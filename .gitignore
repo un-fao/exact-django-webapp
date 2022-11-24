@@ -3,6 +3,14 @@
 # Learn more about .gitignore:
 #     https://www.atlassian.com/git/tutorials/saving-changes/gitignore
 
+# Ignore env directory
+*.pyc
+__pycache__
+db.sqlite3
+/env
+*.env
+.vscode
+
 # Node artifact files
 node_modules/
 dist/
