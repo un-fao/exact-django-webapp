@@ -131,7 +131,7 @@ def calc_defo_result(defo: DeforestationInput, project: Project):
         defo.ha_w_rate.name,
         defo.ha_w_rate.value,
         total_biomass.value,
-        None,
+        defo.final_rcs_biomass_t2, # total_biomass t2
         project.gw_potential.n2o,
         project.gw_potential.ch4,
         defo.is_fire_used,
@@ -139,21 +139,21 @@ def calc_defo_result(defo: DeforestationInput, project: Project):
         combustion_factor.ch4,
         combustion_factor.value,
         moisture_factor.value,
-        mangroves_data.litter if mangroves_data is not None else defo_table.litter,
-        None,
-        mangroves_data.dw if mangroves_data is not None else defo_table.dw,
-        None,
+        defo_table.litter if mangroves_data is None else mangroves_data.litter,
+        defo.rcs_litter_t2, # litter t2
+        defo_table.dw if mangroves_data is None else mangroves_data.dw,
+        defo.rcs_deadwood_t2, # deadwood t2
         defo.hwp,
         MANGROVE_FACTOR if mangroves_data is not None else NON_MANGROVE_FACTOR,
-        None,
-        None,
+        defo.rcs_bg_t2, # bg t2
+        defo.rcs_ag_t2, # ag t2
         flu.value,
-        mangroves_data.agb_c if mangroves_data is not None else ag_biomass.value,
-        mangroves_data.bgb if mangroves_data is not None else bg_biomass.value,
+        ag_biomass.value if mangroves_data is None else mangroves_data.agb_c,
+        bg_biomass.value if mangroves_data is None else mangroves_data.bgb,
         CN_RATIO_FOREST,
-        None,
+        defo.final_rcs_soil_c_t2, # soil after defo t2
         soc_ref.value,
-        None
+        defo.rcs_soil_c_t2 # soil t2
     ]
 
     total_w, total_wo, balance = defo_math.GHG_emissions(*inputs)
