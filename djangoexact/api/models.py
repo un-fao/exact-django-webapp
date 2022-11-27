@@ -297,6 +297,19 @@ class DeforestationInput(LandUseInput):
 
 class AfforestationInput(LandUseInput):
     # TODO: Add T2 values
+
+    initial_biomass_t2 = FloatField()
+    initial_soil_carbon_t2 = FloatField()
+    final_ag_biomass_le_20yrs_t2 = FloatField()
+    final_ag_biomass_gt_20yrs_t2 = FloatField()
+    final_bg_biomass_le_20yrs_t2 = FloatField()
+    final_bg_biomass_gt_20yrs_t2 = FloatField()
+    final_rcs_t2 = FloatField()
+    final_litter_t2 = FloatField()
+    final_dw_t2 = FloatField()
+    final_soil_carbon_t2 = FloatField()
+
+    yearly_ghg_t2 = FloatField()
     
     def __str__(self):
         return f"AfforestationInput for {self.vegetation_type.name}"
