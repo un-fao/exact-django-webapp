@@ -1,5 +1,6 @@
 import time
 from .models import *
+from ipcc.models import *
 from typing import List
 from .utilities import *
 from .serializers import *
@@ -100,15 +101,15 @@ def calc_defo_result(defo: DeforestationInput, project: Project):
     defo_table = None
 
     # Get the IPCC data
-    soc_ref = IPCCSoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil=soil_type)
-    total_biomass = IPCCTotalBiomassAfterDefo.objects.get(climate=climate, moisture=moisture, continent=continent, vegetation_type=vegetation_type)
+    soc_ref = SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil=soil_type)
+    total_biomass = TotalBiomassAfterDefo.objects.get(climate=climate, moisture=moisture, continent=continent, vegetation_type=vegetation_type)
 
     # NOTE: Maybe merge the mangroves and deforestation IPCC tables into one table?
     # NOTE: Maybe use Redis to further improve performance
     if(defo.vegetation_type != MANGROVES):
-        defo_table = IPCCLitterDeadwoodCarbonStock.objects.get(forest=vegetation_type)
-        ag_biomass = IPCCAboveGroundBiomass.objects.get(continent=continent, vegetation_type=vegetation_type)
-        bg_biomass = IPCCBelowGroundBiomass.objects.filter(continent=continent, vegetation_type=vegetation_type)
+        defo_table = LitterDeadwoodCarbonStock.objects.get(forest=vegetation_type)
+        ag_biomass = AboveGroundBiomass.objects.get(continent=continent, vegetation_type=vegetation_type)
+        bg_biomass = BelowGroundBiomass.objects.filter(continent=continent, vegetation_type=vegetation_type)
 
         # Gets the row matching the lowest threshold value above the ag_biomass threshold limit
         # NOTE: If a new, highest threshold is added to the db, this can return the wrong value unless the old highest threshold is set to a proper value
@@ -116,11 +117,11 @@ def calc_defo_result(defo: DeforestationInput, project: Project):
         # NOTE: For more than ~50 inputs, 25% improvement in performance by merging with the query above.
         bg_biomass = bg_biomass.filter(Q(threshold__gt=ag_biomass.value) | Q(threshold__isnull=True)).order_by('threshold').first()
     else:
-        mangroves_data = IPCCDataOnMangroves.objects.get(continent=continent)
+        mangroves_data = DataOnMangroves.objects.get(continent=continent)
 
-    combustion_factor = IPCCCombustionFactorValues.objects.get(vegetation_type=vegetation_type)
-    moisture_factor = IPCCDefaultEmissionFactors.objects.get(moisture=moisture)
-    flu = IPCCLandUseStockExchangeFactor.objects.get(climate=climate, moisture=moisture, agroforestry_system=land_use_type)
+    combustion_factor = CombustionFactorValues.objects.get(vegetation_type=vegetation_type)
+    moisture_factor = DefaultEmissionFactors.objects.get(moisture=moisture)
+    flu = LandUseStockExchangeFactor.objects.get(climate=climate, moisture=moisture, agroforestry_system=land_use_type)
     
     inputs = [
         defo.ha_start,

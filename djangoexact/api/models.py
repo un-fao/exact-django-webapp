@@ -124,114 +124,6 @@ class OrganicAmendmentType(Model):
         return self.name
 
 ##############################
-############# IPCC ###########
-##############################
-
-class IPCCGlobalWarmingPotential(Model):
-    name = CharField(max_length=100)
-    co2 = FloatField()
-    ch4 = FloatField()
-    n2o = FloatField()
-
-    def __str__(self):
-        return self.name
-
-class IPCCNitrousEmissionFactor(Model):
-    name = CharField(max_length=100)
-    moisture_type = ForeignKey(Moisture, on_delete=CASCADE)
-    value = FloatField()
-
-    def __str__(self):
-        return self.name
-
-class IPCCTotalBiomassAfterDefo(Model):
-    climate = ForeignKey(Climate, on_delete=CASCADE)
-    moisture = ForeignKey(Moisture, on_delete=CASCADE)
-    continent = ForeignKey(Continent, on_delete=CASCADE)
-    vegetation_type = ForeignKey(VegetationType, on_delete=CASCADE)
-    value = FloatField()
-
-class IPCCDataOnMangroves(Model):
-    # TODO: Merge this and deforestation table?
-    climate = ForeignKey(Climate, on_delete=CASCADE)
-    moisture = ForeignKey(Moisture, on_delete=CASCADE)
-    agb_dry_matter = FloatField()
-    c_fraction = FloatField()
-    agb_c = FloatField()
-    agb_growth = FloatField()
-    r = FloatField()
-    bgb = FloatField()
-    litter  = FloatField()
-    dw = FloatField()
-    soc_ref = FloatField()
-
-    def __str__(self):
-        return f"{self.climate.name} {self.moisture.name}, dry_matter: {self.agb_dry_matter}, c_fraction: {self.c_fraction}, agb_c: {self.agb_c}, agb_growth: {self.agb_growth}, r: {self.r}, bgb: {self.bgb}, litter: {self.litter}, dw: {self.dw}, soc_ref: {self.soc_ref}"
-
-class IPCCCombustionFactorValues(Model):
-    # TODO: Merge Forest and AgroforestrySystemType into one model?
-    vegetation_type = ForeignKey(VegetationType, on_delete=CASCADE)
-    co2 = FloatField()
-    ch4 = FloatField()
-    n2o = FloatField()
-    value = FloatField()
-
-    def __str__(self):
-        return f"Factor for {self.vegetation_type.name}, value: {self.value}"
-
-class IPCCDefaultEmissionFactors(Model):
-    input = ForeignKey(Input, on_delete=CASCADE)
-    moisture = ForeignKey(Moisture, on_delete=CASCADE)
-    value = FloatField()
-
-    def __str__(self):
-        return f"Factor for {self.moisture.name}, value: {self.value}"
-
-class IPCCLitterDeadwoodCarbonStock(Model):
-    forest = ForeignKey(VegetationType, on_delete=CASCADE)
-    litter = FloatField()
-    dw = FloatField()
-
-    def __str__(self):
-        return f"{self.forest.name}, litter: {self.litter}, dw: {self.dw}"
-
-class IPCCLandUseStockExchangeFactor(Model):
-    climate = ForeignKey(Climate, on_delete=CASCADE)
-    moisture = ForeignKey(Moisture, on_delete=CASCADE)
-    agroforestry_system = ForeignKey(LandUseType, on_delete=CASCADE)
-    value = FloatField()
-
-class IPCCSoilOrcanicCarbonCNRatio(Model):
-    land_use_type = ForeignKey(LandUseType, on_delete=CASCADE, limit_choices_to={'parent': None})
-    value = FloatField()
-
-class IPCCAboveGroundBiomass(Model):
-    continent = ForeignKey(Continent, on_delete=CASCADE)
-    vegetation_type = ForeignKey(VegetationType, on_delete=CASCADE)
-    value = FloatField()
-
-    def __str__(self):
-        return f"{self.continent.name} {self.vegetation_type.name}, value: {self.value}"
-
-class IPCCBelowGroundBiomass(Model):
-    continent = ForeignKey(Continent, on_delete=CASCADE)
-    vegetation_type = ForeignKey(VegetationType, on_delete=CASCADE)
-    threshold = FloatField(null=True, blank=True) # Maximum acceptable ag_biomass needed for this value to be chosen
-    value = FloatField()
-
-    def __str__(self):
-        return f"{self.continent.name} {self.vegetation_type.name}, threshold: {self.threshold}, value: {self.value}"
-
-class IPCCSoilOrganicCarbon(Model):
-    climate = ForeignKey(Climate, on_delete=CASCADE)
-    moisture = ForeignKey(Moisture, on_delete=CASCADE)
-    soil = ForeignKey(SoilType, on_delete=CASCADE)
-    value = FloatField()
-
-    def __str__(self):
-        return f"{self.climate} {self.moisture} for {self.soil} soil"
-
-##############################
 ############ FORMS ###########
 ##############################
 
@@ -257,9 +149,9 @@ class Project(Model):
     moisture = ForeignKey(Moisture, on_delete=CASCADE)
     soil_type = ForeignKey(SoilType, on_delete=CASCADE)
 
-    gw_potential = ForeignKey(IPCCGlobalWarmingPotential, on_delete=CASCADE)
+    gw_potential = ForeignKey('ipcc.GlobalWarmingPotential', on_delete=CASCADE)
 
-    soc_ref = ForeignKey(IPCCSoilOrganicCarbon, on_delete=CASCADE)
+    soc_ref = ForeignKey('ipcc.SoilOrganicCarbon', on_delete=CASCADE)
 
     def __str__(self):
         return self.name
@@ -298,18 +190,17 @@ class DeforestationInput(LandUseInput):
 class AfforestationInput(LandUseInput):
     # TODO: Add T2 values
 
-    initial_biomass_t2 = FloatField()
-    initial_soil_carbon_t2 = FloatField()
-    final_ag_biomass_le_20yrs_t2 = FloatField()
-    final_ag_biomass_gt_20yrs_t2 = FloatField()
-    final_bg_biomass_le_20yrs_t2 = FloatField()
-    final_bg_biomass_gt_20yrs_t2 = FloatField()
-    final_rcs_t2 = FloatField()
-    final_litter_t2 = FloatField()
-    final_dw_t2 = FloatField()
-    final_soil_carbon_t2 = FloatField()
+    initial_biomass_t2 = FloatField(null=True, blank=True)
+    initial_soil_carbon_t2 = FloatField(null=True, blank=True)
+    final_ag_biomass_le_20yrs_t2 = FloatField(null=True, blank=True)
+    final_bg_biomass_le_20yrs_t2 = FloatField(null=True, blank=True)
+    final_bg_biomass_gt_20yrs_t2 = FloatField(null=True, blank=True)
+    final_rcs_t2 = FloatField(null=True, blank=True)
+    final_litter_t2 = FloatField(null=True, blank=True)
+    final_dw_t2 = FloatField(null=True, blank=True)
+    final_soil_carbon_t2 = FloatField(null=True, blank=True)
 
-    yearly_ghg_t2 = FloatField()
+    yearly_ghg_t2 = FloatField(null=True, blank=True)
     
     def __str__(self):
         return f"AfforestationInput for {self.vegetation_type.name}"
