@@ -57,3 +57,4 @@ Thumbs.db
 *.wmv
 
 djangoexact/db.json
+djangoexact/djangoexact/redis.py
