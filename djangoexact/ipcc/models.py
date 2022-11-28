@@ -21,8 +21,12 @@ class TotalBiomassAfterDefo(Model):
     climate = ForeignKey('api.Climate', on_delete=CASCADE)
     moisture = ForeignKey('api.Moisture', on_delete=CASCADE)
     continent = ForeignKey('api.Continent', on_delete=CASCADE)
-    vegetation_type = ForeignKey('api.VegetationType', on_delete=CASCADE)
-    value = FloatField()
+    land_use_type = ForeignKey('api.LandUseType', on_delete=CASCADE)
+    year = IntegerField(null=True)
+    value = FloatField(null=True)
+
+    def __str__(self):
+        return f"Climate: {self.climate}, Moisture: {self.moisture}, Continent: {self.continent}, Land Use Type: {self.land_use_type}, Year: {self.year}, Value: {self.value}"
 
 class DataOnMangroves(Model):
     # TODO: Merge this and deforestation table?
@@ -43,9 +47,9 @@ class DataOnMangroves(Model):
 
 class CombustionFactorValues(Model):
     vegetation_type = ForeignKey('api.VegetationType', on_delete=CASCADE)
-    co2 = FloatField()
-    ch4 = FloatField()
-    n2o = FloatField()
+    co2 = FloatField(null=True)
+    ch4 = FloatField(null=True)
+    n2o = FloatField(null=True)
     value = FloatField()
 
     def __str__(self):
@@ -57,21 +61,24 @@ class DefaultEmissionFactors(Model):
     value = FloatField()
 
     def __str__(self):
-        return f"Factor for {self.moisture.name}, value: {self.value}"
+        return f"Factor for {self.moisture.name}, {self.input}, value: {self.value}"
 
 class LitterDeadwoodCarbonStock(Model):
-    forest = ForeignKey('api.VegetationType', on_delete=CASCADE)
+    vegetation_type = ForeignKey('api.VegetationType', on_delete=CASCADE)
     litter = FloatField()
     dw = FloatField()
 
     def __str__(self):
-        return f"{self.forest.name}, litter: {self.litter}, dw: {self.dw}"
+        return f"{self.vegetation_type.name}, litter: {self.litter}, dw: {self.dw}"
 
 class LandUseStockExchangeFactor(Model):
     climate = ForeignKey('api.Climate', on_delete=CASCADE)
     moisture = ForeignKey('api.Moisture', on_delete=CASCADE)
-    agroforestry_system = ForeignKey('api.LandUseType', on_delete=CASCADE)
+    land_use_type = ForeignKey('api.LandUseType', on_delete=CASCADE)
     value = FloatField()
+
+    def __str__(self):
+        return f"{self.climate.name} {self.moisture.name} {self.land_use_type.name}, value: {self.value}"
 
 class SoilOrcanicCarbonCNRatio(Model):
     land_use_type = ForeignKey('api.LandUseType', on_delete=CASCADE, limit_choices_to={'parent': None})
@@ -97,8 +104,8 @@ class BelowGroundBiomass(Model):
 class SoilOrganicCarbon(Model):
     climate = ForeignKey('api.Climate', on_delete=CASCADE)
     moisture = ForeignKey('api.Moisture', on_delete=CASCADE)
-    soil = ForeignKey('api.SoilType', on_delete=CASCADE)
-    value = FloatField()
+    soil_type = ForeignKey('api.SoilType', on_delete=CASCADE)
+    value = FloatField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.climate} {self.moisture} for {self.soil} soil"
+        return f"{self.climate} {self.moisture} for {self.soil_type} soil, value {self.value}"
