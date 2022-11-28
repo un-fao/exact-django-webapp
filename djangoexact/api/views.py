@@ -17,12 +17,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
     serializer_class = ProjectSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def create(self, request, *args, **kwargs):
-        """
-        Create a new project
-        """
-        return super().create(request, *args, **kwargs)
-
 class DeforestationInputViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows deforestation inputs to be viewed or edited.
@@ -101,13 +95,14 @@ def calc_defo_result(defo: DeforestationInput, project: Project):
     defo_table = None
 
     # Get the IPCC data
-    soc_ref = SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil=soil_type)
-    total_biomass = TotalBiomassAfterDefo.objects.get(climate=climate, moisture=moisture, continent=continent, vegetation_type=vegetation_type)
-
+    soc_ref = SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
+    total_biomass = TotalBiomassAfterDefo.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
+    
     # NOTE: Maybe merge the mangroves and deforestation IPCC tables into one table?
     # NOTE: Maybe use Redis to further improve performance
     if(defo.vegetation_type != MANGROVES):
-        defo_table = LitterDeadwoodCarbonStock.objects.get(forest=vegetation_type)
+        defo_table = LitterDeadwoodCarbonStock.objects.get(vegetation_type=vegetation_type)
+        print(f"Continent: {continent}, Vegetation type: {vegetation_type}")
         ag_biomass = AboveGroundBiomass.objects.get(continent=continent, vegetation_type=vegetation_type)
         bg_biomass = BelowGroundBiomass.objects.filter(continent=continent, vegetation_type=vegetation_type)
 
@@ -121,7 +116,7 @@ def calc_defo_result(defo: DeforestationInput, project: Project):
 
     combustion_factor = CombustionFactorValues.objects.get(vegetation_type=vegetation_type)
     moisture_factor = DefaultEmissionFactors.objects.get(moisture=moisture)
-    flu = LandUseStockExchangeFactor.objects.get(climate=climate, moisture=moisture, agroforestry_system=land_use_type)
+    flu = LandUseStockExchangeFactor.objects.get(climate=climate, moisture=moisture, land_use_type=land_use_type)
     
     inputs = [
         defo.ha_start,
@@ -131,7 +126,7 @@ def calc_defo_result(defo: DeforestationInput, project: Project):
         project.capitalization_duration_yrs,
         defo.ha_w_rate.name,
         defo.ha_w_rate.value,
-        total_biomass.value,
+        total_biomass.value if total_biomass.value is not None else 0,
         defo.final_rcs_biomass_t2, # total_biomass t2
         project.gw_potential.n2o,
         project.gw_potential.ch4,
@@ -153,7 +148,7 @@ def calc_defo_result(defo: DeforestationInput, project: Project):
         bg_biomass.value if mangroves_data is None else mangroves_data.bgb,
         CN_RATIO_FOREST,
         defo.final_rcs_soil_c_t2, # soil after defo t2
-        soc_ref.value,
+        soc_ref.value if soc_ref.value is not None else 0,
         defo.rcs_soil_c_t2 # soil t2
     ]
 
