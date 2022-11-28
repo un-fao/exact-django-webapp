@@ -6,7 +6,7 @@ from .utilities import *
 from .serializers import *
 from django.db.models import Q
 from rest_framework.response import Response
-from . import deforestation_functions as defo_math
+from math_model import defo as defo_math
 from rest_framework import viewsets, status, permissions
 
 class ProjectViewSet(viewsets.ModelViewSet):
