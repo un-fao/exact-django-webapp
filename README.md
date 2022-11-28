@@ -22,3 +22,8 @@
 10. Run command `python -m django manage.py migrate`
 11. Run command `django manage.py runserver`
 12. Enjoy
+
+### How to dump IPCC Data in your local Database
+1. Make sure you have installed 'django_extensions' with pip
+2. Run `python manage.py runscript ipcc_dump`
+3. Wait for termination
