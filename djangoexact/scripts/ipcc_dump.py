@@ -6,6 +6,7 @@ def sanitize(s:str):
     return s.replace('ï»¿', '').title().strip()
 
 def run():
+    """
     with(open('scripts\ipcc_data\AboveGroundBiomass.csv', 'rU')) as f:
 
         reader = csv.reader(f)
@@ -20,24 +21,24 @@ def run():
 
     with(open('scripts\ipcc_data\BelowGroundBiomass.csv', 'rU')) as f:
 
-        reader = csv.reader(f)
-        header = next(reader, None)
-        thresholds = next(reader, None)
-        data = list(reader)
+    reader = csv.reader(f)
+    header = next(reader, None)
+    thresholds = next(reader, None)
+    data = list(reader)
 
-        for i, head in enumerate(header):
-            threshold = sanitize(thresholds[i])
-            if threshold == '> 125' or threshold == '> 75':
-                threshold = None
-            elif '125' in threshold:
-                threshold = 125
-            elif '75' in threshold:
-                threshold = 75
+    for i, head in enumerate(header):
+        threshold = sanitize(thresholds[i])
+        if threshold == '> 125' or threshold == '>75':
+            threshold = None
+        elif '125' in threshold:
+            threshold = 125
+        elif '75' in threshold:
+            threshold = 75
 
-            vegetation_type = VegetationType.objects.get_or_create(name=sanitize(head))[0]
-            for row in data:
-                continent = Continent.objects.get_or_create(name=sanitize(row[0]))[0]
-                BelowGroundBiomass.objects.get_or_create(vegetation_type=vegetation_type, continent=continent, threshold=threshold, value=row[i+1])
+        vegetation_type = VegetationType.objects.get_or_create(name=sanitize(head))[0]
+        for row in data:
+            continent = Continent.objects.get_or_create(name=sanitize(row[0]))[0]
+            BelowGroundBiomass.objects.get_or_create(vegetation_type=vegetation_type, continent=continent, threshold=threshold, value=row[i+1])
 
     with(open('scripts\ipcc_data\TotalBiomassAfterDefo.csv', 'rU')) as f:
             
@@ -143,5 +144,81 @@ def run():
             input = Input.objects.get_or_create(name=sanitize(row[0]))[0]
             moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
             DefaultEmissionFactors.objects.get_or_create(input=input, moisture=moisture, value=row[2])
-    
+
+    with(open('scripts\ipcc_data\ForestTotalBiomass.csv', 'rU')) as f:
+
+        reader = csv.reader(f)
+        header = next(reader, None)
+        data = list(reader)
+
+        for i, head in enumerate(header):
+            head = sanitize(head)
+            if head == '': continue
+            land_use_type = LandUseType.objects.get_or_create(name=head)[0]
+            for row in data:
+                if row[i+3] == '': continue
+                climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
+                moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
+                continent = Continent.objects.get_or_create(name=sanitize(row[2]))[0]
+                value = row[i+3]
+                ForestTotalBiomass.objects.get_or_create(land_use_type=land_use_type, climate=climate, moisture=moisture, continent=continent, value=value)
+
+    with(open('scripts\ipcc_data\AfforestationLandUseStockExchangeFactor.csv', 'rU')) as f:
+
+        reader = csv.reader(f)
+        header = next(reader, None)
+        data = list(reader)
+
+        for i, head in enumerate(header):
+            head = sanitize(head)
+            if head == '': continue
+            land_use_type = LandUseType.objects.get_or_create(name=head)[0]
+            for row in data:
+                if row[i+2] == '': continue
+                climate = Climate.objects.get_or_create(name=sanitize(sanitize(row[0])))[0]
+                moisture = Moisture.objects.get_or_create(name=sanitize(sanitize(row[1])))[0]
+                value = row[i+2]
+                AfforestationLandUseStockExchangeFactor.objects.get_or_create(land_use_type=land_use_type, climate=climate, moisture=moisture, value=value)
+
+    with(open('scripts\ipcc_data\AboveGroundNetBiomassGrowth.csv', 'rU')) as f:
+
+        reader = csv.reader(f)
+        data = list(reader)
+
+        for row in data:
+            
+            vegetation_type = VegetationType.objects.get_or_create(name=sanitize(row[0]))[0]
+            continent = Continent.objects.get_or_create(name=sanitize(row[1]))[0]
+            value_after_20_years = row[2]
+            value_upto_20_years = row[3]
+            AboveGroundNetBiomassGrowth.objects.get_or_create(
+                vegetation_type=vegetation_type, 
+                continent=continent, 
+                value_after_20_years=value_after_20_years, 
+                value_upto_20_years=value_upto_20_years
+            )
+
+    with(open('scripts\ipcc_data\AfforestationCombustionFactorValues.csv', 'rU')) as f:
+            
+        reader = csv.reader(f)
+        header = next(reader, None)
+        data = list(reader)
+
+        cf = 1
+        co2 = 2
+        ch4 = 3
+        n2o = 4
+
+        for row in data:
+
+            land_use_type = LandUseType.objects.get_or_create(name=sanitize(row[0]))[0]
+            AfforestationCombustionFactorValues.objects.get_or_create(
+                land_use_type=land_use_type,
+                value=row[cf],
+                co2=row[co2],
+                ch4=row[ch4],
+                n2o=row[n2o]
+            )
+    """
+
     pass
