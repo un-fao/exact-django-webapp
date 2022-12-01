@@ -55,6 +55,13 @@ class CombustionFactorValues(Model):
     def __str__(self):
         return f"Factor for {self.vegetation_type.name}, value: {self.value}"
 
+class AfforestationCombustionFactorValues(Model):
+    land_use_type = ForeignKey('api.LandUseType', on_delete=CASCADE)
+    co2 = FloatField(null=True)
+    ch4 = FloatField(null=True)
+    n2o = FloatField(null=True)
+    value = FloatField()
+
 class DefaultEmissionFactors(Model):
     input = ForeignKey('api.Input', on_delete=CASCADE)
     moisture = ForeignKey('api.Moisture', on_delete=CASCADE)
@@ -92,14 +99,41 @@ class AboveGroundBiomass(Model):
     def __str__(self):
         return f"{self.continent.name} {self.vegetation_type.name}, value: {self.value}"
 
+class BelowGroundBiomassManager(Manager):
+    def get_max_within_threshold(self, continent, vegetation_type, threshold):
+        return self.filter(
+            continent = continent,
+            vegetation_type = vegetation_type,
+        ).filter(
+            Q(threshold__gt=threshold) 
+          | Q(threshold__isnull=True)
+        ).order_by('threshold').first()
+    
+    def get_highest_value(self, continent, vegetation_type):
+        return self.filter(
+            continent = continent,
+            vegetation_type = vegetation_type,
+            threshold__isnull=True
+        ).order_by('threshold').first()
+    
+    def get_lowest_value(self, continent, vegetation_type):
+        return self.filter(
+            continent = continent,
+            vegetation_type = vegetation_type,
+            threshold__isnull=False
+        ).order_by('threshold').first()
+
 class BelowGroundBiomass(Model):
     continent = ForeignKey('api.Continent', on_delete=CASCADE)
     vegetation_type = ForeignKey('api.VegetationType', on_delete=CASCADE)
     threshold = FloatField(null=True, blank=True) # Maximum acceptable ag_biomass needed for this value to be chosen
     value = FloatField()
+    objects = BelowGroundBiomassManager()
 
     def __str__(self):
         return f"{self.continent.name} {self.vegetation_type.name}, threshold: {self.threshold}, value: {self.value}"
+
+
 
 class SoilOrganicCarbon(Model):
     climate = ForeignKey('api.Climate', on_delete=CASCADE)
@@ -109,3 +143,31 @@ class SoilOrganicCarbon(Model):
 
     def __str__(self):
         return f"{self.climate} {self.moisture} for {self.soil_type} soil, value {self.value}"
+
+class ForestTotalBiomass(Model):
+    climate = ForeignKey('api.Climate', on_delete=CASCADE)
+    moisture = ForeignKey('api.Moisture', on_delete=CASCADE)
+    continent = ForeignKey('api.Continent', on_delete=CASCADE)
+    land_use_type = ForeignKey('api.LandUseType', on_delete=CASCADE)
+    value = FloatField()
+
+    def __str__(self):
+        return f"{self.climate} {self.moisture} for {self.continent} {self.land_use_type}, value {self.value}"
+
+class AfforestationLandUseStockExchangeFactor(Model):
+    climate = ForeignKey('api.Climate', on_delete=CASCADE)
+    moisture = ForeignKey('api.Moisture', on_delete=CASCADE)
+    land_use_type = ForeignKey('api.LandUseType', on_delete=CASCADE)
+    value = FloatField()
+
+    def __str__(self):
+        return f"{self.climate} {self.moisture} for {self.land_use_type}, value {self.value}"
+
+class AboveGroundNetBiomassGrowth(Model):
+    vegetation_type = ForeignKey('api.VegetationType', on_delete=CASCADE)
+    continent = ForeignKey('api.Continent', on_delete=CASCADE)
+    value_after_20_years = FloatField()
+    value_upto_20_years = FloatField()
+
+    def __str__(self):
+        return f"{self.continent} {self.vegetation_type}, value after 20 years: {self.value_after_20_years}, value upto 20 years: {self.value_upto_20_years}"

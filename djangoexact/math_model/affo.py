@@ -52,12 +52,9 @@ def afforestation(ha_w, ha_wo, time_impl, time_cap, initial_biomass, initial_bio
                    reference_carbon_stocks_tier_2 : tier 2 value, expects either Float input from user or None
 
                    # TO ADD TO INPUTS
-                   parametro_1 : above ground bio-mass A591 match region and final land use
-                   parametro_2 : ratio of below ground bio to above ground bio A618 match region and final land use - smaller 125
-                   parametro_3 : ratio of below ground bio to above ground bio A618 match region and final land use - larger 125
-
-
-
+                   abg_biomass : above ground bio-mass A591 match region and final land use
+                   rate_bgb_agb_s_125 : ratio of below ground bio to above ground bio A618 match region and final land use - smaller 125
+                   rate_bgb_agb_b_125 : ratio of below ground bio to above ground bio A618 match region and final land use - larger 125
 
     """
 
