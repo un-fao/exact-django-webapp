@@ -196,6 +196,7 @@ class AfforestationInput(LandUseInput):
     initial_biomass_t2 = FloatField(null=True, blank=True)
     initial_soil_carbon_t2 = FloatField(null=True, blank=True)
     final_ag_biomass_le_20yrs_t2 = FloatField(null=True, blank=True)
+    final_ag_biomass_gt_20yrs_t2 = FloatField(null=True, blank=True)
     final_bg_biomass_le_20yrs_t2 = FloatField(null=True, blank=True)
     final_bg_biomass_gt_20yrs_t2 = FloatField(null=True, blank=True)
     final_rcs_t2 = FloatField(null=True, blank=True)
