@@ -2,7 +2,7 @@
 
 ### Prerequisites
 
-- Python 3.8.0
+- Python 3.11.0
 - Pip
 - Virtualenv (`pip install virtualenv`)
 - Everything added to PATH (if on Windows)

@@ -58,3 +58,4 @@ Thumbs.db
 
 djangoexact/db.json
 djangoexact/djangoexact/redis.py
+requirements.txt.old
