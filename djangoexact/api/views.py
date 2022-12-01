@@ -1,13 +1,15 @@
-import time
 from .models import *
 from ipcc.models import *
-from typing import List
+from typing import List,TypeVar
 from .utilities import *
 from .serializers import *
 from django.db.models import Q
 from rest_framework.response import Response
 from math_model import defo as defo_math
+from math_model import affo as affo_math
 from rest_framework import viewsets, status, permissions
+
+T = TypeVar('T')
 
 class ProjectViewSet(viewsets.ModelViewSet):
     """
@@ -45,25 +47,46 @@ class DeforestationInputViewSet(viewsets.ModelViewSet):
         project = Project.objects.prefetch_related().get(pk=project_id)
         defo_input_list = project.deforestationinput_set.all()
 
-        start_time = time.time()
-
-        # NOTE: Fetch heavy. Local page load reduced to ~400ms by not prefetching unnecessary objects. Async in FE?
-        #       ~400ms seems to be the floor for load time for any page in Django on this machine
-        # TODO: Requires proper performance testing to determine if this is a bottleneck
-        # NOTE: For 101 inputs, local page load is ~2s. Although it's extremely unlikely to have that many inputs.
-        
-        defo_results = calc_defo_results(defo_input_list, project)
-        
-        print("--- %s seconds ---" % (time.time() - start_time))
+        defo_results = calc_results(defo_input_list, project)
         
         serializer = DefoResultsSerializer(defo_results)
         return Response(serializer.data)
 
-def calc_defo_results(input_list: List[DeforestationInput], project:Project):
+class AfforestationInputViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows afforestation inputs to be viewed or edited.
+    """
+    queryset = AfforestationInput.objects.all()
+    serializer_class = AfforestationInputSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-    # TODO: Define proper objects for results
-    defo_results = {
-        "inputs_emissions_list": [],
+    def create(self, request, project_id=None):
+        """
+        Create a new afforestation input.
+        """
+        serializer = AfforestationInputSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def results(self, request, project_id=None, affo_id=None):
+        """
+        Calculate total emissions for all Afforestation inputs.
+        get: Returns total emissions for Afforestation inputs.
+        """
+        project = Project.objects.prefetch_related().get(pk=project_id)
+        affo_input_list = project.afforestationinput_set.all()
+
+        affo_results = calc_results(affo_input_list, project)
+        serializer = AffoResultsSerializer(affo_results)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+def calc_results(input_list: List[T], project:Project):
+
+    results = {
+        "inputs": [],
         "result": {
             "total_w": 0,
             "total_wo": 0,
@@ -73,14 +96,120 @@ def calc_defo_results(input_list: List[DeforestationInput], project:Project):
 
     for input in input_list:
 
-        result = calc_defo_result(input, project)
+        match input.__class__.__name__:
+            case "DeforestationInput":
+                result = calc_defo_result(input, project)
+            case "AfforestationInput":
+                result = calc_affo_result(input, project)
+            case _:
+                raise Exception("Invalid input type")
 
-        defo_results["inputs_emissions_list"].append({'input': input, 'result': result})
-        defo_results["result"]["total_w"] += result["total_w"]
-        defo_results["result"]["total_wo"] += result["total_wo"]
-        defo_results["result"]["balance"] += result["balance"]
+        results["inputs"].append({'input': input, 'result': result})
+        results["result"]["total_w"] += result["total_w"]
+        results["result"]["total_wo"] += result["total_wo"]
+        results["result"]["balance"] += result["balance"]
 
-    return defo_results
+    return results
+
+def calc_affo_result(input: AfforestationInput, project:Project):
+    """
+    Calculate emissions for a single Afforestation input.
+    """
+
+    initial_biomass = ForestTotalBiomass.objects.get(
+        climate = project.climate,
+        moisture = project.moisture,
+        continent = project.continent,
+        land_use_type = input.land_use_type
+    )
+
+    combustion_factor = AfforestationCombustionFactorValues.objects.get(land_use_type = input.land_use_type)
+    
+    # NOTE: Maybe merge all LandUseStockExchangeFactors and filter by model?
+    flu = AfforestationLandUseStockExchangeFactor.objects.get(
+        climate = project.climate,
+        moisture = project.moisture,
+        land_use_type = input.land_use_type
+    )
+
+    litter_dw = LitterDeadwoodCarbonStock.objects.get(vegetation_type = input.vegetation_type)
+
+    ag_net_biomass = AboveGroundNetBiomassGrowth.objects.get(
+        vegetation_type = input.vegetation_type,
+        continent = project.continent
+    )
+
+    bg_biomass_before_20_yrs = BelowGroundBiomass.objects.get_max_within_threshold(
+        continent = project.continent,
+        vegetation_type = input.vegetation_type,
+        threshold = ag_net_biomass.value_upto_20_years
+    )
+    bg_biomass_after_20_yrs = BelowGroundBiomass.objects.get_max_within_threshold(
+        continent = project.continent,
+        vegetation_type = input.vegetation_type,
+        threshold = ag_net_biomass.value_after_20_years
+    )
+
+    ag_biomass = AboveGroundBiomass.objects.get(
+        continent = project.continent,
+        vegetation_type = input.vegetation_type
+    )
+
+    bg_biomass_le_125 = BelowGroundBiomass.objects.get_lowest_value(
+        continent = project.continent,
+        vegetation_type = input.vegetation_type,
+    )
+
+    bg_biomass_gt_125 = BelowGroundBiomass.objects.get_highest_value(
+        continent = project.continent,
+        vegetation_type = input.vegetation_type,
+    )
+
+    inputs = [
+        input.ha_w,
+        input.ha_wo,
+        project.implementation_duration_yrs,
+        project.capitalization_duration_yrs,
+        initial_biomass.value,
+        input.initial_biomass_t2,
+        input.is_fire_used,
+        project.gw_potential.n2o,
+        project.gw_potential.ch4,
+        combustion_factor.ch4,
+        combustion_factor.n2o,
+        combustion_factor.value,
+        input.ha_w_rate.name,
+        input.ha_w_rate.value,
+        flu.value,
+        project.soc_ref.value,
+        None, # TODO: Add project.soc_ref_t2
+        litter_dw.dw,
+        input.final_dw_t2,
+        litter_dw.litter,
+        input.final_litter_t2,
+        ag_net_biomass.value_upto_20_years,
+        ag_net_biomass.value_after_20_years,
+        bg_biomass_before_20_yrs.value,
+        bg_biomass_after_20_yrs.value,
+        input.final_ag_biomass_le_20yrs_t2,
+        input.final_ag_biomass_gt_20yrs_t2,
+        input.final_bg_biomass_le_20yrs_t2,
+        input.final_bg_biomass_gt_20yrs_t2,
+        input.final_rcs_t2,
+        ag_biomass.value,
+        bg_biomass_le_125.value,
+        bg_biomass_gt_125.value
+    ]
+    
+    total_w, total_wo, balance = affo_math.afforestation(*inputs)
+
+    results = {
+        "total_w": total_w,
+        "total_wo": total_wo,
+        "balance": balance
+    }
+
+    return results
 
 def calc_defo_result(defo: DeforestationInput, project: Project):
 
@@ -99,7 +228,6 @@ def calc_defo_result(defo: DeforestationInput, project: Project):
     total_biomass = TotalBiomassAfterDefo.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
     
     # NOTE: Maybe merge the mangroves and deforestation IPCC tables into one table?
-    # NOTE: Maybe use Redis to further improve performance
     if(defo.vegetation_type != MANGROVES):
         defo_table = LitterDeadwoodCarbonStock.objects.get(vegetation_type=vegetation_type)
         print(f"Continent: {continent}, Vegetation type: {vegetation_type}")
