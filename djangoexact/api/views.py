@@ -8,80 +8,97 @@ from rest_framework.response import Response
 from math_model import defo as defo_math
 from math_model import affo as affo_math
 from rest_framework import viewsets, status, permissions
+from rest_framework.decorators import api_view
 
 T = TypeVar('T')
 
-class ProjectViewSet(viewsets.ModelViewSet):
+class AuthenticatedViewSet(viewsets.GenericViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+
+class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
     API endpoint that allows projects to be viewed or edited.
     """
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
-class DeforestationInputViewSet(viewsets.ModelViewSet):
+class DeforestationInputViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
     API endpoint that allows deforestation inputs to be viewed or edited.
     """
     queryset = DeforestationInput.objects.all()
-    serializer_class = DeforestationInputSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = getGenericSerializer(DeforestationInput)
 
     def create(self, request, project_id=None):
         """
         Create a new deforestation input.
         """
-        serializer = DeforestationInputSerializer(data=request.data)
+        serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # TODO: GET results for single input?
-    def results(self, request, project_id=None, defo_id=None):
+    def results(self, request, project_id=None):
         """
         Calculate total emissions for all Deforestation inputs.
-        get: Returns total emissions for Deforestation inputs.
+        get: Returns list of emissions for each input and the total of all inputs
         TODO: Communicate with FE on the structure and format of the real response.
         """
         project = Project.objects.prefetch_related().get(pk=project_id)
         defo_input_list = project.deforestationinput_set.all()
 
         defo_results = calc_results(defo_input_list, project)
-        
-        serializer = DefoResultsSerializer(defo_results)
+
+        serializer = getGenericResultsSerializer(DeforestationInput)(defo_results)
         return Response(serializer.data)
 
-class AfforestationInputViewSet(viewsets.ModelViewSet):
+class AfforestationInputViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
     API endpoint that allows afforestation inputs to be viewed or edited.
     """
     queryset = AfforestationInput.objects.all()
-    serializer_class = AfforestationInputSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def create(self, request, project_id=None):
-        """
-        Create a new afforestation input.
-        """
-        serializer = AfforestationInputSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    serializer_class = getGenericSerializer(AfforestationInput)
     
-    def results(self, request, project_id=None, affo_id=None):
+    def results(self, request, project_id=None):
         """
         Calculate total emissions for all Afforestation inputs.
-        get: Returns total emissions for Afforestation inputs.
+        get: Returns list of emissions for each input and the total of all inputs
         """
         project = Project.objects.prefetch_related().get(pk=project_id)
         affo_input_list = project.afforestationinput_set.all()
 
+        errors = validate_inputs(affo_input_list)
+        if len(errors["errors"]) > 0:
+            return Response(data=errors, status=status.HTTP_400_BAD_REQUEST)
+
         affo_results = calc_results(affo_input_list, project)
-        serializer = AffoResultsSerializer(affo_results)
+        serializer = getGenericResultsSerializer(DeforestationInput)(affo_results)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class AnnualCroppingInputViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    
+    queryset = AnnualCroppingInput.objects.all()
+    serializer_class = getGenericSerializer(AnnualCroppingInput)
+
+    def results(self, request, project_id=None):
+        """
+        Calculate total emissions for all Deforestation inputs.
+        get: Returns list of emissions for each input and the total of all inputs
+        TODO: Communicate with FE on the structure and format of the real response.
+        """
+        project = Project.objects.prefetch_related().get(pk=project_id)
+        annuals = project.annualcroppinginput_set.all()
+
+        errors = validate_inputs(annuals)
+        if len(errors["errors"]) > 0:
+            return Response(data=errors, status=status.HTTP_400_BAD_REQUEST)
+
+        defo_results = calc_results(annuals, project)
+        
+        serializer = getGenericSerializer(AnnualCroppingInput)(defo_results)
+        return Response(serializer.data)
 
 def calc_results(input_list: List[T], project:Project):
 
@@ -110,6 +127,19 @@ def calc_results(input_list: List[T], project:Project):
         results["result"]["balance"] += result["balance"]
 
     return results
+
+@api_view(['GET'])
+def check_uncompleted_modules(request, project_id=None):
+    """
+    Check if there are any uncompleted modules in the project.
+    """
+    project = Project.objects.prefetch_related().get(pk=project_id)
+    uncompleted_modules = {}
+
+    uncompleted_modules["defo"] = validate_inputs(project.deforestationinput_set.all())
+    uncompleted_modules["affo"] = validate_inputs(project.afforestationinput_set.all())
+
+    return Response(data=uncompleted_modules, status=status.HTTP_200_OK)
 
 def calc_affo_result(input: AfforestationInput, project:Project):
     """
@@ -289,3 +319,36 @@ def calc_defo_result(defo: DeforestationInput, project: Project):
     }
 
     return results
+
+def validate_inputs(inputs: List[T]) -> dict:
+    """
+    Validates inputs for a module.
+
+    Args:
+        inputs (List[T]): List of inputs to validate.
+    
+    Returns:
+        dict: Object containing a list of errors.
+        
+        {
+            "errors": [
+                {
+                    "error": "Error message",
+                    "input_id": 1
+                }
+            ]
+        }
+    """
+
+    errors = { "errors": []}
+
+    for input in inputs:
+        is_father = input.land_use_type.parent is None
+        if not is_father and input.child_input is None:
+            errors["errors"].append(
+                {
+                    "error": f"Required input not found for input '{input.land_use_type.name}'. Please fill the {input.land_use_type.parent.name} module.", 
+                    "input_id": input.id
+                }
+            )
+    return errors

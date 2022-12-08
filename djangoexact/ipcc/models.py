@@ -62,6 +62,9 @@ class AfforestationCombustionFactorValues(Model):
     n2o = FloatField(null=True)
     value = FloatField()
 
+    def __str__(self):
+        return f"Factor for {self.land_use_type.name}, value: {self.value}"
+
 class DefaultEmissionFactors(Model):
     input = ForeignKey('api.Input', on_delete=CASCADE)
     moisture = ForeignKey('api.Moisture', on_delete=CASCADE)
@@ -121,7 +124,7 @@ class BelowGroundBiomassManager(Manager):
             continent = continent,
             vegetation_type = vegetation_type,
             threshold__isnull=False
-        ).order_by('threshold').first()
+        ).order_by('-threshold').first()
 
 class BelowGroundBiomass(Model):
     continent = ForeignKey('api.Continent', on_delete=CASCADE)
