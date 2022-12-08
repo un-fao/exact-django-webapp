@@ -7,40 +7,35 @@ class ProjectSerializer(serializers.ModelSerializer):
         model = Project
         fields = '__all__'
 
-class DeforestationInputSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DeforestationInput
-        fields = '__all__'
-
-class AfforestationInputSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AfforestationInput
-        fields = '__all__'
-
 # TODO: Make generic serializer for results
 
-class AffoResultSerializer(serializers.Serializer):
-    total_w = serializers.FloatField()
-    total_wo = serializers.FloatField()
-    balance = serializers.FloatField()
 
-class AffoResultInputSerializer(serializers.Serializer):
-    input = AfforestationInputSerializer()
-    result = AffoResultSerializer()
+def getGenericResultsSerializer(model_arg):
 
-class AffoResultsSerializer(serializers.Serializer):
-    inputs = AffoResultInputSerializer(many=True)
-    result = AffoResultSerializer()
+    class ResultSerializer(serializers.Serializer):
+        total_w = serializers.FloatField()
+        total_wo = serializers.FloatField()
+        balance = serializers.FloatField()
 
-class DefoResultSerializer(serializers.Serializer):
-    total_w = serializers.FloatField()
-    total_wo = serializers.FloatField()
-    balance = serializers.FloatField()
+    class GenericSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = model_arg
+            fields = '__all__'
 
-class DefoResultInputSerializer(serializers.Serializer):
-    input = DeforestationInputSerializer()
-    result = DefoResultSerializer()
+    class GenericResultInputsSerializer(serializers.Serializer):
+        input = GenericSerializer()
+        result = ResultSerializer()
 
-class DefoResultsSerializer(serializers.Serializer):
-    inputs = DefoResultInputSerializer(many=True)
-    result = DefoResultSerializer()
+    class GenericResultsSerializer(serializers.Serializer):
+        inputs = GenericResultInputsSerializer(many=True)
+        result = ResultSerializer()
+
+    return GenericResultsSerializer
+
+def getGenericSerializer(model_arg):
+    class GenericSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = model_arg
+            fields = '__all__'
+
+    return GenericSerializer
