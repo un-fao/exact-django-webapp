@@ -35,3 +35,8 @@
 1. Make sure you have installed **django_extensions** with pip (check with command `pip list` while inside your virtual environment)
 2. Run `python manage.py runscript ipcc_dump`
 3. Wait for completion (it might take a while)
+
+## How to use the Postman collection of currently-working requests
+
+1. [Download Postman](https://www.postman.com/downloads/)
+2. Import file `EX-ACT.postman_collection.json`
