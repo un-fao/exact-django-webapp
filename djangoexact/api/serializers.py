@@ -1,21 +1,15 @@
 from rest_framework import serializers
 from .models import *
 
-class ProjectSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Project
-        fields = '__all__'
-
-# TODO: Make generic serializer for results
-
-
-def getGenericResultsSerializer(model_arg):
-
+def getResultSerializer():
     class ResultSerializer(serializers.Serializer):
         total_w = serializers.FloatField()
         total_wo = serializers.FloatField()
         balance = serializers.FloatField()
+    
+    return ResultSerializer
+
+def getResultsSerializer(model_arg):
 
     class GenericSerializer(serializers.ModelSerializer):
         class Meta:
@@ -24,18 +18,30 @@ def getGenericResultsSerializer(model_arg):
 
     class GenericResultInputsSerializer(serializers.Serializer):
         input = GenericSerializer()
-        result = ResultSerializer()
+        result = getResultSerializer()
 
     class GenericResultsSerializer(serializers.Serializer):
         inputs = GenericResultInputsSerializer(many=True)
-        result = ResultSerializer()
+        result = getResultSerializer()
 
     return GenericResultsSerializer
 
-def getGenericSerializer(model_arg):
+def getModelSerializer(model_arg):
     class GenericSerializer(serializers.ModelSerializer):
         class Meta:
             model = model_arg
             fields = '__all__'
 
     return GenericSerializer
+
+def getAssessmentSerializer(model_arg):
+    class AssessmentSerializer(serializers.Serializer):
+        parent_name = serializers.CharField(max_length=200)
+        parent_id = serializers.IntegerField()
+        assessment = getModelSerializer(model_arg)()
+
+        def save(self):
+            self.assessment.save()
+            return self.assessment
+
+    return AssessmentSerializer
