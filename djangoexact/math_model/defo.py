@@ -147,6 +147,3 @@ def outer_if_other(rate_type, time_tot, time_impl):
         return time_tot - 20 + 0.217 * time_impl * (math.exp(4.606 * (20 - time_tot/time_impl)) - 1)
     else:
         return pow(time_tot - 20, 2) * (0.5/time_impl)
-
-
-# ao = GHG_emissions(12, 11, 12, 1, 1, 'D', 0.5, 4.7, None, 265.0, 28.0, True, 0.26, 4.7, 0.45, 0.005, 2.9, None, 36.8, None, 12.0, 0.47, None, None, 0.77, 180.0, 0.22, 15, None, 20, None)
