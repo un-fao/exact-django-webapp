@@ -1,6 +1,6 @@
 from .models import *
 from ipcc.models import *
-from typing import List,TypeVar
+from typing import List
 from .utilities import *
 from .serializers import *
 from django.db.models import Q
@@ -9,19 +9,9 @@ from math_model import defo as defo_math
 from math_model import affo as affo_math
 from math_model import oluc as oluc_math
 from rest_framework import viewsets, status, permissions
-from rest_framework.decorators import api_view
-from itertools import chain
-from django.db import transaction
-from rest_framework import exceptions
+from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
-
-def get_param_or_validation_error(request, param_name):
-    param = request.query_params.get(param_name)
-    if param is None:
-        raise exceptions.ValidationError(f"{param_name} is required")
-    return param
-
-T = TypeVar('T')
+from rest_framework.views import *
 
 class AuthenticatedViewSet(viewsets.GenericViewSet):
     permission_classes = [permissions.IsAuthenticated]
@@ -31,256 +21,83 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     API endpoint that allows projects to be viewed or edited.
     """
     queryset = Project.objects.all()
-    serializer_class = getModelSerializer(Project)
+    serializer_class = get_model_serializer(Project)
 
 class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
-    API endpoint that allows activities to be viewed or edited.
+    API endpoint that allows activities to be viewed or edited. 
     """
     queryset = Activity.objects.all()
-    serializer_class = getModelSerializer(Activity)
+    serializer_class = get_model_serializer(Activity)
 
     def get_queryset(self):
-        project_id = get_param_or_validation_error(self.request, 'project_id')
-
+        """
+        Get all activities for a given project, by filtering against a `project_id` query parameter in the URL.
+        """
+        project_id = get_query_param_or_validation_error(self.request, 'project_id')
         return Activity.objects.filter(project__id=project_id, project__user=self.request.user)
+
+    @action(detail=True, methods=['get'])
+    def modules(self, request, pk=None):
+        """
+        Lists the modules of a given activity.
+        """
+
+        get_object_or_404(Activity, pk=pk, project__user=self.request.user)
+
+        modules = {}
+        module_types = ModuleType.objects.all()
+
+        for module in module_types:
+            module_model = apps.get_model('api', module.name.replace(" ", ""))
+            module_object = module_model.objects.filter(activity__id=pk, activity__project__user=self.request.user).first()
+            if module_object:
+                modules[module.name] = get_model_serializer(module_model)(module_object).data
+        
+        return Response(data=modules, status=status.HTTP_200_OK)
 
 class ModuleTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
     API endpoint that allows module types to be viewed or edited.
     """
     queryset = ModuleType.objects.all()
-    serializer_class = getModelSerializer(ModuleType)
+    serializer_class = get_model_serializer(ModuleType)
 
-class DeforestationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
-    """
-    API endpoint that allows deforestation inputs to be viewed or edited.
-    """
-    queryset = Deforestation.objects.all()
-    serializer_class = getModelSerializer(Deforestation)
+def generic_module_viewset(model: Model):
+    class GenericModelViewSet(viewsets.ModelViewSet):
+        queryset = model.objects.all()
+        serializer_class = get_model_serializer(model)
+        permission_classes = [permissions.IsAuthenticated]
 
-    def retrieve(self, request, pk=None):
-        deforestation_module = get_object_or_404(Deforestation, pk=pk, activity__project__user=self.request.user)
-        return Response(getModelSerializer(Deforestation)(deforestation_module).data)
+        def retrieve(self, request, pk=None):
+            module = get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
+            return Response(get_model_serializer(model)(module).data)
 
-    def list(self, request):
-        """
-        Lists the Deforestation module(s) of a given activity,
-        by filtering against a `activity_id` query parameter in the URL.
-        """
+        def list(self, request):
+            """
+            Lists the module(s) of a given activity,
+            by filtering against a `activity_id` query parameter in the URL.
+            """
 
-        activity_id = get_param_or_validation_error(self.request, 'activity_id')
-        defo = get_object_or_404(Deforestation, activity__id=activity_id)
+            activity_id = get_query_param_or_validation_error(self.request, 'activity_id')
+            module = get_object_or_404(model, activity__id=activity_id)
 
-        serializer = getModelSerializer(Deforestation)(defo)
-        return Response(serializer.data)
+            serializer = get_model_serializer(model)(module)
+            return Response(serializer.data)
 
-    def results(self, request, module_id=None):
-        """
-        Calculate total emissions for all Deforestation inputs.
-        get: Returns list of emissions for each input and the total of all inputs
-        TODO: Define structure and format of the real response.
-        """
+        @action(detail=True, methods=['get'])
+        def results(self, request, pk=None):
+            """
+            Calculates and returns total emissions for a single module.
+            TODO: Define structure and format of the real response.
+            """
 
-        defo_results = calculate_module_results(Deforestation, module_id, self.request.user)
+            module_results = calculate_module_results(model, pk, self.request.user)
+            serializer = getResultSerializer()(module_results)
 
-        serializer = getResultSerializer()(defo_results)
-        return Response(serializer.data)
+            return Response(serializer.data)
 
-class AfforestationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
-    """
-    API endpoint that allows afforestation inputs to be viewed or edited.
-    """
-    queryset = Afforestation.objects.all()
-    serializer_class = getModelSerializer(Afforestation)
-
-    def retrieve(self, request, pk=None):
-        afforestation_module = get_object_or_404(Afforestation, pk=pk, activity__project__user=self.request.userser)
-
-        return Response(getModelSerializer(Afforestation)(afforestation_module).data)
-
-    def list(self, request):
-        """
-        Lists the Afforestation module(s) of a given activity,
-        by filtering against a `activity_id` query parameter in the URL.
-        """
-
-        activity_id = get_param_or_validation_error(self.request, 'activity_id')
-        affo = get_object_or_404(Afforestation, activity__id=activity_id)
-
-        serializer = getModelSerializer(Afforestation)(affo)
-        return Response(serializer.data)
-
-    def results(self, request, module_id=None):
-        """
-        Calculate total emissions for a single Deforestation module.
-        TODO: Define structure and format of the real response.
-        """
-
-        defo_results = calculate_module_results(Afforestation, module_id, self.request.user)
-        serializer = getResultSerializer()(defo_results)
-
-        return Response(serializer.data)
-
-class OtherLandUseChangeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
-    """
-    API endpoint that allows other land use change inputs to be viewed or edited.
-    """
-    queryset = OtherLandUseChange.objects.all()
-    serializer_class = getModelSerializer(OtherLandUseChange)
-
-    def retrieve(self, request, pk=None):
-        oluc_module = get_object_or_404(OtherLandUseChange, pk=pk, activity__project__user=self.request.user)
-        return Response(getModelSerializer(OtherLandUseChange)(oluc_module).data)
-
-    def list(self, request):
-        """
-        Lists the OtherLandUseChange module(s) of a given activity,
-        by filtering against a `activity_id` query parameter in the URL.
-        """
-
-        activity_id = get_param_or_validation_error(self.request, 'activity_id')
-        oluc = get_object_or_404(OtherLandUseChange, activity__id=activity_id)
-
-        return Response(getModelSerializer(OtherLandUseChange)(oluc, many=True).data)
-
-    def results(self, request, module_id=None):
-        """
-        Calculate total emissions for a single OtherLandUseChange module.
-        """
-            
-        oluc_results = calculate_module_results(OtherLandUseChange, module_id, self.request.user)
-        serializer = getResultSerializer()(oluc_results)
-
-        return Response(serializer.data)
-
-class AnnualCroppingViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
-    """
-    API endpoint that allows annual cropping inputs to be viewed or edited.
-    """
-    queryset = AnnualCropping.objects.all()
-    serializer_class = getModelSerializer(AnnualCropping)
-
-    def retrieve(self, request, pk=None):
-        annual_cropping_module = get_object_or_404(AnnualCropping, pk=pk, activity__project__user=self.request.user)
-        return Response(getModelSerializer(AnnualCropping)(annual_cropping_module).data)
-    
-    def list(self, request):
-        """
-        Lists the AnnualCropping module(s) of a given activity,
-        by filtering against a `activity_id` query parameter in the URL.
-        """
-
-        activity_id = get_param_or_validation_error(self.request, 'activity_id')
-        annual_cropping = get_object_or_404(AnnualCropping, activity__id=activity_id)
-
-        return Response(getModelSerializer(AnnualCropping)(annual_cropping, many=True).data)
-
-class PerennialCroppingViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
-    """
-    API endpoint that allows perennial cropping inputs to be viewed or edited.
-    """
-    queryset = PerennialCropping.objects.all()
-    serializer_class = getModelSerializer(PerennialCropping)
-
-    def retrieve(self, request, pk=None):
-        perennial_cropping_module = get_object_or_404(PerennialCropping, pk=pk, activity__project__user=self.request.user)
-        return Response(getModelSerializer(PerennialCropping)(perennial_cropping_module).data)
-    
-    def list(self, request):
-        """
-        Lists the PerennialCropping module(s) of a given activity,
-        by filtering against a `activity_id` query parameter in the URL.
-        """
-
-        activity_id = get_param_or_validation_error(self.request, 'activity_id')
-        perennial_cropping = get_object_or_404(PerennialCropping, activity__id=activity_id)
-
-        return Response(getModelSerializer(PerennialCropping)(perennial_cropping, many=True).data)
-
-class FloodedRiceViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
-    """
-    API endpoint that allows flooded rice inputs to be viewed or edited.
-    """
-    queryset = FloodedRice.objects.all()
-    serializer_class = getModelSerializer(FloodedRice)
-
-    def retrieve(self, request, pk=None):
-        flooded_rice_module = get_object_or_404(FloodedRice, pk=pk, activity__project__user=self.request.user)
-        return Response(getModelSerializer(FloodedRice)(flooded_rice_module).data)
-    
-    def list(self, request):
-        """
-        Lists the FloodedRice module(s) of a given activity,
-        by filtering against a `activity_id` query parameter in the URL.
-        """
-
-        activity_id = get_param_or_validation_error(self.request, 'activity_id')
-        flooded_rice = get_object_or_404(FloodedRice, activity__id=activity_id)
-
-        return Response(getModelSerializer(FloodedRice)(flooded_rice, many=True).data)
-
-class GrasslandViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
-    """
-    API endpoint that allows grassland inputs to be viewed or edited.
-    """
-    queryset = Grassland.objects.all()
-    serializer_class = getModelSerializer(Grassland)
-
-    def retrieve(self, request, pk=None):
-        grassland_module = get_object_or_404(Grassland, pk=pk, activity__project__user=self.request.user)
-        return Response(getModelSerializer(Grassland)(grassland_module).data)
-    
-    def list(self, request):
-        """
-        Lists the Grassland module(s) of a given activity,
-        by filtering against a `activity_id` query parameter in the URL.
-        """
-
-        activity_id = get_param_or_validation_error(self.request, 'activity_id')
-        grassland = get_object_or_404(Grassland, activity__id=activity_id)
-
-        return Response(getModelSerializer(Grassland)(grassland, many=True).data)
-
-class LivestockViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
-    """
-    API endpoint that allows livestock inputs to be viewed or edited.
-    """
-    queryset = Livestock.objects.all()
-    serializer_class = getModelSerializer(Livestock)
-
-    def retrieve(self, request, pk=None):
-        livestock_module = get_object_or_404(Livestock, pk=pk, activity__project__user=self.request.user)
-        return Response(getModelSerializer(Livestock)(livestock_module).data)
-    
-    def list(self, request):
-        """
-        Lists the Livestock module(s) of a given activity,
-        by filtering against a `activity_id` query parameter in the URL.
-        """
-
-        activity_id = get_param_or_validation_error(self.request, 'activity_id')
-        livestock = get_object_or_404(Livestock, activity__id=activity_id)
-
-        return Response(getModelSerializer(Livestock)(livestock, many=True).data)
-
-@api_view(['GET'])
-def get_modules_for_activity(request):
-
-    activity_id = request.query_params.get('activity_id')
-    if activity_id is None:
-        return Response("activity_id is required", status=status.HTTP_400_BAD_REQUEST)
-
-    modules = {}
-    
-    module_types = ModuleType.objects.all()
-    for module in module_types:
-        module_model = apps.get_model('api', module.name.replace(" ", ""))
-        module_object = module_model.objects.filter(activity__id=activity_id).first()
-        if module_object:
-            modules[module.name] = getModelSerializer(module_model)(module_object).data
-    
-    return Response(data=modules, status=status.HTTP_200_OK)
+    return GenericModelViewSet
 
 def calculate_module_results(model: Model, module_id: int, user: User):
 
@@ -288,7 +105,7 @@ def calculate_module_results(model: Model, module_id: int, user: User):
     project = get_object_or_404(Project, pk=module.activity.project.id)
     return calc_result(module, project)
 
-def calc_result(input: Model, project:Project):
+def calc_result(input: Model, project: Project):
 
     result = {}
 
@@ -304,7 +121,7 @@ def calc_result(input: Model, project:Project):
 
     return result
 
-def calc_activity_results(input_list: List[T], project:Project):
+def calc_activity_results(input_list: List, project: Project):
 
     results = {
         "inputs": [],
@@ -577,3 +394,4 @@ def calc_oluc_result(input: OtherLandUseChange, project:Project):
     }
 
     return results
+
