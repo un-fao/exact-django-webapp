@@ -7,8 +7,19 @@ from django.db.models import Q
 from rest_framework.response import Response
 from math_model import defo as defo_math
 from math_model import affo as affo_math
+from math_model import oluc as oluc_math
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import api_view
+from itertools import chain
+from django.db import transaction
+from rest_framework import exceptions
+from django.shortcuts import get_object_or_404
+
+def get_param_or_validation_error(request, param_name):
+    param = request.query_params.get(param_name)
+    if param is None:
+        raise exceptions.ValidationError(f"{param_name} is required")
+    return param
 
 T = TypeVar('T')
 
@@ -20,87 +31,280 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     API endpoint that allows projects to be viewed or edited.
     """
     queryset = Project.objects.all()
-    serializer_class = ProjectSerializer
+    serializer_class = getModelSerializer(Project)
 
-class DeforestationInputViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    """
+    API endpoint that allows activities to be viewed or edited.
+    """
+    queryset = Activity.objects.all()
+    serializer_class = getModelSerializer(Activity)
+
+    def get_queryset(self):
+        project_id = get_param_or_validation_error(self.request, 'project_id')
+
+        return Activity.objects.filter(project__id=project_id, project__user=self.request.user)
+
+class ModuleTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    """
+    API endpoint that allows module types to be viewed or edited.
+    """
+    queryset = ModuleType.objects.all()
+    serializer_class = getModelSerializer(ModuleType)
+
+class DeforestationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
     API endpoint that allows deforestation inputs to be viewed or edited.
     """
-    queryset = DeforestationInput.objects.all()
-    serializer_class = getGenericSerializer(DeforestationInput)
+    queryset = Deforestation.objects.all()
+    serializer_class = getModelSerializer(Deforestation)
 
-    def create(self, request, project_id=None):
-        """
-        Create a new deforestation input.
-        """
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def retrieve(self, request, pk=None):
+        deforestation_module = get_object_or_404(Deforestation, pk=pk, activity__project__user=self.request.user)
+        return Response(getModelSerializer(Deforestation)(deforestation_module).data)
 
-    def results(self, request, project_id=None):
+    def list(self, request):
+        """
+        Lists the Deforestation module(s) of a given activity,
+        by filtering against a `activity_id` query parameter in the URL.
+        """
+
+        activity_id = get_param_or_validation_error(self.request, 'activity_id')
+        defo = get_object_or_404(Deforestation, activity__id=activity_id)
+
+        serializer = getModelSerializer(Deforestation)(defo)
+        return Response(serializer.data)
+
+    def results(self, request, module_id=None):
         """
         Calculate total emissions for all Deforestation inputs.
         get: Returns list of emissions for each input and the total of all inputs
-        TODO: Communicate with FE on the structure and format of the real response.
+        TODO: Define structure and format of the real response.
         """
-        project = Project.objects.prefetch_related().get(pk=project_id)
-        defo_input_list = project.deforestationinput_set.all()
 
-        defo_results = calc_results(defo_input_list, project)
+        defo_results = calculate_module_results(Deforestation, module_id, self.request.user)
 
-        serializer = getGenericResultsSerializer(DeforestationInput)(defo_results)
+        serializer = getResultSerializer()(defo_results)
         return Response(serializer.data)
 
-class AfforestationInputViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+class AfforestationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
     API endpoint that allows afforestation inputs to be viewed or edited.
     """
-    queryset = AfforestationInput.objects.all()
-    serializer_class = getGenericSerializer(AfforestationInput)
-    
-    def results(self, request, project_id=None):
+    queryset = Afforestation.objects.all()
+    serializer_class = getModelSerializer(Afforestation)
+
+    def retrieve(self, request, pk=None):
+        afforestation_module = get_object_or_404(Afforestation, pk=pk, activity__project__user=self.request.userser)
+
+        return Response(getModelSerializer(Afforestation)(afforestation_module).data)
+
+    def list(self, request):
         """
-        Calculate total emissions for all Afforestation inputs.
-        get: Returns list of emissions for each input and the total of all inputs
+        Lists the Afforestation module(s) of a given activity,
+        by filtering against a `activity_id` query parameter in the URL.
         """
-        project = Project.objects.prefetch_related().get(pk=project_id)
-        affo_input_list = project.afforestationinput_set.all()
 
-        errors = validate_inputs(affo_input_list)
-        if len(errors["errors"]) > 0:
-            return Response(data=errors, status=status.HTTP_400_BAD_REQUEST)
+        activity_id = get_param_or_validation_error(self.request, 'activity_id')
+        affo = get_object_or_404(Afforestation, activity__id=activity_id)
 
-        affo_results = calc_results(affo_input_list, project)
-        serializer = getGenericResultsSerializer(DeforestationInput)(affo_results)
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-class AnnualCroppingInputViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
-    
-    queryset = AnnualCroppingInput.objects.all()
-    serializer_class = getGenericSerializer(AnnualCroppingInput)
-
-    def results(self, request, project_id=None):
-        """
-        Calculate total emissions for all Deforestation inputs.
-        get: Returns list of emissions for each input and the total of all inputs
-        TODO: Communicate with FE on the structure and format of the real response.
-        """
-        project = Project.objects.prefetch_related().get(pk=project_id)
-        annuals = project.annualcroppinginput_set.all()
-
-        errors = validate_inputs(annuals)
-        if len(errors["errors"]) > 0:
-            return Response(data=errors, status=status.HTTP_400_BAD_REQUEST)
-
-        defo_results = calc_results(annuals, project)
-        
-        serializer = getGenericSerializer(AnnualCroppingInput)(defo_results)
+        serializer = getModelSerializer(Afforestation)(affo)
         return Response(serializer.data)
 
-def calc_results(input_list: List[T], project:Project):
+    def results(self, request, module_id=None):
+        """
+        Calculate total emissions for a single Deforestation module.
+        TODO: Define structure and format of the real response.
+        """
+
+        defo_results = calculate_module_results(Afforestation, module_id, self.request.user)
+        serializer = getResultSerializer()(defo_results)
+
+        return Response(serializer.data)
+
+class OtherLandUseChangeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    """
+    API endpoint that allows other land use change inputs to be viewed or edited.
+    """
+    queryset = OtherLandUseChange.objects.all()
+    serializer_class = getModelSerializer(OtherLandUseChange)
+
+    def retrieve(self, request, pk=None):
+        oluc_module = get_object_or_404(OtherLandUseChange, pk=pk, activity__project__user=self.request.user)
+        return Response(getModelSerializer(OtherLandUseChange)(oluc_module).data)
+
+    def list(self, request):
+        """
+        Lists the OtherLandUseChange module(s) of a given activity,
+        by filtering against a `activity_id` query parameter in the URL.
+        """
+
+        activity_id = get_param_or_validation_error(self.request, 'activity_id')
+        oluc = get_object_or_404(OtherLandUseChange, activity__id=activity_id)
+
+        return Response(getModelSerializer(OtherLandUseChange)(oluc, many=True).data)
+
+    def results(self, request, module_id=None):
+        """
+        Calculate total emissions for a single OtherLandUseChange module.
+        """
+            
+        oluc_results = calculate_module_results(OtherLandUseChange, module_id, self.request.user)
+        serializer = getResultSerializer()(oluc_results)
+
+        return Response(serializer.data)
+
+class AnnualCroppingViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    """
+    API endpoint that allows annual cropping inputs to be viewed or edited.
+    """
+    queryset = AnnualCropping.objects.all()
+    serializer_class = getModelSerializer(AnnualCropping)
+
+    def retrieve(self, request, pk=None):
+        annual_cropping_module = get_object_or_404(AnnualCropping, pk=pk, activity__project__user=self.request.user)
+        return Response(getModelSerializer(AnnualCropping)(annual_cropping_module).data)
+    
+    def list(self, request):
+        """
+        Lists the AnnualCropping module(s) of a given activity,
+        by filtering against a `activity_id` query parameter in the URL.
+        """
+
+        activity_id = get_param_or_validation_error(self.request, 'activity_id')
+        annual_cropping = get_object_or_404(AnnualCropping, activity__id=activity_id)
+
+        return Response(getModelSerializer(AnnualCropping)(annual_cropping, many=True).data)
+
+class PerennialCroppingViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    """
+    API endpoint that allows perennial cropping inputs to be viewed or edited.
+    """
+    queryset = PerennialCropping.objects.all()
+    serializer_class = getModelSerializer(PerennialCropping)
+
+    def retrieve(self, request, pk=None):
+        perennial_cropping_module = get_object_or_404(PerennialCropping, pk=pk, activity__project__user=self.request.user)
+        return Response(getModelSerializer(PerennialCropping)(perennial_cropping_module).data)
+    
+    def list(self, request):
+        """
+        Lists the PerennialCropping module(s) of a given activity,
+        by filtering against a `activity_id` query parameter in the URL.
+        """
+
+        activity_id = get_param_or_validation_error(self.request, 'activity_id')
+        perennial_cropping = get_object_or_404(PerennialCropping, activity__id=activity_id)
+
+        return Response(getModelSerializer(PerennialCropping)(perennial_cropping, many=True).data)
+
+class FloodedRiceViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    """
+    API endpoint that allows flooded rice inputs to be viewed or edited.
+    """
+    queryset = FloodedRice.objects.all()
+    serializer_class = getModelSerializer(FloodedRice)
+
+    def retrieve(self, request, pk=None):
+        flooded_rice_module = get_object_or_404(FloodedRice, pk=pk, activity__project__user=self.request.user)
+        return Response(getModelSerializer(FloodedRice)(flooded_rice_module).data)
+    
+    def list(self, request):
+        """
+        Lists the FloodedRice module(s) of a given activity,
+        by filtering against a `activity_id` query parameter in the URL.
+        """
+
+        activity_id = get_param_or_validation_error(self.request, 'activity_id')
+        flooded_rice = get_object_or_404(FloodedRice, activity__id=activity_id)
+
+        return Response(getModelSerializer(FloodedRice)(flooded_rice, many=True).data)
+
+class GrasslandViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    """
+    API endpoint that allows grassland inputs to be viewed or edited.
+    """
+    queryset = Grassland.objects.all()
+    serializer_class = getModelSerializer(Grassland)
+
+    def retrieve(self, request, pk=None):
+        grassland_module = get_object_or_404(Grassland, pk=pk, activity__project__user=self.request.user)
+        return Response(getModelSerializer(Grassland)(grassland_module).data)
+    
+    def list(self, request):
+        """
+        Lists the Grassland module(s) of a given activity,
+        by filtering against a `activity_id` query parameter in the URL.
+        """
+
+        activity_id = get_param_or_validation_error(self.request, 'activity_id')
+        grassland = get_object_or_404(Grassland, activity__id=activity_id)
+
+        return Response(getModelSerializer(Grassland)(grassland, many=True).data)
+
+class LivestockViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    """
+    API endpoint that allows livestock inputs to be viewed or edited.
+    """
+    queryset = Livestock.objects.all()
+    serializer_class = getModelSerializer(Livestock)
+
+    def retrieve(self, request, pk=None):
+        livestock_module = get_object_or_404(Livestock, pk=pk, activity__project__user=self.request.user)
+        return Response(getModelSerializer(Livestock)(livestock_module).data)
+    
+    def list(self, request):
+        """
+        Lists the Livestock module(s) of a given activity,
+        by filtering against a `activity_id` query parameter in the URL.
+        """
+
+        activity_id = get_param_or_validation_error(self.request, 'activity_id')
+        livestock = get_object_or_404(Livestock, activity__id=activity_id)
+
+        return Response(getModelSerializer(Livestock)(livestock, many=True).data)
+
+@api_view(['GET'])
+def get_modules_for_activity(request):
+
+    activity_id = request.query_params.get('activity_id')
+    if activity_id is None:
+        return Response("activity_id is required", status=status.HTTP_400_BAD_REQUEST)
+
+    modules = {}
+    
+    module_types = ModuleType.objects.all()
+    for module in module_types:
+        module_model = apps.get_model('api', module.name.replace(" ", ""))
+        module_object = module_model.objects.filter(activity__id=activity_id).first()
+        if module_object:
+            modules[module.name] = getModelSerializer(module_model)(module_object).data
+    
+    return Response(data=modules, status=status.HTTP_200_OK)
+
+def calculate_module_results(model: Model, module_id: int, user: User):
+
+    module = get_object_or_404(model, pk=module_id, activity__project__user=user)
+    project = get_object_or_404(Project, pk=module.activity.project.id)
+    return calc_result(module, project)
+
+def calc_result(input: Model, project:Project):
+
+    result = {}
+
+    match input.__class__.__name__:
+        case "Deforestation":
+            result = calc_defo_result(input, project)
+        case "Afforestation":
+            result = calc_affo_result(input, project)
+        case "OtherLandUseChange":
+            result = calc_oluc_result(input, project)
+        case _:
+            raise Exception("Invalid input type")
+
+    return result
+
+def calc_activity_results(input_list: List[T], project:Project):
 
     results = {
         "inputs": [],
@@ -113,13 +317,7 @@ def calc_results(input_list: List[T], project:Project):
 
     for input in input_list:
 
-        match input.__class__.__name__:
-            case "DeforestationInput":
-                result = calc_defo_result(input, project)
-            case "AfforestationInput":
-                result = calc_affo_result(input, project)
-            case _:
-                raise Exception("Invalid input type")
+        result = calc_result(input, project)
 
         results["inputs"].append({'input': input, 'result': result})
         results["result"]["total_w"] += result["total_w"]
@@ -128,71 +326,61 @@ def calc_results(input_list: List[T], project:Project):
 
     return results
 
-@api_view(['GET'])
-def check_uncompleted_modules(request, project_id=None):
-    """
-    Check if there are any uncompleted modules in the project.
-    """
-    project = Project.objects.prefetch_related().get(pk=project_id)
-    uncompleted_modules = {}
-
-    uncompleted_modules["defo"] = validate_inputs(project.deforestationinput_set.all())
-    uncompleted_modules["affo"] = validate_inputs(project.afforestationinput_set.all())
-
-    return Response(data=uncompleted_modules, status=status.HTTP_200_OK)
-
-def calc_affo_result(input: AfforestationInput, project:Project):
+def calc_affo_result(input: Afforestation, project:Project):
     """
     Calculate emissions for a single Afforestation input.
     """
+
+    inital_land_use = input.land_use_type
+    final_land_use = input.vegetation_type
 
     initial_biomass = ForestTotalBiomass.objects.get(
         climate = project.climate,
         moisture = project.moisture,
         continent = project.continent,
-        land_use_type = input.land_use_type
+        land_use_type = inital_land_use
     )
 
-    combustion_factor = AfforestationCombustionFactorValues.objects.get(land_use_type = input.land_use_type)
+    combustion_factor = AfforestationCombustionFactorValues.objects.get(land_use_type = inital_land_use)
     
     # NOTE: Maybe merge all LandUseStockExchangeFactors and filter by model?
     flu = AfforestationLandUseStockExchangeFactor.objects.get(
         climate = project.climate,
         moisture = project.moisture,
-        land_use_type = input.land_use_type
+        land_use_type = inital_land_use
     )
 
-    litter_dw = LitterDeadwoodCarbonStock.objects.get(vegetation_type = input.vegetation_type)
+    litter_dw = LitterDeadwoodCarbonStock.objects.get(vegetation_type = final_land_use)
 
     ag_net_biomass = AboveGroundNetBiomassGrowth.objects.get(
-        vegetation_type = input.vegetation_type,
+        vegetation_type = final_land_use,
         continent = project.continent
     )
 
     bg_biomass_before_20_yrs = BelowGroundBiomass.objects.get_max_within_threshold(
         continent = project.continent,
-        vegetation_type = input.vegetation_type,
+        vegetation_type = final_land_use,
         threshold = ag_net_biomass.value_upto_20_years
     )
     bg_biomass_after_20_yrs = BelowGroundBiomass.objects.get_max_within_threshold(
         continent = project.continent,
-        vegetation_type = input.vegetation_type,
+        vegetation_type = final_land_use,
         threshold = ag_net_biomass.value_after_20_years
     )
 
     ag_biomass = AboveGroundBiomass.objects.get(
         continent = project.continent,
-        vegetation_type = input.vegetation_type
+        vegetation_type = final_land_use
     )
 
     bg_biomass_le_125 = BelowGroundBiomass.objects.get_lowest_value(
         continent = project.continent,
-        vegetation_type = input.vegetation_type,
+        vegetation_type = final_land_use,
     )
 
     bg_biomass_gt_125 = BelowGroundBiomass.objects.get_highest_value(
         continent = project.continent,
-        vegetation_type = input.vegetation_type,
+        vegetation_type = final_land_use,
     )
 
     inputs = [
@@ -212,7 +400,7 @@ def calc_affo_result(input: AfforestationInput, project:Project):
         input.ha_w_rate.value,
         flu.value,
         project.soc_ref.value,
-        None, # TODO: Add project.soc_ref_t2
+        project.soc_ref_t2,
         litter_dw.dw,
         input.final_dw_t2,
         litter_dw.litter,
@@ -241,7 +429,7 @@ def calc_affo_result(input: AfforestationInput, project:Project):
 
     return results
 
-def calc_defo_result(defo: DeforestationInput, project: Project):
+def calc_defo_result(defo: Deforestation, project: Project):
 
     climate = project.climate
     moisture = project.moisture
@@ -260,7 +448,6 @@ def calc_defo_result(defo: DeforestationInput, project: Project):
     # NOTE: Maybe merge the mangroves and deforestation IPCC tables into one table?
     if(defo.vegetation_type != MANGROVES):
         defo_table = LitterDeadwoodCarbonStock.objects.get(vegetation_type=vegetation_type)
-        print(f"Continent: {continent}, Vegetation type: {vegetation_type}")
         ag_biomass = AboveGroundBiomass.objects.get(continent=continent, vegetation_type=vegetation_type)
         bg_biomass = BelowGroundBiomass.objects.filter(continent=continent, vegetation_type=vegetation_type)
 
@@ -304,7 +491,7 @@ def calc_defo_result(defo: DeforestationInput, project: Project):
         flu.value,
         ag_biomass.value if mangroves_data is None else mangroves_data.agb_c,
         bg_biomass.value if mangroves_data is None else mangroves_data.bgb,
-        CN_RATIO_FOREST,
+        CN_RATIO_GRASSLAND,
         defo.final_rcs_soil_c_t2, # soil after defo t2
         soc_ref.value if soc_ref.value is not None else 0,
         defo.rcs_soil_c_t2 # soil t2
@@ -320,35 +507,73 @@ def calc_defo_result(defo: DeforestationInput, project: Project):
 
     return results
 
-def validate_inputs(inputs: List[T]) -> dict:
+def calc_oluc_result(input: OtherLandUseChange, project:Project):
     """
-    Validates inputs for a module.
+    Calculate emissions for a single Afforestation input.
+    """
 
-    Args:
-        inputs (List[T]): List of inputs to validate.
+    climate = project.climate
+    moisture = project.moisture
+    continent = project.continent
+    final_land_use_type = input.final_land_use_type
+    initial_land_use = input.initial_land_use_type
+
+    initial_biomass = ForestTotalBiomass.objects.get(
+        climate = project.climate,
+        moisture = project.moisture,
+        continent = project.continent,
+        land_use_type = initial_land_use
+    )
+
+    total_biomass = TotalBiomassAfterDefo.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=final_land_use_type)
+
+    flu_initial = AfforestationLandUseStockExchangeFactor.objects.get(
+        climate = project.climate,
+        moisture = project.moisture,
+        land_use_type = initial_land_use
+    )
+
+    flu_final = LandUseStockExchangeFactor.objects.get(climate=climate, moisture=moisture, land_use_type=final_land_use_type)
+
+    c_n_ratio = CN_RATIO_GRASSLAND if initial_land_use.name == "Grassland" else CN_RATIO_FOREST
+
+    moisture_factor = DefaultEmissionFactors.objects.get(moisture=moisture)
+    combustion_factor = AfforestationCombustionFactorValues.objects.get(land_use_type=initial_land_use)
+
+    inputs = [
+        initial_biomass.value,
+        total_biomass.value,
+        input.initial_biomass_t2,
+        input.final_biomass_t2,
+        project.soc_ref.value,
+        flu_initial.value,
+        flu_final.value,
+        project.soc_ref_t2,
+        None, #Final socref
+        c_n_ratio,
+        moisture_factor.value,
+        combustion_factor.value,
+        combustion_factor.n2o,
+        combustion_factor.ch4,
+        project.gw_potential.n2o,
+        project.gw_potential.ch4,
+        input.is_fire_used,
+        project.implementation_duration_yrs,
+        project.capitalization_duration_yrs,
+        input.ha_w_rate.name,
+        input.ha_w_rate.value,
+        input.ha_wo_rate.name,
+        input.ha_wo_rate.value,
+        input.ha_w,
+        input.ha_wo
+    ]
     
-    Returns:
-        dict: Object containing a list of errors.
-        
-        {
-            "errors": [
-                {
-                    "error": "Error message",
-                    "input_id": 1
-                }
-            ]
-        }
-    """
+    total_w, total_wo, balance = oluc_math.calculate_w_wo_balance(*inputs)
 
-    errors = { "errors": []}
+    results = {
+        "total_w": total_w,
+        "total_wo": total_wo,
+        "balance": balance
+    }
 
-    for input in inputs:
-        is_father = input.land_use_type.parent is None
-        if not is_father and input.child_input is None:
-            errors["errors"].append(
-                {
-                    "error": f"Required input not found for input '{input.land_use_type.name}'. Please fill the {input.land_use_type.parent.name} module.", 
-                    "input_id": input.id
-                }
-            )
-    return errors
+    return results
