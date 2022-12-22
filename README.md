@@ -9,7 +9,11 @@
 
 <br>
 
-### [Click here to see the API's Docs](http://localhost:8000/api/docs/) (make sure your local Django app is running)
+### [Click here to see the Django API Docs](http://localhost:8000/api/docs/) (make sure your local Django app is running)
+### [Click here to see the Swagger API Docs](http://localhost:8000/api/swagger/) (make sure your local Django app is running)
+### [Click here to see the Swagger .yaml](http://localhost:8000/api/swagger.yaml) (make sure your local Django app is running)
+### [Click here to see the Swagger .json](http://localhost:8000/api/swagger.json) (make sure your local Django app is running)
+### [Click here to see the Redoc API Docs](http://localhost:8000/api/redoc/) (make sure your local Django app is running)
 
 <br>
 
