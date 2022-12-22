@@ -47,3 +47,7 @@
 
 1. [Download Postman](https://www.postman.com/downloads/)
 2. Import file `EX-ACT.postman_collection.json`
+
+    Alternatively,
+
+    [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/7002893-9d88940d-a037-477a-b287-d42e01c25749?action=collection%2Ffork&collection-url=entityId%3D7002893-9d88940d-a037-477a-b287-d42e01c25749%26entityType%3Dcollection%26workspaceId%3D7e75d44c-4b11-4375-afea-b500866e6198)
