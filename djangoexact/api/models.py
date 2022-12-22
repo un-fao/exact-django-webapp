@@ -186,7 +186,8 @@ class ManureManagementType(Model):
         return self.name
 
 class ModuleType(Model):
-    name = CharField(max_length=100, )
+    name = CharField(max_length=100, unique=True)
+    verbose_name = CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -280,6 +281,8 @@ class Module(Model):
     class Meta:
         abstract = True
 
+##### Land Use Changes
+
 class Deforestation(Module):
 
     vegetation_type = ForeignKey(VegetationType, on_delete=CASCADE)
@@ -362,6 +365,8 @@ class OtherLandUse(Module):
     def __str__(self):
         return f"OtherLandUseChange for {self.final_land_use_type.name}"
 
+##### Cropland Management
+
 class AnnualCropping(Module):
 
     user_notes = TextField(null=True, blank=True)
@@ -413,6 +418,8 @@ class FloodedRice(Module):
 
     def __str__(self):
         return f"FloodedRice for activity {self.activity.name} in project {self.activity.project.name}"
+
+##### Grassland and Livestock
 
 class Grassland(Module):
 
@@ -485,6 +492,8 @@ class Livestock(Module):
 
     implementation_year_start = IntegerField(null=True, blank=True)
 
+##### Forest Management
+
 class Forest(Module):
     vegetation_type = ForeignKey(VegetationType, on_delete=CASCADE)
     degradation_level_start = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_start")
@@ -518,6 +527,8 @@ class Forest(Module):
     land_input_factor_wo_t2 = FloatField(null=True, blank=True)
 
     implementation_year_start_t2 = IntegerField(null=True, blank=True)
+
+##### Inland Wetlands
 
 class OrganicSoil(Module):
     class Meta:
