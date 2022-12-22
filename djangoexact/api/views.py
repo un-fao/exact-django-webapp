@@ -69,7 +69,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     @swagger_auto_schema(
         responses={404: 'Module not found', 400: 'Invalid Module name'}
     )
-    def get_module_from_uri(self, request, activity_id=None, module_name: str=None):
+    def module_from_uri(self, request, activity_id=None, module_name: str=None):
         """
         Returns a Module for a given activity matching `activity_id`and `module_name`.
         """
@@ -118,10 +118,30 @@ class ModuleTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     serializer_class = get_model_serializer(ModuleType)
 
 def generic_module_viewset(model: Model):
-    class GenericModelViewSet(viewsets.ModelViewSet):
+    class GenericModelViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         queryset = model.objects.all()
         serializer_class = get_model_serializer(model)
-        permission_classes = [permissions.IsAuthenticated]
+
+        def create(self, request):
+            """
+            Creates a new module for a given activity.
+            """
+
+            serializer = get_model_serializer(model)(data=request.data)
+            if serializer.is_valid(raise_exception=True):
+
+                activity_id = serializer.validated_data["activity"].pk
+
+                # Check if the same module for this activity already exists
+                # TODO: Can activities have multiples of the same module?
+                if model.objects.filter(activity__id=activity_id).exists():
+                    return Response({"details": f"Module '{model.__name__}' already exists for this activity."}, status=status.HTTP_400_BAD_REQUEST)
+
+                activity = get_object_or_404(Activity, pk=activity_id, project__user=self.request.user)
+                serializer.save(activity=activity)
+
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         def retrieve(self, request, pk=None):
             module = get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
