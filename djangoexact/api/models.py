@@ -191,8 +191,38 @@ class ModuleType(Model):
     def __str__(self):
         return self.name
 
+class ForestDegradationLevel(Model):
+    name = CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+class FireType(Model):
+    name = CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+class PeatType(Model):
+    name = CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+class WaterbodyType(Model):
+    name = CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+class TrophicType(Model):
+    name = CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
 ##############################
-########## MODULES ###########
+########## Project ###########
 ##############################
 
 class Project(Model):
@@ -225,6 +255,10 @@ class Project(Model):
     def __str__(self):
         return self.name
 
+##############################
+######### Activity ###########
+##############################
+
 class Activity(Model):
     project = ForeignKey(Project, on_delete=CASCADE)
     name = CharField(max_length=255)
@@ -235,6 +269,10 @@ class Activity(Model):
 
     def __str__(self):
         return self.name
+
+##############################
+########## Modules ###########
+##############################
 
 class Module(Model):
     activity = ForeignKey(Activity, on_delete=CASCADE)
@@ -300,7 +338,7 @@ class Afforestation(Module):
     def __str__(self):
         return f"Afforestation for {self.land_use_type.name}"
 
-class OtherLandUseChange(Module):
+class OtherLandUse(Module):
 
     notes = TextField(null=True, blank=True)
     initial_land_use_type = ForeignKey(LandUseType, on_delete=CASCADE, related_name="%(class)s_initial_land_use_type", null= True, blank=True)
@@ -447,3 +485,292 @@ class Livestock(Module):
 
     implementation_year_start = IntegerField(null=True, blank=True)
 
+class Forest(Module):
+    vegetation_type = ForeignKey(VegetationType, on_delete=CASCADE)
+    degradation_level_start = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_start")
+    degradation_level_w = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_w")
+    degradation_level_wo = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_wo")
+    is_fire_used_w = BooleanField(default=False)
+    is_fire_used_wo = BooleanField(default=False)
+    fire_periodicity_w = IntegerField(null=True, blank=True)
+    fire_periodicity_wo = IntegerField(null=True, blank=True)
+    fire_impact_percentage_w = FloatField(null=True, blank=True) # TODO: What's the default value?
+    fire_impact_percentage_wo = FloatField(null=True, blank=True) # TODO: What's the default value?
+    ha_start = IntegerField(null=True, blank=True)
+    ha_w = IntegerField(null=True, blank=True)
+    ha_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_w_rate")
+    ha_wo = IntegerField(null=True, blank=True)
+    ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_wo_rate")
+
+    degradation_level_start_t2 = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_start_t2")
+    degradation_level_w_t2 = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_w_t2")
+    degradation_level_wo_t2 = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_wo_t2")
+
+    ag_carbon_t2 = FloatField(null=True, blank=True)
+    bg_carbon_t2 = FloatField(null=True, blank=True)
+    litter_t2 = FloatField(null=True, blank=True)
+    deadwood_t2 = FloatField(null=True, blank=True)
+
+    soil_carbon_t2 = FloatField(null=True, blank=True)
+
+    land_input_factor_start_t2 = FloatField(null=True, blank=True)
+    land_input_factor_w_t2 = FloatField(null=True, blank=True)
+    land_input_factor_wo_t2 = FloatField(null=True, blank=True)
+
+    implementation_year_start_t2 = IntegerField(null=True, blank=True)
+
+class OrganicSoil(Module):
+    class Meta:
+        abstract = True
+    
+    ag_carbon_t2 = FloatField(null=True, blank=True)
+    bg_carbon_t2 = FloatField(null=True, blank=True)
+    litter_t2 = FloatField(null=True, blank=True)
+    deadwood_t2 = FloatField(null=True, blank=True)
+    final_land_use_bgb_agb_t2 = FloatField(null=True, blank=True)
+
+    # TODO: Should a second variable be added for each module?
+    implementation_year_start_t2 = IntegerField(null=True, blank=True)
+
+class DeforestationSoilManagement(OrganicSoil):
+    vegetation_type = ForeignKey(VegetationType, on_delete=CASCADE)
+    hwp = FloatField(default=0.0)
+    is_fire_used = BooleanField(default=False)
+    final_land_use = ForeignKey(LandUseType, on_delete=CASCADE)
+    
+    ha_start = IntegerField(null=True, blank=True)
+    ha_w = IntegerField(null=True, blank=True)
+    ha_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_w_rate")
+    ha_wo = IntegerField(null=True, blank=True)
+    ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_wo_rate")
+
+    is_biomass_burned = BooleanField(default=False)
+
+    drainage_ha_start = IntegerField(null=True, blank=True)
+    drainage_ha_w = IntegerField(null=True, blank=True)
+    drainage_ha_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_drainage_ha_w_rate")
+    drainage_ha_wo = IntegerField(null=True, blank=True)
+    drainage_ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_drainage_ha_wo_rate")
+
+    is_fire_on_soil = BooleanField(default=False) # TODO: Find a better name?
+
+    ag_carbon_t2 = FloatField(null=True, blank=True)
+    bg_carbon_t2 = FloatField(null=True, blank=True)
+    litter_t2 = FloatField(null=True, blank=True)
+    deadwood_t2 = FloatField(null=True, blank=True)
+    final_land_use_bgb_agb_t2 = FloatField(null=True, blank=True)
+
+    initial_onsite_drainage_co2_t2 = FloatField(null=True, blank=True)
+    initial_onsite_drainage_ch4_t2 = FloatField(null=True, blank=True)
+    initial_onsite_drainage_n2o_t2 = FloatField(null=True, blank=True)
+    initial_offsite_drainage_doc_t2 = FloatField(null=True, blank=True)
+    initial_offsite_drainage_ch4_t2 = FloatField(null=True, blank=True)
+
+    initial_soil_fire_type_t2 = ForeignKey(FireType, on_delete=CASCADE, null=True, blank=True)
+    initial_soil_fire_periodicity_w = IntegerField(null=True, blank=True)
+    initial_soil_fire_impact_percentage_w = FloatField(null=True, blank=True) # TODO: What's the default value?
+    initial_soil_fire_periodicity_wo = IntegerField(null=True, blank=True)
+    initial_soil_fire_impact_percentage_wo = FloatField(null=True, blank=True) # TODO: What's the default value?
+
+    initial_soil_co2_t2 = FloatField(null=True, blank=True)
+    initial_soil_co_t2 = FloatField(null=True, blank=True)
+    initial_soil_ch4_t2 = FloatField(null=True, blank=True)
+    initial_soil_mean_dry_matter_t2 = FloatField(null=True, blank=True)
+
+class AfforestationSoilManagement(OrganicSoil):
+
+    final_vegetation_type = ForeignKey(VegetationType, on_delete=CASCADE)
+    initial_land_use = ForeignKey(LandUseType, on_delete=CASCADE)
+
+    ha_w = IntegerField(null=True, blank=True)
+    ha_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_w_rate")
+    ha_wo = IntegerField(null=True, blank=True)
+    ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_wo_rate")
+
+    is_biomass_burned = BooleanField(default=False)
+
+    # Area under drainage
+    drained_ha_w = IntegerField(null=True, blank=True)
+    drained_ha_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_drained_ha_w_rate")
+    drained_ha_wo = IntegerField(null=True, blank=True)
+    drained_ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_drained_ha_wo_rate")
+
+    # TODO: Find a better name?
+    is_fire_on_soil = BooleanField(default=False) 
+
+    # TODO: Replace other occurrences with this variable name
+    initial_ag_bg_biomass_t2 = FloatField(null=True, blank=True) 
+
+    final_ag_biomass_upto_20yrs_t2 = FloatField(null=True, blank=True)
+    final_ag_biomass_after_20yrs_t2 = FloatField(null=True, blank=True)
+
+    final_bg_biomass_upto_20yrs_t2 = FloatField(null=True, blank=True)
+    final_bg_biomass_after_20yrs_t2 = FloatField(null=True, blank=True)
+
+    final_socref_ag_bg_t2 = FloatField(null=True, blank=True)
+    final_litter_t2 = FloatField(null=True, blank=True)
+    final_deadwood_t2 = FloatField(null=True, blank=True)
+
+class OtherLandUseSoilManagement(OrganicSoil):
+
+    is_fire_used = BooleanField(default=False)
+
+    initial_land_use = ForeignKey(LandUseType, on_delete=CASCADE, related_name="%(class)s_initial_land_use")
+    final_land_use = ForeignKey(LandUseType, on_delete=CASCADE, related_name="%(class)s_final_land_use")
+
+    ha_w = IntegerField(null=True, blank=True)
+    ha_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_w_rate")
+    ha_wo = IntegerField(null=True, blank=True)
+    ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_wo_rate")
+
+    is_biomass_burned = BooleanField(default=False)
+
+    # Area under drainage
+    drained_ha_start = IntegerField(null=True, blank=True)
+    drained_ha_w = IntegerField(null=True, blank=True)
+    drained_ha_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_drained_ha_w_rate")
+    drained_ha_wo = IntegerField(null=True, blank=True)
+    drained_ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_drained_ha_wo_rate")
+
+    is_fire_on_soil = BooleanField(default=False)
+
+    initial_ag_carbon_t2 = FloatField(null=True, blank=True)
+    final_ag_carbon_t2 = FloatField(null=True, blank=True)
+
+class ForestLandManagement(Module):
+    vegetation_type = ForeignKey(VegetationType, on_delete=CASCADE)
+
+    degradation_level_start = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_degradation_level_start")
+    degradation_level_w = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_degradation_level_w")
+    degradation_level_wo = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_degradation_level_wo")
+
+    # TODO: Are ha_w and ha_wo read-only in the Excel sheet?
+    ha_start = IntegerField(null=True, blank=True)
+    ha_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_w_rate")
+    ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_wo_rate")
+
+    is_biomass_burned = BooleanField(default=False)
+
+    # Area under drainage
+    drained_ha_start = IntegerField(null=True, blank=True)
+    drained_ha_w = IntegerField(null=True, blank=True)
+    drained_ha_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_drained_ha_w_rate")
+    drained_ha_wo = IntegerField(null=True, blank=True)
+    drained_ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_drained_ha_wo_rate")
+
+    is_fire_on_soil = BooleanField(default=False)
+
+    degradation_level_start_t2 = FloatField(null=True, blank=True)
+    degradation_level_w_t2 = FloatField(null=True, blank=True)
+    degradation_level_wo_t2 = FloatField(null=True, blank=True)
+
+    ag_carbon_t2 = FloatField(null=True, blank=True)
+    bg_carbon_t2 = FloatField(null=True, blank=True)
+    litter_t2 = FloatField(null=True, blank=True)
+    deadwood_t2 = FloatField(null=True, blank=True)
+
+    initial_onsite_drainage_co2_t2 = FloatField(null=True, blank=True)
+    initial_onsite_drainage_ch4_t2 = FloatField(null=True, blank=True)
+    initial_onsite_drainage_n2o_t2 = FloatField(null=True, blank=True)
+
+    initial_offsite_drainage_doc_t2 = FloatField(null=True, blank=True)
+    initial_offsite_drainage_ch4_t2 = FloatField(null=True, blank=True)
+
+    initial_soil_fire_type_t2 = ForeignKey(FireType, on_delete=CASCADE, null=True, blank=True)
+    initial_soil_fire_periodicity_w = IntegerField(null=True, blank=True)
+    initial_soil_fire_impact_percentage_w = FloatField(null=True, blank=True) # TODO: What's the default value? And the max value?
+    initial_soil_fire_periodicity_wo = IntegerField(null=True, blank=True)
+    initial_soil_fire_impact_percentage_wo = FloatField(null=True, blank=True) # TODO: What's the default value? And the max value?
+
+    initial_soil_co2_t2 = FloatField(null=True, blank=True)
+    initial_soil_co_t2 = FloatField(null=True, blank=True)
+    initial_soil_ch4_t2 = FloatField(null=True, blank=True)
+    initial_soil_mean_dry_matter_t2 = FloatField(null=True, blank=True)
+
+    final_rewitting_onsite_co2_t2 = FloatField(null=True, blank=True)
+    final_rewitting_onsite_ch4_t2 = FloatField(null=True, blank=True)
+    final_rewitting_n2o_t2 = FloatField(null=True, blank=True)
+    final_rewitting_offsite_doc_t2 = FloatField(null=True, blank=True)
+
+class OtherLandManagement(Module):
+    land_use_type = ForeignKey(
+        LandUseType, 
+        on_delete=CASCADE, 
+        limit_choices_to=Q(parent_land_use__isnull=True) | Q(parent_land_use__name="Agroforestry")
+    )
+
+    land_use_area = IntegerField(null=True, blank=True)
+
+    drainage_ha_start = IntegerField(null=True, blank=True)
+    drainage_ha_w = IntegerField(null=True, blank=True)
+    drainage_ha_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_drained_ha_w_rate")
+    drainage_ha_wo = IntegerField(null=True, blank=True)
+    drainage_ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_drained_ha_wo_rate")
+
+    is_management_burned = BooleanField(default=False)
+    is_fire_on_soil = BooleanField(default=False)
+
+    onsite_drainage_co2_t2 = FloatField(null=True, blank=True)
+    onsite_drainage_ch4_t2 = FloatField(null=True, blank=True)
+    onsite_drainage_n2o_t2 = FloatField(null=True, blank=True)
+    offsite_drainage_doc_t2 = FloatField(null=True, blank=True)
+    offsite_drainage_ch4_t2 = FloatField(null=True, blank=True)
+
+    soil_fire_type_t2 = ForeignKey(FireType, on_delete=CASCADE, null=True, blank=True)
+    soil_fire_periodicity_w = IntegerField(null=True, blank=True)
+    soil_fire_impact_percentage_w = FloatField(null=True, blank=True) # TODO: What's the default value? And the max value?
+    soil_fire_periodicity_wo = IntegerField(null=True, blank=True)
+    soil_fire_impact_percentage_wo = FloatField(null=True, blank=True) # TODO: What's the default value? And the max value?
+    soil_co2_t2 = FloatField(null=True, blank=True)
+    soil_co_t2 = FloatField(null=True, blank=True)
+    soil_ch4_t2 = FloatField(null=True, blank=True)
+    soil_mean_dry_matter_t2 = FloatField(null=True, blank=True)
+
+    rewitting_onsite_co2_t2 = FloatField(null=True, blank=True)
+    rewitting_onsite_ch4_t2 = FloatField(null=True, blank=True)
+    rewitting_n2o_t2 = FloatField(null=True, blank=True)
+    rewitting_offsite_doc_t2 = FloatField(null=True, blank=True)
+
+class PeatExtractionLandManagement(Module):
+    peat_type = ForeignKey(PeatType, on_delete=CASCADE)
+
+    ha_start = IntegerField(null=True, blank=True)
+    ha_w = IntegerField(null=True, blank=True)
+    ha_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_w_rate")
+    ha_wo = IntegerField(null=True, blank=True)
+    ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_wo_rate")
+
+    ditches_percentage_start = FloatField(null=True, blank=True)
+    ditches_percentage_w = FloatField(null=True, blank=True)
+    ditches_percentage_wo = FloatField(null=True, blank=True)
+
+    extraction_height_start = FloatField(null=True, blank=True)
+    extraction_height_w = FloatField(null=True, blank=True)
+    extraction_height_wo = FloatField(null=True, blank=True)
+
+    onsite_drainage_co2_t2 = FloatField(null=True, blank=True)
+    onsite_drainage_ch4_t2 = FloatField(null=True, blank=True)
+    onsite_drainage_n2o_t2 = FloatField(null=True, blank=True)
+    offsite_drainage_doc_t2 = FloatField(null=True, blank=True)
+    offsite_drainage_ch4_t2 = FloatField(null=True, blank=True)
+
+    peat_density_t2 = FloatField(null=True, blank=True)
+    is_used_for_energy_t2 = BooleanField(default=False)
+
+class InlandWaterbody(Module):
+    waterbody_type = ForeignKey(WaterbodyType, on_delete=CASCADE)
+
+    ha_start = IntegerField(null=True, blank=True)
+    ha_w = IntegerField(null=True, blank=True)
+    ha_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_w_rate")
+    ha_wo = IntegerField(null=True, blank=True)
+    ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_wo_rate")
+
+    trophic_type = ForeignKey(TrophicType, on_delete=CASCADE, null=True, blank=True)
+
+    ch4_emissions_start_t2 = FloatField(null=True, blank=True)
+    ch4_emissions_w_t2 = FloatField(null=True, blank=True)
+    ch4_emissions_wo_t2 = FloatField(null=True, blank=True)
+
+    trophic_alpha_t2 = FloatField(null=True, blank=True)
+    trophic_mean_annual_t2 = FloatField(null=True, blank=True)
