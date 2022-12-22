@@ -12,6 +12,11 @@ from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from rest_framework.views import *
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+
+activity_id = openapi.Parameter('activity_id', openapi.IN_QUERY, description="ID of activity related to the module", type=openapi.TYPE_INTEGER)
+project_id = openapi.Parameter('project_id', openapi.IN_QUERY, description="ID of project related to the activity", type=openapi.TYPE_INTEGER)
 
 class AuthenticatedViewSet(viewsets.GenericViewSet):
     permission_classes = [permissions.IsAuthenticated]
@@ -30,12 +35,17 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = Activity.objects.all()
     serializer_class = get_model_serializer(Activity)
 
-    def get_queryset(self):
+    @swagger_auto_schema(
+        manual_parameters=[project_id],
+        responses={400: 'project_id not provided'}
+    )
+    def list(self, request):
         """
         Get all activities for a given project, by filtering against a `project_id` query parameter in the URL.
         """
         project_id = get_query_param_or_validation_error(self.request, 'project_id')
-        return Activity.objects.filter(project__id=project_id, project__user=self.request.user)
+        list = Activity.objects.filter(project__id=project_id, project__user=self.request.user)
+        return Response(data=get_model_serializer(Activity)(list, many=True).data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['get'])
     def modules(self, request, pk=None):
@@ -55,6 +65,50 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 modules[module.name] = get_model_serializer(module_model)(module_object).data
         
         return Response(data=modules, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        responses={404: 'Module not found', 400: 'Invalid Module name'}
+    )
+    def get_module_from_uri(self, request, activity_id=None, module_name: str=None):
+        """
+        Returns a Module for a given activity matching `activity_id`and `module_name`.
+        """
+
+        activity = get_object_or_404(Activity, pk=activity_id, project__user=self.request.user)
+
+        try:
+            module_object = apps.get_model('api', module_name.capitalize())
+        except LookupError:
+            return Response({"details": f"Module '{module_name}' does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+
+        module = get_object_or_404(module_object, activity__id=activity.pk, activity__project__user=self.request.user)
+        
+        self.serializer_class = get_model_serializer(module.__class__)
+        serializer = get_model_serializer(module.__class__)(module)
+
+        return Response(serializer.data)
+
+    @swagger_auto_schema(
+        responses={404: 'Activity or Module not found', 400: 'Invalid Module name'}
+    )
+    def module_results(self, request, activity_id=None, module_name: str=None):
+        """
+        Calculates and returns total emissions for a single module.
+        """
+
+        activity = get_object_or_404(Activity, pk=activity_id, project__user=self.request.user)
+
+        try:
+            module_object = apps.get_model('api', module_name.capitalize())
+        except LookupError:
+            return Response({"details": f"Module '{module_name}' does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+
+        module = get_object_or_404(module_object, activity__id=activity.pk, activity__project__user=self.request.user)
+
+        module_results = calculate_module_results(module.__class__, module.pk, self.request.user)
+        serializer = getResultSerializer()(module_results)
+
+        return Response(serializer.data)
 
 class ModuleTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
@@ -114,10 +168,10 @@ def calc_result(input: Model, project: Project):
             result = calc_defo_result(input, project)
         case "Afforestation":
             result = calc_affo_result(input, project)
-        case "OtherLandUseChange":
+        case "OtherLandUse":
             result = calc_oluc_result(input, project)
         case _:
-            raise Exception("Invalid input type")
+            return Response({"details": f"No implemented calculations for Module '{input.__class__.__name__}'."}, status=status.HTTP_400_BAD_REQUEST)
 
     return result
 
@@ -324,7 +378,7 @@ def calc_defo_result(defo: Deforestation, project: Project):
 
     return results
 
-def calc_oluc_result(input: OtherLandUseChange, project:Project):
+def calc_oluc_result(input: OtherLandUse, project:Project):
     """
     Calculate emissions for a single Afforestation input.
     """
