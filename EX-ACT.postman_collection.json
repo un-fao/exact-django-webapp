@@ -57,20 +57,16 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8000/api/modules?activity_id=5",
+					"raw": "localhost:8000/api/activities/5/modules",
 					"host": [
 						"localhost"
 					],
 					"port": "8000",
 					"path": [
 						"api",
+						"activities",
+						"5",
 						"modules"
-					],
-					"query": [
-						{
-							"key": "activity_id",
-							"value": "5"
-						}
 					]
 				}
 			},
@@ -102,21 +98,17 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8000/api/modules/deforestation?activity_id=5",
+					"raw": "localhost:8000/api/activities/5/modules/deforestation",
 					"host": [
 						"localhost"
 					],
 					"port": "8000",
 					"path": [
 						"api",
+						"activities",
+						"5",
 						"modules",
 						"deforestation"
-					],
-					"query": [
-						{
-							"key": "activity_id",
-							"value": "5"
-						}
 					]
 				}
 			},
@@ -128,21 +120,17 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8000/api/modules/afforestation?activity_id=5",
+					"raw": "localhost:8000/api/activities/5/modules/afforestation",
 					"host": [
 						"localhost"
 					],
 					"port": "8000",
 					"path": [
 						"api",
+						"activities",
+						"5",
 						"modules",
 						"afforestation"
-					],
-					"query": [
-						{
-							"key": "activity_id",
-							"value": "5"
-						}
 					]
 				}
 			},
@@ -154,21 +142,17 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8000/api/modules/otherlanduses?activity_id=5",
+					"raw": "localhost:8000/api/activities/5/modules/otherlanduse",
 					"host": [
 						"localhost"
 					],
 					"port": "8000",
 					"path": [
 						"api",
+						"activities",
+						"5",
 						"modules",
-						"otherlanduses"
-					],
-					"query": [
-						{
-							"key": "activity_id",
-							"value": "5"
-						}
+						"otherlanduse"
 					]
 				}
 			},
@@ -180,21 +164,83 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8000/api/modules/annualcropping?activity_id=5",
+					"raw": "localhost:8000/api/activities/5/modules/annualcropping",
 					"host": [
 						"localhost"
 					],
 					"port": "8000",
 					"path": [
 						"api",
+						"activities",
+						"5",
 						"modules",
 						"annualcropping"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PerennialCropping Module(s) for Activity",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/api/activities/5/modules/perennialcropping",
+					"host": [
+						"localhost"
 					],
-					"query": [
-						{
-							"key": "activity_id",
-							"value": "5"
-						}
+					"port": "8000",
+					"path": [
+						"api",
+						"activities",
+						"5",
+						"modules",
+						"perennialcropping"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Grassland Module(s) for Activity",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/api/activities/5/modules/grassland",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"activities",
+						"5",
+						"modules",
+						"grassland"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Livestock Module(s) for Activity",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/api/activities/5/modules/livestock",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"activities",
+						"5",
+						"modules",
+						"livestock"
 					]
 				}
 			},
@@ -206,16 +252,17 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8000/api/modules/deforestation/2/results",
+					"raw": "localhost:8000/api/activities/5/modules/deforestation/results",
 					"host": [
 						"localhost"
 					],
 					"port": "8000",
 					"path": [
 						"api",
+						"activities",
+						"5",
 						"modules",
 						"deforestation",
-						"2",
 						"results"
 					]
 				}
@@ -228,16 +275,17 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8000/api/modules/afforestation/1/results",
+					"raw": "localhost:8000/api/activities/5/modules/afforestation/results",
 					"host": [
 						"localhost"
 					],
 					"port": "8000",
 					"path": [
 						"api",
+						"activities",
+						"5",
 						"modules",
 						"afforestation",
-						"1",
 						"results"
 					]
 				}
@@ -245,21 +293,45 @@
 			"response": []
 		},
 		{
-			"name": "OtherLandUses Results",
+			"name": "OtherLandUse Results",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8000/api/modules/otherlanduses/2/results",
+					"raw": "localhost:8000/api/activities/5/modules/otherlanduse/results",
 					"host": [
 						"localhost"
 					],
 					"port": "8000",
 					"path": [
 						"api",
+						"activities",
+						"5",
 						"modules",
-						"otherlanduses",
-						"2",
+						"otherlanduse",
+						"results"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AnnualCropping Results",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/api/activities/5/modules/annualcropping/results",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"activities",
+						"5",
+						"modules",
+						"annualcropping",
 						"results"
 					]
 				}
