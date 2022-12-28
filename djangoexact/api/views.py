@@ -49,6 +49,30 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(data=get_model_serializer(Activity)(list, many=True).data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['get'])
+    def results(self, request, pk=None):
+        """
+        Calculates and returns total emissions for all the modules in the activity.
+        """
+        activity = get_object_or_404(Activity, pk=pk, project__user=self.request.user)
+
+        module_types = ModuleType.objects.all()
+        modules = {}
+        for module in module_types:
+            module_model = apps.get_model(API, sanitize_for_model(module.name))
+            module_object = module_model.objects.filter(activity__id=pk, activity__project__user=self.request.user).first()
+            if module_object:
+                modules[module.name] = {}
+                modules[module.name][DATA] = get_model_serializer(module_model)(module_object).data
+
+                try:
+                    results = calc_result(module_object, activity.project)
+                    modules[module.name][RESULTS] = get_result_serializer()(results).data
+                except Exception as e:
+                    modules[module.name][RESULTS] = {DETAILS: str(e)}
+
+        return Response(modules)
+
+    @action(detail=True, methods=['get'])
     def modules(self, request, pk=None):
         """
         Lists the modules of a given activity.
@@ -60,56 +84,12 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         module_types = ModuleType.objects.all()
 
         for module in module_types:
-            module_model = apps.get_model('api', module.name.replace(" ", ""))
+            module_model = apps.get_model(API, sanitize_for_model(module.name))
             module_object = module_model.objects.filter(activity__id=pk, activity__project__user=self.request.user).first()
             if module_object:
                 modules[module.name] = get_model_serializer(module_model)(module_object).data
         
         return Response(data=modules, status=status.HTTP_200_OK)
-
-    @swagger_auto_schema(
-        responses={404: 'Module not found', 400: 'Invalid Module name'}
-    )
-    def module_from_uri(self, request, activity_id=None, module_name: str=None):
-        """
-        Returns a Module for a given activity matching `activity_id`and `module_name`.
-        """
-
-        activity = get_object_or_404(Activity, pk=activity_id, project__user=self.request.user)
-
-        try:
-            module_object = apps.get_model('api', module_name.capitalize())
-        except LookupError:
-            return Response({"details": f"Module '{module_name}' does not exist."}, status=status.HTTP_400_BAD_REQUEST)
-
-        module = get_object_or_404(module_object, activity__id=activity.pk, activity__project__user=self.request.user)
-        
-        self.serializer_class = get_model_serializer(module.__class__)
-        serializer = get_model_serializer(module.__class__)(module)
-
-        return Response(serializer.data)
-
-    @swagger_auto_schema(
-        responses={404: 'Activity or Module not found', 400: 'Invalid Module name'}
-    )
-    def module_results(self, request, activity_id=None, module_name: str=None):
-        """
-        Calculates and returns total emissions for a single module.
-        """
-
-        activity = get_object_or_404(Activity, pk=activity_id, project__user=self.request.user)
-
-        try:
-            module_object = apps.get_model('api', module_name.capitalize())
-        except LookupError:
-            return Response({"details": f"Module '{module_name}' does not exist."}, status=status.HTTP_400_BAD_REQUEST)
-
-        module = get_object_or_404(module_object, activity__id=activity.pk, activity__project__user=self.request.user)
-
-        module_results = calculate_module_results(module.__class__, module.pk, self.request.user)
-        serializer = getResultSerializer()(module_results)
-
-        return Response(serializer.data)
 
 class ModuleTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
@@ -119,7 +99,7 @@ class ModuleTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     serializer_class = get_model_serializer(ModuleType)
 
 def generic_module_viewset(model: Model):
-    class GenericModelViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    class GenericModuleViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         queryset = model.objects.all()
         serializer_class = get_model_serializer(model)
 
@@ -136,8 +116,9 @@ def generic_module_viewset(model: Model):
                 # Check if the same module for this activity already exists
                 # TODO: Can activities have multiples of the same module?
                 if model.objects.filter(activity__id=activity_id).exists():
-                    return Response({"details": f"Module '{model.__name__}' already exists for this activity."}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response(error(f"Module '{model.__name__}' already exists for this activity."), status=status.HTTP_400_BAD_REQUEST)
 
+                # Check if the activity belongs to the user
                 activity = get_object_or_404(Activity, pk=activity_id, project__user=self.request.user)
                 serializer.save(activity=activity)
 
@@ -167,58 +148,32 @@ def generic_module_viewset(model: Model):
             TODO: Define structure and format of the real response.
             """
 
-            module_results = calculate_module_results(model, pk, self.request.user)
-            serializer = getResultSerializer()(module_results)
+            module = get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
+
+            try:
+                module_results = calc_result(module, module.activity.project)
+            except Exception as e:
+                return Response(error(str(e)), status=status.HTTP_400_BAD_REQUEST)
+
+            serializer = get_result_serializer()(module_results)
 
             return Response(serializer.data)
 
-    return GenericModelViewSet
-
-def calculate_module_results(model: Model, module_id: int, user: User):
-
-    module = get_object_or_404(model, pk=module_id, activity__project__user=user)
-    project = get_object_or_404(Project, pk=module.activity.project.id)
-    return calc_result(module, project)
+    return GenericModuleViewSet
 
 def calc_result(input: Model, project: Project):
 
-    result = {}
-
     match input.__class__.__name__:
-        case "Deforestation":
-            result = calc_defo_result(input, project)
-        case "Afforestation":
-            result = calc_affo_result(input, project)
-        case "OtherLandUse":
-            result = calc_oluc_result(input, project)
-        case "AnnualCropping":
-            result = calc_annual_result(input, project)
+        case Deforestation.__name__:
+            return calc_defo_result(input, project)
+        case Afforestation.__name__:
+            return calc_affo_result(input, project)
+        case OtherLandUse.__name__:
+            return calc_oluc_result(input, project)
+        case AnnualCropping.__name__:
+            return calc_annual_result(input, project)
         case _:
-            return Response({"details": f"No implemented calculations for Module '{input.__class__.__name__}'."}, status=status.HTTP_400_BAD_REQUEST)
-
-    return result
-
-def calc_activity_results(input_list: List, project: Project):
-
-    results = {
-        "inputs": [],
-        "result": {
-            "total_w": 0,
-            "total_wo": 0,
-            "balance": 0,
-        }
-    }
-
-    for input in input_list:
-
-        result = calc_result(input, project)
-
-        results["inputs"].append({'input': input, 'result': result})
-        results["result"]["total_w"] += result["total_w"]
-        results["result"]["total_wo"] += result["total_wo"]
-        results["result"]["balance"] += result["balance"]
-
-    return results
+            raise Exception(f"Module '{input.__class__.__name__}' not supported.")
 
 def calc_affo_result(input: Afforestation, project:Project):
     """
@@ -354,7 +309,7 @@ def calc_defo_result(defo: Deforestation, project: Project):
         mangroves_data = DataOnMangroves.objects.get(continent=continent)
 
     combustion_factor = CombustionFactorValues.objects.get(vegetation_type=vegetation_type)
-    moisture_factor = DefaultEmissionFactors.objects.get(moisture=moisture)
+    moisture_factor = DefaultEmissionFactors.objects.get(moisture=moisture, input__name__icontains="Other N Inputs")
     flu = LandUseCarbonStockExchangeFactor.objects.get(climate=climate, moisture=moisture, land_use_type=land_use_type)
     
     inputs = [
@@ -431,7 +386,7 @@ def calc_oluc_result(input: OtherLandUse, project:Project):
 
     c_n_ratio = CN_RATIO_GRASSLAND if initial_land_use.name == "Grassland" else CN_RATIO_FOREST
 
-    moisture_factor = DefaultEmissionFactors.objects.get(moisture=moisture)
+    moisture_factor = DefaultEmissionFactors.objects.get(moisture=moisture, input__name__icontains="Other N Inputs")
     combustion_factor = AfforestationCombustionFactorValues.objects.get(land_use_type=initial_land_use)
 
     inputs = [
@@ -478,7 +433,6 @@ def calc_annual_result(input: AnnualCropping, project:Project):
     """
     climate = project.climate
     moisture = project.moisture
-    continent = project.continent
     land_use_type = input.land_use_type
     minor_land_use_type = input.minor_crop_type_t2
 
@@ -488,17 +442,13 @@ def calc_annual_result(input: AnnualCropping, project:Project):
     n_estimation_factor = CropNitrousEstimationDefaultFactor.objects.get(land_use_type=land_use_type)
 
     # Minor crop
-
-    minor_burning_emission_factor = None
-    minor_combustion_factor = None
-    minor_n_estimation_factor = None
-
     try:
         minor_combustion_factor = FiresCombustionFactor.objects.get(land_use_type=minor_land_use_type)
-        # TODO: Change logic
+        # TODO: Change logic for cleaner code
         minor_burning_emission_factor = BurningEmissionFactor.objects.get(category__name="Agricultural residues")
         minor_n_estimation_factor = CropNitrousEstimationDefaultFactor.objects.get(land_use_type=minor_land_use_type)
     except:
+        # If only one of the above operations fails, all minor variables must be set to None
         minor_burning_emission_factor = None
         minor_combustion_factor = None
         minor_n_estimation_factor = None
@@ -507,7 +457,6 @@ def calc_annual_result(input: AnnualCropping, project:Project):
     flu = LandUseCarbonStockExchangeFactor.objects.get(climate=climate, moisture=moisture, land_use_type=land_use_type)
     fi = OrganicInputCarbonStockExchangeFactor.objects.get(climate=climate, moisture=moisture, organic_input_type=input.organic_input_type)
     fmg = TillageCarbonStockExchangeFactor.objects.get(climate=climate, moisture=moisture, tillage_management_type=input.tillage_management_type)
-
 
     inputs = [
 
@@ -538,16 +487,16 @@ def calc_annual_result(input: AnnualCropping, project:Project):
 
         ### Residue Burning
         project.gw_potential.ch4,
-        # TODO: Add residue_management_type to db for cleaner logic
+        # TODO: Add residue_management_type attribute to model for cleaner logic
         burning_emission_factor.ch4 if input.residue_management_type.name == "Burned" else None,
-        fires_combustion_factor.value, # Wrong 0.89 should be 0.85
+        fires_combustion_factor.value,
         input.main_biomass_factor_t2,
         n_estimation_factor.slope,
         n_estimation_factor.intercept,
         input.crop_yield,
         minor_burning_emission_factor.ch4 if minor_burning_emission_factor is not None else None,
-        minor_combustion_factor.value if minor_combustion_factor is not None else None, # It's 0.85 in Excel?
-        input.minor_biomass_factor_t2, # It's 0 in Excel?
+        minor_combustion_factor.value if minor_combustion_factor is not None else None,
+        input.minor_biomass_factor_t2,
         minor_n_estimation_factor.slope if minor_n_estimation_factor is not None else None,
         minor_n_estimation_factor.intercept if minor_n_estimation_factor is not None else None,
         input.minor_yield_t2,
@@ -562,7 +511,7 @@ def calc_annual_result(input: AnnualCropping, project:Project):
         minor_n_estimation_factor.rs_t if minor_n_estimation_factor is not None else None,
         minor_n_estimation_factor.n_bg_t if minor_n_estimation_factor is not None else None,
     ]
-    print(inputs)
+
     total_w, total_wo, balance = annuals.calculate_emissions(*inputs)
 
     results = {
