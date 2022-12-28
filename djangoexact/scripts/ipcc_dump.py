@@ -219,5 +219,57 @@ def run():
                 ch4=row[ch4],
                 n2o=row[n2o]
             )
+
+    with(open('scripts\ipcc_data\BurningEmissionFactors.csv', 'r')) as f:
+        reader = csv.reader(f)
+        header = next(reader, None)
+        data = list(reader)
+
+        for row in data:
+
+            category = 0
+            co2 = 1
+            co = 2
+            ch4 = 3
+            n2o = 4
+            nox = 5
+
+            emission_factor_category = EmissionFactorCategory.objects.get_or_create(name=row[category])[0]
+            
+            BurningEmissionFactor.objects.get_or_create(
+                category = emission_factor_category,
+                co2 = row[co2],
+                co = row[co],
+                ch4 = row[ch4],
+                n2o = row[n2o],
+                nox = row[nox]
+            )
+    with(open('scripts\ipcc_data\FiresCombustionFactors.csv', 'r')) as f:
+        reader = csv.reader(f)
+        data = list(reader)
+
+        for row in data:
+            land_name = sanitize(row[0])
+            land_use_type = LandUseType.objects.get_or_create(name=land_name)[0] if land_name != "Other" else None
+            
+            fires_cf = FiresCombustionFactor.objects.get_or_create(
+                land_use_type = land_use_type,
+                value = row[1]
+            ) if land_use_type is not None else None
+
+    with(open('scripts\ipcc_data\CropNitrousEstimationDefaultFactors.csv', 'r')) as f:
+        reader = csv.reader(f)
+        header = next(reader, None)
+        data = list(reader)
+
+        for row in data:
+            crop_type = LandUseType.objects.get_or_create(name=sanitize(row[0]))[0]
+            CropNitrousEstimationDefaultFactor.objects.get_or_create(
+                land_use_type = crop_type,
+                slope = row[1] if row[1] != 'NA' else None,
+                intercept = row[2] if row[2] != 'NA' else None,
+                n_ag_residues = row[3],
+                rs_t = row[4],
+                n_bg_t = row[5]
+            )
 """
-    pass
