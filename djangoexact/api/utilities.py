@@ -6,6 +6,10 @@ CN_RATIO_GRASSLAND = 15
 MANGROVE_FACTOR = 0.451
 NON_MANGROVE_FACTOR = 0.47
 MANGROVES = 'Mangroves'
+DATA = 'data'
+RESULTS = 'results'
+DETAILS = 'details'
+API = 'api'
 
 def snake_case(str):
     res = [str[0].lower()]
@@ -22,7 +26,7 @@ def sanitize_for_model(str: str):
     return str.replace(" ", "").replace("-", "").replace("_", "")
 
 def error(msg):
-    return {'error': msg}
+    return {'details': msg}
 
 def get_model(name, app_name='api', suffix='Input'):
     return apps.get_model(app_name, sanitize_for_model(name+suffix))
