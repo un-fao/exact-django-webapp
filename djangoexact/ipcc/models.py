@@ -81,7 +81,7 @@ class LitterDeadwoodCarbonStock(Model):
     def __str__(self):
         return f"{self.vegetation_type.name}, litter: {self.litter}, dw: {self.dw}"
 
-class LandUseStockExchangeFactor(Model):
+class LandUseCarbonStockExchangeFactor(Model):
     climate = ForeignKey('api.Climate', on_delete=CASCADE)
     moisture = ForeignKey('api.Moisture', on_delete=CASCADE)
     land_use_type = ForeignKey('api.LandUseType', on_delete=CASCADE)
@@ -174,3 +174,56 @@ class AboveGroundNetBiomassGrowth(Model):
 
     def __str__(self):
         return f"{self.continent} {self.vegetation_type}, value after 20 years: {self.value_after_20_years}, value upto 20 years: {self.value_upto_20_years}"
+
+class EmissionFactorCategory(Model):
+    name = CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.name
+
+class BurningEmissionFactor(Model):
+    category = ForeignKey('ipcc.EmissionFactorCategory', on_delete=CASCADE)
+    co2 = FloatField()
+    co = FloatField()
+    ch4 = FloatField()
+    n2o = FloatField()
+    nox = FloatField()
+
+    def __str__(self):
+        return f"BurningEmissionFactor for {self.category.name}"
+
+class FiresCombustionFactor(Model):
+    land_use_type = ForeignKey('api.LandUseType', on_delete=CASCADE)
+    value = FloatField()
+
+    def __str__(self):
+        return f"FiresCombustionFactor for {self.land_use_type.name}"
+
+class CropNitrousEstimationDefaultFactor(Model):
+    land_use_type = ForeignKey('api.LandUseType', on_delete=CASCADE)
+    slope = FloatField(null=True, blank=True)
+    intercept = FloatField(null=True, blank=True)
+    n_ag_residues = FloatField()
+    rs_t = FloatField()
+    n_bg_t = FloatField()
+
+    def __str__(self):
+        return f"CropNitrousEstimationDefaultFactor for {self.land_use_type.name}"
+
+class TillageCarbonStockExchangeFactor(Model):
+    climate = ForeignKey('api.Climate', on_delete=CASCADE)
+    moisture = ForeignKey('api.Moisture', on_delete=CASCADE)
+    tillage_management_type = ForeignKey('api.TillageManagementType', on_delete=CASCADE)
+    value = FloatField()
+
+    def __str__(self):
+        return f"({self.pk}) value {self.value} for {self.tillage_management_type.name}"
+
+class OrganicInputCarbonStockExchangeFactor(Model):
+    climate = ForeignKey('api.Climate', on_delete=CASCADE)
+    moisture = ForeignKey('api.Moisture', on_delete=CASCADE)
+    organic_input_type = ForeignKey('api.OrganicInputType', on_delete=CASCADE)
+    value = FloatField()
+
+    def __str__(self):
+        return f"({self.pk}) value {self.value} for {self.organic_input_type.name}"
