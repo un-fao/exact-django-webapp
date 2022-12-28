@@ -48,7 +48,7 @@ class LandUseType(Model):
     needs_assessment = BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.name}"+(f" of {self.parent_land_use}" if self.parent_land_use else "")
+        return f"({self.pk}) {self.name}"+(f" of {self.parent_land_use}" if self.parent_land_use else "")
 
 class ChangeRate(Model):
     name = CharField(max_length=25)
@@ -117,7 +117,7 @@ class OrganicInputType(Model):
     name = CharField(max_length=100)
 
     def __str__(self):
-        return self.name
+        return f"({self.pk}) {self.name}"
 
 class ResidueManagementType(Model):
     name = CharField(max_length=100)
@@ -147,7 +147,7 @@ class TillageManagementType(Model):
     name = CharField(max_length=100)
 
     def __str__(self):
-        return self.name
+        return f"({self.pk}) {self.name}"
 
 class WaterManagementTypeBeforeCultivation(Model):
     name = CharField(max_length=100)
@@ -382,6 +382,24 @@ class AnnualCropping(Module):
     organic_input_type = ForeignKey(OrganicInputType, on_delete=CASCADE)
     residue_management_type = ForeignKey(ResidueManagementType, on_delete=CASCADE)
     crop_yield = FloatField()
+
+    ha_start = IntegerField()
+    ha_w = IntegerField()
+    ha_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_w_rate")
+    ha_wo = IntegerField()
+    ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_wo_rate+")
+
+    main_soil_carbon_t2 = FloatField(null=True, blank=True)
+    main_tillage_factor_t2 = FloatField(null=True, blank=True)
+    main_organic_input_factor_t2 = FloatField(null=True, blank=True)
+    main_biomass_factor_t2 = FloatField(null=True, blank=True)
+
+    main_land_use_factor_t2 = FloatField(null=True, blank=True)
+
+    minor_crop_type_t2 = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_minor_crop_type")
+    minor_yield_t2 = FloatField(null=True, blank=True)
+    minor_residue_management_type_t2 = ForeignKey(ResidueManagementType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_minor_residue_management_type")
+    minor_biomass_factor_t2 = FloatField(null=True, blank=True)
 
     def __str__(self):
         return f"AnnualCroppingInput for activity {self.activity.name}, crop {self.land_use_type.name} in project {self.activity.project.name}"
