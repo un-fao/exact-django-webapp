@@ -222,6 +222,12 @@ class TrophicType(Model):
     def __str__(self):
         return self.name
 
+class Salinity(Model):
+    name = CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
 ##############################
 ########## Project ###########
 ##############################
@@ -800,6 +806,72 @@ class InlandWaterbody(Module):
     ch4_emissions_start_t2 = FloatField(null=True, blank=True)
     ch4_emissions_w_t2 = FloatField(null=True, blank=True)
     ch4_emissions_wo_t2 = FloatField(null=True, blank=True)
+
+    trophic_alpha_t2 = FloatField(null=True, blank=True)
+    trophic_mean_annual_t2 = FloatField(null=True, blank=True)
+
+##### Coastal Wetlands
+
+class Extraction(Module):
+    vegetation_type = ForeignKey(VegetationType, on_delete=CASCADE)
+    ha_start = IntegerField(null=True, blank=True)
+    ha_w_excavated_percentage = FloatField(null=True, blank=True)
+    ha_wo_excavated_percentage = FloatField(null=True, blank=True)
+
+    extraction_ag_t2 = FloatField(null=True, blank=True)
+    extraction_bg_t2 = FloatField(null=True, blank=True)
+    extraction_litter_t2 = FloatField(null=True, blank=True)
+    extraction_deadwood_t2 = FloatField(null=True, blank=True)
+    extraction_soil_type_t2 = ForeignKey(SoilType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_extracted_soil_type_t2")
+    extraction_soil_t2 = FloatField(null=True, blank=True)
+    c_after_excavation_t2 = FloatField(null=True, blank=True)
+
+    # TODO: Drainage as separate module?
+    drainage_percentage_start = FloatField(null=True, blank=True)
+    drainage_percentage_w = FloatField(null=True, blank=True)
+    drainage_percentage_wo = FloatField(null=True, blank=True)
+
+    drainage_ag_t2 = FloatField(null=True, blank=True)
+    drainage_bg_t2 = FloatField(null=True, blank=True)
+    drainage_litter_t2 = FloatField(null=True, blank=True)
+    drainage_deadwood_t2 = FloatField(null=True, blank=True)
+    drainage_soil_type_t2 = ForeignKey(SoilType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_drained_soil_type_t2")
+    drainage_soil_t2 = FloatField(null=True, blank=True)
+
+    ef_drainage_t2 = FloatField(null=True, blank=True)
+
+class Rewetting(Module):
+    vegetation_type = ForeignKey(VegetationType, on_delete=CASCADE)
+    ha_w = IntegerField(null=True, blank=True)
+    ha_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_w_rate")
+    ha_wo = IntegerField(null=True, blank=True)
+    ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_wo_rate")
+
+    restored_biomass_percentage_w = FloatField(null=True, blank=True)
+    restored_biomass_percentage_wo = FloatField(null=True, blank=True)
+
+    ag_t2 = FloatField(null=True, blank=True)
+    bg_t2 = FloatField(null=True, blank=True)
+    litter_t2 = FloatField(null=True, blank=True)
+    deadwood_t2 = FloatField(null=True, blank=True)
+    avg_salinity_t2 = ForeignKey(Salinity, on_delete=CASCADE, null=True, blank=True)
+    ef_co2_t2 = FloatField(null=True, blank=True)
+    ef_ch4_t2 = FloatField(null=True, blank=True)
+
+class CoastalWaterbody(Module):
+    waterbody_type = ForeignKey(WaterbodyType, on_delete=CASCADE)
+    trophic_type = ForeignKey(TrophicType, on_delete=CASCADE, null=True, blank=True)
+
+    # NOTE: Total area must remain constant
+    ha_start = IntegerField(null=True, blank=True)
+    ha_w = IntegerField(null=True, blank=True)
+    ha_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_w_rate")
+    ha_wo = IntegerField(null=True, blank=True)
+    ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_wo_rate")
+
+    ch4_start_t2 = FloatField(null=True, blank=True)
+    ch4_w_t2 = FloatField(null=True, blank=True)
+    ch4_wo_t2 = FloatField(null=True, blank=True)
 
     trophic_alpha_t2 = FloatField(null=True, blank=True)
     trophic_mean_annual_t2 = FloatField(null=True, blank=True)

@@ -41,6 +41,9 @@ router.register(r'forest-land-managements', views.generic_module_viewset(ForestL
 router.register(r'other-land-managements', views.generic_module_viewset(OtherLandManagement), basename='other-land-management')
 router.register(r'peat-extraction-land-managements', views.generic_module_viewset(PeatExtractionLandManagement), basename='peat-extraction-land-management')
 router.register(r'inland-waterbodies', views.generic_module_viewset(InlandWaterbody), basename='inland-waterbodies')
+router.register(r'extractions', views.generic_module_viewset(Extraction), basename='inland-waterbodies')
+router.register(r'rewettings', views.generic_module_viewset(Rewetting), basename='inland-waterbodies')
+router.register(r'coastal-waterbodies', views.generic_module_viewset(CoastalWaterbody), basename='inland-waterbodies')
 
 urlpatterns = [
    path('docs/', include_docs_urls(title='EX-ACT Docs')),
