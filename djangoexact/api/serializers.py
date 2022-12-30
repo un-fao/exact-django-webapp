@@ -1,13 +1,10 @@
 from rest_framework import serializers
 from .models import *
 
-def get_result_serializer():
-    class ResultSerializer(serializers.Serializer):
-        total_w = serializers.FloatField()
-        total_wo = serializers.FloatField()
-        balance = serializers.FloatField()
-    
-    return ResultSerializer
+class ResultSerializer(serializers.Serializer):
+    total_w = serializers.FloatField()
+    total_wo = serializers.FloatField()
+    balance = serializers.FloatField()
 
 def get_model_serializer(model_arg):
     class GenericSerializer(serializers.ModelSerializer):
