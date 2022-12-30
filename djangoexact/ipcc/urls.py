@@ -6,4 +6,4 @@ from django.urls import path
 urlpatterns = []
 
 for model_name, model in apps.get_app_config('ipcc').models.items():
-    urlpatterns.append(path(f"{model_name}/", views.GenericAPIView.as_view(), {'model': model}))
+    urlpatterns.append(path(model_name, views.GenericAPIView.as_view(), {'model': model}))
