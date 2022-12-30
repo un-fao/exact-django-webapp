@@ -1,13 +1,12 @@
 from .models import *
 from ipcc.models import *
-from typing import List
 from .utilities import *
 from .serializers import *
 from django.db.models import Q
 from rest_framework.response import Response
-from math_model import defo as defo_math
-from math_model import affo as affo_math
-from math_model import oluc as oluc_math
+from math_model import defo as defo
+from math_model import affo as affo
+from math_model import oluc as oluc
 from math_model import annuals
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
@@ -18,6 +17,12 @@ from drf_yasg.utils import swagger_auto_schema
 
 activity_id = openapi.Parameter('activity_id', openapi.IN_QUERY, description="ID of activity related to the module", type=openapi.TYPE_INTEGER)
 project_id = openapi.Parameter('project_id', openapi.IN_QUERY, description="ID of project related to the activity", type=openapi.TYPE_INTEGER)
+
+class Result(object):
+    def __init__(self, total_w, total_wo, balance):
+        self.total_w = total_w
+        self.total_wo = total_wo
+        self.balance = balance
 
 class AuthenticatedViewSet(viewsets.GenericViewSet):
     permission_classes = [permissions.IsAuthenticated]
@@ -51,22 +56,20 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     @action(detail=True, methods=['get'])
     def results(self, request, pk=None):
         """
-        Calculates and returns total emissions for all the modules in the activity.
+        Calculates and returns total emissions for each module in the activity.
         """
         activity = get_object_or_404(Activity, pk=pk, project__user=self.request.user)
 
-        module_types = ModuleType.objects.all()
         modules = {}
+        module_types = ModuleType.objects.all()
         for module in module_types:
             module_model = apps.get_model(API, sanitize_for_model(module.name))
             module_object = module_model.objects.filter(activity__id=pk, activity__project__user=self.request.user).first()
             if module_object:
                 modules[module.name] = {}
                 modules[module.name][DATA] = get_model_serializer(module_model)(module_object).data
-
                 try:
-                    results = calc_result(module_object, activity.project)
-                    modules[module.name][RESULTS] = get_result_serializer()(results).data
+                    modules[module.name][RESULTS] = calc_result(module_object, activity.project)
                 except Exception as e:
                     modules[module.name][RESULTS] = {DETAILS: str(e)}
 
@@ -78,7 +81,8 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         Lists the modules of a given activity.
         """
 
-        get_object_or_404(Activity, pk=pk, project__user=self.request.user)
+        if not Activity.objects.filter(pk=pk, project__user=self.request.user).exists():
+            return Response(error(f"Activity with id '{pk}' does not exist."), status=status.HTTP_400_BAD_REQUEST)
 
         modules = {}
         module_types = ModuleType.objects.all()
@@ -268,24 +272,16 @@ def calc_affo_result(input: Afforestation, project:Project):
         bg_biomass_gt_125.value
     ]
     
-    total_w, total_wo, balance = affo_math.afforestation(*inputs)
+    return Result(*affo.afforestation(*inputs))
 
-    results = {
-        "total_w": total_w,
-        "total_wo": total_wo,
-        "balance": balance
-    }
-
-    return results
-
-def calc_defo_result(defo: Deforestation, project: Project):
+def calc_defo_result(input: Deforestation, project: Project):
 
     climate = project.climate
     moisture = project.moisture
     continent = project.continent
     soil_type = project.soil_type
-    land_use_type = defo.land_use_type
-    vegetation_type = defo.vegetation_type
+    land_use_type = input.land_use_type
+    vegetation_type = input.vegetation_type
 
     mangroves_data = None
     defo_table = None
@@ -295,7 +291,7 @@ def calc_defo_result(defo: Deforestation, project: Project):
     total_biomass = TotalBiomassAfterDefo.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
     
     # NOTE: Maybe merge the mangroves and deforestation IPCC tables into one table?
-    if(defo.vegetation_type != MANGROVES):
+    if(input.vegetation_type != MANGROVES):
         defo_table = LitterDeadwoodCarbonStock.objects.get(vegetation_type=vegetation_type)
         ag_biomass = AboveGroundBiomass.objects.get(continent=continent, vegetation_type=vegetation_type)
         bg_biomass = BelowGroundBiomass.objects.filter(continent=continent, vegetation_type=vegetation_type)
@@ -313,48 +309,40 @@ def calc_defo_result(defo: Deforestation, project: Project):
     flu = LandUseCarbonStockExchangeFactor.objects.get(climate=climate, moisture=moisture, land_use_type=land_use_type)
     
     inputs = [
-        defo.ha_start,
-        defo.ha_w,
-        defo.ha_wo,
+        input.ha_start,
+        input.ha_w,
+        input.ha_wo,
         project.implementation_duration_yrs,
         project.capitalization_duration_yrs,
-        defo.ha_w_rate.name,
-        defo.ha_w_rate.value,
+        input.ha_w_rate.name,
+        input.ha_w_rate.value,
         total_biomass.value if total_biomass.value is not None else 0,
-        defo.final_rcs_biomass_t2, # total_biomass t2
+        input.final_rcs_biomass_t2,
         project.gw_potential.n2o,
         project.gw_potential.ch4,
-        defo.is_fire_used,
+        input.is_fire_used,
         combustion_factor.n2o,
         combustion_factor.ch4,
         combustion_factor.value,
         moisture_factor.value,
         defo_table.litter if mangroves_data is None else mangroves_data.litter,
-        defo.rcs_litter_t2, # litter t2
+        input.rcs_litter_t2,
         defo_table.dw if mangroves_data is None else mangroves_data.dw,
-        defo.rcs_deadwood_t2, # deadwood t2
-        defo.hwp,
+        input.rcs_deadwood_t2,
+        input.hwp,
         MANGROVE_FACTOR if mangroves_data is not None else NON_MANGROVE_FACTOR,
-        defo.rcs_bg_t2, # bg t2
-        defo.rcs_ag_t2, # ag t2
+        input.rcs_bg_t2,
+        input.rcs_ag_t2,
         flu.value,
-        ag_biomass.value if mangroves_data is None else mangroves_data.agb_c,
-        bg_biomass.value if mangroves_data is None else mangroves_data.bgb,
+        getattr(ag_biomass, 'value', mangroves_data.agb_c),
+        getattr(bg_biomass, 'value', mangroves_data.bgb),
         CN_RATIO_GRASSLAND,
-        defo.final_rcs_soil_c_t2, # soil after defo t2
+        input.final_rcs_soil_c_t2, # soil after defo t2
         soc_ref.value if soc_ref.value is not None else 0,
-        defo.rcs_soil_c_t2 # soil t2
+        input.rcs_soil_c_t2 # soil t2
     ]
 
-    total_w, total_wo, balance = defo_math.GHG_emissions(*inputs)
-
-    results = {
-        "total_w": total_w,
-        "total_wo": total_wo,
-        "balance": balance
-    }
-
-    return results
+    return Result(*defo.GHG_emissions(*inputs))
 
 def calc_oluc_result(input: OtherLandUse, project:Project):
     """
@@ -398,7 +386,7 @@ def calc_oluc_result(input: OtherLandUse, project:Project):
         flu_initial.value,
         flu_final.value,
         project.soc_ref_t2,
-        None, #Final socref
+        input.final_soil_carbon_t2, #TODO: Final socref?
         c_n_ratio,
         moisture_factor.value,
         combustion_factor.value,
@@ -417,15 +405,7 @@ def calc_oluc_result(input: OtherLandUse, project:Project):
         input.ha_wo
     ]
     
-    total_w, total_wo, balance = oluc_math.calculate_w_wo_balance(*inputs)
-
-    results = {
-        "total_w": total_w,
-        "total_wo": total_wo,
-        "balance": balance
-    }
-
-    return results
+    return Result(*oluc.calculate_w_wo_balance(*inputs))
 
 def calc_annual_result(input: AnnualCropping, project:Project):
     """
@@ -494,30 +474,22 @@ def calc_annual_result(input: AnnualCropping, project:Project):
         n_estimation_factor.slope,
         n_estimation_factor.intercept,
         input.crop_yield,
-        minor_burning_emission_factor.ch4 if minor_burning_emission_factor is not None else None,
-        minor_combustion_factor.value if minor_combustion_factor is not None else None,
+        getattr(minor_burning_emission_factor, "ch4", None),
+        getattr(minor_combustion_factor, "value", None),
         input.minor_biomass_factor_t2,
-        minor_n_estimation_factor.slope if minor_n_estimation_factor is not None else None,
-        minor_n_estimation_factor.intercept if minor_n_estimation_factor is not None else None,
+        getattr(minor_n_estimation_factor, "slope", None),
+        getattr(minor_n_estimation_factor, "intercept", None),
         input.minor_yield_t2,
         burning_emission_factor.n2o,
         input.residue_management_type.name == "Retained",
-        minor_burning_emission_factor.n2o if minor_burning_emission_factor is not None else None,
-        input.minor_residue_management_type_t2.name == "Retained" if input.minor_residue_management_type_t2 is not None else False,
+        getattr(minor_burning_emission_factor, "n2o", None),
+        getattr(input.minor_residue_management_type_t2, "name", None) == "Retained",
         n_estimation_factor.n_ag_residues,
         n_estimation_factor.rs_t,
         n_estimation_factor.n_bg_t,
-        minor_n_estimation_factor.n_ag_residues if minor_n_estimation_factor is not None else None,
-        minor_n_estimation_factor.rs_t if minor_n_estimation_factor is not None else None,
-        minor_n_estimation_factor.n_bg_t if minor_n_estimation_factor is not None else None,
+        getattr(minor_n_estimation_factor, "n_ag_residues", None),
+        getattr(minor_n_estimation_factor, "rs_t", None),
+        getattr(minor_n_estimation_factor, "n_bg_t", None)
     ]
 
-    total_w, total_wo, balance = annuals.calculate_emissions(*inputs)
-
-    results = {
-        "total_w": total_w,
-        "total_wo": total_wo,
-        "balance": balance
-    }
-
-    return results
+    return Result(*annuals.calculate_emissions(*inputs))
