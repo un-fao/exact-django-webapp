@@ -1,5 +1,4 @@
-from .models import *
-from ipcc.models import *
+from .models import Project, Activity, ModuleType
 from .utilities import *
 from .serializers import *
 from rest_framework import viewsets, status, permissions
@@ -150,8 +149,6 @@ def generic_module_viewset(model: Model):
             except Exception as e:
                 return Response(error(str(e)), status=status.HTTP_400_BAD_REQUEST)
 
-            serializer = get_result_serializer()(module_results)
-
-            return Response(serializer.data)
+            return Response(ResultSerializer(module_results).data)
 
     return GenericModuleViewSet
