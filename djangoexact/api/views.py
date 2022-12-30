@@ -4,10 +4,7 @@ from .utilities import *
 from .serializers import *
 from django.db.models import Q
 from rest_framework.response import Response
-from math_model import defo as defo
-from math_model import affo as affo
-from math_model import oluc as oluc
-from math_model import annuals
+from math_model import defo, affo, oluc, annuals
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
@@ -39,7 +36,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     API endpoint that allows activities to be viewed or edited. 
     """
     queryset = Activity.objects.all()
-    serializer_class = get_model_serializer(Activity)
+    serializer_class = get_module_serializer(Activity)
 
     @swagger_auto_schema(
         manual_parameters=[project_id],
@@ -51,7 +48,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
         project_id = get_query_param_or_validation_error(self.request, 'project_id')
         list = Activity.objects.filter(project__id=project_id, project__user=self.request.user)
-        return Response(data=get_model_serializer(Activity)(list, many=True).data, status=status.HTTP_200_OK)
+        return Response(data=get_module_serializer(Activity)(list, many=True).data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['get'])
     def results(self, request, pk=None):
@@ -67,7 +64,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             module_object = module_model.objects.filter(activity__id=pk, activity__project__user=self.request.user).first()
             if module_object:
                 modules[module.name] = {}
-                modules[module.name][DATA] = get_model_serializer(module_model)(module_object).data
+                modules[module.name][DATA] = get_module_serializer(module_model)(module_object).data
                 try:
                     modules[module.name][RESULTS] = calc_result(module_object, activity.project)
                 except Exception as e:
@@ -91,7 +88,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             module_model = apps.get_model(API, sanitize_for_model(module.name))
             module_object = module_model.objects.filter(activity__id=pk, activity__project__user=self.request.user).first()
             if module_object:
-                modules[module.name] = get_model_serializer(module_model)(module_object).data
+                modules[module.name] = get_module_serializer(module_model)(module_object).data
         
         return Response(data=modules, status=status.HTTP_200_OK)
 
@@ -105,14 +102,14 @@ class ModuleTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 def generic_module_viewset(model: Model):
     class GenericModuleViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         queryset = model.objects.all()
-        serializer_class = get_model_serializer(model)
+        serializer_class = get_module_serializer(model)
 
         def create(self, request):
             """
             Creates a new module for a given activity.
             """
 
-            serializer = get_model_serializer(model)(data=request.data)
+            serializer = get_module_serializer(model)(data=request.data)
             if serializer.is_valid():
 
                 activity_id = serializer.validated_data["activity"].pk
@@ -131,7 +128,7 @@ def generic_module_viewset(model: Model):
 
         def retrieve(self, request, pk=None):
             module = get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
-            return Response(get_model_serializer(model)(module).data)
+            return Response(get_module_serializer(model)(module).data)
 
         def list(self, request):
             """
@@ -142,7 +139,7 @@ def generic_module_viewset(model: Model):
             activity_id = get_query_param_or_validation_error(self.request, 'activity_id')
             module = get_object_or_404(model, activity__id=activity_id)
 
-            serializer = get_model_serializer(model)(module)
+            serializer = get_module_serializer(model)(module)
             return Response(serializer.data)
 
         @action(detail=True, methods=['get'])
