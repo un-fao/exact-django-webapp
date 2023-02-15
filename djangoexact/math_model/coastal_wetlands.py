@@ -58,7 +58,7 @@ def extraction_and_excavation(area_start, percentage_excavated_w, percentage_exc
 
     return total_w, total_wo, balance
 
-def drainage(area_start, area_end, rate_type, rate_coefficient, time_impl, time_cap, agb_default, bgb_default, litter_default, deadwood_default,
+def drainage(area_start, percentage_drained_start, percentage_drained_end, rate_type, rate_coefficient, time_impl, time_cap, agb_default, bgb_default, litter_default, deadwood_default,
             soil_1m_default, EF_drainage_default, agb_tier_2, bgb_tier_2,litter_tier_2, deadwood_tier_2, soil_1m_tier_2, EF_drainage_tier_2):
 
     ####### HELPER FUNCTIONS
@@ -145,15 +145,20 @@ def drainage(area_start, area_end, rate_type, rate_coefficient, time_impl, time_
 
     # ask Lorenzo about this variable
     stock_c_biomass_start = 0
+    area_drained_end = area_start * percentage_drained_end
+    area_drained_start = area_start * percentage_drained_start
+    
 
 
-    stock_c_biomass_end = (agb + bgb + litter + deadwood) * area_end
+    stock_c_biomass_end = (agb + bgb + litter + deadwood) * area_drained_end
     total_emissions_biomass = (stock_c_biomass_start - stock_c_biomass_end) * (44/12)
 
     maximum_soil_years = 1000 if EF_drainage == 0 else int(soil_1m/EF_drainage)
     maximum_soil_emissions = soil_1m * 44/12
 
-    total_soil_emissions = min(maximum_soil_emissions_for_area(area_start, area_end, maximum_soil_emissions), calculated_soil_emissions(EF_drainage, maximum_soil_years, time_impl, time_cap, area_start, area_end,rate_type, rate_coefficient))
+    # HERE THERE IS A 0 IN AREA_DRAINED_START ERROR?
+    # total_soil_emissions = min(maximum_soil_emissions_for_area(area_drained_start, area_drained_end, maximum_soil_emissions), calculated_soil_emissions(EF_drainage, maximum_soil_years, time_impl, time_cap, area_drained_start, area_drained_end,rate_type, rate_coefficient))
+    total_soil_emissions = min(maximum_soil_emissions_for_area(0, area_drained_end, maximum_soil_emissions), calculated_soil_emissions(EF_drainage, maximum_soil_years, time_impl, time_cap, 0, area_drained_end,rate_type, rate_coefficient))
 
     return total_soil_emissions + total_emissions_biomass
 
@@ -236,13 +241,169 @@ def coastal_waterbodies(area_start, area_end, trophic_state_default, methane_emi
     
     return total_emissions
 
+# MAYBE CHANGE THIS TO A FUNCTION THAT CAN BE GENERALIZED FOR W AND WO, WHICH WE THEN CALL TWO TIMES IN TOTAL_EMISSIONS_CALCULATION, TO DO SO IT IS SUFFICIENT TO CHANGE EXTRACTION_AND_EXCAVATION
+def total_emission_calculation(area_start_extr_drain, percentage_excavated_w, percentage_excavated_wo, agb_default_extraction, bgb_default_extraction, litter_default_extraction, deadwood_default_extraction,
+                                        soil_1m_default_extraction, percentage_c_lost_excavation_default, agb_tier_2_extraction, bgb_tier_2_extraction, litter_tier_2_extraction, deadwood_tier_2_extraction,
+                                        soil_1m_tier_2_extraction, percentage_c_lost_excavation_tier_2, percentage_drained_start, percentage_drained_w, rate_type_drainage_w, rate_coefficient_drainage_w, time_impl,
+                                        time_cap, agb_default_drainage, bgb_default_drainage, litter_default_drainage, deadwood_default_drainage, soil_1m_default_drainage, EF_drainage_default, agb_tier_2_drainage, 
+                                        bgb_tier_2_drainage, litter_tier_2_drainage, deadwood_tier_2_drainage, soil_1_m_tier_2_drainage, Ef_drainage_tier_2,  percentage_drained_wo, rate_type_drainage_wo, rate_coefficient_drainage_wo,
+                                        agb_default_rewetting, bgb_default_rewetting, litter_default_rewetting, deadwood_default_rewetting, EF_rewetting_carbon_default, EF_rewetting_methane_default,
+                                        agb_rewetting_tier_2, bgb_rewetting_tier_2, litter_rewetting_tier_2, deadwood_rewetting_tier_2, EF_rewetting_carbon_tier_2, EF_rewetting_methane_tier_2,
+                                        soil_type_rewetting, area_start_rewetting, area_rewetting_w, rate_type_rewetting_w, rate_coefficient_rewetting_w, methane_constant, area_rewetting_wo, rate_type_rewetting_wo, rate_coefficient_rewetting_wo,
+                                        area_start_waterbodies, area_w_waterbodies, trophic_state_default, methane_emission_factor_default, trophic_state_tier_2, methane_emission_factor_start_tier_2, methane_emission_factor_w_tier_2,
+                                        rate_coefficient_waterbodies_w, area_wo_waterbodies, methane_emission_factor_wo_tier_2, rate_coefficient_waterbodies_wo
+                                        ):
 
-extract_losses = extraction_and_excavation(100, 1, 0, 0, 3.65, 0, 0, 226, 0.96, None, None, None, None, None, None)
 
-drainage_losses = drainage(0, 35, 'D', 0.5, 20, 9, 0, 0, 0, 0, 226, 7.9, None, None, None, None, None, None)
+    """
+    This function is used to calculated total emissions with and without the project for the module Coastal_Wetlands.
+    It calls the functions extraction_and_excavation, drainage, rewetting, and coastal_waterbodies.
+    Inputs are:
+    EXCAVATION AND EXTRACTION:
+        area_start_extr_drain: area of the wetland at the start of the project
+        percentage_excavated_w: percentage of the wetland that is excavated with the project
+        percentage_excavated_wo: percentage of the wetland that is excavated without the project
+        agb_default_extraction: match climate moisture and type of vegetation to IPCC A2903, if present return value, else 0
+        bgb_default_extraction: match climate moisture and type of vegetation to IPCC A2111, if present return value, else 0
+        litter_default_extraction: match climate moisture and type of vegetation to IPCC A2128, if present return value, else 0
+        deadwood_default_extraction: match climate moisture and type of vegetation to IPCC A2145, if present return value, else 0
+        soil_1m_default_extraction: if type of vegetation == MANGROVE and soil tier == Tier 1:
+                                                match COUNTRY to table Atwood and take Mg C/ha
+                                    else:
+                                            if soil type == 'Mineral':
+                                                match climate moisture and type of vegetation to IPCC A2162
+                                            elif soil type == 'Organic':
+                                                match climate moisture and type of vegetation to IPCC A2179
+                                            elif soil type == 'Aggregated'
+                                                match climate moisture and type of vegetation to IPCC A2196
+                                            else:
+                                                return 0
+        percentage_c_lost_excavation_default: standard value, 96%, discuss and ask whether to include in model directly
+        agb_tier_2_extraction: tier 2 value, expects float or None
+        bgb_tier_2_extraction: tier 2 value, expects float or None
+        litter_tier_2_extraction: tier 2 value, expects float or None
+        deadwood_tier_2_extraction: tier 2 value, expects float or None
+        soil_1m_tier_2_extraction:  tier 2 value, expects float or None
+        percentage_c_lost_excavation_tier_2: tier 2 value, expects float or None
+    DRAINAGE:
+        percentage_drained_start: front end input
+        percentage_drained_w: front end input
+        rate_type_drainage_w: front end input
+        rate_coefficient_drainage_w: as always, search for rate type in reference table
+        time_impl: implementation time for the project
+        time_cap: capitalization time for the project
+        agb_default_drainage: match climate moisture and type of vegetation to IPCC A2903, if present return value, else 0
+        bgb_default_drainage: match climate moisture and type of vegetation to IPCC A2111, if present return value, else 0
+        litter_default_drainage: match climate moisture and type of vegetation to IPCC A2128, if present return value, else 0
+        deadwood_default_drainage: match climate moisture and type of vegetation to IPCC A2145, if present return value, else 0
+        soil_1m_default_drainage: if type of vegetation == MANGROVE and soil tier == Tier 1:
+                                                match COUNTRY to table Atwood and take Mg C/ha
+                                    else:
+                                            if soil type == 'Mineral':
+                                                match climate moisture and type of vegetation to IPCC A2162
+                                            elif soil type == 'Organic':
+                                                match climate moisture and type of vegetation to IPCC A2179
+                                            elif soil type == 'Aggregated'
+                                                match climate moisture and type of vegetation to IPCC A2196
+                                            else:
+                                                return 0
+        EF_drainage_default: match climate moisture and type of vegetation to IPCC A2213, if present return value, else 0
+        agb_tier_2_drainage: tier 2 value, expects float or None
+        bgb_tier_2_drainage: tier 2 value, expects float or None
+        litter_tier_2_drainage: tier 2 value, expects float or None
+        deadwood_tier_2_drainage: tier 2 value, expects float or None
+        soil_1_m_tier_2_drainage: tier 2 value, expects float or None
+        Ef_drainage_tier_2: tier 2 value, expects float or None
+        percentage_drained_wo: front end input
+        rate_type_drainage_wo: front end input
+        rate_coefficient_drainage_wo: as always, search for rate type in reference table
+    REWETTING:
+        agb_default_rewetting: match climate moisture and type of vegetation to IPCC A2903, if present return value, else 0
+        bgb_default_rewetting: match climate moisture and type of vegetation to IPCC A2111, if present return value, else 0
+        litter_default_rewetting: match climate moisture and type of vegetation to IPCC A2128, if present return value, else 0
+        deadwood_default_rewetting: match climate moisture and type of vegetation to IPCC A2145, if present return value, else 0
+        EF_rewetting_carbon_default: match climate moisture and type of vegetation to IPCC A2230, if present return value, else 0
+        EF_rewetting_methane_default: match climate moisture and type of vegetation to IPCC A2247, if present return value, else 0
+        agb_rewetting_tier_2: tier 2 value, expects float or None
+        bgb_rewetting_tier_2: tier 2 value, expects float or None
+        litter_rewetting_tier_2: tier 2 value, expects float or None
+        deadwood_rewetting_tier_2: tier 2 value, expects float or None
+        EF_rewetting_carbon_tier_2: tier 2 value, expects float or None
+        EF_rewetting_methane_tier_2: tier 2 value, expects float or None
+        soil_type_rewetting: front end input
+        area_start_rewetting: front end input
+        area_rewetting_w: front end input
+        rate_type_rewetting_w: front end input
+        rate_coefficient_rewetting_w: as always, search for rate type in reference table
+        methane_constant: input in 1.Description
+        area_rewetting_wo: front end input
+        rate_type_rewetting_wo: front end input
+        rate_coefficient_rewetting_wo: as always, search for rate type in reference table
+    COASTAL WATERBODIES:
+        area_start_waterbodies: front end input
+        area_w_waterbodies: front end input
+        trophic_state_default: if Chlo.A front end input is empty then 0.7, else 0.26 * Chlo.A. We can change this parameter to Chlo.A or add another to implement this logic
+        methane_emission_factor_default: Can be seen in Fish and aqua module. Match climate moisture and waterbody type to IPCC A3204, if present return value, else 0
+        trophic_state_tier_2: tier 2 value, expects float or None
+        methane_emission_factor_start_tier_2: tier 2 value, expects float or None
+        methane_emission_factor_w_tier_2: tier 2 value, expects float or None
+        rate_coefficient_waterbodies_w: as always, search for rate type in reference table
+        area_wo_waterbodies: front end input
+        methane_emission_factor_wo_tier_2: tier 2 value, expects float or None
+        rate_coefficient_waterbodies_wo: as always, search for rate type in reference table
+    
+    Outputs are:
+        total_emissions_w: total emissions with the project
+        total_emissions_wo: total emissions without the project
+        balance: difference between total emissions with and without the project
+    
+    """
+    
+    extraction_w, extraction_wo, _ = extraction_and_excavation(area_start_extr_drain, percentage_excavated_w, percentage_excavated_wo, agb_default_extraction, bgb_default_extraction, litter_default_extraction, deadwood_default_extraction,
+                                                            soil_1m_default_extraction, percentage_c_lost_excavation_default, agb_tier_2_extraction, bgb_tier_2_extraction, litter_tier_2_extraction, deadwood_tier_2_extraction,
+                                                            soil_1m_tier_2_extraction, percentage_c_lost_excavation_tier_2)
+    
+    drainage_w = drainage(area_start_extr_drain, percentage_drained_start, percentage_drained_w, rate_type_drainage_w, rate_coefficient_drainage_w, time_impl, time_cap, agb_default_drainage, bgb_default_drainage,
+                            litter_default_drainage, deadwood_default_drainage, soil_1m_default_drainage, EF_drainage_default, agb_tier_2_drainage, bgb_tier_2_drainage, litter_tier_2_drainage,
+                            deadwood_tier_2_drainage ,soil_1_m_tier_2_drainage, Ef_drainage_tier_2)
 
-rewetting_losses = rewetting_revegetation(0, 0, 0, 0, -0.91, 193.70, None, None, None, None, None, None, '<18', 0, 45, 'D', 0.5, 20, 9, 28)
+    drainage_wo = drainage(area_start_extr_drain, percentage_drained_start, percentage_drained_wo, rate_type_drainage_wo, rate_coefficient_drainage_wo, time_impl, time_cap, agb_default_drainage, bgb_default_drainage,
+                            litter_default_drainage, deadwood_default_drainage, soil_1m_default_drainage, EF_drainage_default, agb_tier_2_drainage,  bgb_tier_2_drainage, litter_tier_2_drainage, deadwood_tier_2_drainage,
+                            soil_1_m_tier_2_drainage, Ef_drainage_tier_2)
+    
+    rewetting_w = rewetting_revegetation(agb_default_rewetting, bgb_default_rewetting, litter_default_rewetting, deadwood_default_rewetting, EF_rewetting_carbon_default, EF_rewetting_methane_default,
+                                        agb_rewetting_tier_2, bgb_rewetting_tier_2, litter_rewetting_tier_2, deadwood_rewetting_tier_2, EF_rewetting_carbon_tier_2, EF_rewetting_methane_tier_2,
+                                        soil_type_rewetting, area_start_rewetting, area_rewetting_w, rate_type_rewetting_w, rate_coefficient_rewetting_w, time_impl, time_cap, methane_constant)
+    
+    rewetting_wo = rewetting_revegetation(agb_default_rewetting, bgb_default_rewetting, litter_default_rewetting, deadwood_default_rewetting, EF_rewetting_carbon_default, EF_rewetting_methane_default,
+                                        agb_rewetting_tier_2, bgb_rewetting_tier_2, litter_rewetting_tier_2, deadwood_rewetting_tier_2, EF_rewetting_carbon_tier_2, EF_rewetting_methane_tier_2,
+                                        soil_type_rewetting, area_start_rewetting, area_rewetting_wo, rate_type_rewetting_wo, rate_coefficient_rewetting_wo, time_impl, time_cap, methane_constant)
+    
+    costal_waterbodies_w = coastal_waterbodies(area_start_waterbodies, area_w_waterbodies, trophic_state_default, methane_emission_factor_default, trophic_state_tier_2, methane_emission_factor_start_tier_2,
+                                                methane_emission_factor_w_tier_2, methane_constant, time_cap, time_impl, rate_coefficient_waterbodies_w)
 
-coastal_losses = coastal_waterbodies(45, 45, 0.7, 30, None, None, None, 28, 20, 9, 0.5)
+    costal_waterbodies_wo = coastal_waterbodies(area_start_waterbodies, area_wo_waterbodies, trophic_state_default, methane_emission_factor_default, trophic_state_tier_2, methane_emission_factor_start_tier_2,
+                                                methane_emission_factor_wo_tier_2, methane_constant, time_cap, time_impl, rate_coefficient_waterbodies_wo)  
 
-# EVERYTHING WORKS, JUST ADD A GENERAL FUNCTION FOR WITH AND WITHOUT
+
+    total_w = extraction_w + drainage_w + rewetting_w + costal_waterbodies_w
+    total_wo = extraction_wo + drainage_wo + rewetting_wo + costal_waterbodies_wo
+
+    return total_w, total_wo, total_w - total_wo
+    
+# extract_losses_w, extract_losses_wo, extract_balance = extraction_and_excavation(100, 1, 0, 0, 3.65, 0, 0, 226, 0.96, None, None, None, None, None, None)
+
+# drainage_losses = drainage(0, 0.45, 0, 'D', 0.5, 20, 9, 0, 0, 0, 0, 226, 7.9, None, None, None, None, None, None)
+
+# rewetting_losses = rewetting_revegetation(0, 0, 0, 0, -0.91, 193.70, None, None, None, None, None, None, '<18', 0, 45, 'D', 0.5, 20, 9, 28)
+
+# coastal_losses = coastal_waterbodies(45, 45, 0.7, 30, None, None, None, 28, 20, 9, 0.5)
+
+total_w, total_wo, balance = total_emission_calculation(
+    100, 1, 0, 0, 3.65, 0, 0, 226, 0.96, None, None, None, None, None, None,
+    0.45, 0, 'D', 0.5, 20, 9, 0, 0, 0, 0, 226, 7.9, None, None, None, None, None, None,
+    0.35, 'D', 0.5, 0, 0, 0, 0, -0.91, 193.7, None, None, None, None, None, None,
+    '<18', 0, 21, 'D', 0.5, 28, 45, 'D', 0.5, 45, 45, 0.7, 30, 0.7, None, None,
+    0.5, 45, None, 0.5)
+
+print(total_w, total_wo, balance)
