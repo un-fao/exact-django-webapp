@@ -226,3 +226,39 @@ class OrganicInputCarbonStockExchangeFactor(Model):
     def __str__(self):
         return f"({self.pk}) value {self.value} for {self.organic_input_type.name}"
 
+class CoastalAboveGroundBiomass(Model):
+    climate = ForeignKey('api.Climate', on_delete=CASCADE)
+    moisture = ForeignKey('api.Moisture', on_delete=CASCADE)
+    vegetation_type = ForeignKey('api.VegetationType', on_delete=CASCADE)
+    value = FloatField(default=0)
+
+class CoastalBGAGRatio(Model):
+    climate = ForeignKey('api.Climate', on_delete=CASCADE)
+    moisture = ForeignKey('api.Moisture', on_delete=CASCADE)
+    vegetation_type = ForeignKey('api.VegetationType', on_delete=CASCADE)
+    value = FloatField(default=0)
+
+class CoastalLitter(Model):
+    climate = ForeignKey('api.Climate', on_delete=CASCADE)
+    moisture = ForeignKey('api.Moisture', on_delete=CASCADE)
+    vegetation_type = ForeignKey('api.VegetationType', on_delete=CASCADE)
+    value = FloatField(default=0)
+
+class CoastalDeadwood(Model):
+    climate = ForeignKey('api.Climate', on_delete=CASCADE)
+    moisture = ForeignKey('api.Moisture', on_delete=CASCADE)
+    vegetation_type = ForeignKey('api.VegetationType', on_delete=CASCADE)
+    value = FloatField(default=0)
+
+class RewettingCarbonFactor(Model):
+    climate = ForeignKey('api.Climate', on_delete=CASCADE)
+    moisture = ForeignKey('api.Moisture', on_delete=CASCADE)
+    vegetation_type = ForeignKey('api.VegetationType', on_delete=CASCADE)
+    value = FloatField(default=0)
+
+class RewettingMethaneFactor(Model):
+    climate = ForeignKey('api.Climate', on_delete=CASCADE)
+    moisture = ForeignKey('api.Moisture', on_delete=CASCADE)
+    vegetation_type = ForeignKey('api.VegetationType', on_delete=CASCADE)
+    value = FloatField(default=0)
+    salinity = ForeignKey('api.SalinityType', on_delete=CASCADE)
