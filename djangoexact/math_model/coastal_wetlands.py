@@ -203,7 +203,7 @@ def rewetting_revegetation(agb_default, bgb_default, litter_default, deadwood_de
 
     soil_type: soil type (front end input), expects string
     """
-    ef_rewetting_carbon_default = 0 if not soil_type == '<18' else ef_rewetting_carbon_default
+    ef_rewetting_methane_default = 0 if not soil_type == '<18' else ef_rewetting_methane_default
 
     agb = agb_default * 0.451 if not agb_tier_2 else agb_tier_2
     bgb = bgb_default * agb if not bgb_tier_2 else bgb_tier_2
@@ -268,7 +268,7 @@ def total_emission_calculation(area_start_extr_drain, percentage_excavated_w, pe
         litter_default_extraction: match climate moisture and type of vegetation to IPCC A2128, if present return value, else 0
         deadwood_default_extraction: match climate moisture and type of vegetation to IPCC A2145, if present return value, else 0
         soil_1m_default_extraction: if type of vegetation == MANGROVE and soil tier == Tier 1:
-                                                match COUNTRY to table Atwood and take Mg C/ha
+                                                match COUNTRY to table in module Atwood and take Mg C/ha
                                     else:
                                             if soil type == 'Mineral':
                                                 match climate moisture and type of vegetation to IPCC A2162
@@ -391,19 +391,21 @@ def total_emission_calculation(area_start_extr_drain, percentage_excavated_w, pe
 
     return total_w, total_wo, total_w - total_wo
     
-# extract_losses_w, extract_losses_wo, extract_balance = extraction_and_excavation(100, 1, 0, 0, 3.65, 0, 0, 226, 0.96, None, None, None, None, None, None)
 
-# drainage_losses = drainage(0, 0.45, 0, 'D', 0.5, 20, 9, 0, 0, 0, 0, 226, 7.9, None, None, None, None, None, None)
+extract_losses_w, extract_losses_wo, extract_balance = extraction_and_excavation(100, 1, 0, 0, 3.65, 0, 0, 226, 0.96, None, None, None, None, None, None)
 
-# rewetting_losses = rewetting_revegetation(0, 0, 0, 0, -0.91, 193.70, None, None, None, None, None, None, '<18', 0, 45, 'D', 0.5, 20, 9, 28)
+drainage_losses = drainage(0, 0.45, 0, 'D', 0.5, 20, 9, 0, 0, 0, 0, 226, 7.9, None, None, None, None, None, None)
 
-# coastal_losses = coastal_waterbodies(45, 45, 0.7, 30, None, None, None, 28, 20, 9, 0.5)
+rewetting_losses = rewetting_revegetation(0, 0, 0, 0, -0.91, 193.70, None, None, None, None, None, None, '<18', 0, 45, 'D', 0.5, 20, 9, 28)
 
-total_w, total_wo, balance = total_emission_calculation(
-    100, 1, 0, 0, 3.65, 0, 0, 226, 0.96, None, None, None, None, None, None,
-    0.45, 0, 'D', 0.5, 20, 9, 0, 0, 0, 0, 226, 7.9, None, None, None, None, None, None,
-    0.35, 'D', 0.5, 0, 0, 0, 0, -0.91, 193.7, None, None, None, None, None, None,
-    '<18', 0, 21, 'D', 0.5, 28, 45, 'D', 0.5, 45, 45, 0.7, 30, 0.7, None, None,
-    0.5, 45, None, 0.5)
+coastal_losses = coastal_waterbodies(45, 45, 0.7, 30, None, None, None, 28, 20, 9, 0.5)
 
-print(total_w, total_wo, balance)
+
+# total_w, total_wo, balance = total_emission_calculation(
+#     100, 1, 0, 0, 3.65, 0, 0, 226, 0.96, None, None, None, None, None, None,
+#     0.45, 0, 'D', 0.5, 20, 9, 0, 0, 0, 0, 226, 7.9, None, None, None, None, None, None,
+#     0.35, 'D', 0.5, 0, 0, 0, 0, -0.91, 193.7, None, None, None, None, None, None,
+#     '<18', 0, 21, 'D', 0.5, 28, 45, 'D', 0.5, 45, 45, 0.7, 30, 0.7, None, None,
+#     0.5, 45, None, 0.5)
+
+# print(total_w, total_wo, balance)
