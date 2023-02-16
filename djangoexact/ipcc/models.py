@@ -136,8 +136,6 @@ class BelowGroundBiomass(Model):
     def __str__(self):
         return f"{self.continent.name} {self.vegetation_type.name}, threshold: {self.threshold}, value: {self.value}"
 
-
-
 class SoilOrganicCarbon(Model):
     climate = ForeignKey('api.Climate', on_delete=CASCADE)
     moisture = ForeignKey('api.Moisture', on_delete=CASCADE)
@@ -227,3 +225,4 @@ class OrganicInputCarbonStockExchangeFactor(Model):
 
     def __str__(self):
         return f"({self.pk}) value {self.value} for {self.organic_input_type.name}"
+
