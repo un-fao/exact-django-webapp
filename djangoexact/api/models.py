@@ -282,7 +282,7 @@ class ElectricityEmission(Model):
         return f"Electricity Emissions for {self.country}"
 
 class SalinityType(Model):
-    value = CharField()
+    value = CharField(max_length=3)
 
 ##############################
 ########## Project ###########
