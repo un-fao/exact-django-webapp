@@ -33,6 +33,7 @@ class ActivityType(Model):
         return self.name
 
 class LandUseType(Model):
+    
     name = CharField(max_length=100)
     parent_land_use = ForeignKey(
         "self", 
@@ -227,6 +228,58 @@ class Salinity(Model):
 
     def __str__(self):
         return self.name
+    
+class FisheryType(Model):
+    name = CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+class GearType(Model):
+    name = CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+class FishType(Model):
+    name = CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+class LargeFisheryFUI(Model):
+    fish_type = ForeignKey(FishType, on_delete=CASCADE)
+    gear_type = ForeignKey(GearType, on_delete=CASCADE)
+    value = FloatField()
+
+    def __str__(self):
+        return f"{self.fish_type} - {self.gear_type} FUI: {self.value}"
+
+class SmallFisheryFUI(Model):
+    fishery_type = ForeignKey(FisheryType, on_delete=CASCADE)
+    gear_type = ForeignKey(GearType, on_delete=CASCADE)
+    value = FloatField()
+
+    def __str__(self):
+        return f"{self.fishery_type} - {self.gear_type} FUI: {self.value}"
+
+class ElectricityEmission(Model):
+    country = ForeignKey(Country, on_delete=CASCADE)
+    continent = ForeignKey(Continent, on_delete=CASCADE)
+    year = IntegerField(null=True, blank=True)
+
+    ef_grid = FloatField(null=True, blank=True)
+    final_ef_grid = FloatField(null=True, blank=True)
+    operating_margin = FloatField(null=True, blank=True)
+
+    # TODO: In the Excel file this is calculated in Elec G5, but here I'm putting it as static. Ask about this.
+    combined_margin = FloatField(null=True, blank=True)
+
+    # TODO: What is this exactly?
+    for_formulas = FloatField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Electricity Emissions for {self.country}"
 
 ##############################
 ########## Project ###########
@@ -287,7 +340,7 @@ class Module(Model):
     class Meta:
         abstract = True
 
-##### Land Use Changes
+##### Land Use Changes #####
 
 class Deforestation(Module):
 
@@ -371,7 +424,7 @@ class OtherLandUse(Module):
     def __str__(self):
         return f"OtherLandUseChange for {self.final_land_use_type.name}"
 
-##### Cropland Management
+##### Cropland Management #####
 
 class AnnualCropping(Module):
 
@@ -443,7 +496,7 @@ class FloodedRice(Module):
     def __str__(self):
         return f"FloodedRice for activity {self.activity.name} in project {self.activity.project.name}"
 
-##### Grassland and Livestock
+##### Grassland and Livestock #####
 
 class Grassland(Module):
 
@@ -516,7 +569,7 @@ class Livestock(Module):
 
     implementation_year_start = IntegerField(null=True, blank=True)
 
-##### Forest Management
+##### Forest Management #####
 
 class Forest(Module):
     vegetation_type = ForeignKey(VegetationType, on_delete=CASCADE)
@@ -552,7 +605,7 @@ class Forest(Module):
 
     implementation_year_start_t2 = IntegerField(null=True, blank=True)
 
-##### Inland Wetlands
+##### Inland Wetlands #####
 
 class OrganicSoil(Module):
     class Meta:
@@ -810,7 +863,7 @@ class InlandWaterbody(Module):
     trophic_alpha_t2 = FloatField(null=True, blank=True)
     trophic_mean_annual_t2 = FloatField(null=True, blank=True)
 
-##### Coastal Wetlands
+##### Coastal Wetlands #####
 
 class Extraction(Module):
     vegetation_type = ForeignKey(VegetationType, on_delete=CASCADE)
@@ -826,10 +879,12 @@ class Extraction(Module):
     extraction_soil_t2 = FloatField(null=True, blank=True)
     c_after_excavation_t2 = FloatField(null=True, blank=True)
 
-    # TODO: Drainage as separate module?
+    # TODO: Drainage as separate module? (probably not, since it's only used here)
     drainage_percentage_start = FloatField(null=True, blank=True)
     drainage_percentage_w = FloatField(null=True, blank=True)
+    drainage_percentage_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_drainage_percentage_w_rate")
     drainage_percentage_wo = FloatField(null=True, blank=True)
+    drainage_percentage_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_drainage_percentage_wo_rate")
 
     drainage_ag_t2 = FloatField(null=True, blank=True)
     drainage_bg_t2 = FloatField(null=True, blank=True)
@@ -875,3 +930,72 @@ class CoastalWaterbody(Module):
 
     trophic_alpha_t2 = FloatField(null=True, blank=True)
     trophic_mean_annual_t2 = FloatField(null=True, blank=True)
+
+##### Fisheries and Aquaculture #####
+
+class Fishery(Module):
+
+    class Meta:
+        abstract = True
+
+    fishery_type = ForeignKey(FisheryType, on_delete=CASCADE)
+    gear_type = ForeignKey(GearType, on_delete=CASCADE)
+
+    refrigerant_pc_start = FloatField(null=True, blank=True)
+    refrigerant_pc_w = FloatField(null=True, blank=True)
+    refrigerant_pc_wo = FloatField(null=True, blank=True)
+
+    refrigerant_gwp = FloatField(null=True, blank=True, default=1810)
+
+    fui_start = FloatField(null=True, blank=True)
+    fui_w = FloatField(null=True, blank=True)
+    fui_wo = FloatField(null=True, blank=True)
+
+    total_catch_yr_start = FloatField(null=True, blank=True)
+    total_catch_yr_w = FloatField(null=True, blank=True)
+    total_catch_yr_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_total_catch_yr_w_rate")
+    total_catch_yr_wo = FloatField(null=True, blank=True)
+    total_catch_yr_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_total_catch_yr_wo_rate")
+
+    ice_preserved_catch_pc_start = FloatField(null=True, blank=True)
+    ice_preserved_catch_pc_w = FloatField(null=True, blank=True)
+    ice_preserved_catch_pc_wo = FloatField(null=True, blank=True)
+
+    # TODO: Is the non-t2 value static for this specific module? It's always related to Gasoil/Diesel
+    energy_emission_factor_t2 = FloatField(null=True, blank=True)
+    refrigerant_lost_per_tonne_t2 = FloatField(null=True, blank=True)
+    refrigerant_gwp_t2 = FloatField(null=True, blank=True)
+    inshore_ice_production_emissions_t2 = FloatField(null=True, blank=True)
+
+    # TODO: This part has some internal logic that has to be examined more deeply
+    # NOTE: The logic does not seem to make much sense. It's just to display some values and can probably be ignored altogether
+    inshore_ice_production_kwh_per_tonne_t2 = FloatField(null=True, blank=True)
+    inshore_ice_production_country = ForeignKey(Country, on_delete=CASCADE, null=True, blank=True)
+
+    implementation_year_t2 = IntegerField(null=True, blank=True)
+
+class SmallFishery(Fishery):
+    fui_default = ForeignKey(SmallFisheryFUI, on_delete=CASCADE, null=True, blank=True)
+
+class LargeFishery(Fishery):
+    fui_default = ForeignKey(LargeFisheryFUI, on_delete=CASCADE, null=True, blank=True)
+
+class Aquaculture(Module):
+    user_notes = TextField(null=True, blank=True)
+
+    annual_feed_quantity_start = FloatField(null=True, blank=True)
+    annual_feed_quantity_w = FloatField(null=True, blank=True)
+    annual_feed_quantity_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_annual_feed_quantity_w_rate")
+    annual_feed_quantity_wo = FloatField(null=True, blank=True)
+    annual_feed_quantity_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_annual_feed_quantity_wo_rate")
+
+    annual_production_start = FloatField(null=True, blank=True)
+    annual_production_w = FloatField(null=True, blank=True)
+    annual_production_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_annual_production_w_rate")
+    annual_production_wo = FloatField(null=True, blank=True)
+    annual_production_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_annual_production_wo_rate")
+
+    feed_use_emissions_t2 = FloatField(null=True, blank=True)
+    production_n2o_ef_t2 = FloatField(null=True, blank=True)
+
+    implementation_year_t2 = IntegerField(null=True, blank=True)
