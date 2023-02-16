@@ -27,6 +27,9 @@ def calc_result(input: Model, project: Project):
             raise Exception(f"Module '{input.__class__.__name__}' not supported.")
 
 def calc_rewetting_result(input: Rewetting, project: Project):
+    """
+    Calculate emissions for a single Rewetting module.
+    """
 
     climate = project.climate
     moisture = project.moisture
@@ -73,60 +76,41 @@ def calc_rewetting_result(input: Rewetting, project: Project):
 
 def calc_affo_result(input: Afforestation, project:Project):
     """
-    Calculate emissions for a single Afforestation input.
+    Calculate emissions for a single Afforestation module.
     """
 
-    inital_land_use = input.land_use_type
-    final_land_use = input.vegetation_type
+    lut = input.land_use_type
+    vt = input.vegetation_type
+    continent = project.continent
 
-    initial_biomass = ForestTotalBiomass.objects.get(
-        climate = project.climate,
-        moisture = project.moisture,
-        continent = project.continent,
-        land_use_type = inital_land_use
-    )
+    cml = {
+        'climate':project.climate,
+        'moisture':project.moisture,
+        'land_use_type':lut
+    }
 
-    combustion_factor = AfforestationCombustionFactorValues.objects.get(land_use_type = inital_land_use)
+    cvt = {
+        'continent':continent,
+        'vegetation_type':vt
+    }
+
+    initial_biomass = ForestTotalBiomass.objects.get(**cml,continent=continent)
+    combustion_factor = AfforestationCombustionFactorValues.objects.get(land_use_type=lut)
     
     # NOTE: Maybe merge all LandUseStockExchangeFactors and filter by model?
-    flu = AfforestationLandUseStockExchangeFactor.objects.get(
-        climate = project.climate,
-        moisture = project.moisture,
-        land_use_type = inital_land_use
-    )
+    flu = AfforestationLandUseStockExchangeFactor.objects.get(**cml)
+    litter_dw = LitterDeadwoodCarbonStock.objects.get(vegetation_type=vt)
+    ag_net_biomass = AboveGroundNetBiomassGrowth.objects.get(**cvt)
 
-    litter_dw = LitterDeadwoodCarbonStock.objects.get(vegetation_type = final_land_use)
+    le_20yrs = ag_net_biomass.value_upto_20_years
+    gt_20yrs = ag_net_biomass.value_after_20_years
 
-    ag_net_biomass = AboveGroundNetBiomassGrowth.objects.get(
-        vegetation_type = final_land_use,
-        continent = project.continent
-    )
+    bg_biomass_before_20_yrs = BelowGroundBiomass.objects.get_max_within_threshold(**cvt,threshold=le_20yrs)
+    bg_biomass_after_20_yrs = BelowGroundBiomass.objects.get_max_within_threshold(**cvt,threshold=gt_20yrs)
 
-    bg_biomass_before_20_yrs = BelowGroundBiomass.objects.get_max_within_threshold(
-        continent = project.continent,
-        vegetation_type = final_land_use,
-        threshold = ag_net_biomass.value_upto_20_years
-    )
-    bg_biomass_after_20_yrs = BelowGroundBiomass.objects.get_max_within_threshold(
-        continent = project.continent,
-        vegetation_type = final_land_use,
-        threshold = ag_net_biomass.value_after_20_years
-    )
-
-    ag_biomass = AboveGroundBiomass.objects.get(
-        continent = project.continent,
-        vegetation_type = final_land_use
-    )
-
-    bg_biomass_le_125 = BelowGroundBiomass.objects.get_lowest_value(
-        continent = project.continent,
-        vegetation_type = final_land_use,
-    )
-
-    bg_biomass_gt_125 = BelowGroundBiomass.objects.get_highest_value(
-        continent = project.continent,
-        vegetation_type = final_land_use,
-    )
+    ag_biomass = AboveGroundBiomass.objects.get(**cvt)
+    bg_biomass_le_125 = BelowGroundBiomass.objects.get_lowest_value(**cvt)
+    bg_biomass_gt_125 = BelowGroundBiomass.objects.get_highest_value(**cvt)
 
     inputs = [
         input.ha_w,
@@ -167,6 +151,9 @@ def calc_affo_result(input: Afforestation, project:Project):
     return Result(*affo.afforestation(*inputs))
 
 def calc_defo_result(input: Deforestation, project: Project):
+    """
+    Calculate emissions for a single Deforestation module.
+    """
 
     climate = project.climate
     moisture = project.moisture
@@ -238,7 +225,7 @@ def calc_defo_result(input: Deforestation, project: Project):
 
 def calc_oluc_result(input: OtherLandUse, project:Project):
     """
-    Calculate emissions for a single Afforestation input.
+    Calculate emissions for a single OtherLandUse module.
     """
 
     climate = project.climate
@@ -254,7 +241,12 @@ def calc_oluc_result(input: OtherLandUse, project:Project):
         land_use_type = initial_land_use
     )
 
-    total_biomass = TotalBiomassAfterDefo.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=final_land_use_type)
+    total_biomass = TotalBiomassAfterDefo.objects.get(
+        climate=climate, 
+        moisture=moisture, 
+        continent=continent, 
+        land_use_type=final_land_use_type
+    )
 
     flu_initial = AfforestationLandUseStockExchangeFactor.objects.get(
         climate = project.climate,
@@ -301,8 +293,9 @@ def calc_oluc_result(input: OtherLandUse, project:Project):
 
 def calc_annual_result(input: AnnualCropping, project:Project):
     """
-    Calculate emissions for a single Annual Cropping Module.
+    Calculate emissions for a single AnnualCropping module.
     """
+
     climate = project.climate
     moisture = project.moisture
     land_use_type = input.land_use_type
@@ -366,7 +359,7 @@ def calc_annual_result(input: AnnualCropping, project:Project):
         n_estimation_factor.slope,
         n_estimation_factor.intercept,
         input.crop_yield,
-        getattr(minor_burning_emission_factor, "ch4", None),
+        getattr(minor_burning_emission_factor, "ch4", None), # TODO: Review looking for cleaner logic
         getattr(minor_combustion_factor, "value", None),
         input.minor_biomass_factor_t2,
         getattr(minor_n_estimation_factor, "slope", None),
