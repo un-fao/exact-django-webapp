@@ -281,6 +281,9 @@ class ElectricityEmission(Model):
     def __str__(self):
         return f"Electricity Emissions for {self.country}"
 
+class SalinityType(Model):
+    value = CharField()
+
 ##############################
 ########## Project ###########
 ##############################
