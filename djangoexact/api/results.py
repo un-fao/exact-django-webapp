@@ -21,8 +21,55 @@ def calc_result(input: Model, project: Project):
             return calc_oluc_result(input, project)
         case AnnualCropping.__name__:
             return calc_annual_result(input, project)
+        case Rewetting.__name__:
+            return calc_rewetting_result(input, project)
         case _:
             raise Exception(f"Module '{input.__class__.__name__}' not supported.")
+
+def calc_rewetting_result(input: Rewetting, project: Project):
+
+    climate = project.climate
+    moisture = project.moisture
+    vegetation_type = input.vegetation_type
+
+    cmv = {
+        'climate':climate,
+        'moisture':moisture,
+        'vegetation_type':vegetation_type
+    }
+
+    agb = CoastalAboveGroundBiomass.objects.get(**cmv)
+    bgb = CoastalBGAGRatio.objects.get(**cmv)
+    litter = CoastalLitter.objects.get(**cmv)
+    dw = CoastalDeadwood.objects.get(**cmv)
+    carbon = RewettingCarbonFactor.objects.get(**cmv)
+    methane = RewettingMethaneFactor.objects.get(**cmv)
+
+    inputs =  [
+        agb,
+        bgb,
+        litter,
+        dw,
+        carbon,
+        methane,
+        input.ag_t2,
+        input.bg_t2,
+        input.litter_t2,
+        input.deadwood_t2,
+        input.ef_co2_t2,
+        input.ef_ch4_t2,
+        project.soil_type.name,
+        0, # area_start does not exist for rewetting
+        input.ha_w,
+        input.ha_w_rate.name,
+        input.ha_w_rate.value,
+        project.gw_potential.ch4,
+        input.ha_wo,
+        input.ha_wo_rate.name,
+        input.ha_wo_rate.value,
+    ]
+
+    pass
 
 def calc_affo_result(input: Afforestation, project:Project):
     """
