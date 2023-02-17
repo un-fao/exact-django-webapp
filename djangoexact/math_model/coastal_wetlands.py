@@ -221,7 +221,7 @@ def rewetting_revegetation(agb_default, bgb_default, litter_default, deadwood_de
     return total_carbon + total_methane
 
 def coastal_waterbodies(area_start, area_end, trophic_state_default, methane_emission_factor_default, trophic_state_tier_2, methane_emission_factor_start_tier_2, 
-                        methane_emission_factor_end_tier_2,  methane_constant, time_cap, time_impl, rate_coefficient):
+                        methane_emission_factor_end_tier_2,  methane_constant, time_cap, time_impl, rate_coefficient, chlo_A,):
     
     # this function is the same as flooded rice ch4 calculation, that's why it says area
     def time_dependency(area_start, area, rate_coefficient, time_impl, time_cap):
@@ -230,6 +230,7 @@ def coastal_waterbodies(area_start, area_end, trophic_state_default, methane_emi
         else:
             return time_impl * (1 - rate_coefficient)
     
+    trophic_state = trophic_state_default if not chlo_A else 0.26 * chlo_A
     trophic_state = trophic_state_default if not trophic_state_tier_2 else trophic_state_tier_2
     methane_emission_factor_end = methane_emission_factor_default if not methane_emission_factor_end_tier_2 else methane_emission_factor_end_tier_2
     methane_emission_factor_start = methane_emission_factor_default if not methane_emission_factor_start_tier_2 else methane_emission_factor_start_tier_2
@@ -392,20 +393,82 @@ def total_emission_calculation(area_start_extr_drain, percentage_excavated_w, pe
     return total_w, total_wo, total_w - total_wo
     
 
-extract_losses_w, extract_losses_wo, extract_balance = extraction_and_excavation(100, 1, 0, 0, 3.65, 0, 0, 226, 0.96, None, None, None, None, None, None)
+def rewetting_w_wo(agb_default_rewetting, bgb_default_rewetting, litter_default_rewetting, deadwood_default_rewetting, EF_rewetting_carbon_default, EF_rewetting_methane_default,
+                                        agb_rewetting_tier_2, bgb_rewetting_tier_2, litter_rewetting_tier_2, deadwood_rewetting_tier_2, EF_rewetting_carbon_tier_2, EF_rewetting_methane_tier_2,
+                                        soil_type_rewetting, area_start_rewetting, area_rewetting_w, rate_type_rewetting_w, rate_coefficient_rewetting_w, time_impl, time_cap, methane_constant,
+                                        area_rewetting_wo, rate_type_rewetting_wo, rate_coefficient_rewetting_wo):
+    
+    """
+    REWETTING:
+        agb_default_rewetting: match climate moisture and type of vegetation to IPCC A2903, if present return value, else 0
+        bgb_default_rewetting: match climate moisture and type of vegetation to IPCC A2111, if present return value, else 0
+        litter_default_rewetting: match climate moisture and type of vegetation to IPCC A2128, if present return value, else 0
+        deadwood_default_rewetting: match climate moisture and type of vegetation to IPCC A2145, if present return value, else 0
+        EF_rewetting_carbon_default: match climate moisture and type of vegetation to IPCC A2230, if present return value, else 0
+        EF_rewetting_methane_default: match climate moisture and type of vegetation to IPCC A2247, if present return value, else 0
+        agb_rewetting_tier_2: tier 2 value, expects float or None
+        bgb_rewetting_tier_2: tier 2 value, expects float or None
+        litter_rewetting_tier_2: tier 2 value, expects float or None
+        deadwood_rewetting_tier_2: tier 2 value, expects float or None
+        EF_rewetting_carbon_tier_2: tier 2 value, expects float or None
+        EF_rewetting_methane_tier_2: tier 2 value, expects float or None
+        soil_type_rewetting: front end input
+        area_start_rewetting: front end input
+        area_rewetting_w: front end input
+        rate_type_rewetting_w: front end input
+        rate_coefficient_rewetting_w: as always, search for rate type in reference table
+        time_impl: input in 1.Description
+        time_cap: input in 1.Description
+        methane_constant: input in 1.Description
+        area_rewetting_wo: front end input
+        rate_type_rewetting_wo: front end input
+        rate_coefficient_rewetting_wo: as always, search for rate type in reference table
+    """
 
-drainage_losses = drainage(0, 0.45, 0, 'D', 0.5, 20, 9, 0, 0, 0, 0, 226, 7.9, None, None, None, None, None, None)
+    rewetting_w = rewetting_revegetation(agb_default_rewetting, bgb_default_rewetting, litter_default_rewetting, deadwood_default_rewetting, EF_rewetting_carbon_default, EF_rewetting_methane_default,
+                                        agb_rewetting_tier_2, bgb_rewetting_tier_2, litter_rewetting_tier_2, deadwood_rewetting_tier_2, EF_rewetting_carbon_tier_2, EF_rewetting_methane_tier_2,
+                                        soil_type_rewetting, area_start_rewetting, area_rewetting_w, rate_type_rewetting_w, rate_coefficient_rewetting_w, time_impl, time_cap, methane_constant)
+    
+    rewetting_wo = rewetting_revegetation(agb_default_rewetting, bgb_default_rewetting, litter_default_rewetting, deadwood_default_rewetting, EF_rewetting_carbon_default, EF_rewetting_methane_default,
+                                        agb_rewetting_tier_2, bgb_rewetting_tier_2, litter_rewetting_tier_2, deadwood_rewetting_tier_2, EF_rewetting_carbon_tier_2, EF_rewetting_methane_tier_2,
+                                        soil_type_rewetting, area_start_rewetting, area_rewetting_wo, rate_type_rewetting_wo, rate_coefficient_rewetting_wo, time_impl, time_cap, methane_constant)
 
-rewetting_losses = rewetting_revegetation(0, 0, 0, 0, -0.91, 193.70, None, None, None, None, None, None, '<18', 0, 45, 'D', 0.5, 20, 9, 28)
 
-coastal_losses = coastal_waterbodies(45, 45, 0.7, 30, None, None, None, 28, 20, 9, 0.5)
+    return rewetting_w, rewetting_wo, rewetting_w - rewetting_wo
 
 
-# total_w, total_wo, balance = total_emission_calculation(
-#     100, 1, 0, 0, 3.65, 0, 0, 226, 0.96, None, None, None, None, None, None,
-#     0.45, 0, 'D', 0.5, 20, 9, 0, 0, 0, 0, 226, 7.9, None, None, None, None, None, None,
-#     0.35, 'D', 0.5, 0, 0, 0, 0, -0.91, 193.7, None, None, None, None, None, None,
-#     '<18', 0, 21, 'D', 0.5, 28, 45, 'D', 0.5, 45, 45, 0.7, 30, 0.7, None, None,
-#     0.5, 45, None, 0.5)
+def coastal_waterbodies_w_wo(area_start_waterbodies, area_w_waterbodies, trophic_state_default, methane_emission_factor_default, trophic_state_tier_2, methane_emission_factor_start_tier_2,
+                                                methane_emission_factor_w_tier_2, methane_constant, time_cap, time_impl, rate_coefficient_waterbodies_w,area_wo_waterbodies,
+                                                methane_emission_factor_wo_tier_2, rate_coefficient_waterbodies_wo, chlo_A_w ):
 
-# print(total_w, total_wo, balance)
+    """
+
+    COASTAL WATERBODIES:
+        area_start_waterbodies: front end input
+        area_w_waterbodies: front end input
+        trophic_state_default: 0.7 fixed value
+        methane_emission_factor_default: Can be seen in Fish and aqua module. Match climate moisture and waterbody type to IPCC A3204, if present return value, else 0
+        trophic_state_tier_2: tier 2 value, expects float or None
+        methane_emission_factor_start_tier_2: tier 2 value, expects float or None
+        methane_emission_factor_w_tier_2: tier 2 value, expects float or None
+        methane_constant: input in 1.Description
+        time_cap: input in 1.Description
+        time_impl: input in 1.Description
+        rate_coefficient_waterbodies_w: as always, search for rate type in reference table
+        area_wo_waterbodies: front end input
+        methane_emission_factor_wo_tier_2: tier 2 value, expects float or None
+        rate_coefficient_waterbodies_wo: as always, search for rate type in reference table
+        chlo_A_w: front end input
+
+    """
+
+    costal_waterbodies_w = coastal_waterbodies(area_start_waterbodies, area_w_waterbodies, trophic_state_default, methane_emission_factor_default, trophic_state_tier_2, methane_emission_factor_start_tier_2,
+                                                methane_emission_factor_w_tier_2, methane_constant, time_cap, time_impl, rate_coefficient_waterbodies_w, chlo_A_w)
+
+    costal_waterbodies_wo = coastal_waterbodies(area_start_waterbodies, area_wo_waterbodies, trophic_state_default, methane_emission_factor_default, trophic_state_tier_2, methane_emission_factor_start_tier_2,
+                                                methane_emission_factor_wo_tier_2, methane_constant, time_cap, time_impl, rate_coefficient_waterbodies_wo, chlo_A_w)  
+
+
+    return costal_waterbodies_w, costal_waterbodies_wo, costal_waterbodies_w - costal_waterbodies_wo
+
+
