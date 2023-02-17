@@ -50,18 +50,18 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
         activity = get_object_or_404(Activity, pk=pk, project__user=self.request.user)
 
-        modules = {}
+        modules = []
         module_types = ModuleType.objects.all()
         for module in module_types:
             module_model = apps.get_model(API, sanitize_for_model(module.name))
             module_object = module_model.objects.filter(activity__id=pk, activity__project__user=self.request.user).first()
             if module_object:
-                modules[module.name] = {}
-                modules[module.name][DATA] = get_module_serializer(module_model)(module_object).data
+                module_dict = get_module_serializer(module_model)(module_object).data
                 try:
-                    modules[module.name][RESULTS] = calc_result(module_object, activity.project)
+                    module_dict[RESULTS] = ResultSerializer(calc_result(module_object, activity.project)).data
                 except Exception as e:
-                    modules[module.name][RESULTS] = {DETAILS: str(e)}
+                    module_dict[RESULTS] = error(str(e))
+                modules.append(module_dict)
 
         return Response(modules)
 
@@ -71,17 +71,16 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         Lists the modules of a given activity.
         """
 
-        if not Activity.objects.filter(pk=pk, project__user=self.request.user).exists():
-            return Response(error(f"Activity with id '{pk}' does not exist."), status=status.HTTP_400_BAD_REQUEST)
+        get_object_or_404(Activity, pk=pk, project__user=self.request.user)
 
-        modules = {}
+        modules = []
         module_types = ModuleType.objects.all()
 
         for module in module_types:
             module_model = apps.get_model(API, sanitize_for_model(module.name))
             module_object = module_model.objects.filter(activity__id=pk, activity__project__user=self.request.user).first()
             if module_object:
-                modules[module.name] = get_module_serializer(module_model)(module_object).data
+                modules.append(get_module_serializer(module_model)(module_object).data)
         
         return Response(data=modules, status=status.HTTP_200_OK)
 
