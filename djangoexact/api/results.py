@@ -24,7 +24,7 @@ def calc_result(input: Model, project: Project):
         case Rewetting.__name__:
             return calc_rewetting_result(input, project)
         case _:
-            raise Exception(f"Module '{input.__class__.__name__}' not supported.")
+            raise Exception(f"Module '{input.__class__.__name__}' not (yet) supported.")
 
 def calc_rewetting_result(input: Rewetting, project: Project):
     """
@@ -213,8 +213,8 @@ def calc_defo_result(input: Deforestation, project: Project):
         input.rcs_bg_t2,
         input.rcs_ag_t2,
         flu.value,
-        getattr(ag_biomass, 'value', mangroves_data.agb_c),
-        getattr(bg_biomass, 'value', mangroves_data.bgb),
+        mangroves_data.agb_c if mangroves_data is not None else ag_biomass.value,
+        mangroves_data.bgb if mangroves_data is not None else bg_biomass.value,
         CN_RATIO_GRASSLAND,
         input.final_rcs_soil_c_t2, # soil after defo t2
         soc_ref.value if soc_ref.value is not None else 0,
