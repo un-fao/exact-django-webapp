@@ -18,10 +18,12 @@ def get_module_serializer(model_arg):
     class GenericSerializer(serializers.ModelSerializer):
 
         # activity = serializers.PrimaryKeyRelatedField(source='activity.name', queryset=Activity.objects.all(), many=False)
+        module_type = serializers.ReadOnlyField(default=model_arg.__name__)
 
         class Meta:
             model = model_arg
             fields = '__all__'
+            extra_fields = ['module_type']
             ref_name = model_arg.__name__
 
     return GenericSerializer
