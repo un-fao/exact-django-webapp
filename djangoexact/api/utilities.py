@@ -26,7 +26,7 @@ def sanitize_for_model(str: str):
     return str.replace(" ", "").replace("-", "").replace("_", "")
 
 def error(msg):
-    return {'details': msg}
+    return {DETAILS: msg}
 
 def get_model(name, app_name='api', suffix='Input'):
     return apps.get_model(app_name, sanitize_for_model(name+suffix))

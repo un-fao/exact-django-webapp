@@ -373,7 +373,7 @@ class Deforestation(Module):
     final_rcs_soil_c_t2 = FloatField(null=True, blank=True, help_text="Custom reference carbon stock for soil carbon in final land use (in tC/ha)")
 
     def __str__(self):
-        return f"Deforestation fof {self.land_use_type.name}"
+        return f"Deforestation for {self.land_use_type.name}"
 
 class Afforestation(Module):
 
