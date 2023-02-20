@@ -272,4 +272,184 @@ def run():
                 rs_t = row[4],
                 n_bg_t = row[5]
             )
+    with(open('scripts\ipcc_data\CoastalAboveGroundBiomass.csv', 'r')) as f:
+        reader = csv.reader(f)
+        header = next(reader, None)
+        data = list(reader)
+
+        for i, head in enumerate(header):
+            head = sanitize(head).title()
+            vegetation_type = VegetationType.objects.get_or_create(name=head)[0]
+            for row in data:
+                if sanitize(row[0]) == '':
+                    continue
+
+                climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
+                moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
+
+                value = row[i+2]
+
+                CoastalAboveGroundBiomass.objects.get_or_create(
+                    vegetation_type=vegetation_type,
+                    climate=climate,
+                    moisture=moisture,
+                    value=value
+                )
+
+    with(open('scripts\ipcc_data\CoastalBGAGRatio.csv', 'r')) as f:
+        reader = csv.reader(f)
+        header = next(reader, None)
+        data = list(reader)
+
+        for i, head in enumerate(header):
+            head = sanitize(head).title()
+            vegetation_type = VegetationType.objects.get_or_create(name=head)[0]
+            for row in data:
+                if sanitize(row[0]) == '':
+                    continue
+
+                climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
+                moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
+
+                value = row[i+2]
+
+                print(f"{vegetation_type}, {climate}, {moisture}, {value}")
+
+                CoastalBGAGRatio.objects.get_or_create(
+                    vegetation_type=vegetation_type,
+                    climate=climate,
+                    moisture=moisture,
+                    value=value
+                )
+
+    with(open('scripts\ipcc_data\CoastalLitter.csv', 'r')) as f:
+        reader = csv.reader(f)
+        header = next(reader, None)
+        data = list(reader)
+
+        for i, head in enumerate(header):
+            head = sanitize(head).title()
+            vegetation_type = VegetationType.objects.get_or_create(name=head)[0]
+            for row in data:
+                if sanitize(row[0]) == '':
+                    continue
+
+                climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
+                moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
+
+                value = row[i+2]
+
+                print(f"{vegetation_type}, {climate}, {moisture}, {value}")
+
+                CoastalLitter.objects.get_or_create(
+                    vegetation_type=vegetation_type,
+                    climate=climate,
+                    moisture=moisture,
+                    value=value
+                )
+
+    with(open('scripts\ipcc_data\CoastalDeadwood.csv', 'r')) as f:
+        reader = csv.reader(f)
+        header = next(reader, None)
+        data = list(reader)
+
+        for i, head in enumerate(header):
+            head = sanitize(head).title()
+            vegetation_type = VegetationType.objects.get_or_create(name=head)[0]
+            for row in data:
+                if sanitize(row[0]) == '':
+                    continue
+
+                climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
+                moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
+
+                value = row[i+2]
+
+                print(f"{vegetation_type}, {climate}, {moisture}, {value}")
+
+                CoastalDeadwood.objects.get_or_create(
+                    vegetation_type=vegetation_type,
+                    climate=climate,
+                    moisture=moisture,
+                    value=value
+                )
+    
+    with(open('scripts\ipcc_data\RewettingEmissionFactors.csv', 'r')) as f:
+        reader = csv.reader(f)
+        header = next(reader, None)
+        data = list(reader)
+
+        for i, head in enumerate(header):
+            head = sanitize(head).title()
+            vegetation_type = VegetationType.objects.get_or_create(name=head)[0]
+            for row in data:
+                if sanitize(row[0]) == '':
+                    continue
+
+                climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
+                moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
+
+                value = row[i+2]
+
+                print(f"{vegetation_type}, {climate}, {moisture}, {value}")
+
+                RewettingCarbonFactor.objects.get_or_create(
+                    vegetation_type=vegetation_type,
+                    climate=climate,
+                    moisture=moisture,
+                    value=value
+                )
+
+    with(open('scripts\ipcc_data\RewettingMethaneFactors_salinity-lt18.csv', 'r')) as f:
+        reader = csv.reader(f)
+        header = next(reader, None)
+        data = list(reader)
+
+        for i, head in enumerate(header):
+            head = sanitize(head).title()
+            vegetation_type = VegetationType.objects.get_or_create(name=head)[0]
+            for row in data:
+                if sanitize(row[0]) == '':
+                    continue
+
+                climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
+                moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
+                salinity = SalinityType.objects.get_or_create(value="<18")[0]
+
+                value = row[i+2]
+
+                print(f"{vegetation_type}, {climate}, {moisture}, {value}")
+
+                RewettingMethaneFactor.objects.get_or_create(
+                    vegetation_type=vegetation_type,
+                    climate=climate,
+                    moisture=moisture,
+                    salinity=salinity,
+                    value=value
+                )
 """
+    with(open('scripts\ipcc_data\OtherConstructedWaterbodiesEmissionFactors.csv', 'r')) as f:
+        reader = csv.reader(f)
+        header = next(reader, None)
+        data = list(reader)
+
+        for i, head in enumerate(header):
+            head = sanitize(head).title()
+            waterbody_type = WaterbodyType.objects.get_or_create(name=head)[0]
+            for row in data:
+                if sanitize(row[0]) == '':
+                    continue
+
+                climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
+                moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
+
+                value = row[i+2]
+
+                print(f"{waterbody_type}, {climate}, {moisture}, {value}")
+
+                OtherConstructedWaterbodiesEmissionFactor.objects.get_or_create(
+                    waterbody_type=waterbody_type,
+                    climate=climate,
+                    moisture=moisture,
+                    value=value
+                )
