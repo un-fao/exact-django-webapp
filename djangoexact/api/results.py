@@ -1,5 +1,5 @@
 from .models import Deforestation, Afforestation, OtherLandUse, AnnualCropping, Project
-from math_model import defo, affo, oluc, annuals
+from math_model import defo, affo, oluc, annuals, coastal_wetlands
 from .serializers import *
 from ipcc.models import *
 from .utilities import *
@@ -23,8 +23,38 @@ def calc_result(input: Model, project: Project):
             return calc_annual_result(input, project)
         case Rewetting.__name__:
             return calc_rewetting_result(input, project)
+        case CoastalWaterbody.__name__:
+            return calc_coastal_waterbody_result(input, project)
         case _:
             raise Exception(f"Module '{input.__class__.__name__}' not (yet) supported.")
+
+def calc_coastal_waterbody_result(input:CoastalWaterbody, project: Project):
+
+    methane_emission_factor = OtherConstructedWaterbodiesEmissionFactor.objects.get(
+        climate=project.climate, 
+        moisture=project.moisture,
+        waterbody_type=input.waterbody_type    
+    )
+
+    inputs = [
+        input.ha_start,
+        input.ha_w,
+        TROPHIC_STATE,
+        methane_emission_factor.value,
+        input.trophic_alpha_t2,
+        input.ch4_start_t2,
+        input.ch4_w_t2,
+        project.gw_potential.ch4,
+        project.capitalization_duration_yrs,
+        project.implementation_duration_yrs,
+        input.ha_w_rate.value,
+        input.ha_wo,
+        input.ch4_wo_t2,
+        input.ha_wo_rate.value,
+        input.trophic_mean_annual_t2,
+    ]
+
+    return Result(*coastal_wetlands.coastal_waterbodies_w_wo(*inputs))
 
 def calc_rewetting_result(input: Rewetting, project: Project):
     """
@@ -35,44 +65,46 @@ def calc_rewetting_result(input: Rewetting, project: Project):
     moisture = project.moisture
     vegetation_type = input.vegetation_type
 
-    cmv = {
+    criteria = {
         'climate':climate,
         'moisture':moisture,
         'vegetation_type':vegetation_type
     }
 
-    agb = CoastalAboveGroundBiomass.objects.get(**cmv)
-    bgb = CoastalBGAGRatio.objects.get(**cmv)
-    litter = CoastalLitter.objects.get(**cmv)
-    dw = CoastalDeadwood.objects.get(**cmv)
-    carbon = RewettingCarbonFactor.objects.get(**cmv)
-    methane = RewettingMethaneFactor.objects.get(**cmv)
+    agb = CoastalAboveGroundBiomass.objects.get(**criteria)
+    bgb = CoastalBGAGRatio.objects.get(**criteria)
+    litter = CoastalLitter.objects.get(**criteria)
+    dw = CoastalDeadwood.objects.get(**criteria)
+    carbon = RewettingCarbonFactor.objects.get(**criteria)
+    methane = RewettingMethaneFactor.objects.get(**criteria)
 
     inputs =  [
-        agb,
-        bgb,
-        litter,
-        dw,
-        carbon,
-        methane,
+        agb.value,
+        bgb.value,
+        litter.value,
+        dw.value,
+        carbon.value,
+        methane.value,
         input.ag_t2,
         input.bg_t2,
         input.litter_t2,
         input.deadwood_t2,
         input.ef_co2_t2,
         input.ef_ch4_t2,
-        project.soil_type.name,
+        input.avg_salinity_t2.value,
         0, # area_start does not exist for rewetting
         input.ha_w,
         input.ha_w_rate.name,
         input.ha_w_rate.value,
+        project.implementation_duration_yrs,
+        project.capitalization_duration_yrs,
         project.gw_potential.ch4,
         input.ha_wo,
         input.ha_wo_rate.name,
         input.ha_wo_rate.value,
     ]
 
-    pass
+    return Result(*coastal_wetlands.rewetting_w_wo(*inputs))
 
 def calc_affo_result(input: Afforestation, project:Project):
     """
