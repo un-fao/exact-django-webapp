@@ -25,8 +25,69 @@ def calc_result(input: Model, project: Project):
             return calc_rewetting_result(input, project)
         case CoastalWaterbody.__name__:
             return calc_coastal_waterbody_result(input, project)
+        case Extraction.__name__:
+            return calc_extraction_result(input, project)
         case _:
             raise Exception(f"Module '{input.__class__.__name__}' not (yet) supported.")
+
+def calc_extraction_result(input:Extraction, project:Project):
+
+    climate = project.climate
+    moisture = project.moisture
+    vegetation_type = input.vegetation_type
+
+    criteria = {
+        'climate':climate,
+        'moisture':moisture,
+        'vegetation_type':vegetation_type
+    }
+
+    agb = CoastalAboveGroundBiomass.objects.get(**criteria)
+    bgb = CoastalBGAGRatio.objects.get(**criteria)
+    litter = CoastalLitter.objects.get(**criteria)
+    dw = CoastalDeadwood.objects.get(**criteria)
+
+    soil_1m = None
+
+    cs_criteria = {
+        'climate':climate,
+        'moisture':moisture,
+        'vegetation_type':vegetation_type,
+        'soil_type':input.extraction_soil_type_t2
+    }
+
+    if vegetation_type.name == MANGROVES:
+        atwood = Atwood.objects.get(country=project.country)
+        soil_1m = atwood.mg_c_ha
+    else:
+        try:
+            soil_1m = DefaultSoilCarbonStock.objects.get(**cs_criteria).value
+        except DefaultSoilCarbonStock.DoesNotExist:
+            # TODO: Insert default values for other soil_types at 0 in db
+            soil_1m = 0
+
+    inputs = [
+        input.ha_start,
+        input.ha_w_excavated_percentage,
+        input.ha_wo_excavated_percentage,
+        agb.value,
+        bgb.value,
+        litter.value,
+        dw.value,
+        soil_1m,
+        .96, #TODO: Add to db
+        input.extraction_ag_t2,
+        input.extraction_bg_t2,
+        input.extraction_litter_t2,
+        input.extraction_deadwood_t2,
+        input.extraction_soil_t2,
+        input.c_after_excavation_t2,
+
+    ]
+
+    print(inputs)
+
+    return Result(*coastal_wetlands.extraction_and_excavation_w_wo(*inputs))
 
 def calc_coastal_waterbody_result(input:CoastalWaterbody, project: Project):
 
