@@ -222,13 +222,7 @@ class TrophicType(Model):
 
     def __str__(self):
         return self.name
-
-class Salinity(Model):
-    name = CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
-    
+ 
 class FisheryType(Model):
     name = CharField(max_length=255)
 
@@ -283,6 +277,9 @@ class ElectricityEmission(Model):
 
 class SalinityType(Model):
     value = CharField(max_length=3)
+
+    def __str__(self):
+        return self.value
 
 ##############################
 ########## Project ###########
@@ -912,7 +909,7 @@ class Rewetting(Module):
     bg_t2 = FloatField(null=True, blank=True)
     litter_t2 = FloatField(null=True, blank=True)
     deadwood_t2 = FloatField(null=True, blank=True)
-    avg_salinity_t2 = ForeignKey(Salinity, on_delete=CASCADE, null=True, blank=True)
+    avg_salinity_t2 = ForeignKey(SalinityType, on_delete=CASCADE, null=True, blank=True, default=SalinityType.objects.get(value="<18").pk)
     ef_co2_t2 = FloatField(null=True, blank=True)
     ef_ch4_t2 = FloatField(null=True, blank=True)
 
