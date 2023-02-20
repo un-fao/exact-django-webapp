@@ -76,7 +76,7 @@ class Continent(Model):
 
 class Country(Model):
     name = CharField(max_length=100)
-    continent = ForeignKey(Continent, on_delete=CASCADE)
+    continent = ForeignKey(Continent, on_delete=CASCADE, null=True, blank=True)
 
     class Meta:
         verbose_name_plural = "Countries"
@@ -877,7 +877,7 @@ class Extraction(Module):
     extraction_deadwood_t2 = FloatField(null=True, blank=True)
     extraction_soil_type_t2 = ForeignKey(SoilType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_extracted_soil_type_t2")
     extraction_soil_t2 = FloatField(null=True, blank=True)
-    c_after_excavation_t2 = FloatField(null=True, blank=True)
+    c_after_excavation_t2 = FloatField(null=True, blank=True, default=.96)
 
     # TODO: Drainage as separate module? (probably not, since it's only used here)
     drainage_percentage_start = FloatField(null=True, blank=True)
