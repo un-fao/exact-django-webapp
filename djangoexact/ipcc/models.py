@@ -271,3 +271,21 @@ class OtherConstructedWaterbodiesEmissionFactor(Model):
     moisture = ForeignKey('api.Moisture', on_delete=CASCADE)
     waterbody_type = ForeignKey('api.WaterbodyType', on_delete=CASCADE)
     value = FloatField(default=0)
+
+class Atwood(Model):
+    country = ForeignKey('api.Country', on_delete=CASCADE)
+    n = FloatField(default=0)
+    area_2014_km2 = FloatField(default=0)
+    mg_c_ha = FloatField(default=0)
+    sd = FloatField(default=None, null=True, blank=True)
+    score = FloatField(default=None, null=True, blank=True)
+
+class DefaultSoilCarbonStock(Model):
+    vegetation_type = ForeignKey('api.VegetationType', on_delete=CASCADE)
+    climate = ForeignKey('api.Climate', on_delete=CASCADE)
+    moisture = ForeignKey('api.Moisture', on_delete=CASCADE)
+    soil_type = ForeignKey('api.SoilType', on_delete=CASCADE)
+    value = FloatField(default=0)
+
+    def __str__(self):
+        return f"{self.value} for {self.climate.name} {self.moisture.name} {self.vegetation_type.name} {self.soil_type.name}"
