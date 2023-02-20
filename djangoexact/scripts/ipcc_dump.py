@@ -427,7 +427,6 @@ def run():
                     salinity=salinity,
                     value=value
                 )
-"""
     with(open('scripts\ipcc_data\OtherConstructedWaterbodiesEmissionFactors.csv', 'r')) as f:
         reader = csv.reader(f)
         header = next(reader, None)
@@ -453,3 +452,109 @@ def run():
                     moisture=moisture,
                     value=value
                 )
+    with(open('scripts\ipcc_data\DefaultSoilCarbonStockMineralSoil.csv', 'r')) as f:
+        reader = csv.reader(f)
+        header = next(reader, None)
+        data = list(reader)
+
+        for i, head in enumerate(header):
+            head = sanitize(head).title()
+            vegetation_type = VegetationType.objects.get_or_create(name=head)[0]
+            for row in data:
+                if sanitize(row[0]) == '':
+                    continue
+
+                climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
+                moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
+                soil_type = SoilType.objects.get_or_create(name="Mineral")[0]
+
+                value = row[i+2]
+
+                print(f"{vegetation_type}, {climate}, {moisture}, {value}")
+
+                DefaultSoilCarbonStock.objects.get_or_create(
+                    vegetation_type=vegetation_type,
+                    climate=climate,
+                    moisture=moisture,
+                    soil_type=soil_type,
+                    value=value
+                )
+    with(open('scripts\ipcc_data\DefaultSoilCarbonStockOrganicSoil.csv', 'r')) as f:
+        reader = csv.reader(f)
+        header = next(reader, None)
+        data = list(reader)
+
+        for i, head in enumerate(header):
+            head = sanitize(head).title()
+            vegetation_type = VegetationType.objects.get_or_create(name=head)[0]
+            for row in data:
+                if sanitize(row[0]) == '':
+                    continue
+
+                climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
+                moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
+                soil_type = SoilType.objects.get_or_create(name="Organic")[0]
+
+                value = row[i+2]
+
+                print(f"{vegetation_type}, {climate}, {moisture}, {value}")
+
+                DefaultSoilCarbonStock.objects.get_or_create(
+                    vegetation_type=vegetation_type,
+                    climate=climate,
+                    moisture=moisture,
+                    soil_type=soil_type,
+                    value=value
+                )
+
+    with(open('scripts\ipcc_data\DefaultSoilCarbonStockAggregatedSoil.csv', 'r')) as f:
+        reader = csv.reader(f)
+        header = next(reader, None)
+        data = list(reader)
+
+        for i, head in enumerate(header):
+            head = sanitize(head).title()
+            vegetation_type = VegetationType.objects.get_or_create(name=head)[0]
+            for row in data:
+                if sanitize(row[0]) == '':
+                    continue
+
+                climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
+                moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
+                soil_type = SoilType.objects.get_or_create(name="Aggregated")[0]
+
+                value = row[i+2]
+
+                print(f"{vegetation_type}, {climate}, {moisture}, {value}")
+
+                DefaultSoilCarbonStock.objects.get_or_create(
+                    vegetation_type=vegetation_type,
+                    climate=climate,
+                    moisture=moisture,
+                    soil_type=soil_type,
+                    value=value
+                )
+    with(open('scripts\ipcc_data\Atwood.csv', 'r')) as f:
+        reader = csv.reader(f)
+        data = list(reader)
+
+        for row in data:
+
+            # FIXME: Some countries have no continent in the database. Link them
+            country = Country.objects.get_or_create(name=sanitize(row[0]))[0]
+
+            n = sanitize(row[1])
+            area_2014_km2 = sanitize(row[2])
+            mg_c_ha = sanitize(row[3])
+            sd = sanitize(row[4]) if sanitize(row[4]) != '' else None
+            score = sanitize(row[5]) if sanitize(row[5]) != '' else None
+
+            Atwood.objects.get_or_create(
+                country = country,
+                n = n,
+                area_2014_km2 = area_2014_km2,
+                mg_c_ha = mg_c_ha,
+                sd = sd,
+                score = score
+            )
+"""
