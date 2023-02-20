@@ -1,11 +1,11 @@
 Mangrove,Tidal marsh,Seagrass
-Boreal Dry,0,0,0
-Boreal Moist,0,0,0
-Cool Temperate Dry,0,0,0
-Cool Temperate Moist,0,0,0
-Warm Temperate Dry,75,0,0
-Warm Temperate Moist,75,0,0
-Tropical Dry,92,0,0
-Tropical Moist,192,0,0
-Tropical Wet,192,0,0
-Tropical Montane,0,0,0
+Boreal,Dry,0,0,0
+Boreal,Moist,0,0,0
+Cool Temperate,Dry,0,0,0
+Cool Temperate,Moist,0,0,0
+Warm Temperate,Dry,75,0,0
+Warm Temperate,Moist,75,0,0
+Tropical,Dry,92,0,0
+Tropical,Moist,192,0,0
+Tropical,Wet,192,0,0
+Tropical,Montane,0,0,0
