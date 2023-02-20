@@ -1,5 +1,5 @@
 
-def total_emissions_small_or_large_fisheries(time_impl, time_cap, rate_coefficient, catch_start, catch_w, catch_wo, ef_diesel_default, ef_diesel_tier_2, fui_default, fui_start_tier_2, fui_w_tier_2, fui_wo_tier_2,  gwp_refrigerant_default,
+def total_emissions_small_or_large_fisheries(time_impl, time_cap, rate_coefficient_w, rate_coefficient_wo, catch_start, catch_w, catch_wo, ef_diesel_default, ef_diesel_tier_2, fui_default, fui_start_tier_2, fui_w_tier_2, fui_wo_tier_2,  gwp_refrigerant_default,
                     gwp_refrigerant_tier_2, quantity_lost_refrigerant_default, quantity_lost_refrigerant_tier_2, percentage_refrigerant_start, percentage_refrigerant_w, 
                     percentage_refrigerant_wo, tonnes_ice_default, tonnes_ice_tier_2,  kwh_ice_per_tonne_default, kwh_ice_per_tonne_tier_2, operating_margin,
                     percentage_ice_start, percentage_ice_w, percentage_ice_wo):
@@ -61,7 +61,8 @@ def total_emissions_small_or_large_fisheries(time_impl, time_cap, rate_coefficie
     """
     time_impl: project implementation time in years
     time_cap: project capitalization time in years
-    rate_coefficient: obtained matching rate_type to reference table
+    rate_coefficient_w: obtained matching rate_type to reference table
+    rate_coefficient_wo: obtained matching rate_type to reference table #### MISSING IN EXCEL
     catch_start: catch in tonnes at project start
     catch_w: catch in tonnes with project
     catch_wo: catch in tonnes without project
@@ -88,21 +89,21 @@ def total_emissions_small_or_large_fisheries(time_impl, time_cap, rate_coefficie
     percentage_ice_wo: percentage of catch preserved with ice without project
     """
 
-    emissions_catch_w = emissions_catch(time_impl, time_cap, rate_coefficient, catch_start, catch_w, ef_diesel_default, ef_diesel_tier_2, fui_default, fui_start_tier_2, fui_w_tier_2) 
-    emissions_catch_wo = emissions_catch(time_impl, time_cap, rate_coefficient, catch_start, catch_wo, ef_diesel_default, ef_diesel_tier_2, fui_default, fui_start_tier_2, fui_wo_tier_2)
+    emissions_catch_w = emissions_catch(time_impl, time_cap, rate_coefficient_w, catch_start, catch_w, ef_diesel_default, ef_diesel_tier_2, fui_default, fui_start_tier_2, fui_w_tier_2) 
+    emissions_catch_wo = emissions_catch(time_impl, time_cap, rate_coefficient_wo, catch_start, catch_wo, ef_diesel_default, ef_diesel_tier_2, fui_default, fui_start_tier_2, fui_wo_tier_2)
 
-    emissions_refrigerant_w = emissions_refrigerant(time_impl, time_cap, rate_coefficient, gwp_refrigerant_default, gwp_refrigerant_tier_2, quantity_lost_refrigerant_default, quantity_lost_refrigerant_tier_2, catch_start, catch_w, percentage_refrigerant_start, percentage_refrigerant_w)
-    emissions_refrigerant_wo = emissions_refrigerant(time_impl, time_cap, rate_coefficient, gwp_refrigerant_default, gwp_refrigerant_tier_2, quantity_lost_refrigerant_default, quantity_lost_refrigerant_tier_2, catch_start, catch_wo, percentage_refrigerant_start, percentage_refrigerant_wo)
+    emissions_refrigerant_w = emissions_refrigerant(time_impl, time_cap, rate_coefficient_w, gwp_refrigerant_default, gwp_refrigerant_tier_2, quantity_lost_refrigerant_default, quantity_lost_refrigerant_tier_2, catch_start, catch_w, percentage_refrigerant_start, percentage_refrigerant_w)
+    emissions_refrigerant_wo = emissions_refrigerant(time_impl, time_cap, rate_coefficient_wo, gwp_refrigerant_default, gwp_refrigerant_tier_2, quantity_lost_refrigerant_default, quantity_lost_refrigerant_tier_2, catch_start, catch_wo, percentage_refrigerant_start, percentage_refrigerant_wo)
 
-    emissions_ice_w = emissions_ice(time_impl, time_cap, rate_coefficient, tonnes_ice_default, kwh_ice_per_tonne_default, operating_margin, kwh_ice_per_tonne_tier_2, tonnes_ice_tier_2, catch_start, catch_w, percentage_ice_start, percentage_ice_w)
-    emissions_ice_wo = emissions_ice(time_impl, time_cap, rate_coefficient, tonnes_ice_default, kwh_ice_per_tonne_default, operating_margin, kwh_ice_per_tonne_tier_2,tonnes_ice_tier_2, catch_start, catch_wo, percentage_ice_start, percentage_ice_wo)
+    emissions_ice_w = emissions_ice(time_impl, time_cap, rate_coefficient_w, tonnes_ice_default, kwh_ice_per_tonne_default, operating_margin, kwh_ice_per_tonne_tier_2, tonnes_ice_tier_2, catch_start, catch_w, percentage_ice_start, percentage_ice_w)
+    emissions_ice_wo = emissions_ice(time_impl, time_cap, rate_coefficient_wo, tonnes_ice_default, kwh_ice_per_tonne_default, operating_margin, kwh_ice_per_tonne_tier_2,tonnes_ice_tier_2, catch_start, catch_wo, percentage_ice_start, percentage_ice_wo)
 
     total_w = emissions_catch_w + emissions_refrigerant_w + emissions_ice_w
     total_wo = emissions_catch_wo + emissions_refrigerant_wo + emissions_ice_wo
     
     return total_w, total_wo, total_w - total_wo
 
-def total_inland_coastal_aquaculture(production_start, production_w, nitrous_ef_default, nitrous_ef_tier_2, nitrous_constant, time_impl, time_cap, rate_coefficient, production_wo,feed_start, feed_w, ef_feed_default, ef_feed_tier_2, feed_wo):
+def total_inland_coastal_aquaculture(production_start, production_w, nitrous_ef_default, nitrous_ef_tier_2, nitrous_constant, time_impl, time_cap, rate_coefficient_w, rate_coefficient_wo, production_wo,feed_start, feed_w, ef_feed_default, ef_feed_tier_2, feed_wo):
 
     # INTERMEDIATE FUNCTIONS AND SUPPORT FUNCTIONS
     def nitrous_emissions(production_start, production_end, nitrous_ef_default, nitrous_ef_tier_2, nitrous_constant, time_impl, time_cap, rate_coefficient):
@@ -152,7 +153,8 @@ def total_inland_coastal_aquaculture(production_start, production_w, nitrous_ef_
     nitrous_constant: constant for nitrous oxide emission factor
     time_impl: implementation time
     time_cap: cap time
-    rate_coefficient: rate coefficient
+    rate_coefficient_w: rate coefficient
+    rate_coefficient_wo: rate coefficient
     production_wo: production in 2015 without tier 2
     feed_start: feed in 2010
     feed_w: feed in 2015
@@ -161,11 +163,11 @@ def total_inland_coastal_aquaculture(production_start, production_w, nitrous_ef_
     feed_wo: feed in 2015 without tier 2
     """
 
-    nitrous_emissions_w = nitrous_emissions(production_start, production_w, nitrous_ef_default, nitrous_ef_tier_2, nitrous_constant, time_impl, time_cap, rate_coefficient)
-    nitrous_emissions_wo = nitrous_emissions(production_start, production_wo, nitrous_ef_default, nitrous_ef_tier_2, nitrous_constant, time_impl, time_cap, rate_coefficient)
+    nitrous_emissions_w = nitrous_emissions(production_start, production_w, nitrous_ef_default, nitrous_ef_tier_2, nitrous_constant, time_impl, time_cap, rate_coefficient_w)
+    nitrous_emissions_wo = nitrous_emissions(production_start, production_wo, nitrous_ef_default, nitrous_ef_tier_2, nitrous_constant, time_impl, time_cap, rate_coefficient_wo)
 
-    feed_emissions_w = feed_emissions(feed_start, feed_w, ef_feed_default, ef_feed_tier_2, time_impl, time_cap, rate_coefficient)
-    feed_emissions_wo = feed_emissions(feed_start, feed_wo, ef_feed_default, ef_feed_tier_2, time_impl, time_cap, rate_coefficient)
+    feed_emissions_w = feed_emissions(feed_start, feed_w, ef_feed_default, ef_feed_tier_2, time_impl, time_cap, rate_coefficient_w)
+    feed_emissions_wo = feed_emissions(feed_start, feed_wo, ef_feed_default, ef_feed_tier_2, time_impl, time_cap, rate_coefficient_wo)
 
     total_w = nitrous_emissions_w + feed_emissions_w
     total_wo = nitrous_emissions_wo + feed_emissions_wo
