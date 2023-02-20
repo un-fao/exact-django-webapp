@@ -10,6 +10,7 @@ DATA = 'data'
 RESULTS = 'results'
 DETAILS = 'details'
 API = 'api'
+TROPHIC_STATE = .7
 
 def snake_case(str):
     res = [str[0].lower()]
