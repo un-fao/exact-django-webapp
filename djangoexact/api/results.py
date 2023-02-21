@@ -49,24 +49,25 @@ def calc_extraction_result(input:Extraction, project:Project):
 
     soil_1m = None
 
-    cs_criteria = {
-        'climate':climate,
-        'moisture':moisture,
-        'vegetation_type':vegetation_type,
-        'soil_type':input.extraction_soil_type_t2
-    }
+    
 
     if vegetation_type.name == MANGROVES:
         atwood = Atwood.objects.get(country=project.country)
         soil_1m = atwood.mg_c_ha
     else:
         try:
+            cs_criteria = {
+                'climate':climate,
+                'moisture':moisture,
+                'vegetation_type':vegetation_type,
+                'soil_type':input.extraction_soil_type_t2
+            }
             soil_1m = DefaultSoilCarbonStock.objects.get(**cs_criteria).value
         except DefaultSoilCarbonStock.DoesNotExist:
             # TODO: Insert default values for other soil_types at 0 in db
             soil_1m = 0
 
-    inputs = [
+    extraction_inputs = [
         input.ha_start,
         input.ha_w_excavated_percentage,
         input.ha_wo_excavated_percentage,
@@ -85,9 +86,58 @@ def calc_extraction_result(input:Extraction, project:Project):
 
     ]
 
-    print(inputs)
+    extraction_result = Result(*coastal_wetlands.extraction_and_excavation_w_wo(*extraction_inputs))
 
-    return Result(*coastal_wetlands.extraction_and_excavation_w_wo(*inputs))
+    if vegetation_type.name == MANGROVES:
+        atwood = Atwood.objects.get(country=project.country)
+        soil_1m = atwood.mg_c_ha
+    else:
+        try:
+            cs_criteria = {
+                'climate':climate,
+                'moisture':moisture,
+                'vegetation_type':vegetation_type,
+                'soil_type':input.drainage_soil_type_t2
+            }
+            soil_1m = DefaultSoilCarbonStock.objects.get(**cs_criteria).value
+        except DefaultSoilCarbonStock.DoesNotExist:
+            # TODO: Insert default values for other soil_types at 0 in db
+            soil_1m = 0 
+    
+    drainage_ef = DrainageEmissionFactor.objects.get(
+        climate=climate,
+        moisture=moisture,
+        vegetation_type=vegetation_type
+    )
+
+    drainage_inputs = [
+        input.ha_start,
+        input.drainage_percentage_start,
+        input.drainage_percentage_w,
+        input.drainage_percentage_w_rate.name,
+        input.drainage_percentage_w_rate.value,
+        project.implementation_duration_yrs,
+        project.capitalization_duration_yrs,
+        agb.value,
+        bgb.value,
+        litter.value,
+        dw.value,
+        soil_1m,
+        drainage_ef.value,
+        input.drainage_ag_t2,
+        input.drainage_bg_t2,
+        input.drainage_litter_t2,
+        input.drainage_deadwood_t2,
+        input.drainage_soil_t2,
+        input.ef_drainage_t2,
+        input.drainage_percentage_wo,
+        input.drainage_percentage_wo_rate.name,
+        input.drainage_percentage_wo_rate.value
+    ]
+
+    drainage_result = Result(*coastal_wetlands.drainage_w_wo(*drainage_inputs))
+
+    return [extraction_result, drainage_result]
 
 def calc_coastal_waterbody_result(input:CoastalWaterbody, project: Project):
 
