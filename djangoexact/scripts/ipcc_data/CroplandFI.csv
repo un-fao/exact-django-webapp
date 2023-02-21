@@ -1,0 +1,11 @@
+﻿Low C input,Medium C input,"High C input, no manure","High C input, with manure"
+Boreal,Moist,0.92,1.00,1.11,1.44
+Boreal,Dry,0.95,1.00,1.04,1.37
+Cool temperate,dry,0.95,1.00,1.04,1.37
+Cool temperate,moist,0.92,1.00,1.11,1.44
+Warm temperate,dry,0.95,1.00,1.04,1.37
+Warm temperate,moist,0.92,1.00,1.11,1.44
+Tropical,dry,0.95,1.00,1.04,1.37
+Tropical,moist,0.92,1.00,1.11,1.44
+Tropical,wet,0.92,1.00,1.11,1.44
+Tropical,Montane,0.94,1.00,1.08,1.41
