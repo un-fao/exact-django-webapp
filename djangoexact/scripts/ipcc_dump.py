@@ -557,4 +557,29 @@ def run():
                 sd = sd,
                 score = score
             )
+    with(open('scripts\ipcc_data\DrainageEmissionFactors.csv', 'r')) as f:
+        reader = csv.reader(f)
+        header = next(reader, None)
+        data = list(reader)
+
+        for i, head in enumerate(header):
+            head = sanitize(head).title()
+            vegetation_type = VegetationType.objects.get_or_create(name=head)[0]
+            for row in data:
+                if sanitize(row[0]) == '':
+                    continue
+
+                climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
+                moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
+
+                value = row[i+2]
+
+                print(f"{vegetation_type}, {climate}, {moisture}, {value}")
+
+                DrainageEmissionFactor.objects.get_or_create(
+                    vegetation_type=vegetation_type,
+                    climate=climate,
+                    moisture=moisture,
+                    value=value
+                )
 """
