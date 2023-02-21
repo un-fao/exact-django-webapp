@@ -582,4 +582,172 @@ def run():
                     moisture=moisture,
                     value=value
                 )
+    with(open('scripts\ipcc_data\CroplandFLU.csv', 'r')) as f:
+        reader = csv.reader(f)
+        header = next(reader, None)
+        data = list(reader)
+
+        for i, head in enumerate(header):
+            head = sanitize(head).title()
+            land_use_type = LandUseType.objects.get_or_create(name=head)[0]
+            for row in data:
+                if sanitize(row[0]) == '':
+                    continue
+
+                climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
+                moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
+
+                value = row[i+2]
+
+                print(f"{land_use_type}, {climate}, {moisture}, {value}")
+
+                CroplandFLU.objects.get_or_create(
+                    land_use_type=land_use_type,
+                    climate=climate,
+                    moisture=moisture,
+                    value=value
+                )
+
+    with(open('scripts\ipcc_data\CroplandFMG.csv', 'r')) as f:
+        reader = csv.reader(f)
+        header = next(reader, None)
+        data = list(reader)
+
+        for i, head in enumerate(header):
+            head = sanitize(head).title()
+            tillage_type = TillageType.objects.get_or_create(name=head)[0]
+            for row in data:
+                if sanitize(row[0]) == '':
+                    continue
+
+                climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
+                moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
+
+                value = row[i+2]
+
+                print(f"{tillage_type}, {climate}, {moisture}, {value}")
+
+                CroplandFMG.objects.get_or_create(
+                    tillage_type=tillage_type,
+                    climate=climate,
+                    moisture=moisture,
+                    value=value
+                )
+
+    with(open('scripts\ipcc_data\CroplandFI.csv', 'r')) as f:
+        reader = csv.reader(f)
+        header = next(reader, None)
+        data = list(reader)
+
+        for i, head in enumerate(header):
+            head = sanitize(head).title()
+            organic_input_type = OrganicInputType.objects.get_or_create(name=head)[0]
+            for row in data:
+                if sanitize(row[0]) == '':
+                    continue
+
+                climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
+                moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
+
+                value = row[i+2]
+
+                print(f"{organic_input_type}, {climate}, {moisture}, {value}")
+
+                CroplandFI.objects.get_or_create(
+                    organic_input_type=organic_input_type,
+                    climate=climate,
+                    moisture=moisture,
+                    value=value
+                )
+
+    with(open('scripts\ipcc_data\PerennialAGB.csv', 'r')) as f:
+        reader = csv.reader(f)
+        header = next(reader, None)
+        data = list(reader)
+
+        for i, head in enumerate(header):
+            head = sanitize(head).title()
+            if head == '': continue
+            
+            land_use_type = LandUseType.objects.get_or_create(name=head)[0]
+            for row in data:
+                if sanitize(row[0]) == '':
+                    continue
+
+                climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
+                moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
+
+                # FIXME: Maybe skip instead of setting to None?
+                value = row[i+4] if row[i+4] != '' else None
+
+                print(f"{land_use_type}, {climate}, {moisture}, {value}")
+
+                PerennialAGB.objects.get_or_create(
+                    land_use_type=land_use_type,
+                    climate=climate,
+                    moisture=moisture,
+                    value=value
+                )
+    with(open('scripts\ipcc_data\PerennialMaximumAGB_C.csv', 'r')) as f:
+        reader = csv.reader(f)
+        header = next(reader, None)
+        data = list(reader)
+
+
+        for i, head in enumerate(header):
+            head = sanitize(head).title()
+            land_use_type = LandUseType.objects.get_or_create(name=head)[0]
+            for row in data:
+                if sanitize(row[0]) == '': 
+                    continue
+                try:
+                    # FIXME: This skips rows in PerennialMaximumAGB_C that don't have moisture values. Must be fixed. Ask team.
+                    # Some rows in the Excel are only matched to a climate, not climate and moisture.
+                    float(row[1])
+                    continue
+                except ValueError:
+                    pass
+
+                climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
+                moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
+                
+                print(f"i = {i}")
+                print(f"{land_use_type}, {climate}, {moisture}")
+
+                value = row[i+2]
+
+                print(f"Value {value}")
+
+
+                PerennialMaximumAGBC.objects.get_or_create(
+                    land_use_type=land_use_type,
+                    climate=climate,
+                    moisture=moisture,
+                    value=value
+                )
 """
+    with(open('scripts\ipcc_data\CroplandFMG.csv', 'r')) as f:
+        reader = csv.reader(f)
+        header = next(reader, None)
+        data = list(reader)
+
+        for i, head in enumerate(header):
+            head = sanitize(head).title()
+            tillage_type = TillageManagementType.objects.get_or_create(name=head)[0]
+            for row in data:
+                if sanitize(row[0]) == '':
+                    continue
+
+                climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
+                moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
+
+                value = row[i+2]
+
+                print(f"{tillage_type}, {climate}, {moisture}, {value}")
+
+                CroplandFMG.objects.get_or_create(
+                    tillage_management_type=tillage_type,
+                    climate=climate,
+                    moisture=moisture,
+                    value=value
+                )
