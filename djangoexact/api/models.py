@@ -478,7 +478,22 @@ class PerennialCropping(Module):
     tillage_management_type = ForeignKey(TillageManagementType, on_delete=CASCADE)
     organic_input_type = ForeignKey(OrganicInputType, on_delete=CASCADE)
     is_biomass_burned = BooleanField()
+
+    ha_start = IntegerField()
+    ha_w = IntegerField()
+    ha_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_w_rate")
+    ha_wo = IntegerField()
+    ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_wo_rate+")
+
     crop_yield = FloatField()
+
+    ag_t2 = FloatField(null=True, blank=True)
+    bg_t2 = FloatField(null=True, blank=True)
+    sc_t2 = FloatField(null=True, blank=True)
+    tillage_factor_t2 = FloatField(null=True, blank=True)
+    input_factor_t2 = FloatField(null=True, blank=True)
+    residue_burned_t2 = FloatField(null=True, blank=True)
+    fire_periodicity_t2 = FloatField(null=True, blank=True, default=1)
 
     def __str__(self):
         return f"PerennialCroppingInput for activity {self.activity.name}, {self.agroforestry_system.name} in project {self.activity.module.project.name}"
