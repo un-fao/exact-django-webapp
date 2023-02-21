@@ -148,6 +148,6 @@ def generic_module_viewset(model: Model):
             except Exception as e:
                 return Response(error(str(e)), status=status.HTTP_400_BAD_REQUEST)
 
-            return Response(ResultSerializer(module_results).data)
+            return Response(ResultSerializer(module_results, many=True).data)
 
     return GenericModuleViewSet
