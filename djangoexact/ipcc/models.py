@@ -289,3 +289,12 @@ class DefaultSoilCarbonStock(Model):
 
     def __str__(self):
         return f"{self.value} for {self.climate.name} {self.moisture.name} {self.vegetation_type.name} {self.soil_type.name}"
+    
+class DrainageEmissionFactor(Model):
+    climate = ForeignKey('api.Climate', on_delete=CASCADE)
+    moisture = ForeignKey('api.Moisture', on_delete=CASCADE)
+    vegetation_type = ForeignKey('api.VegetationType', on_delete=CASCADE)
+    value = FloatField(default=0)
+
+    def __str__(self):
+        return f"{self.value} for {self.climate.name} {self.moisture.name}"
