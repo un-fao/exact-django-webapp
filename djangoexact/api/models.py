@@ -489,14 +489,14 @@ class PerennialCropping(Module):
 
     ag_t2 = FloatField(null=True, blank=True)
     bg_t2 = FloatField(null=True, blank=True)
-    sc_t2 = FloatField(null=True, blank=True)
+    soc_t2 = FloatField(null=True, blank=True)
     tillage_factor_t2 = FloatField(null=True, blank=True)
     input_factor_t2 = FloatField(null=True, blank=True)
     residue_burned_t2 = FloatField(null=True, blank=True)
     fire_periodicity_t2 = FloatField(null=True, blank=True, default=1)
 
     def __str__(self):
-        return f"PerennialCroppingInput for activity {self.activity.name}, {self.agroforestry_system.name} in project {self.activity.module.project.name}"
+        return f"PerennialCropping for activity {self.activity.name}, crop {self.land_use_type.name} in project {self.activity.project.name}"
 
 class FloodedRice(Module):
 
