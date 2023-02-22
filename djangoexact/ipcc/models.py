@@ -321,7 +321,6 @@ class PerennialBGB(Model):
 
 class PerennialMaximumAGBC(Model):
     climate = ForeignKey('api.Climate', on_delete=CASCADE)
-    moisture = ForeignKey('api.Moisture', on_delete=CASCADE)
     land_use_type = ForeignKey('api.LandUseType', on_delete=CASCADE)
     value = FloatField(default=0, null=True, blank=True)
 
