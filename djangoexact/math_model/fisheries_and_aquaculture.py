@@ -122,9 +122,7 @@ def total_inland_coastal_aquaculture(production_start, production_w, nitrous_ef_
         nitrous_emissions_start = production_start * nitrous_ef_production
 
         total_nitrous = (min(nitrous_emissions_start, nitrous_emissions_end) * (time_cap + time_impl) + abs(nitrous_emissions_start - nitrous_emissions_end) * time_dependency(nitrous_emissions_start, nitrous_emissions_end, rate_coefficient, time_impl, time_cap))
-
-        ciao = 2
-
+        
         return total_nitrous
 
     def feed_emissions (feed_start, feed_end, ef_feed_default, ef_feed_tier_2, time_impl, time_cap, rate_coefficient):
@@ -146,21 +144,21 @@ def total_inland_coastal_aquaculture(production_start, production_w, nitrous_ef_
         return total_feed
 
     """
-    production_start: production in 2010
-    production_w: production in 2015
-    nitrous_ef_default: nitrous oxide emission factor for default scenario
-    nitrous_ef_tier_2: nitrous oxide emission factor for tier 2 scenario
-    nitrous_constant: constant for nitrous oxide emission factor
+    production_start: front end input
+    production_w: front end input
+    nitrous_ef_default: fixed value 0.00169
+    nitrous_ef_tier_2: tier 2 value, expects float or none
+    nitrous_constant: input in 1.Description
     time_impl: implementation time
     time_cap: cap time
     rate_coefficient_w: rate coefficient
-    rate_coefficient_wo: rate coefficient
-    production_wo: production in 2015 without tier 2
-    feed_start: feed in 2010
-    feed_w: feed in 2015
-    ef_feed_default: feed emission factor for default scenario
-    ef_feed_tier_2: feed emission factor for tier 2 scenario
-    feed_wo: feed in 2015 without tier 2
+    rate_coefficient_wo: rate coefficient # MISSING IN EXCEL REFERENCE
+    production_wo: front end input
+    feed_start: front end input
+    feed_w: front end input
+    ef_feed_default: fixed value 0
+    ef_feed_tier_2: tier 2 value, expects float or none
+    feed_wo: front end input
     """
 
     nitrous_emissions_w = nitrous_emissions(production_start, production_w, nitrous_ef_default, nitrous_ef_tier_2, nitrous_constant, time_impl, time_cap, rate_coefficient_w)
