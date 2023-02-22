@@ -37,7 +37,7 @@ def calculate_emissions(area_start, area_w, area_wo, time_impl, time_cap, rate_t
     # Som and Soil Calculation
     socref: standard value listed in 1.Description
     soc_tier_2: tier 2 value, excepts None or Float value 
-    f_lu_ref: taken from IPCC A57 matching CLIMATE REGION and taking colum Long-term cultivated
+    f_lu_ref: taken from IPCC A57 matching CLIMATE REGION and taking colum Perennial/Tree crop
     f_lu_tier_2: tier 2 value, expects None or Float value
     f_i_ref: taken from IPCC A57 matching CLIMATE REGION to rows and INPUT OF ORGANIC MATERIAL to columns
     f_i_tier_2: tier 2 value, expects None or Float value
@@ -79,8 +79,7 @@ def soil_co2_change(area_start, area, time_impl, time_cap, rate_coefficient, rat
                 else:
                     return 0.215 * time_impl - (time_impl/4.6 * math.exp(-92.1/time_impl) - 0.01)
             else:
-                time_impl * (1 - rate_coefficient)
-            return
+                return time_impl * (1 - rate_coefficient)
     
         def not_immediate_area_start_smaller_area(time_impl, time_cap, rate_type, rate_coefficient):
 
@@ -296,5 +295,4 @@ def total_biomass_co2 (area_start, area, time_impl, time_cap, rate_type, rate_co
     
     return - min(calculated, tabular) if max_agb != 0 else calculated
 
-
-
+# em = calculate_emissions(12, 12, 12, 20, 9, 'D', 0.5, 'D', 0.5, 265, 28, True, 0.21, 2.3, 0.85, 1, None, None, 3.16, None, 48, 0.71, None, 46, None, 1.01, None, 0.92, None, 1.04, None)
