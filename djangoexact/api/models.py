@@ -337,6 +337,7 @@ class Activity(Model):
 
 class Module(Model):
     activity = ForeignKey(Activity, on_delete=CASCADE)
+    parent_module_type = ForeignKey(ModuleType, on_delete=CASCADE, null=True, blank=True)
 
     class Meta:
         abstract = True
