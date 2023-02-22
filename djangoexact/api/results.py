@@ -169,7 +169,7 @@ def calc_coastal_waterbody_result(input:CoastalWaterbody, project: Project):
         input.trophic_mean_annual_t2,
     ]
 
-    return Result(*coastal_wetlands.coastal_waterbodies_w_wo(*inputs))
+    return [Result(*coastal_wetlands.coastal_waterbodies_w_wo(*inputs))]
 
 def calc_rewetting_result(input: Rewetting, project: Project):
     """
@@ -219,7 +219,7 @@ def calc_rewetting_result(input: Rewetting, project: Project):
         input.ha_wo_rate.value,
     ]
 
-    return Result(*coastal_wetlands.rewetting_w_wo(*inputs))
+    return [Result(*coastal_wetlands.rewetting_w_wo(*inputs))]
 
 def calc_affo_result(input: Afforestation, project:Project):
     """
@@ -295,7 +295,7 @@ def calc_affo_result(input: Afforestation, project:Project):
         bg_biomass_gt_125.value
     ]
     
-    return Result(*affo.afforestation(*inputs))
+    return [Result(*affo.afforestation(*inputs))]
 
 def calc_defo_result(input: Deforestation, project: Project):
     """
@@ -368,7 +368,7 @@ def calc_defo_result(input: Deforestation, project: Project):
         input.rcs_soil_c_t2 # soil t2
     ]
 
-    return Result(*defo.GHG_emissions(*inputs))
+    return [Result(*defo.GHG_emissions(*inputs))]
 
 def calc_oluc_result(input: OtherLandUse, project:Project):
     """
@@ -436,7 +436,7 @@ def calc_oluc_result(input: OtherLandUse, project:Project):
         input.ha_wo
     ]
     
-    return Result(*oluc.calculate_w_wo_balance(*inputs))
+    return [Result(*oluc.calculate_w_wo_balance(*inputs))]
 
 def calc_annual_result(input: AnnualCropping, project:Project):
     """
@@ -525,7 +525,7 @@ def calc_annual_result(input: AnnualCropping, project:Project):
         getattr(minor_n_estimation_factor, "n_bg_t", None)
     ]
 
-    return Result(*annuals.calculate_emissions(*inputs))
+    return [Result(*annuals.calculate_emissions(*inputs))]
 
 def calc_perennial_result(input: PerennialCropping, project: Project):
     """
@@ -537,15 +537,15 @@ def calc_perennial_result(input: PerennialCropping, project: Project):
     continent = project.continent
     land_use_type = input.land_use_type
 
-    burning_emission_factor = BurningEmissionFactor.objects.get(category__name="Agricultural residues")
+    burning_emission_factor = BurningEmissionFactor.objects.get(category__name="Savanna and grassland")
     
     # TODO: Replace 'other' with all the other land_use_types in db
     fires_combustion_factor = FiresCombustionFactor.objects.get(land_use_type=land_use_type)
     ag_default = PerennialAGB.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
-    agb_max_c = PerennialMaximumAGBC.objects.get(climate=climate, moisture=moisture, land_use_type=land_use_type)
+    agb_max_c = PerennialMaximumAGBC.objects.get(climate=climate, land_use_type=land_use_type)
     bg_default = PerennialBGB.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
 
-    flu = CroplandFLU.objects.get(climate=climate, moisture=moisture, land_use_type__name="Long-Term Cultivated")
+    flu = CroplandFLU.objects.get(climate=climate, moisture=moisture, land_use_type__name="Perennial/Tree Crop")
     fi = CroplandFI.objects.get(climate=climate, moisture=moisture, organic_input_type=input.organic_input_type)
     fmg = CroplandFMG.objects.get(climate=climate, moisture=moisture, tillage_management_type=input.tillage_management_type)
 
@@ -562,25 +562,25 @@ def calc_perennial_result(input: PerennialCropping, project: Project):
         project.gw_potential.n2o,
         project.gw_potential.ch4,
         input.is_biomass_burned,
-        burning_emission_factor.ch4,
         burning_emission_factor.n2o,
+        burning_emission_factor.ch4,
         fires_combustion_factor.value,
         1, # Default
         input.fire_periodicity_t2,
         input.residue_burned_t2,
-        ag_default.value, # Same as two lines above
-        input.ag_t2, # agb_rate_tier_2 does not exist
+        ag_default.value, 
+        input.ag_t2, 
         agb_max_c.value,
-        bg_default.value,
+        bg_default.value, 
         input.bg_t2,
         project.soc_ref.value,
         input.soc_t2,
-        flu.value,
+        flu.value, 
         input.flu_t2,
         fi.value,
-        input.input_factor_t2, # input.fi_t2,
+        input.input_factor_t2,
         fmg.value,
-        input.tillage_factor_t2, # input.fmg_t2
+        input.tillage_factor_t2,
     ]
 
-    return Result(*perennial_cropping.calculate_emissions(*inputs))
+    return [Result(*perennial_cropping.calculate_emissions(*inputs))]
