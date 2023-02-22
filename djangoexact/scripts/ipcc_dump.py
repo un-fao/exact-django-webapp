@@ -725,7 +725,6 @@ def run():
                     moisture=moisture,
                     value=value
                 )
-"""
     with(open('scripts\ipcc_data\CroplandFMG.csv', 'r')) as f:
         reader = csv.reader(f)
         header = next(reader, None)
@@ -749,5 +748,72 @@ def run():
                     tillage_management_type=tillage_type,
                     climate=climate,
                     moisture=moisture,
+                    value=value
+                )
+"""
+
+    with(open('scripts\ipcc_data\PerennialAGB.csv', 'r')) as f:
+        reader = csv.reader(f)
+        header = next(reader, None)
+        data = list(reader)
+
+        for i, head in enumerate(header):
+            head = sanitize(head).title()
+            if head == '': continue
+            
+            land_use_type = LandUseType.objects.get_or_create(name=head)[0]
+            for row in data:
+                if sanitize(row[0]) == '':
+                    continue
+
+                climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
+                moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
+                continent = Continent.objects.get_or_create(name=sanitize(row[2]))[0]
+
+                value = row[i+4]
+
+                if value == '':
+                    continue
+
+                print(f"{land_use_type}, {climate}, {moisture}, {value}")
+
+                PerennialAGB.objects.get_or_create(
+                    land_use_type=land_use_type,
+                    climate=climate,
+                    moisture=moisture,
+                    continent=continent,
+                    value=value
+                )
+
+    with(open('scripts\ipcc_data\PerennialBGB.csv', 'r')) as f:
+        reader = csv.reader(f)
+        header = next(reader, None)
+        data = list(reader)
+
+        for i, head in enumerate(header):
+            head = sanitize(head).title()
+            if head == '': continue
+            
+            land_use_type = LandUseType.objects.get_or_create(name=head)[0]
+            for row in data:
+                if sanitize(row[0]) == '':
+                    continue
+
+                climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
+                moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
+                continent = Continent.objects.get_or_create(name=sanitize(row[2]))[0]
+
+                value = row[i+3]
+
+                if value == '':
+                    continue
+
+                print(f"{land_use_type}, {climate}, {moisture}, {value}")
+
+                PerennialBGB.objects.get_or_create(
+                    land_use_type=land_use_type,
+                    climate=climate,
+                    moisture=moisture,
+                    continent=continent,
                     value=value
                 )
