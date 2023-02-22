@@ -545,7 +545,10 @@ def calc_perennial_result(input: PerennialCropping, project: Project):
     agb_max_c = PerennialMaximumAGBC.objects.get(climate=climate, land_use_type=land_use_type)
     bg_default = PerennialBGB.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
 
-    flu = CroplandFLU.objects.get(climate=climate, moisture=moisture, land_use_type__name="Perennial/Tree Crop")
+    flu_obj = AfforestationFLU if input.parent_module_type is not None else CroplandFLU
+    lu_name = land_use_type.name if input.parent_module_type is not None else "Perennial/Tree Crop"
+    flu = flu_obj.objects.get(climate=climate, moisture=moisture, land_use_type__name=lu_name)
+
     fi = CroplandFI.objects.get(climate=climate, moisture=moisture, organic_input_type=input.organic_input_type)
     fmg = CroplandFMG.objects.get(climate=climate, moisture=moisture, tillage_management_type=input.tillage_management_type)
 
@@ -555,10 +558,10 @@ def calc_perennial_result(input: PerennialCropping, project: Project):
         input.ha_wo,
         project.implementation_duration_yrs,
         project.capitalization_duration_yrs,
-        input.ha_w_rate.name,
-        input.ha_w_rate.value,
-        input.ha_wo_rate.name,
-        input.ha_wo_rate.value,
+        input.ha_w_rate.name if input.parent_module_type is None else 'D',
+        input.ha_w_rate.value if input.parent_module_type is None else 0.5,
+        input.ha_wo_rate.name if input.parent_module_type is None else 'D',
+        input.ha_wo_rate.value if input.parent_module_type is None else 0.5,
         project.gw_potential.n2o,
         project.gw_potential.ch4,
         input.is_biomass_burned,
@@ -575,7 +578,7 @@ def calc_perennial_result(input: PerennialCropping, project: Project):
         input.bg_t2,
         project.soc_ref.value,
         input.soc_t2,
-        flu.value, 
+        flu.value if input.parent_module_type is not None else 1, 
         input.flu_t2,
         fi.value,
         input.input_factor_t2,
