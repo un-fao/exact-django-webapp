@@ -750,7 +750,6 @@ def run():
                     moisture=moisture,
                     value=value
                 )
-"""
 
     with(open('scripts\ipcc_data\PerennialAGB.csv', 'r')) as f:
         reader = csv.reader(f)
@@ -877,5 +876,31 @@ def run():
                 PerennialMaximumAGBC.objects.get_or_create(
                     land_use_type=land_use_type,
                     climate=climate,
+                    value=value
+                )
+"""
+    with(open('scripts\ipcc_data\AfforestationFLU.csv', 'r')) as f:
+        reader = csv.reader(f)
+        header = next(reader, None)
+        data = list(reader)
+
+        for i, head in enumerate(header):
+            head = sanitize(head).title()
+            land_use_type = LandUseType.objects.get(name=head)
+            for row in data:
+                if sanitize(row[0]) == '':
+                    continue
+
+                climate = Climate.objects.get(name=sanitize(row[0]).title())
+                moisture = Moisture.objects.get(name=sanitize(row[1]).title())
+
+                value = row[i+2]
+
+                print(f"{land_use_type}, {climate}, {moisture}, {value}")
+
+                AfforestationFLU.objects.get_or_create(
+                    land_use_type=land_use_type,
+                    climate=climate,
+                    moisture=moisture,
                     value=value
                 )
