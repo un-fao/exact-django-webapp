@@ -761,21 +761,21 @@ def run():
             head = sanitize(head).title()
             if head == '': continue
             
-            land_use_type = LandUseType.objects.get_or_create(name=head)[0]
+            land_use_type = LandUseType.objects.get(name=head)
             for row in data:
                 if sanitize(row[0]) == '':
                     continue
 
-                climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
-                moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
-                continent = Continent.objects.get_or_create(name=sanitize(row[2]))[0]
+                climate = Climate.objects.get(name=sanitize(row[0]))
+                moisture = Moisture.objects.get(name=sanitize(row[1]))
+                continent = Continent.objects.get(name=sanitize(row[2]))
 
                 value = row[i+4]
 
-                if value == '':
+                if value == '' and i != 0:
                     continue
 
-                print(f"{land_use_type}, {climate}, {moisture}, {value}")
+                print(f"{land_use_type}, {climate}, {moisture}, {continent}, {value}")
 
                 PerennialAGB.objects.get_or_create(
                     land_use_type=land_use_type,
@@ -794,26 +794,88 @@ def run():
             head = sanitize(head).title()
             if head == '': continue
             
-            land_use_type = LandUseType.objects.get_or_create(name=head)[0]
+            land_use_type = LandUseType.objects.get(name=head)
             for row in data:
                 if sanitize(row[0]) == '':
                     continue
 
-                climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
-                moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
-                continent = Continent.objects.get_or_create(name=sanitize(row[2]))[0]
+                climate = Climate.objects.get(name=sanitize(row[0]).title())
+                moisture = Moisture.objects.get(name=sanitize(row[1]).title())
+                continent = Continent.objects.get(name=sanitize(row[2]).title())
 
-                value = row[i+3]
+                value = row[i+4]
 
-                if value == '':
+                if value == '' and i != 0:
                     continue
 
-                print(f"{land_use_type}, {climate}, {moisture}, {value}")
+                print(f"{land_use_type}, {climate}, {moisture}, {continent}, {value}")
 
                 PerennialBGB.objects.get_or_create(
                     land_use_type=land_use_type,
                     climate=climate,
                     moisture=moisture,
                     continent=continent,
+                    value=value
+                )
+                
+    with(open('scripts\ipcc_data\CroplandFLU.csv', 'r')) as f:
+        reader = csv.reader(f)
+        header = next(reader, None)
+        data = list(reader)
+
+        for i, head in enumerate(header):
+            head = sanitize(head).title()
+            land_use_type = LandUseType.objects.get(name=head)
+            for row in data:
+                if sanitize(row[0]) == '':
+                    continue
+
+                climate = Climate.objects.get(name=sanitize(row[0]).title())
+                moisture = Moisture.objects.get(name=sanitize(row[1]).title())
+
+                value = row[i+2]
+
+                print(f"{land_use_type}, {climate}, {moisture}, {value}")
+
+                CroplandFLU.objects.get_or_create(
+                    land_use_type=land_use_type,
+                    climate=climate,
+                    moisture=moisture,
+                    value=value
+                )
+
+    with(open('scripts\ipcc_data\PerennialMaximumAGB_C.csv', 'r')) as f:
+        reader = csv.reader(f)
+        header = next(reader, None)
+        data = list(reader)
+
+
+        for i, head in enumerate(header):
+            head = sanitize(head).title()
+            land_use_type = LandUseType.objects.get(name=head)
+            for row in data:
+                if sanitize(row[0]) == '': 
+                    continue
+                try:
+                    # FIXME: This skips rows in that don't have moisture values. Must be fixed. Ask team.
+                    # Some rows in the Excel are only matched to a climate, not climate and moisture.
+                    float(row[1])
+                    continue
+                except ValueError:
+                    pass
+
+                climate = Climate.objects.get(name=sanitize(row[0]).title())
+                
+                print(f"i = {i}")
+                print(f"{land_use_type}, {climate}, {moisture}")
+
+                value = row[i+2]
+
+                print(f"Value {value}")
+
+
+                PerennialMaximumAGBC.objects.get_or_create(
+                    land_use_type=land_use_type,
+                    climate=climate,
                     value=value
                 )
