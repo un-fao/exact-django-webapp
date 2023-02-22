@@ -72,7 +72,7 @@ class Continent(Model):
     name = CharField(max_length=100)
 
     def __str__(self):
-        return self.name
+        return f"({self.pk}) {self.name}"
 
 class Country(Model):
     name = CharField(max_length=100)
@@ -94,7 +94,8 @@ class Moisture(Model):
     name = CharField(max_length=100)
 
     def __str__(self):
-        return self.name
+        return f"({self.pk}) {self.name}"
+
 
 class SoilType(Model):
     name = CharField(max_length=100)
@@ -493,7 +494,7 @@ class PerennialCropping(Module):
     tillage_factor_t2 = FloatField(null=True, blank=True)
     input_factor_t2 = FloatField(null=True, blank=True)
     residue_burned_t2 = FloatField(null=True, blank=True)
-    fire_periodicity_t2 = FloatField(null=True, blank=True, default=1)
+    fire_periodicity_t2 = FloatField(null=True, blank=True)
 
     flu_t2 = FloatField(null=True, blank=True)
 
