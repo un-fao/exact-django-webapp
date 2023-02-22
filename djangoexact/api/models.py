@@ -495,6 +495,8 @@ class PerennialCropping(Module):
     residue_burned_t2 = FloatField(null=True, blank=True)
     fire_periodicity_t2 = FloatField(null=True, blank=True, default=1)
 
+    flu_t2 = FloatField(null=True, blank=True)
+
     def __str__(self):
         return f"PerennialCropping for activity {self.activity.name}, crop {self.land_use_type.name} in project {self.activity.project.name}"
 
