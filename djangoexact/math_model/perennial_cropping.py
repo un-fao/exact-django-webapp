@@ -62,6 +62,8 @@ def calculate_emissions(area_start, area_w, area_wo, time_impl, time_cap, rate_t
     total_w = residue_emissions_w + total_bio_emissions_w + som_emissions_w + soil_emissions_w
     total_wo = residue_emissions_wo + total_bio_emissions_wo + som_emissions_wo + soil_emissions_wo
 
+    ciao = 2
+
     return total_w, total_wo, total_w - total_wo
 
 def soil_co2_change(area_start, area, time_impl, time_cap, rate_coefficient, rate_type, socref, soc_tier_2, f_lu_ref, f_lu_tier_2, f_i_ref, f_i_tier_2, f_mg_ref, f_mg_tier_2):
@@ -118,10 +120,9 @@ def soil_co2_change(area_start, area, time_impl, time_cap, rate_coefficient, rat
     delta_soil_c_20_years = delta_soil_c / 20
 
     maximum = - delta_soil_c * max(area_start, area)
-    calculated_time_ind = - delta_soil_c_20_years * min(area, area_start) * min (20, time_impl + time_cap)
+    calculated_time_ind =  min(area, area_start) * min (20, time_impl + time_cap)
     calculated_time_dep = immediate_soil(area, area_start, time_impl, time_cap) if rate_type == 'I' else not_immediate_soil(area, area_start, time_impl, time_cap, rate_type, rate_coefficient)
-    calculated = calculated_time_dep + calculated_time_ind
-
+    calculated = - delta_soil_c_20_years * (calculated_time_dep + calculated_time_ind)
 
     return maximum if abs(calculated) > maximum else calculated
 
@@ -296,3 +297,7 @@ def total_biomass_co2 (area_start, area, time_impl, time_cap, rate_type, rate_co
     return - min(calculated, tabular) if max_agb != 0 else calculated
 
 # em = calculate_emissions(12, 12, 12, 20, 9, 'D', 0.5, 'D', 0.5, 265, 28, True, 0.21, 2.3, 0.85, 1, None, None, 3.16, None, 48, 0.71, None, 46, None, 1.01, None, 0.92, None, 1.04, None)
+
+defo = calculate_emissions(0, 10, 1, 20, 9, 'D', 0.5, 'D', 0.5, 265, 28, True, 0.21, 2.3, 0.85, 1, None, None, 3.16, None, 48, 0.71, None, 46, None, 1.01, None, 0.92, None, 1.04, None)
+
+print(defo)
