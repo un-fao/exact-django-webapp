@@ -1,5 +1,5 @@
 from .models import Deforestation, Afforestation, OtherLandUse, AnnualCropping, Project
-from math_model import defo, affo, oluc, annuals, coastal_wetlands
+from math_model import defo, affo, oluc, annuals, perennial_cropping, coastal_wetlands
 from .serializers import *
 from ipcc.models import *
 from .utilities import *
@@ -21,6 +21,8 @@ def calc_result(input: Model, project: Project):
             return calc_oluc_result(input, project)
         case AnnualCropping.__name__:
             return calc_annual_result(input, project)
+        case PerennialCropping.__name__:
+            return calc_perennial_result(input, project)
         case Rewetting.__name__:
             return calc_rewetting_result(input, project)
         case CoastalWaterbody.__name__:
@@ -31,6 +33,8 @@ def calc_result(input: Model, project: Project):
             raise Exception(f"Module '{input.__class__.__name__}' not (yet) supported.")
 
 def calc_extraction_result(input:Extraction, project:Project):
+
+    # Extraction
 
     climate = project.climate
     moisture = project.moisture
@@ -48,8 +52,6 @@ def calc_extraction_result(input:Extraction, project:Project):
     dw = CoastalDeadwood.objects.get(**criteria)
 
     soil_1m = None
-
-    
 
     if vegetation_type.name == MANGROVES:
         atwood = Atwood.objects.get(country=project.country)
@@ -87,6 +89,8 @@ def calc_extraction_result(input:Extraction, project:Project):
     ]
 
     extraction_result = Result(*coastal_wetlands.extraction_and_excavation_w_wo(*extraction_inputs))
+
+    # Drainage
 
     if vegetation_type.name == MANGROVES:
         atwood = Atwood.objects.get(country=project.country)
@@ -461,6 +465,7 @@ def calc_annual_result(input: AnnualCropping, project:Project):
         minor_combustion_factor = None
         minor_n_estimation_factor = None
 
+    # FIXME: Wrong table for flu, fi, fmg?
     emission_factors = DefaultEmissionFactors.objects.get(moisture=moisture, input=input.organic_input_type)
     flu = LandUseCarbonStockExchangeFactor.objects.get(climate=climate, moisture=moisture, land_use_type=land_use_type)
     fi = OrganicInputCarbonStockExchangeFactor.objects.get(climate=climate, moisture=moisture, organic_input_type=input.organic_input_type)
@@ -521,3 +526,61 @@ def calc_annual_result(input: AnnualCropping, project:Project):
     ]
 
     return Result(*annuals.calculate_emissions(*inputs))
+
+def calc_perennial_result(input: PerennialCropping, project: Project):
+    """
+    Calculate emissions for a single PerennialCropping module.
+    """
+
+    climate = project.climate
+    moisture = project.moisture
+    continent = project.continent
+    land_use_type = input.land_use_type
+
+    burning_emission_factor = BurningEmissionFactor.objects.get(category__name="Agricultural residues")
+    
+    # TODO: Replace 'other' with all the other land_use_types in db
+    fires_combustion_factor = FiresCombustionFactor.objects.get(land_use_type=land_use_type)
+    ag_default = PerennialAGB.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
+    agb_max_c = PerennialMaximumAGBC.objects.get(climate=climate, moisture=moisture, land_use_type=land_use_type)
+    bg_default = PerennialBGB.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
+
+    flu = CroplandFLU.objects.get(climate=climate, moisture=moisture, land_use_type__name="Long-Term Cultivated")
+    fi = CroplandFI.objects.get(climate=climate, moisture=moisture, organic_input_type=input.organic_input_type)
+    fmg = CroplandFMG.objects.get(climate=climate, moisture=moisture, tillage_management_type=input.tillage_management_type)
+
+    inputs = [
+        input.ha_start,
+        input.ha_w,
+        input.ha_wo,
+        project.implementation_duration_yrs,
+        project.capitalization_duration_yrs,
+        input.ha_w_rate.name,
+        input.ha_w_rate.value,
+        input.ha_wo_rate.name,
+        input.ha_wo_rate.value,
+        project.gw_potential.n2o,
+        project.gw_potential.ch4,
+        input.is_biomass_burned,
+        burning_emission_factor.ch4,
+        burning_emission_factor.n2o,
+        fires_combustion_factor.value,
+        1, # Default
+        input.fire_periodicity_t2,
+        input.residue_burned_t2,
+        ag_default.value, # Same as two lines above
+        input.ag_t2, # agb_rate_tier_2 does not exist
+        agb_max_c.value,
+        bg_default.value,
+        input.bg_t2,
+        project.soc_ref.value,
+        input.soc_t2,
+        flu.value,
+        input.flu_t2,
+        fi.value,
+        input.input_factor_t2, # input.fi_t2,
+        fmg.value,
+        input.tillage_factor_t2, # input.fmg_t2
+    ]
+
+    return Result(*perennial_cropping.calculate_emissions(*inputs))
