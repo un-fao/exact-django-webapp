@@ -2,7 +2,7 @@ import math
 
 def calculate_emissions(area_start, area_w, area_wo, time_impl, time_cap, rate_type_w, rate_coefficient_w,rate_type_wo, rate_coefficient_wo,
                     nitrous_constant, methane_constant, residue_burnt, emission_factor_burning_nitrous,
-                    emission_factor_burning_methane, combustion_factor, fire_periodicity_default, fire_periodicity_tier_2, t_biomass_tier_2, ag_tc_default, ag_tc_tier_2,
+                    emission_factor_burning_methane, combustion_factor, fire_periodicity_default, fire_periodicity_tier_2, t_biomass_tier_2, 
                     agb_rate_default, agb_rate_tier_2, agb_maximum_c, bgb_rate_default, bgb_rate_tier_2,
                     socref, soc_tier_2, f_lu_ref, f_lu_tier_2, f_i_ref, f_i_tier_2, f_mg_ref, f_mg_tier_2,
                     ):
@@ -28,11 +28,9 @@ def calculate_emissions(area_start, area_w, area_wo, time_impl, time_cap, rate_t
     fire_periodicity_deafult: stable value, no logic, always = 1
     fire_periodicity_tier_2: tier 2 value, expects INT or None
     t_biomass_tier_2: tier 2 value, expects Float or None
-    ag_tc_default: taken from IPCC E107 matching clim_moist_cont to rows and CROP TYPE to columns
-    ag_tc_tier_2: tier 2 value, expects Float or None
-    # Total Biomass CO2 Calculation
     agb_rate_default: taken from IPCC E105 matching clim_moist_cont to rows and CROP TYPE to columns ------ COULD BE THE SAME AS AG_TC_DEFAULT
     agb_rate_tier_2: tier 2 value, expects Float or None
+    # Total Biomass CO2 Calculation
     agb_maximum_c: taken from IPCC A3235 matching climate to rows and CROP TYPE to columns
     bgb_rate_default: taken from IPCC E308 matching clim_moist_cont to rows and CROP TYPE to columns
     bgb_rate_tier_2: tier 2 value, expects Float or None
@@ -50,13 +48,13 @@ def calculate_emissions(area_start, area_w, area_wo, time_impl, time_cap, rate_t
     
     '''
     residue_emissions_w = residue_burning(area_start, area_w, time_impl, time_cap, rate_coefficient_w, nitrous_constant, methane_constant, residue_burnt, emission_factor_burning_nitrous,
-                    emission_factor_burning_methane, combustion_factor, fire_periodicity_default, fire_periodicity_tier_2, t_biomass_tier_2, ag_tc_default, ag_tc_tier_2)
+                    emission_factor_burning_methane, combustion_factor, fire_periodicity_default, fire_periodicity_tier_2, t_biomass_tier_2, agb_rate_default, agb_rate_tier_2)
     total_bio_emissions_w = total_biomass_co2(area_start, area_w, time_impl, time_cap, rate_type_w, rate_coefficient_w, agb_rate_default, agb_rate_tier_2, agb_maximum_c, bgb_rate_default, bgb_rate_tier_2)
     som_emissions_w = som(area_start, area_w, time_impl, time_cap, rate_coefficient_w, rate_type_w, socref, soc_tier_2, f_lu_ref, f_lu_tier_2, f_i_ref, f_i_tier_2, f_mg_ref, f_mg_tier_2)
     soil_emissions_w = soil_co2_change (area_start, area_w, time_impl, time_cap, rate_coefficient_w, rate_type_w, socref, soc_tier_2, f_lu_ref, f_lu_tier_2, f_i_ref, f_i_tier_2, f_mg_ref, f_mg_tier_2)
 
     residue_emissions_wo = residue_burning(area_start, area_wo, time_impl, time_cap, rate_coefficient_wo, nitrous_constant, methane_constant, residue_burnt, emission_factor_burning_nitrous,
-                    emission_factor_burning_methane, combustion_factor, fire_periodicity_default, fire_periodicity_tier_2, t_biomass_tier_2, ag_tc_default, ag_tc_tier_2)
+                    emission_factor_burning_methane, combustion_factor, fire_periodicity_default, fire_periodicity_tier_2, t_biomass_tier_2, agb_rate_default, agb_rate_tier_2)
     total_bio_emissions_wo = total_biomass_co2(area_start, area_wo, time_impl, time_cap, rate_type_wo, rate_coefficient_wo, agb_rate_default, agb_rate_tier_2, agb_maximum_c, bgb_rate_default, bgb_rate_tier_2)
     som_emissions_wo = som(area_start, area_wo, time_impl, time_cap, rate_coefficient_wo, rate_type_wo, socref, soc_tier_2, f_lu_ref, f_lu_tier_2, f_i_ref, f_i_tier_2, f_mg_ref, f_mg_tier_2)
     soil_emissions_wo = soil_co2_change (area_start, area_wo, time_impl, time_cap, rate_coefficient_wo, rate_type_wo, socref, soc_tier_2, f_lu_ref, f_lu_tier_2, f_i_ref, f_i_tier_2, f_mg_ref, f_mg_tier_2)
