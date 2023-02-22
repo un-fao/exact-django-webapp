@@ -79,8 +79,7 @@ def soil_co2_change(area_start, area, time_impl, time_cap, rate_coefficient, rat
                 else:
                     return 0.215 * time_impl - (time_impl/4.6 * math.exp(-92.1/time_impl) - 0.01)
             else:
-                time_impl * (1 - rate_coefficient)
-            return
+                return time_impl * (1 - rate_coefficient)
     
         def not_immediate_area_start_smaller_area(time_impl, time_cap, rate_type, rate_coefficient):
 
