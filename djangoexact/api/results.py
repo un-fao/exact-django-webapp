@@ -577,7 +577,7 @@ def calc_perennial_result(input: PerennialCropping, project: Project):
         bg_default.value, 
         input.bg_t2,
         project.soc_ref.value,
-        input.soc_t2,
+        input.soc_t2 if input.parent_module_type is not None else 1,
         flu.value if input.parent_module_type is not None else 1, 
         input.flu_t2,
         fi.value,
