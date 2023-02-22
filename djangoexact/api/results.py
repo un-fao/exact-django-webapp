@@ -465,11 +465,11 @@ def calc_annual_result(input: AnnualCropping, project:Project):
         minor_combustion_factor = None
         minor_n_estimation_factor = None
 
-    # FIXME: Wrong table for flu, fi, fmg?
+    # TODO: Rename all tables related to FLU, FI, FMG
     emission_factors = DefaultEmissionFactors.objects.get(moisture=moisture, input=input.organic_input_type)
-    flu = LandUseCarbonStockExchangeFactor.objects.get(climate=climate, moisture=moisture, land_use_type=land_use_type)
-    fi = OrganicInputCarbonStockExchangeFactor.objects.get(climate=climate, moisture=moisture, organic_input_type=input.organic_input_type)
-    fmg = TillageCarbonStockExchangeFactor.objects.get(climate=climate, moisture=moisture, tillage_management_type=input.tillage_management_type)
+    flu = CroplandFLU.objects.get(climate=climate, moisture=moisture, land_use_type__name="Long-Term Cultivated")
+    fi = CroplandFI.objects.get(climate=climate, moisture=moisture, organic_input_type=input.organic_input_type)
+    fmg = CroplandFMG.objects.get(climate=climate, moisture=moisture, tillage_management_type=input.tillage_management_type)
 
     inputs = [
 
