@@ -319,7 +319,7 @@ class PerennialBGB(Model):
     def __str__(self):
         return f"{self.value} for {self.climate.name} {self.moisture.name} {self.land_use_type.name}"
 
-class PerennialMaximumAGBC(Model):
+class PerennialMaxAGB(Model):
     climate = ForeignKey('api.Climate', on_delete=CASCADE)
     land_use_type = ForeignKey('api.LandUseType', on_delete=CASCADE)
     value = FloatField(default=0, null=True, blank=True)
