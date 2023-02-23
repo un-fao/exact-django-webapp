@@ -244,6 +244,7 @@ def run():
                 n2o = row[n2o],
                 nox = row[nox]
             )
+            
     with(open('scripts\ipcc_data\FiresCombustionFactors.csv', 'r')) as f:
         reader = csv.reader(f)
         data = list(reader)
@@ -255,7 +256,9 @@ def run():
             fires_cf = FiresCombustionFactor.objects.get_or_create(
                 land_use_type = land_use_type,
                 value = row[1]
-            ) if land_use_type is not None else None
+            ) 
+            
+            if land_use_type is not None else None
 
     with(open('scripts\ipcc_data\CropNitrousEstimationDefaultFactors.csv', 'r')) as f:
         reader = csv.reader(f)
@@ -272,6 +275,7 @@ def run():
                 rs_t = row[4],
                 n_bg_t = row[5]
             )
+
     with(open('scripts\ipcc_data\CoastalAboveGroundBiomass.csv', 'r')) as f:
         reader = csv.reader(f)
         header = next(reader, None)
@@ -427,6 +431,7 @@ def run():
                     salinity=salinity,
                     value=value
                 )
+
     with(open('scripts\ipcc_data\OtherConstructedWaterbodiesEmissionFactors.csv', 'r')) as f:
         reader = csv.reader(f)
         header = next(reader, None)
@@ -452,6 +457,7 @@ def run():
                     moisture=moisture,
                     value=value
                 )
+
     with(open('scripts\ipcc_data\DefaultSoilCarbonStockMineralSoil.csv', 'r')) as f:
         reader = csv.reader(f)
         header = next(reader, None)
@@ -479,6 +485,7 @@ def run():
                     soil_type=soil_type,
                     value=value
                 )
+
     with(open('scripts\ipcc_data\DefaultSoilCarbonStockOrganicSoil.csv', 'r')) as f:
         reader = csv.reader(f)
         header = next(reader, None)
@@ -557,6 +564,7 @@ def run():
                 sd = sd,
                 score = score
             )
+
     with(open('scripts\ipcc_data\DrainageEmissionFactors.csv', 'r')) as f:
         reader = csv.reader(f)
         header = next(reader, None)
@@ -582,6 +590,7 @@ def run():
                     moisture=moisture,
                     value=value
                 )
+
     with(open('scripts\ipcc_data\CroplandFLU.csv', 'r')) as f:
         reader = csv.reader(f)
         header = next(reader, None)
@@ -688,6 +697,7 @@ def run():
                     moisture=moisture,
                     value=value
                 )
+
     with(open('scripts\ipcc_data\PerennialMaximumAGB_C.csv', 'r')) as f:
         reader = csv.reader(f)
         header = next(reader, None)
@@ -725,6 +735,7 @@ def run():
                     moisture=moisture,
                     value=value
                 )
+
     with(open('scripts\ipcc_data\CroplandFMG.csv', 'r')) as f:
         reader = csv.reader(f)
         header = next(reader, None)
@@ -878,7 +889,7 @@ def run():
                     climate=climate,
                     value=value
                 )
-"""
+
     with(open('scripts\ipcc_data\AfforestationFLU.csv', 'r')) as f:
         reader = csv.reader(f)
         header = next(reader, None)
@@ -904,3 +915,4 @@ def run():
                     moisture=moisture,
                     value=value
                 )
+"""
