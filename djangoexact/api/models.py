@@ -532,7 +532,7 @@ class FloodedRice(Assessment):
 
 ##### Grassland and Livestock #####
 
-class Grassland(Module):
+class Grassland(Assessment):
 
     description = TextField(null=True, blank=True)
     user_notes = TextField(null=True, blank=True)
