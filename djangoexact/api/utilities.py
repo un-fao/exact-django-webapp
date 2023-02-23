@@ -37,3 +37,24 @@ def get_query_param_or_validation_error(request, param_name):
     if param is None:
         raise exceptions.ValidationError(f"{param_name} is required")
     return param
+
+def get_assessment_or_parent(module):
+    """
+        Looks for the assessment class in the module and returns it.
+        Returns None if no assessment class is found.
+    """
+
+    relative = None
+
+    # NOTE: To add new assessments, make sure you follow the naming convention of the Assessment class in models.py
+    for attr in dir(module):
+        if getattr(module, attr, None) is not None:
+            
+            if "_assessment" in attr:
+                relative = (getattr(module, attr), 'child')
+                break
+            if ("parent_" in attr and not attr.startswith("_") and not attr in ["_id"]):
+                relative = (getattr(module, attr), 'parent')
+                break
+            
+    return relative
