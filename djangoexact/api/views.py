@@ -118,7 +118,7 @@ def generic_module_viewset(model: Model):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        def retrieve(self, request, pk=None):
+        def retrieve(self, request: Request, pk=None):
             module = get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
             return Response(get_module_serializer(model)(module).data)
 
@@ -129,10 +129,16 @@ def generic_module_viewset(model: Model):
             """
 
             activity_id = get_query_param_or_validation_error(self.request, 'activity_id')
-            module = get_object_or_404(model, activity__id=activity_id)
 
-            serializer = get_module_serializer(model)(module)
-            return Response(serializer.data)
+            module = get_object_or_404(model, activity__id=activity_id)
+            module_serializer = get_module_serializer(model)(module)
+
+            if request.query_params.get('include_related'):
+                relative_module, relation = get_assessment_or_parent(module)
+                relative_serializer = get_module_serializer(relative_module.__class__)(relative_module)
+                return Response({relation: relative_serializer.data, **module_serializer.data})
+
+            return Response(module_serializer.data)
 
         @action(detail=True, methods=['get'])
         def results(self, request, pk=None):
