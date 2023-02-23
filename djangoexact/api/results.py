@@ -542,7 +542,7 @@ def calc_perennial_result(input: PerennialCropping, project: Project):
     # TODO: Replace 'other' with all the other land_use_types in db
     fires_combustion_factor = FiresCombustionFactor.objects.get(land_use_type=land_use_type)
     ag_default = PerennialAGB.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
-    agb_max_c = PerennialMaximumAGBC.objects.get(climate=climate, land_use_type=land_use_type)
+    agb_max_c = PerennialMaxAGB.objects.get(climate=climate, land_use_type=land_use_type)
     bg_default = PerennialBGB.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
 
     flu_obj = AfforestationFLU if input.parent_module_type is not None else CroplandFLU
