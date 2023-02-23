@@ -1,6 +1,7 @@
 from django.db.models import *
 from django.contrib.auth import models as auth_models
 from django.core.validators import RegexValidator
+from django.core.exceptions import ValidationError
 
 alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', 'Only alphanumeric characters are allowed.')
 letters_only = RegexValidator(r'^[a-zA-Z]*$', 'Only letters are allowed.')
@@ -337,7 +338,6 @@ class Activity(Model):
 
 class Module(Model):
     activity = ForeignKey(Activity, on_delete=CASCADE)
-    parent_module_type = ForeignKey(ModuleType, on_delete=CASCADE, null=True, blank=True)
 
     class Meta:
         abstract = True
@@ -428,7 +428,22 @@ class OtherLandUse(Module):
 
 ##### Cropland Management #####
 
-class AnnualCropping(Module):
+class Assessment(Module):
+
+    parent_afforestation = OneToOneField(Afforestation, on_delete=CASCADE, null=True, blank=True, related_name='%(class)s_assessment')
+    parent_deforestation = OneToOneField(Deforestation, on_delete=CASCADE, null=True, blank=True, related_name='%(class)s_assessment')
+    parent_other_land_use = OneToOneField(OtherLandUse, on_delete=CASCADE, null=True, blank=True, related_name='%(class)s_assessment')
+
+    def clean(self) -> None:
+        super().clean()
+        fields = [self.parent_afforestation, self.parent_deforestation, self.parent_other_land_use]
+        if len([f for f in fields if f]) > 1:
+            raise ValidationError("Exactly one of deforestation, afforestation, or other land use can be set.")
+
+    class Meta:
+        abstract = True
+
+class AnnualCropping(Assessment):
 
     user_notes = TextField(null=True, blank=True)
 
@@ -465,7 +480,7 @@ class AnnualCropping(Module):
     def __str__(self):
         return f"AnnualCroppingInput for activity {self.activity.name}, crop {self.land_use_type.name} in project {self.activity.project.name}"
 
-class PerennialCropping(Module):
+class PerennialCropping(Assessment):
 
     user_notes = TextField(null=True, blank=True)
 
@@ -502,7 +517,7 @@ class PerennialCropping(Module):
     def __str__(self):
         return f"PerennialCropping for activity {self.activity.name}, crop {self.land_use_type.name} in project {self.activity.project.name}"
 
-class FloodedRice(Module):
+class FloodedRice(Assessment):
 
     user_notes = TextField(null=True, blank=True)
 
