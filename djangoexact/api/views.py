@@ -12,7 +12,7 @@ from .results import calc_result
 
 activity_id = openapi.Parameter('activity_id', openapi.IN_QUERY, description="ID of activity related to the module", type=openapi.TYPE_INTEGER)
 project_id = openapi.Parameter('project_id', openapi.IN_QUERY, description="ID of project related to the activity", type=openapi.TYPE_INTEGER)
-
+include_related = openapi.Parameter('include_related', openapi.IN_QUERY, description="Include related modules", type=openapi.TYPE_BOOLEAN)
 
 class AuthenticatedViewSet(viewsets.GenericViewSet):
     permission_classes = [permissions.IsAuthenticated]
@@ -101,10 +101,10 @@ def generic_module_viewset(model: Model):
             Creates a new module for a given activity.
             """
 
-            serializer = get_module_serializer(model)(data=request.data)
-            if serializer.is_valid():
+            module_serializer = get_module_serializer(model)(data=request.data)
+            if module_serializer.is_valid():
 
-                activity_id = serializer.validated_data["activity"].pk
+                activity_id = module_serializer.validated_data["activity"].pk
 
                 # Check if the same module for this activity already exists
                 # TODO: Can activities have multiples of the same module?
@@ -113,19 +113,23 @@ def generic_module_viewset(model: Model):
 
                 # Check if the activity belongs to the user
                 activity = get_object_or_404(Activity, pk=activity_id, project__user=self.request.user)
-                serializer.save(activity=activity)
+                module_serializer.save(activity=activity)
 
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response(module_serializer.data, status=status.HTTP_201_CREATED)
+            return Response(module_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         def retrieve(self, request: Request, pk=None):
             module = get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
             return Response(get_module_serializer(model)(module).data)
 
+        @swagger_auto_schema(
+            manual_parameters=[activity_id, include_related],
+        )
         def list(self, request):
             """
-            Lists the module(s) of a given activity,
-            by filtering against a `activity_id` query parameter in the URL.
+            Lists the module(s) of a given activity
+            by filtering against an `activity_id` query parameter in the URL and
+            optionally including related modules by sending the `include_related` query parameter as `true`.
             """
 
             activity_id = get_query_param_or_validation_error(self.request, 'activity_id')
@@ -133,10 +137,12 @@ def generic_module_viewset(model: Model):
             module = get_object_or_404(model, activity__id=activity_id)
             module_serializer = get_module_serializer(model)(module)
 
-            if request.query_params.get('include_related'):
+            if request.query_params.get(INCLUDE_RELATED):
                 relative_module, relation = get_assessment_or_parent(module)
-                relative_serializer = get_module_serializer(relative_module.__class__)(relative_module)
-                return Response({relation: relative_serializer.data, **module_serializer.data})
+
+                if relative_module:
+                    relative_serializer = get_module_serializer(relative_module.__class__)(relative_module)
+                    return Response({relation: relative_serializer.data, **module_serializer.data})
 
             return Response(module_serializer.data)
 
