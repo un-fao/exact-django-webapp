@@ -12,25 +12,11 @@ class Result(object):
 
 def calc_result(input: Model, project: Project):
 
-    match input.__class__.__name__:
-        case Deforestation.__name__:
-            return calc_defo_result(input, project)
-        case Afforestation.__name__:
-            return calc_affo_result(input, project)
-        case OtherLandUse.__name__:
-            return calc_oluc_result(input, project)
-        case AnnualCropping.__name__:
-            return calc_annual_result(input, project)
-        case PerennialCropping.__name__:
-            return calc_perennial_result(input, project)
-        case Rewetting.__name__:
-            return calc_rewetting_result(input, project)
-        case CoastalWaterbody.__name__:
-            return calc_coastal_waterbody_result(input, project)
-        case Extraction.__name__:
-            return calc_extraction_result(input, project)
-        case _:
-            raise Exception(f"Module '{input.__class__.__name__}' not (yet) supported.")
+    try:
+        func = f"calc_{input.__class__.__name__.lower()}_result"
+        return globals()[func](input, project)
+    except:
+        raise Exception(f"Module '{input.__class__.__name__}' not (yet) supported.")
 
 def calc_extraction_result(input:Extraction, project:Project):
 
@@ -143,7 +129,7 @@ def calc_extraction_result(input:Extraction, project:Project):
 
     return [extraction_result, drainage_result]
 
-def calc_coastal_waterbody_result(input:CoastalWaterbody, project: Project):
+def calc_coastalwaterbody_result(input:CoastalWaterbody, project: Project):
 
     methane_emission_factor = OtherConstructedWaterbodiesEmissionFactor.objects.get(
         climate=project.climate, 
@@ -221,7 +207,7 @@ def calc_rewetting_result(input: Rewetting, project: Project):
 
     return [Result(*coastal_wetlands.rewetting_w_wo(*inputs))]
 
-def calc_affo_result(input: Afforestation, project:Project):
+def calc_afforestation_result(input: Afforestation, project:Project):
     """
     Calculate emissions for a single Afforestation module.
     """
@@ -297,7 +283,7 @@ def calc_affo_result(input: Afforestation, project:Project):
     
     return [Result(*affo.afforestation(*inputs))]
 
-def calc_defo_result(input: Deforestation, project: Project):
+def calc_deforestation_result(input: Deforestation, project: Project):
     """
     Calculate emissions for a single Deforestation module.
     """
@@ -370,7 +356,7 @@ def calc_defo_result(input: Deforestation, project: Project):
 
     return [Result(*defo.GHG_emissions(*inputs))]
 
-def calc_oluc_result(input: OtherLandUse, project:Project):
+def calc_otherlanduse_result(input: OtherLandUse, project:Project):
     """
     Calculate emissions for a single OtherLandUse module.
     """
@@ -438,7 +424,7 @@ def calc_oluc_result(input: OtherLandUse, project:Project):
     
     return [Result(*oluc.calculate_w_wo_balance(*inputs))]
 
-def calc_annual_result(input: AnnualCropping, project:Project):
+def calc_annualcropping_result(input: AnnualCropping, project:Project):
     """
     Calculate emissions for a single AnnualCropping module.
     """
@@ -527,7 +513,7 @@ def calc_annual_result(input: AnnualCropping, project:Project):
 
     return [Result(*annuals.calculate_emissions(*inputs))]
 
-def calc_perennial_result(input: PerennialCropping, project: Project):
+def calc_perennialcropping_result(input: PerennialCropping, project: Project):
     """
     Calculate emissions for a single PerennialCropping module.
     """
