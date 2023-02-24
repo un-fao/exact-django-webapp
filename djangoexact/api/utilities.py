@@ -1,5 +1,6 @@
 from django.apps import apps
 from rest_framework import exceptions
+import re
 
 CN_RATIO_FOREST = 10
 CN_RATIO_GRASSLAND = 15
@@ -11,6 +12,7 @@ RESULTS = 'results'
 DETAILS = 'details'
 API = 'api'
 TROPHIC_STATE = .7
+INCLUDE_RELATED = 'include_related'
 
 def snake_case(str):
     res = [str[0].lower()]
@@ -44,7 +46,7 @@ def get_assessment_or_parent(module):
         Returns None if no assessment class is found.
     """
 
-    relative = None
+    relative = (None, None)
 
     # NOTE: To add new assessments, make sure you follow the naming convention of the Assessment class in models.py
     for attr in dir(module):
@@ -53,7 +55,7 @@ def get_assessment_or_parent(module):
             if "_assessment" in attr:
                 relative = (getattr(module, attr), 'child')
                 break
-            if ("parent_" in attr and not attr.startswith("_") and not attr in ["_id"]):
+            elif re.match('parent_[^_]*[^_id]', attr):
                 relative = (getattr(module, attr), 'parent')
                 break
             
