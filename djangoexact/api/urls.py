@@ -30,7 +30,7 @@ router.register(r'afforestations', views.generic_module_viewset(Afforestation), 
 router.register(r'other-land-uses', views.generic_module_viewset(OtherLandUse), basename='otherlanduses')
 router.register(r'annual-croppings', views.generic_module_viewset(AnnualCropping), basename='annualcroppings')
 router.register(r'perennial-croppings', views.generic_module_viewset(PerennialCropping), basename='perennialcroppings')
-router.register(r'floodedrices', views.generic_module_viewset(FloodedRice), basename='floodedrices')
+router.register(r'flooded-rices', views.generic_module_viewset(FloodedRice), basename='floodedrices')
 router.register(r'grasslands', views.generic_module_viewset(Grassland), basename='grasslands')
 router.register(r'livestocks', views.generic_module_viewset(Livestock), basename='livestocks')
 router.register(r'forests', views.generic_module_viewset(Forest), basename='forests')
