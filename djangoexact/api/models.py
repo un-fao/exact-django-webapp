@@ -339,6 +339,9 @@ class Activity(Model):
 class Module(Model):
     activity = ForeignKey(Activity, on_delete=CASCADE)
 
+    def __str__(self):
+        return f"{self._meta.object_name} in {self.activity.name}"
+
     class Meta:
         abstract = True
 
@@ -371,9 +374,6 @@ class Deforestation(Module):
     final_rcs_biomass_t2 = FloatField(null=True, blank=True, help_text="Custom reference carbon stock for biomass in final land use (in tC/ha)")
     final_rcs_soil_c_t2 = FloatField(null=True, blank=True, help_text="Custom reference carbon stock for soil carbon in final land use (in tC/ha)")
 
-    def __str__(self):
-        return f"Deforestation for {self.land_use_type.name}"
-
 class Afforestation(Module):
 
     land_use_type = ForeignKey(LandUseType, on_delete=CASCADE, null= True, blank=True)
@@ -399,9 +399,6 @@ class Afforestation(Module):
 
     yearly_ghg_t2 = FloatField(null=True, blank=True)
 
-    def __str__(self):
-        return f"Afforestation for {self.land_use_type.name}"
-
 class OtherLandUse(Module):
 
     notes = TextField(null=True, blank=True)
@@ -422,9 +419,6 @@ class OtherLandUse(Module):
     final_soil_carbon_t2 = FloatField(null=True, blank=True)
 
     implementation_year_start = IntegerField(null=True, blank=True)
-
-    def __str__(self):
-        return f"OtherLandUseChange for {self.final_land_use_type.name}"
 
 ##### Cropland Management #####
 
@@ -477,9 +471,6 @@ class AnnualCropping(Assessment):
     minor_residue_management_type_t2 = ForeignKey(ResidueManagementType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_minor_residue_management_type")
     minor_biomass_factor_t2 = FloatField(null=True, blank=True)
 
-    def __str__(self):
-        return f"AnnualCroppingInput for activity {self.activity.name}, crop {self.land_use_type.name} in project {self.activity.project.name}"
-
 class PerennialCropping(Assessment):
 
     user_notes = TextField(null=True, blank=True)
@@ -514,9 +505,6 @@ class PerennialCropping(Assessment):
 
     flu_t2 = FloatField(null=True, blank=True)
 
-    def __str__(self):
-        return f"PerennialCropping for activity {self.activity.name}, crop {self.land_use_type.name} in project {self.activity.project.name}"
-
 class FloodedRice(Assessment):
 
     user_notes = TextField(null=True, blank=True)
@@ -526,9 +514,6 @@ class FloodedRice(Assessment):
     water_management_type_after_cultivation = ForeignKey(WaterManagementTypeAfterCultivation, on_delete=CASCADE)
     organic_amendment_type = ForeignKey(OrganicAmendmentType, on_delete=CASCADE)
     crop_yield = FloatField()
-
-    def __str__(self):
-        return f"FloodedRice for activity {self.activity.name} in project {self.activity.project.name}"
 
 ##### Grassland and Livestock #####
 
@@ -559,9 +544,6 @@ class Grassland(Assessment):
     implementation_year_start = IntegerField(null=True, blank=True)
 
     ha_start = IntegerField(null=True, blank=True)
-
-    def __str__(self):
-        return f"GrasslandInput for activity {self.activity.name} in project {self.activity.project.name}"
 
 class Livestock(Module):
     
