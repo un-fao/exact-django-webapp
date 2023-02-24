@@ -27,3 +27,4 @@ def get_module_serializer(model_arg):
             ref_name = model_arg.__name__
 
     return GenericSerializer
+
