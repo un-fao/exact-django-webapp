@@ -362,3 +362,18 @@ class AfforestationFLU(Model):
 
     def __str__(self):
         return f"{self.value} for {self.climate.name} {self.moisture.name} {self.land_use_type.name}"
+    
+class GrasslandAGB(Model):
+    climate = ForeignKey('api.Climate', on_delete=CASCADE)
+    moisture = ForeignKey('api.Moisture', on_delete=CASCADE)
+    value = FloatField(default=0)
+
+    def __str__(self):
+        return f"{self.value} for {self.climate.name} {self.moisture.name}"
+
+class GrasslandSOC(Model):
+    grassland_management_type = ForeignKey('api.GrasslandManagementType', on_delete=CASCADE)
+    value = FloatField(default=0)
+
+    def __str__(self):
+        return f"{self.value} for {self.grassland_management_type.name}"
