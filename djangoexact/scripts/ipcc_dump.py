@@ -916,3 +916,38 @@ def run():
                     value=value
                 )
 """
+    with(open('scripts\ipcc_data\GrasslandAGB.csv', 'r')) as f:
+        reader = csv.reader(f)
+        data = list(reader)
+
+        for row in data:
+
+            climate = Climate.objects.get(name=sanitize(row[0]).title())
+            moisture = Moisture.objects.get(name=sanitize(row[1]).title())
+
+            value = row[2]
+
+            print(f"{climate}, {moisture}, {value}")
+
+            GrasslandAGB.objects.get_or_create(
+                climate=climate,
+                moisture=moisture,
+                value=value
+            )
+
+    with(open('scripts\ipcc_data\GrasslandSOC.csv', 'r')) as f:
+
+        reader = csv.reader(f)
+        data = list(reader)
+
+        for row in data:
+
+            grassland_management_type = GrasslandManagementType.objects.get_or_create(name=sanitize(row[0]).title())[0]
+            value = row[1]
+
+            print(f"{grassland_management_type}, {value}")
+
+            GrasslandSOC.objects.get_or_create(
+                grassland_management_type=grassland_management_type,
+                value=value
+            )
