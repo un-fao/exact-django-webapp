@@ -121,7 +121,7 @@ def total_inland_coastal_aquaculture(production_start, production_w, nitrous_ef_
         nitrous_emissions_end = production_end * nitrous_ef_production
         nitrous_emissions_start = production_start * nitrous_ef_production
 
-        total_nitrous = (min(nitrous_emissions_start, nitrous_emissions_end) * (time_cap + time_impl) + abs(nitrous_emissions_start - nitrous_emissions_end) * time_dependency(nitrous_emissions_start, nitrous_emissions_end, rate_coefficient, time_impl, time_cap))
+        total_nitrous = (min(nitrous_emissions_start, nitrous_emissions_end) * (time_cap + time_impl) + abs(nitrous_emissions_end - nitrous_emissions_start) * time_dependency(nitrous_emissions_start, nitrous_emissions_end, rate_coefficient, time_impl, time_cap))
         
         return total_nitrous
 
