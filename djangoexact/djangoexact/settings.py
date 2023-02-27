@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'drf_yasg',
     'django_extensions',
+    'auditlog',
 
     'rest_framework',
     'ipcc',
@@ -58,6 +59,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'auditlog.middleware.AuditlogMiddleware',
+
 ]
 
 ROOT_URLCONF = 'djangoexact.urls'
@@ -144,3 +148,10 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ] 
 }
+
+# Auditlog Settings
+AUDITLOG_INCLUDE_ALL_MODELS=True
+AUDITLOG_EXCLUDE_TRACKING_FIELDS = (
+    "created",
+    "modified"
+)
