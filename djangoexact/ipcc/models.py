@@ -377,3 +377,51 @@ class GrasslandSOC(Model):
 
     def __str__(self):
         return f"{self.value} for {self.grassland_management_type.name}"
+    
+class ElectricityEmission(Model):
+    country = ForeignKey("api.Country", on_delete=CASCADE)
+    continent = ForeignKey("api.Continent", on_delete=CASCADE)
+    year = IntegerField(null=True, blank=True)
+
+    ef_grid = FloatField(null=True, blank=True)
+    final_ef_grid = FloatField(null=True, blank=True)
+    operating_margin = FloatField(null=True, blank=True)
+
+    # TODO: In the Excel file this is calculated in Elec G5, but here I'm putting it as static. Ask about this.
+    combined_margin = FloatField(null=True, blank=True)
+
+    # TODO: What is this exactly?
+    for_formulas = FloatField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Electricity Emissions for {self.country}"
+
+class EnergyDefaultEmissionFactor(Model):
+    fuel_type = ForeignKey('api.FuelType', on_delete=CASCADE)
+    t_co2_eq_m3 = FloatField(blank=True, null=True)
+    tj_gg = FloatField(blank=True, null=True)
+    kg_ch4_tj = FloatField(blank=True, null=True)
+    kg_n2o_tj = FloatField(blank=True, null=True)
+    density_kg_m3 = FloatField(blank=True, null=True)
+    co2_emissions = FloatField(blank=True, null=True)
+    ch4_emissions = FloatField(blank=True, null=True)
+    n2o_emissions = FloatField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.fuel_type.name} {self.t_co2_eq_m3} {self.tj_gg} {self.kg_ch4_tj} {self.kg_n2o_tj} {self.density_kg_m3} {self.co2_emissions} {self.ch4_emissions} {self.n2o_emissions}"
+
+class LargeFisheryFUI(Model):
+    fish_type = ForeignKey("api.FishType", on_delete=CASCADE)
+    gear_type = ForeignKey("api.GearType", on_delete=CASCADE)
+    value = FloatField()
+
+    def __str__(self):
+        return f"{self.fish_type} - {self.gear_type} FUI: {self.value}"
+
+class SmallFisheryFUI(Model):
+    fishery_type = ForeignKey("api.FisheryType", on_delete=CASCADE)
+    gear_type = ForeignKey("api.GearType", on_delete=CASCADE)
+    value = FloatField()
+
+    def __str__(self):
+        return f"{self.fishery_type} - {self.gear_type} FUI: {self.value}"
