@@ -244,39 +244,11 @@ class FishType(Model):
     def __str__(self):
         return self.name
 
-class LargeFisheryFUI(Model):
-    fish_type = ForeignKey(FishType, on_delete=CASCADE)
-    gear_type = ForeignKey(GearType, on_delete=CASCADE)
-    value = FloatField()
+class FuelType(Model):
+    name = CharField(max_length=100)
 
     def __str__(self):
-        return f"{self.fish_type} - {self.gear_type} FUI: {self.value}"
-
-class SmallFisheryFUI(Model):
-    fishery_type = ForeignKey(FisheryType, on_delete=CASCADE)
-    gear_type = ForeignKey(GearType, on_delete=CASCADE)
-    value = FloatField()
-
-    def __str__(self):
-        return f"{self.fishery_type} - {self.gear_type} FUI: {self.value}"
-
-class ElectricityEmission(Model):
-    country = ForeignKey(Country, on_delete=CASCADE)
-    continent = ForeignKey(Continent, on_delete=CASCADE)
-    year = IntegerField(null=True, blank=True)
-
-    ef_grid = FloatField(null=True, blank=True)
-    final_ef_grid = FloatField(null=True, blank=True)
-    operating_margin = FloatField(null=True, blank=True)
-
-    # TODO: In the Excel file this is calculated in Elec G5, but here I'm putting it as static. Ask about this.
-    combined_margin = FloatField(null=True, blank=True)
-
-    # TODO: What is this exactly?
-    for_formulas = FloatField(null=True, blank=True)
-
-    def __str__(self):
-        return f"Electricity Emissions for {self.country}"
+        return self.name
 
 class SalinityType(Model):
     value = CharField(max_length=3)
@@ -1006,10 +978,10 @@ class Fishery(Module):
     implementation_year_t2 = IntegerField(null=True, blank=True)
 
 class SmallFishery(Fishery):
-    fui_default = ForeignKey(SmallFisheryFUI, on_delete=CASCADE, null=True, blank=True)
+    fui_default = ForeignKey("ipcc.SmallFisheryFUI", on_delete=CASCADE, null=True, blank=True)
 
 class LargeFishery(Fishery):
-    fui_default = ForeignKey(LargeFisheryFUI, on_delete=CASCADE, null=True, blank=True)
+    fui_default = ForeignKey("ipcc.LargeFisheryFUI", on_delete=CASCADE, null=True, blank=True)
 
 class Aquaculture(Module):
     user_notes = TextField(null=True, blank=True)
