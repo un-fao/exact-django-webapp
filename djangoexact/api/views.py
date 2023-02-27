@@ -110,6 +110,9 @@ def generic_module_viewset(model: Model):
                 # TODO: Can activities have multiples of the same module?
                 if model.objects.filter(activity__id=activity_id).exists():
                     return Response(error(f"Module '{model.__name__}' already exists for this activity."), status=status.HTTP_400_BAD_REQUEST)
+                
+                if get_assessment_or_parent(model):
+                    return Response(error(f"Module '{model.__name__}' already has an attached assessment."), status=status.HTTP_400_BAD_REQUEST)
 
                 # Check if the activity belongs to the user
                 activity = get_object_or_404(Activity, pk=activity_id, project__user=self.request.user)
