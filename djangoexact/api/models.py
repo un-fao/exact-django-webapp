@@ -534,6 +534,12 @@ class Grassland(Assessment):
     yield_w = FloatField(null=True, blank=True)
     yield_wo = FloatField(null=True, blank=True)
 
+    ha_start = FloatField(null=True, blank=True)
+    ha_w = FloatField(null=True, blank=True)
+    ha_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_w_rate")
+    ha_wo = FloatField(null=True, blank=True)
+    ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_wo_rate+")
+
     # Tier 2 values
     soil_carbon_start_t2 = FloatField(null=True, blank=True)
     soil_carbon_w_t2 = FloatField(null=True, blank=True)
