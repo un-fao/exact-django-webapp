@@ -2,6 +2,7 @@ from django.db.models import *
 from django.contrib.auth import models as auth_models
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
+from .utilities import *
 
 alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', 'Only alphanumeric characters are allowed.')
 letters_only = RegexValidator(r'^[a-zA-Z]*$', 'Only letters are allowed.')
@@ -341,7 +342,7 @@ class Module(Model):
     notes = TextField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self._meta.object_name} in {self.activity.name}"
+        return f"({self.pk}) {self._meta.object_name} in {self.activity.name}"
 
     class Meta:
         abstract = True
@@ -434,6 +435,10 @@ class Assessment(Module):
         fields = [self.parent_afforestation, self.parent_deforestation, self.parent_other_land_use]
         if len([f for f in fields if f]) > 1:
             raise ValidationError("Exactly one of deforestation, afforestation, or other land use can be set.")
+        relative, relationship = get_assessment_or_parent(self)
+        if relative:
+            raise ValidationError(f"{relative} is already a {relationship}")
+
 
     class Meta:
         abstract = True
