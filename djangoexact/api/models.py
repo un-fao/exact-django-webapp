@@ -330,7 +330,7 @@ class Activity(Model):
     updated_at = DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
-        return self.name
+        return f"({self.pk}) {self.name} in {self.project.name}"
 
 ##############################
 ########## Modules ###########
@@ -523,9 +523,9 @@ class Grassland(Assessment):
     description = TextField(null=True, blank=True)
     user_notes = TextField(null=True, blank=True)
 
-    grassland_at_start = ForeignKey(GrasslandManagementType, on_delete=CASCADE, related_name="%(class)s_start")
-    grassland_without = ForeignKey(GrasslandManagementType, on_delete=CASCADE, related_name="%(class)s_without")
-    grassland_with = ForeignKey(GrasslandManagementType, on_delete=CASCADE, related_name="%(class)s_with")
+    grassland_management_type_start = ForeignKey(GrasslandManagementType, on_delete=CASCADE, related_name="%(class)s_start")
+    grassland_management_type_w = ForeignKey(GrasslandManagementType, on_delete=CASCADE, related_name="%(class)s_without")
+    grassland_management_type_wo = ForeignKey(GrasslandManagementType, on_delete=CASCADE, related_name="%(class)s_with")
 
     is_fire_used_w = BooleanField()
     is_fire_used_wo = BooleanField()
