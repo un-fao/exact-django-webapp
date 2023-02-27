@@ -527,6 +527,9 @@ class Grassland(Assessment):
     grassland_without = ForeignKey(GrasslandManagementType, on_delete=CASCADE, related_name="%(class)s_without")
     grassland_with = ForeignKey(GrasslandManagementType, on_delete=CASCADE, related_name="%(class)s_with")
 
+    is_fire_used_w = BooleanField()
+    is_fire_used_wo = BooleanField()
+
     years_w_fire_management = IntegerField(null=True, blank=True)
     years_wo_fire_management = IntegerField(null=True, blank=True)
 
@@ -538,7 +541,7 @@ class Grassland(Assessment):
     ha_w = FloatField(null=True, blank=True)
     ha_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_w_rate")
     ha_wo = FloatField(null=True, blank=True)
-    ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_wo_rate+")
+    ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_wo_rate")
 
     # Tier 2 values
     soil_carbon_start_t2 = FloatField(null=True, blank=True)
