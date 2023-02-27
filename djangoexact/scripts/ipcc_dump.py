@@ -915,7 +915,7 @@ def run():
                     moisture=moisture,
                     value=value
                 )
-"""
+
     with(open('scripts\ipcc_data\GrasslandAGB.csv', 'r')) as f:
         reader = csv.reader(f)
         data = list(reader)
@@ -951,3 +951,81 @@ def run():
                 grassland_management_type=grassland_management_type,
                 value=value
             )
+
+    with(open('scripts\ipcc_data\EnergyDefaultEmissionFactors.csv', 'r')) as f:
+
+        reader = csv.reader(f)
+        data = list(reader)
+
+        for row in data:
+
+            fuel_type = FuelType.objects.get_or_create(name=sanitize(row[0]).title())[0]
+
+            foo = EnergyDefaultEmissionFactor()
+            foo.fuel_type = fuel_type
+            foo.t_co2_eq_m3 = row[1] if row[1] != '' else None
+            foo.tj_gg = row[2] if row[2] != '' else None
+            foo.kg_ch4_tj = row[3] if row[3] != '' else None
+            foo.kg_n2o_tj = row[4] if row[4] != '' else None
+            foo.density_kg_m3 = row[5] if row[5] != '' else None
+            foo.co2_emissions = row[6] if row[6] != '' else None
+            foo.ch4_emissions = row[7] if row[7] != '' else None
+            foo.n2o_emissions = row[8] if row[8] != '' else None
+            foo.save()
+
+            print(f"{fuel_type}, {row[1]}, {row[2]}, {row[3]}, {row[4]}, {row[5]}, {row[6]}, {row[7]}, {row[8]}")
+    with(open('scripts\ipcc_data\SmallFisheryDatabaseFish.csv', 'r')) as f:
+
+        reader = csv.reader(f)
+        header = next(reader, None)
+        data = list(reader)
+
+        for i, head in enumerate(header):
+            head = sanitize(head).title()
+            gear_type = GearType.objects.get_or_create(name=head)[0]
+            for row in data:
+                if row[i+1] == '':
+                    continue
+
+                fishery_type = FisheryType.objects.get_or_create(name=sanitize(row[0]).title())[0]
+                value = float(row[i+1])
+
+                print(f"{fishery_type}, {gear_type}, {value}")
+
+                SmallFisheryFUI.objects.get_or_create(
+                    fishery_type=fishery_type,
+                    gear_type=gear_type,
+                    value=value
+                )
+"""
+
+    with(open('scripts\ipcc_data\ElectricityEmissions.csv', 'r')) as f:
+
+        reader = csv.reader(f)
+        data = list(reader)
+
+        for row in data:
+            country = Country.objects.get_or_create(name=sanitize(row[0]).title())[0]
+            continent = Continent.objects.get_or_create(name=sanitize(row[1]).title())[0]
+
+            i = 2
+
+            ef_grid = row[i+0] if row[i+0] != '' else None
+            year = row[i+1] if row[i+1] != '' else None
+            final_ef = row[i+2] if row[i+2] != '' else None
+            op_margin = row[i+3] if row[i+3] != '' else None
+            combined_margin = row[i+4] if row[i+4] != '' else None
+
+            print(f"{country}, {continent}, {ef_grid}, {year}, {final_ef}, {op_margin}, {combined_margin}")
+
+            ElectricityEmission.objects.get_or_create(
+                country = country,
+                continent = continent,
+                ef_grid = ef_grid,
+                year = year,
+                final_ef_grid = final_ef,
+                operating_margin = op_margin,
+                combined_margin = combined_margin
+            )
+
+                
