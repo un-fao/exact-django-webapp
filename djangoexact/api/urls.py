@@ -44,6 +44,7 @@ router.register(r'inland-waterbodies', views.generic_module_viewset(InlandWaterb
 router.register(r'extractions', views.generic_module_viewset(Extraction), basename='inland-waterbodies')
 router.register(r'rewettings', views.generic_module_viewset(Rewetting), basename='inland-waterbodies')
 router.register(r'coastal-waterbodies', views.generic_module_viewset(CoastalWaterbody), basename='inland-waterbodies')
+router.register(r'small-fisheries', views.generic_module_viewset(SmallFishery), basename='small-fisheries')
 
 urlpatterns = [
    path('docs/', include_docs_urls(title='EX-ACT Docs')),
