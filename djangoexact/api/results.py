@@ -1,5 +1,5 @@
 from .models import Deforestation, Afforestation, OtherLandUse, AnnualCropping, Project
-from math_model import defo, affo, oluc, annuals, perennial_cropping, coastal_wetlands
+from math_model import defo, affo, oluc, annuals, perennial_cropping, coastal_wetlands, grassland_management
 from .serializers import *
 from ipcc.models import *
 from .utilities import *
@@ -14,9 +14,12 @@ def calc_result(input: Model, project: Project):
 
     try:
         func = f"calc_{input.__class__.__name__.lower()}_result"
+        print(func)
         return globals()[func](input, project)
-    except:
+    except KeyError:
         raise Exception(f"Module '{input.__class__.__name__}' not (yet) supported.")
+    except Exception as e:
+        raise e
 
 def calc_extraction_result(input:Extraction, project:Project):
 
@@ -574,3 +577,48 @@ def calc_perennialcropping_result(input: PerennialCropping, project: Project):
     ]
 
     return [Result(*perennial_cropping.calculate_emissions(*inputs))]
+
+def calc_grassland_result(input: Grassland, project: Project):
+    """
+    Calculate emissions for a single Grassland module.
+    """
+
+    ef = BurningEmissionFactor.objects.get(category__name="Savanna and grassland")
+    agb = GrasslandAGB.objects.get(climate=project.climate, moisture=project.moisture)
+    cf = .77
+    soc_start = GrasslandSOC.objects.get(grassland_management_type=input.grassland_management_type_start)
+    soc_w = GrasslandSOC.objects.get(grassland_management_type=input.grassland_management_type_w)
+    soc_wo = GrasslandSOC.objects.get(grassland_management_type=input.grassland_management_type_wo)
+
+
+    inputs = [
+        input.ha_start,
+        input.ha_w,
+        input.ha_wo,
+        project.implementation_duration_yrs,
+        project.capitalization_duration_yrs,
+        input.ha_w_rate.name,
+        input.ha_w_rate.value,
+        input.ha_wo_rate.name,
+        input.ha_wo_rate.value,
+        project.gw_potential.n2o,
+        project.gw_potential.ch4,
+        input.years_w_fire_management,
+        input.years_wo_fire_management,
+        input.is_fire_used_w,
+        input.is_fire_used_wo,
+        ef.ch4,
+        ef.n2o,
+        agb.value,
+        input.agb_t2,
+        cf,
+        input.combustion_factor_t2,
+        soc_start.value,
+        input.soil_carbon_start_t2,
+        soc_w.value,
+        soc_wo.value,
+        input.soil_carbon_w_t2,
+        input.soil_carbon_wo_t2
+    ]
+
+    return [Result(*grassland_management.calculate_total_emissions(*inputs))]
