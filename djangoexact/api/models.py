@@ -313,6 +313,9 @@ class Module(Model):
     activity = ForeignKey(Activity, on_delete=CASCADE)
     notes = TextField(null=True, blank=True)
 
+    created_at = DateTimeField(auto_now_add=True, null=True)
+    updated_at = DateTimeField(auto_now=True, null=True)
+
     def __str__(self):
         return f"({self.pk}) {self._meta.object_name} in {self.activity.name}"
 
