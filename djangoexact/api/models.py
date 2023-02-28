@@ -7,6 +7,7 @@ from .utilities import *
 alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', 'Only alphanumeric characters are allowed.')
 letters_only = RegexValidator(r'^[a-zA-Z]*$', 'Only letters are allowed.')
 capitalized = RegexValidator(r'[A-Z][a-z]*(\s[A-Z][a-z]*)*', 'Only capitalized words are allowed.')
+pc_as_float = RegexValidator(r'^[0-1]*\.?[0-9]*$', 'Only correctly formatted percentages are allowed.')
 
 RICE_CULTIVATION_DAYS = 113
 
@@ -944,12 +945,11 @@ class Fishery(Module):
     class Meta:
         abstract = True
 
-    fishery_type = ForeignKey(FisheryType, on_delete=CASCADE)
     gear_type = ForeignKey(GearType, on_delete=CASCADE)
 
-    refrigerant_pc_start = FloatField(null=True, blank=True)
-    refrigerant_pc_w = FloatField(null=True, blank=True)
-    refrigerant_pc_wo = FloatField(null=True, blank=True)
+    refrigerant_pc_start = FloatField(null=True, blank=True, validators=[pc_as_float])
+    refrigerant_pc_w = FloatField(null=True, blank=True, validators=[pc_as_float])
+    refrigerant_pc_wo = FloatField(null=True, blank=True, validators=[pc_as_float])
 
     refrigerant_gwp = FloatField(null=True, blank=True, default=1810)
 
@@ -963,9 +963,9 @@ class Fishery(Module):
     total_catch_yr_wo = FloatField(null=True, blank=True)
     total_catch_yr_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_total_catch_yr_wo_rate")
 
-    ice_preserved_catch_pc_start = FloatField(null=True, blank=True)
-    ice_preserved_catch_pc_w = FloatField(null=True, blank=True)
-    ice_preserved_catch_pc_wo = FloatField(null=True, blank=True)
+    ice_preserved_catch_pc_start = FloatField(null=True, blank=True, validators=[pc_as_float])
+    ice_preserved_catch_pc_w = FloatField(null=True, blank=True, validators=[pc_as_float])
+    ice_preserved_catch_pc_wo = FloatField(null=True, blank=True, validators=[pc_as_float])
 
     # TODO: Is the non-t2 value static for this specific module? It's always related to Gasoil/Diesel
     energy_emission_factor_t2 = FloatField(null=True, blank=True)
@@ -981,9 +981,11 @@ class Fishery(Module):
     implementation_year_t2 = IntegerField(null=True, blank=True)
 
 class SmallFishery(Fishery):
+    fishery_type = ForeignKey(FisheryType, on_delete=CASCADE)
     fui_default = ForeignKey("ipcc.SmallFisheryFUI", on_delete=CASCADE, null=True, blank=True)
 
 class LargeFishery(Fishery):
+    fish_type = ForeignKey(FishType, on_delete=CASCADE)
     fui_default = ForeignKey("ipcc.LargeFisheryFUI", on_delete=CASCADE, null=True, blank=True)
 
 class Aquaculture(Module):
