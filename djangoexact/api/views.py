@@ -58,7 +58,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             if module_object:
                 module_dict = get_module_serializer(module_model)(module_object).data
                 try:
-                    module_dict[RESULTS] = ResultSerializer(calc_result(module_object, activity.project)).data
+                    module_dict[RESULTS] = ResultSerializer(calc_result(module_object, activity.project), many=True).data
                 except Exception as e:
                     module_dict[RESULTS] = error(str(e))
                 modules.append(module_dict)
