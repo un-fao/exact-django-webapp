@@ -629,6 +629,8 @@ def calc_smallfishery_result(input: SmallFishery, project: Project):
     """
 
     ef_diesel_default_list = EnergyDefaultEmissionFactor.objects.filter(fuel_type__name__contains="Off-Road")
+
+    # Average of all default emission factors for gasoil/diesel
     ef_diesel_default = sum([ef.t_co2_eq_m3 for ef in ef_diesel_default_list]) / len(ef_diesel_default_list)
 
     fui_default = SmallFisheryFUI.objects.get(
@@ -679,7 +681,71 @@ def calc_smallfishery_result(input: SmallFishery, project: Project):
         input.ice_preserved_catch_pc_start,
         input.ice_preserved_catch_pc_w,
         input.ice_preserved_catch_pc_wo
-
     ]
 
     return [Result(*fisheries_and_aquaculture.total_emissions_small_or_large_fisheries(*inputs))]
+
+def calc_largefishery_result(input: LargeFishery, project: Project):
+    """
+    Calculate emissions for a single LargeFishery module.
+    """
+
+    ef_diesel_default_list = EnergyDefaultEmissionFactor.objects.filter(fuel_type__name__contains="Off-Road")
+
+    # Average of all default emission factors for gasoil/diesel
+    ef_diesel_default = sum([ef.t_co2_eq_m3 for ef in ef_diesel_default_list]) / len(ef_diesel_default_list)
+
+    fui_default = LargeFisheryFUI.objects.get(
+        fish_type=input.fish_type,
+        gear_type=input.gear_type,
+    )
+
+    # TODO: Maybe use a table (.083 for SmallFishery)
+    lost_refrigerant_default = .48734 
+    
+    # TODO: Maybe use a table (2.8 for SmallFishery)
+    tonnes_ice_default = 2.8
+
+    # TODO: Maybe use a table (60 for SmallFishery)
+    kw_tonnes = 60
+
+    electricity_country = input.inshore_ice_production_country if input.inshore_ice_production_country else project.country
+
+    electricity_emission = ElectricityEmission.objects.get(
+        country = electricity_country,
+        continent = project.continent
+    )
+
+    inputs = [
+        project.implementation_duration_yrs,
+        project.capitalization_duration_yrs,
+        input.total_catch_yr_w_rate.value,
+        input.total_catch_yr_wo_rate.value,
+        input.total_catch_yr_start,
+        input.total_catch_yr_w,
+        input.total_catch_yr_wo,
+        ef_diesel_default,
+        input.energy_emission_factor_t2,
+        fui_default.value,
+        input.fui_start,
+        input.fui_w,
+        input.fui_wo,
+        input.refrigerant_gwp,
+        input.refrigerant_gwp_t2,
+        lost_refrigerant_default,
+        input.refrigerant_lost_per_tonne_t2,
+        input.refrigerant_pc_start,
+        input.refrigerant_pc_w,
+        input.refrigerant_pc_wo,
+        tonnes_ice_default,
+        input.inshore_ice_production_emissions_t2,
+        kw_tonnes,
+        input.inshore_ice_production_kwh_per_tonne_t2,
+        electricity_emission.operating_margin,
+        input.ice_preserved_catch_pc_start,
+        input.ice_preserved_catch_pc_w,
+        input.ice_preserved_catch_pc_wo
+    ]
+
+    return [Result(*fisheries_and_aquaculture.total_emissions_small_or_large_fisheries(*inputs))]
+
