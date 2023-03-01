@@ -88,16 +88,30 @@ WSGI_APPLICATION = 'djangoexact.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env("DB_NAME"),
-        'USER': env("DB_USER"),
-        'PASSWORD': env("DB_PASSWORD"),
-        'HOST': env("DB_HOST"),
-        'PORT': env("DB_PORT"),
+if os.getenv('GAE_APPLICATION', None):
+    # Running on production App Engine, so connect to Google Cloud SQL using
+    # the unix socket at /cloudsql/<your-cloudsql-connection string>
+    DATABASES = {
+        'default': {
+            'ENGINE': '$DB_ENGINE',
+            'HOST': '/cloudsql/$DB_INSTANCE_CONNECTION',
+            'USER': '$DB_USERNAME',
+            'PASSWORD': '$DB_PASSWORD',
+            'NAME': '$DB_NAME',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            #'ENGINE': 'django.db.backends.postgresql',
+            'ENGINE': env("DB_ENGINE"),
+            'HOST': env("DB_HOST"),
+            'USER': env("DB_USER"),
+            'PASSWORD': env("DB_PASSWORD"),
+            'NAME': env("DB_NAME"),
+            'PORT': env("DB_PORT"),
+        }
+    }
 
 
 # Password validation

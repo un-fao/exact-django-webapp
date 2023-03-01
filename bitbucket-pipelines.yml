@@ -1,0 +1,64 @@
+image: python:3.9
+definitions:
+  steps:
+    - step: &test
+        name: test App
+        script:
+          - echo 'deploying djangoexact'
+    - step: &deploy
+        name: Deploy App
+        script:
+          - export CLOUDSDK_CORE_DISABLE_PROMPTS=1
+          - SDK_VERSION=365.0.0
+          - SDK_FILENAME=google-cloud-sdk-${SDK_VERSION}-linux-x86_64.tar.gz
+          - curl -O -J https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/${SDK_FILENAME}
+          - tar -zxvf ${SDK_FILENAME} --directory ${HOME}
+          - export PATH=${PATH}:${HOME}/google-cloud-sdk/bin
+          - echo ${PROJECT_KEYFILE:0:120}
+          
+          - echo $PROJECT_KEYFILE > /tmp/key-file.json
+          - gcloud auth activate-service-account --key-file /tmp/key-file.json
+
+          - apt-get install wget
+          - wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
+          - chmod +x cloud_sql_proxy
+          - ./cloud_sql_proxy -instances=$DB_INSTANCE_CONNECTION=tcp:$DB_PORT > cloudsql.log 2>&1 &
+
+          - cd djangoexact
+
+          - sed -i "s|\$SERVICE_NAME|$SERVICE_NAME|g" app.yaml
+          - sed -i "s|\$PROJECT_ID|$PROJECT_ID|g" app.yaml
+
+          - sed -i "s|\$DB_ENGINE|$DB_ENGINE|g" outbreak/settings.py
+          - sed -i "s|\$DB_INSTANCE_CONNECTION|$DB_INSTANCE_CONNECTION|g" outbreak/settings.py
+          - sed -i "s|\$DB_USERNAME|$DB_USERNAME|g" outbreak/settings.py
+          - sed -i "s|\$DB_PASSWORD|$DB_PASSWORD|g" outbreak/settings.py
+          - sed -i "s|\$DB_NAME|$DB_NAME|g" outbreak/settings.py
+          - sed -i "s|\$DB_PORT|$DB_PORT|g" outbreak/settings.py
+
+          - pip install -r requirements.txt
+          #- python manage.py makemigrations
+          - python manage.py migrate
+          - python manage.py collectstatic
+
+          - gcloud config set project $PROJECT_ID
+          - gcloud app deploy app.yaml --project $PROJECT_ID --verbosity=debug
+pipelines:
+  branches:
+    edge:
+      - step: *test
+      - step:
+          <<: *deploy
+          deployment: development
+    review:
+      - step: *test
+      - step:
+          <<: *deploy
+          deployment: review
+          trigger: manual
+    master:
+      - step: *test
+      - step:
+          <<: *deploy
+          deployment: production
+          trigger: manual
