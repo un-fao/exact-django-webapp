@@ -377,7 +377,17 @@ class GrasslandSOC(Model):
 
     def __str__(self):
         return f"{self.value} for {self.grassland_management_type.name}"
-    
+
+class GrasslandStockExchangeFactor(Model):
+    grassland_management_type = ForeignKey('api.GrasslandManagementType', on_delete=CASCADE)
+    climate = ForeignKey('api.Climate', on_delete=CASCADE)
+    fmg = FloatField(default=1)
+    flu = FloatField(default=1)
+    fi = FloatField(default=1)
+
+    def __str__(self):
+        return f"{self.fmg} {self.flu} {self.fi} for {self.grassland_management_type.name} {self.climate.name}"
+
 class ElectricityEmission(Model):
     country = ForeignKey("api.Country", on_delete=CASCADE)
     continent = ForeignKey("api.Continent", on_delete=CASCADE)
