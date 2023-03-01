@@ -24,7 +24,6 @@ def calc_result(input: Model, project: Project):
 def calc_extraction_result(input:Extraction, project:Project):
 
     # Extraction
-
     climate = project.climate
     moisture = project.moisture
     vegetation_type = input.vegetation_type
@@ -80,7 +79,6 @@ def calc_extraction_result(input:Extraction, project:Project):
     extraction_result = Result(*coastal_wetlands.extraction_and_excavation_w_wo(*extraction_inputs))
 
     # Drainage
-
     if vegetation_type.name == MANGROVES:
         atwood = Atwood.objects.get(country=project.country)
         soil_1m = atwood.mg_c_ha
@@ -320,7 +318,8 @@ def calc_deforestation_result(input: Deforestation, project: Project):
         mangroves_data = DataOnMangroves.objects.get(continent=continent)
 
     combustion_factor = CombustionFactorValues.objects.get(vegetation_type=vegetation_type)
-    moisture_factor = DefaultEmissionFactors.objects.get(moisture=moisture, input__name__icontains="Other N Inputs")
+    moisture_factor = DefaultEmissionFactors.objects.filter(moisture=moisture)
+    moisture_factor = moisture_factor.filter(Q(input__name__icontains="Other N Inputs") | Q(input__name__icontains="All N Inputs")).first()
     flu = LandUseCarbonStockExchangeFactor.objects.get(climate=climate, moisture=moisture, land_use_type=land_use_type)
     
     inputs = [
@@ -578,6 +577,8 @@ def calc_perennialcropping_result(input: PerennialCropping, project: Project):
 
     return [Result(*perennial_cropping.calculate_emissions(*inputs))]
 
+
+
 def calc_grassland_result(input: Grassland, project: Project):
     """
     Calculate emissions for a single Grassland module.
@@ -586,21 +587,41 @@ def calc_grassland_result(input: Grassland, project: Project):
     ef = BurningEmissionFactor.objects.get(category__name="Savanna and grassland")
     agb = GrasslandAGB.objects.get(climate=project.climate, moisture=project.moisture)
     cf = .77
-    soc_start = GrasslandSOC.objects.get(grassland_management_type=input.grassland_management_type_start)
-    soc_w = GrasslandSOC.objects.get(grassland_management_type=input.grassland_management_type_w)
-    soc_wo = GrasslandSOC.objects.get(grassland_management_type=input.grassland_management_type_wo)
+    proj_soc = project.soc_ref.value
 
+    relative, relation = get_assessment_or_parent(input)
+    is_parent = relation == 'parent'
+
+    # NOTE: Default values at start are for 'Non-Degraded' land
+    soc_start = GrasslandStockExchangeFactor.objects.filter(
+        grassland_management_type=input.grassland_management_type_start, 
+        climate=project.climate
+    ).first()
+
+    soc_w = GrasslandStockExchangeFactor.objects.filter(
+        grassland_management_type=input.grassland_management_type_w, 
+        climate=project.climate
+    ).first()
+
+    soc_wo = GrasslandStockExchangeFactor.objects.filter(
+        grassland_management_type=input.grassland_management_type_wo, 
+        climate=project.climate
+    ).first()
+
+    soc_start = proj_soc*soc_start.fmg*soc_start.flu*soc_start.fi if soc_start else project.soc_ref.value
+    soc_w = proj_soc*soc_w.fmg*soc_w.flu*soc_w.fi if soc_w else project.soc_ref.value
+    soc_wo = proj_soc*soc_wo.fmg*soc_wo.flu*soc_wo.fi if soc_wo else project.soc_ref.value
 
     inputs = [
-        input.ha_start,
-        input.ha_w,
-        input.ha_wo,
+        relative.ha_start if is_parent else input.ha_start,
+        relative.ha_wo if is_parent else input.ha_w,
+        relative.ha_w if is_parent else input.ha_wo,
         project.implementation_duration_yrs,
         project.capitalization_duration_yrs,
-        input.ha_w_rate.name,
-        input.ha_w_rate.value,
-        input.ha_wo_rate.name,
-        input.ha_wo_rate.value,
+        relative.ha_wo_rate.name if is_parent else input.ha_w_rate.name,
+        relative.ha_wo_rate.value if is_parent else input.ha_w_rate.value,
+        relative.ha_w_rate.name if is_parent else input.ha_wo_rate.name,
+        relative.ha_w_rate.value if is_parent else input.ha_wo_rate.value,
         project.gw_potential.n2o,
         project.gw_potential.ch4,
         input.years_w_fire_management,
@@ -613,10 +634,10 @@ def calc_grassland_result(input: Grassland, project: Project):
         input.agb_t2,
         cf,
         input.combustion_factor_t2,
-        soc_start.value,
+        soc_start,
         input.soil_carbon_start_t2,
-        soc_w.value,
-        soc_wo.value,
+        soc_w,
+        soc_wo,
         input.soil_carbon_w_t2,
         input.soil_carbon_wo_t2
     ]
