@@ -29,12 +29,12 @@ definitions:
           - sed -i "s|\$SERVICE_NAME|$SERVICE_NAME|g" app.yaml
           - sed -i "s|\$PROJECT_ID|$PROJECT_ID|g" app.yaml
 
-          - sed -i "s|\$DB_ENGINE|$DB_ENGINE|g" settings.py
-          - sed -i "s|\$DB_INSTANCE_CONNECTION|$DB_INSTANCE_CONNECTION|g" settings.py
-          - sed -i "s|\$DB_USERNAME|$DB_USERNAME|g" settings.py
-          - sed -i "s|\$DB_PASSWORD|$DB_PASSWORD|g" settings.py
-          - sed -i "s|\$DB_NAME|$DB_NAME|g" settings.py
-          - sed -i "s|\$DB_PORT|$DB_PORT|g" settings.py
+          - sed -i "s|\$DB_ENGINE|$DB_ENGINE|g" djangoexact/settings.py
+          - sed -i "s|\$DB_INSTANCE_CONNECTION|$DB_INSTANCE_CONNECTION|g" djangoexact/settings.py
+          - sed -i "s|\$DB_USERNAME|$DB_USERNAME|g" djangoexact/settings.py
+          - sed -i "s|\$DB_PASSWORD|$DB_PASSWORD|g" djangoexact/settings.py
+          - sed -i "s|\$DB_NAME|$DB_NAME|g" djangoexact/settings.py
+          - sed -i "s|\$DB_PORT|$DB_PORT|g" djangoexact/settings.py
 
           - pip install -r requirements.txt
           #- python manage.py makemigrations
