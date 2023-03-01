@@ -408,13 +408,14 @@ class Assessment(Module):
 
     def clean(self) -> None:
         super().clean()
+
         fields = [self.parent_afforestation, self.parent_deforestation, self.parent_other_land_use]
         if len([f for f in fields if f]) > 1:
             raise ValidationError("Exactly one of deforestation, afforestation, or other land use can be set.")
+        
         relative, relationship = get_assessment_or_parent(self)
-        if relative:
+        if relative and not relative in fields:
             raise ValidationError(f"{relative} is already a {relationship}")
-
 
     class Meta:
         abstract = True
@@ -504,9 +505,9 @@ class Grassland(Assessment):
     description = TextField(null=True, blank=True)
     user_notes = TextField(null=True, blank=True)
 
-    grassland_management_type_start = ForeignKey(GrasslandManagementType, on_delete=CASCADE, related_name="%(class)s_start")
-    grassland_management_type_w = ForeignKey(GrasslandManagementType, on_delete=CASCADE, related_name="%(class)s_without")
-    grassland_management_type_wo = ForeignKey(GrasslandManagementType, on_delete=CASCADE, related_name="%(class)s_with")
+    grassland_management_type_start = ForeignKey(GrasslandManagementType, on_delete=CASCADE, related_name="%(class)s_start", null=True, blank=True)
+    grassland_management_type_w = ForeignKey(GrasslandManagementType, on_delete=CASCADE, related_name="%(class)s_without", null=True, blank=True)
+    grassland_management_type_wo = ForeignKey(GrasslandManagementType, on_delete=CASCADE, related_name="%(class)s_with", null=True, blank=True)
 
     is_fire_used_w = BooleanField()
     is_fire_used_wo = BooleanField()
@@ -520,9 +521,9 @@ class Grassland(Assessment):
 
     ha_start = FloatField(null=True, blank=True)
     ha_w = FloatField(null=True, blank=True)
-    ha_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_w_rate")
+    ha_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_w_rate", null=True, blank=True)
     ha_wo = FloatField(null=True, blank=True)
-    ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_wo_rate")
+    ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_wo_rate", null=True, blank=True)  
 
     # Tier 2 values
     soil_carbon_start_t2 = FloatField(null=True, blank=True)
