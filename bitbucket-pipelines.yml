@@ -29,7 +29,7 @@ definitions:
           - sed -i "s|\$SERVICE_NAME|$SERVICE_NAME|g" app.yaml
           - sed -i "s|\$PROJECT_ID|$PROJECT_ID|g" app.yaml
           - sed -i "s|\$DB_ENGINE|$DB_ENGINE|g" app.yaml
-          - sed -i "s|\$DB_HOST|#DB_HOST|g" app.yaml
+          - sed -i "s|\$DB_HOST|$DB_HOST|g" app.yaml
           - sed -i "s|\$DB_USERNAME|$DB_USERNAME|g" app.yaml
           - sed -i "s|\$DB_PASSWORD|$DB_PASSWORD|g" app.yaml
           - sed -i "s|\$DB_NAME|$DB_NAME|g" app.yaml
@@ -37,7 +37,7 @@ definitions:
 
           - sed -i "s|\$DB_ENGINE|$DB_ENGINE|g" djangoexact/settings.py
           - sed -i "s|\$DB_INSTANCE_CONNECTION|$DB_INSTANCE_CONNECTION|g" djangoexact/settings.py
-          - sed -i "s|\$DB_HOST|#DB_HOST|g" djangoexact/settings.py
+          - sed -i "s|\$DB_HOST|$DB_HOST|g" djangoexact/settings.py
           - sed -i "s|\$DB_USERNAME|$DB_USERNAME|g" djangoexact/settings.py
           - sed -i "s|\$DB_PASSWORD|$DB_PASSWORD|g" djangoexact/settings.py
           - sed -i "s|\$DB_NAME|$DB_NAME|g" djangoexact/settings.py
