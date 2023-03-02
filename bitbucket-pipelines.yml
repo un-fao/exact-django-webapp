@@ -8,14 +8,6 @@ definitions:
     - step: &deploy
         name: Deploy App
         script:
-          - export CLOUDSDK_CORE_DISABLE_PROMPTS=1
-          - SDK_VERSION=420.0.0
-          - SDK_FILENAME=google-cloud-sdk-${SDK_VERSION}-linux-x86_64.tar.gz
-          - curl -O -J https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/${SDK_FILENAME}
-          - tar -zxvf ${SDK_FILENAME} --directory ${HOME}
-          - export PATH=${PATH}:${HOME}/google-cloud-sdk/bin
-          - echo ${PROJECT_KEYFILE:0:120}
-          
           - echo $PROJECT_KEYFILE > /tmp/key-file.json
           - gcloud auth activate-service-account --key-file /tmp/key-file.json
 
@@ -48,6 +40,14 @@ definitions:
           #- python manage.py makemigrations
           - python manage.py migrate
           - python manage.py collectstatic --noinput
+
+          - export CLOUDSDK_CORE_DISABLE_PROMPTS=1
+          - SDK_VERSION=420.0.0
+          - SDK_FILENAME=google-cloud-sdk-${SDK_VERSION}-linux-x86_64.tar.gz
+          - curl -O -J https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/${SDK_FILENAME}
+          - tar -zxvf ${SDK_FILENAME} --directory ${HOME}
+          - export PATH=${PATH}:${HOME}/google-cloud-sdk/bin
+          - echo ${PROJECT_KEYFILE:0:120}
 
           - gcloud config set project $PROJECT_ID
           - gcloud app deploy app.yaml --project $PROJECT_ID --verbosity=debug
