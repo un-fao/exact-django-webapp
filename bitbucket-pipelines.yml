@@ -9,7 +9,7 @@ definitions:
         name: Deploy App
         script:
           - export CLOUDSDK_CORE_DISABLE_PROMPTS=1
-          - SDK_VERSION=365.0.0
+          - SDK_VERSION=420.0.0
           - SDK_FILENAME=google-cloud-sdk-${SDK_VERSION}-linux-x86_64.tar.gz
           - curl -O -J https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/${SDK_FILENAME}
           - tar -zxvf ${SDK_FILENAME} --directory ${HOME}
