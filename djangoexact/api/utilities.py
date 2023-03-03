@@ -1,6 +1,7 @@
 from django.apps import apps
 from rest_framework import exceptions
 import re
+from api.models import Model
 
 CN_RATIO_FOREST = 10
 CN_RATIO_GRASSLAND = 15
@@ -40,10 +41,10 @@ def get_query_param_or_validation_error(request, param_name):
         raise exceptions.ValidationError(f"{param_name} is required")
     return param
 
-def get_assessment_or_parent(module):
+def get_assessment_or_parent(module) -> tuple[Model, str] | tuple[None, None]:
     """
-        Looks for the assessment class in the module and returns it.
-        Returns None if no assessment class is found.
+        Looks for the assessment class in the module and returns a tuple (module, relationship).
+        Returns (None, None) if no assessment class is found.
     """
 
     relative = (None, None)
