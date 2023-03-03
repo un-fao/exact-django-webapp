@@ -102,6 +102,11 @@ class AboveGroundBiomass(Model):
     def __str__(self):
         return f"{self.continent.name} {self.vegetation_type.name}, value: {self.value}"
 
+class ForestAGB(Model):
+    continent = ForeignKey('api.Continent', on_delete=CASCADE)
+    vegetation_type = ForeignKey('api.VegetationType', on_delete=CASCADE)
+    value = FloatField()
+
 class BelowGroundBiomassManager(Manager):
     def get_max_within_threshold(self, continent, vegetation_type, threshold):
         return self.filter(
