@@ -43,10 +43,8 @@ def calculate_emissions(area_start, area_w, area_wo, time_impl, time_cap, rate_t
     f_i_tier_2: tier 2 value, expects None or Float value
     f_mg_ref: taken from IPCC A57 matching CLIMATE REGION to rows and TILLAGE MANAGEMENT to columns
     f_mg_tier_2: tier 2 value, expects None or Float value
-
-
-    
     '''
+    
     residue_emissions_w = residue_burning(area_start, area_w, time_impl, time_cap, rate_coefficient_w, nitrous_constant, methane_constant, residue_burnt, emission_factor_burning_nitrous,
                     emission_factor_burning_methane, combustion_factor, fire_periodicity_default, fire_periodicity_tier_2, t_biomass_tier_2, agb_rate_default, agb_rate_tier_2)
     total_bio_emissions_w = total_biomass_co2(area_start, area_w, time_impl, time_cap, rate_type_w, rate_coefficient_w, agb_rate_default, agb_rate_tier_2, agb_maximum_c, bgb_rate_default, bgb_rate_tier_2)
@@ -61,8 +59,6 @@ def calculate_emissions(area_start, area_w, area_wo, time_impl, time_cap, rate_t
 
     total_w = residue_emissions_w + total_bio_emissions_w + som_emissions_w + soil_emissions_w
     total_wo = residue_emissions_wo + total_bio_emissions_wo + som_emissions_wo + soil_emissions_wo
-
-    ciao = 2
 
     return total_w, total_wo, total_w - total_wo
 
@@ -300,4 +296,3 @@ def total_biomass_co2 (area_start, area, time_impl, time_cap, rate_type, rate_co
 
 defo = calculate_emissions(0, 10, 1, 20, 9, 'D', 0.5, 'D', 0.5, 265, 28, True, 0.21, 2.3, 0.85, 1, None, None, 3.16, None, 48, 0.71, None, 46, None, 1.01, None, 0.92, None, 1.04, None)
 
-print(defo)
