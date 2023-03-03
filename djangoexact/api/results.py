@@ -1,5 +1,5 @@
 from .models import Deforestation, Afforestation, OtherLandUse, AnnualCropping, Project
-from math_model import defo, affo, oluc, annuals, perennial_cropping, coastal_wetlands, grassland_management, fisheries_and_aquaculture
+from math_model import defo, affo, oluc, annuals, perennial_cropping, coastal_wetlands, grassland_management, fisheries_and_aquaculture, forest_management
 from .serializers import *
 from ipcc.models import *
 from .utilities import *
@@ -779,3 +779,95 @@ def calc_largefishery_result(input: LargeFishery):
 
     return [Result(*fisheries_and_aquaculture.total_emissions_small_or_large_fisheries(*inputs))]
 
+def calc_forest_result(input: Forest):
+    """
+    Calculate emissions for a single Forest module.
+    """
+
+    project: Project = input.activity.project
+    data = None
+    agb = None
+    bgb = None
+    soc = None
+    LAND_INPUT_FACTOR_DEFAULT = 1
+    AGB_MULTIPLICATION_FACTOR = .47
+
+    if input.vegetation_type.name == "Mangrove Forest":
+        data = DataOnMangroves.objects.get(
+            climate = project.climate,
+            moisture = project.moisture
+        )
+        agb = data.agb_c
+        bgb = data.bgb
+        soc = data.soc_ref
+    else:
+        data = LitterDeadwoodCarbonStock.objects.get(
+            vegetation_type = input.vegetation_type
+        )
+        f_agb = ForestAGB.objects.get(
+            continent=project.continent,
+            vegetation_type = input.vegetation_type
+        )
+        f_bgb = BelowGroundBiomass.objects.get_max_within_threshold(
+            continent=project.continent,
+            vegetation_type = input.vegetation_type,
+            threshold=f_agb.value
+        )
+
+        agb = f_agb.value * AGB_MULTIPLICATION_FACTOR
+        bgb = f_bgb.value * agb
+        soc = project.soc_ref.value
+    
+    cf: CombustionFactorValues = CombustionFactorValues.objects.get(vegetation_type=input.vegetation_type)
+
+    inputs = [
+        
+        input.ha_start,
+        input.ha_w,
+        input.ha_wo,
+        project.implementation_duration_yrs,
+        project.capitalization_duration_yrs,
+        input.ha_w_rate.name,
+        input.ha_wo_rate.name,
+        input.ha_w_rate.value,
+        input.ha_wo_rate.value,
+        project.gw_potential.n2o,
+        project.gw_potential.ch4,
+
+        input.degradation_level_w.value,
+        input.degradation_level_w_t2.value if input.degradation_level_w_t2 else None,
+        input.degradation_level_wo.value,
+        input.degradation_level_wo_t2.value if input.degradation_level_wo_t2 else None,
+        input.degradation_level_start.value,
+        input.degradation_level_start_t2.value if input.degradation_level_start_t2 else None,
+
+        agb,
+        input.ag_carbon_t2,
+        bgb,
+        input.bg_carbon_t2,
+
+        data.litter,
+        input.litter_t2,
+        data.dw,
+        input.deadwood_t2,
+        soc,
+        input.soil_carbon_t2,
+        LAND_INPUT_FACTOR_DEFAULT,
+        input.land_input_factor_start_t2,
+        input.land_input_factor_w_t2,
+        input.land_input_factor_wo_t2,
+
+        input.fire_periodicity_w,
+        input.fire_periodicity_wo,
+        input.is_fire_used_w,
+        input.is_fire_used_wo,
+        input.fire_impact_percentage_w,
+        input.fire_impact_percentage_wo,
+
+        cf.value,
+        cf.ch4,
+        cf.n2o
+
+    ]
+
+    return [Result(*forest_management.calculate_emissions(*inputs))]
