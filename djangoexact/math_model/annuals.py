@@ -71,9 +71,6 @@ def calculate_emissions_annual_to_annual(nitrous_constant, methane_constant, ):
 
     """
 
-
-
-
 def soil_co2_change(area_start, area, time_impl, time_cap, rate_coefficient, rate_type, socref, soc_tier_2, f_lu_ref, f_lu_tier_2, f_i_ref, f_i_tier_2, f_mg_ref, f_mg_tier_2):
 
     def immediate_soil(area, area_start, time_impl, time_cap):
@@ -162,7 +159,6 @@ def som (area_start, area, time_impl, time_cap, rate_coefficient, socref, soc_ti
     som_n2o = 0 if maximum_soc_20_years > reference_soc else (maximum_soc_20_years - reference_soc) * 5  * emission_factor_nitrous * n2o_n_conversion * (nitrous_constant/1000)
 
     total = - (min(area_start, area) * (time_cap + time_impl) + abs(area - area_start) * func1(area_start, area, rate_coefficient, time_impl, time_cap)) *  som_n2o 
-
 
     return total
 
