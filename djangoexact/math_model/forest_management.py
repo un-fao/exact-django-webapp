@@ -19,7 +19,7 @@ def total_biomass_emissions(area_start, area_end, degradation_level_end_ref, deg
     degradation_level_start = degradation_level_start_ref if not degradation_level_start_tier_2 else degradation_level_start_tier_2
     degradation_level_end = degradation_level_end_ref if not degradation_level_end_tier_2 else degradation_level_end_tier_2
     agb = agb_ref if not agb_tier_2 else agb_tier_2
-    bgb = bgb_ref * agb_ref if not bgb_tier_2 else bgb_tier_2
+    bgb = bgb_ref if not bgb_tier_2 else bgb_tier_2
 
 
     tot_biomass = agb + bgb
@@ -136,7 +136,7 @@ def fire_emissions(area_end, time_impl, time_cap, rate_coefficient, methane_cons
         degradation_level_start = degradation_level_start_ref if not degradation_level_start_tier_2 else degradation_level_start_tier_2
         degradation_level_end = degradation_level_end_ref if not degradation_level_end_tier_2 else degradation_level_end_tier_2
         agb = agb_ref if not agb_tier_2 else agb_tier_2
-        bgb = bgb_ref * agb_ref if not bgb_tier_2 else bgb_tier_2
+        bgb = bgb_ref if not bgb_tier_2 else bgb_tier_2
 
         tot_biomass = agb + bgb
 
