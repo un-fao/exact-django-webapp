@@ -173,6 +173,7 @@ def total_inland_coastal_aquaculture(production_start, production_w, nitrous_ef_
     return total_w, total_wo, total_w - total_wo
 
 
-
+em = total_emissions_small_or_large_fisheries(20, 9, 0.5, 0.5, 500, 450, 500, 2.572333333334, None, 671, 73, 45, 73, 1810, None, 0.083, None, 0.5, 0.5, 0.5, 2.8, None, 60, None, 0.574, 0.5, 0.8, 0.5)
+print(em)
 
 

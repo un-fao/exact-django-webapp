@@ -19,7 +19,7 @@ def total_biomass_emissions(area_start, area_end, degradation_level_end_ref, deg
     degradation_level_start = degradation_level_start_ref if not degradation_level_start_tier_2 else degradation_level_start_tier_2
     degradation_level_end = degradation_level_end_ref if not degradation_level_end_tier_2 else degradation_level_end_tier_2
     agb = agb_ref if not agb_tier_2 else agb_tier_2
-    bgb = bgb_ref if not bgb_tier_2 else bgb_tier_2
+    bgb = bgb_ref * agb_ref if not bgb_tier_2 else bgb_tier_2
 
 
     tot_biomass = agb + bgb
@@ -128,13 +128,15 @@ def fire_emissions(area_end, time_impl, time_cap, rate_coefficient, methane_cons
         else:
             return time_impl * (1 - rate_coefficient)
     
+    
+
     if fire_periodicity > (time_impl + time_cap) or not fire_used:  
         return 0
     else:
         degradation_level_start = degradation_level_start_ref if not degradation_level_start_tier_2 else degradation_level_start_tier_2
         degradation_level_end = degradation_level_end_ref if not degradation_level_end_tier_2 else degradation_level_end_tier_2
         agb = agb_ref if not agb_tier_2 else agb_tier_2
-        bgb = bgb_ref if not bgb_tier_2 else bgb_tier_2
+        bgb = bgb_ref * agb_ref if not bgb_tier_2 else bgb_tier_2
 
         tot_biomass = agb + bgb
 
@@ -245,6 +247,3 @@ def calculate_emissions(area_start, area_w, area_wo, time_impl, time_cap, rate_t
     CIAO = 2
     return (total_w, total_wo, total_w-total_wo)
 
-ao = calculate_emissions(400, 400, 400, 20, 9, 'D', 'D', 0.5, 0.5, 265, 28, 0.8, None, 0.4, None, 0.4, None, 86.592, None, 42.43008, None, 0.7, None, 10.7, None, 46, None, 1, None, None, None, 15, 5, True, True, 0.5, 0.2, 0.32, 6.8, 0.2)
-
-print(ao)

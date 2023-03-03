@@ -83,13 +83,8 @@ def soil_co2_change(area_start, area, time_impl, time_cap, rate_coefficient, rat
     return maximum if abs(calculated) > maximum else calculated
 
 def ch4_emitted(area_start, area, time_impl, time_cap, rate_coefficient, methane_constant, cultivation_period_ref, 
-                cultivation_period_tier_2, adjusted_daily_ef_methane_ref, adjusted_daily_ef_methane_tier_2):
-    '''
-    cultivation_period_ref:  taken from IPCC A515 matching CONTINENT_SELECTED
-    cultivation_period_tier_2 : tier_2 value, expects either Float or None
-    adjusted_daily_ef_methane_ref: questo lo devo calcolare io nella funzione generale sulla base dei tier_2
-    adjusted_daily_ef_methane_tier_2: tier_2 value, expects either Float or None
-    '''
+                cultivation_period_tier_2, daily_ef_methane_default, daily_ef_methane_tier_2):
+
     def area_time_dependency(area_start, area, rate_coefficient, time_impl, time_cap):
         if area > area_start:
             return time_cap + time_impl * rate_coefficient
@@ -97,10 +92,11 @@ def ch4_emitted(area_start, area, time_impl, time_cap, rate_coefficient, methane
             return time_impl * (1 - rate_coefficient)
 
     cultivation_period = cultivation_period_ref if not cultivation_period_tier_2 else cultivation_period_tier_2
-    adjusted_daily_ef_methane = adjusted_daily_ef_methane_ref if not adjusted_daily_ef_methane_tier_2 else adjusted_daily_ef_methane_tier_2
-    kg_methane_per_ha = adjusted_daily_ef_methane * cultivation_period
+    daily_ef_methane = daily_ef_methane_default if not daily_ef_methane_tier_2 else daily_ef_methane_tier_2
 
-    return (min(area_start, area) * (time_cap + time_impl) + abs(area_start - area) * area_time_dependency(area_start, area, rate_coefficient, time_impl, time_cap)) * kg_methane_per_ha * methane_constant / 1000
+    kg_methane_cultivation_period = daily_ef_methane * cultivation_period
+
+    return (min(area_start, area) * (time_cap + time_impl) + abs(area_start - area) * area_time_dependency(area_start, area, rate_coefficient, time_impl, time_cap)) * kg_methane_cultivation_period * methane_constant / 1000
 
 def straw_burning(area_start, area, time_impl, time_cap, rate_coefficient, straw_burnt, rice_cf, methane_ef, methane_constant, 
                   nitrous_ef, nitrous_constant, straw_tonnes_ref, straw_tonnes_tier_2):
@@ -129,10 +125,8 @@ def straw_burning(area_start, area, time_impl, time_cap, rate_coefficient, straw
         
         return (min(area_start, area) * (time_cap + time_impl) + abs(area_start - area) * area_time_dependency(area_start, area, rate_coefficient)) * (straw_methane_co2 + straw_nitrous_co2)
 
+straw = straw_burning(100, 100, 20, 9, 0.5, True, 0.8, 2.7, 28, 0.07, 265, 45.2, None )
 
+ch4 = ch4_emitted(100, 100, 20, 9, 0.5, 28, 113, None, 1.05910000, None)
 
-ch4 = ch4_emitted(12, 12, 20, 9, 0.5, 28, 113, None, 0.8449, None)
-
-straw = straw_burning(12, 12, 20, 9, 0.5, True, 0.80, 2.7, 28, 0.07, 265, 49.96, None)
-
-print(straw)
+soil = soil_co2_change(100, 100, 20, 9, 'D', 0.5, 46, None, 1.35, None, )
