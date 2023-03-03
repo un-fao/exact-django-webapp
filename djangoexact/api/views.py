@@ -58,7 +58,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             if module_object:
                 module_dict = get_module_serializer(module_model)(module_object).data
                 try:
-                    module_dict[RESULTS] = ResultSerializer(calc_result(module_object, activity.project), many=True).data
+                    module_dict[RESULTS] = ResultSerializer(calc_result(module_object), many=True).data
                 except Exception as e:
                     module_dict[RESULTS] = error(str(e))
                 modules.append(module_dict)
@@ -159,7 +159,7 @@ def generic_module_viewset(model: Model):
             module = get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
 
             try:
-                module_results = calc_result(module, module.activity.project)
+                module_results = calc_result(module)
             except Exception as e:
                 return Response(error(str(e)), status=status.HTTP_400_BAD_REQUEST)
 
