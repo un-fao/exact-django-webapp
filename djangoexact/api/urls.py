@@ -24,6 +24,7 @@ router = routers.DefaultRouter()
 
 router.register(r'projects', views.ProjectViewSet)
 router.register(r'activities', views.ActivityViewSet, basename='activities')
+router.register(r'land-use-types', views.LandUseTypeViewSet, basename='land-use-types')
 router.register(r'module-types', views.ModuleTypeViewSet, basename='modules')
 router.register(r'deforestations', views.generic_module_viewset(Deforestation), basename='deforestations')
 router.register(r'afforestations', views.generic_module_viewset(Afforestation), basename='afforestations')
