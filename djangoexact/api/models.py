@@ -38,21 +38,17 @@ class ActivityType(Model):
 class LandUseType(Model):
     
     name = CharField(max_length=100)
-    parent_land_use = ForeignKey(
+    parent = ForeignKey(
         "self", 
         on_delete=CASCADE, 
         null=True, 
         blank=True, 
         related_name="children", 
-        limit_choices_to={'parent_land_use': None}
+        limit_choices_to={'parent': None}
     )
 
-    assessment_activity = ForeignKey(ActivityType, on_delete=CASCADE, null=True, blank=True)
-
-    needs_assessment = BooleanField(default=False)
-
     def __str__(self):
-        return f"({self.pk}) {self.name}"+(f" of {self.parent_land_use}" if self.parent_land_use else "")
+        return f"({self.pk}) {self.name}"+(f" of {self.parent}" if self.parent else "")
 
 class ChangeRate(Model):
     name = CharField(max_length=25)
