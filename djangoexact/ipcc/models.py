@@ -333,7 +333,7 @@ class PerennialMaxAGB(Model):
     value = FloatField(default=0, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.value} for {self.climate.name} {self.moisture.name} {self.land_use_type.name}"
+        return f"{self.value} for {self.climate.name} {self.land_use_type.name}"
     
 class CroplandFLU(Model):
     climate = ForeignKey('api.Climate', on_delete=CASCADE)
