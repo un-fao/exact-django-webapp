@@ -2,6 +2,8 @@ from django.apps import apps
 from rest_framework import exceptions
 import re
 from api.models import Model
+from rest_framework.response import Response
+
 
 CN_RATIO_FOREST = 10
 CN_RATIO_GRASSLAND = 15
@@ -63,3 +65,8 @@ def get_assessment_or_parent(module) -> tuple[Model, str] | tuple[None, None]:
                 break
             
     return relative
+
+# define ErrorResponse class
+class ErrorResponse(Response):
+    def __init__(self, data, status):
+        super().__init__(error(data), status=status)
