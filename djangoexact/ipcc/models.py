@@ -108,7 +108,10 @@ class ForestAGB(Model):
     value = FloatField()
 
 class BelowGroundBiomassManager(Manager):
-    def get_max_within_threshold(self, continent, vegetation_type, threshold):
+    def get_max_below_threshold(self, continent, vegetation_type, threshold):
+        """
+        Returns the highest value below the threshold.
+        """
         return self.filter(
             continent = continent,
             vegetation_type = vegetation_type,

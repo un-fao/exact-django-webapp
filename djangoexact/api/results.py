@@ -243,8 +243,8 @@ def calc_afforestation_result(input: Afforestation):
     le_20yrs = ag_net_biomass.value_upto_20_years
     gt_20yrs = ag_net_biomass.value_after_20_years
 
-    bg_biomass_before_20_yrs = BelowGroundBiomass.objects.get_max_within_threshold(**cvt,threshold=le_20yrs)
-    bg_biomass_after_20_yrs = BelowGroundBiomass.objects.get_max_within_threshold(**cvt,threshold=gt_20yrs)
+    bg_biomass_before_20_yrs = BelowGroundBiomass.objects.get_max_below_threshold(**cvt,threshold=le_20yrs)
+    bg_biomass_after_20_yrs = BelowGroundBiomass.objects.get_max_below_threshold(**cvt,threshold=gt_20yrs)
 
     ag_biomass = AboveGroundBiomass.objects.get(**cvt)
     bg_biomass_le_125 = BelowGroundBiomass.objects.get_lowest_value(**cvt)
@@ -808,7 +808,7 @@ def calc_forest_result(input: Forest):
             continent=project.continent,
             vegetation_type = input.vegetation_type
         )
-        f_bgb = BelowGroundBiomass.objects.get_max_within_threshold(
+        f_bgb = BelowGroundBiomass.objects.get_max_below_threshold(
             continent=project.continent,
             vegetation_type = input.vegetation_type,
             threshold=f_agb.value
