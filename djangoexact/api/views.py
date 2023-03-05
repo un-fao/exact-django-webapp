@@ -33,6 +33,8 @@ class LandUseTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         parent = self.request.query_params.get('parent', None)
         if parent:
             land_use_types = LandUseType.objects.filter(parent__name=parent).order_by('name')
+            if not land_use_types:
+                return ErrorResponse(f"No land use types found for parent: {parent}", status=status.HTTP_404_NOT_FOUND)
             return Response(data=get_model_serializer(LandUseType)(land_use_types, many=True).data, status=status.HTTP_200_OK)
         else:
             return super().list(request)
