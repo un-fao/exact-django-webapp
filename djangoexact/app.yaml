@@ -14,10 +14,6 @@ handlers:
 - url: /.*
   script: auto
 
-libraries:
-- name: django
-  version: 4.1.3
-
 env_variables:
   PROJECT_ID: "$PROJECT_ID"
   DB_ENGINE: "$DB_ENGINE"
