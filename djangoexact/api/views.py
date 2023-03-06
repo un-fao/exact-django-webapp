@@ -17,6 +17,28 @@ include_related = openapi.Parameter('include_related', openapi.IN_QUERY, descrip
 class AuthenticatedViewSet(viewsets.GenericViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
+class LandUseTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    """
+    API endpoint that allows land use types to be viewed or edited.
+    """
+    queryset = LandUseType.objects.all()
+    serializer_class = get_model_serializer(LandUseType)
+
+    # Modify get method to accept OPTIONAL query parameter 'module' to return land use types for a given module
+    @swagger_auto_schema(manual_parameters=[openapi.Parameter('parent', openapi.IN_QUERY, description="Parent name", type=openapi.TYPE_STRING)])
+    def list(self, request):
+        """
+        Get all land use types, or all land use types for a given module, by filtering against a `module` query parameter in the URL.
+        """
+        parent = self.request.query_params.get('parent', None)
+        if parent:
+            land_use_types = LandUseType.objects.filter(parent__name=parent).order_by('name')
+            if not land_use_types:
+                return ErrorResponse(f"No land use types found for parent: {parent}", status=status.HTTP_404_NOT_FOUND)
+            return Response(data=get_model_serializer(LandUseType)(land_use_types, many=True).data, status=status.HTTP_200_OK)
+        else:
+            return super().list(request)
+
 class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
     API endpoint that allows projects to be viewed or edited.
@@ -58,7 +80,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             if module_object:
                 module_dict = get_module_serializer(module_model)(module_object).data
                 try:
-                    module_dict[RESULTS] = ResultSerializer(calc_result(module_object, activity.project), many=True).data
+                    module_dict[RESULTS] = ResultSerializer(calc_result(module_object), many=True).data
                 except Exception as e:
                     module_dict[RESULTS] = error(str(e))
                 modules.append(module_dict)
@@ -159,7 +181,7 @@ def generic_module_viewset(model: Model):
             module = get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
 
             try:
-                module_results = calc_result(module, module.activity.project)
+                module_results = calc_result(module)
             except Exception as e:
                 return Response(error(str(e)), status=status.HTTP_400_BAD_REQUEST)
 

@@ -38,21 +38,17 @@ class ActivityType(Model):
 class LandUseType(Model):
     
     name = CharField(max_length=100)
-    parent_land_use = ForeignKey(
+    parent = ForeignKey(
         "self", 
         on_delete=CASCADE, 
         null=True, 
         blank=True, 
         related_name="children", 
-        limit_choices_to={'parent_land_use': None}
+        limit_choices_to={'parent': None}
     )
 
-    assessment_activity = ForeignKey(ActivityType, on_delete=CASCADE, null=True, blank=True)
-
-    needs_assessment = BooleanField(default=False)
-
     def __str__(self):
-        return f"({self.pk}) {self.name}"+(f" of {self.parent_land_use}" if self.parent_land_use else "")
+        return f"({self.pk}) {self.name}"+(f" of {self.parent}" if self.parent else "")
 
 class ChangeRate(Model):
     name = CharField(max_length=25)
@@ -199,6 +195,7 @@ class ModuleType(Model):
 
 class ForestDegradationLevel(Model):
     name = CharField(max_length=100)
+    value = FloatField()
 
     def __str__(self):
         return self.name
@@ -596,9 +593,9 @@ class Forest(Module):
     ha_wo = FloatField(null=True, blank=True)
     ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_wo_rate")
 
-    degradation_level_start_t2 = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_start_t2")
-    degradation_level_w_t2 = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_w_t2")
-    degradation_level_wo_t2 = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_wo_t2")
+    degradation_level_start_t2 = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_start_t2", null=True, blank=True)
+    degradation_level_w_t2 = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_w_t2", null=True, blank=True)
+    degradation_level_wo_t2 = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_wo_t2", null=True, blank=True)
 
     ag_carbon_t2 = FloatField(null=True, blank=True)
     bg_carbon_t2 = FloatField(null=True, blank=True)

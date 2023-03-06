@@ -104,13 +104,12 @@ if os.getenv('GAE_APPLICATION', None):
 else:
     DATABASES = {
         'default': {
-            #'ENGINE': 'django.db.backends.postgresql',
-            'ENGINE': '$DB_ENGINE',
-            'HOST': '$DB_HOST',
-            'USER':'$DB_USERNAME',
-            'PASSWORD': '$DB_PASSWORD',
-            'NAME': '$DB_NAME',
-            'PORT': '$DB_PORT',
+            'ENGINE': env("DB_ENGINE"),
+            'HOST': env("DB_HOST"),
+            'USER': env("DB_USER"),
+            'PASSWORD': env("DB_PASSWORD"),
+            'NAME': env("DB_NAME"),
+            'PORT': env("DB_PORT"),
         }
     }
 
