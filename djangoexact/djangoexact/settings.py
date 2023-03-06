@@ -109,7 +109,7 @@ else:
             'USER': env("DB_USER", default='$DB_USERNAME'),
             'PASSWORD': env("DB_PASSWORD", default='$DB_PASSWORD'),
             'NAME': env("DB_NAME", default='$DB_NAME'),
-            'PORT': env("DB_PORT", default=5542)
+            'PORT': env("DB_PORT", default=5432)
         }
     }
 
