@@ -871,3 +871,32 @@ def calc_forest_result(input: Forest):
     ]
 
     return [Result(*forest_management.calculate_emissions(*inputs))]
+
+def calc_aquaculture_result(input: Aquaculture):
+    """
+    Calculate emissions for a single Aquaculture module.
+    """
+
+    project: Project = input.activity.project
+    NITROUS_EF_DEFAULT = .00169
+    FEED_EF_DEFAULT = 0
+
+    inputs = [
+        input.annual_production_start,
+        input.annual_production_w,
+        NITROUS_EF_DEFAULT,
+        input.production_n2o_ef_t2,
+        project.gw_potential.n2o,
+        project.implementation_duration_yrs,
+        project.capitalization_duration_yrs,
+        input.annual_production_w_rate.value,
+        input.annual_production_wo_rate.value,
+        input.annual_production_wo,
+        input.annual_feed_quantity_start,
+        input.annual_feed_quantity_w,
+        FEED_EF_DEFAULT,
+        input.feed_use_emissions_t2,
+        input.annual_feed_quantity_wo
+    ]
+
+    return [Result(*fisheries_and_aquaculture.total_inland_coastal_aquaculture(*inputs))]
