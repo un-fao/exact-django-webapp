@@ -102,8 +102,16 @@ class AboveGroundBiomass(Model):
     def __str__(self):
         return f"{self.continent.name} {self.vegetation_type.name}, value: {self.value}"
 
+class ForestAGB(Model):
+    continent = ForeignKey('api.Continent', on_delete=CASCADE)
+    vegetation_type = ForeignKey('api.VegetationType', on_delete=CASCADE)
+    value = FloatField()
+
 class BelowGroundBiomassManager(Manager):
-    def get_max_within_threshold(self, continent, vegetation_type, threshold):
+    def get_max_below_threshold(self, continent, vegetation_type, threshold):
+        """
+        Returns the highest value below the threshold.
+        """
         return self.filter(
             continent = continent,
             vegetation_type = vegetation_type,
@@ -325,7 +333,7 @@ class PerennialMaxAGB(Model):
     value = FloatField(default=0, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.value} for {self.climate.name} {self.moisture.name} {self.land_use_type.name}"
+        return f"{self.value} for {self.climate.name} {self.land_use_type.name}"
     
 class CroplandFLU(Model):
     climate = ForeignKey('api.Climate', on_delete=CASCADE)

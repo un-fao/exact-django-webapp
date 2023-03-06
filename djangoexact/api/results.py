@@ -1,5 +1,5 @@
 from .models import Deforestation, Afforestation, OtherLandUse, AnnualCropping, Project
-from math_model import defo, affo, oluc, annuals, perennial_cropping, coastal_wetlands, grassland_management, fisheries_and_aquaculture
+from math_model import defo, affo, oluc, annuals, perennial_cropping, coastal_wetlands, grassland_management, fisheries_and_aquaculture, forest_management
 from .serializers import *
 from ipcc.models import *
 from .utilities import *
@@ -10,20 +10,21 @@ class Result(object):
         self.total_wo = total_wo
         self.balance = balance
 
-def calc_result(input: Model, project: Project):
+def calc_result(input: Model):
 
     try:
         func = f"calc_{input.__class__.__name__.lower()}_result"
         print(func)
-        return globals()[func](input, project)
+        return globals()[func](input)
     except KeyError:
         raise Exception(f"Module '{input.__class__.__name__}' not (yet) supported.")
     except Exception as e:
         raise e
 
-def calc_extraction_result(input:Extraction, project:Project):
+def calc_extraction_result(input:Extraction):
 
     # Extraction
+    project = input.activity.project
     climate = project.climate
     moisture = project.moisture
     vegetation_type = input.vegetation_type
@@ -130,8 +131,9 @@ def calc_extraction_result(input:Extraction, project:Project):
 
     return [extraction_result, drainage_result]
 
-def calc_coastalwaterbody_result(input:CoastalWaterbody, project: Project):
+def calc_coastalwaterbody_result(input:CoastalWaterbody):
 
+    project = input.activity.project
     methane_emission_factor = OtherConstructedWaterbodiesEmissionFactor.objects.get(
         climate=project.climate, 
         moisture=project.moisture,
@@ -158,11 +160,12 @@ def calc_coastalwaterbody_result(input:CoastalWaterbody, project: Project):
 
     return [Result(*coastal_wetlands.coastal_waterbodies_w_wo(*inputs))]
 
-def calc_rewetting_result(input: Rewetting, project: Project):
+def calc_rewetting_result(input: Rewetting):
     """
     Calculate emissions for a single Rewetting module.
     """
 
+    project = input.activity.project
     climate = project.climate
     moisture = project.moisture
     vegetation_type = input.vegetation_type
@@ -208,11 +211,12 @@ def calc_rewetting_result(input: Rewetting, project: Project):
 
     return [Result(*coastal_wetlands.rewetting_w_wo(*inputs))]
 
-def calc_afforestation_result(input: Afforestation, project:Project):
+def calc_afforestation_result(input: Afforestation):
     """
     Calculate emissions for a single Afforestation module.
     """
 
+    project = input.activity.project
     lut = input.land_use_type
     vt = input.vegetation_type
     continent = project.continent
@@ -239,8 +243,8 @@ def calc_afforestation_result(input: Afforestation, project:Project):
     le_20yrs = ag_net_biomass.value_upto_20_years
     gt_20yrs = ag_net_biomass.value_after_20_years
 
-    bg_biomass_before_20_yrs = BelowGroundBiomass.objects.get_max_within_threshold(**cvt,threshold=le_20yrs)
-    bg_biomass_after_20_yrs = BelowGroundBiomass.objects.get_max_within_threshold(**cvt,threshold=gt_20yrs)
+    bg_biomass_before_20_yrs = BelowGroundBiomass.objects.get_max_below_threshold(**cvt,threshold=le_20yrs)
+    bg_biomass_after_20_yrs = BelowGroundBiomass.objects.get_max_below_threshold(**cvt,threshold=gt_20yrs)
 
     ag_biomass = AboveGroundBiomass.objects.get(**cvt)
     bg_biomass_le_125 = BelowGroundBiomass.objects.get_lowest_value(**cvt)
@@ -284,11 +288,12 @@ def calc_afforestation_result(input: Afforestation, project:Project):
     
     return [Result(*affo.afforestation(*inputs))]
 
-def calc_deforestation_result(input: Deforestation, project: Project):
+def calc_deforestation_result(input: Deforestation):
     """
     Calculate emissions for a single Deforestation module.
     """
 
+    project = input.activity.project
     climate = project.climate
     moisture = project.moisture
     continent = project.continent
@@ -358,11 +363,12 @@ def calc_deforestation_result(input: Deforestation, project: Project):
 
     return [Result(*defo.GHG_emissions(*inputs))]
 
-def calc_otherlanduse_result(input: OtherLandUse, project:Project):
+def calc_otherlanduse_result(input: OtherLandUse):
     """
     Calculate emissions for a single OtherLandUse module.
     """
 
+    project = input.activity.project
     climate = project.climate
     moisture = project.moisture
     continent = project.continent
@@ -426,11 +432,12 @@ def calc_otherlanduse_result(input: OtherLandUse, project:Project):
     
     return [Result(*oluc.calculate_w_wo_balance(*inputs))]
 
-def calc_annualcropping_result(input: AnnualCropping, project:Project):
+def calc_annualcropping_result(input: AnnualCropping):
     """
     Calculate emissions for a single AnnualCropping module.
     """
 
+    project = input.activity.project
     climate = project.climate
     moisture = project.moisture
     land_use_type = input.land_use_type
@@ -515,11 +522,12 @@ def calc_annualcropping_result(input: AnnualCropping, project:Project):
 
     return [Result(*annuals.calculate_emissions(*inputs))]
 
-def calc_perennialcropping_result(input: PerennialCropping, project: Project):
+def calc_perennialcropping_result(input: PerennialCropping):
     """
     Calculate emissions for a single PerennialCropping module.
     """
 
+    project = input.activity.project
     climate = project.climate
     moisture = project.moisture
     continent = project.continent
@@ -577,13 +585,12 @@ def calc_perennialcropping_result(input: PerennialCropping, project: Project):
 
     return [Result(*perennial_cropping.calculate_emissions(*inputs))]
 
-
-
-def calc_grassland_result(input: Grassland, project: Project):
+def calc_grassland_result(input: Grassland):
     """
     Calculate emissions for a single Grassland module.
     """
 
+    project = input.activity.project
     ef = BurningEmissionFactor.objects.get(category__name="Savanna and grassland")
     agb = GrasslandAGB.objects.get(climate=project.climate, moisture=project.moisture)
     cf = .77
@@ -644,11 +651,12 @@ def calc_grassland_result(input: Grassland, project: Project):
 
     return [Result(*grassland_management.calculate_total_emissions(*inputs))]
 
-def calc_smallfishery_result(input: SmallFishery, project: Project):
+def calc_smallfishery_result(input: SmallFishery):
     """
     Calculate emissions for a single SmallFishery module.
     """
 
+    project = input.activity.project
     ef_diesel_default_list = EnergyDefaultEmissionFactor.objects.filter(fuel_type__name__contains="Off-Road")
 
     # Average of all default emission factors for gasoil/diesel
@@ -706,11 +714,12 @@ def calc_smallfishery_result(input: SmallFishery, project: Project):
 
     return [Result(*fisheries_and_aquaculture.total_emissions_small_or_large_fisheries(*inputs))]
 
-def calc_largefishery_result(input: LargeFishery, project: Project):
+def calc_largefishery_result(input: LargeFishery):
     """
     Calculate emissions for a single LargeFishery module.
     """
 
+    project = input.activity.project
     ef_diesel_default_list = EnergyDefaultEmissionFactor.objects.filter(fuel_type__name__contains="Off-Road")
 
     # Average of all default emission factors for gasoil/diesel
@@ -770,3 +779,95 @@ def calc_largefishery_result(input: LargeFishery, project: Project):
 
     return [Result(*fisheries_and_aquaculture.total_emissions_small_or_large_fisheries(*inputs))]
 
+def calc_forest_result(input: Forest):
+    """
+    Calculate emissions for a single Forest module.
+    """
+
+    project: Project = input.activity.project
+    data = None
+    agb = None
+    bgb = None
+    soc = None
+    LAND_INPUT_FACTOR_DEFAULT = 1
+    AGB_MULTIPLICATION_FACTOR = .47
+
+    if input.vegetation_type.name == "Mangrove Forest":
+        data = DataOnMangroves.objects.get(
+            climate = project.climate,
+            moisture = project.moisture
+        )
+        agb = data.agb_c
+        bgb = data.bgb
+        soc = data.soc_ref
+    else:
+        data = LitterDeadwoodCarbonStock.objects.get(
+            vegetation_type = input.vegetation_type
+        )
+        f_agb = ForestAGB.objects.get(
+            continent=project.continent,
+            vegetation_type = input.vegetation_type
+        )
+        f_bgb = BelowGroundBiomass.objects.get_max_below_threshold(
+            continent=project.continent,
+            vegetation_type = input.vegetation_type,
+            threshold=f_agb.value
+        )
+
+        agb = f_agb.value * AGB_MULTIPLICATION_FACTOR
+        bgb = f_bgb.value * agb
+        soc = project.soc_ref.value
+    
+    cf: CombustionFactorValues = CombustionFactorValues.objects.get(vegetation_type=input.vegetation_type)
+
+    inputs = [
+        
+        input.ha_start,
+        input.ha_w,
+        input.ha_wo,
+        project.implementation_duration_yrs,
+        project.capitalization_duration_yrs,
+        input.ha_w_rate.name,
+        input.ha_wo_rate.name,
+        input.ha_w_rate.value,
+        input.ha_wo_rate.value,
+        project.gw_potential.n2o,
+        project.gw_potential.ch4,
+
+        input.degradation_level_w.value,
+        input.degradation_level_w_t2.value if input.degradation_level_w_t2 else None,
+        input.degradation_level_wo.value,
+        input.degradation_level_wo_t2.value if input.degradation_level_wo_t2 else None,
+        input.degradation_level_start.value,
+        input.degradation_level_start_t2.value if input.degradation_level_start_t2 else None,
+
+        agb,
+        input.ag_carbon_t2,
+        bgb,
+        input.bg_carbon_t2,
+
+        data.litter,
+        input.litter_t2,
+        data.dw,
+        input.deadwood_t2,
+        soc,
+        input.soil_carbon_t2,
+        LAND_INPUT_FACTOR_DEFAULT,
+        input.land_input_factor_start_t2,
+        input.land_input_factor_w_t2,
+        input.land_input_factor_wo_t2,
+
+        input.fire_periodicity_w,
+        input.fire_periodicity_wo,
+        input.is_fire_used_w,
+        input.is_fire_used_wo,
+        input.fire_impact_percentage_w,
+        input.fire_impact_percentage_wo,
+
+        cf.value,
+        cf.ch4,
+        cf.n2o
+
+    ]
+
+    return [Result(*forest_management.calculate_emissions(*inputs))]
