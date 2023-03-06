@@ -13,6 +13,7 @@ from .results import calc_result
 activity_id = openapi.Parameter('activity_id', openapi.IN_QUERY, description="ID of activity related to the module", type=openapi.TYPE_INTEGER)
 project_id = openapi.Parameter('project_id', openapi.IN_QUERY, description="ID of project related to the activity", type=openapi.TYPE_INTEGER)
 include_related = openapi.Parameter('include_related', openapi.IN_QUERY, description="Include related modules", type=openapi.TYPE_BOOLEAN)
+parent = openapi.Parameter('parent', openapi.IN_QUERY, description="Parent name", type=openapi.TYPE_STRING)
 
 class AuthenticatedViewSet(viewsets.GenericViewSet):
     permission_classes = [permissions.IsAuthenticated]
@@ -25,10 +26,10 @@ class LandUseTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     serializer_class = get_model_serializer(LandUseType)
 
     # Modify get method to accept OPTIONAL query parameter 'module' to return land use types for a given module
-    @swagger_auto_schema(manual_parameters=[openapi.Parameter('parent', openapi.IN_QUERY, description="Parent name", type=openapi.TYPE_STRING)])
+    @swagger_auto_schema(manual_parameters=[parent], responses={404: 'No land use types found for parent'})
     def list(self, request):
         """
-        Get all land use types, or all land use types for a given module, by filtering against a `module` query parameter in the URL.
+        Get all land use types, or all land use types for a given parent, by filtering against a `parent` query parameter in the URL.
         """
         parent = self.request.query_params.get('parent', None)
         if parent:
@@ -70,6 +71,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
         Calculates and returns total emissions for each module in the activity.
         """
+        # Checks if the activity exists AND belongs to the user
         activity = get_object_or_404(Activity, pk=pk, project__user=self.request.user)
 
         modules = []
