@@ -104,12 +104,12 @@ if os.getenv('GAE_APPLICATION', None):
 else:
     DATABASES = {
         'default': {
-            'ENGINE': env("DB_ENGINE"),
-            'HOST': env("DB_HOST"),
-            'USER': env("DB_USER"),
-            'PASSWORD': env("DB_PASSWORD"),
-            'NAME': env("DB_NAME"),
-            'PORT': env("DB_PORT"),
+            'ENGINE': env("DB_ENGINE", default='$DB_ENGINE'),
+            'HOST': env("DB_HOST", default='/cloudsql/$DB_INSTANCE_CONNECTION'),
+            'USER': env("DB_USER", default='$DB_USERNAME'),
+            'PASSWORD': env("DB_PASSWORD", default='$DB_PASSWORD'),
+            'NAME': env("DB_NAME", default='$DB_NAME'),
+            'PORT': env("DB_PORT", default=5542)
         }
     }
 
