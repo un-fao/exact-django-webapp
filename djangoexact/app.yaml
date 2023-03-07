@@ -14,7 +14,7 @@ handlers:
 - url: /.*
   script: auto
 
-entrypoint: gunicorn -b :$PORT djangoexact:wsgi
+# entrypoint: gunicorn -b :$PORT djangoexact:wsgi
 
 env_variables:
   PROJECT_ID: "$PROJECT_ID"
