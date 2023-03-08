@@ -50,10 +50,6 @@ definitions:
           - python manage.py migrate
           - python manage.py collectstatic --noinput
 
-          - which gunicorn
-          - which python
-          - python -c "import django; print(django.__path__)"
-
           - gcloud config set project $PROJECT_ID
           - gcloud app deploy app.yaml --project $PROJECT_ID --verbosity=debug
 pipelines:
