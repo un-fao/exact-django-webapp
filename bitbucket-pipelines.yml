@@ -24,7 +24,7 @@ definitions:
           - chmod +x cloud_sql_proxy
           - ./cloud_sql_proxy -instances=$DB_INSTANCE_CONNECTION=tcp:$DB_PORT > cloudsql.log 2>&1 &
 
-          - pip install -I -r ../requirements.txt
+          - pip install -I -r requirements.txt
           - cd djangoexact
 
           - sed -i "s|\$SERVICE_NAME|$SERVICE_NAME|g" app.yaml
