@@ -37,8 +37,8 @@ class LandUseTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             if not land_use_types:
                 return ErrorResponse(f"No land use types found for parent: {parent}", status=status.HTTP_404_NOT_FOUND)
             return Response(data=get_model_serializer(LandUseType)(land_use_types, many=True).data, status=status.HTTP_200_OK)
-        else:
-            return super().list(request)
+        
+        return super().list(request)
 
 class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
@@ -130,13 +130,12 @@ def generic_module_viewset(model: Model):
 
                 activity_id = module_serializer.validated_data["activity"].pk
 
-                # Check if the same module for this activity already exists
                 # TODO: Can activities have multiples of the same module?
                 if model.objects.filter(activity__id=activity_id).exists():
-                    return Response(error(f"Module '{model.__name__}' already exists for this activity."), status=status.HTTP_400_BAD_REQUEST)
+                    return ErrorResponse(f"Module '{model.__name__}' already exists for this activity.", status=status.HTTP_400_BAD_REQUEST)
                 
                 if get_assessment_or_parent(model):
-                    return Response(error(f"Module '{model.__name__}' already has an attached assessment."), status=status.HTTP_400_BAD_REQUEST)
+                    return ErrorResponse(f"Module '{model.__name__}' already has an attached assessment.", status=status.HTTP_400_BAD_REQUEST)
 
                 # Check if the activity belongs to the user
                 activity = get_object_or_404(Activity, pk=activity_id, project__user=self.request.user)
@@ -165,10 +164,10 @@ def generic_module_viewset(model: Model):
             module_serializer = get_module_serializer(model)(module)
 
             if request.query_params.get(INCLUDE_RELATED):
-                relative_module, relation = get_assessment_or_parent(module)
+                relative, relation = get_assessment_or_parent(module)
 
-                if relative_module:
-                    relative_serializer = get_module_serializer(relative_module.__class__)(relative_module)
+                if relative:
+                    relative_serializer = get_module_serializer(relative.__class__)(relative)
                     return Response({relation: relative_serializer.data, **module_serializer.data})
 
             return Response(module_serializer.data)
@@ -185,8 +184,24 @@ def generic_module_viewset(model: Model):
             try:
                 module_results = calc_result(module)
             except Exception as e:
-                return Response(error(str(e)), status=status.HTTP_400_BAD_REQUEST)
+                return ErrorResponse(str(e), status=status.HTTP_400_BAD_REQUEST)
 
             return Response(ResultSerializer(module_results, many=True).data)
+
+        @action(detail=True, methods=['get'])
+        def defaults(self, request, pk=None):
+            """
+            Returns the default values for a module.
+
+            GET /annual-croplands/1/defaults/
+            """
+
+            module = get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
+
+            try:
+                # module_defaults = get_defaults(module)
+                return Response({"details": "Not implemented yet."})
+            except Exception as e:
+                return ErrorResponse(str(e), status=status.HTTP_400_BAD_REQUEST)
 
     return GenericModuleViewSet
