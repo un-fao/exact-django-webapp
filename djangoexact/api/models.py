@@ -330,7 +330,7 @@ class Deforestation(Module):
         on_delete=CASCADE, 
         null=True, 
         blank=True, 
-        limit_choices_to=Q(parent_land_use__isnull=True) | Q(parent_land_use__name="Agroforestry")
+        limit_choices_to=Q(parent__isnull=True) | Q(parent__name="Agroforestry")
     )
 
     hwp = FloatField()
@@ -426,7 +426,7 @@ class AnnualCropping(Assessment):
         on_delete=CASCADE, 
         null=True, 
         blank=True, 
-        limit_choices_to=Q(parent_land_use__name="Annual Cropland")
+        limit_choices_to=Q(parent__name="Annual Cropland")
     )
     tillage_management_type = ForeignKey(TillageManagementType, on_delete=CASCADE)
     organic_input_type = ForeignKey(OrganicInputType, on_delete=CASCADE)
@@ -460,7 +460,7 @@ class PerennialCropping(Assessment):
         on_delete=CASCADE, 
         null=True,
         blank=True,
-        limit_choices_to=Q(parent_land_use__name="Agroforestry")
+        limit_choices_to=Q(parent__name="Agroforestry")
     )
 
     tillage_management_type = ForeignKey(TillageManagementType, on_delete=CASCADE)
@@ -789,7 +789,7 @@ class OtherLandManagement(Module):
     land_use_type = ForeignKey(
         LandUseType, 
         on_delete=CASCADE, 
-        limit_choices_to=Q(parent_land_use__isnull=True) | Q(parent_land_use__name="Agroforestry")
+        limit_choices_to=Q(parent__isnull=True) | Q(parent__name="Agroforestry")
     )
 
     land_use_area = FloatField(null=True, blank=True)
