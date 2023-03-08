@@ -19,7 +19,6 @@ definitions:
           - echo $PROJECT_KEYFILE > /tmp/key-file.json
           - gcloud auth activate-service-account --key-file /tmp/key-file.json
 
-          - apt remove gunicorn
           - apt install gunicorn3
 
           - apt-get install wget
