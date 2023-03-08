@@ -5,23 +5,30 @@ from ipcc.models import *
 from .utilities import *
 
 class Result(object):
+    """
+    Base class for all results.
+    """
     def __init__(self, total_w, total_wo, balance):
         self.total_w = total_w
         self.total_wo = total_wo
         self.balance = balance
 
 def calc_result(input: Model):
-
+    """
+    Calculates the results for a given module.
+    """
     try:
         func = f"calc_{input.__class__.__name__.lower()}_result"
-        print(func)
         return globals()[func](input)
     except KeyError:
         raise Exception(f"Module '{input.__class__.__name__}' not (yet) supported.")
-    except Exception as e:
-        raise e
+    except Exception as ex:
+        raise ex
 
-def calc_extraction_result(input:Extraction):
+def calc_extraction_result(input: Extraction):
+    """
+    Calculates the results for an extraction module.
+    """
 
     # Extraction
     project = input.activity.project
