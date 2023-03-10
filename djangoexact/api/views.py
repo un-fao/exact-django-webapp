@@ -13,9 +13,32 @@ from .results import calc_result
 activity_id = openapi.Parameter('activity_id', openapi.IN_QUERY, description="ID of activity related to the module", type=openapi.TYPE_INTEGER)
 project_id = openapi.Parameter('project_id', openapi.IN_QUERY, description="ID of project related to the activity", type=openapi.TYPE_INTEGER)
 include_related = openapi.Parameter('include_related', openapi.IN_QUERY, description="Include related modules", type=openapi.TYPE_BOOLEAN)
+parent = openapi.Parameter('parent', openapi.IN_QUERY, description="Parent name", type=openapi.TYPE_STRING)
 
 class AuthenticatedViewSet(viewsets.GenericViewSet):
     permission_classes = [permissions.IsAuthenticated]
+
+class LandUseTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    """
+    API endpoint that allows land use types to be viewed or edited.
+    """
+    queryset = LandUseType.objects.all()
+    serializer_class = get_model_serializer(LandUseType)
+
+    # Modify get method to accept OPTIONAL query parameter 'module' to return land use types for a given module
+    @swagger_auto_schema(manual_parameters=[parent], responses={404: 'No land use types found for parent'})
+    def list(self, request):
+        """
+        Get all land use types, or all land use types for a given parent, by filtering against a `parent` query parameter in the URL.
+        """
+        parent = self.request.query_params.get('parent', None)
+        if parent:
+            land_use_types = LandUseType.objects.filter(parent__name=parent).order_by('name')
+            if not land_use_types:
+                return ErrorResponse(f"No land use types found for parent: {parent}", status=status.HTTP_404_NOT_FOUND)
+            return Response(data=get_model_serializer(LandUseType)(land_use_types, many=True).data, status=status.HTTP_200_OK)
+        
+        return super().list(request)
 
 class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
@@ -48,6 +71,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
         Calculates and returns total emissions for each module in the activity.
         """
+        # Checks if the activity exists AND belongs to the user
         activity = get_object_or_404(Activity, pk=pk, project__user=self.request.user)
 
         modules = []
@@ -58,7 +82,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             if module_object:
                 module_dict = get_module_serializer(module_model)(module_object).data
                 try:
-                    module_dict[RESULTS] = ResultSerializer(calc_result(module_object, activity.project)).data
+                    module_dict[RESULTS] = ResultSerializer(calc_result(module_object), many=True).data
                 except Exception as e:
                     module_dict[RESULTS] = error(str(e))
                 modules.append(module_dict)
@@ -106,13 +130,12 @@ def generic_module_viewset(model: Model):
 
                 activity_id = module_serializer.validated_data["activity"].pk
 
-                # Check if the same module for this activity already exists
                 # TODO: Can activities have multiples of the same module?
                 if model.objects.filter(activity__id=activity_id).exists():
-                    return Response(error(f"Module '{model.__name__}' already exists for this activity."), status=status.HTTP_400_BAD_REQUEST)
+                    return ErrorResponse(f"Module '{model.__name__}' already exists for this activity.", status=status.HTTP_400_BAD_REQUEST)
                 
                 if get_assessment_or_parent(model):
-                    return Response(error(f"Module '{model.__name__}' already has an attached assessment."), status=status.HTTP_400_BAD_REQUEST)
+                    return ErrorResponse(f"Module '{model.__name__}' already has an attached assessment.", status=status.HTTP_400_BAD_REQUEST)
 
                 # Check if the activity belongs to the user
                 activity = get_object_or_404(Activity, pk=activity_id, project__user=self.request.user)
@@ -141,10 +164,10 @@ def generic_module_viewset(model: Model):
             module_serializer = get_module_serializer(model)(module)
 
             if request.query_params.get(INCLUDE_RELATED):
-                relative_module, relation = get_assessment_or_parent(module)
+                relative, relation = get_assessment_or_parent(module)
 
-                if relative_module:
-                    relative_serializer = get_module_serializer(relative_module.__class__)(relative_module)
+                if relative:
+                    relative_serializer = get_module_serializer(relative.__class__)(relative)
                     return Response({relation: relative_serializer.data, **module_serializer.data})
 
             return Response(module_serializer.data)
@@ -159,10 +182,26 @@ def generic_module_viewset(model: Model):
             module = get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
 
             try:
-                module_results = calc_result(module, module.activity.project)
+                module_results = calc_result(module)
             except Exception as e:
-                return Response(error(str(e)), status=status.HTTP_400_BAD_REQUEST)
+                return ErrorResponse(str(e), status=status.HTTP_400_BAD_REQUEST)
 
             return Response(ResultSerializer(module_results, many=True).data)
+
+        @action(detail=True, methods=['get'])
+        def defaults(self, request, pk=None):
+            """
+            Returns the default values for a module.
+
+            GET /annual-croplands/1/defaults/
+            """
+
+            module = get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
+
+            try:
+                # module_defaults = get_defaults(module)
+                return Response({"details": "Not implemented yet."})
+            except Exception as e:
+                return ErrorResponse(str(e), status=status.HTTP_400_BAD_REQUEST)
 
     return GenericModuleViewSet
