@@ -330,7 +330,7 @@ def calc_deforestation_result(input: Deforestation):
         mangroves_data = DataOnMangroves.objects.get(continent=continent)
 
     combustion_factor = CombustionFactorValues.objects.get(vegetation_type=vegetation_type)
-    moisture_factor = DefaultEmissionFactors.objects.filter(moisture=moisture)
+    moisture_factor = DefaultEmissionFactor.objects.filter(moisture=moisture)
     moisture_factor = moisture_factor.filter(Q(input__name__icontains="Other N Inputs") | Q(input__name__icontains="All N Inputs")).first()
     flu = LandUseCarbonStockExchangeFactor.objects.get(climate=climate, moisture=moisture, land_use_type=land_use_type)
     
@@ -406,7 +406,7 @@ def calc_otherlanduse_result(input: OtherLandUse):
 
     c_n_ratio = CN_RATIO_GRASSLAND if initial_land_use.name == "Grassland" else CN_RATIO_FOREST
 
-    moisture_factor = DefaultEmissionFactors.objects.get(moisture=moisture, input__name__icontains="Other N Inputs")
+    moisture_factor = DefaultEmissionFactor.objects.get(moisture=moisture, input__name__icontains="Other N Inputs")
     combustion_factor = AfforestationCombustionFactorValues.objects.get(land_use_type=initial_land_use)
 
     inputs = [
@@ -471,7 +471,7 @@ def calc_annualcropping_result(input: AnnualCropping):
 
     # TODO: Rename all tables related to FLU, FI, FMG
     # TODO: DefaultEmissionFactors must be inserted properly in the database (IPCC!B99)
-    emission_factors = DefaultEmissionFactors.objects.get(moisture=moisture, input=input.organic_input_type)
+    emission_factors = DefaultEmissionFactor.objects.get(moisture=moisture, input=input.organic_input_type)
     flu = CroplandFLU.objects.get(climate=climate, moisture=moisture, land_use_type__name="Long-Term Cultivated")
     fi = CroplandFI.objects.get(climate=climate, moisture=moisture, organic_input_type=input.organic_input_type)
     fmg = CroplandFMG.objects.get(climate=climate, moisture=moisture, tillage_management_type=input.tillage_management_type)
