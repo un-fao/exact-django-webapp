@@ -1,3 +1,4 @@
+import os
 """
 Django settings for djangoexact project.
 
@@ -24,12 +25,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env("SECRET_KEY")
+SECRET_KEY = env("SECRET_KEY") if not os.getenv('GAE_APPLICATION', None) else '$SECRET_KEY'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["$ALLOWED_HOST", "localhost", "127.0.0.1"]
 
 
 # Application definition
@@ -88,17 +89,29 @@ WSGI_APPLICATION = 'djangoexact.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env("DB_NAME"),
-        'USER': env("DB_USER"),
-        'PASSWORD': env("DB_PASSWORD"),
-        'HOST': env("DB_HOST"),
-        'PORT': env("DB_PORT"),
+if os.getenv('GAE_APPLICATION', None):
+    # Running on production App Engine, so connect to Google Cloud SQL using
+    # the unix socket at /cloudsql/<your-cloudsql-connection string>
+    DATABASES = {
+        'default': {
+            'ENGINE': '$DB_ENGINE',
+            'HOST': '/cloudsql/$DB_INSTANCE_CONNECTION',
+            'USER': '$DB_USERNAME',
+            'PASSWORD': '$DB_PASSWORD',
+            'NAME': '$DB_NAME',
+        }
     }
-}
-
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': env("DB_ENGINE", default='$DB_ENGINE'),
+            'HOST': env("DB_HOST", default='/cloudsql/$DB_INSTANCE_CONNECTION'),
+            'USER': env("DB_USER", default='$DB_USERNAME'),
+            'PASSWORD': env("DB_PASSWORD", default='$DB_PASSWORD'),
+            'NAME': env("DB_NAME", default='$DB_NAME'),
+            'PORT': env("DB_PORT", default=5432)
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -133,7 +146,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = 'static/'
 
 # Default primary key field type

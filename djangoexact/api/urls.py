@@ -24,6 +24,7 @@ router = routers.DefaultRouter()
 
 router.register(r'projects', views.ProjectViewSet)
 router.register(r'activities', views.ActivityViewSet, basename='activities')
+router.register(r'land-use-types', views.LandUseTypeViewSet, basename='land-use-types')
 router.register(r'module-types', views.ModuleTypeViewSet, basename='modules')
 router.register(r'deforestations', views.generic_module_viewset(Deforestation), basename='deforestations')
 router.register(r'afforestations', views.generic_module_viewset(Afforestation), basename='afforestations')
@@ -45,6 +46,8 @@ router.register(r'extractions', views.generic_module_viewset(Extraction), basena
 router.register(r'rewettings', views.generic_module_viewset(Rewetting), basename='inland-waterbodies')
 router.register(r'coastal-waterbodies', views.generic_module_viewset(CoastalWaterbody), basename='inland-waterbodies')
 router.register(r'small-fisheries', views.generic_module_viewset(SmallFishery), basename='small-fisheries')
+router.register(r'large-fisheries', views.generic_module_viewset(LargeFishery), basename='large-fisheries')
+router.register(r'aquacultures', views.generic_module_viewset(Aquaculture), basename='aquacultures')
 
 urlpatterns = [
    path('docs/', include_docs_urls(title='EX-ACT Docs')),

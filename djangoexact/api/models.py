@@ -7,6 +7,7 @@ from .utilities import *
 alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', 'Only alphanumeric characters are allowed.')
 letters_only = RegexValidator(r'^[a-zA-Z]*$', 'Only letters are allowed.')
 capitalized = RegexValidator(r'[A-Z][a-z]*(\s[A-Z][a-z]*)*', 'Only capitalized words are allowed.')
+pc_as_float = RegexValidator(r'^[0-1]*\.?[0-9]*$', 'Only correctly formatted percentages are allowed.')
 
 RICE_CULTIVATION_DAYS = 113
 
@@ -37,21 +38,17 @@ class ActivityType(Model):
 class LandUseType(Model):
     
     name = CharField(max_length=100)
-    parent_land_use = ForeignKey(
+    parent = ForeignKey(
         "self", 
         on_delete=CASCADE, 
         null=True, 
         blank=True, 
         related_name="children", 
-        limit_choices_to={'parent_land_use': None}
+        limit_choices_to={'parent': None}
     )
 
-    assessment_activity = ForeignKey(ActivityType, on_delete=CASCADE, null=True, blank=True)
-
-    needs_assessment = BooleanField(default=False)
-
     def __str__(self):
-        return f"({self.pk}) {self.name}"+(f" of {self.parent_land_use}" if self.parent_land_use else "")
+        return f"({self.pk}) {self.name}"+(f" of {self.parent}" if self.parent else "")
 
 class ChangeRate(Model):
     name = CharField(max_length=25)
@@ -198,6 +195,7 @@ class ModuleType(Model):
 
 class ForestDegradationLevel(Model):
     name = CharField(max_length=100)
+    value = FloatField()
 
     def __str__(self):
         return self.name
@@ -332,7 +330,7 @@ class Deforestation(Module):
         on_delete=CASCADE, 
         null=True, 
         blank=True, 
-        limit_choices_to=Q(parent_land_use__isnull=True) | Q(parent_land_use__name="Agroforestry")
+        limit_choices_to=Q(parent__isnull=True) | Q(parent__name="Agroforestry")
     )
 
     hwp = FloatField()
@@ -407,13 +405,14 @@ class Assessment(Module):
 
     def clean(self) -> None:
         super().clean()
+
         fields = [self.parent_afforestation, self.parent_deforestation, self.parent_other_land_use]
         if len([f for f in fields if f]) > 1:
             raise ValidationError("Exactly one of deforestation, afforestation, or other land use can be set.")
+        
         relative, relationship = get_assessment_or_parent(self)
-        if relative:
+        if relative and not relative in fields:
             raise ValidationError(f"{relative} is already a {relationship}")
-
 
     class Meta:
         abstract = True
@@ -427,18 +426,18 @@ class AnnualCropping(Assessment):
         on_delete=CASCADE, 
         null=True, 
         blank=True, 
-        limit_choices_to=Q(parent_land_use__name="Annual Cropland")
+        limit_choices_to=Q(parent__name="Annual Cropland")
     )
     tillage_management_type = ForeignKey(TillageManagementType, on_delete=CASCADE)
     organic_input_type = ForeignKey(OrganicInputType, on_delete=CASCADE)
     residue_management_type = ForeignKey(ResidueManagementType, on_delete=CASCADE)
-    crop_yield = FloatField()
+    crop_yield = FloatField(null=True, blank=True)
 
-    ha_start = FloatField()
-    ha_w = FloatField()
-    ha_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_w_rate")
-    ha_wo = FloatField()
-    ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_wo_rate+")
+    ha_start = FloatField(null=True, blank=True)
+    ha_w = FloatField(null=True, blank=True)
+    ha_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_w_rate",null=True, blank=True)
+    ha_wo = FloatField(null=True, blank=True)
+    ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_wo_rate+",null=True, blank=True)
 
     main_soil_carbon_t2 = FloatField(null=True, blank=True)
     main_tillage_factor_t2 = FloatField(null=True, blank=True)
@@ -461,7 +460,7 @@ class PerennialCropping(Assessment):
         on_delete=CASCADE, 
         null=True,
         blank=True,
-        limit_choices_to=Q(parent_land_use__name="Agroforestry")
+        limit_choices_to=Q(parent__name="Agroforestry")
     )
 
     tillage_management_type = ForeignKey(TillageManagementType, on_delete=CASCADE)
@@ -503,9 +502,9 @@ class Grassland(Assessment):
     description = TextField(null=True, blank=True)
     user_notes = TextField(null=True, blank=True)
 
-    grassland_management_type_start = ForeignKey(GrasslandManagementType, on_delete=CASCADE, related_name="%(class)s_start")
-    grassland_management_type_w = ForeignKey(GrasslandManagementType, on_delete=CASCADE, related_name="%(class)s_without")
-    grassland_management_type_wo = ForeignKey(GrasslandManagementType, on_delete=CASCADE, related_name="%(class)s_with")
+    grassland_management_type_start = ForeignKey(GrasslandManagementType, on_delete=CASCADE, related_name="%(class)s_start", null=True, blank=True)
+    grassland_management_type_w = ForeignKey(GrasslandManagementType, on_delete=CASCADE, related_name="%(class)s_without", null=True, blank=True)
+    grassland_management_type_wo = ForeignKey(GrasslandManagementType, on_delete=CASCADE, related_name="%(class)s_with", null=True, blank=True)
 
     is_fire_used_w = BooleanField()
     is_fire_used_wo = BooleanField()
@@ -519,9 +518,9 @@ class Grassland(Assessment):
 
     ha_start = FloatField(null=True, blank=True)
     ha_w = FloatField(null=True, blank=True)
-    ha_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_w_rate")
+    ha_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_w_rate", null=True, blank=True)
     ha_wo = FloatField(null=True, blank=True)
-    ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_wo_rate")
+    ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_wo_rate", null=True, blank=True)  
 
     # Tier 2 values
     soil_carbon_start_t2 = FloatField(null=True, blank=True)
@@ -594,9 +593,9 @@ class Forest(Module):
     ha_wo = FloatField(null=True, blank=True)
     ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_wo_rate")
 
-    degradation_level_start_t2 = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_start_t2")
-    degradation_level_w_t2 = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_w_t2")
-    degradation_level_wo_t2 = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_wo_t2")
+    degradation_level_start_t2 = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_start_t2", null=True, blank=True)
+    degradation_level_w_t2 = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_w_t2", null=True, blank=True)
+    degradation_level_wo_t2 = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_wo_t2", null=True, blank=True)
 
     ag_carbon_t2 = FloatField(null=True, blank=True)
     bg_carbon_t2 = FloatField(null=True, blank=True)
@@ -790,7 +789,7 @@ class OtherLandManagement(Module):
     land_use_type = ForeignKey(
         LandUseType, 
         on_delete=CASCADE, 
-        limit_choices_to=Q(parent_land_use__isnull=True) | Q(parent_land_use__name="Agroforestry")
+        limit_choices_to=Q(parent__isnull=True) | Q(parent__name="Agroforestry")
     )
 
     land_use_area = FloatField(null=True, blank=True)
@@ -944,12 +943,11 @@ class Fishery(Module):
     class Meta:
         abstract = True
 
-    fishery_type = ForeignKey(FisheryType, on_delete=CASCADE)
     gear_type = ForeignKey(GearType, on_delete=CASCADE)
 
-    refrigerant_pc_start = FloatField(null=True, blank=True)
-    refrigerant_pc_w = FloatField(null=True, blank=True)
-    refrigerant_pc_wo = FloatField(null=True, blank=True)
+    refrigerant_pc_start = FloatField(null=True, blank=True, validators=[pc_as_float])
+    refrigerant_pc_w = FloatField(null=True, blank=True, validators=[pc_as_float])
+    refrigerant_pc_wo = FloatField(null=True, blank=True, validators=[pc_as_float])
 
     refrigerant_gwp = FloatField(null=True, blank=True, default=1810)
 
@@ -963,9 +961,9 @@ class Fishery(Module):
     total_catch_yr_wo = FloatField(null=True, blank=True)
     total_catch_yr_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_total_catch_yr_wo_rate")
 
-    ice_preserved_catch_pc_start = FloatField(null=True, blank=True)
-    ice_preserved_catch_pc_w = FloatField(null=True, blank=True)
-    ice_preserved_catch_pc_wo = FloatField(null=True, blank=True)
+    ice_preserved_catch_pc_start = FloatField(null=True, blank=True, validators=[pc_as_float])
+    ice_preserved_catch_pc_w = FloatField(null=True, blank=True, validators=[pc_as_float])
+    ice_preserved_catch_pc_wo = FloatField(null=True, blank=True, validators=[pc_as_float])
 
     # TODO: Is the non-t2 value static for this specific module? It's always related to Gasoil/Diesel
     energy_emission_factor_t2 = FloatField(null=True, blank=True)
@@ -981,9 +979,11 @@ class Fishery(Module):
     implementation_year_t2 = IntegerField(null=True, blank=True)
 
 class SmallFishery(Fishery):
+    fishery_type = ForeignKey(FisheryType, on_delete=CASCADE)
     fui_default = ForeignKey("ipcc.SmallFisheryFUI", on_delete=CASCADE, null=True, blank=True)
 
 class LargeFishery(Fishery):
+    fish_type = ForeignKey(FishType, on_delete=CASCADE)
     fui_default = ForeignKey("ipcc.LargeFisheryFUI", on_delete=CASCADE, null=True, blank=True)
 
 class Aquaculture(Module):

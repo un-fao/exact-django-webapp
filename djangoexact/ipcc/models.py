@@ -102,8 +102,16 @@ class AboveGroundBiomass(Model):
     def __str__(self):
         return f"{self.continent.name} {self.vegetation_type.name}, value: {self.value}"
 
+class ForestAGB(Model):
+    continent = ForeignKey('api.Continent', on_delete=CASCADE)
+    vegetation_type = ForeignKey('api.VegetationType', on_delete=CASCADE)
+    value = FloatField()
+
 class BelowGroundBiomassManager(Manager):
-    def get_max_within_threshold(self, continent, vegetation_type, threshold):
+    def get_max_below_threshold(self, continent, vegetation_type, threshold):
+        """
+        Returns the highest value below the threshold.
+        """
         return self.filter(
             continent = continent,
             vegetation_type = vegetation_type,
@@ -190,12 +198,32 @@ class BurningEmissionFactor(Model):
     def __str__(self):
         return f"BurningEmissionFactor for {self.category.name}"
 
+class FiresCombustionFactorManager(Manager):
+    def get_or_other(self, land_use_type):
+        """
+        Returns the factor for the given land_use_type or the factor for 'other' if it exists.
+        """
+        try:
+            return self.get(land_use_type=land_use_type)
+        except self.model.DoesNotExist:
+            return self.get(land_use_type__name='Other')
+
 class FiresCombustionFactor(Model):
     land_use_type = ForeignKey('api.LandUseType', on_delete=CASCADE)
     value = FloatField()
 
     def __str__(self):
         return f"FiresCombustionFactor for {self.land_use_type.name}"
+
+class CropNitrousEstimationDefaultFactorManager(Manager):
+    def get_or_grains(self, land_use_type):
+        """
+        Returns the factor for the given land_use_type or the factor for 'other' if it exists.
+        """
+        try:
+            return self.get(land_use_type=land_use_type)
+        except self.model.DoesNotExist:
+            return self.get(land_use_type__name='Grains')
 
 class CropNitrousEstimationDefaultFactor(Model):
     land_use_type = ForeignKey('api.LandUseType', on_delete=CASCADE)
@@ -204,6 +232,8 @@ class CropNitrousEstimationDefaultFactor(Model):
     n_ag_residues = FloatField()
     rs_t = FloatField()
     n_bg_t = FloatField()
+
+    objects = CropNitrousEstimationDefaultFactorManager()
 
     def __str__(self):
         return f"CropNitrousEstimationDefaultFactor for {self.land_use_type.name}"
@@ -325,7 +355,7 @@ class PerennialMaxAGB(Model):
     value = FloatField(default=0, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.value} for {self.climate.name} {self.moisture.name} {self.land_use_type.name}"
+        return f"{self.value} for {self.climate.name} {self.land_use_type.name}"
     
 class CroplandFLU(Model):
     climate = ForeignKey('api.Climate', on_delete=CASCADE)
@@ -377,7 +407,17 @@ class GrasslandSOC(Model):
 
     def __str__(self):
         return f"{self.value} for {self.grassland_management_type.name}"
-    
+
+class GrasslandStockExchangeFactor(Model):
+    grassland_management_type = ForeignKey('api.GrasslandManagementType', on_delete=CASCADE)
+    climate = ForeignKey('api.Climate', on_delete=CASCADE)
+    fmg = FloatField(default=1)
+    flu = FloatField(default=1)
+    fi = FloatField(default=1)
+
+    def __str__(self):
+        return f"{self.fmg} {self.flu} {self.fi} for {self.grassland_management_type.name} {self.climate.name}"
+
 class ElectricityEmission(Model):
     country = ForeignKey("api.Country", on_delete=CASCADE)
     continent = ForeignKey("api.Continent", on_delete=CASCADE)
@@ -425,3 +465,13 @@ class SmallFisheryFUI(Model):
 
     def __str__(self):
         return f"{self.fishery_type} - {self.gear_type} FUI: {self.value}"
+
+class CropYieldStats(Model):
+    land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
+    continent = ForeignKey("api.Continent", on_delete=CASCADE)
+    year_2016 = FloatField(null=True, blank=True)
+    year_2017 = FloatField(null=True, blank=True)
+    year_2018 = FloatField(null=True, blank=True)
+    year_2019 = FloatField(null=True, blank=True)
+    year_2020 = FloatField(null=True, blank=True)
+    average = FloatField()
