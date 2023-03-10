@@ -198,12 +198,32 @@ class BurningEmissionFactor(Model):
     def __str__(self):
         return f"BurningEmissionFactor for {self.category.name}"
 
+class FiresCombustionFactorManager(Manager):
+    def get_or_other(self, land_use_type):
+        """
+        Returns the factor for the given land_use_type or the factor for 'other' if it exists.
+        """
+        try:
+            return self.get(land_use_type=land_use_type)
+        except self.model.DoesNotExist:
+            return self.get(land_use_type__name='Other')
+
 class FiresCombustionFactor(Model):
     land_use_type = ForeignKey('api.LandUseType', on_delete=CASCADE)
     value = FloatField()
 
     def __str__(self):
         return f"FiresCombustionFactor for {self.land_use_type.name}"
+
+class CropNitrousEstimationDefaultFactorManager(Manager):
+    def get_or_grains(self, land_use_type):
+        """
+        Returns the factor for the given land_use_type or the factor for 'other' if it exists.
+        """
+        try:
+            return self.get(land_use_type=land_use_type)
+        except self.model.DoesNotExist:
+            return self.get(land_use_type__name='Grains')
 
 class CropNitrousEstimationDefaultFactor(Model):
     land_use_type = ForeignKey('api.LandUseType', on_delete=CASCADE)
@@ -212,6 +232,8 @@ class CropNitrousEstimationDefaultFactor(Model):
     n_ag_residues = FloatField()
     rs_t = FloatField()
     n_bg_t = FloatField()
+
+    objects = CropNitrousEstimationDefaultFactorManager()
 
     def __str__(self):
         return f"CropNitrousEstimationDefaultFactor for {self.land_use_type.name}"
@@ -443,3 +465,13 @@ class SmallFisheryFUI(Model):
 
     def __str__(self):
         return f"{self.fishery_type} - {self.gear_type} FUI: {self.value}"
+
+class CropYieldStats(Model):
+    land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
+    continent = ForeignKey("api.Continent", on_delete=CASCADE)
+    year_2016 = FloatField(null=True, blank=True)
+    year_2017 = FloatField(null=True, blank=True)
+    year_2018 = FloatField(null=True, blank=True)
+    year_2019 = FloatField(null=True, blank=True)
+    year_2020 = FloatField(null=True, blank=True)
+    average = FloatField()
