@@ -450,17 +450,19 @@ def calc_annualcropping_result(input: AnnualCropping):
     land_use_type = input.land_use_type
     minor_land_use_type = input.minor_crop_type_t2
 
+    relative, relation = get_assessment_or_parent(input)
+    is_parent = relation == 'parent'
+
     burning_emission_factor = BurningEmissionFactor.objects.get(category__name="Agricultural residues")
-    # TODO: Manage inputs for 'other' (Manager with select_or_other)
     fires_combustion_factor = FiresCombustionFactor.objects.get(land_use_type=land_use_type)
-    n_estimation_factor = CropNitrousEstimationDefaultFactor.objects.get(land_use_type=land_use_type)
+    n_estimation_factor = CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=land_use_type)
 
     # Minor crop
     try:
         minor_combustion_factor = FiresCombustionFactor.objects.get(land_use_type=minor_land_use_type)
         # TODO: Change logic for cleaner code
         minor_burning_emission_factor = BurningEmissionFactor.objects.get(category__name="Agricultural residues")
-        minor_n_estimation_factor = CropNitrousEstimationDefaultFactor.objects.get(land_use_type=minor_land_use_type)
+        minor_n_estimation_factor = CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=minor_land_use_type)
     except:
         # If only one of the above operations fails, all minor variables must be set to None
         minor_burning_emission_factor = None
@@ -468,23 +470,37 @@ def calc_annualcropping_result(input: AnnualCropping):
         minor_n_estimation_factor = None
 
     # TODO: Rename all tables related to FLU, FI, FMG
+    # TODO: DefaultEmissionFactors must be inserted properly in the database (IPCC!B99)
     emission_factors = DefaultEmissionFactors.objects.get(moisture=moisture, input=input.organic_input_type)
     flu = CroplandFLU.objects.get(climate=climate, moisture=moisture, land_use_type__name="Long-Term Cultivated")
     fi = CroplandFI.objects.get(climate=climate, moisture=moisture, organic_input_type=input.organic_input_type)
     fmg = CroplandFMG.objects.get(climate=climate, moisture=moisture, tillage_management_type=input.tillage_management_type)
 
+    crop_yield = input.crop_yield if input.crop_yield else CropYieldStats.objects.get(continent=project.continent, land_use_type=land_use_type).average
+
+
+    # TODO: Temporary, must be handled by front-end
+    ha_data = [input.ha_start, input.ha_w, input.ha_wo]
+
+    if is_parent:
+        match relative.__class__.__name__:
+            case Deforestation.__name__:
+                ha_data = [0, relative.ha_w, (relative.ha_start - relative.ha_wo)]
+            case Afforestation.__name__:
+                ha_data = [relative.ha_w, relative.ha_w, relative.ha_wo]
+            case OtherLandUse.__name__:
+                ha_data = [relative.ha_start, relative.ha_w, 0]
+
     inputs = [
 
         ### General
-        input.ha_start,
-        input.ha_w,
-        input.ha_wo,
+        *ha_data,
         project.implementation_duration_yrs,
         project.capitalization_duration_yrs,
-        input.ha_w_rate.name,
-        input.ha_w_rate.value,
-        input.ha_wo_rate.name,
-        input.ha_wo_rate.value,
+        input.ha_w_rate.name if not is_parent else relative.ha_w_rate.name,
+        input.ha_w_rate.value if not is_parent else relative.ha_w_rate.value,
+        input.ha_wo_rate.name if not is_parent else relative.ha_wo_rate.name,
+        input.ha_wo_rate.value if not is_parent else relative.ha_wo_rate.value,
 
         ### Soil
         project.soc_ref.value,
@@ -508,14 +524,14 @@ def calc_annualcropping_result(input: AnnualCropping):
         input.main_biomass_factor_t2,
         n_estimation_factor.slope,
         n_estimation_factor.intercept,
-        input.crop_yield,
+        crop_yield,
         getattr(minor_burning_emission_factor, "ch4", None), # TODO: Review looking for cleaner logic
         getattr(minor_combustion_factor, "value", None),
         input.minor_biomass_factor_t2,
         getattr(minor_n_estimation_factor, "slope", None),
         getattr(minor_n_estimation_factor, "intercept", None),
         input.minor_yield_t2,
-        burning_emission_factor.n2o,
+        burning_emission_factor.n2o if input.residue_management_type.name == "Burned" else None,
         input.residue_management_type.name == "Retained",
         getattr(minor_burning_emission_factor, "n2o", None),
         getattr(input.minor_residue_management_type_t2, "name", None) == "Retained",
@@ -626,10 +642,21 @@ def calc_grassland_result(input: Grassland):
     soc_w = proj_soc*soc_w.fmg*soc_w.flu*soc_w.fi if soc_w else project.soc_ref.value
     soc_wo = proj_soc*soc_wo.fmg*soc_wo.flu*soc_wo.fi if soc_wo else project.soc_ref.value
 
+    # TODO: A method must be defined that takes into account the nature of the land use change (defo, affo, oluc) and builds start,w,wo accordingly.
+
+    ha_data = [input.ha_start, input.ha_w, input.ha_wo]
+
+    if is_parent:
+        match relative.__class__.__name__:
+            case Deforestation.__name__:
+                ha_data = [0, relative.ha_w, (relative.ha_start - relative.ha_wo)]
+            case Afforestation.__name__:
+                ha_data = [relative.ha_w, relative.ha_w, relative.ha_wo]
+            case OtherLandUse.__name__:
+                ha_data = [relative.ha_start, relative.ha_w, 0]
+
     inputs = [
-        relative.ha_start if is_parent else input.ha_start,
-        relative.ha_wo if is_parent else input.ha_w,
-        relative.ha_w if is_parent else input.ha_wo,
+        *ha_data,
         project.implementation_duration_yrs,
         project.capitalization_duration_yrs,
         relative.ha_wo_rate.name if is_parent else input.ha_w_rate.name,
