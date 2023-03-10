@@ -65,7 +65,7 @@ class AfforestationCombustionFactorValues(Model):
     def __str__(self):
         return f"Factor for {self.land_use_type.name}, value: {self.value}"
 
-class DefaultEmissionFactors(Model):
+class DefaultEmissionFactor(Model):
     input = ForeignKey('api.OrganicInputType', on_delete=CASCADE)
     moisture = ForeignKey('api.Moisture', on_delete=CASCADE)
     value = FloatField()
