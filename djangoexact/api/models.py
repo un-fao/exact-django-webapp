@@ -3,6 +3,7 @@ from django.contrib.auth import models as auth_models
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 from .utilities import *
+import uuid
 
 alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', 'Only alphanumeric characters are allowed.')
 letters_only = RegexValidator(r'^[a-zA-Z]*$', 'Only letters are allowed.')
@@ -257,6 +258,12 @@ class SalinityType(Model):
 ##############################
 ########## Project ###########
 ##############################
+
+class BaseModel(Model):
+    id = UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    class Meta:
+        abstract=True
 
 class Project(Model):
     # TODO: Implement uuid instead of BigAutoField?
