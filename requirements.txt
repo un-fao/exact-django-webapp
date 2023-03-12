@@ -1,44 +1,45 @@
-asgiref==3.5.2
-attrs==22.1.0
-certifi==2022.9.24
-charset-normalizer==2.1.1
 colorama==0.4.6
-coreapi==2.3.3
-coreschema==0.0.4
-Django==4.0.4; python_version >= '3.8'
-Django==3.2.14; python_version < '3.8'
 django-auditlog==2.2.2
 django-cors-headers==3.13.0
 django-environ==0.9.0
 django-extensions==3.2.1
-djangorestframework==3.14.0
 drf-spectacular==0.24.2
 drf-yasg==1.21.4
 gunicorn==20.1.0
-idna==3.4
-inflection==0.5.1
-iniconfig==2.0.0
-itypes==1.2.0
-Jinja2==3.1.2
-jsonschema==4.17.3
-MarkupSafe==2.1.1
 numpy==1.23.5
 openapi-codec==1.3.2
-packaging==22.0
-pluggy==1.0.0
-psycopg2==2.9.5
+pip-chill==1.0.1
+psycopg2-binary==2.9.5
 pydotplus==2.0.2
-pyparsing==3.0.9
-pyrsistent==0.19.2
 pytest==7.2.1
-python-dateutil==2.8.2
-pytz==2022.6
-PyYAML==6.0
-requests==2.28.1
-ruamel.yaml==0.17.21
+python-dotenv==1.0.0
 simplejson==3.18.0
-six==1.16.0
-sqlparse==0.4.3
 tzdata==2022.7
-uritemplate==4.1.1
-urllib3==1.26.13
+# asgiref==3.5.2 # Installed as dependency for django
+# attrs==22.1.0 # Installed as dependency for jsonschema, pytest
+# certifi==2022.9.24 # Installed as dependency for requests
+# charset-normalizer==2.1.1 # Installed as dependency for requests
+# coreapi==2.3.3 # Installed as dependency for openapi-codec, drf-yasg
+# coreschema==0.0.4 # Installed as dependency for drf-yasg, coreapi
+# django==4.0.4 # Installed as dependency for drf-yasg, djangorestframework, drf-spectacular, django-auditlog, django-cors-headers, django-extensions
+# djangorestframework==3.14.0 # Installed as dependency for drf-yasg, drf-spectacular
+# idna==3.4 # Installed as dependency for requests
+# inflection==0.5.1 # Installed as dependency for drf-yasg, drf-spectacular
+# iniconfig==2.0.0 # Installed as dependency for pytest
+# itypes==1.2.0 # Installed as dependency for coreapi
+# jinja2==3.1.2 # Installed as dependency for coreschema
+# jsonschema==4.17.3 # Installed as dependency for drf-spectacular
+# markupsafe==2.1.1 # Installed as dependency for jinja2
+# packaging==22.0 # Installed as dependency for drf-yasg, pytest
+# pluggy==1.0.0 # Installed as dependency for pytest
+# pyparsing==3.0.9 # Installed as dependency for pydotplus
+# pyrsistent==0.19.2 # Installed as dependency for jsonschema
+# python-dateutil==2.8.2 # Installed as dependency for django-auditlog
+# pytz==2022.6 # Installed as dependency for drf-yasg, djangorestframework
+# pyyaml==6.0 # Installed as dependency for drf-spectacular
+# requests==2.28.1 # Installed as dependency for coreapi
+# ruamel.yaml==0.17.21 # Installed as dependency for drf-yasg
+# six==1.16.0 # Installed as dependency for python-dateutil
+# sqlparse==0.4.3 # Installed as dependency for django
+# uritemplate==4.1.1 # Installed as dependency for drf-yasg, coreapi, drf-spectacular
+# urllib3==1.26.13 # Installed as dependency for requests
