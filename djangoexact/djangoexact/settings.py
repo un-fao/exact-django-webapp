@@ -12,10 +12,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
-import environ
-
-env = environ.Env()
-environ.Env.read_env()
+from dotenv import load_dotenv
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env("SECRET_KEY") if not os.getenv('GAE_APPLICATION', None) else '$SECRET_KEY'
+SECRET_KEY = os.getenv("SECRET_KEY") if not os.getenv('GAE_APPLICATION', None) else '$SECRET_KEY'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -104,12 +102,12 @@ if os.getenv('GAE_APPLICATION', None):
 else:
     DATABASES = {
         'default': {
-            'ENGINE': env("DB_ENGINE", default='$DB_ENGINE'),
-            'HOST': env("DB_HOST", default='/cloudsql/$DB_INSTANCE_CONNECTION'),
-            'USER': env("DB_USER", default='$DB_USERNAME'),
-            'PASSWORD': env("DB_PASSWORD", default='$DB_PASSWORD'),
-            'NAME': env("DB_NAME", default='$DB_NAME'),
-            'PORT': env("DB_PORT", default=5432)
+            'ENGINE': os.getenv("DB_ENGINE", default='$DB_ENGINE'),
+            'HOST': os.getenv("DB_HOST", default='/cloudsql/$DB_INSTANCE_CONNECTION'),
+            'USER': os.getenv("DB_USER", default='$DB_USERNAME'),
+            'PASSWORD': os.getenv("DB_PASSWORD", default='$DB_PASSWORD'),
+            'NAME': os.getenv("DB_NAME", default='$DB_NAME'),
+            'PORT': os.getenv("DB_PORT", default=5432)
         }
     }
 
