@@ -131,8 +131,8 @@ def generic_module_viewset(model: Model):
                 activity_id = module_serializer.validated_data["activity"].pk
 
                 # TODO: Can activities have multiples of the same module?
-                if model.objects.filter(activity__id=activity_id).exists():
-                    return ErrorResponse(f"Module '{model.__name__}' already exists for this activity.", status=status.HTTP_400_BAD_REQUEST)
+                # if model.objects.filter(activity__id=activity_id).exists():
+                #     return ErrorResponse(f"Module '{model.__name__}' already exists for this activity.", status=status.HTTP_400_BAD_REQUEST)
                 
                 if get_assessment_or_parent(model):
                     return ErrorResponse(f"Module '{model.__name__}' already has an attached assessment.", status=status.HTTP_400_BAD_REQUEST)
@@ -160,17 +160,23 @@ def generic_module_viewset(model: Model):
 
             activity_id = get_query_param_or_validation_error(self.request, 'activity_id')
 
-            module = get_object_or_404(model, activity__id=activity_id)
-            module_serializer = get_module_serializer(model)(module)
+            modules = model.objects.filter(activity__id=activity_id)
 
-            if request.query_params.get(INCLUDE_RELATED):
-                relative, relation = get_assessment_or_parent(module)
+            data = []
 
-                if relative:
-                    relative_serializer = get_module_serializer(relative.__class__)(relative)
-                    return Response({relation: relative_serializer.data, **module_serializer.data})
+            for i, module in enumerate(modules):
+                module_serializer = get_module_serializer(model)(module)
+                data.append({**module_serializer.data})
+                
+                if request.query_params.get(INCLUDE_RELATED):
+                    relative, relation = get_assessment_or_parent(module)
 
-            return Response(module_serializer.data)
+                    if relative:
+                        relative_serializer = get_module_serializer(relative.__class__)(relative)
+
+                    data[i][relation] = relative_serializer.data
+
+            return Response(data)
 
         @action(detail=True, methods=['get'])
         def results(self, request, pk=None):
