@@ -201,7 +201,7 @@ class BurningEmissionFactor(Model):
 class FiresCombustionFactorManager(Manager):
     def get_or_other(self, land_use_type):
         """
-        Returns the factor for the given land_use_type or the factor for 'other' if it exists.
+        Returns the factor for the given land_use_type or the factor for 'other' if the factor for land_use_type does not exists.
         """
         try:
             return self.get(land_use_type=land_use_type)
@@ -211,6 +211,8 @@ class FiresCombustionFactorManager(Manager):
 class FiresCombustionFactor(Model):
     land_use_type = ForeignKey('api.LandUseType', on_delete=CASCADE)
     value = FloatField()
+
+    objects = FiresCombustionFactorManager()
 
     def __str__(self):
         return f"FiresCombustionFactor for {self.land_use_type.name}"
@@ -328,7 +330,6 @@ class DrainageEmissionFactor(Model):
 
     def __str__(self):
         return f"{self.value} for {self.climate.name} {self.moisture.name}"
-    
 class PerennialAGB(Model):
     climate = ForeignKey('api.Climate', on_delete=CASCADE)
     moisture = ForeignKey('api.Moisture', on_delete=CASCADE)
