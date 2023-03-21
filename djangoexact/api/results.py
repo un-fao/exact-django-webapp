@@ -13,7 +13,7 @@ class Result(object):
         self.total_wo = total_wo
         self.balance = balance
 
-def calc_result(input: Model):
+def calc_result(input: Model) -> list[Result]:
     """
     Calculates the results for a given module.
     """
@@ -560,14 +560,12 @@ def calc_perennialcropping_result(input: PerennialCropping):
     burning_emission_factor = BurningEmissionFactor.objects.get(category__name="Savanna and grassland")
     
     # TODO: Replace 'other' with all the other land_use_types in db
-    fires_combustion_factor = FiresCombustionFactor.objects.get(land_use_type=land_use_type)
-    ag_default = PerennialAGB.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
+    fires_combustion_factor = FiresCombustionFactor.objects.get_or_other(land_use_type=land_use_type)
+    ag_default = PerennialAGB.objects.get_or_default(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
     agb_max_c = PerennialMaxAGB.objects.get(climate=climate, land_use_type=land_use_type)
-    bg_default = PerennialBGB.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
+    bg_default = PerennialBGB.objects.get_or_default(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
 
-    flu_obj = AfforestationFLU if parent else CroplandFLU
-    flu_name = land_use_type.name if parent else "Perennial/Tree Crop"
-    flu = flu_obj.objects.get(climate=climate, moisture=moisture, land_use_type__name=flu_name)
+    flu = CroplandFLU.objects.get(climate=climate, moisture=moisture, land_use_type__name="Perennial/Tree Crop")
 
     fi = CroplandFI.objects.get(climate=climate, moisture=moisture, organic_input_type=input.organic_input_type)
     fmg = CroplandFMG.objects.get(climate=climate, moisture=moisture, tillage_management_type=input.tillage_management_type)
@@ -605,7 +603,7 @@ def calc_perennialcropping_result(input: PerennialCropping):
         fmg.value,
         input.tillage_factor_t2,
     ]
-
+    # BUG: Results for annual crops do not add up. Wait for Lorenzo's unlocked Excel files
     return [Result(*perennial_cropping.calculate_emissions(*inputs))]
 
 def calc_grassland_result(input: Grassland):
