@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import *
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from .results import calc_result
+from .calculators import CalculatorFactory
 
 activity_id = openapi.Parameter('activity_id', openapi.IN_QUERY, description="ID of activity related to the module", type=openapi.TYPE_INTEGER)
 project_id = openapi.Parameter('project_id', openapi.IN_QUERY, description="ID of project related to the activity", type=openapi.TYPE_INTEGER)
@@ -82,7 +82,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             if module_object:
                 module_dict = get_module_serializer(module_model)(module_object).data
                 try:
-                    module_dict[RESULTS] = ResultSerializer(calc_result(module_object), many=True).data
+                    module_dict[RESULTS] = ResultSerializer(CalculatorFactory().calculate_result(module_object), many=True).data
                 except Exception as e:
                     module_dict[RESULTS] = error(str(e))
                 modules.append(module_dict)
@@ -183,7 +183,7 @@ def generic_module_viewset(model: Model):
             module = get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
 
             try:
-                module_results = calc_result(module)
+                module_results = CalculatorFactory().calculate_result(module)
             except Exception as e:
                 return ErrorResponse(str(e))
 
