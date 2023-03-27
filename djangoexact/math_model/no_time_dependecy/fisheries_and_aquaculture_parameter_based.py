@@ -1,3 +1,4 @@
+import math
 
 def total_emissions_small_or_large_fisheries(time_impl, time_cap, rate_coefficient_w, rate_coefficient_wo, catch_start, catch_w, catch_wo, ef_diesel_default, ef_diesel_tier_2, fui_default, fui_start_tier_2, fui_w_tier_2, fui_wo_tier_2,  gwp_refrigerant_default,
                     gwp_refrigerant_tier_2, quantity_lost_refrigerant_default, quantity_lost_refrigerant_tier_2, percentage_refrigerant_start, percentage_refrigerant_w, 
@@ -6,35 +7,28 @@ def total_emissions_small_or_large_fisheries(time_impl, time_cap, rate_coefficie
     
     # SINGLE EMISSION CALCULATION FUNCTIONS AND SUPPORT FUNCTIONS
     
-    def emissions_catch(time_impl, time_cap, rate_coefficient, catch_start, catch_end, ef_diesel_default, ef_diesel_tier_2, fui_default, fui_start_tier_2, fui_end_tier_2):
+    def emissions_catch(catch_start, ef_diesel_default, ef_diesel_tier_2, fui_start):
 
         ef_diesel = ef_diesel_default if not ef_diesel_tier_2 else ef_diesel_tier_2
 
-        fui_start = fui_default if not fui_start_tier_2 else fui_start_tier_2
-        fui_end = fui_default if not fui_end_tier_2 else fui_end_tier_2
-
         ef_start = fui_start * ef_diesel / 1000
-        ef_end = fui_end * ef_diesel / 1000
 
         annual_start = catch_start * ef_start
-        annual_end = catch_end * ef_end
+        
+        return annual_start
 
-        return min(annual_start, annual_end) * (time_impl + time_cap) + abs(annual_end - annual_start) * time_component(annual_start, annual_end, time_impl, time_cap, rate_coefficient)
-
-    def emissions_refrigerant(time_impl, time_cap, rate_coefficient, gwp_refrigerant_default, gwp_refrigerant_tier_2, quantity_lost_refrigerant_default, quantity_lost_refrigerant_tier_2, catch_start, catch_end, percentage_refrigerant_start, percentage_refrigerant_end):
+    def emissions_refrigerant(gwp_refrigerant_default, gwp_refrigerant_tier_2, quantity_lost_refrigerant_default, quantity_lost_refrigerant_tier_2, catch_start, percentage_refrigerant_start):
 
         gwp_refrigerant = gwp_refrigerant_default if not gwp_refrigerant_tier_2 else gwp_refrigerant_tier_2
         quantity_lost_refrigerant = quantity_lost_refrigerant_default if not quantity_lost_refrigerant_tier_2 else quantity_lost_refrigerant_tier_2
 
         catch_with_refrigerant_start = catch_start * percentage_refrigerant_start
-        catch_with_refrigerant_end = catch_end * percentage_refrigerant_end
 
         annual_start = gwp_refrigerant * quantity_lost_refrigerant * catch_with_refrigerant_start / 1000
-        annual_end = gwp_refrigerant * quantity_lost_refrigerant * catch_with_refrigerant_end / 1000
 
-        return min(annual_start, annual_end) * (time_impl + time_cap) + abs(annual_end - annual_start) * time_component(annual_start, annual_end, time_impl, time_cap, rate_coefficient)
+        return annual_start
 
-    def emissions_ice(time_impl, time_cap, rate_coefficient, tonnes_ice_default, kwh_ice_per_tonne_default, operating_margin, kwh_ice_per_tonne_tier_2, tonnes_ice_tier_2, catch_start, catch_end, percentage_ice_start, percentage_ice_end):
+    def emissions_ice(tonnes_ice_default, kwh_ice_per_tonne_default, operating_margin, kwh_ice_per_tonne_tier_2, tonnes_ice_tier_2, catch_start, percentage_ice_start):
 
         tonnes_ice = tonnes_ice_default if not tonnes_ice_tier_2 else tonnes_ice_tier_2
         kwh_ice_per_tonne = kwh_ice_per_tonne_default if not kwh_ice_per_tonne_tier_2 else kwh_ice_per_tonne_tier_2
@@ -42,20 +36,10 @@ def total_emissions_small_or_large_fisheries(time_impl, time_cap, rate_coefficie
         ice_ef = tonnes_ice * kwh_ice_per_tonne * operating_margin / 1000
 
         catch_with_refrigerant_start = catch_start * percentage_ice_start
-        catch_with_refrigerant_end = catch_end * percentage_ice_end
 
         annual_start = ice_ef * catch_with_refrigerant_start 
-        annual_end = ice_ef * catch_with_refrigerant_end
 
-        return min(annual_start, annual_end) * (time_impl + time_cap) + abs(annual_end - annual_start) * time_component(annual_start, annual_end, time_impl, time_cap, rate_coefficient)
-
-    def time_component(start, end, time_impl, time_cap, rate_coefficient):
-            if end > start:
-                return time_cap + time_impl * rate_coefficient
-            else:
-                return time_impl * (1 - rate_coefficient)
-
-
+        return annual_start
 
     """
     time_impl: project implementation time in years
@@ -88,18 +72,55 @@ def total_emissions_small_or_large_fisheries(time_impl, time_cap, rate_coefficie
     percentage_ice_wo: percentage of catch preserved with ice without project
     """
 
-    emissions_catch_w = emissions_catch(time_impl, time_cap, rate_coefficient_w, catch_start, catch_w, ef_diesel_default, ef_diesel_tier_2, fui_default, fui_start_tier_2, fui_w_tier_2) 
-    emissions_catch_wo = emissions_catch(time_impl, time_cap, rate_coefficient_wo, catch_start, catch_wo, ef_diesel_default, ef_diesel_tier_2, fui_default, fui_start_tier_2, fui_wo_tier_2)
 
-    emissions_refrigerant_w = emissions_refrigerant(time_impl, time_cap, rate_coefficient_w, gwp_refrigerant_default, gwp_refrigerant_tier_2, quantity_lost_refrigerant_default, quantity_lost_refrigerant_tier_2, catch_start, catch_w, percentage_refrigerant_start, percentage_refrigerant_w)
-    emissions_refrigerant_wo = emissions_refrigerant(time_impl, time_cap, rate_coefficient_wo, gwp_refrigerant_default, gwp_refrigerant_tier_2, quantity_lost_refrigerant_default, quantity_lost_refrigerant_tier_2, catch_start, catch_wo, percentage_refrigerant_start, percentage_refrigerant_wo)
+    rate_type = 'D'
 
-    emissions_ice_w = emissions_ice(time_impl, time_cap, rate_coefficient_w, tonnes_ice_default, kwh_ice_per_tonne_default, operating_margin, kwh_ice_per_tonne_tier_2, tonnes_ice_tier_2, catch_start, catch_w, percentage_ice_start, percentage_ice_w)
-    emissions_ice_wo = emissions_ice(time_impl, time_cap, rate_coefficient_wo, tonnes_ice_default, kwh_ice_per_tonne_default, operating_margin, kwh_ice_per_tonne_tier_2,tonnes_ice_tier_2, catch_start, catch_wo, percentage_ice_start, percentage_ice_wo)
+    units_catch_w = calculate_unit_distribution(rate_type, catch_start, catch_w, time_impl, time_cap)
+    units_catch_wo = calculate_unit_distribution(rate_type, catch_start, catch_wo, time_impl, time_cap)
 
-    total_w = emissions_catch_w + emissions_refrigerant_w + emissions_ice_w
-    total_wo = emissions_catch_wo + emissions_refrigerant_wo + emissions_ice_wo
-    
+    units_refrigerant_w = calculate_unit_distribution(rate_type, percentage_refrigerant_start, percentage_refrigerant_w, time_impl, time_cap)
+    units_refrigerant_wo = calculate_unit_distribution(rate_type, percentage_refrigerant_start, percentage_refrigerant_wo, time_impl, time_cap)
+
+    units_ice_w = calculate_unit_distribution(rate_type,  percentage_ice_start, percentage_ice_w, time_impl, time_cap)
+    units_ice_wo = calculate_unit_distribution(rate_type,  percentage_ice_start, percentage_ice_wo, time_impl, time_cap)
+
+    units_fui_w = calculate_unit_distribution(rate_type, fui_default, fui_w_tier_2, time_impl, time_cap)
+    units_fui_wo = calculate_unit_distribution(rate_type, fui_default, fui_wo_tier_2, time_impl, time_cap)
+
+
+    emissions_catch_w = []
+    emissions_catch_wo = []
+    emissions_refrigerant_w = []
+    emissions_refrigerant_wo = []
+    emissions_ice_w = []
+    emissions_ice_wo = []
+
+    for i in range(0, len(units_fui_w)):
+
+        emissions_catch_w.append(emissions_catch(units_catch_w[i], ef_diesel_default, ef_diesel_tier_2, units_fui_w[i]))
+        emissions_catch_wo.append(emissions_catch(units_catch_wo[i], ef_diesel_default, ef_diesel_tier_2, units_fui_wo[i]))
+
+        emissions_refrigerant_w.append(emissions_refrigerant(gwp_refrigerant_default, gwp_refrigerant_tier_2, quantity_lost_refrigerant_default, quantity_lost_refrigerant_tier_2, units_catch_w[i], units_refrigerant_w[i]))
+        emissions_refrigerant_wo.append(emissions_refrigerant(gwp_refrigerant_default, gwp_refrigerant_tier_2, quantity_lost_refrigerant_default, quantity_lost_refrigerant_tier_2, units_catch_wo[i], units_refrigerant_wo[i]))
+
+        emissions_ice_w.append(emissions_ice(tonnes_ice_default, kwh_ice_per_tonne_default, operating_margin, kwh_ice_per_tonne_tier_2, tonnes_ice_tier_2, units_catch_w[i], units_ice_w[i]))
+        emissions_ice_wo.append(emissions_ice(tonnes_ice_default, kwh_ice_per_tonne_default, operating_margin, kwh_ice_per_tonne_tier_2, tonnes_ice_tier_2, units_catch_wo[i], units_ice_wo[i]))
+
+    total_w = sum(emissions_catch_w) + sum(emissions_refrigerant_w) + sum(emissions_ice_w)
+    total_wo = sum(emissions_catch_wo) + sum(emissions_refrigerant_wo) + sum(emissions_ice_wo)
+
+    ice = sum(emissions_ice_w)
+    refrigerant = sum(emissions_refrigerant_w)
+    catch = sum(emissions_catch_w)
+
+    ice_wo = sum(emissions_ice_wo)
+    refrigerant_wo = sum(emissions_refrigerant_wo)
+    catch_wo_project = sum(emissions_catch_wo)
+
+    yearly_breakdown(emissions_catch_w, emissions_refrigerant_w, emissions_refrigerant_w, 'with_project', total_w)
+    yearly_breakdown(emissions_catch_wo, emissions_refrigerant_wo, emissions_refrigerant_wo, 'without_project', total_wo)
+
+                                                                             
     return total_w, total_wo, total_w - total_wo
 
 def total_inland_coastal_aquaculture(production_start, production_w, nitrous_ef_default, nitrous_ef_tier_2, nitrous_constant, time_impl, time_cap, rate_coefficient_w, rate_coefficient_wo, production_wo,feed_start, feed_w, ef_feed_default, ef_feed_tier_2, feed_wo):
@@ -171,8 +192,90 @@ def total_inland_coastal_aquaculture(production_start, production_w, nitrous_ef_
 
     return total_w, total_wo, total_w - total_wo
 
+def calculate_unit_distribution(rate_type, units_start ,units_end, time_impl, time_cap):
 
-em = total_emissions_small_or_large_fisheries(20, 9, 0.5, 0.5, 500, 450, 1000, 2.572333333334, None, 671, 73, 45, 73, 1810, None, 0.083, None, 0.5, 0.5, 0.5, 2.8, None, 60, None, 0.573978947, 0.5, 0.8, 0.5)
+    if rate_type == 'D':
+
+        """
+        With a linear rate type we can consider yearly emissions to go from an annual emission value at time 0 to an final annual emissions value in a time period of time_impl years. 
+        The emissions then remain constant throughout all capitalization years (time_cap).
+        In order to evaluate how this happens in a linear matter we can consider the slope of the line that connects the two points (0, units_start) and (time_impl, units_end).
+        Below we can see how m is calculated, with m representing the slope of the line. after that the values of emissions at each year are calculated by using the formula y = mx + b, where m is the slope of the line and b is the y-intercept.
+
+        The total emissions can then be calculated as the integral between year[i] and year[i+1] of the function y = mx + b, where m is the slope of the line and b is the y-intercept, to which we add the emissions at the year [i+1] if increasing
+
+
+        | annual_emissions
+        |
+        |\
+        | \
+        |  \
+        |   \
+        |    \
+        |     \ ________________________________
+        --------------------------------------------> time
+               | time implementation            | time capitalization
+        """
+
+
+        m = math.atan((units_end - units_start) / time_impl)
+        y = [math.tan(m) * i + units_start for i in range(0, time_impl +1)]
+
+
+        y.extend([units_end for i in range(0, time_cap -1)])
+
+    return y
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+def get_cumulated_array(data, **kwargs):
+    cum = data.clip(**kwargs)
+    cum = np.cumsum(cum, axis=0)
+    d = np.zeros(np.shape(data))
+    d[1:] = cum[:-1]
+    return d  
+
+def yearly_breakdown(catch, refrigerant, ice, w_wo, total):
+
+    plt.style.use('Solarize_Light2')
+
+    years = range(len(catch))
+    data = np.array([catch, refrigerant, ice])
+
+    data_shape = np.shape(data)
+
+    cumulated_data = get_cumulated_array(data, min=0)
+    cumulated_data_neg = get_cumulated_array(data, max=0)
+
+    # Re-merge negative and positive data.
+    row_mask = (data<0)
+    cumulated_data[row_mask] = cumulated_data_neg[row_mask]
+    data_stack = cumulated_data
+
+    names = ['Catch Emissions', 'Refrigerant Emissions', 'Ice Emissions']
+
+    fig = plt.figure(figsize =(15, 10))
+    ax = plt.subplot(111)
+
+    color_palette = sns.color_palette('pastel')
+
+    for i in np.arange(0, data_shape[0]):
+        ax.bar(np.arange(data_shape[1]), data[i], bottom=data_stack[i], color=color_palette[i], label = names[i])
+    
+    plt.xlabel('Year')
+    plt.xticks(years, [str(i + 1) for i in years])
+
+    plt.ylabel('Yearly Emission (tCO2-e)')
+    plt.legend()
+    plt.title('Break-Down of Emissions, total emissions: ' + str(total) + ' tCO2-e')
+
+    plt.savefig(f'yearly_breakdown_{w_wo}_parameters.png')
+
+
+em = total_emissions_small_or_large_fisheries(20, 9, 0.5, 0.5, 500, 450, 1000, 2.5722345860000, None, 73, None, 45, 73, 1810, None, 0.083, None, 0.5, 0.8, 0.8, 2.8, None, 60,  None, 0.573978947, 0.5, 0.8, 0.7)
 print(em)
 
 
