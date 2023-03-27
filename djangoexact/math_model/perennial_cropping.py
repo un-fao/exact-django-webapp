@@ -124,7 +124,7 @@ def soil_co2_change(area_start, area, time_impl, time_cap, rate_coefficient, rat
     calculated_time_dep = immediate_soil(area, area_start, time_impl, time_cap) if rate_type == 'I' else not_immediate_soil(area, area_start, time_impl, time_cap, rate_type, rate_coefficient)
     calculated = - delta_soil_c_20_years * (calculated_time_dep + calculated_time_ind)
 
-    return maximum if abs(calculated) > maximum else calculated
+    return maximum if abs(calculated) > abs(maximum) else calculated
 
 def som (area_start, area, time_impl, time_cap, rate_coefficient, rate_type, socref, soc_tier_2, f_lu_ref, f_lu_tier_2, f_i_ref, f_i_tier_2, f_mg_ref, f_mg_tier_2):
 
