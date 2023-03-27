@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import *
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from .results import calc_result
+from .calculators import CalculatorFactory
 
 activity_id = openapi.Parameter('activity_id', openapi.IN_QUERY, description="ID of activity related to the module", type=openapi.TYPE_INTEGER)
 project_id = openapi.Parameter('project_id', openapi.IN_QUERY, description="ID of project related to the activity", type=openapi.TYPE_INTEGER)
@@ -82,7 +82,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             if module_object:
                 module_dict = get_module_serializer(module_model)(module_object).data
                 try:
-                    module_dict[RESULTS] = ResultSerializer(calc_result(module_object), many=True).data
+                    module_dict[RESULTS] = ResultSerializer(CalculatorFactory().calculate_result(module_object), many=True).data
                 except Exception as e:
                     module_dict[RESULTS] = error(str(e))
                 modules.append(module_dict)
@@ -125,28 +125,24 @@ def generic_module_viewset(model: Model):
             Creates a new module for a given activity.
             """
 
-            module_serializer = get_module_serializer(model)(data=request.data)
+            module_serializer = self.serializer_class(data=request.data)
             if module_serializer.is_valid():
 
                 activity_id = module_serializer.validated_data["activity"].pk
 
                 # TODO: Can activities have multiples of the same module?
-                if model.objects.filter(activity__id=activity_id).exists():
-                    return ErrorResponse(f"Module '{model.__name__}' already exists for this activity.", status=status.HTTP_400_BAD_REQUEST)
-                
-                if get_assessment_or_parent(model):
-                    return ErrorResponse(f"Module '{model.__name__}' already has an attached assessment.", status=status.HTTP_400_BAD_REQUEST)
+                # if model.objects.filter(activity__id=activity_id).exists():
+                #     return ErrorResponse(f"Module '{model.__name__}' already exists for this activity.", status=status.HTTP_400_BAD_REQUEST)
 
-                # Check if the activity belongs to the user
+                relative, relation = get_assessment_or_parent(model)
+                if relative:
+                    return ErrorResponse(f"Module '{model.__name__}' already has an attached {relative.__name__} {relation}.")
+
                 activity = get_object_or_404(Activity, pk=activity_id, project__user=self.request.user)
                 module_serializer.save(activity=activity)
 
                 return Response(module_serializer.data, status=status.HTTP_201_CREATED)
             return Response(module_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        def retrieve(self, request: Request, pk=None):
-            module = get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
-            return Response(get_module_serializer(model)(module).data)
 
         @swagger_auto_schema(
             manual_parameters=[activity_id, include_related],
@@ -160,17 +156,22 @@ def generic_module_viewset(model: Model):
 
             activity_id = get_query_param_or_validation_error(self.request, 'activity_id')
 
-            module = get_object_or_404(model, activity__id=activity_id)
-            module_serializer = get_module_serializer(model)(module)
+            modules = model.objects.filter(activity__id=activity_id)
 
-            if request.query_params.get(INCLUDE_RELATED):
-                relative, relation = get_assessment_or_parent(module)
+            data = []
 
-                if relative:
-                    relative_serializer = get_module_serializer(relative.__class__)(relative)
-                    return Response({relation: relative_serializer.data, **module_serializer.data})
+            # TODO: Use a serializer for this
+            for i, module in enumerate(modules):
+                data.append({**self.serializer_class(module).data})
+                
+                if request.query_params.get(INCLUDE_RELATED):
+                    relative, relation = get_assessment_or_parent(module)
 
-            return Response(module_serializer.data)
+                    if relative:
+                        relative_serializer = get_module_serializer(relative.__class__)(relative)
+                        data[i][relation] = relative_serializer.data
+
+            return Response(data)
 
         @action(detail=True, methods=['get'])
         def results(self, request, pk=None):
@@ -182,9 +183,9 @@ def generic_module_viewset(model: Model):
             module = get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
 
             try:
-                module_results = calc_result(module)
+                module_results = CalculatorFactory().calculate_result(module)
             except Exception as e:
-                return ErrorResponse(str(e), status=status.HTTP_400_BAD_REQUEST)
+                return ErrorResponse(str(e))
 
             return Response(ResultSerializer(module_results, many=True).data)
 
@@ -199,9 +200,10 @@ def generic_module_viewset(model: Model):
             module = get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
 
             try:
+                # TODO: Implement defaults
                 # module_defaults = get_defaults(module)
                 return Response({"details": "Not implemented yet."})
             except Exception as e:
-                return ErrorResponse(str(e), status=status.HTTP_400_BAD_REQUEST)
+                return ErrorResponse(str(e))
 
     return GenericModuleViewSet

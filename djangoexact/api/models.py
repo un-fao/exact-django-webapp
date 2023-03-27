@@ -3,6 +3,7 @@ from django.contrib.auth import models as auth_models
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 from .utilities import *
+import uuid
 
 alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', 'Only alphanumeric characters are allowed.')
 letters_only = RegexValidator(r'^[a-zA-Z]*$', 'Only letters are allowed.')
@@ -258,6 +259,12 @@ class SalinityType(Model):
 ########## Project ###########
 ##############################
 
+class BaseModel(Model):
+    id = UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    class Meta:
+        abstract=True
+
 class Project(Model):
     # TODO: Implement uuid instead of BigAutoField?
     # id = UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -473,7 +480,7 @@ class PerennialCropping(Assessment):
     ha_wo = FloatField()
     ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_wo_rate+")
 
-    crop_yield = FloatField()
+    crop_yield = FloatField(null=True, blank=True)
 
     ag_t2 = FloatField(null=True, blank=True)
     bg_t2 = FloatField(null=True, blank=True)
@@ -589,9 +596,9 @@ class Forest(Module):
     fire_impact_percentage_wo = FloatField(null=True, blank=True) # TODO: What's the default value?
     ha_start = FloatField(null=True, blank=True)
     ha_w = FloatField(null=True, blank=True)
-    ha_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_w_rate")
+    ha_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, default=ChangeRate.objects.get(name='D').pk, related_name="%(class)s_ha_w_rate")
     ha_wo = FloatField(null=True, blank=True)
-    ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_wo_rate")
+    ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, default=ChangeRate.objects.get(name='D').pk, related_name="%(class)s_ha_wo_rate")
 
     degradation_level_start_t2 = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_start_t2", null=True, blank=True)
     degradation_level_w_t2 = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_w_t2", null=True, blank=True)
@@ -1005,3 +1012,4 @@ class Aquaculture(Module):
     production_n2o_ef_t2 = FloatField(null=True, blank=True)
 
     implementation_year_t2 = IntegerField(null=True, blank=True)
+
