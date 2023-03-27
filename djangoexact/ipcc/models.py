@@ -493,3 +493,16 @@ class CropYieldStats(Model):
     year_2019 = FloatField(null=True, blank=True)
     year_2020 = FloatField(null=True, blank=True)
     average = FloatField()
+
+class InputReference(Model):
+    gw_potential = ForeignKey(GlobalWarmingPotential, on_delete=CASCADE)
+    input_type = ForeignKey("api.InputType", on_delete=CASCADE)
+    co2_multiplier = FloatField(null=True, blank=True)
+    co2_emissions_multiplier = FloatField(null=True, blank=True)
+    n2o_quantity_multiplier = FloatField(null=True, blank=True)
+    n2o_emissions_multiplier = FloatField(null=True, blank=True)
+    production_quantity_multiplier = FloatField(null=True, blank=True)
+    production_emissions_multiplier = FloatField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Input Reference {self.co2_multiplier} {self.co2_emissions_multiplier} {self.n2o_quantity_multiplier} {self.n2o_emissions_multiplier} {self.production_quantity_multiplier} {self.production_emissions_multiplier}"
