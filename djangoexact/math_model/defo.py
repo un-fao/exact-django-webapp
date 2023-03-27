@@ -81,7 +81,6 @@ def GHG_emissions(ha_start, ha_end_w, ha_end_wo, time_impl, time_cap, rate_type_
     biomass_forest_dom_t_co2_per_ha = biomass_forest_dom_t_c_per_ha * (44/12)
 
     total_ch4_n2o_per_ha = (fire_kg_ch4 * methane + (fire_kg_n2o + soil_kg_n2o) * nitrous)/1000
-    print(total_ch4_n2o_per_ha)
 
     area_defo_wo = 0 if ha_end_wo > ha_start else ha_start - ha_end_wo
     area_defo_w = 0 if ha_end_w > ha_start else ha_start - ha_end_w
@@ -98,6 +97,8 @@ def GHG_emissions(ha_start, ha_end_w, ha_end_wo, time_impl, time_cap, rate_type_
     soil_wo = soil_emissions(time_impl, time_cap, rate_type_soil, rate_of_change_soil, area_defo_wo, delta_co2_mineral_per_ha_per_yr, delta_c_mineral_per_ha)
     soil_w = soil_emissions(time_impl, time_cap, rate_type_soil, rate_of_change_soil, area_defo_w, delta_co2_mineral_per_ha_per_yr, delta_c_mineral_per_ha)
 
+    
+
     fire_fsom_N_wo = total_ch4_n2o_per_ha * area_defo_wo
     fire_fsom_N_w = total_ch4_n2o_per_ha * area_defo_w
     # print(fire_fsom_N_w)
@@ -105,9 +106,8 @@ def GHG_emissions(ha_start, ha_end_w, ha_end_wo, time_impl, time_cap, rate_type_
     # print(total_ch4_n2o_per_ha)
     # print(fire_fsom_N_w)
 
-    total_wo = biomass_loss_wo + biomass_gain_wo + dom_loss_wo + soil_wo + fire_fsom_N_wo 
+    total_wo = biomass_loss_wo + biomass_gain_wo + dom_loss_wo + soil_wo + fire_fsom_N_wo
     total_w = biomass_loss_w + biomass_gain_w + dom_loss_w + soil_w + fire_fsom_N_w 
-
 
     total_defo = total_w - total_wo
 
@@ -120,6 +120,7 @@ def soil_emissions(time_impl, time_cap, rate_type, rate_of_change_soil, area_def
     comparison_term_1 = (delta_co2_mineral_per_ha_per_yr * soil_rate_immediate(area_defo, time_tot)) if rate_type == "I" else (delta_co2_mineral_per_ha_per_yr * soil_rate_other(time_tot, time_impl, area_defo, rate_of_change_soil, rate_type))        
     comparison_term_2 = (area_defo * delta_c_mineral_per_ha * (-44/12))
     
+    print(comparison_term_1)
     return comparison_term_2 if abs(comparison_term_1) >= abs(comparison_term_2) else comparison_term_1
 
 def soil_rate_immediate(area_defo, time_tot):
@@ -147,3 +148,8 @@ def outer_if_other(rate_type, time_tot, time_impl):
         return time_tot - 20 + 0.217 * time_impl * (math.exp(4.606 * (20 - time_tot/time_impl)) - 1)
     else:
         return pow(time_tot - 20, 2) * (0.5/time_impl)
+
+
+ao = GHG_emissions(150, 10, 88, 25, 5, 'D', 0.5, 4.7, None, 265.0, 28.0, True, 0.26, 4.7, 0.45, 0.005, 2.9, None, 36.8, None, 12.0, 0.47, None, None, 0.77, 180.0, 0.22, 15, None, 20, None)
+
+print(ao)

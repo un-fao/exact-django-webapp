@@ -294,5 +294,5 @@ def total_biomass_co2 (area_start, area, time_impl, time_cap, rate_type, rate_co
 
 # em = calculate_emissions(12, 12, 12, 20, 9, 'D', 0.5, 'D', 0.5, 265, 28, True, 0.21, 2.3, 0.85, 1, None, None, 3.16, None, 48, 0.71, None, 46, None, 1.01, None, 0.92, None, 1.04, None)
 
-defo = calculate_emissions(0, 10, 1, 20, 9, 'D', 0.5, 'D', 0.5, 265, 28, True, 0.21, 2.3, 0.85, 1, None, None, 3.16, None, 48, 0.71, None, 46, None, 1.01, None, 0.92, None, 1.04, None)
+# defo = calculate_emissions(0, 10, 1, 20, 9, 'D', 0.5, 'D', 0.5, 265, 28, True, 0.21, 2.3, 0.85, 1, None, None, 3.16, None, 48, 0.71, None, 46, None, 1.01, None, 0.92, None, 1.04, None)
 
