@@ -65,7 +65,7 @@ class AfforestationCombustionFactorValues(Model):
     def __str__(self):
         return f"Factor for {self.land_use_type.name}, value: {self.value}"
 
-class DefaultEmissionFactors(Model):
+class DefaultEmissionFactor(Model):
     input = ForeignKey('api.OrganicInputType', on_delete=CASCADE)
     moisture = ForeignKey('api.Moisture', on_delete=CASCADE)
     value = FloatField()
@@ -201,7 +201,7 @@ class BurningEmissionFactor(Model):
 class FiresCombustionFactorManager(Manager):
     def get_or_other(self, land_use_type):
         """
-        Returns the factor for the given land_use_type or the factor for 'other' if it exists.
+        Returns the factor for the given land_use_type or the factor for 'other' if the factor for land_use_type does not exists.
         """
         try:
             return self.get(land_use_type=land_use_type)
@@ -211,6 +211,8 @@ class FiresCombustionFactorManager(Manager):
 class FiresCombustionFactor(Model):
     land_use_type = ForeignKey('api.LandUseType', on_delete=CASCADE)
     value = FloatField()
+
+    objects = FiresCombustionFactorManager()
 
     def __str__(self):
         return f"FiresCombustionFactor for {self.land_use_type.name}"
@@ -329,6 +331,12 @@ class DrainageEmissionFactor(Model):
     def __str__(self):
         return f"{self.value} for {self.climate.name} {self.moisture.name}"
     
+class PerennialAGBManager(Manager):
+    def get_or_default(self, climate, moisture, continent, land_use_type):
+        try:
+            return self.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
+        except PerennialAGB.DoesNotExist:
+            return PerennialAGB.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type__name="Agroforestry")
 class PerennialAGB(Model):
     climate = ForeignKey('api.Climate', on_delete=CASCADE)
     moisture = ForeignKey('api.Moisture', on_delete=CASCADE)
@@ -336,9 +344,17 @@ class PerennialAGB(Model):
     land_use_type = ForeignKey('api.LandUseType', on_delete=CASCADE)
     value = FloatField(default=0, null=True, blank=True)
 
-    def __str__(self):
-        return f"{self.value} for {self.climate.name} {self.moisture.name} {self.land_use_type.name}"
+    objects = PerennialAGBManager()
 
+    def __str__(self):
+        return f"{self.value} for {self.climate.name} {self.moisture.name} in {self.continent.name} {self.land_use_type.name}"
+
+class PerennialBGBManager(Manager):
+    def get_or_default(self, climate, moisture, continent, land_use_type):
+        try:
+            return self.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
+        except PerennialBGB.DoesNotExist:
+            return PerennialBGB.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type__name="Agroforestry")
 class PerennialBGB(Model):
     climate = ForeignKey('api.Climate', on_delete=CASCADE)
     moisture = ForeignKey('api.Moisture', on_delete=CASCADE)
@@ -346,8 +362,10 @@ class PerennialBGB(Model):
     land_use_type = ForeignKey('api.LandUseType', on_delete=CASCADE)
     value = FloatField(default=0, null=True, blank=True)
 
+    objects = PerennialBGBManager()
+
     def __str__(self):
-        return f"{self.value} for {self.climate.name} {self.moisture.name} {self.land_use_type.name}"
+        return f"{self.value} for {self.climate.name} {self.moisture.name} in {self.continent.name} for {self.land_use_type.name}"
 
 class PerennialMaxAGB(Model):
     climate = ForeignKey('api.Climate', on_delete=CASCADE)
