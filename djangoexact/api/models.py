@@ -1013,3 +1013,24 @@ class Aquaculture(Module):
 
     implementation_year_t2 = IntegerField(null=True, blank=True)
 
+class InputType(Model):
+    name = CharField(max_length=255, unique=True)
+    description = TextField(null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+class Input(Module):
+    type = ForeignKey(InputType, on_delete=CASCADE)
+    value_start = FloatField(null=True, blank=True)
+    value_w = FloatField(null=True, blank=True)
+    value_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_value_w_rate")
+    value_wo = FloatField(null=True, blank=True)
+    value_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_value_wo_rate")
+
+    co2_emissions_t2 = FloatField(null=True, blank=True)
+    n2o_emissions_t2 = FloatField(null=True, blank=True)
+    co2_e_emissions_t2 = FloatField(null=True, blank=True)
+
+    implementation_year_t2 = IntegerField(null=True, blank=True)
+
