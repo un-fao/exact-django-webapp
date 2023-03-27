@@ -3,6 +3,7 @@ from rest_framework import exceptions
 import re
 from api.models import Model
 from rest_framework.response import Response
+from rest_framework import status
 
 
 CN_RATIO_FOREST = 10
@@ -68,5 +69,5 @@ def get_assessment_or_parent(module) -> tuple[Model, str] | tuple[None, None]:
 
 # define ErrorResponse class
 class ErrorResponse(Response):
-    def __init__(self, data, status):
+    def __init__(self, data, status=status.HTTP_400_BAD_REQUEST):
         super().__init__(error(data), status=status)
