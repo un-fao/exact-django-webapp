@@ -58,33 +58,20 @@ def calculate_emissions(ha_start, ha_end_w, ha_end_wo, time_impl, time_cap, rate
                     dw_tier_2, hwp_before_t_dm_per_ha, mangrove_factor, bgb_t_c_per_ha_tier_2, agb_t_c_per_ha_tier_2, flu,
                     agb_t_dm_per_ha_default, bgb_t_dm_per_ha_default_input_parameter, c_n_ratio, soc_after_defo_tier_2, soc_reference, soc_reference_tier_2)
 
-                    # CALCULATE TIME DEPENDENT COMPONENT, TO WHICH WE ADD THE PREVIOUSLY CALCULATED NOT TIME DEPENDENT COMPONENT
-                    total_time_dependent_w = []
-                    total_time_dependent_wo = []
+                    
 
-                    for units_w, units_wo, year in zip(units_per_year_w, units_per_year_wo, years_w):
-                      
-                        total_w, total_wo = deforestation_time_dependent(ha_start, ha_start - units_w, ha_start - units_wo, time_impl, time_cap, rate_type_soil, rate_of_change_soil, biomass_final_1_year_t_per_ha, 
-                        biomass_final_1_year_t_per_ha_tier_2, nitrous, methane, fire_bool, n2o_vegetation, ch4_vegetation, 
-                        cf_vegetation, moisture_emission_factor, litter, litter_tier_2, dw, 
-                        dw_tier_2, hwp_before_t_dm_per_ha, mangrove_factor, bgb_t_c_per_ha_tier_2, agb_t_c_per_ha_tier_2, flu,
-                        agb_t_dm_per_ha_default, bgb_t_dm_per_ha_default_input_parameter, c_n_ratio, soc_after_defo_tier_2, soc_reference, soc_reference_tier_2)
-                      
-
-                        total_time_dependent_w.append(total_w)
-                        total_time_dependent_wo.append(total_wo)
-
-                    # total_time_dependent_w = total_time_dependent_w[0:20]
-                    # total_time_dependent_wo = total_time_dependent_wo[0:20]
-
-                    total_w = [i + total_non_time_w/(time_tot) for i in total_time_dependent_w]
-                    total_wo = [i + total_non_time_wo/(time_tot) for i in total_time_dependent_wo]
+                    total_w, total_wo = deforestation_time_dependent(ha_start, ha_end_w, ha_end_wo, time_impl, time_cap, rate_type_soil, rate_of_change_soil, biomass_final_1_year_t_per_ha, 
+                            biomass_final_1_year_t_per_ha_tier_2, nitrous, methane, fire_bool, n2o_vegetation, ch4_vegetation, 
+                            cf_vegetation, moisture_emission_factor, litter, litter_tier_2, dw, 
+                            dw_tier_2, hwp_before_t_dm_per_ha, mangrove_factor, bgb_t_c_per_ha_tier_2, agb_t_c_per_ha_tier_2, flu,
+                            agb_t_dm_per_ha_default, bgb_t_dm_per_ha_default_input_parameter, c_n_ratio, soc_after_defo_tier_2, soc_reference, soc_reference_tier_2)
+                            
 
                    
                     #plt.bar(years_w, total_w)
                     #plt.show()
 
-                    return sum(total_w), sum(total_wo), sum(total_w) - sum(total_wo)
+                    return total_non_time_w + sum(total_w), total_non_time_wo + sum(total_wo), total_non_time_w + sum(total_w) - sum(total_wo) - total_non_time_wo
 
 
 def calculate_unit_distribution(rate_type, total_units, time_impl, time_cap):
@@ -165,8 +152,6 @@ def deforestation_non_time_dependent(ha_start, ha_end_w, ha_end_wo, time_impl, t
     total_wo = biomass_loss_wo + biomass_gain_wo + dom_loss_wo + fire_fsom_N_wo 
     total_w = biomass_loss_w + biomass_gain_w + dom_loss_w + fire_fsom_N_w 
 
-    total_defo = total_w - total_wo
-
     return total_w, total_wo
 
 def deforestation_time_dependent(ha_start, ha_end_w, ha_end_wo, time_impl, time_cap, rate_type_soil, rate_of_change_soil, biomass_final_1_year_t_per_ha, 
@@ -181,25 +166,90 @@ def deforestation_time_dependent(ha_start, ha_end_w, ha_end_wo, time_impl, time_
     if soc_reference_tier_2: soc_reference = soc_reference_tier_2
     delta_c_mineral_per_ha = soc_reference * flu - soc_reference if not soc_after_defo_tier_2 else soc_after_defo_tier_2 - soc_reference
     delta_co2_mineral_per_ha_per_yr = delta_c_mineral_per_ha * (-44/(12*20))
-    soil_wo = soil_emissions(time_impl, time_cap, rate_type_soil, rate_of_change_soil, area_defo_wo, delta_co2_mineral_per_ha_per_yr, delta_c_mineral_per_ha)
-    soil_w = soil_emissions(time_impl, time_cap, rate_type_soil, rate_of_change_soil, area_defo_w, delta_co2_mineral_per_ha_per_yr, delta_c_mineral_per_ha)
+    y_wo, soil_wo = soil_emissions(time_impl, time_cap, rate_type_soil, rate_of_change_soil, area_defo_wo, delta_co2_mineral_per_ha_per_yr, delta_c_mineral_per_ha)
+    # plot a scatter plot where y_wo and soil_wo represent two different variables on the y axis and the x axis is given by the indices of the list
+
+    def range_with_floats(start, stop, step):
+
+        result = []
+        while stop > start:
+            result.append(start)
+            start += step
+
+        return result
+
+    import matplotlib.pyplot as plt
+
+    plt.scatter(range_with_floats(0.5, time_cap + time_impl +0.5, 1), soil_wo, color='blue')
+    plt.show()
+
+    y_w, soil_w = soil_emissions(time_impl, time_cap, rate_type_soil, rate_of_change_soil, area_defo_w, delta_co2_mineral_per_ha_per_yr, delta_c_mineral_per_ha)
+    
+
+    # print(sum(soil_w))
+    # print(sum(soil_wo))
 
     return soil_w, soil_wo
+def calculate_unit_distribution___2(rate_type, units_start ,units_end, time_impl, time_cap):
+
+    if rate_type == 'D':
+
+        """
+        With a linear rate type we can consider yearly emissions to go from an annual emission value at time 0 to an final annual emissions value in a time period of time_impl years. 
+        The emissions then remain constant throughout all capitalization years (time_cap).
+        In order to evaluate how this happens in a linear matter we can consider the slope of the line that connects the two points (0, units_start) and (time_impl, units_end).
+        Below we can see how m is calculated, with m representing the slope of the line. after that the values of emissions at each year are calculated by using the formula y = mx + b, where m is the slope of the line and b is the y-intercept.
+
+        The total emissions can then be calculated as the integral between year[i] and year[i+1] of the function y = mx + b, where m is the slope of the line and b is the y-intercept, to which we add the emissions at the year [i+1] if increasing
+
+
+        | annual_emissions
+        |
+        |\
+        | \
+        |  \
+        |   \
+        |    \
+        |     \ ________________________________
+        --------------------------------------------> time
+               | time implementation            | time capitalization
+        """
+
+
+        m = math.atan((units_end - units_start) / time_impl)
+        y = [math.tan(m) * i + units_start for i in range(0, time_impl +1)]
+
+        if units_start > units_end:
+            result = [y[i]-abs((y[i] - y[i+1]))/2 for i in range(0, len(y) - 1)]
+
+        else: 
+            result = [y[i]+abs((y[i] - y[i+1]))/2 for i in range(0, len(y) - 1)]
+
+        result.extend([units_end for i in range(0, time_cap)])
+
+        # for each position i in y, calculate the difference between the value in position i and the value in position i+1, where i+1 is smaller than the length of y, else return value in position i
+        return y, result
+
+    else:
+        return None, None
 
 
 def soil_emissions(time_impl, time_cap, rate_type, rate_of_change_soil, area_defo, delta_co2_mineral_per_ha_per_yr, delta_c_mineral_per_ha):
 
-    time_tot = time_impl + time_cap
+    if rate_type == 'D':
+        y, soil_emissions = calculate_unit_distribution___2(rate_type, 0, area_defo * delta_co2_mineral_per_ha_per_yr, time_impl, time_cap)
 
-    calculated = (delta_co2_mineral_per_ha_per_yr * soil_rate_immediate(area_defo, time_tot))
-    maximum = (area_defo * delta_c_mineral_per_ha * (-44/12)/20)
+        if time_impl + time_cap > 20:
+            for i in range(21, time_impl + time_cap):
+                soil_emissions[i] = soil_emissions[i] - y[1]*(i - 20)
 
-    return maximum if abs(calculated) >= abs(maximum) else calculated
+    return y, soil_emissions          
+    
     
 
 def soil_rate_immediate(area_defo, time_tot):
     return area_defo if area_defo > 0 else 0
 
-ao = calculate_emissions(12, 11, 12, 25, 5, 'D', 0.5, 4.7, None, 265.0, 28.0, True, 0.26, 4.7, 0.45, 0.005, 2.9, None, 36.8, None, 12.0, 0.47, None, None, 0.77, 180.0, 0.22, 15, None, 20, None)
+ao = calculate_emissions(150, 10, 88, 25, 5, 'D', 0.5, 4.7, None, 265.0, 28.0, True, 0.26, 4.7, 0.45, 0.005, 2.9, None, 36.8, None, 12.0, 0.47, None, None, 0.77, 180.0, 0.22, 15, None, 20, None)
 
 print(ao)
