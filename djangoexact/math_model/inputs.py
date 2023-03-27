@@ -7,10 +7,10 @@ def input_single_calculation(unit_start, unit_end, rate_coefficient, ipcc_factor
             else:
                 return time_impl * (1 - rate_coefficient)
             
-    factor = tier_2_factor if tier_2_factor else ipcc_factor
+    ipcc_or_tier_2_factor = tier_2_factor if tier_2_factor else ipcc_factor
 
-    unit_start = unit_start * unit_factor
-    unit_end = unit_end * unit_factor
+    unit_start = unit_start * unit_factor * ipcc_or_tier_2_factor
+    unit_end = unit_end * unit_factor * ipcc_or_tier_2_factor
 
     emissions_start = unit_start * ipcc_factor * emissions_factor
     emissions_end = unit_end * ipcc_factor * emissions_factor
