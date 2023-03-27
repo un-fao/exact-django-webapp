@@ -24,7 +24,7 @@ class CalculatorFactory():
             # Finds and instantiates the calculator class for the given module
             calculator: AbstractCalculator = getattr(sys.modules[__name__], calculator_name)(input)
             return calculator.calculate()
-        except AttributeError:
+        except AttributeError as e:
             raise Exception(f"Module '{input.__class__.__name__}' not (yet) supported.")
         except Exception as ex:
             raise ex
@@ -506,7 +506,7 @@ class AnnualCroppingCalculator(AbstractCalculator):
         land_use_type = self.data.land_use_type
         minor_land_use_type = self.data.minor_crop_type_t2
 
-        relative, relation = get_assessment_or_parent(input)
+        relative, relation = get_assessment_or_parent(self.data)
         is_parent = relation == 'parent'
 
         burning_emission_factor = BurningEmissionFactor.objects.get(category__name="Agricultural residues")
@@ -616,7 +616,7 @@ class PerennialCroppingCalculator(AbstractCalculator):
         moisture = project.moisture
         continent = project.continent
         land_use_type = self.data.land_use_type
-        parent, _ = get_assessment_or_parent(input)
+        parent, _ = get_assessment_or_parent(self.data)
 
         burning_emission_factor = BurningEmissionFactor.objects.get(category__name="Savanna and grassland")
         
@@ -626,7 +626,12 @@ class PerennialCroppingCalculator(AbstractCalculator):
         agb_max_c = PerennialMaxAGB.objects.get(climate=climate, land_use_type=land_use_type)
         bg_default = PerennialBGB.objects.get_or_default(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
 
-        flu = CroplandFLU.objects.get(climate=climate, moisture=moisture, land_use_type__name="Perennial/Tree Crop")
+        if parent:
+            # TODO: initial_land_use and final_land_use change based on what's initial and whats final. Differentiate in LUC_From | LUC_To
+            # NOTE: Maybe not? It's possible that the correct one is always final_land_use_type. Ask EX-ACT Team
+            flu = AfforestationFLU.objects.get(climate=climate, moisture=moisture, land_use_type=parent.final_land_use_type)
+        else:
+            flu = CroplandFLU.objects.get(climate=climate, moisture=moisture, land_use_type__name="Perennial/Tree Crop")
 
         fi = CroplandFI.objects.get(climate=climate, moisture=moisture, organic_input_type=self.data.organic_input_type)
         fmg = CroplandFMG.objects.get(climate=climate, moisture=moisture, tillage_management_type=self.data.tillage_management_type)
@@ -664,7 +669,7 @@ class PerennialCroppingCalculator(AbstractCalculator):
             fmg.value,
             self.data.tillage_factor_t2,
         ]
-        # BUG: Results for annual crops do not add up. Wait for Lorenzo's unlocked Excel files
+        # BUG: Results for perennial crops do not add up. Wait for Lorenzo's unlocked Excel files
         return [Result(*perennial_cropping.calculate_emissions(*inputs))]
 
 class GrasslandCalculator(AbstractCalculator):
@@ -683,7 +688,7 @@ class GrasslandCalculator(AbstractCalculator):
         cf = .77
         proj_soc = project.soc_ref.value
 
-        relative, relation = get_assessment_or_parent(input)
+        relative, relation = get_assessment_or_parent(self.data)
         is_parent = relation == 'parent'
 
         # NOTE: Default values at start are for 'Non-Degraded' land
