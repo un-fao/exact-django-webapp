@@ -505,4 +505,4 @@ class InputReference(Model):
     production_emissions_multiplier = FloatField(null=True, blank=True)
 
     def __str__(self):
-        return f"Input Reference {self.co2_multiplier} {self.co2_emissions_multiplier} {self.n2o_quantity_multiplier} {self.n2o_emissions_multiplier} {self.production_quantity_multiplier} {self.production_emissions_multiplier}"
+        return f"Input Reference for {self.input_type.name} and {self.gw_potential.name}"
