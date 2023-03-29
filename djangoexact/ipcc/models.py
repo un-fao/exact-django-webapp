@@ -513,8 +513,10 @@ class InputEmissionFactor(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     water_regime_type = ForeignKey("api.WaterRegimeType", on_delete=CASCADE, null=True, blank=True)
-    value = FloatField()
+    co2_value = FloatField(null=True, blank=True)
+    n2o_value = FloatField(null=True, blank=True)
+    co2_eq_value = FloatField(null=True, blank=True)
 
     def __str__(self):
-        return f"Input Emission Factor for {self.input_type.name} {self.climate.name} {self.moisture.name} {self.water_regime_type.name if self.water_regime_type else ''} value: {self.value}"
+        return f"Input Emission Factor for {self.input_type.name} {self.climate.name} {self.moisture.name} {self.water_regime_type.name if self.water_regime_type else ''} value: {self.co2_value} {self.n2o_value} {self.co2_eq_value}"
 
