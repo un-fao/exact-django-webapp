@@ -9,11 +9,11 @@ def input_single_calculation(unit_start, unit_end, rate_coefficient, ipcc_factor
             
         ipcc_or_tier_2_factor = tier_2_factor if tier_2_factor else ipcc_factor
 
-        unit_start = unit_start * unit_factor * ipcc_or_tier_2_factor
-        unit_end = unit_end * unit_factor * ipcc_or_tier_2_factor
+        unit_start = unit_start * unit_factor 
+        unit_end = unit_end * unit_factor 
 
-        emissions_start = unit_start * ipcc_factor * emissions_factor
-        emissions_end = unit_end * ipcc_factor * emissions_factor
+        emissions_start = unit_start * ipcc_or_tier_2_factor * emissions_factor
+        emissions_end = unit_end * ipcc_or_tier_2_factor * emissions_factor
 
         total_emissions = (min(emissions_start, emissions_end) * (time_cap + time_impl) + abs(emissions_end - emissions_start) * time_dependency(emissions_start, emissions_end, rate_coefficient, time_impl, time_cap))
 
