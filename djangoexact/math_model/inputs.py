@@ -22,15 +22,26 @@ def input_single_calculation(unit_start, unit_end, rate_coefficient, ipcc_factor
 def input_w_wo_calculation(unit_start, unit_w, unit_wo, rate_coefficient_w, rate_coefficient_wo, ipcc_factor_c2o, tier_2_factor_c2o, unit_factor_c2o, emissions_factor_c2o, time_impl, time_cap,
                            ipcc_factor_n2o, tier_2_factor_n2o, unit_factor_n2o, emissions_factor_n2o, ipcc_factor_co2_eq, tier_2_factor_co2_eq, unit_factor_eq, emissions_factor_eq):
     
-        
-    em_w_co2 = input_single_calculation(unit_start, unit_w, rate_coefficient_w, ipcc_factor_c2o, tier_2_factor_c2o, unit_factor_c2o, emissions_factor_c2o, time_impl, time_cap)
-    em_wo_co2 = input_single_calculation(unit_start, unit_wo, rate_coefficient_wo, ipcc_factor_c2o, tier_2_factor_c2o, unit_factor_c2o, emissions_factor_c2o, time_impl, time_cap)
+    if unit_factor_c2o is None or emissions_factor_c2o is None:
+        em_w_co2 = 0
+        em_wo_co2 = 0
+    else:
+        em_w_co2 = input_single_calculation(unit_start, unit_w, rate_coefficient_w, ipcc_factor_c2o, tier_2_factor_c2o, unit_factor_c2o, emissions_factor_c2o, time_impl, time_cap)
+        em_wo_co2 = input_single_calculation(unit_start, unit_wo, rate_coefficient_wo, ipcc_factor_c2o, tier_2_factor_c2o, unit_factor_c2o, emissions_factor_c2o, time_impl, time_cap)
 
-    em_w_n2o = input_single_calculation(unit_start, unit_w, rate_coefficient_w, ipcc_factor_n2o, tier_2_factor_n2o, unit_factor_n2o, emissions_factor_n2o, time_impl, time_cap)
-    em_wo_n2o = input_single_calculation(unit_start, unit_wo, rate_coefficient_wo, ipcc_factor_n2o, tier_2_factor_n2o, unit_factor_n2o, emissions_factor_n2o, time_impl, time_cap)
+    if unit_factor_n2o is None or emissions_factor_n2o is None:
+        em_w_n2o = 0
+        em_wo_n2o = 0
+    else:
+        em_w_n2o = input_single_calculation(unit_start, unit_w, rate_coefficient_w, ipcc_factor_n2o, tier_2_factor_n2o, unit_factor_n2o, emissions_factor_n2o, time_impl, time_cap)
+        em_wo_n2o = input_single_calculation(unit_start, unit_wo, rate_coefficient_wo, ipcc_factor_n2o, tier_2_factor_n2o, unit_factor_n2o, emissions_factor_n2o, time_impl, time_cap)
 
-    em_w_co2_eq = input_single_calculation(unit_start, unit_w, rate_coefficient_w, ipcc_factor_co2_eq, tier_2_factor_co2_eq, unit_factor_eq, emissions_factor_eq, time_impl, time_cap)
-    em_wo_co2_eq = input_single_calculation(unit_start, unit_wo, rate_coefficient_wo, ipcc_factor_co2_eq, tier_2_factor_co2_eq, unit_factor_eq, emissions_factor_eq, time_impl, time_cap)
+    if unit_factor_eq is None or emissions_factor_eq is None:
+        em_w_co2_eq = input_single_calculation(unit_start, unit_w, rate_coefficient_w, ipcc_factor_co2_eq, tier_2_factor_co2_eq, unit_factor_eq, emissions_factor_eq, time_impl, time_cap)
+        em_wo_co2_eq = input_single_calculation(unit_start, unit_wo, rate_coefficient_wo, ipcc_factor_co2_eq, tier_2_factor_co2_eq, unit_factor_eq, emissions_factor_eq, time_impl, time_cap)
+    else:
+        em_w_co2_eq = 0
+        em_wo_co2_eq = 0
 
     return [(em_w_co2, em_wo_co2, em_w_co2-em_wo_co2), (em_w_n2o, em_wo_n2o, em_w_n2o - em_wo_n2o), (em_w_co2_eq, em_wo_co2_eq, em_w_co2_eq - em_wo_co2_eq)]
 
