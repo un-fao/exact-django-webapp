@@ -1013,15 +1013,26 @@ class Aquaculture(Module):
 
     implementation_year_t2 = IntegerField(null=True, blank=True)
 
+
+class MacroInputType(Model):
+    name = CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return f"({self.id}) {self.name}"
+
 class InputType(Model):
+    macro_input_type = ForeignKey(MacroInputType, on_delete=CASCADE)
     name = CharField(max_length=255, unique=True)
     description = TextField(null=True, blank=True)
 
+    class Meta:
+        unique_together = ("macro_input_type", "name")
+
     def __str__(self):
-        return self.name
+        return f"({self.id}) {self.name}"
 
 class Input(Module):
-    type = ForeignKey(InputType, on_delete=CASCADE)
+    input_type = ForeignKey(InputType, on_delete=CASCADE, null=True, blank=True)
     value_start = FloatField(null=True, blank=True)
     value_w = FloatField(null=True, blank=True)
     value_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_value_w_rate")
