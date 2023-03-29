@@ -37,13 +37,13 @@ def input_w_wo_calculation(unit_start, unit_w, unit_wo, rate_coefficient_w, rate
         em_wo_n2o = input_single_calculation(unit_start, unit_wo, rate_coefficient_wo, ipcc_factor_n2o, tier_2_factor_n2o, unit_factor_n2o, emissions_factor_n2o, time_impl, time_cap)
 
     if unit_factor_eq is None or emissions_factor_eq is None:
-        em_w_co2_eq = input_single_calculation(unit_start, unit_w, rate_coefficient_w, ipcc_factor_co2_eq, tier_2_factor_co2_eq, unit_factor_eq, emissions_factor_eq, time_impl, time_cap)
-        em_wo_co2_eq = input_single_calculation(unit_start, unit_wo, rate_coefficient_wo, ipcc_factor_co2_eq, tier_2_factor_co2_eq, unit_factor_eq, emissions_factor_eq, time_impl, time_cap)
-    else:
         em_w_co2_eq = 0
         em_wo_co2_eq = 0
+    else:
+        em_w_co2_eq = input_single_calculation(unit_start, unit_w, rate_coefficient_w, ipcc_factor_co2_eq, tier_2_factor_co2_eq, unit_factor_eq, emissions_factor_eq, time_impl, time_cap)
+        em_wo_co2_eq = input_single_calculation(unit_start, unit_wo, rate_coefficient_wo, ipcc_factor_co2_eq, tier_2_factor_co2_eq, unit_factor_eq, emissions_factor_eq, time_impl, time_cap)
 
-    return [(em_w_co2, em_wo_co2, em_w_co2-em_wo_co2), (em_w_n2o, em_wo_n2o, em_w_n2o - em_wo_n2o), (em_w_co2_eq, em_wo_co2_eq, em_w_co2_eq - em_wo_co2_eq)]
+    return [(em_w_co2, em_wo_co2, em_w_co2-em_wo_co2), (em_w_n2o, em_wo_n2o, em_w_n2o - em_wo_n2o), (em_w_co2_eq, em_wo_co2_eq, em_w_co2_eq - em_wo_co2_eq), (em_w_co2 + em_w_n2o + em_w_co2_eq, em_wo_co2 + em_wo_n2o + em_wo_co2_eq, em_w_co2 + em_w_n2o + em_w_co2_eq - em_wo_co2 - em_wo_n2o - em_wo_co2_eq)]
 
 def new_irrigation_system(ef_ipcc, ef_tier_2, units_end):
      
@@ -96,6 +96,3 @@ def operational_irrigation(ef_default, ef_tier_2, total_dynamic_head_default, to
 
     return emissions_w, emissions_wo, emissions_w - emissions_wo
 
-
-    
-     
