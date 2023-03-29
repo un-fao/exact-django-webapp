@@ -1,7 +1,4 @@
-def input_w_wo_calculation(unit_start, unit_w, unit_wo, rate_coefficient_w, rate_coefficient_wo, ipcc_factor, tier_2_factor, unit_factor, emissions_factor, time_impl, time_cap):
-    
-    
-    def input_single_calculation(unit_start, unit_end, rate_coefficient, ipcc_factor, tier_2_factor, unit_factor, emissions_factor, time_impl, time_cap):
+def input_single_calculation(unit_start, unit_end, rate_coefficient, ipcc_factor, tier_2_factor, unit_factor, emissions_factor, time_impl, time_cap):
 
         def time_dependency(area_start, area, rate_coefficient, time_impl, time_cap):
 
@@ -22,7 +19,8 @@ def input_w_wo_calculation(unit_start, unit_w, unit_wo, rate_coefficient_w, rate
 
         return total_emissions
 
-    
+def input_w_wo_calculation(unit_start, unit_w, unit_wo, rate_coefficient_w, rate_coefficient_wo, ipcc_factor, tier_2_factor, unit_factor, emissions_factor, time_impl, time_cap):
+        
     em_w = input_single_calculation(unit_start, unit_w, rate_coefficient_w, ipcc_factor, tier_2_factor, unit_factor, emissions_factor, time_impl, time_cap)
     em_wo = input_single_calculation(unit_start, unit_wo, rate_coefficient_wo, ipcc_factor, tier_2_factor, unit_factor, emissions_factor, time_impl, time_cap)
 
