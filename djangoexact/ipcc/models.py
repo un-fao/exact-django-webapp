@@ -495,6 +495,7 @@ class CropYieldStats(Model):
     average = FloatField()
 
 class InputReference(Model):
+    # TODO: Maybe unify with InputEmissionFactor?
     gw_potential = ForeignKey(GlobalWarmingPotential, on_delete=CASCADE)
     input_type = ForeignKey("api.InputType", on_delete=CASCADE)
     co2_multiplier = FloatField(null=True, blank=True)
@@ -506,3 +507,14 @@ class InputReference(Model):
 
     def __str__(self):
         return f"Input Reference for {self.input_type.name} and {self.gw_potential.name}"
+
+class InputEmissionFactor(Model):
+    input_type = ForeignKey("api.InputType", on_delete=CASCADE)
+    climate = ForeignKey("api.Climate", on_delete=CASCADE)
+    moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
+    water_regime_type = ForeignKey("api.WaterRegimeType", on_delete=CASCADE, null=True, blank=True)
+    value = FloatField()
+
+    def __str__(self):
+        return f"Input Emission Factor for {self.input_type.name} {self.climate.name} {self.moisture.name} {self.water_regime_type.name if self.water_regime_type else ''} value: {self.value}"
+
