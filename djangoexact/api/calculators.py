@@ -1,5 +1,6 @@
-from .models import Deforestation, Afforestation, OtherLandUse, Project
+from .models import Deforestation, Afforestation, OtherLandUse, Project, Input
 from math_model import defo, affo, oluc, annuals, perennial_cropping, coastal_wetlands, grassland_management, fisheries_and_aquaculture, forest_management
+from math_model import inputs as math_inputs
 from ipcc.models import *
 from .utilities import *
 from abc import ABC, abstractmethod
@@ -1024,3 +1025,29 @@ class AquacultureCalculator(AbstractCalculator):
 
         return [Result(*fisheries_and_aquaculture.total_inland_coastal_aquaculture(*inputs))]
 
+class InputCalculator(AbstractCalculator):
+    """
+    Calculator for inputs.
+    """
+
+    def calculate(self) -> list[Result]:
+        project: Project = self.data.activity.project
+        input: Input = self.data
+
+        input_references = InputReference.objects.get(gw_potential=project.gw_potential, input_type=self.data.input_type)
+        water_regime_type = getattr(input, 'water_regime_type', None)
+        ef = InputEmissionFactor.objects.get(input_type=self.data.input_type, climate=project.climate, moisture=project.moisture, water_regime_type=water_regime_type)
+
+        inputs = [
+            input.value_start,
+            input.value_w,
+            input.value_w_rate.value,
+            ef.value,
+            input.co2_emissions_t2,
+            input_references.co2_multiplier,
+            input_references.co2_emissions_multiplier,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs
+        ]
+
+        return [Result(math_inputs.input_single_calculation(*inputs))]
