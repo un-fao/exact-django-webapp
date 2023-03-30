@@ -45,7 +45,7 @@ def input_w_wo_calculation(unit_start, unit_w, unit_wo, rate_coefficient_w, rate
 
     return [(em_w_co2, em_wo_co2, em_w_co2-em_wo_co2), (em_w_n2o, em_wo_n2o, em_w_n2o - em_wo_n2o), (em_w_co2_eq, em_wo_co2_eq, em_w_co2_eq - em_wo_co2_eq), (em_w_co2 + em_w_n2o + em_w_co2_eq, em_wo_co2 + em_wo_n2o + em_wo_co2_eq, em_w_co2 + em_w_n2o + em_w_co2_eq - em_wo_co2 - em_wo_n2o - em_wo_co2_eq)]
 
-def irrigation_system_w_wo_calculation(ef_ipcc, ef_tier_2, units_w, units_wo):
+def new_irrigation_system(ef_ipcc, ef_tier_2, units_w, units_wo,):
      
     def irrigation_system_evaluation(ef_ipcc, ef_tier_2, units_end):
      
@@ -64,7 +64,27 @@ def irrigation_system_w_wo_calculation(ef_ipcc, ef_tier_2, units_w, units_wo):
 
     return em_w, em_wo, em_w - em_wo
 
-def general_w_wo_calculation(unit_start, unit_w, unit_wo, rate_coefficient_w, rate_coefficient_wo, ipcc_factor, tier_2_factor, unit_factor, emissions_factor, time_impl, time_cap):
+def roads(ef_ipcc, ef_tier_2, units_w, units_wo,):
+     
+    def irrigation_system_evaluation(ef_ipcc, ef_tier_2, units_end):
+     
+        """
+        ef_ipcc: taken from EnergyDB A8-B16
+        """
+        
+        ef = ef_ipcc if ef_ipcc else ef_tier_2
+
+        annual_emissions = units_end * ef / 1000
+
+        return annual_emissions
+     
+    em_w = irrigation_system_evaluation(ef_ipcc, ef_tier_2, units_w/1000) # 1000 is the conversion factor from kg to g
+    em_wo = irrigation_system_evaluation(ef_ipcc, ef_tier_2, units_wo/1000) # 1000 is the conversion factor from kg to g
+
+    return em_w, em_wo, em_w - em_wo
+
+def single_w_wo_calculation(unit_start, unit_w, unit_wo, rate_coefficient_w, rate_coefficient_wo, ipcc_factor, tier_2_factor, unit_factor, emissions_factor, 
+                             time_impl, time_cap):
 
     em_w = input_single_calculation(unit_start, unit_w, rate_coefficient_w, ipcc_factor, tier_2_factor, unit_factor, emissions_factor, time_impl, time_cap)
     em_wo = input_single_calculation(unit_start, unit_wo, rate_coefficient_wo, ipcc_factor, tier_2_factor, unit_factor, emissions_factor, time_impl, time_cap)
