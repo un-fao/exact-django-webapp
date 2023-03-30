@@ -141,7 +141,6 @@ def middle_if_other(time_tot, time_impl, rate_of_change_soil, rate_type):
         else: 
             return min(20, time_impl) * rate_of_change_soil + time_tot - min(20, time_impl) - outer_if_other(rate_type, time_tot, time_impl)
 
-
 def outer_if_other(rate_type, time_tot, time_impl):
 
     if rate_type == "E":
@@ -149,7 +148,8 @@ def outer_if_other(rate_type, time_tot, time_impl):
     else:
         return pow(time_tot - 20, 2) * (0.5/time_impl)
 
-
 ao = GHG_emissions(150, 10, 88, 25, 5, 'D', 0.5, 4.7, None, 265.0, 28.0, True, 0.26, 4.7, 0.45, 0.005, 2.9, None, 36.8, None, 12.0, 0.47, None, None, 0.77, 180.0, 0.22, 15, None, 20, None)
 
 print(ao)
+
+
