@@ -1021,7 +1021,7 @@ class MacroInputType(Model):
         return f"({self.id}) {self.name}"
 
 class InputType(Model):
-    macro_input_type = ForeignKey(MacroInputType, on_delete=CASCADE)
+    macro_input_type = ForeignKey(MacroInputType, on_delete=CASCADE, null=True, blank=True)
     name = CharField(max_length=255, unique=True)
     description = TextField(null=True, blank=True)
 
@@ -1045,3 +1045,16 @@ class Input(Module):
 
     implementation_year_t2 = IntegerField(null=True, blank=True)
 
+
+class BuildingType(Model):
+    name = CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return f"({self.id}) {self.name}"
+class Building(Module):
+    input_type = ForeignKey(InputType, on_delete=CASCADE, default=InputType.objects.get(name="Buildings And Roads").pk)
+    building_type = ForeignKey(BuildingType, on_delete=CASCADE)
+    surface_w = FloatField(null=True, blank=True)
+    surface_wo = FloatField(null=True, blank=True)
+
+    t_co2_m2_t2 = FloatField(null=True, blank=True)
