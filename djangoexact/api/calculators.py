@@ -1,4 +1,4 @@
-from .models import Deforestation, Afforestation, OtherLandUse, Project, Input
+from .models import Deforestation, Afforestation, OtherLandUse, Project, Input, Building
 from math_model import defo, affo, oluc, annuals, perennial_cropping, coastal_wetlands, grassland_management, fisheries_and_aquaculture, forest_management
 from math_model import inputs as math_inputs
 from ipcc.models import *
@@ -1063,3 +1063,26 @@ class InputCalculator(AbstractCalculator):
         results = [Result(*result) for result in math_inputs.input_w_wo_calculation(*inputs)]
         
         return results
+    
+class BuildingCalculator(AbstractCalculator):
+    """
+    Calculator for buildings and roads.
+    """
+
+    def calculate(self) -> list[Result]:
+        """
+        Calculate emissions for a single Building module.
+        """
+
+        input: Building = self.data
+
+        ef: BuildingEmissionFactor = BuildingEmissionFactor.objects.get(building_type=input.building_type)
+
+        inputs = [
+            ef.kg_co2_m2,
+            input.t_co2_m2_t2,
+            input.surface_w,
+            input.surface_wo
+        ]
+
+        return [Result(*math_inputs.roads(*inputs))]
