@@ -520,3 +520,6 @@ class InputEmissionFactor(Model):
     def __str__(self):
         return f"Input Emission Factor for {self.input_type.name} {self.climate.name} {self.moisture.name} {self.water_regime_type.name if self.water_regime_type else ''} value: {self.co2_value} {self.n2o_value} {self.co2_eq_value}"
 
+class BuildingEmissionFactor(Model):
+    building_type = ForeignKey("api.BuildingType", on_delete=CASCADE)
+    kg_co2_m2 = FloatField(null=True, blank=True)
