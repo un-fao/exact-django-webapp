@@ -90,8 +90,14 @@ def evaluate_factor(kg_head_year, ef_ppr, percentage_ppr_ipcc, percentage_ppr_en
 # meth_manure = methane_manure_management(20, 9, 0.5, 28, 500, 15, None, 3, 5, 0, 0, 0.59, 0.45, 0, 0  )
 # print(meth_manure)
 
-def methane_manure_management(ch4head, ef_prp, ef_system, tam, vser, percentage_prp, percentage_system ):
+# CHECK WITH LORENZO
+def methane_manure_management(ch4head, ef_prp, ef_system, tam, vser, percentage_prp, percentage_system):
 
     ch4headprp = ef_prp * tam * vser * 365 * percentage_prp
     ch4headcomp = ef_system * tam * vser * 365 * percentage_system
     ch4head = ch4headprp + ch4headcomp if not ch4head else ch4head
+
+    return ch4head
+
+meth_manure = methane_manure_management(20, 9, 0.5, 28, 500, 15, None, 3, 5, 0, 0, 0.59, 0.45, 0, 0  )
+print(meth_manure)
