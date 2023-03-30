@@ -66,7 +66,7 @@ def new_irrigation_system(ef_ipcc, ef_tier_2, units_w, units_wo,):
 
 def roads(ef_ipcc:float, ef_tier_2, units_w, units_wo):
      
-    def irrigation_system_evaluation(ef_ipcc, ef_tier_2, units_end):
+    def roads_evaluation(ef_ipcc, ef_tier_2, units_end):
      
         """
         ef_ipcc: taken from EnergyDB A27-B45
@@ -74,12 +74,12 @@ def roads(ef_ipcc:float, ef_tier_2, units_w, units_wo):
         
         ef = ef_ipcc if ef_ipcc else ef_tier_2
 
-        annual_emissions = units_end * ef / 1000
+        annual_emissions = units_end * ef / 1000 # to convert the ef from kg to g
 
         return annual_emissions
      
-    em_w = irrigation_system_evaluation(ef_ipcc, ef_tier_2, units_w/1000) # 1000 is the conversion factor from kg to g
-    em_wo = irrigation_system_evaluation(ef_ipcc, ef_tier_2, units_wo/1000) # 1000 is the conversion factor from kg to g
+    em_w = roads_evaluation(ef_ipcc, ef_tier_2, units_w) # 1000 is the conversion factor from kg to g
+    em_wo = roads_evaluation(ef_ipcc, ef_tier_2, units_wo) # 1000 is the conversion factor from kg to g
 
     return em_w, em_wo, em_w - em_wo
 
