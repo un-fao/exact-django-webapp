@@ -1041,13 +1041,25 @@ class InputCalculator(AbstractCalculator):
         inputs = [
             input.value_start,
             input.value_w,
+            input.value_wo,
             input.value_w_rate.value,
-            ef.value,
+            input.value_wo_rate.value,
+            ef.co2_value,
             input.co2_emissions_t2,
             input_references.co2_multiplier,
             input_references.co2_emissions_multiplier,
             project.implementation_duration_yrs,
-            project.capitalization_duration_yrs
+            project.capitalization_duration_yrs,
+            ef.n2o_value,
+            input.n2o_emissions_t2,
+            input_references.n2o_quantity_multiplier,
+            input_references.n2o_emissions_multiplier,
+            ef.co2_eq_value,
+            input.co2_e_emissions_t2,
+            input_references.production_quantity_multiplier,
+            input_references.production_emissions_multiplier
         ]
 
-        return [Result(math_inputs.input_single_calculation(*inputs))]
+        results = [Result(*result) for result in math_inputs.input_w_wo_calculation(*inputs)]
+        
+        return results
