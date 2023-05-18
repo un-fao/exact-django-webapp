@@ -5,7 +5,6 @@ django-environ
 django-extensions
 drf-spectacular
 drf-yasg
-gunicorn
 numpy
 openapi-codec
 pip-chill
