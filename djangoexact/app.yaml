@@ -1,4 +1,4 @@
-runtime: python311
+runtime: python310
 service: $SERVICE_NAME
 instance_class: F2
 
