@@ -246,6 +246,8 @@ class ExtractionCalculator(AbstractCalculator):
 
         drainage_result = Result(*coastal_wetlands.drainage_w_wo(*drainage_inputs))
 
+        return [extraction_result, drainage_result]
+
 class CoastalWaterbodyCalculator(AbstractCalculator):
     """
     Calculator for coastal waterbody modules.
