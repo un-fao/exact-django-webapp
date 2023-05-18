@@ -1,4 +1,4 @@
-from .models import Deforestation, Afforestation, OtherLandUse, Project, Input, Building
+from .models import Deforestation, Afforestation, OtherLandUse, Project, Input, Building, Livestock
 from math_model import defo, affo, oluc, annuals, perennial_cropping, coastal_wetlands, grassland_management, fisheries_and_aquaculture, forest_management
 from math_model import inputs as math_inputs
 from ipcc.models import *
@@ -23,14 +23,14 @@ class CalculatorFactory():
         try:
             calculator_name = input.__class__.__name__+"Calculator"
             # Finds and instantiates the calculator class for the given module
-            calculator: AbstractCalculator = getattr(sys.modules[__name__], calculator_name)(input)
+            calculator: BaseCalculator = getattr(sys.modules[__name__], calculator_name)(input)
             return calculator.calculate()
         except AttributeError as e:
             raise Exception(f"Module '{input.__class__.__name__}' not (yet) supported.")
         except Exception as ex:
             raise ex
 
-class AbstractCalculator(ABC):
+class BaseCalculator(ABC):
     """
     Abstract base class for all calculators.
     """
@@ -50,7 +50,7 @@ class AbstractCalculator(ABC):
         """
         pass
 
-class DeforestationCalculator(AbstractCalculator):
+class DeforestationCalculator(BaseCalculator):
     """
     Calculator for deforestation modules.
     """
@@ -130,7 +130,7 @@ class DeforestationCalculator(AbstractCalculator):
 
         return [Result(*defo.GHG_emissions(*inputs))]
 
-class ExtractionCalculator(AbstractCalculator):
+class ExtractionCalculator(BaseCalculator):
     """
     Calculator for extraction modules.
     """
@@ -248,7 +248,7 @@ class ExtractionCalculator(AbstractCalculator):
 
         return [extraction_result, drainage_result]
 
-class CoastalWaterbodyCalculator(AbstractCalculator):
+class CoastalWaterbodyCalculator(BaseCalculator):
     """
     Calculator for coastal waterbody modules.
     """
@@ -281,7 +281,7 @@ class CoastalWaterbodyCalculator(AbstractCalculator):
 
         return [Result(*coastal_wetlands.coastal_waterbodies_w_wo(*inputs))]
 
-class RewettingCalculator(AbstractCalculator):
+class RewettingCalculator(BaseCalculator):
     """
     Calculator for rewetting modules.
     """
@@ -337,7 +337,7 @@ class RewettingCalculator(AbstractCalculator):
 
         return [Result(*coastal_wetlands.rewetting_w_wo(*inputs))]
 
-class AfforestationCalculator(AbstractCalculator):
+class AfforestationCalculator(BaseCalculator):
     """
     Calculator for afforestation modules.
     """
@@ -419,7 +419,7 @@ class AfforestationCalculator(AbstractCalculator):
         
         return [Result(*affo.afforestation(*inputs))]
 
-class OtherLandUseCalculator(AbstractCalculator):
+class OtherLandUseCalculator(BaseCalculator):
     """
     Calculator for other land use modules.
     """
@@ -493,7 +493,7 @@ class OtherLandUseCalculator(AbstractCalculator):
         
         return [Result(*oluc.calculate_w_wo_balance(*inputs))]
 
-class AnnualCroppingCalculator(AbstractCalculator):
+class AnnualCroppingCalculator(BaseCalculator):
     """
     Calculator for annual cropping modules.
     """
@@ -604,7 +604,7 @@ class AnnualCroppingCalculator(AbstractCalculator):
 
         return [Result(*annuals.calculate_emissions(*inputs))]
 
-class PerennialCroppingCalculator(AbstractCalculator):
+class PerennialCroppingCalculator(BaseCalculator):
     """
     Calculator for perennial cropping.
     """
@@ -675,7 +675,7 @@ class PerennialCroppingCalculator(AbstractCalculator):
         # BUG: Results for perennial crops do not add up. Wait for Lorenzo's unlocked Excel files
         return [Result(*perennial_cropping.calculate_emissions(*inputs))]
 
-class GrasslandCalculator(AbstractCalculator):
+class GrasslandCalculator(BaseCalculator):
     """
     Calculator for grassland.
     """
@@ -757,7 +757,7 @@ class GrasslandCalculator(AbstractCalculator):
 
         return [Result(*grassland_management.calculate_total_emissions(*inputs))]
 
-class SmallFisheryCalculator(AbstractCalculator):
+class SmallFisheryCalculator(BaseCalculator):
     """
     Calculator for small fishery.
     """
@@ -825,7 +825,7 @@ class SmallFisheryCalculator(AbstractCalculator):
 
         return [Result(*fisheries_and_aquaculture.total_emissions_small_or_large_fisheries(*inputs))]
 
-class LargeFisheryCalculator(AbstractCalculator):
+class LargeFisheryCalculator(BaseCalculator):
     """
     Calculator for large fishery.
     """
@@ -895,7 +895,7 @@ class LargeFisheryCalculator(AbstractCalculator):
 
         return [Result(*fisheries_and_aquaculture.total_emissions_small_or_large_fisheries(*inputs))]
 
-class ForestCalculator(AbstractCalculator):
+class ForestCalculator(BaseCalculator):
     """
     Calculator for forest.
     """
@@ -993,7 +993,7 @@ class ForestCalculator(AbstractCalculator):
 
         return [Result(*forest_management.calculate_emissions(*inputs))]
 
-class AquacultureCalculator(AbstractCalculator):
+class AquacultureCalculator(BaseCalculator):
     """
     Calculator for aquaculture.
     """
@@ -1027,7 +1027,7 @@ class AquacultureCalculator(AbstractCalculator):
 
         return [Result(*fisheries_and_aquaculture.total_inland_coastal_aquaculture(*inputs))]
 
-class InputCalculator(AbstractCalculator):
+class InputCalculator(BaseCalculator):
     """
     Calculator for inputs.
     """
@@ -1066,7 +1066,7 @@ class InputCalculator(AbstractCalculator):
         
         return results
     
-class BuildingCalculator(AbstractCalculator):
+class BuildingCalculator(BaseCalculator):
     """
     Calculator for buildings and roads.
     """
@@ -1088,3 +1088,20 @@ class BuildingCalculator(AbstractCalculator):
         ]
 
         return [Result(*math_inputs.roads(*inputs))]
+    
+class LivestockCalculator(BaseCalculator):
+    """
+    Calculator for livestock
+    """
+
+    def calculate(self) -> list[Result]:
+        """
+        Calculate emissions for a single Livestock module.
+        """
+
+        project: Project = self.data.activity.project
+        input: Livestock = self.data
+
+        # TODO: implement calculations
+
+        
