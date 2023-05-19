@@ -37,7 +37,31 @@ def emissions_calculation(tam: float, vser: float, ef_prp_methane: float, percen
 
     return em_w, em_wo, em_w - em_wo
 
+def methane_enteric_fermentation_emissions(time_impl, time_cap, rate_coefficient_w, rate_coefficient_wo, methane_constant, head_number_start, head_number_w, head_number_wo, specific_factor_default, specific_factor_start_tier_2, specific_factor_w_tier_2, specific_factor_wo_tier_2):
+    
+    def methane_enteric_fermentation(time_impl, time_cap, rate_coefficient, methane_constant, head_number_start, head_number_end, specific_factor_default, specific_factor_start_tier_2, specific_factor_end_tier_2):
 
+        # this function is the same as flooded rice ch4 calculation, that's why it says area
+        def time_dependency(area_start, area, rate_coefficient, time_impl, time_cap):
+            if area > area_start:
+                return time_cap + time_impl * rate_coefficient
+            else:
+                return time_impl * (1 - rate_coefficient)
+
+        specific_factor_start = specific_factor_default if not specific_factor_start_tier_2 else specific_factor_start_tier_2
+        specific_factor_end = specific_factor_default if not specific_factor_end_tier_2 else specific_factor_end_tier_2
+
+        emissions_start = specific_factor_start / 1000 * methane_constant * head_number_start
+        emissions_end = specific_factor_end / 1000 * methane_constant * head_number_end
+
+        total_emissions = (min(emissions_start, emissions_end) * (time_cap + time_impl) + abs(emissions_end - emissions_start) * time_dependency(emissions_start, emissions_end, rate_coefficient, time_impl, time_cap))
+        
+        return total_emissions
+    
+    em_w = methane_enteric_fermentation(time_impl, time_cap, rate_coefficient_w, methane_constant, head_number_start, head_number_w, specific_factor_default, specific_factor_start_tier_2, specific_factor_w_tier_2)
+    em_wo = methane_enteric_fermentation(time_impl, time_cap, rate_coefficient_wo, methane_constant, head_number_start, head_number_wo, specific_factor_default, specific_factor_start_tier_2, specific_factor_wo_tier_2)
+
+    return em_w, em_wo, em_w - em_wo
 
 # ef_prp = 0.6
 # ef_system = [8, 3.2, 16.1]
