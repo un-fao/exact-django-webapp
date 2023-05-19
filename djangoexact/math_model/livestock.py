@@ -1,103 +1,55 @@
+def emissions_calculation(tam: float, vser: float, ef_prp_methane: float, percentage_prp_default: float, percentage_prp_tier_2_start: float, percentage_prp_tier_2_w: float, percentage_prp_tier_2_wo: float,
+                          ef_system_methane: list, ch4_prp_tier_2_start: float, ch4_prp_tier_2_w: float, ch4_prp_tier_2_wo: float, n_heads_start: int, n_heads_w: int, n_heads_wo:int, methane_constant: float,
+                          rate_w:float, rate_wo:float, time_impl: float, time_cap: float):
+
+    def time_component(start, end, time_impl, time_cap, rate_coefficient):
+            if end > start:
+                return time_cap + time_impl * rate_coefficient
+            else:
+                return time_impl * (1 - rate_coefficient)
+
+    def inital_w_wo_calculation(tam: float, vser: float, ef_prp: float, percentage_prp_default: float, percentage_prp_tier_2: float, ef_system: list, ch4_prp_tier_2: float, n_heads: int, emission_constant: float):
+        
+        def ch4_head_calculation(tam: float, vser: float, ef_prp: float, percentage_prp_default: float, percentage_prp_tier_2: float, ef_system: list, ch4_prp_tier_2: float):
+
+            if not percentage_prp_tier_2:
+                ch4_system = [i * (tam/1000) * (vser/1000) * 365 * j/100 for (i,j) in zip(ef_system, percentage_system_default)]
+            else: 
+                # this recalculates percentages in the system as a function of percentage prp tier 2
+                ch4_system = [i * (tam/1000) * (vser/1000) * 365 * j/100 * ((1-percentage_prp_tier_2/100)/(1-percentage_prp_default/100)) for (i,j) in zip(ef_system, percentage_system_default)]
+            
+            percentage_prp = percentage_prp_default if not percentage_prp_tier_2 else percentage_prp_tier_2
+            ch4_prp = ef_prp * (tam/1000) * (vser/1000) * 365 * percentage_prp/100 if not ch4_prp_tier_2 else ch4_prp_tier_2 if not ch4_prp_tier_2 else ch4_prp_tier_2 * percentage_prp/100
+
+            ch4_head = sum(ch4_system) + ch4_prp
+            return ch4_head
+        
+        ch4_head = ch4_head_calculation(tam, vser, ef_prp, percentage_prp_default, percentage_prp_tier_2, ef_system, ch4_prp_tier_2)
+
+        return ch4_head * n_heads / 1000 * emission_constant
+
+    annual_start = inital_w_wo_calculation(tam, vser, ef_prp_methane, percentage_prp_default, percentage_prp_tier_2_start, ef_system_methane, ch4_prp_tier_2_start, n_heads_start, methane_constant)
+    annual_w = inital_w_wo_calculation(tam, vser, ef_prp_methane, percentage_prp_default, percentage_prp_tier_2_w, ef_system_methane, ch4_prp_tier_2_w, n_heads_w, methane_constant)
+    annual_wo = inital_w_wo_calculation(tam, vser, ef_prp_methane, percentage_prp_default, percentage_prp_tier_2_wo, ef_system_methane, ch4_prp_tier_2_wo, n_heads_wo, methane_constant)
+
+    em_w = min(annual_start, annual_w) * (time_impl + time_cap) + abs(annual_w - annual_start) * time_component(annual_start, annual_w, time_impl, time_cap, rate_w)
+    em_wo = min(annual_start, annual_wo) * (time_impl + time_cap) + abs(annual_wo - annual_start) * time_component(annual_start, annual_wo, time_impl, time_cap, rate_wo)
+
+    return em_w, em_wo, em_w - em_wo
 
 
 
-def methane_enteric_fermentation(time_impl, time_cap, rate_coefficient, methane_constant, head_number_start, head_number_end, specific_factor_default, specific_factor_start_tier_2, specific_factor_end_tier_2):
+# ef_prp = 0.6
+# ef_system = [8, 3.2, 16.1]
+# percentage_system_default = [20, 29, 6] # solid storage, dry lot, burned for fuel
+# tam = 250
+# vser = 21.7
+# percentage_prp_default = 45
+# percentage_prp_tier_2 = None
+# ch4_prp_tier_2 = None
+# n_heads = 500
+# emission_constant = 28
 
-    # this function is the same as flooded rice ch4 calculation, that's why it says area
-    def time_dependency(area_start, area, rate_coefficient, time_impl, time_cap):
-        if area > area_start:
-            return time_cap + time_impl * rate_coefficient
-        else:
-            return time_impl * (1 - rate_coefficient)
+# ao = emissions_calculation(tam, vser, ef_prp, percentage_prp_default, None, None, None, ef_system, None, None, None, 500, 100, 250, emission_constant, 0.5, 0.5, 20, 5 )
 
-    specific_factor_start = specific_factor_default if not specific_factor_start_tier_2 else specific_factor_start_tier_2
-    specific_factor_end = specific_factor_default if not specific_factor_end_tier_2 else specific_factor_end_tier_2
-
-    emissions_start = specific_factor_start / 1000 * methane_constant * head_number_start
-    emissions_end = specific_factor_end / 1000 * methane_constant * head_number_end
-
-    total_emissions = (min(emissions_start, emissions_end) * (time_cap + time_impl) + abs(emissions_end - emissions_start) * time_dependency(emissions_start, emissions_end, rate_coefficient, time_impl, time_cap))
-    
-    return total_emissions
-
-def methane_manure_management(time_impl, time_cap, rate_coefficient, methane_constant, head_number_start, head_number_end, ostrich_or_deer_factor, kg_head_year_start, kg_head_year_end, ef_ppr, percentage_ppr_ipcc, percentage_ppr_start, percentage_ppr_end, ef_comp, ef_reg_share):
-
-    def time_dependency(area_start, area, rate_coefficient, time_impl, time_cap):
-        if area > area_start:
-            return time_cap + time_impl * rate_coefficient
-        else:
-            return time_impl * (1 - rate_coefficient)
-
-
-    """
-    ostrich_or_deer_factor = 0.22 if 'Deer' else 5.67 if 'Ostrich' else None
-    """
-
-    factor_ipcc_start = evaluate_factor(kg_head_year_start, ef_ppr, percentage_ppr_ipcc, percentage_ppr_start, ef_comp, ef_reg_share)
-    factor_ipcc_end = evaluate_factor(kg_head_year_end, ef_ppr, percentage_ppr_ipcc, percentage_ppr_end, ef_comp, ef_reg_share)
-
-    factor_start = ostrich_or_deer_factor if ostrich_or_deer_factor else factor_ipcc_start
-    factor_end = ostrich_or_deer_factor if ostrich_or_deer_factor else factor_ipcc_end
-
-    emissions_start = factor_start / 1000 * methane_constant * head_number_start
-    emissions_end = factor_end / 1000 * methane_constant * head_number_end
-
-    total_emissions = (min(emissions_start, emissions_end) * (time_cap + time_impl) + abs(emissions_end - emissions_start) * time_dependency(emissions_start, emissions_end, rate_coefficient, time_impl, time_cap))
-    
-    return total_emissions
-
-def methane_manure_management(time_impl, time_cap, rate_coefficient, methane_constant, head_number_start, head_number_end, ostrich_or_deer_factor, kg_head_year_start, kg_head_year_end, ef_ppr, percentage_ppr_ipcc, percentage_ppr_start, percentage_ppr_end, ef_comp, ef_reg_share):
-
-    def time_dependency(area_start, area, rate_coefficient, time_impl, time_cap):
-        if area > area_start:
-            return time_cap + time_impl * rate_coefficient
-        else:
-            return time_impl * (1 - rate_coefficient)
-
-
-    """
-    ostrich_or_deer_factor = 0.22 if 'Deer' else 5.67 if 'Ostrich' else None
-    """
-
-    factor_ipcc_start = evaluate_factor(kg_head_year_start, ef_ppr, percentage_ppr_ipcc, percentage_ppr_start, ef_comp, ef_reg_share)
-    factor_ipcc_end = evaluate_factor(kg_head_year_end, ef_ppr, percentage_ppr_ipcc, percentage_ppr_end, ef_comp, ef_reg_share)
-
-    factor_start = ostrich_or_deer_factor if ostrich_or_deer_factor else factor_ipcc_start
-    factor_end = ostrich_or_deer_factor if ostrich_or_deer_factor else factor_ipcc_end
-
-    emissions_start = factor_start / 1000 * methane_constant * head_number_start
-    emissions_end = factor_end / 1000 * methane_constant * head_number_end
-
-    total_emissions = (min(emissions_start, emissions_end) * (time_cap + time_impl) + abs(emissions_end - emissions_start) * time_dependency(emissions_start, emissions_end, rate_coefficient, time_impl, time_cap))
-    
-    return total_emissions
-
-def evaluate_factor(kg_head_year, ef_ppr, percentage_ppr_ipcc, percentage_ppr_end, ef_comp, ef_reg_share):
-
-    if kg_head_year:
-        return kg_head_year * percentage_ppr_end + ef_comp * (1 - percentage_ppr_end) + ef_reg_share * (1 - percentage_ppr_end)
-    else:
-        return ef_ppr / percentage_ppr_ipcc * percentage_ppr_end + ef_comp * (1 - percentage_ppr_end) + ef_reg_share / (1 - percentage_ppr_ipcc) * (1 - percentage_ppr_end)  
-
-
-
-# methane_wo = methane_enteric_fermentation(20, 9, 0.5, 28, 500, 15, 81, None, None)
-
-# print(methane_wo)
-
-# fac = evaluate_factor(6, 0, 0, 0.35, 0, 0)
-
-# meth_manure = methane_manure_management(20, 9, 0.5, 28, 500, 15, None, 3, 5, 0, 0, 0.59, 0.45, 0, 0  )
-# print(meth_manure)
-
-# CHECK WITH LORENZO
-def methane_manure_management(ch4head, ef_prp, ef_system, tam, vser, percentage_prp, percentage_system):
-
-    ch4headprp = ef_prp * tam * vser * 365 * percentage_prp
-    ch4headcomp = ef_system * tam * vser * 365 * percentage_system
-    ch4head = ch4headprp + ch4headcomp if not ch4head else ch4head
-
-    return ch4head
-
-meth_manure = methane_manure_management(20, 9, 0.5, 28, 500, 15, None, 3, 5, 0, 0, 0.59, 0.45, 0, 0  )
-print(meth_manure)
+# print(ao)
