@@ -207,7 +207,7 @@ def generic_module_viewset(model: Model):
             try:
                 # TODO: Implement defaults
                 # module_defaults = get_defaults(module)
-                return Response({"details": "Not implemented yet."})
+                return ErrorResponse("Not implemented", status=status.HTTP_501_NOT_IMPLEMENTED)
             except Exception as e:
                 return ErrorResponse(str(e))
 
