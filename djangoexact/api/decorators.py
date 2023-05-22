@@ -7,7 +7,7 @@ def can_access(resource: str):
         @wraps(func)
         def wrapper(request, *args, **kwargs):
             if not request.user.is_authenticated:
-                return HttpResponseForbidden("You don't have permission to access this resource")
+                return HttpResponseForbidden("User is not authenticated")
 
             can_access = False
 
@@ -24,10 +24,9 @@ def can_access(resource: str):
                 case _:
                     raise Exception(f"Invalid resource in @can_access decorator: {resource}")
 
-            if not can_access:
-                return HttpResponseForbidden("You don't have permission to access this resource")
+            if can_access:
+                return func(request, *args, **kwargs)
             
-            return func(request, *args, **kwargs)
-            
+            return HttpResponseForbidden("You don't have permission to access this resource")
         return wrapper
     return decorator_func
