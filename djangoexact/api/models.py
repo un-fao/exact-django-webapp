@@ -281,6 +281,7 @@ class Project(Model):
     implementation_duration_yrs = FloatField()
     capitalization_duration_yrs = FloatField()
 
+    # TODO: Rename continent to region
     continent = ForeignKey(Continent, on_delete=CASCADE)
     country = ForeignKey(Country, on_delete=CASCADE)
     climate = ForeignKey(Climate, on_delete=CASCADE)
@@ -300,7 +301,7 @@ class Project(Model):
 ##############################
 
 class Activity(Model):
-    project = ForeignKey(Project, on_delete=CASCADE)
+    project = ForeignKey(Project, on_delete=CASCADE, related_name="activities")
     name = CharField(max_length=255)
     description = TextField(null=True, blank=True)
     user = ForeignKey(User, on_delete=CASCADE)
@@ -315,7 +316,7 @@ class Activity(Model):
 ##############################
 
 class Module(Model):
-    activity = ForeignKey(Activity, on_delete=CASCADE)
+    activity = ForeignKey(Activity, on_delete=CASCADE, related_name="%(class)s")
     notes = TextField(null=True, blank=True)
 
     created_at = DateTimeField(auto_now_add=True, null=True)
