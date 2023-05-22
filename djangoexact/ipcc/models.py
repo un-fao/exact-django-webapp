@@ -523,3 +523,79 @@ class InputEmissionFactor(Model):
 class BuildingEmissionFactor(Model):
     building_type = ForeignKey("api.BuildingType", on_delete=CASCADE)
     kg_co2_m2 = FloatField(null=True, blank=True)
+
+class LivestockEntericEF(Model):
+    '''
+        IPCC 2262:2313
+    '''
+    production_type = ForeignKey("api.LivestockProductionType", on_delete=CASCADE)
+    livestock_category = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
+    region = ForeignKey("api.Continent", on_delete=CASCADE)
+    value = FloatField()
+
+class EmissionType(Model):
+    name = CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+    
+class LivestockManureEF(Model):
+    '''
+        IPCC 2706:3010
+    '''
+    emission_type = ForeignKey(EmissionType, on_delete=CASCADE)
+    livestock_category = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
+    climate = ForeignKey("api.Climate", on_delete=CASCADE)
+    moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
+    manure_management_type = ForeignKey("api.ManureManagementType", on_delete=CASCADE)
+    value = FloatField(null=True, blank=True)
+
+    def __str__(self):
+        return f"({self.id}) {self.emission_type.name} {self.livestock_category.name} {self.climate.name} {self.moisture.name} {self.manure_management_type.name} {self.value}"
+
+class LivestockTAM(Model):
+    '''
+        IPCC 2315:2364
+    '''
+    emission_type = ForeignKey(EmissionType, on_delete=CASCADE, null=True, blank=True)
+    production_type = ForeignKey("api.LivestockProductionType", on_delete=CASCADE)
+    livestock_category = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
+    region = ForeignKey("api.Continent", on_delete=CASCADE)
+    value = FloatField()
+
+class LivestockVSER(Model):
+    '''
+        IPCC 2366:2415
+    '''
+    emission_type = ForeignKey(EmissionType, on_delete=CASCADE, null=True, blank=True)
+    production_type = ForeignKey("api.LivestockProductionType", on_delete=CASCADE)
+    livestock_category = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
+    region = ForeignKey("api.Continent", on_delete=CASCADE)
+    value = FloatField()
+
+    @staticmethod
+    def get_average_value(emission_type, production_type, livestock_category, region):
+        values = LivestockVSER.objects.filter(emission_type=emission_type, production_type=production_type, livestock_category=livestock_category, region=region).values_list('value', flat=True)
+        return sum(values) / len(values)
+
+class LivestockNER(Model):
+    '''
+        IPCC 3012:3061
+    '''
+    emission_type = ForeignKey(EmissionType, on_delete=CASCADE)
+    production_type = ForeignKey("api.LivestockProductionType", on_delete=CASCADE)
+    livestock_category = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
+    region = ForeignKey("api.Continent", on_delete=CASCADE)
+    value = FloatField()
+
+class LivestockAnimalWasteManagementSystem(Model):
+    '''
+        IPCC 2417:2704
+
+        Value is a percentage expressed as a decimal <= 1
+    '''
+    emission_type = ForeignKey(EmissionType, on_delete=CASCADE)
+    livestock_category = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
+    manure_management_type = ForeignKey("api.ManureManagementType", on_delete=CASCADE)
+    region = ForeignKey("api.Continent", on_delete=CASCADE)
+    value = FloatField()
