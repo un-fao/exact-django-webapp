@@ -9,6 +9,7 @@ from rest_framework.views import *
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from .calculators import CalculatorFactory
+from decorators import can_access
 
 activity_id = openapi.Parameter('activity_id', openapi.IN_QUERY, description="ID of activity related to the module", type=openapi.TYPE_INTEGER)
 project_id = openapi.Parameter('project_id', openapi.IN_QUERY, description="ID of project related to the activity", type=openapi.TYPE_INTEGER)
@@ -40,6 +41,7 @@ class LandUseTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         
         return super().list(request)
 
+@can_access("project")
 class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
     API endpoint that allows projects to be viewed or edited.
@@ -47,6 +49,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = Project.objects.all()
     serializer_class = get_model_serializer(Project)
 
+@can_access("activity")
 class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
     API endpoint that allows activities to be viewed or edited. 
@@ -71,11 +74,12 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
         Calculates and returns total emissions for each module in the activity.
         """
-        # Checks if the activity exists AND belongs to the user
-        activity = get_object_or_404(Activity, pk=pk, project__user=self.request.user)
+        
+        get_object_or_404(Activity, pk=pk, project__user=self.request.user)
 
         modules = []
         module_types = ModuleType.objects.all()
+        # TODO: Make a serializer for this
         for module in module_types:
             module_model = apps.get_model(API, sanitize_for_model(module.name))
             module_object = module_model.objects.filter(activity__id=pk, activity__project__user=self.request.user).first()
@@ -115,6 +119,7 @@ class ModuleTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = ModuleType.objects.all()
     serializer_class = get_model_serializer(ModuleType)
 
+@can_access("module")
 def generic_module_viewset(model: Model):
     class GenericModuleViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         queryset = model.objects.all()
