@@ -76,7 +76,7 @@ def drainage(area_start, percentage_drained_start, percentage_drained_end, rate_
     EF_drainage_tier_2 : tier 2 value, expects float or None
     
     """
-
+    # TODO: 0.451 is specific to MANGROVE, ask Claudio to parametrize this and send it in the inputs (percentage carbon wood/mangrove)
     agb = agb_default * 0.451 if not agb_tier_2 else agb_tier_2
     bgb = bgb_default * agb if not bgb_tier_2 else bgb_tier_2
     litter = litter_default if not litter_tier_2 else litter_tier_2
