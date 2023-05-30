@@ -2,7 +2,7 @@ def annexed_module(fire_boolean_end, fire_periodicity_end, area_affected_by_acti
                     time_impl, time_cap, nitrous_constant,  # GENERAL INFO
                     rate_coefficient_drainage_end, ef_doc_ref_drainage_initial, ef_doc_tier_2_drainage_initial, area_drained_start, area_drained_end, ef_co2_ref_drainage_initial, ef_co2_tier_2_drainage_initial, percentage_ditches_start, percentage_ditches_end, ef_ch4_onsite_ref_drainage_initial, ef_ch4_onsite_tier_2_drainage_initial, ef_ch4_offsite_ref_drainage_initial, ef_ch4_offsite_tier_2_drainage_initial, ef_n2o_ref_drainage_initial, ef_n2o_tier_2_drainage_initial, # DRAINAGE EMISSIONS INITIAL
                     ef_doc_ref_drainage_final, ef_doc_tier_2_drainage_final, ef_co2_ref_drainage_final, ef_co2_tier_2_drainage_final, ef_ch4_onsite_ref_drainage_final, ef_ch4_onsite_tier_2_drainage_final, ef_ch4_offsite_ref_drainage_final, ef_ch4_offsite_tier_2_drainage_final, ef_n2o_ref_drainage_final, ef_n2o_tier_2_drainage_final, # DRAINAGE EMISSIONS FINAL
-                    rate_coefficient_rewetting_end, ef_doc_ref_rewetting_initial, ef_doc_tier_2_rewetting_initial, ef_co2_ref_rewetting_initial, ef_co2_tier_2_rewetting_initial, ef_ch4_ref_rewetting_initial, ef_ch4_tier_2_rewetting_initial, ef_n2o_ref_rewetting_initial, ef_n2o_tier_2_rewetting_initial, ef_doc_ref_rewetting_final, ef_doc_tier_2_rewetting_final, ef_co2_ref_rewetting_final, ef_co2_tier_2_rewetting_final, ef_ch4_ref_rewetting_final, ef_ch4_tier_2_rewetting_final, ef_n2o_ref_rewetting_final, ef_n2o_tier_2_rewetting_final, area_rewetted, area_not_rewetted,   # REWETTING EMISSIONS
+                    rate_coefficient_rewetting_end, ef_doc_ref_rewetting_initial, ef_doc_tier_2_rewetting_initial, ef_co2_ref_rewetting_initial, ef_co2_tier_2_rewetting_initial, ef_ch4_ref_rewetting_initial, ef_ch4_tier_2_rewetting_initial, ef_n2o_ref_rewetting_initial, ef_n2o_tier_2_rewetting_initial, ef_doc_ref_rewetting_final, ef_doc_tier_2_rewetting_final, ef_co2_ref_rewetting_final, ef_co2_tier_2_rewetting_final, ef_ch4_ref_rewetting_final, ef_ch4_tier_2_rewetting_final, ef_n2o_ref_rewetting_final, ef_n2o_tier_2_rewetting_final, area_rewetted_initial, area_rewetted_final,   # REWETTING EMISSIONS
                     ):
 
     # FIRE EMISSIONS
@@ -23,7 +23,7 @@ def annexed_module(fire_boolean_end, fire_periodicity_end, area_affected_by_acti
     ef_ch4_rewetting_final = ef_ch4_ref_rewetting_final if not ef_ch4_tier_2_rewetting_final else ef_ch4_tier_2_rewetting_final
     ef_n2o_rewetting_final = ef_n2o_ref_rewetting_final if not ef_n2o_tier_2_rewetting_final else ef_n2o_tier_2_rewetting_final
 
-    rewetting_initial_final = rewetting_emissions_total(area_rewetted, ef_doc_rewetting_initial, ef_co2_rewetting_initial, ef_ch4_rewetting_initial, ef_n2o_rewetting_initial, methane_constant, nitrous_constant, area_not_rewetted, ef_doc_rewetting_final, ef_co2_rewetting_final, ef_ch4_rewetting_final, ef_n2o_rewetting_final, rate_coefficient_rewetting_end, time_impl, time_cap)
+    rewetting_initial_final = rewetting_emissions_total(area_rewetted_initial, area_rewetted_final, ef_doc_rewetting_initial, ef_co2_rewetting_initial, ef_ch4_rewetting_initial, ef_n2o_rewetting_initial, methane_constant, nitrous_constant, ef_doc_rewetting_final, ef_co2_rewetting_final, ef_ch4_rewetting_final, ef_n2o_rewetting_final, rate_coefficient_rewetting_end, time_impl, time_cap)
     # DRAINAGE EMISSIONS
     ef_doc_drainage_initial = ef_doc_ref_drainage_initial if not ef_doc_tier_2_drainage_initial else ef_doc_tier_2_drainage_initial
     ef_co2_drainage_initial = ef_co2_ref_drainage_initial if not ef_co2_tier_2_drainage_initial else ef_co2_tier_2_drainage_initial
@@ -37,8 +37,8 @@ def annexed_module(fire_boolean_end, fire_periodicity_end, area_affected_by_acti
     ef_ch4_offsite_drainage_final= ef_ch4_offsite_ref_drainage_final if not ef_ch4_offsite_tier_2_drainage_final else ef_ch4_offsite_tier_2_drainage_final
     ef_n2o_drainage_final = ef_n2o_ref_drainage_final if not ef_n2o_tier_2_drainage_final else ef_n2o_tier_2_drainage_final
 
-    drainage_initial = drainage_emissions_final(rate_coefficient_drainage_end, time_impl, time_cap, ef_doc_drainage_initial, area_affected_by_action_end, area_drained_start, area_drained_end, ef_co2_drainage_initial, methane_constant, percentage_ditches_start, percentage_ditches_end, ef_ch4_onsite_drainage_initial, ef_ch4_offsite_drainage_initial, ef_n2o_drainage_initial, nitrous_constant)
-    drainage_final = drainage_emissions_initial(rate_coefficient_drainage_end, time_impl, time_cap, ef_doc_drainage_final, area_affected_by_action_end, area_drained_start, area_drained_end, ef_co2_drainage_final, methane_constant, percentage_ditches_start, percentage_ditches_end, ef_ch4_onsite_drainage_final, ef_ch4_offsite_drainage_final, ef_n2o_drainage_final, nitrous_constant)
+    drainage_initial = drainage_emissions_initial(rate_coefficient_drainage_end, time_impl, time_cap, ef_doc_drainage_initial, area_affected_by_action_end, area_drained_start, area_drained_end, ef_co2_drainage_initial, methane_constant, percentage_ditches_start, percentage_ditches_end, ef_ch4_onsite_drainage_initial, ef_ch4_offsite_drainage_initial, ef_n2o_drainage_initial, nitrous_constant)
+    drainage_final = drainage_emissions_final(rate_coefficient_drainage_end, time_impl, time_cap, ef_doc_drainage_final, area_affected_by_action_end, area_drained_start, area_drained_end, ef_co2_drainage_final, methane_constant, percentage_ditches_start, percentage_ditches_end, ef_ch4_onsite_drainage_final, ef_ch4_offsite_drainage_final, ef_n2o_drainage_final, nitrous_constant)
 
     return fire_soil_em_end + drainage_initial + drainage_final + rewetting_initial_final
 
@@ -54,6 +54,7 @@ def time_dependency(rate_coefficient, time_impl, time_cap, units_start, units_en
 
     return total_emissions
 
+# TODO: redo fire emissions
 def fire_emissions(fire_boolean, time_impl, time_cap, rate_coefficient, area, dry_matter, percentage_area_burned, ef_co2, ef_co, fire_periodicity, ef_ch4, methane_constant):
 
     def fire_co2_co_ch4(fire_periodicity, dry_matter, area, rate_coefficient, time_impl, time_cap, percentage_area_burned, ef_co2, ef_co, ef_ch4, methane_constant):
@@ -84,11 +85,11 @@ def drainage_emissions_initial(rate_coefficient, time_impl, time_cap, ef_doc, ar
             em_start = ef * area_affected_by_action_start * multiplying_constant * percentage_area_multiplier_start
 
             if area_affected_by_module == 0:
-                em_end = ef * area_affected_by_action_end * percentage_area_multiplier_end * multiplying_constant
+                em_end = ef * area_affected_by_module * percentage_area_multiplier_end * multiplying_constant
             elif area_affected_by_action_end < area_affected_by_module:
                 em_end = 0
             else:
-                em_end = ef * (area_affected_by_action_end - area_affected_by_action_start) * percentage_area_multiplier_end *  multiplying_constant
+                em_end = ef * (area_affected_by_module - area_affected_by_action_end) * percentage_area_multiplier_end *  multiplying_constant
     
             return em_start, em_end
 
@@ -109,7 +110,7 @@ def drainage_emissions_initial(rate_coefficient, time_impl, time_cap, ef_doc, ar
     total_doc = time_dependency(rate_coefficient, time_impl, time_cap, doc_start, doc_end)
     total_co2 = time_dependency(rate_coefficient, time_impl, time_cap, co2_start, co2_end)
 
-    return total_doc + total_co2, total_ch4_onsite + total_ch4_off_site, total_n2o
+    return sum([total_doc + total_co2, total_ch4_onsite + total_ch4_off_site, total_n2o])
 
 def drainage_emissions_final(rate_coefficient, time_impl, time_cap, ef_doc, area_affected, area_drained_start, area_drained_end, ef_co2, methane_constant, percentage_ditches_start, percentage_ditches_end,
                        ef_ch4_on_site, ef_ch4_off_site, ef_n2o, nitrous_constant
@@ -124,17 +125,17 @@ def drainage_emissions_final(rate_coefficient, time_impl, time_cap, ef_doc, area
             elif area_affected_by_action_end < area_affected_by_module:
                 em_end = ef * area_affected_by_action_end * percentage_area_multiplier_end * multiplying_constant
             else:
-                em_end = ef * (area_affected_by_action_end - area_affected_by_action_start) * percentage_area_multiplier_end *  multiplying_constant
+                em_end = ef * (area_affected_by_action_start) * percentage_area_multiplier_end *  multiplying_constant
     
             return em_start, em_end
 
-    n2ostart, n2oend = calculate_emissions_start_end(ef_n2o, area_drained_start, area_drained_end, 1, 1, area_affected, 44/28 * nitrous_constant/1000)
+    n2ostart, n2oend = calculate_emissions_start_end(ef_n2o, area_affected, area_drained_end, 1, 1, area_affected, 44/28 * nitrous_constant/1000) # 
 
-    ch4_start, ch4_end = calculate_emissions_start_end(ef_ch4_on_site, area_drained_start, area_drained_end, 1 - percentage_ditches_start, 1 - percentage_ditches_end, area_affected, methane_constant/1000) 
-    ch4_start_ditches, ch4_end_ditches = calculate_emissions_start_end(ef_ch4_off_site, area_drained_start, area_drained_end, percentage_ditches_start, percentage_ditches_end, area_affected, methane_constant/1000)
+    ch4_start, ch4_end = calculate_emissions_start_end(ef_ch4_on_site, area_affected, area_drained_end, 1 - percentage_ditches_start, 1 - percentage_ditches_end, area_affected, methane_constant/1000) #
+    ch4_start_ditches, ch4_end_ditches = calculate_emissions_start_end(ef_ch4_off_site, area_affected, area_drained_end, percentage_ditches_start, percentage_ditches_end, area_affected, methane_constant/1000) #
 
-    co2_start, co2_end = calculate_emissions_start_end(ef_co2, area_drained_start, 1, 1, area_drained_end, area_affected, 44/12)
-    doc_start, doc_end = calculate_emissions_start_end(ef_doc, area_drained_start, 1, 1, area_drained_end, area_affected, 44/12)
+    co2_start, co2_end = calculate_emissions_start_end(ef_co2, area_affected, 1, 1, area_drained_end, area_affected, 44/12) #
+    doc_start, doc_end = calculate_emissions_start_end(ef_doc, area_affected, 1, 1, area_drained_end, area_affected, 44/12) #
 
 
     total_n2o = time_dependency(rate_coefficient, time_impl, time_cap, n2ostart, n2oend)
@@ -145,9 +146,9 @@ def drainage_emissions_final(rate_coefficient, time_impl, time_cap, ef_doc, area
     total_doc = time_dependency(rate_coefficient, time_impl, time_cap, doc_start, doc_end)
     total_co2 = time_dependency(rate_coefficient, time_impl, time_cap, co2_start, co2_end)
 
-    return total_doc + total_co2, total_ch4_onsite + total_ch4_off_site, total_n2o
+    return sum([total_doc + total_co2, total_ch4_onsite + total_ch4_off_site, total_n2o])
 
-def rewetting_emissions_total(area_rewetted, ef_doc_initial, ef_co2_initial, ef_ch4_initial, ef_n2o_initial, methane_constant, nitrous_constant, area_not_rewetted, ef_doc_final, ef_co2_final, ef_ch4_final, ef_n2o_final, rate_coefficient, time_impl, time_cap):
+def rewetting_emissions_total(area_rewetted_initial, area_rewetted_final, ef_doc_initial, ef_co2_initial, ef_ch4_initial, ef_n2o_initial, methane_constant, nitrous_constant, ef_doc_final, ef_co2_final, ef_ch4_final, ef_n2o_final, rate_coefficient, time_impl, time_cap):
 
     def rewetting_emissions(area_rewetted, ef_doc, ef_co2, ef_ch4, ef_n2o, methane_constant, nitrous_constant, rate_coefficient, time_impl, time_cap):
         
@@ -164,28 +165,63 @@ def rewetting_emissions_total(area_rewetted, ef_doc_initial, ef_co2_initial, ef_
 
         return sum([total_co2_doc, total_ch4, total_n2o])
     
-    rewetting_initial = rewetting_emissions(area_rewetted, ef_doc_initial, ef_co2_initial, ef_ch4_initial, ef_n2o_initial, methane_constant, nitrous_constant, rate_coefficient, time_impl, time_cap)
-    rewetting_final = rewetting_emissions(area_not_rewetted - area_rewetted, ef_doc_final, ef_co2_final, ef_ch4_final, ef_n2o_final, methane_constant, nitrous_constant, rate_coefficient, time_impl, time_cap)
+    rewetting_initial = rewetting_emissions(area_rewetted_initial, ef_doc_initial, ef_co2_initial, ef_ch4_initial, ef_n2o_initial, methane_constant, nitrous_constant, rate_coefficient, time_impl, time_cap)
+    rewetting_final = rewetting_emissions(area_rewetted_final, ef_doc_final, ef_co2_final, ef_ch4_final, ef_n2o_final, methane_constant, nitrous_constant, rate_coefficient, time_impl, time_cap)
 
     return sum([rewetting_initial, rewetting_final])
 
-def w_wo_annexed_module(forested_area_start, forested_area_w, forested_area_wo, area_drained_start, area_drained_w, area_drained_wo, ):
+#  TODO: ask Claudio how to address maximum_area_for_water_management, as it's different for defo, affo, ecc
+def w_wo_annexed_module(maximum_area_for_water_management, area_drained_start, area_drained_w, area_drained_wo, area_affected_by_action_w, area_affected_by_action_wo, fire_boolean_w, fire_boolean_wo,
+                        fire_periodicity_w, fire_periodicity_wo, percentage_area_burned_w, percentage_area_burned_wo, rate_coefficient_fire_w, rate_coefficient_fire_wo, rate_coefficient_drainage_w, rate_coefficient_drainage_wo,
+                        percentage_ditches_w, percentage_ditches_wo,  dry_matter_ref_fire, dry_matter_tier_2_fire, ef_co2_ref_fire, ef_co2_tier_2_fire, ef_co_ref_fire,
+                        ef_co_tier_2_fire, ef_ch4_ref_fire, ef_ch4_tier_2_fire, methane_constant, time_impl, time_cap, nitrous_constant, ef_doc_ref_drainage_initial,
+                        ef_doc_tier_2_drainage_initial, ef_co2_ref_drainage_initial, ef_co2_tier_2_drainage_initial, percentage_ditches_start, ef_ch4_onsite_ref_drainage_initial,
+                        ef_ch4_onsite_tier_2_drainage_initial, ef_ch4_offsite_ref_drainage_initial, ef_ch4_offsite_tier_2_drainage_initial, ef_n2o_ref_drainage_initial, ef_n2o_tier_2_drainage_initial, ef_doc_ref_drainage_final,
+                        ef_doc_tier_2_drainage_final, ef_co2_ref_drainage_final, ef_co2_tier_2_drainage_final, ef_ch4_onsite_ref_drainage_final, ef_ch4_onsite_tier_2_drainage_final, ef_ch4_offsite_ref_drainage_final,
+                        ef_ch4_offsite_tier_2_drainage_final, ef_n2o_ref_drainage_final, ef_n2o_tier_2_drainage_final, rate_coefficient_rewetting_w, rate_coefficient_rewetting_wo, ef_doc_ref_rewetting_initial, ef_doc_tier_2_rewetting_initial, ef_co2_ref_rewetting_initial,
+                        ef_co2_tier_2_rewetting_initial, ef_ch4_ref_rewetting_initial, ef_ch4_tier_2_rewetting_initial, ef_n2o_ref_rewetting_initial, ef_n2o_tier_2_rewetting_initial, ef_doc_ref_rewetting_final, ef_doc_tier_2_rewetting_final,
+                        ef_co2_ref_rewetting_final, ef_co2_tier_2_rewetting_final, ef_ch4_ref_rewetting_final, ef_ch4_tier_2_rewetting_final, ef_n2o_ref_rewetting_final, ef_n2o_tier_2_rewetting_final,
+                        
+                        
+                        ):
 
-    # get the maximum value in the list
-    maximum_for_water_management = max([forested_area_start, forested_area_w, forested_area_wo])
+    area_not_drained_start = maximum_area_for_water_management - area_drained_start
+    area_not_drained_w = maximum_area_for_water_management - area_drained_w
+    area_not_drained_wo = maximum_area_for_water_management - area_drained_wo
 
-    not_drained_start = maximum_for_water_management - area_drained_start
-    not_drained_w = maximum_for_water_management - area_drained_w
-    not_drained_wo = maximum_for_water_management - area_drained_wo
+    if area_not_drained_start == maximum_area_for_water_management:
+        area_rewet_initial_wo = 0
+        area_rewet_final_wo = 0
+        area_rewet_final_w = 0
+        area_rewet_initial_w = 0
+    else:
+        area_rewet_initial_wo = max(0, area_not_drained_wo - area_not_drained_start - area_affected_by_action_wo)
+        area_rewet_initial_w = max(0, area_not_drained_w - area_not_drained_start - area_affected_by_action_w)
+        area_rewet_final_wo = area_not_drained_wo - area_rewet_initial_wo
+        area_rewet_final_w = area_not_drained_w - area_rewet_initial_w
 
-    area_deforested_w = forested_area_start - forested_area_w
-    area_deforested_wo = forested_area_start - forested_area_wo
+    em_w = annexed_module(fire_boolean_w, fire_periodicity_w, area_affected_by_action_w, dry_matter_ref_fire, dry_matter_tier_2_fire, percentage_area_burned_w, ef_co2_ref_fire, ef_co2_tier_2_fire, ef_co_ref_fire,
+                        ef_co_tier_2_fire, ef_ch4_ref_fire, ef_ch4_tier_2_fire, methane_constant, rate_coefficient_fire_w, time_impl, time_cap, nitrous_constant, rate_coefficient_drainage_w, ef_doc_ref_drainage_initial,
+                        ef_doc_tier_2_drainage_initial, area_drained_start, area_drained_w, ef_co2_ref_drainage_initial, ef_co2_tier_2_drainage_initial, percentage_ditches_start, percentage_ditches_w, ef_ch4_onsite_ref_drainage_initial,
+                        ef_ch4_onsite_tier_2_drainage_initial, ef_ch4_offsite_ref_drainage_initial, ef_ch4_offsite_tier_2_drainage_initial, ef_n2o_ref_drainage_initial, ef_n2o_tier_2_drainage_initial, ef_doc_ref_drainage_final,
+                        ef_doc_tier_2_drainage_final, ef_co2_ref_drainage_final, ef_co2_tier_2_drainage_final, ef_ch4_onsite_ref_drainage_final, ef_ch4_onsite_tier_2_drainage_final, ef_ch4_offsite_ref_drainage_final,
+                        ef_ch4_offsite_tier_2_drainage_final, ef_n2o_ref_drainage_final, ef_n2o_tier_2_drainage_final, rate_coefficient_rewetting_w, ef_doc_ref_rewetting_initial, ef_doc_tier_2_rewetting_initial, ef_co2_ref_rewetting_initial,
+                        ef_co2_tier_2_rewetting_initial, ef_ch4_ref_rewetting_initial, ef_ch4_tier_2_rewetting_initial, ef_n2o_ref_rewetting_initial, ef_n2o_tier_2_rewetting_initial, ef_doc_ref_rewetting_final, ef_doc_tier_2_rewetting_final,
+                        ef_co2_ref_rewetting_final, ef_co2_tier_2_rewetting_final, ef_ch4_ref_rewetting_final, ef_ch4_tier_2_rewetting_final, ef_n2o_ref_rewetting_final, ef_n2o_tier_2_rewetting_final, area_rewet_initial_w, area_rewet_final_w,
+                        )
+    
+    em_wo = annexed_module(fire_boolean_wo, fire_periodicity_wo, area_affected_by_action_wo, dry_matter_ref_fire, dry_matter_tier_2_fire, percentage_area_burned_wo, ef_co2_ref_fire, ef_co2_tier_2_fire, ef_co_ref_fire,
+                           ef_co_tier_2_fire, ef_ch4_ref_fire, ef_ch4_tier_2_fire, methane_constant, rate_coefficient_fire_wo, time_impl, time_cap, nitrous_constant, rate_coefficient_drainage_wo, ef_doc_ref_drainage_initial,
+                           ef_doc_tier_2_drainage_initial, area_drained_start, area_drained_wo, ef_co2_ref_drainage_initial, ef_co2_tier_2_drainage_initial, percentage_ditches_start, percentage_ditches_wo, ef_ch4_onsite_ref_drainage_initial,
+                           ef_ch4_onsite_tier_2_drainage_initial, ef_ch4_offsite_ref_drainage_initial, ef_ch4_offsite_tier_2_drainage_initial, ef_n2o_ref_drainage_initial, ef_n2o_tier_2_drainage_initial, ef_doc_ref_drainage_final,
+                           ef_doc_tier_2_drainage_final, ef_co2_ref_drainage_final, ef_co2_tier_2_drainage_final, ef_ch4_onsite_ref_drainage_final, ef_ch4_onsite_tier_2_drainage_final, ef_ch4_offsite_ref_drainage_final,
+                           ef_ch4_offsite_tier_2_drainage_final, ef_n2o_ref_drainage_final, ef_n2o_tier_2_drainage_final, rate_coefficient_rewetting_wo, ef_doc_ref_rewetting_initial, ef_doc_tier_2_rewetting_initial, ef_co2_ref_rewetting_initial,
+                           ef_co2_tier_2_rewetting_initial, ef_ch4_ref_rewetting_initial, ef_ch4_tier_2_rewetting_initial, ef_n2o_ref_rewetting_initial, ef_n2o_tier_2_rewetting_initial, ef_doc_ref_rewetting_final, ef_doc_tier_2_rewetting_final,
+                           ef_co2_ref_rewetting_final, ef_co2_tier_2_rewetting_final, ef_ch4_ref_rewetting_final, ef_ch4_tier_2_rewetting_final, ef_n2o_ref_rewetting_final, ef_n2o_tier_2_rewetting_final, area_rewet_initial_wo, area_rewet_final_wo,
+                           )
+    
+    return em_w, em_wo, em_w - em_wo
 
-    if not_drained_start == maximum_for_water_management:
-        area_rewet_wo = 0
-        area_rewet_w = 0
-
-# TODO: talk to Lorenzo about rewetting and drainage, not completely clear what FINAL and INITIAL represent, why they are there ecc
 
 def peat_extraction_w_wo(hectars_start, hectars_w, hectars_wo, percentage_ditches_start, percentage_ditches_w, percentage_ditches_wo, rate_coefficient_w, rate_coefficient_wo, ef_co2_onsite_ref, ef_co2_onsite_tier_2, ef_ch4_onsite_ref, ef_ch4_onsite_tier_2, ef_n2o_onsite_ref, ef_n2o_onsite_tier_2, ef_doc_offsite_ref, 
                          ef_doc_offsite_tier_2, ef_ch4_offsite_ref, ef_ch4_offsite_tier_2,methane_constant, nitrous_constant, time_impl, time_cap, mass_tonnes_ref, mass_tonnes_tier_2, conversion_factor_volume, c_fraction_ref, extraction_height_start, extraction_height_w, extraction_height_wo ):
@@ -244,8 +280,8 @@ def peat_extraction_w_wo(hectars_start, hectars_w, hectars_wo, percentage_ditche
 # ao = peat_extraction_w_wo(500, 32, 30, 0.5, 0.5, 0.5, 0.5, 0.5, 2, None, 0, None, 3.6, None, 0.82, None, 0, None, 28, 265, 20, 5, 0.765, None, 1, 0.34, 50, 50, 50)
 # print(ao)
 
-# TODO: ask lorenzo if all areas must be the same?!?!?
-def inland_aquaculture_w_wo(trophic_state_ref, trophic_state_tier_2, chlo_A, ch4_emission_ref, ch4_emission_tier_2_start, ch4_emission_tier_2_w, ch4_emission_tier_2_wo, methane_constant, rate_coefficient_w, rate_coefficient_wo, time_impl, time_cap, hectars_start, hectars_w, hectars_wo):
+# TODO: TELL CLAUDIO THAT THE SUM OF ALL VALUES ON A COLUMN MUST BE THE SAME
+def inland_waterbodies_w_wo(trophic_state_ref, trophic_state_tier_2, chlo_A, ch4_emission_ref, ch4_emission_tier_2_start, ch4_emission_tier_2_w, ch4_emission_tier_2_wo, methane_constant, rate_coefficient_w, rate_coefficient_wo, time_impl, time_cap, hectars_start, hectars_w, hectars_wo):
 
     def inland_emissions(trophic_state_ref, trophic_state_tier_2, chlo_A, ch4_emission_ref, ch4_emission_tier_2_start, ch4_emission_tier_2_end, methane_constant, rate_coefficient, time_impl, time_cap, hectars_start, hectars_end):
         
@@ -270,15 +306,98 @@ def inland_aquaculture_w_wo(trophic_state_ref, trophic_state_tier_2, chlo_A, ch4
 
     return em_w, em_wo, em_w - em_wo
 
+      
+# ao = inland_aquaculture_w_wo(3, None, None, 183, None, None, None, 28, 0.5, 0.5, 20, 5, 43, 43, 43)
+# print(ao)
 
-        
-          
-ao = inland_aquaculture_w_wo(3, None, None, 183, None, None, None, 28, 0.5, 0.5, 20, 5, 43, 43, 43)
-print(ao)
-     
+maximum_area_for_water_management = 200
+area_drained_start = 100
+area_drained_w = 50
+area_drained_wo = 30
+area_affected_by_action_w = 50
+area_affected_by_action_wo = 50
+fire_boolean_w = True
+fire_boolean_wo = True
+fire_periodicity_w = 1
+fire_periodicity_wo = 1
+percentage_area_burned_w = 0.6
+percentage_area_burned_wo = 0.6
+rate_coefficient_fire_w = 0.5
+rate_coefficient_fire_wo = 0.5
+rate_coefficient_drainage_w = 0.5
+rate_coefficient_drainage_wo = 0.5
+percentage_ditches_w = 0.5
+percentage_ditches_wo = 0.5
+dry_matter_ref_fire = 155
+dry_matter_tier_2_fire = None
+ef_co2_ref_fire = 464
+ef_co2_tier_2_fire = None
+ef_co_ref_fire = 210
+ef_co_tier_2_fire = None
+ef_ch4_ref_fire = 21
+ef_ch4_tier_2_fire = None
+methane_constant = 28
+time_impl = 20
+time_cap = 5
+nitrous_constant = 265
+ef_doc_ref_drainage_initial = 0.82
+ef_doc_tier_2_drainage_initial = None
+ef_co2_ref_drainage_initial = 5.3
+ef_co2_tier_2_drainage_initial = None
+percentage_ditches_start = 0.5
+ef_ch4_onsite_ref_drainage_initial = 4.9
+ef_ch4_onsite_tier_2_drainage_initial = None
+ef_ch4_offsite_ref_drainage_initial = 2259
+ef_ch4_offsite_tier_2_drainage_initial = None
+ef_n2o_ref_drainage_initial = 2.4
+ef_n2o_tier_2_drainage_initial = None
+ef_doc_ref_drainage_final = 0.82
+ef_doc_tier_2_drainage_final = None
+ef_co2_ref_drainage_final = 9.6
+ef_co2_tier_2_drainage_final = None
+ef_ch4_onsite_ref_drainage_final = 7
+ef_ch4_onsite_tier_2_drainage_final = None
+ef_ch4_offsite_ref_drainage_final = 2259
+ef_ch4_offsite_tier_2_drainage_final = None
+ef_n2o_ref_drainage_final = 5
+ef_n2o_tier_2_drainage_final = None
+rate_coefficient_rewetting_w = 0.5
+rate_coefficient_rewetting_wo = 0.5
+ef_doc_ref_rewetting_initial = 0.51
+ef_doc_tier_2_rewetting_initial = None
+ef_co2_ref_rewetting_initial = 0
+ef_co2_tier_2_rewetting_initial = None
+ef_ch4_ref_rewetting_initial = 41
+ef_ch4_tier_2_rewetting_initial = None
+ef_n2o_ref_rewetting_initial = 0
+ef_n2o_tier_2_rewetting_initial = None
+ef_doc_ref_rewetting_final = 0.51
+ef_doc_tier_2_rewetting_final = None
+ef_co2_ref_rewetting_final = 0 
+ef_co2_tier_2_rewetting_final = None
+ef_ch4_ref_rewetting_final = 41
+ef_ch4_tier_2_rewetting_final = None
+ef_n2o_ref_rewetting_final = 0
+ef_n2o_tier_2_rewetting_final = None
+
+    
+ao =  w_wo_annexed_module(maximum_area_for_water_management, area_drained_start, area_drained_w, area_drained_wo, area_affected_by_action_w, area_affected_by_action_wo, fire_boolean_w, fire_boolean_wo,
+                        fire_periodicity_w, fire_periodicity_wo, percentage_area_burned_w, percentage_area_burned_wo, rate_coefficient_fire_w, rate_coefficient_fire_wo, rate_coefficient_drainage_w, rate_coefficient_drainage_wo,
+                        percentage_ditches_w, percentage_ditches_wo,  dry_matter_ref_fire, dry_matter_tier_2_fire, ef_co2_ref_fire, ef_co2_tier_2_fire, ef_co_ref_fire,
+                        ef_co_tier_2_fire, ef_ch4_ref_fire, ef_ch4_tier_2_fire, methane_constant, time_impl, time_cap, nitrous_constant, ef_doc_ref_drainage_initial,
+                        ef_doc_tier_2_drainage_initial, ef_co2_ref_drainage_initial, ef_co2_tier_2_drainage_initial, percentage_ditches_start, ef_ch4_onsite_ref_drainage_initial,
+                        ef_ch4_onsite_tier_2_drainage_initial, ef_ch4_offsite_ref_drainage_initial, ef_ch4_offsite_tier_2_drainage_initial, ef_n2o_ref_drainage_initial, ef_n2o_tier_2_drainage_initial, ef_doc_ref_drainage_final,
+                        ef_doc_tier_2_drainage_final, ef_co2_ref_drainage_final, ef_co2_tier_2_drainage_final, ef_ch4_onsite_ref_drainage_final, ef_ch4_onsite_tier_2_drainage_final, ef_ch4_offsite_ref_drainage_final,
+                        ef_ch4_offsite_tier_2_drainage_final, ef_n2o_ref_drainage_final, ef_n2o_tier_2_drainage_final, rate_coefficient_rewetting_w, rate_coefficient_rewetting_wo, ef_doc_ref_rewetting_initial, ef_doc_tier_2_rewetting_initial, ef_co2_ref_rewetting_initial,
+                        ef_co2_tier_2_rewetting_initial, ef_ch4_ref_rewetting_initial, ef_ch4_tier_2_rewetting_initial, ef_n2o_ref_rewetting_initial, ef_n2o_tier_2_rewetting_initial, ef_doc_ref_rewetting_final, ef_doc_tier_2_rewetting_final,
+                        ef_co2_ref_rewetting_final, ef_co2_tier_2_rewetting_final, ef_ch4_ref_rewetting_final, ef_ch4_tier_2_rewetting_final, ef_n2o_ref_rewetting_final, ef_n2o_tier_2_rewetting_final,
+                        )
 
 
     
+# final = drainage_emissions_final(0.5, 20, 5, 0.82, 50, 100, 50, 9.6, 28, 0.5, 0.5, 7, 2259, 5, 265)
+# initial = drainage_emissions_initial(0.5, 20, 5, 0.82, 50, 100, 50, 5.3 , 28, 0.5, 0.5, 4.9, 2259, 2.4, 265)
 
 
-    
+# print(final)
+# print(initial)
