@@ -16,4 +16,4 @@ simplejson
 tzdata
 django
 gunicorn
-decorator
+decorators
