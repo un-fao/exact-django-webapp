@@ -102,21 +102,12 @@ if os.getenv('GAE_APPLICATION', None):
 else:
     DATABASES = {
         'default': {
-<<<<<<< Updated upstream
             'ENGINE': os.getenv("DB_ENGINE", default='$DB_ENGINE'),
-            'HOST': os.getenv("DB_HOST", default='/cloudsql/$DB_INSTANCE_CONNECTION'),
+            'HOST': os.getenv("DB_HOST", default='$DB_HOST'),
             'USER': os.getenv("DB_USER", default='$DB_USERNAME'),
             'PASSWORD': os.getenv("DB_PASSWORD", default='$DB_PASSWORD'),
             'NAME': os.getenv("DB_NAME", default='$DB_NAME'),
-            'PORT': os.getenv("DB_PORT", default=5432)
-=======
-            'ENGINE': '$DB_ENGINE',
-            'HOST': '$DB_HOST',
-            'USER': '$DB_USERNAME',
-            'PASSWORD': '$DB_PASSWORD',
-            'NAME': '$DB_NAME',
-            'PORT': '$DB_PORT',
->>>>>>> Stashed changes
+            'PORT': os.getenv("DB_PORT", default='$DB_PORT')
         }
     }
 
