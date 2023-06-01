@@ -37,7 +37,7 @@ definitions:
 
           - sed -i "s|\$DB_ENGINE|$DB_ENGINE|g" djangoexact/settings.py
           - sed -i "s|\$DB_INSTANCE_CONNECTION|$DB_INSTANCE_CONNECTION|g" djangoexact/settings.py
-          - sed -i "s|\$DB_HOST|$DB_HOST|g" djangoexact/settings.py
+          - sed -i "s|\$DB_HOST|127.0.0.1|g" djangoexact/settings.py
           - sed -i "s|\$DB_USERNAME|$DB_USERNAME|g" djangoexact/settings.py
           - sed -i "s|\$DB_PASSWORD|$DB_PASSWORD|g" djangoexact/settings.py
           - sed -i "s|\$DB_NAME|$DB_NAME|g" djangoexact/settings.py
@@ -51,6 +51,7 @@ definitions:
           - python manage.py collectstatic --noinput
 
           - pip list
+          - sed -i "s|127.0.0.1|$DB_HOST|g" djangoexact/settings.py
 
           - gcloud config set project $PROJECT_ID
           - gcloud app deploy app.yaml --project $PROJECT_ID --verbosity=debug
