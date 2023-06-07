@@ -208,10 +208,41 @@ def middle_if_other(time_tot, time_impl, rate_of_change_soil, rate_type):
         else: 
             return min(20, time_impl) * rate_of_change_soil + time_tot - min(20, time_impl) - outer_if_other(rate_type, time_tot, time_impl)
 
-
 def outer_if_other(rate_type, time_tot, time_impl):
 
     if rate_type == "E":
         return time_tot - 20 + 0.217 * time_impl * (math.exp(4.606 * ((20 - time_tot)/time_impl)) - 1)
     else:
         return pow(time_tot - 20, 2) * (0.5/time_impl)
+
+
+def default_tier_2 (biomass_start_default, soc_ref, flu_start_default, agb_under_20_end_default, agb_over_20_end_default, bgb_under_20_end_default, bgb_over_20_end_default, abg_biomass, rate_bgb_agb_s_125,
+                    rate_bgb_agb_b_125, litter_end_default, dead_wood_end_default, flu_end_default):
+
+    # BIOMASS START
+    biomass_start = biomass_start_default
+    # SOC START
+    soc_start = soc_ref
+    # FLU START
+    flu_start = flu_start_default
+
+    # AGB_UNDER_20_END
+    agb_under_20_end = agb_under_20_end_default * 0.47
+    # AGB_OVER_20_END
+    agb_over_20_end = agb_over_20_end_default * 0.47
+    # BGB_UNDER_20_END
+    bgb_under_20_end = bgb_under_20_end_default * 0.47
+    # BGB_OVER_20_END
+    bgb_over_20_end = bgb_over_20_end_default * 0.47
+    # REFERENCE_CARBON_STOCKS_END
+    reference_carbon_stocks_end = max_co2_above_below_ground(abg_biomass, rate_bgb_agb_s_125, rate_bgb_agb_b_125) * 12/44
+    # LITTER_END
+    litter_end = litter_end_default
+    # DEAD WOOD_END
+    dead_wood_end = dead_wood_end_default
+    # SOC_END
+    soc_end = soc_ref
+    # FLU_END
+    flu_end = flu_end_default
+
+    return biomass_start, soc_start, flu_start, agb_under_20_end, agb_over_20_end, bgb_under_20_end, bgb_over_20_end, reference_carbon_stocks_end, litter_end, dead_wood_end, soc_end, flu_end

@@ -247,3 +247,16 @@ def calculate_emissions(area_start, area_w, area_wo, time_impl, time_cap, rate_t
     CIAO = 2
     return (total_w, total_wo, total_w-total_wo)
 
+def default_tier_2(degradation_level_start_ref, degradation_level_w_ref, degradation_level_wo_ref, agb_ref, bgb_ref, litter_ref, deadwood_ref, socref, luf_default):
+
+    degradation_level_start = degradation_level_start_ref
+    degradation_level_w = degradation_level_w_ref
+    degradation_level_wo = degradation_level_wo_ref
+    agb = agb_ref
+    bgb = bgb_ref
+    litter = litter_ref
+    deadwood = deadwood_ref
+    soc = socref
+    luf = luf_default # valid for all three, start with and without. Tier 2 values are available for all three
+
+    return (degradation_level_start, degradation_level_w, degradation_level_wo, agb, bgb, litter, deadwood, soc, luf)
