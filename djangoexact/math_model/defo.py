@@ -152,4 +152,31 @@ ao = GHG_emissions(150, 10, 88, 25, 5, 'D', 0.5, 4.7, None, 265.0, 28.0, True, 0
 
 print(ao)
 
+def default_tier_2(agb_default, bgb_default, mangrove_factor, litter_default, deadwood_default, socref, flu_start, flu_final_default, biomass_final_default, soc_final_default, flu_final_default):
+
+    ####### DEFORESTED LAND ########
+
+    # ABOVE GROUND BIOMASS ----> agb is dependent on forest type
+    agb_start = agb_default * mangrove_factor
+    # BELOW GROUND BIOMASS ----> bgb is dependent on forest type
+    bgb_start = bgb_default * mangrove_factor
+    # LITTER
+    litter_start = litter_default
+    # DEAD WOOD
+    deadwood_start = deadwood_default
+    # SOIL CARBON
+    soc_start = socref
+    # FLU
+    flu_start = flu_start
+    ######## AFTER DEFORESTATION ##########
+    # BIOMASS
+    biomass_final = biomass_final_default
+    # SOIL CARBON
+    soc_final = socref
+    # FLU
+    flu_final = flu_final_default
+
+    return (agb_start, bgb_start, litter_start, deadwood_start, soc_start, flu_start, biomass_final, soc_final, flu_final)
+
+    
 
