@@ -1,5 +1,5 @@
 colorama
-# Django
+Django
 django-auditlog
 django-cors-headers
 django-environ
