@@ -17,3 +17,5 @@ simplejson
 tzdata
 gunicorn
 decorators
+uwsgi==2.0.21
+flask==2.1.0
