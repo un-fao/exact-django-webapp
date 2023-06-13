@@ -540,15 +540,21 @@ class AnnualCroppingCalculator(BaseCalculator):
 
         # TODO: Temporary, must be handled by front-end
         ha_data = [self.data.ha_start, self.data.ha_w, self.data.ha_wo]
-
+        # if is_parent:
+        #     match relative.__class__.__name__:
+        #         case Deforestation.__name__:
+        #             ha_data = [0, relative.ha_w, (relative.ha_start - relative.ha_wo)]
+        #         case Afforestation.__name__:
+        #             ha_data = [relative.ha_w, relative.ha_w, relative.ha_wo]
+        #         case OtherLandUse.__name__:
+        #             ha_data = [relative.ha_start, relative.ha_w, 0]
         if is_parent:
-            match relative.__class__.__name__:
-                case Deforestation.__name__:
-                    ha_data = [0, relative.ha_w, (relative.ha_start - relative.ha_wo)]
-                case Afforestation.__name__:
-                    ha_data = [relative.ha_w, relative.ha_w, relative.ha_wo]
-                case OtherLandUse.__name__:
-                    ha_data = [relative.ha_start, relative.ha_w, 0]
+            if relative.__class__.__name__ == Deforestation.__name__:
+                ha_data = [0, relative.ha_w, (relative.ha_start - relative.ha_wo)]
+            elif relative.__class__.__name__ == Afforestation.__name__:
+                ha_data = [relative.ha_w, relative.ha_w, relative.ha_wo]
+            elif relative.__class__.__name__ == OtherLandUse.__name__:
+                ha_data = [relative.ha_start, relative.ha_w, 0]
 
         inputs = [
 
@@ -717,15 +723,21 @@ class GrasslandCalculator(BaseCalculator):
         # TODO: A method must be defined that takes into account the nature of the land use change (defo, affo, oluc) and builds start,w,wo accordingly.
 
         ha_data = [self.data.ha_start, self.data.ha_w, self.data.ha_wo]
-
+        # if is_parent:
+        #     match relative.__class__.__name__:
+        #         case Deforestation.__name__:
+        #             ha_data = [0, relative.ha_w, (relative.ha_start - relative.ha_wo)]
+        #         case Afforestation.__name__:
+        #             ha_data = [relative.ha_w, relative.ha_w, relative.ha_wo]
+        #         case OtherLandUse.__name__:
+        #             ha_data = [relative.ha_start, relative.ha_w, 0]
         if is_parent:
-            match relative.__class__.__name__:
-                case Deforestation.__name__:
-                    ha_data = [0, relative.ha_w, (relative.ha_start - relative.ha_wo)]
-                case Afforestation.__name__:
-                    ha_data = [relative.ha_w, relative.ha_w, relative.ha_wo]
-                case OtherLandUse.__name__:
-                    ha_data = [relative.ha_start, relative.ha_w, 0]
+            if relative.__class__.__name__ == Deforestation.__name__:
+                ha_data = [0, relative.ha_w, (relative.ha_start - relative.ha_wo)]
+            if relative.__class__.__name__ ==  Afforestation.__name__:
+                ha_data = [relative.ha_w, relative.ha_w, relative.ha_wo]
+            if relative.__class__.__name__ ==  OtherLandUse.__name__:
+                ha_data = [relative.ha_start, relative.ha_w, 0]
 
         inputs = [
             *ha_data,
