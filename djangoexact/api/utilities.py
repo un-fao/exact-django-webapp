@@ -44,7 +44,7 @@ def get_query_param_or_validation_error(request, param_name):
         raise exceptions.ValidationError(f"{param_name} is required")
     return param
 
-def get_assessment_or_parent(module) -> tuple[Model, str] | tuple[None, None]:
+def get_assessment_or_parent(module):
     """
         Looks for the assessment class in the module and returns a tuple (module, relationship).
         Returns (None, None) if no assessment class is found.
@@ -66,6 +66,29 @@ def get_assessment_or_parent(module) -> tuple[Model, str] | tuple[None, None]:
                 break
             
     return relative
+
+# def get_assessment_or_parent_(module) -> tuple[Model, str] | tuple[None, None]:
+#     """
+#         Looks for the assessment class in the module and returns a tuple (module, relationship).
+#         Returns (None, None) if no assessment class is found.
+#     """
+
+#     relative = (None, None)
+
+#     # NOTE: To add new assessments, make sure you follow the naming convention of the Assessment class in models.py
+#     # NOTE: Refer to documentation for more information (WIP)
+#     for attr in dir(module):
+#         if getattr(module, attr, None) is not None:
+            
+#             if "_assessment" in attr:
+#                 relative = (getattr(module, attr), 'child')
+#                 break
+#             # Matches all attributes with 'parent_' prefix and not ending with '_id'
+#             elif re.match('parent_[^_]*[^_id]', attr):
+#                 relative = (getattr(module, attr), 'parent')
+#                 break
+            
+#     return relative
 
 # define ErrorResponse class
 class ErrorResponse(Response):
