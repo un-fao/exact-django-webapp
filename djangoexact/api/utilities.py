@@ -67,7 +67,7 @@ def get_assessment_or_parent(module) -> tuple[Model, str]:
             
     return relative
 
-def get_assessment_or_parent_(module) -> tuple[Model, str] | tuple[None, None]:
+def get_assessment_or_parent_(module) -> tuple[Model, str]:
     """
         Looks for the assessment class in the module and returns a tuple (module, relationship).
         Returns (None, None) if no assessment class is found.
