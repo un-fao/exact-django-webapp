@@ -32,8 +32,6 @@ def calculate_emissions(area_start, area_w, area_wo, EFc_ref, EFc_tier_2, SFw_re
 
     return total_w, total_wo, total_w - total_wo
 
-
-
 def soil_co2_change(area_start, area, time_impl, time_cap, rate_coefficient, rate_type, socref, soc_tier_2, f_lu_ref, f_lu_tier_2, f_i_ref, f_i_tier_2, f_mg_ref, f_mg_tier_2):
 
     def immediate_soil(area, area_start, time_impl, time_cap):
@@ -143,6 +141,32 @@ def straw_burning(area_start, area, time_impl, time_cap, rate_coefficient, straw
 # ch4 = ch4_emitted(100, 100, 20, 9, 0.5, 28, 113, None, 1.05910000, None)
 
 # soil = soil_co2_change(100, 100, 20, 9, 'D', 0.5, 46, None, 1.35, None, )
+def default_tier_2(EFc_ref, EFc_tier_2, SFw_ref, SFw_tier_2, SFp_ref, SFp_tier_2, SFo_ref, SFo_tier_2, socref, f_lu_ref, f_i_ref, f_mg_ref, straw_tonnes_ref ):
+
+    EFc = EFc_ref if not EFc_tier_2 else EFc_tier_2
+    SFw = SFw_ref if not SFw_tier_2 else SFw_tier_2
+    SFp = SFp_ref if not SFp_tier_2 else SFp_tier_2
+    SFo = SFo_ref if not SFo_tier_2 else SFo_tier_2
+
+    # TODO: show lorenzo, as the above parameters are used for calculation of this parameter, I have to return defaults but also retrieve the tier 2 values in order to calculate it correctly
+    adjusted_daily_ef_methane_ref = EFc * SFw * SFp * SFo
+
+
+    soc = socref
+    f_lu = f_lu_ref
+    f_i = f_i_ref
+    f_mg = f_mg_ref
+
+    straw_tonnes = straw_tonnes_ref
+
+    # the comment above is the reason why I am returning EFc_ref instead of EFc
+    return EFc_ref, SFw_ref, SFp_ref, SFo_ref, adjusted_daily_ef_methane_ref, soc, f_lu, f_i, f_mg, straw_tonnes
+
+
+
+
+
+
 
 em = calculate_emissions(12, 12, 12, 1.19, None, 1, None, 0.89, None, 1, None, 50, 0.95, 2.46, None,2.7, 0.8 ,0.07, 265, 20, 5, 0.5, 28, 113, None, 0.5, 'D', 'D', 70, None, 0, 0 , 0, 0, 0, 0)
 print(em)

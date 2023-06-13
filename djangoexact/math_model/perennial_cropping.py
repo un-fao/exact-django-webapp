@@ -280,8 +280,12 @@ def total_biomass_co2 (area_start, area, time_impl, time_cap, rate_type, rate_co
     # agb_maximum_c: IPCC A3235 matching CLIMATE and AGRO-FORESTRY SYSTEM
     agb_rate = agb_rate_default * 44/12 if not agb_rate_tier_2 else agb_rate_tier_2 * 44/12
     bgb_rate = bgb_rate_default * 44/12 if not bgb_rate_tier_2 else bgb_rate_tier_2 * 44/12
-
-    max_agb = 0 if agb_rate_tier_2 else agb_maximum_c * 44/12
+    
+    if agb_rate_tier_2:
+        max_agb = 0 if agb_rate_default < agb_rate_tier_2 else agb_maximum_c * 44/12
+    else:
+        max_agb = agb_maximum_c * 44/12
+    
     biomass_accumulation_rate = agb_rate + bgb_rate
 
     max_years_growth = max_agb/agb_rate 
@@ -296,3 +300,23 @@ def total_biomass_co2 (area_start, area, time_impl, time_cap, rate_type, rate_co
 
 # defo = calculate_emissions(0, 10, 1, 20, 9, 'D', 0.5, 'D', 0.5, 265, 28, True, 0.21, 2.3, 0.85, 1, None, None, 3.16, None, 48, 0.71, None, 46, None, 1.01, None, 0.92, None, 1.04, None)
 
+def default_tier_2(socref, f_lu_ref, f_i_ref, f_mg_ref, fire_periodicity_default, agb_rate_default, agb_maximum_c, bgb_rate_default, ag_tc_default, t_biomass_default, ag_tc_tier_2):
+
+    soc = socref
+    f_lu = f_lu_ref
+    f_i = f_i_ref
+    f_mg = f_mg_ref
+
+    fire_periodicity = fire_periodicity_default 
+
+    agb_rate = agb_rate_default
+    bgb_rate = bgb_rate_default
+    max_agb = agb_maximum_c
+
+    ag_tc = ag_tc_default if not ag_tc_tier_2 else ag_tc_tier_2
+
+    # TODO: tell Lorenzo t_biomass is dependent on ag_tc
+    t_biomass = ag_tc * 0.5 /0.47
+
+
+    return soc, f_lu, f_i, f_mg, fire_periodicity, agb_rate, bgb_rate, max_agb, ag_tc_default, t_biomass
