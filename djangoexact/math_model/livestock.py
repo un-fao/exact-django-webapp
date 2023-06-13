@@ -1,4 +1,4 @@
-#### HAVE TO ADD ALL THE LOGIC NECESSART FOR A CALCULATION OF ALL COMPONENTS OF THE LIVESTOCK EMISSIONS
+#### TODO: HAVE TO ADD ALL THE LOGIC NECESSART FOR A CALCULATION OF ALL COMPONENTS OF THE LIVESTOCK EMISSIONS
 
 def emissions_calculation(tam: float, vser: float, ef_prp_methane: float, percentage_prp_default: float, percentage_prp_tier_2_start: float, percentage_prp_tier_2_w: float, percentage_prp_tier_2_wo: float,
                           ef_system_methane: list, ch4_prp_tier_2_start: float, ch4_prp_tier_2_w: float, ch4_prp_tier_2_wo: float, n_heads_start: int, n_heads_w: int, n_heads_wo:int, methane_constant: float,
