@@ -269,6 +269,21 @@ def calculate_emissions(area_start, area_w, area_wo, time_impl, time_cap, rate_w
 
     return total_w, total_wo, total_w - total_wo
 
+def default_tier_2 (socref, f_lu_ref, f_i_ref, f_mg_ref, n_estimation_slope_main, n_estimation_intercept_main, yield_value_main, n_estimation_slope_minor, n_estimation_intercept_minor, yield_value_minor):
+
+    soc = socref
+    f_lu = f_lu_ref
+    f_i = f_i_ref
+    f_mg = f_mg_ref
+
+    ag_residue_main = yield_value_main * n_estimation_slope_main + n_estimation_intercept_main
+    ag_residue_minor = yield_value_minor * n_estimation_slope_minor + n_estimation_intercept_minor if yield_value_minor else 0
+
+    return soc, f_lu, f_i, f_mg, ag_residue_main, ag_residue_minor
+
+
+
+
 ao = residue_burning(12,12,20, 9, 0.5, 265, 28, 2.7, 0.85, None, 1.13, 0.85, 50, None, 0.85, 0, None, None, None, 0.07, False, None, False, 0.008, 0.19, 0.008, None, None, None, 0.006 )
 
 som_test = som(12, 12, 20, 9, 0.5, 46, None, 0.83, None, 1.11, None, 1.04, None, 0.006, 265)
