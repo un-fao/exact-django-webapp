@@ -1,13 +1,8 @@
-<<<<<<< HEAD
-runtime: python39
+runtime: python310
 service: $SERVICE_NAME
-=======
-runtime: python311
-service: default
->>>>>>> feature/fixing_app_engine
 instance_class: F2
 
-#entrypoint: gunicorn -b :$PORT djangoexact:app
+entrypoint: gunicorn -b :$PORT djangoexact:app
 
 handlers:
 # This configures Google App Engine to serve the files in the app's static
@@ -22,11 +17,11 @@ handlers:
   script: auto
 
 env_variables:
-  PROJECT_ID: "fao-exact-review"
-  DB_ENGINE: "django.db.backends.postgresql"
-  DB_HOST: "127.0.0.1"
-  DB_USERNAME: "exact_user"
-  DB_PASSWORD: "P4ssw0rd!@#$ASDFasdf"
-  DB_NAME: "exact"
-  DB_PORT: "5432"
+  PROJECT_ID: "$PROJECT_ID"
+  DB_ENGINE: "$DB_ENGINE"
+  DB_HOST: "$DB_HOST"
+  DB_USERNAME: "$DB_USERNAME"
+  DB_PASSWORD: "$DB_PASSWORD"
+  DB_NAME: "$DB_NAME"
+  DB_PORT: "$DB_PORT"
   SECRET_KEY: "$SECRET_KEY"
