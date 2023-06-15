@@ -2,7 +2,7 @@ runtime: python311
 service: default
 instance_class: F2
 
-#entrypoint: gunicorn -b :$PORT djangoexact:app
+entrypoint: gunicorn -b :$PORT djangoexact:app
 
 handlers:
 # This configures Google App Engine to serve the files in the app's static
