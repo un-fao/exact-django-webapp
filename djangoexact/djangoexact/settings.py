@@ -102,21 +102,12 @@ if os.getenv('GAE_APPLICATION', None):
 else:
     DATABASES = {
         'default': {
-<<<<<<< HEAD
             'ENGINE': os.getenv("DB_ENGINE", default='$DB_ENGINE'),
             'HOST': os.getenv("DB_HOST", default='$DB_HOST'),
             'USER': os.getenv("DB_USER", default='$DB_USERNAME'),
             'PASSWORD': os.getenv("DB_PASSWORD", default='$DB_PASSWORD'),
             'NAME': os.getenv("DB_NAME", default='$DB_NAME'),
             'PORT': os.getenv("DB_PORT", default='$DB_PORT')
-=======
-            'ENGINE': os.getenv("DB_ENGINE", default='django.db.backends.postgresql'),
-            'HOST': os.getenv("DB_HOST", default='127.0.0.1'),
-            'USER': os.getenv("DB_USER", default='exact_user'),
-            'PASSWORD': os.getenv("DB_PASSWORD", default='P4ssw0rd!@#$ASDFasdf'),
-            'NAME': os.getenv("DB_NAME", default='exact'),
-            'PORT': os.getenv("DB_PORT", default='5502')
->>>>>>> feature/fixing_app_engine
         }
     }
 
