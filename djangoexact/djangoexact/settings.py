@@ -23,12 +23,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY") if not os.getenv('GAE_APPLICATION', None) else ''
+SECRET_KEY = os.getenv("SECRET_KEY") if not os.getenv('GAE_APPLICATION', None) else '$SECRET_KEY'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["fao-exact-review.ew.r.appspot.com", "localhost", "127.0.0.1", "0.0.0.0"]
+ALLOWED_HOSTS = ["$ALLOWED_HOST", "localhost", "127.0.0.1", "0.0.0.0"]
 
 
 # Application definition
@@ -92,11 +92,11 @@ if os.getenv('GAE_APPLICATION', None):
     # the unix socket at /cloudsql/<your-cloudsql-connection string>
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'HOST': '/cloudsql/fao-exact-review:europe-west1:fao-exact-review-postgres',
-            'USER': 'exact_user',
-            'PASSWORD': 'P4ssw0rd!@#$ASDFasdf',
-            'NAME': 'exact',
+            'ENGINE': '$DB_ENGINE',
+            'HOST': '/cloudsql/$DB_INSTANCE_CONNECTION',
+            'USER': '$DB_USERNAME',
+            'PASSWORD': '$DB_PASSWORD',
+            'NAME': '$DB_NAME',
         }
     }
 else:
