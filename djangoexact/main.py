@@ -7,8 +7,4 @@ from djangoexact.wsgi import application
 # App Engine without additional configuration.
 # Alternatively, you can add a custom entrypoint field in your app.yaml:
 # entrypoint: gunicorn -b :$PORT mysite.wsgi
-<<<<<<< HEAD
 app = application
-=======
-app = application
->>>>>>> feature/fixing_app_engine
