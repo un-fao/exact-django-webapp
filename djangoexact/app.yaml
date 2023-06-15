@@ -1,10 +1,5 @@
-<<<<<<< HEAD
-runtime: python39
-service: $SERVICE_NAME
-=======
 runtime: python311
 service: default
->>>>>>> feature/fixing_app_engine
 instance_class: F2
 
 #entrypoint: gunicorn -b :$PORT djangoexact:app
