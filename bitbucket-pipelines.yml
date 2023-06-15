@@ -45,7 +45,7 @@ definitions:
           - sed -i "s|\$ALLOWED_HOST|$ALLOWED_HOST|g" djangoexact/settings.py
           - sed -i "s|\$SECRET_KEY|$SECRET_KEY|g" djangoexact/settings.py
 
-          - pip install -r ../requirements.txt
+          - pip install -r requirements.txt
           #- python manage.py makemigrations
           - python manage.py migrate
           - python manage.py collectstatic --noinput
