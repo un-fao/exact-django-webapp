@@ -151,7 +151,6 @@ def default_tier_2(EFc_ref, EFc_tier_2, SFw_ref, SFw_tier_2, SFp_ref, SFp_tier_2
     # TODO: show lorenzo, as the above parameters are used for calculation of this parameter, I have to return defaults but also retrieve the tier 2 values in order to calculate it correctly
     adjusted_daily_ef_methane_ref = EFc * SFw * SFp * SFo
 
-
     soc = socref
     f_lu = f_lu_ref
     f_i = f_i_ref

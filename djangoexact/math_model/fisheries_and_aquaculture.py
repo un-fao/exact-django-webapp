@@ -178,3 +178,25 @@ print(em)
 
 # em = total_inland_coastal_aquaculture(757, 213, 0.00169, None, 265, 20, 9, 0.5, 0.5, 45, 500, 453, 0, None, 456)
 # print(em)
+
+def default_tier_2_small_or_large_fisheries(ef_diesel_default, fui_default, gwp_refrigerant_default, quantity_lost_refrigerant_default, tonnes_ice_default, kwh_ice_per_tonne_default):
+
+    ef_diesel = ef_diesel_default 
+    fui_start = fui_default
+    fui_w = fui_default
+    fui_wo = fui_default
+
+    gwp_refrigerant = gwp_refrigerant_default
+    quantity_lost_refrigerant = quantity_lost_refrigerant_default
+
+    tonnes_ice = tonnes_ice_default 
+    kwh_ice_per_tonne = kwh_ice_per_tonne_default 
+
+    return ef_diesel, fui_start, fui_w, fui_wo, gwp_refrigerant, quantity_lost_refrigerant, tonnes_ice, kwh_ice_per_tonne
+
+def default_tier_2_inland_coastal_aquaculture(nitrous_ef_default, ef_feed_default):
+
+    nitrous_ef = nitrous_ef_default
+    ef_feed = ef_feed_default 
+
+    return nitrous_ef, ef_feed
