@@ -122,3 +122,14 @@ def calculate_w_or_wo (area_start, area_end, time_impl, time_cap, rate_type, rat
                                                                
 
 # emissions = calculate_total_emissions(100, 100, 100, 20, 9, 'D', 0.5, 'D', 0.5, 265, 28, 5, 8, True, True, 2.3, 0.21, 6.2, None, 0.77, None, 41.4, None, 46, 46, None, None  )
+
+def default_tier_2(soc_start_ref, soc_end_ref_w, soc_end_ref_wo, agb_ref, cf_ref, ):
+
+    soc_start = soc_start_ref 
+    soc_w = soc_end_ref_w
+    soc_wo = soc_end_ref_wo
+
+    agb = agb_ref 
+    cf = cf_ref 
+
+    return soc_start, soc_w, soc_wo, agb, cf

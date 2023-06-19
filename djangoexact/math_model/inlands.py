@@ -309,6 +309,30 @@ def inland_waterbodies_w_wo(trophic_state_ref, trophic_state_tier_2, chlo_A, ch4
       
 # ao = inland_aquaculture_w_wo(3, None, None, 183, None, None, None, 28, 0.5, 0.5, 20, 5, 43, 43, 43)
 # print(ao)
+def default_tier_2_inland_waterbodies(chlo_A, trophic_state_ref, ch4_emission_ref):
+
+    if chlo_A:
+        trophic_state = chlo_A * 0.26
+    else:
+        trophic_state = trophic_state_ref
+        
+    ch4_emission_start = ch4_emission_ref 
+    ch4_emission_w = ch4_emission_ref
+    ch4_emission_wo = ch4_emission_ref
+
+    return trophic_state, ch4_emission_start, ch4_emission_w, ch4_emission_wo
+
+def default_tier_2_peat_extraction(ef_co2_onsite_ref, ef_ch4_onsite_ref, ef_n2o_onsite_ref, ef_doc_offsite_ref, ef_ch4_offsite_ref, mass_tonnes_ref):
+
+    ef_co2_onsite = ef_co2_onsite_ref 
+    ef_ch4_onsite = ef_ch4_onsite_ref 
+    ef_n2o_onsite = ef_n2o_onsite_ref 
+    ef_doc_offsite = ef_doc_offsite_ref 
+    ef_ch4_offsite = ef_ch4_offsite_ref 
+    mass_tonnes = mass_tonnes_ref 
+
+    return ef_co2_onsite, ef_ch4_onsite, ef_n2o_onsite, ef_doc_offsite, ef_ch4_offsite, mass_tonnes
+
 
 maximum_area_for_water_management = 200
 area_drained_start = 100
