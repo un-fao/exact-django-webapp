@@ -33,6 +33,7 @@ SECRET_KEY = (
 DEBUG = True
 
 ALLOWED_HOSTS = ["$ALLOWED_HOST", "localhost", "127.0.0.1", "0.0.0.0", "localhost:3000"]
+
 CORS_ORIGIN_ALLOW_ALL = DEBUG
 
 
@@ -52,6 +53,9 @@ INSTALLED_APPS = [
     "ipcc",
     "api",
 ]
+
+if DEBUG:
+    INSTALLED_APPS += ("corsheaders",)
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
