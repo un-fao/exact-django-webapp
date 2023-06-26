@@ -1,4 +1,5 @@
 import os
+
 """
 Django settings for djangoexact project.
 
@@ -13,6 +14,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 from dotenv import load_dotenv
+
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -23,91 +25,90 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY") if not os.getenv('GAE_APPLICATION', None) else '$SECRET_KEY'
+SECRET_KEY = (
+    os.getenv("SECRET_KEY") if not os.getenv("GAE_APPLICATION", None) else "$SECRET_KEY"
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["$ALLOWED_HOST", "localhost", "127.0.0.1", "0.0.0.0"]
+ALLOWED_HOSTS = ["$ALLOWED_HOST", "localhost", "127.0.0.1", "0.0.0.0", "localhost:3000"]
+CORS_ORIGIN_ALLOW_ALL = DEBUG
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'drf_yasg',
-    'django_extensions',
-    'auditlog',
-
-    'rest_framework',
-    'ipcc',
-    'api',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "drf_yasg",
+    "django_extensions",
+    "auditlog",
+    "rest_framework",
+    "ipcc",
+    "api",
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-    'auditlog.middleware.AuditlogMiddleware',
-
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "auditlog.middleware.AuditlogMiddleware",
 ]
 
-ROOT_URLCONF = 'djangoexact.urls'
+ROOT_URLCONF = "djangoexact.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'djangoexact.wsgi.application'
+WSGI_APPLICATION = "djangoexact.wsgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-if os.getenv('GAE_APPLICATION', None):
+if os.getenv("GAE_APPLICATION", None):
     # Running on production App Engine, so connect to Google Cloud SQL using
     # the unix socket at /cloudsql/<your-cloudsql-connection string>
     DATABASES = {
-        'default': {
-            'ENGINE': '$DB_ENGINE',
-            'HOST': '/cloudsql/$DB_INSTANCE_CONNECTION',
-            'USER': '$DB_USERNAME',
-            'PASSWORD': '$DB_PASSWORD',
-            'NAME': '$DB_NAME',
+        "default": {
+            "ENGINE": "$DB_ENGINE",
+            "HOST": "/cloudsql/$DB_INSTANCE_CONNECTION",
+            "USER": "$DB_USERNAME",
+            "PASSWORD": "$DB_PASSWORD",
+            "NAME": "$DB_NAME",
         }
     }
 else:
     DATABASES = {
-        'default': {
-            'ENGINE': os.getenv("DB_ENGINE", default='$DB_ENGINE'),
-            'HOST': os.getenv("DB_HOST", default='$DB_HOST'),
-            'USER': os.getenv("DB_USER", default='$DB_USERNAME'),
-            'PASSWORD': os.getenv("DB_PASSWORD", default='$DB_PASSWORD'),
-            'NAME': os.getenv("DB_NAME", default='$DB_NAME'),
-            'PORT': os.getenv("DB_PORT", default='$DB_PORT')
+        "default": {
+            "ENGINE": os.getenv("DB_ENGINE", default="$DB_ENGINE"),
+            "HOST": os.getenv("DB_HOST", default="$DB_HOST"),
+            "USER": os.getenv("DB_USER", default="$DB_USERNAME"),
+            "PASSWORD": os.getenv("DB_PASSWORD", default="$DB_PASSWORD"),
+            "NAME": os.getenv("DB_NAME", default="$DB_NAME"),
+            "PORT": os.getenv("DB_PORT", default="$DB_PORT"),
         }
     }
 
@@ -116,16 +117,16 @@ else:
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -133,9 +134,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
@@ -144,26 +145,22 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
-#STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATIC_ROOT = 'static'
-STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_URL = "static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-REST_FRAMEWORK = { 
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema', 
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    ] 
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.BasicAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ],
 }
 
 # Auditlog Settings
-AUDITLOG_INCLUDE_ALL_MODELS=True
-AUDITLOG_EXCLUDE_TRACKING_FIELDS = (
-    "created",
-    "modified"
-)
+AUDITLOG_INCLUDE_ALL_MODELS = True
+AUDITLOG_EXCLUDE_TRACKING_FIELDS = ("created", "modified")
