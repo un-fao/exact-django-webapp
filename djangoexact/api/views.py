@@ -271,3 +271,11 @@ def generic_module_viewset(model: Model):
                 return ErrorResponse(str(e))
 
     return GenericModuleViewSet
+
+
+def generic_viewset(model: Model):
+    class GenericViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+        queryset = model.objects.all()
+        serializer_class = get_model_serializer(model)
+
+    return GenericViewSet
