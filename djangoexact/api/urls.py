@@ -141,8 +141,6 @@ router.register(r"gear-types", views.generic_viewset(GearType), basename="gear-t
 
 
 urlpatterns = [
-    path("login/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("docs/", include_docs_urls(title="EX-ACT Docs")),
     re_path(
         r"^swagger(?P<format>\.json|\.yaml)$",
