@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "auditlog",
     "rest_framework",
+    "rest_framework_simplejwt",
     "ipcc",
     "api",
 ]
@@ -162,6 +163,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.BasicAuthentication",
         "rest_framework.authentication.SessionAuthentication",
+        "rest_framework_simplejwt.authentication.JWTStatelessUserAuthentication",
     ],
 }
 
