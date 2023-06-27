@@ -1,0 +1,11 @@
+﻿Full tillage,Reduced tillage,No tillage
+Boreal,Moist,1.00,1.04,1.09
+Boreal,Dry,1.00,0.98,1.03
+Cool temperate,dry,1.00,0.98,1.03
+Cool temperate,moist,1.00,1.04,1.09
+Warm temperate,dry,1.00,0.99,1.04
+Warm temperate,moist,1.00,1.05,1.10
+Tropical,dry,1.00,0.99,1.04
+Tropical,moist,1.00,1.04,1.10
+Tropical,wet,1.00,1.04,1.10
+Tropical,Montane,1.00,1.09,1.16

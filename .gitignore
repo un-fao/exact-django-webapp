@@ -66,4 +66,3 @@ requirements.txt.old
 djangoexact/api/old_models.py
 djangoexact/api/non_generic_viewsets.py
 djangoexact/math_model/cropland_annual.xlsb
-djangoexact/scripts/
