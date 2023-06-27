@@ -1,6 +1,6 @@
 #### TODO: HAVE TO ADD ALL THE LOGIC NECESSART FOR A CALCULATION OF ALL COMPONENTS OF THE LIVESTOCK EMISSIONS
 
-def emissions_calculation(tam: float, vser: float, ef_prp_methane: float, percentage_prp_default: float, percentage_prp_tier_2_start: float, percentage_prp_tier_2_w: float, percentage_prp_tier_2_wo: float,
+def emissions_calculation(tam, vser: float, ef_prp_methane: float, percentage_prp_default: float, percentage_prp_tier_2_start: float, percentage_prp_tier_2_w: float, percentage_prp_tier_2_wo: float,
                           ef_system_methane: list, ch4_prp_tier_2_start: float, ch4_prp_tier_2_w: float, ch4_prp_tier_2_wo: float, n_heads_start: int, n_heads_w: int, n_heads_wo:int, methane_constant: float,
                           rate_w:float, rate_wo:float, time_impl: float, time_cap: float, percentage_system_default: list):
 
@@ -72,7 +72,43 @@ def default_tier_2(specific_factor_default_mef: float, percentage_prp_default: f
 
     return specific_factor_mef, percentage_prp
 
+def emissions_w_wo(time_impl, time_cap, methane_constant, head_number_start, head_number_w, head_number_wo, 
+                   rate_coefficient_w_mef, rate_coefficient_wo_mef, specific_factor_default, specific_factor_start_tier_2, specific_factor_w_tier_2, specific_factor_wo_tier_2, # METHANE ENTERIC FERMENTATION EMISSIONS PARAMETERS
+                   ef_prp_methane, percentage_prp_default, percentage_prp_tier_2_start, percentage_prp_tier_2_w, percentage_prp_tier_2_wo, ef_system_methane, ch4_prp_tier_2_start, ch4_prp_tier_2_w, 
+                   ch4_prp_tier_2_wo, percentage_system_default, rate_coefficient_w_mmm, rate_coefficient_wo_mmm, tam, vser, # METHANE MANURE MANAGEMENT EMISSIONS PARAMETERS
+                   ef_prp_nitrous_direct, ef_system_nitrous_direct, n2o_prp_tier_2_start_direct, n2o_prp_tier_2_w_direct, n2o_prp_tier_2_wo_direct, rate_coefficient_w_nmm, rate_coefficient_wo_nmm, ner, # NITROUS OXIDE MANURE MANAGEMENT EMISSIONS PARAMETERS DIRECT
+                   ef_prp_nitrous_indirect_volatization, ef_system_nitrous_indirect_volatization, n2o_prp_tier_2_start_indirect_volatization, n2o_prp_tier_2_w_indirect_volatization, n2o_prp_tier_2_wo_indirect_volatization,  # NITROUS OXIDE MANURE MANAGEMENT EMISSIONS PARAMETERS INDIRECT VOLATIZATION
+                   ef_prp_nitrous_indirect_leaching, ef_system_nitrous_indirect_leaching, n2o_prp_tier_2_start_indirect_leaching, n2o_prp_tier_2_w_indirect_leaching, n2o_prp_tier_2_wo_indirect_leaching # NITROUS OXIDE MANURE MANAGEMENT EMISSIONS PARAMETERS INDIRECT LEACHING
+                     ):
 
+    # METHANE ENTERIC FERMENTATION EMISSIONS
+    mef_w, mef_wo, mef_balance = methane_enteric_fermentation_emissions(time_impl, time_cap,  rate_coefficient_w_mef, rate_coefficient_wo_mef, methane_constant, head_number_start, head_number_w, head_number_wo, 
+                                                                        specific_factor_default, specific_factor_start_tier_2, specific_factor_w_tier_2, specific_factor_wo_tier_2)
+    
+    # METHANE MANURE MANAGEMENT EMISSIONS
+    mmm_w, mmm_wo, mmm_balance = emissions_calculation(tam, vser, ef_prp_methane, percentage_prp_default, percentage_prp_tier_2_start, percentage_prp_tier_2_w, percentage_prp_tier_2_wo,
+                                                        ef_system_methane, ch4_prp_tier_2_start, ch4_prp_tier_2_w, ch4_prp_tier_2_wo, head_number_start, head_number_w, head_number_wo, methane_constant,
+                                                        rate_coefficient_w_mmm, rate_coefficient_wo_mmm, time_impl, time_cap, percentage_system_default)
+    
+    nmm_direct_w, nmm_direct_wo, nmm_direct_balance = emissions_calculation(tam, ner, ef_prp_nitrous_direct, percentage_prp_default, percentage_prp_tier_2_start, percentage_prp_tier_2_w, percentage_prp_tier_2_wo,
+                                                       ef_system_nitrous_direct, n2o_prp_tier_2_start_direct, n2o_prp_tier_2_w_direct, n2o_prp_tier_2_wo_direct, head_number_start, head_number_w, head_number_wo, methane_constant,
+                                                       rate_coefficient_w_nmm, rate_coefficient_wo_nmm, time_impl, time_cap, percentage_system_default)
+    
+    nmm_indirect_volatization_w, nmm_indirect_volatization_wo, nmm_indirect_volatization_balance = emissions_calculation(tam, ner, ef_prp_nitrous_indirect_volatization, percentage_prp_default, percentage_prp_tier_2_start, percentage_prp_tier_2_w, percentage_prp_tier_2_wo,
+                                                        ef_system_nitrous_indirect_volatization, n2o_prp_tier_2_start_indirect_volatization, n2o_prp_tier_2_w_indirect_volatization, n2o_prp_tier_2_wo_indirect_volatization, head_number_start, head_number_w, head_number_wo, methane_constant,
+                                                        rate_coefficient_w_nmm, rate_coefficient_wo_nmm, time_impl, time_cap, percentage_system_default)
+
+
+    nmm_indirect_leaching_w, nmm_indirect_leaching_wo, nmm_indirect_volatization_balance = emissions_calculation(tam, ner, ef_prp_nitrous_indirect_leaching, percentage_prp_default, percentage_prp_tier_2_start, percentage_prp_tier_2_w, percentage_prp_tier_2_wo,
+                                                        ef_system_nitrous_indirect_leaching, n2o_prp_tier_2_start_indirect_leaching, n2o_prp_tier_2_w_indirect_leaching, n2o_prp_tier_2_wo_indirect_leaching, head_number_start, head_number_w, head_number_wo, methane_constant,
+                                                        rate_coefficient_w_nmm, rate_coefficient_wo_nmm, time_impl, time_cap, percentage_system_default)
+    
+    # TOTAL EMISSIONS
+    total_w = mef_w + mmm_w + nmm_direct_w + nmm_indirect_volatization_w + nmm_indirect_leaching_w
+    total_wo = mef_wo + mmm_wo + nmm_direct_wo + nmm_indirect_volatization_wo + nmm_indirect_leaching_wo
+    total_balance = mef_balance + mmm_balance + nmm_direct_balance + nmm_indirect_volatization_balance + nmm_indirect_volatization_balance
+    
+    return total_w, total_wo, total_balance 
 
 
 ef_prp = 0.6
