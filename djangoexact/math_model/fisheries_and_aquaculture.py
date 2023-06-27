@@ -1,11 +1,12 @@
 def total_emissions_small_or_large_fisheries(time_impl, time_cap, rate_coefficient_w, rate_coefficient_wo, catch_start, catch_w, catch_wo, 
                     ef_diesel_default, ef_diesel_start_tier_2, ef_diesel_w_tier_2, ef_diesel_wo_tier_2,
-                    fui_default_start, fui_default_w, fui_default_wo, fui_start_tier_2, fui_w_tier_2, fui_wo_tier_2,  gwp_refrigerant_default,
-                    gwp_refrigerant_start_tier_2, gwp_refrigerant_w_tier_2, gwp_refrigerant_wo_tier_2,
+                    fui_default_start, fui_default_w, fui_default_wo, fui_start_tier_2, fui_w_tier_2, fui_wo_tier_2,  
+                    gwp_refrigerant_default, gwp_refrigerant_start_tier_2, gwp_refrigerant_w_tier_2, gwp_refrigerant_wo_tier_2,
                     quantity_lost_refrigerant_default, quantity_lost_refrigerant_start_tier_2, quantity_lost_refrigerant_w_tier_2, quantity_lost_refrigerant_wo_tier_2,
-                    percentage_refrigerant_start, percentage_refrigerant_w, 
-                    percentage_refrigerant_wo, tonnes_ice_default, tonnes_ice_start_tier_2, tonnes_ice_w_tier_2, tonnes_ice_wo_tier_2,
-                    kwh_ice_per_tonne_default, kwh_ice_per_tonne_start_tier_2, kwh_ice_per_tonne_w_tier_2, kwh_ice_per_tonne_wo_tier_2, operating_margin,
+                    percentage_refrigerant_start, percentage_refrigerant_w, percentage_refrigerant_wo, 
+                    tonnes_ice_default, tonnes_ice_start_tier_2, tonnes_ice_w_tier_2, tonnes_ice_wo_tier_2,
+                    kwh_ice_per_tonne_default, kwh_ice_per_tonne_start_tier_2, kwh_ice_per_tonne_w_tier_2, kwh_ice_per_tonne_wo_tier_2, 
+                    operating_margin,
                     percentage_ice_start, percentage_ice_w, percentage_ice_wo):
     
     # SINGLE EMISSION CALCULATION FUNCTIONS AND SUPPORT FUNCTIONS
