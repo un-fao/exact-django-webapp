@@ -52,7 +52,6 @@ INSTALLED_APPS = [
     "auditlog",
     "rest_framework",
     "rest_framework_simplejwt",
-    "corsheaders",
     "accounts",
     "ipcc",
     "api",
