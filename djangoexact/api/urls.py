@@ -138,6 +138,10 @@ router.register(
     r"change-rates", views.generic_viewset(ChangeRate), basename="change-rates"
 )
 router.register(r"gear-types", views.generic_viewset(GearType), basename="gear-types")
+router.register(r"fish-types", views.generic_viewset(FishType), basename="fish-types")
+router.register(
+    r"fishery-types", views.generic_viewset(FisheryType), basename="fishery-types"
+)
 
 
 urlpatterns = [
