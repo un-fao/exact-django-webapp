@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "auditlog",
     "rest_framework",
     "rest_framework_simplejwt",
+    "accounts",
     "ipcc",
     "api",
 ]
@@ -163,7 +164,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.BasicAuthentication",
         "rest_framework.authentication.SessionAuthentication",
-        "rest_framework_simplejwt.authentication.JWTStatelessUserAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
 }
 

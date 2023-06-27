@@ -9,6 +9,10 @@ from rest_framework.views import *
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from .calculators import CalculatorFactory
+from rest_framework.permissions import AllowAny
+from rest_framework import generics
+from rest_framework_simplejwt.views import TokenObtainPairView
+
 
 activity_id = openapi.Parameter(
     "activity_id",
