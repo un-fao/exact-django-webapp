@@ -132,6 +132,7 @@ router.register(
 router.register(
     r"change-rates", views.generic_viewset(ChangeRate), basename="change-rates"
 )
+router.register(r"gear-types", views.generic_viewset(GearType), basename="gear-types")
 
 
 urlpatterns = [
