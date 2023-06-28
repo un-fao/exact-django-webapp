@@ -1495,8 +1495,10 @@ class Fishery(Module):
 
     # TODO: This part has some internal logic that has to be examined more deeply
     # NOTE: The logic does not seem to make much sense. It's just to display some values and can probably be ignored altogether
-    inshore_ice_production_kwh_per_tonne_t2 = FloatField(null=True, blank=True)
-    inshore_ice_production_country = ForeignKey(
+    inshore_ice_production_kwh_per_tonne_t2_start = FloatField(null=True, blank=True)
+    inshore_ice_production_kwh_per_tonne_t2_w = FloatField(null=True, blank=True)
+    inshore_ice_production_kwh_per_tonne_t2_wo = FloatField(null=True, blank=True)
+    inshore_ice_production_country_t2 = ForeignKey(
         Country, on_delete=CASCADE, null=True, blank=True
     )
 
