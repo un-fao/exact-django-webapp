@@ -49,6 +49,7 @@ class CalculatorFactory:
             )(input)
             return calculator.calculate()
         except AttributeError as e:
+            print(e)
             raise Exception(f"Module '{input.__class__.__name__}' not (yet) supported.")
         except Exception as ex:
             raise ex
@@ -887,9 +888,9 @@ class GrasslandCalculator(BaseCalculator):
         if is_parent:
             if relative.__class__.__name__ == Deforestation.__name__:
                 ha_data = [0, relative.ha_w, (relative.ha_start - relative.ha_wo)]
-            if relative.__class__.__name__ ==  Afforestation.__name__:
+            if relative.__class__.__name__ == Afforestation.__name__:
                 ha_data = [relative.ha_w, relative.ha_w, relative.ha_wo]
-            if relative.__class__.__name__ ==  OtherLandUse.__name__:
+            if relative.__class__.__name__ == OtherLandUse.__name__:
                 ha_data = [relative.ha_start, relative.ha_w, 0]
 
         inputs = [
@@ -978,7 +979,9 @@ class SmallFisheryCalculator(BaseCalculator):
             self.data.total_catch_yr_w,
             self.data.total_catch_yr_wo,
             ef_diesel_default,
-            self.data.energy_emission_factor_t2,
+            self.data.energy_emission_factor_t2_start,
+            self.data.energy_emission_factor_t2_w,
+            self.data.energy_emission_factor_t2_wo,
             fui_default_start.value,
             fui_default_w.value,
             fui_default_wo.value,
@@ -986,14 +989,20 @@ class SmallFisheryCalculator(BaseCalculator):
             self.data.fui_w,
             self.data.fui_wo,
             self.data.refrigerant_gwp,
-            self.data.refrigerant_gwp_t2,
+            self.data.refrigerant_gwp_t2_start,
+            self.data.refrigerant_gwp_t2_w,
+            self.data.refrigerant_gwp_t2_wo,
             lost_refrigerant_default,
-            self.data.refrigerant_lost_per_tonne_t2,
+            self.data.refrigerant_lost_per_tonne_t2_start,
+            self.data.refrigerant_lost_per_tonne_t2_w,
+            self.data.refrigerant_lost_per_tonne_t2_wo,
             self.data.refrigerant_pc_start,
             self.data.refrigerant_pc_w,
             self.data.refrigerant_pc_wo,
             tonnes_ice_default,
-            self.data.inshore_ice_production_emissions_t2,
+            self.data.tonnes_of_ice_t2_start,
+            self.data.tonnes_of_ice_t2_w,
+            self.data.tonnes_of_ice_t2_wo,
             kw_tonnes,
             self.data.inshore_ice_production_kwh_per_tonne_t2,
             electricity_emission.operating_margin,
