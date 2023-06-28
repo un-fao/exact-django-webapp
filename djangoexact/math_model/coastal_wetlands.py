@@ -76,7 +76,7 @@ def drainage(area_start, percentage_drained_start, percentage_drained_end, rate_
     EF_drainage_tier_2 : tier 2 value, expects float or None
     
     """
-
+    # TODO: 0.451 is specific to MANGROVE, ask Claudio to parametrize this and send it in the inputs (percentage carbon wood/mangrove)
     agb = agb_default * 0.451 if not agb_tier_2 else agb_tier_2
     bgb = bgb_default * agb if not bgb_tier_2 else bgb_tier_2
     litter = litter_default if not litter_tier_2 else litter_tier_2
@@ -127,7 +127,7 @@ def rewetting_revegetation(agb_default, bgb_default, litter_default, deadwood_de
                 else:
                     return min(20, time_impl * rate_coefficient) + time_impl + time_cap - min(20, time_impl) - exponential_correction(time_impl, time_cap, rate_type)
 
-
+    # TODO: check if this is correct, reference version on the Excel is different, could be due to the fact that the Excel version has been changed!
     """
     agb_default : match climate moisture and type of vegetation to IPCC A2903, if present return value, else 0
     bgb_default : match climate moisture and type of vegetation to IPCC A2111, if present return value, else 0
@@ -433,4 +433,46 @@ def extraction_and_drainage_w_wo(area_start_extr_drain, percentage_excavated_w, 
 
 
     return drainage_w + extraction_w, drainage_wo + extraction_wo, drainage_w + extraction_w - drainage_wo - extraction_wo
+
+
+def default_tier_2_extraction_drainage(agb_default, agb_tier_2, bgb_default, litter_default, deadwood_default, soil_1m_default, percentage_c_lost_excavation_default, EF_drainage_default):
+
+    # TODO: check if Lorenzo put this in the tier_2_dependencies
+    agb = agb_default * 0.451 if not agb_tier_2 else agb_tier_2
+    bgb = bgb_default * agb
+    litter = litter_default
+    deadwood = deadwood_default
+    soil_1m = soil_1m_default
+    percentage_c_lost_excavation = percentage_c_lost_excavation_default
+    EF_drainage = EF_drainage_default
+
+    return agb_default, bgb, litter, deadwood, soil_1m, percentage_c_lost_excavation, EF_drainage
+
+def default_tier_2_rewetting_revegetation(agb_default, agb_tier_2, bgb_default, litter_default, deadwood_default, ef_rewetting_carbon_default, ef_rewetting_methane_default):
+
+    # TODO: check if Lorenzo put this in the tier_2_dependencies
+    agb = agb_default * 0.451 if not agb_tier_2 else agb_tier_2
+    bgb = bgb_default * agb 
+    litter = litter_default
+    deadwood = deadwood_default 
+    ef_rewetting_carbon = ef_rewetting_carbon_default 
+    ef_rewetting_methane = ef_rewetting_methane_default 
+
+
+
+    return agb_default, bgb, litter, deadwood, ef_rewetting_carbon, ef_rewetting_methane
+
+def default_tier_2_coastal_waterbodies(trophic_state_default, methane_emission_factor_default):
+
+    trophic_state = trophic_state_default 
+    methane_emission_factor_w = methane_emission_factor_default
+    methane_emissions_factor_wo = methane_emission_factor_default
+    methane_emission_factor_start = methane_emission_factor_default 
+
+    return trophic_state, methane_emission_factor_w, methane_emissions_factor_wo, methane_emission_factor_start
+    
+
+
+
+    
 
