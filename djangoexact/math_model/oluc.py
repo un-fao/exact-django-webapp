@@ -146,3 +146,20 @@ def calculate_soil_emissions(time_impl, time_cap, rate_type, rate_of_change_soil
     return tabular if abs(calculated) >= abs(tabular) else calculated
 
     
+
+def default_tier_2 (biomass_start_default, soc_ref, flu_start_default, biomass_end_default, soc_end_default, flu_end_default):
+    # BIOMASS START
+    biomass_start = biomass_start_default
+    # SOC START
+    soc_start = soc_ref
+    # FLU START
+    flu_start = flu_start_default
+    # BIOMASS END
+    biomass_end = biomass_end_default
+    # SOC END
+    soc_end = soc_ref
+    # FLU END
+    flu_end = flu_end_default
+
+    return biomass_start, soc_start, flu_start, biomass_end, soc_end, flu_end
+

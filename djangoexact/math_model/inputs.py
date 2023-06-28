@@ -130,5 +130,25 @@ def operational_irrigation_w_wo_calculation(ef_default, ef_tier_2, total_dynamic
 
     return emissions_w, emissions_wo, emissions_w - emissions_wo
 
+def default_tier_2_inputs(ipcc_factor_c2o_default, ipcc_factor_n2o_default, ipcc_factor_co2_default):
 
+    # TODO: fix the name of c2o all across the code
+    ipcc_factor_c2o = ipcc_factor_c2o_default
+    ipcc_factor_n2o = ipcc_factor_n2o_default
+    ipcc_factor_co2 = ipcc_factor_co2_default
 
+    return ipcc_factor_c2o, ipcc_factor_n2o, ipcc_factor_co2
+
+def default_tier_2_irrigation(pumping_efficiency_default, average_pressure_default, average_pressure_tier_2, ef_default):
+    pumping_efficiency = pumping_efficiency_default
+    average_pressure = average_pressure_default if not average_pressure_tier_2 else average_pressure_tier_2
+    total_dynamic_head_default = average_pressure * 10
+    ef = ef_default
+
+    return pumping_efficiency, average_pressure_default, total_dynamic_head_default, ef
+    
+def default_tier_2_single_input(ef_ipcc):
+    # AKA not fertilizers. energy consumption, roads, old irrigation
+    ef = ef_ipcc
+
+    return ef
