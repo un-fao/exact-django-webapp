@@ -176,4 +176,5 @@ AUDITLOG_EXCLUDE_TRACKING_FIELDS = ("created", "modified")
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "TOKEN_OBTAIN_SERIALIZER": "accounts.serializers.MyTokenObtainPairSerializer",
 }
