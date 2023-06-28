@@ -79,7 +79,7 @@ def emissions_w_wo(time_impl, time_cap, methane_constant, head_number_start, hea
                    ef_prp_nitrous_direct, ef_system_nitrous_direct, n2o_prp_tier_2_start_direct, n2o_prp_tier_2_w_direct, n2o_prp_tier_2_wo_direct, rate_coefficient_w_nmm, rate_coefficient_wo_nmm, ner, # NITROUS OXIDE MANURE MANAGEMENT EMISSIONS PARAMETERS DIRECT
                    ef_prp_nitrous_indirect_volatization, ef_system_nitrous_indirect_volatization, n2o_prp_tier_2_start_indirect_volatization, n2o_prp_tier_2_w_indirect_volatization, n2o_prp_tier_2_wo_indirect_volatization,  # NITROUS OXIDE MANURE MANAGEMENT EMISSIONS PARAMETERS INDIRECT VOLATIZATION
                    ef_prp_nitrous_indirect_leaching, ef_system_nitrous_indirect_leaching, n2o_prp_tier_2_start_indirect_leaching, n2o_prp_tier_2_w_indirect_leaching, n2o_prp_tier_2_wo_indirect_leaching # NITROUS OXIDE MANURE MANAGEMENT EMISSIONS PARAMETERS INDIRECT LEACHING
-                     ):
+                         ):
 
     # METHANE ENTERIC FERMENTATION EMISSIONS
     mef_w, mef_wo, mef_balance = methane_enteric_fermentation_emissions(time_impl, time_cap,  rate_coefficient_w_mef, rate_coefficient_wo_mef, methane_constant, head_number_start, head_number_w, head_number_wo, 
@@ -111,17 +111,17 @@ def emissions_w_wo(time_impl, time_cap, methane_constant, head_number_start, hea
     return total_w, total_wo, total_balance 
 
 
-ef_prp = 0.6
-ef_system = [8, 3.2, 16.1]
-percentage_system_default = [20, 29, 6] # solid storage, dry lot, burned for fuel
-tam = 250
-vser = 21.7
-percentage_prp_default = 45
-percentage_prp_tier_2 = None
-ch4_prp_tier_2 = None
-n_heads = 500
-emission_constant = 28
+# ef_prp = 0.6
+# ef_system = [8, 3.2, 16.1]
+# percentage_system_default = [20, 29, 6] # solid storage, dry lot, burned for fuel
+# tam = 250
+# vser = 21.7
+# percentage_prp_default = 45
+# percentage_prp_tier_2 = None
+# ch4_prp_tier_2 = None
+# n_heads = 500
+# emission_constant = 28
 
-ao = emissions_calculation(tam, vser, ef_prp, percentage_prp_default, None, None, None, ef_system, None, None, None, 500, 100, 250, emission_constant, 0.5, 0.5, 20, 5, percentage_system_default)
+# ao = emissions_calculation(tam, vser, ef_prp, percentage_prp_default, None, None, None, ef_system, None, None, None, 500, 100, 250, emission_constant, 0.5, 0.5, 20, 5, percentage_system_default)
 
-print(ao)
+# print(ao)
