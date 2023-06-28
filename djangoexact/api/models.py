@@ -340,7 +340,7 @@ class Project(Model):
     soc_ref_t2 = FloatField(null=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return f"({self.pk}) {self.name}"
 
 
 ##############################
