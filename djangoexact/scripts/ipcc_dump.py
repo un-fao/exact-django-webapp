@@ -2,6 +2,7 @@ import pandas as pd
 from api.models import *
 from ipcc.models import *
 import os
+import csv
 
 
 def capitalize_all(string):
@@ -25,16 +26,12 @@ def parse_csv_number(number):
         return float(number)
 
 
-import csv
-from api.models import *
-from ipcc.models import *
-
-
 def sanitize(s: str):
     return s.replace("ï»¿", "").title().strip()
 
 
 def run():
+    """
     with open("scripts/ipcc_data/AboveGroundBiomass.csv", "r") as f:
         reader = csv.reader(f)
         header = next(reader, None)  # skip the headers
@@ -1070,28 +1067,7 @@ def run():
                 SmallFisheryFUI.objects.get_or_create(
                     fishery_type=fishery_type, gear_type=gear_type, value=value
                 )
-    with open("scripts/ipcc_data/LargeFisheryFUI.csv", "r") as f:
-        reader = csv.reader(f)
-        header = next(reader, None)
-        data = list(reader)
 
-        for i, head in enumerate(header):
-            head = sanitize(head).title()
-            gear_type = GearType.objects.get_or_create(name=head)[0]
-            for row in data:
-                if row[i + 1] == "":
-                    continue
-
-                fish_type = FishType.objects.get_or_create(
-                    name=sanitize(row[0]).title()
-                )[0]
-                value = float(row[i + 1])
-
-                print(f"{fish_type}, {gear_type}, {value}")
-
-                LargeFisheryFUI.objects.get_or_create(
-                    fish_type=fish_type, gear_type=gear_type, value=value
-                )
 
     with open("scripts/ipcc_data/ElectricityEmissions.csv", "r") as f:
         reader = csv.reader(f)
@@ -1255,3 +1231,37 @@ def run():
 
             if j + 2 == len(df_headers) - 1:
                 break
+
+    with open("scripts/ipcc_data/LargeFisheryFUI.csv", "r") as f:
+        reader = csv.reader(f)
+        header = next(reader, None)
+        data = list(reader)
+
+        for i, head in enumerate(header):
+            head = sanitize(head).title()
+            gear_type = GearType.objects.get_or_create(name=head)[0]
+            for row in data:
+                if row[i + 1] == "":
+                    continue
+
+                fish_type = FishType.objects.get_or_create(
+                    name=sanitize(row[0]).title()
+                )[0]
+                value = float(row[i + 1])
+
+                print(f"{fish_type}, {gear_type}, {value}")
+
+                LargeFisheryFUI.objects.get_or_create(
+                    fish_type=fish_type, gear_type=gear_type, value=value
+                )
+    """
+
+    print("AO")
+    nsed = LargeFisheryFUI.objects.filter(gear_type__name="Not Specified")
+    print(nsed)
+    for n in nsed:
+        _all = LargeFisheryFUI.objects.filter(fish_type=n.fish_type)
+        for a in _all:
+            if a.gear_type.name != "Not Specified":
+                print(a.value)
+                print(n.value)

@@ -944,15 +944,15 @@ class SmallFisheryCalculator(BaseCalculator):
             [ef.t_co2_eq_m3 for ef in ef_diesel_default_list]
         ) / len(ef_diesel_default_list)
 
-        fui_default_start = SmallFisheryFUI.objects.get(
+        fui_default_start = SmallFisheryFUI.objects.get_value_or_average(
             fishery_type=self.data.fishery_type,
             gear_type=self.data.gear_type_start,
         )
-        fui_default_w = SmallFisheryFUI.objects.get(
+        fui_default_w = SmallFisheryFUI.objects.get_value_or_average(
             fishery_type=self.data.fishery_type,
             gear_type=self.data.gear_type_w,
         )
-        fui_default_wo = SmallFisheryFUI.objects.get(
+        fui_default_wo = SmallFisheryFUI.objects.get_value_or_average(
             fishery_type=self.data.fishery_type,
             gear_type=self.data.gear_type_wo,
         )
@@ -982,9 +982,9 @@ class SmallFisheryCalculator(BaseCalculator):
             self.data.energy_emission_factor_t2_start,
             self.data.energy_emission_factor_t2_w,
             self.data.energy_emission_factor_t2_wo,
-            fui_default_start.value,
-            fui_default_w.value,
-            fui_default_wo.value,
+            fui_default_start,
+            fui_default_w,
+            fui_default_wo,
             self.data.fui_start,
             self.data.fui_w,
             self.data.fui_wo,
@@ -1042,15 +1042,15 @@ class LargeFisheryCalculator(BaseCalculator):
             [ef.t_co2_eq_m3 for ef in ef_diesel_default_list]
         ) / len(ef_diesel_default_list)
 
-        fui_default_start = LargeFisheryFUI.objects.get(
+        fui_default_start = LargeFisheryFUI.objects.get_value_or_average(
             fish_type=self.data.fish_type,
             gear_type=self.data.gear_type_start,
         )
-        fui_default_w = LargeFisheryFUI.objects.get(
+        fui_default_w = LargeFisheryFUI.objects.get_value_or_average(
             fish_type=self.data.fish_type,
             gear_type=self.data.gear_type_w,
         )
-        fui_default_wo = LargeFisheryFUI.objects.get(
+        fui_default_wo = LargeFisheryFUI.objects.get_value_or_average(
             fish_type=self.data.fish_type,
             gear_type=self.data.gear_type_wo,
         )
@@ -1065,8 +1065,8 @@ class LargeFisheryCalculator(BaseCalculator):
         kw_tonnes = 60
 
         electricity_country = (
-            self.data.inshore_ice_production_country
-            if self.data.inshore_ice_production_country
+            self.data.inshore_ice_production_country_t2
+            if self.data.inshore_ice_production_country_t2
             else project.country
         )
 
@@ -1086,9 +1086,9 @@ class LargeFisheryCalculator(BaseCalculator):
             self.data.energy_emission_factor_t2_start,
             self.data.energy_emission_factor_t2_w,
             self.data.energy_emission_factor_t2_wo,
-            fui_default_start.value,
-            fui_default_w.value,
-            fui_default_wo.value,
+            fui_default_start,
+            fui_default_w,
+            fui_default_wo,
             self.data.fui_start,
             self.data.fui_w,
             self.data.fui_wo,
