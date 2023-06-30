@@ -33,6 +33,20 @@ class User(auth_models.User):
 ##############################
 
 
+class IPCCRegion(Model):
+    name = CharField(max_length=100)
+
+    def __str__(self):
+        return f"({self.pk}) {self.name}"
+
+
+class GLEAMRegion(Model):
+    name = CharField(max_length=100)
+
+    def __str__(self):
+        return f"({self.pk}) {self.name}"
+
+
 class VegetationType(Model):
     name = CharField(max_length=100)
 
@@ -92,7 +106,15 @@ class Continent(Model):
 
 class Country(Model):
     name = CharField(max_length=100)
-    continent = ForeignKey(Continent, on_delete=CASCADE, null=True, blank=True)
+    continent = ForeignKey(
+        Continent, on_delete=CASCADE, null=True, blank=True, related_name="countries"
+    )
+    ipcc_region = ForeignKey(
+        IPCCRegion, on_delete=CASCADE, null=True, blank=True, related_name="countries"
+    )
+    gleam_region = ForeignKey(
+        GLEAMRegion, on_delete=CASCADE, null=True, blank=True, related_name="countries"
+    )
 
     class Meta:
         verbose_name_plural = "Countries"

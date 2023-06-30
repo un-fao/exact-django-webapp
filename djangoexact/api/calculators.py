@@ -1345,3 +1345,9 @@ class LivestockCalculator(BaseCalculator):
         input: Livestock = self.data
 
         # TODO: implement calculations
+
+        manure_ef_list = LivestockManureEF.objects.get(
+            emission_type=input.emission_type,
+            
+
+        )
