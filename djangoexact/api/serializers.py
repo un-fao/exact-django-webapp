@@ -1,5 +1,7 @@
 from rest_framework import serializers
+from rest_framework.fields import empty
 from .models import *
+from ipcc.models import *
 from django.contrib.auth.models import User
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
@@ -34,3 +36,27 @@ def get_module_serializer(model_arg):
             ref_name = model_arg.__name__
 
     return GenericSerializer
+
+
+class ProjectSerializer(serializers.ModelSerializer):
+    climate = get_model_serializer(Climate)(many=False)
+    continent = get_model_serializer(Continent)(many=False)
+    country = get_model_serializer(Country)(many=False)
+    moisture = get_model_serializer(Moisture)(many=False)
+    soil_type = get_model_serializer(SoilType)(many=False)
+    gw_potential = get_model_serializer(GlobalWarmingPotential)(many=False)
+
+    class Meta:
+        model = Project
+        fields = "__all__"
+        ref_name = "Project"
+
+
+class ActivitySerializer(serializers.ModelSerializer):
+    project = get_model_serializer(Project)(many=False)
+    modules = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Activity
+        fields = "__all__"
+        ref_name = "Activity"
