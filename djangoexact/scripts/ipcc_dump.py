@@ -1102,7 +1102,7 @@ def run():
             )
 
     df2 = pd.read_csv(
-        os.path.join(os.path.dirname(__file__), "ipcc_data", "LivestockManureEF.csv"),
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "LivestockManureEF2.csv"),
         header=0,
         sep=";",
     )
@@ -1254,14 +1254,166 @@ def run():
                 LargeFisheryFUI.objects.get_or_create(
                     fish_type=fish_type, gear_type=gear_type, value=value
                 )
+
+    ManureManagementType.objects.all().delete()
+
+    df2 = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "LivestockManureEF2.csv"),
+        header=0,
+        sep=";",
+    )
+
+    df_headers2 = df2.columns.values.tolist()
+    df_dict2 = df2.to_dict("records")
+
+    for i, row in enumerate(df_dict2):
+        emission_type = EmissionType.objects.get_or_create(
+            name=capitalize_all(row["emission_type"])
+        )[0]
+        livestock_category = LivestockCategoryType.objects.get_or_create(
+            name=capitalize_all(row["livestock_category_type"])
+        )[0]
+        livestock_production_type = LivestockProductionType.objects.get_or_create(
+            name=capitalize_all(row["livestock_production_type"])
+        )[0]
+        climate = Climate.objects.get_or_create(name=capitalize_all(row["climate"]))[0]
+        moisture = Moisture.objects.get_or_create(name=capitalize_all(row["moisture"]))[
+            0
+        ]
+
+        for j, header in enumerate(df_headers2):
+            print(header)
+            if j < 4:
+                continue
+
+            manure_management_type = ManureManagementType.objects.get_or_create(
+                name=capitalize_all(df_headers2[j + 5])
+            )[0]
+
+            print(
+                emission_type,
+                livestock_category,
+                livestock_production_type,
+                climate,
+                moisture,
+                manure_management_type,
+                row[df_headers2[j + 5]],
+            )
+
+            LivestockManureEF.objects.get_or_create(
+                emission_type=emission_type,
+                livestock_category_type=livestock_category,
+                livestock_production_type=livestock_production_type,
+                climate=climate,
+                moisture=moisture,
+                manure_management_type=manure_management_type,
+                value=parse_csv_number(row[df_headers2[j + 5]]),
+            )
+
+            if j + 5 == len(df_headers2) - 1:
+                break
+
+    # print("AO")
+    # nsed = LargeFisheryFUI.objects.filter(gear_type__name="Not Specified")
+    # print(nsed)
+    # for n in nsed:
+    #     _all = LargeFisheryFUI.objects.filter(fish_type=n.fish_type)
+    #     for a in _all:
+    #         if a.gear_type.name != "Not Specified":
+    #             print(a.value)
+    #             print(n.value)
+
+    with open("scripts/ipcc_data/ListRegionsIPCC.csv", "r") as f:
+        reader = csv.reader(f)
+        data = list(reader)
+
+        for row in data:
+            ipcc_region = IPCCRegion.objects.get_or_create(name=row[0])[0]
+
+    df = pd.read_csv(
+        os.path.join(
+            os.path.dirname(__file__), "ipcc_data", "AnimalWasteManagementSystem.csv"
+        ),
+        header=0,
+        sep=";",
+    )
+
+    df_headers = df.columns.values.tolist()
+    df_dict = df.to_dict("records")
+
+    for i, row in enumerate(df_dict):
+        livestock_category_type = LivestockCategoryType.objects.get_or_create(
+            name=capitalize_all(row["livestock_category_type"])
+        )[0]
+
+        livestock_production_type = LivestockProductionType.objects.get_or_create(
+            name=capitalize_all(row["livestock_production_type"])
+        )[0]
+
+        ipcc_region = IPCCRegion.objects.get_or_create(name=row["ipcc_region"])[0]
+
+        for j in range(2, len(df_headers)):
+            manure_management_type = ManureManagementType.objects.get_or_create(
+                name=capitalize_all(df_headers[j + 3])
+            )[0]
+
+            LivestockAnimalWasteManagementSystem.objects.get_or_create(
+                manure_management_type=manure_management_type,
+                livestock_category=livestock_category_type,
+                livestock_production_type=livestock_production_type,
+                ipcc_region=ipcc_region,
+                value=parse_csv_number(row[j + 3]),
+            )
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "ListCountries.csv"),
+        header=0,
+        sep=";",
+    )
+
+    df_headers = df.columns.values.tolist()
+    df_dict = df.to_dict("records")
+
+    for i, row in enumerate(df_dict):
+        continent = Continent.objects.get_or_create(name=row["EX-ACT"])[0]
+        gleam_region = GLEAMRegion.objects.get_or_create(name=row["GLEAM"])[0]
+        ipcc_region = IPCCRegion.objects.get_or_create(name=row["IPCC"])[0]
+
+        country = Country.objects.filter(name=row["Countries"]).first()
+
+        if country:
+            country.continent = continent
+            country.gleam_region = gleam_region
+            country.ipcc_region = ipcc_region
+            country.save()
     """
 
-    print("AO")
-    nsed = LargeFisheryFUI.objects.filter(gear_type__name="Not Specified")
-    print(nsed)
-    for n in nsed:
-        _all = LargeFisheryFUI.objects.filter(fish_type=n.fish_type)
-        for a in _all:
-            if a.gear_type.name != "Not Specified":
-                print(a.value)
-                print(n.value)
+    df = pd.read_csv(
+        os.path.join(
+            os.path.dirname(__file__), "ipcc_data", "AnimalWasteManagementSystem.csv"
+        ),
+        header=0,
+        sep=";",
+    )
+
+    df_headers = df.columns.values.tolist()
+    df_dict = df.to_dict("records")
+
+    for i, row in enumerate(df_dict):
+        livestock_category_type = LivestockCategoryType.objects.get_or_create(
+            name=capitalize_all(row["livestock_category_type"])
+        )[0]
+
+        livestock_production_type = LivestockProductionType.objects.get_or_create(
+            name=capitalize_all(row["livestock_production_type"])
+        )[0]
+
+        ipcc_region = IPCCRegion.objects.get_or_create(name=row["ipcc_region"])[0]
+
+        for j in range(3, len(df_headers)):
+            LivestockAnimalWasteManagementSystem.objects.get_or_create(
+                livestock_category=livestock_category_type,
+                livestock_production_type=livestock_production_type,
+                ipcc_region=ipcc_region,
+                value=parse_csv_number(row[df_headers[j]]),
+            )
