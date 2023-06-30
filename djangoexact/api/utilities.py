@@ -10,33 +10,38 @@ CN_RATIO_FOREST = 10
 CN_RATIO_GRASSLAND = 15
 MANGROVE_FACTOR = 0.451
 NON_MANGROVE_FACTOR = 0.47
-MANGROVES = 'Mangroves'
-DATA = 'data'
-RESULTS = 'results'
-DETAILS = 'details'
-API = 'api'
-TROPHIC_STATE = .7
-INCLUDE_RELATED = 'include_related'
+MANGROVES = "Mangroves"
+DATA = "data"
+RESULTS = "results"
+DETAILS = "details"
+API = "api"
+TROPHIC_STATE = 0.7
+INCLUDE_RELATED = "include_related"
+
 
 def snake_case(str):
     res = [str[0].lower()]
     for c in str[1:]:
-        if c in ('ABCDEFGHIJKLMNOPQRSTUVWXYZ'):
-            res.append('_')
+        if c in ("ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
+            res.append("_")
             res.append(c.lower())
         else:
             res.append(c)
-     
-    return ''.join(res)
+
+    return "".join(res)
+
 
 def sanitize_for_model(str: str):
     return str.replace(" ", "").replace("-", "").replace("_", "")
 
+
 def error(msg):
     return {DETAILS: msg}
 
-def get_model(name, app_name='api', suffix='Input'):
-    return apps.get_model(app_name, sanitize_for_model(name+suffix))
+
+def get_model(name, app_name="api", suffix="Input"):
+    return apps.get_model(app_name, sanitize_for_model(name + suffix))
+
 
 def get_query_param_or_validation_error(request, param_name):
     param = request.query_params.get(param_name)
@@ -44,10 +49,11 @@ def get_query_param_or_validation_error(request, param_name):
         raise exceptions.ValidationError(f"{param_name} is required")
     return param
 
+
 def get_assessment_or_parent(module) -> tuple[Model, str]:
     """
-        Looks for the assessment class in the module and returns a tuple (module, relationship).
-        Returns (None, None) if no assessment class is found.
+    Looks for the assessment class in the module and returns a tuple (module, relationship).
+    Returns (None, None) if no assessment class is found.
     """
 
     relative = (None, None)
@@ -56,21 +62,21 @@ def get_assessment_or_parent(module) -> tuple[Model, str]:
     # NOTE: Refer to documentation for more information (WIP)
     for attr in dir(module):
         if getattr(module, attr, None) is not None:
-            
             if "_assessment" in attr:
-                relative = (getattr(module, attr), 'child')
+                relative = (getattr(module, attr), "child")
                 break
             # Matches all attributes with 'parent_' prefix and not ending with '_id'
-            elif re.match('parent_[^_]*[^_id]', attr):
-                relative = (getattr(module, attr), 'parent')
+            elif re.match("parent_[^_]*[^_id]", attr):
+                relative = (getattr(module, attr), "parent")
                 break
-            
+
     return relative
+
 
 def get_assessment_or_parent_(module) -> tuple[Model, str]:
     """
-        Looks for the assessment class in the module and returns a tuple (module, relationship).
-        Returns (None, None) if no assessment class is found.
+    Looks for the assessment class in the module and returns a tuple (module, relationship).
+    Returns (None, None) if no assessment class is found.
     """
 
     relative = (None, None)
@@ -79,16 +85,16 @@ def get_assessment_or_parent_(module) -> tuple[Model, str]:
     # NOTE: Refer to documentation for more information (WIP)
     for attr in dir(module):
         if getattr(module, attr, None) is not None:
-            
             if "_assessment" in attr:
-                relative = (getattr(module, attr), 'child')
+                relative = (getattr(module, attr), "child")
                 break
             # Matches all attributes with 'parent_' prefix and not ending with '_id'
-            elif re.match('parent_[^_]*[^_id]', attr):
-                relative = (getattr(module, attr), 'parent')
+            elif re.match("parent_[^_]*[^_id]", attr):
+                relative = (getattr(module, attr), "parent")
                 break
-            
+
     return relative
+
 
 # define ErrorResponse class
 class ErrorResponse(Response):
