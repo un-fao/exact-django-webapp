@@ -1,7 +1,8 @@
 #### TODO: HAVE TO ADD ALL THE LOGIC NECESSART FOR A CALCULATION OF ALL COMPONENTS OF THE LIVESTOCK EMISSIONS
 
-def emissions_calculation(tam, vser: float, ef_prp_methane: float, percentage_prp_default: float, percentage_prp_tier_2_start: float, percentage_prp_tier_2_w: float, percentage_prp_tier_2_wo: float,
-                          ef_system_methane: list, ch4_prp_tier_2_start: float, ch4_prp_tier_2_w: float, ch4_prp_tier_2_wo: float, n_heads_start: int, n_heads_w: int, n_heads_wo:int, methane_constant: float,
+def emissions_calculation(tam:float, vser: float, ef_prp_methane: float, percentage_prp_default: float, percentage_prp_tier_2_start: float, percentage_prp_tier_2_w: float, percentage_prp_tier_2_wo: float,
+                          ef_system_methane: list, ef_system_methane_tier_2, ch4_prp_tier_2_start: float, ch4_prp_tier_2_w: float, ch4_prp_tier_2_wo: float, n_heads_start: int, 
+                          n_heads_w: int, n_heads_wo:int, methane_constant: float,
                           rate_w:float, rate_wo:float, time_impl: float, time_cap: float, percentage_system_default: list):
 
     def time_component(start, end, time_impl, time_cap, rate_coefficient):
@@ -10,9 +11,12 @@ def emissions_calculation(tam, vser: float, ef_prp_methane: float, percentage_pr
             else:
                 return time_impl * (1 - rate_coefficient)
 
-    def inital_w_wo_calculation(tam: float, vser: float, ef_prp: float, percentage_prp_default: float, percentage_prp_tier_2: float, ef_system: list, ch4_prp_tier_2: float, n_heads: int, emission_constant: float, percentage_system_default: list):
+    def inital_w_wo_calculation(tam: float, vser: float, ef_prp: float, percentage_prp_default: float, percentage_prp_tier_2: float, ef_system_default: list, ef_system_tier_2, ch4_prp_tier_2: float, n_heads: int, emission_constant: float, percentage_system_default: list):
         
-        def ch4_head_calculation(tam: float, vser: float, ef_prp: float, percentage_prp_default: float, percentage_prp_tier_2: float, ef_system: list, ch4_prp_tier_2: float, percentage_system_default: list):
+        def ch4_head_calculation(tam: float, vser: float, ef_prp: float, percentage_prp_default: float, percentage_prp_tier_2: float, ef_system_default: list, ef_system_tier_2: list, ch4_prp_tier_2: float, percentage_system_default: list):
+            
+            # THIS MEANS THAT THERE IS A TIER 2 VALUE 
+            ef_system = ef_system_default if not ef_system_tier_2 else ef_system_tier_2
 
             if not percentage_prp_tier_2:
                 ch4_system = [i * (tam/1000) * (vser/1000) * 365 * j/100 for (i,j) in zip(ef_system, percentage_system_default)]
@@ -26,13 +30,13 @@ def emissions_calculation(tam, vser: float, ef_prp_methane: float, percentage_pr
             ch4_head = sum(ch4_system) + ch4_prp
             return ch4_head
         
-        ch4_head = ch4_head_calculation(tam, vser, ef_prp, percentage_prp_default, percentage_prp_tier_2, ef_system, ch4_prp_tier_2, percentage_system_default)
+        ch4_head = ch4_head_calculation(tam, vser, ef_prp, percentage_prp_default, percentage_prp_tier_2, ef_system_default, ef_system_tier_2, ch4_prp_tier_2, percentage_system_default)
 
         return ch4_head * n_heads / 1000 * emission_constant
 
-    annual_start = inital_w_wo_calculation(tam, vser, ef_prp_methane, percentage_prp_default, percentage_prp_tier_2_start, ef_system_methane, ch4_prp_tier_2_start, n_heads_start, methane_constant, percentage_system_default)
-    annual_w = inital_w_wo_calculation(tam, vser, ef_prp_methane, percentage_prp_default, percentage_prp_tier_2_w, ef_system_methane, ch4_prp_tier_2_w, n_heads_w, methane_constant, percentage_system_default)
-    annual_wo = inital_w_wo_calculation(tam, vser, ef_prp_methane, percentage_prp_default, percentage_prp_tier_2_wo, ef_system_methane, ch4_prp_tier_2_wo, n_heads_wo, methane_constant, percentage_system_default)
+    annual_start = inital_w_wo_calculation(tam, vser, ef_prp_methane, percentage_prp_default, percentage_prp_tier_2_start, ef_system_methane, ef_system_methane_tier_2, ch4_prp_tier_2_start, n_heads_start, methane_constant, percentage_system_default)
+    annual_w = inital_w_wo_calculation(tam, vser, ef_prp_methane, percentage_prp_default, percentage_prp_tier_2_w, ef_system_methane, ef_system_methane_tier_2, ch4_prp_tier_2_w, n_heads_w, methane_constant, percentage_system_default)
+    annual_wo = inital_w_wo_calculation(tam, vser, ef_prp_methane, percentage_prp_default, percentage_prp_tier_2_wo, ef_system_methane, ef_system_methane_tier_2, ch4_prp_tier_2_wo, n_heads_wo, methane_constant, percentage_system_default)
 
     em_w = min(annual_start, annual_w) * (time_impl + time_cap) + abs(annual_w - annual_start) * time_component(annual_start, annual_w, time_impl, time_cap, rate_w)
     em_wo = min(annual_start, annual_wo) * (time_impl + time_cap) + abs(annual_wo - annual_start) * time_component(annual_start, annual_wo, time_impl, time_cap, rate_wo)
