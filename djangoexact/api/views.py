@@ -37,6 +37,19 @@ parent = openapi.Parameter(
 )
 
 
+def get_modules(activity):
+    modules = []
+    module_types = ModuleType.objects.all()
+    for module in module_types:
+        module_model = apps.get_model(API, sanitize_for_model(module.name))
+        module_object = module_model.objects.filter(activity__id=activity.pk).first()
+        if module_object:
+            module_dict = get_module_serializer(module_model)(module_object).data
+            modules.append(module_dict)
+
+    return modules
+
+
 class AuthenticatedViewSet(viewsets.GenericViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -82,7 +95,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
 
     queryset = Project.objects.all()
-    serializer_class = get_model_serializer(Project)
+    serializer_class = ProjectSerializer
 
 
 class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
@@ -91,7 +104,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
 
     queryset = Activity.objects.all()
-    serializer_class = get_module_serializer(Activity)
+    serializer_class = ActivitySerializer
 
     @swagger_auto_schema(
         manual_parameters=[project_id], responses={400: "project_id not provided"}
@@ -100,10 +113,12 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
         Get all activities for a given project, by filtering against a `project_id` query parameter in the URL.
         """
+        print("list")
         project_id = get_query_param_or_validation_error(self.request, "project_id")
         list = Activity.objects.filter(
             project__id=project_id, project__user=self.request.user
         )
+
         return Response(
             data=get_module_serializer(Activity)(list, many=True).data,
             status=status.HTTP_200_OK,
