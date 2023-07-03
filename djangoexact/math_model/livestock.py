@@ -1,5 +1,3 @@
-#### TODO: HAVE TO ADD ALL THE LOGIC NECESSART FOR A CALCULATION OF ALL COMPONENTS OF THE LIVESTOCK EMISSIONS
-
 def emissions_calculation(tam:float, vser: float, ef_prp_methane: float, percentage_prp_default: float, percentage_prp_tier_2_start: float, percentage_prp_tier_2_w: float, percentage_prp_tier_2_wo: float,
                           ef_system_methane: list, ef_system_methane_tier_2, ch4_prp_tier_2_start: float, ch4_prp_tier_2_w: float, ch4_prp_tier_2_wo: float, n_heads_start: int, 
                           n_heads_w: int, n_heads_wo:int, methane_constant: float,
@@ -16,7 +14,7 @@ def emissions_calculation(tam:float, vser: float, ef_prp_methane: float, percent
         def ch4_head_calculation(tam: float, vser: float, ef_prp: float, percentage_prp_default: float, percentage_prp_tier_2: float, ef_system_default: list, ef_system_tier_2: list, ch4_prp_tier_2: float, percentage_system_default: list):
             
             # THIS MEANS THAT THERE IS A TIER 2 VALUE 
-            ef_system = ef_system_default if not ef_system_tier_2 else ef_system_tier_2
+            ef_system = ef_system_default if not ef_system_tier_2 else [ef_system_tier_2]
 
             if not percentage_prp_tier_2:
                 ch4_system = [i * (tam/1000) * (vser/1000) * 365 * j/100 for (i,j) in zip(ef_system, percentage_system_default)]
