@@ -699,7 +699,7 @@ class LivestockManureEF(Model):
     value = FloatField(null=True, blank=True)
 
     def __str__(self):
-        return f"({self.id}) {self.emission_type.name} {self.livestock_category_type.name} {self.climate.name} {self.moisture.name} {self.manure_management_type.name} {self.value}"
+        return f"({self.id}) {self.emission_type.name} {self.livestock_production_type.name} {self.livestock_category_type.name} {self.climate.name} {self.moisture.name} {self.manure_management_type.name} {self.value}"
 
 
 class LivestockTAM(Model):
@@ -708,10 +708,15 @@ class LivestockTAM(Model):
     """
 
     emission_type = ForeignKey(EmissionType, on_delete=CASCADE, null=True, blank=True)
-    production_type = ForeignKey("api.LivestockProductionType", on_delete=CASCADE)
-    livestock_category = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
-    region = ForeignKey("api.Continent", on_delete=CASCADE)
+    livestock_production_type = ForeignKey(
+        "api.LivestockProductionType", on_delete=CASCADE
+    )
+    livestock_category_type = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
+    ipcc_region = ForeignKey("api.IPCCRegion", on_delete=CASCADE)
     value = FloatField()
+
+    def __str__(self):
+        return f"({self.id}) {self.livestock_category_type} {self.livestock_production_type} {self.ipcc_region.name} {self.value}"
 
 
 class LivestockVSER(Model):
@@ -720,20 +725,27 @@ class LivestockVSER(Model):
     """
 
     emission_type = ForeignKey(EmissionType, on_delete=CASCADE, null=True, blank=True)
-    production_type = ForeignKey("api.LivestockProductionType", on_delete=CASCADE)
-    livestock_category = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
-    region = ForeignKey("api.Continent", on_delete=CASCADE)
+    livestock_production_type = ForeignKey(
+        "api.LivestockProductionType", on_delete=CASCADE
+    )
+    livestock_category_type = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
+    ipcc_region = ForeignKey("api.IPCCRegion", on_delete=CASCADE)
     value = FloatField()
 
     @staticmethod
-    def get_average_value(emission_type, production_type, livestock_category, region):
+    def get_average_value(
+        emission_type, production_type, livestock_category, ipcc_region
+    ):
         values = LivestockVSER.objects.filter(
             emission_type=emission_type,
-            production_type=production_type,
-            livestock_category=livestock_category,
-            region=region,
+            livestock_production_type=production_type,
+            livestock_category_type=livestock_category,
+            ipcc_region=ipcc_region,
         ).values_list("value", flat=True)
         return sum(values) / len(values)
+
+    def __str__(self):
+        return f"({self.id}) {self.livestock_category_type} {self.livestock_production_type} {self.ipcc_region.name} {self.value}"
 
 
 class LivestockNER(Model):
@@ -742,8 +754,10 @@ class LivestockNER(Model):
     """
 
     emission_type = ForeignKey(EmissionType, on_delete=CASCADE)
-    production_type = ForeignKey("api.LivestockProductionType", on_delete=CASCADE)
-    livestock_category = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
+    livestock_production_type = ForeignKey(
+        "api.LivestockProductionType", on_delete=CASCADE
+    )
+    livestock_category_type = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
     continent = ForeignKey("api.Continent", on_delete=CASCADE)
     value = FloatField()
 
@@ -758,9 +772,12 @@ class LivestockAnimalWasteManagementSystem(Model):
     livestock_production_type = ForeignKey(
         "api.LivestockProductionType", on_delete=CASCADE
     )
-    livestock_category = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
+    manure_management_type = ForeignKey(
+        "api.ManureManagementType", on_delete=CASCADE, null=True, blank=True
+    )
+    livestock_category_type = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
     ipcc_region = ForeignKey("api.IPCCRegion", on_delete=CASCADE)
     value = FloatField()
 
     def __str__(self):
-        return f"({self.pk}) {self.livestock_production_type.name} {self.livestock_category.name} {self.ipcc_region.name} {self.value}"
+        return f"({self.pk}) {self.livestock_production_type.name} {self.livestock_category_type.name} {self.manure_management_type.name} {self.ipcc_region.name} {self.value}"
