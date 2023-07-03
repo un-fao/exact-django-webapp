@@ -52,6 +52,7 @@ class CalculatorFactory:
             print(e)
             raise Exception(f"Module '{input.__class__.__name__}' not (yet) supported.")
         except Exception as ex:
+            print(ex)
             raise ex
 
 
@@ -1346,8 +1347,95 @@ class LivestockCalculator(BaseCalculator):
 
         # TODO: implement calculations
 
-        manure_ef_list = LivestockManureEF.objects.get(
-            emission_type=input.emission_type,
-            
-
+        print(
+            input.livestock_category_type.name,
+            input.livestock_production_type.name,
+            input.activity.project.country.ipcc_region.name,
         )
+
+        tam_ch4 = LivestockTAM.objects.get(
+            livestock_production_type=input.livestock_production_type,
+            livestock_category_type=input.livestock_category_type,
+            ipcc_region=input.activity.project.country.ipcc_region,
+        )
+
+        vser_ch4 = LivestockVSER.objects.get(
+            livestock_production_type=input.livestock_production_type,
+            livestock_category_type=input.livestock_category_type,
+            ipcc_region=input.activity.project.country.ipcc_region,
+        )
+
+        ef_prp = LivestockManureEF.objects.get(
+            emission_type__name="CH4",
+            livestock_category_type=input.livestock_category_type,
+            livestock_production_type=input.livestock_production_type,
+            climate=project.climate,
+            moisture=project.moisture,
+            manure_management_type__name="Pasture/Range/Paddock",
+        )
+
+        ef_systems = (
+            LivestockManureEF.objects.filter(
+                emission_type__name="CH4",
+                livestock_category_type=input.livestock_category_type,
+                livestock_production_type=input.livestock_production_type,
+                climate=project.climate,
+                moisture=project.moisture,
+            )
+            .exclude(manure_management_type__name="Pasture/Range/Paddock")
+            .order_by("manure_management_type__name")
+        )
+
+        ef_system_values = [system.value for system in ef_systems]
+
+        animal_waste_prp = LivestockAnimalWasteManagementSystem.objects.get(
+            livestock_category_type=input.livestock_category_type,
+            livestock_production_type=input.livestock_production_type,
+            ipcc_region=input.activity.project.country.ipcc_region,
+            manure_management_type__name="Pasture/Range/Paddock",
+        )
+
+        animal_waste_management_systems = (
+            LivestockAnimalWasteManagementSystem.objects.filter(
+                livestock_category_type=input.livestock_category_type,
+                livestock_production_type=input.livestock_production_type,
+                ipcc_region=input.activity.project.country.ipcc_region,
+            )
+            .exclude(manure_management_type__name="Pasture/Range/Paddock")
+            .order_by("manure_management_type__name")
+        )
+
+        # list comprehension to get the animal waste management systems values
+        animal_waste_management_systems_values = [
+            system.value for system in animal_waste_management_systems
+        ]
+
+        inputs = [
+            tam_ch4.value,
+            vser_ch4.value,
+            ef_prp.value,
+            animal_waste_prp.value,
+            input.pasture_percentage_start_t2,
+            input.pasture_percentage_w_t2,
+            input.pasture_percentage_wo_t2,
+            ef_system_values,
+            input.emission_factor_ch4_t2,
+            input.emission_factor_start_t2,
+            input.emission_factor_w_t2,
+            input.emission_factor_wo_t2,
+            input.heads_number_start,
+            input.heads_number_w,
+            input.heads_number_wo,
+            project.gw_potential.ch4,
+            input.heads_number_w_rate.value,
+            input.heads_number_wo_rate.value,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            animal_waste_management_systems_values,
+        ]
+
+        from math_model.livestock import emissions_calculation as ec
+
+        results = ec(*inputs)
+
+        print(results)

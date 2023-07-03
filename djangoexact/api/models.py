@@ -232,14 +232,14 @@ class LivestockProductionType(Model):
     name = CharField(max_length=100)
 
     def __str__(self):
-        return self.name
+        return f"({self.pk}) {self.name}"
 
 
 class ManureManagementType(Model):
     name = CharField(max_length=100)
 
     def __str__(self):
-        return self.name
+        return f"({self.pk}) {self.name}"
 
 
 class ModuleType(Model):
@@ -762,7 +762,7 @@ class Livestock(Module):
     description = TextField(null=True, blank=True)
     user_notes = TextField(null=True, blank=True)
 
-    livestock_category = ForeignKey(LivestockCategoryType, on_delete=CASCADE)
+    livestock_category_type = ForeignKey(LivestockCategoryType, on_delete=CASCADE)
     livestock_production_type = ForeignKey(LivestockProductionType, on_delete=CASCADE)
 
     production_start = FloatField(null=True, blank=True)
