@@ -1,0 +1,421 @@
+livestock_category_type;livestock_production_type;emission_type;climate;moisture;Lagoon;Liquid/slurry;Solid storage;Dry lot;Pasture/Range/Paddock;Daily spread;Digester;Burned for fuel;Pit<1Month;Pit>1 month;Poultry manure;Deep bedding;Composting;Aerobic treatment;Other (pls. go Tier 2)
+Dairy Cattle;High-Productivity;N2O;Cool Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Cattle;High-Productivity;N2O;Cool Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Cattle;High-Productivity;N2O;Boreal;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Cattle;High-Productivity;N2O;Boreal;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Cattle;High-Productivity;N2O;Warm Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Cattle;High-Productivity;N2O;Warm Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Cattle;High-Productivity;N2O;Tropical;Montane;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Cattle;High-Productivity;N2O;Tropical;Wet;0;0,003333333;0,0075;0,02;0,006;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Cattle;High-Productivity;N2O;Tropical;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Cattle;High-Productivity;N2O;Tropical;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Cattle;Low-Productivity;N2O;Cool Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Cattle;Low-Productivity;N2O;Cool Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Cattle;Low-Productivity;N2O;Boreal;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Cattle;Low-Productivity;N2O;Boreal;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Cattle;Low-Productivity;N2O;Warm Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Cattle;Low-Productivity;N2O;Warm Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Cattle;Low-Productivity;N2O;Tropical;Montane;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Cattle;Low-Productivity;N2O;Tropical;Wet;0;0,003333333;0,0075;0,02;0,006;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Cattle;Low-Productivity;N2O;Tropical;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Cattle;Low-Productivity;N2O;Tropical;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Cattle;Default;N2O;Cool Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Cattle;Default;N2O;Cool Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Cattle;Default;N2O;Boreal;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Cattle;Default;N2O;Boreal;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Cattle;Default;N2O;Warm Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Cattle;Default;N2O;Warm Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Cattle;Default;N2O;Tropical;Montane;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Cattle;Default;N2O;Tropical;Wet;0;0,003333333;0,0075;0,02;0,006;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Cattle;Default;N2O;Tropical;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Cattle;Default;N2O;Tropical;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;High-Productivity;N2O;Cool Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;High-Productivity;N2O;Cool Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;High-Productivity;N2O;Boreal;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;High-Productivity;N2O;Boreal;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;High-Productivity;N2O;Warm Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;High-Productivity;N2O;Warm Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;High-Productivity;N2O;Tropical;Montane;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;High-Productivity;N2O;Tropical;Wet;0;0,003333333;0,0075;0,02;0,006;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;High-Productivity;N2O;Tropical;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;High-Productivity;N2O;Tropical;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;Low-Productivity;N2O;Cool Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;Low-Productivity;N2O;Cool Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;Low-Productivity;N2O;Boreal;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;Low-Productivity;N2O;Boreal;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;Low-Productivity;N2O;Warm Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;Low-Productivity;N2O;Warm Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;Low-Productivity;N2O;Tropical;Montane;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;Low-Productivity;N2O;Tropical;Wet;0;0,003333333;0,0075;0,02;0,006;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;Low-Productivity;N2O;Tropical;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;Low-Productivity;N2O;Tropical;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;Default;N2O;Cool Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;Default;N2O;Cool Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;Default;N2O;Boreal;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;Default;N2O;Boreal;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;Default;N2O;Warm Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;Default;N2O;Warm Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;Default;N2O;Tropical;Montane;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;Default;N2O;Tropical;Wet;0;0,003333333;0,0075;0,02;0,006;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;Default;N2O;Tropical;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Cattle;Default;N2O;Tropical;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Goat;High-Productivity;N2O;Cool Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Goat;High-Productivity;N2O;Cool Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Goat;High-Productivity;N2O;Boreal;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Goat;High-Productivity;N2O;Boreal;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Goat;High-Productivity;N2O;Warm Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Goat;High-Productivity;N2O;Warm Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Goat;High-Productivity;N2O;Tropical;Montane;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Goat;High-Productivity;N2O;Tropical;Wet;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Goat;High-Productivity;N2O;Tropical;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Goat;High-Productivity;N2O;Tropical;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Goat;Low-Productivity;N2O;Cool Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Goat;Low-Productivity;N2O;Cool Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Goat;Low-Productivity;N2O;Boreal;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Goat;Low-Productivity;N2O;Boreal;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Goat;Low-Productivity;N2O;Warm Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Goat;Low-Productivity;N2O;Warm Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Goat;Low-Productivity;N2O;Tropical;Montane;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Goat;Low-Productivity;N2O;Tropical;Wet;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Goat;Low-Productivity;N2O;Tropical;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Goat;Low-Productivity;N2O;Tropical;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Goat;Default;N2O;Cool Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Goat;Default;N2O;Cool Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Goat;Default;N2O;Boreal;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Goat;Default;N2O;Boreal;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Goat;Default;N2O;Warm Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Goat;Default;N2O;Warm Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Goat;Default;N2O;Tropical;Montane;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Goat;Default;N2O;Tropical;Wet;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Goat;Default;N2O;Tropical;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Goat;Default;N2O;Tropical;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;High-Productivity;N2O;Cool Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;High-Productivity;N2O;Cool Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;High-Productivity;N2O;Boreal;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;High-Productivity;N2O;Boreal;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;High-Productivity;N2O;Warm Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;High-Productivity;N2O;Warm Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;High-Productivity;N2O;Tropical;Montane;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;High-Productivity;N2O;Tropical;Wet;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;High-Productivity;N2O;Tropical;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;High-Productivity;N2O;Tropical;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;Low-Productivity;N2O;Cool Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;Low-Productivity;N2O;Cool Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;Low-Productivity;N2O;Boreal;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;Low-Productivity;N2O;Boreal;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;Low-Productivity;N2O;Warm Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;Low-Productivity;N2O;Warm Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;Low-Productivity;N2O;Tropical;Montane;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;Low-Productivity;N2O;Tropical;Wet;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;Low-Productivity;N2O;Tropical;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;Low-Productivity;N2O;Tropical;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;Default;N2O;Cool Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;Default;N2O;Cool Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;Default;N2O;Boreal;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;Default;N2O;Boreal;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;Default;N2O;Warm Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;Default;N2O;Warm Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;Default;N2O;Tropical;Montane;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;Default;N2O;Tropical;Wet;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;Default;N2O;Tropical;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Camels;Default;N2O;Tropical;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;High-Productivity;N2O;Cool Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;High-Productivity;N2O;Cool Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;High-Productivity;N2O;Boreal;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;High-Productivity;N2O;Boreal;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;High-Productivity;N2O;Warm Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;High-Productivity;N2O;Warm Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;High-Productivity;N2O;Tropical;Montane;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;High-Productivity;N2O;Tropical;Wet;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;High-Productivity;N2O;Tropical;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;High-Productivity;N2O;Tropical;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;Low-Productivity;N2O;Cool Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;Low-Productivity;N2O;Cool Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;Low-Productivity;N2O;Boreal;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;Low-Productivity;N2O;Boreal;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;Low-Productivity;N2O;Warm Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;Low-Productivity;N2O;Warm Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;Low-Productivity;N2O;Tropical;Montane;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;Low-Productivity;N2O;Tropical;Wet;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;Low-Productivity;N2O;Tropical;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;Low-Productivity;N2O;Tropical;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;Default;N2O;Cool Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;Default;N2O;Cool Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;Default;N2O;Boreal;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;Default;N2O;Boreal;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;Default;N2O;Warm Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;Default;N2O;Warm Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;Default;N2O;Tropical;Montane;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;Default;N2O;Tropical;Wet;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;Default;N2O;Tropical;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Horses;Default;N2O;Tropical;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;High-Productivity;N2O;Cool Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;High-Productivity;N2O;Cool Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;High-Productivity;N2O;Boreal;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;High-Productivity;N2O;Boreal;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;High-Productivity;N2O;Warm Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;High-Productivity;N2O;Warm Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;High-Productivity;N2O;Tropical;Montane;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;High-Productivity;N2O;Tropical;Wet;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;High-Productivity;N2O;Tropical;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;High-Productivity;N2O;Tropical;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;Low-Productivity;N2O;Cool Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;Low-Productivity;N2O;Cool Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;Low-Productivity;N2O;Boreal;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;Low-Productivity;N2O;Boreal;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;Low-Productivity;N2O;Warm Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;Low-Productivity;N2O;Warm Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;Low-Productivity;N2O;Tropical;Montane;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;Low-Productivity;N2O;Tropical;Wet;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;Low-Productivity;N2O;Tropical;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;Low-Productivity;N2O;Tropical;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;Default;N2O;Cool Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;Default;N2O;Cool Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;Default;N2O;Boreal;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;Default;N2O;Boreal;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;Default;N2O;Warm Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;Default;N2O;Warm Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;Default;N2O;Tropical;Montane;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;Default;N2O;Tropical;Wet;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;Default;N2O;Tropical;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Mules And Asses;Default;N2O;Tropical;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;High-Productivity;N2O;Cool Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;High-Productivity;N2O;Cool Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;High-Productivity;N2O;Boreal;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;High-Productivity;N2O;Boreal;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;High-Productivity;N2O;Warm Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;High-Productivity;N2O;Warm Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;High-Productivity;N2O;Tropical;Montane;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;High-Productivity;N2O;Tropical;Wet;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;High-Productivity;N2O;Tropical;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;High-Productivity;N2O;Tropical;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;Low-Productivity;N2O;Cool Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;Low-Productivity;N2O;Cool Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;Low-Productivity;N2O;Boreal;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;Low-Productivity;N2O;Boreal;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;Low-Productivity;N2O;Warm Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;Low-Productivity;N2O;Warm Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;Low-Productivity;N2O;Tropical;Montane;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;Low-Productivity;N2O;Tropical;Wet;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;Low-Productivity;N2O;Tropical;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;Low-Productivity;N2O;Tropical;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;Default;N2O;Cool Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;Default;N2O;Cool Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;Default;N2O;Boreal;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;Default;N2O;Boreal;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;Default;N2O;Warm Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;Default;N2O;Warm Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;Default;N2O;Tropical;Montane;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;Default;N2O;Tropical;Wet;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;Default;N2O;Tropical;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Dairy Sheep;Default;N2O;Tropical;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;High-Productivity;N2O;Cool Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;High-Productivity;N2O;Cool Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;High-Productivity;N2O;Boreal;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;High-Productivity;N2O;Boreal;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;High-Productivity;N2O;Warm Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;High-Productivity;N2O;Warm Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;High-Productivity;N2O;Tropical;Montane;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;High-Productivity;N2O;Tropical;Wet;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;High-Productivity;N2O;Tropical;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;High-Productivity;N2O;Tropical;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;Low-Productivity;N2O;Cool Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;Low-Productivity;N2O;Cool Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;Low-Productivity;N2O;Boreal;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;Low-Productivity;N2O;Boreal;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;Low-Productivity;N2O;Warm Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;Low-Productivity;N2O;Warm Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;Low-Productivity;N2O;Tropical;Montane;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;Low-Productivity;N2O;Tropical;Wet;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;Low-Productivity;N2O;Tropical;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;Low-Productivity;N2O;Tropical;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;Default;N2O;Cool Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;Default;N2O;Cool Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;Default;N2O;Boreal;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;Default;N2O;Boreal;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;Default;N2O;Warm Temperate;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;Default;N2O;Warm Temperate;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;Default;N2O;Tropical;Montane;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;Default;N2O;Tropical;Wet;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;Default;N2O;Tropical;Moist;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Other Sheep;Default;N2O;Tropical;Dry;0;0,003333333;0,01;0,02;0,003;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,03
+Chicken Layer;High-Productivity;N2O;Cool Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Layer;High-Productivity;N2O;Cool Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Layer;High-Productivity;N2O;Boreal;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Layer;High-Productivity;N2O;Boreal;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Layer;High-Productivity;N2O;Warm Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Layer;High-Productivity;N2O;Warm Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Layer;High-Productivity;N2O;Tropical;Montane;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Layer;High-Productivity;N2O;Tropical;Wet;0;0,003333333;0,0075;0,02;0,006;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Layer;High-Productivity;N2O;Tropical;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Layer;High-Productivity;N2O;Tropical;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Layer;Low-Productivity;N2O;Cool Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Layer;Low-Productivity;N2O;Cool Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Layer;Low-Productivity;N2O;Boreal;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Layer;Low-Productivity;N2O;Boreal;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Layer;Low-Productivity;N2O;Warm Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Layer;Low-Productivity;N2O;Warm Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Layer;Low-Productivity;N2O;Tropical;Montane;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Layer;Low-Productivity;N2O;Tropical;Wet;0;0,003333333;0,0075;0,02;0,006;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Layer;Low-Productivity;N2O;Tropical;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Layer;Low-Productivity;N2O;Tropical;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Layer;Default;N2O;Cool Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Layer;Default;N2O;Cool Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Layer;Default;N2O;Boreal;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Layer;Default;N2O;Boreal;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Layer;Default;N2O;Warm Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Layer;Default;N2O;Warm Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Layer;Default;N2O;Tropical;Montane;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Layer;Default;N2O;Tropical;Wet;0;0,003333333;0,0075;0,02;0,006;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Layer;Default;N2O;Tropical;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Layer;Default;N2O;Tropical;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;High-Productivity;N2O;Cool Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;High-Productivity;N2O;Cool Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;High-Productivity;N2O;Boreal;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;High-Productivity;N2O;Boreal;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;High-Productivity;N2O;Warm Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;High-Productivity;N2O;Warm Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;High-Productivity;N2O;Tropical;Montane;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;High-Productivity;N2O;Tropical;Wet;0;0,003333333;0,0075;0,02;0,006;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;High-Productivity;N2O;Tropical;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;High-Productivity;N2O;Tropical;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;Low-Productivity;N2O;Cool Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;Low-Productivity;N2O;Cool Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;Low-Productivity;N2O;Boreal;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;Low-Productivity;N2O;Boreal;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;Low-Productivity;N2O;Warm Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;Low-Productivity;N2O;Warm Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;Low-Productivity;N2O;Tropical;Montane;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;Low-Productivity;N2O;Tropical;Wet;0;0,003333333;0,0075;0,02;0,006;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;Low-Productivity;N2O;Tropical;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;Low-Productivity;N2O;Tropical;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;Default;N2O;Cool Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;Default;N2O;Cool Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;Default;N2O;Boreal;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;Default;N2O;Boreal;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;Default;N2O;Warm Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;Default;N2O;Warm Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;Default;N2O;Tropical;Montane;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;Default;N2O;Tropical;Wet;0;0,003333333;0,0075;0,02;0,006;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;Default;N2O;Tropical;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Chicken Broiler;Default;N2O;Tropical;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;High-Productivity;N2O;Cool Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;High-Productivity;N2O;Cool Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;High-Productivity;N2O;Boreal;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;High-Productivity;N2O;Boreal;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;High-Productivity;N2O;Warm Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;High-Productivity;N2O;Warm Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;High-Productivity;N2O;Tropical;Montane;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;High-Productivity;N2O;Tropical;Wet;0;0,003333333;0,0075;0,02;0,006;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;High-Productivity;N2O;Tropical;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;High-Productivity;N2O;Tropical;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;Low-Productivity;N2O;Cool Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;Low-Productivity;N2O;Cool Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;Low-Productivity;N2O;Boreal;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;Low-Productivity;N2O;Boreal;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;Low-Productivity;N2O;Warm Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;Low-Productivity;N2O;Warm Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;Low-Productivity;N2O;Tropical;Montane;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;Low-Productivity;N2O;Tropical;Wet;0;0,003333333;0,0075;0,02;0,006;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;Low-Productivity;N2O;Tropical;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;Low-Productivity;N2O;Tropical;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;Default;N2O;Cool Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;Default;N2O;Cool Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;Default;N2O;Boreal;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;Default;N2O;Boreal;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;Default;N2O;Warm Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;Default;N2O;Warm Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;Default;N2O;Tropical;Montane;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;Default;N2O;Tropical;Wet;0;0,003333333;0,0075;0,02;0,006;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;Default;N2O;Tropical;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Growing Swine;Default;N2O;Tropical;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;High-Productivity;N2O;Cool Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;High-Productivity;N2O;Cool Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;High-Productivity;N2O;Boreal;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;High-Productivity;N2O;Boreal;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;High-Productivity;N2O;Warm Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;High-Productivity;N2O;Warm Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;High-Productivity;N2O;Tropical;Montane;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;High-Productivity;N2O;Tropical;Wet;0;0,003333333;0,0075;0,02;0,006;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;High-Productivity;N2O;Tropical;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;High-Productivity;N2O;Tropical;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;Low-Productivity;N2O;Cool Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;Low-Productivity;N2O;Cool Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;Low-Productivity;N2O;Boreal;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;Low-Productivity;N2O;Boreal;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;Low-Productivity;N2O;Warm Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;Low-Productivity;N2O;Warm Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;Low-Productivity;N2O;Tropical;Montane;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;Low-Productivity;N2O;Tropical;Wet;0;0,003333333;0,0075;0,02;0,006;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;Low-Productivity;N2O;Tropical;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;Low-Productivity;N2O;Tropical;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;Default;N2O;Cool Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;Default;N2O;Cool Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;Default;N2O;Boreal;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;Default;N2O;Boreal;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;Default;N2O;Warm Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;Default;N2O;Warm Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;Default;N2O;Tropical;Montane;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;Default;N2O;Tropical;Wet;0;0,003333333;0,0075;0,02;0,006;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;Default;N2O;Tropical;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Breeding Swine;Default;N2O;Tropical;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;High-Productivity;N2O;Cool Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;High-Productivity;N2O;Cool Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;High-Productivity;N2O;Boreal;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;High-Productivity;N2O;Boreal;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;High-Productivity;N2O;Warm Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;High-Productivity;N2O;Warm Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;High-Productivity;N2O;Tropical;Montane;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;High-Productivity;N2O;Tropical;Wet;0;0,003333333;0,0075;0,02;0,006;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;High-Productivity;N2O;Tropical;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;High-Productivity;N2O;Tropical;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;Low-Productivity;N2O;Cool Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;Low-Productivity;N2O;Cool Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;Low-Productivity;N2O;Boreal;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;Low-Productivity;N2O;Boreal;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;Low-Productivity;N2O;Warm Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;Low-Productivity;N2O;Warm Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;Low-Productivity;N2O;Tropical;Montane;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;Low-Productivity;N2O;Tropical;Wet;0;0,003333333;0,0075;0,02;0,006;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;Low-Productivity;N2O;Tropical;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;Low-Productivity;N2O;Tropical;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;Default;N2O;Cool Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;Default;N2O;Cool Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;Default;N2O;Boreal;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;Default;N2O;Boreal;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;Default;N2O;Warm Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;Default;N2O;Warm Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;Default;N2O;Tropical;Montane;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;Default;N2O;Tropical;Wet;0;0,003333333;0,0075;0,02;0,006;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;Default;N2O;Tropical;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Dairy Buffalo;Default;N2O;Tropical;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;High-Productivity;N2O;Cool Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;High-Productivity;N2O;Cool Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;High-Productivity;N2O;Boreal;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;High-Productivity;N2O;Boreal;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;High-Productivity;N2O;Warm Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;High-Productivity;N2O;Warm Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;High-Productivity;N2O;Tropical;Montane;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;High-Productivity;N2O;Tropical;Wet;0;0,003333333;0,0075;0,02;0,006;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;High-Productivity;N2O;Tropical;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;High-Productivity;N2O;Tropical;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;Low-Productivity;N2O;Cool Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;Low-Productivity;N2O;Cool Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;Low-Productivity;N2O;Boreal;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;Low-Productivity;N2O;Boreal;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;Low-Productivity;N2O;Warm Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;Low-Productivity;N2O;Warm Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;Low-Productivity;N2O;Tropical;Montane;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;Low-Productivity;N2O;Tropical;Wet;0;0,003333333;0,0075;0,02;0,006;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;Low-Productivity;N2O;Tropical;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;Low-Productivity;N2O;Tropical;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;Default;N2O;Cool Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;Default;N2O;Cool Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;Default;N2O;Boreal;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;Default;N2O;Boreal;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;Default;N2O;Warm Temperate;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;Default;N2O;Warm Temperate;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;Default;N2O;Tropical;Montane;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;Default;N2O;Tropical;Wet;0;0,003333333;0,0075;0,02;0,006;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;Default;N2O;Tropical;Moist;0;0,003333333;0,0075;0,02;0,004;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
+Other Buffalo;Default;N2O;Tropical;Dry;0;0,003333333;0,0075;0,02;0,002;0;0,0006;;0,002;0,002;0,001;0,04;0,0065;0,0075
