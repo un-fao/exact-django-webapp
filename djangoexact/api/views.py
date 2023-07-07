@@ -106,7 +106,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
 
         project = get_object_or_404(Project, pk=pk, user=self.request.user)
-        serialized_project = get_model_serializer(Project)(project).data
+        serialized_project = ProjectSerializer(project).data
 
         project_results = {
             "total_w": 0,
@@ -121,7 +121,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         for activity in activities:
             activity_results = ActivityViewSet.results(self, request, activity.pk)
 
-            activity_dict = get_model_serializer(Activity)(activity).data
+            activity_dict = ActivitySerializer(activity).data
             activity_dict["results"] = activity_results.data["results"]
             response["activities"].append(activity_dict)
 
