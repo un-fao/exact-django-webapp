@@ -132,6 +132,8 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         get_object_or_404(Activity, pk=pk, project__user=self.request.user)
 
+        response = {}
+
         modules = []
         module_types = ModuleType.objects.all()
         # TODO: Make a serializer for this
@@ -150,7 +152,21 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                     module_dict[RESULTS] = error(str(e))
                 modules.append(module_dict)
 
-        return Response(modules)
+        tot_results = {
+            "total_w": 0,
+            "total_wo": 0,
+            "balance": 0,
+        }
+        for module in modules:
+            for result in module[RESULTS]:
+                tot_results["total_w"] += result["total_w"]
+                tot_results["total_wo"] += result["total_wo"]
+                tot_results["balance"] += result["balance"]
+
+        response["modules"] = modules
+        response["results"] = tot_results
+
+        return Response(response)
 
     @action(detail=True, methods=["get"])
     def modules(self, request, pk=None):
