@@ -245,28 +245,28 @@ class FiresCombustionFactorManager(Manager):
 
 
 class FiresCombustionFactor(Model):
-    land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
+    crop_type = ForeignKey("api.CropType", on_delete=CASCADE)
     value = FloatField()
 
     objects = FiresCombustionFactorManager()
 
     def __str__(self):
-        return f"FiresCombustionFactor for {self.land_use_type.name}"
+        return f"FiresCombustionFactor for {self.crop_type.name}"
 
 
 class CropNitrousEstimationDefaultFactorManager(Manager):
-    def get_or_grains(self, land_use_type):
+    def get_or_grains(self, crop_type):
         """
         Returns the factor for the given land_use_type or the factor for 'other' if it exists.
         """
         try:
-            return self.get(land_use_type=land_use_type)
+            return self.get(crop_type=crop_type)
         except self.model.DoesNotExist:
-            return self.get(land_use_type__name="Grains")
+            return self.get(crop_type__name="Grains")
 
 
 class CropNitrousEstimationDefaultFactor(Model):
-    land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
+    crop_type = ForeignKey("api.CropType", on_delete=CASCADE)
     slope = FloatField(null=True, blank=True)
     intercept = FloatField(null=True, blank=True)
     n_ag_residues = FloatField()
@@ -276,7 +276,7 @@ class CropNitrousEstimationDefaultFactor(Model):
     objects = CropNitrousEstimationDefaultFactorManager()
 
     def __str__(self):
-        return f"CropNitrousEstimationDefaultFactor for {self.land_use_type.name}"
+        return f"CropNitrousEstimationDefaultFactor for {self.crop_type.name}"
 
 
 class TillageCarbonStockExchangeFactor(Model):
@@ -454,13 +454,17 @@ class PerennialMaxAGB(Model):
 
 
 class CroplandFLU(Model):
+    """
+    IPCC A57
+    """
+
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
-    land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
+    crop_type = ForeignKey("api.CropType", on_delete=CASCADE)
     value = FloatField(default=0)
 
     def __str__(self):
-        return f"{self.value} for {self.climate.name} {self.moisture.name} {self.land_use_type.name}"
+        return f"{self.value} for {self.climate.name} {self.moisture.name} {self.crop_type.name}"
 
 
 class CroplandFMG(Model):
@@ -561,37 +565,41 @@ class EnergyDefaultEmissionFactor(Model):
 
 class SmallFisheryFUIManager(Manager):
     def get_value_or_average(request, fishery_type, gear_type):
-        model = SmallFisheryFUI.objects.get(
-            fishery_type=fishery_type, gear_type=gear_type
-        )
-        if model and model.value != 0:
+        try:
+            model = SmallFisheryFUI.objects.get(
+                fishery_type=fishery_type, gear_type=gear_type
+            )
             return model.value
-
-        _all = SmallFisheryFUI.objects.filter(
-            fishery_type=fishery_type, gear_type=gear_type
-        )
-        _all = _all.exclude(gear_type__name="Not Specified")
-        _average = sum([x.value for x in _all]) / _all.count()
-        return _average
+        except SmallFisheryFUI.DoesNotExist:
+            _all = SmallFisheryFUI.objects.filter(fishery_type=fishery_type)
+            _all = _all.exclude(gear_type__name="Not Specified")
+            _average = sum([x.value for x in _all]) / _all.count()
+            return _average
 
 
 # LargeFisheryFUIManager
 class LargeFisheryFUIManager(Manager):
     def get_value_or_average(request, fish_type, gear_type):
-        model = LargeFisheryFUI.objects.get(fish_type=fish_type, gear_type=gear_type)
-        if model and model.value != 0:
+        try:
+            model = LargeFisheryFUI.objects.get(
+                fish_type=fish_type, gear_type=gear_type
+            )
+            if model.value == 0:
+                raise LargeFisheryFUI.DoesNotExist
             return model.value
-
-        _all = LargeFisheryFUI.objects.filter(fish_type=fish_type, gear_type=gear_type)
-        not_specified = _all.filter(gear_type__name="Not Specified").first()
-        _all = _all.exclude(gear_type__name="Not Specified")
-        _sum = sum([x.median * x.n for x in _all])
-        return _sum / not_specified.n
+        except LargeFisheryFUI.DoesNotExist:
+            _all = LargeFisheryFUI.objects.filter(fish_type=fish_type)
+            not_specified = LargeFisheryFUI.objects.get(
+                fish_type=fish_type, gear_type__name="Not Specified"
+            )
+            _all = _all.exclude(gear_type__name="Not Specified")
+            _sum = sum([x.median * x.n for x in _all])
+            return _sum / not_specified.n
 
 
 class LargeFisheryFUI(Model):
     fish_type = ForeignKey("api.FishType", on_delete=CASCADE)
-    gear_type = ForeignKey("api.GearType", on_delete=CASCADE)
+    gear_type = ForeignKey("api.LargeFisheryGearType", on_delete=CASCADE, null=True)
     median = FloatField()
     n = IntegerField()
     value = FloatField()
@@ -607,8 +615,11 @@ class LargeFisheryFUI(Model):
 
 
 class SmallFisheryFUI(Model):
+    class Meta:
+        unique_together = ("fishery_type", "gear_type")
+
     fishery_type = ForeignKey("api.FisheryType", on_delete=CASCADE)
-    gear_type = ForeignKey("api.GearType", on_delete=CASCADE)
+    gear_type = ForeignKey("api.SmallFisheryGearType", on_delete=CASCADE, null=True)
     value = FloatField()
 
     objects = SmallFisheryFUIManager()
@@ -618,7 +629,7 @@ class SmallFisheryFUI(Model):
 
 
 class CropYieldStats(Model):
-    land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
+    crop_type = ForeignKey("api.CropType", on_delete=CASCADE)
     continent = ForeignKey("api.Continent", on_delete=CASCADE)
     year_2016 = FloatField(null=True, blank=True)
     year_2017 = FloatField(null=True, blank=True)
@@ -626,6 +637,9 @@ class CropYieldStats(Model):
     year_2019 = FloatField(null=True, blank=True)
     year_2020 = FloatField(null=True, blank=True)
     average = FloatField()
+
+    def __str__(self):
+        return f"({self.pk}) {self.crop_type} - {self.continent} - {self.average}"
 
 
 class InputReference(Model):

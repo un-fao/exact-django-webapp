@@ -137,7 +137,16 @@ router.register(
 router.register(
     r"change-rates", views.generic_viewset(ChangeRate), basename="change-rates"
 )
-router.register(r"gear-types", views.generic_viewset(GearType), basename="gear-types")
+router.register(
+    r"small-fishery-gear-types",
+    views.generic_viewset(SmallFisheryGearType),
+    basename="small-fishery-gear-types",
+)
+router.register(
+    r"large-fishery-gear-types",
+    views.generic_viewset(LargeFisheryGearType),
+    basename="large-fishery-gear-types",
+)
 router.register(r"fish-types", views.generic_viewset(FishType), basename="fish-types")
 router.register(
     r"fishery-types", views.generic_viewset(FisheryType), basename="fishery-types"

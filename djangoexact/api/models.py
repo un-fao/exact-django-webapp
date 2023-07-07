@@ -4,6 +4,7 @@ from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 from .utilities import *
 import uuid
+from dataclasses import dataclass
 
 alphanumeric = RegexValidator(
     r"^[0-9a-zA-Z]*$", "Only alphanumeric characters are allowed."
@@ -120,14 +121,14 @@ class Country(Model):
         verbose_name_plural = "Countries"
 
     def __str__(self):
-        return self.name
+        return f"({self.pk}) {self.name}"
 
 
 class Climate(Model):
     name = CharField(max_length=100)
 
     def __str__(self):
-        return self.name
+        return f"({self.pk}) {self.name}"
 
 
 class Moisture(Model):
@@ -141,7 +142,14 @@ class SoilType(Model):
     name = CharField(max_length=100)
 
     def __str__(self):
-        return self.name
+        return f"({self.pk}) {self.name}"
+
+
+class ExtractionSoilType(Model):
+    name = CharField(max_length=100)
+
+    def __str__(self):
+        return f"({self.pk}) {self.name}"
 
 
 class Input(Model):
@@ -290,21 +298,28 @@ class FisheryType(Model):
     name = CharField(max_length=255)
 
     def __str__(self):
-        return self.name
+        return f"({self.pk}) {self.name}"
 
 
-class GearType(Model):
+class LargeFisheryGearType(Model):
     name = CharField(max_length=255)
 
     def __str__(self):
-        return self.name
+        return f"({self.pk}) {self.name}"
+
+
+class SmallFisheryGearType(Model):
+    name = CharField(max_length=255)
+
+    def __str__(self):
+        return f"({self.pk}) {self.name}"
 
 
 class FishType(Model):
     name = CharField(max_length=255)
 
     def __str__(self):
-        return self.name
+        return f"({self.pk}) {self.name}"
 
 
 class FuelType(Model):
@@ -578,16 +593,18 @@ class Assessment(Module):
         abstract = True
 
 
+class CropType(Model):
+    name = CharField(max_length=255, unique=True)
+    description = TextField(null=True, blank=True)
+
+    def __str__(self) -> str:
+        return f"({self.pk}) {self.name}"
+
+
 class AnnualCropping(Assessment):
     user_notes = TextField(null=True, blank=True)
 
-    land_use_type = ForeignKey(
-        LandUseType,
-        on_delete=CASCADE,
-        null=True,
-        blank=True,
-        limit_choices_to=Q(parent__name="Annual Cropland"),
-    )
+    crop_type = ForeignKey(CropType, on_delete=CASCADE, null=True, blank=True)
     tillage_management_type = ForeignKey(TillageManagementType, on_delete=CASCADE)
     organic_input_type = ForeignKey(OrganicInputType, on_delete=CASCADE)
     residue_management_type = ForeignKey(ResidueManagementType, on_delete=CASCADE)
@@ -619,7 +636,7 @@ class AnnualCropping(Assessment):
     main_land_use_factor_t2 = FloatField(null=True, blank=True)
 
     minor_crop_type_t2 = ForeignKey(
-        LandUseType,
+        CropType,
         on_delete=CASCADE,
         null=True,
         blank=True,
@@ -1457,12 +1474,6 @@ class Fishery(Module):
     class Meta:
         abstract = True
 
-    gear_type_start = ForeignKey(
-        GearType, on_delete=CASCADE, related_name="%(class)s_start"
-    )
-    gear_type_w = ForeignKey(GearType, on_delete=CASCADE, related_name="%(class)s_w")
-    gear_type_wo = ForeignKey(GearType, on_delete=CASCADE, related_name="%(class)s_wo")
-
     refrigerant_pc_start = FloatField(null=True, blank=True, validators=[pc_as_float])
     refrigerant_pc_w = FloatField(null=True, blank=True, validators=[pc_as_float])
     refrigerant_pc_wo = FloatField(null=True, blank=True, validators=[pc_as_float])
@@ -1528,6 +1539,27 @@ class Fishery(Module):
 
 
 class SmallFishery(Fishery):
+    gear_type_start = ForeignKey(
+        SmallFisheryGearType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(class)s_gear_type_start",
+    )
+    gear_type_w = ForeignKey(
+        SmallFisheryGearType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(class)s_gear_type_w",
+    )
+    gear_type_wo = ForeignKey(
+        SmallFisheryGearType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(class)s_gear_type_wo",
+    )
     fishery_type = ForeignKey(FisheryType, on_delete=CASCADE)
     fui_default = ForeignKey(
         "ipcc.SmallFisheryFUI", on_delete=CASCADE, null=True, blank=True
@@ -1535,6 +1567,27 @@ class SmallFishery(Fishery):
 
 
 class LargeFishery(Fishery):
+    gear_type_start = ForeignKey(
+        LargeFisheryGearType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(class)s_gear_type_start",
+    )
+    gear_type_w = ForeignKey(
+        LargeFisheryGearType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(class)s_gear_type_w",
+    )
+    gear_type_wo = ForeignKey(
+        LargeFisheryGearType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(class)s_gear_type_wo",
+    )
     fish_type = ForeignKey(FishType, on_delete=CASCADE)
     fui_default = ForeignKey(
         "ipcc.LargeFisheryFUI", on_delete=CASCADE, null=True, blank=True
