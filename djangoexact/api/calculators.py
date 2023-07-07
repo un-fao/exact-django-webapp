@@ -6,6 +6,8 @@ from .models import (
     Input,
     Building,
     Livestock,
+    AnnualCropping,
+    CropType,
 )
 from math_model import (
     defo,
@@ -25,7 +27,7 @@ from abc import ABC, abstractmethod
 import sys
 
 
-class Result(object):
+class Result:
     """
     Base class for all results.
     """
@@ -34,6 +36,9 @@ class Result(object):
         self.total_w = total_w
         self.total_wo = total_wo
         self.balance = balance
+
+    def __str__(self):
+        return f"Total with: {self.total_w}, total without: {self.total_wo}, balance: {self.balance}"
 
 
 class CalculatorFactory:
@@ -181,7 +186,9 @@ class DeforestationCalculator(BaseCalculator):
             self.data.rcs_soil_c_t2,  # soil t2
         ]
 
-        return [Result(*defo.GHG_emissions(*inputs))]
+        results = defo.GHG_emissions(*inputs)
+
+        return [Result(*results)]
 
 
 class ExtractionCalculator(BaseCalculator):
@@ -574,11 +581,13 @@ class AnnualCroppingCalculator(BaseCalculator):
         Calculate emissions for a single AnnualCropping module.
         """
 
-        project = self.data.activity.project
+        input: AnnualCropping = self.data
+
+        project: Project = self.data.activity.project
         climate = project.climate
         moisture = project.moisture
-        land_use_type = self.data.land_use_type
-        minor_land_use_type = self.data.minor_crop_type_t2
+        crop_type = input.crop_type
+        minor_crop_type = input.minor_crop_type_t2
 
         relative, relation = get_assessment_or_parent(self.data)
         is_parent = relation == "parent"
@@ -586,17 +595,15 @@ class AnnualCroppingCalculator(BaseCalculator):
         burning_emission_factor = BurningEmissionFactor.objects.get(
             category__name="Agricultural residues"
         )
-        fires_combustion_factor = FiresCombustionFactor.objects.get(
-            land_use_type=land_use_type
-        )
+        fires_combustion_factor = FiresCombustionFactor.objects.get(crop_type=crop_type)
         n_estimation_factor = CropNitrousEstimationDefaultFactor.objects.get_or_grains(
-            land_use_type=land_use_type
+            crop_type=crop_type
         )
 
         # Minor crop
         try:
             minor_combustion_factor = FiresCombustionFactor.objects.get(
-                land_use_type=minor_land_use_type
+                crop_type=crop_type
             )
             # TODO: Change logic for cleaner code
             minor_burning_emission_factor = BurningEmissionFactor.objects.get(
@@ -604,7 +611,7 @@ class AnnualCroppingCalculator(BaseCalculator):
             )
             minor_n_estimation_factor = (
                 CropNitrousEstimationDefaultFactor.objects.get_or_grains(
-                    land_use_type=minor_land_use_type
+                    crop_type=minor_crop_type
                 )
             )
         except:
@@ -618,10 +625,11 @@ class AnnualCroppingCalculator(BaseCalculator):
         emission_factors = DefaultEmissionFactor.objects.get(
             moisture=moisture, input=self.data.organic_input_type
         )
+
         flu = CroplandFLU.objects.get(
             climate=climate,
             moisture=moisture,
-            land_use_type__name="Long-Term Cultivated",
+            crop_type__name="Long-Term Cultivated",
         )
         fi = CroplandFI.objects.get(
             climate=climate,
@@ -638,7 +646,7 @@ class AnnualCroppingCalculator(BaseCalculator):
             self.data.crop_yield
             if self.data.crop_yield
             else CropYieldStats.objects.get(
-                continent=project.continent, land_use_type=land_use_type
+                continent=project.continent, crop_type=crop_type
             ).average
         )
 
@@ -936,6 +944,8 @@ class SmallFisheryCalculator(BaseCalculator):
         """
 
         project = self.data.activity.project
+        input = self.data
+
         ef_diesel_default_list = EnergyDefaultEmissionFactor.objects.filter(
             fuel_type__name__contains="Off-Road"
         )
@@ -1013,6 +1023,16 @@ class SmallFisheryCalculator(BaseCalculator):
             self.data.ice_preserved_catch_pc_w,
             self.data.ice_preserved_catch_pc_wo,
         ]
+
+        # print()
+        # print("--- INPUTS ---")
+        # print()
+        # print(inputs)
+        # print()
+        # print("--- END INPUTS ---")
+        # print()
+
+        print(f"Small fishery: {inputs}")
 
         return [
             Result(
@@ -1117,6 +1137,16 @@ class LargeFisheryCalculator(BaseCalculator):
             self.data.ice_preserved_catch_pc_w,
             self.data.ice_preserved_catch_pc_wo,
         ]
+
+        # print()
+        # print("--- INPUTS ---")
+        # print()
+        # print(inputs)
+        # print()
+        # print("--- END INPUTS ---")
+        # print()
+
+        print(f"Large fishery: {inputs}")
 
         return [
             Result(
