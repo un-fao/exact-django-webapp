@@ -580,7 +580,6 @@ class SmallFisheryFUIManager(Manager):
 # LargeFisheryFUIManager
 class LargeFisheryFUIManager(Manager):
     def get_value_or_average(request, fish_type, gear_type):
-        print(fish_type, gear_type)
         try:
             model = LargeFisheryFUI.objects.get(
                 fish_type=fish_type, gear_type=gear_type
