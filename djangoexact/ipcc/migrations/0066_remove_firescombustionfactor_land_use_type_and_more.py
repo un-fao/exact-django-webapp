@@ -5,21 +5,25 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('api', '0085_croptype_remove_annualcropping_land_use_type_and_more'),
-        ('ipcc', '0065_alter_livestockanimalwastemanagementsystem_manure_management_type'),
+        ("api", "0085_croptype_remove_annualcropping_land_use_type_and_more"),
+        (
+            "ipcc",
+            "0065_alter_livestockanimalwastemanagementsystem_manure_management_type",
+        ),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='firescombustionfactor',
-            name='land_use_type',
+            model_name="firescombustionfactor",
+            name="land_use_type",
         ),
         migrations.AddField(
-            model_name='firescombustionfactor',
-            name='crop_type',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='api.croptype'),
+            model_name="firescombustionfactor",
+            name="crop_type",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="api.croptype"
+            ),
             preserve_default=False,
         ),
     ]
