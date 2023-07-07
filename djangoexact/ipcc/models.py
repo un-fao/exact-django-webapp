@@ -245,7 +245,7 @@ class FiresCombustionFactorManager(Manager):
 
 
 class FiresCombustionFactor(Model):
-    crop_type = ForeignKey("api.CropType", on_delete=CASCADE)
+    crop_type = ForeignKey("api.CropType", on_delete=CASCADE, null=True, blank=True)
     value = FloatField()
 
     objects = FiresCombustionFactorManager()
