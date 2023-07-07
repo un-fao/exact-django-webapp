@@ -53,8 +53,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
 
 class ActivitySerializer(serializers.ModelSerializer):
-    project = get_model_serializer(Project)(many=False)
-    modules = serializers.SerializerMethodField()
+    project = ProjectSerializer(many=False)
 
     class Meta:
         model = Activity
