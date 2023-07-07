@@ -37,17 +37,19 @@ parent = openapi.Parameter(
 )
 
 
-def get_modules(activity):
+def get_modules(activity, serialized=True):
     modules = []
+    modules_dict = []
     module_types = ModuleType.objects.all()
     for module in module_types:
         module_model = apps.get_model(API, sanitize_for_model(module.name))
         module_object = module_model.objects.filter(activity__id=activity.pk).first()
         if module_object:
+            modules.append(module_object)
             module_dict = get_module_serializer(module_model)(module_object).data
-            modules.append(module_dict)
+            modules_dict.append(module_dict)
 
-    return modules
+    return modules_dict if serialized else modules
 
 
 class AuthenticatedViewSet(viewsets.GenericViewSet):
@@ -96,6 +98,43 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+
+    @action(detail=True, methods=["get"])
+    def results(self, request, pk=None):
+        """
+        Calculates and returns total emissions for each module in the project.
+        """
+
+        project = get_object_or_404(Project, pk=pk, user=self.request.user)
+        serialized_project = get_model_serializer(Project)(project).data
+
+        project_results = {
+            "total_w": 0,
+            "total_wo": 0,
+            "balance": 0,
+        }
+
+        response = serialized_project
+        response["activities"] = []
+
+        activities = project.activities.all()
+        for activity in activities:
+            activity_results = ActivityViewSet.results(self, request, activity.pk)
+
+            activity_dict = get_model_serializer(Activity)(activity).data
+            activity_dict["results"] = activity_results.data["results"]
+            response["activities"].append(activity_dict)
+
+            project_results["total_w"] += activity_results.data["results"]["total_w"]
+            project_results["total_wo"] += activity_results.data["results"]["total_wo"]
+            project_results["balance"] += activity_results.data["results"]["balance"]
+
+        response["results"] = project_results
+
+        return Response(
+            data=response,
+            status=status.HTTP_200_OK,
+        )
 
 
 class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
