@@ -37,6 +37,19 @@ class Result:
         self.total_wo = total_wo
         self.balance = balance
 
+    @staticmethod
+    def add(a, b):
+        """
+        Adds two results together.
+        """
+
+        if not isinstance(a, Result) or not isinstance(b, Result):
+            raise Exception("Can only add two results")
+
+        return Result(
+            a.total_w + b.total_w, a.total_wo + b.total_wo, a.balance + b.balance
+        )
+
     def __str__(self):
         return f"Total with: {self.total_w}, total without: {self.total_wo}, balance: {self.balance}"
 
