@@ -45,6 +45,8 @@ class ProjectSerializer(serializers.ModelSerializer):
     moisture = get_model_serializer(Moisture)(many=False)
     soil_type = get_model_serializer(SoilType)(many=False)
     gw_potential = get_model_serializer(GlobalWarmingPotential)(many=False)
+    soc_ref = get_model_serializer(SoilOrganicCarbon)(many=False)
+    status = get_model_serializer(ProjectStatus)(many=False)
 
     class Meta:
         model = Project

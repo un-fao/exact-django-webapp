@@ -22,8 +22,7 @@ class Migration(migrations.Migration):
             model_name="firescombustionfactor",
             name="crop_type",
             field=models.ForeignKey(
-                blank=True,
-                null=True,
+                default=1,
                 on_delete=django.db.models.deletion.CASCADE,
                 to="api.croptype",
             ),

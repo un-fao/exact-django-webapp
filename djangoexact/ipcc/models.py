@@ -245,7 +245,7 @@ class FiresCombustionFactorManager(Manager):
 
 
 class FiresCombustionFactor(Model):
-    crop_type = ForeignKey("api.CropType", on_delete=CASCADE, null=True, blank=True)
+    crop_type = ForeignKey("api.CropType", on_delete=CASCADE)
     value = FloatField()
 
     objects = FiresCombustionFactorManager()
@@ -580,19 +580,23 @@ class SmallFisheryFUIManager(Manager):
 # LargeFisheryFUIManager
 class LargeFisheryFUIManager(Manager):
     def get_value_or_average(request, fish_type, gear_type):
+        print(fish_type, gear_type)
         try:
             model = LargeFisheryFUI.objects.get(
                 fish_type=fish_type, gear_type=gear_type
             )
-            if model.value == 0:
+
+            if model.median is None:
                 raise LargeFisheryFUI.DoesNotExist
-            return model.value
+
+            return model.median
         except LargeFisheryFUI.DoesNotExist:
             _all = LargeFisheryFUI.objects.filter(fish_type=fish_type)
-            not_specified = LargeFisheryFUI.objects.get(
-                fish_type=fish_type, gear_type__name="Not Specified"
-            )
+            not_specified = LargeFisheryFUI.objects.filter(
+                gear_type__name="Not Specified"
+            ).first()
             _all = _all.exclude(gear_type__name="Not Specified")
+
             _sum = sum([x.median * x.n for x in _all])
             return _sum / not_specified.n
 
@@ -600,18 +604,16 @@ class LargeFisheryFUIManager(Manager):
 class LargeFisheryFUI(Model):
     fish_type = ForeignKey("api.FishType", on_delete=CASCADE)
     gear_type = ForeignKey("api.LargeFisheryGearType", on_delete=CASCADE, null=True)
-    median = FloatField()
-    n = IntegerField()
-    value = FloatField()
+    median = FloatField(null=True)
+    n = IntegerField(null=True)
 
     objects = LargeFisheryFUIManager()
 
-    def save(self, *args, **kwargs):
-        self.value = self.median * self.n
-        super().save(*args, **kwargs)
+    class Meta:
+        unique_together = ("fish_type", "gear_type")
 
     def __str__(self):
-        return f"{self.fish_type} - {self.gear_type} FUI: {self.value}"
+        return f"{self.fish_type} - {self.gear_type} n: {self.n} median: {self.median}"
 
 
 class SmallFisheryFUI(Model):
