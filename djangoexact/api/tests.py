@@ -33,25 +33,31 @@ wbook = xw.Book("scenario.xlsx")
 # User Creation
 u = User.objects.get(username="admin")
 
-country = random.choice(countries)
-continent = country.continent
-climate = random.choice(climates)
-moisture = random.choice(moistures)
-soil_type = random.choice(soil_types)
-gw_potential = GlobalWarmingPotential.objects.get(name="100 yr AR5 w/out CC feedback")
 
-print(f"Country: {country}")
-print(f"Continent: {continent}")
-print(f"Climate: {climate}")
-print(f"Moisture: {moisture}")
-print(f"Soil Type: {soil_type}")
-print(f"GW Potential: {gw_potential}")
+while True:
+    try:
+        country = random.choice(countries)
+        continent = country.continent
+        climate = random.choice(climates)
+        moisture = random.choice(moistures)
+        soil_type = random.choice(soil_types)
+        gw_potential = GlobalWarmingPotential.objects.get(
+            name="100 yr AR5 w/out CC feedback"
+        )
+        socref = SoilOrganicCarbon.objects.get(
+            climate=climate, moisture=moisture, soil_type=soil_type
+        )
+        print(f"Country: {country}")
+        print(f"Continent: {continent}")
+        print(f"Climate: {climate}")
+        print(f"Moisture: {moisture}")
+        print(f"Soil Type: {soil_type}")
+        print(f"GW Potential: {gw_potential}")
+        print(f"Soil Organic Carbon: {socref}")
+        break
+    except:
+        pass
 
-socref = SoilOrganicCarbon.objects.get(
-    climate=climate, moisture=moisture, soil_type=soil_type
-)
-
-print(f"Soil Organic Carbon: {socref}")
 
 # Project Creation
 p: ProjectFactory = ProjectFactory.create(
@@ -65,6 +71,7 @@ p: ProjectFactory = ProjectFactory.create(
     soc_ref=socref,
 )
 
+# Spreadeheet setup
 ds = wbook.sheets["1.Description"]
 ds["Q8"].value = p.continent.name
 ds["Q9"].value = p.country.name
@@ -77,14 +84,13 @@ ds["T14"].value = p.capitalization_duration_yrs
 # Activity Creation
 a = ActivityFactory.create(project=p, user=u)
 
+# Fishery Sheet
 fishery_sheet = wbook.sheets["8. Fisheries and aquaculture"]
 
 # Small Fishery Creation
 sm_fisheries = SmallFisheryFactory.create_batch(BATCH_SIZE, activity=a)
-
 total_fisheries = sm_fisheries.__len__()
 passed_fisheries = 0
-
 
 # Small Fishery Testing
 for i, fishery in enumerate(sm_fisheries):
@@ -128,10 +134,8 @@ for i, fishery in enumerate(sm_fisheries):
 
 # Large Fishery Creation
 lg_fisheries = LargeFisheryFactory.create_batch(BATCH_SIZE, activity=a)
-
 total_lg_fisheries = lg_fisheries.__len__()
 passed_lg_fisheries = 0
-
 
 # Large Fishery Testing
 for i, fishery in enumerate(lg_fisheries):
@@ -173,6 +177,7 @@ for i, fishery in enumerate(lg_fisheries):
         print(f"balance: {result.balance}")
         print(f"sheet_w: {sheet_w}, sheet_wo: {sheet_wo}")
         print(f"sheet_balance: {sheet_balance}")
+
 
 print(f"\nTotal Tested Small Fisheries: {total_fisheries}")
 print(f"Passed Tests: {passed_fisheries}\n")

@@ -19,10 +19,9 @@ class Migration(migrations.Migration):
             model_name="cropyieldstats",
             name="crop_type",
             field=models.ForeignKey(
+                default=1,
                 on_delete=django.db.models.deletion.CASCADE,
                 to="api.croptype",
-                null=True,
-                blank=True,
             ),
             preserve_default=False,
         ),
