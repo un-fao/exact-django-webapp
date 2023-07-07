@@ -302,14 +302,14 @@ class FisheryType(Model):
 
 
 class LargeFisheryGearType(Model):
-    name = CharField(max_length=255)
+    name = CharField(max_length=255, unique=True)
 
     def __str__(self):
         return f"({self.pk}) {self.name}"
 
 
 class SmallFisheryGearType(Model):
-    name = CharField(max_length=255)
+    name = CharField(max_length=255, unique=True)
 
     def __str__(self):
         return f"({self.pk}) {self.name}"
@@ -1560,7 +1560,7 @@ class SmallFishery(Fishery):
         blank=True,
         related_name="%(class)s_gear_type_wo",
     )
-    fishery_type = ForeignKey(FisheryType, on_delete=CASCADE)
+    fishery_type = ForeignKey(FisheryType, on_delete=CASCADE, null=True, blank=True)
     fui_default = ForeignKey(
         "ipcc.SmallFisheryFUI", on_delete=CASCADE, null=True, blank=True
     )

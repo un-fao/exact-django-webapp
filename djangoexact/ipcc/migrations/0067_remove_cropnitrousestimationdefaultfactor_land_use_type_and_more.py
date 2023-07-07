@@ -19,8 +19,7 @@ class Migration(migrations.Migration):
             model_name="cropnitrousestimationdefaultfactor",
             name="crop_type",
             field=models.ForeignKey(
-                null=True,
-                blank=True,
+                default=1,
                 on_delete=django.db.models.deletion.CASCADE,
                 to="api.croptype",
             ),

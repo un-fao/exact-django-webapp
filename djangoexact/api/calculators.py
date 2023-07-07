@@ -1045,7 +1045,7 @@ class SmallFisheryCalculator(BaseCalculator):
         # print("--- END INPUTS ---")
         # print()
 
-        print(f"Small fishery: {inputs}")
+        # print(f"Small fishery: {inputs}")
 
         return [
             Result(
@@ -1159,7 +1159,7 @@ class LargeFisheryCalculator(BaseCalculator):
         # print("--- END INPUTS ---")
         # print()
 
-        print(f"Large fishery: {inputs}")
+        # print(f"Large fishery: {inputs}")
 
         return [
             Result(
