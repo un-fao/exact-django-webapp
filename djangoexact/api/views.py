@@ -212,6 +212,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 activity__id=pk, activity__project__user=self.request.user
             ).first()
             if module_object:
+                print(module_object)
                 module_dict = get_module_serializer(module_model)(module_object).data
                 try:
                     module_dict[RESULTS] = ResultSerializer(
@@ -228,6 +229,8 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         }
         for module in modules:
             print(module[RESULTS])
+            if "details" in module[RESULTS]:
+                continue
             for result in module[RESULTS]:
                 tot_results["total_w"] += result["total_w"]
                 tot_results["total_wo"] += result["total_wo"]

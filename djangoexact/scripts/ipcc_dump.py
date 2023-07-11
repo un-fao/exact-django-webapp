@@ -181,19 +181,6 @@ with open("scripts/ipcc_data/SoilOrganicCarbon.csv", "r") as f:
                 climate=climate, moisture=moisture, soil_type=soil_type, value=value
             )
 
-with open("scripts/ipcc_data/DefaultEmissionFactors.csv", "r") as f:
-    reader = csv.reader(f)
-    data = list(reader)
-
-    for row in data:
-        if row[1] == "":
-            continue  # Skip rows that have no associated data
-        input = OrganicInputType.objects.get_or_create(name=sanitize(row[0]))[0]
-        moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
-        DefaultEmissionFactor.objects.get_or_create(
-            input=input, moisture=moisture, value=row[2]
-        )
-
 with open("scripts/ipcc_data/ForestTotalBiomass.csv", "r") as f:
     reader = csv.reader(f)
     header = next(reader, None)
@@ -304,26 +291,6 @@ with open("scripts/ipcc_data/BurningEmissionFactors.csv", "r") as f:
             ch4=row[ch4],
             n2o=row[n2o],
             nox=row[nox],
-        )
-
-with open("scripts/ipcc_data/FiresCombustionFactors.csv", "r") as f:
-    reader = csv.reader(f)
-    data = list(reader)
-
-    for row in data:
-        land_name = sanitize(row[0])
-        crop_type = (
-            CropType.objects.get_or_create(name=land_name)[0]
-            if land_name != "Other"
-            else None
-        )
-
-        fires_cf = (
-            FiresCombustionFactor.objects.get_or_create(
-                crop_type=crop_type, value=row[1]
-            )
-            if crop_type is not None
-            else None
         )
 
 with open("scripts/ipcc_data/CropNitrousEstimationDefaultFactors.csv", "r") as f:
@@ -1478,9 +1445,6 @@ with open("scripts/ipcc_data/SmallFisheryDatabaseFish.csv", "r") as f:
             SmallFisheryFUI.objects.get_or_create(
                 fishery_type=fishery_type, gear_type=gear_type, value=value
             )
-"""
-
-LargeFisheryFUI.objects.all().delete()
 
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "LargeFisheryFUI.csv"),
@@ -1516,23 +1480,118 @@ for row in rows:
     )
 
 
-# with open("scripts/ipcc_data/LargeFisheryFUI.csv", "r") as f:
-#     reader = csv.reader(f)
-#     header = next(reader, None)
-#     data = list(reader)
+with open("scripts/ipcc_data/LargeFisheryFUI.csv", "r") as f:
+    reader = csv.reader(f)
+    header = next(reader, None)
+    data = list(reader)
 
-#     for i, head in enumerate(header):
-#         head = sanitize(head).title()
-#         gear_type = LargeFisheryGearType.objects.get_or_create(name=head)[0]
-#         for row in data:
-#             if row[i + 1] == "":
-#                 continue
+    for i, head in enumerate(header):
+        head = sanitize(head).title()
+        gear_type = LargeFisheryGearType.objects.get_or_create(name=head)[0]
+        for row in data:
+            if row[i + 1] == "":
+                continue
 
-#             fish_type = FishType.objects.get_or_create(name=sanitize(row[0]).title())[0]
-#             value = float(row[i + 1])
+            fish_type = FishType.objects.get_or_create(name=sanitize(row[0]).title())[0]
+            value = float(row[i + 1])
 
-#             print(f"{fish_type}, {gear_type}, {value}")
+            print(f"{fish_type}, {gear_type}, {value}")
 
-#             LargeFisheryFUI.objects.get_or_create(
-#                 fish_type=fish_type, gear_type=gear_type, value=value
-#             )
+            LargeFisheryFUI.objects.get_or_create(
+                fish_type=fish_type, gear_type=gear_type, value=value
+            )
+
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "FiresCombustionFactors.csv"),
+    header=[0],
+    sep=";",
+)
+
+for i, row in df.iterrows():
+    crop_type = CropType.objects.get_or_create(name=sanitize(row["crop_type"]))[0]
+    combustion_factor = FiresCombustionFactor.objects.get_or_create(
+        crop_type=crop_type,
+        value=float(row["value"]),
+    )[0]
+
+    print(combustion_factor)
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "DefaultEmissionFactors.csv"),
+    header=[0],
+    sep=",",
+)
+
+for i, row in df.iterrows():
+    organic_input_type = OrganicInputType.objects.get_or_create(
+        name=sanitize(row["organic_input_type"])
+    )[0]
+    moisture = Moisture.objects.get_or_create(name=sanitize(row["moisture"]))[0]
+    emission_factor = DefaultEmissionFactor.objects.get_or_create(
+        organic_input_type=organic_input_type,
+        moisture=moisture,
+        value=float(row["value"]),
+    )[0]
+
+    print(emission_factor)
+with open("scripts/ipcc_data/CroplandFLU.csv", "r") as f:
+    reader = csv.reader(f)
+    header = next(reader, None)
+    data = list(reader)
+
+    for i, head in enumerate(header):
+        head = sanitize(head).title()
+        crop_type = CropType.objects.get_or_create(name=head)[0]
+        for row in data:
+            if sanitize(row[0]) == "":
+                continue
+
+            climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
+            moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
+
+            value = row[i + 2]
+
+            print(f"{crop_type}, {climate}, {moisture}, {value}")
+
+            CroplandFLU.objects.get_or_create(
+                crop_type=crop_type,
+                climate=climate,
+                moisture=moisture,
+                value=value,
+            )
+"""
+
+CropYieldStats.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "CropYieldStats.csv"),
+    header=[0],
+    sep=";",
+)
+
+for i, row in df.iterrows():
+    crop_type = CropType.objects.get_or_create(name=sanitize(row["crop_type"]))[0]
+    continent = Continent.objects.get_or_create(name=sanitize(row["continent"]))[0]
+    yr_2016 = float(row["2016"])
+    yr_2017 = float(row["2017"])
+    yr_2018 = float(row["2018"])
+    yr_2019 = float(row["2019"])
+    yr_2020 = float(row["2020"])
+
+    average = (yr_2016 + yr_2017 + yr_2018 + yr_2019 + yr_2020) / 5 / 10000
+
+    print(
+        f"{crop_type}, {continent}, {yr_2016}, {yr_2017}, {yr_2018}, {yr_2019}, {yr_2020}, {average}"
+    )
+
+    stat = CropYieldStats.objects.get_or_create(
+        crop_type=crop_type,
+        continent=continent,
+        year_2016=yr_2016,
+        year_2017=yr_2017,
+        year_2018=yr_2018,
+        year_2019=yr_2019,
+        year_2020=yr_2020,
+        average=average,
+    )[0]

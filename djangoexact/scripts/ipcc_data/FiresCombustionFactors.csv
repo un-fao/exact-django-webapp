@@ -1,5 +1,21 @@
-﻿Wheat,0.90
-Maize,0.80
-Rice,0.80
-Sugarcane,0.80
-Other,0.85
+﻿crop_type;value
+Wheat;0.90
+Maize;0.80
+Rice;0.80
+Sugarcane;0.80
+Grains;0.85
+Beans & pulses;0.85
+Tubers;0.85
+Barley;0.85
+Oats;0.85
+Potatoes;0.85
+Soybeans;0.85
+Millet;0.85
+Sorghum;0.85
+Rye;0.85
+Peanuts;0.85
+Dry bean;0.85
+Root crops;0.85
+Oilseeds;0.85
+Vegetables;0.85
+

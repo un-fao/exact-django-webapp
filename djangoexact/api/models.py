@@ -656,8 +656,8 @@ class AnnualCropping(Assessment):
 class PerennialCropping(Assessment):
     user_notes = TextField(null=True, blank=True)
 
-    land_use_type = ForeignKey(
-        LandUseType,
+    crop_type = ForeignKey(
+        CropType,
         on_delete=CASCADE,
         null=True,
         blank=True,

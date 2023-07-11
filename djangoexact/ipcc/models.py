@@ -1,4 +1,5 @@
 from django.db.models import *
+from types import SimpleNamespace
 
 
 class GlobalWarmingPotential(Model):
@@ -73,12 +74,12 @@ class AfforestationCombustionFactorValues(Model):
 
 
 class DefaultEmissionFactor(Model):
-    input = ForeignKey("api.OrganicInputType", on_delete=CASCADE)
+    organic_input_type = ForeignKey("api.OrganicInputType", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     value = FloatField()
 
     def __str__(self):
-        return f"Factor for {self.moisture.name}, {self.input}, value: {self.value}"
+        return f"Factor for {self.moisture.name}, {self.organic_input_type}, value: {self.value}"
 
 
 class LitterDeadwoodCarbonStock(Model):
@@ -251,7 +252,7 @@ class FiresCombustionFactor(Model):
     objects = FiresCombustionFactorManager()
 
     def __str__(self):
-        return f"FiresCombustionFactor for {self.crop_type.name}"
+        return f"FiresCombustionFactor for {self.crop_type.name}, value {self.value}"
 
 
 class CropNitrousEstimationDefaultFactorManager(Manager):
@@ -629,6 +630,16 @@ class SmallFisheryFUI(Model):
         return f"{self.fishery_type} - {self.gear_type} FUI: {self.value}"
 
 
+class CropYieldStatsManager(Manager):
+    def get_or_region_average(self, crop_type, continent):
+        try:
+            return CropYieldStats.objects.get(crop_type=crop_type, continent=continent)
+        except CropYieldStats.DoesNotExist:
+            _all = CropYieldStats.objects.filter(continent=continent).all()
+            _average = sum([x.average for x in _all if x.average > 0]) / _all.count()
+            return SimpleNamespace(average=_average)
+
+
 class CropYieldStats(Model):
     crop_type = ForeignKey("api.CropType", on_delete=CASCADE)
     continent = ForeignKey("api.Continent", on_delete=CASCADE)
@@ -639,8 +650,29 @@ class CropYieldStats(Model):
     year_2020 = FloatField(null=True, blank=True)
     average = FloatField()
 
+    objects = CropYieldStatsManager()
+
+    def save(self, *args, **kwargs):
+        self.average = (
+            sum(
+                [
+                    x
+                    for x in [
+                        self.year_2016,
+                        self.year_2017,
+                        self.year_2018,
+                        self.year_2019,
+                        self.year_2020,
+                    ]
+                ]
+            )
+            / 5
+            / 10000
+        )
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"({self.pk}) {self.crop_type} - {self.continent} - {self.average}"
+        return f"({self.pk}) - {self.continent} - {self.average}"
 
 
 class InputReference(Model):
