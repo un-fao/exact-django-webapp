@@ -67,7 +67,7 @@ class CalculatorFactory:
             )(input)
             return calculator.calculate()
         except AttributeError as e:
-            print(e)
+            print(f"Calculator error: {e}")
             raise Exception(f"Module '{input.__class__.__name__}' not (yet) supported.")
         except Exception as ex:
             print(ex)
@@ -636,7 +636,7 @@ class AnnualCroppingCalculator(BaseCalculator):
         # TODO: Rename all tables related to FLU, FI, FMG
         # TODO: DefaultEmissionFactors must be inserted properly in the database (IPCC!B99)
         emission_factors = DefaultEmissionFactor.objects.get(
-            moisture=moisture, input=self.data.organic_input_type
+            moisture=moisture, organic_input_type=self.data.organic_input_type
         )
 
         flu = CroplandFLU.objects.get(
@@ -658,7 +658,7 @@ class AnnualCroppingCalculator(BaseCalculator):
         crop_yield = (
             self.data.crop_yield
             if self.data.crop_yield
-            else CropYieldStats.objects.get(
+            else CropYieldStats.objects.get_or_region_average(
                 continent=project.continent, crop_type=crop_type
             ).average
         )
@@ -736,6 +736,7 @@ class AnnualCroppingCalculator(BaseCalculator):
             getattr(minor_n_estimation_factor, "n_bg_t", None),
         ]
 
+        print(inputs)
         return [Result(*annuals.calculate_emissions(*inputs))]
 
 
@@ -762,7 +763,7 @@ class PerennialCroppingCalculator(BaseCalculator):
 
         # TODO: Replace 'other' with all the other land_use_types in db
         fires_combustion_factor = FiresCombustionFactor.objects.get_or_other(
-            land_use_type=land_use_type
+            crop_type=land_use_type
         )
         ag_default = PerennialAGB.objects.get_or_default(
             climate=climate,
@@ -792,7 +793,7 @@ class PerennialCroppingCalculator(BaseCalculator):
             flu = CroplandFLU.objects.get(
                 climate=climate,
                 moisture=moisture,
-                land_use_type__name="Perennial/Tree Crop",
+                crop_type__name="Perennial/Tree Crop",
             )
 
         fi = CroplandFI.objects.get(

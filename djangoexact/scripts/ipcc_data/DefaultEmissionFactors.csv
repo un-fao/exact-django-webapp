@@ -1,6 +1,13 @@
-﻿Default,Default,0.01
-Synthetic fertiliser inputs in wet climates,Wet,0.016
-Synthetic fertiliser inputs in moist climates,Moist,0.0105
-Other N inputs in wet climates,Wet,0.006
-Other N inputs in moist climates,Moist,0.0055
-All N inputs in dry climates,Dry,0.005
+﻿organic_input_type,moisture,value
+Low C Input,Wet,0.006
+Low C Input,Moist,0.0055
+Low C Input,Dry,0.005
+Medium C Input,Wet,0.006
+Medium C Input,Moist,0.0055
+Medium C Input,Dry,0.005
+"High C Input, No Manure",Wet,0.006
+"High C Input, No Manure",Moist,0.0055
+"High C Input, No Manure",Dry,0.005
+"High C Input, Manure",Wet,0.006
+"High C Input, Manure",Moist,0.0055
+"High C Input, Manure",Dry,0.005
