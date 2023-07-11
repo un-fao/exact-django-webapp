@@ -176,7 +176,23 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     serializer_class = ActivitySerializer
 
     @swagger_auto_schema(
-        manual_parameters=[project_id], responses={400: "project_id not provided"}
+        manual_parameters=[project_id], responses={400: "activity_id not provided"}
+    )
+    def retrieve(self, request, pk=None):
+        """
+        Get a single activity for a given user.
+        """
+        activity = get_object_or_404(Activity, pk=pk, project__user=self.request.user)
+        activity_dict = ActivitySerializer(activity).data
+        activity_dict["modules"] = get_modules(activity)
+
+        return Response(
+            data=activity_dict,
+            status=status.HTTP_200_OK,
+        )
+
+    @swagger_auto_schema(
+        manual_parameters=[project_id], responses={400: "activity_id not provided"}
     )
     def list(self, request):
         """
@@ -188,8 +204,15 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             project__id=project_id, project__user=self.request.user
         )
 
+        response = []
+
+        for activity in list:
+            activity_dict = ActivitySerializer(activity).data
+            activity_dict["modules"] = get_modules(activity)
+            response.append(activity_dict)
+
         return Response(
-            data=get_module_serializer(Activity)(list, many=True).data,
+            data=response,
             status=status.HTTP_200_OK,
         )
 
