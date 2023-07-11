@@ -99,7 +99,37 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
 
+    @swagger_auto_schema(
+        manual_parameters=[project_id], responses={404: "Project not found"}
+    )
+    def retrieve(self, request, pk=None):
+        """
+        Get a single project for a given user.
+        """
+        project = get_object_or_404(Project, pk=pk, user=self.request.user)
+        return Response(
+            data=get_model_serializer(Project)(project).data,
+            status=status.HTTP_200_OK,
+        )
+
+    @swagger_auto_schema(
+        manual_parameters=[project_id], responses={404: "Project not found"}
+    )
+    def list(self, request):
+        """
+        Get all projects for a given user.
+        """
+        list = Project.objects.filter(user=self.request.user)
+
+        return Response(
+            data=get_model_serializer(Project)(list, many=True).data,
+            status=status.HTTP_200_OK,
+        )
+
     @action(detail=True, methods=["get"])
+    @swagger_auto_schema(
+        manual_parameters=[project_id], responses={404: "Project not found"}
+    )
     def results(self, request, pk=None):
         """
         Calculates and returns total emissions for each module in the project.
@@ -197,6 +227,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             "balance": 0,
         }
         for module in modules:
+            print(module[RESULTS])
             for result in module[RESULTS]:
                 tot_results["total_w"] += result["total_w"]
                 tot_results["total_wo"] += result["total_wo"]
