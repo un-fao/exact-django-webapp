@@ -86,9 +86,8 @@ def soil_co2_change(area_start, area, time_impl, time_cap, rate_coefficient, rat
                 else:
                     return 0.215 * time_impl - (time_impl/4.6 * math.exp(-92.1/time_impl) - 0.01)
             else:
-                time_impl * (1 - rate_coefficient)
-            return
-    
+                return time_impl * (1 - rate_coefficient)    
+        
         def not_immediate_area_start_smaller_area(time_impl, time_cap, rate_type, rate_coefficient):
 
             # SUPPORT FUNCTION
@@ -241,11 +240,11 @@ def residue_burning(area_start, area, time_impl, time_cap, rate_coefficient, nit
     return total
 
 def calculate_emissions(area_start, area_w, area_wo, time_impl, time_cap, rate_w, rate_coefficient_w, rate_wo, rate_coefficient_wo, socref, soc_tier_2, f_lu_ref, f_lu_tier_2, f_i_ref, f_i_tier_2, f_mg_ref, f_mg_tier_2,
-                        emission_factor_nitrous, nitrous_constant, methane_constant, ef_methane_agr_residues_main, combustion_factor_main, 
-                    residue_main_tier_2 , n_estimation_slope_main, n_estimation_intercept_main, yield_value_main,ef_methane_agr_residues_minor, combustion_factor_minor,residue_minor_tier_2,
-                    n_estimation_slope_minor, n_estimation_intercept_minor, yield_value_minor, ef_nitrous_agr_residues_main, retained_main, ef_nitrous_agr_residues_minor, retained_minor,
-                    n_content_ag_main, ratio_bg_ag_main, n_content_bg_main, n_content_ag_minor, ratio_bg_ag_minor, n_content_bg_minor
-                        ):
+                            emission_factor_nitrous, nitrous_constant, methane_constant, ef_methane_agr_residues_main, combustion_factor_main, 
+                            residue_main_tier_2 , n_estimation_slope_main, n_estimation_intercept_main, yield_value_main,ef_methane_agr_residues_minor, combustion_factor_minor,residue_minor_tier_2,
+                            n_estimation_slope_minor, n_estimation_intercept_minor, yield_value_minor, ef_nitrous_agr_residues_main, retained_main, ef_nitrous_agr_residues_minor, retained_minor,
+                            n_content_ag_main, ratio_bg_ag_main, n_content_bg_main, n_content_ag_minor, ratio_bg_ag_minor, n_content_bg_minor
+                                ):
 
     soil_w = soil_co2_change(area_start, area_w, time_impl, time_cap, rate_coefficient_w, rate_w, socref, soc_tier_2, f_lu_ref, f_lu_tier_2, f_i_ref, f_i_tier_2, f_mg_ref, f_mg_tier_2)
     soil_wo = soil_co2_change(area_start, area_wo, time_impl, time_cap, rate_coefficient_wo, rate_wo, socref, soc_tier_2, f_lu_ref, f_lu_tier_2, f_i_ref, f_i_tier_2, f_mg_ref, f_mg_tier_2)
