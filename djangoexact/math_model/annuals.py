@@ -121,7 +121,7 @@ def soil_co2_change(area_start, area, time_impl, time_cap, rate_coefficient, rat
     f_i = f_i_ref if not f_i_tier_2 else f_i_tier_2
     f_mg = f_mg_ref if not f_mg_tier_2 else f_mg_tier_2
 
-    delta_soil_c = (soc * f_lu) * (f_mg * f_i - 1) * (44/12)
+    delta_soil_c = (soc * f_lu * f_mg * f_i - soc) * (44/12)
     delta_soil_c_20_years = delta_soil_c / 20
 
     maximum = - delta_soil_c * max(area_start, area)
@@ -153,9 +153,6 @@ def som (area_start, area, time_impl, time_cap, rate_coefficient, socref, soc_ti
     reference_soc = soc
     maximum_soc_20_years = soc * f_i * f_mg * f_lu 
     n2o_n_conversion = 44/28
-
-
-    ciao = ((maximum_soc_20_years - reference_soc)/20/10*1000)
 
     som_n2o = 0 if maximum_soc_20_years > reference_soc else ((maximum_soc_20_years - reference_soc)/20/10*1000)  * emission_factor_nitrous * n2o_n_conversion * (nitrous_constant/1000)
 
