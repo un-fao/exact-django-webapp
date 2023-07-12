@@ -33,7 +33,7 @@ class TotalBiomassAfterDefo(Model):
         return f"Climate: {self.climate}, Moisture: {self.moisture}, Continent: {self.continent}, Land Use Type: {self.land_use_type}, Year: {self.year}, Value: {self.value}"
 
 
-class DataOnMangroves(Model):
+class DataOnMangrove(Model):
     # TODO: Merge this and deforestation table?
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
@@ -51,7 +51,7 @@ class DataOnMangroves(Model):
         return f"{self.climate.name} {self.moisture.name}, dry_matter: {self.agb_dry_matter}, c_fraction: {self.c_fraction}, agb_c: {self.agb_c}, agb_growth: {self.agb_growth}, r: {self.r}, bgb: {self.bgb}, litter: {self.litter}, dw: {self.dw}, soc_ref: {self.soc_ref}"
 
 
-class CombustionFactorValues(Model):
+class CombustionFactor(Model):
     vegetation_type = ForeignKey("api.VegetationType", on_delete=CASCADE)
     co2 = FloatField(null=True)
     ch4 = FloatField(null=True)
@@ -62,7 +62,7 @@ class CombustionFactorValues(Model):
         return f"Factor for {self.vegetation_type.name}, value: {self.value}"
 
 
-class AfforestationCombustionFactorValues(Model):
+class AfforestationCombustionFactor(Model):
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     co2 = FloatField(null=True)
     ch4 = FloatField(null=True)
