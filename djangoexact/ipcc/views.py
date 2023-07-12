@@ -1,12 +1,17 @@
-from .serializers import GeneralSerializer
 from rest_framework import generics
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+from django.db.models import Model
+from .serializers import get_model_serializer
 
-# Create your views here.
-class GenericAPIView(generics.ListAPIView):
-    def dispatch(self, request, *args, **kwargs):
-        self.model = kwargs.pop('model')
-        self.queryset = self.model.objects.all()
-        serializer = GeneralSerializer
-        serializer.Meta.model = self.model
-        self.serializer_class = serializer
-        return super().dispatch(request, *args, **kwargs)
+
+class AuthenticatedViewSet:
+    permission_classes = [IsAuthenticated]
+
+
+def generic_viewset(model: Model):
+    class GenericViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+        queryset = model.objects.all()
+        serializer_class = get_model_serializer(model)
+
+    return GenericViewSet

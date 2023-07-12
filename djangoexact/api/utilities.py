@@ -96,6 +96,22 @@ def get_assessment_or_parent_(module) -> tuple[Model, str]:
     return relative
 
 
+def get_url_name(model_name):
+    url_name = model_name
+
+    # regex split on non consecutive capital letters
+    url_name = "".join(
+        [f"-{x}" for x in re.split(r"(?<!^)(?=[A-Z](?![A-Z]|$))", url_name)]
+    ).lower()
+    url_name = url_name[1:]
+
+    if url_name[-1] == "s":
+        url_name += "es"
+    else:
+        url_name += "s"
+    return url_name
+
+
 # define ErrorResponse class
 class ErrorResponse(Response):
     def __init__(self, data, status=status.HTTP_400_BAD_REQUEST):
