@@ -654,7 +654,6 @@ class PerennialCropping(Assessment):
         on_delete=CASCADE,
         null=True,
         blank=True,
-        limit_choices_to=Q(parent__name="Agroforestry"),
     )
 
     tillage_management_type = ForeignKey(TillageManagementType, on_delete=CASCADE)
