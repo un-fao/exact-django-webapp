@@ -151,8 +151,8 @@ def som (area_start, area, time_impl, time_cap, rate_coefficient, socref, soc_ti
 
     # ACTUAL COMPUTATION
 
-    #reference_soc = soc * f_lu
-    reference_soc = soc
+    reference_soc = soc * f_lu
+    # reference_soc = soc
     maximum_soc_20_years = soc * f_i * f_mg * f_lu 
     n2o_n_conversion = 44/28
 
