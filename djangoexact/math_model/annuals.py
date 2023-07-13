@@ -86,9 +86,8 @@ def soil_co2_change(area_start, area, time_impl, time_cap, rate_coefficient, rat
                 else:
                     return 0.215 * time_impl - (time_impl/4.6 * math.exp(-92.1/time_impl) - 0.01)
             else:
-                time_impl * (1 - rate_coefficient)
-            return
-    
+                return time_impl * (1 - rate_coefficient)    
+        
         def not_immediate_area_start_smaller_area(time_impl, time_cap, rate_type, rate_coefficient):
 
             # SUPPORT FUNCTION
@@ -122,7 +121,7 @@ def soil_co2_change(area_start, area, time_impl, time_cap, rate_coefficient, rat
     f_i = f_i_ref if not f_i_tier_2 else f_i_tier_2
     f_mg = f_mg_ref if not f_mg_tier_2 else f_mg_tier_2
 
-    delta_soil_c = (soc * f_lu) * (f_mg * f_i - 1) * (44/12)
+    delta_soil_c = (soc * f_lu * f_mg * f_i - soc) * (44/12)
     delta_soil_c_20_years = delta_soil_c / 20
 
     maximum = - delta_soil_c * max(area_start, area)
@@ -151,12 +150,11 @@ def som (area_start, area, time_impl, time_cap, rate_coefficient, socref, soc_ti
 
     # ACTUAL COMPUTATION
 
-    reference_soc = soc * f_lu
+    reference_soc = soc
     maximum_soc_20_years = soc * f_i * f_mg * f_lu 
     n2o_n_conversion = 44/28
 
-
-    som_n2o = 0 if maximum_soc_20_years < reference_soc else (maximum_soc_20_years - reference_soc) * 5  * emission_factor_nitrous * n2o_n_conversion * (nitrous_constant/1000)
+    som_n2o = 0 if maximum_soc_20_years > reference_soc else ((maximum_soc_20_years - reference_soc)/20/10*1000)  * emission_factor_nitrous * n2o_n_conversion * (nitrous_constant/1000)
 
     total = - (min(area_start, area) * (time_cap + time_impl) + abs(area - area_start) * func1(area_start, area, rate_coefficient, time_impl, time_cap)) *  som_n2o 
 
@@ -241,11 +239,11 @@ def residue_burning(area_start, area, time_impl, time_cap, rate_coefficient, nit
     return total
 
 def calculate_emissions(area_start, area_w, area_wo, time_impl, time_cap, rate_w, rate_coefficient_w, rate_wo, rate_coefficient_wo, socref, soc_tier_2, f_lu_ref, f_lu_tier_2, f_i_ref, f_i_tier_2, f_mg_ref, f_mg_tier_2,
-                        emission_factor_nitrous, nitrous_constant, methane_constant, ef_methane_agr_residues_main, combustion_factor_main, 
-                    residue_main_tier_2 , n_estimation_slope_main, n_estimation_intercept_main, yield_value_main,ef_methane_agr_residues_minor, combustion_factor_minor,residue_minor_tier_2,
-                    n_estimation_slope_minor, n_estimation_intercept_minor, yield_value_minor, ef_nitrous_agr_residues_main, retained_main, ef_nitrous_agr_residues_minor, retained_minor,
-                    n_content_ag_main, ratio_bg_ag_main, n_content_bg_main, n_content_ag_minor, ratio_bg_ag_minor, n_content_bg_minor
-                        ):
+                            emission_factor_nitrous, nitrous_constant, methane_constant, ef_methane_agr_residues_main, combustion_factor_main, 
+                            residue_main_tier_2 , n_estimation_slope_main, n_estimation_intercept_main, yield_value_main,ef_methane_agr_residues_minor, combustion_factor_minor,residue_minor_tier_2,
+                            n_estimation_slope_minor, n_estimation_intercept_minor, yield_value_minor, ef_nitrous_agr_residues_main, retained_main, ef_nitrous_agr_residues_minor, retained_minor,
+                            n_content_ag_main, ratio_bg_ag_main, n_content_bg_main, n_content_ag_minor, ratio_bg_ag_minor, n_content_bg_minor
+                                ):
 
     soil_w = soil_co2_change(area_start, area_w, time_impl, time_cap, rate_coefficient_w, rate_w, socref, soc_tier_2, f_lu_ref, f_lu_tier_2, f_i_ref, f_i_tier_2, f_mg_ref, f_mg_tier_2)
     soil_wo = soil_co2_change(area_start, area_wo, time_impl, time_cap, rate_coefficient_wo, rate_wo, socref, soc_tier_2, f_lu_ref, f_lu_tier_2, f_i_ref, f_i_tier_2, f_mg_ref, f_mg_tier_2)
@@ -284,9 +282,12 @@ def default_tier_2 (socref, f_lu_ref, f_i_ref, f_mg_ref, n_estimation_slope_main
 
 
 
-ao = residue_burning(12,12,20, 9, 0.5, 265, 28, 2.7, 0.85, None, 1.13, 0.85, 50, None, 0.85, 0, None, None, None, 0.07, False, None, False, 0.008, 0.19, 0.008, None, None, None, 0.006 )
+# ao = residue_burning(12,12,20, 9, 0.5, 265, 28, 2.7, 0.85, None, 1.13, 0.85, 50, None, 0.85, 0, None, None, None, 0.07, False, None, False, 0.008, 0.19, 0.008, None, None, None, 0.006 )
 
-som_test = som(12, 12, 20, 9, 0.5, 46, None, 0.83, None, 1.11, None, 1.04, None, 0.006, 265)
+# som_test = som(12, 12, 20, 9, 0.5, 46, None, 0.83, None, 1.11, None, 1.04, None, 0.006, 265)
 
-soil = soil_co2_change(12, 12, 20, 9, 0.5, 'D', 46, None, 0.83, None, 1.11, None, 1.04, None )
+# soil = soil_co2_change(12, 12, 20, 9, 0.5, 'D', 46, None, 0.83, None, 1.11, None, 1.04, None )
 
+# inputs=[4250.0, 0.0, 2975.0, 5.0, 15.0, 'D', 0.5, 'D', 0.5, 40.0, None, 0.83, None, 0.92, None, 1.0, None, 0.0055, 298.0, 34.0, 2.7, 0.85, None, 1.09, 0.88, 1.2604799999999998, None, None, None, None, None, None, 0.07, False, None, False, 0.006, 0.22, 0.009, None, None, None]
+
+# print(calculate_emissions(*inputs))
