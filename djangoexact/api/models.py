@@ -160,7 +160,7 @@ class TillageType(Model):
 
 
 class OrganicInputType(Model):
-    name = CharField(max_length=100)
+    name = CharField(max_length=100, unique=True)
 
     def __str__(self):
         return f"({self.pk}) {self.name}"
@@ -589,6 +589,7 @@ class Assessment(Module):
 class CropType(Model):
     name = CharField(max_length=255, unique=True)
     description = TextField(null=True, blank=True)
+    is_main_crop = BooleanField(default=False)
 
     def __str__(self) -> str:
         return f"({self.pk}) {self.name}"

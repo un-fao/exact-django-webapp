@@ -293,22 +293,6 @@ with open("scripts/ipcc_data/BurningEmissionFactors.csv", "r") as f:
             nox=row[nox],
         )
 
-with open("scripts/ipcc_data/CropNitrousEstimationDefaultFactors.csv", "r") as f:
-    reader = csv.reader(f)
-    header = next(reader, None)
-    data = list(reader)
-
-    for row in data:
-        crop_type = CropType.objects.get_or_create(name=sanitize(row[0]))[0]
-        CropNitrousEstimationDefaultFactor.objects.get_or_create(
-            crop_type=crop_type,
-            slope=row[1] if row[1] != "NA" else None,
-            intercept=row[2] if row[2] != "NA" else None,
-            n_ag_residues=row[3],
-            rs_t=row[4],
-            n_bg_t=row[5],
-        )
-
 with open("scripts/ipcc_data/CoastalAboveGroundBiomass.csv", "r") as f:
     reader = csv.reader(f)
     header = next(reader, None)
@@ -670,32 +654,6 @@ with open("scripts/ipcc_data/CroplandFMG.csv", "r") as f:
 
             CroplandFMG.objects.get_or_create(
                 tillage_management_type=tillage_type,
-                climate=climate,
-                moisture=moisture,
-                value=value,
-            )
-
-with open("scripts/ipcc_data/CroplandFI.csv", "r") as f:
-    reader = csv.reader(f)
-    header = next(reader, None)
-    data = list(reader)
-
-    for i, head in enumerate(header):
-        head = sanitize(head).title()
-        organic_input_type = OrganicInputType.objects.get_or_create(name=head)[0]
-        for row in data:
-            if sanitize(row[0]) == "":
-                continue
-
-            climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
-            moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
-
-            value = row[i + 2]
-
-            print(f"{organic_input_type}, {climate}, {moisture}, {value}")
-
-            CroplandFI.objects.get_or_create(
-                organic_input_type=organic_input_type,
                 climate=climate,
                 moisture=moisture,
                 value=value,
@@ -1560,7 +1518,6 @@ with open("scripts/ipcc_data/CroplandFLU.csv", "r") as f:
                 moisture=moisture,
                 value=value,
             )
-"""
 
 CropYieldStats.objects.all().delete()
 
@@ -1595,3 +1552,64 @@ for i, row in df.iterrows():
         year_2020=yr_2020,
         average=average,
     )[0]
+
+with open("scripts/ipcc_data/CroplandFI.csv", "r") as f:
+    reader = csv.reader(f)
+    header = next(reader, None)
+    data = list(reader)
+
+    for i, head in enumerate(header):
+        head = sanitize(head).title()
+        organic_input_type = OrganicInputType.objects.get_or_create(name=head)[0]
+        for row in data:
+            if sanitize(row[0]) == "":
+                continue
+
+            climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
+            moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
+
+            value = row[i + 2]
+
+            print(f"{organic_input_type}, {climate}, {moisture}, {value}")
+
+            CroplandFI.objects.get_or_create(
+                organic_input_type=organic_input_type,
+                climate=climate,
+                moisture=moisture,
+                value=value,
+            )
+
+with open("scripts/ipcc_data/CropNitrousEstimationDefaultFactors.csv", "r") as f:
+    reader = csv.reader(f)
+    header = next(reader, None)
+    data = list(reader)
+
+    for row in data:
+        crop_type = CropType.objects.get_or_create(name=sanitize(row[0]))[0]
+        CropNitrousEstimationDefaultFactor.objects.get_or_create(
+            crop_type=crop_type,
+            slope=row[1] if row[1] != "NA" else None,
+            intercept=row[2] if row[2] != "NA" else None,
+            n_ag_residues=row[3],
+            rs_t=row[4],
+            n_bg_t=row[5],
+        )
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "DefaultEmissionFactors.csv"),
+    header=[0],
+    sep=",",
+)
+
+for i, row in df.iterrows():
+    organic_input_type = OrganicInputType.objects.get_or_create(
+        name=sanitize(row["organic_input_type"])
+    )[0]
+    moisture = Moisture.objects.get_or_create(name=sanitize(row["moisture"]))[0]
+    emission_factor = DefaultEmissionFactor.objects.get_or_create(
+        organic_input_type=organic_input_type,
+        moisture=moisture,
+        value=float(row["value"]),
+    )[0]
+
+    print(emission_factor)
+"""

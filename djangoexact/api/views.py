@@ -108,7 +108,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
         project = get_object_or_404(Project, pk=pk, user=self.request.user)
         return Response(
-            data=get_model_serializer(Project)(project).data,
+            data=ProjectSerializer(project).data,
             status=status.HTTP_200_OK,
         )
 
@@ -122,7 +122,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         list = Project.objects.filter(user=self.request.user)
 
         return Response(
-            data=get_model_serializer(Project)(list, many=True).data,
+            data=ProjectSerializer(list, many=True).data,
             status=status.HTTP_200_OK,
         )
 
