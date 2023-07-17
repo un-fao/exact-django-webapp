@@ -214,7 +214,12 @@ if TEST_ANNUAL_CROPPING:
 
         results = CalculatorFactory().calculate_result(annual_cropping)
 
-        cropland_sheet["E25"].value = annual_cropping.crop_type.name
+        cropland_sheet["E25"].value = (
+            annual_cropping.crop_type.name
+            if annual_cropping.crop_type.name not in ["Beans", "Pulses"]
+            else "Beans & pulses"
+        )
+        print(cropland_sheet["E25"].value)
         cropland_sheet["G25"].value = annual_cropping.tillage_management_type.name
         cropland_sheet["I25"].value = annual_cropping.organic_input_type.name
         cropland_sheet["K25"].value = annual_cropping.residue_management_type.name
@@ -226,6 +231,7 @@ if TEST_ANNUAL_CROPPING:
         sheet_wo = float(cropland_sheet["W25"].value)
         sheet_w = float(cropland_sheet["X25"].value)
         sheet_balance = float(cropland_sheet["Z25"].value)
+        sleep(1)
 
         try:
             assert math.isclose(results[0].total_wo, sheet_wo, rel_tol=0.02)

@@ -1612,4 +1612,87 @@ for i, row in df.iterrows():
     )[0]
 
     print(emission_factor)
+
+Atwood.objects.all().delete()
+
+with open("scripts/ipcc_data/Atwood.csv", "r") as f:
+    reader = csv.reader(f)
+    data = list(reader)
+
+    for row in data:
+        # FIXME: Some countries have no continent in the database. Link them
+        country = Country.objects.get_or_create(name=capitalize_all(row[0]))[0]
+
+        n = sanitize(row[1])
+        area_2014_km2 = sanitize(row[2])
+        mg_c_ha = sanitize(row[3])
+        sd = sanitize(row[4]) if sanitize(row[4]) != "" else None
+        score = sanitize(row[5]) if sanitize(row[5]) != "" else None
+
+        Atwood.objects.get_or_create(
+            country=country,
+            n=n,
+            area_2014_km2=area_2014_km2,
+            mg_c_ha=mg_c_ha,
+            sd=sd,
+            score=score,
+        )
+
+ElectricityEmission.objects.all().delete()
+
+with open("scripts/ipcc_data/ElectricityEmissions.csv", "r") as f:
+    reader = csv.reader(f)
+    data = list(reader)
+
+    for row in data:
+        country = Country.objects.get_or_create(name=capitalize_all(row[0]))[0]
+        continent = Continent.objects.get_or_create(name=capitalize_all(row[1]))[0]
+
+        i = 2
+
+        ef_grid = row[i + 0] if row[i + 0] != "" else None
+        year = row[i + 1] if row[i + 1] != "" else None
+        final_ef = row[i + 2] if row[i + 2] != "" else None
+        op_margin = row[i + 3] if row[i + 3] != "" else None
+        combined_margin = row[i + 4] if row[i + 4] != "" else None
+
+        print(
+            f"{country}, {continent}, {ef_grid}, {year}, {final_ef}, {op_margin}, {combined_margin}"
+        )
+
+        ElectricityEmission.objects.get_or_create(
+            country=country,
+            continent=continent,
+            ef_grid=ef_grid,
+            year=year,
+            final_ef_grid=final_ef,
+            operating_margin=op_margin,
+            combined_margin=combined_margin,
+        )
+
+with open("scripts/ipcc_data/CroplandFMG.csv", "r") as f:
+    reader = csv.reader(f)
+    header = next(reader, None)
+    data = list(reader)
+
+    for i, head in enumerate(header):
+        head = capitalize_all(sanitize(head)).title()
+        tillage_type = TillageManagementType.objects.get_or_create(name=head)[0]
+        for row in data:
+            if sanitize(row[0]) == "":
+                continue
+
+            climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
+            moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
+
+            value = row[i + 2]
+
+            print(f"{tillage_type}, {climate}, {moisture}, {value}")
+
+            CroplandFMG.objects.get_or_create(
+                tillage_management_type=tillage_type,
+                climate=climate,
+                moisture=moisture,
+                value=value,
+            )
 """
