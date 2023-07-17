@@ -361,6 +361,9 @@ class Atwood(Model):
     sd = FloatField(default=None, null=True, blank=True)
     score = FloatField(default=None, null=True, blank=True)
 
+    def __str__(self):
+        return f"Atwood for {self.country.name}"
+
 
 class DefaultSoilCarbonStock(Model):
     vegetation_type = ForeignKey("api.VegetationType", on_delete=CASCADE)

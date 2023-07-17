@@ -99,14 +99,14 @@ class ProjectStatus(Model):
 
 
 class Continent(Model):
-    name = CharField(max_length=100)
+    name = CharField(max_length=100, unique=True)
 
     def __str__(self):
         return f"({self.pk}) {self.name}"
 
 
 class Country(Model):
-    name = CharField(max_length=100)
+    name = CharField(max_length=100, unique=True)
     continent = ForeignKey(
         Continent, on_delete=CASCADE, null=True, blank=True, related_name="countries"
     )
@@ -195,7 +195,7 @@ class OrganicAmendmentType(Model):
 
 
 class TillageManagementType(Model):
-    name = CharField(max_length=100)
+    name = CharField(max_length=100, unique=True)
 
     def __str__(self):
         return f"({self.pk}) {self.name}"
