@@ -131,7 +131,7 @@ def soil_co2_change(area_start, area, time_impl, time_cap, rate_coefficient, rat
     calculated = (calculated_time_dep + calculated_time_ind) * (- delta_soil_c_20_years) 
 
 
-    return maximum if abs(calculated) > maximum else calculated
+    return maximum if abs(calculated) > abs(maximum) else calculated
 
 def som (area_start, area, time_impl, time_cap, rate_coefficient, socref, soc_tier_2, f_lu_ref, f_lu_tier_2, f_i_ref, f_i_tier_2, f_mg_ref, f_mg_tier_2, emission_factor_nitrous, nitrous_constant):
 
@@ -290,6 +290,5 @@ def default_tier_2 (socref, f_lu_ref, f_i_ref, f_mg_ref, n_estimation_slope_main
 
 # soil = soil_co2_change(12, 12, 20, 9, 0.5, 'D', 46, None, 0.83, None, 1.11, None, 1.04, None )
 
-inputs=[4250.0, 0.0, 2975.0, 5.0, 15.0, 'D', 0.5, 'D', 0.5, 40.0, None, 0.83, None, 0.92, None, 1.0, None, 0.0055, 298.0, 34.0, 2.7, 0.85, None, 1.09, 0.88, 1.2604799999999998, None, None, None, None, None, None, 0.07, False, None, False, 0.006, 0.22, 0.009, None, None, None]
-
-print(calculate_emissions(*inputs))
+# inputs = [27, 93, 36, 5, 17, 'D', 0.5, 'D', 0.5, 87.0, None, 0.77, None, 1.0, None, 1.03, None, 0.005, 265.0, 28.0, None, 0.85, None, 0.88, 1.33, 50, None, None, None, None, None, None, None, True, None, False, 0.007, 0.22, 0.006, None, None, None]
+# print(calculate_emissions(*inputs))
