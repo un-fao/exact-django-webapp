@@ -2,12 +2,15 @@
 Low C Input,Wet,0.006
 Low C Input,Moist,0.0055
 Low C Input,Dry,0.005
+Low C Input,Montane,0.005
 Medium C Input,Wet,0.006
 Medium C Input,Moist,0.0055
 Medium C Input,Dry,0.005
+Medium C Input,Montane,0.005
 "High C Input, No Manure",Wet,0.006
 "High C Input, No Manure",Moist,0.0055
 "High C Input, No Manure",Dry,0.005
-"High C Input, Manure",Wet,0.006
-"High C Input, Manure",Moist,0.0055
-"High C Input, Manure",Dry,0.005
+"High C Input, With Manure",Wet,0.006
+"High C Input, With Manure",Moist,0.0055
+"High C Input, With Manure",Dry,0.005
+"High C Input, With Manure",Montane,0.005
