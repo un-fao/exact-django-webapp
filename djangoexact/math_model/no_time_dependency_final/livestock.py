@@ -1,4 +1,4 @@
-from general_functions import yearly_parameter_breakdown, plot_yearly_breakdown, plot_all_functions, ch4_head_calculation_general
+from general_functions import yearly_time_dependent_parameter_breakdown, ch4_head_calculation_general
 import traceback, re
 class Livestock():
 
@@ -79,7 +79,7 @@ class Livestock():
                 emissions_start = specific_factor_start / 1000 * self.methane_constant * self.head_number_start
                 emissions_end = specific_factor_end / 1000 * self.methane_constant * self.head_number_end
 
-                self.mef_emissions_yearly = yearly_parameter_breakdown(self.time_impl, self.time_cap, emissions_start, emissions_end, self.rate_type_mef)
+                self.mef_emissions_yearly = yearly_time_dependent_parameter_breakdown(self.time_impl, self.time_cap, emissions_start, emissions_end, self.rate_type_mef)
                 self.mef_emissions = sum(self.mef_emissions_yearly)
 
             except Exception as e:
@@ -91,7 +91,7 @@ class Livestock():
                     ch4_head_start = ch4_head_calculation_general(self.tam, self.vser, self.ef_prp_methane, self.percentage_prp_default, self.percentage_prp_tier_2_start, self.ef_system_methane, self.ch4_prp_tier_2_start, self.percentage_system_default)
                     ch4_head_end = ch4_head_calculation_general(self.tam, self.vser, self.ef_prp_methane, self.percentage_prp_default, self.percentage_prp_tier_2_end, self.ef_system_methane, self.ch4_prp_tier_2_end, self.percentage_system_default)
     
-                    self.mmm_emissions_yearly = yearly_parameter_breakdown(self.time_impl, self.time_cap, ch4_head_start, ch4_head_end, self.rate_type_mmm)
+                    self.mmm_emissions_yearly = yearly_time_dependent_parameter_breakdown(self.time_impl, self.time_cap, ch4_head_start, ch4_head_end, self.rate_type_mmm)
                     self.mmm_emissions = sum(self.mmm_emissions_yearly)
     
                 except Exception as e:
@@ -103,7 +103,7 @@ class Livestock():
                 n2o_head_start = ch4_head_calculation_general(self.tam, self.ner, self.ef_prp_nitrous_direct, self.percentage_prp_default, self.percentage_prp_tier_2_start, self.ef_system_nitrous_direct, self.n2o_prp_tier_2_start_direct, self.percentage_system_default)
                 n2o_head_end = ch4_head_calculation_general(self.tam, self.ner, self.ef_prp_nitrous_direct, self.percentage_prp_default, self.percentage_prp_tier_2_end, self.ef_system_nitrous_direct, self.n2o_prp_tier_2_end_direct, self.percentage_system_default)
 
-                self.nmm_emissions_yearly = yearly_parameter_breakdown(self.time_impl, self.time_cap, n2o_head_start, n2o_head_end, self.rate_type_nmm)
+                self.nmm_emissions_yearly = yearly_time_dependent_parameter_breakdown(self.time_impl, self.time_cap, n2o_head_start, n2o_head_end, self.rate_type_nmm)
                 self.nmm_emissions = sum(self.nmm_emissions_yearly)
 
             except Exception as e:
@@ -115,7 +115,7 @@ class Livestock():
                 n2o_head_start = ch4_head_calculation_general(self.tam, self.ner, self.ef_prp_nitrous_indirect_volatization, self.percentage_prp_default, self.percentage_prp_tier_2_start, self.ef_system_nitrous_indirect_volatization, self.n2o_prp_tier_2_start_indirect_volatization, self.percentage_system_default)
                 n2o_head_end = ch4_head_calculation_general(self.tam, self.ner, self.ef_prp_nitrous_indirect_volatization, self.percentage_prp_default, self.percentage_prp_tier_2_end, self.ef_system_nitrous_indirect_volatization, self.n2o_prp_tier_2_end_indirect_volatization, self.percentage_system_default)
 
-                self.nmm_indirect_volatization_emissions_yearly = yearly_parameter_breakdown(self.time_impl, self.time_cap, n2o_head_start, n2o_head_end, self.rate_type_nmm)
+                self.nmm_indirect_volatization_emissions_yearly = yearly_time_dependent_parameter_breakdown(self.time_impl, self.time_cap, n2o_head_start, n2o_head_end, self.rate_type_nmm)
                 self.nmm_indirect_volatization_emissions = sum(self.nmm_indirect_volatization_emissions_yearly)
 
             except Exception as e:
@@ -127,7 +127,7 @@ class Livestock():
                 n2o_head_start = ch4_head_calculation_general(self.tam, self.ner, self.ef_prp_nitrous_indirect_leaching, self.percentage_prp_default, self.percentage_prp_tier_2_start, self.ef_system_nitrous_indirect_leaching, self.n2o_prp_tier_2_start_indirect_leaching, self.percentage_system_default)
                 n2o_head_end = ch4_head_calculation_general(self.tam, self.ner, self.ef_prp_nitrous_indirect_leaching, self.percentage_prp_default, self.percentage_prp_tier_2_end, self.ef_system_nitrous_indirect_leaching, self.n2o_prp_tier_2_end_indirect_leaching, self.percentage_system_default)
 
-                self.nmm_indirect_leaching_emissions_yearly = yearly_parameter_breakdown(self.time_impl, self.time_cap, n2o_head_start, n2o_head_end, self.rate_type_nmm)
+                self.nmm_indirect_leaching_emissions_yearly = yearly_time_dependent_parameter_breakdown(self.time_impl, self.time_cap, n2o_head_start, n2o_head_end, self.rate_type_nmm)
                 self.nmm_indirect_leaching_emissions = sum(self.nmm_indirect_leaching_emissions_yearly)
 
             except Exception as e:
@@ -141,6 +141,8 @@ class Livestock():
         try:
             self.emissions_total_yearly = [sum(x) for x in zip(self.mef_emissions_yearly, self.mmm_emissions_yearly, self.nmm_direct_emissions_yearly, self.nmm_indirect_volatization_emissions_yearly, self.nmm_indirect_leaching_emissions_yearly)]
             self.total_emissions = sum(self.emissions_total_yearly)
+
+            return self.total_emissions
         except Exception as e:
             traceback.print_exc()
     
