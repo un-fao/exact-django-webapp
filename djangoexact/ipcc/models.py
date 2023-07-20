@@ -408,13 +408,13 @@ class PerennialAGB(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     continent = ForeignKey("api.Continent", on_delete=CASCADE)
-    land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
+    crop_type = ForeignKey("api.CropType", on_delete=CASCADE)
     value = FloatField(default=0, null=True, blank=True)
 
     objects = PerennialAGBManager()
 
     def __str__(self):
-        return f"{self.value} for {self.climate.name} {self.moisture.name} in {self.continent.name} {self.land_use_type.name}"
+        return f"{self.value} for {self.climate.name} {self.moisture.name} in {self.continent.name} {self.crop_type.name}"
 
 
 class PerennialBGBManager(Manager):
@@ -439,22 +439,22 @@ class PerennialBGB(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     continent = ForeignKey("api.Continent", on_delete=CASCADE)
-    land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
+    crop_type = ForeignKey("api.CropType", on_delete=CASCADE)
     value = FloatField(default=0, null=True, blank=True)
 
     objects = PerennialBGBManager()
 
     def __str__(self):
-        return f"{self.value} for {self.climate.name} {self.moisture.name} in {self.continent.name} for {self.land_use_type.name}"
+        return f"{self.value} for {self.climate.name} {self.moisture.name} in {self.continent.name} for {self.crop_type.name}"
 
 
 class PerennialMaxAGB(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
-    land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
+    crop_type = ForeignKey("api.CropType", on_delete=CASCADE)
     value = FloatField(default=0, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.value} for {self.climate.name} {self.land_use_type.name}"
+        return f"{self.value} for {self.climate.name} {self.crop_type.name}"
 
 
 class CroplandFLU(Model):
