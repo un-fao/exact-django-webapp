@@ -354,8 +354,8 @@ class Project(Model):
     executing_agency = CharField(max_length=100)
     status = ForeignKey(ProjectStatus, on_delete=CASCADE)
 
-    implementation_duration_yrs = FloatField()
-    capitalization_duration_yrs = FloatField()
+    implementation_duration_yrs = IntegerField()
+    capitalization_duration_yrs = IntegerField()
 
     # TODO: Rename continent to region
     continent = ForeignKey(Continent, on_delete=CASCADE)
