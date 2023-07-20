@@ -1,4 +1,4 @@
-from general_functions import yearly_parameter_breakdown, plot_yearly_breakdown, plot_all_functions
+from general_functions import yearly_time_dependent_parameter_breakdown
 import traceback
 import re
 
@@ -79,7 +79,7 @@ class Fishery:
                 annual_start = self.catch_start * ef_start
                 annual_end = self.catch_end * ef_end
 
-                self.emissions_catch_yearly = yearly_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
+                self.emissions_catch_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
                 self.emissions_catch_total = sum(self.emissions_catch_yearly)
             except Exception as e:
                 traceback.print_exc()
@@ -100,7 +100,7 @@ class Fishery:
                 annual_end = gwp_refrigerant_end * quantity_lost_refrigerant_end * catch_with_refrigerant_end / 1000
 
                 
-                self.emissions_refrigerant_yearly = yearly_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
+                self.emissions_refrigerant_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
                 self.emissions_refrigerant_total = sum(self.emissions_refrigerant_yearly)
             except Exception as e:
                 traceback.print_exc()
@@ -123,7 +123,7 @@ class Fishery:
                 annual_start = ice_ef_start * catch_with_refrigerant_start 
                 annual_end = ice_ef_end * catch_with_refrigerant_end
 
-                self.emissions_ice_yearly = yearly_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
+                self.emissions_ice_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
                 self.emissions_ice_total = sum(self.emissions_ice_yearly)
             except Exception as e:
                 traceback.print_exc()
@@ -198,7 +198,7 @@ class CoastalAquaculture():
                 annual_start = nitrous_ef_start * self.production_start * self.nitrous_constant
                 annual_end = nitrous_ef_end * self.production_end * self.nitrous_constant
 
-                self.emissions_nitrous_yearly = yearly_parameter_breakdown(annual_start, annual_end, self.time_impl, self.time_cap, self.rate_type)
+                self.emissions_nitrous_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.time_impl, self.time_cap, self.rate_type)
                 self.emissions_nitrous_total = sum(self.emissions_nitrous_yearly)
             except Exception as e:
                 traceback.print_exc()
@@ -211,7 +211,7 @@ class CoastalAquaculture():
                 annual_start = ef_feed_start * self.feed_start
                 annual_end = ef_feed_end * self.feed_end
 
-                self.emissions_feed_yearly = yearly_parameter_breakdown(annual_start, annual_end, self.time_impl, self.time_cap, self.rate_type)
+                self.emissions_feed_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.time_impl, self.time_cap, self.rate_type)
                 self.emissions_feed_total = sum(self.emissions_feed_yearly)
             except Exception as e:
                 traceback.print_exc()
@@ -238,13 +238,13 @@ class CoastalAquaculture():
             return {}
 
         
-# inputs_class = [10, 11, 'D', 5.23659035050339, 71.3662756029244, 2.572333333333333, None, None, 697.0, 697.0, 19.8011614615062, 31.2816563027116, 1810, None, None, None, None, None, 0.388905643541494, 0.0490041343890272, 2.8, None, None, 60, None, None,  0.296, 0.169438233537953, 0.180905927941485]
+# # inputs_class = [10, 11, 'D', 5.23659035050339, 71.3662756029244, 2.572333333333333, None, None, 697.0, 697.0, 19.8011614615062, 31.2816563027116, 1810, None, None, None, None, None, 0.388905643541494, 0.0490041343890272, 2.8, None, None, 60, None, None,  0.296, 0.169438233537953, 0.180905927941485]
 # inputs_class = [10, 11, 'D', 5.23659035050339, 71.3662756029244, 2.572333333333333, None, None, 697.0, 697.0, 19.8011614615062, 31.2816563027116, 1810, None, None, 0.48734, None, None, 0.388905643541494, 0.0490041343890272, 2.8, None, None, 60, None, None,  0.296, 0.169438233537953, 0.180905927941485]
-# inputs = [10, 11, 'D', 'D', 5.23659035050339, 71.3662756029244, 44.0123155054382, 2.572333333333333, None, None, None, 697.0, 697.0, 697.0, 19.8011614615062, 31.2816563027116, 43.4530778935223, 1810, None, None, None, 0.48734, None, None, None, 0.388905643541494, 0.0490041343890272, 0.152197266950354, 2.8, None, None, None, 60, None, None, None, 0.296, 0.169438233537953, 0.180905927941485, 0.967017664672948]
+# # inputs = [10, 11, 'D', 'D', 5.23659035050339, 71.3662756029244, 44.0123155054382, 2.572333333333333, None, None, None, 697.0, 697.0, 697.0, 19.8011614615062, 31.2816563027116, 43.4530778935223, 1810, None, None, None, 0.48734, None, None, None, 0.388905643541494, 0.0490041343890272, 0.152197266950354, 2.8, None, None, None, 60, None, None, None, 0.296, 0.169438233537953, 0.180905927941485, 0.967017664672948]
 
-# ao = total_emissions_small_or_large_fisheries(*inputs)
-# print('No time dependency')
-# print(ao)
+# # ao = total_emissions_small_or_large_fisheries(*inputs)
+# # print('No time dependency')
+# # print(ao)
 
 # fishery_w = Fishery(*inputs_class)
 # fishery_w.calculate_emissions()

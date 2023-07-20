@@ -1,15 +1,17 @@
 # download a package to calculate logarithm in base e
 import math
-def yearly_parameter_breakdown(start_value, end_value, years_implementation, years_capitalization, function):
-
-    # UTILIZING THIS FUNCTION WE ARE RETURNING THE MIDDLE VALUE BETWEEN THE CALCULATED VALUES AT THE BEGINNING OF EACH YEAR. 
-    # THIS IS DONE SO THAT THE YEARLY BREAKDOWN IS A LIST OF THE SAME LENGTH AS THE NUMBER OF YEARS IMPLEMENTATION + CAPITALIZATION
-    # ALSO, THIS WAY THE RESULTS ARE THE SAME AS THE EXCEL RESULTS  
-    def average_yearly_value(yearly_breakdown: list):
+def average_yearly_value(yearly_breakdown: list):
      
         average_yearly_value = [(yearly_breakdown[i] + yearly_breakdown[i + 1]) / 2 for i in range(len(yearly_breakdown) - 1)]
         
         return average_yearly_value
+
+def yearly_time_dependent_parameter_breakdown(start_value, end_value, years_implementation, years_capitalization, function, interim_values = True):
+
+    # UTILIZING THIS FUNCTION WE ARE RETURNING THE MIDDLE VALUE BETWEEN THE CALCULATED VALUES AT THE BEGINNING OF EACH YEAR. 
+    # THIS IS DONE SO THAT THE YEARLY BREAKDOWN IS A LIST OF THE SAME LENGTH AS THE NUMBER OF YEARS IMPLEMENTATION + CAPITALIZATION
+    # ALSO, THIS WAY THE RESULTS ARE THE SAME AS THE EXCEL RESULTS  
+    
 
 
     # EXPONENTIAL CASE
@@ -30,7 +32,10 @@ def yearly_parameter_breakdown(start_value, end_value, years_implementation, yea
             yearly_breakdown.extend([yearly_breakdown[-1] for i in range(years_capitalization)])
 
             # return the yearly breakdown
-            return average_yearly_value(yearly_breakdown)
+            if interim_values:
+                return average_yearly_value(yearly_breakdown)
+            else:
+                return yearly_breakdown
     
     if function == 'D':
          
@@ -48,13 +53,42 @@ def yearly_parameter_breakdown(start_value, end_value, years_implementation, yea
             yearly_breakdown.extend([yearly_breakdown[-1] for i in range(years_capitalization)])
 
             # return the yearly breakdown
-            return average_yearly_value(yearly_breakdown)
+            if interim_values:
+                return average_yearly_value(yearly_breakdown)
+            else:
+                return yearly_breakdown
     
     if function == 'immediate':
+        if interim_values:
+            return average_yearly_value([end_value for i in range(years_implementation + years_capitalization + 1)])
+        else:
+            return [end_value for i in range(years_implementation + years_capitalization + 1)]
 
-        return average_yearly_value([end_value for i in range(years_implementation + years_capitalization + 1)])
+def yearly_constant_emissions_breakdown(total_emissions, years_implementation, years_capitalization):
+    # create a list with total_emissions/years_implementation for each year of implementation
+    yearly_breakdown = [total_emissions / years_implementation for i in range(years_implementation)]
+    yearly_breakdown.extend([0 for i in range(years_capitalization)])
 
+    ao = sum(yearly_breakdown)
 
+    return yearly_breakdown
+
+def yearly_time_dependent_20_year_breakdown(start_value, end_value, years_implementation, years_capitalization, function):
+    
+    breakdown = yearly_time_dependent_parameter_breakdown(start_value, end_value, years_implementation, years_capitalization, function, interim_values = False)
+    
+    after_20 = [0 for i in range(20)]
+    after_20.extend(breakdown)
+
+    before_20 = [i-j for i, j in zip(breakdown, after_20[0:len(breakdown)])]
+    
+    
+    return average_yearly_value(before_20), average_yearly_value(after_20)[0:len(breakdown)]
+
+def breakdown_according_to_values(maximum, list_of_proportions):
+
+    result = [maximum * i/sum(list_of_proportions) for i in list_of_proportions]
+    return result
 # LIVESTOCK CH4 HEAD GENERAL FUNCTION    
 def ch4_head_calculation_general(tam: float, vser: float, ef_prp: float, percentage_prp_default: float, percentage_prp_tier_2: float, ef_system_default: list, ef_system_tier_2: list, ch4_prp_tier_2: float, percentage_system_default: list):
             
@@ -74,4 +108,28 @@ def ch4_head_calculation_general(tam: float, vser: float, ef_prp: float, percent
 
         return ch4_head
     
+def soil_emissions(hectars_before_20: list, area_start: float, area_end:float,
+                   socref, soc_tier_2, f_lu_tier_2, f_i_tier_2, f_mg_tier_2, 
+                   f_lu_ref = 1, f_i_ref = 1, f_mg_ref = 1):
+    
+    # f_mg and f_i are defaulted to 1 in case they are not inserted
+    soc = socref if not soc_tier_2 else soc_tier_2
+    f_lu = f_lu_ref if not f_lu_tier_2 else f_lu_tier_2
+    f_i = f_i_ref if not f_i_tier_2 else f_i_tier_2
+    f_mg = f_mg_ref if not f_mg_tier_2 else f_mg_tier_2
+    
+    delta_soil_c = (soc * f_lu) * (f_mg * f_i - 1) * (44/12)
+    delta_soil_c_20_years = delta_soil_c / 20
 
+    # SLIGHTLY DIFFERENT AS WE HAVE EXTRA PARAMETERS FOR DELTA SOIL C CALCULATION
+    maximum = - delta_soil_c * max(area_start, area_end)
+
+    total_hectars_soil = sum(hectars_before_20)
+    predicted_emissions = - delta_soil_c_20_years * total_hectars_soil
+
+    emissions = predicted_emissions if abs(predicted_emissions) < abs(maximum) else maximum
+
+    emissions_soil_yearly = breakdown_according_to_values(emissions, hectars_before_20)
+    emissions_soil_total = emissions
+
+    return emissions_soil_yearly, emissions_soil_total
