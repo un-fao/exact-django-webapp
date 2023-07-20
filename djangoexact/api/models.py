@@ -599,21 +599,93 @@ class CropType(Model):
 class AnnualCropping(Assessment):
     user_notes = TextField(null=True, blank=True)
 
-    crop_type_start = ForeignKey(CropType, on_delete=CASCADE, null=True, blank=True)
-    crop_type_w = ForeignKey(CropType, on_delete=CASCADE, null=True, blank=True)
-    crop_type_wo = ForeignKey(CropType, on_delete=CASCADE, null=True, blank=True)
+    crop_type_start = ForeignKey(
+        CropType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(class)s_crop_type_start",
+    )
+    crop_type_w = ForeignKey(
+        CropType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(class)s_crop_type_w",
+    )
+    crop_type_wo = ForeignKey(
+        CropType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(class)s_crop_type_wo",
+    )
 
-    tillage_management_type_start = ForeignKey(TillageManagementType, on_delete=CASCADE)
-    tillage_management_type_w = ForeignKey(TillageManagementType, on_delete=CASCADE)
-    tillage_management_type_wo = ForeignKey(TillageManagementType, on_delete=CASCADE)
+    tillage_management_type_start = ForeignKey(
+        TillageManagementType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(class)s_tillage_management_type_start",
+    )
+    tillage_management_type_w = ForeignKey(
+        TillageManagementType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(class)s_tillage_management_type_w",
+    )
+    tillage_management_type_wo = ForeignKey(
+        TillageManagementType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(class)s_tillage_management_type_wo",
+    )
 
-    organic_input_type_start = ForeignKey(OrganicInputType, on_delete=CASCADE)
-    organic_input_type_w = ForeignKey(OrganicInputType, on_delete=CASCADE)
-    organic_input_type_wo = ForeignKey(OrganicInputType, on_delete=CASCADE)
+    organic_input_type_start = ForeignKey(
+        OrganicInputType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(class)s_organic_input_type_start",
+    )
+    organic_input_type_w = ForeignKey(
+        OrganicInputType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(class)s_organic_input_type_w",
+    )
+    organic_input_type_wo = ForeignKey(
+        OrganicInputType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(class)s_organic_input_type_wo",
+    )
 
-    residue_management_type_start = ForeignKey(ResidueManagementType, on_delete=CASCADE)
-    residue_management_type_w = ForeignKey(ResidueManagementType, on_delete=CASCADE)
-    residue_management_type_wo = ForeignKey(ResidueManagementType, on_delete=CASCADE)
+    residue_management_type_start = ForeignKey(
+        ResidueManagementType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(class)s_residue_management_type_start",
+    )
+    residue_management_type_w = ForeignKey(
+        ResidueManagementType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(class)s_residue_management_type_w",
+    )
+    residue_management_type_wo = ForeignKey(
+        ResidueManagementType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(class)s_residue_management_type_wo",
+    )
 
     crop_yield_start = FloatField(null=True, blank=True)
     crop_yield_w = FloatField(null=True, blank=True)
@@ -708,6 +780,10 @@ class AnnualCropping(Assessment):
     minor_biomass_factor_t2_start = FloatField(null=True, blank=True)
     minor_biomass_factor_t2_w = FloatField(null=True, blank=True)
     minor_biomass_factor_t2_wo = FloatField(null=True, blank=True)
+
+    soc_ref_t2_start = FloatField(null=True, blank=True)
+    soc_ref_t2_w = FloatField(null=True, blank=True)
+    soc_ref_t2_wo = FloatField(null=True, blank=True)
 
 
 class PerennialCropping(Assessment):

@@ -13,13 +13,13 @@ from math_model import (
     defo,
     affo,
     oluc,
-    annuals,
     perennial_cropping,
     coastal_wetlands,
     grassland_management,
     fisheries_and_aquaculture,
     forest_management,
 )
+from math_model.no_time_dependency_final.annuals import AnnualCropland
 from math_model import inputs as math_inputs
 from ipcc.models import *
 from .utilities import *
@@ -754,69 +754,56 @@ class AnnualCroppingCalculator(BaseCalculator):
         )
 
         # TODO: Temporary, must be handled by front-end
-        ha_data = [self.data.ha_start, self.data.ha_w, self.data.ha_wo]
+        # ha_data = [self.data.ha_start, self.data.ha_w, self.data.ha_wo]
         # if is_parent:
-        #     match relative.__class__.__name__:
-        #         case Deforestation.__name__:
-        #             ha_data = [0, relative.ha_w, (relative.ha_start - relative.ha_wo)]
-        #         case Afforestation.__name__:
-        #             ha_data = [relative.ha_w, relative.ha_w, relative.ha_wo]
-        #         case OtherLandUse.__name__:
-        #             ha_data = [relative.ha_start, relative.ha_w, 0]
-        if is_parent:
-            if relative.__class__.__name__ == Deforestation.__name__:
-                ha_data = [0, relative.ha_w, (relative.ha_start - relative.ha_wo)]
-            elif relative.__class__.__name__ == Afforestation.__name__:
-                ha_data = [relative.ha_w, relative.ha_w, relative.ha_wo]
-            elif relative.__class__.__name__ == OtherLandUse.__name__:
-                ha_data = [relative.ha_start, relative.ha_w, 0]
+        #     if relative.__class__.__name__ == Deforestation.__name__:
+        #         ha_data = [0, relative.ha_w, (relative.ha_start - relative.ha_wo)]
+        #     elif relative.__class__.__name__ == Afforestation.__name__:
+        #         ha_data = [relative.ha_w, relative.ha_w, relative.ha_wo]
+        #     elif relative.__class__.__name__ == OtherLandUse.__name__:
+        #         ha_data = [relative.ha_start, relative.ha_w, 0]
 
-        inputs = [
-            ### General
-            *ha_data,
+        ha_data_start = [input.ha_start, input.ha_start]
+
+        inputs_start = [
+            *ha_data_start,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
-            self.data.ha_w_rate.name if not is_parent else relative.ha_w_rate.name,
-            self.data.ha_w_rate.value if not is_parent else relative.ha_w_rate.value,
-            self.data.ha_wo_rate.name if not is_parent else relative.ha_wo_rate.name,
-            self.data.ha_wo_rate.value if not is_parent else relative.ha_wo_rate.value,
-            ### Soil
+            input.ha_w_rate.name,  # NOTE: This will be handled on activity-level
+            input.ha_w_rate.value,
             project.soc_ref.value,
-            project.soc_ref_t2,
+            input.soc_ref_t2_start,
             flu.value,
-            self.data.main_land_use_factor_t2,
+            input.main_land_use_factor_t2_start,
             fi_start.value,
-            self.data.main_organic_input_factor_t2,
+            input.main_organic_input_factor_t2_start,
             fmg_start.value,
-            self.data.main_tillage_factor_t2,
-            ### SOM
+            input.main_tillage_factor_t2_start,
             emission_factors_start.value,
             project.gw_potential.n2o,
-            ### Residue Burning
             project.gw_potential.ch4,
             # TODO: Add residue_management_type attribute to model for cleaner logic
             burning_emission_factor.ch4
-            if self.data.residue_management_type.name == "Burned"
+            if input.residue_management_type_start.name == "Burned"
             else None,
             fires_combustion_factor_start.value,
-            self.data.main_biomass_factor_t2,
+            input.main_biomass_factor_t2_start,
             n_estimation_factor_start.slope,
             n_estimation_factor_start.intercept,
             crop_yield_start,
-            getattr(
-                minor_burning_emission_factor, "ch4", None
-            ),  # TODO: Review looking for cleaner logic
+            # TODO: Review looking for cleaner logic
+            getattr(minor_burning_emission_factor, "ch4", None),
             getattr(minor_combustion_factor_start, "value", None),
-            self.data.minor_biomass_factor_t2,
+            input.minor_biomass_factor_t2_start,
             getattr(minor_n_estimation_factor_start, "slope", None),
             getattr(minor_n_estimation_factor_start, "intercept", None),
-            self.data.minor_yield_t2,
+            input.minor_yield_start,
             burning_emission_factor.n2o
-            if self.data.residue_management_type.name == "Burned"
+            if input.residue_management_type_start.name == "Burned"
             else None,
-            self.data.residue_management_type.name == "Retained",
+            input.residue_management_type_start.name == "Retained",
             getattr(minor_burning_emission_factor, "n2o", None),
-            getattr(self.data.minor_residue_management_type_t2, "name", None)
+            getattr(input.minor_residue_management_type_start, "name", None)
             == "Retained",
             n_estimation_factor_start.n_ag_residues,
             n_estimation_factor_start.rs_t,
@@ -825,9 +812,108 @@ class AnnualCroppingCalculator(BaseCalculator):
             getattr(minor_n_estimation_factor_start, "rs_t", None),
             getattr(minor_n_estimation_factor_start, "n_bg_t", None),
         ]
+        ha_data_w = [input.ha_start, input.ha_w]
 
-        print(inputs)
-        return [Result(*annuals.calculate_emissions(*inputs))]
+        inputs_w = [
+            *ha_data_w,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            input.ha_w_rate.name,  # NOTE: This will be handled on activity-level
+            input.ha_w_rate.value,
+            project.soc_ref.value,
+            input.soc_ref_t2_w,
+            flu.value,
+            input.main_land_use_factor_t2_w,
+            fi_w.value,
+            input.main_organic_input_factor_t2_w,
+            fmg_w.value,
+            input.main_tillage_factor_t2_w,
+            emission_factors_w.value,
+            project.gw_potential.n2o,
+            project.gw_potential.ch4,
+            burning_emission_factor.ch4
+            if input.residue_management_type_w.name == "Burned"
+            else None,
+            fires_combustion_factor_w.value,
+            input.main_biomass_factor_t2_w,
+            n_estimation_factor_w.slope,
+            n_estimation_factor_w.intercept,
+            crop_yield_w,
+            getattr(minor_burning_emission_factor, "ch4", None),
+            getattr(minor_combustion_factor_w, "value", None),
+            input.minor_biomass_factor_t2_w,
+            getattr(minor_n_estimation_factor_w, "slope", None),
+            getattr(minor_n_estimation_factor_w, "intercept", None),
+            input.minor_yield_w,
+            burning_emission_factor.n2o
+            if input.residue_management_type_w.name == "Burned"
+            else None,
+            input.residue_management_type_w.name == "Retained",
+            getattr(minor_burning_emission_factor, "n2o", None),
+            getattr(input.minor_residue_management_type_w, "name", None) == "Retained",
+            n_estimation_factor_w.n_ag_residues,
+            n_estimation_factor_w.rs_t,
+            n_estimation_factor_w.n_bg_t,
+            getattr(minor_n_estimation_factor_w, "n_ag_residues", None),
+            getattr(minor_n_estimation_factor_w, "rs_t", None),
+            getattr(minor_n_estimation_factor_w, "n_bg_t", None),
+        ]
+
+        ha_data_wo = [input.ha_start, input.ha_wo]
+
+        inputs_wo = [
+            *ha_data_wo,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            input.ha_wo_rate.name,  # NOTE: This will be handled on activity-level
+            input.ha_wo_rate.value,
+            project.soc_ref.value,
+            input.soc_ref_t2_wo,
+            flu.value,
+            input.main_land_use_factor_t2_wo,
+            fi_wo.value,
+            input.main_organic_input_factor_t2_wo,
+            fmg_wo.value,
+            input.main_tillage_factor_t2_wo,
+            emission_factors_wo.value,
+            project.gw_potential.n2o,
+            project.gw_potential.ch4,
+            burning_emission_factor.ch4
+            if input.residue_management_type_wo.name == "Burned"
+            else None,
+            fires_combustion_factor_wo.value,
+            input.main_biomass_factor_t2_wo,
+            n_estimation_factor_wo.slope,
+            n_estimation_factor_wo.intercept,
+            crop_yield_wo,
+            getattr(minor_burning_emission_factor, "ch4", None),
+            getattr(minor_combustion_factor_wo, "value", None),
+            input.minor_biomass_factor_t2_wo,
+            getattr(minor_n_estimation_factor_wo, "slope", None),
+            getattr(minor_n_estimation_factor_wo, "intercept", None),
+            input.minor_yield_wo,
+            burning_emission_factor.n2o
+            if input.residue_management_type_wo.name == "Burned"
+            else None,
+            input.residue_management_type_wo.name == "Retained",
+            getattr(minor_burning_emission_factor, "n2o", None),
+            getattr(input.minor_residue_management_type_wo, "name", None) == "Retained",
+            n_estimation_factor_wo.n_ag_residues,
+            n_estimation_factor_wo.rs_t,
+            n_estimation_factor_wo.n_bg_t,
+            getattr(minor_n_estimation_factor_wo, "n_ag_residues", None),
+            getattr(minor_n_estimation_factor_wo, "rs_t", None),
+            getattr(minor_n_estimation_factor_wo, "n_bg_t", None),
+        ]
+
+        emissions_start = AnnualCropland(*inputs_start).calculate_emissions()
+        emissions_w = AnnualCropland(*inputs_w).calculate_emissions()
+        emissions_wo = AnnualCropland(*inputs_wo).calculate_emissions()
+
+        res_w = emissions_w - emissions_start
+        res_wo = emissions_wo - emissions_start
+
+        return [Result(res_w, res_wo, res_w - res_wo)]
 
 
 class PerennialCroppingCalculator(BaseCalculator):
