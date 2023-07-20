@@ -108,7 +108,7 @@ def ch4_head_calculation_general(tam: float, vser: float, ef_prp: float, percent
 
         return ch4_head
     
-def soil_emissions(hectars_before_20: list, area_start: float, area_end:float,
+def soil_emissions(hectars_before_20, area_start, area_end,
                    socref, soc_tier_2, f_lu_tier_2, f_i_tier_2, f_mg_tier_2, 
                    f_lu_ref = 1, f_i_ref = 1, f_mg_ref = 1):
     
