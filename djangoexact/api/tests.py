@@ -14,7 +14,8 @@ import math
 BATCH_SIZE = 10
 TEST_SM_FISHERY = False
 TEST_LG_FISHERY = False
-TEST_ANNUAL_CROPPING = True
+TEST_ANNUAL_CROPPING = False
+TEST_PERENNIAL_CROPPING = True
 
 
 def verbose_print(obj):
@@ -90,11 +91,13 @@ ds["T14"].value = p.capitalization_duration_yrs
 # Activity Creation
 a = ActivityFactory.create(project=p, user=u)
 
+# Fishery Sheet
+fishery_sheet = wbook.sheets["8. Fisheries and aquaculture"]
+
+# Cropland Testing
+cropland_sheet = wbook.sheets["3. Cropland"]
 
 if TEST_SM_FISHERY:
-    # Fishery Sheet
-    fishery_sheet = wbook.sheets["8. Fisheries and aquaculture"]
-
     # Small Fishery Creation
     sm_fisheries = SmallFisheryFactory.create_batch(BATCH_SIZE, activity=a)
     total_fisheries = sm_fisheries.__len__()
@@ -193,9 +196,6 @@ if TEST_LG_FISHERY:
     print(f"\nTotal Tested Large Fisheries: {total_lg_fisheries}")
     print(f"Passed Tests: {passed_lg_fisheries}\n\n")
 
-# Cropland Testing
-cropland_sheet = wbook.sheets["3. Cropland"]
-
 if TEST_ANNUAL_CROPPING:
     annual_croppings = AnnualCroppingFactory.create_batch(BATCH_SIZE, activity=a)
     total_croplands = annual_croppings.__len__()
@@ -247,3 +247,12 @@ if TEST_ANNUAL_CROPPING:
 
     print(f"\nTotal Tested Croplands: {total_croplands}")
     print(f"Passed Tests: {passed_croplands}\n\n")
+
+if TEST_PERENNIAL_CROPPING:
+    perennials = PerennialCroppingFactory().create_batch(BATCH_SIZE, activity=a)
+
+    total_perennials = perennials.__len__()
+    passed_perennials = 0
+
+    print("Testing Perennial...")
+    # for i, perennial in enumerate(perennials):

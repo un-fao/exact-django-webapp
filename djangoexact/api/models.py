@@ -590,6 +590,7 @@ class CropType(Model):
     name = CharField(max_length=255, unique=True)
     description = TextField(null=True, blank=True)
     is_main_crop = BooleanField(default=False)
+    is_agrofoforestry = BooleanField(default=False)
 
     def __str__(self) -> str:
         return f"({self.pk}) {self.name}"
@@ -598,11 +599,25 @@ class CropType(Model):
 class AnnualCropping(Assessment):
     user_notes = TextField(null=True, blank=True)
 
-    crop_type = ForeignKey(CropType, on_delete=CASCADE, null=True, blank=True)
-    tillage_management_type = ForeignKey(TillageManagementType, on_delete=CASCADE)
-    organic_input_type = ForeignKey(OrganicInputType, on_delete=CASCADE)
-    residue_management_type = ForeignKey(ResidueManagementType, on_delete=CASCADE)
-    crop_yield = FloatField(null=True, blank=True)
+    crop_type_start = ForeignKey(CropType, on_delete=CASCADE, null=True, blank=True)
+    crop_type_w = ForeignKey(CropType, on_delete=CASCADE, null=True, blank=True)
+    crop_type_wo = ForeignKey(CropType, on_delete=CASCADE, null=True, blank=True)
+
+    tillage_management_type_start = ForeignKey(TillageManagementType, on_delete=CASCADE)
+    tillage_management_type_w = ForeignKey(TillageManagementType, on_delete=CASCADE)
+    tillage_management_type_wo = ForeignKey(TillageManagementType, on_delete=CASCADE)
+
+    organic_input_type_start = ForeignKey(OrganicInputType, on_delete=CASCADE)
+    organic_input_type_w = ForeignKey(OrganicInputType, on_delete=CASCADE)
+    organic_input_type_wo = ForeignKey(OrganicInputType, on_delete=CASCADE)
+
+    residue_management_type_start = ForeignKey(ResidueManagementType, on_delete=CASCADE)
+    residue_management_type_w = ForeignKey(ResidueManagementType, on_delete=CASCADE)
+    residue_management_type_wo = ForeignKey(ResidueManagementType, on_delete=CASCADE)
+
+    crop_yield_start = FloatField(null=True, blank=True)
+    crop_yield_w = FloatField(null=True, blank=True)
+    crop_yield_wo = FloatField(null=True, blank=True)
 
     ha_start = FloatField(null=True, blank=True)
     ha_w = FloatField(null=True, blank=True)
@@ -622,29 +637,77 @@ class AnnualCropping(Assessment):
         blank=True,
     )
 
-    main_soil_carbon_t2 = FloatField(null=True, blank=True)
-    main_tillage_factor_t2 = FloatField(null=True, blank=True)
-    main_organic_input_factor_t2 = FloatField(null=True, blank=True)
-    main_biomass_factor_t2 = FloatField(null=True, blank=True)
+    main_soil_carbon_t2_start = FloatField(null=True, blank=True)
+    main_soil_carbon_t2_w = FloatField(null=True, blank=True)
+    main_soil_carbon_t2_wo = FloatField(null=True, blank=True)
 
-    main_land_use_factor_t2 = FloatField(null=True, blank=True)
+    main_tillage_factor_t2_start = FloatField(null=True, blank=True)
+    main_tillage_factor_t2_w = FloatField(null=True, blank=True)
+    main_tillage_factor_t2_wo = FloatField(null=True, blank=True)
 
-    minor_crop_type_t2 = ForeignKey(
+    main_organic_input_factor_t2_start = FloatField(null=True, blank=True)
+    main_organic_input_factor_t2_w = FloatField(null=True, blank=True)
+    main_organic_input_factor_t2_wo = FloatField(null=True, blank=True)
+
+    main_biomass_factor_t2_start = FloatField(null=True, blank=True)
+    main_biomass_factor_t2_w = FloatField(null=True, blank=True)
+    main_biomass_factor_t2_wo = FloatField(null=True, blank=True)
+
+    main_land_use_factor_t2_start = FloatField(null=True, blank=True)
+    main_land_use_factor_t2_w = FloatField(null=True, blank=True)
+    main_land_use_factor_t2_wo = FloatField(null=True, blank=True)
+
+    minor_crop_type_start = ForeignKey(
         CropType,
         on_delete=CASCADE,
         null=True,
         blank=True,
         related_name="%(class)s_minor_crop_type",
     )
-    minor_yield_t2 = FloatField(null=True, blank=True)
-    minor_residue_management_type_t2 = ForeignKey(
+    minor_crop_type_w = ForeignKey(
+        CropType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(class)s_minor_crop_type_w",
+    )
+    minor_crop_type_wo = ForeignKey(
+        CropType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(class)s_minor_crop_type_wo",
+    )
+
+    minor_yield_start = FloatField(null=True, blank=True)
+    minor_yield_w = FloatField(null=True, blank=True)
+    minor_yield_wo = FloatField(null=True, blank=True)
+
+    minor_residue_management_type_start = ForeignKey(
         ResidueManagementType,
         on_delete=CASCADE,
         null=True,
         blank=True,
         related_name="%(class)s_minor_residue_management_type",
     )
-    minor_biomass_factor_t2 = FloatField(null=True, blank=True)
+    minor_residue_management_type_w = ForeignKey(
+        ResidueManagementType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(class)s_minor_residue_management_type_w",
+    )
+    minor_residue_management_type_wo = ForeignKey(
+        ResidueManagementType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(class)s_minor_residue_management_type_wo",
+    )
+
+    minor_biomass_factor_t2_start = FloatField(null=True, blank=True)
+    minor_biomass_factor_t2_w = FloatField(null=True, blank=True)
+    minor_biomass_factor_t2_wo = FloatField(null=True, blank=True)
 
 
 class PerennialCropping(Assessment):

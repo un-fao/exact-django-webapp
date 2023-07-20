@@ -599,8 +599,12 @@ class AnnualCroppingCalculator(BaseCalculator):
         project: Project = self.data.activity.project
         climate = project.climate
         moisture = project.moisture
-        crop_type = input.crop_type
-        minor_crop_type = input.minor_crop_type_t2
+        crop_type_start = input.crop_type_start
+        crop_type_w = input.crop_type_w
+        crop_type_wo = input.crop_type_wo
+        minor_crop_type_start = input.minor_crop_type_start
+        minor_crop_type_w = input.minor_crop_type_w
+        minor_crop_type_wo = input.minor_crop_type_wo
 
         relative, relation = get_assessment_or_parent(self.data)
         is_parent = relation == "parent"
@@ -608,35 +612,87 @@ class AnnualCroppingCalculator(BaseCalculator):
         burning_emission_factor = BurningEmissionFactor.objects.get(
             category__name="Agricultural residues"
         )
-        fires_combustion_factor = FiresCombustionFactor.objects.get(crop_type=crop_type)
-        n_estimation_factor = CropNitrousEstimationDefaultFactor.objects.get_or_grains(
-            crop_type=crop_type
+
+        fires_combustion_factor_start = FiresCombustionFactor.objects.get(
+            crop_type=crop_type_start
+        )
+        fires_combustion_factor_w = FiresCombustionFactor.objects.get(
+            crop_type=crop_type_w
+        )
+        fires_combustion_factor_wo = FiresCombustionFactor.objects.get(
+            crop_type=crop_type_wo
+        )
+
+        n_estimation_factor_start = (
+            CropNitrousEstimationDefaultFactor.objects.get_or_grains(
+                crop_type=crop_type_start
+            )
+        )
+        n_estimation_factor_w = (
+            CropNitrousEstimationDefaultFactor.objects.get_or_grains(
+                crop_type=crop_type_w
+            )
+        )
+        n_estimation_factor_wo = (
+            CropNitrousEstimationDefaultFactor.objects.get_or_grains(
+                crop_type=crop_type_wo
+            )
         )
 
         # Minor crop
         try:
-            minor_combustion_factor = FiresCombustionFactor.objects.get(
-                crop_type=crop_type
+            minor_combustion_factor_start = FiresCombustionFactor.objects.get(
+                crop_type=crop_type_start
             )
+            minor_combustion_factor_w = FiresCombustionFactor.objects.get(
+                crop_type=crop_type_w
+            )
+            minor_combustion_factor_wo = FiresCombustionFactor.objects.get(
+                crop_type=crop_type_wo
+            )
+
             # TODO: Change logic for cleaner code
             minor_burning_emission_factor = BurningEmissionFactor.objects.get(
                 category__name="Agricultural residues"
             )
-            minor_n_estimation_factor = (
+
+            minor_n_estimation_factor_start = (
                 CropNitrousEstimationDefaultFactor.objects.get_or_grains(
-                    crop_type=minor_crop_type
+                    crop_type=minor_crop_type_start
+                )
+            )
+            minor_n_estimation_factor_w = (
+                CropNitrousEstimationDefaultFactor.objects.get_or_grains(
+                    crop_type=minor_crop_type_w
+                )
+            )
+            minor_n_estimation_factor_wo = (
+                CropNitrousEstimationDefaultFactor.objects.get_or_grains(
+                    crop_type=minor_crop_type_wo
                 )
             )
         except:
             # If only one of the above operations fails, all minor variables must be set to None
             minor_burning_emission_factor = None
-            minor_combustion_factor = None
-            minor_n_estimation_factor = None
+
+            minor_combustion_factor_start = None
+            minor_combustion_factor_w = None
+            minor_combustion_factor_wo = None
+
+            minor_n_estimation_factor_start = None
+            minor_n_estimation_factor_w = None
+            minor_n_estimation_factor_wo = None
 
         # TODO: Rename all tables related to FLU, FI, FMG
         # TODO: DefaultEmissionFactors must be inserted properly in the database (IPCC!B99)
-        emission_factors = DefaultEmissionFactor.objects.get(
-            moisture=moisture, organic_input_type=self.data.organic_input_type
+        emission_factors_start = DefaultEmissionFactor.objects.get(
+            moisture=moisture, organic_input_type=input.organic_input_type_start
+        )
+        emission_factors_w = DefaultEmissionFactor.objects.get(
+            moisture=moisture, organic_input_type=input.organic_input_type_w
+        )
+        emission_factors_wo = DefaultEmissionFactor.objects.get(
+            moisture=moisture, organic_input_type=input.organic_input_type_wo
         )
 
         flu = CroplandFLU.objects.get(
@@ -644,22 +700,56 @@ class AnnualCroppingCalculator(BaseCalculator):
             moisture=moisture,
             crop_type__name="Long-Term Cultivated",
         )
-        fi = CroplandFI.objects.get(
+        fi_start = CroplandFI.objects.get(
             climate=climate,
             moisture=moisture,
-            organic_input_type=self.data.organic_input_type,
+            organic_input_type=input.organic_input_type_start,
         )
-        fmg = CroplandFMG.objects.get(
+        fi_w = CroplandFI.objects.get(
             climate=climate,
             moisture=moisture,
-            tillage_management_type=self.data.tillage_management_type,
+            organic_input_type=input.organic_input_type_w,
+        )
+        fi_wo = CroplandFI.objects.get(
+            climate=climate,
+            moisture=moisture,
+            organic_input_type=input.organic_input_type_wo,
+        )
+        fmg_start = CroplandFMG.objects.get(
+            climate=climate,
+            moisture=moisture,
+            tillage_management_type=input.tillage_management_type_start,
+        )
+        fmg_w = CroplandFMG.objects.get(
+            climate=climate,
+            moisture=moisture,
+            tillage_management_type=input.tillage_management_type_w,
+        )
+        fmg_wo = CroplandFMG.objects.get(
+            climate=climate,
+            moisture=moisture,
+            tillage_management_type=input.tillage_management_type_wo,
         )
 
-        crop_yield = (
-            self.data.crop_yield
-            if self.data.crop_yield
+        crop_yield_start = (
+            input.crop_yield_start
+            if input.crop_yield_start
             else CropYieldStats.objects.get_or_region_average(
-                continent=project.continent, crop_type=crop_type
+                continent=project.continent, crop_type=crop_type_start
+            ).average
+        )
+        crop_yield_w = (
+            input.crop_yield_w
+            if input.crop_yield_w
+            else CropYieldStats.objects.get_or_region_average(
+                continent=project.continent, crop_type=crop_type_w
+            ).average
+        )
+        crop_yield_wo = (
+            input.crop_yield_wo
+            if input.crop_yield_wo
+            else CropYieldStats.objects.get_or_region_average(
+                continent=project.continent, crop_type=crop_type_wo
             ).average
         )
 
@@ -695,12 +785,12 @@ class AnnualCroppingCalculator(BaseCalculator):
             project.soc_ref_t2,
             flu.value,
             self.data.main_land_use_factor_t2,
-            fi.value,
+            fi_start.value,
             self.data.main_organic_input_factor_t2,
-            fmg.value,
+            fmg_start.value,
             self.data.main_tillage_factor_t2,
             ### SOM
-            emission_factors.value,
+            emission_factors_start.value,
             project.gw_potential.n2o,
             ### Residue Burning
             project.gw_potential.ch4,
@@ -708,18 +798,18 @@ class AnnualCroppingCalculator(BaseCalculator):
             burning_emission_factor.ch4
             if self.data.residue_management_type.name == "Burned"
             else None,
-            fires_combustion_factor.value,
+            fires_combustion_factor_start.value,
             self.data.main_biomass_factor_t2,
-            n_estimation_factor.slope,
-            n_estimation_factor.intercept,
-            crop_yield,
+            n_estimation_factor_start.slope,
+            n_estimation_factor_start.intercept,
+            crop_yield_start,
             getattr(
                 minor_burning_emission_factor, "ch4", None
             ),  # TODO: Review looking for cleaner logic
-            getattr(minor_combustion_factor, "value", None),
+            getattr(minor_combustion_factor_start, "value", None),
             self.data.minor_biomass_factor_t2,
-            getattr(minor_n_estimation_factor, "slope", None),
-            getattr(minor_n_estimation_factor, "intercept", None),
+            getattr(minor_n_estimation_factor_start, "slope", None),
+            getattr(minor_n_estimation_factor_start, "intercept", None),
             self.data.minor_yield_t2,
             burning_emission_factor.n2o
             if self.data.residue_management_type.name == "Burned"
@@ -728,12 +818,12 @@ class AnnualCroppingCalculator(BaseCalculator):
             getattr(minor_burning_emission_factor, "n2o", None),
             getattr(self.data.minor_residue_management_type_t2, "name", None)
             == "Retained",
-            n_estimation_factor.n_ag_residues,
-            n_estimation_factor.rs_t,
-            n_estimation_factor.n_bg_t,
-            getattr(minor_n_estimation_factor, "n_ag_residues", None),
-            getattr(minor_n_estimation_factor, "rs_t", None),
-            getattr(minor_n_estimation_factor, "n_bg_t", None),
+            n_estimation_factor_start.n_ag_residues,
+            n_estimation_factor_start.rs_t,
+            n_estimation_factor_start.n_bg_t,
+            getattr(minor_n_estimation_factor_start, "n_ag_residues", None),
+            getattr(minor_n_estimation_factor_start, "rs_t", None),
+            getattr(minor_n_estimation_factor_start, "n_bg_t", None),
         ]
 
         print(inputs)
@@ -754,7 +844,7 @@ class PerennialCroppingCalculator(BaseCalculator):
         climate = project.climate
         moisture = project.moisture
         continent = project.continent
-        land_use_type = self.data.land_use_type
+        crop_type = self.data.crop_type
         parent, _ = get_assessment_or_parent(self.data)
 
         burning_emission_factor = BurningEmissionFactor.objects.get(
@@ -763,22 +853,22 @@ class PerennialCroppingCalculator(BaseCalculator):
 
         # TODO: Replace 'other' with all the other land_use_types in db
         fires_combustion_factor = FiresCombustionFactor.objects.get_or_other(
-            crop_type=land_use_type
+            crop_type=crop_type
         )
         ag_default = PerennialAGB.objects.get_or_default(
             climate=climate,
             moisture=moisture,
             continent=continent,
-            land_use_type=land_use_type,
+            land_use_type=crop_type,
         )
         agb_max_c = PerennialMaxAGB.objects.get(
-            climate=climate, land_use_type=land_use_type
+            climate=climate, land_use_type=crop_type
         )
         bg_default = PerennialBGB.objects.get_or_default(
             climate=climate,
             moisture=moisture,
             continent=continent,
-            land_use_type=land_use_type,
+            land_use_type=crop_type,
         )
 
         if parent:
