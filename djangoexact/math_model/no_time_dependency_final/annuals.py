@@ -1,12 +1,11 @@
 import traceback
-from general_functions import yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, yearly_time_dependent_20_year_breakdown, breakdown_according_to_values, soil_emissions
-
+from .general_functions import yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, yearly_time_dependent_20_year_breakdown, breakdown_according_to_values, soil_emissions
 
 class AnnualCropland:
 
     def __init__(self, area_start, area_end, time_impl, time_cap, rate_end, rate_coefficient_end, socref, soc_tier_2, f_lu_ref, f_lu_tier_2, f_i_ref, f_i_tier_2, f_mg_ref, f_mg_tier_2,
                             emission_factor_nitrous, nitrous_constant, methane_constant, ef_methane_agr_residues_main, combustion_factor_main, 
-                            residue_main_tier_2 , n_estimation_slope_main, n_estimation_intercept_main, yield_value_main, ef_methane_agr_residues_minor, combustion_factor_minor,residue_minor_tier_2,
+                            residue_main_tier_2, n_estimation_slope_main, n_estimation_intercept_main, yield_value_main, ef_methane_agr_residues_minor, combustion_factor_minor,residue_minor_tier_2,
                             n_estimation_slope_minor, n_estimation_intercept_minor, yield_value_minor, ef_nitrous_agr_residues_main, retained_main, ef_nitrous_agr_residues_minor, retained_minor,
                             n_content_ag_main, ratio_bg_ag_main, n_content_bg_main, n_content_ag_minor, ratio_bg_ag_minor, n_content_bg_minor
                             ):
@@ -177,8 +176,6 @@ class AnnualCropland:
 
             kg_nitrous = main_season_nitrous + minor_season_nitrous
 
-
-
             co2_crop = (kg_nitrous * self.nitrous_constant + kg_methane * self.methane_constant)/1000
 
             _min = min(self.area_start, self.area_end) * (self.time_cap + self.time_impl)
@@ -209,7 +206,7 @@ class AnnualCropland:
     def evaluate_tier_2_defaults(self):
         pass
 
-inputs = [27, 93, 5, 17, 'D', 0.5, 87.0, None, 0.77, None, 1.0, None, 1.03, None, 0.005, 265.0, 28.0, None, 0.85, None, 0.88, 1.33, 50, None, None, None, None, None, None, None, True, None, False, 0.007, 0.22, 0.006, None, None, None]
-annual = (AnnualCropland(*inputs))
+# inputs = [27, 93, 5, 17, 'D', 0.5, 87.0, None, 0.77, None, 1.0, None, 1.03, None, 0.005, 265.0, 28.0, None, 0.85, None, 0.88, 1.33, 50, None, None, None, None, None, None, None, True, None, False, 0.007, 0.22, 0.006, None, None, None]
+# annual = (AnnualCropland(*inputs))
 
-annual.calculate_emissions()
+# annual.calculate_emissions()
