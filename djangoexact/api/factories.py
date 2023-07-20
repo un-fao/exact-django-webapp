@@ -105,8 +105,14 @@ class AnnualCroppingFactory(DjangoModelFactory):
     class Meta:
         model = AnnualCropping
 
-    crop_type = factory.fuzzy.FuzzyChoice(crop_types)
-    tillage_management_type = factory.fuzzy.FuzzyChoice(tillage_management_types)
+    crop_type_start = factory.fuzzy.FuzzyChoice(crop_types)
+    crop_type_w = factory.fuzzy.FuzzyChoice(crop_types)
+    crop_type_wo = factory.fuzzy.FuzzyChoice(crop_types)
+
+    tillage_management_type_start = factory.fuzzy.FuzzyChoice(tillage_management_types)
+    tillage_management_type_w = factory.fuzzy.FuzzyChoice(tillage_management_types)
+    tillage_management_type_wo = factory.fuzzy.FuzzyChoice(tillage_management_types)
+
     organic_input_type = factory.fuzzy.FuzzyChoice(organic_input_types)
     residue_management_type = factory.fuzzy.FuzzyChoice(residue_management_types)
 
