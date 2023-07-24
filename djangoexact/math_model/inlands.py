@@ -54,7 +54,6 @@ def time_dependency(rate_coefficient, time_impl, time_cap, units_start, units_en
 
     return total_emissions
 
-# TODO: redo fire emissions
 def fire_emissions(fire_boolean, time_impl, time_cap, rate_coefficient, area, dry_matter, percentage_area_burned, ef_co2, ef_co, fire_periodicity, ef_ch4, methane_constant):
 
     def fire_co2_co_ch4(fire_periodicity, dry_matter, area, rate_coefficient, time_impl, time_cap, percentage_area_burned, ef_co2, ef_co, ef_ch4, methane_constant):
@@ -418,10 +417,3 @@ ao =  w_wo_annexed_module(maximum_area_for_water_management, area_drained_start,
                         )
 
 
-    
-# final = drainage_emissions_final(0.5, 20, 5, 0.82, 50, 100, 50, 9.6, 28, 0.5, 0.5, 7, 2259, 5, 265)
-# initial = drainage_emissions_initial(0.5, 20, 5, 0.82, 50, 100, 50, 5.3 , 28, 0.5, 0.5, 4.9, 2259, 2.4, 265)
-
-
-# print(final)
-# print(initial)
