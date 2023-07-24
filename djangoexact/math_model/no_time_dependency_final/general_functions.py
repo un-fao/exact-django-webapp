@@ -70,8 +70,6 @@ def yearly_constant_emissions_breakdown(total_emissions, years_implementation, y
     yearly_breakdown = [total_emissions / years_implementation for i in range(years_implementation)]
     yearly_breakdown.extend([0 for i in range(years_capitalization)])
 
-    ao = sum(yearly_breakdown)
-
     return yearly_breakdown
 
 def yearly_time_dependent_20_year_breakdown(start_value, end_value, years_implementation, years_capitalization, function):
@@ -113,6 +111,7 @@ def soil_emissions(hectars_before_20, area_start, area_end,
                    socref, soc_tier_2, f_lu_tier_2, f_i_tier_2, f_mg_tier_2, 
                    f_lu_ref = 1, f_i_ref = 1, f_mg_ref = 1):
     
+    # TODO: GENERALIZE SO IT CAN BE USED FOR ALL DIFFERENT KINDS OF CALCULATIONS, MEANING THAT SOCREF, FLU ecc ARE ASSIGNED IN THE MODULE SPECIFIC FUNCTION
     # f_mg and f_i are defaulted to 1 in case they are not inserted
     soc = socref if not soc_tier_2 else soc_tier_2
     f_lu = f_lu_ref if not f_lu_tier_2 else f_lu_tier_2
