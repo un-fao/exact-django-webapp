@@ -244,7 +244,6 @@ def calculate_emissions(area_start, area_w, area_wo, time_impl, time_cap, rate_t
     total_w = biomass_w + dom_w + soc_w + fire_w
     total_wo = biomass_wo + dom_wo + soc_wo + fire_wo
 
-    CIAO = 2
     return (total_w, total_wo, total_w-total_wo)
 
 def default_tier_2(degradation_level_start_ref, degradation_level_w_ref, degradation_level_wo_ref, agb_ref, bgb_ref, litter_ref, deadwood_ref, socref, luf_default):
