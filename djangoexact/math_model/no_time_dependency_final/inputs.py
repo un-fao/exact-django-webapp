@@ -1,4 +1,4 @@
-from general_functions import yearly_time_dependent_parameter_breakdown, input_single_calculation, yearly_constant_emissions_breakdown
+from .general_functions import yearly_time_dependent_parameter_breakdown, input_single_calculation, yearly_constant_emissions_breakdown
 
 class Inputs:
 
