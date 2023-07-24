@@ -64,7 +64,7 @@ class Afforestation:
         self.yearly_fire_emissions = []
         self.total_fire_emissions = 0
 
-        self.yearly_total_emissions = []
+        self.emissions_total_yearly = []
         self.total_emissions = 0
 
     def calculate_emissions(self):
@@ -170,8 +170,8 @@ class Afforestation:
         calculate_fire_emissions()
 
         try:
-            self.yearly_total_emissions = [i + j + k + l + n for i, j, k, l, n in zip(self.yearly_biomass_gain_emissions, self.yearly_dom_emissions, self.yearly_biomass_loss_emissions, self.yearly_soil_emissions, self.yearly_fire_emissions)]
-            self.total_emissions = sum(self.yearly_total_emissions)
+            self.emissions_total_yearly = [i + j + k + l + n for i, j, k, l, n in zip(self.yearly_biomass_gain_emissions, self.yearly_dom_emissions, self.yearly_biomass_loss_emissions, self.yearly_soil_emissions, self.yearly_fire_emissions)]
+            self.total_emissions = sum(self.emissions_total_yearly)
 
             return self.total_emissions
 
