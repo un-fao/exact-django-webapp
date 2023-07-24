@@ -188,14 +188,6 @@ def total_inland_coastal_aquaculture(production_start, production_w, nitrous_ef_
 
     return total_w, total_wo, total_w - total_wo
 
-
-em = total_emissions_small_or_large_fisheries(20, 9, 0.5, 0.5, 500, 450, 1000, 2.572333333334, None, 671, 73, 45, 73, 1810, None, 0.083, None, 0.5, 0.5, 0.5, 2.8, None, 60, None, 0.573978947, 0.5, 0.8, 0.5)
-print(em)
-
-
-# em = total_inland_coastal_aquaculture(757, 213, 0.00169, None, 265, 20, 9, 0.5, 0.5, 45, 500, 453, 0, None, 456)
-# print(em)
-
 def default_tier_2_small_or_large_fisheries(ef_diesel_default, fui_default, gwp_refrigerant_default, quantity_lost_refrigerant_default, tonnes_ice_default, kwh_ice_per_tonne_default):
 
     ef_diesel = ef_diesel_default 
@@ -217,3 +209,9 @@ def default_tier_2_inland_coastal_aquaculture(nitrous_ef_default, ef_feed_defaul
     ef_feed = ef_feed_default 
 
     return nitrous_ef, ef_feed
+
+# inputs = [10, 11, 0.5, 0.5, 5.23659035050339, 71.3662756029244, 44.0123155054382, 2.572333333333333, None, None, None, 697.0, 697.0, 697.0, 19.8011614615062, 31.2816563027116, 43.4530778935223, 1810, None, None, None, 0.48734, None, None, None, 0.388905643541494, 0.0490041343890272, 0.152197266950354, 2.8, None, None, None, 60, None, None, None, 0.296, 0.169438233537953, 0.180905927941485, 0.967017664672948]
+
+# ao = total_emissions_small_or_large_fisheries(*inputs)
+# print('Time dependency')
+# print(ao)
