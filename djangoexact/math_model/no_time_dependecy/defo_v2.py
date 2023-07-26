@@ -240,7 +240,7 @@ def soil_emissions(time_impl, time_cap, rate_type, rate_of_change_soil, area_def
         y, soil_emissions = calculate_unit_distribution___2(rate_type, 0, area_defo * delta_co2_mineral_per_ha_per_yr, time_impl, time_cap)
 
         if time_impl + time_cap > 20:
-            for i in range(21, time_impl + time_cap):
+            for i in range(20, time_impl + time_cap):
                 soil_emissions[i] = soil_emissions[i] - y[1]*(i - 20)
 
     return y, soil_emissions          

@@ -135,9 +135,6 @@ def max_co2_above_below_ground(parametro_1, parametro_2, parametro_3):
     else:
         return (parametro_1 + parametro_1 * parametro_3) * 0.47 * 44/12
 
-
-
-
 ######### FUNCTIONS FOR BIOMASS ANNUAL RATE CALCULATION ######################
 def biomass_annual_rate_calculation (area, time_impl, time_cap, rate_type, rate_of_change_soil, tot_biomass_growth_before_20_years, tot_biomass_growth_after_20_years):
 
@@ -161,7 +158,7 @@ def time_component_before_20(time_tot, time_impl, rate_of_change_soil, rate_type
         if time_tot < 20:
             return time_impl * rate_of_change_soil + time_tot - time_impl
         else: 
-            return min(20, time_impl) * rate_of_change_soil + time_tot - min(20, time_impl) - outer_if_other(rate_type, time_tot, time_impl)
+            return min(20, time_impl) * rate_of_change_soil + time_tot - min(20, time_impl) - outer_if_other_after_20(rate_type, time_tot, time_impl)
 
 # FOR CALCULATION AFTER 20 YEARS
 def time_component_after_20(time_tot, time_impl, rate_of_change_soil, rate_type):
@@ -184,6 +181,30 @@ def outer_if_other_after_20(rate_type, time_tot, time_impl):
 
 ######## FUNCTIONS FOR SOIL EMISSION CALCULATION
 def soil_emissions(time_impl, time_cap, rate_type, rate_of_change_soil, area_defo, delta_co2_mineral_per_ha_per_yr, delta_c_mineral_per_ha):
+    
+    def soil_rate_immediate(area_defo, time_tot):
+        return area_defo * min(20, time_tot) if area_defo > 0 else 0
+
+    def soil_rate_other(time_tot, time_impl, area_defo, rate_of_change_soil, rate_type):
+        return area_defo * middle_if_other(time_tot, time_impl, rate_of_change_soil, rate_type)
+
+    def middle_if_other(time_tot, time_impl, rate_of_change_soil, rate_type):
+
+        if time_tot > time_impl + 20:
+            return 20
+        else:
+            if time_tot < 20:
+                return time_impl * rate_of_change_soil + time_tot - time_impl
+            else: 
+                return min(20, time_impl) * rate_of_change_soil + time_tot - min(20, time_impl) - outer_if_other(rate_type, time_tot, time_impl)
+
+    def outer_if_other(rate_type, time_tot, time_impl):
+
+        if rate_type == "E":
+            return time_tot - 20 + 0.217 * time_impl * (math.exp(4.606 * ((20 - time_tot)/time_impl)) - 1)
+        else:
+            return pow(time_tot - 20, 2) * (0.5/time_impl)
+
 
     time_tot = time_impl + time_cap
 
@@ -191,29 +212,6 @@ def soil_emissions(time_impl, time_cap, rate_type, rate_of_change_soil, area_def
     comparison_term_2 = (area_defo * delta_c_mineral_per_ha * (-44/12))
     
     return comparison_term_2 if abs(comparison_term_1) >= abs(comparison_term_2) else comparison_term_1
-
-def soil_rate_immediate(area_defo, time_tot):
-    return area_defo * min(20, time_tot) if area_defo > 0 else 0
-
-def soil_rate_other(time_tot, time_impl, area_defo, rate_of_change_soil, rate_type):
-    return area_defo * middle_if_other(time_tot, time_impl, rate_of_change_soil, rate_type)
-
-def middle_if_other(time_tot, time_impl, rate_of_change_soil, rate_type):
-
-    if time_tot > time_impl + 20:
-        return 20
-    else:
-        if time_tot < 20:
-            return time_impl * rate_of_change_soil + time_tot - time_impl
-        else: 
-            return min(20, time_impl) * rate_of_change_soil + time_tot - min(20, time_impl) - outer_if_other(rate_type, time_tot, time_impl)
-
-def outer_if_other(rate_type, time_tot, time_impl):
-
-    if rate_type == "E":
-        return time_tot - 20 + 0.217 * time_impl * (math.exp(4.606 * ((20 - time_tot)/time_impl)) - 1)
-    else:
-        return pow(time_tot - 20, 2) * (0.5/time_impl)
 
 
 def default_tier_2 (biomass_start_default, soc_ref, flu_start_default, agb_under_20_end_default, agb_over_20_end_default, bgb_under_20_end_default, bgb_over_20_end_default, abg_biomass, rate_bgb_agb_s_125,
@@ -246,3 +244,5 @@ def default_tier_2 (biomass_start_default, soc_ref, flu_start_default, agb_under
     flu_end = flu_end_default
 
     return biomass_start, soc_start, flu_start, agb_under_20_end, agb_over_20_end, bgb_under_20_end, bgb_over_20_end, reference_carbon_stocks_end, litter_end, dead_wood_end, soc_end, flu_end
+
+print(afforestation(100,0, 21,1,35,0,'True',265,28,2.30,0.21,0.8,'D',0.5,0.72,20,0,19.7,0,31.4,0,1,1, 0.39,0.39,0,0,0,0,0,40,0.39,0.24))

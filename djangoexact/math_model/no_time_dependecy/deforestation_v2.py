@@ -200,6 +200,36 @@ def soil_emissions(time_impl, time_cap, rate_type, rate_of_change_soil, area_def
 def soil_rate_immediate(area_defo, time_tot):
     return area_defo if area_defo > 0 else 0
 
-ao = calculate_emissions(12, 11, 12, 25, 5, 'D', 0.5, 4.7, None, 265.0, 28.0, True, 0.26, 4.7, 0.45, 0.005, 2.9, None, 36.8, None, 12.0, 0.47, None, None, 0.77, 180.0, 0.22, 15, None, 20, None)
+ao = calculate_emissions(150,
+    10,
+    88,
+    25,
+    5,
+    "D",
+    0.5,
+    4.7,
+    None,
+    265.0,
+    28.0,
+    True,
+    0.26,
+    4.7,
+    0.45,
+    0.005,
+    2.9,
+    None,
+    36.8,
+    None,
+    12.0,
+    0.47,
+    None,
+    None,
+    0.77,
+    180.0,
+    0.22,
+    15,
+    None,
+    20,
+    None,)
 
 print(ao)

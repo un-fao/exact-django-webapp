@@ -1,4 +1,4 @@
-from general_functions import yearly_time_dependent_parameter_breakdown, ch4_head_calculation_general
+from .general_functions import yearly_time_dependent_parameter_breakdown, ch4_head_calculation_general
 import traceback, re
 class Livestock():
 
@@ -103,8 +103,8 @@ class Livestock():
                 n2o_head_start = ch4_head_calculation_general(self.tam, self.ner, self.ef_prp_nitrous_direct, self.percentage_prp_default, self.percentage_prp_tier_2_start, self.ef_system_nitrous_direct, self.n2o_prp_tier_2_start_direct, self.percentage_system_default)
                 n2o_head_end = ch4_head_calculation_general(self.tam, self.ner, self.ef_prp_nitrous_direct, self.percentage_prp_default, self.percentage_prp_tier_2_end, self.ef_system_nitrous_direct, self.n2o_prp_tier_2_end_direct, self.percentage_system_default)
 
-                self.nmm_emissions_yearly = yearly_time_dependent_parameter_breakdown(self.time_impl, self.time_cap, n2o_head_start, n2o_head_end, self.rate_type_nmm)
-                self.nmm_emissions = sum(self.nmm_emissions_yearly)
+                self.nmm_direct_emissions_yearly = yearly_time_dependent_parameter_breakdown(self.time_impl, self.time_cap, n2o_head_start, n2o_head_end, self.rate_type_nmm)
+                self.nmm_direct_emissions = sum(self.nmm_direct_emissions_yearly)
 
             except Exception as e:
                 traceback.print_exc()
