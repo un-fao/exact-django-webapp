@@ -1568,27 +1568,27 @@ class LivestockCalculator(BaseCalculator):
         # TODO: implement calculations
 
         print(
-            input.livestock_category_type.name,
-            input.livestock_production_type.name,
+            input.livestock_category_type_start.name,
+            input.livestock_production_type_start.name,
             input.activity.project.country.ipcc_region.name,
         )
 
         tam_ch4 = LivestockTAM.objects.get(
-            livestock_production_type=input.livestock_production_type,
-            livestock_category_type=input.livestock_category_type,
+            livestock_production_type=input.livestock_production_type_start,
+            livestock_category_type=input.livestock_category_type_start,
             ipcc_region=input.activity.project.country.ipcc_region,
         )
 
         vser_ch4 = LivestockVSER.objects.get(
-            livestock_production_type=input.livestock_production_type,
-            livestock_category_type=input.livestock_category_type,
+            livestock_production_type=input.livestock_production_type_start,
+            livestock_category_type=input.livestock_category_type_start,
             ipcc_region=input.activity.project.country.ipcc_region,
         )
 
         ef_prp = LivestockManureEF.objects.get(
             emission_type__name="CH4",
-            livestock_category_type=input.livestock_category_type,
-            livestock_production_type=input.livestock_production_type,
+            livestock_category_type=input.livestock_category_type_start,
+            livestock_production_type=input.livestock_production_type_start,
             climate=project.climate,
             moisture=project.moisture,
             manure_management_type__name="Pasture/Range/Paddock",
@@ -1597,8 +1597,8 @@ class LivestockCalculator(BaseCalculator):
         ef_systems = (
             LivestockManureEF.objects.filter(
                 emission_type__name="CH4",
-                livestock_category_type=input.livestock_category_type,
-                livestock_production_type=input.livestock_production_type,
+                livestock_category_type=input.livestock_category_type_start,
+                livestock_production_type=input.livestock_production_type_start,
                 climate=project.climate,
                 moisture=project.moisture,
             )
@@ -1609,16 +1609,16 @@ class LivestockCalculator(BaseCalculator):
         ef_system_values = [system.value for system in ef_systems]
 
         animal_waste_prp = LivestockAnimalWasteManagementSystem.objects.get(
-            livestock_category_type=input.livestock_category_type,
-            livestock_production_type=input.livestock_production_type,
+            livestock_category_type=input.livestock_category_type_start,
+            livestock_production_type=input.livestock_production_type_start,
             ipcc_region=input.activity.project.country.ipcc_region,
             manure_management_type__name="Pasture/Range/Paddock",
         )
 
         animal_waste_management_systems = (
             LivestockAnimalWasteManagementSystem.objects.filter(
-                livestock_category_type=input.livestock_category_type,
-                livestock_production_type=input.livestock_production_type,
+                livestock_category_type=input.livestock_category_type_start,
+                livestock_production_type=input.livestock_production_type_start,
                 ipcc_region=input.activity.project.country.ipcc_region,
             )
             .exclude(manure_management_type__name="Pasture/Range/Paddock")
@@ -1653,8 +1653,6 @@ class LivestockCalculator(BaseCalculator):
             project.capitalization_duration_yrs,
             animal_waste_management_systems_values,
         ]
-
-        from math_model.livestock import emissions_calculation as ec
 
         results = ec(*inputs)
 
