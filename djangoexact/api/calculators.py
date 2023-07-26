@@ -25,6 +25,7 @@ from ipcc.models import *
 from .utilities import *
 from abc import ABC, abstractmethod
 import sys
+from math_model.no_time_dependency_final.livestock import Livestock as MathLivestock
 
 
 class Result:
@@ -1565,30 +1566,72 @@ class LivestockCalculator(BaseCalculator):
         project: Project = self.data.activity.project
         input: Livestock = self.data
 
+        input_data_start = (
+            input.livestock_category_type_start,
+            input.livestock_production_type_start,
+            project.country.ipcc_region,
+        )
+
         # TODO: implement calculations
 
-        print(
-            input.livestock_category_type_start.name,
-            input.livestock_production_type_start.name,
-            input.activity.project.country.ipcc_region.name,
-        )
-
-        tam_ch4 = LivestockTAM.objects.get(
+        tam_ch4_start = LivestockTAM.objects.get(
             livestock_production_type=input.livestock_production_type_start,
             livestock_category_type=input.livestock_category_type_start,
             ipcc_region=input.activity.project.country.ipcc_region,
         )
 
-        vser_ch4 = LivestockVSER.objects.get(
+        tam_ch4_w = LivestockTAM.objects.get(
+            livestock_production_type=input.livestock_production_type_w,
+            livestock_category_type=input.livestock_category_type_w,
+            ipcc_region=input.activity.project.country.ipcc_region,
+        )
+
+        tam_ch4_wo = LivestockTAM.objects.get(
+            livestock_production_type=input.livestock_production_type_wo,
+            livestock_category_type=input.livestock_category_type_wo,
+            ipcc_region=input.activity.project.country.ipcc_region,
+        )
+
+        vser_ch4_start = LivestockVSER.objects.get(
             livestock_production_type=input.livestock_production_type_start,
             livestock_category_type=input.livestock_category_type_start,
             ipcc_region=input.activity.project.country.ipcc_region,
         )
 
-        ef_prp = LivestockManureEF.objects.get(
+        vser_ch4_w = LivestockVSER.objects.get(
+            livestock_production_type=input.livestock_production_type_w,
+            livestock_category_type=input.livestock_category_type_w,
+            ipcc_region=input.activity.project.country.ipcc_region,
+        )
+
+        vser_ch4_wo = LivestockVSER.objects.get(
+            livestock_production_type=input.livestock_production_type_wo,
+            livestock_category_type=input.livestock_category_type_wo,
+            ipcc_region=input.activity.project.country.ipcc_region,
+        )
+
+        ef_prp_start = LivestockManureEF.objects.get(
             emission_type__name="CH4",
             livestock_category_type=input.livestock_category_type_start,
             livestock_production_type=input.livestock_production_type_start,
+            climate=project.climate,
+            moisture=project.moisture,
+            manure_management_type__name="Pasture/Range/Paddock",
+        )
+
+        ef_prp_w = LivestockManureEF.objects.get(
+            emission_type__name="CH4",
+            livestock_category_type=input.livestock_category_type_w,
+            livestock_production_type=input.livestock_production_type_w,
+            climate=project.climate,
+            moisture=project.moisture,
+            manure_management_type__name="Pasture/Range/Paddock",
+        )
+
+        ef_prp_wo = LivestockManureEF.objects.get(
+            emission_type__name="CH4",
+            livestock_category_type=input.livestock_category_type_wo,
+            livestock_production_type=input.livestock_production_type_wo,
             climate=project.climate,
             moisture=project.moisture,
             manure_management_type__name="Pasture/Range/Paddock",
@@ -1631,9 +1674,9 @@ class LivestockCalculator(BaseCalculator):
         ]
 
         inputs = [
-            tam_ch4.value,
-            vser_ch4.value,
-            ef_prp.value,
+            tam_ch4_start.value,
+            vser_ch4_start.value,
+            ef_prp_start.value,
             animal_waste_prp.value,
             input.pasture_percentage_start_t2,
             input.pasture_percentage_w_t2,
@@ -1654,6 +1697,8 @@ class LivestockCalculator(BaseCalculator):
             animal_waste_management_systems_values,
         ]
 
-        results = ec(*inputs)
+        start = MathLivestock()
+
+        results = []
 
         print(results)
