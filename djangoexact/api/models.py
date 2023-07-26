@@ -386,6 +386,28 @@ class Activity(Model):
     created_at = DateTimeField(auto_now_add=True, null=True)
     updated_at = DateTimeField(auto_now=True, null=True)
 
+    change_rate_start = ForeignKey(
+        ChangeRate,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="change_rate_start",
+    )
+    change_rate_w = ForeignKey(
+        ChangeRate,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="change_rate_w",
+    )
+    change_rate_wo = ForeignKey(
+        ChangeRate,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="change_rate_wo",
+    )
+
     def __str__(self):
         return f"({self.pk}) {self.name} in {self.project.name}"
 
