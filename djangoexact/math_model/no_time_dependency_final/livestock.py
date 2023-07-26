@@ -67,6 +67,7 @@ class Livestock():
         #TODO: on notion is not there. Is it same for vol/leach/direct?
         self.n2o_prp_tier_2_start_indirect_volatization = n2o_prp_tier_2_start_indirect_volatization
         self.n2o_prp_tier_2_end_indirect_volatization = n2o_prp_tier_2_end_indirect_volatization
+
         self.n20_system_indirect_volatization_default_start = n20_system_indirect_volatization_default_start
         self.n20_system_indirect_volatization_default_end = n20_system_indirect_volatization_default_end
         self.n20_system_indirect_volatization_tier_2_start = n20_system_indirect_volatization_tier_2_start
@@ -126,7 +127,7 @@ class Livestock():
                 try:
                     ch4_head_start = ch4_head_calculation_general(self.tam_start, self.vser_start, self.ef_prp_methane_start, self.percentage_prp_default_start, self.percentage_prp_tier_2_start, self.ef_system_methane_start, self.ch4_prp_tier_2_start, self.percentage_system_default_start, self.ch4_system_default_start, self.ch4_system_tier_2_start)
                     ch4_head_end = ch4_head_calculation_general(self.tam_end, self.vser_end, self.ef_prp_methane_end, self.percentage_prp_default_end, self.percentage_prp_tier_2_end, self.ef_system_methane_end, self.ch4_prp_tier_2_end, self.percentage_system_default_end, self.ch4_system_default_end, self.ch4_system_tier_2_end)
-    
+
                     self.mmm_emissions_yearly = yearly_time_dependent_parameter_breakdown(self.time_impl, self.time_cap, ch4_head_start, ch4_head_end, self.rate)
                     self.mmm_emissions = sum(self.mmm_emissions_yearly)
     
