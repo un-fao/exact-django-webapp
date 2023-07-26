@@ -1709,3 +1709,52 @@ with open("scripts/ipcc_data/PerennialMaximumAGB_C.csv", "r") as f:
                 value=value,
             )
 """
+df2 = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "LivestockManureEFN2O.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers2 = df2.columns.values.tolist()
+df_dict2 = df2.to_dict("records")
+
+for i, row in enumerate(df_dict2):
+    emission_type = EmissionType.objects.get_or_create(
+        name=sanitize(row["emission_type"])
+    )[0]
+    livestock_category = LivestockCategoryType.objects.get_or_create(
+        name=sanitize(row["livestock_category_type"])
+    )[0]
+
+    livestock_production_type = LivestockProductionType.objects.get_or_create(
+        name=sanitize(row["livestock_production_type"])
+    )[0]
+    climate = Climate.objects.get_or_create(name=sanitize(row["climate"]))[0]
+    moisture = Moisture.objects.get_or_create(name=sanitize(row["moisture"]))[0]
+
+    for j, header in enumerate(df_headers2, start=5):
+        manure_management_type = ManureManagementType.objects.get_or_create(
+            name=sanitize(df_headers2[j])
+        )[0]
+
+        print(
+            emission_type,
+            livestock_category,
+            climate,
+            moisture,
+            manure_management_type,
+            row[df_headers2[j]],
+        )
+
+        LivestockManureEF.objects.get_or_create(
+            emission_type=emission_type,
+            livestock_category_type=livestock_category,
+            livestock_production_type=livestock_production_type,
+            climate=climate,
+            moisture=moisture,
+            manure_management_type=manure_management_type,
+            value=parse_csv_number(row[df_headers2[j]]),
+        )
+
+        if j == len(df_headers2) - 1:
+            break

@@ -129,10 +129,18 @@ class PerennialCroppingFactory(DjangoModelFactory):
     class Meta:
         model = PerennialCropping
 
-    crop_type = factory.fuzzy.FuzzyChoice(crop_types)
-    tillage_management_type = factory.fuzzy.FuzzyChoice(tillage_management_types)
-    organic_input_type = factory.fuzzy.FuzzyChoice(organic_input_types)
-    is_biomass_burned = factory.fuzzy.FuzzyChoice([True, False])
+    crop_type_start = factory.fuzzy.FuzzyChoice(crop_types)
+    crop_type_w = factory.fuzzy.FuzzyChoice(crop_types)
+    crop_type_wo = factory.fuzzy.FuzzyChoice(crop_types)
+    tillage_management_type_start = factory.fuzzy.FuzzyChoice(tillage_management_types)
+    tillage_management_type_w = factory.fuzzy.FuzzyChoice(tillage_management_types)
+    tillage_management_type_wo = factory.fuzzy.FuzzyChoice(tillage_management_types)
+    organic_input_type_start = factory.fuzzy.FuzzyChoice(organic_input_types)
+    organic_input_type_w = factory.fuzzy.FuzzyChoice(organic_input_types)
+    organic_input_type_wo = factory.fuzzy.FuzzyChoice(organic_input_types)
+    is_biomass_burned_start = factory.fuzzy.FuzzyChoice([True, False])
+    is_biomass_burned_w = factory.fuzzy.FuzzyChoice([True, False])
+    is_biomass_burned_wo = factory.fuzzy.FuzzyChoice([True, False])
 
     ha_start = factory.fuzzy.FuzzyInteger(0, 100)
     ha_w = factory.fuzzy.FuzzyInteger(0, 100)
@@ -140,4 +148,6 @@ class PerennialCroppingFactory(DjangoModelFactory):
     ha_wo = factory.fuzzy.FuzzyInteger(0, 100)
     ha_wo_rate = def_rate
 
-    crop_yield = factory.fuzzy.FuzzyInteger(0, 100)
+    crop_yield_start = factory.fuzzy.FuzzyInteger(0, 100)
+    crop_yield_w = factory.fuzzy.FuzzyInteger(0, 100)
+    crop_yield_wo = factory.fuzzy.FuzzyInteger(0, 100)
