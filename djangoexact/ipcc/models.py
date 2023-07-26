@@ -831,3 +831,16 @@ class LivestockAnimalWasteManagementSystem(Model):
 
     def __str__(self):
         return f"({self.pk}) {self.livestock_production_type.name} {self.livestock_category_type.name} {self.manure_management_type.name} {self.ipcc_region.name} {self.value}"
+
+
+class LivestockNER(Model):
+    """
+    IPCC3012:3061
+    """
+
+    ipcc_region = ForeignKey("api.IPCCRegion", on_delete=CASCADE)
+    livestock_production_type = ForeignKey(
+        "api.LivestockProductionType", on_delete=CASCADE
+    )
+    livestock_category_type = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
+    value = FloatField()
