@@ -1708,7 +1708,6 @@ with open("scripts/ipcc_data/PerennialMaximumAGB_C.csv", "r") as f:
                 climate=climate,
                 value=value,
             )
-"""
 df2 = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "LivestockManureEFN2O.csv"),
     header=0,
@@ -1758,3 +1757,40 @@ for i, row in enumerate(df_dict2):
 
         if j == len(df_headers2) - 1:
             break
+"""
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "LivestockNER.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers = df.columns.values.tolist()
+df_dict = df.to_dict("records")
+
+for i, row in enumerate(df_dict):
+    ipcc_region = IPCCRegion.objects.get_or_create(name=sanitize(row["ipcc_region"]))[0]
+    livestock_production_type = LivestockProductionType.objects.get_or_create(
+        name=sanitize(row["livestock_production_type"])
+    )[0]
+    for j, header in enumerate(df_headers, start=2):
+        if j == len(df_headers):
+            break
+
+        livestock_category_type = LivestockCategoryType.objects.get_or_create(
+            name=sanitize(df_headers[j])
+        )[0]
+
+        print(
+            ipcc_region,
+            livestock_production_type,
+            livestock_category_type,
+            row[df_headers[j]],
+        )
+
+        LivestockNER.objects.get_or_create(
+            ipcc_region=ipcc_region,
+            livestock_production_type=livestock_production_type,
+            livestock_category_type=livestock_category_type,
+            value=parse_csv_number(row[df_headers[j]]),
+        )
