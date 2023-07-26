@@ -93,10 +93,10 @@ def breakdown_according_to_values(maximum, list_of_proportions):
 def ch4_head_calculation_general(tam: float, vser: float, ef_prp: float, percentage_prp_default: float, percentage_prp_tier_2: float, ef_system_default: list, ef_system_tier_2: list, ch4_prp_tier_2: float, percentage_system_default: list, ch4_system_default, ch4_system_tier_2):
         
         try:
-            # THIS MEANS THAT THERE IS A TIER 2 VALUE 
-            ef_system = ef_system_default if not ef_system_tier_2 else [ef_system_tier_2]
-
             if not ch4_system_default and not ch4_system_tier_2:
+                
+                ef_system = ef_system_default
+
                 if not percentage_prp_tier_2:
                     ch4_system = [i * (tam/1000) * (vser/1000) * 365 * j/100 for (i,j) in zip(ef_system, percentage_system_default)]
                 else: 
