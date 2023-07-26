@@ -33,7 +33,7 @@ def GHG_emissions(
     soc_after_defo_tier_2,
     soc_reference,
     soc_reference_tier_2,
-):
+): 
     """
     This function calculates GHG emission
     Inputs ----->  ha_start : hectars at the start
@@ -99,6 +99,7 @@ def GHG_emissions(
 
     if soc_reference_tier_2:
         soc_reference = soc_reference_tier_2
+
     delta_c_mineral_per_ha = (
         soc_reference * flu - soc_reference
         if not soc_after_defo_tier_2
@@ -183,6 +184,8 @@ def GHG_emissions(
         delta_c_mineral_per_ha,
     )
 
+    print('soil_w:{}'.format(soil_w))
+
     fire_fsom_N_wo = total_ch4_n2o_per_ha * area_defo_wo
     fire_fsom_N_w = total_ch4_n2o_per_ha * area_defo_w
     # print(fire_fsom_N_w)
@@ -194,6 +197,18 @@ def GHG_emissions(
         biomass_loss_wo + biomass_gain_wo + dom_loss_wo + soil_wo + fire_fsom_N_wo
     )
     total_w = biomass_loss_w + biomass_gain_w + dom_loss_w + soil_w + fire_fsom_N_w
+
+    # print(delta_c_mineral_per_ha)
+    # print(delta_co2_mineral_per_ha_per_yr)
+    # print(soc_reference)
+
+    # print(biomass_gain_w)
+    # print(biomass_loss_w)
+    # print(dom_loss_w)
+    # print(soil_w)
+    # print(fire_fsom_N_w)
+    # print(total_w)
+
 
     total_defo = total_w - total_wo
 
@@ -211,6 +226,8 @@ def soil_emissions(
 ):
     time_tot = time_impl + time_cap
 
+    print(delta_co2_mineral_per_ha_per_yr)
+
     comparison_term_1 = (
         (delta_co2_mineral_per_ha_per_yr * soil_rate_immediate(area_defo, time_tot))
         if rate_type == "I"
@@ -223,7 +240,12 @@ def soil_emissions(
     )
     comparison_term_2 = area_defo * delta_c_mineral_per_ha * (-44 / 12)
 
-    print(comparison_term_1)
+    print(comparison_term_1/delta_co2_mineral_per_ha_per_yr)
+
+    
+    print('CALCULATED:{}'.format(comparison_term_1))
+    print('REFERENCE:{}'.format(comparison_term_2))
+    #
     return (
         comparison_term_2
         if abs(comparison_term_1) >= abs(comparison_term_2)
@@ -269,8 +291,8 @@ def outer_if_other(rate_type, time_tot, time_impl):
 
 ao = GHG_emissions(
     150,
-    10,
-    88,
+    0,
+    0,
     25,
     5,
     "D",
@@ -301,7 +323,7 @@ ao = GHG_emissions(
     None,
 )
 
-print(ao)
+
 
 
 def default_tier_2(
@@ -349,3 +371,6 @@ def default_tier_2(
         soc_final,
         flu_final,
     )
+
+
+# print(soil_emissions(25, 5, 'D', 0.5, 150, 0.64166666666667, -3.5))

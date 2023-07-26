@@ -19,15 +19,15 @@ def input_single_calculation(unit_start, unit_end, rate_coefficient, ipcc_factor
 
         return total_emissions
 
-def input_w_wo_calculation(unit_start, unit_w, unit_wo, rate_coefficient_w, rate_coefficient_wo, ipcc_factor_c2o, tier_2_factor_c2o, unit_factor_c2o, emissions_factor_c2o, time_impl, time_cap,
-                           ipcc_factor_n2o, tier_2_factor_n2o, unit_factor_n2o, emissions_factor_n2o, ipcc_factor_co2_eq, tier_2_factor_co2_eq, unit_factor_eq, emissions_factor_eq):
+def input_w_wo_calculation(unit_start, unit_w, unit_wo, rate_coefficient_w, rate_coefficient_wo, ipcc_factor_co2_eq, tier_2_factor_co2_eq, unit_factor_co2_eq, emissions_factor_co2_eq, time_impl, time_cap,
+                           ipcc_factor_n2o, tier_2_factor_n2o, unit_factor_n2o, emissions_factor_n2o, unit_factor_eq, emissions_factor_eq):
     
-    if unit_factor_c2o is None or emissions_factor_c2o is None:
+    if unit_factor_co2_eq is None or emissions_factor_co2_eq is None:
         em_w_co2 = 0
         em_wo_co2 = 0
     else:
-        em_w_co2 = input_single_calculation(unit_start, unit_w, rate_coefficient_w, ipcc_factor_c2o, tier_2_factor_c2o, unit_factor_c2o, emissions_factor_c2o, time_impl, time_cap)
-        em_wo_co2 = input_single_calculation(unit_start, unit_wo, rate_coefficient_wo, ipcc_factor_c2o, tier_2_factor_c2o, unit_factor_c2o, emissions_factor_c2o, time_impl, time_cap)
+        em_w_co2 = input_single_calculation(unit_start, unit_w, rate_coefficient_w, ipcc_factor_co2_eq, tier_2_factor_co2_eq, unit_factor_co2_eq, emissions_factor_co2_eq, time_impl, time_cap)
+        em_wo_co2 = input_single_calculation(unit_start, unit_wo, rate_coefficient_wo, ipcc_factor_co2_eq, tier_2_factor_co2_eq, unit_factor_co2_eq, emissions_factor_co2_eq, time_impl, time_cap)
 
     if unit_factor_n2o is None or emissions_factor_n2o is None:
         em_w_n2o = 0
@@ -130,14 +130,13 @@ def operational_irrigation_w_wo_calculation(ef_default, ef_tier_2, total_dynamic
 
     return emissions_w, emissions_wo, emissions_w - emissions_wo
 
-def default_tier_2_inputs(ipcc_factor_c2o_default, ipcc_factor_n2o_default, ipcc_factor_co2_default):
+def default_tier_2_inputs(ipcc_factor_co2_eq_default, ipcc_factor_n2o_default, ipcc_factor_co2_default):
 
-    # TODO: fix the name of c2o all across the code
-    ipcc_factor_c2o = ipcc_factor_c2o_default
+    ipcc_factor_co2_eq = ipcc_factor_co2_eq_default
     ipcc_factor_n2o = ipcc_factor_n2o_default
     ipcc_factor_co2 = ipcc_factor_co2_default
 
-    return ipcc_factor_c2o, ipcc_factor_n2o, ipcc_factor_co2
+    return ipcc_factor_co2_eq, ipcc_factor_n2o, ipcc_factor_co2
 
 def default_tier_2_irrigation(pumping_efficiency_default, average_pressure_default, average_pressure_tier_2, ef_default):
     pumping_efficiency = pumping_efficiency_default
