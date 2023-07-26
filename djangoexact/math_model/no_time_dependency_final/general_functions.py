@@ -81,7 +81,6 @@ def yearly_time_dependent_20_year_breakdown(start_value, end_value, years_implem
 
     before_20 = [i-j for i, j in zip(breakdown, after_20[0:len(breakdown)])]
     
-    
     return average_yearly_value(before_20), average_yearly_value(after_20)[0:len(breakdown)]
 
 def breakdown_according_to_values(maximum, list_of_proportions):
@@ -101,7 +100,7 @@ def ch4_head_calculation_general(tam: float, vser: float, ef_prp: float, percent
             ch4_system = [i * (tam/1000) * (vser/1000) * 365 * j/100 * ((1-percentage_prp_tier_2/100)/(1-percentage_prp_default/100)) for (i,j) in zip(ef_system, percentage_system_default)]
         
         percentage_prp = percentage_prp_default if not percentage_prp_tier_2 else percentage_prp_tier_2
-        ch4_prp = ef_prp * (tam/1000) * (vser/1000) * 365 * percentage_prp/100 if not ch4_prp_tier_2 else ch4_prp_tier_2 if not ch4_prp_tier_2 else ch4_prp_tier_2 * percentage_prp/100
+        ch4_prp = ef_prp * (tam/1000) * (vser/1000) * 365 * percentage_prp/100 if not ch4_prp_tier_2 else ch4_prp_tier_2 * percentage_prp/100
 
         ch4_head = sum(ch4_system) + ch4_prp
 
