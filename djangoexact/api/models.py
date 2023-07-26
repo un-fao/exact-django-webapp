@@ -911,8 +911,38 @@ class Livestock(Module):
     description = TextField(null=True, blank=True)
     user_notes = TextField(null=True, blank=True)
 
-    livestock_category_type = ForeignKey(LivestockCategoryType, on_delete=CASCADE)
-    livestock_production_type = ForeignKey(LivestockProductionType, on_delete=CASCADE)
+    livestock_category_type_start = ForeignKey(LivestockCategoryType, on_delete=CASCADE)
+    livestock_category_type_w = ForeignKey(
+        LivestockCategoryType,
+        on_delete=CASCADE,
+        related_name="%(class)s_livestock_categories_w",
+        null=True,
+        blank=True,
+    )
+    livestock_category_type_wo = ForeignKey(
+        LivestockCategoryType,
+        on_delete=CASCADE,
+        related_name="%(class)s_livestock_categories_wo",
+        null=True,
+        blank=True,
+    )
+    livestock_production_type_start = ForeignKey(
+        LivestockProductionType, on_delete=CASCADE
+    )
+    livestock_production_type_w = ForeignKey(
+        LivestockProductionType,
+        on_delete=CASCADE,
+        related_name="%(class)s_livestock_productions_w",
+        null=True,
+        blank=True,
+    )
+    livestock_production_type_wo = ForeignKey(
+        LivestockProductionType,
+        on_delete=CASCADE,
+        related_name="%(class)s_livestock_productions_wo",
+        null=True,
+        blank=True,
+    )
 
     production_start = FloatField(null=True, blank=True)
     production_w = FloatField(null=True, blank=True)
