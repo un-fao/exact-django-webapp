@@ -1,6 +1,6 @@
 import math 
 import matplotlib.pyplot as plt
-from affo_graphs import yearly_emissions, yearly_breakdown, show_before_after_20, make_plots
+#from affo_graphs import yearly_emissions, yearly_breakdown, show_before_after_20, make_plots
 
 def calculate_emissions(ha_w, ha_wo, time_impl, time_cap, initial_biomass, initial_biomass_tier_2, fire_bool, nitrous, methane, 
                     emission_factor_ch4, emission_factor_n2o, combusted_fraction, rate_type, rate_of_change_soil,
@@ -92,14 +92,20 @@ def calculate_emissions(ha_w, ha_wo, time_impl, time_cap, initial_biomass, initi
                     #     print('{}:{}'.format(i, j, units_per_year_w_after_20[i]))
 
                     #yearly_breakdown(total_non_time_w, total_time_dependent_w, time_impl, years_w)
-                    make_plots(units_per_year_w_before_20, units_per_year_w_after_20, years_w, total_non_time_w, total_time_dependent_w, time_impl, total_w)
+                    # make_plots(units_per_year_w_before_20, units_per_year_w_after_20, years_w, total_non_time_w, total_time_dependent_w, time_impl, total_w)
 
                     return sum(total_w), sum(total_wo), sum(total_w) - sum(total_wo)
+
+def average_yearly_value(yearly_breakdown: list):
+     
+        average_yearly_value = [(yearly_breakdown[i] + yearly_breakdown[i + 1]) / 2 for i in range(len(yearly_breakdown) - 1)]
+        
+        return average_yearly_value
 
 def calculate_unit_distribution(rate_type, total_units, time_impl, time_cap):
 
     units_per_year = range(time_cap + time_impl)
-    years = range(0, time_impl + time_cap)
+    years = range(0, time_impl + time_cap + 1)
     
 
     if rate_type == 'I':
@@ -117,7 +123,7 @@ def calculate_unit_distribution(rate_type, total_units, time_impl, time_cap):
         coefficient = (time_impl + 1)/math.log(total_units)
         units_per_year = [math.exp(coefficient * i) if i <= time_impl else total_units for i in years]
 
-    return result, to_subtract[0:len(units_per_year)], years
+    return average_yearly_value(result), average_yearly_value(to_subtract[0:len(units_per_year) + 1]), years
 
 def compute_yearly_time_dependent(units_per_year_w_before_20, units_per_year_w_after_20, units_per_year_wo_before_20, units_per_year_wo_after_20, years_w, ha_w, ha_wo, time_impl, time_cap, initial_biomass, initial_biomass_tier_2, fire_bool, nitrous, methane, 
                     emission_factor_ch4, emission_factor_n2o, combusted_fraction, rate_type, rate_of_change_soil,

@@ -65,11 +65,10 @@ def yearly_time_dependent_parameter_breakdown(start_value, end_value, years_impl
             return [end_value for i in range(years_implementation + years_capitalization + 1)]
 
 def yearly_constant_emissions_breakdown(total_emissions, years_implementation, years_capitalization):
-    # create a list with total_emissions/years_implementation for each year of implementation
+    # TODO: add logic for breakdown according to rate type
+    # total emissions are broken down across impl with 0 in cap
     yearly_breakdown = [total_emissions / years_implementation for i in range(years_implementation)]
     yearly_breakdown.extend([0 for i in range(years_capitalization)])
-
-    ao = sum(yearly_breakdown)
 
     return yearly_breakdown
 
@@ -112,6 +111,7 @@ def soil_emissions(hectars_before_20, area_start, area_end,
                    socref, soc_tier_2, f_lu_tier_2, f_i_tier_2, f_mg_tier_2, 
                    f_lu_ref = 1, f_i_ref = 1, f_mg_ref = 1):
     
+    # TODO: GENERALIZE SO IT CAN BE USED FOR ALL DIFFERENT KINDS OF CALCULATIONS, MEANING THAT SOCREF, FLU ecc ARE ASSIGNED IN THE MODULE SPECIFIC FUNCTION
     # f_mg and f_i are defaulted to 1 in case they are not inserted
     soc = socref if not soc_tier_2 else soc_tier_2
     f_lu = f_lu_ref if not f_lu_tier_2 else f_lu_tier_2
@@ -133,3 +133,18 @@ def soil_emissions(hectars_before_20, area_start, area_end,
     emissions_soil_total = emissions
 
     return emissions_soil_yearly, emissions_soil_total
+
+# INPUT SINGLE MODULE CALCULATION
+def input_single_calculation(unit_start, unit_end, ipcc_factor, tier_2_factor, unit_factor, emissions_factor, time_implementation, time_capitalization, rate_type):
+                
+            ipcc_or_tier_2_factor = tier_2_factor if tier_2_factor else ipcc_factor
+
+            unit_start = unit_start * unit_factor 
+            unit_end = unit_end * unit_factor 
+
+            emissions_start = unit_start * ipcc_or_tier_2_factor * emissions_factor
+            emissions_end = unit_end * ipcc_or_tier_2_factor * emissions_factor
+
+            annual_emissions = yearly_time_dependent_parameter_breakdown(emissions_start, emissions_end, time_implementation , time_capitalization, rate_type)
+
+            return annual_emissions, sum(annual_emissions)
