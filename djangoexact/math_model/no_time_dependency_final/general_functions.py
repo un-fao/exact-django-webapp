@@ -90,13 +90,13 @@ def breakdown_according_to_values(maximum, list_of_proportions):
     result = [maximum * i/sum(list_of_proportions) for i in list_of_proportions]
     return result
 # LIVESTOCK CH4 HEAD GENERAL FUNCTION    
-def ch4_head_calculation_general(tam: float, vser: float, ef_prp: float, percentage_prp_default: float, percentage_prp_tier_2: float, ef_system_default: list, ef_system_tier_2: list, ch4_prp_tier_2: float, percentage_system_default: list, ch4_system_default, ch4_system_tier_2):
+def ch4_head_calculation_general(tam: float, vser: float, ef_prp: float, percentage_prp_default: float, percentage_prp_tier_2: float, ef_system_default: list, ch4_prp_tier_2: float, percentage_system_default: list, ef_single_system, ch4_system_tier_2):
         
         try:
-            if not ch4_system_default and not ch4_system_tier_2:
+            if not ch4_system_tier_2:
                 
-                ef_system = ef_system_default
-
+                ef_system = [ef_system_default] if not ef_single_system else [ef_single_system]
+                
                 if not percentage_prp_tier_2:
                     ch4_system = [i * (tam/1000) * (vser/1000) * 365 * j/100 for (i,j) in zip(ef_system, percentage_system_default)]
                 else: 
@@ -104,7 +104,7 @@ def ch4_head_calculation_general(tam: float, vser: float, ef_prp: float, percent
                     ch4_system = [i * (tam/1000) * (vser/1000) * 365 * j/100 * ((1-percentage_prp_tier_2/100)/(1-percentage_prp_default/100)) for (i,j) in zip(ef_system, percentage_system_default)]
             
             else:
-                ch4_system = [ch4_system_default] if not ch4_system_tier_2 else [ch4_system_tier_2]
+                ch4_system = [ch4_system_tier_2]
 
             percentage_prp = percentage_prp_default if not percentage_prp_tier_2 else percentage_prp_tier_2
             ch4_prp = ef_prp * (tam/1000) * (vser/1000) * 365 * percentage_prp/100 if not ch4_prp_tier_2 else ch4_prp_tier_2 * percentage_prp/100
