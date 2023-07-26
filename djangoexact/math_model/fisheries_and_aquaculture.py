@@ -475,7 +475,6 @@ def total_inland_coastal_aquaculture(
 
     return total_w, total_wo, total_w - total_wo
 
-def default_tier_2_small_or_large_fisheries(ef_diesel_default, fui_default, gwp_refrigerant_default, quantity_lost_refrigerant_default, tonnes_ice_default, kwh_ice_per_tonne_default):
 
 def default_tier_2_small_or_large_fisheries(
     ef_diesel_default,
@@ -513,6 +512,7 @@ def default_tier_2_inland_coastal_aquaculture(nitrous_ef_default, ef_feed_defaul
     ef_feed = ef_feed_default
 
     return nitrous_ef, ef_feed
+
 
 # inputs = [10, 11, 0.5, 0.5, 5.23659035050339, 71.3662756029244, 44.0123155054382, 2.572333333333333, None, None, None, 697.0, 697.0, 697.0, 19.8011614615062, 31.2816563027116, 43.4530778935223, 1810, None, None, None, 0.48734, None, None, None, 0.388905643541494, 0.0490041343890272, 0.152197266950354, 2.8, None, None, None, 60, None, None, None, 0.296, 0.169438233537953, 0.180905927941485, 0.967017664672948]
 
