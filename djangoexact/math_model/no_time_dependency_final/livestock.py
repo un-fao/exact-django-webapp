@@ -2,48 +2,80 @@ from .general_functions import yearly_time_dependent_parameter_breakdown, ch4_he
 import traceback, re
 class Livestock():
 
-    def __init__(self, time_impl, time_cap, methane_constant, head_number_start, head_number_end, 
-                   rate_type_mef, specific_factor_default, specific_factor_start_tier_2, specific_factor_end_tier_2, # METHANE ENTERIC FERMENTATION EMISSIONS PARAMETERS
-                   ef_prp_methane, percentage_prp_default, percentage_prp_tier_2_start, percentage_prp_tier_2_end, ef_system_methane, ch4_prp_tier_2_start, ch4_prp_tier_2_end, 
-                   percentage_system_default, rate_type_mmm, tam, vser, # METHANE MANURE MANAGEMENT EMISSIONS PARAMETERS
-                   ef_prp_nitrous_direct, ef_system_nitrous_direct, n2o_prp_tier_2_start_direct, n2o_prp_tier_2_end_direct, rate_type_nmm, ner, # NITROUS OXIDE MANURE MANAGEMENT EMISSIONS PARAMETERS DIRECT
-                   ef_prp_nitrous_indirect_volatization, ef_system_nitrous_indirect_volatization, n2o_prp_tier_2_start_indirect_volatization, n2o_prp_tier_2_end_indirect_volatization,  # NITROUS OXIDE MANURE MANAGEMENT EMISSIONS PARAMETERS INDIRECT VOLATIZATION
-                   ef_prp_nitrous_indirect_leaching, ef_system_nitrous_indirect_leaching, n2o_prp_tier_2_start_indirect_leaching, n2o_prp_tier_2_end_indirect_leaching # NITROUS OXIDE MANURE MANAGEMENT EMISSIONS PARAMETERS INDIRECT LEACHING
+    def __init__(self, time_impl, time_cap, rate,  methane_constant, head_number_start, head_number_end, 
+                   specific_factor_default_start, specific_factor_default_end, specific_factor_start_tier_2, specific_factor_end_tier_2, # METHANE ENTERIC FERMENTATION EMISSIONS PARAMETERS
+                   ef_prp_methane_start, ef_prp_methane_end, percentage_prp_default_start, percentage_prp_default_end, percentage_prp_tier_2_start, percentage_prp_tier_2_end, ef_system_methane_start, ef_system_methane_end, ch4_prp_tier_2_start, ch4_prp_tier_2_end, 
+                   percentage_system_default_start, percentage_system_default_end, tam_start, tam_end, vser_start, vser_end, # METHANE MANURE MANAGEMENT EMISSIONS PARAMETERS
+                   ef_prp_nitrous_direct_start, ef_prp_nitrous_direct_end, ef_system_nitrous_direct_start, ef_system_nitrous_direct_end, n2o_prp_tier_2_start_direct, n2o_prp_tier_2_end_direct, ner_start, ner_end, # NITROUS OXIDE MANURE MANAGEMENT EMISSIONS PARAMETERS DIRECT
+                   ef_prp_nitrous_indirect_volatization_start, ef_prp_nitrous_indirect_volatization_end, ef_system_nitrous_indirect_volatization_start, ef_system_nitrous_indirect_volatization_end, n2o_prp_tier_2_start_indirect_volatization, n2o_prp_tier_2_end_indirect_volatization,  # NITROUS OXIDE MANURE MANAGEMENT EMISSIONS PARAMETERS INDIRECT VOLATIZATION
+                   ef_prp_nitrous_indirect_leaching_start, ef_prp_nitrous_indirect_leaching_end, ef_system_nitrous_indirect_leaching_start, ef_system_nitrous_indirect_leaching_end, n2o_prp_tier_2_start_indirect_leaching, n2o_prp_tier_2_end_indirect_leaching # NITROUS OXIDE MANURE MANAGEMENT EMISSIONS PARAMETERS INDIRECT LEACHING
                  ):
         
         # INPUT PARAMETERS
         self.time_impl = time_impl
         self.time_cap = time_cap
+        self.rate = rate
         self.methane_constant = methane_constant
         self.head_number_start = head_number_start
         self.head_number_end = head_number_end
-        self.rate_type_mef = rate_type_mef
-        self.specific_factor_default = specific_factor_default
+
+        self.specific_factor_default_start = specific_factor_default_start
+        self.specific_factor_default_end = specific_factor_default_end
+
         self.specific_factor_start_tier_2 = specific_factor_start_tier_2
         self.specific_factor_end_tier_2 = specific_factor_end_tier_2
-        self.ef_prp_methane = ef_prp_methane
-        self.percentage_prp_default = percentage_prp_default
+
+        self.ef_prp_methane_start = ef_prp_methane_start
+        self.ef_prp_methane_end = ef_prp_methane_end
+
+        self.percentage_prp_default_start = percentage_prp_default_start
+        self.percentage_prp_default_end = percentage_prp_default_end
+
         self.percentage_prp_tier_2_start = percentage_prp_tier_2_start
         self.percentage_prp_tier_2_end = percentage_prp_tier_2_end
-        self.ef_system_methane = ef_system_methane
+
+        self.ef_system_methane_start = ef_system_methane_start
+        self.ef_system_methane_end = ef_system_methane_end
+
         self.ch4_prp_tier_2_start = ch4_prp_tier_2_start
         self.ch4_prp_tier_2_end = ch4_prp_tier_2_end
-        self.percentage_system_default = percentage_system_default
-        self.rate_type_mmm = rate_type_mmm
-        self.tam = tam
-        self.vser = vser
-        self.ef_prp_nitrous_direct = ef_prp_nitrous_direct
-        self.ef_system_nitrous_direct = ef_system_nitrous_direct
+
+        self.percentage_system_default_start = percentage_system_default_start
+        self.percentage_system_default_end = percentage_system_default_end
+
+        self.tam_start = tam_start
+        self.tam_end = tam_end
+
+        self.vser_start = vser_start
+        self.vser_end = vser_end
+
+        self.ef_prp_nitrous_direct_start = ef_prp_nitrous_direct_start
+        self.ef_prp_nitrous_direct_end = ef_prp_nitrous_direct_end
+
+        self.ef_system_nitrous_direct_start = ef_system_nitrous_direct_start
+        self.ef_system_nitrous_direct_end = ef_system_nitrous_direct_end
+
         self.n2o_prp_tier_2_start_direct = n2o_prp_tier_2_start_direct
         self.n2o_prp_tier_2_end_direct = n2o_prp_tier_2_end_direct
-        self.rate_type_nmm = rate_type_nmm
-        self.ner = ner
-        self.ef_prp_nitrous_indirect_volatization = ef_prp_nitrous_indirect_volatization
-        self.ef_system_nitrous_indirect_volatization = ef_system_nitrous_indirect_volatization
+
+        self.ner_start = ner_start
+        self.ner_end = ner_end
+
+        self.ef_prp_nitrous_indirect_volatization_start = ef_prp_nitrous_indirect_volatization_start
+        self.ef_prp_nitrous_indirect_volatization_end = ef_prp_nitrous_indirect_volatization_end
+
+        self.ef_system_nitrous_indirect_volatization_start = ef_system_nitrous_indirect_volatization_start
+        self.ef_system_nitrous_indirect_volatization_end = ef_system_nitrous_indirect_volatization_end
+
         self.n2o_prp_tier_2_start_indirect_volatization = n2o_prp_tier_2_start_indirect_volatization
         self.n2o_prp_tier_2_end_indirect_volatization = n2o_prp_tier_2_end_indirect_volatization
-        self.ef_prp_nitrous_indirect_leaching = ef_prp_nitrous_indirect_leaching
-        self.ef_system_nitrous_indirect_leaching = ef_system_nitrous_indirect_leaching
+
+        self.ef_prp_nitrous_indirect_leaching_start = ef_prp_nitrous_indirect_leaching_start
+        self.ef_prp_nitrous_indirect_leaching_end = ef_prp_nitrous_indirect_leaching_end
+
+        self.ef_system_nitrous_indirect_leaching_start = ef_system_nitrous_indirect_leaching_start
+        self.ef_system_nitrous_indirect_leaching_end = ef_system_nitrous_indirect_leaching_end
+
         self.n2o_prp_tier_2_start_indirect_leaching = n2o_prp_tier_2_start_indirect_leaching
         self.n2o_prp_tier_2_end_indirect_leaching = n2o_prp_tier_2_end_indirect_leaching
 
@@ -73,13 +105,13 @@ class Livestock():
         def calculate_methane_enteric_fermentation_emissions():
             
             try:
-                specific_factor_start = self.specific_factor_default if not self.specific_factor_start_tier_2 else self.specific_factor_start_tier_2
-                specific_factor_end = self.specific_factor_default if not self.specific_factor_end_tier_2 else self.specific_factor_end_tier_2
+                specific_factor_start = self.specific_factor_default_start if not self.specific_factor_start_tier_2 else self.specific_factor_start_tier_2
+                specific_factor_end = self.specific_factor_default_end if not self.specific_factor_end_tier_2 else self.specific_factor_end_tier_2
 
                 emissions_start = specific_factor_start / 1000 * self.methane_constant * self.head_number_start
                 emissions_end = specific_factor_end / 1000 * self.methane_constant * self.head_number_end
 
-                self.mef_emissions_yearly = yearly_time_dependent_parameter_breakdown(self.time_impl, self.time_cap, emissions_start, emissions_end, self.rate_type_mef)
+                self.mef_emissions_yearly = yearly_time_dependent_parameter_breakdown(self.time_impl, self.time_cap, emissions_start, emissions_end, self.rate)
                 self.mef_emissions = sum(self.mef_emissions_yearly)
 
             except Exception as e:
@@ -88,10 +120,10 @@ class Livestock():
         def calculate_methane_manure_management_emissions():
                 
                 try:
-                    ch4_head_start = ch4_head_calculation_general(self.tam, self.vser, self.ef_prp_methane, self.percentage_prp_default, self.percentage_prp_tier_2_start, self.ef_system_methane, self.ch4_prp_tier_2_start, self.percentage_system_default)
-                    ch4_head_end = ch4_head_calculation_general(self.tam, self.vser, self.ef_prp_methane, self.percentage_prp_default, self.percentage_prp_tier_2_end, self.ef_system_methane, self.ch4_prp_tier_2_end, self.percentage_system_default)
+                    ch4_head_start = ch4_head_calculation_general(self.tam_start, self.vser_start, self.ef_prp_methane_start, self.percentage_prp_default_start, self.percentage_prp_tier_2_start, self.ef_system_methane_start, self.ch4_prp_tier_2_start, self.percentage_system_default_start)
+                    ch4_head_end = ch4_head_calculation_general(self.tam_end, self.vser_end, self.ef_prp_methane_end, self.percentage_prp_default_end, self.percentage_prp_tier_2_end, self.ef_system_methane_end, self.ch4_prp_tier_2_end, self.percentage_system_default_end)
     
-                    self.mmm_emissions_yearly = yearly_time_dependent_parameter_breakdown(self.time_impl, self.time_cap, ch4_head_start, ch4_head_end, self.rate_type_mmm)
+                    self.mmm_emissions_yearly = yearly_time_dependent_parameter_breakdown(self.time_impl, self.time_cap, ch4_head_start, ch4_head_end, self.rate)
                     self.mmm_emissions = sum(self.mmm_emissions_yearly)
     
                 except Exception as e:
@@ -100,10 +132,10 @@ class Livestock():
         def calculate_nitrous_manure_management_direct():
             
             try:
-                n2o_head_start = ch4_head_calculation_general(self.tam, self.ner, self.ef_prp_nitrous_direct, self.percentage_prp_default, self.percentage_prp_tier_2_start, self.ef_system_nitrous_direct, self.n2o_prp_tier_2_start_direct, self.percentage_system_default)
-                n2o_head_end = ch4_head_calculation_general(self.tam, self.ner, self.ef_prp_nitrous_direct, self.percentage_prp_default, self.percentage_prp_tier_2_end, self.ef_system_nitrous_direct, self.n2o_prp_tier_2_end_direct, self.percentage_system_default)
+                n2o_head_start = ch4_head_calculation_general(self.tam_start, self.ner_start, self.ef_prp_nitrous_direct_start, self.percentage_prp_default_start, self.percentage_prp_tier_2_start, self.ef_system_nitrous_direct_start, self.n2o_prp_tier_2_start_direct, self.percentage_system_default_start)
+                n2o_head_end = ch4_head_calculation_general(self.tam_end, self.ner_end, self.ef_prp_nitrous_direct_end, self.percentage_prp_default_end, self.percentage_prp_tier_2_end, self.ef_system_nitrous_direct_end, self.n2o_prp_tier_2_end_direct, self.percentage_system_default_end)
 
-                self.nmm_direct_emissions_yearly = yearly_time_dependent_parameter_breakdown(self.time_impl, self.time_cap, n2o_head_start, n2o_head_end, self.rate_type_nmm)
+                self.nmm_direct_emissions_yearly = yearly_time_dependent_parameter_breakdown(self.time_impl, self.time_cap, n2o_head_start, n2o_head_end, self.rate)
                 self.nmm_direct_emissions = sum(self.nmm_direct_emissions_yearly)
 
             except Exception as e:
@@ -112,10 +144,10 @@ class Livestock():
         def calculate_nitrous_manure_management_indirect_volatization():
 
             try:
-                n2o_head_start = ch4_head_calculation_general(self.tam, self.ner, self.ef_prp_nitrous_indirect_volatization, self.percentage_prp_default, self.percentage_prp_tier_2_start, self.ef_system_nitrous_indirect_volatization, self.n2o_prp_tier_2_start_indirect_volatization, self.percentage_system_default)
-                n2o_head_end = ch4_head_calculation_general(self.tam, self.ner, self.ef_prp_nitrous_indirect_volatization, self.percentage_prp_default, self.percentage_prp_tier_2_end, self.ef_system_nitrous_indirect_volatization, self.n2o_prp_tier_2_end_indirect_volatization, self.percentage_system_default)
+                n2o_head_start = ch4_head_calculation_general(self.tam_start, self.ner_start, self.ef_prp_nitrous_indirect_volatization_start, self.percentage_prp_default_start, self.percentage_prp_tier_2_start, self.ef_system_nitrous_indirect_volatization_start, self.n2o_prp_tier_2_start_indirect_volatization, self.percentage_system_default_start)
+                n2o_head_end = ch4_head_calculation_general(self.tam_end, self.ner_end, self.ef_prp_nitrous_indirect_volatization_end, self.percentage_prp_default_end, self.percentage_prp_tier_2_end, self.ef_system_nitrous_indirect_volatization_end, self.n2o_prp_tier_2_end_indirect_volatization, self.percentage_system_default_end)
 
-                self.nmm_indirect_volatization_emissions_yearly = yearly_time_dependent_parameter_breakdown(self.time_impl, self.time_cap, n2o_head_start, n2o_head_end, self.rate_type_nmm)
+                self.nmm_indirect_volatization_emissions_yearly = yearly_time_dependent_parameter_breakdown(self.time_impl, self.time_cap, n2o_head_start, n2o_head_end, self.rate)
                 self.nmm_indirect_volatization_emissions = sum(self.nmm_indirect_volatization_emissions_yearly)
 
             except Exception as e:
@@ -124,10 +156,10 @@ class Livestock():
         def calculate_nitrous_manure_management_indirect_leaching():
 
             try:
-                n2o_head_start = ch4_head_calculation_general(self.tam, self.ner, self.ef_prp_nitrous_indirect_leaching, self.percentage_prp_default, self.percentage_prp_tier_2_start, self.ef_system_nitrous_indirect_leaching, self.n2o_prp_tier_2_start_indirect_leaching, self.percentage_system_default)
-                n2o_head_end = ch4_head_calculation_general(self.tam, self.ner, self.ef_prp_nitrous_indirect_leaching, self.percentage_prp_default, self.percentage_prp_tier_2_end, self.ef_system_nitrous_indirect_leaching, self.n2o_prp_tier_2_end_indirect_leaching, self.percentage_system_default)
+                n2o_head_start = ch4_head_calculation_general(self.tam_start, self.ner_start, self.ef_prp_nitrous_indirect_leaching_start, self.percentage_prp_default_start, self.percentage_prp_tier_2_start, self.ef_system_nitrous_indirect_leaching_start, self.n2o_prp_tier_2_start_indirect_leaching, self.percentage_system_default_start)
+                n2o_head_end = ch4_head_calculation_general(self.tam_end, self.ner_end, self.ef_prp_nitrous_indirect_leaching_end, self.percentage_prp_default_end, self.percentage_prp_tier_2_end, self.ef_system_nitrous_indirect_leaching_end, self.n2o_prp_tier_2_end_indirect_leaching, self.percentage_system_default_end)
 
-                self.nmm_indirect_leaching_emissions_yearly = yearly_time_dependent_parameter_breakdown(self.time_impl, self.time_cap, n2o_head_start, n2o_head_end, self.rate_type_nmm)
+                self.nmm_indirect_leaching_emissions_yearly = yearly_time_dependent_parameter_breakdown(self.time_impl, self.time_cap, n2o_head_start, n2o_head_end, self.rate)
                 self.nmm_indirect_leaching_emissions = sum(self.nmm_indirect_leaching_emissions_yearly)
 
             except Exception as e:
