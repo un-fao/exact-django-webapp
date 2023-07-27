@@ -226,7 +226,7 @@ class LivestockCategoryType(Model):
     name = CharField(max_length=100)
 
     def __str__(self):
-        return self.name
+        return f"({self.pk}) {self.name}"
 
 
 class LivestockProductionType(Model):
@@ -992,23 +992,47 @@ class Livestock(Module):
     enteric_fermentation_w_t2 = FloatField(null=True, blank=True)
     enteric_fermentation_wo_t2 = FloatField(null=True, blank=True)
 
-    pasture_percentage_start_t2 = FloatField(null=True, blank=True)
-    pasture_percentage_w_t2 = FloatField(null=True, blank=True)
-    pasture_percentage_wo_t2 = FloatField(null=True, blank=True)
+    prp_percentage_start_t2 = FloatField(null=True, blank=True)
+    prp_percentage_w_t2 = FloatField(null=True, blank=True)
+    prp_percentage_wo_t2 = FloatField(null=True, blank=True)
 
-    emission_factor_start_t2 = FloatField(null=True, blank=True)
-    emission_factor_w_t2 = FloatField(null=True, blank=True)
-    emission_factor_wo_t2 = FloatField(null=True, blank=True)
+    prp_ch4_start_t2 = FloatField(null=True, blank=True)
+    prp_ch4_w_t2 = FloatField(null=True, blank=True)
+    prp_ch4_wo_t2 = FloatField(null=True, blank=True)
 
-    n2o_start_t2 = FloatField(null=True, blank=True)
-    n2o_w_t2 = FloatField(null=True, blank=True)
-    n2o_wo_t2 = FloatField(null=True, blank=True)
+    prp_n2o_start_t2 = FloatField(null=True, blank=True)
+    prp_n2o_w_t2 = FloatField(null=True, blank=True)
+    prp_n2o_wo_t2 = FloatField(null=True, blank=True)
 
-    manure_management_type_t2 = ForeignKey(
-        ManureManagementType, on_delete=CASCADE, null=True, blank=True
+    manure_management_type_t2_start = ForeignKey(
+        ManureManagementType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(class)s_manure_management_type_t2_start",
     )
-    emission_factor_ch4_t2 = FloatField(null=True, blank=True)
-    emission_factor_n20_t2 = FloatField(null=True, blank=True)
+    emission_factor_ch4_t2_start = FloatField(null=True, blank=True)
+    emission_factor_n2o_t2_start = FloatField(null=True, blank=True)
+
+    manure_management_type_t2_w = ForeignKey(
+        ManureManagementType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(class)s_manure_management_type_t2_w",
+    )
+    emission_factor_ch4_t2_w = FloatField(null=True, blank=True)
+    emission_factor_n2o_t2_w = FloatField(null=True, blank=True)
+
+    manure_management_type_t2_wo = ForeignKey(
+        ManureManagementType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(class)s_manure_management_type_t2_wo",
+    )
+    emission_factor_ch4_t2_wo = FloatField(null=True, blank=True)
+    emission_factor_n2o_t2_wo = FloatField(null=True, blank=True)
 
     implementation_year_start = IntegerField(null=True, blank=True)
 
