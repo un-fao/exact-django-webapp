@@ -145,8 +145,8 @@ class Livestock():
         def calculate_nitrous_manure_management_direct():
             
             try:
-                n2o_head_start = ch4_head_calculation_general(self.tam_start, self.ner_start, self.ef_prp_nitrous_direct_start, self.percentage_prp_default_start, self.percentage_prp_tier_2_start, self.ef_system_nitrous_direct_start, self.n2o_prp_tier_2_start_direct, self.percentage_system_default_start, self.n2o_system_direct_default_start, self.n2o_system_direct_tier_2_start, 1000)
-                n2o_head_end = ch4_head_calculation_general(self.tam_end, self.ner_end, self.ef_prp_nitrous_direct_end, self.percentage_prp_default_end, self.percentage_prp_tier_2_end, self.ef_system_nitrous_direct_end, self.n2o_prp_tier_2_end_direct, self.percentage_system_default_end, self.n2o_system_direct_default_end, self.n2o_system_direct_tier_2_end, 1000)
+                n2o_head_start = ch4_head_calculation_general(self.tam_start, self.ner_start, self.ef_prp_nitrous_direct_start, self.percentage_prp_default_start, self.percentage_prp_tier_2_start, self.ef_system_nitrous_direct_start, self.n2o_prp_tier_2_start_direct, self.percentage_system_default_start, self.n2o_system_direct_default_start, self.n2o_system_direct_tier_2_start)
+                n2o_head_end = ch4_head_calculation_general(self.tam_end, self.ner_end, self.ef_prp_nitrous_direct_end, self.percentage_prp_default_end, self.percentage_prp_tier_2_end, self.ef_system_nitrous_direct_end, self.n2o_prp_tier_2_end_direct, self.percentage_system_default_end, self.n2o_system_direct_default_end, self.n2o_system_direct_tier_2_end)
 
                 annual_start = n2o_head_start * self.head_number_start / 1000 * 44/28 * self.nitrous_constant
                 annual_end = n2o_head_end * self.head_number_end / 1000 * 44/28 * self.nitrous_constant
