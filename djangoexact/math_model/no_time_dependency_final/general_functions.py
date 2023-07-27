@@ -94,8 +94,8 @@ def ch4_head_calculation_general(tam: float, vser: float, ef_prp: float, percent
         
         try:
             if not ch4_system_tier_2:
-                
-                ef_system = [ef_system_default] if not ef_single_system else [ef_single_system]
+
+                ef_system = ef_system_default if not ef_single_system else [ef_single_system]
                 
                 if not percentage_prp_tier_2:
                     ch4_system = [i * (tam/1000) * (vser/1000) * 365 * j/100 for (i,j) in zip(ef_system, percentage_system_default)]
