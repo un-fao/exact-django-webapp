@@ -107,7 +107,7 @@ def ch4_head_calculation_general(tam: float, vser: float, ef_prp: float, percent
                 ch4_system = [ch4_system_tier_2]
 
             percentage_prp = percentage_prp_default if not percentage_prp_tier_2 else percentage_prp_tier_2
-            ch4_prp = ef_prp * (tam/1000) * (vser/1000) * 365 * percentage_prp/100 if not ch4_prp_tier_2 else ch4_prp_tier_2 * percentage_prp/100
+            ch4_prp = ef_prp * (tam/1000) * vser / ch4_dividing_parameter * 365 * percentage_prp/100 if not ch4_prp_tier_2 else ch4_prp_tier_2 * percentage_prp/100
 
             ch4_head = sum(ch4_system) + ch4_prp
             
