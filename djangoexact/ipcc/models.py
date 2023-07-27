@@ -860,3 +860,11 @@ class MethaneEntericFermentationFactor(Model):
 
     def __str__(self):
         return f"({self.pk}) {self.ipcc_region.name} {self.livestock_production_type.name} {self.livestock_category_type.name} {self.value}"
+
+
+class ManureManagementVolatilizationMultiplier(Model):
+    moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
+    value = FloatField()
+
+    def __str__(self):
+        return f"({self.pk}) {self.moisture.name} {self.value}"
