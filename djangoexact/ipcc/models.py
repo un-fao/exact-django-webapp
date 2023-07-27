@@ -730,7 +730,7 @@ class EmissionType(Model):
     name = CharField(max_length=255)
 
     def __str__(self):
-        return self.name
+        return f"({self.id}) {self.name}"
 
 
 class LivestockManureEF(Model):
@@ -844,3 +844,19 @@ class LivestockNER(Model):
     )
     livestock_category_type = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
     value = FloatField()
+
+
+class MethaneEntericFermentationFactor(Model):
+    """
+    IPCC:2262:2301
+    """
+
+    ipcc_region = ForeignKey("api.IPCCRegion", on_delete=CASCADE)
+    livestock_production_type = ForeignKey(
+        "api.LivestockProductionType", on_delete=CASCADE
+    )
+    livestock_category_type = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
+    value = FloatField()
+
+    def __str__(self):
+        return f"({self.pk}) {self.ipcc_region.name} {self.livestock_production_type.name} {self.livestock_category_type.name} {self.value}"
