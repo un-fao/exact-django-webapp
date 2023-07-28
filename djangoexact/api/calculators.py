@@ -1566,12 +1566,6 @@ class LivestockCalculator(BaseCalculator):
         project: Project = self.data.activity.project
         input: Livestock = self.data
 
-        input_data_start = (
-            input.livestock_category_type_start,
-            input.livestock_production_type_start,
-            project.country.ipcc_region,
-        )
-
         # TODO: implement calculations
 
         tam_ch4_start = LivestockTAM.objects.get(
@@ -1610,7 +1604,7 @@ class LivestockCalculator(BaseCalculator):
             ipcc_region=input.activity.project.country.ipcc_region,
         )
 
-        ef_prp_start = LivestockManureEF.objects.get(
+        ef_ch4_prp_start = LivestockManureEF.objects.get(
             emission_type__name="CH4",
             livestock_category_type=input.livestock_category_type_start,
             livestock_production_type=input.livestock_production_type_start,
@@ -1619,7 +1613,7 @@ class LivestockCalculator(BaseCalculator):
             manure_management_type__name="Pasture/Range/Paddock",
         )
 
-        ef_prp_w = LivestockManureEF.objects.get(
+        ef_ch4_prp_w = LivestockManureEF.objects.get(
             emission_type__name="CH4",
             livestock_category_type=input.livestock_category_type_w,
             livestock_production_type=input.livestock_production_type_w,
@@ -1628,7 +1622,7 @@ class LivestockCalculator(BaseCalculator):
             manure_management_type__name="Pasture/Range/Paddock",
         )
 
-        ef_prp_wo = LivestockManureEF.objects.get(
+        ef_ch4_prp_wo = LivestockManureEF.objects.get(
             emission_type__name="CH4",
             livestock_category_type=input.livestock_category_type_wo,
             livestock_production_type=input.livestock_production_type_wo,
@@ -1637,7 +1631,7 @@ class LivestockCalculator(BaseCalculator):
             manure_management_type__name="Pasture/Range/Paddock",
         )
 
-        ef_systems = (
+        ef_ch4_systems_start = (
             LivestockManureEF.objects.filter(
                 emission_type__name="CH4",
                 livestock_category_type=input.livestock_category_type_start,
@@ -1649,16 +1643,56 @@ class LivestockCalculator(BaseCalculator):
             .order_by("manure_management_type__name")
         )
 
-        ef_system_values = [system.value for system in ef_systems]
+        ef_ch4_systems_w = (
+            LivestockManureEF.objects.filter(
+                emission_type__name="CH4",
+                livestock_category_type=input.livestock_category_type_w,
+                livestock_production_type=input.livestock_production_type_w,
+                climate=project.climate,
+                moisture=project.moisture,
+            )
+            .exclude(manure_management_type__name="Pasture/Range/Paddock")
+            .order_by("manure_management_type__name")
+        )
 
-        animal_waste_prp = LivestockAnimalWasteManagementSystem.objects.get(
+        ef_ch4_systems_wo = (
+            LivestockManureEF.objects.filter(
+                emission_type__name="CH4",
+                livestock_category_type=input.livestock_category_type_wo,
+                livestock_production_type=input.livestock_production_type_wo,
+                climate=project.climate,
+                moisture=project.moisture,
+            )
+            .exclude(manure_management_type__name="Pasture/Range/Paddock")
+            .order_by("manure_management_type__name")
+        )
+
+        ef_ch4_system_values_start = [system.value for system in ef_ch4_systems_start]
+        ef_ch4_system_values_w = [system.value for system in ef_ch4_systems_w]
+        ef_ch4_system_values_wo = [system.value for system in ef_ch4_systems_wo]
+
+        animal_waste_prp_start = LivestockAnimalWasteManagementSystem.objects.get(
             livestock_category_type=input.livestock_category_type_start,
             livestock_production_type=input.livestock_production_type_start,
             ipcc_region=input.activity.project.country.ipcc_region,
             manure_management_type__name="Pasture/Range/Paddock",
         )
 
-        animal_waste_management_systems = (
+        animal_waste_prp_w = LivestockAnimalWasteManagementSystem.objects.get(
+            livestock_category_type=input.livestock_category_type_w,
+            livestock_production_type=input.livestock_production_type_w,
+            ipcc_region=input.activity.project.country.ipcc_region,
+            manure_management_type__name="Pasture/Range/Paddock",
+        )
+
+        animal_waste_prp_wo = LivestockAnimalWasteManagementSystem.objects.get(
+            livestock_category_type=input.livestock_category_type_wo,
+            livestock_production_type=input.livestock_production_type_wo,
+            ipcc_region=input.activity.project.country.ipcc_region,
+            manure_management_type__name="Pasture/Range/Paddock",
+        )
+
+        animal_waste_management_systems_start = (
             LivestockAnimalWasteManagementSystem.objects.filter(
                 livestock_category_type=input.livestock_category_type_start,
                 livestock_production_type=input.livestock_production_type_start,
@@ -1668,37 +1702,595 @@ class LivestockCalculator(BaseCalculator):
             .order_by("manure_management_type__name")
         )
 
+        animal_waste_management_systems_w = (
+            LivestockAnimalWasteManagementSystem.objects.filter(
+                livestock_category_type=input.livestock_category_type_w,
+                livestock_production_type=input.livestock_production_type_w,
+                ipcc_region=input.activity.project.country.ipcc_region,
+            )
+            .exclude(manure_management_type__name="Pasture/Range/Paddock")
+            .order_by("manure_management_type__name")
+        )
+
+        animal_waste_management_systems_wo = (
+            LivestockAnimalWasteManagementSystem.objects.filter(
+                livestock_category_type=input.livestock_category_type_wo,
+                livestock_production_type=input.livestock_production_type_wo,
+                ipcc_region=input.activity.project.country.ipcc_region,
+            )
+            .exclude(manure_management_type__name="Pasture/Range/Paddock")
+            .order_by("manure_management_type__name")
+        )
+
         # list comprehension to get the animal waste management systems values
-        animal_waste_management_systems_values = [
-            system.value for system in animal_waste_management_systems
+        animal_waste_management_systems_values_start = [
+            system.value for system in animal_waste_management_systems_start
+        ]
+        animal_waste_management_systems_values_w = [
+            system.value for system in animal_waste_management_systems_w
+        ]
+        animal_waste_management_systems_values_wo = [
+            system.value for system in animal_waste_management_systems_wo
         ]
 
-        inputs = [
-            tam_ch4_start.value,
-            vser_ch4_start.value,
-            ef_prp_start.value,
-            animal_waste_prp.value,
-            input.pasture_percentage_start_t2,
-            input.pasture_percentage_w_t2,
-            input.pasture_percentage_wo_t2,
-            ef_system_values,
-            input.emission_factor_ch4_t2,
-            input.emission_factor_start_t2,
-            input.emission_factor_w_t2,
-            input.emission_factor_wo_t2,
-            input.heads_number_start,
-            input.heads_number_w,
-            input.heads_number_wo,
-            project.gw_potential.ch4,
-            input.heads_number_w_rate.value,
-            input.heads_number_wo_rate.value,
+        # inputs = [
+        #     tam_ch4_start.value,
+        #     vser_ch4_start.value,
+        #     ef_ch4_prp_start.value,
+        #     animal_waste_prp_start.value,
+        #     input.prp_percentage_start_t2,
+        #     input.pasture_percentage_w_t2,
+        #     input.pasture_percentage_wo_t2,
+        #     ef_system_values_start,
+        #     input.emission_factor_ch4_t2_start,
+        #     input.prp_ch4_start_t2,
+        #     input.emission_factor_w_t2,
+        #     input.emission_factor_wo_t2,
+        #     input.heads_number_start,
+        #     input.heads_number_w,
+        #     input.heads_number_wo,
+        #     project.gw_potential.ch4,
+        #     input.heads_number_w_rate.value,
+        #     input.heads_number_wo_rate.value,
+        #     project.implementation_duration_yrs,
+        #     project.capitalization_duration_yrs,
+        #     animal_waste_management_systems_values_start,
+        # ]
+
+        ch4_enteric_start = MethaneEntericFermentationFactor.objects.get(
+            livestock_category_type=input.livestock_category_type_start,
+            livestock_production_type=input.livestock_production_type_start,
+            ipcc_region=input.activity.project.country.ipcc_region,
+        )
+
+        ch4_enteric_w = MethaneEntericFermentationFactor.objects.get(
+            livestock_category_type=input.livestock_category_type_w,
+            livestock_production_type=input.livestock_production_type_w,
+            ipcc_region=input.activity.project.country.ipcc_region,
+        )
+
+        ch4_enteric_wo = MethaneEntericFermentationFactor.objects.get(
+            livestock_category_type=input.livestock_category_type_wo,
+            livestock_production_type=input.livestock_production_type_wo,
+            ipcc_region=input.activity.project.country.ipcc_region,
+        )
+
+        prp_n2o_direct_ef_start = LivestockManureEF.objects.get(
+            emission_type__name="N2O",
+            livestock_category_type=input.livestock_category_type_start,
+            livestock_production_type=input.livestock_production_type_start,
+            climate=project.climate,
+            moisture=project.moisture,
+            manure_management_type__name="Pasture/Range/Paddock",
+        )
+
+        prp_n2o_direct_ef_w = LivestockManureEF.objects.get(
+            emission_type__name="N2O",
+            livestock_category_type=input.livestock_category_type_w,
+            livestock_production_type=input.livestock_production_type_w,
+            climate=project.climate,
+            moisture=project.moisture,
+            manure_management_type__name="Pasture/Range/Paddock",
+        )
+
+        prp_n2o_direct_ef_wo = LivestockManureEF.objects.get(
+            emission_type__name="N2O",
+            livestock_category_type=input.livestock_category_type_wo,
+            livestock_production_type=input.livestock_production_type_wo,
+            climate=project.climate,
+            moisture=project.moisture,
+            manure_management_type__name="Pasture/Range/Paddock",
+        )
+
+        prp_n2o_volatilization_ef_start = LivestockManureEF.objects.get(
+            emission_type__name="N2O Volatilization",
+            livestock_category_type=input.livestock_category_type_start,
+            livestock_production_type=input.livestock_production_type_start,
+            climate=project.climate,
+            moisture=project.moisture,
+            manure_management_type__name="Pasture/Range/Paddock",
+        )
+
+        prp_n2o_volatilization_ef_w = LivestockManureEF.objects.get(
+            emission_type__name="N2O Volatilization",
+            livestock_category_type=input.livestock_category_type_w,
+            livestock_production_type=input.livestock_production_type_w,
+            climate=project.climate,
+            moisture=project.moisture,
+            manure_management_type__name="Pasture/Range/Paddock",
+        )
+
+        prp_n2o_volatilization_ef_wo = LivestockManureEF.objects.get(
+            emission_type__name="N2O Volatilization",
+            livestock_category_type=input.livestock_category_type_wo,
+            livestock_production_type=input.livestock_production_type_wo,
+            climate=project.climate,
+            moisture=project.moisture,
+            manure_management_type__name="Pasture/Range/Paddock",
+        )
+
+        prp_n2o_leaching_ef_start = LivestockManureEF.objects.get(
+            emission_type__name="N2O Leaching",
+            livestock_category_type=input.livestock_category_type_wo,
+            livestock_production_type=input.livestock_production_type_wo,
+            climate=project.climate,
+            moisture=project.moisture,
+            manure_management_type__name="Pasture/Range/Paddock",
+        )
+
+        prp_n2o_leaching_ef_w = LivestockManureEF.objects.get(
+            emission_type__name="N2O Leaching",
+            livestock_category_type=input.livestock_category_type_wo,
+            livestock_production_type=input.livestock_production_type_wo,
+            climate=project.climate,
+            moisture=project.moisture,
+            manure_management_type__name="Pasture/Range/Paddock",
+        )
+
+        prp_n2o_leaching_ef_wo = LivestockManureEF.objects.get(
+            emission_type__name="N2O Leaching",
+            livestock_category_type=input.livestock_category_type_wo,
+            livestock_production_type=input.livestock_production_type_wo,
+            climate=project.climate,
+            moisture=project.moisture,
+            manure_management_type__name="Pasture/Range/Paddock",
+        )
+
+        ef_n2o_direct_systems_start = (
+            LivestockManureEF.objects.filter(
+                emission_type__name="N2O",
+                livestock_category_type=input.livestock_category_type_start,
+                livestock_production_type=input.livestock_production_type_start,
+                climate=project.climate,
+                moisture=project.moisture,
+            )
+            .exclude(manure_management_type__name="Pasture/Range/Paddock")
+            .order_by("manure_management_type__name")
+        )
+
+        ef_n2o_direct_systems_w = (
+            LivestockManureEF.objects.filter(
+                emission_type__name="N2O",
+                livestock_category_type=input.livestock_category_type_w,
+                livestock_production_type=input.livestock_production_type_w,
+                climate=project.climate,
+                moisture=project.moisture,
+            )
+            .exclude(manure_management_type__name="Pasture/Range/Paddock")
+            .order_by("manure_management_type__name")
+        )
+
+        ef_n2o_direct_systems_wo = (
+            LivestockManureEF.objects.filter(
+                emission_type__name="N2O",
+                livestock_category_type=input.livestock_category_type_wo,
+                livestock_production_type=input.livestock_production_type_wo,
+                climate=project.climate,
+                moisture=project.moisture,
+            )
+            .exclude(manure_management_type__name="Pasture/Range/Paddock")
+            .order_by("manure_management_type__name")
+        )
+
+        ef_n2o_direct_systems_start = [s.value for s in ef_n2o_direct_systems_start]
+        ef_n2o_direct_systems_w = [s.value for s in ef_n2o_direct_systems_w]
+        ef_n2o_direct_systems_wo = [s.value for s in ef_n2o_direct_systems_wo]
+
+        ef_n2o_volatilization_systems_start = (
+            LivestockManureEF.objects.filter(
+                emission_type__name="N2O Volatilization",
+                livestock_category_type=input.livestock_category_type_start,
+                livestock_production_type=input.livestock_production_type_start,
+                climate=project.climate,
+                moisture=project.moisture,
+            )
+            .exclude(manure_management_type__name="Pasture/Range/Paddock")
+            .order_by("manure_management_type__name")
+        )
+
+        ef_n2o_volatilization_systems_w = (
+            LivestockManureEF.objects.filter(
+                emission_type__name="N2O Volatilization",
+                livestock_category_type=input.livestock_category_type_w,
+                livestock_production_type=input.livestock_production_type_w,
+                climate=project.climate,
+                moisture=project.moisture,
+            )
+            .exclude(manure_management_type__name="Pasture/Range/Paddock")
+            .order_by("manure_management_type__name")
+        )
+
+        ef_n2o_volatilization_systems_wo = (
+            LivestockManureEF.objects.filter(
+                emission_type__name="N2O Volatilization",
+                livestock_category_type=input.livestock_category_type_wo,
+                livestock_production_type=input.livestock_production_type_wo,
+                climate=project.climate,
+                moisture=project.moisture,
+            )
+            .exclude(manure_management_type__name="Pasture/Range/Paddock")
+            .order_by("manure_management_type__name")
+        )
+
+        ef_n2o_volatilization_systems_start = [
+            s.value for s in ef_n2o_volatilization_systems_start
+        ]
+        ef_n2o_volatilization_systems_w = [
+            s.value for s in ef_n2o_volatilization_systems_w
+        ]
+        ef_n2o_volatilization_systems_wo = [
+            s.value for s in ef_n2o_volatilization_systems_wo
+        ]
+
+        ef_n2o_leaching_systems_start = (
+            LivestockManureEF.objects.filter(
+                emission_type__name="N2O Leaching",
+                livestock_category_type=input.livestock_category_type_start,
+                livestock_production_type=input.livestock_production_type_start,
+                climate=project.climate,
+                moisture=project.moisture,
+            )
+            .exclude(manure_management_type__name="Pasture/Range/Paddock")
+            .order_by("manure_management_type__name")
+        )
+
+        ef_n2o_leaching_systems_w = (
+            LivestockManureEF.objects.filter(
+                emission_type__name="N2O Leaching",
+                livestock_category_type=input.livestock_category_type_w,
+                livestock_production_type=input.livestock_production_type_w,
+                climate=project.climate,
+                moisture=project.moisture,
+            )
+            .exclude(manure_management_type__name="Pasture/Range/Paddock")
+            .order_by("manure_management_type__name")
+        )
+
+        ef_n2o_leaching_systems_wo = (
+            LivestockManureEF.objects.filter(
+                emission_type__name="N2O Leaching",
+                livestock_category_type=input.livestock_category_type_wo,
+                livestock_production_type=input.livestock_production_type_wo,
+                climate=project.climate,
+                moisture=project.moisture,
+            )
+            .exclude(manure_management_type__name="Pasture/Range/Paddock")
+            .order_by("manure_management_type__name")
+        )
+
+        ef_n2o_leaching_systems_start = [s.value for s in ef_n2o_leaching_systems_start]
+        ef_n2o_leaching_systems_w = [s.value for s in ef_n2o_leaching_systems_w]
+        ef_n2o_leaching_systems_wo = [s.value for s in ef_n2o_leaching_systems_wo]
+
+        ner_start = LivestockNER.objects.get(
+            livestock_category_type=input.livestock_category_type_start,
+            livestock_production_type=input.livestock_production_type_start,
+            ipcc_region=project.country.ipcc_region,
+        )
+
+        ner_w = LivestockNER.objects.get(
+            livestock_category_type=input.livestock_category_type_w,
+            livestock_production_type=input.livestock_production_type_w,
+            ipcc_region=project.country.ipcc_region,
+        )
+
+        ner_wo = LivestockNER.objects.get(
+            livestock_category_type=input.livestock_category_type_wo,
+            livestock_production_type=input.livestock_production_type_wo,
+            ipcc_region=project.country.ipcc_region,
+        )
+
+        n2o_ef_t2_start = None
+        n2o_volatilization_ef_t2_start = None
+        n2o_leaching_ef_t2_start = None
+        ch4_ef_t2_start = None
+        if input.manure_management_type_t2_start is not None:
+            n2o_ef_t2_start = LivestockManureEF.objects.get(
+                emission_type__name="N2O",
+                livestock_category_type=input.livestock_category_type_start,
+                livestock_production_type=input.livestock_production_type_start,
+                climate=project.climate,
+                moisture=project.moisture,
+                manure_management_type=input.manure_management_type_t2_start,
+            )
+            if n2o_ef_t2_start:
+                n2o_ef_t2_start = n2o_ef_t2_start.value
+
+            n2o_volatilization_ef_t2_start = LivestockManureEF.objects.get(
+                emission_type__name="N2O Volatilization",
+                livestock_category_type=input.livestock_category_type_start,
+                livestock_production_type=input.livestock_production_type_start,
+                climate=project.climate,
+                moisture=project.moisture,
+                manure_management_type=input.manure_management_type_t2_start,
+            )
+            if n2o_volatilization_ef_t2_start:
+                n2o_volatilization_ef_t2_start = n2o_volatilization_ef_t2_start.value
+
+            n2o_leaching_ef_t2_start = LivestockManureEF.objects.get(
+                emission_type__name="N2O Leaching",
+                livestock_category_type=input.livestock_category_type_start,
+                livestock_production_type=input.livestock_production_type_start,
+                climate=project.climate,
+                moisture=project.moisture,
+                manure_management_type=input.manure_management_type_t2_start,
+            )
+            if n2o_leaching_ef_t2_start:
+                n2o_leaching_ef_t2_start = n2o_leaching_ef_t2_start.value
+
+            ch4_ef_t2_start = LivestockManureEF.objects.get(
+                emission_type__name="CH4",
+                livestock_category_type=input.livestock_category_type_start,
+                livestock_production_type=input.livestock_production_type_start,
+                climate=project.climate,
+                moisture=project.moisture,
+                manure_management_type=input.manure_management_type_t2_start,
+            )
+            if ch4_ef_t2_start:
+                ch4_ef_t2_start = ch4_ef_t2_start.value
+
+        n2o_ef_t2_w = None
+        n2o_volatilization_ef_t2_w = None
+        n2o_leaching_ef_t2_w = None
+        ch4_ef_t2_w = None
+        if input.manure_management_type_t2_w is not None:
+            n2o_ef_t2_w = LivestockManureEF.objects.get(
+                emission_type__name="N2O",
+                livestock_category_type=input.livestock_category_type_w,
+                livestock_production_type=input.livestock_production_type_w,
+                climate=project.climate,
+                moisture=project.moisture,
+                manure_management_type=input.manure_management_type_t2_w,
+            )
+            if n2o_ef_t2_w:
+                n2o_ef_t2_w = n2o_ef_t2_w.value
+
+            n2o_volatilization_ef_t2_w = LivestockManureEF.objects.get(
+                emission_type__name="N2O Volatilization",
+                livestock_category_type=input.livestock_category_type_w,
+                livestock_production_type=input.livestock_production_type_w,
+                climate=project.climate,
+                moisture=project.moisture,
+                manure_management_type=input.manure_management_type_t2_w,
+            )
+            if n2o_volatilization_ef_t2_w:
+                n2o_volatilization_ef_t2_w = n2o_volatilization_ef_t2_w.value
+
+            n2o_leaching_ef_t2_w = LivestockManureEF.objects.get(
+                emission_type__name="N2O Leaching",
+                livestock_category_type=input.livestock_category_type_w,
+                livestock_production_type=input.livestock_production_type_w,
+                climate=project.climate,
+                moisture=project.moisture,
+                manure_management_type=input.manure_management_type_t2_w,
+            )
+            if n2o_leaching_ef_t2_w:
+                n2o_leaching_ef_t2_w = n2o_leaching_ef_t2_w.value
+
+            ch4_ef_t2_w = LivestockManureEF.objects.get(
+                emission_type__name="CH4",
+                livestock_category_type=input.livestock_category_type_w,
+                livestock_production_type=input.livestock_production_type_w,
+                climate=project.climate,
+                moisture=project.moisture,
+                manure_management_type=input.manure_management_type_t2_w,
+            )
+            if ch4_ef_t2_w:
+                ch4_ef_t2_w = ch4_ef_t2_w.value
+
+        n2o_ef_t2_wo = None
+        n2o_volatilization_ef_t2_wo = None
+        n2o_leaching_ef_t2_wo = None
+        ch4_ef_t2_wo = None
+        if input.manure_management_type_t2_wo is not None:
+            n2o_ef_t2_wo = LivestockManureEF.objects.get(
+                emission_type__name="N2O",
+                livestock_category_type=input.livestock_category_type_wo,
+                livestock_production_type=input.livestock_production_type_wo,
+                climate=project.climate,
+                moisture=project.moisture,
+                manure_management_type=input.manure_management_type_t2_wo,
+            )
+            if n2o_ef_t2_wo:
+                n2o_ef_t2_wo = n2o_ef_t2_wo.value
+
+            n2o_volatilization_ef_t2_wo = LivestockManureEF.objects.get(
+                emission_type__name="N2O Volatilization",
+                livestock_category_type=input.livestock_category_type_wo,
+                livestock_production_type=input.livestock_production_type_wo,
+                climate=project.climate,
+                moisture=project.moisture,
+                manure_management_type=input.manure_management_type_t2_wo,
+            )
+            if n2o_volatilization_ef_t2_wo:
+                n2o_volatilization_ef_t2_wo = n2o_volatilization_ef_t2_wo.value
+
+            n2o_leaching_ef_t2_wo = LivestockManureEF.objects.get(
+                emission_type__name="N2O Leaching",
+                livestock_category_type=input.livestock_category_type_wo,
+                livestock_production_type=input.livestock_production_type_wo,
+                climate=project.climate,
+                moisture=project.moisture,
+                manure_management_type=input.manure_management_type_t2_wo,
+            )
+            if n2o_leaching_ef_t2_wo:
+                n2o_leaching_ef_t2_wo = n2o_leaching_ef_t2_wo.value
+
+            ch4_ef_t2_wo = LivestockManureEF.objects.get(
+                emission_type__name="CH4",
+                livestock_category_type=input.livestock_category_type_wo,
+                livestock_production_type=input.livestock_production_type_wo,
+                climate=project.climate,
+                moisture=project.moisture,
+                manure_management_type=input.manure_management_type_t2_wo,
+            )
+            if ch4_ef_t2_wo:
+                ch4_ef_t2_wo = ch4_ef_t2_wo.value
+
+        LEACHING_MULTI = 0.011  # TODO: Put in db (livestock parameters or something)
+
+        volatilization_multi = ManureManagementVolatilizationMultiplier.objects.get(
+            moisture=project.moisture,
+        )
+
+        i_w = [
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
-            animal_waste_management_systems_values,
+            input.activity.change_rate_start.name,
+            project.gw_potential.ch4,
+            input.heads_number_start,
+            input.heads_number_w,
+            ch4_enteric_start.value,
+            ch4_enteric_w.value,
+            input.enteric_fermentation_start_t2,
+            input.enteric_fermentation_w_t2,
+            ef_ch4_prp_start.value,
+            ef_ch4_prp_w.value,
+            animal_waste_prp_start.value,
+            animal_waste_prp_w.value,
+            input.prp_percentage_start_t2,
+            input.prp_percentage_w_t2,
+            ef_ch4_system_values_start,
+            ef_ch4_system_values_w,
+            input.prp_ch4_start_t2,
+            input.prp_ch4_w_t2,
+            ch4_ef_t2_start,  ###
+            ch4_ef_t2_w,
+            input.emission_factor_ch4_t2_start,
+            input.emission_factor_ch4_t2_w,
+            animal_waste_management_systems_values_start,
+            animal_waste_management_systems_values_w,
+            tam_ch4_start.value,
+            tam_ch4_w.value,
+            vser_ch4_start.value,
+            vser_ch4_w.value,
+            prp_n2o_direct_ef_start.value,
+            prp_n2o_direct_ef_w.value,
+            ef_n2o_direct_systems_start,
+            ef_n2o_direct_systems_w,
+            input.prp_n2o_start_t2,
+            input.prp_n2o_w_t2,
+            n2o_ef_t2_start,  ###
+            n2o_ef_t2_w,
+            input.emission_factor_n2o_t2_start,
+            input.emission_factor_n2o_t2_w,
+            ner_start.value,
+            ner_w.value,
+            prp_n2o_volatilization_ef_start.value,
+            prp_n2o_volatilization_ef_w.value,
+            ef_n2o_volatilization_systems_start,
+            ef_n2o_volatilization_systems_w,
+            input.prp_n2o_start_t2,  # TODO: Maybe add specific t2 for volatilization
+            input.prp_n2o_w_t2,
+            n2o_volatilization_ef_t2_start,  ###
+            n2o_volatilization_ef_t2_w,
+            input.emission_factor_n2o_t2_start,
+            input.emission_factor_n2o_t2_w,
+            prp_n2o_leaching_ef_start.value,
+            prp_n2o_leaching_ef_w.value,
+            ef_n2o_leaching_systems_start,
+            ef_n2o_leaching_systems_w,
+            input.prp_n2o_start_t2,  # TODO: Maybe add specific t2 for leaching
+            input.prp_n2o_w_t2,
+            n2o_leaching_ef_t2_start,  ###
+            n2o_leaching_ef_t2_w,
+            input.emission_factor_n2o_t2_start,
+            input.emission_factor_n2o_t2_w,
+            project.gw_potential.n2o,
+            volatilization_multi.value,
+            LEACHING_MULTI,
         ]
 
-        start = MathLivestock()
+        results_w = MathLivestock(*i_w).calculate_emissions()
 
-        results = []
+        i_wo = [
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            input.activity.change_rate_start.name,
+            project.gw_potential.ch4,
+            input.heads_number_start,
+            input.heads_number_wo,
+            ch4_enteric_start.value,
+            ch4_enteric_wo.value,
+            input.enteric_fermentation_start_t2,
+            input.enteric_fermentation_wo_t2,
+            ef_ch4_prp_start.value,
+            ef_ch4_prp_wo.value,
+            animal_waste_prp_start.value,
+            animal_waste_prp_wo.value,
+            input.prp_percentage_start_t2,
+            input.prp_percentage_wo_t2,
+            ef_ch4_system_values_start,
+            ef_ch4_system_values_wo,
+            input.prp_ch4_start_t2,
+            input.prp_ch4_wo_t2,
+            ch4_ef_t2_start,  ###
+            ch4_ef_t2_wo,
+            input.emission_factor_ch4_t2_start,
+            input.emission_factor_ch4_t2_wo,
+            animal_waste_management_systems_values_start,
+            animal_waste_management_systems_values_wo,
+            tam_ch4_start.value,
+            tam_ch4_wo.value,
+            vser_ch4_start.value,
+            vser_ch4_wo.value,
+            prp_n2o_direct_ef_start.value,
+            prp_n2o_direct_ef_wo.value,
+            ef_n2o_direct_systems_start,
+            ef_n2o_direct_systems_wo,
+            input.prp_n2o_start_t2,
+            input.prp_n2o_wo_t2,
+            n2o_ef_t2_start,  ###
+            n2o_ef_t2_wo,
+            input.emission_factor_n2o_t2_start,
+            input.emission_factor_n2o_t2_wo,
+            ner_start.value,
+            ner_wo.value,
+            prp_n2o_volatilization_ef_start.value,
+            prp_n2o_volatilization_ef_wo.value,
+            ef_n2o_volatilization_systems_start,
+            ef_n2o_volatilization_systems_wo,
+            input.prp_n2o_start_t2,  # TODO: Maybe add specific t2 for volatilization
+            input.prp_n2o_wo_t2,
+            n2o_volatilization_ef_t2_start,  ###
+            n2o_volatilization_ef_t2_wo,
+            input.emission_factor_n2o_t2_start,
+            input.emission_factor_n2o_t2_wo,
+            prp_n2o_leaching_ef_start.value,
+            prp_n2o_leaching_ef_wo.value,
+            ef_n2o_leaching_systems_start,
+            ef_n2o_leaching_systems_wo,
+            input.prp_n2o_start_t2,  # TODO: Maybe add specific t2 for leaching
+            input.prp_n2o_wo_t2,
+            n2o_leaching_ef_t2_start,  ###
+            n2o_leaching_ef_t2_wo,
+            input.emission_factor_n2o_t2_start,
+            input.emission_factor_n2o_t2_wo,
+            project.gw_potential.n2o,
+            volatilization_multi.value,
+            LEACHING_MULTI,
+        ]
 
-        print(results)
+        results_wo = MathLivestock(*i_wo).calculate_emissions()
+
+        return [Result(results_w, results_wo, results_w - results_wo)]
