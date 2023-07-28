@@ -16,7 +16,17 @@ tillage_management_types = [tillage for tillage in TillageManagementType.objects
 organic_input_types = [organic for organic in OrganicInputType.objects.all()]
 residue_management_types = [residue for residue in ResidueManagementType.objects.all()]
 
+livestock_category_types = [
+    c
+    for c in LivestockCategoryType.objects.all().exclude(
+        Q(name="Sheep") | Q(name="Swine")
+    )
+]
+livestock_production_types = [c for c in LivestockProductionType.objects.all()]
+
 def_rate = ChangeRate.objects.get(name="D")
+sm_gear_type = random.choice(sma_gear_types)
+lge_gear_type = random.choice(lge_gear_types)
 
 
 class UserFactory(DjangoModelFactory):
@@ -46,9 +56,9 @@ class ActivityFactory(DjangoModelFactory):
     name = factory.fuzzy.FuzzyText()
     user = factory
 
-
-sm_gear_type = random.choice(sma_gear_types)
-lge_gear_type = random.choice(lge_gear_types)
+    change_rate_start = def_rate
+    change_rate_w = def_rate
+    change_rate_wo = def_rate
 
 
 class FisheryFactory(DjangoModelFactory):
@@ -151,3 +161,28 @@ class PerennialCroppingFactory(DjangoModelFactory):
     crop_yield_start = factory.fuzzy.FuzzyInteger(0, 100)
     crop_yield_w = factory.fuzzy.FuzzyInteger(0, 100)
     crop_yield_wo = factory.fuzzy.FuzzyInteger(0, 100)
+
+
+class LivestockFactory(DjangoModelFactory):
+    class Meta:
+        model = Livestock
+
+    livestock_category_type_start = factory.fuzzy.FuzzyChoice(livestock_category_types)
+    livestock_category_type_w = factory.fuzzy.FuzzyChoice(livestock_category_types)
+    livestock_category_type_wo = factory.fuzzy.FuzzyChoice(livestock_category_types)
+
+    livestock_production_type_start = factory.fuzzy.FuzzyChoice(
+        livestock_production_types
+    )
+    livestock_production_type_w = factory.fuzzy.FuzzyChoice(livestock_production_types)
+    livestock_production_type_wo = factory.fuzzy.FuzzyChoice(livestock_production_types)
+
+    production_start = factory.fuzzy.FuzzyInteger(0, 100)
+    production_w = factory.fuzzy.FuzzyInteger(0, 100)
+    production_wo = factory.fuzzy.FuzzyInteger(0, 100)
+
+    heads_number_start = factory.fuzzy.FuzzyInteger(0, 1000)
+    heads_number_w = factory.fuzzy.FuzzyInteger(0, 1000)
+    heads_number_w_rate = def_rate
+    heads_number_wo = factory.fuzzy.FuzzyInteger(0, 1000)
+    heads_number_wo_rate = def_rate

@@ -11,11 +11,12 @@ from time import sleep
 import xlwings as xw
 import math
 
-BATCH_SIZE = 10
+BATCH_SIZE = 50
 TEST_SM_FISHERY = False
 TEST_LG_FISHERY = False
-TEST_ANNUAL_CROPPING = True
+TEST_ANNUAL_CROPPING = False
 TEST_PERENNIAL_CROPPING = False
+TEST_LIVESTOCK = True
 
 
 def verbose_print(obj):
@@ -90,6 +91,7 @@ ds["T14"].value = p.capitalization_duration_yrs
 
 # Activity Creation
 a = ActivityFactory.create(project=p, user=u)
+print(f"Activity: {a}")
 
 # Fishery Sheet
 fishery_sheet = wbook.sheets["8. Fisheries and aquaculture"]
@@ -249,10 +251,44 @@ if TEST_ANNUAL_CROPPING:
     print(f"Passed Tests: {passed_croplands}\n\n")
 
 if TEST_PERENNIAL_CROPPING:
-    perennials = PerennialCroppingFactory().create_batch(BATCH_SIZE, activity=a)
+    perennials = PerennialCroppingFactory.create_batch(BATCH_SIZE, activity=a)
 
     total_perennials = perennials.__len__()
     passed_perennials = 0
 
     print("Testing Perennial...")
     # for i, perennial in enumerate(perennials):
+
+if TEST_LIVESTOCK:
+    # NOTE: Comparison with excel results is impossible because the module changed too much
+    # TODO: Missing data for Deer, Llamas And Alpacas, Ostrich LivestockManureEF CH4 and all N2Os. All data is 0, for now
+
+    livestock = LivestockFactory.create_batch(BATCH_SIZE, activity=a)
+
+    total_livestocks = livestock.__len__()
+    passed_livestocks = 0
+
+    print("Testing Livestock...")
+    for i, livestock in enumerate(livestock):
+        print(f"\n\nTesting Livestock {i+1}...")
+        print("-----------------------------------")
+
+        print(livestock.id)
+
+        print(livestock.livestock_category_type_start)
+        print(livestock.livestock_category_type_w)
+        print(livestock.livestock_category_type_wo)
+
+        print(livestock.livestock_production_type_start)
+        print(livestock.livestock_production_type_w)
+        print(livestock.livestock_production_type_wo)
+
+        results = CalculatorFactory().calculate_result(livestock)
+
+        print(f"total_w: {results[0].total_w}, total_wo: {results[0].total_wo}")
+        print(f"balance: {results[0].balance}")
+
+        passed_livestocks += 1
+
+    print(f"\nTotal Tested Livestocks: {total_livestocks}")
+    print(f"Passed Tests: {passed_livestocks}\n\n")
