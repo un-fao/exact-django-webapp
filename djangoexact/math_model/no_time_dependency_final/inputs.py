@@ -179,15 +179,16 @@ class Roads:
 
 class ElectryicityConsumption:
 
-    def __init__(self, emissions_factor, specific_factor, mwh_start, mwh_end, rate_type, time_impl, time_cap):
+    def __init__(self, emissions_factor, specific_factor, mwh_start, mwh_end, percent_loss_transportation, rate_type, time_impl, time_cap):
 
-        self.emissions_factor = emissions_factor  # Match Country and Source of Emission Factor to Elec Table (columns 6 or 7)
-        self.specific_factor = specific_factor    # Tier 2 Value
-        self.mwh_start = mwh_start                # User Input
-        self.mwh_end = mwh_end                    # User Input
-        self.rate_type = rate_type                # Activity Input
-        self.time_impl = time_impl                # Project/Activity Input
-        self.time_cap = time_cap                  # Project/Activity Input
+        self.emissions_factor = emissions_factor                        # Match Country and Source of Emission Factor to Elec Table (columns 6 or 7)
+        self.specific_factor = specific_factor                          # Tier 2 Value
+        self.mwh_start = mwh_start                                      # User Input
+        self.mwh_end = mwh_end                                          # User Input
+        self.percent_loss_transportation = percent_loss_transportation  # User Input expects number between 0 and 1
+        self.rate_type = rate_type                                      # Activity Input
+        self.time_impl = time_impl                                      # Project/Activity Input
+        self.time_cap = time_cap                                        # Project/Activity Input
 
         # RESULTS
         self.emissions_total_yearly = []
@@ -201,6 +202,10 @@ class ElectryicityConsumption:
         annual_end = factor * self.mwh_end
 
         self.emissions_total_yearly = yearly_time_dependent_parameter_breakdown(self.time_impl, self.time_cap, annual_start, annual_end, self.rate_type)
+
+        # Adjust for transmission losses
+        self.emissions_total_yearly = [x * (1 + self.percent_loss_transportation) for x in self.emissions_total_yearly]
+        
         self.total_emissions = sum(self.emissions_total_yearly)
 
         return self.total_emissions
