@@ -1,5 +1,5 @@
 import traceback
-from .general_functions import yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, yearly_time_dependent_20_year_breakdown, breakdown_according_to_values, soil_emissions
+from general_functions import yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, yearly_time_dependent_20_year_breakdown, breakdown_according_to_values, soil_emissions
 
 class AnnualCropland:
 
@@ -52,7 +52,7 @@ class AnnualCropland:
 
         # AUXILIARY VARIABLES FOR SOIL CALCULATION
         self.hectars_before_20, self.hectars_after_20 = yearly_time_dependent_20_year_breakdown(min(area_start, area_end),max(area_start, area_end),self.time_impl, self.time_cap, self.rate)
-
+        self.total_hectars = yearly_time_dependent_parameter_breakdown(min(area_start, area_end),max(area_start, area_end),self.time_impl, self.time_cap, self.rate, interim_values = True)
         # DEFAULTS FOR TIER 2 VALUES INITIALIZATION
 
         # RESULTS
@@ -105,7 +105,7 @@ class AnnualCropland:
 
                 som_n2o = 0 if maximum_soc_20_years >= reference_soc else ((maximum_soc_20_years - reference_soc)/20/10*1000)  * self.emission_factor_nitrous * n2o_n_conversion * (self.nitrous_constant/1000)
 
-                total = - (min(self.area_start, self.area_end) * (self.time_cap + self.time_impl) + abs(self.area_end - self.area_start) * func1(self.area_start, self.area_end, self.rate_coefficient, self.time_impl, self.time_cap)) *  som_n2o 
+                total = sum(self.total_hectars) * som_n2o
 
                 # TODO: ask if this should be broken down proportionally, in that case we have to take an approach similar to the one used in the soil calculation
                 self.emissions_som_yearly = yearly_constant_emissions_breakdown(total, self.time_impl, self.time_cap)
@@ -116,17 +116,6 @@ class AnnualCropland:
                 traceback.print_exc()
 
         def calculate_emissions_residue_burning():
-
-            # SUPPORT FUNCTIONS 
-            def func1(area_start, area, rate_coefficient, time_impl, time_cap):
-
-                if area > area_start:
-                    return time_cap + time_impl * rate_coefficient
-                else:
-                    return time_impl * (1 - rate_coefficient)
-
-
-            # ACTUAL COMPUTATION
 
             ################## COMPUTATION OF AMOUNT OF KG OF METHANE ###################
 
@@ -178,13 +167,8 @@ class AnnualCropland:
 
             co2_crop = (kg_nitrous * self.nitrous_constant + kg_methane * self.methane_constant)/1000
 
-            _min = min(self.area_start, self.area_end) * (self.time_cap + self.time_impl)
-            _abs = abs(self.area_end - self.area_start) * func1(self.area_start, self.area_end, self.rate_coefficient, self.time_impl, self.time_cap)
-
-            min__abs = _min + _abs
-
-            total = (min__abs) * co2_crop
-
+            total = (sum(self.total_hectars)) * co2_crop
+            
             # TODO: again check if func1 is necessary, same as above. Could be that it is sufficient to use sum of before and after 20
             self.emissions_residue_burning_total = total
             self.emissions_residue_burning_yearly = yearly_constant_emissions_breakdown(total, self.time_impl, self.time_cap)
