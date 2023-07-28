@@ -145,6 +145,22 @@ def soil_emissions(hectars_before_20, area_start, area_end,
 
     return emissions_soil_yearly, emissions_soil_total
 
+def soil_emissions_delta_soc_known(delta_soil_c, delta_soil_c_20_years, area_start, area_end, hectars_before_20):
+
+    maximum = - delta_soil_c * max(area_start, area_end)
+
+    total_hectars_soil = sum(hectars_before_20)
+    
+    predicted_emissions = - delta_soil_c_20_years * total_hectars_soil
+
+    emissions = predicted_emissions if abs(predicted_emissions) < abs(maximum) else maximum
+
+    emissions_soil_yearly = breakdown_according_to_values(emissions, hectars_before_20)
+    emissions_soil_total = emissions
+
+    return emissions_soil_yearly, emissions_soil_total
+     
+     
 # INPUT SINGLE MODULE CALCULATION
 def input_single_calculation(unit_start, unit_end, ipcc_factor, tier_2_factor, unit_factor, emissions_factor, time_implementation, time_capitalization, rate_type):
                 
