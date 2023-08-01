@@ -1,0 +1,226 @@
+input_type;climate;moisture;co2_value;n2o_value;co2_eq_value
+Limestone;Tropical;Dry;0,12;;0,586666667
+Limestone;Tropical;Wet;0,12;;0,586666667
+Limestone;Tropical;Moist;0,12;;0,586666667
+Limestone;Tropical Montane;Dry;0,12;;0,586666667
+Limestone;Tropical Montane;Wet;0,12;;0,586666667
+Limestone;Tropical Montane;Moist;0,12;;0,586666667
+Limestone;Boreal;Dry;0,12;;0,586666667
+Limestone;Boreal;Wet;0,12;;0,586666667
+Limestone;Boreal;Moist;0,12;;0,586666667
+Limestone;Cool Temperate;Dry;0,12;;0,586666667
+Limestone;Cool Temperate;Wet;0,12;;0,586666667
+Limestone;Cool Temperate;Moist;0,12;;0,586666667
+Limestone;Warm Temperate;Dry;0,12;;0,586666667
+Limestone;Warm Temperate;Wet;0,12;;0,586666667
+Limestone;Warm Temperate;Moist;0,12;;0,586666667
+Dolomite;Tropical;Dry;0,13;;0,586666667
+Dolomite;Tropical;Wet;0,13;;0,586666667
+Dolomite;Tropical;Moist;0,13;;0,586666667
+Dolomite;Tropical Montane;Dry;0,13;;0,586666667
+Dolomite;Tropical Montane;Wet;0,13;;0,586666667
+Dolomite;Tropical Montane;Moist;0,13;;0,586666667
+Dolomite;Boreal;Dry;0,13;;0,586666667
+Dolomite;Boreal;Wet;0,13;;0,586666667
+Dolomite;Boreal;Moist;0,13;;0,586666667
+Dolomite;Cool Temperate;Dry;0,13;;0,586666667
+Dolomite;Cool Temperate;Wet;0,13;;0,586666667
+Dolomite;Cool Temperate;Moist;0,13;;0,586666667
+Dolomite;Warm Temperate;Dry;0,13;;0,586666667
+Dolomite;Warm Temperate;Wet;0,13;;0,586666667
+Dolomite;Warm Temperate;Moist;0,13;;0,586666667
+Not Specified;Tropical;Dry;0,125;;0,586666667
+Not Specified;Tropical;Wet;0,125;;0,586666667
+Not Specified;Tropical;Moist;0,125;;0,586666667
+Not Specified;Tropical Montane;Dry;0,125;;0,586666667
+Not Specified;Tropical Montane;Wet;0,125;;0,586666667
+Not Specified;Tropical Montane;Moist;0,125;;0,586666667
+Not Specified;Boreal;Dry;0,125;;0,586666667
+Not Specified;Boreal;Wet;0,125;;0,586666667
+Not Specified;Boreal;Moist;0,125;;0,586666667
+Not Specified;Cool Temperate;Dry;0,125;;0,586666667
+Not Specified;Cool Temperate;Wet;0,125;;0,586666667
+Not Specified;Cool Temperate;Moist;0,125;;0,586666667
+Not Specified;Warm Temperate;Dry;0,125;;0,586666667
+Not Specified;Warm Temperate;Wet;0,125;;0,586666667
+Not Specified;Warm Temperate;Moist;0,125;;0,586666667
+Urea;Tropical;Dry;;0,005;4,766666667
+Urea;Tropical;Wet;;0,016;4,766666667
+Urea;Tropical;Moist;;0,0105;4,766666667
+Urea;Tropical Montane;Dry;;0,005;4,766666667
+Urea;Tropical Montane;Wet;;0,005;4,766666667
+Urea;Tropical Montane;Moist;;0,005;4,766666667
+Urea;Boreal;Dry;;0,005;4,766666667
+Urea;Boreal;Wet;;0,016;4,766666667
+Urea;Boreal;Moist;;0,0105;4,766666667
+Urea;Cool Temperate;Dry;;0,005;4,766666667
+Urea;Cool Temperate;Wet;;0,016;4,766666667
+Urea;Cool Temperate;Moist;;0,0105;4,766666667
+Urea;Warm Temperate;Dry;;0,005;4,766666667
+Urea;Warm Temperate;Wet;;0,016;4,766666667
+Urea;Warm Temperate;Moist;;0,0105;4,766666667
+Synthetic N-Fertilizers Other Than Urea;Tropical;Dry;;0,005;4,766666667
+Synthetic N-Fertilizers Other Than Urea;Tropical;Wet;;0,016;4,766666667
+Synthetic N-Fertilizers Other Than Urea;Tropical;Moist;;0,0105;4,766666667
+Synthetic N-Fertilizers Other Than Urea;Tropical Montane;Dry;;0,005;4,766666667
+Synthetic N-Fertilizers Other Than Urea;Tropical Montane;Wet;;0,005;4,766666667
+Synthetic N-Fertilizers Other Than Urea;Tropical Montane;Moist;;0,005;4,766666667
+Synthetic N-Fertilizers Other Than Urea;Boreal;Dry;;0,005;4,766666667
+Synthetic N-Fertilizers Other Than Urea;Boreal;Wet;;0,016;4,766666667
+Synthetic N-Fertilizers Other Than Urea;Boreal;Moist;;0,0105;4,766666667
+Synthetic N-Fertilizers Other Than Urea;Cool Temperate;Dry;;0,005;4,766666667
+Synthetic N-Fertilizers Other Than Urea;Cool Temperate;Wet;;0,016;4,766666667
+Synthetic N-Fertilizers Other Than Urea;Cool Temperate;Moist;;0,0105;4,766666667
+Synthetic N-Fertilizers Other Than Urea;Warm Temperate;Dry;;0,005;4,766666667
+Synthetic N-Fertilizers Other Than Urea;Warm Temperate;Wet;;0,016;4,766666667
+Synthetic N-Fertilizers Other Than Urea;Warm Temperate;Moist;;0,0105;4,766666667
+N-Fertilizers In Continuously Irrigated Rice;Tropical;Dry;;0,003;4,766666667
+N-Fertilizers In Continuously Irrigated Rice;Tropical;Wet;;0,003;4,766666667
+N-Fertilizers In Continuously Irrigated Rice;Tropical;Moist;;0,003;4,766666667
+N-Fertilizers In Continuously Irrigated Rice;Tropical Montane;Dry;;0,003;4,766666667
+N-Fertilizers In Continuously Irrigated Rice;Tropical Montane;Wet;;0,003;4,766666667
+N-Fertilizers In Continuously Irrigated Rice;Tropical Montane;Moist;;0,003;4,766666667
+N-Fertilizers In Continuously Irrigated Rice;Boreal;Dry;;0,003;4,766666667
+N-Fertilizers In Continuously Irrigated Rice;Boreal;Wet;;0,003;4,766666667
+N-Fertilizers In Continuously Irrigated Rice;Boreal;Moist;;0,003;4,766666667
+N-Fertilizers In Continuously Irrigated Rice;Cool Temperate;Dry;;0,003;4,766666667
+N-Fertilizers In Continuously Irrigated Rice;Cool Temperate;Wet;;0,003;4,766666667
+N-Fertilizers In Continuously Irrigated Rice;Cool Temperate;Moist;;0,003;4,766666667
+N-Fertilizers In Continuously Irrigated Rice;Warm Temperate;Dry;;0,003;4,766666667
+N-Fertilizers In Continuously Irrigated Rice;Warm Temperate;Wet;;0,003;4,766666667
+N-Fertilizers In Continuously Irrigated Rice;Warm Temperate;Moist;;0,003;4,766666667
+N-Fertilizers In Wet And Dry Irrigated Rice;Tropical;Dry;;0,005;4,766666667
+N-Fertilizers In Wet And Dry Irrigated Rice;Tropical;Wet;;0,005;4,766666667
+N-Fertilizers In Wet And Dry Irrigated Rice;Tropical;Moist;;0,005;4,766666667
+N-Fertilizers In Wet And Dry Irrigated Rice;Tropical Montane;Dry;;0,005;4,766666667
+N-Fertilizers In Wet And Dry Irrigated Rice;Tropical Montane;Wet;;0,005;4,766666667
+N-Fertilizers In Wet And Dry Irrigated Rice;Tropical Montane;Moist;;0,005;4,766666667
+N-Fertilizers In Wet And Dry Irrigated Rice;Boreal;Dry;;0,005;4,766666667
+N-Fertilizers In Wet And Dry Irrigated Rice;Boreal;Wet;;0,005;4,766666667
+N-Fertilizers In Wet And Dry Irrigated Rice;Boreal;Moist;;0,005;4,766666667
+N-Fertilizers In Wet And Dry Irrigated Rice;Cool Temperate;Dry;;0,005;4,766666667
+N-Fertilizers In Wet And Dry Irrigated Rice;Cool Temperate;Wet;;0,005;4,766666667
+N-Fertilizers In Wet And Dry Irrigated Rice;Cool Temperate;Moist;;0,005;4,766666667
+N-Fertilizers In Wet And Dry Irrigated Rice;Warm Temperate;Dry;;0,005;4,766666667
+N-Fertilizers In Wet And Dry Irrigated Rice;Warm Temperate;Wet;;0,005;4,766666667
+N-Fertilizers In Wet And Dry Irrigated Rice;Warm Temperate;Moist;;0,005;4,766666667
+Sewage;Tropical;Dry;;0,005;
+Sewage;Tropical;Wet;;0,006;
+Sewage;Tropical;Moist;;0,0055;
+Sewage;Tropical Montane;Dry;;0,005;
+Sewage;Tropical Montane;Wet;;0,005;
+Sewage;Tropical Montane;Moist;;0,005;
+Sewage;Boreal;Dry;;0,005;
+Sewage;Boreal;Wet;;0,006;
+Sewage;Boreal;Moist;;0,0055;
+Sewage;Cool Temperate;Dry;;0,005;
+Sewage;Cool Temperate;Wet;;0,006;
+Sewage;Cool Temperate;Moist;;0,0055;
+Sewage;Warm Temperate;Dry;;0,005;
+Sewage;Warm Temperate;Wet;;0,006;
+Sewage;Warm Temperate;Moist;;0,0055;
+Compost;Tropical;Dry;;0,005;
+Compost;Tropical;Wet;;0,006;
+Compost;Tropical;Moist;;0,0055;
+Compost;Tropical Montane;Dry;;0,005;
+Compost;Tropical Montane;Wet;;0,005;
+Compost;Tropical Montane;Moist;;0,005;
+Compost;Boreal;Dry;;0,005;
+Compost;Boreal;Wet;;0,006;
+Compost;Boreal;Moist;;0,0055;
+Compost;Cool Temperate;Dry;;0,005;
+Compost;Cool Temperate;Wet;;0,006;
+Compost;Cool Temperate;Moist;;0,0055;
+Compost;Warm Temperate;Dry;;0,005;
+Compost;Warm Temperate;Wet;;0,006;
+Compost;Warm Temperate;Moist;;0,0055;
+Rendering Waste, Brewery Waste, Guano;Tropical;Dry;;0,005;
+Rendering Waste, Brewery Waste, Guano;Tropical;Wet;;0,006;
+Rendering Waste, Brewery Waste, Guano;Tropical;Moist;;0,0055;
+Rendering Waste, Brewery Waste, Guano;Tropical Montane;Dry;;0,005;
+Rendering Waste, Brewery Waste, Guano;Tropical Montane;Wet;;0,005;
+Rendering Waste, Brewery Waste, Guano;Tropical Montane;Moist;;0,005;
+Rendering Waste, Brewery Waste, Guano;Boreal;Dry;;0,005;
+Rendering Waste, Brewery Waste, Guano;Boreal;Wet;;0,006;
+Rendering Waste, Brewery Waste, Guano;Boreal;Moist;;0,0055;
+Rendering Waste, Brewery Waste, Guano;Cool Temperate;Dry;;0,005;
+Rendering Waste, Brewery Waste, Guano;Cool Temperate;Wet;;0,006;
+Rendering Waste, Brewery Waste, Guano;Cool Temperate;Moist;;0,0055;
+Rendering Waste, Brewery Waste, Guano;Warm Temperate;Dry;;0,005;
+Rendering Waste, Brewery Waste, Guano;Warm Temperate;Wet;;0,006;
+Rendering Waste, Brewery Waste, Guano;Warm Temperate;Moist;;0,0055;
+Phosphorous;Tropical;Dry;;;0,733333333
+Phosphorous;Tropical;Wet;;;0,733333333
+Phosphorous;Tropical;Moist;;;0,733333333
+Phosphorous;Tropical Montane;Dry;;;0,733333333
+Phosphorous;Tropical Montane;Wet;;;0,733333333
+Phosphorous;Tropical Montane;Moist;;;0,733333333
+Phosphorous;Boreal;Dry;;;0,733333333
+Phosphorous;Boreal;Wet;;;0,733333333
+Phosphorous;Boreal;Moist;;;0,733333333
+Phosphorous;Cool Temperate;Dry;;;0,733333333
+Phosphorous;Cool Temperate;Wet;;;0,733333333
+Phosphorous;Cool Temperate;Moist;;;0,733333333
+Phosphorous;Warm Temperate;Dry;;;0,733333333
+Phosphorous;Warm Temperate;Wet;;;0,733333333
+Phosphorous;Warm Temperate;Moist;;;0,733333333
+Potassium;Tropical;Dry;;;0,55
+Potassium;Tropical;Wet;;;0,55
+Potassium;Tropical;Moist;;;0,55
+Potassium;Tropical Montane;Dry;;;0,55
+Potassium;Tropical Montane;Wet;;;0,55
+Potassium;Tropical Montane;Moist;;;0,55
+Potassium;Boreal;Dry;;;0,55
+Potassium;Boreal;Wet;;;0,55
+Potassium;Boreal;Moist;;;0,55
+Potassium;Cool Temperate;Dry;;;0,55
+Potassium;Cool Temperate;Wet;;;0,55
+Potassium;Cool Temperate;Moist;;;0,55
+Potassium;Warm Temperate;Dry;;;0,55
+Potassium;Warm Temperate;Wet;;;0,55
+Potassium;Warm Temperate;Moist;;;0,55
+Fungicides;Tropical;Dry;;;14,3
+Fungicides;Tropical;Wet;;;14,3
+Fungicides;Tropical;Moist;;;14,3
+Fungicides;Tropical Montane;Dry;;;14,3
+Fungicides;Tropical Montane;Wet;;;14,3
+Fungicides;Tropical Montane;Moist;;;14,3
+Fungicides;Boreal;Dry;;;14,3
+Fungicides;Boreal;Wet;;;14,3
+Fungicides;Boreal;Moist;;;14,3
+Fungicides;Cool Temperate;Dry;;;14,3
+Fungicides;Cool Temperate;Wet;;;14,3
+Fungicides;Cool Temperate;Moist;;;14,3
+Fungicides;Warm Temperate;Dry;;;14,3
+Fungicides;Warm Temperate;Wet;;;14,3
+Fungicides;Warm Temperate;Moist;;;14,3
+Pesticides;Tropical;Dry;;;23,1
+Pesticides;Tropical;Wet;;;23,1
+Pesticides;Tropical;Moist;;;23,1
+Pesticides;Tropical Montane;Dry;;;23,1
+Pesticides;Tropical Montane;Wet;;;23,1
+Pesticides;Tropical Montane;Moist;;;23,1
+Pesticides;Boreal;Dry;;;23,1
+Pesticides;Boreal;Wet;;;23,1
+Pesticides;Boreal;Moist;;;23,1
+Pesticides;Cool Temperate;Dry;;;23,1
+Pesticides;Cool Temperate;Wet;;;23,1
+Pesticides;Cool Temperate;Moist;;;23,1
+Pesticides;Warm Temperate;Dry;;;23,1
+Pesticides;Warm Temperate;Wet;;;23,1
+Pesticides;Warm Temperate;Moist;;;23,1
+Insecticides;Tropical;Dry;;;18,7
+Insecticides;Tropical;Wet;;;18,7
+Insecticides;Tropical;Moist;;;18,7
+Insecticides;Tropical Montane;Dry;;;18,7
+Insecticides;Tropical Montane;Wet;;;18,7
+Insecticides;Tropical Montane;Moist;;;18,7
+Insecticides;Boreal;Dry;;;18,7
+Insecticides;Boreal;Wet;;;18,7
+Insecticides;Boreal;Moist;;;18,7
+Insecticides;Cool Temperate;Dry;;;18,7
+Insecticides;Cool Temperate;Wet;;;18,7
+Insecticides;Cool Temperate;Moist;;;18,7
+Insecticides;Warm Temperate;Dry;;;18,7
+Insecticides;Warm Temperate;Wet;;;18,7
+Insecticides;Warm Temperate;Moist;;;18,7

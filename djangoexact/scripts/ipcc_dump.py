@@ -18,11 +18,11 @@ def capitalize_all(string):
     return string
 
 
-def parse_csv_number(number):
+def parse_csv_number(number, nan_value=0):
     if isinstance(number, str):
         return float(number.replace(",", "."))
     elif pd.isna(number):
-        return 0
+        return nan_value
     else:
         return float(number)
 
@@ -2032,7 +2032,6 @@ for i, row in enumerate(df_dict2):
 
         if j == len(df_headers2) - 1:
             break
-"""
 
 df2 = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "LivestockManureEF2.csv"),
@@ -2083,3 +2082,41 @@ for i, row in enumerate(df_dict2):
             manure_management_type=manure_management_type,
             value=parse_csv_number(row[df_headers2[j]]),
         )
+"""
+
+df2 = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "InputsEmissionFactors.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers2 = df2.columns.values.tolist()
+df_dict2 = df2.to_dict("records")
+
+for i, row in enumerate(df_dict2):
+    input_type = InputType.objects.get_or_create(name=sanitize(row["input_type"]))[0]
+    climate = Climate.objects.get_or_create(name=sanitize(row["climate"]))[0]
+    moisture = Moisture.objects.get_or_create(name=sanitize(row["moisture"]))[0]
+
+    # read floats from dataframe that have , as decimal separator
+    co2_value = parse_csv_number(row["co2_value"], nan_value=None)
+    n2o_value = parse_csv_number(row["n2o_value"], nan_value=None)
+    co2_eq_value = parse_csv_number(row["co2_eq_value"], nan_value=None)
+
+    print(
+        input_type,
+        climate,
+        moisture,
+        co2_value,
+        n2o_value,
+        co2_eq_value,
+    )
+
+    InputEmissionFactor.objects.get_or_create(
+        input_type=input_type,
+        climate=climate,
+        moisture=moisture,
+        co2_value=co2_value,
+        n2o_value=n2o_value,
+        co2_eq_value=co2_eq_value,
+    )
