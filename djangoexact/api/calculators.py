@@ -26,6 +26,7 @@ from .utilities import *
 from abc import ABC, abstractmethod
 import sys
 from math_model.no_time_dependency_final.livestock import Livestock as MathLivestock
+from math_model.no_time_dependency_final.inputs import Inputs as MathInputs
 
 
 class Result:
@@ -1495,20 +1496,16 @@ class InputCalculator(BaseCalculator):
         input_references = InputReference.objects.get(
             gw_potential=project.gw_potential, input_type=self.data.input_type
         )
-        water_regime_type = getattr(input, "water_regime_type", None)
         ef = InputEmissionFactor.objects.get(
             input_type=self.data.input_type,
             climate=project.climate,
             moisture=project.moisture,
-            water_regime_type=water_regime_type,
         )
 
-        inputs = [
+        inputs_w = [
             input.value_start,
             input.value_w,
-            input.value_wo,
-            input.value_w_rate.value,
-            input.value_wo_rate.value,
+            input.value_w_rate.name,
             ef.co2_value,
             input.co2_emissions_t2,
             input_references.co2_multiplier,
@@ -1525,11 +1522,46 @@ class InputCalculator(BaseCalculator):
             input_references.production_emissions_multiplier,
         ]
 
-        results = [
-            Result(*result) for result in math_inputs.input_w_wo_calculation(*inputs)
+        inputs_wo = [
+            input.value_start,
+            input.value_wo,
+            input.value_wo_rate.name,
+            ef.co2_value,
+            input.co2_emissions_t2,
+            input_references.co2_multiplier,
+            input_references.co2_emissions_multiplier,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            ef.n2o_value,
+            input.n2o_emissions_t2,
+            input_references.n2o_quantity_multiplier,
+            input_references.n2o_emissions_multiplier,
+            ef.co2_eq_value,
+            input.co2_e_emissions_t2,
+            input_references.production_quantity_multiplier,
+            input_references.production_emissions_multiplier,
         ]
 
-        return results
+        results_w = MathInputs(*inputs_w).calculate_emissions()
+        results_wo = MathInputs(*inputs_wo).calculate_emissions()
+
+        results = [results_w, results_wo, results_w - results_wo]
+
+        return [Result(*results)]
+
+
+class EnergyCalculator(BaseCalculator):
+    """
+    #TODO: Calculator for energy.
+    """
+
+    # FuelType can be solid or liquid. Call different classes based on that
+
+
+class IrrigationCalculator(BaseCalculator):
+    """
+    #TODO: Calculator for irrigation.
+    """
 
 
 class BuildingCalculator(BaseCalculator):
