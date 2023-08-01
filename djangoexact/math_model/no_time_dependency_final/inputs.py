@@ -45,14 +45,14 @@ class Inputs:
         
         try:
             if self.unit_factor_co2 is None or self.emissions_factor_co2 is None:
-                self.yearly_co2_eq_emissions, self.total_co2_eq_emissions = [], 0
+                self.yearly_co2_eq_emissions, self.total_co2_eq_emissions = [0 for i in range(0, self.time_impl + self.time_cap)], 0
             else:
                 self.yearly_co2_eq_emissions, self.total_co2_eq_emissions = input_single_calculation(self.unit_start, self.unit_end, self.ipcc_factor_co2, 
                                                                                                     self.tier_2_factor_co2, self.unit_factor_co2, 
                                                                                                     self.emissions_factor_co2, self.time_impl, self.time_cap, self.rate_type)
             
             if self.unit_factor_n2o is None or self.emissions_factor_n2o is None:
-                self.yearly_n2o_emissions, self.total_n2o_emissions = [], 0
+                self.yearly_n2o_emissions, self.total_n2o_emissions = [0 for i in range(0, self.time_impl + self.time_cap)], 0
             else:
                 self.yearly_n2o_emissions, self.total_n2o_emissions = input_single_calculation(self.unit_start, self.unit_end, self.ipcc_factor_n2o,
                                                                                             self.tier_2_factor_n2o, self.unit_factor_n2o, self.emissions_factor_n2o, 
@@ -60,7 +60,7 @@ class Inputs:
                 
 
             if self.unit_factor_eq is None or self.emissions_factor_eq is None:
-                self.yearly_co2_emissions, self.total_co2_emissions = [], 0
+                self.yearly_co2_emissions, self.total_co2_emissions = [0 for i in range(0, self.time_impl + self.time_cap)], 0
             else:
                 self.yearly_co2_emissions, self.total_co2_emissions = input_single_calculation(self.unit_start, self.unit_end, self.ipcc_factor_eq,
                                                                                                self.tier_2_factor_eq, self.unit_factor_eq, self.emissions_factor_eq, 
