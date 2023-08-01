@@ -72,7 +72,7 @@ class Inputs:
     def evaluate_tier_2_defaults():
         pass
 
-class Irrigation:
+class OperationPhaseIrrigation:
 
     def __init__(self, ef_default, ef_tier_2, total_dynamic_head_default, total_dynamic_head_tier_2, average_pressure_default, average_pressure_tier_2, 
                  pumping_efficiency_default, pumping_efficiency_tier_2, erh, depth,
@@ -167,7 +167,7 @@ class Roads:
             self.total_emissions = self.units_end * ef / 1000 # to convert the ef from kg to g
             self.emissions_total_yearly = yearly_constant_emissions_breakdown(self.total_emissions, self.time_impl, self.time_cap)
 
-            return self.emissions_total
+            return self.total_emissions
         
         except:
             traceback.print_exc()
@@ -305,3 +305,29 @@ class SolidConsumption:
 
     def evaluate_tier_2_defaults():
         pass
+
+class NewIrrigation:
+
+    def __init__(self, ef_ref, ef_tier_2, units_end, time_impl, time_cap, rate_type):
+
+        self.ef_ref = ef_ref
+        self.ef_tier_2 = ef_tier_2
+        self.units_end = units_end
+        self.time_impl = time_impl # Project Input
+        self.time_cap = time_cap   # Project Input
+        self.rate_type = rate_type # Rate Type
+
+        # RESULTS
+        self.emissions_total_yearly = []
+        self.total_emissions = 0
+
+    def calculate_emissions(self,):
+
+        ef = self.ef_ref if not self.ef_tier_2 else self.ef_tier_2
+
+        self.total_emissions = ef * self.units_end / 1000
+        self.emissions_total_yearly = yearly_constant_emissions_breakdown(self.total_emissions, self.time_impl, self.time_cap)
+        
+    def evaluate_tier_2_defaults():
+        pass
+
