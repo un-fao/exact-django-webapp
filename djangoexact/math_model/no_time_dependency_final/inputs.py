@@ -3,21 +3,27 @@ import math, traceback
 class Inputs:
 
     def __init__(self, unit_start, unit_end, rate_type, ipcc_factor_co2_eq, tier_2_factor_co2_eq, unit_factor_co2_eq, emissions_factor_co2_eq, time_impl, time_cap,
-                           ipcc_factor_n2o, tier_2_factor_n2o, unit_factor_n2o, emissions_factor_n2o, unit_factor_eq, emissions_factor_eq):
+                           ipcc_factor_n2o, tier_2_factor_n2o, unit_factor_n2o, emissions_factor_n2o, ipcc_factor_eq, tier_2_factor_eq, unit_factor_eq, emissions_factor_eq):
         
         self.unit_start = unit_start
         self.unit_end = unit_end
         self.rate_type = rate_type
+
         self.ipcc_factor_co2_eq = ipcc_factor_co2_eq
         self.tier_2_factor_co2_eq = tier_2_factor_co2_eq
         self.unit_factor_co2_eq = unit_factor_co2_eq
         self.emissions_factor_co2_eq = emissions_factor_co2_eq
+
         self.time_impl = time_impl
         self.time_cap = time_cap
+
         self.ipcc_factor_n2o = ipcc_factor_n2o
         self.tier_2_factor_n2o = tier_2_factor_n2o
         self.unit_factor_n2o = unit_factor_n2o
         self.emissions_factor_n2o = emissions_factor_n2o
+        
+        self.ipcc_factor_eq = ipcc_factor_eq
+        self.tier_2_factor_eq = tier_2_factor_eq
         self.unit_factor_eq = unit_factor_eq
         self.emissions_factor_eq = emissions_factor_eq
         
@@ -56,8 +62,8 @@ class Inputs:
             if self.unit_factor_eq is None or self.emissions_factor_eq is None:
                 self.yearly_co2_emissions, self.total_co2_emissions = [], 0
             else:
-                self.yearly_co2_emissions, self.total_co2_emissions = input_single_calculation(self.unit_start, self.unit_end, self.ipcc_factor_co2_eq, 
-                                                                                            self.tier_2_factor_co2_eq, self.unit_factor_eq, self.emissions_factor_eq,
+                self.yearly_co2_emissions, self.total_co2_emissions = input_single_calculation(self.unit_start, self.unit_end, self.ipcc_factor_eq,
+                                                                                               self.tier_2_factor_eq, self.unit_factor_eq, self.emissions_factor_eq, 
                                                                                             self.time_impl, self.time_cap, self.rate_type)
 
             self.emissions_total_yearly = [sum(x) for x in zip(self.yearly_co2_emissions, self.yearly_n2o_emissions, self.yearly_co2_eq_emissions)]
