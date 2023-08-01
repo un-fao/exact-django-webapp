@@ -4,6 +4,7 @@ import re
 from api.models import Model
 from rest_framework.response import Response
 from rest_framework import status
+from enum import Enum
 
 
 CN_RATIO_FOREST = 10
@@ -17,6 +18,18 @@ DETAILS = "details"
 API = "api"
 TROPHIC_STATE = 0.7
 INCLUDE_RELATED = "include_related"
+
+
+class ManureManagementTypes(Enum):
+    PRP = "Pasture/Range/Paddock"
+
+
+class EmissionTypes(Enum):
+    CO2 = "CO2"
+    CH4 = "CH4"
+    N2O = "N2O"
+    N2O_VOLATILIZATION = "N2O Volatilization"
+    N2O_LEACHING = "N2O Leaching"
 
 
 def snake_case(str):
