@@ -2,17 +2,17 @@ from .general_functions import yearly_time_dependent_parameter_breakdown, input_
 import math, traceback
 class Inputs:
 
-    def __init__(self, unit_start, unit_end, rate_type, ipcc_factor_co2_eq, tier_2_factor_co2_eq, unit_factor_co2_eq, emissions_factor_co2_eq, time_impl, time_cap,
+    def __init__(self, unit_start, unit_end, rate_type, ipcc_factor_co2, tier_2_factor_co2, unit_factor_co2, emissions_factor_co2, time_impl, time_cap,
                            ipcc_factor_n2o, tier_2_factor_n2o, unit_factor_n2o, emissions_factor_n2o, ipcc_factor_eq, tier_2_factor_eq, unit_factor_eq, emissions_factor_eq):
         
         self.unit_start = unit_start
         self.unit_end = unit_end
         self.rate_type = rate_type
 
-        self.ipcc_factor_co2_eq = ipcc_factor_co2_eq
-        self.tier_2_factor_co2_eq = tier_2_factor_co2_eq
-        self.unit_factor_co2_eq = unit_factor_co2_eq
-        self.emissions_factor_co2_eq = emissions_factor_co2_eq
+        self.ipcc_factor_co2 = ipcc_factor_co2
+        self.tier_2_factor_co2 = tier_2_factor_co2
+        self.unit_factor_co2 = unit_factor_co2
+        self.emissions_factor_co2 = emissions_factor_co2
 
         self.time_impl = time_impl
         self.time_cap = time_cap
@@ -44,12 +44,12 @@ class Inputs:
     def calculate_emissions(self):
         
         try:
-            if self.unit_factor_co2_eq is None or self.emissions_factor_co2_eq is None:
+            if self.unit_factor_co2 is None or self.emissions_factor_co2 is None:
                 self.yearly_co2_eq_emissions, self.total_co2_eq_emissions = [], 0
             else:
-                self.yearly_co2_eq_emissions, self.total_co2_eq_emissions = input_single_calculation(self.unit_start, self.unit_end, self.ipcc_factor_co2_eq, 
-                                                                                                    self.tier_2_factor_co2_eq, self.unit_factor_co2_eq, 
-                                                                                                    self.emissions_factor_co2_eq, self.time_impl, self.time_cap, self.rate_type)
+                self.yearly_co2_eq_emissions, self.total_co2_eq_emissions = input_single_calculation(self.unit_start, self.unit_end, self.ipcc_factor_co2, 
+                                                                                                    self.tier_2_factor_co2, self.unit_factor_co2, 
+                                                                                                    self.emissions_factor_co2, self.time_impl, self.time_cap, self.rate_type)
             
             if self.unit_factor_n2o is None or self.emissions_factor_n2o is None:
                 self.yearly_n2o_emissions, self.total_n2o_emissions = [], 0
