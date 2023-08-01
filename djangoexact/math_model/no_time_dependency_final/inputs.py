@@ -310,7 +310,7 @@ class NewIrrigation:
 
     def __init__(self, ef_ref, ef_tier_2, units_end, time_impl, time_cap, rate_type):
 
-        self.ef_ref = ef_ref
+        self.ef_ref = ef_ref       # Match Irrigation Type to Energy DB A7:B16 column 2
         self.ef_tier_2 = ef_tier_2
         self.units_end = units_end
         self.time_impl = time_impl # Project Input
