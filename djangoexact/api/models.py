@@ -1940,3 +1940,14 @@ class Building(Module):
     surface_wo = FloatField(null=True, blank=True)
 
     t_co2_m2_t2 = FloatField(null=True, blank=True)
+
+
+### MODEL PARAMETERS TABLES ###
+
+
+class LivestockParameter(Model):
+    name = CharField(max_length=255, unique=True)
+    value = FloatField(null=True, blank=True)
+
+    def __str__(self):
+        return f"({self.id}) {self.name} = {self.value}"
