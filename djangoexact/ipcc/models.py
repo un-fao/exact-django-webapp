@@ -552,21 +552,6 @@ class ElectricityEmission(Model):
         return f"Electricity Emissions for {self.country}"
 
 
-class EnergyDefaultEmissionFactor(Model):
-    fuel_type = ForeignKey("api.FuelType", on_delete=CASCADE)
-    t_co2_eq_m3 = FloatField(blank=True, null=True)
-    tj_gg = FloatField(blank=True, null=True)
-    kg_ch4_tj = FloatField(blank=True, null=True)
-    kg_n2o_tj = FloatField(blank=True, null=True)
-    density_kg_m3 = FloatField(blank=True, null=True)
-    co2_emissions = FloatField(blank=True, null=True)
-    ch4_emissions = FloatField(blank=True, null=True)
-    n2o_emissions = FloatField(blank=True, null=True)
-
-    def __str__(self):
-        return f"{self.fuel_type.name} {self.t_co2_eq_m3} {self.tj_gg} {self.kg_ch4_tj} {self.kg_n2o_tj} {self.density_kg_m3} {self.co2_emissions} {self.ch4_emissions} {self.n2o_emissions}"
-
-
 class SmallFisheryFUIManager(Manager):
     def get_value_or_average(request, fishery_type, gear_type):
         try:
@@ -868,3 +853,21 @@ class ManureManagementVolatilizationMultiplier(Model):
 
     def __str__(self):
         return f"({self.pk}) {self.moisture.name} {self.value}"
+
+
+class EnergyDefaultEmissionFactor(Model):
+    """
+    IPCC 1724:1753
+    """
+
+    fuel_type = ForeignKey("api.FuelType", on_delete=CASCADE)
+    t_co2_eq = FloatField(null=True, blank=True)
+    net_calorific_value = FloatField(null=True, blank=True)
+    co2 = FloatField(null=True, blank=True)
+    ch4 = FloatField(null=True, blank=True)
+    n2o = FloatField(null=True, blank=True)
+    density = FloatField(null=True, blank=True)
+
+    def __str__(self):
+        fuel_use_type = getattr(self.fuel_type.fuel_use_type, "name", None)
+        return f"({self.pk}) {self.fuel_type.name} {fuel_use_type} {self.t_co2_eq} {self.net_calorific_value} {self.co2} {self.ch4} {self.n2o} {self.density}"

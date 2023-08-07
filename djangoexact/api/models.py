@@ -315,11 +315,30 @@ class FishType(Model):
         return f"({self.pk}) {self.name}"
 
 
-class FuelType(Model):
+class MacroFuelType(Model):
     name = CharField(max_length=100)
 
     def __str__(self):
-        return self.name
+        return f"({self.pk}) {self.name}"
+
+
+class FuelUseType(Model):
+    name = CharField(max_length=100)
+
+    def __str__(self):
+        return f"({self.pk}) {self.name}"
+
+
+class FuelType(Model):
+    name = CharField(max_length=100)
+    fuel_use_type = ForeignKey(FuelUseType, on_delete=CASCADE, null=True, blank=True)
+    macro_type = ForeignKey(MacroFuelType, on_delete=CASCADE)
+
+    class Meta:
+        unique_together = ("name", "fuel_use_type", "macro_type")
+
+    def __str__(self):
+        return f"({self.pk}) {self.macro_type.name} - {self.name}"
 
 
 class SalinityType(Model):
@@ -1893,6 +1912,18 @@ class Input(Module):
     co2_e_emissions_t2 = FloatField(null=True, blank=True)
 
     implementation_year_t2 = IntegerField(null=True, blank=True)
+
+
+class Electricity(Module):
+    origin_country = ForeignKey(Country, on_delete=CASCADE, null=True, blank=True)
+    electricity_start = FloatField(null=True, blank=True)
+    electricity_w = FloatField(null=True, blank=True)
+    electrivity_wo = FloatField(null=True, blank=True)
+
+    fuel = ForeignKey(FuelType, on_delete=CASCADE, null=True, blank=True)
+    fuel_start = FloatField(null=True, blank=True)
+    fuel_w = FloatField(null=True, blank=True)
+    fuel_wo = FloatField(null=True, blank=True)
 
 
 class BuildingType(Model):
