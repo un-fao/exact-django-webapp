@@ -8,6 +8,9 @@ from .models import (
     Livestock,
     AnnualCropping,
     CropType,
+    LivestockParameter,
+    Electricity,
+    Fuel,
 )
 from math_model import (
     defo,
@@ -22,12 +25,16 @@ from math_model import (
 from math_model.no_time_dependency_final.annuals import AnnualCropland
 from math_model import inputs as math_inputs
 from ipcc.models import *
-from api.models import LivestockParameter
 from .utilities import *
 from abc import ABC, abstractmethod
 import sys
 from math_model.no_time_dependency_final.livestock import Livestock as MathLivestock
 from math_model.no_time_dependency_final.inputs import Inputs as MathInputs
+from math_model.no_time_dependency_final.inputs import (
+    FuelConsumption,
+    SolidConsumption,
+    ElectryicityConsumption,
+)
 
 
 class Result:
@@ -1552,12 +1559,143 @@ class InputCalculator(BaseCalculator):
         return [Result(*results)]
 
 
-class EnergyCalculator(BaseCalculator):
+class ElectricityCalculator(BaseCalculator):
     """
     #TODO: Calculator for energy.
     """
 
+    def calculate(self) -> list[Result]:
+        """
+        Calculate emissions for a single Energy module.
+        """
+
+        input: Electricity = self.data
+        project: Project = self.data.activity.project
+
+        elec: ElectricityEmission = ElectricityEmission.objects.get(
+            country=project.country,
+            continent=project.country.continent,  # TODO: Remove continent from model and from project
+        )
+
+        inputs_w = [
+            elec.operating_margin
+            if input.ef_source.name == "Operating Margin"
+            else elec.combined_margin,
+            input.ef_t2,
+            input.mwh_start,
+            input.mwh_w,
+            input.transmission_loss,
+            input.activity.change_rate_start.name,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+        ]
+
+        res_w = ElectryicityConsumption(*inputs_w).calculate_emissions()
+
+        inputs_wo = [
+            elec.operating_margin
+            if input.ef_source.name == "Operating Margin"
+            else elec.combined_margin,
+            input.ef_t2,
+            input.mwh_start,
+            input.mwh_wo,
+            input.transmission_loss,
+            input.activity.change_rate_start.name,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+        ]
+
+        res_wo = ElectryicityConsumption(*inputs_wo).calculate_emissions()
+
+        return [Result(res_w, res_wo, res_w - res_wo)]
+
     # FuelType can be solid or liquid. Call different classes based on that
+
+
+class FuelCalculator(BaseCalculator):
+    """
+    Calculator for fuel
+    """
+
+    def calculate(self) -> list[Result]:
+        """
+        Calculate emissions for a single Fuel module.
+        """
+
+        input: Fuel = self.data
+        project: Project = self.data.activity.project
+
+        macro_fuel_type = input.fuel_type.macro_fuel_type.name
+
+        ef = EnergyDefaultEmissionFactor.objects.get(
+            fuel_type=input.fuel_type,
+        )
+
+        if macro_fuel_type == "Liquid":
+            input_w = [
+                ef.t_co2_eq,
+                input.ef_t2,
+                input.fuel_start,
+                input.fuel_w,
+                input.activity.change_rate_start.name,
+                project.implementation_duration_yrs,
+                project.capitalization_duration_yrs,
+            ]
+
+            input_wo = [
+                ef.t_co2_eq,
+                input.ef_t2,
+                input.fuel_start,
+                input.fuel_wo,
+                input.activity.change_rate_start.name,
+                project.implementation_duration_yrs,
+                project.capitalization_duration_yrs,
+            ]
+
+            res_w = FuelConsumption(*input_w).calculate_emissions()
+            res_wo = FuelConsumption(*input_wo).calculate_emissions()
+
+            return [Result(res_w, res_wo, res_w - res_wo)]
+
+        elif macro_fuel_type == "Solid":
+            input_w = [
+                ef.net_calorific_value,
+                ef.co2,
+                ef.ch4,
+                ef.n2o,
+                input.account_for_co2,
+                project.gw_potential.ch4,
+                project.gw_potential.n2o,
+                input.ef_t2,
+                input.fuel_start,
+                input.fuel_w,
+                input.activity.change_rate_start.name,
+                project.implementation_duration_yrs,
+                project.capitalization_duration_yrs,
+            ]
+
+            input_wo = [
+                ef.net_calorific_value,
+                ef.co2,
+                ef.ch4,
+                ef.n2o,
+                input.account_for_co2,
+                project.gw_potential.ch4,
+                project.gw_potential.n2o,
+                input.ef_t2,
+                input.fuel_start,
+                input.fuel_wo,
+                input.activity.change_rate_start.name,
+                project.implementation_duration_yrs,
+                project.capitalization_duration_yrs,
+            ]
+
+            res_w = SolidConsumption(*input_w).calculate_emissions()
+            res_wo = SolidConsumption(*input_wo).calculate_emissions()
+
+            return [Result(res_w, res_wo, res_w - res_wo)]
+
+        return [Result(0, 0, 0)]
 
 
 class IrrigationCalculator(BaseCalculator):
