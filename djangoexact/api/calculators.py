@@ -22,6 +22,7 @@ from math_model import (
 from math_model.no_time_dependency_final.annuals import AnnualCropland
 from math_model import inputs as math_inputs
 from ipcc.models import *
+from api.models import LivestockParameter
 from .utilities import *
 from abc import ABC, abstractmethod
 import sys
@@ -2154,7 +2155,9 @@ class LivestockCalculator(BaseCalculator):
             if ch4_ef_t2_wo:
                 ch4_ef_t2_wo = ch4_ef_t2_wo.value
 
-        LEACHING_MULTI = 0.011  # TODO: Put in db (livestock parameters or something)
+        LEACHING_MULTI = LivestockParameter.objects.get(
+            name="LEACHING_MULTIPLIER"
+        ).value
 
         volatilization_multi = ManureManagementVolatilizationMultiplier.objects.get(
             moisture=project.moisture,
