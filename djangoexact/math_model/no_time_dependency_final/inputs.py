@@ -207,7 +207,7 @@ class ElectryicityConsumption:
         annual_start = factor * self.mwh_start
         annual_end = factor * self.mwh_end
 
-        self.emissions_total_yearly = yearly_time_dependent_parameter_breakdown(self.time_impl, self.time_cap, annual_start, annual_end, self.rate_type)
+        self.emissions_total_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.time_impl, self.time_cap, self.rate_type)
 
         # Adjust for transmission losses
         self.emissions_total_yearly = [x * (1 + self.percent_loss_transportation) for x in self.emissions_total_yearly]
@@ -244,7 +244,7 @@ class FuelConsumption:
             annual_start = factor * self.mwh_start
             annual_end = factor * self.mwh_end
 
-            self.emissions_total_yearly = yearly_time_dependent_parameter_breakdown(self.time_impl, self.time_cap, annual_start, annual_end, self.rate_type)
+            self.emissions_total_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.time_impl, self.time_cap, self.rate_type)
             self.total_emissions = sum(self.emissions_total_yearly)
 
             return self.total_emissions
@@ -298,7 +298,7 @@ class SolidConsumption:
             annual_start = factor * self.mwh_start
             annual_end = factor * self.mwh_end
 
-            self.emissions_total_yearly = yearly_time_dependent_parameter_breakdown(self.time_impl, self.time_cap, annual_start, annual_end, self.rate_type)
+            self.emissions_total_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.time_impl, self.time_cap, self.rate_type)
             self.total_emissions = sum(self.emissions_total_yearly)
 
             return self.total_emissions
@@ -314,10 +314,12 @@ class SolidConsumption:
 
 class NewIrrigation:
 
-    def __init__(self, ef_ref, ef_tier_2, units_end, time_impl, time_cap, rate_type):
+    def __init__(self, ef_ref, ef_tier_2, units_start, units_end, time_impl, time_cap, rate_type):
 
         self.ef_ref = ef_ref       # Match Irrigation Type to Energy DB A7:B16 column 2
         self.ef_tier_2 = ef_tier_2
+        # TODO: ADD HECTARS START AND REMOVE FROM FINAL
+        self.units_start = units_start
         self.units_end = units_end
         self.time_impl = time_impl # Project Input
         self.time_cap = time_cap   # Project Input
@@ -331,7 +333,7 @@ class NewIrrigation:
 
         ef = self.ef_ref if not self.ef_tier_2 else self.ef_tier_2
 
-        self.total_emissions = ef * self.units_end / 1000
+        self.total_emissions = ef * (self.units_end - self.units_start) / 1000
         self.emissions_total_yearly = yearly_constant_emissions_breakdown(self.total_emissions, self.time_impl, self.time_cap)
         
     def evaluate_tier_2_defaults():
