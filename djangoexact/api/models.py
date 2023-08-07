@@ -332,13 +332,13 @@ class FuelUseType(Model):
 class FuelType(Model):
     name = CharField(max_length=100)
     fuel_use_type = ForeignKey(FuelUseType, on_delete=CASCADE, null=True, blank=True)
-    macro_type = ForeignKey(MacroFuelType, on_delete=CASCADE)
+    macro_fuel_type = ForeignKey(MacroFuelType, on_delete=CASCADE)
 
     class Meta:
-        unique_together = ("name", "fuel_use_type", "macro_type")
+        unique_together = ("name", "fuel_use_type", "macro_fuel_type")
 
     def __str__(self):
-        return f"({self.pk}) {self.macro_type.name} - {self.name}"
+        return f"({self.pk}) {self.macro_fuel_type.name} - {self.name}"
 
 
 class SalinityType(Model):
@@ -1914,16 +1914,34 @@ class Input(Module):
     implementation_year_t2 = IntegerField(null=True, blank=True)
 
 
-class Electricity(Module):
-    origin_country = ForeignKey(Country, on_delete=CASCADE, null=True, blank=True)
-    electricity_start = FloatField(null=True, blank=True)
-    electricity_w = FloatField(null=True, blank=True)
-    electrivity_wo = FloatField(null=True, blank=True)
+class EmissionFactorSource(Model):
+    name = CharField(max_length=255, unique=True)
 
-    fuel = ForeignKey(FuelType, on_delete=CASCADE, null=True, blank=True)
+    def __str__(self):
+        return f"({self.id}) {self.name}"
+
+
+class Electricity(Module):
+    country = ForeignKey(Country, on_delete=CASCADE, null=True, blank=True)
+    mwh_start = FloatField(null=True, blank=True)
+    mwh_w = FloatField(null=True, blank=True)
+    mwh_wo = FloatField(null=True, blank=True)
+
+    ef_t2 = FloatField(null=True, blank=True)
+    transmission_loss = FloatField(default=0.1)
+    ef_source = ForeignKey(
+        EmissionFactorSource, on_delete=CASCADE, null=True, blank=True
+    )
+
+
+class Fuel(Module):
+    fuel_type = ForeignKey(FuelType, on_delete=CASCADE, null=True, blank=True)
     fuel_start = FloatField(null=True, blank=True)
     fuel_w = FloatField(null=True, blank=True)
     fuel_wo = FloatField(null=True, blank=True)
+
+    ef_t2 = FloatField(null=True, blank=True)
+    account_for_co2 = BooleanField(default=False)
 
 
 class BuildingType(Model):
