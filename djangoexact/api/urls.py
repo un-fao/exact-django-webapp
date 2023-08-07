@@ -151,7 +151,13 @@ router.register(r"fish-types", views.generic_viewset(FishType), basename="fish-t
 router.register(
     r"fishery-types", views.generic_viewset(FisheryType), basename="fishery-types"
 )
+router.register(
+    r"electricities",
+    views.generic_module_viewset(Electricity),
+    basename="electricities",
+)
 
+router.register(r"fuels", views.generic_module_viewset(Fuel), basename="fuels")
 
 urlpatterns = [
     path("docs/", include_docs_urls(title="EX-ACT Docs")),
