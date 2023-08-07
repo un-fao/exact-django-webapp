@@ -207,7 +207,7 @@ class ElectryicityConsumption:
         annual_start = factor * self.mwh_start
         annual_end = factor * self.mwh_end
 
-        self.emissions_total_yearly = yearly_time_dependent_parameter_breakdown(self.time_impl, self.time_cap, annual_start, annual_end, self.rate_type)
+        self.emissions_total_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.time_impl, self.time_cap, self.rate_type)
 
         # Adjust for transmission losses
         self.emissions_total_yearly = [x * (1 + self.percent_loss_transportation) for x in self.emissions_total_yearly]
