@@ -28,6 +28,8 @@ def parse_csv_number(number, nan_value=0):
 
 
 def sanitize(s: str):
+    if not s or pd.isna(s):
+        return None
     return s.replace("ï»¿", "").title().strip()
 
 
@@ -2082,7 +2084,6 @@ for i, row in enumerate(df_dict2):
             manure_management_type=manure_management_type,
             value=parse_csv_number(row[df_headers2[j]]),
         )
-"""
 
 df2 = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "InputsEmissionFactors.csv"),
@@ -2119,4 +2120,57 @@ for i, row in enumerate(df_dict2):
         co2_value=co2_value,
         n2o_value=n2o_value,
         co2_eq_value=co2_eq_value,
+    )
+"""
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "LiquidFuelTypes.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers = df.columns.values.tolist()
+df_dict = df.to_dict("records")
+
+for i, row in enumerate(df_dict):
+    macro_fuel_type = (
+        MacroFuelType.objects.get_or_create(name=sanitize(row["macro_fuel_type"]))[0]
+        if row["macro_fuel_type"]
+        else None
+    )
+    fuel_use_type = (
+        FuelUseType.objects.get_or_create(name=sanitize(row["fuel_use_type"]))[0]
+        if pd.notna(row["fuel_use_type"])
+        else None
+    )
+    fuel_type = (
+        FuelType.objects.get_or_create(
+            name=sanitize(row["fuel_type"]),
+            macro_type=macro_fuel_type,
+            fuel_use_type=fuel_use_type,
+        )[0]
+        if row["fuel_type"]
+        else None
+    )
+
+    print(
+        fuel_type,
+        row["t_co2_eq"],
+        row["co2"],
+        row["ch4"],
+        row["n2o"],
+        row["density"],
+        row["net_calorific_value"],
+    )
+
+    EnergyDefaultEmissionFactor.objects.get_or_create(
+        fuel_type=fuel_type,
+        t_co2_eq=parse_csv_number(row["t_co2_eq"], nan_value=None),
+        co2=parse_csv_number(row["co2"], nan_value=None),
+        ch4=parse_csv_number(row["ch4"], nan_value=None),
+        n2o=parse_csv_number(row["n2o"], nan_value=None),
+        density=parse_csv_number(row["density"], nan_value=None),
+        net_calorific_value=parse_csv_number(
+            row["net_calorific_value"], nan_value=None
+        ),
     )
