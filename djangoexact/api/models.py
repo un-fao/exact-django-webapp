@@ -1927,6 +1927,10 @@ class Electricity(Module):
     mwh_w = FloatField(null=True, blank=True)
     mwh_wo = FloatField(null=True, blank=True)
 
+    mwh_renewables_start = FloatField(null=True, blank=True)
+    mwh_renewables_w = FloatField(null=True, blank=True)
+    mwh_renewables_wo = FloatField(null=True, blank=True)
+
     ef_t2 = FloatField(null=True, blank=True)
     transmission_loss = FloatField(default=0.1)
     ef_source = ForeignKey(
