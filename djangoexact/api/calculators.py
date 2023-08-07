@@ -1764,30 +1764,6 @@ class LivestockCalculator(BaseCalculator):
             system.value for system in animal_waste_management_systems_wo
         ]
 
-        # inputs = [
-        #     tam_ch4_start.value,
-        #     vser_ch4_start.value,
-        #     ef_ch4_prp_start.value,
-        #     animal_waste_prp_start.value,
-        #     input.prp_percentage_start_t2,
-        #     input.pasture_percentage_w_t2,
-        #     input.pasture_percentage_wo_t2,
-        #     ef_system_values_start,
-        #     input.emission_factor_ch4_t2_start,
-        #     input.prp_ch4_start_t2,
-        #     input.emission_factor_w_t2,
-        #     input.emission_factor_wo_t2,
-        #     input.heads_number_start,
-        #     input.heads_number_w,
-        #     input.heads_number_wo,
-        #     project.gw_potential.ch4,
-        #     input.heads_number_w_rate.value,
-        #     input.heads_number_wo_rate.value,
-        #     project.implementation_duration_yrs,
-        #     project.capitalization_duration_yrs,
-        #     animal_waste_management_systems_values_start,
-        # ]
-
         ch4_enteric_start = MethaneEntericFermentationFactor.objects.get(
             livestock_category_type=input.livestock_category_type_start,
             livestock_production_type=input.livestock_production_type_start,
