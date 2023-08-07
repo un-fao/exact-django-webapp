@@ -1,0 +1,18 @@
+﻿macro_fuel_type;fuel_use_type;fuel_type;t_co2_eq;net_calorific_value;co2;ch4;n2o;density
+Liquid;Stationary;Motor Gasoline;2,289273336;44,3;69300;10;0,6;741
+Liquid;Stationary;Gasoil /Diesel Oil;2,682733149;43;74100;10;0,6;837
+Liquid;Stationary;Waste Oil / Lubrificants;2,81609241;40,2;73300;10;0,6;950
+Liquid;Stationary;LPG;1,595005405;47,3;63100;5;0,1;533
+Liquid;Stationary;Natural Gas;0,002074208;48;56100;5;0,1;0,768
+Liquid;Mobile;Motor Gasoline;2,333030794;44,3;69300;33;3,2;741
+Liquid;Mobile;Gasoil /Diesel Oil;2,708060016;43;74100;3,9;3,9;837
+Liquid;Mobile;Natural Gas;0,002192339;48;56100;92;3;0,768
+Liquid;Mobile;LPG;1,63591009;47,3;63100;62;0,2;533
+Liquid;Mobile;Ethanol (cars);0,042807312;27;1508;18;;788
+Liquid;Mobile;Ethanol (trucks);0,418137228;27;1508;260;41;788
+Liquid;Off-Road;Diesel ;2,943891043;43;74100;4,15;28,6;837
+Liquid;Off-Road;Gasoline (2-stroke);2,407021274;44,3;69300;140;0,4;741
+Liquid;Off-Road;Gasoline (4-stroke);2,365791441;44,3;69300;80;2;741
+Solid;;Wood;0,147576;15,6;112000;300;4;
+Solid;;Peat;0,08560496;9,76;106000;300;1,4;
+Solid;;Charcoal;0,1730175;29,5;112000;200;1;
