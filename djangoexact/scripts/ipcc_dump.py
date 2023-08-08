@@ -2174,7 +2174,6 @@ for i, row in enumerate(df_dict):
         ),
     )
 
-"""
 
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "IrrigationSystems.csv"),
@@ -2196,4 +2195,78 @@ for i, row in enumerate(df_dict):
     IrrigationSystemData.objects.get_or_create(
         irrigation_system_type=irrigation_system,
         value=value,
+    )
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "IrrigationPhaseData.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers = df.columns.values.tolist()
+df_dict = df.to_dict("records")
+
+for i, row in enumerate(df_dict):
+    fuel_type = FuelType.objects.get_or_create(
+        name=sanitize(row["fuel_type"]),
+    )[0]
+
+    print(
+        fuel_type,
+        row["emission_factor"],
+        row["calorific_value"],
+        row["co2_emissions"],
+        row["ch4_emissions"],
+        row["n2o_emissions"],
+        row["density"],
+    )
+
+    data = IrrigationPhaseData.objects.get_or_create(
+        fuel_type=fuel_type,
+        emission_factor=parse_csv_number(row["emission_factor"], nan_value=None),
+        calorific_value=parse_csv_number(row["calorific_value"], nan_value=None),
+        co2_emissions=parse_csv_number(row["co2_emissions"], nan_value=None),
+        ch4_emissions=parse_csv_number(row["ch4_emissions"], nan_value=None),
+        n2o_emissions=parse_csv_number(row["n2o_emissions"], nan_value=None),
+        density=parse_csv_number(row["density"], nan_value=None),
+    )
+"""
+
+df = pd.read_csv(
+    os.path.join(
+        os.path.dirname(__file__), "ipcc_data", "IrrigationPressureRequirements.csv"
+    ),
+    header=0,
+    sep=";",
+)
+
+df_headers = df.columns.values.tolist()
+df_dict = df.to_dict("records")
+
+for i, row in enumerate(df_dict):
+    irrigation_system_type = IrrigationSystemType.objects.get_or_create(
+        name=sanitize(row["irrigation_system_type"])
+    )[0]
+
+    print(
+        irrigation_system_type,
+        row["bar"],
+        row["avg_pressure"],
+        row["head"],
+    )
+
+    try:
+        bar_ranges = row["bar"].split("-")
+    except AttributeError:
+        bar_ranges = [row["bar"], row["bar"]]
+
+    bar_start = parse_csv_number(bar_ranges[0], nan_value=None)
+    bar_end = parse_csv_number(bar_ranges[1], nan_value=None)
+
+    data = IrrigationPressureRequirement.objects.get_or_create(
+        irrigation_system_type=irrigation_system_type,
+        bar_start=bar_start,
+        bar_end=bar_end,
+        avg_pressure=parse_csv_number(row["avg_pressure"], nan_value=None),
+        head=parse_csv_number(row["head"], nan_value=None),
     )

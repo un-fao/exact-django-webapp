@@ -336,6 +336,8 @@ class NewIrrigation:
         self.total_emissions = ef * (self.units_end - self.units_start) / 1000
         self.emissions_total_yearly = yearly_constant_emissions_breakdown(self.total_emissions, self.time_impl, self.time_cap)
         
+        return self.total_emissions
+
     def evaluate_tier_2_defaults():
         pass
 

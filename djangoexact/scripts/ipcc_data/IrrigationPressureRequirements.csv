@@ -1,0 +1,7 @@
+irrigation_system_type;initial_denomination;bar;avg_pressure;head
+Center-Pivot sprinkler;Pivot;1-3;2;21,399
+Trickle;Drip;0.5-3;0,9;9,62955
+Micro Sprinkler;;0.5-2;1,25;13,374375
+Sprinkler;;2-5;3,5;37,44825
+Traveler Sprinkler;Traveling gun ;2-8;5;53,4975
+Other;;;2,53;27,069735
