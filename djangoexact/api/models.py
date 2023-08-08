@@ -1948,6 +1948,69 @@ class Fuel(Module):
     account_for_co2 = BooleanField(default=False)
 
 
+class IrrigationSystemType(Model):
+    name = CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return f"({self.id}) {self.name}"
+
+
+class EnergySourceType(Model):
+    name = CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return f"({self.id}) {self.name}"
+
+
+class IrrigationSystem(Module):
+    irrigation_system_type = ForeignKey(
+        IrrigationSystemType, on_delete=CASCADE, null=True, blank=True
+    )
+    ha_start = FloatField(null=True, blank=True)
+    ha_w = FloatField(null=True, blank=True)
+    ha_wo = FloatField(null=True, blank=True)
+
+    ef_t2_start = FloatField(null=True, blank=True)
+    ef_t2_w = FloatField(null=True, blank=True)
+    ef_t2_wo = FloatField(null=True, blank=True)
+
+
+class IrrigationPhase(Module):
+    irrigation_system_type = ForeignKey(
+        IrrigationSystemType, on_delete=CASCADE, null=True, blank=True
+    )
+    energy_source_type = ForeignKey(
+        EnergySourceType, on_delete=CASCADE, null=True, blank=True
+    )
+    well_depth = FloatField(null=True, blank=True)
+    ha_start = FloatField(null=True, blank=True)
+    ha_w = FloatField(null=True, blank=True)
+    ha_wo = FloatField(null=True, blank=True)
+
+    gross_irrigation_water_start = FloatField(null=True, blank=True)
+    gross_irrigation_water_w = FloatField(null=True, blank=True)
+    gross_irrigation_water_wo = FloatField(null=True, blank=True)
+
+    power_origin_country_t2 = ForeignKey(
+        Country, on_delete=CASCADE, null=True, blank=True
+    )
+    ef_t2_start = FloatField(null=True, blank=True)
+    ef_t2_w = FloatField(null=True, blank=True)
+    ef_t2_wo = FloatField(null=True, blank=True)
+
+    transmission_loss_t2_start = FloatField(null=True, blank=True)
+    transmission_loss_t2_w = FloatField(null=True, blank=True)
+    transmission_loss_t2_wo = FloatField(null=True, blank=True)
+
+    average_pressure_t2 = FloatField(null=True, blank=True)
+
+    total_dynamic_head_t2 = FloatField(null=True, blank=True)
+
+    pumping_efficiency_t2_start = FloatField(null=True, blank=True)
+    pumping_efficiency_t2_w = FloatField(null=True, blank=True)
+    pumping_efficiency_t2_wo = FloatField(null=True, blank=True)
+
+
 class BuildingType(Model):
     name = CharField(max_length=255, unique=True)
 
