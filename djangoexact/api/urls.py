@@ -158,6 +158,11 @@ router.register(
 )
 
 router.register(r"fuels", views.generic_module_viewset(Fuel), basename="fuels")
+router.register(
+    r"irrigation-systems",
+    views.generic_module_viewset(IrrigationSystem),
+    basename="irrigation-systems",
+)
 
 router.register(r"crop-types", views.generic_viewset(CropType), basename="crop-types")
 router.register(
