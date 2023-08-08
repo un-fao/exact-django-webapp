@@ -159,6 +159,21 @@ router.register(
 
 router.register(r"fuels", views.generic_module_viewset(Fuel), basename="fuels")
 
+router.register(r"crop-types", views.generic_viewset(CropType), basename="crop-types")
+router.register(
+    r"tillage-management-types",
+    views.generic_viewset(TillageManagementType),
+    basename="tillage-management-types",
+)
+router.register(
+    r"input-types", views.generic_viewset(InputType), basename="input-types"
+)
+router.register(
+    r"residue-management-types",
+    views.generic_viewset(ResidueManagementType),
+    basename="residue-management-types",
+)
+
 urlpatterns = [
     path("docs/", include_docs_urls(title="EX-ACT Docs")),
     re_path(
