@@ -11,6 +11,8 @@ from .models import (
     LivestockParameter,
     Electricity,
     Fuel,
+    IrrigationSystem,
+    IrrigationPhase,
 )
 from math_model import (
     defo,
@@ -34,6 +36,7 @@ from math_model.no_time_dependency_final.inputs import (
     FuelConsumption,
     SolidConsumption,
     ElectryicityConsumption,
+    NewIrrigation,
 )
 
 
@@ -2440,5 +2443,49 @@ class LivestockCalculator(BaseCalculator):
         ]
 
         results_wo = MathLivestock(*i_wo).calculate_emissions()
+
+        return [Result(results_w, results_wo, results_w - results_wo)]
+
+
+class IrrigationSystemCalculator(BaseCalculator):
+    """
+    Calculates the emissions of the irrigation system
+    """
+
+    def calculate(self) -> list[Result]:
+        """
+        Calculates the emissions of the irrigation system
+        """
+
+        _input: IrrigationSystem = self.data
+        project: Project = _input.activity.project
+
+        ef = IrrigationSystemData.objects.get(
+            irrigation_system_type=_input.irrigation_system_type
+        )
+
+        inputs_w = [
+            ef.value,
+            _input.ef_t2_start,
+            _input.ha_start,
+            _input.ha_w,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            _input.activity.change_rate_start.name,
+        ]
+
+        results_w = NewIrrigation(*inputs_w).calculate_emissions()
+
+        inputs_wo = [
+            ef.value,
+            _input.ef_t2_wo,
+            _input.ha_start,
+            _input.ha_wo,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            _input.activity.change_rate_start.name,
+        ]
+
+        results_wo = NewIrrigation(*inputs_wo).calculate_emissions()
 
         return [Result(results_w, results_wo, results_w - results_wo)]
