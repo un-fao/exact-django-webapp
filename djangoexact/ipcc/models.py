@@ -871,3 +871,16 @@ class EnergyDefaultEmissionFactor(Model):
     def __str__(self):
         fuel_use_type = getattr(self.fuel_type.fuel_use_type, "name", None)
         return f"({self.pk}) {self.fuel_type.name} {fuel_use_type} {self.t_co2_eq} {self.net_calorific_value} {self.co2} {self.ch4} {self.n2o} {self.density}"
+
+
+class IrrigationSystemData(Model):
+    irrigation_system_type = OneToOneField(
+        "api.IrrigationSystemType", on_delete=CASCADE
+    )
+    value = FloatField()
+
+    def __str__(self):
+        return f"({self.pk}) {self.irrigation_system_type.name} {self.value}"
+
+    class Meta:
+        verbose_name_plural = "Irrigation system data"
