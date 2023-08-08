@@ -21,9 +21,7 @@ def get_model_serializer(model_arg):
             fields = "__all__"
             ref_name = model_arg.__name__
 
-    # Look if a serializer with the name of the model exists
-    # If it does, return it
-    # If it doesn't, return the generic serializer
+    # Look if a serializer with the name of the model exists. Else, return generic serializer
     try:
         return globals()[model_arg.__name__ + "Serializer"]
     except KeyError:
