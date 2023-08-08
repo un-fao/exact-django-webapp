@@ -21,7 +21,13 @@ def get_model_serializer(model_arg):
             fields = "__all__"
             ref_name = model_arg.__name__
 
-    return GenericSerializer
+    # Look if a serializer with the name of the model exists
+    # If it does, return it
+    # If it doesn't, return the generic serializer
+    try:
+        return globals()[model_arg.__name__ + "Serializer"]
+    except KeyError:
+        return GenericSerializer
 
 
 def get_module_serializer(model_arg):
@@ -61,3 +67,12 @@ class ActivitySerializer(serializers.ModelSerializer):
         model = Activity
         fields = "__all__"
         ref_name = "Activity"
+
+
+class InputTypeSerializer(serializers.ModelSerializer):
+    macro_input_type = get_model_serializer(MacroInputType)(many=False)
+
+    class Meta:
+        model = InputType
+        fields = "__all__"
+        ref_name = "InputType"
