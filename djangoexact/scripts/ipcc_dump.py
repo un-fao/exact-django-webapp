@@ -2121,7 +2121,6 @@ for i, row in enumerate(df_dict2):
         n2o_value=n2o_value,
         co2_eq_value=co2_eq_value,
     )
-"""
 
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "LiquidFuelTypes.csv"),
@@ -2173,4 +2172,28 @@ for i, row in enumerate(df_dict):
         net_calorific_value=parse_csv_number(
             row["net_calorific_value"], nan_value=None
         ),
+    )
+
+"""
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "IrrigationSystems.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers = df.columns.values.tolist()
+df_dict = df.to_dict("records")
+
+for i, row in enumerate(df_dict):
+    irrigation_system = IrrigationSystemType.objects.get_or_create(
+        name=sanitize(row["irrigation_system_type"])
+    )[0]
+    value = parse_csv_number(row["value"], nan_value=None)
+
+    print(irrigation_system, value)
+
+    IrrigationSystemData.objects.get_or_create(
+        irrigation_system_type=irrigation_system,
+        value=value,
     )
