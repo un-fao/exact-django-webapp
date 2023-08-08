@@ -884,3 +884,22 @@ class IrrigationSystemData(Model):
 
     class Meta:
         verbose_name_plural = "Irrigation system data"
+
+
+class IrrigationPhaseData(Model):
+    fuel_type = ForeignKey("api.FuelType", on_delete=CASCADE)
+    emission_factor = FloatField()
+    calorific_value = FloatField(blank=True, null=True)
+    co2_emissions = FloatField(blank=True, null=True)
+    ch4_emissions = FloatField(blank=True, null=True)
+    n2o_emissions = FloatField(blank=True, null=True)
+    density = FloatField(blank=True, null=True)
+
+
+class IrrigationPressureRequirement(Model):
+    irrigation_system_type = ForeignKey("api.IrrigationSystemType", on_delete=CASCADE)
+    initial_denomination = CharField(max_length=255)
+    bar_start = FloatField(null=True, blank=True)
+    bar_end = FloatField(null=True, blank=True)
+    avg_pressure = FloatField()
+    head = FloatField()

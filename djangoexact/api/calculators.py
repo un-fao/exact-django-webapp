@@ -13,6 +13,7 @@ from .models import (
     Fuel,
     IrrigationSystem,
     IrrigationPhase,
+    IrrigationParameter,
 )
 from math_model import (
     defo,
@@ -2489,3 +2490,37 @@ class IrrigationSystemCalculator(BaseCalculator):
         results_wo = NewIrrigation(*inputs_wo).calculate_emissions()
 
         return [Result(results_w, results_wo, results_w - results_wo)]
+
+
+class IrrigationPhaseCalculator(BaseCalculator):
+    """
+    # TODO: Review math model implementation
+    """
+
+    def calculate(self) -> list[Result]:
+        """ """
+
+        input: IrrigationPhase = self.data
+        project: Project = input.activity.project
+
+        ef = IrrigationPhaseData.objects.get(
+            fuel_type=input.fuel_type,
+        )
+
+        pressure = IrrigationPressureRequirement.objects.get(
+            irrigation_system_type=input.irrigation_system_type,
+        )
+
+        conversion_bar_meter_head = IrrigationParameter.objects.get(
+            name="CONVERSION_BAR_METER_HEAD"
+        ).value
+
+        inputs_w = [
+            ef.emission_factor,
+            input.ef_t2_start,
+            pressure.bar_start,
+            pressure.bar_end,
+            pressure.avg_pressure,
+            pressure.head,
+            conversion_bar_meter_head,
+        ]

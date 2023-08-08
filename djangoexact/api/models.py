@@ -332,13 +332,16 @@ class FuelUseType(Model):
 class FuelType(Model):
     name = CharField(max_length=100)
     fuel_use_type = ForeignKey(FuelUseType, on_delete=CASCADE, null=True, blank=True)
-    macro_fuel_type = ForeignKey(MacroFuelType, on_delete=CASCADE)
+    macro_fuel_type = ForeignKey(
+        MacroFuelType, on_delete=CASCADE, null=True, blank=True
+    )
 
     class Meta:
         unique_together = ("name", "fuel_use_type", "macro_fuel_type")
 
     def __str__(self):
-        return f"({self.pk}) {self.macro_fuel_type.name} - {self.name}"
+        macro = getattr(self.macro_fuel_type, "name", None)
+        return f"({self.pk}) {macro} - {self.name}"
 
 
 class SalinityType(Model):
@@ -1979,9 +1982,7 @@ class IrrigationPhase(Module):
     irrigation_system_type = ForeignKey(
         IrrigationSystemType, on_delete=CASCADE, null=True, blank=True
     )
-    energy_source_type = ForeignKey(
-        EnergySourceType, on_delete=CASCADE, null=True, blank=True
-    )
+    fuel_type = ForeignKey(FuelType, on_delete=CASCADE, null=True, blank=True)
     well_depth = FloatField(null=True, blank=True)
     ha_start = FloatField(null=True, blank=True)
     ha_w = FloatField(null=True, blank=True)
@@ -2031,6 +2032,14 @@ class Building(Module):
 
 
 class LivestockParameter(Model):
+    name = CharField(max_length=255, unique=True)
+    value = FloatField(null=True, blank=True)
+
+    def __str__(self):
+        return f"({self.id}) {self.name} = {self.value}"
+
+
+class IrrigationParameter(Model):
     name = CharField(max_length=255, unique=True)
     value = FloatField(null=True, blank=True)
 
