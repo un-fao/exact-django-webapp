@@ -175,6 +175,11 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = Activity.objects.all()
     serializer_class = ActivitySerializer
 
+    def create(self, request, *args, **kwargs):
+        state = ActivityState.objects.get_or_create(name="EMPTY")[0]
+        request.data["state"] = state.pk
+        return super().create(request, *args, **kwargs)
+
     @swagger_auto_schema(
         manual_parameters=[project_id], responses={400: "activity_id not provided"}
     )
