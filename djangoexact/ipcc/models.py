@@ -742,7 +742,6 @@ class LivestockTAM(Model):
     IPCC 2315:2364
     """
 
-    emission_type = ForeignKey(EmissionType, on_delete=CASCADE, null=True, blank=True)
     livestock_production_type = ForeignKey(
         "api.LivestockProductionType", on_delete=CASCADE
     )
