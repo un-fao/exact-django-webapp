@@ -179,6 +179,10 @@ router.register(
     basename="residue-management-types",
 )
 
+router.register(
+    r"activity-states", views.generic_viewset(ActivityState), basename="activity-states"
+)
+
 urlpatterns = [
     path("docs/", include_docs_urls(title="EX-ACT Docs")),
     re_path(
