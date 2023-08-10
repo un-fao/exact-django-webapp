@@ -36,8 +36,20 @@ class AfforestationFLUAdmin(admin.ModelAdmin):
 
 
 class LivestockTAMAdmin(admin.ModelAdmin):
+    list_display = [
+        "livestock_production_type",
+        "livestock_category_type",
+        "ipcc_region",
+        "value",
+    ]
+
+    list_select_related = [
+        "livestock_production_type",
+        "livestock_category_type",
+        "ipcc_region",
+    ]
+
     search_fields = [
-        "emission_type__name",
         "livestock_production_type__name",
         "livestock_category_type__name",
         "ipcc_region__name",
@@ -45,6 +57,21 @@ class LivestockTAMAdmin(admin.ModelAdmin):
 
 
 class LivestockVSERAdmin(admin.ModelAdmin):
+    list_display = [
+        "emission_type",
+        "livestock_production_type",
+        "livestock_category_type",
+        "ipcc_region",
+        "value",
+    ]
+
+    list_select_related = [
+        "emission_type",
+        "livestock_production_type",
+        "livestock_category_type",
+        "ipcc_region",
+    ]
+
     search_fields = [
         "emission_type__name",
         "livestock_production_type__name",
@@ -54,6 +81,23 @@ class LivestockVSERAdmin(admin.ModelAdmin):
 
 
 class LivestockManureEFAdmin(admin.ModelAdmin):
+    list_display = [
+        "emission_type",
+        "livestock_production_type",
+        "livestock_category_type",
+        "climate",
+        "moisture",
+        "value",
+    ]
+
+    list_select_related = [
+        "emission_type",
+        "livestock_production_type",
+        "livestock_category_type",
+        "climate",
+        "moisture",
+    ]
+
     search_fields = [
         "emission_type__name",
         "livestock_production_type__name",
