@@ -202,19 +202,25 @@ class ElectryicityConsumption:
 
     def calculate_emissions(self,):
 
-        factor = self.specific_factor if self.specific_factor else self.emissions_factor
+        try:
+            factor = self.specific_factor if self.specific_factor else self.emissions_factor
 
-        annual_start = factor * self.mwh_start
-        annual_end = factor * self.mwh_end
+            annual_start = factor * self.mwh_start
+            annual_end = factor * self.mwh_end
 
-        self.emissions_total_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.time_impl, self.time_cap, self.rate_type)
+            self.emissions_total_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.time_impl, self.time_cap, self.rate_type)
 
-        # Adjust for transmission losses
-        self.emissions_total_yearly = [x * (1 + self.percent_loss_transportation) for x in self.emissions_total_yearly]
+            # Adjust for transmission losses
+            self.emissions_total_yearly = [x * (1 + self.percent_loss_transportation) for x in self.emissions_total_yearly]
+            
+            self.total_emissions = sum(self.emissions_total_yearly)
+
+            return self.total_emissions
         
-        self.total_emissions = sum(self.emissions_total_yearly)
+        except:
+            traceback.print_exc()
 
-        return self.total_emissions
+            return None
 
     def evaluate_tier_2_defaults():
         pass
@@ -331,10 +337,18 @@ class NewIrrigation:
 
     def calculate_emissions(self,):
 
-        ef = self.ef_ref if not self.ef_tier_2 else self.ef_tier_2
+        try:
+            ef = self.ef_ref if not self.ef_tier_2 else self.ef_tier_2
 
-        self.total_emissions = ef * (self.units_end - self.units_start) / 1000
-        self.emissions_total_yearly = yearly_constant_emissions_breakdown(self.total_emissions, self.time_impl, self.time_cap)
+            self.total_emissions = ef * (self.units_end - self.units_start) / 1000
+            self.emissions_total_yearly = yearly_constant_emissions_breakdown(self.total_emissions, self.time_impl, self.time_cap)
+
+            return self.total_emissions
+
+        except:
+
+            traceback.print_exc()
+            return None
         
     def evaluate_tier_2_defaults():
         pass
