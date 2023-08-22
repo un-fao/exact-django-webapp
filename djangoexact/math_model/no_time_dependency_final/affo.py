@@ -12,7 +12,7 @@ class Afforestation:
                     reference_carbon_stocks_tier_2, abg_biomass, rate_bgb_agb_s_125, rate_bgb_agb_b_125
                     ):
         
-        self.hectars_end = hectars_end
+        self.hectars_end = hectars_end 
         self.time_impl = time_impl
         self.time_cap = time_cap
         self.initial_biomass = initial_biomass
