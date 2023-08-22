@@ -1151,13 +1151,13 @@ class SmallFisheryCalculator(BaseCalculator):
         input = self.data
 
         ef_diesel_default_list = EnergyDefaultEmissionFactor.objects.filter(
-            fuel_type__name__contains="Off-Road"
+            fuel_type__fuel_use_type__name__contains="Off-Road"
         )
 
         # Average of all default emission factors for gasoil/diesel
-        ef_diesel_default = sum(
-            [ef.t_co2_eq_m3 for ef in ef_diesel_default_list]
-        ) / len(ef_diesel_default_list)
+        ef_diesel_default = sum([ef.t_co2_eq for ef in ef_diesel_default_list]) / len(
+            ef_diesel_default_list
+        )
 
         fui_default_start = SmallFisheryFUI.objects.get_value_or_average(
             fishery_type=self.data.fishery_type,
