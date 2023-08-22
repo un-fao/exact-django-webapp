@@ -85,6 +85,7 @@ class LivestockManureEFAdmin(admin.ModelAdmin):
         "emission_type",
         "livestock_production_type",
         "livestock_category_type",
+        "manure_management_type",
         "climate",
         "moisture",
         "value",
@@ -94,6 +95,7 @@ class LivestockManureEFAdmin(admin.ModelAdmin):
         "emission_type",
         "livestock_production_type",
         "livestock_category_type",
+        "manure_management_type",
         "climate",
         "moisture",
     ]
@@ -102,6 +104,7 @@ class LivestockManureEFAdmin(admin.ModelAdmin):
         "emission_type__name",
         "livestock_production_type__name",
         "livestock_category_type__name",
+        "manure_management_type__name",
         "climate__name",
         "moisture__name",
     ]
