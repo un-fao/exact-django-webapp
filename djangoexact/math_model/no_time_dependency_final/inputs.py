@@ -80,27 +80,29 @@ class Inputs:
 
 class OperationPhaseIrrigation:
 
-    def __init__(self, ef_default, ef_tier_2, total_dynamic_head_default, total_dynamic_head_tier_2, average_pressure_default, average_pressure_tier_2, 
-                 pumping_efficiency_default, pumping_efficiency_tier_2, erh, depth,
+    def __init__(self, ef_default, ef_tier_2, total_dynamic_head_tier_2, average_pressure_default, average_pressure_tier_2, 
+                 pumping_efficiency_default, pumping_efficiency_tier_2, erh_electricity, fuel_density, fuel_net_calorific_values, depth,
                  units_start, units_end, rate_type, time_impl, time_cap, 
-                 electricity_multiplier_end):
+                 transportation_loss, gwir):
         
-        self.ef_default = ef_default
-        self.ef_tier_2 = ef_tier_2
-        self.total_dynamic_head_default = total_dynamic_head_default
-        self.total_dynamic_head_tier_2 = total_dynamic_head_tier_2
-        self.average_pressure_default = average_pressure_default
-        self.average_pressure_tier_2 = average_pressure_tier_2
-        self.pumping_efficiency_default = pumping_efficiency_default
-        self.pumping_efficiency_tier_2 = pumping_efficiency_tier_2
-        self.erh = erh
-        self.depth = depth
+        self.ef_default = ef_default                                            # Match Source of Energy to table EnergyDB G7-H13 column 2
+        self.ef_tier_2 = ef_tier_2                                              # Tier 2 Value
+        self.total_dynamic_head_tier_2 = total_dynamic_head_tier_2              # Tier 2 Value
+        self.average_pressure_default = average_pressure_default                # Match Irrigation System type to Energy DB Table O7-S12, column 4
+        self.average_pressure_tier_2 = average_pressure_tier_2                  # Tier 2 Value
+        self.pumping_efficiency_default = pumping_efficiency_default            # Fixed value at 45% for all pumps
+        self.pumping_efficiency_tier_2 = pumping_efficiency_tier_2              # Tier 2 Value
+        self.erh_electricity = erh_electricity                                  # Fixed value, Energy DB value AJ4
+        self.fuel_net_calorific_values = fuel_net_calorific_values              # Energy DB Table G6-M13, match row to Fuel Type and Column 'Net Calorific Value'         
+        self.fuel_density = fuel_density                                        # Energy DB Table G6-M13, match row to Fuel Type and Column 'Density'
+        self.depth = depth                                                      # Front-End Input
         self.units_start = units_start
         self.units_end = units_end
         self.rate_type = rate_type
         self.time_impl = time_impl
         self.time_cap = time_cap
-        self.electricity_multiplier_end = electricity_multiplier_end
+        self.transportation_loss = transportation_loss                          # Float, Fixed at 0.1 (10%) on Excel (could become front-end Input)
+        self.gwir = gwir                                                        # Front-End input Gross Water Irrigation Requirement
 
         # RESULTS
         self.emissions_total_yearly = []
@@ -108,7 +110,8 @@ class OperationPhaseIrrigation:
 
     def calculate_emissions(self,):
 
-        def ef_calculation(ef_default, ef_tier_2, total_dynamic_head_default, total_dynamic_head_tier_2, average_pressure_default, average_pressure_tier_2, pumping_efficiency_default, pumping_efficiency_tier_2, erh, depth ):
+        def ef_calculation(ef_default, ef_tier_2, total_dynamic_head_tier_2, average_pressure_default, average_pressure_tier_2, pumping_efficiency_default, 
+                           pumping_efficiency_tier_2, erh_electricity, fuel_net_calorific_values, fuel_density,  depth, gwir):
             
             try:
                 pumping_efficiency = pumping_efficiency_default if not pumping_efficiency_tier_2 else pumping_efficiency_tier_2
@@ -117,6 +120,7 @@ class OperationPhaseIrrigation:
                 total_dynamic_head = total_dynamic_head_default if not total_dynamic_head_tier_2 else total_dynamic_head_tier_2
                 ef = ef_default if not ef_tier_2 else ef_tier_2
                 gwir = gwir * 10
+                erh = erh_electricity if erh_electricity else 9.81/(fuel_net_calorific_values*fuel_density)/math.pow(10, 3)
 
                 total_energy = gwir * erh
                 A_efficiency = total_energy / pumping_efficiency
@@ -131,11 +135,13 @@ class OperationPhaseIrrigation:
                 return None
         
         try:
-            ef = ef_calculation(self.ef_default, self.ef_tier_2, self.total_dynamic_head_default, self.total_dynamic_head_tier_2, self.average_pressure_default, self.average_pressure_tier_2, self.pumping_efficiency_default, self.pumping_efficiency_tier_2, self.erh, self.depth )
+            ef = ef_calculation(self.ef_default, self.ef_tier_2, self.total_dynamic_head_tier_2, self.average_pressure_default, 
+                                self.average_pressure_tier_2, self.pumping_efficiency_default, self.pumping_efficiency_tier_2, self.erh_electricity, 
+                                self.fuel_net_calorific_values, self.fuel_density, self.depth, self.gwir)
 
             # THESE ARE SAVED IN ORDER TO MULTIPLY BY ELECTRICITY MULTIPLIER
             yearly_emissions, total_emissions = input_single_calculation(self.units_start, self.units_end, self.rate_type, ef, None, 1, 1, self.time_impl, self.time_cap)
-            yearly_emissions = [x * (1 + self.electricity_multiplier_end) for x in yearly_emissions] if self.electricity_multiplier_end else yearly_emissions
+            yearly_emissions = [x * (1 + self.transportation_loss) for x in yearly_emissions] if self.transportation_loss else yearly_emissions
             
             self.emissions_total_yearly = yearly_emissions
             self.total_emissions = sum(self.emissions_total_yearly)
