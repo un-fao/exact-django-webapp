@@ -88,7 +88,6 @@ class ForestManagement:
             except Exception as e:
                 traceback.print_exc()
                 
-
         def calculate_dom_emissions():
             try:
                 degradation_level_start = self.degradation_level_start_ref if not self.degradation_level_start_tier_2 else self.degradation_level_start_tier_2
