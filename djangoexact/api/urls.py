@@ -171,6 +171,11 @@ router.register(
     basename="tillage-management-types",
 )
 router.register(
+    r"organic-input-types",
+    views.generic_viewset(OrganicInputType),
+    basename="organic-input-types",
+)
+router.register(
     r"input-types", views.generic_viewset(InputType), basename="input-types"
 )
 router.register(
