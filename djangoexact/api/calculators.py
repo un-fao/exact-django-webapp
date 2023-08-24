@@ -2504,7 +2504,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
         energy_db = EnergyDefaultEmissionFactor.objects.get(fuel_type=input.fuel_type)
         pressure = IrrigationPressureRequirement.objects.get(irrigation_system_type=input.irrigation_system_type)
 
-        erh_electricity = IrrigationParameter.objects.get(name="ERH_ELECTRICITY").value if input.fuel_tyoe.name == "Electricity" else None
+        erh_electricity = IrrigationParameter.objects.get(name="ERH_ELECTRICITY").value if input.fuel_type.name == "Electricity" else None
         transportation_loss = IrrigationParameter.objects.get(name="TRANSPORTATION_LOSS")
         pumping_efficiency = IrrigationParameter.objects.get(name="PUMPING_EFFICIENCY")
 
@@ -2552,7 +2552,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
             input.gross_irrigation_water_w,
         ]
 
-        results_w = OperationPhaseIrrigation(*inputs_w).calculate_emissions() + results_from_start
+        results_w = OperationPhaseIrrigation(*inputs_w).calculate_emissions()
 
         inputs_wo = [
             ef.emission_factor,
@@ -2575,6 +2575,6 @@ class IrrigationPhaseCalculator(BaseCalculator):
             input.gross_irrigation_water_wo,
         ]
 
-        results_wo = OperationPhaseIrrigation(*inputs_wo).calculate_emissions() + results_from_start
+        results_wo = OperationPhaseIrrigation(*inputs_wo).calculate_emissions()
 
         return [Result(results_w, results_wo, results_w - results_wo)]
