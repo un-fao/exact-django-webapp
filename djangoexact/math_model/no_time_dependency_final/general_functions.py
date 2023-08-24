@@ -89,6 +89,7 @@ def breakdown_according_to_values(maximum, list_of_proportions):
 
     result = [maximum * i/sum(list_of_proportions) for i in list_of_proportions]
     return result
+
 # LIVESTOCK CH4 HEAD GENERAL FUNCTION    
 def ch4_head_calculation_general(tam: float, vser: float, ef_prp: float, percentage_prp_default: float, percentage_prp_tier_2: float, ef_system_default: list, ch4_prp_tier_2: float, percentage_system_default: list, ef_single_system, ch4_system_tier_2, ch4_dividing_parameter = 1):
         
@@ -165,10 +166,10 @@ def soil_emissions_delta_soc_known(delta_soil_c, delta_soil_c_20_years, area_sta
 
     return emissions_soil_yearly, emissions_soil_total
      
-     
 # INPUT SINGLE MODULE CALCULATION
 def input_single_calculation(unit_start, unit_end, ipcc_factor, tier_2_factor, unit_factor, emissions_factor, time_implementation, time_capitalization, rate_type):
-                
+
+        try:   
             ipcc_or_tier_2_factor = tier_2_factor if tier_2_factor else ipcc_factor
 
             unit_start = unit_start * unit_factor 
@@ -179,4 +180,8 @@ def input_single_calculation(unit_start, unit_end, ipcc_factor, tier_2_factor, u
 
             annual_emissions = yearly_time_dependent_parameter_breakdown(emissions_start, emissions_end, time_implementation , time_capitalization, rate_type)
 
-            return annual_emissions, sum(annual_emissions)
+        except:
+            traceback.print_exc()
+            return None
+
+        return annual_emissions, sum(annual_emissions)
