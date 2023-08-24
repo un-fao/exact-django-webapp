@@ -185,3 +185,22 @@ def input_single_calculation(unit_start, unit_end, ipcc_factor, tier_2_factor, u
             return None
 
         return annual_emissions, sum(annual_emissions)
+
+def input_single_calculation_different_ef(unit_start, unit_end, ipcc_factor, tier_2_factor, unit_factor, emission_factor_start, emission_factor_end, time_implementation, time_capitalization, rate_type):
+
+        try:   
+            ipcc_or_tier_2_factor = tier_2_factor if tier_2_factor else ipcc_factor
+
+            unit_start = unit_start * unit_factor 
+            unit_end = unit_end * unit_factor 
+
+            emissions_start = unit_start * ipcc_or_tier_2_factor * emission_factor_start
+            emissions_end = unit_end * ipcc_or_tier_2_factor * emission_factor_end
+
+            annual_emissions = yearly_time_dependent_parameter_breakdown(emissions_start, emissions_end, time_implementation , time_capitalization, rate_type)
+
+        except:
+            traceback.print_exc()
+            return None
+
+        return annual_emissions, sum(annual_emissions)
