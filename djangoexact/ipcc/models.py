@@ -898,7 +898,15 @@ class IrrigationPhaseData(Model):
 class IrrigationPressureRequirement(Model):
     irrigation_system_type = ForeignKey("api.IrrigationSystemType", on_delete=CASCADE)
     initial_denomination = CharField(max_length=255)
-    bar_start = FloatField(null=True, blank=True)
-    bar_end = FloatField(null=True, blank=True)
+    bar_start = FloatField()
+    bar_end = FloatField()
     avg_pressure = FloatField()
     head = FloatField()
+
+    def save(self, *args, **kwargs):
+        if not self.avg_pressure:
+            self.avg_pressure = (self.bar_start + self.bar_end) / 2
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"({self.pk}) {self.irrigation_system_type.name} {self.avg_pressure}"
