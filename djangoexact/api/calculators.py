@@ -2496,7 +2496,6 @@ class IrrigationSystemCalculator(BaseCalculator):
 class IrrigationPhaseCalculator(BaseCalculator):
 
     def calculate(self) -> list[Result]:
-        """ """
 
         input: IrrigationPhase = self.data
         project: Project = input.activity.project
@@ -2508,6 +2507,32 @@ class IrrigationPhaseCalculator(BaseCalculator):
         erh_electricity = IrrigationParameter.objects.get(name="ERH_ELECTRICITY")
         transportation_loss = IrrigationParameter.objects.get(name="TRANSPORTATION_LOSS")
         pumping_efficiency = IrrigationParameter.objects.get(name="PUMPING_EFFICIENCY")
+
+        inputs_from_start = [
+            ef.emission_factor,
+            input.ef_t2_start,
+            0,
+            input.total_dynamic_head_t2,
+            pressure.avg_pressure,
+            input.average_pressure_t2,
+            pumping_efficiency.value,
+            input.pumping_efficiency_t2_start,
+            0,
+            erh_electricity.value,
+            energy_db.net_calorific_value,
+            energy_db.density,
+            input.well_depth,
+            input.ha_start,
+            input.ha_w,
+            input.activity.change_rate_start.name,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            transportation_loss.value,
+            input.gross_irrigation_water_start,
+            0,
+        ]
+
+        results_from_start = OperationPhaseIrrigation(*inputs_from_start).calculate_emissions()
 
         inputs_w = [
             ef.emission_factor,
@@ -2533,7 +2558,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
             input.gross_irrigation_water_w,
         ]
 
-        results_w = OperationPhaseIrrigation(*inputs_w).calculate_emissions()
+        results_w = OperationPhaseIrrigation(*inputs_w).calculate_emissions() + results_from_start
 
         inputs_wo = [
             ef.emission_factor,
@@ -2559,6 +2584,6 @@ class IrrigationPhaseCalculator(BaseCalculator):
             input.gross_irrigation_water_wo,
         ]
 
-        results_wo = OperationPhaseIrrigation(*inputs_wo).calculate_emissions()
+        results_wo = OperationPhaseIrrigation(*inputs_wo).calculate_emissions() + results_from_start
 
         return [Result(results_w, results_wo, results_w - results_wo)]
