@@ -116,7 +116,7 @@ class OperationPhaseIrrigation:
             try:
                 pumping_efficiency = pumping_efficiency_default if not pumping_efficiency_tier_2 else pumping_efficiency_tier_2
                 average_pressure = average_pressure_default if not average_pressure_tier_2 else average_pressure_tier_2
-                total_dynamic_head_default = average_pressure * 10
+                total_dynamic_head_default = average_pressure * 10.19
                 total_dynamic_head = total_dynamic_head_default if not total_dynamic_head_tier_2 else total_dynamic_head_tier_2
                 ef = ef_default if not ef_tier_2 else ef_tier_2
                 gwir = gwir * 10
