@@ -38,6 +38,7 @@ from math_model.no_time_dependency_final.inputs import (
     SolidConsumption,
     ElectryicityConsumption,
     NewIrrigation,
+    OperationPhaseIrrigation,
 )
 
 
@@ -2493,9 +2494,6 @@ class IrrigationSystemCalculator(BaseCalculator):
 
 
 class IrrigationPhaseCalculator(BaseCalculator):
-    """
-    # TODO: Review math model implementation
-    """
 
     def calculate(self) -> list[Result]:
         """ """
@@ -2503,24 +2501,64 @@ class IrrigationPhaseCalculator(BaseCalculator):
         input: IrrigationPhase = self.data
         project: Project = input.activity.project
 
-        ef = IrrigationPhaseData.objects.get(
-            fuel_type=input.fuel_type,
-        )
+        ef = IrrigationPhaseData.objects.get(fuel_type=input.fuel_type)
+        energy_db = EnergyDefaultEmissionFactor.objects.get(fuel_type=input.fuel_type)
+        pressure = IrrigationPressureRequirement.objects.get(irrigation_system_type=input.irrigation_system_type)
 
-        pressure = IrrigationPressureRequirement.objects.get(
-            irrigation_system_type=input.irrigation_system_type,
-        )
-
-        conversion_bar_meter_head = IrrigationParameter.objects.get(
-            name="CONVERSION_BAR_METER_HEAD"
-        ).value
+        erh_electricity = IrrigationParameter.objects.get(name="ERH_ELECTRICITY")
+        transportation_loss = IrrigationParameter.objects.get(name="TRANSPORTATION_LOSS")
+        pumping_efficiency = IrrigationParameter.objects.get(name="PUMPING_EFFICIENCY")
 
         inputs_w = [
             ef.emission_factor,
             input.ef_t2_start,
-            pressure.bar_start,
-            pressure.bar_end,
+            input.ef_t2_w,
+            input.total_dynamic_head_t2,
             pressure.avg_pressure,
-            pressure.head,
-            conversion_bar_meter_head,
+            input.average_pressure_t2,
+            pumping_efficiency.value,
+            input.pumping_efficiency_t2_start,
+            input.pumping_efficiency_t2_w,
+            erh_electricity.value,
+            energy_db.net_calorific_value,
+            energy_db.density,
+            input.well_depth,
+            input.ha_start,
+            input.ha_w,
+            input.activity.change_rate_start.name,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            transportation_loss.value,
+            input.gross_irrigation_water_start,
+            input.gross_irrigation_water_w,
         ]
+
+        results_w = OperationPhaseIrrigation(*inputs_w).calculate_emissions()
+
+        inputs_wo = [
+            ef.emission_factor,
+            input.ef_t2_start,
+            input.ef_t2_wo,
+            input.total_dynamic_head_t2,
+            pressure.avg_pressure,
+            input.average_pressure_t2,
+            pumping_efficiency.value,
+            input.pumping_efficiency_t2_start,
+            input.pumping_efficiency_t2_wo,
+            erh_electricity.value,
+            energy_db.net_calorific_value,
+            energy_db.density,
+            input.well_depth,
+            input.ha_start,
+            input.ha_wo,
+            input.activity.change_rate_start.name,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            transportation_loss.value,
+            input.gross_irrigation_water_start,
+            input.gross_irrigation_water_wo,
+        ]
+
+        results_wo = OperationPhaseIrrigation(*inputs_wo).calculate_emissions()
+
+        return [Result(results_w, results_wo, results_w - results_wo)]
