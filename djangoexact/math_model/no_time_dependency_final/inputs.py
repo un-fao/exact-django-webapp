@@ -92,7 +92,7 @@ class OperationPhaseIrrigation:
         self.average_pressure_tier_2 = average_pressure_tier_2                  # Tier 2 Value
         self.pumping_efficiency_default = pumping_efficiency_default            # Fixed value at 45% for all pumps
         self.pumping_efficiency_tier_2 = pumping_efficiency_tier_2              # Tier 2 Value
-        self.erh_electricity = erh_electricity                                  # Fixed value, Energy DB value AJ4
+        self.erh_electricity = erh_electricity                                  # Fixed value, Energy DB value AJ4 if Electricity else None
         self.fuel_net_calorific_values = fuel_net_calorific_values              # Energy DB Table G6-M13, match row to Fuel Type and Column 'Net Calorific Value'         
         self.fuel_density = fuel_density                                        # Energy DB Table G6-M13, match row to Fuel Type and Column 'Density'
         self.depth = depth                                                      # Front-End Input
@@ -111,7 +111,7 @@ class OperationPhaseIrrigation:
     def calculate_emissions(self,):
 
         def ef_calculation(ef_default, ef_tier_2, total_dynamic_head_tier_2, average_pressure_default, average_pressure_tier_2, pumping_efficiency_default, 
-                           pumping_efficiency_tier_2, erh_electricity, fuel_net_calorific_values, fuel_density,  depth, gwir):
+                           pumping_efficiency_tier_2, erh_electricity, fuel_net_calorific_values, fuel_density, depth, gwir):
             
             try:
                 pumping_efficiency = pumping_efficiency_default if not pumping_efficiency_tier_2 else pumping_efficiency_tier_2
@@ -140,7 +140,7 @@ class OperationPhaseIrrigation:
                                 self.fuel_net_calorific_values, self.fuel_density, self.depth, self.gwir)
 
             # THESE ARE SAVED IN ORDER TO MULTIPLY BY ELECTRICITY MULTIPLIER
-            yearly_emissions, total_emissions = input_single_calculation(self.units_start, self.units_end, self.rate_type, ef, None, 1, 1, self.time_impl, self.time_cap)
+            yearly_emissions, total_emissions = input_single_calculation(self.units_start, self.units_end, ef, None, 1, 1, self.time_impl, self.time_cap, self.rate_type)
             yearly_emissions = [x * (1 + self.transportation_loss) for x in yearly_emissions] if self.transportation_loss else yearly_emissions
             
             self.emissions_total_yearly = yearly_emissions
