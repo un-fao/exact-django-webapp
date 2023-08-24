@@ -2525,7 +2525,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
             input.activity.change_rate_start.name,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
-            transportation_loss.value,
+            transportation_loss.value if input.fuel_type.name == "Electricity" else 0,
             input.gross_irrigation_water_start,
         ]
 
@@ -2548,7 +2548,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
             input.activity.change_rate_start.name,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
-            transportation_loss.value,
+            transportation_loss.value if input.fuel_type.name == "Electricity" else 0,
             input.gross_irrigation_water_w,
         ]
 
@@ -2571,7 +2571,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
             input.activity.change_rate_start.name,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
-            transportation_loss.value,
+            transportation_loss.value if input.fuel_type.name == "Electricity" else 0,
             input.gross_irrigation_water_wo,
         ]
 
