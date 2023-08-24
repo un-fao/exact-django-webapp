@@ -2055,6 +2055,7 @@ class LivestockParameter(Model):
 class IrrigationParameter(Model):
     name = CharField(max_length=255, unique=True)
     value = FloatField(null=True, blank=True)
+    unit = CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
-        return f"({self.id}) {self.name} = {self.value}"
+        return f"({self.pk}) {self.name} = {self.value} {self.unit if self.unit else ''}"
