@@ -41,6 +41,10 @@ def get_module_serializer(model_arg):
 
     return GenericSerializer
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'first_name', 'last_name']
 
 class ProjectSerializer(serializers.ModelSerializer):
     climate = get_model_serializer(Climate)(many=False)
@@ -74,3 +78,20 @@ class InputTypeSerializer(serializers.ModelSerializer):
         model = InputType
         fields = "__all__"
         ref_name = "InputType"
+
+class RecursiveField(serializers.Serializer):
+    def to_representation(self, value):
+        serializer = self.parent.parent.__class__(value, context=self.context)
+        return serializer.data
+
+class UserSummarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username']
+
+class CommentSerializer(serializers.ModelSerializer):
+    replies = RecursiveField(many=True, read_only=True, source='comment_set')
+    author = UserSummarySerializer(many=False, read_only=True)
+    class Meta:
+        model = Comment
+        fields = '__all__'

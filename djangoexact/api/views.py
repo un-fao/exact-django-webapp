@@ -290,6 +290,12 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         return Response(data=modules, status=status.HTTP_200_OK)
 
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
 class ModuleTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
