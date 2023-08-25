@@ -41,33 +41,25 @@ from math_model.no_time_dependency_final.inputs import (
     OperationPhaseIrrigation,
 )
 
-
 class Result:
     """
     Base class for all results.
     """
-
-    def __init__(self, total_w, total_wo, balance):
+    def __init__(self, total_w=0, total_wo=0, balance=0):
         self.total_w = total_w
         self.total_wo = total_wo
         self.balance = balance
-
-    @staticmethod
-    def add(a, b):
-        """
-        Adds two results together.
-        """
-
-        if not isinstance(a, Result) or not isinstance(b, Result):
-            raise Exception("Can only add two results")
-
-        return Result(
-            a.total_w + b.total_w, a.total_wo + b.total_wo, a.balance + b.balance
-        )
-
+    
     def __str__(self):
-        return f"Total with: {self.total_w}, total without: {self.total_wo}, balance: {self.balance}"
-
+        return f"total_w: {self.total_w}, total_wo: {self.total_wo}, balance: {self.balance}"
+    
+    def add(self, result):
+        if not isinstance(result, self.__class__):
+            raise TypeError(f"Cannot add {type(result)} to {type(self)}. Must use a {type(self)} instance.")
+        
+        self.total_w += result.total_w
+        self.total_wo += result.total_wo
+        self.balance += result.balance
 
 class CalculatorFactory:
     def calculate_result(self, input):
@@ -103,7 +95,7 @@ class BaseCalculator(ABC):
         super().__init__()
 
     @abstractmethod
-    def calculate(self, input: Model) -> list[Result]:
+    def calculate(self, input: Model) -> Result:
         """
         Calculate emissions for a single module.
         """
@@ -115,7 +107,7 @@ class DeforestationCalculator(BaseCalculator):
     Calculator for deforestation modules.
     """
 
-    def calculate(self) -> list[Result]:
+    def calculate(self) -> Result:
         """
         Calculate emissions for a single Deforestation module.
         """
@@ -216,7 +208,7 @@ class DeforestationCalculator(BaseCalculator):
 
         results = defo.GHG_emissions(*inputs)
 
-        return [Result(*results)]
+        return Result(*results)
 
 
 class ExtractionCalculator(BaseCalculator):
@@ -368,7 +360,7 @@ class CoastalWaterbodyCalculator(BaseCalculator):
             self.data.trophic_mean_annual_t2,
         ]
 
-        return [Result(*coastal_wetlands.coastal_waterbodies_w_wo(*inputs))]
+        return Result(*coastal_wetlands.coastal_waterbodies_w_wo(*inputs))
 
 
 class RewettingCalculator(BaseCalculator):
@@ -425,7 +417,7 @@ class RewettingCalculator(BaseCalculator):
             self.data.ha_wo_rate.value,
         ]
 
-        return [Result(*coastal_wetlands.rewetting_w_wo(*inputs))]
+        return Result(*coastal_wetlands.rewetting_w_wo(*inputs))
 
 
 class AfforestationCalculator(BaseCalculator):
@@ -511,7 +503,7 @@ class AfforestationCalculator(BaseCalculator):
             bg_biomass_gt_125.value,
         ]
 
-        return [Result(*affo.afforestation(*inputs))]
+        return Result(*affo.afforestation(*inputs))
 
 
 class OtherLandUseCalculator(BaseCalculator):
@@ -596,7 +588,7 @@ class OtherLandUseCalculator(BaseCalculator):
             self.data.ha_wo,
         ]
 
-        return [Result(*oluc.calculate_w_wo_balance(*inputs))]
+        return Result(*oluc.calculate_w_wo_balance(*inputs))
 
 
 class AnnualCroppingCalculator(BaseCalculator):
@@ -927,7 +919,7 @@ class AnnualCroppingCalculator(BaseCalculator):
         res_w = emissions_w - emissions_start
         res_wo = emissions_wo - emissions_start
 
-        return [Result(res_w, res_wo, res_w - res_wo)]
+        return Result(res_w, res_wo, res_w - res_wo)
 
 
 class PerennialCroppingCalculator(BaseCalculator):
@@ -1031,7 +1023,7 @@ class PerennialCroppingCalculator(BaseCalculator):
             self.data.tillage_factor_t2,
         ]
         # BUG: Results for perennial crops do not add up. Wait for Lorenzo's unlocked Excel files
-        return [Result(*perennial_cropping.calculate_emissions(*inputs))]
+        return Result(*perennial_cropping.calculate_emissions(*inputs))
 
 
 class GrasslandCalculator(BaseCalculator):
@@ -1135,7 +1127,7 @@ class GrasslandCalculator(BaseCalculator):
             self.data.soil_carbon_wo_t2,
         ]
 
-        return [Result(*grassland_management.calculate_total_emissions(*inputs))]
+        return Result(*grassland_management.calculate_total_emissions(*inputs))
 
 
 class SmallFisheryCalculator(BaseCalculator):
@@ -1239,13 +1231,8 @@ class SmallFisheryCalculator(BaseCalculator):
 
         # print(f"Small fishery: {inputs}")
 
-        return [
-            Result(
-                *fisheries_and_aquaculture.total_emissions_small_or_large_fisheries(
-                    *inputs
-                )
-            )
-        ]
+        return Result(*fisheries_and_aquaculture.total_emissions_small_or_large_fisheries(*inputs))
+        
 
 
 class LargeFisheryCalculator(BaseCalculator):
@@ -1353,13 +1340,8 @@ class LargeFisheryCalculator(BaseCalculator):
 
         # print(f"Large fishery: {inputs}")
 
-        return [
-            Result(
-                *fisheries_and_aquaculture.total_emissions_small_or_large_fisheries(
-                    *inputs
-                )
-            )
-        ]
+        return Result(*fisheries_and_aquaculture.total_emissions_small_or_large_fisheries(*inputs))
+        
 
 
 class ForestCalculator(BaseCalculator):
@@ -1457,7 +1439,7 @@ class ForestCalculator(BaseCalculator):
             cf.n2o,
         ]
 
-        return [Result(*forest_management.calculate_emissions(*inputs))]
+        return Result(*forest_management.calculate_emissions(*inputs))
 
 
 class AquacultureCalculator(BaseCalculator):
@@ -1492,9 +1474,7 @@ class AquacultureCalculator(BaseCalculator):
             self.data.annual_feed_quantity_wo,
         ]
 
-        return [
-            Result(*fisheries_and_aquaculture.total_inland_coastal_aquaculture(*inputs))
-        ]
+        return Result(*fisheries_and_aquaculture.total_inland_coastal_aquaculture(*inputs))
 
 
 class InputCalculator(BaseCalculator):
@@ -1561,7 +1541,7 @@ class InputCalculator(BaseCalculator):
 
         results = [results_w, results_wo, results_w - results_wo]
 
-        return [Result(*results)]
+        return Result(*results)
 
 
 class ElectricityCalculator(BaseCalculator):
@@ -1612,7 +1592,7 @@ class ElectricityCalculator(BaseCalculator):
 
         res_wo = ElectryicityConsumption(*inputs_wo).calculate_emissions()
 
-        return [Result(res_w, res_wo, res_w - res_wo)]
+        return Result(res_w, res_wo, res_w - res_wo)
 
     # FuelType can be solid or liquid. Call different classes based on that
 
@@ -1660,7 +1640,7 @@ class FuelCalculator(BaseCalculator):
             res_w = FuelConsumption(*input_w).calculate_emissions()
             res_wo = FuelConsumption(*input_wo).calculate_emissions()
 
-            return [Result(res_w, res_wo, res_w - res_wo)]
+            return Result(res_w, res_wo, res_w - res_wo)
 
         elif macro_fuel_type == "Solid":
             input_w = [
@@ -1698,9 +1678,9 @@ class FuelCalculator(BaseCalculator):
             res_w = SolidConsumption(*input_w).calculate_emissions()
             res_wo = SolidConsumption(*input_wo).calculate_emissions()
 
-            return [Result(res_w, res_wo, res_w - res_wo)]
+            return Result(res_w, res_wo, res_w - res_wo)
 
-        return [Result(0, 0, 0)]
+        return Result(0, 0, 0)
 
 
 class IrrigationCalculator(BaseCalculator):
@@ -1727,7 +1707,7 @@ class BuildingCalculator(BaseCalculator):
 
         inputs = [ef.kg_co2_m2, input.t_co2_m2_t2, input.surface_w, input.surface_wo]
 
-        return [Result(*math_inputs.roads(*inputs))]
+        return Result(*math_inputs.roads(*inputs))
 
 
 class LivestockCalculator(BaseCalculator):
@@ -2446,7 +2426,7 @@ class LivestockCalculator(BaseCalculator):
 
         results_wo = MathLivestock(*i_wo).calculate_emissions()
 
-        return [Result(results_w, results_wo, results_w - results_wo)]
+        return Result(results_w, results_wo, results_w - results_wo)
 
 
 class IrrigationSystemCalculator(BaseCalculator):
@@ -2490,7 +2470,7 @@ class IrrigationSystemCalculator(BaseCalculator):
 
         results_wo = NewIrrigation(*inputs_wo).calculate_emissions()
 
-        return [Result(results_w, results_wo, results_w - results_wo)]
+        return Result(results_w, results_wo, results_w - results_wo)
 
 
 class IrrigationPhaseCalculator(BaseCalculator):
@@ -2577,4 +2557,4 @@ class IrrigationPhaseCalculator(BaseCalculator):
 
         results_wo = OperationPhaseIrrigation(*inputs_wo).calculate_emissions()
 
-        return [Result(results_w, results_wo, results_w - results_wo)]
+        return Result(results_w, results_wo, results_w - results_wo)

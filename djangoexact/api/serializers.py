@@ -61,6 +61,9 @@ class ProjectSerializer(serializers.ModelSerializer):
         fields = "__all__"
         ref_name = "Project"
 
+class ProjectResultSerializer(serializers.Serializer):
+    activities = serializers.SerializerMethodField()
+    results = ResultSerializer(many=False)
 
 class ActivitySerializer(serializers.ModelSerializer):
     project = ProjectSerializer(many=False)
