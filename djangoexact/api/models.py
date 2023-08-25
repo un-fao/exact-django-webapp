@@ -2059,3 +2059,14 @@ class IrrigationParameter(Model):
 
     def __str__(self):
         return f"({self.pk}) {self.name} = {self.value} {self.unit if self.unit else ''}"
+
+class Comment(Model):
+    activity = ForeignKey(Activity, on_delete=CASCADE)
+    content = TextField()
+    date_created = DateTimeField(auto_now_add=True)
+    author = ForeignKey(User, on_delete=CASCADE)
+    parent = ForeignKey('self', null=True, blank=True, on_delete=CASCADE)
+    # You can add other fields like 'is_active', 'likes', etc.
+
+    def __str__(self):
+        return f"({self.pk}) {self.author.username}: {self.content[:40]}..."
