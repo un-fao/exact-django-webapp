@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import *
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from .calculators import CalculatorFactory
+from .calculators import CalculatorFactory, Result
 from rest_framework.permissions import AllowAny
 from rest_framework import generics
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -138,33 +138,21 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         project = get_object_or_404(Project, pk=pk, user=self.request.user)
         serialized_project = ProjectSerializer(project).data
 
-        project_results = {
-            "total_w": 0,
-            "total_wo": 0,
-            "balance": 0,
-        }
+        project_results = Result()
 
         response = serialized_project
         response["activities"] = []
 
         activities = project.activities.all()
         for activity in activities:
-            activity_results = ActivityViewSet.results(self, request, activity.pk)
+            activity_results = ActivityViewSet.results(self, request, activity.pk).data
+            response["activities"].append(activity_results)
 
-            activity_dict = ActivitySerializer(activity).data
-            activity_dict["results"] = activity_results.data["results"]
-            response["activities"].append(activity_dict)
+            project_results.add(Result(**activity_results[RESULTS]))
 
-            project_results["total_w"] += activity_results.data["results"]["total_w"]
-            project_results["total_wo"] += activity_results.data["results"]["total_wo"]
-            project_results["balance"] += activity_results.data["results"]["balance"]
+        response["results"] = ResultSerializer(project_results).data
 
-        response["results"] = project_results
-
-        return Response(
-            data=response,
-            status=status.HTTP_200_OK,
-        )
+        return Response(data=response, status=status.HTTP_200_OK)
 
 
 class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
@@ -227,45 +215,35 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         Calculates and returns total emissions for each module in the activity.
         """
 
-        get_object_or_404(Activity, pk=pk, project__user=self.request.user)
+        activity = get_object_or_404(Activity, pk=pk, project__user=self.request.user)
 
-        response = {}
+        response = {**ActivitySerializer(activity).data}
+        tot_result = Result()
 
         modules = []
         module_types = ModuleType.objects.all()
         # TODO: Make a serializer for this
         for module in module_types:
-            module_model = apps.get_model(API, sanitize_for_model(module.name))
-            module_object = module_model.objects.filter(
-                activity__id=pk, activity__project__user=self.request.user
-            ).first()
-            if module_object:
-                print(module_object)
-                module_dict = get_module_serializer(module_model)(module_object).data
-                try:
-                    module_dict[RESULTS] = ResultSerializer(
-                        CalculatorFactory().calculate_result(module_object), many=True
-                    ).data
-                except Exception as e:
-                    module_dict[RESULTS] = error(str(e))
-                modules.append(module_dict)
+            model_ref = apps.get_model(API, sanitize_for_model(module.name))
+            object = model_ref.objects.filter(activity__id=pk, activity__project__user=self.request.user).first()
 
-        tot_results = {
-            "total_w": 0,
-            "total_wo": 0,
-            "balance": 0,
-        }
-        for module in modules:
-            print(module[RESULTS])
-            if "details" in module[RESULTS]:
-                continue
-            for result in module[RESULTS]:
-                tot_results["total_w"] += result["total_w"]
-                tot_results["total_wo"] += result["total_wo"]
-                tot_results["balance"] += result["balance"]
+            if object:
+                module_dict = get_module_serializer(model_ref)(object).data
+
+                try:
+                    result: Result = CalculatorFactory().calculate_result(object)
+                    module_dict[RESULTS] = ResultSerializer(result).data
+                    tot_result.add(result)
+                except Exception as e:
+                    print("module_id", module_dict["id"])
+                    print("Error calculating result in ActivityViewSet.results", e)
+                    module_dict[RESULTS] = error(str(e))
+
+                modules.append(module_dict)
+                    
 
         response["modules"] = modules
-        response["results"] = tot_results
+        response["results"] = ResultSerializer(tot_result).data
 
         return Response(response)
 
@@ -396,7 +374,7 @@ def generic_module_viewset(model: Model):
             """
             Returns the default values for a module.
 
-            GET /annual-croplands/1/defaults/
+            ex. GET /annual-croplands/1/defaults/
             """
 
             module = get_object_or_404(
