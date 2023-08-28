@@ -12,6 +12,7 @@ from .calculators import CalculatorFactory, Result
 from rest_framework.permissions import AllowAny
 from rest_framework import generics
 from rest_framework_simplejwt.views import TokenObtainPairView
+from django.db import transaction
 
 
 activity_id = openapi.Parameter(
@@ -289,6 +290,7 @@ def generic_module_viewset(model: Model):
         queryset = model.objects.all()
         serializer_class = get_module_serializer(model)
 
+        @transaction.atomic
         def create(self, request):
             """
             Creates a new module for a given activity.
@@ -298,25 +300,24 @@ def generic_module_viewset(model: Model):
             if module_serializer.is_valid():
                 activity_id = module_serializer.validated_data["activity"].pk
 
+                for attr in dir(model):
+                    if attr.endswith("_thread"): # NOTE: This could create problems if any other attribute ends in "_thread"
+                        module_serializer.validated_data[attr] = CommentThread.objects.create()
+
                 # TODO: Can activities have multiples of the same module?
                 # if model.objects.filter(activity__id=activity_id).exists():
                 #     return ErrorResponse(f"Module '{model.__name__}' already exists for this activity.", status=status.HTTP_400_BAD_REQUEST)
 
                 relative, relation = get_assessment_or_parent(model)
                 if relative:
-                    return ErrorResponse(
-                        f"Module '{model.__name__}' already has an attached {relative.__name__} {relation}."
-                    )
+                    return ErrorResponse(f"Module '{model.__name__}' already has an attached {relative.__name__} {relation}.")
 
-                activity = get_object_or_404(
-                    Activity, pk=activity_id, project__user=self.request.user
-                )
+                activity = get_object_or_404(Activity, pk=activity_id, project__user=self.request.user)
                 module_serializer.save(activity=activity)
 
                 return Response(module_serializer.data, status=status.HTTP_201_CREATED)
-            return Response(
-                module_serializer.errors, status=status.HTTP_400_BAD_REQUEST
-            )
+            
+            return Response(module_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         @swagger_auto_schema(
             manual_parameters=[activity_id, include_related],
@@ -328,9 +329,7 @@ def generic_module_viewset(model: Model):
             optionally including related modules by sending the `include_related` query parameter as `true`.
             """
 
-            activity_id = get_query_param_or_validation_error(
-                self.request, "activity_id"
-            )
+            activity_id = get_query_param_or_validation_error(self.request, "activity_id")
 
             modules = model.objects.filter(activity__id=activity_id)
 
@@ -344,9 +343,7 @@ def generic_module_viewset(model: Model):
                     relative, relation = get_assessment_or_parent(module)
 
                     if relative:
-                        relative_serializer = get_module_serializer(relative.__class__)(
-                            relative
-                        )
+                        relative_serializer = get_module_serializer(relative.__class__)(relative)
                         data[i][relation] = relative_serializer.data
 
             return Response(data)
@@ -358,16 +355,14 @@ def generic_module_viewset(model: Model):
             TODO: Define structure and format of the real response.
             """
 
-            module = get_object_or_404(
-                model, pk=pk, activity__project__user=self.request.user
-            )
+            module = get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
 
             try:
                 module_results = CalculatorFactory().calculate_result(module)
             except Exception as e:
                 return ErrorResponse(str(e))
 
-            return Response(ResultSerializer(module_results, many=True).data)
+            return Response(ResultSerializer(module_results).data)
 
         @action(detail=True, methods=["get"])
         def defaults(self, request, pk=None):
@@ -377,16 +372,12 @@ def generic_module_viewset(model: Model):
             ex. GET /annual-croplands/1/defaults/
             """
 
-            module = get_object_or_404(
-                model, pk=pk, activity__project__user=self.request.user
-            )
+            get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
 
             try:
                 # TODO: Implement defaults
                 # module_defaults = get_defaults(module)
-                return ErrorResponse(
-                    "Not implemented", status=status.HTTP_501_NOT_IMPLEMENTED
-                )
+                return ErrorResponse("Not implemented", status=status.HTTP_501_NOT_IMPLEMENTED)
             except Exception as e:
                 return ErrorResponse(str(e))
 
