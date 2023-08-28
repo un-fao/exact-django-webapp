@@ -36,6 +36,12 @@ include_related = openapi.Parameter(
 parent = openapi.Parameter(
     "parent", openapi.IN_QUERY, description="Parent name", type=openapi.TYPE_STRING
 )
+cascade = openapi.Parameter(
+    "cascade",
+    openapi.IN_QUERY,
+    description="Include comments in thread",
+    type=openapi.TYPE_BOOLEAN,
+)
 
 
 def get_modules(activity, serialized=True):
@@ -268,6 +274,23 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 modules.append(get_module_serializer(module_model)(module_object).data)
 
         return Response(data=modules, status=status.HTTP_200_OK)
+
+class CommentThreadViewSet(viewsets.ModelViewSet):
+    queryset = CommentThread.objects.all()
+    serializer_class = CommentThreadSerializer
+
+    @action(detail=True, methods=["get"])
+    def comments(self, request, pk=None):
+        """
+        Lists the comments of a given thread.
+        """
+
+        thread = get_object_or_404(CommentThread, pk=pk)
+        comments = thread.comments.all()
+
+        return Response(data=CommentSerializer(comments, many=True).data, status=status.HTTP_200_OK)
+
+
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
