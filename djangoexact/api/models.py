@@ -43,7 +43,7 @@ class Comment(Model):
     content = TextField()
     date_created = DateTimeField(auto_now_add=True)
     author = ForeignKey(User, on_delete=CASCADE)
-    parent = ForeignKey('self', null=True, blank=True, on_delete=CASCADE)
+    parent = ForeignKey('self', null=True, blank=True, on_delete=CASCADE, related_name='replies')
     # You can add other fields like 'is_active', 'likes', etc.
 
     def __str__(self):

@@ -93,7 +93,7 @@ class UserSummarySerializer(serializers.ModelSerializer):
         fields = ['id', 'username']
 
 class CommentSerializer(serializers.ModelSerializer):
-    replies = RecursiveField(many=True, read_only=True, source='comment_set')
+    replies = RecursiveField(many=True, read_only=True)
     author = UserSummarySerializer(many=False, read_only=True)
     class Meta:
         model = Comment
