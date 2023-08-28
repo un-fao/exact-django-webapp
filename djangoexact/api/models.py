@@ -39,7 +39,7 @@ class CommentThread(Model):
         return f"({self.pk})"
 
 class Comment(Model):
-    activity = ForeignKey("api.Activity", on_delete=CASCADE)
+    thread = ForeignKey(CommentThread, on_delete=CASCADE, related_name="comments", null=True, blank=True)
     content = TextField()
     date_created = DateTimeField(auto_now_add=True)
     author = ForeignKey(User, on_delete=CASCADE)
