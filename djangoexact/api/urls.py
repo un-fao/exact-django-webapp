@@ -30,7 +30,7 @@ router = routers.DefaultRouter()
 router.register(r"projects", views.ProjectViewSet)
 router.register(r"activities", views.ActivityViewSet, basename="activities")
 router.register(r'threads', views.CommentThreadViewSet, basename='threads')
-router.register(r'comments', views.CommentViewSet, basename='comments')
+router.register(r'threads/(?P<thread_id>\d+)/comments', views.CommentViewSet, basename='comments')
 router.register(r"land-use-types", views.LandUseTypeViewSet, basename="land-use-types")
 router.register(r"module-types", views.ModuleTypeViewSet, basename="modules")
 router.register(
