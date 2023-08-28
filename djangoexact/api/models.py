@@ -33,6 +33,21 @@ class User(auth_models.User):
 ############# MISC ###########
 ##############################
 
+class CommentThread(Model):
+
+    def __str__(self):
+        return f"({self.pk})"
+
+class Comment(Model):
+    activity = ForeignKey("api.Activity", on_delete=CASCADE)
+    content = TextField()
+    date_created = DateTimeField(auto_now_add=True)
+    author = ForeignKey(User, on_delete=CASCADE)
+    parent = ForeignKey('self', null=True, blank=True, on_delete=CASCADE)
+    # You can add other fields like 'is_active', 'likes', etc.
+
+    def __str__(self):
+        return f"({self.pk}) {self.author.username}: {self.content[:40]}..."
 
 class IPCCRegion(Model):
     name = CharField(max_length=100)
@@ -983,45 +998,22 @@ class Livestock(Module):
         null=True,
         blank=True,
     )
-    livestock_production_type_start = ForeignKey(
-        LivestockProductionType, on_delete=CASCADE
-    )
-    livestock_production_type_w = ForeignKey(
-        LivestockProductionType,
-        on_delete=CASCADE,
-        related_name="%(class)s_livestock_productions_w",
-        null=True,
-        blank=True,
-    )
-    livestock_production_type_wo = ForeignKey(
-        LivestockProductionType,
-        on_delete=CASCADE,
-        related_name="%(class)s_livestock_productions_wo",
-        null=True,
-        blank=True,
-    )
+    livestock_category_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_livestock_categories_thread", on_delete=SET_NULL)
+
+    livestock_production_type_start = ForeignKey(LivestockProductionType, on_delete=CASCADE)
+    livestock_production_type_w = ForeignKey(LivestockProductionType,on_delete=CASCADE,related_name="%(class)s_livestock_productions_w",null=True,blank=True)
+    livestock_production_type_wo = ForeignKey(LivestockProductionType,on_delete=CASCADE,related_name="%(class)s_livestock_productions_wo",null=True,blank=True)
+    livestock_production_type_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_livestock_production_type_thread", on_delete=SET_NULL)
 
     production_start = FloatField(null=True, blank=True)
     production_w = FloatField(null=True, blank=True)
     production_wo = FloatField(null=True, blank=True)
+    production_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_production_thread", on_delete=SET_NULL)
 
     heads_number_start = IntegerField(null=True, blank=True)
     heads_number_w = IntegerField(null=True, blank=True)
-    heads_number_w_rate = ForeignKey(
-        ChangeRate,
-        on_delete=CASCADE,
-        null=True,
-        blank=True,
-        related_name="%(class)s_heads_number_w_rate",
-    )
     heads_number_wo = IntegerField(null=True, blank=True)
-    heads_number_wo_rate = ForeignKey(
-        ChangeRate,
-        on_delete=CASCADE,
-        null=True,
-        blank=True,
-        related_name="%(class)s_heads_number_wo_rate",
-    )
+    heads_number_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_heads_number_thread", on_delete=SET_NULL)
 
     enteric_fermentation_start_t2 = FloatField(null=True, blank=True)
     enteric_fermentation_w_t2 = FloatField(null=True, blank=True)
@@ -1720,6 +1712,7 @@ class Fishery(Module):
     refrigerant_pc_start = FloatField(null=True, blank=True, validators=[pc_as_float])
     refrigerant_pc_w = FloatField(null=True, blank=True, validators=[pc_as_float])
     refrigerant_pc_wo = FloatField(null=True, blank=True, validators=[pc_as_float])
+    refrigerant_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_refrigerant_thread", on_delete=SET_NULL)
 
     refrigerant_gwp = FloatField(null=True, blank=True, default=1810)
 
@@ -1729,42 +1722,27 @@ class Fishery(Module):
 
     total_catch_yr_start = FloatField(null=True, blank=True)
     total_catch_yr_w = FloatField(null=True, blank=True)
-    total_catch_yr_w_rate = ForeignKey(
-        ChangeRate,
-        on_delete=CASCADE,
-        null=True,
-        blank=True,
-        related_name="%(class)s_total_catch_yr_w_rate",
-    )
     total_catch_yr_wo = FloatField(null=True, blank=True)
-    total_catch_yr_wo_rate = ForeignKey(
-        ChangeRate,
-        on_delete=CASCADE,
-        null=True,
-        blank=True,
-        related_name="%(class)s_total_catch_yr_wo_rate",
-    )
+    total_catch_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_total_catch_thread", on_delete=SET_NULL)
 
-    ice_preserved_catch_pc_start = FloatField(
-        null=True, blank=True, validators=[pc_as_float]
-    )
-    ice_preserved_catch_pc_w = FloatField(
-        null=True, blank=True, validators=[pc_as_float]
-    )
-    ice_preserved_catch_pc_wo = FloatField(
-        null=True, blank=True, validators=[pc_as_float]
-    )
+    ice_preserved_catch_pc_start = FloatField(null=True, blank=True, validators=[pc_as_float])
+    ice_preserved_catch_pc_w = FloatField(null=True, blank=True, validators=[pc_as_float])
+    ice_preserved_catch_pc_wo = FloatField(null=True, blank=True, validators=[pc_as_float])
+    ice_preserved_catch_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_ice_preserved_catch_thread", on_delete=SET_NULL)
 
     # TODO: Is the non-t2 value static for this specific module? It's always related to Gasoil/Diesel
     energy_emission_factor_t2_start = FloatField(null=True, blank=True)
     energy_emission_factor_t2_w = FloatField(null=True, blank=True)
     energy_emission_factor_t2_wo = FloatField(null=True, blank=True)
+
     refrigerant_lost_per_tonne_t2_start = FloatField(null=True, blank=True)
     refrigerant_lost_per_tonne_t2_w = FloatField(null=True, blank=True)
     refrigerant_lost_per_tonne_t2_wo = FloatField(null=True, blank=True)
+
     refrigerant_gwp_t2_start = FloatField(null=True, blank=True)
     refrigerant_gwp_t2_w = FloatField(null=True, blank=True)
     refrigerant_gwp_t2_wo = FloatField(null=True, blank=True)
+
     tonnes_of_ice_t2_start = FloatField(null=True, blank=True)
     tonnes_of_ice_t2_w = FloatField(null=True, blank=True)
     tonnes_of_ice_t2_wo = FloatField(null=True, blank=True)
@@ -1774,9 +1752,8 @@ class Fishery(Module):
     inshore_ice_production_kwh_per_tonne_t2_start = FloatField(null=True, blank=True)
     inshore_ice_production_kwh_per_tonne_t2_w = FloatField(null=True, blank=True)
     inshore_ice_production_kwh_per_tonne_t2_wo = FloatField(null=True, blank=True)
-    inshore_ice_production_country_t2 = ForeignKey(
-        Country, on_delete=CASCADE, null=True, blank=True
-    )
+    
+    inshore_ice_production_country_t2 = ForeignKey(Country, on_delete=CASCADE, null=True, blank=True)
 
     implementation_year_t2 = IntegerField(null=True, blank=True)
 
@@ -1803,6 +1780,7 @@ class SmallFishery(Fishery):
         blank=True,
         related_name="%(class)s_gear_type_wo",
     )
+    gear_type_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_gear_type_thread", on_delete=SET_NULL)
     fishery_type = ForeignKey(FisheryType, on_delete=CASCADE, null=True, blank=True)
     fui_default = ForeignKey(
         "ipcc.SmallFisheryFUI", on_delete=CASCADE, null=True, blank=True
@@ -1831,6 +1809,7 @@ class LargeFishery(Fishery):
         blank=True,
         related_name="%(class)s_gear_type_wo",
     )
+    gear_type_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_gear_type_thread", on_delete=SET_NULL)
     fish_type = ForeignKey(FishType, on_delete=CASCADE)
     fui_default = ForeignKey(
         "ipcc.LargeFisheryFUI", on_delete=CASCADE, null=True, blank=True
@@ -2059,14 +2038,3 @@ class IrrigationParameter(Model):
 
     def __str__(self):
         return f"({self.pk}) {self.name} = {self.value} {self.unit if self.unit else ''}"
-
-class Comment(Model):
-    activity = ForeignKey(Activity, on_delete=CASCADE)
-    content = TextField()
-    date_created = DateTimeField(auto_now_add=True)
-    author = ForeignKey(User, on_delete=CASCADE)
-    parent = ForeignKey('self', null=True, blank=True, on_delete=CASCADE)
-    # You can add other fields like 'is_active', 'likes', etc.
-
-    def __str__(self):
-        return f"({self.pk}) {self.author.username}: {self.content[:40]}..."
