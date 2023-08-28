@@ -290,14 +290,23 @@ class CommentThreadViewSet(viewsets.ModelViewSet):
 
         return Response(data=CommentSerializer(comments, many=True).data, status=status.HTTP_200_OK)
 
-
-
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+    @action(detail=True, methods=["get"])
+    def replies(self, request, thread_id=None, pk=None):
+        """
+        Lists the replies of a given comment.
+        """
+
+        comment = get_object_or_404(Comment, pk=pk)
+        replies = comment.replies.all()
+
+        return Response(data=CommentSerializer(replies, many=True).data, status=status.HTTP_200_OK)
 
 class ModuleTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
