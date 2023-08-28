@@ -2509,7 +2509,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
             input.gross_irrigation_water_start,
         ]
 
-        results_from_start = OperationPhaseIrrigation(*inputs_from_start).calculate_emissions()
+        results_start = OperationPhaseIrrigation(*inputs_from_start).calculate_emissions()
 
         inputs_w = [
             ef.emission_factor,
@@ -2557,4 +2557,4 @@ class IrrigationPhaseCalculator(BaseCalculator):
 
         results_wo = OperationPhaseIrrigation(*inputs_wo).calculate_emissions()
 
-        return Result(results_w, results_wo, results_w - results_wo)
+        return Result(results_w+results_start, results_wo+results_start, results_w - results_wo)
