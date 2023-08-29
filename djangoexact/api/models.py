@@ -2022,19 +2022,25 @@ class Building(Module):
 
 ### MODEL PARAMETERS TABLES ###
 
+class Parameter(Model):
+    class Meta:
+        abstract = True
 
-class LivestockParameter(Model):
-    name = CharField(max_length=255, unique=True)
-    value = FloatField(null=True, blank=True)
-
-    def __str__(self):
-        return f"({self.id}) {self.name} = {self.value}"
-
-
-class IrrigationParameter(Model):
     name = CharField(max_length=255, unique=True)
     value = FloatField(null=True, blank=True)
     unit = CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return f"({self.pk}) {self.name} = {self.value} {self.unit if self.unit else ''}"
+    
+class LivestockParameter(Parameter):
+    pass
+
+class IrrigationParameter(Parameter):
+    pass
+
+class SmallFisheryParameter(Parameter):
+    pass
+
+class LargeFisheryParameter(Parameter):
+    pass
