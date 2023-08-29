@@ -14,6 +14,8 @@ from .models import (
     IrrigationSystem,
     IrrigationPhase,
     IrrigationParameter,
+    SmallFisheryParameter,
+    LargeFisheryParameter,
 )
 from math_model import (
     defo,
@@ -1143,40 +1145,20 @@ class SmallFisheryCalculator(BaseCalculator):
         project = self.data.activity.project
         input = self.data
 
-        ef_diesel_default_list = EnergyDefaultEmissionFactor.objects.filter(
-            fuel_type__fuel_use_type__name__contains="Off-Road"
-        )
+        ef_diesel_default_list = EnergyDefaultEmissionFactor.objects.filter(fuel_type__fuel_use_type__name__contains="Off-Road")
 
         # Average of all default emission factors for gasoil/diesel
-        ef_diesel_default = sum([ef.t_co2_eq for ef in ef_diesel_default_list]) / len(
-            ef_diesel_default_list
-        )
+        ef_diesel_default = sum([ef.t_co2_eq for ef in ef_diesel_default_list]) / len(ef_diesel_default_list)
 
-        fui_default_start = SmallFisheryFUI.objects.get_value_or_average(
-            fishery_type=self.data.fishery_type,
-            gear_type=self.data.gear_type_start,
-        )
-        fui_default_w = SmallFisheryFUI.objects.get_value_or_average(
-            fishery_type=self.data.fishery_type,
-            gear_type=self.data.gear_type_w,
-        )
-        fui_default_wo = SmallFisheryFUI.objects.get_value_or_average(
-            fishery_type=self.data.fishery_type,
-            gear_type=self.data.gear_type_wo,
-        )
+        fui_default_start = SmallFisheryFUI.objects.get_value_or_average(fishery_type=self.data.fishery_type, gear_type=self.data.gear_type_start)
+        fui_default_w = SmallFisheryFUI.objects.get_value_or_average(fishery_type=self.data.fishery_type, gear_type=self.data.gear_type_w)
+        fui_default_wo = SmallFisheryFUI.objects.get_value_or_average(fishery_type=self.data.fishery_type, gear_type=self.data.gear_type_wo)
 
-        # TODO: Maybe use a table (.48734 for LargeFishery)
-        lost_refrigerant_default = 0.083
+        lost_refrigerant_default = SmallFisheryParameter.object.get("lost_refrigerant_default").value
+        tonnes_ice_default = SmallFisheryParameter.object.get("tonnes_ice_default").value
+        kw_tonnes = SmallFisheryParameter.object.get("kw_tonnes").value
 
-        # TODO: Maybe use a table (2.8 for LargeFishery)
-        tonnes_ice_default = 2.8
-
-        # TODO: Maybe use a table (60 for LargeFishery)
-        kw_tonnes = 60
-
-        electricity_emission = ElectricityEmission.objects.get(
-            country=project.country, continent=project.continent
-        )
+        electricity_emission = ElectricityEmission.objects.get(country=project.country, continent=project.continent)
 
         inputs = [
             project.implementation_duration_yrs,
@@ -1268,14 +1250,14 @@ class LargeFisheryCalculator(BaseCalculator):
             gear_type=self.data.gear_type_wo,
         )
 
-        # TODO: Maybe use a table (.083 for SmallFishery)
-        lost_refrigerant_default = 0.48734
+        # TODO: Maybe use a table (0.48734, .083 for SmallFishery)
+        lost_refrigerant_default = LargeFisheryParameter.objects.get("lost_refrigerant_default").value
 
-        # TODO: Maybe use a table (2.8 for SmallFishery)
-        tonnes_ice_default = 2.8
+        # TODO: Maybe use a table (2.8 for both)
+        tonnes_ice_default = LargeFisheryParameter.objects.get("tonnes_ice_default").value
 
-        # TODO: Maybe use a table (60 for SmallFishery)
-        kw_tonnes = 60
+        # TODO: Maybe use a table (60 for both)
+        kw_tonnes = LargeFisheryParameter.objects.get("kw_tonnes").value
 
         electricity_country = (
             self.data.inshore_ice_production_country_t2
