@@ -21,7 +21,6 @@ def get_model_serializer(model_arg):
             fields = "__all__"
             ref_name = model_arg.__name__
 
-    # Look if a serializer with the name of the model exists. Else, return generic serializer
     try:
         return globals()[model_arg.__name__ + "Serializer"]
     except KeyError:
@@ -32,6 +31,7 @@ def get_module_serializer(model_arg):
     class GenericSerializer(serializers.ModelSerializer):
         # activity = serializers.PrimaryKeyRelatedField(source='activity.name', queryset=Activity.objects.all(), many=False)
         module_type = serializers.ReadOnlyField(default=model_arg.__name__)
+        activity = ActivitySerializer(many=False)
 
         class Meta:
             model = model_arg
@@ -67,6 +67,7 @@ class ProjectResultSerializer(serializers.Serializer):
 
 class ActivitySerializer(serializers.ModelSerializer):
     project = ProjectSerializer(many=False)
+    user = UserSerializer(many=False)
 
     class Meta:
         model = Activity
