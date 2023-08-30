@@ -485,58 +485,155 @@ class Module(Model):
 
 
 class Deforestation(Module):
-    vegetation_type = ForeignKey(VegetationType, on_delete=CASCADE)
-    land_use_type = ForeignKey(
+    vegetation_type_start = ForeignKey(VegetationType, on_delete=CASCADE, related_name="%(class)s_vegetation_type_start")
+    vegetation_type_w = ForeignKey(VegetationType, on_delete=CASCADE, related_name="%(class)s_vegetation_type_w")
+    vegetation_type_wo = ForeignKey(VegetationType, on_delete=CASCADE, related_name="%(class)s_vegetation_type_wo")
+
+
+    land_use_type_start = ForeignKey(
         LandUseType,
         on_delete=CASCADE,
         null=True,
         blank=True,
         limit_choices_to=Q(parent__isnull=True) | Q(parent__name="Agroforestry"),
+        related_name="%(class)s_land_use_type_start",
+    )
+    land_use_type_w = ForeignKey(
+        LandUseType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        limit_choices_to=Q(parent__isnull=True) | Q(parent__name="Agroforestry"),
+        related_name="%(class)s_land_use_type_w",
+    )
+    land_use_type_wo = ForeignKey(
+        LandUseType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        limit_choices_to=Q(parent__isnull=True) | Q(parent__name="Agroforestry"),
+        related_name="%(class)s_land_use_type_wo",
     )
 
-    hwp = FloatField()
-    is_fire_used = BooleanField(default=False)
+    hwp_start = FloatField()
+    hwp_w = FloatField()
+    hwp_wo = FloatField()
+
+    is_fire_used_start = BooleanField(default=False)
+    is_fire_used_w = BooleanField(default=False)
+    is_fire_used_wo = BooleanField(default=False)
+
     ha_start = FloatField()
     ha_w = FloatField()
-    ha_w_rate = ForeignKey(
-        ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_w_rate"
-    )
     ha_wo = FloatField()
-    ha_wo_rate = ForeignKey(
-        ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_wo_rate+"
-    )
 
-    rcs_ag_t2 = FloatField(
+    rcs_ag_t2_start = FloatField(
         null=True,
         blank=True,
         help_text="Custom reference carbon stock for above-ground biomass (in tC/ha)",
     )
-    rcs_bg_t2 = FloatField(
+    rcs_ag_t2_w = FloatField(
+        null=True,
+        blank=True,
+        help_text="Custom reference carbon stock for above-ground biomass (in tC/ha)",
+    )
+    rcs_ag_t2_wo = FloatField(
+        null=True,
+        blank=True,
+        help_text="Custom reference carbon stock for above-ground biomass (in tC/ha)",
+    )
+
+    rcs_bg_t2_start = FloatField(
         null=True,
         blank=True,
         help_text="Custom reference carbon stock for below-ground biomass (in tC/ha)",
     )
-    rcs_litter_t2 = FloatField(
+    rcs_bg_t2_w = FloatField(
+        null=True,
+        blank=True,
+        help_text="Custom reference carbon stock for below-ground biomass (in tC/ha)",
+    )
+    rcs_bg_t2_wo = FloatField(
+        null=True,
+        blank=True,
+        help_text="Custom reference carbon stock for below-ground biomass (in tC/ha)",
+    )
+
+
+    rcs_litter_t2_start = FloatField(
         null=True,
         blank=True,
         help_text="Custom reference carbon stock for litter (in tC/ha)",
     )
-    rcs_deadwood_t2 = FloatField(
+    rcs_litter_t2_w = FloatField(
+        null=True,
+        blank=True,
+        help_text="Custom reference carbon stock for litter (in tC/ha)",
+    )
+    rcs_litter_t2_wo = FloatField(
+        null=True,
+        blank=True,
+        help_text="Custom reference carbon stock for litter (in tC/ha)",
+    )
+    rcs_deadwood_t2_start = FloatField(
         null=True,
         blank=True,
         help_text="Custom reference carbon stock for deadwood (in tC/ha)",
     )
-    rcs_soil_c_t2 = FloatField(
+    rcs_deadwood_t2_w = FloatField(
+        null=True,
+        blank=True,
+        help_text="Custom reference carbon stock for deadwood (in tC/ha)",
+    )
+    rcs_deadwood_t2_wo = FloatField(
+        null=True,
+        blank=True,
+        help_text="Custom reference carbon stock for deadwood (in tC/ha)",
+    )
+
+    rcs_soil_c_t2_start = FloatField(
         null=True,
         blank=True,
         help_text="Custom reference carbon stock for soil carbon (in tC/ha)",
     )
-    final_rcs_biomass_t2 = FloatField(
+    rcs_soil_c_t2_w = FloatField(
+        null=True,
+        blank=True,
+        help_text="Custom reference carbon stock for soil carbon (in tC/ha)",
+    )
+    rcs_soil_c_t2_wo = FloatField(
+        null=True,
+        blank=True,
+        help_text="Custom reference carbon stock for soil carbon (in tC/ha)",
+    )
+
+    final_rcs_biomass_t2_start = FloatField(
         null=True,
         blank=True,
         help_text="Custom reference carbon stock for biomass in final land use (in tC/ha)",
     )
-    final_rcs_soil_c_t2 = FloatField(
+    final_rcs_biomass_t2_w = FloatField(
+        null=True,
+        blank=True,
+        help_text="Custom reference carbon stock for biomass in final land use (in tC/ha)",
+    )
+    final_rcs_biomass_t2_wo = FloatField(
+        null=True,
+        blank=True,
+        help_text="Custom reference carbon stock for biomass in final land use (in tC/ha)",
+    )
+
+    soc_after_defo_t2_start = FloatField(
+        null=True,
+        blank=True,
+        help_text="Custom reference carbon stock for soil carbon in final land use (in tC/ha)",
+    )
+    soc_after_defo_t2_w = FloatField(
+        null=True,
+        blank=True,
+        help_text="Custom reference carbon stock for soil carbon in final land use (in tC/ha)",
+    )
+    soc_after_defo_t2_wo = FloatField(
         null=True,
         blank=True,
         help_text="Custom reference carbon stock for soil carbon in final land use (in tC/ha)",
@@ -692,6 +789,7 @@ class AnnualCropping(Assessment):
         blank=True,
         related_name="%(class)s_crop_type_wo",
     )
+    crop_type_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_crop_type_thread")
 
     tillage_management_type_start = ForeignKey(
         TillageManagementType,
@@ -714,6 +812,7 @@ class AnnualCropping(Assessment):
         blank=True,
         related_name="%(class)s_tillage_management_type_wo",
     )
+    tillage_management_type_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_tillage_management_type_thread")
 
     organic_input_type_start = ForeignKey(
         OrganicInputType,
@@ -736,6 +835,7 @@ class AnnualCropping(Assessment):
         blank=True,
         related_name="%(class)s_organic_input_type_wo",
     )
+    organic_input_type_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_organic_input_type_thread")
 
     residue_management_type_start = ForeignKey(
         ResidueManagementType,
@@ -758,28 +858,17 @@ class AnnualCropping(Assessment):
         blank=True,
         related_name="%(class)s_residue_management_type_wo",
     )
+    residue_management_type_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_residue_management_type_thread")
 
     crop_yield_start = FloatField(null=True, blank=True)
     crop_yield_w = FloatField(null=True, blank=True)
     crop_yield_wo = FloatField(null=True, blank=True)
+    crop_yield_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_crop_yield_thread")
 
     ha_start = FloatField(null=True, blank=True)
     ha_w = FloatField(null=True, blank=True)
-    ha_w_rate = ForeignKey(
-        ChangeRate,
-        on_delete=CASCADE,
-        related_name="%(class)s_ha_w_rate",
-        null=True,
-        blank=True,
-    )
     ha_wo = FloatField(null=True, blank=True)
-    ha_wo_rate = ForeignKey(
-        ChangeRate,
-        on_delete=CASCADE,
-        related_name="%(class)s_ha_wo_rate+",
-        null=True,
-        blank=True,
-    )
+    ha_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_thread")
 
     main_soil_carbon_t2_start = FloatField(null=True, blank=True)
     main_soil_carbon_t2_w = FloatField(null=True, blank=True)
@@ -861,28 +950,35 @@ class AnnualCropping(Assessment):
 class PerennialCropping(Assessment):
     user_notes = TextField(null=True, blank=True)
 
-    crop_type = ForeignKey(
-        CropType,
-        on_delete=CASCADE,
-        null=True,
-        blank=True,
-    )
+    crop_type_start = ForeignKey(CropType,on_delete=CASCADE,null=True,blank=True, related_name="%(class)s_crop_type_start")
+    crop_type_w = ForeignKey(CropType,on_delete=CASCADE,null=True,blank=True, related_name="%(class)s_crop_type_w")
+    crop_type_wo = ForeignKey(CropType,on_delete=CASCADE,null=True,blank=True, related_name="%(class)s_crop_type_wo")
+    crop_type_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_crop_type_thread")
 
-    tillage_management_type = ForeignKey(TillageManagementType, on_delete=CASCADE)
-    organic_input_type = ForeignKey(OrganicInputType, on_delete=CASCADE)
-    is_biomass_burned = BooleanField()
+    tillage_management_type_start = ForeignKey(TillageManagementType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_tillage_management_type_start")
+    tillage_management_type_w = ForeignKey(TillageManagementType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_tillage_management_type_w")
+    tillage_management_type_wo = ForeignKey(TillageManagementType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_tillage_management_type_wo")
+    tillage_management_type_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_tillage_management_type_thread")
+
+    organic_input_type_start = ForeignKey(OrganicInputType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_organic_input_type_start")
+    organic_input_type_w = ForeignKey(OrganicInputType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_organic_input_type_w")
+    organic_input_type_wo = ForeignKey(OrganicInputType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_organic_input_type_wo")
+    organic_input_type_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_organic_input_type_thread")
+
+    is_biomass_burned_start = BooleanField()
+    is_biomass_burned_w = BooleanField()
+    is_biomass_burned_wo = BooleanField()
+    is_biomass_burned_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_is_biomass_burned_thread")
 
     ha_start = FloatField()
     ha_w = FloatField()
-    ha_w_rate = ForeignKey(
-        ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_w_rate"
-    )
     ha_wo = FloatField()
-    ha_wo_rate = ForeignKey(
-        ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_wo_rate+"
-    )
+    ha_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_thread")
 
-    crop_yield = FloatField(null=True, blank=True)
+    crop_yield_start = FloatField(null=True, blank=True)
+    crop_yield_w = FloatField(null=True, blank=True)
+    crop_yield_wo = FloatField(null=True, blank=True)
+    crop_yield_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_crop_yield_thread")
 
     ag_t2 = FloatField(null=True, blank=True)
     bg_t2 = FloatField(null=True, blank=True)
