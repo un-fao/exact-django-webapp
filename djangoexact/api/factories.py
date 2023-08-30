@@ -123,16 +123,21 @@ class AnnualCroppingFactory(DjangoModelFactory):
     tillage_management_type_w = factory.fuzzy.FuzzyChoice(tillage_management_types)
     tillage_management_type_wo = factory.fuzzy.FuzzyChoice(tillage_management_types)
 
-    organic_input_type = factory.fuzzy.FuzzyChoice(organic_input_types)
-    residue_management_type = factory.fuzzy.FuzzyChoice(residue_management_types)
+    organic_input_type_start = factory.fuzzy.FuzzyChoice(organic_input_types)
+    organic_input_type_w = organic_input_type_start
+    organic_input_type_wo = organic_input_type_start
 
-    ha_start = factory.fuzzy.FuzzyInteger(0.0, 100)
-    ha_w = factory.fuzzy.FuzzyInteger(0.0, 100)
-    ha_w_rate = def_rate
-    ha_wo = factory.fuzzy.FuzzyInteger(0.0, 100)
-    ha_wo_rate = def_rate
+    residue_management_type_start = factory.fuzzy.FuzzyChoice(residue_management_types)
+    residue_management_type_w = factory.fuzzy.FuzzyChoice(residue_management_types)
+    residue_management_type_wo = factory.fuzzy.FuzzyChoice(residue_management_types)
 
-    crop_yield = factory.fuzzy.FuzzyInteger(0.0, 100)
+    ha_start = random.randint(0, 100)
+    ha_w = ha_start
+    ha_wo = ha_start
+
+    crop_yield_start = factory.fuzzy.FuzzyInteger(0.0, 100)
+    crop_yield_w = factory.fuzzy.FuzzyInteger(0.0, 100)
+    crop_yield_wo = factory.fuzzy.FuzzyInteger(0.0, 100)
 
 
 class PerennialCroppingFactory(DjangoModelFactory):
@@ -171,9 +176,7 @@ class LivestockFactory(DjangoModelFactory):
     livestock_category_type_w = factory.fuzzy.FuzzyChoice(livestock_category_types)
     livestock_category_type_wo = factory.fuzzy.FuzzyChoice(livestock_category_types)
 
-    livestock_production_type_start = factory.fuzzy.FuzzyChoice(
-        livestock_production_types
-    )
+    livestock_production_type_start = factory.fuzzy.FuzzyChoice(livestock_production_types)
     livestock_production_type_w = factory.fuzzy.FuzzyChoice(livestock_production_types)
     livestock_production_type_wo = factory.fuzzy.FuzzyChoice(livestock_production_types)
 
@@ -183,6 +186,4 @@ class LivestockFactory(DjangoModelFactory):
 
     heads_number_start = factory.fuzzy.FuzzyInteger(0, 1000)
     heads_number_w = factory.fuzzy.FuzzyInteger(0, 1000)
-    heads_number_w_rate = def_rate
     heads_number_wo = factory.fuzzy.FuzzyInteger(0, 1000)
-    heads_number_wo_rate = def_rate

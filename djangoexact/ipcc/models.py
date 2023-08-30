@@ -127,6 +127,7 @@ class BelowGroundBiomassManager(Manager):
     def get_max_below_threshold(self, continent, vegetation_type, threshold):
         """
         Returns the highest value below the threshold.
+        NOTE: If a new, highest threshold is added to the db, this can return the wrong value unless the old highest threshold is set to a proper value
         """
         return (
             self.filter(
@@ -135,6 +136,20 @@ class BelowGroundBiomassManager(Manager):
             )
             .filter(Q(threshold__gt=threshold) | Q(threshold__isnull=True))
             .order_by("threshold")
+            .first()
+        )
+    
+    def get_first_above_threshold(self, continent, vegetation_type, threshold) -> "BelowGroundBiomass":
+        """
+        Returns the first value above the threshold.
+        """
+        return (
+            self.filter(
+                continent=continent,
+                vegetation_type=vegetation_type,
+            )
+            .filter(threshold__lt=threshold)
+            .order_by("-threshold")
             .first()
         )
 

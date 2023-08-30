@@ -16,6 +16,7 @@ from .models import (
     IrrigationParameter,
     SmallFisheryParameter,
     LargeFisheryParameter,
+    PerennialCropping,
 )
 from math_model import (
     defo,
@@ -33,9 +34,11 @@ from ipcc.models import *
 from .utilities import *
 from abc import ABC, abstractmethod
 import sys
+from math_model.no_time_dependency_final.defo import Deforestation as MathDeforestation
+from math_model.no_time_dependency_final.annuals import AnnualCropland as MathAnnualCropland
 from math_model.no_time_dependency_final.livestock import Livestock as MathLivestock
-from math_model.no_time_dependency_final.inputs import Inputs as MathInputs
 from math_model.no_time_dependency_final.inputs import (
+    Inputs as MathInputs,
     FuelConsumption,
     SolidConsumption,
     ElectryicityConsumption,
@@ -114,103 +117,166 @@ class DeforestationCalculator(BaseCalculator):
         Calculate emissions for a single Deforestation module.
         """
 
-        project = self.data.activity.project
+        module: Deforestation = self.data
+        project: Project = module.activity.project
+        change_rate = module.activity.change_rate_start
         climate = project.climate
         moisture = project.moisture
         continent = project.continent
         soil_type = project.soil_type
-        land_use_type = self.data.land_use_type
-        vegetation_type = self.data.vegetation_type
+
+        cmc = {
+            "climate": climate,
+            "moisture": moisture,
+            "continent": continent,
+        }
 
         mangroves_data = None
-        defo_table = None
 
-        # Get the IPCC data
-        soc_ref = SoilOrganicCarbon.objects.get(
-            climate=climate, moisture=moisture, soil_type=soil_type
-        )
-        total_biomass = TotalBiomassAfterDefo.objects.get(
-            climate=climate,
-            moisture=moisture,
-            continent=continent,
-            land_use_type=land_use_type,
-        )
+        soc_ref = SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
+
+        total_biomass_start = TotalBiomassAfterDefo.objects.get(**cmc, land_use_type=module.land_use_type_start)
+        total_biomass_w = TotalBiomassAfterDefo.objects.get(**cmc, land_use_type=module.land_use_type_w)
+        total_biomass_wo = TotalBiomassAfterDefo.objects.get(**cmc, land_use_type=module.land_use_type_wo)
 
         # NOTE: Maybe merge the mangroves and deforestation IPCC tables into one table?
         if self.data.vegetation_type != MANGROVES:
-            defo_table = LitterDeadwoodCarbonStock.objects.get(
-                vegetation_type=vegetation_type
-            )
-            ag_biomass = AboveGroundBiomass.objects.get(
-                continent=continent, vegetation_type=vegetation_type
-            )
-            bg_biomass = BelowGroundBiomass.objects.filter(
-                continent=continent, vegetation_type=vegetation_type
-            )
+            defo_table_start = LitterDeadwoodCarbonStock.objects.get(vegetation_type=module.vegetation_type_start)
+            defo_table_w = LitterDeadwoodCarbonStock.objects.get(vegetation_type=module.vegetation_type_w)
+            defo_table_wo = LitterDeadwoodCarbonStock.objects.get(vegetation_type=module.vegetation_type_wo)
 
-            # Gets the row matching the lowest threshold value above the ag_biomass threshold limit
-            # NOTE: If a new, highest threshold is added to the db, this can return the wrong value unless the old highest threshold is set to a proper value
-            # NOTE: This method could be added to the previous one, resulting in a single query but higher cognitive complexity
-            # NOTE: For more than ~50 inputs, 25% improvement in performance by merging with the query above.
-            bg_biomass = (
-                bg_biomass.filter(
-                    Q(threshold__gt=ag_biomass.value) | Q(threshold__isnull=True)
-                )
-                .order_by("threshold")
-                .first()
-            )
+            ag_biomass_start = AboveGroundBiomass.objects.get(continent=continent, vegetation_type=module.vegetation_type_start)
+            ag_biomass_w = AboveGroundBiomass.objects.get(continent=continent, vegetation_type=module.vegetation_type_w)
+            ag_biomass_wo = AboveGroundBiomass.objects.get(continent=continent, vegetation_type=module.vegetation_type_wo)
+
+            bg_biomass_start = BelowGroundBiomass.objects.get_first_above_threshold(continent=continent, vegetation_type=module.vegetation_type_start, threshold=ag_biomass_start.value)
+            bg_biomass_w = BelowGroundBiomass.objects.get_first_above_threshold(continent=continent, vegetation_type=module.vegetation_type_w, threshold=ag_biomass_w.value)
+            bg_biomass_wo = BelowGroundBiomass.objects.get_first_above_threshold(continent=continent, vegetation_type=module.vegetation_type_wo, threshold=ag_biomass_wo.value)
+
+            # TODO: Delete if above query works
+            # bg_biomass_start = bg_biomass_start.filter(Q(threshold__gt=ag_biomass_start.value) | Q(threshold__isnull=True)).order_by("threshold").first()
         else:
-            mangroves_data = DataOnMangroves.objects.get(continent=continent)
+            mangroves_data = DataOnMangrove.objects.get(continent=continent)
 
-        combustion_factor = CombustionFactorValues.objects.get(
-            vegetation_type=vegetation_type
-        )
+        combustion_factor_start = CombustionFactor.objects.get(vegetation_type=module.vegetation_type_start)
+        combustion_factor_w = CombustionFactor.objects.get(vegetation_type=module.vegetation_type_w)
+        combustion_factor_wo = CombustionFactor.objects.get(vegetation_type=module.vegetation_type_wo)
+
+        # TODO: Review this query
         moisture_factor = DefaultEmissionFactor.objects.filter(moisture=moisture)
-        moisture_factor = moisture_factor.filter(
-            Q(input__name__icontains="Other N Inputs")
-            | Q(input__name__icontains="All N Inputs")
-        ).first()
-        flu = LandUseCarbonStockExchangeFactor.objects.get(
-            climate=climate, moisture=moisture, land_use_type=land_use_type
-        )
+        moisture_factor = moisture_factor.filter(Q(input__name__icontains="Other N Inputs") | Q(input__name__icontains="All N Inputs")).first()
 
-        inputs = [
-            self.data.ha_start,
-            self.data.ha_w,
-            self.data.ha_wo,
+        flu_start = LandUseCarbonStockExchangeFactor.objects.get(climate=climate, moisture=moisture, land_use_type=module.land_use_type_start)
+        flu_w = LandUseCarbonStockExchangeFactor.objects.get(climate=climate, moisture=moisture, land_use_type=module.land_use_type_w)
+        flu_wo = LandUseCarbonStockExchangeFactor.objects.get(climate=climate, moisture=moisture, land_use_type=module.land_use_type_wo)
+
+
+        inputs_start = [
+            module.ha_start,
+            0,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
-            self.data.ha_w_rate.name,
-            self.data.ha_w_rate.value,
-            total_biomass.value if total_biomass.value is not None else 0,
-            self.data.final_rcs_biomass_t2,
+            change_rate.name,
+            change_rate.name, # TODO: Remove from math model
+            total_biomass_start.value,
+            module.final_rcs_biomass_t2_start,
             project.gw_potential.n2o,
             project.gw_potential.ch4,
-            self.data.is_fire_used,
-            combustion_factor.n2o,
-            combustion_factor.ch4,
-            combustion_factor.value,
+            module.is_fire_used_start,
+            combustion_factor_start.n2o,
+            combustion_factor_start.ch4,
+            combustion_factor_start.value,
             moisture_factor.value,
-            defo_table.litter if mangroves_data is None else mangroves_data.litter,
-            self.data.rcs_litter_t2,
-            defo_table.dw if mangroves_data is None else mangroves_data.dw,
-            self.data.rcs_deadwood_t2,
-            self.data.hwp,
+            defo_table_start.litter if mangroves_data is None else mangroves_data.litter,
+            module.rcs_litter_t2_start,
+            defo_table_start.dw if mangroves_data is None else mangroves_data.dw,
+            module.rcs_deadwood_t2_start,
+            module.hwp_start,
             MANGROVE_FACTOR if mangroves_data is not None else NON_MANGROVE_FACTOR,
-            self.data.rcs_bg_t2,
-            self.data.rcs_ag_t2,
-            flu.value,
-            mangroves_data.agb_c if mangroves_data is not None else ag_biomass.value,
-            mangroves_data.bgb if mangroves_data is not None else bg_biomass.value,
+            module.rcs_bg_t2_start,
+            module.rcs_ag_t2_start,
+            flu_start.value,
+            mangroves_data.agb_c if mangroves_data is not None else ag_biomass_start.value,
+            mangroves_data.bgb if mangroves_data is not None else bg_biomass_start.value,
             CN_RATIO_GRASSLAND,
-            self.data.final_rcs_soil_c_t2,  # soil after defo t2
-            soc_ref.value if soc_ref.value is not None else 0,
-            self.data.rcs_soil_c_t2,  # soil t2
+            module.soc_after_defo_t2_start, # soil after defo t2
+            soc_ref.value,
+            module.rcs_soil_c_t2_start, # soil t2
         ]
 
-        results = defo.GHG_emissions(*inputs)
 
-        return Result(*results)
+        inputs_w = [
+            0,
+            module.ha_w,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            change_rate.name,
+            change_rate.name, # TODO: Remove from math model
+            total_biomass_w.value,
+            module.final_rcs_biomass_t2_w,
+            project.gw_potential.n2o,
+            project.gw_potential.ch4,
+            module.is_fire_used_w,
+            combustion_factor_w.n2o,
+            combustion_factor_w.ch4,
+            combustion_factor_w.value,
+            moisture_factor.value,
+            defo_table_w.litter if mangroves_data is None else mangroves_data.litter,
+            module.rcs_litter_t2_w,
+            defo_table_w.dw if mangroves_data is None else mangroves_data.dw,
+            module.rcs_deadwood_t2_w,
+            module.hwp_w,
+            MANGROVE_FACTOR if mangroves_data is not None else NON_MANGROVE_FACTOR,
+            module.rcs_bg_t2_w,
+            module.rcs_ag_t2_w,
+            flu_w.value,
+            mangroves_data.agb_c if mangroves_data is not None else ag_biomass_w.value,
+            mangroves_data.bgb if mangroves_data is not None else bg_biomass_w.value,
+            CN_RATIO_GRASSLAND,
+            module.soc_after_defo_t2_w, # soil after defo t2
+            soc_ref.value,
+            module.rcs_soil_c_t2_w, # soil t2
+        ]
+
+
+        inputs_wo = [
+            0,
+            module.ha_wo,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            change_rate.name,
+            change_rate.name, # TODO: Remove from math model
+            total_biomass_wo.value,
+            module.final_rcs_biomass_t2_wo,
+            project.gw_potential.n2o,
+            project.gw_potential.ch4,
+            module.is_fire_used_wo,
+            combustion_factor_wo.n2o,
+            combustion_factor_wo.ch4,
+            combustion_factor_wo.value,
+            moisture_factor.value,
+            defo_table_wo.litter if mangroves_data is None else mangroves_data.litter,
+            module.rcs_litter_t2_wo,
+            defo_table_wo.dw if mangroves_data is None else mangroves_data.dw,
+            module.rcs_deadwood_t2_wo,
+            module.hwp_wo,
+            MANGROVE_FACTOR if mangroves_data is not None else NON_MANGROVE_FACTOR,
+            module.rcs_bg_t2_wo,
+            module.rcs_ag_t2_wo,
+            flu_wo.value,
+            mangroves_data.agb_c if mangroves_data is not None else ag_biomass_wo.value,
+            mangroves_data.bgb if mangroves_data is not None else bg_biomass_wo.value,
+            CN_RATIO_GRASSLAND,
+            module.soc_after_defo_t2_wo, # soil after defo t2
+            soc_ref.value,
+            module.rcs_soil_c_t2_wo, # soil t2
+        ]
+
+        results_start = MathDeforestation(*inputs_start).calculate_emissions()
+        results_w = MathDeforestation(*inputs_w).calculate_emissions()
+        results_wo = MathDeforestation(*inputs_wo).calculate_emissions()
+
+        return Result(results_w+results_start, results_wo+results_start, results_w - results_wo)
 
 
 class ExtractionCalculator(BaseCalculator):
@@ -604,13 +670,20 @@ class AnnualCroppingCalculator(BaseCalculator):
         """
 
         input: AnnualCropping = self.data
-
-        project: Project = self.data.activity.project
+        project: Project = input.activity.project
+        change_rate = input.activity.change_rate_start
         climate = project.climate
         moisture = project.moisture
+
+        cm = {
+            "climate": climate,
+            "moisture": moisture,
+        }
+
         crop_type_start = input.crop_type_start
         crop_type_w = input.crop_type_w
         crop_type_wo = input.crop_type_wo
+
         minor_crop_type_start = input.minor_crop_type_start
         minor_crop_type_w = input.minor_crop_type_w
         minor_crop_type_wo = input.minor_crop_type_wo
@@ -618,67 +691,28 @@ class AnnualCroppingCalculator(BaseCalculator):
         relative, relation = get_assessment_or_parent(self.data)
         is_parent = relation == "parent"
 
-        burning_emission_factor = BurningEmissionFactor.objects.get(
-            category__name="Agricultural residues"
-        )
+        burning_emission_factor = BurningEmissionFactor.objects.get(category__name="Agricultural residues")
 
-        fires_combustion_factor_start = FiresCombustionFactor.objects.get(
-            crop_type=crop_type_start
-        )
-        fires_combustion_factor_w = FiresCombustionFactor.objects.get(
-            crop_type=crop_type_w
-        )
-        fires_combustion_factor_wo = FiresCombustionFactor.objects.get(
-            crop_type=crop_type_wo
-        )
+        fires_combustion_factor_start = FiresCombustionFactor.objects.get(crop_type=crop_type_start)
+        fires_combustion_factor_w = FiresCombustionFactor.objects.get(crop_type=crop_type_w)
+        fires_combustion_factor_wo = FiresCombustionFactor.objects.get(crop_type=crop_type_wo)
 
-        n_estimation_factor_start = (
-            CropNitrousEstimationDefaultFactor.objects.get_or_grains(
-                crop_type=crop_type_start
-            )
-        )
-        n_estimation_factor_w = (
-            CropNitrousEstimationDefaultFactor.objects.get_or_grains(
-                crop_type=crop_type_w
-            )
-        )
-        n_estimation_factor_wo = (
-            CropNitrousEstimationDefaultFactor.objects.get_or_grains(
-                crop_type=crop_type_wo
-            )
-        )
+        n_estimation_factor_start = CropNitrousEstimationDefaultFactor.objects.get_or_grains(crop_type=crop_type_start)
+        n_estimation_factor_w = CropNitrousEstimationDefaultFactor.objects.get_or_grains(crop_type=crop_type_w)
+        n_estimation_factor_wo = CropNitrousEstimationDefaultFactor.objects.get_or_grains(crop_type=crop_type_wo)
 
         # Minor crop
         try:
-            minor_combustion_factor_start = FiresCombustionFactor.objects.get(
-                crop_type=crop_type_start
-            )
-            minor_combustion_factor_w = FiresCombustionFactor.objects.get(
-                crop_type=crop_type_w
-            )
-            minor_combustion_factor_wo = FiresCombustionFactor.objects.get(
-                crop_type=crop_type_wo
-            )
+            minor_combustion_factor_start = FiresCombustionFactor.objects.get(crop_type=crop_type_start)
+            minor_combustion_factor_w = FiresCombustionFactor.objects.get(crop_type=crop_type_w)
+            minor_combustion_factor_wo = FiresCombustionFactor.objects.get(crop_type=crop_type_wo)
 
-            minor_burning_emission_factor = BurningEmissionFactor.objects.get(
-                category__name="Agricultural residues"
-            )
+            minor_burning_emission_factor = BurningEmissionFactor.objects.get(category__name="Agricultural residues")
 
-            minor_n_estimation_factor_start = (
-                CropNitrousEstimationDefaultFactor.objects.get_or_grains(
-                    crop_type=minor_crop_type_start
-                )
-            )
-            minor_n_estimation_factor_w = (
-                CropNitrousEstimationDefaultFactor.objects.get_or_grains(
-                    crop_type=minor_crop_type_w
-                )
-            )
-            minor_n_estimation_factor_wo = (
-                CropNitrousEstimationDefaultFactor.objects.get_or_grains(
-                    crop_type=minor_crop_type_wo
-                )
-            )
+            minor_n_estimation_factor_start = CropNitrousEstimationDefaultFactor.objects.get_or_grains(crop_type=minor_crop_type_start)
+            minor_n_estimation_factor_w = CropNitrousEstimationDefaultFactor.objects.get_or_grains(crop_type=minor_crop_type_w)
+            minor_n_estimation_factor_wo = CropNitrousEstimationDefaultFactor.objects.get_or_grains(crop_type=minor_crop_type_wo)
+
         except:
             # If only one of the above operations fails, all minor variables must be set to None
             minor_burning_emission_factor = None
@@ -691,53 +725,19 @@ class AnnualCroppingCalculator(BaseCalculator):
             minor_n_estimation_factor_w = None
             minor_n_estimation_factor_wo = None
 
-        emission_factors_start = DefaultEmissionFactor.objects.get(
-            moisture=moisture, organic_input_type=input.organic_input_type_start
-        )
-        emission_factors_w = DefaultEmissionFactor.objects.get(
-            moisture=moisture, organic_input_type=input.organic_input_type_w
-        )
-        emission_factors_wo = DefaultEmissionFactor.objects.get(
-            moisture=moisture, organic_input_type=input.organic_input_type_wo
-        )
+        emission_factors_start = DefaultEmissionFactor.objects.get(moisture=moisture, organic_input_type=input.organic_input_type_start)
+        emission_factors_w = DefaultEmissionFactor.objects.get(moisture=moisture, organic_input_type=input.organic_input_type_w)
+        emission_factors_wo = DefaultEmissionFactor.objects.get(moisture=moisture, organic_input_type=input.organic_input_type_wo)
 
-        flu = CroplandFLU.objects.get(
-            climate=climate,
-            moisture=moisture,
-            crop_type__name="Long-Term Cultivated",
-        )
+        flu = CroplandFLU.objects.get(**cm, crop_type__name="Long-Term Cultivated")
 
-        fi_start = CroplandFI.objects.get(
-            climate=climate,
-            moisture=moisture,
-            organic_input_type=input.organic_input_type_start,
-        )
-        fi_w = CroplandFI.objects.get(
-            climate=climate,
-            moisture=moisture,
-            organic_input_type=input.organic_input_type_w,
-        )
-        fi_wo = CroplandFI.objects.get(
-            climate=climate,
-            moisture=moisture,
-            organic_input_type=input.organic_input_type_wo,
-        )
+        fi_start = CroplandFI.objects.get(**cm,organic_input_type=input.organic_input_type_start)
+        fi_w = CroplandFI.objects.get(**cm, organic_input_type=input.organic_input_type_w)
+        fi_wo = CroplandFI.objects.get(**cm,organic_input_type=input.organic_input_type_wo)
 
-        fmg_start = CroplandFMG.objects.get(
-            climate=climate,
-            moisture=moisture,
-            tillage_management_type=input.tillage_management_type_start,
-        )
-        fmg_w = CroplandFMG.objects.get(
-            climate=climate,
-            moisture=moisture,
-            tillage_management_type=input.tillage_management_type_w,
-        )
-        fmg_wo = CroplandFMG.objects.get(
-            climate=climate,
-            moisture=moisture,
-            tillage_management_type=input.tillage_management_type_wo,
-        )
+        fmg_start = CroplandFMG.objects.get(**cm,tillage_management_type=input.tillage_management_type_start)
+        fmg_w = CroplandFMG.objects.get(**cm,tillage_management_type=input.tillage_management_type_w)
+        fmg_wo = CroplandFMG.objects.get(**cm,tillage_management_type=input.tillage_management_type_wo)
 
         crop_yield_start = (
             input.crop_yield_start
@@ -761,9 +761,9 @@ class AnnualCroppingCalculator(BaseCalculator):
             ).average
         )
 
-        ha_data_start = [input.ha_start, input.ha_start]
-        ha_data_w = [input.ha_start, input.ha_w]
-        ha_data_wo = [input.ha_start, input.ha_wo]
+        ha_data_start = [input.ha_start, 0]
+        ha_data_w = [0, input.ha_w]
+        ha_data_wo = [0, input.ha_wo]
 
         # NOTE: Is this still needed?
         # if is_parent:
@@ -780,8 +780,8 @@ class AnnualCroppingCalculator(BaseCalculator):
             *ha_data_start,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
-            input.ha_w_rate.name,  # NOTE: This will be handled on activity-level
-            input.ha_w_rate.value,
+            change_rate.name,
+            change_rate.value,
             project.soc_ref.value,
             input.soc_ref_t2_start,
             flu.value,
@@ -828,8 +828,8 @@ class AnnualCroppingCalculator(BaseCalculator):
             *ha_data_w,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
-            input.ha_w_rate.name,  # NOTE: This will be handled on activity-level
-            input.ha_w_rate.value,
+            change_rate.name,
+            change_rate.value,
             project.soc_ref.value,
             input.soc_ref_t2_w,
             flu.value,
@@ -873,8 +873,8 @@ class AnnualCroppingCalculator(BaseCalculator):
             *ha_data_wo,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
-            input.ha_wo_rate.name,  # NOTE: This will be handled on activity-level
-            input.ha_wo_rate.value,
+            change_rate.name,
+            change_rate.value,
             project.soc_ref.value,
             input.soc_ref_t2_wo,
             flu.value,
@@ -914,14 +914,13 @@ class AnnualCroppingCalculator(BaseCalculator):
             getattr(minor_n_estimation_factor_wo, "n_bg_t", None),
         ]
 
-        emissions_start = AnnualCropland(*inputs_start).calculate_emissions()
-        emissions_w = AnnualCropland(*inputs_w).calculate_emissions()
-        emissions_wo = AnnualCropland(*inputs_wo).calculate_emissions()
+        results_start = AnnualCropland(*inputs_start).calculate_emissions()
+        results_w = AnnualCropland(*inputs_w).calculate_emissions()
+        results_wo = AnnualCropland(*inputs_wo).calculate_emissions()
 
-        res_w = emissions_w - emissions_start
-        res_wo = emissions_wo - emissions_start
+        results = Result(results_w+results_start, results_wo+results_start, results_w-results_wo)
 
-        return Result(res_w, res_wo, res_w - res_wo)
+        return results
 
 
 class PerennialCroppingCalculator(BaseCalculator):
@@ -935,97 +934,101 @@ class PerennialCroppingCalculator(BaseCalculator):
         """
 
         project = self.data.activity.project
+        module: PerennialCropping = self.data
         climate = project.climate
         moisture = project.moisture
         continent = project.continent
-        crop_type = self.data.crop_type
-        parent, _ = get_assessment_or_parent(self.data)
+        parent, _ = get_assessment_or_parent(module)
 
-        burning_emission_factor = BurningEmissionFactor.objects.get(
-            category__name="Savanna and grassland"
-        )
+        cm = {
+            "climate": climate,
+            "moisture": moisture,
+        }
+
+        cmc = {
+            "climate": climate,
+            "moisture": moisture,
+            "continent": continent,
+        }
+
+        burning_emission_factor = BurningEmissionFactor.objects.get(category__name="Savanna and grassland")
 
         # TODO: Replace 'other' with all the other land_use_types in db
-        fires_combustion_factor = FiresCombustionFactor.objects.get_or_other(
-            crop_type=crop_type
-        )
-        ag_default = PerennialAGB.objects.get_or_default(
-            climate=climate,
-            moisture=moisture,
-            continent=continent,
-            land_use_type=crop_type,
-        )
-        agb_max_c = PerennialMaxAGB.objects.get(
-            climate=climate, land_use_type=crop_type
-        )
-        bg_default = PerennialBGB.objects.get_or_default(
-            climate=climate,
-            moisture=moisture,
-            continent=continent,
-            land_use_type=crop_type,
-        )
+        fires_combustion_factor_start = FiresCombustionFactor.objects.get_or_other(crop_type=module.crop_type_start)
+        fires_combustion_factor_w = FiresCombustionFactor.objects.get_or_other(crop_type=module.crop_type_w)
+        fires_combustion_factor_wo = FiresCombustionFactor.objects.get_or_other(crop_type=module.crop_type_wo)
+
+        ag_default_start = PerennialAGB.objects.get_or_default(**cmc,land_use_type=module.crop_type_start)
+        ag_default_w = PerennialAGB.objects.get_or_default(**cmc,land_use_type=module.crop_type_w)
+        ag_default_wo = PerennialAGB.objects.get_or_default(**cmc,land_use_type=module.crop_type_wo)
+
+        agb_max_c_start = PerennialMaxAGB.objects.get(climate=climate, land_use_type=module.crop_type_start)
+        agb_max_c_w = PerennialMaxAGB.objects.get(climate=climate, land_use_type=module.crop_type_w)
+        agb_max_c_wo = PerennialMaxAGB.objects.get(climate=climate, land_use_type=module.crop_type_wo)
+
+        bg_default_start = PerennialBGB.objects.get_or_default(**cmc,land_use_type=module.crop_type_start)
+        bg_default_w = PerennialBGB.objects.get_or_default(**cmc,land_use_type=module.crop_type_w)
+        bg_default_wo = PerennialBGB.objects.get_or_default(**cmc,land_use_type=module.crop_type_wo)
 
         if parent:
             # TODO: initial_land_use and final_land_use change based on what's initial and whats final. Differentiate in LUC_From | LUC_To
             # NOTE: Maybe not? It's possible that the correct one is always final_land_use_type. Ask EX-ACT Team
-            flu = AfforestationFLU.objects.get(
-                climate=climate,
-                moisture=moisture,
-                land_use_type=parent.final_land_use_type,
-            )
+            flu = AfforestationFLU.objects.get(**cm,land_use_type=parent.final_land_use_type)
         else:
-            flu = CroplandFLU.objects.get(
-                climate=climate,
-                moisture=moisture,
-                crop_type__name="Perennial/Tree Crop",
-            )
+            flu = CroplandFLU.objects.get(**cm,crop_type__name="Perennial/Tree Crop")
 
-        fi = CroplandFI.objects.get(
-            climate=climate,
-            moisture=moisture,
-            organic_input_type=self.data.organic_input_type,
-        )
-        fmg = CroplandFMG.objects.get(
-            climate=climate,
-            moisture=moisture,
-            tillage_management_type=self.data.tillage_management_type,
-        )
+        fi_start = CroplandFI.objects.get(**cm,organic_input_type=module.organic_input_type_start)
+        fi_w = CroplandFI.objects.get(**cm,organic_input_type=module.organic_input_type_w)
+        fi_wo = CroplandFI.objects.get(**cm,organic_input_type=module.organic_input_type_wo)
 
-        inputs = [
-            self.data.ha_start,
-            self.data.ha_w,
-            self.data.ha_wo,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
-            self.data.ha_w_rate.name if parent else "D",
-            self.data.ha_w_rate.value if parent else 0.5,
-            self.data.ha_wo_rate.name if parent else "D",
-            self.data.ha_wo_rate.value if parent else 0.5,
-            project.gw_potential.n2o,
-            project.gw_potential.ch4,
-            self.data.is_biomass_burned,
-            burning_emission_factor.n2o,
-            burning_emission_factor.ch4,
-            fires_combustion_factor.value,
-            1,  # Default
-            self.data.fire_periodicity_t2,
-            self.data.residue_burned_t2,
-            ag_default.value,
-            self.data.ag_t2,
-            agb_max_c.value,
-            bg_default.value,
-            self.data.bg_t2,
-            project.soc_ref.value,
-            self.data.soc_t2 if parent else 1,
-            flu.value if parent else 1,
-            self.data.flu_t2,
-            fi.value,
-            self.data.input_factor_t2,
-            fmg.value,
-            self.data.tillage_factor_t2,
-        ]
+        fmg_start = CroplandFMG.objects.get(**cm,tillage_management_type=module.tillage_management_type_start)
+        fmg_w = CroplandFMG.objects.get(**cm,tillage_management_type=module.tillage_management_type_w)
+        fmg_wo = CroplandFMG.objects.get(**cm,tillage_management_type=module.tillage_management_type_wo)
+
+        inputs_start = []
+        inputs_w = []
+        inputs_wo = []
+
+        results_start = None
+        results_w = None
+        results_wo = None
+
+        # inputs = [
+        #     self.data.ha_start,
+        #     self.data.ha_w,
+        #     self.data.ha_wo,
+        #     project.implementation_duration_yrs,
+        #     project.capitalization_duration_yrs,
+        #     self.data.ha_w_rate.name if parent else "D",
+        #     self.data.ha_w_rate.value if parent else 0.5,
+        #     self.data.ha_wo_rate.name if parent else "D",
+        #     self.data.ha_wo_rate.value if parent else 0.5,
+        #     project.gw_potential.n2o,
+        #     project.gw_potential.ch4,
+        #     self.data.is_biomass_burned,
+        #     burning_emission_factor.n2o,
+        #     burning_emission_factor.ch4,
+        #     fires_combustion_factor.value,
+        #     1,  # Default
+        #     self.data.fire_periodicity_t2,
+        #     self.data.residue_burned_t2,
+        #     ag_default.value,
+        #     self.data.ag_t2,
+        #     agb_max_c.value,
+        #     bg_default.value,
+        #     self.data.bg_t2,
+        #     project.soc_ref.value,
+        #     self.data.soc_t2 if parent else 1,
+        #     flu.value if parent else 1,
+        #     self.data.flu_t2,
+        #     fi.value,
+        #     self.data.input_factor_t2,
+        #     fmg.value,
+        #     self.data.tillage_factor_t2,
+        # ]
+        
         # BUG: Results for perennial crops do not add up. Wait for Lorenzo's unlocked Excel files
-        return Result(*perennial_cropping.calculate_emissions(*inputs))
+        return Result(results_w+results_start, results_wo+results_start, results_w-results_wo)
 
 
 class GrasslandCalculator(BaseCalculator):
@@ -2260,13 +2263,9 @@ class LivestockCalculator(BaseCalculator):
             if ch4_ef_t2_wo:
                 ch4_ef_t2_wo = ch4_ef_t2_wo.value
 
-        LEACHING_MULTI = LivestockParameter.objects.get(
-            name="LEACHING_MULTIPLIER"
-        ).value
+        LEACHING_MULTI = LivestockParameter.objects.get(name="LEACHING_MULTIPLIER").value
 
-        volatilization_multi = ManureManagementVolatilizationMultiplier.objects.get(
-            moisture=project.moisture,
-        )
+        volatilization_multi = ManureManagementVolatilizationMultiplier.objects.get(moisture=project.moisture,)
 
         i_w = [
             project.implementation_duration_yrs,

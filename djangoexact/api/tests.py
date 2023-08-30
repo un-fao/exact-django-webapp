@@ -11,12 +11,12 @@ from time import sleep
 import xlwings as xw
 import math
 
-BATCH_SIZE = 50
+BATCH_SIZE = 1
 TEST_SM_FISHERY = False
 TEST_LG_FISHERY = False
-TEST_ANNUAL_CROPPING = False
+TEST_ANNUAL_CROPPING = True
 TEST_PERENNIAL_CROPPING = False
-TEST_LIVESTOCK = True
+TEST_LIVESTOCK = False
 
 
 def verbose_print(obj):
@@ -209,41 +209,73 @@ if TEST_ANNUAL_CROPPING:
         print("-----------------------------------")
 
         print(annual_cropping.id)
-        print(annual_cropping.crop_type)
-        print(annual_cropping.tillage_management_type)
-        print(annual_cropping.organic_input_type)
-        print(annual_cropping.residue_management_type)
+
+        print(annual_cropping.ha_start)
+        print(annual_cropping.ha_w)
+        print(annual_cropping.ha_wo)
+
+        print(annual_cropping.crop_type_start)
+        print(annual_cropping.tillage_management_type_start)
+        print(annual_cropping.organic_input_type_start)
+        print(annual_cropping.residue_management_type_start)
 
         results = CalculatorFactory().calculate_result(annual_cropping)
 
         cropland_sheet["E25"].value = (
-            annual_cropping.crop_type.name
-            if annual_cropping.crop_type.name not in ["Beans", "Pulses"]
+            annual_cropping.crop_type_start.name
+            if annual_cropping.crop_type_start.name not in ["Beans", "Pulses"]
             else "Beans & pulses"
         )
-        print(cropland_sheet["E25"].value)
-        cropland_sheet["G25"].value = annual_cropping.tillage_management_type.name
-        cropland_sheet["I25"].value = annual_cropping.organic_input_type.name
-        cropland_sheet["K25"].value = annual_cropping.residue_management_type.name
-        cropland_sheet["M25"].value = annual_cropping.crop_yield
-        cropland_sheet["Q25"].value = annual_cropping.ha_start
-        cropland_sheet["R25"].value = annual_cropping.ha_wo
-        cropland_sheet["T25"].value = annual_cropping.ha_w
 
-        sheet_wo = float(cropland_sheet["W25"].value)
-        sheet_w = float(cropland_sheet["X25"].value)
-        sheet_balance = float(cropland_sheet["Z25"].value)
+
+        cropland_sheet["G25"].value = annual_cropping.tillage_management_type_start.name
+        cropland_sheet["I25"].value = annual_cropping.organic_input_type_start.name
+        cropland_sheet["K25"].value = annual_cropping.residue_management_type_start.name
+        cropland_sheet["M25"].value = annual_cropping.crop_yield_start
+        cropland_sheet["Q25"].value = annual_cropping.ha_start
+        cropland_sheet["R25"].value = 0
+        cropland_sheet["T25"].value = 0
+
+        cropland_sheet["E26"].value = (
+            annual_cropping.crop_type_wo.name
+            if annual_cropping.crop_type_wo.name not in ["Beans", "Pulses"]
+            else "Beans & pulses"
+        )
+        cropland_sheet["G26"].value = annual_cropping.tillage_management_type_wo.name
+        cropland_sheet["I26"].value = annual_cropping.organic_input_type_wo.name
+        cropland_sheet["K26"].value = annual_cropping.residue_management_type_wo.name
+        cropland_sheet["M26"].value = annual_cropping.crop_yield_wo
+        cropland_sheet["Q26"].value = 0
+        cropland_sheet["R26"].value = annual_cropping.ha_wo
+        cropland_sheet["T26"].value = 0
+
+        cropland_sheet["E27"].value = (
+            annual_cropping.crop_type_w.name
+            if annual_cropping.crop_type_w.name not in ["Beans", "Pulses"]
+            else "Beans & pulses"
+        )
+        cropland_sheet["G27"].value = annual_cropping.tillage_management_type_w.name
+        cropland_sheet["I27"].value = annual_cropping.organic_input_type_w.name
+        cropland_sheet["K27"].value = annual_cropping.residue_management_type_w.name
+        cropland_sheet["M27"].value = annual_cropping.crop_yield_w
+        cropland_sheet["Q27"].value = 0
+        cropland_sheet["R27"].value = 0
+        cropland_sheet["T27"].value = annual_cropping.ha_w
+
+        sheet_wo = float(cropland_sheet["W37"].value)
+        sheet_w = float(cropland_sheet["X37"].value)
+        sheet_balance = float(cropland_sheet["Z37"].value)
         sleep(1)
 
         try:
-            assert math.isclose(results[0].total_wo, sheet_wo, rel_tol=0.02)
-            assert math.isclose(results[0].total_w, sheet_w, rel_tol=0.02)
-            assert math.isclose(results[0].balance, sheet_balance, rel_tol=0.02)
+            assert math.isclose(results.total_wo, sheet_wo, rel_tol=0.02)
+            assert math.isclose(results.total_w, sheet_w, rel_tol=0.02)
+            assert math.isclose(results.balance, sheet_balance, rel_tol=0.02)
             passed_croplands += 1
         except AssertionError as e:
             print("Results do not match the Excel")
-            print(f"total_w: {results[0].total_w}, total_wo: {results[0].total_wo}")
-            print(f"balance: {results[0].balance}")
+            print(f"total_w: {results.total_w}, total_wo: {results.total_wo}")
+            print(f"balance: {results.balance}")
             print(f"sheet_w: {sheet_w}, sheet_wo: {sheet_wo}")
             print(f"sheet_balance: {sheet_balance}")
 
@@ -285,8 +317,8 @@ if TEST_LIVESTOCK:
 
         results = CalculatorFactory().calculate_result(livestock)
 
-        print(f"total_w: {results[0].total_w}, total_wo: {results[0].total_wo}")
-        print(f"balance: {results[0].balance}")
+        print(f"total_w: {results.total_w}, total_wo: {results.total_wo}")
+        print(f"balance: {results.balance}")
 
         passed_livestocks += 1
 
