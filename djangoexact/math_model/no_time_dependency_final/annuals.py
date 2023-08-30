@@ -51,8 +51,8 @@ class AnnualCropland:
         self.n_content_bg_minor = n_content_bg_minor
 
         # AUXILIARY VARIABLES FOR SOIL CALCULATION
-        self.hectars_before_20, self.hectars_after_20 = yearly_time_dependent_20_year_breakdown(min(area_start, area_end),max(area_start, area_end),self.time_impl, self.time_cap, self.rate)
-        self.total_hectars = yearly_time_dependent_parameter_breakdown(min(area_start, area_end),max(area_start, area_end),self.time_impl, self.time_cap, self.rate, interim_values = True)
+        self.hectars_before_20, self.hectars_after_20 = yearly_time_dependent_20_year_breakdown(area_start, area_end ,self.time_impl, self.time_cap, self.rate)
+        self.total_hectars = yearly_time_dependent_parameter_breakdown(area_start, area_end, self.time_impl, self.time_cap, self.rate, interim_values = True)
         # DEFAULTS FOR TIER 2 VALUES INITIALIZATION
 
         # RESULTS
@@ -74,7 +74,7 @@ class AnnualCropland:
 
             try:
 
-                self.emissions_soil_yearly, self.emissions_soil_total = soil_emissions(self.hectars_before_20, min(self.area_start, self.area_end), max(self.area_start, self.area_end), self.socref,
+                self.emissions_soil_yearly, self.emissions_soil_total = soil_emissions(self.hectars_before_20, self.area_start, self.area_end, self.socref,
                                         self.soc_tier_2, self.f_lu_tier_2, self.f_i_tier_2, self.f_mg_tier_2, self.f_lu_ref, self.f_i_ref, self.f_mg_ref)
 
             except Exception as e:
@@ -105,7 +105,7 @@ class AnnualCropland:
 
                 som_n2o = 0 if maximum_soc_20_years >= reference_soc else ((maximum_soc_20_years - reference_soc)/20/10*1000)  * self.emission_factor_nitrous * n2o_n_conversion * (self.nitrous_constant/1000)
 
-                total = sum(self.total_hectars) * som_n2o
+                total = - sum(self.total_hectars) * som_n2o
 
                 # TODO: ask if this should be broken down proportionally, in that case we have to take an approach similar to the one used in the soil calculation
                 self.emissions_som_yearly = yearly_constant_emissions_breakdown(total, self.time_impl, self.time_cap)
