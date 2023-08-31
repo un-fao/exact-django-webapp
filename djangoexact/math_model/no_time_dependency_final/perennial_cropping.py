@@ -39,8 +39,8 @@ class PerennialCropping:
         self.f_mg_tier_2 = f_mg_tier_2
 
         # Added values
-        self.total_hectars = yearly_time_dependent_parameter_breakdown(min(area_start, area_end),max(area_start, area_end),self.time_impl, self.time_cap, self.rate)
-        self.hectars_before_20, self.hectars_after_20 = yearly_time_dependent_20_year_breakdown(min(area_start, area_end),max(area_start, area_end),self.time_impl, self.time_cap, self.rate)
+        self.total_hectars = yearly_time_dependent_parameter_breakdown(area_start, area_end,self.time_impl, self.time_cap, self.rate)
+        self.hectars_before_20, self.hectars_after_20 = yearly_time_dependent_20_year_breakdown(area_start, area_end, self.time_impl, self.time_cap, self.rate)
 
         # RESULTS
         self.yearly_residue_emissions = []
@@ -128,7 +128,7 @@ class PerennialCropping:
 
                 som_n2o = 0 if maximum_soc_20_years > reference_soc else (reference_soc - maximum_soc_20_years) * 5  * n2o_n_conversion / 1000
                 
-                total = som_n2o * sum(self.total_hectars)
+                total = - som_n2o * sum(self.total_hectars)
 
                 self.yearly_som_emissions = breakdown_according_to_values(total, self.total_hectars)
                 self.total_som_emissions = total
