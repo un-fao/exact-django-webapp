@@ -19,14 +19,14 @@ for model in [
 
 
 class AGBAdmin(admin.ModelAdmin):
-    search_fields = ["climate__name", "moisture__name", "land_use_type__name"]
+    search_fields = ["climate__name", "moisture__name", "crop_type__name"]
 
 
 class BGBAdmin(admin.ModelAdmin):
     search_fields = [
         "climate__name",
         "moisture__name",
-        "land_use_type__name",
+        "crop_type__name",
         "continent__name",
     ]
 
