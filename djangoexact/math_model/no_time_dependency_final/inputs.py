@@ -140,7 +140,9 @@ class OperationPhaseIrrigation:
                                 self.fuel_net_calorific_values, self.fuel_density, self.depth, self.gwir)
 
             # THESE ARE SAVED IN ORDER TO MULTIPLY BY ELECTRICITY MULTIPLIER
-            yearly_emissions, total_emissions = input_single_calculation(self.units_start, self.units_end, ef, None, 1, 1, self.time_impl, self.time_cap, self.rate_type)
+
+            # TODO: CHECK IF THIS CAN BE CHANGED TO HAVING MULTIPLE INPUTS FOR START AND END LIKE FISHERIES ECC (so backend changes from start to end and not start-0 0-end)
+            yearly_emissions, _ = input_single_calculation(self.units_start, self.units_end, ef, None, 1, 1, self.time_impl, self.time_cap, self.rate_type)
             yearly_emissions = [x * (1 + self.transportation_loss) for x in yearly_emissions] if self.transportation_loss else yearly_emissions
             
             self.emissions_total_yearly = yearly_emissions
