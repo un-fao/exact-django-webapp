@@ -7,6 +7,7 @@ from .models import (
     Building,
     Livestock,
     AnnualCropping,
+    AnnualCroplandParameter,
     CropType,
     LivestockParameter,
     Electricity,
@@ -19,6 +20,8 @@ from .models import (
     PerennialCropping,
     Aquaculture,
     AquacultureParameter,
+    Grassland,
+    GrasslandParameter,
 )
 from math_model import (
     defo,
@@ -39,6 +42,7 @@ from abc import ABC, abstractmethod
 import sys
 from math_model.no_time_dependency_final.defo import Deforestation as MathDeforestation
 from math_model.no_time_dependency_final.livestock import Livestock as MathLivestock
+from math_model.no_time_dependency_final.grassland_management import GrasslandManagement as MathGrassland
 from math_model.no_time_dependency_final.fisheries_and_aquaculture import (
     CoastalAquaculture as MathAquaculture,
 )
@@ -623,11 +627,7 @@ class OtherLandUseCalculator(BaseCalculator):
             climate=climate, moisture=moisture, land_use_type=final_land_use_type
         )
 
-        c_n_ratio = (
-            CN_RATIO_GRASSLAND
-            if initial_land_use.name == "Grassland"
-            else CN_RATIO_FOREST
-        )
+        c_n_ratio = CN_RATIO_GRASSLAND if initial_land_use.name == "Grassland" else CN_RATIO_FOREST
 
         moisture_factor = DefaultEmissionFactor.objects.get(
             moisture=moisture, input__name__icontains="Other N Inputs"
@@ -722,7 +722,7 @@ class AnnualCroppingCalculator(BaseCalculator):
             minor_n_estimation_factor_wo = CropNitrousEstimationDefaultFactor.objects.get_or_grains(crop_type=minor_crop_type_wo)
 
         except:
-            # If only one of the above operations fails, all minor variables must be set to None
+            # If only one of the above operations fails, all minor variables must be set to None for the math model to workx
             minor_burning_emission_factor = None
 
             minor_combustion_factor_start = None
@@ -994,6 +994,8 @@ class PerennialCroppingCalculator(BaseCalculator):
         fmg_w = CroplandFMG.objects.get(**cm,tillage_management_type=module.tillage_management_type_w)
         fmg_wo = CroplandFMG.objects.get(**cm,tillage_management_type=module.tillage_management_type_wo)
 
+        default_fire_periodicity = AnnualCroplandParameter.objects.get_or_default(name="default_fire_periodicity")
+
         inputs_start = [
             module.ha_start,
             0,
@@ -1006,7 +1008,7 @@ class PerennialCroppingCalculator(BaseCalculator):
             burning_emission_factor.ch4,
             burning_emission_factor.n2o,
             fires_combustion_factor_start.value,
-            1,  # Default
+            default_fire_periodicity.value,
             module.fire_periodicity_t2_start,
             module.residue_burned_t2_start,
             ag_default_start.value,
@@ -1036,7 +1038,7 @@ class PerennialCroppingCalculator(BaseCalculator):
             burning_emission_factor.ch4,
             burning_emission_factor.n2o,
             fires_combustion_factor_w.value,
-            1,  # Default
+            default_fire_periodicity.value,
             module.fire_periodicity_t2_w,
             module.residue_burned_t2_w,
             ag_default_w.value,
@@ -1066,7 +1068,7 @@ class PerennialCroppingCalculator(BaseCalculator):
             burning_emission_factor.ch4,
             burning_emission_factor.n2o,
             fires_combustion_factor_wo.value,
-            1,  # Default
+            default_fire_periodicity.value,
             module.fire_periodicity_t2_wo,
             module.residue_burned_t2_wo,
             ag_default_wo.value,
@@ -1103,97 +1105,113 @@ class GrasslandCalculator(BaseCalculator):
         Calculate emissions for a single Grassland module.
         """
 
-        project = self.data.activity.project
+        module: Grassland = self.data
+        project = module.activity.project
+        change_rate = module.activity.change_rate
         ef = BurningEmissionFactor.objects.get(category__name="Savanna and grassland")
-        agb = GrasslandAGB.objects.get(
-            climate=project.climate, moisture=project.moisture
-        )
-        cf = 0.77
+        agb = GrasslandAGB.objects.get(climate=project.climate, moisture=project.moisture)
+        cf = GrasslandParameter.objects.get(name="default_combustion_factor").value
         proj_soc = project.soc_ref.value
-
-        relative, relation = get_assessment_or_parent(self.data)
-        is_parent = relation == "parent"
 
         # NOTE: Default values at start are for 'Non-Degraded' land
         soc_start = GrasslandStockExchangeFactor.objects.filter(
-            grassland_management_type=self.data.grassland_management_type_start,
+            grassland_management_type=module.grassland_management_type_start,
             climate=project.climate,
         ).first()
 
         soc_w = GrasslandStockExchangeFactor.objects.filter(
-            grassland_management_type=self.data.grassland_management_type_w,
+            grassland_management_type=module.grassland_management_type_w,
             climate=project.climate,
         ).first()
 
         soc_wo = GrasslandStockExchangeFactor.objects.filter(
-            grassland_management_type=self.data.grassland_management_type_wo,
+            grassland_management_type=module.grassland_management_type_wo,
             climate=project.climate,
         ).first()
 
-        soc_start = (
-            proj_soc * soc_start.fmg * soc_start.flu * soc_start.fi
-            if soc_start
-            else project.soc_ref.value
-        )
-        soc_w = (
-            proj_soc * soc_w.fmg * soc_w.flu * soc_w.fi
-            if soc_w
-            else project.soc_ref.value
-        )
-        soc_wo = (
-            proj_soc * soc_wo.fmg * soc_wo.flu * soc_wo.fi
-            if soc_wo
-            else project.soc_ref.value
-        )
+        soc_start = proj_soc * soc_start.fmg * soc_start.flu * soc_start.fi if soc_start else project.soc_ref.value
+        soc_w = proj_soc * soc_w.fmg * soc_w.flu * soc_w.fi if soc_w else project.soc_ref.value
+        soc_wo = proj_soc * soc_wo.fmg * soc_wo.flu * soc_wo.fi if soc_wo else project.soc_ref.value
 
-        # TODO: A method must be defined that takes into account the nature of the land use change (defo, affo, oluc) and builds start,w,wo accordingly.
-
-        ha_data = [self.data.ha_start, self.data.ha_w, self.data.ha_wo]
-        # if is_parent:
-        #     match relative.__class__.__name__:
-        #         case Deforestation.__name__:
-        #             ha_data = [0, relative.ha_w, (relative.ha_start - relative.ha_wo)]
-        #         case Afforestation.__name__:
-        #             ha_data = [relative.ha_w, relative.ha_w, relative.ha_wo]
-        #         case OtherLandUse.__name__:
-        #             ha_data = [relative.ha_start, relative.ha_w, 0]
-        if is_parent:
-            if relative.__class__.__name__ == Deforestation.__name__:
-                ha_data = [0, relative.ha_w, (relative.ha_start - relative.ha_wo)]
-            if relative.__class__.__name__ == Afforestation.__name__:
-                ha_data = [relative.ha_w, relative.ha_w, relative.ha_wo]
-            if relative.__class__.__name__ == OtherLandUse.__name__:
-                ha_data = [relative.ha_start, relative.ha_w, 0]
-
-        inputs = [
-            *ha_data,
+        inputs_start = [
+            module.ha_start,
+            0,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
-            relative.ha_wo_rate.name if is_parent else self.data.ha_w_rate.name,
-            relative.ha_wo_rate.value if is_parent else self.data.ha_w_rate.value,
-            relative.ha_w_rate.name if is_parent else self.data.ha_wo_rate.name,
-            relative.ha_w_rate.value if is_parent else self.data.ha_wo_rate.value,
+            change_rate.name,
             project.gw_potential.n2o,
             project.gw_potential.ch4,
-            self.data.years_w_fire_management,
-            self.data.years_wo_fire_management,
-            self.data.is_fire_used_w,
-            self.data.is_fire_used_wo,
+            module.fire_periodicity_start,
+            module.is_fire_used_start,
             ef.ch4,
             ef.n2o,
             agb.value,
-            self.data.agb_t2,
+            module.agb_t2_start,
             cf,
-            self.data.combustion_factor_t2,
+            module.combustion_factor_t2_start,
             soc_start,
-            self.data.soil_carbon_start_t2,
+            module.soil_carbon_t2_start,
             soc_w,
-            soc_wo,
-            self.data.soil_carbon_w_t2,
-            self.data.soil_carbon_wo_t2,
+            module.soil_carbon_t2_w
         ]
 
-        return Result(*grassland_management.calculate_total_emissions(*inputs))
+        inputs_w = [
+            0,
+            module.ha_w,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            change_rate.name,
+            project.gw_potential.n2o,
+            project.gw_potential.ch4,
+            module.fire_periodicity_w,
+            module.is_fire_used_w,
+            ef.ch4,
+            ef.n2o,
+            agb.value,
+            module.agb_t2_w,
+            cf,
+            module.combustion_factor_t2_start,
+            soc_start,
+            module.soil_carbon_t2_w,
+            soc_w,
+            module.soil_carbon_t2_w
+        ]
+
+        inputs_wo = [
+            0,
+            module.ha_wo,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            change_rate.name,
+            project.gw_potential.n2o,
+            project.gw_potential.ch4,
+            module.fire_periodicity_wo,
+            module.is_fire_used_wo,
+            ef.ch4,
+            ef.n2o,
+            agb.value,
+            module.agb_t2_wo,
+            cf,
+            module.combustion_factor_t2_start,
+            soc_start,
+            module.soil_carbon_t2_wo,
+            soc_w,
+            module.soil_carbon_t2_w
+        ]
+
+        math_start = MathGrassland(*inputs_start)
+        math_w = MathGrassland(*inputs_w)
+        math_wo = MathGrassland(*inputs_wo)
+
+        math_start.calculate_emissions()
+        math_w.calculate_emissions()
+        math_wo.calculate_emissions()
+
+        results_start = math_start.total_emissions
+        results_w = math_w.total_emissions
+        results_wo = math_wo.total_emissions
+
+        return Result(results_w+results_start, results_wo+results_start, results_w-results_wo)
 
 
 class SmallFisheryCalculator(BaseCalculator):
