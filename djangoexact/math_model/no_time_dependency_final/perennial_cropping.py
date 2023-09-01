@@ -1,5 +1,5 @@
 import traceback
-from .general_functions import yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, yearly_time_dependent_20_year_breakdown, breakdown_according_to_values, soil_emissions
+from general_functions import yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, yearly_time_dependent_20_year_breakdown, breakdown_according_to_values, soil_emissions
 
 class PerennialCropping:
 
@@ -100,8 +100,9 @@ class PerennialCropping:
                 max_years_growth = max_agb/agb_rate 
 
                 calculated = biomass_accumulation_rate * sum(self.total_hectars)
-                tabular = (max_agb + bgb_rate * max_years_growth) * sum(self.total_hectars)
-                
+
+                tabular = (max_agb + bgb_rate * max_years_growth) * self.area_end
+
                 total = - min(calculated, tabular) if max_agb != 0 else calculated
 
                 self.yearly_bio_emissions = breakdown_according_to_values(total, self.total_hectars)
@@ -160,3 +161,8 @@ class PerennialCropping:
         pass
         
 
+wo = [0, 88.0, 5, 15, 'D', 265.0, 28.0, False, 2.3, 0.21, 0.85, 1, None, None, 2.97, None, 27.3, 0.77, None, 76.0, None, 0.72, None, 1.44, None, 1.04, None]
+peren_start = PerennialCropping(*wo)
+peren_start.calculate_emissions()
+print(peren_start.total_emissions)
+print(peren_start.emissions_total_yearly)
