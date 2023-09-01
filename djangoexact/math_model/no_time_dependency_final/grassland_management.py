@@ -74,7 +74,7 @@ class GrasslandManagement:
 
 
                 calculated = delta_co2_mineral_per_ha_per_yr * sum(self.total_hectars)
-                tabular = max(self.area_start * self.area_end) * delta_co2_mineral_per_ha_per_yr * 20
+                tabular = max(self.area_start, self.area_end) * delta_co2_mineral_per_ha_per_yr * 20
                 
                 return tabular if abs(calculated) >= abs(tabular) else calculated
             except:
