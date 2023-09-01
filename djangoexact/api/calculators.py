@@ -1076,10 +1076,6 @@ class PerennialCroppingCalculator(BaseCalculator):
             module.tillage_factor_t2_wo
         ]
 
-        print(inputs_start)
-        print(inputs_w)
-        print(inputs_wo)
-
         results_start = PerennialCropland(*inputs_start).calculate_emissions()
         results_w = PerennialCropland(*inputs_w).calculate_emissions()
         results_wo = PerennialCropland(*inputs_wo).calculate_emissions()
@@ -1388,7 +1384,7 @@ class LargeFisheryCalculator(BaseCalculator):
 
 class ForestCalculator(BaseCalculator):
     """
-    Calculator for forest.
+    TODO: Calculator for forest.
     """
 
     def calculate(self) -> list[Result]:
