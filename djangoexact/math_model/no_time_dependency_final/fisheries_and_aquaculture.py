@@ -1,4 +1,4 @@
-from .general_functions import yearly_time_dependent_parameter_breakdown
+from general_functions import yearly_time_dependent_parameter_breakdown
 import traceback
 import re
 
@@ -190,8 +190,8 @@ class CoastalAquaculture():
                 nitrous_ef_start = self.nitrous_ef_default if not self.nitrous_ef_start_tier_2 else self.nitrous_ef_start_tier_2
                 nitrous_ef_end = self.nitrous_ef_default if not self.nitrous_ef_end_tier_2 else self.nitrous_ef_end_tier_2
 
-                annual_start = nitrous_ef_start * self.production_start * self.nitrous_constant
-                annual_end = nitrous_ef_end * self.production_end * self.nitrous_constant
+                annual_start = nitrous_ef_start * self.production_start * self.nitrous_constant * 44/28
+                annual_end = nitrous_ef_end * self.production_end * self.nitrous_constant * 44/28
 
                 self.emissions_nitrous_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.time_impl, self.time_cap, self.rate_type)
                 self.emissions_nitrous_total = sum(self.emissions_nitrous_yearly)
@@ -217,3 +217,7 @@ class CoastalAquaculture():
             traceback.print_exc()
             return {}
 
+w = [22.0, 45.0, 0.00169, None, None, 265.0, 5, 15, 'D']
+a = CoastalAquaculture(*w)
+
+a.calculate_emissions()
