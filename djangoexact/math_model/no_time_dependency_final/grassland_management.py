@@ -37,6 +37,9 @@ class GrasslandManagement:
         self.emissions_residue_burning_yearly = []
         self.emissions_residue_burning_total = 0
 
+        self.emissions_soil_yearly = []
+        self.emissions_soil_total = 0
+
         self.emissions_total_yearly = []
         self.total_emissions = 0
 
@@ -74,9 +77,13 @@ class GrasslandManagement:
 
 
                 calculated = delta_co2_mineral_per_ha_per_yr * sum(self.total_hectars)
-                tabular = max(self.area_start * self.area_end) * delta_co2_mineral_per_ha_per_yr * 20
+                tabular = max(self.area_start, self.area_end) * delta_co2_mineral_per_ha_per_yr * 20
                 
-                return tabular if abs(calculated) >= abs(tabular) else calculated
+                total = tabular if abs(calculated) >= abs(tabular) else calculated
+
+                self.emissions_soil_yearly = breakdown_according_to_values(total, self.total_hectars)
+                self.emissions_soil_total = total
+                return
             except:
                 traceback.print_exc()
                 return
