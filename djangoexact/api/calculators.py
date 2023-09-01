@@ -1156,7 +1156,7 @@ class GrasslandCalculator(BaseCalculator):
         ]
 
         inputs_w = [
-            0,
+            module.ha_start,
             module.ha_w,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
@@ -1178,7 +1178,7 @@ class GrasslandCalculator(BaseCalculator):
         ]
 
         inputs_wo = [
-            0,
+            module.ha_start,
             module.ha_wo,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
@@ -1195,8 +1195,8 @@ class GrasslandCalculator(BaseCalculator):
             module.combustion_factor_t2_start,
             soc_start,
             module.soil_carbon_t2_wo,
-            soc_w,
-            module.soil_carbon_t2_w
+            soc_wo,
+            module.soil_carbon_t2_wo
         ]
 
         math_start = MathGrassland(*inputs_start)
@@ -1211,7 +1211,7 @@ class GrasslandCalculator(BaseCalculator):
         results_w = math_w.total_emissions
         results_wo = math_wo.total_emissions
 
-        return Result(results_w+results_start, results_wo+results_start, results_w-results_wo)
+        return Result(results_w, results_wo, results_w-results_wo)
 
 
 class SmallFisheryCalculator(BaseCalculator):
