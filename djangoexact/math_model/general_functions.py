@@ -63,12 +63,12 @@ def plot_all_functions(yearly_breakdown_exponential, yearly_breakdown_linear, ye
     plt.legend()
     plt.show()
 
-exponential = yearly_parameter_breakdown(200, 1000, 20, 5, 'exponential')
-print(exponential)
-linear = yearly_parameter_breakdown(200, 1000, 20, 5, 'linear')
-print(linear)
-immediate = yearly_parameter_breakdown(200, 1000, 20, 5, 'immediate')
-print(immediate)
+# exponential = yearly_parameter_breakdown(200, 1000, 20, 5, 'exponential')
+# print(exponential)
+# linear = yearly_parameter_breakdown(200, 1000, 20, 5, 'linear')
+# print(linear)
+# immediate = yearly_parameter_breakdown(200, 1000, 20, 5, 'immediate')
+# print(immediate)
 
 plot_all_functions(exponential, linear, immediate)
 
