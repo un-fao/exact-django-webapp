@@ -1,4 +1,4 @@
-from general_functions import yearly_time_dependent_parameter_breakdown
+from .general_functions import yearly_time_dependent_parameter_breakdown
 import traceback
 import re
 
