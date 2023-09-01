@@ -1114,11 +1114,6 @@ class GrasslandCalculator(BaseCalculator):
         proj_soc = project.soc_ref.value
 
         # NOTE: Default values at start are for 'Non-Degraded' land
-        soc_start = GrasslandStockExchangeFactor.objects.filter(
-            grassland_management_type=module.grassland_management_type_start,
-            climate=project.climate,
-        ).first()
-
         soc_w = GrasslandStockExchangeFactor.objects.filter(
             grassland_management_type=module.grassland_management_type_w,
             climate=project.climate,
@@ -1133,30 +1128,8 @@ class GrasslandCalculator(BaseCalculator):
         soc_w = proj_soc * soc_w.fmg * soc_w.flu * soc_w.fi if soc_w else project.soc_ref.value
         soc_wo = proj_soc * soc_wo.fmg * soc_wo.flu * soc_wo.fi if soc_wo else project.soc_ref.value
 
-        inputs_start = [
-            module.ha_start,
-            0,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
-            change_rate.name,
-            project.gw_potential.n2o,
-            project.gw_potential.ch4,
-            module.fire_periodicity_start,
-            module.is_fire_used_start,
-            ef.ch4,
-            ef.n2o,
-            agb.value,
-            module.agb_t2_start,
-            cf,
-            module.combustion_factor_t2_start,
-            soc_start,
-            module.soil_carbon_t2_start,
-            soc_w,
-            module.soil_carbon_t2_w
-        ]
-
         inputs_w = [
-            module.ha_start,
+            0,
             module.ha_w,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
@@ -1178,7 +1151,7 @@ class GrasslandCalculator(BaseCalculator):
         ]
 
         inputs_wo = [
-            module.ha_start,
+            0,
             module.ha_wo,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
@@ -1199,15 +1172,12 @@ class GrasslandCalculator(BaseCalculator):
             module.soil_carbon_t2_wo
         ]
 
-        math_start = MathGrassland(*inputs_start)
         math_w = MathGrassland(*inputs_w)
         math_wo = MathGrassland(*inputs_wo)
 
-        math_start.calculate_emissions()
         math_w.calculate_emissions()
         math_wo.calculate_emissions()
 
-        results_start = math_start.total_emissions
         results_w = math_w.total_emissions
         results_wo = math_wo.total_emissions
 
