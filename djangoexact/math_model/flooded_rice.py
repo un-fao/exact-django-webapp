@@ -167,5 +167,5 @@ def default_tier_2(EFc_ref, EFc_tier_2, SFw_ref, SFw_tier_2, SFp_ref, SFp_tier_2
 
 
 
-em = calculate_emissions(12, 12, 12, 1.19, None, 1, None, 0.89, None, 1, None, 50, 0.95, 2.46, None,2.7, 0.8 ,0.07, 265, 20, 5, 0.5, 28, 113, None, 0.5, 'D', 'D', 70, None, 0, 0 , 0, 0, 0, 0)
-print(em)
+# em = calculate_emissions(12, 12, 12, 1.19, None, 1, None, 0.89, None, 1, None, 50, 0.95, 2.46, None,2.7, 0.8 ,0.07, 265, 20, 5, 0.5, 28, 113, None, 0.5, 'D', 'D', 70, None, 0, 0 , 0, 0, 0, 0)
+# print(em)

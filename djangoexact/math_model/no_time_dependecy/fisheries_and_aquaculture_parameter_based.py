@@ -275,8 +275,8 @@ def yearly_breakdown(catch, refrigerant, ice, w_wo, total):
     plt.savefig(f'yearly_breakdown_{w_wo}_parameters.png')
 
 
-em = total_emissions_small_or_large_fisheries(20, 9, 0.5, 0.5, 500, 450, 1000, 2.5722345860000, None, 73, None, 45, 73, 1810, None, 0.083, None, 0.5, 0.8, 0.8, 2.8, None, 60,  None, 0.573978947, 0.5, 0.8, 0.7)
-print(em)
+# em = total_emissions_small_or_large_fisheries(20, 9, 0.5, 0.5, 500, 450, 1000, 2.5722345860000, None, 73, None, 45, 73, 1810, None, 0.083, None, 0.5, 0.8, 0.8, 2.8, None, 60,  None, 0.573978947, 0.5, 0.8, 0.7)
+# print(em)
 
 
 # em = total_inland_coastal_aquaculture(757, 213, 0.00169, None, 265, 20, 9, 0.5, 0.5, 45, 500, 453, 0, None, 456)

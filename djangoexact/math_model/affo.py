@@ -143,7 +143,6 @@ def biomass_annual_rate_calculation (area, time_impl, time_cap, rate_type, rate_
     component_before_20_years = area * tot_biomass_growth_before_20_years * min(20, time_tot) if rate_type == 'I' else tot_biomass_growth_before_20_years * area * time_component_before_20(time_tot, time_impl, rate_of_change_soil, rate_type)
     component_after_20_years = tot_biomass_growth_after_20_years * area * (time_tot - min(20, time_tot)) if rate_type == 'I' else tot_biomass_growth_after_20_years * area * time_component_after_20(time_tot, time_impl, rate_of_change_soil, rate_type)
 
-    print(area * time_component_after_20(time_tot, time_impl, rate_of_change_soil, rate_type))
 
     return (component_before_20_years + component_after_20_years) * (-44/12)
 

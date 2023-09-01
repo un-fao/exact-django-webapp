@@ -341,4 +341,4 @@ def soil_emissions(hectars, delta_co2_mineral_per_ha_per_yr, delta_c_mineral_per
     computed_value = delta_co2_mineral_per_ha_per_yr * hectars if hectars > 0 else 0
     return computed_value
 
-print(calculate_emissions(100,0, 21,1,35,0,'True',265,28,2.30,0.21,0.8,'D',0.5,0.72,20,0,19.7,0,31.4,0,1,1, 0.39,0.39,0,0,0,0,0,40,0.39,0.24))
+# print(calculate_emissions(100,0, 21,1,35,0,'True',265,28,2.30,0.21,0.8,'D',0.5,0.72,20,0,19.7,0,31.4,0,1,1, 0.39,0.39,0,0,0,0,0,40,0.39,0.24))
