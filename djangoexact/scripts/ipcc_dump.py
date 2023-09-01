@@ -2230,7 +2230,6 @@ for i, row in enumerate(df_dict):
         n2o_emissions=parse_csv_number(row["n2o_emissions"], nan_value=None),
         density=parse_csv_number(row["density"], nan_value=None),
     )
-"""
 
 df = pd.read_csv(
     os.path.join(
@@ -2270,3 +2269,40 @@ for i, row in enumerate(df_dict):
         avg_pressure=parse_csv_number(row["avg_pressure"], nan_value=None),
         head=parse_csv_number(row["head"], nan_value=None),
     )
+PerennialMaxAGB.objects.all().delete()
+
+df2 = pd.read_csv(
+    os.path.join(
+        os.path.dirname(__file__), "ipcc_data", "PerennialMaxAGB.csv"
+    ),
+    header=0,
+    sep=",",
+)
+
+df_headers2 = df2.columns.values.tolist()
+df_dict2 = df2.to_dict("records")
+
+for i, row in enumerate(df_dict2):
+    climate = Climate.objects.get_or_create(name=sanitize(row["climate"]))[0]
+
+    for j, header in enumerate(df_headers2, start=1):
+        crop_type = CropType.objects.get_or_create(name=sanitize(df_headers2[j]))[0]
+
+        print(
+            climate,
+            crop_type,
+            row[df_headers2[j]],
+        )
+
+        PerennialMaxAGB.objects.get_or_create(
+            climate=climate,
+            crop_type=crop_type,
+            value=parse_csv_number(row[df_headers2[j]]),
+        )
+
+        if j == len(df_headers2) - 1:
+            break
+
+"""
+
+PerennialAGB.objects.filter(value=None).update(value=0)

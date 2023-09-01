@@ -436,27 +436,7 @@ class Activity(Model):
     created_at = DateTimeField(auto_now_add=True, null=True)
     updated_at = DateTimeField(auto_now=True, null=True)
 
-    change_rate_start = ForeignKey(
-        ChangeRate,
-        on_delete=CASCADE,
-        null=True,
-        blank=True,
-        related_name="change_rate_start",
-    )
-    change_rate_w = ForeignKey(
-        ChangeRate,
-        on_delete=CASCADE,
-        null=True,
-        blank=True,
-        related_name="change_rate_w",
-    )
-    change_rate_wo = ForeignKey(
-        ChangeRate,
-        on_delete=CASCADE,
-        null=True,
-        blank=True,
-        related_name="change_rate_wo",
-    )
+    change_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, related_name="change_rate")
 
     def __str__(self):
         return f"({self.pk}) {self.name} in {self.project.name}"
@@ -980,15 +960,37 @@ class PerennialCropping(Assessment):
     crop_yield_wo = FloatField(null=True, blank=True)
     crop_yield_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_crop_yield_thread")
 
-    ag_t2 = FloatField(null=True, blank=True)
-    bg_t2 = FloatField(null=True, blank=True)
-    soc_t2 = FloatField(null=True, blank=True)
-    tillage_factor_t2 = FloatField(null=True, blank=True)
-    input_factor_t2 = FloatField(null=True, blank=True)
-    residue_burned_t2 = FloatField(null=True, blank=True)
-    fire_periodicity_t2 = FloatField(null=True, blank=True)
+    ag_t2_start = FloatField(null=True, blank=True)
+    ag_t2_w = FloatField(null=True, blank=True)
+    ag_t2_wo = FloatField(null=True, blank=True)
 
-    flu_t2 = FloatField(null=True, blank=True)
+    bg_t2_start = FloatField(null=True, blank=True)
+    bg_t2_w = FloatField(null=True, blank=True)
+    bg_t2_wo = FloatField(null=True, blank=True)
+
+    soc_t2_start = FloatField(null=True, blank=True)
+    soc_t2_w = FloatField(null=True, blank=True)
+    soc_t2_wo = FloatField(null=True, blank=True)
+
+    tillage_factor_t2_start = FloatField(null=True, blank=True)
+    tillage_factor_t2_w = FloatField(null=True, blank=True)
+    tillage_factor_t2_wo = FloatField(null=True, blank=True)
+
+    input_factor_t2_start = FloatField(null=True, blank=True)
+    input_factor_t2_w = FloatField(null=True, blank=True)
+    input_factor_t2_wo = FloatField(null=True, blank=True)
+
+    residue_burned_t2_start = FloatField(null=True, blank=True)
+    residue_burned_t2_w = FloatField(null=True, blank=True)
+    residue_burned_t2_wo = FloatField(null=True, blank=True)
+
+    fire_periodicity_t2_start = FloatField(null=True, blank=True)
+    fire_periodicity_t2_w = FloatField(null=True, blank=True)
+    fire_periodicity_t2_wo = FloatField(null=True, blank=True)
+
+    flu_t2_start = FloatField(null=True, blank=True)
+    flu_t2_w = FloatField(null=True, blank=True)
+    flu_t2_wo = FloatField(null=True, blank=True)
 
 
 class FloodedRice(Assessment):

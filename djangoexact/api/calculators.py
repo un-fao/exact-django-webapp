@@ -29,13 +29,13 @@ from math_model import (
     forest_management,
 )
 from math_model.no_time_dependency_final.annuals import AnnualCropland
+from math_model.no_time_dependency_final.perennial_cropping import PerennialCropping as PerennialCropland
 from math_model import inputs as math_inputs
 from ipcc.models import *
 from .utilities import *
 from abc import ABC, abstractmethod
 import sys
 from math_model.no_time_dependency_final.defo import Deforestation as MathDeforestation
-from math_model.no_time_dependency_final.annuals import AnnualCropland as MathAnnualCropland
 from math_model.no_time_dependency_final.livestock import Livestock as MathLivestock
 from math_model.no_time_dependency_final.inputs import (
     Inputs as MathInputs,
@@ -119,7 +119,7 @@ class DeforestationCalculator(BaseCalculator):
 
         module: Deforestation = self.data
         project: Project = module.activity.project
-        change_rate = module.activity.change_rate_start
+        change_rate = module.activity.change_rate
         climate = project.climate
         moisture = project.moisture
         continent = project.continent
@@ -671,7 +671,7 @@ class AnnualCroppingCalculator(BaseCalculator):
 
         input: AnnualCropping = self.data
         project: Project = input.activity.project
-        change_rate = input.activity.change_rate_start
+        change_rate = input.activity.change_rate
         climate = project.climate
         moisture = project.moisture
 
@@ -939,6 +939,7 @@ class PerennialCroppingCalculator(BaseCalculator):
         moisture = project.moisture
         continent = project.continent
         parent, _ = get_assessment_or_parent(module)
+        change_rate = module.activity.change_rate
 
         cm = {
             "climate": climate,
@@ -953,22 +954,22 @@ class PerennialCroppingCalculator(BaseCalculator):
 
         burning_emission_factor = BurningEmissionFactor.objects.get(category__name="Savanna and grassland")
 
-        # TODO: Replace 'other' with all the other land_use_types in db
+        # TODO: Replace 'other' with all the other crop_types in db
         fires_combustion_factor_start = FiresCombustionFactor.objects.get_or_other(crop_type=module.crop_type_start)
         fires_combustion_factor_w = FiresCombustionFactor.objects.get_or_other(crop_type=module.crop_type_w)
         fires_combustion_factor_wo = FiresCombustionFactor.objects.get_or_other(crop_type=module.crop_type_wo)
 
-        ag_default_start = PerennialAGB.objects.get_or_default(**cmc,land_use_type=module.crop_type_start)
-        ag_default_w = PerennialAGB.objects.get_or_default(**cmc,land_use_type=module.crop_type_w)
-        ag_default_wo = PerennialAGB.objects.get_or_default(**cmc,land_use_type=module.crop_type_wo)
+        ag_default_start = PerennialAGB.objects.get_or_default(**cmc,crop_type=module.crop_type_start)
+        ag_default_w = PerennialAGB.objects.get_or_default(**cmc,crop_type=module.crop_type_w)
+        ag_default_wo = PerennialAGB.objects.get_or_default(**cmc,crop_type=module.crop_type_wo)
 
-        agb_max_c_start = PerennialMaxAGB.objects.get(climate=climate, land_use_type=module.crop_type_start)
-        agb_max_c_w = PerennialMaxAGB.objects.get(climate=climate, land_use_type=module.crop_type_w)
-        agb_max_c_wo = PerennialMaxAGB.objects.get(climate=climate, land_use_type=module.crop_type_wo)
+        agb_max_c_start = PerennialMaxAGB.objects.get(climate=climate, crop_type=module.crop_type_start)
+        agb_max_c_w = PerennialMaxAGB.objects.get(climate=climate, crop_type=module.crop_type_w)
+        agb_max_c_wo = PerennialMaxAGB.objects.get(climate=climate, crop_type=module.crop_type_wo)
 
-        bg_default_start = PerennialBGB.objects.get_or_default(**cmc,land_use_type=module.crop_type_start)
-        bg_default_w = PerennialBGB.objects.get_or_default(**cmc,land_use_type=module.crop_type_w)
-        bg_default_wo = PerennialBGB.objects.get_or_default(**cmc,land_use_type=module.crop_type_wo)
+        bg_default_start = PerennialBGB.objects.get_or_default(**cmc,crop_type=module.crop_type_start)
+        bg_default_w = PerennialBGB.objects.get_or_default(**cmc,crop_type=module.crop_type_w)
+        bg_default_wo = PerennialBGB.objects.get_or_default(**cmc,crop_type=module.crop_type_wo)
 
         if parent:
             # TODO: initial_land_use and final_land_use change based on what's initial and whats final. Differentiate in LUC_From | LUC_To
@@ -985,48 +986,104 @@ class PerennialCroppingCalculator(BaseCalculator):
         fmg_w = CroplandFMG.objects.get(**cm,tillage_management_type=module.tillage_management_type_w)
         fmg_wo = CroplandFMG.objects.get(**cm,tillage_management_type=module.tillage_management_type_wo)
 
-        inputs_start = []
-        inputs_w = []
-        inputs_wo = []
+        inputs_start = [
+            module.ha_start,
+            0,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            change_rate.name,
+            project.gw_potential.n2o,
+            project.gw_potential.ch4,
+            module.is_biomass_burned_start,
+            burning_emission_factor.ch4,
+            burning_emission_factor.n2o,
+            fires_combustion_factor_start.value,
+            1,  # Default
+            module.fire_periodicity_t2_start,
+            module.residue_burned_t2_start,
+            ag_default_start.value,
+            module.ag_t2_start,
+            agb_max_c_start.value,
+            bg_default_start.value,
+            module.bg_t2_start,
+            project.soc_ref.value,
+            module.soc_t2_start,
+            flu.value,
+            module.flu_t2_start,
+            fi_start.value,
+            module.input_factor_t2_start,
+            fmg_start.value,
+            module.tillage_factor_t2_start
+        ]
 
-        results_start = None
-        results_w = None
-        results_wo = None
+        inputs_w = [
+            0,
+            module.ha_w,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            change_rate.name,
+            project.gw_potential.n2o,
+            project.gw_potential.ch4,
+            module.is_biomass_burned_w,
+            burning_emission_factor.ch4,
+            burning_emission_factor.n2o,
+            fires_combustion_factor_w.value,
+            1,  # Default
+            module.fire_periodicity_t2_w,
+            module.residue_burned_t2_w,
+            ag_default_w.value,
+            module.ag_t2_w,
+            agb_max_c_w.value,
+            bg_default_w.value,
+            module.bg_t2_w,
+            project.soc_ref.value,
+            module.soc_t2_w,
+            flu.value,
+            module.flu_t2_w,
+            fi_w.value,
+            module.input_factor_t2_w,
+            fmg_w.value,
+            module.tillage_factor_t2_w
+        ]
 
-        # inputs = [
-        #     self.data.ha_start,
-        #     self.data.ha_w,
-        #     self.data.ha_wo,
-        #     project.implementation_duration_yrs,
-        #     project.capitalization_duration_yrs,
-        #     self.data.ha_w_rate.name if parent else "D",
-        #     self.data.ha_w_rate.value if parent else 0.5,
-        #     self.data.ha_wo_rate.name if parent else "D",
-        #     self.data.ha_wo_rate.value if parent else 0.5,
-        #     project.gw_potential.n2o,
-        #     project.gw_potential.ch4,
-        #     self.data.is_biomass_burned,
-        #     burning_emission_factor.n2o,
-        #     burning_emission_factor.ch4,
-        #     fires_combustion_factor.value,
-        #     1,  # Default
-        #     self.data.fire_periodicity_t2,
-        #     self.data.residue_burned_t2,
-        #     ag_default.value,
-        #     self.data.ag_t2,
-        #     agb_max_c.value,
-        #     bg_default.value,
-        #     self.data.bg_t2,
-        #     project.soc_ref.value,
-        #     self.data.soc_t2 if parent else 1,
-        #     flu.value if parent else 1,
-        #     self.data.flu_t2,
-        #     fi.value,
-        #     self.data.input_factor_t2,
-        #     fmg.value,
-        #     self.data.tillage_factor_t2,
-        # ]
-        
+        inputs_wo = [
+            0,
+            module.ha_wo,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            change_rate.name,
+            project.gw_potential.n2o,
+            project.gw_potential.ch4,
+            module.is_biomass_burned_wo,
+            burning_emission_factor.ch4,
+            burning_emission_factor.n2o,
+            fires_combustion_factor_wo.value,
+            1,  # Default
+            module.fire_periodicity_t2_wo,
+            module.residue_burned_t2_wo,
+            ag_default_wo.value,
+            module.ag_t2_wo,
+            agb_max_c_wo.value,
+            bg_default_wo.value,
+            module.bg_t2_wo,
+            project.soc_ref.value,
+            module.soc_t2_wo,
+            flu.value,
+            module.flu_t2_wo,
+            fi_wo.value,
+            module.input_factor_t2_wo,
+            fmg_wo.value,
+            module.tillage_factor_t2_wo
+        ]
+
+        print(inputs_start)
+        print(inputs_w)
+        print(inputs_wo)
+
+        results_start = PerennialCropland(*inputs_start).calculate_emissions()
+        results_w = PerennialCropland(*inputs_w).calculate_emissions()
+        results_wo = PerennialCropland(*inputs_wo).calculate_emissions()
+
         # BUG: Results for perennial crops do not add up. Wait for Lorenzo's unlocked Excel files
         return Result(results_w+results_start, results_wo+results_start, results_w-results_wo)
 
@@ -1555,7 +1612,7 @@ class ElectricityCalculator(BaseCalculator):
             input.mwh_start,
             input.mwh_w,
             input.transmission_loss,
-            input.activity.change_rate_start.name,
+            input.activity.change_rate.name,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
         ]
@@ -1570,7 +1627,7 @@ class ElectricityCalculator(BaseCalculator):
             input.mwh_start,
             input.mwh_wo,
             input.transmission_loss,
-            input.activity.change_rate_start.name,
+            input.activity.change_rate.name,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
         ]
@@ -1607,7 +1664,7 @@ class FuelCalculator(BaseCalculator):
                 input.ef_t2,
                 input.fuel_start,
                 input.fuel_w,
-                input.activity.change_rate_start.name,
+                input.activity.change_rate.name,
                 project.implementation_duration_yrs,
                 project.capitalization_duration_yrs,
             ]
@@ -1617,7 +1674,7 @@ class FuelCalculator(BaseCalculator):
                 input.ef_t2,
                 input.fuel_start,
                 input.fuel_wo,
-                input.activity.change_rate_start.name,
+                input.activity.change_rate.name,
                 project.implementation_duration_yrs,
                 project.capitalization_duration_yrs,
             ]
@@ -1639,7 +1696,7 @@ class FuelCalculator(BaseCalculator):
                 input.ef_t2,
                 input.fuel_start,
                 input.fuel_w,
-                input.activity.change_rate_start.name,
+                input.activity.change_rate.name,
                 project.implementation_duration_yrs,
                 project.capitalization_duration_yrs,
             ]
@@ -1655,7 +1712,7 @@ class FuelCalculator(BaseCalculator):
                 input.ef_t2,
                 input.fuel_start,
                 input.fuel_wo,
-                input.activity.change_rate_start.name,
+                input.activity.change_rate.name,
                 project.implementation_duration_yrs,
                 project.capitalization_duration_yrs,
             ]
@@ -2270,7 +2327,7 @@ class LivestockCalculator(BaseCalculator):
         i_w = [
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
-            input.activity.change_rate_start.name,
+            input.activity.change_rate.name,
             project.gw_potential.ch4,
             input.heads_number_start,
             input.heads_number_w,
@@ -2340,7 +2397,7 @@ class LivestockCalculator(BaseCalculator):
         i_wo = [
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
-            input.activity.change_rate_start.name,
+            input.activity.change_rate.name,
             project.gw_potential.ch4,
             input.heads_number_start,
             input.heads_number_wo,
@@ -2434,7 +2491,7 @@ class IrrigationSystemCalculator(BaseCalculator):
             _input.ha_w,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
-            _input.activity.change_rate_start.name,
+            _input.activity.change_rate.name,
         ]
 
         results_w = NewIrrigation(*inputs_w).calculate_emissions()
@@ -2446,7 +2503,7 @@ class IrrigationSystemCalculator(BaseCalculator):
             _input.ha_wo,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
-            _input.activity.change_rate_start.name,
+            _input.activity.change_rate.name,
         ]
 
         results_wo = NewIrrigation(*inputs_wo).calculate_emissions()
@@ -2483,7 +2540,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
             input.well_depth,
             input.ha_start,
             0,
-            input.activity.change_rate_start.name,
+            input.activity.change_rate.name,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
             transportation_loss.value if input.fuel_type.name == "Electricity" else 0,
@@ -2506,7 +2563,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
             input.well_depth,
             0,
             input.ha_w,
-            input.activity.change_rate_start.name,
+            input.activity.change_rate.name,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
             transportation_loss.value if input.fuel_type.name == "Electricity" else 0,
@@ -2529,7 +2586,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
             input.well_depth,
             0,
             input.ha_wo,
-            input.activity.change_rate_start.name,
+            input.activity.change_rate.name,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
             transportation_loss.value if input.fuel_type.name == "Electricity" else 0,
