@@ -2059,6 +2059,64 @@ class Building(Module):
 
     t_co2_m2_t2 = FloatField(null=True, blank=True)
 
+class OrganicSoil(Module):
+
+    drainage_area_start = FloatField(null=True, blank=True)
+    drainage_area_w = FloatField(null=True, blank=True)
+    drainage_area_wo = FloatField(null=True, blank=True)
+    drainage_area_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_drainage_area_thread", on_delete=SET_NULL)
+
+    area_not_drained_start = FloatField(null=True, blank=True)
+    area_not_drained_w = FloatField(null=True, blank=True)
+    area_not_drained_wo = FloatField(null=True, blank=True)
+    area_not_drained_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_area_not_drained_thread", on_delete=SET_NULL)
+
+    ditches_area_start = FloatField(null=True, blank=True)
+    ditches_area_w = FloatField(null=True, blank=True)
+    ditches_area_wo = FloatField(null=True, blank=True)
+    ditches_area_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_ditches_area_thread", on_delete=SET_NULL)
+
+    is_fire_on_soil_start = BooleanField(default=False)
+    is_fire_on_soil_w = BooleanField(default=False)
+    is_fire_on_soil_wo = BooleanField(default=False)
+    is_fire_on_soil_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_is_fire_on_soil_thread", on_delete=SET_NULL)
+
+    soil_fire_periodicity_start = FloatField(null=True, blank=True)
+    soil_fire_periodicity_w = FloatField(null=True, blank=True)
+    soil_fire_periodicity_wo = FloatField(null=True, blank=True)
+    soil_fire_periodicity_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_soil_fire_periodicity_thread", on_delete=SET_NULL)
+
+    soil_fire_impact_percentage_start = FloatField(null=True, blank=True)
+    soil_fire_impact_percentage_w = FloatField(null=True, blank=True)
+    soil_fire_impact_percentage_wo = FloatField(null=True, blank=True)
+    soil_fire_impact_percentage_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_soil_fire_impact_percentage_thread", on_delete=SET_NULL)
+
+    has_peat_extraction = BooleanField(default=False)
+
+    peat_type_start = ForeignKey(PeatType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_peat_type_start")
+    peat_type_w = ForeignKey(PeatType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_peat_type_w")
+    peat_type_wo = ForeignKey(PeatType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_peat_type_wo")
+    peat_type_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_type_thread", on_delete=SET_NULL)
+
+    peat_area_start = FloatField(null=True, blank=True)
+    peat_area_w = FloatField(null=True, blank=True)
+    peat_area_wo = FloatField(null=True, blank=True)
+    peat_area_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_area_thread", on_delete=SET_NULL)
+
+    peat_ditches_area_start = FloatField(null=True, blank=True)
+    peat_ditches_area_w = FloatField(null=True, blank=True)
+    peat_ditches_area_wo = FloatField(null=True, blank=True)
+    peat_ditches_area_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_ditches_area_thread", on_delete=SET_NULL)
+
+    peat_extraction_height_start = FloatField(null=True, blank=True)
+    peat_extraction_height_w = FloatField(null=True, blank=True)
+    peat_extraction_height_wo = FloatField(null=True, blank=True)
+    peat_extraction_height_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_extraction_height_thread", on_delete=SET_NULL)
+
+    is_peat_for_energy_start = BooleanField(default=False)
+    is_peat_is_for_energy_w = BooleanField(default=False)
+    is_peat_is_for_energy_wo = BooleanField(default=False)
+    is_peat_is_for_energy_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_is_for_energy_thread", on_delete=SET_NULL)
 
 ### MODEL PARAMETERS TABLES ###
 
