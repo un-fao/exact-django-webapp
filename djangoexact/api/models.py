@@ -1911,47 +1911,17 @@ class LargeFishery(Fishery):
 class Aquaculture(Module):
     user_notes = TextField(null=True, blank=True)
 
-    annual_feed_quantity_start = FloatField(null=True, blank=True)
-    annual_feed_quantity_w = FloatField(null=True, blank=True)
-    annual_feed_quantity_w_rate = ForeignKey(
-        ChangeRate,
-        on_delete=CASCADE,
-        null=True,
-        blank=True,
-        related_name="%(class)s_annual_feed_quantity_w_rate",
-    )
-    annual_feed_quantity_wo = FloatField(null=True, blank=True)
-    annual_feed_quantity_wo_rate = ForeignKey(
-        ChangeRate,
-        on_delete=CASCADE,
-        null=True,
-        blank=True,
-        related_name="%(class)s_annual_feed_quantity_wo_rate",
-    )
-
     annual_production_start = FloatField(null=True, blank=True)
     annual_production_w = FloatField(null=True, blank=True)
-    annual_production_w_rate = ForeignKey(
-        ChangeRate,
-        on_delete=CASCADE,
-        null=True,
-        blank=True,
-        related_name="%(class)s_annual_production_w_rate",
-    )
     annual_production_wo = FloatField(null=True, blank=True)
-    annual_production_wo_rate = ForeignKey(
-        ChangeRate,
-        on_delete=CASCADE,
-        null=True,
-        blank=True,
-        related_name="%(class)s_annual_production_wo_rate",
-    )
 
-    feed_use_emissions_t2 = FloatField(null=True, blank=True)
-    production_n2o_ef_t2 = FloatField(null=True, blank=True)
-
-    implementation_year_t2 = IntegerField(null=True, blank=True)
-
+    n2o_from_production_t2_start = FloatField(null=True, blank=True)
+    n2o_from_production_t2_w = FloatField(null=True, blank=True)
+    n2o_from_production_t2_wo = FloatField(null=True, blank=True)
+    
+    electricity_used_t2_start = FloatField(null=True, blank=True)
+    electricity_used_t2_w = FloatField(null=True, blank=True)
+    electricity_used_t2_wo = FloatField(null=True, blank=True)
 
 class MacroInputType(Model):
     name = CharField(max_length=255, unique=True)
@@ -2135,4 +2105,7 @@ class SmallFisheryParameter(Parameter):
     pass
 
 class LargeFisheryParameter(Parameter):
+    pass
+
+class AquacultureParameter(Parameter):
     pass
