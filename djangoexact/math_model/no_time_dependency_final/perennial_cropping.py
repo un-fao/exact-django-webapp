@@ -103,7 +103,7 @@ class PerennialCropping:
 
                 tabular = (max_agb + bgb_rate * max_years_growth) * self.area_end
 
-                total = - min(calculated, tabular) if (max_agb != 0 and self.area_end != 0) else calculated
+                total = - min(calculated, tabular) if (max_agb != 0 and self.area_end != 0) else - calculated
 
                 self.yearly_bio_emissions = breakdown_according_to_values(total, self.total_hectars)
                 self.total_bio_emissions = total
