@@ -1012,23 +1012,34 @@ class Grassland(Assessment):
     grassland_management_type_w = ForeignKey(GrasslandManagementType,on_delete=CASCADE,related_name="%(class)s_management_type_w",null=True)
     grassland_management_type_wo = ForeignKey(GrasslandManagementType,on_delete=CASCADE,related_name="%(class)s_management_type_wo",null=True)
 
-    is_fire_used_w = BooleanField()
-    is_fire_used_wo = BooleanField()
+    is_fire_used_start = BooleanField(default=False)
+    is_fire_used_w = BooleanField(default=False)
+    is_fire_used_wo = BooleanField(default=False)
+    is_fire_used_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_is_fire_used_thread")
 
-    years_w_fire_management = IntegerField(null=True, blank=True)
-    years_wo_fire_management = IntegerField(null=True, blank=True)
+    fire_periodicity_start = FloatField(null=True, blank=True)
+    fire_periodicity_w = FloatField(null=True, blank=True)
+    fire_periodicity_wo = FloatField(null=True, blank=True)
+    fire_periodicity_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_fire_periodicity_thread")
+
+    fire_impact_start = FloatField(null=True, blank=True)
+    fire_impact_w = FloatField(null=True, blank=True)
+    fire_impact_wo = FloatField(null=True, blank=True)
+    fire_impact_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_fire_impact_thread")
 
     yield_start = FloatField(null=True, blank=True)
     yield_w = FloatField(null=True, blank=True)
     yield_wo = FloatField(null=True, blank=True)
+    yield_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_yield_thread")
 
     ha_start = FloatField(null=True, blank=True)
     ha_w = FloatField(null=True, blank=True)
     ha_wo = FloatField(null=True, blank=True)
+    ha_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_thread")
 
-    soil_carbon_start_t2 = FloatField(null=True, blank=True)
-    soil_carbon_w_t2 = FloatField(null=True, blank=True)
-    soil_carbon_wo_t2 = FloatField(null=True, blank=True)
+    soil_carbon_t2_start = FloatField(null=True, blank=True)
+    soil_carbon_t2_w = FloatField(null=True, blank=True)
+    soil_carbon_t2_wo = FloatField(null=True, blank=True)
 
     agb_t2_start = FloatField(null=True, blank=True)
     agb_t2_w = FloatField(null=True, blank=True)
@@ -2075,4 +2086,10 @@ class LargeFisheryParameter(Parameter):
     pass
 
 class AquacultureParameter(Parameter):
+    pass
+
+class GrasslandParameter(Parameter):
+    pass
+
+class AnnualCroplandParameter(Parameter):
     pass

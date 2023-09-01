@@ -1,0 +1,5 @@
+# Annual Cropland
+DEFAULT_FIRE_PERIODICITY = 1
+
+# Grassland
+DEFAULT_COMBUSTION_FACTOR = .77
