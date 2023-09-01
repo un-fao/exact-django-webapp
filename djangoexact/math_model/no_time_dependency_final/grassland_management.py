@@ -65,10 +65,28 @@ class GrasslandManagement:
                 traceback.print_exc()
                 return 
             
+        def calculate_soil_emissions():
+
+            try:
+                soc_start = self.soc_start_ref if not self.soc_start_tier_2 else self.soc_start_tier_2
+                soc_end = self.soc_end_ref if not self.soc_end_tier_2 else self.soc_end_tier_2
+                delta_co2_mineral_per_ha_per_yr = - (soc_end - soc_start) / 20 * (44/12)
+
+
+                calculated = delta_co2_mineral_per_ha_per_yr * sum(self.total_hectars)
+                tabular = max(self.area_start * self.area_end) * delta_co2_mineral_per_ha_per_yr * 20
+                
+                return tabular if abs(calculated) >= abs(tabular) else calculated
+            except:
+                traceback.print_exc()
+                return
+
+            
         calculate_residue_burning()
+        calculate_soil_emissions()
 
         try:
-            self.emissions_total_yearly = [sum(x) for x in zip(self.emissions_residue_burning_yearly)]
+            self.emissions_total_yearly = [x + y for x, y in zip(self.emissions_residue_burning_yearly, self.emissions_residue_burning_yearly)]
             self.total_emissions = sum(self.emissions_total_yearly)
             return self.total_emissions
 
