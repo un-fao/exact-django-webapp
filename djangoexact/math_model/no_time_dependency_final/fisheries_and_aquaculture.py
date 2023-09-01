@@ -161,39 +161,34 @@ class Fishery:
 
 class CoastalAquaculture():
 
-    def __init__(self, production_start, production_w, nitrous_ef_default, nitrous_ef_tier_2, nitrous_constant, time_impl, time_cap, rate_type, feed_start, feed_w, ef_feed_default, ef_feed_tier_2):
+    def __init__(self, production_start, production_w, nitrous_ef_default, nitrous_ef_start_tier_2, nitrous_ef_end_tier_2, nitrous_constant, time_impl, time_cap, rate_type, feed_start, feed_w, ef_feed_default, ef_feed_tier_2):
 
         self.time_impl = time_impl
         self.time_cap = time_cap
         self.production_start = production_start
         self.production_end = production_w
         self.nitrous_ef_default = nitrous_ef_default
-        self.nitrous_ef_tier_2 = nitrous_ef_tier_2
+        self.nitrous_ef_start_tier_2 = nitrous_ef_start_tier_2
+        self.nitrous_ef_end_tier_2 = nitrous_ef_end_tier_2
         self.nitrous_constant = nitrous_constant
         self.rate_type = rate_type
-        self.feed_start = feed_start
-        self.feed_end = feed_w
-        self.ef_feed_default = ef_feed_default
-        self.ef_feed_tier_2 = ef_feed_tier_2
 
         # DEFINITION OF TIER 2 DEFAULTS
         self.nitrous_ef_tier_2_default = None
         self.ef_feed_tier_2_default = None 
 
         self.emissions_nitrous_yearly = []
-        self.emissions_feed_yearly = []
         self.emissions_total_yearly = []
 
         self.emissions_nitrous_total = 0
-        self.emissions_feed_total = 0
         self.total_emissions = 0
 
     def calculate_emissions(self):
             
         def calculate_nitrous_emissions():
             try:
-                nitrous_ef_start = self.nitrous_ef_default
-                nitrous_ef_end = self.nitrous_ef_tier_2
+                nitrous_ef_start = self.nitrous_ef_default if not self.nitrous_ef_start_tier_2 else self.nitrous_ef_start_tier_2
+                nitrous_ef_end = self.nitrous_ef_default if not self.nitrous_ef_end_tier_2 else self.nitrous_ef_end_tier_2
 
                 annual_start = nitrous_ef_start * self.production_start * self.nitrous_constant
                 annual_end = nitrous_ef_end * self.production_end * self.nitrous_constant
@@ -203,24 +198,10 @@ class CoastalAquaculture():
             except Exception as e:
                 traceback.print_exc()
 
-        def calculate_feed_emissions():
-            try:
-                ef_feed_start = self.ef_feed_default
-                ef_feed_end = self.ef_feed_tier_2
-
-                annual_start = ef_feed_start * self.feed_start
-                annual_end = ef_feed_end * self.feed_end
-
-                self.emissions_feed_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.time_impl, self.time_cap, self.rate_type)
-                self.emissions_feed_total = sum(self.emissions_feed_yearly)
-            except Exception as e:
-                traceback.print_exc()
-
         calculate_nitrous_emissions()
-        calculate_feed_emissions()
 
         try:
-            self.emissions_total_yearly = [sum(x) for x in zip(self.emissions_nitrous_yearly, self.emissions_feed_yearly)]
+            self.emissions_total_yearly = [sum(x) for x in zip(self.emissions_nitrous_yearly)]
             self.total_emissions = sum(self.emissions_total_yearly)
         except Exception as e:
             traceback.print_exc()
@@ -229,26 +210,10 @@ class CoastalAquaculture():
 
         try:
             self.nitrous_ef_tier_2_default = self.nitrous_ef_default
-            self.ef_feed_tier_2_default = self.ef_feed_default
             
             return {re.sub('_tier_2_default', '', k): v for k, v in self.__dict__.items() if '_tier_2_default' in k}
 
         except Exception as e:
             traceback.print_exc()
             return {}
-
-        
-# # inputs_class = [10, 11, 'D', 5.23659035050339, 71.3662756029244, 2.572333333333333, None, None, 697.0, 697.0, 19.8011614615062, 31.2816563027116, 1810, None, None, None, None, None, 0.388905643541494, 0.0490041343890272, 2.8, None, None, 60, None, None,  0.296, 0.169438233537953, 0.180905927941485]
-# inputs_class = [10, 11, 'D', 5.23659035050339, 71.3662756029244, 2.572333333333333, None, None, 697.0, 697.0, 19.8011614615062, 31.2816563027116, 1810, None, None, 0.48734, None, None, 0.388905643541494, 0.0490041343890272, 2.8, None, None, 60, None, None,  0.296, 0.169438233537953, 0.180905927941485]
-# # inputs = [10, 11, 'D', 'D', 5.23659035050339, 71.3662756029244, 44.0123155054382, 2.572333333333333, None, None, None, 697.0, 697.0, 697.0, 19.8011614615062, 31.2816563027116, 43.4530778935223, 1810, None, None, None, 0.48734, None, None, None, 0.388905643541494, 0.0490041343890272, 0.152197266950354, 2.8, None, None, None, 60, None, None, None, 0.296, 0.169438233537953, 0.180905927941485, 0.967017664672948]
-
-# # ao = total_emissions_small_or_large_fisheries(*inputs)
-# # print('No time dependency')
-# # print(ao)
-
-# fishery_w = Fishery(*inputs_class)
-# fishery_w.calculate_emissions()
-# print(fishery_w.evaluate_tier_2_defaults())
-# print(fishery_w.total_emissions)
-
 
