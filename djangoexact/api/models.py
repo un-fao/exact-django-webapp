@@ -1008,27 +1008,9 @@ class Grassland(Assessment):
     description = TextField(null=True, blank=True)
     user_notes = TextField(null=True, blank=True)
 
-    grassland_management_type_start = ForeignKey(
-        GrasslandManagementType,
-        on_delete=CASCADE,
-        related_name="%(class)s_start",
-        null=True,
-        blank=True,
-    )
-    grassland_management_type_w = ForeignKey(
-        GrasslandManagementType,
-        on_delete=CASCADE,
-        related_name="%(class)s_without",
-        null=True,
-        blank=True,
-    )
-    grassland_management_type_wo = ForeignKey(
-        GrasslandManagementType,
-        on_delete=CASCADE,
-        related_name="%(class)s_with",
-        null=True,
-        blank=True,
-    )
+    grassland_management_type_start = ForeignKey(GrasslandManagementType,on_delete=CASCADE,related_name="%(class)s_management_type_start",null=True)
+    grassland_management_type_w = ForeignKey(GrasslandManagementType,on_delete=CASCADE,related_name="%(class)s_management_type_w",null=True)
+    grassland_management_type_wo = ForeignKey(GrasslandManagementType,on_delete=CASCADE,related_name="%(class)s_management_type_wo",null=True)
 
     is_fire_used_w = BooleanField()
     is_fire_used_wo = BooleanField()
@@ -1042,34 +1024,19 @@ class Grassland(Assessment):
 
     ha_start = FloatField(null=True, blank=True)
     ha_w = FloatField(null=True, blank=True)
-    ha_w_rate = ForeignKey(
-        ChangeRate,
-        on_delete=CASCADE,
-        related_name="%(class)s_ha_w_rate",
-        null=True,
-        blank=True,
-    )
     ha_wo = FloatField(null=True, blank=True)
-    ha_wo_rate = ForeignKey(
-        ChangeRate,
-        on_delete=CASCADE,
-        related_name="%(class)s_ha_wo_rate",
-        null=True,
-        blank=True,
-    )
 
-    # Tier 2 values
     soil_carbon_start_t2 = FloatField(null=True, blank=True)
     soil_carbon_w_t2 = FloatField(null=True, blank=True)
     soil_carbon_wo_t2 = FloatField(null=True, blank=True)
 
-    agb_t2 = FloatField(null=True, blank=True)
-    combustion_factor_t2 = FloatField(null=True, blank=True)
+    agb_t2_start = FloatField(null=True, blank=True)
+    agb_t2_w = FloatField(null=True, blank=True)
+    agb_t2_wo = FloatField(null=True, blank=True)
 
-    implementation_year_start = IntegerField(null=True, blank=True)
-
-    ha_start = IntegerField(null=True, blank=True)
-
+    combustion_factor_t2_start = FloatField(null=True, blank=True)
+    combustion_factor_t2_w = FloatField(null=True, blank=True)
+    combustion_factor_t2_wo = FloatField(null=True, blank=True)
 
 class Livestock(Module):
     description = TextField(null=True, blank=True)
