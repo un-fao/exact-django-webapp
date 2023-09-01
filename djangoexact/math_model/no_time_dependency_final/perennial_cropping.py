@@ -153,6 +153,7 @@ class PerennialCropping:
         try:
             self.emissions_total_yearly = [i+j+k+l for i,j,k,l in zip(self.yearly_residue_emissions, self.yearly_bio_emissions, self.yearly_som_emissions, self.yearly_soil_emissions)]
             self.total_emissions = sum(self.emissions_total_yearly)
+            return self.total_emissions
         except Exception as e:
             traceback.print_exc()
 

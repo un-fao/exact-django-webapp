@@ -74,6 +74,9 @@ class AfforestationCombustionFactor(Model):
 
 
 class DefaultEmissionFactor(Model):
+    """
+    IPCC:A96
+    """
     organic_input_type = ForeignKey("api.OrganicInputType", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     value = FloatField()
@@ -238,6 +241,9 @@ class EmissionFactorCategory(Model):
 
 
 class BurningEmissionFactor(Model):
+    """
+    IPCC:A75
+    """
     category = ForeignKey("ipcc.EmissionFactorCategory", on_delete=CASCADE)
     co2 = FloatField()
     co = FloatField()
@@ -250,17 +256,20 @@ class BurningEmissionFactor(Model):
 
 
 class FiresCombustionFactorManager(Manager):
-    def get_or_other(self, land_use_type):
+    def get_or_other(self, crop_type):
         """
         Returns the factor for the given land_use_type or the factor for 'other' if the factor for land_use_type does not exists.
         """
         try:
-            return self.get(land_use_type=land_use_type)
+            return self.get(crop_type=crop_type)
         except self.model.DoesNotExist:
-            return self.get(land_use_type__name="Other")
+            return self.get(crop_type__name="Other")
 
 
 class FiresCombustionFactor(Model):
+    """
+    IPCC:A84
+    """
     crop_type = ForeignKey("api.CropType", on_delete=CASCADE)
     value = FloatField()
 
@@ -282,6 +291,9 @@ class CropNitrousEstimationDefaultFactorManager(Manager):
 
 
 class CropNitrousEstimationDefaultFactor(Model):
+    """
+    IPCC:A8
+    """
     crop_type = ForeignKey("api.CropType", on_delete=CASCADE)
     slope = FloatField(null=True, blank=True)
     intercept = FloatField(null=True, blank=True)
@@ -402,24 +414,27 @@ class DrainageEmissionFactor(Model):
 
 
 class PerennialAGBManager(Manager):
-    def get_or_default(self, climate, moisture, continent, land_use_type):
+    def get_or_default(self, climate, moisture, continent, crop_type):
         try:
             return self.get(
                 climate=climate,
                 moisture=moisture,
                 continent=continent,
-                land_use_type=land_use_type,
+                crop_type=crop_type,
             )
         except PerennialAGB.DoesNotExist:
             return PerennialAGB.objects.get(
                 climate=climate,
                 moisture=moisture,
                 continent=continent,
-                land_use_type__name="Agroforestry",
+                crop_type__name="Agroforestry",
             )
 
 
 class PerennialAGB(Model):
+    """
+    IPCC A107
+    """
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     continent = ForeignKey("api.Continent", on_delete=CASCADE)
@@ -433,20 +448,20 @@ class PerennialAGB(Model):
 
 
 class PerennialBGBManager(Manager):
-    def get_or_default(self, climate, moisture, continent, land_use_type):
+    def get_or_default(self, climate, moisture, continent, crop_type):
         try:
             return self.get(
                 climate=climate,
                 moisture=moisture,
                 continent=continent,
-                land_use_type=land_use_type,
+                crop_type=crop_type,
             )
         except PerennialBGB.DoesNotExist:
             return PerennialBGB.objects.get(
                 climate=climate,
                 moisture=moisture,
                 continent=continent,
-                land_use_type__name="Agroforestry",
+                crop_type__name="Agroforestry",
             )
 
 
@@ -464,6 +479,9 @@ class PerennialBGB(Model):
 
 
 class PerennialMaxAGB(Model):
+    """
+    IPCC A3237
+    """
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     crop_type = ForeignKey("api.CropType", on_delete=CASCADE)
     value = FloatField(default=0, null=True, blank=True)
