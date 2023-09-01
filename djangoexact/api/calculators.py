@@ -17,6 +17,8 @@ from .models import (
     SmallFisheryParameter,
     LargeFisheryParameter,
     PerennialCropping,
+    Aquaculture,
+    AquacultureParameter,
 )
 from math_model import (
     defo,
@@ -37,6 +39,9 @@ from abc import ABC, abstractmethod
 import sys
 from math_model.no_time_dependency_final.defo import Deforestation as MathDeforestation
 from math_model.no_time_dependency_final.livestock import Livestock as MathLivestock
+from math_model.no_time_dependency_final.fisheries_and_aquaculture import (
+    CoastalAquaculture as MathAquaculture,
+)
 from math_model.no_time_dependency_final.inputs import (
     Inputs as MathInputs,
     FuelConsumption,
@@ -45,6 +50,8 @@ from math_model.no_time_dependency_final.inputs import (
     NewIrrigation,
     OperationPhaseIrrigation,
 )
+import traceback
+
 
 class Result:
     """
@@ -79,10 +86,11 @@ class CalculatorFactory:
             )(input)
             return calculator.calculate()
         except AttributeError as e:
-            print(f"Calculator error: {e}")
+            traceback.print_exc()
             raise Exception(f"Module '{input.__class__.__name__}' not (yet) supported.")
         except Exception as ex:
-            print(ex)
+            # Print traceback
+            traceback.print_exc()
             raise ex
 
 
@@ -1401,7 +1409,7 @@ class ForestCalculator(BaseCalculator):
         AGB_MULTIPLICATION_FACTOR = 0.47
 
         if self.data.vegetation_type.name == "Mangrove Forest":
-            data = DataOnMangroves.objects.get(
+            data = DataOnMangrove.objects.get(
                 climate=project.climate, moisture=project.moisture
             )
             agb = data.agb_c
@@ -1424,7 +1432,7 @@ class ForestCalculator(BaseCalculator):
             bgb = f_bgb.value * agb
             soc = project.soc_ref.value
 
-        cf: CombustionFactorValues = CombustionFactorValues.objects.get(
+        cf: CombustionFactor = CombustionFactor.objects.get(
             vegetation_type=self.data.vegetation_type
         )
 
@@ -1490,29 +1498,50 @@ class AquacultureCalculator(BaseCalculator):
         Calculate emissions for a single Aquaculture module.
         """
 
-        project: Project = self.data.activity.project
-        NITROUS_EF_DEFAULT = 0.00169
-        FEED_EF_DEFAULT = 0
+        module: Aquaculture = self.data
+        change_rate = module.activity.change_rate
+        project: Project = module.activity.project
+        
+        # NOTE: NITROUS_EF_DEFAULT = 0.00169
+        NITROUS_EF_DEFAULT = AquacultureParameter.objects.get(name="nitrous_ef_default").value
+        # NOTE: FEED_EF_DEFAULT = 0
+        # TODO: This will now be used in the inputs module for feed
+        FEED_EF_DEFAULT = AquacultureParameter.objects.get(name="feed_ef_default").value
 
-        inputs = [
-            self.data.annual_production_start,
-            self.data.annual_production_w,
+        inputs_w = [
+            module.annual_production_start,
+            module.annual_production_w,
             NITROUS_EF_DEFAULT,
-            self.data.production_n2o_ef_t2,
+            module.n2o_from_production_t2_start,
+            module.n2o_from_production_t2_w,
             project.gw_potential.n2o,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
-            self.data.annual_production_w_rate.value,
-            self.data.annual_production_wo_rate.value,
-            self.data.annual_production_wo,
-            self.data.annual_feed_quantity_start,
-            self.data.annual_feed_quantity_w,
-            FEED_EF_DEFAULT,
-            self.data.feed_use_emissions_t2,
-            self.data.annual_feed_quantity_wo,
+            change_rate.name,
         ]
 
-        return Result(*fisheries_and_aquaculture.total_inland_coastal_aquaculture(*inputs))
+        inputs_wo = [
+            module.annual_production_start,
+            module.annual_production_wo,
+            NITROUS_EF_DEFAULT,
+            module.n2o_from_production_t2_start,
+            module.n2o_from_production_t2_wo,
+            project.gw_potential.n2o,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            change_rate.name,
+        ]
+
+        results_w = MathAquaculture(*inputs_w)
+        results_w.calculate_emissions()
+
+        results_wo = MathAquaculture(*inputs_wo)
+        results_wo.calculate_emissions()
+
+        emissions_w = results_w.total_emissions
+        emissions_wo = results_wo.total_emissions
+
+        return Result(emissions_w, emissions_wo, emissions_w - emissions_wo)
 
 
 class InputCalculator(BaseCalculator):
