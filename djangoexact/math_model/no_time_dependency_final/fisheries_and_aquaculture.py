@@ -161,7 +161,7 @@ class Fishery:
 
 class CoastalAquaculture():
 
-    def __init__(self, production_start, production_w, nitrous_ef_default, nitrous_ef_start_tier_2, nitrous_ef_end_tier_2, nitrous_constant, time_impl, time_cap, rate_type, feed_start, feed_w, ef_feed_default, ef_feed_tier_2):
+    def __init__(self, production_start, production_w, nitrous_ef_default, nitrous_ef_start_tier_2, nitrous_ef_end_tier_2, nitrous_constant, time_impl, time_cap, rate_type):
 
         self.time_impl = time_impl
         self.time_cap = time_cap
