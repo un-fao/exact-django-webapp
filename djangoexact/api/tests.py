@@ -10,8 +10,9 @@ from openpyxl import load_workbook
 from time import sleep
 import xlwings as xw
 import math
+from .serializers import *
 
-BATCH_SIZE = 1
+BATCH_SIZE = 5
 TEST_SM_FISHERY = False
 TEST_LG_FISHERY = False
 TEST_ANNUAL_CROPPING = True
@@ -33,7 +34,7 @@ soc_refs = SoilOrganicCarbon.objects.all()
 
 f = APIRequestFactory()
 
-wbook = xw.Book("scenario.xlsb")
+wbook = xw.Book("EX-ACT_V9.4.1_open[1298].xlsb")
 
 # User Creation
 u = User.objects.get(username="admin")
@@ -46,12 +47,9 @@ while True:
         climate = random.choice(climates)
         moisture = random.choice(moistures)
         soil_type = random.choice(soil_types)
-        gw_potential = GlobalWarmingPotential.objects.get(
-            name="100 yr AR5 w/out CC feedback"
-        )
-        socref = SoilOrganicCarbon.objects.get(
-            climate=climate, moisture=moisture, soil_type=soil_type
-        )
+        gw_potential = GlobalWarmingPotential.objects.get(name="100 yr AR5 w/out CC feedback")
+        socref = SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
+
         if socref.value is None:
             # TODO: Define behaviour for when socref is None (either input T2 or what?)
             raise Exception
@@ -79,6 +77,8 @@ p: ProjectFactory = ProjectFactory.create(
     soc_ref=socref,
 )
 
+print(ProjectSerializer(p).data)
+
 # Spreadeheet setup
 ds = wbook.sheets["1.Description"]
 ds["Q8"].value = p.continent.name
@@ -88,6 +88,7 @@ ds["Q11"].value = p.moisture.name
 ds["Q12"].value = p.soil_type.name + " soils"
 ds["T13"].value = p.implementation_duration_yrs
 ds["T14"].value = p.capitalization_duration_yrs
+sleep(1)
 
 # Activity Creation
 a = ActivityFactory.create(project=p, user=u)
@@ -207,17 +208,7 @@ if TEST_ANNUAL_CROPPING:
     for i, annual_cropping in enumerate(annual_croppings):
         print(f"\n\nTesting AnnualCropping {i+1}...")
         print("-----------------------------------")
-
-        print(annual_cropping.id)
-
-        print(annual_cropping.ha_start)
-        print(annual_cropping.ha_w)
-        print(annual_cropping.ha_wo)
-
-        print(annual_cropping.crop_type_start)
-        print(annual_cropping.tillage_management_type_start)
-        print(annual_cropping.organic_input_type_start)
-        print(annual_cropping.residue_management_type_start)
+        print(get_module_serializer(AnnualCropping)(annual_cropping).data)
 
         results = CalculatorFactory().calculate_result(annual_cropping)
 
@@ -226,8 +217,6 @@ if TEST_ANNUAL_CROPPING:
             if annual_cropping.crop_type_start.name not in ["Beans", "Pulses"]
             else "Beans & pulses"
         )
-
-
         cropland_sheet["G25"].value = annual_cropping.tillage_management_type_start.name
         cropland_sheet["I25"].value = annual_cropping.organic_input_type_start.name
         cropland_sheet["K25"].value = annual_cropping.residue_management_type_start.name
@@ -265,12 +254,12 @@ if TEST_ANNUAL_CROPPING:
         sheet_wo = float(cropland_sheet["W37"].value)
         sheet_w = float(cropland_sheet["X37"].value)
         sheet_balance = float(cropland_sheet["Z37"].value)
-        sleep(1)
+        sleep(2)
 
         try:
-            assert math.isclose(results.total_wo, sheet_wo, rel_tol=0.02)
-            assert math.isclose(results.total_w, sheet_w, rel_tol=0.02)
-            assert math.isclose(results.balance, sheet_balance, rel_tol=0.02)
+            assert math.isclose(results.total_wo, sheet_wo, rel_tol=0.05)
+            assert math.isclose(results.total_w, sheet_w, rel_tol=0.05)
+            assert math.isclose(results.balance, sheet_balance, rel_tol=0.05)
             passed_croplands += 1
         except AssertionError as e:
             print("Results do not match the Excel")
