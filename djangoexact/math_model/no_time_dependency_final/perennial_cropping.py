@@ -162,8 +162,8 @@ class PerennialCropping:
         pass
         
 
-wo = [0, 88.0, 5, 15, 'D', 265.0, 28.0, False, 2.3, 0.21, 0.85, 1, None, None, 2.97, None, 27.3, 0.77, None, 76.0, None, 0.72, None, 1.44, None, 1.04, None]
-peren_start = PerennialCropping(*wo)
-peren_start.calculate_emissions()
-print(peren_start.total_emissions)
-print(peren_start.emissions_total_yearly)
+# wo = [0, 88.0, 5, 15, 'D', 265.0, 28.0, False, 2.3, 0.21, 0.85, 1, None, None, 2.97, None, 27.3, 0.77, None, 76.0, None, 0.72, None, 1.44, None, 1.04, None]
+# peren_start = PerennialCropping(*wo)
+# peren_start.calculate_emissions()
+# print(peren_start.total_emissions)
+# print(peren_start.emissions_total_yearly)

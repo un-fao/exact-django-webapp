@@ -184,7 +184,7 @@ def GHG_emissions(
         delta_c_mineral_per_ha,
     )
 
-    print('soil_w:{}'.format(soil_w))
+    # print('soil_w:{}'.format(soil_w))
 
     fire_fsom_N_wo = total_ch4_n2o_per_ha * area_defo_wo
     fire_fsom_N_w = total_ch4_n2o_per_ha * area_defo_w
@@ -226,7 +226,7 @@ def soil_emissions(
 ):
     time_tot = time_impl + time_cap
 
-    print(delta_co2_mineral_per_ha_per_yr)
+    # print(delta_co2_mineral_per_ha_per_yr)
 
     comparison_term_1 = (
         (delta_co2_mineral_per_ha_per_yr * soil_rate_immediate(area_defo, time_tot))
@@ -240,11 +240,11 @@ def soil_emissions(
     )
     comparison_term_2 = area_defo * delta_c_mineral_per_ha * (-44 / 12)
 
-    print(comparison_term_1/delta_co2_mineral_per_ha_per_yr)
+    # print(comparison_term_1/delta_co2_mineral_per_ha_per_yr)
 
     
-    print('CALCULATED:{}'.format(comparison_term_1))
-    print('REFERENCE:{}'.format(comparison_term_2))
+    # print('CALCULATED:{}'.format(comparison_term_1))
+    # print('REFERENCE:{}'.format(comparison_term_2))
     #
     return (
         comparison_term_2

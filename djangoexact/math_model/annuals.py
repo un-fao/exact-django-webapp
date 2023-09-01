@@ -287,5 +287,5 @@ def default_tier_2 (socref, f_lu_ref, f_i_ref, f_mg_ref, n_estimation_slope_main
 
 # soil = soil_co2_change(12, 12, 20, 9, 0.5, 'D', 46, None, 0.83, None, 1.11, None, 1.04, None )
 
-inputs = [27, 93, 36, 5, 17, 'D', 0.5, 'D', 0.5, 87.0, None, 0.77, None, 1.0, None, 1.03, None, 0.005, 265.0, 28.0, None, 0.85, None, 0.88, 1.33, 50, None, None, None, None, None, None, None, True, None, False, 0.007, 0.22, 0.006, None, None, None]
-print(calculate_emissions(*inputs))
+# inputs = [27, 93, 36, 5, 17, 'D', 0.5, 'D', 0.5, 87.0, None, 0.77, None, 1.0, None, 1.03, None, 0.005, 265.0, 28.0, None, 0.85, None, 0.88, 1.33, 50, None, None, None, None, None, None, None, True, None, False, 0.007, 0.22, 0.006, None, None, None]
+# print(calculate_emissions(*inputs))

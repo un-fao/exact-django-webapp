@@ -63,7 +63,7 @@ class OtherLandUseChanges:
                 self.yearly_biomass_emissions = yearly_constant_emissions_breakdown(total, self.time_impl, self.time_cap)
             
             except Exception as e:
-                print(traceback.format_exc())
+                traceback.print_exc()
 
         def calculate_soc():
 
@@ -77,7 +77,7 @@ class OtherLandUseChanges:
                 self.yearly_soc_emissions, self.total_soc_emissions = soil_emissions_delta_soc_known(delta_c_soc_20_years, delta_co2_soc, 0, self.area, self.hectars_before_20)
 
             except Exception as e:
-                print(traceback.format_exc())
+                traceback.print_exc()
 
         def calculate_fire():
 
@@ -112,7 +112,7 @@ class OtherLandUseChanges:
             self.total_emissions = sum(self.emissions_total_yearly)
 
         except Exception as e:
-            print(traceback.format_exc())
+            traceback.print_exc()
 
     def evaluate_tier_2_defaults():
         pass
