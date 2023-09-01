@@ -222,17 +222,15 @@ def calculate_logging_effect(agb_matrix, recurrence, percentage=1.0, rotation=Fa
 
 
 # deadwood_litter_emissions(10, 100, 50, 40, 5, 5, yearly_time_dependent_parameter_breakdown(0, 100, 5, 5, 'D'))
-import numpy as np
-
-import numpy as np
-
-import numpy as np
 
 import numpy as np
 
 import numpy as np
 
 def calculate_rotation_effect(agb_matrix, recurrence, percentage=1.0):
+
+    print(agb_matrix)
+    
     max_cols = agb_matrix.shape[1]
     max_rows = agb_matrix.shape[0]
     
@@ -241,10 +239,8 @@ def calculate_rotation_effect(agb_matrix, recurrence, percentage=1.0):
     
     # Create a matrix to accumulate rotation effects
     rotation_matrix = np.zeros(agb_matrix.shape)
-
-    print(agb_matrix)
     
-    for year in range(1, max_cols + 1):
+    for year in range(recurrence, max_cols + 1):
         total_rotation = 0
         
         # Main diagonal rotation
@@ -258,7 +254,14 @@ def calculate_rotation_effect(agb_matrix, recurrence, percentage=1.0):
         for row in range(year-1):
             # Check if it's time for the recurrence of this row
             if (year - row) % recurrence == 0:
-                last_rotated_col = np.where(rotation_matrix[row, :year] != 0)[0][-1] + 1
+                rotated_indices = np.where(rotation_matrix[row, :year] != 0)[0]
+                
+                # Check if any rotation happened for this row before
+                if rotated_indices.size == 0:
+                    last_rotated_col = 0
+                else:
+                    last_rotated_col = rotated_indices[-1] + 1
+                
                 rotated_values = agb_matrix[row, last_rotated_col:year] * percentage
                 total_rotation += np.nansum(rotated_values)
                 rotation_matrix[row, last_rotated_col:year] += -rotated_values
@@ -266,12 +269,11 @@ def calculate_rotation_effect(agb_matrix, recurrence, percentage=1.0):
         
         yearly_totals[year] = total_rotation
 
+
     print(rotation_matrix)
     print(yearly_totals)
+
     return yearly_totals, rotation_matrix
-
-
-
 
 # Test
 calculate_rotation_effect(create_agb_matrix(5, 5, 10), 2, 1)
