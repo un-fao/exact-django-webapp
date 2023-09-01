@@ -81,7 +81,7 @@ class GrasslandManagement:
                 
                 total = tabular if abs(calculated) >= abs(tabular) else calculated
 
-                self.emissions_soil_yearly = breakdown_according_to_values(total, self.total_hectars)
+                self.emissions_soil_yearly = breakdown_according_to_values(total, self.hectars_before_20)
                 self.emissions_soil_total = total
                 return
             except:
