@@ -622,20 +622,14 @@ class Deforestation(Module):
 
 class Afforestation(Module):
     land_use_type = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True)
-    vegetation_type = ForeignKey(
-        VegetationType, on_delete=CASCADE, null=True, blank=True
-    )
+    vegetation_type = ForeignKey(VegetationType, on_delete=CASCADE, null=True, blank=True)
 
     is_fire_used = BooleanField(default=False)
 
     ha_w = FloatField()
-    ha_w_rate = ForeignKey(
-        ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_w_rate"
-    )
+    ha_w_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_w_rate")
     ha_wo = FloatField()
-    ha_wo_rate = ForeignKey(
-        ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_wo_rate+"
-    )
+    ha_wo_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_wo_rate+")
 
     initial_biomass_t2 = FloatField(null=True, blank=True)
     initial_soil_carbon_t2 = FloatField(null=True, blank=True)
