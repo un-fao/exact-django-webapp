@@ -6,7 +6,9 @@ class GrasslandManagement:
 
     def __init__(self, area_start, area_end, time_impl, time_cap, rate, nitrous_constant, methane_constant,
                             fire_interval, fire_used, methane_ef, nitrous_ef, agb_ref, agb_tier_2, cf_ref, cf_tier_2,
-                            soc_start_ref, soc_start_tier_2, soc_end_ref, soc_end_tier_2):
+                            soc_start_ref, soc_start_tier_2, soc_end_ref, soc_end_tier_2, fmg_start = 1, fmg_end = 1,
+                            flu_start = 1, flu_end = 1, fi_start = 1, fi_end = 1
+                            ):
         
         self.area_start = area_start
         self.area_end = area_end
@@ -27,6 +29,12 @@ class GrasslandManagement:
         self.soc_start_tier_2 = soc_start_tier_2 # tier 2 value, expects float or None
         self.soc_end_ref = soc_end_ref # lookup state_end_w in table in grass! W28-Y33
         self.soc_end_tier_2 = soc_end_tier_2 # tier 2 value, expects float or None
+        self.fmg_start = fmg_start # defaulted to 1 in case there are None, if not float value
+        self.fmg_end = fmg_end # defaulted to 1 in case there are None, if not float value
+        self.flu_start = flu_start # defaulted to 1 in case there are None, if not float value
+        self.flu_end = flu_end  # defaulted to 1 in case there are None, if not float value
+        self.fi_start = fi_start # defaulted to 1 in case there are None, if not float value
+        self.fi_end = fi_end # defaulted to 1 in case there are None, if not float value
 
         # Space for the results
         self.hectars_before_20, self.hectars_after_20 = yearly_time_dependent_20_year_breakdown(area_start, area_end ,self.time_impl, self.time_cap, self.rate)
@@ -71,8 +79,8 @@ class GrasslandManagement:
         def calculate_soil_emissions():
 
             try:
-                soc_start = self.soc_start_ref if not self.soc_start_tier_2 else self.soc_start_tier_2
-                soc_end = self.soc_end_ref if not self.soc_end_tier_2 else self.soc_end_tier_2
+                soc_start = self.soc_start_ref * self.fmg_start * self.fi_start * self.flu_start if not self.soc_start_tier_2 else self.soc_start_tier_2
+                soc_end = self.soc_end_ref * self.fmg_end * self.fi_end * self.flu_end if not self.soc_end_tier_2 else self.soc_end_tier_2
                 delta_co2_mineral_per_ha_per_yr = - (soc_end - soc_start) / 20 * (44/12)
 
 
