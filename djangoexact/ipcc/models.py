@@ -565,7 +565,6 @@ class GrasslandStockExchangeFactor(Model):
     def __str__(self):
         return f"{self.fmg} {self.flu} {self.fi} for {self.grassland_management_type.name} {self.climate.name}"
 
-
 class ElectricityEmission(Model):
     country = ForeignKey("api.Country", on_delete=CASCADE)
     continent = ForeignKey("api.Continent", on_delete=CASCADE)

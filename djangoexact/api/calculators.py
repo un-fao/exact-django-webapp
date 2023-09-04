@@ -1111,22 +1111,22 @@ class GrasslandCalculator(BaseCalculator):
         ef = BurningEmissionFactor.objects.get(category__name="Savanna and grassland")
         agb = GrasslandAGB.objects.get(climate=project.climate, moisture=project.moisture)
         cf = GrasslandParameter.objects.get(name="default_combustion_factor").value
-        proj_soc = project.soc_ref.value
 
-        # NOTE: Default values at start are for 'Non-Degraded' land
-        soc_w = GrasslandStockExchangeFactor.objects.filter(
+        soc_start = GrasslandStockExchangeFactor.objects.get(
+            grassland_management_type=module.grassland_management_type_start,
+            climate=project.climate,
+        )
+
+        soc_w = GrasslandStockExchangeFactor.objects.get(
             grassland_management_type=module.grassland_management_type_w,
             climate=project.climate,
-        ).first()
+        )
 
-        soc_wo = GrasslandStockExchangeFactor.objects.filter(
+
+        soc_wo = GrasslandStockExchangeFactor.objects.get(
             grassland_management_type=module.grassland_management_type_wo,
             climate=project.climate,
-        ).first()
-
-        soc_start = proj_soc * soc_start.fmg * soc_start.flu * soc_start.fi if soc_start else project.soc_ref.value
-        soc_w = proj_soc * soc_w.fmg * soc_w.flu * soc_w.fi if soc_w else project.soc_ref.value
-        soc_wo = proj_soc * soc_wo.fmg * soc_wo.flu * soc_wo.fi if soc_wo else project.soc_ref.value
+        )
 
         inputs_w = [
             0,
@@ -1144,10 +1144,15 @@ class GrasslandCalculator(BaseCalculator):
             module.agb_t2_w,
             cf,
             module.combustion_factor_t2_start,
-            soc_start,
+            project.soc_ref.value,
+            module.soil_carbon_t2_start,
             module.soil_carbon_t2_w,
-            soc_w,
-            module.soil_carbon_t2_w
+            soc_start.fmg,
+            soc_w.fmg,
+            soc_start.flu,
+            soc_w.flu,
+            soc_start.fi,
+            soc_w.fi,
         ]
 
         inputs_wo = [
@@ -1166,10 +1171,15 @@ class GrasslandCalculator(BaseCalculator):
             module.agb_t2_wo,
             cf,
             module.combustion_factor_t2_start,
-            soc_start,
+            project.soc_ref.value,
+            module.soil_carbon_t2_start,
             module.soil_carbon_t2_wo,
-            soc_wo,
-            module.soil_carbon_t2_wo
+            soc_start.fmg,
+            soc_wo.fmg,
+            soc_start.flu,
+            soc_wo.flu,
+            soc_start.fi,
+            soc_wo.fi,
         ]
 
         math_w = MathGrassland(*inputs_w)
