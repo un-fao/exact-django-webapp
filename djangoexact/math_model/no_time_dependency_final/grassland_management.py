@@ -78,8 +78,8 @@ class GrasslandManagement:
         def calculate_soil_emissions():
 
             try:
-                soc_start = self.soc_start_ref * self.fmg_start * self.fi_start * self.flu_start if not self.soc_start_tier_2 else self.soc_start_tier_2
-                soc_end = self.soc_end_ref * self.fmg_end * self.fi_end * self.flu_end if not self.soc_end_tier_2 else self.soc_end_tier_2
+                soc_start = self.soc_ref * self.fmg_start * self.fi_start * self.flu_start if not self.soc_start_tier_2 else self.soc_start_tier_2
+                soc_end = self.soc_ref * self.fmg_end * self.fi_end * self.flu_end if not self.soc_end_tier_2 else self.soc_end_tier_2
                 delta_co2_mineral_per_ha_per_yr = - (soc_end - soc_start) / 20 * (44/12)
 
 
