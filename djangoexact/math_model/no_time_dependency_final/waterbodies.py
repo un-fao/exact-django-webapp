@@ -1,3 +1,6 @@
+import traceback
+from general_functions import yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, yearly_time_dependent_20_year_breakdown, breakdown_according_to_values, soil_emissions
+
 class CoastalWaterbodies:
 
     def __init__(self, area_start, area_end, trophic_state_default, methane_emission_factor_default, trophic_state_tier_2, methane_emission_factor_start_tier_2, 
