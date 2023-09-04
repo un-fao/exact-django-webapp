@@ -729,7 +729,7 @@ class InputEmissionFactor(Model):
 
 class BuildingEmissionFactor(Model):
     building_type = ForeignKey("api.BuildingType", on_delete=CASCADE)
-    kg_co2_m2 = FloatField(null=True, blank=True)
+    value = FloatField(null=True, blank=True)
 
 
 class LivestockEntericEF(Model):
