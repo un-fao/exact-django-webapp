@@ -2052,12 +2052,17 @@ class BuildingType(Model):
 
 
 class Building(Module):
-    input_type = ForeignKey(InputType, on_delete=CASCADE)
-    building_type = ForeignKey(BuildingType, on_delete=CASCADE)
+    building_type_start = ForeignKey(BuildingType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_building_type_start")
+    building_type_w = ForeignKey(BuildingType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_building_type_w")
+    building_type_wo = ForeignKey(BuildingType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_building_type_wo")
+    
+    surface_start = FloatField(null=True, blank=True)
     surface_w = FloatField(null=True, blank=True)
     surface_wo = FloatField(null=True, blank=True)
 
-    t_co2_m2_t2 = FloatField(null=True, blank=True)
+    ef_t2_start = FloatField(null=True, blank=True)
+    ef_t2_w = FloatField(null=True, blank=True)
+    ef_t2_wo = FloatField(null=True, blank=True)
 
 class OrganicSoil(Module):
 
