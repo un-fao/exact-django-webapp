@@ -1,16 +1,243 @@
 import traceback
 from general_functions import yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, yearly_time_dependent_20_year_breakdown, breakdown_according_to_values, soil_emissions
 
-
 class CoastalWetland:
 
-    def __init__():
+    def __init__(self, area_start_drainage, percentage_drained_start, percentage_drained_end, rate_type, time_impl, time_cap, agb_default, bgb_default, litter_default, deadwood_default,
+            soil_1m_default, EF_drainage_default, agb_tier_2, bgb_tier_2,litter_tier_2, deadwood_tier_2, soil_1m_tier_2, EF_drainage_tier_2, 
+            area_start_excavation, percentage_excavated, percentage_c_lost_excavation_default, percentage_c_lost_excavation_tier_2,
+            ef_rewetting_carbon_default, ef_rewetting_methane_default, ef_rewetting_carbon_tier_2, ef_rewetting_methane_tier_2, soil_type, 
+            area_start_rewetting, area_end_rewetting, rate_coefficient, methane_constant
+            
+            ):
+        
+        self.area_start_drainage = area_start_drainage # area at start of the period, expects float
+        self.percentage_drained_start = percentage_drained_start # percentage drained start, expects float
+        self.percentage_drained_end = percentage_drained_end  # percentage drained start, expects float
+        self.rate_type = rate_type # rate type, expects string
+        self.time_impl = time_impl # time implementation, expects int front end input
+        self.time_cap = time_cap # time capitalization, expects int front end input
+        self.agb_default = agb_default  # match climate moisture and type of vegetation to IPCC A2903, if present return value, else 0
+        self.bgb_default = bgb_default  # match climate moisture and type of vegetation to IPCC A2111, if present return value, else 0
+        self.litter_default = litter_default # match climate moisture and type of vegetation to IPCC A2128, if present return value, else 0
+        self.deadwood_default = deadwood_default # match climate moisture and type of vegetation to IPCC A2145, if present return value, else 0 
+        self.soil_1m_default = soil_1m_default # if type of vegetation == MANGROVE and soil tier == Tier 1:
+                                                #             match COUNTRY to table Atwood and take Mg C/ha
+                                                # else:
+                                                #         if soil type == 'Mineral':
+                                                #             match climate moisture and type of vegetation to IPCC A2162
+                                                #         elif soil type == 'Organic':
+                                                #             match climate moisture and type of vegetation to IPCC A2179
+                                                #         elif soil type == 'Aggregated'
+                                                #             match climate moisture and type of vegetation to IPCC A2196
+                                                #         else:
+                                                #             return 0
+
+        self.EF_drainage_default = EF_drainage_default # match climate moisture and type of vegetation to IPCC A2213, if present return value, else 0
+        self.agb_tier_2 = agb_tier_2 
+        self.bgb_tier_2 = bgb_tier_2
+        self.litter_tier_2 = litter_tier_2
+        self.deadwood_tier_2 = deadwood_tier_2
+        self.soil_1m_tier_2 = soil_1m_tier_2
+        self.EF_drainage_tier_2 = EF_drainage_tier_2
+
+        self.area_start_excavation = area_start_excavation # area of excavation at start
+        self.percentage_excavated = percentage_excavated # percentage excavated, front end input expects float
+        self.percentage_c_lost_excavation_default = percentage_c_lost_excavation_default # standard value, 96%, discuss and ask whether to include in model directly
+        self.percentage_c_lost_excavation_tier_2 = percentage_c_lost_excavation_tier_2
+
+        self.ef_rewetting_carbon_default = ef_rewetting_carbon_default  # match climate moisture and type of vegetation to IPCC A2230, if present return value, else 0
+        self.ef_rewetting_methane_default = ef_rewetting_methane_default # match climate moisture and type of vegetation to IPCC A2247, if present return value, else 0
+        self.ef_rewetting_carbon_tier_2 = ef_rewetting_carbon_tier_2 
+        self.ef_rewetting_methane_tier_2 = ef_rewetting_methane_tier_2
+        self.soil_type = soil_type # front end input expects string
+        self.area_start_rewetting = area_start_rewetting # front end input
+        self.area_end_rewetting = area_end_rewetting # front end input
+        self.methane_constant = methane_constant # front end input
+
+
+        # HECTARES DRAINED
+        # TODO: ask Lorenzo why this is done
+        self.hectares_drained_before_20, self.hectares_drained_after_20 = yearly_time_dependent_20_year_breakdown(0, self.area_start_drainage * self.percentage_drained_end, self.time_impl, self.time_cap, self.rate_type)
+
+        # RESULTS
+        self.emissions_biomass_yearly_drainage = []
+        self.emissions_biomass_total_drainage = 0
+
+        self.emissions_soil_yearly_drainage = []
+        self.emissions_soil_total_drainage = 0
+
+        # TODO: add emissions yearly drainage
+        self.emissions_total_drainage = 0
+
+        # TODO: add emissions yearly extraction
+        self.emissions_total_extraction_excavation = 0
+
+        # TODO: add emissions yearly rewetting
+        self.emissions_total_rewetting = 0
+        self.emissions_yearly_rewetting_carbon = []
+        self.emissions_yearly_rewetting_methane = []
+        
+
+        self.emissions_total_yearly = []
+        self.total_emissions = 0
+        
         pass
 
-    def calculate_emissions():
-        pass
+    def calculate_emissions(self,):
+
+        def calculate_drainage():
+
+            def calculate_biomass():
+
+                try:
+                    agb = self.agb_default * 0.451 if not self.agb_tier_2 else self.agb_tier_2
+                    bgb = self.bgb_default * agb if not self.bgb_tier_2 else self.bgb_tier_2
+                    litter = self.litter_default if not self.litter_tier_2 else self.litter_tier_2
+                    deadwood = self.deadwood_default if not self.deadwood_tier_2 else self.deadwood_tier_2
+                
+                    # TODO: ask Lorenzo about this variable, should it be 0? Should it be calculated?
+                    stock_c_biomass_start = 0
+                    area_drained_end = self.area_start_drainage * self.percentage_drained_end
+                    area_drained_start = self.area_start_drainage * self.percentage_drained_start
+                    
+
+
+                    stock_c_biomass_end = (agb + bgb + litter + deadwood) * area_drained_end
+
+                    #TODO: ask Lorenzo how the biomass emissions should be divided across the years
+                    self.emissions_biomass_total_drainage = (stock_c_biomass_start - stock_c_biomass_end) * (44/12)
+                except Exception as e:
+                    traceback.print_exc()
+                    pass
+            
+            def calculate_soil():
+                try:
+                    soil_1m = self.soil_1m_default if not self.soil_1m_tier_2 else self.soil_1m_tier_2
+                    EF_drainage = self.EF_drainage_default if not self.EF_drainage_tier_2 else self.EF_drainage_tier_2
+
+                    maximum_soil_years = 1000 if EF_drainage == 0 else int(soil_1m/EF_drainage)
+                    maximum_soil_emissions = soil_1m * 44/12
+
+                    # TODO: ask lorenzo: HERE THERE IS A 0 IN AREA_DRAINED_START ERROR?
+                    calculated = EF_drainage * 44/12 * sum(self.hectares_drained_before_20)
+                    maximum = max(0, self.area_start_drainage * self.percentage_drained_end) * maximum_soil_emissions
+
+                    total = calculated if abs(calculated) < abs(maximum) else maximum
+
+                    self.emissions_soil_total_drainage = total
+                    self.emissions_soil_yearly_drainage = breakdown_according_to_values(total, self.hectares_drained_before_20)
+
+                except Exception as e:
+                    traceback.print_exc()
+                    pass
+            
+            calculate_biomass()
+            calculate_soil()
+
+            self.emissions_total_drainage = self.emissions_biomass_total_drainage + self.emissions_soil_total_drainage
+
+        def calculate_extraction_excavation():
+            try:
+
+                # THIS VARIABLE IS SET TO 0 AS DEFAULT ON THE EXCEL, ASK LORENZO
+                area_excavated_start = 0
+
+                area_excavated = self.area_start_excavation * self.percentage_excavated
+
+                agb = self.agb_default * 0.451 if not self.agb_tier_2 else self.agb_tier_2
+                bgb = self.bgb_default * agb if not self.bgb_tier_2 else self.bgb_tier_2
+                litter = self.litter_default if not self.litter_tier_2 else self.litter_tier_2
+                deadwood = self.deadwood_default if not self.deadwood_tier_2 else self.deadwood_tier_2
+                soil_1m = self.soil_1m_default if not self.soil_1m_tier_2 else self.soil_1m_tier_2
+                percentage_c_lost_excavation = self.percentage_c_lost_excavation_default if not self.percentage_c_lost_excavation_tier_2 else self.percentage_c_lost_excavation_tier_2
+
+                biomass_c = agb + bgb + litter + deadwood
+                soil_c = soil_1m * percentage_c_lost_excavation
+
+                biomass_co2 = biomass_c * 44/12
+                soil_co2 = soil_c * 44/12
+
+                total = (biomass_co2 + soil_co2) * (area_excavated - area_excavated_start)
+                # TODO: ask Lorenzo about this variable and how it should be split across the years
+                self.emissions_total_extraction_excavation = total
+
+                pass
+            except Exception as e:
+                traceback.print_exc()
+                pass
+            pass
+        
+        def calculate_rewetting_revegetation():
+            try:
+                self.ef_rewetting_methane_default = 0 if not self.soil_type == '<18' else self.ef_rewetting_methane_default
+                ef_rewetting_carbon = self.ef_rewetting_carbon_default if not self.ef_rewetting_carbon_tier_2 else self.ef_rewetting_carbon_tier_2
+                ef_rewetting_methane = self.ef_rewetting_methane_default if not self.ef_rewetting_methane_tier_2 else self.ef_rewetting_methane_tier_2
+
+                self.emissions_yearly_rewetting_carbon = yearly_time_dependent_parameter_breakdown(0, 44/12 * self.area_end_rewetting * ef_rewetting_carbon, self.time_impl, self.time_cap, self.rate_type)
+                self.emissions_yearly_rewetting_methane = yearly_time_dependent_parameter_breakdown(0, self.methane_constant * self.area_end_rewetting * ef_rewetting_methane / 1000 )
+
+                self.emissions_total_rewetting = sum(self.emissions_yearly_rewetting_carbon) + sum(self.emissions_yearly_rewetting_methane)
+                
+            except Exception as e:
+                traceback.print_exc()
+                pass
+            
+
+        calculate_drainage()
+        calculate_extraction_excavation()
+        calculate_rewetting_revegetation()
+
+        self.total_emissions = self.emissions_total_drainage + self.emissions_total_extraction_excavation + self.emissions_total_rewetting
+        # TODO: add other components
+        self.emissions_total_yearly = [i + j + k for i, j, k in zip(self.emissions_biomass_yearly_drainage, self.emissions_soil_yearly_drainage, self.emissions_yearly_rewetting_carbon)]
 
     def evaluate_tier_2_defaults():
         pass
 
-    
+class CoastalWaterbodies:
+
+    def __init__(self, area_start, area_end, trophic_state_default, methane_emission_factor_default, trophic_state_tier_2, methane_emission_factor_start_tier_2, 
+                methane_emission_factor_end_tier_2,  methane_constant, time_cap, time_impl, rate, chlo_A,):
+        
+        self.area_start = area_start
+        self.area_end = area_end
+        self.trophic_state_default = trophic_state_default
+        self.methane_emission_factor_default = methane_emission_factor_default
+        self.trophic_state_tier_2 = trophic_state_tier_2
+        self.methane_emission_factor_start_tier_2 = methane_emission_factor_start_tier_2
+        self.methane_emission_factor_end_tier_2 = methane_emission_factor_end_tier_2
+        self.methane_constant = methane_constant
+        self.time_cap = time_cap
+        self.time_impl = time_impl
+        self.rate = rate
+        self.chlo_A = chlo_A
+
+        # HECTARES BREAKDOWN
+        self.hectares = yearly_time_dependent_parameter_breakdown(self.area_start, self.area_end, self.time_impl, self.time_cap, self.rate)
+        
+        # RESULTS
+        self.emissions_yearly = []
+        self.total_emissions = 0
+
+        pass
+
+    def calculate_emissions(self, ):
+
+        try:
+
+            # TODO: see if on FIGMA there are more start-end values, in that case they can just be added and calculation can be done on two rows
+            trophic_state = self.trophic_state_default if not self.chlo_A else 0.26 * self.chlo_A
+            trophic_state = self.trophic_state_default if not self.trophic_state_tier_2 else self.trophic_state_tier_2
+            methane_emission_factor_end = self.methane_emission_factor_default if not self.methane_emission_factor_end_tier_2 else self.methane_emission_factor_end_tier_2
+            methane_emission_factor_start = self.methane_emission_factor_default if not self.methane_emission_factor_start_tier_2 else self.methane_emission_factor_start_tier_2
+
+            yearly_emissions_start = self.area_start * trophic_state * methane_emission_factor_start / 1000 * self.methane_constant
+            yearly_emissions_end = self.area_end * trophic_state * methane_emission_factor_end / 1000 * self.methane_constant
+
+            self.emissions_yearly = yearly_time_dependent_parameter_breakdown(yearly_emissions_start, yearly_emissions_end, self.time_impl, self.time_cap, self.rate)
+            self.total_emissions = sum(self.emissions_yearly)
+        except Exception as e:
+            traceback.print_exc()
+            pass
+        
