@@ -43,6 +43,7 @@ import sys
 from math_model.no_time_dependency_final.defo import Deforestation as MathDeforestation
 from math_model.no_time_dependency_final.livestock import Livestock as MathLivestock
 from math_model.no_time_dependency_final.grassland_management import GrasslandManagement as MathGrassland
+from math_model.no_time_dependency_final.inputs import Roads as MathRoads
 from math_model.no_time_dependency_final.fisheries_and_aquaculture import (
     CoastalAquaculture as MathAquaculture,
 )
@@ -1748,12 +1749,6 @@ class FuelCalculator(BaseCalculator):
         return Result(0, 0, 0)
 
 
-class IrrigationCalculator(BaseCalculator):
-    """
-    #TODO: Calculator for irrigation.
-    """
-
-
 class BuildingCalculator(BaseCalculator):
     """
     Calculator for buildings and roads.
@@ -1765,14 +1760,39 @@ class BuildingCalculator(BaseCalculator):
         """
 
         input: Building = self.data
+        project: Project = input.activity.project
 
-        ef: BuildingEmissionFactor = BuildingEmissionFactor.objects.get(
-            building_type=input.building_type
-        )
+        ef_w: BuildingEmissionFactor = BuildingEmissionFactor.objects.get(building_type=input.building_type_w)
+        ef_wo: BuildingEmissionFactor = BuildingEmissionFactor.objects.get(building_type=input.building_type_wo)
 
-        inputs = [ef.kg_co2_m2, input.t_co2_m2_t2, input.surface_w, input.surface_wo]
+        inputs_w = [
+            ef_w.value,
+            input.ef_t2_w,
+            input.surface_w,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            input.activity.change_rate.name,
+        ]
 
-        return Result(*math_inputs.roads(*inputs))
+        inputs_wo = [
+            ef_wo.value,
+            input.ef_t2_wo,
+            input.surface_wo,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            input.activity.change_rate.name,
+        ]
+
+        math_w = MathRoads(*inputs_w)
+        math_wo = MathRoads(*inputs_wo)
+
+        math_w.calculate_emissions()
+        math_wo.calculate_emissions()
+
+        results_w = math_w.total_emissions
+        results_wo = math_wo.total_emissions
+
+        return Result(results_w, results_wo, results_w - results_wo)
 
 
 class LivestockCalculator(BaseCalculator):
