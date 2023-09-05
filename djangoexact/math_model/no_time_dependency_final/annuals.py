@@ -82,14 +82,6 @@ class AnnualCropland:
 
         def calculate_emissions_som():
             try:
-                # SUPPORT FUNCTIONS 
-                def func1(area_start, area, rate_coefficient, time_impl, time_cap):
-
-                    if area > area_start:
-                        return time_cap + time_impl * rate_coefficient
-                    else:
-                        return time_impl * (1 - rate_coefficient)
-                
                 # ASSIGNMENT OF TIER 2 VALUES
                 soc = self.socref if not self.soc_tier_2 else self.soc_tier_2
                 f_lu = self.f_lu_ref if not self.f_lu_tier_2 else self.f_lu_tier_2
@@ -108,7 +100,7 @@ class AnnualCropland:
                 total = - sum(self.total_hectars) * som_n2o
 
                 # TODO: ask if this should be broken down proportionally, in that case we have to take an approach similar to the one used in the soil calculation
-                self.emissions_som_yearly = yearly_constant_emissions_breakdown(total, self.time_impl, self.time_cap)
+                self.emissions_som_yearly = breakdown_according_to_values(total, self.total_hectars)
                 self.emissions_som_total = total
 
             
@@ -169,7 +161,6 @@ class AnnualCropland:
 
             total = (sum(self.total_hectars)) * co2_crop
             
-            # TODO: again check if func1 is necessary, same as above. Could be that it is sufficient to use sum of before and after 20
             self.emissions_residue_burning_total = total
             self.emissions_residue_burning_yearly = yearly_constant_emissions_breakdown(total, self.time_impl, self.time_cap)
 
