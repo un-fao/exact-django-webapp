@@ -22,6 +22,8 @@ from .models import (
     AquacultureParameter,
     Grassland,
     GrasslandParameter,
+    SmallFishery,
+    LargeFishery
 )
 from math_model import (
     defo,
@@ -45,6 +47,7 @@ from math_model.no_time_dependency_final.livestock import Livestock as MathLives
 from math_model.no_time_dependency_final.grassland_management import GrasslandManagement as MathGrassland
 from math_model.no_time_dependency_final.inputs import Roads as MathRoads
 from math_model.no_time_dependency_final.fisheries_and_aquaculture import (
+    Fishery as MathFishery,
     CoastalAquaculture as MathAquaculture,
 )
 from math_model.no_time_dependency_final.inputs import (
@@ -294,6 +297,7 @@ class DeforestationCalculator(BaseCalculator):
 
 class ExtractionCalculator(BaseCalculator):
     """
+    TODO: Redo
     Calculator for extraction modules.
     """
 
@@ -412,6 +416,7 @@ class ExtractionCalculator(BaseCalculator):
 
 class CoastalWaterbodyCalculator(BaseCalculator):
     """
+    TODO: Wait math model for redo
     Calculator for coastal waterbody modules.
     """
 
@@ -446,6 +451,7 @@ class CoastalWaterbodyCalculator(BaseCalculator):
 
 class RewettingCalculator(BaseCalculator):
     """
+    TODO: To be integrated in inland wetlands. Wait for math model
     Calculator for rewetting modules.
     """
 
@@ -1205,80 +1211,98 @@ class SmallFisheryCalculator(BaseCalculator):
         Calculate emissions for a single SmallFishery module.
         """
 
-        project = self.data.activity.project
-        input = self.data
+        module: SmallFishery = self.data
+        project = module.activity.project
 
         ef_diesel_default_list = EnergyDefaultEmissionFactor.objects.filter(fuel_type__fuel_use_type__name__contains="Off-Road")
 
         # Average of all default emission factors for gasoil/diesel
         ef_diesel_default = sum([ef.t_co2_eq for ef in ef_diesel_default_list]) / len(ef_diesel_default_list)
 
-        fui_default_start = SmallFisheryFUI.objects.get_value_or_average(fishery_type=self.data.fishery_type, gear_type=self.data.gear_type_start)
-        fui_default_w = SmallFisheryFUI.objects.get_value_or_average(fishery_type=self.data.fishery_type, gear_type=self.data.gear_type_w)
-        fui_default_wo = SmallFisheryFUI.objects.get_value_or_average(fishery_type=self.data.fishery_type, gear_type=self.data.gear_type_wo)
+        fui_default_start = SmallFisheryFUI.objects.get_value_or_average(fishery_type=module.fishery_type, gear_type=module.gear_type_start)
+        fui_default_w = SmallFisheryFUI.objects.get_value_or_average(fishery_type=module.fishery_type, gear_type=module.gear_type_w)
+        fui_default_wo = SmallFisheryFUI.objects.get_value_or_average(fishery_type=module.fishery_type, gear_type=module.gear_type_wo)
 
-        lost_refrigerant_default = SmallFisheryParameter.object.get("lost_refrigerant_default").value
-        tonnes_ice_default = SmallFisheryParameter.object.get("tonnes_ice_default").value
-        kw_tonnes = SmallFisheryParameter.object.get("kw_tonnes").value
+        lost_refrigerant_default = SmallFisheryParameter.objects.get(name="lost_refrigerant_default").value
+        tonnes_ice_default = SmallFisheryParameter.objects.get(name="tonnes_ice_default").value
+        kw_tonnes = SmallFisheryParameter.objects.get(name="kw_tonnes").value
 
         electricity_emission = ElectricityEmission.objects.get(country=project.country, continent=project.continent)
 
-        inputs = [
+        inputs_w = [
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
-            self.data.total_catch_yr_w_rate.value,
-            self.data.total_catch_yr_wo_rate.value,
-            self.data.total_catch_yr_start,
-            self.data.total_catch_yr_w,
-            self.data.total_catch_yr_wo,
+            module.activity.change_rate.name,
+            module.total_catch_yr_start,
+            module.total_catch_yr_w,
             ef_diesel_default,
-            self.data.energy_emission_factor_t2_start,
-            self.data.energy_emission_factor_t2_w,
-            self.data.energy_emission_factor_t2_wo,
+            module.energy_emission_factor_t2_start,
+            module.energy_emission_factor_t2_w,
             fui_default_start,
             fui_default_w,
-            fui_default_wo,
-            self.data.fui_start,
-            self.data.fui_w,
-            self.data.fui_wo,
-            self.data.refrigerant_gwp,
-            self.data.refrigerant_gwp_t2_start,
-            self.data.refrigerant_gwp_t2_w,
-            self.data.refrigerant_gwp_t2_wo,
+            module.fui_start,
+            module.fui_w,
+            module.refrigerant_gwp,
+            module.refrigerant_gwp_t2_start,
+            module.refrigerant_gwp_t2_w,
             lost_refrigerant_default,
-            self.data.refrigerant_lost_per_tonne_t2_start,
-            self.data.refrigerant_lost_per_tonne_t2_w,
-            self.data.refrigerant_lost_per_tonne_t2_wo,
-            self.data.refrigerant_pc_start,
-            self.data.refrigerant_pc_w,
-            self.data.refrigerant_pc_wo,
+            module.refrigerant_lost_per_tonne_t2_start,
+            module.refrigerant_lost_per_tonne_t2_w,
+            module.refrigerant_pc_start,
+            module.refrigerant_pc_w,
             tonnes_ice_default,
-            self.data.tonnes_of_ice_t2_start,
-            self.data.tonnes_of_ice_t2_w,
-            self.data.tonnes_of_ice_t2_wo,
+            module.tonnes_of_ice_t2_start,
+            module.tonnes_of_ice_t2_w,
             kw_tonnes,
-            self.data.inshore_ice_production_kwh_per_tonne_t2_start,
-            self.data.inshore_ice_production_kwh_per_tonne_t2_w,
-            self.data.inshore_ice_production_kwh_per_tonne_t2_wo,
+            module.inshore_ice_production_kwh_per_tonne_t2_start,
+            module.inshore_ice_production_kwh_per_tonne_t2_w,
             electricity_emission.operating_margin,
-            self.data.ice_preserved_catch_pc_start,
-            self.data.ice_preserved_catch_pc_w,
-            self.data.ice_preserved_catch_pc_wo,
+            module.ice_preserved_catch_pc_start,
+            module.ice_preserved_catch_pc_w,
         ]
 
-        # print()
-        # print("--- INPUTS ---")
-        # print()
-        # print(inputs)
-        # print()
-        # print("--- END INPUTS ---")
-        # print()
+        inputs_wo = [
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            module.activity.change_rate.name,
+            module.total_catch_yr_start,
+            module.total_catch_yr_wo,
+            ef_diesel_default,
+            module.energy_emission_factor_t2_start,
+            module.energy_emission_factor_t2_wo,
+            fui_default_start,
+            fui_default_wo,
+            module.fui_start,
+            module.fui_wo,
+            module.refrigerant_gwp,
+            module.refrigerant_gwp_t2_start,
+            module.refrigerant_gwp_t2_wo,
+            lost_refrigerant_default,
+            module.refrigerant_lost_per_tonne_t2_start,
+            module.refrigerant_lost_per_tonne_t2_wo,
+            module.refrigerant_pc_start,
+            module.refrigerant_pc_wo,
+            tonnes_ice_default,
+            module.tonnes_of_ice_t2_start,
+            module.tonnes_of_ice_t2_wo,
+            kw_tonnes,
+            module.inshore_ice_production_kwh_per_tonne_t2_start,
+            module.inshore_ice_production_kwh_per_tonne_t2_wo,
+            electricity_emission.operating_margin,
+            module.ice_preserved_catch_pc_start,
+            module.ice_preserved_catch_pc_wo,
+        ]
 
-        # print(f"Small fishery: {inputs}")
+        math_w = MathFishery(*inputs_w)
+        math_wo = MathFishery(*inputs_wo)
 
-        return Result(*fisheries_and_aquaculture.total_emissions_small_or_large_fisheries(*inputs))
-        
+        math_w.calculate_emissions()
+        math_wo.calculate_emissions()
 
+        results_w = math_w.total_emissions
+        results_wo = math_wo.total_emissions
+
+        return Result(results_w, results_wo, results_w-results_wo)
 
 class LargeFisheryCalculator(BaseCalculator):
     """
@@ -1290,41 +1314,37 @@ class LargeFisheryCalculator(BaseCalculator):
         Calculate emissions for a single LargeFishery module.
         """
 
-        project = self.data.activity.project
+        module: LargeFishery = self.data
+        project = module.activity.project
         ef_diesel_default_list = EnergyDefaultEmissionFactor.objects.filter(
-            fuel_type__name__contains="Off-Road"
+            fuel_type__fuel_use_type__name__contains="Off-Road"
         )
 
         # Average of all default emission factors for gasoil/diesel
         ef_diesel_default = sum(
-            [ef.t_co2_eq_m3 for ef in ef_diesel_default_list]
+            [ef.t_co2_eq for ef in ef_diesel_default_list]
         ) / len(ef_diesel_default_list)
 
         fui_default_start = LargeFisheryFUI.objects.get_value_or_average(
-            fish_type=self.data.fish_type,
-            gear_type=self.data.gear_type_start,
+            fish_type=module.fish_type,
+            gear_type=module.gear_type_start,
         )
         fui_default_w = LargeFisheryFUI.objects.get_value_or_average(
-            fish_type=self.data.fish_type,
-            gear_type=self.data.gear_type_w,
+            fish_type=module.fish_type,
+            gear_type=module.gear_type_w,
         )
         fui_default_wo = LargeFisheryFUI.objects.get_value_or_average(
-            fish_type=self.data.fish_type,
-            gear_type=self.data.gear_type_wo,
+            fish_type=module.fish_type,
+            gear_type=module.gear_type_wo,
         )
 
-        # TODO: Maybe use a table (0.48734, .083 for SmallFishery)
-        lost_refrigerant_default = LargeFisheryParameter.objects.get("lost_refrigerant_default").value
-
-        # TODO: Maybe use a table (2.8 for both)
-        tonnes_ice_default = LargeFisheryParameter.objects.get("tonnes_ice_default").value
-
-        # TODO: Maybe use a table (60 for both)
-        kw_tonnes = LargeFisheryParameter.objects.get("kw_tonnes").value
+        lost_refrigerant_default = LargeFisheryParameter.objects.get(name="lost_refrigerant_default").value
+        tonnes_ice_default = LargeFisheryParameter.objects.get(name="tonnes_ice_default").value
+        kw_tonnes = LargeFisheryParameter.objects.get(name="kw_tonnes").value
 
         electricity_country = (
-            self.data.inshore_ice_production_country_t2
-            if self.data.inshore_ice_production_country_t2
+            module.inshore_ice_production_country_t2
+            if module.inshore_ice_production_country_t2
             else project.country
         )
 
@@ -1332,62 +1352,82 @@ class LargeFisheryCalculator(BaseCalculator):
             country=electricity_country, continent=project.continent
         )
 
-        inputs = [
+        #  TODO: Change fui to T2
+
+        inputs_w = [
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
-            self.data.total_catch_yr_w_rate.value,
-            self.data.total_catch_yr_wo_rate.value,
-            self.data.total_catch_yr_start,
-            self.data.total_catch_yr_w,
-            self.data.total_catch_yr_wo,
+            module.activity.change_rate.name,
+            module.total_catch_yr_start,
+            module.total_catch_yr_w,
             ef_diesel_default,
-            self.data.energy_emission_factor_t2_start,
-            self.data.energy_emission_factor_t2_w,
-            self.data.energy_emission_factor_t2_wo,
+            module.energy_emission_factor_t2_start,
+            module.energy_emission_factor_t2_w,
             fui_default_start,
             fui_default_w,
-            fui_default_wo,
-            self.data.fui_start,
-            self.data.fui_w,
-            self.data.fui_wo,
-            self.data.refrigerant_gwp,
-            self.data.refrigerant_gwp_t2_start,
-            self.data.refrigerant_gwp_t2_w,
-            self.data.refrigerant_gwp_t2_wo,
+            module.fui_start,
+            module.fui_w,
+            module.refrigerant_gwp,
+            module.refrigerant_gwp_t2_start,
+            module.refrigerant_gwp_t2_w,
             lost_refrigerant_default,
-            self.data.refrigerant_lost_per_tonne_t2_start,
-            self.data.refrigerant_lost_per_tonne_t2_w,
-            self.data.refrigerant_lost_per_tonne_t2_wo,
-            self.data.refrigerant_pc_start,
-            self.data.refrigerant_pc_w,
-            self.data.refrigerant_pc_wo,
+            module.refrigerant_lost_per_tonne_t2_start,
+            module.refrigerant_lost_per_tonne_t2_w,
+            module.refrigerant_pc_start,
+            module.refrigerant_pc_w,
             tonnes_ice_default,
-            self.data.tonnes_of_ice_t2_start,
-            self.data.tonnes_of_ice_t2_w,
-            self.data.tonnes_of_ice_t2_wo,
+            module.tonnes_of_ice_t2_start,
+            module.tonnes_of_ice_t2_w,
             kw_tonnes,
-            self.data.inshore_ice_production_kwh_per_tonne_t2_start,
-            self.data.inshore_ice_production_kwh_per_tonne_t2_w,
-            self.data.inshore_ice_production_kwh_per_tonne_t2_wo,
+            module.inshore_ice_production_kwh_per_tonne_t2_start,
+            module.inshore_ice_production_kwh_per_tonne_t2_w,
             electricity_emission.operating_margin,
-            self.data.ice_preserved_catch_pc_start,
-            self.data.ice_preserved_catch_pc_w,
-            self.data.ice_preserved_catch_pc_wo,
+            module.ice_preserved_catch_pc_start,
+            module.ice_preserved_catch_pc_w,
         ]
 
-        # print()
-        # print("--- INPUTS ---")
-        # print()
-        # print(inputs)
-        # print()
-        # print("--- END INPUTS ---")
-        # print()
+        inputs_wo = [
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            module.activity.change_rate.name,
+            module.total_catch_yr_start,
+            module.total_catch_yr_wo,
+            ef_diesel_default,
+            module.energy_emission_factor_t2_start,
+            module.energy_emission_factor_t2_wo,
+            fui_default_start,
+            fui_default_wo,
+            module.fui_start,
+            module.fui_wo,
+            module.refrigerant_gwp,
+            module.refrigerant_gwp_t2_start,
+            module.refrigerant_gwp_t2_wo,
+            lost_refrigerant_default,
+            module.refrigerant_lost_per_tonne_t2_start,
+            module.refrigerant_lost_per_tonne_t2_wo,
+            module.refrigerant_pc_start,
+            module.refrigerant_pc_wo,
+            tonnes_ice_default,
+            module.tonnes_of_ice_t2_start,
+            module.tonnes_of_ice_t2_wo,
+            kw_tonnes,
+            module.inshore_ice_production_kwh_per_tonne_t2_start,
+            module.inshore_ice_production_kwh_per_tonne_t2_wo,
+            electricity_emission.operating_margin,
+            module.ice_preserved_catch_pc_start,
+            module.ice_preserved_catch_pc_wo,
+        ]
 
-        # print(f"Large fishery: {inputs}")
+        math_w = MathFishery(*inputs_w)
+        math_wo = MathFishery(*inputs_wo)
 
-        return Result(*fisheries_and_aquaculture.total_emissions_small_or_large_fisheries(*inputs))
-        
+        math_w.calculate_emissions()
+        math_wo.calculate_emissions()
 
+        results_w = math_w.total_emissions
+        results_wo = math_wo.total_emissions
+
+        return Result(results_w, results_wo, results_w-results_wo)
 
 class ForestCalculator(BaseCalculator):
     """
