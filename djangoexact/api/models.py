@@ -1779,9 +1779,9 @@ class Fishery(Module):
     class Meta:
         abstract = True
 
-    refrigerant_pc_start = FloatField(null=True, blank=True, validators=[pc_as_float])
-    refrigerant_pc_w = FloatField(null=True, blank=True, validators=[pc_as_float])
-    refrigerant_pc_wo = FloatField(null=True, blank=True, validators=[pc_as_float])
+    refrigerant_pc_start = FloatField(validators=[pc_as_float], default=0)
+    refrigerant_pc_w = FloatField(validators=[pc_as_float], default=0)
+    refrigerant_pc_wo = FloatField(validators=[pc_as_float], default=0)
     refrigerant_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_refrigerant_thread", on_delete=SET_NULL)
 
     refrigerant_gwp = FloatField(null=True, blank=True, default=1810)
@@ -1795,9 +1795,9 @@ class Fishery(Module):
     total_catch_yr_wo = FloatField(null=True, blank=True)
     total_catch_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_total_catch_thread", on_delete=SET_NULL)
 
-    ice_preserved_catch_pc_start = FloatField(null=True, blank=True, validators=[pc_as_float])
-    ice_preserved_catch_pc_w = FloatField(null=True, blank=True, validators=[pc_as_float])
-    ice_preserved_catch_pc_wo = FloatField(null=True, blank=True, validators=[pc_as_float])
+    ice_preserved_catch_pc_start = FloatField(default=0, validators=[pc_as_float])
+    ice_preserved_catch_pc_w = FloatField(default=0, validators=[pc_as_float])
+    ice_preserved_catch_pc_wo = FloatField(default=0, validators=[pc_as_float])
     ice_preserved_catch_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_ice_preserved_catch_thread", on_delete=SET_NULL)
 
     # TODO: Is the non-t2 value static for this specific module? It's always related to Gasoil/Diesel
@@ -1852,9 +1852,7 @@ class SmallFishery(Fishery):
     )
     gear_type_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_gear_type_thread", on_delete=SET_NULL)
     fishery_type = ForeignKey(FisheryType, on_delete=CASCADE, null=True, blank=True)
-    fui_default = ForeignKey(
-        "ipcc.SmallFisheryFUI", on_delete=CASCADE, null=True, blank=True
-    )
+    fui_default = ForeignKey("ipcc.SmallFisheryFUI", on_delete=CASCADE, null=True, blank=True)
 
 
 class LargeFishery(Fishery):
