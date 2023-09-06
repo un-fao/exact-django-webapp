@@ -103,6 +103,7 @@ class FloodedRice:
 
                     total = annual_co2 * sum(self.hectares_total)
                     self.straw_burning_yearly = breakdown_according_to_values(total, self.hectares_total)
+                    self.straw_burning_total = sum(self.straw_burning_yearly)
 
             except:
                 traceback.print_exc()

@@ -166,7 +166,7 @@ router.register(
     basename="irrigation-systems",
 )
 router.register(r'irrigation-phases', views.generic_module_viewset(IrrigationPhase), basename='irrigation-phases')
-
+router.register(r'flooded-rices', views.generic_module_viewset(FloodedRice), basename='flooded-rices')
 router.register(r"crop-types", views.generic_viewset(CropType), basename="crop-types")
 router.register(
     r"tillage-management-types",
