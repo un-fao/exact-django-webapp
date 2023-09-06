@@ -1,0 +1,7 @@
+water_regime_type;value
+Irrigated, Continuously flooded;1
+Irrigated, Single drainage period;0,71
+Irrigated, Multiple drainage periods;0,55
+Rainfed, wet season (regular rainfed);0,54
+Rainfed, dry season (drought prone);0,16
+Rainfed, Deep water;0,06
