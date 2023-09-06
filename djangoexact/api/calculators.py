@@ -25,6 +25,8 @@ from .models import (
     SmallFishery,
     LargeFishery,
     FloodedRice,
+    CoastalWetland,
+    CoastalWetlandParameter,
 )
 from math_model import (
     defo,
@@ -47,8 +49,8 @@ from math_model.no_time_dependency_final.defo import Deforestation as MathDefore
 from math_model.no_time_dependency_final.livestock import Livestock as MathLivestock
 from math_model.no_time_dependency_final.grassland_management import GrasslandManagement as MathGrassland
 from math_model.no_time_dependency_final.inputs import Roads as MathRoads
+from math_model.no_time_dependency_final.coastal_wetlands import CoastalWetland as MathCoastalWetland
 from math_model.no_time_dependency_final.fisheries_and_aquaculture import (
-    Fishery as MathFishery,
     CoastalAquaculture as MathAquaculture,
 )
 from math_model.no_time_dependency_final.flooded_rice import FloodedRice as MathFloodedRice
@@ -317,8 +319,8 @@ class ExtractionCalculator(BaseCalculator):
             "vegetation_type": vegetation_type,
         }
 
-        agb = CoastalAboveGroundBiomass.objects.get(**criteria)
-        bgb = CoastalBGAGRatio.objects.get(**criteria)
+        agb = CoastalAGB.objects.get(**criteria)
+        bgb = CoastalBGB.objects.get(**criteria)
         litter = CoastalLitter.objects.get(**criteria)
         dw = CoastalDeadwood.objects.get(**criteria)
 
@@ -470,8 +472,8 @@ class RewettingCalculator(BaseCalculator):
             "vegetation_type": vegetation_type,
         }
 
-        agb = CoastalAboveGroundBiomass.objects.get(**criteria)
-        bgb = CoastalBGAGRatio.objects.get(**criteria)
+        agb = CoastalAGB.objects.get(**criteria)
+        bgb = CoastalBGB.objects.get(**criteria)
         litter = CoastalLitter.objects.get(**criteria)
         dw = CoastalDeadwood.objects.get(**criteria)
         carbon = RewettingCarbonFactor.objects.get(**criteria)
@@ -1110,16 +1112,53 @@ class FloodedRiceCalculator(BaseCalculator):
         sfp_w = RiceSFP.objects.get(water_management_type_before_cultivation=input.water_management_type_before_cultivation_w)
         sfp_wo = RiceSFP.objects.get(water_management_type_before_cultivation=input.water_management_type_before_cultivation_wo)
 
-        sfo_start = RiceSFO.objects.get(organic_amendment_type=input.organic_amendment_type_start)
-        sfo_w = RiceSFO.objects.get(organic_amendment_type=input.organic_amendment_type_w)
-        sfo_wo = RiceSFO.objects.get(organic_amendment_type=input.organic_amendment_type_wo)
+        cfoa_start = RiceSFO.objects.get(organic_amendment_type=input.organic_amendment_type_start)
+        cfoa_w = RiceSFO.objects.get(organic_amendment_type=input.organic_amendment_type_w)
+        cfoa_wo = RiceSFO.objects.get(organic_amendment_type=input.organic_amendment_type_wo)
 
         n_estimation_factor = CropNitrousEstimationDefaultFactor.objects.get(crop_type__name="Rice")
         burning_emission_factor = BurningEmissionFactor.objects.get(category__name="Agricultural residues")
         rice_cf = FiresCombustionFactor.objects.get(crop_type__name="Rice")
 
-        inputs_w = [
+        inputs_start = [
             input.ha_start,
+            0,
+            efc.value,
+            input.efc_t2_start,
+            sfw_start.value,
+            input.sfw_t2_start,
+            sfp_start.value,
+            input.sfp_t2_start,
+            cfoa_start.value,
+            input.sfo_t2_start,
+            input.efi_t2_start,
+            yield_ref.value,
+            input.crop_yield_start,
+            n_estimation_factor.slope,
+            n_estimation_factor.intercept,
+            input.rice_straw_t2_start,
+            burning_emission_factor.ch4,
+            rice_cf.value,
+            burning_emission_factor.n2o,
+            project.gw_potential.ch4,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            input.activity.change_rate.name,
+            project.gw_potential.n2o,
+            efc.cultivation_period,
+            input.cultivation_period_start,
+            project.soc_ref.value,
+            project.soc_ref_t2,
+            flu.value,
+            input.land_use_factor_t2_start,
+            1, # TODO: Fi. Will be added in the future
+            None, # Fi t2
+            1, # TODO: Fmg. Will be added in the future
+            None, # Fmg t2
+        ]
+
+        inputs_w = [
+            0,
             input.ha_w,
             efc.value,
             input.efc_t2_w,
@@ -1127,9 +1166,11 @@ class FloodedRiceCalculator(BaseCalculator):
             input.sfw_t2_w,
             sfp_w.value,
             input.sfp_t2_w,
-            sfo_w.value, # TODO: The formula for SFo is a bit more complex, but it doesn't seem to be taken into account in the mathematical model
+            cfoa_w.value,
             input.sfo_t2_w,
+            input.efi_t2_w,
             yield_ref.value,
+            input.crop_yield_w,
             n_estimation_factor.slope,
             n_estimation_factor.intercept,
             input.rice_straw_t2_w,
@@ -1147,14 +1188,14 @@ class FloodedRiceCalculator(BaseCalculator):
             project.soc_ref_t2,
             flu.value,
             input.land_use_factor_t2_w,
-            1, # TODO: Fi. Discuss with Lorenzo
+            1, # TODO: Fi. Will be added in the future
             None, # Fi t2
-            1, # TODO: Fmg. Discuss with Lorenzo
+            1, # TODO: Fmg. Will be added in the future
             None, # Fmg t2
         ]
 
         inputs_wo = [
-            input.ha_start,
+            0,
             input.ha_wo,
             efc.value,
             input.efc_t2_wo,
@@ -1162,9 +1203,11 @@ class FloodedRiceCalculator(BaseCalculator):
             input.sfw_t2_wo,
             sfp_wo.value,
             input.sfp_t2_wo,
-            sfo_wo.value,
+            cfoa_wo.value,
             input.sfo_t2_wo,
+            input.efi_t2_wo,
             yield_ref.value,
+            input.crop_yield_wo,
             n_estimation_factor.slope,
             n_estimation_factor.intercept,
             input.rice_straw_t2_wo,
@@ -1182,22 +1225,25 @@ class FloodedRiceCalculator(BaseCalculator):
             project.soc_ref_t2,
             flu.value,
             input.land_use_factor_t2_wo,
-            1, # TODO: Fi. Discuss with Lorenzo
+            1, # TODO: Fi. Will be added in the future
             None, # Fi t2
-            1, # TODO: Fmg. Discuss with Lorenzo
+            1, # TODO: Fmg. Will be added in the future
             None, # Fmg t2
         ]
 
+        math_start = MathFloodedRice(*inputs_start)
         math_w = MathFloodedRice(*inputs_w)
         math_wo = MathFloodedRice(*inputs_wo)
 
+        math_start.calculate_emissions()
         math_w.calculate_emissions()
         math_wo.calculate_emissions()
 
+        results_start = math_start.total_emissions
         results_w = math_w.total_emissions
         results_wo = math_wo.total_emissions
 
-        return Result(results_w, results_wo, results_w-results_wo)
+        return Result(results_w+results_start, results_wo+results_start, results_w-results_wo)
 
 class GrasslandCalculator(BaseCalculator):
     """
@@ -2775,3 +2821,108 @@ class IrrigationPhaseCalculator(BaseCalculator):
         results_wo = OperationPhaseIrrigation(*inputs_wo).calculate_emissions()
 
         return Result(results_w+results_start, results_wo+results_start, results_w - results_wo)
+
+class CoastalWetlandCalculator(BaseCalculator):
+    """
+    Calculates the emissions of the coastal wetland
+    """
+
+    def calculate(self) -> Result:
+        """
+        Calculates the emissions of the coastal wetland
+        """
+
+        input: CoastalWetland = self.data
+        project: Project = input.activity.project
+
+        cm = {
+            "climate": project.climate,
+            "moisture": project.moisture,
+        }
+
+        agb = CoastalAGB.objects.get(*cm, vegetation_type=input.vegetation_type)
+        bgb = CoastalBGB.objects.get(*cm, vegetation_type=input.vegetation_type)
+        litter = CoastalLitter.objects.get(*cm, vegetation_type=input.vegetation_type)
+        dw = CoastalDeadwood.objects.get(*cm, vegetation_type=input.vegetation_type)
+        soil_1m = DefaultSoilCarbonStock1Meter.objects.get(*cm, vegetation_type=input.vegetation_type)
+        ef_drainage = DrainageEmissionFactor.objects.get(*cm, vegetation_type=input.vegetation_type)
+        pc_c_lost_excavation = CoastalWetlandParameter.objects.get(name="PERCENTAGE_C_LOST_EXCAVATION")
+
+        rewetting_c = RewettingCarbonFactor.objects.get(*cm, vegetation_type=input.vegetation_type)
+        rewetting_ch4 = RewettingMethaneFactor.objects.get(*cm, vegetation_type=input.vegetation_type)
+
+        inputs_w = [
+            input.area_under_drainage_w,
+            .5, # TODO: percentage_drained_start
+            .5, # TODO: percentage_drained_end
+            input.activity.change_rate.name,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            agb.value,
+            bgb.value,
+            litter.value,
+            dw.value,
+            soil_1m.value,
+            ef_drainage.value,
+            input.agb_t2_w,
+            input.bgb_t2_w,
+            input.litter_t2_w,
+            input.deadwood_t2_w,
+            input.soc_t2_w,
+            input.drainage_ef_t2_w,
+            input.drained_area_excavated_start,
+            input.drained_area_excavated_w,
+            .5, # TODO: percentage_excavated
+            pc_c_lost_excavation.value,
+            input.pc_c_lost_after_excavation_t2_w,
+            rewetting_c.value,
+            rewetting_ch4.value,
+            input.co2_rewetting_w,
+            input.ch4_rewetting_w,
+            input.soil_type_t2.name,
+            10, # TODO: area_rewetted_start
+            10, # TODO: area_rewetted_end
+            project.gw_potential.ch4,
+        ]
+
+        inputs_wo = [
+            input.area_under_drainage_wo,
+            .5, # TODO: percentage_drained_start
+            .5, # TODO: percentage_drained_end
+            input.activity.change_rate.name,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            agb.value,
+            bgb.value,
+            litter.value,
+            dw.value,
+            soil_1m.value,
+            ef_drainage.value,
+            input.agb_t2_wo,
+            input.bgb_t2_wo,
+            input.litter_t2_wo,
+            input.deadwood_t2_wo,
+            input.soc_t2_wo,
+            input.drainage_ef_t2_wo,
+            input.drained_area_excavated_start,
+            input.drained_area_excavated_wo,
+            .5, # TODO: percentage_excavated
+            pc_c_lost_excavation.value,
+            input.pc_c_lost_after_excavation_t2_wo,
+            rewetting_c.value,
+            rewetting_ch4.value,
+            input.co2_rewetting_wo,
+            input.ch4_rewetting_wo,
+            input.soil_type_t2.name,
+            10, # TODO: area_rewetted_start
+            10, # TODO: area_rewetted_end
+            project.gw_potential.ch4,
+        ]
+
+        math_w = MathCoastalWetland(*inputs_w)
+        math_wo = MathCoastalWetland(*inputs_wo)
+
+        results_w = math_w.calculate_emissions()
+        results_wo = math_wo.calculate_emissions()
+
+        return Result(results_w, results_wo, results_w - results_wo)
