@@ -1,0 +1,11 @@
+﻿climate;moisture;unit;Mangrove;Tidal Marsh;Seagrass
+Boreal;Dry;t dry matter/ha;0;0;0
+Boreal;Moist;t dry matter/ha;0;0;0
+Cool Temperate;Dry;t dry matter/ha;0;0;0
+Cool Temperate;Moist;t dry matter/ha;0;0;0
+Warm Temperate;Dry;t dry matter/ha;75;0;0
+Warm Temperate;Moist;t dry matter/ha;75;0;0
+Tropical;Dry;t dry matter/ha;92;0;0
+Tropical;Moist;t dry matter/ha;192;0;0
+Tropical;Wet;t dry matter/ha;192;0;0
+Tropical Montane;Dry;t dry matter/ha;0;0;0
