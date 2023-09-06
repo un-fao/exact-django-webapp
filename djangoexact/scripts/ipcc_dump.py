@@ -2305,4 +2305,116 @@ for i, row in enumerate(df_dict2):
 
 """
 
-PerennialAGB.objects.filter(value=None).update(value=0)
+df = pd.read_csv(
+    os.path.join(
+        os.path.dirname(__file__), "ipcc_data", "RiceDefaultEmissionFactor.csv"
+    ),
+    header=0,
+    sep=";",
+)
+
+df_headers = df.columns.values.tolist()
+df_dict = df.to_dict("records")
+
+for i, row in enumerate(df_dict):
+    continent = Continent.objects.get_or_create(name=sanitize(row["continent"]))[0]
+
+    print(continent, row["value"], row["cultivation_period"])
+
+    bar_start = parse_csv_number(row["value"], nan_value=0)
+    bar_end = parse_csv_number(row['cultivation_period'], nan_value=0)
+
+    RiceDefaultEmissionFactor.objects.get_or_create(
+        continent=continent,
+        value=bar_start,
+        cultivation_period=bar_end,
+    )
+
+df = pd.read_csv(
+    os.path.join(
+        os.path.dirname(__file__), "ipcc_data", "RiceSFO.csv"
+    ),
+    header=0,
+    sep=";",
+)
+
+df_headers = df.columns.values.tolist()
+df_dict = df.to_dict("records")
+
+for i, row in enumerate(df_dict):
+    organic_amendment_type = OrganicAmendmentType.objects.get_or_create(name=sanitize(row["organic_amendment_type"]))[0]
+
+    print(continent, row["organic_amendment_type"], row["value"])
+
+    value = parse_csv_number(row["value"], nan_value=0)
+
+    RiceSFO.objects.get_or_create(
+        organic_amendment_type=organic_amendment_type,
+        value=value,
+    )
+
+df = pd.read_csv(
+    os.path.join(
+        os.path.dirname(__file__), "ipcc_data", "RiceSFP.csv"
+    ),
+    header=0,
+    sep=";",
+)
+
+df_headers = df.columns.values.tolist()
+df_dict = df.to_dict("records")
+
+for i, row in enumerate(df_dict):
+    water_management_type_before_cultivation = WaterManagementTypeBeforeCultivation.objects.get_or_create(name=sanitize(row["water_regime_type"]))[0]
+    value = parse_csv_number(row["value"], nan_value=0)
+
+    print(continent, row["water_regime_type"], value)
+
+    RiceSFP.objects.get_or_create(
+        water_management_type_before_cultivation=water_management_type_before_cultivation,
+        value=value,
+    )
+
+df = pd.read_csv(
+    os.path.join(
+        os.path.dirname(__file__), "ipcc_data", "RiceSFW.csv"
+    ),
+    header=0,
+    sep=";",
+)
+
+df_headers = df.columns.values.tolist()
+df_dict = df.to_dict("records")
+
+for i, row in enumerate(df_dict):
+    water_management_type_after_cultivation = WaterManagementTypeAfterCultivation.objects.get_or_create(name=sanitize(row["water_regime_type"]))[0]
+    value = parse_csv_number(row["value"], nan_value=0)
+
+    print(continent, row["water_regime_type"], value)
+
+    RiceSFW.objects.get_or_create(
+        water_management_type_after_cultivation=water_management_type_after_cultivation,
+        value=value,
+    )
+
+df = pd.read_csv(
+    os.path.join(
+        os.path.dirname(__file__), "ipcc_data", "RiceYield.csv"
+    ),
+    header=0,
+    sep=";",
+)
+
+df_headers = df.columns.values.tolist()
+df_dict = df.to_dict("records")
+
+for i, row in enumerate(df_dict):
+    continent = Continent.objects.get_or_create(name=sanitize(row["continent"]))[0]
+    value = parse_csv_number(row["value"], nan_value=0)
+
+    print(continent, value)
+
+    RiceYield.objects.get_or_create(
+        continent=continent,
+        value=value,
+    )

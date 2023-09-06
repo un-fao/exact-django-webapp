@@ -232,14 +232,14 @@ class WaterManagementTypeBeforeCultivation(Model):
     name = CharField(max_length=100)
 
     def __str__(self):
-        return self.name
+        return f"({self.pk}) {self.name}"
 
 
 class WaterManagementTypeAfterCultivation(Model):
     name = CharField(max_length=100)
 
     def __str__(self):
-        return self.name
+        return f"({self.pk}) {self.name}"
 
 
 class GrasslandManagementType(Model):
@@ -990,15 +990,65 @@ class PerennialCropping(Assessment):
 class FloodedRice(Assessment):
     user_notes = TextField(null=True, blank=True)
 
-    cultivation_period = IntegerField(default=RICE_CULTIVATION_DAYS)
-    water_management_type_before_cultivation = ForeignKey(
-        WaterManagementTypeBeforeCultivation, on_delete=CASCADE
-    )
-    water_management_type_after_cultivation = ForeignKey(
-        WaterManagementTypeAfterCultivation, on_delete=CASCADE
-    )
-    organic_amendment_type = ForeignKey(OrganicAmendmentType, on_delete=CASCADE)
-    crop_yield = FloatField()
+    ha_start = FloatField()
+    ha_w = FloatField()
+    ha_wo = FloatField()
+
+    cultivation_period_start = IntegerField(default=RICE_CULTIVATION_DAYS)
+    cultivation_period_w = IntegerField(default=RICE_CULTIVATION_DAYS)
+    cultivation_period_wo = IntegerField(default=RICE_CULTIVATION_DAYS)
+
+    water_management_type_before_cultivation_start = ForeignKey(WaterManagementTypeBeforeCultivation, on_delete=CASCADE, related_name="%(class)s_water_management_type_before_cultivation_start")
+    water_management_type_before_cultivation_w = ForeignKey(WaterManagementTypeBeforeCultivation, on_delete=CASCADE, related_name="%(class)s_water_management_type_before_cultivation_w")
+    water_management_type_before_cultivation_wo = ForeignKey(WaterManagementTypeBeforeCultivation, on_delete=CASCADE, related_name="%(class)s_water_management_type_before_cultivation_wo")
+
+    water_management_type_after_cultivation_start = ForeignKey(WaterManagementTypeAfterCultivation, on_delete=CASCADE, related_name="%(class)s_water_management_type_after_cultivation_start")
+    water_management_type_after_cultivation_w = ForeignKey(WaterManagementTypeAfterCultivation, on_delete=CASCADE, related_name="%(class)s_water_management_type_after_cultivation_w")
+    water_management_type_after_cultivation_wo = ForeignKey(WaterManagementTypeAfterCultivation, on_delete=CASCADE, related_name="%(class)s_water_management_type_after_cultivation_wo")
+
+    organic_amendment_type_start = ForeignKey(OrganicAmendmentType, on_delete=CASCADE, related_name="%(class)s_organic_amendment_type_start")
+    organic_amendment_type_w = ForeignKey(OrganicAmendmentType, on_delete=CASCADE, related_name="%(class)s_organic_amendment_type_w")
+    organic_amendment_type_wo = ForeignKey(OrganicAmendmentType, on_delete=CASCADE, related_name="%(class)s_organic_amendment_type_wo")
+
+    crop_yield_start = FloatField()
+    crop_yield_w = FloatField()
+    crop_yield_wo = FloatField()
+
+    soc_t2_start = FloatField(null=True, blank=True)
+    soc_t2_w = FloatField(null=True, blank=True)
+    soc_t2_wo = FloatField(null=True, blank=True)
+
+    land_use_factor_t2_start = FloatField(null=True, blank=True)
+    land_use_factor_t2_w = FloatField(null=True, blank=True)
+    land_use_factor_t2_wo = FloatField(null=True, blank=True)
+
+    efc_t2_start = FloatField(null=True, blank=True)
+    efc_t2_w = FloatField(null=True, blank=True)
+    efc_t2_wo = FloatField(null=True, blank=True)
+
+    sfw_t2_start = FloatField(null=True, blank=True)
+    sfw_t2_w = FloatField(null=True, blank=True)
+    sfw_t2_wo = FloatField(null=True, blank=True)
+
+    sfp_t2_start = FloatField(null=True, blank=True)
+    sfp_t2_w = FloatField(null=True, blank=True)
+    sfp_t2_wo = FloatField(null=True, blank=True)
+
+    sfp_t2_start = FloatField(null=True, blank=True)
+    sfp_t2_w = FloatField(null=True, blank=True)
+    sfp_t2_wo = FloatField(null=True, blank=True)
+
+    sfo_t2_start = FloatField(null=True, blank=True)
+    sfo_t2_w = FloatField(null=True, blank=True)
+    sfo_t2_wo = FloatField(null=True, blank=True)
+
+    efi_t2_start = FloatField(null=True, blank=True)
+    efi_t2_w = FloatField(null=True, blank=True)
+    efi_t2_wo = FloatField(null=True, blank=True)
+
+    rice_straw_t2_start = FloatField(null=True, blank=True)
+    rice_straw_t2_w = FloatField(null=True, blank=True)
+    rice_straw_t2_wo = FloatField(null=True, blank=True)
 
 
 ##### Grassland and Livestock #####

@@ -942,3 +942,39 @@ class IrrigationPressureRequirement(Model):
 
     def __str__(self):
         return f"({self.pk}) {self.irrigation_system_type.name} {self.avg_pressure}"
+    
+class RiceDefaultEmissionFactor(Model):
+    continent = ForeignKey("api.Continent", on_delete=CASCADE)
+    cultivation_period = IntegerField()
+    value = FloatField()
+
+    def __str__(self):
+        return f"({self.pk}) {self.continent.name} {self.value}"
+    
+class RiceSFO(Model):
+    organic_amendment_type = ForeignKey("api.OrganicAmendmentType", on_delete=CASCADE)
+    value = FloatField()
+
+    def __str__(self):
+        return f"({self.pk}) {self.organic_amendment_type.name} {self.value}"
+    
+class RiceSFP(Model):
+    water_management_type_before_cultivation = ForeignKey("api.WaterManagementTypeBeforeCultivation", on_delete=CASCADE)
+    value = FloatField()
+
+    def __str__(self):
+        return f"({self.pk}) {self.water_management_type_before_cultivation.name} {self.value}"
+    
+class RiceSFW(Model):
+    water_management_type_after_cultivation = ForeignKey("api.WaterManagementTypeAfterCultivation", on_delete=CASCADE)
+    value = FloatField()
+
+    def __str__(self):
+        return f"({self.pk}) {self.water_management_type_after_cultivation.name} {self.value}"
+    
+class RiceYield(Model):
+    continent = ForeignKey("api.Continent", on_delete=CASCADE)
+    value = FloatField()
+
+    def __str__(self):
+        return f"({self.pk}) {self.continent.name} {self.value}"

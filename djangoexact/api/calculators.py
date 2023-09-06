@@ -23,7 +23,8 @@ from .models import (
     Grassland,
     GrasslandParameter,
     SmallFishery,
-    LargeFishery
+    LargeFishery,
+    FloodedRice,
 )
 from math_model import (
     defo,
@@ -50,6 +51,7 @@ from math_model.no_time_dependency_final.fisheries_and_aquaculture import (
     Fishery as MathFishery,
     CoastalAquaculture as MathAquaculture,
 )
+from math_model.no_time_dependency_final.flooded_rice import FloodedRice as MathFloodedRice
 from math_model.no_time_dependency_final.inputs import (
     Inputs as MathInputs,
     FuelConsumption,
@@ -89,15 +91,12 @@ class CalculatorFactory:
         try:
             calculator_name = input.__class__.__name__ + "Calculator"
             # Finds and instantiates the calculator class for the given module
-            calculator: BaseCalculator = getattr(
-                sys.modules[__name__], calculator_name
-            )(input)
+            calculator: BaseCalculator = getattr(sys.modules[__name__], calculator_name)(input)
             return calculator.calculate()
         except AttributeError as e:
             traceback.print_exc()
             raise Exception(f"Module '{input.__class__.__name__}' not (yet) supported.")
         except Exception as ex:
-            # Print traceback
             traceback.print_exc()
             raise ex
 
@@ -780,17 +779,6 @@ class AnnualCroppingCalculator(BaseCalculator):
         ha_data_w = [0, input.ha_w]
         ha_data_wo = [0, input.ha_wo]
 
-        # NOTE: Is this still needed?
-        # if is_parent:
-        #     if relative.__class__.__name__ == Deforestation.__name__:
-        #         ha_data_start = [0, relative.ha_w]
-        #         ha_data_w = [0, relative.ha_w]
-        #         ha_data_wo = [0, relative.ha_w]
-        #     elif relative.__class__.__name__ == Afforestation.__name__:
-        #         ha_data_start = [relative.ha_w, relative.ha_w]
-        #         ha_data_w = [relative.ha_w, relative.ha_w]
-        #         ha_data_wo = [relative.ha_w, relative.ha_w]
-
         inputs_start = [
             *ha_data_start,
             project.implementation_duration_yrs,
@@ -1100,6 +1088,116 @@ class PerennialCroppingCalculator(BaseCalculator):
         # BUG: Results for perennial crops do not add up. Wait for Lorenzo's unlocked Excel files
         return Result(results_w+results_start, results_wo+results_start, results_w-results_wo)
 
+class FloodedRiceCalculator(BaseCalculator):
+    """
+    Calculator for flooded rice.
+    """
+
+    def calculate(self) -> Result:
+
+        input: FloodedRice = self.data
+        project: Project = input.activity.project
+        
+        flu = LandUseCarbonStockExchangeFactor.objects.get(land_use_type__name="Flooded Rice", climate=project.climate, moisture=project.moisture)
+        efc = RiceDefaultEmissionFactor.objects.get(continent=project.country.continent,)
+        yield_ref = RiceYield.objects.get(continent=project.continent)
+
+        sfw_start = RiceSFW.objects.get(water_management_type_after_cultivation=input.water_management_type_after_cultivation_start)
+        sfw_w = RiceSFW.objects.get(water_management_type_after_cultivation=input.water_management_type_after_cultivation_w)
+        sfw_wo = RiceSFW.objects.get(water_management_type_after_cultivation=input.water_management_type_after_cultivation_wo)
+
+        sfp_start = RiceSFP.objects.get(water_management_type_before_cultivation=input.water_management_type_before_cultivation_start)
+        sfp_w = RiceSFP.objects.get(water_management_type_before_cultivation=input.water_management_type_before_cultivation_w)
+        sfp_wo = RiceSFP.objects.get(water_management_type_before_cultivation=input.water_management_type_before_cultivation_wo)
+
+        sfo_start = RiceSFO.objects.get(organic_amendment_type=input.organic_amendment_type_start)
+        sfo_w = RiceSFO.objects.get(organic_amendment_type=input.organic_amendment_type_w)
+        sfo_wo = RiceSFO.objects.get(organic_amendment_type=input.organic_amendment_type_wo)
+
+        n_estimation_factor = CropNitrousEstimationDefaultFactor.objects.get(crop_type__name="Rice")
+        burning_emission_factor = BurningEmissionFactor.objects.get(category__name="Agricultural residues")
+        rice_cf = FiresCombustionFactor.objects.get(crop_type__name="Rice")
+
+        inputs_w = [
+            input.ha_start,
+            input.ha_w,
+            efc.value,
+            input.efc_t2_w,
+            sfw_w.value,
+            input.sfw_t2_w,
+            sfp_w.value,
+            input.sfp_t2_w,
+            sfo_w.value, # TODO: The formula for SFo is a bit more complex, but it doesn't seem to be taken into account in the mathematical model
+            input.sfo_t2_w,
+            yield_ref.value,
+            n_estimation_factor.slope,
+            n_estimation_factor.intercept,
+            input.rice_straw_t2_w,
+            burning_emission_factor.ch4,
+            rice_cf.value,
+            burning_emission_factor.n2o,
+            project.gw_potential.ch4,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            input.activity.change_rate.name,
+            project.gw_potential.n2o,
+            efc.cultivation_period,
+            input.cultivation_period_w,
+            project.soc_ref.value,
+            project.soc_ref_t2,
+            flu.value,
+            input.land_use_factor_t2_w,
+            1, # TODO: Fi. Discuss with Lorenzo
+            None, # Fi t2
+            1, # TODO: Fmg. Discuss with Lorenzo
+            None, # Fmg t2
+        ]
+
+        inputs_wo = [
+            input.ha_start,
+            input.ha_wo,
+            efc.value,
+            input.efc_t2_wo,
+            sfw_wo.value,
+            input.sfw_t2_wo,
+            sfp_wo.value,
+            input.sfp_t2_wo,
+            sfo_wo.value,
+            input.sfo_t2_wo,
+            yield_ref.value,
+            n_estimation_factor.slope,
+            n_estimation_factor.intercept,
+            input.rice_straw_t2_wo,
+            burning_emission_factor.ch4,
+            rice_cf.value,
+            burning_emission_factor.n2o,
+            project.gw_potential.ch4,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            input.activity.change_rate.name,
+            project.gw_potential.n2o,
+            efc.cultivation_period,
+            input.cultivation_period_wo,
+            project.soc_ref.value,
+            project.soc_ref_t2,
+            flu.value,
+            input.land_use_factor_t2_wo,
+            1, # TODO: Fi. Discuss with Lorenzo
+            None, # Fi t2
+            1, # TODO: Fmg. Discuss with Lorenzo
+            None, # Fmg t2
+        ]
+
+        math_w = MathFloodedRice(*inputs_w)
+        math_wo = MathFloodedRice(*inputs_wo)
+
+        math_w.calculate_emissions()
+        math_wo.calculate_emissions()
+
+        results_w = math_w.total_emissions
+        results_wo = math_wo.total_emissions
+
+        return Result(results_w, results_wo, results_w-results_wo)
 
 class GrasslandCalculator(BaseCalculator):
     """
@@ -1526,7 +1624,6 @@ class ForestCalculator(BaseCalculator):
 
         return Result(*forest_management.calculate_emissions(*inputs))
 
-
 class AquacultureCalculator(BaseCalculator):
     """
     Calculator for aquaculture.
@@ -1541,9 +1638,8 @@ class AquacultureCalculator(BaseCalculator):
         change_rate = module.activity.change_rate
         project: Project = module.activity.project
         
-        # NOTE: NITROUS_EF_DEFAULT = 0.00169
         NITROUS_EF_DEFAULT = AquacultureParameter.objects.get(name="nitrous_ef_default").value
-        # NOTE: FEED_EF_DEFAULT = 0
+
         # TODO: This will now be used in the inputs module for feed
         FEED_EF_DEFAULT = AquacultureParameter.objects.get(name="feed_ef_default").value
 
