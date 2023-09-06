@@ -4,7 +4,7 @@ import traceback
 
 class FloodedRice:
 
-    def __init__(self, area_start, area_end, EFc_ref, EFc_tier_2, SFw_ref, SFw_tier_2, SFp_ref, SFp_tier_2, cfoa, SFo_tier_2, rice_straw_tier_2, yield_ref, yield_tier_2, rice_slope, rice_intercept, straw_tonnes_tier_2, methane_ef, rice_cf, nitrous_ef, nitrous_constant,
+    def __init__(self, area_start, area_end, EFc_ref, EFc_tier_2, SFw_ref, SFw_tier_2, SFp_ref, SFp_tier_2, cfoa, SFo_tier_2, adjusted_daily_ef_methane_tier_2, rice_straw_tier_2, yield_ref, yield_tier_2, rice_slope, rice_intercept, straw_tonnes_tier_2, methane_ef, rice_cf, nitrous_ef, nitrous_constant,
                         time_impl, time_cap, rate, methane_constant, cultivation_period_ref, cultivation_period_tier_2,  socref, soc_tier_2, f_lu_ref, f_lu_tier_2, f_i_ref, f_i_tier_2, f_mg_ref, f_mg_tier_2,
                         ):
         
@@ -18,6 +18,7 @@ class FloodedRice:
         self.SFp_tier_2 = SFp_tier_2
         self.cfoa = cfoa
         self.SFo_tier_2 = SFo_tier_2
+        self.adjusted_daily_ef_methane_tier_2 = adjusted_daily_ef_methane_tier_2
         self.rice_straw_tier_2 = rice_straw_tier_2
         self.yield_ref = yield_ref
         self.yield_tier_2 = yield_tier_2
@@ -78,7 +79,7 @@ class FloodedRice:
                 if self.area_start == 0 and self.area_end == 0:
                     adjusted_daily_ef_methane_ref = 0
                 else:
-                    adjusted_daily_ef_methane_ref = EFc * SFw * SFp * SFo
+                    adjusted_daily_ef_methane_ref = EFc * SFw * SFp * SFo if not self.adjusted_daily_ef_methane_tier_2 else self.adjusted_daily_ef_methane_tier_2
 
                 cultivation_period = self.cultivation_period_ref if not self.cultivation_period_tier_2 else self.cultivation_period_tier_2
 
