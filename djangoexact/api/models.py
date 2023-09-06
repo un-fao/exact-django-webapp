@@ -1821,6 +1821,73 @@ class CoastalWaterbody(Module):
     trophic_alpha_t2 = FloatField(null=True, blank=True)
     trophic_mean_annual_t2 = FloatField(null=True, blank=True)
 
+class CoastalWetland(Module):
+    vegetation_type = ForeignKey(VegetationType, on_delete=CASCADE)
+
+    ha_start = FloatField(null=True, blank=True)
+    ha_w = FloatField(null=True, blank=True)
+    ha_wo = FloatField(null=True, blank=True)
+    ha_thread = ForeignKey(CommentThread, null=True, blank=True, on_delete=SET_NULL, related_name="%(class)s_ha_thread")
+
+    area_under_drainage_start = FloatField(null=True, blank=True)
+    area_under_drainage_w = FloatField(null=True, blank=True)
+    area_under_drainage_wo = FloatField(null=True, blank=True)
+    area_under_drainage_thread = ForeignKey(CommentThread, null=True, blank=True, on_delete=SET_NULL, related_name="%(class)s_area_under_drainage_thread")
+
+    drained_area_excavated_start = FloatField(null=True, blank=True)
+    drained_area_excavated_w = FloatField(null=True, blank=True)
+    drained_area_excavated_wo = FloatField(null=True, blank=True)
+    drained_area_excavated_thread = ForeignKey(CommentThread, null=True, blank=True, on_delete=SET_NULL, related_name="%(class)s_drained_area_excavated_thread")
+
+    area_not_drained_or_rewetted_start = FloatField(null=True, blank=True)
+    area_not_drained_or_rewetted_w = FloatField(null=True, blank=True)
+    area_not_drained_or_rewetted_wo = FloatField(null=True, blank=True)
+    area_not_drained_or_rewetted_thread = ForeignKey(CommentThread, null=True, blank=True, on_delete=SET_NULL, related_name="%(class)s_area_not_drained_or_rewetted_thread")
+
+    area_w_restored_vegetation_start = FloatField(null=True, blank=True)
+    area_w_restored_vegetation_w = FloatField(null=True, blank=True)
+    area_w_restored_vegetation_wo = FloatField(null=True, blank=True)
+    area_w_restored_vegetation_thread = ForeignKey(CommentThread, null=True, blank=True, on_delete=SET_NULL, related_name="%(class)s_area_w_restored_vegetation_thread")
+
+    soil_type_t2 = ForeignKey(SoilType, null=True, blank=True, on_delete=SET_NULL)
+
+    soc_t2_start = FloatField(null=True, blank=True)
+    soc_t2_w = FloatField(null=True, blank=True)
+    soc_t2_wo = FloatField(null=True, blank=True)
+
+    pc_c_lost_after_excavation_t2_start = FloatField(null=True, blank=True)
+    pc_c_lost_after_excavation_t2_w = FloatField(null=True, blank=True)
+    pc_c_lost_after_excavation_t2_wo = FloatField(null=True, blank=True)
+
+    agb_t2_start = FloatField(null=True, blank=True)
+    agb_t2_w = FloatField(null=True, blank=True)
+    agb_t2_wo = FloatField(null=True, blank=True)
+
+    bgb_t2_start = FloatField(null=True, blank=True)
+    bgb_t2_w = FloatField(null=True, blank=True)
+    bgb_t2_wo = FloatField(null=True, blank=True)
+
+    litter_t2_start = FloatField(null=True, blank=True)
+    litter_t2_w = FloatField(null=True, blank=True)
+    litter_t2_wo = FloatField(null=True, blank=True)
+
+    deadwood_t2_start = FloatField(null=True, blank=True)
+    deadwood_t2_w = FloatField(null=True, blank=True)
+    deadwood_t2_wo = FloatField(null=True, blank=True)
+
+    drainage_ef_t2_start = FloatField(null=True, blank=True)
+    drainage_ef_t2_w = FloatField(null=True, blank=True)
+    drainage_ef_t2_wo = FloatField(null=True, blank=True)
+
+    co2_rewetting_start = FloatField(null=True, blank=True)
+    co2_rewetting_w = FloatField(null=True, blank=True)
+    co2_rewetting_wo = FloatField(null=True, blank=True)
+
+    ch4_rewetting_start = FloatField(null=True, blank=True)
+    ch4_rewetting_w = FloatField(null=True, blank=True)
+    ch4_rewetting_wo = FloatField(null=True, blank=True)
+
+    avg_salinity_t2 = ForeignKey(SalinityType, null=True, blank=True, on_delete=SET_NULL)
 
 ##### Fisheries and Aquaculture #####
 
@@ -2203,4 +2270,7 @@ class GrasslandParameter(Parameter):
     pass
 
 class AnnualCroplandParameter(Parameter):
+    pass
+
+class CoastalWetlandParameter(Parameter):
     pass
