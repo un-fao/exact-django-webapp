@@ -4,7 +4,7 @@ import traceback
 
 class FloodedRice:
 
-    def __init__(self, area_start, area_end, EFc_ref, EFc_tier_2, SFw_ref, SFw_tier_2, SFp_ref, SFp_tier_2, cfoa, SFo_tier_2, rice_straw, rice_straw_tier_2, yield_ref, rice_slope, rice_intercept, straw_tonnes_tier_2, methane_ef, rice_cf, nitrous_ef, nitrous_constant,
+    def __init__(self, area_start, area_end, EFc_ref, EFc_tier_2, SFw_ref, SFw_tier_2, SFp_ref, SFp_tier_2, cfoa, SFo_tier_2, rice_straw, rice_straw_tier_2, yield_ref, yield_tier_2, rice_slope, rice_intercept, straw_tonnes_tier_2, methane_ef, rice_cf, nitrous_ef, nitrous_constant,
                         time_impl, time_cap, rate, methane_constant, cultivation_period_ref, cultivation_period_tier_2,  socref, soc_tier_2, f_lu_ref, f_lu_tier_2, f_i_ref, f_i_tier_2, f_mg_ref, f_mg_tier_2,
                         ):
         
@@ -21,6 +21,7 @@ class FloodedRice:
         self.rice_straw = rice_straw
         self.rice_straw_tier_2 = rice_straw_tier_2
         self.yield_ref = yield_ref
+        self.yield_tier_2 = yield_tier_2
         self.rice_slope = rice_slope
         self.rice_intercept = rice_intercept
         self.straw_tonnes_tier_2 = straw_tonnes_tier_2
@@ -71,9 +72,9 @@ class FloodedRice:
                 EFc = self.EFc_ref if not self.EFc_tier_2 else self.EFc_tier_2
                 SFw = self.SFw_ref if not self.SFw_tier_2 else self.SFw_tier_2
                 SFp = self.SFp_ref if not self.SFp_tier_2 else self.SFp_tier_2
-                cfoa = self.cfoa if not self.cfoa_tier_2 else self.cfoa_tier_2
-                rice_straw = self.rice_straw if not self.rice_straw_tier_2 else self.rice_straw_tier_2
-                SFo = 1 + rice_straw * cfoa * 0.59 if not self.SFo_tier_2 else self.SFo_tier_2
+                yield_value = self.yield_ref if not self.yield_tier_2 else self.yield_tier_2
+                straw_tonnes_ref = yield_value * self.rice_slope + self.rice_intercept if not self.straw_tonnes_tier_2 else self.straw_tonnes_tier_2
+                SFo = 1 + straw_tonnes_ref * self.cfoa * 0.59 if not self.SFo_tier_2 else self.SFo_tier_2
 
                 if self.area_start == 0 and self.area_end == 0:
                     adjusted_daily_ef_methane_ref = 0
@@ -99,7 +100,8 @@ class FloodedRice:
                     self.straw_burning_total = 0
                 
                 else:
-                    straw_tonnes_ref = self.yield_ref * self.rice_slope + self.rice_intercept if not self.straw_tonnes_tier_2 else self.straw_tonnes_tier_2
+                    yield_value = self.yield_ref if not self.yield_tier_2 else self.yield_tier_2
+                    straw_tonnes_ref = yield_value * self.rice_slope + self.rice_intercept if not self.straw_tonnes_tier_2 else self.straw_tonnes_tier_2
                     straw_methane_co2 = straw_tonnes_ref * self.rice_cf * self.methane_ef * self.methane_constant / 1000
                     straw_nitrous_co2 = straw_tonnes_ref * self.rice_cf * self.nitrous_ef * self.nitrous_constant / 1000
 
