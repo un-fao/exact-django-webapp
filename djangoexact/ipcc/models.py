@@ -1008,3 +1008,11 @@ class RiceYield(Model):
 
     def __str__(self):
         return f"({self.pk}) {self.continent.name} {self.value}"
+    
+class TrophicStateFactor(Model):
+    trophic_type = ForeignKey("api.TrophicType", on_delete=CASCADE)
+    value = FloatField()
+    chloa = FloatField()
+
+    def __str__(self):
+        return f"({self.pk}) {self.trophic_type.name} {self.value} {self.chloa}"
