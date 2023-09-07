@@ -2303,7 +2303,6 @@ for i, row in enumerate(df_dict2):
         if j == len(df_headers2) - 1:
             break
 
-"""
 
 df = pd.read_csv(
     os.path.join(
@@ -2417,4 +2416,29 @@ for i, row in enumerate(df_dict):
     RiceYield.objects.get_or_create(
         continent=continent,
         value=value,
+    )
+"""
+
+df = pd.read_csv(
+    os.path.join(
+        os.path.dirname(__file__), "ipcc_data", "TrophicStateFactor.csv"
+    ),
+    header=0,
+    sep=";",
+)
+
+df_headers = df.columns.values.tolist()
+df_dict = df.to_dict("records")
+
+for i, row in enumerate(df_dict):
+    trophic_type = TrophicType.objects.get_or_create(name=sanitize(row["trophic_type"]))[0]
+    value = parse_csv_number(row["value"], nan_value=0)
+    chloa = parse_csv_number(row["chloa"], nan_value=0)
+
+    print(trophic_type, value, chloa)
+
+    TrophicStateFactor.objects.get_or_create(
+        trophic_type=trophic_type,
+        value=value,
+        chloa=chloa,
     )
