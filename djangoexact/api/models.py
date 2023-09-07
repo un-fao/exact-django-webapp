@@ -1699,8 +1699,8 @@ class InlandWaterbody(Module):
 
 ##### Coastal Wetlands #####
 
-
 class Extraction(Module):
+    # TODO: Remove class
     vegetation_type = ForeignKey(VegetationType, on_delete=CASCADE)
     ha_start = IntegerField(null=True, blank=True)
     ha_w_excavated_percentage = FloatField(null=True, blank=True)
@@ -1756,6 +1756,7 @@ class Extraction(Module):
 
 
 class Rewetting(Module):
+    # TODO: Remove class
     vegetation_type = ForeignKey(VegetationType, on_delete=CASCADE)
     ha_w = FloatField(null=True, blank=True)
     ha_w_rate = ForeignKey(
@@ -1792,6 +1793,8 @@ class Rewetting(Module):
 
 
 class CoastalWaterbody(Module):
+    # TODO: Remove class
+
     waterbody_type = ForeignKey(WaterbodyType, on_delete=CASCADE)
     trophic_type = ForeignKey(TrophicType, on_delete=CASCADE, null=True, blank=True)
 
@@ -1910,7 +1913,6 @@ class CoastalWetland(Module):
 
 ##### Fisheries and Aquaculture #####
 
-
 class Fishery(Module):
     class Meta:
         abstract = True
@@ -1963,7 +1965,6 @@ class Fishery(Module):
 
     implementation_year_t2 = IntegerField(null=True, blank=True)
 
-
 class SmallFishery(Fishery):
     gear_type_start = ForeignKey(
         SmallFisheryGearType,
@@ -1989,7 +1990,6 @@ class SmallFishery(Fishery):
     gear_type_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_gear_type_thread", on_delete=SET_NULL)
     fishery_type = ForeignKey(FisheryType, on_delete=CASCADE, null=True, blank=True)
     fui_default = ForeignKey("ipcc.SmallFisheryFUI", on_delete=CASCADE, null=True, blank=True)
-
 
 class LargeFishery(Fishery):
     gear_type_start = ForeignKey(
@@ -2018,7 +2018,6 @@ class LargeFishery(Fishery):
     fui_default = ForeignKey(
         "ipcc.LargeFisheryFUI", on_delete=CASCADE, null=True, blank=True
     )
-
 
 class Aquaculture(Module):
     user_notes = TextField(null=True, blank=True)
@@ -2082,13 +2081,11 @@ class Input(Module):
 
     implementation_year_t2 = IntegerField(null=True, blank=True)
 
-
 class EmissionFactorSource(Model):
     name = CharField(max_length=255, unique=True)
 
     def __str__(self):
         return f"({self.id}) {self.name}"
-
 
 class Electricity(Module):
     country = ForeignKey(Country, on_delete=CASCADE, null=True, blank=True)
@@ -2105,7 +2102,6 @@ class Electricity(Module):
     ef_source = ForeignKey(
         EmissionFactorSource, on_delete=CASCADE, null=True, blank=True
     )
-
 
 class Fuel(Module):
     fuel_type = ForeignKey(FuelType, on_delete=CASCADE, null=True, blank=True)
@@ -2256,6 +2252,17 @@ class OrganicSoil(Module):
     is_peat_is_for_energy_w = BooleanField(default=False)
     is_peat_is_for_energy_wo = BooleanField(default=False)
     is_peat_is_for_energy_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_is_for_energy_thread", on_delete=SET_NULL)
+
+
+class Settlement(Module):
+    ha_start = FloatField(null=True, blank=True)
+    ha_w = FloatField(null=True, blank=True)
+    ha_wo = FloatField(null=True, blank=True)
+    ha_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_ha_thread", on_delete=SET_NULL)
+
+    is_settlement_start = BooleanField(default=False)
+    is_settlement_w = BooleanField(default=False)
+    is_settlement_wo = BooleanField(default=False)
 
 ### MODEL PARAMETERS TABLES ###
 
