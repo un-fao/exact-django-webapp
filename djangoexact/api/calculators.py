@@ -27,6 +27,7 @@ from .models import (
     FloodedRice,
     CoastalWetland,
     CoastalWetlandParameter,
+    Waterbody,
 )
 from math_model import (
     defo,
@@ -46,6 +47,7 @@ from .utilities import *
 from abc import ABC, abstractmethod
 import sys
 from math_model.no_time_dependency_final.defo import Deforestation as MathDeforestation
+from math_model.no_time_dependency_final.waterbodies import CoastalWaterbodies as MathWaterbodies
 from math_model.no_time_dependency_final.livestock import Livestock as MathLivestock
 from math_model.no_time_dependency_final.grassland_management import GrasslandManagement as MathGrassland
 from math_model.no_time_dependency_final.inputs import Roads as MathRoads
@@ -418,7 +420,7 @@ class CoastalWaterbodyCalculator(BaseCalculator):
     Calculator for coastal waterbody modules.
     """
 
-    def calculate(self) -> list[Result]:
+    def calculate(self) -> Result:
         project = self.data.activity.project
         methane_emission_factor = OtherConstructedWaterbodiesEmissionFactor.objects.get(
             climate=project.climate,
@@ -446,6 +448,93 @@ class CoastalWaterbodyCalculator(BaseCalculator):
 
         return Result(*coastal_wetlands.coastal_waterbodies_w_wo(*inputs))
 
+class WaterbodyCalculator(BaseCalculator):
+    """
+
+    """
+
+    def calculate(self) -> Result:
+        """
+        Calculate emissions for a single Waterbody module.
+        """
+        module: Waterbody = self.data
+        project = module.activity.project
+        methane_emission_factor = OtherConstructedWaterbodiesEmissionFactor.objects.get(
+            climate=project.climate,
+            moisture=project.moisture,
+            waterbody_type=module.waterbody_type,
+        )
+
+        trophic_state_start = TrophicStateFactor.objects.get(trophic_type=module.trophic_type_start)
+        trophic_state_w = TrophicStateFactor.objects.get(trophic_type=module.trophic_type_w)
+        trophic_state_wo = TrophicStateFactor.objects.get(trophic_type=module.trophic_type_wo)
+
+
+        inputs_start = [
+            module.area,
+            0,
+            trophic_state_start.value,
+            methane_emission_factor.value,
+            module.alpha_t2_start,
+            0,
+            module.ch4_ef_t2_start,
+            0,
+            project.gw_potential.ch4,
+            project.capitalization_duration_yrs,
+            project.implementation_duration_yrs,
+            module.activity.change_rate.name,
+            module.mean_annual_t2_start,
+            0,
+        ]
+
+        inputs_w = [
+            0,
+            module.area,
+            trophic_state_w.value,
+            methane_emission_factor.value,
+            module.alpha_t2_start,
+            module.alpha_t2_w,
+            module.ch4_ef_t2_start,
+            module.ch4_ef_t2_w,
+            project.gw_potential.ch4,
+            project.capitalization_duration_yrs,
+            project.implementation_duration_yrs,
+            module.activity.change_rate.name,
+            module.mean_annual_t2_start,
+            module.mean_annual_t2_w,
+        ]
+
+        inputs_wo = [
+            0,
+            module.area,
+            trophic_state_wo.value,
+            methane_emission_factor.value,
+            module.alpha_t2_start,
+            module.alpha_t2_wo,
+            module.ch4_ef_t2_start,
+            module.ch4_ef_t2_wo,
+            project.gw_potential.ch4,
+            project.capitalization_duration_yrs,
+            project.implementation_duration_yrs,
+            module.activity.change_rate.name,
+            module.mean_annual_t2_start,
+            module.mean_annual_t2_wo,
+        ]
+
+        math_start = MathWaterbodies(*inputs_start)
+        math_w = MathWaterbodies(*inputs_w)
+        math_wo = MathWaterbodies(*inputs_wo)
+
+        math_start.calculate_emissions()
+        math_w.calculate_emissions()
+        math_wo.calculate_emissions()
+
+        results_start = math_start.total_emissions
+        results_w = math_w.total_emissions
+        results_wo = math_wo.total_emissions
+
+        return Result(results_w+results_start, results_wo+results_start, results_w - results_wo)
+        
 class RewettingCalculator(BaseCalculator):
     """
     TODO: To be integrated in inland wetlands. Wait for math model

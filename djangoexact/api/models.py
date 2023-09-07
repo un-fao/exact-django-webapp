@@ -1821,6 +1821,25 @@ class CoastalWaterbody(Module):
     trophic_alpha_t2 = FloatField(null=True, blank=True)
     trophic_mean_annual_t2 = FloatField(null=True, blank=True)
 
+class Waterbody(Module):
+    waterbody_type = ForeignKey(WaterbodyType, on_delete=CASCADE)
+    area = FloatField(null=True, blank=True)
+    trophic_type_start = ForeignKey(TrophicType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_trophic_class_start")
+    trophic_type_w = ForeignKey(TrophicType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_trophic_class_w")
+    trophic_type_wo = ForeignKey(TrophicType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_trophic_class_wo")
+
+    ch4_ef_t2_start = FloatField(null=True, blank=True)
+    ch4_ef_t2_w = FloatField(null=True, blank=True)
+    ch4_ef_t2_wo = FloatField(null=True, blank=True)
+
+    alpha_t2_start = FloatField(null=True, blank=True)
+    alpha_t2_w = FloatField(null=True, blank=True)
+    alpha_t2_wo = FloatField(null=True, blank=True)
+
+    mean_annual_t2_start = FloatField(null=True, blank=True)
+    mean_annual_t2_w = FloatField(null=True, blank=True)
+    mean_annual_t2_wo = FloatField(null=True, blank=True)
+
 class CoastalWetland(Module):
     vegetation_type = ForeignKey(VegetationType, on_delete=CASCADE)
 
