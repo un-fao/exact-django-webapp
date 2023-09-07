@@ -52,6 +52,7 @@ from math_model.no_time_dependency_final.inputs import Roads as MathRoads
 from math_model.no_time_dependency_final.coastal_wetlands import CoastalWetland as MathCoastalWetland
 from math_model.no_time_dependency_final.fisheries_and_aquaculture import (
     CoastalAquaculture as MathAquaculture,
+    Fishery as MathFishery,
 )
 from math_model.no_time_dependency_final.flooded_rice import FloodedRice as MathFloodedRice
 from math_model.no_time_dependency_final.inputs import (
@@ -63,7 +64,6 @@ from math_model.no_time_dependency_final.inputs import (
     OperationPhaseIrrigation,
 )
 import traceback
-
 
 class Result:
     """
@@ -102,7 +102,6 @@ class CalculatorFactory:
             traceback.print_exc()
             raise ex
 
-
 class BaseCalculator(ABC):
     """
     Abstract base class for all calculators.
@@ -123,9 +122,9 @@ class BaseCalculator(ABC):
         """
         pass
 
-
 class DeforestationCalculator(BaseCalculator):
     """
+    TODO: Refactor with new logic
     Calculator for deforestation modules.
     """
 
@@ -295,7 +294,6 @@ class DeforestationCalculator(BaseCalculator):
 
         return Result(results_w+results_start, results_wo+results_start, results_w - results_wo)
 
-
 class ExtractionCalculator(BaseCalculator):
     """
     TODO: Redo
@@ -414,7 +412,6 @@ class ExtractionCalculator(BaseCalculator):
 
         return [extraction_result, drainage_result]
 
-
 class CoastalWaterbodyCalculator(BaseCalculator):
     """
     TODO: Wait math model for redo
@@ -448,7 +445,6 @@ class CoastalWaterbodyCalculator(BaseCalculator):
         ]
 
         return Result(*coastal_wetlands.coastal_waterbodies_w_wo(*inputs))
-
 
 class RewettingCalculator(BaseCalculator):
     """
@@ -507,7 +503,6 @@ class RewettingCalculator(BaseCalculator):
 
         return Result(*coastal_wetlands.rewetting_w_wo(*inputs))
 
-
 class AfforestationCalculator(BaseCalculator):
     """
     Calculator for afforestation modules.
@@ -532,7 +527,7 @@ class AfforestationCalculator(BaseCalculator):
         cvt = {"continent": continent, "vegetation_type": vt}
 
         initial_biomass = ForestTotalBiomass.objects.get(**cml, continent=continent)
-        combustion_factor = AfforestationCombustionFactorValues.objects.get(
+        combustion_factor = AfforestationCombustionFactor.objects.get(
             land_use_type=lut
         )
 
@@ -593,7 +588,6 @@ class AfforestationCalculator(BaseCalculator):
 
         return Result(*affo.afforestation(*inputs))
 
-
 class OtherLandUseCalculator(BaseCalculator):
     """
     Calculator for other land use modules.
@@ -640,7 +634,7 @@ class OtherLandUseCalculator(BaseCalculator):
         moisture_factor = DefaultEmissionFactor.objects.get(
             moisture=moisture, input__name__icontains="Other N Inputs"
         )
-        combustion_factor = AfforestationCombustionFactorValues.objects.get(
+        combustion_factor = AfforestationCombustionFactor.objects.get(
             land_use_type=initial_land_use
         )
 
@@ -673,7 +667,6 @@ class OtherLandUseCalculator(BaseCalculator):
         ]
 
         return Result(*oluc.calculate_w_wo_balance(*inputs))
-
 
 class AnnualCroppingCalculator(BaseCalculator):
     """
@@ -927,7 +920,6 @@ class AnnualCroppingCalculator(BaseCalculator):
 
         return results
 
-
 class PerennialCroppingCalculator(BaseCalculator):
     """
     Calculator for perennial cropping.
@@ -1140,11 +1132,11 @@ class FloodedRiceCalculator(BaseCalculator):
             burning_emission_factor.ch4,
             rice_cf.value,
             burning_emission_factor.n2o,
-            project.gw_potential.ch4,
+            project.gw_potential.n2o,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
             input.activity.change_rate.name,
-            project.gw_potential.n2o,
+            project.gw_potential.ch4,
             efc.cultivation_period,
             input.cultivation_period_start,
             project.soc_ref.value,
@@ -1177,11 +1169,11 @@ class FloodedRiceCalculator(BaseCalculator):
             burning_emission_factor.ch4,
             rice_cf.value,
             burning_emission_factor.n2o,
-            project.gw_potential.ch4,
+            project.gw_potential.n2o,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
             input.activity.change_rate.name,
-            project.gw_potential.n2o,
+            project.gw_potential.ch4,
             efc.cultivation_period,
             input.cultivation_period_w,
             project.soc_ref.value,
@@ -1214,11 +1206,11 @@ class FloodedRiceCalculator(BaseCalculator):
             burning_emission_factor.ch4,
             rice_cf.value,
             burning_emission_factor.n2o,
-            project.gw_potential.ch4,
+            project.gw_potential.n2o,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
             input.activity.change_rate.name,
-            project.gw_potential.n2o,
+            project.gw_potential.ch4,
             efc.cultivation_period,
             input.cultivation_period_wo,
             project.soc_ref.value,
@@ -1263,21 +1255,9 @@ class GrasslandCalculator(BaseCalculator):
         agb = GrasslandAGB.objects.get(climate=project.climate, moisture=project.moisture)
         cf = GrasslandParameter.objects.get(name="default_combustion_factor").value
 
-        soc_start = GrasslandStockExchangeFactor.objects.get(
-            grassland_management_type=module.grassland_management_type_start,
-            climate=project.climate,
-        )
-
-        soc_w = GrasslandStockExchangeFactor.objects.get(
-            grassland_management_type=module.grassland_management_type_w,
-            climate=project.climate,
-        )
-
-
-        soc_wo = GrasslandStockExchangeFactor.objects.get(
-            grassland_management_type=module.grassland_management_type_wo,
-            climate=project.climate,
-        )
+        soc_start = GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_start, climate=project.climate)
+        soc_w = GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_w, climate=project.climate)
+        soc_wo = GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_wo, climate=project.climate)
 
         inputs_w = [
             0,
@@ -1343,7 +1323,6 @@ class GrasslandCalculator(BaseCalculator):
         results_wo = math_wo.total_emissions
 
         return Result(results_w, results_wo, results_w-results_wo)
-
 
 class SmallFisheryCalculator(BaseCalculator):
     """
@@ -1724,7 +1703,6 @@ class AquacultureCalculator(BaseCalculator):
 
         return Result(emissions_w, emissions_wo, emissions_w - emissions_wo)
 
-
 class InputCalculator(BaseCalculator):
     """
     Calculator for inputs.
@@ -1791,7 +1769,6 @@ class InputCalculator(BaseCalculator):
 
         return Result(*results)
 
-
 class ElectricityCalculator(BaseCalculator):
     """
     #TODO: Calculator for energy.
@@ -1843,7 +1820,6 @@ class ElectricityCalculator(BaseCalculator):
         return Result(res_w, res_wo, res_w - res_wo)
 
     # FuelType can be solid or liquid. Call different classes based on that
-
 
 class FuelCalculator(BaseCalculator):
     """
@@ -1930,7 +1906,6 @@ class FuelCalculator(BaseCalculator):
 
         return Result(0, 0, 0)
 
-
 class BuildingCalculator(BaseCalculator):
     """
     Calculator for buildings and roads.
@@ -1975,7 +1950,6 @@ class BuildingCalculator(BaseCalculator):
         results_wo = math_wo.total_emissions
 
         return Result(results_w, results_wo, results_w - results_wo)
-
 
 class LivestockCalculator(BaseCalculator):
     """
@@ -2617,8 +2591,6 @@ class LivestockCalculator(BaseCalculator):
             LEACHING_MULTI,
         ]
 
-        results_w = MathLivestock(*i_w).calculate_emissions()
-
         i_wo = [
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
@@ -2687,10 +2659,10 @@ class LivestockCalculator(BaseCalculator):
             LEACHING_MULTI,
         ]
 
+        results_w = MathLivestock(*i_w).calculate_emissions()
         results_wo = MathLivestock(*i_wo).calculate_emissions()
 
         return Result(results_w, results_wo, results_w - results_wo)
-
 
 class IrrigationSystemCalculator(BaseCalculator):
     """
@@ -2734,7 +2706,6 @@ class IrrigationSystemCalculator(BaseCalculator):
         results_wo = NewIrrigation(*inputs_wo).calculate_emissions()
 
         return Result(results_w, results_wo, results_w - results_wo)
-
 
 class IrrigationPhaseCalculator(BaseCalculator):
 
@@ -2824,6 +2795,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
 
 class CoastalWetlandCalculator(BaseCalculator):
     """
+    TODO: Redo
     Calculates the emissions of the coastal wetland
     """
 
