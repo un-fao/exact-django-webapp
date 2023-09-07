@@ -2290,7 +2290,32 @@ class SetAside(Module):
     bgb_t2_w = FloatField(null=True, blank=True)
     bgb_t2_wo = FloatField(null=True, blank=True)
 
+class DegradedLand(Module):
+    ha_start = FloatField(null=True, blank=True)
+    ha_w = FloatField(null=True, blank=True)
+    ha_wo = FloatField(null=True, blank=True)
 
+    is_degraded_land_start = BooleanField(default=False)
+    is_degraded_land_w = BooleanField(default=False)
+    is_degraded_land_wo = BooleanField(default=False)
+
+    soc_t2_start = FloatField(null=True, blank=True)
+    soc_t2_w = FloatField(null=True, blank=True)
+    soc_t2_wo = FloatField(null=True, blank=True)
+
+    flu_t2_start = FloatField(null=True, blank=True)
+    flu_t2_w = FloatField(null=True, blank=True)
+    flu_t2_wo = FloatField(null=True, blank=True)
+
+    agb_t2_start = FloatField(null=True, blank=True)
+    agb_t2_w = FloatField(null=True, blank=True)
+    agb_t2_wo = FloatField(null=True, blank=True)
+
+    bgb_t2_start = FloatField(null=True, blank=True)
+    bgb_t2_w = FloatField(null=True, blank=True)
+    bgb_t2_wo = FloatField(null=True, blank=True)
+
+    
 ### MODEL PARAMETERS TABLES ###
 
 class Parameter(Model):
