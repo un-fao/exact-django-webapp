@@ -169,6 +169,9 @@ router.register(r'irrigation-phases', views.generic_module_viewset(IrrigationPha
 router.register(r'flooded-rices', views.generic_module_viewset(FloodedRice), basename='flooded-rices')
 router.register(r"crop-types", views.generic_viewset(CropType), basename="crop-types")
 router.register(r"waterbodies", views.generic_module_viewset(Waterbody), basename="waterbodies")
+router.register(r"set-asides", views.generic_module_viewset(SetAside), basename="set-asides")
+router.register(r"degraded-lands", views.generic_module_viewset(DegradedLand), basename="degraded-lands")
+
 router.register(
     r"tillage-management-types",
     views.generic_viewset(TillageManagementType),
