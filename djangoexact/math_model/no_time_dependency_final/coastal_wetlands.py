@@ -176,7 +176,7 @@ class CoastalWetland:
                 ef_rewetting_methane = self.ef_rewetting_methane_default if not self.ef_rewetting_methane_tier_2 else self.ef_rewetting_methane_tier_2
 
                 self.emissions_yearly_rewetting_carbon = yearly_time_dependent_parameter_breakdown(0, 44/12 * self.area_end_rewetting * ef_rewetting_carbon, self.time_impl, self.time_cap, self.rate_type)
-                self.emissions_yearly_rewetting_methane = yearly_time_dependent_parameter_breakdown(0, self.methane_constant * self.area_end_rewetting * ef_rewetting_methane / 1000 )
+                self.emissions_yearly_rewetting_methane = yearly_time_dependent_parameter_breakdown(0, self.methane_constant * self.area_end_rewetting * ef_rewetting_methane / 1000, self.time_impl, self.time_cap, self.rate_type )
 
                 self.emissions_total_rewetting = sum(self.emissions_yearly_rewetting_carbon) + sum(self.emissions_yearly_rewetting_methane)
                 
