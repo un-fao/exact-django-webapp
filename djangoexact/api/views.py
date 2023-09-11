@@ -328,7 +328,7 @@ def generic_module_viewset(model: Model):
             Creates a new module for a given activity.
             """
 
-            module_serializer = self.serializer_class(data=request.data)
+            module_serializer = self.serializer_class(data=request.data, many=request.data.__class__ == list)
             if module_serializer.is_valid():
                 activity_id = module_serializer.validated_data["activity"].pk
 
