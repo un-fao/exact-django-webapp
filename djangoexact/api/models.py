@@ -2179,20 +2179,53 @@ class BuildingType(Model):
 
     def __str__(self):
         return f"({self.id}) {self.name}"
-
-
-class Building(Module):
-    building_type_start = ForeignKey(BuildingType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_building_type_start")
-    building_type_w = ForeignKey(BuildingType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_building_type_w")
-    building_type_wo = ForeignKey(BuildingType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_building_type_wo")
     
-    surface_start = FloatField(null=True, blank=True)
-    surface_w = FloatField(null=True, blank=True)
-    surface_wo = FloatField(null=True, blank=True)
+class RoadType(Model):
+    name = CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return f"({self.id}) {self.name}"
+
+class SettlementInfrastructure(Module):
+    class Meta:
+        abstract = True
+
+    settlement = ForeignKey("api.Settlement", on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_settlement")
 
     ef_t2_start = FloatField(null=True, blank=True)
     ef_t2_w = FloatField(null=True, blank=True)
     ef_t2_wo = FloatField(null=True, blank=True)
+
+class Building(SettlementInfrastructure):
+    building_type_start = ForeignKey(BuildingType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_building_type_start")
+    building_type_w = ForeignKey(BuildingType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_building_type_w")
+    building_type_wo = ForeignKey(BuildingType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_building_type_wo")
+    
+    area_m2_start = FloatField(null=True, blank=True)
+    area_m2_w = FloatField(null=True, blank=True)
+    area_m2_wo = FloatField(null=True, blank=True)
+    area_m2_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_surface_thread", on_delete=SET_NULL)
+
+class Road(SettlementInfrastructure):
+    road_type_start = ForeignKey(RoadType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_road_type_start")
+    road_type_w = ForeignKey(RoadType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_road_type_w")
+    road_type_wo = ForeignKey(RoadType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_road_type_wo")
+
+    length_km_start = FloatField(null=True, blank=True)
+    length_km_w = FloatField(null=True, blank=True)
+    length_km_wo = FloatField(null=True, blank=True)
+    length_km_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_length_km_thread", on_delete=SET_NULL)
+
+    width_m_start = FloatField(null=True, blank=True)
+    width_m_w = FloatField(null=True, blank=True)
+    width_m_wo = FloatField(null=True, blank=True)
+    width_m_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_width_m_thread", on_delete=SET_NULL)
+
+class OtherInfrastructure(SettlementInfrastructure):
+    area_m2_start = FloatField(null=True, blank=True)
+    area_m2_w = FloatField(null=True, blank=True)
+    area_m2_wo = FloatField(null=True, blank=True)
+    area_m2_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_area_m2_thread", on_delete=SET_NULL)
 
 class OrganicSoil(Module):
 
