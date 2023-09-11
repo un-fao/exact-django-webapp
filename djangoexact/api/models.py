@@ -1901,13 +1901,13 @@ class CoastalWetland(Module):
     drainage_ef_t2_w = FloatField(null=True, blank=True)
     drainage_ef_t2_wo = FloatField(null=True, blank=True)
 
-    co2_rewetting_start = FloatField(null=True, blank=True)
-    co2_rewetting_w = FloatField(null=True, blank=True)
-    co2_rewetting_wo = FloatField(null=True, blank=True)
+    co2_rewetting_t2_start = FloatField(null=True, blank=True)
+    co2_rewetting_t2_w = FloatField(null=True, blank=True)
+    co2_rewetting_t2_wo = FloatField(null=True, blank=True)
 
-    ch4_rewetting_start = FloatField(null=True, blank=True)
-    ch4_rewetting_w = FloatField(null=True, blank=True)
-    ch4_rewetting_wo = FloatField(null=True, blank=True)
+    ch4_rewetting_t2_start = FloatField(null=True, blank=True)
+    ch4_rewetting_t2_w = FloatField(null=True, blank=True)
+    ch4_rewetting_t2_wo = FloatField(null=True, blank=True)
 
     avg_salinity_t2 = ForeignKey(SalinityType, null=True, blank=True, on_delete=SET_NULL)
 
