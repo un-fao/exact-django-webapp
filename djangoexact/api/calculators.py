@@ -1720,7 +1720,7 @@ class BuildingCalculator(BaseCalculator):
         inputs_w = [
             ef_w.value,
             input.ef_t2_w,
-            input.surface_w,
+            input.area_m2_w,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
             input.activity.change_rate.name,
@@ -1729,7 +1729,7 @@ class BuildingCalculator(BaseCalculator):
         inputs_wo = [
             ef_wo.value,
             input.ef_t2_wo,
-            input.surface_wo,
+            input.area_m2_wo,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
             input.activity.change_rate.name,
