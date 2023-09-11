@@ -3,7 +3,7 @@ from .general_functions import yearly_constant_emissions_breakdown, yearly_time_
 
 class CoastalWetland:
 
-    def __init__(self, maximum_area_for_water_management, area_start_drainage, area_drained_start, area_drained_end, rate_type, time_impl, time_cap, agb_default, bgb_default, litter_default, deadwood_default,
+    def __init__(self, maximum_area_for_water_management, area_drained_start, area_drained_end, rate_type, time_impl, time_cap, agb_default, bgb_default, litter_default, deadwood_default,
             soil_1m_default, EF_drainage_default, agb_tier_2, bgb_tier_2,litter_tier_2, deadwood_tier_2, soil_1m_tier_2, EF_drainage_tier_2, 
             area_excavated_start, area_excavated_end, percentage_c_lost_excavation_default, percentage_c_lost_excavation_tier_2,
             ef_rewetting_carbon_default, ef_rewetting_methane_default, ef_rewetting_carbon_tier_2, ef_rewetting_methane_tier_2, soil_type, 
@@ -12,7 +12,6 @@ class CoastalWetland:
             ):
         
         self.maximum_area_for_water_management = maximum_area_for_water_management # front_end input
-        self.area_start_drainage = area_start_drainage # area at start of the period, expects float
         self.area_drained_start = area_drained_start # area drained start, expects float
         self.area_drained_end = area_drained_end  # area drained end, expects float
         self.rate_type = rate_type # rate type, expects string
@@ -52,14 +51,14 @@ class CoastalWetland:
         self.ef_rewetting_carbon_tier_2 = ef_rewetting_carbon_tier_2 
         self.ef_rewetting_methane_tier_2 = ef_rewetting_methane_tier_2
         self.soil_type = soil_type # front end input expects string
-        self.area_start_rewetting = 0 if self.area_drained_start == 0 else max(0, - self.area_drained_end + self.area_drained_start - self.area_start_drainage)
+        self.area_start_rewetting = 0 if self.area_drained_start == 0 else max(0, - self.area_drained_end + self.area_drained_start)
         self.area_end_rewetting = 0 if self.area_drained_end == 0 else max(0, - self.area_drained_end + self.area_drained_start)
         self.methane_constant = methane_constant # front end input
 
 
         # HECTARES DRAINED
         # TODO: ask Lorenzo why this is done
-        self.hectares_drained_before_20, self.hectares_drained_after_20 = yearly_time_dependent_20_year_breakdown(0, self.area_start_drainage, self.time_impl, self.time_cap, self.rate_type)
+        self.hectares_drained_before_20, self.hectares_drained_after_20 = yearly_time_dependent_20_year_breakdown(0, self.area_drained_start, self.time_impl, self.time_cap, self.rate_type)
 
         # RESULTS
         self.emissions_biomass_yearly_drainage = []
