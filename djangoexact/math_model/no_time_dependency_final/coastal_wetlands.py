@@ -58,7 +58,7 @@ class CoastalWetland:
 
         # HECTARES DRAINED
         # TODO: ask Lorenzo why this is done
-        self.hectares_drained_before_20, self.hectares_drained_after_20 = yearly_time_dependent_20_year_breakdown(0, self.area_drained_end, self.time_impl, self.time_cap, self.rate_type)
+        self.hectares_drained_before_20, self.hectares_drained_after_20 = yearly_time_dependent_20_year_breakdown(0, self.area_drained_end, self.time_impl, self.time_cap, self.rate_type, interim_values = True)
 
         # RESULTS
         self.emissions_biomass_yearly_drainage = []
