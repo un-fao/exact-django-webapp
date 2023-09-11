@@ -58,7 +58,8 @@ class CoastalWetland:
 
         # HECTARES DRAINED
         # TODO: ask Lorenzo why this is done
-        self.hectares_drained_before_20, self.hectares_drained_after_20 = yearly_time_dependent_20_year_breakdown(0, self.area_drained_end, self.time_impl, self.time_cap, self.rate_type, interim_values = True)
+        self.hectares_drained_before_20, self.hectares_drained_after_20 = yearly_time_dependent_20_year_breakdown(0, self.area_drained_end, self.time_impl, self.time_cap, self.rate_type)
+        self.hectares_drained = yearly_time_dependent_parameter_breakdown(0, self.area_drained_end, self.time_impl, self.time_cap, self.rate_type)
 
         # RESULTS
         self.emissions_biomass_yearly_drainage = []
@@ -127,7 +128,7 @@ class CoastalWetland:
                     total = calculated if abs(calculated) < abs(maximum) else maximum
 
                     self.emissions_soil_total_drainage = total
-                    self.emissions_soil_yearly_drainage = breakdown_according_to_values(total, self.hectares_drained_before_20)
+                    self.emissions_soil_yearly_drainage = breakdown_according_to_values(total, self.hectares_drained)
 
                 except Exception as e:
                     traceback.print_exc()
