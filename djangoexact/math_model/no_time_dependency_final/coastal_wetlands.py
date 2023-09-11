@@ -122,7 +122,6 @@ class CoastalWetland:
                     maximum_soil_emissions = soil_1m * 44/12
 
                     # TODO: ask lorenzo: HERE THERE IS A 0 IN AREA_DRAINED_START ERROR?
-                    print(sum(self.hectares_drained_before_20))
                     calculated = EF_drainage * 44/12 * sum(self.hectares_drained_before_20)
                     maximum = max(0, self.area_drained_end) * maximum_soil_emissions
 
