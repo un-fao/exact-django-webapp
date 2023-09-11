@@ -376,7 +376,12 @@ class DefaultSoilCarbonStock1Meter(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     vegetation_type = ForeignKey("api.VegetationType", on_delete=CASCADE)
+    soil_type = ForeignKey("api.SoilType", on_delete=CASCADE)
+    unit = CharField(max_length=10)
     value = FloatField(default=0)
+
+    def __str__(self):
+        return f"{self.value} for {self.climate.name} {self.moisture.name} {self.vegetation_type.name} {self.soil_type.name}"
 
 
 class RewettingCarbonFactor(Model):
@@ -398,6 +403,9 @@ class RewettingMethaneFactor(Model):
     vegetation_type = ForeignKey("api.VegetationType", on_delete=CASCADE)
     value = FloatField(default=0)
     salinity = ForeignKey("api.SalinityType", on_delete=CASCADE)
+    
+    def __str__(self):
+        return f"{self.value} for {self.climate.name} {self.moisture.name} {self.vegetation_type.name} {self.salinity.value}"
 
 
 class OtherConstructedWaterbodiesEmissionFactor(Model):
