@@ -67,7 +67,7 @@ class VegetationType(Model):
     name = CharField(max_length=100)
 
     def __str__(self):
-        return self.name
+        return f"({self.pk}) {self.name}"
 
 
 class ActivityType(Model):

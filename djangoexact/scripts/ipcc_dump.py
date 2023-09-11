@@ -2417,7 +2417,6 @@ for i, row in enumerate(df_dict):
         continent=continent,
         value=value,
     )
-"""
 
 df = pd.read_csv(
     os.path.join(
@@ -2442,3 +2441,44 @@ for i, row in enumerate(df_dict):
         value=value,
         chloa=chloa,
     )
+"""
+
+df2 = pd.read_csv(
+    os.path.join(
+        os.path.dirname(__file__), "ipcc_data", "DefaultSoilCarbonStock1Meter.csv"
+    ),
+    header=0,
+    sep=";",
+)
+
+df_headers2 = df2.columns.values.tolist()
+df_dict2 = df2.to_dict("records")
+
+for i, row in enumerate(df_dict2):
+    climate = Climate.objects.get_or_create(name=sanitize(row["climate"]))[0]
+    moisture = Moisture.objects.get_or_create(name=sanitize(row["moisture"]))[0]
+    soil_type = SoilType.objects.get_or_create(name=sanitize(row["soil_type"]))[0]
+    unit = sanitize(row["unit"])
+
+    for j, header in enumerate(df_headers2, start=4):
+        vegetation_type = VegetationType.objects.get_or_create(name=sanitize(df_headers2[j]))[0]
+
+        print(
+            climate,
+            moisture,
+            soil_type,
+            vegetation_type,
+            row[df_headers2[j]],
+        )
+
+        DefaultSoilCarbonStock1Meter.objects.get_or_create(
+            climate=climate,
+            moisture=moisture,
+            soil_type=soil_type,
+            vegetation_type=vegetation_type,
+            unit=unit,
+            value=row[df_headers2[j]],
+        )
+
+        if j == len(df_headers2) - 1:
+            break

@@ -2607,21 +2607,23 @@ class CoastalWetlandCalculator(BaseCalculator):
             "moisture": project.moisture,
         }
 
-        agb = CoastalAGB.objects.get(*cm, vegetation_type=input.vegetation_type)
-        bgb = CoastalBGB.objects.get(*cm, vegetation_type=input.vegetation_type)
-        litter = CoastalLitter.objects.get(*cm, vegetation_type=input.vegetation_type)
-        dw = CoastalDeadwood.objects.get(*cm, vegetation_type=input.vegetation_type)
-        soil_1m = DefaultSoilCarbonStock1Meter.objects.get(*cm, vegetation_type=input.vegetation_type)
-        ef_drainage = DrainageEmissionFactor.objects.get(*cm, vegetation_type=input.vegetation_type)
+        soil_type_name = input.soil_type_t2.name if input.soil_type_t2 else "Mineral Soil"
+
+        agb = CoastalAGB.objects.get(**cm, vegetation_type=input.vegetation_type)
+        bgb = CoastalBGB.objects.get(**cm, vegetation_type=input.vegetation_type)
+        litter = CoastalLitter.objects.get(**cm, vegetation_type=input.vegetation_type)
+        dw = CoastalDeadwood.objects.get(**cm, vegetation_type=input.vegetation_type)
+        soil_1m = DefaultSoilCarbonStock1Meter.objects.get(**cm, vegetation_type=input.vegetation_type, soil_type__name=soil_type_name)
+        ef_drainage = DrainageEmissionFactor.objects.get(**cm, vegetation_type=input.vegetation_type)
         pc_c_lost_excavation = CoastalWetlandParameter.objects.get(name="PERCENTAGE_C_LOST_EXCAVATION")
 
-        rewetting_c = RewettingCarbonFactor.objects.get(*cm, vegetation_type=input.vegetation_type)
-        rewetting_ch4 = RewettingMethaneFactor.objects.get(*cm, vegetation_type=input.vegetation_type)
+        rewetting_c = RewettingCarbonFactor.objects.get(**cm, vegetation_type=input.vegetation_type)
+        rewetting_ch4 = RewettingMethaneFactor.objects.get(**cm, vegetation_type=input.vegetation_type)
 
         inputs_w = [
+            input.ha_start,
+            input.area_under_drainage_start,
             input.area_under_drainage_w,
-            .5, # TODO: percentage_drained_start
-            .5, # TODO: percentage_drained_end
             input.activity.change_rate.name,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
@@ -2639,23 +2641,20 @@ class CoastalWetlandCalculator(BaseCalculator):
             input.drainage_ef_t2_w,
             input.drained_area_excavated_start,
             input.drained_area_excavated_w,
-            .5, # TODO: percentage_excavated
             pc_c_lost_excavation.value,
             input.pc_c_lost_after_excavation_t2_w,
             rewetting_c.value,
             rewetting_ch4.value,
-            input.co2_rewetting_w,
-            input.ch4_rewetting_w,
-            input.soil_type_t2.name,
-            10, # TODO: area_rewetted_start
-            10, # TODO: area_rewetted_end
+            input.co2_rewetting_t2_start,
+            input.ch4_rewetting_t2_w,
+            input.avg_salinity_t2.value,
             project.gw_potential.ch4,
         ]
 
         inputs_wo = [
+            input.ha_start,
+            input.area_under_drainage_start,
             input.area_under_drainage_wo,
-            .5, # TODO: percentage_drained_start
-            .5, # TODO: percentage_drained_end
             input.activity.change_rate.name,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
@@ -2673,24 +2672,24 @@ class CoastalWetlandCalculator(BaseCalculator):
             input.drainage_ef_t2_wo,
             input.drained_area_excavated_start,
             input.drained_area_excavated_wo,
-            .5, # TODO: percentage_excavated
             pc_c_lost_excavation.value,
             input.pc_c_lost_after_excavation_t2_wo,
             rewetting_c.value,
             rewetting_ch4.value,
-            input.co2_rewetting_wo,
-            input.ch4_rewetting_wo,
-            input.soil_type_t2.name,
-            10, # TODO: area_rewetted_start
-            10, # TODO: area_rewetted_end
+            input.co2_rewetting_t2_wo,
+            input.ch4_rewetting_t2_wo,
+            input.avg_salinity_t2.value,
             project.gw_potential.ch4,
         ]
 
         math_w = MathCoastalWetland(*inputs_w)
         math_wo = MathCoastalWetland(*inputs_wo)
 
-        results_w = math_w.calculate_emissions()
-        results_wo = math_wo.calculate_emissions()
+        math_w.calculate_emissions()
+        math_wo.calculate_emissions()
+
+        results_w = math_w.total_emissions
+        results_wo = math_wo.total_emissions
 
         return Result(results_w, results_wo, results_w - results_wo)
 
