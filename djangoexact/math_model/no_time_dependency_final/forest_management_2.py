@@ -1,6 +1,6 @@
 import numpy as np
 import copy 
-from general_functions import yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, yearly_time_dependent_20_year_breakdown, breakdown_according_to_values, soil_emissions, yearly_time_dependent_increase
+from general_functions import yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, yearly_time_dependent_20_year_breakdown, breakdown_according_to_values, soil_emissions, yearly_time_dependent_increase_half_year, yearly_time_dependent_full_year, yearly_time_dependent_matrix
 import traceback
 import pprint
 
@@ -76,26 +76,17 @@ def calculate_logging_effect(agb_matrix_original, recurrence, percentage=1.0):
 
     return result, logging_matrix
 
-def multiply_matrix_by_list(matrix, lst):
-    """
-    Multiply each row of the matrix by the respective value in the list.
+def multiply_matrix_by_matrix(matrix1, matrix2):
+    if matrix1.shape != matrix2.shape:
+        raise ValueError("Both matrices must have the same dimensions!")
     
-    Args:
-    - matrix (numpy.ndarray): A 2D numpy array.
-    - lst (list): A list of scalar values.
+    # Element-wise multiplication
+    multiplied_matrix = np.multiply(matrix1, matrix2)
     
-    Returns:
-    - numpy.ndarray: A matrix where each row has been multiplied by the respective list value.
-    """
-    
-    result = np.zeros(matrix.shape)
-    for i in range(len(lst)):
-        result[i, :] = matrix[i, :] * lst[i]
-    
-    result = np.sum(result, axis=0)
+    # Sum each column
+    result = np.sum(multiplied_matrix, axis=0)
 
     return result
-
 
 def calculate_rotation_effect(agb_matrix, recurrence, percentage=1):
 
@@ -164,8 +155,7 @@ class ForestManagement:
         # Hectares breakdown
         self.hectares_total = yearly_time_dependent_parameter_breakdown(self.hectares_start, self.hectares_end, self.years_impl, self.years_cap, self.rate)
         self.hectares_before_20, self.hectares_after_20 = yearly_time_dependent_20_year_breakdown(self.hectares_start, self.hectares_end, self.years_impl, self.years_cap, self.rate)
-        self.yearly_hectare_increase = yearly_time_dependent_increase(self.hectares_start, self.hectares_end, self.years_impl, self.years_cap, self.rate)
-
+        self.hectares_matrix = yearly_time_dependent_matrix(self.hectares_start, self.hectares_end, self.years_impl, self.years_cap, self.rate)
         # RESULTS
         self.yearly_agb_emissions = []
         self.total_agb_emissions = 0
@@ -220,8 +210,10 @@ class ForestManagement:
                 if np.any(agb_changed < 0):
                     raise ValueError(f'Negative values in agb_matrix, check the parameters for logging and disturbance % over 100')
                 
-                yearly_bio_hectares = multiply_matrix_by_list(agb_matrix, self.yearly_hectare_increase)
-                yearly_agb_emissions = [x * -44/12 for x in yearly_bio_hectares]
+                
+                
+                agb_times_hectares = multiply_matrix_by_matrix(agb_matrix, self.hectares_matrix)
+                yearly_agb_emissions = [x * -44/12 for x in agb_times_hectares]
                 self.yearly_agb_emissions = yearly_agb_emissions
                 self.total_agb_emissions = sum(yearly_agb_emissions)
 
@@ -258,7 +250,7 @@ class ForestManagement:
         def calculate_litter():
             try:
                 litter_matrix = create_agb_matrix(self.years_impl, self.years_cap, self.litter_20_years/20, 0, self.litter_20_years, 0)
-                self.yearly_litter_emissions = [x * -44/12 for x in multiply_matrix_by_list(litter_matrix, self.yearly_hectare_increase)]
+                self.yearly_litter_emissions = [x * -44/12 for x in multiply_matrix_by_matrix(litter_matrix, self.hectares_matrix)]
                 self.total_litter_emissions = sum(self.yearly_litter_emissions)
             except Exception as e:
                 traceback.print_exc()
@@ -267,7 +259,7 @@ class ForestManagement:
         def calculate_deadwood():
             try:
                 deadwood_matrix = create_agb_matrix(self.years_impl, self.years_cap, self.deadwood_20_years/20, 0, self.deadwood_20_years, 0)
-                self.yearly_deadwood_emissions = [x * -44/12 for x in multiply_matrix_by_list(deadwood_matrix, self.yearly_hectare_increase)]
+                self.yearly_deadwood_emissions = [x * -44/12 for x in multiply_matrix_by_matrix(deadwood_matrix, self.hectares_matrix)]
                 self.total_deadwood_emissions = sum(self.yearly_deadwood_emissions)
             except Exception as e:
                 traceback.print_exc()
@@ -288,40 +280,33 @@ class ForestManagement:
         calculate_soc()
 
         # print results
-        # pprint.pprint('agb')
-        # pprint.pprint(self.yearly_agb_emissions)
-        # pprint.pprint('bgb')
-        # pprint.pprint(self.yearly_bgb_emissions)
-        # pprint.pprint('litter')
-        # pprint.pprint(self.yearly_litter_emissions)
-        # pprint.pprint('deadwood')
-        # pprint.pprint(self.yearly_deadwood_emissions)
-        # pprint.pprint('rotation')
-        # pprint.pprint(self.yearly_rotation_emissions)
-        # pprint.pprint('soc')
-        # pprint.pprint(self.yearly_soc_emissions)
-        # pprint.pprint('disturbance')
-        # pprint.pprint(self.yearly_disturbance_emissions)
+        pprint.pprint('agb')
+        pprint.pprint(self.yearly_agb_emissions)
+        pprint.pprint('bgb')
+        pprint.pprint(self.yearly_bgb_emissions)
+        pprint.pprint('litter')
+        pprint.pprint(self.yearly_litter_emissions)
+        pprint.pprint('deadwood')
+        pprint.pprint(self.yearly_deadwood_emissions)
+        pprint.pprint('rotation')
+        pprint.pprint(self.yearly_rotation_emissions)
+        pprint.pprint('soc')
+        pprint.pprint(self.yearly_soc_emissions)
+        pprint.pprint('disturbance')
+        pprint.pprint(self.yearly_disturbance_emissions)
 
-        print('total agb')
-        print(self.total_agb_emissions)
-
+        try:
+            # ADD ALL EXPECT FOR DISTURBANCE EMISSIONS
+            self.emissions_total_yearly = [i + j + k + l + m + n for i, j ,k, l, m, n in zip(self.yearly_agb_emissions, self.yearly_bgb_emissions, self.yearly_litter_emissions, self.yearly_deadwood_emissions, self.yearly_rotation_emissions, self.yearly_soc_emissions)]
+            # ADD DISTURBANCE EMISSIONS
+            for i in self.yearly_disturbance_emissions:
+                for j, k in enumerate(i):
+                    self.emissions_total_yearly[j] += k
         
-
-
-
-        # try:
-        #     # ADD ALL EXPECT FOR DISTURBANCE EMISSIONS
-        #     self.emissions_total_yearly = [i + j + k + l + m + n for i, j ,k, l, m, n in zip(self.yearly_agb_emissions, self.yearly_bgb_emissions, self.yearly_litter_emissions, self.yearly_deadwood_emissions, self.yearly_rotation_emissions, self.yearly_soc_emissions)]
-        #     # ADD DISTURBANCE EMISSIONS
-        #     for i in self.yearly_disturbance_emissions:
-        #         for j, k in enumerate(i):
-        #             self.emissions_total_yearly[j] += k
-        
-        #     self.total_emissions = sum(self.emissions_total_yearly)
-        # except Exception as e:
-        #     traceback.print_exc()
-        #     return
+            self.total_emissions = sum(self.emissions_total_yearly)
+        except Exception as e:
+            traceback.print_exc()
+            return
         
 years_cap = 0
 years_impl = 5
@@ -347,34 +332,10 @@ f_lu_ref = 1
 f_i_ref = 1
 f_mg_ref = 1
 
-# ForestManagements = ForestManagement(years_cap, years_impl, rate, hectares_start, hectares_end, rotation_recurrence, bgb_yearly_growth_under_20, agb_start,  agb_yearly_growth_under_20, agb_yearly_growth_over_20, max_agb_value,
-                                     #disturbance_or_logging_recurrence, disturbance_or_logging_percentage, litter_20_years, deadwood_20_years, socref, soc_tier_2, f_lu_tier_2, f_i_tier_2, f_mg_tier_2, f_lu_ref, f_i_ref, f_mg_ref)
-# ForestManagements.calculate_emissions()
+ForestManagements = ForestManagement(years_cap, years_impl, rate, hectares_start, hectares_end, rotation_recurrence, bgb_yearly_growth_under_20, agb_start,  agb_yearly_growth_under_20, agb_yearly_growth_over_20, max_agb_value,
+                                     disturbance_or_logging_recurrence, disturbance_or_logging_percentage, litter_20_years, deadwood_20_years, socref, soc_tier_2, f_lu_tier_2, f_i_tier_2, f_mg_tier_2, f_lu_ref, f_i_ref, f_mg_ref)
+ForestManagements.calculate_emissions()
 
-# print(ForestManagement.emissions_total_yearly)
-
-# print(ForestManagement.total_emissions)
-
-agb_rate_default = 2
-max_agb = 100
-hectares_start = 0
-hectares_end = 500
-years_impl = 5
-years_cap = 0
-rate = 'D'
-
-agb_rate =  agb_rate_default
-max_years_growth = max_agb/agb_rate
-
-calculated = agb_rate * sum(yearly_time_dependent_parameter_breakdown(hectares_start, hectares_end, years_impl, years_cap, rate))
-
-tabular = (max_agb) * hectares_end
-
-total = - min(calculated, tabular) if (max_agb != 0 and hectares_end != 0) else - calculated
-
-print(calculated)
-print(tabular)
-print(total)
 
 
 
