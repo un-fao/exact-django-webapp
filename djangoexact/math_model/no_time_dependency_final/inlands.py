@@ -264,6 +264,130 @@ class AnnexedModule:
             traceback.print_exc()
             return
 
-            
+class PeatExtraction:
 
+    def __init__(self, hectares_start, hectares_end, percentage_ditches_start, percentage_ditches_end, rate_coefficient_end, 
+                 ef_co2_onsite_ref, ef_co2_onsite_tier_2, ef_ch4_onsite_ref, ef_ch4_onsite_tier_2, ef_n2o_onsite_ref,
+                 ef_n2o_onsite_tier_2, ef_doc_offsite_ref, ef_doc_offsite_tier_2, ef_ch4_offsite_ref, ef_ch4_offsite_tier_2,
+                 methane_constant, nitrous_constant, time_impl, time_cap, rate_coefficient_start,
+                 mass_tonnes_ref, mass_tonnes_tier_2, conversion_factor_volume, c_fraction_ref, extraction_height_start, extraction_height_end):
+        
+        self.hectares_start = hectares_start
+        self.hectares_end = hectares_end
+        self.percentage_ditches_start = percentage_ditches_start
+        self.percentage_ditches_end = percentage_ditches_end
+        self.rate_coefficient_end = rate_coefficient_end
+        self.ef_co2_onsite_ref = ef_co2_onsite_ref
+        self.ef_co2_onsite_tier_2 = ef_co2_onsite_tier_2
+        self.ef_ch4_onsite_ref = ef_ch4_onsite_ref
+        self.ef_ch4_onsite_tier_2 = ef_ch4_onsite_tier_2
+        self.ef_n2o_onsite_ref = ef_n2o_onsite_ref
+        self.ef_n2o_onsite_tier_2 = ef_n2o_onsite_tier_2
+        self.ef_doc_offsite_ref = ef_doc_offsite_ref
+        self.ef_doc_offsite_tier_2 = ef_doc_offsite_tier_2
+        self.ef_ch4_offsite_ref = ef_ch4_offsite_ref
+        self.ef_ch4_offsite_tier_2 = ef_ch4_offsite_tier_2
+        self.methane_constant = methane_constant
+        self.nitrous_constant = nitrous_constant
+        self.time_impl = time_impl
+        self.time_cap = time_cap
+        self.rate_coefficient_start = rate_coefficient_start
+        self.mass_tonnes_ref = mass_tonnes_ref
+        self.mass_tonnes_tier_2 = mass_tonnes_tier_2
+        self.conversion_factor_volume = conversion_factor_volume
+        self.c_fraction_ref = c_fraction_ref
+        self.extraction_height_start = extraction_height_start
+        self.extraction_height_end = extraction_height_end
+
+
+        # RESULTS
+        self.drainage_co2_doc_yearly = []
+        self.drainage_co2_doc_total = 0
+
+        self.drainage_ch4_yearly = []
+        self.drainage_ch4_total = 0
+
+        self.drainage_n2o_yearly = []
+        self.drainage_n2o_total = 0
+
+        self.drainage_total_yearly = []
+        self.drainage_total = 0
+
+        self.offsite_emissions_yearly = []
+        self.offsite_emissions_total = 0
+
+        self.emissions_total_yearly = []
+        self.total_emissions = 0
+
+
+
+    def calculate_emissions(self):
+
+        def drainage_emissions():
+
+            def yearly_emissions_calculation(ef_multiplication_parameter, hectars_start, hectars_end, ef, multiplier_start = 1, multiplier_end = 1):
+                    return hectars_start * ef * ef_multiplication_parameter * multiplier_start, hectars_end * ef * ef_multiplication_parameter * multiplier_end
+
+            try:
+                ef_co2_onsite = self.ef_co2_onsite_ref if not self.ef_co2_onsite_tier_2 else self.ef_co2_onsite_tier_2
+                ef_ch4_onsite = self.ef_ch4_onsite_ref if not self.ef_ch4_onsite_tier_2 else self.ef_ch4_onsite_tier_2
+                ef_n2o_onsite = self.ef_n2o_onsite_ref if not self.ef_n2o_onsite_tier_2 else self.ef_n2o_onsite_tier_2
+                ef_doc_offsite = self.ef_doc_offsite_ref if not self.ef_doc_offsite_tier_2 else self.ef_doc_offsite_tier_2
+                ef_ch4_offsite = self.ef_ch4_offsite_ref if not self.ef_ch4_offsite_tier_2 else self.ef_ch4_offsite_tier_2
+
+                co2_onsite_emissions_start, co2_onsite_emissions_end = yearly_emissions_calculation(44/12, self.hectares_start, self.hectares_end, ef_co2_onsite)
+                ch4_onsite_emissions_start, ch4_onsite_emissions_end = yearly_emissions_calculation(self.methane_constant/1000, self.hectares_start, self.hectares_end, ef_ch4_onsite, 1 - self.percentage_ditches_start, 1 - self.percentage_ditches_end)
+                n2o_onsite_emissions_start, n2o_onsite_emissions_end = yearly_emissions_calculation(self.nitrous_constant/1000 * 44/28, self.hectares_start, self.hectares_end, ef_n2o_onsite)
+                doc_offsite_emissions_start, doc_offsite_emissions_end = yearly_emissions_calculation(44/12, self.hectares_start, self.hectares_end, ef_doc_offsite)
+                ch4_offsite_emissions_start, ch4_offsite_emissions_end = yearly_emissions_calculation(self.methane_constant/1000, self.hectares_start, self.hectares_end, ef_ch4_offsite, self.percentage_ditches_start, self.percentage_ditches_end)
+
+                self.drainage_co2_doc_total = yearly_time_dependent_parameter_breakdown(co2_onsite_emissions_start + doc_offsite_emissions_start, co2_onsite_emissions_end + doc_offsite_emissions_end, self.time_impl, self.time_cap, self.rate_coefficient_end, interim_values = True)
+                self.drainage_ch4_yearly = yearly_time_dependent_parameter_breakdown(ch4_onsite_emissions_start + ch4_offsite_emissions_start, ch4_onsite_emissions_end + ch4_offsite_emissions_end, self.time_impl, self.time_cap, self.rate_coefficient_end, interim_values = True)
+                self.drainage_n2o_yearly = yearly_time_dependent_parameter_breakdown(n2o_onsite_emissions_start, n2o_onsite_emissions_end, self.time_impl, self.time_cap, self.rate_coefficient_end, interim_values = True)
+
+                self.drainage_co2_doc_total = sum(self.drainage_co2_doc_total)
+                self.drainage_ch4_total = sum(self.drainage_ch4_yearly)
+                self.drainage_n2o_total = sum(self.drainage_n2o_yearly)
+
+                self.drainage_total_yearly = [i + j + k for i, j, k in zip(self.drainage_co2_doc_yearly, self.drainage_ch4_yearly, self.drainage_n2o_yearly)]
+                self.drainage_total = self.drainage_co2_doc_total + self.drainage_ch4_total + self.drainage_n2o_total
+
+            except:
+                traceback.print_exc()
+                return
+            
+        def off_site_emissions():
+
+            def yearly_emissions_calculation(ef_multiplication_parameter, hectars_start, hectars_end, ef, multiplier_start = 1, multiplier_end = 1):
+                return hectars_start * ef * ef_multiplication_parameter * multiplier_start, hectars_end * ef * ef_multiplication_parameter * multiplier_end
+
+            try:
+                mass_tonnes = self.mass_tonnes_ref if not self.mass_tonnes_tier_2 else self.mass_tonnes_tier_2
+                air_dry_weight_start, air_dry_weight_end = yearly_emissions_calculation(10000/100, self.hectares_start, self.hectares_end, mass_tonnes, self.extraction_height_start, self.extraction_height_end)
+
+                em_start = air_dry_weight_start * self.conversion_factor_volume * self.c_fraction_ref * 44/12
+                em_end = air_dry_weight_end * self.conversion_factor_volume * self.c_fraction_ref * 44/12
+
+                self.offsite_emissions_yearly = yearly_time_dependent_parameter_breakdown(em_start, em_end, self.time_impl, self.time_cap, self.rate_coefficient_end, interim_values = True)
+                self.offsite_emissions_total = sum(self.offsite_emissions_yearly)
+            except:
+                traceback.print_exc()
+                return
+            
+        drainage_emissions()
+        off_site_emissions()
+
+        try:
+            self.emissions_total_yearly = [i + j for i, j in zip(self.drainage_total_yearly, self.offsite_emissions_yearly)]
+            self.total_emissions = self.drainage_total + self.offsite_emissions_total
+        except:
+            traceback.print_exc()
+            return
+
+        
+
+
+        
+
+    
         
