@@ -1,0 +1,11 @@
+climate;moisture;Wildfire undrained peat;Wildfire drained peat;Prescribed fire (e.g. Land mgnt)
+Boreal;Dry;66;336;0
+Boreal;Moist;66;336;0
+Cool Temperate;Dry;66;336;0
+Cool Temperate;Moist;66;336;0
+Warm Temperate;Dry;66;336;0
+Warm Temperate;Moist;66;336;0
+Tropical;Dry;0;353;155
+Tropical;Moist;0;353;155
+Tropical;Wet;0;353;155
+Tropical Montane;Dry;0;353;155
