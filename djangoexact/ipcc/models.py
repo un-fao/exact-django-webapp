@@ -1024,3 +1024,132 @@ class TrophicStateFactor(Model):
 
     def __str__(self):
         return f"({self.pk}) {self.trophic_type.name} {self.value} {self.chloa}"
+    
+class SiteLocationType(Model):
+    name = CharField(max_length=255)
+
+    def __str__(self):
+        return f"({self.pk}) {self.name}"
+    
+
+# TODO: Dump data from here to end
+
+class OrganicSoilDrainageEmissionFactorManager(Manager):
+    def get_or_other_luc(self, climate, moisture, module_type, peat_type, site_location_type):
+        try:
+            return self.get(
+                climate=climate,
+                moisture=moisture,
+                module_type=module_type,
+                peat_type=peat_type,
+                site_location_type=site_location_type,
+            )
+        except:
+            return self.get(
+                climate=climate,
+                moisture=moisture,
+                module_type=module_type,
+                peat_type=peat_type,
+                site_location_type__name="OtherLandUseChange",
+            )
+
+class OrganicSoilDrainageEmissionFactor(Model):
+    climate = ForeignKey("api.Climate", on_delete=CASCADE)
+    moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
+    module_type = ForeignKey("api.ModuleType", on_delete=CASCADE)
+    peat_type = ForeignKey("api.PeatType", on_delete=CASCADE)
+    site_location_type = ForeignKey("api.SiteLocationType", on_delete=CASCADE)
+
+    co2 = FloatField(default=0)
+    co2_unit = CharField(max_length=100, default="tC/ha/yr")
+
+    doc = FloatField(default=0)
+    doc_unit = CharField(max_length=100, default="tC/ha/yr")
+
+    ch4 = FloatField(default=0)
+    ch4_unit = CharField(max_length=100, default="kg CH4/ha/yr")
+
+    n2o = FloatField(default=0)
+    n2o_unit = CharField(max_length=100, default="kg N2O/ha/yr")
+
+    objects = OrganicSoilDrainageEmissionFactorManager()
+
+    def __str__(self):
+        return f"({self.pk}) {self.climate.name} {self.moisture.name} {self.land_use_type.name} {self.peat_type.name} {self.site_location_type.name}"
+    
+class PeatEctractionEmissionFactor(Model):
+    climate = ForeignKey("api.Climate", on_delete=CASCADE)
+    moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
+    peat_type = ForeignKey("api.PeatType", on_delete=CASCADE)
+    site_location_type = ForeignKey("api.SiteLocationType", on_delete=CASCADE)
+
+    co2 = FloatField(default=0)
+    co2_unit = CharField(max_length=100, default="tC/ha/yr")
+
+    doc = FloatField(default=0)
+    doc_unit = CharField(max_length=100, default="tC/ha/yr")
+
+    ch4 = FloatField(default=0)
+    ch4_unit = CharField(max_length=100, default="kg CH4/ha/yr")
+
+    n2o = FloatField(default=0)
+    n2o_unit = CharField(max_length=100, default="kg N2O/ha/yr")
+
+    def __str__(self):
+        return f"({self.pk}) {self.climate.name} {self.moisture.name} {self.peat_type.name} {self.site_location_type.name}"
+    
+class PeatExtractionConversionFactor(Model):
+    climate = ForeignKey("api.Climate", on_delete=CASCADE)
+    moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
+    peat_type = ForeignKey("api.PeatType", on_delete=CASCADE)
+    weight = FloatField(default=0)
+    weight_unit = CharField(max_length=100, default="tC/t air dry peat")
+    volume = FloatField(default=0)
+    volume_unit = CharField(max_length=100, default="tC/m3 air dry peat")
+
+    def __str__(self):
+        return f"({self.pk}) {self.climate.name} {self.moisture.name} {self.peat_type.name}"
+    
+class OrganicSoilFuelConsumption(Model):
+    climate = ForeignKey("api.Climate", on_delete=CASCADE)
+    moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
+    fire_type = ForeignKey("api.FireType", on_delete=CASCADE)
+    value = FloatField(default=0)
+    unit = CharField(max_length=100, default="t dm/ha")
+
+    def __str__(self):
+        return f"({self.pk}) {self.climate.name} {self.moisture.name} {self.fire_type.name}"
+    
+class OrganicSoilGefEmissionFactor(Model):
+    climate = ForeignKey("api.Climate", on_delete=CASCADE)
+    moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
+    co2 = FloatField(default=0)
+    co2_unit = CharField(max_length=100, default="g CO2-C/kg dry matter burned")
+    co = FloatField(default=0)
+    co_unit = CharField(max_length=100, default="g CO/kg dry matter burned")
+    ch4 = FloatField(default=0)
+    ch4_unit = CharField(max_length=100, default="g CH4/kg dry matter burned")
+
+    def __str__(self):
+        return f"({self.pk}) {self.climate.name} {self.moisture.name}"
+    
+class OrganicSoilRewettingEmissionFactor(Model):
+    climate = ForeignKey("api.Climate", on_delete=CASCADE)
+    moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
+    peat_type = ForeignKey("api.PeatType", on_delete=CASCADE)
+    module_type = ForeignKey("api.ModuleType", on_delete=CASCADE)
+
+    co2 = FloatField(default=0)
+    co2_unit = CharField(max_length=100, default="tCO2-C/ha/yr")
+
+    doc = FloatField(default=0)
+    doc_unit = CharField(max_length=100, default="tCO2-C/ha/yr")
+
+    ch4 = FloatField(default=0)
+    ch4_unit = CharField(max_length=100, default="kg CH4-C/ha/yr")
+
+    n2o = FloatField(default=0)
+    n2o_unit = CharField(max_length=100, default="tN2O-N/ha/yr")
+
+    def __str__(self):
+        return f"({self.pk}) {self.climate.name} {self.moisture.name} {self.peat_type.name} {self.module_type.name}"
