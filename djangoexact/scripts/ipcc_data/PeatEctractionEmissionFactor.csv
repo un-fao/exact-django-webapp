@@ -1,0 +1,41 @@
+site_location_type;peaty_type;climate;moisture;co2;ch4;doc;n2o
+On-Site;Nutrient Rich;Boreal;Dry;2,8;6,1;;0,3
+On-Site;Nutrient Rich;Boreal;Moist;2,8;6,1;;0,3
+On-Site;Nutrient Rich;Cool Temperate;Dry;2,8;6,1;;0,3
+On-Site;Nutrient Rich;Cool Temperate;Moist;2,8;6,1;;0,3
+On-Site;Nutrient Rich;Warm Temperate;Dry;2,8;6,1;;0,3
+On-Site;Nutrient Rich;Warm Temperate;Moist;2,8;6,1;;0,3
+On-Site;Nutrient Rich;Tropical;Dry;2;0;;3,6
+On-Site;Nutrient Rich;Tropical;Moist;2;0;;3,6
+On-Site;Nutrient Rich;Tropical;Wet;2;0;;3,6
+On-Site;Nutrient Rich;Tropical Montane;Dry;2;0;;3,6
+On-Site;Nutrient Poor;Boreal;Dry;2,8;6,1;;0,3
+On-Site;Nutrient Poor;Boreal;Moist;2,8;6,1;;0,3
+On-Site;Nutrient Poor;Cool Temperate;Dry;2,8;6,1;;0,3
+On-Site;Nutrient Poor;Cool Temperate;Moist;2,8;6,1;;0,3
+On-Site;Nutrient Poor;Warm Temperate;Dry;2,8;6,1;;0,3
+On-Site;Nutrient Poor;Warm Temperate;Moist;2,8;6,1;;0,3
+On-Site;Nutrient Poor;Tropical;Dry;2;0;;3,6
+On-Site;Nutrient Poor;Tropical;Moist;2;0;;3,6
+On-Site;Nutrient Poor;Tropical;Wet;2;0;;3,6
+On-Site;Nutrient Poor;Tropical Montane;Dry;2;0;;3,6
+Off-Site;Nutrient Rich;Boreal;Dry;;542;0,12;
+Off-Site;Nutrient Rich;Boreal;Moist;;542;0,12;
+Off-Site;Nutrient Rich;Cool Temperate;Dry;;542;0,31;
+Off-Site;Nutrient Rich;Cool Temperate;Moist;;542;0,31;
+Off-Site;Nutrient Rich;Warm Temperate;Dry;;542;0,31;
+Off-Site;Nutrient Rich;Warm Temperate;Moist;;542;0,31;
+Off-Site;Nutrient Rich;Tropical;Dry;;0;0,82;
+Off-Site;Nutrient Rich;Tropical;Moist;;0;0,82;
+Off-Site;Nutrient Rich;Tropical;Wet;;0;0,82;
+Off-Site;Nutrient Rich;Tropical Montane;Dry;;0;0,82;
+Off-Site;Nutrient Poor;Boreal;Dry;;542;0,12;
+Off-Site;Nutrient Poor;Boreal;Moist;;542;0,12;
+Off-Site;Nutrient Poor;Cool Temperate;Dry;;542;0,31;
+Off-Site;Nutrient Poor;Cool Temperate;Moist;;542;0,31;
+Off-Site;Nutrient Poor;Warm Temperate;Dry;;542;0,31;
+Off-Site;Nutrient Poor;Warm Temperate;Moist;;542;0,31;
+Off-Site;Nutrient Poor;Tropical;Dry;;0;0,82;
+Off-Site;Nutrient Poor;Tropical;Moist;;0;0,82;
+Off-Site;Nutrient Poor;Tropical;Wet;;0;0,82;
+Off-Site;Nutrient Poor;Tropical Montane;Dry;;0;0,82;

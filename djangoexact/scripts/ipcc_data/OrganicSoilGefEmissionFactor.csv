@@ -1,0 +1,11 @@
+climate;moisture;co2;co;ch4
+Boreal;Dry;362;207;9
+Boreal;Moist;362;207;9
+Cool Temperate;Dry;362;207;9
+Cool Temperate;Moist;362;207;9
+Warm Temperate;Dry;362;207;9
+Warm Temperate;Moist;362;207;9
+Tropical;Dry;464;210;21
+Tropical;Moist;464;210;21
+Tropical;Wet;464;210;21
+Tropical Montane;Dry;464;210;21

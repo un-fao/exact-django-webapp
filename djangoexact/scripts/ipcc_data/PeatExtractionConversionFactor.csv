@@ -1,0 +1,21 @@
+peat_type;climate;moisture;weight;volume
+Nutrient Poor;Boreal;Dry;0,45;0,07
+Nutrient Poor;Boreal;Moist;0,45;0,07
+Nutrient Poor;Cool Temperate;Dry;0,45;0,07
+Nutrient Poor;Cool Temperate;Moist;0,45;0,07
+Nutrient Poor;Warm Temperate;Dry;0,45;0,07
+Nutrient Poor;Warm Temperate;Moist;0,45;0,07
+Nutrient Poor;Tropical;Dry;0,34;0,26
+Nutrient Poor;Tropical;Moist;0,34;0,26
+Nutrient Poor;Tropical;Wet;0,34;0,26
+Nutrient Poor;Tropical Montane;Dry;0,34;0,26
+Nutrient Rich;Boreal;Dry;0,4;0,24
+Nutrient Rich;Boreal;Moist;0,4;0,24
+Nutrient Rich;Cool Temperate;Dry;0,4;0,24
+Nutrient Rich;Cool Temperate;Moist;0,4;0,24
+Nutrient Rich;Warm Temperate;Dry;0,4;0,24
+Nutrient Rich;Warm Temperate;Moist;0,4;0,24
+Nutrient Rich;Tropical;Dry;0,34;0,26
+Nutrient Rich;Tropical;Moist;0,34;0,26
+Nutrient Rich;Tropical;Wet;0,34;0,26
+Nutrient Rich;Tropical Montane;Dry;0,34;0,26
