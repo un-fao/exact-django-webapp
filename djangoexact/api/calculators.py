@@ -28,6 +28,8 @@ from .models import (
     CoastalWetland,
     CoastalWetlandParameter,
     Waterbody,
+    OrganicSoil,
+    ModuleType,
 )
 from math_model import (
     defo,
@@ -2992,3 +2994,64 @@ class RewettingCalculator(BaseCalculator):
         ]
 
         return Result(*coastal_wetlands.rewetting_w_wo(*inputs))
+
+class OrganicSoilCalculator(BaseCalculator):
+
+    def calculate(self) -> Result:
+        input: OrganicSoil = self.data
+        project: Project = input.activity.project
+
+        relative, relation = get_assessment_or_parent(input)
+        
+        if not relative:
+            raise ValueError("Organic Soil is missing a land use from a parent module")
+
+        relative_class = relative.__class__.__name__
+
+        cmt = {
+            "climate": project.climate,
+            "moisture": project.moisture,
+            "module_type__name": relative_class,
+        }
+        
+        ef_onsite_start = OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(
+            **cmt,
+            peat_type=input.peat_type_start,
+            site_location_type__name="On-Site",
+        )
+
+        ef_onsite_w = OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(
+            **cmt,
+            peat_type=input.peat_type_w,
+            site_location_type__name="On-Site",
+        )
+
+        ef_onsite_wo = OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(
+            **cmt,
+            peat_type=input.peat_type_wo,
+            site_location_type__name="On-Site",
+        )
+
+        ef_offsite_start = OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(
+            **cmt,
+            peat_type=input.peat_type_start,
+            site_location_type__name="Off-Site",
+        )
+
+        ef_offsite_w = OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(
+            **cmt,
+            peat_type=input.peat_type_w,
+            site_location_type__name="Off-Site",
+        )
+
+        ef_offsite_wo = OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(
+            **cmt,
+            peat_type=input.peat_type_wo,
+            site_location_type__name="Off-Site",
+        )
+
+        inputs_w = [
+            input.is_fire_on_soil_w,
+            input.soil_fire_periodicity_w,
+            input.drainage_area_w,
+        ]
