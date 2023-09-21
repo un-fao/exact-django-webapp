@@ -195,6 +195,8 @@ router.register(
     r"activity-states", views.generic_viewset(ActivityState), basename="activity-states"
 )
 
+router.register(r"settlements", views.generic_module_viewset(Settlement), basename="settlements")
+
 urlpatterns = [
     path("docs/", include_docs_urls(title="EX-ACT Docs")),
     re_path(

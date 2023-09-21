@@ -1,3 +1,4 @@
+from django.db.models import Model
 from .models import (
     Deforestation,
     Afforestation,
@@ -30,6 +31,8 @@ from .models import (
     Waterbody,
     OrganicSoil,
     ModuleType,
+    Road,
+    Settlement,
 )
 from math_model import (
     defo,
@@ -1702,7 +1705,24 @@ class FuelCalculator(BaseCalculator):
             return Result(res_w, res_wo, res_w - res_wo)
 
         return Result(0, 0, 0)
+    
+class SettlementCalculator(BaseCalculator):
+    """
+    Calculator for settlements
+    """
 
+    def calculate(self) -> Result:
+        input: Settlement = self.data
+        result = Result()
+
+        for building in input.buildings.all():
+            result.add(BuildingCalculator(building).calculate())
+
+        for road in input.roads.all():
+            result.add(RoadCalculator(road).calculate())
+
+        return result
+    
 class BuildingCalculator(BaseCalculator):
     """
     Calculator for buildings and roads.
@@ -1718,6 +1738,51 @@ class BuildingCalculator(BaseCalculator):
 
         ef_w: BuildingEmissionFactor = BuildingEmissionFactor.objects.get(building_type=input.building_type_w)
         ef_wo: BuildingEmissionFactor = BuildingEmissionFactor.objects.get(building_type=input.building_type_wo)
+
+        inputs_w = [
+            ef_w.value,
+            input.ef_t2_w,
+            input.area_m2_w,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            input.activity.change_rate.name,
+        ]
+
+        inputs_wo = [
+            ef_wo.value,
+            input.ef_t2_wo,
+            input.area_m2_wo,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            input.activity.change_rate.name,
+        ]
+
+        math_w = MathRoads(*inputs_w)
+        math_wo = MathRoads(*inputs_wo)
+
+        math_w.calculate_emissions()
+        math_wo.calculate_emissions()
+
+        results_w = math_w.total_emissions
+        results_wo = math_wo.total_emissions
+
+        return Result(results_w, results_wo, results_w - results_wo)
+    
+class RoadCalculator(BaseCalculator):
+    """
+    Calculator for buildings and roads.
+    """
+
+    def calculate(self) -> list[Result]:
+        """
+        Calculate emissions for a single Building module.
+        """
+
+        input: Road = self.data
+        project: Project = input.activity.project
+
+        ef_w: RoadEmissionFactor = RoadEmissionFactor.objects.get(road_type=input.road_type_w)
+        ef_wo: RoadEmissionFactor = RoadEmissionFactor.objects.get(road_type=input.road_type_wo)
 
         inputs_w = [
             ef_w.value,

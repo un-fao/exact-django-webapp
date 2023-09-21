@@ -769,6 +769,15 @@ class BuildingEmissionFactor(Model):
     building_type = ForeignKey("api.BuildingType", on_delete=CASCADE)
     value = FloatField(null=True, blank=True)
 
+    def __str__(self):
+        return f"({self.pk}) {self.building_type.name} {self.value}"
+
+class RoadEmissionFactor(Model):
+    road_type = ForeignKey("api.RoadType", on_delete=CASCADE)
+    value = FloatField(null=True, blank=True)
+
+    def __str__(self):
+        return f"({self.pk}) {self.road_type.name} {self.value}"
 
 class LivestockEntericEF(Model):
     """
