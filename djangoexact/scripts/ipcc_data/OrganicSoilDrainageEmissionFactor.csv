@@ -1,0 +1,361 @@
+site_location_type;peaty_type;climate;moisture;module_type;co2;ch4;doc;n2o
+On-Site;Nutrient Rich;Boreal;Dry;ForestManagement;0,31;2;0;3,2
+On-Site;Nutrient Rich;Boreal;Moist;ForestManagement;0,31;2;0;3,2
+On-Site;Nutrient Rich;Cool Temperate;Dry;ForestManagement;2,6;2,5;0;2,8
+On-Site;Nutrient Rich;Cool Temperate;Moist;ForestManagement;2,6;2,5;0;2,8
+On-Site;Nutrient Rich;Warm Temperate;Dry;ForestManagement;2,6;2,5;0;2,8
+On-Site;Nutrient Rich;Warm Temperate;Moist;ForestManagement;2,6;2,5;0;2,8
+On-Site;Nutrient Rich;Tropical;Dry;ForestManagement;5,3;4,9;0;2,4
+On-Site;Nutrient Rich;Tropical;Moist;ForestManagement;5,3;4,9;0;2,4
+On-Site;Nutrient Rich;Tropical;Wet;ForestManagement;5,3;4,9;0;2,4
+On-Site;Nutrient Rich;Tropical Montane;Dry;ForestManagement;5,3;4,9;0;2,4
+On-Site;Nutrient Rich;Boreal;Dry;Plantation;0,31;2;0;3,2
+On-Site;Nutrient Rich;Boreal;Moist;Plantation;0,31;2;0;3,2
+On-Site;Nutrient Rich;Cool Temperate;Dry;Plantation;2,6;2,5;0;2,8
+On-Site;Nutrient Rich;Cool Temperate;Moist;Plantation;2,6;2,5;0;2,8
+On-Site;Nutrient Rich;Warm Temperate;Dry;Plantation;2,6;2,5;0;2,8
+On-Site;Nutrient Rich;Warm Temperate;Moist;Plantation;2,6;2,5;0;2,8
+On-Site;Nutrient Rich;Tropical;Dry;Plantation;10,83333333;9,633333333;0;2,25
+On-Site;Nutrient Rich;Tropical;Moist;Plantation;10,83333333;9,633333333;0;2,25
+On-Site;Nutrient Rich;Tropical;Wet;Plantation;10,83333333;9,633333333;0;2,25
+On-Site;Nutrient Rich;Tropical Montane;Dry;Plantation;10,83333333;9,633333333;0;2,25
+On-Site;Nutrient Rich;Boreal;Dry;AnnualCropping;7,9;0;0;13
+On-Site;Nutrient Rich;Boreal;Moist;AnnualCropping;7,9;0;0;13
+On-Site;Nutrient Rich;Cool Temperate;Dry;AnnualCropping;7,9;0;0;13
+On-Site;Nutrient Rich;Cool Temperate;Moist;AnnualCropping;7,9;0;0;13
+On-Site;Nutrient Rich;Warm Temperate;Dry;AnnualCropping;7,9;0;0;13
+On-Site;Nutrient Rich;Warm Temperate;Moist;AnnualCropping;7,9;0;0;13
+On-Site;Nutrient Rich;Tropical;Dry;AnnualCropping;14;7;0;5
+On-Site;Nutrient Rich;Tropical;Moist;AnnualCropping;14;7;0;5
+On-Site;Nutrient Rich;Tropical;Wet;AnnualCropping;14;7;0;5
+On-Site;Nutrient Rich;Tropical Montane;Dry;AnnualCropping;14;7;0;5
+On-Site;Nutrient Rich;Boreal;Dry;PerennialCropping;7,9;0;0;13
+On-Site;Nutrient Rich;Boreal;Moist;PerennialCropping;7,9;0;0;13
+On-Site;Nutrient Rich;Cool Temperate;Dry;PerennialCropping;7,9;0;0;13
+On-Site;Nutrient Rich;Cool Temperate;Moist;PerennialCropping;7,9;0;0;13
+On-Site;Nutrient Rich;Warm Temperate;Dry;PerennialCropping;7,9;0;0;13
+On-Site;Nutrient Rich;Warm Temperate;Moist;PerennialCropping;7,9;0;0;13
+On-Site;Nutrient Rich;Tropical;Dry;PerennialCropping;14;7;0;5
+On-Site;Nutrient Rich;Tropical;Moist;PerennialCropping;14;7;0;5
+On-Site;Nutrient Rich;Tropical;Wet;PerennialCropping;14;7;0;5
+On-Site;Nutrient Rich;Tropical Montane;Dry;PerennialCropping;14;7;0;5
+On-Site;Nutrient Rich;Boreal;Dry;FloodedRice;0;0;0;0
+On-Site;Nutrient Rich;Boreal;Moist;FloodedRice;0;0;0;0
+On-Site;Nutrient Rich;Cool Temperate;Dry;FloodedRice;0;0;0;0
+On-Site;Nutrient Rich;Cool Temperate;Moist;FloodedRice;0;0;0;0
+On-Site;Nutrient Rich;Warm Temperate;Dry;FloodedRice;0;0;0;0
+On-Site;Nutrient Rich;Warm Temperate;Moist;FloodedRice;0;0;0;0
+On-Site;Nutrient Rich;Tropical;Dry;FloodedRice;9,4;143,5;0;0,4
+On-Site;Nutrient Rich;Tropical;Moist;FloodedRice;9,4;143,5;0;0,4
+On-Site;Nutrient Rich;Tropical;Wet;FloodedRice;9,4;143,5;0;0,4
+On-Site;Nutrient Rich;Tropical Montane;Dry;FloodedRice;9,4;143,5;0;0,4
+On-Site;Nutrient Rich;Boreal;Dry;Grassland;5,7;1,4;0;9,5
+On-Site;Nutrient Rich;Boreal;Moist;Grassland;5,7;1,4;0;9,5
+On-Site;Nutrient Rich;Cool Temperate;Dry;Grassland;5,3;27,5;0;4,9
+On-Site;Nutrient Rich;Cool Temperate;Moist;Grassland;5,3;27,5;0;4,9
+On-Site;Nutrient Rich;Warm Temperate;Dry;Grassland;5,3;27,5;0;4,9
+On-Site;Nutrient Rich;Warm Temperate;Moist;Grassland;5,3;27,5;0;4,9
+On-Site;Nutrient Rich;Tropical;Dry;Grassland;9,6;7;0;5
+On-Site;Nutrient Rich;Tropical;Moist;Grassland;9,6;7;0;5
+On-Site;Nutrient Rich;Tropical;Wet;Grassland;9,6;7;0;5
+On-Site;Nutrient Rich;Tropical Montane;Dry;Grassland;9,6;7;0;5
+On-Site;Nutrient Rich;Boreal;Dry;Settlement;0;0;0;0
+On-Site;Nutrient Rich;Boreal;Moist;Settlement;0;0;0;0
+On-Site;Nutrient Rich;Cool Temperate;Dry;Settlement;0;0;0;0
+On-Site;Nutrient Rich;Cool Temperate;Moist;Settlement;0;0;0;0
+On-Site;Nutrient Rich;Warm Temperate;Dry;Settlement;0;0;0;0
+On-Site;Nutrient Rich;Warm Temperate;Moist;Settlement;0;0;0;0
+On-Site;Nutrient Rich;Tropical;Dry;Settlement;0;0;0;0
+On-Site;Nutrient Rich;Tropical;Moist;Settlement;0;0;0;0
+On-Site;Nutrient Rich;Tropical;Wet;Settlement;0;0;0;0
+On-Site;Nutrient Rich;Tropical Montane;Dry;Settlement;0;0;0;0
+On-Site;Nutrient Rich;Boreal;Dry;OtherLandUse;0;0;0;0
+On-Site;Nutrient Rich;Boreal;Moist;OtherLandUse;0;0;0;0
+On-Site;Nutrient Rich;Cool Temperate;Dry;OtherLandUse;0;0;0;0
+On-Site;Nutrient Rich;Cool Temperate;Moist;OtherLandUse;0;0;0;0
+On-Site;Nutrient Rich;Warm Temperate;Dry;OtherLandUse;0;0;0;0
+On-Site;Nutrient Rich;Warm Temperate;Moist;OtherLandUse;0;0;0;0
+On-Site;Nutrient Rich;Tropical;Dry;OtherLandUse;0;0;0;0
+On-Site;Nutrient Rich;Tropical;Moist;OtherLandUse;0;0;0;0
+On-Site;Nutrient Rich;Tropical;Wet;OtherLandUse;0;0;0;0
+On-Site;Nutrient Rich;Tropical Montane;Dry;OtherLandUse;0;0;0;0
+On-Site;Nutrient Rich;Boreal;Dry;DegradedLand;0;0;0;0
+On-Site;Nutrient Rich;Boreal;Moist;DegradedLand;0;0;0;0
+On-Site;Nutrient Rich;Cool Temperate;Dry;DegradedLand;0;0;0;0
+On-Site;Nutrient Rich;Cool Temperate;Moist;DegradedLand;0;0;0;0
+On-Site;Nutrient Rich;Warm Temperate;Dry;DegradedLand;0;0;0;0
+On-Site;Nutrient Rich;Warm Temperate;Moist;DegradedLand;0;0;0;0
+On-Site;Nutrient Rich;Tropical;Dry;DegradedLand;0;0;0;0
+On-Site;Nutrient Rich;Tropical;Moist;DegradedLand;0;0;0;0
+On-Site;Nutrient Rich;Tropical;Wet;DegradedLand;0;0;0;0
+On-Site;Nutrient Rich;Tropical Montane;Dry;DegradedLand;0;0;0;0
+On-Site;Nutrient Poor;Boreal;Dry;ForestManagement;0,93;7;0;0,22
+On-Site;Nutrient Poor;Boreal;Moist;ForestManagement;0,93;7;0;0,22
+On-Site;Nutrient Poor;Cool Temperate;Dry;ForestManagement;2,6;2,5;0;2,8
+On-Site;Nutrient Poor;Cool Temperate;Moist;ForestManagement;2,6;2,5;0;2,8
+On-Site;Nutrient Poor;Warm Temperate;Dry;ForestManagement;2,6;2,5;0;2,8
+On-Site;Nutrient Poor;Warm Temperate;Moist;ForestManagement;2,6;2,5;0;2,8
+On-Site;Nutrient Poor;Tropical;Dry;ForestManagement;5,3;4,9;0;2,4
+On-Site;Nutrient Poor;Tropical;Moist;ForestManagement;5,3;4,9;0;2,4
+On-Site;Nutrient Poor;Tropical;Wet;ForestManagement;5,3;4,9;0;2,4
+On-Site;Nutrient Poor;Tropical Montane;Dry;ForestManagement;5,3;4,9;0;2,4
+On-Site;Nutrient Poor;Boreal;Dry;Plantation;0,93;7;0;0,22
+On-Site;Nutrient Poor;Boreal;Moist;Plantation;0,93;7;0;0,22
+On-Site;Nutrient Poor;Cool Temperate;Dry;Plantation;2,6;2,5;0;2,8
+On-Site;Nutrient Poor;Cool Temperate;Moist;Plantation;2,6;2,5;0;2,8
+On-Site;Nutrient Poor;Warm Temperate;Dry;Plantation;2,6;2,5;0;2,8
+On-Site;Nutrient Poor;Warm Temperate;Moist;Plantation;2,6;2,5;0;2,8
+On-Site;Nutrient Poor;Tropical;Dry;Plantation;10,83333333;9,633333333;0;2,25
+On-Site;Nutrient Poor;Tropical;Moist;Plantation;10,83333333;9,633333333;0;2,25
+On-Site;Nutrient Poor;Tropical;Wet;Plantation;10,83333333;9,633333333;0;2,25
+On-Site;Nutrient Poor;Tropical Montane;Dry;Plantation;10,83333333;9,633333333;0;2,25
+On-Site;Nutrient Poor;Boreal;Dry;AnnualCropping;7,9;0;0;13
+On-Site;Nutrient Poor;Boreal;Moist;AnnualCropping;7,9;0;0;13
+On-Site;Nutrient Poor;Cool Temperate;Dry;AnnualCropping;7,9;0;0;13
+On-Site;Nutrient Poor;Cool Temperate;Moist;AnnualCropping;7,9;0;0;13
+On-Site;Nutrient Poor;Warm Temperate;Dry;AnnualCropping;7,9;0;0;13
+On-Site;Nutrient Poor;Warm Temperate;Moist;AnnualCropping;7,9;0;0;13
+On-Site;Nutrient Poor;Tropical;Dry;AnnualCropping;14;7;0;5
+On-Site;Nutrient Poor;Tropical;Moist;AnnualCropping;14;7;0;5
+On-Site;Nutrient Poor;Tropical;Wet;AnnualCropping;14;7;0;5
+On-Site;Nutrient Poor;Tropical Montane;Dry;AnnualCropping;14;7;0;5
+On-Site;Nutrient Poor;Boreal;Dry;PerennialCropping;7,9;0;0;13
+On-Site;Nutrient Poor;Boreal;Moist;PerennialCropping;7,9;0;0;13
+On-Site;Nutrient Poor;Cool Temperate;Dry;PerennialCropping;7,9;0;0;13
+On-Site;Nutrient Poor;Cool Temperate;Moist;PerennialCropping;7,9;0;0;13
+On-Site;Nutrient Poor;Warm Temperate;Dry;PerennialCropping;7,9;0;0;13
+On-Site;Nutrient Poor;Warm Temperate;Moist;PerennialCropping;7,9;0;0;13
+On-Site;Nutrient Poor;Tropical;Dry;PerennialCropping;14;7;0;5
+On-Site;Nutrient Poor;Tropical;Moist;PerennialCropping;14;7;0;5
+On-Site;Nutrient Poor;Tropical;Wet;PerennialCropping;14;7;0;5
+On-Site;Nutrient Poor;Tropical Montane;Dry;PerennialCropping;14;7;0;5
+On-Site;Nutrient Poor;Boreal;Dry;FloodedRice;0;0;0;0
+On-Site;Nutrient Poor;Boreal;Moist;FloodedRice;0;0;0;0
+On-Site;Nutrient Poor;Cool Temperate;Dry;FloodedRice;0;0;0;0
+On-Site;Nutrient Poor;Cool Temperate;Moist;FloodedRice;0;0;0;0
+On-Site;Nutrient Poor;Warm Temperate;Dry;FloodedRice;0;0;0;0
+On-Site;Nutrient Poor;Warm Temperate;Moist;FloodedRice;0;0;0;0
+On-Site;Nutrient Poor;Tropical;Dry;FloodedRice;9,4;143,5;0;0,4
+On-Site;Nutrient Poor;Tropical;Moist;FloodedRice;9,4;143,5;0;0,4
+On-Site;Nutrient Poor;Tropical;Wet;FloodedRice;9,4;143,5;0;0,4
+On-Site;Nutrient Poor;Tropical Montane;Dry;FloodedRice;9,4;143,5;0;0,4
+On-Site;Nutrient Poor;Boreal;Dry;Grassland;5,7;1,4;0;9,5
+On-Site;Nutrient Poor;Boreal;Moist;Grassland;5,7;1,4;0;9,5
+On-Site;Nutrient Poor;Cool Temperate;Dry;Grassland;4,85;1,8;0;4,3
+On-Site;Nutrient Poor;Cool Temperate;Moist;Grassland;4,85;1,8;0;4,3
+On-Site;Nutrient Poor;Warm Temperate;Dry;Grassland;4,85;1,8;0;4,3
+On-Site;Nutrient Poor;Warm Temperate;Moist;Grassland;4,85;1,8;0;4,3
+On-Site;Nutrient Poor;Tropical;Dry;Grassland;9,6;7;0;5
+On-Site;Nutrient Poor;Tropical;Moist;Grassland;9,6;7;0;5
+On-Site;Nutrient Poor;Tropical;Wet;Grassland;9,6;7;0;5
+On-Site;Nutrient Poor;Tropical Montane;Dry;Grassland;9,6;7;0;5
+On-Site;Nutrient Poor;Boreal;Dry;Settlement;0;0;0;0
+On-Site;Nutrient Poor;Boreal;Moist;Settlement;0;0;0;0
+On-Site;Nutrient Poor;Cool Temperate;Dry;Settlement;0;0;0;0
+On-Site;Nutrient Poor;Cool Temperate;Moist;Settlement;0;0;0;0
+On-Site;Nutrient Poor;Warm Temperate;Dry;Settlement;0;0;0;0
+On-Site;Nutrient Poor;Warm Temperate;Moist;Settlement;0;0;0;0
+On-Site;Nutrient Poor;Tropical;Dry;Settlement;0;0;0;0
+On-Site;Nutrient Poor;Tropical;Moist;Settlement;0;0;0;0
+On-Site;Nutrient Poor;Tropical;Wet;Settlement;0;0;0;0
+On-Site;Nutrient Poor;Tropical Montane;Dry;Settlement;0;0;0;0
+On-Site;Nutrient Poor;Boreal;Dry;OtherLandUse;0;0;0;0
+On-Site;Nutrient Poor;Boreal;Moist;OtherLandUse;0;0;0;0
+On-Site;Nutrient Poor;Cool Temperate;Dry;OtherLandUse;0;0;0;0
+On-Site;Nutrient Poor;Cool Temperate;Moist;OtherLandUse;0;0;0;0
+On-Site;Nutrient Poor;Warm Temperate;Dry;OtherLandUse;0;0;0;0
+On-Site;Nutrient Poor;Warm Temperate;Moist;OtherLandUse;0;0;0;0
+On-Site;Nutrient Poor;Tropical;Dry;OtherLandUse;0;0;0;0
+On-Site;Nutrient Poor;Tropical;Moist;OtherLandUse;0;0;0;0
+On-Site;Nutrient Poor;Tropical;Wet;OtherLandUse;0;0;0;0
+On-Site;Nutrient Poor;Tropical Montane;Dry;OtherLandUse;0;0;0;0
+On-Site;Nutrient Poor;Boreal;Dry;DegradedLand;0;0;0;0
+On-Site;Nutrient Poor;Boreal;Moist;DegradedLand;0;0;0;0
+On-Site;Nutrient Poor;Cool Temperate;Dry;DegradedLand;0;0;0;0
+On-Site;Nutrient Poor;Cool Temperate;Moist;DegradedLand;0;0;0;0
+On-Site;Nutrient Poor;Warm Temperate;Dry;DegradedLand;0;0;0;0
+On-Site;Nutrient Poor;Warm Temperate;Moist;DegradedLand;0;0;0;0
+On-Site;Nutrient Poor;Tropical;Dry;DegradedLand;0;0;0;0
+On-Site;Nutrient Poor;Tropical;Moist;DegradedLand;0;0;0;0
+On-Site;Nutrient Poor;Tropical;Wet;DegradedLand;0;0;0;0
+On-Site;Nutrient Poor;Tropical Montane;Dry;DegradedLand;0;0;0;0
+Off-Site;Nutrient Poor;Boreal;Dry;ForestManagement;0;217;0,12;0
+Off-Site;Nutrient Poor;Boreal;Moist;ForestManagement;0;217;0,12;0
+Off-Site;Nutrient Poor;Cool Temperate;Dry;ForestManagement;0;217;0,31;0
+Off-Site;Nutrient Poor;Cool Temperate;Moist;ForestManagement;0;217;0,31;0
+Off-Site;Nutrient Poor;Warm Temperate;Dry;ForestManagement;0;217;0,31;0
+Off-Site;Nutrient Poor;Warm Temperate;Moist;ForestManagement;0;217;0,31;0
+Off-Site;Nutrient Poor;Tropical;Dry;ForestManagement;0;2259;0,82;0
+Off-Site;Nutrient Poor;Tropical;Moist;ForestManagement;0;2259;0,82;0
+Off-Site;Nutrient Poor;Tropical;Wet;ForestManagement;0;2259;0,82;0
+Off-Site;Nutrient Poor;Tropical Montane;Dry;ForestManagement;0;2259;0,82;0
+Off-Site;Nutrient Poor;Boreal;Dry;Plantation;0;217;0,12;0
+Off-Site;Nutrient Poor;Boreal;Moist;Plantation;0;217;0,12;0
+Off-Site;Nutrient Poor;Cool Temperate;Dry;Plantation;0;217;0,31;0
+Off-Site;Nutrient Poor;Cool Temperate;Moist;Plantation;0;217;0,31;0
+Off-Site;Nutrient Poor;Warm Temperate;Dry;Plantation;0;217;0,31;0
+Off-Site;Nutrient Poor;Warm Temperate;Moist;Plantation;0;217;0,31;0
+Off-Site;Nutrient Poor;Tropical;Dry;Plantation;0;2259;0,82;0
+Off-Site;Nutrient Poor;Tropical;Moist;Plantation;0;2259;0,82;0
+Off-Site;Nutrient Poor;Tropical;Wet;Plantation;0;2259;0,82;0
+Off-Site;Nutrient Poor;Tropical Montane;Dry;Plantation;0;2259;0,82;0
+Off-Site;Nutrient Poor;Boreal;Dry;AnnualCropping;0;1165;0,12;0
+Off-Site;Nutrient Poor;Boreal;Moist;AnnualCropping;0;1165;0,12;0
+Off-Site;Nutrient Poor;Cool Temperate;Dry;AnnualCropping;0;1165;0,31;0
+Off-Site;Nutrient Poor;Cool Temperate;Moist;AnnualCropping;0;1165;0,31;0
+Off-Site;Nutrient Poor;Warm Temperate;Dry;AnnualCropping;0;1165;0,31;0
+Off-Site;Nutrient Poor;Warm Temperate;Moist;AnnualCropping;0;1165;0,31;0
+Off-Site;Nutrient Poor;Tropical;Dry;AnnualCropping;0;2259;0,82;0
+Off-Site;Nutrient Poor;Tropical;Moist;AnnualCropping;0;2259;0,82;0
+Off-Site;Nutrient Poor;Tropical;Wet;AnnualCropping;0;2259;0,82;0
+Off-Site;Nutrient Poor;Tropical Montane;Dry;AnnualCropping;0;2259;0,82;0
+Off-Site;Nutrient Poor;Boreal;Dry;PerennialCropping;0;1165;0,12;0
+Off-Site;Nutrient Poor;Boreal;Moist;PerennialCropping;0;1165;0,12;0
+Off-Site;Nutrient Poor;Cool Temperate;Dry;PerennialCropping;0;1165;0,31;0
+Off-Site;Nutrient Poor;Cool Temperate;Moist;PerennialCropping;0;1165;0,31;0
+Off-Site;Nutrient Poor;Warm Temperate;Dry;PerennialCropping;0;1165;0,31;0
+Off-Site;Nutrient Poor;Warm Temperate;Moist;PerennialCropping;0;1165;0,31;0
+Off-Site;Nutrient Poor;Tropical;Dry;PerennialCropping;0;2259;0,82;0
+Off-Site;Nutrient Poor;Tropical;Moist;PerennialCropping;0;2259;0,82;0
+Off-Site;Nutrient Poor;Tropical;Wet;PerennialCropping;0;2259;0,82;0
+Off-Site;Nutrient Poor;Tropical Montane;Dry;PerennialCropping;0;2259;0,82;0
+Off-Site;Nutrient Poor;Boreal;Dry;FloodedRice;0;0;0,12;0
+Off-Site;Nutrient Poor;Boreal;Moist;FloodedRice;0;0;0,12;0
+Off-Site;Nutrient Poor;Cool Temperate;Dry;FloodedRice;0;0;0,31;0
+Off-Site;Nutrient Poor;Cool Temperate;Moist;FloodedRice;0;0;0,31;0
+Off-Site;Nutrient Poor;Warm Temperate;Dry;FloodedRice;0;0;0,31;0
+Off-Site;Nutrient Poor;Warm Temperate;Moist;FloodedRice;0;0;0,31;0
+Off-Site;Nutrient Poor;Tropical;Dry;FloodedRice;0;2259;0,82;0
+Off-Site;Nutrient Poor;Tropical;Moist;FloodedRice;0;2259;0,82;0
+Off-Site;Nutrient Poor;Tropical;Wet;FloodedRice;0;2259;0,82;0
+Off-Site;Nutrient Poor;Tropical Montane;Dry;FloodedRice;0;2259;0,82;0
+Off-Site;Nutrient Poor;Boreal;Dry;Grassland;0;527;0,12;0
+Off-Site;Nutrient Poor;Boreal;Moist;Grassland;0;527;0,12;0
+Off-Site;Nutrient Poor;Cool Temperate;Dry;Grassland;0;527;0,31;0
+Off-Site;Nutrient Poor;Cool Temperate;Moist;Grassland;0;527;0,31;0
+Off-Site;Nutrient Poor;Warm Temperate;Dry;Grassland;0;527;0,31;0
+Off-Site;Nutrient Poor;Warm Temperate;Moist;Grassland;0;527;0,31;0
+Off-Site;Nutrient Poor;Tropical;Dry;Grassland;0;2259;0,82;0
+Off-Site;Nutrient Poor;Tropical;Moist;Grassland;0;2259;0,82;0
+Off-Site;Nutrient Poor;Tropical;Wet;Grassland;0;2259;0,82;0
+Off-Site;Nutrient Poor;Tropical Montane;Dry;Grassland;0;2259;0,82;0
+Off-Site;Nutrient Poor;Boreal;Dry;Settlement;0;0;0;0
+Off-Site;Nutrient Poor;Boreal;Moist;Settlement;0;0;0;0
+Off-Site;Nutrient Poor;Cool Temperate;Dry;Settlement;0;0;0;0
+Off-Site;Nutrient Poor;Cool Temperate;Moist;Settlement;0;0;0;0
+Off-Site;Nutrient Poor;Warm Temperate;Dry;Settlement;0;0;0;0
+Off-Site;Nutrient Poor;Warm Temperate;Moist;Settlement;0;0;0;0
+Off-Site;Nutrient Poor;Tropical;Dry;Settlement;0;0;0;0
+Off-Site;Nutrient Poor;Tropical;Moist;Settlement;0;0;0;0
+Off-Site;Nutrient Poor;Tropical;Wet;Settlement;0;0;0;0
+Off-Site;Nutrient Poor;Tropical Montane;Dry;Settlement;0;0;0;0
+Off-Site;Nutrient Poor;Boreal;Dry;OtherLandUse;0;0;0;0
+Off-Site;Nutrient Poor;Boreal;Moist;OtherLandUse;0;0;0;0
+Off-Site;Nutrient Poor;Cool Temperate;Dry;OtherLandUse;0;0;0;0
+Off-Site;Nutrient Poor;Cool Temperate;Moist;OtherLandUse;0;0;0;0
+Off-Site;Nutrient Poor;Warm Temperate;Dry;OtherLandUse;0;0;0;0
+Off-Site;Nutrient Poor;Warm Temperate;Moist;OtherLandUse;0;0;0;0
+Off-Site;Nutrient Poor;Tropical;Dry;OtherLandUse;0;0;0;0
+Off-Site;Nutrient Poor;Tropical;Moist;OtherLandUse;0;0;0;0
+Off-Site;Nutrient Poor;Tropical;Wet;OtherLandUse;0;0;0;0
+Off-Site;Nutrient Poor;Tropical Montane;Dry;OtherLandUse;0;0;0;0
+Off-Site;Nutrient Poor;Boreal;Dry;DegradedLand;0;0;0;0
+Off-Site;Nutrient Poor;Boreal;Moist;DegradedLand;0;0;0;0
+Off-Site;Nutrient Poor;Cool Temperate;Dry;DegradedLand;0;0;0;0
+Off-Site;Nutrient Poor;Cool Temperate;Moist;DegradedLand;0;0;0;0
+Off-Site;Nutrient Poor;Warm Temperate;Dry;DegradedLand;0;0;0;0
+Off-Site;Nutrient Poor;Warm Temperate;Moist;DegradedLand;0;0;0;0
+Off-Site;Nutrient Poor;Tropical;Dry;DegradedLand;0;0;0;0
+Off-Site;Nutrient Poor;Tropical;Moist;DegradedLand;0;0;0;0
+Off-Site;Nutrient Poor;Tropical;Wet;DegradedLand;0;0;0;0
+Off-Site;Nutrient Poor;Tropical Montane;Dry;DegradedLand;0;0;0;0
+Off-Site;Nutrient Rich;Boreal;Dry;ForestManagement;0;217;0,12;0
+Off-Site;Nutrient Rich;Boreal;Moist;ForestManagement;0;217;0,12;0
+Off-Site;Nutrient Rich;Cool Temperate;Dry;ForestManagement;0;217;0,31;0
+Off-Site;Nutrient Rich;Cool Temperate;Moist;ForestManagement;0;217;0,31;0
+Off-Site;Nutrient Rich;Warm Temperate;Dry;ForestManagement;0;217;0,31;0
+Off-Site;Nutrient Rich;Warm Temperate;Moist;ForestManagement;0;217;0,31;0
+Off-Site;Nutrient Rich;Tropical;Dry;ForestManagement;0;2259;0,82;0
+Off-Site;Nutrient Rich;Tropical;Moist;ForestManagement;0;2259;0,82;0
+Off-Site;Nutrient Rich;Tropical;Wet;ForestManagement;0;2259;0,82;0
+Off-Site;Nutrient Rich;Tropical Montane;Dry;ForestManagement;0;2259;0,82;0
+Off-Site;Nutrient Rich;Boreal;Dry;Plantation;0;217;0,12;0
+Off-Site;Nutrient Rich;Boreal;Moist;Plantation;0;217;0,12;0
+Off-Site;Nutrient Rich;Cool Temperate;Dry;Plantation;0;217;0,31;0
+Off-Site;Nutrient Rich;Cool Temperate;Moist;Plantation;0;217;0,31;0
+Off-Site;Nutrient Rich;Warm Temperate;Dry;Plantation;0;217;0,31;0
+Off-Site;Nutrient Rich;Warm Temperate;Moist;Plantation;0;217;0,31;0
+Off-Site;Nutrient Rich;Tropical;Dry;Plantation;0;2259;0,82;0
+Off-Site;Nutrient Rich;Tropical;Moist;Plantation;0;2259;0,82;0
+Off-Site;Nutrient Rich;Tropical;Wet;Plantation;0;2259;0,82;0
+Off-Site;Nutrient Rich;Tropical Montane;Dry;Plantation;0;2259;0,82;0
+Off-Site;Nutrient Rich;Boreal;Dry;AnnualCropping;0;1165;0,12;0
+Off-Site;Nutrient Rich;Boreal;Moist;AnnualCropping;0;1165;0,12;0
+Off-Site;Nutrient Rich;Cool Temperate;Dry;AnnualCropping;0;1165;0,31;0
+Off-Site;Nutrient Rich;Cool Temperate;Moist;AnnualCropping;0;1165;0,31;0
+Off-Site;Nutrient Rich;Warm Temperate;Dry;AnnualCropping;0;1165;0,31;0
+Off-Site;Nutrient Rich;Warm Temperate;Moist;AnnualCropping;0;1165;0,31;0
+Off-Site;Nutrient Rich;Tropical;Dry;AnnualCropping;0;2259;0,82;0
+Off-Site;Nutrient Rich;Tropical;Moist;AnnualCropping;0;2259;0,82;0
+Off-Site;Nutrient Rich;Tropical;Wet;AnnualCropping;0;2259;0,82;0
+Off-Site;Nutrient Rich;Tropical Montane;Dry;AnnualCropping;0;2259;0,82;0
+Off-Site;Nutrient Rich;Boreal;Dry;PerennialCropping;0;1165;0,12;0
+Off-Site;Nutrient Rich;Boreal;Moist;PerennialCropping;0;1165;0,12;0
+Off-Site;Nutrient Rich;Cool Temperate;Dry;PerennialCropping;0;1165;0,31;0
+Off-Site;Nutrient Rich;Cool Temperate;Moist;PerennialCropping;0;1165;0,31;0
+Off-Site;Nutrient Rich;Warm Temperate;Dry;PerennialCropping;0;1165;0,31;0
+Off-Site;Nutrient Rich;Warm Temperate;Moist;PerennialCropping;0;1165;0,31;0
+Off-Site;Nutrient Rich;Tropical;Dry;PerennialCropping;0;2259;0,82;0
+Off-Site;Nutrient Rich;Tropical;Moist;PerennialCropping;0;2259;0,82;0
+Off-Site;Nutrient Rich;Tropical;Wet;PerennialCropping;0;2259;0,82;0
+Off-Site;Nutrient Rich;Tropical Montane;Dry;PerennialCropping;0;2259;0,82;0
+Off-Site;Nutrient Rich;Boreal;Dry;FloodedRice;0;0;0,12;0
+Off-Site;Nutrient Rich;Boreal;Moist;FloodedRice;0;0;0,12;0
+Off-Site;Nutrient Rich;Cool Temperate;Dry;FloodedRice;0;0;0,31;0
+Off-Site;Nutrient Rich;Cool Temperate;Moist;FloodedRice;0;0;0,31;0
+Off-Site;Nutrient Rich;Warm Temperate;Dry;FloodedRice;0;0;0,31;0
+Off-Site;Nutrient Rich;Warm Temperate;Moist;FloodedRice;0;0;0,31;0
+Off-Site;Nutrient Rich;Tropical;Dry;FloodedRice;0;2259;0,82;0
+Off-Site;Nutrient Rich;Tropical;Moist;FloodedRice;0;2259;0,82;0
+Off-Site;Nutrient Rich;Tropical;Wet;FloodedRice;0;2259;0,82;0
+Off-Site;Nutrient Rich;Tropical Montane;Dry;FloodedRice;0;2259;0,82;0
+Off-Site;Nutrient Rich;Boreal;Dry;Grassland;0;527;0,12;0
+Off-Site;Nutrient Rich;Boreal;Moist;Grassland;0;527;0,12;0
+Off-Site;Nutrient Rich;Cool Temperate;Dry;Grassland;0;527;0,31;0
+Off-Site;Nutrient Rich;Cool Temperate;Moist;Grassland;0;527;0,31;0
+Off-Site;Nutrient Rich;Warm Temperate;Dry;Grassland;0;527;0,31;0
+Off-Site;Nutrient Rich;Warm Temperate;Moist;Grassland;0;527;0,31;0
+Off-Site;Nutrient Rich;Tropical;Dry;Grassland;0;2259;0,82;0
+Off-Site;Nutrient Rich;Tropical;Moist;Grassland;0;2259;0,82;0
+Off-Site;Nutrient Rich;Tropical;Wet;Grassland;0;2259;0,82;0
+Off-Site;Nutrient Rich;Tropical Montane;Dry;Grassland;0;2259;0,82;0
+Off-Site;Nutrient Rich;Boreal;Dry;Settlement;0;0;0;0
+Off-Site;Nutrient Rich;Boreal;Moist;Settlement;0;0;0;0
+Off-Site;Nutrient Rich;Cool Temperate;Dry;Settlement;0;0;0;0
+Off-Site;Nutrient Rich;Cool Temperate;Moist;Settlement;0;0;0;0
+Off-Site;Nutrient Rich;Warm Temperate;Dry;Settlement;0;0;0;0
+Off-Site;Nutrient Rich;Warm Temperate;Moist;Settlement;0;0;0;0
+Off-Site;Nutrient Rich;Tropical;Dry;Settlement;0;0;0;0
+Off-Site;Nutrient Rich;Tropical;Moist;Settlement;0;0;0;0
+Off-Site;Nutrient Rich;Tropical;Wet;Settlement;0;0;0;0
+Off-Site;Nutrient Rich;Tropical Montane;Dry;Settlement;0;0;0;0
+Off-Site;Nutrient Rich;Boreal;Dry;OtherLandUse;0;0;0;0
+Off-Site;Nutrient Rich;Boreal;Moist;OtherLandUse;0;0;0;0
+Off-Site;Nutrient Rich;Cool Temperate;Dry;OtherLandUse;0;0;0;0
+Off-Site;Nutrient Rich;Cool Temperate;Moist;OtherLandUse;0;0;0;0
+Off-Site;Nutrient Rich;Warm Temperate;Dry;OtherLandUse;0;0;0;0
+Off-Site;Nutrient Rich;Warm Temperate;Moist;OtherLandUse;0;0;0;0
+Off-Site;Nutrient Rich;Tropical;Dry;OtherLandUse;0;0;0;0
+Off-Site;Nutrient Rich;Tropical;Moist;OtherLandUse;0;0;0;0
+Off-Site;Nutrient Rich;Tropical;Wet;OtherLandUse;0;0;0;0
+Off-Site;Nutrient Rich;Tropical Montane;Dry;OtherLandUse;0;0;0;0
+Off-Site;Nutrient Rich;Boreal;Dry;DegradedLand;0;0;0;0
+Off-Site;Nutrient Rich;Boreal;Moist;DegradedLand;0;0;0;0
+Off-Site;Nutrient Rich;Cool Temperate;Dry;DegradedLand;0;0;0;0
+Off-Site;Nutrient Rich;Cool Temperate;Moist;DegradedLand;0;0;0;0
+Off-Site;Nutrient Rich;Warm Temperate;Dry;DegradedLand;0;0;0;0
+Off-Site;Nutrient Rich;Warm Temperate;Moist;DegradedLand;0;0;0;0
+Off-Site;Nutrient Rich;Tropical;Dry;DegradedLand;0;0;0;0
+Off-Site;Nutrient Rich;Tropical;Moist;DegradedLand;0;0;0;0
+Off-Site;Nutrient Rich;Tropical;Wet;DegradedLand;0;0;0;0
+Off-Site;Nutrient Rich;Tropical Montane;Dry;DegradedLand;0;0;0;0
