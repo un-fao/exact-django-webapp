@@ -2441,7 +2441,6 @@ for i, row in enumerate(df_dict):
         value=value,
         chloa=chloa,
     )
-"""
 
 df2 = pd.read_csv(
     os.path.join(
@@ -2482,3 +2481,26 @@ for i, row in enumerate(df_dict2):
 
         if j == len(df_headers2) - 1:
             break
+"""
+
+df2 = pd.read_csv(
+    os.path.join(
+        os.path.dirname(__file__), "ipcc_data", "RoadEmissionFactors.csv"
+    ),
+    header=0,
+    sep=";",
+)
+
+df_headers2 = df2.columns.values.tolist()
+df_dict2 = df2.to_dict("records")
+
+for i, row in enumerate(df_dict2):
+    road_type = RoadType.objects.get_or_create(name=sanitize(row["road_type"]))[0]
+    value = parse_csv_number(row["value"], nan_value=0)
+
+    print(road_type, value)
+
+    RoadEmissionFactor.objects.get_or_create(
+        road_type=road_type,
+        value=value,
+    )
