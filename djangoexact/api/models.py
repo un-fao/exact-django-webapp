@@ -2227,7 +2227,7 @@ class OtherInfrastructure(SettlementInfrastructure):
     area_m2_wo = FloatField(null=True, blank=True)
     area_m2_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_area_m2_thread", on_delete=SET_NULL)
 
-class OrganicSoil(Module):
+class OrganicSoil(Assessment):
 
     drainage_area_start = FloatField(null=True, blank=True)
     drainage_area_w = FloatField(null=True, blank=True)
@@ -2244,6 +2244,7 @@ class OrganicSoil(Module):
     ditches_area_wo = FloatField(null=True, blank=True)
     ditches_area_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_ditches_area_thread", on_delete=SET_NULL)
 
+    # TODO: Change to fire_type
     is_fire_on_soil_start = BooleanField(default=False)
     is_fire_on_soil_w = BooleanField(default=False)
     is_fire_on_soil_wo = BooleanField(default=False)
@@ -2258,6 +2259,60 @@ class OrganicSoil(Module):
     soil_fire_impact_percentage_w = FloatField(null=True, blank=True)
     soil_fire_impact_percentage_wo = FloatField(null=True, blank=True)
     soil_fire_impact_percentage_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_soil_fire_impact_percentage_thread", on_delete=SET_NULL)
+
+    onsite_co2_drainge_t2_start = FloatField(null=True, blank=True)
+    onsite_co2_drainge_t2_w = FloatField(null=True, blank=True)
+    onsite_co2_drainge_t2_wo = FloatField(null=True, blank=True)
+
+    onsite_ch4_drainge_t2_start = FloatField(null=True, blank=True)
+    onsite_ch4_drainge_t2_w = FloatField(null=True, blank=True)
+    onsite_ch4_drainge_t2_wo = FloatField(null=True, blank=True)
+
+    onsite_n2o_drainge_t2_start = FloatField(null=True, blank=True)
+    onsite_n2o_drainge_t2_w = FloatField(null=True, blank=True)
+    onsite_n2o_drainge_t2_wo = FloatField(null=True, blank=True)
+
+    offsite_doc_drainge_t2_start = FloatField(null=True, blank=True)
+    offsite_doc_drainge_t2_w = FloatField(null=True, blank=True)
+    offsite_doc_drainge_t2_wo = FloatField(null=True, blank=True)
+
+    offsite_ch4_drainge_t2_start = FloatField(null=True, blank=True)
+    offsite_ch4_drainge_t2_w = FloatField(null=True, blank=True)
+    offsite_ch4_drainge_t2_wo = FloatField(null=True, blank=True)
+
+    onsite_co2_rewetting_t2_start = FloatField(null=True, blank=True)
+    onsite_co2_rewetting_t2_w = FloatField(null=True, blank=True)
+    onsite_co2_rewetting_t2_wo = FloatField(null=True, blank=True)
+
+    onsite_ch4_rewetting_t2_start = FloatField(null=True, blank=True)
+    onsite_ch4_rewetting_t2_w = FloatField(null=True, blank=True)
+    onsite_ch4_rewetting_t2_wo = FloatField(null=True, blank=True)
+
+    onsite_n2o_rewetting_t2_start = FloatField(null=True, blank=True)
+    onsite_n2o_rewetting_t2_w = FloatField(null=True, blank=True)
+    onsite_n2o_rewetting_t2_wo = FloatField(null=True, blank=True)
+
+    offsite_doc_rewetting_t2_start = FloatField(null=True, blank=True)
+    offsite_doc_rewetting_t2_w = FloatField(null=True, blank=True)
+    offsite_doc_rewetting_t2_wo = FloatField(null=True, blank=True)
+
+    mean_dry_matter_t2_start = FloatField(null=True, blank=True)
+    mean_dry_matter_t2_w = FloatField(null=True, blank=True)
+    mean_dry_matter_t2_wo = FloatField(null=True, blank=True)
+
+    fire_on_soil_co2_t2_start = FloatField(null=True, blank=True)
+    fire_on_soil_co2_t2_w = FloatField(null=True, blank=True)
+    fire_on_soil_co2_t2_wo = FloatField(null=True, blank=True)
+
+    fire_on_soil_co_t2_start = FloatField(null=True, blank=True)
+    fire_on_soil_co_t2_w = FloatField(null=True, blank=True)
+    fire_on_soil_co_t2_wo = FloatField(null=True, blank=True)
+
+    fire_on_soil_ch4_t2_start = FloatField(null=True, blank=True)
+    fire_on_soil_ch4_t2_w = FloatField(null=True, blank=True)
+    fire_on_soil_ch4_t2_wo = FloatField(null=True, blank=True)
+
+    ##### Peat Extraction #####
 
     has_peat_extraction = BooleanField(default=False)
 
