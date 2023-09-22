@@ -4,7 +4,7 @@ from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 from .utilities import *
 import uuid
-from dataclasses import dataclass
+from simple_history.models import HistoricalRecords
 
 alphanumeric = RegexValidator(
     r"^[0-9a-zA-Z]*$", "Only alphanumeric characters are allowed."
@@ -395,8 +395,13 @@ class BaseModel(Model):
     class Meta:
         abstract = True
 
+class Historical(Model):
+    history = HistoricalRecords(related_name="%(class)s_history")
 
-class Project(Model):
+    class Meta:
+        abstract = True
+
+class Project(Historical):
     # TODO: Implement uuid instead of BigAutoField?
     # id = UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
@@ -433,7 +438,7 @@ class Project(Model):
 ##############################
 
 
-class Activity(Model):
+class Activity(Historical):
     project = ForeignKey(Project, on_delete=CASCADE, related_name="activities")
     name = CharField(max_length=255)
     description = TextField(null=True, blank=True)
@@ -452,8 +457,7 @@ class Activity(Model):
 ########## Modules ###########
 ##############################
 
-
-class Module(Model):
+class Module(Historical):
     activity = ForeignKey(Activity, on_delete=CASCADE, related_name="%(class)s")
     notes = TextField(null=True, blank=True)
 
