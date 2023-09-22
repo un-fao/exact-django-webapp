@@ -330,11 +330,11 @@ def generic_module_viewset(model: Model):
 
             module_serializer = get_module_serializer(model, create=True)(data=request.data, many=request.data.__class__ == list)
             if module_serializer.is_valid():
-                land_use_change = module_serializer.validated_data.get("land_use_change", None)
+                luc = module_serializer.validated_data.get("land_use_change", None)
 
-                if land_use_change:
-                    luc_start = land_use_change.land_use_type_start
-                    luc_end = land_use_change.land_use_type_end
+                if luc:
+                    luc_start = luc.land_use_type_start
+                    luc_end = luc.land_use_type_end
 
                     # NOTE: Should I prevent the module to be created if the correct module type has not yet been selected in LandUseChange?
                     if not luc_start and not luc_end:
