@@ -329,28 +329,30 @@ def generic_module_viewset(model: Model):
             """
 
             module_serializer = get_module_serializer(model, create=True)(data=request.data, many=request.data.__class__ == list)
-            if module_serializer.is_valid():
-                luc = module_serializer.validated_data.get("land_use_change", None)
-
-                if luc:
-                    luc_start = luc.land_use_type_start
-                    luc_end = luc.land_use_type_end
-
-                    if not luc_start and not luc_end:
-                        return ErrorResponse(f"Land use change must have at least one land use type selected.", status=status.HTTP_400_BAD_REQUEST)
-                    
-                    if (luc_start and luc_start.module_type.name != model.__name__) or (luc_end and luc_end.module_type.name != model.__name__):
-                        return ErrorResponse(f"At least one land use type in land use change must be related to a {model.__name__} module.", status=status.HTTP_400_BAD_REQUEST)
-                    
-                for attr in dir(model):
-                    if attr.endswith("_thread"): # NOTE: This could create problems if any other attribute ends in "_thread"
-                        module_serializer.validated_data[attr] = CommentThread.objects.create()
-
-                module_serializer.save()
-
-                return Response(module_serializer.data, status=status.HTTP_201_CREATED)
             
-            return Response(module_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            if not module_serializer.is_valid():
+                return Response(module_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+            luc = module_serializer.validated_data.get("land_use_change", None)
+
+            if luc:
+                luc_start = luc.land_use_type_start
+                luc_end = luc.land_use_type_end
+
+                if not luc_start and not luc_end:
+                    return ErrorResponse(f"Land use change must have at least one land use type selected.", status=status.HTTP_400_BAD_REQUEST)
+                
+                if (luc_start and luc_start.module_type.name != model.__name__) or (luc_end and luc_end.module_type.name != model.__name__):
+                    return ErrorResponse(f"At least one land use type in land use change must be related to a {model.__name__} module.", status=status.HTTP_400_BAD_REQUEST)
+                
+            for attr in dir(model):
+                if attr.endswith("_thread"): # NOTE: This could create problems if any other attribute ends in "_thread"
+                    module_serializer.validated_data[attr] = CommentThread.objects.create()
+
+            module_serializer.save()
+
+            return Response(module_serializer.data, status=status.HTTP_201_CREATED)
+            
 
         @swagger_auto_schema(
             manual_parameters=[activity_id, include_related],
