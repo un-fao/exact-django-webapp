@@ -196,6 +196,7 @@ router.register(
 )
 
 router.register(r"settlements", views.generic_module_viewset(Settlement), basename="settlements")
+router.register(r"land-use-changes", views.generic_module_viewset(LandUseChange), basename="land-use-changes")
 
 urlpatterns = [
     path("docs/", include_docs_urls(title="EX-ACT Docs")),
