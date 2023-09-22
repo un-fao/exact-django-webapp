@@ -330,22 +330,24 @@ def generic_module_viewset(model: Model):
 
             module_serializer = get_module_serializer(model, create=True)(data=request.data, many=request.data.__class__ == list)
             if module_serializer.is_valid():
-                activity_id = module_serializer.validated_data["activity"].pk
+                land_use_change = module_serializer.validated_data.get("land_use_change", None)
 
+                if land_use_change:
+                    luc_start = land_use_change.land_use_type_start
+                    luc_end = land_use_change.land_use_type_end
+
+                    # NOTE: Should I prevent the module to be created if the correct module type has not yet been selected in LandUseChange?
+                    if not luc_start and not luc_end:
+                        return ErrorResponse(f"Land use change must have at least one land use type selected.", status=status.HTTP_400_BAD_REQUEST)
+                    
+                    if (luc_start and luc_start.module_type.name != model.__name__) or (luc_end and luc_end.module_type.name != model.__name__):
+                        return ErrorResponse(f"At least one land use type in land use change must be related to a {model.__name__} module.", status=status.HTTP_400_BAD_REQUEST)
+                    
                 for attr in dir(model):
                     if attr.endswith("_thread"): # NOTE: This could create problems if any other attribute ends in "_thread"
                         module_serializer.validated_data[attr] = CommentThread.objects.create()
 
-                if model.objects.filter(activity__id=activity_id).exists():
-                    return ErrorResponse(f"Module '{model.__name__}' already exists for this activity.", status=status.HTTP_400_BAD_REQUEST)
-
-                # TODO: Redo for new land use change module
-                # relative, relation = get_relative(model)
-                # if relative:
-                #     return ErrorResponse(f"Module '{model.__name__}' already has an attached {relative.get_object().__name__} {relation}.")
-
-                activity = get_object_or_404(Activity, pk=activity_id, project__user=self.request.user)
-                module_serializer.save(activity=activity)
+                module_serializer.save()
 
                 return Response(module_serializer.data, status=status.HTTP_201_CREATED)
             
