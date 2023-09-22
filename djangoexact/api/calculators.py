@@ -33,6 +33,8 @@ from .models import (
     ModuleType,
     Road,
     Settlement,
+    LandUseChange,
+    Activity,
 )
 from math_model import (
     defo,
@@ -92,22 +94,27 @@ class Result:
         self.total_wo += result.total_wo
         self.balance += result.balance
 
+        return self
+
 class CalculatorFactory:
     def calculate_result(self, input):
         """
         Calculates the results for a given module.
         """
         try:
-            calculator_name = input.__class__.__name__ + "Calculator"
-            # Finds and instantiates the calculator class for the given module
-            calculator: BaseCalculator = getattr(sys.modules[__name__], calculator_name)(input)
+            # Finds and instantiates the calculator class for the given module, if any
+            CalculatorClass = getattr(sys.modules[__name__], f"{input.__class__.__name__}Calculator", None)
+            
+            if not CalculatorClass:
+                raise Exception(f"No calculator found for {input.__class__.__name__}")
+
+            calculator: BaseCalculator = CalculatorClass(input)
+
             return calculator.calculate()
-        except AttributeError as e:
+
+        except Exception as e:
             traceback.print_exc()
-            raise Exception(f"Module '{input.__class__.__name__}' not (yet) supported.")
-        except Exception as ex:
-            traceback.print_exc()
-            raise ex
+            raise Exception(f"Error in {input.__class__.__name__}: {e}")
 
 class BaseCalculator(ABC):
     """
@@ -128,6 +135,36 @@ class BaseCalculator(ABC):
         Calculate emissions for a single module.
         """
         pass
+
+class LandUseChangeCalculator(BaseCalculator):
+    """
+    Calculator for land use change modules.
+    """
+
+    def calculate(self) -> Result:
+        """
+        Calculate emissions for a single LandUseChange module.
+        # TODO: Define the logic for this module
+        """
+
+        input: LandUseChange = self.data
+
+        start_module = getattr(input.activity, sanitize_for_model(input.module_type_start.name).lower(), None)
+        end_module = getattr(input.activity, sanitize_for_model(input.module_type_end.name).lower(), None)
+
+        if start_module is None or end_module is None:
+            missing_module = "start" if start_module is None else "end"
+            raise Exception(f"LandUseChange module must have a start and end module. Missing {missing_module} module.")
+        
+        start_module = start_module.first()
+        end_module = end_module.first()
+
+        start_result = CalculatorFactory().calculate_result(start_module)
+        end_result = CalculatorFactory().calculate_result(end_module)
+
+        result = Result().add(start_result).add(end_result)
+
+        return result
 
 class DeforestationCalculator(BaseCalculator):
     """
@@ -497,7 +534,7 @@ class AnnualCroppingCalculator(BaseCalculator):
         minor_crop_type_w = input.minor_crop_type_w
         minor_crop_type_wo = input.minor_crop_type_wo
 
-        relative, relation = get_assessment_or_parent(self.data)
+        relative, relation = get_relative(self.data)
         is_parent = relation == "parent"
 
         burning_emission_factor = BurningEmissionFactor.objects.get(category__name="Agricultural residues")
@@ -735,7 +772,7 @@ class PerennialCroppingCalculator(BaseCalculator):
         climate = project.climate
         moisture = project.moisture
         continent = project.continent
-        parent, _ = get_assessment_or_parent(module)
+        parent, _ = get_relative(module)
         change_rate = module.activity.change_rate
 
         cm = {
@@ -3066,7 +3103,7 @@ class OrganicSoilCalculator(BaseCalculator):
         input: OrganicSoil = self.data
         project: Project = input.activity.project
 
-        relative, relation = get_assessment_or_parent(input)
+        relative, relation = get_relative(input)
         
         if not relative:
             raise ValueError("Organic Soil is missing a land use from a parent module")
