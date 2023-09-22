@@ -67,7 +67,7 @@ router.register(
 router.register(
     r"livestocks", views.generic_module_viewset(Livestock), basename="livestocks"
 )
-router.register(r"forests", views.generic_module_viewset(Forest), basename="forests")
+router.register(r"forest-managements", views.generic_module_viewset(ForestManagement), basename="forests")
 router.register(
     r"deforestation-soil-managements",
     views.generic_module_viewset(DeforestationSoilManagement),
