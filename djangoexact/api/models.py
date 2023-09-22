@@ -691,6 +691,7 @@ class OtherLandUse(Module):
 
 
 class Assessment(Module):
+    land_use_change = OneToOneField("api.LandUseChange", on_delete=CASCADE, null=True, blank=True, related_name="%(class)s")
     parent_afforestation = OneToOneField(
         Afforestation,
         on_delete=CASCADE,
@@ -726,7 +727,7 @@ class Assessment(Module):
                 "Exactly one of deforestation, afforestation, or other land use can be set."
             )
 
-        relative, relationship = get_assessment_or_parent(self)
+        relative, relationship = get_relative(self)
         if relative and not relative in fields:
             raise ValidationError(f"{relative} is already a {relationship}")
 
@@ -2415,6 +2416,17 @@ class DegradedLand(Module):
     bgb_t2_w = FloatField(null=True, blank=True)
     bgb_t2_wo = FloatField(null=True, blank=True)
 
+class LandUseChange(Module):
+    
+    module_type_start = ForeignKey(ModuleType, on_delete=CASCADE, null=True, blank=True, related_name="start")
+    module_type_end = ForeignKey(ModuleType, on_delete=CASCADE, null=True, blank=True, related_name="end")
+    ha = FloatField(null=True, blank=True)
+
+    fire_use_w = BooleanField(default=False)
+    fire_use_wo = BooleanField(default=False)
+
+    dry_matter_w = FloatField(null=True, blank=True)
+    dry_matter_wo = FloatField(null=True, blank=True)
     
 ### MODEL PARAMETERS TABLES ###
 

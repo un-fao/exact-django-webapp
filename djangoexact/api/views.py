@@ -336,11 +336,10 @@ def generic_module_viewset(model: Model):
                     if attr.endswith("_thread"): # NOTE: This could create problems if any other attribute ends in "_thread"
                         module_serializer.validated_data[attr] = CommentThread.objects.create()
 
-                # TODO: Can activities have multiples of the same module?
-                # if model.objects.filter(activity__id=activity_id).exists():
-                #     return ErrorResponse(f"Module '{model.__name__}' already exists for this activity.", status=status.HTTP_400_BAD_REQUEST)
+                if model.objects.filter(activity__id=activity_id).exists():
+                    return ErrorResponse(f"Module '{model.__name__}' already exists for this activity.", status=status.HTTP_400_BAD_REQUEST)
 
-                relative, relation = get_assessment_or_parent(model)
+                relative, relation = get_relative(model)
                 if relative:
                     return ErrorResponse(f"Module '{model.__name__}' already has an attached {relative.__name__} {relation}.")
 
@@ -372,7 +371,7 @@ def generic_module_viewset(model: Model):
                 data.append({**self.serializer_class(module).data})
 
                 if request.query_params.get(INCLUDE_RELATED):
-                    relative, relation = get_assessment_or_parent(module)
+                    relative, relation = get_relative(module)
 
                     if relative:
                         relative_serializer = get_module_serializer(relative.__class__)(relative)

@@ -63,7 +63,7 @@ def get_query_param_or_validation_error(request, param_name):
     return param
 
 
-def get_assessment_or_parent(module) -> tuple[Model, str]:
+def get_relative(module) -> tuple[Model, str]:
     """
     Looks for the assessment class in the module and returns a tuple (module, relationship).
     Returns (None, None) if no assessment class is found.
