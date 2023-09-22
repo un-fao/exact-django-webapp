@@ -846,10 +846,7 @@ class AnnualCropping(Assessment):
     crop_yield_wo = FloatField(null=True, blank=True)
     crop_yield_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_crop_yield_thread")
 
-    ha_start = FloatField(null=True, blank=True)
-    ha_w = FloatField(null=True, blank=True)
-    ha_wo = FloatField(null=True, blank=True)
-    ha_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_thread")
+    area = FloatField(null=True, blank=True)
 
     main_soil_carbon_t2_start = FloatField(null=True, blank=True)
     main_soil_carbon_t2_w = FloatField(null=True, blank=True)
@@ -951,10 +948,7 @@ class PerennialCropping(Assessment):
     is_biomass_burned_wo = BooleanField()
     is_biomass_burned_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_is_biomass_burned_thread")
 
-    ha_start = FloatField()
-    ha_w = FloatField()
-    ha_wo = FloatField()
-    ha_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_thread")
+    area = FloatField(null=True, blank=True)
 
     crop_yield_start = FloatField(null=True, blank=True)
     crop_yield_w = FloatField(null=True, blank=True)
@@ -997,9 +991,7 @@ class PerennialCropping(Assessment):
 class FloodedRice(Assessment):
     user_notes = TextField(null=True, blank=True)
 
-    ha_start = FloatField()
-    ha_w = FloatField()
-    ha_wo = FloatField()
+    area = FloatField(null=True, blank=True)
 
     cultivation_period_start = IntegerField(default=RICE_CULTIVATION_DAYS)
     cultivation_period_w = IntegerField(default=RICE_CULTIVATION_DAYS)
@@ -1089,10 +1081,7 @@ class Grassland(Assessment):
     yield_wo = FloatField(null=True, blank=True)
     yield_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_yield_thread")
 
-    ha_start = FloatField(null=True, blank=True)
-    ha_w = FloatField(null=True, blank=True)
-    ha_wo = FloatField(null=True, blank=True)
-    ha_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_thread")
+    area = FloatField(null=True, blank=True)
 
     soil_carbon_t2_start = FloatField(null=True, blank=True)
     soil_carbon_t2_w = FloatField(null=True, blank=True)
@@ -1947,7 +1936,7 @@ class OrganicSoil(Assessment):
     is_peat_is_for_energy_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_is_for_energy_thread", on_delete=SET_NULL)
 
 
-class Settlement(Module):
+class Settlement(Assessment):
     ha_start = FloatField(null=True, blank=True)
     ha_w = FloatField(null=True, blank=True)
     ha_wo = FloatField(null=True, blank=True)
@@ -2021,7 +2010,7 @@ class LandUseChange(Module):
 
     module_type_start = ForeignKey(ModuleType, on_delete=CASCADE, null=True, blank=True, related_name="start")
     module_type_end = ForeignKey(ModuleType, on_delete=CASCADE, null=True, blank=True, related_name="end")
-    ha = FloatField(null=True, blank=True)
+    area = FloatField(null=True, blank=True)
 
     is_fire_used_start = BooleanField(default=False)
     is_fire_used_end = BooleanField(default=False)
