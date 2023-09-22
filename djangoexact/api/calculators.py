@@ -238,7 +238,6 @@ class DeforestationCalculator(BaseCalculator):
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
             change_rate.name,
-            change_rate.name, # TODO: Remove from math model
             total_biomass_start.value,
             module.final_rcs_biomass_t2_start,
             project.gw_potential.n2o,
@@ -272,7 +271,6 @@ class DeforestationCalculator(BaseCalculator):
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
             change_rate.name,
-            change_rate.name, # TODO: Remove from math model
             total_biomass_end.value,
             module.final_rcs_biomass_t2_end,
             project.gw_potential.n2o,
@@ -306,7 +304,6 @@ class DeforestationCalculator(BaseCalculator):
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
             change_rate.name,
-            change_rate.name, # TODO: Remove from math model
             total_biomass_start.value,
             module.final_rcs_biomass_t2_start,
             project.gw_potential.n2o,

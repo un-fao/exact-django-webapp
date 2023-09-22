@@ -3,7 +3,7 @@ import traceback, re
 
 class Deforestation():
 
-    def __init__(self, ha_start, ha_end,time_impl,time_cap,rate_type_soil,rate_of_change_soil,biomass_final_1_year_t_per_ha,biomass_final_1_year_t_per_ha_tier_2,
+    def __init__(self, ha_start, ha_end,time_impl,time_cap,rate_type_soil,biomass_final_1_year_t_per_ha,biomass_final_1_year_t_per_ha_tier_2,
         nitrous_constant, methane_constant,fire_bool,n2o_vegetation,ch4_vegetation,cf_vegetation,moisture_emission_factor,
         litter,litter_tier_2,dw,dw_tier_2,hwp_before_t_dm_per_ha,mangrove_factor,bgb_t_c_per_ha_tier_2,
         agb_t_c_per_ha_tier_2,flu,agb_t_dm_per_ha_default,bgb_t_dm_per_ha_default_input_parameter,c_n_ratio,
@@ -15,7 +15,6 @@ class Deforestation():
         self.time_impl = time_impl
         self.time_cap = time_cap
         self.rate_type_soil = rate_type_soil
-        self.rate_of_change_soil = rate_of_change_soil
         self.biomass_final_1_year_t_per_ha_default = biomass_final_1_year_t_per_ha
         self.biomass_final_1_year_t_per_ha_tier_2 = biomass_final_1_year_t_per_ha_tier_2
         self.nitrous_constant = nitrous_constant
