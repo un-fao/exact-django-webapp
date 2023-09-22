@@ -26,12 +26,11 @@ def get_model_serializer(model_arg):
     except KeyError:
         return GenericSerializer
 
-
-def get_module_serializer(model_arg):
+def get_module_serializer(model_arg, create=False):
     class GenericSerializer(serializers.ModelSerializer):
-        # activity = serializers.PrimaryKeyRelatedField(source='activity.name', queryset=Activity.objects.all(), many=False)
-        module_type = serializers.ReadOnlyField(default=model_arg.__name__)
-        activity = ActivitySerializer(many=False)
+        if not create:
+            module_type = serializers.ReadOnlyField(default=model_arg.__name__)
+            activity = ActivitySerializer(many=False)
 
         class Meta:
             model = model_arg

@@ -328,7 +328,7 @@ def generic_module_viewset(model: Model):
             Creates a new module for a given activity.
             """
 
-            module_serializer = self.serializer_class(data=request.data, many=request.data.__class__ == list)
+            module_serializer = get_module_serializer(model, create=True)(data=request.data, many=request.data.__class__ == list)
             if module_serializer.is_valid():
                 activity_id = module_serializer.validated_data["activity"].pk
 
@@ -339,9 +339,10 @@ def generic_module_viewset(model: Model):
                 if model.objects.filter(activity__id=activity_id).exists():
                     return ErrorResponse(f"Module '{model.__name__}' already exists for this activity.", status=status.HTTP_400_BAD_REQUEST)
 
-                relative, relation = get_relative(model)
-                if relative:
-                    return ErrorResponse(f"Module '{model.__name__}' already has an attached {relative.__name__} {relation}.")
+                # TODO: Redo for new land use change module
+                # relative, relation = get_relative(model)
+                # if relative:
+                #     return ErrorResponse(f"Module '{model.__name__}' already has an attached {relative.get_object().__name__} {relation}.")
 
                 activity = get_object_or_404(Activity, pk=activity_id, project__user=self.request.user)
                 module_serializer.save(activity=activity)
