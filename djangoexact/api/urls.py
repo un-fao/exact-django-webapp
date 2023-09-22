@@ -68,36 +68,7 @@ router.register(
     r"livestocks", views.generic_module_viewset(Livestock), basename="livestocks"
 )
 router.register(r"forest-managements", views.generic_module_viewset(ForestManagement), basename="forests")
-router.register(
-    r"deforestation-soil-managements",
-    views.generic_module_viewset(DeforestationSoilManagement),
-    basename="deforestation-soil-management",
-)
-router.register(
-    r"afforestation-soil-managements",
-    views.generic_module_viewset(AfforestationSoilManagement),
-    basename="afforestation-soil-management",
-)
-router.register(
-    r"other-land-use-soil-managements",
-    views.generic_module_viewset(OtherLandUseSoilManagement),
-    basename="other-land-use-soil-management",
-)
-router.register(
-    r"forest-land-managements",
-    views.generic_module_viewset(ForestLandManagement),
-    basename="forest-land-management",
-)
-router.register(
-    r"other-land-managements",
-    views.generic_module_viewset(OtherLandManagement),
-    basename="other-land-management",
-)
-router.register(
-    r"peat-extraction-land-managements",
-    views.generic_module_viewset(PeatExtractionLandManagement),
-    basename="peat-extraction-land-management",
-)
+
 router.register(
     r"inland-waterbodies",
     views.generic_module_viewset(InlandWaterbody),
