@@ -79,10 +79,10 @@ class Result:
     """
     Base class for all results.
     """
-    def __init__(self, total_w=0, total_wo=0, balance=0):
+    def __init__(self, total_w=0, total_wo=0):
         self.total_w = total_w
         self.total_wo = total_wo
-        self.balance = balance
+        self.balance = total_w - total_wo
     
     def __str__(self):
         return f"total_w: {self.total_w}, total_wo: {self.total_wo}, balance: {self.balance}"
@@ -157,20 +157,21 @@ class LandUseChangeCalculator(BaseCalculator):
             missing_module = "start" if start_module is None else "end"
             raise Exception(f"LandUseChange module must have a start and end module. Missing {missing_module} module.")
         
-        start_module = start_module.first()
-        end_module = end_module.first()
+        start_module = start_module.get(land_use_change=input)
+        end_module = end_module.get(land_use_change=input)
 
         start_result = CalculatorFactory().calculate_result(start_module)
 
-        if start_module.__class__ == ForestManagement:
-            luc = DeforestationCalculator(start_module).calculate()
-        if end_module.__class__ == ForestManagement:
-            luc = ForestManagement(end_module).calculate()
-        else:
-            luc = OtherLandUseCalculator(end_module).calculate()
+        # TODO: Finish calculators implementation
+        # if start_module.__class__ == ForestManagement:
+        #     luc = DeforestationCalculator(start_module).calculate()
+        # if end_module.__class__ == ForestManagement:
+        #     luc = ForestManagement(end_module).calculate()
+        # else:
+        #     luc = OtherLandUseCalculator(end_module).calculate()
 
         end_result: Result = CalculatorFactory().calculate_result(end_module)
-        end_result.add(luc)
+        # end_result.add(luc)
 
         result = Result().add(start_result).add(end_result)
 
@@ -233,7 +234,7 @@ class DeforestationCalculator(BaseCalculator):
         flu_end = LandUseCarbonStockExchangeFactor.objects.get(climate=climate, moisture=moisture, land_use_type=luc.land_use_type_end)
 
         inputs_start = [
-            luc.ha,
+            luc.area,
             0,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
@@ -267,7 +268,7 @@ class DeforestationCalculator(BaseCalculator):
 
         inputs_w = [
             0,
-            luc.ha,
+            luc.area,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
             change_rate.name,
@@ -300,7 +301,7 @@ class DeforestationCalculator(BaseCalculator):
 
         inputs_wo = [
             0,
-            luc.ha,
+            luc.area,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
             change_rate.name,
@@ -334,7 +335,7 @@ class DeforestationCalculator(BaseCalculator):
         results_w = MathDeforestation(*inputs_w).calculate_emissions()
         results_wo = MathDeforestation(*inputs_wo).calculate_emissions()
 
-        return Result(results_w+results_start, results_wo+results_start, results_w - results_wo)
+        return Result(results_w+results_start, results_wo+results_start)
 
 class AfforestationCalculator(BaseCalculator):
     """
@@ -406,7 +407,7 @@ class AfforestationCalculator(BaseCalculator):
 
         # TODO: Class Based inputs
         inputs_start = [
-            luc.ha,
+            luc.area,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
             initial_biomass_start.value,
@@ -440,7 +441,7 @@ class AfforestationCalculator(BaseCalculator):
         ]
 
         inputs_start = [
-            luc.ha,
+            luc.area,
             0,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
@@ -477,7 +478,7 @@ class AfforestationCalculator(BaseCalculator):
 
         inputs_w = [
             0,
-            luc.ha,
+            luc.area,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
             initial_biomass_end.value,
@@ -513,7 +514,7 @@ class AfforestationCalculator(BaseCalculator):
 
         inputs_wo = [
             0,
-            luc.ha,
+            luc.area,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
             initial_biomass_start.value,
@@ -551,7 +552,7 @@ class AfforestationCalculator(BaseCalculator):
         results_w = affo.calculate_w_wo_balance(*inputs_w)
         results_wo = affo.calculate_w_wo_balance(*inputs_wo)
 
-        return Result(results_w.total+results_start.total, results_wo.total+results_start.total, results_w.total - results_wo.total)
+        return Result(results_w.total+results_start.total, results_wo.total+results_start.total)
 
 class OtherLandUseCalculator(BaseCalculator):
     """
@@ -646,14 +647,14 @@ class AnnualCroppingCalculator(BaseCalculator):
 
         input: AnnualCropping = self.data
         project: Project = input.activity.project
+        luc: LandUseChange = input.land_use_change
         change_rate = input.activity.change_rate
         climate = project.climate
         moisture = project.moisture
 
-        cm = {
-            "climate": climate,
-            "moisture": moisture,
-        }
+        area = luc.area if luc.area else input.area
+
+        cm = {"climate": climate, "moisture": moisture}
 
         crop_type_start = input.crop_type_start
         crop_type_w = input.crop_type_w
@@ -662,9 +663,6 @@ class AnnualCroppingCalculator(BaseCalculator):
         minor_crop_type_start = input.minor_crop_type_start
         minor_crop_type_w = input.minor_crop_type_w
         minor_crop_type_wo = input.minor_crop_type_wo
-
-        relative, relation = get_relative(self.data)
-        is_parent = relation == "parent"
 
         burning_emission_factor = BurningEmissionFactor.objects.get(category__name="Agricultural residues")
 
@@ -689,7 +687,7 @@ class AnnualCroppingCalculator(BaseCalculator):
             minor_n_estimation_factor_wo = CropNitrousEstimationDefaultFactor.objects.get_or_grains(crop_type=minor_crop_type_wo)
 
         except:
-            # If only one of the above operations fails, all minor variables must be set to None for the math model to workx
+            # If only one of the above operations fails, all minor variables must be set to None for the math model to work
             minor_burning_emission_factor = None
 
             minor_combustion_factor_start = None
@@ -736,12 +734,8 @@ class AnnualCroppingCalculator(BaseCalculator):
             ).average
         )
 
-        ha_data_start = [input.ha_start, 0]
-        ha_data_w = [0, input.ha_w]
-        ha_data_wo = [0, input.ha_wo]
-
         inputs_start = [
-            *ha_data_start,
+            *[area, 0],
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
             change_rate.name,
@@ -789,7 +783,7 @@ class AnnualCroppingCalculator(BaseCalculator):
         ]
 
         inputs_w = [
-            *ha_data_w,
+            *[0, area],
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
             change_rate.name,
@@ -834,7 +828,7 @@ class AnnualCroppingCalculator(BaseCalculator):
         ]
 
         inputs_wo = [
-            *ha_data_wo,
+            *[0, area],
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
             change_rate.name,
@@ -882,7 +876,7 @@ class AnnualCroppingCalculator(BaseCalculator):
         results_w = AnnualCropland(*inputs_w).calculate_emissions()
         results_wo = AnnualCropland(*inputs_wo).calculate_emissions()
 
-        results = Result(results_w+results_start, results_wo+results_start, results_w-results_wo)
+        results = Result(results_w+results_start, results_wo+results_start)
 
         return results
 
@@ -896,13 +890,16 @@ class PerennialCroppingCalculator(BaseCalculator):
         Calculate emissions for a single PerennialCropping module.
         """
 
-        project = self.data.activity.project
         module: PerennialCropping = self.data
+        project = module.activity.project
+        luc: LandUseChange = module.land_use_change
         climate = project.climate
         moisture = project.moisture
         continent = project.continent
         parent, _ = get_relative(module)
         change_rate = module.activity.change_rate
+
+        area = luc.area if luc else module.area
 
         cm = {
             "climate": climate,
@@ -952,7 +949,7 @@ class PerennialCroppingCalculator(BaseCalculator):
         default_fire_periodicity = AnnualCroplandParameter.objects.get(name="default_fire_periodicity")
 
         inputs_start = [
-            module.ha_start,
+            area,
             0,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
@@ -983,7 +980,7 @@ class PerennialCroppingCalculator(BaseCalculator):
 
         inputs_w = [
             0,
-            module.ha_w,
+            area,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
             change_rate.name,
@@ -1013,7 +1010,7 @@ class PerennialCroppingCalculator(BaseCalculator):
 
         inputs_wo = [
             0,
-            module.ha_wo,
+            area,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
             change_rate.name,
@@ -1046,7 +1043,7 @@ class PerennialCroppingCalculator(BaseCalculator):
         results_wo = PerennialCropland(*inputs_wo).calculate_emissions()
 
         # BUG: Results for perennial crops do not add up. Wait for Lorenzo's unlocked Excel files
-        return Result(results_w+results_start, results_wo+results_start, results_w-results_wo)
+        return Result(results_w+results_start, results_wo+results_start)
 
 class FloodedRiceCalculator(BaseCalculator):
     """
@@ -1057,6 +1054,8 @@ class FloodedRiceCalculator(BaseCalculator):
 
         input: FloodedRice = self.data
         project: Project = input.activity.project
+        luc: LandUseChange = input.land_use_change
+        area = luc.area if luc.area else input.area
         
         flu = LandUseCarbonStockExchangeFactor.objects.get(land_use_type__name="Flooded Rice", climate=project.climate, moisture=project.moisture)
         efc = RiceDefaultEmissionFactor.objects.get(continent=project.country.continent,)
@@ -1079,8 +1078,7 @@ class FloodedRiceCalculator(BaseCalculator):
         rice_cf = FiresCombustionFactor.objects.get(crop_type__name="Rice")
 
         inputs_start = [
-            input.ha_start,
-            0,
+            *[area, 0],
             efc.value,
             input.efc_t2_start,
             sfw_start.value,
@@ -1116,8 +1114,7 @@ class FloodedRiceCalculator(BaseCalculator):
         ]
 
         inputs_w = [
-            0,
-            input.ha_w,
+            *[0, area],
             efc.value,
             input.efc_t2_w,
             sfw_w.value,
@@ -1153,8 +1150,7 @@ class FloodedRiceCalculator(BaseCalculator):
         ]
 
         inputs_wo = [
-            0,
-            input.ha_wo,
+            *[0, area],
             efc.value,
             input.efc_t2_wo,
             sfw_wo.value,
@@ -1201,7 +1197,7 @@ class FloodedRiceCalculator(BaseCalculator):
         results_w = math_w.total_emissions
         results_wo = math_wo.total_emissions
 
-        return Result(results_w+results_start, results_wo+results_start, results_w-results_wo)
+        return Result(results_w+results_start, results_wo+results_start)
 
 class GrasslandCalculator(BaseCalculator):
     """
@@ -1216,18 +1212,20 @@ class GrasslandCalculator(BaseCalculator):
 
         module: Grassland = self.data
         project = module.activity.project
+        luc: LandUseChange = module.land_use_change
         change_rate = module.activity.change_rate
         ef = BurningEmissionFactor.objects.get(category__name="Savanna and grassland")
         agb = GrasslandAGB.objects.get(climate=project.climate, moisture=project.moisture)
         cf = GrasslandParameter.objects.get(name="default_combustion_factor").value
+
+        area = luc.area if luc.area else module.area
 
         soc_start = GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_start, climate=project.climate)
         soc_w = GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_w, climate=project.climate)
         soc_wo = GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_wo, climate=project.climate)
 
         inputs_w = [
-            0,
-            module.ha_w,
+            *[0, area],
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
             change_rate.name,
@@ -1253,8 +1251,7 @@ class GrasslandCalculator(BaseCalculator):
         ]
 
         inputs_wo = [
-            0,
-            module.ha_wo,
+            *[0, area],
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
             change_rate.name,
@@ -1288,7 +1285,7 @@ class GrasslandCalculator(BaseCalculator):
         results_w = math_w.total_emissions
         results_wo = math_wo.total_emissions
 
-        return Result(results_w, results_wo, results_w-results_wo)
+        return Result(results_w, results_wo)
 
 class SmallFisheryCalculator(BaseCalculator):
     """
@@ -1391,7 +1388,7 @@ class SmallFisheryCalculator(BaseCalculator):
         results_w = math_w.total_emissions
         results_wo = math_wo.total_emissions
 
-        return Result(results_w, results_wo, results_w-results_wo)
+        return Result(results_w, results_wo)
 
 class LargeFisheryCalculator(BaseCalculator):
     """
@@ -1516,8 +1513,9 @@ class LargeFisheryCalculator(BaseCalculator):
         results_w = math_w.total_emissions
         results_wo = math_wo.total_emissions
 
-        return Result(results_w, results_wo, results_w-results_wo)
+        return Result(results_w, results_wo)
 
+# TODO: Delete
 class ForestCalculator(BaseCalculator):
     """
     TODO: Redo
@@ -1614,7 +1612,7 @@ class ForestCalculator(BaseCalculator):
         ]
 
         return Result(*forest_management.calculate_emissions(*inputs))
-
+# END TODO: Delete
 class AquacultureCalculator(BaseCalculator):
     """
     Calculator for aquaculture.
@@ -1667,7 +1665,7 @@ class AquacultureCalculator(BaseCalculator):
         emissions_w = results_w.total_emissions
         emissions_wo = results_wo.total_emissions
 
-        return Result(emissions_w, emissions_wo, emissions_w - emissions_wo)
+        return Result(emissions_w, emissions_wo)
 
 class InputCalculator(BaseCalculator):
     """
@@ -1678,15 +1676,8 @@ class InputCalculator(BaseCalculator):
         project: Project = self.data.activity.project
         input: Input = self.data
 
-        ref = InputReference.objects.get(
-            gw_potential=project.gw_potential, input_type=self.data.input_type
-        )
-
-        ef = InputEmissionFactor.objects.get(
-            input_type=self.data.input_type,
-            climate=project.climate,
-            moisture=project.moisture,
-        )
+        ref = InputReference.objects.get(gw_potential=project.gw_potential, input_type=self.data.input_type)
+        ef = InputEmissionFactor.objects.get(input_type=self.data.input_type,climate=project.climate,moisture=project.moisture)
 
         inputs_w = [
             input.value_start,
@@ -1731,13 +1722,13 @@ class InputCalculator(BaseCalculator):
         results_w = MathInputs(*inputs_w).calculate_emissions()
         results_wo = MathInputs(*inputs_wo).calculate_emissions()
 
-        results = [results_w, results_wo, results_w - results_wo]
+        results = [results_w, results_wo]
 
         return Result(*results)
 
 class ElectricityCalculator(BaseCalculator):
     """
-    #TODO: Calculator for energy.
+    Calculator for energy.
     """
 
     def calculate(self) -> list[Result]:
@@ -1748,10 +1739,7 @@ class ElectricityCalculator(BaseCalculator):
         input: Electricity = self.data
         project: Project = self.data.activity.project
 
-        elec: ElectricityEmission = ElectricityEmission.objects.get(
-            country=project.country,
-            continent=project.country.continent,  # TODO: Remove continent from model and from project
-        )
+        elec: ElectricityEmission = ElectricityEmission.objects.get(country=project.country, continent=project.country.continent)  # TODO: Remove continent from model and from project
 
         inputs_w = [
             elec.operating_margin
@@ -1783,7 +1771,7 @@ class ElectricityCalculator(BaseCalculator):
 
         res_wo = ElectryicityConsumption(*inputs_wo).calculate_emissions()
 
-        return Result(res_w, res_wo, res_w - res_wo)
+        return Result(res_w, res_wo)
 
     # FuelType can be solid or liquid. Call different classes based on that
 
@@ -1801,10 +1789,7 @@ class FuelCalculator(BaseCalculator):
         project: Project = self.data.activity.project
 
         macro_fuel_type = input.fuel_type.macro_fuel_type.name
-
-        ef = EnergyDefaultEmissionFactor.objects.get(
-            fuel_type=input.fuel_type,
-        )
+        ef = EnergyDefaultEmissionFactor.objects.get(fuel_type=input.fuel_type)
 
         if macro_fuel_type == "Liquid":
             input_w = [
@@ -1868,9 +1853,9 @@ class FuelCalculator(BaseCalculator):
             res_w = SolidConsumption(*input_w).calculate_emissions()
             res_wo = SolidConsumption(*input_wo).calculate_emissions()
 
-            return Result(res_w, res_wo, res_w - res_wo)
+            return Result(res_w, res_wo)
 
-        return Result(0, 0, 0)
+        return Result()
     
 class SettlementCalculator(BaseCalculator):
     """
@@ -1932,7 +1917,7 @@ class BuildingCalculator(BaseCalculator):
         results_w = math_w.total_emissions
         results_wo = math_wo.total_emissions
 
-        return Result(results_w, results_wo, results_w - results_wo)
+        return Result(results_w, results_wo)
     
 class RoadCalculator(BaseCalculator):
     """
@@ -1977,7 +1962,7 @@ class RoadCalculator(BaseCalculator):
         results_w = math_w.total_emissions
         results_wo = math_wo.total_emissions
 
-        return Result(results_w, results_wo, results_w - results_wo)
+        return Result(results_w, results_wo)
 
 class LivestockCalculator(BaseCalculator):
     """
@@ -2690,7 +2675,7 @@ class LivestockCalculator(BaseCalculator):
         results_w = MathLivestock(*i_w).calculate_emissions()
         results_wo = MathLivestock(*i_wo).calculate_emissions()
 
-        return Result(results_w, results_wo, results_w - results_wo)
+        return Result(results_w, results_wo)
 
 class IrrigationSystemCalculator(BaseCalculator):
     """
@@ -2733,7 +2718,7 @@ class IrrigationSystemCalculator(BaseCalculator):
 
         results_wo = NewIrrigation(*inputs_wo).calculate_emissions()
 
-        return Result(results_w, results_wo, results_w - results_wo)
+        return Result(results_w, results_wo)
 
 class IrrigationPhaseCalculator(BaseCalculator):
 
@@ -2819,7 +2804,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
 
         results_wo = OperationPhaseIrrigation(*inputs_wo).calculate_emissions()
 
-        return Result(results_w+results_start, results_wo+results_start, results_w - results_wo)
+        return Result(results_w+results_start, results_wo+results_start)
 
 class CoastalWetlandCalculator(BaseCalculator):
     """
@@ -2924,7 +2909,7 @@ class CoastalWetlandCalculator(BaseCalculator):
         results_w = math_w.total_emissions
         results_wo = math_wo.total_emissions
 
-        return Result(results_w, results_wo, results_w - results_wo)
+        return Result(results_w, results_wo)
 
 class WaterbodyCalculator(BaseCalculator):
     """
@@ -3011,7 +2996,7 @@ class WaterbodyCalculator(BaseCalculator):
         results_w = math_w.total_emissions
         results_wo = math_wo.total_emissions
 
-        return Result(results_w+results_start, results_wo+results_start, results_w - results_wo)
+        return Result(results_w+results_start, results_wo+results_start)
 
 
 
@@ -3226,6 +3211,7 @@ class RewettingCalculator(BaseCalculator):
 
         return Result(*coastal_wetlands.rewetting_w_wo(*inputs))
 
+### END TO BE REMOVED ###
 class OrganicSoilCalculator(BaseCalculator):
 
     def calculate(self) -> Result:
