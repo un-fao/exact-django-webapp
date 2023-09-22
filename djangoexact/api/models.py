@@ -104,6 +104,7 @@ class LandUseType(Model):
         related_name="children",
         limit_choices_to={"parent": None},
     )
+    module_type = ForeignKey("api.ModuleType", on_delete=CASCADE, null=True, blank=True)
 
     def __str__(self):
         return f"({self.pk}) {self.name}" + (
@@ -2417,7 +2418,10 @@ class DegradedLand(Module):
     bgb_t2_wo = FloatField(null=True, blank=True)
 
 class LandUseChange(Module):
-    
+
+    land_use_type_start = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="luc_start")
+    land_use_type_end = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="luc_end")
+
     module_type_start = ForeignKey(ModuleType, on_delete=CASCADE, null=True, blank=True, related_name="start")
     module_type_end = ForeignKey(ModuleType, on_delete=CASCADE, null=True, blank=True, related_name="end")
     ha = FloatField(null=True, blank=True)
