@@ -1194,80 +1194,73 @@ class Livestock(Module):
 ##### Forest Management #####
 
 
-class Forest(Module):
-    vegetation_type = ForeignKey(VegetationType, on_delete=CASCADE)
-    degradation_level_start = ForeignKey(
-        ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_start"
-    )
-    degradation_level_w = ForeignKey(
-        ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_w"
-    )
-    degradation_level_wo = ForeignKey(
-        ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_wo"
-    )
-    is_fire_used_w = BooleanField(default=False)
-    is_fire_used_wo = BooleanField(default=False)
-    fire_periodicity_w = IntegerField(null=True, blank=True)
-    fire_periodicity_wo = IntegerField(null=True, blank=True)
-    fire_impact_percentage_w = FloatField(
-        null=True, blank=True
-    )  # TODO: What's the default value?
-    fire_impact_percentage_wo = FloatField(
-        null=True, blank=True
-    )  # TODO: What's the default value?
-    ha_start = FloatField(null=True, blank=True)
-    ha_w = FloatField(null=True, blank=True)
-    ha_w_rate = ForeignKey(
-        ChangeRate,
-        on_delete=CASCADE,
-        null=True,
-        blank=True,
-        related_name="%(class)s_ha_w_rate",
-    )
-    ha_wo = FloatField(null=True, blank=True)
-    ha_wo_rate = ForeignKey(
-        ChangeRate,
-        on_delete=CASCADE,
-        null=True,
-        blank=True,
-        related_name="%(class)s_ha_wo_rate",
-    )
+class ForestManagement(Module):
+    forest_type = ForeignKey("api.ForestType", on_delete=CASCADE)
 
-    degradation_level_start_t2 = ForeignKey(
-        ForestDegradationLevel,
-        on_delete=CASCADE,
-        related_name="%(class)s_start_t2",
-        null=True,
-        blank=True,
-    )
-    degradation_level_w_t2 = ForeignKey(
-        ForestDegradationLevel,
-        on_delete=CASCADE,
-        related_name="%(class)s_w_t2",
-        null=True,
-        blank=True,
-    )
-    degradation_level_wo_t2 = ForeignKey(
-        ForestDegradationLevel,
-        on_delete=CASCADE,
-        related_name="%(class)s_wo_t2",
-        null=True,
-        blank=True,
-    )
+    degradation_level_start = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_start")
+    degradation_level_w = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_w")
+    degradation_level_wo = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_wo")
+    degradation_level_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_degradation_level_thread")
 
-    ag_carbon_t2 = FloatField(null=True, blank=True)
-    bg_carbon_t2 = FloatField(null=True, blank=True)
-    litter_t2 = FloatField(null=True, blank=True)
-    deadwood_t2 = FloatField(null=True, blank=True)
+    rotation_occurrence_start = FloatField(null=True, blank=True)
+    rotation_occurrence_w = FloatField(null=True, blank=True)
+    rotation_occurrence_wo = FloatField(null=True, blank=True)
+    rotation_occurrence_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_rotation_occurrence_thread")
 
-    soil_carbon_t2 = FloatField(null=True, blank=True)
+    is_rotation_used_for_energy_start = BooleanField(default=False)
+    is_rotation_used_for_energy_w = BooleanField(default=False)
+    is_rotation_used_for_energy_wo = BooleanField(default=False)
+    is_rotation_used_for_energy_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_is_used_for_energy_thread")
 
-    land_input_factor_start_t2 = FloatField(null=True, blank=True)
-    land_input_factor_w_t2 = FloatField(null=True, blank=True)
-    land_input_factor_wo_t2 = FloatField(null=True, blank=True)
+    logging_start = FloatField(null=True, blank=True)
+    logging_w = FloatField(null=True, blank=True)
+    logging_wo = FloatField(null=True, blank=True)
+    logging_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_logging_thread")
 
-    implementation_year_start_t2 = IntegerField(null=True, blank=True)
+    is_logging_used_for_energy_start = BooleanField(default=False)
+    is_logging_used_for_energy_w = BooleanField(default=False)
+    is_logging_used_for_energy_wo = BooleanField(default=False)
+    is_logging_used_for_energy_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_is_logging_used_for_energy_thread")
 
+    soil_carbon_t2_start = FloatField(null=True, blank=True)
+    soil_carbon_t2_w = FloatField(null=True, blank=True)
+    soil_carbon_t2_wo = FloatField(null=True, blank=True)
+
+    land_use_factor_t2_start = FloatField(null=True, blank=True)
+    land_use_factor_t2_w = FloatField(null=True, blank=True)
+    land_use_factor_t2_wo = FloatField(null=True, blank=True)
+
+    agb_t2_start = FloatField(null=True, blank=True)
+    agb_t2_w = FloatField(null=True, blank=True)
+    agb_t2_wo = FloatField(null=True, blank=True)
+
+    bgb_t2_start = FloatField(null=True, blank=True)
+    bgb_t2_w = FloatField(null=True, blank=True)
+    bgb_t2_wo = FloatField(null=True, blank=True)
+
+    agb_growth_rate_gt_20_yrs_t2_start = FloatField(null=True, blank=True)
+    agb_growth_rate_gt_20_yrs_t2_w = FloatField(null=True, blank=True)
+    agb_growth_rate_gt_20_yrs_t2_wo = FloatField(null=True, blank=True)
+
+    agb_growth_rate_le_20_yrs_t2_start = FloatField(null=True, blank=True)
+    agb_growth_rate_le_20_yrs_t2_w = FloatField(null=True, blank=True)
+    agb_growth_rate_le_20_yrs_t2_wo = FloatField(null=True, blank=True)
+
+    bgb_growth_rate_gt_20_yrs_t2_start = FloatField(null=True, blank=True)
+    bgb_growth_rate_gt_20_yrs_t2_w = FloatField(null=True, blank=True)
+    bgb_growth_rate_gt_20_yrs_t2_wo = FloatField(null=True, blank=True)
+
+    bgb_growth_rate_le_20_yrs_t2_start = FloatField(null=True, blank=True)
+    bgb_growth_rate_le_20_yrs_t2_w = FloatField(null=True, blank=True)
+    bgb_growth_rate_le_20_yrs_t2_wo = FloatField(null=True, blank=True)
+
+    litter_t2_start = FloatField(null=True, blank=True)
+    litter_t2_w = FloatField(null=True, blank=True)
+    litter_t2_wo = FloatField(null=True, blank=True)
+
+    deadwood_t2_start = FloatField(null=True, blank=True)
+    deadwood_t2_w = FloatField(null=True, blank=True)
+    deadwood_t2_wo = FloatField(null=True, blank=True)
 
 ##### Inland Wetlands #####
 
@@ -2416,6 +2409,12 @@ class DegradedLand(Module):
     bgb_t2_start = FloatField(null=True, blank=True)
     bgb_t2_w = FloatField(null=True, blank=True)
     bgb_t2_wo = FloatField(null=True, blank=True)
+
+class ForestType(Model):
+    name = CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return f"({self.id}) {self.name}"
 
 class LandUseChange(Module):
 
