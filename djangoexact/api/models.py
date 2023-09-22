@@ -1194,7 +1194,7 @@ class Livestock(Module):
 ##### Forest Management #####
 
 
-class ForestManagement(Module):
+class ForestManagement(Assessment):
     forest_type = ForeignKey("api.ForestType", on_delete=CASCADE)
 
     degradation_level_start = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_start")
@@ -2023,11 +2023,11 @@ class LandUseChange(Module):
     module_type_end = ForeignKey(ModuleType, on_delete=CASCADE, null=True, blank=True, related_name="end")
     ha = FloatField(null=True, blank=True)
 
-    fire_use_w = BooleanField(default=False)
-    fire_use_wo = BooleanField(default=False)
+    is_fire_used_start = BooleanField(default=False)
+    is_fire_used_end = BooleanField(default=False)
 
-    dry_matter_w = FloatField(null=True, blank=True)
-    dry_matter_wo = FloatField(null=True, blank=True)
+    dry_matter_start = FloatField(null=True, blank=True)
+    dry_matter_end = FloatField(null=True, blank=True)
     
 ### MODEL PARAMETERS TABLES ###
 
