@@ -336,7 +336,6 @@ def generic_module_viewset(model: Model):
                     luc_start = luc.land_use_type_start
                     luc_end = luc.land_use_type_end
 
-                    # NOTE: Should I prevent the module to be created if the correct module type has not yet been selected in LandUseChange?
                     if not luc_start and not luc_end:
                         return ErrorResponse(f"Land use change must have at least one land use type selected.", status=status.HTTP_400_BAD_REQUEST)
                     
