@@ -1,6 +1,7 @@
 # download a package to calculate logarithm in base e
 import math
 import traceback
+import numpy as np
 
 def average_yearly_value(yearly_breakdown: list):
      
@@ -89,6 +90,45 @@ def breakdown_according_to_values(maximum, list_of_proportions):
 
     result = [maximum * i/sum(list_of_proportions) for i in list_of_proportions]
     return result
+
+def yearly_time_dependent_increase_half_year(start_value, end_value, years_implementation, years_capitalization, function):
+
+
+    result_interim = yearly_time_dependent_parameter_breakdown(start_value, end_value, years_implementation, years_capitalization, function, interim_values = True)
+    result_not_interim = yearly_time_dependent_parameter_breakdown(start_value, end_value, years_implementation, years_capitalization, function, interim_values = False)
+
+    # subtract result_interim with each equivalent value in result_not_interim
+    result = [i-j for i, j in zip(result_interim, result_not_interim)]
+
+    return result 
+
+def yearly_time_dependent_full_year(start_value, end_value, years_implementation, years_capitalization, function):
+    
+    values_at_year = yearly_time_dependent_parameter_breakdown(start_value, end_value, years_implementation, years_capitalization, function, interim_values = False)
+    delta_yearly = [values_at_year[i] - values_at_year[i-1] for i in range(1, len(values_at_year))]
+
+    return delta_yearly
+
+def yearly_time_dependent_matrix(start_value, end_value, years_implementation, years_capitalization, function, interim_values = True):
+        
+        
+        years_total = years_implementation + years_capitalization 
+
+        half_year = yearly_time_dependent_increase_half_year(start_value, end_value, years_implementation, years_capitalization, function)
+        full_year = yearly_time_dependent_full_year(start_value, end_value, years_implementation, years_capitalization, function)
+
+        matrix = np.full((years_total, years_total), 0.)
+        n = len(half_year)
+
+        
+        for i in range(n):
+            matrix[i][i] = half_year[i]
+            for j in range(i+1, n):
+                matrix[i][j] = full_year[j]
+
+        return matrix
+
+
 
 # LIVESTOCK CH4 HEAD GENERAL FUNCTION    
 def ch4_head_calculation_general(tam: float, vser: float, ef_prp: float, percentage_prp_default: float, percentage_prp_tier_2: float, ef_system_default: list, ch4_prp_tier_2: float, percentage_system_default: list, ef_single_system, ch4_system_tier_2, ch4_dividing_parameter = 1):
