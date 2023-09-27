@@ -8,7 +8,9 @@ class AnnexedModule:
                     time_impl, time_cap, nitrous_constant,  # GENERAL INFO
                     ef_doc_ref_drainage_initial, ef_doc_tier_2_drainage_initial, area_drained_start, area_drained_end, ef_co2_ref_drainage_initial, ef_co2_tier_2_drainage_initial, percentage_ditches_start, percentage_ditches_end, ef_ch4_onsite_ref_drainage_initial, ef_ch4_onsite_tier_2_drainage_initial, ef_ch4_offsite_ref_drainage_initial, ef_ch4_offsite_tier_2_drainage_initial, ef_n2o_ref_drainage_initial, ef_n2o_tier_2_drainage_initial, # DRAINAGE EMISSIONS INITIAL
                     ef_doc_ref_drainage_final, ef_doc_tier_2_drainage_final, ef_co2_ref_drainage_final, ef_co2_tier_2_drainage_final, ef_ch4_onsite_ref_drainage_final, ef_ch4_onsite_tier_2_drainage_final, ef_ch4_offsite_ref_drainage_final, ef_ch4_offsite_tier_2_drainage_final, ef_n2o_ref_drainage_final, ef_n2o_tier_2_drainage_final, # DRAINAGE EMISSIONS FINAL
-                    ):
+                    ef_doc_rewetting_initial, ef_doc_rewetting_initial_tier_2, ef_co2_rewetting_initial, ef_co2_rewetting_initial_tier_2, ef_ch4_rewetting_initial, ef_ch4_rewetting_initial_tier_2, ef_n2o_rewetting_initial, ef_n2o_rewetting_initial_tier_2, # REWETTING EMISSIONS INITIAL
+                    ef_doc_rewetting_final, ef_doc_rewetting_final_tier_2, ef_co2_rewetting_final, ef_co2_rewetting_final_tier_2, ef_ch4_rewetting_final, ef_ch4_rewetting_final_tier_2, ef_n2o_rewetting_final, ef_n2o_rewetting_final_tier_2, # REWETTING EMISSIONS FINAL
+                    maximum_area_for_water_management): # GENERAL INFO
         
         self.fire_boolean_end = fire_boolean_end
         self.fire_periodicity_end = fire_periodicity_end
@@ -51,6 +53,25 @@ class AnnexedModule:
         self.ef_ch4_offsite_tier_2_drainage_final = ef_ch4_offsite_tier_2_drainage_final
         self.ef_n2o_ref_drainage_final = ef_n2o_ref_drainage_final
         self.ef_n2o_tier_2_drainage_final = ef_n2o_tier_2_drainage_final
+        self.ef_doc_rewetting_initial = ef_doc_rewetting_initial
+        self.ef_doc_rewetting_initial_tier_2 = ef_doc_rewetting_initial_tier_2
+        self.ef_co2_rewetting_initial = ef_co2_rewetting_initial
+        self.ef_co2_rewetting_initial_tier_2 = ef_co2_rewetting_initial_tier_2
+        self.ef_ch4_rewetting_initial = ef_ch4_rewetting_initial
+        self.ef_ch4_rewetting_initial_tier_2 = ef_ch4_rewetting_initial_tier_2
+        self.ef_n2o_rewetting_initial = ef_n2o_rewetting_initial
+        self.ef_n2o_rewetting_initial_tier_2 = ef_n2o_rewetting_initial_tier_2
+        self.ef_doc_rewetting_final = ef_doc_rewetting_final
+        self.ef_doc_rewetting_final_tier_2 = ef_doc_rewetting_final_tier_2
+        self.ef_co2_rewetting_final = ef_co2_rewetting_final
+        self.ef_co2_rewetting_final_tier_2 = ef_co2_rewetting_final_tier_2
+        self.ef_ch4_rewetting_final = ef_ch4_rewetting_final
+        self.ef_ch4_rewetting_final_tier_2 = ef_ch4_rewetting_final_tier_2
+        self.ef_n2o_rewetting_final = ef_n2o_rewetting_final
+        self.ef_n2o_rewetting_final_tier_2 = ef_n2o_rewetting_final_tier_2
+
+
+        self.maximum_area_for_water_management = maximum_area_for_water_management
 
         # RESULTS
 
@@ -243,8 +264,28 @@ class AnnexedModule:
                 
             # TODO: check with Lorenzo why initial and final
             try:
-                total_co2_doc_initial, total_ch4_initial, total_n2o_initital, total_rewetting_initial = rewetting_emissions(area_rewetted_initial, ef_doc_initial, ef_co2_initial, ef_ch4_initial, ef_n2o_initial, methane_constant, nitrous_constant, rate_coefficient, time_impl, time_cap)
-                total_co2_doc_final, total_ch4_final, total_n2o_final, total_rewetting_final = rewetting_emissions(area_rewetted_final, ef_doc_final, ef_co2_final, ef_ch4_final, ef_n2o_final, methane_constant, nitrous_constant, rate_coefficient, time_impl, time_cap)
+                area_not_drained_start = self.maximum_area_for_water_management - self.area_drained_start
+                area_not_drained_end = self.maximum_area_for_water_management - self.area_drained_end
+
+                if area_not_drained_start == self.maximum_area_for_water_management:
+                    area_rewet_final = 0
+                    area_rewet_initial = 0
+                else:
+                    area_rewet_initial = max(0, area_not_drained_end - area_not_drained_start - self.area_affected_by_action_end)
+                    area_rewet_final = area_not_drained_end - area_rewet_initial
+
+                ef_doc_rewetting_initial = self.ef_doc_rewetting_initial if not self.ef_doc_rewetting_initial_tier_2 else self.ef_doc_rewetting_initial_tier_2
+                ef_co2_rewetting_initial = self.ef_co2_rewetting_initial if not self.ef_co2_rewetting_initial_tier_2 else self.ef_co2_rewetting_initial_tier_2
+                ef_ch4_rewetting_initial = self.ef_ch4_rewetting_initial if not self.ef_ch4_rewetting_initial_tier_2 else self.ef_ch4_rewetting_initial_tier_2
+                ef_n2o_rewetting_initial = self.ef_n2o_rewetting_initial if not self.ef_n2o_rewetting_initial_tier_2 else self.ef_n2o_rewetting_initial_tier_2
+
+                ef_doc_rewetting_final = self.ef_doc_rewetting_final if not self.ef_doc_rewetting_final_tier_2 else self.ef_doc_rewetting_final_tier_2
+                ef_co2_rewetting_final = self.ef_co2_rewetting_final if not self.ef_co2_rewetting_final_tier_2 else self.ef_co2_rewetting_final_tier_2
+                ef_ch4_rewetting_final = self.ef_ch4_rewetting_final if not self.ef_ch4_rewetting_final_tier_2 else self.ef_ch4_rewetting_final_tier_2
+                ef_n2o_rewetting_final = self.ef_n2o_rewetting_final if not self.ef_n2o_rewetting_final_tier_2 else self.ef_n2o_rewetting_final_tier_2
+            
+                total_co2_doc_initial, total_ch4_initial, total_n2o_initital, total_rewetting_initial = rewetting_emissions(area_rewet_initial, ef_doc_rewetting_initial, ef_co2_rewetting_initial, ef_ch4_rewetting_initial, ef_n2o_rewetting_initial, self.methane_constant, self.nitrous_constant, self.rate, self.time_impl, self.time_cap)
+                total_co2_doc_final, total_ch4_final, total_n2o_final, total_rewetting_final = rewetting_emissions(area_rewet_final, ef_doc_rewetting_final, ef_co2_rewetting_final, ef_ch4_rewetting_final, ef_n2o_rewetting_final, self.methane_constant, self.nitrous_constant, self.rate, self.time_impl, self.time_cap)
                 
                 total_rewetting = total_rewetting_final + total_rewetting_initial
                 self.emissions_rewetting_yearly = [i + j + k + l + m + n for i, j, k, l, m, n in zip(total_co2_doc_initial, total_ch4_initial, total_n2o_initital, total_co2_doc_final, total_ch4_final, total_n2o_final)]
