@@ -81,7 +81,7 @@ def check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value):
                 else:
                     delta_agb_matrix[i][j] = max_agb_value - agb_matrix[i][j-1]
 
-                delta_agb_matrix[i][j:] = 0
+                delta_agb_matrix[i][j+1:] = 0
                 break
     
     return agb_matrix, delta_agb_matrix
@@ -182,7 +182,7 @@ def calculate_rotation_effect(original_agb_matrix, original_delta_agb_matrix, ma
     results = dict(sorted(results.items()))
 
     # add to each year  
-    return results, rotation_matrix, agb_matrix
+    return results, rotation_matrix, delta_agb_matrix
 
 def calculate_logging_effect(original_agb_matrix, original_delta_agb_matrix, max_agb_value, recurrence, percentage):
         
@@ -206,7 +206,7 @@ def calculate_logging_effect(original_agb_matrix, original_delta_agb_matrix, max
             agb_matrix, delta_agb_matrix = update_agb_matrix_logging(agb_matrix, delta_agb_matrix, original_delta_agb_matrix, max_agb_value, logging_impact, i * recurrence - 1)
             agb_matrix, delta_agb_matrix = check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value)
         
-        return result, logging_impact, agb_matrix
+        return result, logging_impact, delta_agb_matrix
 
 def multiply_matrix_by_matrix(matrix1, matrix2):
     if matrix1.shape != matrix2.shape:
@@ -222,18 +222,19 @@ def multiply_matrix_by_matrix(matrix1, matrix2):
 
 # NOTE: LITTER AND DEADWOOD DON'T CARE, THEY KEEP ON GROWING
 # TODO: TALK AGAIN ABOUT LITTER AND DEADWOOD, NOW SET TO KEEP ON GROWING OR EXISTING REGARDLESS OF ROTATION AND LOGGING, MAY CHANGE IN FUTURE
-# agb_matrix, delta_agb_matrix = create_agb_matrix(5, 20, 10, 17, 92)
+# agb_matrix, delta_agb_matrix = create_agb_matrix(5, 5, 10, 17, 88)
 # #results, rotation_impact = calculate_rotation_effect(agb_matrix, delta_agb_matrix, 100, 5, 1)
-# results, logging_impact = calculate_logging_effect(agb_matrix, delta_agb_matrix, 100, 5, 0.5)
+# results, logging_matrix, agb_matrix = calculate_logging_effect(agb_matrix, delta_agb_matrix, 100, 5, 0.5)
 
 class ForestManagement:
 
-    def __init__(self, years_cap, years_impl, rate, hectares_start, hectares_end, rotation_recurrence, bgb_yearly_growth_under_20_default, 
+    def __init__(self, years_cap, years_impl, rate, hectares_start, hectares_end, rotation_recurrence, rotation_start_year, rotation_use_energy,bgb_yearly_growth_under_20_default, 
                 bgb_yearly_growth_under_20_tier_2, bgb_yearly_growth_over_20_deafult, bgb_yearly_growth_over_20_tier_2,
                 agb_start_default, agb_start_tier_2, bgb_start_default, bgb_start_tier_2, agb_yearly_growth_under_20_default, agb_yearly_growth_under_20_tier_2, 
                 agb_yearly_growth_over_20_default, agb_yearly_growth_over_20_tier_2, max_agb_value, max_bgb_value,
-                disturbance_or_logging_recurrence: list, disturbance_or_logging_percentage: list, litter_20_years_default, litter_20_years_tier_2, 
-                deadwood_20_years_default, deadwood_20_years_tier_2, socref_default, soc_tier_2, f_lu_tier_2, f_i_tier_2, f_mg_tier_2, f_lu_ref, f_i_ref, f_mg_ref):
+                disturbance_or_logging_recurrence: list, disturbance_or_logging_percentage: list, disturbance_or_logging_use_energy: list, disturbance_or_logging_year_of_start: list,
+                litter_20_years_default, litter_20_years_tier_2, deadwood_20_years_default, deadwood_20_years_tier_2, socref_default, 
+                soc_tier_2, f_lu_tier_2, f_i_tier_2, f_mg_tier_2, f_lu_ref, f_i_ref, f_mg_ref):
         
         self.years_cap = years_cap
         self.years_impl = years_impl
@@ -312,8 +313,8 @@ class ForestManagement:
                 
                 
                 if self.rotation_recurrence:
-                    result_rotation_agb, rotation_matrix_agb, agb_matrix = calculate_rotation_effect(agb_matrix, delta_agb_matrix, self.max_agb_value, self.rotation_recurrence)
-                    result_rotation_bgb, rotation_matrix_bgb, bgb_matrix = calculate_rotation_effect(bgb_matrix, delta_bgb_matrix, self.max_bgb_value, self.rotation_recurrence)
+                    result_rotation_agb, rotation_matrix_agb, delta_agb_matrix = calculate_rotation_effect(agb_matrix, delta_agb_matrix, self.max_agb_value, self.rotation_recurrence)
+                    result_rotation_bgb, rotation_matrix_bgb, delta_bgb_matrix = calculate_rotation_effect(bgb_matrix, delta_bgb_matrix, self.max_bgb_value, self.rotation_recurrence)
 
                     rotation_times_hectares_agb = multiply_matrix_by_matrix(rotation_matrix_agb, self.hectares_matrix)
                     rotation_times_hectares_bgb = multiply_matrix_by_matrix(rotation_matrix_bgb, self.hectares_matrix)
@@ -328,8 +329,8 @@ class ForestManagement:
                 
                 else:
                     for recurrence, percentage in zip(self.disturbance_or_logging_recurrence, self.disturbance_or_logging_percentage):
-                        result_logging_disturbance_agb, logging_matrix_agb, agb_matrix = calculate_logging_effect(agb_matrix, delta_agb_matrix, self.max_agb_value, recurrence, percentage)
-                        result_logging_disturbance_bgb, logging_matrix_bgb, bgb_matrix = calculate_logging_effect(bgb_matrix, delta_bgb_matrix, self.max_bgb_value, recurrence, percentage)
+                        result_logging_disturbance_agb, logging_matrix_agb, delta_agb_matrix = calculate_logging_effect(agb_matrix, delta_agb_matrix, self.max_agb_value, recurrence, percentage)
+                        result_logging_disturbance_bgb, logging_matrix_bgb, delta_bgb_matrix = calculate_logging_effect(bgb_matrix, delta_bgb_matrix, self.max_bgb_value, recurrence, percentage)
 
                         logging_times_hectares_agb = multiply_matrix_by_matrix(logging_matrix_agb, self.hectares_matrix)
                         logging_times_hectares_bgb = multiply_matrix_by_matrix(logging_matrix_bgb, self.hectares_matrix)
