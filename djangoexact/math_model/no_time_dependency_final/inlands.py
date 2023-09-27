@@ -4,9 +4,9 @@ import traceback
 
 class AnnexedModule:
 
-    def __init__(self, fire_boolean_end, fire_periodicity_end, area_affected_by_action_end, dry_matter_ref_fire, dry_matter_tier_2_fire, percentage_area_burned_end, ef_co2_ref_fire, ef_co2_tier_2_fire, ef_co_ref_fire, ef_co_tier_2_fire, ef_ch4_ref_fire, ef_ch4_tier_2_fire, methane_constant, rate_coefficient_fire_end, # FIRE EMISSIONS
+    def __init__(self, fire_boolean_end, fire_periodicity_end, area_affected_by_action_end, dry_matter_ref_fire, dry_matter_tier_2_fire, percentage_area_burned_end, ef_co2_ref_fire, ef_co2_tier_2_fire, ef_co_ref_fire, ef_co_tier_2_fire, ef_ch4_ref_fire, ef_ch4_tier_2_fire, methane_constant, rate, # FIRE EMISSIONS
                     time_impl, time_cap, nitrous_constant,  # GENERAL INFO
-                    rate_coefficient_drainage_end, ef_doc_ref_drainage_initial, ef_doc_tier_2_drainage_initial, area_drained_start, area_drained_end, ef_co2_ref_drainage_initial, ef_co2_tier_2_drainage_initial, percentage_ditches_start, percentage_ditches_end, ef_ch4_onsite_ref_drainage_initial, ef_ch4_onsite_tier_2_drainage_initial, ef_ch4_offsite_ref_drainage_initial, ef_ch4_offsite_tier_2_drainage_initial, ef_n2o_ref_drainage_initial, ef_n2o_tier_2_drainage_initial, # DRAINAGE EMISSIONS INITIAL
+                    ef_doc_ref_drainage_initial, ef_doc_tier_2_drainage_initial, area_drained_start, area_drained_end, ef_co2_ref_drainage_initial, ef_co2_tier_2_drainage_initial, percentage_ditches_start, percentage_ditches_end, ef_ch4_onsite_ref_drainage_initial, ef_ch4_onsite_tier_2_drainage_initial, ef_ch4_offsite_ref_drainage_initial, ef_ch4_offsite_tier_2_drainage_initial, ef_n2o_ref_drainage_initial, ef_n2o_tier_2_drainage_initial, # DRAINAGE EMISSIONS INITIAL
                     ef_doc_ref_drainage_final, ef_doc_tier_2_drainage_final, ef_co2_ref_drainage_final, ef_co2_tier_2_drainage_final, ef_ch4_onsite_ref_drainage_final, ef_ch4_onsite_tier_2_drainage_final, ef_ch4_offsite_ref_drainage_final, ef_ch4_offsite_tier_2_drainage_final, ef_n2o_ref_drainage_final, ef_n2o_tier_2_drainage_final, # DRAINAGE EMISSIONS FINAL
                     ):
         
@@ -23,11 +23,10 @@ class AnnexedModule:
         self.ef_ch4_ref_fire = ef_ch4_ref_fire
         self.ef_ch4_tier_2_fire = ef_ch4_tier_2_fire
         self.methane_constant = methane_constant
-        self.rate_coefficient_fire_end = rate_coefficient_fire_end
+        self.rate = rate
         self.time_impl = time_impl
         self.time_cap = time_cap
         self.nitrous_constant = nitrous_constant
-        self.rate_coefficient_drainage_end = rate_coefficient_drainage_end
         self.ef_doc_ref_drainage_initial = ef_doc_ref_drainage_initial
         self.ef_doc_tier_2_drainage_initial = ef_doc_tier_2_drainage_initial
         self.area_drained_start = area_drained_start
@@ -90,10 +89,10 @@ class AnnexedModule:
             
             try:
                 if self.fire_boolean_end or self.fire_periodicity_end > self.time_impl + self.time_cap:
-                    co2_co, ch4 = fire_co2_co_ch4(self.fire_periodicity_end, self.dry_matter_ref_fire if not self.dry_matter_tier_2_fire else self.dry_matter_tier_2_fire, self.area_affected_by_action_end, self.rate_coefficient_fire_end, self.time_impl, self.time_cap, self.percentage_area_burned_end, self.ef_co2_ref_fire if not self.ef_co2_tier_2_fire else self.ef_co2_tier_2_fire, self.ef_co_ref_fire if not self.ef_co_tier_2_fire else self.ef_co_tier_2_fire, self.ef_ch4_ref_fire if not self.ef_ch4_tier_2_fire else self.ef_ch4_tier_2_fire, self.methane_constant)
+                    co2_co, ch4 = fire_co2_co_ch4(self.fire_periodicity_end, self.dry_matter_ref_fire if not self.dry_matter_tier_2_fire else self.dry_matter_tier_2_fire, self.area_affected_by_action_end, self.rate, self.time_impl, self.time_cap, self.percentage_area_burned_end, self.ef_co2_ref_fire if not self.ef_co2_tier_2_fire else self.ef_co2_tier_2_fire, self.ef_co_ref_fire if not self.ef_co_tier_2_fire else self.ef_co_tier_2_fire, self.ef_ch4_ref_fire if not self.ef_ch4_tier_2_fire else self.ef_ch4_tier_2_fire, self.methane_constant)
                     # TODO: ask how they should be broken down
                     self.emissions_fire_total = co2_co + ch4
-                    self.emissions_fire_yearly = breakdown_according_to_values(self.emissions_fire_total, yearly_time_dependent_parameter_breakdown(0, self.area_affected_by_action_end * self.dry_matter_ref_fire if not self.dry_matter_tier_2_fire else self.area_affected_by_action_end * self.dry_matter_tier_2_fire, self.time_impl, self.time_cap, self.rate_coefficient_fire_end, interim_values = True))
+                    self.emissions_fire_yearly = breakdown_according_to_values(self.emissions_fire_total, yearly_time_dependent_parameter_breakdown(0, self.area_affected_by_action_end * self.dry_matter_ref_fire if not self.dry_matter_tier_2_fire else self.area_affected_by_action_end * self.dry_matter_tier_2_fire, self.time_impl, self.time_cap, self.rate, interim_values = True))
                 else:
                     self.emissions_fire_yearly = [0 for i in range(self.time_impl + self.time_cap)]
                     self.emissions_fire_total = 0
@@ -140,13 +139,13 @@ class AnnexedModule:
                     doc_start, doc_end = calculate_emissions_start_end(ef_doc, self.area_drained_start, 1, 1, self.area_drained_end, self.area_affected_by_action_end, 44/12)
 
 
-                    total_n2o = yearly_time_dependent_20_year_breakdown(n2ostart, n2oend, self.time_impl, self.time_cap, self.rate_coefficient_drainage_end, interim_values = True)
+                    total_n2o = yearly_time_dependent_20_year_breakdown(n2ostart, n2oend, self.time_impl, self.time_cap, self.rate, interim_values = True)
 
-                    total_ch4_onsite = yearly_time_dependent_20_year_breakdown(ch4_start, ch4_end, self.time_impl, self.time_cap, self.rate_coefficient_drainage_end, interim_values = True)
-                    total_ch4_off_site = yearly_time_dependent_20_year_breakdown(ch4_start_ditches, ch4_end_ditches, self.time_impl, self.time_cap, self.rate_coefficient_drainage_end, interim_values = True)
+                    total_ch4_onsite = yearly_time_dependent_20_year_breakdown(ch4_start, ch4_end, self.time_impl, self.time_cap, self.rate, interim_values = True)
+                    total_ch4_off_site = yearly_time_dependent_20_year_breakdown(ch4_start_ditches, ch4_end_ditches, self.time_impl, self.time_cap, self.rate, interim_values = True)
 
-                    total_doc = yearly_time_dependent_20_year_breakdown(doc_start, doc_end, self.time_impl, self.time_cap, self.rate_coefficient_drainage_end, interim_values = True)
-                    total_co2 = yearly_time_dependent_20_year_breakdown(co2_start, co2_end, self.time_impl, self.time_cap, self.rate_coefficient_drainage_end, interim_values = True)
+                    total_doc = yearly_time_dependent_20_year_breakdown(doc_start, doc_end, self.time_impl, self.time_cap, self.rate, interim_values = True)
+                    total_co2 = yearly_time_dependent_20_year_breakdown(co2_start, co2_end, self.time_impl, self.time_cap, self.rate, interim_values = True)
 
                     return total_n2o, total_ch4_onsite, total_ch4_off_site, total_doc, total_co2, sum(total_n2o) + sum(total_ch4_onsite) + sum(total_ch4_off_site) + sum(total_doc) + sum(total_co2)
                 
@@ -192,13 +191,13 @@ class AnnexedModule:
                     doc_start, doc_end = calculate_emissions_start_end(ef_doc, self.area_drained_start, 1, 1, self.area_drained_end, self.area_affected_by_action_end, 44/12)
 
 
-                    total_n2o = yearly_time_dependent_20_year_breakdown(n2ostart, n2oend, self.time_impl, self.time_cap, self.rate_coefficient_drainage_end, interim_values = True)
+                    total_n2o = yearly_time_dependent_20_year_breakdown(n2ostart, n2oend, self.time_impl, self.time_cap, self.rate, interim_values = True)
 
-                    total_ch4_onsite = yearly_time_dependent_20_year_breakdown(ch4_start, ch4_end, self.time_impl, self.time_cap, self.rate_coefficient_drainage_end, interim_values = True)
-                    total_ch4_off_site = yearly_time_dependent_20_year_breakdown(ch4_start_ditches, ch4_end_ditches, self.time_impl, self.time_cap, self.rate_coefficient_drainage_end, interim_values = True)
+                    total_ch4_onsite = yearly_time_dependent_20_year_breakdown(ch4_start, ch4_end, self.time_impl, self.time_cap, self.rate, interim_values = True)
+                    total_ch4_off_site = yearly_time_dependent_20_year_breakdown(ch4_start_ditches, ch4_end_ditches, self.time_impl, self.time_cap, self.rate, interim_values = True)
 
-                    total_doc = yearly_time_dependent_20_year_breakdown(doc_start, doc_end, self.time_impl, self.time_cap, self.rate_coefficient_drainage_end, interim_values = True)
-                    total_co2 = yearly_time_dependent_20_year_breakdown(co2_start, co2_end, self.time_impl, self.time_cap, self.rate_coefficient_drainage_end, interim_values = True)
+                    total_doc = yearly_time_dependent_20_year_breakdown(doc_start, doc_end, self.time_impl, self.time_cap, self.rate, interim_values = True)
+                    total_co2 = yearly_time_dependent_20_year_breakdown(co2_start, co2_end, self.time_impl, self.time_cap, self.rate, interim_values = True)
 
                     return total_n2o, total_ch4_onsite, total_ch4_off_site, total_doc, total_co2, sum(total_n2o) + sum(total_ch4_onsite) + sum(total_ch4_off_site) + sum(total_doc) + sum(total_co2)
                 except:
