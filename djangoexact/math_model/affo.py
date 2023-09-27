@@ -244,4 +244,4 @@ def default_tier_2 (biomass_start_default, soc_ref, flu_start_default, agb_under
 
     return biomass_start, soc_start, flu_start, agb_under_20_end, agb_over_20_end, bgb_under_20_end, bgb_over_20_end, reference_carbon_stocks_end, litter_end, dead_wood_end, soc_end, flu_end
 
-print(afforestation(100,0, 21,1,35,0,'True',265,28,2.30,0.21,0.8,'D',0.5,0.72,20,0,19.7,0,31.4,0,1,1, 0.39,0.39,0,0,0,0,0,40,0.39,0.24))
+# print(afforestation(100,0, 21,1,35,0,'True',265,28,2.30,0.21,0.8,'D',0.5,0.72,20,0,19.7,0,31.4,0,1,1, 0.39,0.39,0,0,0,0,0,40,0.39,0.24))
