@@ -1034,30 +1034,24 @@ class TrophicStateFactor(Model):
     def __str__(self):
         return f"({self.pk}) {self.trophic_type.name} {self.value} {self.chloa}"
     
-class SiteLocationType(Model):
-    name = CharField(max_length=255)
-
-    def __str__(self):
-        return f"({self.pk}) {self.name}"
-    
 
 # TODO: Dump data from here to end
 
 class OrganicSoilDrainageEmissionFactorManager(Manager):
-    def get_or_other_luc(self, climate, moisture, module_type, peat_type, site_location_type):
+    def get_or_other_luc(self, climate, moisture, module_type_name, peat_type, site_location_type_name):
         try:
             return self.get(
                 climate=climate,
                 moisture=moisture,
-                module_type=module_type,
+                module_type__name=module_type_name,
                 peat_type=peat_type,
-                site_location_type=site_location_type,
+                site_location_type__name=site_location_type_name,
             )
         except:
             return self.get(
                 climate=climate,
                 moisture=moisture,
-                module_type=module_type,
+                module_type__name=module_type_name,
                 peat_type=peat_type,
                 site_location_type__name="OtherLandUseChange",
             )
@@ -1084,9 +1078,9 @@ class OrganicSoilDrainageEmissionFactor(Model):
     objects = OrganicSoilDrainageEmissionFactorManager()
 
     def __str__(self):
-        return f"({self.pk}) {self.climate.name} {self.moisture.name} {self.land_use_type.name} {self.peat_type.name} {self.site_location_type.name}"
+        return f"({self.pk}) {self.climate.name} {self.moisture.name} {self.module_type.name} {self.peat_type.name} {self.site_location_type.name}"
     
-class PeatEctractionEmissionFactor(Model):
+class PeatExtractionEmissionFactor(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     peat_type = ForeignKey("api.PeatType", on_delete=CASCADE)
