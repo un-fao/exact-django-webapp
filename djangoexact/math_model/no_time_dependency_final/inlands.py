@@ -314,7 +314,7 @@ class PeatExtraction:
                  ef_co2_onsite_ref, ef_co2_onsite_tier_2, ef_ch4_onsite_ref, ef_ch4_onsite_tier_2, ef_n2o_onsite_ref,
                  ef_n2o_onsite_tier_2, ef_doc_offsite_ref, ef_doc_offsite_tier_2, ef_ch4_offsite_ref, ef_ch4_offsite_tier_2,
                  methane_constant, nitrous_constant, time_impl, time_cap, rate_coefficient_start,
-                 mass_tonnes_ref, mass_tonnes_tier_2, conversion_factor_volume, c_fraction_ref, extraction_height_start, extraction_height_end):
+                 weight_peat, mass_tonnes_tier_2, conversion_factor_volume, c_fraction_ref, extraction_height_start, extraction_height_end):
         
         self.hectares_start = hectares_start
         self.hectares_end = hectares_end
@@ -336,7 +336,7 @@ class PeatExtraction:
         self.time_impl = time_impl
         self.time_cap = time_cap
         self.rate_coefficient_start = rate_coefficient_start
-        self.mass_tonnes_ref = mass_tonnes_ref
+        self.weight_peat = weight_peat
         self.mass_tonnes_tier_2 = mass_tonnes_tier_2
         self.conversion_factor_volume = conversion_factor_volume
         self.c_fraction_ref = c_fraction_ref
@@ -402,15 +402,16 @@ class PeatExtraction:
             
         def off_site_emissions():
 
-            def yearly_emissions_calculation(ef_multiplication_parameter, hectars_start, hectars_end, ef, multiplier_start = 1, multiplier_end = 1):
-                return hectars_start * ef * ef_multiplication_parameter * multiplier_start, hectars_end * ef * ef_multiplication_parameter * multiplier_end
+            def yearly_emissions_calculation(mass_tonnes, hectares_start, hectares_end, height_of_extraction_start, height_of_extraction_end):
+
+                return mass_tonnes * hectares_start * height_of_extraction_start * 100, mass_tonnes * hectares_end * height_of_extraction_end * 100
 
             try:
-                mass_tonnes = self.mass_tonnes_ref if not self.mass_tonnes_tier_2 else self.mass_tonnes_tier_2
-                air_dry_weight_start, air_dry_weight_end = yearly_emissions_calculation(10000/100, self.hectares_start, self.hectares_end, mass_tonnes, self.extraction_height_start, self.extraction_height_end)
+                mass_tonnes = self.weight_peat * self.conversion_factor_volume / self.c_fraction_ref if not self.mass_tonnes_tier_2 else self.mass_tonnes_tier_2
+                air_dry_weight_start, air_dry_weight_end = yearly_emissions_calculation(mass_tonnes, self.hectares_start, self.hectares_end, self.extraction_height_start, self.extraction_height_end)
 
-                em_start = air_dry_weight_start * self.conversion_factor_volume * self.c_fraction_ref * 44/12
-                em_end = air_dry_weight_end * self.conversion_factor_volume * self.c_fraction_ref * 44/12
+                em_start = air_dry_weight_start *  self.c_fraction_ref * 44/12
+                em_end = air_dry_weight_end * self.c_fraction_ref * 44/12
 
                 self.offsite_emissions_yearly = yearly_time_dependent_parameter_breakdown(em_start, em_end, self.time_impl, self.time_cap, self.rate_coefficient_end, interim_values = True)
                 self.offsite_emissions_total = sum(self.offsite_emissions_yearly)
