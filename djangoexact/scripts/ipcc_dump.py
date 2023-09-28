@@ -2481,7 +2481,6 @@ for i, row in enumerate(df_dict2):
 
         if j == len(df_headers2) - 1:
             break
-"""
 
 df2 = pd.read_csv(
     os.path.join(
@@ -2503,4 +2502,270 @@ for i, row in enumerate(df_dict2):
     RoadEmissionFactor.objects.get_or_create(
         road_type=road_type,
         value=value,
+    )
+
+df2 = pd.read_csv(
+    os.path.join(
+        os.path.dirname(__file__), "ipcc_data", "OrganicSoilDrainageEmissionFactor.csv"
+    ),
+    header=0,
+    sep=";",
+)
+
+df_headers2 = df2.columns.values.tolist()
+df_dict2 = df2.to_dict("records")
+
+for i, row in enumerate(df_dict2):
+    site_location_type = SiteLocationType.objects.get_or_create(name=sanitize(row["site_location_type"]))[0]
+    peat_type = PeatType.objects.get_or_create(name=sanitize(row["peat_type"]))[0]
+    climate = Climate.objects.get_or_create(name=sanitize(row["climate"]))[0]
+    moisture = Moisture.objects.get_or_create(name=sanitize(row["moisture"]))[0]
+    module_type = ModuleType.objects.get_or_create(name=sanitize(row["module_type"]))[0]
+    co2 = parse_csv_number(row["co2"], nan_value=0)
+    ch4 = parse_csv_number(row["ch4"], nan_value=0)
+    doc = parse_csv_number(row["doc"], nan_value=0)
+    n2o = parse_csv_number(row["n2o"], nan_value=0)
+
+    print(
+        site_location_type,
+        peat_type,
+        climate,
+        moisture,
+        module_type,
+        co2,
+        ch4,
+        doc,
+        n2o,
+    )
+
+    OrganicSoilDrainageEmissionFactor.objects.get_or_create(
+        site_location_type=site_location_type,
+        peat_type=peat_type,
+        climate=climate,
+        moisture=moisture,
+        module_type=module_type,
+        co2=co2,
+        ch4=ch4,
+        doc=doc,
+        n2o=n2o,
+    )
+df2 = pd.read_csv(
+    os.path.join(
+        os.path.dirname(__file__), "ipcc_data", "OrganicSoilFuelConsumption.csv"
+    ),
+    header=0,
+    sep=";",
+)
+
+df_headers2 = df2.columns.values.tolist()
+df_dict2 = df2.to_dict("records")
+
+for i, row in enumerate(df_dict2):
+    climate = Climate.objects.get_or_create(name=sanitize(row["climate"]))[0]
+    moisture = Moisture.objects.get_or_create(name=sanitize(row["moisture"]))[0]
+    
+
+    for j, header in enumerate(df_headers2, start=2):
+        fire_type = FireType.objects.get_or_create(name=sanitize(df_headers2[j]))[0]
+
+        print(
+            climate,
+            moisture,
+            fire_type,
+            row[df_headers2[j]],
+        )
+
+        OrganicSoilFuelConsumption.objects.get_or_create(
+            climate=climate,
+            moisture=moisture,
+            fire_type=fire_type,
+            value=parse_csv_number(row[df_headers2[j]])
+        )
+
+        if j == len(df_headers2) - 1:
+            break
+            
+df2 = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "OrganicSoilGefEmissionFactor.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers2 = df2.columns.values.tolist()
+df_dict2 = df2.to_dict("records")
+
+for i, row in enumerate(df_dict2):
+    climate = Climate.objects.get_or_create(name=sanitize(row["climate"]))[0]
+    moisture = Moisture.objects.get_or_create(name=sanitize(row["moisture"]))[0]
+    co2 = parse_csv_number(row["co2"], nan_value=0)
+    ch4 = parse_csv_number(row["ch4"], nan_value=0)
+    co = parse_csv_number(row["co"], nan_value=0)
+
+    print(
+        climate,
+        moisture,
+        co2,
+        ch4,
+        co,
+    )
+
+    OrganicSoilGefEmissionFactor.objects.get_or_create(
+        climate=climate,
+        moisture=moisture,
+        co2=co2,
+        ch4=ch4,
+        co=co,
+    )
+
+df2 = pd.read_csv(
+    os.path.join(
+        os.path.dirname(__file__), "ipcc_data", "OrganicSoilRewettingEmissionFactor.csv"
+    ),
+    header=0,
+    sep=";",
+)
+
+df_headers2 = df2.columns.values.tolist()
+df_dict2 = df2.to_dict("records")
+
+for i, row in enumerate(df_dict2):
+    peat_type = PeatType.objects.get_or_create(name=sanitize(row["peat_type"]))[0]
+    climate = Climate.objects.get_or_create(name=sanitize(row["climate"]))[0]
+    moisture = Moisture.objects.get_or_create(name=sanitize(row["moisture"]))[0]
+    module_type = ModuleType.objects.get_or_create(name=sanitize(row["module_type"]))[0]
+    co2 = parse_csv_number(row["co2"], nan_value=0)
+    ch4 = parse_csv_number(row["ch4"], nan_value=0)
+    doc = parse_csv_number(row["doc"], nan_value=0)
+    n2o = parse_csv_number(row["n2o"], nan_value=0)
+
+    print(
+        peat_type,
+        climate,
+        moisture,
+        module_type,
+        co2,
+        ch4,
+        doc,
+        n2o,
+    )
+
+    OrganicSoilRewettingEmissionFactor.objects.get_or_create(
+        peat_type=peat_type,
+        climate=climate,
+        moisture=moisture,
+        module_type=module_type,
+        co2=co2,
+        ch4=ch4,
+        doc=doc,
+        n2o=n2o,
+    )
+df2 = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "RewettingEmissionFactor.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers2 = df2.columns.values.tolist()
+df_dict2 = df2.to_dict("records")
+
+for i, row in enumerate(df_dict2):
+    climate = Climate.objects.get_or_create(name=sanitize(row["climate"]))[0]
+    moisture = Moisture.objects.get_or_create(name=sanitize(row["moisture"]))[0]
+    soil_type = SoilType.objects.get_or_create(name=sanitize(row["soil_type"]))[0]
+
+    for j, header in enumerate(df_headers2, start=4):
+        vegetation_type = VegetationType.objects.get_or_create(name=sanitize(df_headers2[j]))[0]
+
+        print(
+            climate,
+            moisture,
+            soil_type,
+            vegetation_type,
+            row[df_headers2[j]],
+        )
+
+        RewettingEmissionFactor.objects.get_or_create(
+            climate=climate,
+            moisture=moisture,
+            soil_type=soil_type,
+            vegetation_type=vegetation_type,
+            value=parse_csv_number(row[df_headers2[j]]),
+        )
+
+        if j == len(df_headers2) - 1:
+            break
+            
+
+df2 = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "PeatExtractionEmissionFactor.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers2 = df2.columns.values.tolist()
+df_dict2 = df2.to_dict("records")
+
+for i, row in enumerate(df_dict2):
+    peat_type = PeatType.objects.get_or_create(name=sanitize(row["peat_type"]))[0]
+    climate = Climate.objects.get_or_create(name=sanitize(row["climate"]))[0]
+    moisture = Moisture.objects.get_or_create(name=sanitize(row["moisture"]))[0]
+    site_location_type = SiteLocationType.objects.get_or_create(name=sanitize(row["site_location_type"]))[0]
+    co2 = parse_csv_number(row["co2"], nan_value=0)
+    doc = parse_csv_number(row["doc"], nan_value=0)
+    ch4 = parse_csv_number(row["ch4"], nan_value=0)
+    n2o = parse_csv_number(row["n2o"], nan_value=0)
+
+    print(
+        peat_type,
+        climate,
+        moisture,
+        site_location_type,
+        co2,
+        ch4,
+        doc,
+        n2o,
+    )
+
+    PeatExtractionEmissionFactor.objects.get_or_create(
+        peat_type=peat_type,
+        climate=climate,
+        moisture=moisture,
+        site_location_type=site_location_type,
+        co2=co2,
+        ch4=ch4,
+        doc=doc,
+        n2o=n2o,
+    )
+"""
+
+df2 = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "PeatExtractionConversionFactor.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers2 = df2.columns.values.tolist()
+df_dict2 = df2.to_dict("records")
+
+for i, row in enumerate(df_dict2):
+    peat_type = PeatType.objects.get_or_create(name=sanitize(row["peat_type"]))[0]
+    climate = Climate.objects.get_or_create(name=sanitize(row["climate"]))[0]
+    moisture = Moisture.objects.get_or_create(name=sanitize(row["moisture"]))[0]
+    weight = parse_csv_number(row["weight"], nan_value=0)
+    volume = parse_csv_number(row["volume"], nan_value=0)
+
+    print(
+        peat_type,
+        climate,
+        moisture,
+        weight,
+        volume,
+    )
+
+    PeatExtractionConversionFactor.objects.get_or_create(
+        peat_type=peat_type,
+        climate=climate,
+        moisture=moisture,
+        weight=weight,
+        volume=volume,
     )
