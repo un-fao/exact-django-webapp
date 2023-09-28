@@ -110,11 +110,13 @@ class AnnexedModule:
                 return total_biomass * multiplication_parameter_co2_co, total_biomass * multiplication_parameter_ch4, biomass_yearly
             
             try:
-                if self.fire_boolean_end or self.fire_periodicity_end > self.time_impl + self.time_cap:
-                    co2_co, ch4, biomass_yearly = fire_co2_co_ch4(self.fire_periodicity_end, self.dry_matter_ref_fire if not self.dry_matter_tier_2_fire else self.dry_matter_tier_2_fire, self.area_affected_by_action_end, self.rate, self.time_impl, self.time_cap, self.percentage_area_burned_end, self.ef_co2_ref_fire if not self.ef_co2_tier_2_fire else self.ef_co2_tier_2_fire, self.ef_co_ref_fire if not self.ef_co_tier_2_fire else self.ef_co_tier_2_fire, self.ef_ch4_ref_fire if not self.ef_ch4_tier_2_fire else self.ef_ch4_tier_2_fire, self.methane_constant)
+                dry_matter_ref_fire = self.dry_matter_ref_fire if not self.dry_matter_tier_2_fire else self.dry_matter_tier_2_fire
+
+                if self.fire_boolean_end or self.fire_periodicity_end > self.time_impl + self.time_cap or self.area_affected_by_action_end == 0 or dry_matter_ref_fire == 0:
+                    co2_co, ch4 = fire_co2_co_ch4(self.fire_periodicity_end, dry_matter_ref_fire, self.area_affected_by_action_end, self.rate, self.time_impl, self.time_cap, self.percentage_area_burned_end, self.ef_co2_ref_fire if not self.ef_co2_tier_2_fire else self.ef_co2_tier_2_fire, self.ef_co_ref_fire if not self.ef_co_tier_2_fire else self.ef_co_tier_2_fire, self.ef_ch4_ref_fire if not self.ef_ch4_tier_2_fire else self.ef_ch4_tier_2_fire, self.methane_constant)
                     # TODO: ask how they should be broken down
                     self.emissions_fire_total = co2_co + ch4
-                    self.emissions_fire_yearly = breakdown_according_to_values(self.emissions_fire_total, biomass_yearly)
+                    self.emissions_fire_yearly = breakdown_according_to_values(self.emissions_fire_total, yearly_time_dependent_parameter_breakdown(0, self.area_affected_by_action_end * dry_matter_ref_fire, self.time_impl, self.time_cap, self.rate, interim_values = True))
                 else:
                     self.emissions_fire_yearly = [0 for i in range(self.time_impl + self.time_cap)]
                     self.emissions_fire_total = 0
