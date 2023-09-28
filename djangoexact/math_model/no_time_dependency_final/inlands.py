@@ -160,13 +160,13 @@ class AnnexedModule:
                     doc_start, doc_end = calculate_emissions_start_end(ef_doc, self.area_drained_start, 1, 1, self.area_drained_end, self.area_affected_by_action_end, 44/12)
 
 
-                    total_n2o = yearly_time_dependent_20_year_breakdown(n2ostart, n2oend, self.time_impl, self.time_cap, self.rate, interim_values = True)
+                    total_n2o = yearly_time_dependent_parameter_breakdown(n2ostart, n2oend, self.time_impl, self.time_cap, self.rate, interim_values = True)
 
-                    total_ch4_onsite = yearly_time_dependent_20_year_breakdown(ch4_start, ch4_end, self.time_impl, self.time_cap, self.rate, interim_values = True)
-                    total_ch4_off_site = yearly_time_dependent_20_year_breakdown(ch4_start_ditches, ch4_end_ditches, self.time_impl, self.time_cap, self.rate, interim_values = True)
+                    total_ch4_onsite = yearly_time_dependent_parameter_breakdown(ch4_start, ch4_end, self.time_impl, self.time_cap, self.rate, interim_values = True)
+                    total_ch4_off_site = yearly_time_dependent_parameter_breakdown(ch4_start_ditches, ch4_end_ditches, self.time_impl, self.time_cap, self.rate, interim_values = True)
 
-                    total_doc = yearly_time_dependent_20_year_breakdown(doc_start, doc_end, self.time_impl, self.time_cap, self.rate, interim_values = True)
-                    total_co2 = yearly_time_dependent_20_year_breakdown(co2_start, co2_end, self.time_impl, self.time_cap, self.rate, interim_values = True)
+                    total_doc = yearly_time_dependent_parameter_breakdown(doc_start, doc_end, self.time_impl, self.time_cap, self.rate, interim_values = True)
+                    total_co2 = yearly_time_dependent_parameter_breakdown(co2_start, co2_end, self.time_impl, self.time_cap, self.rate, interim_values = True)
 
                     return total_n2o, total_ch4_onsite, total_ch4_off_site, total_doc, total_co2, sum(total_n2o) + sum(total_ch4_onsite) + sum(total_ch4_off_site) + sum(total_doc) + sum(total_co2)
                 
@@ -212,15 +212,16 @@ class AnnexedModule:
                     doc_start, doc_end = calculate_emissions_start_end(ef_doc, self.area_drained_start, 1, 1, self.area_drained_end, self.area_affected_by_action_end, 44/12)
 
 
-                    total_n2o = yearly_time_dependent_20_year_breakdown(n2ostart, n2oend, self.time_impl, self.time_cap, self.rate, interim_values = True)
+                    total_n2o = yearly_time_dependent_parameter_breakdown(n2ostart, n2oend, self.time_impl, self.time_cap, self.rate, interim_values = True)
 
-                    total_ch4_onsite = yearly_time_dependent_20_year_breakdown(ch4_start, ch4_end, self.time_impl, self.time_cap, self.rate, interim_values = True)
-                    total_ch4_off_site = yearly_time_dependent_20_year_breakdown(ch4_start_ditches, ch4_end_ditches, self.time_impl, self.time_cap, self.rate, interim_values = True)
+                    total_ch4_onsite = yearly_time_dependent_parameter_breakdown(ch4_start, ch4_end, self.time_impl, self.time_cap, self.rate, interim_values = True)
+                    total_ch4_off_site = yearly_time_dependent_parameter_breakdown(ch4_start_ditches, ch4_end_ditches, self.time_impl, self.time_cap, self.rate, interim_values = True)
 
-                    total_doc = yearly_time_dependent_20_year_breakdown(doc_start, doc_end, self.time_impl, self.time_cap, self.rate, interim_values = True)
-                    total_co2 = yearly_time_dependent_20_year_breakdown(co2_start, co2_end, self.time_impl, self.time_cap, self.rate, interim_values = True)
+                    total_doc = yearly_time_dependent_parameter_breakdown(doc_start, doc_end, self.time_impl, self.time_cap, self.rate, interim_values = True)
+                    total_co2 = yearly_time_dependent_parameter_breakdown(co2_start, co2_end, self.time_impl, self.time_cap, self.rate, interim_values = True)
 
                     return total_n2o, total_ch4_onsite, total_ch4_off_site, total_doc, total_co2, sum(total_n2o) + sum(total_ch4_onsite) + sum(total_ch4_off_site) + sum(total_doc) + sum(total_co2)
+                
                 except:
                     traceback.print_exc()
                     return
