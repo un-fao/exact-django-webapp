@@ -1,4 +1,4 @@
-peaty_type;climate;moisture;module_type;co2;ch4;doc;n2o
+peat_type;climate;moisture;module_type;co2;ch4;doc;n2o
 Nutrient Rich;Boreal;Dry;ForestManagement;-0,55;137;0,08;0
 Nutrient Rich;Boreal;Moist;ForestManagement;-0,55;137;0,08;0
 Nutrient Rich;Cool Temperate;Dry;ForestManagement;0,5;216;0,24;0
