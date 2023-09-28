@@ -65,6 +65,8 @@ from math_model.no_time_dependency_final.fisheries_and_aquaculture import (
     Fishery as MathFishery,
 )
 from math_model.no_time_dependency_final.flooded_rice import FloodedRice as MathFloodedRice
+from math_model.no_time_dependency_final.inlands import AnnexedModule as MathOrganicSoil
+from math_model.no_time_dependency_final.inlands import PeatExtraction as MathPeatExtraction
 from math_model.no_time_dependency_final.inputs import (
     Inputs as MathInputs,
     FuelConsumption,
@@ -93,7 +95,7 @@ class Result:
         
         self.total_w += result.total_w
         self.total_wo += result.total_wo
-        self.balance += result.balance
+        self.balance = self.total_w - self.total_wo
 
         return self
 
@@ -3217,58 +3219,299 @@ class OrganicSoilCalculator(BaseCalculator):
     def calculate(self) -> Result:
         input: OrganicSoil = self.data
         project: Project = input.activity.project
+        luc: LandUseChange = input.land_use_change
 
-        relative, relation = get_relative(input)
-        
-        if not relative:
+        if not luc:
             raise ValueError("Organic Soil is missing a land use from a parent module")
 
-        relative_class = relative.__class__.__name__
+        relative_class = luc.land_use_type_end.module_type.name
+
+        if luc.land_use_type_start.module_type.name == "ForestManagement":
+            area_affected_by_module = 0
 
         cmt = {
             "climate": project.climate,
             "moisture": project.moisture,
-            "module_type__name": relative_class,
+            "module_type_name": relative_class,
+        }
+
+        cm = {
+            "climate": project.climate,
+            "moisture": project.moisture,
         }
         
         ef_onsite_start = OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(
-            **cmt,
+            climate=project.climate,
+            moisture=project.moisture,
+            module_type_name=luc.land_use_type_start.module_type.name,
             peat_type=input.peat_type_start,
-            site_location_type__name="On-Site",
+            site_location_type_name="On-Site",
         )
 
         ef_onsite_w = OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(
             **cmt,
             peat_type=input.peat_type_w,
-            site_location_type__name="On-Site",
+            site_location_type_name="On-Site",
         )
 
         ef_onsite_wo = OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(
             **cmt,
             peat_type=input.peat_type_wo,
-            site_location_type__name="On-Site",
+            site_location_type_name="On-Site",
         )
 
         ef_offsite_start = OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(
             **cmt,
             peat_type=input.peat_type_start,
-            site_location_type__name="Off-Site",
+            site_location_type_name="Off-Site",
         )
 
         ef_offsite_w = OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(
             **cmt,
             peat_type=input.peat_type_w,
-            site_location_type__name="Off-Site",
+            site_location_type_name="Off-Site",
         )
 
         ef_offsite_wo = OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(
             **cmt,
             peat_type=input.peat_type_wo,
-            site_location_type__name="Off-Site",
+            site_location_type_name="Off-Site",
         )
 
+        dry_matter_start = OrganicSoilFuelConsumption.objects.get(**cm, fire_type=input.fire_type_start)
+        dry_matter_w = OrganicSoilFuelConsumption.objects.get(**cm, fire_type=input.fire_type_w)
+        dry_matter_wo = OrganicSoilFuelConsumption.objects.get(**cm, fire_type=input.fire_type_wo)
+
+        fire_ref = OrganicSoilGefEmissionFactor.objects.get(**cm)
+
+        rewetting_start = OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=input.peat_type_start, module_type__name=relative_class)
+        rewetting_w = OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=input.peat_type_w, module_type__name=relative_class)
+        rewetting_wo = OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=input.peat_type_wo, module_type__name=relative_class)
+
         inputs_w = [
-            input.is_fire_on_soil_w,
+            input.fire_type_w is not None,
             input.soil_fire_periodicity_w,
+            area_affected_by_module,
+            dry_matter_w.value,
+            input.mean_dry_matter_t2_w,
+            input.soil_fire_impact_percentage_w,
+            fire_ref.co2,
+            input.fire_on_soil_co2_t2_w,
+            fire_ref.co,
+            input.fire_on_soil_co_t2_w,
+            fire_ref.ch4,
+            input.fire_on_soil_ch4_t2_w,
+            project.gw_potential.ch4,
+            input.activity.change_rate.name,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            project.gw_potential.n2o,
+            ef_offsite_start.doc,
+            input.offsite_doc_drainge_t2_start,
+            input.drainage_area_start,
             input.drainage_area_w,
+            ef_onsite_start.co2,
+            input.onsite_co2_drainge_t2_start,
+            input.ditches_area_start,
+            input.ditches_area_w,
+            ef_onsite_start.ch4,
+            input.onsite_ch4_drainge_t2_start,
+            ef_offsite_start.ch4,
+            input.offsite_ch4_drainge_t2_start,
+            ef_onsite_start.n2o,
+            input.onsite_n2o_drainge_t2_start,
+            ef_offsite_w.doc,
+            input.offsite_doc_drainge_t2_start,
+            ef_onsite_w.co2,
+            input.onsite_co2_drainge_t2_w,
+            ef_onsite_w.ch4,
+            input.onsite_ch4_drainge_t2_w,
+            ef_offsite_w.ch4,
+            input.offsite_ch4_drainge_t2_w,
+            ef_onsite_w.n2o,
+            input.onsite_n2o_drainge_t2_w,
+            rewetting_start.doc,
+            input.offsite_doc_rewetting_t2_start,
+            rewetting_start.co2,
+            input.onsite_co2_rewetting_t2_start,
+            rewetting_start.ch4,
+            input.onsite_ch4_rewetting_t2_start,
+            rewetting_start.n2o,
+            input.onsite_n2o_rewetting_t2_start,
+            rewetting_w.doc,
+            input.offsite_doc_rewetting_t2_w,
+            rewetting_w.co2,
+            input.onsite_co2_rewetting_t2_w,
+            rewetting_w.ch4,
+            input.onsite_ch4_rewetting_t2_w,
+            rewetting_w.n2o,
+            input.onsite_n2o_rewetting_t2_w,
+            luc.area,
         ]
+
+        inputs_wo = [
+            input.fire_type_wo is not None,
+            input.soil_fire_periodicity_wo,
+            area_affected_by_module,
+            dry_matter_wo.value,
+            input.mean_dry_matter_t2_wo,
+            input.soil_fire_impact_percentage_wo,
+            fire_ref.co2,
+            input.fire_on_soil_co2_t2_wo,
+            fire_ref.co,
+            input.fire_on_soil_co_t2_wo,
+            fire_ref.ch4,
+            input.fire_on_soil_ch4_t2_wo,
+            project.gw_potential.ch4,
+            input.activity.change_rate.name,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            project.gw_potential.n2o,
+            ef_offsite_start.doc,
+            input.offsite_doc_drainge_t2_start,
+            input.drainage_area_start,
+            input.drainage_area_wo,
+            ef_onsite_start.co2,
+            input.onsite_co2_drainge_t2_start,
+            input.ditches_area_start,
+            input.ditches_area_wo,
+            ef_onsite_start.ch4,
+            input.onsite_ch4_drainge_t2_start,
+            ef_offsite_start.ch4,
+            input.offsite_ch4_drainge_t2_start,
+            ef_onsite_start.n2o,
+            input.onsite_n2o_drainge_t2_start,
+            ef_offsite_start.doc,
+            input.offsite_doc_drainge_t2_start,
+            ef_onsite_wo.co2,
+            input.onsite_co2_drainge_t2_wo,
+            ef_onsite_wo.ch4,
+            input.onsite_ch4_drainge_t2_wo,
+            ef_offsite_wo.ch4,
+            input.offsite_ch4_drainge_t2_wo,
+            ef_onsite_wo.n2o,
+            input.onsite_n2o_drainge_t2_wo,
+            rewetting_start.doc,
+            input.offsite_doc_rewetting_t2_start,
+            rewetting_start.co2,
+            input.onsite_co2_rewetting_t2_start,
+            rewetting_start.ch4,
+            input.onsite_ch4_rewetting_t2_start,
+            rewetting_start.n2o,
+            input.onsite_n2o_rewetting_t2_start,
+            rewetting_wo.doc,
+            input.offsite_doc_rewetting_t2_wo,
+            rewetting_wo.co2,
+            input.onsite_co2_rewetting_t2_wo,
+            rewetting_wo.ch4,
+            input.onsite_ch4_rewetting_t2_wo,
+            rewetting_wo.n2o,
+            input.onsite_n2o_rewetting_t2_wo,
+            luc.area,
+        ]
+
+        math_w = MathOrganicSoil(*inputs_w)
+        math_wo = MathOrganicSoil(*inputs_wo)
+
+        math_w.calculate_emissions()
+        math_wo.calculate_emissions()
+
+        results_w = math_w.total_emissions
+        results_wo = math_wo.total_emissions
+
+        ## Peat Extraction
+
+        onsite_ef_start = PeatExtractionEmissionFactor.objects.get(**cm, peat_type=input.peat_type_start, site_location_type__name="On-Site")
+        onsite_ef_w = PeatExtractionEmissionFactor.objects.get(**cm, peat_type=input.peat_type_w, site_location_type__name="On-Site")
+        onsite_ef_wo = PeatExtractionEmissionFactor.objects.get(**cm, peat_type=input.peat_type_wo, site_location_type__name="On-Site")
+
+        offsite_ef_start = PeatExtractionEmissionFactor.objects.get(**cm, peat_type=input.peat_type_start, site_location_type__name="Off-Site")
+        offsite_ef_w = PeatExtractionEmissionFactor.objects.get(**cm, peat_type=input.peat_type_w, site_location_type__name="Off-Site")
+        offsite_ef_wo = PeatExtractionEmissionFactor.objects.get(**cm, peat_type=input.peat_type_wo, site_location_type__name="Off-Site")
+
+        conversion_factor_start = PeatExtractionConversionFactor.objects.get(**cm, peat_type=input.peat_type_start)
+        conversion_factor_w = PeatExtractionConversionFactor.objects.get(**cm, peat_type=input.peat_type_w)
+        conversion_factor_wo = PeatExtractionConversionFactor.objects.get(**cm, peat_type=input.peat_type_wo)
+
+        inputs_w = [
+            input.peat_area_start,
+            input.peat_area_w,
+            input.peat_ditches_area_start,
+            input.peat_ditches_area_w,
+            input.activity.change_rate.name,
+            onsite_ef_w.co2,
+            input.onsite_co2_peat_t2,
+            onsite_ef_w.ch4,
+            input.onsite_ch4_peat_t2,
+            onsite_ef_w.n2o,
+            input.onsite_n2o_peat_t2,
+            offsite_ef_w.doc,
+            input.offsite_doc_peat_t2,
+            offsite_ef_w.ch4,
+            input.offsite_ch4_peat_t2,
+            project.gw_potential.ch4,
+            project.gw_potential.n2o,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            conversion_factor_w.volume,
+            input.peat_density_t2,
+            1, # TODO: Should be conversion_factor_w.volume,
+            conversion_factor_w.weight,
+            input.peat_extraction_height_start,
+            input.peat_extraction_height_w,
+        ]
+
+        print(inputs_w)
+
+        inputs_wo = [
+            input.peat_area_start,
+            input.peat_area_wo,
+            input.peat_ditches_area_start,
+            input.peat_ditches_area_wo,
+            input.activity.change_rate.name,
+            onsite_ef_wo.co2,
+            input.onsite_co2_peat_t2,
+            onsite_ef_wo.ch4,
+            input.onsite_ch4_peat_t2,
+            onsite_ef_wo.n2o,
+            input.onsite_n2o_peat_t2,
+            offsite_ef_wo.doc,
+            input.offsite_doc_peat_t2,
+            offsite_ef_wo.ch4,
+            input.offsite_ch4_peat_t2,
+            project.gw_potential.ch4,
+            project.gw_potential.n2o,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            conversion_factor_wo.volume,
+            input.peat_density_t2,
+            1, # TODO: Should be conversion_factor_wo.volume,
+            conversion_factor_wo.weight,
+            input.peat_extraction_height_start,
+            input.peat_extraction_height_wo,
+        ]
+
+        peat_math_w = MathPeatExtraction(*inputs_w)
+        peat_math_wo = MathPeatExtraction(*inputs_wo)
+
+        peat_math_w.calculate_emissions()
+        peat_math_wo.calculate_emissions()
+
+        peat_results_w = peat_math_w.total_emissions
+        peat_results_wo = peat_math_wo.total_emissions
+
+        inland_result = Result(results_w, results_wo)
+        peat_result = Result(peat_results_w, peat_results_wo)
+
+        inland_result.add(peat_result)
+
+        return inland_result
+
+class ForestManagementCalculator(BaseCalculator):
+    """"""
+
+    def calculate(self) -> Result:
+        """"""
+
+
+

@@ -281,7 +281,7 @@ class ModuleType(Model):
     verbose_name = CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return f"({self.pk}) {self.name}"
 
 
 class ForestDegradationLevel(Model):
@@ -296,7 +296,7 @@ class FireType(Model):
     name = CharField(max_length=100)
 
     def __str__(self):
-        return self.name
+        return f"({self.pk}) {self.name}"
 
 
 class PeatType(Model):
@@ -1843,10 +1843,10 @@ class OrganicSoil(Assessment):
     ditches_area_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_ditches_area_thread", on_delete=SET_NULL)
 
     # TODO: Change to fire_type
-    is_fire_on_soil_start = BooleanField(default=False)
-    is_fire_on_soil_w = BooleanField(default=False)
-    is_fire_on_soil_wo = BooleanField(default=False)
-    is_fire_on_soil_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_is_fire_on_soil_thread", on_delete=SET_NULL)
+    fire_type_start = ForeignKey(FireType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_fire_type_start")
+    fire_type_w = ForeignKey(FireType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_fire_type_w")
+    fire_type_wo = ForeignKey(FireType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_fire_type_wo")
+    fire_type_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_fire_type_thread", on_delete=SET_NULL)
 
     soil_fire_periodicity_start = FloatField(null=True, blank=True)
     soil_fire_periodicity_w = FloatField(null=True, blank=True)
@@ -1912,6 +1912,7 @@ class OrganicSoil(Assessment):
 
     ##### Peat Extraction #####
 
+    # TODO: Remove this field
     has_peat_extraction = BooleanField(default=False)
 
     peat_type_start = ForeignKey(PeatType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_peat_type_start")
@@ -1939,6 +1940,13 @@ class OrganicSoil(Assessment):
     is_peat_is_for_energy_wo = BooleanField(default=False)
     is_peat_is_for_energy_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_is_for_energy_thread", on_delete=SET_NULL)
 
+    onsite_co2_peat_t2 = FloatField(null=True, blank=True)
+    onsite_ch4_peat_t2 = FloatField(null=True, blank=True)
+    onsite_n2o_peat_t2 = FloatField(null=True, blank=True)
+    offsite_doc_peat_t2 = FloatField(null=True, blank=True)
+    offsite_ch4_peat_t2 = FloatField(null=True, blank=True)
+
+    peat_density_t2 = FloatField(null=True, blank=True)
 
 class Settlement(Assessment):
     ha_start = FloatField(null=True, blank=True)
