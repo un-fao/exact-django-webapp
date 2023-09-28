@@ -101,19 +101,20 @@ class AnnexedModule:
                 biomass_start = 0
                 biomass_end = area * dry_matter
 
-                total_biomass = sum(yearly_time_dependent_parameter_breakdown(biomass_start, biomass_end, time_impl, time_cap, rate_coefficient, interim_values = True))
+                biomass_yearly = yearly_time_dependent_parameter_breakdown(biomass_start, biomass_end, time_impl, time_cap, rate_coefficient, interim_values = True)
+                total_biomass = sum(biomass_yearly)
 
                 multiplication_parameter_co2_co = (1/fire_periodicity * percentage_area_burned * ef_co2 * 44/12/1000) + (1/fire_periodicity * percentage_area_burned  * ef_co * 2 / 1000)
                 multiplication_parameter_ch4 = 1/fire_periodicity * percentage_area_burned * ef_ch4 * methane_constant / 1000
 
-                return total_biomass * multiplication_parameter_co2_co, total_biomass * multiplication_parameter_ch4
+                return total_biomass * multiplication_parameter_co2_co, total_biomass * multiplication_parameter_ch4, biomass_yearly
             
             try:
                 if self.fire_boolean_end or self.fire_periodicity_end > self.time_impl + self.time_cap:
-                    co2_co, ch4 = fire_co2_co_ch4(self.fire_periodicity_end, self.dry_matter_ref_fire if not self.dry_matter_tier_2_fire else self.dry_matter_tier_2_fire, self.area_affected_by_action_end, self.rate, self.time_impl, self.time_cap, self.percentage_area_burned_end, self.ef_co2_ref_fire if not self.ef_co2_tier_2_fire else self.ef_co2_tier_2_fire, self.ef_co_ref_fire if not self.ef_co_tier_2_fire else self.ef_co_tier_2_fire, self.ef_ch4_ref_fire if not self.ef_ch4_tier_2_fire else self.ef_ch4_tier_2_fire, self.methane_constant)
+                    co2_co, ch4, biomass_yearly = fire_co2_co_ch4(self.fire_periodicity_end, self.dry_matter_ref_fire if not self.dry_matter_tier_2_fire else self.dry_matter_tier_2_fire, self.area_affected_by_action_end, self.rate, self.time_impl, self.time_cap, self.percentage_area_burned_end, self.ef_co2_ref_fire if not self.ef_co2_tier_2_fire else self.ef_co2_tier_2_fire, self.ef_co_ref_fire if not self.ef_co_tier_2_fire else self.ef_co_tier_2_fire, self.ef_ch4_ref_fire if not self.ef_ch4_tier_2_fire else self.ef_ch4_tier_2_fire, self.methane_constant)
                     # TODO: ask how they should be broken down
                     self.emissions_fire_total = co2_co + ch4
-                    self.emissions_fire_yearly = breakdown_according_to_values(self.emissions_fire_total, yearly_time_dependent_parameter_breakdown(0, self.area_affected_by_action_end * self.dry_matter_ref_fire if not self.dry_matter_tier_2_fire else self.area_affected_by_action_end * self.dry_matter_tier_2_fire, self.time_impl, self.time_cap, self.rate, interim_values = True))
+                    self.emissions_fire_yearly = breakdown_according_to_values(self.emissions_fire_total, biomass_yearly)
                 else:
                     self.emissions_fire_yearly = [0 for i in range(self.time_impl + self.time_cap)]
                     self.emissions_fire_total = 0
