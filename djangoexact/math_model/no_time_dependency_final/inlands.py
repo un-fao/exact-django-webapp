@@ -107,7 +107,7 @@ class AnnexedModule:
                 multiplication_parameter_co2_co = (1/fire_periodicity * percentage_area_burned * ef_co2 * 44/12/1000) + (1/fire_periodicity * percentage_area_burned  * ef_co * 2 / 1000)
                 multiplication_parameter_ch4 = 1/fire_periodicity * percentage_area_burned * ef_ch4 * methane_constant / 1000
 
-                return total_biomass * multiplication_parameter_co2_co, total_biomass * multiplication_parameter_ch4, biomass_yearly
+                return total_biomass * multiplication_parameter_co2_co, total_biomass * multiplication_parameter_ch4
             
             try:
                 dry_matter_ref_fire = self.dry_matter_ref_fire if not self.dry_matter_tier_2_fire else self.dry_matter_tier_2_fire
