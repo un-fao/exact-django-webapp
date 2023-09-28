@@ -112,7 +112,7 @@ class AnnexedModule:
             try:
                 dry_matter_ref_fire = self.dry_matter_ref_fire if not self.dry_matter_tier_2_fire else self.dry_matter_tier_2_fire
 
-                if self.fire_boolean_end or self.fire_periodicity_end > self.time_impl + self.time_cap or self.area_affected_by_action_end != 0 or dry_matter_ref_fire != 0:
+                if self.fire_boolean_end and self.fire_periodicity_end < self.time_impl + self.time_cap and self.area_affected_by_action_end != 0 and dry_matter_ref_fire != 0:
                     co2_co, ch4 = fire_co2_co_ch4(self.fire_periodicity_end, dry_matter_ref_fire, self.area_affected_by_action_end, self.rate, self.time_impl, self.time_cap, self.percentage_area_burned_end, self.ef_co2_ref_fire if not self.ef_co2_tier_2_fire else self.ef_co2_tier_2_fire, self.ef_co_ref_fire if not self.ef_co_tier_2_fire else self.ef_co_tier_2_fire, self.ef_ch4_ref_fire if not self.ef_ch4_tier_2_fire else self.ef_ch4_tier_2_fire, self.methane_constant)
                     # TODO: ask how they should be broken down
                     self.emissions_fire_total = co2_co + ch4
