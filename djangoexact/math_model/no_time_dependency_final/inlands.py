@@ -135,7 +135,7 @@ class AnnexedModule:
                         em_start = ef * area_affected_by_action_start * multiplying_constant * percentage_area_multiplier_start
 
                         if area_affected_by_module == 0:
-                            em_end = ef * area_affected_by_module * percentage_area_multiplier_end * multiplying_constant
+                            em_end = ef * area_affected_by_action_end * percentage_area_multiplier_end * multiplying_constant
                         elif area_affected_by_action_end < area_affected_by_module:
                             em_end = 0
                         else:
@@ -313,7 +313,7 @@ class PeatExtraction:
     def __init__(self, hectares_start, hectares_end, percentage_ditches_start, percentage_ditches_end, rate_coefficient_end, 
                  ef_co2_onsite_ref, ef_co2_onsite_tier_2, ef_ch4_onsite_ref, ef_ch4_onsite_tier_2, ef_n2o_onsite_ref,
                  ef_n2o_onsite_tier_2, ef_doc_offsite_ref, ef_doc_offsite_tier_2, ef_ch4_offsite_ref, ef_ch4_offsite_tier_2,
-                 methane_constant, nitrous_constant, time_impl, time_cap, rate_coefficient_start,
+                 methane_constant, nitrous_constant, time_impl, time_cap,
                  weight_peat, mass_tonnes_tier_2, conversion_factor_volume, c_fraction_ref, extraction_height_start, extraction_height_end):
         
         self.hectares_start = hectares_start
@@ -335,7 +335,6 @@ class PeatExtraction:
         self.nitrous_constant = nitrous_constant
         self.time_impl = time_impl
         self.time_cap = time_cap
-        self.rate_coefficient_start = rate_coefficient_start
         self.weight_peat = weight_peat
         self.mass_tonnes_tier_2 = mass_tonnes_tier_2
         self.conversion_factor_volume = conversion_factor_volume
