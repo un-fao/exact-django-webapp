@@ -49,7 +49,11 @@ def get_modules(activity, serialized=True):
     modules_dict = []
     module_types = ModuleType.objects.all()
     for module in module_types:
-        module_model = apps.get_model(API, sanitize_for_model(module.name))
+        try:
+            module_model = apps.get_model(API, sanitize_for_model(module.name))
+        except LookupError:
+            print(f"Module {module.name} not found")
+            continue
         module_object = module_model.objects.filter(activity__id=activity.pk).first()
         if module_object:
             modules.append(module_object)
@@ -200,9 +204,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
         print("list")
         project_id = get_query_param_or_validation_error(self.request, "project_id")
-        list = Activity.objects.filter(
-            project__id=project_id, project__user=self.request.user
-        )
+        list = Activity.objects.filter(project__id=project_id, project__user=self.request.user)
 
         response = []
 
@@ -354,9 +356,7 @@ def generic_module_viewset(model: Model):
             return Response(module_serializer.data, status=status.HTTP_201_CREATED)
             
 
-        @swagger_auto_schema(
-            manual_parameters=[activity_id, include_related],
-        )
+        @swagger_auto_schema(manual_parameters=[activity_id, include_related])
         def list(self, request):
             """
             Lists the module(s) of a given activity
