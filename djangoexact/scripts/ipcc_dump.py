@@ -2736,7 +2736,6 @@ for i, row in enumerate(df_dict2):
         doc=doc,
         n2o=n2o,
     )
-"""
 
 df2 = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "PeatExtractionConversionFactor.csv"),
@@ -2768,4 +2767,49 @@ for i, row in enumerate(df_dict2):
         moisture=moisture,
         weight=weight,
         volume=volume,
+    )
+
+"""
+
+ForestManagementAGB.objects.all().delete()
+
+df2 = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestManagementAGB.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers2 = df2.columns.values.tolist()
+df_dict2 = df2.to_dict("records")
+
+for i, row in enumerate(df_dict2):
+    vegetation_type = VegetationType.objects.get_or_create(name=sanitize(row["vegetation_type"]))[0]
+    continent = Continent.objects.get_or_create(name=sanitize(row["continent"]))[0]
+    forest_condition_type = ForestConditionType.objects.get_or_create(name=sanitize(row["forest_condition_type"]))[0]
+    forest_type = ForestType.objects.get_or_create(name=sanitize(row["forest_type"]))[0]
+    agb_min = parse_csv_number(row["agb_min"], nan_value=0)
+    agb_max = parse_csv_number(row["agb_max"], nan_value=0)
+    agb_growth_min = parse_csv_number(row["agb_growth_min"], nan_value=0)
+    agb_growth_max = parse_csv_number(row["agb_growth_max"], nan_value=0)
+
+    print(
+        vegetation_type,
+        continent,
+        forest_condition_type,
+        forest_type,
+        agb_min,
+        agb_max,
+        agb_growth_min,
+        agb_growth_max,
+    )
+    
+    ForestManagementAGB.objects.get_or_create(
+        vegetation_type=vegetation_type,
+        continent=continent,
+        forest_condition_type=forest_condition_type,
+        forest_type=forest_type,
+        agb_min=agb_min,
+        agb_max=agb_max,
+        agb_growth_min=agb_growth_min,
+        agb_growth_max=agb_growth_max,
     )
