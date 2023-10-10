@@ -36,6 +36,7 @@ from .models import (
     LandUseChange,
     Activity,
     ForestManagement,
+    VegetationType,
 )
 from math_model import (
     defo,
@@ -165,6 +166,7 @@ class LandUseChangeCalculator(BaseCalculator):
         start_result = CalculatorFactory().calculate_result(start_module)
 
         # TODO: Finish calculators implementation
+        # NOTE: DeforestationCalculator now expects the ForestManagement module only. Refactor the calculator accordingly (check T2 values!)
         # if start_module.__class__ == ForestManagement:
         #     luc = DeforestationCalculator(start_module).calculate()
         # if end_module.__class__ == ForestManagement:
@@ -654,7 +656,7 @@ class AnnualCroppingCalculator(BaseCalculator):
         climate = project.climate
         moisture = project.moisture
 
-        area = luc.area if luc.area else input.area
+        area = luc.area if luc else input.area
 
         cm = {"climate": climate, "moisture": moisture}
 
@@ -689,7 +691,7 @@ class AnnualCroppingCalculator(BaseCalculator):
             minor_n_estimation_factor_wo = CropNitrousEstimationDefaultFactor.objects.get_or_grains(crop_type=minor_crop_type_wo)
 
         except:
-            # If only one of the above operations fails, all minor variables must be set to None for the math model to work
+            # NOTE: If only one of the above operations fails, all minor variables must be set to None for the math model to work
             minor_burning_emission_factor = None
 
             minor_combustion_factor_start = None
@@ -3240,45 +3242,14 @@ class OrganicSoilCalculator(BaseCalculator):
             "moisture": project.moisture,
         }
         
-        ef_onsite_start = OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(
-            climate=project.climate,
-            moisture=project.moisture,
-            module_type_name=luc.land_use_type_start.module_type.name,
-            peat_type=input.peat_type_start,
-            site_location_type_name="On-Site",
-        )
+        ef_onsite_start = OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cm,module_type_name=luc.land_use_type_start.module_type.name,peat_type=input.peat_type_start,site_location_type_name="On-Site")
+        ef_onsite_w = OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cmt,peat_type=input.peat_type_w,site_location_type_name="On-Site")
+        ef_onsite_wo = OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cmt, peat_type=input.peat_type_wo,site_location_type_name="On-Site")
 
-        ef_onsite_w = OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(
-            **cmt,
-            peat_type=input.peat_type_w,
-            site_location_type_name="On-Site",
-        )
+        ef_offsite_start = OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cmt,peat_type=input.peat_type_start,site_location_type_name="Off-Site")
+        ef_offsite_w = OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cmt,peat_type=input.peat_type_w,site_location_type_name="Off-Site")
+        ef_offsite_wo = OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cmt,peat_type=input.peat_type_wo,site_location_type_name="Off-Site",)
 
-        ef_onsite_wo = OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(
-            **cmt,
-            peat_type=input.peat_type_wo,
-            site_location_type_name="On-Site",
-        )
-
-        ef_offsite_start = OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(
-            **cmt,
-            peat_type=input.peat_type_start,
-            site_location_type_name="Off-Site",
-        )
-
-        ef_offsite_w = OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(
-            **cmt,
-            peat_type=input.peat_type_w,
-            site_location_type_name="Off-Site",
-        )
-
-        ef_offsite_wo = OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(
-            **cmt,
-            peat_type=input.peat_type_wo,
-            site_location_type_name="Off-Site",
-        )
-
-        dry_matter_start = OrganicSoilFuelConsumption.objects.get(**cm, fire_type=input.fire_type_start)
         dry_matter_w = OrganicSoilFuelConsumption.objects.get(**cm, fire_type=input.fire_type_w)
         dry_matter_wo = OrganicSoilFuelConsumption.objects.get(**cm, fire_type=input.fire_type_wo)
 
@@ -3421,15 +3392,12 @@ class OrganicSoilCalculator(BaseCalculator):
 
         ## Peat Extraction
 
-        onsite_ef_start = PeatExtractionEmissionFactor.objects.get(**cm, peat_type=input.peat_type_start, site_location_type__name="On-Site")
         onsite_ef_w = PeatExtractionEmissionFactor.objects.get(**cm, peat_type=input.peat_type_w, site_location_type__name="On-Site")
         onsite_ef_wo = PeatExtractionEmissionFactor.objects.get(**cm, peat_type=input.peat_type_wo, site_location_type__name="On-Site")
 
-        offsite_ef_start = PeatExtractionEmissionFactor.objects.get(**cm, peat_type=input.peat_type_start, site_location_type__name="Off-Site")
         offsite_ef_w = PeatExtractionEmissionFactor.objects.get(**cm, peat_type=input.peat_type_w, site_location_type__name="Off-Site")
         offsite_ef_wo = PeatExtractionEmissionFactor.objects.get(**cm, peat_type=input.peat_type_wo, site_location_type__name="Off-Site")
 
-        conversion_factor_start = PeatExtractionConversionFactor.objects.get(**cm, peat_type=input.peat_type_start)
         conversion_factor_w = PeatExtractionConversionFactor.objects.get(**cm, peat_type=input.peat_type_w)
         conversion_factor_wo = PeatExtractionConversionFactor.objects.get(**cm, peat_type=input.peat_type_wo)
 
@@ -3460,8 +3428,6 @@ class OrganicSoilCalculator(BaseCalculator):
             input.peat_extraction_height_start,
             input.peat_extraction_height_w,
         ]
-
-        print(inputs_w)
 
         inputs_wo = [
             input.peat_area_start,
@@ -3513,5 +3479,46 @@ class ForestManagementCalculator(BaseCalculator):
     def calculate(self) -> Result:
         """"""
 
+        input: ForestManagement = self.data
+        luc: LandUseChange = input.land_use_change
+        project: Project = input.activity.project
 
+        # TODO: Review
+        vegetation_type = luc.land_use_type_end if luc.land_use_type_end.module_type.name == "ForestManagement" else luc.land_use_type_start
+        vegetation_type = VegetationType.objects.get(name=vegetation_type.name)
 
+        
+
+        cvt = {"continent": project.continent, "vegetation_type": vegetation_type} # TODO: Change to land use type
+
+        ag_net_biomass_start = AboveGroundNetBiomassGrowth.objects.get(**cvt) # TODO: Change to land use type
+        ag_net_biomass_end = AboveGroundNetBiomassGrowth.objects.get(**cvt) # TODO: Change to land use type
+
+        le_20yrs_start = ag_net_biomass_start.value_upto_20_years
+        le_20yrs_end = ag_net_biomass_end.value_upto_20_years
+
+        gt_20yrs_start = ag_net_biomass_start.value_after_20_years
+        gt_20yrs_end = ag_net_biomass_end.value_after_20_years
+
+        bgb_before_20_yrs_start = BelowGroundBiomass.objects.get_max_below_threshold(**cvt, threshold=le_20yrs_start) # TODO: Change to land use type
+        bgb_before_20_yrs_end = BelowGroundBiomass.objects.get_max_below_threshold(**cvt, threshold=le_20yrs_end) # TODO: Change to land use type
+
+        bgb_after_20_yrs_start = BelowGroundBiomass.objects.get_max_below_threshold(**cvt, threshold=gt_20yrs_start) # TODO: Change to land use type
+        bgb_after_20_yrs_end = BelowGroundBiomass.objects.get_max_below_threshold(**cvt, threshold=gt_20yrs_end) # TODO: Change to land use type
+
+        agb = ForestManagementAGB.objects.get(
+            **cvt,
+            forest_condition_type=input.forest_condition_type,
+            forest_type=input.forest_type
+        )
+
+        inputs_start = [
+            project.capitalization_duration_yrs,
+            project.implementation_duration_yrs,
+            input.activity.change_rate.name,
+            luc.area,
+            0,
+            input.rotation_occurrence_start,
+            bgb_before_20_yrs_start.value,
+            bgb_after_20_yrs_start.value,
+        ]

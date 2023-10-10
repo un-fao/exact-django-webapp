@@ -1156,3 +1156,18 @@ class OrganicSoilRewettingEmissionFactor(Model):
 
     def __str__(self):
         return f"({self.pk}) {self.climate.name} {self.moisture.name} {self.peat_type.name} {self.module_type.name}"
+
+class ForestManagementAGB(Model):
+    vegetation_type = ForeignKey("api.VegetationType", on_delete=CASCADE)
+    continent = ForeignKey("api.Continent", on_delete=CASCADE)
+    forest_condition_type = ForeignKey("api.ForestConditionType", on_delete=CASCADE)
+    forest_type = ForeignKey("api.ForestType", on_delete=CASCADE)
+    agb_min = FloatField(default=0)
+    agb_max = FloatField(default=0)
+    agb_growth_min = FloatField(default=0)
+    agb_growth_max = FloatField(default=0)
+    agb_unit = CharField(max_length=100, default="tonnes d.m./ha")
+
+    def __str__(self):
+        return f"({self.pk}) {self.vegetation_type.name} {self.continent.name} {self.forest_condition_type.name} {self.forest_type.name}"
+    
