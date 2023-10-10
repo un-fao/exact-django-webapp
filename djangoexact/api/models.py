@@ -62,6 +62,18 @@ class GLEAMRegion(Model):
     def __str__(self):
         return f"({self.pk}) {self.name}"
 
+class ForestType(Model):
+    name = CharField(max_length=100)
+
+    def __str__(self):
+        return f"({self.pk}) {self.name}"
+    
+class ForestConditionType(Model):
+    name = CharField(max_length=100)
+
+    def __str__(self):
+        return f"({self.pk}) {self.name}"
+
 class SiteLocationType(Model):
     name = CharField(max_length=100)
 
@@ -1188,12 +1200,8 @@ class Livestock(Module):
 
 
 class ForestManagement(Assessment):
-    forest_type = ForeignKey("api.ForestType", on_delete=CASCADE)
-
-    degradation_level_start = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_start")
-    degradation_level_w = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_w")
-    degradation_level_wo = ForeignKey(ForestDegradationLevel, on_delete=CASCADE, related_name="%(class)s_wo")
-    degradation_level_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_degradation_level_thread")
+    forest_type = ForeignKey(ForestType, on_delete=CASCADE)
+    forest_condition_type = ForeignKey(ForestConditionType, on_delete=CASCADE, related_name="%(class)s_forest_condition_type")
 
     rotation_occurrence_start = FloatField(null=True, blank=True)
     rotation_occurrence_w = FloatField(null=True, blank=True)
@@ -1719,9 +1727,7 @@ class EnergySourceType(Model):
 
 
 class IrrigationSystem(Module):
-    irrigation_system_type = ForeignKey(
-        IrrigationSystemType, on_delete=CASCADE, null=True, blank=True
-    )
+    irrigation_system_type = ForeignKey(IrrigationSystemType, on_delete=CASCADE, null=True, blank=True)
     ha_start = FloatField(null=True, blank=True)
     ha_w = FloatField(null=True, blank=True)
     ha_wo = FloatField(null=True, blank=True)
@@ -1732,9 +1738,7 @@ class IrrigationSystem(Module):
 
 
 class IrrigationPhase(Module):
-    irrigation_system_type = ForeignKey(
-        IrrigationSystemType, on_delete=CASCADE, null=True, blank=True
-    )
+    irrigation_system_type = ForeignKey(IrrigationSystemType, on_delete=CASCADE, null=True, blank=True)
     fuel_type = ForeignKey(FuelType, on_delete=CASCADE, null=True, blank=True)
     well_depth = FloatField(null=True, blank=True)
     ha_start = FloatField(null=True, blank=True)
@@ -1745,9 +1749,7 @@ class IrrigationPhase(Module):
     gross_irrigation_water_w = FloatField(null=True, blank=True)
     gross_irrigation_water_wo = FloatField(null=True, blank=True)
 
-    power_origin_country_t2 = ForeignKey(
-        Country, on_delete=CASCADE, null=True, blank=True
-    )
+    power_origin_country_t2 = ForeignKey(Country, on_delete=CASCADE, null=True, blank=True)
     ef_t2_start = FloatField(null=True, blank=True)
     ef_t2_w = FloatField(null=True, blank=True)
     ef_t2_wo = FloatField(null=True, blank=True)
@@ -2008,12 +2010,6 @@ class DegradedLand(Module):
     bgb_t2_start = FloatField(null=True, blank=True)
     bgb_t2_w = FloatField(null=True, blank=True)
     bgb_t2_wo = FloatField(null=True, blank=True)
-
-class ForestType(Model):
-    name = CharField(max_length=255, unique=True)
-
-    def __str__(self):
-        return f"({self.id}) {self.name}"
 
 class LandUseChange(Module):
 
