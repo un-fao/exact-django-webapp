@@ -110,9 +110,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
 
-    @swagger_auto_schema(
-        manual_parameters=[project_id], responses={404: "Project not found"}
-    )
+    @swagger_auto_schema(manual_parameters=[project_id], responses={404: "Project not found"})
     def retrieve(self, request, pk=None):
         """
         Get a single project for a given user.
@@ -123,9 +121,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             status=status.HTTP_200_OK,
         )
 
-    @swagger_auto_schema(
-        manual_parameters=[project_id], responses={404: "Project not found"}
-    )
+    @swagger_auto_schema(manual_parameters=[project_id], responses={404: "Project not found"})
     def list(self, request):
         """
         Get all projects for a given user.
@@ -138,9 +134,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         )
 
     @action(detail=True, methods=["get"])
-    @swagger_auto_schema(
-        manual_parameters=[project_id], responses={404: "Project not found"}
-    )
+    @swagger_auto_schema(manual_parameters=[project_id], responses={404: "Project not found"})
     def results(self, request, pk=None):
         """
         Calculates and returns total emissions for each module in the project.
@@ -159,7 +153,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             activity_results = ActivityViewSet.results(self, request, activity.pk).data
             response["activities"].append(activity_results)
 
-            project_results.add(Result(**activity_results[RESULTS]))
+            project_results.add(Result(activity_results[RESULTS]['total_w'], activity_results[RESULTS]['total_wo']))
 
         response["results"] = ResultSerializer(project_results).data
 
@@ -233,7 +227,11 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         module_types = ModuleType.objects.all()
         # TODO: Make a serializer for this
         for module in module_types:
-            model_ref = apps.get_model(API, sanitize_for_model(module.name))
+            try:
+                model_ref = apps.get_model(API, sanitize_for_model(module.name))
+            except LookupError:
+                print(f"Module {module.name} not found")
+                continue
             object = model_ref.objects.filter(activity__id=pk, activity__project__user=self.request.user).first()
 
             if object:
