@@ -30,8 +30,8 @@ def get_module_serializer(model_arg, create=False):
     class GenericSerializer(serializers.ModelSerializer):
         if not create:
             module_type = serializers.ReadOnlyField(default=model_arg.__name__)
-            activity = ActivitySerializer(many=False)
-
+            # exclude activity for update
+            activity = ActivitySerializer(many=False, read_only=True)
         class Meta:
             model = model_arg
             fields = "__all__"
@@ -61,21 +61,21 @@ class ProjectSerializer(serializers.ModelSerializer):
         ref_name = "Project"
 
 class ProjectResultSerializer(serializers.Serializer):
+    # TODO: This can probably be removed and the fields moved to ProjectSerializer as read_only
     activities = serializers.SerializerMethodField()
     results = ResultSerializer(many=False)
 
 class ActivitySerializer(serializers.ModelSerializer):
-    project = ProjectSerializer(many=False)
-    user = UserSerializer(many=False)
+    project = ProjectSerializer(many=False, read_only=True)
+    user = UserSerializer(many=False, read_only=True)
 
     class Meta:
         model = Activity
         fields = "__all__"
         ref_name = "Activity"
 
-
 class InputTypeSerializer(serializers.ModelSerializer):
-    macro_input_type = get_model_serializer(MacroInputType)(many=False)
+    macro_input_type = get_model_serializer(MacroInputType)(many=False, read_only=True)
 
     class Meta:
         model = InputType
