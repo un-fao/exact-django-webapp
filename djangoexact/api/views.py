@@ -172,10 +172,8 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         state = ActivityState.objects.get_or_create(name="EMPTY")[0]
         request.data["state"] = state.pk
         return super().create(request, *args, **kwargs)
-
-    @swagger_auto_schema(
-        manual_parameters=[project_id], responses={400: "activity_id not provided"}
-    )
+    
+    @swagger_auto_schema(manual_parameters=[project_id], responses={400: "activity_id not provided"})
     def retrieve(self, request, pk=None):
         """
         Get a single activity for a given user.
@@ -189,9 +187,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             status=status.HTTP_200_OK,
         )
 
-    @swagger_auto_schema(
-        manual_parameters=[project_id], responses={400: "activity_id not provided"}
-    )
+    @swagger_auto_schema(manual_parameters=[project_id], responses={400: "activity_id not provided"})
     def list(self, request):
         """
         Get all activities for a given project, by filtering against a `project_id` query parameter in the URL.
@@ -260,18 +256,8 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         Lists the modules of a given activity.
         """
 
-        get_object_or_404(Activity, pk=pk, project__user=self.request.user)
-
-        modules = []
-        module_types = ModuleType.objects.all()
-
-        for module in module_types:
-            module_model = apps.get_model(API, sanitize_for_model(module.name))
-            module_object = module_model.objects.filter(
-                activity__id=pk, activity__project__user=self.request.user
-            ).first()
-            if module_object:
-                modules.append(get_module_serializer(module_model)(module_object).data)
+        activity = get_object_or_404(Activity, pk=pk, project__user=self.request.user)
+        modules = get_modules(activity)
 
         return Response(data=modules, status=status.HTTP_200_OK)
 
