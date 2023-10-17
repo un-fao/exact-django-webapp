@@ -167,7 +167,8 @@ router.register(
 router.register(r"settlements", views.generic_module_viewset(Settlement), basename="settlements")
 router.register(r"land-use-changes", views.generic_module_viewset(LandUseChange), basename="land-use-changes")
 router.register(r"organic-soils", views.generic_module_viewset(OrganicSoil), basename="organic-soils")
-
+router.register(r'soil-types', views.generic_viewset(SoilType), basename='soil-types')
+router.register(r"climates", views.generic_viewset(Climate), basename="climates")
 urlpatterns = [
     path("docs/", include_docs_urls(title="EX-ACT Docs")),
     re_path(
