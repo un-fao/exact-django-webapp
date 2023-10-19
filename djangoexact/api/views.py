@@ -50,7 +50,7 @@ def get_modules(activity, serialized=True):
     module_types = ModuleType.objects.all()
     for module in module_types:
         try:
-            module_model = apps.get_model(API, sanitize_for_model(module.name))
+            module_model = apps.get_model(API, module.class_name)
         except LookupError:
             print(f"Module {module.name} not found")
             continue
@@ -224,7 +224,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         # TODO: Make a serializer for this
         for module in module_types:
             try:
-                model_ref = apps.get_model(API, sanitize_for_model(module.name))
+                model_ref = apps.get_model(API, module.class_name)
             except LookupError:
                 print(f"Module {module.name} not found")
                 continue
@@ -260,6 +260,27 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         modules = get_modules(activity)
 
         return Response(data=modules, status=status.HTTP_200_OK)
+
+    @transaction.atomic
+    @action(detail=False, methods=["post"])
+    @swagger_auto_schema(request_body=ActivityBuilderSerializer, responses={400: "Bad request"})
+    def build(self, request):
+        """
+        Builds a new activity and the modules associated with it.
+        """
+
+        try:
+
+            serializer = ActivityBuilderSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            
+            activity = serializer.save()
+
+        except Exception as e:
+            print("Error building activity:", e)
+            return ErrorResponse(str(e))
+
+        return Response(ActivitySerializer(activity).data, status=status.HTTP_200_OK)
 
 class CommentThreadViewSet(viewsets.ModelViewSet):
     queryset = CommentThread.objects.all()
