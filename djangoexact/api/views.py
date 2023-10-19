@@ -263,7 +263,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
     @transaction.atomic
     @action(detail=False, methods=["post"])
-    @swagger_auto_schema(request_body=ActivityBuilderSerializer, responses={400: "Bad request"})
+    @swagger_auto_schema(request_body=ActivityBuilderSerializer, responses={400: "Bad request", 200: ActivitySerializer})
     def build(self, request):
         """
         Builds a new activity and the modules associated with it.
