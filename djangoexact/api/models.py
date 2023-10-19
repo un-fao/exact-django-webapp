@@ -472,6 +472,7 @@ class Activity(Historical):
 class Module(Historical):
     activity = ForeignKey(Activity, on_delete=CASCADE, related_name="%(class)s")
     notes = TextField(null=True, blank=True)
+    start_year = IntegerField(default=1)
 
     created_at = DateTimeField(auto_now_add=True, null=True)
     updated_at = DateTimeField(auto_now=True, null=True)
@@ -1028,6 +1029,10 @@ class FloodedRice(Assessment):
     crop_yield_start = FloatField()
     crop_yield_w = FloatField()
     crop_yield_wo = FloatField()
+
+    main_biomass_factor_t2_start = FloatField(null=True, blank=True)
+    main_biomass_factor_t2_w = FloatField(null=True, blank=True)
+    main_biomass_factor_t2_wo = FloatField(null=True, blank=True)
 
     soc_t2_start = FloatField(null=True, blank=True)
     soc_t2_w = FloatField(null=True, blank=True)
@@ -1959,6 +1964,22 @@ class Settlement(Assessment):
     is_settlement_start = BooleanField(default=False)
     is_settlement_w = BooleanField(default=False)
     is_settlement_wo = BooleanField(default=False)
+
+    soil_carbon_t2_start = FloatField(null=True, blank=True)
+    soil_carbon_t2_w = FloatField(null=True, blank=True)
+    soil_carbon_t2_wo = FloatField(null=True, blank=True)
+
+    flu_t2_start = FloatField(null=True, blank=True)
+    flu_t2_w = FloatField(null=True, blank=True)
+    flu_t2_wo = FloatField(null=True, blank=True)
+
+    agb_t2_start = FloatField(null=True, blank=True)
+    agb_t2_w = FloatField(null=True, blank=True)
+    agb_t2_wo = FloatField(null=True, blank=True)
+
+    bgb_t2_start = FloatField(null=True, blank=True)
+    bgb_t2_w = FloatField(null=True, blank=True)
+    bgb_t2_wo = FloatField(null=True, blank=True)
 
 class SetAside(Module):
     ha_start = FloatField(null=True, blank=True)

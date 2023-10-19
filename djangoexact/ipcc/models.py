@@ -133,10 +133,7 @@ class BelowGroundBiomassManager(Manager):
         NOTE: If a new, highest threshold is added to the db, this can return the wrong value unless the old highest threshold is set to a proper value
         """
         return (
-            self.filter(
-                continent=continent,
-                vegetation_type=vegetation_type,
-            )
+            self.filter(continent=continent, vegetation_type=vegetation_type,)
             .filter(Q(threshold__gt=threshold) | Q(threshold__isnull=True))
             .order_by("threshold")
             .first()
