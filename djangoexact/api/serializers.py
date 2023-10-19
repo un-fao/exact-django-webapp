@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+import sys
 
 
 class ResultSerializer(serializers.Serializer):
@@ -26,12 +27,11 @@ def get_model_serializer(model_arg):
     except KeyError:
         return GenericSerializer
 
-def get_module_serializer(model_arg, create=False):
+def get_module_serializer(model_arg):
     class GenericSerializer(serializers.ModelSerializer):
-        if not create:
-            module_type = serializers.ReadOnlyField(default=model_arg.__name__)
-            # exclude activity for update
-            activity = ActivitySerializer(many=False, read_only=True)
+        module_type = get_model_serializer(ModuleType)(many=False, read_only=True)
+        activity = ActivitySerializer(many=False, read_only=True)
+
         class Meta:
             model = model_arg
             fields = "__all__"
@@ -73,6 +73,76 @@ class ActivitySerializer(serializers.ModelSerializer):
         model = Activity
         fields = "__all__"
         ref_name = "Activity"
+
+class ActivityBuilderSerializer(serializers.Serializer):
+    """
+    Serializer for the activity builder.\n
+    The serializer validates the input data and creates a new activity object with the specified fields.\n
+    It then creates the associated land use change and module objects, if any.
+
+    This serializer expects a JSON object with the following fields:
+    - project: the ID of the project to which the activity belongs (required).
+    - name: the name of the activity (required).
+    - climate: the ID of the climate associated with the activity (required).
+    - soil_type: the ID of the soil type associated with the activity (required).
+    - duration: the duration of the activity in days (required).
+    - land_use_change: an optional object with the following fields:
+        - module_type_start: the ID of the module type at the start of the land use change.
+        - module_type_end: the ID of the module type at the end of the land use change.
+        - area: the area affected by the land use change in hectares.
+    - modules: an optional list of module type IDs associated with the activity.
+    - has_input: a boolean flag indicating whether the activity requires the Inputs module (default is false).
+    """
+
+    class LandUseChangeBuilderSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = LandUseChange
+            fields = ["module_type_start", "module_type_end", "area"]
+            ref_name = "LandUseChange"
+
+    project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(), required=True)
+    name = serializers.CharField(max_length=255, required=True)
+    climate = serializers.PrimaryKeyRelatedField(queryset=Climate.objects.all(), required=True)
+    soil_type = serializers.PrimaryKeyRelatedField(queryset=SoilType.objects.all(), required=True)
+    duration = serializers.IntegerField(required=True)
+    land_use_change = LandUseChangeBuilderSerializer(many=False, required=False)
+    modules = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
+    has_input = serializers.BooleanField(default=False, required=False)
+
+    def validate(self, data):
+        if data["has_input"] and not data.get("modules", None):
+            raise serializers.ValidationError("If has_input is true, at least one module must be provided")
+        super().validate(data)
+        return data
+    
+    def save(self, **kwargs):
+        try:
+            activity = Activity.objects.create(
+                name=self.validated_data["name"], 
+                project=self.validated_data["project"], 
+                climate_t2=self.validated_data["climate"], 
+                soil_type_t2=self.validated_data["soil_type"], 
+                duration_t2=self.validated_data["duration"]
+            )
+
+            if self.validated_data.get("land_use_change", None):
+                land_use_change = LandUseChange.objects.create(**self.validated_data["land_use_change"], activity=activity)
+                land_use_change.save()
+            
+            if self.validated_data.get("modules", None):
+                for module_type in self.validated_data["modules"]:
+                    try:
+                        Module = apps.get_model("api", module_type.class_name)
+                        Module.objects.create(activity=activity)
+                    except AttributeError:
+                        raise serializers.ValidationError(f"Invalid module type: {module_type.class_name}")
+        except Exception as e:
+            raise serializers.ValidationError(e)
+        
+        return activity
+        
+
+
 
 class InputTypeSerializer(serializers.ModelSerializer):
     macro_input_type = get_model_serializer(MacroInputType)(many=False, read_only=True)
