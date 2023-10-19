@@ -290,7 +290,7 @@ class ManureManagementType(Model):
 
 class ModuleType(Model):
     name = CharField(max_length=100, unique=True)
-    verbose_name = CharField(max_length=255, null=True, blank=True)
+    class_name = CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return f"({self.pk}) {self.name}"
@@ -454,10 +454,14 @@ class Activity(Historical):
     project = ForeignKey(Project, on_delete=CASCADE, related_name="activities")
     name = CharField(max_length=255)
     description = TextField(null=True, blank=True)
-    user = ForeignKey(User, on_delete=CASCADE)
+    # user = ForeignKey(User, on_delete=CASCADE) # TODO: Define when it's useful to have this
     state = ForeignKey(ActivityState, on_delete=CASCADE, null=True, blank=True)
     created_at = DateTimeField(auto_now_add=True, null=True)
     updated_at = DateTimeField(auto_now=True, null=True)
+
+    climate_t2 = ForeignKey(Climate, on_delete=CASCADE, null=True, blank=True)
+    soil_type_t2 = ForeignKey(SoilType, on_delete=CASCADE, null=True, blank=True)
+    duration_t2 = IntegerField(null=True, blank=True)
 
     change_rate = ForeignKey(ChangeRate, on_delete=CASCADE, null=True, related_name="change_rate")
 
