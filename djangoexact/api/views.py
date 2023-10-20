@@ -15,57 +15,34 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from django.db import transaction
 
 
-activity_id = openapi.Parameter(
-    "activity_id",
-    openapi.IN_QUERY,
-    description="ID of activity related to the module",
-    type=openapi.TYPE_INTEGER,
-)
-project_id = openapi.Parameter(
-    "project_id",
-    openapi.IN_QUERY,
-    description="ID of project related to the activity",
-    type=openapi.TYPE_INTEGER,
-)
-include_related = openapi.Parameter(
-    "include_related",
-    openapi.IN_QUERY,
-    description="Include related modules",
-    type=openapi.TYPE_BOOLEAN,
-)
-parent = openapi.Parameter(
-    "parent", openapi.IN_QUERY, description="Parent name", type=openapi.TYPE_STRING
-)
-cascade = openapi.Parameter(
-    "cascade",
-    openapi.IN_QUERY,
-    description="Include comments in thread",
-    type=openapi.TYPE_BOOLEAN,
-)
+activity_id = openapi.Parameter("activity_id",openapi.IN_QUERY,description="ID of activity related to the module",type=openapi.TYPE_INTEGER)
+project_id = openapi.Parameter( "project_id", openapi.IN_QUERY, description="ID of project related to the activity", type=openapi.TYPE_INTEGER)
+include_related = openapi.Parameter( "include_related", openapi.IN_QUERY, description="Include related modules", type=openapi.TYPE_BOOLEAN)
+module_type = openapi.Parameter("module_type", openapi.IN_QUERY, description="Module associated with Land Use Type", type=openapi.TYPE_INTEGER)
+cascade = openapi.Parameter("cascade", openapi.IN_QUERY, description="Include comments in thread", type=openapi.TYPE_BOOLEAN)
 
 
-def get_modules(activity, serialized=True):
+def get_modules(activity: Activity, serialized=True) -> list:
     modules = []
-    modules_dict = []
+    module_serializers_list = []
     module_types = ModuleType.objects.all()
     for module in module_types:
         try:
             module_model = apps.get_model(API, module.class_name)
         except LookupError:
-            print(f"Module {module.name} not found")
+            print(f"get_modules: Module {module.name} not found")
             continue
         module_object = module_model.objects.filter(activity__id=activity.pk).first()
         if module_object:
             modules.append(module_object)
             module_dict = get_module_serializer(module_model)(module_object).data
-            modules_dict.append(module_dict)
+            module_serializers_list.append(module_dict)
 
-    return modules_dict if serialized else modules
+    return module_serializers_list if serialized else modules
 
 
 class AuthenticatedViewSet(viewsets.GenericViewSet):
     permission_classes = [permissions.IsAuthenticated]
-
 
 class LandUseTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
@@ -75,29 +52,16 @@ class LandUseTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = LandUseType.objects.all()
     serializer_class = get_model_serializer(LandUseType)
 
-    # Modify get method to accept OPTIONAL query parameter 'module' to return land use types for a given module
-    @swagger_auto_schema(
-        manual_parameters=[parent],
-        responses={404: "No land use types found for parent"},
-    )
+    @swagger_auto_schema(manual_parameters=[module_type])
     def list(self, request):
         """
-        Get all land use types, or all land use types for a given parent, by filtering against a `parent` query parameter in the URL.
+        Get all land use types, or all land use types for a given module type, by filtering against a `module_type` query parameter in the URL.
         """
-        parent = self.request.query_params.get("parent", None)
-        if parent:
-            land_use_types = LandUseType.objects.filter(parent__name=parent).order_by(
-                "name"
-            )
-            if not land_use_types:
-                return ErrorResponse(
-                    f"No land use types found for parent: {parent}",
-                    status=status.HTTP_404_NOT_FOUND,
-                )
-            return Response(
-                data=get_model_serializer(LandUseType)(land_use_types, many=True).data,
-                status=status.HTTP_200_OK,
-            )
+        module_type_id = self.request.query_params.get("module_type", None)
+        if module_type_id:
+            land_use_types = LandUseType.objects.filter(module_type__pk=module_type_id).all()
+            serializer = get_model_serializer(LandUseType)(land_use_types, many=True)
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
 
         return super().list(request)
 
