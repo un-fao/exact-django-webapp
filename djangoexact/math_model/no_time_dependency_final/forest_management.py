@@ -28,6 +28,21 @@ def create_agb_matrix(years_impl, years_cap, delta_agb_yearly_below_20, delta_ag
     # NOTE: no check is made to verify that the agb is not over the maximum value possible
     return agb_matrix, delta_agb_matrix
 
+def create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, bgb_ratio_under_threshold, bgb_ratio_over_threshold, threshold, bgb_start):
+    
+    delta_bgb_matrix = delta_agb_matrix * bgb_ratio_under_threshold
+    bgb_matrix = np.full((agb_matrix.shape[0],  agb_matrix.shape[1]), 0.)
+
+    for i in range(agb_matrix.shape[0]):
+        for j in range(i, agb_matrix.shape[1]):
+            value_to_assign = bgb_start + delta_bgb_matrix[i][j] + np.sum(delta_bgb_matrix[i, i:j])
+            if value_to_assign > threshold:
+                delta_bgb_matrix[i][j] = delta_bgb_matrix[i][j] * bgb_ratio_over_threshold
+                value_to_assign = bgb_start + delta_bgb_matrix[i][j] + np.sum(delta_bgb_matrix[i, i:j])
+            bgb_matrix [i][j] = value_to_assign
+ 
+    return bgb_matrix, delta_bgb_matrix
+
 def plot_matrix(matrix):
     # Number of rows and columns in the matrix
     num_rows, num_cols = matrix.shape
@@ -228,14 +243,15 @@ def multiply_matrix_by_matrix(matrix1, matrix2):
 
 class ForestManagement:
 
-    def __init__(self, years_cap, years_impl, rate, hectares_start, hectares_end, rotation_recurrence, rotation_start_year, rotation_use_energy,bgb_yearly_growth_under_20_default, 
-                bgb_yearly_growth_under_20_tier_2, bgb_yearly_growth_over_20_deafult, bgb_yearly_growth_over_20_tier_2,
+    def __init__(self, years_cap, years_impl, rate, hectares_start, hectares_end, rotation_recurrence, rotation_start_year, rotation_use_energy, bgb_ratio_threshold, 
+                bgb_ratio_under_threshold, bgb_ratio_over_threshold, bgb_yearly_growth_under_20_tier_2, bgb_yearly_growth_over_20_tier_2,
                 agb_start_default, agb_start_tier_2, bgb_start_default, bgb_start_tier_2, agb_yearly_growth_under_20_default, agb_yearly_growth_under_20_tier_2, 
                 agb_yearly_growth_over_20_default, agb_yearly_growth_over_20_tier_2, max_agb_value, max_bgb_value,
                 disturbance_or_logging_recurrence: list, disturbance_or_logging_percentage: list, disturbance_or_logging_use_energy: list, disturbance_or_logging_year_of_start: list,
                 litter_20_years_default, litter_20_years_tier_2, deadwood_20_years_default, deadwood_20_years_tier_2, socref_default, 
                 soc_tier_2, f_lu_tier_2, f_i_tier_2, f_mg_tier_2, f_lu_ref, f_i_ref, f_mg_ref):
         
+        # TODO: add year of start logic for rotation and disturbance
         self.years_cap = years_cap
         self.years_impl = years_impl
         self.rate = rate
@@ -243,10 +259,15 @@ class ForestManagement:
         self.hectares_end = hectares_end
         self.rotation_recurrence = rotation_recurrence
 
-        self.bgb_yearly_growth_under_20 = bgb_yearly_growth_under_20_default if not bgb_yearly_growth_under_20_tier_2 else bgb_yearly_growth_under_20_tier_2
-        self.bgb_yearly_growth_over_20 = bgb_yearly_growth_over_20_deafult if not bgb_yearly_growth_over_20_tier_2 else bgb_yearly_growth_over_20_tier_2
         self.agb_yearly_growth_over_20 = agb_yearly_growth_over_20_default if not agb_yearly_growth_over_20_tier_2 else agb_yearly_growth_over_20_tier_2       
         self.agb_yearly_growth_under_20 = agb_yearly_growth_under_20_default if not agb_yearly_growth_under_20_tier_2 else agb_yearly_growth_under_20_tier_2
+        
+        self.bgb_ratio_threshold = bgb_ratio_threshold
+        self.bgb_ratio_under_threshold = bgb_ratio_under_threshold
+        self.bgb_ratio_over_threshold = bgb_ratio_over_threshold
+
+        self.bgb_yearly_growth_under_20_tier_2 = bgb_yearly_growth_under_20_tier_2
+        self.bgb_yearly_growth_over_20_tier_2 = bgb_yearly_growth_over_20_tier_2
 
         self.agb_start = agb_start_default if not agb_start_tier_2 else agb_start_tier_2
         self.bgb_start = bgb_start_default if not bgb_start_default else bgb_start_tier_2
@@ -307,7 +328,11 @@ class ForestManagement:
 
                 # calculate agb matrix
                 agb_matrix, delta_agb_matrix = create_agb_matrix(self.years_impl, self.years_cap, self.agb_yearly_growth_under_20, self.agb_yearly_growth_over_20, self.agb_start)
-                bgb_matrix, delta_bgb_matrix = create_agb_matrix(self.years_impl, self.years_cap, self.bgb_yearly_growth_under_20, self.bgb_yearly_growth_over_20, self.bgb_start)
+                if self.bgb_yearly_growth_over_20_tier_2 and self.bgb_yearly_growth_under_20_tier_2:
+                    bgb_matrix, delta_bgb_matrix = create_agb_matrix(self.years_impl, self.years_cap, self.bgb_yearly_growth_under_20_tier_2, self.bgb_yearly_growth_over_20_tier_2, self.bgb_start)
+                else:
+                    bgb_matrix, delta_bgb_matrix = create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, self.bgb_ratio_under_threshold, self.bgb_ratio_over_threshold, self.bgb_ratio_threshold, self.bgb_start)
+
                 # agb_matrix, delta_agb_matrix = check_agb_matrices(agb_matrix, delta_agb_matrix, self.max_agb_value)
                 # if there is rotation there is not logging or disturbance
                 
