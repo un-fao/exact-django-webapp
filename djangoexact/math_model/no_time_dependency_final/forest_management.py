@@ -243,13 +243,13 @@ def multiply_matrix_by_matrix(matrix1, matrix2):
 
 class ForestManagement:
 
-    def __init__(self, years_cap, years_impl, rate, hectares_start, hectares_end, rotation_recurrence, rotation_start_year, rotation_use_energy, bgb_ratio_threshold, 
+    def __init__(self, years_cap, years_impl, rate, hectares_start, hectares_end, rotation_recurrence, rotation_start_year, rotation_percentage_energy, bgb_ratio_threshold, 
                 bgb_ratio_under_threshold, bgb_ratio_over_threshold, bgb_yearly_growth_under_20_tier_2, bgb_yearly_growth_over_20_tier_2,
                 agb_start_default, agb_start_tier_2, bgb_start_default, bgb_start_tier_2, agb_yearly_growth_under_20_default, agb_yearly_growth_under_20_tier_2, 
                 agb_yearly_growth_over_20_default, agb_yearly_growth_over_20_tier_2, max_agb_value, max_bgb_value,
-                disturbance_or_logging_recurrence: list, disturbance_or_logging_percentage: list, disturbance_or_logging_use_energy: list, disturbance_or_logging_year_of_start: list,
+                disturbance_or_logging_recurrence: list, disturbance_or_logging_percentage: list, disturbance_or_logging_percentage_energy: list, disturbance_or_logging_year_of_start: list,
                 litter_20_years_default, litter_20_years_tier_2, deadwood_20_years_default, deadwood_20_years_tier_2, socref_default, 
-                soc_tier_2, f_lu_tier_2, f_i_tier_2, f_mg_tier_2, f_lu_ref, f_i_ref, f_mg_ref):
+                soc_tier_2, f_lu_tier_2, f_i_tier_2, f_mg_tier_2, f_lu_ref, f_i_ref, f_mg_ref, ef_methane, ef_nitrous):
         
         # TODO: add year of start logic for rotation and disturbance
         self.years_cap = years_cap
@@ -258,6 +258,8 @@ class ForestManagement:
         self.hectares_start = hectares_start
         self.hectares_end = hectares_end
         self.rotation_recurrence = rotation_recurrence
+        self.rotation_start_year = rotation_start_year
+        self.rotation_percentage_energy = rotation_percentage_energy
 
         self.agb_yearly_growth_over_20 = agb_yearly_growth_over_20_default if not agb_yearly_growth_over_20_tier_2 else agb_yearly_growth_over_20_tier_2       
         self.agb_yearly_growth_under_20 = agb_yearly_growth_under_20_default if not agb_yearly_growth_under_20_tier_2 else agb_yearly_growth_under_20_tier_2
@@ -277,6 +279,8 @@ class ForestManagement:
 
         self.disturbance_or_logging_recurrence = disturbance_or_logging_recurrence
         self.disturbance_or_logging_percentage = disturbance_or_logging_percentage
+        self.disturbance_or_logging_percentage_energy = disturbance_or_logging_percentage_energy
+        self.disturbance_or_logging_year_of_start = disturbance_or_logging_year_of_start
 
         self.litter_20_years = litter_20_years_default if not litter_20_years_tier_2 else litter_20_years_tier_2
         self.deadwood_20_years = deadwood_20_years_default if not deadwood_20_years_tier_2 else deadwood_20_years_tier_2 
@@ -288,6 +292,9 @@ class ForestManagement:
         self.f_lu_ref = f_lu_ref
         self.f_i_ref = f_i_ref
         self.f_mg_ref = f_mg_ref
+
+        self.ef_methane = ef_methane
+        self.ef_nitrous = ef_nitrous
 
         # Hectares breakdown
         self.hectares_total = yearly_time_dependent_parameter_breakdown(self.hectares_start, self.hectares_end, self.years_impl, self.years_cap, self.rate)
@@ -307,10 +314,16 @@ class ForestManagement:
         self.total_deadwood_emissions = 0
 
         self.yearly_disturbance_emissions = [] # NOTE: THIS IS A LIST OF LISTS
-        self.total_disturbance_emissions = 0
+        self.total_disturbance_emissions = []
 
         self.yearly_rotation_emissions = []
         self.total_rotation_emissions = 0
+
+        self.yearly_fire_rotation_emissions = []
+        self.total_fire_rotation_emissions = 0
+
+        self.yearly_fire_disturbance_emissions = []
+        self.total_fire_disturbance_emissions = 0
 
         self.yearly_soc_emissions = []
         self.total_soc_emissions = 0
@@ -344,8 +357,17 @@ class ForestManagement:
                     rotation_times_hectares_agb = multiply_matrix_by_matrix(rotation_matrix_agb, self.hectares_matrix)
                     rotation_times_hectares_bgb = multiply_matrix_by_matrix(rotation_matrix_bgb, self.hectares_matrix)
 
-                    rotation_yearly_emissions_agb = [x * -44/12 for x in rotation_times_hectares_agb]
-                    rotation_yearly_emissions_bgb = [x * -44/12 for x in rotation_times_hectares_bgb]
+                    rotation_yearly_emissions_agb = [x * -44/12 * (1 - self.rotation_percentage_energy) for x in rotation_times_hectares_agb]
+                    # TODO:check if this is correct
+                    rotation_yearly_emissions_bgb = [x * -44/12 * (1 - self.rotation_percentage_energy) for x in rotation_times_hectares_bgb]
+
+                    agb_fire_component = [x * -44/12 * self.rotation_percentage_energy for x in rotation_times_hectares_agb]
+                    bgb_fire_component = [x * -44/12 * self.rotation_percentage_energy for x in rotation_times_hectares_bgb]
+                    nitrous_fire_component = [x * -44/12 * self.rotation_percentage_energy * self.ef_nitrous for x in rotation_times_hectares_agb]
+                    methane_fire_component = [x * -44/12 * self.rotation_percentage_energy * self.ef_methane for x in rotation_times_hectares_agb]
+
+                    self.yearly_fire_rotation_emissions = [x + y + z + w for x, y, z, w in zip(agb_fire_component, bgb_fire_component, nitrous_fire_component, methane_fire_component)]
+                    self.total_fire_rotation_emissions = sum(self.yearly_fire_rotation_emissions)
 
                     rotation_yearly_emissions = [x + y for x, y in zip(rotation_yearly_emissions_agb, rotation_yearly_emissions_bgb)]
 
@@ -353,12 +375,21 @@ class ForestManagement:
                     self.yearly_rotation_emissions = rotation_yearly_emissions
                 
                 else:
-                    for recurrence, percentage in zip(self.disturbance_or_logging_recurrence, self.disturbance_or_logging_percentage):
+                    for recurrence, percentage, percentage_fire in zip(self.disturbance_or_logging_recurrence, self.disturbance_or_logging_percentage, self.disturbance_or_logging_percentage_energy):
+
                         result_logging_disturbance_agb, logging_matrix_agb, delta_agb_matrix = calculate_logging_effect(agb_matrix, delta_agb_matrix, self.max_agb_value, recurrence, percentage)
                         result_logging_disturbance_bgb, logging_matrix_bgb, delta_bgb_matrix = calculate_logging_effect(bgb_matrix, delta_bgb_matrix, self.max_bgb_value, recurrence, percentage)
 
                         logging_times_hectares_agb = multiply_matrix_by_matrix(logging_matrix_agb, self.hectares_matrix)
                         logging_times_hectares_bgb = multiply_matrix_by_matrix(logging_matrix_bgb, self.hectares_matrix)
+
+                        agb_fire_component = [x * -44/12 * percentage_fire for x in logging_times_hectares_agb]
+                        bgb_fire_component = [x * -44/12 * percentage_fire for x in logging_times_hectares_bgb]
+                        nitrous_fire_component = [x * -44/12 * percentage_fire * self.ef_nitrous for x in logging_times_hectares_agb]
+                        methane_fire_component = [x * -44/12 * percentage_fire * self.ef_methane for x in logging_times_hectares_agb]
+
+                        self.yearly_fire_disturbance_emissions.append([x + y + z + w for x, y, z, w in zip(agb_fire_component, bgb_fire_component, nitrous_fire_component, methane_fire_component)])
+                        self.total_fire_disturbance_emissions = sum(self.yearly_fire_disturbance_emissions[-1])
 
                         logging_yearly_emissions_agb = [x * -44/12 for x in logging_times_hectares_agb]
                         logging_yearly_emissions_bgb = [x * -44/12 for x in logging_times_hectares_bgb]
