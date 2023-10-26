@@ -453,11 +453,17 @@ class ForestManagement:
 
         try:
             # ADD ALL EXPECT FOR DISTURBANCE EMISSIONS
-            self.emissions_total_yearly = [i + j + k + l + m + n for i, j ,k, l, m, n in zip(self.yearly_agb_emissions, self.yearly_bgb_emissions, self.yearly_litter_emissions, self.yearly_deadwood_emissions, self.yearly_rotation_emissions, self.yearly_soc_emissions)]
+            #self.emissions_total_yearly = [i + j + k + l + m + n for i, j ,k, l, m, n in zip(self.yearly_agb_emissions, self.yearly_bgb_emissions, self.yearly_litter_emissions, self.yearly_deadwood_emissions, self.yearly_rotation_emissions, self.yearly_soc_emissions)]
+            self.emissions_total_yearly = [i + j + k + l + m + n + o for i, j ,k, l, m, n, o in zip(self.yearly_agb_emissions, self.yearly_bgb_emissions, self.yearly_litter_emissions, self.yearly_deadwood_emissions, self.yearly_rotation_emissions, self.yearly_soc_emissions, self.yearly_fire_rotation_emissions)]
+            
             # ADD DISTURBANCE EMISSIONS
-            for i in self.yearly_disturbance_emissions:
-                for j, k in enumerate(i):
-                    self.emissions_total_yearly[j] += k
+            # for i in self.yearly_disturbance_emissions:
+            #     for j, k in enumerate(i):
+            #         self.emissions_total_yearly[j] += k
+            for i, j in zip(self.yearly_disturbance_emissions, self.yearly_fire_disturbance_emissions):
+                for k, l in enumerate(i):
+                    self.emissions_total_yearly[k] += l
+                    self.emissions_total_yearly[k] += j[k]
         
             self.total_emissions = sum(self.emissions_total_yearly)
         except Exception as e:
