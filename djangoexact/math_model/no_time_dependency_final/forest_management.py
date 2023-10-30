@@ -247,7 +247,8 @@ class ForestManagement:
                 bgb_ratio_under_threshold, bgb_ratio_over_threshold, bgb_yearly_growth_under_20_tier_2, bgb_yearly_growth_over_20_tier_2,
                 agb_start_default, agb_start_tier_2, bgb_start_default, bgb_start_tier_2, agb_yearly_growth_under_20_default, agb_yearly_growth_under_20_tier_2, 
                 agb_yearly_growth_over_20_default, agb_yearly_growth_over_20_tier_2, max_agb_value, max_bgb_value,
-                disturbance_or_logging_recurrence: list, disturbance_or_logging_percentage: list, disturbance_or_logging_percentage_energy: list, disturbance_or_logging_year_of_start: list,
+                disturbance_recurrence: list, disturbance_percentage: list, disturbance_year_of_start: list,
+                logging_recurrence, logging_percentage, logging_percentage_energy, logging_year_of_start,
                 litter_20_years_default, litter_20_years_tier_2, deadwood_20_years_default, deadwood_20_years_tier_2, socref_default, 
                 soc_tier_2, f_lu_tier_2, f_i_tier_2, f_mg_tier_2, f_lu_ref, f_i_ref, f_mg_ref, ef_methane, ef_nitrous):
         
@@ -277,10 +278,13 @@ class ForestManagement:
         self.max_agb_value = max_agb_value
         self.max_bgb_value = max_bgb_value
 
-        self.disturbance_or_logging_recurrence = disturbance_or_logging_recurrence
-        self.disturbance_or_logging_percentage = disturbance_or_logging_percentage
-        self.disturbance_or_logging_percentage_energy = disturbance_or_logging_percentage_energy
-        self.disturbance_or_logging_year_of_start = disturbance_or_logging_year_of_start
+        self.disturbance_recurrence = disturbance_recurrence
+        self.disturbance_percentage = disturbance_percentage
+        self.disturbance_year_of_start = disturbance_year_of_start
+        self.logging_recurrence = logging_recurrence
+        self.logging_percentage = logging_percentage
+        self.logging_percentage_energy = logging_percentage_energy
+        self.logging_year_of_start = logging_year_of_start
 
         self.litter_20_years = litter_20_years_default if not litter_20_years_tier_2 else litter_20_years_tier_2
         self.deadwood_20_years = deadwood_20_years_default if not deadwood_20_years_tier_2 else deadwood_20_years_tier_2 
@@ -375,7 +379,11 @@ class ForestManagement:
                     self.yearly_rotation_emissions = rotation_yearly_emissions
                 
                 else:
-                    for recurrence, percentage, percentage_fire in zip(self.disturbance_or_logging_recurrence, self.disturbance_or_logging_percentage, self.disturbance_or_logging_percentage_energy):
+                    disturbance_or_logging_recurrence = [self.disturbance_recurrence].extend(self.logging_recurrence)
+                    disturbance_or_logging_percentage = [self.disturbance_percentage].extend(self.logging_percentage)
+                    disturbance_or_logging_percentage_energy = [0 for i in self.disturbance_percentage].extend([self.logging_percentage_energy])   
+
+                    for recurrence, percentage, percentage_fire in zip(disturbance_or_logging_recurrence, disturbance_or_logging_percentage, disturbance_or_logging_percentage_energy):
 
                         result_logging_disturbance_agb, logging_matrix_agb, delta_agb_matrix = calculate_logging_effect(agb_matrix, delta_agb_matrix, self.max_agb_value, recurrence, percentage)
                         result_logging_disturbance_bgb, logging_matrix_bgb, delta_bgb_matrix = calculate_logging_effect(bgb_matrix, delta_bgb_matrix, self.max_bgb_value, recurrence, percentage)
