@@ -245,7 +245,7 @@ class ForestManagement:
 
     def __init__(self, years_cap, years_impl, rate, hectares_start, hectares_end, rotation_recurrence, rotation_start_year, rotation_percentage_energy, bgb_ratio_threshold, 
                 bgb_ratio_under_threshold, bgb_ratio_over_threshold, bgb_yearly_growth_under_20_tier_2, bgb_yearly_growth_over_20_tier_2,
-                agb_start_default, agb_start_tier_2, bgb_start_default, bgb_start_tier_2, agb_yearly_growth_under_20_default, agb_yearly_growth_under_20_tier_2, 
+                agb_start_default, agb_start_tier_2, agb_yearly_growth_under_20_default, agb_yearly_growth_under_20_tier_2, 
                 agb_yearly_growth_over_20_default, agb_yearly_growth_over_20_tier_2, max_agb_value, max_bgb_value,
                 disturbance_recurrence: list, disturbance_percentage: list, disturbance_year_of_start: list,
                 logging_recurrence, logging_percentage, logging_percentage_energy, logging_year_of_start,
@@ -273,7 +273,7 @@ class ForestManagement:
         self.bgb_yearly_growth_over_20_tier_2 = bgb_yearly_growth_over_20_tier_2
 
         self.agb_start = agb_start_default if not agb_start_tier_2 else agb_start_tier_2
-        self.bgb_start = bgb_start_default if not bgb_start_default else bgb_start_tier_2
+        self.bgb_start = self.agb_start * self.bgb_ratio_under_threshold if self.agb_start < self.bgb_ratio_threshold else self.agb_start * self.bgb_ratio_over_threshold
         
         self.max_agb_value = max_agb_value
         self.max_bgb_value = max_bgb_value
