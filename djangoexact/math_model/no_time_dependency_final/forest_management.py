@@ -276,7 +276,7 @@ class ForestManagement:
         self.bgb_start = self.agb_start * self.bgb_ratio_under_threshold if self.agb_start < self.bgb_ratio_threshold else self.agb_start * self.bgb_ratio_over_threshold
         
         self.max_agb_value = max_agb_value
-        self.max_bgb_value = max_bgb_value
+        self.max_bgb_value = self.max_agb_value * self.bgb_ratio_under_threshold if self.max_agb_value < self.bgb_ratio_threshold else self.max_agb_value * self.bgb_ratio_over_threshold
 
         self.disturbance_recurrence = disturbance_recurrence
         self.disturbance_percentage = disturbance_percentage
