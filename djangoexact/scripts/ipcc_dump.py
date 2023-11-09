@@ -609,31 +609,7 @@ with open("scripts/ipcc_data/DrainageEmissionFactors.csv", "r") as f:
                 value=value,
             )
 
-with open("scripts/ipcc_data/CroplandFLU.csv", "r") as f:
-    reader = csv.reader(f)
-    header = next(reader, None)
-    data = list(reader)
 
-    for i, head in enumerate(header):
-        head = sanitize(head).title()
-        crop_type = CropType.objects.get_or_create(name=head)[0]
-        for row in data:
-            if sanitize(row[0]) == "":
-                continue
-
-            climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
-            moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
-
-            value = row[i + 2]
-
-            print(f"{crop_type}, {climate}, {moisture}, {value}")
-
-            CroplandFLU.objects.get_or_create(
-                crop_type=crop_type,
-                climate=climate,
-                moisture=moisture,
-                value=value,
-            )
 
 with open("scripts/ipcc_data/CroplandFMG.csv", "r") as f:
     reader = csv.reader(f)
@@ -723,31 +699,7 @@ with open("scripts/ipcc_data/PerennialAGB.csv", "r") as f:
                 value=value,
             )
 
-with open("scripts/ipcc_data/CroplandFLU.csv", "r") as f:
-    reader = csv.reader(f)
-    header = next(reader, None)
-    data = list(reader)
 
-    for i, head in enumerate(header):
-        head = sanitize(head).title()
-        crop_type = CropType.objects.get(name=head)
-        for row in data:
-            if sanitize(row[0]) == "":
-                continue
-
-            climate = Climate.objects.get(name=sanitize(row[0]).title())
-            moisture = Moisture.objects.get(name=sanitize(row[1]).title())
-
-            value = row[i + 2]
-
-            print(f"{crop_type}, {climate}, {moisture}, {value}")
-
-            CroplandFLU.objects.get_or_create(
-                crop_type=crop_type,
-                climate=climate,
-                moisture=moisture,
-                value=value,
-            )
 
 with open("scripts/ipcc_data/PerennialMaximumAGB_C.csv", "r") as f:
     reader = csv.reader(f)
@@ -942,48 +894,10 @@ for i, row in enumerate(df_dict):
 
 
 
-with open("scripts/ipcc_data/CropNitrousEstimationDefaultFactors.csv", "r") as f:
-    reader = csv.reader(f)
-    header = next(reader, None)
-    data = list(reader)
-
-    for row in data:
-        crop_type = CropType.objects.get_or_create(name=sanitize(row[0]))[0]
-        CropNitrousEstimationDefaultFactor.objects.get_or_create(
-            crop_type=crop_type,
-            slope=row[1] if row[1] != "NA" else None,
-            intercept=row[2] if row[2] != "NA" else None,
-            n_ag_residues=row[3],
-            rs_t=row[4],
-            n_bg_t=row[5],
-        )
 
 
-with open("scripts/ipcc_data/CroplandFLU.csv", "r") as f:
-    reader = csv.reader(f)
-    header = next(reader, None)
-    data = list(reader)
 
-    for i, head in enumerate(header):
-        head = sanitize(head).title()
-        crop_type = CropType.objects.get_or_create(name=head)[0]
-        for row in data:
-            if sanitize(row[0]) == "":
-                continue
 
-            climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
-            moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
-
-            value = row[i + 2]
-
-            print(f"{crop_type}, {climate}, {moisture}, {value}")
-
-            CroplandFLU.objects.get_or_create(
-                crop_type=crop_type,
-                climate=climate,
-                moisture=moisture,
-                value=value,
-            )
 
 
 with open("scripts/ipcc_data/SmallFisheryDatabaseFish.csv", "r") as f:
@@ -1065,20 +979,7 @@ with open("scripts/ipcc_data/LargeFisheryFUI.csv", "r") as f:
             )
 
 
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "FiresCombustionFactors.csv"),
-    header=[0],
-    sep=";",
-)
 
-for i, row in df.iterrows():
-    crop_type = CropType.objects.get_or_create(name=sanitize(row["crop_type"]))[0]
-    combustion_factor = FiresCombustionFactor.objects.get_or_create(
-        crop_type=crop_type,
-        value=float(row["value"]),
-    )[0]
-
-    print(combustion_factor)
 
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "DefaultEmissionFactors.csv"),
@@ -1098,65 +999,11 @@ for i, row in df.iterrows():
     )[0]
 
     print(emission_factor)
-with open("scripts/ipcc_data/CroplandFLU.csv", "r") as f:
-    reader = csv.reader(f)
-    header = next(reader, None)
-    data = list(reader)
 
-    for i, head in enumerate(header):
-        head = sanitize(head).title()
-        crop_type = CropType.objects.get_or_create(name=head)[0]
-        for row in data:
-            if sanitize(row[0]) == "":
-                continue
-
-            climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
-            moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
-
-            value = row[i + 2]
-
-            print(f"{crop_type}, {climate}, {moisture}, {value}")
-
-            CroplandFLU.objects.get_or_create(
-                crop_type=crop_type,
-                climate=climate,
-                moisture=moisture,
-                value=value,
-            )
 
 CropYieldStats.objects.all().delete()
 
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "CropYieldStats.csv"),
-    header=[0],
-    sep=";",
-)
 
-for i, row in df.iterrows():
-    crop_type = CropType.objects.get_or_create(name=sanitize(row["crop_type"]))[0]
-    continent = Continent.objects.get_or_create(name=sanitize(row["continent"]))[0]
-    yr_2016 = float(row["2016"])
-    yr_2017 = float(row["2017"])
-    yr_2018 = float(row["2018"])
-    yr_2019 = float(row["2019"])
-    yr_2020 = float(row["2020"])
-
-    average = (yr_2016 + yr_2017 + yr_2018 + yr_2019 + yr_2020) / 5 / 10000
-
-    print(
-        f"{crop_type}, {continent}, {yr_2016}, {yr_2017}, {yr_2018}, {yr_2019}, {yr_2020}, {average}"
-    )
-
-    stat = CropYieldStats.objects.get_or_create(
-        crop_type=crop_type,
-        continent=continent,
-        year_2016=yr_2016,
-        year_2017=yr_2017,
-        year_2018=yr_2018,
-        year_2019=yr_2019,
-        year_2020=yr_2020,
-        average=average,
-    )[0]
 
 with open("scripts/ipcc_data/CroplandFI.csv", "r") as f:
     reader = csv.reader(f)
@@ -1184,21 +1031,7 @@ with open("scripts/ipcc_data/CroplandFI.csv", "r") as f:
                 value=value,
             )
 
-with open("scripts/ipcc_data/CropNitrousEstimationDefaultFactors.csv", "r") as f:
-    reader = csv.reader(f)
-    header = next(reader, None)
-    data = list(reader)
 
-    for row in data:
-        crop_type = CropType.objects.get_or_create(name=sanitize(row[0]))[0]
-        CropNitrousEstimationDefaultFactor.objects.get_or_create(
-            crop_type=crop_type,
-            slope=row[1] if row[1] != "NA" else None,
-            intercept=row[2] if row[2] != "NA" else None,
-            n_ag_residues=row[3],
-            rs_t=row[4],
-            n_bg_t=row[5],
-        )
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "DefaultEmissionFactors.csv"),
     header=[0],
@@ -1300,118 +1133,13 @@ with open("scripts/ipcc_data/CroplandFMG.csv", "r") as f:
                 moisture=moisture,
                 value=value,
             )
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "FiresCombustionFactors.csv"),
-    header=[0],
-    sep=";",
-)
 
-for i, row in df.iterrows():
-    crop_type = CropType.objects.get_or_create(name=sanitize(row["crop_type"]))[0]
-    combustion_factor = FiresCombustionFactor.objects.get_or_create(
-        crop_type=crop_type,
-        value=float(row["value"]),
-    )[0]
 
-    print(combustion_factor)
 
-with open("scripts/ipcc_data/PerennialAGB.csv", "r") as f:
-    reader = csv.reader(f)
-    header = next(reader, None)
-    data = list(reader)
 
-    for i, head in enumerate(header):
-        if head == "":
-            continue
 
-        land_use_type = CropType.objects.get_or_create(name=head)[0]
-        for row in data:
-            if sanitize(row[0]) == "":
-                continue
 
-            climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
-            moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
-            continent = Continent.objects.get_or_create(name=sanitize(row[2]))[0]
 
-            # FIXME: Maybe skip instead of setting to None?
-            value = row[i + 4] if row[i + 4] != "" else None
-
-            print(f"{land_use_type}, {climate}, {moisture}, {value}")
-
-            PerennialAGB.objects.get_or_create(
-                crop_type=land_use_type,
-                climate=climate,
-                moisture=moisture,
-                continent=continent,
-                value=value,
-            )
-
-with open("scripts/ipcc_data/PerennialBGB.csv", "r") as f:
-    reader = csv.reader(f)
-    header = next(reader, None)
-    data = list(reader)
-
-    for i, head in enumerate(header):
-        if head == "":
-            continue
-
-        land_use_type = CropType.objects.get(name=head)
-        for row in data:
-            if sanitize(row[0]) == "":
-                continue
-
-            climate = Climate.objects.get(name=sanitize(row[0]).title())
-            moisture = Moisture.objects.get(name=sanitize(row[1]).title())
-            continent = Continent.objects.get(name=sanitize(row[2]).title())
-
-            value = row[i + 4]
-
-            if value == "" and i != 0:
-                continue
-
-            print(f"{land_use_type}, {climate}, {moisture}, {continent}, {value}")
-
-            PerennialBGB.objects.get_or_create(
-                crop_type=land_use_type,
-                climate=climate,
-                moisture=moisture,
-                continent=continent,
-                value=value,
-            )
-
-with open("scripts/ipcc_data/PerennialMaximumAGB_C.csv", "r") as f:
-    reader = csv.reader(f)
-    header = next(reader, None)
-    data = list(reader)
-
-    for i, head in enumerate(header):
-        land_use_type = CropType.objects.get_or_create(name=head)[0]
-        for row in data:
-            if sanitize(row[0]) == "":
-                continue
-            try:
-                # FIXME: This skips rows in PerennialMaximumAGB_C that don't have moisture values. Must be fixed. Ask team.
-                # Some rows in the Excel are only matched to a climate, not climate and moisture.
-                float(row[1])
-                continue
-            except ValueError:
-                pass
-
-            climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
-            moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
-
-            print(f"i = {i}")
-            print(f"{land_use_type}, {climate}, {moisture}")
-
-            value = row[i + 2]
-
-            print(f"Value {value}")
-
-            PerennialMaxAGB.objects.get_or_create(
-                crop_type=land_use_type,
-                climate=climate,
-                value=value,
-            )
 
 
 df = pd.read_csv(
@@ -2271,37 +1999,7 @@ for i, row in enumerate(df_dict):
     )
 PerennialMaxAGB.objects.all().delete()
 
-df2 = pd.read_csv(
-    os.path.join(
-        os.path.dirname(__file__), "ipcc_data", "PerennialMaxAGB.csv"
-    ),
-    header=0,
-    sep=",",
-)
 
-df_headers2 = df2.columns.values.tolist()
-df_dict2 = df2.to_dict("records")
-
-for i, row in enumerate(df_dict2):
-    climate = Climate.objects.get_or_create(name=sanitize(row["climate"]))[0]
-
-    for j, header in enumerate(df_headers2, start=1):
-        crop_type = CropType.objects.get_or_create(name=sanitize(df_headers2[j]))[0]
-
-        print(
-            climate,
-            crop_type,
-            row[df_headers2[j]],
-        )
-
-        PerennialMaxAGB.objects.get_or_create(
-            climate=climate,
-            crop_type=crop_type,
-            value=parse_csv_number(row[df_headers2[j]]),
-        )
-
-        if j == len(df_headers2) - 1:
-            break
 
 
 df = pd.read_csv(
@@ -2769,8 +2467,6 @@ for i, row in enumerate(df_dict2):
         volume=volume,
     )
 
-"""
-
 ForestManagementAGB.objects.all().delete()
 
 df2 = pd.read_csv(
@@ -2813,3 +2509,248 @@ for i, row in enumerate(df_dict2):
         agb_growth_min=agb_growth_min,
         agb_growth_max=agb_growth_max,
     )
+
+
+# CroplandFLU.objects.all().delete()
+with open("scripts/ipcc_data/CroplandFLU.csv", "r") as f:
+    reader = csv.reader(f)
+    header = next(reader, None)
+    data = list(reader)
+
+    for i, head in enumerate(header):
+        head = sanitize(head).title()
+        land_use_type = LandUseType.objects.get_or_create(name=head)[0]
+        for row in data:
+            if sanitize(row[0]) == "":
+                continue
+
+            climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
+            moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
+
+            value = row[i + 2]
+
+            print(f"{land_use_type}, {climate}, {moisture}, {value}")
+
+            CroplandFLU.objects.get_or_create(
+                land_use_type=land_use_type,
+                climate=climate,
+                moisture=moisture,
+                value=value,
+            )
+
+# CropNitrousEstimationDefaultFactor.objects.all().delete()
+with open("scripts/ipcc_data/CropNitrousEstimationDefaultFactors.csv", "r") as f:
+    reader = csv.reader(f)
+    header = next(reader, None)
+    data = list(reader)
+
+    for row in data:
+        land_use_type = LandUseType.objects.get_or_create(name=sanitize(row[0]))[0]
+        CropNitrousEstimationDefaultFactor.objects.get_or_create(
+            land_use_type=land_use_type,
+            slope=row[1] if row[1] != "NA" else None,
+            intercept=row[2] if row[2] != "NA" else None,
+            n_ag_residues=row[3],
+            rs_t=row[4],
+            n_bg_t=row[5],
+        )
+
+# FiresCombustionFactor.objects.all().delete()
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "FiresCombustionFactors.csv"),
+    header=[0],
+    sep=";",
+)
+
+for i, row in df.iterrows():
+    land_use_type = LandUseType.objects.get_or_create(name=sanitize(row["land_use_type"]))[0]
+    combustion_factor = FiresCombustionFactor.objects.get_or_create(
+        land_use_type=land_use_type,
+        value=float(row["value"]),
+    )[0]
+
+    print(combustion_factor)
+
+# CropYieldStats.objects.all().delete()
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "CropYieldStats.csv"),
+    header=[0],
+    sep=";",
+)
+
+for i, row in df.iterrows():
+    land_use_type = LandUseType.objects.get_or_create(name=sanitize(row["land_use_type"]))[0]
+    continent = Continent.objects.get_or_create(name=sanitize(row["continent"]))[0]
+    yr_2016 = float(row["2016"])
+    yr_2017 = float(row["2017"])
+    yr_2018 = float(row["2018"])
+    yr_2019 = float(row["2019"])
+    yr_2020 = float(row["2020"])
+
+    average = (yr_2016 + yr_2017 + yr_2018 + yr_2019 + yr_2020) / 5 / 10000
+
+    print(
+        f"{land_use_type}, {continent}, {yr_2016}, {yr_2017}, {yr_2018}, {yr_2019}, {yr_2020}, {average}"
+    )
+
+    stat = CropYieldStats.objects.get_or_create(
+        land_use_type=land_use_type,
+        continent=continent,
+        year_2016=yr_2016,
+        year_2017=yr_2017,
+        year_2018=yr_2018,
+        year_2019=yr_2019,
+        year_2020=yr_2020,
+        average=average,
+    )[0]
+
+CropNitrousEstimationDefaultFactor.objects.all().delete()
+with open("scripts/ipcc_data/CropNitrousEstimationDefaultFactors.csv", "r") as f:
+    reader = csv.reader(f)
+    header = next(reader, None)
+    data = list(reader)
+
+    for row in data:
+        land_use_type = LandUseType.objects.get_or_create(name=sanitize(row[0]))[0]
+        CropNitrousEstimationDefaultFactor.objects.get_or_create(
+            land_use_type=land_use_type,
+            slope=row[1] if row[1] != "NA" else None,
+            intercept=row[2] if row[2] != "NA" else None,
+            n_ag_residues=row[3],
+            rs_t=row[4],
+            n_bg_t=row[5],
+        )
+
+# PerennialAGB.objects.all().delete()
+with open("scripts/ipcc_data/PerennialAGB.csv", "r") as f:
+    reader = csv.reader(f)
+    header = next(reader, None)
+    data = list(reader)
+
+    for i, head in enumerate(header):
+        if head == "":
+            continue
+
+        land_use_type = LandUseType.objects.get_or_create(name=head)[0]
+        for row in data:
+            if sanitize(row[0]) == "":
+                continue
+
+            climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
+            moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
+            continent = Continent.objects.get_or_create(name=sanitize(row[2]))[0]
+
+            # FIXME: Maybe skip instead of setting to None?
+            value = row[i + 4] if row[i + 4] != "" else None
+
+            print(f"{land_use_type}, {climate}, {moisture}, {value}")
+
+            PerennialAGB.objects.get_or_create(
+                land_use_type=land_use_type,
+                climate=climate,
+                moisture=moisture,
+                continent=continent,
+                value=value,
+            )
+
+# PerennialBGB.objects.all().delete()
+with open("scripts/ipcc_data/PerennialBGB.csv", "r") as f:
+    reader = csv.reader(f)
+    header = next(reader, None)
+    data = list(reader)
+
+    for i, head in enumerate(header):
+        if head == "":
+            continue
+
+        land_use_type = LandUseType.objects.get(name=head)
+        for row in data:
+            if sanitize(row[0]) == "":
+                continue
+
+            climate = Climate.objects.get(name=sanitize(row[0]).title())
+            moisture = Moisture.objects.get(name=sanitize(row[1]).title())
+            continent = Continent.objects.get(name=sanitize(row[2]).title())
+
+            value = row[i + 4]
+
+            if value == "" and i != 0:
+                continue
+
+            print(f"{land_use_type}, {climate}, {moisture}, {continent}, {value}")
+
+            PerennialBGB.objects.get_or_create(
+                land_use_type=land_use_type,
+                climate=climate,
+                moisture=moisture,
+                continent=continent,
+                value=value,
+            )
+
+# PerennialMaxAGB.objects.all().delete()
+# with open("scripts/ipcc_data/PerennialMaximumAGB_C.csv", "r") as f:
+#     reader = csv.reader(f)
+#     header = next(reader, None)
+#     data = list(reader)
+
+#     for i, head in enumerate(header):
+#         land_use_type = LandUseType.objects.get_or_create(name=head)[0]
+#         for row in data:
+#             if sanitize(row[0]) == "":
+#                 continue
+#             try:
+#                 # FIXME: This skips rows in PerennialMaximumAGB_C that don't have moisture values. Must be fixed. Ask team.
+#                 # Some rows in the Excel are only matched to a climate, not climate and moisture.
+#                 float(row[1])
+#                 continue
+#             except ValueError:
+#                 pass
+
+#             climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
+#             moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
+
+#             print(f"i = {i}")
+#             print(f"{land_use_type}, {climate}, {moisture}")
+
+#             value = row[i + 2]
+
+#             print(f"Value {value}")
+
+#             PerennialMaxAGB.objects.get_or_create(
+#                 land_use_type=land_use_type,
+#                 climate=climate,
+#                 value=value,
+#             )
+
+df2 = pd.read_csv(
+    os.path.join(
+        os.path.dirname(__file__), "ipcc_data", "PerennialMaxAGB.csv"
+    ),
+    header=0,
+    sep=",",
+)
+
+df_headers2 = df2.columns.values.tolist()
+df_dict2 = df2.to_dict("records")
+
+for i, row in enumerate(df_dict2):
+    climate = Climate.objects.get_or_create(name=sanitize(row["climate"]))[0]
+
+    for j, header in enumerate(df_headers2, start=1):
+        land_use_type = LandUseType.objects.get_or_create(name=sanitize(df_headers2[j]))[0]
+
+        print(
+            climate,
+            land_use_type,
+            row[df_headers2[j]],
+        )
+
+        PerennialMaxAGB.objects.get_or_create(
+            climate=climate,
+            land_use_type=land_use_type,
+            value=parse_csv_number(row[df_headers2[j]]),
+        )
+
+        if j == len(df_headers2) - 1:
+            break
+"""
