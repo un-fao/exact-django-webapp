@@ -23,6 +23,10 @@ INCLUDE_RELATED = "include_related"
 class ManureManagementTypes(Enum):
     PRP = "Pasture/Range/Paddock"
 
+class ScenarioTypes(Enum):
+    START = "start"
+    WITH = "with"
+    WITHOUT = "without"
 
 class EmissionTypes(Enum):
     CO2 = "CO2"
@@ -31,6 +35,8 @@ class EmissionTypes(Enum):
     N2O_VOLATILIZATION = "N2O Volatilization"
     N2O_LEACHING = "N2O Leaching"
 
+def avg(lst):
+    return sum(lst) / len(lst)
 
 def snake_case(str):
     res = [str[0].lower()]

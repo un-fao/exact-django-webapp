@@ -253,45 +253,45 @@ class BurningEmissionFactor(Model):
 
 
 class FiresCombustionFactorManager(Manager):
-    def get_or_other(self, crop_type):
+    def get_or_other(self, land_use_type):
         """
         Returns the factor for the given land_use_type or the factor for 'other' if the factor for land_use_type does not exists.
         """
         try:
-            return self.get(crop_type=crop_type)
+            return self.get(land_use_type=land_use_type)
         except self.model.DoesNotExist:
-            return self.get(crop_type__name="Other")
+            return self.get(land_use_type__name="Other")
 
 
 class FiresCombustionFactor(Model):
     """
     IPCC:A84
     """
-    crop_type = ForeignKey("api.CropType", on_delete=CASCADE)
+    land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField()
 
     objects = FiresCombustionFactorManager()
 
     def __str__(self):
-        return f"FiresCombustionFactor for {self.crop_type.name}, value {self.value}"
+        return f"FiresCombustionFactor for {self.land_use_type.name}, value {self.value}"
 
 
 class CropNitrousEstimationDefaultFactorManager(Manager):
-    def get_or_grains(self, crop_type):
+    def get_or_grains(self, land_use_type):
         """
         Returns the factor for the given land_use_type or the factor for 'other' if it exists.
         """
         try:
-            return self.get(crop_type=crop_type)
+            return self.get(land_use_type=land_use_type)
         except self.model.DoesNotExist:
-            return self.get(crop_type__name="Grains")
+            return self.get(land_use_type__name="Grains")
 
 
 class CropNitrousEstimationDefaultFactor(Model):
     """
     IPCC:A8
     """
-    crop_type = ForeignKey("api.CropType", on_delete=CASCADE)
+    land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     slope = FloatField(null=True, blank=True)
     intercept = FloatField(null=True, blank=True)
     n_ag_residues = FloatField()
@@ -301,7 +301,7 @@ class CropNitrousEstimationDefaultFactor(Model):
     objects = CropNitrousEstimationDefaultFactorManager()
 
     def __str__(self):
-        return f"CropNitrousEstimationDefaultFactor for {self.crop_type.name}"
+        return f"CropNitrousEstimationDefaultFactor for {self.land_use_type.name}"
 
 
 class TillageCarbonStockExchangeFactor(Model):
@@ -449,20 +449,20 @@ class DrainageEmissionFactor(Model):
 
 
 class PerennialAGBManager(Manager):
-    def get_or_default(self, climate, moisture, continent, crop_type):
+    def get_or_default(self, climate, moisture, continent, land_use_type):
         try:
             return self.get(
                 climate=climate,
                 moisture=moisture,
                 continent=continent,
-                crop_type=crop_type,
+                land_use_type=land_use_type,
             )
         except PerennialAGB.DoesNotExist:
             return PerennialAGB.objects.get(
                 climate=climate,
                 moisture=moisture,
                 continent=continent,
-                crop_type__name="Agroforestry",
+                land_use_type__name="Agroforestry",
             )
 
 
@@ -473,30 +473,30 @@ class PerennialAGB(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     continent = ForeignKey("api.Continent", on_delete=CASCADE)
-    crop_type = ForeignKey("api.CropType", on_delete=CASCADE)
+    land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField(default=0, null=True, blank=True)
 
     objects = PerennialAGBManager()
 
     def __str__(self):
-        return f"{self.value} for {self.climate.name} {self.moisture.name} in {self.continent.name} {self.crop_type.name}"
+        return f"{self.value} for {self.climate.name} {self.moisture.name} in {self.continent.name} {self.land_use_type.name}"
 
 
 class PerennialBGBManager(Manager):
-    def get_or_default(self, climate, moisture, continent, crop_type):
+    def get_or_default(self, climate, moisture, continent, land_use_type):
         try:
             return self.get(
                 climate=climate,
                 moisture=moisture,
                 continent=continent,
-                crop_type=crop_type,
+                land_use_type=land_use_type,
             )
         except PerennialBGB.DoesNotExist:
             return PerennialBGB.objects.get(
                 climate=climate,
                 moisture=moisture,
                 continent=continent,
-                crop_type__name="Agroforestry",
+                land_use_type__name="Agroforestry",
             )
 
 
@@ -504,13 +504,13 @@ class PerennialBGB(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     continent = ForeignKey("api.Continent", on_delete=CASCADE)
-    crop_type = ForeignKey("api.CropType", on_delete=CASCADE)
+    land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField(default=0, null=True, blank=True)
 
     objects = PerennialBGBManager()
 
     def __str__(self):
-        return f"{self.value} for {self.climate.name} {self.moisture.name} in {self.continent.name} for {self.crop_type.name}"
+        return f"{self.value} for {self.climate.name} {self.moisture.name} in {self.continent.name} for {self.land_use_type.name}"
 
 
 class PerennialMaxAGB(Model):
@@ -518,11 +518,11 @@ class PerennialMaxAGB(Model):
     IPCC A3237
     """
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
-    crop_type = ForeignKey("api.CropType", on_delete=CASCADE)
+    land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField(default=0, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.value} for {self.climate.name} {self.crop_type.name}"
+        return f"{self.value} for {self.climate.name} {self.land_use_type.name}"
 
 
 class CroplandFLU(Model):
@@ -532,11 +532,11 @@ class CroplandFLU(Model):
 
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
-    crop_type = ForeignKey("api.CropType", on_delete=CASCADE)
+    land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField(default=0)
 
     def __str__(self):
-        return f"{self.value} for {self.climate.name} {self.moisture.name} {self.crop_type.name}"
+        return f"{self.value} for {self.climate.name} {self.moisture.name} {self.land_use_type.name}"
 
 
 class CroplandFMG(Model):
@@ -686,9 +686,9 @@ class SmallFisheryFUI(Model):
 
 
 class CropYieldStatsManager(Manager):
-    def get_or_region_average(self, crop_type, continent):
+    def get_or_region_average(self, land_use_type, continent):
         try:
-            return CropYieldStats.objects.get(crop_type=crop_type, continent=continent)
+            return CropYieldStats.objects.get(land_use_type=land_use_type, continent=continent)
         except CropYieldStats.DoesNotExist:
             _all = CropYieldStats.objects.filter(continent=continent).all()
             _average = sum([x.average for x in _all if x.average > 0]) / _all.count()
@@ -696,7 +696,7 @@ class CropYieldStatsManager(Manager):
 
 
 class CropYieldStats(Model):
-    crop_type = ForeignKey("api.CropType", on_delete=CASCADE)
+    land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     continent = ForeignKey("api.Continent", on_delete=CASCADE)
     year_2016 = FloatField(null=True, blank=True)
     year_2017 = FloatField(null=True, blank=True)
