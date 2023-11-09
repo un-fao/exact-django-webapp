@@ -59,12 +59,11 @@ class LandUseTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
         module_type_id = self.request.query_params.get("module_type", None)
         if module_type_id:
-            land_use_types = LandUseType.objects.filter(module_type__pk=module_type_id).all()
+            land_use_types = LandUseType.objects.filter(module_types__pk=module_type_id).all()
             serializer = get_model_serializer(LandUseType)(land_use_types, many=True)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
         return super().list(request)
-
 
 class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """

@@ -108,20 +108,12 @@ class ActivityState(Model):
 
 class LandUseType(Model):
     name = CharField(max_length=100)
-    parent = ForeignKey(
-        "self",
-        on_delete=CASCADE,
-        null=True,
-        blank=True,
-        related_name="children",
-        limit_choices_to={"parent": None},
-    )
-    module_type = ForeignKey("api.ModuleType", on_delete=CASCADE, null=True, blank=True)
+    module_types = ManyToManyField("api.ModuleType", related_name="land_use_types")
+    forest_type = ForeignKey("api.ForestType", on_delete=CASCADE, null=True, blank=True)
 
     def __str__(self):
-        return f"({self.pk}) {self.name}" + (
-            f" of {self.parent}" if self.parent else ""
-        )
+        module_types = ", ".join([str(x.name) for x in self.module_types.all()])
+        return f"({self.pk}) {self.name}" + (f" ({module_types})" if module_types else "")
 
 
 class ChangeRate(Model):
@@ -291,9 +283,10 @@ class ManureManagementType(Model):
 class ModuleType(Model):
     name = CharField(max_length=100, unique=True)
     class_name = CharField(max_length=255, null=True, blank=True)
+    is_luc = BooleanField(default=False)
 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return f"({self.pk}) {self.name}" + (" (LUC)" if self.is_luc else "")
 
 
 class ForestDegradationLevel(Model):
@@ -714,48 +707,36 @@ class OtherLandUse(Module):
 
 class Assessment(Module):
     land_use_change = OneToOneField("api.LandUseChange", on_delete=CASCADE, null=True, blank=True, related_name="%(class)s")
-    parent_afforestation = OneToOneField(
-        Afforestation,
-        on_delete=CASCADE,
-        null=True,
-        blank=True,
-        related_name="%(class)s_assessment",
-    )
-    parent_deforestation = OneToOneField(
-        Deforestation,
-        on_delete=CASCADE,
-        null=True,
-        blank=True,
-        related_name="%(class)s_assessment",
-    )
-    parent_other_land_use = OneToOneField(
-        OtherLandUse,
-        on_delete=CASCADE,
-        null=True,
-        blank=True,
-        related_name="%(class)s_assessment",
-    )
 
-    def clean(self) -> None:
-        super().clean()
-
-        fields = [
-            self.parent_afforestation,
-            self.parent_deforestation,
-            self.parent_other_land_use,
-        ]
-        if len([f for f in fields if f]) > 1:
-            raise ValidationError(
-                "Exactly one of deforestation, afforestation, or other land use can be set."
-            )
-
-        relative, relationship = get_relative(self)
-        if relative and not relative in fields:
-            raise ValidationError(f"{relative} is already a {relationship}")
+    # TODO: Add land_use_types start/w/wo for all assessments
+    land_use_type_start = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_start")
+    land_use_type_w = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_w")
+    land_use_type_wo = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_wo")
+    land_use_type_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_thread")
 
     class Meta:
         abstract = True
 
+class AssessmentNoScenarios(Module):
+    land_use_change = OneToOneField("api.LandUseChange", on_delete=CASCADE, null=True, blank=True, related_name="%(class)s")
+
+    land_use_type = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_start")
+    land_use_type_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_thread")
+
+    class Meta:
+        abstract = True
+class FixedAssessment(Assessment):
+
+    def save(self, *args, **kwargs):
+        if not self.land_use_type_start:
+            self.land_use_type_start = LandUseType.objects.get(module_type__class_name=self.__class__.__name__)
+            self.land_use_type_w = LandUseType.objects.get(module_type__class_name=self.__class__.__name__)
+            self.land_use_type_wo = LandUseType.objects.get(module_type__class_name=self.__class__.__name__)
+
+        super().save(*args, **kwargs)
+
+    class Meta:
+        abstract = True
 
 class CropType(Model):
     name = CharField(max_length=255, unique=True)
@@ -766,32 +747,10 @@ class CropType(Model):
     def __str__(self) -> str:
         return f"({self.pk}) {self.name}"
 
-
 class AnnualCropping(Assessment):
     user_notes = TextField(null=True, blank=True)
 
-    crop_type_start = ForeignKey(
-        CropType,
-        on_delete=CASCADE,
-        null=True,
-        blank=True,
-        related_name="%(class)s_crop_type_start",
-    )
-    crop_type_w = ForeignKey(
-        CropType,
-        on_delete=CASCADE,
-        null=True,
-        blank=True,
-        related_name="%(class)s_crop_type_w",
-    )
-    crop_type_wo = ForeignKey(
-        CropType,
-        on_delete=CASCADE,
-        null=True,
-        blank=True,
-        related_name="%(class)s_crop_type_wo",
-    )
-    crop_type_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_crop_type_thread")
+    # TODO: Change crop_type to land_use_type
 
     tillage_management_type_start = ForeignKey(
         TillageManagementType,
@@ -889,26 +848,26 @@ class AnnualCropping(Assessment):
     main_land_use_factor_t2_w = FloatField(null=True, blank=True)
     main_land_use_factor_t2_wo = FloatField(null=True, blank=True)
 
-    minor_crop_type_start = ForeignKey(
-        CropType,
+    minor_land_use_type_start = ForeignKey(
+        LandUseType,
         on_delete=CASCADE,
         null=True,
         blank=True,
-        related_name="%(class)s_minor_crop_type",
+        related_name="%(class)s_minor_land_use_type_start",
     )
-    minor_crop_type_w = ForeignKey(
-        CropType,
+    minor_land_use_type_w = ForeignKey(
+        LandUseType,
         on_delete=CASCADE,
         null=True,
         blank=True,
-        related_name="%(class)s_minor_crop_type_w",
+        related_name="%(class)s_minor_land_use_type_w",
     )
-    minor_crop_type_wo = ForeignKey(
-        CropType,
+    minor_land_use_type_wo = ForeignKey(
+        LandUseType,
         on_delete=CASCADE,
         null=True,
         blank=True,
-        related_name="%(class)s_minor_crop_type_wo",
+        related_name="%(class)s_minor_land_use_type_wo",
     )
 
     minor_yield_start = FloatField(null=True, blank=True)
@@ -945,14 +904,17 @@ class AnnualCropping(Assessment):
     soc_ref_t2_w = FloatField(null=True, blank=True)
     soc_ref_t2_wo = FloatField(null=True, blank=True)
 
+    def save(self, *args, **kwargs):
+        if not self.land_use_type_start:
+            self.land_use_type_start = LandUseType.objects.get(name="Annual Cropland")
+            self.land_use_type_w = LandUseType.objects.get(name="Annual Cropland")
+            self.land_use_type_wo = LandUseType.objects.get(name="Annual Cropland")
+
+        super().save(*args, **kwargs)
+
 
 class PerennialCropping(Assessment):
     user_notes = TextField(null=True, blank=True)
-
-    crop_type_start = ForeignKey(CropType,on_delete=CASCADE,null=True,blank=True, related_name="%(class)s_crop_type_start")
-    crop_type_w = ForeignKey(CropType,on_delete=CASCADE,null=True,blank=True, related_name="%(class)s_crop_type_w")
-    crop_type_wo = ForeignKey(CropType,on_delete=CASCADE,null=True,blank=True, related_name="%(class)s_crop_type_wo")
-    crop_type_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_crop_type_thread")
 
     tillage_management_type_start = ForeignKey(TillageManagementType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_tillage_management_type_start")
     tillage_management_type_w = ForeignKey(TillageManagementType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_tillage_management_type_w")
@@ -1008,8 +970,16 @@ class PerennialCropping(Assessment):
     flu_t2_w = FloatField(null=True, blank=True)
     flu_t2_wo = FloatField(null=True, blank=True)
 
+    def save(self, *args, **kwargs):
+        if not self.land_use_type_start:
+            self.land_use_type_start = LandUseType.objects.get(name="Perennial Cropland")
+            self.land_use_type_w = LandUseType.objects.get(name="Perennial Cropland")
+            self.land_use_type_wo = LandUseType.objects.get(name="Perennial Cropland")
 
-class FloodedRice(Assessment):
+        super().save(*args, **kwargs)
+
+
+class FloodedRice(FixedAssessment):
     user_notes = TextField(null=True, blank=True)
 
     area = FloatField(null=True, blank=True)
@@ -1078,7 +1048,7 @@ class FloodedRice(Assessment):
 ##### Grassland and Livestock #####
 
 
-class Grassland(Assessment):
+class Grassland(FixedAssessment):
     description = TextField(null=True, blank=True)
     user_notes = TextField(null=True, blank=True)
 
@@ -1208,29 +1178,46 @@ class Livestock(Module):
 ##### Forest Management #####
 
 
-class ForestManagement(Assessment):
+class ForestManagement(AssessmentNoScenarios):
     forest_type = ForeignKey(ForestType, on_delete=CASCADE)
-    forest_condition_type = ForeignKey(ForestConditionType, on_delete=CASCADE, related_name="%(class)s_forest_condition_type")
 
-    rotation_occurrence_start = FloatField(null=True, blank=True)
-    rotation_occurrence_w = FloatField(null=True, blank=True)
-    rotation_occurrence_wo = FloatField(null=True, blank=True)
-    rotation_occurrence_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_rotation_occurrence_thread")
+    ##### ROTATION #####
 
-    is_rotation_used_for_energy_start = BooleanField(default=False)
-    is_rotation_used_for_energy_w = BooleanField(default=False)
-    is_rotation_used_for_energy_wo = BooleanField(default=False)
-    is_rotation_used_for_energy_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_is_used_for_energy_thread")
+    rotation_length_yrs_start = IntegerField(null=True, blank=True)
+    rotation_length_yrs_w = IntegerField(null=True, blank=True)
+    rotation_length_yrs_wo = IntegerField(null=True, blank=True)
+    rotation_length_yrs_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_rotation_length_yrs_thread")
 
-    logging_start = FloatField(null=True, blank=True)
-    logging_w = FloatField(null=True, blank=True)
-    logging_wo = FloatField(null=True, blank=True)
-    logging_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_logging_thread")
+    rotation_percentage_biomass_for_energy_start = FloatField(null=True, blank=True)
+    rotation_percentage_biomass_for_energy_w = FloatField(null=True, blank=True)
+    rotation_percentage_biomass_for_energy_wo = FloatField(null=True, blank=True)
+    rotation_percentage_biomass_for_energy_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_rotation_percentage_biomass_for_energy_thread")
 
-    is_logging_used_for_energy_start = BooleanField(default=False)
-    is_logging_used_for_energy_w = BooleanField(default=False)
-    is_logging_used_for_energy_wo = BooleanField(default=False)
-    is_logging_used_for_energy_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_is_logging_used_for_energy_thread")
+    ##### LOGGING #####
+
+    logging_recurrence_yrs_start = IntegerField(null=True, blank=True)
+    logging_recurrence_yrs_w = IntegerField(null=True, blank=True)
+    logging_recurrence_yrs_wo = IntegerField(null=True, blank=True)
+    logging_recurrence_yrs_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_logging_recurrence_yrs_thread")
+
+    logging_percentage_agb_logged_start = FloatField(null=True, blank=True)
+    logging_percentage_agb_logged_w = FloatField(null=True, blank=True)
+    logging_percentage_agb_logged_wo = FloatField(null=True, blank=True)
+    logging_percentage_agb_logged_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_logging_percentage_agb_logged_thread")
+
+    logging_percentage_biomass_for_energy_start = FloatField(null=True, blank=True)
+    logging_percentage_biomass_for_energy_w = FloatField(null=True, blank=True)
+    logging_percentage_biomass_for_energy_wo = FloatField(null=True, blank=True)
+    logging_percentage_biomass_for_energy_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_logging_percentage_biomass_for_energy_thread")
+
+    ##### DEGRADATION #####
+
+    average_yearly_degradation_percentage_start = FloatField(null=True, blank=True)
+    average_yearly_degradation_percentage_w = FloatField(null=True, blank=True)
+    average_yearly_degradation_percentage_wo = FloatField(null=True, blank=True)
+    average_yearly_degradation_percentage_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_average_yearly_degradation_percentage_thread")
+
+    ##### TIER 2 #####
 
     soil_carbon_t2_start = FloatField(null=True, blank=True)
     soil_carbon_t2_w = FloatField(null=True, blank=True)
@@ -1248,22 +1235,6 @@ class ForestManagement(Assessment):
     bgb_t2_w = FloatField(null=True, blank=True)
     bgb_t2_wo = FloatField(null=True, blank=True)
 
-    agb_growth_rate_gt_20_yrs_t2_start = FloatField(null=True, blank=True)
-    agb_growth_rate_gt_20_yrs_t2_w = FloatField(null=True, blank=True)
-    agb_growth_rate_gt_20_yrs_t2_wo = FloatField(null=True, blank=True)
-
-    agb_growth_rate_le_20_yrs_t2_start = FloatField(null=True, blank=True)
-    agb_growth_rate_le_20_yrs_t2_w = FloatField(null=True, blank=True)
-    agb_growth_rate_le_20_yrs_t2_wo = FloatField(null=True, blank=True)
-
-    bgb_growth_rate_gt_20_yrs_t2_start = FloatField(null=True, blank=True)
-    bgb_growth_rate_gt_20_yrs_t2_w = FloatField(null=True, blank=True)
-    bgb_growth_rate_gt_20_yrs_t2_wo = FloatField(null=True, blank=True)
-
-    bgb_growth_rate_le_20_yrs_t2_start = FloatField(null=True, blank=True)
-    bgb_growth_rate_le_20_yrs_t2_w = FloatField(null=True, blank=True)
-    bgb_growth_rate_le_20_yrs_t2_wo = FloatField(null=True, blank=True)
-
     litter_t2_start = FloatField(null=True, blank=True)
     litter_t2_w = FloatField(null=True, blank=True)
     litter_t2_wo = FloatField(null=True, blank=True)
@@ -1271,6 +1242,68 @@ class ForestManagement(Assessment):
     deadwood_t2_start = FloatField(null=True, blank=True)
     deadwood_t2_w = FloatField(null=True, blank=True)
     deadwood_t2_wo = FloatField(null=True, blank=True)
+    
+    agb_growth_rate_le_20_yrs_t2_start = FloatField(null=True, blank=True)
+    agb_growth_rate_le_20_yrs_t2_w = FloatField(null=True, blank=True)
+    agb_growth_rate_le_20_yrs_t2_wo = FloatField(null=True, blank=True)
+
+    agb_growth_rate_gt_20_yrs_t2_start = FloatField(null=True, blank=True)
+    agb_growth_rate_gt_20_yrs_t2_w = FloatField(null=True, blank=True)
+    agb_growth_rate_gt_20_yrs_t2_wo = FloatField(null=True, blank=True)
+    
+    bgb_growth_rate_le_20_yrs_t2_start = FloatField(null=True, blank=True)
+    bgb_growth_rate_le_20_yrs_t2_w = FloatField(null=True, blank=True)
+    bgb_growth_rate_le_20_yrs_t2_wo = FloatField(null=True, blank=True)
+
+    bgb_growth_rate_gt_20_yrs_t2_start = FloatField(null=True, blank=True)
+    bgb_growth_rate_gt_20_yrs_t2_w = FloatField(null=True, blank=True)
+    bgb_growth_rate_gt_20_yrs_t2_wo = FloatField(null=True, blank=True)
+
+    rotation_start_year_t2_start = IntegerField(default=1)
+    rotation_start_year_t2_w = IntegerField(default=1)
+    rotation_start_year_t2_wo = IntegerField(default=1)
+
+    logging_start_year_t2_start = IntegerField(default=1)
+    logging_start_year_t2_w = IntegerField(default=1)
+    logging_start_year_t2_wo = IntegerField(default=1)
+
+    logging_dry_matter_logged_t2_start = FloatField(null=True, blank=True)
+    logging_dry_matter_logged_t2_w = FloatField(null=True, blank=True)
+    logging_dry_matter_logged_t2_wo = FloatField(null=True, blank=True)
+
+    degradation_dry_matter_impacted_t2_start = FloatField(null=True, blank=True)
+    degradation_dry_matter_impacted_t2_w = FloatField(null=True, blank=True)
+    degradation_dry_matter_impacted_t2_wo = FloatField(null=True, blank=True)
+
+class DisturbanceType(Module):
+    name = CharField(max_length=255)
+
+    def __str__(self):
+        return f"({self.pk}) {self.name}"
+
+class ForestDisturbance(Model):
+    forest_management = ForeignKey(ForestManagement, on_delete=CASCADE)
+
+    disturbance_type = ForeignKey(DisturbanceType, on_delete=CASCADE)
+    disturbance_type_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_disturbance_type_thread")
+
+    recurrence_yrs_start = IntegerField(null=True, blank=True)
+    recurrence_yrs_w = IntegerField(null=True, blank=True)
+    recurrence_yrs_wo = IntegerField(null=True, blank=True)
+    recurrence_yrs_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_disturbance_recurrence_yrs_thread")
+
+    percentage_biomass_destruction_start = FloatField(null=True, blank=True)
+    percentage_biomass_destruction_w = FloatField(null=True, blank=True)
+    percentage_biomass_destruction_wo = FloatField(null=True, blank=True)
+    percentage_biomass_destruction_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_disturbance_percentage_biomass_destruction_thread")
+
+    start_year_t2_start = IntegerField(default=1)
+    start_year_t2_w = IntegerField(default=1)
+    start_year_t2_wo = IntegerField(default=1)
+
+    dry_matter_impacted_t2_start = FloatField(null=True, blank=True)
+    dry_matter_impacted_t2_w = FloatField(null=True, blank=True)
+    dry_matter_impacted_t2_wo = FloatField(null=True, blank=True)
 
 ##### Inland Wetlands #####
 
@@ -1747,7 +1780,7 @@ class IrrigationSystem(Module):
 
 
 class IrrigationPhase(Module):
-    irrigation_system_type = ForeignKey(IrrigationSystemType, on_delete=CASCADE, null=True, blank=True)
+    irrigation_system_type = ForeignKey(IrrigationSystemType, on_delete=CASCADE, null=True, blank=True, related_name="irrigation_phases")
     fuel_type = ForeignKey(FuelType, on_delete=CASCADE, null=True, blank=True)
     well_depth = FloatField(null=True, blank=True)
     ha_start = FloatField(null=True, blank=True)
@@ -1836,7 +1869,7 @@ class OtherInfrastructure(Module):
     ef_t2_w = FloatField(null=True, blank=True)
     ef_t2_wo = FloatField(null=True, blank=True)
 
-class OrganicSoil(Assessment):
+class OrganicSoil(FixedAssessment):
 
     drainage_area_start = FloatField(null=True, blank=True)
     drainage_area_w = FloatField(null=True, blank=True)
@@ -1959,7 +1992,7 @@ class OrganicSoil(Assessment):
 
     peat_density_t2 = FloatField(null=True, blank=True)
 
-class Settlement(Assessment):
+class Settlement(FixedAssessment):
     ha_start = FloatField(null=True, blank=True)
     ha_w = FloatField(null=True, blank=True)
     ha_wo = FloatField(null=True, blank=True)
@@ -2038,11 +2071,10 @@ class DegradedLand(Module):
 
 class LandUseChange(Module):
 
-    land_use_type_start = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="luc_start")
-    land_use_type_end = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="luc_end")
-
     module_type_start = ForeignKey(ModuleType, on_delete=CASCADE, null=True, blank=True, related_name="start")
-    module_type_end = ForeignKey(ModuleType, on_delete=CASCADE, null=True, blank=True, related_name="end")
+    module_type_w = ForeignKey(ModuleType, on_delete=CASCADE, null=True, blank=True, related_name="w")
+    module_type_wo = ForeignKey(ModuleType, on_delete=CASCADE, null=True, blank=True, related_name="wo")
+
     area = FloatField(null=True, blank=True)
 
     is_fire_used_start = BooleanField(default=False)
