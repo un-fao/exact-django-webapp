@@ -116,7 +116,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
     def validate(self, data):
         if data["has_input"] and not data.get("modules", None):
-            raise serializers.ValidationError("If has_input is true, at least one module must be provided")
+            raise serializers.ValidationError("If has_input is true, at least one input module must be provided")
         super().validate(data)
         return data
     
