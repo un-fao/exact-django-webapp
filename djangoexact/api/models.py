@@ -284,10 +284,13 @@ class ModuleType(Model):
     name = CharField(max_length=100, unique=True)
     class_name = CharField(max_length=255, null=True, blank=True)
     is_luc = BooleanField(default=False)
+    is_submodule = BooleanField(default=False)
 
     def __str__(self):
         return f"({self.pk}) {self.name}" + (" (LUC)" if self.is_luc else "")
-
+    
+    class Meta:
+        verbose_name_plural = "Module types"
 
 class ForestDegradationLevel(Model):
     name = CharField(max_length=100)
