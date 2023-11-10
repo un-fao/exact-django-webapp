@@ -111,3 +111,6 @@ def get_url_name(model_name):
 class ErrorResponse(Response):
     def __init__(self, data, status=status.HTTP_400_BAD_REQUEST):
         super().__init__(error(data), status=status)
+
+def is_start_with_changed(_class: object, luc):
+    return luc.module_type_start.class_name == _class.__name__ and luc.module_type_start != luc.module_type_wo
