@@ -102,7 +102,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
     class LandUseChangeBuilderSerializer(serializers.ModelSerializer):
         class Meta:
             model = LandUseChange
-            fields = ["module_type_start", "module_type_end", "area"]
+            fields = ["module_type_start", "module_type_w", "module_type_wo", "area"]
             ref_name = "LandUseChange"
 
     project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(), required=True)
