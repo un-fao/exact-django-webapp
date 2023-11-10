@@ -240,6 +240,8 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             activity = serializer.save()
 
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             print("Error building activity:", e)
             return ErrorResponse(str(e))
 
@@ -285,6 +287,19 @@ class ModuleTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
     queryset = ModuleType.objects.all()
     serializer_class = get_model_serializer(ModuleType)
+
+    def list(self, request):
+        """
+        Get all module types.
+        """
+        is_luc = self.request.query_params.get("is_luc", None) == "true"
+
+        if is_luc:
+            module_types = ModuleType.objects.filter(is_luc=is_luc).all()
+            serializer = get_model_serializer(ModuleType)(module_types, many=True)
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+    
+        return super().list(request)
 
 
 def generic_module_viewset(model: Model):
