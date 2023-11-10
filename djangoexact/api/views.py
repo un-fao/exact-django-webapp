@@ -25,7 +25,7 @@ cascade = openapi.Parameter("cascade", openapi.IN_QUERY, description="Include co
 def get_modules(activity: Activity, serialized=True) -> list:
     modules = []
     module_serializers_list = []
-    module_types = ModuleType.objects.all()
+    module_types = ModuleType.objects.filter(is_submodule=False).all()
     for module in module_types:
         try:
             module_model = apps.get_model(API, module.class_name)
