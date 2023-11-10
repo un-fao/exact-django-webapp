@@ -38,6 +38,11 @@ def get_module_serializer(model_arg):
             extra_fields = ["module_type"]
             ref_name = model_arg.__name__
 
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.fields["module_type"].default = ModuleType.objects.get(class_name=model_arg.__name__)
+            
+
     return GenericSerializer
 
 class UserSerializer(serializers.ModelSerializer):
