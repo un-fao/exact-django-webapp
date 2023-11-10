@@ -734,13 +734,13 @@ class AssessmentNoScenarios(Module):
         abstract = True
 class FixedAssessment(Assessment):
 
-    def save(self, *args, **kwargs):
-        if not self.land_use_type_start:
-            self.land_use_type_start = LandUseType.objects.get(module_type__class_name=self.__class__.__name__)
-            self.land_use_type_w = LandUseType.objects.get(module_type__class_name=self.__class__.__name__)
-            self.land_use_type_wo = LandUseType.objects.get(module_type__class_name=self.__class__.__name__)
+    # def save(self, *args, **kwargs):
+    #     if not self.land_use_type_start:
+    #         self.land_use_type_start = LandUseType.objects.get(module_types__class_name=self.__class__.__name__)
+    #         self.land_use_type_w = LandUseType.objects.get(module_types__class_name=self.__class__.__name__)
+    #         self.land_use_type_wo = LandUseType.objects.get(module_types__class_name=self.__class__.__name__)
 
-        super().save(*args, **kwargs)
+    #     super().save(*args, **kwargs)
 
     class Meta:
         abstract = True
@@ -979,9 +979,9 @@ class PerennialCropping(Assessment):
 
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:
-            self.land_use_type_start = LandUseType.objects.get(name="Perennial Cropland")
-            self.land_use_type_w = LandUseType.objects.get(name="Perennial Cropland")
-            self.land_use_type_wo = LandUseType.objects.get(name="Perennial Cropland")
+            self.land_use_type_start = LandUseType.objects.get(name="Agroforestry")
+            self.land_use_type_w = self.land_use_type_start
+            self.land_use_type_wo = self.land_use_type_start
 
         super().save(*args, **kwargs)
 
@@ -995,17 +995,17 @@ class FloodedRice(FixedAssessment):
     cultivation_period_w = IntegerField(default=RICE_CULTIVATION_DAYS)
     cultivation_period_wo = IntegerField(default=RICE_CULTIVATION_DAYS)
 
-    water_management_type_before_cultivation_start = ForeignKey(WaterManagementTypeBeforeCultivation, on_delete=CASCADE, related_name="%(class)s_water_management_type_before_cultivation_start")
-    water_management_type_before_cultivation_w = ForeignKey(WaterManagementTypeBeforeCultivation, on_delete=CASCADE, related_name="%(class)s_water_management_type_before_cultivation_w")
-    water_management_type_before_cultivation_wo = ForeignKey(WaterManagementTypeBeforeCultivation, on_delete=CASCADE, related_name="%(class)s_water_management_type_before_cultivation_wo")
+    water_management_type_before_cultivation_start = ForeignKey(WaterManagementTypeBeforeCultivation, on_delete=CASCADE, related_name="%(class)s_water_management_type_before_cultivation_start", null=True)
+    water_management_type_before_cultivation_w = ForeignKey(WaterManagementTypeBeforeCultivation, on_delete=CASCADE, related_name="%(class)s_water_management_type_before_cultivation_w", null=True)
+    water_management_type_before_cultivation_wo = ForeignKey(WaterManagementTypeBeforeCultivation, on_delete=CASCADE, related_name="%(class)s_water_management_type_before_cultivation_wo", null=True)
 
-    water_management_type_after_cultivation_start = ForeignKey(WaterManagementTypeAfterCultivation, on_delete=CASCADE, related_name="%(class)s_water_management_type_after_cultivation_start")
-    water_management_type_after_cultivation_w = ForeignKey(WaterManagementTypeAfterCultivation, on_delete=CASCADE, related_name="%(class)s_water_management_type_after_cultivation_w")
-    water_management_type_after_cultivation_wo = ForeignKey(WaterManagementTypeAfterCultivation, on_delete=CASCADE, related_name="%(class)s_water_management_type_after_cultivation_wo")
+    water_management_type_after_cultivation_start = ForeignKey(WaterManagementTypeAfterCultivation, on_delete=CASCADE, related_name="%(class)s_water_management_type_after_cultivation_start", null=True)
+    water_management_type_after_cultivation_w = ForeignKey(WaterManagementTypeAfterCultivation, on_delete=CASCADE, related_name="%(class)s_water_management_type_after_cultivation_w", null=True)
+    water_management_type_after_cultivation_wo = ForeignKey(WaterManagementTypeAfterCultivation, on_delete=CASCADE, related_name="%(class)s_water_management_type_after_cultivation_wo", null=True)
 
-    organic_amendment_type_start = ForeignKey(OrganicAmendmentType, on_delete=CASCADE, related_name="%(class)s_organic_amendment_type_start")
-    organic_amendment_type_w = ForeignKey(OrganicAmendmentType, on_delete=CASCADE, related_name="%(class)s_organic_amendment_type_w")
-    organic_amendment_type_wo = ForeignKey(OrganicAmendmentType, on_delete=CASCADE, related_name="%(class)s_organic_amendment_type_wo")
+    organic_amendment_type_start = ForeignKey(OrganicAmendmentType, on_delete=CASCADE, related_name="%(class)s_organic_amendment_type_start", null=True)
+    organic_amendment_type_w = ForeignKey(OrganicAmendmentType, on_delete=CASCADE, related_name="%(class)s_organic_amendment_type_w", null=True)
+    organic_amendment_type_wo = ForeignKey(OrganicAmendmentType, on_delete=CASCADE, related_name="%(class)s_organic_amendment_type_wo", null=True)
 
     crop_yield_start = FloatField(null=True, blank=True)
     crop_yield_w = FloatField(null=True, blank=True)
@@ -1050,6 +1050,14 @@ class FloodedRice(FixedAssessment):
     rice_straw_t2_start = FloatField(null=True, blank=True)
     rice_straw_t2_w = FloatField(null=True, blank=True)
     rice_straw_t2_wo = FloatField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.land_use_type_start:
+            self.land_use_type_start = LandUseType.objects.get(name="Flooded Rice")
+            self.land_use_type_w = self.land_use_type_start
+            self.land_use_type_wo = self.land_use_type_start
+
+        super().save(*args, **kwargs)
 
 
 ##### Grassland and Livestock #####
@@ -1186,7 +1194,7 @@ class Livestock(Module):
 
 
 class ForestManagement(AssessmentNoScenarios):
-    forest_type = ForeignKey(ForestType, on_delete=CASCADE)
+    forest_type = ForeignKey(ForestType, on_delete=CASCADE, null=True, blank=True)
 
     ##### ROTATION #####
 
@@ -1739,7 +1747,7 @@ class Energy(Module):
     pass
 
 class Electricity(Module):
-    energy = ForeignKey(Energy, on_delete=CASCADE, null=True, blank=True)
+    energy = ForeignKey(Energy, on_delete=CASCADE, null=True, blank=True, related_name="electricities")
     country = ForeignKey(Country, on_delete=CASCADE, null=True, blank=True)
     mwh_start = FloatField(null=True, blank=True)
     mwh_w = FloatField(null=True, blank=True)
@@ -1754,7 +1762,7 @@ class Electricity(Module):
     ef_source = ForeignKey(EmissionFactorSource, on_delete=CASCADE, null=True, blank=True)
 
 class Fuel(Module):
-    energy = ForeignKey(Energy, on_delete=CASCADE, null=True, blank=True)
+    energy = ForeignKey(Energy, on_delete=CASCADE, null=True, blank=True, related_name="fuels")
     fuel_type = ForeignKey(FuelType, on_delete=CASCADE, null=True, blank=True)
     fuel_start = FloatField(null=True, blank=True)
     fuel_w = FloatField(null=True, blank=True)
