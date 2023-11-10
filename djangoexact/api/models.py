@@ -256,7 +256,7 @@ class GrasslandManagementType(Model):
     name = CharField(max_length=100)
 
     def __str__(self):
-        return self.name
+        return f"({self.pk}) {self.name}"
 
 
 class LivestockCategoryType(Model):
@@ -926,9 +926,9 @@ class PerennialCropping(Assessment):
     organic_input_type_wo = ForeignKey(OrganicInputType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_organic_input_type_wo")
     organic_input_type_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_organic_input_type_thread")
 
-    is_biomass_burned_start = BooleanField()
-    is_biomass_burned_w = BooleanField()
-    is_biomass_burned_wo = BooleanField()
+    is_biomass_burned_start = BooleanField(null=True, blank=True)
+    is_biomass_burned_w = BooleanField(null=True, blank=True)
+    is_biomass_burned_wo = BooleanField(null=True, blank=True)
     is_biomass_burned_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_is_biomass_burned_thread")
 
     area = FloatField(null=True, blank=True)
@@ -1000,9 +1000,9 @@ class FloodedRice(FixedAssessment):
     organic_amendment_type_w = ForeignKey(OrganicAmendmentType, on_delete=CASCADE, related_name="%(class)s_organic_amendment_type_w")
     organic_amendment_type_wo = ForeignKey(OrganicAmendmentType, on_delete=CASCADE, related_name="%(class)s_organic_amendment_type_wo")
 
-    crop_yield_start = FloatField()
-    crop_yield_w = FloatField()
-    crop_yield_wo = FloatField()
+    crop_yield_start = FloatField(null=True, blank=True)
+    crop_yield_w = FloatField(null=True, blank=True)
+    crop_yield_wo = FloatField(null=True, blank=True)
 
     main_biomass_factor_t2_start = FloatField(null=True, blank=True)
     main_biomass_factor_t2_w = FloatField(null=True, blank=True)
@@ -1094,7 +1094,7 @@ class Livestock(Module):
     description = TextField(null=True, blank=True)
     user_notes = TextField(null=True, blank=True)
 
-    livestock_category_type_start = ForeignKey(LivestockCategoryType, on_delete=CASCADE)
+    livestock_category_type_start = ForeignKey(LivestockCategoryType, on_delete=CASCADE,null=True, blank=True)
     livestock_category_type_w = ForeignKey(
         LivestockCategoryType,
         on_delete=CASCADE,
@@ -1111,7 +1111,7 @@ class Livestock(Module):
     )
     livestock_category_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_livestock_categories_thread", on_delete=SET_NULL)
 
-    livestock_production_type_start = ForeignKey(LivestockProductionType, on_delete=CASCADE)
+    livestock_production_type_start = ForeignKey(LivestockProductionType, on_delete=CASCADE,null=True, blank=True)
     livestock_production_type_w = ForeignKey(LivestockProductionType,on_delete=CASCADE,related_name="%(class)s_livestock_productions_w",null=True,blank=True)
     livestock_production_type_wo = ForeignKey(LivestockProductionType,on_delete=CASCADE,related_name="%(class)s_livestock_productions_wo",null=True,blank=True)
     livestock_production_type_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_livestock_production_type_thread", on_delete=SET_NULL)
@@ -1436,7 +1436,7 @@ class Rewetting(Module):
 class CoastalWaterbody(Module):
     # TODO: Remove class
 
-    waterbody_type = ForeignKey(WaterbodyType, on_delete=CASCADE)
+    waterbody_type = ForeignKey(WaterbodyType, on_delete=CASCADE,null=True, blank=True)
     trophic_type = ForeignKey(TrophicType, on_delete=CASCADE, null=True, blank=True)
 
     # NOTE: Total area must remain constant
@@ -1485,7 +1485,7 @@ class Waterbody(Module):
     mean_annual_t2_wo = FloatField(null=True, blank=True)
 
 class CoastalWetland(Module):
-    vegetation_type = ForeignKey(VegetationType, on_delete=CASCADE)
+    vegetation_type = ForeignKey(VegetationType, on_delete=CASCADE,null=True, blank=True)
 
     ha_start = FloatField(null=True, blank=True)
     ha_w = FloatField(null=True, blank=True)
@@ -1655,7 +1655,7 @@ class LargeFishery(Fishery):
         related_name="%(class)s_gear_type_wo",
     )
     gear_type_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_gear_type_thread", on_delete=SET_NULL)
-    fish_type = ForeignKey(FishType, on_delete=CASCADE)
+    fish_type = ForeignKey(FishType, on_delete=CASCADE,null=True, blank=True)
     fui_default = ForeignKey(
         "ipcc.LargeFisheryFUI", on_delete=CASCADE, null=True, blank=True
     )
