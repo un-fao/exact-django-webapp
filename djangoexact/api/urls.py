@@ -143,11 +143,9 @@ router.register(r"waterbodies", views.generic_module_viewset(Waterbody), basenam
 router.register(r"set-asides", views.generic_module_viewset(SetAside), basename="set-asides")
 router.register(r"degraded-lands", views.generic_module_viewset(DegradedLand), basename="degraded-lands")
 router.register(r"coastal-wetlands", views.generic_module_viewset(CoastalWetland), basename="coastal-wetlands")
-router.register(
-    r"tillage-management-types",
-    views.generic_viewset(TillageManagementType),
-    basename="tillage-management-types",
-)
+router.register(r'energies', views.generic_viewset(Energy), basename='energies')
+router.register(r'irrigations', views.generic_module_viewset(Irrigation), basename='irrigations')
+router.register(r"tillage-management-types", views.generic_viewset(TillageManagementType),basename="tillage-management-types",)
 router.register(
     r"organic-input-types",
     views.generic_viewset(OrganicInputType),
