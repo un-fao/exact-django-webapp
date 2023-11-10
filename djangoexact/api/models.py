@@ -466,6 +466,13 @@ class Activity(Historical):
 ########## Modules ###########
 ##############################
 
+class Submodule(Historical):
+    created_at = DateTimeField(auto_now_add=True, null=True)
+    updated_at = DateTimeField(auto_now=True, null=True)
+
+    class Meta:
+        abstract = True
+
 class Module(Historical):
     activity = ForeignKey(Activity, on_delete=CASCADE, related_name="%(class)s")
     notes = TextField(null=True, blank=True)
@@ -1728,7 +1735,11 @@ class EmissionFactorSource(Model):
     def __str__(self):
         return f"({self.id}) {self.name}"
 
+class Energy(Module):
+    pass
+
 class Electricity(Module):
+    energy = ForeignKey(Energy, on_delete=CASCADE, null=True, blank=True)
     country = ForeignKey(Country, on_delete=CASCADE, null=True, blank=True)
     mwh_start = FloatField(null=True, blank=True)
     mwh_w = FloatField(null=True, blank=True)
@@ -1740,11 +1751,10 @@ class Electricity(Module):
 
     ef_t2 = FloatField(null=True, blank=True)
     transmission_loss = FloatField(default=0.1)
-    ef_source = ForeignKey(
-        EmissionFactorSource, on_delete=CASCADE, null=True, blank=True
-    )
+    ef_source = ForeignKey(EmissionFactorSource, on_delete=CASCADE, null=True, blank=True)
 
 class Fuel(Module):
+    energy = ForeignKey(Energy, on_delete=CASCADE, null=True, blank=True)
     fuel_type = ForeignKey(FuelType, on_delete=CASCADE, null=True, blank=True)
     fuel_start = FloatField(null=True, blank=True)
     fuel_w = FloatField(null=True, blank=True)
@@ -1767,9 +1777,12 @@ class EnergySourceType(Model):
     def __str__(self):
         return f"({self.id}) {self.name}"
 
+class Irrigation(Module):
+    pass
 
-class IrrigationSystem(Module):
-    irrigation_system_type = ForeignKey(IrrigationSystemType, on_delete=CASCADE, null=True, blank=True)
+class IrrigationSystem(Submodule):
+    irrigation = ForeignKey(Irrigation, on_delete=CASCADE, null=True, blank=True, related_name="irrigation_systems")
+    irrigation_system_type = ForeignKey(IrrigationSystemType, on_delete=CASCADE, null=True, blank=True, related_name="irrigation_systems")
     ha_start = FloatField(null=True, blank=True)
     ha_w = FloatField(null=True, blank=True)
     ha_wo = FloatField(null=True, blank=True)
@@ -1779,7 +1792,8 @@ class IrrigationSystem(Module):
     ef_t2_wo = FloatField(null=True, blank=True)
 
 
-class IrrigationPhase(Module):
+class IrrigationPhase(Submodule):
+    irrigation = ForeignKey(Irrigation, on_delete=CASCADE, null=True, blank=True, related_name="irrigation_phases")
     irrigation_system_type = ForeignKey(IrrigationSystemType, on_delete=CASCADE, null=True, blank=True, related_name="irrigation_phases")
     fuel_type = ForeignKey(FuelType, on_delete=CASCADE, null=True, blank=True)
     well_depth = FloatField(null=True, blank=True)
