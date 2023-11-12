@@ -105,9 +105,7 @@ class LandUseCarbonStockExchangeFactor(Model):
 
 
 class SoilOrcanicCarbonCNRatio(Model):
-    land_use_type = ForeignKey(
-        "api.LandUseType", on_delete=CASCADE, limit_choices_to={"parent": None}
-    )
+    land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField()
 
 

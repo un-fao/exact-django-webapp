@@ -318,17 +318,15 @@ def generic_module_viewset(model: Model):
             if not module_serializer.is_valid():
                 return Response(module_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             
-            luc = module_serializer.validated_data.get("land_use_change", None)
+            luc: LandUseChange = module_serializer.validated_data.get("land_use_change", None)
 
             if luc:
-                luc_start = luc.land_use_type_start
-                luc_end = luc.land_use_type_end
+                luc_start = luc.module_type_start
+                luc_w = luc.module_type_w
+                luc_wo = luc.module_type_wo
 
-                if not luc_start and not luc_end:
-                    return ErrorResponse(f"Land use change must have at least one land use type selected.", status=status.HTTP_400_BAD_REQUEST)
-                
-                if (luc_start and luc_start.module_type.name != model.__name__) or (luc_end and luc_end.module_type.name != model.__name__):
-                    return ErrorResponse(f"At least one land use type in land use change must be related to a {model.__name__} module.", status=status.HTTP_400_BAD_REQUEST)
+                if not luc_start and not luc_w and not luc_wo:
+                    return ErrorResponse(f"Land use change must have at least one land use type.", status=status.HTTP_400_BAD_REQUEST)
                 
             for attr in dir(model):
                 if attr.endswith("_thread"): # NOTE: This could create problems if any other attribute ends in "_thread"
@@ -348,21 +346,12 @@ def generic_module_viewset(model: Model):
             """
 
             activity_id = get_query_param_or_validation_error(self.request, "activity_id")
-
             modules = model.objects.filter(activity__id=activity_id)
 
             data = []
 
-            # TODO: Use a serializer for this
             for i, module in enumerate(modules):
                 data.append({**self.serializer_class(module).data})
-
-                if request.query_params.get(INCLUDE_RELATED):
-                    relative, relation = get_relative(module)
-
-                    if relative:
-                        relative_serializer = get_module_serializer(relative.__class__)(relative)
-                        data[i][relation] = relative_serializer.data
 
             return Response(data)
 
