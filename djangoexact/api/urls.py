@@ -33,16 +33,16 @@ router.register(r'threads', views.CommentThreadViewSet, basename='threads')
 router.register(r'threads/(?P<thread_id>\d+)/comments', views.CommentViewSet, basename='comments')
 router.register(r"land-use-types", views.LandUseTypeViewSet, basename="land-use-types")
 router.register(r"module-types", views.ModuleTypeViewSet, basename="modules")
-router.register(
-    r"deforestations",
-    views.generic_module_viewset(Deforestation),
-    basename="deforestations",
-)
-router.register(
-    r"afforestations",
-    views.generic_module_viewset(Afforestation),
-    basename="afforestations",
-)
+# router.register(
+#     r"deforestations",
+#     views.generic_module_viewset(Deforestation),
+#     basename="deforestations",
+# )
+# router.register(
+#     r"afforestations",
+#     views.generic_module_viewset(Afforestation),
+#     basename="afforestations",
+# )
 router.register(
     r"other-land-uses",
     views.generic_module_viewset(OtherLandUse),
@@ -69,26 +69,26 @@ router.register(
 )
 router.register(r"forest-managements", views.generic_module_viewset(ForestManagement), basename="forests")
 
-router.register(
-    r"inland-waterbodies",
-    views.generic_module_viewset(InlandWaterbody),
-    basename="inland-waterbodies",
-)
-router.register(
-    r"extractions",
-    views.generic_module_viewset(Extraction),
-    basename="inland-waterbodies",
-)
-router.register(
-    r"rewettings",
-    views.generic_module_viewset(Rewetting),
-    basename="inland-waterbodies",
-)
-router.register(
-    r"coastal-waterbodies",
-    views.generic_module_viewset(CoastalWaterbody),
-    basename="inland-waterbodies",
-)
+# router.register(
+#     r"inland-waterbodies",
+#     views.generic_module_viewset(InlandWaterbody),
+#     basename="inland-waterbodies",
+# )
+# router.register(
+#     r"extractions",
+#     views.generic_module_viewset(Extraction),
+#     basename="inland-waterbodies",
+# )
+# router.register(
+#     r"rewettings",
+#     views.generic_module_viewset(Rewetting),
+#     basename="inland-waterbodies",
+# )
+# router.register(
+#     r"coastal-waterbodies",
+#     views.generic_module_viewset(CoastalWaterbody),
+#     basename="inland-waterbodies",
+# )
 router.register(
     r"small-fisheries",
     views.generic_module_viewset(SmallFishery),
