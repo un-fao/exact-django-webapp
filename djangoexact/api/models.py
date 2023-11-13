@@ -1762,10 +1762,12 @@ class LandUseChange(Module):
     area = FloatField(null=True, blank=True)
 
     is_fire_used_start = BooleanField(default=False)
-    is_fire_used_end = BooleanField(default=False)
+    is_fire_used_w = BooleanField(default=False)
+    is_fire_used_wo = BooleanField(default=False)
 
     dry_matter_start = FloatField(null=True, blank=True)
-    dry_matter_end = FloatField(null=True, blank=True)
+    dry_matter_w = FloatField(null=True, blank=True)
+    dry_matter_wo = FloatField(null=True, blank=True)
     
 ### MODEL PARAMETERS TABLES ###
 
