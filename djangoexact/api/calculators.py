@@ -81,7 +81,9 @@ from math_model.no_time_dependency_final.inputs import (
     NewIrrigation,
     OperationPhaseIrrigation,
 )
+from math_model.no_time_dependency_final.oluc import OtherLandUseChanges as MathOtherLandUseChanges
 import traceback
+from django.core.exceptions import ObjectDoesNotExist
 
 class Result:
     """
@@ -119,7 +121,10 @@ class CalculatorFactory:
 
             calculator: BaseCalculator = CalculatorClass(input)
 
-            return calculator.calculate()
+            try:
+                return calculator.calculate()
+            except ObjectDoesNotExist as e:
+                raise Exception(f"Object not found: {e}")
 
         except Exception as e:
             traceback.print_exc()
@@ -540,7 +545,8 @@ class OtherLandUseCalculator(BaseCalculator):
         """
 
         input: Assessment = self.data
-        project = self.data.activity.project
+        luc: LandUseChange = input.land_use_change
+        project: Project = self.data.activity.project
         climate = project.climate
         moisture = project.moisture
         continent = project.continent
@@ -584,8 +590,56 @@ class OtherLandUseCalculator(BaseCalculator):
         combustion_factor_wo = AfforestationCombustionFactor.objects.get(land_use_type=input.land_use_type_wo)
 
         # TODO: Implement results calculation
+        inputs_w = [
+            initial_biomass_w.value,
+            # TODO: add biomass_start_t2 to Assessment abstract model
+            total_biomass_w.value,
+            # TODO: add biomass_w_t2 to Assessment abstract model
+            c_n_ratio_w,
+            # TODO: moisture_factor missing. It's not DefaultEmissionFactor
+            combustion_factor_w.ch4,
+            combustion_factor_w.n2o,
+            input.activity.project.gw_potential.ch4,
+            input.activity.project.gw_potential.n2o,
+            luc.is_fire_used_w,
+            project.soc_ref.value,
+            flu_initial_w.value,
+            flu_final_w.value,
+            # TODO: input.soc_start_t2
+            # TODO: input.soc_w_t2
+            luc.area,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            input.activity.change_rate.name,
+        ]
 
-        return Result()
+        inputs_wo = [
+            initial_biomass_wo.value,
+            # TODO: add biomass_start_t2 to Assessment abstract model
+            total_biomass_wo.value,
+            # TODO: add biomass_w_t2 to Assessment abstract model
+            c_n_ratio_wo,
+            # TODO: moisture_factor missing. It's not DefaultEmissionFactor
+            combustion_factor_wo.ch4,
+            combustion_factor_wo.n2o,
+            input.activity.project.gw_potential.ch4,
+            input.activity.project.gw_potential.n2o,
+            luc.is_fire_used_wo,
+            project.soc_ref.value,
+            flu_initial_wo.value,
+            flu_final_wo.value,
+            # TODO: input.soc_start_t2
+            # TODO: input.soc_w_t2
+            luc.area,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            input.activity.change_rate.name,
+        ]
+
+        results_w = MathOtherLandUseChanges(*inputs_w).calculate_emissions()
+        results_wo = MathOtherLandUseChanges(*inputs_wo).calculate_emissions()
+
+        return Result(results_w.total_emissions, results_wo.total_emissions)
 
 class AnnualCroppingCalculator(BaseCalculator):
     """
