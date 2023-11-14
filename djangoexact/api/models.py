@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from .utilities import *
 import uuid
 from simple_history.models import HistoricalRecords
+from abc import ABC, abstractmethod
 
 alphanumeric = RegexValidator(
     r"^[0-9a-zA-Z]*$", "Only alphanumeric characters are allowed."
@@ -481,6 +482,10 @@ class Module(Historical):
     notes = TextField(null=True, blank=True)
     start_year = IntegerField(default=1)
 
+    soc_t2_start = FloatField(null=True, blank=True)
+    soc_t2_w = FloatField(null=True, blank=True)
+    soc_t2_wo = FloatField(null=True, blank=True)
+
     created_at = DateTimeField(auto_now_add=True, null=True)
     updated_at = DateTimeField(auto_now=True, null=True)
 
@@ -489,6 +494,54 @@ class Module(Historical):
 
     class Meta:
         abstract = True
+class BiomassModule(Module):
+    class Meta:
+        abstract = True
+
+    @abstractmethod
+    def get_biomass_t2(self, scenario: ScenarioTypes):
+        pass
+
+class SingleBiomassModule(BiomassModule):
+    biomass_t2_start = FloatField(null=True, blank=True)
+    biomass_t2_w = FloatField(null=True, blank=True)
+    biomass_t2_wo = FloatField(null=True, blank=True)
+
+    class Meta:
+        abstract = True
+
+    def get_biomass_t2(self, scenario: ScenarioTypes):
+        return getattr(self, f"biomass_{scenario.value}_t2")
+
+class DoubleBiomassModule(BiomassModule):
+    agb_t2_start = FloatField(null=True, blank=True)
+    agb_t2_w = FloatField(null=True, blank=True)
+    agb_t2_wo = FloatField(null=True, blank=True)
+
+    bgb_t2_start = FloatField(null=True, blank=True)
+    bgb_t2_w = FloatField(null=True, blank=True)
+    bgb_t2_wo = FloatField(null=True, blank=True)
+
+    class Meta:
+        abstract = True
+
+    def get_biomass_t2(self, scenario: ScenarioTypes):
+        return getattr(self, f"{scenario.value}_t2_start") + getattr(self, f"{scenario.value}_t2_w") + getattr(self, f"{scenario.value}_t2_wo")
+    
+class MultiBiomassModule(DoubleBiomassModule):
+    litter_t2_start = FloatField(null=True, blank=True)
+    litter_t2_w = FloatField(null=True, blank=True)
+    litter_t2_wo = FloatField(null=True, blank=True)
+
+    deadwood_t2_start = FloatField(null=True, blank=True)
+    deadwood_t2_w = FloatField(null=True, blank=True)
+    deadwood_t2_wo = FloatField(null=True, blank=True)
+
+    class Meta:
+        abstract = True
+
+    def get_biomass_t2(self, scenario: ScenarioTypes):
+        return super().get_biomass_t2(scenario) + getattr(self, f"{scenario.value}_t2_start") + getattr(self, f"{scenario.value}_t2_w") + getattr(self, f"{scenario.value}_t2_wo")
 
 
 ##### Land Use Changes #####
@@ -742,7 +795,7 @@ class AnnualCropping(Assessment):
         super().save(*args, **kwargs)
 
 
-class PerennialCropping(Assessment):
+class PerennialCropping(Assessment, DoubleBiomassModule):
     user_notes = TextField(null=True, blank=True)
 
     tillage_management_type_start = ForeignKey(TillageManagementType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_tillage_management_type_start")
@@ -808,7 +861,7 @@ class PerennialCropping(Assessment):
         super().save(*args, **kwargs)
 
 
-class FloodedRice(FixedAssessment):
+class FloodedRice(FixedAssessment, SingleBiomassModule):
     user_notes = TextField(null=True, blank=True)
 
     area = FloatField(null=True, blank=True)
@@ -885,7 +938,7 @@ class FloodedRice(FixedAssessment):
 ##### Grassland and Livestock #####
 
 
-class Grassland(FixedAssessment):
+class Grassland(FixedAssessment, SingleBiomassModule):
     description = TextField(null=True, blank=True)
     user_notes = TextField(null=True, blank=True)
 
@@ -1015,7 +1068,7 @@ class Livestock(Module):
 ##### Forest Management #####
 
 
-class ForestManagement(AssessmentNoScenarios):
+class ForestManagement(AssessmentNoScenarios, MultiBiomassModule):
     forest_type = ForeignKey(ForestType, on_delete=CASCADE, null=True, blank=True)
 
     ##### ROTATION #####
@@ -1504,7 +1557,7 @@ class RoadType(Model):
 
     def __str__(self):
         return f"({self.id}) {self.name}"
-class Building(Module):
+class Building(SingleBiomassModule):
     settlement = ForeignKey("api.Settlement", on_delete=CASCADE, null=True, blank=True, related_name="buildings")
 
     building_type_start = ForeignKey(BuildingType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_building_type_start")
@@ -1702,7 +1755,7 @@ class Settlement(FixedAssessment):
     bgb_t2_w = FloatField(null=True, blank=True)
     bgb_t2_wo = FloatField(null=True, blank=True)
 
-class SetAside(Module):
+class SetAside(SingleBiomassModule):
     ha_start = FloatField(null=True, blank=True)
     ha_w = FloatField(null=True, blank=True)
     ha_wo = FloatField(null=True, blank=True)
@@ -1728,7 +1781,7 @@ class SetAside(Module):
     bgb_t2_w = FloatField(null=True, blank=True)
     bgb_t2_wo = FloatField(null=True, blank=True)
 
-class DegradedLand(Module):
+class DegradedLand(SingleBiomassModule):
     ha_start = FloatField(null=True, blank=True)
     ha_w = FloatField(null=True, blank=True)
     ha_wo = FloatField(null=True, blank=True)
