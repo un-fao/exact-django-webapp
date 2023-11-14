@@ -42,6 +42,7 @@ from .models import (
     LandUseType,
     Irrigation,
     Energy,
+    BiomassModule,
 )
 from math_model import (
     defo,
@@ -544,7 +545,7 @@ class OtherLandUseCalculator(BaseCalculator):
         Calculate emissions for a single OtherLandUse module.
         """
 
-        input: Assessment = self.data
+        input: BiomassModule = self.data
         luc: LandUseChange = input.land_use_change
         project: Project = self.data.activity.project
         climate = project.climate
@@ -583,20 +584,19 @@ class OtherLandUseCalculator(BaseCalculator):
         c_n_ratio_w = utils.CN_RATIO_GRASSLAND if input.land_use_type_w.module_types.name == "Grassland" else utils.CN_RATIO_FOREST
         c_n_ratio_wo = utils.CN_RATIO_GRASSLAND if input.land_use_type_wo.module_types.name == "Grassland" else utils.CN_RATIO_FOREST
 
-        # moisture_factor = DefaultEmissionFactor.objects.get(moisture=moisture, organic_input_type__name__icontains="Other N Inputs")
+        moisture_factor = NitrousEmissionFactor.objects.get(moisture=moisture, name__icontains="Other N Inputs")
 
         combustion_factor_start = AfforestationCombustionFactor.objects.get(land_use_type=input.land_use_type_start)
         combustion_factor_w = AfforestationCombustionFactor.objects.get(land_use_type=input.land_use_type_w)
         combustion_factor_wo = AfforestationCombustionFactor.objects.get(land_use_type=input.land_use_type_wo)
 
-        # TODO: Implement results calculation
         inputs_w = [
             initial_biomass_w.value,
-            # TODO: add biomass_start_t2 to Assessment abstract model
+            input.get_biomass_t2(utils.ScenarioTypes.START),
             total_biomass_w.value,
-            # TODO: add biomass_w_t2 to Assessment abstract model
+            input.get_biomass_t2(utils.ScenarioTypes.WITH),
             c_n_ratio_w,
-            # TODO: moisture_factor missing. It's not DefaultEmissionFactor
+            moisture_factor.value,
             combustion_factor_w.ch4,
             combustion_factor_w.n2o,
             input.activity.project.gw_potential.ch4,
@@ -605,8 +605,8 @@ class OtherLandUseCalculator(BaseCalculator):
             project.soc_ref.value,
             flu_initial_w.value,
             flu_final_w.value,
-            # TODO: input.soc_start_t2
-            # TODO: input.soc_w_t2
+            input.soc_t2_start,
+            input.soc_t2_w,
             luc.area,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
@@ -615,11 +615,11 @@ class OtherLandUseCalculator(BaseCalculator):
 
         inputs_wo = [
             initial_biomass_wo.value,
-            # TODO: add biomass_start_t2 to Assessment abstract model
+            input.get_biomass_t2(utils.ScenarioTypes.START),
             total_biomass_wo.value,
-            # TODO: add biomass_w_t2 to Assessment abstract model
+            input.get_biomass_t2(utils.ScenarioTypes.WITHOUT),
             c_n_ratio_wo,
-            # TODO: moisture_factor missing. It's not DefaultEmissionFactor
+            moisture_factor.value,
             combustion_factor_wo.ch4,
             combustion_factor_wo.n2o,
             input.activity.project.gw_potential.ch4,
@@ -628,16 +628,19 @@ class OtherLandUseCalculator(BaseCalculator):
             project.soc_ref.value,
             flu_initial_wo.value,
             flu_final_wo.value,
-            # TODO: input.soc_start_t2
-            # TODO: input.soc_w_t2
+            input.soc_t2_start,
+            input.soc_t2_wo,
             luc.area,
             project.implementation_duration_yrs,
             project.capitalization_duration_yrs,
             input.activity.change_rate.name,
         ]
 
-        results_w = MathOtherLandUseChanges(*inputs_w).calculate_emissions()
-        results_wo = MathOtherLandUseChanges(*inputs_wo).calculate_emissions()
+        results_w = MathOtherLandUseChanges(*inputs_w)
+        results_w.calculate_emissions()
+
+        results_wo = MathOtherLandUseChanges(*inputs_wo)
+        results_wo.calculate_emissions()
 
         return Result(results_w.total_emissions, results_wo.total_emissions)
 
