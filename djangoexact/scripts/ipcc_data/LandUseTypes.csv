@@ -1,0 +1,137 @@
+﻿land_use_type;climate;moisture;module_type
+Hedgerow;Cool Temperate;Dry;PerennialCropping
+Hedgerow;Cool Temperate;Moist;PerennialCropping
+Hedgerow;Warm Temperate;Dry;PerennialCropping
+Hedgerow;Warm Temperate;Moist;PerennialCropping
+Hedgerow;Tropical;Dry;PerennialCropping
+Hedgerow;Tropical;Moist;PerennialCropping
+Hedgerow;Tropical;Wet;PerennialCropping
+Hedgerow;Tropical;Montane;PerennialCropping
+Hedgerow;Boreal;Dry;PerennialCropping
+Hedgerow;Boreal;Moist;PerennialCropping
+Olive;Cool Temperate;Dry;PerennialCropping
+Olive;Cool Temperate;Moist;PerennialCropping
+Olive;Warm Temperate;Dry;PerennialCropping
+Olive;Warm Temperate;Moist;PerennialCropping
+Olive;Boreal;Dry;PerennialCropping
+Olive;Boreal;Moist;PerennialCropping
+Orchard;Cool Temperate;Dry;PerennialCropping
+Orchard;Cool Temperate;Moist;PerennialCropping
+Orchard;Warm Temperate;Dry;PerennialCropping
+Orchard;Warm Temperate;Moist;PerennialCropping
+Orchard;Boreal;Dry;PerennialCropping
+Orchard;Boreal;Moist;PerennialCropping
+Short Rotation Coppice;Cool Temperate;Dry;PerennialCropping
+Short Rotation Coppice;Cool Temperate;Moist;PerennialCropping
+Short Rotation Coppice;Warm Temperate;Dry;PerennialCropping
+Short Rotation Coppice;Warm Temperate;Moist;PerennialCropping
+Short Rotation Coppice;Boreal;Dry;PerennialCropping
+Short Rotation Coppice;Boreal;Moist;PerennialCropping
+Silvoarable;Cool Temperate;Dry;PerennialCropping
+Silvoarable;Cool Temperate;Moist;PerennialCropping
+Silvoarable;Warm Temperate;Dry;PerennialCropping
+Silvoarable;Warm Temperate;Moist;PerennialCropping
+Silvoarable;Boreal;Dry;PerennialCropping
+Silvoarable;Boreal;Moist;PerennialCropping
+Silvopasture;Cool Temperate;Dry;PerennialCropping
+Silvopasture;Cool Temperate;Moist;PerennialCropping
+Silvopasture;Warm Temperate;Dry;PerennialCropping
+Silvopasture;Warm Temperate;Moist;PerennialCropping
+Silvopasture;Boreal;Dry;PerennialCropping
+Silvopasture;Boreal;Moist;PerennialCropping
+Tea;Cool Temperate;Dry;PerennialCropping
+Tea;Cool Temperate;Moist;PerennialCropping
+Tea;Warm Temperate;Dry;PerennialCropping
+Tea;Warm Temperate;Moist;PerennialCropping
+Tea;Boreal;Dry;PerennialCropping
+Tea;Boreal;Moist;PerennialCropping
+Vine;Cool Temperate;Dry;PerennialCropping
+Vine;Cool Temperate;Moist;PerennialCropping
+Vine;Warm Temperate;Dry;PerennialCropping
+Vine;Warm Temperate;Moist;PerennialCropping
+Vine;Boreal;Dry;PerennialCropping
+Vine;Boreal;Moist;PerennialCropping
+Agroforestry - default;Cool Temperate;Dry;PerennialCropping
+Agroforestry - default;Cool Temperate;Moist;PerennialCropping
+Agroforestry - default;Warm Temperate;Dry;PerennialCropping
+Agroforestry - default;Warm Temperate;Moist;PerennialCropping
+Agroforestry - default;Boreal;Dry;PerennialCropping
+Agroforestry - default;Boreal;Moist;PerennialCropping
+Alley Cropping;Tropical;Dry;PerennialCropping
+Hedgerow;Tropical;Dry;PerennialCropping
+Multistrata;Tropical;Dry;PerennialCropping
+Oil palm;Tropical;Dry;PerennialCropping
+Parkland;Tropical;Dry;PerennialCropping
+Perennial fallow;Tropical;Dry;PerennialCropping
+Rubber;Tropical;Dry;PerennialCropping
+Shaded Perennial;Tropical;Dry;PerennialCropping
+Silvoarable;Tropical;Dry;PerennialCropping
+Silvopasture;Tropical;Dry;PerennialCropping
+Tea;Tropical;Dry;PerennialCropping
+Alley Cropping;Tropical;Moist;PerennialCropping
+Hedgerow;Tropical;Moist;PerennialCropping
+Multistrata;Tropical;Moist;PerennialCropping
+Oil palm;Tropical;Moist;PerennialCropping
+Parkland;Tropical;Moist;PerennialCropping
+Perennial fallow;Tropical;Moist;PerennialCropping
+Rubber;Tropical;Moist;PerennialCropping
+Shaded Perennial;Tropical;Moist;PerennialCropping
+Silvoarable;Tropical;Moist;PerennialCropping
+Silvopasture;Tropical;Moist;PerennialCropping
+Tea;Tropical;Moist;PerennialCropping
+Alley Cropping;Tropical;Wet;PerennialCropping
+Hedgerow;Tropical;Wet;PerennialCropping
+Multistrata;Tropical;Wet;PerennialCropping
+Oil palm;Tropical;Wet;PerennialCropping
+Parkland;Tropical;Wet;PerennialCropping
+Perennial fallow;Tropical;Wet;PerennialCropping
+Rubber;Tropical;Wet;PerennialCropping
+Shaded Perennial;Tropical;Wet;PerennialCropping
+Silvoarable;Tropical;Wet;PerennialCropping
+Silvopasture;Tropical;Wet;PerennialCropping
+Tea;Tropical;Wet;PerennialCropping
+Alley Cropping;Tropical;Montane;PerennialCropping
+Hedgerow;Tropical;Montane;PerennialCropping
+Multistrata;Tropical;Montane;PerennialCropping
+Oil palm;Tropical;Montane;PerennialCropping
+Parkland;Tropical;Montane;PerennialCropping
+Perennial fallow;Tropical;Montane;PerennialCropping
+Rubber;Tropical;Montane;PerennialCropping
+Shaded Perennial;Tropical;Montane;PerennialCropping
+Silvoarable;Tropical;Montane;PerennialCropping
+Silvopasture;Tropical;Montane;PerennialCropping
+Tea;Tropical;Montane;PerennialCropping
+Tropical Rainforest;Tropical;;ForestManagement
+Tropical Moist Deciduous Forest;Tropical;;ForestManagement
+Tropical Dry Forest;Tropical;;ForestManagement
+Tropical Shrubland;Tropical;;ForestManagement
+Planted Tropical Rainforest;Tropical;;ForestManagement
+Planted Tropical Moist Deciduous Forest;Tropical;;ForestManagement
+Planted Tropical dry forest;Tropical;;ForestManagement
+Planted  Tropical shrubland;Tropical;;ForestManagement
+Subtropical humid forest;Warm Temperate;;ForestManagement
+Subtropical dry forest;Warm Temperate;;ForestManagement
+Subtropical steppe;Warm Temperate;;ForestManagement
+Subtropical mountain systems;Warm Temperate;;ForestManagement
+Planted Subtropical humid forest;Warm Temperate;;ForestManagement
+Planted Subtropical dry forest;Warm Temperate;;ForestManagement
+Planted Subtropical steppe;Warm Temperate;;ForestManagement
+Planted Subtropical mountain systems;Warm Temperate;;ForestManagement
+Temperate oceanic forest;Cool Temperate;;ForestManagement
+Temperate continental forest;Cool Temperate;;ForestManagement
+Temperate mountain systems;Cool Temperate;;ForestManagement
+Temperate desert;Cool Temperate;;ForestManagement
+Temperate steppe;Cool Temperate;;ForestManagement
+Planted Temperate oceanic forest;Cool Temperate;;ForestManagement
+Planted Temperate continental forest;Cool Temperate;;ForestManagement
+Planted Temperate mountain systems;Cool Temperate;;ForestManagement
+Planted Temperate desert;Cool Temperate;;ForestManagement
+Planted Temperate steppe;Cool Temperate;;ForestManagement
+Boreal coniferous forest;Boreal;;ForestManagement
+Boreal tundra woodland;Boreal;;ForestManagement
+Boreal mountain systems;Boreal;;ForestManagement
+Planted Boreal coniferous forest;Boreal;;ForestManagement
+Planted Boreal tundra woodland;Boreal;;ForestManagement
+Planted Boreal mountain systems;Boreal;;ForestManagement
+Tropical mountain systems;Tropical Montane;;ForestManagement
+Planted Tropical mountain systems;Tropical Montane;;ForestManagement

@@ -2754,3 +2754,33 @@ for i, row in enumerate(df_dict2):
         if j == len(df_headers2) - 1:
             break
 """
+
+df2 = pd.read_csv(
+    os.path.join(
+        os.path.dirname(__file__), "ipcc_data", "LandUseTypes.csv"
+    ),
+    header=0,
+    sep=";",
+)
+
+df_headers2 = df2.columns.values.tolist()
+df_dict2 = df2.to_dict("records")
+
+# Iterate rows
+for i, row in enumerate(df_dict2):
+    land_use_type: LandUseType = LandUseType.objects.get_or_create(name=sanitize(row["land_use_type"]))[0]
+
+    land_use_type.climates.add(Climate.objects.get(name=sanitize(row["climate"])))
+    if pd.notna(row["moisture"]):
+        land_use_type.moistures.add(Moisture.objects.get(name=sanitize(row["moisture"])))
+    land_use_type.module_types.add(ModuleType.objects.get(class_name=row["module_type"]))
+
+    print(
+        land_use_type,
+        row["climate"],
+        row["moisture"],
+        row["module_type"],
+    )
+
+    if i == len(df_dict2) - 1:
+        break
