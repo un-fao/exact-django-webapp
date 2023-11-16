@@ -13,7 +13,9 @@ from rest_framework.permissions import AllowAny
 from rest_framework import generics
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.db import transaction
+import logging
 
+logger = logging.getLogger("console")
 
 activity_id = openapi.Parameter("activity_id",openapi.IN_QUERY,description="ID of activity related to the module",type=openapi.TYPE_INTEGER)
 project_id = openapi.Parameter( "project_id", openapi.IN_QUERY, description="ID of project related to the activity", type=openapi.TYPE_INTEGER)
@@ -32,7 +34,7 @@ def get_modules(activity: Activity, serialized=True) -> list:
         try:
             module_model = apps.get_model(API, module.class_name)
         except LookupError:
-            print(f"get_modules: Module {module.name} not found")
+            logger.warning(f"get_modules: Module {module.name} not found")
             continue
         module_object = module_model.objects.filter(activity__id=activity.pk).first()
         if module_object:
@@ -94,22 +96,15 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         Get a single project for a given user.
         """
         project = get_object_or_404(Project, pk=pk, user=self.request.user)
-        return Response(
-            data=ProjectSerializer(project).data,
-            status=status.HTTP_200_OK,
-        )
+        return Response(data=ProjectSerializer(project).data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(manual_parameters=[project_id], responses={404: "Project not found"})
     def list(self, request):
         """
         Get all projects for a given user.
         """
-        list = Project.objects.filter(user=self.request.user)
-
-        return Response(
-            data=ProjectSerializer(list, many=True).data,
-            status=status.HTTP_200_OK,
-        )
+        list = Project.objects.filter(user=self.request.user).all()
+        return Response(data=ProjectSerializer(list, many=True).data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])
     @swagger_auto_schema(manual_parameters=[project_id], responses={404: "Project not found"})
@@ -126,8 +121,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         response = serialized_project
         response["activities"] = []
 
-        activities = project.activities.all()
-        for activity in activities:
+        for activity in project.activities.all():
             activity_results = ActivityViewSet.results(self, request, activity.pk).data
             response["activities"].append(activity_results)
 
@@ -156,21 +150,19 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
         Get a single activity for a given user.
         """
+        logger.info("ActivityViewSet.retrieve")
         activity = get_object_or_404(Activity, pk=pk, project__user=self.request.user)
         activity_dict = ActivitySerializer(activity).data
         activity_dict["modules"] = get_modules(activity)
 
-        return Response(
-            data=activity_dict,
-            status=status.HTTP_200_OK,
-        )
+        return Response(data=activity_dict, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(manual_parameters=[project_id], responses={400: "activity_id not provided"})
     def list(self, request):
         """
         Get all activities for a given project, by filtering against a `project_id` query parameter in the URL.
         """
-        print("list")
+        logger.info("ActivityViewSet.list")
         project_id = get_query_param_or_validation_error(self.request, "project_id")
         list = Activity.objects.filter(project__id=project_id, project__user=self.request.user)
 
@@ -181,10 +173,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             activity_dict["modules"] = get_modules(activity)
             response.append(activity_dict)
 
-        return Response(
-            data=response,
-            status=status.HTTP_200_OK,
-        )
+        return Response(data=response, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])
     def results(self, request, pk=None):
@@ -204,7 +193,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             try:
                 model_ref = apps.get_model(API, module.class_name)
             except LookupError:
-                print(f"Module {module.name} not found")
+                logger.warning(f"Module {module.name} not found")
                 continue
             object = model_ref.objects.filter(activity__id=pk, activity__project__user=self.request.user).first()
 
@@ -216,8 +205,8 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                     module_dict[RESULTS] = ResultSerializer(result).data
                     tot_result.add(result)
                 except Exception as e:
-                    print("module_id", module_dict["id"])
-                    print("Error calculating result in ActivityViewSet.results", e)
+                    logger.error("module_id", module_dict["id"])
+                    logger.error("Error calculating result in ActivityViewSet.results", e)
                     module_dict[RESULTS] = error(str(e))
 
                 modules.append(module_dict)
@@ -257,7 +246,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         except Exception as e:
             import traceback
             traceback.print_exc()
-            print("Error building activity:", e)
+            logger.error("Error building activity:", e)
             return ErrorResponse(str(e))
 
         return Response(ActivitySerializer(activity).data, status=status.HTTP_200_OK)
