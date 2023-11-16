@@ -19,6 +19,8 @@ activity_id = openapi.Parameter("activity_id",openapi.IN_QUERY,description="ID o
 project_id = openapi.Parameter( "project_id", openapi.IN_QUERY, description="ID of project related to the activity", type=openapi.TYPE_INTEGER)
 include_related = openapi.Parameter( "include_related", openapi.IN_QUERY, description="Include related modules", type=openapi.TYPE_BOOLEAN)
 module_type = openapi.Parameter("module_type", openapi.IN_QUERY, description="Module associated with Land Use Type", type=openapi.TYPE_INTEGER)
+climate = openapi.Parameter("climate", openapi.IN_QUERY, description="Climate associated with Land Use Type", type=openapi.TYPE_INTEGER)
+moisture = openapi.Parameter("moisture", openapi.IN_QUERY, description="Moisture associated with Land Use Type", type=openapi.TYPE_INTEGER)
 cascade = openapi.Parameter("cascade", openapi.IN_QUERY, description="Include comments in thread", type=openapi.TYPE_BOOLEAN)
 
 
@@ -50,21 +52,34 @@ class LandUseTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
 
     queryset = LandUseType.objects.all()
-    serializer_class = get_model_serializer(LandUseType)
+    serializer_class = LandUseTypeSerializer
 
-    @swagger_auto_schema(manual_parameters=[module_type])
+    @swagger_auto_schema(manual_parameters=[module_type, climate, moisture])
     def list(self, request):
         """
         Get all land use types, or all land use types for a given module type, by filtering against a `module_type` query parameter in the URL.
         """
+
         module_type_id = self.request.query_params.get("module_type", None)
+        climate_id = self.request.query_params.get("climate", None)
+        moisture_id = self.request.query_params.get("moisture", None)
+
+        if not module_type_id and not climate_id and not moisture_id:
+            return super().list(request)
+
+        filters = {}
+
         if module_type_id:
-            land_use_types = LandUseType.objects.filter(module_types__pk=module_type_id).all()
-            serializer = get_model_serializer(LandUseType)(land_use_types, many=True)
-            return Response(data=serializer.data, status=status.HTTP_200_OK)
-
-        return super().list(request)
-
+            filters["module_types__id"] = module_type_id
+        if climate_id:
+            filters["climate__id"] = climate_id
+        if moisture_id:
+            filters["moisture__id"] = moisture_id
+        
+        list = LandUseType.objects.filter(**filters).all()
+        serializer = get_model_serializer(LandUseType)(list, many=True)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
+    
 class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
     API endpoint that allows projects to be viewed or edited.
