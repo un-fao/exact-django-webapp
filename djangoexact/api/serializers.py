@@ -115,6 +115,9 @@ class ActivityBuilderSerializer(serializers.Serializer):
     has_input = serializers.BooleanField(default=False, required=False)
 
     def validate(self, data):
+        luc_module: ModuleType = ModuleType.objects.filter(name="Land Use Change").first()
+        if luc_module and luc_module in data["modules"]:
+            raise serializers.ValidationError("Land Use Change module cannot be added manually")
         if data["has_input"] and not data.get("modules", None):
             raise serializers.ValidationError("If has_input is true, at least one input module must be provided")
         super().validate(data)
