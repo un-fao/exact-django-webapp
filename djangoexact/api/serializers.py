@@ -180,3 +180,13 @@ class CommentThreadSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommentThread
         fields = '__all__'
+
+class LandUseTypeSerializer(serializers.ModelSerializer):
+
+    module_types = get_model_serializer(ModuleType)(many=True, read_only=True)
+    climate = get_model_serializer(Climate)(many=False, read_only=True)
+    moisture = get_model_serializer(Moisture)(many=False, read_only=True)
+    class Meta:
+        model = LandUseType
+        fields = "__all__"
+        ref_name = "LandUseType"
