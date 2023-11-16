@@ -1,6 +1,7 @@
 from .general_functions import yearly_time_dependent_parameter_breakdown
 import traceback
 import re
+from .ghg_emissions_classes import GasTypes, ActivityTypes, Emission, YearlyActivityEmissionSet, Result
 
 class Fishery:
 
@@ -62,6 +63,8 @@ class Fishery:
         self.emissions_total_yearly = []
         self.total_emissions = 0
 
+        self.result = Result()
+
     def calculate_emissions(self):
         
         def calculate_catch_emissions():
@@ -81,6 +84,15 @@ class Fishery:
 
                 self.emissions_catch_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
                 self.emissions_catch_total = sum(self.emissions_catch_yearly)
+
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyActivityEmissionSet(
+                    year = 0,
+                    gas_type = GasTypes.CO2,
+                    emissions = [Emission(x, GasTypes.CO2) for x in self.emissions_catch_yearly],
+                    activity = ActivityTypes.CATCH
+                ))
+
+
             except Exception as e:
                 traceback.print_exc()
 
@@ -102,6 +114,14 @@ class Fishery:
                 
                 self.emissions_refrigerant_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
                 self.emissions_refrigerant_total = sum(self.emissions_refrigerant_yearly)
+
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyActivityEmissionSet(
+                    year = 0,
+                    gas_type = GasTypes.OTHER,
+                    emissions = [Emission(x, GasTypes.OTHER) for x in self.emissions_refrigerant_yearly],
+                    activity = ActivityTypes.REFRIGERANT
+                ))
+
             except Exception as e:
                 traceback.print_exc()
 
@@ -125,6 +145,14 @@ class Fishery:
 
                 self.emissions_ice_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
                 self.emissions_ice_total = sum(self.emissions_ice_yearly)
+
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyActivityEmissionSet(
+                    year = 0,
+                    gas_type = GasTypes.OTHER,
+                    emissions = [Emission(x, GasTypes.OTHER) for x in self.emissions_ice_yearly],
+                    activity = ActivityTypes.ICE
+                ))
+                
             except Exception as e:
                 traceback.print_exc()
 
