@@ -111,8 +111,8 @@ class LandUseType(Model):
     name = CharField(max_length=100)
     module_types = ManyToManyField("api.ModuleType", related_name="land_use_types")
     forest_type = ForeignKey("api.ForestType", on_delete=CASCADE, null=True, blank=True)
-    climate = ManyToManyField("api.Climate", related_name="land_use_types")
-    moisture = ManyToManyField("api.Moisture", related_name="land_use_types")
+    climates = ManyToManyField("api.Climate", related_name="land_use_types")
+    moistures = ManyToManyField("api.Moisture", related_name="land_use_types")
 
     def __str__(self):
         module_types = ", ".join([str(x.name) for x in self.module_types.all()])
