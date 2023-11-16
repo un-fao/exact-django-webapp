@@ -72,9 +72,9 @@ class LandUseTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if module_type_id:
             filters["module_types__id"] = module_type_id
         if climate_id:
-            filters["climate__id"] = climate_id
+            filters["climates__id"] = climate_id
         if moisture_id:
-            filters["moisture__id"] = moisture_id
+            filters["moistures__id"] = moisture_id
         
         list = LandUseType.objects.filter(**filters).all()
         serializer = get_model_serializer(LandUseType)(list, many=True)
