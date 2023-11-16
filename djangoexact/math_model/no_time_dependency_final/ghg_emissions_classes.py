@@ -22,13 +22,13 @@ class Emission:
         self.gas_type: GasTypes | None = gas_type
         self.value: float = value
 
-class GasEmissionSet:
+class YearlyGasEmissionSet:
 
     def __init__(self,year, gas_type, emissions):
         self.year: int = year
         self.gas_type: GasTypes = gas_type
         self.emissions: list[Emission] = emissions
-class YearlyActivityEmissionSet(GasEmissionSet):
+class YearlyActivityEmissionSet(YearlyGasEmissionSet):
 
     def __init__(self, year, gas_type, emissions, activity):
         super().__init__(year, gas_type, emissions)
@@ -43,7 +43,7 @@ class Result:
 
     def breakdown_by_gas(self):
 
-        aggregated_emissions = {gas_type: GasEmissionSet(0, gas_type, [0 for i in self.total_years]) for gas_type in GasTypes}
+        aggregated_emissions = {gas_type: YearlyGasEmissionSet(0, gas_type, [0 for i in self.total_years]) for gas_type in GasTypes}
 
         for yearly_emission in self.yearly_emissions_by_sector_by_gas:
             aggregated_emissions[yearly_emission.gas_type].emissions = [x + y for x,y in zip(aggregated_emissions[yearly_emission.gas_type].emissions, yearly_emission.emissions)]
@@ -54,7 +54,7 @@ class Result:
 
         return self.yearly_emissions_by_sector_by_gas
     
-    
+
 
         
 
