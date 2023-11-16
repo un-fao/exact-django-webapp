@@ -40,6 +40,7 @@ class Result:
     def __init__(self, time_impl, time_cap):
         self.yearly_emissions_by_sector_by_gas: list[YearlyActivityEmissionSet] = []
         self.total_years = time_impl + time_cap
+        self.balance = 0
 
     def breakdown_by_gas(self):
 
@@ -48,11 +49,26 @@ class Result:
         for yearly_emission in self.yearly_emissions_by_sector_by_gas:
             aggregated_emissions[yearly_emission.gas_type].emissions = [x + y for x,y in zip(aggregated_emissions[yearly_emission.gas_type].emissions, yearly_emission.emissions)]
         
-        return aggregated_emissions
+        return aggregated_emissions.values()
     
     def breakdown_by_activity(self):
 
-        return self.yearly_emissions_by_sector_by_gas
+        aggregated_emissions = {activity: YearlyActivityEmissionSet(0, activity, [0 for i in self.total_years], activity) for activity in [i.activity for i in self.yearly_emissions_by_sector_by_gas]}
+
+        for yearly_emission in self.yearly_emissions_by_sector_by_gas:
+            aggregated_emissions[yearly_emission.activity].emissions = [x + y for x,y in zip(aggregated_emissions[yearly_emission.activity].emissions, yearly_emission.emissions)]
+        
+        return aggregated_emissions.values()
+    
+    def breakdown_by_activity_by_gas(self):
+
+        return self.yearly_emissions_by_sector_by_gas.sort(key=lambda x: x.activity)
+
+    def compute_balance(self):
+
+        self.balance = sum([sum(i.emissions) for i in self.yearly_emissions_by_sector_by_gas])
+
+        return self.balance
     
 
 
