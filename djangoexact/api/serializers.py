@@ -27,7 +27,7 @@ def get_model_serializer(model_arg):
     except KeyError:
         return GenericSerializer
 
-def get_module_serializer(model_arg):
+def get_module_serializer(model_arg: Model) -> serializers.ModelSerializer:
     class GenericSerializer(serializers.ModelSerializer):
         module_type = get_model_serializer(ModuleType)(many=False, read_only=True)
         activity = ActivitySerializer(many=False, read_only=True)
