@@ -1217,7 +1217,7 @@ class Waterbody(Module):
     mean_annual_t2_wo = FloatField(null=True, blank=True)
 
 class CoastalWetland(Module):
-    vegetation_type = ForeignKey(VegetationType, on_delete=CASCADE,null=True, blank=True)
+    land_use_type = ForeignKey(LandUseType, on_delete=CASCADE,null=True, blank=True)
 
     ha_start = FloatField(null=True, blank=True)
     ha_w = FloatField(null=True, blank=True)
