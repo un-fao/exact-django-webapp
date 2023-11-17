@@ -491,6 +491,8 @@ class Module(Historical):
     created_at = DateTimeField(auto_now_add=True, null=True)
     updated_at = DateTimeField(auto_now=True, null=True)
 
+    status = ForeignKey(ActivityState, default=ActivityState.get(value=0))
+
     def __str__(self):
         return f"({self.pk}) {self._meta.object_name} in {self.activity.name}"
 
@@ -528,7 +530,7 @@ class DoubleBiomassModule(BiomassModule):
         abstract = True
 
     def get_biomass_t2(self, scenario: ScenarioTypes):
-        return getattr(self, f"{scenario.value}_t2_start") + getattr(self, f"{scenario.value}_t2_w") + getattr(self, f"{scenario.value}_t2_wo")
+        return getattr(self, f"agb_t2_{scenario.value}") + getattr(self, f"bgb_t2_{scenario.value}")
     
 class MultiBiomassModule(DoubleBiomassModule):
     litter_t2_start = FloatField(null=True, blank=True)
@@ -543,7 +545,7 @@ class MultiBiomassModule(DoubleBiomassModule):
         abstract = True
 
     def get_biomass_t2(self, scenario: ScenarioTypes):
-        return super().get_biomass_t2(scenario) + getattr(self, f"{scenario.value}_t2_start") + getattr(self, f"{scenario.value}_t2_w") + getattr(self, f"{scenario.value}_t2_wo")
+        return super().get_biomass_t2(scenario) + getattr(self, f"litter_t2_{scenario.value}") + getattr(self, f"deadwood_t2_{scenario.value}")
 
 
 ##### Land Use Changes #####
@@ -633,8 +635,6 @@ class CropType(Model):
 
 class AnnualCropping(Assessment):
     user_notes = TextField(null=True, blank=True)
-
-    # TODO: Change crop_type to land_use_type
 
     tillage_management_type_start = ForeignKey(
         TillageManagementType,
