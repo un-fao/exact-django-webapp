@@ -1,4 +1,5 @@
-﻿Tropical rainforest,Eastern Africa,3.5,7.6
+land_use_type,continent,gt_20_yrs,le_20_yrs
+Tropical rainforest,Eastern Africa,3.5,7.6
 Tropical rainforest,Central Africa,3.5,7.6
 Tropical rainforest,Northern Africa,3.5,7.6
 Tropical rainforest,Southern Africa,3.5,7.6
@@ -110,22 +111,22 @@ Subtropical steppe,North America,1,4
 Subtropical steppe,South America,1,4
 Subtropical steppe,Central America,1,4
 Subtropical steppe,Caribbean,1,4
-Subtropical mountain systems,Eastern Africa,0.5,2.5
-Subtropical mountain systems,Central Africa,0.5,2.5
-Subtropical mountain systems,Northern Africa,0.5,2.5
-Subtropical mountain systems,Southern Africa,0.5,2.5
-Subtropical mountain systems,Western Africa,0.5,2.5
-Subtropical mountain systems,Central Asia,0.5,2.5
-Subtropical mountain systems,Eastern Asia,0.5,2.5
-Subtropical mountain systems,South-eastern Asia,0.5,2.5
-Subtropical mountain systems,Southern Asia,0.5,2.5
-Subtropical mountain systems,Western Asia,0.5,2.5
-Subtropical mountain systems,Europe,1,1
-Subtropical mountain systems,Oceania,1,1
-Subtropical mountain systems,North America,0.5,2.5
-Subtropical mountain systems,South America,0.5,2.5
-Subtropical mountain systems,Central America,0.5,2.5
-Subtropical mountain systems,Caribbean,0.5,2.5
+Subtropical mountain System,Eastern Africa,0.5,2.5
+Subtropical mountain System,Central Africa,0.5,2.5
+Subtropical mountain System,Northern Africa,0.5,2.5
+Subtropical mountain System,Southern Africa,0.5,2.5
+Subtropical mountain System,Western Africa,0.5,2.5
+Subtropical mountain System,Central Asia,0.5,2.5
+Subtropical mountain System,Eastern Asia,0.5,2.5
+Subtropical mountain System,South-eastern Asia,0.5,2.5
+Subtropical mountain System,Southern Asia,0.5,2.5
+Subtropical mountain System,Western Asia,0.5,2.5
+Subtropical mountain System,Europe,1,1
+Subtropical mountain System,Oceania,1,1
+Subtropical mountain System,North America,0.5,2.5
+Subtropical mountain System,South America,0.5,2.5
+Subtropical mountain System,Central America,0.5,2.5
+Subtropical mountain System,Caribbean,0.5,2.5
 Temperate oceanic forest,Eastern Africa,4.4,4.4
 Temperate oceanic forest,Central Africa,4.4,4.4
 Temperate oceanic forest,Northern Africa,4.4,4.4
@@ -158,22 +159,22 @@ Temperate continental forest,North America,3.6,3.3
 Temperate continental forest,South America,3.6,3.3
 Temperate continental forest,Central America,3.6,3.3
 Temperate continental forest,Caribbean,3.6,3.3
-Temperate mountain systems,Eastern Africa,3,3
-Temperate mountain systems,Central Africa,3,3
-Temperate mountain systems,Northern Africa,3,3
-Temperate mountain systems,Southern Africa,3,3
-Temperate mountain systems,Western Africa,3,3
-Temperate mountain systems,Central Asia,3,3
-Temperate mountain systems,Eastern Asia,3,3
-Temperate mountain systems,South-eastern Asia,3,3
-Temperate mountain systems,Southern Asia,3,3
-Temperate mountain systems,Western Asia,3,3
-Temperate mountain systems,Europe,3,3
-Temperate mountain systems,Oceania,3,3
-Temperate mountain systems,North America,4.4,3.1
-Temperate mountain systems,South America,4.4,3.1
-Temperate mountain systems,Central America,4.4,3.1
-Temperate mountain systems,Caribbean,4.4,3.1
+Temperate mountain System,Eastern Africa,3,3
+Temperate mountain System,Central Africa,3,3
+Temperate mountain System,Northern Africa,3,3
+Temperate mountain System,Southern Africa,3,3
+Temperate mountain System,Western Africa,3,3
+Temperate mountain System,Central Asia,3,3
+Temperate mountain System,Eastern Asia,3,3
+Temperate mountain System,South-eastern Asia,3,3
+Temperate mountain System,Southern Asia,3,3
+Temperate mountain System,Western Asia,3,3
+Temperate mountain System,Europe,3,3
+Temperate mountain System,Oceania,3,3
+Temperate mountain System,North America,4.4,3.1
+Temperate mountain System,South America,4.4,3.1
+Temperate mountain System,Central America,4.4,3.1
+Temperate mountain System,Caribbean,4.4,3.1
 Temperate desert,Eastern Africa,0.6,0.5
 Temperate desert,Central Africa,0.6,0.5
 Temperate desert,Northern Africa,0.6,0.5
@@ -238,38 +239,38 @@ Boreal tundra woodland,North America,0.4,0.4
 Boreal tundra woodland,South America,0.4,0.4
 Boreal tundra woodland,Central America,0.4,0.4
 Boreal tundra woodland,Caribbean,0.4,0.4
-Boreal mountain systems,Eastern Africa,0,0
-Boreal mountain systems,Central Africa,0,0
-Boreal mountain systems,Northern Africa,0,0
-Boreal mountain systems,Southern Africa,0,0
-Boreal mountain systems,Western Africa,0,0
-Boreal mountain systems,Central Asia,1.3,1.05
-Boreal mountain systems,Eastern Asia,1.3,1.05
-Boreal mountain systems,South-eastern Asia,1.3,1.05
-Boreal mountain systems,Southern Asia,1.3,1.05
-Boreal mountain systems,Western Asia,1.3,1.05
-Boreal mountain systems,Europe,1.3,1.05
-Boreal mountain systems,Oceania,1.3,1.05
-Boreal mountain systems,North America,1.3,1.05
-Boreal mountain systems,South America,1.3,1.05
-Boreal mountain systems,Central America,1.3,1.05
-Boreal mountain systems,Caribbean,1.3,1.05
-Tropical mountain systems,Eastern Africa,1.8,5.5
-Tropical mountain systems,Central Africa,1.8,5.5
-Tropical mountain systems,Northern Africa,1.8,5.5
-Tropical mountain systems,Southern Africa,1.8,5.5
-Tropical mountain systems,Western Africa,1.8,5.5
-Tropical mountain systems,Central Asia,1.1,2.9
-Tropical mountain systems,Eastern Asia,1.1,2.9
-Tropical mountain systems,South-eastern Asia,1.1,2.9
-Tropical mountain systems,Southern Asia,1.1,2.9
-Tropical mountain systems,Western Asia,1.1,2.9
-Tropical mountain systems,Europe,1,1
-Tropical mountain systems,Oceania,1,1
-Tropical mountain systems,North America,1.8,4.4
-Tropical mountain systems,South America,1.8,4.4
-Tropical mountain systems,Central America,1.8,4.4
-Tropical mountain systems,Caribbean,1.8,4.4
+Boreal mountain System,Eastern Africa,0,0
+Boreal mountain System,Central Africa,0,0
+Boreal mountain System,Northern Africa,0,0
+Boreal mountain System,Southern Africa,0,0
+Boreal mountain System,Western Africa,0,0
+Boreal mountain System,Central Asia,1.3,1.05
+Boreal mountain System,Eastern Asia,1.3,1.05
+Boreal mountain System,South-eastern Asia,1.3,1.05
+Boreal mountain System,Southern Asia,1.3,1.05
+Boreal mountain System,Western Asia,1.3,1.05
+Boreal mountain System,Europe,1.3,1.05
+Boreal mountain System,Oceania,1.3,1.05
+Boreal mountain System,North America,1.3,1.05
+Boreal mountain System,South America,1.3,1.05
+Boreal mountain System,Central America,1.3,1.05
+Boreal mountain System,Caribbean,1.3,1.05
+Tropical mountain System,Eastern Africa,1.8,5.5
+Tropical mountain System,Central Africa,1.8,5.5
+Tropical mountain System,Northern Africa,1.8,5.5
+Tropical mountain System,Southern Africa,1.8,5.5
+Tropical mountain System,Western Africa,1.8,5.5
+Tropical mountain System,Central Asia,1.1,2.9
+Tropical mountain System,Eastern Asia,1.1,2.9
+Tropical mountain System,South-eastern Asia,1.1,2.9
+Tropical mountain System,Southern Asia,1.1,2.9
+Tropical mountain System,Western Asia,1.1,2.9
+Tropical mountain System,Europe,1,1
+Tropical mountain System,Oceania,1,1
+Tropical mountain System,North America,1.8,4.4
+Tropical mountain System,South America,1.8,4.4
+Tropical mountain System,Central America,1.8,4.4
+Tropical mountain System,Caribbean,1.8,4.4
 Planted Tropical rainforest,Eastern Africa,15,6.5
 Planted Tropical rainforest,Central Africa,15,6.5
 Planted Tropical rainforest,Northern Africa,15,6.5
@@ -334,22 +335,22 @@ Planted  Tropical shrubland,North America,12.5,12.5
 Planted  Tropical shrubland,South America,12.5,12.5
 Planted  Tropical shrubland,Central America,12.5,12.5
 Planted  Tropical shrubland,Caribbean,12.5,12.5
-Planted Tropical mountain systems,Eastern Africa,10,10
-Planted Tropical mountain systems,Central Africa,10,10
-Planted Tropical mountain systems,Northern Africa,10,10
-Planted Tropical mountain systems,Southern Africa,10,10
-Planted Tropical mountain systems,Western Africa,10,10
-Planted Tropical mountain systems,Central Asia,5.5,5.5
-Planted Tropical mountain systems,Eastern Asia,5.5,5.5
-Planted Tropical mountain systems,South-eastern Asia,5.5,5.5
-Planted Tropical mountain systems,Southern Asia,5.5,5.5
-Planted Tropical mountain systems,Western Asia,5.5,5.5
-Planted Tropical mountain systems,Europe,5,5
-Planted Tropical mountain systems,Oceania,5,5
-Planted Tropical mountain systems,North America,13,13
-Planted Tropical mountain systems,South America,13,13
-Planted Tropical mountain systems,Central America,13,13
-Planted Tropical mountain systems,Caribbean,13,13
+Planted Tropical mountain System,Eastern Africa,10,10
+Planted Tropical mountain System,Central Africa,10,10
+Planted Tropical mountain System,Northern Africa,10,10
+Planted Tropical mountain System,Southern Africa,10,10
+Planted Tropical mountain System,Western Africa,10,10
+Planted Tropical mountain System,Central Asia,5.5,5.5
+Planted Tropical mountain System,Eastern Asia,5.5,5.5
+Planted Tropical mountain System,South-eastern Asia,5.5,5.5
+Planted Tropical mountain System,Southern Asia,5.5,5.5
+Planted Tropical mountain System,Western Asia,5.5,5.5
+Planted Tropical mountain System,Europe,5,5
+Planted Tropical mountain System,Oceania,5,5
+Planted Tropical mountain System,North America,13,13
+Planted Tropical mountain System,South America,13,13
+Planted Tropical mountain System,Central America,13,13
+Planted Tropical mountain System,Caribbean,13,13
 Planted Subtropical humid forest,Eastern Africa,10,10
 Planted Subtropical humid forest,Central Africa,10,10
 Planted Subtropical humid forest,Northern Africa,10,10
@@ -398,38 +399,38 @@ Planted Subtropical steppe,North America,12.5,12.5
 Planted Subtropical steppe,South America,12.5,12.5
 Planted Subtropical steppe,Central America,12.5,12.5
 Planted Subtropical steppe,Caribbean,12.5,12.5
-Planted Subtropical mountain systems,Eastern Africa,10,10
-Planted Subtropical mountain systems,Central Africa,10,10
-Planted Subtropical mountain systems,Northern Africa,10,10
-Planted Subtropical mountain systems,Southern Africa,10,10
-Planted Subtropical mountain systems,Western Africa,10,10
-Planted Subtropical mountain systems,Central Asia,6.5,6.5
-Planted Subtropical mountain systems,Eastern Asia,6.5,6.5
-Planted Subtropical mountain systems,South-eastern Asia,6.5,6.5
-Planted Subtropical mountain systems,Southern Asia,6.5,6.5
-Planted Subtropical mountain systems,Western Asia,6.5,6.5
-Planted Subtropical mountain systems,Europe,5,5
-Planted Subtropical mountain systems,Oceania,5,5
-Planted Subtropical mountain systems,North America,10,10
-Planted Subtropical mountain systems,South America,10,10
-Planted Subtropical mountain systems,Central America,10,10
-Planted Subtropical mountain systems,Caribbean,10,10
-Planted Temperate mountain systems,Eastern Africa,3,3
-Planted Temperate mountain systems,Central Africa,3,3
-Planted Temperate mountain systems,Northern Africa,3,3
-Planted Temperate mountain systems,Southern Africa,3,3
-Planted Temperate mountain systems,Western Africa,3,3
-Planted Temperate mountain systems,Central Asia,3,3
-Planted Temperate mountain systems,Eastern Asia,3,3
-Planted Temperate mountain systems,South-eastern Asia,3,3
-Planted Temperate mountain systems,Southern Asia,3,3
-Planted Temperate mountain systems,Western Asia,3,3
-Planted Temperate mountain systems,Europe,3,3
-Planted Temperate mountain systems,Oceania,3,3
-Planted Temperate mountain systems,North America,9,10
-Planted Temperate mountain systems,South America,9,10
-Planted Temperate mountain systems,Central America,9,10
-Planted Temperate mountain systems,Caribbean,9,10
+Planted Subtropical mountain System,Eastern Africa,10,10
+Planted Subtropical mountain System,Central Africa,10,10
+Planted Subtropical mountain System,Northern Africa,10,10
+Planted Subtropical mountain System,Southern Africa,10,10
+Planted Subtropical mountain System,Western Africa,10,10
+Planted Subtropical mountain System,Central Asia,6.5,6.5
+Planted Subtropical mountain System,Eastern Asia,6.5,6.5
+Planted Subtropical mountain System,South-eastern Asia,6.5,6.5
+Planted Subtropical mountain System,Southern Asia,6.5,6.5
+Planted Subtropical mountain System,Western Asia,6.5,6.5
+Planted Subtropical mountain System,Europe,5,5
+Planted Subtropical mountain System,Oceania,5,5
+Planted Subtropical mountain System,North America,10,10
+Planted Subtropical mountain System,South America,10,10
+Planted Subtropical mountain System,Central America,10,10
+Planted Subtropical mountain System,Caribbean,10,10
+Planted Temperate mountain System,Eastern Africa,3,3
+Planted Temperate mountain System,Central Africa,3,3
+Planted Temperate mountain System,Northern Africa,3,3
+Planted Temperate mountain System,Southern Africa,3,3
+Planted Temperate mountain System,Western Africa,3,3
+Planted Temperate mountain System,Central Asia,3,3
+Planted Temperate mountain System,Eastern Asia,3,3
+Planted Temperate mountain System,South-eastern Asia,3,3
+Planted Temperate mountain System,Southern Asia,3,3
+Planted Temperate mountain System,Western Asia,3,3
+Planted Temperate mountain System,Europe,3,3
+Planted Temperate mountain System,Oceania,3,3
+Planted Temperate mountain System,North America,9,10
+Planted Temperate mountain System,South America,9,10
+Planted Temperate mountain System,Central America,9,10
+Planted Temperate mountain System,Caribbean,9,10
 Planted Temperate continental forest,Eastern Africa,4,4
 Planted Temperate continental forest,Central Africa,4,4
 Planted Temperate continental forest,Northern Africa,4,4
@@ -526,19 +527,19 @@ Planted Boreal tundra woodland,North America,0.4,0.4
 Planted Boreal tundra woodland,South America,0.4,0.4
 Planted Boreal tundra woodland,Central America,0.4,0.4
 Planted Boreal tundra woodland,Caribbean,0.4,0.4
-Planted Boreal mountain systems,Eastern Africa,1,1
-Planted Boreal mountain systems,Central Africa,1,1
-Planted Boreal mountain systems,Northern Africa,1,1
-Planted Boreal mountain systems,Southern Africa,1,1
-Planted Boreal mountain systems,Western Africa,1,1
-Planted Boreal mountain systems,Central Asia,1,1
-Planted Boreal mountain systems,Eastern Asia,1,1
-Planted Boreal mountain systems,South-eastern Asia,1,1
-Planted Boreal mountain systems,Southern Asia,1,1
-Planted Boreal mountain systems,Western Asia,1,1
-Planted Boreal mountain systems,Europe,1,1
-Planted Boreal mountain systems,Oceania,1,1
-Planted Boreal mountain systems,North America,1,1
-Planted Boreal mountain systems,South America,1,1
-Planted Boreal mountain systems,Central America,1,1
-Planted Boreal mountain systems,Caribbean,1,1
+Planted Boreal mountain System,Eastern Africa,1,1
+Planted Boreal mountain System,Central Africa,1,1
+Planted Boreal mountain System,Northern Africa,1,1
+Planted Boreal mountain System,Southern Africa,1,1
+Planted Boreal mountain System,Western Africa,1,1
+Planted Boreal mountain System,Central Asia,1,1
+Planted Boreal mountain System,Eastern Asia,1,1
+Planted Boreal mountain System,South-eastern Asia,1,1
+Planted Boreal mountain System,Southern Asia,1,1
+Planted Boreal mountain System,Western Asia,1,1
+Planted Boreal mountain System,Europe,1,1
+Planted Boreal mountain System,Oceania,1,1
+Planted Boreal mountain System,North America,1,1
+Planted Boreal mountain System,South America,1,1
+Planted Boreal mountain System,Central America,1,1
+Planted Boreal mountain System,Caribbean,1,1
