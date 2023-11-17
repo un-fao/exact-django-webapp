@@ -613,6 +613,7 @@ class AssessmentNoScenarios(Module):
         abstract = True
 class FixedAssessment(Assessment):
 
+    # TODO: Rework
     # def save(self, *args, **kwargs):
     #     if not self.land_use_type_start:
     #         self.land_use_type_start = LandUseType.objects.get(module_types__class_name=self.__class__.__name__)
