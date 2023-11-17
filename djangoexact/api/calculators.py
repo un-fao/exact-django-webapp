@@ -145,10 +145,23 @@ class BaseCalculator(ABC):
         super().__init__()
 
     @abstractmethod
-    def calculate(self, input: Model) -> Result:
+    def calculate(self, input: Module) -> Result:
         """
         Calculate emissions for a single module.
         """
+
+        if input.__class__ == LandUseChange:
+            luc: LandUseChange = input
+            module_start = getattr(input.activity, luc.module_type_start.lower(), None)
+            module_w = getattr(input.activity, luc.module_type_w.lower(), None)
+            module_wo = getattr(input.activity, luc.module_typw_wo.lower(), None)
+
+            if not module_start or not module_w or not module_wo:
+                raise Exception("At least one module is missing")
+        
+            if module_start.status.value != 1 or module_w.status.value != 1 or module_wo.status.value != 1:
+                raise Exception("At least one module is not ready to perform the calculation")
+
         pass
 
 class LandUseChangeCalculator(BaseCalculator):
@@ -206,7 +219,7 @@ class DeforestationCalculator(BaseCalculator):
         Calculate emissions for a single Deforestation module.
         """
 
-        module: Assessment = self.data
+        module: Assessment | BiomassModule = self.data
         luc: LandUseChange = module.land_use_change
         project: Project = module.activity.project
         change_rate = module.activity.change_rate
@@ -214,6 +227,14 @@ class DeforestationCalculator(BaseCalculator):
         moisture = project.moisture
         continent = project.continent
         soil_type = project.soil_type
+
+        forest: ForestManagement = module.activity.forestmanagement
+
+        # TODO: Maybe generalise this on a higher level
+        if not forest:
+            raise Exception("Forest module is missing")
+        if forest.status.value != 1:
+            raise Exception("Forest module is not complete")
 
         cmc = {
             "climate": climate,
@@ -223,139 +244,141 @@ class DeforestationCalculator(BaseCalculator):
 
         mangroves_data = None
 
-        # soc_ref = SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
+        soc_ref = SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
 
-        # total_biomass_start = TotalBiomassAfterDefo.objects.get(**cmc, land_use_type=module.land_use_type_start)
-        # total_biomass_end = TotalBiomassAfterDefo.objects.get(**cmc, land_use_type=module.land_use_type_w)
+        total_biomass_start = TotalBiomassAfterDefo.objects.get(**cmc, land_use_type=module.land_use_type_start)
+        total_biomass_end = TotalBiomassAfterDefo.objects.get(**cmc, land_use_type=module.land_use_type_w)
 
-        # # NOTE: Maybe merge the mangroves and deforestation IPCC tables into one table?
-        # if self.data.vegetation_type != utils.MANGROVES:
-        #     defo_table_start = LitterDeadwoodCarbonStock.objects.get(vegetation_type=module.land_use_type_start)
-        #     defo_table_end = LitterDeadwoodCarbonStock.objects.get(vegetation_type=module.land_use_type_w)
+        # NOTE: Maybe merge the mangroves and deforestation IPCC tables into one table?
+        if self.data.vegetation_type != utils.MANGROVES:
+            defo_table_start = LitterDeadwoodCarbonStock.objects.get(vegetation_type=module.land_use_type_start)
+            defo_table_end = LitterDeadwoodCarbonStock.objects.get(vegetation_type=module.land_use_type_w)
 
-        #     ag_biomass_start = AboveGroundBiomass.objects.get(continent=continent, vegetation_type=module.land_use_type_start)
-        #     ag_biomass_end = AboveGroundBiomass.objects.get(continent=continent, vegetation_type=module.land_use_type_w)
+            ag_biomass_start = AboveGroundBiomass.objects.get(continent=continent, vegetation_type=module.land_use_type_start)
+            ag_biomass_end = AboveGroundBiomass.objects.get(continent=continent, vegetation_type=module.land_use_type_w)
 
-        #     bg_biomass_start = BelowGroundBiomass.objects.get_first_above_threshold(continent=continent, vegetation_type=module.land_use_type_start, threshold=ag_biomass_start.value)
-        #     bg_biomass_end = BelowGroundBiomass.objects.get_first_above_threshold(continent=continent, vegetation_type=module.land_use_type_w, threshold=ag_biomass_end.value)
-        # else:
-        #     mangroves_data = DataOnMangrove.objects.get(continent=continent)
+            bg_biomass_start = BelowGroundBiomass.objects.get_first_above_threshold(continent=continent, vegetation_type=module.land_use_type_start, threshold=ag_biomass_start.value)
+            bg_biomass_end = BelowGroundBiomass.objects.get_first_above_threshold(continent=continent, vegetation_type=module.land_use_type_w, threshold=ag_biomass_end.value)
+        else:
+            mangroves_data = DataOnMangrove.objects.get(continent=continent)
 
-        # combustion_factor_start = CombustionFactor.objects.get(vegetation_type=module.land_use_type_start)
-        # combustion_factor_end = CombustionFactor.objects.get(vegetation_type=module.land_use_type_w)
+        combustion_factor_start = CombustionFactor.objects.get(vegetation_type=module.land_use_type_start)
+        combustion_factor_end = CombustionFactor.objects.get(vegetation_type=module.land_use_type_w)
 
-        # # TODO: Review this query
-        # moisture_factor = DefaultEmissionFactor.objects.filter(moisture=moisture)
-        # moisture_factor = moisture_factor.filter(Q(input__name__icontains="Other N Inputs") | Q(input__name__icontains="All N Inputs")).first()
+        # TODO: Review this query
+        moisture_factor = DefaultEmissionFactor.objects.filter(moisture=moisture)
+        moisture_factor = moisture_factor.filter(Q(input__name__icontains="Other N Inputs") | Q(input__name__icontains="All N Inputs")).first()
 
-        # flu_start = LandUseCarbonStockExchangeFactor.objects.get(climate=climate, moisture=moisture, land_use_type=module.land_use_type_start)
-        # flu_end = LandUseCarbonStockExchangeFactor.objects.get(climate=climate, moisture=moisture, land_use_type=module.land_use_type_w)
+        flu_start = LandUseCarbonStockExchangeFactor.objects.get(climate=climate, moisture=moisture, land_use_type=module.land_use_type_start)
+        flu_end = LandUseCarbonStockExchangeFactor.objects.get(climate=climate, moisture=moisture, land_use_type=module.land_use_type_w)
 
-        # inputs_start = [
-        #     luc.area,
-        #     0,
-        #     project.implementation_duration_yrs,
-        #     project.capitalization_duration_yrs,
-        #     change_rate.name,
-        #     total_biomass_start.value,
-        #     module.final_rcs_biomass_t2_start,
-        #     project.gw_potential.n2o,
-        #     project.gw_potential.ch4,
-        #     module.is_fire_used_start,
-        #     combustion_factor_start.n2o,
-        #     combustion_factor_start.ch4,
-        #     combustion_factor_start.value,
-        #     moisture_factor.value,
-        #     defo_table_start.litter if mangroves_data is None else mangroves_data.litter,
-        #     module.rcs_litter_t2_start,
-        #     defo_table_start.dw if mangroves_data is None else mangroves_data.dw,
-        #     module.rcs_deadwood_t2_start,
-        #     module.hwp_start,
-        #     utils.MANGROVE_FACTOR if mangroves_data is not None else utils.NON_MANGROVE_FACTOR,
-        #     module.rcs_bg_t2_start,
-        #     module.rcs_ag_t2_start,
-        #     flu_start.value,
-        #     mangroves_data.agb_c if mangroves_data is not None else ag_biomass_start.value,
-        #     mangroves_data.bgb if mangroves_data is not None else bg_biomass_start.value,
-        #     utils.CN_RATIO_GRASSLAND,
-        #     module.soc_after_defo_t2_start, # soil after defo t2
-        #     soc_ref.value,
-        #     module.rcs_soil_c_t2_start, # soil t2
-        # ]
-
-
-        # inputs_w = [
-        #     0,
-        #     luc.area,
-        #     project.implementation_duration_yrs,
-        #     project.capitalization_duration_yrs,
-        #     change_rate.name,
-        #     total_biomass_end.value,
-        #     module.final_rcs_biomass_t2_end,
-        #     project.gw_potential.n2o,
-        #     project.gw_potential.ch4,
-        #     module.is_fire_used_end,
-        #     combustion_factor_end.n2o,
-        #     combustion_factor_end.ch4,
-        #     combustion_factor_end.value,
-        #     moisture_factor.value,
-        #     defo_table_end.litter if mangroves_data is None else mangroves_data.litter,
-        #     module.rcs_litter_t2_end,
-        #     defo_table_end.dw if mangroves_data is None else mangroves_data.dw,
-        #     module.rcs_deadwood_t2_end,
-        #     module.hwp_end,
-        #     utils.MANGROVE_FACTOR if mangroves_data is not None else utils.NON_MANGROVE_FACTOR,
-        #     module.rcs_bg_t2_end,
-        #     module.rcs_ag_t2_end,
-        #     flu_end.value,
-        #     mangroves_data.agb_c if mangroves_data is not None else ag_biomass_end.value,
-        #     mangroves_data.bgb if mangroves_data is not None else bg_biomass_end.value,
-        #     utils.CN_RATIO_GRASSLAND,
-        #     module.soc_after_defo_t2_end, # soil after defo t2
-        #     soc_ref.value,
-        #     module.rcs_soil_c_t2_end, # soil t2
-        # ]
+        inputs_start = [
+            luc.area,
+            0,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            change_rate.name,
+            total_biomass_start.value,
+            forest.get_biomass_t2(utils.ScenarioTypes.START),
+            project.gw_potential.n2o,
+            project.gw_potential.ch4,
+            luc.is_fire_used_start,
+            combustion_factor_start.n2o,
+            combustion_factor_start.ch4,
+            combustion_factor_start.value,
+            moisture_factor.value,
+            defo_table_start.litter if mangroves_data is None else mangroves_data.litter,
+            forest.litter_t2_start,
+            defo_table_start.dw if mangroves_data is None else mangroves_data.dw,
+            forest.deadwood_t2_start,
+            module.hwp_start, # TODO: What's hwp in the new forest?
+            utils.MANGROVE_FACTOR if mangroves_data is not None else utils.NON_MANGROVE_FACTOR,
+            forest.agb_t2_start,
+            forest.bgb_t2_start,
+            flu_start.value,
+            mangroves_data.agb_c if mangroves_data is not None else ag_biomass_start.value,
+            mangroves_data.bgb if mangroves_data is not None else bg_biomass_start.value,
+            utils.CN_RATIO_GRASSLAND,
+            module.soc_after_defo_t2_start, # TODO: soil after defo t2
+            soc_ref.value,
+            project.soc_ref_t2,
+        ]
 
 
-        # inputs_wo = [
-        #     0,
-        #     luc.area,
-        #     project.implementation_duration_yrs,
-        #     project.capitalization_duration_yrs,
-        #     change_rate.name,
-        #     total_biomass_start.value,
-        #     module.final_rcs_biomass_t2_start,
-        #     project.gw_potential.n2o,
-        #     project.gw_potential.ch4,
-        #     module.is_fire_used_start,
-        #     combustion_factor_start.n2o,
-        #     combustion_factor_start.ch4,
-        #     combustion_factor_start.value,
-        #     moisture_factor.value,
-        #     defo_table_start.litter if mangroves_data is None else mangroves_data.litter,
-        #     module.rcs_litter_t2_start,
-        #     defo_table_start.dw if mangroves_data is None else mangroves_data.dw,
-        #     module.rcs_deadwood_t2_start,
-        #     module.hwp_start,
-        #     utils.MANGROVE_FACTOR if mangroves_data is not None else utils.NON_MANGROVE_FACTOR,
-        #     module.rcs_bg_t2_start,
-        #     module.rcs_ag_t2_start,
-        #     flu_start.value,
-        #     mangroves_data.agb_c if mangroves_data is not None else ag_biomass_start.value,
-        #     mangroves_data.bgb if mangroves_data is not None else bg_biomass_start.value,
-        #     utils.CN_RATIO_GRASSLAND,
-        #     module.soc_after_defo_t2_start, # soil after defo t2
-        #     soc_ref.value,
-        #     module.rcs_soil_c_t2_start, # soil t2
-        # ]
+        inputs_w = [
+            0,
+            luc.area,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            change_rate.name,
+            total_biomass_end.value,
+            forest.get_biomass_t2(utils.ScenarioTypes.WITH),
+            project.gw_potential.n2o,
+            project.gw_potential.ch4,
+            luc.is_fire_used_w,
+            combustion_factor_end.n2o,
+            combustion_factor_end.ch4,
+            combustion_factor_end.value,
+            moisture_factor.value,
+            defo_table_end.litter if mangroves_data is None else mangroves_data.litter,
+            forest.litter_t2_w,
+            defo_table_end.dw if mangroves_data is None else mangroves_data.dw,
+            forest.deadwood_t2_w,
+            module.hwp_end,
+            utils.MANGROVE_FACTOR if mangroves_data is not None else utils.NON_MANGROVE_FACTOR,
+            forest.agb_t2_w,
+            forest.bgb_t2_w,
+            flu_end.value,
+            mangroves_data.agb_c if mangroves_data is not None else ag_biomass_end.value,
+            mangroves_data.bgb if mangroves_data is not None else bg_biomass_end.value,
+            utils.CN_RATIO_GRASSLAND,
+            module.soc_after_defo_t2_end, # soil after defo t2
+            soc_ref.value,
+            project.soc_ref_t2,
+        ]
 
-        # results_start = MathDeforestation(*inputs_start).calculate_emissions()
-        # results_w = MathDeforestation(*inputs_w).calculate_emissions()
-        # results_wo = MathDeforestation(*inputs_wo).calculate_emissions()
 
-        # return Result(results_w+results_start, results_wo+results_start)
+        inputs_wo = [
+            0,
+            luc.area,
+            project.implementation_duration_yrs,
+            project.capitalization_duration_yrs,
+            change_rate.name,
+            total_biomass_start.value,
+            forest.get_biomass_t2(utils.ScenarioTypes.WITHOUT),
+            project.gw_potential.n2o,
+            project.gw_potential.ch4,
+            luc.is_fire_used_start,
+            combustion_factor_start.n2o,
+            combustion_factor_start.ch4,
+            combustion_factor_start.value,
+            moisture_factor.value,
+            defo_table_start.litter if mangroves_data is None else mangroves_data.litter,
+            forest.litter_t2_wo,
+            defo_table_start.dw if mangroves_data is None else mangroves_data.dw,
+            forest.deadwood_t2_wo,
+            module.hwp_start,
+            utils.MANGROVE_FACTOR if mangroves_data is not None else utils.NON_MANGROVE_FACTOR,
+            forest.agb_t2_wo,
+            forest.bgb_t2_wo,
+            flu_start.value,
+            mangroves_data.agb_c if mangroves_data is not None else ag_biomass_start.value,
+            mangroves_data.bgb if mangroves_data is not None else bg_biomass_start.value,
+            utils.CN_RATIO_GRASSLAND,
+            module.soc_after_defo_t2_start, # soil after defo t2
+            soc_ref.value,
+            project.soc_ref_t2,
+        ]
 
-        return Result()
+        math_start = MathDeforestation(*inputs_start)
+        math_w = MathDeforestation(*inputs_w)
+        math_wo = MathDeforestation(*inputs_wo)
+
+        math_start.calculate_emissions()
+        math_w.calculate_emissions()
+        math_wo.calculate_emissions()
+
+        return Result(math_w.total_emissions+math_start.total_emissions, math_wo.total_emissions+math_start.total_emissions)
 
 class AfforestationCalculator(BaseCalculator):
     """
