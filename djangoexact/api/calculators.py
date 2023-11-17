@@ -152,9 +152,9 @@ class BaseCalculator(ABC):
 
         if input.__class__ == LandUseChange:
             luc: LandUseChange = input
-            module_start = getattr(input.activity, luc.module_type_start.lower(), None)
-            module_w = getattr(input.activity, luc.module_type_w.lower(), None)
-            module_wo = getattr(input.activity, luc.module_typw_wo.lower(), None)
+            module_start = getattr(luc.activity, luc.module_type_start.lower(), None)
+            module_w = getattr(luc.activity, luc.module_type_w.lower(), None)
+            module_wo = getattr(luc.activity, luc.module_typw_wo.lower(), None)
 
             if not module_start or not module_w or not module_wo:
                 raise Exception("At least one module is missing")
