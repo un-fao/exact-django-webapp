@@ -329,11 +329,12 @@ def generic_module_viewset(model: Model):
                 luc_w = luc.module_type_w
                 luc_wo = luc.module_type_wo
 
-                if not luc_start and not luc_w and not luc_wo:
-                    return ErrorResponse(f"Land use change must have at least one land use type.", status=status.HTTP_400_BAD_REQUEST)
+                if not luc_start or not luc_w or not luc_wo:
+                    return ErrorResponse(f"At least one land use has not been set.", status=status.HTTP_400_BAD_REQUEST)
                 
             for attr in dir(model):
-                if attr.endswith("_thread"): # NOTE: This could create problems if any other attribute ends in "_thread"
+                # NOTE: This could create problems if any other attribute ends in "_thread"
+                if attr.endswith("_thread"):
                     module_serializer.validated_data[attr] = CommentThread.objects.create()
 
             module_serializer.save()
