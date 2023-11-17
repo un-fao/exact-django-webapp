@@ -73,6 +73,8 @@ class ProjectResultSerializer(serializers.Serializer):
 class ActivitySerializer(serializers.ModelSerializer):
     project = ProjectSerializer(many=False, read_only=True)
     user = UserSerializer(many=False, read_only=True)
+    climate_t2 = get_model_serializer(Climate)()
+    soil_type_t2 = get_model_serializer(SoilType)()
 
     class Meta:
         model = Activity
