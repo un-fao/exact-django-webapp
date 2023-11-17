@@ -162,8 +162,6 @@ class BaseCalculator(ABC):
             if module_start.status.value != 1 or module_w.status.value != 1 or module_wo.status.value != 1:
                 raise Exception("At least one module is not ready to perform the calculation")
 
-        pass
-
 class LandUseChangeCalculator(BaseCalculator):
     """
     Calculator for land use change modules.
@@ -219,7 +217,7 @@ class DeforestationCalculator(BaseCalculator):
         Calculate emissions for a single Deforestation module.
         """
 
-        module: Assessment | BiomassModule = self.data
+        module: Assessment = self.data
         luc: LandUseChange = module.land_use_change
         project: Project = module.activity.project
         change_rate = module.activity.change_rate
@@ -688,35 +686,35 @@ class AnnualCroppingCalculator(BaseCalculator):
 
         cm = {"climate": climate, "moisture": moisture}
 
-        crop_type_start = input.crop_type_start
-        crop_type_w = input.crop_type_w
-        crop_type_wo = input.crop_type_wo
+        land_use_type_start = input.land_use_type_start
+        land_use_type_w = input.land_use_type_w
+        land_use_type_wo = input.land_use_type_wo
 
-        minor_crop_type_start = input.minor_crop_type_start
-        minor_crop_type_w = input.minor_crop_type_w
-        minor_crop_type_wo = input.minor_crop_type_wo
+        minor_land_use_type_start = input.minor_land_use_type_start
+        minor_land_use_type_w = input.minor_land_use_type_w
+        minor_land_use_type_wo = input.minor_land_use_type_wo
 
         burning_emission_factor = BurningEmissionFactor.objects.get(category__name="Agricultural residues")
 
-        fires_combustion_factor_start = FiresCombustionFactor.objects.get(crop_type=crop_type_start)
-        fires_combustion_factor_w = FiresCombustionFactor.objects.get(crop_type=crop_type_w)
-        fires_combustion_factor_wo = FiresCombustionFactor.objects.get(crop_type=crop_type_wo)
+        fires_combustion_factor_start = FiresCombustionFactor.objects.get(land_use_type=land_use_type_start)
+        fires_combustion_factor_w = FiresCombustionFactor.objects.get(land_use_type=land_use_type_w)
+        fires_combustion_factor_wo = FiresCombustionFactor.objects.get(land_use_type=land_use_type_wo)
 
-        n_estimation_factor_start = CropNitrousEstimationDefaultFactor.objects.get_or_grains(crop_type=crop_type_start)
-        n_estimation_factor_w = CropNitrousEstimationDefaultFactor.objects.get_or_grains(crop_type=crop_type_w)
-        n_estimation_factor_wo = CropNitrousEstimationDefaultFactor.objects.get_or_grains(crop_type=crop_type_wo)
+        n_estimation_factor_start = CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=land_use_type_start)
+        n_estimation_factor_w = CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=land_use_type_w)
+        n_estimation_factor_wo = CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=land_use_type_wo)
 
         # Minor crop
         try:
-            minor_combustion_factor_start = FiresCombustionFactor.objects.get(crop_type=crop_type_start)
-            minor_combustion_factor_w = FiresCombustionFactor.objects.get(crop_type=crop_type_w)
-            minor_combustion_factor_wo = FiresCombustionFactor.objects.get(crop_type=crop_type_wo)
+            minor_combustion_factor_start = FiresCombustionFactor.objects.get(land_use_type=land_use_type_start)
+            minor_combustion_factor_w = FiresCombustionFactor.objects.get(land_use_type=land_use_type_w)
+            minor_combustion_factor_wo = FiresCombustionFactor.objects.get(land_use_type=land_use_type_wo)
 
             minor_burning_emission_factor = BurningEmissionFactor.objects.get(category__name="Agricultural residues")
 
-            minor_n_estimation_factor_start = CropNitrousEstimationDefaultFactor.objects.get_or_grains(crop_type=minor_crop_type_start)
-            minor_n_estimation_factor_w = CropNitrousEstimationDefaultFactor.objects.get_or_grains(crop_type=minor_crop_type_w)
-            minor_n_estimation_factor_wo = CropNitrousEstimationDefaultFactor.objects.get_or_grains(crop_type=minor_crop_type_wo)
+            minor_n_estimation_factor_start = CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=minor_land_use_type_start)
+            minor_n_estimation_factor_w = CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=minor_land_use_type_w)
+            minor_n_estimation_factor_wo = CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=minor_land_use_type_wo)
 
         except:
             # NOTE: If only one of the above operations fails, all minor variables must be set to None for the math model to work
@@ -748,21 +746,21 @@ class AnnualCroppingCalculator(BaseCalculator):
             input.crop_yield_start
             if input.crop_yield_start
             else CropYieldStats.objects.get_or_region_average(
-                continent=project.continent, crop_type=crop_type_start
+                continent=project.continent, crop_type=land_use_type_start
             ).average
         )
         crop_yield_w = (
             input.crop_yield_w
             if input.crop_yield_w
             else CropYieldStats.objects.get_or_region_average(
-                continent=project.continent, crop_type=crop_type_w
+                continent=project.continent, crop_type=land_use_type_w
             ).average
         )
         crop_yield_wo = (
             input.crop_yield_wo
             if input.crop_yield_wo
             else CropYieldStats.objects.get_or_region_average(
-                continent=project.continent, crop_type=crop_type_wo
+                continent=project.continent, crop_type=land_use_type_wo
             ).average
         )
 
@@ -783,29 +781,22 @@ class AnnualCroppingCalculator(BaseCalculator):
             emission_factors_start.value,
             project.gw_potential.n2o,
             project.gw_potential.ch4,
-            # TODO: Add residue_management_type attribute to model for cleaner logic
-            burning_emission_factor.ch4
-            if input.residue_management_type_start.name == "Burned"
-            else None,
+            burning_emission_factor.ch4 if input.residue_management_type_start.name == "Burned" else None,
             fires_combustion_factor_start.value,
             input.main_biomass_factor_t2_start,
             n_estimation_factor_start.slope,
             n_estimation_factor_start.intercept,
             crop_yield_start,
-            # TODO: Review looking for cleaner logic
             getattr(minor_burning_emission_factor, "ch4", None),
             getattr(minor_combustion_factor_start, "value", None),
             input.minor_biomass_factor_t2_start,
             getattr(minor_n_estimation_factor_start, "slope", None),
             getattr(minor_n_estimation_factor_start, "intercept", None),
             input.minor_yield_start,
-            burning_emission_factor.n2o
-            if input.residue_management_type_start.name == "Burned"
-            else None,
+            burning_emission_factor.n2o if input.residue_management_type_start.name == "Burned" else None,
             input.residue_management_type_start.name == "Retained",
             getattr(minor_burning_emission_factor, "n2o", None),
-            getattr(input.minor_residue_management_type_start, "name", None)
-            == "Retained",
+            getattr(input.minor_residue_management_type_start, "name", None) == "Retained",
             n_estimation_factor_start.n_ag_residues,
             n_estimation_factor_start.rs_t,
             n_estimation_factor_start.n_bg_t,
@@ -831,9 +822,7 @@ class AnnualCroppingCalculator(BaseCalculator):
             emission_factors_w.value,
             project.gw_potential.n2o,
             project.gw_potential.ch4,
-            burning_emission_factor.ch4
-            if input.residue_management_type_w.name == "Burned"
-            else None,
+            burning_emission_factor.ch4 if input.residue_management_type_w.name == "Burned" else None,
             fires_combustion_factor_w.value,
             input.main_biomass_factor_t2_w,
             n_estimation_factor_w.slope,
@@ -845,9 +834,7 @@ class AnnualCroppingCalculator(BaseCalculator):
             getattr(minor_n_estimation_factor_w, "slope", None),
             getattr(minor_n_estimation_factor_w, "intercept", None),
             input.minor_yield_w,
-            burning_emission_factor.n2o
-            if input.residue_management_type_w.name == "Burned"
-            else None,
+            burning_emission_factor.n2o if input.residue_management_type_w.name == "Burned" else None,
             input.residue_management_type_w.name == "Retained",
             getattr(minor_burning_emission_factor, "n2o", None),
             getattr(input.minor_residue_management_type_w, "name", None) == "Retained",
@@ -876,9 +863,7 @@ class AnnualCroppingCalculator(BaseCalculator):
             emission_factors_wo.value,
             project.gw_potential.n2o,
             project.gw_potential.ch4,
-            burning_emission_factor.ch4
-            if input.residue_management_type_wo.name == "Burned"
-            else None,
+            burning_emission_factor.ch4 if input.residue_management_type_wo.name == "Burned" else None,
             fires_combustion_factor_wo.value,
             input.main_biomass_factor_t2_wo,
             n_estimation_factor_wo.slope,
@@ -890,9 +875,7 @@ class AnnualCroppingCalculator(BaseCalculator):
             getattr(minor_n_estimation_factor_wo, "slope", None),
             getattr(minor_n_estimation_factor_wo, "intercept", None),
             input.minor_yield_wo,
-            burning_emission_factor.n2o
-            if input.residue_management_type_wo.name == "Burned"
-            else None,
+            burning_emission_factor.n2o if input.residue_management_type_wo.name == "Burned" else None,
             input.residue_management_type_wo.name == "Retained",
             getattr(minor_burning_emission_factor, "n2o", None),
             getattr(input.minor_residue_management_type_wo, "name", None) == "Retained",

@@ -3219,3 +3219,20 @@ for i, row in enumerate(df_dict2):
         agb_growth_min=agb_growth_min,
         agb_growth_max=agb_growth_max,
     )
+
+CropNitrousEstimationDefaultFactor.objects.all().delete()
+with open("scripts/ipcc_data/CropNitrousEstimationDefaultFactors.csv", "r") as f:
+    reader = csv.reader(f)
+    header = next(reader, None)
+    data = list(reader)
+
+    for row in data:
+        land_use_type, _ = LandUseType.objects.get_or_create(name=sanitize(row[0]))
+        CropNitrousEstimationDefaultFactor.objects.get_or_create(
+            land_use_type=land_use_type,
+            slope=parse_csv_number(row[1]),
+            intercept=parse_csv_number(row[2]),
+            n_ag_residues=parse_csv_number(row[3]),
+            rs_t=parse_csv_number(row[4]),
+            n_bg_t=parse_csv_number(row[5]),
+        )
