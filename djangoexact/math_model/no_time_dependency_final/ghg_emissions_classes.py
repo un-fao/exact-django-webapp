@@ -39,24 +39,25 @@ class Result:
 
     def __init__(self, time_impl, time_cap):
         self.yearly_emissions_by_sector_by_gas: list[YearlyActivityEmissionSet] = []
-        self.total_years = time_impl + time_cap
         self.balance = 0
+        self.time_tot = time_impl + time_cap
+
 
     def breakdown_by_gas(self):
 
-        aggregated_emissions = {gas_type: YearlyGasEmissionSet(0, gas_type, [0 for i in self.total_years]) for gas_type in GasTypes}
+        aggregated_emissions = {gas_type: YearlyGasEmissionSet(0, gas_type, [0 for i in range(self.time_tot)]) for gas_type in GasTypes}
 
         for yearly_emission in self.yearly_emissions_by_sector_by_gas:
-            aggregated_emissions[yearly_emission.gas_type].emissions = [x + y for x,y in zip(aggregated_emissions[yearly_emission.gas_type].emissions, yearly_emission.emissions)]
+            aggregated_emissions[yearly_emission.gas_type].emissions = [x + y.value for x,y in zip(aggregated_emissions[yearly_emission.gas_type].emissions, yearly_emission.emissions)]
         
         return aggregated_emissions.values()
     
     def breakdown_by_activity(self):
 
-        aggregated_emissions = {activity: YearlyActivityEmissionSet(0, activity, [0 for i in self.total_years], activity) for activity in [i.activity for i in self.yearly_emissions_by_sector_by_gas]}
+        aggregated_emissions = {activity: YearlyActivityEmissionSet(0, activity, [0 for i in range(self.time_tot)], activity) for activity in [i.activity for i in self.yearly_emissions_by_sector_by_gas]}
 
         for yearly_emission in self.yearly_emissions_by_sector_by_gas:
-            aggregated_emissions[yearly_emission.activity].emissions = [x + y for x,y in zip(aggregated_emissions[yearly_emission.activity].emissions, yearly_emission.emissions)]
+            aggregated_emissions[yearly_emission.activity].emissions = [x + y.value for x,y in zip(aggregated_emissions[yearly_emission.activity].emissions, yearly_emission.emissions)]
         
         return aggregated_emissions.values()
     
