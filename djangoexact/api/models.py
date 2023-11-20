@@ -975,10 +975,6 @@ class Grassland(FixedAssessment, SingleBiomassModule):
     soil_carbon_t2_w = FloatField(null=True, blank=True)
     soil_carbon_t2_wo = FloatField(null=True, blank=True)
 
-    agb_t2_start = FloatField(null=True, blank=True)
-    agb_t2_w = FloatField(null=True, blank=True)
-    agb_t2_wo = FloatField(null=True, blank=True)
-
     combustion_factor_t2_start = FloatField(null=True, blank=True)
     combustion_factor_t2_w = FloatField(null=True, blank=True)
     combustion_factor_t2_wo = FloatField(null=True, blank=True)
