@@ -68,7 +68,7 @@ class AnnualCropland:
         self.emissions_total_yearly = []
         self.total_emissions = 0
 
-        self.Result = Result()
+        self.result = Result(self.time_impl, self.time_cap)
         
     def calculate_emissions(self):
 
