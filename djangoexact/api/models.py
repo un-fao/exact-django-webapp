@@ -56,6 +56,11 @@ class IPCCRegion(Model):
     def __str__(self):
         return f"({self.pk}) {self.name}"
 
+class GasType(Model):
+    name = CharField(max_length=100)
+
+    def __str__(self):
+        return f"({self.pk}) {self.name}"
 
 class GLEAMRegion(Model):
     name = CharField(max_length=100)
@@ -515,7 +520,7 @@ class SingleBiomassModule(BiomassModule):
         abstract = True
 
     def get_biomass_t2(self, scenario: ScenarioTypes):
-        return getattr(self, f"biomass_{scenario.value}_t2")
+        return getattr(self, f"biomass_t2_{scenario.value}")
 
 class DoubleBiomassModule(BiomassModule):
     agb_t2_start = FloatField(null=True, blank=True)
@@ -954,9 +959,9 @@ class Grassland(FixedAssessment, SingleBiomassModule):
     is_fire_used_wo = BooleanField(default=False)
     is_fire_used_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_is_fire_used_thread")
 
-    fire_periodicity_start = FloatField(null=True, blank=True)
-    fire_periodicity_w = FloatField(null=True, blank=True)
-    fire_periodicity_wo = FloatField(null=True, blank=True)
+    fire_periodicity_start = FloatField(null=True, blank=True, default=0)
+    fire_periodicity_w = FloatField(null=True, blank=True, default=0)
+    fire_periodicity_wo = FloatField(null=True, blank=True, default=0)
     fire_periodicity_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_fire_periodicity_thread")
 
     fire_impact_start = FloatField(null=True, blank=True)
