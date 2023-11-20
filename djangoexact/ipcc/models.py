@@ -330,6 +330,7 @@ class CoastalAGB(Model):
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField(default=0)
+    unit = CharField(max_length=50, null=True, blank=True)
 
     def __str__(self):
         return f"{self.value} for {self.climate.name} {self.moisture.name} {self.land_use_type.name}"
@@ -343,6 +344,10 @@ class CoastalBGB(Model):
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField(default=0)
+    unit = CharField(max_length=50, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.value} for {self.climate.name} {self.moisture.name} {self.land_use_type.name}"
 
 
 class CoastalLitter(Model):
