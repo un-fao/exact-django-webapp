@@ -1,11 +1,31 @@
-climate;moisture;unit;Mangrove;Tidal Marsh;Seagrass
-Boreal;Dry;t dry matter/ha;0;0;0
-Boreal;Moist;t dry matter/ha;0;0;0
-Cool Temperate;Dry;t dry matter/ha;0;0;0
-Cool Temperate;Moist;t dry matter/ha;0;0;0
-Warm Temperate;Dry;t dry matter/ha;75;0;0
-Warm Temperate;Moist;t dry matter/ha;75;0;0
-Tropical;Dry;t dry matter/ha;92;0;0
-Tropical;Moist;t dry matter/ha;192;0;0
-Tropical;Wet;t dry matter/ha;192;0;0
-Tropical Montane;Dry;t dry matter/ha;0;0;0
+land_use_type;climate;moisture;unit;value
+Mangrove;Boreal;Dry;t dry matter/ha;0
+Mangrove;Boreal;Moist;t dry matter/ha;0
+Mangrove;Cool Temperate;Dry;t dry matter/ha;0
+Mangrove;Cool Temperate;Moist;t dry matter/ha;0
+Mangrove;Warm Temperate;Dry;t dry matter/ha;75
+Mangrove;Warm Temperate;Moist;t dry matter/ha;75
+Mangrove;Tropical;Dry;t dry matter/ha;92
+Mangrove;Tropical;Moist;t dry matter/ha;192
+Mangrove;Tropical;Wet;t dry matter/ha;192
+Mangrove;Tropical Montane;Dry;t dry matter/ha;0
+Tidal Marsh;Boreal;Dry;t dry matter/ha;0
+Tidal Marsh;Boreal;Moist;t dry matter/ha;0
+Tidal Marsh;Cool Temperate;Dry;t dry matter/ha;0
+Tidal Marsh;Cool Temperate;Moist;t dry matter/ha;0
+Tidal Marsh;Warm Temperate;Dry;t dry matter/ha;0
+Tidal Marsh;Warm Temperate;Moist;t dry matter/ha;0
+Tidal Marsh;Tropical;Dry;t dry matter/ha;0
+Tidal Marsh;Tropical;Moist;t dry matter/ha;0
+Tidal Marsh;Tropical;Wet;t dry matter/ha;0
+Tidal Marsh;Tropical Montane;Dry;t dry matter/ha;0
+Seagrass;Boreal;Dry;t dry matter/ha;0
+Seagrass;Boreal;Moist;t dry matter/ha;0
+Seagrass;Cool Temperate;Dry;t dry matter/ha;0
+Seagrass;Cool Temperate;Moist;t dry matter/ha;0
+Seagrass;Warm Temperate;Dry;t dry matter/ha;0
+Seagrass;Warm Temperate;Moist;t dry matter/ha;0
+Seagrass;Tropical;Dry;t dry matter/ha;0
+Seagrass;Tropical;Moist;t dry matter/ha;0
+Seagrass;Tropical;Wet;t dry matter/ha;0
+Seagrass;Tropical Montane;Dry;t dry matter/ha;0
