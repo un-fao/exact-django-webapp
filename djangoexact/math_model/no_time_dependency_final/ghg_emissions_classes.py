@@ -111,13 +111,15 @@ class Result:
 
     def compute_balance(self):
 
+        self.balance = 0
+
         for yearly_emission in self.yearly_emissions_by_sector_by_gas:
             self.balance += sum([i.value for i in yearly_emission.emissions])
 
         return self.balance
     
     def __add__(self, other):
-        self.yearly_emissions_by_sector_by_gas += other.yearly_emissions_by_sector_by_gas
+        self.yearly_emissions_by_sector_by_gas = [YearlyGasActivityEmissionSet(i.year, i.gas_type, [x + y for x,y in zip(i.emissions, j.emissions)], i.activity) for i,j in zip(self.yearly_emissions_by_sector_by_gas, other.yearly_emissions_by_sector_by_gas)]
         return self
 
     def __sub__(self, other):
