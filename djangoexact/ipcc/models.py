@@ -14,7 +14,7 @@ class GlobalWarmingPotential(Model):
 
 class NitrousEmissionFactor(Model):
     name = CharField(max_length=100)
-    moisture_type = ForeignKey("api.Moisture", on_delete=CASCADE)
+    moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     value = FloatField()
 
     def __str__(self):
