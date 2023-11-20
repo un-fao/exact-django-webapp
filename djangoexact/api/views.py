@@ -14,6 +14,8 @@ from rest_framework import generics
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.db import transaction
 import logging
+from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes, Result as MathResult
+from django.core import serializers as django_serializers
 
 logger = logging.getLogger("console")
 
@@ -116,21 +118,13 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         project = get_object_or_404(Project, pk=pk, user=self.request.user)
         serialized_project = ProjectSerializer(project).data
 
-        project_results = Result()
-
         response = serialized_project
         response["activities"] = []
 
         for activity in project.activities.all():
-            activity_results = ActivityViewSet.results(self, request, activity.pk).data
-            response["activities"].append(activity_results)
-
-            project_results.add(Result(activity_results[RESULTS]['total_w'], activity_results[RESULTS]['total_wo']))
-
-        response["results"] = ResultSerializer(project_results).data
+            response["activities"].append(ActivityViewSet.results(self, request, activity.pk).data)
 
         return Response(data=response, status=status.HTTP_200_OK)
-
 
 class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
@@ -182,12 +176,10 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
 
         activity = get_object_or_404(Activity, pk=pk)
-
         response = {**ActivitySerializer(activity).data}
-        tot_result = Result()
 
         modules = []
-        module_types = ModuleType.objects.all()
+        module_types = ModuleType.objects.filter(is_submodule=False).all()
         # TODO: Make a serializer for this
         for module in module_types:
             try:
@@ -195,25 +187,26 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             except LookupError:
                 logger.warning(f"Module {module.name} not found")
                 continue
-            object = model_ref.objects.filter(activity__id=pk).first()
 
-            if object:
-                module_dict = get_module_serializer(model_ref)(object).data
+            object = getattr(activity, module.class_name.lower(), None).first()
 
-                try:
-                    result: Result = CalculatorFactory().calculate_result(object)
-                    module_dict[RESULTS] = ResultSerializer(result).data
-                    tot_result.add(result)
-                except Exception as e:
-                    logger.error("module_id", module_dict["id"])
-                    logger.error("Error calculating result in ActivityViewSet.results", e)
-                    module_dict[RESULTS] = error(str(e))
+            if not object:
+                continue
 
-                modules.append(module_dict)
+            module_dict = get_module_serializer(model_ref)(object).data
+
+            try:
+
+                viewset = generic_module_viewset(model_ref).results(self, request, pk=object.pk)
+                module_dict[RESULTS] = viewset.data
+
+            except Exception as e:
+                logger.error("Error calculating result in ActivityViewSet.results", e)
+                module_dict[RESULTS] = error(str(e))
+
+            modules.append(module_dict)
                     
-
         response["modules"] = modules
-        response["results"] = ResultSerializer(tot_result).data
 
         return Response(response)
 
@@ -367,14 +360,35 @@ def generic_module_viewset(model: Model):
             TODO: Define structure and format of the real response.
             """
 
+            from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
+
+            aggregate_by = BreakdownTypes(request.query_params.get("aggregate", BreakdownTypes.TOTAL))
+
             module = get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
 
             try:
-                module_results = CalculatorFactory().calculate_result(module)
+                results_w, results_wo, results_tot = CalculatorFactory().calculate_result(module, aggregate_by=aggregate_by)
+                Serializer = ResultSerializerFactory().by(aggregate_by)
+
+                if Serializer == TotalResultSerializer:
+                    module_results = Serializer(
+                        {
+                            "total_w": results_w,
+                            "total_wo": results_wo,
+                            "balance": results_tot,
+                        }
+                    ).data
+                else:
+                    module_results = {
+                        "total_w": Serializer(results_w, many=True).data,
+                        "total_wo": Serializer(results_wo, many=True).data,
+                        "balance": Serializer(results_tot, many=True).data,
+                    }
+
             except Exception as e:
                 return ErrorResponse(str(e))
 
-            return Response(ResultSerializer(module_results).data)
+            return Response(module_results)
 
         @action(detail=True, methods=["get"])
         def defaults(self, request, pk=None):

@@ -7,13 +7,7 @@ from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 import sys
-
-
-class ResultSerializer(serializers.Serializer):
-    total_w = serializers.FloatField()
-    total_wo = serializers.FloatField()
-    balance = serializers.FloatField()
-
+from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
 
 def get_model_serializer(model_arg):
     class GenericSerializer(serializers.ModelSerializer):
@@ -44,6 +38,73 @@ def get_module_serializer(model_arg: Model) -> serializers.ModelSerializer:
             
 
     return GenericSerializer
+
+class EmissionSerializer(serializers.Serializer):
+    gas_type = get_model_serializer(GasType)(many=False, read_only=True)
+    value = serializers.FloatField()
+
+class YearlyGasEmissionSerializer(serializers.Serializer):
+    year = serializers.IntegerField()
+    gas_type = get_model_serializer(GasType)(many=False, read_only=True)
+    emissions = EmissionSerializer(many=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+class YearlyActivityEmissionSerializer(serializers.Serializer):
+    year = serializers.IntegerField()
+    gas_type = get_model_serializer(GasType)(many=False, read_only=True)
+    emissions = EmissionSerializer(many=True)
+    activity = serializers.CharField()
+
+class TotalResultSerializer(serializers.Serializer):
+    total_w = serializers.FloatField()
+    total_wo = serializers.FloatField()
+    balance = serializers.FloatField()
+
+class ResultSerializerFactory:
+    def by(self, by: BreakdownTypes = BreakdownTypes.TOTAL):
+        match by:
+            case BreakdownTypes.TOTAL:
+                return TotalResultSerializer
+            case BreakdownTypes.GAS:
+                return YearlyGasEmissionSerializer
+            case BreakdownTypes.ACTIVITY:
+                return YearlyActivityEmissionSerializer
+            case BreakdownTypes.ACTIVITY_GAS:
+                return YearlyActivityEmissionSerializer
+            case _:
+                raise ValueError("Invalid breakdown type")
+
+class ResultSerializer(serializers.Serializer):
+
+    serializer = TotalResultSerializer
+
+    def __init__(self, *args, **kwargs):
+        if self.serializer == TotalResultSerializer:
+            self.fields["total_w"] = serializers.FloatField()
+            self.fields["total_wo"] = serializers.FloatField()
+            self.fields["balance"] = serializers.FloatField()
+        else:
+            self.fields["total_w"] = self.serializer(many=True)
+            self.fields["total_wo"] = self.serializer(many=True)
+            self.fields["balance"] = self.serializer(many=True)
+        super().__init__(*args, **kwargs)
+
+    def by(self, by: BreakdownTypes = BreakdownTypes.TOTAL):
+        match by:
+            case BreakdownTypes.TOTAL:
+                self.serializer = TotalResultSerializer
+            case BreakdownTypes.GAS:
+                self.serializer = YearlyGasEmissionSerializer
+            case BreakdownTypes.ACTIVITY:
+                self.serializer = YearlyActivityEmissionSerializer
+            case BreakdownTypes.ACTIVITY_GAS:
+                self.serializer = YearlyActivityEmissionSerializer
+            case _:
+                self.serializer = TotalResultSerializer
+
+        return self
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

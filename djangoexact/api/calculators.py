@@ -83,18 +83,19 @@ from math_model.no_time_dependency_final.inputs import (
     OperationPhaseIrrigation,
 )
 from math_model.no_time_dependency_final.oluc import OtherLandUseChanges as MathOtherLandUseChanges
+from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes, Result as MathResult
 import traceback
 from django.core.exceptions import ObjectDoesNotExist
-
+import copy
 class Result:
     """
     Base class for all results.
     """
-    def __init__(self, total_w=0, total_wo=0):
-        self.total_w = total_w
-        self.total_wo = total_wo
-        self.balance = total_w - total_wo
-    
+    def __init__(self, w: MathResult, wo: MathResult, balance: MathResult = None) -> None:
+        self.total_w = w
+        self.total_wo = wo
+        self.balance = copy.deepcopy(w) - copy.deepcopy(wo) if balance is None else balance
+        
     def __str__(self):
         return f"total_w: {self.total_w}, total_wo: {self.total_wo}, balance: {self.balance}"
     
@@ -107,9 +108,15 @@ class Result:
         self.balance = self.total_w - self.total_wo
 
         return self
-
+    
+    def __add__(self, other):
+        return self.add(other)
+    
+    def breakdown(self, by=BreakdownTypes.TOTAL):
+        return (self.total_w.breakdown(by=by), self.total_wo.breakdown(by=by), self.balance.breakdown(by=by))
+    
 class CalculatorFactory:
-    def calculate_result(self, input):
+    def calculate_result(self, input, aggregate_by=BreakdownTypes.TOTAL):
         """
         Calculates the results for a given module.
         """
@@ -122,10 +129,7 @@ class CalculatorFactory:
 
             calculator: BaseCalculator = CalculatorClass(input)
 
-            try:
-                return calculator.calculate()
-            except ObjectDoesNotExist as e:
-                raise Exception(f"Object not found: {e}")
+            return calculator.calculate(aggregate_by=aggregate_by)
 
         except Exception as e:
             traceback.print_exc()
@@ -145,7 +149,7 @@ class BaseCalculator(ABC):
         super().__init__()
 
     @abstractmethod
-    def calculate(self, input: Module) -> Result:
+    def calculate(self, input: Module, aggregate_by=BreakdownTypes.TOTAL) -> Result:
         """
         Calculate emissions for a single module.
         """
@@ -167,17 +171,17 @@ class LandUseChangeCalculator(BaseCalculator):
     Calculator for land use change modules.
     """
 
-    def luc_based_calculation(self, module_start: Module, module_end: Module) -> Result:
+    def luc_based_calculation(self, module_start: Module, module_end: Module, aggregate_by=BreakdownTypes.TOTAL) -> Result:
 
         if type(module_start) == ForestManagement:
-            return DeforestationCalculator(module_start).calculate()
+            return DeforestationCalculator(module_start).calculate(aggregate_by=aggregate_by)
         
         if type(module_end) == ForestManagement:
-            return ForestManagementCalculator(module_end).calculate()
+            return ForestManagementCalculator(module_end).calculate(aggregate_by=aggregate_by)
         
-        return OtherLandUseCalculator(module_end).calculate()
+        return OtherLandUseCalculator(module_end).calculate(aggregate_by=aggregate_by)
 
-    def calculate(self) -> Result:
+    def calculate(self, aggregate_by=BreakdownTypes.TOTAL) -> Result:
         """
         Calculate emissions for a single LandUseChange module.
         # TODO: Define the logic for this module
@@ -198,9 +202,9 @@ class LandUseChangeCalculator(BaseCalculator):
         module_wo = module_wo.get(land_use_change=input)
 
         # TODO: DeforestationCalculator now expects the ForestManagement module only. Refactor the calculator accordingly (check T2 values!)
-        results_start = CalculatorFactory().calculate_result(module_start)
-        results_w = self.luc_based_calculation(module_start, module_w)
-        results_wo = self.luc_based_calculation(module_start, module_wo)
+        results_start = CalculatorFactory().calculate_result(module_start, aggregate_by=aggregate_by)
+        results_w = self.luc_based_calculation(module_start, module_w, aggregate_by=aggregate_by)
+        results_wo = self.luc_based_calculation(module_start, module_wo, aggregate_by=aggregate_by)
 
         result = Result().add(results_start).add(results_w).add(results_wo)
 
@@ -561,7 +565,7 @@ class OtherLandUseCalculator(BaseCalculator):
     Calculator for other land use modules.
     """
 
-    def calculate(self) -> list[Result]:
+    def calculate(self, aggregate_by=BreakdownTypes.TOTAL) -> list[Result]:
         """
         Calculate emissions for a single OtherLandUse module.
         """
@@ -663,7 +667,7 @@ class OtherLandUseCalculator(BaseCalculator):
         results_wo = MathOtherLandUseChanges(*inputs_wo)
         results_wo.calculate_emissions()
 
-        return Result(results_w.total_emissions, results_wo.total_emissions)
+        return Result(results_w.result.breakdown(by=aggregate_by), results_w.result.breakdown(by=aggregate_by))
 
 class AnnualCroppingCalculator(BaseCalculator):
     """
@@ -1220,7 +1224,7 @@ class GrasslandCalculator(BaseCalculator):
     # TODO: Implement class-based math model
     """
 
-    def calculate(self) -> list[Result]:
+    def calculate(self, aggregate_by=BreakdownTypes.TOTAL) -> list[Result]:
         """
         Calculate emissions for a single Grassland module.
         """
@@ -1238,9 +1242,9 @@ class GrasslandCalculator(BaseCalculator):
         soc_start = GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_start, climate=project.climate)
         soc_wo = GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_wo, climate=project.climate)
 
-        results = Result()
+        is_grassland_remaining_grassland = luc and luc.module_type_start.name == "Grassland" and luc.module_type_wo.name == "Grassland"
 
-        if luc.module_type_start.name == "Grassland" and luc.module_type_wo.name != "Grassland":
+        if not luc:
 
             soc_w = GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_w, climate=project.climate)
 
@@ -1256,7 +1260,7 @@ class GrasslandCalculator(BaseCalculator):
                 ef.ch4,
                 ef.n2o,
                 agb.value,
-                module.agb_t2_w,
+                module.get_biomass_t2(utils.ScenarioTypes.WITH),
                 cf,
                 module.combustion_factor_t2_start,
                 project.soc_ref.value,
@@ -1272,7 +1276,6 @@ class GrasslandCalculator(BaseCalculator):
 
             math_w = MathGrassland(*inputs_w)
             math_w.calculate_emissions()
-            results.total_w = math_w.total_emissions
 
         inputs_wo = [
             *[0, area],
@@ -1286,7 +1289,7 @@ class GrasslandCalculator(BaseCalculator):
             ef.ch4,
             ef.n2o,
             agb.value,
-            module.agb_t2_wo,
+            module.get_biomass_t2(utils.ScenarioTypes.WITHOUT),
             cf,
             module.combustion_factor_t2_start,
             project.soc_ref.value,
@@ -1303,9 +1306,12 @@ class GrasslandCalculator(BaseCalculator):
         math_wo = MathGrassland(*inputs_wo)
         math_wo.calculate_emissions()
 
-        results.total_wo = math_wo.total_emissions
+        if not luc:
+            resultcls = Result(math_w.result, math_wo.result)
+        else:
+            resultcls = Result(MathResult(project.implementation_duration_yrs, project.capitalization_duration_yrs), math_wo.result)
 
-        return results
+        return resultcls.breakdown(by=aggregate_by)
 
 class SmallFisheryCalculator(BaseCalculator):
     """
