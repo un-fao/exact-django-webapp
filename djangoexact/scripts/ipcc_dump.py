@@ -2700,23 +2700,30 @@ for i, row in enumerate(df_dict2):
 
     if i == len(df_dict2) - 1:
         break
-"""
 
 
 # CombustionFactor
 CombustionFactor.objects.all().delete()
 df = pd.read_csv(os.path.join(os.path.dirname(__file__), "ipcc_data", "CombustionFactorValues.csv"), header=0, sep=",")
 
-for row in df.to_dict():
-    lut = LandUseType.objects.get_or_create(name=row["land_use_type"])
+for row in df.to_dict("records"):
+    lut,_ = LandUseType.objects.get_or_create(name=sanitize(row["land_use_type"]))
     cf = parse_csv_number(row["cf"])
     co2 = parse_csv_number(row["co2"])
     ch4 = parse_csv_number(row["ch4"])
     n2o = parse_csv_number(row["n2o"])
 
+    print(
+        lut,
+        cf,
+        co2,
+        ch4,
+        n2o
+    )
+
     CombustionFactor.objects.create(
         land_use_type = lut,
-        cf = cf,
+        value = cf,
         co2 = co2,
         ch4 = ch4,
         n2o = n2o
@@ -2727,15 +2734,21 @@ for row in df.to_dict():
 LitterDeadwoodCarbonStock.objects.all().delete()
 df = pd.read_csv(os.path.join(os.path.dirname(__file__), "ipcc_data", "LitterDeadwoodCarbonStock.csv"), header=0, sep=",")
 
-for row in df.to_dict():
-    lut = LandUseType.objects.get_or_create(name=row["land_use_type"])
+for row in df.to_dict("records"):
+    lut,_ = LandUseType.objects.get_or_create(name=sanitize(row["land_use_type"]))
     litter = parse_csv_number(row["litter"])
     deadwood = parse_csv_number(row["deadwood"])
+
+    print(
+        lut,
+        litter,
+        deadwood
+    )
 
     LitterDeadwoodCarbonStock.objects.create(
         land_use_type = lut,
         litter = litter,
-        deadwood = deadwood,
+        dw = deadwood,
     )
 
 #AboveGroundBiomass
@@ -2830,72 +2843,81 @@ with open("scripts/ipcc_data/BelowGroundBiomass.csv", "r") as f:
 AboveGroundNetBiomassGrowth.objects.all().delete()
 df = pd.read_csv(os.path.join(os.path.dirname(__file__), "ipcc_data", "AboveGroundNetBiomassGrowth.csv"), header=0, sep=",")
 
-for row in df.to_dict():
-    lut = LandUseType.objects.get_or_create(name=sanitize(row["land_use_type"]))
-    continent = Continent.objects.get_or_create(name=sanitize(row["continent"]))
+for row in df.to_dict("records"):
+    lut,_ = LandUseType.objects.get_or_create(name=sanitize(row["land_use_type"]))
+    continent,_ = Continent.objects.get_or_create(name=sanitize(row["continent"]))
     gt_20_yrs = parse_csv_number(row["gt_20_yrs"])
     le_20_yrs = parse_csv_number(row["le_20_yrs"])
+
+    print(
+        lut,
+        continent,
+        gt_20_yrs,
+        le_20_yrs
+    )
 
     AboveGroundNetBiomassGrowth.objects.create(
         land_use_type = lut,
         continent = continent,
-        value_after_20_yrs = gt_20_yrs,
-        value_upto_20_yrs = le_20_yrs
+        value_after_20_years = gt_20_yrs,
+        value_upto_20_years = le_20_yrs
     )
 
 # CoastalAGB
 CoastalAGB.objects.all().delete()
+df = pd.read_csv(os.path.join(os.path.dirname(__file__), "ipcc_data", "CoastalAGB.csv"), header=0, sep=";")
 with open("scripts/ipcc_data/CoastalAGB.csv", "r") as f:
-    reader = csv.reader(f)
-    header = next(reader, None)
-    data = list(reader)
 
-    for i, head in enumerate(header):
-        head = sanitize(head).title()
-        land_use_type = LandUseType.objects.get_or_create(name=head)[0]
-        for row in data:
-            if sanitize(row[0]) == "":
-                continue
+    for row in df.to_dict("records"):
+        climate = Climate.objects.get_or_create(name=sanitize(row["climate"]))[0]
+        moisture = Moisture.objects.get_or_create(name=sanitize(row["moisture"]))[0]
+        land_use_type = LandUseType.objects.get_or_create(name=sanitize(row["land_use_type"]))[0]
+        unit = row["unit"]
+        value = parse_csv_number(row["value"])
 
-            climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
-            moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
-            unit = row[2]
-            value = parse_csv_number(row[i + 3])
+        print(
+            climate,
+            moisture,
+            land_use_type,
+            unit,
+            value,
+        )
 
-            CoastalAGB.objects.get_or_create(
-                land_use_type=land_use_type,
-                climate=climate,
-                moisture=moisture,
-                value=value,
-                unit=unit
-            )
+        CoastalAGB.objects.get_or_create(
+            land_use_type=land_use_type,
+            climate=climate,
+            moisture=moisture,
+            value=value,
+            unit=unit
+        )
+"""
 
 # CoastalBGB
 CoastalBGB.objects.all().delete()
-with open("scripts/ipcc_data/CoastalBGB.csv", "r") as f:
-    reader = csv.reader(f)
-    header = next(reader, None)
-    data = list(reader)
+df = pd.read_csv(os.path.join(os.path.dirname(__file__), "ipcc_data", "CoastalBGB.csv"), header=0, sep=";")
 
-    for i, head in enumerate(header):
-        head = sanitize(head).title()
-        land_use_type = LandUseType.objects.get_or_create(name=head)[0]
-        for row in data:
-            if sanitize(row[0]) == "":
-                continue
+for row in df.to_dict("records"):
+    climate = Climate.objects.get_or_create(name=sanitize(row["climate"]))[0]
+    moisture = Moisture.objects.get_or_create(name=sanitize(row["moisture"]))[0]
+    land_use_type = LandUseType.objects.get_or_create(name=sanitize(row["land_use_type"]))[0]
+    unit = row["unit"]
+    value = parse_csv_number(row["value"])
 
-            climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
-            moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
-            unit = row[2]
-            value = parse_csv_number(row[i + 3])
+    print(
+        climate,
+        moisture,
+        land_use_type,
+        unit,
+        value,
+    )
 
-            CoastalBGB.objects.get_or_create(
-                land_use_type=land_use_type,
-                climate=climate,
-                moisture=moisture,
-                value=value,
-                unit=unit
-            )
+    CoastalBGB.objects.get_or_create(
+        land_use_type=land_use_type,
+        climate=climate,
+        moisture=moisture,
+        value=value,
+        unit=unit
+    )
 
 # CoastalLitter
 
