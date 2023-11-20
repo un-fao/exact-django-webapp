@@ -1,6 +1,6 @@
 from .general_functions import yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, yearly_time_dependent_20_year_breakdown, breakdown_according_to_values, soil_emissions
 import traceback, re
-from .ghg_emissions_classes import GasTypes, ActivityTypes, Emission, YearlyActivityEmissionSet, Result
+from .ghg_emissions_classes import GasTypes, ActivityTypes, Emission, YearlyGasActivityEmissionSet, Result
 
 class Deforestation():
 
@@ -112,7 +112,7 @@ class Deforestation():
                 self.emissions_biomass_loss_yearly = yearly_constant_emissions_breakdown(biomass_loss, self.time_impl, self.time_cap)
                 self.emissions_biomass_loss_total = biomass_loss
 
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyActivityEmissionSet(
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
                     year = 0,
                     gas_type = GasTypes.CO2,
                     emissions = [Emission(e, GasTypes.CO2) for e in self.emissions_biomass_loss_yearly],
@@ -133,7 +133,7 @@ class Deforestation():
                 self.emissions_biomass_gain_total = 0 if self.emissions_biomass_loss_total == 0 else -(biomass_final_1_year_t_per_ha * self.area_deforested * (44 / 12))
                 self.emissions_biomass_gain_yearly = yearly_constant_emissions_breakdown(self.emissions_biomass_gain_total, self.time_impl, self.time_cap)
 
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyActivityEmissionSet(
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
                     year = 0,
                     gas_type = GasTypes.CO2,
                     emissions = [Emission(e, GasTypes.CO2) for e in self.emissions_biomass_gain_yearly],
@@ -155,7 +155,7 @@ class Deforestation():
                 self.emissions_dom_yearly = yearly_constant_emissions_breakdown(dom_loss, self.time_impl, self.time_cap)
                 self.emissions_dom_total = dom_loss
 
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyActivityEmissionSet(
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
                     year = 0,
                     gas_type = GasTypes.CO2,
                     emissions = [Emission(e, GasTypes.CO2) for e in self.emissions_dom_yearly],
@@ -170,7 +170,7 @@ class Deforestation():
             try:
                 self.emissions_soil_yearly, self.emissions_soil_total = soil_emissions(self.hectars_before_20, 0, self.area_deforested, self.soc_reference_default, self.soc_reference_tier_2, None, None, None, self.flu)
 
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyActivityEmissionSet(
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
                     year = 0,
                     gas_type = GasTypes.CO2,
                     emissions = [Emission(e, GasTypes.CO2) for e in self.emissions_soil_yearly],
@@ -221,14 +221,14 @@ class Deforestation():
                 emissions_ch4 = yearly_constant_emissions_breakdown(total_ch4_per_ha * self.area_deforested, self.time_impl, self.time_cap)
                 emissions_n2o = yearly_constant_emissions_breakdown(total_n2o_per_ha * self.area_deforested, self.time_impl, self.time_cap)
 
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyActivityEmissionSet(
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
                     year = 0,
                     gas_type = GasTypes.CH4,
                     emissions = [Emission(e, GasTypes.CH4) for e in emissions_ch4],
                     activity = ActivityTypes.RESIDUE_BURNING
                 ))
 
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyActivityEmissionSet(
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
                     year = 0,
                     gas_type = GasTypes.N2O,
                     emissions = [Emission(e, GasTypes.N2O) for e in emissions_n2o],

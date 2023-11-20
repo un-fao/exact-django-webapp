@@ -1,7 +1,7 @@
 from .general_functions import yearly_time_dependent_parameter_breakdown
 import traceback
 import re
-from .ghg_emissions_classes import GasTypes, ActivityTypes, Emission, YearlyActivityEmissionSet, Result
+from .ghg_emissions_classes import GasTypes, ActivityTypes, Emission, YearlyGasActivityEmissionSet, Result
 
 class Fishery:
 
@@ -85,7 +85,7 @@ class Fishery:
                 self.emissions_catch_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
                 self.emissions_catch_total = sum(self.emissions_catch_yearly)
 
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyActivityEmissionSet(
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
                     year = 0,
                     gas_type = GasTypes.CO2,
                     emissions = [Emission(x, GasTypes.CO2) for x in self.emissions_catch_yearly],
@@ -115,7 +115,7 @@ class Fishery:
                 self.emissions_refrigerant_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
                 self.emissions_refrigerant_total = sum(self.emissions_refrigerant_yearly)
 
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyActivityEmissionSet(
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
                     year = 0,
                     gas_type = GasTypes.OTHER,
                     emissions = [Emission(x, GasTypes.OTHER) for x in self.emissions_refrigerant_yearly],
@@ -146,7 +146,7 @@ class Fishery:
                 self.emissions_ice_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
                 self.emissions_ice_total = sum(self.emissions_ice_yearly)
 
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyActivityEmissionSet(
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
                     year = 0,
                     gas_type = GasTypes.OTHER,
                     emissions = [Emission(x, GasTypes.OTHER) for x in self.emissions_ice_yearly],

@@ -1,7 +1,7 @@
 import math
 from .general_functions import yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, yearly_time_dependent_20_year_breakdown, breakdown_according_to_values, soil_emissions
 import traceback
-from .ghg_emissions_classes import GasTypes, ActivityTypes, Emission, YearlyActivityEmissionSet, Result
+from .ghg_emissions_classes import GasTypes, ActivityTypes, Emission, YearlyGasActivityEmissionSet, Result
 
 class GrasslandManagement:
 
@@ -65,14 +65,14 @@ class GrasslandManagement:
                     self.emissions_residue_burning_total = 0
 
                     # NOTE: needed? Or no?
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyActivityEmissionSet(
+                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
                         year = 0,
                         gas_type = GasTypes.N2O,
                         emissions = [Emission(0, GasTypes.N2O) for i in range(self.time_impl + self.time_cap)],
                         activity = ActivityTypes.RESIDUE_BURNING
                     ))
 
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyActivityEmissionSet(
+                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
                         year = 0,
                         gas_type = GasTypes.CH4,
                         emissions = [Emission(0, GasTypes.CH4) for i in range(self.time_impl + self.time_cap)],
@@ -95,14 +95,14 @@ class GrasslandManagement:
                     total_nitrous = annual_nitrous * sum(self.total_hectars)
                     total_methane = annual_methane * sum(self.total_hectars)
 
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyActivityEmissionSet(
+                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
                         year = 0,
                         gas_type = GasTypes.N2O,
                         emissions = [Emission(e, GasTypes.N2O) for e in breakdown_according_to_values(total_nitrous, self.total_hectars)],
                         activity = ActivityTypes.RESIDUE_BURNING
                     ))
 
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyActivityEmissionSet(
+                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
                         year = 0,
                         gas_type = GasTypes.CH4,
                         emissions = [Emission(e, GasTypes.CH4) for e in breakdown_according_to_values(total_methane, self.total_hectars)],
@@ -129,7 +129,7 @@ class GrasslandManagement:
                 self.emissions_soil_yearly = breakdown_according_to_values(total, self.hectars_before_20)
                 self.emissions_soil_total = total
 
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyActivityEmissionSet(
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
                     year = 0,
                     gas_type = GasTypes.CO2,
                     emissions = [Emission(e, GasTypes.CO2) for e in breakdown_according_to_values(total, self.hectars_before_20)],
