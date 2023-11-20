@@ -151,7 +151,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         Get a single activity for a given user.
         """
         logger.info("ActivityViewSet.retrieve")
-        activity = get_object_or_404(Activity, pk=pk, project__user=self.request.user)
+        activity = get_object_or_404(Activity, pk=pk)
         activity_dict = ActivitySerializer(activity).data
         activity_dict["modules"] = get_modules(activity)
 
@@ -164,7 +164,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
         logger.info("ActivityViewSet.list")
         project_id = get_query_param_or_validation_error(self.request, "project_id")
-        list = Activity.objects.filter(project__id=project_id, project__user=self.request.user)
+        list = Activity.objects.filter(project__id=project_id)
 
         response = []
 
@@ -181,7 +181,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         Calculates and returns total emissions for each module in the activity.
         """
 
-        activity = get_object_or_404(Activity, pk=pk, project__user=self.request.user)
+        activity = get_object_or_404(Activity, pk=pk)
 
         response = {**ActivitySerializer(activity).data}
         tot_result = Result()
@@ -195,7 +195,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             except LookupError:
                 logger.warning(f"Module {module.name} not found")
                 continue
-            object = model_ref.objects.filter(activity__id=pk, activity__project__user=self.request.user).first()
+            object = model_ref.objects.filter(activity__id=pk).first()
 
             if object:
                 module_dict = get_module_serializer(model_ref)(object).data
@@ -223,7 +223,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         Lists the modules of a given activity.
         """
 
-        activity = get_object_or_404(Activity, pk=pk, project__user=self.request.user)
+        activity = get_object_or_404(Activity, pk=pk)
         modules = get_modules(activity)
 
         return Response(data=modules, status=status.HTTP_200_OK)
