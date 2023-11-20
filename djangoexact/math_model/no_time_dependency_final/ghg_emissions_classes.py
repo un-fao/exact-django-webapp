@@ -13,6 +13,16 @@ class ActivityTypes(Enum):
     CATCH = "Catch"
     REFRIGERANT = "Refrigerant"
     ICE = "Ice"
+    BIOMASS_LOSS = "Biomass Loss"
+    BIOMASS_GAIN = "Biomass Gain"
+    DOM = "Dead Organic Matter"
+    ROTATION_AGB = "Rotation AGB"
+    ROTATION_BGB = "Rotation BGB"
+    LITTER = "Litter"
+    DEADWOOD = "Deadwood"
+    ROTATION = "Rotation"
+    DISTURBANCE = "Disturbance"
+
     
 
 
