@@ -1,11 +1,41 @@
-climate;moisture;unit;Mangrove;Tidal Marsh;Seagrass;Tidal Marsh Mediterranean
-Boreal;Dry;t root dm/t shoot dm;0;0;0;0
-Boreal;Moist;t root dm/t shoot dm;0;0;0;0
-Cool Temperate;Dry;t root dm/t shoot dm;0;2,1;1,3;0
-Cool Temperate;Moist;t root dm/t shoot dm;0;2,1;1,3;0
-Warm Temperate;Dry;t root dm/t shoot dm;0,96;3,65;2,4;3,63
-Warm Temperate;Moist;t root dm/t shoot dm;0,96;3,65;2,4;3,63
-Tropical;Dry;t root dm/t shoot dm;0,29;3,65;1,7;3,63
-Tropical;Moist;t root dm/t shoot dm;0,49;3,65;1,7;0
-Tropical;Wet;t root dm/t shoot dm;0,49;3,65;1,7;0
-Tropical Montane;Dry;t root dm/t shoot dm;0;0;0;0
+land_use_type;climate;moisture;unit;value
+Mangrove;Boreal;Dry;t root dm/t shoot dm;0
+Mangrove;Boreal;Moist;t root dm/t shoot dm;0
+Mangrove;Cool Temperate;Dry;t root dm/t shoot dm;0
+Mangrove;Cool Temperate;Moist;t root dm/t shoot dm;0
+Mangrove;Warm Temperate;Dry;t root dm/t shoot dm;0,96
+Mangrove;Warm Temperate;Moist;t root dm/t shoot dm;0,96
+Mangrove;Tropical;Dry;t root dm/t shoot dm;0,29
+Mangrove;Tropical;Moist;t root dm/t shoot dm;0,49
+Mangrove;Tropical;Wet;t root dm/t shoot dm;0,49
+Mangrove;Tropical Montane;Dry;t root dm/t shoot dm;0
+Tidal Marsh;Boreal;Dry;t root dm/t shoot dm;0
+Tidal Marsh;Boreal;Moist;t root dm/t shoot dm;0
+Tidal Marsh;Cool Temperate;Dry;t root dm/t shoot dm;2,1
+Tidal Marsh;Cool Temperate;Moist;t root dm/t shoot dm;2,1
+Tidal Marsh;Warm Temperate;Dry;t root dm/t shoot dm;3,65
+Tidal Marsh;Warm Temperate;Moist;t root dm/t shoot dm;3,65
+Tidal Marsh;Tropical;Dry;t root dm/t shoot dm;3,65
+Tidal Marsh;Tropical;Moist;t root dm/t shoot dm;3,65
+Tidal Marsh;Tropical;Wet;t root dm/t shoot dm;3,65
+Tidal Marsh;Tropical Montane;Dry;t root dm/t shoot dm;0
+Seagrass;Boreal;Dry;t root dm/t shoot dm;0
+Seagrass;Boreal;Moist;t root dm/t shoot dm;0
+Seagrass;Cool Temperate;Dry;t root dm/t shoot dm;1,3
+Seagrass;Cool Temperate;Moist;t root dm/t shoot dm;1,3
+Seagrass;Warm Temperate;Dry;t root dm/t shoot dm;2,4
+Seagrass;Warm Temperate;Moist;t root dm/t shoot dm;2,4
+Seagrass;Tropical;Dry;t root dm/t shoot dm;1,7
+Seagrass;Tropical;Moist;t root dm/t shoot dm;1,7
+Seagrass;Tropical;Wet;t root dm/t shoot dm;1,7
+Seagrass;Tropical Montane;Dry;t root dm/t shoot dm;0
+Tidal Marsh Mediterranean;Boreal;Dry;t root dm/t shoot dm;0
+Tidal Marsh Mediterranean;Boreal;Moist;t root dm/t shoot dm;0
+Tidal Marsh Mediterranean;Cool Temperate;Dry;t root dm/t shoot dm;0
+Tidal Marsh Mediterranean;Cool Temperate;Moist;t root dm/t shoot dm;0
+Tidal Marsh Mediterranean;Warm Temperate;Dry;t root dm/t shoot dm;3,63
+Tidal Marsh Mediterranean;Warm Temperate;Moist;t root dm/t shoot dm;3,63
+Tidal Marsh Mediterranean;Tropical;Dry;t root dm/t shoot dm;3,63
+Tidal Marsh Mediterranean;Tropical;Moist;t root dm/t shoot dm;0
+Tidal Marsh Mediterranean;Tropical;Wet;t root dm/t shoot dm;0
+Tidal Marsh Mediterranean;Tropical Montane;Dry;t root dm/t shoot dm;0
