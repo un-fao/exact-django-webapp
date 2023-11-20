@@ -65,6 +65,9 @@ router.register(
     r"grasslands", views.generic_module_viewset(Grassland), basename="grasslands"
 )
 router.register(
+    r"grassland-management-types", views.generic_viewset(GrasslandManagementType), basename="grasslandmanagementtypes"
+)
+router.register(
     r"livestocks", views.generic_module_viewset(Livestock), basename="livestocks"
 )
 router.register(r"forest-managements", views.generic_module_viewset(ForestManagement), basename="forests")
