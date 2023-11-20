@@ -1,6 +1,6 @@
 import traceback
 from .general_functions import yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, yearly_time_dependent_20_year_breakdown, breakdown_according_to_values, soil_emissions
-from .ghg_emissions_classes import YearlyActivityEmissionSet, Emission, GasTypes, ActivityTypes, Result
+from .ghg_emissions_classes import YearlyGasActivityEmissionSet, Emission, GasTypes, ActivityTypes, Result
 class AnnualCropland:
 
     def __init__(self, area_start, area_end, time_impl, time_cap, rate_end, rate_coefficient_end, socref, soc_tier_2, f_lu_ref, f_lu_tier_2, f_i_ref, f_i_tier_2, f_mg_ref, f_mg_tier_2,
@@ -79,7 +79,7 @@ class AnnualCropland:
                 self.emissions_soil_yearly, self.emissions_soil_total = soil_emissions(self.hectars_before_20, self.area_start, self.area_end, self.socref,
                                         self.soc_tier_2, self.f_lu_tier_2, self.f_i_tier_2, self.f_mg_tier_2, self.f_lu_ref, self.f_i_ref, self.f_mg_ref)
                 
-                soil_emission_set = YearlyActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_soil_yearly], ActivityTypes.SOIL_CO2_CHANGE)
+                soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_soil_yearly], ActivityTypes.SOIL_CO2_CHANGE)
                 self.Result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
 
             except Exception as e:
@@ -108,7 +108,7 @@ class AnnualCropland:
                 self.emissions_som_yearly = breakdown_according_to_values(total, self.total_hectars)
                 self.emissions_som_total = total
 
-                som_emission_set = YearlyActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in self.emissions_som_yearly], ActivityTypes.SOM)
+                som_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in self.emissions_som_yearly], ActivityTypes.SOM)
                 self.Result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
             
             except Exception as e:
@@ -174,8 +174,8 @@ class AnnualCropland:
             total_nitrous = (sum(self.total_hectars)) * kg_nitrous * self.nitrous_constant / 1000
             total_methane = (sum(self.total_hectars)) * kg_methane * self.methane_constant / 1000
 
-            residue_burning_nitrous_emission_set = YearlyActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in yearly_constant_emissions_breakdown(total_nitrous, self.time_impl, self.time_cap)], ActivityTypes.RESIDUE_BURNING)
-            residue_burning_methane_emission_set = YearlyActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in yearly_constant_emissions_breakdown(total_methane, self.time_impl, self.time_cap)], ActivityTypes.RESIDUE_BURNING)
+            residue_burning_nitrous_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in yearly_constant_emissions_breakdown(total_nitrous, self.time_impl, self.time_cap)], ActivityTypes.RESIDUE_BURNING)
+            residue_burning_methane_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in yearly_constant_emissions_breakdown(total_methane, self.time_impl, self.time_cap)], ActivityTypes.RESIDUE_BURNING)
 
             self.Result.yearly_emissions_by_sector_by_gas.append(residue_burning_nitrous_emission_set)
             self.Result.yearly_emissions_by_sector_by_gas.append(residue_burning_methane_emission_set)
