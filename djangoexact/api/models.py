@@ -496,7 +496,7 @@ class Module(Historical):
     created_at = DateTimeField(auto_now_add=True, null=True)
     updated_at = DateTimeField(auto_now=True, null=True)
 
-    status = ForeignKey(ActivityState, on_delete=CASCADE)
+    status = ForeignKey(ActivityState, on_delete=CASCADE, null=True, blank=True)
 
     def __str__(self):
         return f"({self.pk}) {self._meta.object_name} in {self.activity.name}"
