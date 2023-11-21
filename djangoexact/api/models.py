@@ -950,9 +950,9 @@ class Grassland(FixedAssessment, SingleBiomassModule):
     description = TextField(null=True, blank=True)
     user_notes = TextField(null=True, blank=True)
 
-    grassland_management_type_start = ForeignKey(GrasslandManagementType,on_delete=CASCADE,related_name="%(class)s_management_type_start",null=True)
-    grassland_management_type_w = ForeignKey(GrasslandManagementType,on_delete=CASCADE,related_name="%(class)s_management_type_w",null=True)
-    grassland_management_type_wo = ForeignKey(GrasslandManagementType,on_delete=CASCADE,related_name="%(class)s_management_type_wo",null=True)
+    grassland_management_type_start = ForeignKey(GrasslandManagementType,on_delete=CASCADE,related_name="%(class)s_management_type_start",null=True, blank=True)
+    grassland_management_type_w = ForeignKey(GrasslandManagementType,on_delete=CASCADE,related_name="%(class)s_management_type_w",null=True, blank=True)
+    grassland_management_type_wo = ForeignKey(GrasslandManagementType,on_delete=CASCADE,related_name="%(class)s_management_type_wo",null=True, blank=True)
 
     is_fire_used_start = BooleanField(default=False)
     is_fire_used_w = BooleanField(default=False)
@@ -1825,6 +1825,9 @@ class LandUseChange(Module):
     dry_matter_start = FloatField(null=True, blank=True)
     dry_matter_w = FloatField(null=True, blank=True)
     dry_matter_wo = FloatField(null=True, blank=True)
+
+    def is_filled(self):
+        return self.area is not None and self.module_type_start is not None and self.module_type_w is not None and self.module_type_wo is not None
     
 ### MODEL PARAMETERS TABLES ###
 
