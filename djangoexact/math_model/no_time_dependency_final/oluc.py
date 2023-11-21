@@ -1,5 +1,7 @@
 from .general_functions import yearly_time_dependent_parameter_breakdown, ch4_head_calculation_general, yearly_constant_emissions_breakdown, soil_emissions_delta_soc_known, yearly_time_dependent_20_year_breakdown
 import traceback, re
+from .ghg_emissions_classes import GasTypes, ActivityTypes, Emission, YearlyGasActivityEmissionSet, Result
+
 
 class OtherLandUseChanges:
 
@@ -47,6 +49,8 @@ class OtherLandUseChanges:
         self.emissions_total_yearly = []
         self.total_emissions = 0
 
+        self.result = Result(self.time_impl, self.time_cap)
+
     def calculate_emissions(self):
 
         def calculate_biomass():
@@ -61,6 +65,14 @@ class OtherLandUseChanges:
 
                 self.total_biomass_emissions = total
                 self.yearly_biomass_emissions = yearly_constant_emissions_breakdown(total, self.time_impl, self.time_cap)
+
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
+                    year = 0,
+                    gas_type = GasTypes.CO2,
+                    emissions = [Emission(total, GasTypes.CO2) for i in range(self.time_impl + self.time_cap)],
+                    # TODO: ask Lorenzo if Biomass Loss or Gain
+                    activity = ActivityTypes.BIOMASS_GAIN
+                ))
             
             except Exception as e:
                 traceback.print_exc()
@@ -75,6 +87,13 @@ class OtherLandUseChanges:
                 delta_co2_soc = delta_c_soc_20_years * (-44/12)
 
                 self.yearly_soc_emissions, self.total_soc_emissions = soil_emissions_delta_soc_known(delta_c_soc_20_years, delta_co2_soc, 0, self.area, self.hectars_before_20)
+
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
+                    year = 0,
+                    gas_type = GasTypes.CO2,
+                    emissions = [Emission(e, GasTypes.CO2) for e in self.yearly_soc_emissions],
+                    activity = ActivityTypes.SOIL_CO2_CHANGE
+                ))
 
             except Exception as e:
                 traceback.print_exc()
@@ -102,6 +121,31 @@ class OtherLandUseChanges:
 
             self.total_fire_emissions = total_em_per_hectar * self.area
             self.yearly_fire_emissions = yearly_constant_emissions_breakdown(self.total_fire_emissions, self.time_impl, self.time_cap)
+            
+            # CALCULATE FOR INDIVIDUAL METHANE AND NITROUS EMISSIONS(the calculation on top can be removed in the future)
+            methane_em_per_hectar = methane_emissions/1000 
+            nitrous_em_per_hectar = nitrous_emissions/1000
+
+            methane_fire_emissions = methane_em_per_hectar * self.area
+            nitrous_fire_emissions = nitrous_em_per_hectar * self.area
+
+            yearly_methane_fire_emissions = yearly_constant_emissions_breakdown(methane_fire_emissions, self.time_impl, self.time_cap)
+            yearly_nitrous_fire_emissions = yearly_constant_emissions_breakdown(nitrous_fire_emissions, self.time_impl, self.time_cap)
+
+            # TODO: check if this is indeed residue burning
+            self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
+                year = 0,
+                gas_type = GasTypes.CH4,
+                emissions = [Emission(e, GasTypes.CH4) for e in yearly_methane_fire_emissions],
+                activity = ActivityTypes.RESIDUE_BURNING
+            ))
+
+            self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
+                year = 0,
+                gas_type = GasTypes.N2O,
+                emissions = [Emission(e, GasTypes.N2O) for e in yearly_nitrous_fire_emissions],
+                activity = ActivityTypes.RESIDUE_BURNING
+            ))
             
         try:
             calculate_biomass()
