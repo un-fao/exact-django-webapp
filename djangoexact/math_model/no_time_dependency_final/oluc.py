@@ -152,7 +152,7 @@ class OtherLandUseChanges:
             calculate_soc()
             calculate_fire()
 
-            self.emissions_total_yearly = [sum(x) for x in zip(self.yearly_biomass_emissions, self.yearly_soc_emissions, self.yearly_fire_emissions)]
+            self.emissions_total_yearly = [x + y + z for x,y,z in zip(self.yearly_biomass_emissions, self.yearly_soc_emissions, self.yearly_fire_emissions)]
             self.total_emissions = sum(self.emissions_total_yearly)
 
         except Exception as e:
