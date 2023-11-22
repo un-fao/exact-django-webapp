@@ -109,7 +109,7 @@ class AnnualCropland:
                 self.emissions_som_total = total
 
                 som_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in self.emissions_som_yearly], ActivityTypes.SOM)
-                self.Result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
+                self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
             
             except Exception as e:
                 traceback.print_exc()
@@ -177,8 +177,8 @@ class AnnualCropland:
             residue_burning_nitrous_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in yearly_constant_emissions_breakdown(total_nitrous, self.time_impl, self.time_cap)], ActivityTypes.RESIDUE_BURNING)
             residue_burning_methane_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in yearly_constant_emissions_breakdown(total_methane, self.time_impl, self.time_cap)], ActivityTypes.RESIDUE_BURNING)
 
-            self.Result.yearly_emissions_by_sector_by_gas.append(residue_burning_nitrous_emission_set)
-            self.Result.yearly_emissions_by_sector_by_gas.append(residue_burning_methane_emission_set)
+            self.result.yearly_emissions_by_sector_by_gas.append(residue_burning_nitrous_emission_set)
+            self.result.yearly_emissions_by_sector_by_gas.append(residue_burning_methane_emission_set)
 
 
         calculate_emissions_soil()
