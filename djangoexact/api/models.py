@@ -639,7 +639,7 @@ class CropType(Model):
     def __str__(self) -> str:
         return f"({self.pk}) {self.name}"
 
-class AnnualCropping(Assessment):
+class AnnualCropping(Assessment, SingleBiomassModule):
     user_notes = TextField(null=True, blank=True)
 
     tillage_management_type_start = ForeignKey(
@@ -950,9 +950,9 @@ class Grassland(FixedAssessment, SingleBiomassModule):
     description = TextField(null=True, blank=True)
     user_notes = TextField(null=True, blank=True)
 
-    grassland_management_type_start = ForeignKey(GrasslandManagementType,on_delete=CASCADE,related_name="%(class)s_management_type_start",null=True)
-    grassland_management_type_w = ForeignKey(GrasslandManagementType,on_delete=CASCADE,related_name="%(class)s_management_type_w",null=True)
-    grassland_management_type_wo = ForeignKey(GrasslandManagementType,on_delete=CASCADE,related_name="%(class)s_management_type_wo",null=True)
+    grassland_management_type_start = ForeignKey(GrasslandManagementType,on_delete=CASCADE,related_name="%(class)s_management_type_start",null=True, blank=True)
+    grassland_management_type_w = ForeignKey(GrasslandManagementType,on_delete=CASCADE,related_name="%(class)s_management_type_w",null=True, blank=True)
+    grassland_management_type_wo = ForeignKey(GrasslandManagementType,on_delete=CASCADE,related_name="%(class)s_management_type_wo",null=True, blank=True)
 
     is_fire_used_start = BooleanField(default=False)
     is_fire_used_w = BooleanField(default=False)
@@ -1120,22 +1120,6 @@ class ForestManagement(AssessmentNoScenarios, MultiBiomassModule):
     land_use_factor_t2_start = FloatField(null=True, blank=True)
     land_use_factor_t2_w = FloatField(null=True, blank=True)
     land_use_factor_t2_wo = FloatField(null=True, blank=True)
-
-    agb_t2_start = FloatField(null=True, blank=True)
-    agb_t2_w = FloatField(null=True, blank=True)
-    agb_t2_wo = FloatField(null=True, blank=True)
-
-    bgb_t2_start = FloatField(null=True, blank=True)
-    bgb_t2_w = FloatField(null=True, blank=True)
-    bgb_t2_wo = FloatField(null=True, blank=True)
-
-    litter_t2_start = FloatField(null=True, blank=True)
-    litter_t2_w = FloatField(null=True, blank=True)
-    litter_t2_wo = FloatField(null=True, blank=True)
-
-    deadwood_t2_start = FloatField(null=True, blank=True)
-    deadwood_t2_w = FloatField(null=True, blank=True)
-    deadwood_t2_wo = FloatField(null=True, blank=True)
     
     agb_growth_rate_le_20_yrs_t2_start = FloatField(null=True, blank=True)
     agb_growth_rate_le_20_yrs_t2_w = FloatField(null=True, blank=True)
@@ -1825,6 +1809,9 @@ class LandUseChange(Module):
     dry_matter_start = FloatField(null=True, blank=True)
     dry_matter_w = FloatField(null=True, blank=True)
     dry_matter_wo = FloatField(null=True, blank=True)
+
+    def is_filled(self):
+        return self.area is not None and self.module_type_start is not None and self.module_type_w is not None and self.module_type_wo is not None
     
 ### MODEL PARAMETERS TABLES ###
 

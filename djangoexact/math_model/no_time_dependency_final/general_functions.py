@@ -193,11 +193,11 @@ def soil_emissions(hectars_before_20, area_start, area_end,
 
 def soil_emissions_delta_soc_known(delta_soil_c, delta_soil_c_20_years, area_start, area_end, hectars_before_20):
 
-    maximum = - delta_soil_c * max(area_start, area_end)
+    maximum = delta_soil_c_20_years * max(area_start, area_end) * 20
 
     total_hectars_soil = sum(hectars_before_20)
     
-    predicted_emissions = - delta_soil_c_20_years * total_hectars_soil
+    predicted_emissions = delta_soil_c_20_years * total_hectars_soil
 
     emissions = predicted_emissions if abs(predicted_emissions) < abs(maximum) else maximum
 
