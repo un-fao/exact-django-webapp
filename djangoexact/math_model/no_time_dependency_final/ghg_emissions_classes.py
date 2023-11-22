@@ -119,10 +119,14 @@ class Result:
         return self.balance
     
     def __add__(self, other):
+        if other.yearly_emissions_by_sector_by_gas == []:
+            return self
         self.yearly_emissions_by_sector_by_gas = [YearlyGasActivityEmissionSet(i.year, i.gas_type, [x + y for x,y in zip(i.emissions, j.emissions)], i.activity) for i,j in zip(self.yearly_emissions_by_sector_by_gas, other.yearly_emissions_by_sector_by_gas)]
         return self
 
     def __sub__(self, other):
+        if other.yearly_emissions_by_sector_by_gas == []:
+            return self
         self.yearly_emissions_by_sector_by_gas = [YearlyGasActivityEmissionSet(i.year, i.gas_type, [x - y for x,y in zip(i.emissions, j.emissions)], i.activity) for i,j in zip(self.yearly_emissions_by_sector_by_gas, other.yearly_emissions_by_sector_by_gas)]
         return self
 
