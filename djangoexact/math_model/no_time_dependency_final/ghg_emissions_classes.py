@@ -1,5 +1,5 @@
 from enum import Enum
-
+import copy
 class GasTypes(Enum):
     CO2 = "CO2"
     CH4 = "CH4"
@@ -125,9 +125,12 @@ class Result:
         return self
 
     def __sub__(self, other):
+
+        obj = copy.deepcopy(self)
+
         if other.yearly_emissions_by_sector_by_gas == []:
             return self
-        self.yearly_emissions_by_sector_by_gas = [YearlyGasActivityEmissionSet(i.year, i.gas_type, [x - y for x,y in zip(i.emissions, j.emissions)], i.activity) for i,j in zip(self.yearly_emissions_by_sector_by_gas, other.yearly_emissions_by_sector_by_gas)]
+        self.yearly_emissions_by_sector_by_gas = [YearlyGasActivityEmissionSet(i.year, i.gas_type, [x - abs(y) for x,y in zip(i.emissions, j.emissions)], i.activity) for i,j in zip(self.yearly_emissions_by_sector_by_gas, other.yearly_emissions_by_sector_by_gas)]
         return self
 
     # Here add all necessary functions for result aggregation depending on what Claudio needs
