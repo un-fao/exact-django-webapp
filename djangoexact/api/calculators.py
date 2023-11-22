@@ -696,8 +696,6 @@ class AnnualCroppingCalculator(BaseCalculator):
         input: AnnualCropping = self.data
         project: Project = input.activity.project
         luc: LandUseChange = input.land_use_change
-        if luc and not luc.is_filled():
-            raise Exception("Land use change module is not filled")
         
         change_rate = input.activity.change_rate
         climate = project.climate
@@ -722,7 +720,7 @@ class AnnualCroppingCalculator(BaseCalculator):
 
 
         # Start
-        if luc and luc.module_type_start.class_name == "AnnualCropping":
+        if not luc or (luc and luc.module_type_start.class_name == "AnnualCropping"):
             land_use_type_start = input.land_use_type_start
             minor_land_use_type_start = input.minor_land_use_type_start
             fires_combustion_factor_start = FiresCombustionFactor.objects.get(land_use_type=land_use_type_start)
@@ -789,7 +787,7 @@ class AnnualCroppingCalculator(BaseCalculator):
             results_start = AnnualCropland(*inputs_start)
             results_start.calculate_emissions()
 
-        if luc and luc.module_type_wo.class_name == "AnnualCropping":
+        if not luc or (luc and luc.module_type_wo.class_name == "AnnualCropping"):
             # Without
 
             land_use_type_wo = input.land_use_type_wo
@@ -859,7 +857,7 @@ class AnnualCroppingCalculator(BaseCalculator):
             results_wo = AnnualCropland(*inputs_wo)
             results_wo.calculate_emissions()
 
-        if luc and luc.module_type_w.class_name == "AnnualCropping":
+        if not luc or (luc and luc.module_type_w.class_name == "AnnualCropping"):
             # With
             land_use_type_w = input.land_use_type_w
             minor_land_use_type_w = input.minor_land_use_type_w
@@ -1270,7 +1268,7 @@ class GrasslandCalculator(BaseCalculator):
         luc: LandUseChange = module.land_use_change
 
         # NOTE: Redundant
-        if not luc.is_filled():
+        if luc and not luc.is_filled():
             raise ValueError("Land use change is not filled")
 
         change_rate = module.activity.change_rate
@@ -1284,7 +1282,7 @@ class GrasslandCalculator(BaseCalculator):
         math_w = None
         math_wo = None
 
-        if luc and luc.module_type_start.class_name == "Grassland":
+        if not luc or (luc and luc.module_type_start.class_name == "Grassland"):
             soc_start = GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_start, climate=project.climate)
 
             inputs_start = [
@@ -1313,7 +1311,7 @@ class GrasslandCalculator(BaseCalculator):
             math_start = MathGrassland(*inputs_start)
             math_start.calculate_emissions()
 
-        if luc and luc.module_type_w.class_name == "Grassland":
+        if not luc or (luc and luc.module_type_w.class_name == "Grassland"):
 
             soc_w = GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_w, climate=project.climate)
 
@@ -1346,7 +1344,7 @@ class GrasslandCalculator(BaseCalculator):
             math_w = MathGrassland(*inputs_w)
             math_w.calculate_emissions()
 
-        if luc and luc.module_type_wo.class_name == "Grassland":
+        if not luc or (luc and luc.module_type_wo.class_name == "Grassland"):
 
             soc_wo = GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_wo, climate=project.climate)
 
