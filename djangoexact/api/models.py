@@ -504,12 +504,13 @@ class Module(Historical):
     class Meta:
         abstract = True
 class BiomassModule(Module):
+
     class Meta:
         abstract = True
 
     @abstractmethod
     def get_biomass_t2(self, scenario: ScenarioTypes):
-        pass
+        return getattr(self, f"soc_t2_{scenario.value}")
 
 class SingleBiomassModule(BiomassModule):
     biomass_t2_start = FloatField(null=True, blank=True)
@@ -520,7 +521,7 @@ class SingleBiomassModule(BiomassModule):
         abstract = True
 
     def get_biomass_t2(self, scenario: ScenarioTypes):
-        return getattr(self, f"biomass_t2_{scenario.value}")
+        return super().get_biomass_t2(scenario) + getattr(self, f"biomass_t2_{scenario.value}")
 
 class DoubleBiomassModule(BiomassModule):
     agb_t2_start = FloatField(null=True, blank=True)
@@ -535,7 +536,7 @@ class DoubleBiomassModule(BiomassModule):
         abstract = True
 
     def get_biomass_t2(self, scenario: ScenarioTypes):
-        return getattr(self, f"agb_t2_{scenario.value}") + getattr(self, f"bgb_t2_{scenario.value}")
+        return super().get_biomass_t2(scenario) + getattr(self, f"agb_t2_{scenario.value}") + getattr(self, f"bgb_t2_{scenario.value}")
     
 class MultiBiomassModule(DoubleBiomassModule):
     litter_t2_start = FloatField(null=True, blank=True)
