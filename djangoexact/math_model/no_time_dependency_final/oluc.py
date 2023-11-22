@@ -69,7 +69,7 @@ class OtherLandUseChanges:
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
                     year = 0,
                     gas_type = GasTypes.CO2,
-                    emissions = [Emission(total, GasTypes.CO2) for i in range(self.time_impl + self.time_cap)],
+                    emissions = [Emission(e, GasTypes.CO2) for e in self.yearly_biomass_emissions],
                     # TODO: ask Lorenzo if Biomass Loss or Gain
                     activity = ActivityTypes.BIOMASS_GAIN
                 ))
@@ -80,11 +80,11 @@ class OtherLandUseChanges:
         def calculate_soc():
 
             try:
-                initial_soc = self.socref * self.initial_flu if not self.initial_soc_tier_2 else self.initial_soc_tier_2
-                final_soc = self.socref * self.final_flu if not self.final_soc_tier_2 else self.final_soc_tier_2
+                initial_soc = self.socref if not self.initial_soc_tier_2 else self.initial_soc_tier_2
+                final_soc = self.socref if not self.final_soc_tier_2 else self.final_soc_tier_2
 
                 delta_c_soc_20_years = (final_soc - initial_soc)/20
-                delta_co2_soc = delta_c_soc_20_years * (-44/12)
+                delta_co2_soc = ((final_soc * self.final_flu - initial_soc * self.initial_flu)/20) * (-44/12)
 
                 self.yearly_soc_emissions, self.total_soc_emissions = soil_emissions_delta_soc_known(delta_c_soc_20_years, delta_co2_soc, 0, self.area, self.hectars_before_20)
 
@@ -152,7 +152,7 @@ class OtherLandUseChanges:
             calculate_soc()
             calculate_fire()
 
-            self.emissions_total_yearly = [sum(x) for x in zip(self.yearly_biomass_emissions, self.yearly_soc_emissions, self.yearly_fire_emissions)]
+            self.emissions_total_yearly = [x + y + z for x,y,z in zip(self.yearly_biomass_emissions, self.yearly_soc_emissions, self.yearly_fire_emissions)]
             self.total_emissions = sum(self.emissions_total_yearly)
 
         except Exception as e:
