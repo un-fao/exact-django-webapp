@@ -639,7 +639,7 @@ class CropType(Model):
     def __str__(self) -> str:
         return f"({self.pk}) {self.name}"
 
-class AnnualCropping(Assessment):
+class AnnualCropping(Assessment, SingleBiomassModule):
     user_notes = TextField(null=True, blank=True)
 
     tillage_management_type_start = ForeignKey(
@@ -1120,22 +1120,6 @@ class ForestManagement(AssessmentNoScenarios, MultiBiomassModule):
     land_use_factor_t2_start = FloatField(null=True, blank=True)
     land_use_factor_t2_w = FloatField(null=True, blank=True)
     land_use_factor_t2_wo = FloatField(null=True, blank=True)
-
-    agb_t2_start = FloatField(null=True, blank=True)
-    agb_t2_w = FloatField(null=True, blank=True)
-    agb_t2_wo = FloatField(null=True, blank=True)
-
-    bgb_t2_start = FloatField(null=True, blank=True)
-    bgb_t2_w = FloatField(null=True, blank=True)
-    bgb_t2_wo = FloatField(null=True, blank=True)
-
-    litter_t2_start = FloatField(null=True, blank=True)
-    litter_t2_w = FloatField(null=True, blank=True)
-    litter_t2_wo = FloatField(null=True, blank=True)
-
-    deadwood_t2_start = FloatField(null=True, blank=True)
-    deadwood_t2_w = FloatField(null=True, blank=True)
-    deadwood_t2_wo = FloatField(null=True, blank=True)
     
     agb_growth_rate_le_20_yrs_t2_start = FloatField(null=True, blank=True)
     agb_growth_rate_le_20_yrs_t2_w = FloatField(null=True, blank=True)
