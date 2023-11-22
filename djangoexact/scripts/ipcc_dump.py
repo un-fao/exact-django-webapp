@@ -2427,34 +2427,6 @@ for i, row in enumerate(df_dict2):
         agb_growth_max=agb_growth_max,
     )
 
-
-# CroplandFLU.objects.all().delete()
-with open("scripts/ipcc_data/CroplandFLU.csv", "r") as f:
-    reader = csv.reader(f)
-    header = next(reader, None)
-    data = list(reader)
-
-    for i, head in enumerate(header):
-        head = sanitize(head).title()
-        land_use_type = LandUseType.objects.get_or_create(name=head)[0]
-        for row in data:
-            if sanitize(row[0]) == "":
-                continue
-
-            climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
-            moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
-
-            value = row[i + 2]
-
-            print(f"{land_use_type}, {climate}, {moisture}, {value}")
-
-            CroplandFLU.objects.get_or_create(
-                land_use_type=land_use_type,
-                climate=climate,
-                moisture=moisture,
-                value=value,
-            )
-
 # CropNitrousEstimationDefaultFactor.objects.all().delete()
 with open("scripts/ipcc_data/CropNitrousEstimationDefaultFactors.csv", "r") as f:
     reader = csv.reader(f)
@@ -2471,22 +2443,6 @@ with open("scripts/ipcc_data/CropNitrousEstimationDefaultFactors.csv", "r") as f
             rs_t=row[4],
             n_bg_t=row[5],
         )
-
-# FiresCombustionFactor.objects.all().delete()
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "FiresCombustionFactors.csv"),
-    header=[0],
-    sep=";",
-)
-
-for i, row in df.iterrows():
-    land_use_type = LandUseType.objects.get_or_create(name=sanitize(row["land_use_type"]))[0]
-    combustion_factor = FiresCombustionFactor.objects.get_or_create(
-        land_use_type=land_use_type,
-        value=float(row["value"]),
-    )[0]
-
-    print(combustion_factor)
 
 # CropYieldStats.objects.all().delete()
 df = pd.read_csv(
@@ -2890,7 +2846,6 @@ with open("scripts/ipcc_data/CoastalAGB.csv", "r") as f:
             value=value,
             unit=unit
         )
-"""
 
 # CoastalBGB
 CoastalBGB.objects.all().delete()
@@ -3258,3 +3213,72 @@ with open("scripts/ipcc_data/CropNitrousEstimationDefaultFactors.csv", "r") as f
             rs_t=parse_csv_number(row[4]),
             n_bg_t=parse_csv_number(row[5]),
         )
+
+CroplandFLU.objects.all().delete()
+with open("scripts/ipcc_data/CroplandFLU.csv", "r") as f:
+    reader = csv.reader(f)
+    header = next(reader, None)
+    data = list(reader)
+
+    for i, head in enumerate(header):
+        head = sanitize(head).title()
+        land_use_type = LandUseType.objects.get_or_create(name=head)[0]
+        for row in data:
+            if sanitize(row[0]) == "":
+                continue
+
+            climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
+            moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
+
+            value = row[i + 2]
+
+            print(f"{land_use_type}, {climate}, {moisture}, {value}")
+
+            CroplandFLU.objects.get_or_create(
+                land_use_type=land_use_type,
+                climate=climate,
+                moisture=moisture,
+                value=value,
+            )
+
+FiresCombustionFactor.objects.all().delete()
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "FiresCombustionFactors.csv"),
+    header=[0],
+    sep=";",
+)
+
+for i, row in df.iterrows():
+    land_use_type = LandUseType.objects.get_or_create(name=sanitize(row["land_use_type"]))[0]
+    combustion_factor = FiresCombustionFactor.objects.get_or_create(
+        land_use_type=land_use_type,
+        value=float(row["value"]),
+    )[0]
+
+    print(combustion_factor)
+
+
+NitrousEmissionFactor.objects.all().delete()
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "NitrousEmissionFactors.csv"),
+    header=[0],
+    sep=";",
+)
+
+for i, row in df.iterrows():
+    moisture = Moisture.objects.get_or_create(name=sanitize(row["moisture"]))[0]
+    name = sanitize(row["input_type"])
+    value = parse_csv_number(row["value"])
+
+    print(
+        moisture,
+        name,
+        value,
+    )
+
+    NitrousEmissionFactor.objects.get_or_create(
+        moisture=moisture,
+        name=name,
+        value=value,
+    )
+"""
