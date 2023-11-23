@@ -163,9 +163,13 @@ class ActivityBuilderSerializer(serializers.Serializer):
     """
 
     class LandUseChangeBuilderSerializer(serializers.ModelSerializer):
+
+        module_type_start = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), required=True)
+        module_type_w = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), required=True)
+        module_type_wo = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), required=True)
         class Meta:
             model = LandUseChange
-            fields = ["module_type_start", "module_type_w", "module_type_wo", "area"]
+            fields = ["module_type_start", "module_type_w", "module_type_wo"]
             ref_name = "LandUseChange"
 
     project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(), required=True)
@@ -176,6 +180,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
     land_use_change = LandUseChangeBuilderSerializer(many=False, required=False)
     modules = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
     has_input = serializers.BooleanField(default=False, required=False)
+    area = serializers.FloatField(required=True)
 
     def validate(self, data):
         luc_module: ModuleType = ModuleType.objects.filter(name="Land Use Change").first()
@@ -197,14 +202,23 @@ class ActivityBuilderSerializer(serializers.Serializer):
             )
 
             if self.validated_data.get("land_use_change", None):
-                land_use_change = LandUseChange.objects.create(**self.validated_data["land_use_change"], activity=activity)
+                land_use_change = LandUseChange.objects.create(**self.validated_data["land_use_change"], activity=activity, area=self.validated_data["area"])
                 land_use_change.save()
             
             if self.validated_data.get("modules", None):
                 for module_type in self.validated_data["modules"]:
                     try:
                         Module = apps.get_model("api", module_type.class_name)
-                        Module.objects.create(activity=activity)
+
+                        data = {"activity": activity}
+
+                        if self.validated_data.get("land_use_change", None) and module_type.is_luc:
+                            data["land_use_change"] = land_use_change
+                        elif getattr(Module, "area", None):
+                            data["area"] = self.validated_data["area"]
+
+                        Module.objects.create(**data)
+
                     except AttributeError:
                         raise serializers.ValidationError(f"Invalid module type: {module_type.class_name}")
         except Exception as e:

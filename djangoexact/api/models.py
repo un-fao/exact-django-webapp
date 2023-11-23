@@ -600,6 +600,8 @@ class OtherLandUse(Module):
 class Assessment(Module):
     land_use_change = OneToOneField("api.LandUseChange", on_delete=CASCADE, null=True, blank=True, related_name="%(class)s")
 
+    area = FloatField(null=True, blank=True)
+
     # TODO: Add land_use_types start/w/wo for all assessments
     land_use_type_start = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_start")
     land_use_type_w = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_w")
@@ -622,9 +624,9 @@ class FixedAssessment(Assessment):
     # TODO: Rework
     # def save(self, *args, **kwargs):
     #     if not self.land_use_type_start:
-    #         self.land_use_type_start = LandUseType.objects.get(module_types__class_name=self.__class__.__name__)
-    #         self.land_use_type_w = LandUseType.objects.get(module_types__class_name=self.__class__.__name__)
-    #         self.land_use_type_wo = LandUseType.objects.get(module_types__class_name=self.__class__.__name__)
+    #         self.land_use_type_start = LandUseType.objects.get(name=self.__class__.__name__)
+    #         self.land_use_type_w = self.land_use_type_start
+    #         self.land_use_type_wo = self.land_use_type_start
 
     #     super().save(*args, **kwargs)
 
@@ -1073,7 +1075,7 @@ class Livestock(Module):
 ##### Forest Management #####
 
 
-class ForestManagement(AssessmentNoScenarios, MultiBiomassModule):
+class ForestManagement(Assessment, MultiBiomassModule):
     forest_type = ForeignKey(ForestType, on_delete=CASCADE, null=True, blank=True)
 
     ##### ROTATION #####
@@ -1153,6 +1155,12 @@ class ForestManagement(AssessmentNoScenarios, MultiBiomassModule):
     degradation_dry_matter_impacted_t2_start = FloatField(null=True, blank=True)
     degradation_dry_matter_impacted_t2_w = FloatField(null=True, blank=True)
     degradation_dry_matter_impacted_t2_wo = FloatField(null=True, blank=True)
+
+    # def save(self, *args, **kwargs):
+    #     if not self.land_use_type_start:
+    #         self.land_use_type_start = LandUseType.objects.get(name="Agroforestry")
+    #         self.land_use_type_w = self.land_use_type_start
+    #         self.land_use_type_wo = self.land_use_type_start
 
 class DisturbanceType(Module):
     name = CharField(max_length=255)
@@ -1770,7 +1778,7 @@ class SetAside(SingleBiomassModule):
     bgb_t2_w = FloatField(null=True, blank=True)
     bgb_t2_wo = FloatField(null=True, blank=True)
 
-class DegradedLand(SingleBiomassModule):
+class DegradedLand(Assessment, SingleBiomassModule):
     ha_start = FloatField(null=True, blank=True)
     ha_w = FloatField(null=True, blank=True)
     ha_wo = FloatField(null=True, blank=True)
@@ -1794,6 +1802,14 @@ class DegradedLand(SingleBiomassModule):
     bgb_t2_start = FloatField(null=True, blank=True)
     bgb_t2_w = FloatField(null=True, blank=True)
     bgb_t2_wo = FloatField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.land_use_type_start:
+            self.land_use_type_start = LandUseType.objects.get(name="Degraded Land")
+            self.land_use_type_w = self.land_use_type_start
+            self.land_use_type_wo = self.land_use_type_start
+
+        super().save(*args, **kwargs)
 
 class LandUseChange(Module):
 
