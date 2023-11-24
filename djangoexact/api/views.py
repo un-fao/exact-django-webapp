@@ -92,6 +92,13 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
 
+    def create(self, request, *args, **kwargs):
+        """
+        Creates a new project for a given user.
+        """
+        request.data["user"] = self.request.user.pk
+        return super().create(request, *args, **kwargs)
+
     @swagger_auto_schema(manual_parameters=[project_id], responses={404: "Project not found"})
     def retrieve(self, request, pk=None):
         """

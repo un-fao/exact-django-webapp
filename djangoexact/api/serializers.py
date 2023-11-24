@@ -111,15 +111,35 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'email', 'first_name', 'last_name']
 
+class CountrySerializer(serializers.ModelSerializer):
+    region = get_model_serializer(Region)(many=False, read_only=True)
+    ipcc_region = get_model_serializer(IPCCRegion)(many=False, read_only=True)
+    gleam_region = get_model_serializer(GLEAMRegion)(many=False, read_only=True)
+    class Meta:
+        model = Country
+        fields = "__all__"
+        ref_name = "Country"
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'first_name', 'last_name']
+
 class ProjectSerializer(serializers.ModelSerializer):
-    climate = get_model_serializer(Climate)(many=False)
-    region = get_model_serializer(Region)(many=False)
-    country = get_model_serializer(Country)(many=False)
-    moisture = get_model_serializer(Moisture)(many=False)
-    soil_type = get_model_serializer(SoilType)(many=False)
-    gw_potential = get_model_serializer(GlobalWarmingPotential)(many=False)
-    soc_ref = get_model_serializer(SoilOrganicCarbon)(many=False)
-    status = get_model_serializer(ProjectStatus)(many=False)
+    climate = get_model_serializer(Climate)(many=False, read_only=True)
+    country = CountrySerializer(many=False, read_only=True)
+    moisture = get_model_serializer(Moisture)(many=False, read_only=True)
+    soil_type = get_model_serializer(SoilType)(many=False, read_only=True)
+    gw_potential = get_model_serializer(GlobalWarmingPotential)(many=False, read_only=True)
+    status = get_model_serializer(ProjectStatus)(many=False, required=False, read_only=True)
+    user = UserSerializer(many=False, read_only=True)
+
+    climate = serializers.PrimaryKeyRelatedField(queryset=Climate.objects.all(), required=True)
+    country = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(), required=True)
+    moisture = serializers.PrimaryKeyRelatedField(queryset=Moisture.objects.all(), required=True)
+    soil_type = serializers.PrimaryKeyRelatedField(queryset=SoilType.objects.all(), required=True)
+    gw_potential = serializers.PrimaryKeyRelatedField(queryset=GlobalWarmingPotential.objects.all(), required=True)
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)
 
     class Meta:
         model = Project
