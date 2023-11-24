@@ -130,7 +130,7 @@ class CalculatorFactory:
 
             calculator: BaseCalculator = CalculatorClass(input)
 
-            result: tuple = calculator.calculate(aggregate_by=aggregate_by)
+            result: tuple[MathResult] = calculator.calculate()
 
             return Result(*result).breakdown(by=aggregate_by)
 
@@ -1480,10 +1480,10 @@ class SmallFisheryCalculator(BaseCalculator):
         math_w.calculate_emissions()
         math_wo.calculate_emissions()
 
-        results_w = math_w.total_emissions
-        results_wo = math_wo.total_emissions
+        results_w = math_w.result
+        results_wo = math_wo.result
 
-        return Result(results_w, results_wo)
+        return (results_w, results_wo)
 
 class LargeFisheryCalculator(BaseCalculator):
     """
@@ -1605,10 +1605,10 @@ class LargeFisheryCalculator(BaseCalculator):
         math_w.calculate_emissions()
         math_wo.calculate_emissions()
 
-        results_w = math_w.total_emissions
-        results_wo = math_wo.total_emissions
+        results_w = math_w.result
+        results_wo = math_wo.result
 
-        return Result(results_w, results_wo)
+        return (results_w, results_wo)
 
 # TODO: Delete
 class ForestCalculator(BaseCalculator):
