@@ -63,7 +63,7 @@ class Fishery:
         self.emissions_total_yearly = []
         self.total_emissions = 0
 
-        self.result = Result(self.time_impl, self.time_cap)
+        self.result = Result(self.implementation_time, self.capitalization_time)
 
     def calculate_emissions(self):
         
