@@ -582,6 +582,8 @@ class OtherLandUseCalculator(BaseCalculator):
         moisture = project.moisture
         continent = project.country.region
 
+        soc = SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=project.soil_type)
+
         cm = {
             "climate": climate,
             "moisture": moisture,
@@ -636,7 +638,7 @@ class OtherLandUseCalculator(BaseCalculator):
                 input.activity.project.gw_potential.ch4,
                 input.activity.project.gw_potential.n2o,
                 luc.is_fire_used_w,
-                project.soc_ref.value,
+                soc.value,
                 flu_initial.value,
                 flu_final_w.value,
                 input.soc_t2_start,
@@ -664,7 +666,7 @@ class OtherLandUseCalculator(BaseCalculator):
                 input.activity.project.gw_potential.ch4,
                 input.activity.project.gw_potential.n2o,
                 luc.is_fire_used_wo,
-                project.soc_ref.value,
+                soc.value,
                 flu_initial.value,
                 flu_final_wo.value,
                 input.soc_t2_start,
