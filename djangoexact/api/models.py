@@ -143,7 +143,7 @@ class ProjectStatus(Model):
         return self.name
 
 
-class Continent(Model):
+class Region(Model):
     name = CharField(max_length=100, unique=True)
 
     def __str__(self):
@@ -153,7 +153,7 @@ class Continent(Model):
 class Country(Model):
     name = CharField(max_length=100, unique=True)
     continent = ForeignKey(
-        Continent, on_delete=CASCADE, null=True, blank=True, related_name="countries"
+        Region, on_delete=CASCADE, null=True, blank=True, related_name="countries"
     )
     ipcc_region = ForeignKey(
         IPCCRegion, on_delete=CASCADE, null=True, blank=True, related_name="countries"
@@ -422,19 +422,19 @@ class Project(Historical):
     # id = UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     user = ForeignKey(User, on_delete=CASCADE, related_name="projects")
-    date = DateTimeField(auto_now_add=True)
+    date = DateTimeField(auto_now_add=True, null=True, blank=True)
     name = CharField(max_length=100)
-    code = CharField(max_length=100)
-    cost = FloatField()
-    funding_agency = CharField(max_length=100)
-    executing_agency = CharField(max_length=100)
-    status = ForeignKey(ProjectStatus, on_delete=CASCADE)
+    code = CharField(max_length=100, null=True, blank=True)
+    cost = FloatField(null=True, blank=True)
+    funding_agency = CharField(max_length=100, null=True, blank=True)
+    executing_agency = CharField(max_length=100, null=True, blank=True)
+    status = ForeignKey(ProjectStatus, on_delete=CASCADE, null=True, blank=True)
 
     implementation_duration_yrs = IntegerField()
     capitalization_duration_yrs = IntegerField()
 
     # TODO: Rename continent to region
-    continent = ForeignKey(Continent, on_delete=CASCADE)
+    region = ForeignKey(Region, on_delete=CASCADE)
     country = ForeignKey(Country, on_delete=CASCADE)
     climate = ForeignKey(Climate, on_delete=CASCADE)
     moisture = ForeignKey(Moisture, on_delete=CASCADE)
@@ -442,7 +442,6 @@ class Project(Historical):
 
     gw_potential = ForeignKey("ipcc.GlobalWarmingPotential", on_delete=CASCADE)
 
-    soc_ref = ForeignKey("ipcc.SoilOrganicCarbon", on_delete=CASCADE)
     soc_ref_t2 = FloatField(null=True, blank=True)
 
     def __str__(self):
