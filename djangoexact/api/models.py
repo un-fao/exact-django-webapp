@@ -510,7 +510,10 @@ class BiomassModule(Module):
 
     @abstractmethod
     def get_biomass_t2(self, scenario: ScenarioTypes):
-        return getattr(self, f"soc_t2_{scenario.value}")
+        try:
+            return getattr(self, f"soc_t2_{scenario.value}")
+        except TypeError:
+            return None
 
 class SingleBiomassModule(BiomassModule):
     biomass_t2_start = FloatField(null=True, blank=True)
@@ -521,7 +524,10 @@ class SingleBiomassModule(BiomassModule):
         abstract = True
 
     def get_biomass_t2(self, scenario: ScenarioTypes):
-        return super().get_biomass_t2(scenario) + getattr(self, f"biomass_t2_{scenario.value}")
+        try:
+            return super().get_biomass_t2(scenario) + getattr(self, f"biomass_t2_{scenario.value}")
+        except TypeError:
+            return None
 
 class DoubleBiomassModule(BiomassModule):
     agb_t2_start = FloatField(null=True, blank=True)
@@ -536,8 +542,10 @@ class DoubleBiomassModule(BiomassModule):
         abstract = True
 
     def get_biomass_t2(self, scenario: ScenarioTypes):
-        return super().get_biomass_t2(scenario) + getattr(self, f"agb_t2_{scenario.value}") + getattr(self, f"bgb_t2_{scenario.value}")
-    
+        try:
+            return super().get_biomass_t2(scenario) + getattr(self, f"agb_t2_{scenario.value}") + getattr(self, f"bgb_t2_{scenario.value}")
+        except TypeError:
+            return None
 class MultiBiomassModule(DoubleBiomassModule):
     litter_t2_start = FloatField(null=True, blank=True)
     litter_t2_w = FloatField(null=True, blank=True)
@@ -551,8 +559,10 @@ class MultiBiomassModule(DoubleBiomassModule):
         abstract = True
 
     def get_biomass_t2(self, scenario: ScenarioTypes):
-        return super().get_biomass_t2(scenario) + getattr(self, f"litter_t2_{scenario.value}") + getattr(self, f"deadwood_t2_{scenario.value}")
-
+        try:
+            return super().get_biomass_t2(scenario) + getattr(self, f"litter_t2_{scenario.value}") + getattr(self, f"deadwood_t2_{scenario.value}")
+        except TypeError:
+            return None
 
 ##### Land Use Changes #####
 
