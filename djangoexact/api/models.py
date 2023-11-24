@@ -152,7 +152,7 @@ class Region(Model):
 
 class Country(Model):
     name = CharField(max_length=100, unique=True)
-    continent = ForeignKey(
+    region = ForeignKey(
         Region, on_delete=CASCADE, null=True, blank=True, related_name="countries"
     )
     ipcc_region = ForeignKey(
@@ -433,8 +433,6 @@ class Project(Historical):
     implementation_duration_yrs = IntegerField()
     capitalization_duration_yrs = IntegerField()
 
-    # TODO: Rename continent to region
-    region = ForeignKey(Region, on_delete=CASCADE)
     country = ForeignKey(Country, on_delete=CASCADE)
     climate = ForeignKey(Climate, on_delete=CASCADE)
     moisture = ForeignKey(Moisture, on_delete=CASCADE)
@@ -446,6 +444,10 @@ class Project(Historical):
 
     def __str__(self):
         return f"({self.pk}) {self.name}"
+    
+    class Meta:
+        verbose_name_plural = "Projects"
+        unique_together = ("name", "user")
 
 
 ##############################

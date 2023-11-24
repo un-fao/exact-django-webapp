@@ -232,7 +232,7 @@ class DeforestationCalculator(BaseCalculator):
         change_rate = module.activity.change_rate
         climate = project.climate
         moisture = project.moisture
-        continent = project.region
+        continent = project.country.region
         soil_type = project.soil_type
 
         forest: ForestManagement = module.activity.forestmanagement
@@ -402,7 +402,7 @@ class AfforestationCalculator(BaseCalculator):
         luc: LandUseChange = input.land_use_change
         lut = self.data.land_use_type
         vt = self.data.vegetation_type
-        continent = project.region
+        continent = project.country.region
 
         cml_start = {
             "climate": project.climate,
@@ -580,7 +580,7 @@ class OtherLandUseCalculator(BaseCalculator):
         project: Project = self.data.activity.project
         climate = project.climate
         moisture = project.moisture
-        continent = project.region
+        continent = project.country.region
 
         cm = {
             "climate": climate,
@@ -741,7 +741,7 @@ class AnnualCroppingCalculator(BaseCalculator):
                 input.crop_yield_start
                 if input.crop_yield_start
                 else CropYieldStats.objects.get_or_region_average(
-                    continent=project.region, land_use_type=land_use_type_start
+                    continent=project.country.region, land_use_type=land_use_type_start
                 ).average
             )
 
@@ -811,7 +811,7 @@ class AnnualCroppingCalculator(BaseCalculator):
                 input.crop_yield_wo
                 if input.crop_yield_wo
                 else CropYieldStats.objects.get_or_region_average(
-                    continent=project.region, land_use_type=land_use_type_wo
+                    continent=project.country.region, land_use_type=land_use_type_wo
                 ).average
             )
 
@@ -879,7 +879,7 @@ class AnnualCroppingCalculator(BaseCalculator):
                 input.crop_yield_w
                 if input.crop_yield_w
                 else CropYieldStats.objects.get_or_region_average(
-                    continent=project.region, land_use_type=land_use_type_w
+                    continent=project.country.region, land_use_type=land_use_type_w
                 ).average
             )
 
@@ -948,7 +948,7 @@ class PerennialCroppingCalculator(BaseCalculator):
         luc: LandUseChange = module.land_use_change
         climate = project.climate
         moisture = project.moisture
-        continent = project.region
+        continent = project.country.region
         parent, _ = utils.get_relative(module)
         change_rate = module.activity.change_rate
 
@@ -1113,8 +1113,8 @@ class FloodedRiceCalculator(BaseCalculator):
         area = luc.area if luc.area else input.area
         
         flu = LandUseCarbonStockExchangeFactor.objects.get(land_use_type__name="Flooded Rice", climate=project.climate, moisture=project.moisture)
-        efc = RiceDefaultEmissionFactor.objects.get(continent=project.country.continent,)
-        yield_ref = RiceYield.objects.get(continent=project.region)
+        efc = RiceDefaultEmissionFactor.objects.get(continent=project.country.region,)
+        yield_ref = RiceYield.objects.get(continent=project.country.region)
 
         sfw_start = RiceSFW.objects.get(water_management_type_after_cultivation=input.water_management_type_after_cultivation_start)
         sfw_w = RiceSFW.objects.get(water_management_type_after_cultivation=input.water_management_type_after_cultivation_w)
@@ -1411,7 +1411,7 @@ class SmallFisheryCalculator(BaseCalculator):
         tonnes_ice_default = SmallFisheryParameter.objects.get(name="tonnes_ice_default").value
         kw_tonnes = SmallFisheryParameter.objects.get(name="kw_tonnes").value
 
-        electricity_emission = ElectricityEmission.objects.get(country=project.country, continent=project.region)
+        electricity_emission = ElectricityEmission.objects.get(country=project.country, continent=project.country.region)
 
         inputs_w = [
             project.implementation_duration_yrs,
@@ -1533,7 +1533,7 @@ class LargeFisheryCalculator(BaseCalculator):
         )
 
         electricity_emission = ElectricityEmission.objects.get(
-            country=electricity_country, continent=project.region
+            country=electricity_country, continent=project.country.region
         )
 
         #  TODO: Change fui to T2
@@ -1644,10 +1644,10 @@ class ForestCalculator(BaseCalculator):
                 vegetation_type=self.data.vegetation_type
             )
             f_agb = ForestAGB.objects.get(
-                continent=project.region, vegetation_type=self.data.vegetation_type
+                continent=project.country.region, vegetation_type=self.data.vegetation_type
             )
             f_bgb = BelowGroundBiomass.objects.get_max_below_threshold(
-                continent=project.region,
+                continent=project.country.region,
                 vegetation_type=self.data.vegetation_type,
                 threshold=f_agb.value,
             )
@@ -1858,7 +1858,7 @@ class ElectricityCalculator(BaseCalculator):
         input: Electricity = self.data
         project: Project = self.data.activity.project
 
-        elec: ElectricityEmission = ElectricityEmission.objects.get(country=project.country, continent=project.country.continent)  # TODO: Remove continent from model and from project
+        elec: ElectricityEmission = ElectricityEmission.objects.get(country=project.country, continent=project.country.region)  # TODO: Remove continent from model and from project
 
         inputs_w = [
             elec.operating_margin
@@ -3401,7 +3401,7 @@ class ForestManagementCalculator(BaseCalculator):
         land_use_type = input.land_use_type if luc.module_type_start.class_name == "ForestManagement" else input.land_use_type_start
         land_use_type = LandUseType.objects.get(name=land_use_type.name)
 
-        cvt = {"continent": project.region, "vegetation_type": land_use_type} # TODO: Change to land use type
+        cvt = {"continent": project.country.region, "vegetation_type": land_use_type} # TODO: Change to land use type
 
         # ag_net_biomass_start = AboveGroundNetBiomassGrowth.objects.get(**cvt) # TODO: Change to land use type
         # ag_net_biomass_end = AboveGroundNetBiomassGrowth.objects.get(**cvt) # TODO: Change to land use type
