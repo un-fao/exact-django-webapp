@@ -39,7 +39,7 @@ class TotalBiomassAfterDefoManager(Manager):
 class TotalBiomassAfterDefo(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
-    continent = ForeignKey("api.Continent", on_delete=CASCADE)
+    continent = ForeignKey("api.Region", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     year = IntegerField(null=True)
     value = FloatField(null=True)
@@ -150,7 +150,7 @@ class SoilOrcanicCarbonCNRatio(Model):
 
 
 class AboveGroundBiomass(Model):
-    continent = ForeignKey("api.Continent", on_delete=CASCADE)
+    continent = ForeignKey("api.Region", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField()
 
@@ -159,7 +159,7 @@ class AboveGroundBiomass(Model):
 
 
 class ForestAGB(Model):
-    continent = ForeignKey("api.Continent", on_delete=CASCADE)
+    continent = ForeignKey("api.Region", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField()
 
@@ -215,7 +215,7 @@ class BelowGroundBiomassManager(Manager):
 
 
 class BelowGroundBiomass(Model):
-    continent = ForeignKey("api.Continent", on_delete=CASCADE)
+    continent = ForeignKey("api.Region", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     threshold = FloatField(
         null=True, blank=True
@@ -256,7 +256,7 @@ class ForestTotalBiomassManager(Manager):
 class ForestTotalBiomass(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
-    continent = ForeignKey("api.Continent", on_delete=CASCADE)
+    continent = ForeignKey("api.Region", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField()
 
@@ -292,7 +292,7 @@ class AfforestationLandUseStockExchangeFactor(Model):
 
 class AboveGroundNetBiomassGrowth(Model):
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
-    continent = ForeignKey("api.Continent", on_delete=CASCADE)
+    continent = ForeignKey("api.Region", on_delete=CASCADE)
     value_after_20_years = FloatField()
     value_upto_20_years = FloatField()
 
@@ -547,7 +547,7 @@ class PerennialAGB(Model):
     """
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
-    continent = ForeignKey("api.Continent", on_delete=CASCADE)
+    continent = ForeignKey("api.Region", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField(default=0, null=True, blank=True)
 
@@ -578,7 +578,7 @@ class PerennialBGBManager(Manager):
 class PerennialBGB(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
-    continent = ForeignKey("api.Continent", on_delete=CASCADE)
+    continent = ForeignKey("api.Region", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField(default=0, null=True, blank=True)
 
@@ -677,7 +677,7 @@ class GrasslandStockExchangeFactor(Model):
 
 class ElectricityEmission(Model):
     country = ForeignKey("api.Country", on_delete=CASCADE)
-    continent = ForeignKey("api.Continent", on_delete=CASCADE)
+    continent = ForeignKey("api.Region", on_delete=CASCADE)
     year = IntegerField(null=True, blank=True)
 
     ef_grid = FloatField(null=True, blank=True)
@@ -772,7 +772,7 @@ class CropYieldStatsManager(Manager):
 
 class CropYieldStats(Model):
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
-    continent = ForeignKey("api.Continent", on_delete=CASCADE)
+    continent = ForeignKey("api.Region", on_delete=CASCADE)
     year_2016 = FloatField(null=True, blank=True)
     year_2017 = FloatField(null=True, blank=True)
     year_2018 = FloatField(null=True, blank=True)
@@ -858,7 +858,7 @@ class LivestockEntericEF(Model):
 
     production_type = ForeignKey("api.LivestockProductionType", on_delete=CASCADE)
     livestock_category = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
-    region = ForeignKey("api.Continent", on_delete=CASCADE)
+    region = ForeignKey("api.Region", on_delete=CASCADE)
     value = FloatField()
 
 
@@ -943,7 +943,7 @@ class LivestockNER(Model):
         "api.LivestockProductionType", on_delete=CASCADE
     )
     livestock_category_type = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
-    continent = ForeignKey("api.Continent", on_delete=CASCADE)
+    continent = ForeignKey("api.Region", on_delete=CASCADE)
     value = FloatField()
 
 
@@ -1063,7 +1063,7 @@ class IrrigationPressureRequirement(Model):
         return f"({self.pk}) {self.irrigation_system_type.name} {self.avg_pressure}"
     
 class RiceDefaultEmissionFactor(Model):
-    continent = ForeignKey("api.Continent", on_delete=CASCADE)
+    continent = ForeignKey("api.Region", on_delete=CASCADE)
     cultivation_period = IntegerField()
     value = FloatField()
 
@@ -1092,7 +1092,7 @@ class RiceSFW(Model):
         return f"({self.pk}) {self.water_management_type_after_cultivation.name} {self.value}"
     
 class RiceYield(Model):
-    continent = ForeignKey("api.Continent", on_delete=CASCADE)
+    continent = ForeignKey("api.Region", on_delete=CASCADE)
     value = FloatField()
 
     def __str__(self):
@@ -1231,7 +1231,7 @@ class OrganicSoilRewettingEmissionFactor(Model):
 
 class ForestManagementAGB(Model):
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
-    continent = ForeignKey("api.Continent", on_delete=CASCADE)
+    continent = ForeignKey("api.Region", on_delete=CASCADE)
     forest_condition_type = ForeignKey("api.ForestConditionType", on_delete=CASCADE)
     forest_type = ForeignKey("api.ForestType", on_delete=CASCADE)
     agb_min = FloatField(default=0)

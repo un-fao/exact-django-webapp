@@ -113,7 +113,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class ProjectSerializer(serializers.ModelSerializer):
     climate = get_model_serializer(Climate)(many=False)
-    continent = get_model_serializer(Continent)(many=False)
+    region = get_model_serializer(Region)(many=False)
     country = get_model_serializer(Country)(many=False)
     moisture = get_model_serializer(Moisture)(many=False)
     soil_type = get_model_serializer(SoilType)(many=False)
