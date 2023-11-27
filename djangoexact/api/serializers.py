@@ -125,7 +125,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'email', 'first_name', 'last_name']
 
-class ProjectSerializer(serializers.ModelSerializer):
+class ReadProjectSerializer(serializers.ModelSerializer):
     climate = get_model_serializer(Climate)(many=False, read_only=True)
     country = CountrySerializer(many=False, read_only=True)
     moisture = get_model_serializer(Moisture)(many=False, read_only=True)
@@ -134,12 +134,18 @@ class ProjectSerializer(serializers.ModelSerializer):
     status = get_model_serializer(ProjectStatus)(many=False, required=False, read_only=True)
     user = UserSerializer(many=False, read_only=True)
 
-    climate = serializers.PrimaryKeyRelatedField(queryset=Climate.objects.all(), required=True)
-    country = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(), required=True)
-    moisture = serializers.PrimaryKeyRelatedField(queryset=Moisture.objects.all(), required=True)
-    soil_type = serializers.PrimaryKeyRelatedField(queryset=SoilType.objects.all(), required=True)
-    gw_potential = serializers.PrimaryKeyRelatedField(queryset=GlobalWarmingPotential.objects.all(), required=True)
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True)
+    class Meta:
+        model = Project
+        fields = "__all__"
+        ref_name = "Project"
+
+class WriteProjectSerializer(serializers.ModelSerializer):
+    climate = serializers.PrimaryKeyRelatedField(queryset=Climate.objects.all(), required=True, write_only=True)
+    country = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(), required=True, write_only=True)
+    moisture = serializers.PrimaryKeyRelatedField(queryset=Moisture.objects.all(), required=True, write_only=True)
+    soil_type = serializers.PrimaryKeyRelatedField(queryset=SoilType.objects.all(), required=True, write_only=True)
+    gw_potential = serializers.PrimaryKeyRelatedField(queryset=GlobalWarmingPotential.objects.all(), required=True, write_only=True)
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True, write_only=True)
 
     class Meta:
         model = Project
@@ -152,7 +158,7 @@ class ProjectResultSerializer(serializers.Serializer):
     results = ResultSerializer(many=False)
 
 class ActivitySerializer(serializers.ModelSerializer):
-    project = ProjectSerializer(many=False, read_only=True)
+    project = ReadProjectSerializer(many=False, read_only=True)
     user = UserSerializer(many=False, read_only=True)
     climate_t2 = get_model_serializer(Climate)()
     soil_type_t2 = get_model_serializer(SoilType)()

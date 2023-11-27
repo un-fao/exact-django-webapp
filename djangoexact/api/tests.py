@@ -77,7 +77,7 @@ p: ProjectFactory = ProjectFactory.create(
     soc_ref=socref,
 )
 
-print(ProjectSerializer(p).data)
+print(WriteProjectSerializer(p).data)
 
 # Spreadeheet setup
 ds = wbook.sheets["1.Description"]
