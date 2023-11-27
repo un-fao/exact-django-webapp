@@ -305,6 +305,26 @@ class ModuleTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     
         return super().list(request)
 
+class CountryViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    """
+    API endpoint that allows countries to be viewed or edited.
+    """
+
+    queryset = Country.objects.all()
+    serializer_class = CountrySerializer
+
+    def list(self, request):
+        """
+        Get all countries.
+        """
+        region_id = self.request.query_params.get("region", None)
+
+        if region_id:
+            countries = Country.objects.filter(region__id=region_id).all()
+            serializer = get_model_serializer(Country)(countries, many=True)
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+    
+        return super().list(request)
 
 def generic_module_viewset(model: Model):
     class GenericModuleViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):

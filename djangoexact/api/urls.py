@@ -6,6 +6,7 @@ from django.urls import path, re_path
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from ipcc.models import GlobalWarmingPotential
 
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -33,6 +34,12 @@ router.register(r'threads', views.CommentThreadViewSet, basename='threads')
 router.register(r'threads/(?P<thread_id>\d+)/comments', views.CommentViewSet, basename='comments')
 router.register(r"land-use-types", views.LandUseTypeViewSet, basename="land-use-types")
 router.register(r"module-types", views.ModuleTypeViewSet, basename="modules")
+
+router.register(r"statuses", views.generic_viewset(ProjectStatus), basename="statuses")
+router.register(r"regions", views.generic_viewset(Region), basename="regions")
+router.register(r"countries", views.CountryViewSet, basename="countries")
+router.register(r"global-warming-pontentials", views.generic_viewset(GlobalWarmingPotential), basename="global-warming-pontentials")
+
 # router.register(
 #     r"deforestations",
 #     views.generic_module_viewset(Deforestation),
