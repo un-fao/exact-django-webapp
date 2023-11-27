@@ -90,7 +90,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
 
     queryset = Project.objects.all()
-    serializer_class = ProjectSerializer
+    serializer_class = WriteProjectSerializer
 
     def create(self, request, *args, **kwargs):
         """
@@ -105,7 +105,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         Get a single project for a given user.
         """
         project = get_object_or_404(Project, pk=pk, user=self.request.user)
-        return Response(data=ProjectSerializer(project).data, status=status.HTTP_200_OK)
+        return Response(data=ReadProjectSerializer(project).data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(manual_parameters=[project_id], responses={404: "Project not found"})
     def list(self, request):
@@ -113,7 +113,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         Get all projects for a given user.
         """
         list = Project.objects.filter(user=self.request.user).all()
-        return Response(data=ProjectSerializer(list, many=True).data, status=status.HTTP_200_OK)
+        return Response(data=ReadProjectSerializer(list, many=True).data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])
     @swagger_auto_schema(manual_parameters=[project_id], responses={404: "Project not found"})
@@ -123,7 +123,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
 
         project = get_object_or_404(Project, pk=pk, user=self.request.user)
-        serialized_project = ProjectSerializer(project).data
+        serialized_project = ReadProjectSerializer(project).data
 
         response = serialized_project
         response["activities"] = []
