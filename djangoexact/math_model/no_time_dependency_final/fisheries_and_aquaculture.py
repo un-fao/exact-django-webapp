@@ -7,7 +7,7 @@ class Fishery:
 
     def __init__(self, time_impl, time_cap, rate_type, catch_start, catch_end, ef_diesel_default, ef_diesel_start_tier_2, ef_diesel_tier_2_end, fui_default_start, fui_default_end, fui_start_tier_2, fui_end_tier_2, gwp_refrigerant_default, gwp_refrigerant_start_tier_2,
                  gwp_refrigerant_end_tier_2, quantity_lost_refrigerant_default, quantity_lost_refrigerant_start_tier_2, quantity_lost_refrigerant_end_tier_2, percentage_refrigerant_start, percentage_refrigerant_end, tonnes_ice_default, tonnes_ice_start_tier_2, tonnes_ice_end_tier_2, 
-                 kwh_ice_per_tonne_default, kwh_ice_per_tonne_start_tier_2, kwh_ice_per_tonne_end_tier_2, operating_margin, percentage_ice_start, percentage_ice_end) -> None:
+                 kwh_ice_per_tonne_default, kwh_ice_per_tonne_start_tier_2, kwh_ice_per_tonne_end_tier_2, operating_margin, percentage_ice_start, percentage_ice_end, delay) -> None:
         
         # DEFINITIONS OF PARAMETERS
         self.implementation_time = time_impl
@@ -39,6 +39,7 @@ class Fishery:
         self.operating_margin = operating_margin
         self.percentage_ice_start = percentage_ice_start
         self.percentage_ice_end = percentage_ice_end
+        self.delay = delay
         
         # DEFINITION OF THE TIER 2 DEFAULTS
         self.ef_diesel_tier_2_default = None 
@@ -89,7 +90,8 @@ class Fishery:
                     year = 0,
                     gas_type = GasTypes.CO2,
                     emissions = [Emission(x, GasTypes.CO2) for x in self.emissions_catch_yearly],
-                    activity = ActivityTypes.CATCH
+                    activity = ActivityTypes.CATCH,
+                    delay = self.delay
                 ))
 
 
@@ -119,7 +121,8 @@ class Fishery:
                     year = 0,
                     gas_type = GasTypes.OTHER,
                     emissions = [Emission(x, GasTypes.OTHER) for x in self.emissions_refrigerant_yearly],
-                    activity = ActivityTypes.REFRIGERANT
+                    activity = ActivityTypes.REFRIGERANT,
+                    delay = self.delay
                 ))
 
             except Exception as e:
@@ -150,7 +153,8 @@ class Fishery:
                     year = 0,
                     gas_type = GasTypes.OTHER,
                     emissions = [Emission(x, GasTypes.OTHER) for x in self.emissions_ice_yearly],
-                    activity = ActivityTypes.ICE
+                    activity = ActivityTypes.ICE,
+                    delay = self.delay
                 ))
                 
             except Exception as e:
