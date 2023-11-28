@@ -197,7 +197,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
             object = getattr(activity, module.class_name.lower(), None).first()
 
-            if not object:
+            if not object or (object.status and object.status.name != "READY"):
                 continue
 
             module_dict = get_module_serializer(model_ref)(object).data
@@ -338,7 +338,7 @@ def generic_module_viewset(model: Model):
             Creates a new module for a given activity.
             """
 
-            module_serializer = get_module_serializer(model, create=True)(data=request.data, many=request.data.__class__ == list)
+            module_serializer = get_module_serializer(model)(data=request.data, many=request.data.__class__ == list)
             
             if not module_serializer.is_valid():
                 return Response(module_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -356,7 +356,7 @@ def generic_module_viewset(model: Model):
             for attr in dir(model):
                 # NOTE: This could create problems if any other attribute ends in "_thread"
                 if attr.endswith("_thread"):
-                    module_serializer.validated_data[attr] = CommentThread.objects.create()
+                    module_serializer.data[attr] = CommentThread.objects.create()
 
             module_serializer.save()
 
