@@ -205,7 +205,7 @@ class LandUseChangeCalculator(BaseCalculator):
         module_wo = module_wo.get(land_use_change=input)
 
         # TODO: DeforestationCalculator now expects the ForestManagement module only. Refactor the calculator accordingly (check T2 values!)
-        results_start = CalculatorFactory().calculate_result(module_start, aggregate_by=aggregate_by)
+        # results_start = CalculatorFactory().calculate_result(module_start, aggregate_by=aggregate_by)
         results_w, results_wo = self.luc_based_calculation(module_start, module_w, aggregate_by=aggregate_by)
         results = Result(results_w, results_wo)
 
