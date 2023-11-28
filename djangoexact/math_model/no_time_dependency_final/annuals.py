@@ -80,7 +80,7 @@ class AnnualCropland:
                                         self.soc_tier_2, self.f_lu_tier_2, self.f_i_tier_2, self.f_mg_tier_2, self.f_lu_ref, self.f_i_ref, self.f_mg_ref)
                 
                 soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_soil_yearly], ActivityTypes.SOIL_CO2_CHANGE)
-                self.Result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
+                self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
 
             except Exception as e:
                 traceback.print_exc()
