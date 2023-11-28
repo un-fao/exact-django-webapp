@@ -204,7 +204,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
     climate = serializers.PrimaryKeyRelatedField(queryset=Climate.objects.all(), required=True)
     soil_type = serializers.PrimaryKeyRelatedField(queryset=SoilType.objects.all(), required=True)
     duration = serializers.IntegerField(required=True)
-    land_use_change = LandUseChangeBuilderSerializer(many=False, required=False)
+    land_use_change = LandUseChangeBuilderSerializer(many=False, required=False, allow_null=True)
     modules = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
     has_input = serializers.BooleanField(default=False, required=False)
     area = serializers.FloatField(required=True)
