@@ -485,6 +485,11 @@ class Submodule(Historical):
     class Meta:
         abstract = True
 
+    def save(self, *args, **kwargs):
+        if not self.parent and self.pk:
+            raise ValidationError("Submodule must have a parent field specified in the model")
+        super().save(*args, **kwargs)
+
 class Module(Historical):
     activity = ForeignKey(Activity, on_delete=CASCADE, related_name="%(class)s")
     notes = TextField(null=True, blank=True)
