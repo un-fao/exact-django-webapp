@@ -7,7 +7,7 @@ class AnnualCropland:
                             emission_factor_nitrous, nitrous_constant, methane_constant, ef_methane_agr_residues_main, combustion_factor_main, 
                             residue_main_tier_2, n_estimation_slope_main, n_estimation_intercept_main, yield_value_main, ef_methane_agr_residues_minor, combustion_factor_minor,residue_minor_tier_2,
                             n_estimation_slope_minor, n_estimation_intercept_minor, yield_value_minor, ef_nitrous_agr_residues_main, retained_main, ef_nitrous_agr_residues_minor, retained_minor,
-                            n_content_ag_main, ratio_bg_ag_main, n_content_bg_main, n_content_ag_minor, ratio_bg_ag_minor, n_content_bg_minor, delay
+                            n_content_ag_main, ratio_bg_ag_main, n_content_bg_main, n_content_ag_minor, ratio_bg_ag_minor, n_content_bg_minor, delay=0
                             ):
         
         self.area_start = area_start
