@@ -488,6 +488,11 @@ class Submodule(Historical):
     def save(self, *args, **kwargs):
         if not self.parent and self.pk:
             raise ValidationError("Submodule must have a parent field specified in the model")
+        
+        for attr in dir(self):
+            if attr.endswith("_thread") and getattr(self, attr) is None:
+                setattr(self, attr, CommentThread.objects.create())
+
         super().save(*args, **kwargs)
 
 class Module(Historical):
@@ -506,7 +511,12 @@ class Module(Historical):
 
     def __str__(self):
         return f"({self.pk}) {self._meta.object_name} in {self.activity.name}"
-
+    
+    def save(self, *args, **kwargs):
+        for attr in dir(self):
+            if attr.endswith("_thread") and getattr(self, attr) is None:
+                setattr(self, attr, CommentThread.objects.create())
+        super().save(*args, **kwargs)
     class Meta:
         abstract = True
 class BiomassModule(Module):
