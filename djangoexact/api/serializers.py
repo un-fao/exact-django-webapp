@@ -26,6 +26,7 @@ def get_module_serializer(model_arg: Model) -> serializers.ModelSerializer:
         module_type = get_model_serializer(ModuleType)(many=False, read_only=True)
         activity = ActivitySerializer(many=False, read_only=True)
         land_use_change = get_model_serializer(LandUseChange)(many=False, read_only=True, required=False)
+        status = get_model_serializer(ActivityState)(many=False, read_only=True)
 
         class Meta:
             model = model_arg
