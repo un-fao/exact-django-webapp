@@ -7,7 +7,7 @@ class OtherLandUseChanges:
 
     def __init__(self, initial_lu_biomass, initial_lu_biomass_tier_2, final_lu_biomass, final_lu_biomass_tier_2,
     c_n_ratio, moisture_emission_factor,combustion_factor, emission_factor_nitrous, emission_factor_methane,nitrous_constant, methane_constant,fire_bool,
-    socref, initial_flu, final_flu, initial_soc_tier_2, final_soc_tier_2, area, time_impl, time_cap, rate):
+    socref, initial_flu, final_flu, initial_soc_tier_2, final_soc_tier_2, area, time_impl, time_cap, rate, delay=0):
         
         self.initial_lu_biomass = initial_lu_biomass
         self.initial_lu_biomass_tier_2 = initial_lu_biomass_tier_2
@@ -27,9 +27,10 @@ class OtherLandUseChanges:
         self.initial_soc_tier_2 = initial_soc_tier_2
         self.final_soc_tier_2 = final_soc_tier_2
         self.area = area
-        self.time_impl = time_impl
+        self.time_impl = time_impl - delay
         self.time_cap = time_cap
         self.rate = rate
+        self.delay = delay
 
         # ADDED PARAMETERS FOR CALCULATION
         self.hectars_before_20, self.hectars_after_20 = yearly_time_dependent_20_year_breakdown(0, self.area, self.time_impl, self.time_cap, self.rate)
@@ -71,7 +72,8 @@ class OtherLandUseChanges:
                     gas_type = GasTypes.CO2,
                     emissions = [Emission(e, GasTypes.CO2) for e in self.yearly_biomass_emissions],
                     # TODO: ask Lorenzo if Biomass Loss or Gain
-                    activity = ActivityTypes.BIOMASS_GAIN
+                    activity = ActivityTypes.BIOMASS_GAIN,
+                    delay=self.delay
                 ))
             
             except Exception as e:
@@ -92,7 +94,8 @@ class OtherLandUseChanges:
                     year = 0,
                     gas_type = GasTypes.CO2,
                     emissions = [Emission(e, GasTypes.CO2) for e in self.yearly_soc_emissions],
-                    activity = ActivityTypes.SOIL_CO2_CHANGE
+                    activity = ActivityTypes.SOIL_CO2_CHANGE,
+                    delay=self.delay
                 ))
 
             except Exception as e:
@@ -137,14 +140,16 @@ class OtherLandUseChanges:
                 year = 0,
                 gas_type = GasTypes.CH4,
                 emissions = [Emission(e, GasTypes.CH4) for e in yearly_methane_fire_emissions],
-                activity = ActivityTypes.RESIDUE_BURNING
+                activity = ActivityTypes.RESIDUE_BURNING,
+                delay = self.delay
             ))
 
             self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
                 year = 0,
                 gas_type = GasTypes.N2O,
                 emissions = [Emission(e, GasTypes.N2O) for e in yearly_nitrous_fire_emissions],
-                activity = ActivityTypes.RESIDUE_BURNING
+                activity = ActivityTypes.RESIDUE_BURNING,
+                delay = self.delay
             ))
             
         try:
