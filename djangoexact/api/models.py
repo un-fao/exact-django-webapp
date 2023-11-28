@@ -513,6 +513,10 @@ class Module(Historical):
         return f"({self.pk}) {self._meta.object_name} in {self.activity.name}"
     
     def save(self, *args, **kwargs):
+
+        if not self.pk:
+            self.status = ActivityState.objects.get_or_create(name="EMPTY")[0]
+
         for attr in dir(self):
             if attr.endswith("_thread") and getattr(self, attr) is None:
                 setattr(self, attr, CommentThread.objects.create())
