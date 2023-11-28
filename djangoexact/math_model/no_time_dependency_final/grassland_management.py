@@ -60,7 +60,7 @@ class GrasslandManagement:
         def calculate_residue_burning():
             
             try:
-                if not self.fire_interval or self.time_impl + self.time_cap < self.fire_interval or not self.fire_used or self.fire_interval == 0:
+                if self.time_impl + self.time_cap < self.fire_interval or not self.fire_used or self.fire_interval == None:
                     self.emissions_residue_burning_yearly = [0 for i in range(self.time_impl + self.time_cap)]
                     self.emissions_residue_burning_total = 0
 
