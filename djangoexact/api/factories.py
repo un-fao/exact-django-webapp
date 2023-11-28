@@ -11,10 +11,11 @@ fishery_types = [fishery for fishery in FisheryType.objects.all()]
 fish_types = [fish for fish in FishType.objects.all()]
 statuses = [status for status in ProjectStatus.objects.all()]
 
-crop_types = [crop for crop in CropType.objects.filter(is_main_crop=True)]
+crop_types = [crop for crop in LandUseType.objects.filter(module_types__class_name="AnnualCropping")]
 tillage_management_types = [tillage for tillage in TillageManagementType.objects.all()]
 organic_input_types = [organic for organic in OrganicInputType.objects.all()]
 residue_management_types = [residue for residue in ResidueManagementType.objects.all()]
+grassland_management_types = GrasslandManagementType.objects.all()
 
 livestock_category_types = [
     c
@@ -54,12 +55,9 @@ class ActivityFactory(DjangoModelFactory):
         model = Activity
 
     name = factory.fuzzy.FuzzyText()
-    user = factory
+    # user = factory
 
-    change_rate_start = def_rate
-    change_rate_w = def_rate
-    change_rate_wo = def_rate
-
+    change_rate = def_rate
 
 class FisheryFactory(DjangoModelFactory):
     class Meta:
@@ -78,9 +76,7 @@ class FisheryFactory(DjangoModelFactory):
 
     total_catch_yr_start = factory.fuzzy.FuzzyFloat(0.0, 100)
     total_catch_yr_w = factory.fuzzy.FuzzyFloat(0.0, 100)
-    total_catch_yr_w_rate = def_rate
     total_catch_yr_wo = factory.fuzzy.FuzzyFloat(0.0, 100)
-    total_catch_yr_wo_rate = def_rate
 
     ice_preserved_catch_pc_start = factory.fuzzy.FuzzyFloat(0.0, 1)
     ice_preserved_catch_pc_w = factory.fuzzy.FuzzyFloat(0.0, 1)
@@ -115,9 +111,9 @@ class AnnualCroppingFactory(DjangoModelFactory):
     class Meta:
         model = AnnualCropping
 
-    crop_type_start = factory.fuzzy.FuzzyChoice(crop_types)
-    crop_type_w = factory.fuzzy.FuzzyChoice(crop_types)
-    crop_type_wo = factory.fuzzy.FuzzyChoice(crop_types)
+    land_use_type_start = factory.fuzzy.FuzzyChoice(crop_types)
+    land_use_type_w = factory.fuzzy.FuzzyChoice(crop_types)
+    land_use_type_wo = factory.fuzzy.FuzzyChoice(crop_types)
 
     tillage_management_type_start = factory.fuzzy.FuzzyChoice(tillage_management_types)
     tillage_management_type_w = factory.fuzzy.FuzzyChoice(tillage_management_types)
@@ -131,22 +127,17 @@ class AnnualCroppingFactory(DjangoModelFactory):
     residue_management_type_w = factory.fuzzy.FuzzyChoice(residue_management_types)
     residue_management_type_wo = factory.fuzzy.FuzzyChoice(residue_management_types)
 
-    ha_start = random.randint(0, 100)
-    ha_w = ha_start
-    ha_wo = ha_start
-
     crop_yield_start = factory.fuzzy.FuzzyInteger(0.0, 100)
     crop_yield_w = factory.fuzzy.FuzzyInteger(0.0, 100)
     crop_yield_wo = factory.fuzzy.FuzzyInteger(0.0, 100)
+
+    area = factory.fuzzy.FuzzyInteger(1, 150)
 
 
 class PerennialCroppingFactory(DjangoModelFactory):
     class Meta:
         model = PerennialCropping
 
-    crop_type_start = factory.fuzzy.FuzzyChoice(crop_types)
-    crop_type_w = factory.fuzzy.FuzzyChoice(crop_types)
-    crop_type_wo = factory.fuzzy.FuzzyChoice(crop_types)
     tillage_management_type_start = factory.fuzzy.FuzzyChoice(tillage_management_types)
     tillage_management_type_w = factory.fuzzy.FuzzyChoice(tillage_management_types)
     tillage_management_type_wo = factory.fuzzy.FuzzyChoice(tillage_management_types)
@@ -156,12 +147,6 @@ class PerennialCroppingFactory(DjangoModelFactory):
     is_biomass_burned_start = factory.fuzzy.FuzzyChoice([True, False])
     is_biomass_burned_w = factory.fuzzy.FuzzyChoice([True, False])
     is_biomass_burned_wo = factory.fuzzy.FuzzyChoice([True, False])
-
-    ha_start = factory.fuzzy.FuzzyInteger(0, 100)
-    ha_w = factory.fuzzy.FuzzyInteger(0, 100)
-    ha_w_rate = def_rate
-    ha_wo = factory.fuzzy.FuzzyInteger(0, 100)
-    ha_wo_rate = def_rate
 
     crop_yield_start = factory.fuzzy.FuzzyInteger(0, 100)
     crop_yield_w = factory.fuzzy.FuzzyInteger(0, 100)
@@ -187,3 +172,30 @@ class LivestockFactory(DjangoModelFactory):
     heads_number_start = factory.fuzzy.FuzzyInteger(0, 1000)
     heads_number_w = factory.fuzzy.FuzzyInteger(0, 1000)
     heads_number_wo = factory.fuzzy.FuzzyInteger(0, 1000)
+
+class GrasslandFactory(DjangoModelFactory):
+    class Meta:
+        model = Grassland
+
+    grassland_management_type_start = factory.fuzzy.FuzzyChoice(grassland_management_types)
+    grassland_management_type_w = factory.fuzzy.FuzzyChoice(grassland_management_types)
+    grassland_management_type_wo = factory.fuzzy.FuzzyChoice(grassland_management_types)
+
+    is_fire_used_start = factory.fuzzy.FuzzyChoice([True, False])
+    is_fire_used_w = factory.fuzzy.FuzzyChoice([True, False])
+    is_fire_used_wo = factory.fuzzy.FuzzyChoice([True, False])
+
+    fire_periodicity_start = factory.fuzzy.FuzzyInteger(0, 100)
+    fire_periodicity_w = factory.fuzzy.FuzzyInteger(0, 100)
+    fire_periodicity_wo = factory.fuzzy.FuzzyInteger(0, 100)
+
+    fire_impact_start = factory.fuzzy.FuzzyFloat(0, 1)
+    fire_impact_w = factory.fuzzy.FuzzyFloat(0, 1)
+    fire_impact_wo = factory.fuzzy.FuzzyFloat(0, 1)
+
+    yield_start = factory.fuzzy.FuzzyInteger(0, 100)
+    yield_w = factory.fuzzy.FuzzyInteger(0, 100)
+    yield_wo = factory.fuzzy.FuzzyInteger(0, 100)
+
+    area = factory.fuzzy.FuzzyInteger(1, 150)
+    

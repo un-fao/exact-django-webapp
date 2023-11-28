@@ -351,7 +351,7 @@ def generic_module_viewset(model: Model):
 
                 if not luc_start or not luc_w or not luc_wo:
                     return ErrorResponse(f"At least one land use has not been set.", status=status.HTTP_400_BAD_REQUEST)
-                
+
             for attr in dir(model):
                 # NOTE: This could create problems if any other attribute ends in "_thread"
                 if attr.endswith("_thread"):
@@ -360,7 +360,6 @@ def generic_module_viewset(model: Model):
             module_serializer.save()
 
             return Response(module_serializer.data, status=status.HTTP_201_CREATED)
-            
 
         @swagger_auto_schema(manual_parameters=[activity_id, include_related])
         def list(self, request):
