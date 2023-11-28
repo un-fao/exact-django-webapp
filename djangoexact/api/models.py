@@ -472,6 +472,12 @@ class Activity(Historical):
 
     def __str__(self):
         return f"({self.pk}) {self.name} in {self.project.name}"
+    
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.state = ActivityState.objects.get_or_create(name="EMPTY")[0]
+            self.change_rate = ChangeRate.objects.get_or_create(name="D")[0]
+        super().save(*args, **kwargs)
 
 
 ##############################
