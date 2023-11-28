@@ -40,14 +40,15 @@ class Emission:
 
 class YearlyGasEmissionSet:
 
-    def __init__(self,year, gas_type, emissions):
+    def __init__(self, year, gas_type, emissions, delay=0):
         self.year: int = year
         self.gas_type: GasTypes = gas_type
-        self.emissions: list[Emission] = emissions
+        self.delay: int = delay
+        self.emissions: list[Emission] = [Emission(0, emissions[0].gas_type) for i in self.delay].extend(emissions)
 class YearlyGasActivityEmissionSet(YearlyGasEmissionSet):
 
     def __init__(self, year, gas_type, emissions, activity):
-        super().__init__(year, gas_type, emissions)
+        super().__init__(year, gas_type, emissions, delay=0)
         # Can be a sub-activity, e.g. "Fire on Soil"
         self.activity: ActivityTypes = activity
 
