@@ -332,17 +332,23 @@ def generic_module_viewset(model: Model):
         queryset = model.objects.all()
         serializer_class = get_module_serializer(model)
 
+        def get_queryset(self):
+            if self.action == "create":
+                return get_module_serializer(model, read=False)
+            else:
+                return get_module_serializer(model)
+
         @transaction.atomic
         def create(self, request):
             """
             Creates a new module for a given activity.
             """
 
-            module_serializer = get_module_serializer(model)(data=request.data, many=request.data.__class__ == list)
-            
+            module_serializer = get_module_serializer(model, read=False)(data=request.data, many=request.data.__class__ == list)
+
             if not module_serializer.is_valid():
                 return Response(module_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            
+
             luc: LandUseChange = module_serializer.validated_data.get("land_use_change", None)
 
             if luc:
@@ -352,15 +358,16 @@ def generic_module_viewset(model: Model):
 
                 if not luc_start or not luc_w or not luc_wo:
                     return ErrorResponse(f"At least one land use has not been set.", status=status.HTTP_400_BAD_REQUEST)
-
-            for attr in dir(model):
-                # NOTE: This could create problems if any other attribute ends in "_thread"
-                if attr.endswith("_thread"):
-                    module_serializer.data[attr] = CommentThread.objects.create()
+            
+            # Find all attributes ending in "_thread" in the model and create a thread for each
+            for t in [f for f in model._meta.get_fields() if f.name.endswith("_thread")]:
+                setattr(module_serializer.validated_data, t.name, CommentThread.objects.create())
 
             module_serializer.save()
 
-            return Response(module_serializer.data, status=status.HTTP_201_CREATED)
+            read_serializer = get_module_serializer(model)(module_serializer.instance)
+
+            return Response(read_serializer.data, status=status.HTTP_201_CREATED)
 
         @swagger_auto_schema(manual_parameters=[activity_id, include_related])
         def list(self, request):
