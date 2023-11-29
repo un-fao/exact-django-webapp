@@ -21,25 +21,34 @@ def get_model_serializer(model_arg):
     except KeyError:
         return GenericSerializer
 
-def get_module_serializer(model_arg: Model) -> serializers.ModelSerializer:
-    class GenericSerializer(serializers.ModelSerializer):
-        module_type = get_model_serializer(ModuleType)(many=False, read_only=True)
-        activity = ActivitySerializer(many=False, read_only=True)
-        land_use_change = get_model_serializer(LandUseChange)(many=False, read_only=True, required=False)
-        status = get_model_serializer(ActivityState)(many=False, read_only=True)
+def get_module_serializer(model_arg: Model, read=True) -> serializers.ModelSerializer:
+    if read:
+        class GenericSerializer(serializers.ModelSerializer):
+            module_type = get_model_serializer(ModuleType)(many=False, read_only=True)
+            activity = ActivitySerializer(many=False, read_only=True)
+            land_use_change = get_model_serializer(LandUseChange)(many=False, read_only=True, required=False)
+            status = get_model_serializer(ActivityState)(many=False, read_only=True)
 
-        class Meta:
-            model = model_arg
-            fields = "__all__"
-            extra_fields = ["module_type"]
-            ref_name = model_arg.__name__
+            class Meta:
+                model = model_arg
+                fields = "__all__"
+                extra_fields = ["module_type"]
+                ref_name = model_arg.__name__
 
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-            self.fields["module_type"].default = ModuleType.objects.get(class_name=model_arg.__name__)
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                self.fields["module_type"].default = ModuleType.objects.get(class_name=model_arg.__name__)
             
 
-    return GenericSerializer
+        return GenericSerializer
+    else:
+        class GenericSerializer(serializers.ModelSerializer):
+            class Meta:
+                model = model_arg
+                fields = "__all__"
+                ref_name = model_arg.__name__
+            
+        return GenericSerializer
 
 class EmissionSerializer(serializers.Serializer):
     gas_type = get_model_serializer(GasType)(many=False, read_only=True)

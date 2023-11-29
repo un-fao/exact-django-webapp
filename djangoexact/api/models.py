@@ -413,6 +413,8 @@ class BaseModel(Model):
 
 class Historical(Model):
     history = HistoricalRecords(related_name="%(class)s_history")
+    created_at = DateTimeField(auto_now_add=True, null=True)
+    updated_at = DateTimeField(auto_now=True, null=True)
 
     class Meta:
         abstract = True
@@ -461,8 +463,6 @@ class Activity(Historical):
     description = TextField(null=True, blank=True)
     # user = ForeignKey(User, on_delete=CASCADE) # TODO: Define when it's useful to have this
     state = ForeignKey(ActivityState, on_delete=CASCADE, null=True, blank=True)
-    created_at = DateTimeField(auto_now_add=True, null=True)
-    updated_at = DateTimeField(auto_now=True, null=True)
 
     climate_t2 = ForeignKey(Climate, on_delete=CASCADE, null=True, blank=True)
     soil_type_t2 = ForeignKey(SoilType, on_delete=CASCADE, null=True, blank=True)
@@ -473,11 +473,11 @@ class Activity(Historical):
     def __str__(self):
         return f"({self.pk}) {self.name} in {self.project.name}"
     
-    def save(self, *args, **kwargs):
-        if not self.pk:
-            self.state = ActivityState.objects.get_or_create(name="EMPTY")[0]
-            self.change_rate = ChangeRate.objects.get_or_create(name="D")[0]
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     if not self.pk:
+    #         self.state = ActivityState.objects.get_or_create(name="EMPTY")[0]
+    #         self.change_rate = ChangeRate.objects.get_or_create(name="D")[0]
+    #     super().save(*args, **kwargs)
 
 
 ##############################
@@ -485,8 +485,6 @@ class Activity(Historical):
 ##############################
 
 class Submodule(Historical):
-    created_at = DateTimeField(auto_now_add=True, null=True)
-    updated_at = DateTimeField(auto_now=True, null=True)
 
     class Meta:
         abstract = True
@@ -502,6 +500,9 @@ class Submodule(Historical):
         super().save(*args, **kwargs)
 
 class Module(Historical):
+    class Meta:
+        abstract = True
+
     activity = ForeignKey(Activity, on_delete=CASCADE, related_name="%(class)s")
     notes = TextField(null=True, blank=True)
     start_year = IntegerField(default=1)
@@ -509,9 +510,6 @@ class Module(Historical):
     soc_t2_start = FloatField(null=True, blank=True)
     soc_t2_w = FloatField(null=True, blank=True)
     soc_t2_wo = FloatField(null=True, blank=True)
-
-    created_at = DateTimeField(auto_now_add=True, null=True)
-    updated_at = DateTimeField(auto_now=True, null=True)
 
     status = ForeignKey(ActivityState, on_delete=CASCADE, null=True, blank=True)
 
@@ -527,8 +525,6 @@ class Module(Historical):
             if attr.endswith("_thread") and getattr(self, attr) is None:
                 setattr(self, attr, CommentThread.objects.create())
         super().save(*args, **kwargs)
-    class Meta:
-        abstract = True
 class BiomassModule(Module):
 
     class Meta:
@@ -572,6 +568,7 @@ class DoubleBiomassModule(BiomassModule):
             return super().get_biomass_t2(scenario) + getattr(self, f"agb_t2_{scenario.value}") + getattr(self, f"bgb_t2_{scenario.value}")
         except TypeError:
             return None
+        
 class MultiBiomassModule(DoubleBiomassModule):
     litter_t2_start = FloatField(null=True, blank=True)
     litter_t2_w = FloatField(null=True, blank=True)
@@ -592,34 +589,16 @@ class MultiBiomassModule(DoubleBiomassModule):
 
 ##### Land Use Changes #####
 
-
 class OtherLandUse(Module):
     notes = TextField(null=True, blank=True)
-    initial_land_use_type = ForeignKey(
-        LandUseType,
-        on_delete=CASCADE,
-        related_name="%(class)s_initial_land_use_type",
-        null=True,
-        blank=True,
-    )
-    final_land_use_type = ForeignKey(
-        LandUseType,
-        on_delete=CASCADE,
-        related_name="%(class)s_land_use_type",
-        null=True,
-        blank=True,
-    )
+
+    initial_land_use_type = ForeignKey(LandUseType, null=True, blank=True, on_delete=CASCADE, related_name="initial_land_use_type")
+    final_land_use_type = ForeignKey(LandUseType, null=True, blank=True, on_delete=CASCADE, related_name="final_land_use_type")
 
     is_fire_used = BooleanField(default=False)
 
     ha_w = FloatField()
-    ha_w_rate = ForeignKey(
-        ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_w_rate"
-    )
     ha_wo = FloatField()
-    ha_wo_rate = ForeignKey(
-        ChangeRate, on_delete=CASCADE, related_name="%(class)s_ha_wo_rate+"
-    )
 
     initial_biomass_t2 = FloatField(null=True, blank=True)
     initial_soil_carbon_t2 = FloatField(null=True, blank=True)
@@ -628,9 +607,6 @@ class OtherLandUse(Module):
     final_soil_carbon_t2 = FloatField(null=True, blank=True)
 
     implementation_year_start = IntegerField(null=True, blank=True)
-
-
-##### Cropland Management #####
 
 
 class Assessment(Module):
@@ -655,12 +631,16 @@ class AssessmentNoScenarios(Module):
 
     class Meta:
         abstract = True
+
 class FixedAssessment(Assessment):
 
     # TODO: Rework
     # def save(self, *args, **kwargs):
     #     if not self.land_use_type_start:
-    #         self.land_use_type_start = LandUseType.objects.get(name=self.__class__.__name__)
+
+    #         mt = ModuleType.objects.get(class_name=self.__class__.__name__)
+
+    #         self.land_use_type_start = LandUseType.objects.get(name=mt.name)
     #         self.land_use_type_w = self.land_use_type_start
     #         self.land_use_type_wo = self.land_use_type_start
 
