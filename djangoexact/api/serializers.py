@@ -333,7 +333,12 @@ class ActivityBuilderSerializer(serializers.Serializer):
         activity.module_types.set(self.validated_data.get("modules", []))
 
         if self.validated_data.get("land_use_change", None):
-            LandUseChange.objects.create(**self.validated_data["land_use_change"], activity=activity, area=self.validated_data["area"])
+            luc = LandUseChange.objects.create(**self.validated_data["land_use_change"], activity=activity, area=self.validated_data["area"])
+            activity.module_types.add(luc.module_type_start.id)
+            activity.module_types.add(luc.module_type_w.id)
+            activity.module_types.add(luc.module_type_wo.id)
+
+        activity.save()
 
         return activity
 
