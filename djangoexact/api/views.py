@@ -228,9 +228,9 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         return Response(data=modules, status=status.HTTP_200_OK)
 
-    @transaction.atomic
     @action(detail=False, methods=["post"])
     @swagger_auto_schema(request_body=ActivityBuilderSerializer, responses={400: "Bad request", 200: ActivitySerializer})
+    @transaction.atomic
     def build(self, request):
         """
         Builds a new activity and the modules associated with it.
@@ -243,12 +243,14 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             
             activity = serializer.save()
+        
+        except serializers.ValidationError as e:
+            logger.error("Error building activity:", e.get_full_details())
+            return Response(e.get_full_details(), status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as e:
-            import traceback
-            traceback.print_exc()
             logger.error("Error building activity:", e)
-            return ErrorResponse(str(e))
+            return ErrorResponse(str(e), status=status.HTTP_400_BAD_REQUEST)
 
         return Response(ActivitySerializer(activity).data, status=status.HTTP_200_OK)
 
@@ -348,20 +350,22 @@ def generic_module_viewset(model: Model):
 
             if not module_serializer.is_valid():
                 return Response(module_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+            # TODO: I think this whole chunk is not needed anymore, as the LUC serializer will validate this
 
-            luc: LandUseChange = module_serializer.validated_data.get("land_use_change", None)
+            # luc: LandUseChange = module_serializer.validated_data.get("land_use_change", None)
 
-            if luc:
-                luc_start = luc.module_type_start
-                luc_w = luc.module_type_w
-                luc_wo = luc.module_type_wo
+            # if luc:
+            #     luc_start = luc.module_type_start
+            #     luc_w = luc.module_type_w
+            #     luc_wo = luc.module_type_wo
 
-                if not luc_start or not luc_w or not luc_wo:
-                    return ErrorResponse(f"At least one land use has not been set.", status=status.HTTP_400_BAD_REQUEST)
+            #     if not luc_start or not luc_w or not luc_wo:
+            #         return ErrorResponse(f"At least one land use has not been set.", status=status.HTTP_400_BAD_REQUEST)
             
             # Find all attributes ending in "_thread" in the model and create a thread for each
-            for t in [f for f in model._meta.get_fields() if f.name.endswith("_thread")]:
-                setattr(module_serializer.validated_data, t.name, CommentThread.objects.create())
+            for t in get_thread_attributes(model):
+                module_serializer.validated_data[t.name] = CommentThread.objects.create()
 
             module_serializer.save()
 
