@@ -8,6 +8,7 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 import sys
 from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
+from django.db import transaction
 
 def get_model_serializer(model_arg):
     class GenericSerializer(serializers.ModelSerializer):
@@ -47,6 +48,29 @@ def get_module_serializer(model_arg: Model, read=True) -> serializers.ModelSeria
                 model = model_arg
                 fields = "__all__"
                 ref_name = model_arg.__name__
+
+            def validate(self, data):
+                activity = data["activity"]
+                luc = activity.landusechange.first()
+                module_types = list(map(lambda module: module.class_name, activity.modules.all()))
+
+                if getattr(activity, model_arg.__name__.lower(), None):
+                    raise serializers.ValidationError("A module of this type is already present for this activity")
+
+                if luc:
+                    module_type = ModuleType.objects.get(class_name=model_arg.__name__)
+                    luc_module_types = [luc.module_type_start.class_name, luc.module_type_w.class_name, luc.module_type_wo.class_name]
+
+                    # NOTE: Redundant as it's already checked in ActivityBuilderSerializer, but just in case
+                    if module_type.is_luc and module_type.class_name not in luc_module_types:
+                        raise serializers.ValidationError("Cannot add this module to an activity with a Land Use Change")
+
+                    module_types += luc_module_types
+
+                if model_arg.__name__ not in module_types:
+                    raise serializers.ValidationError("This module type is not present for this activity")
+                
+                return super().validate(data)
             
         return GenericSerializer
 
@@ -173,6 +197,7 @@ class ActivitySerializer(serializers.ModelSerializer):
     user = UserSerializer(many=False, read_only=True)
     climate_t2 = get_model_serializer(Climate)(read_only=True)
     soil_type_t2 = get_model_serializer(SoilType)(read_only=True)
+    modules = get_model_serializer(ModuleType)(many=True, read_only=True)
 
     class Meta:
         model = Activity
@@ -218,6 +243,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
     modules = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
     has_input = serializers.BooleanField(default=False, required=False)
     area = serializers.FloatField(required=True)
+    modules = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
 
     def validate(self, data):
         luc_module: ModuleType = ModuleType.objects.filter(name="Land Use Change").first()
@@ -225,49 +251,32 @@ class ActivityBuilderSerializer(serializers.Serializer):
             raise serializers.ValidationError("Land Use Change module cannot be added manually")
         if data["has_input"] and not data.get("modules", None):
             raise serializers.ValidationError("If has_input is true, at least one input module must be provided")
+        if data.get("land_use_change", None) and len(list(filter(lambda module: module.is_luc, data['modules']))) > 0:
+            raise serializers.ValidationError("Land Modules cannot be independently added to activities with a Land Use Change")
+        
         super().validate(data)
+
         return data
     
+    @transaction.atomic
     def save(self, **kwargs):
-        try:
-            activity = Activity.objects.create(
-                name=self.validated_data["name"],
-                project=self.validated_data["project"], 
-                climate_t2=self.validated_data["climate"], 
-                soil_type_t2=self.validated_data["soil_type"], 
-                duration_t2=self.validated_data["duration"]
-            )
 
-            if self.validated_data.get("land_use_change", None):
-                land_use_change = LandUseChange.objects.create(**self.validated_data["land_use_change"], activity=activity, area=self.validated_data["area"])
-                land_use_change.save()
-            
-            if self.validated_data.get("modules", None):
-                # Cycle through all the selected modules and create them
-                for module_type in self.validated_data["modules"]:
-                    try:
-                        Module = apps.get_model("api", module_type.class_name)
+        if Activity.objects.filter(name=self.validated_data["name"], project=self.validated_data["project"]).exists():
+            raise serializers.ValidationError("An activity with this name already exists for this project")
 
-                        data = {"activity": activity}
+        activity: Activity = Activity.objects.create(
+            name=self.validated_data["name"],
+            project=self.validated_data["project"], 
+            climate_t2=self.validated_data["climate"], 
+            soil_type_t2=self.validated_data["soil_type"], 
+            duration_t2=self.validated_data["duration"],
+        )
+        activity.modules.set(self.validated_data.get("modules", []))
 
-                        if self.validated_data.get("land_use_change", None) and module_type.is_luc:
-                            data["land_use_change"] = land_use_change
-                        elif getattr(Module, "area", None):
-                            data["area"] = self.validated_data["area"]
+        if self.validated_data.get("land_use_change", None):
+            LandUseChange.objects.create(**self.validated_data["land_use_change"], activity=activity, area=self.validated_data["area"])
 
-                        Module.objects.create(**data)
-
-                    except AttributeError:
-                        raise serializers.ValidationError(f"Invalid module type: {module_type.class_name}")
-                    except Exception as e:
-                        raise serializers.ValidationError(e)
-        except Exception as e:
-            raise serializers.ValidationError(e)
-        
         return activity
-        
-
-
 
 class InputTypeSerializer(serializers.ModelSerializer):
     macro_input_type = get_model_serializer(MacroInputType)(many=False, read_only=True)
