@@ -171,8 +171,8 @@ class ProjectResultSerializer(serializers.Serializer):
 class ActivitySerializer(serializers.ModelSerializer):
     project = ReadProjectSerializer(many=False, read_only=True)
     user = UserSerializer(many=False, read_only=True)
-    climate_t2 = get_model_serializer(Climate)()
-    soil_type_t2 = get_model_serializer(SoilType)()
+    climate_t2 = get_model_serializer(Climate)(read_only=True)
+    soil_type_t2 = get_model_serializer(SoilType)(read_only=True)
 
     class Meta:
         model = Activity
@@ -231,7 +231,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
     def save(self, **kwargs):
         try:
             activity = Activity.objects.create(
-                name=self.validated_data["name"], 
+                name=self.validated_data["name"],
                 project=self.validated_data["project"], 
                 climate_t2=self.validated_data["climate"], 
                 soil_type_t2=self.validated_data["soil_type"], 
@@ -243,6 +243,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
                 land_use_change.save()
             
             if self.validated_data.get("modules", None):
+                # Cycle through all the selected modules and create them
                 for module_type in self.validated_data["modules"]:
                     try:
                         Module = apps.get_model("api", module_type.class_name)
@@ -258,6 +259,8 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
                     except AttributeError:
                         raise serializers.ValidationError(f"Invalid module type: {module_type.class_name}")
+                    except Exception as e:
+                        raise serializers.ValidationError(e)
         except Exception as e:
             raise serializers.ValidationError(e)
         
