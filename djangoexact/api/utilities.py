@@ -119,3 +119,6 @@ class ScenarioTypes(Enum):
     START = "start"
     WITH = "w"
     WITHOUT = "wo"
+
+def get_thread_attributes(module: Model):
+    return [attr for attr in module._meta.get_fields() if attr.endswith("_thread")]
