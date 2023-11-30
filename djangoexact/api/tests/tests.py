@@ -1,20 +1,20 @@
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory
 from model_bakery import baker
-from .models import *
+from api.models import *
 from ipcc.models import *
 from .factories import *
-from .calculators import *
+from api.calculators import *
 import openpyxl as xl
 from openpyxl import load_workbook
 from time import sleep
 import xlwings as xw
 import math
-from .serializers import *
+from api.serializers import *
 
-BATCH_SIZE = 100
-TEST_SM_FISHERY = True
-TEST_LG_FISHERY = True
+BATCH_SIZE = 10
+TEST_SM_FISHERY = False
+TEST_LG_FISHERY = False
 TEST_ANNUAL_CROPPING = True
 TEST_PERENNIAL_CROPPING = False
 TEST_LIVESTOCK = False
@@ -63,7 +63,7 @@ while True:
             print("socref is None")
             raise Exception
         print(f"Country: {country}")
-        print(f"Continent: {country.continent}")
+        print(f"Continent: {country.region}")
         print(f"Climate: {climate}")
         print(f"Moisture: {moisture}")
         print(f"Soil Type: {soil_type}")
@@ -115,6 +115,7 @@ if TEST_SM_FISHERY:
     passed_fisheries = 0
 
     # Small Fishery Testing
+    print("Testing SmallFishery...")
     for i, fishery in enumerate(sm_fisheries):
         # print(f"\n\n Testing SmallFishery {i+1}...")
         # print("-----------------------------------")
@@ -168,6 +169,7 @@ if TEST_LG_FISHERY:
     passed_lg_fisheries = 0
 
     # Large Fishery Testing
+    print("Testing LargeFishery...")
     for i, fishery in enumerate(lg_fisheries):
         # print(f"\n\n Testing LargeFishery {i+1}...")
         # print("-----------------------------------")
@@ -216,7 +218,7 @@ if TEST_ANNUAL_CROPPING:
     total_croplands = annual_croppings.__len__()
     passed_croplands = 0
 
-    print("Testing Cropland...")
+    print("Testing AnnualCropping...")
     for i, annual_cropping in enumerate(annual_croppings):
         # print(f"\n\nTesting AnnualCropping {i+1}...")
         # print("-----------------------------------")
