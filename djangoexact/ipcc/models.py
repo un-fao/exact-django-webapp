@@ -1242,4 +1242,3 @@ class ForestManagementAGB(Model):
 
     def __str__(self):
         return f"({self.pk}) {self.land_use_type.name} {self.continent.name} {self.forest_condition_type.name} {self.forest_type.name}"
-    
