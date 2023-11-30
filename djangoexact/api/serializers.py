@@ -94,7 +94,7 @@ def get_module_serializer(model_arg: Model, read=True) -> serializers.ModelSeria
             def validate(self, data):
                 activity = data["activity"]
                 luc = activity.landusechange.first()
-                module_types = list(map(lambda module: module.class_name, activity.modules.all()))
+                module_types = list(map(lambda module: module.class_name, activity.module_types.all()))
 
                 if getattr(activity, model_arg.__name__.lower(), None).exists():
                     raise serializers.ValidationError("A module of this type is already present for this activity")
@@ -240,7 +240,7 @@ class ActivitySerializer(serializers.ModelSerializer):
     user = UserSerializer(many=False, read_only=True)
     climate_t2 = get_model_serializer(Climate)(read_only=True)
     soil_type_t2 = get_model_serializer(SoilType)(read_only=True)
-    modules = get_model_serializer(ModuleType)(many=True, read_only=True)
+    module_types = get_model_serializer(ModuleType)(many=True, read_only=True)
 
     class Meta:
         model = Activity
@@ -252,6 +252,16 @@ class WriteActivitySerializer(serializers.ModelSerializer):
         model = Activity
         fields = "__all__"
         ref_name = "Activity"
+
+    def validate(self, data):
+        if self.instance:
+            luc_module: ModuleType = ModuleType.objects.filter(name="Land Use Change").first()
+            if luc_module and luc_module in data["module_types"]:
+                raise serializers.ValidationError("Land Use Change module cannot be added manually")
+            if self.instance.landusechange.exists() and len(list(filter(lambda module: module.is_luc, data['module_types']))) > 0:
+                raise serializers.ValidationError("Land Modules cannot be independently added to activities with a Land Use Change")
+            
+        return super().validate(data)
 
 class ActivityBuilderSerializer(serializers.Serializer):
     """
@@ -320,7 +330,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
             soil_type_t2=self.validated_data["soil_type"], 
             duration_t2=self.validated_data["duration"],
         )
-        activity.modules.set(self.validated_data.get("modules", []))
+        activity.module_types.set(self.validated_data.get("modules", []))
 
         if self.validated_data.get("land_use_change", None):
             LandUseChange.objects.create(**self.validated_data["land_use_change"], activity=activity, area=self.validated_data["area"])
