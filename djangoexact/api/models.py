@@ -129,7 +129,7 @@ class ChangeRate(Model):
     value = FloatField(unique=True)
 
     def __str__(self):
-        return self.name
+        return f"({self.pk}) {self.name}"
 
 
 class ProjectStatus(Model):
@@ -293,6 +293,7 @@ class ModuleType(Model):
     class_name = CharField(max_length=255, null=True, blank=True)
     is_luc = BooleanField(default=False)
     is_submodule = BooleanField(default=False)
+    is_fixed_assessment = BooleanField(default=False)
 
     def __str__(self):
         return f"({self.pk}) {self.name}" + (" (LUC)" if self.is_luc else "")
