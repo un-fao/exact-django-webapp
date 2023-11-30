@@ -470,6 +470,8 @@ class Activity(Historical):
 
     change_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="activities", null=True, blank=True)
 
+    modules = ManyToManyField("api.ModuleType", related_name="activities", null=True, blank=True)
+
     def __str__(self):
         return f"({self.pk}) {self.name} in {self.project.name}"
 
