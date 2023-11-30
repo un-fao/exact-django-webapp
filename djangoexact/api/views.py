@@ -141,6 +141,21 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = Activity.objects.all()
     serializer_class = ActivitySerializer
 
+    def update(self, request, *args, **kwargs):
+        
+        activity = self.get_object()
+
+        serializer = WriteActivitySerializer(data=request.data, instance=activity)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        activity = serializer.save()
+
+        read_serializer = ActivitySerializer(instance=activity)
+
+        return Response(read_serializer.data, status=status.HTTP_200_OK)
+
     def partial_update(self, request, *args, **kwargs):
 
         activity = self.get_object()
