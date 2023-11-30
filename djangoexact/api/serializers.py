@@ -49,12 +49,54 @@ def get_module_serializer(model_arg: Model, read=True) -> serializers.ModelSeria
                 fields = "__all__"
                 ref_name = model_arg.__name__
 
+            def __init__(self, instance=None, data=..., **kwargs):
+                super().__init__(instance, data, **kwargs)
+
+                luc_id = data.get("land_use_change", None)
+                luc = LandUseChange.objects.filter(id=luc_id).first()
+                module_type = ModuleType.objects.get(class_name=model_arg.__name__)
+
+                if luc and module_type.is_luc and not module_type.is_fixed_assessment:
+                    luc_start = luc.module_type_start
+                    luc_w = luc.module_type_w
+                    luc_wo = luc.module_type_wo
+
+                    # Avoids ValidationError by setting the unused land use type to something (it's not used anyway)
+                    if luc_start == luc_w != module_type:
+                        data["land_use_type_w"] = data["land_use_type_wo"]
+                        data["land_use_type_start"] = data["land_use_type_wo"]
+                    elif luc_start == luc_wo != module_type:
+                        data["land_use_type_wo"] = data["land_use_type_w"]
+                        data["land_use_type_start"] = data["land_use_type_w"]
+                    elif luc_w == luc_wo != module_type:
+                        data["land_use_type_wo"] = data["land_use_type_start"]
+                        data["land_use_type_w"] = data["land_use_type_start"]
+
+                    # Anything that ends with either _start, _w or _wo
+                    scenario_fields = [field.name for field in model_arg._meta.get_fields() if field.name.endswith("_start") or field.name.endswith("_w") or field.name.endswith("_wo")]
+                    mandatory_fields = [field.name for field in model_arg._meta.get_fields() if not field.null and field.name in scenario_fields]
+
+                    # Cycle fields and do the same check as above
+                    for field in mandatory_fields:
+                        pure_field = field.split("_")[:-1]
+                        pure_field = "_".join(pure_field)
+
+                        try:
+                            if luc_start == luc_w != module_type:
+                                data.update({field: data[f"{pure_field}_start"]})
+                            if luc_start == luc_wo != module_type:
+                                data.update({field: data[f"{pure_field}_w"]})
+                            if luc_w == luc_wo != module_type:
+                                data.update({field: data[f"{pure_field}_start"]})
+                        except KeyError:
+                            raise serializers.ValidationError(f"Missing field {pure_field} for {model_arg.__name__}")
+
             def validate(self, data):
                 activity = data["activity"]
                 luc = activity.landusechange.first()
                 module_types = list(map(lambda module: module.class_name, activity.modules.all()))
 
-                if getattr(activity, model_arg.__name__.lower(), None):
+                if getattr(activity, model_arg.__name__.lower(), None).exists():
                     raise serializers.ValidationError("A module of this type is already present for this activity")
 
                 if luc:
@@ -67,7 +109,7 @@ def get_module_serializer(model_arg: Model, read=True) -> serializers.ModelSeria
 
                     module_types += luc_module_types
 
-                if model_arg.__name__ not in module_types:
+                if model_arg.__name__ not in module_types and model_arg.__name__ != "LandUseChange":
                     raise serializers.ValidationError("This module type is not present for this activity")
                 
                 return super().validate(data)
@@ -193,12 +235,19 @@ class ProjectResultSerializer(serializers.Serializer):
     results = ResultSerializer(many=False)
 
 class ActivitySerializer(serializers.ModelSerializer):
+    name = serializers.CharField(max_length=255, read_only=True)
     project = ReadProjectSerializer(many=False, read_only=True)
     user = UserSerializer(many=False, read_only=True)
     climate_t2 = get_model_serializer(Climate)(read_only=True)
     soil_type_t2 = get_model_serializer(SoilType)(read_only=True)
     modules = get_model_serializer(ModuleType)(many=True, read_only=True)
 
+    class Meta:
+        model = Activity
+        fields = "__all__"
+        ref_name = "Activity"
+
+class WriteActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
         fields = "__all__"
