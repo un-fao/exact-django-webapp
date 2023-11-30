@@ -141,10 +141,20 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = Activity.objects.all()
     serializer_class = ActivitySerializer
 
+    @transaction.atomic
     def create(self, request, *args, **kwargs):
         state = ActivityState.objects.get_or_create(name="EMPTY")[0]
-        request.data["state"] = state.pk
-        return super().create(request, *args, **kwargs)
+        request.data["status"] = state.pk
+        serializer = WriteActivitySerializer(data=request.data)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        activity = serializer.save()
+
+        read_serializer = ActivitySerializer(instance=activity)
+
+        return Response(read_serializer.data, status=status.HTTP_201_CREATED)
     
     @swagger_auto_schema(manual_parameters=[project_id], responses={400: "activity_id not provided"})
     def retrieve(self, request, pk=None):
@@ -334,11 +344,9 @@ def generic_module_viewset(model: Model):
         queryset = model.objects.all()
         serializer_class = get_module_serializer(model)
 
-        def get_queryset(self):
-            if self.action == "create":
-                return get_module_serializer(model, read=False)
-            else:
-                return get_module_serializer(model)
+        # def partial_update(self, request, *args, **kwargs):
+        #     self.serializer_class = get_module_serializer(model, read=False)
+        #     return super().partial_update(request, *args, **kwargs)
 
         @transaction.atomic
         def create(self, request):
