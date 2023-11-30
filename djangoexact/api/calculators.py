@@ -282,8 +282,8 @@ class DeforestationCalculator(BaseCalculator):
         inputs_start = [
             luc.area,
             0,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             change_rate.name,
             total_biomass_start.value,
             forest.get_biomass_t2(utils.ScenarioTypes.START),
@@ -315,8 +315,8 @@ class DeforestationCalculator(BaseCalculator):
         inputs_w = [
             0,
             luc.area,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             change_rate.name,
             total_biomass_end.value,
             forest.get_biomass_t2(utils.ScenarioTypes.WITH),
@@ -348,8 +348,8 @@ class DeforestationCalculator(BaseCalculator):
         inputs_wo = [
             0,
             luc.area,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             change_rate.name,
             total_biomass_start.value,
             forest.get_biomass_t2(utils.ScenarioTypes.WITHOUT),
@@ -458,8 +458,8 @@ class AfforestationCalculator(BaseCalculator):
         # TODO: Class Based inputs
         inputs_start = [
             luc.area,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             initial_biomass_start.value,
             0, # TODO: initial_biomass_tier_2 missing
             luc.is_fire_used_start,
@@ -492,8 +492,8 @@ class AfforestationCalculator(BaseCalculator):
 
         inputs_w = [
             luc.area,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             initial_biomass_end.value,
             0, # TODO: initial_biomass_tier_2 missing
             luc.is_fire_used_w,
@@ -526,8 +526,8 @@ class AfforestationCalculator(BaseCalculator):
 
         inputs_wo = [
             luc.area,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             initial_biomass_end.value,
             0, # TODO: initial_biomass_tier_2 missing
             luc.is_fire_used_w,
@@ -644,8 +644,8 @@ class OtherLandUseCalculator(BaseCalculator):
                 input.soc_t2_start,
                 input.soc_t2_w,
                 luc.area,
-                project.implementation_duration_yrs,
-                project.capitalization_duration_yrs,
+                project.implementation_years,
+                project.capitalization_years,
                 input.activity.change_rate.name,
             ]
 
@@ -672,16 +672,16 @@ class OtherLandUseCalculator(BaseCalculator):
                 input.soc_t2_start,
                 input.soc_t2_wo,
                 luc.area,
-                project.implementation_duration_yrs,
-                project.capitalization_duration_yrs,
+                project.implementation_years,
+                project.capitalization_years,
                 input.activity.change_rate.name,
             ]
 
             results_wo = MathOtherLandUseChanges(*inputs_wo)
             results_wo.calculate_emissions()
 
-        res_w = results_w.result if results_w else MathResult(project.implementation_duration_yrs, project.capitalization_duration_yrs)
-        res_wo = results_wo.result if results_wo else MathResult(project.implementation_duration_yrs, project.capitalization_duration_yrs)
+        res_w = results_w.result if results_w else MathResult(project.implementation_years, project.capitalization_years)
+        res_wo = results_wo.result if results_wo else MathResult(project.implementation_years, project.capitalization_years)
 
         return (res_w, res_wo)
 
@@ -749,8 +749,8 @@ class AnnualCroppingCalculator(BaseCalculator):
 
             inputs_start = [
                 *[area, 0],
-                project.implementation_duration_yrs,
-                project.capitalization_duration_yrs,
+                project.implementation_years,
+                project.capitalization_years,
                 change_rate.name,
                 change_rate.value,
                 soc.value,
@@ -819,8 +819,8 @@ class AnnualCroppingCalculator(BaseCalculator):
 
             inputs_wo = [
                 *[0, area],
-                project.implementation_duration_yrs,
-                project.capitalization_duration_yrs,
+                project.implementation_years,
+                project.capitalization_years,
                 change_rate.name,
                 change_rate.value,
                 soc.value,
@@ -887,8 +887,8 @@ class AnnualCroppingCalculator(BaseCalculator):
 
             inputs_w = [
                 *[0, area],
-                project.implementation_duration_yrs,
-                project.capitalization_duration_yrs,
+                project.implementation_years,
+                project.capitalization_years,
                 change_rate.name,
                 change_rate.value,
                 soc.value,
@@ -929,9 +929,9 @@ class AnnualCroppingCalculator(BaseCalculator):
             results_w = AnnualCropland(*inputs_w)
             results_w.calculate_emissions()
 
-        res_start = results_start.result if results_start else MathResult(project.implementation_duration_yrs, project.capitalization_duration_yrs)
-        res_w = results_w.result if results_w else MathResult(project.implementation_duration_yrs, project.capitalization_duration_yrs)
-        res_wo = results_wo.result if results_wo else MathResult(project.implementation_duration_yrs, project.capitalization_duration_yrs)
+        res_start = results_start.result if results_start else MathResult(project.implementation_years, project.capitalization_years)
+        res_w = results_w.result if results_w else MathResult(project.implementation_years, project.capitalization_years)
+        res_wo = results_wo.result if results_wo else MathResult(project.implementation_years, project.capitalization_years)
 
         return (res_w+res_start, res_wo+res_start)
 
@@ -1006,8 +1006,8 @@ class PerennialCroppingCalculator(BaseCalculator):
         inputs_start = [
             area,
             0,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             change_rate.name,
             project.gw_potential.n2o,
             project.gw_potential.ch4,
@@ -1036,8 +1036,8 @@ class PerennialCroppingCalculator(BaseCalculator):
         inputs_w = [
             0,
             area,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             change_rate.name,
             project.gw_potential.n2o,
             project.gw_potential.ch4,
@@ -1066,8 +1066,8 @@ class PerennialCroppingCalculator(BaseCalculator):
         inputs_wo = [
             0,
             area,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             change_rate.name,
             project.gw_potential.n2o,
             project.gw_potential.ch4,
@@ -1154,8 +1154,8 @@ class FloodedRiceCalculator(BaseCalculator):
             rice_cf.value,
             burning_emission_factor.n2o,
             project.gw_potential.n2o,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             input.activity.change_rate.name,
             project.gw_potential.ch4,
             efc.cultivation_period,
@@ -1190,8 +1190,8 @@ class FloodedRiceCalculator(BaseCalculator):
             rice_cf.value,
             burning_emission_factor.n2o,
             project.gw_potential.n2o,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             input.activity.change_rate.name,
             project.gw_potential.ch4,
             efc.cultivation_period,
@@ -1226,8 +1226,8 @@ class FloodedRiceCalculator(BaseCalculator):
             rice_cf.value,
             burning_emission_factor.n2o,
             project.gw_potential.n2o,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             input.activity.change_rate.name,
             project.gw_potential.ch4,
             efc.cultivation_period,
@@ -1292,8 +1292,8 @@ class GrasslandCalculator(BaseCalculator):
 
             inputs_start = [
                 *[area, 0],
-                project.implementation_duration_yrs,
-                project.capitalization_duration_yrs,
+                project.implementation_years,
+                project.capitalization_years,
                 change_rate.name,
                 project.gw_potential.n2o,
                 project.gw_potential.ch4,
@@ -1322,8 +1322,8 @@ class GrasslandCalculator(BaseCalculator):
 
             inputs_w = [
                 *[0, area],
-                project.implementation_duration_yrs,
-                project.capitalization_duration_yrs,
+                project.implementation_years,
+                project.capitalization_years,
                 change_rate.name,
                 project.gw_potential.n2o,
                 project.gw_potential.ch4,
@@ -1355,8 +1355,8 @@ class GrasslandCalculator(BaseCalculator):
 
             inputs_wo = [
                 *[0, area],
-                project.implementation_duration_yrs,
-                project.capitalization_duration_yrs,
+                project.implementation_years,
+                project.capitalization_years,
                 change_rate.name,
                 project.gw_potential.n2o,
                 project.gw_potential.ch4,
@@ -1382,9 +1382,9 @@ class GrasslandCalculator(BaseCalculator):
             math_wo = MathGrassland(*inputs_wo)
             math_wo.calculate_emissions()
 
-        res_start = math_start.result if math_start else MathResult(project.implementation_duration_yrs, project.capitalization_duration_yrs)
-        res_w = math_w.result if math_w else MathResult(project.implementation_duration_yrs, project.capitalization_duration_yrs)
-        res_wo = math_wo.result if math_wo else MathResult(project.implementation_duration_yrs, project.capitalization_duration_yrs)
+        res_start = math_start.result if math_start else MathResult(project.implementation_years, project.capitalization_years)
+        res_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
+        res_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
         return (res_w+res_start, res_wo+res_start)
 class SmallFisheryCalculator(BaseCalculator):
@@ -1416,8 +1416,8 @@ class SmallFisheryCalculator(BaseCalculator):
         electricity_emission = ElectricityEmission.objects.get(country=project.country, continent=project.country.region)
 
         inputs_w = [
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             module.activity.change_rate.name,
             module.total_catch_yr_start,
             module.total_catch_yr_w,
@@ -1448,8 +1448,8 @@ class SmallFisheryCalculator(BaseCalculator):
         ]
 
         inputs_wo = [
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             module.activity.change_rate.name,
             module.total_catch_yr_start,
             module.total_catch_yr_wo,
@@ -1541,8 +1541,8 @@ class LargeFisheryCalculator(BaseCalculator):
         #  TODO: Change fui to T2
 
         inputs_w = [
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             module.activity.change_rate.name,
             module.total_catch_yr_start,
             module.total_catch_yr_w,
@@ -1573,8 +1573,8 @@ class LargeFisheryCalculator(BaseCalculator):
         ]
 
         inputs_wo = [
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             module.activity.change_rate.name,
             module.total_catch_yr_start,
             module.total_catch_yr_wo,
@@ -1666,8 +1666,8 @@ class ForestCalculator(BaseCalculator):
             self.data.ha_start,
             self.data.ha_w,
             self.data.ha_wo,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             self.data.ha_w_rate.name,
             self.data.ha_wo_rate.name,
             self.data.ha_w_rate.value,
@@ -1739,8 +1739,8 @@ class AquacultureCalculator(BaseCalculator):
             module.n2o_from_production_t2_start,
             module.n2o_from_production_t2_w,
             project.gw_potential.n2o,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             change_rate.name,
         ]
 
@@ -1751,8 +1751,8 @@ class AquacultureCalculator(BaseCalculator):
             module.n2o_from_production_t2_start,
             module.n2o_from_production_t2_wo,
             project.gw_potential.n2o,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             change_rate.name,
         ]
 
@@ -1787,8 +1787,8 @@ class InputCalculator(BaseCalculator):
             input.co2_emissions_t2,
             ref.co2_multiplier,
             ref.co2_emissions_multiplier,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             ef.n2o_value,
             input.n2o_emissions_t2,
             ref.n2o_quantity_multiplier,
@@ -1807,8 +1807,8 @@ class InputCalculator(BaseCalculator):
             input.co2_emissions_t2,
             ref.co2_multiplier,
             ref.co2_emissions_multiplier,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             ef.n2o_value,
             input.n2o_emissions_t2,
             ref.n2o_quantity_multiplier,
@@ -1871,8 +1871,8 @@ class ElectricityCalculator(BaseCalculator):
             input.mwh_w,
             input.transmission_loss,
             input.activity.change_rate.name,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
         ]
 
         res_w = ElectryicityConsumption(*inputs_w).calculate_emissions()
@@ -1886,8 +1886,8 @@ class ElectricityCalculator(BaseCalculator):
             input.mwh_wo,
             input.transmission_loss,
             input.activity.change_rate.name,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
         ]
 
         res_wo = ElectryicityConsumption(*inputs_wo).calculate_emissions()
@@ -1919,8 +1919,8 @@ class FuelCalculator(BaseCalculator):
                 input.fuel_start,
                 input.fuel_w,
                 input.activity.change_rate.name,
-                project.implementation_duration_yrs,
-                project.capitalization_duration_yrs,
+                project.implementation_years,
+                project.capitalization_years,
             ]
 
             input_wo = [
@@ -1929,8 +1929,8 @@ class FuelCalculator(BaseCalculator):
                 input.fuel_start,
                 input.fuel_wo,
                 input.activity.change_rate.name,
-                project.implementation_duration_yrs,
-                project.capitalization_duration_yrs,
+                project.implementation_years,
+                project.capitalization_years,
             ]
 
             res_w = FuelConsumption(*input_w).calculate_emissions()
@@ -1951,8 +1951,8 @@ class FuelCalculator(BaseCalculator):
                 input.fuel_start,
                 input.fuel_w,
                 input.activity.change_rate.name,
-                project.implementation_duration_yrs,
-                project.capitalization_duration_yrs,
+                project.implementation_years,
+                project.capitalization_years,
             ]
 
             input_wo = [
@@ -1967,8 +1967,8 @@ class FuelCalculator(BaseCalculator):
                 input.fuel_start,
                 input.fuel_wo,
                 input.activity.change_rate.name,
-                project.implementation_duration_yrs,
-                project.capitalization_duration_yrs,
+                project.implementation_years,
+                project.capitalization_years,
             ]
 
             res_w = SolidConsumption(*input_w).calculate_emissions()
@@ -2015,8 +2015,8 @@ class BuildingCalculator(BaseCalculator):
             ef_w.value,
             input.ef_t2_w,
             input.area_m2_w,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             input.activity.change_rate.name,
         ]
 
@@ -2024,8 +2024,8 @@ class BuildingCalculator(BaseCalculator):
             ef_wo.value,
             input.ef_t2_wo,
             input.area_m2_wo,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             input.activity.change_rate.name,
         ]
 
@@ -2060,8 +2060,8 @@ class RoadCalculator(BaseCalculator):
             ef_w.value,
             input.ef_t2_w,
             input.area_m2_w,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             input.activity.change_rate.name,
         ]
 
@@ -2069,8 +2069,8 @@ class RoadCalculator(BaseCalculator):
             ef_wo.value,
             input.ef_t2_wo,
             input.area_m2_wo,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             input.activity.change_rate.name,
         ]
 
@@ -2658,8 +2658,8 @@ class LivestockCalculator(BaseCalculator):
         volatilization_multi = ManureManagementVolatilizationMultiplier.objects.get(moisture=project.moisture,)
 
         i_w = [
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             input.activity.change_rate.name,
             project.gw_potential.ch4,
             input.heads_number_start,
@@ -2726,8 +2726,8 @@ class LivestockCalculator(BaseCalculator):
         ]
 
         i_wo = [
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             input.activity.change_rate.name,
             project.gw_potential.ch4,
             input.heads_number_start,
@@ -2833,8 +2833,8 @@ class IrrigationSystemCalculator(BaseCalculator):
             _input.ef_t2_start,
             _input.ha_start,
             _input.ha_w,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             _input.activity.change_rate.name,
         ]
 
@@ -2845,8 +2845,8 @@ class IrrigationSystemCalculator(BaseCalculator):
             _input.ef_t2_wo,
             _input.ha_start,
             _input.ha_wo,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             _input.activity.change_rate.name,
         ]
 
@@ -2884,8 +2884,8 @@ class IrrigationPhaseCalculator(BaseCalculator):
             input.ha_start,
             0,
             input.activity.change_rate.name,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             transportation_loss.value if input.fuel_type.name == "Electricity" else 0,
             input.gross_irrigation_water_start,
         ]
@@ -2907,8 +2907,8 @@ class IrrigationPhaseCalculator(BaseCalculator):
             0,
             input.ha_w,
             input.activity.change_rate.name,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             transportation_loss.value if input.fuel_type.name == "Electricity" else 0,
             input.gross_irrigation_water_w,
         ]
@@ -2930,8 +2930,8 @@ class IrrigationPhaseCalculator(BaseCalculator):
             0,
             input.ha_wo,
             input.activity.change_rate.name,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             transportation_loss.value if input.fuel_type.name == "Electricity" else 0,
             input.gross_irrigation_water_wo,
         ]
@@ -2977,8 +2977,8 @@ class CoastalWetlandCalculator(BaseCalculator):
             input.area_under_drainage_start,
             input.area_under_drainage_w,
             input.activity.change_rate.name,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             agb.value,
             bgb.value,
             litter.value,
@@ -3008,8 +3008,8 @@ class CoastalWetlandCalculator(BaseCalculator):
             input.area_under_drainage_start,
             input.area_under_drainage_wo,
             input.activity.change_rate.name,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             agb.value,
             bgb.value,
             litter.value,
@@ -3077,8 +3077,8 @@ class WaterbodyCalculator(BaseCalculator):
             module.ch4_ef_t2_start,
             0,
             project.gw_potential.ch4,
-            project.capitalization_duration_yrs,
-            project.implementation_duration_yrs,
+            project.capitalization_years,
+            project.implementation_years,
             module.activity.change_rate.name,
             module.mean_annual_t2_start,
             0,
@@ -3094,8 +3094,8 @@ class WaterbodyCalculator(BaseCalculator):
             module.ch4_ef_t2_start,
             module.ch4_ef_t2_w,
             project.gw_potential.ch4,
-            project.capitalization_duration_yrs,
-            project.implementation_duration_yrs,
+            project.capitalization_years,
+            project.implementation_years,
             module.activity.change_rate.name,
             module.mean_annual_t2_start,
             module.mean_annual_t2_w,
@@ -3111,8 +3111,8 @@ class WaterbodyCalculator(BaseCalculator):
             module.ch4_ef_t2_start,
             module.ch4_ef_t2_wo,
             project.gw_potential.ch4,
-            project.capitalization_duration_yrs,
-            project.implementation_duration_yrs,
+            project.capitalization_years,
+            project.implementation_years,
             module.activity.change_rate.name,
             module.mean_annual_t2_start,
             module.mean_annual_t2_wo,
@@ -3190,8 +3190,8 @@ class OrganicSoilCalculator(BaseCalculator):
             input.fire_on_soil_ch4_t2_w,
             project.gw_potential.ch4,
             input.activity.change_rate.name,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             project.gw_potential.n2o,
             ef_offsite_start.doc,
             input.offsite_doc_drainge_t2_start,
@@ -3251,8 +3251,8 @@ class OrganicSoilCalculator(BaseCalculator):
             input.fire_on_soil_ch4_t2_wo,
             project.gw_potential.ch4,
             input.activity.change_rate.name,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             project.gw_potential.n2o,
             ef_offsite_start.doc,
             input.offsite_doc_drainge_t2_start,
@@ -3335,8 +3335,8 @@ class OrganicSoilCalculator(BaseCalculator):
             input.offsite_ch4_peat_t2,
             project.gw_potential.ch4,
             project.gw_potential.n2o,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             conversion_factor_w.volume,
             input.peat_density_t2,
             1, # TODO: Should be conversion_factor_w.volume,
@@ -3363,8 +3363,8 @@ class OrganicSoilCalculator(BaseCalculator):
             input.offsite_ch4_peat_t2,
             project.gw_potential.ch4,
             project.gw_potential.n2o,
-            project.implementation_duration_yrs,
-            project.capitalization_duration_yrs,
+            project.implementation_years,
+            project.capitalization_years,
             conversion_factor_wo.volume,
             input.peat_density_t2,
             1, # TODO: Should be conversion_factor_wo.volume,
