@@ -613,8 +613,8 @@ class OtherLandUseCalculator(BaseCalculator):
         flu_final_w = LandUseCarbonStockExchangeFactor.objects.get_or_default(**cm, land_use_type=luc_w)
         flu_final_wo = LandUseCarbonStockExchangeFactor.objects.get_or_default(**cm, land_use_type=luc_wo)
 
-        c_n_ratio_w = utils.CN_RATIO_GRASSLAND if input.land_use_type_w.module_types.name == "Grassland" else utils.CN_RATIO_FOREST
-        c_n_ratio_wo = utils.CN_RATIO_GRASSLAND if input.land_use_type_wo.module_types.name == "Grassland" else utils.CN_RATIO_FOREST
+        c_n_ratio_w = utils.CN_RATIO_GRASSLAND if luc.module_type_w.class_name == "Grassland" else utils.CN_RATIO_FOREST
+        c_n_ratio_wo = utils.CN_RATIO_GRASSLAND if luc.module_type_wo.class_name == "Grassland" else utils.CN_RATIO_FOREST
 
         moisture_factor = NitrousEmissionFactor.objects.get(moisture=moisture, name__icontains="Other N Inputs")
 
