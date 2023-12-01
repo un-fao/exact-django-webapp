@@ -190,7 +190,7 @@ LOGGING = {
     },
     "root": {
         "handlers": ["console"],
-        "level": "INFO",
+        "level": "DEBUG",
     },
     "formatters": {
         "verbose": {
@@ -203,3 +203,5 @@ LOGGING = {
         },
     },
 }
+
+APPEND_SLASH = False
