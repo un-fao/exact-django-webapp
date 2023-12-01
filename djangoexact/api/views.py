@@ -97,7 +97,17 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         Creates a new project for a given user.
         """
         request.data["user"] = self.request.user.pk
-        return super().create(request, *args, **kwargs)
+        serializer = WriteProjectSerializer(data=request.data)
+
+        if not serializer.is_valid():
+            logging.error("Error creating project:", serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        project = serializer.save()
+
+        read_serializer = ReadProjectSerializer(instance=project)
+
+        return Response(read_serializer.data, status=status.HTTP_201_CREATED)
 
     @swagger_auto_schema(manual_parameters=[project_id], responses={404: "Project not found"})
     def retrieve(self, request, pk=None):
@@ -387,6 +397,7 @@ def generic_module_viewset(model: Model):
             module_serializer = get_module_serializer(model, read=False)(data=request.data, many=request.data.__class__ == list)
 
             if not module_serializer.is_valid():
+                logger.error("Error creating module:", module_serializer.errors)
                 return Response(module_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             
             # TODO: I think this whole chunk is not needed anymore, as the LUC serializer will validate this
