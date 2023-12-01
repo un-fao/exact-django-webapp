@@ -384,9 +384,10 @@ def generic_module_viewset(model: Model):
         queryset = model.objects.all()
         serializer_class = get_module_serializer(model)
 
-        # def partial_update(self, request, *args, **kwargs):
-        #     self.serializer_class = get_module_serializer(model, read=False)
-        #     return super().partial_update(request, *args, **kwargs)
+        def get_serializer_class(self):
+            if self.action in ["create", "update", "partial_update"]:
+                return get_module_serializer(model, read=False)
+            return get_module_serializer(model)
 
         @transaction.atomic
         def create(self, request):
@@ -400,22 +401,9 @@ def generic_module_viewset(model: Model):
             module_serializer = get_module_serializer(model, read=False)(data=request.data, many=request.data.__class__ == list)
 
             if not module_serializer.is_valid():
-                logger.error("Error creating module:", module_serializer.errors)
+                logger.error(f"Error creating module: {module_serializer.errors}")
                 return Response(module_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             
-            # TODO: I think this whole chunk is not needed anymore, as the LUC serializer will validate this
-
-            # luc: LandUseChange = module_serializer.validated_data.get("land_use_change", None)
-
-            # if luc:
-            #     luc_start = luc.module_type_start
-            #     luc_w = luc.module_type_w
-            #     luc_wo = luc.module_type_wo
-
-            #     if not luc_start or not luc_w or not luc_wo:
-            #         return ErrorResponse(f"At least one land use has not been set.", status=status.HTTP_400_BAD_REQUEST)
-            
-            # Find all attributes ending in "_thread" in the model and create a thread for each
             for t in get_thread_attributes(model):
                 module_serializer.validated_data[t.name] = CommentThread.objects.create()
 
