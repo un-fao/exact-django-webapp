@@ -306,6 +306,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
             activity.module_types.add(luc.module_type_start.id)
             activity.module_types.add(luc.module_type_w.id)
             activity.module_types.add(luc.module_type_wo.id)
+            activity.module_types.add(ModuleType.objects.get(name="Land Use Change").id)
 
         activity.save()
 
