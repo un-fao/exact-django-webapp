@@ -667,19 +667,19 @@ class CropType(Model):
 class AnnualCropping(Assessment, SingleBiomassModule):
     user_notes = TextField(null=True, blank=True)
 
-    tillage_management_type_start = ForeignKey(TillageManagementType, on_delete=CASCADE, related_name="%(class)s_tillage_management_type_start")
-    tillage_management_type_w = ForeignKey(TillageManagementType, on_delete=CASCADE, related_name="%(class)s_tillage_management_type_w")
-    tillage_management_type_wo = ForeignKey(TillageManagementType,on_delete=CASCADE,related_name="%(class)s_tillage_management_type_wo")
+    tillage_management_type_start = ForeignKey(TillageManagementType, on_delete=CASCADE, related_name="%(class)s_tillage_management_type_start", null=True, blank=True)
+    tillage_management_type_w = ForeignKey(TillageManagementType, on_delete=CASCADE, related_name="%(class)s_tillage_management_type_w", null=True, blank=True)
+    tillage_management_type_wo = ForeignKey(TillageManagementType,on_delete=CASCADE,related_name="%(class)s_tillage_management_type_wo", null=True, blank=True)
     tillage_management_type_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_tillage_management_type_thread")
 
-    organic_input_type_start = ForeignKey(OrganicInputType,on_delete=CASCADE,related_name="%(class)s_organic_input_type_start")
-    organic_input_type_w = ForeignKey(OrganicInputType,on_delete=CASCADE,related_name="%(class)s_organic_input_type_w",)
-    organic_input_type_wo = ForeignKey(OrganicInputType,on_delete=CASCADE,related_name="%(class)s_organic_input_type_wo",)
+    organic_input_type_start = ForeignKey(OrganicInputType,on_delete=CASCADE,related_name="%(class)s_organic_input_type_start", null=True, blank=True)
+    organic_input_type_w = ForeignKey(OrganicInputType,on_delete=CASCADE,related_name="%(class)s_organic_input_type_w", null=True, blank=True)
+    organic_input_type_wo = ForeignKey(OrganicInputType,on_delete=CASCADE,related_name="%(class)s_organic_input_type_wo", null=True, blank=True)
     organic_input_type_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_organic_input_type_thread")
 
-    residue_management_type_start = ForeignKey(ResidueManagementType,on_delete=CASCADE,related_name="%(class)s_residue_management_type_start",)
-    residue_management_type_w = ForeignKey(ResidueManagementType,on_delete=CASCADE,related_name="%(class)s_residue_management_type_w",)
-    residue_management_type_wo = ForeignKey(ResidueManagementType,on_delete=CASCADE,related_name="%(class)s_residue_management_type_wo",)
+    residue_management_type_start = ForeignKey(ResidueManagementType,on_delete=CASCADE,related_name="%(class)s_residue_management_type_start", null=True, blank=True)
+    residue_management_type_w = ForeignKey(ResidueManagementType,on_delete=CASCADE,related_name="%(class)s_residue_management_type_w", null=True, blank=True)
+    residue_management_type_wo = ForeignKey(ResidueManagementType,on_delete=CASCADE,related_name="%(class)s_residue_management_type_wo", null=True, blank=True)
     residue_management_type_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_residue_management_type_thread")
 
     crop_yield_start = FloatField(null=True, blank=True)
@@ -885,9 +885,9 @@ class Grassland(FixedAssessment, SingleBiomassModule):
     description = TextField(null=True, blank=True)
     user_notes = TextField(null=True, blank=True)
 
-    grassland_management_type_start = ForeignKey(GrasslandManagementType,on_delete=CASCADE,related_name="%(class)s_grassland_management_type_start")
-    grassland_management_type_w = ForeignKey(GrasslandManagementType,on_delete=CASCADE,related_name="%(class)s_grassland_management_type_w")
-    grassland_management_type_wo = ForeignKey(GrasslandManagementType,on_delete=CASCADE,related_name="%(class)s_grassland_management_type_wo")
+    grassland_management_type_start = ForeignKey(GrasslandManagementType,on_delete=CASCADE,related_name="%(class)s_grassland_management_type_start", null=True)
+    grassland_management_type_w = ForeignKey(GrasslandManagementType,on_delete=CASCADE,related_name="%(class)s_grassland_management_type_w", null=True)
+    grassland_management_type_wo = ForeignKey(GrasslandManagementType,on_delete=CASCADE,related_name="%(class)s_grassland_management_type_wo", null=True)
 
     is_fire_used_start = BooleanField(default=False)
     is_fire_used_w = BooleanField(default=False)
@@ -918,6 +918,18 @@ class Grassland(FixedAssessment, SingleBiomassModule):
     combustion_factor_t2_start = FloatField(null=True, blank=True)
     combustion_factor_t2_w = FloatField(null=True, blank=True)
     combustion_factor_t2_wo = FloatField(null=True, blank=True)
+
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     if self.is_fire_used_start:
+    #         self._meta.get_field("fire_periodicity_start").null = False
+    #         self._meta.get_field("fire_impact_start").null = False
+    #     if self.is_fire_used_w:
+    #         self._meta.get_field("fire_periodicity_w").null = False
+    #         self._meta.get_field("fire_impact_w").null = False
+    #     if self.is_fire_used_wo:
+    #         self._meta.get_field("fire_periodicity_wo").null = False
+    #         self._meta.get_field("fire_impact_wo").null = False
 
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:

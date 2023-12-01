@@ -9,6 +9,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 import sys
 from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
 from django.db import transaction
+import logging
 
 def get_model_serializer(model_arg):
     class GenericSerializer(serializers.ModelSerializer):
@@ -23,98 +24,114 @@ def get_model_serializer(model_arg):
         return GenericSerializer
 
 def get_module_serializer(model_arg: Model, read=True) -> serializers.ModelSerializer:
-    if read:
-        class GenericSerializer(serializers.ModelSerializer):
-            module_type = get_model_serializer(ModuleType)(many=False, read_only=True)
-            activity = ActivitySerializer(many=False, read_only=True)
-            land_use_change = get_model_serializer(LandUseChange)(many=False, read_only=True, required=False)
-            status = get_model_serializer(ActivityState)(many=False, read_only=True)
+    try:
+        return globals()[model_arg.__name__ + "Serializer"]
+    except KeyError:
+        if read:
+            class GenericSerializer(serializers.ModelSerializer):
+                module_type = get_model_serializer(ModuleType)(many=False, read_only=True)
+                activity = ActivitySerializer(many=False, read_only=True)
+                land_use_change = get_model_serializer(LandUseChange)(many=False, read_only=True, required=False)
+                status = get_model_serializer(ActivityState)(many=False, read_only=True)
 
-            class Meta:
-                model = model_arg
-                fields = "__all__"
-                extra_fields = ["module_type"]
-                ref_name = model_arg.__name__
+                class Meta:
+                    model = model_arg
+                    fields = "__all__"
+                    extra_fields = ["module_type"]
+                    ref_name = model_arg.__name__
 
-            def __init__(self, *args, **kwargs):
-                super().__init__(*args, **kwargs)
-                self.fields["module_type"].default = ModuleType.objects.get(class_name=model_arg.__name__)
-            
-
-        return GenericSerializer
-    else:
-        class GenericSerializer(serializers.ModelSerializer):
-            class Meta:
-                model = model_arg
-                fields = "__all__"
-                ref_name = model_arg.__name__
-
-            def __init__(self, instance=None, data=..., **kwargs):
-                super().__init__(instance, data, **kwargs)
-
-                luc_id = data.get("land_use_change", None)
-                luc = LandUseChange.objects.filter(id=luc_id).first()
-                module_type = ModuleType.objects.get(class_name=model_arg.__name__)
-
-                if luc and module_type.is_luc and not module_type.is_fixed_assessment:
-                    luc_start = luc.module_type_start
-                    luc_w = luc.module_type_w
-                    luc_wo = luc.module_type_wo
-
-                    # Avoids ValidationError by setting the unused land use type to something (it's not used anyway)
-                    if luc_start == luc_w != module_type:
-                        data["land_use_type_w"] = data["land_use_type_wo"]
-                        data["land_use_type_start"] = data["land_use_type_wo"]
-                    elif luc_start == luc_wo != module_type:
-                        data["land_use_type_wo"] = data["land_use_type_w"]
-                        data["land_use_type_start"] = data["land_use_type_w"]
-                    elif luc_w == luc_wo != module_type:
-                        data["land_use_type_wo"] = data["land_use_type_start"]
-                        data["land_use_type_w"] = data["land_use_type_start"]
-
-                    # Anything that ends with either _start, _w or _wo
-                    scenario_fields = [field.name for field in model_arg._meta.get_fields() if field.name.endswith("_start") or field.name.endswith("_w") or field.name.endswith("_wo")]
-                    mandatory_fields = [field.name for field in model_arg._meta.get_fields() if not field.null and field.name in scenario_fields]
-
-                    # Cycle fields and do the same check as above
-                    for field in mandatory_fields:
-                        pure_field = field.split("_")[:-1]
-                        pure_field = "_".join(pure_field)
-
-                        try:
-                            if luc_start == luc_w != module_type:
-                                data.update({field: data[f"{pure_field}_start"]})
-                            if luc_start == luc_wo != module_type:
-                                data.update({field: data[f"{pure_field}_w"]})
-                            if luc_w == luc_wo != module_type:
-                                data.update({field: data[f"{pure_field}_start"]})
-                        except KeyError:
-                            raise serializers.ValidationError(f"Missing field {pure_field} for {model_arg.__name__}")
-
-            def validate(self, data):
-                activity = data["activity"]
-                luc = activity.landusechange.first()
-                module_types = list(map(lambda module: module.class_name, activity.module_types.all()))
-
-                if getattr(activity, model_arg.__name__.lower(), None).exists():
-                    raise serializers.ValidationError("A module of this type is already present for this activity")
-
-                if luc:
-                    module_type = ModuleType.objects.get(class_name=model_arg.__name__)
-                    luc_module_types = [luc.module_type_start.class_name, luc.module_type_w.class_name, luc.module_type_wo.class_name]
-
-                    # NOTE: Redundant as it's already checked in ActivityBuilderSerializer, but just in case
-                    if module_type.is_luc and module_type.class_name not in luc_module_types:
-                        raise serializers.ValidationError("Cannot add this module to an activity with a Land Use Change")
-
-                    module_types += luc_module_types
-
-                if model_arg.__name__ not in module_types and model_arg.__name__ != "LandUseChange":
-                    raise serializers.ValidationError("This module type is not present for this activity")
+                def __init__(self, *args, **kwargs):
+                    super().__init__(*args, **kwargs)
+                    self.fields["module_type"].default = ModuleType.objects.get(class_name=model_arg.__name__)
                 
-                return super().validate(data)
-            
-        return GenericSerializer
+
+            return GenericSerializer
+        else:
+            class GenericSerializer(serializers.ModelSerializer):
+                class Meta:
+                    model = model_arg
+                    fields = "__all__"
+                    ref_name = model_arg.__name__
+
+                def __init__(self, instance=None, data=..., **kwargs):
+                    super().__init__(instance, data, **kwargs)
+
+                    luc_id = data.get("land_use_change", None)
+                    luc = LandUseChange.objects.filter(id=luc_id).first()
+                    module_type = ModuleType.objects.get(class_name=model_arg.__name__)
+
+
+                    if luc and module_type.is_luc:
+                        luc_start = luc.module_type_start
+                        luc_w = luc.module_type_w
+                        luc_wo = luc.module_type_wo
+
+                        if not module_type.is_fixed_assessment:
+                            # Avoids ValidationError by setting the unused land use type to something (it's not used anyway)
+                            if data["land_use_type_start"] and data["land_use_type_w"]:
+                                data["land_use_type_wo"] = data["land_use_type_start"]
+                            elif data["land_use_type_start"] and data["land_use_type_wo"]:
+                                data["land_use_type_w"] = data["land_use_type_start"]
+                            elif data["land_use_type_w"] and data["land_use_type_wo"]:
+                                data["land_use_type_start"] = data["land_use_type_w"]
+
+                        # Anything that ends with either _start, _w or _wo
+                        sometimes_mandatory_fields = ["fire_periodicity_start", "fire_periodicity_w", "fire_periodicity_wo", "fire_impact_start", "fire_impact_w", "fire_impact_wo"]
+                        scenario_fields = [field.name for field in model_arg._meta.get_fields() if field.name.endswith("_start") or field.name.endswith("_w") or field.name.endswith("_wo")]
+                        mandatory_fields = [field.name for field in model_arg._meta.get_fields() if not field.null and field.name in scenario_fields]+sometimes_mandatory_fields
+
+                        # Cycle fields and do the same check as above
+                        for field in mandatory_fields:
+                            pure_field = field.split("_")[:-1]
+                            pure_field = "_".join(pure_field)
+
+                            try:
+                                if module_type == luc_start == luc_wo:
+                                    logging.info(f"Setting {pure_field}_w to {pure_field}_start")
+                                    self.initial_data[f"{pure_field}_w"] = data[f"{pure_field}_start"]
+                                elif module_type == luc_start == luc_w:
+                                    logging.info(f"Setting {pure_field}_wo to {pure_field}_start")
+                                    self.initial_data[f"{pure_field}_wo"] = data[f"{pure_field}_start"]
+                                elif module_type == luc_w == luc_wo:
+                                    logging.info(f"Setting {pure_field}_start to {pure_field}_w")
+                                    self.initial_data[f"{pure_field}_start"] = data[f"{pure_field}_w"]
+                            except KeyError as e:
+                                logging.error(e)
+                                raise serializers.ValidationError(f"Missing field {field} for {model_arg.__name__}")
+                            
+                        logging.info(f"Data: {data}")
+
+                def validate(self, data):
+                    logging.info(f"Validating {model_arg.__name__}")
+                    activity = data["activity"]
+                    luc = activity.landusechange.first()
+                    module_types = list(map(lambda module: module.class_name, activity.module_types.all()))
+
+                    logging.info(f"Module types: {module_types}")
+
+                    if getattr(activity, model_arg.__name__.lower(), None).exists():
+                        logging.error(f"Activity already has a {model_arg.__name__}")
+                        raise serializers.ValidationError("A module of this type is already present for this activity")
+
+                    if luc:
+                        logging.info(f"Activity has a Land Use Change")
+                        module_type = ModuleType.objects.get(class_name=model_arg.__name__)
+                        luc_module_types = [luc.module_type_start.class_name, luc.module_type_w.class_name, luc.module_type_wo.class_name]
+
+                        # NOTE: Redundant as it's already checked in ActivityBuilderSerializer, but just in case
+                        if module_type.is_luc and module_type.class_name not in luc_module_types:
+                            logging.error(f"Cannot add {module_type.class_name} to an activity with a Land Use Change")
+                            raise serializers.ValidationError("Cannot add this module to an activity with a Land Use Change")
+
+                        module_types += luc_module_types
+
+                    if model_arg.__name__ not in module_types and model_arg.__name__ != "LandUseChange":
+                        logging.error(f"Module type {model_arg.__name__} is not present for this activity")
+                        raise serializers.ValidationError("This module type is not present for this activity")
+                    
+                    return super().validate(data)
+                
+            return GenericSerializer
 
 class EmissionSerializer(serializers.Serializer):
     gas_type = get_model_serializer(GasType)(many=False, read_only=True)
@@ -383,3 +400,114 @@ class LandUseTypeSerializer(serializers.ModelSerializer):
         model = LandUseType
         fields = "__all__"
         ref_name = "LandUseType"
+
+class LandModuleSerializer(serializers.ModelSerializer):
+    def validate(self, data):
+        activity = data["activity"]
+        luc = activity.landusechange.first()
+        module_types = list(map(lambda module: module.class_name, activity.module_types.all()))
+
+        if getattr(activity, self.Meta.ref_name.lower(), None).exists():
+            logging.error(f"Activity already has a {self.Meta.ref_name}")
+            raise serializers.ValidationError("A module of this type is already present for this activity")
+
+        if luc:
+            module_type = ModuleType.objects.get(class_name=self.Meta.ref_name)
+            luc_module_types = [luc.module_type_start.class_name, luc.module_type_w.class_name, luc.module_type_wo.class_name]
+
+            # NOTE: Redundant as it's already checked in ActivityBuilderSerializer, but just in case
+            if module_type.is_luc and module_type.class_name not in luc_module_types:
+                logging.error(f"Cannot add {module_type.class_name} to an activity with a Land Use Change")
+                raise serializers.ValidationError("Cannot add this module to an activity with a Land Use Change")
+
+            module_types += luc_module_types
+
+        if self.Meta.ref_name not in module_types and self.Meta.ref_name != "LandUseChange":
+            logging.error(f"Module type {self.Meta.ref_name} is not present for this activity")
+            raise serializers.ValidationError("This module type is not present for this activity")
+
+        logging.debug(f"Validated {self.Meta.ref_name}")
+        return super().validate(data)
+
+class GrasslandSerializer(LandModuleSerializer):
+    class Meta:
+        model = Grassland
+        fields = "__all__"
+        ref_name = "Grassland"
+
+    def validate(self, data):
+        logging.debug(f"Validating {self.Meta.ref_name}")
+        if data.get("grassland_management_type_start", None):
+            mandatory_fields = [data.get("grassland_management_type_start", None)]
+            if data['is_fire_used_start']:
+                mandatory_fields += [data.get("fire_periodicity_start", None), data.get("fire_impact_start", None)]
+        if data.get("grassland_management_type_w", None):
+            mandatory_fields = [data.get("grassland_management_type_w", None)]
+            if data['is_fire_used_w']:
+                mandatory_fields += [data.get("fire_periodicity_w", None), data.get("fire_impact_w", None)]
+        if data.get("grassland_management_type_wo", None):
+            mandatory_fields = [data.get("grassland_management_type_wo", None)]
+            if data['is_fire_used_wo']:
+                mandatory_fields += [data.get("fire_periodicity_wo", None), data.get("fire_impact_wo", None)]
+
+        if not all(mandatory_fields):
+                raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
+
+        return super().validate(data)
+    
+class AnnualCroppingSerializer(LandModuleSerializer):
+    class Meta:
+        model = AnnualCropping
+        fields = "__all__"
+        ref_name = "AnnualCropping"
+
+    def validate(self, data):
+        logging.debug(f"Validating {self.Meta.ref_name}")
+        mandatory_fields = []
+        if data.get("land_use_type_start", None):
+            mandatory_fields += [
+                data.get("tillage_management_type_start", None),
+                data.get("organic_input_type_start", None),
+                data.get("residue_management_type_start", None),
+            ]
+        if data.get("land_use_type_w", None):
+            mandatory_fields += [
+                data.get("tillage_management_type_w", None),
+                data.get("organic_input_type_w", None),
+                data.get("residue_management_type_w", None),
+            ]
+            
+        if data.get("land_use_type_wo", None):
+            mandatory_fields += [
+                data.get("tillage_management_type_wo", None),
+                data.get("organic_input_type_wo", None),
+                data.get("residue_management_type_wo", None),
+            ]
+
+        if not all(mandatory_fields):
+                raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
+
+        activity = data["activity"]
+        luc = activity.landusechange.first()
+        module_types = list(map(lambda module: module.class_name, activity.module_types.all()))
+
+        if getattr(activity, self.Meta.ref_name.lower(), None).exists():
+            logging.error(f"Activity already has a {self.Meta.ref_name}")
+            raise serializers.ValidationError("A module of this type is already present for this activity")
+
+        if luc:
+            module_type = ModuleType.objects.get(class_name=self.Meta.ref_name)
+            luc_module_types = [luc.module_type_start.class_name, luc.module_type_w.class_name, luc.module_type_wo.class_name]
+
+            # NOTE: Redundant as it's already checked in ActivityBuilderSerializer, but just in case
+            if module_type.is_luc and module_type.class_name not in luc_module_types:
+                logging.error(f"Cannot add {module_type.class_name} to an activity with a Land Use Change")
+                raise serializers.ValidationError("Cannot add this module to an activity with a Land Use Change")
+
+            module_types += luc_module_types
+
+        if self.Meta.ref_name not in module_types and self.Meta.ref_name != "LandUseChange":
+            logging.error(f"Module type {self.Meta.ref_name} is not present for this activity")
+            raise serializers.ValidationError(f"{self.Meta.ref_name} is not present for this activity")
+        
+        return super().validate(data)
