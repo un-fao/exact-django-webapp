@@ -11,6 +11,11 @@ from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownT
 from django.db import transaction
 import logging
 
+class ActionTypes(Enum):
+    CREATE = "CREATE"
+    UPDATE = "UPDATE"
+    RETRIEVE = "RETRIEVE"
+
 def get_model_serializer(model_arg):
     class GenericSerializer(serializers.ModelSerializer):
         class Meta:
@@ -23,14 +28,16 @@ def get_model_serializer(model_arg):
     except KeyError:
         return GenericSerializer
 
-def get_module_serializer(model_arg: Model, read=True) -> serializers.ModelSerializer:
+def get_module_serializer(model_arg: Model, action=ActionTypes.RETRIEVE) -> serializers.ModelSerializer:
     try:
-        if read:
-            return globals()[model_arg.__name__ + "ReadSerializer"]
-        else:
-            return globals()[model_arg.__name__ + "WriteSerializer"]
+        match action:
+            case ActionTypes.CREATE | ActionTypes.UPDATE:
+                return globals()[model_arg.__name__ + "WriteSerializer"]
+            case ActionTypes.RETRIEVE:
+                return globals()[model_arg.__name__ + "ReadSerializer"]
     except KeyError:
-        if read:
+        # TODO: Remove this once all modules have been implemented
+        if action == ActionTypes.RETRIEVE:
             class GenericSerializer(serializers.ModelSerializer):
                 module_type = get_model_serializer(ModuleType)(many=False, read_only=True)
                 activity = ActivitySerializer(many=False, read_only=True)
@@ -46,9 +53,6 @@ def get_module_serializer(model_arg: Model, read=True) -> serializers.ModelSeria
                 def __init__(self, *args, **kwargs):
                     super().__init__(*args, **kwargs)
                     self.fields["module_type"].default = ModuleType.objects.get(class_name=model_arg.__name__)
-                
-
-            return GenericSerializer
         else:
             class GenericSerializer(serializers.ModelSerializer):
                 class Meta:
@@ -87,7 +91,7 @@ def get_module_serializer(model_arg: Model, read=True) -> serializers.ModelSeria
                     
                     return super().validate(data)
                 
-            return GenericSerializer
+        return GenericSerializer
 
 class EmissionSerializer(serializers.Serializer):
     gas_type = get_model_serializer(GasType)(many=False, read_only=True)
@@ -360,6 +364,12 @@ class LandUseTypeSerializer(serializers.ModelSerializer):
 
 class LandModuleBaseSerializer(serializers.ModelSerializer):
 
+    class Meta:
+        mandatory_fields = []
+
+    
+
+class LandModuleWriteSerializer(LandModuleBaseSerializer):
     def validate(self, data):
         logging.debug(f"START LandModuleSerializer[{self.Meta.ref_name}].validate")
         logging.debug(f"Data: {data}")
@@ -368,7 +378,7 @@ class LandModuleBaseSerializer(serializers.ModelSerializer):
         luc = activity.landusechange.first()
         module_types = list(map(lambda module: module.class_name, activity.module_types.all()))
 
-        if getattr(activity, self.Meta.ref_name.lower(), None).exists():
+        if getattr(activity, self.Meta.ref_name.lower(), None).exists() and not self.instance:
             logging.error(f"Activity already has a {self.Meta.ref_name}")
             raise serializers.ValidationError("A module of this type is already present for this activity")
 
@@ -390,9 +400,6 @@ class LandModuleBaseSerializer(serializers.ModelSerializer):
         logging.debug(f"END LandModuleSerializer[{self.Meta.ref_name}].validate")
         return super().validate(data)
 
-class LandModuleWriteSerializer(LandModuleBaseSerializer):
-    pass
-
 class LandModuleReadSerializer(LandModuleBaseSerializer):
     module_type = get_model_serializer(ModuleType)(many=False, read_only=True)
     activity = ActivitySerializer(many=False, read_only=True)
@@ -412,21 +419,33 @@ class GrasslandWriteSerializer(LandModuleWriteSerializer):
         fields = "__all__"
         ref_name = "Grassland"
 
-    def validate(self, data):
-        if data.get("grassland_management_type_start", None):
-            mandatory_fields = [data.get("grassland_management_type_start", None)]
-            if data['is_fire_used_start']:
-                mandatory_fields += [data.get("fire_periodicity_start", None), data.get("fire_impact_start", None)]
-        if data.get("grassland_management_type_w", None):
-            mandatory_fields = [data.get("grassland_management_type_w", None)]
-            if data['is_fire_used_w']:
-                mandatory_fields += [data.get("fire_periodicity_w", None), data.get("fire_impact_w", None)]
-        if data.get("grassland_management_type_wo", None):
-            mandatory_fields = [data.get("grassland_management_type_wo", None)]
-            if data['is_fire_used_wo']:
-                mandatory_fields += [data.get("fire_periodicity_wo", None), data.get("fire_impact_wo", None)]
+        mandatory_fields = [
+            "grassland_management_type",
+            "is_fire_used",
+        ]
 
-        if not all(mandatory_fields):
+    def validate(self, data):
+
+        gm_start = data.get("grassland_management_type_start", getattr(self.instance, "grassland_management_type_start", None))
+        gm_w = data.get("grassland_management_type_w", getattr(self.instance, "grassland_management_type_w", None))
+        gm_wo = data.get("grassland_management_type_wo", getattr(self.instance, "grassland_management_type_wo", None))
+
+        mandatory_fields = []
+        if gm_start:
+            mandatory_fields += list(map(lambda field: f"{field}_start", self.Meta.mandatory_fields))
+            if data.get('is_fire_used_start', getattr(self.instance, "is_fire_used_start", None)):
+                mandatory_fields += ["fire_periodicity_start", "fire_impact_start"]
+        if gm_w:
+            mandatory_fields += list(map(lambda field: f"{field}_w", self.Meta.mandatory_fields))
+            if data.get('is_fire_used_w', getattr(self.instance, "is_fire_used_w", None)):
+                mandatory_fields += ["fire_periodicity_w", "fire_impact_w"]
+        if gm_wo:
+            mandatory_fields += list(map(lambda field: f"{field}_wo", self.Meta.mandatory_fields))
+            if data.get('is_fire_used_wo', getattr(self.instance, "is_fire_used_wo", None)):
+                mandatory_fields += ["fire_periodicity_wo", "fire_impact_wo"]
+
+        # Check that all mandatory fields are present either in the data or in the instance
+        if not all(list(map(lambda field: data.get(field, getattr(self.instance, field, None)) != None, mandatory_fields))):
                 raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
 
         return super().validate(data)
@@ -438,37 +457,37 @@ class GrasslandReadSerializer(LandModuleReadSerializer):
         ref_name = "Grassland"
 
 class AnnualCroppingWriteSerializer(LandModuleWriteSerializer):
+
     class Meta:
         model = AnnualCropping
         fields = "__all__"
         ref_name = "AnnualCropping"
+        mandatory_fields = [
+            "land_use_type",
+            "tillage_management_type",
+            "organic_input_type",
+            "residue_management_type",
+        ]
 
     def validate(self, data):
-        if not data.get("land_use_type_w", None) and not data.get("land_use_type_wo", None) and not data.get("land_use_type_start", None):
+
+        lut_start = data.get("land_use_type_start", getattr(self.instance, "land_use_type_start", None))
+        lut_w = data.get("land_use_type_w", getattr(self.instance, "land_use_type_w", None))
+        lut_wo = data.get("land_use_type_wo", getattr(self.instance, "land_use_type_wo", None))
+
+        if not lut_start and not lut_w and not lut_wo:
             raise serializers.ValidationError("At least one land use type must be provided")
 
         mandatory_fields = []
-        if data.get("land_use_type_start", None):
-            mandatory_fields += [
-                data.get("tillage_management_type_start", None),
-                data.get("organic_input_type_start", None),
-                data.get("residue_management_type_start", None),
-            ]
-        if data.get("land_use_type_w", None):
-            mandatory_fields += [
-                data.get("tillage_management_type_w", None),
-                data.get("organic_input_type_w", None),
-                data.get("residue_management_type_w", None),
-            ]
-            
-        if data.get("land_use_type_wo", None):
-            mandatory_fields += [
-                data.get("tillage_management_type_wo", None),
-                data.get("organic_input_type_wo", None),
-                data.get("residue_management_type_wo", None),
-            ]
+        if lut_start:
+            mandatory_fields += list(map(lambda field: f"{field}_start", self.Meta.mandatory_fields))
+        if lut_w:
+            mandatory_fields += list(map(lambda field: f"{field}_w", self.Meta.mandatory_fields))
+        if lut_wo:
+            mandatory_fields += list(map(lambda field: f"{field}_wo", self.Meta.mandatory_fields))
 
-        if not all(mandatory_fields):
+        # Check that all mandatory fields are present either in the data or in the instance
+        if not all(list(map(lambda field: data.get(field, getattr(self.instance, field, None)), mandatory_fields))):
                 raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
         
         return super().validate(data)
