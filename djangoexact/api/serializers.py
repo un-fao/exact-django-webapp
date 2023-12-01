@@ -355,6 +355,16 @@ class LandUseTypeSerializer(serializers.ModelSerializer):
         ref_name = "LandUseType"
 
 class LandModuleSerializer(serializers.ModelSerializer):
+
+    module_type = get_model_serializer(ModuleType)(many=False, read_only=True)
+    activity = ActivitySerializer(many=False, read_only=True)
+    land_use_change = get_model_serializer(LandUseChange)(many=False, read_only=True, required=False)
+    status = get_model_serializer(ActivityState)(many=False, read_only=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["module_type"].default = ModuleType.objects.get(class_name=self.Meta.ref_name)
+
     def validate(self, data):
         logging.debug(f"START LandModuleSerializer[{self.Meta.ref_name}].validate")
         logging.debug(f"Data: {data}")
