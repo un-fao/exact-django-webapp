@@ -394,6 +394,9 @@ def generic_module_viewset(model: Model):
             Creates a new module for a given activity.
             """
 
+            logging.debug(f"START GenericModuleViewSet[{model.__name__}].create")
+            logging.debug(f"request.data: {request.data}")
+
             module_serializer = get_module_serializer(model, read=False)(data=request.data, many=request.data.__class__ == list)
 
             if not module_serializer.is_valid():
@@ -419,6 +422,8 @@ def generic_module_viewset(model: Model):
             module_serializer.save()
 
             read_serializer = get_module_serializer(model)(module_serializer.instance)
+
+            logging.debug(f"END GenericModuleViewSet[{model.__name__}].create")
 
             return Response(read_serializer.data, status=status.HTTP_201_CREATED)
 
