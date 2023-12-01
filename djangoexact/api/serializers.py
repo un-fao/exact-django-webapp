@@ -437,6 +437,7 @@ class GrasslandSerializer(LandModuleSerializer):
 
     def validate(self, data):
         logging.debug(f"Validating {self.Meta.ref_name}")
+
         if data.get("grassland_management_type_start", None):
             mandatory_fields = [data.get("grassland_management_type_start", None)]
             if data['is_fire_used_start']:
@@ -463,6 +464,10 @@ class AnnualCroppingSerializer(LandModuleSerializer):
 
     def validate(self, data):
         logging.debug(f"Validating {self.Meta.ref_name}")
+
+        if not data.get("land_use_type_w", None) and not data.get("land_use_type_wo", None) and not data.get("land_use_type_start", None):
+            raise serializers.ValidationError("At least one land use type must be provided")
+
         mandatory_fields = []
         if data.get("land_use_type_start", None):
             mandatory_fields += [
