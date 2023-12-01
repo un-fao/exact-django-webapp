@@ -502,3 +502,23 @@ class AnnualCroppingReadSerializer(LandModuleReadSerializer):
         model = AnnualCropping
         fields = "__all__"
         ref_name = "AnnualCropping"
+
+class LandUseChangeWriteSerializer(LandModuleWriteSerializer):
+    class Meta:
+        model = LandUseChange
+        fields = "__all__"
+        ref_name = "LandUseChange"
+
+    def validate(self, data):
+        if self.instance:
+            self.instance.status = ActivityState.objects.get(name="READY")
+        else:
+            data["status"] = ActivityState.objects.get(name="READY")
+
+        return super().validate(data)
+    
+class LandUseChangeReadSerializer(LandModuleReadSerializer):
+    class Meta:
+        model = LandUseChange
+        fields = "__all__"
+        ref_name = "LandUseChange"
