@@ -1766,11 +1766,11 @@ class DegradedLand(Assessment, SingleBiomassModule):
 
 class LandUseChange(Module):
 
-    module_type_start = ForeignKey(ModuleType, on_delete=CASCADE, null=True, blank=True, related_name="start")
-    module_type_w = ForeignKey(ModuleType, on_delete=CASCADE, null=True, blank=True, related_name="w")
-    module_type_wo = ForeignKey(ModuleType, on_delete=CASCADE, null=True, blank=True, related_name="wo")
+    module_type_start = ForeignKey(ModuleType, on_delete=CASCADE, related_name="start")
+    module_type_w = ForeignKey(ModuleType, on_delete=CASCADE, related_name="w")
+    module_type_wo = ForeignKey(ModuleType, on_delete=CASCADE, related_name="wo")
 
-    area = FloatField(null=True, blank=True)
+    area = FloatField()
 
     is_fire_used_start = BooleanField(default=False)
     is_fire_used_w = BooleanField(default=False)
