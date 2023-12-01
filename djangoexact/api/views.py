@@ -238,7 +238,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         modules = []
         module_types = ModuleType.objects.filter(is_submodule=False).all()
         # TODO: Make a serializer for this
-        for module in module_types:
+        for module in activity.module_types.all():
             try:
                 model_ref = apps.get_model(API, module.class_name)
             except LookupError:
@@ -440,8 +440,8 @@ def generic_module_viewset(model: Model):
                 logger.error(f"Error creating module: {module_serializer.errors}")
                 return Response(module_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             
-            for t in get_thread_attributes(model):
-                module_serializer.validated_data[t.name] = CommentThread.objects.create()
+            # for t in get_thread_attributes(model):
+            #     module_serializer.validated_data[t.name] = CommentThread.objects.create()
 
             module_serializer.save()
 

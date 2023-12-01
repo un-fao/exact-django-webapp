@@ -374,7 +374,7 @@ class LandModuleWriteSerializer(LandModuleBaseSerializer):
         logging.debug(f"START LandModuleSerializer[{self.Meta.ref_name}].validate")
         logging.debug(f"Data: {data}")
 
-        activity = data["activity"]
+        activity = data["activity"] if "activity" in data else self.instance.activity
         luc = activity.landusechange.first()
         module_types = list(map(lambda module: module.class_name, activity.module_types.all()))
 
@@ -489,6 +489,11 @@ class AnnualCroppingWriteSerializer(LandModuleWriteSerializer):
         # Check that all mandatory fields are present either in the data or in the instance
         if not all(list(map(lambda field: data.get(field, getattr(self.instance, field, None)), mandatory_fields))):
                 raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
+        
+        if self.instance:
+            self.instance.status = ActivityState.objects.get(name="READY")
+        else:
+            data["status"] = ActivityState.objects.get(name="READY")
         
         return super().validate(data)
 
