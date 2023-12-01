@@ -268,18 +268,18 @@ class ActivityBuilderSerializer(serializers.Serializer):
     soil_type = serializers.PrimaryKeyRelatedField(queryset=SoilType.objects.all(), required=True)
     duration = serializers.IntegerField(required=True)
     land_use_change = LandUseChangeBuilderSerializer(many=False, required=False, allow_null=True)
-    modules = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
+    module_types = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
     has_input = serializers.BooleanField(default=False, required=False)
     area = serializers.FloatField(required=True)
-    modules = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
+    module_types = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
 
     def validate(self, data):
         luc_module: ModuleType = ModuleType.objects.filter(name="Land Use Change").first()
-        if luc_module and luc_module in data["modules"]:
+        if luc_module and luc_module in data["module_types"]:
             raise serializers.ValidationError("Land Use Change module cannot be added manually")
-        if data["has_input"] and not data.get("modules", None):
+        if data["has_input"] and not data.get["module_types"]:
             raise serializers.ValidationError("If has_input is true, at least one input module must be provided")
-        if data.get("land_use_change", None) and len(list(filter(lambda module: module.is_luc, data['modules']))) > 0:
+        if data.get("land_use_change", None) and len(list(filter(lambda module: module.is_luc, data['module_types']))) > 0:
             raise serializers.ValidationError("Land Modules cannot be independently added to activities with a Land Use Change")
         
         super().validate(data)
@@ -299,7 +299,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
             soil_type_t2=self.validated_data["soil_type"], 
             duration_t2=self.validated_data["duration"],
         )
-        activity.module_types.set(self.validated_data.get("modules", []))
+        activity.module_types.set(self.validated_data.get("module_types", []))
 
         if self.validated_data.get("land_use_change", None):
             luc = LandUseChange.objects.create(**self.validated_data["land_use_change"], activity=activity, area=self.validated_data["area"])
