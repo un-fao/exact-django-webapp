@@ -25,7 +25,10 @@ def get_model_serializer(model_arg):
 
 def get_module_serializer(model_arg: Model, read=True) -> serializers.ModelSerializer:
     try:
-        return globals()[model_arg.__name__ + "Serializer"]
+        if read:
+            return globals()[model_arg.__name__ + "ReadSerializer"]
+        else:
+            return globals()[model_arg.__name__ + "WriteSerializer"]
     except KeyError:
         if read:
             class GenericSerializer(serializers.ModelSerializer):
@@ -61,6 +64,7 @@ def get_module_serializer(model_arg: Model, read=True) -> serializers.ModelSeria
 
                     logging.info(f"Module types: {module_types}")
 
+                    # TODO: Make activity OneToOneField and remove this check
                     if getattr(activity, model_arg.__name__.lower(), None).exists():
                         logging.error(f"Activity already has a {model_arg.__name__}")
                         raise serializers.ValidationError("A module of this type is already present for this activity")
@@ -354,16 +358,7 @@ class LandUseTypeSerializer(serializers.ModelSerializer):
         fields = "__all__"
         ref_name = "LandUseType"
 
-class LandModuleSerializer(serializers.ModelSerializer):
-
-    module_type = get_model_serializer(ModuleType)(many=False, read_only=True)
-    activity = ActivitySerializer(many=False, read_only=True)
-    land_use_change = get_model_serializer(LandUseChange)(many=False, read_only=True, required=False)
-    status = get_model_serializer(ActivityState)(many=False, read_only=True)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["module_type"].default = ModuleType.objects.get(class_name=self.Meta.ref_name)
+class LandModuleBaseSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         logging.debug(f"START LandModuleSerializer[{self.Meta.ref_name}].validate")
@@ -395,7 +390,23 @@ class LandModuleSerializer(serializers.ModelSerializer):
         logging.debug(f"END LandModuleSerializer[{self.Meta.ref_name}].validate")
         return super().validate(data)
 
-class GrasslandSerializer(LandModuleSerializer):
+class LandModuleWriteSerializer(LandModuleBaseSerializer):
+    pass
+
+class LandModuleReadSerializer(LandModuleBaseSerializer):
+    module_type = get_model_serializer(ModuleType)(many=False, read_only=True)
+    activity = ActivitySerializer(many=False, read_only=True)
+    land_use_change = get_model_serializer(LandUseChange)(many=False, read_only=True, required=False)
+    status = get_model_serializer(ActivityState)(many=False, read_only=True)
+
+    class Meta:
+        extra_fields = ["module_type"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["module_type"].default = ModuleType.objects.get(class_name=self.Meta.ref_name)
+
+class GrasslandWriteSerializer(LandModuleWriteSerializer):
     class Meta:
         model = Grassland
         fields = "__all__"
@@ -420,7 +431,13 @@ class GrasslandSerializer(LandModuleSerializer):
 
         return super().validate(data)
     
-class AnnualCroppingSerializer(LandModuleSerializer):
+class GrasslandReadSerializer(LandModuleReadSerializer):
+    class Meta:
+        model = Grassland
+        fields = "__all__"
+        ref_name = "Grassland"
+
+class AnnualCroppingWriteSerializer(LandModuleWriteSerializer):
     class Meta:
         model = AnnualCropping
         fields = "__all__"
@@ -455,3 +472,9 @@ class AnnualCroppingSerializer(LandModuleSerializer):
                 raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
         
         return super().validate(data)
+
+class AnnualCroppingReadSerializer(LandModuleReadSerializer):
+    class Meta:
+        model = AnnualCropping
+        fields = "__all__"
+        ref_name = "AnnualCropping"
