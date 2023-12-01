@@ -386,8 +386,44 @@ def generic_module_viewset(model: Model):
 
         def get_serializer_class(self):
             if self.action in ["create", "update", "partial_update"]:
-                return get_module_serializer(model, read=False)
+                return get_module_serializer(model, action=ActionTypes.CREATE)
             return get_module_serializer(model)
+        
+        def update(self, request, *args, **kwargs):
+            """
+            Updates a module.
+            """
+
+            module = self.get_object()
+
+            serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data=request.data, instance=module)
+
+            if not serializer.is_valid():
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+            module = serializer.save()
+
+            read_serializer = get_module_serializer(model)(instance=module, context={"request": request})
+
+            return Response(read_serializer.data, status=status.HTTP_200_OK)
+        
+        def partial_update(self, request, *args, **kwargs):
+            """
+            Partially updates a module.
+            """
+
+            module = self.get_object()
+
+            serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data=request.data, partial=True, instance=module)
+
+            if not serializer.is_valid():
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+            module = serializer.save()
+
+            read_serializer = get_module_serializer(model)(instance=module, context={"request": request})
+
+            return Response(read_serializer.data, status=status.HTTP_200_OK)
 
         @transaction.atomic
         def create(self, request):
@@ -398,7 +434,7 @@ def generic_module_viewset(model: Model):
             logging.debug(f"START GenericModuleViewSet[{model.__name__}].create")
             logging.debug(f"request.data: {request.data}")
 
-            module_serializer = get_module_serializer(model, read=False)(data=request.data, many=request.data.__class__ == list)
+            module_serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data=request.data, many=request.data.__class__ == list)
 
             if not module_serializer.is_valid():
                 logger.error(f"Error creating module: {module_serializer.errors}")
