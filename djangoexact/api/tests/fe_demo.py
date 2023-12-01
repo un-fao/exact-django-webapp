@@ -20,8 +20,8 @@ climate = Climate.objects.get(name="Tropical")
 moisture = Moisture.objects.get(name="Moist")
 soil_type = SoilType.objects.get(name="High Activity Clay")
 gw_potential = GlobalWarmingPotential.objects.get(name="100 yr AR5 w/out CC feedback")
-implementation_years = 7
-capitalization_years = 10
+implementation_years = 5
+capitalization_years = 15
 
 # Generate random name
 post_project = {

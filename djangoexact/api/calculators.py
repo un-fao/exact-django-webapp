@@ -791,8 +791,8 @@ class AnnualCroppingCalculator(BaseCalculator):
             results_start = AnnualCropland(*inputs_start)
             results_start.calculate_emissions()
 
+        # Without
         if not luc or (luc and luc.module_type_wo.class_name == "AnnualCropping"):
-            # Without
 
             land_use_type_wo = input.land_use_type_wo
             minor_land_use_type_wo = input.minor_land_use_type_wo
@@ -861,8 +861,8 @@ class AnnualCroppingCalculator(BaseCalculator):
             results_wo = AnnualCropland(*inputs_wo)
             results_wo.calculate_emissions()
 
+        # With
         if not luc or (luc and luc.module_type_w.class_name == "AnnualCropping"):
-            # With
             land_use_type_w = input.land_use_type_w
             minor_land_use_type_w = input.minor_land_use_type_w
             fires_combustion_factor_w = FiresCombustionFactor.objects.get(land_use_type=land_use_type_w)
@@ -1283,14 +1283,16 @@ class GrasslandCalculator(BaseCalculator):
 
         area = luc.area if luc and luc.area else module.area
 
-        math_start = None
+        math_start_w = None
+        math_start_wo = None
         math_w = None
         math_wo = None
 
-        if not luc or (luc and luc.module_type_start.class_name == "Grassland"):
+        if not luc or (luc and luc.module_type_start.class_name == "Grassland" and luc.module_type_w.class_name == "Grassland"):
             soc_start = GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_start, climate=project.climate)
+            soc_w = GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_w, climate=project.climate)
 
-            inputs_start = [
+            inputs_start_w = [
                 *[area, 0],
                 project.implementation_years,
                 project.capitalization_years,
@@ -1309,12 +1311,48 @@ class GrasslandCalculator(BaseCalculator):
                 module.soil_carbon_t2_start,
                 module.soil_carbon_t2_start,
                 soc_start.fmg,
+                soc_w.fmg,
                 soc_start.flu,
+                soc_w.flu,
                 soc_start.fi,
+                soc_w.fi,
             ]
 
-            math_start = MathGrassland(*inputs_start)
-            math_start.calculate_emissions()
+            math_start_w = MathGrassland(*inputs_start_w)
+            math_start_w.calculate_emissions()
+
+        if not luc or (luc and luc.module_type_start.class_name == "Grassland" and luc.module_type_wo.class_name == "Grassland"):
+            soc_start = GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_start, climate=project.climate)
+            soc_wo = GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_wo, climate=project.climate)
+
+            inputs_start_wo = [
+                *[area, 0],
+                project.implementation_years,
+                project.capitalization_years,
+                change_rate.name,
+                project.gw_potential.n2o,
+                project.gw_potential.ch4,
+                module.fire_periodicity_start,
+                module.is_fire_used_start,
+                ef.ch4,
+                ef.n2o,
+                agb.value,
+                module.get_biomass_t2(utils.ScenarioTypes.START),
+                cf,
+                module.combustion_factor_t2_start,
+                soc.value,
+                module.soil_carbon_t2_start,
+                module.soil_carbon_t2_start,
+                soc_start.fmg,
+                soc_wo.fmg,
+                soc_start.flu,
+                soc_wo.flu,
+                soc_start.fi,
+                soc_wo.fi,
+            ]
+
+            math_start_wo = MathGrassland(*inputs_start_wo)
+            math_start_wo.calculate_emissions()
 
         if not luc or (luc and luc.module_type_w.class_name == "Grassland"):
 
@@ -1382,11 +1420,12 @@ class GrasslandCalculator(BaseCalculator):
             math_wo = MathGrassland(*inputs_wo)
             math_wo.calculate_emissions()
 
-        res_start = math_start.result if math_start else MathResult(project.implementation_years, project.capitalization_years)
+        res_start_w = math_start_w.result if math_start_w else MathResult(project.implementation_years, project.capitalization_years)
+        res_start_wo = math_start_wo.result if math_start_wo else MathResult(project.implementation_years, project.capitalization_years)
         res_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
         res_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
-        return (res_w+res_start, res_wo+res_start)
+        return (res_w+res_start_w, res_wo+res_start_wo)
 class SmallFisheryCalculator(BaseCalculator):
     """
     Calculator for small fishery.
