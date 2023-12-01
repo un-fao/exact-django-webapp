@@ -729,15 +729,6 @@ class AnnualCropping(Assessment, SingleBiomassModule):
     soc_ref_t2_w = FloatField(null=True, blank=True)
     soc_ref_t2_wo = FloatField(null=True, blank=True)
 
-    def save(self, *args, **kwargs):
-        if not self.land_use_type_start:
-            self.land_use_type_start = LandUseType.objects.get(name="Annual Cropland")
-            self.land_use_type_w = self.land_use_type_start
-            self.land_use_type_wo = self.land_use_type_start
-
-        super().save(*args, **kwargs)
-
-
 class PerennialCropping(Assessment, DoubleBiomassModule):
     user_notes = TextField(null=True, blank=True)
 
