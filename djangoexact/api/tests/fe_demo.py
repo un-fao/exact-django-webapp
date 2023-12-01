@@ -36,7 +36,7 @@ post_project = {
 }
 
 project_response = client.post('/api/projects/', json.dumps(post_project), content_type='application/json')
-print(project_response)
+logging.debug(project_response)
 
 post_activity = {
     "name": "Activity for demo",
@@ -45,7 +45,7 @@ post_activity = {
 }
 
 activity_response = client.post('/api/activities/', post_activity, format='json')
-print(activity_response)
+logging.debug(activity_response)
 
 module_type_start = ModuleType.objects.get(name="Grassland")
 module_type_w = ModuleType.objects.get(name="Annual Cropland")
@@ -62,7 +62,7 @@ post_luc = {
 }
 
 luc_response = client.post('/api/land-use-changes/', post_luc, format='json')
-print(luc_response)
+logging.debug(luc_response)
 
 post_grassland = {
     "activity": activity_response.data['id'],
@@ -78,7 +78,7 @@ post_grassland = {
 }
 
 post_annual_cropland = {
-    "actvity": activity_response.data['id'],
+    "activity": activity_response.data['id'],
     "land_use_change": luc_response.data["id"],
     "land_use_type_w": LandUseType.objects.get(name="Maize").id,
     "tillage_management_type_w": TillageManagementType.objects.get(name="Full Tillage").id,
@@ -87,52 +87,51 @@ post_annual_cropland = {
 }
 
 grassland_response = client.post('/api/grasslands/', post_grassland, format='json')
-logging.info(grassland_response.data)
-grassland_results_response = client.get(f'/api/grasslands/{grassland_response.data["id"]}/results', format='json')
-print(grassland_results_response)
+logging.debug(grassland_response)
+grassland_results_response = client.get(f'/api/grasslands/{grassland_response.data["id"]}/results/')
+logging.debug(grassland_results_response)
 
 annualcropping_response = client.post('/api/annual-croppings/', post_annual_cropland, format='json')
-print(annualcropping_response)
-annualcropping_results_response = client.get(f'/api/annual-croppings/{annualcropping_response.data["id"]}/results', format='json')
-print(annualcropping_results_response)
+logging.debug(annualcropping_response)
+annualcropping_results_response = client.get(f'/api/annual-croppings/{annualcropping_response.data["id"]}/results/')
+logging.debug(annualcropping_results_response)
 
-luc_results_response = client.get(f'/api/land-use-changes/{luc_response.data["id"]}/results', format='json')
-print(luc_results_response)
+luc_results_response = client.get(f'/api/land-use-changes/{luc_response.data["id"]}/results/')
 
-print("##### Test Suite for COP28 Demo #####\n\n")
+logging.debug("##### Test Suite for COP28 Demo #####\n\n")
 
-print("##### PARAMETERS #####\n\n")
+logging.debug("##### PARAMETERS #####\n\n")
 
-print(f"Hectars: {area}")
-print(f"Country: {country}")
-print(f"Region: {country.region}")
-print(f"Climate: {climate}")
-print(f"Moisture: {moisture}")
-print(f"Soil Type: {soil_type}")
+logging.debug(f"Hectars: {area}")
+logging.debug(f"Country: {country}")
+logging.debug(f"Region: {country.region}")
+logging.debug(f"Climate: {climate}")
+logging.debug(f"Moisture: {moisture}")
+logging.debug(f"Soil Type: {soil_type}\n\n")
 
-print("##### PROJECT #####\n\n")
+logging.debug("##### PROJECT #####\n\n")
 
-print(f"Project name: {project_response.data['name']}")
+logging.debug(f"Project name: {project_response.data['name']}\n\n")
 
-print("##### ACTIVITY #####\n\n")
+logging.debug("##### ACTIVITY #####\n\n")
 
-print(f"Activity name: {activity_response.data['name']}")
+logging.debug(f"Activity name: {activity_response.data['name']}\n\n")
 
-print("##### LAND USE CHANGE #####\n\n")
+logging.debug("##### LAND USE CHANGE #####\n\n")
 
-print(f"Module type start: {module_type_start}")
-print(f"Module type w: {module_type_w}")
-print(f"Module type wo: {module_type_wo}")
+logging.debug(f"Module type start: {module_type_start}")
+logging.debug(f"Module type w: {module_type_w}")
+logging.debug(f"Module type wo: {module_type_wo}\n\n")
 
-print(f"Results: {luc_results_response.data}")
+logging.debug(f"Results: {luc_results_response.data}\n\n")
 
-print("##### GRASSLAND #####\n\n")
+logging.debug("##### GRASSLAND #####\n\n")
 
-print(f"Results: {grassland_results_response.data}")
+logging.debug(f"Results: {grassland_results_response.data}\n\n")
 
-print("##### ANNUAL CROPLAND #####\n\n")
+logging.debug("##### ANNUAL CROPLAND #####\n\n")
 
-print(f"Results: {annualcropping_results_response.data}")
+logging.debug(f"Results: {annualcropping_results_response.data}\n\n")
 
 
 
