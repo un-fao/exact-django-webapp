@@ -233,9 +233,9 @@ class WriteActivitySerializer(serializers.ModelSerializer):
     def validate(self, data):
         if self.instance:
             luc_module: ModuleType = ModuleType.objects.filter(name="Land Use Change").first()
-            if luc_module and luc_module in data["module_types"]:
+            if luc_module and luc_module in data.get("module_types", []):
                 raise serializers.ValidationError("Land Use Change module cannot be added manually")
-            if self.instance.landusechange.exists() and len(list(filter(lambda module: module.is_luc, data['module_types']))) > 0:
+            if self.instance.landusechange.exists() and len(list(filter(lambda module: module.is_luc, data.get('module_types', [])))) > 0:
                 raise serializers.ValidationError("Land Modules cannot be independently added to activities with a Land Use Change")
             
         return super().validate(data)
@@ -315,6 +315,8 @@ class ActivityBuilderSerializer(serializers.Serializer):
             activity.module_types.add(luc.module_type_w.id)
             activity.module_types.add(luc.module_type_wo.id)
             activity.module_types.add(ModuleType.objects.get(name="Land Use Change").id)
+            luc.status = ActivityState.objects.get(name="READY")
+            luc.save()
 
         activity.save()
 
@@ -396,6 +398,11 @@ class LandModuleWriteSerializer(LandModuleBaseSerializer):
         if self.Meta.ref_name not in module_types and self.Meta.ref_name != "LandUseChange":
             logging.error(f"Module type {self.Meta.ref_name} is not present for this activity")
             raise serializers.ValidationError("This module type is not present for this activity")
+        
+        if self.instance:
+            self.instance.status = ActivityState.objects.get(name="READY")
+        else:
+            data["status"] = ActivityState.objects.get(name="READY")
 
         logging.debug(f"END LandModuleSerializer[{self.Meta.ref_name}].validate")
         return super().validate(data)
@@ -447,6 +454,8 @@ class GrasslandWriteSerializer(LandModuleWriteSerializer):
         # Check that all mandatory fields are present either in the data or in the instance
         if not all(list(map(lambda field: data.get(field, getattr(self.instance, field, None)) != None, mandatory_fields))):
                 raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
+        
+
 
         return super().validate(data)
     
@@ -489,11 +498,6 @@ class AnnualCroppingWriteSerializer(LandModuleWriteSerializer):
         # Check that all mandatory fields are present either in the data or in the instance
         if not all(list(map(lambda field: data.get(field, getattr(self.instance, field, None)), mandatory_fields))):
                 raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
-        
-        if self.instance:
-            self.instance.status = ActivityState.objects.get(name="READY")
-        else:
-            data["status"] = ActivityState.objects.get(name="READY")
         
         return super().validate(data)
 
