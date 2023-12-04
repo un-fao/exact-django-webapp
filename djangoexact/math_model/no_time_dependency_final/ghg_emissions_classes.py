@@ -157,4 +157,6 @@ class Result:
             ) for i, j in zip(result_obj.yearly_emissions_by_sector_by_gas, other.yearly_emissions_by_sector_by_gas)
         ]
 
+        return result_obj
+
     # Here add all necessary functions for result aggregation depending on what Claudio needs
