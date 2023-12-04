@@ -207,12 +207,6 @@ class LandUseChangeCalculator(BaseCalculator):
         # TODO: DeforestationCalculator now expects the ForestManagement module only. Refactor the calculator accordingly (check T2 values!)
         # results_start = CalculatorFactory().calculate_result(module_start, aggregate_by=aggregate_by)
         results_w, results_wo = self.luc_based_calculation(module_start, module_w, aggregate_by=aggregate_by)
-        results = Result(results_w, results_wo)
-
-        print(results_w.compute_balance())
-        print(results_wo.compute_balance())
-
-        print(results.balance.compute_balance())
 
         return (results_w, results_wo)
 class DeforestationCalculator(BaseCalculator):
@@ -595,9 +589,9 @@ class OtherLandUseCalculator(BaseCalculator):
             "continent": continent,
         }
 
-        module_start = getattr(input.activity, luc.module_type_start.class_name.lower(), None).first()
-        module_w = getattr(input.activity, luc.module_type_w.class_name.lower(), None).first()
-        module_wo = getattr(input.activity, luc.module_type_wo.class_name.lower(), None).first()
+        module_start: BiomassModule | Assessment = getattr(input.activity, luc.module_type_start.class_name.lower(), None).first()
+        module_w: BiomassModule | Assessment = getattr(input.activity, luc.module_type_w.class_name.lower(), None).first()
+        module_wo: BiomassModule | Assessment = getattr(input.activity, luc.module_type_wo.class_name.lower(), None).first()
 
         luc_start = LandUseType.objects.get(name=luc.module_type_start.name)
         luc_w = LandUseType.objects.get(name=luc.module_type_w.name)
@@ -621,64 +615,59 @@ class OtherLandUseCalculator(BaseCalculator):
         combustion_factor_w = AfforestationCombustionFactor.objects.get_or_default(land_use_type=luc_w)
         combustion_factor_wo = AfforestationCombustionFactor.objects.get_or_default(land_use_type=luc_wo)
 
-        results_w = None
-        results_wo = None
+        inputs_w = [
+            biomass_initial.value,
+            module_start.get_biomass_t2(utils.ScenarioTypes.START),
+            biomass_final_w.value,
+            module_w.get_biomass_t2(utils.ScenarioTypes.WITH),
+            c_n_ratio_w,
+            moisture_factor.value,
+            combustion_factor_w.value,
+            combustion_factor_w.ch4,
+            combustion_factor_w.n2o,
+            input.activity.project.gw_potential.ch4,
+            input.activity.project.gw_potential.n2o,
+            luc.is_fire_used_w,
+            soc.value,
+            flu_initial.value,
+            flu_final_w.value,
+            input.soc_t2_start,
+            input.soc_t2_w,
+            luc.area,
+            project.implementation_years,
+            project.capitalization_years,
+            input.activity.change_rate.name,
+        ]
 
-        if luc.module_type_start != luc.module_type_w:
-            inputs_w = [
-                biomass_initial.value,
-                input.get_biomass_t2(utils.ScenarioTypes.START),
-                biomass_final_w.value,
-                input.get_biomass_t2(utils.ScenarioTypes.WITH),
-                c_n_ratio_w,
-                moisture_factor.value,
-                combustion_factor_w.value,
-                combustion_factor_w.ch4,
-                combustion_factor_w.n2o,
-                input.activity.project.gw_potential.ch4,
-                input.activity.project.gw_potential.n2o,
-                luc.is_fire_used_w,
-                soc.value,
-                flu_initial.value,
-                flu_final_w.value,
-                input.soc_t2_start,
-                input.soc_t2_w,
-                luc.area,
-                project.implementation_years,
-                project.capitalization_years,
-                input.activity.change_rate.name,
-            ]
+        results_w = MathOtherLandUseChanges(*inputs_w)
+        results_w.calculate_emissions()
 
-            results_w = MathOtherLandUseChanges(*inputs_w)
-            results_w.calculate_emissions()
+        inputs_wo = [
+            biomass_initial.value,
+            module_start.get_biomass_t2(utils.ScenarioTypes.START),
+            biomass_final_wo.value,
+            module_wo.get_biomass_t2(utils.ScenarioTypes.WITHOUT),
+            c_n_ratio_wo,
+            moisture_factor.value,
+            combustion_factor_wo.value,
+            combustion_factor_wo.ch4,
+            combustion_factor_wo.n2o,
+            input.activity.project.gw_potential.ch4,
+            input.activity.project.gw_potential.n2o,
+            luc.is_fire_used_wo,
+            soc.value,
+            flu_initial.value,
+            flu_final_wo.value,
+            input.soc_t2_start,
+            input.soc_t2_wo,
+            luc.area,
+            project.implementation_years,
+            project.capitalization_years,
+            input.activity.change_rate.name,
+        ]
 
-        if luc.module_type_start != luc.module_type_wo:
-            inputs_wo = [
-                biomass_initial.value,
-                input.get_biomass_t2(utils.ScenarioTypes.START),
-                biomass_final_wo.value,
-                input.get_biomass_t2(utils.ScenarioTypes.WITHOUT),
-                c_n_ratio_wo,
-                moisture_factor.value,
-                combustion_factor_wo.value,
-                combustion_factor_wo.ch4,
-                combustion_factor_wo.n2o,
-                input.activity.project.gw_potential.ch4,
-                input.activity.project.gw_potential.n2o,
-                luc.is_fire_used_wo,
-                soc.value,
-                flu_initial.value,
-                flu_final_wo.value,
-                input.soc_t2_start,
-                input.soc_t2_wo,
-                luc.area,
-                project.implementation_years,
-                project.capitalization_years,
-                input.activity.change_rate.name,
-            ]
-
-            results_wo = MathOtherLandUseChanges(*inputs_wo)
-            results_wo.calculate_emissions()
+        results_wo = MathOtherLandUseChanges(*inputs_wo)
+        results_wo.calculate_emissions()
 
         res_w = results_w.result if results_w else MathResult(project.implementation_years, project.capitalization_years)
         res_wo = results_wo.result if results_wo else MathResult(project.implementation_years, project.capitalization_years)
