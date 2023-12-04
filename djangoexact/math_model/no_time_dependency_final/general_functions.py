@@ -40,7 +40,7 @@ def yearly_time_dependent_parameter_breakdown(start_value, end_value, years_impl
             else:
                 return yearly_breakdown
     
-    if function == 'D':
+    elif function == 'D':
          
          # calculate the parameters for the function a + bx 
             a = min(start_value, end_value)
@@ -61,11 +61,16 @@ def yearly_time_dependent_parameter_breakdown(start_value, end_value, years_impl
             else:
                 return yearly_breakdown
     
-    if function == 'immediate':
+    elif function == 'immediate':
         if interim_values:
             return average_yearly_value([end_value for i in range(years_implementation + years_capitalization + 1)])
         else:
             return [end_value for i in range(years_implementation + years_capitalization + 1)]
+        
+    else:
+        raise Exception(f'Function "{function}" not recognized')
+        
+    
 
 def yearly_constant_emissions_breakdown(total_emissions, years_implementation, years_capitalization):
     # TODO: add logic for breakdown according to rate type
@@ -193,11 +198,11 @@ def soil_emissions(hectars_before_20, area_start, area_end,
 
 def soil_emissions_delta_soc_known(delta_soil_c, delta_soil_c_20_years, area_start, area_end, hectars_before_20):
 
-    maximum = - delta_soil_c * max(area_start, area_end)
+    maximum = delta_soil_c_20_years * max(area_start, area_end) * 20
 
     total_hectars_soil = sum(hectars_before_20)
     
-    predicted_emissions = - delta_soil_c_20_years * total_hectars_soil
+    predicted_emissions = delta_soil_c_20_years * total_hectars_soil
 
     emissions = predicted_emissions if abs(predicted_emissions) < abs(maximum) else maximum
 
