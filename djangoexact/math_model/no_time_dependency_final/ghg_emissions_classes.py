@@ -132,11 +132,31 @@ class Result:
 
     def __sub__(self, other):
 
-        obj = copy.deepcopy(self)
+        result_obj = copy.deepcopy(self)
 
         if other.yearly_emissions_by_sector_by_gas == []:
-            return self
-        self.yearly_emissions_by_sector_by_gas = [YearlyGasActivityEmissionSet(i.year, i.gas_type, [x - y for x,y in zip(i.emissions, j.emissions)], i.activity) for i,j in zip(self.yearly_emissions_by_sector_by_gas, other.yearly_emissions_by_sector_by_gas)]
-        return self
+            return result_obj
+        
+        if result_obj.yearly_emissions_by_sector_by_gas == []:
+            result_obj.yearly_emissions_by_sector_by_gas = [
+                YearlyGasActivityEmissionSet(
+                    i.year, 
+                    i.gas_type, 
+                    [Emission(-x.value, x.gas_type) for x in i.emissions], 
+                    i.activity
+                ) for i in other.yearly_emissions_by_sector_by_gas
+            ]
+            return result_obj
+        
+        result_obj.yearly_emissions_by_sector_by_gas = [
+            YearlyGasActivityEmissionSet(
+                i.year,
+                i.gas_type,
+                [x - y for x, y in zip(i.emissions, j.emissions)],
+                i.activity
+            ) for i, j in zip(result_obj.yearly_emissions_by_sector_by_gas, other.yearly_emissions_by_sector_by_gas)
+        ]
+
+        return result_obj
 
     # Here add all necessary functions for result aggregation depending on what Claudio needs
