@@ -57,11 +57,11 @@ definitions:
           - gcloud app deploy app.yaml --project $PROJECT_ID --verbosity=debug
 pipelines:
   branches:
-    edge:
+    develop:
       - step: *predeploy
       - step:
           <<: *deploy
-          deployment: development
+          deployment: develop
     review:
       - step: *predeploy
       - step:
