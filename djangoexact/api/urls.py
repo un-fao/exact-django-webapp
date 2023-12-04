@@ -6,6 +6,7 @@ from django.urls import path, re_path
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from ipcc.models import GlobalWarmingPotential
 
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -33,16 +34,22 @@ router.register(r'threads', views.CommentThreadViewSet, basename='threads')
 router.register(r'threads/(?P<thread_id>\d+)/comments', views.CommentViewSet, basename='comments')
 router.register(r"land-use-types", views.LandUseTypeViewSet, basename="land-use-types")
 router.register(r"module-types", views.ModuleTypeViewSet, basename="modules")
-router.register(
-    r"deforestations",
-    views.generic_module_viewset(Deforestation),
-    basename="deforestations",
-)
-router.register(
-    r"afforestations",
-    views.generic_module_viewset(Afforestation),
-    basename="afforestations",
-)
+
+router.register(r"statuses", views.generic_viewset(ProjectStatus), basename="statuses")
+router.register(r"regions", views.generic_viewset(Region), basename="regions")
+router.register(r"countries", views.CountryViewSet, basename="countries")
+router.register(r"global-warming-pontentials", views.generic_viewset(GlobalWarmingPotential), basename="global-warming-pontentials")
+
+# router.register(
+#     r"deforestations",
+#     views.generic_module_viewset(Deforestation),
+#     basename="deforestations",
+# )
+# router.register(
+#     r"afforestations",
+#     views.generic_module_viewset(Afforestation),
+#     basename="afforestations",
+# )
 router.register(
     r"other-land-uses",
     views.generic_module_viewset(OtherLandUse),
@@ -65,30 +72,33 @@ router.register(
     r"grasslands", views.generic_module_viewset(Grassland), basename="grasslands"
 )
 router.register(
+    r"grassland-management-types", views.generic_viewset(GrasslandManagementType), basename="grasslandmanagementtypes"
+)
+router.register(
     r"livestocks", views.generic_module_viewset(Livestock), basename="livestocks"
 )
 router.register(r"forest-managements", views.generic_module_viewset(ForestManagement), basename="forests")
 
-router.register(
-    r"inland-waterbodies",
-    views.generic_module_viewset(InlandWaterbody),
-    basename="inland-waterbodies",
-)
-router.register(
-    r"extractions",
-    views.generic_module_viewset(Extraction),
-    basename="inland-waterbodies",
-)
-router.register(
-    r"rewettings",
-    views.generic_module_viewset(Rewetting),
-    basename="inland-waterbodies",
-)
-router.register(
-    r"coastal-waterbodies",
-    views.generic_module_viewset(CoastalWaterbody),
-    basename="inland-waterbodies",
-)
+# router.register(
+#     r"inland-waterbodies",
+#     views.generic_module_viewset(InlandWaterbody),
+#     basename="inland-waterbodies",
+# )
+# router.register(
+#     r"extractions",
+#     views.generic_module_viewset(Extraction),
+#     basename="inland-waterbodies",
+# )
+# router.register(
+#     r"rewettings",
+#     views.generic_module_viewset(Rewetting),
+#     basename="inland-waterbodies",
+# )
+# router.register(
+#     r"coastal-waterbodies",
+#     views.generic_module_viewset(CoastalWaterbody),
+#     basename="inland-waterbodies",
+# )
 router.register(
     r"small-fisheries",
     views.generic_module_viewset(SmallFishery),
@@ -143,11 +153,9 @@ router.register(r"waterbodies", views.generic_module_viewset(Waterbody), basenam
 router.register(r"set-asides", views.generic_module_viewset(SetAside), basename="set-asides")
 router.register(r"degraded-lands", views.generic_module_viewset(DegradedLand), basename="degraded-lands")
 router.register(r"coastal-wetlands", views.generic_module_viewset(CoastalWetland), basename="coastal-wetlands")
-router.register(
-    r"tillage-management-types",
-    views.generic_viewset(TillageManagementType),
-    basename="tillage-management-types",
-)
+router.register(r'energies', views.generic_viewset(Energy), basename='energies')
+router.register(r'irrigations', views.generic_module_viewset(Irrigation), basename='irrigations')
+router.register(r"tillage-management-types", views.generic_viewset(TillageManagementType),basename="tillage-management-types",)
 router.register(
     r"organic-input-types",
     views.generic_viewset(OrganicInputType),

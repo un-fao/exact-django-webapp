@@ -23,6 +23,10 @@ INCLUDE_RELATED = "include_related"
 class ManureManagementTypes(Enum):
     PRP = "Pasture/Range/Paddock"
 
+class ScenarioTypes(Enum):
+    START = "start"
+    WITH = "with"
+    WITHOUT = "without"
 
 class EmissionTypes(Enum):
     CO2 = "CO2"
@@ -31,6 +35,8 @@ class EmissionTypes(Enum):
     N2O_VOLATILIZATION = "N2O Volatilization"
     N2O_LEACHING = "N2O Leaching"
 
+def avg(lst):
+    return sum(lst) / len(lst)
 
 def snake_case(str):
     res = [str[0].lower()]
@@ -105,3 +111,14 @@ def get_url_name(model_name):
 class ErrorResponse(Response):
     def __init__(self, data, status=status.HTTP_400_BAD_REQUEST):
         super().__init__(error(data), status=status)
+
+def is_start_with_changed(_class: object, luc):
+    return luc.module_type_start.class_name == _class.__name__ and luc.module_type_start != luc.module_type_wo
+
+class ScenarioTypes(Enum):
+    START = "start"
+    WITH = "w"
+    WITHOUT = "wo"
+
+def get_thread_attributes(module: Model):
+    return [attr for attr in module._meta.get_fields() if attr.name.endswith("_thread")]

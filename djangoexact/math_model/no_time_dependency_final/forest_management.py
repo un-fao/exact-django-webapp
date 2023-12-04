@@ -3,6 +3,7 @@ import copy
 import matplotlib.pyplot as plt
 import traceback
 from general_functions import yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, yearly_time_dependent_20_year_breakdown, breakdown_according_to_values, soil_emissions, yearly_time_dependent_increase_half_year, yearly_time_dependent_full_year, yearly_time_dependent_matrix
+from .ghg_emissions_classes import GasTypes, ActivityTypes, Emission, YearlyGasActivityEmissionSet, Result
 
 def create_agb_matrix(years_impl, years_cap, delta_agb_yearly_below_20, delta_agb_yearly_after_20, agb_start):
     
@@ -335,6 +336,8 @@ class ForestManagement:
         self.emissions_total_yearly = []
         self.total_emissions = 0
 
+        self.result = Result(self.years_impl, self.years_cap)
+
         pass
 
     def calculate_emissions(self,):
@@ -377,6 +380,13 @@ class ForestManagement:
 
                     self.total_rotation_emissions = sum(rotation_yearly_emissions)
                     self.yearly_rotation_emissions = rotation_yearly_emissions
+
+                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
+                                    year = 0,
+                                    gas_type = GasTypes.CO2,
+                                    emissions = [Emission(e, GasTypes.CO2) for e in self.yearly_rotation_emissions],
+                                    activity = ActivityTypes.ROTATION
+                                ))
                 
                 else:
                     disturbance_or_logging_recurrence = [self.disturbance_recurrence].extend(self.logging_recurrence)
@@ -407,6 +417,14 @@ class ForestManagement:
                         self.yearly_disturbance_emissions.append(logging_yearly_emissions)
                         self.total_disturbance_emissions.append(sum(self.yearly_disturbance_emissions[-1]))
 
+                        self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
+                                    year = 0,
+                                    gas_type = GasTypes.CO2,
+                                    emissions = [Emission(e, GasTypes.CO2) for e in self.yearly_disturbance_emissions[-1]],
+                                    activity = ActivityTypes.DISTURBANCE
+                                ))
+
+
                 
                 # TODO: find a way to check if agb_matrix has negative values just not this way
 
@@ -424,6 +442,20 @@ class ForestManagement:
                 self.yearly_bgb_emissions = yearly_bgb_emissions
                 self.total_bgb_emissions = sum(yearly_bgb_emissions)
 
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
+                                    year = 0,
+                                    gas_type = GasTypes.CO2,
+                                    emissions = [Emission(e, GasTypes.CO2) for e in self.yearly_agb_emissions],
+                                    activity = ActivityTypes.ROTATION_AGB
+                                ))
+                
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
+                                    year = 0,
+                                    gas_type = GasTypes.CO2,
+                                    emissions = [Emission(e, GasTypes.CO2) for e in self.yearly_bgb_emissions],
+                                    activity = ActivityTypes.ROTATION_BGB
+                                ))
+            
             except Exception as e:
                 traceback.print_exc()
                 return
@@ -433,6 +465,14 @@ class ForestManagement:
                 litter_matrix, delta_litter_matrix = create_agb_matrix(self.years_impl, self.years_cap, self.litter_20_years/20, 0, self.litter_20_years, 0, self.hectares_start, self.hectares_end)
                 self.yearly_litter_emissions = [x * -44/12 for x in multiply_matrix_by_matrix(delta_litter_matrix, self.hectares_matrix)]
                 self.total_litter_emissions = sum(self.yearly_litter_emissions)
+
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
+                                    year = 0,
+                                    gas_type = GasTypes.CO2,
+                                    emissions = [Emission(e, GasTypes.CO2) for e in self.yearly_litter_emissions],
+                                    activity = ActivityTypes.LITTER
+                                ))
+                
             except Exception as e:
                 traceback.print_exc()
                 return
@@ -442,6 +482,14 @@ class ForestManagement:
                 deadwood_matrix, delta_deadwood_matrix = create_agb_matrix(self.years_impl, self.years_cap, self.deadwood_20_years/20, 0, self.deadwood_20_years, 0, self.hectares_start, self.hectares_end)
                 self.yearly_deadwood_emissions = [x * -44/12 for x in multiply_matrix_by_matrix(delta_deadwood_matrix, self.hectares_matrix)]
                 self.total_deadwood_emissions = sum(self.yearly_deadwood_emissions)
+
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
+                                    year = 0,
+                                    gas_type = GasTypes.CO2,
+                                    emissions = [Emission(e, GasTypes.CO2) for e in self.yearly_deadwood_emissions],
+                                    activity = ActivityTypes.DEADWOOD
+                                ))
+                
             except Exception as e:
                 traceback.print_exc()
                 return
@@ -450,6 +498,14 @@ class ForestManagement:
             try:
                 self.yearly_soc_emissions, self.total_soc_emissions  = soil_emissions(self.hectares_before_20, self.hectares_start, self.hectares_end, self.socref, self.soc_tier_2, self.f_lu_tier_2, 
                                                                                                                     self.f_i_tier_2, self.f_mg_tier_2, self.f_lu_ref, self.f_i_ref, self.f_mg_ref)
+            
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
+                                    year = 0,
+                                    gas_type = GasTypes.CO2,
+                                    emissions = [Emission(e, GasTypes.CO2) for e in self.yearly_soc_emissions],
+                                    activity = ActivityTypes.SOIL_CO2_CHANGE
+                                ))
+                
             except Exception as e:
                 traceback.print_exc()
                 return
