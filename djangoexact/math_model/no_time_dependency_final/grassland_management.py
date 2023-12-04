@@ -1,18 +1,19 @@
 import math
 from .general_functions import yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, yearly_time_dependent_20_year_breakdown, breakdown_according_to_values, soil_emissions
 import traceback
+from .ghg_emissions_classes import GasTypes, ActivityTypes, Emission, YearlyGasActivityEmissionSet, Result
 
 class GrasslandManagement:
 
     def __init__(self, area_start, area_end, time_impl, time_cap, rate, nitrous_constant, methane_constant,
                             fire_interval, fire_used, methane_ef, nitrous_ef, agb_ref, agb_tier_2, cf_ref, cf_tier_2,
                             soc_ref, soc_start_tier_2, soc_end_tier_2, fmg_start = 1, fmg_end = 1,
-                            flu_start = 1, flu_end = 1, fi_start = 1, fi_end = 1
+                            flu_start = 1, flu_end = 1, fi_start = 1, fi_end = 1, delay = 0
                             ):
         
         self.area_start = area_start
         self.area_end = area_end
-        self.time_impl = time_impl
+        self.time_impl = time_impl - delay
         self.time_cap = time_cap
         self.rate = rate
         self.nitrous_constant = nitrous_constant
@@ -34,6 +35,7 @@ class GrasslandManagement:
         self.flu_end = flu_end  # defaulted to 1 in case there are None, if not float value
         self.fi_start = fi_start # defaulted to 1 in case there are None, if not float value
         self.fi_end = fi_end # defaulted to 1 in case there are None, if not float value
+        self.delay = delay # defaulted to 0 in case there are None, if not float value
 
         # Space for the results
         self.hectars_before_20, self.hectars_after_20 = yearly_time_dependent_20_year_breakdown(area_start, area_end ,self.time_impl, self.time_cap, self.rate)
@@ -50,6 +52,8 @@ class GrasslandManagement:
         self.emissions_total_yearly = []
         self.total_emissions = 0
 
+        self.result = Result(self.time_impl, self.time_cap)
+
         return
     
     def calculate_emissions(self,):
@@ -57,9 +61,26 @@ class GrasslandManagement:
         def calculate_residue_burning():
             
             try:
-                if self.time_impl + self.time_cap < self.fire_interval or not self.fire_used:
+                if self.time_impl + self.time_cap < self.fire_interval or not self.fire_used or self.fire_interval == None:
                     self.emissions_residue_burning_yearly = [0 for i in range(self.time_impl + self.time_cap)]
                     self.emissions_residue_burning_total = 0
+
+                    # NOTE: needed? Or no?
+                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
+                        year = 0,
+                        gas_type = GasTypes.N2O,
+                        emissions = [Emission(0, GasTypes.N2O) for i in range(self.time_impl + self.time_cap)],
+                        activity = ActivityTypes.RESIDUE_BURNING,
+                        delay = self.delay
+                    ))
+
+                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
+                        year = 0,
+                        gas_type = GasTypes.CH4,
+                        emissions = [Emission(0, GasTypes.CH4) for i in range(self.time_impl + self.time_cap)],
+                        activity = ActivityTypes.RESIDUE_BURNING,
+                        delay = self.delay
+                    ))
                 
                 else:
                     agb = self.agb_ref if not self.agb_tier_2 else self.agb_tier_2
@@ -70,6 +91,28 @@ class GrasslandManagement:
                     total = annual_co2 * sum(self.total_hectars)
                     self.emissions_residue_burning_yearly = breakdown_according_to_values(total, self.total_hectars)
                     self.emissions_residue_burning_total = total
+
+                    annual_nitrous = (agb * cf * self.nitrous_ef * self.nitrous_constant / 1000) / self.fire_interval
+                    annual_methane = (agb * cf * self.methane_ef * self.methane_constant / 1000) / self.fire_interval
+
+                    total_nitrous = annual_nitrous * sum(self.total_hectars)
+                    total_methane = annual_methane * sum(self.total_hectars)
+
+                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
+                        year = 0,
+                        gas_type = GasTypes.N2O,
+                        emissions = [Emission(e, GasTypes.N2O) for e in breakdown_according_to_values(total_nitrous, self.total_hectars)],
+                        activity = ActivityTypes.RESIDUE_BURNING,
+                        delay = self.delay
+                    ))
+
+                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
+                        year = 0,
+                        gas_type = GasTypes.CH4,
+                        emissions = [Emission(e, GasTypes.CH4) for e in breakdown_according_to_values(total_methane, self.total_hectars)],
+                        activity = ActivityTypes.RESIDUE_BURNING,
+                        delay = self.delay
+                    ))
                 return
             except:
                 traceback.print_exc()
@@ -90,6 +133,15 @@ class GrasslandManagement:
 
                 self.emissions_soil_yearly = breakdown_according_to_values(total, self.hectars_before_20)
                 self.emissions_soil_total = total
+
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
+                    year = 0,
+                    gas_type = GasTypes.CO2,
+                    emissions = [Emission(e, GasTypes.CO2) for e in breakdown_according_to_values(total, self.hectars_before_20)],
+                    activity = ActivityTypes.SOIL_CO2_CHANGE,
+                    delay = self.delay
+                ))
+                
                 return
             except:
                 traceback.print_exc()

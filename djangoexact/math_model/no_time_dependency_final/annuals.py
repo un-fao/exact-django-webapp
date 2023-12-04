@@ -1,13 +1,13 @@
 import traceback
 from .general_functions import yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, yearly_time_dependent_20_year_breakdown, breakdown_according_to_values, soil_emissions
-
+from .ghg_emissions_classes import YearlyGasActivityEmissionSet, Emission, GasTypes, ActivityTypes, Result
 class AnnualCropland:
 
     def __init__(self, area_start, area_end, time_impl, time_cap, rate_end, rate_coefficient_end, socref, soc_tier_2, f_lu_ref, f_lu_tier_2, f_i_ref, f_i_tier_2, f_mg_ref, f_mg_tier_2,
                             emission_factor_nitrous, nitrous_constant, methane_constant, ef_methane_agr_residues_main, combustion_factor_main, 
                             residue_main_tier_2, n_estimation_slope_main, n_estimation_intercept_main, yield_value_main, ef_methane_agr_residues_minor, combustion_factor_minor,residue_minor_tier_2,
                             n_estimation_slope_minor, n_estimation_intercept_minor, yield_value_minor, ef_nitrous_agr_residues_main, retained_main, ef_nitrous_agr_residues_minor, retained_minor,
-                            n_content_ag_main, ratio_bg_ag_main, n_content_bg_main, n_content_ag_minor, ratio_bg_ag_minor, n_content_bg_minor
+                            n_content_ag_main, ratio_bg_ag_main, n_content_bg_main, n_content_ag_minor, ratio_bg_ag_minor, n_content_bg_minor, delay=0
                             ):
         
         self.area_start = area_start
@@ -49,6 +49,7 @@ class AnnualCropland:
         self.n_content_ag_minor = n_content_ag_minor
         self.ratio_bg_ag_minor = ratio_bg_ag_minor
         self.n_content_bg_minor = n_content_bg_minor
+        self.delay = delay
 
         # AUXILIARY VARIABLES FOR SOIL CALCULATION
         self.hectars_before_20, self.hectars_after_20 = yearly_time_dependent_20_year_breakdown(area_start, area_end ,self.time_impl, self.time_cap, self.rate)
@@ -67,6 +68,8 @@ class AnnualCropland:
 
         self.emissions_total_yearly = []
         self.total_emissions = 0
+
+        self.result = Result(self.time_impl, self.time_cap)
         
     def calculate_emissions(self):
 
@@ -76,6 +79,9 @@ class AnnualCropland:
 
                 self.emissions_soil_yearly, self.emissions_soil_total = soil_emissions(self.hectars_before_20, self.area_start, self.area_end, self.socref,
                                         self.soc_tier_2, self.f_lu_tier_2, self.f_i_tier_2, self.f_mg_tier_2, self.f_lu_ref, self.f_i_ref, self.f_mg_ref)
+                
+                soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_soil_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
+                self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
 
             except Exception as e:
                 traceback.print_exc()
@@ -103,6 +109,8 @@ class AnnualCropland:
                 self.emissions_som_yearly = breakdown_according_to_values(total, self.total_hectars)
                 self.emissions_som_total = total
 
+                som_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in self.emissions_som_yearly], ActivityTypes.SOM, delay=self.delay)
+                self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
             
             except Exception as e:
                 traceback.print_exc()
@@ -163,6 +171,15 @@ class AnnualCropland:
             
             self.emissions_residue_burning_total = total
             self.emissions_residue_burning_yearly = yearly_constant_emissions_breakdown(total, self.time_impl, self.time_cap)
+
+            total_nitrous = (sum(self.total_hectars)) * kg_nitrous * self.nitrous_constant / 1000
+            total_methane = (sum(self.total_hectars)) * kg_methane * self.methane_constant / 1000
+
+            residue_burning_nitrous_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in yearly_constant_emissions_breakdown(total_nitrous, self.time_impl, self.time_cap)], ActivityTypes.RESIDUE_BURNING, delay=self.delay)
+            residue_burning_methane_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in yearly_constant_emissions_breakdown(total_methane, self.time_impl, self.time_cap)], ActivityTypes.RESIDUE_BURNING, delay=self.delay)
+
+            self.result.yearly_emissions_by_sector_by_gas.append(residue_burning_nitrous_emission_set)
+            self.result.yearly_emissions_by_sector_by_gas.append(residue_burning_methane_emission_set)
 
 
         calculate_emissions_soil()
