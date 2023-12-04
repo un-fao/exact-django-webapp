@@ -637,6 +637,7 @@ class OtherLandUseCalculator(BaseCalculator):
             project.implementation_years,
             project.capitalization_years,
             input.activity.change_rate.name,
+            # input.activity.duration_t2,
         ]
 
         results_w = MathOtherLandUseChanges(*inputs_w)
@@ -664,6 +665,7 @@ class OtherLandUseCalculator(BaseCalculator):
             project.implementation_years,
             project.capitalization_years,
             input.activity.change_rate.name,
+            # input.activity.duration_t2,
         ]
 
         results_wo = MathOtherLandUseChanges(*inputs_wo)
@@ -775,6 +777,7 @@ class AnnualCroppingCalculator(BaseCalculator):
                 getattr(minor_n_estimation_factor_start, "n_ag_residues", None),
                 getattr(minor_n_estimation_factor_start, "rs_t", None),
                 getattr(minor_n_estimation_factor_start, "n_bg_t", None),
+                # input.activity.duration_t2,
             ]
 
             results_start = AnnualCropland(*inputs_start)
@@ -845,6 +848,7 @@ class AnnualCroppingCalculator(BaseCalculator):
                 getattr(minor_n_estimation_factor_wo, "n_ag_residues", None),
                 getattr(minor_n_estimation_factor_wo, "rs_t", None),
                 getattr(minor_n_estimation_factor_wo, "n_bg_t", None),
+                # input.activity.duration_t2,
             ]
 
             results_wo = AnnualCropland(*inputs_wo)
@@ -913,6 +917,7 @@ class AnnualCroppingCalculator(BaseCalculator):
                 getattr(minor_n_estimation_factor_w, "n_ag_residues", None),
                 getattr(minor_n_estimation_factor_w, "rs_t", None),
                 getattr(minor_n_estimation_factor_w, "n_bg_t", None),
+                # input.activity.duration_t2,
             ]
 
             results_w = AnnualCropland(*inputs_w)
@@ -1305,6 +1310,7 @@ class GrasslandCalculator(BaseCalculator):
                 soc_w.flu,
                 soc_start.fi,
                 soc_w.fi,
+                # module.activity.duration_t2,
             ]
 
             math_start_w = MathGrassland(*inputs_start_w)
@@ -1338,6 +1344,7 @@ class GrasslandCalculator(BaseCalculator):
                 soc_wo.flu,
                 soc_start.fi,
                 soc_wo.fi,
+                # module.activity.duration_t2,
             ]
 
             math_start_wo = MathGrassland(*inputs_start_wo)
@@ -1371,6 +1378,7 @@ class GrasslandCalculator(BaseCalculator):
                 soc_w.flu,
                 soc_start.fi,
                 soc_w.fi,
+                # module.activity.duration_t2,
             ]
 
             math_w = MathGrassland(*inputs_w)
@@ -1404,6 +1412,7 @@ class GrasslandCalculator(BaseCalculator):
                 soc_wo.flu,
                 soc_start.fi,
                 soc_wo.fi,
+                # module.activity.duration_t2,
             ]
 
             math_wo = MathGrassland(*inputs_wo)
