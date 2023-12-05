@@ -486,7 +486,13 @@ def generic_module_viewset(model: Model):
                 Serializer = ResultSerializerFactory().by(aggregate_by)
 
                 if Serializer == TotalResultSerializer:
-                    module_results = Serializer(results_tot, many=True).data
+                    module_results = Serializer(
+                        {
+                            "total_w": results_w,
+                            "total_wo": results_wo,
+                            "balance": results_tot,
+                        }
+                    ).data
                 else:
                     module_results = {
                         "total_w": Serializer(results_w, many=True).data,
