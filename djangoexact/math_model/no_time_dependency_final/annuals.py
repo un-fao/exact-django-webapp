@@ -175,8 +175,8 @@ class AnnualCropland:
             total_nitrous = (sum(self.total_hectars)) * kg_nitrous * self.nitrous_constant / 1000
             total_methane = (sum(self.total_hectars)) * kg_methane * self.methane_constant / 1000
 
-            residue_burning_nitrous_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in yearly_constant_emissions_breakdown(total_nitrous, self.time_impl, self.time_cap)], ActivityTypes.RESIDUE_BURNING, delay=self.delay)
-            residue_burning_methane_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in yearly_constant_emissions_breakdown(total_methane, self.time_impl, self.time_cap)], ActivityTypes.RESIDUE_BURNING, delay=self.delay)
+            residue_burning_nitrous_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in breakdown_according_to_values(total_nitrous, self.total_hectars)], ActivityTypes.RESIDUE_BURNING, delay=self.delay)
+            residue_burning_methane_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in breakdown_according_to_values(total_methane, self.total_hectars)], ActivityTypes.RESIDUE_BURNING, delay=self.delay)
 
             self.result.yearly_emissions_by_sector_by_gas.append(residue_burning_nitrous_emission_set)
             self.result.yearly_emissions_by_sector_by_gas.append(residue_burning_methane_emission_set)
