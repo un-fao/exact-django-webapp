@@ -133,7 +133,39 @@ logging.debug("##### ANNUAL CROPLAND #####\n\n")
 
 logging.debug(f"Results: {annualcropping_results_response.data}\n\n")
 
+logging.debug("##### TOTAL EMISSIONS FOR PROJECT #####\n\n")
 
+class Result:
+    def __init__(self, total_w, total_wo, balance=None) -> None:
+        self.w = float(total_w)
+        self.wo = float(total_wo)
+        self.balance = total_w-total_wo if not balance else float(balance)
 
+    def __str__(self) -> str:
+        return f"w: {self.w}, wo: {self.wo}, balance: {self.balance}"
+    
+    def __add__(self, other):
+        return Result(self.w + other.w, self.wo + other.wo, self.balance + other.balance)
+    
+    def __sub__(self, other):
+        return Result(self.w - other.w, self.wo - other.wo, self.balance - other.balance)
+
+# Grassland
+grassland_results = Result(**grassland_results_response.data)
+
+# Annual Cropland
+annualcropping_results = Result(**annualcropping_results_response.data)
+
+# Land Use Change
+luc_results = Result(**luc_results_response.data)
+
+# Total
+total_w = grassland_results.w + annualcropping_results.w + luc_results.w
+total_wo = grassland_results.wo + annualcropping_results.wo + luc_results.wo
+total_balance = total_w - total_wo
+
+total_results = Result(total_w, total_wo, total_balance)
+
+logging.debug(f"Total results: {total_results}\n\n")
 
 
