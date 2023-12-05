@@ -79,7 +79,7 @@ class PerennialCropping:
 
                 total = sum(self.total_hectars) * co2_crop
 
-                self.yearly_residue_emissions = yearly_constant_emissions_breakdown(total, self.time_impl, self.time_cap)
+                self.yearly_residue_emissions = breakdown_according_to_values(total, self.total_hectars)
                 self.total_residue_emissions = total
             except Exception as e:
                 traceback.print_exc()
