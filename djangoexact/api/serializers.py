@@ -117,7 +117,9 @@ class TotalResultSerializer(serializers.Serializer):
     balance = serializers.FloatField()
 
 class ResultSerializerFactory:
-    def by(self, by: BreakdownTypes = BreakdownTypes.TOTAL):
+
+    @staticmethod
+    def by(by: BreakdownTypes = BreakdownTypes.TOTAL):
         match by:
             case BreakdownTypes.TOTAL:
                 return TotalResultSerializer
@@ -135,30 +137,20 @@ class ResultSerializer(serializers.Serializer):
     serializer = TotalResultSerializer
 
     def __init__(self, *args, **kwargs):
+        # Get the serializer passed in the constructor
+        if "serializer" in kwargs:
+            self.serializer = kwargs["serializer"]
+            del kwargs["serializer"]
         if self.serializer == TotalResultSerializer:
             self.fields["total_w"] = serializers.FloatField()
             self.fields["total_wo"] = serializers.FloatField()
             self.fields["balance"] = serializers.FloatField()
         else:
-            self.fields["total_w"] = self.serializer(many=True)
-            self.fields["total_wo"] = self.serializer(many=True)
-            self.fields["balance"] = self.serializer(many=True)
+            self.fields["total_w"] = self.serializer(many=True, required=False)
+            self.fields["total_wo"] = self.serializer(many=True, required=False)
+            self.fields["balance"] = self.serializer(many=True, required=False)
+        
         super().__init__(*args, **kwargs)
-
-    def by(self, by: BreakdownTypes = BreakdownTypes.TOTAL):
-        match by:
-            case BreakdownTypes.TOTAL:
-                self.serializer = TotalResultSerializer
-            case BreakdownTypes.GAS:
-                self.serializer = YearlyGasEmissionSerializer
-            case BreakdownTypes.ACTIVITY:
-                self.serializer = YearlyActivityEmissionSerializer
-            case BreakdownTypes.ACTIVITY_GAS:
-                self.serializer = YearlyActivityEmissionSerializer
-            case _:
-                self.serializer = TotalResultSerializer
-
-        return self
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
