@@ -236,7 +236,6 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         response = {**ActivitySerializer(activity).data}
 
         modules = []
-        module_types = ModuleType.objects.filter(is_submodule=False).all()
         # TODO: Make a serializer for this
         for module in activity.module_types.all():
             try:
@@ -487,13 +486,7 @@ def generic_module_viewset(model: Model):
                 Serializer = ResultSerializerFactory().by(aggregate_by)
 
                 if Serializer == TotalResultSerializer:
-                    module_results = Serializer(
-                        {
-                            "total_w": results_w,
-                            "total_wo": results_wo,
-                            "balance": results_tot,
-                        }
-                    ).data
+                    module_results = Serializer(results_tot, many=True).data
                 else:
                     module_results = {
                         "total_w": Serializer(results_w, many=True).data,
@@ -502,6 +495,7 @@ def generic_module_viewset(model: Model):
                     }
 
             except Exception as e:
+                logging.error("Error calculating result in GenericModuleViewSet.results", e)
                 return ErrorResponse(str(e))
 
             return Response(module_results)
