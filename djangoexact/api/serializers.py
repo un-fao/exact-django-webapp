@@ -10,6 +10,7 @@ import sys
 from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
 from django.db import transaction
 import logging
+import django.apps
 
 class ActionTypes(Enum):
     CREATE = "CREATE"
@@ -270,18 +271,31 @@ class ActivityBuilderSerializer(serializers.Serializer):
     land_use_change = LandUseChangeBuilderSerializer(many=False, required=False, allow_null=True)
     module_types = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
     has_input = serializers.BooleanField(default=False, required=False)
-    area = serializers.FloatField(required=True)
+    area = serializers.FloatField(required=False)
     module_types = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
 
     def validate(self, data):
-        luc_module: ModuleType = ModuleType.objects.filter(name="Land Use Change").first()
-        if luc_module and luc_module in data["module_types"]:
+        luc_module = ModuleType.objects.filter(name="Land Use Change").first()
+        module_types = data.get("module_types", [])
+        land_use_change = data.get("land_use_change", None)
+        has_input = data.get("has_input", False)
+        area = data.get("area", None)
+
+        if luc_module and luc_module in module_types:
             raise serializers.ValidationError("Land Use Change module cannot be added manually")
-        if data["has_input"] and not data.get["module_types"]:
+
+        if has_input and not module_types:
             raise serializers.ValidationError("If has_input is true, at least one input module must be provided")
-        if data.get("land_use_change", None) and len(list(filter(lambda module: module.is_luc, data['module_types']))) > 0:
+
+        if land_use_change and any(module.is_luc for module in module_types):
             raise serializers.ValidationError("Land Modules cannot be independently added to activities with a Land Use Change")
-        
+
+        if land_use_change and not area:
+            raise serializers.ValidationError("Area must be provided")
+
+        if any(module.is_luc for module in module_types) and not area:
+            raise serializers.ValidationError("Area must be provided")
+
         super().validate(data)
 
         return data
@@ -301,6 +315,8 @@ class ActivityBuilderSerializer(serializers.Serializer):
         )
         activity.module_types.set(self.validated_data.get("module_types", []))
 
+        luc = None
+
         if self.validated_data.get("land_use_change", None):
             luc = LandUseChange.objects.create(**self.validated_data["land_use_change"], activity=activity, area=self.validated_data["area"])
             activity.module_types.add(luc.module_type_start.id)
@@ -309,6 +325,17 @@ class ActivityBuilderSerializer(serializers.Serializer):
             activity.module_types.add(ModuleType.objects.get(name="Land Use Change").id)
             luc.status = ActivityState.objects.get(name="READY")
             luc.save()
+
+        for module_type in activity.module_types.all():
+            if module_type.class_name == "LandUseChange":
+                continue
+
+            ModuleClass = apps.get_model("api", module_type.class_name)
+
+            if module_type.is_luc:
+                ModuleClass.objects.create(activity=activity, land_use_change=luc, area=self.validated_data.get("area"))
+            else:
+                ModuleClass.objects.create(activity=activity)
 
         activity.save()
 
