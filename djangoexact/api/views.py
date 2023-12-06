@@ -26,6 +26,7 @@ module_type = openapi.Parameter("module_type", openapi.IN_QUERY, description="Mo
 climate = openapi.Parameter("climate", openapi.IN_QUERY, description="Climate associated with Land Use Type", type=openapi.TYPE_INTEGER)
 moisture = openapi.Parameter("moisture", openapi.IN_QUERY, description="Moisture associated with Land Use Type", type=openapi.TYPE_INTEGER)
 cascade = openapi.Parameter("cascade", openapi.IN_QUERY, description="Include comments in thread", type=openapi.TYPE_BOOLEAN)
+email = openapi.Parameter("email", openapi.IN_BODY, description="Email of user to invite", type=openapi.TYPE_STRING)
 
 
 def get_modules(activity: Activity, serialized=True) -> list:
@@ -161,6 +162,49 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             response["activities"].append(ActivityViewSet.results(self, request, activity.pk).data)
 
         return Response(data=response, status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=['get', 'post'])
+    @swagger_auto_schema(request_body=ProjectInvitationWriteSerializer, responses={400: "Bad request", 201: "Invitation sent successfully", 403: "Selected user does not have permission to invite users", 200: ProjectInvitationReadSerializer})
+    def invitations(self, request, pk=None):
+        logging.debug("START ProjectViewSet.invitations")
+        email = request.data.get("email", None)
+
+        if request.method == 'GET':
+
+            if not self.request.user.has_perm("api.view_projectinvitation"):
+                logging.error("Selected user does not have permission to view invitations")
+                return ErrorResponse("Selected user does not have permission to view invitations", status=status.HTTP_403_FORBIDDEN)
+
+            project = self.get_object()
+            invitations = project.invitations.all()
+            return Response(data=ProjectInvitationReadSerializer(invitations, many=True).data, status=status.HTTP_200_OK)
+        
+        if not self.request.user.has_perm("api.add_projectinvitation"):
+            logging.error("Selected user does not have permission to invite users")
+            return ErrorResponse("Selected user does not have permission to invite users", status=status.HTTP_403_FORBIDDEN)
+
+        project = self.get_object()
+        user = None
+
+        serializer = ProjectInvitationWriteSerializer(data=request.data)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            logging.error(f"User with email {email} does not exist")
+            return ErrorResponse(f"User with email {email} does not exist", status=status.HTTP_400_BAD_REQUEST)
+        
+        invitation, created = ProjectInvitation.objects.get_or_create(project=project, email=email, user=user)
+
+        if not created:
+            return Response({'error': 'Invitation already sent'}, status=status.HTTP_400_BAD_REQUEST)
+
+        logging.debug("END ProjectViewSet.invitations")
+        return Response({'message': 'Invitation sent successfully'})
+        
 
 class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """

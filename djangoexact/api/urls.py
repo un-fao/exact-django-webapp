@@ -40,16 +40,6 @@ router.register(r"regions", views.generic_viewset(Region), basename="regions")
 router.register(r"countries", views.CountryViewSet, basename="countries")
 router.register(r"global-warming-pontentials", views.generic_viewset(GlobalWarmingPotential), basename="global-warming-pontentials")
 
-# router.register(
-#     r"deforestations",
-#     views.generic_module_viewset(Deforestation),
-#     basename="deforestations",
-# )
-# router.register(
-#     r"afforestations",
-#     views.generic_module_viewset(Afforestation),
-#     basename="afforestations",
-# )
 router.register(
     r"other-land-uses",
     views.generic_module_viewset(OtherLandUse),

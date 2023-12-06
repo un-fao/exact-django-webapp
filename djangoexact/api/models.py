@@ -452,6 +452,17 @@ class Project(Historical):
         verbose_name_plural = "Projects"
         unique_together = ("name", "user")
 
+class ProjectInvitation(Model):
+    project = ForeignKey(Project, on_delete=CASCADE, related_name="invitations")
+    user = ForeignKey(User, on_delete=CASCADE, related_name="invitations")
+    date = DateTimeField(auto_now_add=True)
+    is_accepted = BooleanField(default=False)
+
+    class Meta:
+        unique_together = (("project", "user"),)
+
+    def __str__(self):
+        return f"({self.pk}) {self.project.name} - {self.user.email}"
 
 ##############################
 ######### Activity ###########
