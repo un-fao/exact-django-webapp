@@ -466,6 +466,7 @@ class Activity(Historical):
     status = ForeignKey(ActivityState, on_delete=CASCADE, null=True, blank=True)
 
     climate_t2 = ForeignKey(Climate, on_delete=CASCADE, null=True, blank=True)
+    moisture_t2 = ForeignKey(Moisture, on_delete=CASCADE, null=True, blank=True)
     soil_type_t2 = ForeignKey(SoilType, on_delete=CASCADE, null=True, blank=True)
     duration_t2 = IntegerField(default=0)
 
