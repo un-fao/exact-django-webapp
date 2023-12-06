@@ -941,15 +941,6 @@ class Grassland(FixedAssessment, SingleBiomassModule):
             self.land_use_type_w = self.land_use_type_start
             self.land_use_type_wo = self.land_use_type_start
 
-        if self.is_fire_used_start and (self.fire_periodicity_start == None or self.fire_impact_start == None):
-            raise ValidationError("Fire periodicity and impact cannot be null if fire is used")
-        
-        if self.is_fire_used_w and (self.fire_periodicity_w == None or self.fire_impact_w == None):
-            raise ValidationError("Fire periodicity and impact cannot be null if fire is used")
-        
-        if self.is_fire_used_wo and (self.fire_periodicity_wo == None or self.fire_impact_wo == None):
-            raise ValidationError("Fire periodicity and impact cannot be null if fire is used")
-
         super().save(*args, **kwargs)
 
 class Livestock(Module):
@@ -1585,7 +1576,6 @@ class OrganicSoil(FixedAssessment):
     ditches_area_wo = FloatField(null=True, blank=True)
     ditches_area_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_ditches_area_thread", on_delete=SET_NULL)
 
-    # TODO: Change to fire_type
     fire_type_start = ForeignKey(FireType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_fire_type_start")
     fire_type_w = ForeignKey(FireType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_fire_type_w")
     fire_type_wo = ForeignKey(FireType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_fire_type_wo")
