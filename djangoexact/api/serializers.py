@@ -326,16 +326,16 @@ class ActivityBuilderSerializer(serializers.Serializer):
             luc.status = ActivityState.objects.get(name="READY")
             luc.save()
 
-        # for module_type in activity.module_types.all():
-        #     if module_type.class_name == "LandUseChange":
-        #         continue
+        for module_type in activity.module_types.all():
+            if module_type.class_name == "LandUseChange":
+                continue
 
-        #     ModuleClass = apps.get_model("api", module_type.class_name)
+            ModuleClass = apps.get_model("api", module_type.class_name)
 
-        #     if module_type.is_luc:
-        #         ModuleClass.objects.create(activity=activity, land_use_change=luc, area=self.validated_data.get("area"))
-        #     else:
-        #         ModuleClass.objects.create(activity=activity)
+            if module_type.is_luc:
+                ModuleClass.objects.create(activity=activity, land_use_change=luc, area=self.validated_data.get("area"))
+            else:
+                ModuleClass.objects.create(activity=activity)
 
         activity.save()
 
