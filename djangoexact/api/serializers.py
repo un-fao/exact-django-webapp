@@ -17,6 +17,22 @@ class ActionTypes(Enum):
     UPDATE = "UPDATE"
     RETRIEVE = "RETRIEVE"
 
+
+def are_fields_filled(data, mandatory_fields):
+    return all(list(map(lambda field: data.get(field, None) != None, mandatory_fields)))
+
+def generate_fields_for_scenario(scenario: str, mandatory_fields: list):
+    fields = []
+    for field in mandatory_fields:
+        fields.append(f"{field}_{scenario}")
+    return fields
+
+def generate_fields_for_scenarios(scenarios: list[str], mandatory_fields: list):
+    fields = []
+    for scenario in scenarios:
+        fields += generate_fields_for_scenario(scenario, mandatory_fields)
+    return fields
+
 def get_model_serializer(model_arg):
     class GenericSerializer(serializers.ModelSerializer):
         class Meta:
@@ -458,23 +474,20 @@ class GrasslandWriteSerializer(LandModuleWriteSerializer):
 
         mandatory_fields = []
         if gm_start:
-            mandatory_fields += list(map(lambda field: f"{field}_start", self.Meta.mandatory_fields))
+            mandatory_fields += generate_fields_for_scenario("start", self.Meta.mandatory_fields)
             if data.get('is_fire_used_start', getattr(self.instance, "is_fire_used_start", None)):
-                mandatory_fields += ["fire_periodicity_start", "fire_impact_start"]
+                mandatory_fields += generate_fields_for_scenario("start", ["fire_periodicity_start", "fire_impact_start"])
         if gm_w:
-            mandatory_fields += list(map(lambda field: f"{field}_w", self.Meta.mandatory_fields))
+            mandatory_fields += generate_fields_for_scenario("w", self.Meta.mandatory_fields)
             if data.get('is_fire_used_w', getattr(self.instance, "is_fire_used_w", None)):
-                mandatory_fields += ["fire_periodicity_w", "fire_impact_w"]
+                mandatory_fields += generate_fields_for_scenario("w", ["fire_periodicity_w", "fire_impact_w"])
         if gm_wo:
-            mandatory_fields += list(map(lambda field: f"{field}_wo", self.Meta.mandatory_fields))
+            mandatory_fields += generate_fields_for_scenario("wo", self.Meta.mandatory_fields)
             if data.get('is_fire_used_wo', getattr(self.instance, "is_fire_used_wo", None)):
-                mandatory_fields += ["fire_periodicity_wo", "fire_impact_wo"]
+                mandatory_fields += generate_fields_for_scenario("wo", ["fire_periodicity_wo", "fire_impact_wo"])
 
-        # Check that all mandatory fields are present either in the data or in the instance
-        if not all(list(map(lambda field: data.get(field, getattr(self.instance, field, None)) != None, mandatory_fields))):
-                raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
-        
-
+        if not are_fields_filled(data, mandatory_fields):
+            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
 
         return super().validate(data)
     
@@ -508,17 +521,50 @@ class AnnualCroppingWriteSerializer(LandModuleWriteSerializer):
 
         mandatory_fields = []
         if lut_start:
-            mandatory_fields += list(map(lambda field: f"{field}_start", self.Meta.mandatory_fields))
+            mandatory_fields += generate_fields_for_scenario("start", self.Meta.mandatory_fields)
         if lut_w:
-            mandatory_fields += list(map(lambda field: f"{field}_w", self.Meta.mandatory_fields))
+            mandatory_fields += generate_fields_for_scenario("w", self.Meta.mandatory_fields)
         if lut_wo:
-            mandatory_fields += list(map(lambda field: f"{field}_wo", self.Meta.mandatory_fields))
+            mandatory_fields += generate_fields_for_scenario("wo", self.Meta.mandatory_fields)
 
-        # Check that all mandatory fields are present either in the data or in the instance
-        if not all(list(map(lambda field: data.get(field, getattr(self.instance, field, None)), mandatory_fields))):
-                raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
+        if not are_fields_filled(data, mandatory_fields):
+            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
         
         return super().validate(data)
+
+class PerennialCroppingWriteSerializer(LandModuleWriteSerializer):
+    class Meta:
+        model = PerennialCropping
+        fields = "__all__"
+        ref_name = "PerennialCropping"
+        mandatory_fields = [
+            "land_use_type",
+            "tillage_management_type",
+            "organic_input_type",
+        ]
+
+    def validate(self, data):
+            
+        lut_start = data.get("land_use_type_start", getattr(self.instance, "land_use_type_start", None))
+        lut_w = data.get("land_use_type_w", getattr(self.instance, "land_use_type_w", None))
+        lut_wo = data.get("land_use_type_wo", getattr(self.instance, "land_use_type_wo", None))
+
+        if not lut_start and not lut_w and not lut_wo:
+            raise serializers.ValidationError("At least one land use type must be provided")
+
+        mandatory_fields = []
+        if lut_start:
+            mandatory_fields += generate_fields_for_scenario("start", self.Meta.mandatory_fields)
+        if lut_w:
+            mandatory_fields += generate_fields_for_scenario("w", self.Meta.mandatory_fields)
+        if lut_wo:
+            mandatory_fields += generate_fields_for_scenario("wo", self.Meta.mandatory_fields)
+
+        if not are_fields_filled(data, mandatory_fields):
+            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
+        
+        return super().validate(data)
+
 
 class AnnualCroppingReadSerializer(LandModuleReadSerializer):
     class Meta:
