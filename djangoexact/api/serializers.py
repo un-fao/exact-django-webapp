@@ -545,3 +545,19 @@ class LandUseChangeReadSerializer(LandModuleReadSerializer):
         model = LandUseChange
         fields = "__all__"
         ref_name = "LandUseChange"
+
+class ProjectInvitationWriteSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+
+class ProjectInvitationReadSerializer(serializers.ModelSerializer):
+    user = UserSerializer(many=False, read_only=True)
+    # Only show project name
+    project = serializers.SerializerMethodField()
+
+    def get_project(self, obj):
+        return obj.project.name
+
+    class Meta:
+        model = ProjectInvitation
+        fields = "__all__"
+        ref_name = "ProjectInvitation"
