@@ -96,6 +96,11 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
         Creates a new project for a given user.
         """
+
+        if not self.request.user.has_perm("api.add_project"):
+            logging.error("Selected user does not have permission to create projects")
+            return ErrorResponse("Selected user does not have permission to create projects", status=status.HTTP_403_FORBIDDEN)
+
         request.data["user"] = self.request.user.pk
         serializer = WriteProjectSerializer(data=request.data)
 
@@ -114,6 +119,11 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
         Get a single project for a given user.
         """
+
+        if not self.request.user.has_perm("api.view_project"):
+            logging.error("Selected user does not have permission to view projects")
+            return ErrorResponse("Selected user does not have permission to view projects", status=status.HTTP_403_FORBIDDEN)
+
         project = get_object_or_404(Project, pk=pk, user=self.request.user)
         return Response(data=ReadProjectSerializer(project).data, status=status.HTTP_200_OK)
 
@@ -122,6 +132,11 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
         Get all projects for a given user.
         """
+
+        if not self.request.user.has_perm("api.view_project"):
+            logging.error("Selected user does not have permission to view projects")
+            return ErrorResponse("Selected user does not have permission to view projects", status=status.HTTP_403_FORBIDDEN)
+
         list = Project.objects.filter(user=self.request.user).all()
         return Response(data=ReadProjectSerializer(list, many=True).data, status=status.HTTP_200_OK)
 
@@ -131,6 +146,10 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
         Calculates and returns total emissions for each module in the project.
         """
+
+        if not self.request.user.has_perm("api.view_project"):
+            logging.error("Selected user does not have permission to view project results")
+            return ErrorResponse("Selected user does not have permission to view project results", status=status.HTTP_403_FORBIDDEN)
 
         project = get_object_or_404(Project, pk=pk, user=self.request.user)
         serialized_project = ReadProjectSerializer(project).data
