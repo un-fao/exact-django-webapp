@@ -1467,6 +1467,11 @@ class IrrigationSystem(Submodule):
     ef_t2_w = FloatField(null=True, blank=True)
     ef_t2_wo = FloatField(null=True, blank=True)
 
+    def save(self, *args, **kwargs):
+        if self.irrigation and self.irrigation_phases:
+            raise ValidationError("Cannot have both irrigation system and irrigation phases in the same irrigation module")
+        super().save(*args, **kwargs)
+
 
 class IrrigationPhase(Submodule):
     irrigation = ForeignKey(Irrigation, on_delete=CASCADE, null=True, blank=True, related_name="irrigation_phases")
