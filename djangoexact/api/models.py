@@ -979,6 +979,36 @@ class Livestock(Module):
     heads_number_wo = IntegerField(null=True, blank=True)
     heads_number_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_heads_number_thread", on_delete=SET_NULL)
 
+    complementary_manure_management_type_start = ForeignKey(
+        ManureManagementType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(class)s_manure_management_type_t2_start",
+    )
+
+    complementary_manure_management_type_w = ForeignKey(
+        ManureManagementType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(class)s_manure_management_type_t2_w",
+    )
+
+    complementary_manure_management_type_wo = ForeignKey(
+        ManureManagementType,
+        on_delete=CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(class)s_manure_management_type_t2_wo",
+    )
+    complementary_manure_management_type_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_complementary_manure_management_type_thread", on_delete=SET_NULL)
+
+    percentage_heads_on_pasture_start = FloatField(null=True, blank=True)
+    percentage_heads_on_pasture_w = FloatField(null=True, blank=True)
+    percentage_heads_on_pasture_wo = FloatField(null=True, blank=True)
+    percentage_heads_on_pasture_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_percentage_heads_on_pasture_thread", on_delete=SET_NULL)
+
     enteric_fermentation_start_t2 = FloatField(null=True, blank=True)
     enteric_fermentation_w_t2 = FloatField(null=True, blank=True)
     enteric_fermentation_wo_t2 = FloatField(null=True, blank=True)
@@ -995,33 +1025,15 @@ class Livestock(Module):
     prp_n2o_w_t2 = FloatField(null=True, blank=True)
     prp_n2o_wo_t2 = FloatField(null=True, blank=True)
 
-    manure_management_type_t2_start = ForeignKey(
-        ManureManagementType,
-        on_delete=CASCADE,
-        null=True,
-        blank=True,
-        related_name="%(class)s_manure_management_type_t2_start",
-    )
+    
     emission_factor_ch4_t2_start = FloatField(null=True, blank=True)
     emission_factor_n2o_t2_start = FloatField(null=True, blank=True)
 
-    manure_management_type_t2_w = ForeignKey(
-        ManureManagementType,
-        on_delete=CASCADE,
-        null=True,
-        blank=True,
-        related_name="%(class)s_manure_management_type_t2_w",
-    )
+    
     emission_factor_ch4_t2_w = FloatField(null=True, blank=True)
     emission_factor_n2o_t2_w = FloatField(null=True, blank=True)
 
-    manure_management_type_t2_wo = ForeignKey(
-        ManureManagementType,
-        on_delete=CASCADE,
-        null=True,
-        blank=True,
-        related_name="%(class)s_manure_management_type_t2_wo",
-    )
+    
     emission_factor_ch4_t2_wo = FloatField(null=True, blank=True)
     emission_factor_n2o_t2_wo = FloatField(null=True, blank=True)
 
@@ -1345,6 +1357,8 @@ class LargeFishery(Fishery):
 
 class Aquaculture(Module):
     user_notes = TextField(null=True, blank=True)
+
+    # fish_type = ForeignKey(FishType, on_delete=CASCADE, null=True, blank=True)
 
     annual_production_start = FloatField(null=True, blank=True)
     annual_production_w = FloatField(null=True, blank=True)
