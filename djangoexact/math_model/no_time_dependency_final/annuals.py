@@ -170,7 +170,7 @@ class AnnualCropland:
             total = (sum(self.total_hectars)) * co2_crop
             
             self.emissions_residue_burning_total = total
-            self.emissions_residue_burning_yearly = yearly_constant_emissions_breakdown(total, self.time_impl, self.time_cap)
+            self.emissions_residue_burning_yearly = breakdown_according_to_values(total, self.total_hectars)
 
             total_nitrous = (sum(self.total_hectars)) * kg_nitrous * self.nitrous_constant / 1000
             total_methane = (sum(self.total_hectars)) * kg_methane * self.methane_constant / 1000
