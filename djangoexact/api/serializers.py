@@ -503,7 +503,7 @@ class GrasslandWriteSerializer(LandModuleWriteSerializer):
 
         for scenario in grassland_mgmt_scenarios:
             mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
-            if scenario in fire_scenarios:
+            if scenario in fire_scenarios and data.get("is_fire_used", None):
                 mandatory_fields += generate_fields_for_scenario(scenario, ["fire_periodicity", "fire_impact"])
 
         if not are_fields_filled(data, mandatory_fields):
