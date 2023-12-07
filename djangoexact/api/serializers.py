@@ -593,16 +593,13 @@ class OrganicSoilWriteSerializer(LandModuleWriteSerializer):
     def validate(self, data):
         mandatory_fields = []
 
-        lut_scenarios = get_filled_scenarios(data, ["land_use_type"])
-
         peat_scenarios = get_filled_scenarios(data, ["peat_type"])
         fire_scenarios = get_filled_scenarios(data, ["fire_type"])
 
-        for scenario in lut_scenarios:
-            if scenario in peat_scenarios:
-                mandatory_fields += generate_fields_for_scenario(scenario, ["peat_extraction_height", "peat_area"])
-            if scenario in fire_scenarios:
-                mandatory_fields += generate_fields_for_scenario(scenario, ["fire_periodicity", "soil_fire_impact_percentage"])
+        for scenario in peat_scenarios:
+            mandatory_fields += generate_fields_for_scenario(scenario, ["peat_extraction_height", "peat_area"])
+        for scenario in fire_scenarios:
+            mandatory_fields += generate_fields_for_scenario(scenario, ["fire_periodicity", "soil_fire_impact_percentage"])
         
         if not are_fields_filled(data, mandatory_fields):
             raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
@@ -631,10 +628,16 @@ class FloodedRiceWriteSerializer(LandModuleWriteSerializer):
     def validate(self, data):
         mandatory_fields = []
 
-        lut_scenarios = get_filled_scenarios(data, ["land_use_type"])
+        water_mgmt_before_scenarios = get_filled_scenarios(data, ["water_management_type_before_cultivation"])
+        water_mgmt_after_scenarios = get_filled_scenarios(data, ["water_management_type_after_cultivation"])
+        organic_amendment_scenarios = get_filled_scenarios(data, ["organic_amendment_type"])
 
-        for scenario in lut_scenarios:
-            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
+        for scenario in water_mgmt_before_scenarios:
+            mandatory_fields += generate_fields_for_scenario(scenario, ["water_management_type_before_cultivation"])
+        for scenario in water_mgmt_after_scenarios:
+            mandatory_fields += generate_fields_for_scenario(scenario, ["water_management_type_after_cultivation"])
+        for scenario in organic_amendment_scenarios:
+            mandatory_fields += generate_fields_for_scenario(scenario, ["organic_amendment_type"])
 
         if not are_fields_filled(data, mandatory_fields):
             raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
