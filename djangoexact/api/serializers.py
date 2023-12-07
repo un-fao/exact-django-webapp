@@ -707,6 +707,12 @@ class RoadWriteSerializer(LandModuleWriteSerializer):
 
         return super().validate(data)
     
+class RoadReadSerializer(LandModuleReadSerializer):
+    class Meta:
+        model = Road
+        fields = "__all__"
+        ref_name = "Road"
+        
 # Other
 
 class OtherInfrastructureWriteSerializer(LandModuleWriteSerializer):
@@ -731,11 +737,134 @@ class OtherInfrastructureWriteSerializer(LandModuleWriteSerializer):
 
         return super().validate(data)
 
-class RoadReadSerializer(LandModuleReadSerializer):
+class OtherInfrastructureReadSerializer(LandModuleReadSerializer):
     class Meta:
-        model = Road
+        model = OtherInfrastructure
         fields = "__all__"
-        ref_name = "Road"
+        ref_name = "Other"
+
+# IrrigationSystem
+
+class IrrigationSystemWriteSerializer(LandModuleWriteSerializer):
+    class Meta:
+        model = IrrigationSystem
+        fields = "__all__"
+        ref_name = "IrrigationSystem"
+        mandatory_fields = [
+            "irrigation_type",
+            "ha",
+        ]
+
+    def validate(self, data):
+        mandatory_fields = []
+
+        irrigation_type_scenarios = get_filled_scenarios(data, ["irrigation_type"])
+
+        for scenario in irrigation_type_scenarios:
+            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
+
+        if not are_fields_filled(data, mandatory_fields):
+            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
+
+        return super().validate(data)
+    
+class IrrigationSystemReadSerializer(LandModuleReadSerializer):
+    class Meta:
+        model = IrrigationSystem
+        fields = "__all__"
+        ref_name = "IrrigationSystem"
+
+# IrrigationPhase
+
+class IrrigationPhaseWriteSerializer(LandModuleWriteSerializer):
+    class Meta:
+        model = IrrigationPhase
+        fields = "__all__"
+        ref_name = "IrrigationPhase"
+        mandatory_fields = [
+            "irrigation_phase_type",
+            "fuel_type",
+            "ha",
+            "gross_irrigation_water"
+        ]
+
+    def validate(self, data):
+        mandatory_fields = []
+
+        irrigation_phase_type_scenarios = get_filled_scenarios(data, ["irrigation_phase_type"])
+
+        for scenario in irrigation_phase_type_scenarios:
+            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
+
+        if not are_fields_filled(data, mandatory_fields):
+            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
+
+        return super().validate(data)
+    
+class IrrigationPhaseReadSerializer(LandModuleReadSerializer):
+    class Meta:
+        model = IrrigationPhase
+        fields = "__all__"
+        ref_name = "IrrigationPhase"
+
+class EnergyWriteSerializer(LandModuleWriteSerializer):
+    class Meta:
+        model = Energy
+        fields = "__all__"
+        ref_name = "Energy"
+        mandatory_fields = [
+            "mwh",
+        ]
+
+    def validate(self, data):
+        mandatory_fields = []
+
+        energy_type_scenarios = get_filled_scenarios(data, ["mwh"])
+
+        if energy_type_scenarios != []:
+            mandatory_fields += "country"
+
+        if not are_fields_filled(data, mandatory_fields):
+            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
+
+        return super().validate(data)
+
+class EnergyReadSerializer(LandModuleReadSerializer):
+    class Meta:
+        model = Energy
+        fields = "__all__"
+        ref_name = "Energy"
+
+# Fuel
+
+class FuelWriteSerializer(LandModuleWriteSerializer):
+    class Meta:
+        model = Fuel
+        fields = "__all__"
+        ref_name = "Fuel"
+        mandatory_fields = [
+            "fuel_type",
+            "fuel",
+        ]
+
+    def validate(self, data):
+        mandatory_fields = []
+
+        fuel_type_scenarios = get_filled_scenarios(data, ["fuel_type"])
+
+        for scenario in fuel_type_scenarios:
+            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
+
+        if not are_fields_filled(data, mandatory_fields):
+            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
+
+        return super().validate(data)    
+
+class FuelReadSerializer(LandModuleReadSerializer):
+    class Meta:
+        model = Fuel
+        fields = "__all__"
+        ref_name = "Fuel"
 
 class LandUseChangeReadSerializer(LandModuleReadSerializer):
     class Meta:
