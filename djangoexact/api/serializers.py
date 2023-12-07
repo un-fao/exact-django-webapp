@@ -34,9 +34,15 @@ def generate_fields_for_scenarios(scenarios: list[str], mandatory_fields: list):
     return fields
 
 def is_scenario_filled(data, scenario: str, mandatory_fields: list):
+    """
+    Returns true if any of the fields for the given scenario are filled
+    """
     return any(list(map(lambda field: data.get(f"{field}_{scenario}", None) != None, mandatory_fields)))
 
 def get_filled_scenarios(data, mandatory_fields: list):
+    """
+    Returns a list of scenarios for which all mandatory fields are filled
+    """
     scenarios = []
     if is_scenario_filled(data, "start", mandatory_fields):
         scenarios.append("start")
@@ -643,6 +649,93 @@ class FloodedRiceWriteSerializer(LandModuleWriteSerializer):
             raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
 
         return super().validate(data)
+
+
+# Building
+class BuildingWriteSerializer(LandModuleWriteSerializer):
+    class Meta:
+        model = Building
+        fields = "__all__"
+        ref_name = "Building"
+        mandatory_fields = [
+            "building_type",
+            "area_m2",
+        ]
+
+    def validate(self, data):
+        mandatory_fields = []
+
+        building_type_scenarios = get_filled_scenarios(data, ["building_type"])
+
+        for scenario in building_type_scenarios:
+            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
+
+        if not are_fields_filled(data, mandatory_fields):
+            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
+
+        return super().validate(data)
+    
+class BuildingReadSerializer(LandModuleReadSerializer):
+    class Meta:
+        model = Building
+        fields = "__all__"
+        ref_name = "Building"
+
+# Road
+
+class RoadWriteSerializer(LandModuleWriteSerializer):
+    class Meta:
+        model = Road
+        fields = "__all__"
+        ref_name = "Road"
+        mandatory_fields = [
+            "road_type",
+            "length_km",
+            "width_m",
+        ]
+
+    def validate(self, data):
+        mandatory_fields = []
+
+        road_type_scenarios = get_filled_scenarios(data, ["road_type"])
+
+        for scenario in road_type_scenarios:
+            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
+
+        if not are_fields_filled(data, mandatory_fields):
+            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
+
+        return super().validate(data)
+    
+# Other
+
+class OtherInfrastructureWriteSerializer(LandModuleWriteSerializer):
+    class Meta:
+        model = OtherInfrastructure
+        fields = "__all__"
+        ref_name = "Other"
+        mandatory_fields = [
+            "area_m2",
+        ]
+
+    def validate(self, data):
+        mandatory_fields = []
+
+        areas = get_filled_scenarios(data, self.Meta.mandatory_fields)
+
+        for scenario in areas:
+            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
+
+        if not are_fields_filled(data, mandatory_fields):
+            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
+
+        return super().validate(data)
+
+class RoadReadSerializer(LandModuleReadSerializer):
+    class Meta:
+        model = Road
+        fields = "__all__"
+        ref_name = "Road"
 
 class LandUseChangeReadSerializer(LandModuleReadSerializer):
     class Meta:
