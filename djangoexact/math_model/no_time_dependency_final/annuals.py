@@ -103,10 +103,10 @@ class AnnualCropland:
 
                 som_n2o = 0 if maximum_soc_20_years >= reference_soc else ((maximum_soc_20_years - reference_soc)/20/10*1000)  * self.emission_factor_nitrous * n2o_n_conversion * (self.nitrous_constant/1000)
 
-                total = - sum(self.total_hectars) * som_n2o
+                total = - sum(self.hectars_before_20) * som_n2o
 
                 # TODO: ask if this should be broken down proportionally, in that case we have to take an approach similar to the one used in the soil calculation
-                self.emissions_som_yearly = breakdown_according_to_values(total, self.total_hectars)
+                self.emissions_som_yearly = breakdown_according_to_values(total, self.hectars_before_20)
                 self.emissions_som_total = total
 
                 som_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in self.emissions_som_yearly], ActivityTypes.SOM, delay=self.delay)
