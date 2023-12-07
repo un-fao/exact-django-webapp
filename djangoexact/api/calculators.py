@@ -2547,14 +2547,14 @@ class LivestockCalculator(BaseCalculator):
         n2o_volatilization_ef_t2_start = None
         n2o_leaching_ef_t2_start = None
         ch4_ef_t2_start = None
-        if input.manure_management_type_t2_start is not None:
+        if input.complementary_manure_management_type_start is not None:
             n2o_ef_t2_start = LivestockManureEF.objects.get(
                 emission_type__name=utils.EmissionTypes.N2O,
                 livestock_category_type=input.livestock_category_type_start,
                 livestock_production_type=input.livestock_production_type_start,
                 climate=project.climate,
                 moisture=project.moisture,
-                manure_management_type=input.manure_management_type_t2_start,
+                manure_management_type=input.complementary_manure_management_type_start,
             )
             if n2o_ef_t2_start:
                 n2o_ef_t2_start = n2o_ef_t2_start.value
@@ -2565,7 +2565,7 @@ class LivestockCalculator(BaseCalculator):
                 livestock_production_type=input.livestock_production_type_start,
                 climate=project.climate,
                 moisture=project.moisture,
-                manure_management_type=input.manure_management_type_t2_start,
+                manure_management_type=input.complementary_manure_management_type_start,
             )
             if n2o_volatilization_ef_t2_start:
                 n2o_volatilization_ef_t2_start = n2o_volatilization_ef_t2_start.value
@@ -2576,7 +2576,7 @@ class LivestockCalculator(BaseCalculator):
                 livestock_production_type=input.livestock_production_type_start,
                 climate=project.climate,
                 moisture=project.moisture,
-                manure_management_type=input.manure_management_type_t2_start,
+                manure_management_type=input.complementary_manure_management_type_start,
             )
             if n2o_leaching_ef_t2_start:
                 n2o_leaching_ef_t2_start = n2o_leaching_ef_t2_start.value
@@ -2587,7 +2587,7 @@ class LivestockCalculator(BaseCalculator):
                 livestock_production_type=input.livestock_production_type_start,
                 climate=project.climate,
                 moisture=project.moisture,
-                manure_management_type=input.manure_management_type_t2_start,
+                manure_management_type=input.complementary_manure_management_type_start,
             )
             if ch4_ef_t2_start:
                 ch4_ef_t2_start = ch4_ef_t2_start.value
@@ -2596,14 +2596,14 @@ class LivestockCalculator(BaseCalculator):
         n2o_volatilization_ef_t2_w = None
         n2o_leaching_ef_t2_w = None
         ch4_ef_t2_w = None
-        if input.manure_management_type_t2_w is not None:
+        if input.complementary_manure_management_type_w is not None:
             n2o_ef_t2_w = LivestockManureEF.objects.get(
                 emission_type__name=utils.EmissionTypes.N2O,
                 livestock_category_type=input.livestock_category_type_w,
                 livestock_production_type=input.livestock_production_type_w,
                 climate=project.climate,
                 moisture=project.moisture,
-                manure_management_type=input.manure_management_type_t2_w,
+                manure_management_type=input.complementary_manure_management_type_w,
             )
             if n2o_ef_t2_w:
                 n2o_ef_t2_w = n2o_ef_t2_w.value
@@ -2614,7 +2614,7 @@ class LivestockCalculator(BaseCalculator):
                 livestock_production_type=input.livestock_production_type_w,
                 climate=project.climate,
                 moisture=project.moisture,
-                manure_management_type=input.manure_management_type_t2_w,
+                manure_management_type=input.complementary_manure_management_type_w,
             )
             if n2o_volatilization_ef_t2_w:
                 n2o_volatilization_ef_t2_w = n2o_volatilization_ef_t2_w.value
@@ -2625,7 +2625,7 @@ class LivestockCalculator(BaseCalculator):
                 livestock_production_type=input.livestock_production_type_w,
                 climate=project.climate,
                 moisture=project.moisture,
-                manure_management_type=input.manure_management_type_t2_w,
+                manure_management_type=input.complementary_manure_management_type_w,
             )
             if n2o_leaching_ef_t2_w:
                 n2o_leaching_ef_t2_w = n2o_leaching_ef_t2_w.value
@@ -2636,7 +2636,7 @@ class LivestockCalculator(BaseCalculator):
                 livestock_production_type=input.livestock_production_type_w,
                 climate=project.climate,
                 moisture=project.moisture,
-                manure_management_type=input.manure_management_type_t2_w,
+                manure_management_type=input.complementary_manure_management_type_w,
             )
             if ch4_ef_t2_w:
                 ch4_ef_t2_w = ch4_ef_t2_w.value
@@ -2645,14 +2645,14 @@ class LivestockCalculator(BaseCalculator):
         n2o_volatilization_ef_t2_wo = None
         n2o_leaching_ef_t2_wo = None
         ch4_ef_t2_wo = None
-        if input.manure_management_type_t2_wo is not None:
+        if input.complementary_manure_management_type_wo is not None:
             n2o_ef_t2_wo = LivestockManureEF.objects.get(
                 emission_type__name=utils.EmissionTypes.N2O,
                 livestock_category_type=input.livestock_category_type_wo,
                 livestock_production_type=input.livestock_production_type_wo,
                 climate=project.climate,
                 moisture=project.moisture,
-                manure_management_type=input.manure_management_type_t2_wo,
+                manure_management_type=input.complementary_manure_management_type_wo,
             )
             if n2o_ef_t2_wo:
                 n2o_ef_t2_wo = n2o_ef_t2_wo.value
@@ -2663,7 +2663,7 @@ class LivestockCalculator(BaseCalculator):
                 livestock_production_type=input.livestock_production_type_wo,
                 climate=project.climate,
                 moisture=project.moisture,
-                manure_management_type=input.manure_management_type_t2_wo,
+                manure_management_type=input.complementary_manure_management_type_wo,
             )
             if n2o_volatilization_ef_t2_wo:
                 n2o_volatilization_ef_t2_wo = n2o_volatilization_ef_t2_wo.value
@@ -2674,7 +2674,7 @@ class LivestockCalculator(BaseCalculator):
                 livestock_production_type=input.livestock_production_type_wo,
                 climate=project.climate,
                 moisture=project.moisture,
-                manure_management_type=input.manure_management_type_t2_wo,
+                manure_management_type=input.complementary_manure_management_type_wo,
             )
             if n2o_leaching_ef_t2_wo:
                 n2o_leaching_ef_t2_wo = n2o_leaching_ef_t2_wo.value
@@ -2685,7 +2685,7 @@ class LivestockCalculator(BaseCalculator):
                 livestock_production_type=input.livestock_production_type_wo,
                 climate=project.climate,
                 moisture=project.moisture,
-                manure_management_type=input.manure_management_type_t2_wo,
+                manure_management_type=input.complementary_manure_management_type_wo,
             )
             if ch4_ef_t2_wo:
                 ch4_ef_t2_wo = ch4_ef_t2_wo.value
