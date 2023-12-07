@@ -35,6 +35,7 @@ class OtherLandUseChanges:
         # ADDED PARAMETERS FOR CALCULATION
         self.hectars_before_20, self.hectars_after_20 = yearly_time_dependent_20_year_breakdown(0, self.area, self.time_impl, self.time_cap, self.rate)
 
+
         # TIER 2 VALUE DEFAULTS
 
         # RESULTS
@@ -62,9 +63,11 @@ class OtherLandUseChanges:
 
                 delta_c_biomass = (final_biomass - initial_biomass) * (-44/12)
 
+                # TODO: add logic for comprehension of amount of hectars addressed in one year (not self.total_hectars) and use that for the breakdown and total
                 total = delta_c_biomass * self.area
 
                 self.total_biomass_emissions = total
+                # TODO: change so only in implementation years but proportionate to the hectars addressed in that year
                 self.yearly_biomass_emissions = yearly_constant_emissions_breakdown(total, self.time_impl, self.time_cap)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
@@ -129,6 +132,7 @@ class OtherLandUseChanges:
             methane_em_per_hectar = methane_emissions/1000 
             nitrous_em_per_hectar = nitrous_emissions/1000
 
+            #TODO: same as biomass above, breakdown according to hectares addressed in that year
             methane_fire_emissions = methane_em_per_hectar * self.area
             nitrous_fire_emissions = nitrous_em_per_hectar * self.area
 
@@ -165,6 +169,5 @@ class OtherLandUseChanges:
 
     def evaluate_tier_2_defaults():
         pass
-
 
 
