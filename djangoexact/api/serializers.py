@@ -19,7 +19,7 @@ class ActionTypes(Enum):
 
 
 def are_fields_filled(data, mandatory_fields):
-    return mandatory_fields == [] or all(list(map(lambda field: data.get(field, None) != None, mandatory_fields)))
+    return all(list(map(lambda field: data.get(field, None) != None, mandatory_fields)))
 
 def generate_fields_for_scenario(scenario: str, mandatory_fields: list):
     fields = []
@@ -37,7 +37,7 @@ def is_scenario_filled(data, scenario: str, mandatory_fields: list):
     """
     Returns true if any of the fields for the given scenario are filled
     """
-    return any(list(map(lambda field: data.get(f"{field}_{scenario}", None) != None, mandatory_fields)))
+    return all(list(map(lambda field: data.get(f"{field}_{scenario}", None) != None, mandatory_fields)))
 
 def get_filled_scenarios(data, mandatory_fields: list):
     """
@@ -588,6 +588,12 @@ class LandUseChangeWriteSerializer(LandModuleWriteSerializer):
         fields = "__all__"
         ref_name = "LandUseChange"
 
+class LandUseChangeReadSerializer(LandModuleReadSerializer):
+    class Meta:
+        model = LandUseChange
+        fields = "__all__"
+        ref_name = "LandUseChange"
+
 # Organic Soil
 
 class OrganicSoilWriteSerializer(LandModuleWriteSerializer):
@@ -866,11 +872,149 @@ class FuelReadSerializer(LandModuleReadSerializer):
         fields = "__all__"
         ref_name = "Fuel"
 
-class LandUseChangeReadSerializer(LandModuleReadSerializer):
+# Livestock
+
+class LivestockWriteSerializer(LandModuleWriteSerializer):
     class Meta:
-        model = LandUseChange
+        model = Livestock
         fields = "__all__"
-        ref_name = "LandUseChange"
+        ref_name = "Livestock"
+        mandatory_fields = [
+            "livestock_category_type",
+            "heads_number",
+            "livestock_production_type"
+        ]
+
+    def validate(self, data):
+        mandatory_fields = []
+
+        livestock_type_scenarios = get_filled_scenarios(data, ["livestock_category_type"])
+        complementary_manure_mngt_scenarios = get_filled_scenarios(data, ["complementary_manure_management_type_t2"])
+
+        for scenario in livestock_type_scenarios:
+            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
+            if scenario in complementary_manure_mngt_scenarios:
+                mandatory_fields += generate_fields_for_scenario(scenario, ["complementary_manure_management_type_t2, percentage_heads_on_pasture"])
+
+        if not are_fields_filled(data, mandatory_fields):
+            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
+        
+        return super().validate(data)
+    
+# Aquaculture
+
+class AquacultureWriteSerializer(LandModuleWriteSerializer):
+    class Meta:
+        model = Aquaculture
+        fields = "__all__"
+        ref_name = "Aquaculture"
+        mandatory_fields = [
+            "annual_production",
+        ]
+
+    def validate(self, data):
+        return super().validate(data)
+    
+class AquacultureReadSerializer(LandModuleReadSerializer):
+    class Meta:
+        model = Aquaculture
+        fields = "__all__"
+        ref_name = "Aquaculture"
+
+# SmllFishery
+class SmallFisheryWriteSerializer(LandModuleWriteSerializer):
+    class Meta:
+        model = SmallFishery
+        fields = "__all__"
+        ref_name = "SmallFishery"
+        mandatory_fields = [
+            "fishery_type",
+            "gear_type",
+            "total_catch_yr",
+        ]
+
+    def validate(self, data):
+        mandatory_fields = []
+
+        fishery_type_scenarios = get_filled_scenarios(data, self.Meta.mandatory_fields)
+
+        for scenario in fishery_type_scenarios:
+            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
+        
+        if not are_fields_filled(data, mandatory_fields):
+            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
+        
+        return super().validate(data)
+    
+class SmallFisheryReadSerializer(LandModuleReadSerializer):
+    class Meta:
+        model = SmallFishery
+        fields = "__all__"
+        ref_name = "SmallFishery"
+
+# LargeFishery
+class LargeFisheryWriteSerializer(LandModuleWriteSerializer):
+    class Meta:
+        model = LargeFishery
+        fields = "__all__"
+        ref_name = "LargeFishery"
+        mandatory_fields = [
+            "fish_type",
+            "gear_type",
+            "total_catch_yr",
+        ]
+
+    def validate(self, data):
+        mandatory_fields = []
+
+        fishery_type_scenarios = get_filled_scenarios(data, self.Meta.mandatory_fields)
+
+        for scenario in fishery_type_scenarios:
+            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
+        
+        if not are_fields_filled(data, mandatory_fields):
+            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
+        
+        return super().validate(data)
+
+class LargeFisheryReadSerializer(LandModuleReadSerializer):
+    class Meta:
+        model = LargeFishery
+        fields = "__all__"
+        ref_name = "LargeFishery"
+
+# Waterbody
+class WaterbodyWriteSerializer(LandModuleWriteSerializer):
+    class Meta:
+        model = Waterbody
+        fields = "__all__"
+        ref_name = "Waterbodies"
+        mandatory_fields = [
+            "waterbody_type",
+            "trophic_type"
+        ]
+
+    def validate(self, data):
+        mandatory_fields = []
+
+        waterbody_type_scenarios = get_filled_scenarios(data, ["trophic_type"])
+
+        if waterbody_type_scenarios != []:
+            mandatory_fields += "area"
+
+        for scenario in waterbody_type_scenarios:
+            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
+        
+        if not are_fields_filled(data, mandatory_fields):
+            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
+        
+        return super().validate(data)
+    
+class WaterbodyReadSerializer(LandModuleReadSerializer):
+    class Meta:
+        model = Waterbody
+        fields = "__all__"
+        ref_name = "Waterbodies"
 
 class ProjectInvitationWriteSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
