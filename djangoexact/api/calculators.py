@@ -43,6 +43,7 @@ from .models import (
     Irrigation,
     Energy,
     BiomassModule,
+    ActivityState,
 )
 from math_model import (
     defo,
@@ -177,12 +178,12 @@ class LandUseChangeCalculator(BaseCalculator):
     def luc_based_calculation(self, module_start: Module, module_end: Module, aggregate_by=BreakdownTypes.TOTAL) -> Result:
 
         if type(module_start) == ForestManagement:
-            return DeforestationCalculator(module_start).calculate(aggregate_by=aggregate_by)
+            return DeforestationCalculator(module_start).calculate()
         
         if type(module_end) == ForestManagement:
-            return ForestManagementCalculator(module_end).calculate(aggregate_by=aggregate_by)
+            return ForestManagementCalculator(module_end).calculate()
         
-        return OtherLandUseCalculator(module_end).calculate(aggregate_by=aggregate_by)
+        return OtherLandUseCalculator(module_end).calculate()
 
     def calculate(self, aggregate_by=BreakdownTypes.TOTAL) -> Result:
         """
@@ -234,7 +235,7 @@ class DeforestationCalculator(BaseCalculator):
         # TODO: Maybe generalise this on a higher level
         if not forest:
             raise Exception("Forest module is missing")
-        if forest.status.value != 1:
+        if module.status != ActivityState.objects.get(name="READY"):
             raise Exception("Forest module is not complete")
 
         cmc = {
@@ -379,7 +380,11 @@ class DeforestationCalculator(BaseCalculator):
         math_w.calculate_emissions()
         math_wo.calculate_emissions()
 
-        return Result(math_w.total_emissions+math_start.total_emissions, math_wo.total_emissions+math_start.total_emissions)
+        res_start = math_start.result if math_start else MathResult(project.implementation_years, project.capitalization_years)
+        res_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
+        res_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+
+        return (res_w+res_start, res_wo+res_start)
 
 class AfforestationCalculator(BaseCalculator):
     """
@@ -564,7 +569,7 @@ class OtherLandUseCalculator(BaseCalculator):
     Calculator for other land use modules.
     """
 
-    def calculate(self, aggregate_by=BreakdownTypes.TOTAL) -> list[Result]:
+    def calculate(self) -> list[Result]:
         """
         Calculate emissions for a single OtherLandUse module.
         """
