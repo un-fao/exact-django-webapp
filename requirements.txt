@@ -13,6 +13,7 @@ django-auditlog==2.2.2
 django-cors-headers==4.0.0
 django-environ==0.10.0
 django-extensions==3.2.1
+django-filter==23.5
 django-simple-history==3.4.0
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.2.2
