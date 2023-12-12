@@ -374,6 +374,8 @@ class ActivityBuilderSerializer(serializers.Serializer):
             if module_type.class_name == "LandUseChange":
                 continue
 
+            logging.debug(f"Creating module {module_type.class_name}")
+
             ModuleClass = apps.get_model("api", module_type.class_name)
 
             if module_type.is_luc:
@@ -1031,3 +1033,23 @@ class ProjectInvitationReadSerializer(serializers.ModelSerializer):
         model = ProjectInvitation
         fields = "__all__"
         ref_name = "ProjectInvitation"
+
+class ForestManagementWriteSerializer(LandModuleWriteSerializer):
+    class Meta:
+        model = ForestManagement
+        fields = "__all__"
+        ref_name = "ForestManagement"
+        mandatory_fields = [
+            "forest_management_type",
+            "area",
+        ]
+
+    def validate(self, data):
+        
+        return super().validate(data)
+
+class ForestManagementReadSerializer(LandModuleReadSerializer):
+    class Meta:
+        model = ForestManagement
+        fields = "__all__"
+        ref_name = "ForestManagement"
