@@ -84,12 +84,15 @@ def yearly_time_dependent_20_year_breakdown(start_value, end_value, years_implem
     
     breakdown = yearly_time_dependent_parameter_breakdown(start_value, end_value, years_implementation, years_capitalization, function, interim_values = False)
     
-    after_20 = [0 for i in range(20)]
+    after_20 = [0 for i in range(21)]
     after_20.extend(breakdown)
 
     before_20 = [i-j for i, j in zip(breakdown, after_20[0:len(breakdown)])]
+
+    average_before_20 = average_yearly_value(before_20)
+    average_after_20 = average_yearly_value(after_20)[0:len(breakdown) - 1]
     
-    return average_yearly_value(before_20), average_yearly_value(after_20)[0:len(breakdown)]
+    return average_before_20, average_after_20
 
 def breakdown_according_to_values(maximum, list_of_proportions):
 
