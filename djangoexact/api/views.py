@@ -542,7 +542,7 @@ def generic_module_viewset(model: Model):
 
             aggregate_by = BreakdownTypes(request.query_params.get("aggregate", BreakdownTypes.TOTAL))
 
-            module = get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
+            module = get_object_or_404(model, pk=pk)
 
             try:
                 results_w, results_wo, results_tot = CalculatorFactory().calculate_result(module, aggregate_by=aggregate_by)
