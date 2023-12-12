@@ -536,7 +536,7 @@ class Module(Historical):
 
     def save(self, *args, **kwargs):
 
-        if not self.pk and not self.status:
+        if self.pk and not self.status:
             self.status = ActivityState.objects.get_or_create(name="EMPTY")[0]
 
         for attr in dir(self):
@@ -1840,3 +1840,18 @@ class AnnualCroplandParameter(Parameter):
 
 class CoastalWetlandParameter(Parameter):
     pass
+
+
+class FundingAgency(Model):
+    name = CharField(max_length=255, unique=True)
+    abbreviation = CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return f"({self.pk}) {self.name}"
+    
+class ExecutingAgency(Model):
+    name = CharField(max_length=255, unique=True)
+    abbreviation = CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return f"({self.pk}) {self.name}"
