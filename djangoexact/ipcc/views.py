@@ -9,8 +9,6 @@ import django_filters
 class AuthenticatedViewSet:
     permission_classes = [IsAuthenticated]
 
-
-
 def generic_viewset(_model: Model):
     class GenericFilterSet(django_filters.FilterSet):
         class Meta:
