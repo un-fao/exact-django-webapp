@@ -38,7 +38,7 @@ router.register(r"module-types", views.ModuleTypeViewSet, basename="modules")
 router.register(r"statuses", views.generic_viewset(ProjectStatus), basename="statuses")
 router.register(r"regions", views.generic_viewset(Region), basename="regions")
 router.register(r"countries", views.CountryViewSet, basename="countries")
-router.register(r"global-warming-pontentials", views.generic_viewset(GlobalWarmingPotential), basename="global-warming-pontentials")
+router.register(r"global-warming-potentials", views.generic_viewset(GlobalWarmingPotential), basename="global-warming-potentials")
 
 router.register(
     r"other-land-uses",
@@ -168,6 +168,10 @@ router.register(r"organic-soils", views.generic_module_viewset(OrganicSoil), bas
 router.register(r'soil-types', views.generic_viewset(SoilType), basename='soil-types')
 router.register(r"climates", views.generic_viewset(Climate), basename="climates")
 router.register(r"moistures", views.generic_viewset(Moisture), basename="moistures")
+
+router.register(r'funding-agencies', views.generic_viewset(FundingAgency), basename='funding-agencies')
+router.register(r'executing-agencies', views.generic_viewset(ExecutingAgency), basename='executing-agencies')
+
 urlpatterns = [
     path("docs/", include_docs_urls(title="EX-ACT Docs")),
     re_path(
