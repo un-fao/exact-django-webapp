@@ -38,8 +38,13 @@ post_project = {
 project_response = client.post('/api/projects/', json.dumps(post_project), content_type='application/json')
 logging.debug(project_response)
 
+
+module_type_start = ModuleType.objects.get(name="Forest Management")
+module_type_w = ModuleType.objects.get(name="Annual Cropland")
+module_type_wo = ModuleType.objects.get(name="Forest Management")
+
 post_activity = {
-    "name": "Activity for demo",
+    "name": "Deforestation to Annual Cropland",
     "climate": climate.id,
     "moisture": moisture.id,
     "soil_type": soil_type.id,
@@ -47,9 +52,9 @@ post_activity = {
     "project": project_response.data["id"],
     "module_types": [],
     "land_use_change": {
-        "module_type_start": ModuleType.objects.get(name="Grassland").id,
-        "module_type_w": ModuleType.objects.get(name="Annual Cropland").id,
-        "module_type_wo": ModuleType.objects.get(name="Grassland").id,
+        "module_type_start": module_type_start.id,
+        "module_type_w": module_type_w.id,
+        "module_type_wo": module_type_wo.id,
     },
     "area": 150,
 }
@@ -57,30 +62,14 @@ post_activity = {
 activity_response = client.post('/api/activities/build/', post_activity, format='json')
 logging.debug(activity_response.data)
 
-module_type_start = ModuleType.objects.get(name="Grassland")
-module_type_w = ModuleType.objects.get(name="Annual Cropland")
-module_type_wo = ModuleType.objects.get(name="Grassland")
-
-area = 150
-
-post_luc = {
-    "module_type_start": module_type_start.id,
-    "module_type_w": module_type_w.id,
-    "module_type_wo": module_type_wo.id,
-}
-
 luc = client.get(f'/api/land-use-changes/?activity_id={activity_response.data["id"]}')
 logging.debug(luc)
 
-post_grassland = {
-    "grassland_management_type_start": GrasslandManagementType.objects.get(name="High Intensity Grazing").id,
-    "grassland_management_type_wo": GrasslandManagementType.objects.get(name="Severely Degraded").id,
-    "is_fire_used_start": True,
-    "is_fire_used_wo": True,
-    "fire_periodicity_start": 2,
-    "fire_periodicity_wo": 2,
-    "fire_impact_start": 0.2,
-    "fire_impact_wo": 0.2
+post_forest_management = {
+    "activity": activity_response.data["id"],
+    "land_use_type_start": 114,
+    "land_use_type_w": 114,
+    "land_use_type_wo": 114,
 }
 
 post_annual_cropland = {
@@ -90,12 +79,13 @@ post_annual_cropland = {
     "residue_management_type_w": ResidueManagementType.objects.get(name="Retained").id,
 }
 
-grassland = client.get(f'/api/grasslands/?activity_id={activity_response.data["id"]}')
-grassland_response = client.patch(f'/api/grasslands/{grassland.data[0]["id"]}/', post_grassland, format='json')
-logging.debug(grassland_response)
+forest_management = client.get(f'/api/forest-managements/?activity_id={activity_response.data["id"]}')
+logging.debug(forest_management)
+forest_response = client.patch(f'/api/forest-managements/{forest_management.data[0]["id"]}/', post_forest_management, format='json')
+logging.debug(forest_response)
 
-grassland_results_response = client.get(f'/api/grasslands/{grassland_response.data["id"]}/results/')
-logging.debug(grassland_results_response)
+forest_results_response = client.get(f'/api/forest-managements/{forest_response.data["id"]}/results/')
+logging.debug(forest_results_response)
 
 annualcropping = client.get(f'/api/annual-croppings/?activity_id={activity_response.data["id"]}')
 annualcropping_response = client.patch(f'/api/annual-croppings/{annualcropping.data[0]["id"]}/', post_annual_cropland, format='json')
@@ -135,7 +125,7 @@ logging.debug(f"Results: {luc_results_response.data}\n\n")
 
 logging.debug("##### GRASSLAND #####\n\n")
 
-logging.debug(f"Results: {grassland_results_response.data}\n\n")
+logging.debug(f"Results: {forest_results_response.data}\n\n")
 
 logging.debug("##### ANNUAL CROPLAND #####\n\n")
 
@@ -159,7 +149,7 @@ class Result:
         return Result(self.w - other.w, self.wo - other.wo, self.balance - other.balance)
 
 # Grassland
-grassland_results = Result(**grassland_results_response.data)
+grassland_results = Result(**forest_results_response.data)
 
 # Annual Cropland
 annualcropping_results = Result(**annualcropping_results_response.data)
