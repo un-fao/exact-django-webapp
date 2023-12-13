@@ -38,8 +38,8 @@ from .models import (
     VegetationType,
     Module,
     ForestDisturbance,
-    Assessment,
-    AssessmentNoScenarios,
+    LandModule,
+    LandModuleNoScenarios,
     LandUseType,
     Irrigation,
     Energy,
@@ -222,7 +222,7 @@ class DeforestationCalculator(BaseCalculator):
         Calculate emissions for a single Deforestation module.
         """
 
-        module: Assessment = self.data
+        module: LandModule = self.data
         luc: LandUseChange = module.land_use_change
         project: Project = module.activity.project
         change_rate = module.activity.change_rate
@@ -575,7 +575,7 @@ class OtherLandUseCalculator(BaseCalculator):
         Calculate emissions for a single OtherLandUse module.
         """
 
-        input: BiomassModule | Assessment = self.data
+        input: BiomassModule | LandModule = self.data
         luc: LandUseChange = input.land_use_change
         project: Project = self.data.activity.project
         climate = project.climate
@@ -595,9 +595,9 @@ class OtherLandUseCalculator(BaseCalculator):
             "continent": continent,
         }
 
-        module_start: BiomassModule | Assessment = getattr(input.activity, luc.module_type_start.class_name.lower(), None).first()
-        module_w: BiomassModule | Assessment = getattr(input.activity, luc.module_type_w.class_name.lower(), None).first()
-        module_wo: BiomassModule | Assessment = getattr(input.activity, luc.module_type_wo.class_name.lower(), None).first()
+        module_start: BiomassModule | LandModule = getattr(input.activity, luc.module_type_start.class_name.lower(), None).first()
+        module_w: BiomassModule | LandModule = getattr(input.activity, luc.module_type_w.class_name.lower(), None).first()
+        module_wo: BiomassModule | LandModule = getattr(input.activity, luc.module_type_wo.class_name.lower(), None).first()
 
         luc_start = LandUseType.objects.get(name=luc.module_type_start.name)
         luc_w = LandUseType.objects.get(name=luc.module_type_w.name)
@@ -3472,7 +3472,7 @@ class ForestManagementCalculator(BaseCalculator):
     def calculate(self) -> Result:
         """"""
 
-        input: Assessment | AssessmentNoScenarios = self.data
+        input: LandModule | LandModuleNoScenarios = self.data
         luc: LandUseChange = input.land_use_change
         project: Project = input.activity.project
 
