@@ -521,8 +521,13 @@ def generic_module_viewset(model: Model):
             optionally including related modules by sending the `include_related` query parameter as `true`.
             """
 
-            activity_id = get_query_param_or_validation_error(self.request, "activity_id")
-            modules = model.objects.filter(activity__id=activity_id)
+            activity_id = get_query_param_or_validation_error(self.request, "activity")
+            module_type = ModuleType.objects.get(class_name=model.__name__)
+
+            if module_type.is_submodule:
+                modules = model.objects.filter(parent__activity__id=activity_id).all()
+            else:
+                modules = model.objects.filter(activity__id=activity_id).all()
 
             data = []
 
