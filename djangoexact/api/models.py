@@ -503,6 +503,7 @@ class Activity(Historical):
 ##############################
 
 class Submodule(Historical):
+    module_type = ForeignKey("api.ModuleType", on_delete=CASCADE, related_name="%(class)s")
 
     class Meta:
         abstract = True
@@ -1392,26 +1393,17 @@ class InputType(Model):
     def __str__(self):
         return f"({self.id}) {self.name}"
 
-
 class Input(Module):
-    input_type = ForeignKey(InputType, on_delete=CASCADE, null=True, blank=True)
-    value_start = FloatField(null=True, blank=True)
-    value_w = FloatField(null=True, blank=True)
-    value_w_rate = ForeignKey(
-        ChangeRate,
-        on_delete=CASCADE,
-        null=True,
-        blank=True,
-        related_name="%(class)s_value_w_rate",
-    )
-    value_wo = FloatField(null=True, blank=True)
-    value_wo_rate = ForeignKey(
-        ChangeRate,
-        on_delete=CASCADE,
-        null=True,
-        blank=True,
-        related_name="%(class)s_value_wo_rate",
-    )
+    pass
+
+class InputEntry(Submodule):
+    parent = ForeignKey(Input, on_delete=CASCADE, related_name="input_entries")
+    input_type = ForeignKey(InputType, on_delete=CASCADE)
+
+    value_start = FloatField()
+    value_w = FloatField()
+    value_wo = FloatField()
+    value_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_value_thread")
 
     co2_emissions_t2 = FloatField(null=True, blank=True)
     n2o_emissions_t2 = FloatField(null=True, blank=True)
@@ -1428,8 +1420,8 @@ class EmissionFactorSource(Model):
 class Energy(Module):
     pass
 
-class Electricity(Module):
-    energy = ForeignKey(Energy, on_delete=CASCADE, null=True, blank=True, related_name="electricities")
+class Electricity(Submodule):
+    parent = ForeignKey(Energy, on_delete=CASCADE, null=True, blank=True, related_name="electricities")
     country = ForeignKey(Country, on_delete=CASCADE, null=True, blank=True)
     mwh_start = FloatField(null=True, blank=True)
     mwh_w = FloatField(null=True, blank=True)
@@ -1443,8 +1435,8 @@ class Electricity(Module):
     transmission_loss = FloatField(default=0.1)
     ef_source = ForeignKey(EmissionFactorSource, on_delete=CASCADE, null=True, blank=True)
 
-class Fuel(Module):
-    energy = ForeignKey(Energy, on_delete=CASCADE, null=True, blank=True, related_name="fuels")
+class Fuel(Submodule):
+    parent = ForeignKey(Energy, on_delete=CASCADE, null=True, blank=True, related_name="fuels")
     fuel_type = ForeignKey(FuelType, on_delete=CASCADE, null=True, blank=True)
     fuel_start = FloatField(null=True, blank=True)
     fuel_w = FloatField(null=True, blank=True)
@@ -1471,7 +1463,7 @@ class Irrigation(Module):
     pass
 
 class IrrigationSystem(Submodule):
-    irrigation = ForeignKey(Irrigation, on_delete=CASCADE, null=True, blank=True, related_name="irrigation_systems")
+    parent = ForeignKey(Irrigation, on_delete=CASCADE, null=True, blank=True, related_name="irrigation_systems")
     irrigation_system_type = ForeignKey(IrrigationSystemType, on_delete=CASCADE, null=True, blank=True, related_name="irrigation_systems")
     ha_start = FloatField(null=True, blank=True)
     ha_w = FloatField(null=True, blank=True)
@@ -1488,7 +1480,7 @@ class IrrigationSystem(Submodule):
 
 
 class IrrigationPhase(Submodule):
-    irrigation = ForeignKey(Irrigation, on_delete=CASCADE, null=True, blank=True, related_name="irrigation_phases")
+    parent = ForeignKey(Irrigation, on_delete=CASCADE, null=True, blank=True, related_name="irrigation_phases")
     irrigation_system_type = ForeignKey(IrrigationSystemType, on_delete=CASCADE, null=True, blank=True, related_name="irrigation_phases")
     fuel_type = ForeignKey(FuelType, on_delete=CASCADE, null=True, blank=True)
     well_depth = FloatField(null=True, blank=True)
