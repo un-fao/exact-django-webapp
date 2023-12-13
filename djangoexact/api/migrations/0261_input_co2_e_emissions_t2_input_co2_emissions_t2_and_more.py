@@ -11,56 +11,56 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # migrations.AddField(
-        #     model_name='input',
-        #     name='co2_e_emissions_t2',
-        #     field=models.FloatField(blank=True, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name='input',
-        #     name='co2_emissions_t2',
-        #     field=models.FloatField(blank=True, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name='input',
-        #     name='implementation_year_t2',
-        #     field=models.IntegerField(blank=True, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name='input',
-        #     name='input_type',
-        #     field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='api.inputtype'),
-        #     preserve_default=False,
-        # ),
-        # migrations.AddField(
-        #     model_name='input',
-        #     name='n2o_emissions_t2',
-        #     field=models.FloatField(blank=True, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name='input',
-        #     name='value_start',
-        #     field=models.FloatField(default=1),
-        #     preserve_default=False,
-        # ),
-        # migrations.AddField(
-        #     model_name='input',
-        #     name='value_thread',
-        #     field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='%(class)s_value_thread', to='api.commentthread'),
-        # ),
-        # migrations.AddField(
-        #     model_name='input',
-        #     name='value_w',
-        #     field=models.FloatField(default=1),
-        #     preserve_default=False,
-        # ),
-        # migrations.AddField(
-        #     model_name='input',
-        #     name='value_wo',
-        #     field=models.FloatField(default=1),
-        #     preserve_default=False,
-        # ),
-        # migrations.DeleteModel(
-        #     name='InputEntry',
-        # ),
+        migrations.AddField(
+            model_name='input',
+            name='co2_e_emissions_t2',
+            field=models.FloatField(blank=True, null=True),
+        ),
+        migrations.AddField(
+            model_name='input',
+            name='co2_emissions_t2',
+            field=models.FloatField(blank=True, null=True),
+        ),
+        migrations.AddField(
+            model_name='input',
+            name='implementation_year_t2',
+            field=models.IntegerField(blank=True, null=True),
+        ),
+        migrations.AddField(
+            model_name='input',
+            name='input_type',
+            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='api.inputtype'),
+            preserve_default=False,
+        ),
+        migrations.AddField(
+            model_name='input',
+            name='n2o_emissions_t2',
+            field=models.FloatField(blank=True, null=True),
+        ),
+        migrations.AddField(
+            model_name='input',
+            name='value_start',
+            field=models.FloatField(default=1),
+            preserve_default=False,
+        ),
+        migrations.AddField(
+            model_name='input',
+            name='value_thread',
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='%(class)s_value_thread', to='api.commentthread'),
+        ),
+        migrations.AddField(
+            model_name='input',
+            name='value_w',
+            field=models.FloatField(default=1),
+            preserve_default=False,
+        ),
+        migrations.AddField(
+            model_name='input',
+            name='value_wo',
+            field=models.FloatField(default=1),
+            preserve_default=False,
+        ),
+        migrations.DeleteModel(
+            name='InputEntry',
+        ),
     ]

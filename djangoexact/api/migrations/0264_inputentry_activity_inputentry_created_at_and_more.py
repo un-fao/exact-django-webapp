@@ -11,50 +11,50 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # migrations.AddField(
-        #     model_name='inputentry',
-        #     name='activity',
-        #     field=models.ForeignKey(default=513, on_delete=django.db.models.deletion.CASCADE, related_name='%(class)s', to='api.activity'),
-        #     preserve_default=False,
-        # ),
-        # migrations.AddField(
-        #     model_name='inputentry',
-        #     name='created_at',
-        #     field=models.DateTimeField(auto_now_add=True, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name='inputentry',
-        #     name='notes',
-        #     field=models.TextField(blank=True, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name='inputentry',
-        #     name='soc_t2_start',
-        #     field=models.FloatField(blank=True, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name='inputentry',
-        #     name='soc_t2_w',
-        #     field=models.FloatField(blank=True, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name='inputentry',
-        #     name='soc_t2_wo',
-        #     field=models.FloatField(blank=True, null=True),
-        # ),
-        # migrations.AddField(
-        #     model_name='inputentry',
-        #     name='start_year',
-        #     field=models.IntegerField(default=1),
-        # ),
-        # migrations.AddField(
-        #     model_name='inputentry',
-        #     name='status',
-        #     field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='api.activitystate'),
-        # ),
-        # migrations.AddField(
-        #     model_name='inputentry',
-        #     name='updated_at',
-        #     field=models.DateTimeField(auto_now=True, null=True),
-        # ),
+        migrations.AddField(
+            model_name='inputentry',
+            name='activity',
+            field=models.ForeignKey(default=513, on_delete=django.db.models.deletion.CASCADE, related_name='%(class)s', to='api.activity'),
+            preserve_default=False,
+        ),
+        migrations.AddField(
+            model_name='inputentry',
+            name='created_at',
+            field=models.DateTimeField(auto_now_add=True, null=True),
+        ),
+        migrations.AddField(
+            model_name='inputentry',
+            name='notes',
+            field=models.TextField(blank=True, null=True),
+        ),
+        migrations.AddField(
+            model_name='inputentry',
+            name='soc_t2_start',
+            field=models.FloatField(blank=True, null=True),
+        ),
+        migrations.AddField(
+            model_name='inputentry',
+            name='soc_t2_w',
+            field=models.FloatField(blank=True, null=True),
+        ),
+        migrations.AddField(
+            model_name='inputentry',
+            name='soc_t2_wo',
+            field=models.FloatField(blank=True, null=True),
+        ),
+        migrations.AddField(
+            model_name='inputentry',
+            name='start_year',
+            field=models.IntegerField(default=1),
+        ),
+        migrations.AddField(
+            model_name='inputentry',
+            name='status',
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='api.activitystate'),
+        ),
+        migrations.AddField(
+            model_name='inputentry',
+            name='updated_at',
+            field=models.DateTimeField(auto_now=True, null=True),
+        ),
     ]

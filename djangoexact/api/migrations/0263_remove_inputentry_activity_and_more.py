@@ -10,40 +10,40 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # migrations.RemoveField(
-        #     model_name='inputentry',
-        #     name='activity',
-        # ),
-        # migrations.RemoveField(
-        #     model_name='inputentry',
-        #     name='created_at',
-        # ),
-        # migrations.RemoveField(
-        #     model_name='inputentry',
-        #     name='notes',
-        # ),
-        # migrations.RemoveField(
-        #     model_name='inputentry',
-        #     name='soc_t2_start',
-        # ),
-        # migrations.RemoveField(
-        #     model_name='inputentry',
-        #     name='soc_t2_w',
-        # ),
-        # migrations.RemoveField(
-        #     model_name='inputentry',
-        #     name='soc_t2_wo',
-        # ),
-        # migrations.RemoveField(
-        #     model_name='inputentry',
-        #     name='start_year',
-        # ),
-        # migrations.RemoveField(
-        #     model_name='inputentry',
-        #     name='status',
-        # ),
-        # migrations.RemoveField(
-        #     model_name='inputentry',
-        #     name='updated_at',
-        # ),
+        migrations.RemoveField(
+            model_name='inputentry',
+            name='activity',
+        ),
+        migrations.RemoveField(
+            model_name='inputentry',
+            name='created_at',
+        ),
+        migrations.RemoveField(
+            model_name='inputentry',
+            name='notes',
+        ),
+        migrations.RemoveField(
+            model_name='inputentry',
+            name='soc_t2_start',
+        ),
+        migrations.RemoveField(
+            model_name='inputentry',
+            name='soc_t2_w',
+        ),
+        migrations.RemoveField(
+            model_name='inputentry',
+            name='soc_t2_wo',
+        ),
+        migrations.RemoveField(
+            model_name='inputentry',
+            name='start_year',
+        ),
+        migrations.RemoveField(
+            model_name='inputentry',
+            name='status',
+        ),
+        migrations.RemoveField(
+            model_name='inputentry',
+            name='updated_at',
+        ),
     ]

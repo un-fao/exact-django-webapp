@@ -11,42 +11,42 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # migrations.RemoveField(
-        #     model_name='input',
-        #     name='co2_e_emissions_t2',
-        # ),
-        # migrations.RemoveField(
-        #     model_name='input',
-        #     name='co2_emissions_t2',
-        # ),
-        # migrations.RemoveField(
-        #     model_name='input',
-        #     name='implementation_year_t2',
-        # ),
-        # migrations.RemoveField(
-        #     model_name='input',
-        #     name='input_type',
-        # ),
-        # migrations.RemoveField(
-        #     model_name='input',
-        #     name='n2o_emissions_t2',
-        # ),
-        # migrations.RemoveField(
-        #     model_name='input',
-        #     name='value_start',
-        # ),
-        # migrations.RemoveField(
-        #     model_name='input',
-        #     name='value_thread',
-        # ),
-        # migrations.RemoveField(
-        #     model_name='input',
-        #     name='value_w',
-        # ),
-        # migrations.RemoveField(
-        #     model_name='input',
-        #     name='value_wo',
-        # ),
+        migrations.RemoveField(
+            model_name='input',
+            name='co2_e_emissions_t2',
+        ),
+        migrations.RemoveField(
+            model_name='input',
+            name='co2_emissions_t2',
+        ),
+        migrations.RemoveField(
+            model_name='input',
+            name='implementation_year_t2',
+        ),
+        migrations.RemoveField(
+            model_name='input',
+            name='input_type',
+        ),
+        migrations.RemoveField(
+            model_name='input',
+            name='n2o_emissions_t2',
+        ),
+        migrations.RemoveField(
+            model_name='input',
+            name='value_start',
+        ),
+        migrations.RemoveField(
+            model_name='input',
+            name='value_thread',
+        ),
+        migrations.RemoveField(
+            model_name='input',
+            name='value_w',
+        ),
+        migrations.RemoveField(
+            model_name='input',
+            name='value_wo',
+        ),
         migrations.CreateModel(
             name='InputEntry',
             fields=[
