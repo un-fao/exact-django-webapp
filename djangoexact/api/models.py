@@ -476,15 +476,14 @@ class Activity(Historical):
     # user = ForeignKey(User, on_delete=CASCADE) # TODO: Define when it's useful to have this
     status = ForeignKey(StatusType, on_delete=CASCADE, null=True, blank=True)
 
+    change_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="activities", null=True, blank=True)
+    module_types = ManyToManyField("api.ModuleType", related_name="activities", null=True, blank=True)
+
     climate_t2 = ForeignKey(Climate, on_delete=CASCADE, null=True, blank=True)
     moisture_t2 = ForeignKey(Moisture, on_delete=CASCADE, null=True, blank=True)
     soil_type_t2 = ForeignKey(SoilType, on_delete=CASCADE, null=True, blank=True)
     duration_t2 = IntegerField(null=True, blank=True)
     start_year_t2 = IntegerField(null=True, blank=True)
-
-    change_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="activities", null=True, blank=True)
-
-    module_types = ManyToManyField("api.ModuleType", related_name="activities", null=True, blank=True)
 
     def __str__(self):
         return f"({self.pk}) {self.name} in {self.project.name}"
