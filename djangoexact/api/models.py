@@ -479,7 +479,8 @@ class Activity(Historical):
     climate_t2 = ForeignKey(Climate, on_delete=CASCADE, null=True, blank=True)
     moisture_t2 = ForeignKey(Moisture, on_delete=CASCADE, null=True, blank=True)
     soil_type_t2 = ForeignKey(SoilType, on_delete=CASCADE, null=True, blank=True)
-    duration_t2 = IntegerField(default=0)
+    duration_t2 = IntegerField(null=True, blank=True)
+    start_year_t2 = IntegerField(null=True, blank=True)
 
     change_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="activities", null=True, blank=True)
 
