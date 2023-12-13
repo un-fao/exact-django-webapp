@@ -100,12 +100,12 @@ class ActivityType(Model):
         return self.name
 
 
-class ActivityState(Model):
+class StatusType(Model):
     name = CharField(max_length=255, unique=True)
     value = FloatField(null=True, blank=True, unique=True)
 
     class Meta:
-        verbose_name_plural = "Activity states"
+        verbose_name_plural = "Status types"
         unique_together = ("name", "value")
 
     def __str__(self):
@@ -474,7 +474,7 @@ class Activity(Historical):
     name = CharField(max_length=255)
     description = TextField(null=True, blank=True)
     # user = ForeignKey(User, on_delete=CASCADE) # TODO: Define when it's useful to have this
-    status = ForeignKey(ActivityState, on_delete=CASCADE, null=True, blank=True)
+    status = ForeignKey(StatusType, on_delete=CASCADE, null=True, blank=True)
 
     climate_t2 = ForeignKey(Climate, on_delete=CASCADE, null=True, blank=True)
     moisture_t2 = ForeignKey(Moisture, on_delete=CASCADE, null=True, blank=True)
@@ -490,7 +490,7 @@ class Activity(Historical):
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            self.state = ActivityState.objects.get_or_create(name="EMPTY")[0]
+            self.state = StatusType.objects.get_or_create(name="EMPTY")[0]
             if not self.change_rate:
                 self.change_rate = ChangeRate.objects.get_or_create(name="D")[0]
         super().save(*args, **kwargs)
@@ -530,7 +530,7 @@ class Module(Historical):
     soc_t2_w = FloatField(null=True, blank=True)
     soc_t2_wo = FloatField(null=True, blank=True)
 
-    status = ForeignKey(ActivityState, on_delete=CASCADE, null=True, blank=True)
+    status = ForeignKey(StatusType, on_delete=CASCADE, null=True, blank=True)
 
     def __str__(self):
         return f"({self.pk}) {self._meta.object_name} in {self.activity.name}"
@@ -538,7 +538,7 @@ class Module(Historical):
     def save(self, *args, **kwargs):
 
         if self.pk and not self.status:
-            self.status = ActivityState.objects.get_or_create(name="EMPTY")[0]
+            self.status = StatusType.objects.get_or_create(name="EMPTY")[0]
 
         for attr in dir(self):
             if attr.endswith("_thread") and getattr(self, attr, None):

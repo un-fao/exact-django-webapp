@@ -87,7 +87,7 @@ def get_module_serializer(model_arg: Model, action=ActionTypes.RETRIEVE) -> seri
                 module_type = get_model_serializer(ModuleType)(many=False, read_only=True)
                 activity = ActivitySerializer(many=False, read_only=True)
                 land_use_change = get_model_serializer(LandUseChange)(many=False, read_only=True, required=False)
-                status = get_model_serializer(ActivityState)(many=False, read_only=True)
+                status = get_model_serializer(StatusType)(many=False, read_only=True)
 
                 class Meta:
                     model = model_arg
@@ -371,7 +371,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
             activity.module_types.add(luc.module_type_w.id)
             activity.module_types.add(luc.module_type_wo.id)
             activity.module_types.add(ModuleType.objects.get(name="Land Use Change").id)
-            luc.status = ActivityState.objects.get(name="READY")
+            luc.status = StatusType.objects.get(name="READY")
             luc.save()
 
         for module_type in activity.module_types.all():
@@ -457,9 +457,9 @@ class ModuleBaseSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("This module type is not present for this activity")
 
         if self.instance:
-            self.instance.status = ActivityState.objects.get(name="READY")
+            self.instance.status = StatusType.objects.get(name="READY")
         else:
-            data["status"] = ActivityState.objects.get(name="READY")
+            data["status"] = StatusType.objects.get(name="READY")
 
         logging.debug(f"END ModuleBaseSerializer[{self.Meta.ref_name}].validate")
         return super().validate(data)
@@ -492,7 +492,7 @@ class LandModuleReadSerializer(ModuleBaseSerializer):
     module_type = get_model_serializer(ModuleType)(many=False, read_only=True)
     activity = ActivitySerializer(many=False, read_only=True)
     land_use_change = get_model_serializer(LandUseChange)(many=False, read_only=True, required=False)
-    status = get_model_serializer(ActivityState)(many=False, read_only=True)
+    status = get_model_serializer(StatusType)(many=False, read_only=True)
 
     class Meta:
         extra_fields = ["module_type"]
