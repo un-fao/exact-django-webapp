@@ -103,6 +103,7 @@ router.register(
     r"aquacultures", views.generic_module_viewset(Aquaculture), basename="aquacultures"
 )
 router.register(r"inputs", views.generic_module_viewset(Input), basename="inputs")
+router.register(r"input-entries", views.generic_module_viewset(InputEntry), basename="input-entries")
 router.register(
     r"buildings", views.generic_module_viewset(Building), basename="buildings"
 )
