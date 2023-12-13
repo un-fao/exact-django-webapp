@@ -204,6 +204,23 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         logging.debug("END ProjectViewSet.invitations")
         return Response({'message': 'Invitation sent successfully'})
+    
+    @transaction.atomic
+    def partial_update(self, request, *args, **kwargs):
+
+        new_years = request.data.get("implementation_years", None)
+
+        if new_years:
+            project = self.get_object()
+            project.implementation_years = new_years
+            for activity in project.activities.all():
+                if activity.duration_t2 > new_years:
+                    logging.warning(f"Activity {activity.name} duration_t2 is greater than project implementation years. Setting activity duration_t2 to project implementation years.")
+                    activity.duration_t2 = new_years
+                    activity.save()
+            project.save()
+
+        return super().partial_update(request, *args, **kwargs)
         
 
 class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
@@ -246,7 +263,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
     @transaction.atomic
     def create(self, request, *args, **kwargs):
-        state = ActivityState.objects.get_or_create(name="EMPTY")[0]
+        state = StatusType.objects.get_or_create(name="EMPTY")[0]
         request.data["status"] = state.pk
         serializer = WriteActivitySerializer(data=request.data)
 
@@ -521,8 +538,13 @@ def generic_module_viewset(model: Model):
             optionally including related modules by sending the `include_related` query parameter as `true`.
             """
 
-            activity_id = get_query_param_or_validation_error(self.request, "activity_id")
-            modules = model.objects.filter(activity__id=activity_id)
+            activity_id = get_query_param_or_validation_error(self.request, "activity")
+            module_type = ModuleType.objects.get(class_name=model.__name__)
+
+            if module_type.is_submodule:
+                modules = model.objects.filter(parent__activity__id=activity_id).all()
+            else:
+                modules = model.objects.filter(activity__id=activity_id).all()
 
             data = []
 

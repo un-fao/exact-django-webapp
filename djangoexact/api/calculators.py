@@ -3,6 +3,7 @@ from .models import (
     OtherLandUse,
     Project,
     Input,
+    InputEntry,
     Building,
     Livestock,
     AnnualCropping,
@@ -37,13 +38,13 @@ from .models import (
     VegetationType,
     Module,
     ForestDisturbance,
-    Assessment,
-    AssessmentNoScenarios,
+    LandModule,
+    LandModuleNoScenarios,
     LandUseType,
     Irrigation,
     Energy,
     BiomassModule,
-    ActivityState,
+    StatusType,
 )
 from math_model import (
     defo,
@@ -221,7 +222,7 @@ class DeforestationCalculator(BaseCalculator):
         Calculate emissions for a single Deforestation module.
         """
 
-        module: Assessment = self.data
+        module: LandModule = self.data
         luc: LandUseChange = module.land_use_change
         project: Project = module.activity.project
         change_rate = module.activity.change_rate
@@ -235,7 +236,7 @@ class DeforestationCalculator(BaseCalculator):
         # TODO: Maybe generalise this on a higher level
         if not forest:
             raise Exception("Forest module is missing")
-        if module.status != ActivityState.objects.get(name="READY"):
+        if module.status != StatusType.objects.get(name="READY"):
             raise Exception("Forest module is not complete")
 
         cmc = {
@@ -574,7 +575,7 @@ class OtherLandUseCalculator(BaseCalculator):
         Calculate emissions for a single OtherLandUse module.
         """
 
-        input: BiomassModule | Assessment = self.data
+        input: BiomassModule | LandModule = self.data
         luc: LandUseChange = input.land_use_change
         project: Project = self.data.activity.project
         climate = project.climate
@@ -594,9 +595,9 @@ class OtherLandUseCalculator(BaseCalculator):
             "continent": continent,
         }
 
-        module_start: BiomassModule | Assessment = getattr(input.activity, luc.module_type_start.class_name.lower(), None).first()
-        module_w: BiomassModule | Assessment = getattr(input.activity, luc.module_type_w.class_name.lower(), None).first()
-        module_wo: BiomassModule | Assessment = getattr(input.activity, luc.module_type_wo.class_name.lower(), None).first()
+        module_start: BiomassModule | LandModule = getattr(input.activity, luc.module_type_start.class_name.lower(), None).first()
+        module_w: BiomassModule | LandModule = getattr(input.activity, luc.module_type_w.class_name.lower(), None).first()
+        module_wo: BiomassModule | LandModule = getattr(input.activity, luc.module_type_wo.class_name.lower(), None).first()
 
         luc_start = LandUseType.objects.get(name=luc.module_type_start.name)
         luc_w = LandUseType.objects.get(name=luc.module_type_w.name)
@@ -1811,20 +1812,43 @@ class AquacultureCalculator(BaseCalculator):
 
 class InputCalculator(BaseCalculator):
     """
-    Calculator for inputs.
+    Calculator for Inputs macromodule
+    """
+
+
+    def calculate(self) -> list[MathResult]:
+
+        input: Input = self.data
+        project: Project = input.activity.project
+
+        results_w = MathResult(project.implementation_years, project.capitalization_years)
+        results_wo = MathResult(project.implementation_years, project.capitalization_years)
+
+        for entry in input.input_entries.all():
+            r_w, r_wo = InputEntryCalculator(entry).calculate()
+
+            results_w += r_w
+            results_wo += r_wo
+        
+        return (results_w, results_wo)
+
+class InputEntryCalculator(BaseCalculator):
+    """
+    Calculator for single input entries.
     """
 
     def calculate(self) -> list[Result]:
-        project: Project = self.data.activity.project
-        input: Input = self.data
+        input: InputEntry = self.data
+        activity: Activity = input.parent.activity
+        project: Project = activity.project
 
-        ref = InputReference.objects.get(gw_potential=project.gw_potential, input_type=self.data.input_type)
-        ef = InputEmissionFactor.objects.get(input_type=self.data.input_type,climate=project.climate,moisture=project.moisture)
+        ref = InputReference.objects.get(gw_potential=project.gw_potential, input_type=input.input_type)
+        ef = InputEmissionFactor.objects.get(input_type=input.input_type,climate=project.climate,moisture=project.moisture)
 
         inputs_w = [
             input.value_start,
             input.value_w,
-            input.value_w_rate.name,
+            activity.change_rate.name,
             ef.co2_value,
             input.co2_emissions_t2,
             ref.co2_multiplier,
@@ -1844,7 +1868,7 @@ class InputCalculator(BaseCalculator):
         inputs_wo = [
             input.value_start,
             input.value_wo,
-            input.value_wo_rate.name,
+            activity.change_rate.name,
             ef.co2_value,
             input.co2_emissions_t2,
             ref.co2_multiplier,
@@ -1861,12 +1885,16 @@ class InputCalculator(BaseCalculator):
             ref.production_emissions_multiplier,
         ]
 
-        results_w = MathInputs(*inputs_w).calculate_emissions()
-        results_wo = MathInputs(*inputs_wo).calculate_emissions()
+        results_w = MathInputs(*inputs_w)
+        results_wo = MathInputs(*inputs_wo)
 
-        results = [results_w, results_wo]
+        results_w.calculate_emissions()
+        results_wo.calculate_emissions()
 
-        return Result(*results)
+        res_w = results_w.total_emissions if results_w.total_emissions else MathResult(project.implementation_years, project.capitalization_years)
+        res_wo = results_wo.total_emissions if results_wo.total_emissions else MathResult(project.implementation_years, project.capitalization_years)
+
+        return (res_w, res_wo)
 
 class EnergyCalculator(BaseCalculator):
     """
@@ -1879,15 +1907,22 @@ class EnergyCalculator(BaseCalculator):
         """
 
         input: Energy = self.data
-        result = Result()
+        res_w = MathResult(input.activity.project.implementation_years, input.activity.project.capitalization_years)
+        res_wo = MathResult(input.activity.project.implementation_years, input.activity.project.capitalization_years)
         
         for elec in input.electricities:
-            result.add(ElectricityCalculator(elec).calculate())
+            r_w, r_wo = ElectricityCalculator(elec).calculate()
+
+            res_w += r_w
+            res_wo += r_wo
         
         for fuel in input.fuels:
-            result.add(FuelCalculator(fuel).calculate())
+            r_w, r_wo = FuelCalculator(fuel).calculate()
 
-        return result
+            res_w += r_w
+            res_wo += r_wo
+
+        return (res_w, res_wo)
 
 class ElectricityCalculator(BaseCalculator):
     """
@@ -3437,7 +3472,7 @@ class ForestManagementCalculator(BaseCalculator):
     def calculate(self) -> Result:
         """"""
 
-        input: Assessment | AssessmentNoScenarios = self.data
+        input: LandModule | LandModuleNoScenarios = self.data
         luc: LandUseChange = input.land_use_change
         project: Project = input.activity.project
 
