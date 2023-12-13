@@ -421,8 +421,9 @@ class Historical(Model):
         abstract = True
 
 class Project(Historical):
-    # TODO: Implement uuid instead of BigAutoField?
-    # id = UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    class Meta:
+        verbose_name_plural = "Projects"
+        unique_together = ("name", "user")
 
     user = ForeignKey(User, on_delete=CASCADE, related_name="projects")
     date = DateTimeField(null=True, blank=True)
@@ -445,12 +446,15 @@ class Project(Historical):
 
     soc_ref_t2 = FloatField(null=True, blank=True)
 
+    def save(self, *args, **kwargs):
+        if self.pk:
+            old = Project.objects.get(pk=self.pk)
+            if old.user != self.user:
+                raise ValidationError("User cannot be changed")
+        super().save(*args, **kwargs)
+    
     def __str__(self):
         return f"({self.pk}) {self.name}"
-
-    class Meta:
-        verbose_name_plural = "Projects"
-        unique_together = ("name", "user")
 
 class ProjectInvitation(Model):
     project = ForeignKey(Project, on_delete=CASCADE, related_name="invitations")
