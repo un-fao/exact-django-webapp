@@ -629,7 +629,7 @@ class OtherLandUse(Module):
     implementation_year_start = IntegerField(null=True, blank=True)
 
 
-class Assessment(Module):
+class LandModule(Module):
     land_use_change = OneToOneField("api.LandUseChange", on_delete=CASCADE, null=True, blank=True, related_name="%(class)s")
 
     area = FloatField(null=True, blank=True)
@@ -643,7 +643,7 @@ class Assessment(Module):
     class Meta:
         abstract = True
 
-class AssessmentNoScenarios(Module):
+class LandModuleNoScenarios(Module):
     land_use_change = OneToOneField("api.LandUseChange", on_delete=CASCADE, null=True, blank=True, related_name="%(class)s")
 
     land_use_type = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_start")
@@ -652,7 +652,7 @@ class AssessmentNoScenarios(Module):
     class Meta:
         abstract = True
 
-class FixedAssessment(Assessment):
+class LandModuleFixed(LandModule):
 
     # TODO: Rework
     # def save(self, *args, **kwargs):
@@ -678,7 +678,7 @@ class CropType(Model):
     def __str__(self) -> str:
         return f"({self.pk}) {self.name}"
 
-class AnnualCropping(Assessment, SingleBiomassModule):
+class AnnualCropping(LandModule, SingleBiomassModule):
     user_notes = TextField(null=True, blank=True)
 
     tillage_management_type_start = ForeignKey(TillageManagementType, on_delete=CASCADE, related_name="%(class)s_tillage_management_type_start", null=True, blank=True)
@@ -743,7 +743,7 @@ class AnnualCropping(Assessment, SingleBiomassModule):
     soc_ref_t2_w = FloatField(null=True, blank=True)
     soc_ref_t2_wo = FloatField(null=True, blank=True)
 
-class PerennialCropping(Assessment, DoubleBiomassModule):
+class PerennialCropping(LandModule, DoubleBiomassModule):
     user_notes = TextField(null=True, blank=True)
 
     tillage_management_type_start = ForeignKey(TillageManagementType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_tillage_management_type_start")
@@ -809,7 +809,7 @@ class PerennialCropping(Assessment, DoubleBiomassModule):
         super().save(*args, **kwargs)
 
 
-class FloodedRice(FixedAssessment, SingleBiomassModule):
+class FloodedRice(LandModuleFixed, SingleBiomassModule):
     user_notes = TextField(null=True, blank=True)
 
     area = FloatField(null=True, blank=True)
@@ -886,7 +886,7 @@ class FloodedRice(FixedAssessment, SingleBiomassModule):
 ##### Grassland and Livestock #####
 
 
-class Grassland(FixedAssessment, SingleBiomassModule):
+class Grassland(LandModuleFixed, SingleBiomassModule):
     description = TextField(null=True, blank=True)
     user_notes = TextField(null=True, blank=True)
 
@@ -1044,7 +1044,7 @@ class Livestock(Module):
 ##### Forest Management #####
 
 
-class ForestManagement(Assessment, MultiBiomassModule):
+class ForestManagement(LandModule, MultiBiomassModule):
     forest_type = ForeignKey(ForestType, on_delete=CASCADE, null=True, blank=True)
 
     ##### ROTATION #####
@@ -1570,7 +1570,7 @@ class OtherInfrastructure(Module):
     ef_t2_w = FloatField(null=True, blank=True)
     ef_t2_wo = FloatField(null=True, blank=True)
 
-class OrganicSoil(FixedAssessment):
+class OrganicSoil(LandModuleFixed):
 
     drainage_area_start = FloatField(null=True, blank=True)
     drainage_area_w = FloatField(null=True, blank=True)
@@ -1692,7 +1692,7 @@ class OrganicSoil(FixedAssessment):
 
     peat_density_t2 = FloatField(null=True, blank=True)
 
-class Settlement(FixedAssessment):
+class Settlement(LandModuleFixed):
     ha_start = FloatField(null=True, blank=True)
     ha_w = FloatField(null=True, blank=True)
     ha_wo = FloatField(null=True, blank=True)
@@ -1744,7 +1744,7 @@ class SetAside(SingleBiomassModule):
     bgb_t2_w = FloatField(null=True, blank=True)
     bgb_t2_wo = FloatField(null=True, blank=True)
 
-class DegradedLand(Assessment, SingleBiomassModule):
+class DegradedLand(LandModule, SingleBiomassModule):
     ha_start = FloatField(null=True, blank=True)
     ha_w = FloatField(null=True, blank=True)
     ha_wo = FloatField(null=True, blank=True)
