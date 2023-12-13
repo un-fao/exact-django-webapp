@@ -100,12 +100,12 @@ class ActivityType(Model):
         return self.name
 
 
-class ActivityState(Model):
+class StatusType(Model):
     name = CharField(max_length=255, unique=True)
     value = FloatField(null=True, blank=True, unique=True)
 
     class Meta:
-        verbose_name_plural = "Activity states"
+        verbose_name_plural = "Status types"
         unique_together = ("name", "value")
 
     def __str__(self):
@@ -474,23 +474,23 @@ class Activity(Historical):
     name = CharField(max_length=255)
     description = TextField(null=True, blank=True)
     # user = ForeignKey(User, on_delete=CASCADE) # TODO: Define when it's useful to have this
-    status = ForeignKey(ActivityState, on_delete=CASCADE, null=True, blank=True)
+    status = ForeignKey(StatusType, on_delete=CASCADE, null=True, blank=True)
+
+    change_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="activities", null=True, blank=True)
+    module_types = ManyToManyField("api.ModuleType", related_name="activities", null=True, blank=True)
 
     climate_t2 = ForeignKey(Climate, on_delete=CASCADE, null=True, blank=True)
     moisture_t2 = ForeignKey(Moisture, on_delete=CASCADE, null=True, blank=True)
     soil_type_t2 = ForeignKey(SoilType, on_delete=CASCADE, null=True, blank=True)
-    duration_t2 = IntegerField(default=0)
-
-    change_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="activities", null=True, blank=True)
-
-    module_types = ManyToManyField("api.ModuleType", related_name="activities", null=True, blank=True)
+    duration_t2 = IntegerField(null=True, blank=True)
+    start_year_t2 = IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"({self.pk}) {self.name} in {self.project.name}"
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            self.state = ActivityState.objects.get_or_create(name="EMPTY")[0]
+            self.state = StatusType.objects.get_or_create(name="EMPTY")[0]
             if not self.change_rate:
                 self.change_rate = ChangeRate.objects.get_or_create(name="D")[0]
         super().save(*args, **kwargs)
@@ -503,6 +503,7 @@ class Activity(Historical):
 ##############################
 
 class Submodule(Historical):
+    module_type = ForeignKey("api.ModuleType", on_delete=CASCADE, related_name="%(class)s")
 
     class Meta:
         abstract = True
@@ -529,7 +530,7 @@ class Module(Historical):
     soc_t2_w = FloatField(null=True, blank=True)
     soc_t2_wo = FloatField(null=True, blank=True)
 
-    status = ForeignKey(ActivityState, on_delete=CASCADE, null=True, blank=True)
+    status = ForeignKey(StatusType, on_delete=CASCADE, null=True, blank=True)
 
     def __str__(self):
         return f"({self.pk}) {self._meta.object_name} in {self.activity.name}"
@@ -537,7 +538,7 @@ class Module(Historical):
     def save(self, *args, **kwargs):
 
         if self.pk and not self.status:
-            self.status = ActivityState.objects.get_or_create(name="EMPTY")[0]
+            self.status = StatusType.objects.get_or_create(name="EMPTY")[0]
 
         for attr in dir(self):
             if attr.endswith("_thread") and getattr(self, attr, None):
@@ -628,7 +629,7 @@ class OtherLandUse(Module):
     implementation_year_start = IntegerField(null=True, blank=True)
 
 
-class Assessment(Module):
+class LandModule(Module):
     land_use_change = OneToOneField("api.LandUseChange", on_delete=CASCADE, null=True, blank=True, related_name="%(class)s")
 
     area = FloatField(null=True, blank=True)
@@ -642,7 +643,7 @@ class Assessment(Module):
     class Meta:
         abstract = True
 
-class AssessmentNoScenarios(Module):
+class LandModuleNoScenarios(Module):
     land_use_change = OneToOneField("api.LandUseChange", on_delete=CASCADE, null=True, blank=True, related_name="%(class)s")
 
     land_use_type = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_start")
@@ -651,7 +652,7 @@ class AssessmentNoScenarios(Module):
     class Meta:
         abstract = True
 
-class FixedAssessment(Assessment):
+class LandModuleFixed(LandModule):
 
     # TODO: Rework
     # def save(self, *args, **kwargs):
@@ -677,7 +678,7 @@ class CropType(Model):
     def __str__(self) -> str:
         return f"({self.pk}) {self.name}"
 
-class AnnualCropping(Assessment, SingleBiomassModule):
+class AnnualCropping(LandModule, SingleBiomassModule):
     user_notes = TextField(null=True, blank=True)
 
     tillage_management_type_start = ForeignKey(TillageManagementType, on_delete=CASCADE, related_name="%(class)s_tillage_management_type_start", null=True, blank=True)
@@ -742,7 +743,7 @@ class AnnualCropping(Assessment, SingleBiomassModule):
     soc_ref_t2_w = FloatField(null=True, blank=True)
     soc_ref_t2_wo = FloatField(null=True, blank=True)
 
-class PerennialCropping(Assessment, DoubleBiomassModule):
+class PerennialCropping(LandModule, DoubleBiomassModule):
     user_notes = TextField(null=True, blank=True)
 
     tillage_management_type_start = ForeignKey(TillageManagementType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_tillage_management_type_start")
@@ -808,7 +809,7 @@ class PerennialCropping(Assessment, DoubleBiomassModule):
         super().save(*args, **kwargs)
 
 
-class FloodedRice(FixedAssessment, SingleBiomassModule):
+class FloodedRice(LandModuleFixed, SingleBiomassModule):
     user_notes = TextField(null=True, blank=True)
 
     area = FloatField(null=True, blank=True)
@@ -885,7 +886,7 @@ class FloodedRice(FixedAssessment, SingleBiomassModule):
 ##### Grassland and Livestock #####
 
 
-class Grassland(FixedAssessment, SingleBiomassModule):
+class Grassland(LandModuleFixed, SingleBiomassModule):
     description = TextField(null=True, blank=True)
     user_notes = TextField(null=True, blank=True)
 
@@ -1043,7 +1044,7 @@ class Livestock(Module):
 ##### Forest Management #####
 
 
-class ForestManagement(Assessment, MultiBiomassModule):
+class ForestManagement(LandModule, MultiBiomassModule):
     forest_type = ForeignKey(ForestType, on_delete=CASCADE, null=True, blank=True)
 
     ##### ROTATION #####
@@ -1392,26 +1393,17 @@ class InputType(Model):
     def __str__(self):
         return f"({self.id}) {self.name}"
 
-
 class Input(Module):
-    input_type = ForeignKey(InputType, on_delete=CASCADE, null=True, blank=True)
-    value_start = FloatField(null=True, blank=True)
-    value_w = FloatField(null=True, blank=True)
-    value_w_rate = ForeignKey(
-        ChangeRate,
-        on_delete=CASCADE,
-        null=True,
-        blank=True,
-        related_name="%(class)s_value_w_rate",
-    )
-    value_wo = FloatField(null=True, blank=True)
-    value_wo_rate = ForeignKey(
-        ChangeRate,
-        on_delete=CASCADE,
-        null=True,
-        blank=True,
-        related_name="%(class)s_value_wo_rate",
-    )
+    pass
+
+class InputEntry(Submodule):
+    parent = ForeignKey(Input, on_delete=CASCADE, related_name="input_entries")
+    input_type = ForeignKey(InputType, on_delete=CASCADE)
+
+    value_start = FloatField()
+    value_w = FloatField()
+    value_wo = FloatField()
+    value_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_value_thread")
 
     co2_emissions_t2 = FloatField(null=True, blank=True)
     n2o_emissions_t2 = FloatField(null=True, blank=True)
@@ -1428,8 +1420,8 @@ class EmissionFactorSource(Model):
 class Energy(Module):
     pass
 
-class Electricity(Module):
-    energy = ForeignKey(Energy, on_delete=CASCADE, null=True, blank=True, related_name="electricities")
+class Electricity(Submodule):
+    parent = ForeignKey(Energy, on_delete=CASCADE, null=True, blank=True, related_name="electricities")
     country = ForeignKey(Country, on_delete=CASCADE, null=True, blank=True)
     mwh_start = FloatField(null=True, blank=True)
     mwh_w = FloatField(null=True, blank=True)
@@ -1443,8 +1435,8 @@ class Electricity(Module):
     transmission_loss = FloatField(default=0.1)
     ef_source = ForeignKey(EmissionFactorSource, on_delete=CASCADE, null=True, blank=True)
 
-class Fuel(Module):
-    energy = ForeignKey(Energy, on_delete=CASCADE, null=True, blank=True, related_name="fuels")
+class Fuel(Submodule):
+    parent = ForeignKey(Energy, on_delete=CASCADE, null=True, blank=True, related_name="fuels")
     fuel_type = ForeignKey(FuelType, on_delete=CASCADE, null=True, blank=True)
     fuel_start = FloatField(null=True, blank=True)
     fuel_w = FloatField(null=True, blank=True)
@@ -1471,7 +1463,7 @@ class Irrigation(Module):
     pass
 
 class IrrigationSystem(Submodule):
-    irrigation = ForeignKey(Irrigation, on_delete=CASCADE, null=True, blank=True, related_name="irrigation_systems")
+    parent = ForeignKey(Irrigation, on_delete=CASCADE, null=True, blank=True, related_name="irrigation_systems")
     irrigation_system_type = ForeignKey(IrrigationSystemType, on_delete=CASCADE, null=True, blank=True, related_name="irrigation_systems")
     ha_start = FloatField(null=True, blank=True)
     ha_w = FloatField(null=True, blank=True)
@@ -1488,7 +1480,7 @@ class IrrigationSystem(Submodule):
 
 
 class IrrigationPhase(Submodule):
-    irrigation = ForeignKey(Irrigation, on_delete=CASCADE, null=True, blank=True, related_name="irrigation_phases")
+    parent = ForeignKey(Irrigation, on_delete=CASCADE, null=True, blank=True, related_name="irrigation_phases")
     irrigation_system_type = ForeignKey(IrrigationSystemType, on_delete=CASCADE, null=True, blank=True, related_name="irrigation_phases")
     fuel_type = ForeignKey(FuelType, on_delete=CASCADE, null=True, blank=True)
     well_depth = FloatField(null=True, blank=True)
@@ -1578,7 +1570,7 @@ class OtherInfrastructure(Module):
     ef_t2_w = FloatField(null=True, blank=True)
     ef_t2_wo = FloatField(null=True, blank=True)
 
-class OrganicSoil(FixedAssessment):
+class OrganicSoil(LandModuleFixed):
 
     drainage_area_start = FloatField(null=True, blank=True)
     drainage_area_w = FloatField(null=True, blank=True)
@@ -1700,7 +1692,7 @@ class OrganicSoil(FixedAssessment):
 
     peat_density_t2 = FloatField(null=True, blank=True)
 
-class Settlement(FixedAssessment):
+class Settlement(LandModuleFixed):
     ha_start = FloatField(null=True, blank=True)
     ha_w = FloatField(null=True, blank=True)
     ha_wo = FloatField(null=True, blank=True)
@@ -1752,7 +1744,7 @@ class SetAside(SingleBiomassModule):
     bgb_t2_w = FloatField(null=True, blank=True)
     bgb_t2_wo = FloatField(null=True, blank=True)
 
-class DegradedLand(Assessment, SingleBiomassModule):
+class DegradedLand(LandModule, SingleBiomassModule):
     ha_start = FloatField(null=True, blank=True)
     ha_w = FloatField(null=True, blank=True)
     ha_wo = FloatField(null=True, blank=True)
