@@ -105,9 +105,9 @@ class Result:
 
         for yearly_emission in self.yearly_emissions_by_sector_by_gas:
             aggregated_emissions[yearly_emission.activity.value].emissions = [x + y for x,y in zip(aggregated_emissions[yearly_emission.activity.value].emissions, yearly_emission.emissions)]
-        
+
         return aggregated_emissions.values()
-    
+
     def breakdown_by_activity_by_gas(self):
 
         for yearly_emission in self.yearly_emissions_by_sector_by_gas:
@@ -123,12 +123,13 @@ class Result:
             self.balance += sum([i.value for i in yearly_emission.emissions])
 
         return self.balance
-    
+
     def __add__(self, other):
         result_obj = copy.deepcopy(self)
         if other.yearly_emissions_by_sector_by_gas == []:
             return result_obj
-        result_obj.yearly_emissions_by_sector_by_gas = [YearlyGasActivityEmissionSet(i.year, i.gas_type, [x + y for x,y in zip(i.emissions, j.emissions)], i.activity) for i,j in zip(self.yearly_emissions_by_sector_by_gas, other.yearly_emissions_by_sector_by_gas)]
+
+        result_obj.yearly_emissions_by_sector_by_gas = [YearlyGasActivityEmissionSet(i.year, i.gas_type, [x + y for x,y in zip(i.emissions, j.emissions)], i.activity) for i,j in zip(result_obj.yearly_emissions_by_sector_by_gas, other.yearly_emissions_by_sector_by_gas)]
         return result_obj
 
     def __sub__(self, other):
