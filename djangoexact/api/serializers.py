@@ -275,6 +275,10 @@ class WriteActivitySerializer(serializers.ModelSerializer):
             if self.instance.landusechange.exists() and len(list(filter(lambda module: module.is_luc, data.get('module_types', [])))) > 0:
                 raise serializers.ValidationError("Land Modules cannot be independently added to activities with a Land Use Change")
             
+            new_duration = data.get("duration_t2", None)
+            if new_duration and new_duration > self.instance.project.duration_years:
+                raise serializers.ValidationError("Activity duration cannot be greater than project duration")
+            
         return super().validate(data)
 
 class ActivityBuilderSerializer(serializers.Serializer):
