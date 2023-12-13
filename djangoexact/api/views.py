@@ -263,7 +263,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
     @transaction.atomic
     def create(self, request, *args, **kwargs):
-        state = ActivityState.objects.get_or_create(name="EMPTY")[0]
+        state = StatusType.objects.get_or_create(name="EMPTY")[0]
         request.data["status"] = state.pk
         serializer = WriteActivitySerializer(data=request.data)
 

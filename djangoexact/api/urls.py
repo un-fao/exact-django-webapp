@@ -160,7 +160,7 @@ router.register(
 )
 
 router.register(
-    r"activity-states", views.generic_viewset(ActivityState), basename="activity-states"
+    r"status-types", views.generic_viewset(StatusType), basename="status-types"
 )
 
 router.register(r"settlements", views.generic_module_viewset(Settlement), basename="settlements")

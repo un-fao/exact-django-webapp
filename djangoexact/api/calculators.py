@@ -44,7 +44,7 @@ from .models import (
     Irrigation,
     Energy,
     BiomassModule,
-    ActivityState,
+    StatusType,
 )
 from math_model import (
     defo,
@@ -236,7 +236,7 @@ class DeforestationCalculator(BaseCalculator):
         # TODO: Maybe generalise this on a higher level
         if not forest:
             raise Exception("Forest module is missing")
-        if module.status != ActivityState.objects.get(name="READY"):
+        if module.status != StatusType.objects.get(name="READY"):
             raise Exception("Forest module is not complete")
 
         cmc = {
