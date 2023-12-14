@@ -126,39 +126,46 @@ class Result:
 
     def __add__(self, other):
         result_obj = copy.deepcopy(self)
-        if other.yearly_emissions_by_sector_by_gas == []:
-            return result_obj
 
-        result_obj.yearly_emissions_by_sector_by_gas = [YearlyGasActivityEmissionSet(i.year, i.gas_type, [x + y for x,y in zip(i.emissions, j.emissions)], i.activity) for i,j in zip(result_obj.yearly_emissions_by_sector_by_gas, other.yearly_emissions_by_sector_by_gas)]
+        for other_yearly_emission in other.yearly_emissions_by_sector_by_gas:
+            match_found = False
+            for self_yearly_emission in result_obj.yearly_emissions_by_sector_by_gas:
+                if (other_yearly_emission.year == self_yearly_emission.year and 
+                    other_yearly_emission.gas_type == self_yearly_emission.gas_type and 
+                    other_yearly_emission.activity == self_yearly_emission.activity):
+                    self_yearly_emission.emissions = [x + y for x, y in zip(self_yearly_emission.emissions, other_yearly_emission.emissions)]
+                    match_found = True
+                    break
+            
+            if not match_found:
+                result_obj.yearly_emissions_by_sector_by_gas.append(other_yearly_emission)
+
         return result_obj
+
 
     def __sub__(self, other):
-
         result_obj = copy.deepcopy(self)
 
-        if other.yearly_emissions_by_sector_by_gas == []:
-            return result_obj
-        
-        if result_obj.yearly_emissions_by_sector_by_gas == []:
-            result_obj.yearly_emissions_by_sector_by_gas = [
-                YearlyGasActivityEmissionSet(
-                    i.year, 
-                    i.gas_type, 
-                    [Emission(-x.value, x.gas_type) for x in i.emissions], 
-                    i.activity
-                ) for i in other.yearly_emissions_by_sector_by_gas
-            ]
-            return result_obj
-        
-        result_obj.yearly_emissions_by_sector_by_gas = [
-            YearlyGasActivityEmissionSet(
-                i.year,
-                i.gas_type,
-                [x - y for x, y in zip(i.emissions, j.emissions)],
-                i.activity
-            ) for i, j in zip(result_obj.yearly_emissions_by_sector_by_gas, other.yearly_emissions_by_sector_by_gas)
-        ]
+        for other_yearly_emission in other.yearly_emissions_by_sector_by_gas:
+            match_found = False
+            for self_yearly_emission in result_obj.yearly_emissions_by_sector_by_gas:
+                if (other_yearly_emission.year == self_yearly_emission.year and 
+                    other_yearly_emission.gas_type == self_yearly_emission.gas_type and 
+                    other_yearly_emission.activity == self_yearly_emission.activity):
+                    self_yearly_emission.emissions = [x - y for x, y in zip(self_yearly_emission.emissions, other_yearly_emission.emissions)]
+                    match_found = True
+                    break
+            
+            if not match_found:
+                negated_emissions = [Emission(-emission.value, emission.gas_type) for emission in other_yearly_emission.emissions]
+                result_obj.yearly_emissions_by_sector_by_gas.append(
+                    YearlyGasActivityEmissionSet(other_yearly_emission.year, 
+                                                other_yearly_emission.gas_type, 
+                                                negated_emissions, 
+                                                other_yearly_emission.activity)
+                )
 
         return result_obj
+
 
     # Here add all necessary functions for result aggregation depending on what Claudio needs
