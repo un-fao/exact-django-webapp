@@ -424,6 +424,10 @@ class CommentSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         if attrs.get("parent", None) and attrs.get("parent", None).parent:
             raise serializers.ValidationError("Cannot reply to a reply")
+        
+        if not attrs.get("parent", None) and not attrs.get("thread", None):
+            raise serializers.ValidationError("Either parent comment or thread must be provided")
+
         return super().validate(attrs)
 
 class CommentThreadSerializer(serializers.ModelSerializer):

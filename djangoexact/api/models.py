@@ -40,7 +40,7 @@ class CommentThread(Model):
         return f"({self.pk})"
 
 class Comment(Model):
-    thread = ForeignKey(CommentThread, on_delete=CASCADE, related_name="comments")
+    thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="comments")
     parent = ForeignKey('self', null=True, blank=True, on_delete=CASCADE, related_name='replies')
     date_created = DateTimeField(auto_now_add=True)
     author = ForeignKey(User, on_delete=CASCADE)
