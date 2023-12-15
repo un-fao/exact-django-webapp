@@ -1839,14 +1839,14 @@ class CoastalWetlandParameter(Parameter):
 
 
 class FundingAgency(Model):
-    name = CharField(max_length=255, unique=True)
+    name = CharField(max_length=255, unique=True, null=True, blank=True)
     abbreviation = CharField(max_length=255, unique=True)
 
     def __str__(self):
         return f"({self.pk}) {self.name}"
     
 class ExecutingAgency(Model):
-    name = CharField(max_length=255, unique=True)
+    name = CharField(max_length=255, unique=True, null=True, blank=True)
     abbreviation = CharField(max_length=255, unique=True)
 
     def __str__(self):
