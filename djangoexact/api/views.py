@@ -405,6 +405,15 @@ class CommentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
+    def get_queryset(self):
+        queryset = Comment.objects.all()
+        parent = self.request.query_params.get('parent', None)
+        if parent is not None:
+            queryset = queryset.filter(parent=parent)
+        else:
+            queryset = queryset.filter(parent__isnull=True)
+        return queryset
+
     @action(detail=True, methods=["get"])
     def replies(self, request, thread_id=None, pk=None):
         """
