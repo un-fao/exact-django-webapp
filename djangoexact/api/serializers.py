@@ -410,11 +410,25 @@ class UserSummarySerializer(serializers.ModelSerializer):
         fields = ['id', 'username']
 
 class CommentSerializer(serializers.ModelSerializer):
-    replies = RecursiveField(many=True, read_only=True)
+    replies = serializers.SerializerMethodField()
     author = UserSummarySerializer(many=False, read_only=True)
     class Meta:
         model = Comment
         fields = '__all__'
+
+    def get_replies(self, obj):
+        if obj.replies.exists():
+            return CommentSerializer(obj.replies.all(), many=True).data
+        return []
+    
+    def validate(self, attrs):
+        if attrs.get("parent", None) and attrs.get("parent", None).parent:
+            raise serializers.ValidationError("Cannot reply to a reply")
+        
+        if not attrs.get("parent", None) and not attrs.get("thread", None):
+            raise serializers.ValidationError("Either parent comment or thread must be provided")
+
+        return super().validate(attrs)
 
 class CommentThreadSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True, read_only=True)
