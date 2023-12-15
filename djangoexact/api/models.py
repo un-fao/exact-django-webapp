@@ -40,12 +40,13 @@ class CommentThread(Model):
         return f"({self.pk})"
 
 class Comment(Model):
-    thread = ForeignKey(CommentThread, on_delete=CASCADE, related_name="comments", null=True, blank=True)
-    content = TextField()
+    thread = ForeignKey(CommentThread, on_delete=CASCADE, related_name="comments")
+    parent = ForeignKey('self', null=True, blank=True, on_delete=CASCADE, related_name='replies')
     date_created = DateTimeField(auto_now_add=True)
     author = ForeignKey(User, on_delete=CASCADE)
-    parent = ForeignKey('self', null=True, blank=True, on_delete=CASCADE, related_name='replies')
-    # You can add other fields like 'is_active', 'likes', etc.
+
+    content = TextField()
+    # We can add other fields like 'is_active', 'likes', etc.
 
     def __str__(self):
         return f"({self.pk}) {self.author.username}: {self.content[:40]}..."
