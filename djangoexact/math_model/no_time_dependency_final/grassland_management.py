@@ -1,5 +1,5 @@
 import math
-from .general_functions import yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, yearly_time_dependent_20_year_breakdown, breakdown_according_to_values, soil_emissions
+from .general_functions import yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, yearly_time_dependent_20_year_breakdown, breakdown_according_to_values, soil_emissions_2
 import traceback
 from .ghg_emissions_classes import GasTypes, ActivityTypes, Emission, YearlyGasActivityEmissionSet, Result
 import re
@@ -8,8 +8,9 @@ class GrasslandManagement:
 
     def __init__(self, area_start, area_end, time_impl, time_cap, rate, nitrous_constant, methane_constant,
                             fire_interval, fire_used, methane_ef, nitrous_ef, agb_ref, agb_tier_2, cf_ref, cf_tier_2,
-                            soc_ref, soc_start_tier_2, soc_end_tier_2, calculate_soc, fmg_start = 1, fmg_end = 1,
-                            flu_start = 1, flu_end = 1, fi_start = 1, fi_end = 1, delay = 0
+                            soc_start_default, soc_end_default, soc_start_tier_2, soc_end_tier_2, calculate_soc, fmg_start_default, fmg_end_default,
+                            fmg_start_tier_2, fmg_end_tier_2, flu_start_default, flu_end_default, flu_start_tier_2,
+                            flu_end_tier_2, fi_start_default, fi_end_default, fi_start_tier_2, fi_end_tier_2, delay
                             ):
         
         self.area_start = area_start
@@ -27,20 +28,41 @@ class GrasslandManagement:
         self.agb_tier_2 = agb_tier_2 # tier 2 value, expects float or None
         self.cf_ref = cf_ref # default is 77%, not tabulated
         self.cf_tier_2 = cf_tier_2 # tier 2 value, expects float or None   
-        self.soc_ref = soc_ref
+        self.soc_start_default = soc_start_default
+        self.soc_end_default = soc_end_default
         self.soc_start_tier_2 = soc_start_tier_2 # tier 2 value, expects float or None
         self.soc_end_tier_2 = soc_end_tier_2 # tier 2 value, expects float or None
-        self.fmg_start = fmg_start # defaulted to 1 in case there are None, if not float value
-        self.fmg_end = fmg_end # defaulted to 1 in case there are None, if not float value
-        self.flu_start = flu_start # defaulted to 1 in case there are None, if not float value
-        self.flu_end = flu_end  # defaulted to 1 in case there are None, if not float value
-        self.fi_start = fi_start # defaulted to 1 in case there are None, if not float value
-        self.fi_end = fi_end # defaulted to 1 in case there are None, if not float value
+
+        self.fmg_start_default = fmg_start_default # defaulted to 1 in case there are None, if not float value
+        self.fmg_end_default = fmg_end_default # defaulted to 1 in case there are None, if not float value
+        self.fmg_start_tier_2 = fmg_start_tier_2 # tier 2 value, expects float or None
+        self.fmg_end_tier_2 = fmg_end_tier_2 # tier 2 value, expects float or None
+        self.flu_start_default = flu_start_default # defaulted to 1 in case there are None, if not float value
+        self.flu_end_default = flu_end_default  # defaulted to 1 in case there are None, if not float value
+        self.flu_start_tier_2 = flu_start_tier_2 # tier 2 value, expects float or None
+        self.flu_end_tier_2 = flu_end_tier_2 # tier 2 value, expects float or None
+        self.fi_start_default = fi_start_default # defaulted to 1 in case there are None, if not float value
+        self.fi_end_default = fi_end_default # defaulted to 1 in case there are None, if not float value
+        self.fi_start_tier_2 = fi_start_tier_2 # tier 2 value, expects float or None
+        self.fi_end_tier_2 = fi_end_tier_2 # tier 2 value, expects float or None
+
+        # TODO: Assigned FMG, FLU, FI values. Maybe once everything has been done change this structure
+        self.fmg_start = self.fmg_start_tier_2 if self.fmg_start_tier_2 else self.fmg_start_default
+        self.fmg_end = self.fmg_end_tier_2 if self.fmg_end_tier_2 else self.fmg_end_default
+        self.flu_start = self.flu_start_tier_2 if self.flu_start_tier_2 else self.flu_start_default
+        self.flu_end = self.flu_end_tier_2 if self.flu_end_tier_2 else self.flu_end_default
+        self.fi_start = self.fi_start_tier_2 if self.fi_start_tier_2 else self.fi_start_default
+        self.fi_end = self.fi_end_tier_2 if self.fi_end_tier_2 else self.fi_end_default
+    
+
         self.delay = delay # defaulted to 0 in case there are None, if not float value
 
         # Space for the results
         self.hectars_before_20, self.hectars_after_20 = yearly_time_dependent_20_year_breakdown(area_start, area_end ,self.time_impl, self.time_cap, self.rate)
         self.total_hectars = yearly_time_dependent_parameter_breakdown(area_start, area_end, self.time_impl, self.time_cap, self.rate, interim_values = True)
+
+        self.soc_start = self.soc_start_default * self.fmg_start * self.flu_start * self.fi_start if not self.soc_start_tier_2 else self.soc_start_tier_2
+        self.soc_end = self.soc_end_default * self.fmg_end * self.flu_end * self.fi_end if not self.soc_end_tier_2 else self.soc_end_tier_2
         # DEFAULTS FOR TIER 2 VALUES INITIALIZATION
 
         # RESULTS
@@ -58,8 +80,8 @@ class GrasslandManagement:
         self.calculate_soc = calculate_soc
 
         # TIER 2 DEFAULTS
-        self.soc_start_tier_2_default = self.soc_ref * self.fmg_start * self.fi_start * self.flu_start 
-        self.soc_end_tier_2_default = self.soc_ref * self.fmg_end * self.fi_end * self.flu_end
+        self.soc_start_tier_2_default = self.soc_start_default * self.fmg_start * self.fi_start * self.flu_start 
+        self.soc_end_tier_2_default = self.soc_end_default * self.fmg_end * self.fi_end * self.flu_end
         self.agb_tier_2_default = self.agb_ref 
         self.cf_tier_2_default = self.cf_ref 
 
@@ -133,35 +155,15 @@ class GrasslandManagement:
 
             try:
                 if self.calculate_soc:
-                    soc_start = self.soc_ref * self.fmg_start * self.fi_start * self.flu_start if not self.soc_start_tier_2 else self.soc_start_tier_2
-                    soc_end = self.soc_ref * self.fmg_end * self.fi_end * self.flu_end if not self.soc_end_tier_2 else self.soc_end_tier_2
-                    delta_co2_mineral_per_ha_per_yr = - (soc_end - soc_start) / 20 * (44/12)
 
-
-                    calculated = delta_co2_mineral_per_ha_per_yr * sum(self.total_hectars)
-                    tabular = max(self.area_start, self.area_end) * delta_co2_mineral_per_ha_per_yr * 20
+                    self.emissions_soil_yearly, self.emissions_soil_total = soil_emissions_2(self.soc_start, self.soc_end, self.total_hectars, self.area_start,
+                                                                                             self.area_end, self.hectars_before_20)
                     
-                    total = tabular if abs(calculated) >= abs(tabular) else calculated
+                    soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_soil_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
+                    self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
 
-                    self.emissions_soil_yearly = breakdown_according_to_values(total, self.hectars_before_20)
-                    self.emissions_soil_total = total
-
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
-                        year = 0,
-                        gas_type = GasTypes.CO2,
-                        emissions = [Emission(e, GasTypes.CO2) for e in breakdown_according_to_values(total, self.hectars_before_20)],
-                        activity = ActivityTypes.SOIL_CO2_CHANGE,
-                        delay = self.delay
-                    ))
-                    
-                    return
-                
-                else:
-                    return
-                
-            except:
+            except Exception as e:
                 traceback.print_exc()
-                return
 
             
         calculate_residue_burning()
