@@ -1310,6 +1310,7 @@ class GrasslandCalculator(BaseCalculator):
                 soc.value,
                 module.soil_carbon_t2_start,
                 module.soil_carbon_t2_start,
+                False,
                 soc_start.fmg,
                 soc_w.fmg,
                 soc_start.flu,
@@ -1344,6 +1345,7 @@ class GrasslandCalculator(BaseCalculator):
                 soc.value,
                 module.soil_carbon_t2_start,
                 module.soil_carbon_t2_start,
+                False,
                 soc_start.fmg,
                 soc_wo.fmg,
                 soc_start.flu,
@@ -1378,6 +1380,7 @@ class GrasslandCalculator(BaseCalculator):
                 soc.value,
                 module.soil_carbon_t2_start,
                 module.soil_carbon_t2_w,
+                True,
                 soc_start.fmg,
                 soc_w.fmg,
                 soc_start.flu,
@@ -1412,6 +1415,7 @@ class GrasslandCalculator(BaseCalculator):
                 soc.value,
                 module.soil_carbon_t2_start,
                 module.soil_carbon_t2_wo,
+                True,
                 soc_start.fmg,
                 soc_wo.fmg,
                 soc_start.flu,
@@ -1428,6 +1432,9 @@ class GrasslandCalculator(BaseCalculator):
         res_start_wo = math_start_wo.result if math_start_wo else MathResult(project.implementation_years, project.capitalization_years)
         res_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
         res_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+
+        ao = res_w + res_start_w
+        bo = res_wo + res_start_wo
 
         return (res_w+res_start_w, res_wo+res_start_wo)
 class SmallFisheryCalculator(BaseCalculator):
