@@ -88,6 +88,9 @@ def yearly_time_dependent_20_year_breakdown(start_value, end_value, years_implem
     after_20.extend(breakdown)
 
     before_20 = [i-j for i, j in zip(breakdown, after_20[0:len(breakdown)])]
+    
+    # NOTE: remove all negative values and replace them with 0 
+    before_20 = [0 if i < 0 else i for i in before_20]
 
     average_before_20 = average_yearly_value(before_20)
     average_after_20 = average_yearly_value(after_20)[0:len(breakdown) - 1]
