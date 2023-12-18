@@ -645,6 +645,18 @@ class LandModule(Module):
     land_use_type_wo = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_wo")
     land_use_type_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_thread")
 
+    flu_t2_start = FloatField(null=True, blank=True)
+    flu_t2_w = FloatField(null=True, blank=True)
+    flu_t2_wo = FloatField(null=True, blank=True)
+
+    fi_t2_start = FloatField(null=True, blank=True)
+    fi_t2_w = FloatField(null=True, blank=True)
+    fi_t2_wo = FloatField(null=True, blank=True)
+
+    fmg_t2_start = FloatField(null=True, blank=True)
+    fmg_t2_w = FloatField(null=True, blank=True)
+    fmg_t2_wo = FloatField(null=True, blank=True)
+
     class Meta:
         abstract = True
 
