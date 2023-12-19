@@ -416,6 +416,8 @@ class PeatExtraction:
         self.emissions_total_yearly = []
         self.total_emissions = 0
 
+        self.result = Result(self.time_impl, self.time_cap)
+
 
 
     def calculate_emissions(self):
@@ -438,7 +440,7 @@ class PeatExtraction:
                 doc_offsite_emissions_start, doc_offsite_emissions_end = yearly_emissions_calculation(44/12, self.hectares_start, self.hectares_end, ef_doc_offsite)
                 ch4_offsite_emissions_start, ch4_offsite_emissions_end = yearly_emissions_calculation(self.methane_constant/1000, self.hectares_start, self.hectares_end, ef_ch4_offsite, self.percentage_ditches_start, self.percentage_ditches_end)
 
-                self.drainage_co2_doc_total = yearly_time_dependent_parameter_breakdown(co2_onsite_emissions_start + doc_offsite_emissions_start, co2_onsite_emissions_end + doc_offsite_emissions_end, self.time_impl, self.time_cap, self.rate_coefficient_end, interim_values = True)
+                self.drainage_co2_doc_yearly = yearly_time_dependent_parameter_breakdown(co2_onsite_emissions_start + doc_offsite_emissions_start, co2_onsite_emissions_end + doc_offsite_emissions_end, self.time_impl, self.time_cap, self.rate_coefficient_end, interim_values = True)
                 self.drainage_ch4_yearly = yearly_time_dependent_parameter_breakdown(ch4_onsite_emissions_start + ch4_offsite_emissions_start, ch4_onsite_emissions_end + ch4_offsite_emissions_end, self.time_impl, self.time_cap, self.rate_coefficient_end, interim_values = True)
                 self.drainage_n2o_yearly = yearly_time_dependent_parameter_breakdown(n2o_onsite_emissions_start, n2o_onsite_emissions_end, self.time_impl, self.time_cap, self.rate_coefficient_end, interim_values = True)
 
@@ -448,6 +450,10 @@ class PeatExtraction:
 
                 self.drainage_total_yearly = [i + j + k for i, j, k in zip(self.drainage_co2_doc_yearly, self.drainage_ch4_yearly, self.drainage_n2o_yearly)]
                 self.drainage_total = self.drainage_co2_doc_total + self.drainage_ch4_total + self.drainage_n2o_total
+
+                drainage_peat_co2_doc_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.drainage_co2_doc_yearly], ActivityTypes.DRAINAGE_PEAT, delay=0)
+                drainage_peat_ch4_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in self.drainage_ch4_yearly], ActivityTypes.DRAINAGE_PEAT, delay=0)
+                drainage_peat_n2o_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in self.drainage_n2o_yearly], ActivityTypes.DRAINAGE_PEAT, delay=0)
 
             except:
                 traceback.print_exc()
@@ -468,6 +474,10 @@ class PeatExtraction:
 
                 self.offsite_emissions_yearly = yearly_time_dependent_parameter_breakdown(em_start, em_end, self.time_impl, self.time_cap, self.rate_coefficient_end, interim_values = True)
                 self.offsite_emissions_total = sum(self.offsite_emissions_yearly)
+
+                offsite_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.offsite_emissions_yearly], ActivityTypes.OFFSITE_PEAT, delay=0)
+                self.result.yearly_emissions_by_sector_by_gas.append(offsite_emission_set)
+            
             except:
                 traceback.print_exc()
                 return
