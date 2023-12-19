@@ -3281,7 +3281,6 @@ for i, row in df.iterrows():
         name=name,
         value=value,
     )
-"""
 CropYieldStats.objects.all().delete()
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "CropYieldStats.csv"),
@@ -3314,3 +3313,97 @@ for i, row in df.iterrows():
         year_2020=yr_2020,
         average=average,
     )[0]
+
+FMGData.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "FMG.csv"),
+    header=[0],
+    sep=";",
+)
+
+for i, row in df.iterrows():
+    print(i, row)
+    climate = Climate.objects.get(name=sanitize(row["climate"]))
+    moisture = Moisture.objects.get(name=sanitize(row["moisture"]))
+    tillage_management_type = TillageManagementType.objects.get(name=sanitize(row["tillage_management_type"]))
+
+    value = parse_csv_number(row["value"])
+
+    print(
+        climate,
+        moisture,
+        tillage_management_type,
+        value,
+    )
+
+    FMGData.objects.get_or_create(
+        climate=climate,
+        moisture=moisture,
+        tillage_management_type=tillage_management_type,
+        value=value,
+    )
+
+FIData.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "FI.csv"),
+    header=[0],
+    sep=";",
+)
+
+for i, row in df.iterrows():
+    print(i, row)
+    climate = Climate.objects.get(name=sanitize(row["climate"]))
+    moisture = Moisture.objects.get(name=sanitize(row["moisture"]))
+    organic_input_type = OrganicInputType.objects.get(name=row["organic_input_type"])
+
+    value = parse_csv_number(row["value"])
+
+    print(
+        climate,
+        moisture,
+        organic_input_type,
+        value,
+    )
+
+    FIData.objects.get_or_create(
+        climate=climate,
+        moisture=moisture,
+        organic_input_type=organic_input_type,
+        value=value,
+    )
+
+    if i == len(df) - 1:
+        break
+"""
+
+FLUData.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "FLU.csv"),
+    header=[0],
+    sep=";",
+)
+
+for i, row in df.iterrows():
+    print(i, row)
+    climate = Climate.objects.get(name=sanitize(row["climate"]))
+    moisture = Moisture.objects.get(name=sanitize(row["moisture"]))
+    land_use_type = LandUseType.objects.get(name=sanitize(row["land_use_type"]))
+
+    value = parse_csv_number(row["value"])
+
+    print(
+        climate,
+        moisture,
+        land_use_type,
+        value,
+    )
+
+    FLUData.objects.get_or_create(
+        climate=climate,
+        moisture=moisture,
+        land_use_type=land_use_type,
+        value=value,
+    )
