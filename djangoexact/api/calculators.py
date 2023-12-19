@@ -661,9 +661,17 @@ class OtherLandUseCalculator(BaseCalculator):
 
         soc = SoilOrganicCarbon.objects.get(**cm, soil_type=project.soil_type)
 
-        flu_initial = AfforestationLandUseStockExchangeFactor.objects.get_or_default(**cm, land_use_type=luc_start)
-        flu_final_w = LandUseCarbonStockExchangeFactor.objects.get_or_default(**cm, land_use_type=luc_w)
-        flu_final_wo = LandUseCarbonStockExchangeFactor.objects.get_or_default(**cm, land_use_type=luc_wo)
+        fmg_start = FMGData.objects.get(**cm, tillage_management_type=module_start.tillage_management_type)
+        fmg_final_w = FMGData.objects.get(**cm, tillage_management_type=module_w.tillage_management_type)
+        fmg_final_wo = FMGData.objects.get(**cm, tillage_management_type=module_wo.tillage_management_type)
+
+        fi_start = FIData.objects.get(**cm, organic_input_type=module_start.organic_input_type)
+        fi_final_w = FIData.objects.get(**cm, organic_input_type=module_w.organic_input_type)
+        fi_final_wo = FIData.objects.get(**cm, organic_input_type=module_wo.organic_input_type)
+
+        flu_start = FLUData.objects.get_or_default(**cm, land_use_type=luc_start)
+        flu_final_w = FLUData.objects.get_or_default(**cm, land_use_type=luc_w)
+        flu_final_wo = FLUData.objects.get_or_default(**cm, land_use_type=luc_wo)
 
         c_n_ratio_w = utils.CN_RATIO_GRASSLAND if luc.module_type_w.class_name == "Grassland" else utils.CN_RATIO_FOREST
         c_n_ratio_wo = utils.CN_RATIO_GRASSLAND if luc.module_type_wo.class_name == "Grassland" else utils.CN_RATIO_FOREST
@@ -687,15 +695,27 @@ class OtherLandUseCalculator(BaseCalculator):
             input.activity.project.gw_potential.n2o,
             luc.is_fire_used_w,
             soc.value,
-            flu_initial.value,
+            soc.value,
+            module_start.soc_t2_start,
+            module_w.soc_t2_w,
+            fmg_start.value,
+            fmg_final_w.value,
+            module_start.fmg_t2_start, # TODO: Start module has 3 fmg values. What to choose?
+            module_w.fmg_t2_w,
+            flu_start.value,
             flu_final_w.value,
-            input.soc_t2_start,
-            input.soc_t2_w,
+            module_start.flu_t2_start,
+            module_w.flu_t2_w,
+            fi_start.value,
+            fi_final_w.value,
+            module_start.fi_t2_start,
+            module_w.fi_t2_w,
+            True,
             luc.area,
             project.implementation_years,
             project.capitalization_years,
             input.activity.change_rate.name,
-            # input.activity.duration_t2,
+            input.activity.duration_t2,
         ]
 
         results_w = MathOtherLandUseChanges(*inputs_w)
@@ -715,15 +735,27 @@ class OtherLandUseCalculator(BaseCalculator):
             input.activity.project.gw_potential.n2o,
             luc.is_fire_used_wo,
             soc.value,
-            flu_initial.value,
+            soc.value,
+            module_start.soc_t2_start,
+            module_wo.soc_t2_wo,
+            fmg_start.value,
+            fmg_final_wo.value,
+            module_start.fmg_t2_start, # TODO: Start module has 3 fmg (also fi and flu) values. What to choose?
+            module_wo.fmg_t2_wo,
+            flu_start.value,
             flu_final_wo.value,
-            input.soc_t2_start,
-            input.soc_t2_wo,
+            module_start.flu_t2_start,
+            module_wo.flu_t2_wo,
+            fi_start.value,
+            fi_final_wo.value,
+            module_start.fi_t2_start,
+            module_wo.fi_t2_wo,
+            True,
             luc.area,
             project.implementation_years,
             project.capitalization_years,
             input.activity.change_rate.name,
-            # input.activity.duration_t2,
+            input.activity.duration_t2,
         ]
 
         results_wo = MathOtherLandUseChanges(*inputs_wo)
