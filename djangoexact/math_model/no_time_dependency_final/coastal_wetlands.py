@@ -1,5 +1,6 @@
 import traceback
 from .general_functions import yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, yearly_time_dependent_20_year_breakdown, breakdown_according_to_values, soil_emissions
+from .ghg_emissions_classes import YearlyGasActivityEmissionSet, Emission, GasTypes, ActivityTypes, Result
 
 class CoastalWetland:
 
@@ -61,6 +62,7 @@ class CoastalWetland:
         self.hectares_drained_before_20, self.hectares_drained_after_20 = yearly_time_dependent_20_year_breakdown(0, self.area_drained_end, self.time_impl, self.time_cap, self.rate_type)
         self.hectares_drained = yearly_time_dependent_parameter_breakdown(0, self.area_drained_end, self.time_impl, self.time_cap, self.rate_type)
 
+        
         # RESULTS
         self.emissions_biomass_yearly_drainage = []
         self.emissions_biomass_total_drainage = 0
@@ -73,6 +75,7 @@ class CoastalWetland:
 
         # TODO: add emissions yearly extraction
         self.emissions_total_extraction_excavation = 0
+        self.emissions_yearly_extraction_excavation = []
 
         # TODO: add emissions yearly rewetting
         self.emissions_total_rewetting = 0
@@ -82,6 +85,8 @@ class CoastalWetland:
 
         self.emissions_total_yearly = []
         self.total_emissions = 0
+
+        self.result = Result(self.time_impl, self.time_cap)
         
         pass
 
@@ -102,13 +107,18 @@ class CoastalWetland:
                     area_drained_end = self.area_drained_end
                     # NOT USED IN THE EXCEL, TODO: ask Lorenzo
                     area_drained_start = self.area_drained_start
-                    
-
 
                     stock_c_biomass_end = (agb + bgb + litter + deadwood) * area_drained_end
 
                     #TODO: ask Lorenzo how the biomass emissions should be divided across the years
                     self.emissions_biomass_total_drainage = (stock_c_biomass_start - stock_c_biomass_end) * (44/12)
+
+                    # soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_soil_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
+                    # self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
+
+                    biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(self.emissions_biomass_total_drainage, GasTypes.CO2)], ActivityTypes.BIOMASS, delay=0)
+                    self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
+                
                 except Exception as e:
                     traceback.print_exc()
                     pass
@@ -129,6 +139,9 @@ class CoastalWetland:
 
                     self.emissions_soil_total_drainage = total
                     self.emissions_soil_yearly_drainage = breakdown_according_to_values(total, self.hectares_drained)
+
+                    soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_soil_yearly_drainage], ActivityTypes.SOIL_CO2_CHANGE, delay=0)
+                    self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
 
                 except Exception as e:
                     traceback.print_exc()
@@ -161,8 +174,24 @@ class CoastalWetland:
                 soil_co2 = soil_c * 44/12
 
                 total = (biomass_co2 + soil_co2) * (area_excavated - area_excavated_start)
+
+                total_biomass = biomass_co2 * (area_excavated - area_excavated_start)
+                total_soil = soil_co2 * (area_excavated - area_excavated_start)
                 # TODO: ask Lorenzo about this variable and how it should be split across the years
+
+                hectares_excavated = yearly_time_dependent_parameter_breakdown(area_excavated - area_excavated_start, 0, self.time_impl, self.time_cap, self.rate_type)
                 self.emissions_total_extraction_excavation = total
+
+                self.emissions_yearly_extraction_excavation = breakdown_according_to_values(total, hectares_excavated)
+
+                emissions_yearly_biomass_extraction_excavation = breakdown_according_to_values(total_biomass, hectares_excavated)
+                emissions_yearly_soil_extraction_excavation = breakdown_according_to_values(total_soil, hectares_excavated)
+
+                biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_yearly_biomass_extraction_excavation], ActivityTypes.BIOMASS, delay=0)
+                self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
+
+                soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_yearly_soil_extraction_excavation], ActivityTypes.SOIL_CO2_CHANGE, delay=0)
+                self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
 
                 pass
             except Exception as e:
@@ -180,6 +209,12 @@ class CoastalWetland:
                 self.emissions_yearly_rewetting_methane = yearly_time_dependent_parameter_breakdown(0, self.methane_constant * self.area_end_rewetting * ef_rewetting_methane / 1000, self.time_impl, self.time_cap, self.rate_type )
 
                 self.emissions_total_rewetting = sum(self.emissions_yearly_rewetting_carbon) + sum(self.emissions_yearly_rewetting_methane)
+
+                rewetting_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_yearly_rewetting_carbon], ActivityTypes.REWETTING_REVEGETATION, delay=0)
+                self.result.yearly_emissions_by_sector_by_gas.append(rewetting_emission_set)
+
+                rewetting_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in self.emissions_yearly_rewetting_methane], ActivityTypes.REWETTING_REVEGETATION, delay=0)
+                self.result.yearly_emissions_by_sector_by_gas.append(rewetting_emission_set)
                 
             except Exception as e:
                 traceback.print_exc()
