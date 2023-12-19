@@ -72,12 +72,7 @@ class Inputs:
 
             self.emissions_total_yearly = [sum(x) for x in zip(self.yearly_co2_emissions, self.yearly_n2o_emissions, self.yearly_co2_eq_emissions)]
             self.total_emissions = sum(self.emissions_total_yearly)
-
-            # soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_soil_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
-            # self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
-
-
-            # ----------------------------------------->>>>>>>>>>>>>>>><
+            
             co2_eq_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.yearly_co2_eq_emissions], ActivityTypes.CO2_EQUIVALENT_VC, delay=0)
             self.result.yearly_emissions_by_sector_by_gas.append(co2_eq_emission_set)
 
