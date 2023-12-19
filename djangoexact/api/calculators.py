@@ -96,14 +96,14 @@ def is_luc_remaining_same(module: LandModule):
     Checks if a module is business as usual.
     """
     luc: LandUseChange = module.land_use_change
-    return (luc and luc.module_type_start.class_name == module.__name__ and luc.module_type_w.class_name == module.__name__)
+    return not luc or (luc and luc.module_type_start.class_name == module.__name__ and luc.module_type_w.class_name == module.__name__)
 
 def is_business_as_usual(module: LandModule):
     """
     Checks if a module is business as usual.
     """
     luc: LandUseChange = module.land_use_change
-    return (luc and luc.module_type_start.class_name == module.__name__ and luc.module_type_wo.class_name == module.__name__)
+    return not luc or (luc and luc.module_type_start.class_name == module.__name__ and luc.module_type_wo.class_name == module.__name__)
 
 def is_without(module: LandModule):
     """
@@ -222,13 +222,6 @@ class BaseCalculator(ABC):
         
             if module_start.status.value != 1 or module_w.status.value != 1 or module_wo.status.value != 1:
                 raise Exception("At least one module is not ready to perform the calculation")
-            
-    @abstractmethod
-    def defaults(self) -> dict:
-        """
-        Returns the default values for the module.
-        """
-        raise NotImplementedError()
 
 class LandUseChangeCalculator(BaseCalculator):
     """
@@ -768,11 +761,11 @@ class AnnualCroppingCalculator(BaseCalculator):
         soc = SoilOrganicCarbon.objects.get(**cm, soil_type=soil_type)
         flu = CroplandFLU.objects.get(**cm, land_use_type__name__icontains="Long-Term Cultivated")
         burning_emission_factor = BurningEmissionFactor.objects.get(category__name="Agricultural residues")
-        
-        try:
+
+
+        minor_burning_emission_factor = None
+        if input.minor_land_use_type_start or input.minor_land_use_type_w or input.minor_land_use_type_wo:
             minor_burning_emission_factor = BurningEmissionFactor.objects.get(category__name="Agricultural residues")
-        except:
-            minor_burning_emission_factor = None
 
         math_start_w = None
         math_start_wo = None
@@ -780,8 +773,6 @@ class AnnualCroppingCalculator(BaseCalculator):
         math_wo = None
 
         if is_luc_remaining_same(input):
-            pass
-
             lut_start = input.land_use_type_start
             lut_w = input.land_use_type_w
 
@@ -955,7 +946,7 @@ class AnnualCroppingCalculator(BaseCalculator):
                 emission_factors_w.value,
                 project.gw_potential.n2o,
                 project.gw_potential.ch4,
-                burning_emission_factor.ch4 if input.residue_management_type_start.name == "Burned" else None,
+                burning_emission_factor.ch4 if input.residue_management_type_w.name == "Burned" else None,
                 fires_w.value,
                 input.main_biomass_factor_t2_start,
                 n_estimation_factor_w.slope,
@@ -963,14 +954,14 @@ class AnnualCroppingCalculator(BaseCalculator):
                 crop_yield_w,
                 getattr(minor_burning_emission_factor, "ch4", None),
                 getattr(minor_fires_w, "value", None),
-                input.minor_biomass_factor_t2_start,
+                input.minor_biomass_factor_t2_w,
                 getattr(minor_n_estimation_factor_w, "slope", None),
                 getattr(minor_n_estimation_factor_w, "intercept", None),
-                input.minor_yield_start,
-                burning_emission_factor.n2o if input.residue_management_type_start.name == "Burned" else None,
-                input.residue_management_type_start.name == "Retained",
+                input.minor_yield_w,
+                burning_emission_factor.n2o if input.residue_management_type_w.name == "Burned" else None,
+                input.residue_management_type_w.name == "Retained",
                 getattr(minor_burning_emission_factor, "n2o", None),
-                getattr(input.minor_residue_management_type_start, "name", None) == "Retained",
+                getattr(input.minor_residue_management_type_w, "name", None) == "Retained",
                 n_estimation_factor_w.n_ag_residues,
                 n_estimation_factor_w.rs_t,
                 n_estimation_factor_w.n_bg_t,
@@ -1166,14 +1157,14 @@ class AnnualCroppingCalculator(BaseCalculator):
                 crop_yield_wo,
                 getattr(minor_burning_emission_factor, "ch4", None),
                 getattr(minor_fires_wo, "value", None),
-                input.minor_biomass_factor_t2_start,
+                input.minor_biomass_factor_t2_wo,
                 getattr(minor_n_estimation_factor_wo, "slope", None),
                 getattr(minor_n_estimation_factor_wo, "intercept", None),
-                input.minor_yield_start,
-                burning_emission_factor.n2o if input.residue_management_type_start.name == "Burned" else None,
-                input.residue_management_type_start.name == "Retained",
+                input.minor_yield_wo,
+                burning_emission_factor.n2o if input.residue_management_type_wo.name == "Burned" else None,
+                input.residue_management_type_wo.name == "Retained",
                 getattr(minor_burning_emission_factor, "n2o", None),
-                getattr(input.minor_residue_management_type_start, "name", None) == "Retained",
+                getattr(input.minor_residue_management_type_wo, "name", None) == "Retained",
                 n_estimation_factor_wo.n_ag_residues,
                 n_estimation_factor_wo.rs_t,
                 n_estimation_factor_wo.n_bg_t,
@@ -1546,7 +1537,7 @@ class GrasslandCalculator(BaseCalculator):
         math_w = None
         math_wo = None
 
-        if is_luc_remaining_same(input):
+        if is_luc_remaining_same(module):
             soc_start = GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_start, climate=project.climate)
             soc_w = GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_w, climate=project.climate)
 
@@ -1588,7 +1579,7 @@ class GrasslandCalculator(BaseCalculator):
             math_start_w = MathGrassland(*inputs_start_w)
             math_start_w.calculate_emissions()
         
-        if is_with(input):
+        if is_with(module):
 
             soc_start = GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_start, climate=project.climate)
             soc_w = GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_w, climate=project.climate)
@@ -1631,7 +1622,7 @@ class GrasslandCalculator(BaseCalculator):
             math_w = MathGrassland(*inputs_w)
             math_w.calculate_emissions()
 
-        if is_business_as_usual(input):
+        if is_business_as_usual(module):
             soc_start = GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_start, climate=project.climate)
             soc_wo = GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_wo, climate=project.climate)
 
@@ -1673,7 +1664,7 @@ class GrasslandCalculator(BaseCalculator):
             math_start_wo = MathGrassland(*inputs_start_wo)
             math_start_wo.calculate_emissions()
 
-        if is_without(input):
+        if is_without(module):
 
             soc_start = GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_start, climate=project.climate)
             soc_wo = GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_wo, climate=project.climate)
