@@ -1,6 +1,8 @@
 import math
 from .general_functions import yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, yearly_time_dependent_20_year_breakdown, breakdown_according_to_values, soil_emissions
 import traceback
+from .ghg_emissions_classes import GasTypes, ActivityTypes, Emission, YearlyGasActivityEmissionSet, Result
+
 
 class AnnexedModule:
 
@@ -89,6 +91,7 @@ class AnnexedModule:
         self.emissions_total_yearly = []
         self.total_emissions = 0
 
+        self.result = Result(self.time_impl, self.time_cap)
         pass
 
     def calculate_emissions(self,):
@@ -105,18 +108,40 @@ class AnnexedModule:
                 total_biomass = sum(biomass_yearly)
 
                 multiplication_parameter_co2_co = (1/fire_periodicity * percentage_area_burned * ef_co2 * 44/12/1000) + (1/fire_periodicity * percentage_area_burned  * ef_co * 2 / 1000)
+
+                multiplication_parameter_co2 = 1/fire_periodicity * percentage_area_burned * ef_co2 * 44/12/1000
+                multiplication_parameter_co = 1/fire_periodicity * percentage_area_burned * ef_co * 2 / 1000
                 multiplication_parameter_ch4 = 1/fire_periodicity * percentage_area_burned * ef_ch4 * methane_constant / 1000
 
-                return total_biomass * multiplication_parameter_co2_co, total_biomass * multiplication_parameter_ch4
+                return total_biomass * multiplication_parameter_co2, total_biomass * multiplication_parameter_co, total_biomass * multiplication_parameter_ch4
             
             try:
                 dry_matter_ref_fire = self.dry_matter_ref_fire if not self.dry_matter_tier_2_fire else self.dry_matter_tier_2_fire
 
                 if self.fire_boolean_end and self.fire_periodicity_end < self.time_impl + self.time_cap and self.area_affected_by_action_end != 0 and dry_matter_ref_fire != 0:
-                    co2_co, ch4 = fire_co2_co_ch4(self.fire_periodicity_end, dry_matter_ref_fire, self.area_affected_by_action_end, self.rate, self.time_impl, self.time_cap, self.percentage_area_burned_end, self.ef_co2_ref_fire if not self.ef_co2_tier_2_fire else self.ef_co2_tier_2_fire, self.ef_co_ref_fire if not self.ef_co_tier_2_fire else self.ef_co_tier_2_fire, self.ef_ch4_ref_fire if not self.ef_ch4_tier_2_fire else self.ef_ch4_tier_2_fire, self.methane_constant)
+                    co2, co, ch4 = fire_co2_co_ch4(self.fire_periodicity_end, dry_matter_ref_fire, self.area_affected_by_action_end, self.rate, self.time_impl, self.time_cap, self.percentage_area_burned_end, self.ef_co2_ref_fire if not self.ef_co2_tier_2_fire else self.ef_co2_tier_2_fire, self.ef_co_ref_fire if not self.ef_co_tier_2_fire else self.ef_co_tier_2_fire, self.ef_ch4_ref_fire if not self.ef_ch4_tier_2_fire else self.ef_ch4_tier_2_fire, self.methane_constant)
                     # TODO: ask how they should be broken down
-                    self.emissions_fire_total = co2_co + ch4
+                    self.emissions_fire_total = co2 + co + ch4
                     self.emissions_fire_yearly = breakdown_according_to_values(self.emissions_fire_total, yearly_time_dependent_parameter_breakdown(0, self.area_affected_by_action_end * dry_matter_ref_fire, self.time_impl, self.time_cap, self.rate, interim_values = True))
+                    
+                    emissions_co2_yearly = breakdown_according_to_values(co2, yearly_time_dependent_parameter_breakdown(0, self.area_affected_by_action_end * dry_matter_ref_fire, self.time_impl, self.time_cap, self.rate, interim_values = True))
+                    emissions_co_yearly = breakdown_according_to_values(co, yearly_time_dependent_parameter_breakdown(0, self.area_affected_by_action_end * dry_matter_ref_fire, self.time_impl, self.time_cap, self.rate, interim_values = True))
+                    emissions_ch4_yearly = breakdown_according_to_values(ch4, yearly_time_dependent_parameter_breakdown(0, self.area_affected_by_action_end * dry_matter_ref_fire, self.time_impl, self.time_cap, self.rate, interim_values = True))
+
+                    # residue_burning_nitrous_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in breakdown_according_to_values(total_nitrous, self.total_hectars)], ActivityTypes.RESIDUE_BURNING, delay=self.delay)
+                    # residue_burning_methane_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in breakdown_according_to_values(total_methane, self.total_hectars)], ActivityTypes.RESIDUE_BURNING, delay=self.delay)
+
+                    # self.result.yearly_emissions_by_sector_by_gas.append(residue_burning_nitrous_emission_set)
+                    # self.result.yearly_emissions_by_sector_by_gas.append(residue_burning_methane_emission_set)
+
+                    co2_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_co2_yearly], ActivityTypes.FIRE_ON_SOIL, delay=0)
+                    co_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO, [Emission(e, GasTypes.CO) for e in emissions_co_yearly], ActivityTypes.FIRE_ON_SOIL, delay=0)
+                    ch4_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in emissions_ch4_yearly], ActivityTypes.FIRE_ON_SOIL, delay=0)
+
+                    self.result.yearly_emissions_by_sector_by_gas.append(co2_emission_set)
+                    self.result.yearly_emissions_by_sector_by_gas.append(co_emission_set)
+                    self.result.yearly_emissions_by_sector_by_gas.append(ch4_emission_set)
+                
                 else:
                     self.emissions_fire_yearly = [0 for i in range(self.time_impl + self.time_cap)]
                     self.emissions_fire_total = 0
@@ -170,6 +195,18 @@ class AnnexedModule:
 
                     total_doc = yearly_time_dependent_parameter_breakdown(doc_start, doc_end, self.time_impl, self.time_cap, self.rate, interim_values = True)
                     total_co2 = yearly_time_dependent_parameter_breakdown(co2_start, co2_end, self.time_impl, self.time_cap, self.rate, interim_values = True)
+
+                    co2_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in total_co2], ActivityTypes.DRAINAGE, delay=0)
+                    doc_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.DOC, [Emission(e, GasTypes.DOC) for e in total_doc], ActivityTypes.DRAINAGE, delay=0)
+                    ch4_onsite_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in total_ch4_onsite], ActivityTypes.DRAINAGE, delay=0)
+                    ch4_offsite_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in total_ch4_off_site], ActivityTypes.DRAINAGE, delay=0)
+                    n2o_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in total_n2o], ActivityTypes.DRAINAGE, delay=0)
+
+                    self.result.yearly_emissions_by_sector_by_gas.append(co2_emission_set)
+                    self.result.yearly_emissions_by_sector_by_gas.append(doc_emission_set)
+                    self.result.yearly_emissions_by_sector_by_gas.append(ch4_onsite_emission_set)
+                    self.result.yearly_emissions_by_sector_by_gas.append(ch4_offsite_emission_set)
+                    self.result.yearly_emissions_by_sector_by_gas.append(n2o_emission_set)
 
                     return total_n2o, total_ch4_onsite, total_ch4_off_site, total_doc, total_co2, sum(total_n2o) + sum(total_ch4_onsite) + sum(total_ch4_off_site) + sum(total_doc) + sum(total_co2)
                 
@@ -294,6 +331,23 @@ class AnnexedModule:
                 total_rewetting = total_rewetting_final + total_rewetting_initial
                 self.emissions_rewetting_yearly = [i + j + k + l + m + n for i, j, k, l, m, n in zip(total_co2_doc_initial, total_ch4_initial, total_n2o_initital, total_co2_doc_final, total_ch4_final, total_n2o_final)]
                 self.emissions_rewetting_total = total_rewetting
+
+                co2_doc_emission_set_initial = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in total_co2_doc_initial], ActivityTypes.REWETTING, delay=0)
+                ch4_emission_set_initial = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in total_ch4_initial], ActivityTypes.REWETTING, delay=0)
+                n2o_emission_set_initial = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in total_n2o_initital], ActivityTypes.REWETTING, delay=0)
+
+                co2_doc_emission_set_final = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in total_co2_doc_final], ActivityTypes.REWETTING, delay=0)
+                ch4_emission_set_final = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in total_ch4_final], ActivityTypes.REWETTING, delay=0)
+                n2o_emission_set_final = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in total_n2o_final], ActivityTypes.REWETTING, delay=0)
+
+                self.result.yearly_emissions_by_sector_by_gas.append(co2_doc_emission_set_initial)
+                self.result.yearly_emissions_by_sector_by_gas.append(ch4_emission_set_initial)
+                self.result.yearly_emissions_by_sector_by_gas.append(n2o_emission_set_initial)
+
+                self.result.yearly_emissions_by_sector_by_gas.append(co2_doc_emission_set_final)
+                self.result.yearly_emissions_by_sector_by_gas.append(ch4_emission_set_final)
+                self.result.yearly_emissions_by_sector_by_gas.append(n2o_emission_set_final)
+
             except:
                 traceback.print_exc()
                 return
