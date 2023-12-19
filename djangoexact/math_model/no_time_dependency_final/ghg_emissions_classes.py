@@ -4,6 +4,7 @@ class GasTypes(Enum):
     CO2 = "CO2"
     CH4 = "CH4"
     N2O = "N2O"
+    CO = "CO"
     OTHER = "Other"
 
 class ActivityTypes(Enum):
@@ -37,7 +38,10 @@ class ActivityTypes(Enum):
     NITROUS_MANURE_MANAGEMENT = "Nitrous Oxide Manure Management"
     NITROUS_MANURE_MANAGEMENT_INDIRECT_VOLATILIZATION = "Nitrous Oxide Manure Management Indirect Volatilization"
     NITROUS_MANURE_MANAGEMENT_INDIRECT_LEACHING = "Nitrous Oxide Manure Management Indirect Leaching"
-    
+    REWETTING_REVEGETATION = "Rewetting Revegetation"
+    FIRE_ON_SOIL = "Fire on Soil"
+    DRAINAGE = "Drainage"
+    REWETTING = "Rewetting"
 
 
 class Emission:
