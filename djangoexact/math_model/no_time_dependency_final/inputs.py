@@ -1,5 +1,7 @@
 from .general_functions import yearly_time_dependent_parameter_breakdown, input_single_calculation, yearly_constant_emissions_breakdown
 import math, traceback
+from .ghg_emissions_classes import YearlyGasActivityEmissionSet, Emission, GasTypes, ActivityTypes, Result
+
 class Inputs:
 
     def __init__(self, unit_start, unit_end, rate_type, ipcc_factor_co2, tier_2_factor_co2, unit_factor_co2, emissions_factor_co2, time_impl, time_cap,
@@ -38,6 +40,8 @@ class Inputs:
         self.total_n2o_emissions = 0
         self.total_co2_eq_emissions = 0
         self.total_emissions = 0
+        
+        self.result = Result(self.time_impl, self.time_cap)
 
         pass
 
@@ -68,6 +72,21 @@ class Inputs:
 
             self.emissions_total_yearly = [sum(x) for x in zip(self.yearly_co2_emissions, self.yearly_n2o_emissions, self.yearly_co2_eq_emissions)]
             self.total_emissions = sum(self.emissions_total_yearly)
+
+            # soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_soil_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
+            # self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
+
+
+            # ----------------------------------------->>>>>>>>>>>>>>>><
+            co2_eq_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.yearly_co2_eq_emissions], ActivityTypes.CO2_EQUIVALENT_VC, delay=0)
+            self.result.yearly_emissions_by_sector_by_gas.append(co2_eq_emission_set)
+
+            co2_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.yearly_co2_emissions], ActivityTypes.CO2_FIELD, delay=0)
+            self.result.yearly_emissions_by_sector_by_gas.append(co2_emission_set)
+
+            n2o_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in self.yearly_n2o_emissions], ActivityTypes.N20_FIELD, delay=0)
+            self.result.yearly_emissions_by_sector_by_gas.append(n2o_emission_set)
+
 
             return self.total_emissions
         
@@ -108,6 +127,8 @@ class OperationPhaseIrrigation:
         self.emissions_total_yearly = []
         self.total_emissions = 0
 
+        self.result = Result(self.time_impl, self.time_cap)
+
     def calculate_emissions(self,):
 
         def ef_calculation(ef_default, ef_tier_2, total_dynamic_head_tier_2, average_pressure_default, average_pressure_tier_2, pumping_efficiency_default, 
@@ -144,6 +165,9 @@ class OperationPhaseIrrigation:
             # TODO: CHECK IF THIS CAN BE CHANGED TO HAVING MULTIPLE INPUTS FOR START AND END LIKE FISHERIES ECC (so backend changes from start to end and not start-0 0-end)
             yearly_emissions, _ = input_single_calculation(self.units_start, self.units_end, ef, None, 1, 1, self.time_impl, self.time_cap, self.rate_type)
             yearly_emissions = [x * (1 + self.transportation_loss) for x in yearly_emissions] if self.transportation_loss else yearly_emissions
+
+            irrigation_operational_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_emissions], ActivityTypes.IRRIGATION_OPERATIONAL, delay=0)
+            self.result.yearly_emissions_by_sector_by_gas.append(irrigation_operational_emission_set)
             
             self.emissions_total_yearly = yearly_emissions
             self.total_emissions = sum(self.emissions_total_yearly)
@@ -171,6 +195,8 @@ class Roads:
         #  RESULTS
         self.emissions_total_yearly = []
         self.total_emissions = 0
+
+        self.result = Result(self.time_impl, self.time_cap)
         
     def calculate_emissions(self):
 
@@ -180,6 +206,9 @@ class Roads:
 
             self.total_emissions = self.units_end * ef / 1000 # to convert the ef from kg to g
             self.emissions_total_yearly = yearly_constant_emissions_breakdown(self.total_emissions, self.time_impl, self.time_cap)
+
+            roads_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_total_yearly], ActivityTypes.ROADS, delay=0)
+            self.result.yearly_emissions_by_sector_by_gas.append(roads_emission_set)
 
             return self.total_emissions
         
@@ -208,6 +237,8 @@ class ElectryicityConsumption:
         self.emissions_total_yearly = []
         self.total_emissions = 0
 
+        self.result = Result(self.time_impl, self.time_cap)
+
     def calculate_emissions(self,):
 
         try:
@@ -222,6 +253,9 @@ class ElectryicityConsumption:
             self.emissions_total_yearly = [x * (1 + self.percent_loss_transportation) for x in self.emissions_total_yearly]
             
             self.total_emissions = sum(self.emissions_total_yearly)
+
+            electricity_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_total_yearly], ActivityTypes.ELECTRICITY, delay=0)
+            self.result.yearly_emissions_by_sector_by_gas.append(electricity_emission_set)
 
             return self.total_emissions
         
@@ -249,6 +283,8 @@ class FuelConsumption:
         self.emissions_total_yearly = []
         self.total_emissions = 0
 
+        self.result = Result(self.time_impl, self.time_cap)
+
     def calculate_emissions(self,):
 
         try:
@@ -260,6 +296,9 @@ class FuelConsumption:
 
             self.emissions_total_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.time_impl, self.time_cap, self.rate_type)
             self.total_emissions = sum(self.emissions_total_yearly)
+
+            fuel_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_total_yearly], ActivityTypes.FUEL, delay=0)
+            self.result.yearly_emissions_by_sector_by_gas.append(fuel_emission_set)
 
             return self.total_emissions
         
@@ -294,6 +333,8 @@ class SolidConsumption:
         self.emissions_total_yearly = []
         self.total_emissions = 0
 
+        self.result = Result(self.time_impl, self.time_cap)
+
     def calculate_emissions(self,):
 
         def calculate_factor(joules_factor, co2_factor, ch4_factor, n2o_factor, account_for_co2_boolean, methane_constant, nitrous_constant):
@@ -314,6 +355,9 @@ class SolidConsumption:
 
             self.emissions_total_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.time_impl, self.time_cap, self.rate_type)
             self.total_emissions = sum(self.emissions_total_yearly)
+
+            solid_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_total_yearly], ActivityTypes.SOLID_CONSUMPTION, delay=0)
+            self.result.yearly_emissions_by_sector_by_gas.append(solid_emission_set)
 
             return self.total_emissions
         
@@ -343,6 +387,8 @@ class NewIrrigation:
         self.emissions_total_yearly = []
         self.total_emissions = 0
 
+        self.result = Result(self.time_impl, self.time_cap)
+
     def calculate_emissions(self,):
 
         try:
@@ -350,6 +396,9 @@ class NewIrrigation:
 
             self.total_emissions = ef * (self.units_end - self.units_start) / 1000
             self.emissions_total_yearly = yearly_constant_emissions_breakdown(self.total_emissions, self.time_impl, self.time_cap)
+
+            new_irrigation_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_total_yearly], ActivityTypes.NEW_IRRIGATION, delay=0)
+            self.result.yearly_emissions_by_sector_by_gas.append(new_irrigation_emission_set)
 
             return self.total_emissions
 
