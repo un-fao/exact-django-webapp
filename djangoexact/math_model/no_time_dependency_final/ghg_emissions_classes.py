@@ -32,7 +32,11 @@ class ActivityTypes(Enum):
     FUEL = "Fuel"
     SOLID_CONSUMPTION = "Solid Consumption"
     NEW_IRRIGATION = "New Irrigation"
-
+    METHANE_ENTERIC_FERMENTATION = "Methane Enteric Fermentation"
+    METHANE_MANURE_MANAGEMENT = "Methane Manure Management"
+    NITROUS_MANURE_MANAGEMENT = "Nitrous Oxide Manure Management"
+    NITROUS_MANURE_MANAGEMENT_INDIRECT_VOLATILIZATION = "Nitrous Oxide Manure Management Indirect Volatilization"
+    NITROUS_MANURE_MANAGEMENT_INDIRECT_LEACHING = "Nitrous Oxide Manure Management Indirect Leaching"
     
 
 
