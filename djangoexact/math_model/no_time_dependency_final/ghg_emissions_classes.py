@@ -23,6 +23,15 @@ class ActivityTypes(Enum):
     DISTURBANCE = "Disturbance"
     CH4_EMITTED_RICE = "CH4 Emitted Rice"
     STRAW_BURNING = "Straw Burning"
+    IRRIGATION_OPERATIONAL = "Operational Phase of Irrigation"
+    CO2_FIELD = "CO2 Field"
+    N20_FIELD = "N2O Field"
+    CO2_EQUIVALENT_VC = "CO2 Equivalent VC"
+    ROADS = "Roads"
+    ELECTRICITY = "Electricity"
+    FUEL = "Fuel"
+    SOLID_CONSUMPTION = "Solid Consumption"
+    NEW_IRRIGATION = "New Irrigation"
 
     
 
