@@ -3282,3 +3282,35 @@ for i, row in df.iterrows():
         value=value,
     )
 """
+CropYieldStats.objects.all().delete()
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "CropYieldStats.csv"),
+    header=[0],
+    sep=";",
+)
+
+for i, row in df.iterrows():
+    land_use_type = LandUseType.objects.get_or_create(name=sanitize(row["land_use_type"]))[0]
+    continent = Region.objects.get_or_create(name=sanitize(row["continent"]))[0]
+    yr_2016 = parse_csv_number(row["2016"])
+    yr_2017 = parse_csv_number(row["2017"])
+    yr_2018 = parse_csv_number(row["2018"])
+    yr_2019 = parse_csv_number(row["2019"])
+    yr_2020 = parse_csv_number(row["2020"])
+
+    average = (yr_2016 + yr_2017 + yr_2018 + yr_2019 + yr_2020) / 5 / 10000
+
+    print(
+        f"{land_use_type}, {continent}, {yr_2016}, {yr_2017}, {yr_2018}, {yr_2019}, {yr_2020}, {average}"
+    )
+
+    stat = CropYieldStats.objects.get_or_create(
+        land_use_type=land_use_type,
+        continent=continent,
+        year_2016=yr_2016,
+        year_2017=yr_2017,
+        year_2018=yr_2018,
+        year_2019=yr_2019,
+        year_2020=yr_2020,
+        average=average,
+    )[0]
