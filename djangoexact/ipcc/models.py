@@ -765,8 +765,8 @@ class CropYieldStatsManager(Manager):
         try:
             return CropYieldStats.objects.get(land_use_type=land_use_type, continent=continent)
         except CropYieldStats.DoesNotExist:
-            _all = CropYieldStats.objects.filter(continent=continent).all()
-            _average = sum([x.average for x in _all if x.average > 0]) / _all.count()
+            _all = CropYieldStats.objects.filter(Q(average__gt=0), continent=continent).values_list("average", flat=True)
+            _average = sum(_all) / _all.count()
             return SimpleNamespace(average=_average)
 
 
@@ -802,7 +802,7 @@ class CropYieldStats(Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"({self.pk}) - {self.continent} - {self.average}"
+        return f"({self.pk}) - {self.land_use_type.name} - {self.continent} - {self.average}"
 
 
 class InputReference(Model):
