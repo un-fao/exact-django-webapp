@@ -508,7 +508,7 @@ class Activity(Historical):
 ##############################
 
 class Submodule(Historical):
-    module_type = ForeignKey("api.ModuleType", on_delete=CASCADE, related_name="%(class)s")
+    # module_type = ForeignKey("api.ModuleType", on_delete=CASCADE, related_name="%(class)s")
 
     class Meta:
         abstract = True
@@ -1403,6 +1403,9 @@ class InputType(Model):
     )
     name = CharField(max_length=255, unique=True)
     description = TextField(null=True, blank=True)
+    has_co2_emissions = BooleanField(default=False)
+    has_n2o_emissions = BooleanField(default=False)
+    has_co2_e_emissions = BooleanField(default=False)
 
     class Meta:
         unique_together = ("macro_input_type", "name")
