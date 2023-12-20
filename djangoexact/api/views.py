@@ -566,13 +566,21 @@ def generic_module_viewset(model: Model):
             TODO: Define structure and format of the real response.
             """
 
-            from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
-
-            aggregate_by = BreakdownTypes(request.query_params.get("aggregate", BreakdownTypes.TOTAL))
-
             module = get_object_or_404(model, pk=pk)
+            module_type = ModuleType.objects.get(class_name=model.__name__)
+
+            if module_type.class_name == LandUseChange.__name__:
+                activity: Activity = module.activity
+
+                status_start = get_module_status(self, activity, module.module_type_start)
+                status_w = get_module_status(self, activity, module.module_type_w)
+                status_wo = get_module_status(self, activity, module.module_type_wo)
+
+                if not all(status == StatusType.objects.get(name="READY") for status in [status_start, status_w, status_wo]):
+                    return ErrorResponse("Not all modules are ready. Land Use Change module cannot be calculated.")
 
             try:
+                aggregate_by = BreakdownTypes(request.query_params.get("aggregate", BreakdownTypes.TOTAL))
                 results_w, results_wo, results_tot = CalculatorFactory().calculate_result(module, aggregate_by=aggregate_by)
                 Serializer = ResultSerializerFactory().by(aggregate_by)
 
