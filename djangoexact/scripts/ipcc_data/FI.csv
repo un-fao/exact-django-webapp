@@ -1,0 +1,37 @@
+climate;moisture;organic_input_type;value
+Boreal;Moist;Low C input;0,95
+Boreal;Dry;Low C input;0,92
+Cool Temperate;Moist;Low C input;0,95
+Cool Temperate;Dry;Low C input;0,92
+Warm Temperate;Moist;Low C input;0,95
+Warm Temperate;Dry;Low C input;0,92
+Tropical;Moist;Low C input;0,95
+Tropical;Dry;Low C input;0,92
+Tropical;Wet;Low C input;0,92
+Tropical Montane;Moist;Low C input;0,94
+Tropical Montane;Dry;Low C input;0,94
+Tropical Montane;Wet;Low C input;0,94
+Boreal;Moist;High C input, no manure;1,04
+Boreal;Dry;High C input, no manure;1,11
+Cool Temperate;Moist;High C input, no manure;1,04
+Cool Temperate;Dry;High C input, no manure;1,11
+Warm Temperate;Moist;High C input, no manure;1,04
+Warm Temperate;Dry;High C input, no manure;1,11
+Tropical;Moist;High C input, no manure;1,04
+Tropical;Dry;High C input, no manure;1,11
+Tropical;Wet;High C input, no manure;1,11
+Tropical Montane;Moist;High C input, no manure;1,08
+Tropical Montane;Dry;High C input, no manure;1,08
+Tropical Montane;Wet;High C input, no manure;1,08
+Boreal;Moist;High C input, with manure;1,37
+Boreal;Dry;High C input, with manure;1,44
+Cool Temperate;Moist;High C input, with manure;1,37
+Cool Temperate;Dry;High C input, with manure;1,44
+Warm Temperate;Moist;High C input, with manure;1,37
+Warm Temperate;Dry;High C input, with manure;1,44
+Tropical;Moist;High C input, with manure;1,37
+Tropical;Dry;High C input, with manure;1,44
+Tropical;Wet;High C input, with manure;1,44
+Tropical Montane;Moist;High C input, with manure;1,41
+Tropical Montane;Dry;High C input, with manure;1,41
+Tropical Montane;Wet;High C input, with manure;1,41

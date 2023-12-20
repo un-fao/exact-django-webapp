@@ -487,7 +487,7 @@ class Activity(Historical):
     climate_t2 = ForeignKey(Climate, on_delete=CASCADE, null=True, blank=True)
     moisture_t2 = ForeignKey(Moisture, on_delete=CASCADE, null=True, blank=True)
     soil_type_t2 = ForeignKey(SoilType, on_delete=CASCADE, null=True, blank=True)
-    duration_t2 = IntegerField(null=True, blank=True)
+    duration_t2 = IntegerField(default=0)
     start_year_t2 = IntegerField(null=True, blank=True)
 
     def __str__(self):
@@ -508,7 +508,7 @@ class Activity(Historical):
 ##############################
 
 class Submodule(Historical):
-    module_type = ForeignKey("api.ModuleType", on_delete=CASCADE, related_name="%(class)s")
+    # module_type = ForeignKey("api.ModuleType", on_delete=CASCADE, related_name="%(class)s")
 
     class Meta:
         abstract = True
@@ -542,7 +542,7 @@ class Module(Historical):
 
     def save(self, *args, **kwargs):
 
-        if self.pk and not self.status:
+        if not self.status:
             self.status = StatusType.objects.get_or_create(name="EMPTY")[0]
 
         for attr in dir(self):
@@ -644,6 +644,18 @@ class LandModule(Module):
     land_use_type_w = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_w")
     land_use_type_wo = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_wo")
     land_use_type_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_thread")
+
+    flu_t2_start = FloatField(null=True, blank=True)
+    flu_t2_w = FloatField(null=True, blank=True)
+    flu_t2_wo = FloatField(null=True, blank=True)
+
+    fi_t2_start = FloatField(null=True, blank=True)
+    fi_t2_w = FloatField(null=True, blank=True)
+    fi_t2_wo = FloatField(null=True, blank=True)
+
+    fmg_t2_start = FloatField(null=True, blank=True)
+    fmg_t2_w = FloatField(null=True, blank=True)
+    fmg_t2_wo = FloatField(null=True, blank=True)
 
     class Meta:
         abstract = True
@@ -1391,6 +1403,9 @@ class InputType(Model):
     )
     name = CharField(max_length=255, unique=True)
     description = TextField(null=True, blank=True)
+    has_co2_emissions = BooleanField(default=False)
+    has_n2o_emissions = BooleanField(default=False)
+    has_co2_e_emissions = BooleanField(default=False)
 
     class Meta:
         unique_together = ("macro_input_type", "name")
