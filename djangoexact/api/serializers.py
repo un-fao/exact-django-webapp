@@ -332,8 +332,8 @@ class ActivityBuilderSerializer(serializers.Serializer):
         if luc_module and luc_module in module_types:
             raise serializers.ValidationError("Land Use Change module cannot be added manually")
 
-        if has_input and not module_types:
-            raise serializers.ValidationError("If has_input is true, at least one input module must be provided")
+        if has_input:
+            module_types.append(ModuleType.objects.get(name="Input"))
 
         if land_use_change and any(module.is_luc for module in module_types):
             raise serializers.ValidationError("Land Modules cannot be independently added to activities with a Land Use Change")

@@ -528,9 +528,6 @@ def generic_module_viewset(model: Model):
                 logger.error(f"Error creating module: {module_serializer.errors}")
                 return Response(module_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             
-            # for t in get_thread_attributes(model):
-            #     module_serializer.validated_data[t.name] = CommentThread.objects.create()
-
             module_serializer.save()
 
             read_serializer = get_module_serializer(model)(module_serializer.instance)
