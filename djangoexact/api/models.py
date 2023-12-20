@@ -542,7 +542,7 @@ class Module(Historical):
 
     def save(self, *args, **kwargs):
 
-        if self.pk and not self.status:
+        if not self.status:
             self.status = StatusType.objects.get_or_create(name="EMPTY")[0]
 
         for attr in dir(self):
