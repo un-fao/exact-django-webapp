@@ -1,4 +1,4 @@
-from .general_functions import yearly_time_dependent_parameter_breakdown, ch4_head_calculation_general, yearly_constant_emissions_breakdown, soil_emissions_delta_soc_known, yearly_time_dependent_20_year_breakdown
+from .general_functions import yearly_time_dependent_parameter_breakdown, ch4_head_calculation_general, yearly_constant_emissions_breakdown, yearly_time_dependent_20_year_breakdown, soil_emissions_2
 import traceback, re
 from .ghg_emissions_classes import GasTypes, ActivityTypes, Emission, YearlyGasActivityEmissionSet, Result
 
@@ -7,7 +7,9 @@ class OtherLandUseChanges:
 
     def __init__(self, initial_lu_biomass, initial_lu_biomass_tier_2, final_lu_biomass, final_lu_biomass_tier_2,
     c_n_ratio, moisture_emission_factor,combustion_factor, emission_factor_nitrous, emission_factor_methane,nitrous_constant, methane_constant,fire_bool,
-    socref, initial_flu, final_flu, initial_soc_tier_2, final_soc_tier_2, area, time_impl, time_cap, rate, delay=0):
+    soc_start_default, soc_end_default, soc_start_tier_2, soc_end_tier_2, fmg_start_default, fmg_end_default, fmg_start_tier_2, fmg_end_tier_2, 
+    flu_start_default, flu_end_default, flu_start_tier_2, flu_end_tier_2, fi_start_default, fi_end_default, 
+    fi_start_tier_2, fi_end_tier_2, calculate_soc_som, area, time_impl, time_cap, rate, delay=0):
         
         self.initial_lu_biomass = initial_lu_biomass
         self.initial_lu_biomass_tier_2 = initial_lu_biomass_tier_2
@@ -21,19 +23,47 @@ class OtherLandUseChanges:
         self.nitrous_constant = nitrous_constant
         self.methane_constant = methane_constant
         self.fire_bool = fire_bool
-        self.socref = socref
-        self.initial_flu = initial_flu
-        self.final_flu = final_flu
-        self.initial_soc_tier_2 = initial_soc_tier_2
-        self.final_soc_tier_2 = final_soc_tier_2
+        
+        self.soc_start_default = soc_start_default
+        self.soc_end_default = soc_end_default
+        self.soc_start_tier_2 = soc_start_tier_2
+        self.soc_end_tier_2 = soc_end_tier_2
+
+        self.fmg_start_default = fmg_start_default # defaulted to 1 in case there are None, if not float value
+        self.fmg_end_default = fmg_end_default # defaulted to 1 in case there are None, if not float value
+        self.fmg_start_tier_2 = fmg_start_tier_2 # tier 2 value, expects float or None
+        self.fmg_end_tier_2 = fmg_end_tier_2 # tier 2 value, expects float or None
+        self.flu_start_default = flu_start_default # defaulted to 1 in case there are None, if not float value
+        self.flu_end_default = flu_end_default  # defaulted to 1 in case there are None, if not float value
+        self.flu_start_tier_2 = flu_start_tier_2 # tier 2 value, expects float or None
+        self.flu_end_tier_2 = flu_end_tier_2 # tier 2 value, expects float or None
+        self.fi_start_default = fi_start_default # defaulted to 1 in case there are None, if not float value
+        self.fi_end_default = fi_end_default # defaulted to 1 in case there are None, if not float value
+        self.fi_start_tier_2 = fi_start_tier_2 # tier 2 value, expects float or None
+        self.fi_end_tier_2 = fi_end_tier_2 # tier 2 value, expects float or None
+
+        self.calculate_soc_som = calculate_soc_som
+
+        
         self.area = area
         self.time_impl = time_impl - delay
         self.time_cap = time_cap
         self.rate = rate
         self.delay = delay
 
-        # ADDED PARAMETERS FOR CALCULATION
-        self.hectars_before_20, self.hectars_after_20 = yearly_time_dependent_20_year_breakdown(0, self.area, self.time_impl, self.time_cap, self.rate)
+        self.fmg_start = self.fmg_start_tier_2 if self.fmg_start_tier_2 else self.fmg_start_default
+        self.fmg_end = self.fmg_end_tier_2 if self.fmg_end_tier_2 else self.fmg_end_default
+        self.flu_start = self.flu_start_tier_2 if self.flu_start_tier_2 else self.flu_start_default
+        self.flu_end = self.flu_end_tier_2 if self.flu_end_tier_2 else self.flu_end_default
+        self.fi_start = self.fi_start_tier_2 if self.fi_start_tier_2 else self.fi_start_default
+        self.fi_end = self.fi_end_tier_2 if self.fi_end_tier_2 else self.fi_end_default 
+
+        # AUXILIARY VARIABLES FOR SOIL CALCULATION
+        self.hectars_before_20, self.hectars_after_20 = yearly_time_dependent_20_year_breakdown(0, self.area ,self.time_impl, self.time_cap, self.rate)
+        self.total_hectars = yearly_time_dependent_parameter_breakdown(0, self.area, self.time_impl, self.time_cap, self.rate, interim_values = True)
+
+        self.soc_start = self.soc_start_default * self.fmg_start * self.flu_start * self.fi_start if not self.soc_start_tier_2 else self.soc_start_tier_2
+        self.soc_end = self.soc_end_default * self.fmg_end * self.flu_end * self.fi_end if not self.soc_end_tier_2 else self.soc_end_tier_2
 
 
         # TIER 2 VALUE DEFAULTS
@@ -85,31 +115,24 @@ class OtherLandUseChanges:
         def calculate_soc():
 
             try:
-                initial_soc = self.socref if not self.initial_soc_tier_2 else self.initial_soc_tier_2
-                final_soc = self.socref if not self.final_soc_tier_2 else self.final_soc_tier_2
+                if self.calculate_soc_som:
 
-                delta_c_soc_20_years = (final_soc - initial_soc)/20
-                delta_co2_soc = ((final_soc * self.final_flu - initial_soc * self.initial_flu)/20) * (-44/12)
+                    self.yearly_soc_emissions, self.total_soc_emissions = soil_emissions_2(self.soc_start, self.soc_end, self.total_hectars, 0, self.area, self.hectars_before_20)
 
-                self.yearly_soc_emissions, self.total_soc_emissions = soil_emissions_delta_soc_known(delta_c_soc_20_years, delta_co2_soc, 0, self.area, self.hectars_before_20)
-
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
-                    year = 0,
-                    gas_type = GasTypes.CO2,
-                    emissions = [Emission(e, GasTypes.CO2) for e in self.yearly_soc_emissions],
-                    activity = ActivityTypes.SOIL_CO2_CHANGE,
-                    delay=self.delay
-                ))
+                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
+                        year = 0,
+                        gas_type = GasTypes.CO2,
+                        emissions = [Emission(e, GasTypes.CO2) for e in self.yearly_soc_emissions],
+                        activity = ActivityTypes.SOIL_CO2_CHANGE,
+                        delay=self.delay
+                    ))
 
             except Exception as e:
                 traceback.print_exc()
 
         def calculate_fire():
 
-            initial_soc = self.socref * self.initial_flu if not self.initial_soc_tier_2 else self.initial_soc_tier_2
-            final_soc = self.socref * self.final_flu if not self.final_soc_tier_2 else self.final_soc_tier_2
-
-            delta_c_soc = (final_soc - initial_soc)/20
+            delta_c_soc = (self.soc_end - self.soc_start)/20
 
             initial_biomass = self.initial_lu_biomass if not self.initial_lu_biomass_tier_2 else self.initial_lu_biomass_tier_2
             fire_mb = initial_biomass / 0.4

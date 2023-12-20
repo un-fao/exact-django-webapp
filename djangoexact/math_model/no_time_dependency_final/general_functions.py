@@ -88,6 +88,9 @@ def yearly_time_dependent_20_year_breakdown(start_value, end_value, years_implem
     after_20.extend(breakdown)
 
     before_20 = [i-j for i, j in zip(breakdown, after_20[0:len(breakdown)])]
+    
+    # NOTE: remove all negative values and replace them with 0 
+    before_20 = [0 if i < 0 else i for i in before_20]
 
     average_before_20 = average_yearly_value(before_20)
     average_after_20 = average_yearly_value(after_20)[0:len(breakdown) - 1]
@@ -199,21 +202,36 @@ def soil_emissions(hectars_before_20, area_start, area_end,
 
     return emissions_soil_yearly, emissions_soil_total
 
-def soil_emissions_delta_soc_known(delta_soil_c, delta_soil_c_20_years, area_start, area_end, hectars_before_20):
+def soil_emissions_2(soc_start, soc_end, total_hectares, area_start, area_end, hectares_before_20):
 
-    maximum = delta_soil_c_20_years * max(area_start, area_end) * 20
 
-    total_hectars_soil = sum(hectars_before_20)
+    delta_co2_mineral_per_ha_per_yr = - (soc_end - soc_start) / 20 * (44/12)
+
+    calculated = delta_co2_mineral_per_ha_per_yr * sum(total_hectares)
+    tabular = max(area_start, area_end) * delta_co2_mineral_per_ha_per_yr * 20
     
-    predicted_emissions = delta_soil_c_20_years * total_hectars_soil
+    total = tabular if abs(calculated) >= abs(tabular) else calculated
 
-    emissions = predicted_emissions if abs(predicted_emissions) < abs(maximum) else maximum
-
-    emissions_soil_yearly = breakdown_according_to_values(emissions, hectars_before_20)
-    emissions_soil_total = emissions
+    emissions_soil_yearly = breakdown_according_to_values(total, hectares_before_20)
+    emissions_soil_total = total
 
     return emissions_soil_yearly, emissions_soil_total
+
+def som_emissions(soc_final, soc_initial, emission_factor_nitrous, nitrous_constant, hectares_before_20 ):
      
+
+    n2o_n_conversion = 44/28
+
+    som_n2o = 0 if soc_final >= soc_initial else ((soc_final - soc_initial)/20/10*1000)  * emission_factor_nitrous * n2o_n_conversion * (nitrous_constant/1000)
+
+    total = - sum(hectares_before_20) * som_n2o
+
+    # TODO: ask if this should be broken down proportionally, in that case we have to take an approach similar to the one used in the soil calculation
+    emissions_som_yearly = breakdown_according_to_values(total, hectares_before_20)
+    emissions_som_total = total
+
+    return emissions_som_yearly, emissions_som_total
+       
 # INPUT SINGLE MODULE CALCULATION
 def input_single_calculation(unit_start, unit_end, ipcc_factor, tier_2_factor, unit_factor, emissions_factor, time_implementation, time_capitalization, rate_type):
 
@@ -252,3 +270,18 @@ def input_single_calculation_different_ef(unit_start, unit_end, ipcc_factor, tie
             return None
 
         return annual_emissions, sum(annual_emissions)
+
+def soil_emissions_delta_soc_known(delta_soil_c, delta_soil_c_20_years, area_start, area_end, hectars_before_20):
+
+    maximum = delta_soil_c_20_years * max(area_start, area_end) * 20
+
+    total_hectars_soil = sum(hectars_before_20)
+    
+    predicted_emissions = delta_soil_c_20_years * total_hectars_soil
+
+    emissions = predicted_emissions if abs(predicted_emissions) < abs(maximum) else maximum
+
+    emissions_soil_yearly = breakdown_according_to_values(emissions, hectars_before_20)
+    emissions_soil_total = emissions
+
+    return emissions_soil_yearly, emissions_soil_total
