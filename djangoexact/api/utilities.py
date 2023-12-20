@@ -122,3 +122,8 @@ class ScenarioTypes(Enum):
 
 def get_thread_attributes(module: Model):
     return [attr for attr in module._meta.get_fields() if attr.name.endswith("_thread")]
+
+def get_module_status(self, activity, module_type):
+    module_attr = getattr(activity, module_type.class_name.lower(), None)
+    module = module_attr.first() if module_attr else None
+    return module.status if module else None
