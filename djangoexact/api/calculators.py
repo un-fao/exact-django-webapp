@@ -96,29 +96,61 @@ def is_luc_remaining_same(module: LandModule):
     Checks if a module is business as usual.
     """
     luc: LandUseChange = module.land_use_change
-    return not luc or (luc and luc.module_type_start.class_name == module.__name__ and luc.module_type_w.class_name == module.__name__)
+    return not luc or (luc and luc.module_type_start.class_name == module.__class__.__name__ and luc.module_type_w.class_name == module.__class__.__name__)
 
 def is_business_as_usual(module: LandModule):
     """
     Checks if a module is business as usual.
     """
     luc: LandUseChange = module.land_use_change
-    return not luc or (luc and luc.module_type_start.class_name == module.__name__ and luc.module_type_wo.class_name == module.__name__)
+    return not luc or (luc and luc.module_type_start.class_name == module.__class__.__name__ and luc.module_type_wo.class_name == module.__class__.__name__)
 
 def is_without(module: LandModule):
     """
     Checks if a module is business as usual.
     """
     luc: LandUseChange = module.land_use_change
-    return not luc or (luc.module_type_wo.class_name == module.__name__)
+    return not luc or (luc.module_type_wo.class_name == module.__class__.__name__)
 
 def is_with(module: LandModule):
     """
     Checks if a module is business as usual.
     """
     luc: LandUseChange = module.land_use_change
-    return not luc or (luc.module_type_w.class_name == module.__name__)
+    return not luc or (luc.module_type_w.class_name == module.__class__.__name__)
 
+def get_fi_data(module, scenario: utils.ScenarioTypes):
+    attr = getattr(module, f"organic_input_type_{scenario}", None)
+    if attr:
+        return FIData.objects.get(**cm,organic_input_type=attr)
+    else:
+        return SimpleNamespace(value=1)
+                
+def get_fmg_data(module, scenario: utils.ScenarioTypes):
+    attr = getattr(module, f"tillage_management_type_{scenario}", None)
+    if attr:
+        return FMGData.objects.get(**cm,tillage_management_type=attr)
+    else:
+        return SimpleNamespace(value=1)
+    
+def get_flu_data(module, scenario: utils.ScenarioTypes):
+    attr = getattr(module, f"land_use_type_{scenario}", None)
+    if attr:
+        return FLUData.objects.get(**cm,land_use_type=attr)
+    else:
+        return SimpleNamespace(value=1)
+    
+def get_luc_modules(luc:LandUseChange) -> tuple[LandModule]:
+            modules = (
+                getattr(luc.activity, luc.module_type_start.class_name.lower(), None).first(),
+                getattr(luc.activity, luc.module_type_w.class_name.lower(), None).first(),
+                getattr(luc.activity, luc.module_type_wo.class_name.lower(), None).first(),
+            )
+
+            if not all(modules):
+                raise Exception("At least one module is missing")
+            
+            return modules
 class Result:
     """
     Base class for all results.
@@ -263,6 +295,7 @@ class LandUseChangeCalculator(BaseCalculator):
         results_w, results_wo = self.luc_based_calculation(module_start, module_w, aggregate_by=aggregate_by)
 
         return (results_w, results_wo)
+
 class DeforestationCalculator(BaseCalculator):
     """
     TODO: Refactor with new logic
@@ -661,17 +694,50 @@ class OtherLandUseCalculator(BaseCalculator):
 
         soc = SoilOrganicCarbon.objects.get(**cm, soil_type=project.soil_type)
 
-        fmg_start = FMGData.objects.get(**cm, tillage_management_type=module_start.tillage_management_type)
-        fmg_final_w = FMGData.objects.get(**cm, tillage_management_type=module_w.tillage_management_type)
-        fmg_final_wo = FMGData.objects.get(**cm, tillage_management_type=module_wo.tillage_management_type)
+        if getattr(module_start, "tillage_management_type_start", None):
+            fmg_start = FMGData.objects.get(**cm, tillage_management_type=module_start.tillage_management_type)
+        else: 
+            fmg_start = SimpleNamespace(value=1)
 
-        fi_start = FIData.objects.get(**cm, organic_input_type=module_start.organic_input_type)
-        fi_final_w = FIData.objects.get(**cm, organic_input_type=module_w.organic_input_type)
-        fi_final_wo = FIData.objects.get(**cm, organic_input_type=module_wo.organic_input_type)
+        if getattr(module_w, "tillage_management_type_w", None):
+            fmg_final_w = FMGData.objects.get(**cm, tillage_management_type=module_w.tillage_management_type_w)
+        else:
+            fmg_final_w = SimpleNamespace(value=1)
 
-        flu_start = FLUData.objects.get_or_default(**cm, land_use_type=luc_start)
-        flu_final_w = FLUData.objects.get_or_default(**cm, land_use_type=luc_w)
-        flu_final_wo = FLUData.objects.get_or_default(**cm, land_use_type=luc_wo)
+        if getattr(module_wo, "tillage_management_type_wo", None):
+            fmg_final_wo = FMGData.objects.get(**cm, tillage_management_type=module_wo.tillage_management_type)
+        else:
+            fmg_final_wo = SimpleNamespace(value=1)
+
+        if getattr(module_start, "organic_input_type_start", None):
+            fi_start = FIData.objects.get(**cm, organic_input_type=module_start.organic_input_type_start)
+        else:
+            fi_start = SimpleNamespace(value=1)
+        
+        if getattr(module_w, "organic_input_type_w", None):
+            fi_final_w = FIData.objects.get(**cm, organic_input_type=module_w.organic_input_type_w)
+        else:
+            fi_final_w = SimpleNamespace(value=1)
+
+        if getattr(module_wo, "organic_input_type_wo", None):
+            fi_final_wo = FIData.objects.get(**cm, organic_input_type=module_wo.organic_input_type_wo)
+        else:
+            fi_final_wo = SimpleNamespace(value=1)
+
+        if getattr(module_start, "land_use_type_start", None):
+            flu_start = FLUData.objects.get(**cm, land_use_type=module_start.land_use_type_start)
+        else:
+            flu_start = SimpleNamespace(value=1)
+        
+        if getattr(module_w, "land_use_type_w", None):
+            flu_final_w = FLUData.objects.get(**cm, land_use_type__name="Annual Cropland") # TODO: Fix this (extend to all land use types)
+        else:
+            flu_final_w = SimpleNamespace(value=1)
+        
+        if getattr(module_wo, "land_use_type_wo", None):
+            flu_final_wo = FLUData.objects.get(**cm, land_use_type=module_wo.land_use_type_wo)
+        else:
+            flu_final_wo = SimpleNamespace(value=1)
 
         c_n_ratio_w = utils.CN_RATIO_GRASSLAND if luc.module_type_w.class_name == "Grassland" else utils.CN_RATIO_FOREST
         c_n_ratio_wo = utils.CN_RATIO_GRASSLAND if luc.module_type_wo.class_name == "Grassland" else utils.CN_RATIO_FOREST
@@ -779,15 +845,52 @@ class AnnualCroppingCalculator(BaseCalculator):
         input: AnnualCropping = self.data
         project: Project = input.activity.project
         luc: LandUseChange = input.land_use_change
+        module_start, module_w, module_wo = get_luc_modules(luc)
         
+        area = luc.area if luc else input.area
         change_rate = input.activity.change_rate
         climate = project.climate
         moisture = project.moisture
         soil_type = project.soil_type
 
-        area = luc.area if luc else input.area
-
         cm = {"climate": climate, "moisture": moisture}
+
+        fi_start = get_fi_data(module_start, utils.ScenarioTypes.START)
+        fmg_start = get_fmg_data(module_start, utils.ScenarioTypes.START)
+        flu_start = get_flu_data(module_start, utils.ScenarioTypes.START)
+
+        fi_w = get_fi_data(module_w, utils.ScenarioTypes.WITH)
+        fmg_w = get_fmg_data(module_w, utils.ScenarioTypes.WITH)
+        flu_w = get_flu_data(module_w, utils.ScenarioTypes.WITH)
+
+        fi_wo = get_fi_data(module_wo, utils.ScenarioTypes.WITHOUT)
+        fmg_wo = get_fmg_data(module_wo, utils.ScenarioTypes.WITHOUT)
+        flu_wo = get_flu_data(module_wo, utils.ScenarioTypes.WITHOUT)
+
+        crop_yield_start = (
+            input.crop_yield_start
+            if input.crop_yield_start
+            else CropYieldStats.objects.get_or_region_average(
+                continent=project.country.region, land_use_type=input.land_use_type_start
+            ).average
+        )
+
+        crop_yield_w = (
+            input.crop_yield_w
+            if input.crop_yield_w
+            else CropYieldStats.objects.get_or_region_average(
+                continent=project.country.region, land_use_type=input.land_use_type_w
+            ).average
+        )
+
+        crop_yield_wo = (
+            input.crop_yield_wo
+            if input.crop_yield_wo
+            else CropYieldStats.objects.get_or_region_average(
+                continent=project.country.region, land_use_type=input.land_use_type_wo
+            ).average
+        )
+
 
         # General
         soc = SoilOrganicCarbon.objects.get(**cm, soil_type=soil_type)
@@ -806,12 +909,8 @@ class AnnualCroppingCalculator(BaseCalculator):
 
         if is_luc_remaining_same(input):
             lut_start = input.land_use_type_start
-            lut_w = input.land_use_type_w
-
             minor_lut_start = input.minor_land_use_type_start
-
             fires_start = FiresCombustionFactor.objects.get(land_use_type=lut_start)
-
             n_estimation_factor_start = CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=lut_start)
 
             try:
@@ -822,29 +921,6 @@ class AnnualCroppingCalculator(BaseCalculator):
                 minor_n_estimation_factor_start = None
             
             emission_factors_start = DefaultEmissionFactor.objects.get(moisture=moisture, organic_input_type=input.organic_input_type_start)
-            emission_factors_w = DefaultEmissionFactor.objects.get(moisture=moisture, organic_input_type=input.organic_input_type_w)
-
-            fi_start = CroplandFI.objects.get(**cm,organic_input_type=input.organic_input_type_start)
-            fi_w = CroplandFI.objects.get(**cm,organic_input_type=input.organic_input_type_w)
-
-            fmg_start = CroplandFMG.objects.get(**cm,tillage_management_type=input.tillage_management_type_start)
-            fmg_w = CroplandFMG.objects.get(**cm,tillage_management_type=input.tillage_management_type_w)
-
-            crop_yield_start = (
-                input.crop_yield_start
-                if input.crop_yield_start
-                else CropYieldStats.objects.get_or_region_average(
-                    continent=project.country.region, land_use_type=lut_start
-                ).average
-            )
-
-            crop_yield_w = (
-                input.crop_yield_w
-                if input.crop_yield_w
-                else CropYieldStats.objects.get_or_region_average(
-                    continent=project.country.region, land_use_type=lut_w
-                ).average
-            )
 
             inputs_start_w = [
                 *[area, 0],
@@ -858,16 +934,16 @@ class AnnualCroppingCalculator(BaseCalculator):
                 input.soc_t2_w,
                 fmg_start.value,
                 fmg_w.value,
-                input.main_tillage_factor_t2_start, # TODO: Rename all to proper names
-                input.main_tillage_factor_t2_w,
-                flu.value,
-                flu.value, # TODO: Will change with actual land_use_type reference when tables are unified
-                input.main_land_use_factor_t2_start,
-                input.main_land_use_factor_t2_w,
+                module_start.fmg_t2_start,
+                input.fmg_t2_w,
+                flu_start.value,
+                flu_w.value, 
+                module_start.flu_t2_start,
+                input.flu_t2_w,
                 fi_start.value,
                 fi_w.value,
-                input.main_organic_input_factor_t2_start,
-                input.main_organic_input_factor_t2_w,
+                module_start.fi_t2_start,
+                input.fi_t2_w,
                 False,
                 emission_factors_start.value,
                 project.gw_potential.n2o,
@@ -902,55 +978,21 @@ class AnnualCroppingCalculator(BaseCalculator):
 
         if is_with(input):
 
-            lut_start = input.land_use_type_start
             lut_w = input.land_use_type_w
-
-            minor_lut_start = input.minor_land_use_type_start
             minor_lut_w = input.minor_land_use_type_w
-
-            fires_start = FiresCombustionFactor.objects.get(land_use_type=lut_start)
             fires_w = FiresCombustionFactor.objects.get(land_use_type=lut_w)
-
-            n_estimation_factor_start = CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=lut_start)
             n_estimation_factor_w = CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=lut_w)
 
             try:
-                minor_fires_start = FiresCombustionFactor.objects.get(land_use_type=minor_lut_start)
                 minor_fires_w = FiresCombustionFactor.objects.get(land_use_type=lut_w)
 
-                minor_n_estimation_factor_start = CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=minor_lut_start)
                 minor_n_estimation_factor_w = CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=minor_lut_w)
             except:
-                minor_fires_start = None
                 minor_fires_w = None
 
-                minor_n_estimation_factor_start = None
                 minor_n_estimation_factor_w = None
             
-            emission_factors_start = DefaultEmissionFactor.objects.get(moisture=moisture, organic_input_type=input.organic_input_type_start)
             emission_factors_w = DefaultEmissionFactor.objects.get(moisture=moisture, organic_input_type=input.organic_input_type_w)
-
-            fi_start = CroplandFI.objects.get(**cm,organic_input_type=input.organic_input_type_start)
-            fi_w = CroplandFI.objects.get(**cm,organic_input_type=input.organic_input_type_w)
-
-            fmg_start = CroplandFMG.objects.get(**cm,tillage_management_type=input.tillage_management_type_start)
-            fmg_w = CroplandFMG.objects.get(**cm,tillage_management_type=input.tillage_management_type_w)
-
-            crop_yield_start = (
-                input.crop_yield_start
-                if input.crop_yield_start
-                else CropYieldStats.objects.get_or_region_average(
-                    continent=project.country.region, land_use_type=lut_start
-                ).average
-            )
-
-            crop_yield_w = (
-                input.crop_yield_w
-                if input.crop_yield_w
-                else CropYieldStats.objects.get_or_region_average(
-                    continent=project.country.region, land_use_type=lut_w
-                ).average
-            )
 
             inputs_w = [
                 *[0, area],
@@ -964,16 +1006,16 @@ class AnnualCroppingCalculator(BaseCalculator):
                 input.soc_t2_w,
                 fmg_start.value,
                 fmg_w.value,
-                input.main_tillage_factor_t2_start, # TODO: Rename all to proper names
-                input.main_tillage_factor_t2_w,
-                flu.value,
-                flu.value, # TODO: Will change with actual land_use_type reference when tables are unified
-                input.main_land_use_factor_t2_start,
-                input.main_land_use_factor_t2_w,
+                module_start.fmg_t2_start,
+                input.fmg_t2_w,
+                flu_start.value,
+                flu_w.value,
+                module_start.flu_t2_start,
+                input.flu_t2_w,
                 fi_start.value,
                 fi_w.value,
-                input.main_organic_input_factor_t2_start,
-                input.main_organic_input_factor_t2_w,
+                module_start.fi_t2_start,
+                input.fi_t2_w,
                 True,
                 emission_factors_w.value,
                 project.gw_potential.n2o,
@@ -1010,11 +1052,8 @@ class AnnualCroppingCalculator(BaseCalculator):
         if is_business_as_usual(input):
             lut_start = input.land_use_type_start
             lut_wo = input.land_use_type_wo
-
             minor_lut_start = input.minor_land_use_type_start
-
             fires_start = FiresCombustionFactor.objects.get(land_use_type=lut_start)
-
             n_estimation_factor_start = CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=lut_start)
 
             try:
@@ -1025,29 +1064,6 @@ class AnnualCroppingCalculator(BaseCalculator):
                 minor_n_estimation_factor_start = None
             
             emission_factors_start = DefaultEmissionFactor.objects.get(moisture=moisture, organic_input_type=input.organic_input_type_start)
-            emission_factors_wo = DefaultEmissionFactor.objects.get(moisture=moisture, organic_input_type=input.organic_input_type_wo)
-
-            fi_start = CroplandFI.objects.get(**cm,organic_input_type=input.organic_input_type_start)
-            fi_wo = CroplandFI.objects.get(**cm,organic_input_type=input.organic_input_type_wo)
-
-            fmg_start = CroplandFMG.objects.get(**cm,tillage_management_type=input.tillage_management_type_start)
-            fmg_wo = CroplandFMG.objects.get(**cm,tillage_management_type=input.tillage_management_type_wo)
-
-            crop_yield_start = (
-                input.crop_yield_start
-                if input.crop_yield_start
-                else CropYieldStats.objects.get_or_region_average(
-                    continent=project.country.region, land_use_type=lut_start
-                ).average
-            )
-
-            crop_yield_wo = (
-                input.crop_yield_wo
-                if input.crop_yield_wo
-                else CropYieldStats.objects.get_or_region_average(
-                    continent=project.country.region, land_use_type=lut_wo
-                ).average
-            )
 
             inputs_start_wo = [
                 *[area, 0],
@@ -1061,16 +1077,16 @@ class AnnualCroppingCalculator(BaseCalculator):
                 input.soc_t2_wo,
                 fmg_start.value,
                 fmg_wo.value,
-                input.main_tillage_factor_t2_start, # TODO: Rename all to proper names
-                input.main_tillage_factor_t2_wo,
-                flu.value,
-                flu.value, # TODO: Will change with actual land_use_type reference when tables are unified
-                input.main_land_use_factor_t2_start,
-                input.main_land_use_factor_t2_wo,
+                input.fmg_t2_start,
+                input.fmg_t2_wo,
+                flu_start.value,
+                flu_wo.value,
+                input.flu_t2_start,
+                input.flu_t2_wo,
                 fi_start.value,
                 fi_wo.value,
-                input.main_organic_input_factor_t2_start,
-                input.main_organic_input_factor_t2_wo,
+                input.fi_t2_start,
+                input.fi_t2_wo,
                 False,
                 emission_factors_start.value,
                 project.gw_potential.n2o,
@@ -1111,49 +1127,20 @@ class AnnualCroppingCalculator(BaseCalculator):
             minor_lut_start = input.minor_land_use_type_start
             minor_lut_wo = input.minor_land_use_type_wo
 
-            fires_start = FiresCombustionFactor.objects.get(land_use_type=lut_start)
             fires_wo = FiresCombustionFactor.objects.get(land_use_type=lut_wo)
-
-            n_estimation_factor_start = CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=lut_start)
             n_estimation_factor_wo = CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=lut_wo)
+
             try:
-                minor_fires_start = FiresCombustionFactor.objects.get(land_use_type=minor_lut_start)
                 minor_fires_wo = FiresCombustionFactor.objects.get(land_use_type=lut_wo)
 
-                minor_n_estimation_factor_start = CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=minor_lut_start)
                 minor_n_estimation_factor_wo = CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=minor_lut_wo)
 
             except:
-                minor_fires_start = None
                 minor_fires_wo = None
 
-                minor_n_estimation_factor_start = None
                 minor_n_estimation_factor_wo = None
 
-            emission_factors_start = DefaultEmissionFactor.objects.get(moisture=moisture, organic_input_type=input.organic_input_type_start)
             emission_factors_wo = DefaultEmissionFactor.objects.get(moisture=moisture, organic_input_type=input.organic_input_type_wo)
-
-            fi_start = CroplandFI.objects.get(**cm,organic_input_type=input.organic_input_type_start)
-            fi_wo = CroplandFI.objects.get(**cm,organic_input_type=input.organic_input_type_wo)
-
-            fmg_start = CroplandFMG.objects.get(**cm,tillage_management_type=input.tillage_management_type_start)
-            fmg_wo = CroplandFMG.objects.get(**cm,tillage_management_type=input.tillage_management_type_wo)
-
-            crop_yield_start = (
-                input.crop_yield_start
-                if input.crop_yield_start
-                else CropYieldStats.objects.get_or_region_average(
-                    continent=project.country.region, land_use_type=lut_start
-                ).average
-            )
-
-            crop_yield_wo = (
-                input.crop_yield_wo
-                if input.crop_yield_wo
-                else CropYieldStats.objects.get_or_region_average(
-                    continent=project.country.region, land_use_type=lut_wo
-                ).average
-            )
 
             inputs_wo = [
                 *[0, area],
@@ -1167,16 +1154,16 @@ class AnnualCroppingCalculator(BaseCalculator):
                 input.soc_t2_wo,
                 fmg_start.value,
                 fmg_wo.value,
-                input.main_tillage_factor_t2_start, # TODO: Rename all to proper names
-                input.main_tillage_factor_t2_wo,
+                module_start.fmg_t2_start,
+                input.fmg_t2_wo,
                 flu.value,
-                flu.value, # TODO: Will change with actual land_use_type reference when tables are unified
-                input.main_land_use_factor_t2_start,
-                input.main_land_use_factor_t2_wo,
+                flu.value,
+                module_start.flu_t2_start,
+                input.flu_t2_wo,
                 fi_start.value,
                 fi_wo.value,
-                input.main_organic_input_factor_t2_start,
-                input.main_organic_input_factor_t2_wo,
+                module_start.fi_t2_start,
+                input.fi_t2_wo,
                 True,
                 emission_factors_wo.value,
                 project.gw_potential.n2o,
