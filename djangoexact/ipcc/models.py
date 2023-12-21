@@ -1,5 +1,6 @@
-from django.db.models import *
 from types import SimpleNamespace
+
+from django.db.models import *
 
 
 class GlobalWarmingPotential(Model):
@@ -20,6 +21,7 @@ class NitrousEmissionFactor(Model):
     def __str__(self):
         return self.name
 
+
 class TotalBiomassAfterDefoManager(Manager):
     def get_or_default(self, climate, moisture, continent, land_use_type):
         try:
@@ -36,6 +38,8 @@ class TotalBiomassAfterDefoManager(Manager):
                 continent=continent,
                 land_use_type__name__icontains="Default",
             )
+
+
 class TotalBiomassAfterDefo(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
@@ -78,13 +82,15 @@ class CombustionFactor(Model):
     def __str__(self):
         return f"Factor for {self.land_use_type.name}, value: {self.value}"
 
+
 class AfforestationCombustionFactorManager(Manager):
     def get_or_default(self, land_use_type):
         try:
             return self.get(land_use_type=land_use_type)
         except AfforestationCombustionFactor.DoesNotExist:
             return self.get(land_use_type__name__icontains="Default")
-        
+
+
 class AfforestationCombustionFactor(Model):
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     co2 = FloatField(null=True)
@@ -102,6 +108,7 @@ class DefaultEmissionFactor(Model):
     """
     IPCC:A96
     """
+
     organic_input_type = ForeignKey("api.OrganicInputType", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     value = FloatField()
@@ -118,6 +125,7 @@ class LitterDeadwoodCarbonStock(Model):
     def __str__(self):
         return f"{self.land_use_type.name}, litter: {self.litter}, dw: {self.dw}"
 
+
 class LandUseCarbonStockExchangeFactorManager(Manager):
     def get_or_default(self, climate, moisture, land_use_type):
         try:
@@ -132,6 +140,8 @@ class LandUseCarbonStockExchangeFactorManager(Manager):
                 moisture=moisture,
                 land_use_type__name__icontains="Default",
             )
+
+
 class LandUseCarbonStockExchangeFactor(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
@@ -171,12 +181,15 @@ class BelowGroundBiomassManager(Manager):
         NOTE: If a new, highest threshold is added to the db, this can return the wrong value unless the old highest threshold is set to a proper value
         """
         return (
-            self.filter(continent=continent, land_use_type=land_use_type,)
+            self.filter(
+                continent=continent,
+                land_use_type=land_use_type,
+            )
             .filter(Q(threshold__gt=threshold) | Q(threshold__isnull=True))
             .order_by("threshold")
             .first()
         )
-    
+
     def get_first_above_threshold(self, continent, land_use_type, threshold) -> "BelowGroundBiomass":
         """
         Returns the first value above the threshold.
@@ -217,9 +230,7 @@ class BelowGroundBiomassManager(Manager):
 class BelowGroundBiomass(Model):
     continent = ForeignKey("api.Region", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
-    threshold = FloatField(
-        null=True, blank=True
-    )  # Maximum acceptable ag_biomass needed for this value to be chosen
+    threshold = FloatField(null=True, blank=True)  # Maximum acceptable ag_biomass needed for this value to be chosen
     value = FloatField()
     objects = BelowGroundBiomassManager()
 
@@ -235,6 +246,7 @@ class SoilOrganicCarbon(Model):
 
     def __str__(self):
         return f"{self.climate} {self.moisture} for {self.soil_type} soil, value {self.value}"
+
 
 class ForestTotalBiomassManager(Manager):
     def get_or_default(self, climate, moisture, continent, land_use_type):
@@ -253,6 +265,7 @@ class ForestTotalBiomassManager(Manager):
                 land_use_type__name__icontains="Default",
             )
 
+
 class ForestTotalBiomass(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
@@ -264,6 +277,7 @@ class ForestTotalBiomass(Model):
 
     def __str__(self):
         return f"{self.climate} {self.moisture} for {self.continent} {self.land_use_type}, value {self.value}"
+
 
 class AfforestationLandUseStockExchangeFactorManager(Manager):
     def get_or_default(self, climate, moisture, land_use_type):
@@ -279,6 +293,8 @@ class AfforestationLandUseStockExchangeFactorManager(Manager):
                 moisture=moisture,
                 land_use_type__name__icontains="Default",
             )
+
+
 class AfforestationLandUseStockExchangeFactor(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
@@ -289,6 +305,7 @@ class AfforestationLandUseStockExchangeFactor(Model):
 
     def __str__(self):
         return f"{self.climate} {self.moisture} for {self.land_use_type}, value {self.value}"
+
 
 class AboveGroundNetBiomassGrowth(Model):
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
@@ -311,6 +328,7 @@ class BurningEmissionFactor(Model):
     """
     IPCC:A75
     """
+
     category = ForeignKey("ipcc.EmissionFactorCategory", on_delete=CASCADE)
     co2 = FloatField()
     co = FloatField()
@@ -337,6 +355,7 @@ class FiresCombustionFactor(Model):
     """
     IPCC:A84
     """
+
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField()
 
@@ -361,6 +380,7 @@ class CropNitrousEstimationDefaultFactor(Model):
     """
     IPCC:A8
     """
+
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     slope = FloatField(null=True, blank=True)
     intercept = FloatField(null=True, blank=True)
@@ -398,6 +418,7 @@ class CoastalAGB(Model):
     """
     IPCC 2094
     """
+
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
@@ -412,6 +433,7 @@ class CoastalBGB(Model):
     """
     IPCC 2113
     """
+
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
@@ -426,6 +448,7 @@ class CoastalLitter(Model):
     """
     IPCC 2128
     """
+
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
@@ -436,15 +459,18 @@ class CoastalDeadwood(Model):
     """
     IPCC 2145
     """
+
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField(default=0)
 
+
 class DefaultSoilCarbonStock1Meter(Model):
     """
     IPCC 2164
     """
+
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
@@ -460,6 +486,7 @@ class RewettingCarbonFactor(Model):
     """
     IPCC 2228
     """
+
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
@@ -470,12 +497,13 @@ class RewettingMethaneFactor(Model):
     """
     IPCC 2245
     """
+
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField(default=0)
     salinity = ForeignKey("api.SalinityType", on_delete=CASCADE)
-    
+
     def __str__(self):
         return f"{self.value} for {self.climate.name} {self.moisture.name} {self.land_use_type.name} {self.salinity.value}"
 
@@ -514,6 +542,7 @@ class DrainageEmissionFactor(Model):
     """
     IPCC 2111
     """
+
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
@@ -545,6 +574,7 @@ class PerennialAGB(Model):
     """
     IPCC A107
     """
+
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     continent = ForeignKey("api.Region", on_delete=CASCADE)
@@ -592,6 +622,7 @@ class PerennialMaxAGB(Model):
     """
     IPCC A3237
     """
+
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField(default=0, null=True, blank=True)
@@ -654,9 +685,7 @@ class GrasslandAGB(Model):
 
 
 class GrasslandSOC(Model):
-    grassland_management_type = ForeignKey(
-        "api.GrasslandManagementType", on_delete=CASCADE
-    )
+    grassland_management_type = ForeignKey("api.GrasslandManagementType", on_delete=CASCADE)
     value = FloatField(default=0)
 
     def __str__(self):
@@ -664,9 +693,7 @@ class GrasslandSOC(Model):
 
 
 class GrasslandStockExchangeFactor(Model):
-    grassland_management_type = ForeignKey(
-        "api.GrasslandManagementType", on_delete=CASCADE
-    )
+    grassland_management_type = ForeignKey("api.GrasslandManagementType", on_delete=CASCADE)
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     fmg = FloatField(default=1)
     flu = FloatField(default=1)
@@ -674,6 +701,7 @@ class GrasslandStockExchangeFactor(Model):
 
     def __str__(self):
         return f"{self.fmg} {self.flu} {self.fi} for {self.grassland_management_type.name} {self.climate.name}"
+
 
 class ElectricityEmission(Model):
     country = ForeignKey("api.Country", on_delete=CASCADE)
@@ -697,9 +725,7 @@ class ElectricityEmission(Model):
 class SmallFisheryFUIManager(Manager):
     def get_value_or_average(request, fishery_type, gear_type):
         try:
-            model = SmallFisheryFUI.objects.get(
-                fishery_type=fishery_type, gear_type=gear_type
-            )
+            model = SmallFisheryFUI.objects.get(fishery_type=fishery_type, gear_type=gear_type)
             return model.value
         except SmallFisheryFUI.DoesNotExist:
             _all = SmallFisheryFUI.objects.filter(fishery_type=fishery_type)
@@ -712,9 +738,7 @@ class SmallFisheryFUIManager(Manager):
 class LargeFisheryFUIManager(Manager):
     def get_value_or_average(request, fish_type, gear_type):
         try:
-            model = LargeFisheryFUI.objects.get(
-                fish_type=fish_type, gear_type=gear_type
-            )
+            model = LargeFisheryFUI.objects.get(fish_type=fish_type, gear_type=gear_type)
 
             if model.median is None:
                 raise LargeFisheryFUI.DoesNotExist
@@ -722,9 +746,7 @@ class LargeFisheryFUIManager(Manager):
             return model.median
         except LargeFisheryFUI.DoesNotExist:
             _all = LargeFisheryFUI.objects.filter(fish_type=fish_type)
-            not_specified = LargeFisheryFUI.objects.filter(
-                gear_type__name="Not Specified"
-            ).first()
+            not_specified = LargeFisheryFUI.objects.filter(gear_type__name="Not Specified").first()
             _all = _all.exclude(gear_type__name="Not Specified")
 
             _sum = sum([x.median * x.n for x in _all])
@@ -817,18 +839,14 @@ class InputReference(Model):
     production_emissions_multiplier = FloatField(null=True, blank=True)
 
     def __str__(self):
-        return (
-            f"Input Reference for {self.input_type.name} and {self.gw_potential.name}"
-        )
+        return f"Input Reference for {self.input_type.name} and {self.gw_potential.name}"
 
 
 class InputEmissionFactor(Model):
     input_type = ForeignKey("api.InputType", on_delete=CASCADE)
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
-    water_regime_type = ForeignKey(
-        "api.WaterRegimeType", on_delete=CASCADE, null=True, blank=True
-    )
+    water_regime_type = ForeignKey("api.WaterRegimeType", on_delete=CASCADE, null=True, blank=True)
     co2_value = FloatField(null=True, blank=True)
     n2o_value = FloatField(null=True, blank=True)
     co2_eq_value = FloatField(null=True, blank=True)
@@ -844,12 +862,14 @@ class BuildingEmissionFactor(Model):
     def __str__(self):
         return f"({self.pk}) {self.building_type.name} {self.value}"
 
+
 class RoadEmissionFactor(Model):
     road_type = ForeignKey("api.RoadType", on_delete=CASCADE)
     value = FloatField(null=True, blank=True)
 
     def __str__(self):
         return f"({self.pk}) {self.road_type.name} {self.value}"
+
 
 class LivestockEntericEF(Model):
     """
@@ -876,9 +896,7 @@ class LivestockManureEF(Model):
 
     emission_type = ForeignKey(EmissionType, on_delete=CASCADE)
     livestock_category_type = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
-    livestock_production_type = ForeignKey(
-        "api.LivestockProductionType", on_delete=CASCADE
-    )
+    livestock_production_type = ForeignKey("api.LivestockProductionType", on_delete=CASCADE)
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     manure_management_type = ForeignKey("api.ManureManagementType", on_delete=CASCADE)
@@ -893,9 +911,7 @@ class LivestockTAM(Model):
     IPCC 2315:2364
     """
 
-    livestock_production_type = ForeignKey(
-        "api.LivestockProductionType", on_delete=CASCADE
-    )
+    livestock_production_type = ForeignKey("api.LivestockProductionType", on_delete=CASCADE)
     livestock_category_type = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
     ipcc_region = ForeignKey("api.IPCCRegion", on_delete=CASCADE)
     value = FloatField()
@@ -910,17 +926,13 @@ class LivestockVSER(Model):
     """
 
     emission_type = ForeignKey(EmissionType, on_delete=CASCADE, null=True, blank=True)
-    livestock_production_type = ForeignKey(
-        "api.LivestockProductionType", on_delete=CASCADE
-    )
+    livestock_production_type = ForeignKey("api.LivestockProductionType", on_delete=CASCADE)
     livestock_category_type = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
     ipcc_region = ForeignKey("api.IPCCRegion", on_delete=CASCADE)
     value = FloatField()
 
     @staticmethod
-    def get_average_value(
-        emission_type, production_type, livestock_category, ipcc_region
-    ):
+    def get_average_value(emission_type, production_type, livestock_category, ipcc_region):
         values = LivestockVSER.objects.filter(
             emission_type=emission_type,
             livestock_production_type=production_type,
@@ -939,9 +951,7 @@ class LivestockNER(Model):
     """
 
     emission_type = ForeignKey(EmissionType, on_delete=CASCADE)
-    livestock_production_type = ForeignKey(
-        "api.LivestockProductionType", on_delete=CASCADE
-    )
+    livestock_production_type = ForeignKey("api.LivestockProductionType", on_delete=CASCADE)
     livestock_category_type = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
     continent = ForeignKey("api.Region", on_delete=CASCADE)
     value = FloatField()
@@ -954,12 +964,8 @@ class LivestockAnimalWasteManagementSystem(Model):
     Value is a percentage expressed as a decimal <= 1
     """
 
-    livestock_production_type = ForeignKey(
-        "api.LivestockProductionType", on_delete=CASCADE
-    )
-    manure_management_type = ForeignKey(
-        "api.ManureManagementType", on_delete=CASCADE, null=True, blank=True
-    )
+    livestock_production_type = ForeignKey("api.LivestockProductionType", on_delete=CASCADE)
+    manure_management_type = ForeignKey("api.ManureManagementType", on_delete=CASCADE, null=True, blank=True)
     livestock_category_type = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
     ipcc_region = ForeignKey("api.IPCCRegion", on_delete=CASCADE)
     value = FloatField()
@@ -974,9 +980,7 @@ class LivestockNER(Model):
     """
 
     ipcc_region = ForeignKey("api.IPCCRegion", on_delete=CASCADE)
-    livestock_production_type = ForeignKey(
-        "api.LivestockProductionType", on_delete=CASCADE
-    )
+    livestock_production_type = ForeignKey("api.LivestockProductionType", on_delete=CASCADE)
     livestock_category_type = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
     value = FloatField()
 
@@ -987,9 +991,7 @@ class MethaneEntericFermentationFactor(Model):
     """
 
     ipcc_region = ForeignKey("api.IPCCRegion", on_delete=CASCADE)
-    livestock_production_type = ForeignKey(
-        "api.LivestockProductionType", on_delete=CASCADE
-    )
+    livestock_production_type = ForeignKey("api.LivestockProductionType", on_delete=CASCADE)
     livestock_category_type = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
     value = FloatField()
 
@@ -1024,9 +1026,7 @@ class EnergyDefaultEmissionFactor(Model):
 
 
 class IrrigationSystemData(Model):
-    irrigation_system_type = OneToOneField(
-        "api.IrrigationSystemType", on_delete=CASCADE
-    )
+    irrigation_system_type = OneToOneField("api.IrrigationSystemType", on_delete=CASCADE)
     value = FloatField()
 
     def __str__(self):
@@ -1061,7 +1061,8 @@ class IrrigationPressureRequirement(Model):
 
     def __str__(self):
         return f"({self.pk}) {self.irrigation_system_type.name} {self.avg_pressure}"
-    
+
+
 class RiceDefaultEmissionFactor(Model):
     continent = ForeignKey("api.Region", on_delete=CASCADE)
     cultivation_period = IntegerField()
@@ -1069,35 +1070,40 @@ class RiceDefaultEmissionFactor(Model):
 
     def __str__(self):
         return f"({self.pk}) {self.continent.name} {self.value}"
-    
+
+
 class RiceSFO(Model):
     organic_amendment_type = ForeignKey("api.OrganicAmendmentType", on_delete=CASCADE)
     value = FloatField()
 
     def __str__(self):
         return f"({self.pk}) {self.organic_amendment_type.name} {self.value}"
-    
+
+
 class RiceSFP(Model):
     water_management_type_before_cultivation = ForeignKey("api.WaterManagementTypeBeforeCultivation", on_delete=CASCADE)
     value = FloatField()
 
     def __str__(self):
         return f"({self.pk}) {self.water_management_type_before_cultivation.name} {self.value}"
-    
+
+
 class RiceSFW(Model):
     water_management_type_after_cultivation = ForeignKey("api.WaterManagementTypeAfterCultivation", on_delete=CASCADE)
     value = FloatField()
 
     def __str__(self):
         return f"({self.pk}) {self.water_management_type_after_cultivation.name} {self.value}"
-    
+
+
 class RiceYield(Model):
     continent = ForeignKey("api.Region", on_delete=CASCADE)
     value = FloatField()
 
     def __str__(self):
         return f"({self.pk}) {self.continent.name} {self.value}"
-    
+
+
 class TrophicStateFactor(Model):
     trophic_type = ForeignKey("api.TrophicType", on_delete=CASCADE)
     value = FloatField()
@@ -1105,9 +1111,10 @@ class TrophicStateFactor(Model):
 
     def __str__(self):
         return f"({self.pk}) {self.trophic_type.name} {self.value} {self.chloa}"
-    
+
 
 # TODO: Dump data from here to end
+
 
 class OrganicSoilDrainageEmissionFactorManager(Manager):
     def get_or_other_luc(self, climate, moisture, module_type_name, peat_type, site_location_type_name):
@@ -1127,6 +1134,7 @@ class OrganicSoilDrainageEmissionFactorManager(Manager):
                 peat_type=peat_type,
                 site_location_type__name="OtherLandUseChange",
             )
+
 
 class OrganicSoilDrainageEmissionFactor(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
@@ -1151,7 +1159,8 @@ class OrganicSoilDrainageEmissionFactor(Model):
 
     def __str__(self):
         return f"({self.pk}) {self.climate.name} {self.moisture.name} {self.module_type.name} {self.peat_type.name} {self.site_location_type.name}"
-    
+
+
 class PeatExtractionEmissionFactor(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
@@ -1172,7 +1181,8 @@ class PeatExtractionEmissionFactor(Model):
 
     def __str__(self):
         return f"({self.pk}) {self.climate.name} {self.moisture.name} {self.peat_type.name} {self.site_location_type.name}"
-    
+
+
 class PeatExtractionConversionFactor(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
@@ -1184,7 +1194,8 @@ class PeatExtractionConversionFactor(Model):
 
     def __str__(self):
         return f"({self.pk}) {self.climate.name} {self.moisture.name} {self.peat_type.name}"
-    
+
+
 class OrganicSoilFuelConsumption(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
@@ -1194,7 +1205,8 @@ class OrganicSoilFuelConsumption(Model):
 
     def __str__(self):
         return f"({self.pk}) {self.climate.name} {self.moisture.name} {self.fire_type.name}"
-    
+
+
 class OrganicSoilGefEmissionFactor(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
@@ -1207,7 +1219,8 @@ class OrganicSoilGefEmissionFactor(Model):
 
     def __str__(self):
         return f"({self.pk}) {self.climate.name} {self.moisture.name}"
-    
+
+
 class OrganicSoilRewettingEmissionFactor(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
@@ -1229,6 +1242,7 @@ class OrganicSoilRewettingEmissionFactor(Model):
     def __str__(self):
         return f"({self.pk}) {self.climate.name} {self.moisture.name} {self.peat_type.name} {self.module_type.name}"
 
+
 class ForestManagementAGB(Model):
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     continent = ForeignKey("api.Region", on_delete=CASCADE)
@@ -1243,6 +1257,7 @@ class ForestManagementAGB(Model):
     def __str__(self):
         return f"({self.pk}) {self.land_use_type.name} {self.continent.name} {self.forest_condition_type.name} {self.forest_type.name}"
 
+
 class FMGData(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
@@ -1251,6 +1266,7 @@ class FMGData(Model):
 
     def __str__(self):
         return f"({self.pk}) {self.climate.name} {self.moisture.name} {self.tillage_management_type.name} {self.value}"
+
 
 class FIData(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
@@ -1261,6 +1277,7 @@ class FIData(Model):
     def __str__(self):
         return f"({self.pk}) {self.climate.name} {self.moisture.name} {self.organic_input_type.name} {self.value}"
 
+
 class FLUData(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
@@ -1269,3 +1286,6 @@ class FLUData(Model):
 
     def __str__(self):
         return f"({self.pk}) {self.climate.name} {self.moisture.name} {self.land_use_type.name} {self.value}"
+
+    class Meta:
+        unique_together = ("climate", "moisture", "land_use_type")
