@@ -42,6 +42,9 @@ class ActivityTypes(Enum):
     FIRE_ON_SOIL = "Fire on Soil"
     DRAINAGE = "Drainage"
     REWETTING = "Rewetting"
+    DRAINAGE_PEAT = "Drainage Peat Extraction"
+    OFFSITE_PEAT = "Offsite Peat Extraction"
+    COASTAL_WATERBODIES = "Coastal Waterbodies"
 
 
 class Emission:
