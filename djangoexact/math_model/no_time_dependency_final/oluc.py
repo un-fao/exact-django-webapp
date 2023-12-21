@@ -88,6 +88,7 @@ class OtherLandUseChanges:
         def calculate_biomass():
             
             try:
+                #TODO: talk to Claudio, there is a problem here where there is a value for biomass change in emissions, even though initial and final should be the same
                 initial_biomass = self.initial_lu_biomass if not self.initial_lu_biomass_tier_2 else self.initial_lu_biomass_tier_2
                 final_biomass = self.final_lu_biomass if not self.final_lu_biomass_tier_2 else self.final_lu_biomass_tier_2
 
@@ -105,7 +106,7 @@ class OtherLandUseChanges:
                     gas_type = GasTypes.CO2,
                     emissions = [Emission(e, GasTypes.CO2) for e in self.yearly_biomass_emissions],
                     # TODO: ask Lorenzo if Biomass Loss or Gain
-                    activity = ActivityTypes.BIOMASS_GAIN,
+                    activity = ActivityTypes.BIOMASS,
                     delay=self.delay
                 ))
             
