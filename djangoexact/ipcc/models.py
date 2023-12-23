@@ -705,7 +705,6 @@ class GrasslandStockExchangeFactor(Model):
 
 class ElectricityEmission(Model):
     country = ForeignKey("api.Country", on_delete=CASCADE)
-    continent = ForeignKey("api.Region", on_delete=CASCADE)
     year = IntegerField(null=True, blank=True)
 
     ef_grid = FloatField(null=True, blank=True)
