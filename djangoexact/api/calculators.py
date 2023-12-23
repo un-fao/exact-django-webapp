@@ -2127,40 +2127,47 @@ class AquacultureCalculator(BaseCalculator):
         # TODO: This will now be used in the inputs module for feed
         FEED_EF_DEFAULT = AquacultureParameter.objects.get(name="feed_ef_default").value
 
-        inputs_w = [
-            module.annual_production_start,
-            module.annual_production_w,
-            NITROUS_EF_DEFAULT,
-            module.n2o_from_production_t2_start,
-            module.n2o_from_production_t2_w,
-            project.gw_potential.n2o,
-            project.implementation_years,
-            project.capitalization_years,
-            change_rate.name,
-        ]
+        math_w = None
+        math_wo = None
 
-        inputs_wo = [
-            module.annual_production_start,
-            module.annual_production_wo,
-            NITROUS_EF_DEFAULT,
-            module.n2o_from_production_t2_start,
-            module.n2o_from_production_t2_wo,
-            project.gw_potential.n2o,
-            project.implementation_years,
-            project.capitalization_years,
-            change_rate.name,
-        ]
+        if is_with(module):
+            inputs_w = [
+                module.annual_production_start,
+                module.annual_production_w,
+                NITROUS_EF_DEFAULT,
+                module.n2o_from_production_t2_start,
+                module.n2o_from_production_t2_w,
+                project.gw_potential.n2o,
+                project.implementation_years,
+                project.capitalization_years,
+                change_rate.name,
+            ]
 
-        results_w = MathAquaculture(*inputs_w)
-        results_w.calculate_emissions()
+            math_w = MathAquaculture(*inputs_w)
+            math_w.calculate_emissions()
 
-        results_wo = MathAquaculture(*inputs_wo)
-        results_wo.calculate_emissions()
+        if is_without(module):
+            inputs_wo = [
+                module.annual_production_start,
+                module.annual_production_wo,
+                NITROUS_EF_DEFAULT,
+                module.n2o_from_production_t2_start,
+                module.n2o_from_production_t2_wo,
+                project.gw_potential.n2o,
+                project.implementation_years,
+                project.capitalization_years,
+                change_rate.name,
+            ]
 
-        emissions_w = results_w.total_emissions
-        emissions_wo = results_wo.total_emissions
+            math_wo = MathAquaculture(*inputs_wo)
+            math_wo.calculate_emissions()
 
-        return Result(emissions_w, emissions_wo)
+        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
+        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+
+        results_tuple = (results_w, results_wo)
+
+        return results_tuple
 
 
 class InputCalculator(BaseCalculator):
