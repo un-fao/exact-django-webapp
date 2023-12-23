@@ -2458,15 +2458,28 @@ class SettlementCalculator(BaseCalculator):
 
     def calculate(self) -> Result:
         input: Settlement = self.data
-        result = Result()
+        res_w = MathResult(
+            input.activity.project.implementation_years,
+            input.activity.project.capitalization_years,
+        )
+        res_wo = MathResult(
+            input.activity.project.implementation_years,
+            input.activity.project.capitalization_years,
+        )
 
         for building in input.buildings.all():
-            result.add(BuildingCalculator(building).calculate())
+            r_w, r_wo = BuildingCalculator(building).calculate()
+
+            res_w += r_w
+            res_wo += r_wo
 
         for road in input.roads.all():
-            result.add(RoadCalculator(road).calculate())
+            r_w, r_wo = RoadCalculator(road).calculate()
 
-        return result
+            res_w += r_w
+            res_wo += r_wo
+
+        return (res_w, res_wo)
 
 
 class BuildingCalculator(BaseCalculator):
@@ -3321,15 +3334,26 @@ class LivestockCalculator(BaseCalculator):
 
 class IrrigationCalculator(BaseCalculator):
     def calculate(self) -> list[Result]:
-        _input: Irrigation = self.data
-        result = Result()
-        for system in _input.irrigation_systems:
-            result.add(IrrigationSystemCalculator(system).calculate())
+        input: Irrigation = self.data
+        res_w = MathResult(
+            input.activity.project.implementation_years,
+            input.activity.project.capitalization_years,
+        )
+        res_wo = MathResult(
+            input.activity.project.implementation_years,
+            input.activity.project.capitalization_years,
+        )
+        for system in input.irrigation_systems:
+            r_w, r_wo = IrrigationSystemCalculator(system).calculate()
+            res_w += r_w
+            res_wo += r_wo
 
-        for phase in _input.irrigation_phases:
-            result.add(IrrigationPhaseCalculator(phase).calculate())
+        for phase in input.irrigation_phases:
+            r_w, r_wo = IrrigationPhaseCalculator(phase).calculate()
+            res_w += r_w
+            res_wo += r_wo
 
-        return result
+        return (res_w, res_wo)
 
 
 class IrrigationSystemCalculator(BaseCalculator):
