@@ -1,13 +1,13 @@
-from django.apps import apps
-from rest_framework import exceptions
 import re
-from api.models import Model
-from rest_framework.response import Response
-from rest_framework import status
 from enum import Enum
 
+from django.apps import apps
+from rest_framework import exceptions, status
+from rest_framework.response import Response
 
-CN_RATIO_FOREST = 10
+from api.models import Model
+
+CN_RATIO_CROP = 10
 CN_RATIO_GRASSLAND = 15
 MANGROVE_FACTOR = 0.451
 NON_MANGROVE_FACTOR = 0.47
@@ -23,10 +23,12 @@ INCLUDE_RELATED = "include_related"
 class ManureManagementTypes(Enum):
     PRP = "Pasture/Range/Paddock"
 
+
 class ScenarioTypes(Enum):
     START = "start"
     WITH = "with"
     WITHOUT = "without"
+
 
 class EmissionTypes(Enum):
     CO2 = "CO2"
@@ -35,8 +37,10 @@ class EmissionTypes(Enum):
     N2O_VOLATILIZATION = "N2O Volatilization"
     N2O_LEACHING = "N2O Leaching"
 
+
 def avg(lst):
     return sum(lst) / len(lst)
+
 
 def snake_case(str):
     res = [str[0].lower()]
@@ -91,13 +95,12 @@ def get_relative(module) -> tuple[Model, str]:
 
     return relative
 
+
 def get_url_name(model_name):
     url_name = model_name
 
     # regex split on non consecutive capital letters
-    url_name = "".join(
-        [f"-{x}" for x in re.split(r"(?<!^)(?=[A-Z](?![A-Z]|$))", url_name)]
-    ).lower()
+    url_name = "".join([f"-{x}" for x in re.split(r"(?<!^)(?=[A-Z](?![A-Z]|$))", url_name)]).lower()
     url_name = url_name[1:]
 
     if url_name[-1] == "s":
@@ -112,16 +115,20 @@ class ErrorResponse(Response):
     def __init__(self, data, status=status.HTTP_400_BAD_REQUEST):
         super().__init__(error(data), status=status)
 
+
 def is_start_with_changed(_class: object, luc):
     return luc.module_type_start.class_name == _class.__name__ and luc.module_type_start != luc.module_type_wo
+
 
 class ScenarioTypes(Enum):
     START = "start"
     WITH = "w"
     WITHOUT = "wo"
 
+
 def get_thread_attributes(module: Model):
     return [attr for attr in module._meta.get_fields() if attr.name.endswith("_thread")]
+
 
 def get_module_status(self, activity, module_type):
     module_attr = getattr(activity, module_type.class_name.lower(), None)
