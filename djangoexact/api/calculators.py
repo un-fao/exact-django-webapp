@@ -3404,99 +3404,106 @@ class CoastalWetlandCalculator(BaseCalculator):
         Calculates the emissions of the coastal wetland
         """
 
-        input: CoastalWetland = self.data
-        project: Project = input.activity.project
+        module: CoastalWetland = self.data
+        project: Project = module.activity.project
 
         cm = {
             "climate": project.climate,
             "moisture": project.moisture,
         }
 
-        soil_type_name = input.soil_type_t2.name if input.soil_type_t2 else "Mineral Soil"
+        soil_type_name = module.soil_type_t2.name if module.soil_type_t2 else "Mineral Soil"
 
-        agb = ipcc.CoastalAGB.objects.get(**cm, vegetation_type=input.vegetation_type)
-        bgb = ipcc.CoastalBGB.objects.get(**cm, vegetation_type=input.vegetation_type)
-        litter = ipcc.CoastalLitter.objects.get(**cm, vegetation_type=input.vegetation_type)
-        dw = ipcc.CoastalDeadwood.objects.get(**cm, vegetation_type=input.vegetation_type)
-        soil_1m = ipcc.DefaultSoilCarbonStock1Meter.objects.get(**cm, vegetation_type=input.vegetation_type, soil_type__name=soil_type_name)
-        ef_drainage = ipcc.DrainageEmissionFactor.objects.get(**cm, vegetation_type=input.vegetation_type)
+        agb = ipcc.CoastalAGB.objects.get(**cm, vegetation_type=module.vegetation_type)
+        bgb = ipcc.CoastalBGB.objects.get(**cm, vegetation_type=module.vegetation_type)
+        litter = ipcc.CoastalLitter.objects.get(**cm, vegetation_type=module.vegetation_type)
+        dw = ipcc.CoastalDeadwood.objects.get(**cm, vegetation_type=module.vegetation_type)
+        soil_1m = ipcc.DefaultSoilCarbonStock1Meter.objects.get(**cm, vegetation_type=module.vegetation_type, soil_type__name=soil_type_name)
+        ef_drainage = ipcc.DrainageEmissionFactor.objects.get(**cm, vegetation_type=module.vegetation_type)
         pc_c_lost_excavation = CoastalWetlandParameter.objects.get(name="PERCENTAGE_C_LOST_EXCAVATION")
 
-        rewetting_c = ipcc.RewettingCarbonFactor.objects.get(**cm, vegetation_type=input.vegetation_type)
-        rewetting_ch4 = ipcc.RewettingMethaneFactor.objects.get(**cm, vegetation_type=input.vegetation_type)
+        rewetting_c = ipcc.RewettingCarbonFactor.objects.get(**cm, vegetation_type=module.vegetation_type)
+        rewetting_ch4 = ipcc.RewettingMethaneFactor.objects.get(**cm, vegetation_type=module.vegetation_type)
 
-        inputs_w = [
-            input.ha_start,
-            input.area_under_drainage_start,
-            input.area_under_drainage_w,
-            input.activity.change_rate.name,
-            project.implementation_years,
-            project.capitalization_years,
-            agb.value,
-            bgb.value,
-            litter.value,
-            dw.value,
-            soil_1m.value,
-            ef_drainage.value,
-            input.agb_t2_w,
-            input.bgb_t2_w,
-            input.litter_t2_w,
-            input.deadwood_t2_w,
-            input.soc_t2_w,
-            input.drainage_ef_t2_w,
-            input.drained_area_excavated_start,
-            input.drained_area_excavated_w,
-            pc_c_lost_excavation.value,
-            input.pc_c_lost_after_excavation_t2_w,
-            rewetting_c.value,
-            rewetting_ch4.value,
-            input.co2_rewetting_t2_start,
-            input.ch4_rewetting_t2_w,
-            input.avg_salinity_t2.value,
-            project.gw_potential.ch4,
-        ]
+        math_w = None
+        math_wo = None
 
-        inputs_wo = [
-            input.ha_start,
-            input.area_under_drainage_start,
-            input.area_under_drainage_wo,
-            input.activity.change_rate.name,
-            project.implementation_years,
-            project.capitalization_years,
-            agb.value,
-            bgb.value,
-            litter.value,
-            dw.value,
-            soil_1m.value,
-            ef_drainage.value,
-            input.agb_t2_wo,
-            input.bgb_t2_wo,
-            input.litter_t2_wo,
-            input.deadwood_t2_wo,
-            input.soc_t2_wo,
-            input.drainage_ef_t2_wo,
-            input.drained_area_excavated_start,
-            input.drained_area_excavated_wo,
-            pc_c_lost_excavation.value,
-            input.pc_c_lost_after_excavation_t2_wo,
-            rewetting_c.value,
-            rewetting_ch4.value,
-            input.co2_rewetting_t2_wo,
-            input.ch4_rewetting_t2_wo,
-            input.avg_salinity_t2.value,
-            project.gw_potential.ch4,
-        ]
+        if is_with(module):
+            inputs_w = [
+                module.ha_start,
+                module.area_under_drainage_start,
+                module.area_under_drainage_w,
+                module.activity.change_rate.name,
+                project.implementation_years,
+                project.capitalization_years,
+                agb.value,
+                bgb.value,
+                litter.value,
+                dw.value,
+                soil_1m.value,
+                ef_drainage.value,
+                module.agb_t2_w,
+                module.bgb_t2_w,
+                module.litter_t2_w,
+                module.deadwood_t2_w,
+                module.soc_t2_w,
+                module.drainage_ef_t2_w,
+                module.drained_area_excavated_start,
+                module.drained_area_excavated_w,
+                pc_c_lost_excavation.value,
+                module.pc_c_lost_after_excavation_t2_w,
+                rewetting_c.value,
+                rewetting_ch4.value,
+                module.co2_rewetting_t2_start,
+                module.ch4_rewetting_t2_w,
+                module.avg_salinity_t2.value,
+                project.gw_potential.ch4,
+            ]
 
-        math_w = MathCoastalWetland(*inputs_w)
-        math_wo = MathCoastalWetland(*inputs_wo)
+            math_w = MathCoastalWetland(*inputs_w)
+            math_w.calculate_emissions()
 
-        math_w.calculate_emissions()
-        math_wo.calculate_emissions()
+        if is_without(module):
+            inputs_wo = [
+                module.ha_start,
+                module.area_under_drainage_start,
+                module.area_under_drainage_wo,
+                module.activity.change_rate.name,
+                project.implementation_years,
+                project.capitalization_years,
+                agb.value,
+                bgb.value,
+                litter.value,
+                dw.value,
+                soil_1m.value,
+                ef_drainage.value,
+                module.agb_t2_wo,
+                module.bgb_t2_wo,
+                module.litter_t2_wo,
+                module.deadwood_t2_wo,
+                module.soc_t2_wo,
+                module.drainage_ef_t2_wo,
+                module.drained_area_excavated_start,
+                module.drained_area_excavated_wo,
+                pc_c_lost_excavation.value,
+                module.pc_c_lost_after_excavation_t2_wo,
+                rewetting_c.value,
+                rewetting_ch4.value,
+                module.co2_rewetting_t2_wo,
+                module.ch4_rewetting_t2_wo,
+                module.avg_salinity_t2.value,
+                project.gw_potential.ch4,
+            ]
 
-        results_w = math_w.total_emissions
-        results_wo = math_wo.total_emissions
+            math_wo = MathCoastalWetland(*inputs_wo)
+            math_wo.calculate_emissions()
 
-        return Result(results_w, results_wo)
+        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
+        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+
+        results_tuple = (results_w, results_wo)
+
+        return results_tuple
 
 
 class WaterbodyCalculator(BaseCalculator):
