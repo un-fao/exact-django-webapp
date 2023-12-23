@@ -116,7 +116,7 @@ class Deforestation():
                     year = 0,
                     gas_type = GasTypes.CO2,
                     emissions = [Emission(e, GasTypes.CO2) for e in self.emissions_biomass_loss_yearly],
-                    activity = ActivityTypes.BIOMASS_LOSS
+                    activity = ActivityTypes.BIOMASS
                 ))
 
             except Exception as e:
@@ -137,7 +137,7 @@ class Deforestation():
                     year = 0,
                     gas_type = GasTypes.CO2,
                     emissions = [Emission(e, GasTypes.CO2) for e in self.emissions_biomass_gain_yearly],
-                    activity = ActivityTypes.BIOMASS_GAIN
+                    activity = ActivityTypes.BIOMASS
                 ))
 
             except Exception as e:

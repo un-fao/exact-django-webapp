@@ -222,6 +222,7 @@ def som_emissions(soc_final, soc_initial, emission_factor_nitrous, nitrous_const
 
     n2o_n_conversion = 44/28
 
+    # TODO: the divided by 10 has to be parametrized (take it from Claudio C:N ratio)
     som_n2o = 0 if soc_final >= soc_initial else ((soc_final - soc_initial)/20/10*1000)  * emission_factor_nitrous * n2o_n_conversion * (nitrous_constant/1000)
 
     total = - sum(hectares_before_20) * som_n2o
