@@ -4,6 +4,7 @@ class GasTypes(Enum):
     CO2 = "CO2"
     CH4 = "CH4"
     N2O = "N2O"
+    CO = "CO"
     OTHER = "Other"
 
 class ActivityTypes(Enum):
@@ -13,8 +14,7 @@ class ActivityTypes(Enum):
     CATCH = "Catch"
     REFRIGERANT = "Refrigerant"
     ICE = "Ice"
-    BIOMASS_LOSS = "Biomass Loss"
-    BIOMASS_GAIN = "Biomass Gain"
+    BIOMASS = "Biomass"
     DOM = "Dead Organic Matter"
     ROTATION_AGB = "Rotation AGB"
     ROTATION_BGB = "Rotation BGB"
@@ -22,8 +22,29 @@ class ActivityTypes(Enum):
     DEADWOOD = "Deadwood"
     ROTATION = "Rotation"
     DISTURBANCE = "Disturbance"
-
-    
+    CH4_EMITTED_RICE = "CH4 Emitted Rice"
+    STRAW_BURNING = "Straw Burning"
+    IRRIGATION_OPERATIONAL = "Operational Phase of Irrigation"
+    CO2_FIELD = "CO2 Field"
+    N20_FIELD = "N2O Field"
+    CO2_EQUIVALENT_VC = "CO2 Equivalent VC"
+    ROADS = "Roads"
+    ELECTRICITY = "Electricity"
+    FUEL = "Fuel"
+    SOLID_CONSUMPTION = "Solid Consumption"
+    NEW_IRRIGATION = "New Irrigation"
+    METHANE_ENTERIC_FERMENTATION = "Methane Enteric Fermentation"
+    METHANE_MANURE_MANAGEMENT = "Methane Manure Management"
+    NITROUS_MANURE_MANAGEMENT = "Nitrous Oxide Manure Management"
+    NITROUS_MANURE_MANAGEMENT_INDIRECT_VOLATILIZATION = "Nitrous Oxide Manure Management Indirect Volatilization"
+    NITROUS_MANURE_MANAGEMENT_INDIRECT_LEACHING = "Nitrous Oxide Manure Management Indirect Leaching"
+    REWETTING_REVEGETATION = "Rewetting Revegetation"
+    FIRE_ON_SOIL = "Fire on Soil"
+    DRAINAGE = "Drainage"
+    REWETTING = "Rewetting"
+    DRAINAGE_PEAT = "Drainage Peat Extraction"
+    OFFSITE_PEAT = "Offsite Peat Extraction"
+    COASTAL_WATERBODIES = "Coastal Waterbodies"
 
 
 class Emission:
