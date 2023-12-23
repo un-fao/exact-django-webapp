@@ -91,10 +91,12 @@ from .models import (
     OrganicSoil,
     PerennialCropping,
     Project,
+    Region,
     Road,
     Settlement,
     SmallFishery,
     SmallFisheryParameter,
+    SoilType,
     StatusType,
     Waterbody,
 )
@@ -1375,15 +1377,32 @@ class FloodedRiceCalculator(BaseCalculator):
         luc: LandUseChange = input.land_use_change
         area = luc.area if luc.area else input.area
 
-        flu = ipcc.LandUseCarbonStockExchangeFactor.objects.get(
-            land_use_type__name="Flooded Rice",
-            climate=project.climate,
-            moisture=project.moisture,
-        )
-        efc = ipcc.RiceDefaultEmissionFactor.objects.get(
-            continent=project.country.region,
-        )
-        yield_ref = ipcc.RiceYield.objects.get(continent=project.country.region)
+        climate: Climate = project.climate
+        moisture: Moisture = project.moisture
+        region: Region = project.country.region
+        soil_type: SoilType = project.soil_type
+
+        soc = ipcc.SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
+        grassland_soc = get_grassland_soc(luc)
+
+        rice_ef = ipcc.RiceDefaultEmissionFactor.objects.get(continent=region)
+        yield_ref = ipcc.RiceYield.objects.get(continent=region)
+
+        soc_start = grassland_soc.value if grassland_soc else soc.value
+        soc_w = soc.value
+        soc_wo = soc.value
+
+        flu_start = get_flu_data(input, climate, moisture, utils.ScenarioTypes.START)
+        flu_w = get_flu_data(input, climate, moisture, utils.ScenarioTypes.WITH)
+        flu_wo = get_flu_data(input, climate, moisture, utils.ScenarioTypes.WITHOUT)
+
+        fmg_start = get_fmg_data(input, climate, moisture, utils.ScenarioTypes.START)
+        fmg_w = get_fmg_data(input, climate, moisture, utils.ScenarioTypes.WITH)
+        fmg_wo = get_fmg_data(input, climate, moisture, utils.ScenarioTypes.WITHOUT)
+
+        fi_start = get_fi_data(input, climate, moisture, utils.ScenarioTypes.START)
+        fi_w = get_fi_data(input, climate, moisture, utils.ScenarioTypes.WITH)
+        fi_wo = get_fi_data(input, climate, moisture, utils.ScenarioTypes.WITHOUT)
 
         sfw_start = ipcc.RiceSFW.objects.get(water_management_type_after_cultivation=input.water_management_type_after_cultivation_start)
         sfw_w = ipcc.RiceSFW.objects.get(water_management_type_after_cultivation=input.water_management_type_after_cultivation_w)
@@ -1397,131 +1416,223 @@ class FloodedRiceCalculator(BaseCalculator):
         cfoa_w = ipcc.RiceSFO.objects.get(organic_amendment_type=input.organic_amendment_type_w)
         cfoa_wo = ipcc.RiceSFO.objects.get(organic_amendment_type=input.organic_amendment_type_wo)
 
-        n_estimation_factor = ipcc.CropNitrousEstimationDefaultFactor.objects.get(crop_type__name="Rice")
+        n_estimation_factor = ipcc.CropNitrousEstimationDefaultFactor.objects.get(land_use_type__name="Rice")
         burning_emission_factor = ipcc.BurningEmissionFactor.objects.get(category__name="Agricultural residues")
-        rice_cf = ipcc.FiresCombustionFactor.objects.get(crop_type__name="Rice")
+        rice_cf = ipcc.FiresCombustionFactor.objects.get(land_use_type__name="Rice")
 
-        inputs_start = [
-            *[area, 0],
-            efc.value,
-            input.efc_t2_start,
-            sfw_start.value,
-            input.sfw_t2_start,
-            sfp_start.value,
-            input.sfp_t2_start,
-            cfoa_start.value,
-            input.sfo_t2_start,
-            input.efi_t2_start,
-            yield_ref.value,
-            input.crop_yield_start,
-            n_estimation_factor.slope,
-            n_estimation_factor.intercept,
-            input.rice_straw_t2_start,
-            burning_emission_factor.ch4,
-            rice_cf.value,
-            burning_emission_factor.n2o,
-            project.gw_potential.n2o,
-            project.implementation_years,
-            project.capitalization_years,
-            input.activity.change_rate.name,
-            project.gw_potential.ch4,
-            efc.cultivation_period,
-            input.cultivation_period_start,
-            project.soc_ref.value,
-            project.soc_ref_t2,
-            flu.value,
-            input.land_use_factor_t2_start,
-            1,  # TODO: Fi. Will be added in the future
-            None,  # Fi t2
-            1,  # TODO: Fmg. Will be added in the future
-            None,  # Fmg t2
-        ]
+        math_start_w = None
+        math_start_wo = None
+        math_w = None
+        math_wo = None
 
-        inputs_w = [
-            *[0, area],
-            efc.value,
-            input.efc_t2_w,
-            sfw_w.value,
-            input.sfw_t2_w,
-            sfp_w.value,
-            input.sfp_t2_w,
-            cfoa_w.value,
-            input.sfo_t2_w,
-            input.efi_t2_w,
-            yield_ref.value,
-            input.crop_yield_w,
-            n_estimation_factor.slope,
-            n_estimation_factor.intercept,
-            input.rice_straw_t2_w,
-            burning_emission_factor.ch4,
-            rice_cf.value,
-            burning_emission_factor.n2o,
-            project.gw_potential.n2o,
-            project.implementation_years,
-            project.capitalization_years,
-            input.activity.change_rate.name,
-            project.gw_potential.ch4,
-            efc.cultivation_period,
-            input.cultivation_period_w,
-            project.soc_ref.value,
-            project.soc_ref_t2,
-            flu.value,
-            input.land_use_factor_t2_w,
-            1,  # TODO: Fi. Will be added in the future
-            None,  # Fi t2
-            1,  # TODO: Fmg. Will be added in the future
-            None,  # Fmg t2
-        ]
+        if is_luc_remaining_same(input):
+            inputs_start_w = [
+                *[area, 0],
+                rice_ef.value,
+                input.efc_t2_start,
+                sfw_start.value,
+                input.sfw_t2_start,
+                sfp_start.value,
+                input.sfp_t2_start,
+                cfoa_start.value,
+                input.sfo_t2_start,
+                input.efi_t2_start,
+                yield_ref.value,
+                input.crop_yield_start,
+                n_estimation_factor.slope,
+                n_estimation_factor.intercept,
+                input.rice_straw_t2_start,
+                burning_emission_factor.ch4,
+                rice_cf.value,
+                burning_emission_factor.n2o,
+                project.gw_potential.n2o,
+                project.implementation_years,
+                project.capitalization_years,
+                input.activity.change_rate.name,
+                project.gw_potential.ch4,
+                rice_ef.cultivation_period,
+                input.cultivation_period_start,
+                soc_start,
+                soc_w,
+                input.soc_t2_start,
+                input.soc_t2_w,
+                fmg_start.value,
+                fmg_w.value,
+                input.fmg_t2_start,
+                input.fmg_t2_w,
+                flu_start.value,
+                flu_w.value,
+                input.flu_t2_start,
+                input.flu_t2_w,
+                fi_start.value,
+                fi_w.value,
+                input.fi_t2_start,
+                input.fi_t2_w,
+                True,
+                0,  # Delay
+            ]
 
-        inputs_wo = [
-            *[0, area],
-            efc.value,
-            input.efc_t2_wo,
-            sfw_wo.value,
-            input.sfw_t2_wo,
-            sfp_wo.value,
-            input.sfp_t2_wo,
-            cfoa_wo.value,
-            input.sfo_t2_wo,
-            input.efi_t2_wo,
-            yield_ref.value,
-            input.crop_yield_wo,
-            n_estimation_factor.slope,
-            n_estimation_factor.intercept,
-            input.rice_straw_t2_wo,
-            burning_emission_factor.ch4,
-            rice_cf.value,
-            burning_emission_factor.n2o,
-            project.gw_potential.n2o,
-            project.implementation_years,
-            project.capitalization_years,
-            input.activity.change_rate.name,
-            project.gw_potential.ch4,
-            efc.cultivation_period,
-            input.cultivation_period_wo,
-            project.soc_ref.value,
-            project.soc_ref_t2,
-            flu.value,
-            input.land_use_factor_t2_wo,
-            1,  # TODO: Fi. Will be added in the future
-            None,  # Fi t2
-            1,  # TODO: Fmg. Will be added in the future
-            None,  # Fmg t2
-        ]
+            math_start_w = MathFloodedRice(*inputs_start_w)
+            math_start_w.calculate_emissions()
 
-        math_start = MathFloodedRice(*inputs_start)
-        math_w = MathFloodedRice(*inputs_w)
-        math_wo = MathFloodedRice(*inputs_wo)
+        if is_business_as_usual(input):
+            inputs_start_wo = [
+                *[area, 0],
+                rice_ef.value,
+                input.efc_t2_start,
+                sfw_start.value,
+                input.sfw_t2_start,
+                sfp_start.value,
+                input.sfp_t2_start,
+                cfoa_start.value,
+                input.sfo_t2_start,
+                input.efi_t2_start,
+                yield_ref.value,
+                input.crop_yield_start,
+                n_estimation_factor.slope,
+                n_estimation_factor.intercept,
+                input.rice_straw_t2_start,
+                burning_emission_factor.ch4,
+                rice_cf.value,
+                burning_emission_factor.n2o,
+                project.gw_potential.n2o,
+                project.implementation_years,
+                project.capitalization_years,
+                input.activity.change_rate.name,
+                project.gw_potential.ch4,
+                rice_ef.cultivation_period,
+                input.cultivation_period_start,
+                soc_start,
+                soc_wo,
+                input.soc_t2_start,
+                input.soc_t2_wo,
+                fmg_start.value,
+                fmg_wo.value,
+                input.fmg_t2_start,
+                input.fmg_t2_wo,
+                flu_start.value,
+                flu_wo.value,
+                input.flu_t2_start,
+                input.flu_t2_wo,
+                fi_start.value,
+                fi_wo.value,
+                input.fi_t2_start,
+                input.fi_t2_wo,
+                True,
+                0,  # Delay
+            ]
 
-        math_start.calculate_emissions()
-        math_w.calculate_emissions()
-        math_wo.calculate_emissions()
+            math_start_wo = MathFloodedRice(*inputs_start_wo)
+            math_start_wo.calculate_emissions()
 
-        results_start = math_start.total_emissions
-        results_w = math_w.total_emissions
-        results_wo = math_wo.total_emissions
+        if is_with(input):
+            inputs_w = [
+                *[0, area],
+                rice_ef.value,
+                input.efc_t2_w,
+                sfw_w.value,
+                input.sfw_t2_w,
+                sfp_w.value,
+                input.sfp_t2_w,
+                cfoa_w.value,
+                input.sfo_t2_w,
+                input.efi_t2_w,
+                yield_ref.value,
+                input.crop_yield_w,
+                n_estimation_factor.slope,
+                n_estimation_factor.intercept,
+                input.rice_straw_t2_w,
+                burning_emission_factor.ch4,
+                rice_cf.value,
+                burning_emission_factor.n2o,
+                project.gw_potential.n2o,
+                project.implementation_years,
+                project.capitalization_years,
+                input.activity.change_rate.name,
+                project.gw_potential.ch4,
+                rice_ef.cultivation_period,
+                input.cultivation_period_w,
+                soc_start,
+                soc_w,
+                input.soc_t2_start,
+                input.soc_t2_w,
+                fmg_start.value,
+                fmg_w.value,
+                input.fmg_t2_start,
+                input.fmg_t2_w,
+                flu_start.value,
+                flu_w.value,
+                input.flu_t2_start,
+                input.flu_t2_w,
+                fi_start.value,
+                fi_w.value,
+                input.fi_t2_start,
+                input.fi_t2_w,
+                True,
+                0,  # Delay
+            ]
 
-        return Result(results_w + results_start, results_wo + results_start)
+            math_w = MathFloodedRice(*inputs_w)
+            math_w.calculate_emissions()
+
+        if is_without(input):
+            inputs_wo = [
+                *[0, area],
+                rice_ef.value,
+                input.efc_t2_wo,
+                sfw_wo.value,
+                input.sfw_t2_wo,
+                sfp_wo.value,
+                input.sfp_t2_wo,
+                cfoa_wo.value,
+                input.sfo_t2_wo,
+                input.efi_t2_wo,
+                yield_ref.value,
+                input.crop_yield_wo,
+                n_estimation_factor.slope,
+                n_estimation_factor.intercept,
+                input.rice_straw_t2_wo,
+                burning_emission_factor.ch4,
+                rice_cf.value,
+                burning_emission_factor.n2o,
+                project.gw_potential.n2o,
+                project.implementation_years,
+                project.capitalization_years,
+                input.activity.change_rate.name,
+                project.gw_potential.ch4,
+                rice_ef.cultivation_period,
+                input.cultivation_period_wo,
+                soc_start,
+                soc_wo,
+                input.soc_t2_start,
+                input.soc_t2_wo,
+                fmg_start.value,
+                fmg_wo.value,
+                input.fmg_t2_start,
+                input.fmg_t2_wo,
+                flu_start.value,
+                flu_wo.value,
+                input.flu_t2_start,
+                input.flu_t2_wo,
+                fi_start.value,
+                fi_wo.value,
+                input.fi_t2_start,
+                input.fi_t2_wo,
+                False,
+                0,  # Delay
+            ]
+
+            math_wo = MathFloodedRice(*inputs_wo)
+            math_wo.calculate_emissions()
+
+        results_start_w = math_start_w.result if math_start_w else MathResult(project.implementation_years, project.capitalization_years)
+        results_start_wo = math_start_wo.result if math_start_wo else MathResult(project.implementation_years, project.capitalization_years)
+        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
+        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+
+        results_tuple = (results_w + results_start_w, results_wo + results_start_wo)
+
+        return results_tuple
 
 
 class GrasslandCalculator(BaseCalculator):
