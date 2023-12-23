@@ -62,6 +62,7 @@ from .models import (
     AquacultureParameter,
     BiomassModule,
     Building,
+    Climate,
     CoastalWetland,
     CoastalWetlandParameter,
     Electricity,
@@ -86,6 +87,7 @@ from .models import (
     Livestock,
     LivestockParameter,
     Module,
+    Moisture,
     OrganicSoil,
     PerennialCropping,
     Project,
@@ -130,7 +132,20 @@ def is_with(module: LandModule):
     return not luc or (luc.module_type_w.class_name == module.__class__.__name__)
 
 
-def get_fi_data(module, climate, moisture, scenario: utils.ScenarioTypes):
+def get_fi_data(module: LandModule, climate: Climate, moisture: Moisture, scenario: utils.ScenarioTypes):
+    """
+    Retrieve the FI data based on the given parameters.
+
+    Args:
+        module (LandModule): The land module.
+        climate (Climate): The climate.
+        moisture (Moisture): The moisture.
+        scenario (utils.ScenarioTypes): The scenario type.
+
+    Returns:
+        FIData or SimpleNamespace: The FI data object if found,
+        or a SimpleNamespace object with a value of 1 if no match is found.
+    """
     attr = getattr(module, f"organic_input_type_{scenario.value}", None)
     if attr:
         return ipcc.FIData.objects.get(climate=climate, moisture=moisture, organic_input_type=attr)
@@ -138,7 +153,20 @@ def get_fi_data(module, climate, moisture, scenario: utils.ScenarioTypes):
         return SimpleNamespace(value=1)
 
 
-def get_fmg_data(module, climate, moisture, scenario: utils.ScenarioTypes):
+def get_fmg_data(module: LandModule, climate: Climate, moisture: Moisture, scenario: utils.ScenarioTypes):
+    """
+    Retrieve FMG data based on the provided parameters.
+
+    Args:
+        module (LandModule): The land module.
+        climate (Climate): The climate.
+        moisture (Moisture): The moisture.
+        scenario (utils.ScenarioTypes): The scenario type.
+
+    Returns:
+        FMGData: The FMG data object matching the provided parameters,
+        or a SimpleNamespace object with a value of 1 if no match is found.
+    """
     attr = getattr(module, f"tillage_management_type_{scenario.value}", None)
     if attr:
         return ipcc.FMGData.objects.get(climate=climate, moisture=moisture, tillage_management_type=attr)
@@ -146,7 +174,20 @@ def get_fmg_data(module, climate, moisture, scenario: utils.ScenarioTypes):
         return SimpleNamespace(value=1)
 
 
-def get_flu_data(module, climate, moisture, scenario: utils.ScenarioTypes):
+def get_flu_data(module: LandModule, climate: Climate, moisture: Moisture, scenario: utils.ScenarioTypes):
+    """
+    Retrieve the FluData object based on the given parameters.
+
+    Args:
+        module (LandModule): The LandModule object.
+        climate (Climate): The Climate object.
+        moisture (Moisture): The Moisture object.
+        scenario (utils.ScenarioTypes): The scenario type.
+
+    Returns:
+        FluData: The FluData object matching the given parameters,
+        or a SimpleNamespace object with a value of 1 if no match is found.
+    """
     attr = getattr(module, f"land_use_type_{scenario.value}", None)
     if attr:
         return ipcc.FLUData.objects.get(climate=climate, moisture=moisture, land_use_type=attr)
@@ -155,6 +196,18 @@ def get_flu_data(module, climate, moisture, scenario: utils.ScenarioTypes):
 
 
 def get_luc_modules(luc: LandUseChange) -> tuple[LandModule]:
+    """
+    Retrieves the land use change modules associated with each scenario of a given LandUseChange object.
+
+    Args:
+        luc (LandUseChange): The LandUseChange object.
+
+    Returns:
+        tuple[LandModule]: A tuple containing the land use change modules for each scenario.
+
+    Raises:
+        Exception: If at least one module is missing.
+    """
     modules = (
         getattr(luc.activity, luc.module_type_start.class_name.lower(), None).first(),
         getattr(luc.activity, luc.module_type_w.class_name.lower(), None).first(),
@@ -165,6 +218,28 @@ def get_luc_modules(luc: LandUseChange) -> tuple[LandModule]:
         raise Exception("At least one module is missing")
 
     return modules
+
+
+def get_grassland_soc(luc: LandUseChange) -> ipcc.GrasslandStockExchangeFactor | None:
+    """
+    Get the soil organic carbon (SOC) for grassland
+    if there's a land use change and the start module is a grassland module.
+
+    Args:
+        luc (LandUseChange): The land use change object.
+
+    Returns:
+        grassland_soc (GrasslandStockExchangeFactor): The grassland SOC object.
+    """
+    grassland_soc = None
+    module_start: Grassland = getattr(luc.activity, luc.module_type_start.class_name.lower(), None).first()
+    if luc.module_type_start.name == "Grassland" and module_start:
+        grassland_soc = ipcc.GrasslandStockExchangeFactor.objects.get(
+            grassland_management_type=module_start.grassland_management_type_start,
+            climate=luc.activity.project.climate,
+        )
+
+    return grassland_soc
 
 
 class Result:
@@ -1020,160 +1095,249 @@ class PerennialCroppingCalculator(BaseCalculator):
 
         module: PerennialCropping = self.data
         project = module.activity.project
+        activity: Activity = module.activity
         luc: LandUseChange = module.land_use_change
-        climate = project.climate
-        moisture = project.moisture
-        continent = project.country.region
-        parent, _ = utils.get_relative(module)
-        change_rate = module.activity.change_rate
+        climate = activity.climate_t2 or project.climate
+        moisture = activity.moisture_t2 or project.moisture
+        region = project.country.region
+        change_rate = activity.change_rate
+
+        soc = ipcc.SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=project.soil_type)
+        grassland_soc = get_grassland_soc(luc)
+
+        soc_start = grassland_soc.value if grassland_soc else soc.value
+        soc_w = soc.value
+        soc_wo = soc.value
 
         area = luc.area if luc else module.area
-
-        cm = {
-            "climate": climate,
-            "moisture": moisture,
-        }
 
         cmc = {
             "climate": climate,
             "moisture": moisture,
-            "continent": continent,
+            "continent": region,
         }
 
         burning_emission_factor = ipcc.BurningEmissionFactor.objects.get(category__name="Savanna and grassland")
 
-        # TODO: Replace 'other' with all the other crop_types in db
-        fires_combustion_factor_start = ipcc.FiresCombustionFactor.objects.get_or_other(crop_type=module.crop_type_start)
-        fires_combustion_factor_w = ipcc.FiresCombustionFactor.objects.get_or_other(crop_type=module.crop_type_w)
-        fires_combustion_factor_wo = ipcc.FiresCombustionFactor.objects.get_or_other(crop_type=module.crop_type_wo)
+        fires_combustion_factor_start = ipcc.FiresCombustionFactor.objects.get_or_other(land_use_type=module.land_use_type_start)
+        fires_combustion_factor_w = ipcc.FiresCombustionFactor.objects.get_or_other(land_use_type=module.land_use_type_w)
+        fires_combustion_factor_wo = ipcc.FiresCombustionFactor.objects.get_or_other(land_use_type=module.land_use_type_wo)
 
-        ag_default_start = ipcc.PerennialAGB.objects.get_or_default(**cmc, crop_type=module.crop_type_start)
-        ag_default_w = ipcc.PerennialAGB.objects.get_or_default(**cmc, crop_type=module.crop_type_w)
-        ag_default_wo = ipcc.PerennialAGB.objects.get_or_default(**cmc, crop_type=module.crop_type_wo)
+        ag_default_start = ipcc.PerennialAGB.objects.get_or_default(**cmc, land_use_type=module.land_use_type_start)
+        ag_default_w = ipcc.PerennialAGB.objects.get_or_default(**cmc, land_use_type=module.land_use_type_w)
+        ag_default_wo = ipcc.PerennialAGB.objects.get_or_default(**cmc, land_use_type=module.land_use_type_wo)
 
-        agb_max_c_start = ipcc.PerennialMaxAGB.objects.get(climate=climate, crop_type=module.crop_type_start)
-        agb_max_c_w = ipcc.PerennialMaxAGB.objects.get(climate=climate, crop_type=module.crop_type_w)
-        agb_max_c_wo = ipcc.PerennialMaxAGB.objects.get(climate=climate, crop_type=module.crop_type_wo)
+        agb_max_c_start = ipcc.PerennialMaxAGB.objects.get(climate=climate, land_use_type=module.land_use_type_start)
+        agb_max_c_w = ipcc.PerennialMaxAGB.objects.get(climate=climate, land_use_type=module.land_use_type_w)
+        agb_max_c_wo = ipcc.PerennialMaxAGB.objects.get(climate=climate, land_use_type=module.land_use_type_wo)
 
-        bg_default_start = ipcc.PerennialBGB.objects.get_or_default(**cmc, crop_type=module.crop_type_start)
-        bg_default_w = ipcc.PerennialBGB.objects.get_or_default(**cmc, crop_type=module.crop_type_w)
-        bg_default_wo = ipcc.PerennialBGB.objects.get_or_default(**cmc, crop_type=module.crop_type_wo)
+        bg_default_start = ipcc.PerennialBGB.objects.get_or_default(**cmc, land_use_type=module.land_use_type_start)
+        bg_default_w = ipcc.PerennialBGB.objects.get_or_default(**cmc, land_use_type=module.land_use_type_w)
+        bg_default_wo = ipcc.PerennialBGB.objects.get_or_default(**cmc, land_use_type=module.land_use_type_wo)
 
-        if parent:
-            # TODO: initial_land_use and final_land_use change based on what's initial and whats final. Differentiate in LUC_From | LUC_To
-            # NOTE: Maybe not? It's possible that the correct one is always final_land_use_type. Ask EX-ACT Team
-            flu = ipcc.AfforestationFLU.objects.get(**cm, land_use_type=parent.final_land_use_type)
-        else:
-            flu = ipcc.CroplandFLU.objects.get(**cm, crop_type__name="Perennial/Tree Crop")
+        flu_start = get_flu_data(module, climate, moisture, utils.ScenarioTypes.START)
+        flu_w = get_flu_data(module, climate, moisture, utils.ScenarioTypes.WITH)
+        flu_wo = get_flu_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
 
-        fi_start = ipcc.CroplandFI.objects.get(**cm, organic_input_type=module.organic_input_type_start)
-        fi_w = ipcc.CroplandFI.objects.get(**cm, organic_input_type=module.organic_input_type_w)
-        fi_wo = ipcc.CroplandFI.objects.get(**cm, organic_input_type=module.organic_input_type_wo)
+        fi_start = get_fi_data(module, climate, moisture, utils.ScenarioTypes.START)
+        fi_w = get_fi_data(module, climate, moisture, utils.ScenarioTypes.WITH)
+        fi_wo = get_fi_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
 
-        fmg_start = ipcc.CroplandFMG.objects.get(**cm, tillage_management_type=module.tillage_management_type_start)
-        fmg_w = ipcc.CroplandFMG.objects.get(**cm, tillage_management_type=module.tillage_management_type_w)
-        fmg_wo = ipcc.CroplandFMG.objects.get(**cm, tillage_management_type=module.tillage_management_type_wo)
+        fmg_start = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.START)
+        fmg_w = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.WITH)
+        fmg_wo = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
 
         default_fire_periodicity = AnnualCroplandParameter.objects.get(name="default_fire_periodicity")
 
-        inputs_start = [
-            area,
-            0,
-            project.implementation_years,
-            project.capitalization_years,
-            change_rate.name,
-            project.gw_potential.n2o,
-            project.gw_potential.ch4,
-            module.is_biomass_burned_start,
-            burning_emission_factor.ch4,
-            burning_emission_factor.n2o,
-            fires_combustion_factor_start.value,
-            default_fire_periodicity.value,
-            module.fire_periodicity_t2_start,
-            module.residue_burned_t2_start,
-            ag_default_start.value,
-            module.ag_t2_start,
-            agb_max_c_start.value,
-            bg_default_start.value,
-            module.bg_t2_start,
-            project.soc_ref.value,
-            module.soc_t2_start,
-            flu.value,
-            module.flu_t2_start,
-            fi_start.value,
-            module.input_factor_t2_start,
-            fmg_start.value,
-            module.tillage_factor_t2_start,
-        ]
+        math_start_w = None
+        math_start_wo = None
+        math_w = None
+        math_wo = None
 
-        inputs_w = [
-            0,
-            area,
-            project.implementation_years,
-            project.capitalization_years,
-            change_rate.name,
-            project.gw_potential.n2o,
-            project.gw_potential.ch4,
-            module.is_biomass_burned_w,
-            burning_emission_factor.ch4,
-            burning_emission_factor.n2o,
-            fires_combustion_factor_w.value,
-            default_fire_periodicity.value,
-            module.fire_periodicity_t2_w,
-            module.residue_burned_t2_w,
-            ag_default_w.value,
-            module.ag_t2_w,
-            agb_max_c_w.value,
-            bg_default_w.value,
-            module.bg_t2_w,
-            project.soc_ref.value,
-            module.soc_t2_w,
-            flu.value,
-            module.flu_t2_w,
-            fi_w.value,
-            module.input_factor_t2_w,
-            fmg_w.value,
-            module.tillage_factor_t2_w,
-        ]
+        if is_luc_remaining_same(module):
+            inputs_start_w = [
+                area,
+                0,
+                project.implementation_years,
+                project.capitalization_years,
+                change_rate.name,
+                project.gw_potential.n2o,
+                project.gw_potential.ch4,
+                module.is_biomass_burned_start,
+                burning_emission_factor.n2o,
+                burning_emission_factor.ch4,
+                fires_combustion_factor_start.value,
+                default_fire_periodicity.value,
+                module.fire_periodicity_t2_start,
+                module.residue_burned_t2_start,
+                ag_default_start.value,
+                module.ag_t2_start,
+                agb_max_c_start.value,
+                bg_default_start.value,
+                module.bg_t2_start,
+                soc_start,
+                soc_w,
+                module.soc_t2_start,
+                module.soc_t2_w,
+                fmg_start.value,
+                fmg_w.value,
+                module.fmg_t2_start,
+                module.fmg_t2_w,
+                flu_start.value,
+                flu_w.value,
+                module.flu_t2_start,
+                module.flu_t2_w,
+                fi_start.value,
+                fi_w.value,
+                module.fi_t2_start,
+                module.fi_t2_w,
+                False,
+                0,  # Delay
+            ]
 
-        inputs_wo = [
-            0,
-            area,
-            project.implementation_years,
-            project.capitalization_years,
-            change_rate.name,
-            project.gw_potential.n2o,
-            project.gw_potential.ch4,
-            module.is_biomass_burned_wo,
-            burning_emission_factor.ch4,
-            burning_emission_factor.n2o,
-            fires_combustion_factor_wo.value,
-            default_fire_periodicity.value,
-            module.fire_periodicity_t2_wo,
-            module.residue_burned_t2_wo,
-            ag_default_wo.value,
-            module.ag_t2_wo,
-            agb_max_c_wo.value,
-            bg_default_wo.value,
-            module.bg_t2_wo,
-            project.soc_ref.value,
-            module.soc_t2_wo,
-            flu.value,
-            module.flu_t2_wo,
-            fi_wo.value,
-            module.input_factor_t2_wo,
-            fmg_wo.value,
-            module.tillage_factor_t2_wo,
-        ]
+            math_start_w = PerennialCropland(*inputs_start_w)
+            math_start_w.calculate_emissions()
 
-        results_start = PerennialCropland(*inputs_start).calculate_emissions()
-        results_w = PerennialCropland(*inputs_w).calculate_emissions()
-        results_wo = PerennialCropland(*inputs_wo).calculate_emissions()
+        if is_business_as_usual(module):
+            input_start_wo = [
+                area,
+                0,
+                project.implementation_years,
+                project.capitalization_years,
+                change_rate.name,
+                project.gw_potential.n2o,
+                project.gw_potential.ch4,
+                module.is_biomass_burned_start,
+                burning_emission_factor.n2o,
+                burning_emission_factor.ch4,
+                fires_combustion_factor_start.value,
+                default_fire_periodicity.value,
+                module.fire_periodicity_t2_start,
+                module.residue_burned_t2_start,
+                ag_default_start.value,
+                module.ag_t2_start,
+                agb_max_c_start.value,
+                bg_default_start.value,
+                module.bg_t2_start,
+                soc_start,
+                soc_wo,
+                module.soc_t2_start,
+                module.soc_t2_wo,
+                fmg_start.value,
+                fmg_wo.value,
+                module.fmg_t2_start,
+                module.fmg_t2_wo,
+                flu_start.value,
+                flu_wo.value,
+                module.flu_t2_start,
+                module.flu_t2_wo,
+                fi_start.value,
+                fi_wo.value,
+                module.fi_t2_start,
+                module.fi_t2_wo,
+                False,
+                0,  # Delay
+            ]
 
-        res = Result(results_w + results_start, results_wo + results_start)
+            math_start_wo = PerennialCropland(*input_start_wo)
+            math_start_wo.calculate_emissions()
 
-        # BUG: Results for perennial crops do not add up. Wait for Lorenzo's unlocked Excel files
-        return res.breakdown(by=aggregate_by)
+        if is_with(module):
+            inputs_w = [
+                0,
+                area,
+                project.implementation_years,
+                project.capitalization_years,
+                change_rate.name,
+                project.gw_potential.n2o,
+                project.gw_potential.ch4,
+                module.is_biomass_burned_w,
+                burning_emission_factor.n2o,
+                burning_emission_factor.ch4,
+                fires_combustion_factor_w.value,
+                default_fire_periodicity.value,
+                module.fire_periodicity_t2_w,
+                module.residue_burned_t2_w,
+                ag_default_w.value,
+                module.ag_t2_w,
+                agb_max_c_w.value,
+                bg_default_w.value,
+                module.bg_t2_w,
+                soc_start,
+                soc_w,
+                module.soc_t2_start,
+                module.soc_t2_w,
+                fmg_start.value,
+                fmg_w.value,
+                module.fmg_t2_start,
+                module.fmg_t2_w,
+                flu_start.value,
+                flu_w.value,
+                module.flu_t2_start,
+                module.flu_t2_w,
+                fi_start.value,
+                fi_w.value,
+                module.fi_t2_start,
+                module.fi_t2_w,
+                True,
+                0,  # Delay
+            ]
+
+            math_w = PerennialCropland(*inputs_w)
+            math_w.calculate_emissions()
+
+        if is_without(module):
+            inputs_wo = [
+                0,
+                area,
+                project.implementation_years,
+                project.capitalization_years,
+                change_rate.name,
+                project.gw_potential.n2o,
+                project.gw_potential.ch4,
+                module.is_biomass_burned_wo,
+                burning_emission_factor.n2o,
+                burning_emission_factor.ch4,
+                fires_combustion_factor_wo.value,
+                default_fire_periodicity.value,
+                module.fire_periodicity_t2_wo,
+                module.residue_burned_t2_wo,
+                ag_default_wo.value,
+                module.ag_t2_wo,
+                agb_max_c_wo.value,
+                bg_default_wo.value,
+                module.bg_t2_wo,
+                soc_start,
+                soc_wo,
+                module.soc_t2_start,
+                module.soc_t2_wo,
+                fmg_start.value,
+                fmg_wo.value,
+                module.fmg_t2_start,
+                module.fmg_t2_wo,
+                flu_start.value,
+                flu_wo.value,
+                module.flu_t2_start,
+                module.flu_t2_wo,
+                fi_start.value,
+                fi_wo.value,
+                module.fi_t2_start,
+                module.fi_t2_wo,
+                False,
+                0,  # Delay
+            ]
+
+            math_wo = PerennialCropland(*inputs_wo)
+            math_wo.calculate_emissions()
+
+        results_start_w = math_start_w.result if math_start_w else MathResult(project.implementation_years, project.capitalization_years)
+        results_start_wo = math_start_wo.result if math_start_wo else MathResult(project.implementation_years, project.capitalization_years)
+        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
+        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+
+        results_tuple = (results_w + results_start_w, results_wo + results_start_wo)
+
+        return results_tuple
 
 
 class FloodedRiceCalculator(BaseCalculator):
