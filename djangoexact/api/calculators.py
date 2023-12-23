@@ -2485,34 +2485,41 @@ class BuildingCalculator(BaseCalculator):
         ef_w: ipcc.BuildingEmissionFactor = ipcc.BuildingEmissionFactor.objects.get(building_type=input.building_type_w)
         ef_wo: ipcc.BuildingEmissionFactor = ipcc.BuildingEmissionFactor.objects.get(building_type=input.building_type_wo)
 
-        inputs_w = [
-            ef_w.value,
-            input.ef_t2_w,
-            input.area_m2_w,
-            project.implementation_years,
-            project.capitalization_years,
-            input.activity.change_rate.name,
-        ]
+        math_w = None
+        math_wo = None
 
-        inputs_wo = [
-            ef_wo.value,
-            input.ef_t2_wo,
-            input.area_m2_wo,
-            project.implementation_years,
-            project.capitalization_years,
-            input.activity.change_rate.name,
-        ]
+        if is_with(input):
+            inputs_w = [
+                ef_w.value,
+                input.ef_t2_w,
+                input.area_m2_w,
+                project.implementation_years,
+                project.capitalization_years,
+                input.activity.change_rate.name,
+            ]
 
-        math_w = MathRoads(*inputs_w)
-        math_wo = MathRoads(*inputs_wo)
+            math_w = MathRoads(*inputs_w)
+            math_w.calculate_emissions()
 
-        math_w.calculate_emissions()
-        math_wo.calculate_emissions()
+        if is_without(input):
+            inputs_wo = [
+                ef_wo.value,
+                input.ef_t2_wo,
+                input.area_m2_wo,
+                project.implementation_years,
+                project.capitalization_years,
+                input.activity.change_rate.name,
+            ]
 
-        results_w = math_w.total_emissions
-        results_wo = math_wo.total_emissions
+            math_wo = MathRoads(*inputs_wo)
+            math_wo.calculate_emissions()
 
-        return Result(results_w, results_wo)
+        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
+        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+
+        results_tuple = (results_w, results_wo)
+
+        return results_tuple
 
 
 class RoadCalculator(BaseCalculator):
@@ -2531,34 +2538,41 @@ class RoadCalculator(BaseCalculator):
         ef_w: ipcc.RoadEmissionFactor = ipcc.RoadEmissionFactor.objects.get(road_type=input.road_type_w)
         ef_wo: ipcc.RoadEmissionFactor = ipcc.RoadEmissionFactor.objects.get(road_type=input.road_type_wo)
 
-        inputs_w = [
-            ef_w.value,
-            input.ef_t2_w,
-            input.area_m2_w,
-            project.implementation_years,
-            project.capitalization_years,
-            input.activity.change_rate.name,
-        ]
+        math_w = None
+        math_wo = None
 
-        inputs_wo = [
-            ef_wo.value,
-            input.ef_t2_wo,
-            input.area_m2_wo,
-            project.implementation_years,
-            project.capitalization_years,
-            input.activity.change_rate.name,
-        ]
+        if is_with(input):
+            inputs_w = [
+                ef_w.value,
+                input.ef_t2_w,
+                input.area_m2_w,
+                project.implementation_years,
+                project.capitalization_years,
+                input.activity.change_rate.name,
+            ]
 
-        math_w = MathRoads(*inputs_w)
-        math_wo = MathRoads(*inputs_wo)
+            math_w = MathRoads(*inputs_w)
+            math_w.calculate_emissions()
 
-        math_w.calculate_emissions()
-        math_wo.calculate_emissions()
+        if is_without(input):
+            inputs_wo = [
+                ef_wo.value,
+                input.ef_t2_wo,
+                input.area_m2_wo,
+                project.implementation_years,
+                project.capitalization_years,
+                input.activity.change_rate.name,
+            ]
 
-        results_w = math_w.total_emissions
-        results_wo = math_wo.total_emissions
+            math_wo = MathRoads(*inputs_wo)
+            math_wo.calculate_emissions()
 
-        return Result(results_w, results_wo)
+        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
+        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+
+        results_tuple = (results_w, results_wo)
+
+        return results_tuple
 
 
 class LivestockCalculator(BaseCalculator):
