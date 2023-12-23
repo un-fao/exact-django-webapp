@@ -1372,13 +1372,14 @@ class FloodedRiceCalculator(BaseCalculator):
     """
 
     def calculate(self) -> Result:
-        input: FloodedRice = self.data
-        project: Project = input.activity.project
-        luc: LandUseChange = input.land_use_change
-        area = luc.area if luc.area else input.area
+        module: FloodedRice = self.data
+        activity: Activity = module.activity
+        project: Project = activity.project
+        luc: LandUseChange = module.land_use_change
+        area = luc.area if luc.area else module.area
 
-        climate: Climate = project.climate
-        moisture: Moisture = project.moisture
+        climate: Climate = activity.climate_t2 or project.climate
+        moisture: Moisture = activity.moisture_t2 or project.moisture
         region: Region = project.country.region
         soil_type: SoilType = project.soil_type
 
@@ -1392,29 +1393,29 @@ class FloodedRiceCalculator(BaseCalculator):
         soc_w = soc.value
         soc_wo = soc.value
 
-        flu_start = get_flu_data(input, climate, moisture, utils.ScenarioTypes.START)
-        flu_w = get_flu_data(input, climate, moisture, utils.ScenarioTypes.WITH)
-        flu_wo = get_flu_data(input, climate, moisture, utils.ScenarioTypes.WITHOUT)
+        flu_start = get_flu_data(module, climate, moisture, utils.ScenarioTypes.START)
+        flu_w = get_flu_data(module, climate, moisture, utils.ScenarioTypes.WITH)
+        flu_wo = get_flu_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
 
-        fmg_start = get_fmg_data(input, climate, moisture, utils.ScenarioTypes.START)
-        fmg_w = get_fmg_data(input, climate, moisture, utils.ScenarioTypes.WITH)
-        fmg_wo = get_fmg_data(input, climate, moisture, utils.ScenarioTypes.WITHOUT)
+        fmg_start = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.START)
+        fmg_w = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.WITH)
+        fmg_wo = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
 
-        fi_start = get_fi_data(input, climate, moisture, utils.ScenarioTypes.START)
-        fi_w = get_fi_data(input, climate, moisture, utils.ScenarioTypes.WITH)
-        fi_wo = get_fi_data(input, climate, moisture, utils.ScenarioTypes.WITHOUT)
+        fi_start = get_fi_data(module, climate, moisture, utils.ScenarioTypes.START)
+        fi_w = get_fi_data(module, climate, moisture, utils.ScenarioTypes.WITH)
+        fi_wo = get_fi_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
 
-        sfw_start = ipcc.RiceSFW.objects.get(water_management_type_after_cultivation=input.water_management_type_after_cultivation_start)
-        sfw_w = ipcc.RiceSFW.objects.get(water_management_type_after_cultivation=input.water_management_type_after_cultivation_w)
-        sfw_wo = ipcc.RiceSFW.objects.get(water_management_type_after_cultivation=input.water_management_type_after_cultivation_wo)
+        sfw_start = ipcc.RiceSFW.objects.get(water_management_type_after_cultivation=module.water_management_type_after_cultivation_start)
+        sfw_w = ipcc.RiceSFW.objects.get(water_management_type_after_cultivation=module.water_management_type_after_cultivation_w)
+        sfw_wo = ipcc.RiceSFW.objects.get(water_management_type_after_cultivation=module.water_management_type_after_cultivation_wo)
 
-        sfp_start = ipcc.RiceSFP.objects.get(water_management_type_before_cultivation=input.water_management_type_before_cultivation_start)
-        sfp_w = ipcc.RiceSFP.objects.get(water_management_type_before_cultivation=input.water_management_type_before_cultivation_w)
-        sfp_wo = ipcc.RiceSFP.objects.get(water_management_type_before_cultivation=input.water_management_type_before_cultivation_wo)
+        sfp_start = ipcc.RiceSFP.objects.get(water_management_type_before_cultivation=module.water_management_type_before_cultivation_start)
+        sfp_w = ipcc.RiceSFP.objects.get(water_management_type_before_cultivation=module.water_management_type_before_cultivation_w)
+        sfp_wo = ipcc.RiceSFP.objects.get(water_management_type_before_cultivation=module.water_management_type_before_cultivation_wo)
 
-        cfoa_start = ipcc.RiceSFO.objects.get(organic_amendment_type=input.organic_amendment_type_start)
-        cfoa_w = ipcc.RiceSFO.objects.get(organic_amendment_type=input.organic_amendment_type_w)
-        cfoa_wo = ipcc.RiceSFO.objects.get(organic_amendment_type=input.organic_amendment_type_wo)
+        cfoa_start = ipcc.RiceSFO.objects.get(organic_amendment_type=module.organic_amendment_type_start)
+        cfoa_w = ipcc.RiceSFO.objects.get(organic_amendment_type=module.organic_amendment_type_w)
+        cfoa_wo = ipcc.RiceSFO.objects.get(organic_amendment_type=module.organic_amendment_type_wo)
 
         n_estimation_factor = ipcc.CropNitrousEstimationDefaultFactor.objects.get(land_use_type__name="Rice")
         burning_emission_factor = ipcc.BurningEmissionFactor.objects.get(category__name="Agricultural residues")
@@ -1425,49 +1426,49 @@ class FloodedRiceCalculator(BaseCalculator):
         math_w = None
         math_wo = None
 
-        if is_luc_remaining_same(input):
+        if is_luc_remaining_same(module):
             inputs_start_w = [
                 *[area, 0],
                 rice_ef.value,
-                input.efc_t2_start,
+                module.efc_t2_start,
                 sfw_start.value,
-                input.sfw_t2_start,
+                module.sfw_t2_start,
                 sfp_start.value,
-                input.sfp_t2_start,
+                module.sfp_t2_start,
                 cfoa_start.value,
-                input.sfo_t2_start,
-                input.efi_t2_start,
+                module.sfo_t2_start,
+                module.efi_t2_start,
                 yield_ref.value,
-                input.crop_yield_start,
+                module.crop_yield_start,
                 n_estimation_factor.slope,
                 n_estimation_factor.intercept,
-                input.rice_straw_t2_start,
+                module.rice_straw_t2_start,
                 burning_emission_factor.ch4,
                 rice_cf.value,
                 burning_emission_factor.n2o,
                 project.gw_potential.n2o,
                 project.implementation_years,
                 project.capitalization_years,
-                input.activity.change_rate.name,
+                module.activity.change_rate.name,
                 project.gw_potential.ch4,
                 rice_ef.cultivation_period,
-                input.cultivation_period_start,
+                module.cultivation_period_start,
                 soc_start,
                 soc_w,
-                input.soc_t2_start,
-                input.soc_t2_w,
+                module.soc_t2_start,
+                module.soc_t2_w,
                 fmg_start.value,
                 fmg_w.value,
-                input.fmg_t2_start,
-                input.fmg_t2_w,
+                module.fmg_t2_start,
+                module.fmg_t2_w,
                 flu_start.value,
                 flu_w.value,
-                input.flu_t2_start,
-                input.flu_t2_w,
+                module.flu_t2_start,
+                module.flu_t2_w,
                 fi_start.value,
                 fi_w.value,
-                input.fi_t2_start,
-                input.fi_t2_w,
+                module.fi_t2_start,
+                module.fi_t2_w,
                 True,
                 0,  # Delay
             ]
@@ -1475,49 +1476,49 @@ class FloodedRiceCalculator(BaseCalculator):
             math_start_w = MathFloodedRice(*inputs_start_w)
             math_start_w.calculate_emissions()
 
-        if is_business_as_usual(input):
+        if is_business_as_usual(module):
             inputs_start_wo = [
                 *[area, 0],
                 rice_ef.value,
-                input.efc_t2_start,
+                module.efc_t2_start,
                 sfw_start.value,
-                input.sfw_t2_start,
+                module.sfw_t2_start,
                 sfp_start.value,
-                input.sfp_t2_start,
+                module.sfp_t2_start,
                 cfoa_start.value,
-                input.sfo_t2_start,
-                input.efi_t2_start,
+                module.sfo_t2_start,
+                module.efi_t2_start,
                 yield_ref.value,
-                input.crop_yield_start,
+                module.crop_yield_start,
                 n_estimation_factor.slope,
                 n_estimation_factor.intercept,
-                input.rice_straw_t2_start,
+                module.rice_straw_t2_start,
                 burning_emission_factor.ch4,
                 rice_cf.value,
                 burning_emission_factor.n2o,
                 project.gw_potential.n2o,
                 project.implementation_years,
                 project.capitalization_years,
-                input.activity.change_rate.name,
+                module.activity.change_rate.name,
                 project.gw_potential.ch4,
                 rice_ef.cultivation_period,
-                input.cultivation_period_start,
+                module.cultivation_period_start,
                 soc_start,
                 soc_wo,
-                input.soc_t2_start,
-                input.soc_t2_wo,
+                module.soc_t2_start,
+                module.soc_t2_wo,
                 fmg_start.value,
                 fmg_wo.value,
-                input.fmg_t2_start,
-                input.fmg_t2_wo,
+                module.fmg_t2_start,
+                module.fmg_t2_wo,
                 flu_start.value,
                 flu_wo.value,
-                input.flu_t2_start,
-                input.flu_t2_wo,
+                module.flu_t2_start,
+                module.flu_t2_wo,
                 fi_start.value,
                 fi_wo.value,
-                input.fi_t2_start,
-                input.fi_t2_wo,
+                module.fi_t2_start,
+                module.fi_t2_wo,
                 True,
                 0,  # Delay
             ]
@@ -1525,49 +1526,49 @@ class FloodedRiceCalculator(BaseCalculator):
             math_start_wo = MathFloodedRice(*inputs_start_wo)
             math_start_wo.calculate_emissions()
 
-        if is_with(input):
+        if is_with(module):
             inputs_w = [
                 *[0, area],
                 rice_ef.value,
-                input.efc_t2_w,
+                module.efc_t2_w,
                 sfw_w.value,
-                input.sfw_t2_w,
+                module.sfw_t2_w,
                 sfp_w.value,
-                input.sfp_t2_w,
+                module.sfp_t2_w,
                 cfoa_w.value,
-                input.sfo_t2_w,
-                input.efi_t2_w,
+                module.sfo_t2_w,
+                module.efi_t2_w,
                 yield_ref.value,
-                input.crop_yield_w,
+                module.crop_yield_w,
                 n_estimation_factor.slope,
                 n_estimation_factor.intercept,
-                input.rice_straw_t2_w,
+                module.rice_straw_t2_w,
                 burning_emission_factor.ch4,
                 rice_cf.value,
                 burning_emission_factor.n2o,
                 project.gw_potential.n2o,
                 project.implementation_years,
                 project.capitalization_years,
-                input.activity.change_rate.name,
+                module.activity.change_rate.name,
                 project.gw_potential.ch4,
                 rice_ef.cultivation_period,
-                input.cultivation_period_w,
+                module.cultivation_period_w,
                 soc_start,
                 soc_w,
-                input.soc_t2_start,
-                input.soc_t2_w,
+                module.soc_t2_start,
+                module.soc_t2_w,
                 fmg_start.value,
                 fmg_w.value,
-                input.fmg_t2_start,
-                input.fmg_t2_w,
+                module.fmg_t2_start,
+                module.fmg_t2_w,
                 flu_start.value,
                 flu_w.value,
-                input.flu_t2_start,
-                input.flu_t2_w,
+                module.flu_t2_start,
+                module.flu_t2_w,
                 fi_start.value,
                 fi_w.value,
-                input.fi_t2_start,
-                input.fi_t2_w,
+                module.fi_t2_start,
+                module.fi_t2_w,
                 True,
                 0,  # Delay
             ]
@@ -1575,49 +1576,49 @@ class FloodedRiceCalculator(BaseCalculator):
             math_w = MathFloodedRice(*inputs_w)
             math_w.calculate_emissions()
 
-        if is_without(input):
+        if is_without(module):
             inputs_wo = [
                 *[0, area],
                 rice_ef.value,
-                input.efc_t2_wo,
+                module.efc_t2_wo,
                 sfw_wo.value,
-                input.sfw_t2_wo,
+                module.sfw_t2_wo,
                 sfp_wo.value,
-                input.sfp_t2_wo,
+                module.sfp_t2_wo,
                 cfoa_wo.value,
-                input.sfo_t2_wo,
-                input.efi_t2_wo,
+                module.sfo_t2_wo,
+                module.efi_t2_wo,
                 yield_ref.value,
-                input.crop_yield_wo,
+                module.crop_yield_wo,
                 n_estimation_factor.slope,
                 n_estimation_factor.intercept,
-                input.rice_straw_t2_wo,
+                module.rice_straw_t2_wo,
                 burning_emission_factor.ch4,
                 rice_cf.value,
                 burning_emission_factor.n2o,
                 project.gw_potential.n2o,
                 project.implementation_years,
                 project.capitalization_years,
-                input.activity.change_rate.name,
+                module.activity.change_rate.name,
                 project.gw_potential.ch4,
                 rice_ef.cultivation_period,
-                input.cultivation_period_wo,
+                module.cultivation_period_wo,
                 soc_start,
                 soc_wo,
-                input.soc_t2_start,
-                input.soc_t2_wo,
+                module.soc_t2_start,
+                module.soc_t2_wo,
                 fmg_start.value,
                 fmg_wo.value,
-                input.fmg_t2_start,
-                input.fmg_t2_wo,
+                module.fmg_t2_start,
+                module.fmg_t2_wo,
                 flu_start.value,
                 flu_wo.value,
-                input.flu_t2_start,
-                input.flu_t2_wo,
+                module.flu_t2_start,
+                module.flu_t2_wo,
                 fi_start.value,
                 fi_wo.value,
-                input.fi_t2_start,
-                input.fi_t2_wo,
+                module.fi_t2_start,
+                module.fi_t2_wo,
                 False,
                 0,  # Delay
             ]
@@ -1883,7 +1884,8 @@ class SmallFisheryCalculator(BaseCalculator):
         """
 
         module: SmallFishery = self.data
-        project = module.activity.project
+        activity: Activity = module.activity
+        project: Project = activity.project
 
         ef_diesel_default_list = ipcc.EnergyDefaultEmissionFactor.objects.filter(fuel_type__fuel_use_type__name__contains="Off-Road")
 
@@ -2090,94 +2092,6 @@ class LargeFisheryCalculator(BaseCalculator):
         results_wo = math_wo.result
 
         return (results_w, results_wo)
-
-
-# TODO: Delete
-class ForestCalculator(BaseCalculator):
-    """
-    TODO: Redo
-    """
-
-    def calculate(self) -> list[Result]:
-        """
-        Calculate emissions for a single Forest module.
-        """
-
-        project: Project = self.data.activity.project
-        data = None
-        agb = None
-        bgb = None
-        soc = None
-        LAND_INPUT_FACTOR_DEFAULT = 1
-        AGB_MULTIPLICATION_FACTOR = 0.47
-
-        if self.data.vegetation_type.name == "Mangrove Forest":
-            data = ipcc.DataOnMangrove.objects.get(climate=project.climate, moisture=project.moisture)
-            agb = data.agb_c
-            bgb = data.bgb
-            soc = data.soc_ref
-        else:
-            data = ipcc.LitterDeadwoodCarbonStock.objects.get(vegetation_type=self.data.vegetation_type)
-            f_agb = ipcc.ForestAGB.objects.get(continent=project.country.region, vegetation_type=self.data.vegetation_type)
-            f_bgb = ipcc.BelowGroundBiomass.objects.get_max_below_threshold(
-                continent=project.country.region,
-                vegetation_type=self.data.vegetation_type,
-                threshold=f_agb.value,
-            )
-
-            agb = f_agb.value * AGB_MULTIPLICATION_FACTOR
-            bgb = f_bgb.value * agb
-            soc = project.soc_ref.value
-
-        cf: ipcc.CombustionFactor = ipcc.CombustionFactor.objects.get(vegetation_type=self.data.vegetation_type)
-
-        inputs = [
-            self.data.ha_start,
-            self.data.ha_w,
-            self.data.ha_wo,
-            project.implementation_years,
-            project.capitalization_years,
-            self.data.ha_w_rate.name,
-            self.data.ha_wo_rate.name,
-            self.data.ha_w_rate.value,
-            self.data.ha_wo_rate.value,
-            project.gw_potential.n2o,
-            project.gw_potential.ch4,
-            self.data.degradation_level_w.value,
-            self.data.degradation_level_w_t2.value if self.data.degradation_level_w_t2 else None,
-            self.data.degradation_level_wo.value,
-            self.data.degradation_level_wo_t2.value if self.data.degradation_level_wo_t2 else None,
-            self.data.degradation_level_start.value,
-            self.data.degradation_level_start_t2.value if self.data.degradation_level_start_t2 else None,
-            agb,
-            self.data.ag_carbon_t2,
-            bgb,
-            self.data.bg_carbon_t2,
-            data.litter,
-            self.data.litter_t2,
-            data.dw,
-            self.data.deadwood_t2,
-            soc,
-            self.data.soil_carbon_t2,
-            LAND_INPUT_FACTOR_DEFAULT,
-            self.data.land_input_factor_start_t2,
-            self.data.land_input_factor_w_t2,
-            self.data.land_input_factor_wo_t2,
-            self.data.fire_periodicity_w,
-            self.data.fire_periodicity_wo,
-            self.data.is_fire_used_w,
-            self.data.is_fire_used_wo,
-            self.data.fire_impact_percentage_w,
-            self.data.fire_impact_percentage_wo,
-            cf.value,
-            cf.ch4,
-            cf.n2o,
-        ]
-
-        return Result(*forest_management.calculate_emissions(*inputs))
-
-
-# END TODO: Delete
 
 
 class AquacultureCalculator(BaseCalculator):
