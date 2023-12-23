@@ -3347,31 +3347,43 @@ class IrrigationSystemCalculator(BaseCalculator):
 
         ef = ipcc.IrrigationSystemData.objects.get(irrigation_system_type=_input.irrigation_system_type)
 
-        inputs_w = [
-            ef.value,
-            _input.ef_t2_start,
-            _input.ha_start,
-            _input.ha_w,
-            project.implementation_years,
-            project.capitalization_years,
-            _input.activity.change_rate.name,
-        ]
+        math_w = None
+        math_wo = None
 
-        results_w = NewIrrigation(*inputs_w).calculate_emissions()
+        if is_with(_input):
+            inputs_w = [
+                ef.value,
+                _input.ef_t2_start,
+                _input.ha_start,
+                _input.ha_w,
+                project.implementation_years,
+                project.capitalization_years,
+                _input.activity.change_rate.name,
+            ]
 
-        inputs_wo = [
-            ef.value,
-            _input.ef_t2_wo,
-            _input.ha_start,
-            _input.ha_wo,
-            project.implementation_years,
-            project.capitalization_years,
-            _input.activity.change_rate.name,
-        ]
+            math_w = NewIrrigation(*inputs_w)
+            math_w.calculate_emissions()
 
-        results_wo = NewIrrigation(*inputs_wo).calculate_emissions()
+        if is_without(_input):
+            inputs_wo = [
+                ef.value,
+                _input.ef_t2_wo,
+                _input.ha_start,
+                _input.ha_wo,
+                project.implementation_years,
+                project.capitalization_years,
+                _input.activity.change_rate.name,
+            ]
 
-        return Result(results_w, results_wo)
+            math_wo = NewIrrigation(*inputs_wo)
+            math_wo.calculate_emissions()
+
+        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
+        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+
+        results_tuple = (results_w, results_wo)
+
+        return results_tuple
 
 
 class IrrigationPhaseCalculator(BaseCalculator):
@@ -3387,7 +3399,11 @@ class IrrigationPhaseCalculator(BaseCalculator):
         transportation_loss = IrrigationParameter.objects.get(name="TRANSPORTATION_LOSS")
         pumping_efficiency = IrrigationParameter.objects.get(name="PUMPING_EFFICIENCY")
 
-        inputs_from_start = [
+        math_start = None
+        math_w = None
+        math_wo = None
+
+        inputs_start = [
             ef.emission_factor,
             input.ef_t2_start,
             input.total_dynamic_head_t2,
@@ -3408,55 +3424,66 @@ class IrrigationPhaseCalculator(BaseCalculator):
             input.gross_irrigation_water_start,
         ]
 
-        results_start = OperationPhaseIrrigation(*inputs_from_start).calculate_emissions()
+        math_start = OperationPhaseIrrigation(*inputs_start)
+        math_start.calculate_emissions()
 
-        inputs_w = [
-            ef.emission_factor,
-            input.ef_t2_w,
-            input.total_dynamic_head_t2,
-            pressure.avg_pressure,
-            input.average_pressure_t2,
-            pumping_efficiency.value,
-            input.pumping_efficiency_t2_w,
-            erh_electricity,
-            energy_db.net_calorific_value,
-            energy_db.density,
-            input.well_depth,
-            0,
-            input.ha_w,
-            input.activity.change_rate.name,
-            project.implementation_years,
-            project.capitalization_years,
-            transportation_loss.value if input.fuel_type.name == "Electricity" else 0,
-            input.gross_irrigation_water_w,
-        ]
+        if is_with(input):
+            inputs_w = [
+                ef.emission_factor,
+                input.ef_t2_w,
+                input.total_dynamic_head_t2,
+                pressure.avg_pressure,
+                input.average_pressure_t2,
+                pumping_efficiency.value,
+                input.pumping_efficiency_t2_w,
+                erh_electricity,
+                energy_db.net_calorific_value,
+                energy_db.density,
+                input.well_depth,
+                0,
+                input.ha_w,
+                input.activity.change_rate.name,
+                project.implementation_years,
+                project.capitalization_years,
+                transportation_loss.value if input.fuel_type.name == "Electricity" else 0,
+                input.gross_irrigation_water_w,
+            ]
 
-        results_w = OperationPhaseIrrigation(*inputs_w).calculate_emissions()
+            math_w = OperationPhaseIrrigation(*inputs_w)
+            math_w.calculate_emissions()
 
-        inputs_wo = [
-            ef.emission_factor,
-            input.ef_t2_wo,
-            input.total_dynamic_head_t2,
-            pressure.avg_pressure,
-            input.average_pressure_t2,
-            pumping_efficiency.value,
-            input.pumping_efficiency_t2_wo,
-            erh_electricity,
-            energy_db.net_calorific_value,
-            energy_db.density,
-            input.well_depth,
-            0,
-            input.ha_wo,
-            input.activity.change_rate.name,
-            project.implementation_years,
-            project.capitalization_years,
-            transportation_loss.value if input.fuel_type.name == "Electricity" else 0,
-            input.gross_irrigation_water_wo,
-        ]
+        if is_without(input):
+            inputs_wo = [
+                ef.emission_factor,
+                input.ef_t2_wo,
+                input.total_dynamic_head_t2,
+                pressure.avg_pressure,
+                input.average_pressure_t2,
+                pumping_efficiency.value,
+                input.pumping_efficiency_t2_wo,
+                erh_electricity,
+                energy_db.net_calorific_value,
+                energy_db.density,
+                input.well_depth,
+                0,
+                input.ha_wo,
+                input.activity.change_rate.name,
+                project.implementation_years,
+                project.capitalization_years,
+                transportation_loss.value if input.fuel_type.name == "Electricity" else 0,
+                input.gross_irrigation_water_wo,
+            ]
 
-        results_wo = OperationPhaseIrrigation(*inputs_wo).calculate_emissions()
+            math_wo = OperationPhaseIrrigation(*inputs_wo)
+            math_wo.calculate_emissions()
 
-        return Result(results_w + results_start, results_wo + results_start)
+        results_start = math_start.result if math_start else MathResult(project.implementation_years, project.capitalization_years)
+        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
+        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+
+        results_tuple = (results_w + results_start, results_wo + results_start)
+
+        return results_tuple
 
 
 class CoastalWetlandCalculator(BaseCalculator):
