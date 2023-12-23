@@ -2190,63 +2190,70 @@ class InputEntryCalculator(BaseCalculator):
     """
 
     def calculate(self) -> list[Result]:
-        input: InputEntry = self.data
-        activity: Activity = input.parent.activity
+        module: InputEntry = self.data
+        activity: Activity = module.parent.activity
         project: Project = activity.project
 
-        ref = ipcc.InputReference.objects.get(gw_potential=project.gw_potential, input_type=input.input_type)
-        ef = ipcc.InputEmissionFactor.objects.get(input_type=input.input_type, climate=project.climate, moisture=project.moisture)
+        ref = ipcc.InputReference.objects.get(gw_potential=project.gw_potential, input_type=module.input_type)
+        ef = ipcc.InputEmissionFactor.objects.get(input_type=module.input_type, climate=project.climate, moisture=project.moisture)
 
-        inputs_w = [
-            input.value_start,
-            input.value_w,
-            activity.change_rate.name,
-            ef.co2_value,
-            input.co2_emissions_t2,
-            ref.co2_multiplier,
-            ref.co2_emissions_multiplier,
-            project.implementation_years,
-            project.capitalization_years,
-            ef.n2o_value,
-            input.n2o_emissions_t2,
-            ref.n2o_quantity_multiplier,
-            ref.n2o_emissions_multiplier,
-            ef.co2_eq_value,
-            input.co2_e_emissions_t2,
-            ref.production_quantity_multiplier,
-            ref.production_emissions_multiplier,
-        ]
+        math_w = None
+        math_wo = None
 
-        inputs_wo = [
-            input.value_start,
-            input.value_wo,
-            activity.change_rate.name,
-            ef.co2_value,
-            input.co2_emissions_t2,
-            ref.co2_multiplier,
-            ref.co2_emissions_multiplier,
-            project.implementation_years,
-            project.capitalization_years,
-            ef.n2o_value,
-            input.n2o_emissions_t2,
-            ref.n2o_quantity_multiplier,
-            ref.n2o_emissions_multiplier,
-            ef.co2_eq_value,
-            input.co2_e_emissions_t2,
-            ref.production_quantity_multiplier,
-            ref.production_emissions_multiplier,
-        ]
+        if is_with(module):
+            inputs_w = [
+                module.value_start,
+                module.value_w,
+                activity.change_rate.name,
+                ef.co2_value,
+                module.co2_emissions_t2,
+                ref.co2_multiplier,
+                ref.co2_emissions_multiplier,
+                project.implementation_years,
+                project.capitalization_years,
+                ef.n2o_value,
+                module.n2o_emissions_t2,
+                ref.n2o_quantity_multiplier,
+                ref.n2o_emissions_multiplier,
+                ef.co2_eq_value,
+                module.co2_e_emissions_t2,
+                ref.production_quantity_multiplier,
+                ref.production_emissions_multiplier,
+            ]
 
-        results_w = MathInputs(*inputs_w)
-        results_wo = MathInputs(*inputs_wo)
+            math_w = MathInputs(*inputs_w)
+            math_w = math_w.calculate_emissions()
 
-        results_w.calculate_emissions()
-        results_wo.calculate_emissions()
+        if is_without(module):
+            inputs_wo = [
+                module.value_start,
+                module.value_wo,
+                activity.change_rate.name,
+                ef.co2_value,
+                module.co2_emissions_t2,
+                ref.co2_multiplier,
+                ref.co2_emissions_multiplier,
+                project.implementation_years,
+                project.capitalization_years,
+                ef.n2o_value,
+                module.n2o_emissions_t2,
+                ref.n2o_quantity_multiplier,
+                ref.n2o_emissions_multiplier,
+                ef.co2_eq_value,
+                module.co2_e_emissions_t2,
+                ref.production_quantity_multiplier,
+                ref.production_emissions_multiplier,
+            ]
 
-        res_w = results_w.total_emissions if results_w.total_emissions else MathResult(project.implementation_years, project.capitalization_years)
-        res_wo = results_wo.total_emissions if results_wo.total_emissions else MathResult(project.implementation_years, project.capitalization_years)
+            math_wo = MathInputs(*inputs_wo)
+            math_wo = math_wo.calculate_emissions()
 
-        return (res_w, res_wo)
+        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
+        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+
+        results_tuple = (results_w, results_wo)
+
+        return results_tuple
 
 
 class EnergyCalculator(BaseCalculator):
