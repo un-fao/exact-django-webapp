@@ -1,16 +1,70 @@
 import math
-from .general_functions import yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, yearly_time_dependent_20_year_breakdown, breakdown_according_to_values, soil_emissions_2
 import traceback
-from .ghg_emissions_classes import YearlyGasActivityEmissionSet, Emission, GasTypes, ActivityTypes, Result
+
+from .general_functions import (
+    breakdown_according_to_values,
+    soil_emissions_2,
+    yearly_constant_emissions_breakdown,
+    yearly_time_dependent_20_year_breakdown,
+    yearly_time_dependent_parameter_breakdown,
+)
+from .ghg_emissions_classes import (
+    ActivityTypes,
+    Emission,
+    GasTypes,
+    Result,
+    YearlyGasActivityEmissionSet,
+)
+
 
 class FloodedRice:
-
-    def __init__(self, area_start, area_end, EFc_ref, EFc_tier_2, SFw_ref, SFw_tier_2, SFp_ref, SFp_tier_2, cfoa, SFo_tier_2, adjusted_daily_ef_methane_tier_2, yield_ref, yield_tier_2, rice_slope, rice_intercept, straw_tonnes_tier_2, methane_ef, rice_cf, nitrous_ef, nitrous_constant,
-                        time_impl, time_cap, rate, methane_constant, cultivation_period_ref, cultivation_period_tier_2, soc_start_default, soc_end_default, soc_start_tier_2, soc_end_tier_2, fmg_start_default, fmg_end_default, fmg_start_tier_2, fmg_end_tier_2, flu_start_default, 
-                        flu_end_default, flu_start_tier_2, flu_end_tier_2, fi_start_default, fi_end_default, fi_start_tier_2, fi_end_tier_2, calculate_soc_som, delay = 0
-
-                        ):
-        
+    def __init__(
+        self,
+        area_start,
+        area_end,
+        EFc_ref,
+        EFc_tier_2,
+        SFw_ref,
+        SFw_tier_2,
+        SFp_ref,
+        SFp_tier_2,
+        cfoa,
+        SFo_tier_2,
+        adjusted_daily_ef_methane_tier_2,
+        yield_ref,
+        yield_tier_2,
+        rice_slope,
+        rice_intercept,
+        straw_tonnes_tier_2,
+        methane_ef,
+        rice_cf,
+        nitrous_ef,
+        nitrous_constant,
+        time_impl,
+        time_cap,
+        rate,
+        methane_constant,
+        cultivation_period_ref,
+        cultivation_period_tier_2,
+        soc_start_default,
+        soc_end_default,
+        soc_start_tier_2,
+        soc_end_tier_2,
+        fmg_start_default,
+        fmg_end_default,
+        fmg_start_tier_2,
+        fmg_end_tier_2,
+        flu_start_default,
+        flu_end_default,
+        flu_start_tier_2,
+        flu_end_tier_2,
+        fi_start_default,
+        fi_end_default,
+        fi_start_tier_2,
+        fi_end_tier_2,
+        calculate_soc_som,
+        delay=0,
+    ):
         self.area_start = area_start
         self.area_end = area_end
         self.EFc_ref = EFc_ref
@@ -43,18 +97,18 @@ class FloodedRice:
         self.soc_start_tier_2 = soc_start_tier_2
         self.soc_end_tier_2 = soc_end_tier_2
 
-        self.fmg_start_default = fmg_start_default # defaulted to 1 in case there are None, if not float value
-        self.fmg_end_default = fmg_end_default # defaulted to 1 in case there are None, if not float value
-        self.fmg_start_tier_2 = fmg_start_tier_2 # tier 2 value, expects float or None
-        self.fmg_end_tier_2 = fmg_end_tier_2 # tier 2 value, expects float or None
-        self.flu_start_default = flu_start_default # defaulted to 1 in case there are None, if not float value
+        self.fmg_start_default = fmg_start_default  # defaulted to 1 in case there are None, if not float value
+        self.fmg_end_default = fmg_end_default  # defaulted to 1 in case there are None, if not float value
+        self.fmg_start_tier_2 = fmg_start_tier_2  # tier 2 value, expects float or None
+        self.fmg_end_tier_2 = fmg_end_tier_2  # tier 2 value, expects float or None
+        self.flu_start_default = flu_start_default  # defaulted to 1 in case there are None, if not float value
         self.flu_end_default = flu_end_default  # defaulted to 1 in case there are None, if not float value
-        self.flu_start_tier_2 = flu_start_tier_2 # tier 2 value, expects float or None
-        self.flu_end_tier_2 = flu_end_tier_2 # tier 2 value, expects float or None
-        self.fi_start_default = fi_start_default # defaulted to 1 in case there are None, if not float value
-        self.fi_end_default = fi_end_default # defaulted to 1 in case there are None, if not float value
-        self.fi_start_tier_2 = fi_start_tier_2 # tier 2 value, expects float or None
-        self.fi_end_tier_2 = fi_end_tier_2 # tier 2 value, expects float or None
+        self.flu_start_tier_2 = flu_start_tier_2  # tier 2 value, expects float or None
+        self.flu_end_tier_2 = flu_end_tier_2  # tier 2 value, expects float or None
+        self.fi_start_default = fi_start_default  # defaulted to 1 in case there are None, if not float value
+        self.fi_end_default = fi_end_default  # defaulted to 1 in case there are None, if not float value
+        self.fi_start_tier_2 = fi_start_tier_2  # tier 2 value, expects float or None
+        self.fi_end_tier_2 = fi_end_tier_2  # tier 2 value, expects float or None
 
         self.calculate_soc_som = calculate_soc_som
 
@@ -66,12 +120,12 @@ class FloodedRice:
         self.flu_start = self.flu_start_tier_2 if self.flu_start_tier_2 else self.flu_start_default
         self.flu_end = self.flu_end_tier_2 if self.flu_end_tier_2 else self.flu_end_default
         self.fi_start = self.fi_start_tier_2 if self.fi_start_tier_2 else self.fi_start_default
-        self.fi_end = self.fi_end_tier_2 if self.fi_end_tier_2 else self.fi_end_default 
+        self.fi_end = self.fi_end_tier_2 if self.fi_end_tier_2 else self.fi_end_default
 
         # HECTARES
-        self.hectares_before_20, self.hectares_after_20 = yearly_time_dependent_20_year_breakdown(area_start, area_end ,self.time_impl, self.time_cap, self.rate)
+        self.hectares_before_20, self.hectares_after_20 = yearly_time_dependent_20_year_breakdown(area_start, area_end, self.time_impl, self.time_cap, self.rate)
         self.hectares_total = yearly_time_dependent_parameter_breakdown(area_start, area_end, self.time_impl, self.time_cap, self.rate)
-        
+
         self.soc_start = self.soc_start_default * self.fmg_start * self.flu_start * self.fi_start if not self.soc_start_tier_2 else self.soc_start_tier_2
         self.soc_end = self.soc_end_default * self.fmg_end * self.flu_end * self.fi_end if not self.soc_end_tier_2 else self.soc_end_tier_2
 
@@ -90,13 +144,10 @@ class FloodedRice:
 
         self.result = Result(self.time_impl, self.time_cap)
 
-
-
-
-    def calculate_emissions(self,):
-
+    def calculate_emissions(
+        self,
+    ):
         def calculate_ch4_emitted():
-            
             try:
                 # TODO: maybe this could be moved to the constructor
                 EFc = self.EFc_ref if not self.EFc_tier_2 else self.EFc_tier_2
@@ -121,19 +172,16 @@ class FloodedRice:
                 ch4_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in self.ch4_emitted_yearly], ActivityTypes.CH4_EMITTED_RICE, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(ch4_emission_set)
 
-
-            
             except:
                 traceback.print_exc()
                 return
-            
-        def calculate_straw_burning():
 
+        def calculate_straw_burning():
             try:
                 if self.area_start == 0 and self.area_end == 0:
                     self.straw_burning_yearly = [0 for i in range(self.time_impl + self.time_cap)]
                     self.straw_burning_total = 0
-                
+
                 else:
                     yield_value = self.yield_ref if not self.yield_tier_2 else self.yield_tier_2
                     straw_tonnes_ref = yield_value * self.rice_slope + self.rice_intercept if not self.straw_tonnes_tier_2 else self.straw_tonnes_tier_2
@@ -152,21 +200,19 @@ class FloodedRice:
             except:
                 traceback.print_exc()
                 return
-            
-        def calculate_soil_emissions():
 
+        def calculate_soil_emissions():
             try:
                 if self.calculate_soc_som:
-                    self.soil_emissions_yearly, self.soil_emissions_total = soil_emissions_2(self.soc_start, self.soc_end, self.hectares_total, self.area_start,
-                                                                                                self.area_end, self.hectares_before_20)
-                    
+                    self.soil_emissions_yearly, self.soil_emissions_total = soil_emissions_2(self.soc_start, self.soc_end, self.hectares_total, self.area_start, self.area_end, self.hectares_before_20)
+
                     soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.soil_emissions_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
-                
+
             except:
                 traceback.print_exc()
                 return
-            
+
         calculate_ch4_emitted()
         calculate_straw_burning()
         calculate_soil_emissions()
