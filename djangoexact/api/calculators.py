@@ -2302,39 +2302,51 @@ class ElectricityCalculator(BaseCalculator):
         """
 
         input: Electricity = self.data
+        activity: Activity = input.parent.activity
         project: Project = self.data.activity.project
+        change_rate = activity.change_rate
 
-        elec: ipcc.ElectricityEmission = ipcc.ElectricityEmission.objects.get(country=project.country, continent=project.country.region)  # TODO: Remove continent from model and from project
+        elec = ipcc.ElectricityEmission.objects.get(country=project.country)
 
-        inputs_w = [
-            elec.operating_margin if input.ef_source.name == "Operating Margin" else elec.combined_margin,
-            input.ef_t2,
-            input.mwh_start,
-            input.mwh_w,
-            input.transmission_loss,
-            input.activity.change_rate.name,
-            project.implementation_years,
-            project.capitalization_years,
-        ]
+        math_w = None
+        math_wo = None
 
-        res_w = ElectryicityConsumption(*inputs_w).calculate_emissions()
+        if is_with(input):
+            inputs_w = [
+                elec.operating_margin if input.ef_source.name == "Operating Margin" else elec.combined_margin,
+                input.ef_t2,
+                input.mwh_start,
+                input.mwh_w,
+                input.transmission_loss,
+                change_rate.name,
+                project.implementation_years,
+                project.capitalization_years,
+            ]
 
-        inputs_wo = [
-            elec.operating_margin if input.ef_source.name == "Operating Margin" else elec.combined_margin,
-            input.ef_t2,
-            input.mwh_start,
-            input.mwh_wo,
-            input.transmission_loss,
-            input.activity.change_rate.name,
-            project.implementation_years,
-            project.capitalization_years,
-        ]
+            math_w = ElectryicityConsumption(*inputs_w)
+            math_w.calculate_emissions()
 
-        res_wo = ElectryicityConsumption(*inputs_wo).calculate_emissions()
+        if is_without(input):
+            inputs_wo = [
+                elec.operating_margin if input.ef_source.name == "Operating Margin" else elec.combined_margin,
+                input.ef_t2,
+                input.mwh_start,
+                input.mwh_wo,
+                input.transmission_loss,
+                change_rate.name,
+                project.implementation_years,
+                project.capitalization_years,
+            ]
 
-        return Result(res_w, res_wo)
+            math_wo = ElectryicityConsumption(*inputs_wo)
+            math_wo.calculate_emissions()
 
-    # FuelType can be solid or liquid. Call different classes based on that
+        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
+        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+
+        results_tuple = (results_w, results_wo)
+
+        return results_tuple
 
 
 class FuelCalculator(BaseCalculator):
@@ -2348,76 +2360,95 @@ class FuelCalculator(BaseCalculator):
         """
 
         input: Fuel = self.data
-        project: Project = self.data.activity.project
+        activity: Activity = input.parent.activity
+        project: Project = activity.project
+        change_rate = activity.change_rate
 
         macro_fuel_type = input.fuel_type.macro_fuel_type.name
         ef = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=input.fuel_type)
 
+        math_w = None
+        math_wo = None
+
         if macro_fuel_type == "Liquid":
-            input_w = [
-                ef.t_co2_eq,
-                input.ef_t2,
-                input.fuel_start,
-                input.fuel_w,
-                input.activity.change_rate.name,
-                project.implementation_years,
-                project.capitalization_years,
-            ]
+            if is_with(input):
+                input_w = [
+                    ef.t_co2_eq,
+                    input.ef_t2,
+                    input.fuel_start,
+                    input.fuel_w,
+                    change_rate.name,
+                    project.implementation_years,
+                    project.capitalization_years,
+                ]
 
-            input_wo = [
-                ef.t_co2_eq,
-                input.ef_t2,
-                input.fuel_start,
-                input.fuel_wo,
-                input.activity.change_rate.name,
-                project.implementation_years,
-                project.capitalization_years,
-            ]
+                math_w = FuelConsumption(*input_w)
+                math_w.calculate_emissions()
 
-            res_w = FuelConsumption(*input_w).calculate_emissions()
-            res_wo = FuelConsumption(*input_wo).calculate_emissions()
+            if is_without(input):
+                input_wo = [
+                    ef.t_co2_eq,
+                    input.ef_t2,
+                    input.fuel_start,
+                    input.fuel_wo,
+                    change_rate.name,
+                    project.implementation_years,
+                    project.capitalization_years,
+                ]
 
-            return Result(res_w, res_wo, res_w - res_wo)
+                math_wo = FuelConsumption(*input_wo)
+                math_wo.calculate_emissions()
 
         elif macro_fuel_type == "Solid":
-            input_w = [
-                ef.net_calorific_value,
-                ef.co2,
-                ef.ch4,
-                ef.n2o,
-                input.account_for_co2,
-                project.gw_potential.ch4,
-                project.gw_potential.n2o,
-                input.ef_t2,
-                input.fuel_start,
-                input.fuel_w,
-                input.activity.change_rate.name,
-                project.implementation_years,
-                project.capitalization_years,
-            ]
+            if is_with(input):
+                input_w = [
+                    ef.net_calorific_value,
+                    ef.co2,
+                    ef.ch4,
+                    ef.n2o,
+                    input.account_for_co2,
+                    project.gw_potential.ch4,
+                    project.gw_potential.n2o,
+                    input.ef_t2,
+                    input.fuel_start,
+                    input.fuel_w,
+                    input.activity.change_rate.name,
+                    project.implementation_years,
+                    project.capitalization_years,
+                ]
 
-            input_wo = [
-                ef.net_calorific_value,
-                ef.co2,
-                ef.ch4,
-                ef.n2o,
-                input.account_for_co2,
-                project.gw_potential.ch4,
-                project.gw_potential.n2o,
-                input.ef_t2,
-                input.fuel_start,
-                input.fuel_wo,
-                input.activity.change_rate.name,
-                project.implementation_years,
-                project.capitalization_years,
-            ]
+                math_w = SolidConsumption(*input_w)
+                math_w.calculate_emissions()
 
-            res_w = SolidConsumption(*input_w).calculate_emissions()
-            res_wo = SolidConsumption(*input_wo).calculate_emissions()
+            if is_without(input):
+                input_wo = [
+                    ef.net_calorific_value,
+                    ef.co2,
+                    ef.ch4,
+                    ef.n2o,
+                    input.account_for_co2,
+                    project.gw_potential.ch4,
+                    project.gw_potential.n2o,
+                    input.ef_t2,
+                    input.fuel_start,
+                    input.fuel_wo,
+                    input.activity.change_rate.name,
+                    project.implementation_years,
+                    project.capitalization_years,
+                ]
 
-            return Result(res_w, res_wo)
+                math_wo = SolidConsumption(*input_wo)
+                math_wo.calculate_emissions()
 
-        return Result()
+        else:
+            raise ValueError(f"Fuel type {macro_fuel_type} not supported by calculations.")
+
+        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
+        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+
+        results_tuple = (results_w, results_wo)
+
+        return results_tuple
 
 
 class SettlementCalculator(BaseCalculator):
