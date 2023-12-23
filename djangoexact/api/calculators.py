@@ -3644,6 +3644,10 @@ class WaterbodyCalculator(BaseCalculator):
         trophic_state_w = ipcc.TrophicStateFactor.objects.get(trophic_type=module.trophic_type_w)
         trophic_state_wo = ipcc.TrophicStateFactor.objects.get(trophic_type=module.trophic_type_wo)
 
+        math_start = None
+        math_w = None
+        math_wo = None
+
         inputs_start = [
             module.area,
             0,
@@ -3661,53 +3665,58 @@ class WaterbodyCalculator(BaseCalculator):
             0,
         ]
 
-        inputs_w = [
-            0,
-            module.area,
-            trophic_state_w.value,
-            methane_emission_factor.value,
-            module.alpha_t2_start,
-            module.alpha_t2_w,
-            module.ch4_ef_t2_start,
-            module.ch4_ef_t2_w,
-            project.gw_potential.ch4,
-            project.capitalization_years,
-            project.implementation_years,
-            module.activity.change_rate.name,
-            module.mean_annual_t2_start,
-            module.mean_annual_t2_w,
-        ]
-
-        inputs_wo = [
-            0,
-            module.area,
-            trophic_state_wo.value,
-            methane_emission_factor.value,
-            module.alpha_t2_start,
-            module.alpha_t2_wo,
-            module.ch4_ef_t2_start,
-            module.ch4_ef_t2_wo,
-            project.gw_potential.ch4,
-            project.capitalization_years,
-            project.implementation_years,
-            module.activity.change_rate.name,
-            module.mean_annual_t2_start,
-            module.mean_annual_t2_wo,
-        ]
-
         math_start = MathWaterbodies(*inputs_start)
-        math_w = MathWaterbodies(*inputs_w)
-        math_wo = MathWaterbodies(*inputs_wo)
-
         math_start.calculate_emissions()
-        math_w.calculate_emissions()
-        math_wo.calculate_emissions()
 
-        results_start = math_start.total_emissions
-        results_w = math_w.total_emissions
-        results_wo = math_wo.total_emissions
+        if is_with(module):
+            inputs_w = [
+                0,
+                module.area,
+                trophic_state_w.value,
+                methane_emission_factor.value,
+                module.alpha_t2_start,
+                module.alpha_t2_w,
+                module.ch4_ef_t2_start,
+                module.ch4_ef_t2_w,
+                project.gw_potential.ch4,
+                project.capitalization_years,
+                project.implementation_years,
+                module.activity.change_rate.name,
+                module.mean_annual_t2_start,
+                module.mean_annual_t2_w,
+            ]
 
-        return Result(results_w + results_start, results_wo + results_start)
+            math_w = MathWaterbodies(*inputs_w)
+            math_w.calculate_emissions()
+
+        if is_without(module):
+            inputs_wo = [
+                0,
+                module.area,
+                trophic_state_wo.value,
+                methane_emission_factor.value,
+                module.alpha_t2_start,
+                module.alpha_t2_wo,
+                module.ch4_ef_t2_start,
+                module.ch4_ef_t2_wo,
+                project.gw_potential.ch4,
+                project.capitalization_years,
+                project.implementation_years,
+                module.activity.change_rate.name,
+                module.mean_annual_t2_start,
+                module.mean_annual_t2_wo,
+            ]
+
+            math_wo = MathWaterbodies(*inputs_wo)
+            math_wo.calculate_emissions()
+
+        results_start = math_start.result if math_start else MathResult(project.implementation_years, project.capitalization_years)
+        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
+        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+
+        results_tuple = (results_w + results_start, results_wo + results_start)
+
+        return results_tuple
 
 
 class OrganicSoilCalculator(BaseCalculator):
