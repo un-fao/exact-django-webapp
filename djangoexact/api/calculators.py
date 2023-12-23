@@ -131,25 +131,25 @@ def is_with(module: LandModule):
 
 
 def get_fi_data(module, climate, moisture, scenario: utils.ScenarioTypes):
-    attr = getattr(module, f"organic_input_type_{scenario}", None)
+    attr = getattr(module, f"organic_input_type_{scenario.value}", None)
     if attr:
-        return ipcc.FIData.objects.get(climate, moisture, organic_input_type=attr)
+        return ipcc.FIData.objects.get(climate=climate, moisture=moisture, organic_input_type=attr)
     else:
         return SimpleNamespace(value=1)
 
 
 def get_fmg_data(module, climate, moisture, scenario: utils.ScenarioTypes):
-    attr = getattr(module, f"tillage_management_type_{scenario}", None)
+    attr = getattr(module, f"tillage_management_type_{scenario.value}", None)
     if attr:
-        return ipcc.FMGData.objects.get(climate, moisture, tillage_management_type=attr)
+        return ipcc.FMGData.objects.get(climate=climate, moisture=moisture, tillage_management_type=attr)
     else:
         return SimpleNamespace(value=1)
 
 
 def get_flu_data(module, climate, moisture, scenario: utils.ScenarioTypes):
-    attr = getattr(module, f"land_use_type_{scenario}", None)
+    attr = getattr(module, f"land_use_type_{scenario.value}", None)
     if attr:
-        return ipcc.FLUData.objects.get(climate, moisture, land_use_type=attr)
+        return ipcc.FLUData.objects.get(climate=climate, moisture=moisture, land_use_type=attr)
     else:
         return SimpleNamespace(value=1)
 
@@ -418,7 +418,7 @@ class DeforestationCalculator(BaseCalculator):
             flu_start.value,
             mangroves_data.agb_c if mangroves_data is not None else ag_biomass_start.value,
             mangroves_data.bgb if mangroves_data is not None else bg_biomass_start.value,
-            utils.CN_RATIO_GRASSLAND,
+            utils.CN_RATIO_GRASSLAND,  # TODO: Ratio might be different, see OtherLandUseCalculator
             module.soc_after_defo_t2_start,  # TODO: soil after defo t2
             soc_ref.value,
             project.soc_ref_t2,
@@ -716,6 +716,14 @@ class OtherLandUseCalculator(BaseCalculator):
         module_w: BiomassModule | LandModule = getattr(input.activity, luc.module_type_w.class_name.lower(), None).first()
         module_wo: BiomassModule | LandModule = getattr(input.activity, luc.module_type_wo.class_name.lower(), None).first()
 
+        soc_start = None
+        if luc.module_type_start.name == "Grassland":
+            # Grassland SOCs
+            soc_start = ipcc.GrasslandStockExchangeFactor.objects.get(
+                grassland_management_type=module_start.grassland_management_type_start,
+                climate=project.climate,
+            )
+
         luc_start = LandUseType.objects.get(name=luc.module_type_start.name)
         luc_w = LandUseType.objects.get(name=luc.module_type_w.name)
         luc_wo = LandUseType.objects.get(name=luc.module_type_wo.name)
@@ -738,8 +746,7 @@ class OtherLandUseCalculator(BaseCalculator):
         fi_final_w = get_fi_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
         fi_final_wo = get_fi_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
 
-        c_n_ratio_w = utils.CN_RATIO_GRASSLAND if luc.module_type_w.class_name == "Grassland" else utils.CN_RATIO_FOREST
-        c_n_ratio_wo = utils.CN_RATIO_GRASSLAND if luc.module_type_wo.class_name == "Grassland" else utils.CN_RATIO_FOREST
+        c_n_ratio = utils.CN_RATIO_GRASSLAND if luc.module_type_start.class_name in ["Grassland", "ForestManagement"] else utils.CN_RATIO_CROP
 
         moisture_factor = ipcc.NitrousEmissionFactor.objects.get(moisture=moisture, name__icontains="Other N Inputs")
 
@@ -751,27 +758,27 @@ class OtherLandUseCalculator(BaseCalculator):
             module_start.get_biomass_t2(utils.ScenarioTypes.START),
             biomass_final_w.value,
             module_w.get_biomass_t2(utils.ScenarioTypes.WITH),
-            c_n_ratio_w,
+            c_n_ratio,
             moisture_factor.value,
             combustion_factor_w.value,
-            combustion_factor_w.ch4,
             combustion_factor_w.n2o,
-            input.activity.project.gw_potential.ch4,
+            combustion_factor_w.ch4,
             input.activity.project.gw_potential.n2o,
+            input.activity.project.gw_potential.ch4,
             luc.is_fire_used_w,
             soc.value,
             soc.value,
             module_start.soc_t2_start,
             module_w.soc_t2_w,
-            fmg_start.value,
+            soc_start.fmg if soc_start else fmg_start.value,
             fmg_final_w.value,
             module_start.fmg_t2_start,  # TODO: Start module has 3 fmg values. What to choose?
             module_w.fmg_t2_w,
-            flu_start.value,
+            soc_start.flu if soc_start else flu_start.value,
             flu_final_w.value,
             module_start.flu_t2_start,
             module_w.flu_t2_w,
-            fi_start.value,
+            soc_start.fi if soc_start else fi_start.value,
             fi_final_w.value,
             module_start.fi_t2_start,
             module_w.fi_t2_w,
@@ -791,7 +798,7 @@ class OtherLandUseCalculator(BaseCalculator):
             module_start.get_biomass_t2(utils.ScenarioTypes.START),
             biomass_final_wo.value,
             module_wo.get_biomass_t2(utils.ScenarioTypes.WITHOUT),
-            c_n_ratio_wo,
+            c_n_ratio,
             moisture_factor.value,
             combustion_factor_wo.value,
             combustion_factor_wo.ch4,
@@ -868,9 +875,7 @@ class AnnualCroppingCalculator(BaseCalculator):
         flu_wo = get_flu_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
 
         crop_yield_start = input.crop_yield_start if input.crop_yield_start else ipcc.CropYieldStats.objects.get_or_region_average(continent=project.country.region, land_use_type=input.land_use_type_start).average
-
         crop_yield_w = input.crop_yield_w if input.crop_yield_w else ipcc.CropYieldStats.objects.get_or_region_average(continent=project.country.region, land_use_type=input.land_use_type_w).average
-
         crop_yield_wo = input.crop_yield_wo if input.crop_yield_wo else ipcc.CropYieldStats.objects.get_or_region_average(continent=project.country.region, land_use_type=input.land_use_type_wo).average
 
         # General
@@ -973,7 +978,56 @@ class AnnualCroppingCalculator(BaseCalculator):
 
             emission_factors_w = ipcc.DefaultEmissionFactor.objects.get(moisture=moisture, organic_input_type=input.organic_input_type_w)
 
-            inputs_w = [*[0, area], project.implementation_years, project.capitalization_years, change_rate.name, change_rate.value, soc.value, soc.value, input.soc_t2_start, input.soc_t2_w, fmg_start.value, fmg_w.value, module_start.fmg_t2_start, input.fmg_t2_w, flu_start.value, flu_w.value, module_start.flu_t2_start, input.flu_t2_w, fi_start.value, fi_w.value, module_start.fi_t2_start, input.fi_t2_w, True, emission_factors_w.value, project.gw_potential.n2o, project.gw_potential.ch4, burning_emission_factor.ch4 if input.residue_management_type_w.name == "Burned" else None, fires_w.value, input.main_biomass_factor_t2_start, n_estimation_factor_w.slope, n_estimation_factor_w.intercept, crop_yield_w, getattr(minor_burning_emission_factor, "ch4", None), getattr(minor_fires_w, "value", None), input.minor_biomass_factor_t2_w, getattr(minor_n_estimation_factor_w, "slope", None), getattr(minor_n_estimation_factor_w, "intercept", None), input.minor_yield_w, burning_emission_factor.n2o if input.residue_management_type_w.name == "Burned" else None, input.residue_management_type_w.name == "Retained", getattr(minor_burning_emission_factor, "n2o", None), getattr(input.minor_residue_management_type_w, "name", None) == "Retained", n_estimation_factor_w.n_ag_residues, n_estimation_factor_w.rs_t, n_estimation_factor_w.n_bg_t, getattr(minor_n_estimation_factor_w, "n_ag_residues", None), getattr(minor_n_estimation_factor_w, "rs_t", None), getattr(minor_n_estimation_factor_w, "n_bg_t", None), 0]
+            inputs_w = [
+                *[0, area],
+                project.implementation_years,
+                project.capitalization_years,
+                change_rate.name,
+                change_rate.value,
+                soc.value,
+                soc.value,
+                input.soc_t2_start,
+                input.soc_t2_w,
+                fmg_start.value,
+                fmg_w.value,
+                module_start.fmg_t2_start,
+                input.fmg_t2_w,
+                flu_start.value,
+                flu_w.value,
+                module_start.flu_t2_start,
+                input.flu_t2_w,
+                fi_start.value,
+                fi_w.value,
+                module_start.fi_t2_start,
+                input.fi_t2_w,
+                True,
+                emission_factors_w.value,
+                project.gw_potential.n2o,
+                project.gw_potential.ch4,
+                burning_emission_factor.ch4 if input.residue_management_type_w.name == "Burned" else None,
+                fires_w.value,
+                input.main_biomass_factor_t2_start,
+                n_estimation_factor_w.slope,
+                n_estimation_factor_w.intercept,
+                crop_yield_w,
+                getattr(minor_burning_emission_factor, "ch4", None),
+                getattr(minor_fires_w, "value", None),
+                input.minor_biomass_factor_t2_w,
+                getattr(minor_n_estimation_factor_w, "slope", None),
+                getattr(minor_n_estimation_factor_w, "intercept", None),
+                input.minor_yield_w,
+                burning_emission_factor.n2o if input.residue_management_type_w.name == "Burned" else None,
+                input.residue_management_type_w.name == "Retained",
+                getattr(minor_burning_emission_factor, "n2o", None),
+                getattr(input.minor_residue_management_type_w, "name", None) == "Retained",
+                n_estimation_factor_w.n_ag_residues,
+                n_estimation_factor_w.rs_t,
+                n_estimation_factor_w.n_bg_t,
+                getattr(minor_n_estimation_factor_w, "n_ag_residues", None),
+                getattr(minor_n_estimation_factor_w, "rs_t", None),
+                getattr(minor_n_estimation_factor_w, "n_bg_t", None),
+                0,
+            ]
 
             math_w = AnnualCropland(*inputs_w)
             math_w.calculate_emissions()
@@ -1504,7 +1558,40 @@ class GrasslandCalculator(BaseCalculator):
                 climate=project.climate,
             )
 
-            inputs_start_w = [*[area, 0], project.implementation_years, project.capitalization_years, change_rate.name, project.gw_potential.n2o, project.gw_potential.ch4, module.fire_periodicity_start, module.is_fire_used_start, ef.ch4, ef.n2o, agb.value, module.get_biomass_t2(utils.ScenarioTypes.START), cf, module.combustion_factor_t2_start, soc.value, soc.value, module.soc_t2_start, module.soc_t2_w, False, soc_start.fmg, soc_w.fmg, module.fmg_t2_start, module.fmg_t2_w, soc_start.flu, soc_w.flu, module.flu_t2_start, module.flu_t2_w, soc_start.fi, soc_w.fi, module.fi_t2_start, module.fi_t2_w, 0]
+            inputs_start_w = [
+                *[area, 0],
+                project.implementation_years,
+                project.capitalization_years,
+                change_rate.name,
+                project.gw_potential.n2o,
+                project.gw_potential.ch4,
+                module.fire_periodicity_start,
+                module.is_fire_used_start,
+                ef.ch4,
+                ef.n2o,
+                agb.value,
+                module.get_biomass_t2(utils.ScenarioTypes.START),
+                cf,
+                module.combustion_factor_t2_start,
+                soc.value,
+                soc.value,
+                module.soc_t2_start,
+                module.soc_t2_w,
+                False,
+                soc_start.fmg,
+                soc_w.fmg,
+                module.fmg_t2_start,
+                module.fmg_t2_w,
+                soc_start.flu,
+                soc_w.flu,
+                module.flu_t2_start,
+                module.flu_t2_w,
+                soc_start.fi,
+                soc_w.fi,
+                module.fi_t2_start,
+                module.fi_t2_w,
+                0,
+            ]
 
             math_start_w = MathGrassland(*inputs_start_w)
             math_start_w.calculate_emissions()
@@ -1519,7 +1606,40 @@ class GrasslandCalculator(BaseCalculator):
                 climate=project.climate,
             )
 
-            inputs_w = [*[0, area], project.implementation_years, project.capitalization_years, change_rate.name, project.gw_potential.n2o, project.gw_potential.ch4, module.fire_periodicity_w, module.is_fire_used_w, ef.ch4, ef.n2o, agb.value, module.get_biomass_t2(utils.ScenarioTypes.WITH), cf, module.combustion_factor_t2_start, soc.value, soc.value, module.soc_t2_start, module.soc_t2_w, True, soc_start.fmg, soc_w.fmg, module.fmg_t2_start, module.fmg_t2_w, soc_start.flu, soc_w.flu, module.flu_t2_start, module.flu_t2_w, soc_start.fi, soc_w.fi, module.fi_t2_start, module.fi_t2_w, 0]
+            inputs_w = [
+                *[0, area],
+                project.implementation_years,
+                project.capitalization_years,
+                change_rate.name,
+                project.gw_potential.n2o,
+                project.gw_potential.ch4,
+                module.fire_periodicity_w,
+                module.is_fire_used_w,
+                ef.ch4,
+                ef.n2o,
+                agb.value,
+                module.get_biomass_t2(utils.ScenarioTypes.WITH),
+                cf,
+                module.combustion_factor_t2_start,
+                soc.value,
+                soc.value,
+                module.soc_t2_start,
+                module.soc_t2_w,
+                True,
+                soc_start.fmg,
+                soc_w.fmg,
+                module.fmg_t2_start,
+                module.fmg_t2_w,
+                soc_start.flu,
+                soc_w.flu,
+                module.flu_t2_start,
+                module.flu_t2_w,
+                soc_start.fi,
+                soc_w.fi,
+                module.fi_t2_start,
+                module.fi_t2_w,
+                0,
+            ]
 
             math_w = MathGrassland(*inputs_w)
             math_w.calculate_emissions()
@@ -1534,7 +1654,40 @@ class GrasslandCalculator(BaseCalculator):
                 climate=project.climate,
             )
 
-            inputs_start_wo = [*[area, 0], project.implementation_years, project.capitalization_years, change_rate.name, project.gw_potential.n2o, project.gw_potential.ch4, module.fire_periodicity_start, module.is_fire_used_start, ef.ch4, ef.n2o, agb.value, module.get_biomass_t2(utils.ScenarioTypes.START), cf, module.combustion_factor_t2_start, soc.value, soc.value, module.soc_t2_start, module.soc_t2_wo, False, soc_start.fmg, soc_wo.fmg, module.fmg_t2_start, module.fmg_t2_wo, soc_start.flu, soc_wo.flu, module.flu_t2_start, module.flu_t2_wo, soc_start.fi, soc_wo.fi, module.fi_t2_start, module.fi_t2_wo, 0]
+            inputs_start_wo = [
+                *[area, 0],
+                project.implementation_years,
+                project.capitalization_years,
+                change_rate.name,
+                project.gw_potential.n2o,
+                project.gw_potential.ch4,
+                module.fire_periodicity_start,
+                module.is_fire_used_start,
+                ef.ch4,
+                ef.n2o,
+                agb.value,
+                module.get_biomass_t2(utils.ScenarioTypes.START),
+                cf,
+                module.combustion_factor_t2_start,
+                soc.value,
+                soc.value,
+                module.soc_t2_start,
+                module.soc_t2_wo,
+                False,
+                soc_start.fmg,
+                soc_wo.fmg,
+                module.fmg_t2_start,
+                module.fmg_t2_wo,
+                soc_start.flu,
+                soc_wo.flu,
+                module.flu_t2_start,
+                module.flu_t2_wo,
+                soc_start.fi,
+                soc_wo.fi,
+                module.fi_t2_start,
+                module.fi_t2_wo,
+                0,
+            ]
 
             math_start_wo = MathGrassland(*inputs_start_wo)
             math_start_wo.calculate_emissions()
@@ -1549,7 +1702,40 @@ class GrasslandCalculator(BaseCalculator):
                 climate=project.climate,
             )
 
-            inputs_wo = [*[0, area], project.implementation_years, project.capitalization_years, change_rate.name, project.gw_potential.n2o, project.gw_potential.ch4, module.fire_periodicity_wo, module.is_fire_used_wo, ef.ch4, ef.n2o, agb.value, module.get_biomass_t2(utils.ScenarioTypes.WITHOUT), cf, module.combustion_factor_t2_start, soc.value, soc.value, module.soc_t2_start, module.soc_t2_wo, True, soc_start.fmg, soc_wo.fmg, module.fmg_t2_start, module.fmg_t2_wo, soc_start.flu, soc_wo.flu, module.flu_t2_start, module.flu_t2_wo, soc_start.fi, soc_wo.fi, module.fi_t2_start, module.fi_t2_wo, 0]
+            inputs_wo = [
+                *[0, area],
+                project.implementation_years,
+                project.capitalization_years,
+                change_rate.name,
+                project.gw_potential.n2o,
+                project.gw_potential.ch4,
+                module.fire_periodicity_wo,
+                module.is_fire_used_wo,
+                ef.ch4,
+                ef.n2o,
+                agb.value,
+                module.get_biomass_t2(utils.ScenarioTypes.WITHOUT),
+                cf,
+                module.combustion_factor_t2_start,
+                soc.value,
+                soc.value,
+                module.soc_t2_start,
+                module.soc_t2_wo,
+                True,
+                soc_start.fmg,
+                soc_wo.fmg,
+                module.fmg_t2_start,
+                module.fmg_t2_wo,
+                soc_start.flu,
+                soc_wo.flu,
+                module.flu_t2_start,
+                module.flu_t2_wo,
+                soc_start.fi,
+                soc_wo.fi,
+                module.fi_t2_start,
+                module.fi_t2_wo,
+                0,
+            ]
 
             math_wo = MathGrassland(*inputs_wo)
             math_wo.calculate_emissions()
