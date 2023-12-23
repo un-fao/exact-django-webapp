@@ -7,7 +7,7 @@ from types import SimpleNamespace
 
 from django.db.models import Q
 from ipcc import models as ipcc
-from math_model import affo, forest_management
+from math_model import forest_management
 from math_model.no_time_dependency_final.annuals import AnnualCropland
 from math_model.no_time_dependency_final.coastal_wetlands import (
     CoastalWetland as MathCoastalWetland,
@@ -100,33 +100,57 @@ from .models import (
 )
 
 
-def is_luc_remaining_same(module: LandModule):
+def is_luc_remaining_same(module: LandModule) -> bool:
     """
-    Checks if a module is business as usual.
+    Checks if the land use change for a given module remains the same.
+
+    Args:
+        module (LandModule): The land module to check.
+
+    Returns:
+        bool: True if the land use change remains the same, False otherwise.
     """
     luc: LandUseChange = module.land_use_change
     return not luc or (luc and luc.module_type_start.class_name == module.__class__.__name__ and luc.module_type_w.class_name == module.__class__.__name__)
 
 
-def is_business_as_usual(module: LandModule):
+def is_business_as_usual(module: LandModule) -> bool:
     """
-    Checks if a module is business as usual.
+    Checks if the given module represents a business-as-usual scenario.
+
+    Args:
+        module (LandModule): The land module to check.
+
+    Returns:
+        bool: True if the module represents a business-as-usual scenario, False otherwise.
     """
     luc: LandUseChange = module.land_use_change
     return not luc or (luc and luc.module_type_start.class_name == module.__class__.__name__ and luc.module_type_wo.class_name == module.__class__.__name__)
 
 
-def is_without(module: LandModule):
+def is_without(module: LandModule) -> bool:
     """
-    Checks if a module is business as usual.
+    Checks if the given module is without a land use change or if the module type without land use change matches the module's class name.
+
+    Args:
+        module (LandModule): The module to check.
+
+    Returns:
+        bool: True if the module is associated with the land use change or if the provided module types the LandUseChange "WITHOUT" scenario. False otherwise.
     """
     luc: LandUseChange = module.land_use_change
     return not luc or (luc.module_type_wo.class_name == module.__class__.__name__)
 
 
-def is_with(module: LandModule):
+def is_with(module: LandModule) -> bool:
     """
-    Checks if a module is business as usual.
+    Checks if the given module is associated with a specific land use change.
+
+    Args:
+        module (LandModule): The module to check.
+
+    Returns:
+        bool: True if the module is associated with the land use change or if the provided module types the LandUseChange "WITH" scenario. False otherwise.
     """
     luc: LandUseChange = module.land_use_change
     return not luc or (luc.module_type_w.class_name == module.__class__.__name__)
