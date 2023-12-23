@@ -152,6 +152,8 @@ class LandUseTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if moisture_id:
             filters["moistures__id"] = moisture_id
 
+        filters["is_active"] = True
+
         list = LandUseType.objects.filter(**filters).all()
         serializer = get_model_serializer(LandUseType)(list, many=True)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
@@ -228,9 +230,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             )
 
         list = Project.objects.filter(user=self.request.user).all()
-        return Response(
-            data=ReadProjectSerializer(list, many=True).data, status=status.HTTP_200_OK
-        )
+        return Response(data=ReadProjectSerializer(list, many=True).data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])
     @swagger_auto_schema(manual_parameters=[project_id], responses={404: "Project not found"})
@@ -253,9 +253,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         response["activities"] = []
 
         for activity in project.activities.all():
-            response["activities"].append(
-                ActivityViewSet.results(self, request, activity.pk).data
-            )
+            response["activities"].append(ActivityViewSet.results(self, request, activity.pk).data)
 
         return Response(data=response, status=status.HTTP_200_OK)
 
@@ -320,14 +318,10 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        invitation, created = ProjectInvitation.objects.get_or_create(
-            project=project, email=email, user=user
-        )
+        invitation, created = ProjectInvitation.objects.get_or_create(project=project, email=email, user=user)
 
         if not created:
-            return Response(
-                {"error": "Invitation already sent"}, status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"error": "Invitation already sent"}, status=status.HTTP_400_BAD_REQUEST)
 
         logging.debug("END ProjectViewSet.invitations")
         return Response({"message": "Invitation sent successfully"})
@@ -341,9 +335,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             project.implementation_years = new_years
             for activity in project.activities.all():
                 if activity.duration_t2 > new_years:
-                    logging.warning(
-                        f"Activity {activity.name} duration_t2 is greater than project implementation years. Setting activity duration_t2 to project implementation years."
-                    )
+                    logging.warning(f"Activity {activity.name} duration_t2 is greater than project implementation years. Setting activity duration_t2 to project implementation years.")
                     activity.duration_t2 = new_years
                     activity.save()
             project.save()
@@ -376,9 +368,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     def partial_update(self, request, *args, **kwargs):
         activity = self.get_object()
 
-        serializer = WriteActivitySerializer(
-            data=request.data, partial=True, instance=activity
-        )
+        serializer = WriteActivitySerializer(data=request.data, partial=True, instance=activity)
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -404,9 +394,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         return Response(read_serializer.data, status=status.HTTP_201_CREATED)
 
-    @swagger_auto_schema(
-        manual_parameters=[project_id], responses={400: "activity_id not provided"}
-    )
+    @swagger_auto_schema(manual_parameters=[project_id], responses={400: "activity_id not provided"})
     def retrieve(self, request, pk=None):
         """
         Get a single activity for a given user.
@@ -418,9 +406,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         return Response(data=activity_dict, status=status.HTTP_200_OK)
 
-    @swagger_auto_schema(
-        manual_parameters=[project_id], responses={400: "activity_id not provided"}
-    )
+    @swagger_auto_schema(manual_parameters=[project_id], responses={400: "activity_id not provided"})
     def list(self, request):
         """
         Get all activities for a given project, by filtering against a `project_id` query parameter in the URL.
@@ -464,9 +450,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             module_dict = get_module_serializer(model_ref)(object).data
 
             try:
-                viewset = generic_module_viewset(model_ref).results(
-                    self, request, pk=object.pk
-                )
+                viewset = generic_module_viewset(model_ref).results(self, request, pk=object.pk)
                 module_dict[utils.RESULTS] = viewset.data
 
             except Exception as e:
@@ -532,9 +516,7 @@ class CommentThreadViewSet(viewsets.ModelViewSet):
         thread = get_object_or_404(CommentThread, pk=pk)
         comments = thread.comments.all()
 
-        return Response(
-            data=CommentSerializer(comments, many=True).data, status=status.HTTP_200_OK
-        )
+        return Response(data=CommentSerializer(comments, many=True).data, status=status.HTTP_200_OK)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -562,9 +544,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         comment = get_object_or_404(Comment, pk=pk)
         replies = comment.replies.all()
 
-        return Response(
-            data=CommentSerializer(replies, many=True).data, status=status.HTTP_200_OK
-        )
+        return Response(data=CommentSerializer(replies, many=True).data, status=status.HTTP_200_OK)
 
 
 class ModuleTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
@@ -628,18 +608,14 @@ def generic_module_viewset(model: Model):
 
             module = self.get_object()
 
-            serializer = get_module_serializer(model, action=ActionTypes.CREATE)(
-                data=request.data, instance=module
-            )
+            serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data=request.data, instance=module)
 
             if not serializer.is_valid():
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
             module = serializer.save()
 
-            read_serializer = get_module_serializer(model)(
-                instance=module, context={"request": request}
-            )
+            read_serializer = get_module_serializer(model)(instance=module, context={"request": request})
 
             return Response(read_serializer.data, status=status.HTTP_200_OK)
 
@@ -650,18 +626,14 @@ def generic_module_viewset(model: Model):
 
             module = self.get_object()
 
-            serializer = get_module_serializer(model, action=ActionTypes.CREATE)(
-                data=request.data, partial=True, instance=module
-            )
+            serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data=request.data, partial=True, instance=module)
 
             if not serializer.is_valid():
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
             module = serializer.save()
 
-            read_serializer = get_module_serializer(model)(
-                instance=module, context={"request": request}
-            )
+            read_serializer = get_module_serializer(model)(instance=module, context={"request": request})
 
             return Response(read_serializer.data, status=status.HTTP_200_OK)
 
@@ -674,9 +646,7 @@ def generic_module_viewset(model: Model):
             logging.debug(f"START GenericModuleViewSet[{model.__name__}].create")
             logging.debug(f"request.data: {request.data}")
 
-            module_serializer = get_module_serializer(model, action=ActionTypes.CREATE)(
-                data=request.data, many=request.data.__class__ == list
-            )
+            module_serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data=request.data, many=request.data.__class__ == list)
 
             if not module_serializer.is_valid():
                 logger.error(f"Error creating module: {module_serializer.errors}")
@@ -726,24 +696,15 @@ def generic_module_viewset(model: Model):
             if module_type.class_name == LandUseChange.__name__:
                 activity: Activity = module.activity
 
-                status_start = utils.get_module_status(
-                    self, activity, module.module_type_start
-                )
+                status_start = utils.get_module_status(self, activity, module.module_type_start)
                 status_w = utils.get_module_status(self, activity, module.module_type_w)
                 status_wo = utils.get_module_status(self, activity, module.module_type_wo)
 
-                if not all(
-                    status == StatusType.objects.get(name="READY")
-                    for status in [status_start, status_w, status_wo]
-                ):
-                    return utils.ErrorResponse(
-                        "Not all modules are ready. Land Use Change module cannot be calculated."
-                    )
+                if not all(status == StatusType.objects.get(name="READY") for status in [status_start, status_w, status_wo]):
+                    return utils.ErrorResponse("Not all modules are ready. Land Use Change module cannot be calculated.")
 
             try:
-                aggregate_by = BreakdownTypes(
-                    request.query_params.get("aggregate", BreakdownTypes.TOTAL)
-                )
+                aggregate_by = BreakdownTypes(request.query_params.get("aggregate", BreakdownTypes.TOTAL))
                 (
                     results_w,
                     results_wo,
@@ -785,9 +746,7 @@ def generic_module_viewset(model: Model):
             try:
                 # TODO: Implement defaults
                 # module_defaults = get_defaults(module)
-                return utils.ErrorResponse(
-                    "Not implemented", status=status.HTTP_501_NOT_IMPLEMENTED
-                )
+                return utils.ErrorResponse("Not implemented", status=status.HTTP_501_NOT_IMPLEMENTED)
             except Exception as e:
                 return utils.ErrorResponse(str(e))
 
