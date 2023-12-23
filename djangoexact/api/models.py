@@ -127,7 +127,7 @@ class LandUseType(Model):
 
     def __str__(self):
         module_types = ", ".join([str(x.name) for x in self.module_types.all()])
-        return f"({self.pk}) {self.name}" + (f" ({module_types})" if module_types else "")
+        return f"({self.pk}) {self.name} - Active: {self.is_active}" + (f" ({module_types})" if module_types else "")
 
 
 class ChangeRate(Model):
