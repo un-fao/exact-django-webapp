@@ -1902,80 +1902,87 @@ class SmallFisheryCalculator(BaseCalculator):
 
         electricity_emission = ipcc.ElectricityEmission.objects.get(country=project.country, continent=project.country.region)
 
-        inputs_w = [
-            project.implementation_years,
-            project.capitalization_years,
-            module.activity.change_rate.name,
-            module.total_catch_yr_start,
-            module.total_catch_yr_w,
-            ef_diesel_default,
-            module.energy_emission_factor_t2_start,
-            module.energy_emission_factor_t2_w,
-            fui_default_start,
-            fui_default_w,
-            module.fui_start,
-            module.fui_w,
-            module.refrigerant_gwp,
-            module.refrigerant_gwp_t2_start,
-            module.refrigerant_gwp_t2_w,
-            lost_refrigerant_default,
-            module.refrigerant_lost_per_tonne_t2_start,
-            module.refrigerant_lost_per_tonne_t2_w,
-            module.refrigerant_pc_start,
-            module.refrigerant_pc_w,
-            tonnes_ice_default,
-            module.tonnes_of_ice_t2_start,
-            module.tonnes_of_ice_t2_w,
-            kw_tonnes,
-            module.inshore_ice_production_kwh_per_tonne_t2_start,
-            module.inshore_ice_production_kwh_per_tonne_t2_w,
-            electricity_emission.operating_margin,
-            module.ice_preserved_catch_pc_start,
-            module.ice_preserved_catch_pc_w,
-        ]
+        math_w = None
+        math_wo = None
 
-        inputs_wo = [
-            project.implementation_years,
-            project.capitalization_years,
-            module.activity.change_rate.name,
-            module.total_catch_yr_start,
-            module.total_catch_yr_wo,
-            ef_diesel_default,
-            module.energy_emission_factor_t2_start,
-            module.energy_emission_factor_t2_wo,
-            fui_default_start,
-            fui_default_wo,
-            module.fui_start,
-            module.fui_wo,
-            module.refrigerant_gwp,
-            module.refrigerant_gwp_t2_start,
-            module.refrigerant_gwp_t2_wo,
-            lost_refrigerant_default,
-            module.refrigerant_lost_per_tonne_t2_start,
-            module.refrigerant_lost_per_tonne_t2_wo,
-            module.refrigerant_pc_start,
-            module.refrigerant_pc_wo,
-            tonnes_ice_default,
-            module.tonnes_of_ice_t2_start,
-            module.tonnes_of_ice_t2_wo,
-            kw_tonnes,
-            module.inshore_ice_production_kwh_per_tonne_t2_start,
-            module.inshore_ice_production_kwh_per_tonne_t2_wo,
-            electricity_emission.operating_margin,
-            module.ice_preserved_catch_pc_start,
-            module.ice_preserved_catch_pc_wo,
-        ]
+        if is_with(module):
+            inputs_w = [
+                project.implementation_years,
+                project.capitalization_years,
+                module.activity.change_rate.name,
+                module.total_catch_yr_start,
+                module.total_catch_yr_w,
+                ef_diesel_default,
+                module.energy_emission_factor_t2_start,
+                module.energy_emission_factor_t2_w,
+                fui_default_start,
+                fui_default_w,
+                module.fui_start,
+                module.fui_w,
+                module.refrigerant_gwp,
+                module.refrigerant_gwp_t2_start,
+                module.refrigerant_gwp_t2_w,
+                lost_refrigerant_default,
+                module.refrigerant_lost_per_tonne_t2_start,
+                module.refrigerant_lost_per_tonne_t2_w,
+                module.refrigerant_pc_start,
+                module.refrigerant_pc_w,
+                tonnes_ice_default,
+                module.tonnes_of_ice_t2_start,
+                module.tonnes_of_ice_t2_w,
+                kw_tonnes,
+                module.inshore_ice_production_kwh_per_tonne_t2_start,
+                module.inshore_ice_production_kwh_per_tonne_t2_w,
+                electricity_emission.operating_margin,
+                module.ice_preserved_catch_pc_start,
+                module.ice_preserved_catch_pc_w,
+            ]
 
-        math_w = MathFishery(*inputs_w)
-        math_wo = MathFishery(*inputs_wo)
+            math_w = MathFishery(*inputs_w)
+            math_w.calculate_emissions()
 
-        math_w.calculate_emissions()
-        math_wo.calculate_emissions()
+        if is_without(module):
+            inputs_wo = [
+                project.implementation_years,
+                project.capitalization_years,
+                module.activity.change_rate.name,
+                module.total_catch_yr_start,
+                module.total_catch_yr_wo,
+                ef_diesel_default,
+                module.energy_emission_factor_t2_start,
+                module.energy_emission_factor_t2_wo,
+                fui_default_start,
+                fui_default_wo,
+                module.fui_start,
+                module.fui_wo,
+                module.refrigerant_gwp,
+                module.refrigerant_gwp_t2_start,
+                module.refrigerant_gwp_t2_wo,
+                lost_refrigerant_default,
+                module.refrigerant_lost_per_tonne_t2_start,
+                module.refrigerant_lost_per_tonne_t2_wo,
+                module.refrigerant_pc_start,
+                module.refrigerant_pc_wo,
+                tonnes_ice_default,
+                module.tonnes_of_ice_t2_start,
+                module.tonnes_of_ice_t2_wo,
+                kw_tonnes,
+                module.inshore_ice_production_kwh_per_tonne_t2_start,
+                module.inshore_ice_production_kwh_per_tonne_t2_wo,
+                electricity_emission.operating_margin,
+                module.ice_preserved_catch_pc_start,
+                module.ice_preserved_catch_pc_wo,
+            ]
 
-        results_w = math_w.result
-        results_wo = math_wo.result
+            math_wo = MathFishery(*inputs_wo)
+            math_wo.calculate_emissions()
 
-        return (results_w, results_wo)
+        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
+        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+
+        results_tuple = (results_w, results_wo)
+
+        return results_tuple
 
 
 class LargeFisheryCalculator(BaseCalculator):
@@ -2018,80 +2025,87 @@ class LargeFisheryCalculator(BaseCalculator):
 
         #  TODO: Change fui to T2
 
-        inputs_w = [
-            project.implementation_years,
-            project.capitalization_years,
-            module.activity.change_rate.name,
-            module.total_catch_yr_start,
-            module.total_catch_yr_w,
-            ef_diesel_default,
-            module.energy_emission_factor_t2_start,
-            module.energy_emission_factor_t2_w,
-            fui_default_start,
-            fui_default_w,
-            module.fui_start,
-            module.fui_w,
-            module.refrigerant_gwp,
-            module.refrigerant_gwp_t2_start,
-            module.refrigerant_gwp_t2_w,
-            lost_refrigerant_default,
-            module.refrigerant_lost_per_tonne_t2_start,
-            module.refrigerant_lost_per_tonne_t2_w,
-            module.refrigerant_pc_start,
-            module.refrigerant_pc_w,
-            tonnes_ice_default,
-            module.tonnes_of_ice_t2_start,
-            module.tonnes_of_ice_t2_w,
-            kw_tonnes,
-            module.inshore_ice_production_kwh_per_tonne_t2_start,
-            module.inshore_ice_production_kwh_per_tonne_t2_w,
-            electricity_emission.operating_margin,
-            module.ice_preserved_catch_pc_start,
-            module.ice_preserved_catch_pc_w,
-        ]
+        math_w = None
+        math_wo = None
 
-        inputs_wo = [
-            project.implementation_years,
-            project.capitalization_years,
-            module.activity.change_rate.name,
-            module.total_catch_yr_start,
-            module.total_catch_yr_wo,
-            ef_diesel_default,
-            module.energy_emission_factor_t2_start,
-            module.energy_emission_factor_t2_wo,
-            fui_default_start,
-            fui_default_wo,
-            module.fui_start,
-            module.fui_wo,
-            module.refrigerant_gwp,
-            module.refrigerant_gwp_t2_start,
-            module.refrigerant_gwp_t2_wo,
-            lost_refrigerant_default,
-            module.refrigerant_lost_per_tonne_t2_start,
-            module.refrigerant_lost_per_tonne_t2_wo,
-            module.refrigerant_pc_start,
-            module.refrigerant_pc_wo,
-            tonnes_ice_default,
-            module.tonnes_of_ice_t2_start,
-            module.tonnes_of_ice_t2_wo,
-            kw_tonnes,
-            module.inshore_ice_production_kwh_per_tonne_t2_start,
-            module.inshore_ice_production_kwh_per_tonne_t2_wo,
-            electricity_emission.operating_margin,
-            module.ice_preserved_catch_pc_start,
-            module.ice_preserved_catch_pc_wo,
-        ]
+        if is_with(module):
+            inputs_w = [
+                project.implementation_years,
+                project.capitalization_years,
+                module.activity.change_rate.name,
+                module.total_catch_yr_start,
+                module.total_catch_yr_w,
+                ef_diesel_default,
+                module.energy_emission_factor_t2_start,
+                module.energy_emission_factor_t2_w,
+                fui_default_start,
+                fui_default_w,
+                module.fui_start,
+                module.fui_w,
+                module.refrigerant_gwp,
+                module.refrigerant_gwp_t2_start,
+                module.refrigerant_gwp_t2_w,
+                lost_refrigerant_default,
+                module.refrigerant_lost_per_tonne_t2_start,
+                module.refrigerant_lost_per_tonne_t2_w,
+                module.refrigerant_pc_start,
+                module.refrigerant_pc_w,
+                tonnes_ice_default,
+                module.tonnes_of_ice_t2_start,
+                module.tonnes_of_ice_t2_w,
+                kw_tonnes,
+                module.inshore_ice_production_kwh_per_tonne_t2_start,
+                module.inshore_ice_production_kwh_per_tonne_t2_w,
+                electricity_emission.operating_margin,
+                module.ice_preserved_catch_pc_start,
+                module.ice_preserved_catch_pc_w,
+            ]
 
-        math_w = MathFishery(*inputs_w)
-        math_wo = MathFishery(*inputs_wo)
+            math_w = MathFishery(*inputs_w)
+            math_w.calculate_emissions()
 
-        math_w.calculate_emissions()
-        math_wo.calculate_emissions()
+        if is_without(module):
+            inputs_wo = [
+                project.implementation_years,
+                project.capitalization_years,
+                module.activity.change_rate.name,
+                module.total_catch_yr_start,
+                module.total_catch_yr_wo,
+                ef_diesel_default,
+                module.energy_emission_factor_t2_start,
+                module.energy_emission_factor_t2_wo,
+                fui_default_start,
+                fui_default_wo,
+                module.fui_start,
+                module.fui_wo,
+                module.refrigerant_gwp,
+                module.refrigerant_gwp_t2_start,
+                module.refrigerant_gwp_t2_wo,
+                lost_refrigerant_default,
+                module.refrigerant_lost_per_tonne_t2_start,
+                module.refrigerant_lost_per_tonne_t2_wo,
+                module.refrigerant_pc_start,
+                module.refrigerant_pc_wo,
+                tonnes_ice_default,
+                module.tonnes_of_ice_t2_start,
+                module.tonnes_of_ice_t2_wo,
+                kw_tonnes,
+                module.inshore_ice_production_kwh_per_tonne_t2_start,
+                module.inshore_ice_production_kwh_per_tonne_t2_wo,
+                electricity_emission.operating_margin,
+                module.ice_preserved_catch_pc_start,
+                module.ice_preserved_catch_pc_wo,
+            ]
 
-        results_w = math_w.result
-        results_wo = math_wo.result
+            math_wo = MathFishery(*inputs_wo)
+            math_wo.calculate_emissions()
 
-        return (results_w, results_wo)
+        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
+        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+
+        results_tuple = (results_w, results_wo)
+
+        return results_tuple
 
 
 class AquacultureCalculator(BaseCalculator):
