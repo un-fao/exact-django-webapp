@@ -650,7 +650,6 @@ class LandModule(Module):
 
     area = FloatField(null=True, blank=True)
 
-    # TODO: Add land_use_types start/w/wo for all assessments
     land_use_type_start = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_start")
     land_use_type_w = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_w")
     land_use_type_wo = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_wo")
@@ -1657,9 +1656,6 @@ class OrganicSoil(LandModuleFixed):
     fire_on_soil_ch4_t2_wo = FloatField(null=True, blank=True)
 
     ##### Peat Extraction #####
-
-    # TODO: Remove this field
-    has_peat_extraction = BooleanField(default=False)
 
     peat_type_start = ForeignKey(PeatType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_peat_type_start")
     peat_type_w = ForeignKey(PeatType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_peat_type_w")
