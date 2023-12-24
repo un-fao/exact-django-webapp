@@ -7,7 +7,6 @@ from types import SimpleNamespace
 
 from django.db.models import Q
 from ipcc import models as ipcc
-from math_model import forest_management
 from math_model.no_time_dependency_final.annuals import AnnualCropland
 from math_model.no_time_dependency_final.coastal_wetlands import (
     CoastalWetland as MathCoastalWetland,
@@ -397,7 +396,6 @@ class LandUseChangeCalculator(BaseCalculator):
     def calculate(self, aggregate_by=BreakdownTypes.TOTAL) -> Result:
         """
         Calculate emissions for a single LandUseChange module.
-        # TODO: Define the logic for this module
         """
 
         input: LandUseChange = self.data
@@ -486,7 +484,6 @@ class DeforestationCalculator(BaseCalculator):
         combustion_factor_start = ipcc.CombustionFactor.objects.get(vegetation_type=module.land_use_type_start)
         combustion_factor_end = ipcc.CombustionFactor.objects.get(vegetation_type=module.land_use_type_w)
 
-        # TODO: Review this query
         moisture_factor = ipcc.DefaultEmissionFactor.objects.filter(moisture=moisture)
         moisture_factor = moisture_factor.filter(Q(input__name__icontains="Other N Inputs") | Q(input__name__icontains="All N Inputs")).first()
 
@@ -606,7 +603,6 @@ class DeforestationCalculator(BaseCalculator):
 
 class OtherLandUseCalculator(BaseCalculator):
     """
-    TODO: Redo
     Calculator for other land use modules.
     """
 
@@ -1639,7 +1635,6 @@ class FloodedRiceCalculator(BaseCalculator):
 class GrasslandCalculator(BaseCalculator):
     """
     Calculator for grassland.
-    # TODO: Implement class-based math model
     """
 
     def calculate(self, aggregate_by=BreakdownTypes.TOTAL) -> list[Result]:
@@ -2022,8 +2017,6 @@ class LargeFisheryCalculator(BaseCalculator):
         electricity_country = module.inshore_ice_production_country_t2 if module.inshore_ice_production_country_t2 else project.country
 
         electricity_emission = ipcc.ElectricityEmission.objects.get(country=electricity_country, continent=project.country.region)
-
-        #  TODO: Change fui to T2
 
         math_w = None
         math_wo = None
@@ -3519,7 +3512,6 @@ class IrrigationPhaseCalculator(BaseCalculator):
 
 class CoastalWetlandCalculator(BaseCalculator):
     """
-    TODO: Redo
     Calculates the emissions of the coastal wetland
     """
 
@@ -3998,7 +3990,9 @@ class OrganicSoilCalculator(BaseCalculator):
 
 
 class ForestManagementCalculator(BaseCalculator):
-    """"""
+    """
+    # TODO: Review
+    """
 
     def calculate(self) -> Result:
         """"""
