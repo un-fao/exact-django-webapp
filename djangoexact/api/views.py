@@ -35,6 +35,7 @@ from .serializers import (
     CommentSerializer,
     CommentThreadSerializer,
     CountrySerializer,
+    DynamicResultSerializer,
     LandUseTypeSerializer,
     ProjectInvitationReadSerializer,
     ProjectInvitationWriteSerializer,
@@ -96,6 +97,13 @@ email = openapi.Parameter(
     openapi.IN_BODY,
     description="Email of user to invite",
     type=openapi.TYPE_STRING,
+)
+
+module_type = openapi.Parameter(
+    "module_type",
+    openapi.IN_QUERY,
+    description="Module id",
+    type=openapi.TYPE_INTEGER,
 )
 
 
@@ -660,12 +668,12 @@ def generic_module_viewset(model: Model):
 
             return Response(read_serializer.data, status=status.HTTP_201_CREATED)
 
-        @swagger_auto_schema(manual_parameters=[activity_id, include_related])
+        @swagger_auto_schema(manual_parameters=[activity_id, module_type])
         def list(self, request):
             """
             Lists the module(s) of a given activity
-            by filtering against an `activity_id` query parameter in the URL and
-            optionally including related modules by sending the `include_related` query parameter as `true`.
+            by filtering against an `activity_id` query parameter in the URL or
+            by filtering against the 'module_type' query parameter in the URL.
             """
 
             activity_id = utils.get_query_param_or_validation_error(self.request, "activity")
@@ -705,33 +713,22 @@ def generic_module_viewset(model: Model):
 
             try:
                 aggregate_by = BreakdownTypes(request.query_params.get("aggregate", BreakdownTypes.TOTAL))
-                (
-                    results_w,
-                    results_wo,
-                    results_tot,
-                ) = CalculatorFactory().calculate_result(module, aggregate_by=aggregate_by)
-                Serializer = ResultSerializerFactory().by(aggregate_by)
+                results_w, results_wo, results_tot = CalculatorFactory().calculate_result(module, aggregate_by=aggregate_by)
 
-                if Serializer == TotalResultSerializer:
-                    module_results = Serializer(
-                        {
-                            "total_w": results_w,
-                            "total_wo": results_wo,
-                            "balance": results_tot,
-                        }
-                    ).data
-                else:
-                    module_results = {
-                        "total_w": Serializer(results_w, many=True).data,
-                        "total_wo": Serializer(results_wo, many=True).data,
-                        "balance": Serializer(results_tot, many=True).data,
-                    }
+                module_results = {
+                    "total_w": results_w,
+                    "total_wo": results_wo,
+                    "balance": results_tot,
+                }
+
+                serializer = DynamicResultSerializer(module_results, aggregate_by=aggregate_by)
+                serialized_data = serializer.data
+
+                return Response(serialized_data)
 
             except Exception as e:
                 logging.error("Error calculating result in GenericModuleViewSet.results", e)
                 return utils.ErrorResponse(str(e))
-
-            return Response(module_results)
 
         @action(detail=True, methods=["get"])
         def defaults(self, request, pk=None):
