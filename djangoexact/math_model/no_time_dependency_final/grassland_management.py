@@ -4,6 +4,7 @@ import traceback
 from dataclasses import dataclass
 
 from .general_functions import (
+    BaseModule,
     breakdown_according_to_values,
     soil_emissions_2,
     yearly_constant_emissions_breakdown,
@@ -19,7 +20,7 @@ from .ghg_emissions_classes import (
 )
 
 
-class GrasslandManagement:
+class GrasslandManagement(BaseModule):
     def __init__(
         self,
         area_start,
@@ -191,23 +192,3 @@ class GrasslandManagement:
         except Exception as e:
             traceback.print_exc()
             return None
-
-    def evaluate_tier_2_defaults(self):
-        @dataclass
-        class Tier2Defaults:
-            start: dict
-            end: dict
-            other: dict
-
-        try:
-            # TODO: evaluate tier 2 defaults based on the front-end necessities
-
-            t2_start = {re.sub("start_tier_2_default", "", k): v for k, v in self.__dict__.items() if "start_tier_2_default" in k}
-            t2_end = {re.sub("end_tier_2_default", "", k): v for k, v in self.__dict__.items() if "end_tier_2_default" in k}
-            t2_other = {re.sub("_tier_2_default", "", k): v for k, v in self.__dict__.items() if "_tier_2_default" in k and "start" not in k and "end" not in k}
-
-            return Tier2Defaults(t2_start, t2_end, t2_other)
-
-        except Exception as e:
-            traceback.print_exc()
-            return {}
