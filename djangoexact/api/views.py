@@ -738,12 +738,18 @@ def generic_module_viewset(model: Model):
             ex. GET /annual-croplands/1/defaults/
             """
 
-            get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
+            module = get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
 
             try:
                 # TODO: Implement defaults
-                # module_defaults = get_defaults(module)
-                return utils.ErrorResponse("Not implemented", status=status.HTTP_501_NOT_IMPLEMENTED)
+                defaults = CalculatorFactory().get_defaults(module)
+                return Response(
+                    {
+                        "start": defaults.start,
+                        "w": defaults.w,
+                        "wo": defaults.wo,
+                    }
+                )
             except Exception as e:
                 return utils.ErrorResponse(str(e))
 
