@@ -5,7 +5,7 @@ from django.apps import apps
 from rest_framework import exceptions, status
 from rest_framework.response import Response
 
-from api.models import Model
+import api.models as models
 
 CN_RATIO_CROP = 10
 CN_RATIO_GRASSLAND = 15
@@ -73,7 +73,7 @@ def get_query_param_or_validation_error(request, param_name):
     return param
 
 
-def get_relative(module) -> tuple[Model, str]:
+def get_relative(module) -> tuple[models.Model, str]:
     """
     Looks for the assessment class in the module and returns a tuple (module, relationship).
     Returns (None, None) if no assessment class is found.
@@ -126,7 +126,7 @@ class ScenarioTypes(Enum):
     WITHOUT = "wo"
 
 
-def get_thread_attributes(module: Model):
+def get_thread_attributes(module: models.Model):
     return [attr for attr in module._meta.get_fields() if attr.name.endswith("_thread")]
 
 
@@ -134,3 +134,21 @@ def get_module_status(self, activity, module_type):
     module_attr = getattr(activity, module_type.class_name.lower(), None)
     module = module_attr.first() if module_attr else None
     return module.status if module else None
+
+
+def has_project_permission(permission, user, project):
+    """
+    Check if a user has a specific permission for a project.
+
+    Args:
+        permission (str): The codename of the permission to check, without the app name.
+        user (User): The user object.
+        project (Project): The project object.
+
+    Returns:
+        bool: True if the user has the permission, False otherwise.
+    """
+    membership: models.UserProjectGroup = project.members.filter(user=user).first()
+    can_access = membership and membership.group.permissions.filter(codename=permission).exists()
+
+    return can_access

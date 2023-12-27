@@ -1,7 +1,7 @@
 import logging
 
 from django.apps import apps
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Model
@@ -23,10 +23,12 @@ from .models import (
     Country,
     LandUseChange,
     LandUseType,
+    Module,
     ModuleType,
     Project,
     ProjectInvitation,
     StatusType,
+    UserProjectGroup,
 )
 from .serializers import (
     ActionTypes,
@@ -37,11 +39,10 @@ from .serializers import (
     CountrySerializer,
     DynamicResultSerializer,
     LandUseTypeSerializer,
+    ProjectInvitationModelSerializer,
     ProjectInvitationReadSerializer,
     ProjectInvitationWriteSerializer,
     ReadProjectSerializer,
-    ResultSerializerFactory,
-    TotalResultSerializer,
     WriteActivitySerializer,
     WriteProjectSerializer,
     get_model_serializer,
@@ -110,8 +111,7 @@ module_type = openapi.Parameter(
 def get_modules(activity: Activity, serialized=True) -> list:
     modules = []
     module_serializers_list = []
-    module_types = ModuleType.objects.filter(is_submodule=False).all()
-    for module in module_types:
+    for module in activity.module_types.all():
         try:
             module_model = apps.get_model(utils.API, module.class_name)
         except LookupError:
@@ -180,13 +180,6 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         Creates a new project for a given user.
         """
 
-        if not self.request.user.has_perm("api.add_project"):
-            logging.error("Selected user does not have permission to create projects")
-            return utils.ErrorResponse(
-                "Selected user does not have permission to create projects",
-                status=status.HTTP_403_FORBIDDEN,
-            )
-
         request.data["user"] = self.request.user.pk
         serializer = WriteProjectSerializer(data=request.data)
 
@@ -196,48 +189,34 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         project = serializer.save()
 
+        UserProjectGroup.objects.create(user=self.request.user, project=project, group=Group.objects.get(name="Admin"))
+
         read_serializer = ReadProjectSerializer(instance=project)
 
         return Response(read_serializer.data, status=status.HTTP_201_CREATED)
 
-    @swagger_auto_schema(
-        manual_parameters=[project_id],
-        responses={404: "Project not found"},
-        serializer_class=ReadProjectSerializer,
-    )
+    @swagger_auto_schema(manual_parameters=[project_id], responses={404: "Project not found"}, serializer_class=ReadProjectSerializer)
     def retrieve(self, request, pk=None):
         """
         Get a single project for a given user.
         """
 
-        if not self.request.user.has_perm("api.view_project"):
-            logging.error("Selected user does not have permission to view projects")
-            return utils.ErrorResponse(
-                "Selected user does not have permission to view projects",
-                status=status.HTTP_403_FORBIDDEN,
-            )
+        project = self.get_object()
 
-        project = get_object_or_404(Project, pk=pk, user=self.request.user)
+        if not utils.has_project_permission("view_project", self.request.user, project):
+            logging.error("Selected user does not have permission to view the project")
+            return utils.ErrorResponse("Selected user does not have permission to view the project", status=status.HTTP_403_FORBIDDEN)
+
         return Response(data=ReadProjectSerializer(project).data, status=status.HTTP_200_OK)
 
-    @swagger_auto_schema(
-        manual_parameters=[project_id],
-        responses={404: "Project not found"},
-        serializer_class=ReadProjectSerializer,
-    )
+    @swagger_auto_schema(manual_parameters=[project_id], responses={404: "Project not found"}, serializer_class=ReadProjectSerializer)
     def list(self, request):
         """
         Get all projects for a given user.
         """
 
-        if not self.request.user.has_perm("api.view_project"):
-            logging.error("Selected user does not have permission to view projects")
-            return utils.ErrorResponse(
-                "Selected user does not have permission to view projects",
-                status=status.HTTP_403_FORBIDDEN,
-            )
-
-        list = Project.objects.filter(user=self.request.user).all()
+        shared_projects = request.user.memberships.all()
+        list = [share.project for share in shared_projects if utils.has_project_permission("view_project", self.request.user, share.project)]
         return Response(data=ReadProjectSerializer(list, many=True).data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])
@@ -247,14 +226,12 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         Calculates and returns total emissions for each module in the project.
         """
 
-        if not self.request.user.has_perm("api.view_project"):
-            logging.error("Selected user does not have permission to view project results")
-            return utils.ErrorResponse(
-                "Selected user does not have permission to view project results",
-                status=status.HTTP_403_FORBIDDEN,
-            )
+        project = self.get_object()
 
-        project = get_object_or_404(Project, pk=pk, user=self.request.user)
+        if not utils.has_project_permission("view_project", self.request.user, project):
+            logging.error("Selected user does not have permission to view the project")
+            return utils.ErrorResponse("Selected user does not have permission to view the project", status=status.HTTP_403_FORBIDDEN)
+
         serialized_project = ReadProjectSerializer(project).data
 
         response = serialized_project
@@ -265,81 +242,16 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         return Response(data=response, status=status.HTTP_200_OK)
 
-    @swagger_auto_schema(
-        method="get",
-        responses={
-            400: "Bad request",
-            403: "Selected user does not have permission to view invitations",
-            200: ProjectInvitationReadSerializer,
-        },
-    )
-    @swagger_auto_schema(
-        method="post",
-        request_body=ProjectInvitationWriteSerializer,
-        responses={
-            400: "Bad request",
-            201: "Invitation sent successfully",
-            403: "Selected user does not have permission to invite users",
-        },
-    )
-    @action(detail=True, methods=["get", "post"])
-    def invitations(self, request, pk=None):
-        logging.debug("START ProjectViewSet.invitations")
-        email = request.data.get("email", None)
-
-        if request.method == "GET":
-            if not self.request.user.has_perm("api.view_projectinvitation"):
-                logging.error("Selected user does not have permission to view invitations")
-                return utils.ErrorResponse(
-                    "Selected user does not have permission to view invitations",
-                    status=status.HTTP_403_FORBIDDEN,
-                )
-
-            project = self.get_object()
-            invitations = project.invitations.all()
-            return Response(
-                data=ProjectInvitationReadSerializer(invitations, many=True).data,
-                status=status.HTTP_200_OK,
-            )
-
-        if not self.request.user.has_perm("api.add_projectinvitation"):
-            logging.error("Selected user does not have permission to invite users")
-            return utils.ErrorResponse(
-                "Selected user does not have permission to invite users",
-                status=status.HTTP_403_FORBIDDEN,
-            )
-
-        project = self.get_object()
-        user = None
-
-        serializer = ProjectInvitationWriteSerializer(data=request.data)
-
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            logging.error(f"User with email {email} does not exist")
-            return utils.ErrorResponse(
-                f"User with email {email} does not exist",
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        invitation, created = ProjectInvitation.objects.get_or_create(project=project, email=email, user=user)
-
-        if not created:
-            return Response({"error": "Invitation already sent"}, status=status.HTTP_400_BAD_REQUEST)
-
-        logging.debug("END ProjectViewSet.invitations")
-        return Response({"message": "Invitation sent successfully"})
-
     @transaction.atomic
     def partial_update(self, request, *args, **kwargs):
         new_years = request.data.get("implementation_years", None)
+        project = self.get_object()
+
+        if not utils.has_project_permission("change_project", self.request.user, project):
+            logging.error("Selected user does not have permission to update the project")
+            return utils.ErrorResponse("Selected user does not have permission to update the project", status=status.HTTP_403_FORBIDDEN)
 
         if new_years:
-            project = self.get_object()
             project.implementation_years = new_years
             for activity in project.activities.all():
                 if activity.duration_t2 > new_years:
@@ -347,6 +259,104 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                     activity.duration_t2 = new_years
                     activity.save()
             project.save()
+
+        return super().partial_update(request, *args, **kwargs)
+
+
+class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    queryset = ProjectInvitation.objects.all()
+    serializer_class = ProjectInvitationWriteSerializer
+
+    @swagger_auto_schema(
+        responses={
+            400: "Bad request",
+            403: "Selected user does not have permission to view invitations",
+            200: ProjectInvitationReadSerializer,
+        },
+    )
+    def retrieve(self, request, *args, **kwargs):
+        logging.debug("START ProjectInvitationViewset.retrieve")
+        invitation: ProjectInvitation = self.get_object()
+
+        if not utils.has_project_permission("view_projectinvitation", self.request.user, invitation.project):
+            logging.error("Selected user does not have permission to view invitations")
+            return utils.ErrorResponse("Selected user does not have permission to view invitations", status=status.HTTP_403_FORBIDDEN)
+
+        logging.debug("END ProjectInvitationViewset.retrieve")
+        return super().retrieve(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        request_body=ProjectInvitationWriteSerializer,
+        responses={
+            400: "Bad request",
+            201: "Invitation sent successfully",
+            403: "Selected user does not have permission to invite users",
+        },
+    )
+    def create(self, request, pk=None):
+        logging.debug("START ProjectInvitationViewset.create")
+
+        serializer = ProjectInvitationWriteSerializer(data=request.data)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        project = Project.objects.get(pk=serializer.validated_data["project"])
+
+        if not utils.has_project_permission("add_projectinvitation", self.request.user, project):
+            logging.error("Selected user does not have permission to invite users to the project")
+            return utils.ErrorResponse("Selected user does not have permission to invite users to the project", status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            logging.error(f"User with email {email} does not exist")
+            return utils.ErrorResponse(f"User with email {email} does not exist", status=status.HTTP_400_BAD_REQUEST)
+
+        group = Group.objects.get(pk=serializer.validated_data["role"])
+        invitation, created = ProjectInvitation.objects.get_or_create(project=project, user=user, group=group)
+
+        if not created:
+            logging.error(f"Invitation for {user.email} already sent")
+            return Response({"error": f"Invitation for {user.email} already sent"}, status=status.HTTP_400_BAD_REQUEST)
+
+        logging.debug("END ProjectInvitationViewset.create")
+        return Response({"message": f"Invitation for {user.email} sent successfully"})
+
+    @swagger_auto_schema(
+        request_body=ProjectInvitationModelSerializer,
+        responses={
+            400: "Bad request",
+            200: "Invitation updated successfully",
+            403: "Selected user does not have permission to update invitations",
+        },
+    )
+    def partial_update(self, request, *args, **kwargs):
+        invitation = get_object_or_404(ProjectInvitation, pk=kwargs["pk"])
+        data = ProjectInvitationModelSerializer(invitation, data=request.data, partial=True)
+
+        if not utils.has_project_permission("change_projectinvitation", self.request.user, invitation.project):
+            logging.error("Selected user does not have permission to update invitations")
+            return utils.ErrorResponse("Selected user does not have permission to update invitations", status=status.HTTP_403_FORBIDDEN)
+
+        if not data.is_valid():
+            return Response(data.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        if invitation.status == "declined" or invitation.status == "accepted":
+            logger.warning(f"Invitation already {invitation.status}. No further action is possible.")
+            return Response({"message": f"Invitation already {invitation.status}. No further action is possible."}, status=status.HTTP_200_OK)
+
+        new_status = data.validated_data.get("status", None)
+
+        if new_status == invitation.status:
+            logger.warning(f"Invitation already {new_status}")
+            return Response({"message": f"Invitation already {new_status}"}, status=status.HTTP_200_OK)
+
+        if new_status == "accepted":
+            UserProjectGroup.objects.create(user=self.request.user, project=invitation.project, group=invitation.group)
+
+        invitation.status = new_status
+        invitation.save()
 
         return super().partial_update(request, *args, **kwargs)
 
@@ -362,6 +372,10 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     def update(self, request, *args, **kwargs):
         activity = self.get_object()
 
+        if not utils.has_project_permission("change_activity", self.request.user, activity.project):
+            logging.error("Selected user does not have permission to update activities in the project")
+            return utils.ErrorResponse("Selected user does not have permission to update activities in the project", status=status.HTTP_403_FORBIDDEN)
+
         serializer = WriteActivitySerializer(data=request.data, instance=activity)
 
         if not serializer.is_valid():
@@ -376,6 +390,10 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     def partial_update(self, request, *args, **kwargs):
         activity = self.get_object()
 
+        if not utils.has_project_permission("change_activity", self.request.user, activity.project):
+            logging.error("Selected user does not have permission to update activities in the project")
+            return utils.ErrorResponse("Selected user does not have permission to update activities in the project", status=status.HTTP_403_FORBIDDEN)
+
         serializer = WriteActivitySerializer(data=request.data, partial=True, instance=activity)
 
         if not serializer.is_valid():
@@ -389,12 +407,16 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
     @transaction.atomic
     def create(self, request, *args, **kwargs):
-        state = StatusType.objects.get_or_create(name="EMPTY")[0]
-        request.data["status"] = state.pk
+        _status = StatusType.objects.get_or_create(name="EMPTY")[0]
+        request.data["status"] = _status.pk
         serializer = WriteActivitySerializer(data=request.data)
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        if not utils.has_project_permission("add_activity", self.request.user, serializer.validated_data["project"]):
+            logging.error("Selected user does not have permission to add activities to the project")
+            return utils.ErrorResponse("Selected user does not have permission to add activities to the project", status=status.HTTP_403_FORBIDDEN)
 
         activity = serializer.save()
 
@@ -409,18 +431,36 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
         logger.info("ActivityViewSet.retrieve")
         activity = get_object_or_404(Activity, pk=pk)
+
+        if not utils.has_project_permission("view_activity", self.request.user, activity.project):
+            logging.error("Selected user does not have permission to view the activity")
+            return utils.ErrorResponse("Selected user does not have permission to view the activity", status=status.HTTP_403_FORBIDDEN)
+
         activity_dict = ActivitySerializer(activity).data
         activity_dict["modules"] = get_modules(activity)
 
         return Response(data=activity_dict, status=status.HTTP_200_OK)
 
-    @swagger_auto_schema(manual_parameters=[project_id], responses={400: "activity_id not provided"})
+    @swagger_auto_schema(
+        manual_parameters=[project_id],
+        responses={
+            400: "activity_id not provided",
+            403: "Selected user does not have permission to view activities in the project",
+            200: ActivitySerializer(many=True),
+        },
+    )
     def list(self, request):
         """
         Get all activities for a given project, by filtering against a `project_id` query parameter in the URL.
         """
         logger.info("ActivityViewSet.list")
         project_id = utils.get_query_param_or_validation_error(self.request, "project_id")
+        project = get_object_or_404(Project, pk=project_id)
+
+        if not utils.has_project_permission("view_activity", self.request.user, project):
+            logging.error("Selected user does not have permission to view activities in the project")
+            return utils.ErrorResponse("Selected user does not have permission to view activities in the project", status=status.HTTP_403_FORBIDDEN)
+
         list = Activity.objects.filter(project__id=project_id)
 
         response = []
@@ -439,6 +479,11 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
 
         activity = get_object_or_404(Activity, pk=pk)
+
+        if not utils.has_project_permission("view_activity", self.request.user, activity.project):
+            logging.error("Selected user does not have permission to view the activity")
+            return utils.ErrorResponse("Selected user does not have permission to view the activity", status=status.HTTP_403_FORBIDDEN)
+
         response = {**ActivitySerializer(activity).data}
 
         modules = []
@@ -478,6 +523,11 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
 
         activity = get_object_or_404(Activity, pk=pk)
+
+        if not utils.has_project_permission("view_activity", self.request.user, activity.project):
+            logging.error("Selected user does not have permission to view the activity")
+            return utils.ErrorResponse("Selected user does not have permission to view the activity", status=status.HTTP_403_FORBIDDEN)
+
         modules = get_modules(activity)
 
         return Response(data=modules, status=status.HTTP_200_OK)
@@ -495,8 +545,15 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         try:
             serializer = ActivityBuilderSerializer(data=request.data)
+
             if not serializer.is_valid():
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            project = serializer.validated_data["project"]
+
+            if not utils.has_project_permission("add_activity", self.request.user, project):
+                logging.error("Selected user does not have permission to add activities to the project")
+                return utils.ErrorResponse("Selected user does not have permission to add activities to the project", status=status.HTTP_403_FORBIDDEN)
 
             activity = serializer.save()
 
@@ -614,7 +671,11 @@ def generic_module_viewset(model: Model):
             Updates a module.
             """
 
-            module = self.get_object()
+            module: Module = self.get_object()
+
+            if not utils.has_project_permission(f"change_{model.__name__.lower()}", self.request.user, module.activity.project):
+                logging.error("Selected user does not have permission to update this module in the project")
+                return utils.ErrorResponse("Selected user does not have permission to update this module in the project", status=status.HTTP_403_FORBIDDEN)
 
             serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data=request.data, instance=module)
 
@@ -632,7 +693,11 @@ def generic_module_viewset(model: Model):
             Partially updates a module.
             """
 
-            module = self.get_object()
+            module: Module = self.get_object()
+
+            if not utils.has_project_permission(f"change_{model.__name__.lower()}", self.request.user, module.activity.project):
+                logging.error("Selected user does not have permission to update this module in the project")
+                return utils.ErrorResponse("Selected user does not have permission to update this module in the project", status=status.HTTP_403_FORBIDDEN)
 
             serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data=request.data, partial=True, instance=module)
 
@@ -660,6 +725,12 @@ def generic_module_viewset(model: Model):
                 logger.error(f"Error creating module: {module_serializer.errors}")
                 return Response(module_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+            activity = module_serializer.validated_data["activity"]
+
+            if not utils.has_project_permission(f"add_{model.__name__.lower()}", self.request.user, activity.project):
+                logging.error("Selected user does not have permission to add this module to the project")
+                return utils.ErrorResponse("Selected user does not have permission to add this module to the project", status=status.HTTP_403_FORBIDDEN)
+
             module_serializer.save()
 
             read_serializer = get_module_serializer(model)(module_serializer.instance)
@@ -677,6 +748,12 @@ def generic_module_viewset(model: Model):
             """
 
             activity_id = utils.get_query_param_or_validation_error(self.request, "activity")
+            activity = get_object_or_404(Activity, pk=activity_id)
+
+            if not utils.has_project_permission(f"view_{model.__name__.lower()}", self.request.user, activity.project):
+                logging.error("Selected user does not have permission to view this module in the project")
+                return utils.ErrorResponse("Selected user does not have permission to view this module in the project", status=status.HTTP_403_FORBIDDEN)
+
             module_type = ModuleType.objects.get(class_name=model.__name__)
 
             if module_type.is_submodule:
@@ -698,8 +775,12 @@ def generic_module_viewset(model: Model):
             TODO: Define structure and format of the real response.
             """
 
-            module = get_object_or_404(model, pk=pk)
+            module: Module = get_object_or_404(model, pk=pk)
             module_type = ModuleType.objects.get(class_name=model.__name__)
+
+            if not utils.has_project_permission(f"view_{model.__name__.lower()}", self.request.user, module.activity.project):
+                logging.error("Selected user does not have permission to view this module in the project")
+                return utils.ErrorResponse("Selected user does not have permission to view this module in the project", status=status.HTTP_403_FORBIDDEN)
 
             if module_type.class_name == LandUseChange.__name__:
                 activity: Activity = module.activity
@@ -738,7 +819,11 @@ def generic_module_viewset(model: Model):
             ex. GET /annual-croplands/1/defaults/
             """
 
-            module = get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
+            module: Module = get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
+
+            if not utils.has_project_permission(f"view_{model.__name__.lower()}", self.request.user, module.activity.project):
+                logging.error("Selected user does not have permission to view this module in the project")
+                return utils.ErrorResponse("Selected user does not have permission to view this module in the project", status=status.HTTP_403_FORBIDDEN)
 
             try:
                 # TODO: Implement defaults
