@@ -38,6 +38,7 @@ from .serializers import (
     CommentThreadSerializer,
     CountrySerializer,
     DynamicResultSerializer,
+    GroupSerializer,
     LandUseTypeSerializer,
     ProjectInvitationModelSerializer,
     ProjectInvitationReadSerializer,
@@ -128,6 +129,11 @@ def get_modules(activity: Activity, serialized=True) -> list:
 
 class AuthenticatedViewSet(viewsets.GenericViewSet):
     permission_classes = [permissions.IsAuthenticated]
+
+
+class GroupViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
 
 
 class LandUseTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
@@ -268,6 +274,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     serializer_class = ProjectInvitationWriteSerializer
 
     @swagger_auto_schema(
+        operation_description="Get a single invitation by id",
         responses={
             400: "Bad request",
             403: "Selected user does not have permission to view invitations",
@@ -286,6 +293,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return super().retrieve(request, *args, **kwargs)
 
     @swagger_auto_schema(
+        operation_description="Invite a user to a project with a specific permission group",
         request_body=ProjectInvitationWriteSerializer,
         responses={
             400: "Bad request",
@@ -313,7 +321,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error(f"User with email {email} does not exist")
             return utils.ErrorResponse(f"User with email {email} does not exist", status=status.HTTP_400_BAD_REQUEST)
 
-        group = Group.objects.get(pk=serializer.validated_data["role"])
+        group = Group.objects.get(pk=serializer.validated_data["group"])
         invitation, created = ProjectInvitation.objects.get_or_create(project=project, user=user, group=group)
 
         if not created:

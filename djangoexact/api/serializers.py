@@ -2,7 +2,7 @@ import logging
 from enum import Enum
 
 from django.apps import apps
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import Group, Permission, User
 from django.db import transaction
 from django.db.models import Model
 from ipcc.models import GlobalWarmingPotential
@@ -1205,7 +1205,7 @@ class ProjectInvitationModelSerializer(serializers.ModelSerializer):
 
 class ProjectInvitationWriteSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
-    role = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all(), required=True)
+    group = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all(), required=True)
     project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(), required=True)
 
 
@@ -1305,3 +1305,19 @@ class DynamicResultSerializer(serializers.Serializer):
                 return YearlyActivityEmissionSerializer(data, many=True).data
             case _:
                 raise ValueError("Invalid breakdown type")
+
+
+class PermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Permission
+        fields = "__all__"
+        ref_name = "Permission"
+
+
+class GroupSerializer(serializers.ModelSerializer):
+    permissions = PermissionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Group
+        fields = "__all__"
+        ref_name = "Group"
