@@ -2,7 +2,7 @@ import logging
 from enum import Enum
 
 from django.apps import apps
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 from django.db import transaction
 from django.db.models import Model
 from ipcc.models import GlobalWarmingPotential
@@ -1196,8 +1196,17 @@ class WaterbodyReadSerializer(LandModuleReadSerializer):
         ref_name = "Waterbodies"
 
 
+class ProjectInvitationModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectInvitation
+        fields = "__all__"
+        ref_name = "ProjectInvitation"
+
+
 class ProjectInvitationWriteSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
+    role = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all(), required=True)
+    project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(), required=True)
 
 
 class ProjectInvitationReadSerializer(serializers.ModelSerializer):

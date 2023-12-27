@@ -2,6 +2,7 @@ import uuid
 from abc import ABC, abstractmethod
 
 from django.contrib.auth import models as auth_models
+from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db.models import *
@@ -24,6 +25,14 @@ class User(auth_models.User):
 
     def __str__(self):
         return f"{self.username}"
+
+
+class Group(auth_models.Group):
+    class Meta:
+        proxy = True
+
+    def __str__(self) -> str:
+        return f"({self.pk}) {self.name}"
 
 
 ##############################
@@ -414,8 +423,6 @@ class BaseModel(Model):
 
 class Historical(Model):
     history = HistoricalRecords(related_name="%(class)s_history")
-    created_at = DateTimeField(auto_now_add=True, null=True)
-    updated_at = DateTimeField(auto_now=True, null=True)
 
     class Meta:
         abstract = True
@@ -459,17 +466,31 @@ class Project(Historical):
         return f"({self.pk}) {self.name}"
 
 
-class ProjectInvitation(Model):
+class ProjectInvitation(Historical):
+    STATUS_CHOICES = (("sent", "Sent"), ("accepted", "Accepted"), ("declined", "Declined"))
+
     project = ForeignKey(Project, on_delete=CASCADE, related_name="invitations")
     user = ForeignKey(User, on_delete=CASCADE, related_name="invitations")
-    date = DateTimeField(auto_now_add=True)
-    is_accepted = BooleanField(default=False)
+    group = ForeignKey(Group, on_delete=CASCADE)
+    status = CharField(max_length=20, choices=STATUS_CHOICES, default="sent")
+
+    created_at = DateTimeField(auto_now_add=True, null=True)
+    updated_at = DateTimeField(auto_now=True, null=True)
 
     class Meta:
         unique_together = (("project", "user"),)
 
     def __str__(self):
         return f"({self.pk}) {self.project.name} - {self.user.email}"
+
+
+class UserProjectGroup(Model):
+    user = ForeignKey(User, on_delete=CASCADE, related_name="memberships")
+    project = ForeignKey(Project, on_delete=CASCADE, related_name="members")
+    group = ForeignKey(Group, on_delete=CASCADE)
+
+    def __str__(self):
+        return f"({self.pk}) {self.project.name} - {self.user.username} - {self.group.name}"
 
 
 ##############################
