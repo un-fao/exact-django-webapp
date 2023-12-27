@@ -306,9 +306,9 @@ class Result:
 class DefaultData:
     """ """
 
-    defaults_start: dict
-    defaults_w: dict
-    defaults_wo: dict
+    start: dict
+    w: dict
+    wo: dict
 
 
 class CalculatorFactory:
@@ -368,15 +368,20 @@ class BaseCalculator(ABC):
 
         if input.__class__ == LandUseChange or input.luc:
             luc: LandUseChange = input if input.__class__ == LandUseChange else input.luc
-            module_start = getattr(luc.activity, luc.module_type_start.lower(), None)
-            module_w = getattr(luc.activity, luc.module_type_w.lower(), None)
-            module_wo = getattr(luc.activity, luc.module_typw_wo.lower(), None)
+            modules = get_luc_modules(luc)
 
-            if not module_start or not module_w or not module_wo:
+            if not all(modules):
                 raise Exception("At least one module is missing")
 
-            if module_start.status.value != 1 or module_w.status.value != 1 or module_wo.status.value != 1:
+            if any(module.status != StatusType.objects.get(name="READY") for module in modules):
                 raise Exception("At least one module is not ready to perform the calculation")
+
+    @abstractmethod
+    def defaults(self) -> DefaultData:
+        """
+        Get the default values for a given module.
+        """
+        pass
 
 
 class LandUseChangeCalculator(BaseCalculator):
@@ -1637,7 +1642,15 @@ class GrasslandCalculator(BaseCalculator):
     Calculator for grassland.
     """
 
-    def calculate(self, aggregate_by=BreakdownTypes.TOTAL) -> list[Result]:
+    def __init__(self, input) -> None:
+        self.inputs_start_w = None
+        self.inputs_start_wo = None
+        self.inputs_start = None
+        self.inputs_w = None
+        self.inputs_wo = None
+        super().__init__(input)
+
+    def calculate(self) -> list[Result]:
         """
         Calculate emissions for a single Grassland module.
         """
@@ -1675,7 +1688,7 @@ class GrasslandCalculator(BaseCalculator):
                 climate=project.climate,
             )
 
-            inputs_start_w = [
+            self.inputs_start_w = [
                 *[area, 0],
                 project.implementation_years,
                 project.capitalization_years,
@@ -1710,7 +1723,7 @@ class GrasslandCalculator(BaseCalculator):
                 0,
             ]
 
-            math_start_w = MathGrassland(*inputs_start_w)
+            math_start_w = MathGrassland(*self.inputs_start_w)
             math_start_w.calculate_emissions()
 
         if is_with(module):
@@ -1723,7 +1736,7 @@ class GrasslandCalculator(BaseCalculator):
                 climate=project.climate,
             )
 
-            inputs_w = [
+            self.inputs_w = [
                 *[0, area],
                 project.implementation_years,
                 project.capitalization_years,
@@ -1758,7 +1771,7 @@ class GrasslandCalculator(BaseCalculator):
                 0,
             ]
 
-            math_w = MathGrassland(*inputs_w)
+            math_w = MathGrassland(*self.inputs_w)
             math_w.calculate_emissions()
 
         if is_business_as_usual(module):
@@ -1771,7 +1784,7 @@ class GrasslandCalculator(BaseCalculator):
                 climate=project.climate,
             )
 
-            inputs_start_wo = [
+            self.inputs_start_wo = [
                 *[area, 0],
                 project.implementation_years,
                 project.capitalization_years,
@@ -1806,7 +1819,7 @@ class GrasslandCalculator(BaseCalculator):
                 0,
             ]
 
-            math_start_wo = MathGrassland(*inputs_start_wo)
+            math_start_wo = MathGrassland(*self.inputs_start_wo)
             math_start_wo.calculate_emissions()
 
         if is_without(module):
@@ -1819,7 +1832,7 @@ class GrasslandCalculator(BaseCalculator):
                 climate=project.climate,
             )
 
-            inputs_wo = [
+            self.inputs_wo = [
                 *[0, area],
                 project.implementation_years,
                 project.capitalization_years,
@@ -1854,7 +1867,7 @@ class GrasslandCalculator(BaseCalculator):
                 0,
             ]
 
-            math_wo = MathGrassland(*inputs_wo)
+            math_wo = MathGrassland(*self.inputs_wo)
             math_wo.calculate_emissions()
 
         res_start_w = math_start_w.result if math_start_w else MathResult(project.implementation_years, project.capitalization_years)
@@ -1865,7 +1878,38 @@ class GrasslandCalculator(BaseCalculator):
         return (res_w + res_start_w, res_wo + res_start_wo)
 
     def defaults(self):
-        pass
+        self.calculate()
+
+        module: Grassland = self.data
+
+        defaults_start = {}
+        defaults_w = {}
+        defaults_wo = {}
+
+        if is_luc_remaining_same(module):
+            math_start = MathGrassland(*self.inputs_start_w)
+            math_start_defaults = math_start.evaluate_tier_2_defaults()
+            defaults_start.update(math_start_defaults.start)
+            defaults_start.update(math_start_defaults.other)
+        elif is_business_as_usual(module):
+            math_start = MathGrassland(*self.inputs_start_wo)
+            math_start_defaults = math_start.evaluate_tier_2_defaults()
+            defaults_start.update(math_start_defaults.start)
+            defaults_start.update(math_start_defaults.other)
+
+        if is_with(module):
+            math_w = MathGrassland(*self.inputs_w)
+            math_w_defaults = math_w.evaluate_tier_2_defaults()
+            defaults_w.update(math_w_defaults.end)
+            defaults_w.update(math_w_defaults.other)
+
+        if is_without(module):
+            math_wo = MathGrassland(*self.inputs_wo)
+            math_wo_defaults = math_wo.evaluate_tier_2_defaults()
+            defaults_wo.update(math_wo_defaults.end)
+            defaults_wo.update(math_wo_defaults.other)
+
+        return DefaultData(defaults_start, defaults_w, defaults_wo)
 
 
 class SmallFisheryCalculator(BaseCalculator):
