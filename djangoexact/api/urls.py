@@ -26,6 +26,7 @@ router = routers.DefaultRouter()
 
 router.register(r"projects", views.ProjectViewSet)
 router.register(r"project-invitations", views.ProjectInvitationViewSet)
+router.register(r"groups", views.GroupViewSet)
 router.register(r"activities", views.ActivityViewSet, basename="activities")
 router.register(r"threads", views.CommentThreadViewSet, basename="threads")
 router.register(r"comments", views.CommentViewSet, basename="comments")
