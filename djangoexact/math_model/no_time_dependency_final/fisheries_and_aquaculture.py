@@ -46,15 +46,18 @@ class Fishery:
         self.delay = delay
 
         # DEFINITION OF THE TIER 2 DEFAULTS
-        self.ef_diesel_tier_2_default = None
-        self.fui_start_tier_2_default = None
-        self.fui_end_tier_2_default = None
-
-        self.gwp_refrigerant_tier_2_default = None
-        self.quantity_lost_refrigerant_tier_2_default = None
-
-        self.tonnes_ice_tier_2_default = None
-        self.kwh_ice_per_tonne_tier_2_default = None
+        self.ef_diesel_start_tier_2_default = self.ef_diesel_default
+        self.ef_diesel_tier_2_end_default = self.ef_diesel_default
+        self.fui_start_tier_2_default = self.fui_default_start
+        self.fui_end_tier_2_default = self.fui_default_end
+        self.gwp_refrigerant_start_tier_2_default = self.gwp_refrigerant_default
+        self.gwp_refrigerant_end_tier_2_default = self.gwp_refrigerant_default
+        self.quantity_lost_refrigerant_start_tier_2_default = self.quantity_lost_refrigerant_default
+        self.quantity_lost_refrigerant_end_tier_2_default = self.quantity_lost_refrigerant_default
+        self.tonnes_ice_start_tier_2_default = self.tonnes_ice_default
+        self.tonnes_ice_end_tier_2_default = self.tonnes_ice_default
+        self.kwh_ice_per_tonne_start_tier_2_default = self.kwh_ice_per_tonne_default
+        self.kwh_ice_per_tonne_end_tier_2_default = self.kwh_ice_per_tonne_default
 
         # RESULTS
         self.emissions_catch_yearly = []
@@ -152,18 +155,7 @@ class Fishery:
 
     def evaluate_tier_2_defaults(self):
         try:
-            self.ef_diesel_tier_2_default = self.ef_diesel_default
-            self.fui_start_tier_2_default = self.fui_default_start
-            self.fui_end_tier_2_default = self.fui_default_end
-
-            self.gwp_refrigerant_tier_2_default = self.gwp_refrigerant_default
-            self.quantity_lost_refrigerant_tier_2_default = self.quantity_lost_refrigerant_default
-
-            self.tonnes_ice_tier_2_default = self.tonnes_ice_default
-            self.kwh_ice_per_tonne_tier_2_default = self.kwh_ice_per_tonne_default
-
-            # create a dictionary with the name of the variable (removing tier 2 default and capitalizing the first letter) and the value of the variable
-            return {re.sub("_tier_2_default", "", k): v for k, v in self.__dict__.items() if "_tier_2_default" in k}
+            return
 
         except Exception as e:
             traceback.print_exc()
