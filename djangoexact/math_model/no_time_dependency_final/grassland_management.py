@@ -128,8 +128,6 @@ class GrasslandManagement(BaseModule):
         self.agb_tier_2_default = self.agb_ref
         self.combustion_factor_tier_2_default = self.cf_ref
 
-        self.tier_2_defaults = self.evaluate_tier_2_defaults()
-
         return
 
     def calculate_emissions(
