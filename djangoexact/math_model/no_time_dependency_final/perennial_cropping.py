@@ -7,6 +7,7 @@ from .general_functions import (
     yearly_constant_emissions_breakdown,
     yearly_time_dependent_20_year_breakdown,
     yearly_time_dependent_parameter_breakdown,
+    BaseModule
 )
 from .ghg_emissions_classes import (
     ActivityTypes,
@@ -17,7 +18,7 @@ from .ghg_emissions_classes import (
 )
 
 
-class PerennialCropping:
+class PerennialCropping(BaseModule):
     def __init__(
         self,
         area_start,
@@ -112,6 +113,20 @@ class PerennialCropping:
 
         self.soc_start = self.soc_start_default * self.fmg_start * self.flu_start * self.fi_start if not self.soc_start_tier_2 else self.soc_start_tier_2
         self.soc_end = self.soc_end_default * self.fmg_end * self.flu_end * self.fi_end if not self.soc_end_tier_2 else self.soc_end_tier_2
+
+        #TIER 2 DEFAULTS
+        self.soc_start_tier_2_default = self.soc_start_default * self.fmg_start_default * self.flu_start_default * self.fi_start_default
+        self.soc_end_tier_2_default = self.soc_end_default * self.fmg_end_default * self.flu_end_default * self.fi_end_default
+        self.fmg_start_tier_2_default = self.fmg_start_default * self.flu_start_default * self.fi_start_default
+        self.fmg_end_tier_2_default = self.fmg_end_default * self.flu_end_default * self.fi_end_default
+        self.flu_start_tier_2_default = self.flu_start_default * self.fi_start_default
+        self.flu_end_tier_2_default = self.flu_end_default * self.fi_end_default
+        self.fi_start_tier_2_default = self.fi_start_default
+        self.fi_end_tier_2_default = self.fi_end_default
+        self.agb_rate_tier_2_default = self.agb_rate_default
+        self.bgb_rate_tier_2_default = self.bgb_rate_default
+        self.t_biomass_tier_2_default = self.agb_rate_default * 0.5 / 0.47 if not self.agb_rate_tier_2 else self.agb_rate_tier_2 * 0.5 / 0.47 
+
         # RESULTS
         self.yearly_residue_emissions = []
         self.total_residue_emissions = 0
