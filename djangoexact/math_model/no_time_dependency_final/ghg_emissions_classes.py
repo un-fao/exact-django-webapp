@@ -6,6 +6,7 @@ class GasTypes(Enum):
     N2O = "N2O"
     CO = "CO"
     OTHER = "Other"
+    DOC = "DOC"
 
 class ActivityTypes(Enum):
     SOIL_CO2_CHANGE = "Soil CO2 Change"
