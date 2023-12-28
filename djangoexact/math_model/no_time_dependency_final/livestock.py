@@ -92,6 +92,32 @@ class Livestock():
         self.leaching_multiplier = leaching_multiplier
 
         # TIER 2 DEFAULTS
+        self.specific_factor_start_tier_2_default = self.specific_factor_default_start
+        self.specific_factor_end_tier_2_default = self.specific_factor_default_end
+        self.percentage_prp_start_tier_2_default = self.percentage_prp_default_start
+        self.percentage_prp_end_tier_2_default = self.percentage_prp_default_end
+
+        self.ch4_prp_start_tier_2_default = self.ch4_system_default_start
+        self.ch4_prp_end_tier_2_default = self.ch4_system_default_end
+        self.ch4_system_start_tier_2_default = self.ch4_system_default_start
+        self.ch4_system_end_tier_2_default = self.ch4_system_default_end
+
+        self.n2o_prp_direct_start_tier_2_default = self.n2o_system_direct_default_start
+        self.n2o_prp_direct_end_tier_2_default = self.n2o_system_direct_default_end
+        self.n2o_system_direct_start_tier_2_default = self.n2o_system_direct_default_start
+        self.n2o_system_direct_end_tier_2_default = self.n2o_system_direct_default_end
+
+        # self.n2o_prp_indirect_volatization_start_tier_2_default = self.n20_system_indirect_volatization_default_start
+        # self.n2o_prp_indirect_volatization_end_tier_2_default = self.n20_system_indirect_volatization_default_end
+        self.n2o_system_indirect_volatization_start_tier_2_default = self.n20_system_indirect_volatization_default_start
+        self.n2o_system_indirect_volatization_end_tier_2_default = self.n20_system_indirect_volatization_default_end
+
+        self.n2o_prp_indirect_leaching_start_tier_2_default = self.ef_system_nitrous_indirect_leaching_start
+        self.n2o_prp_indirect_leaching_end_tier_2_default = self.ef_system_nitrous_indirect_leaching_end
+        self.n2o_system_indirect_leaching_start_tier_2_default = self.n20_system_indirect_leaching_default_start
+        self.n2o_system_indirect_leaching_end_tier_2_default = self.n20_system_indirect_leaching_default_end
+
+        
 
         # RESULTS
         self.mef_emissions_yearly = []
