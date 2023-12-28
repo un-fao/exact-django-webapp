@@ -1,14 +1,15 @@
-from .general_functions import yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, yearly_time_dependent_20_year_breakdown, breakdown_according_to_values, soil_emissions
+from .general_functions import yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, yearly_time_dependent_20_year_breakdown, breakdown_according_to_values, soil_emissions, BaseModule, soil_emissions_2
 import traceback, re
 from .ghg_emissions_classes import GasTypes, ActivityTypes, Emission, YearlyGasActivityEmissionSet, Result
 
-class Deforestation():
+class Deforestation(BaseModule):
 
     def __init__(self, ha_start, ha_end,time_impl,time_cap,rate_type_soil,biomass_final_1_year_t_per_ha,biomass_final_1_year_t_per_ha_tier_2,
         nitrous_constant, methane_constant,fire_bool,n2o_vegetation,ch4_vegetation,cf_vegetation,moisture_emission_factor,
         litter,litter_tier_2,dw,dw_tier_2,hwp_before_t_dm_per_ha,mangrove_factor,bgb_t_c_per_ha_tier_2,
-        agb_t_c_per_ha_tier_2,flu,agb_t_dm_per_ha_default,bgb_t_dm_per_ha_default_input_parameter,c_n_ratio,
-        soc_after_defo_tier_2,soc_reference_default,soc_reference_tier_2):
+        agb_t_c_per_ha_tier_2,agb_t_dm_per_ha_default,bgb_t_dm_per_ha_default_input_parameter,c_n_ratio,
+        soc_after_defo_tier_2,soc_reference_default,soc_reference_tier_2, fmg_start_tier_2, fmg_end_tier_2, fi_start_tier_2, fi_end_tier_2, flu_start_tier_2, flu_end_tier_2, 
+        soc_start_tier_2, soc_end_tier_2, fmg_start_default, fmg_end_default, fi_start_default, fi_end_default, flu_start_default, flu_end_default, soc_start_default, soc_end_default):
 
         self.ha_start = ha_start
         self.ha_end = ha_end
@@ -33,28 +34,56 @@ class Deforestation():
         self.mangrove_factor = mangrove_factor
         self.bgb_t_c_per_ha_tier_2 = bgb_t_c_per_ha_tier_2
         self.agb_t_c_per_ha_tier_2 = agb_t_c_per_ha_tier_2
-        self.flu = flu
         self.agb_t_dm_per_ha_default = agb_t_dm_per_ha_default
         self.bgb_t_dm_per_ha_default_input_parameter = bgb_t_dm_per_ha_default_input_parameter
         self.c_n_ratio = c_n_ratio
         self.soc_after_defo_tier_2 = soc_after_defo_tier_2
         self.soc_reference_default = soc_reference_default
         self.soc_reference_tier_2 = soc_reference_tier_2
+        self.fmg_start_tier_2 = fmg_start_tier_2
+        self.fmg_end_tier_2 = fmg_end_tier_2
+        self.fi_start_tier_2 = fi_start_tier_2
+        self.fi_end_tier_2 = fi_end_tier_2
+        self.flu_start_tier_2 = flu_start_tier_2
+        self.flu_end_tier_2 = flu_end_tier_2
+        self.soc_start_tier_2 = soc_start_tier_2
+        self.soc_end_tier_2 = soc_end_tier_2
+        self.fmg_start_default = fmg_start_default
+        self.fmg_end_default = fmg_end_default
+        self.fi_start_default = fi_start_default
+        self.fi_end_default = fi_end_default
+        self.flu_start_default = flu_start_default
+        self.flu_end_default = flu_end_default
+        self.soc_start_default = soc_start_default
+        self.soc_end_default = soc_end_default
 
-        # TIER 2 DEFAULT VALUES
-        self.agb_tier_2_default = None
-        self.bgb_tier_2_default = None
-        self.litter_tier_2_default = None
-        self.dw_tier_2_default = None
-        self.soc_start_tier_2_default = None
-        self.soc_final_tier_2_default = None
-        self.flu_start_tier_2_default = None
-        self.flu_final_tier_2_default = None
-        self.biomass_final_tier_2_default = None
+
+
+        # TODO: Assigned FMG, FLU, FI values. Maybe once everything has been done change this structure
+        self.fmg_start = self.fmg_start_tier_2 if self.fmg_start_tier_2 else self.fmg_start_default
+        self.fmg_end = self.fmg_end_tier_2 if self.fmg_end_tier_2 else self.fmg_end_default
+        self.flu_start = self.flu_start_tier_2 if self.flu_start_tier_2 else self.flu_start_default
+        self.flu_end = self.flu_end_tier_2 if self.flu_end_tier_2 else self.flu_end_default
+        self.fi_start = self.fi_start_tier_2 if self.fi_start_tier_2 else self.fi_start_default
+        self.fi_end = self.fi_end_tier_2 if self.fi_end_tier_2 else self.fi_end_default
+
+        self.soc_start = self.soc_start_default * self.fmg_start * self.flu_start * self.fi_start if not self.soc_start_tier_2 else self.soc_start_tier_2
+        self.soc_end = self.soc_end_default * self.fmg_end * self.flu_end * self.fi_end if not self.soc_end_tier_2 else self.soc_end_tier_2
 
         # AUXILIARY VARIABLES FOR SOIL CALCULATION
         self.hectars_before_20, self.hectars_after_20 = yearly_time_dependent_20_year_breakdown(0, self.area_deforested, self.time_impl, self.time_cap, self.rate_type_soil)
+        self.total_hectares = yearly_time_dependent_parameter_breakdown(self.area_deforested, 0, self.time_impl, self.time_cap, self.rate_type_soil)
         #self.hectars_before_20 = yearly_time_dependent_20_year_breakdown(0, self.area_deforested, self.time_impl, self.time_cap, self.rate_type_soil)
+
+        # TIER 2 VALUES
+        self.agb_t_c_tier_2_default = self.agb_t_dm_per_ha_default * self.mangrove_factor
+        self.bgb_t_c_tier_2_default = self.bgb_t_dm_per_ha_default_input_parameter * self.agb_t_dm_per_ha_default * self.mangrove_factor
+        self.hwp_before_t_c_tier_2_default = self.agb_t_dm_per_ha_default * self.mangrove_factor if self.hwp_before_t_dm_per_ha > self.agb_t_dm_per_ha_default else self.hwp_before_t_dm_per_ha * self.mangrove_factor
+        self.biomass_final_1_year_t_per_ha_tier_2_tier_2_default = self.biomass_final_1_year_t_per_ha_default
+        self.litter_tier_2_default = self.litter if not self.litter_tier_2 else self.litter_tier_2
+        self.dw_tier_2_default = self.dw if not self.dw_tier_2 else self.dw_tier_2
+        self.soc_start_tier_2_default = self.soc_start_default * self.fmg_start * self.flu_start * self.fi_start 
+        self.soc_end_tier_2_default = self.soc_end_default * self.fmg_end * self.flu_end * self.fi_end
 
         # RESULTS
         self.emissions_biomass_gain_yearly = []
@@ -168,7 +197,7 @@ class Deforestation():
 
         def calculate_soil_emissions():
             try:
-                self.emissions_soil_yearly, self.emissions_soil_total = soil_emissions(self.hectars_before_20, 0, self.area_deforested, self.soc_reference_default, self.soc_reference_tier_2, None, None, None, self.flu)
+                self.emissions_soil_yearly, self.emissions_soil_total = soil_emissions_2(self.soc_start, self.soc_end, self.total_hectares, self.area_deforested, 0, self.hectars_before_20)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
                     year = 0,
@@ -188,7 +217,7 @@ class Deforestation():
 
                 soc_reference = self.soc_reference_tier_2 if self.soc_reference_tier_2 else self.soc_reference_default
                 delta_c_mineral_per_ha = (
-                    soc_reference * self.flu - soc_reference
+                    self.soc_end - self.soc_start
                     if not self.soc_after_defo_tier_2
                     else self.soc_after_defo_tier_2 - soc_reference
                 )
