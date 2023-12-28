@@ -75,6 +75,40 @@ class AnnexedModule:
 
         self.maximum_area_for_water_management = maximum_area_for_water_management
 
+        # TIER 2 DEFAULTS
+        self.dry_matter_fire_tier_2_default = self.dry_matter_ref_fire
+
+        '''
+        ef_doc_rewetting_initial = self.ef_doc_rewetting_initial if not self.ef_doc_rewetting_initial_tier_2 else self.ef_doc_rewetting_initial_tier_2
+        ef_co2_rewetting_initial = self.ef_co2_rewetting_initial if not self.ef_co2_rewetting_initial_tier_2 else self.ef_co2_rewetting_initial_tier_2
+        ef_ch4_rewetting_initial = self.ef_ch4_rewetting_initial if not self.ef_ch4_rewetting_initial_tier_2 else self.ef_ch4_rewetting_initial_tier_2
+        ef_n2o_rewetting_initial = self.ef_n2o_rewetting_initial if not self.ef_n2o_rewetting_initial_tier_2 else self.ef_n2o_rewetting_initial_tier_2
+
+        ef_doc_rewetting_final = self.ef_doc_rewetting_final if not self.ef_doc_rewetting_final_tier_2 else self.ef_doc_rewetting_final_tier_2
+        ef_co2_rewetting_final = self.ef_co2_rewetting_final if not self.ef_co2_rewetting_final_tier_2 else self.ef_co2_rewetting_final_tier_2
+        ef_ch4_rewetting_final = self.ef_ch4_rewetting_final if not self.ef_ch4_rewetting_final_tier_2 else self.ef_ch4_rewetting_final_tier_2
+        ef_n2o_rewetting_final = self.ef_n2o_rewetting_final if not self.ef_n2o_rewetting_final_tier_2 else self.ef_n2o_rewetting_final_tier_2
+        '''
+        self.ef_n2o_start_tier_2_default = self.ef_n2o_ref_drainage_initial
+        self.ef_ch4_onsite_start_tier_2_default = self.ef_ch4_onsite_ref_drainage_initial
+        self.ef_ch4_offsite_start_tier_2_default = self.ef_ch4_offsite_ref_drainage_initial
+        self.ef_co2_start_tier_2_default = self.ef_co2_ref_drainage_initial
+        self.ef_doc_start_tier_2_default = self.ef_doc_ref_drainage_initial
+        self.ed_n2o_end_tier_2_default = self.ef_n2o_ref_drainage_final
+        self.ef_ch4_onsite_end_tier_2_default = self.ef_ch4_onsite_ref_drainage_final
+        self.ef_ch4_offsite_end_tier_2_default = self.ef_ch4_offsite_ref_drainage_final
+        self.ef_co2_end_tier_2_default = self.ef_co2_ref_drainage_final
+        self.ef_doc_end_tier_2_default = self.ef_doc_ref_drainage_final
+
+        self.ef_doc_rewetting_start_tier_2_default = self.ef_doc_rewetting_initial
+        self.ef_co2_rewetting_start_tier_2_default = self.ef_co2_rewetting_initial
+        self.ef_ch4_rewetting_start_tier_2_default = self.ef_ch4_rewetting_initial
+        self.ef_n2o_rewetting_start_tier_2_default = self.ef_n2o_rewetting_initial
+        self.ef_doc_rewetting_end_tier_2_default = self.ef_doc_rewetting_final
+        self.ef_co2_rewetting_end_tier_2_default = self.ef_co2_rewetting_final
+        self.ef_ch4_rewetting_end_tier_2_default = self.ef_ch4_rewetting_final
+        self.ef_n2o_rewetting_end_tier_2_default = self.ef_n2o_rewetting_final
+
         # RESULTS
 
         # TODO: ADD ALL RESULTS BREAKDOWNS
