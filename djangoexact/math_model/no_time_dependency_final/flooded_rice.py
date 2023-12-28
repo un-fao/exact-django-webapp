@@ -122,6 +122,19 @@ class FloodedRice:
         self.fi_start = self.fi_start_tier_2 if self.fi_start_tier_2 else self.fi_start_default
         self.fi_end = self.fi_end_tier_2 if self.fi_end_tier_2 else self.fi_end_default
 
+        # TIER 2 DEFAULTS
+        # TODO: THIS CAN BE MADE BETTER, BUT HOW?
+        efc_placeholder = self.EFc_ref if not self.EFc_tier_2 else self.EFc_tier_2
+        sfw_placeholder = self.SFw_ref if not self.SFw_tier_2 else self.SFw_tier_2
+        sfp_placeholder = self.SFp_ref if not self.SFp_tier_2 else self.SFp_tier_2
+        
+        self.EFc_tier_2_default = self.EFc_ref
+        self.SFw_tier_2_default = self.SFw_ref
+        self.SFp_tier_2_default = self.SFp_ref
+        self.straw_tonnes_tier_2_default = self.yield_ref * self.rice_slope + self.rice_intercept
+        self.SFo_tier_2_default = 1 + self.straw_tonnes_tier_2 * self.cfoa * 0.59 if self.straw_tonnes_tier_2 else 1 + self.straw_tonnes_tier_2_default * self.cfoa * 0.59
+        self.adjusted_daily_ef_methane_tier_2_default = efc_placeholder * sfw_placeholder * sfp_placeholder * self.SFo_tier_2_default
+
         # HECTARES
         self.hectares_before_20, self.hectares_after_20 = yearly_time_dependent_20_year_breakdown(area_start, area_end, self.time_impl, self.time_cap, self.rate)
         self.hectares_total = yearly_time_dependent_parameter_breakdown(area_start, area_end, self.time_impl, self.time_cap, self.rate)
