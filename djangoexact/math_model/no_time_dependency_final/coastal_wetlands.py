@@ -1,8 +1,8 @@
 import traceback
-from .general_functions import yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, yearly_time_dependent_20_year_breakdown, breakdown_according_to_values, soil_emissions
+from .general_functions import yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, yearly_time_dependent_20_year_breakdown, breakdown_according_to_values, soil_emissions, BaseModule
 from .ghg_emissions_classes import YearlyGasActivityEmissionSet, Emission, GasTypes, ActivityTypes, Result
 
-class CoastalWetland:
+class CoastalWetland(BaseModule):
 
     def __init__(self, maximum_area_for_water_management, area_drained_start, area_drained_end, rate_type, time_impl, time_cap, agb_default, bgb_default, litter_default, deadwood_default,
             soil_1m_default, EF_drainage_default, agb_tier_2, bgb_tier_2,litter_tier_2, deadwood_tier_2, soil_1m_tier_2, EF_drainage_tier_2, 
@@ -61,6 +61,21 @@ class CoastalWetland:
         # TODO: ask Lorenzo why this is done
         self.hectares_drained_before_20, self.hectares_drained_after_20 = yearly_time_dependent_20_year_breakdown(0, self.area_drained_end, self.time_impl, self.time_cap, self.rate_type)
         self.hectares_drained = yearly_time_dependent_parameter_breakdown(0, self.area_drained_end, self.time_impl, self.time_cap, self.rate_type)
+
+        # TIER 2 DEFAULTS
+        self.agb_tier_2_default = self.agb_default * 0.451 
+        self.bgb_tier_2_default = self.bgb_default * self.agb_tier_2_default 
+        self.litter_tier_2_default = self.litter_default 
+        self.deadwood_tier_2_default = self.deadwood_default
+        self.soil_1m_tier_2_default = self.soil_1m_default
+        self.EF_drainage_tier_2_default = self.EF_drainage_default 
+        self.percentage_c_lost_excavation_tier_2_default = self.percentage_c_lost_excavation_default
+        self.ef_rewetting_carbon_tier_2_default = self.ef_rewetting_carbon_default
+        self.ef_rewetting_methane_tier_2_default = self.ef_rewetting_methane_default
+
+
+
+
 
         
         # RESULTS
