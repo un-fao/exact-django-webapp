@@ -1,8 +1,8 @@
-from .general_functions import yearly_time_dependent_parameter_breakdown, input_single_calculation, yearly_constant_emissions_breakdown
+from .general_functions import yearly_time_dependent_parameter_breakdown, input_single_calculation, yearly_constant_emissions_breakdown, BaseModule
 import math, traceback
 from .ghg_emissions_classes import YearlyGasActivityEmissionSet, Emission, GasTypes, ActivityTypes, Result
 
-class Inputs:
+class Inputs(BaseModule):
 
     def __init__(self, unit_start, unit_end, rate_type, ipcc_factor_co2, tier_2_factor_co2, unit_factor_co2, emissions_factor_co2, time_impl, time_cap,
                            ipcc_factor_n2o, tier_2_factor_n2o, unit_factor_n2o, emissions_factor_n2o, ipcc_factor_eq, tier_2_factor_eq, unit_factor_eq, emissions_factor_eq):
@@ -28,6 +28,11 @@ class Inputs:
         self.tier_2_factor_eq = tier_2_factor_eq
         self.unit_factor_eq = unit_factor_eq
         self.emissions_factor_eq = emissions_factor_eq
+
+        # TIER 2 DEFAULTS
+        self.eq_tier_2_default = self.ipcc_factor_eq
+        self.co2_tier_2_default = self.ipcc_factor_co2
+        self.n2o_tier_2_default = self.ipcc_factor_n2o
         
 
         # RESULTS
@@ -92,7 +97,7 @@ class Inputs:
     def evaluate_tier_2_defaults():
         pass
 
-class OperationPhaseIrrigation:
+class OperationPhaseIrrigation(BaseModule):
 
     def __init__(self, ef_default, ef_tier_2, total_dynamic_head_tier_2, average_pressure_default, average_pressure_tier_2, 
                  pumping_efficiency_default, pumping_efficiency_tier_2, erh_electricity, fuel_density, fuel_net_calorific_values, depth,
@@ -118,6 +123,10 @@ class OperationPhaseIrrigation:
         self.transportation_loss = transportation_loss                          # Float, Fixed at 0.1 (10%) on Excel (could become front-end Input)
         self.gwir = gwir                                                        # Front-End input Gross Water Irrigation Requirement
 
+        # TIER 2 DEFAULTS
+        self.ef_tier_2_default = self.ef_default
+        self.total_dynamic_head_tier_2_default = self.average_pressure_default * 10.19
+        self.pumping_efficiency_tier_2_default = self.pumping_efficiency_default
         # RESULTS
         self.emissions_total_yearly = []
         self.total_emissions = 0
@@ -176,7 +185,7 @@ class OperationPhaseIrrigation:
     def evaluate_tier_2_defaults():
         pass
 
-class Roads:
+class Roads(BaseModule):
 
     def __init__(self, ef_ipcc:float, ef_tier_2, units_end, time_impl, time_cap, rate_type):
 
@@ -186,6 +195,9 @@ class Roads:
         self.time_impl = time_impl # Project Input
         self.time_cap = time_cap   # Project Input
         self.rate_type = rate_type # Rate Type
+
+        # TIER 2 DEFAULTS
+        self.ef_tier_2_default = self.ef_ipcc
 
         #  RESULTS
         self.emissions_total_yearly = []
@@ -215,7 +227,7 @@ class Roads:
     def evaluate_tier_2_defaults():
         pass
 
-class ElectryicityConsumption:
+class ElectryicityConsumption(BaseModule):
 
     def __init__(self, emissions_factor, specific_factor, mwh_start, mwh_end, percent_loss_transportation, rate_type, time_impl, time_cap):
 
@@ -262,7 +274,7 @@ class ElectryicityConsumption:
     def evaluate_tier_2_defaults():
         pass
 
-class FuelConsumption:
+class FuelConsumption(BaseModule):
 
     def __init__(self, emissions_factor, specific_factor, mwh_start, mwh_end, rate_type, time_impl, time_cap):
 
@@ -306,7 +318,7 @@ class FuelConsumption:
     def evaluate_tier_2_defaults():
         pass
 
-class SolidConsumption:
+class SolidConsumption(BaseModule):
     
     def __init__(self, joules_factor, co2_factor, ch4_factor, n2o_factor, account_for_co2_boolean, methane_constant, nitrous_constant, specific_factor, mwh_start, mwh_end, rate_type, time_impl, time_cap):
 
@@ -365,7 +377,7 @@ class SolidConsumption:
     def evaluate_tier_2_defaults():
         pass
 
-class NewIrrigation:
+class NewIrrigation(BaseModule):
 
     def __init__(self, ef_ref, ef_tier_2, units_start, units_end, time_impl, time_cap, rate_type):
 
@@ -377,6 +389,9 @@ class NewIrrigation:
         self.time_impl = time_impl # Project Input
         self.time_cap = time_cap   # Project Input
         self.rate_type = rate_type # Rate Type
+
+        # TIER 2 DEFAULTS
+        self.ef_tier_2_default = self.ef_ref
 
         # RESULTS
         self.emissions_total_yearly = []
