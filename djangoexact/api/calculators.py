@@ -640,6 +640,10 @@ class OtherLandUseCalculator(BaseCalculator):
         module_w: BiomassModule | LandModule = getattr(input.activity, luc.module_type_w.class_name.lower(), None).first()
         module_wo: BiomassModule | LandModule = getattr(input.activity, luc.module_type_wo.class_name.lower(), None).first()
 
+        ready = all(module.status == StatusType.objects.get(name="READY") for module in [module_start, module_w, module_wo])
+        if not ready:
+            raise Exception("All modules associated with the land use change must be ready to perform the calculation")
+
         soc_start = None
         if luc.module_type_start.name == "Grassland":
             # Grassland SOCs
