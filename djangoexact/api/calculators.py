@@ -4196,6 +4196,16 @@ class OrganicSoilCalculator(BaseCalculator):
             peat_extraction_math_wo = MathPeatExtraction(*peat_extraction_inputs_wo)
             peat_extraction_math_wo.calculate_emissions()
 
+        self.inputs_w = {
+            "organic_soil": organic_soil_inputs_w,
+            "peat_extraction": peat_extraction_inputs_w,
+        }
+
+        self.inputs_wo = {
+            "organic_soil": organic_soil_inputs_wo,
+            "peat_extraction": peat_extraction_inputs_wo,
+        }
+
         organic_soil_results_w = organic_soil_math_w.result if organic_soil_math_w else MathResult(project.implementation_years, project.capitalization_years)
         organic_soil_results_wo = organic_soil_math_wo.result if organic_soil_math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
@@ -4219,28 +4229,29 @@ class OrganicSoilCalculator(BaseCalculator):
         defaults_wo = {}
 
         if is_with(module):
-            math_w = MathOrganicSoil(*self.inputs_w)
+            math_w = MathOrganicSoil(*self.inputs_w["organic_soil"])
             math_w_defaults = math_w.evaluate_tier_2_defaults()
             defaults_w.update(math_w_defaults.start)
             defaults_w.update(math_w_defaults.other)
 
-            math_w = MathPeatExtraction(*self.inputs_w)
+            math_w = MathPeatExtraction(*self.inputs_w["peat_extraction"])
             math_w_defaults = math_w.evaluate_tier_2_defaults()
             defaults_w.update(math_w_defaults.start)
             defaults_w.update(math_w_defaults.other)
 
         if is_without(module):
-            math_wo = MathOrganicSoil(*self.inputs_wo)
+            math_wo = MathOrganicSoil(*self.inputs_wo["organic_soil"])
             math_wo_defaults = math_wo.evaluate_tier_2_defaults()
             defaults_wo.update(math_wo_defaults.start)
             defaults_wo.update(math_wo_defaults.other)
 
-            math_wo = MathPeatExtraction(*self.inputs_wo)
+            math_wo = MathPeatExtraction(*self.inputs_wo["peat_extraction"])
             math_wo_defaults = math_wo.evaluate_tier_2_defaults()
             defaults_wo.update(math_wo_defaults.start)
             defaults_wo.update(math_wo_defaults.other)
 
         return DefaultData(defaults_start, defaults_w, defaults_wo)
+
 
 class ForestManagementCalculator(BaseCalculator):
     """
