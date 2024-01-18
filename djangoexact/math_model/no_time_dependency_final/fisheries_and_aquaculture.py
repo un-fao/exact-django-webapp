@@ -1,7 +1,7 @@
 import re
 import traceback
 
-from .general_functions import yearly_time_dependent_parameter_breakdown
+from .general_functions import BaseModule, yearly_time_dependent_parameter_breakdown
 from .ghg_emissions_classes import (
     ActivityTypes,
     Emission,
@@ -11,7 +11,7 @@ from .ghg_emissions_classes import (
 )
 
 
-class Fishery:
+class Fishery(BaseModule):
     def __init__(self, time_impl, time_cap, rate_type, catch_start, catch_end, ef_diesel_default, ef_diesel_start_tier_2, ef_diesel_tier_2_end, fui_default_start, fui_default_end, fui_start_tier_2, fui_end_tier_2, gwp_refrigerant_default, gwp_refrigerant_start_tier_2, gwp_refrigerant_end_tier_2, quantity_lost_refrigerant_default, quantity_lost_refrigerant_start_tier_2, quantity_lost_refrigerant_end_tier_2, percentage_refrigerant_start, percentage_refrigerant_end, tonnes_ice_default, tonnes_ice_start_tier_2, tonnes_ice_end_tier_2, kwh_ice_per_tonne_default, kwh_ice_per_tonne_start_tier_2, kwh_ice_per_tonne_end_tier_2, operating_margin, percentage_ice_start, percentage_ice_end, delay=0) -> None:
         # DEFINITIONS OF PARAMETERS
         self.implementation_time = time_impl
@@ -47,7 +47,7 @@ class Fishery:
 
         # DEFINITION OF THE TIER 2 DEFAULTS
         self.ef_diesel_start_tier_2_default = self.ef_diesel_default
-        self.ef_diesel_tier_2_end_default = self.ef_diesel_default
+        self.ef_diesel_end_tier_2_default = self.ef_diesel_default
         self.fui_start_tier_2_default = self.fui_default_start
         self.fui_end_tier_2_default = self.fui_default_end
         self.gwp_refrigerant_start_tier_2_default = self.gwp_refrigerant_default
@@ -208,18 +208,8 @@ class CoastalAquaculture:
         except Exception as e:
             traceback.print_exc()
 
-    def evaluate_tier_2_defaults(self):
-        try:
-            self.nitrous_ef_tier_2_default = self.nitrous_ef_default
 
-            return {re.sub("_tier_2_default", "", k): v for k, v in self.__dict__.items() if "_tier_2_default" in k}
+# w = [22.0, 45.0, 0.00169, None, None, 265.0, 5, 15, "D"]
+# a = CoastalAquaculture(*w)
 
-        except Exception as e:
-            traceback.print_exc()
-            return {}
-
-
-w = [22.0, 45.0, 0.00169, None, None, 265.0, 5, 15, "D"]
-a = CoastalAquaculture(*w)
-
-a.calculate_emissions()
+# a.calculate_emissions()
