@@ -2,6 +2,7 @@ import math
 import traceback
 
 from .general_functions import (
+    BaseModule,
     breakdown_according_to_values,
     soil_emissions_2,
     yearly_constant_emissions_breakdown,
@@ -17,7 +18,7 @@ from .ghg_emissions_classes import (
 )
 
 
-class FloodedRice:
+class FloodedRice(BaseModule):
     def __init__(
         self,
         area_start,
@@ -127,7 +128,7 @@ class FloodedRice:
         efc_placeholder = self.EFc_ref if not self.EFc_tier_2 else self.EFc_tier_2
         sfw_placeholder = self.SFw_ref if not self.SFw_tier_2 else self.SFw_tier_2
         sfp_placeholder = self.SFp_ref if not self.SFp_tier_2 else self.SFp_tier_2
-        
+
         self.EFc_tier_2_default = self.EFc_ref
         self.SFw_tier_2_default = self.SFw_ref
         self.SFp_tier_2_default = self.SFp_ref
@@ -232,6 +233,3 @@ class FloodedRice:
 
         self.emissions_total_yearly = [i + j + k for i, j, k in zip(self.ch4_emitted_yearly, self.straw_burning_yearly, self.soil_emissions_yearly)]
         self.total_emissions = self.ch4_emitted_total + self.straw_burning_total + self.soil_emissions_total
-
-    def evaluate_tier_2_defaults():
-        pass
