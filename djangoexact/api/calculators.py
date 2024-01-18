@@ -868,7 +868,7 @@ class AnnualCroppingCalculator(BaseCalculator):
 
             emission_factors_start = ipcc.DefaultEmissionFactor.objects.get(moisture=moisture, organic_input_type=input.organic_input_type_start)
 
-            inputs_start_w = [
+            self.inputs_start_w = [
                 *[area, 0],
                 project.implementation_years,
                 project.capitalization_years,
@@ -919,7 +919,7 @@ class AnnualCroppingCalculator(BaseCalculator):
                 0,
             ]
 
-            math_start_w = AnnualCropland(*inputs_start_w)
+            math_start_w = AnnualCropland(*self.inputs_start_w)
             math_start_w.calculate_emissions()
 
         if is_with(input):
@@ -939,7 +939,7 @@ class AnnualCroppingCalculator(BaseCalculator):
 
             emission_factors_w = ipcc.DefaultEmissionFactor.objects.get(moisture=moisture, organic_input_type=input.organic_input_type_w)
 
-            inputs_w = [
+            self.inputs_w = [
                 *[0, area],
                 project.implementation_years,
                 project.capitalization_years,
@@ -990,7 +990,7 @@ class AnnualCroppingCalculator(BaseCalculator):
                 0,
             ]
 
-            math_w = AnnualCropland(*inputs_w)
+            math_w = AnnualCropland(*self.inputs_w)
             math_w.calculate_emissions()
 
         if is_business_as_usual(input):
@@ -1009,7 +1009,7 @@ class AnnualCroppingCalculator(BaseCalculator):
 
             emission_factors_start = ipcc.DefaultEmissionFactor.objects.get(moisture=moisture, organic_input_type=input.organic_input_type_start)
 
-            inputs_start_wo = [
+            self.inputs_start_wo = [
                 *[area, 0],
                 project.implementation_years,
                 project.capitalization_years,
@@ -1060,7 +1060,7 @@ class AnnualCroppingCalculator(BaseCalculator):
                 0,
             ]
 
-            math_start_wo = AnnualCropland(*inputs_start_wo)
+            math_start_wo = AnnualCropland(*self.inputs_start_wo)
             math_start_wo.calculate_emissions()
 
         if is_without(input):
@@ -1085,7 +1085,7 @@ class AnnualCroppingCalculator(BaseCalculator):
 
             emission_factors_wo = ipcc.DefaultEmissionFactor.objects.get(moisture=moisture, organic_input_type=input.organic_input_type_wo)
 
-            inputs_wo = [
+            self.inputs_wo = [
                 *[0, area],
                 project.implementation_years,
                 project.capitalization_years,
@@ -1136,7 +1136,7 @@ class AnnualCroppingCalculator(BaseCalculator):
                 0,
             ]
 
-            math_wo = AnnualCropland(*inputs_wo)
+            math_wo = AnnualCropland(*self.inputs_wo)
             math_wo.calculate_emissions()
 
         res_start_w = math_start_w.result if math_start_w else MathResult(project.implementation_years, project.capitalization_years)
@@ -2440,7 +2440,7 @@ class InputEntryCalculator(BaseCalculator):
         math_wo = None
 
         if is_with(module):
-            inputs_w = [
+            self.inputs_w = [
                 module.value_start,
                 module.value_w,
                 activity.change_rate.name,
@@ -2460,11 +2460,11 @@ class InputEntryCalculator(BaseCalculator):
                 ref.production_emissions_multiplier,
             ]
 
-            math_w = MathInputs(*inputs_w)
+            math_w = MathInputs(*self.inputs_w)
             math_w = math_w.calculate_emissions()
 
         if is_without(module):
-            inputs_wo = [
+            self.inputs_wo = [
                 module.value_start,
                 module.value_wo,
                 activity.change_rate.name,
@@ -2484,7 +2484,7 @@ class InputEntryCalculator(BaseCalculator):
                 ref.production_emissions_multiplier,
             ]
 
-            math_wo = MathInputs(*inputs_wo)
+            math_wo = MathInputs(*self.inputs_wo)
             math_wo = math_wo.calculate_emissions()
 
         results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
@@ -3830,7 +3830,7 @@ class CoastalWetlandCalculator(BaseCalculator):
         math_wo = None
 
         if is_with(module):
-            inputs_w = [
+            self.inputs_w = [
                 module.ha_start,
                 module.area_under_drainage_start,
                 module.area_under_drainage_w,
@@ -3861,11 +3861,11 @@ class CoastalWetlandCalculator(BaseCalculator):
                 project.gw_potential.ch4,
             ]
 
-            math_w = MathCoastalWetland(*inputs_w)
+            math_w = MathCoastalWetland(*self.inputs_w)
             math_w.calculate_emissions()
 
         if is_without(module):
-            inputs_wo = [
+            self.inputs_wo = [
                 module.ha_start,
                 module.area_under_drainage_start,
                 module.area_under_drainage_wo,
@@ -3896,7 +3896,7 @@ class CoastalWetlandCalculator(BaseCalculator):
                 project.gw_potential.ch4,
             ]
 
-            math_wo = MathCoastalWetland(*inputs_wo)
+            math_wo = MathCoastalWetland(*self.inputs_wo)
             math_wo.calculate_emissions()
 
         results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
