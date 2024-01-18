@@ -3409,7 +3409,7 @@ class LivestockCalculator(BaseCalculator):
         math_wo = None
 
         if is_with(module):
-            inputs_w = [
+            self.inputs_w = [
                 project.implementation_years,
                 project.capitalization_years,
                 module.activity.change_rate.name,
@@ -3477,11 +3477,11 @@ class LivestockCalculator(BaseCalculator):
                 LEACHING_MULTI,
             ]
 
-            math_w = MathLivestock(*inputs_w)
+            math_w = MathLivestock(*self.inputs_w)
             math_w.calculate_emissions()
 
         if is_without(module):
-            inputs_wo = [
+            self.inputs_wo = [
                 project.implementation_years,
                 project.capitalization_years,
                 module.activity.change_rate.name,
@@ -3549,7 +3549,7 @@ class LivestockCalculator(BaseCalculator):
                 LEACHING_MULTI,
             ]
 
-            math_wo = MathLivestock(*inputs_wo)
+            math_wo = MathLivestock(*self.inputs_wo)
             math_wo.calculate_emissions()
 
         results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
@@ -3558,6 +3558,29 @@ class LivestockCalculator(BaseCalculator):
         results_tuple = (results_w, results_wo)
 
         return Result(*results_tuple)
+
+    def defaults(self) -> DefaultData:
+        self.calculate()
+
+        module: Livestock = self.data
+
+        defaults_start = {}
+        defaults_w = {}
+        defaults_wo = {}
+
+        if is_with(module):
+            math_w = MathLivestock(*self.inputs_w)
+            math_w_defaults = math_w.evaluate_tier_2_defaults()
+            defaults_w.update(math_w_defaults.start)
+            defaults_w.update(math_w_defaults.other)
+
+        if is_without(module):
+            math_wo = MathLivestock(*self.inputs_wo)
+            math_wo_defaults = math_wo.evaluate_tier_2_defaults()
+            defaults_wo.update(math_wo_defaults.start)
+            defaults_wo.update(math_wo_defaults.other)
+
+        return DefaultData(defaults_start, defaults_w, defaults_wo)
 
 
 class IrrigationCalculator(BaseCalculator):
