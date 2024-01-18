@@ -500,7 +500,7 @@ class DeforestationCalculator(BaseCalculator):
         flu_start = ipcc.LandUseCarbonStockExchangeFactor.objects.get(climate=climate, moisture=moisture, land_use_type=module.land_use_type_start)
         flu_end = ipcc.LandUseCarbonStockExchangeFactor.objects.get(climate=climate, moisture=moisture, land_use_type=module.land_use_type_w)
 
-        inputs_start = [
+        self.inputs_start = [
             luc.area,
             0,
             project.implementation_years,
@@ -532,7 +532,7 @@ class DeforestationCalculator(BaseCalculator):
             project.soc_ref_t2,
         ]
 
-        inputs_w = [
+        self.inputs_w = [
             0,
             luc.area,
             project.implementation_years,
@@ -564,7 +564,7 @@ class DeforestationCalculator(BaseCalculator):
             project.soc_ref_t2,
         ]
 
-        inputs_wo = [
+        self.inputs_wo = [
             0,
             luc.area,
             project.implementation_years,
@@ -596,9 +596,9 @@ class DeforestationCalculator(BaseCalculator):
             project.soc_ref_t2,
         ]
 
-        math_start = MathDeforestation(*inputs_start)
-        math_w = MathDeforestation(*inputs_w)
-        math_wo = MathDeforestation(*inputs_wo)
+        math_start = MathDeforestation(*self.inputs_start)
+        math_w = MathDeforestation(*self.inputs_w)
+        math_wo = MathDeforestation(*self.inputs_wo)
 
         math_start.calculate_emissions()
         math_w.calculate_emissions()
@@ -609,6 +609,34 @@ class DeforestationCalculator(BaseCalculator):
         res_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
         return (res_w + res_start, res_wo + res_start)
+
+    def defaults(self) -> DefaultData:
+        self.calculate()
+
+        module: CoastalWetland = self.data
+
+        defaults_start = {}
+        defaults_w = {}
+        defaults_wo = {}
+
+        math_start = MathCoastalWetland(*self.inputs_start)
+        math_start_defaults = math_start.evaluate_tier_2_defaults()
+        defaults_start.update(math_start_defaults.start)
+        defaults_start.update(math_start_defaults.other)
+
+        if is_with(module):
+            math_w = MathCoastalWetland(*self.inputs_w)
+            math_w_defaults = math_w.evaluate_tier_2_defaults()
+            defaults_w.update(math_w_defaults.start)
+            defaults_w.update(math_w_defaults.other)
+
+        if is_without(module):
+            math_wo = MathCoastalWetland(*self.inputs_wo)
+            math_wo_defaults = math_wo.evaluate_tier_2_defaults()
+            defaults_wo.update(math_wo_defaults.start)
+            defaults_wo.update(math_wo_defaults.other)
+
+        return DefaultData(defaults_start, defaults_w, defaults_wo)
 
 
 class OtherLandUseCalculator(BaseCalculator):
@@ -3707,7 +3735,7 @@ class CoastalWetlandCalculator(BaseCalculator):
         results_tuple = (results_w, results_wo)
 
         return results_tuple
-    
+
     def defaults(self) -> DefaultData:
         self.calculate()
 
