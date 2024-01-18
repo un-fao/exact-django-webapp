@@ -1707,6 +1707,40 @@ class FloodedRiceCalculator(BaseCalculator):
 
         return results_tuple
 
+    def defaults(self) -> DefaultData:
+        self.calculate()
+
+        module: FloodedRice = self.data
+
+        defaults_start = {}
+        defaults_w = {}
+        defaults_wo = {}
+
+        if is_luc_remaining_same(module):
+            math_start = MathFloodedRice(*self.inputs_start_w)
+            math_start_defaults = math_start.evaluate_tier_2_defaults()
+            defaults_start.update(math_start_defaults.start)
+            defaults_start.update(math_start_defaults.other)
+        elif is_business_as_usual(module):
+            math_start_wo = MathFloodedRice(*self.inputs_start_wo)
+            math_start_wo_defaults = math_start_wo.evaluate_tier_2_defaults()
+            defaults_start.update(math_start_wo_defaults.start)
+            defaults_start.update(math_start_wo_defaults.other)
+
+        if is_with(module):
+            math_w = MathFloodedRice(*self.inputs_w)
+            math_w_defaults = math_w.evaluate_tier_2_defaults()
+            defaults_w.update(math_w_defaults.start)
+            defaults_w.update(math_w_defaults.other)
+
+        if is_without(module):
+            math_wo = MathFloodedRice(*self.inputs_wo)
+            math_wo_defaults = math_wo.evaluate_tier_2_defaults()
+            defaults_wo.update(math_wo_defaults.start)
+            defaults_wo.update(math_wo_defaults.other)
+
+        return DefaultData(defaults_start, defaults_w, defaults_wo)
+
 
 class GrasslandCalculator(BaseCalculator):
     """
