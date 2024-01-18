@@ -1499,7 +1499,7 @@ class FloodedRiceCalculator(BaseCalculator):
         math_wo = None
 
         if is_luc_remaining_same(module):
-            inputs_start_w = [
+            self.inputs_start_w = [
                 *[area, 0],
                 rice_ef.value,
                 module.efc_t2_start,
@@ -1545,11 +1545,11 @@ class FloodedRiceCalculator(BaseCalculator):
                 0,  # Delay
             ]
 
-            math_start_w = MathFloodedRice(*inputs_start_w)
+            math_start_w = MathFloodedRice(*self.inputs_start_w)
             math_start_w.calculate_emissions()
 
         if is_business_as_usual(module):
-            inputs_start_wo = [
+            self.inputs_start_wo = [
                 *[area, 0],
                 rice_ef.value,
                 module.efc_t2_start,
@@ -1595,11 +1595,11 @@ class FloodedRiceCalculator(BaseCalculator):
                 0,  # Delay
             ]
 
-            math_start_wo = MathFloodedRice(*inputs_start_wo)
+            math_start_wo = MathFloodedRice(*self.inputs_start_wo)
             math_start_wo.calculate_emissions()
 
         if is_with(module):
-            inputs_w = [
+            self.inputs_w = [
                 *[0, area],
                 rice_ef.value,
                 module.efc_t2_w,
@@ -1645,11 +1645,11 @@ class FloodedRiceCalculator(BaseCalculator):
                 0,  # Delay
             ]
 
-            math_w = MathFloodedRice(*inputs_w)
+            math_w = MathFloodedRice(*self.inputs_w)
             math_w.calculate_emissions()
 
         if is_without(module):
-            inputs_wo = [
+            self.inputs_wo = [
                 *[0, area],
                 rice_ef.value,
                 module.efc_t2_wo,
@@ -1695,7 +1695,7 @@ class FloodedRiceCalculator(BaseCalculator):
                 0,  # Delay
             ]
 
-            math_wo = MathFloodedRice(*inputs_wo)
+            math_wo = MathFloodedRice(*self.inputs_wo)
             math_wo.calculate_emissions()
 
         results_start_w = math_start_w.result if math_start_w else MathResult(project.implementation_years, project.capitalization_years)
@@ -1746,14 +1746,6 @@ class GrasslandCalculator(BaseCalculator):
     """
     Calculator for grassland.
     """
-
-    def __init__(self, input) -> None:
-        self.inputs_start_w = None
-        self.inputs_start_wo = None
-        self.inputs_start = None
-        self.inputs_w = None
-        self.inputs_wo = None
-        super().__init__(input)
 
     def calculate(self) -> list[Result]:
         """
@@ -2050,7 +2042,7 @@ class SmallFisheryCalculator(BaseCalculator):
         math_wo = None
 
         if is_with(module):
-            inputs_w = [
+            self.inputs_w = [
                 project.implementation_years,
                 project.capitalization_years,
                 module.activity.change_rate.name,
@@ -2082,11 +2074,11 @@ class SmallFisheryCalculator(BaseCalculator):
                 module.ice_preserved_catch_pc_w,
             ]
 
-            math_w = MathFishery(*inputs_w)
+            math_w = MathFishery(*self.inputs_w)
             math_w.calculate_emissions()
 
         if is_without(module):
-            inputs_wo = [
+            self.inputs_wo = [
                 project.implementation_years,
                 project.capitalization_years,
                 module.activity.change_rate.name,
@@ -2118,7 +2110,7 @@ class SmallFisheryCalculator(BaseCalculator):
                 module.ice_preserved_catch_pc_wo,
             ]
 
-            math_wo = MathFishery(*inputs_wo)
+            math_wo = MathFishery(*self.inputs_wo)
             math_wo.calculate_emissions()
 
         results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
@@ -2194,7 +2186,7 @@ class LargeFisheryCalculator(BaseCalculator):
         math_wo = None
 
         if is_with(module):
-            inputs_w = [
+            self.inputs_w = [
                 project.implementation_years,
                 project.capitalization_years,
                 module.activity.change_rate.name,
@@ -2226,11 +2218,11 @@ class LargeFisheryCalculator(BaseCalculator):
                 module.ice_preserved_catch_pc_w,
             ]
 
-            math_w = MathFishery(*inputs_w)
+            math_w = MathFishery(*self.inputs_w)
             math_w.calculate_emissions()
 
         if is_without(module):
-            inputs_wo = [
+            self.inputs_wo = [
                 project.implementation_years,
                 project.capitalization_years,
                 module.activity.change_rate.name,
@@ -2262,7 +2254,7 @@ class LargeFisheryCalculator(BaseCalculator):
                 module.ice_preserved_catch_pc_wo,
             ]
 
-            math_wo = MathFishery(*inputs_wo)
+            math_wo = MathFishery(*self.inputs_wo)
             math_wo.calculate_emissions()
 
         results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
