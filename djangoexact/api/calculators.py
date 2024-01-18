@@ -1253,7 +1253,7 @@ class PerennialCroppingCalculator(BaseCalculator):
         math_wo = None
 
         if is_luc_remaining_same(module):
-            inputs_start_w = [
+            self.inputs_start_w = [
                 area,
                 0,
                 project.implementation_years,
@@ -1293,11 +1293,11 @@ class PerennialCroppingCalculator(BaseCalculator):
                 0,  # Delay
             ]
 
-            math_start_w = PerennialCropland(*inputs_start_w)
+            math_start_w = PerennialCropland(*self.inputs_start_w)
             math_start_w.calculate_emissions()
 
         if is_business_as_usual(module):
-            input_start_wo = [
+            self.input_start_wo = [
                 area,
                 0,
                 project.implementation_years,
@@ -1337,11 +1337,11 @@ class PerennialCroppingCalculator(BaseCalculator):
                 0,  # Delay
             ]
 
-            math_start_wo = PerennialCropland(*input_start_wo)
+            math_start_wo = PerennialCropland(*self.input_start_wo)
             math_start_wo.calculate_emissions()
 
         if is_with(module):
-            inputs_w = [
+            self.inputs_w = [
                 0,
                 area,
                 project.implementation_years,
@@ -1381,11 +1381,11 @@ class PerennialCroppingCalculator(BaseCalculator):
                 0,  # Delay
             ]
 
-            math_w = PerennialCropland(*inputs_w)
+            math_w = PerennialCropland(*self.inputs_w)
             math_w.calculate_emissions()
 
         if is_without(module):
-            inputs_wo = [
+            self.inputs_wo = [
                 0,
                 area,
                 project.implementation_years,
@@ -1425,7 +1425,7 @@ class PerennialCroppingCalculator(BaseCalculator):
                 0,  # Delay
             ]
 
-            math_wo = PerennialCropland(*inputs_wo)
+            math_wo = PerennialCropland(*self.inputs_wo)
             math_wo.calculate_emissions()
 
         results_start_w = math_start_w.result if math_start_w else MathResult(project.implementation_years, project.capitalization_years)
@@ -1436,6 +1436,40 @@ class PerennialCroppingCalculator(BaseCalculator):
         results_tuple = (results_w + results_start_w, results_wo + results_start_wo)
 
         return results_tuple
+
+    def defaults(self) -> DefaultData:
+        self.calculate()
+
+        module: PerennialCropping = self.data
+
+        defaults_start = {}
+        defaults_w = {}
+        defaults_wo = {}
+
+        if is_luc_remaining_same(module):
+            math_start = PerennialCropland(*self.inputs_start_w)
+            math_start_defaults = math_start.evaluate_tier_2_defaults()
+            defaults_start.update(math_start_defaults.start)
+            defaults_start.update(math_start_defaults.other)
+        elif is_business_as_usual(module):
+            math_start_wo = PerennialCropland(*self.input_start_wo)
+            math_start_wo_defaults = math_start_wo.evaluate_tier_2_defaults()
+            defaults_start.update(math_start_wo_defaults.start)
+            defaults_start.update(math_start_wo_defaults.other)
+
+        if is_with(module):
+            math_w = PerennialCropland(*self.inputs_w)
+            math_w_defaults = math_w.evaluate_tier_2_defaults()
+            defaults_w.update(math_w_defaults.start)
+            defaults_w.update(math_w_defaults.other)
+
+        if is_without(module):
+            math_wo = PerennialCropland(*self.inputs_wo)
+            math_wo_defaults = math_wo.evaluate_tier_2_defaults()
+            defaults_wo.update(math_wo_defaults.start)
+            defaults_wo.update(math_wo_defaults.other)
+
+        return DefaultData(defaults_start, defaults_w, defaults_wo)
 
 
 class FloodedRiceCalculator(BaseCalculator):
