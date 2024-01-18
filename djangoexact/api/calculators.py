@@ -2370,6 +2370,24 @@ class InputCalculator(BaseCalculator):
 
         return (results_w, results_wo)
 
+    def defaults(self) -> DefaultData:
+        self.calculate()
+
+        input: Input = self.data
+
+        defaults_start = {}
+        defaults_w = {}
+        defaults_wo = {}
+
+        for entry in input.input_entries.all():
+            defaults_start_entry, defaults_w_entry, defaults_wo_entry = InputEntryCalculator(entry).defaults()
+
+            defaults_start.update(defaults_start_entry)
+            defaults_w.update(defaults_w_entry)
+            defaults_wo.update(defaults_wo_entry)
+
+        return DefaultData(defaults_start, defaults_w, defaults_wo)
+
 
 class InputEntryCalculator(BaseCalculator):
     """
@@ -2441,6 +2459,29 @@ class InputEntryCalculator(BaseCalculator):
         results_tuple = (results_w, results_wo)
 
         return results_tuple
+
+    def defaults(self) -> DefaultData:
+        self.calculate()
+
+        module: InputEntry = self.data
+
+        defaults_start = {}
+        defaults_w = {}
+        defaults_wo = {}
+
+        if is_with(module):
+            math_w = MathInputs(*self.inputs_w)
+            math_w_defaults = math_w.evaluate_tier_2_defaults()
+            defaults_w.update(math_w_defaults.start)
+            defaults_w.update(math_w_defaults.other)
+
+        if is_without(module):
+            math_wo = MathInputs(*self.inputs_wo)
+            math_wo_defaults = math_wo.evaluate_tier_2_defaults()
+            defaults_wo.update(math_wo_defaults.start)
+            defaults_wo.update(math_wo_defaults.other)
+
+        return DefaultData(defaults_start, defaults_w, defaults_wo)
 
 
 class EnergyCalculator(BaseCalculator):
