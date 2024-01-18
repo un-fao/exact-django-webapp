@@ -150,7 +150,6 @@ class AnnualCropland(BaseModule):
         self.ag_residue_main_tier_2_default = yield_value_main * self.n_estimation_slope_main + self.n_estimation_intercept_main
         self.ag_residue_minor_tier_2_default = yield_value_minor * self.n_estimation_slope_minor + self.n_estimation_intercept_minor
 
-
         # RESULTS
         self.emissions_soil_yearly = []
         self.emissions_soil_total = 0
@@ -265,9 +264,6 @@ class AnnualCropland(BaseModule):
         except Exception as e:
             traceback.print_exc()
             return None
-
-    def evaluate_tier_2_defaults(self):
-        pass
 
 
 # inputs = [27, 93, 5, 17, 'D', 0.5, 87.0, None, 0.77, None, 1.0, None, 1.03, None, 0.005, 265.0, 28.0, None, 0.85, None, 0.88, 1.33, 50, None, None, None, None, None, None, None, True, None, False, 0.007, 0.22, 0.006, None, None, None]

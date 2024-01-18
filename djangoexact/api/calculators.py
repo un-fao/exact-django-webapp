@@ -358,6 +358,11 @@ class BaseCalculator(ABC):
     def __init__(self, input) -> None:
         self.Meta.model = input.__class__
         self.data = input
+        self.inputs_start_w = None
+        self.inputs_start_wo = None
+        self.inputs_start = None
+        self.inputs_w = None
+        self.inputs_wo = None
         super().__init__()
 
     @abstractmethod
@@ -1112,6 +1117,40 @@ class AnnualCroppingCalculator(BaseCalculator):
         res_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
         return (res_w + res_start_w, res_wo + res_start_wo)
+
+    def defaults(self) -> DefaultData:
+        self.calculate()
+
+        module: AnnualCropping = self.data
+
+        defaults_start = {}
+        defaults_w = {}
+        defaults_wo = {}
+
+        if is_luc_remaining_same(module):
+            math_start = AnnualCropland(*self.inputs_start_w)
+            math_start_defaults = math_start.evaluate_tier_2_defaults()
+            defaults_start.update(math_start_defaults.start)
+            defaults_start.update(math_start_defaults.other)
+        elif is_business_as_usual(module):
+            math_start_wo = AnnualCropland(*self.inputs_start_wo)
+            math_start_wo_defaults = math_start_wo.evaluate_tier_2_defaults()
+            defaults_start.update(math_start_wo_defaults.start)
+            defaults_start.update(math_start_wo_defaults.other)
+
+        if is_with(module):
+            math_w = AnnualCropland(*self.inputs_w)
+            math_w_defaults = math_w.evaluate_tier_2_defaults()
+            defaults_w.update(math_w_defaults.start)
+            defaults_w.update(math_w_defaults.other)
+
+        if is_without(module):
+            math_wo = AnnualCropland(*self.inputs_wo)
+            math_wo_defaults = math_wo.evaluate_tier_2_defaults()
+            defaults_wo.update(math_wo_defaults.start)
+            defaults_wo.update(math_wo_defaults.other)
+
+        return DefaultData(defaults_start, defaults_w, defaults_wo)
 
 
 class PerennialCroppingCalculator(BaseCalculator):
