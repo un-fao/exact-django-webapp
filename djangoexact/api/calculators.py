@@ -2094,6 +2094,29 @@ class SmallFisheryCalculator(BaseCalculator):
 
         return results_tuple
 
+    def defaults(self):
+        self.calculate()
+
+        module: SmallFishery = self.data
+
+        defaults_start = {}
+        defaults_w = {}
+        defaults_wo = {}
+
+        if is_with(module):
+            math_w = MathFishery(*self.inputs_w)
+            math_w_defaults = math_w.evaluate_tier_2_defaults()
+            defaults_w.update(math_w_defaults.end)
+            defaults_w.update(math_w_defaults.other)
+
+        if is_without(module):
+            math_wo = MathFishery(*self.inputs_wo)
+            math_wo_defaults = math_wo.evaluate_tier_2_defaults()
+            defaults_wo.update(math_wo_defaults.end)
+            defaults_wo.update(math_wo_defaults.other)
+
+        return DefaultData(defaults_start, defaults_w, defaults_wo)
+
 
 class LargeFisheryCalculator(BaseCalculator):
     """
@@ -2214,6 +2237,29 @@ class LargeFisheryCalculator(BaseCalculator):
         results_tuple = (results_w, results_wo)
 
         return results_tuple
+
+    def defaults(self):
+        self.calculate()
+
+        module: LargeFishery = self.data
+
+        defaults_start = {}
+        defaults_w = {}
+        defaults_wo = {}
+
+        if is_with(module):
+            math_w = MathFishery(*self.inputs_w)
+            math_w_defaults = math_w.evaluate_tier_2_defaults()
+            defaults_w.update(math_w_defaults.end)
+            defaults_w.update(math_w_defaults.other)
+
+        if is_without(module):
+            math_wo = MathFishery(*self.inputs_wo)
+            math_wo_defaults = math_wo.evaluate_tier_2_defaults()
+            defaults_wo.update(math_wo_defaults.end)
+            defaults_wo.update(math_wo_defaults.other)
+
+        return DefaultData(defaults_start, defaults_w, defaults_wo)
 
 
 class AquacultureCalculator(BaseCalculator):
