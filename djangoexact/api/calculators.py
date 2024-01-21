@@ -3452,18 +3452,18 @@ class LivestockCalculator(BaseCalculator):
                 module.heads_number_w,
                 ch4_enteric_start.value,
                 ch4_enteric_w.value,
-                module.enteric_fermentation_start_t2,
-                module.enteric_fermentation_w_t2,
+                module.enteric_fermentation_t2_start,
+                module.enteric_fermentation_t2_w,
                 ef_ch4_prp_start.value,
                 ef_ch4_prp_w.value,
                 animal_waste_prp_start.value,
                 animal_waste_prp_w.value,
-                module.prp_percentage_start_t2,
-                module.prp_percentage_w_t2,
+                module.prp_percentage_t2_start,
+                module.prp_percentage_t2_w,
                 ef_ch4_system_values_start,
                 ef_ch4_system_values_w,
-                module.prp_ch4_start_t2,
-                module.prp_ch4_w_t2,
+                module.prp_ch4_t2_start,
+                module.prp_ch4_t2_w,
                 ch4_ef_t2_start,  ###
                 ch4_ef_t2_w,
                 module.emission_factor_ch4_t2_start,
@@ -3478,8 +3478,8 @@ class LivestockCalculator(BaseCalculator):
                 prp_n2o_direct_ef_w.value,
                 ef_n2o_direct_systems_start,
                 ef_n2o_direct_systems_w,
-                module.prp_n2o_start_t2,
-                module.prp_n2o_w_t2,
+                module.prp_n2o_t2_start,
+                module.prp_n2o_t2_w,
                 n2o_ef_t2_start,  ###
                 n2o_ef_t2_w,
                 module.emission_factor_n2o_t2_start,
@@ -3490,8 +3490,8 @@ class LivestockCalculator(BaseCalculator):
                 prp_n2o_volatilization_ef_w.value,
                 ef_n2o_volatilization_systems_start,
                 ef_n2o_volatilization_systems_w,
-                module.prp_n2o_start_t2,  # TODO: Maybe add specific t2 for volatilization
-                module.prp_n2o_w_t2,
+                module.prp_n2o_t2_start,  # TODO: Maybe add specific t2 for volatilization
+                module.prp_n2o_t2_w,
                 n2o_volatilization_ef_t2_start,  ###
                 n2o_volatilization_ef_t2_w,
                 module.emission_factor_n2o_t2_start,
@@ -3500,8 +3500,8 @@ class LivestockCalculator(BaseCalculator):
                 prp_n2o_leaching_ef_w.value,
                 ef_n2o_leaching_systems_start,
                 ef_n2o_leaching_systems_w,
-                module.prp_n2o_start_t2,  # TODO: Maybe add specific t2 for leaching
-                module.prp_n2o_w_t2,
+                module.prp_n2o_t2_start,  # TODO: Maybe add specific t2 for leaching
+                module.prp_n2o_t2_w,
                 n2o_leaching_ef_t2_start,  ###
                 n2o_leaching_ef_t2_w,
                 module.emission_factor_n2o_t2_start,
@@ -3524,18 +3524,18 @@ class LivestockCalculator(BaseCalculator):
                 module.heads_number_wo,
                 ch4_enteric_start.value,
                 ch4_enteric_wo.value,
-                module.enteric_fermentation_start_t2,
-                module.enteric_fermentation_wo_t2,
+                module.enteric_fermentation_t2_start,
+                module.enteric_fermentation_t2_wo,
                 ef_ch4_prp_start.value,
                 ef_ch4_prp_wo.value,
                 animal_waste_prp_start.value,
                 animal_waste_prp_wo.value,
-                module.prp_percentage_start_t2,
-                module.prp_percentage_wo_t2,
+                module.prp_percentage_t2_start,
+                module.prp_percentage_t2_wo,
                 ef_ch4_system_values_start,
                 ef_ch4_system_values_wo,
-                module.prp_ch4_start_t2,
-                module.prp_ch4_wo_t2,
+                module.prp_ch4_t2_start,
+                module.prp_ch4_t2_wo,
                 ch4_ef_t2_start,  ###
                 ch4_ef_t2_wo,
                 module.emission_factor_ch4_t2_start,
@@ -3550,8 +3550,8 @@ class LivestockCalculator(BaseCalculator):
                 prp_n2o_direct_ef_wo.value,
                 ef_n2o_direct_systems_start,
                 ef_n2o_direct_systems_wo,
-                module.prp_n2o_start_t2,
-                module.prp_n2o_wo_t2,
+                module.prp_n2o_t2_start,
+                module.prp_n2o_t2_wo,
                 n2o_ef_t2_start,  ###
                 n2o_ef_t2_wo,
                 module.emission_factor_n2o_t2_start,
@@ -3562,8 +3562,8 @@ class LivestockCalculator(BaseCalculator):
                 prp_n2o_volatilization_ef_wo.value,
                 ef_n2o_volatilization_systems_start,
                 ef_n2o_volatilization_systems_wo,
-                module.prp_n2o_start_t2,  # TODO: Maybe add specific t2 for volatilization
-                module.prp_n2o_wo_t2,
+                module.prp_n2o_t2_start,  # TODO: Maybe add specific t2 for volatilization
+                module.prp_n2o_t2_wo,
                 n2o_volatilization_ef_t2_start,  ###
                 n2o_volatilization_ef_t2_wo,
                 module.emission_factor_n2o_t2_start,
@@ -3572,8 +3572,8 @@ class LivestockCalculator(BaseCalculator):
                 prp_n2o_leaching_ef_wo.value,
                 ef_n2o_leaching_systems_start,
                 ef_n2o_leaching_systems_wo,
-                module.prp_n2o_start_t2,  # TODO: Maybe add specific t2 for leaching
-                module.prp_n2o_wo_t2,
+                module.prp_n2o_t2_start,  # TODO: Maybe add specific t2 for leaching
+                module.prp_n2o_t2_wo,
                 n2o_leaching_ef_t2_start,  ###
                 n2o_leaching_ef_t2_wo,
                 module.emission_factor_n2o_t2_start,
