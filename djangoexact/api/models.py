@@ -842,6 +842,10 @@ class PerennialCropping(LandModule, DoubleBiomassModule):
     ag_t2_w = FloatField(null=True, blank=True)
     ag_t2_wo = FloatField(null=True, blank=True)
 
+    agb_max_t2_start = FloatField(null=True, blank=True)
+    agb_max_t2_w = FloatField(null=True, blank=True)
+    agb_max_t2_wo = FloatField(null=True, blank=True)
+
     bg_t2_start = FloatField(null=True, blank=True)
     bg_t2_w = FloatField(null=True, blank=True)
     bg_t2_wo = FloatField(null=True, blank=True)
