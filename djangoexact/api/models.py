@@ -1197,7 +1197,7 @@ class ForestDisturbance(Model):
 
 
 class Waterbody(Module):
-    waterbody_type = ForeignKey(WaterbodyType, on_delete=CASCADE)
+    waterbody_type = ForeignKey(WaterbodyType, on_delete=CASCADE, null=True, blank=True)
     area = FloatField(null=True, blank=True)
     trophic_type_start = ForeignKey(TrophicType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_trophic_class_start")
     trophic_type_w = ForeignKey(TrophicType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_trophic_class_w")
