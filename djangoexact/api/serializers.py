@@ -1324,3 +1324,19 @@ class GroupSerializer(serializers.ModelSerializer):
         model = Group
         fields = "__all__"
         ref_name = "Group"
+
+
+class MacroInputTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MacroInputType
+        fields = "__all__"
+        ref_name = "MacroInputType"
+
+
+class InputTypeSerializer(serializers.ModelSerializer):
+    macro_input_type = MacroInputTypeSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = InputType
+        fields = "__all__"
+        ref_name = "InputType"
