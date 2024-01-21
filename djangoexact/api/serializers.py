@@ -798,6 +798,17 @@ class FloodedRiceWriteSerializer(LandModuleWriteSerializer):
         if not are_fields_filled(data, mandatory_fields):
             raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
 
+        # Get cultivation_days of all minor_seasons and check that they are not greater than 365 including the main season
+        cultivation_days = data.get("cultivation_days", 0)
+        minor_seasons = data.get("minor_seasons", None)
+
+        if minor_seasons:
+            for season in minor_seasons:
+                cultivation_days += season.get("cultivation_days", 0)
+
+        if cultivation_days > 365:
+            raise serializers.ValidationError(f"Cultivation days cannot be greater than 365 (one year)")
+
         return super().validate(data)
 
 
