@@ -801,6 +801,9 @@ class FloodedRiceWriteSerializer(LandModuleWriteSerializer):
         if cultivation_days > 365:
             raise serializers.ValidationError(f"Cultivation days cannot be greater than 365 (one year)")
 
+        if minor_seasons.count() > 4:
+            raise serializers.ValidationError(f"Minor seasons cannot be more than 4")
+
         return super().validate(data)
 
 
