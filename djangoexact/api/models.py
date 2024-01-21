@@ -1054,21 +1054,21 @@ class Livestock(Module):
     percentage_heads_on_pasture_wo = FloatField(null=True, blank=True)
     percentage_heads_on_pasture_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_percentage_heads_on_pasture_thread", on_delete=SET_NULL)
 
-    enteric_fermentation_start_t2 = FloatField(null=True, blank=True)
-    enteric_fermentation_w_t2 = FloatField(null=True, blank=True)
-    enteric_fermentation_wo_t2 = FloatField(null=True, blank=True)
+    enteric_fermentation_t2_start = FloatField(null=True, blank=True)
+    enteric_fermentation_t2_w = FloatField(null=True, blank=True)
+    enteric_fermentation_t2_wo = FloatField(null=True, blank=True)
 
-    prp_percentage_start_t2 = FloatField(null=True, blank=True)
-    prp_percentage_w_t2 = FloatField(null=True, blank=True)
-    prp_percentage_wo_t2 = FloatField(null=True, blank=True)
+    prp_percentage_t2_start = FloatField(null=True, blank=True)
+    prp_percentage_t2_w = FloatField(null=True, blank=True)
+    prp_percentage_t2_wo = FloatField(null=True, blank=True)
 
-    prp_ch4_start_t2 = FloatField(null=True, blank=True)
-    prp_ch4_w_t2 = FloatField(null=True, blank=True)
-    prp_ch4_wo_t2 = FloatField(null=True, blank=True)
+    prp_ch4_t2_start = FloatField(null=True, blank=True)
+    prp_ch4_t2_w = FloatField(null=True, blank=True)
+    prp_ch4_t2_wo = FloatField(null=True, blank=True)
 
-    prp_n2o_start_t2 = FloatField(null=True, blank=True)
-    prp_n2o_w_t2 = FloatField(null=True, blank=True)
-    prp_n2o_wo_t2 = FloatField(null=True, blank=True)
+    prp_n2o_t2_start = FloatField(null=True, blank=True)
+    prp_n2o_t2_w = FloatField(null=True, blank=True)
+    prp_n2o_t2_wo = FloatField(null=True, blank=True)
 
     emission_factor_ch4_t2_start = FloatField(null=True, blank=True)
     emission_factor_n2o_t2_start = FloatField(null=True, blank=True)
