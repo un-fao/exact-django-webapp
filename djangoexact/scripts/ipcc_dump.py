@@ -817,38 +817,7 @@ with open("scripts/ipcc_data/SmallFisheryDatabaseFish.csv", "r") as f:
                 fishery_type=fishery_type, gear_type=gear_type, value=value
             )
 
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "LargeFisheryFUI.csv"),
-    header=[0],
-    sep=";",
-)
 
-print(df)
-
-rows = df.to_dict("records")
-
-for row in rows:
-    gear_type = row["gear_type"]
-    fish_type = row["fish_type"]
-    n = row["n"] if not np.isnan(row["n"]) else None
-    median = row["median"] if not np.isnan(row["median"]) else None
-
-    print(f"{gear_type}, {fish_type}, {n}, {median}")
-
-    if n is None and median is None:
-        continue
-
-    gear_type = LargeFisheryGearType.objects.get_or_create(
-        name=capitalize_all(gear_type)
-    )[0]
-    fish_type = FishType.objects.get_or_create(name=capitalize_all(fish_type))[0]
-
-    LargeFisheryFUI.objects.get_or_create(
-        fish_type=fish_type,
-        gear_type=gear_type,
-        n=n,
-        median=median,
-    )
 
 
 with open("scripts/ipcc_data/LargeFisheryFUI.csv", "r") as f:
@@ -3493,3 +3462,25 @@ for i, row in df.iterrows():
         value=value,
     )
 """
+
+LargeFisheryFUI.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "LargeFisheryFUI.csv"),
+    header=[0],
+    sep=";",
+)
+
+rows = df.to_dict("records")
+
+for row in rows:
+    gear_type = row["gear_type"]
+    fish_type = row["fish_type"]
+    value = parse_csv_number(row["value"])
+
+    print(f"{gear_type}, {fish_type}, {value}")
+
+    gear_type = LargeFisheryGearType.objects.get_or_create(name=capitalize_all(gear_type))[0]
+    fish_type = FishType.objects.get_or_create(name=capitalize_all(fish_type))[0]
+
+    LargeFisheryFUI.objects.get_or_create(fish_type=fish_type, gear_type=gear_type, value=value)

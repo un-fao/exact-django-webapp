@@ -738,25 +738,30 @@ class LargeFisheryFUIManager(Manager):
     def get_value_or_average(request, fish_type, gear_type):
         try:
             model = LargeFisheryFUI.objects.get(fish_type=fish_type, gear_type=gear_type)
-
-            if model.median is None:
-                raise LargeFisheryFUI.DoesNotExist
-
-            return model.median
+            return model.value
         except LargeFisheryFUI.DoesNotExist:
-            _all = LargeFisheryFUI.objects.filter(fish_type=fish_type)
-            not_specified = LargeFisheryFUI.objects.filter(gear_type__name="Not Specified").first()
-            _all = _all.exclude(gear_type__name="Not Specified")
+            if fish_type.name == "Not Specified" and gear_type.name == "Not Specified":
+                _all = LargeFisheryFUI.objects.exclude(fish_type__name="Not Specified")
+                _all = _all.exclude(gear_type__name="Not Specified").values_list("value", flat=True)
+                return sum(_all) / len(_all)
 
-            _sum = sum([x.median * x.n for x in _all])
-            return _sum / not_specified.n
+            if fish_type.name == "Not Specified":
+                fuis = LargeFisheryFUI.objects.filter(gear_type=gear_type).values_list("value", flat=True)
+                return sum(fuis) / len(fuis)
+
+            if gear_type.name == "Not Specified":
+                fuis = LargeFisheryFUI.objects.filter(fish_type=fish_type).values_list("value", flat=True)
+                return sum(fuis) / len(fuis)
+
+            _all = LargeFisheryFUI.objects.filter(fish_type=fish_type)
+            _all = _all.exclude(Q(gear_type__name="Not Specified") | Q(fish_type__name="Not Specified")).values_list("value", flat=True)
+            return sum(_all) / len(_all)
 
 
 class LargeFisheryFUI(Model):
     fish_type = ForeignKey("api.FishType", on_delete=CASCADE)
     gear_type = ForeignKey("api.LargeFisheryGearType", on_delete=CASCADE, null=True)
-    median = FloatField(null=True)
-    n = IntegerField(null=True)
+    value = FloatField()
 
     objects = LargeFisheryFUIManager()
 
@@ -764,7 +769,7 @@ class LargeFisheryFUI(Model):
         unique_together = ("fish_type", "gear_type")
 
     def __str__(self):
-        return f"{self.fish_type} - {self.gear_type} n: {self.n} median: {self.median}"
+        return f"{self.fish_type} - {self.gear_type} value: {self.value}"
 
 
 class SmallFisheryFUI(Model):
