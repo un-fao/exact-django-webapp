@@ -388,7 +388,6 @@ class ActivityBuilderSerializer(serializers.Serializer):
     duration = serializers.IntegerField(required=True)
     land_use_change = LandUseChangeBuilderSerializer(many=False, required=False, allow_null=True)
     module_types = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
-    has_input = serializers.BooleanField(default=False, required=False)
     area = serializers.FloatField(required=False)
     module_types = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
 
@@ -396,22 +395,15 @@ class ActivityBuilderSerializer(serializers.Serializer):
         luc_module = ModuleType.objects.filter(name="Land Use Change").first()
         module_types = data.get("module_types", [])
         land_use_change = data.get("land_use_change", None)
-        has_input = data.get("has_input", False)
         area = data.get("area", None)
 
         if luc_module and luc_module in module_types:
             raise serializers.ValidationError("Land Use Change module cannot be added manually")
 
-        if has_input:
-            module_types.append(ModuleType.objects.get(name="Input"))
-
         if land_use_change and any(module.is_luc for module in module_types):
             raise serializers.ValidationError("Land Modules cannot be independently added to activities with a Land Use Change")
 
-        if land_use_change and not area:
-            raise serializers.ValidationError("Area must be provided")
-
-        if any(module.is_luc for module in module_types) and not area:
+        if land_use_change and not area or (any(module.is_luc for module in module_types) and not area):
             raise serializers.ValidationError("Area must be provided")
 
         super().validate(data)
