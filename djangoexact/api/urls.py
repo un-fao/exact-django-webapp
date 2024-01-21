@@ -74,7 +74,7 @@ router.register(r"irrigations", views.generic_module_viewset(models.Irrigation),
 router.register(r"tillage-management-types", views.generic_viewset(models.TillageManagementType), basename="tillage-management-types")
 router.register(r"organic-input-types", views.generic_viewset(models.OrganicInputType), basename="organic-input-types")
 router.register(r"macro-input-types", views.generic_viewset(models.MacroInputType), basename="macro-input-types")
-router.register(r"input-types", views.generic_viewset(models.InputType), basename="input-types")
+router.register(r"input-types", views.InputTypeViewSet, basename="input-types")
 router.register(r"residue-management-types", views.generic_viewset(models.ResidueManagementType), basename="residue-management-types")
 
 router.register(r"status-types", views.generic_viewset(models.StatusType), basename="status-types")
