@@ -21,8 +21,10 @@ from .models import (
     Comment,
     CommentThread,
     Country,
+    InputType,
     LandUseChange,
     LandUseType,
+    MacroInputType,
     Module,
     ModuleType,
     Project,
@@ -39,6 +41,7 @@ from .serializers import (
     CountrySerializer,
     DynamicResultSerializer,
     GroupSerializer,
+    InputTypeSerializer,
     LandUseTypeSerializer,
     ProjectInvitationModelSerializer,
     ProjectInvitationReadSerializer,
@@ -662,6 +665,30 @@ class CountryViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return Response(data=serializer.data, status=status.HTTP_200_OK)
 
         return super().list(request)
+
+
+class InputTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    """
+    API endpoint that allows input types to be viewed or edited.
+    """
+
+    queryset = InputType.objects.all()
+    serializer_class = InputTypeSerializer
+
+    def list(self, request):
+        """
+        Get all input types.
+        """
+
+        macro_input_type_id = self.request.query_params.get("macro_input_type", None)
+
+        if macro_input_type_id:
+            input_types = InputType.objects.filter(macro_input_type__id=macro_input_type_id).all()
+        else:
+            input_types = InputType.objects.all()
+
+        serializer = get_model_serializer(InputType)(input_types, many=True)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
 def generic_module_viewset(model: Model):
