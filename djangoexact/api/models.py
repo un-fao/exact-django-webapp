@@ -879,10 +879,9 @@ class PerennialCropping(LandModule, DoubleBiomassModule):
         super().save(*args, **kwargs)
 
 
-class FloodedRice(LandModuleFixed, SingleBiomassModule):
-    user_notes = TextField(null=True, blank=True)
-
-    area = FloatField(null=True, blank=True)
+class Rice(Module):
+    class Meta:
+        abstract = True
 
     cultivation_period_start = IntegerField(default=RICE_CULTIVATION_DAYS)
     cultivation_period_w = IntegerField(default=RICE_CULTIVATION_DAYS)
@@ -944,6 +943,8 @@ class FloodedRice(LandModuleFixed, SingleBiomassModule):
     rice_straw_t2_w = FloatField(null=True, blank=True)
     rice_straw_t2_wo = FloatField(null=True, blank=True)
 
+
+class FloodedRice(Rice, LandModuleFixed, SingleBiomassModule):
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:
             self.land_use_type_start = LandUseType.objects.get(name="Flooded Rice")
@@ -951,6 +952,10 @@ class FloodedRice(LandModuleFixed, SingleBiomassModule):
             self.land_use_type_wo = self.land_use_type_start
 
         super().save(*args, **kwargs)
+
+
+class MinorSeasonFloodedRice(Rice):
+    parent = ForeignKey(FloodedRice, on_delete=CASCADE, related_name="minor_seasons", null=True, blank=True)
 
 
 ##### Grassland and Livestock #####
