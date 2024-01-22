@@ -73,12 +73,7 @@ include_related = openapi.Parameter(
     description="Include related modules",
     type=openapi.TYPE_BOOLEAN,
 )
-module_type = openapi.Parameter(
-    "module_type",
-    openapi.IN_QUERY,
-    description="Module associated with Land Use Type",
-    type=openapi.TYPE_INTEGER,
-)
+
 climate = openapi.Parameter(
     "climate",
     openapi.IN_QUERY,
@@ -108,6 +103,12 @@ module_type = openapi.Parameter(
     "module_type",
     openapi.IN_QUERY,
     description="Module id",
+    type=openapi.TYPE_INTEGER,
+)
+macro_input_type = openapi.Parameter(
+    "macro_input_type",
+    openapi.IN_QUERY,
+    description="Macro input type id",
     type=openapi.TYPE_INTEGER,
 )
 
@@ -675,6 +676,7 @@ class InputTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = InputType.objects.all()
     serializer_class = InputTypeSerializer
 
+    @swagger_auto_schema(manual_parameters=[macro_input_type])
     def list(self, request):
         """
         Get all input types.
