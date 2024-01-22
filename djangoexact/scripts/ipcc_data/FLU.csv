@@ -1,24 +1,24 @@
 climate;moisture;land_use_type;value
-Boreal;Moist;Annual Cropland;0,77
-Boreal;Dry;Annual Cropland;0,7
-Cool Temperate;Moist;Annual Cropland;0,77
-Cool Temperate;Dry;Annual Cropland;0,7
-Warm Temperate;Moist;Annual Cropland;0,76
-Warm Temperate;Dry;Annual Cropland;0,69
-Tropical;Moist;Annual Cropland;0,92
-Tropical;Dry;Annual Cropland;0,83
+Boreal;Moist;Annual Cropland;0,7
+Boreal;Dry;Annual Cropland;0,77
+Cool Temperate;Moist;Annual Cropland;0,7
+Cool Temperate;Dry;Annual Cropland;0,77
+Warm Temperate;Moist;Annual Cropland;0,69
+Warm Temperate;Dry;Annual Cropland;0,76
+Tropical;Moist;Annual Cropland;0,83
+Tropical;Dry;Annual Cropland;0,92
 Tropical;Wet;Annual Cropland;0,83
 Tropical Montane;Moist;Annual Cropland;0,64
 Tropical Montane;Dry;Annual Cropland;0,64
 Tropical Montane;Wet;Annual Cropland;0,64
-Boreal;Moist;Set Aside;0,93
-Boreal;Dry;Set Aside;0,82
-Cool Temperate;Moist;Set Aside;0,93
-Cool Temperate;Dry;Set Aside;0,82
-Warm Temperate;Moist;Set Aside;0,93
-Warm Temperate;Dry;Set Aside;0,82
-Tropical;Moist;Set Aside;0,93
-Tropical;Dry;Set Aside;0,82
+Boreal;Moist;Set Aside;0,82
+Boreal;Dry;Set Aside;0,93
+Cool Temperate;Moist;Set Aside;0,82
+Cool Temperate;Dry;Set Aside;0,93
+Warm Temperate;Moist;Set Aside;0,82
+Warm Temperate;Dry;Set Aside;0,93
+Tropical;Moist;Set Aside;0,82
+Tropical;Dry;Set Aside;0,93
 Tropical;Wet;Set Aside;0,82
 Tropical Montane;Moist;Set Aside;0,88
 Tropical Montane;Dry;Set Aside;0,88
@@ -56,9 +56,9 @@ Warm Temperate;Dry;Perennial Cropland;0,72
 Tropical;Moist;Perennial Cropland;1,01
 Tropical;Dry;Perennial Cropland;1,01
 Tropical;Wet;Perennial Cropland;1,01
-Tropical Montane;Moist;Perennial Cropland;1
-Tropical Montane;Dry;Perennial Cropland;1
-Tropical Montane;Wet;Perennial Cropland;1
+Tropical Montane;Moist;Perennial Cropland;1,00
+Tropical Montane;Dry;Perennial Cropland;1,00
+Tropical Montane;Wet;Perennial Cropland;1,00
 Boreal;Moist;Agroforestry - default;0,72
 Boreal;Dry;Agroforestry - default;0,72
 Cool Temperate;Moist;Agroforestry - default;0,72
@@ -68,9 +68,9 @@ Warm Temperate;Dry;Agroforestry - default;0,72
 Tropical;Moist;Agroforestry - default;1,01
 Tropical;Dry;Agroforestry - default;1,01
 Tropical;Wet;Agroforestry - default;1,01
-Tropical Montane;Moist;Agroforestry - default;1
-Tropical Montane;Dry;Agroforestry - default;1
-Tropical Montane;Wet;Agroforestry - default;1
+Tropical Montane;Moist;Agroforestry - default;1,00
+Tropical Montane;Dry;Agroforestry - default;1,00
+Tropical Montane;Wet;Agroforestry - default;1,00
 Boreal;Moist;Alley Cropping;0,72
 Boreal;Dry;Alley Cropping;0,72
 Cool Temperate;Moist;Alley Cropping;0,72
@@ -80,9 +80,9 @@ Warm Temperate;Dry;Alley Cropping;0,72
 Tropical;Moist;Alley Cropping;1,01
 Tropical;Dry;Alley Cropping;1,01
 Tropical;Wet;Alley Cropping;1,01
-Tropical Montane;Moist;Alley Cropping;1
-Tropical Montane;Dry;Alley Cropping;1
-Tropical Montane;Wet;Alley Cropping;1
+Tropical Montane;Moist;Alley Cropping;1,00
+Tropical Montane;Dry;Alley Cropping;1,00
+Tropical Montane;Wet;Alley Cropping;1,00
 Boreal;Moist;Perennial Fallow;0,72
 Boreal;Dry;Perennial Fallow;0,72
 Cool Temperate;Moist;Perennial Fallow;0,72
@@ -92,9 +92,9 @@ Warm Temperate;Dry;Perennial Fallow;0,72
 Tropical;Moist;Perennial Fallow;1,01
 Tropical;Dry;Perennial Fallow;1,01
 Tropical;Wet;Perennial Fallow;1,01
-Tropical Montane;Moist;Perennial Fallow;1
-Tropical Montane;Dry;Perennial Fallow;1
-Tropical Montane;Wet;Perennial Fallow;1
+Tropical Montane;Moist;Perennial Fallow;1,00
+Tropical Montane;Dry;Perennial Fallow;1,00
+Tropical Montane;Wet;Perennial Fallow;1,00
 Boreal;Moist;Hedgerow;0,72
 Boreal;Dry;Hedgerow;0,72
 Cool Temperate;Moist;Hedgerow;0,72
@@ -104,9 +104,9 @@ Warm Temperate;Dry;Hedgerow;0,72
 Tropical;Moist;Hedgerow;1,01
 Tropical;Dry;Hedgerow;1,01
 Tropical;Wet;Hedgerow;1,01
-Tropical Montane;Moist;Hedgerow;1
-Tropical Montane;Dry;Hedgerow;1
-Tropical Montane;Wet;Hedgerow;1
+Tropical Montane;Moist;Hedgerow;1,00
+Tropical Montane;Dry;Hedgerow;1,00
+Tropical Montane;Wet;Hedgerow;1,00
 Boreal;Moist;Multistrata;0,72
 Boreal;Dry;Multistrata;0,72
 Cool Temperate;Moist;Multistrata;0,72
@@ -116,9 +116,9 @@ Warm Temperate;Dry;Multistrata;0,72
 Tropical;Moist;Multistrata;1,01
 Tropical;Dry;Multistrata;1,01
 Tropical;Wet;Multistrata;1,01
-Tropical Montane;Moist;Multistrata;1
-Tropical Montane;Dry;Multistrata;1
-Tropical Montane;Wet;Multistrata;1
+Tropical Montane;Moist;Multistrata;1,00
+Tropical Montane;Dry;Multistrata;1,00
+Tropical Montane;Wet;Multistrata;1,00
 Boreal;Moist;Parkland;0,72
 Boreal;Dry;Parkland;0,72
 Cool Temperate;Moist;Parkland;0,72
@@ -128,9 +128,9 @@ Warm Temperate;Dry;Parkland;0,72
 Tropical;Moist;Parkland;1,01
 Tropical;Dry;Parkland;1,01
 Tropical;Wet;Parkland;1,01
-Tropical Montane;Moist;Parkland;1
-Tropical Montane;Dry;Parkland;1
-Tropical Montane;Wet;Parkland;1
+Tropical Montane;Moist;Parkland;1,00
+Tropical Montane;Dry;Parkland;1,00
+Tropical Montane;Wet;Parkland;1,00
 Boreal;Moist;Shaded Perennial;0,72
 Boreal;Dry;Shaded Perennial;0,72
 Cool Temperate;Moist;Shaded Perennial;0,72
@@ -140,9 +140,9 @@ Warm Temperate;Dry;Shaded Perennial;0,72
 Tropical;Moist;Shaded Perennial;1,01
 Tropical;Dry;Shaded Perennial;1,01
 Tropical;Wet;Shaded Perennial;1,01
-Tropical Montane;Moist;Shaded Perennial;1
-Tropical Montane;Dry;Shaded Perennial;1
-Tropical Montane;Wet;Shaded Perennial;1
+Tropical Montane;Moist;Shaded Perennial;1,00
+Tropical Montane;Dry;Shaded Perennial;1,00
+Tropical Montane;Wet;Shaded Perennial;1,00
 Boreal;Moist;Silvoarable;0,72
 Boreal;Dry;Silvoarable;0,72
 Cool Temperate;Moist;Silvoarable;0,72
@@ -152,9 +152,9 @@ Warm Temperate;Dry;Silvoarable;0,72
 Tropical;Moist;Silvoarable;1,01
 Tropical;Dry;Silvoarable;1,01
 Tropical;Wet;Silvoarable;1,01
-Tropical Montane;Moist;Silvoarable;1
-Tropical Montane;Dry;Silvoarable;1
-Tropical Montane;Wet;Silvoarable;1
+Tropical Montane;Moist;Silvoarable;1,00
+Tropical Montane;Dry;Silvoarable;1,00
+Tropical Montane;Wet;Silvoarable;1,00
 Boreal;Moist;Silvopasture;0,72
 Boreal;Dry;Silvopasture;0,72
 Cool Temperate;Moist;Silvopasture;0,72
@@ -164,9 +164,9 @@ Warm Temperate;Dry;Silvopasture;0,72
 Tropical;Moist;Silvopasture;1,01
 Tropical;Dry;Silvopasture;1,01
 Tropical;Wet;Silvopasture;1,01
-Tropical Montane;Moist;Silvopasture;1
-Tropical Montane;Dry;Silvopasture;1
-Tropical Montane;Wet;Silvopasture;1
+Tropical Montane;Moist;Silvopasture;1,00
+Tropical Montane;Dry;Silvopasture;1,00
+Tropical Montane;Wet;Silvopasture;1,00
 Boreal;Moist;Oil Palm;0,72
 Boreal;Dry;Oil Palm;0,72
 Cool Temperate;Moist;Oil Palm;0,72
@@ -176,9 +176,9 @@ Warm Temperate;Dry;Oil Palm;0,72
 Tropical;Moist;Oil Palm;1,01
 Tropical;Dry;Oil Palm;1,01
 Tropical;Wet;Oil Palm;1,01
-Tropical Montane;Moist;Oil Palm;1
-Tropical Montane;Dry;Oil Palm;1
-Tropical Montane;Wet;Oil Palm;1
+Tropical Montane;Moist;Oil Palm;1,00
+Tropical Montane;Dry;Oil Palm;1,00
+Tropical Montane;Wet;Oil Palm;1,00
 Boreal;Moist;Rubber;0,72
 Boreal;Dry;Rubber;0,72
 Cool Temperate;Moist;Rubber;0,72
@@ -188,9 +188,9 @@ Warm Temperate;Dry;Rubber;0,72
 Tropical;Moist;Rubber;1,01
 Tropical;Dry;Rubber;1,01
 Tropical;Wet;Rubber;1,01
-Tropical Montane;Moist;Rubber;1
-Tropical Montane;Dry;Rubber;1
-Tropical Montane;Wet;Rubber;1
+Tropical Montane;Moist;Rubber;1,00
+Tropical Montane;Dry;Rubber;1,00
+Tropical Montane;Wet;Rubber;1,00
 Boreal;Moist;Tea;0,72
 Boreal;Dry;Tea;0,72
 Cool Temperate;Moist;Tea;0,72
@@ -200,9 +200,9 @@ Warm Temperate;Dry;Tea;0,72
 Tropical;Moist;Tea;1,01
 Tropical;Dry;Tea;1,01
 Tropical;Wet;Tea;1,01
-Tropical Montane;Moist;Tea;1
-Tropical Montane;Dry;Tea;1
-Tropical Montane;Wet;Tea;1
+Tropical Montane;Moist;Tea;1,00
+Tropical Montane;Dry;Tea;1,00
+Tropical Montane;Wet;Tea;1,00
 Boreal;Moist;Olive;0,72
 Boreal;Dry;Olive;0,72
 Cool Temperate;Moist;Olive;0,72
@@ -212,9 +212,9 @@ Warm Temperate;Dry;Olive;0,72
 Tropical;Moist;Olive;1,01
 Tropical;Dry;Olive;1,01
 Tropical;Wet;Olive;1,01
-Tropical Montane;Moist;Olive;1
-Tropical Montane;Dry;Olive;1
-Tropical Montane;Wet;Olive;1
+Tropical Montane;Moist;Olive;1,00
+Tropical Montane;Dry;Olive;1,00
+Tropical Montane;Wet;Olive;1,00
 Boreal;Moist;Orchard;0,72
 Boreal;Dry;Orchard;0,72
 Cool Temperate;Moist;Orchard;0,72
@@ -224,9 +224,9 @@ Warm Temperate;Dry;Orchard;0,72
 Tropical;Moist;Orchard;1,01
 Tropical;Dry;Orchard;1,01
 Tropical;Wet;Orchard;1,01
-Tropical Montane;Moist;Orchard;1
-Tropical Montane;Dry;Orchard;1
-Tropical Montane;Wet;Orchard;1
+Tropical Montane;Moist;Orchard;1,00
+Tropical Montane;Dry;Orchard;1,00
+Tropical Montane;Wet;Orchard;1,00
 Boreal;Moist;Short Rotation Coppice;0,72
 Boreal;Dry;Short Rotation Coppice;0,72
 Cool Temperate;Moist;Short Rotation Coppice;0,72
@@ -236,9 +236,9 @@ Warm Temperate;Dry;Short Rotation Coppice;0,72
 Tropical;Moist;Short Rotation Coppice;1,01
 Tropical;Dry;Short Rotation Coppice;1,01
 Tropical;Wet;Short Rotation Coppice;1,01
-Tropical Montane;Moist;Short Rotation Coppice;1
-Tropical Montane;Dry;Short Rotation Coppice;1
-Tropical Montane;Wet;Short Rotation Coppice;1
+Tropical Montane;Moist;Short Rotation Coppice;1,00
+Tropical Montane;Dry;Short Rotation Coppice;1,00
+Tropical Montane;Wet;Short Rotation Coppice;1,00
 Boreal;Moist;Vine;0,72
 Boreal;Dry;Vine;0,72
 Cool Temperate;Moist;Vine;0,72
@@ -248,6 +248,18 @@ Warm Temperate;Dry;Vine;0,72
 Tropical;Moist;Vine;1,01
 Tropical;Dry;Vine;1,01
 Tropical;Wet;Vine;1,01
-Tropical Montane;Moist;Vine;1
-Tropical Montane;Dry;Vine;1
-Tropical Montane;Wet;Vine;1
+Tropical Montane;Moist;Vine;1,00
+Tropical Montane;Dry;Vine;1,00
+Tropical Montane;Wet;Vine;1,00
+Boreal;Moist;Degraded Land;0,33
+Boreal;Dry;Degraded Land;0,33
+Cool Temperate;Moist;Degraded Land;0,33
+Cool Temperate;Dry;Degraded Land;0,33
+Warm Temperate;Moist;Degraded Land;0,33
+Warm Temperate;Dry;Degraded Land;0,33
+Tropical;Moist;Degraded Land;0,33
+Tropical;Dry;Degraded Land;0,33
+Tropical;Wet;Degraded Land;0,33
+Tropical Montane;Moist;Degraded Land;0,33
+Tropical Montane;Dry;Degraded Land;0,33
+Tropical Montane;Wet;Degraded Land;0,33

@@ -1,5 +1,6 @@
 import traceback
 from .general_functions import yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, yearly_time_dependent_20_year_breakdown, breakdown_according_to_values, soil_emissions
+from .ghg_emissions_classes import YearlyGasActivityEmissionSet, Emission, GasTypes, ActivityTypes, Result
 
 class CoastalWaterbodies:
 
@@ -28,6 +29,7 @@ class CoastalWaterbodies:
         self.emissions_yearly = []
         self.total_emissions = 0
 
+        self.result = Result(self.time_impl, self.time_cap)
         pass
 
     def calculate_emissions(self, ):
@@ -49,6 +51,12 @@ class CoastalWaterbodies:
 
             self.emissions_yearly = yearly_time_dependent_parameter_breakdown(yearly_emissions_start, yearly_emissions_end, self.time_impl, self.time_cap, self.rate)
             self.total_emissions = sum(self.emissions_yearly)
+
+            # offsite_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.offsite_emissions_yearly], ActivityTypes.OFFSITE_PEAT, delay=0)
+            # self.result.yearly_emissions_by_sector_by_gas.append(offsite_emission_set)
+
+            emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in self.emissions_yearly], ActivityTypes.COASTAL_WATERBODIES, delay=0)
+            self.result.yearly_emissions_by_sector_by_gas.append(emission_set)
             
         except Exception as e:
             traceback.print_exc()

@@ -1,9 +1,10 @@
+import csv
+import os
+
+import numpy as np
 import pandas as pd
 from api.models import *
 from ipcc.models import *
-import os
-import csv
-import numpy as np
 
 
 def capitalize_all(string):
@@ -19,7 +20,7 @@ def capitalize_all(string):
 
 
 def parse_csv_number(number, nan_value=0):
-    if isinstance(number, str):
+    if isinstance(number, str) and ("," in number or "." in number):
         return float(number.replace(",", "."))
     elif pd.isna(number):
         return nan_value
@@ -76,31 +77,7 @@ with open("scripts/ipcc_data/BelowGroundBiomass.csv", "r") as f:
                 value=row[i + 1],
             )
 
-with open("scripts/ipcc_data/TotalBiomassAfterDefo.csv", "r") as f:
-    reader = csv.reader(f)
-    header = next(reader, None)
-    data = list(reader)
 
-    for i, head in enumerate(header):
-        land_use_type = LandUseType.objects.get_or_create(name=sanitize(head))[0]
-        for row in data:
-            climate_name = sanitize(row[0])
-            moisture_name = sanitize(row[1])
-            continent_name = sanitize(row[2])
-            value = row[i + 3] if row[i + 3] != "" else None
-            year = 1
-
-            climate = Climate.objects.get_or_create(name=climate_name)[0]
-            moisture = Moisture.objects.get_or_create(name=moisture_name)[0]
-            continent = Continent.objects.get_or_create(name=continent_name)[0]
-            TotalBiomassAfterDefo.objects.get_or_create(
-                land_use_type=land_use_type,
-                climate=climate,
-                moisture=moisture,
-                continent=continent,
-                value=value,
-                year=year,
-            )
 
 with open("scripts/ipcc_data/CombustionFactorValues.csv", "r") as f:
     reader = csv.reader(f)
@@ -840,38 +817,7 @@ with open("scripts/ipcc_data/SmallFisheryDatabaseFish.csv", "r") as f:
                 fishery_type=fishery_type, gear_type=gear_type, value=value
             )
 
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "LargeFisheryFUI.csv"),
-    header=[0],
-    sep=";",
-)
 
-print(df)
-
-rows = df.to_dict("records")
-
-for row in rows:
-    gear_type = row["gear_type"]
-    fish_type = row["fish_type"]
-    n = row["n"] if not np.isnan(row["n"]) else None
-    median = row["median"] if not np.isnan(row["median"]) else None
-
-    print(f"{gear_type}, {fish_type}, {n}, {median}")
-
-    if n is None and median is None:
-        continue
-
-    gear_type = LargeFisheryGearType.objects.get_or_create(
-        name=capitalize_all(gear_type)
-    )[0]
-    fish_type = FishType.objects.get_or_create(name=capitalize_all(fish_type))[0]
-
-    LargeFisheryFUI.objects.get_or_create(
-        fish_type=fish_type,
-        gear_type=gear_type,
-        n=n,
-        median=median,
-    )
 
 
 with open("scripts/ipcc_data/LargeFisheryFUI.csv", "r") as f:
@@ -3314,6 +3260,178 @@ for i, row in df.iterrows():
         average=average,
     )[0]
 
+
+
+
+# annualcropland = LandUseType.objects.get(name="Annual Cropland")
+# crops = LandUseType.objects.filter(module_types__class_name="AnnualCropping").all()
+
+with open("scripts/ipcc_data/ForestTotalBiomass.csv", "r") as f:
+    reader = csv.reader(f)
+    header = next(reader, None)
+    data = list(reader)
+
+    for i, head in enumerate(header):
+        head = sanitize(head)
+        if head == "":
+            continue
+        land_use_type = LandUseType.objects.get(name=head)
+
+        for row in data:
+            if row[i + 3] == "":
+                continue
+
+            climate = Climate.objects.get(name=sanitize(row[0]))
+            moisture = Moisture.objects.get(name=sanitize(row[1]))
+            continent = Region.objects.get(name=sanitize(row[2]))
+            value = parse_csv_number(row[i + 3])
+
+            # if land_use_type == annualcropland:
+            #     for crop in crops:
+            #         print(f"{crop}, {climate}, {moisture}, {continent}, {value}")
+
+            #         ForestTotalBiomass.objects.get_or_create(
+            #             land_use_type=crop,
+            #             climate=climate,
+            #             moisture=moisture,
+            #             continent=continent,
+            #             value=value,
+            #         )
+
+            print(f"{land_use_type}, {climate}, {moisture}, {continent}, {value}")
+
+            ForestTotalBiomass.objects.get_or_create(
+                land_use_type=land_use_type,
+                climate=climate,
+                moisture=moisture,
+                continent=continent,
+                value=value,
+            )
+
+with open("scripts/ipcc_data/TotalBiomassAfterDefo.csv", "r") as f:
+    reader = csv.reader(f)
+    header = next(reader, None)
+    data = list(reader)
+
+    for i, head in enumerate(header):
+        head = sanitize(head)
+        land_use_type = LandUseType.objects.get(name=head)
+
+        for row in data:
+            climate_name = sanitize(row[0])
+            moisture_name = sanitize(row[1])
+            continent_name = sanitize(row[2])
+            value = parse_csv_number(row[i + 3]) if row[i + 3] != "" else None
+            year = 1
+
+            climate = Climate.objects.get(name=climate_name)
+            moisture = Moisture.objects.get(name=moisture_name)
+            continent = Region.objects.get(name=continent_name)
+
+            # if land_use_type == annualcropland:
+            #     for crop in crops:
+            #         print(f"{crop}, {climate_name}, {moisture_name}, {continent_name}, {value}")
+
+            #         TotalBiomassAfterDefo.objects.get_or_create(
+            #             land_use_type=crop,
+            #             climate=climate,
+            #             moisture=moisture,
+            #             continent=continent,
+            #             value=value,
+            #             year=year,
+            #         )
+
+            print(f"{land_use_type}, {climate_name}, {moisture_name}, {continent_name}, {value}")
+
+            TotalBiomassAfterDefo.objects.get_or_create(
+                land_use_type=land_use_type,
+                climate=climate,
+                moisture=moisture,
+                continent=continent,
+                value=value,
+                year=year,
+            )
+
+
+
+FIData.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "FI.csv"),
+    header=[0],
+    sep=";",
+)
+
+for i, row in df.iterrows():
+    climate = Climate.objects.get(name=sanitize(row["climate"]))
+    moisture = Moisture.objects.get(name=sanitize(row["moisture"]))
+    organic_input_type = OrganicInputType.objects.get(name=row["organic_input_type"])
+
+    value = parse_csv_number(row["value"])
+
+    print(
+        climate,
+        moisture,
+        organic_input_type,
+        value,
+    )
+
+    FIData.objects.get_or_create(
+        climate=climate,
+        moisture=moisture,
+        organic_input_type=organic_input_type,
+        value=value,
+    )
+
+    if i == len(df) - 1:
+        break
+
+FLUData.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "FLU.csv"),
+    header=[0],
+    sep=";",
+)
+
+annualcropland = LandUseType.objects.get(name="Annual Cropland")
+crops = LandUseType.objects.filter(module_types__class_name="AnnualCropping").all()
+
+for i, row in df.iterrows():
+    climate = Climate.objects.get(name=sanitize(row["climate"]))
+    moisture = Moisture.objects.get(name=sanitize(row["moisture"]))
+    land_use_type = LandUseType.objects.get(name=sanitize(row["land_use_type"]))
+    value = parse_csv_number(row["value"])
+
+    if land_use_type == annualcropland:
+        for crop in crops:
+            print(
+                climate,
+                moisture,
+                crop,
+                value,
+            )
+            FLUData.objects.get_or_create(
+                climate=climate,
+                moisture=moisture,
+                land_use_type=crop,
+                value=value,
+            )
+
+    print(
+        climate,
+        moisture,
+        land_use_type,
+        value,
+    )
+
+    FLUData.objects.get_or_create(
+        climate=climate,
+        moisture=moisture,
+        land_use_type=land_use_type,
+        value=value,
+    )
+
 FMGData.objects.all().delete()
 
 df = pd.read_csv(
@@ -3343,67 +3461,26 @@ for i, row in df.iterrows():
         tillage_management_type=tillage_management_type,
         value=value,
     )
-
-FIData.objects.all().delete()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "FI.csv"),
-    header=[0],
-    sep=";",
-)
-
-for i, row in df.iterrows():
-    print(i, row)
-    climate = Climate.objects.get(name=sanitize(row["climate"]))
-    moisture = Moisture.objects.get(name=sanitize(row["moisture"]))
-    organic_input_type = OrganicInputType.objects.get(name=row["organic_input_type"])
-
-    value = parse_csv_number(row["value"])
-
-    print(
-        climate,
-        moisture,
-        organic_input_type,
-        value,
-    )
-
-    FIData.objects.get_or_create(
-        climate=climate,
-        moisture=moisture,
-        organic_input_type=organic_input_type,
-        value=value,
-    )
-
-    if i == len(df) - 1:
-        break
 """
 
-FLUData.objects.all().delete()
+LargeFisheryFUI.objects.all().delete()
 
 df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "FLU.csv"),
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "LargeFisheryFUI.csv"),
     header=[0],
     sep=";",
 )
 
-for i, row in df.iterrows():
-    print(i, row)
-    climate = Climate.objects.get(name=sanitize(row["climate"]))
-    moisture = Moisture.objects.get(name=sanitize(row["moisture"]))
-    land_use_type = LandUseType.objects.get(name=sanitize(row["land_use_type"]))
+rows = df.to_dict("records")
 
+for row in rows:
+    gear_type = row["gear_type"]
+    fish_type = row["fish_type"]
     value = parse_csv_number(row["value"])
 
-    print(
-        climate,
-        moisture,
-        land_use_type,
-        value,
-    )
+    print(f"{gear_type}, {fish_type}, {value}")
 
-    FLUData.objects.get_or_create(
-        climate=climate,
-        moisture=moisture,
-        land_use_type=land_use_type,
-        value=value,
-    )
+    gear_type = LargeFisheryGearType.objects.get_or_create(name=capitalize_all(gear_type))[0]
+    fish_type = FishType.objects.get_or_create(name=capitalize_all(fish_type))[0]
+
+    LargeFisheryFUI.objects.get_or_create(fish_type=fish_type, gear_type=gear_type, value=value)
