@@ -23,6 +23,13 @@ class User(auth_models.User):
     class Meta:
         proxy = True
 
+        permissions = (
+            ("can_view_modules", "Can view modules"),
+            ("can_add_modules", "Can create modules"),
+            ("can_change_modules", "Can edit modules"),
+            ("can_delete_modules", "Can delete modules"),
+        )
+
     def __str__(self):
         return f"{self.username}"
 
@@ -550,12 +557,16 @@ class Submodule(Historical):
         super().save(*args, **kwargs)
 
 
+class Note(Historical):
+    notes = TextField(null=True, blank=True)
+
+
 class Module(Historical):
     class Meta:
         abstract = True
 
     activity = ForeignKey(Activity, on_delete=CASCADE, related_name="%(class)s")
-    notes = TextField(null=True, blank=True)
+    notes = ForeignKey(Note, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s")
     start_year = IntegerField(default=1)
 
     soc_t2_start = FloatField(null=True, blank=True)
@@ -647,7 +658,6 @@ class MultiBiomassModule(DoubleBiomassModule):
 
 
 class OtherLandUse(Module):
-    notes = TextField(null=True, blank=True)
 
     initial_land_use_type = ForeignKey(LandUseType, null=True, blank=True, on_delete=CASCADE, related_name="initial_land_use_type")
     final_land_use_type = ForeignKey(LandUseType, null=True, blank=True, on_delete=CASCADE, related_name="final_land_use_type")
@@ -730,7 +740,6 @@ class CropType(Model):
 
 
 class AnnualCropping(LandModule, SingleBiomassModule):
-    user_notes = TextField(null=True, blank=True)
 
     tillage_management_type_start = ForeignKey(
         TillageManagementType,
@@ -802,7 +811,6 @@ class AnnualCropping(LandModule, SingleBiomassModule):
 
 
 class PerennialCropping(LandModule, DoubleBiomassModule):
-    user_notes = TextField(null=True, blank=True)
 
     tillage_management_type_start = ForeignKey(TillageManagementType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_tillage_management_type_start")
     tillage_management_type_w = ForeignKey(TillageManagementType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_tillage_management_type_w")
@@ -966,8 +974,6 @@ class MinorSeasonFloodedRice(Rice):
 
 
 class Grassland(LandModuleFixed, SingleBiomassModule):
-    description = TextField(null=True, blank=True)
-    user_notes = TextField(null=True, blank=True)
 
     grassland_management_type_start = ForeignKey(GrasslandManagementType, on_delete=CASCADE, related_name="%(class)s_grassland_management_type_start", null=True)
     grassland_management_type_w = ForeignKey(GrasslandManagementType, on_delete=CASCADE, related_name="%(class)s_grassland_management_type_w", null=True)
@@ -1021,8 +1027,6 @@ class Grassland(LandModuleFixed, SingleBiomassModule):
 
 
 class Livestock(Module):
-    description = TextField(null=True, blank=True)
-    user_notes = TextField(null=True, blank=True)
 
     livestock_category_type_start = ForeignKey(LivestockCategoryType, on_delete=CASCADE, null=True, blank=True)
     livestock_category_type_w = ForeignKey(LivestockCategoryType, on_delete=CASCADE, related_name="%(class)s_livestock_categories_w", null=True, blank=True)
@@ -1369,7 +1373,6 @@ class LargeFishery(Fishery):
 
 
 class Aquaculture(Module):
-    user_notes = TextField(null=True, blank=True)
 
     # fish_type = ForeignKey(FishType, on_delete=CASCADE, null=True, blank=True)
 
@@ -1704,9 +1707,9 @@ class OrganicSoil(LandModuleFixed):
     peat_extraction_height_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_extraction_height_thread", on_delete=SET_NULL)
 
     is_peat_for_energy_start = BooleanField(default=False)
-    is_peat_is_for_energy_w = BooleanField(default=False)
-    is_peat_is_for_energy_wo = BooleanField(default=False)
-    is_peat_is_for_energy_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_is_for_energy_thread", on_delete=SET_NULL)
+    is_peat_for_energy_w = BooleanField(default=False)
+    is_peat_for_energy_wo = BooleanField(default=False)
+    is_peat_for_energy_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_is_for_energy_thread", on_delete=SET_NULL)
 
     onsite_co2_peat_t2 = FloatField(null=True, blank=True)
     onsite_ch4_peat_t2 = FloatField(null=True, blank=True)
