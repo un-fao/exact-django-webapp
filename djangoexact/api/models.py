@@ -1704,9 +1704,9 @@ class OrganicSoil(LandModuleFixed):
     peat_extraction_height_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_extraction_height_thread", on_delete=SET_NULL)
 
     is_peat_for_energy_start = BooleanField(default=False)
-    is_peat_is_for_energy_w = BooleanField(default=False)
-    is_peat_is_for_energy_wo = BooleanField(default=False)
-    is_peat_is_for_energy_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_is_for_energy_thread", on_delete=SET_NULL)
+    is_peat_for_energy_w = BooleanField(default=False)
+    is_peat_for_energy_wo = BooleanField(default=False)
+    is_peat_for_energy_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_is_for_energy_thread", on_delete=SET_NULL)
 
     onsite_co2_peat_t2 = FloatField(null=True, blank=True)
     onsite_ch4_peat_t2 = FloatField(null=True, blank=True)
