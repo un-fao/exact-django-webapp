@@ -23,6 +23,13 @@ class User(auth_models.User):
     class Meta:
         proxy = True
 
+        permissions = (
+            ("can_view_modules", "Can view modules"),
+            ("can_add_modules", "Can create modules"),
+            ("can_change_modules", "Can edit modules"),
+            ("can_delete_modules", "Can delete modules"),
+        )
+
     def __str__(self):
         return f"{self.username}"
 
