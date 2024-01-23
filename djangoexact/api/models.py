@@ -557,12 +557,16 @@ class Submodule(Historical):
         super().save(*args, **kwargs)
 
 
+class Note(Historical):
+    notes = TextField(null=True, blank=True)
+
+
 class Module(Historical):
     class Meta:
         abstract = True
 
     activity = ForeignKey(Activity, on_delete=CASCADE, related_name="%(class)s")
-    notes = TextField(null=True, blank=True)
+    notes = ForeignKey(Note, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s")
     start_year = IntegerField(default=1)
 
     soc_t2_start = FloatField(null=True, blank=True)
@@ -654,7 +658,6 @@ class MultiBiomassModule(DoubleBiomassModule):
 
 
 class OtherLandUse(Module):
-    notes = TextField(null=True, blank=True)
 
     initial_land_use_type = ForeignKey(LandUseType, null=True, blank=True, on_delete=CASCADE, related_name="initial_land_use_type")
     final_land_use_type = ForeignKey(LandUseType, null=True, blank=True, on_delete=CASCADE, related_name="final_land_use_type")
@@ -737,7 +740,6 @@ class CropType(Model):
 
 
 class AnnualCropping(LandModule, SingleBiomassModule):
-    user_notes = TextField(null=True, blank=True)
 
     tillage_management_type_start = ForeignKey(
         TillageManagementType,
@@ -809,7 +811,6 @@ class AnnualCropping(LandModule, SingleBiomassModule):
 
 
 class PerennialCropping(LandModule, DoubleBiomassModule):
-    user_notes = TextField(null=True, blank=True)
 
     tillage_management_type_start = ForeignKey(TillageManagementType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_tillage_management_type_start")
     tillage_management_type_w = ForeignKey(TillageManagementType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_tillage_management_type_w")
@@ -973,8 +974,6 @@ class MinorSeasonFloodedRice(Rice):
 
 
 class Grassland(LandModuleFixed, SingleBiomassModule):
-    description = TextField(null=True, blank=True)
-    user_notes = TextField(null=True, blank=True)
 
     grassland_management_type_start = ForeignKey(GrasslandManagementType, on_delete=CASCADE, related_name="%(class)s_grassland_management_type_start", null=True)
     grassland_management_type_w = ForeignKey(GrasslandManagementType, on_delete=CASCADE, related_name="%(class)s_grassland_management_type_w", null=True)
@@ -1028,8 +1027,6 @@ class Grassland(LandModuleFixed, SingleBiomassModule):
 
 
 class Livestock(Module):
-    description = TextField(null=True, blank=True)
-    user_notes = TextField(null=True, blank=True)
 
     livestock_category_type_start = ForeignKey(LivestockCategoryType, on_delete=CASCADE, null=True, blank=True)
     livestock_category_type_w = ForeignKey(LivestockCategoryType, on_delete=CASCADE, related_name="%(class)s_livestock_categories_w", null=True, blank=True)
@@ -1376,7 +1373,6 @@ class LargeFishery(Fishery):
 
 
 class Aquaculture(Module):
-    user_notes = TextField(null=True, blank=True)
 
     # fish_type = ForeignKey(FishType, on_delete=CASCADE, null=True, blank=True)
 
