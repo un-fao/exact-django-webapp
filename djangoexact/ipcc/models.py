@@ -929,6 +929,9 @@ class LivestockVSER(Model):
     IPCC 2366:2415
     """
 
+    class Meta:
+        unique_together = ("livestock_production_type", "livestock_category_type", "ipcc_region")
+
     emission_type = ForeignKey(EmissionType, on_delete=CASCADE, null=True, blank=True)
     livestock_production_type = ForeignKey("api.LivestockProductionType", on_delete=CASCADE)
     livestock_category_type = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
