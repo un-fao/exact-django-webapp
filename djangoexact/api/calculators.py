@@ -64,6 +64,7 @@ from .models import (
     Climate,
     CoastalWetland,
     CoastalWetlandParameter,
+    Country,
     Electricity,
     Energy,
     FloodedRice,
@@ -2867,6 +2868,7 @@ class LivestockCalculator(BaseCalculator):
         module: Livestock = self.data
         activity: Activity = module.activity
         project: Project = activity.project
+        country: Country = project.country
 
         climate: Climate = activity.climate_t2 or project.climate
         moisture: Moisture = activity.moisture_t2 or project.moisture
@@ -2879,34 +2881,34 @@ class LivestockCalculator(BaseCalculator):
         tam_ch4_start = ipcc.LivestockTAM.objects.get(
             livestock_production_type=module.livestock_production_type_start,
             livestock_category_type=module.livestock_category_type_start,
-            ipcc_region=region,
+            ipcc_region=country.ipcc_region,
         )
         tam_ch4_w = ipcc.LivestockTAM.objects.get(
             livestock_production_type=module.livestock_production_type_w,
             livestock_category_type=module.livestock_category_type_w,
-            ipcc_region=region,
+            ipcc_region=country.ipcc_region,
         )
         tam_ch4_wo = ipcc.LivestockTAM.objects.get(
             livestock_production_type=module.livestock_production_type_wo,
             livestock_category_type=module.livestock_category_type_wo,
-            ipcc_region=region,
+            ipcc_region=country.ipcc_region,
         )
 
         # VSER Values
         vser_ch4_start = ipcc.LivestockVSER.objects.get(
             livestock_production_type=module.livestock_production_type_start,
             livestock_category_type=module.livestock_category_type_start,
-            ipcc_region=region,
+            ipcc_region=country.ipcc_region,
         )
         vser_ch4_w = ipcc.LivestockVSER.objects.get(
             livestock_production_type=module.livestock_production_type_w,
             livestock_category_type=module.livestock_category_type_w,
-            ipcc_region=region,
+            ipcc_region=country.ipcc_region,
         )
         vser_ch4_wo = ipcc.LivestockVSER.objects.get(
             livestock_production_type=module.livestock_production_type_wo,
             livestock_category_type=module.livestock_category_type_wo,
-            ipcc_region=region,
+            ipcc_region=country.ipcc_region,
         )
 
         # EF CH4 PRP Values
@@ -2982,21 +2984,21 @@ class LivestockCalculator(BaseCalculator):
         animal_waste_prp_start = ipcc.LivestockAnimalWasteManagementSystem.objects.get(
             livestock_category_type=module.livestock_category_type_start,
             livestock_production_type=module.livestock_production_type_start,
-            ipcc_region=region,
+            ipcc_region=country.ipcc_region,
             manure_management_type__name=utils.ManureManagementTypes.PRP,
         )
 
         animal_waste_prp_w = ipcc.LivestockAnimalWasteManagementSystem.objects.get(
             livestock_category_type=module.livestock_category_type_w,
             livestock_production_type=module.livestock_production_type_w,
-            ipcc_region=region,
+            ipcc_region=country.ipcc_region,
             manure_management_type__name=utils.ManureManagementTypes.PRP,
         )
 
         animal_waste_prp_wo = ipcc.LivestockAnimalWasteManagementSystem.objects.get(
             livestock_category_type=module.livestock_category_type_wo,
             livestock_production_type=module.livestock_production_type_wo,
-            ipcc_region=region,
+            ipcc_region=country.ipcc_region,
             manure_management_type__name=utils.ManureManagementTypes.PRP,
         )
 
@@ -3006,7 +3008,7 @@ class LivestockCalculator(BaseCalculator):
             ipcc.LivestockAnimalWasteManagementSystem.objects.filter(
                 livestock_category_type=module.livestock_category_type_start,
                 livestock_production_type=module.livestock_production_type_start,
-                ipcc_region=region,
+                ipcc_region=country.ipcc_region,
             )
             .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP)
             .order_by("manure_management_type__name")
@@ -3016,7 +3018,7 @@ class LivestockCalculator(BaseCalculator):
             ipcc.LivestockAnimalWasteManagementSystem.objects.filter(
                 livestock_category_type=module.livestock_category_type_w,
                 livestock_production_type=module.livestock_production_type_w,
-                ipcc_region=region,
+                ipcc_region=country.ipcc_region,
             )
             .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP)
             .order_by("manure_management_type__name")
@@ -3026,7 +3028,7 @@ class LivestockCalculator(BaseCalculator):
             ipcc.LivestockAnimalWasteManagementSystem.objects.filter(
                 livestock_category_type=module.livestock_category_type_wo,
                 livestock_production_type=module.livestock_production_type_wo,
-                ipcc_region=region,
+                ipcc_region=country.ipcc_region,
             )
             .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP)
             .order_by("manure_management_type__name")
@@ -3042,19 +3044,19 @@ class LivestockCalculator(BaseCalculator):
         ch4_enteric_start = ipcc.MethaneEntericFermentationFactor.objects.get(
             livestock_category_type=module.livestock_category_type_start,
             livestock_production_type=module.livestock_production_type_start,
-            ipcc_region=region,
+            ipcc_region=country.ipcc_region,
         )
 
         ch4_enteric_w = ipcc.MethaneEntericFermentationFactor.objects.get(
             livestock_category_type=module.livestock_category_type_w,
             livestock_production_type=module.livestock_production_type_w,
-            ipcc_region=region,
+            ipcc_region=country.ipcc_region,
         )
 
         ch4_enteric_wo = ipcc.MethaneEntericFermentationFactor.objects.get(
             livestock_category_type=module.livestock_category_type_wo,
             livestock_production_type=module.livestock_production_type_wo,
-            ipcc_region=region,
+            ipcc_region=country.ipcc_region,
         )
 
         ##### PRP N2O Direct EF Values #####
