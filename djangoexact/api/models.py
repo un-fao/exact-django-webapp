@@ -187,6 +187,7 @@ class Country(Model):
 
 class Climate(Model):
     name = CharField(max_length=100)
+    moistures = ManyToManyField("api.Moisture", related_name="climates")
 
     def __str__(self):
         return f"({self.pk}) {self.name}"
