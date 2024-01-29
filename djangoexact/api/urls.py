@@ -41,7 +41,7 @@ router.register(r"global-warming-potentials", views.generic_viewset(GlobalWarmin
 router.register(r"annual-croppings", views.generic_module_viewset(models.AnnualCropping), basename="annualcroppings")
 router.register(r"perennial-croppings", views.generic_module_viewset(models.PerennialCropping), basename="perennialcroppings")
 router.register(r"flooded-rices", views.generic_module_viewset(models.FloodedRice), basename="floodedrices")
-router.register(r"flooded-rice-minor-seasons", views.generic_module_viewset(models.MinorSeasonFloodedRice), basename="floodedriceminorseasons")
+router.register(r"flooded-rices/minor-seasons", views.generic_module_viewset(models.MinorSeasonFloodedRice), basename="floodedriceminorseasons")
 router.register(r"grasslands", views.generic_module_viewset(models.Grassland), basename="grasslands")
 router.register(r"grassland-management-types", views.generic_viewset(models.GrasslandManagementType), basename="grasslandmanagementtypes")
 router.register(r"livestocks", views.generic_module_viewset(models.Livestock), basename="livestocks")
