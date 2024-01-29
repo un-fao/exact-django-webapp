@@ -1472,8 +1472,8 @@ class PerennialCroppingCalculator(BaseCalculator):
 
         return DefaultData(defaults_start, defaults_w, defaults_wo)
 
-class FloodedRiceSeasonCalculator(BaseCalculator):
 
+class FloodedRiceSeasonCalculator(BaseCalculator):
     def calculate(self) -> Result:
         module: FloodedRice = self.data
         activity: Activity = module.activity
@@ -1737,6 +1737,7 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
         results_tuple = (results_w + results_start_w, results_wo + results_start_wo)
 
         return results_tuple
+
 
 class FloodedRiceCalculator(BaseCalculator):
     """
@@ -2656,8 +2657,8 @@ class FuelCalculator(BaseCalculator):
                 input_w = [
                     ef.t_co2_eq,
                     input.ef_t2,
-                    input.fuel_start,
-                    input.fuel_w,
+                    input.fuel_consumption_start,
+                    input.fuel_consumption_w,
                     change_rate.name,
                     project.implementation_years,
                     project.capitalization_years,
@@ -2670,8 +2671,8 @@ class FuelCalculator(BaseCalculator):
                 input_wo = [
                     ef.t_co2_eq,
                     input.ef_t2,
-                    input.fuel_start,
-                    input.fuel_wo,
+                    input.fuel_consumption_start,
+                    input.fuel_consumption_wo,
                     change_rate.name,
                     project.implementation_years,
                     project.capitalization_years,
@@ -2691,8 +2692,8 @@ class FuelCalculator(BaseCalculator):
                     project.gw_potential.ch4,
                     project.gw_potential.n2o,
                     input.ef_t2,
-                    input.fuel_start,
-                    input.fuel_w,
+                    input.fuel_consumption_start,
+                    input.fuel_consumption_w,
                     input.activity.change_rate.name,
                     project.implementation_years,
                     project.capitalization_years,
@@ -2711,8 +2712,8 @@ class FuelCalculator(BaseCalculator):
                     project.gw_potential.ch4,
                     project.gw_potential.n2o,
                     input.ef_t2,
-                    input.fuel_start,
-                    input.fuel_wo,
+                    input.fuel_consumption_start,
+                    input.fuel_consumption_wo,
                     input.activity.change_rate.name,
                     project.implementation_years,
                     project.capitalization_years,
