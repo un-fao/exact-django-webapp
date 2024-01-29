@@ -1,9 +1,10 @@
-from api.models import *
+import random
+
 import factory
 import factory.fuzzy
-from factory.django import DjangoModelFactory
-import random
+from api.models import *
 from api.serializers import *
+from factory.django import DjangoModelFactory
 
 sma_gear_types = [gear for gear in SmallFisheryGearType.objects.all()]
 lge_gear_types = [gear for gear in LargeFisheryGearType.objects.all()]
@@ -18,12 +19,7 @@ organic_input_types = [organic for organic in OrganicInputType.objects.all()]
 residue_management_types = [residue for residue in ResidueManagementType.objects.all()]
 grassland_management_types = GrasslandManagementType.objects.all()
 
-livestock_category_types = [
-    c
-    for c in LivestockCategoryType.objects.all().exclude(
-        Q(name="Sheep") | Q(name="Swine")
-    )
-]
+livestock_category_types = [c for c in LivestockCategoryType.objects.all().exclude(Q(name="Ostrich") | Q(name="Llamas And Alpacas"))]
 livestock_production_types = [c for c in LivestockProductionType.objects.all()]
 
 def_rate = ChangeRate.objects.get(name="D")
@@ -59,6 +55,7 @@ class ActivityFactory(DjangoModelFactory):
     # user = factory
 
     change_rate = def_rate
+
 
 class FisheryFactory(DjangoModelFactory):
     class Meta:
@@ -158,9 +155,9 @@ class LivestockFactory(DjangoModelFactory):
     class Meta:
         model = Livestock
 
-    livestock_category_type_start = factory.fuzzy.FuzzyChoice(livestock_category_types)
-    livestock_category_type_w = factory.fuzzy.FuzzyChoice(livestock_category_types)
-    livestock_category_type_wo = factory.fuzzy.FuzzyChoice(livestock_category_types)
+    livestock_category_type_start = random.choice(livestock_category_types)
+    livestock_category_type_w = livestock_category_type_start
+    livestock_category_type_wo = livestock_category_type_start
 
     livestock_production_type_start = factory.fuzzy.FuzzyChoice(livestock_production_types)
     livestock_production_type_w = factory.fuzzy.FuzzyChoice(livestock_production_types)
@@ -173,6 +170,7 @@ class LivestockFactory(DjangoModelFactory):
     heads_number_start = factory.fuzzy.FuzzyInteger(0, 1000)
     heads_number_w = factory.fuzzy.FuzzyInteger(0, 1000)
     heads_number_wo = factory.fuzzy.FuzzyInteger(0, 1000)
+
 
 class GrasslandFactory(DjangoModelFactory):
     class Meta:
@@ -200,9 +198,11 @@ class GrasslandFactory(DjangoModelFactory):
 
     area = factory.fuzzy.FuzzyInteger(1, 150)
 
+
 land_modules = ModuleType.objects.filter(is_luc=True, is_submodule=False).all()
 
 ready_land_modules = land_modules.filter(name__in=["Annual Cropland", "Grassland"]).all()
+
 
 class LandUseChangeFactory(DjangoModelFactory):
     class Meta:
