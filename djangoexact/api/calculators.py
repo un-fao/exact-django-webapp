@@ -1472,11 +1472,7 @@ class PerennialCroppingCalculator(BaseCalculator):
 
         return DefaultData(defaults_start, defaults_w, defaults_wo)
 
-
-class FloodedRiceCalculator(BaseCalculator):
-    """
-    Calculator for flooded rice.
-    """
+class FloodedRiceSeasonCalculator(BaseCalculator):
 
     def calculate(self) -> Result:
         module: FloodedRice = self.data
@@ -1741,6 +1737,28 @@ class FloodedRiceCalculator(BaseCalculator):
         results_tuple = (results_w + results_start_w, results_wo + results_start_wo)
 
         return results_tuple
+
+class FloodedRiceCalculator(BaseCalculator):
+    """
+    Calculator for flooded rice.
+    """
+
+    def calculate(self) -> Result:
+        module: FloodedRice = self.data
+        res_w = MathResult(module.activity.project.implementation_years, module.activity.project.capitalization_years)
+        res_wo = MathResult(module.activity.project.implementation_years, module.activity.project.capitalization_years)
+
+        r_w, r_wo = FloodedRiceSeasonCalculator(module).calculate()
+
+        res_w += r_w
+        res_wo += r_wo
+
+        for season in module.minor_seasons.all():
+            r_w, r_wo = FloodedRiceSeasonCalculator(season).calculate()
+            res_w += r_w
+            res_wo += r_wo
+
+        return (res_w, res_wo)
 
     def defaults(self) -> DefaultData:
         self.calculate()
