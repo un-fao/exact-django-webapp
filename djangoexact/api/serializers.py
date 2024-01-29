@@ -1175,7 +1175,7 @@ class WaterbodyWriteSerializer(LandModuleWriteSerializer):
     class Meta:
         model = Waterbody
         fields = "__all__"
-        ref_name = "Waterbodies"
+        ref_name = "Waterbody"
         mandatory_fields = ["waterbody_type", "trophic_type"]
 
     def validate(self, data):
@@ -1199,7 +1199,7 @@ class WaterbodyReadSerializer(LandModuleReadSerializer):
     class Meta:
         model = Waterbody
         fields = "__all__"
-        ref_name = "Waterbodies"
+        ref_name = "Waterbody"
 
 
 class ProjectInvitationModelSerializer(serializers.ModelSerializer):
@@ -1252,12 +1252,14 @@ class ForestManagementReadSerializer(LandModuleReadSerializer):
 
 class InputWriteSerializer(ModuleBaseSerializer):
     class Meta:
+        model = Input
         fields = "__all__"
         ref_name = "Input"
 
 
 class InputReadSerializer(ModuleBaseSerializer):
     class Meta:
+        model = Input
         fields = "__all__"
         ref_name = "Input"
 
