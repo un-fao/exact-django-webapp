@@ -1252,14 +1252,12 @@ class ForestManagementReadSerializer(LandModuleReadSerializer):
 
 class InputWriteSerializer(ModuleBaseSerializer):
     class Meta:
-        model = Input
         fields = "__all__"
         ref_name = "Input"
 
 
 class InputReadSerializer(ModuleBaseSerializer):
     class Meta:
-        model = Input
         fields = "__all__"
         ref_name = "Input"
 
