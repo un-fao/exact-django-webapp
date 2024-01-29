@@ -1083,45 +1083,6 @@ for i, row in enumerate(df_dict):
 
 
 
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "LivestockVSER.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers = df.columns.values.tolist()
-df_dict = df.to_dict("records")
-
-for i, row in enumerate(df_dict):
-    production_type = LivestockProductionType.objects.get_or_create(
-        name=sanitize(row["production_type"])
-    )[0]
-    region = IPCCRegion.objects.get_or_create(name=sanitize(row["ipcc_region"]))[0]
-
-    for j, header in enumerate(df_headers):
-        if j < 2:
-            continue
-
-        livestock_category = LivestockCategoryType.objects.get_or_create(
-            name=sanitize(df_headers[j + 2])
-        )[0]
-
-        print(
-            production_type,
-            livestock_category,
-            region,
-            row[df_headers[j + 2]],
-        )
-
-        LivestockVSER.objects.get_or_create(
-            livestock_production_type=production_type,
-            livestock_category_type=livestock_category,
-            ipcc_region=region,
-            value=parse_csv_number(row[df_headers[j + 2]]),
-        )
-
-        if j + 2 == len(df_headers) - 1:
-            break
 
 df2 = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "LivestockManureEF2.csv"),
@@ -1269,59 +1230,7 @@ for i, row in enumerate(df_dict):
             value=parse_csv_number(row[df_headers[j]]),
         )
 
-df2 = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "LivestockManureEF2.csv"),
-    header=0,
-    sep=";",
-)
 
-df_headers2 = df2.columns.values.tolist()
-df_dict2 = df2.to_dict("records")
-
-for i, row in enumerate(df_dict2):
-    emission_type = EmissionType.objects.get_or_create(
-        name=capitalize_all(row["emission_type"])
-    )[0]
-    livestock_category = LivestockCategoryType.objects.get_or_create(
-        name=capitalize_all(row["livestock_category_type"])
-    )[0]
-    livestock_production_type = LivestockProductionType.objects.get_or_create(
-        name=capitalize_all(row["livestock_production_type"])
-    )[0]
-    climate = Climate.objects.get_or_create(name=capitalize_all(row["climate"]))[0]
-    moisture = Moisture.objects.get_or_create(name=capitalize_all(row["moisture"]))[0]
-
-    for j, header in enumerate(df_headers2):
-        print(header)
-        if j < 4:
-            continue
-
-        manure_management_type = ManureManagementType.objects.get_or_create(
-            name=capitalize_all(df_headers2[j + 5])
-        )[0]
-
-        print(
-            emission_type,
-            livestock_category,
-            livestock_production_type,
-            climate,
-            moisture,
-            manure_management_type,
-            row[df_headers2[j + 5]],
-        )
-
-        LivestockManureEF.objects.get_or_create(
-            emission_type=emission_type,
-            livestock_category_type=livestock_category,
-            livestock_production_type=livestock_production_type,
-            climate=climate,
-            moisture=moisture,
-            manure_management_type=manure_management_type,
-            value=parse_csv_number(row[df_headers2[j + 5]]),
-        )
-
-        if j + 5 == len(df_headers2) - 1:
-            break
 
 
 
@@ -3461,7 +3370,6 @@ for i, row in df.iterrows():
         tillage_management_type=tillage_management_type,
         value=value,
     )
-"""
 
 LargeFisheryFUI.objects.all().delete()
 
@@ -3484,3 +3392,80 @@ for row in rows:
     fish_type = FishType.objects.get_or_create(name=capitalize_all(fish_type))[0]
 
     LargeFisheryFUI.objects.get_or_create(fish_type=fish_type, gear_type=gear_type, value=value)
+
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "LivestockVSER.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers = df.columns.values.tolist()
+df_dict = df.to_dict("records")
+
+for i, row in enumerate(df_dict):
+    production_type = LivestockProductionType.objects.get_or_create(name=sanitize(row["production_type"]))[0]
+    region = IPCCRegion.objects.get_or_create(name=sanitize(row["ipcc_region"]))[0]
+
+    for j, header in enumerate(df_headers):
+        livestock_category = LivestockCategoryType.objects.get_or_create(name=sanitize(df_headers[j + 2]))[0]
+
+        print(
+            production_type,
+            livestock_category,
+            region,
+            row[df_headers[j + 2]],
+        )
+
+        LivestockVSER.objects.get_or_create(
+            livestock_production_type=production_type,
+            livestock_category_type=livestock_category,
+            ipcc_region=region,
+            value=parse_csv_number(row[df_headers[j + 2]]),
+        )
+
+        if j + 2 == len(df_headers) - 1:
+            break
+"""
+
+df2 = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "LivestockManureEFN2O.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers2 = df2.columns.values.tolist()
+df_dict2 = df2.to_dict("records")
+
+for i, row in enumerate(df_dict2):
+    emission_type = EmissionType.objects.get_or_create(name=capitalize_all(row["emission_type"]))[0]
+    livestock_category = LivestockCategoryType.objects.get_or_create(name=capitalize_all(row["livestock_category_type"]))[0]
+    livestock_production_type = LivestockProductionType.objects.get_or_create(name=capitalize_all(row["livestock_production_type"]))[0]
+    climate = Climate.objects.get_or_create(name=capitalize_all(row["climate"]))[0]
+    moisture = Moisture.objects.get_or_create(name=capitalize_all(row["moisture"]))[0]
+
+    for j, header in enumerate(df_headers2):
+        manure_management_type = ManureManagementType.objects.get_or_create(name=capitalize_all(df_headers2[j + 5]))[0]
+
+        print(
+            emission_type,
+            livestock_category,
+            livestock_production_type,
+            climate,
+            moisture,
+            manure_management_type,
+            row[df_headers2[j + 5]],
+        )
+
+        LivestockManureEF.objects.get_or_create(
+            emission_type=emission_type,
+            livestock_category_type=livestock_category,
+            livestock_production_type=livestock_production_type,
+            climate=climate,
+            moisture=moisture,
+            manure_management_type=manure_management_type,
+            value=parse_csv_number(row[df_headers2[j + 5]]),
+        )
+
+        if j + 5 == len(df_headers2) - 1:
+            break

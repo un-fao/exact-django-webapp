@@ -898,6 +898,9 @@ class LivestockManureEF(Model):
     IPCC 2706:3010
     """
 
+    class Meta:
+        unique_together = ("emission_type", "livestock_production_type", "livestock_category_type", "climate", "moisture", "manure_management_type")
+
     emission_type = ForeignKey(EmissionType, on_delete=CASCADE)
     livestock_category_type = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
     livestock_production_type = ForeignKey("api.LivestockProductionType", on_delete=CASCADE)
