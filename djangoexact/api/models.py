@@ -1462,9 +1462,9 @@ class Electricity(Submodule):
 class Fuel(Submodule):
     parent = ForeignKey(Energy, on_delete=CASCADE, null=True, blank=True, related_name="fuels")
     fuel_type = ForeignKey(FuelType, on_delete=CASCADE, null=True, blank=True)
-    fuel_start = FloatField(null=True, blank=True)
-    fuel_w = FloatField(null=True, blank=True)
-    fuel_wo = FloatField(null=True, blank=True)
+    fuel_consumption_start = FloatField(null=True, blank=True)
+    fuel_consumption_w = FloatField(null=True, blank=True)
+    fuel_consumption_wo = FloatField(null=True, blank=True)
 
     ef_t2 = FloatField(null=True, blank=True)
     account_for_co2 = BooleanField(default=False)
