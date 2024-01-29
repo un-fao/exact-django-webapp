@@ -659,7 +659,6 @@ class MultiBiomassModule(DoubleBiomassModule):
 
 
 class OtherLandUse(Module):
-
     initial_land_use_type = ForeignKey(LandUseType, null=True, blank=True, on_delete=CASCADE, related_name="initial_land_use_type")
     final_land_use_type = ForeignKey(LandUseType, null=True, blank=True, on_delete=CASCADE, related_name="final_land_use_type")
 
@@ -741,7 +740,6 @@ class CropType(Model):
 
 
 class AnnualCropping(LandModule, SingleBiomassModule):
-
     tillage_management_type_start = ForeignKey(
         TillageManagementType,
         on_delete=CASCADE,
@@ -812,7 +810,6 @@ class AnnualCropping(LandModule, SingleBiomassModule):
 
 
 class PerennialCropping(LandModule, DoubleBiomassModule):
-
     tillage_management_type_start = ForeignKey(TillageManagementType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_tillage_management_type_start")
     tillage_management_type_w = ForeignKey(TillageManagementType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_tillage_management_type_w")
     tillage_management_type_wo = ForeignKey(TillageManagementType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_tillage_management_type_wo")
@@ -975,7 +972,6 @@ class MinorSeasonFloodedRice(Rice):
 
 
 class Grassland(LandModuleFixed, SingleBiomassModule):
-
     grassland_management_type_start = ForeignKey(GrasslandManagementType, on_delete=CASCADE, related_name="%(class)s_grassland_management_type_start", null=True)
     grassland_management_type_w = ForeignKey(GrasslandManagementType, on_delete=CASCADE, related_name="%(class)s_grassland_management_type_w", null=True)
     grassland_management_type_wo = ForeignKey(GrasslandManagementType, on_delete=CASCADE, related_name="%(class)s_grassland_management_type_wo", null=True)
@@ -1028,7 +1024,6 @@ class Grassland(LandModuleFixed, SingleBiomassModule):
 
 
 class Livestock(Module):
-
     livestock_category_type_start = ForeignKey(LivestockCategoryType, on_delete=CASCADE, null=True, blank=True)
     livestock_category_type_w = ForeignKey(LivestockCategoryType, on_delete=CASCADE, related_name="%(class)s_livestock_categories_w", null=True, blank=True)
     livestock_category_type_wo = ForeignKey(LivestockCategoryType, on_delete=CASCADE, related_name="%(class)s_livestock_categories_wo", null=True, blank=True)
@@ -1374,7 +1369,6 @@ class LargeFishery(Fishery):
 
 
 class Aquaculture(Module):
-
     # fish_type = ForeignKey(FishType, on_delete=CASCADE, null=True, blank=True)
 
     annual_production_start = FloatField(null=True, blank=True)
