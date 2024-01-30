@@ -1271,11 +1271,10 @@ class InputEntryWriteSerializer(serializers.ModelSerializer):
 
 
 class InputEntryReadSerializer(serializers.ModelSerializer):
-    module_type = get_model_serializer(ModuleType)(many=False, read_only=True)
+    module_type = serializers.SerializerMethodField()
 
-    def __init__(self, instance=None, data=..., **kwargs):
-        super().__init__(instance, data, **kwargs)
-        self.fields["module_type"].default = ModuleType.objects.get(class_name=self.Meta.ref_name)
+    def get_module_type(self, obj):
+        return get_model_serializer(ModuleType)(ModuleType.objects.get(class_name=obj.__class__.__name__), many=False).data
 
     class Meta:
         model = InputEntry
