@@ -762,7 +762,11 @@ def generic_module_viewset(model: Model):
                 logger.error(f"Error creating module: {module_serializer.errors}")
                 return Response(module_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-            activity = module_serializer.validated_data["activity"]
+            module_type = ModuleType.objects.get(class_name=model.__name__)
+            if module_type.is_submodule:
+                activity = module_serializer.validated_data["parent"].activity
+            else:
+                activity = module_serializer.validated_data["activity"]
 
             if not utils.has_project_permission("can_add_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to add this module to the project")
