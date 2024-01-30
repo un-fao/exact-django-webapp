@@ -763,6 +763,7 @@ def generic_module_viewset(model: Model):
                 return Response(module_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
             module_type = ModuleType.objects.get(class_name=model.__name__)
+
             if module_type.is_submodule:
                 activity = module_serializer.validated_data["parent"].activity
             else:
@@ -775,7 +776,6 @@ def generic_module_viewset(model: Model):
             module_serializer.save()
 
             read_serializer = get_module_serializer(model)(instance=module_serializer.instance)
-            read_serializer.is_valid()
 
             logging.debug(f"END GenericModuleViewSet[{model.__name__}].create")
 
@@ -806,7 +806,8 @@ def generic_module_viewset(model: Model):
             data = []
 
             for i, module in enumerate(modules):
-                data.append({**self.serializer_class(module).data})
+                serializer = get_module_serializer(model)(instance=module)
+                data.append({**serializer.data})
 
             return Response(data)
 
