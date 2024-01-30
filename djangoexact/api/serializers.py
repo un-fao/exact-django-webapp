@@ -531,8 +531,15 @@ class SubmoduleBaseSerializer(serializers.Serializer):
 
 
 class ModuleBaseSerializer(serializers.ModelSerializer):
+    module_type = get_model_serializer(ModuleType)(many=False, read_only=True)
+
     class Meta:
         mandatory_fields = []
+        extra_fields = ["module_type"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["module_type"].default = ModuleType.objects.get(class_name=self.Meta.ref_name)
 
     def validate(self, data):
         logging.debug(f"START ModuleBaseSerializer[{self.Meta.ref_name}].validate")
@@ -586,18 +593,9 @@ class LandModuleWriteSerializer(ModuleBaseSerializer):
 
 
 class LandModuleReadSerializer(ModuleBaseSerializer):
-    module_type = get_model_serializer(ModuleType)(many=False, read_only=True)
     activity = ActivitySerializer(many=False, read_only=True)
     land_use_change = get_model_serializer(LandUseChange)(many=False, read_only=True, required=False)
     status = get_model_serializer(StatusType)(many=False, read_only=True)
-
-    class Meta:
-        extra_fields = ["module_type"]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        print(self.Meta.ref_name)
-        self.fields["module_type"].default = ModuleType.objects.get(class_name=self.Meta.ref_name)
 
 
 # Grassland
