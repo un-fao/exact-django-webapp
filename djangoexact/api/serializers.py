@@ -8,6 +8,7 @@ from django.db.models import Model
 from ipcc.models import GlobalWarmingPotential
 from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
 from rest_framework import serializers
+from rest_framework.fields import empty
 
 from .models import (
     Activity,
@@ -1270,10 +1271,17 @@ class InputEntryWriteSerializer(serializers.ModelSerializer):
 
 
 class InputEntryReadSerializer(serializers.ModelSerializer):
+    module_type = get_model_serializer(ModuleType)(many=False, read_only=True)
+
+    def __init__(self, instance=None, data=..., **kwargs):
+        super().__init__(instance, data, **kwargs)
+        self.fields["module_type"].default = ModuleType.objects.get(class_name=self.Meta.ref_name)
+
     class Meta:
         model = InputEntry
         fields = "__all__"
         ref_name = "InputEntry"
+        extra_fields = ["module_type"]
 
 
 class DynamicResultSerializer(serializers.Serializer):
