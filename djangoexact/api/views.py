@@ -774,7 +774,8 @@ def generic_module_viewset(model: Model):
 
             module_serializer.save()
 
-            read_serializer = get_module_serializer(model)(module_serializer.instance)
+            read_serializer = get_module_serializer(model)(instance=module_serializer.instance)
+            read_serializer.is_valid()
 
             logging.debug(f"END GenericModuleViewSet[{model.__name__}].create")
 
