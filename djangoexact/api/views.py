@@ -594,6 +594,19 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         return Response(ActivitySerializer(activity).data, status=status.HTTP_200_OK)
 
+    @action(detail=True, methods=["post"])
+    @swagger_auto_schema(responses={404: "Project not found", 403: "Selected user does not have permission to copy the activity", 201: ActivitySerializer}, request_body=EmptySerializer)
+    def copy(self, request, pk=None):
+        activity = self.get_object()
+
+        if not utils.has_project_permission("view_activity", self.request.user, activity.project):
+            logging.error("Selected user does not have permission to copy the activity")
+            return utils.ErrorResponse("Selected user does not have permission to copy the activity", status=status.HTTP_403_FORBIDDEN)
+
+        new_activity = utils.copy_activity(activity)
+
+        return Response(data=ActivitySerializer(new_activity).data, status=status.HTTP_201_CREATED)
+
 
 class CommentThreadViewSet(viewsets.ModelViewSet):
     queryset = CommentThread.objects.all()

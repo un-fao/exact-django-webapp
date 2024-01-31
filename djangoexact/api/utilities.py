@@ -209,3 +209,35 @@ def copy_project(project):
                     submodule.save()
 
     return project
+
+
+def copy_activity(activity):
+    activity.pk = None
+    activity.name = f"{activity.name} copy {uuid.uuid4().hex[:6]}"
+    activity.save()
+
+    for module in find_modules(activity):
+        module.pk = None
+        module.activity = activity
+        module.save()
+
+        submodules = None
+
+        if module.__name__ == "FloodedRice":
+            submodules = module.minor_seasons.all()
+        elif module.__name__ == "Input":
+            submodules = module.input_entries.all()
+        elif module.__name__ == "Energy":
+            submodules = module.electricities.all()
+            submodules.extend(module.fuels.all())
+        elif module.__name__ == "Irrigaition":
+            submodules = module.irrigation_systems.all()
+            submodules.extend(module.irrigation_phases.all())
+
+        if submodules:
+            for submodule in submodules:
+                submodule.pk = None
+                submodule.parent = module
+                submodule.save()
+
+    return activity
