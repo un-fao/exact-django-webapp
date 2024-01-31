@@ -40,6 +40,7 @@ from .serializers import (
     CommentThreadSerializer,
     CountrySerializer,
     DynamicResultSerializer,
+    EmptySerializer,
     GroupSerializer,
     InputTypeSerializer,
     LandUseTypeSerializer,
@@ -271,6 +272,20 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             project.save()
 
         return super().partial_update(request, *args, **kwargs)
+
+    @action(detail=True, methods=["post"])
+    @swagger_auto_schema(responses={404: "Project not found", 403: "Selected user does not have permission to copy the project", 201: ReadProjectSerializer}, request_body=EmptySerializer)
+    def copy(self, request, pk=None):
+        project = self.get_object()
+
+        if not utils.has_project_permission("view_project", self.request.user, project):
+            logging.error("Selected user does not have permission to copy the project")
+            return utils.ErrorResponse("Selected user does not have permission to copy the project", status=status.HTTP_403_FORBIDDEN)
+
+        new_project = utils.copy_project(project)
+        UserProjectGroup.objects.create(user=self.request.user, project=new_project, group=Group.objects.get(name="Admin"))
+
+        return Response(data=ReadProjectSerializer(new_project).data, status=status.HTTP_201_CREATED)
 
 
 class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):

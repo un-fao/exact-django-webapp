@@ -1,4 +1,5 @@
 import re
+import uuid
 from enum import Enum
 
 from django.apps import apps
@@ -152,3 +153,59 @@ def has_project_permission(permission, user, project):
     can_access = membership and membership.group.permissions.filter(codename=permission).exists()
 
     return can_access
+
+
+def find_modules(activity):
+    """
+    Find all modules in a project.
+
+    Args:
+        project (Project): The project object.
+
+    Returns:
+        list: A list of all modules in the project.
+    """
+    modules = []
+    for module_type in activity.module_types.all():
+        module_attr = getattr(activity, module_type.class_name.lower(), None)
+        module = module_attr.first() if module_attr else None
+        if module:
+            modules.append(module)
+
+    return modules
+
+
+def copy_project(project):
+    project.pk = None
+    project.name = f"{project.name} copy {uuid.uuid4().hex[:6]}"
+    project.save()
+
+    for activity in project.activities.all():
+        activity.pk = None
+        activity.project = project
+        activity.save()
+        for module in find_modules(activity):
+            module.pk = None
+            module.activity = activity
+            module.save()
+
+            submodules = None
+
+            if module.__name__ == "FloodedRice":
+                submodules = module.minor_seasons.all()
+            elif module.__name__ == "Input":
+                submodules = module.input_entries.all()
+            elif module.__name__ == "Energy":
+                submodules = module.electricities.all()
+                submodules.extend(module.fuels.all())
+            elif module.__name__ == "Irrigaition":
+                submodules = module.irrigation_systems.all()
+                submodules.extend(module.irrigation_phases.all())
+
+            if submodules:
+                for submodule in submodules:
+                    submodule.pk = None
+                    submodule.parent = module
+                    submodule.save()
+
+    return project
