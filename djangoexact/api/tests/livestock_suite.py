@@ -87,17 +87,17 @@ for i, livestock in enumerate(livestock):
 
     print(f"livestock: {livestock}")
 
-    print(f"livestock_category_type_start: {livestock.livestock_category_type_start.name}")
-    print(f"livestock_category_type_wo: {livestock.livestock_category_type_wo.name}")
-    print(f"livestock_category_type_w: {livestock.livestock_category_type_w.name}")
+    print(f"livestock_category_type_start: {livestock.livestock_category_type.name}")
+    print(f"livestock_category_type_wo: {livestock.livestock_category_type.name}")
+    print(f"livestock_category_type_w: {livestock.livestock_category_type.name}")
 
     print(f"livestock_production_type_start: {livestock.livestock_production_type_start.name}")
     print(f"livestock_production_type_wo: {livestock.livestock_production_type_wo.name}")
     print(f"livestock_production_type_w: {livestock.livestock_production_type_w.name}")
 
-    sheet["I56"].value = livestock.livestock_category_type_start.name
-    sheet["I57"].value = livestock.livestock_category_type_wo.name
-    sheet["I58"].value = livestock.livestock_category_type_w.name
+    sheet["I56"].value = livestock.livestock_category_type.name
+    sheet["I57"].value = livestock.livestock_category_type.name
+    sheet["I58"].value = livestock.livestock_category_type.name
 
     sheet["K56"].value = livestock.livestock_production_type_start.name
     sheet["K57"].value = livestock.livestock_production_type_wo.name
