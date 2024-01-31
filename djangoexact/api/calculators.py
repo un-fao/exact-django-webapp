@@ -2897,7 +2897,7 @@ class LivestockCalculator(BaseCalculator):
         volatilization_multi = ipcc.ManureManagementVolatilizationMultiplier.objects.get(moisture=moisture)
 
         print("emission type", utils.EmissionTypes.CH4.value)
-        print("livestock category type", module.livestock_category_type_start)
+        print("livestock category type", module.livestock_category_type)
         print("livestock production type", module.livestock_production_type_start)
         print("climate", climate)
         print("moisture", moisture)
@@ -2907,41 +2907,41 @@ class LivestockCalculator(BaseCalculator):
         # TAM Values
         tam_ch4_start = ipcc.LivestockTAM.objects.get(
             livestock_production_type=module.livestock_production_type_start,
-            livestock_category_type=module.livestock_category_type_start,
+            livestock_category_type=module.livestock_category_type,
             ipcc_region=country.ipcc_region,
         )
         tam_ch4_w = ipcc.LivestockTAM.objects.get(
             livestock_production_type=module.livestock_production_type_w,
-            livestock_category_type=module.livestock_category_type_w,
+            livestock_category_type=module.livestock_category_type,
             ipcc_region=country.ipcc_region,
         )
         tam_ch4_wo = ipcc.LivestockTAM.objects.get(
             livestock_production_type=module.livestock_production_type_wo,
-            livestock_category_type=module.livestock_category_type_wo,
+            livestock_category_type=module.livestock_category_type,
             ipcc_region=country.ipcc_region,
         )
 
         # VSER Values
         vser_ch4_start = ipcc.LivestockVSER.objects.get(
             livestock_production_type=module.livestock_production_type_start,
-            livestock_category_type=module.livestock_category_type_start,
+            livestock_category_type=module.livestock_category_type,
             ipcc_region=country.ipcc_region,
         )
         vser_ch4_w = ipcc.LivestockVSER.objects.get(
             livestock_production_type=module.livestock_production_type_w,
-            livestock_category_type=module.livestock_category_type_w,
+            livestock_category_type=module.livestock_category_type,
             ipcc_region=country.ipcc_region,
         )
         vser_ch4_wo = ipcc.LivestockVSER.objects.get(
             livestock_production_type=module.livestock_production_type_wo,
-            livestock_category_type=module.livestock_category_type_wo,
+            livestock_category_type=module.livestock_category_type,
             ipcc_region=country.ipcc_region,
         )
 
         # EF CH4 PRP Values
         ef_ch4_prp_start = ipcc.LivestockManureEF.objects.get(
             emission_type__name=utils.EmissionTypes.CH4.value,
-            livestock_category_type=module.livestock_category_type_start,
+            livestock_category_type=module.livestock_category_type,
             livestock_production_type=module.livestock_production_type_start,
             climate=climate,
             moisture=moisture,
@@ -2950,7 +2950,7 @@ class LivestockCalculator(BaseCalculator):
 
         ef_ch4_prp_w = ipcc.LivestockManureEF.objects.get(
             emission_type__name=utils.EmissionTypes.CH4.value,
-            livestock_category_type=module.livestock_category_type_w,
+            livestock_category_type=module.livestock_category_type,
             livestock_production_type=module.livestock_production_type_w,
             climate=climate,
             moisture=moisture,
@@ -2959,7 +2959,7 @@ class LivestockCalculator(BaseCalculator):
 
         ef_ch4_prp_wo = ipcc.LivestockManureEF.objects.get(
             emission_type__name=utils.EmissionTypes.CH4.value,
-            livestock_category_type=module.livestock_category_type_wo,
+            livestock_category_type=module.livestock_category_type,
             livestock_production_type=module.livestock_production_type_wo,
             climate=climate,
             moisture=moisture,
@@ -2970,7 +2970,7 @@ class LivestockCalculator(BaseCalculator):
         ef_ch4_systems_start = (
             ipcc.LivestockManureEF.objects.filter(
                 emission_type__name=utils.EmissionTypes.CH4.value,
-                livestock_category_type=module.livestock_category_type_start,
+                livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_start,
                 climate=climate,
                 moisture=moisture,
@@ -2982,7 +2982,7 @@ class LivestockCalculator(BaseCalculator):
         ef_ch4_systems_w = (
             ipcc.LivestockManureEF.objects.filter(
                 emission_type__name=utils.EmissionTypes.CH4.value,
-                livestock_category_type=module.livestock_category_type_w,
+                livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_w,
                 climate=climate,
                 moisture=moisture,
@@ -2994,7 +2994,7 @@ class LivestockCalculator(BaseCalculator):
         ef_ch4_systems_wo = (
             ipcc.LivestockManureEF.objects.filter(
                 emission_type__name=utils.EmissionTypes.CH4.value,
-                livestock_category_type=module.livestock_category_type_wo,
+                livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_wo,
                 climate=climate,
                 moisture=moisture,
@@ -3009,21 +3009,21 @@ class LivestockCalculator(BaseCalculator):
 
         # Animal Waste PRP Values
         animal_waste_prp_start = ipcc.LivestockAnimalWasteManagementSystem.objects.get(
-            livestock_category_type=module.livestock_category_type_start,
+            livestock_category_type=module.livestock_category_type,
             livestock_production_type=module.livestock_production_type_start,
             ipcc_region=country.ipcc_region,
             manure_management_type__name=utils.ManureManagementTypes.PRP.value,
         )
 
         animal_waste_prp_w = ipcc.LivestockAnimalWasteManagementSystem.objects.get(
-            livestock_category_type=module.livestock_category_type_w,
+            livestock_category_type=module.livestock_category_type,
             livestock_production_type=module.livestock_production_type_w,
             ipcc_region=country.ipcc_region,
             manure_management_type__name=utils.ManureManagementTypes.PRP.value,
         )
 
         animal_waste_prp_wo = ipcc.LivestockAnimalWasteManagementSystem.objects.get(
-            livestock_category_type=module.livestock_category_type_wo,
+            livestock_category_type=module.livestock_category_type,
             livestock_production_type=module.livestock_production_type_wo,
             ipcc_region=country.ipcc_region,
             manure_management_type__name=utils.ManureManagementTypes.PRP.value,
@@ -3033,7 +3033,7 @@ class LivestockCalculator(BaseCalculator):
 
         animal_waste_management_systems_start = (
             ipcc.LivestockAnimalWasteManagementSystem.objects.filter(
-                livestock_category_type=module.livestock_category_type_start,
+                livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_start,
                 ipcc_region=country.ipcc_region,
             )
@@ -3043,7 +3043,7 @@ class LivestockCalculator(BaseCalculator):
 
         animal_waste_management_systems_w = (
             ipcc.LivestockAnimalWasteManagementSystem.objects.filter(
-                livestock_category_type=module.livestock_category_type_w,
+                livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_w,
                 ipcc_region=country.ipcc_region,
             )
@@ -3053,7 +3053,7 @@ class LivestockCalculator(BaseCalculator):
 
         animal_waste_management_systems_wo = (
             ipcc.LivestockAnimalWasteManagementSystem.objects.filter(
-                livestock_category_type=module.livestock_category_type_wo,
+                livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_wo,
                 ipcc_region=country.ipcc_region,
             )
@@ -3069,19 +3069,19 @@ class LivestockCalculator(BaseCalculator):
         ##### Enteric CH4 Values #####
 
         ch4_enteric_start = ipcc.MethaneEntericFermentationFactor.objects.get(
-            livestock_category_type=module.livestock_category_type_start,
+            livestock_category_type=module.livestock_category_type,
             livestock_production_type=module.livestock_production_type_start,
             ipcc_region=country.ipcc_region,
         )
 
         ch4_enteric_w = ipcc.MethaneEntericFermentationFactor.objects.get(
-            livestock_category_type=module.livestock_category_type_w,
+            livestock_category_type=module.livestock_category_type,
             livestock_production_type=module.livestock_production_type_w,
             ipcc_region=country.ipcc_region,
         )
 
         ch4_enteric_wo = ipcc.MethaneEntericFermentationFactor.objects.get(
-            livestock_category_type=module.livestock_category_type_wo,
+            livestock_category_type=module.livestock_category_type,
             livestock_production_type=module.livestock_production_type_wo,
             ipcc_region=country.ipcc_region,
         )
@@ -3090,7 +3090,7 @@ class LivestockCalculator(BaseCalculator):
 
         prp_n2o_direct_ef_start = ipcc.LivestockManureEF.objects.get(
             emission_type__name=utils.EmissionTypes.N2O.value,
-            livestock_category_type=module.livestock_category_type_start,
+            livestock_category_type=module.livestock_category_type,
             livestock_production_type=module.livestock_production_type_start,
             climate=climate,
             moisture=moisture,
@@ -3099,7 +3099,7 @@ class LivestockCalculator(BaseCalculator):
 
         prp_n2o_direct_ef_w = ipcc.LivestockManureEF.objects.get(
             emission_type__name=utils.EmissionTypes.N2O.value,
-            livestock_category_type=module.livestock_category_type_w,
+            livestock_category_type=module.livestock_category_type,
             livestock_production_type=module.livestock_production_type_w,
             climate=climate,
             moisture=moisture,
@@ -3108,7 +3108,7 @@ class LivestockCalculator(BaseCalculator):
 
         prp_n2o_direct_ef_wo = ipcc.LivestockManureEF.objects.get(
             emission_type__name=utils.EmissionTypes.N2O.value,
-            livestock_category_type=module.livestock_category_type_wo,
+            livestock_category_type=module.livestock_category_type,
             livestock_production_type=module.livestock_production_type_wo,
             climate=climate,
             moisture=moisture,
@@ -3119,7 +3119,7 @@ class LivestockCalculator(BaseCalculator):
 
         prp_n2o_volatilization_ef_start = ipcc.LivestockManureEF.objects.get(
             emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
-            livestock_category_type=module.livestock_category_type_start,
+            livestock_category_type=module.livestock_category_type,
             livestock_production_type=module.livestock_production_type_start,
             climate=climate,
             moisture=moisture,
@@ -3128,7 +3128,7 @@ class LivestockCalculator(BaseCalculator):
 
         prp_n2o_volatilization_ef_w = ipcc.LivestockManureEF.objects.get(
             emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
-            livestock_category_type=module.livestock_category_type_w,
+            livestock_category_type=module.livestock_category_type,
             livestock_production_type=module.livestock_production_type_w,
             climate=climate,
             moisture=moisture,
@@ -3137,7 +3137,7 @@ class LivestockCalculator(BaseCalculator):
 
         prp_n2o_volatilization_ef_wo = ipcc.LivestockManureEF.objects.get(
             emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
-            livestock_category_type=module.livestock_category_type_wo,
+            livestock_category_type=module.livestock_category_type,
             livestock_production_type=module.livestock_production_type_wo,
             climate=climate,
             moisture=moisture,
@@ -3148,7 +3148,7 @@ class LivestockCalculator(BaseCalculator):
 
         prp_n2o_leaching_ef_start = ipcc.LivestockManureEF.objects.get(
             emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
-            livestock_category_type=module.livestock_category_type_wo,
+            livestock_category_type=module.livestock_category_type,
             livestock_production_type=module.livestock_production_type_wo,
             climate=climate,
             moisture=moisture,
@@ -3157,7 +3157,7 @@ class LivestockCalculator(BaseCalculator):
 
         prp_n2o_leaching_ef_w = ipcc.LivestockManureEF.objects.get(
             emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
-            livestock_category_type=module.livestock_category_type_wo,
+            livestock_category_type=module.livestock_category_type,
             livestock_production_type=module.livestock_production_type_wo,
             climate=climate,
             moisture=moisture,
@@ -3166,7 +3166,7 @@ class LivestockCalculator(BaseCalculator):
 
         prp_n2o_leaching_ef_wo = ipcc.LivestockManureEF.objects.get(
             emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
-            livestock_category_type=module.livestock_category_type_wo,
+            livestock_category_type=module.livestock_category_type,
             livestock_production_type=module.livestock_production_type_wo,
             climate=climate,
             moisture=moisture,
@@ -3178,7 +3178,7 @@ class LivestockCalculator(BaseCalculator):
         ef_n2o_direct_systems_start = (
             ipcc.LivestockManureEF.objects.filter(
                 emission_type__name=utils.EmissionTypes.N2O.value,
-                livestock_category_type=module.livestock_category_type_start,
+                livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_start,
                 climate=climate,
                 moisture=moisture,
@@ -3190,7 +3190,7 @@ class LivestockCalculator(BaseCalculator):
         ef_n2o_direct_systems_w = (
             ipcc.LivestockManureEF.objects.filter(
                 emission_type__name=utils.EmissionTypes.N2O.value,
-                livestock_category_type=module.livestock_category_type_w,
+                livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_w,
                 climate=climate,
                 moisture=moisture,
@@ -3202,7 +3202,7 @@ class LivestockCalculator(BaseCalculator):
         ef_n2o_direct_systems_wo = (
             ipcc.LivestockManureEF.objects.filter(
                 emission_type__name=utils.EmissionTypes.N2O.value,
-                livestock_category_type=module.livestock_category_type_wo,
+                livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_wo,
                 climate=climate,
                 moisture=moisture,
@@ -3220,7 +3220,7 @@ class LivestockCalculator(BaseCalculator):
         ef_n2o_volatilization_systems_start = (
             ipcc.LivestockManureEF.objects.filter(
                 emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
-                livestock_category_type=module.livestock_category_type_start,
+                livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_start,
                 climate=climate,
                 moisture=moisture,
@@ -3232,7 +3232,7 @@ class LivestockCalculator(BaseCalculator):
         ef_n2o_volatilization_systems_w = (
             ipcc.LivestockManureEF.objects.filter(
                 emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
-                livestock_category_type=module.livestock_category_type_w,
+                livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_w,
                 climate=climate,
                 moisture=moisture,
@@ -3244,7 +3244,7 @@ class LivestockCalculator(BaseCalculator):
         ef_n2o_volatilization_systems_wo = (
             ipcc.LivestockManureEF.objects.filter(
                 emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
-                livestock_category_type=module.livestock_category_type_wo,
+                livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_wo,
                 climate=climate,
                 moisture=moisture,
@@ -3262,7 +3262,7 @@ class LivestockCalculator(BaseCalculator):
         ef_n2o_leaching_systems_start = (
             ipcc.LivestockManureEF.objects.filter(
                 emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
-                livestock_category_type=module.livestock_category_type_start,
+                livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_start,
                 climate=climate,
                 moisture=moisture,
@@ -3274,7 +3274,7 @@ class LivestockCalculator(BaseCalculator):
         ef_n2o_leaching_systems_w = (
             ipcc.LivestockManureEF.objects.filter(
                 emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
-                livestock_category_type=module.livestock_category_type_w,
+                livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_w,
                 climate=climate,
                 moisture=moisture,
@@ -3286,7 +3286,7 @@ class LivestockCalculator(BaseCalculator):
         ef_n2o_leaching_systems_wo = (
             ipcc.LivestockManureEF.objects.filter(
                 emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
-                livestock_category_type=module.livestock_category_type_wo,
+                livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_wo,
                 climate=climate,
                 moisture=moisture,
@@ -3302,19 +3302,19 @@ class LivestockCalculator(BaseCalculator):
         ##### NER Values #####
 
         ner_start = ipcc.LivestockNER.objects.get(
-            livestock_category_type=module.livestock_category_type_start,
+            livestock_category_type=module.livestock_category_type,
             livestock_production_type=module.livestock_production_type_start,
             ipcc_region=project.country.ipcc_region,
         )
 
         ner_w = ipcc.LivestockNER.objects.get(
-            livestock_category_type=module.livestock_category_type_w,
+            livestock_category_type=module.livestock_category_type,
             livestock_production_type=module.livestock_production_type_w,
             ipcc_region=project.country.ipcc_region,
         )
 
         ner_wo = ipcc.LivestockNER.objects.get(
-            livestock_category_type=module.livestock_category_type_wo,
+            livestock_category_type=module.livestock_category_type,
             livestock_production_type=module.livestock_production_type_wo,
             ipcc_region=project.country.ipcc_region,
         )
@@ -3328,7 +3328,7 @@ class LivestockCalculator(BaseCalculator):
         if module.complementary_manure_management_type_start is not None:
             n2o_ef_t2_start = ipcc.LivestockManureEF.objects.get(
                 emission_type__name=utils.EmissionTypes.N2O.value,
-                livestock_category_type=module.livestock_category_type_start,
+                livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_start,
                 climate=climate,
                 moisture=moisture,
@@ -3339,7 +3339,7 @@ class LivestockCalculator(BaseCalculator):
 
             n2o_volatilization_ef_t2_start = ipcc.LivestockManureEF.objects.get(
                 emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
-                livestock_category_type=module.livestock_category_type_start,
+                livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_start,
                 climate=climate,
                 moisture=moisture,
@@ -3350,7 +3350,7 @@ class LivestockCalculator(BaseCalculator):
 
             n2o_leaching_ef_t2_start = ipcc.LivestockManureEF.objects.get(
                 emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
-                livestock_category_type=module.livestock_category_type_start,
+                livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_start,
                 climate=climate,
                 moisture=moisture,
@@ -3361,7 +3361,7 @@ class LivestockCalculator(BaseCalculator):
 
             ch4_ef_t2_start = ipcc.LivestockManureEF.objects.get(
                 emission_type__name=utils.EmissionTypes.CH4.value,
-                livestock_category_type=module.livestock_category_type_start,
+                livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_start,
                 climate=climate,
                 moisture=moisture,
@@ -3377,7 +3377,7 @@ class LivestockCalculator(BaseCalculator):
         if module.complementary_manure_management_type_w is not None:
             n2o_ef_t2_w = ipcc.LivestockManureEF.objects.get(
                 emission_type__name=utils.EmissionTypes.N2O.value,
-                livestock_category_type=module.livestock_category_type_w,
+                livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_w,
                 climate=climate,
                 moisture=moisture,
@@ -3388,7 +3388,7 @@ class LivestockCalculator(BaseCalculator):
 
             n2o_volatilization_ef_t2_w = ipcc.LivestockManureEF.objects.get(
                 emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
-                livestock_category_type=module.livestock_category_type_w,
+                livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_w,
                 climate=climate,
                 moisture=moisture,
@@ -3399,7 +3399,7 @@ class LivestockCalculator(BaseCalculator):
 
             n2o_leaching_ef_t2_w = ipcc.LivestockManureEF.objects.get(
                 emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
-                livestock_category_type=module.livestock_category_type_w,
+                livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_w,
                 climate=climate,
                 moisture=moisture,
@@ -3410,7 +3410,7 @@ class LivestockCalculator(BaseCalculator):
 
             ch4_ef_t2_w = ipcc.LivestockManureEF.objects.get(
                 emission_type__name=utils.EmissionTypes.CH4.value,
-                livestock_category_type=module.livestock_category_type_w,
+                livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_w,
                 climate=climate,
                 moisture=moisture,
@@ -3426,7 +3426,7 @@ class LivestockCalculator(BaseCalculator):
         if module.complementary_manure_management_type_wo is not None:
             n2o_ef_t2_wo = ipcc.LivestockManureEF.objects.get(
                 emission_type__name=utils.EmissionTypes.N2O.value,
-                livestock_category_type=module.livestock_category_type_wo,
+                livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_wo,
                 climate=climate,
                 moisture=moisture,
@@ -3437,7 +3437,7 @@ class LivestockCalculator(BaseCalculator):
 
             n2o_volatilization_ef_t2_wo = ipcc.LivestockManureEF.objects.get(
                 emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
-                livestock_category_type=module.livestock_category_type_wo,
+                livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_wo,
                 climate=climate,
                 moisture=moisture,
@@ -3448,7 +3448,7 @@ class LivestockCalculator(BaseCalculator):
 
             n2o_leaching_ef_t2_wo = ipcc.LivestockManureEF.objects.get(
                 emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
-                livestock_category_type=module.livestock_category_type_wo,
+                livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_wo,
                 climate=climate,
                 moisture=moisture,
@@ -3459,7 +3459,7 @@ class LivestockCalculator(BaseCalculator):
 
             ch4_ef_t2_wo = ipcc.LivestockManureEF.objects.get(
                 emission_type__name=utils.EmissionTypes.CH4.value,
-                livestock_category_type=module.livestock_category_type_wo,
+                livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_wo,
                 climate=climate,
                 moisture=moisture,
