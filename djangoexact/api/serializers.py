@@ -54,6 +54,10 @@ from .models import (
 )
 
 
+class EmptySerializer(serializers.Serializer):
+    pass
+
+
 class ActionTypes(Enum):
     CREATE = "CREATE"
     UPDATE = "UPDATE"
