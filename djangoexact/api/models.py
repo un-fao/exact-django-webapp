@@ -1024,9 +1024,7 @@ class Grassland(LandModuleFixed, SingleBiomassModule):
 
 
 class Livestock(Module):
-    livestock_category_type_start = ForeignKey(LivestockCategoryType, on_delete=CASCADE, null=True, blank=True)
-    livestock_category_type_w = ForeignKey(LivestockCategoryType, on_delete=CASCADE, related_name="%(class)s_livestock_categories_w", null=True, blank=True)
-    livestock_category_type_wo = ForeignKey(LivestockCategoryType, on_delete=CASCADE, related_name="%(class)s_livestock_categories_wo", null=True, blank=True)
+    livestock_category_type = ForeignKey(LivestockCategoryType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_livestock_category_type")
     livestock_category_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_livestock_categories_thread", on_delete=SET_NULL)
 
     livestock_production_type_start = ForeignKey(LivestockProductionType, on_delete=CASCADE, null=True, blank=True)
