@@ -37,6 +37,8 @@ from .models import (
     LargeFishery,
     Livestock,
     MacroInputType,
+    MinorSeasonFloodedRice,
+    MinorSeasonPerennialCropping,
     ModuleType,
     Moisture,
     OrganicSoil,
@@ -530,7 +532,7 @@ class LandUseTypeSerializer(serializers.ModelSerializer):
         ref_name = "LandUseType"
 
 
-class SubmoduleBaseSerializer(serializers.Serializer):
+class SubmoduleBaseSerializer(serializers.ModelSerializer):
     class Meta:
         mandatory_fields = []
 
@@ -680,6 +682,38 @@ class AnnualCroppingReadSerializer(LandModuleReadSerializer):
 # Perennial Cropping
 
 
+class MinorSeasonPerennialCroppingWriteSerializer(SubmoduleBaseSerializer):
+    class Meta:
+        model = MinorSeasonPerennialCropping
+        fields = "__all__"
+        ref_name = "MinorSeasonPerennialCropping"
+        mandatory_fields = [
+            "land_use_type",
+            "tillage_management_type",
+            "organic_input_type",
+        ]
+
+    def validate(self, data):
+        mandatory_fields = []
+
+        lut_scenarios = get_filled_scenarios(data, ["land_use_type"])
+
+        for scenario in lut_scenarios:
+            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
+
+        if not are_fields_filled(data, mandatory_fields):
+            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
+
+        return super().validate(data)
+
+
+class MinorSeasonPerennialCroppingReadSerializer(SubmoduleBaseSerializer):
+    class Meta:
+        model = MinorSeasonPerennialCropping
+        fields = "__all__"
+        ref_name = "MinorSeasonPerennialCropping"
+
+
 class PerennialCroppingWriteSerializer(LandModuleWriteSerializer):
     class Meta:
         model = PerennialCropping
@@ -706,10 +740,13 @@ class PerennialCroppingWriteSerializer(LandModuleWriteSerializer):
 
 
 class PerennialCroppingReadSerializer(LandModuleReadSerializer):
+    minor_seasons = MinorSeasonPerennialCroppingReadSerializer(many=True, read_only=True)
+
     class Meta:
         model = PerennialCropping
         fields = "__all__"
         ref_name = "PerennialCropping"
+        extra_fields = ["minor_seasons"]
 
 
 # Land Use Change
@@ -765,6 +802,44 @@ class OrganicSoilReadSerializer(LandModuleReadSerializer):
 # Flooded Rice
 
 
+class MinorSeasonFloodedRiceWriteSerializer(SubmoduleBaseSerializer):
+    class Meta:
+        model = MinorSeasonFloodedRice
+        fields = "__all__"
+        ref_name = "MinorSeasonFloodedRice"
+        mandatory_fields = [
+            "water_management_type_before_cultivation",
+            "water_management_type_after_cultivation",
+            "organic_amendment_type",
+        ]
+
+    def validate(self, data):
+        mandatory_fields = []
+
+        water_mgmt_before_scenarios = get_filled_scenarios(data, ["water_management_type_before_cultivation"])
+        water_mgmt_after_scenarios = get_filled_scenarios(data, ["water_management_type_after_cultivation"])
+        organic_amendment_scenarios = get_filled_scenarios(data, ["organic_amendment_type"])
+
+        for scenario in water_mgmt_before_scenarios:
+            mandatory_fields += generate_fields_for_scenario(scenario, ["water_management_type_before_cultivation"])
+        for scenario in water_mgmt_after_scenarios:
+            mandatory_fields += generate_fields_for_scenario(scenario, ["water_management_type_after_cultivation"])
+        for scenario in organic_amendment_scenarios:
+            mandatory_fields += generate_fields_for_scenario(scenario, ["organic_amendment_type"])
+
+        if not are_fields_filled(data, mandatory_fields):
+            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
+
+        return super().validate(data)
+
+
+class MinorSeasonFloodedRiceReadSerializer(SubmoduleBaseSerializer):
+    class Meta:
+        model = MinorSeasonFloodedRice
+        fields = "__all__"
+        ref_name = "MinorSeasonFloodedRice"
+
+
 class FloodedRiceWriteSerializer(LandModuleWriteSerializer):
     class Meta:
         model = FloodedRice
@@ -798,16 +873,26 @@ class FloodedRiceWriteSerializer(LandModuleWriteSerializer):
         minor_seasons = data.get("minor_seasons", None)
 
         if minor_seasons:
+            if minor_seasons.count() > 4:
+                raise serializers.ValidationError(f"Minor seasons cannot be more than 4")
+
             for season in minor_seasons:
                 cultivation_days += season.get("cultivation_days", 0)
 
         if cultivation_days > 365:
             raise serializers.ValidationError(f"Cultivation days cannot be greater than 365 (one year)")
 
-        if minor_seasons.count() > 4:
-            raise serializers.ValidationError(f"Minor seasons cannot be more than 4")
-
         return super().validate(data)
+
+
+class FloodedRiceReadSerializer(LandModuleReadSerializer):
+    minor_seasons = MinorSeasonFloodedRiceReadSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = FloodedRice
+        fields = "__all__"
+        ref_name = "FloodedRice"
+        extra_fields = ["minor_seasons"]
 
 
 # Building

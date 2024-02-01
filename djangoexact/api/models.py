@@ -702,6 +702,32 @@ class LandModule(Module):
         abstract = True
 
 
+class LandSubmodule(Submodule):
+    land_use_change = OneToOneField("api.LandUseChange", on_delete=CASCADE, null=True, blank=True, related_name="%(class)s")
+
+    area = FloatField(null=True, blank=True)
+
+    land_use_type_start = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_start")
+    land_use_type_w = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_w")
+    land_use_type_wo = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_wo")
+    land_use_type_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_thread")
+
+    flu_t2_start = FloatField(null=True, blank=True)
+    flu_t2_w = FloatField(null=True, blank=True)
+    flu_t2_wo = FloatField(null=True, blank=True)
+
+    fi_t2_start = FloatField(null=True, blank=True)
+    fi_t2_w = FloatField(null=True, blank=True)
+    fi_t2_wo = FloatField(null=True, blank=True)
+
+    fmg_t2_start = FloatField(null=True, blank=True)
+    fmg_t2_w = FloatField(null=True, blank=True)
+    fmg_t2_wo = FloatField(null=True, blank=True)
+
+    class Meta:
+        abstract = True
+
+
 class LandModuleNoScenarios(Module):
     land_use_change = OneToOneField("api.LandUseChange", on_delete=CASCADE, null=True, blank=True, related_name="%(class)s")
 
@@ -809,7 +835,10 @@ class AnnualCropping(LandModule, SingleBiomassModule):
     soc_ref_t2_wo = FloatField(null=True, blank=True)
 
 
-class PerennialCropping(LandModule, DoubleBiomassModule):
+class PerennialCrop(Model):
+    class Meta:
+        abstract = True
+
     tillage_management_type_start = ForeignKey(TillageManagementType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_tillage_management_type_start")
     tillage_management_type_w = ForeignKey(TillageManagementType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_tillage_management_type_w")
     tillage_management_type_wo = ForeignKey(TillageManagementType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_tillage_management_type_wo")
@@ -882,14 +911,22 @@ class PerennialCropping(LandModule, DoubleBiomassModule):
 
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:
-            self.land_use_type_start = LandUseType.objects.get(name="Agroforestry")
+            self.land_use_type_start = LandUseType.objects.get(name="Agroforestry - Default")
             self.land_use_type_w = self.land_use_type_start
             self.land_use_type_wo = self.land_use_type_start
 
         super().save(*args, **kwargs)
 
 
-class Rice(Module):
+class PerennialCropping(PerennialCrop, LandModule, DoubleBiomassModule):
+    pass
+
+
+class MinorSeasonPerennialCropping(PerennialCrop, LandSubmodule):
+    parent = ForeignKey(PerennialCropping, on_delete=CASCADE, related_name="minor_seasons", null=True, blank=True)
+
+
+class Rice(Model):
     class Meta:
         abstract = True
 
@@ -953,8 +990,6 @@ class Rice(Module):
     rice_straw_t2_w = FloatField(null=True, blank=True)
     rice_straw_t2_wo = FloatField(null=True, blank=True)
 
-
-class FloodedRice(Rice, LandModuleFixed, SingleBiomassModule):
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:
             self.land_use_type_start = LandUseType.objects.get(name="Flooded Rice")
@@ -964,7 +999,11 @@ class FloodedRice(Rice, LandModuleFixed, SingleBiomassModule):
         super().save(*args, **kwargs)
 
 
-class MinorSeasonFloodedRice(Rice):
+class FloodedRice(Rice, LandModuleFixed, SingleBiomassModule):
+    pass
+
+
+class MinorSeasonFloodedRice(Rice, LandSubmodule):
     parent = ForeignKey(FloodedRice, on_delete=CASCADE, related_name="minor_seasons", null=True, blank=True)
 
 
