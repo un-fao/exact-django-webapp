@@ -23,6 +23,7 @@ class ActivityTypes(Enum):
     DEADWOOD = "Deadwood"
     ROTATION = "Rotation"
     DISTURBANCE = "Disturbance"
+    LOGGING = "Logging"
     CH4_EMITTED_RICE = "CH4 Emitted Rice"
     STRAW_BURNING = "Straw Burning"
     IRRIGATION_OPERATIONAL = "Operational Phase of Irrigation"
