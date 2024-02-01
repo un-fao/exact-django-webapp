@@ -1182,11 +1182,7 @@ class AnnualCroppingCalculator(BaseCalculator):
         return DefaultData(defaults_start, defaults_w, defaults_wo)
 
 
-class PerennialCroppingCalculator(BaseCalculator):
-    """
-    Calculator for perennial cropping.
-    """
-
+class PerennialCropCalculator(BaseCalculator):
     def calculate(self, aggregate_by=BreakdownTypes.TOTAL) -> list[Result]:
         """
         Calculate emissions for a single PerennialCropping module.
@@ -1437,6 +1433,28 @@ class PerennialCroppingCalculator(BaseCalculator):
         results_tuple = (results_w + results_start_w, results_wo + results_start_wo)
 
         return results_tuple
+
+
+class PerennialCroppingCalculator(BaseCalculator):
+    """
+    Calculator for perennial cropping.
+    """
+
+    def calculate(self):
+        module: PerennialCropping = self.data
+
+        res_w = MathResult(input.activity.project.implementation_years, input.activity.project.capitalization_years)
+        res_wo = MathResult(input.activity.project.implementation_years, input.activity.project.capitalization_years)
+
+        r_w, r_wo = PerennialCropCalculator(module).calculate()
+
+        for season in module.minor_seasons.all():
+            r_w, r_wo = PerennialCropCalculator(season).calculate()
+
+            res_w += r_w
+            res_wo += r_wo
+
+        return (res_w, res_wo)
 
     def defaults(self) -> DefaultData:
         self.calculate()
