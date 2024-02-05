@@ -737,8 +737,11 @@ def generic_module_viewset(model: Model):
             """
 
             module: Module = self.get_object()
+            module_type = ModuleType.objects.get(class_name=model.__name__)
 
-            if not utils.has_project_permission("can_change_modules", self.request.user, module.activity.project):
+            activity = module.parent.activity if module_type.is_submodule else module.activity
+
+            if not utils.has_project_permission("can_change_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to update this module in the project")
                 return utils.ErrorResponse("Selected user does not have permission to update this module in the project", status=status.HTTP_403_FORBIDDEN)
 
@@ -759,8 +762,11 @@ def generic_module_viewset(model: Model):
             """
 
             module: Module = self.get_object()
+            module_type = ModuleType.objects.get(class_name=model.__name__)
 
-            if not utils.has_project_permission("can_change_modules", self.request.user, module.activity.project):
+            activity = module.parent.activity if module_type.is_submodule else module.activity
+
+            if not utils.has_project_permission("can_change_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to update this module in the project")
                 return utils.ErrorResponse("Selected user does not have permission to update this module in the project", status=status.HTTP_403_FORBIDDEN)
 
@@ -849,7 +855,9 @@ def generic_module_viewset(model: Model):
             module: Module = get_object_or_404(model, pk=pk)
             module_type = ModuleType.objects.get(class_name=model.__name__)
 
-            if not utils.has_project_permission("can_view_modules", self.request.user, module.activity.project):
+            activity = module.parent.activity if module_type.is_submodule else module.activity
+
+            if not utils.has_project_permission("can_view_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to view this module in the project")
                 return utils.ErrorResponse("Selected user does not have permission to view this module in the project", status=status.HTTP_403_FORBIDDEN)
 
@@ -891,8 +899,11 @@ def generic_module_viewset(model: Model):
             """
 
             module: Module = get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
+            module_type = ModuleType.objects.get(class_name=model.__name__)
 
-            if not utils.has_project_permission("can_view_modules", self.request.user, module.activity.project):
+            activity = module.parent.activity if module_type.is_submodule else module.activity
+
+            if not utils.has_project_permission("can_view_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to view this module in the project")
                 return utils.ErrorResponse("Selected user does not have permission to view this module in the project", status=status.HTTP_403_FORBIDDEN)
 
