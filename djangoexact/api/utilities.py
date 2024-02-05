@@ -1,3 +1,4 @@
+import copy
 import re
 import uuid
 from enum import Enum
@@ -176,68 +177,70 @@ def find_modules(activity):
 
 
 def copy_project(project):
-    project.pk = None
-    project.name = f"{project.name} copy {uuid.uuid4().hex[:6]}"
-    project.save()
+    project_copy = copy.deepcopy(project)
+    project_copy.pk = None
+    project_copy.name = f"{project_copy.name} copy {uuid.uuid4().hex[:6]}"
+    project_copy._state.adding = True
+    project_copy.save()
 
     for activity in project.activities.all():
-        activity.pk = None
-        activity.project = project
-        activity.save()
-        for module in find_modules(activity):
-            module.pk = None
-            module.activity = activity
-            module.save()
+        copy_activity(activity, project_copy)
 
-            submodules = None
-
-            if module.__name__ == "FloodedRice":
-                submodules = module.minor_seasons.all()
-            elif module.__name__ == "Input":
-                submodules = module.input_entries.all()
-            elif module.__name__ == "Energy":
-                submodules = module.electricities.all()
-                submodules.extend(module.fuels.all())
-            elif module.__name__ == "Irrigaition":
-                submodules = module.irrigation_systems.all()
-                submodules.extend(module.irrigation_phases.all())
-
-            if submodules:
-                for submodule in submodules:
-                    submodule.pk = None
-                    submodule.parent = module
-                    submodule.save()
-
-    return project
+    return project_copy
 
 
-def copy_activity(activity):
-    activity.pk = None
-    activity.name = f"{activity.name} copy {uuid.uuid4().hex[:6]}"
-    activity.save()
+def copy_activity(activity, new_project=None):
+    activity_copy = copy.deepcopy(activity)
+    activity_copy.pk = None
+    if new_project:
+        activity_copy.project = new_project
+    activity_copy._state.adding = True
+    activity_copy.save()
+
+    activity_copy.module_types.add(*activity.module_types.all())
+    activity_copy.save()
+
+    luc_copy = None
 
     for module in find_modules(activity):
-        module.pk = None
-        module.activity = activity
-        module.save()
+        module_copy = copy.deepcopy(module)
+        module_copy.pk = None
+        module_copy.activity = activity_copy
+        module_copy._state.adding = True
+        module_copy.land_use_change = None
+        module_copy.save()
+
+        has_luc = getattr(module, "land_use_change", None)
+
+        if has_luc:
+            if not luc_copy:
+                luc_copy = copy.deepcopy(module.land_use_change)
+                luc_copy.pk = None
+                luc_copy.activity = activity_copy
+                luc_copy._state.adding = True
+                luc_copy.save()
+
+            module_copy.land_use_change = luc_copy
+            module_copy.save()
 
         submodules = None
 
-        if module.__name__ == "FloodedRice":
+        if module.__class__.__name__ == "FloodedRice":
             submodules = module.minor_seasons.all()
-        elif module.__name__ == "Input":
+        elif module.__class__.__name__ == "Input":
             submodules = module.input_entries.all()
-        elif module.__name__ == "Energy":
+        elif module.__class__.__name__ == "Energy":
             submodules = module.electricities.all()
             submodules.extend(module.fuels.all())
-        elif module.__name__ == "Irrigaition":
+        elif module.__class__.__name__ == "Irrigaition":
             submodules = module.irrigation_systems.all()
             submodules.extend(module.irrigation_phases.all())
 
         if submodules:
             for submodule in submodules:
                 submodule.pk = None
-                submodule.parent = module
+                submodule.parent = module_copy
+                submodule._state.adding = True
                 submodule.save()
 
     return activity
