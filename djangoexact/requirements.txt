@@ -50,3 +50,4 @@ uritemplate==4.1.1
 urllib3==2.0.2
 django-simple-history==3.4.0
 django-archive==0.2.0
+matplotlib==3.8.2
