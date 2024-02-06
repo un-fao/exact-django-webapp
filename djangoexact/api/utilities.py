@@ -192,6 +192,7 @@ def copy_project(project):
 def copy_activity(activity, new_project=None):
     activity_copy = copy.deepcopy(activity)
     activity_copy.pk = None
+    activity_copy.name = f"{activity_copy.name} copy {uuid.uuid4().hex[:6]}"
     if new_project:
         activity_copy.project = new_project
     activity_copy._state.adding = True
