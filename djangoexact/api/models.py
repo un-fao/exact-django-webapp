@@ -1210,7 +1210,7 @@ class ForestManagement(LandModule, MultiBiomassModule):
     #         self.land_use_type_wo = self.land_use_type_start
 
 
-class DisturbanceType(Module):
+class DisturbanceType(Model):
     name = CharField(max_length=255)
 
     def __str__(self):
@@ -1218,7 +1218,7 @@ class DisturbanceType(Module):
 
 
 class ForestDisturbance(Model):
-    forest_management = ForeignKey(ForestManagement, on_delete=CASCADE)
+    forest_management = ForeignKey(ForestManagement, on_delete=CASCADE, related_name="disturbances")
 
     disturbance_type = ForeignKey(DisturbanceType, on_delete=CASCADE)
     disturbance_type_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_disturbance_type_thread")
