@@ -147,8 +147,14 @@ class AnnualCropland(BaseModule):
         self.f_mg_end_tier_2_default = self.fmg_end
         self.f_i_start_tier_2_default = self.fi_start
         self.f_i_end_tier_2_default = self.fi_end
-        self.ag_residue_main_tier_2_default = yield_value_main * self.n_estimation_slope_main + self.n_estimation_intercept_main
-        self.ag_residue_minor_tier_2_default = yield_value_minor * self.n_estimation_slope_minor + self.n_estimation_intercept_minor
+
+        self.residue_main_tier_2_default = None
+        self.ag_residue_minor_tier_2_default = None
+
+        if yield_value_main:
+            self.ag_residue_main_tier_2_default = yield_value_main * self.n_estimation_slope_main + self.n_estimation_intercept_main
+        if yield_value_minor:
+            self.ag_residue_minor_tier_2_default = yield_value_minor * self.n_estimation_slope_minor + self.n_estimation_intercept_minor
 
         # RESULTS
         self.emissions_soil_yearly = []
