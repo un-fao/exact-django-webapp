@@ -345,6 +345,7 @@ class ForestManagement:
         self.deadwood_20_years = deadwood_20_years_default if not deadwood_20_years_tier_2 else deadwood_20_years_tier_2
 
         self.socref = socref_default if not soc_tier_2 else soc_tier_2
+        self.soc_tier_2 = soc_tier_2
         self.f_lu_tier_2 = f_lu_tier_2
         self.f_i_tier_2 = f_i_tier_2
         self.f_mg_tier_2 = f_mg_tier_2
@@ -530,8 +531,8 @@ class ForestManagement:
 
         def calculate_litter():
             try:
-                litter_matrix, delta_litter_matrix = create_agb_matrix(self.years_impl, self.years_cap, self.litter_20_years / 20, 0, self.litter_20_years, 0, self.hectares_start, self.hectares_end)
-                self.yearly_litter_emissions = [x * -44 / 12 for x in multiply_matrix_by_matrix(delta_litter_matrix, self.hectares_matrix)]
+                litter_matrix, delta_litter_matrix = create_agb_matrix(self.years_impl, self.years_cap, self.litter_20_years/20, self.litter_20_years/20, 0)
+                self.yearly_litter_emissions = [x * -44/12 for x in multiply_matrix_by_matrix(delta_litter_matrix, self.hectares_matrix)]
                 self.total_litter_emissions = sum(self.yearly_litter_emissions)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in self.yearly_litter_emissions], activity=ActivityTypes.LITTER))
@@ -542,8 +543,8 @@ class ForestManagement:
 
         def calculate_deadwood():
             try:
-                deadwood_matrix, delta_deadwood_matrix = create_agb_matrix(self.years_impl, self.years_cap, self.deadwood_20_years / 20, 0, self.deadwood_20_years, 0, self.hectares_start, self.hectares_end)
-                self.yearly_deadwood_emissions = [x * -44 / 12 for x in multiply_matrix_by_matrix(delta_deadwood_matrix, self.hectares_matrix)]
+                deadwood_matrix, delta_deadwood_matrix = create_agb_matrix(self.years_impl, self.years_cap, self.deadwood_20_years/20, self.deadwood_20_years/20, 0)
+                self.yearly_deadwood_emissions = [x * -44/12 for x in multiply_matrix_by_matrix(delta_deadwood_matrix, self.hectares_matrix)]
                 self.total_deadwood_emissions = sum(self.yearly_deadwood_emissions)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in self.yearly_deadwood_emissions], activity=ActivityTypes.DEADWOOD))
