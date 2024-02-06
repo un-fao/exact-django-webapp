@@ -1,17 +1,8 @@
 from django.contrib import admin
+
 from .models import *
 
-for model in [
-    model
-    for model in dir()
-    if not model.startswith("_")
-    and not model.startswith("PerennialAGB")
-    and not model.startswith("PerennialBGB")
-    and not model.startswith("AfforestationFLU")
-    and not model.startswith("LivestockTAM")
-    and not model.startswith("LivestockVSER")
-    and not model.startswith("LivestockManureEF")
-]:
+for model in [model for model in dir() if not model.startswith("_") and not model.startswith("ForestManagementAGB") and not model.startswith("PerennialAGB") and not model.startswith("PerennialBGB") and not model.startswith("AfforestationFLU") and not model.startswith("LivestockTAM") and not model.startswith("LivestockVSER") and not model.startswith("LivestockManureEF")]:
     try:
         admin.site.register(eval(model))
     except:
@@ -53,6 +44,33 @@ class LivestockTAMAdmin(admin.ModelAdmin):
         "livestock_production_type__name",
         "livestock_category_type__name",
         "ipcc_region__name",
+    ]
+
+
+class ForestManagementAGBAdmin(admin.ModelAdmin):
+    list_display = [
+        "land_use_type",
+        "continent",
+        "forest_type",
+        "forest_condition_type",
+        "agb_min",
+        "agb_max",
+        "agb_growth_min",
+        "agb_growth_max",
+    ]
+
+    list_select_related = [
+        "land_use_type",
+        "continent",
+        "forest_type",
+        "forest_condition_type",
+    ]
+
+    search_fields = [
+        "land_use_type__name",
+        "continent__name",
+        "forest_type__name",
+        "forest_condition_type__name",
     ]
 
 
@@ -116,3 +134,4 @@ admin.site.register(AfforestationFLU, AfforestationFLUAdmin)
 admin.site.register(LivestockTAM, LivestockTAMAdmin)
 admin.site.register(LivestockVSER, LivestockVSERAdmin)
 admin.site.register(LivestockManureEF, LivestockManureEFAdmin)
+admin.site.register(ForestManagementAGB, ForestManagementAGBAdmin)
