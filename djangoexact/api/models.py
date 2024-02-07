@@ -788,9 +788,9 @@ class AnnualCropping(LandModule, SingleBiomassModule):
     residue_management_type_wo = ForeignKey(ResidueManagementType, on_delete=CASCADE, related_name="%(class)s_residue_management_type_wo", null=True, blank=True)
     residue_management_type_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_residue_management_type_thread")
 
-    crop_yield_start = FloatField(null=True, blank=True)
-    crop_yield_w = FloatField(null=True, blank=True)
-    crop_yield_wo = FloatField(null=True, blank=True)
+    crop_yield_start = FloatField(default=0)
+    crop_yield_w = FloatField(default=0)
+    crop_yield_wo = FloatField(default=0)
     crop_yield_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_crop_yield_thread")
 
     area = FloatField(null=True, blank=True)
