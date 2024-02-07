@@ -13,7 +13,7 @@ fishery_types = [fishery for fishery in FisheryType.objects.all()]
 fish_types = [fish for fish in FishType.objects.all()]
 statuses = [status for status in ProjectStatus.objects.all()]
 
-crop_types = [crop for crop in LandUseType.objects.filter(module_types__class_name="AnnualCropping")]
+crop_types = [crop for crop in LandUseType.objects.filter(module_types__class_name="AnnualCropping").exclude(is_active=False)]
 tillage_management_types = [tillage for tillage in TillageManagementType.objects.all()]
 organic_input_types = [organic for organic in OrganicInputType.objects.all()]
 residue_management_types = [residue for residue in ResidueManagementType.objects.all()]
