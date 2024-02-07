@@ -184,9 +184,9 @@ class GrasslandFactory(DjangoModelFactory):
     is_fire_used_w = factory.fuzzy.FuzzyChoice([True, False])
     is_fire_used_wo = factory.fuzzy.FuzzyChoice([True, False])
 
-    fire_periodicity_start = factory.fuzzy.FuzzyFloat(0, 1)
-    fire_periodicity_w = factory.fuzzy.FuzzyFloat(0, 1)
-    fire_periodicity_wo = factory.fuzzy.FuzzyFloat(0, 1)
+    fire_periodicity_start = factory.fuzzy.FuzzyInteger(1, 5)
+    fire_periodicity_w = factory.fuzzy.FuzzyInteger(1, 5)
+    fire_periodicity_wo = factory.fuzzy.FuzzyInteger(1, 5)
 
     fire_impact_start = factory.fuzzy.FuzzyFloat(0, 1)
     fire_impact_w = factory.fuzzy.FuzzyFloat(0, 1)
