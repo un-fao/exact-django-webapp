@@ -1,0 +1,31 @@
+﻿grassland_management_type;climate;flu;fmg;fi
+Improved With High Inputs;Boreal;1;1,14;1,11
+Improved With High Inputs;Cool Temperate;1;1,14;1,11
+Improved With High Inputs;Tropical;1;1,17;1,11
+Improved With High Inputs;Tropical Montane;1;1,16;1,11
+Improved With High Inputs;Warm Temperate;1;1,14;1,11
+Improved Grassland;Boreal;1;1,14;1
+Improved Grassland;Cool Temperate;1;1,14;1
+Improved Grassland;Tropical;1;1,17;1
+Improved Grassland;Tropical Montane;1;1,16;1
+Improved Grassland;Warm Temperate;1;1,14;1
+Improved With Medium Inputs;Boreal;1;1,14;1
+Improved With Medium Inputs;Cool Temperate;1;1,14;1
+Improved With Medium Inputs;Tropical;1;1,17;1
+Improved With Medium Inputs;Tropical Montane;1;1,16;1
+Improved With Medium Inputs;Warm Temperate;1;1,14;1
+Severely Degraded;Boreal;1;0,7;1
+Severely Degraded;Tropical;1;0,7;1
+Severely Degraded;Cool Temperate;1;0,7;1
+Severely Degraded;Warm Temperate;1;0,7;1
+Severely Degraded;Tropical Montane;1;0,7;1
+High Intensity Grazing;Boreal;1;0,9;1
+High Intensity Grazing;Tropical;1;0,9;1
+High Intensity Grazing;Cool Temperate;1;0,9;1
+High Intensity Grazing;Warm Temperate;1;0,9;1
+High Intensity Grazing;Tropical Montane;1;0,9;1
+Non-Degraded;Boreal;1;1;1
+Non-Degraded;Tropical;1;1;1
+Non-Degraded;Cool Temperate;1;1;1
+Non-Degraded;Warm Temperate;1;1;1
+Non-Degraded;Tropical Montane;1;1;1
