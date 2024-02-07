@@ -825,8 +825,11 @@ class AnnualCroppingCalculator(BaseCalculator):
 
         input: AnnualCropping = self.data
         project: Project = input.activity.project
+        module_start = module_w = module_wo = input
         luc: LandUseChange = input.land_use_change
-        module_start, module_w, module_wo = get_luc_modules(luc)
+
+        if luc:
+            module_start, module_w, module_wo = get_luc_modules(luc)
 
         area = luc.area if luc else input.area
         change_rate = input.activity.change_rate
