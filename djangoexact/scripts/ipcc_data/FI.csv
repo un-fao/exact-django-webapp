@@ -35,3 +35,15 @@ Tropical;Wet;High C input, with manure;1,44
 Tropical Montane;Moist;High C input, with manure;1,41
 Tropical Montane;Dry;High C input, with manure;1,41
 Tropical Montane;Wet;High C input, with manure;1,41
+Boreal;Moist;Medium C input;1
+Boreal;Dry;Medium C input;1
+Cool Temperate;Moist;Medium C input;1
+Cool Temperate;Dry;Medium C input;1
+Warm Temperate;Moist;Medium C input;1
+Warm Temperate;Dry;Medium C input;1
+Tropical;Moist;Medium C input;1
+Tropical;Dry;Medium C input;1
+Tropical;Wet;Medium C input;1
+Tropical Montane;Moist;Medium C input;1
+Tropical Montane;Dry;Medium C input;1
+Tropical Montane;Wet;Medium C input;1
