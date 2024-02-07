@@ -680,6 +680,9 @@ class GrasslandAGB(Model):
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     value = FloatField(default=0)
 
+    class Meta:
+        unique_together = ("climate", "moisture")
+
     def __str__(self):
         return f"{self.value} for {self.climate.name} {self.moisture.name}"
 
