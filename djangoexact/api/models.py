@@ -202,6 +202,7 @@ class Moisture(Model):
 
 class SoilType(Model):
     name = CharField(max_length=100)
+    active = BooleanField(default=True)
 
     def __str__(self):
         return f"({self.pk}) {self.name}"
