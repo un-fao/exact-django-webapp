@@ -4459,6 +4459,7 @@ class ForestManagementCalculator(BaseCalculator):
         input: LandModule = self.data
         luc: LandUseChange = input.land_use_change
         project: Project = input.activity.project
+        area = luc.area if luc else input.area
 
         # TODO: Review
         if luc:
@@ -4469,14 +4470,14 @@ class ForestManagementCalculator(BaseCalculator):
 
         forest_mgmt: ForestManagement = luc.forestmanagement if luc else input
 
-        AGB_GROWTH_NOT_FOUND = f"AGB Growth not found for ({forest_mgmt.forest_type.name}) {land_use_type.name} in {project.climate.name} climate. Please insert t2 values for AGB Growth Rate for all scenarios."
-        BGB_UNDER_20_NOT_FOUND = f"BGB (under 20 years) not found for ({forest_mgmt.forest_type.name}) {land_use_type.name} in {project.climate.name} climate. Please insert t2 values for BGB (under 20 years) for all scenarios."
-        BGB_OVER_20_NOT_FOUND = f"BGB (over 20 years) not found for ({forest_mgmt.forest_type.name}) {land_use_type.name} in {project.climate.name} climate. Please insert t2 values for BGB (over 20 years) for all scenarios."
-        AGB_UNDER_20_NOT_FOUND = f"AGB (under 20 years) not found for ({forest_mgmt.forest_type.name}) {land_use_type.name} in {project.climate.name} climate. Please insert t2 values for AGB (under 20 years) for all scenarios."
-        AGB_OVER_20_NOT_FOUND = f"AGB (over 20 years) not found for ({forest_mgmt.forest_type.name}) {land_use_type.name} in {project.climate.name} climate. Please insert t2 values for AGB (over 20 years) for all scenarios."
-        LITTER_DW_NOT_FOUND = "Litter/Deadwood Carbon Stock reference value not found for the given parameters"
-        FLU_START_NOT_FOUND = "FLU reference value not found for the given parameters"
-        SOC_NOT_FOUND = "Soil Organic Carbon reference value not found for the given parameters"
+        AGB_GROWTH_NOT_FOUND = f"AGB Growth not found for ({forest_mgmt.forest_type.name}) {land_use_type.name} in {project.climate.name} climate, {project.country.region.name} region. Please insert t2 values for AGB Growth Rate for all scenarios."
+        BGB_UNDER_20_NOT_FOUND = f"BGB (under 20 years) not found for ({forest_mgmt.forest_type.name}) {land_use_type.name} in {project.climate.name} climate, {project.country.region.name} region. Please insert t2 values for BGB (under 20 years) for all scenarios."
+        BGB_OVER_20_NOT_FOUND = f"BGB (over 20 years) not found for ({forest_mgmt.forest_type.name}) {land_use_type.name} in {project.climate.name} climate, {project.country.region.name} region. Please insert t2 values for BGB (over 20 years) for all scenarios."
+        AGB_UNDER_20_NOT_FOUND = f"AGB (under 20 years) not found for ({forest_mgmt.forest_type.name}) {land_use_type.name} in {project.climate.name} climate, {project.country.region.name} region. Please insert t2 values for AGB (under 20 years) for all scenarios."
+        AGB_OVER_20_NOT_FOUND = f"AGB (over 20 years) not found for ({forest_mgmt.forest_type.name}) {land_use_type.name} in {project.climate.name} climate, {project.country.region.name} region. Please insert t2 values for AGB (over 20 years) for all scenarios."
+        LITTER_DW_NOT_FOUND = f"Litter/Deadwood Carbon Stock reference value not found for ({forest_mgmt.forest_type.name}) {land_use_type.name} in {project.climate.name} climate, {project.country.region.name} region."
+        FLU_START_NOT_FOUND = f"FLU reference value not found for ({forest_mgmt.forest_type.name}) {land_use_type.name} in {project.climate.name} climate, {project.country.region.name} region."
+        SOC_NOT_FOUND = f"Soil Organic Carbon reference value not found for the given parameters in {project.climate.name} climate, {project.moisture.name} moisture, {project.soil_type.name} soil type."
 
         is_afforestation_w = luc and luc.module_type_w.class_name == "ForestManagement"
         is_afforestation_wo = luc and luc.module_type_wo.class_name == "ForestManagement"
@@ -4495,6 +4496,9 @@ class ForestManagementCalculator(BaseCalculator):
         try:
             socref = ipcc.SoilOrganicCarbon.objects.get(climate=project.climate, moisture=project.moisture, soil_type=project.soil_type)
         except ipcc.SoilOrganicCarbon.DoesNotExist:
+            socref = None
+
+        if not socref and not project.soc_ref_t2:
             raise ValueError(SOC_NOT_FOUND)
 
         try:
@@ -4589,7 +4593,7 @@ class ForestManagementCalculator(BaseCalculator):
             project.capitalization_years,
             project.implementation_years,
             input.activity.change_rate.name,
-            luc.area,
+            area,
             0,
             forest_mgmt.rotation_length_yrs_start,
             forest_mgmt.rotation_start_year_t2_start,
@@ -4637,7 +4641,7 @@ class ForestManagementCalculator(BaseCalculator):
             project.capitalization_years,
             project.implementation_years,
             input.activity.change_rate.name,
-            luc.area,
+            area,
             0,
             forest_mgmt.rotation_length_yrs_start,
             forest_mgmt.rotation_start_year_t2_start,
@@ -4686,7 +4690,7 @@ class ForestManagementCalculator(BaseCalculator):
             project.implementation_years,
             input.activity.change_rate.name,
             0,
-            luc.area,
+            area,
             forest_mgmt.rotation_length_yrs_w,
             forest_mgmt.rotation_start_year_t2_w,
             forest_mgmt.rotation_percentage_biomass_for_energy_w,
@@ -4734,7 +4738,7 @@ class ForestManagementCalculator(BaseCalculator):
             project.implementation_years,
             input.activity.change_rate.name,
             0,
-            luc.area,
+            area,
             forest_mgmt.rotation_length_yrs_wo,
             forest_mgmt.rotation_start_year_t2_wo,
             forest_mgmt.rotation_percentage_biomass_for_energy_wo,
