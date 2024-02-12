@@ -672,6 +672,9 @@ class AfforestationFLU(Model):
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField(default=0)
 
+    class Meta:
+        unique_together = ("climate", "moisture", "land_use_type")
+
     def __str__(self):
         return f"{self.value} for {self.climate.name} {self.moisture.name} {self.land_use_type.name}"
 
