@@ -18,6 +18,7 @@ tillage_management_types = [tillage for tillage in TillageManagementType.objects
 organic_input_types = [organic for organic in OrganicInputType.objects.all()]
 residue_management_types = [residue for residue in ResidueManagementType.objects.all()]
 grassland_management_types = GrasslandManagementType.objects.all()
+forests = [forest for forest in LandUseType.objects.filter(module_types__class_name="ForestManagement").exclude(is_active=False)]
 
 livestock_category_types = [c for c in LivestockCategoryType.objects.all().exclude(Q(name="Ostrich") | Q(name="Llamas And Alpacas"))]
 livestock_production_types = [c for c in LivestockProductionType.objects.all()]
@@ -220,3 +221,24 @@ class LandUseChangeFactory(DjangoModelFactory):
     dry_matter_start = factory.fuzzy.FuzzyFloat(0, 1)
     dry_matter_w = factory.fuzzy.FuzzyFloat(0, 1)
     dry_matter_wo = factory.fuzzy.FuzzyFloat(0, 1)
+
+
+class ForestManagementFactory(DjangoModelFactory):
+    class Meta:
+        model = ForestManagement
+
+    # On init, choose land_use_type based on activity.project.climate
+
+    land_use_type_start = factory.fuzzy.FuzzyChoice(forests)
+    land_use_type_w = land_use_type_start
+    land_use_type_wo = land_use_type_start
+
+    forest_type = ForestType.objects.get(name="Natural")
+
+    rotation_length_yrs_start = 7
+    rotation_length_yrs_w = 7
+    rotation_length_yrs_wo = 7
+
+    rotation_percentage_biomass_for_energy_start = 1
+    rotation_percentage_biomass_for_energy_w = 1
+    rotation_percentage_biomass_for_energy_wo = 1
