@@ -459,7 +459,7 @@ class DeforestationCalculator(BaseCalculator):
         change_rate = module.activity.change_rate
         climate = project.climate
         moisture = project.moisture
-        continent = project.country.region
+        region = project.country.region
         soil_type = project.soil_type
 
         forest: ForestManagement = module.activity.forestmanagement
@@ -473,7 +473,7 @@ class DeforestationCalculator(BaseCalculator):
         cmc = {
             "climate": climate,
             "moisture": moisture,
-            "continent": continent,
+            "continent": region,
         }
 
         mangroves_data = None
@@ -484,28 +484,29 @@ class DeforestationCalculator(BaseCalculator):
         total_biomass_end = ipcc.TotalBiomassAfterDefo.objects.get(**cmc, land_use_type=module.land_use_type_w)
 
         # NOTE: Maybe merge the mangroves and deforestation IPCC tables into one table?
+        # TODO: Review with new forest management data
         if self.data.vegetation_type != utils.MANGROVES:
             defo_table_start = ipcc.LitterDeadwoodCarbonStock.objects.get(vegetation_type=module.land_use_type_start)
             defo_table_end = ipcc.LitterDeadwoodCarbonStock.objects.get(vegetation_type=module.land_use_type_w)
 
-            ag_biomass_start = ipcc.AboveGroundBiomass.objects.get(continent=continent, vegetation_type=module.land_use_type_start)
-            ag_biomass_end = ipcc.AboveGroundBiomass.objects.get(continent=continent, vegetation_type=module.land_use_type_w)
+            ag_biomass_start = ipcc.ForestManagementAGB.objects.get(climate=climate, region=region, forest_type=forest.forest_type, land_use_type=forest.land_use_type_start)
+            ag_biomass_end = ipcc.ForestManagementAGB.objects.get(continent=region, vegetation_type=module.land_use_type_w)
 
-            bg_biomass_start = ipcc.BelowGroundBiomass.objects.get_first_above_threshold(
-                continent=continent,
+            bg_biomass_start = ipcc.ForestManagementBGB.objects.get_first_above_threshold(
+                continent=region,
                 vegetation_type=module.land_use_type_start,
                 threshold=ag_biomass_start.value,
             )
-            bg_biomass_end = ipcc.BelowGroundBiomass.objects.get_first_above_threshold(
-                continent=continent,
+            bg_biomass_end = ipcc.ForestManagementBGB.objects.get_first_above_threshold(
+                continent=region,
                 vegetation_type=module.land_use_type_w,
                 threshold=ag_biomass_end.value,
             )
         else:
-            mangroves_data = ipcc.DataOnMangrove.objects.get(continent=continent)
+            mangroves_data = ipcc.DataOnMangrove.objects.get(continent=region)
 
-        combustion_factor_start = ipcc.CombustionFactor.objects.get(vegetation_type=module.land_use_type_start)
-        combustion_factor_end = ipcc.CombustionFactor.objects.get(vegetation_type=module.land_use_type_w)
+        combustion_factor_start = ipcc.ForestCombustionFactor.objects.get(vegetation_type=module.land_use_type_start)
+        combustion_factor_end = ipcc.ForestCombustionFactor.objects.get(vegetation_type=module.land_use_type_w)
 
         moisture_factor = ipcc.DefaultEmissionFactor.objects.filter(moisture=moisture)
         moisture_factor = moisture_factor.filter(Q(input__name__icontains="Other N Inputs") | Q(input__name__icontains="All N Inputs")).first()
@@ -4153,12 +4154,6 @@ class OrganicSoilCalculator(BaseCalculator):
         if luc.land_use_type_start.module_type.name == "ForestManagement":
             area_affected_by_module = 0
 
-        cmt = {
-            "climate": project.climate,
-            "moisture": project.moisture,
-            "module_type_name": relative_class,
-        }
-
         cm = {
             "climate": project.climate,
             "moisture": project.moisture,
@@ -4166,13 +4161,13 @@ class OrganicSoilCalculator(BaseCalculator):
 
         ##### Organic Soil Inputs #####
 
-        ef_onsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cm, module_type_name=luc.land_use_type_start.module_type.name, peat_type=input.peat_type_start, site_location_type_name="On-Site")
-        ef_onsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cmt, peat_type=input.peat_type_w, site_location_type_name="On-Site")
-        ef_onsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cmt, peat_type=input.peat_type_wo, site_location_type_name="On-Site")
+        ef_onsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cm, module_type_name=luc.module_type_start.name, peat_type=input.peat_type_start, site_location_type_name="On-Site")
+        ef_onsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cm, module_type_name=luc.module_type_w.name, peat_type=input.peat_type_w, site_location_type_name="On-Site")
+        ef_onsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cm, module_type_name=luc.module_type_wo.name, peat_type=input.peat_type_wo, site_location_type_name="On-Site")
 
-        ef_offsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cmt, peat_type=input.peat_type_start, site_location_type_name="Off-Site")
-        ef_offsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cmt, peat_type=input.peat_type_w, site_location_type_name="Off-Site")
-        ef_offsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cmt, peat_type=input.peat_type_wo, site_location_type_name="Off-Site")
+        ef_offsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cm, module_type_name=luc.module_type_start.name, peat_type=input.peat_type_start, site_location_type_name="Off-Site")
+        ef_offsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cm, module_type_name=luc.module_type_w.name, peat_type=input.peat_type_w, site_location_type_name="Off-Site")
+        ef_offsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cm, module_type_name=luc.module_type_wo.name, peat_type=input.peat_type_wo, site_location_type_name="Off-Site")
 
         dry_matter_w = ipcc.OrganicSoilFuelConsumption.objects.get(**cm, fire_type=input.fire_type_w)
         dry_matter_wo = ipcc.OrganicSoilFuelConsumption.objects.get(**cm, fire_type=input.fire_type_wo)
@@ -4461,38 +4456,72 @@ class ForestManagementCalculator(BaseCalculator):
     def calculate(self) -> Result:
         """"""
 
-        input: LandModule | LandModuleNoScenarios = self.data
+        input: LandModule = self.data
         luc: LandUseChange = input.land_use_change
         project: Project = input.activity.project
 
         # TODO: Review
-        land_use_type = input.land_use_type if luc.module_type_start.class_name == "ForestManagement" else input.land_use_type_start
-        land_use_type = LandUseType.objects.get(name=land_use_type.name)
+        if luc:
+            land_use_type = input.land_use_type if luc.module_type_start.class_name == "ForestManagement" else input.land_use_type_start
+            land_use_type = LandUseType.objects.get(name=land_use_type.name)
+        else:
+            land_use_type = input.land_use_type_start
 
-        cvt = {
-            "continent": project.country.region,
+        forest_mgmt: ForestManagement = luc.forestmanagement if luc else input
+
+        AGB_GROWTH_NOT_FOUND = f"AGB Growth not found for ({forest_mgmt.forest_type.name}) {land_use_type.name} in {project.climate.name} climate. Please insert t2 values for AGB Growth Rate for all scenarios."
+        BGB_UNDER_20_NOT_FOUND = f"BGB (under 20 years) not found for ({forest_mgmt.forest_type.name}) {land_use_type.name} in {project.climate.name} climate. Please insert t2 values for BGB (under 20 years) for all scenarios."
+        BGB_OVER_20_NOT_FOUND = f"BGB (over 20 years) not found for ({forest_mgmt.forest_type.name}) {land_use_type.name} in {project.climate.name} climate. Please insert t2 values for BGB (over 20 years) for all scenarios."
+        AGB_UNDER_20_NOT_FOUND = f"AGB (under 20 years) not found for ({forest_mgmt.forest_type.name}) {land_use_type.name} in {project.climate.name} climate. Please insert t2 values for AGB (under 20 years) for all scenarios."
+        AGB_OVER_20_NOT_FOUND = f"AGB (over 20 years) not found for ({forest_mgmt.forest_type.name}) {land_use_type.name} in {project.climate.name} climate. Please insert t2 values for AGB (over 20 years) for all scenarios."
+        LITTER_DW_NOT_FOUND = "Litter/Deadwood Carbon Stock reference value not found for the given parameters"
+        FLU_START_NOT_FOUND = "FLU reference value not found for the given parameters"
+        SOC_NOT_FOUND = "Soil Organic Carbon reference value not found for the given parameters"
+
+        is_afforestation_w = luc and luc.module_type_w.class_name == "ForestManagement"
+        is_afforestation_wo = luc and luc.module_type_wo.class_name == "ForestManagement"
+
+        has_t2_growth_start = forest_mgmt.agb_growth_rate_gt_20_yrs_t2_start and forest_mgmt.agb_growth_rate_le_20_yrs_t2_start
+        has_t2_growth_w = forest_mgmt.agb_growth_rate_gt_20_yrs_t2_w and forest_mgmt.agb_growth_rate_le_20_yrs_t2_w
+        has_t2_growth_wo = forest_mgmt.agb_growth_rate_gt_20_yrs_t2_wo and forest_mgmt.agb_growth_rate_le_20_yrs_t2_wo
+
+        crluft = {
+            "climate": project.climate,
+            "region": project.country.region,
             "land_use_type": land_use_type,
+            "forest_type": forest_mgmt.forest_type,
         }
 
-        forest_mgmt: ForestManagement = luc.forestmanagement
+        try:
+            socref = ipcc.SoilOrganicCarbon.objects.get(climate=project.climate, moisture=project.moisture, soil_type=project.soil_type)
+        except ipcc.SoilOrganicCarbon.DoesNotExist:
+            raise ValueError(SOC_NOT_FOUND)
 
-        is_afforestation_w = luc.module_type_w.class_name == "ForestManagement"
-        is_afforestation_wo = luc.module_type_wo.class_name == "ForestManagement"
+        try:
+            litter_dw = ipcc.LitterDeadwoodCarbonStock.objects.get(climate=project.climate, forest_type=forest_mgmt.forest_type, land_use_type=land_use_type)
+        except ipcc.LitterDeadwoodCarbonStock.DoesNotExist:
+            raise ValueError(LITTER_DW_NOT_FOUND)
 
-        ag_net_biomass_start = ipcc.AboveGroundNetBiomassGrowth.objects.get(**cvt)  # TODO: Change to land use type
-        ag_net_biomass_end = ipcc.AboveGroundNetBiomassGrowth.objects.get(**cvt)  # TODO: Change to land use type
+        try:
+            agb_growth = ipcc.ForestManagementAGBGrowth.objects.get(**crluft)
+        except ipcc.ForestManagementAGBGrowth.DoesNotExist:
+            agb_growth = None
 
-        le_20yrs_start = ag_net_biomass_start.value_upto_20_years
-        le_20yrs_end = ag_net_biomass_end.value_upto_20_years
+        if not agb_growth and (not has_t2_growth_start or not has_t2_growth_w or not has_t2_growth_wo):
+            raise ValueError(AGB_GROWTH_NOT_FOUND)
 
-        gt_20yrs_start = ag_net_biomass_start.value_after_20_years
-        gt_20yrs_end = ag_net_biomass_end.value_after_20_years
+        before_2_yrs = agb_growth.value_upto_20_years
+        after_20_yrs = agb_growth.value_after_20_years
 
-        bgb_before_20_yrs_start: ipcc.BelowGroundBiomass = ipcc.BelowGroundBiomass.objects.get_max_below_threshold(**cvt, threshold=le_20yrs_start)  # TODO: Change to land use type
-        bgb_before_20_yrs_end: ipcc.BelowGroundBiomass = ipcc.BelowGroundBiomass.objects.get_max_below_threshold(**cvt, threshold=le_20yrs_end)  # TODO: Change to land use type
+        try:
+            bgb_before_20_yrs = ipcc.ForestManagementBGB.objects.get_max_below_threshold(**crluft, threshold=before_2_yrs)
+        except ipcc.ForestManagementBGB.DoesNotExist:
+            raise ValueError(BGB_UNDER_20_NOT_FOUND)
 
-        bgb_after_20_yrs_start: ipcc.BelowGroundBiomass = ipcc.BelowGroundBiomass.objects.get_max_below_threshold(**cvt, threshold=gt_20yrs_start)  # TODO: Change to land use type
-        bgb_after_20_yrs_end: ipcc.BelowGroundBiomass = ipcc.BelowGroundBiomass.objects.get_max_below_threshold(**cvt, threshold=gt_20yrs_end)  # TODO: Change to land use type
+        try:
+            bgb_after_20_yrs = ipcc.ForestManagementBGB.objects.get_max_below_threshold(**crluft, threshold=after_20_yrs)
+        except ipcc.ForestManagementBGB.DoesNotExist:
+            raise ValueError(BGB_OVER_20_NOT_FOUND)
 
         # ForestManagement start/w/wo forest is the same
         # forest_condition_type is based on implementation years (< 20, > 20)
@@ -4501,54 +4530,55 @@ class ForestManagementCalculator(BaseCalculator):
         Se parliamo di forest management invece usiamo i valori di Secondary > 20 sia per AGB growth che per AGB max.
         """
 
-        agb_under_20 = ipcc.ForestManagementAGB.objects.get(
-            continent=project.country.region,
-            land_use_type=forest_mgmt.land_use_type_start,
-            forest_type=forest_mgmt.forest_type,
-            forest_condition_type__name="Secondary ≤20 Years",
-        )
-
-        agb_over_20 = ipcc.ForestManagementAGB.objects.get(
-            continent=project.country.region,
-            land_use_type=forest_mgmt.land_use_type_start,
-            forest_type=forest_mgmt.forest_type,
-            forest_condition_type__name="Secondary >20 Years",
-        )
-
-        agb_max_w = statistics.mean([agb_over_20.agb_min, agb_over_20.agb_max])
-        agb_growth_w = statistics.mean([agb_over_20.agb_growth_max, agb_over_20.agb_growth_min])
-        agb_start_w = agb_max_w
-
-        agb_max_wo = statistics.mean([agb_over_20.agb_min, agb_over_20.agb_max])
-        agb_growth_wo = statistics.mean([agb_over_20.agb_growth_max, agb_over_20.agb_growth_min])
-        agb_start_wo = agb_max_wo
+        try:
+            agb_under_20 = ipcc.ForestManagementAGB.objects.get(**crluft, forest_condition_type__name="Secondary ≤20 Years")
+        except ipcc.ForestManagementAGB.DoesNotExist:
+            raise ValueError(AGB_UNDER_20_NOT_FOUND)
 
         try:
-            flu_start = ipcc.AfforestationFLU.objects.get(climate=project.climate, moisture=project.moisture, land_use_type=land_use_type)  # TODO: Change to land use type
+            agb_over_20 = ipcc.ForestManagementAGB.objects.get(**crluft, forest_condition_type__name="Secondary >20 Years")
+        except ipcc.ForestManagementAGB.DoesNotExist:
+            raise ValueError(AGB_OVER_20_NOT_FOUND)
+
+        try:
+            flu_start = ipcc.AfforestationFLU.objects.get(climate=project.climate, moisture=project.moisture, land_use_type=land_use_type)
         except ipcc.AfforestationFLU.DoesNotExist:
-            flu_start = ipcc.AfforestationFLU.objects.get(climate=project.climate, moisture=project.moisture, land_use_type__name="Agroforestry - Default")  # TODO: Change to land use type
-        flu_w = None
-        flu_wo = None
+            try:
+                flu_start = ipcc.AfforestationFLU.objects.get(climate=project.climate, moisture=project.moisture, land_use_type__name="Agroforestry - Default")
+            except ipcc.AfforestationFLU.DoesNotExist:
+                raise ValueError(FLU_START_NOT_FOUND)
+
+        # START - Reference Values for forest remaining forest
+        agb_max_w = statistics.mean([agb_over_20.agb_min, agb_over_20.agb_max])
+        agb_growth_over_20_w = statistics.mean([agb_over_20.agb_growth_max, agb_over_20.agb_growth_min])
+        agb_growth_under_20_w = agb_growth_over_20_w
+        agb_start_w = agb_max_w
+        flu_w = SimpleNamespace(value=1)
+
+        # TODO: What reference values do I choose for the start scenario?
+
+        agb_max_wo = statistics.mean([agb_over_20.agb_min, agb_over_20.agb_max])
+        agb_growth_over_20_wo = statistics.mean([agb_over_20.agb_growth_max, agb_over_20.agb_growth_min])
+        agb_growth_under_20_wo = agb_growth_over_20_wo
+        agb_start_wo = agb_max_wo
+        flu_wo = SimpleNamespace(value=1)
+        # END - Reference Values for forest remaining forest
 
         if is_afforestation_w:
-            agb_max_w = agb_over_20.agb_max if project.implementation_years > 20 else agb_under_20.agb_max
-            agb_growth_w = statistics.mean([agb_under_20.agb_growth_max, agb_under_20.agb_growth_min])
+            agb_max_w = statistics.mean(agb_over_20.agb_min, agb_over_20.agb_max) if project.implementation_years > 20 else statistics.mean(agb_under_20.agb_min, agb_under_20.agb_max)
+            agb_growth_under_20_w = statistics.mean([agb_under_20.agb_growth_max, agb_under_20.agb_growth_min])
+            agb_growth_over_20_w = agb_growth_under_20_w
             agb_start_w = 0
-            flu_w = ipcc.AfforestationFLU(climate=project.climate, moisture=project.moisture, land_use_type=land_use_type)
+            flu_w = flu_start
 
         if is_afforestation_wo:
-            agb_max_wo = agb_over_20.agb_max if project.implementation_years > 20 else agb_under_20.agb_max
-            agb_growth_wo = statistics.mean([agb_under_20.agb_growth_max, agb_under_20.agb_growth_min])
+            agb_max_wo = statistics.mean(agb_over_20.agb_min, agb_over_20.agb_max) if project.implementation_years > 20 else statistics.mean(agb_under_20.agb_min, agb_under_20.agb_max)
+            agb_growth_under_20_wo = statistics.mean([agb_under_20.agb_growth_max, agb_under_20.agb_growth_min])
+            agb_growth_over_20_wo = agb_growth_under_20_wo
             agb_start_wo = 0
-
-        flu_wo = ipcc.AfforestationFLU(climate=project.climate, moisture=project.moisture, land_use_type=land_use_type)
-
-        litter_dw_start = ipcc.LitterDeadwoodCarbonStock.objects.get(land_use_type=land_use_type)  # TODO: Change to land use type
-        litter_dw_end = ipcc.LitterDeadwoodCarbonStock.objects.get(land_use_type=land_use_type)  # TODO: Change to land use type
+            flu_wo = flu_start
 
         disturbances: list[ForestDisturbance] = input.disturbances.all()
-
-        socref = ipcc.SoilOrganicCarbon.objects.get(climate=project.climate, moisture=project.moisture, soil_type=project.soil_type)
 
         math_start_w = None
         math_start_wo = None
@@ -4564,16 +4594,16 @@ class ForestManagementCalculator(BaseCalculator):
             forest_mgmt.rotation_length_yrs_start,
             forest_mgmt.rotation_start_year_t2_start,
             forest_mgmt.rotation_percentage_biomass_for_energy_start,
-            bgb_before_20_yrs_start.threshold,  # TODO: Can before and after thresholds be different?
-            bgb_before_20_yrs_start.value,
-            bgb_after_20_yrs_start.value,
+            bgb_before_20_yrs.threshold,
+            bgb_before_20_yrs.value,
+            bgb_after_20_yrs.value,
             forest_mgmt.bgb_growth_rate_le_20_yrs_t2_start,
             forest_mgmt.bgb_growth_rate_gt_20_yrs_t2_start,
-            0,
+            agb_start_w,
             forest_mgmt.agb_t2_start,
-            statistics.mean([agb_under_20.agb_growth_max, agb_under_20.agb_growth_min]),
+            agb_growth_under_20_w,
             forest_mgmt.agb_growth_rate_le_20_yrs_t2_start,
-            statistics.mean([agb_over_20.agb_growth_max, agb_over_20.agb_growth_min]),
+            agb_growth_over_20_w,
             forest_mgmt.agb_growth_rate_gt_20_yrs_t2_start,
             agb_max_w,
             None,  # TODO: max_bgb_value ?? Unused in math model
@@ -4584,9 +4614,9 @@ class ForestManagementCalculator(BaseCalculator):
             forest_mgmt.logging_percentage_agb_logged_start,
             forest_mgmt.logging_percentage_biomass_for_energy_start,
             forest_mgmt.logging_start_year_t2_start,
-            litter_dw_start.litter,
+            litter_dw.litter,
             forest_mgmt.litter_t2_start,
-            litter_dw_start.dw,
+            litter_dw.dw,
             forest_mgmt.deadwood_t2_start,
             socref.value,
             project.soc_ref_t2,
@@ -4612,16 +4642,16 @@ class ForestManagementCalculator(BaseCalculator):
             forest_mgmt.rotation_length_yrs_start,
             forest_mgmt.rotation_start_year_t2_start,
             forest_mgmt.rotation_percentage_biomass_for_energy_start,
-            bgb_before_20_yrs_start.threshold,  # TODO: Can before and after thresholds be different?
-            bgb_before_20_yrs_start.value,
-            bgb_after_20_yrs_start.value,
+            bgb_before_20_yrs.threshold,
+            bgb_before_20_yrs.value,
+            bgb_after_20_yrs.value,
             forest_mgmt.bgb_growth_rate_le_20_yrs_t2_start,
             forest_mgmt.bgb_growth_rate_gt_20_yrs_t2_start,
-            0,
+            agb_start_wo,
             forest_mgmt.agb_t2_start,
-            statistics.mean([agb_under_20.agb_growth_max, agb_under_20.agb_growth_min]),
+            agb_growth_under_20_wo,
             forest_mgmt.agb_growth_rate_le_20_yrs_t2_start,
-            statistics.mean([agb_over_20.agb_growth_max, agb_over_20.agb_growth_min]),
+            agb_growth_over_20_wo,
             forest_mgmt.agb_growth_rate_gt_20_yrs_t2_start,
             agb_max_wo,
             None,  # TODO: max_bgb_value ?? Unused in math model
@@ -4632,9 +4662,9 @@ class ForestManagementCalculator(BaseCalculator):
             forest_mgmt.logging_percentage_agb_logged_start,
             forest_mgmt.logging_percentage_biomass_for_energy_start,
             forest_mgmt.logging_start_year_t2_start,
-            litter_dw_start.litter,
+            litter_dw.litter,
             forest_mgmt.litter_t2_start,
-            litter_dw_start.dw,
+            litter_dw.dw,
             forest_mgmt.deadwood_t2_start,
             socref.value,
             project.soc_ref_t2,
@@ -4642,8 +4672,8 @@ class ForestManagementCalculator(BaseCalculator):
             forest_mgmt.fi_t2_start,
             forest_mgmt.fmg_t2_start,
             flu_start.value,
-            1,  # FI
-            1,  # FMG
+            1,  # FI # TODO: Not yet implemented
+            1,  # FMG # TODO: Not yet implemented
             project.gw_potential.ch4,
             project.gw_potential.n2o,
         ]
@@ -4655,21 +4685,21 @@ class ForestManagementCalculator(BaseCalculator):
             project.capitalization_years,
             project.implementation_years,
             input.activity.change_rate.name,
-            luc.area,
             0,
+            luc.area,
             forest_mgmt.rotation_length_yrs_w,
             forest_mgmt.rotation_start_year_t2_w,
             forest_mgmt.rotation_percentage_biomass_for_energy_w,
-            bgb_before_20_yrs_end.threshold,  # TODO: Can before and after thresholds be different?
-            bgb_before_20_yrs_end.value,
-            bgb_after_20_yrs_end.value,
+            bgb_before_20_yrs.threshold,
+            bgb_before_20_yrs.value,
+            bgb_after_20_yrs.value,
             forest_mgmt.bgb_growth_rate_le_20_yrs_t2_w,
             forest_mgmt.bgb_growth_rate_gt_20_yrs_t2_w,
-            0,
+            agb_start_w,
             forest_mgmt.agb_t2_w,
-            statistics.mean([agb_under_20.agb_growth_max, agb_under_20.agb_growth_min]),
+            agb_growth_under_20_w,
             forest_mgmt.agb_growth_rate_le_20_yrs_t2_w,
-            statistics.mean([agb_over_20.agb_growth_max, agb_over_20.agb_growth_min]),
+            agb_growth_over_20_w,
             forest_mgmt.agb_growth_rate_gt_20_yrs_t2_w,
             agb_max_w,
             None,  # TODO: max_bgb_value ?? Unused in math model
@@ -4680,9 +4710,9 @@ class ForestManagementCalculator(BaseCalculator):
             forest_mgmt.logging_percentage_agb_logged_w,
             forest_mgmt.logging_percentage_biomass_for_energy_w,
             forest_mgmt.logging_start_year_t2_w,
-            litter_dw_end.litter,
+            litter_dw.litter,
             forest_mgmt.litter_t2_w,
-            litter_dw_end.dw,
+            litter_dw.dw,
             forest_mgmt.deadwood_t2_w,
             socref.value,
             project.soc_ref_t2,
@@ -4690,8 +4720,8 @@ class ForestManagementCalculator(BaseCalculator):
             forest_mgmt.fi_t2_w,
             forest_mgmt.fmg_t2_w,
             flu_w.value,
-            1,  # FI
-            1,  # FMG
+            1,  # FI # TODO: Not yet implemented
+            1,  # FMG # TODO: Not yet implemented
             project.gw_potential.ch4,
             project.gw_potential.n2o,
         ]
@@ -4703,21 +4733,21 @@ class ForestManagementCalculator(BaseCalculator):
             project.capitalization_years,
             project.implementation_years,
             input.activity.change_rate.name,
-            luc.area,
             0,
+            luc.area,
             forest_mgmt.rotation_length_yrs_wo,
             forest_mgmt.rotation_start_year_t2_wo,
             forest_mgmt.rotation_percentage_biomass_for_energy_wo,
-            bgb_before_20_yrs_end.threshold,  # TODO: Can before and after thresholds be different?
-            bgb_before_20_yrs_end.value,
-            bgb_after_20_yrs_end.value,
+            bgb_before_20_yrs.threshold,
+            bgb_before_20_yrs.value,
+            bgb_after_20_yrs.value,
             forest_mgmt.bgb_growth_rate_le_20_yrs_t2_wo,
             forest_mgmt.bgb_growth_rate_gt_20_yrs_t2_wo,
-            0,
+            agb_start_wo,
             forest_mgmt.agb_t2_wo,
-            statistics.mean([agb_under_20.agb_growth_max, agb_under_20.agb_growth_min]),
+            agb_growth_under_20_wo,
             forest_mgmt.agb_growth_rate_le_20_yrs_t2_wo,
-            statistics.mean([agb_over_20.agb_growth_max, agb_over_20.agb_growth_min]),
+            agb_growth_over_20_wo,
             forest_mgmt.agb_growth_rate_gt_20_yrs_t2_wo,
             agb_max_wo,
             None,  # TODO: max_bgb_value ?? Unused in math model
@@ -4728,9 +4758,9 @@ class ForestManagementCalculator(BaseCalculator):
             forest_mgmt.logging_percentage_agb_logged_wo,
             forest_mgmt.logging_percentage_biomass_for_energy_wo,
             forest_mgmt.logging_start_year_t2_wo,
-            litter_dw_end.litter,
+            litter_dw.litter,
             forest_mgmt.litter_t2_wo,
-            litter_dw_end.dw,
+            litter_dw.dw,
             forest_mgmt.deadwood_t2_wo,
             socref.value,
             project.soc_ref_t2,
@@ -4738,8 +4768,8 @@ class ForestManagementCalculator(BaseCalculator):
             forest_mgmt.fi_t2_wo,
             forest_mgmt.fmg_t2_wo,
             flu_wo.value,
-            1,  # FI
-            1,  # FMG
+            1,  # FI # TODO: Not yet implemented
+            1,  # FMG # TODO: Not yet implemented
             project.gw_potential.ch4,
             project.gw_potential.n2o,
         ]
