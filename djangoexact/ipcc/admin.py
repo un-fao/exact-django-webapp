@@ -50,7 +50,7 @@ class LivestockTAMAdmin(admin.ModelAdmin):
 class ForestManagementAGBAdmin(admin.ModelAdmin):
     list_display = [
         "land_use_type",
-        "continent",
+        "region",
         "forest_type",
         "forest_condition_type",
         "agb_min",
@@ -61,14 +61,14 @@ class ForestManagementAGBAdmin(admin.ModelAdmin):
 
     list_select_related = [
         "land_use_type",
-        "continent",
+        "region",
         "forest_type",
         "forest_condition_type",
     ]
 
     search_fields = [
         "land_use_type__name",
-        "continent__name",
+        "region__name",
         "forest_type__name",
         "forest_condition_type__name",
     ]
