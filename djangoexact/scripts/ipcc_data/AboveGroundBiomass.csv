@@ -1,17 +1,544 @@
-Tropical rainforest,Tropical moist deciduous forest,Tropical dry forest,Tropical shrubland,Planted Tropical rainforest,Planted Tropical moist deciduous forest,Planted Tropical dry forest,Planted  Tropical shrubland,Subtropical humid forest,Subtropical dry forest,Subtropical steppe,Subtropical mountain systems,Planted Subtropical humid forest,Planted Subtropical dry forest,Planted Subtropical steppe,Planted Subtropical mountain systems,Temperate oceanic forest,Temperate continental forest,Temperate mountain systems,Temperate desert,Temperate steppe,Planted Temperate oceanic forest,Planted Temperate continental forest,Planted Temperate mountain systems,Planted Temperate desert,Planted Temperate steppe,Boreal coniferous forest,Boreal tundra woodland,Boreal mountain systems,Planted Boreal coniferous forest,Planted Boreal tundra woodland,Planted Boreal mountain systems,Tropical mountain systems,Planted Tropical mountain systems
-Eastern Africa,404.2,236.6,69.6,48.4,250.0,301.5,127.0,20.0,54.1,65.2,50.5,35.1,140.0,65.0,17.5,90.0,180.0,120.0,100.0,44.0,118.5,160.0,100.0,100.0,44.0,44.3,50.0,15.0,30.0,40.0,15.0,30.0,190.0,90.0
-Central Africa,404.2,236.6,69.6,48.4,250.0,301.5,127.0,20.0,54.1,65.2,50.5,35.1,140.0,65.0,17.5,90.0,180.0,120.0,100.0,44.0,118.5,160.0,100.0,100.0,44.0,44.3,50.0,15.0,30.0,40.0,15.0,30.0,190.0,90.0
-Northern Africa,404.2,236.6,69.6,48.4,250.0,301.5,127.0,20.0,54.1,65.2,50.5,35.1,140.0,65.0,17.5,90.0,180.0,120.0,100.0,44.0,118.5,160.0,100.0,100.0,44.0,44.3,50.0,15.0,30.0,40.0,15.0,30.0,190.0,90.0
-Southern Africa,404.2,236.6,69.6,48.4,250.0,301.5,127.0,20.0,54.1,65.2,50.5,35.1,140.0,65.0,17.5,90.0,180.0,120.0,100.0,44.0,118.5,160.0,100.0,100.0,44.0,44.3,50.0,15.0,30.0,40.0,15.0,30.0,190.0,90.0
-Western Africa,404.2,236.6,69.6,48.4,250.0,301.5,127.0,20.0,54.1,65.2,50.5,35.1,140.0,65.0,17.5,90.0,180.0,120.0,100.0,44.0,118.5,160.0,100.0,100.0,44.0,44.3,50.0,15.0,30.0,40.0,15.0,30.0,190.0,90.0
-Central Asia,413.1,67.7,184.6,38.3,280.7,176.9,67.2,146.7,323.0,70.9,41.6,250.2,140.0,111.8,50.0,90.0,289.8,120.0,100.0,44.0,118.5,175.0,93.3,100.0,44.0,44.3,62.9,15.0,30.0,45.0,25.0,45.0,433.5,87.5
-Eastern Asia,413.1,67.7,184.6,38.3,280.7,176.9,67.2,146.7,323.0,70.9,41.6,250.2,140.0,111.8,50.0,90.0,289.8,120.0,100.0,44.0,118.5,175.0,93.3,100.0,44.0,44.3,62.9,15.0,30.0,45.0,25.0,45.0,433.5,87.5
-South-eastern Asia,413.1,67.7,184.6,38.3,280.7,176.9,67.2,146.7,323.0,70.9,41.6,250.2,140.0,111.8,50.0,90.0,289.8,120.0,100.0,44.0,118.5,175.0,93.3,100.0,44.0,44.3,62.9,15.0,30.0,45.0,25.0,45.0,433.5,87.5
-Southern Asia,413.1,67.7,184.6,38.3,280.7,176.9,67.2,146.7,323.0,70.9,41.6,250.2,140.0,111.8,50.0,90.0,289.8,120.0,100.0,44.0,118.5,175.0,93.3,100.0,44.0,44.3,62.9,15.0,30.0,45.0,25.0,45.0,433.5,87.5
-Western Asia,413.1,67.7,184.6,38.3,280.7,176.9,67.2,146.7,323.0,70.9,41.6,250.2,140.0,111.8,50.0,90.0,289.8,120.0,100.0,44.0,118.5,175.0,93.3,100.0,44.0,44.3,62.9,15.0,30.0,45.0,25.0,45.0,433.5,87.5
-Europe,300.0,180.0,130.0,70.0,150.0,120.0,60.0,30.0,220.0,130.0,70.0,140.0,140.0,60.0,30.0,90.0,126.1,332.4,301.1,44.0,118.5,175.0,100.0,100.0,44.0,44.3,62.9,15.0,30.0,45.0,25.0,45.0,140.0,90.0
-Oceania,300.0,180.0,130.0,70.0,150.0,120.0,60.0,30.0,220.0,130.0,70.0,140.0,140.0,60.0,30.0,90.0,352.7,120.0,100.0,44.0,118.5,160.0,100.0,100.0,44.0,44.3,50.0,15.0,30.0,40.0,15.0,30.0,140.0,90.0
-North America,307.1,187.3,127.5,71.5,225.0,165.5,80.0,45.0,84.5,115.9,44.0,74.6,140.6,85.0,45.0,97.5,180.0,120.0,100.0,44.0,118.5,103.8,59.1,59.2,44.0,44.3,62.9,15.0,30.0,45.0,25.0,45.0,195.0,100.0
-South America,307.1,187.3,127.5,71.5,225.0,165.5,80.0,45.0,84.5,115.9,44.0,74.6,140.6,85.0,45.0,97.5,180.0,120.0,100.0,44.0,118.5,103.8,59.1,59.2,44.0,44.3,50.0,15.0,30.0,40.0,15.0,30.0,195.0,100.0
-Central America,307.1,187.3,127.5,71.5,225.0,165.5,80.0,45.0,84.5,115.9,44.0,74.6,140.6,85.0,45.0,97.5,180.0,120.0,100.0,44.0,118.5,103.8,59.1,59.2,44.0,44.3,50.0,15.0,30.0,40.0,15.0,30.0,103.8,59.1
-Caribbean,307.1,187.3,127.5,71.5,225.0,165.5,80.0,45.0,84.5,115.9,44.0,74.6,140.6,85.0,45.0,97.5,180.0,120.0,100.0,44.0,118.5,103.8,59.1,59.2,44.0,44.3,50.0,15.0,30.0,40.0,15.0,30.0,103.8,59.1
+Eastern Africa;Tropical;Natural;Rainforest;404.2
+Eastern Africa;Tropical;Natural;Moist Deciduous Forest;236.6
+Eastern Africa;Tropical;Natural;Dry Forest;69.6
+Eastern Africa;Tropical;Natural;Shrubland;48.4
+Eastern Africa;Tropical;Plantation;Rainforest;250.0
+Eastern Africa;Tropical;Plantation;Moist Deciduous Forest;301.5
+Eastern Africa;Tropical;Plantation;Dry Forest;127.0
+Eastern Africa;Tropical;Plantation;Shrubland;20.0
+Eastern Africa;Warm Temperate;Natural;Humid Forest;54.1
+Eastern Africa;Warm Temperate;Natural;Dry Forest;65.2
+Eastern Africa;Warm Temperate;Natural;Steppe;50.5
+Eastern Africa;Warm Temperate;Natural;Mountain System;35.1
+Eastern Africa;Warm Temperate;Plantation;Humid Forest;140.0
+Eastern Africa;Warm Temperate;Plantation;Dry Forest;65.0
+Eastern Africa;Warm Temperate;Plantation;Steppe;17.5
+Eastern Africa;Warm Temperate;Plantation;Mountain System;90.0
+Eastern Africa;Cool Temperate;Natural;Oceanic Forest;180.0
+Eastern Africa;Cool Temperate;Natural;Continental Forest;120.0
+Eastern Africa;Cool Temperate;Natural;Mountain System;100.0
+Eastern Africa;Cool Temperate;Natural;Desert;44.0
+Eastern Africa;Cool Temperate;Natural;Steppe;118.5
+Eastern Africa;Cool Temperate;Plantation;Oceanic Forest;160.0
+Eastern Africa;Cool Temperate;Plantation;Continental Forest;100.0
+Eastern Africa;Cool Temperate;Plantation;Mountain System;100.0
+Eastern Africa;Cool Temperate;Plantation;Desert;44.0
+Eastern Africa;Cool Temperate;Plantation;Steppe;44.3
+Eastern Africa;Boreal;Natural;Coniferous Forest;50.0
+Eastern Africa;Boreal;Natural;Tundra Woodland;15.0
+Eastern Africa;Boreal;Natural;Mountain System;30.0
+Eastern Africa;Boreal;Plantation;Coniferous Forest;40.0
+Eastern Africa;Boreal;Plantation;Tundra Woodland;15.0
+Eastern Africa;Boreal;Plantation;Mountain System;30.0
+Eastern Africa;Tropical;Natural;Mountain System;190.0
+Eastern Africa;Tropical;Plantation;Mountain System;90.0
+Central Africa;Tropical;Natural;Rainforest;404.2
+Central Africa;Tropical;Natural;Moist Deciduous Forest;236.6
+Central Africa;Tropical;Natural;Dry Forest;69.6
+Central Africa;Tropical;Natural;Shrubland;48.4
+Central Africa;Tropical;Plantation;Rainforest;250.0
+Central Africa;Tropical;Plantation;Moist Deciduous Forest;301.5
+Central Africa;Tropical;Plantation;Dry Forest;127.0
+Central Africa;Tropical;Plantation;Shrubland;20.0
+Central Africa;Warm Temperate;Natural;Humid Forest;54.1
+Central Africa;Warm Temperate;Natural;Dry Forest;65.2
+Central Africa;Warm Temperate;Natural;Steppe;50.5
+Central Africa;Warm Temperate;Natural;Mountain System;35.1
+Central Africa;Warm Temperate;Plantation;Humid Forest;140.0
+Central Africa;Warm Temperate;Plantation;Dry Forest;65.0
+Central Africa;Warm Temperate;Plantation;Steppe;17.5
+Central Africa;Warm Temperate;Plantation;Mountain System;90.0
+Central Africa;Cool Temperate;Natural;Oceanic Forest;180.0
+Central Africa;Cool Temperate;Natural;Continental Forest;120.0
+Central Africa;Cool Temperate;Natural;Mountain System;100.0
+Central Africa;Cool Temperate;Natural;Desert;44.0
+Central Africa;Cool Temperate;Natural;Steppe;118.5
+Central Africa;Cool Temperate;Plantation;Oceanic Forest;160.0
+Central Africa;Cool Temperate;Plantation;Continental Forest;100.0
+Central Africa;Cool Temperate;Plantation;Mountain System;100.0
+Central Africa;Cool Temperate;Plantation;Desert;44.0
+Central Africa;Cool Temperate;Plantation;Steppe;44.3
+Central Africa;Boreal;Natural;Coniferous Forest;50.0
+Central Africa;Boreal;Natural;Tundra Woodland;15.0
+Central Africa;Boreal;Natural;Mountain System;30.0
+Central Africa;Boreal;Plantation;Coniferous Forest;40.0
+Central Africa;Boreal;Plantation;Tundra Woodland;15.0
+Central Africa;Boreal;Plantation;Mountain System;30.0
+Central Africa;Tropical;Natural;Mountain System;190.0
+Central Africa;Tropical;Plantation;Mountain System;90.0
+Northern Africa;Tropical;Natural;Rainforest;404.2
+Northern Africa;Tropical;Natural;Moist Deciduous Forest;236.6
+Northern Africa;Tropical;Natural;Dry Forest;69.6
+Northern Africa;Tropical;Natural;Shrubland;48.4
+Northern Africa;Tropical;Plantation;Rainforest;250.0
+Northern Africa;Tropical;Plantation;Moist Deciduous Forest;301.5
+Northern Africa;Tropical;Plantation;Dry Forest;127.0
+Northern Africa;Tropical;Plantation;Shrubland;20.0
+Northern Africa;Warm Temperate;Natural;Humid Forest;54.1
+Northern Africa;Warm Temperate;Natural;Dry Forest;65.2
+Northern Africa;Warm Temperate;Natural;Steppe;50.5
+Northern Africa;Warm Temperate;Natural;Mountain System;35.1
+Northern Africa;Warm Temperate;Plantation;Humid Forest;140.0
+Northern Africa;Warm Temperate;Plantation;Dry Forest;65.0
+Northern Africa;Warm Temperate;Plantation;Steppe;17.5
+Northern Africa;Warm Temperate;Plantation;Mountain System;90.0
+Northern Africa;Cool Temperate;Natural;Oceanic Forest;180.0
+Northern Africa;Cool Temperate;Natural;Continental Forest;120.0
+Northern Africa;Cool Temperate;Natural;Mountain System;100.0
+Northern Africa;Cool Temperate;Natural;Desert;44.0
+Northern Africa;Cool Temperate;Natural;Steppe;118.5
+Northern Africa;Cool Temperate;Plantation;Oceanic Forest;160.0
+Northern Africa;Cool Temperate;Plantation;Continental Forest;100.0
+Northern Africa;Cool Temperate;Plantation;Mountain System;100.0
+Northern Africa;Cool Temperate;Plantation;Desert;44.0
+Northern Africa;Cool Temperate;Plantation;Steppe;44.3
+Northern Africa;Boreal;Natural;Coniferous Forest;50.0
+Northern Africa;Boreal;Natural;Tundra Woodland;15.0
+Northern Africa;Boreal;Natural;Mountain System;30.0
+Northern Africa;Boreal;Plantation;Coniferous Forest;40.0
+Northern Africa;Boreal;Plantation;Tundra Woodland;15.0
+Northern Africa;Boreal;Plantation;Mountain System;30.0
+Northern Africa;Tropical;Natural;Mountain System;190.0
+Northern Africa;Tropical;Plantation;Mountain System;90.0
+Southern Africa;Tropical;Natural;Rainforest;404.2
+Southern Africa;Tropical;Natural;Moist Deciduous Forest;236.6
+Southern Africa;Tropical;Natural;Dry Forest;69.6
+Southern Africa;Tropical;Natural;Shrubland;48.4
+Southern Africa;Tropical;Plantation;Rainforest;250.0
+Southern Africa;Tropical;Plantation;Moist Deciduous Forest;301.5
+Southern Africa;Tropical;Plantation;Dry Forest;127.0
+Southern Africa;Tropical;Plantation;Shrubland;20.0
+Southern Africa;Warm Temperate;Natural;Humid Forest;54.1
+Southern Africa;Warm Temperate;Natural;Dry Forest;65.2
+Southern Africa;Warm Temperate;Natural;Steppe;50.5
+Southern Africa;Warm Temperate;Natural;Mountain System;35.1
+Southern Africa;Warm Temperate;Plantation;Humid Forest;140.0
+Southern Africa;Warm Temperate;Plantation;Dry Forest;65.0
+Southern Africa;Warm Temperate;Plantation;Steppe;17.5
+Southern Africa;Warm Temperate;Plantation;Mountain System;90.0
+Southern Africa;Cool Temperate;Natural;Oceanic Forest;180.0
+Southern Africa;Cool Temperate;Natural;Continental Forest;120.0
+Southern Africa;Cool Temperate;Natural;Mountain System;100.0
+Southern Africa;Cool Temperate;Natural;Desert;44.0
+Southern Africa;Cool Temperate;Natural;Steppe;118.5
+Southern Africa;Cool Temperate;Plantation;Oceanic Forest;160.0
+Southern Africa;Cool Temperate;Plantation;Continental Forest;100.0
+Southern Africa;Cool Temperate;Plantation;Mountain System;100.0
+Southern Africa;Cool Temperate;Plantation;Desert;44.0
+Southern Africa;Cool Temperate;Plantation;Steppe;44.3
+Southern Africa;Boreal;Natural;Coniferous Forest;50.0
+Southern Africa;Boreal;Natural;Tundra Woodland;15.0
+Southern Africa;Boreal;Natural;Mountain System;30.0
+Southern Africa;Boreal;Plantation;Coniferous Forest;40.0
+Southern Africa;Boreal;Plantation;Tundra Woodland;15.0
+Southern Africa;Boreal;Plantation;Mountain System;30.0
+Southern Africa;Tropical;Natural;Mountain System;190.0
+Southern Africa;Tropical;Plantation;Mountain System;90.0
+Western Africa;Tropical;Natural;Rainforest;404.2
+Western Africa;Tropical;Natural;Moist Deciduous Forest;236.6
+Western Africa;Tropical;Natural;Dry Forest;69.6
+Western Africa;Tropical;Natural;Shrubland;48.4
+Western Africa;Tropical;Plantation;Rainforest;250.0
+Western Africa;Tropical;Plantation;Moist Deciduous Forest;301.5
+Western Africa;Tropical;Plantation;Dry Forest;127.0
+Western Africa;Tropical;Plantation;Shrubland;20.0
+Western Africa;Warm Temperate;Natural;Humid Forest;54.1
+Western Africa;Warm Temperate;Natural;Dry Forest;65.2
+Western Africa;Warm Temperate;Natural;Steppe;50.5
+Western Africa;Warm Temperate;Natural;Mountain System;35.1
+Western Africa;Warm Temperate;Plantation;Humid Forest;140.0
+Western Africa;Warm Temperate;Plantation;Dry Forest;65.0
+Western Africa;Warm Temperate;Plantation;Steppe;17.5
+Western Africa;Warm Temperate;Plantation;Mountain System;90.0
+Western Africa;Cool Temperate;Natural;Oceanic Forest;180.0
+Western Africa;Cool Temperate;Natural;Continental Forest;120.0
+Western Africa;Cool Temperate;Natural;Mountain System;100.0
+Western Africa;Cool Temperate;Natural;Desert;44.0
+Western Africa;Cool Temperate;Natural;Steppe;118.5
+Western Africa;Cool Temperate;Plantation;Oceanic Forest;160.0
+Western Africa;Cool Temperate;Plantation;Continental Forest;100.0
+Western Africa;Cool Temperate;Plantation;Mountain System;100.0
+Western Africa;Cool Temperate;Plantation;Desert;44.0
+Western Africa;Cool Temperate;Plantation;Steppe;44.3
+Western Africa;Boreal;Natural;Coniferous Forest;50.0
+Western Africa;Boreal;Natural;Tundra Woodland;15.0
+Western Africa;Boreal;Natural;Mountain System;30.0
+Western Africa;Boreal;Plantation;Coniferous Forest;40.0
+Western Africa;Boreal;Plantation;Tundra Woodland;15.0
+Western Africa;Boreal;Plantation;Mountain System;30.0
+Western Africa;Tropical;Natural;Mountain System;190.0
+Western Africa;Tropical;Plantation;Mountain System;90.0
+Central Asia;Tropical;Natural;Rainforest;413.1
+Central Asia;Tropical;Natural;Moist Deciduous Forest;67.7
+Central Asia;Tropical;Natural;Dry Forest;184.6
+Central Asia;Tropical;Natural;Shrubland;38.3
+Central Asia;Tropical;Plantation;Rainforest;280.7
+Central Asia;Tropical;Plantation;Moist Deciduous Forest;176.9
+Central Asia;Tropical;Plantation;Dry Forest;67.2
+Central Asia;Tropical;Plantation;Shrubland;146.7
+Central Asia;Warm Temperate;Natural;Humid Forest;323.0
+Central Asia;Warm Temperate;Natural;Dry Forest;70.9
+Central Asia;Warm Temperate;Natural;Steppe;41.6
+Central Asia;Warm Temperate;Natural;Mountain System;250.2
+Central Asia;Warm Temperate;Plantation;Humid Forest;140.0
+Central Asia;Warm Temperate;Plantation;Dry Forest;111.8
+Central Asia;Warm Temperate;Plantation;Steppe;50.0
+Central Asia;Warm Temperate;Plantation;Mountain System;90.0
+Central Asia;Cool Temperate;Natural;Oceanic Forest;289.8
+Central Asia;Cool Temperate;Natural;Continental Forest;120.0
+Central Asia;Cool Temperate;Natural;Mountain System;100.0
+Central Asia;Cool Temperate;Natural;Desert;44.0
+Central Asia;Cool Temperate;Natural;Steppe;118.5
+Central Asia;Cool Temperate;Plantation;Oceanic Forest;175.0
+Central Asia;Cool Temperate;Plantation;Continental Forest;93.3
+Central Asia;Cool Temperate;Plantation;Mountain System;100.0
+Central Asia;Cool Temperate;Plantation;Desert;44.0
+Central Asia;Cool Temperate;Plantation;Steppe;44.3
+Central Asia;Boreal;Natural;Coniferous Forest;62.9
+Central Asia;Boreal;Natural;Tundra Woodland;15.0
+Central Asia;Boreal;Natural;Mountain System;30.0
+Central Asia;Boreal;Plantation;Coniferous Forest;45.0
+Central Asia;Boreal;Plantation;Tundra Woodland;25.0
+Central Asia;Boreal;Plantation;Mountain System;45.0
+Central Asia;Tropical;Natural;Mountain System;433.5
+Central Asia;Tropical;Plantation;Mountain System;87.5
+Eastern Asia;Tropical;Natural;Rainforest;413.1
+Eastern Asia;Tropical;Natural;Moist Deciduous Forest;67.7
+Eastern Asia;Tropical;Natural;Dry Forest;184.6
+Eastern Asia;Tropical;Natural;Shrubland;38.3
+Eastern Asia;Tropical;Plantation;Rainforest;280.7
+Eastern Asia;Tropical;Plantation;Moist Deciduous Forest;176.9
+Eastern Asia;Tropical;Plantation;Dry Forest;67.2
+Eastern Asia;Tropical;Plantation;Shrubland;146.7
+Eastern Asia;Warm Temperate;Natural;Humid Forest;323.0
+Eastern Asia;Warm Temperate;Natural;Dry Forest;70.9
+Eastern Asia;Warm Temperate;Natural;Steppe;41.6
+Eastern Asia;Warm Temperate;Natural;Mountain System;250.2
+Eastern Asia;Warm Temperate;Plantation;Humid Forest;140.0
+Eastern Asia;Warm Temperate;Plantation;Dry Forest;111.8
+Eastern Asia;Warm Temperate;Plantation;Steppe;50.0
+Eastern Asia;Warm Temperate;Plantation;Mountain System;90.0
+Eastern Asia;Cool Temperate;Natural;Oceanic Forest;289.8
+Eastern Asia;Cool Temperate;Natural;Continental Forest;120.0
+Eastern Asia;Cool Temperate;Natural;Mountain System;100.0
+Eastern Asia;Cool Temperate;Natural;Desert;44.0
+Eastern Asia;Cool Temperate;Natural;Steppe;118.5
+Eastern Asia;Cool Temperate;Plantation;Oceanic Forest;175.0
+Eastern Asia;Cool Temperate;Plantation;Continental Forest;93.3
+Eastern Asia;Cool Temperate;Plantation;Mountain System;100.0
+Eastern Asia;Cool Temperate;Plantation;Desert;44.0
+Eastern Asia;Cool Temperate;Plantation;Steppe;44.3
+Eastern Asia;Boreal;Natural;Coniferous Forest;62.9
+Eastern Asia;Boreal;Natural;Tundra Woodland;15.0
+Eastern Asia;Boreal;Natural;Mountain System;30.0
+Eastern Asia;Boreal;Plantation;Coniferous Forest;45.0
+Eastern Asia;Boreal;Plantation;Tundra Woodland;25.0
+Eastern Asia;Boreal;Plantation;Mountain System;45.0
+Eastern Asia;Tropical;Natural;Mountain System;433.5
+Eastern Asia;Tropical;Plantation;Mountain System;87.5
+South-eastern Asia;Tropical;Natural;Rainforest;413.1
+South-eastern Asia;Tropical;Natural;Moist Deciduous Forest;67.7
+South-eastern Asia;Tropical;Natural;Dry Forest;184.6
+South-eastern Asia;Tropical;Natural;Shrubland;38.3
+South-eastern Asia;Tropical;Plantation;Rainforest;280.7
+South-eastern Asia;Tropical;Plantation;Moist Deciduous Forest;176.9
+South-eastern Asia;Tropical;Plantation;Dry Forest;67.2
+South-eastern Asia;Tropical;Plantation;Shrubland;146.7
+South-eastern Asia;Warm Temperate;Natural;Humid Forest;323.0
+South-eastern Asia;Warm Temperate;Natural;Dry Forest;70.9
+South-eastern Asia;Warm Temperate;Natural;Steppe;41.6
+South-eastern Asia;Warm Temperate;Natural;Mountain System;250.2
+South-eastern Asia;Warm Temperate;Plantation;Humid Forest;140.0
+South-eastern Asia;Warm Temperate;Plantation;Dry Forest;111.8
+South-eastern Asia;Warm Temperate;Plantation;Steppe;50.0
+South-eastern Asia;Warm Temperate;Plantation;Mountain System;90.0
+South-eastern Asia;Cool Temperate;Natural;Oceanic Forest;289.8
+South-eastern Asia;Cool Temperate;Natural;Continental Forest;120.0
+South-eastern Asia;Cool Temperate;Natural;Mountain System;100.0
+South-eastern Asia;Cool Temperate;Natural;Desert;44.0
+South-eastern Asia;Cool Temperate;Natural;Steppe;118.5
+South-eastern Asia;Cool Temperate;Plantation;Oceanic Forest;175.0
+South-eastern Asia;Cool Temperate;Plantation;Continental Forest;93.3
+South-eastern Asia;Cool Temperate;Plantation;Mountain System;100.0
+South-eastern Asia;Cool Temperate;Plantation;Desert;44.0
+South-eastern Asia;Cool Temperate;Plantation;Steppe;44.3
+South-eastern Asia;Boreal;Natural;Coniferous Forest;62.9
+South-eastern Asia;Boreal;Natural;Tundra Woodland;15.0
+South-eastern Asia;Boreal;Natural;Mountain System;30.0
+South-eastern Asia;Boreal;Plantation;Coniferous Forest;45.0
+South-eastern Asia;Boreal;Plantation;Tundra Woodland;25.0
+South-eastern Asia;Boreal;Plantation;Mountain System;45.0
+South-eastern Asia;Tropical;Natural;Mountain System;433.5
+South-eastern Asia;Tropical;Plantation;Mountain System;87.5
+Southern Asia;Tropical;Natural;Rainforest;413.1
+Southern Asia;Tropical;Natural;Moist Deciduous Forest;67.7
+Southern Asia;Tropical;Natural;Dry Forest;184.6
+Southern Asia;Tropical;Natural;Shrubland;38.3
+Southern Asia;Tropical;Plantation;Rainforest;280.7
+Southern Asia;Tropical;Plantation;Moist Deciduous Forest;176.9
+Southern Asia;Tropical;Plantation;Dry Forest;67.2
+Southern Asia;Tropical;Plantation;Shrubland;146.7
+Southern Asia;Warm Temperate;Natural;Humid Forest;323.0
+Southern Asia;Warm Temperate;Natural;Dry Forest;70.9
+Southern Asia;Warm Temperate;Natural;Steppe;41.6
+Southern Asia;Warm Temperate;Natural;Mountain System;250.2
+Southern Asia;Warm Temperate;Plantation;Humid Forest;140.0
+Southern Asia;Warm Temperate;Plantation;Dry Forest;111.8
+Southern Asia;Warm Temperate;Plantation;Steppe;50.0
+Southern Asia;Warm Temperate;Plantation;Mountain System;90.0
+Southern Asia;Cool Temperate;Natural;Oceanic Forest;289.8
+Southern Asia;Cool Temperate;Natural;Continental Forest;120.0
+Southern Asia;Cool Temperate;Natural;Mountain System;100.0
+Southern Asia;Cool Temperate;Natural;Desert;44.0
+Southern Asia;Cool Temperate;Natural;Steppe;118.5
+Southern Asia;Cool Temperate;Plantation;Oceanic Forest;175.0
+Southern Asia;Cool Temperate;Plantation;Continental Forest;93.3
+Southern Asia;Cool Temperate;Plantation;Mountain System;100.0
+Southern Asia;Cool Temperate;Plantation;Desert;44.0
+Southern Asia;Cool Temperate;Plantation;Steppe;44.3
+Southern Asia;Boreal;Natural;Coniferous Forest;62.9
+Southern Asia;Boreal;Natural;Tundra Woodland;15.0
+Southern Asia;Boreal;Natural;Mountain System;30.0
+Southern Asia;Boreal;Plantation;Coniferous Forest;45.0
+Southern Asia;Boreal;Plantation;Tundra Woodland;25.0
+Southern Asia;Boreal;Plantation;Mountain System;45.0
+Southern Asia;Tropical;Natural;Mountain System;433.5
+Southern Asia;Tropical;Plantation;Mountain System;87.5
+Western Asia;Tropical;Natural;Rainforest;413.1
+Western Asia;Tropical;Natural;Moist Deciduous Forest;67.7
+Western Asia;Tropical;Natural;Dry Forest;184.6
+Western Asia;Tropical;Natural;Shrubland;38.3
+Western Asia;Tropical;Plantation;Rainforest;280.7
+Western Asia;Tropical;Plantation;Moist Deciduous Forest;176.9
+Western Asia;Tropical;Plantation;Dry Forest;67.2
+Western Asia;Tropical;Plantation;Shrubland;146.7
+Western Asia;Warm Temperate;Natural;Humid Forest;323.0
+Western Asia;Warm Temperate;Natural;Dry Forest;70.9
+Western Asia;Warm Temperate;Natural;Steppe;41.6
+Western Asia;Warm Temperate;Natural;Mountain System;250.2
+Western Asia;Warm Temperate;Plantation;Humid Forest;140.0
+Western Asia;Warm Temperate;Plantation;Dry Forest;111.8
+Western Asia;Warm Temperate;Plantation;Steppe;50.0
+Western Asia;Warm Temperate;Plantation;Mountain System;90.0
+Western Asia;Cool Temperate;Natural;Oceanic Forest;289.8
+Western Asia;Cool Temperate;Natural;Continental Forest;120.0
+Western Asia;Cool Temperate;Natural;Mountain System;100.0
+Western Asia;Cool Temperate;Natural;Desert;44.0
+Western Asia;Cool Temperate;Natural;Steppe;118.5
+Western Asia;Cool Temperate;Plantation;Oceanic Forest;175.0
+Western Asia;Cool Temperate;Plantation;Continental Forest;93.3
+Western Asia;Cool Temperate;Plantation;Mountain System;100.0
+Western Asia;Cool Temperate;Plantation;Desert;44.0
+Western Asia;Cool Temperate;Plantation;Steppe;44.3
+Western Asia;Boreal;Natural;Coniferous Forest;62.9
+Western Asia;Boreal;Natural;Tundra Woodland;15.0
+Western Asia;Boreal;Natural;Mountain System;30.0
+Western Asia;Boreal;Plantation;Coniferous Forest;45.0
+Western Asia;Boreal;Plantation;Tundra Woodland;25.0
+Western Asia;Boreal;Plantation;Mountain System;45.0
+Western Asia;Tropical;Natural;Mountain System;433.5
+Western Asia;Tropical;Plantation;Mountain System;87.5
+Europe;Tropical;Natural;Rainforest;300.0
+Europe;Tropical;Natural;Moist Deciduous Forest;180.0
+Europe;Tropical;Natural;Dry Forest;130.0
+Europe;Tropical;Natural;Shrubland;70.0
+Europe;Tropical;Plantation;Rainforest;150.0
+Europe;Tropical;Plantation;Moist Deciduous Forest;120.0
+Europe;Tropical;Plantation;Dry Forest;60.0
+Europe;Tropical;Plantation;Shrubland;30.0
+Europe;Warm Temperate;Natural;Humid Forest;220.0
+Europe;Warm Temperate;Natural;Dry Forest;130.0
+Europe;Warm Temperate;Natural;Steppe;70.0
+Europe;Warm Temperate;Natural;Mountain System;140.0
+Europe;Warm Temperate;Plantation;Humid Forest;140.0
+Europe;Warm Temperate;Plantation;Dry Forest;60.0
+Europe;Warm Temperate;Plantation;Steppe;30.0
+Europe;Warm Temperate;Plantation;Mountain System;90.0
+Europe;Cool Temperate;Natural;Oceanic Forest;126.1
+Europe;Cool Temperate;Natural;Continental Forest;332.4
+Europe;Cool Temperate;Natural;Mountain System;301.1
+Europe;Cool Temperate;Natural;Desert;44.0
+Europe;Cool Temperate;Natural;Steppe;118.5
+Europe;Cool Temperate;Plantation;Oceanic Forest;175.0
+Europe;Cool Temperate;Plantation;Continental Forest;100.0
+Europe;Cool Temperate;Plantation;Mountain System;100.0
+Europe;Cool Temperate;Plantation;Desert;44.0
+Europe;Cool Temperate;Plantation;Steppe;44.3
+Europe;Boreal;Natural;Coniferous Forest;62.9
+Europe;Boreal;Natural;Tundra Woodland;15.0
+Europe;Boreal;Natural;Mountain System;30.0
+Europe;Boreal;Plantation;Coniferous Forest;45.0
+Europe;Boreal;Plantation;Tundra Woodland;25.0
+Europe;Boreal;Plantation;Mountain System;45.0
+Europe;Tropical;Natural;Mountain System;140.0
+Europe;Tropical;Plantation;Mountain System;90.0
+Oceania;Tropical;Natural;Rainforest;300.0
+Oceania;Tropical;Natural;Moist Deciduous Forest;180.0
+Oceania;Tropical;Natural;Dry Forest;130.0
+Oceania;Tropical;Natural;Shrubland;70.0
+Oceania;Tropical;Plantation;Rainforest;150.0
+Oceania;Tropical;Plantation;Moist Deciduous Forest;120.0
+Oceania;Tropical;Plantation;Dry Forest;60.0
+Oceania;Tropical;Plantation;Shrubland;30.0
+Oceania;Warm Temperate;Natural;Humid Forest;220.0
+Oceania;Warm Temperate;Natural;Dry Forest;130.0
+Oceania;Warm Temperate;Natural;Steppe;70.0
+Oceania;Warm Temperate;Natural;Mountain System;140.0
+Oceania;Warm Temperate;Plantation;Humid Forest;140.0
+Oceania;Warm Temperate;Plantation;Dry Forest;60.0
+Oceania;Warm Temperate;Plantation;Steppe;30.0
+Oceania;Warm Temperate;Plantation;Mountain System;90.0
+Oceania;Cool Temperate;Natural;Oceanic Forest;352.7
+Oceania;Cool Temperate;Natural;Continental Forest;120.0
+Oceania;Cool Temperate;Natural;Mountain System;100.0
+Oceania;Cool Temperate;Natural;Desert;44.0
+Oceania;Cool Temperate;Natural;Steppe;118.5
+Oceania;Cool Temperate;Plantation;Oceanic Forest;160.0
+Oceania;Cool Temperate;Plantation;Continental Forest;100.0
+Oceania;Cool Temperate;Plantation;Mountain System;100.0
+Oceania;Cool Temperate;Plantation;Desert;44.0
+Oceania;Cool Temperate;Plantation;Steppe;44.3
+Oceania;Boreal;Natural;Coniferous Forest;50.0
+Oceania;Boreal;Natural;Tundra Woodland;15.0
+Oceania;Boreal;Natural;Mountain System;30.0
+Oceania;Boreal;Plantation;Coniferous Forest;40.0
+Oceania;Boreal;Plantation;Tundra Woodland;15.0
+Oceania;Boreal;Plantation;Mountain System;30.0
+Oceania;Tropical;Natural;Mountain System;140.0
+Oceania;Tropical;Plantation;Mountain System;90.0
+North America;Tropical;Natural;Rainforest;307.1
+North America;Tropical;Natural;Moist Deciduous Forest;187.3
+North America;Tropical;Natural;Dry Forest;127.5
+North America;Tropical;Natural;Shrubland;71.5
+North America;Tropical;Plantation;Rainforest;225.0
+North America;Tropical;Plantation;Moist Deciduous Forest;165.5
+North America;Tropical;Plantation;Dry Forest;80.0
+North America;Tropical;Plantation;Shrubland;45.0
+North America;Warm Temperate;Natural;Humid Forest;84.5
+North America;Warm Temperate;Natural;Dry Forest;115.9
+North America;Warm Temperate;Natural;Steppe;44.0
+North America;Warm Temperate;Natural;Mountain System;74.6
+North America;Warm Temperate;Plantation;Humid Forest;140.6
+North America;Warm Temperate;Plantation;Dry Forest;85.0
+North America;Warm Temperate;Plantation;Steppe;45.0
+North America;Warm Temperate;Plantation;Mountain System;97.5
+North America;Cool Temperate;Natural;Oceanic Forest;180.0
+North America;Cool Temperate;Natural;Continental Forest;120.0
+North America;Cool Temperate;Natural;Mountain System;100.0
+North America;Cool Temperate;Natural;Desert;44.0
+North America;Cool Temperate;Natural;Steppe;118.5
+North America;Cool Temperate;Plantation;Oceanic Forest;103.8
+North America;Cool Temperate;Plantation;Continental Forest;59.1
+North America;Cool Temperate;Plantation;Mountain System;59.2
+North America;Cool Temperate;Plantation;Desert;44.0
+North America;Cool Temperate;Plantation;Steppe;44.3
+North America;Boreal;Natural;Coniferous Forest;62.9
+North America;Boreal;Natural;Tundra Woodland;15.0
+North America;Boreal;Natural;Mountain System;30.0
+North America;Boreal;Plantation;Coniferous Forest;45.0
+North America;Boreal;Plantation;Tundra Woodland;25.0
+North America;Boreal;Plantation;Mountain System;45.0
+North America;Tropical;Natural;Mountain System;195.0
+North America;Tropical;Plantation;Mountain System;100.0
+South America;Tropical;Natural;Rainforest;307.1
+South America;Tropical;Natural;Moist Deciduous Forest;187.3
+South America;Tropical;Natural;Dry Forest;127.5
+South America;Tropical;Natural;Shrubland;71.5
+South America;Tropical;Plantation;Rainforest;225.0
+South America;Tropical;Plantation;Moist Deciduous Forest;165.5
+South America;Tropical;Plantation;Dry Forest;80.0
+South America;Tropical;Plantation;Shrubland;45.0
+South America;Warm Temperate;Natural;Humid Forest;84.5
+South America;Warm Temperate;Natural;Dry Forest;115.9
+South America;Warm Temperate;Natural;Steppe;44.0
+South America;Warm Temperate;Natural;Mountain System;74.6
+South America;Warm Temperate;Plantation;Humid Forest;140.6
+South America;Warm Temperate;Plantation;Dry Forest;85.0
+South America;Warm Temperate;Plantation;Steppe;45.0
+South America;Warm Temperate;Plantation;Mountain System;97.5
+South America;Cool Temperate;Natural;Oceanic Forest;180.0
+South America;Cool Temperate;Natural;Continental Forest;120.0
+South America;Cool Temperate;Natural;Mountain System;100.0
+South America;Cool Temperate;Natural;Desert;44.0
+South America;Cool Temperate;Natural;Steppe;118.5
+South America;Cool Temperate;Plantation;Oceanic Forest;103.8
+South America;Cool Temperate;Plantation;Continental Forest;59.1
+South America;Cool Temperate;Plantation;Mountain System;59.2
+South America;Cool Temperate;Plantation;Desert;44.0
+South America;Cool Temperate;Plantation;Steppe;44.3
+South America;Boreal;Natural;Coniferous Forest;50.0
+South America;Boreal;Natural;Tundra Woodland;15.0
+South America;Boreal;Natural;Mountain System;30.0
+South America;Boreal;Plantation;Coniferous Forest;40.0
+South America;Boreal;Plantation;Tundra Woodland;15.0
+South America;Boreal;Plantation;Mountain System;30.0
+South America;Tropical;Natural;Mountain System;195.0
+South America;Tropical;Plantation;Mountain System;100.0
+Central America;Tropical;Natural;Rainforest;307.1
+Central America;Tropical;Natural;Moist Deciduous Forest;187.3
+Central America;Tropical;Natural;Dry Forest;127.5
+Central America;Tropical;Natural;Shrubland;71.5
+Central America;Tropical;Plantation;Rainforest;225.0
+Central America;Tropical;Plantation;Moist Deciduous Forest;165.5
+Central America;Tropical;Plantation;Dry Forest;80.0
+Central America;Tropical;Plantation;Shrubland;45.0
+Central America;Warm Temperate;Natural;Humid Forest;84.5
+Central America;Warm Temperate;Natural;Dry Forest;115.9
+Central America;Warm Temperate;Natural;Steppe;44.0
+Central America;Warm Temperate;Natural;Mountain System;74.6
+Central America;Warm Temperate;Plantation;Humid Forest;140.6
+Central America;Warm Temperate;Plantation;Dry Forest;85.0
+Central America;Warm Temperate;Plantation;Steppe;45.0
+Central America;Warm Temperate;Plantation;Mountain System;97.5
+Central America;Cool Temperate;Natural;Oceanic Forest;180.0
+Central America;Cool Temperate;Natural;Continental Forest;120.0
+Central America;Cool Temperate;Natural;Mountain System;100.0
+Central America;Cool Temperate;Natural;Desert;44.0
+Central America;Cool Temperate;Natural;Steppe;118.5
+Central America;Cool Temperate;Plantation;Oceanic Forest;103.8
+Central America;Cool Temperate;Plantation;Continental Forest;59.1
+Central America;Cool Temperate;Plantation;Mountain System;59.2
+Central America;Cool Temperate;Plantation;Desert;44.0
+Central America;Cool Temperate;Plantation;Steppe;44.3
+Central America;Boreal;Natural;Coniferous Forest;50.0
+Central America;Boreal;Natural;Tundra Woodland;15.0
+Central America;Boreal;Natural;Mountain System;30.0
+Central America;Boreal;Plantation;Coniferous Forest;40.0
+Central America;Boreal;Plantation;Tundra Woodland;15.0
+Central America;Boreal;Plantation;Mountain System;30.0
+Central America;Tropical;Natural;Mountain System;103.8
+Central America;Tropical;Plantation;Mountain System;59.1
+Caribbean;Tropical;Natural;Rainforest;307.1
+Caribbean;Tropical;Natural;Moist Deciduous Forest;187.3
+Caribbean;Tropical;Natural;Dry Forest;127.5
+Caribbean;Tropical;Natural;Shrubland;71.5
+Caribbean;Tropical;Plantation;Rainforest;225.0
+Caribbean;Tropical;Plantation;Moist Deciduous Forest;165.5
+Caribbean;Tropical;Plantation;Dry Forest;80.0
+Caribbean;Tropical;Plantation;Shrubland;45.0
+Caribbean;Warm Temperate;Natural;Humid Forest;84.5
+Caribbean;Warm Temperate;Natural;Dry Forest;115.9
+Caribbean;Warm Temperate;Natural;Steppe;44.0
+Caribbean;Warm Temperate;Natural;Mountain System;74.6
+Caribbean;Warm Temperate;Plantation;Humid Forest;140.6
+Caribbean;Warm Temperate;Plantation;Dry Forest;85.0
+Caribbean;Warm Temperate;Plantation;Steppe;45.0
+Caribbean;Warm Temperate;Plantation;Mountain System;97.5
+Caribbean;Cool Temperate;Natural;Oceanic Forest;180.0
+Caribbean;Cool Temperate;Natural;Continental Forest;120.0
+Caribbean;Cool Temperate;Natural;Mountain System;100.0
+Caribbean;Cool Temperate;Natural;Desert;44.0
+Caribbean;Cool Temperate;Natural;Steppe;118.5
+Caribbean;Cool Temperate;Plantation;Oceanic Forest;103.8
+Caribbean;Cool Temperate;Plantation;Continental Forest;59.1
+Caribbean;Cool Temperate;Plantation;Mountain System;59.2
+Caribbean;Cool Temperate;Plantation;Desert;44.0
+Caribbean;Cool Temperate;Plantation;Steppe;44.3
+Caribbean;Boreal;Natural;Coniferous Forest;50.0
+Caribbean;Boreal;Natural;Tundra Woodland;15.0
+Caribbean;Boreal;Natural;Mountain System;30.0
+Caribbean;Boreal;Plantation;Coniferous Forest;40.0
+Caribbean;Boreal;Plantation;Tundra Woodland;15.0
+Caribbean;Boreal;Plantation;Mountain System;30.0
+Caribbean;Tropical;Natural;Mountain System;103.8
+Caribbean;Tropical;Plantation;Mountain System;59.1

@@ -1,187 +1,871 @@
 land_use_type;continent;forest_condition_type;forest_type;agb_min;agb_max;agb_growth_min;agb_growth_max
-Tropical Dry Forest;Asia;Primary;Natural;184.6;184.6;0;0
-Tropical Dry Forest;Asia;Secondary >20 years;Natural;184.6;184.6;1.6;1.6
-Tropical Dry Forest;Asia;Secondary ≤20 years;Natural;184.6;184.6;3.9;3.9
-Tropical Rainforest;Africa;Primary;Natural;404,2;404,2;1,3;1,3
-Tropical Rainforest;Africa;Secondary >20 years;Natural;212,9;212,9;3,5;3,5
-Tropical Rainforest;Africa;Secondary ≤20 years;Natural;52,8;52,8;7,6;7,6
-Tropical Rainforest;North and South America;Primary;Natural;307,1;307,1;1;1
-Tropical Rainforest;North and South America;Secondary >20 years;Natural;206,4;206,4;2,3;2,3
-Tropical Rainforest;North and South America;Secondary ≤20 years;Natural;75,7;75,7;5,9;5,9
-Tropical Rainforest;Asia;Primary;Natural;413,1;413,1;0,7;0,7
-Tropical Rainforest;Asia;Secondary >20 years;Natural;131,6;131,6;2,7;2,7
-Tropical Rainforest;Asia;Secondary ≤20 years;Natural;45,6;45,6;3,4;3,4
-Tropical Moist Deciduous Forest;Africa;Primary;Natural;236,6;236,6;0,4;0,4
-Tropical Moist Deciduous Forest;Africa;Secondary >20 years;Natural;72,8;72,8;0,9;0,9
-Tropical Moist Deciduous Forest;Africa;Secondary ≤20 years;Natural;72,8;72,8;2,9;2,9
-Tropical Moist Deciduous Forest;North and South America;Primary;Natural;187,3;187,3;0,4;0,4
-Tropical Moist Deciduous Forest;North and South America;Secondary >20 years;Natural;131;131;2,7;2,7
-Tropical Moist Deciduous Forest;North and South America;Secondary ≤20 years;Natural;55,7;55,7;5,2;5,2
-Tropical Moist Deciduous Forest;Asia;Primary;Natural;67,7;67,7;0,4;0,4
-Tropical Moist Deciduous Forest;Asia;Secondary >20 years;Natural;67,7;67,7;0,9;0,9
-Tropical Moist Deciduous Forest;Asia;Secondary ≤20 years;Natural;67,7;67,7;2,4;2,4
-Tropical Dry Forest;Africa;Primary;Natural;69,6;69,6;0;0
-Tropical Dry Forest;Africa;Secondary >20 years;Natural;69,6;69,6;1,6;1,6
-Tropical Dry Forest;Africa;Secondary ≤20 years;Natural;69,6;69,6;3,9;3,9
-Tropical Dry Forest;North and South America;Primary;Natural;127,5;127,5;0;0
-Tropical Dry Forest;North and South America;Secondary >20 years;Natural;118,9;118,9;1,6;1,6
-Tropical Dry Forest;North and South America;Secondary ≤20 years;Natural;32,2;32,2;3,9;3,9
-Tropical Dry Forest;Asia;Primary;Natural;184,6;184,6;0;0
-Tropical Dry Forest;Asia;Secondary >20 years;Natural;184,6;184,6;1,6;1,6
-Tropical Dry Forest;Asia;Secondary ≤20 years;Natural;184,6;184,6;3,9;3,9
-Tropical Shrubland;Africa;Primary;Natural;48,4;48,4;0,9;0,9
-Tropical Shrubland;Africa;Secondary >20 years;Natural;48,4;48,4;0,9;0,9
-Tropical Shrubland;Africa;Secondary ≤20 years;Natural;48,4;48,4;0.2;0.7
-Tropical Shrubland;North and South America;Primary;Natural;71,5;71,5;1;
-Tropical Shrubland;North and South America;Secondary >20 years;Natural;71,5;71,5;1;
-Tropical Shrubland;North and South America;Secondary ≤20 years;Natural;71,5;71,5;4;
-Tropical Shrubland;Asia;Primary;Natural;38,3;38,3;1.0;1.3
-Tropical Shrubland;Asia;Secondary >20 years;Natural;38,3;38,3;1.0;1.3
-Tropical Shrubland;Asia;Secondary ≤20 years;Natural;38,3;38,3;2.0;5
-Tropical Mountain System;Africa;Primary;Natural;190;190;0,5;0,5
-Tropical Mountain System;Africa;Secondary >20 years;Natural;190;190;1,8;1,8
-Tropical Mountain System;Africa;Secondary ≤20 years;Natural;190;190;5,5;5,5
-Tropical Mountain System;North and South America;Primary;Natural;195;195;0,5;0,5
-Tropical Mountain System;North and South America;Secondary >20 years;Natural;184,4;184,4;1,8;1,8
-Tropical Mountain System;North and South America;Secondary ≤20 years;Natural;75,9;75,9;4,4;4,4
-Tropical Mountain System;Asia;Primary;Natural;433,5;433,5;-0,7;-0,7
-Tropical Mountain System;Asia;Secondary >20 years;Natural;66,4;66,4;1,1;1,1
-Tropical Mountain System;Asia;Secondary ≤20 years;Natural;66,4;66,4;2,9;2,9
-Sub-Tropical Humid Forest;Africa;Primary;Natural;54,1;54,1;0;0
-Sub-Tropical Humid Forest;Africa;Secondary >20 years;Natural;54,1;54,1;1;1
-Sub-Tropical Humid Forest;Africa;Secondary ≤20 years;Natural;54,1;54,1;2,5;2,5
-Sub-Tropical Humid Forest;North and South America;Primary;Natural;84,5;84,5;0;0
-Sub-Tropical Humid Forest;North and South America;Secondary >20 years;Natural;84,5;84,5;1;1
-Sub-Tropical Humid Forest;North and South America;Secondary ≤20 years;Natural;84,5;84,5;2,5;2,5
-Sub-Tropical Humid Forest;Asia;Primary;Natural;323;323;0;0
-Sub-Tropical Humid Forest;Asia;Secondary >20 years;Natural;258,4;258,4;1;1
-Sub-Tropical Humid Forest;Asia;Secondary ≤20 years;Natural;258,4;258,4;2,5;2,5
-Sub-Tropical Dry Forest;Africa;Primary;Natural;65,2;65,2;1,8;1,8
-Sub-Tropical Dry Forest;Africa;Secondary >20 years;Natural;65,2;65,2;1,8;1,8
-Sub-Tropical Dry Forest;Africa;Secondary ≤20 years;Natural;65,2;65,2;2,4;2,4
-Sub-Tropical Dry Forest;North and South America;Primary;Natural;115,9;115,9;1;1
-Sub-Tropical Dry Forest;North and South America;Secondary >20 years;Natural;115,9;115,9;1;1
-Sub-Tropical Dry Forest;North and South America;Secondary ≤20 years;Natural;115,9;115,9;4;4
-Sub-Tropical Dry Forest;Asia;Primary;Natural;70,9;70,9;1.5;2
-Sub-Tropical Dry Forest;Asia;Secondary >20 years;Natural;70,9;70,9;1.5;2
-Sub-Tropical Dry Forest;Asia;Secondary ≤20 years;Natural;70,9;70,9;6.0;7
-Sub-Tropical Dry Forest;Africa;Primary;Natural;65,2;65,2;1,8;1,8
-Sub-Tropical Dry Forest;Africa;Secondary >20 years;Natural;65,2;65,2;1,8;1,8
-Sub-Tropical Dry Forest;Africa;Secondary ≤20 years;Natural;65,2;65,2;2,4;2,4
-Sub-Tropical Dry Forest;North and South America;Primary;Natural;115,9;115,9;1;1
-Sub-Tropical Dry Forest;North and South America;Secondary >20 years;Natural;115,9;115,9;1;1
-Sub-Tropical Dry Forest;North and South America;Secondary ≤20 years;Natural;115,9;115,9;4;4
-Sub-Tropical Dry Forest;Asia;Primary;Natural;70,9;70,9;1.5;2
-Sub-Tropical Dry Forest;Asia;Secondary >20 years;Natural;70,9;70,9;1.5;2
-Sub-Tropical Dry Forest;Asia;Secondary ≤20 years;Natural;70,9;70,9;6.0;7
-Sub-Tropical Dry Forest;Africa;Primary;Natural;65,2;65,2;1,8;1,8
-Sub-Tropical Dry Forest;Africa;Secondary >20 years;Natural;65,2;65,2;1,8;1,8
-Sub-Tropical Dry Forest;Africa;Secondary ≤20 years;Natural;65,2;65,2;2,4;2,4
-Sub-Tropical Dry Forest;North and South America;Primary;Natural;115,9;115,9;1;1
-Sub-Tropical Dry Forest;North and South America;Secondary >20 years;Natural;115,9;115,9;1;1
-Sub-Tropical Dry Forest;North and South America;Secondary ≤20 years;Natural;115,9;115,9;4;4
-Sub-Tropical Dry Forest;Asia;Primary;Natural;70,9;70,9;1.5;2
-Sub-Tropical Dry Forest;Asia;Secondary >20 years;Natural;70,9;70,9;1.5;2
-Sub-Tropical Dry Forest;Asia;Secondary ≤20 years;Natural;70,9;70,9;6.0;7
-Sub-Tropical Steppe;Africa;Primary;Natural;50,5;50,5;0,9;0,9
-Sub-Tropical Steppe;Africa;Secondary >20 years;Natural;50,5;50,5;0,9;0,9
-Sub-Tropical Steppe;Africa;Secondary ≤20 years;Natural;50,5;50,5;1,2;1,2
-Sub-Tropical Steppe;North and South America;Primary;Natural;44;44;1;1
-Sub-Tropical Steppe;North and South America;Secondary >20 years;Natural;44;44;1;1
-Sub-Tropical Steppe;North and South America;Secondary ≤20 years;Natural;44;44;4;4
-Sub-Tropical Steppe;Asia;Primary;Natural;41,6;41,6;1.0;1.3
-Sub-Tropical Steppe;Asia;Secondary >20 years;Natural;41,6;41,6;1.0;1.3
-Sub-Tropical Steppe;Asia;Secondary ≤20 years;Natural;41,6;41,6;2.0;5
-Tropical Dry Forest;Asia;Primary;Plantation;0;0;0;0
-Tropical Dry Forest;Asia;Secondary >20 years;Plantation;45.5;88.8;2;25
-Tropical Dry Forest;Asia;Secondary ≤20 years;Plantation;3.56;125.5;2;25
-Tropical Rainforest;Africa;Primary;Plantation;0;0;0;0
-Tropical Rainforest;Africa;Secondary >20 years;Plantation;200;300;0;0
-Tropical Rainforest;Africa;Secondary ≤20 years;Plantation;60;100;5;8
-Tropical Rainforest;North and South America;Primary;Plantation;0;0;0;0
-Tropical Rainforest;North and South America;Secondary >20 years;Plantation;150;300;5;40
-Tropical Rainforest;North and South America;Secondary ≤20 years;Plantation;150;300;5;40
-Tropical Rainforest;Asia;Primary;Plantation;0;0;0;0
-Tropical Rainforest;Asia;Secondary >20 years;Plantation;48.5;512.8;2;8
-Tropical Rainforest;Asia;Secondary ≤20 years;Plantation;13.5;161;2;8
-Tropical Moist Deciduous Forest;Africa;Primary;Plantation;0;0;0;0
-Tropical Moist Deciduous Forest;Africa;Secondary >20 years;Plantation;120;483;0;0
-Tropical Moist Deciduous Forest;Africa;Secondary ≤20 years;Plantation;40;195;3;15
-Tropical Moist Deciduous Forest;North and South America;Primary;Plantation;0;0;0;0
-Tropical Moist Deciduous Forest;North and South America;Secondary >20 years;Plantation;46.9;284;4;20
-Tropical Moist Deciduous Forest;North and South America;Secondary ≤20 years;Plantation;46.9;195;4;20
-Tropical Moist Deciduous Forest;Asia;Primary;Plantation;0;0;0;0
-Tropical Moist Deciduous Forest;Asia;Secondary >20 years;Plantation;93.7;260;8;8
-Tropical Moist Deciduous Forest;Asia;Secondary ≤20 years;Plantation;5.7;202;8;8
-Tropical Dry Forest;Africa;Primary;Plantation;0;0;0;0
-Tropical Dry Forest;Africa;Secondary >20 years;Plantation;60;193.9;6;13
-Tropical Dry Forest;Africa;Secondary ≤20 years;Plantation;20;75.6;4;20
-Tropical Dry Forest;North and South America;Primary;Plantation;0;0;0;0
-Tropical Dry Forest;North and South America;Secondary >20 years;Plantation;50;110;4;30
-Tropical Dry Forest;North and South America;Secondary ≤20 years;Plantation;40;62;4;30
-Tropical Dry Forest;Asia;Primary;Plantation;0;0;0;0
-Tropical Dry Forest;Asia;Secondary >20 years;Plantation;45.5;88.8;2;25
-Tropical Dry Forest;Asia;Secondary ≤20 years;Plantation;3.56;125.5;2;25
-Tropical Shrubland;Africa;Primary;Plantation;0;0;0;0
-Tropical Shrubland;Africa;Secondary >20 years;Plantation;20;20;2.5;14
-Tropical Shrubland;Africa;Secondary ≤20 years;Plantation;15;20;3;7
-Tropical Shrubland;North and South America;Primary;Plantation;0;0;0;0
-Tropical Shrubland;North and South America;Secondary >20 years;Plantation;30;60;5;20
-Tropical Shrubland;North and South America;Secondary ≤20 years;Plantation;30;60;5;20
-Tropical Shrubland;Asia;Primary;Plantation;0;0;0;0
-Tropical Shrubland;Asia;Secondary >20 years;Plantation;30;263.3;1;12
-Tropical Shrubland;Asia;Secondary ≤20 years;Plantation;9;53.3;1;12
-Tropical Mountain System;Africa;Primary;Plantation;0;0;0;0
-Tropical Mountain System;Africa;Secondary >20 years;Plantation;30;150;10;10
-Tropical Mountain System;Africa;Secondary ≤20 years;Plantation;30;100;10;10
-Tropical Mountain System;North and South America;Primary;Plantation;0;0;0;0
-Tropical Mountain System;North and South America;Secondary >20 years;Plantation;30;184,4;8;18
-Tropical Mountain System;North and South America;Secondary ≤20 years;Plantation;30;170;8;18
-Tropical Mountain System;Asia;Primary;Plantation;0;0;0;0
-Tropical Mountain System;Asia;Secondary >20 years;Plantation;25;150;1;10
-Tropical Mountain System;Asia;Secondary ≤20 years;Plantation;25;150;1;10
-Sub-Tropical Humid Forest;Africa;Primary;Plantation;0;0;0;0
-Sub-Tropical Humid Forest;Africa;Secondary >20 years;Plantation;0;0;0;0
-Sub-Tropical Humid Forest;Africa;Secondary ≤20 years;Plantation;0;0;0;0
-Sub-Tropical Humid Forest;North and South America;Primary;Plantation;0;0;0;0
-Sub-Tropical Humid Forest;North and South America;Secondary >20 years;Plantation;11.1;270;3;32
-Sub-Tropical Humid Forest;North and South America;Secondary ≤20 years;Plantation;2.45;270;3;32
-Sub-Tropical Humid Forest;Asia;Primary;Plantation;0;0;0;0
-Sub-Tropical Humid Forest;Asia;Secondary >20 years;Plantation;100;180;8;8
-Sub-Tropical Humid Forest;Asia;Secondary ≤20 years;Plantation;100;180;8;8
-Sub-Tropical Dry Forest;Africa;Primary;Plantation;0;0;0;0
-Sub-Tropical Dry Forest;Africa;Secondary >20 years;Plantation;60;70;8;8
-Sub-Tropical Dry Forest;Africa;Secondary ≤20 years;Plantation;20;30;4;20
-Sub-Tropical Dry Forest;North and South America;Primary;Plantation;0;0;0;0
-Sub-Tropical Dry Forest;North and South America;Secondary >20 years;Plantation;60;110;3;30
-Sub-Tropical Dry Forest;North and South America;Secondary ≤20 years;Plantation;60;110;3;30
-Sub-Tropical Dry Forest;Asia;Primary;Plantation;0;0;0;0
-Sub-Tropical Dry Forest;Asia;Secondary >20 years;Plantation;60;163.5;2;25
-Sub-Tropical Dry Forest;Asia;Secondary ≤20 years;Plantation;54.8;69.5;2;25
-Sub-Tropical Dry Forest;Africa;Primary;Plantation;0;0;0;0
-Sub-Tropical Dry Forest;Africa;Secondary >20 years;Plantation;60;70;8;8
-Sub-Tropical Dry Forest;Africa;Secondary ≤20 years;Plantation;20;30;4;20
-Sub-Tropical Dry Forest;North and South America;Primary;Plantation;0;0;0;0
-Sub-Tropical Dry Forest;North and South America;Secondary >20 years;Plantation;60;110;3;30
-Sub-Tropical Dry Forest;North and South America;Secondary ≤20 years;Plantation;60;110;3;30
-Sub-Tropical Dry Forest;Asia;Primary;Plantation;0;0;0;0
-Sub-Tropical Dry Forest;Asia;Secondary >20 years;Plantation;60;163.5;2;25
-Sub-Tropical Dry Forest;Asia;Secondary ≤20 years;Plantation;54.8;69.5;2;25
-Sub-Tropical Dry Forest;Africa;Primary;Plantation;0;0;0;0
-Sub-Tropical Dry Forest;Africa;Secondary >20 years;Plantation;60;70;8;8
-Sub-Tropical Dry Forest;Africa;Secondary ≤20 years;Plantation;20;30;4;20
-Sub-Tropical Dry Forest;North and South America;Primary;Plantation;0;0;0;0
-Sub-Tropical Dry Forest;North and South America;Secondary >20 years;Plantation;60;110;3;30
-Sub-Tropical Dry Forest;North and South America;Secondary ≤20 years;Plantation;60;110;3;30
-Sub-Tropical Dry Forest;Asia;Primary;Plantation;0;0;0;0
-Sub-Tropical Dry Forest;Asia;Secondary >20 years;Plantation;60;163.5;2;25
-Sub-Tropical Dry Forest;Asia;Secondary ≤20 years;Plantation;54.9;69.5;2;25
-Sub-Tropical Steppe;Africa;Primary;Plantation;0;0;0;0
-Sub-Tropical Steppe;Africa;Secondary >20 years;Plantation;15;20;2.5;14
-Sub-Tropical Steppe;Africa;Secondary ≤20 years;Plantation;15;20;0.5;15
-Sub-Tropical Steppe;North and South America;Primary;Plantation;0;0;0;0
-Sub-Tropical Steppe;North and South America;Secondary >20 years;Plantation;30;60;5;20
-Sub-Tropical Steppe;North and South America;Secondary ≤20 years;Plantation;3.6;60;5;20
-Sub-Tropical Steppe;Asia;Primary;Plantation;0;0;0;0
-Sub-Tropical Steppe;Asia;Secondary >20 years;Plantation;20;80;1;12
-Sub-Tropical Steppe;Asia;Secondary ≤20 years;Plantation;10;120;1;12
+Tropical Dry Forest;Central Asia;Primary;Natural;184.6;184.6;0;0
+Tropical Dry Forest;Central Asia;Secondary >20 years;Natural;184.6;184.6;1.6;1.6
+Tropical Dry Forest;Central Asia;Secondary ≤20 years;Natural;184.6;184.6;3.9;3.9
+Tropical Rainforest;Central Asia;Primary;Natural;413,1;413,1;0,7;0,7
+Tropical Rainforest;Central Asia;Secondary >20 years;Natural;131,6;131,6;2,7;2,7
+Tropical Rainforest;Central Asia;Secondary ≤20 years;Natural;45,6;45,6;3,4;3,4
+Tropical Moist Deciduous Forest;Central Asia;Primary;Natural;67,7;67,7;0,4;0,4
+Tropical Moist Deciduous Forest;Central Asia;Secondary >20 years;Natural;67,7;67,7;0,9;0,9
+Tropical Moist Deciduous Forest;Central Asia;Secondary ≤20 years;Natural;67,7;67,7;2,4;2,4
+Tropical Dry Forest;Central Asia;Primary;Natural;184,6;184,6;0;0
+Tropical Dry Forest;Central Asia;Secondary >20 years;Natural;184,6;184,6;1,6;1,6
+Tropical Dry Forest;Central Asia;Secondary ≤20 years;Natural;184,6;184,6;3,9;3,9
+Tropical Shrubland;Central Asia;Primary;Natural;38,3;38,3;1.0;1.3
+Tropical Shrubland;Central Asia;Secondary >20 years;Natural;38,3;38,3;1.0;1.3
+Tropical Shrubland;Central Asia;Secondary ≤20 years;Natural;38,3;38,3;2.0;5
+Tropical Mountain Systems;Central Asia;Primary;Natural;433,5;433,5;-0,7;-0,7
+Tropical Mountain Systems;Central Asia;Secondary >20 years;Natural;66,4;66,4;1,1;1,1
+Tropical Mountain Systems;Central Asia;Secondary ≤20 years;Natural;66,4;66,4;2,9;2,9
+Subtropical Humid Forest;Central Asia;Primary;Natural;323;323;0;0
+Subtropical Humid Forest;Central Asia;Secondary >20 years;Natural;258,4;258,4;1;1
+Subtropical Humid Forest;Central Asia;Secondary ≤20 years;Natural;258,4;258,4;2,5;2,5
+Subtropical Dry Forest;Central Asia;Primary;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;Central Asia;Secondary >20 years;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;Central Asia;Secondary ≤20 years;Natural;70,9;70,9;6.0;7
+Subtropical Dry Forest;Central Asia;Primary;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;Central Asia;Secondary >20 years;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;Central Asia;Secondary ≤20 years;Natural;70,9;70,9;6.0;7
+Subtropical Dry Forest;Central Asia;Primary;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;Central Asia;Secondary >20 years;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;Central Asia;Secondary ≤20 years;Natural;70,9;70,9;6.0;7
+Subtropical Steppe;Central Asia;Primary;Natural;41,6;41,6;1.0;1.3
+Subtropical Steppe;Central Asia;Secondary >20 years;Natural;41,6;41,6;1.0;1.3
+Subtropical Steppe;Central Asia;Secondary ≤20 years;Natural;41,6;41,6;2.0;5
+Tropical Dry Forest;Central Asia;Primary;Plantation;0;0;0;0
+Tropical Dry Forest;Central Asia;Secondary >20 years;Plantation;45.5;88.8;2;25
+Tropical Dry Forest;Central Asia;Secondary ≤20 years;Plantation;3.56;125.5;2;25
+Tropical Rainforest;Central Asia;Primary;Plantation;0;0;0;0
+Tropical Rainforest;Central Asia;Secondary >20 years;Plantation;48.5;512.8;2;8
+Tropical Rainforest;Central Asia;Secondary ≤20 years;Plantation;13.5;161;2;8
+Tropical Moist Deciduous Forest;Central Asia;Primary;Plantation;0;0;0;0
+Tropical Moist Deciduous Forest;Central Asia;Secondary >20 years;Plantation;93.7;260;8;8
+Tropical Moist Deciduous Forest;Central Asia;Secondary ≤20 years;Plantation;5.7;202;8;8
+Tropical Dry Forest;Central Asia;Primary;Plantation;0;0;0;0
+Tropical Dry Forest;Central Asia;Secondary >20 years;Plantation;45.5;88.8;2;25
+Tropical Dry Forest;Central Asia;Secondary ≤20 years;Plantation;3.56;125.5;2;25
+Tropical Shrubland;Central Asia;Primary;Plantation;0;0;0;0
+Tropical Shrubland;Central Asia;Secondary >20 years;Plantation;30;263.3;1;12
+Tropical Shrubland;Central Asia;Secondary ≤20 years;Plantation;9;53.3;1;12
+Tropical Mountain Systems;Central Asia;Primary;Plantation;0;0;0;0
+Tropical Mountain Systems;Central Asia;Secondary >20 years;Plantation;25;150;1;10
+Tropical Mountain Systems;Central Asia;Secondary ≤20 years;Plantation;25;150;1;10
+Subtropical Humid Forest;Central Asia;Primary;Plantation;0;0;0;0
+Subtropical Humid Forest;Central Asia;Secondary >20 years;Plantation;100;180;8;8
+Subtropical Humid Forest;Central Asia;Secondary ≤20 years;Plantation;100;180;8;8
+Subtropical Dry Forest;Central Asia;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Central Asia;Secondary >20 years;Plantation;60;163.5;2;25
+Subtropical Dry Forest;Central Asia;Secondary ≤20 years;Plantation;54.8;69.5;2;25
+Subtropical Dry Forest;Central Asia;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Central Asia;Secondary >20 years;Plantation;60;163.5;2;25
+Subtropical Dry Forest;Central Asia;Secondary ≤20 years;Plantation;54.8;69.5;2;25
+Subtropical Dry Forest;Central Asia;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Central Asia;Secondary >20 years;Plantation;60;163.5;2;25
+Subtropical Dry Forest;Central Asia;Secondary ≤20 years;Plantation;54.9;69.5;2;25
+Subtropical Steppe;Central Asia;Primary;Plantation;0;0;0;0
+Subtropical Steppe;Central Asia;Secondary >20 years;Plantation;20;80;1;12
+Subtropical Steppe;Central Asia;Secondary ≤20 years;Plantation;10;120;1;12
+Tropical Dry Forest;Eastern Asia;Primary;Natural;184.6;184.6;0;0
+Tropical Dry Forest;Eastern Asia;Secondary >20 years;Natural;184.6;184.6;1.6;1.6
+Tropical Dry Forest;Eastern Asia;Secondary ≤20 years;Natural;184.6;184.6;3.9;3.9
+Tropical Rainforest;Eastern Asia;Primary;Natural;413,1;413,1;0,7;0,7
+Tropical Rainforest;Eastern Asia;Secondary >20 years;Natural;131,6;131,6;2,7;2,7
+Tropical Rainforest;Eastern Asia;Secondary ≤20 years;Natural;45,6;45,6;3,4;3,4
+Tropical Moist Deciduous Forest;Eastern Asia;Primary;Natural;67,7;67,7;0,4;0,4
+Tropical Moist Deciduous Forest;Eastern Asia;Secondary >20 years;Natural;67,7;67,7;0,9;0,9
+Tropical Moist Deciduous Forest;Eastern Asia;Secondary ≤20 years;Natural;67,7;67,7;2,4;2,4
+Tropical Dry Forest;Eastern Asia;Primary;Natural;184,6;184,6;0;0
+Tropical Dry Forest;Eastern Asia;Secondary >20 years;Natural;184,6;184,6;1,6;1,6
+Tropical Dry Forest;Eastern Asia;Secondary ≤20 years;Natural;184,6;184,6;3,9;3,9
+Tropical Shrubland;Eastern Asia;Primary;Natural;38,3;38,3;1.0;1.3
+Tropical Shrubland;Eastern Asia;Secondary >20 years;Natural;38,3;38,3;1.0;1.3
+Tropical Shrubland;Eastern Asia;Secondary ≤20 years;Natural;38,3;38,3;2.0;5
+Tropical Mountain Systems;Eastern Asia;Primary;Natural;433,5;433,5;-0,7;-0,7
+Tropical Mountain Systems;Eastern Asia;Secondary >20 years;Natural;66,4;66,4;1,1;1,1
+Tropical Mountain Systems;Eastern Asia;Secondary ≤20 years;Natural;66,4;66,4;2,9;2,9
+Subtropical Humid Forest;Eastern Asia;Primary;Natural;323;323;0;0
+Subtropical Humid Forest;Eastern Asia;Secondary >20 years;Natural;258,4;258,4;1;1
+Subtropical Humid Forest;Eastern Asia;Secondary ≤20 years;Natural;258,4;258,4;2,5;2,5
+Subtropical Dry Forest;Eastern Asia;Primary;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;Eastern Asia;Secondary >20 years;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;Eastern Asia;Secondary ≤20 years;Natural;70,9;70,9;6.0;7
+Subtropical Dry Forest;Eastern Asia;Primary;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;Eastern Asia;Secondary >20 years;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;Eastern Asia;Secondary ≤20 years;Natural;70,9;70,9;6.0;7
+Subtropical Dry Forest;Eastern Asia;Primary;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;Eastern Asia;Secondary >20 years;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;Eastern Asia;Secondary ≤20 years;Natural;70,9;70,9;6.0;7
+Subtropical Steppe;Eastern Asia;Primary;Natural;41,6;41,6;1.0;1.3
+Subtropical Steppe;Eastern Asia;Secondary >20 years;Natural;41,6;41,6;1.0;1.3
+Subtropical Steppe;Eastern Asia;Secondary ≤20 years;Natural;41,6;41,6;2.0;5
+Tropical Dry Forest;Eastern Asia;Primary;Plantation;0;0;0;0
+Tropical Dry Forest;Eastern Asia;Secondary >20 years;Plantation;45.5;88.8;2;25
+Tropical Dry Forest;Eastern Asia;Secondary ≤20 years;Plantation;3.56;125.5;2;25
+Tropical Rainforest;Eastern Asia;Primary;Plantation;0;0;0;0
+Tropical Rainforest;Eastern Asia;Secondary >20 years;Plantation;48.5;512.8;2;8
+Tropical Rainforest;Eastern Asia;Secondary ≤20 years;Plantation;13.5;161;2;8
+Tropical Moist Deciduous Forest;Eastern Asia;Primary;Plantation;0;0;0;0
+Tropical Moist Deciduous Forest;Eastern Asia;Secondary >20 years;Plantation;93.7;260;8;8
+Tropical Moist Deciduous Forest;Eastern Asia;Secondary ≤20 years;Plantation;5.7;202;8;8
+Tropical Dry Forest;Eastern Asia;Primary;Plantation;0;0;0;0
+Tropical Dry Forest;Eastern Asia;Secondary >20 years;Plantation;45.5;88.8;2;25
+Tropical Dry Forest;Eastern Asia;Secondary ≤20 years;Plantation;3.56;125.5;2;25
+Tropical Shrubland;Eastern Asia;Primary;Plantation;0;0;0;0
+Tropical Shrubland;Eastern Asia;Secondary >20 years;Plantation;30;263.3;1;12
+Tropical Shrubland;Eastern Asia;Secondary ≤20 years;Plantation;9;53.3;1;12
+Tropical Mountain Systems;Eastern Asia;Primary;Plantation;0;0;0;0
+Tropical Mountain Systems;Eastern Asia;Secondary >20 years;Plantation;25;150;1;10
+Tropical Mountain Systems;Eastern Asia;Secondary ≤20 years;Plantation;25;150;1;10
+Subtropical Humid Forest;Eastern Asia;Primary;Plantation;0;0;0;0
+Subtropical Humid Forest;Eastern Asia;Secondary >20 years;Plantation;100;180;8;8
+Subtropical Humid Forest;Eastern Asia;Secondary ≤20 years;Plantation;100;180;8;8
+Subtropical Dry Forest;Eastern Asia;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Eastern Asia;Secondary >20 years;Plantation;60;163.5;2;25
+Subtropical Dry Forest;Eastern Asia;Secondary ≤20 years;Plantation;54.8;69.5;2;25
+Subtropical Dry Forest;Eastern Asia;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Eastern Asia;Secondary >20 years;Plantation;60;163.5;2;25
+Subtropical Dry Forest;Eastern Asia;Secondary ≤20 years;Plantation;54.8;69.5;2;25
+Subtropical Dry Forest;Eastern Asia;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Eastern Asia;Secondary >20 years;Plantation;60;163.5;2;25
+Subtropical Dry Forest;Eastern Asia;Secondary ≤20 years;Plantation;54.9;69.5;2;25
+Subtropical Steppe;Eastern Asia;Primary;Plantation;0;0;0;0
+Subtropical Steppe;Eastern Asia;Secondary >20 years;Plantation;20;80;1;12
+Subtropical Steppe;Eastern Asia;Secondary ≤20 years;Plantation;10;120;1;12
+Tropical Dry Forest;South-Eastern Asia;Primary;Natural;184.6;184.6;0;0
+Tropical Dry Forest;South-Eastern Asia;Secondary >20 years;Natural;184.6;184.6;1.6;1.6
+Tropical Dry Forest;South-Eastern Asia;Secondary ≤20 years;Natural;184.6;184.6;3.9;3.9
+Tropical Rainforest;South-Eastern Asia;Primary;Natural;413,1;413,1;0,7;0,7
+Tropical Rainforest;South-Eastern Asia;Secondary >20 years;Natural;131,6;131,6;2,7;2,7
+Tropical Rainforest;South-Eastern Asia;Secondary ≤20 years;Natural;45,6;45,6;3,4;3,4
+Tropical Moist Deciduous Forest;South-Eastern Asia;Primary;Natural;67,7;67,7;0,4;0,4
+Tropical Moist Deciduous Forest;South-Eastern Asia;Secondary >20 years;Natural;67,7;67,7;0,9;0,9
+Tropical Moist Deciduous Forest;South-Eastern Asia;Secondary ≤20 years;Natural;67,7;67,7;2,4;2,4
+Tropical Dry Forest;South-Eastern Asia;Primary;Natural;184,6;184,6;0;0
+Tropical Dry Forest;South-Eastern Asia;Secondary >20 years;Natural;184,6;184,6;1,6;1,6
+Tropical Dry Forest;South-Eastern Asia;Secondary ≤20 years;Natural;184,6;184,6;3,9;3,9
+Tropical Shrubland;South-Eastern Asia;Primary;Natural;38,3;38,3;1.0;1.3
+Tropical Shrubland;South-Eastern Asia;Secondary >20 years;Natural;38,3;38,3;1.0;1.3
+Tropical Shrubland;South-Eastern Asia;Secondary ≤20 years;Natural;38,3;38,3;2.0;5
+Tropical Mountain Systems;South-Eastern Asia;Primary;Natural;433,5;433,5;-0,7;-0,7
+Tropical Mountain Systems;South-Eastern Asia;Secondary >20 years;Natural;66,4;66,4;1,1;1,1
+Tropical Mountain Systems;South-Eastern Asia;Secondary ≤20 years;Natural;66,4;66,4;2,9;2,9
+Subtropical Humid Forest;South-Eastern Asia;Primary;Natural;323;323;0;0
+Subtropical Humid Forest;South-Eastern Asia;Secondary >20 years;Natural;258,4;258,4;1;1
+Subtropical Humid Forest;South-Eastern Asia;Secondary ≤20 years;Natural;258,4;258,4;2,5;2,5
+Subtropical Dry Forest;South-Eastern Asia;Primary;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;South-Eastern Asia;Secondary >20 years;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;South-Eastern Asia;Secondary ≤20 years;Natural;70,9;70,9;6.0;7
+Subtropical Dry Forest;South-Eastern Asia;Primary;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;South-Eastern Asia;Secondary >20 years;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;South-Eastern Asia;Secondary ≤20 years;Natural;70,9;70,9;6.0;7
+Subtropical Dry Forest;South-Eastern Asia;Primary;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;South-Eastern Asia;Secondary >20 years;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;South-Eastern Asia;Secondary ≤20 years;Natural;70,9;70,9;6.0;7
+Subtropical Steppe;South-Eastern Asia;Primary;Natural;41,6;41,6;1.0;1.3
+Subtropical Steppe;South-Eastern Asia;Secondary >20 years;Natural;41,6;41,6;1.0;1.3
+Subtropical Steppe;South-Eastern Asia;Secondary ≤20 years;Natural;41,6;41,6;2.0;5
+Tropical Dry Forest;South-Eastern Asia;Primary;Plantation;0;0;0;0
+Tropical Dry Forest;South-Eastern Asia;Secondary >20 years;Plantation;45.5;88.8;2;25
+Tropical Dry Forest;South-Eastern Asia;Secondary ≤20 years;Plantation;3.56;125.5;2;25
+Tropical Rainforest;South-Eastern Asia;Primary;Plantation;0;0;0;0
+Tropical Rainforest;South-Eastern Asia;Secondary >20 years;Plantation;48.5;512.8;2;8
+Tropical Rainforest;South-Eastern Asia;Secondary ≤20 years;Plantation;13.5;161;2;8
+Tropical Moist Deciduous Forest;South-Eastern Asia;Primary;Plantation;0;0;0;0
+Tropical Moist Deciduous Forest;South-Eastern Asia;Secondary >20 years;Plantation;93.7;260;8;8
+Tropical Moist Deciduous Forest;South-Eastern Asia;Secondary ≤20 years;Plantation;5.7;202;8;8
+Tropical Dry Forest;South-Eastern Asia;Primary;Plantation;0;0;0;0
+Tropical Dry Forest;South-Eastern Asia;Secondary >20 years;Plantation;45.5;88.8;2;25
+Tropical Dry Forest;South-Eastern Asia;Secondary ≤20 years;Plantation;3.56;125.5;2;25
+Tropical Shrubland;South-Eastern Asia;Primary;Plantation;0;0;0;0
+Tropical Shrubland;South-Eastern Asia;Secondary >20 years;Plantation;30;263.3;1;12
+Tropical Shrubland;South-Eastern Asia;Secondary ≤20 years;Plantation;9;53.3;1;12
+Tropical Mountain Systems;South-Eastern Asia;Primary;Plantation;0;0;0;0
+Tropical Mountain Systems;South-Eastern Asia;Secondary >20 years;Plantation;25;150;1;10
+Tropical Mountain Systems;South-Eastern Asia;Secondary ≤20 years;Plantation;25;150;1;10
+Subtropical Humid Forest;South-Eastern Asia;Primary;Plantation;0;0;0;0
+Subtropical Humid Forest;South-Eastern Asia;Secondary >20 years;Plantation;100;180;8;8
+Subtropical Humid Forest;South-Eastern Asia;Secondary ≤20 years;Plantation;100;180;8;8
+Subtropical Dry Forest;South-Eastern Asia;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;South-Eastern Asia;Secondary >20 years;Plantation;60;163.5;2;25
+Subtropical Dry Forest;South-Eastern Asia;Secondary ≤20 years;Plantation;54.8;69.5;2;25
+Subtropical Dry Forest;South-Eastern Asia;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;South-Eastern Asia;Secondary >20 years;Plantation;60;163.5;2;25
+Subtropical Dry Forest;South-Eastern Asia;Secondary ≤20 years;Plantation;54.8;69.5;2;25
+Subtropical Dry Forest;South-Eastern Asia;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;South-Eastern Asia;Secondary >20 years;Plantation;60;163.5;2;25
+Subtropical Dry Forest;South-Eastern Asia;Secondary ≤20 years;Plantation;54.9;69.5;2;25
+Subtropical Steppe;South-Eastern Asia;Primary;Plantation;0;0;0;0
+Subtropical Steppe;South-Eastern Asia;Secondary >20 years;Plantation;20;80;1;12
+Subtropical Steppe;South-Eastern Asia;Secondary ≤20 years;Plantation;10;120;1;12
+Tropical Dry Forest;Southern Asia;Primary;Natural;184.6;184.6;0;0
+Tropical Dry Forest;Southern Asia;Secondary >20 years;Natural;184.6;184.6;1.6;1.6
+Tropical Dry Forest;Southern Asia;Secondary ≤20 years;Natural;184.6;184.6;3.9;3.9
+Tropical Rainforest;Southern Asia;Primary;Natural;413,1;413,1;0,7;0,7
+Tropical Rainforest;Southern Asia;Secondary >20 years;Natural;131,6;131,6;2,7;2,7
+Tropical Rainforest;Southern Asia;Secondary ≤20 years;Natural;45,6;45,6;3,4;3,4
+Tropical Moist Deciduous Forest;Southern Asia;Primary;Natural;67,7;67,7;0,4;0,4
+Tropical Moist Deciduous Forest;Southern Asia;Secondary >20 years;Natural;67,7;67,7;0,9;0,9
+Tropical Moist Deciduous Forest;Southern Asia;Secondary ≤20 years;Natural;67,7;67,7;2,4;2,4
+Tropical Dry Forest;Southern Asia;Primary;Natural;184,6;184,6;0;0
+Tropical Dry Forest;Southern Asia;Secondary >20 years;Natural;184,6;184,6;1,6;1,6
+Tropical Dry Forest;Southern Asia;Secondary ≤20 years;Natural;184,6;184,6;3,9;3,9
+Tropical Shrubland;Southern Asia;Primary;Natural;38,3;38,3;1.0;1.3
+Tropical Shrubland;Southern Asia;Secondary >20 years;Natural;38,3;38,3;1.0;1.3
+Tropical Shrubland;Southern Asia;Secondary ≤20 years;Natural;38,3;38,3;2.0;5
+Tropical Mountain Systems;Southern Asia;Primary;Natural;433,5;433,5;-0,7;-0,7
+Tropical Mountain Systems;Southern Asia;Secondary >20 years;Natural;66,4;66,4;1,1;1,1
+Tropical Mountain Systems;Southern Asia;Secondary ≤20 years;Natural;66,4;66,4;2,9;2,9
+Subtropical Humid Forest;Southern Asia;Primary;Natural;323;323;0;0
+Subtropical Humid Forest;Southern Asia;Secondary >20 years;Natural;258,4;258,4;1;1
+Subtropical Humid Forest;Southern Asia;Secondary ≤20 years;Natural;258,4;258,4;2,5;2,5
+Subtropical Dry Forest;Southern Asia;Primary;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;Southern Asia;Secondary >20 years;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;Southern Asia;Secondary ≤20 years;Natural;70,9;70,9;6.0;7
+Subtropical Dry Forest;Southern Asia;Primary;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;Southern Asia;Secondary >20 years;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;Southern Asia;Secondary ≤20 years;Natural;70,9;70,9;6.0;7
+Subtropical Dry Forest;Southern Asia;Primary;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;Southern Asia;Secondary >20 years;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;Southern Asia;Secondary ≤20 years;Natural;70,9;70,9;6.0;7
+Subtropical Steppe;Southern Asia;Primary;Natural;41,6;41,6;1.0;1.3
+Subtropical Steppe;Southern Asia;Secondary >20 years;Natural;41,6;41,6;1.0;1.3
+Subtropical Steppe;Southern Asia;Secondary ≤20 years;Natural;41,6;41,6;2.0;5
+Tropical Dry Forest;Southern Asia;Primary;Plantation;0;0;0;0
+Tropical Dry Forest;Southern Asia;Secondary >20 years;Plantation;45.5;88.8;2;25
+Tropical Dry Forest;Southern Asia;Secondary ≤20 years;Plantation;3.56;125.5;2;25
+Tropical Rainforest;Southern Asia;Primary;Plantation;0;0;0;0
+Tropical Rainforest;Southern Asia;Secondary >20 years;Plantation;48.5;512.8;2;8
+Tropical Rainforest;Southern Asia;Secondary ≤20 years;Plantation;13.5;161;2;8
+Tropical Moist Deciduous Forest;Southern Asia;Primary;Plantation;0;0;0;0
+Tropical Moist Deciduous Forest;Southern Asia;Secondary >20 years;Plantation;93.7;260;8;8
+Tropical Moist Deciduous Forest;Southern Asia;Secondary ≤20 years;Plantation;5.7;202;8;8
+Tropical Dry Forest;Southern Asia;Primary;Plantation;0;0;0;0
+Tropical Dry Forest;Southern Asia;Secondary >20 years;Plantation;45.5;88.8;2;25
+Tropical Dry Forest;Southern Asia;Secondary ≤20 years;Plantation;3.56;125.5;2;25
+Tropical Shrubland;Southern Asia;Primary;Plantation;0;0;0;0
+Tropical Shrubland;Southern Asia;Secondary >20 years;Plantation;30;263.3;1;12
+Tropical Shrubland;Southern Asia;Secondary ≤20 years;Plantation;9;53.3;1;12
+Tropical Mountain Systems;Southern Asia;Primary;Plantation;0;0;0;0
+Tropical Mountain Systems;Southern Asia;Secondary >20 years;Plantation;25;150;1;10
+Tropical Mountain Systems;Southern Asia;Secondary ≤20 years;Plantation;25;150;1;10
+Subtropical Humid Forest;Southern Asia;Primary;Plantation;0;0;0;0
+Subtropical Humid Forest;Southern Asia;Secondary >20 years;Plantation;100;180;8;8
+Subtropical Humid Forest;Southern Asia;Secondary ≤20 years;Plantation;100;180;8;8
+Subtropical Dry Forest;Southern Asia;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Southern Asia;Secondary >20 years;Plantation;60;163.5;2;25
+Subtropical Dry Forest;Southern Asia;Secondary ≤20 years;Plantation;54.8;69.5;2;25
+Subtropical Dry Forest;Southern Asia;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Southern Asia;Secondary >20 years;Plantation;60;163.5;2;25
+Subtropical Dry Forest;Southern Asia;Secondary ≤20 years;Plantation;54.8;69.5;2;25
+Subtropical Dry Forest;Southern Asia;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Southern Asia;Secondary >20 years;Plantation;60;163.5;2;25
+Subtropical Dry Forest;Southern Asia;Secondary ≤20 years;Plantation;54.9;69.5;2;25
+Subtropical Steppe;Southern Asia;Primary;Plantation;0;0;0;0
+Subtropical Steppe;Southern Asia;Secondary >20 years;Plantation;20;80;1;12
+Subtropical Steppe;Southern Asia;Secondary ≤20 years;Plantation;10;120;1;12
+Tropical Dry Forest;Western Asia;Primary;Natural;184.6;184.6;0;0
+Tropical Dry Forest;Western Asia;Secondary >20 years;Natural;184.6;184.6;1.6;1.6
+Tropical Dry Forest;Western Asia;Secondary ≤20 years;Natural;184.6;184.6;3.9;3.9
+Tropical Rainforest;Western Asia;Primary;Natural;413,1;413,1;0,7;0,7
+Tropical Rainforest;Western Asia;Secondary >20 years;Natural;131,6;131,6;2,7;2,7
+Tropical Rainforest;Western Asia;Secondary ≤20 years;Natural;45,6;45,6;3,4;3,4
+Tropical Moist Deciduous Forest;Western Asia;Primary;Natural;67,7;67,7;0,4;0,4
+Tropical Moist Deciduous Forest;Western Asia;Secondary >20 years;Natural;67,7;67,7;0,9;0,9
+Tropical Moist Deciduous Forest;Western Asia;Secondary ≤20 years;Natural;67,7;67,7;2,4;2,4
+Tropical Dry Forest;Western Asia;Primary;Natural;184,6;184,6;0;0
+Tropical Dry Forest;Western Asia;Secondary >20 years;Natural;184,6;184,6;1,6;1,6
+Tropical Dry Forest;Western Asia;Secondary ≤20 years;Natural;184,6;184,6;3,9;3,9
+Tropical Shrubland;Western Asia;Primary;Natural;38,3;38,3;1.0;1.3
+Tropical Shrubland;Western Asia;Secondary >20 years;Natural;38,3;38,3;1.0;1.3
+Tropical Shrubland;Western Asia;Secondary ≤20 years;Natural;38,3;38,3;2.0;5
+Tropical Mountain Systems;Western Asia;Primary;Natural;433,5;433,5;-0,7;-0,7
+Tropical Mountain Systems;Western Asia;Secondary >20 years;Natural;66,4;66,4;1,1;1,1
+Tropical Mountain Systems;Western Asia;Secondary ≤20 years;Natural;66,4;66,4;2,9;2,9
+Subtropical Humid Forest;Western Asia;Primary;Natural;323;323;0;0
+Subtropical Humid Forest;Western Asia;Secondary >20 years;Natural;258,4;258,4;1;1
+Subtropical Humid Forest;Western Asia;Secondary ≤20 years;Natural;258,4;258,4;2,5;2,5
+Subtropical Dry Forest;Western Asia;Primary;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;Western Asia;Secondary >20 years;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;Western Asia;Secondary ≤20 years;Natural;70,9;70,9;6.0;7
+Subtropical Dry Forest;Western Asia;Primary;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;Western Asia;Secondary >20 years;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;Western Asia;Secondary ≤20 years;Natural;70,9;70,9;6.0;7
+Subtropical Dry Forest;Western Asia;Primary;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;Western Asia;Secondary >20 years;Natural;70,9;70,9;1.5;2
+Subtropical Dry Forest;Western Asia;Secondary ≤20 years;Natural;70,9;70,9;6.0;7
+Subtropical Steppe;Western Asia;Primary;Natural;41,6;41,6;1.0;1.3
+Subtropical Steppe;Western Asia;Secondary >20 years;Natural;41,6;41,6;1.0;1.3
+Subtropical Steppe;Western Asia;Secondary ≤20 years;Natural;41,6;41,6;2.0;5
+Tropical Dry Forest;Western Asia;Primary;Plantation;0;0;0;0
+Tropical Dry Forest;Western Asia;Secondary >20 years;Plantation;45.5;88.8;2;25
+Tropical Dry Forest;Western Asia;Secondary ≤20 years;Plantation;3.56;125.5;2;25
+Tropical Rainforest;Western Asia;Primary;Plantation;0;0;0;0
+Tropical Rainforest;Western Asia;Secondary >20 years;Plantation;48.5;512.8;2;8
+Tropical Rainforest;Western Asia;Secondary ≤20 years;Plantation;13.5;161;2;8
+Tropical Moist Deciduous Forest;Western Asia;Primary;Plantation;0;0;0;0
+Tropical Moist Deciduous Forest;Western Asia;Secondary >20 years;Plantation;93.7;260;8;8
+Tropical Moist Deciduous Forest;Western Asia;Secondary ≤20 years;Plantation;5.7;202;8;8
+Tropical Dry Forest;Western Asia;Primary;Plantation;0;0;0;0
+Tropical Dry Forest;Western Asia;Secondary >20 years;Plantation;45.5;88.8;2;25
+Tropical Dry Forest;Western Asia;Secondary ≤20 years;Plantation;3.56;125.5;2;25
+Tropical Shrubland;Western Asia;Primary;Plantation;0;0;0;0
+Tropical Shrubland;Western Asia;Secondary >20 years;Plantation;30;263.3;1;12
+Tropical Shrubland;Western Asia;Secondary ≤20 years;Plantation;9;53.3;1;12
+Tropical Mountain Systems;Western Asia;Primary;Plantation;0;0;0;0
+Tropical Mountain Systems;Western Asia;Secondary >20 years;Plantation;25;150;1;10
+Tropical Mountain Systems;Western Asia;Secondary ≤20 years;Plantation;25;150;1;10
+Subtropical Humid Forest;Western Asia;Primary;Plantation;0;0;0;0
+Subtropical Humid Forest;Western Asia;Secondary >20 years;Plantation;100;180;8;8
+Subtropical Humid Forest;Western Asia;Secondary ≤20 years;Plantation;100;180;8;8
+Subtropical Dry Forest;Western Asia;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Western Asia;Secondary >20 years;Plantation;60;163.5;2;25
+Subtropical Dry Forest;Western Asia;Secondary ≤20 years;Plantation;54.8;69.5;2;25
+Subtropical Dry Forest;Western Asia;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Western Asia;Secondary >20 years;Plantation;60;163.5;2;25
+Subtropical Dry Forest;Western Asia;Secondary ≤20 years;Plantation;54.8;69.5;2;25
+Subtropical Dry Forest;Western Asia;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Western Asia;Secondary >20 years;Plantation;60;163.5;2;25
+Subtropical Dry Forest;Western Asia;Secondary ≤20 years;Plantation;54.9;69.5;2;25
+Subtropical Steppe;Western Asia;Primary;Plantation;0;0;0;0
+Subtropical Steppe;Western Asia;Secondary >20 years;Plantation;20;80;1;12
+Subtropical Steppe;Western Asia;Secondary ≤20 years;Plantation;10;120;1;12
+Tropical Rainforest;South America;Primary;Natural;307,1;307,1;1;1
+Tropical Rainforest;South America;Secondary >20 years;Natural;206,4;206,4;2,3;2,3
+Tropical Rainforest;South America;Secondary ≤20 years;Natural;75,7;75,7;5,9;5,9
+Tropical Moist Deciduous Forest;South America;Primary;Natural;187,3;187,3;0,4;0,4
+Tropical Moist Deciduous Forest;South America;Secondary >20 years;Natural;131;131;2,7;2,7
+Tropical Moist Deciduous Forest;South America;Secondary ≤20 years;Natural;55,7;55,7;5,2;5,2
+Tropical Dry Forest;South America;Primary;Natural;127,5;127,5;0;0
+Tropical Dry Forest;South America;Secondary >20 years;Natural;118,9;118,9;1,6;1,6
+Tropical Dry Forest;South America;Secondary ≤20 years;Natural;32,2;32,2;3,9;3,9
+Tropical Shrubland;South America;Primary;Natural;71,5;71,5;1
+Tropical Shrubland;South America;Secondary >20 years;Natural;71,5;71,5;1
+Tropical Shrubland;South America;Secondary ≤20 years;Natural;71,5;71,5;4
+Tropical Mountain Systems;South America;Primary;Natural;195;195;0,5;0,5
+Tropical Mountain Systems;South America;Secondary >20 years;Natural;184,4;184,4;1,8;1,8
+Tropical Mountain Systems;South America;Secondary ≤20 years;Natural;75,9;75,9;4,4;4,4
+Subtropical Humid Forest;South America;Primary;Natural;84,5;84,5;0;0
+Subtropical Humid Forest;South America;Secondary >20 years;Natural;84,5;84,5;1;1
+Subtropical Humid Forest;South America;Secondary ≤20 years;Natural;84,5;84,5;2,5;2,5
+Subtropical Dry Forest;South America;Primary;Natural;115,9;115,9;1;1
+Subtropical Dry Forest;South America;Secondary >20 years;Natural;115,9;115,9;1;1
+Subtropical Dry Forest;South America;Secondary ≤20 years;Natural;115,9;115,9;4;4
+Subtropical Dry Forest;South America;Primary;Natural;115,9;115,9;1;1
+Subtropical Dry Forest;South America;Secondary >20 years;Natural;115,9;115,9;1;1
+Subtropical Dry Forest;South America;Secondary ≤20 years;Natural;115,9;115,9;4;4
+Subtropical Dry Forest;South America;Primary;Natural;115,9;115,9;1;1
+Subtropical Dry Forest;South America;Secondary >20 years;Natural;115,9;115,9;1;1
+Subtropical Dry Forest;South America;Secondary ≤20 years;Natural;115,9;115,9;4;4
+Subtropical Steppe;South America;Primary;Natural;44;44;1;1
+Subtropical Steppe;South America;Secondary >20 years;Natural;44;44;1;1
+Subtropical Steppe;South America;Secondary ≤20 years;Natural;44;44;4;4
+Tropical Rainforest;South America;Primary;Plantation;0;0;0;0
+Tropical Rainforest;South America;Secondary >20 years;Plantation;150;300;5;40
+Tropical Rainforest;South America;Secondary ≤20 years;Plantation;150;300;5;40
+Tropical Moist Deciduous Forest;South America;Primary;Plantation;0;0;0;0
+Tropical Moist Deciduous Forest;South America;Secondary >20 years;Plantation;46.9;284;4;20
+Tropical Moist Deciduous Forest;South America;Secondary ≤20 years;Plantation;46.9;195;4;20
+Tropical Dry Forest;South America;Primary;Plantation;0;0;0;0
+Tropical Dry Forest;South America;Secondary >20 years;Plantation;50;110;4;30
+Tropical Dry Forest;South America;Secondary ≤20 years;Plantation;40;62;4;30
+Tropical Shrubland;South America;Primary;Plantation;0;0;0;0
+Tropical Shrubland;South America;Secondary >20 years;Plantation;30;60;5;20
+Tropical Shrubland;South America;Secondary ≤20 years;Plantation;30;60;5;20
+Tropical Mountain Systems;South America;Primary;Plantation;0;0;0;0
+Tropical Mountain Systems;South America;Secondary >20 years;Plantation;30;184,4;8;18
+Tropical Mountain Systems;South America;Secondary ≤20 years;Plantation;30;170;8;18
+Subtropical Humid Forest;South America;Primary;Plantation;0;0;0;0
+Subtropical Humid Forest;South America;Secondary >20 years;Plantation;11.1;270;3;32
+Subtropical Humid Forest;South America;Secondary ≤20 years;Plantation;2.45;270;3;32
+Subtropical Dry Forest;South America;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;South America;Secondary >20 years;Plantation;60;110;3;30
+Subtropical Dry Forest;South America;Secondary ≤20 years;Plantation;60;110;3;30
+Subtropical Dry Forest;South America;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;South America;Secondary >20 years;Plantation;60;110;3;30
+Subtropical Dry Forest;South America;Secondary ≤20 years;Plantation;60;110;3;30
+Subtropical Dry Forest;South America;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;South America;Secondary >20 years;Plantation;60;110;3;30
+Subtropical Dry Forest;South America;Secondary ≤20 years;Plantation;60;110;3;30
+Subtropical Steppe;South America;Primary;Plantation;0;0;0;0
+Subtropical Steppe;South America;Secondary >20 years;Plantation;30;60;5;20
+Subtropical Steppe;South America;Secondary ≤20 years;Plantation;3.6;60;5;20
+Tropical Rainforest;North America;Primary;Natural;307,1;307,1;1;1
+Tropical Rainforest;North America;Secondary >20 years;Natural;206,4;206,4;2,3;2,3
+Tropical Rainforest;North America;Secondary ≤20 years;Natural;75,7;75,7;5,9;5,9
+Tropical Moist Deciduous Forest;North America;Primary;Natural;187,3;187,3;0,4;0,4
+Tropical Moist Deciduous Forest;North America;Secondary >20 years;Natural;131;131;2,7;2,7
+Tropical Moist Deciduous Forest;North America;Secondary ≤20 years;Natural;55,7;55,7;5,2;5,2
+Tropical Dry Forest;North America;Primary;Natural;127,5;127,5;0;0
+Tropical Dry Forest;North America;Secondary >20 years;Natural;118,9;118,9;1,6;1,6
+Tropical Dry Forest;North America;Secondary ≤20 years;Natural;32,2;32,2;3,9;3,9
+Tropical Shrubland;North America;Primary;Natural;71,5;71,5;1
+Tropical Shrubland;North America;Secondary >20 years;Natural;71,5;71,5;1
+Tropical Shrubland;North America;Secondary ≤20 years;Natural;71,5;71,5;4
+Tropical Mountain Systems;North America;Primary;Natural;195;195;0,5;0,5
+Tropical Mountain Systems;North America;Secondary >20 years;Natural;184,4;184,4;1,8;1,8
+Tropical Mountain Systems;North America;Secondary ≤20 years;Natural;75,9;75,9;4,4;4,4
+Subtropical Humid Forest;North America;Primary;Natural;84,5;84,5;0;0
+Subtropical Humid Forest;North America;Secondary >20 years;Natural;84,5;84,5;1;1
+Subtropical Humid Forest;North America;Secondary ≤20 years;Natural;84,5;84,5;2,5;2,5
+Subtropical Dry Forest;North America;Primary;Natural;115,9;115,9;1;1
+Subtropical Dry Forest;North America;Secondary >20 years;Natural;115,9;115,9;1;1
+Subtropical Dry Forest;North America;Secondary ≤20 years;Natural;115,9;115,9;4;4
+Subtropical Dry Forest;North America;Primary;Natural;115,9;115,9;1;1
+Subtropical Dry Forest;North America;Secondary >20 years;Natural;115,9;115,9;1;1
+Subtropical Dry Forest;North America;Secondary ≤20 years;Natural;115,9;115,9;4;4
+Subtropical Dry Forest;North America;Primary;Natural;115,9;115,9;1;1
+Subtropical Dry Forest;North America;Secondary >20 years;Natural;115,9;115,9;1;1
+Subtropical Dry Forest;North America;Secondary ≤20 years;Natural;115,9;115,9;4;4
+Subtropical Steppe;North America;Primary;Natural;44;44;1;1
+Subtropical Steppe;North America;Secondary >20 years;Natural;44;44;1;1
+Subtropical Steppe;North America;Secondary ≤20 years;Natural;44;44;4;4
+Tropical Rainforest;North America;Primary;Plantation;0;0;0;0
+Tropical Rainforest;North America;Secondary >20 years;Plantation;150;300;5;40
+Tropical Rainforest;North America;Secondary ≤20 years;Plantation;150;300;5;40
+Tropical Moist Deciduous Forest;North America;Primary;Plantation;0;0;0;0
+Tropical Moist Deciduous Forest;North America;Secondary >20 years;Plantation;46.9;284;4;20
+Tropical Moist Deciduous Forest;North America;Secondary ≤20 years;Plantation;46.9;195;4;20
+Tropical Dry Forest;North America;Primary;Plantation;0;0;0;0
+Tropical Dry Forest;North America;Secondary >20 years;Plantation;50;110;4;30
+Tropical Dry Forest;North America;Secondary ≤20 years;Plantation;40;62;4;30
+Tropical Shrubland;North America;Primary;Plantation;0;0;0;0
+Tropical Shrubland;North America;Secondary >20 years;Plantation;30;60;5;20
+Tropical Shrubland;North America;Secondary ≤20 years;Plantation;30;60;5;20
+Tropical Mountain Systems;North America;Primary;Plantation;0;0;0;0
+Tropical Mountain Systems;North America;Secondary >20 years;Plantation;30;184,4;8;18
+Tropical Mountain Systems;North America;Secondary ≤20 years;Plantation;30;170;8;18
+Subtropical Humid Forest;North America;Primary;Plantation;0;0;0;0
+Subtropical Humid Forest;North America;Secondary >20 years;Plantation;11.1;270;3;32
+Subtropical Humid Forest;North America;Secondary ≤20 years;Plantation;2.45;270;3;32
+Subtropical Dry Forest;North America;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;North America;Secondary >20 years;Plantation;60;110;3;30
+Subtropical Dry Forest;North America;Secondary ≤20 years;Plantation;60;110;3;30
+Subtropical Dry Forest;North America;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;North America;Secondary >20 years;Plantation;60;110;3;30
+Subtropical Dry Forest;North America;Secondary ≤20 years;Plantation;60;110;3;30
+Subtropical Dry Forest;North America;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;North America;Secondary >20 years;Plantation;60;110;3;30
+Subtropical Dry Forest;North America;Secondary ≤20 years;Plantation;60;110;3;30
+Subtropical Steppe;North America;Primary;Plantation;0;0;0;0
+Subtropical Steppe;North America;Secondary >20 years;Plantation;30;60;5;20
+Subtropical Steppe;North America;Secondary ≤20 years;Plantation;3.6;60;5;20
+Tropical Rainforest;Eastern Africa;Primary;Natural;404,2;404,2;1,3;1,3
+Tropical Rainforest;Eastern Africa;Secondary >20 years;Natural;212,9;212,9;3,5;3,5
+Tropical Rainforest;Eastern Africa;Secondary ≤20 years;Natural;52,8;52,8;7,6;7,6
+Tropical Moist Deciduous Forest;Eastern Africa;Primary;Natural;236,6;236,6;0,4;0,4
+Tropical Moist Deciduous Forest;Eastern Africa;Secondary >20 years;Natural;72,8;72,8;0,9;0,9
+Tropical Moist Deciduous Forest;Eastern Africa;Secondary ≤20 years;Natural;72,8;72,8;2,9;2,9
+Tropical Dry Forest;Eastern Africa;Primary;Natural;69,6;69,6;0;0
+Tropical Dry Forest;Eastern Africa;Secondary >20 years;Natural;69,6;69,6;1,6;1,6
+Tropical Dry Forest;Eastern Africa;Secondary ≤20 years;Natural;69,6;69,6;3,9;3,9
+Tropical Shrubland;Eastern Africa;Primary;Natural;48,4;48,4;0,9;0,9
+Tropical Shrubland;Eastern Africa;Secondary >20 years;Natural;48,4;48,4;0,9;0,9
+Tropical Shrubland;Eastern Africa;Secondary ≤20 years;Natural;48,4;48,4;0.2;0.7
+Tropical Mountain Systems;Eastern Africa;Primary;Natural;190;190;0,5;0,5
+Tropical Mountain Systems;Eastern Africa;Secondary >20 years;Natural;190;190;1,8;1,8
+Tropical Mountain Systems;Eastern Africa;Secondary ≤20 years;Natural;190;190;5,5;5,5
+Subtropical Humid Forest;Eastern Africa;Primary;Natural;54,1;54,1;0;0
+Subtropical Humid Forest;Eastern Africa;Secondary >20 years;Natural;54,1;54,1;1;1
+Subtropical Humid Forest;Eastern Africa;Secondary ≤20 years;Natural;54,1;54,1;2,5;2,5
+Subtropical Dry Forest;Eastern Africa;Primary;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Eastern Africa;Secondary >20 years;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Eastern Africa;Secondary ≤20 years;Natural;65,2;65,2;2,4;2,4
+Subtropical Dry Forest;Eastern Africa;Primary;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Eastern Africa;Secondary >20 years;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Eastern Africa;Secondary ≤20 years;Natural;65,2;65,2;2,4;2,4
+Subtropical Dry Forest;Eastern Africa;Primary;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Eastern Africa;Secondary >20 years;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Eastern Africa;Secondary ≤20 years;Natural;65,2;65,2;2,4;2,4
+Subtropical Steppe;Eastern Africa;Primary;Natural;50,5;50,5;0,9;0,9
+Subtropical Steppe;Eastern Africa;Secondary >20 years;Natural;50,5;50,5;0,9;0,9
+Subtropical Steppe;Eastern Africa;Secondary ≤20 years;Natural;50,5;50,5;1,2;1,2
+Tropical Rainforest;Eastern Africa;Primary;Plantation;0;0;0;0
+Tropical Rainforest;Eastern Africa;Secondary >20 years;Plantation;200;300;0;0
+Tropical Rainforest;Eastern Africa;Secondary ≤20 years;Plantation;60;100;5;8
+Tropical Moist Deciduous Forest;Eastern Africa;Primary;Plantation;0;0;0;0
+Tropical Moist Deciduous Forest;Eastern Africa;Secondary >20 years;Plantation;120;483;0;0
+Tropical Moist Deciduous Forest;Eastern Africa;Secondary ≤20 years;Plantation;40;195;3;15
+Tropical Dry Forest;Eastern Africa;Primary;Plantation;0;0;0;0
+Tropical Dry Forest;Eastern Africa;Secondary >20 years;Plantation;60;193.9;6;13
+Tropical Dry Forest;Eastern Africa;Secondary ≤20 years;Plantation;20;75.6;4;20
+Tropical Shrubland;Eastern Africa;Primary;Plantation;0;0;0;0
+Tropical Shrubland;Eastern Africa;Secondary >20 years;Plantation;20;20;2.5;14
+Tropical Shrubland;Eastern Africa;Secondary ≤20 years;Plantation;15;20;3;7
+Tropical Mountain Systems;Eastern Africa;Primary;Plantation;0;0;0;0
+Tropical Mountain Systems;Eastern Africa;Secondary >20 years;Plantation;30;150;10;10
+Tropical Mountain Systems;Eastern Africa;Secondary ≤20 years;Plantation;30;100;10;10
+Subtropical Humid Forest;Eastern Africa;Primary;Plantation;0;0;0;0
+Subtropical Humid Forest;Eastern Africa;Secondary >20 years;Plantation;0;0;0;0
+Subtropical Humid Forest;Eastern Africa;Secondary ≤20 years;Plantation;0;0;0;0
+Subtropical Dry Forest;Eastern Africa;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Eastern Africa;Secondary >20 years;Plantation;60;70;8;8
+Subtropical Dry Forest;Eastern Africa;Secondary ≤20 years;Plantation;20;30;4;20
+Subtropical Dry Forest;Eastern Africa;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Eastern Africa;Secondary >20 years;Plantation;60;70;8;8
+Subtropical Dry Forest;Eastern Africa;Secondary ≤20 years;Plantation;20;30;4;20
+Subtropical Dry Forest;Eastern Africa;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Eastern Africa;Secondary >20 years;Plantation;60;70;8;8
+Subtropical Dry Forest;Eastern Africa;Secondary ≤20 years;Plantation;20;30;4;20
+Subtropical Steppe;Eastern Africa;Primary;Plantation;0;0;0;0
+Subtropical Steppe;Eastern Africa;Secondary >20 years;Plantation;15;20;2.5;14
+Subtropical Steppe;Eastern Africa;Secondary ≤20 years;Plantation;15;20;0.5;15
+Tropical Rainforest;Western Africa;Primary;Natural;404,2;404,2;1,3;1,3
+Tropical Rainforest;Western Africa;Secondary >20 years;Natural;212,9;212,9;3,5;3,5
+Tropical Rainforest;Western Africa;Secondary ≤20 years;Natural;52,8;52,8;7,6;7,6
+Tropical Moist Deciduous Forest;Western Africa;Primary;Natural;236,6;236,6;0,4;0,4
+Tropical Moist Deciduous Forest;Western Africa;Secondary >20 years;Natural;72,8;72,8;0,9;0,9
+Tropical Moist Deciduous Forest;Western Africa;Secondary ≤20 years;Natural;72,8;72,8;2,9;2,9
+Tropical Dry Forest;Western Africa;Primary;Natural;69,6;69,6;0;0
+Tropical Dry Forest;Western Africa;Secondary >20 years;Natural;69,6;69,6;1,6;1,6
+Tropical Dry Forest;Western Africa;Secondary ≤20 years;Natural;69,6;69,6;3,9;3,9
+Tropical Shrubland;Western Africa;Primary;Natural;48,4;48,4;0,9;0,9
+Tropical Shrubland;Western Africa;Secondary >20 years;Natural;48,4;48,4;0,9;0,9
+Tropical Shrubland;Western Africa;Secondary ≤20 years;Natural;48,4;48,4;0.2;0.7
+Tropical Mountain Systems;Western Africa;Primary;Natural;190;190;0,5;0,5
+Tropical Mountain Systems;Western Africa;Secondary >20 years;Natural;190;190;1,8;1,8
+Tropical Mountain Systems;Western Africa;Secondary ≤20 years;Natural;190;190;5,5;5,5
+Subtropical Humid Forest;Western Africa;Primary;Natural;54,1;54,1;0;0
+Subtropical Humid Forest;Western Africa;Secondary >20 years;Natural;54,1;54,1;1;1
+Subtropical Humid Forest;Western Africa;Secondary ≤20 years;Natural;54,1;54,1;2,5;2,5
+Subtropical Dry Forest;Western Africa;Primary;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Western Africa;Secondary >20 years;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Western Africa;Secondary ≤20 years;Natural;65,2;65,2;2,4;2,4
+Subtropical Dry Forest;Western Africa;Primary;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Western Africa;Secondary >20 years;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Western Africa;Secondary ≤20 years;Natural;65,2;65,2;2,4;2,4
+Subtropical Dry Forest;Western Africa;Primary;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Western Africa;Secondary >20 years;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Western Africa;Secondary ≤20 years;Natural;65,2;65,2;2,4;2,4
+Subtropical Steppe;Western Africa;Primary;Natural;50,5;50,5;0,9;0,9
+Subtropical Steppe;Western Africa;Secondary >20 years;Natural;50,5;50,5;0,9;0,9
+Subtropical Steppe;Western Africa;Secondary ≤20 years;Natural;50,5;50,5;1,2;1,2
+Tropical Rainforest;Western Africa;Primary;Plantation;0;0;0;0
+Tropical Rainforest;Western Africa;Secondary >20 years;Plantation;200;300;0;0
+Tropical Rainforest;Western Africa;Secondary ≤20 years;Plantation;60;100;5;8
+Tropical Moist Deciduous Forest;Western Africa;Primary;Plantation;0;0;0;0
+Tropical Moist Deciduous Forest;Western Africa;Secondary >20 years;Plantation;120;483;0;0
+Tropical Moist Deciduous Forest;Western Africa;Secondary ≤20 years;Plantation;40;195;3;15
+Tropical Dry Forest;Western Africa;Primary;Plantation;0;0;0;0
+Tropical Dry Forest;Western Africa;Secondary >20 years;Plantation;60;193.9;6;13
+Tropical Dry Forest;Western Africa;Secondary ≤20 years;Plantation;20;75.6;4;20
+Tropical Shrubland;Western Africa;Primary;Plantation;0;0;0;0
+Tropical Shrubland;Western Africa;Secondary >20 years;Plantation;20;20;2.5;14
+Tropical Shrubland;Western Africa;Secondary ≤20 years;Plantation;15;20;3;7
+Tropical Mountain Systems;Western Africa;Primary;Plantation;0;0;0;0
+Tropical Mountain Systems;Western Africa;Secondary >20 years;Plantation;30;150;10;10
+Tropical Mountain Systems;Western Africa;Secondary ≤20 years;Plantation;30;100;10;10
+Subtropical Humid Forest;Western Africa;Primary;Plantation;0;0;0;0
+Subtropical Humid Forest;Western Africa;Secondary >20 years;Plantation;0;0;0;0
+Subtropical Humid Forest;Western Africa;Secondary ≤20 years;Plantation;0;0;0;0
+Subtropical Dry Forest;Western Africa;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Western Africa;Secondary >20 years;Plantation;60;70;8;8
+Subtropical Dry Forest;Western Africa;Secondary ≤20 years;Plantation;20;30;4;20
+Subtropical Dry Forest;Western Africa;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Western Africa;Secondary >20 years;Plantation;60;70;8;8
+Subtropical Dry Forest;Western Africa;Secondary ≤20 years;Plantation;20;30;4;20
+Subtropical Dry Forest;Western Africa;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Western Africa;Secondary >20 years;Plantation;60;70;8;8
+Subtropical Dry Forest;Western Africa;Secondary ≤20 years;Plantation;20;30;4;20
+Subtropical Steppe;Western Africa;Primary;Plantation;0;0;0;0
+Subtropical Steppe;Western Africa;Secondary >20 years;Plantation;15;20;2.5;14
+Subtropical Steppe;Western Africa;Secondary ≤20 years;Plantation;15;20;0.5;15
+Tropical Rainforest;Northern Africa;Primary;Natural;404,2;404,2;1,3;1,3
+Tropical Rainforest;Northern Africa;Secondary >20 years;Natural;212,9;212,9;3,5;3,5
+Tropical Rainforest;Northern Africa;Secondary ≤20 years;Natural;52,8;52,8;7,6;7,6
+Tropical Moist Deciduous Forest;Northern Africa;Primary;Natural;236,6;236,6;0,4;0,4
+Tropical Moist Deciduous Forest;Northern Africa;Secondary >20 years;Natural;72,8;72,8;0,9;0,9
+Tropical Moist Deciduous Forest;Northern Africa;Secondary ≤20 years;Natural;72,8;72,8;2,9;2,9
+Tropical Dry Forest;Northern Africa;Primary;Natural;69,6;69,6;0;0
+Tropical Dry Forest;Northern Africa;Secondary >20 years;Natural;69,6;69,6;1,6;1,6
+Tropical Dry Forest;Northern Africa;Secondary ≤20 years;Natural;69,6;69,6;3,9;3,9
+Tropical Shrubland;Northern Africa;Primary;Natural;48,4;48,4;0,9;0,9
+Tropical Shrubland;Northern Africa;Secondary >20 years;Natural;48,4;48,4;0,9;0,9
+Tropical Shrubland;Northern Africa;Secondary ≤20 years;Natural;48,4;48,4;0.2;0.7
+Tropical Mountain Systems;Northern Africa;Primary;Natural;190;190;0,5;0,5
+Tropical Mountain Systems;Northern Africa;Secondary >20 years;Natural;190;190;1,8;1,8
+Tropical Mountain Systems;Northern Africa;Secondary ≤20 years;Natural;190;190;5,5;5,5
+Subtropical Humid Forest;Northern Africa;Primary;Natural;54,1;54,1;0;0
+Subtropical Humid Forest;Northern Africa;Secondary >20 years;Natural;54,1;54,1;1;1
+Subtropical Humid Forest;Northern Africa;Secondary ≤20 years;Natural;54,1;54,1;2,5;2,5
+Subtropical Dry Forest;Northern Africa;Primary;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Northern Africa;Secondary >20 years;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Northern Africa;Secondary ≤20 years;Natural;65,2;65,2;2,4;2,4
+Subtropical Dry Forest;Northern Africa;Primary;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Northern Africa;Secondary >20 years;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Northern Africa;Secondary ≤20 years;Natural;65,2;65,2;2,4;2,4
+Subtropical Dry Forest;Northern Africa;Primary;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Northern Africa;Secondary >20 years;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Northern Africa;Secondary ≤20 years;Natural;65,2;65,2;2,4;2,4
+Subtropical Steppe;Northern Africa;Primary;Natural;50,5;50,5;0,9;0,9
+Subtropical Steppe;Northern Africa;Secondary >20 years;Natural;50,5;50,5;0,9;0,9
+Subtropical Steppe;Northern Africa;Secondary ≤20 years;Natural;50,5;50,5;1,2;1,2
+Tropical Rainforest;Northern Africa;Primary;Plantation;0;0;0;0
+Tropical Rainforest;Northern Africa;Secondary >20 years;Plantation;200;300;0;0
+Tropical Rainforest;Northern Africa;Secondary ≤20 years;Plantation;60;100;5;8
+Tropical Moist Deciduous Forest;Northern Africa;Primary;Plantation;0;0;0;0
+Tropical Moist Deciduous Forest;Northern Africa;Secondary >20 years;Plantation;120;483;0;0
+Tropical Moist Deciduous Forest;Northern Africa;Secondary ≤20 years;Plantation;40;195;3;15
+Tropical Dry Forest;Northern Africa;Primary;Plantation;0;0;0;0
+Tropical Dry Forest;Northern Africa;Secondary >20 years;Plantation;60;193.9;6;13
+Tropical Dry Forest;Northern Africa;Secondary ≤20 years;Plantation;20;75.6;4;20
+Tropical Shrubland;Northern Africa;Primary;Plantation;0;0;0;0
+Tropical Shrubland;Northern Africa;Secondary >20 years;Plantation;20;20;2.5;14
+Tropical Shrubland;Northern Africa;Secondary ≤20 years;Plantation;15;20;3;7
+Tropical Mountain Systems;Northern Africa;Primary;Plantation;0;0;0;0
+Tropical Mountain Systems;Northern Africa;Secondary >20 years;Plantation;30;150;10;10
+Tropical Mountain Systems;Northern Africa;Secondary ≤20 years;Plantation;30;100;10;10
+Subtropical Humid Forest;Northern Africa;Primary;Plantation;0;0;0;0
+Subtropical Humid Forest;Northern Africa;Secondary >20 years;Plantation;0;0;0;0
+Subtropical Humid Forest;Northern Africa;Secondary ≤20 years;Plantation;0;0;0;0
+Subtropical Dry Forest;Northern Africa;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Northern Africa;Secondary >20 years;Plantation;60;70;8;8
+Subtropical Dry Forest;Northern Africa;Secondary ≤20 years;Plantation;20;30;4;20
+Subtropical Dry Forest;Northern Africa;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Northern Africa;Secondary >20 years;Plantation;60;70;8;8
+Subtropical Dry Forest;Northern Africa;Secondary ≤20 years;Plantation;20;30;4;20
+Subtropical Dry Forest;Northern Africa;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Northern Africa;Secondary >20 years;Plantation;60;70;8;8
+Subtropical Dry Forest;Northern Africa;Secondary ≤20 years;Plantation;20;30;4;20
+Subtropical Steppe;Northern Africa;Primary;Plantation;0;0;0;0
+Subtropical Steppe;Northern Africa;Secondary >20 years;Plantation;15;20;2.5;14
+Subtropical Steppe;Northern Africa;Secondary ≤20 years;Plantation;15;20;0.5;15
+Tropical Rainforest;Southern Africa;Primary;Natural;404,2;404,2;1,3;1,3
+Tropical Rainforest;Southern Africa;Secondary >20 years;Natural;212,9;212,9;3,5;3,5
+Tropical Rainforest;Southern Africa;Secondary ≤20 years;Natural;52,8;52,8;7,6;7,6
+Tropical Moist Deciduous Forest;Southern Africa;Primary;Natural;236,6;236,6;0,4;0,4
+Tropical Moist Deciduous Forest;Southern Africa;Secondary >20 years;Natural;72,8;72,8;0,9;0,9
+Tropical Moist Deciduous Forest;Southern Africa;Secondary ≤20 years;Natural;72,8;72,8;2,9;2,9
+Tropical Dry Forest;Southern Africa;Primary;Natural;69,6;69,6;0;0
+Tropical Dry Forest;Southern Africa;Secondary >20 years;Natural;69,6;69,6;1,6;1,6
+Tropical Dry Forest;Southern Africa;Secondary ≤20 years;Natural;69,6;69,6;3,9;3,9
+Tropical Shrubland;Southern Africa;Primary;Natural;48,4;48,4;0,9;0,9
+Tropical Shrubland;Southern Africa;Secondary >20 years;Natural;48,4;48,4;0,9;0,9
+Tropical Shrubland;Southern Africa;Secondary ≤20 years;Natural;48,4;48,4;0.2;0.7
+Tropical Mountain Systems;Southern Africa;Primary;Natural;190;190;0,5;0,5
+Tropical Mountain Systems;Southern Africa;Secondary >20 years;Natural;190;190;1,8;1,8
+Tropical Mountain Systems;Southern Africa;Secondary ≤20 years;Natural;190;190;5,5;5,5
+Subtropical Humid Forest;Southern Africa;Primary;Natural;54,1;54,1;0;0
+Subtropical Humid Forest;Southern Africa;Secondary >20 years;Natural;54,1;54,1;1;1
+Subtropical Humid Forest;Southern Africa;Secondary ≤20 years;Natural;54,1;54,1;2,5;2,5
+Subtropical Dry Forest;Southern Africa;Primary;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Southern Africa;Secondary >20 years;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Southern Africa;Secondary ≤20 years;Natural;65,2;65,2;2,4;2,4
+Subtropical Dry Forest;Southern Africa;Primary;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Southern Africa;Secondary >20 years;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Southern Africa;Secondary ≤20 years;Natural;65,2;65,2;2,4;2,4
+Subtropical Dry Forest;Southern Africa;Primary;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Southern Africa;Secondary >20 years;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Southern Africa;Secondary ≤20 years;Natural;65,2;65,2;2,4;2,4
+Subtropical Steppe;Southern Africa;Primary;Natural;50,5;50,5;0,9;0,9
+Subtropical Steppe;Southern Africa;Secondary >20 years;Natural;50,5;50,5;0,9;0,9
+Subtropical Steppe;Southern Africa;Secondary ≤20 years;Natural;50,5;50,5;1,2;1,2
+Tropical Rainforest;Southern Africa;Primary;Plantation;0;0;0;0
+Tropical Rainforest;Southern Africa;Secondary >20 years;Plantation;200;300;0;0
+Tropical Rainforest;Southern Africa;Secondary ≤20 years;Plantation;60;100;5;8
+Tropical Moist Deciduous Forest;Southern Africa;Primary;Plantation;0;0;0;0
+Tropical Moist Deciduous Forest;Southern Africa;Secondary >20 years;Plantation;120;483;0;0
+Tropical Moist Deciduous Forest;Southern Africa;Secondary ≤20 years;Plantation;40;195;3;15
+Tropical Dry Forest;Southern Africa;Primary;Plantation;0;0;0;0
+Tropical Dry Forest;Southern Africa;Secondary >20 years;Plantation;60;193.9;6;13
+Tropical Dry Forest;Southern Africa;Secondary ≤20 years;Plantation;20;75.6;4;20
+Tropical Shrubland;Southern Africa;Primary;Plantation;0;0;0;0
+Tropical Shrubland;Southern Africa;Secondary >20 years;Plantation;20;20;2.5;14
+Tropical Shrubland;Southern Africa;Secondary ≤20 years;Plantation;15;20;3;7
+Tropical Mountain Systems;Southern Africa;Primary;Plantation;0;0;0;0
+Tropical Mountain Systems;Southern Africa;Secondary >20 years;Plantation;30;150;10;10
+Tropical Mountain Systems;Southern Africa;Secondary ≤20 years;Plantation;30;100;10;10
+Subtropical Humid Forest;Southern Africa;Primary;Plantation;0;0;0;0
+Subtropical Humid Forest;Southern Africa;Secondary >20 years;Plantation;0;0;0;0
+Subtropical Humid Forest;Southern Africa;Secondary ≤20 years;Plantation;0;0;0;0
+Subtropical Dry Forest;Southern Africa;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Southern Africa;Secondary >20 years;Plantation;60;70;8;8
+Subtropical Dry Forest;Southern Africa;Secondary ≤20 years;Plantation;20;30;4;20
+Subtropical Dry Forest;Southern Africa;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Southern Africa;Secondary >20 years;Plantation;60;70;8;8
+Subtropical Dry Forest;Southern Africa;Secondary ≤20 years;Plantation;20;30;4;20
+Subtropical Dry Forest;Southern Africa;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Southern Africa;Secondary >20 years;Plantation;60;70;8;8
+Subtropical Dry Forest;Southern Africa;Secondary ≤20 years;Plantation;20;30;4;20
+Subtropical Steppe;Southern Africa;Primary;Plantation;0;0;0;0
+Subtropical Steppe;Southern Africa;Secondary >20 years;Plantation;15;20;2.5;14
+Subtropical Steppe;Southern Africa;Secondary ≤20 years;Plantation;15;20;0.5;15
+Tropical Rainforest;Central Africa;Primary;Natural;404,2;404,2;1,3;1,3
+Tropical Rainforest;Central Africa;Secondary >20 years;Natural;212,9;212,9;3,5;3,5
+Tropical Rainforest;Central Africa;Secondary ≤20 years;Natural;52,8;52,8;7,6;7,6
+Tropical Moist Deciduous Forest;Central Africa;Primary;Natural;236,6;236,6;0,4;0,4
+Tropical Moist Deciduous Forest;Central Africa;Secondary >20 years;Natural;72,8;72,8;0,9;0,9
+Tropical Moist Deciduous Forest;Central Africa;Secondary ≤20 years;Natural;72,8;72,8;2,9;2,9
+Tropical Dry Forest;Central Africa;Primary;Natural;69,6;69,6;0;0
+Tropical Dry Forest;Central Africa;Secondary >20 years;Natural;69,6;69,6;1,6;1,6
+Tropical Dry Forest;Central Africa;Secondary ≤20 years;Natural;69,6;69,6;3,9;3,9
+Tropical Shrubland;Central Africa;Primary;Natural;48,4;48,4;0,9;0,9
+Tropical Shrubland;Central Africa;Secondary >20 years;Natural;48,4;48,4;0,9;0,9
+Tropical Shrubland;Central Africa;Secondary ≤20 years;Natural;48,4;48,4;0.2;0.7
+Tropical Mountain Systems;Central Africa;Primary;Natural;190;190;0,5;0,5
+Tropical Mountain Systems;Central Africa;Secondary >20 years;Natural;190;190;1,8;1,8
+Tropical Mountain Systems;Central Africa;Secondary ≤20 years;Natural;190;190;5,5;5,5
+Subtropical Humid Forest;Central Africa;Primary;Natural;54,1;54,1;0;0
+Subtropical Humid Forest;Central Africa;Secondary >20 years;Natural;54,1;54,1;1;1
+Subtropical Humid Forest;Central Africa;Secondary ≤20 years;Natural;54,1;54,1;2,5;2,5
+Subtropical Dry Forest;Central Africa;Primary;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Central Africa;Secondary >20 years;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Central Africa;Secondary ≤20 years;Natural;65,2;65,2;2,4;2,4
+Subtropical Dry Forest;Central Africa;Primary;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Central Africa;Secondary >20 years;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Central Africa;Secondary ≤20 years;Natural;65,2;65,2;2,4;2,4
+Subtropical Dry Forest;Central Africa;Primary;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Central Africa;Secondary >20 years;Natural;65,2;65,2;1,8;1,8
+Subtropical Dry Forest;Central Africa;Secondary ≤20 years;Natural;65,2;65,2;2,4;2,4
+Subtropical Steppe;Central Africa;Primary;Natural;50,5;50,5;0,9;0,9
+Subtropical Steppe;Central Africa;Secondary >20 years;Natural;50,5;50,5;0,9;0,9
+Subtropical Steppe;Central Africa;Secondary ≤20 years;Natural;50,5;50,5;1,2;1,2
+Tropical Rainforest;Central Africa;Primary;Plantation;0;0;0;0
+Tropical Rainforest;Central Africa;Secondary >20 years;Plantation;200;300;0;0
+Tropical Rainforest;Central Africa;Secondary ≤20 years;Plantation;60;100;5;8
+Tropical Moist Deciduous Forest;Central Africa;Primary;Plantation;0;0;0;0
+Tropical Moist Deciduous Forest;Central Africa;Secondary >20 years;Plantation;120;483;0;0
+Tropical Moist Deciduous Forest;Central Africa;Secondary ≤20 years;Plantation;40;195;3;15
+Tropical Dry Forest;Central Africa;Primary;Plantation;0;0;0;0
+Tropical Dry Forest;Central Africa;Secondary >20 years;Plantation;60;193.9;6;13
+Tropical Dry Forest;Central Africa;Secondary ≤20 years;Plantation;20;75.6;4;20
+Tropical Shrubland;Central Africa;Primary;Plantation;0;0;0;0
+Tropical Shrubland;Central Africa;Secondary >20 years;Plantation;20;20;2.5;14
+Tropical Shrubland;Central Africa;Secondary ≤20 years;Plantation;15;20;3;7
+Tropical Mountain Systems;Central Africa;Primary;Plantation;0;0;0;0
+Tropical Mountain Systems;Central Africa;Secondary >20 years;Plantation;30;150;10;10
+Tropical Mountain Systems;Central Africa;Secondary ≤20 years;Plantation;30;100;10;10
+Subtropical Humid Forest;Central Africa;Primary;Plantation;0;0;0;0
+Subtropical Humid Forest;Central Africa;Secondary >20 years;Plantation;0;0;0;0
+Subtropical Humid Forest;Central Africa;Secondary ≤20 years;Plantation;0;0;0;0
+Subtropical Dry Forest;Central Africa;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Central Africa;Secondary >20 years;Plantation;60;70;8;8
+Subtropical Dry Forest;Central Africa;Secondary ≤20 years;Plantation;20;30;4;20
+Subtropical Dry Forest;Central Africa;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Central Africa;Secondary >20 years;Plantation;60;70;8;8
+Subtropical Dry Forest;Central Africa;Secondary ≤20 years;Plantation;20;30;4;20
+Subtropical Dry Forest;Central Africa;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Central Africa;Secondary >20 years;Plantation;60;70;8;8
+Subtropical Dry Forest;Central Africa;Secondary ≤20 years;Plantation;20;30;4;20
+Subtropical Steppe;Central Africa;Primary;Plantation;0;0;0;0
+Subtropical Steppe;Central Africa;Secondary >20 years;Plantation;15;20;2.5;14
+Subtropical Steppe;Central Africa;Secondary ≤20 years;Plantation;15;20;0.5;15
+Tropical Rainforest;Central America;Primary;Natural;307,1;307,1;1;1
+Tropical Rainforest;Central America;Secondary >20 years;Natural;206,4;206,4;2,3;2,3
+Tropical Rainforest;Central America;Secondary ≤20 years;Natural;75,7;75,7;5,9;5,9
+Tropical Moist Deciduous Forest;Central America;Primary;Natural;187,3;187,3;0,4;0,4
+Tropical Moist Deciduous Forest;Central America;Secondary >20 years;Natural;131;131;2,7;2,7
+Tropical Moist Deciduous Forest;Central America;Secondary ≤20 years;Natural;55,7;55,7;5,2;5,2
+Tropical Dry Forest;Central America;Primary;Natural;127,5;127,5;0;0
+Tropical Dry Forest;Central America;Secondary >20 years;Natural;118,9;118,9;1,6;1,6
+Tropical Dry Forest;Central America;Secondary ≤20 years;Natural;32,2;32,2;3,9;3,9
+Tropical Shrubland;Central America;Primary;Natural;71,5;71,5;1
+Tropical Shrubland;Central America;Secondary >20 years;Natural;71,5;71,5;1
+Tropical Shrubland;Central America;Secondary ≤20 years;Natural;71,5;71,5;4
+Tropical Mountain Systems;Central America;Primary;Natural;195;195;0,5;0,5
+Tropical Mountain Systems;Central America;Secondary >20 years;Natural;184,4;184,4;1,8;1,8
+Tropical Mountain Systems;Central America;Secondary ≤20 years;Natural;75,9;75,9;4,4;4,4
+Subtropical Humid Forest;Central America;Primary;Natural;84,5;84,5;0;0
+Subtropical Humid Forest;Central America;Secondary >20 years;Natural;84,5;84,5;1;1
+Subtropical Humid Forest;Central America;Secondary ≤20 years;Natural;84,5;84,5;2,5;2,5
+Subtropical Dry Forest;Central America;Primary;Natural;115,9;115,9;1;1
+Subtropical Dry Forest;Central America;Secondary >20 years;Natural;115,9;115,9;1;1
+Subtropical Dry Forest;Central America;Secondary ≤20 years;Natural;115,9;115,9;4;4
+Subtropical Dry Forest;Central America;Primary;Natural;115,9;115,9;1;1
+Subtropical Dry Forest;Central America;Secondary >20 years;Natural;115,9;115,9;1;1
+Subtropical Dry Forest;Central America;Secondary ≤20 years;Natural;115,9;115,9;4;4
+Subtropical Dry Forest;Central America;Primary;Natural;115,9;115,9;1;1
+Subtropical Dry Forest;Central America;Secondary >20 years;Natural;115,9;115,9;1;1
+Subtropical Dry Forest;Central America;Secondary ≤20 years;Natural;115,9;115,9;4;4
+Subtropical Steppe;Central America;Primary;Natural;44;44;1;1
+Subtropical Steppe;Central America;Secondary >20 years;Natural;44;44;1;1
+Subtropical Steppe;Central America;Secondary ≤20 years;Natural;44;44;4;4
+Tropical Rainforest;Central America;Primary;Plantation;0;0;0;0
+Tropical Rainforest;Central America;Secondary >20 years;Plantation;150;300;5;40
+Tropical Rainforest;Central America;Secondary ≤20 years;Plantation;150;300;5;40
+Tropical Moist Deciduous Forest;Central America;Primary;Plantation;0;0;0;0
+Tropical Moist Deciduous Forest;Central America;Secondary >20 years;Plantation;46.9;284;4;20
+Tropical Moist Deciduous Forest;Central America;Secondary ≤20 years;Plantation;46.9;195;4;20
+Tropical Dry Forest;Central America;Primary;Plantation;0;0;0;0
+Tropical Dry Forest;Central America;Secondary >20 years;Plantation;50;110;4;30
+Tropical Dry Forest;Central America;Secondary ≤20 years;Plantation;40;62;4;30
+Tropical Shrubland;Central America;Primary;Plantation;0;0;0;0
+Tropical Shrubland;Central America;Secondary >20 years;Plantation;30;60;5;20
+Tropical Shrubland;Central America;Secondary ≤20 years;Plantation;30;60;5;20
+Tropical Mountain Systems;Central America;Primary;Plantation;0;0;0;0
+Tropical Mountain Systems;Central America;Secondary >20 years;Plantation;30;184,4;8;18
+Tropical Mountain Systems;Central America;Secondary ≤20 years;Plantation;30;170;8;18
+Subtropical Humid Forest;Central America;Primary;Plantation;0;0;0;0
+Subtropical Humid Forest;Central America;Secondary >20 years;Plantation;11.1;270;3;32
+Subtropical Humid Forest;Central America;Secondary ≤20 years;Plantation;2.45;270;3;32
+Subtropical Dry Forest;Central America;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Central America;Secondary >20 years;Plantation;60;110;3;30
+Subtropical Dry Forest;Central America;Secondary ≤20 years;Plantation;60;110;3;30
+Subtropical Dry Forest;Central America;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Central America;Secondary >20 years;Plantation;60;110;3;30
+Subtropical Dry Forest;Central America;Secondary ≤20 years;Plantation;60;110;3;30
+Subtropical Dry Forest;Central America;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Central America;Secondary >20 years;Plantation;60;110;3;30
+Subtropical Dry Forest;Central America;Secondary ≤20 years;Plantation;60;110;3;30
+Subtropical Steppe;Central America;Primary;Plantation;0;0;0;0
+Subtropical Steppe;Central America;Secondary >20 years;Plantation;30;60;5;20
+Subtropical Steppe;Central America;Secondary ≤20 years;Plantation;3.6;60;5;20
+Tropical Rainforest;Caribbean;Primary;Natural;307,1;307,1;1;1
+Tropical Rainforest;Caribbean;Secondary >20 years;Natural;206,4;206,4;2,3;2,3
+Tropical Rainforest;Caribbean;Secondary ≤20 years;Natural;75,7;75,7;5,9;5,9
+Tropical Moist Deciduous Forest;Caribbean;Primary;Natural;187,3;187,3;0,4;0,4
+Tropical Moist Deciduous Forest;Caribbean;Secondary >20 years;Natural;131;131;2,7;2,7
+Tropical Moist Deciduous Forest;Caribbean;Secondary ≤20 years;Natural;55,7;55,7;5,2;5,2
+Tropical Dry Forest;Caribbean;Primary;Natural;127,5;127,5;0;0
+Tropical Dry Forest;Caribbean;Secondary >20 years;Natural;118,9;118,9;1,6;1,6
+Tropical Dry Forest;Caribbean;Secondary ≤20 years;Natural;32,2;32,2;3,9;3,9
+Tropical Shrubland;Caribbean;Primary;Natural;71,5;71,5;1
+Tropical Shrubland;Caribbean;Secondary >20 years;Natural;71,5;71,5;1
+Tropical Shrubland;Caribbean;Secondary ≤20 years;Natural;71,5;71,5;4
+Tropical Mountain Systems;Caribbean;Primary;Natural;195;195;0,5;0,5
+Tropical Mountain Systems;Caribbean;Secondary >20 years;Natural;184,4;184,4;1,8;1,8
+Tropical Mountain Systems;Caribbean;Secondary ≤20 years;Natural;75,9;75,9;4,4;4,4
+Subtropical Humid Forest;Caribbean;Primary;Natural;84,5;84,5;0;0
+Subtropical Humid Forest;Caribbean;Secondary >20 years;Natural;84,5;84,5;1;1
+Subtropical Humid Forest;Caribbean;Secondary ≤20 years;Natural;84,5;84,5;2,5;2,5
+Subtropical Dry Forest;Caribbean;Primary;Natural;115,9;115,9;1;1
+Subtropical Dry Forest;Caribbean;Secondary >20 years;Natural;115,9;115,9;1;1
+Subtropical Dry Forest;Caribbean;Secondary ≤20 years;Natural;115,9;115,9;4;4
+Subtropical Dry Forest;Caribbean;Primary;Natural;115,9;115,9;1;1
+Subtropical Dry Forest;Caribbean;Secondary >20 years;Natural;115,9;115,9;1;1
+Subtropical Dry Forest;Caribbean;Secondary ≤20 years;Natural;115,9;115,9;4;4
+Subtropical Dry Forest;Caribbean;Primary;Natural;115,9;115,9;1;1
+Subtropical Dry Forest;Caribbean;Secondary >20 years;Natural;115,9;115,9;1;1
+Subtropical Dry Forest;Caribbean;Secondary ≤20 years;Natural;115,9;115,9;4;4
+Subtropical Steppe;Caribbean;Primary;Natural;44;44;1;1
+Subtropical Steppe;Caribbean;Secondary >20 years;Natural;44;44;1;1
+Subtropical Steppe;Caribbean;Secondary ≤20 years;Natural;44;44;4;4
+Tropical Rainforest;Caribbean;Primary;Plantation;0;0;0;0
+Tropical Rainforest;Caribbean;Secondary >20 years;Plantation;150;300;5;40
+Tropical Rainforest;Caribbean;Secondary ≤20 years;Plantation;150;300;5;40
+Tropical Moist Deciduous Forest;Caribbean;Primary;Plantation;0;0;0;0
+Tropical Moist Deciduous Forest;Caribbean;Secondary >20 years;Plantation;46.9;284;4;20
+Tropical Moist Deciduous Forest;Caribbean;Secondary ≤20 years;Plantation;46.9;195;4;20
+Tropical Dry Forest;Caribbean;Primary;Plantation;0;0;0;0
+Tropical Dry Forest;Caribbean;Secondary >20 years;Plantation;50;110;4;30
+Tropical Dry Forest;Caribbean;Secondary ≤20 years;Plantation;40;62;4;30
+Tropical Shrubland;Caribbean;Primary;Plantation;0;0;0;0
+Tropical Shrubland;Caribbean;Secondary >20 years;Plantation;30;60;5;20
+Tropical Shrubland;Caribbean;Secondary ≤20 years;Plantation;30;60;5;20
+Tropical Mountain Systems;Caribbean;Primary;Plantation;0;0;0;0
+Tropical Mountain Systems;Caribbean;Secondary >20 years;Plantation;30;184,4;8;18
+Tropical Mountain Systems;Caribbean;Secondary ≤20 years;Plantation;30;170;8;18
+Subtropical Humid Forest;Caribbean;Primary;Plantation;0;0;0;0
+Subtropical Humid Forest;Caribbean;Secondary >20 years;Plantation;11.1;270;3;32
+Subtropical Humid Forest;Caribbean;Secondary ≤20 years;Plantation;2.45;270;3;32
+Subtropical Dry Forest;Caribbean;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Caribbean;Secondary >20 years;Plantation;60;110;3;30
+Subtropical Dry Forest;Caribbean;Secondary ≤20 years;Plantation;60;110;3;30
+Subtropical Dry Forest;Caribbean;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Caribbean;Secondary >20 years;Plantation;60;110;3;30
+Subtropical Dry Forest;Caribbean;Secondary ≤20 years;Plantation;60;110;3;30
+Subtropical Dry Forest;Caribbean;Primary;Plantation;0;0;0;0
+Subtropical Dry Forest;Caribbean;Secondary >20 years;Plantation;60;110;3;30
+Subtropical Dry Forest;Caribbean;Secondary ≤20 years;Plantation;60;110;3;30
+Subtropical Steppe;Caribbean;Primary;Plantation;0;0;0;0
+Subtropical Steppe;Caribbean;Secondary >20 years;Plantation;30;60;5;20
+Subtropical Steppe;Caribbean;Secondary ≤20 years;Plantation;3.6;60;5;20
