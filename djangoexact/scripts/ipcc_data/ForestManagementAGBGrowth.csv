@@ -1,0 +1,545 @@
+climate;forest_type;land_use_type;region;gt_20_yrs;le_20_yrs
+Tropical;Natural;Rainforest;Eastern Africa;3.5;7.6
+Tropical;Natural;Rainforest;Central Africa;3.5;7.6
+Tropical;Natural;Rainforest;Northern Africa;3.5;7.6
+Tropical;Natural;Rainforest;Southern Africa;3.5;7.6
+Tropical;Natural;Rainforest;Western Africa;3.5;7.6
+Tropical;Natural;Rainforest;Central Asia;2.7;3.4
+Tropical;Natural;Rainforest;Eastern Asia;2.7;3.4
+Tropical;Natural;Rainforest;South-Eastern Asia;2.7;3.4
+Tropical;Natural;Rainforest;Southern Asia;2.7;3.4
+Tropical;Natural;Rainforest;Western Asia;2.7;3.4
+Tropical;Natural;Rainforest;Europe;7;7
+Tropical;Natural;Rainforest;Oceania;7;7
+Tropical;Natural;Rainforest;North America;2.3;5.9
+Tropical;Natural;Rainforest;South America;2.3;5.9
+Tropical;Natural;Rainforest;Central America;2.3;5.9
+Tropical;Natural;Rainforest;Caribbean;2.3;5.9
+Tropical;Natural;Moist Deciduous Forest;Eastern Africa;0.9;2.9
+Tropical;Natural;Moist Deciduous Forest;Central Africa;0.9;2.9
+Tropical;Natural;Moist Deciduous Forest;Northern Africa;0.9;2.9
+Tropical;Natural;Moist Deciduous Forest;Southern Africa;0.9;2.9
+Tropical;Natural;Moist Deciduous Forest;Western Africa;0.9;2.9
+Tropical;Natural;Moist Deciduous Forest;Central Asia;0.9;2.4
+Tropical;Natural;Moist Deciduous Forest;Eastern Asia;0.9;2.4
+Tropical;Natural;Moist Deciduous Forest;South-Eastern Asia;0.9;2.4
+Tropical;Natural;Moist Deciduous Forest;Southern Asia;0.9;2.4
+Tropical;Natural;Moist Deciduous Forest;Western Asia;0.9;2.4
+Tropical;Natural;Moist Deciduous Forest;Europe;5;5
+Tropical;Natural;Moist Deciduous Forest;Oceania;5;5
+Tropical;Natural;Moist Deciduous Forest;North America;2.7;5.2
+Tropical;Natural;Moist Deciduous Forest;South America;2.7;5.2
+Tropical;Natural;Moist Deciduous Forest;Central America;2.7;5.2
+Tropical;Natural;Moist Deciduous Forest;Caribbean;2.7;5.2
+Tropical;Natural;Dry Forest;Eastern Africa;1.6;3.9
+Tropical;Natural;Dry Forest;Central Africa;1.6;3.9
+Tropical;Natural;Dry Forest;Northern Africa;1.6;3.9
+Tropical;Natural;Dry Forest;Southern Africa;1.6;3.9
+Tropical;Natural;Dry Forest;Western Africa;1.6;3.9
+Tropical;Natural;Dry Forest;Central Asia;1.6;3.9
+Tropical;Natural;Dry Forest;Eastern Asia;1.6;3.9
+Tropical;Natural;Dry Forest;South-Eastern Asia;1.6;3.9
+Tropical;Natural;Dry Forest;Southern Asia;1.6;3.9
+Tropical;Natural;Dry Forest;Western Asia;1.6;3.9
+Tropical;Natural;Dry Forest;Europe;2.4;2.4
+Tropical;Natural;Dry Forest;Oceania;2.4;2.4
+Tropical;Natural;Dry Forest;North America;1.6;3.9
+Tropical;Natural;Dry Forest;South America;1.6;3.9
+Tropical;Natural;Dry Forest;Central America;1.6;3.9
+Tropical;Natural;Dry Forest;Caribbean;1.6;3.9
+Tropical;Natural;Shrubland;Eastern Africa;0.9;0.45
+Tropical;Natural;Shrubland;Central Africa;0.9;0.45
+Tropical;Natural;Shrubland;Northern Africa;0.9;0.45
+Tropical;Natural;Shrubland;Southern Africa;0.9;0.45
+Tropical;Natural;Shrubland;Western Africa;0.9;0.45
+Tropical;Natural;Shrubland;Central Asia;1.15;3.5
+Tropical;Natural;Shrubland;Eastern Asia;1.15;3.5
+Tropical;Natural;Shrubland;South-Eastern Asia;1.15;3.5
+Tropical;Natural;Shrubland;Southern Asia;1.15;3.5
+Tropical;Natural;Shrubland;Western Asia;1.15;3.5
+Tropical;Natural;Shrubland;Europe;1;1
+Tropical;Natural;Shrubland;Oceania;1;1
+Tropical;Natural;Shrubland;North America;1;4
+Tropical;Natural;Shrubland;South America;1;4
+Tropical;Natural;Shrubland;Central America;1;4
+Tropical;Natural;Shrubland;Caribbean;1;4
+Warm Temperate;Natural;Humid Forest;Eastern Africa;1;2.5
+Warm Temperate;Natural;Humid Forest;Central Africa;1;2.5
+Warm Temperate;Natural;Humid Forest;Northern Africa;1;2.5
+Warm Temperate;Natural;Humid Forest;Southern Africa;1;2.5
+Warm Temperate;Natural;Humid Forest;Western Africa;1;2.5
+Warm Temperate;Natural;Humid Forest;Central Asia;1;2.5
+Warm Temperate;Natural;Humid Forest;Eastern Asia;1;2.5
+Warm Temperate;Natural;Humid Forest;South-Eastern Asia;1;2.5
+Warm Temperate;Natural;Humid Forest;Southern Asia;1;2.5
+Warm Temperate;Natural;Humid Forest;Western Asia;1;2.5
+Warm Temperate;Natural;Humid Forest;Europe;5;5
+Warm Temperate;Natural;Humid Forest;Oceania;5;5
+Warm Temperate;Natural;Humid Forest;North America;1;2.5
+Warm Temperate;Natural;Humid Forest;South America;1;2.5
+Warm Temperate;Natural;Humid Forest;Central America;1;2.5
+Warm Temperate;Natural;Humid Forest;Caribbean;1;2.5
+Warm Temperate;Natural;Dry Forest;Eastern Africa;1.8;2.4
+Warm Temperate;Natural;Dry Forest;Central Africa;1.8;2.4
+Warm Temperate;Natural;Dry Forest;Northern Africa;1.8;2.4
+Warm Temperate;Natural;Dry Forest;Southern Africa;1.8;2.4
+Warm Temperate;Natural;Dry Forest;Western Africa;1.8;2.4
+Warm Temperate;Natural;Dry Forest;Central Asia;1.75;6.5
+Warm Temperate;Natural;Dry Forest;Eastern Asia;1.75;6.5
+Warm Temperate;Natural;Dry Forest;South-Eastern Asia;1.75;6.5
+Warm Temperate;Natural;Dry Forest;Southern Asia;1.75;6.5
+Warm Temperate;Natural;Dry Forest;Western Asia;1.75;6.5
+Warm Temperate;Natural;Dry Forest;Europe;2.4;2.4
+Warm Temperate;Natural;Dry Forest;Oceania;2.4;2.4
+Warm Temperate;Natural;Dry Forest;North America;1;4
+Warm Temperate;Natural;Dry Forest;South America;1;4
+Warm Temperate;Natural;Dry Forest;Central America;1;4
+Warm Temperate;Natural;Dry Forest;Caribbean;1;4
+Warm Temperate;Natural;Steppe;Eastern Africa;0.9;1.2
+Warm Temperate;Natural;Steppe;Central Africa;0.9;1.2
+Warm Temperate;Natural;Steppe;Northern Africa;0.9;1.2
+Warm Temperate;Natural;Steppe;Southern Africa;0.9;1.2
+Warm Temperate;Natural;Steppe;Western Africa;0.9;1.2
+Warm Temperate;Natural;Steppe;Central Asia;1.15;3.5
+Warm Temperate;Natural;Steppe;Eastern Asia;1.15;3.5
+Warm Temperate;Natural;Steppe;South-Eastern Asia;1.15;3.5
+Warm Temperate;Natural;Steppe;Southern Asia;1.15;3.5
+Warm Temperate;Natural;Steppe;Western Asia;1.15;3.5
+Warm Temperate;Natural;Steppe;Europe;1;1
+Warm Temperate;Natural;Steppe;Oceania;1;1
+Warm Temperate;Natural;Steppe;North America;1;4
+Warm Temperate;Natural;Steppe;South America;1;4
+Warm Temperate;Natural;Steppe;Central America;1;4
+Warm Temperate;Natural;Steppe;Caribbean;1;4
+Warm Temperate;Natural;Mountain System;Eastern Africa;0.5;2.5
+Warm Temperate;Natural;Mountain System;Central Africa;0.5;2.5
+Warm Temperate;Natural;Mountain System;Northern Africa;0.5;2.5
+Warm Temperate;Natural;Mountain System;Southern Africa;0.5;2.5
+Warm Temperate;Natural;Mountain System;Western Africa;0.5;2.5
+Warm Temperate;Natural;Mountain System;Central Asia;0.5;2.5
+Warm Temperate;Natural;Mountain System;Eastern Asia;0.5;2.5
+Warm Temperate;Natural;Mountain System;South-Eastern Asia;0.5;2.5
+Warm Temperate;Natural;Mountain System;Southern Asia;0.5;2.5
+Warm Temperate;Natural;Mountain System;Western Asia;0.5;2.5
+Warm Temperate;Natural;Mountain System;Europe;1;1
+Warm Temperate;Natural;Mountain System;Oceania;1;1
+Warm Temperate;Natural;Mountain System;North America;0.5;2.5
+Warm Temperate;Natural;Mountain System;South America;0.5;2.5
+Warm Temperate;Natural;Mountain System;Central America;0.5;2.5
+Warm Temperate;Natural;Mountain System;Caribbean;0.5;2.5
+Cool Temperate;Natural;Oceanic Forest;Eastern Africa;4.4;4.4
+Cool Temperate;Natural;Oceanic Forest;Central Africa;4.4;4.4
+Cool Temperate;Natural;Oceanic Forest;Northern Africa;4.4;4.4
+Cool Temperate;Natural;Oceanic Forest;Southern Africa;4.4;4.4
+Cool Temperate;Natural;Oceanic Forest;Western Africa;4.4;4.4
+Cool Temperate;Natural;Oceanic Forest;Central Asia;4.4;4.4
+Cool Temperate;Natural;Oceanic Forest;Eastern Asia;4.4;4.4
+Cool Temperate;Natural;Oceanic Forest;South-Eastern Asia;4.4;4.4
+Cool Temperate;Natural;Oceanic Forest;Southern Asia;4.4;4.4
+Cool Temperate;Natural;Oceanic Forest;Western Asia;4.4;4.4
+Cool Temperate;Natural;Oceanic Forest;Europe;2.3;2.3
+Cool Temperate;Natural;Oceanic Forest;Oceania;2.12;3.12
+Cool Temperate;Natural;Oceanic Forest;North America;9.1;6.3
+Cool Temperate;Natural;Oceanic Forest;South America;9.1;6.3
+Cool Temperate;Natural;Oceanic Forest;Central America;9.1;6.3
+Cool Temperate;Natural;Oceanic Forest;Caribbean;9.1;6.3
+Cool Temperate;Natural;Continental Forest;Eastern Africa;4;4
+Cool Temperate;Natural;Continental Forest;Central Africa;4;4
+Cool Temperate;Natural;Continental Forest;Northern Africa;4;4
+Cool Temperate;Natural;Continental Forest;Southern Africa;4;4
+Cool Temperate;Natural;Continental Forest;Western Africa;4;4
+Cool Temperate;Natural;Continental Forest;Central Asia;4;4
+Cool Temperate;Natural;Continental Forest;Eastern Asia;4;4
+Cool Temperate;Natural;Continental Forest;South-Eastern Asia;4;4
+Cool Temperate;Natural;Continental Forest;Southern Asia;4;4
+Cool Temperate;Natural;Continental Forest;Western Asia;4;4
+Cool Temperate;Natural;Continental Forest;Europe;4;4
+Cool Temperate;Natural;Continental Forest;Oceania;4;4
+Cool Temperate;Natural;Continental Forest;North America;3.6;3.3
+Cool Temperate;Natural;Continental Forest;South America;3.6;3.3
+Cool Temperate;Natural;Continental Forest;Central America;3.6;3.3
+Cool Temperate;Natural;Continental Forest;Caribbean;3.6;3.3
+Cool Temperate;Natural;Mountain System;Eastern Africa;3;3
+Cool Temperate;Natural;Mountain System;Central Africa;3;3
+Cool Temperate;Natural;Mountain System;Northern Africa;3;3
+Cool Temperate;Natural;Mountain System;Southern Africa;3;3
+Cool Temperate;Natural;Mountain System;Western Africa;3;3
+Cool Temperate;Natural;Mountain System;Central Asia;3;3
+Cool Temperate;Natural;Mountain System;Eastern Asia;3;3
+Cool Temperate;Natural;Mountain System;South-Eastern Asia;3;3
+Cool Temperate;Natural;Mountain System;Southern Asia;3;3
+Cool Temperate;Natural;Mountain System;Western Asia;3;3
+Cool Temperate;Natural;Mountain System;Europe;3;3
+Cool Temperate;Natural;Mountain System;Oceania;3;3
+Cool Temperate;Natural;Mountain System;North America;4.4;3.1
+Cool Temperate;Natural;Mountain System;South America;4.4;3.1
+Cool Temperate;Natural;Mountain System;Central America;4.4;3.1
+Cool Temperate;Natural;Mountain System;Caribbean;4.4;3.1
+Cool Temperate;Natural;Desert;Eastern Africa;0.6;0.5
+Cool Temperate;Natural;Desert;Central Africa;0.6;0.5
+Cool Temperate;Natural;Desert;Northern Africa;0.6;0.5
+Cool Temperate;Natural;Desert;Southern Africa;0.6;0.5
+Cool Temperate;Natural;Desert;Western Africa;0.6;0.5
+Cool Temperate;Natural;Desert;Central Asia;0.6;0.5
+Cool Temperate;Natural;Desert;Eastern Asia;0.6;0.5
+Cool Temperate;Natural;Desert;South-Eastern Asia;0.6;0.5
+Cool Temperate;Natural;Desert;Southern Asia;0.6;0.5
+Cool Temperate;Natural;Desert;Western Asia;0.6;0.5
+Cool Temperate;Natural;Desert;Europe;0.6;0.5
+Cool Temperate;Natural;Desert;Oceania;0.6;0.5
+Cool Temperate;Natural;Desert;North America;0.6;0.5
+Cool Temperate;Natural;Desert;South America;0.6;0.5
+Cool Temperate;Natural;Desert;Central America;0.6;0.5
+Cool Temperate;Natural;Desert;Caribbean;0.6;0.5
+Cool Temperate;Natural;Steppe;Eastern Africa;3.5;2.3
+Cool Temperate;Natural;Steppe;Central Africa;3.5;2.3
+Cool Temperate;Natural;Steppe;Northern Africa;3.5;2.3
+Cool Temperate;Natural;Steppe;Southern Africa;3.5;2.3
+Cool Temperate;Natural;Steppe;Western Africa;3.5;2.3
+Cool Temperate;Natural;Steppe;Central Asia;3.5;2.3
+Cool Temperate;Natural;Steppe;Eastern Asia;3.5;2.3
+Cool Temperate;Natural;Steppe;South-Eastern Asia;3.5;2.3
+Cool Temperate;Natural;Steppe;Southern Asia;3.5;2.3
+Cool Temperate;Natural;Steppe;Western Asia;3.5;2.3
+Cool Temperate;Natural;Steppe;Europe;3.5;2.3
+Cool Temperate;Natural;Steppe;Oceania;3.5;2.3
+Cool Temperate;Natural;Steppe;North America;3.5;2.3
+Cool Temperate;Natural;Steppe;South America;3.5;2.3
+Cool Temperate;Natural;Steppe;Central America;3.5;2.3
+Cool Temperate;Natural;Steppe;Caribbean;3.5;2.3
+Boreal;Natural;Coniferous Forest;Eastern Africa;0;0
+Boreal;Natural;Coniferous Forest;Central Africa;0;0
+Boreal;Natural;Coniferous Forest;Northern Africa;0;0
+Boreal;Natural;Coniferous Forest;Southern Africa;0;0
+Boreal;Natural;Coniferous Forest;Western Africa;0;0
+Boreal;Natural;Coniferous Forest;Central Asia;1.15;1.2
+Boreal;Natural;Coniferous Forest;Eastern Asia;1.15;1.2
+Boreal;Natural;Coniferous Forest;South-Eastern Asia;1.15;1.2
+Boreal;Natural;Coniferous Forest;Southern Asia;1.15;1.2
+Boreal;Natural;Coniferous Forest;Western Asia;1.15;1.2
+Boreal;Natural;Coniferous Forest;Europe;1.15;1.2
+Boreal;Natural;Coniferous Forest;Oceania;1.15;1.2
+Boreal;Natural;Coniferous Forest;North America;1.15;1.2
+Boreal;Natural;Coniferous Forest;South America;1.15;1.2
+Boreal;Natural;Coniferous Forest;Central America;1.15;1.2
+Boreal;Natural;Coniferous Forest;Caribbean;1.15;1.2
+Boreal;Natural;Tundra Woodland;Eastern Africa;0;0
+Boreal;Natural;Tundra Woodland;Central Africa;0;0
+Boreal;Natural;Tundra Woodland;Northern Africa;0;0
+Boreal;Natural;Tundra Woodland;Southern Africa;0;0
+Boreal;Natural;Tundra Woodland;Western Africa;0;0
+Boreal;Natural;Tundra Woodland;Central Asia;0.4;0.4
+Boreal;Natural;Tundra Woodland;Eastern Asia;0.4;0.4
+Boreal;Natural;Tundra Woodland;South-Eastern Asia;0.4;0.4
+Boreal;Natural;Tundra Woodland;Southern Asia;0.4;0.4
+Boreal;Natural;Tundra Woodland;Western Asia;0.4;0.4
+Boreal;Natural;Tundra Woodland;Europe;0.4;0.4
+Boreal;Natural;Tundra Woodland;Oceania;0.4;0.4
+Boreal;Natural;Tundra Woodland;North America;0.4;0.4
+Boreal;Natural;Tundra Woodland;South America;0.4;0.4
+Boreal;Natural;Tundra Woodland;Central America;0.4;0.4
+Boreal;Natural;Tundra Woodland;Caribbean;0.4;0.4
+Boreal;Natural;Mountain System;Eastern Africa;0;0
+Boreal;Natural;Mountain System;Central Africa;0;0
+Boreal;Natural;Mountain System;Northern Africa;0;0
+Boreal;Natural;Mountain System;Southern Africa;0;0
+Boreal;Natural;Mountain System;Western Africa;0;0
+Boreal;Natural;Mountain System;Central Asia;1.3;1.05
+Boreal;Natural;Mountain System;Eastern Asia;1.3;1.05
+Boreal;Natural;Mountain System;South-Eastern Asia;1.3;1.05
+Boreal;Natural;Mountain System;Southern Asia;1.3;1.05
+Boreal;Natural;Mountain System;Western Asia;1.3;1.05
+Boreal;Natural;Mountain System;Europe;1.3;1.05
+Boreal;Natural;Mountain System;Oceania;1.3;1.05
+Boreal;Natural;Mountain System;North America;1.3;1.05
+Boreal;Natural;Mountain System;South America;1.3;1.05
+Boreal;Natural;Mountain System;Central America;1.3;1.05
+Boreal;Natural;Mountain System;Caribbean;1.3;1.05
+Tropical;Natural;Mountain System;Eastern Africa;1.8;5.5
+Tropical;Natural;Mountain System;Central Africa;1.8;5.5
+Tropical;Natural;Mountain System;Northern Africa;1.8;5.5
+Tropical;Natural;Mountain System;Southern Africa;1.8;5.5
+Tropical;Natural;Mountain System;Western Africa;1.8;5.5
+Tropical;Natural;Mountain System;Central Asia;1.1;2.9
+Tropical;Natural;Mountain System;Eastern Asia;1.1;2.9
+Tropical;Natural;Mountain System;South-Eastern Asia;1.1;2.9
+Tropical;Natural;Mountain System;Southern Asia;1.1;2.9
+Tropical;Natural;Mountain System;Western Asia;1.1;2.9
+Tropical;Natural;Mountain System;Europe;1;1
+Tropical;Natural;Mountain System;Oceania;1;1
+Tropical;Natural;Mountain System;North America;1.8;4.4
+Tropical;Natural;Mountain System;South America;1.8;4.4
+Tropical;Natural;Mountain System;Central America;1.8;4.4
+Tropical;Natural;Mountain System;Caribbean;1.8;4.4
+Tropical;Plantation;Rainforest;Eastern Africa;15;6.5
+Tropical;Plantation;Rainforest;Central Africa;15;6.5
+Tropical;Plantation;Rainforest;Northern Africa;15;6.5
+Tropical;Plantation;Rainforest;Southern Africa;15;6.5
+Tropical;Plantation;Rainforest;Western Africa;15;6.5
+Tropical;Plantation;Rainforest;Central Asia;5;5
+Tropical;Plantation;Rainforest;Eastern Asia;5;5
+Tropical;Plantation;Rainforest;South-Eastern Asia;5;5
+Tropical;Plantation;Rainforest;Southern Asia;5;5
+Tropical;Plantation;Rainforest;Western Asia;5;5
+Tropical;Plantation;Rainforest;Europe;15;15
+Tropical;Plantation;Rainforest;Oceania;15;15
+Tropical;Plantation;Rainforest;North America;22.5;22.5
+Tropical;Plantation;Rainforest;South America;22.5;22.5
+Tropical;Plantation;Rainforest;Central America;22.5;22.5
+Tropical;Plantation;Rainforest;Caribbean;22.5;22.5
+Tropical;Plantation;Moist Deciduous Forest;Eastern Africa;10;9
+Tropical;Plantation;Moist Deciduous Forest;Central Africa;10;9
+Tropical;Plantation;Moist Deciduous Forest;Northern Africa;10;9
+Tropical;Plantation;Moist Deciduous Forest;Southern Africa;10;9
+Tropical;Plantation;Moist Deciduous Forest;Western Africa;10;9
+Tropical;Plantation;Moist Deciduous Forest;Central Asia;8;8
+Tropical;Plantation;Moist Deciduous Forest;Eastern Asia;8;8
+Tropical;Plantation;Moist Deciduous Forest;South-Eastern Asia;8;8
+Tropical;Plantation;Moist Deciduous Forest;Southern Asia;8;8
+Tropical;Plantation;Moist Deciduous Forest;Western Asia;8;8
+Tropical;Plantation;Moist Deciduous Forest;Europe;10;10
+Tropical;Plantation;Moist Deciduous Forest;Oceania;10;10
+Tropical;Plantation;Moist Deciduous Forest;North America;12;12
+Tropical;Plantation;Moist Deciduous Forest;South America;12;12
+Tropical;Plantation;Moist Deciduous Forest;Central America;12;12
+Tropical;Plantation;Moist Deciduous Forest;Caribbean;12;12
+Tropical;Plantation;Dry Forest;Eastern Africa;9.5;12
+Tropical;Plantation;Dry Forest;Central Africa;9.5;12
+Tropical;Plantation;Dry Forest;Northern Africa;9.5;12
+Tropical;Plantation;Dry Forest;Southern Africa;9.5;12
+Tropical;Plantation;Dry Forest;Western Africa;9.5;12
+Tropical;Plantation;Dry Forest;Central Asia;13.5;13.5
+Tropical;Plantation;Dry Forest;Eastern Asia;13.5;13.5
+Tropical;Plantation;Dry Forest;South-Eastern Asia;13.5;13.5
+Tropical;Plantation;Dry Forest;Southern Asia;13.5;13.5
+Tropical;Plantation;Dry Forest;Western Asia;13.5;13.5
+Tropical;Plantation;Dry Forest;Europe;8;8
+Tropical;Plantation;Dry Forest;Oceania;8;8
+Tropical;Plantation;Dry Forest;North America;17;17
+Tropical;Plantation;Dry Forest;South America;17;17
+Tropical;Plantation;Dry Forest;Central America;17;17
+Tropical;Plantation;Dry Forest;Caribbean;17;17
+Tropical;Plantation;Shrubland;Eastern Africa;8.25;5
+Tropical;Plantation;Shrubland;Central Africa;8.25;5
+Tropical;Plantation;Shrubland;Northern Africa;8.25;5
+Tropical;Plantation;Shrubland;Southern Africa;8.25;5
+Tropical;Plantation;Shrubland;Western Africa;8.25;5
+Tropical;Plantation;Shrubland;Central Asia;6.5;6.5
+Tropical;Plantation;Shrubland;Eastern Asia;6.5;6.5
+Tropical;Plantation;Shrubland;South-Eastern Asia;6.5;6.5
+Tropical;Plantation;Shrubland;Southern Asia;6.5;6.5
+Tropical;Plantation;Shrubland;Western Asia;6.5;6.5
+Tropical;Plantation;Shrubland;Europe;5;5
+Tropical;Plantation;Shrubland;Oceania;5;5
+Tropical;Plantation;Shrubland;North America;12.5;12.5
+Tropical;Plantation;Shrubland;South America;12.5;12.5
+Tropical;Plantation;Shrubland;Central America;12.5;12.5
+Tropical;Plantation;Shrubland;Caribbean;12.5;12.5
+Tropical;Plantation;Mountain System;Eastern Africa;10;10
+Tropical;Plantation;Mountain System;Central Africa;10;10
+Tropical;Plantation;Mountain System;Northern Africa;10;10
+Tropical;Plantation;Mountain System;Southern Africa;10;10
+Tropical;Plantation;Mountain System;Western Africa;10;10
+Tropical;Plantation;Mountain System;Central Asia;5.5;5.5
+Tropical;Plantation;Mountain System;Eastern Asia;5.5;5.5
+Tropical;Plantation;Mountain System;South-Eastern Asia;5.5;5.5
+Tropical;Plantation;Mountain System;Southern Asia;5.5;5.5
+Tropical;Plantation;Mountain System;Western Asia;5.5;5.5
+Tropical;Plantation;Mountain System;Europe;5;5
+Tropical;Plantation;Mountain System;Oceania;5;5
+Tropical;Plantation;Mountain System;North America;13;13
+Tropical;Plantation;Mountain System;South America;13;13
+Tropical;Plantation;Mountain System;Central America;13;13
+Tropical;Plantation;Mountain System;Caribbean;13;13
+Warm Temperate;Plantation;Humid Forest;Eastern Africa;10;10
+Warm Temperate;Plantation;Humid Forest;Central Africa;10;10
+Warm Temperate;Plantation;Humid Forest;Northern Africa;10;10
+Warm Temperate;Plantation;Humid Forest;Southern Africa;10;10
+Warm Temperate;Plantation;Humid Forest;Western Africa;10;10
+Warm Temperate;Plantation;Humid Forest;Central Asia;8;8
+Warm Temperate;Plantation;Humid Forest;Eastern Asia;8;8
+Warm Temperate;Plantation;Humid Forest;South-Eastern Asia;8;8
+Warm Temperate;Plantation;Humid Forest;Southern Asia;8;8
+Warm Temperate;Plantation;Humid Forest;Western Asia;8;8
+Warm Temperate;Plantation;Humid Forest;Europe;10;10
+Warm Temperate;Plantation;Humid Forest;Oceania;10;10
+Warm Temperate;Plantation;Humid Forest;North America;17.5;17.5
+Warm Temperate;Plantation;Humid Forest;South America;17.5;17.5
+Warm Temperate;Plantation;Humid Forest;Central America;17.5;17.5
+Warm Temperate;Plantation;Humid Forest;Caribbean;17.5;17.5
+Warm Temperate;Plantation;Dry Forest;Eastern Africa;8;12
+Warm Temperate;Plantation;Dry Forest;Central Africa;8;12
+Warm Temperate;Plantation;Dry Forest;Northern Africa;8;12
+Warm Temperate;Plantation;Dry Forest;Southern Africa;8;12
+Warm Temperate;Plantation;Dry Forest;Western Africa;8;12
+Warm Temperate;Plantation;Dry Forest;Central Asia;13.5;13.5
+Warm Temperate;Plantation;Dry Forest;Eastern Asia;13.5;13.5
+Warm Temperate;Plantation;Dry Forest;South-Eastern Asia;13.5;13.5
+Warm Temperate;Plantation;Dry Forest;Southern Asia;13.5;13.5
+Warm Temperate;Plantation;Dry Forest;Western Asia;13.5;13.5
+Warm Temperate;Plantation;Dry Forest;Europe;8;8
+Warm Temperate;Plantation;Dry Forest;Oceania;8;8
+Warm Temperate;Plantation;Dry Forest;North America;16.5;16.5
+Warm Temperate;Plantation;Dry Forest;South America;16.5;16.5
+Warm Temperate;Plantation;Dry Forest;Central America;16.5;16.5
+Warm Temperate;Plantation;Dry Forest;Caribbean;16.5;16.5
+Warm Temperate;Plantation;Steppe;Eastern Africa;8.25;7.75
+Warm Temperate;Plantation;Steppe;Central Africa;8.25;7.75
+Warm Temperate;Plantation;Steppe;Northern Africa;8.25;7.75
+Warm Temperate;Plantation;Steppe;Southern Africa;8.25;7.75
+Warm Temperate;Plantation;Steppe;Western Africa;8.25;7.75
+Warm Temperate;Plantation;Steppe;Central Asia;6.5;6.5
+Warm Temperate;Plantation;Steppe;Eastern Asia;6.5;6.5
+Warm Temperate;Plantation;Steppe;South-Eastern Asia;6.5;6.5
+Warm Temperate;Plantation;Steppe;Southern Asia;6.5;6.5
+Warm Temperate;Plantation;Steppe;Western Asia;6.5;6.5
+Warm Temperate;Plantation;Steppe;Europe;5;5
+Warm Temperate;Plantation;Steppe;Oceania;5;5
+Warm Temperate;Plantation;Steppe;North America;12.5;12.5
+Warm Temperate;Plantation;Steppe;South America;12.5;12.5
+Warm Temperate;Plantation;Steppe;Central America;12.5;12.5
+Warm Temperate;Plantation;Steppe;Caribbean;12.5;12.5
+Warm Temperate;Plantation;Mountain System;Eastern Africa;10;10
+Warm Temperate;Plantation;Mountain System;Central Africa;10;10
+Warm Temperate;Plantation;Mountain System;Northern Africa;10;10
+Warm Temperate;Plantation;Mountain System;Southern Africa;10;10
+Warm Temperate;Plantation;Mountain System;Western Africa;10;10
+Warm Temperate;Plantation;Mountain System;Central Asia;6.5;6.5
+Warm Temperate;Plantation;Mountain System;Eastern Asia;6.5;6.5
+Warm Temperate;Plantation;Mountain System;South-Eastern Asia;6.5;6.5
+Warm Temperate;Plantation;Mountain System;Southern Asia;6.5;6.5
+Warm Temperate;Plantation;Mountain System;Western Asia;6.5;6.5
+Warm Temperate;Plantation;Mountain System;Europe;5;5
+Warm Temperate;Plantation;Mountain System;Oceania;5;5
+Warm Temperate;Plantation;Mountain System;North America;10;10
+Warm Temperate;Plantation;Mountain System;South America;10;10
+Warm Temperate;Plantation;Mountain System;Central America;10;10
+Warm Temperate;Plantation;Mountain System;Caribbean;10;10
+Cool Temperate;Plantation;Mountain System;Eastern Africa;3;3
+Cool Temperate;Plantation;Mountain System;Central Africa;3;3
+Cool Temperate;Plantation;Mountain System;Northern Africa;3;3
+Cool Temperate;Plantation;Mountain System;Southern Africa;3;3
+Cool Temperate;Plantation;Mountain System;Western Africa;3;3
+Cool Temperate;Plantation;Mountain System;Central Asia;3;3
+Cool Temperate;Plantation;Mountain System;Eastern Asia;3;3
+Cool Temperate;Plantation;Mountain System;South-Eastern Asia;3;3
+Cool Temperate;Plantation;Mountain System;Southern Asia;3;3
+Cool Temperate;Plantation;Mountain System;Western Asia;3;3
+Cool Temperate;Plantation;Mountain System;Europe;3;3
+Cool Temperate;Plantation;Mountain System;Oceania;3;3
+Cool Temperate;Plantation;Mountain System;North America;9;10
+Cool Temperate;Plantation;Mountain System;South America;9;10
+Cool Temperate;Plantation;Mountain System;Central America;9;10
+Cool Temperate;Plantation;Mountain System;Caribbean;9;10
+Cool Temperate;Plantation;Continental Forest;Eastern Africa;4;4
+Cool Temperate;Plantation;Continental Forest;Central Africa;4;4
+Cool Temperate;Plantation;Continental Forest;Northern Africa;4;4
+Cool Temperate;Plantation;Continental Forest;Southern Africa;4;4
+Cool Temperate;Plantation;Continental Forest;Western Africa;4;4
+Cool Temperate;Plantation;Continental Forest;Central Asia;4;4
+Cool Temperate;Plantation;Continental Forest;Eastern Asia;4;4
+Cool Temperate;Plantation;Continental Forest;South-Eastern Asia;4;4
+Cool Temperate;Plantation;Continental Forest;Southern Asia;4;4
+Cool Temperate;Plantation;Continental Forest;Western Asia;4;4
+Cool Temperate;Plantation;Continental Forest;Europe;4;4
+Cool Temperate;Plantation;Continental Forest;Oceania;4;4
+Cool Temperate;Plantation;Continental Forest;North America;4;5
+Cool Temperate;Plantation;Continental Forest;South America;4;5
+Cool Temperate;Plantation;Continental Forest;Central America;4;5
+Cool Temperate;Plantation;Continental Forest;Caribbean;4;5
+Cool Temperate;Plantation;Oceanic Forest;Eastern Africa;4.4;4.4
+Cool Temperate;Plantation;Oceanic Forest;Central Africa;4.4;4.4
+Cool Temperate;Plantation;Oceanic Forest;Northern Africa;4.4;4.4
+Cool Temperate;Plantation;Oceanic Forest;Southern Africa;4.4;4.4
+Cool Temperate;Plantation;Oceanic Forest;Western Africa;4.4;4.4
+Cool Temperate;Plantation;Oceanic Forest;Central Asia;4.4;4.4
+Cool Temperate;Plantation;Oceanic Forest;Eastern Asia;4.4;4.4
+Cool Temperate;Plantation;Oceanic Forest;South-Eastern Asia;4.4;4.4
+Cool Temperate;Plantation;Oceanic Forest;Southern Asia;4.4;4.4
+Cool Temperate;Plantation;Oceanic Forest;Western Asia;4.4;4.4
+Cool Temperate;Plantation;Oceanic Forest;Europe;4.4;4.4
+Cool Temperate;Plantation;Oceanic Forest;Oceania;4.4;4.4
+Cool Temperate;Plantation;Oceanic Forest;North America;10;6
+Cool Temperate;Plantation;Oceanic Forest;South America;10;6
+Cool Temperate;Plantation;Oceanic Forest;Central America;10;6
+Cool Temperate;Plantation;Oceanic Forest;Caribbean;10;6
+Cool Temperate;Plantation;Desert;Eastern Africa;0;0
+Cool Temperate;Plantation;Desert;Central Africa;0;0
+Cool Temperate;Plantation;Desert;Northern Africa;0;0
+Cool Temperate;Plantation;Desert;Southern Africa;0;0
+Cool Temperate;Plantation;Desert;Western Africa;0;0
+Cool Temperate;Plantation;Desert;Central Asia;0;0
+Cool Temperate;Plantation;Desert;Eastern Asia;0;0
+Cool Temperate;Plantation;Desert;South-Eastern Asia;0;0
+Cool Temperate;Plantation;Desert;Southern Asia;0;0
+Cool Temperate;Plantation;Desert;Western Asia;0;0
+Cool Temperate;Plantation;Desert;Europe;0;0
+Cool Temperate;Plantation;Desert;Oceania;0;0
+Cool Temperate;Plantation;Desert;North America;0;0
+Cool Temperate;Plantation;Desert;South America;0;0
+Cool Temperate;Plantation;Desert;Central America;0;0
+Cool Temperate;Plantation;Desert;Caribbean;0;0
+Cool Temperate;Plantation;Steppe;Eastern Africa;11;4
+Cool Temperate;Plantation;Steppe;Central Africa;11;4
+Cool Temperate;Plantation;Steppe;Northern Africa;11;4
+Cool Temperate;Plantation;Steppe;Southern Africa;11;4
+Cool Temperate;Plantation;Steppe;Western Africa;11;4
+Cool Temperate;Plantation;Steppe;Central Asia;11;4
+Cool Temperate;Plantation;Steppe;Eastern Asia;11;4
+Cool Temperate;Plantation;Steppe;South-Eastern Asia;11;4
+Cool Temperate;Plantation;Steppe;Southern Asia;11;4
+Cool Temperate;Plantation;Steppe;Western Asia;11;4
+Cool Temperate;Plantation;Steppe;Europe;11;4
+Cool Temperate;Plantation;Steppe;Oceania;11;4
+Cool Temperate;Plantation;Steppe;North America;11;4
+Cool Temperate;Plantation;Steppe;South America;11;4
+Cool Temperate;Plantation;Steppe;Central America;11;4
+Cool Temperate;Plantation;Steppe;Caribbean;11;4
+Boreal;Plantation;Coniferous Forest;Eastern Africa;1;1
+Boreal;Plantation;Coniferous Forest;Central Africa;1;1
+Boreal;Plantation;Coniferous Forest;Northern Africa;1;1
+Boreal;Plantation;Coniferous Forest;Southern Africa;1;1
+Boreal;Plantation;Coniferous Forest;Western Africa;1;1
+Boreal;Plantation;Coniferous Forest;Central Asia;1;1
+Boreal;Plantation;Coniferous Forest;Eastern Asia;1;1
+Boreal;Plantation;Coniferous Forest;South-Eastern Asia;1;1
+Boreal;Plantation;Coniferous Forest;Southern Asia;1;1
+Boreal;Plantation;Coniferous Forest;Western Asia;1;1
+Boreal;Plantation;Coniferous Forest;Europe;1;1
+Boreal;Plantation;Coniferous Forest;Oceania;1;1
+Boreal;Plantation;Coniferous Forest;North America;1;1
+Boreal;Plantation;Coniferous Forest;South America;1;1
+Boreal;Plantation;Coniferous Forest;Central America;1;1
+Boreal;Plantation;Coniferous Forest;Caribbean;1;1
+Boreal;Plantation;Tundra Woodland;Eastern Africa;0.4;0.4
+Boreal;Plantation;Tundra Woodland;Central Africa;0.4;0.4
+Boreal;Plantation;Tundra Woodland;Northern Africa;0.4;0.4
+Boreal;Plantation;Tundra Woodland;Southern Africa;0.4;0.4
+Boreal;Plantation;Tundra Woodland;Western Africa;0.4;0.4
+Boreal;Plantation;Tundra Woodland;Central Asia;0.4;0.4
+Boreal;Plantation;Tundra Woodland;Eastern Asia;0.4;0.4
+Boreal;Plantation;Tundra Woodland;South-Eastern Asia;0.4;0.4
+Boreal;Plantation;Tundra Woodland;Southern Asia;0.4;0.4
+Boreal;Plantation;Tundra Woodland;Western Asia;0.4;0.4
+Boreal;Plantation;Tundra Woodland;Europe;0.4;0.4
+Boreal;Plantation;Tundra Woodland;Oceania;0.4;0.4
+Boreal;Plantation;Tundra Woodland;North America;0.4;0.4
+Boreal;Plantation;Tundra Woodland;South America;0.4;0.4
+Boreal;Plantation;Tundra Woodland;Central America;0.4;0.4
+Boreal;Plantation;Tundra Woodland;Caribbean;0.4;0.4
+Boreal;Plantation;Mountain System;Eastern Africa;1;1
+Boreal;Plantation;Mountain System;Central Africa;1;1
+Boreal;Plantation;Mountain System;Northern Africa;1;1
+Boreal;Plantation;Mountain System;Southern Africa;1;1
+Boreal;Plantation;Mountain System;Western Africa;1;1
+Boreal;Plantation;Mountain System;Central Asia;1;1
+Boreal;Plantation;Mountain System;Eastern Asia;1;1
+Boreal;Plantation;Mountain System;South-Eastern Asia;1;1
+Boreal;Plantation;Mountain System;Southern Asia;1;1
+Boreal;Plantation;Mountain System;Western Asia;1;1
+Boreal;Plantation;Mountain System;Europe;1;1
+Boreal;Plantation;Mountain System;Oceania;1;1
+Boreal;Plantation;Mountain System;North America;1;1
+Boreal;Plantation;Mountain System;South America;1;1
+Boreal;Plantation;Mountain System;Central America;1;1
+Boreal;Plantation;Mountain System;Caribbean;1;1
