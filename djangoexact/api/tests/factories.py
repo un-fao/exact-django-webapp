@@ -209,6 +209,8 @@ class LandUseChangeFactory(DjangoModelFactory):
     class Meta:
         model = LandUseChange
 
+    area = factory.fuzzy.FuzzyInteger(1, 150)
+
     module_type_start = factory.fuzzy.FuzzyChoice(ready_land_modules)
     module_type_w = factory.fuzzy.FuzzyChoice(ready_land_modules)
     module_type_wo = factory.fuzzy.FuzzyChoice(ready_land_modules)
