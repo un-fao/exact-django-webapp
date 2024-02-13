@@ -360,8 +360,11 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         invitation, created = ProjectInvitation.objects.get_or_create(project=project, user=user, group=group)
 
         if not created:
-            logging.error(f"Invitation for {user.email} already sent")
+            logging.error(f"Invitation for {user.email} already sent with id {invitation.id}")
             return Response({"error": f"Invitation for {user.email} already sent"}, status=status.HTTP_400_BAD_REQUEST)
+
+        invitation.status = "accepted"
+        invitation.save()
 
         logging.debug("END ProjectInvitationViewset.create")
         return Response({"message": f"Invitation for {user.email} sent successfully"})
