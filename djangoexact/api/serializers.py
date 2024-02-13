@@ -1304,13 +1304,32 @@ class ProjectInvitationWriteSerializer(serializers.Serializer):
     project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(), required=True)
 
 
+class ProjectNameIdSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = ["id", "name"]
+
+
+class PermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Permission
+        fields = ["name"]
+        ref_name = "Permission"
+
+
+class GroupSerializer(serializers.ModelSerializer):
+    permissions = PermissionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Group
+        fields = "__all__"
+        ref_name = "Group"
+
+
 class ProjectInvitationReadSerializer(serializers.ModelSerializer):
     user = UserSerializer(many=False, read_only=True)
-    # Only show project name
-    project = serializers.SerializerMethodField()
-
-    def get_project(self, obj):
-        return obj.project.name
+    project = ProjectNameIdSerializer(many=False, read_only=True)
+    group = GroupSerializer(many=False, read_only=True)
 
     class Meta:
         model = ProjectInvitation
@@ -1406,22 +1425,6 @@ class DynamicResultSerializer(serializers.Serializer):
                 return YearlyActivityEmissionSerializer(data, many=True).data
             case _:
                 raise ValueError("Invalid breakdown type")
-
-
-class PermissionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Permission
-        fields = "__all__"
-        ref_name = "Permission"
-
-
-class GroupSerializer(serializers.ModelSerializer):
-    permissions = PermissionSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Group
-        fields = "__all__"
-        ref_name = "Group"
 
 
 class MacroInputTypeSerializer(serializers.ModelSerializer):
