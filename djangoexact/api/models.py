@@ -17,6 +17,11 @@ pc_as_float = RegexValidator(r"^[0-1]*\.?[0-9]*$", "Only correctly formatted per
 
 RICE_CULTIVATION_DAYS = 113
 
+# Make email unique and required
+auth_models.User._meta.get_field("email")._unique = True
+auth_models.User._meta.get_field("email").blank = False
+auth_models.User._meta.get_field("email").null = False
+
 
 # Create your models here.
 class User(auth_models.User):
@@ -25,7 +30,7 @@ class User(auth_models.User):
 
         permissions = (
             ("can_view_modules", "Can view modules"),
-            ("can_add_modules", "Can create modules"),
+            ("can_create_modules", "Can create modules"),
             ("can_change_modules", "Can edit modules"),
             ("can_delete_modules", "Can delete modules"),
         )
