@@ -316,6 +316,19 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
+    @action(detail=True, methods=["get"])
+    @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view invitations", 200: ProjectInvitationReadSerializer})
+    def invitations(self, request, pk=None):
+        project = self.get_object()
+
+        if not utils.has_project_permission("view_project", self.request.user, project):
+            logging.error("Selected user does not have permission to view invitations")
+            return utils.ErrorResponse("Selected user does not have permission to view invitations", status=status.HTTP_403_FORBIDDEN)
+
+        serializer = ProjectInvitationReadSerializer(project.invitations.all(), many=True)
+
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
+
 
 class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = ProjectInvitation.objects.all()
@@ -357,19 +370,20 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        project = Project.objects.get(pk=serializer.validated_data["project"])
+        project = serializer.validated_data["project"]
 
         if not utils.has_project_permission("add_projectinvitation", self.request.user, project):
             logging.error("Selected user does not have permission to invite users to the project")
             return utils.ErrorResponse("Selected user does not have permission to invite users to the project", status=status.HTTP_403_FORBIDDEN)
 
         try:
+            email = serializer.validated_data["email"]
             user = User.objects.get(email=email)
         except User.DoesNotExist:
             logging.error(f"User with email {email} does not exist")
             return utils.ErrorResponse(f"User with email {email} does not exist", status=status.HTTP_400_BAD_REQUEST)
 
-        group = Group.objects.get(pk=serializer.validated_data["group"])
+        group = serializer.validated_data["group"]
         invitation, created = ProjectInvitation.objects.get_or_create(project=project, user=user, group=group)
 
         if not created:
@@ -418,6 +432,31 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         invitation.save()
 
         return super().partial_update(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        manual_parameters=[project_id],
+        responses={
+            400: "Bad request",
+            200: ProjectInvitationReadSerializer,
+            403: "Selected user does not have permission to delete invitations",
+        },
+    )
+    def list(self, request, *args, **kwargs):
+        project_id = self.request.query_params.get("project_id", None)
+
+        if not project_id:
+            logging.error("Project id not provided")
+            return utils.ErrorResponse("Project id not provided", status=status.HTTP_400_BAD_REQUEST)
+
+        project = get_object_or_404(Project, pk=project_id)
+
+        if not utils.has_project_permission("view_projectinvitation", self.request.user, project):
+            logging.error("Selected user does not have permission to view invitations")
+            return utils.ErrorResponse("Selected user does not have permission to view invitations", status=status.HTTP_403_FORBIDDEN)
+
+        serializer = ProjectInvitationReadSerializer(project.invitations.all(), many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
