@@ -48,6 +48,7 @@ from .serializers import (
     ProjectInvitationReadSerializer,
     ProjectInvitationWriteSerializer,
     ReadProjectSerializer,
+    UserProjectGroupSerializer,
     WriteActivitySerializer,
     WriteProjectSerializer,
     get_model_serializer,
@@ -302,6 +303,18 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         UserProjectGroup.objects.create(user=self.request.user, project=new_project, group=Group.objects.get(name="Admin"))
 
         return Response(data=ReadProjectSerializer(new_project).data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=["get"])
+    def users(self, request, pk=None):
+        project = self.get_object()
+
+        if not utils.has_project_permission("view_project", self.request.user, project):
+            logging.error("Selected user does not have permission to copy the project")
+            return utils.ErrorResponse("Selected user does not have permission to copy the project", status=status.HTTP_403_FORBIDDEN)
+
+        serializer = UserProjectGroupSerializer(project.members.all(), many=True)
+
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
 class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
@@ -822,7 +835,7 @@ def generic_module_viewset(model: Model):
             else:
                 activity = module_serializer.validated_data["activity"]
 
-            if not utils.has_project_permission("can_add_modules", self.request.user, activity.project):
+            if not utils.has_project_permission("can_create_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to add this module to the project")
                 return utils.ErrorResponse("Selected user does not have permission to add this module to the project", status=status.HTTP_403_FORBIDDEN)
 

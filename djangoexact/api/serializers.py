@@ -52,6 +52,7 @@ from .models import (
     SmallFishery,
     SoilType,
     StatusType,
+    UserProjectGroup,
     Waterbody,
 )
 
@@ -1437,3 +1438,13 @@ class InputTypeSerializer(serializers.ModelSerializer):
         model = InputType
         fields = "__all__"
         ref_name = "InputType"
+
+
+class UserProjectGroupSerializer(serializers.ModelSerializer):
+    user = UserSerializer(many=False, read_only=True)
+    group = GroupSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = UserProjectGroup
+        fields = "__all__"
+        ref_name = "UserProjectGroup"
