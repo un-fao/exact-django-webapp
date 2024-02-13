@@ -206,6 +206,22 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         return Response(read_serializer.data, status=status.HTTP_201_CREATED)
 
+    def destroy(self, request, *args, **kwargs):
+        project = self.get_object()
+        user = self.request.user
+
+        if not utils.has_project_permission("delete_project", user, project):
+            logging.error("Selected user does not have permission to delete the project")
+            return utils.ErrorResponse("Selected user does not have permission to delete the project", status=status.HTTP_403_FORBIDDEN)
+
+        if user != project.user:
+            logging.error("Selected user is not the owner of the project")
+            return utils.ErrorResponse("Only the owner can delete a project.", status=status.HTTP_403_FORBIDDEN)
+
+        project.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
     @swagger_auto_schema(manual_parameters=[project_id], responses={404: "Project not found"}, serializer_class=ReadProjectSerializer)
     def retrieve(self, request, pk=None):
         """
