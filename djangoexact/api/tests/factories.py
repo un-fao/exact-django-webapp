@@ -3,6 +3,7 @@ import random
 import factory
 import factory.fuzzy
 from api.models import *
+from api.models import CustomUser as User
 from api.serializers import *
 from factory.django import DjangoModelFactory
 
@@ -236,6 +237,8 @@ class ForestManagementFactory(DjangoModelFactory):
     land_use_type_wo = land_use_type_start
 
     forest_type = ForestType.objects.get(name="Natural")
+
+    area = factory.fuzzy.FuzzyInteger(1, 150)
 
     rotation_length_yrs_start = 7
     rotation_length_yrs_w = 7

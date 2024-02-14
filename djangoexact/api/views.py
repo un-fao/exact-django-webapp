@@ -1,7 +1,7 @@
 import logging
 
 from django.apps import apps
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Model
@@ -14,6 +14,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 import api.utilities as utils
+from api.models import CustomUser as User
 
 from .calculators import CalculatorFactory
 from .models import (

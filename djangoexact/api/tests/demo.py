@@ -1,9 +1,12 @@
-from .factories import *
-from api.models import *
-from ipcc.models import SoilOrganicCarbon
-from api.calculators import *
 import json
+
 import factory.fuzzy as fuzzy
+from api.calculators import *
+from api.models import *
+from api.models import CustomUser as User
+from ipcc.models import SoilOrganicCarbon
+
+from .factories import *
 
 ##### Test Suite for COP28 Demo #####
 
@@ -18,7 +21,6 @@ implementation_years = 7
 capitalization_years = 10
 
 for i in range(10):
-
     print(f"\n\n\n##### START TEST {i+1} #####\n\n\n")
 
     p = ProjectFactory.create(name=fuzzy.FuzzyText(length=12), user=u, country=country, climate=climate, moisture=moisture, soil_type=soil_type, gw_potential=gw_potential, implementation_years=implementation_years, capitalization_years=capitalization_years)
