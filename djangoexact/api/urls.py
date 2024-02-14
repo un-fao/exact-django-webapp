@@ -92,6 +92,14 @@ router.register(r"moistures", views.generic_viewset(models.Moisture), basename="
 router.register(r"funding-agencies", views.generic_viewset(models.FundingAgency), basename="funding-agencies")
 router.register(r"executing-agencies", views.generic_viewset(models.ExecutingAgency), basename="executing-agencies")
 
+router.register(r"water-management-types-before-cultivation", views.generic_viewset(models.WaterManagementTypeBeforeCultivation), basename="water-management-types-before-cultivation")
+router.register(r"water-management-types-after-cultivation", views.generic_viewset(models.WaterManagementTypeAfterCultivation), basename="water-management-types-after-cultivation")
+router.register(r"organic-amendment-types", views.generic_viewset(models.OrganicAmendmentType), basename="organic-amendment-types")
+
+router.register(r"livestock-category-types", views.generic_viewset(models.LivestockCategoryType), basename="livestock-category-types")
+router.register(r"livestock-production-types", views.generic_viewset(models.LivestockProductionType), basename="livestock-production-types")
+router.register(r"manure-management-types", views.generic_viewset(models.ManureManagementType), basename="manure-management-types")
+
 urlpatterns = [
     path("docs/", include_docs_urls(title="EX-ACT Docs")),
     re_path(r"^swagger(?P<format>\.json|\.yaml)$", schema_view.without_ui(cache_timeout=0), name="schema-json"),
