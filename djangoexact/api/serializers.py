@@ -2,13 +2,15 @@ import logging
 from enum import Enum
 
 from django.apps import apps
-from django.contrib.auth.models import Group, Permission, User
+from django.contrib.auth.models import Group, Permission
 from django.db import transaction
 from django.db.models import Model
 from ipcc.models import GlobalWarmingPotential
 from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
 from rest_framework import serializers
 from rest_framework.fields import empty
+
+from api.models import CustomUser as User
 
 from .models import (
     Activity,
