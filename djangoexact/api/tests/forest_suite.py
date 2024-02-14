@@ -16,9 +16,9 @@ from api.models import (
     Moisture,
     Project,
     SoilType,
-    User,
     UserProjectGroup,
 )
+from api.models import CustomUser as User
 from api.tests.factories import ActivityFactory, ForestManagementFactory, ProjectFactory
 from ipcc.models import GlobalWarmingPotential, SoilOrganicCarbon
 

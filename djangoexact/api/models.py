@@ -17,17 +17,13 @@ pc_as_float = RegexValidator(r"^[0-1]*\.?[0-9]*$", "Only correctly formatted per
 
 RICE_CULTIVATION_DAYS = 113
 
-# Make email unique and required
-auth_models.User._meta.get_field("email")._unique = True
-auth_models.User._meta.get_field("email").blank = False
-auth_models.User._meta.get_field("email").null = False
-
 
 # Create your models here.
-class User(auth_models.User):
-    class Meta:
-        proxy = True
+class CustomUser(auth_models.AbstractUser):
+    country = ForeignKey("api.Country", on_delete=CASCADE, null=True, blank=True, related_name="users")
+    email = EmailField(unique=True)
 
+    class Meta:
         permissions = (
             ("can_view_modules", "Can view modules"),
             ("can_create_modules", "Can create modules"),
@@ -61,7 +57,7 @@ class Comment(Model):
     thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="comments")
     parent = ForeignKey("self", null=True, blank=True, on_delete=CASCADE, related_name="replies")
     date_created = DateTimeField(auto_now_add=True)
-    author = ForeignKey(User, on_delete=CASCADE)
+    author = ForeignKey(CustomUser, on_delete=CASCADE)
 
     content = TextField()
     # We can add other fields like 'is_active', 'likes', etc.
@@ -447,7 +443,7 @@ class Project(Historical):
         verbose_name_plural = "Projects"
         unique_together = ("name", "user")
 
-    user = ForeignKey(User, on_delete=CASCADE, related_name="projects")
+    user = ForeignKey(CustomUser, on_delete=CASCADE, related_name="projects")
     date = DateTimeField(null=True, blank=True)
     name = CharField(max_length=100)
     code = CharField(max_length=100, null=True, blank=True)
@@ -484,7 +480,7 @@ class ProjectInvitation(Historical):
     STATUS_CHOICES = (("sent", "Sent"), ("accepted", "Accepted"), ("declined", "Declined"))
 
     project = ForeignKey(Project, on_delete=CASCADE, related_name="invitations")
-    user = ForeignKey(User, on_delete=CASCADE, related_name="invitations")
+    user = ForeignKey(CustomUser, on_delete=CASCADE, related_name="invitations")
     group = ForeignKey(Group, on_delete=CASCADE)
     status = CharField(max_length=20, choices=STATUS_CHOICES, default="sent")
 
@@ -499,7 +495,7 @@ class ProjectInvitation(Historical):
 
 
 class UserProjectGroup(Model):
-    user = ForeignKey(User, on_delete=CASCADE, related_name="memberships")
+    user = ForeignKey(CustomUser, on_delete=CASCADE, related_name="memberships")
     project = ForeignKey(Project, on_delete=CASCADE, related_name="members")
     group = ForeignKey(Group, on_delete=CASCADE)
 
@@ -516,11 +512,11 @@ class Activity(Historical):
     project = ForeignKey(Project, on_delete=CASCADE, related_name="activities")
     name = CharField(max_length=255)
     description = TextField(null=True, blank=True)
-    # user = ForeignKey(User, on_delete=CASCADE) # TODO: Define when it's useful to have this
+    # user = ForeignKey(CustomUser, on_delete=CASCADE) # TODO: Define when it's useful to have this
     status = ForeignKey(StatusType, on_delete=CASCADE, null=True, blank=True)
 
     change_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="activities", null=True, blank=True)
-    module_types = ManyToManyField("api.ModuleType", related_name="activities", null=True, blank=True)
+    module_types = ManyToManyField("api.ModuleType", related_name="activities")
 
     climate_t2 = ForeignKey(Climate, on_delete=CASCADE, null=True, blank=True)
     moisture_t2 = ForeignKey(Moisture, on_delete=CASCADE, null=True, blank=True)
