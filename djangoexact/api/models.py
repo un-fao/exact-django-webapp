@@ -288,6 +288,7 @@ class GrasslandManagementType(Model):
 
 class LivestockCategoryType(Model):
     name = CharField(max_length=100)
+    is_active = BooleanField(default=True)
 
     def __str__(self):
         return f"({self.pk}) {self.name}"
@@ -1189,13 +1190,13 @@ class ForestManagement(LandModule, MultiBiomassModule):
     bgb_growth_rate_gt_20_yrs_t2_w = FloatField(null=True, blank=True)
     bgb_growth_rate_gt_20_yrs_t2_wo = FloatField(null=True, blank=True)
 
-    rotation_start_year_t2_start = IntegerField(default=1)
-    rotation_start_year_t2_w = IntegerField(default=1)
-    rotation_start_year_t2_wo = IntegerField(default=1)
+    rotation_start_year_t2_start = IntegerField(default=0)
+    rotation_start_year_t2_w = IntegerField(default=0)
+    rotation_start_year_t2_wo = IntegerField(default=0)
 
-    logging_start_year_t2_start = IntegerField(default=1)
-    logging_start_year_t2_w = IntegerField(default=1)
-    logging_start_year_t2_wo = IntegerField(default=1)
+    logging_start_year_t2_start = IntegerField(default=0)
+    logging_start_year_t2_w = IntegerField(default=0)
+    logging_start_year_t2_wo = IntegerField(default=0)
 
     logging_dry_matter_logged_t2_start = FloatField(null=True, blank=True)
     logging_dry_matter_logged_t2_w = FloatField(null=True, blank=True)
