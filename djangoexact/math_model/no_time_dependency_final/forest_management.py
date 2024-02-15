@@ -61,6 +61,7 @@ def create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, bgb_ratio_under_thr
     return bgb_matrix, delta_bgb_matrix
 
 
+
 def plot_matrix(matrix):
     # Number of rows and columns in the matrix
     num_rows, num_cols = matrix.shape
@@ -99,6 +100,7 @@ def plot_matrix(matrix):
 
     # Show the plot
     plt.show()
+
 
 
 def check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value):
@@ -208,8 +210,8 @@ def calculate_rotation_effect(original_agb_matrix, original_delta_agb_matrix, ma
             i += 1
         row_start += 1
 
-    # plot_matrix(agb_matrix)
-    # plot_matrix(rotation_matrix)
+    #plot_matrix(agb_matrix)
+    #plot_matrix(rotation_matrix)
     # order results by key
     results = dict(sorted(results.items()))
 
@@ -238,6 +240,9 @@ def calculate_logging_effect(original_agb_matrix, original_delta_agb_matrix, max
         # Update the agb_matrix
         agb_matrix, delta_agb_matrix = update_agb_matrix_logging(agb_matrix, delta_agb_matrix, original_delta_agb_matrix, max_agb_value, logging_impact, i * recurrence - 1)
         agb_matrix, delta_agb_matrix = check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value)
+
+    #plot_matrix(agb_matrix)
+    #plot_matrix(logging_impact)
 
     return result, logging_impact, delta_agb_matrix
 
@@ -532,11 +537,14 @@ class ForestManagement(BaseModule):
 
         def calculate_litter():
             try:
+                # TODO: add maximum value for litter to get to in create_agb_matrix and ch
                 litter_matrix, delta_litter_matrix = create_agb_matrix(self.years_impl, self.years_cap, self.litter_20_years / 20, self.litter_20_years / 20, 0)
-                self.yearly_litter_emissions = [x * -44 / 12 for x in multiply_matrix_by_matrix(delta_litter_matrix, self.hectares_matrix)]
+                self.yearly_litter_emissions = [x * - 44 / 12 for x in multiply_matrix_by_matrix(delta_litter_matrix, self.hectares_matrix)]
                 self.total_litter_emissions = sum(self.yearly_litter_emissions)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in self.yearly_litter_emissions], activity=ActivityTypes.LITTER))
+
+                #plot_matrix(litter_matrix)
 
             except Exception as e:
                 traceback.print_exc()
@@ -587,3 +595,16 @@ class ForestManagement(BaseModule):
         except Exception as e:
             traceback.print_exc()
             return
+
+'''
+
+w = [2, 8, 'D', 0, 100.0, 7, 1, 1.0, 125.0, 0.284, 0.284, None, None, 131.0, None, 2.7, None, 2.7, None, 131.0, None,[], [], [], None, None, None, 1, 5.9, None, 8.0, None, 50.0, None, None, None, None, 1, 1, 1, 28.0, 265.0]
+wo = [2, 8, 'D', 0, 100.0, 7, 1, 1.0, 125.0, 0.284, 0.284, None, None, 131.0, None, 2.7, None, 2.7, None, 131.0, None,[], [], [], None, None, None, 1, 5.9, None, 8.0, None, 50.0, None, None, None, None, 1, 1, 1, 28.0, 265.0]
+
+f_w = ForestManagement(*w)
+f_wo = ForestManagement(*wo)
+
+f_w.calculate_emissions()
+f_wo.calculate_emissions()
+
+'''
