@@ -3623,7 +3623,6 @@ with open("scripts/ipcc_data/AfforestationFLU.csv", "r") as f:
                 moisture=moisture,
                 value=value,
             )
-"""
 
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestManagementAGB.csv"),
@@ -3741,3 +3740,106 @@ for i, row in df.iterrows():
                     agb_growth_min=agb_growth_min,
                     agb_growth_max=agb_growth_max,
                 )
+
+lct = LivestockCategoryType.objects.all()
+lpt = LivestockProductionType.objects.all()
+tropicalmontane = Climate.objects.get(name="Tropical Montane")
+dry = Moisture.objects.get(name="Dry")
+emissiontypes = EmissionType.objects.all()
+manuremanagementtypes = ManureManagementType.objects.all()
+
+for livestock_category in lct:
+    for livestock_production_type in lpt:
+        for emission_type in emissiontypes:
+            for manure_management_type in manuremanagementtypes:
+                foo = LivestockManureEF.objects.filter(
+                    livestock_category_type=livestock_category,
+                    livestock_production_type=livestock_production_type,
+                    emission_type=emission_type,
+                    climate=tropicalmontane,
+                    moisture=dry,
+                    manure_management_type=manure_management_type,
+                )
+
+                if not foo:
+                    LivestockManureEF.objects.create(
+                        livestock_category_type=livestock_category,
+                        livestock_production_type=livestock_production_type,
+                        emission_type=emission_type,
+                        climate=tropicalmontane,
+                        moisture=dry,
+                        manure_management_type=manure_management_type,
+                        value=0,
+                    )
+"""
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "LivestockManureEFPROPER.csv"),
+    header=0,
+    sep=";",
+)
+
+
+headers = df.columns.values.tolist()
+rows = df.to_dict("records")
+
+for i, row in enumerate(rows):
+
+    print(row["climate"])
+    print(row["moisture"])
+
+    if row["moisture"] == "Montane":
+        continue
+
+    lcts = []
+    if row["livestock_category_type"] == "All":
+        lcts = LivestockCategoryType.objects.all()
+    else:
+        lcts = [LivestockCategoryType.objects.get(name=row["livestock_category_type"])]
+
+    livestock_production_type = LivestockProductionType.objects.get(name=row["livestock_production_type"])
+    climate = Climate.objects.get(name=row["climate"])
+    moisture = Moisture.objects.get(name=row["moisture"])
+    emission_type = EmissionType.objects.get(name=row["emission_type"])
+
+    for j, header in enumerate(headers, start=5):
+
+        if j == len(headers):
+            break
+
+        manure_management_type = ManureManagementType.objects.get(name=headers[j])
+        value = parse_csv_number(row[headers[j]])
+
+        for lct in lcts:
+            print(
+                livestock_production_type,
+                lct,
+                emission_type,
+                manure_management_type,
+                climate,
+                moisture,
+                value,
+            )
+
+            foo = LivestockManureEF.objects.filter(
+                livestock_category_type=lct,
+                livestock_production_type=livestock_production_type,
+                emission_type=emission_type,
+                manure_management_type=manure_management_type,
+                climate=climate,
+                moisture=moisture,
+            ).first()
+
+            if not foo:
+                LivestockManureEF.objects.get_or_create(
+                    livestock_category_type=lct,
+                    livestock_production_type=livestock_production_type,
+                    emission_type=emission_type,
+                    manure_management_type=manure_management_type,
+                    climate=climate,
+                    moisture=moisture,
+                    value=value,
+                )
+            else:
+                foo.value = value
+                foo.save()
