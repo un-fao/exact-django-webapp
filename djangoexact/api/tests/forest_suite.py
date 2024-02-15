@@ -1,11 +1,8 @@
-import math
 import random
 from time import sleep
 
 import api.calculators as calc
 import api.models as models
-import openpyxl as xl
-import pandas as pd
 import xlwings as xw
 from api.models import (
     Activity,
@@ -32,9 +29,8 @@ soil_types = SoilType.objects.all().exclude(name="Aggregated").exclude(name="Spo
 gw_potentials = GlobalWarmingPotential.objects.all()
 soc_refs = SoilOrganicCarbon.objects.all()
 
-# workbook = xl.load_workbook(filename="api/tests/EX-ACT_V9.4_open.xlsm")
-workbook = xw.Book("api/tests/EX-ACT_V9.4_open.xlsm")
-sheet = workbook.sheets["4.Cropland"]
+# workbook = xw.Book("api/tests/EX-ACT_V9.4_open.xlsm")
+# sheet = workbook.sheets["4.Cropland"]
 
 
 for i in range(PROJECT_SIZE):
@@ -67,15 +63,15 @@ for i in range(PROJECT_SIZE):
 
     UserProjectGroup.objects.create(user=u, project=p, group=group)
 
-    ds = workbook.sheets["1.Description"]
-    ds["Q8"].value = p.country.region.name
-    ds["Q9"].value = p.country.name
-    ds["Q10"].value = p.climate.name
-    ds["Q11"].value = p.moisture.name
-    ds["Q12"].value = p.soil_type.name + " soils"
-    ds["T13"].value = p.implementation_years
-    ds["T14"].value = p.capitalization_years
-    sleep(1)
+    # ds = workbook.sheets["1.Description"]
+    # ds["Q8"].value = p.country.region.name
+    # ds["Q9"].value = p.country.name
+    # ds["Q10"].value = p.climate.name
+    # ds["Q11"].value = p.moisture.name
+    # ds["Q12"].value = p.soil_type.name + " soils"
+    # ds["T13"].value = p.implementation_years
+    # ds["T14"].value = p.capitalization_years
+    # sleep(1)
 
     a: Activity = ActivityFactory.create(project=p)
 

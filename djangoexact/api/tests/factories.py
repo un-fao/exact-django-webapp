@@ -21,7 +21,7 @@ residue_management_types = [residue for residue in ResidueManagementType.objects
 grassland_management_types = GrasslandManagementType.objects.all()
 forests = [forest for forest in LandUseType.objects.filter(module_types__class_name="ForestManagement").exclude(is_active=False)]
 
-livestock_category_types = [c for c in LivestockCategoryType.objects.all().exclude(Q(name="Ostrich") | Q(name="Llamas And Alpacas"))]
+livestock_category_types = [c for c in LivestockCategoryType.objects.filter(is_active=True).all()]
 livestock_production_types = [c for c in LivestockProductionType.objects.all()]
 
 def_rate = ChangeRate.objects.get(name="D")
@@ -157,9 +157,7 @@ class LivestockFactory(DjangoModelFactory):
     class Meta:
         model = Livestock
 
-    livestock_category_type_start = random.choice(livestock_category_types)
-    livestock_category_type_w = livestock_category_type_start
-    livestock_category_type_wo = livestock_category_type_start
+    livestock_category_type = random.choice(livestock_category_types)
 
     livestock_production_type_start = factory.fuzzy.FuzzyChoice(livestock_production_types)
     livestock_production_type_w = factory.fuzzy.FuzzyChoice(livestock_production_types)
