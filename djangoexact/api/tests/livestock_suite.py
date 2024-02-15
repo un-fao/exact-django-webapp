@@ -23,8 +23,7 @@ from ipcc.models import GlobalWarmingPotential, SoilOrganicCarbon
 
 BATCH_SIZE = 1
 
-climates = Climate.objects.all().exclude(name="Tropical Montane")
-moistures = Moisture.objects.all().exclude(name="Montane")
+climates = Climate.objects.all()
 countries = Country.objects.all()
 soil_types = SoilType.objects.all().exclude(name="Aggregated")
 gw_potentials = GlobalWarmingPotential.objects.all()
