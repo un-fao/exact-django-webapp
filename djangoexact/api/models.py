@@ -19,13 +19,14 @@ RICE_CULTIVATION_DAYS = 113
 
 
 # Create your models here.
-class User(auth_models.User):
-    class Meta:
-        proxy = True
+class CustomUser(auth_models.AbstractUser):
+    country = ForeignKey("api.Country", on_delete=CASCADE, null=True, blank=True, related_name="users")
+    email = EmailField(unique=True)
 
+    class Meta:
         permissions = (
             ("can_view_modules", "Can view modules"),
-            ("can_add_modules", "Can create modules"),
+            ("can_create_modules", "Can create modules"),
             ("can_change_modules", "Can edit modules"),
             ("can_delete_modules", "Can delete modules"),
         )
@@ -56,7 +57,7 @@ class Comment(Model):
     thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="comments")
     parent = ForeignKey("self", null=True, blank=True, on_delete=CASCADE, related_name="replies")
     date_created = DateTimeField(auto_now_add=True)
-    author = ForeignKey(User, on_delete=CASCADE)
+    author = ForeignKey(CustomUser, on_delete=CASCADE)
 
     content = TextField()
     # We can add other fields like 'is_active', 'likes', etc.
@@ -287,6 +288,7 @@ class GrasslandManagementType(Model):
 
 class LivestockCategoryType(Model):
     name = CharField(max_length=100)
+    is_active = BooleanField(default=True)
 
     def __str__(self):
         return f"({self.pk}) {self.name}"
@@ -442,7 +444,7 @@ class Project(Historical):
         verbose_name_plural = "Projects"
         unique_together = ("name", "user")
 
-    user = ForeignKey(User, on_delete=CASCADE, related_name="projects")
+    user = ForeignKey(CustomUser, on_delete=CASCADE, related_name="projects")
     date = DateTimeField(null=True, blank=True)
     name = CharField(max_length=100)
     code = CharField(max_length=100, null=True, blank=True)
@@ -479,7 +481,7 @@ class ProjectInvitation(Historical):
     STATUS_CHOICES = (("sent", "Sent"), ("accepted", "Accepted"), ("declined", "Declined"))
 
     project = ForeignKey(Project, on_delete=CASCADE, related_name="invitations")
-    user = ForeignKey(User, on_delete=CASCADE, related_name="invitations")
+    user = ForeignKey(CustomUser, on_delete=CASCADE, related_name="invitations")
     group = ForeignKey(Group, on_delete=CASCADE)
     status = CharField(max_length=20, choices=STATUS_CHOICES, default="sent")
 
@@ -494,7 +496,7 @@ class ProjectInvitation(Historical):
 
 
 class UserProjectGroup(Model):
-    user = ForeignKey(User, on_delete=CASCADE, related_name="memberships")
+    user = ForeignKey(CustomUser, on_delete=CASCADE, related_name="memberships")
     project = ForeignKey(Project, on_delete=CASCADE, related_name="members")
     group = ForeignKey(Group, on_delete=CASCADE)
 
@@ -511,11 +513,11 @@ class Activity(Historical):
     project = ForeignKey(Project, on_delete=CASCADE, related_name="activities")
     name = CharField(max_length=255)
     description = TextField(null=True, blank=True)
-    # user = ForeignKey(User, on_delete=CASCADE) # TODO: Define when it's useful to have this
+    # user = ForeignKey(CustomUser, on_delete=CASCADE) # TODO: Define when it's useful to have this
     status = ForeignKey(StatusType, on_delete=CASCADE, null=True, blank=True)
 
     change_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="activities", null=True, blank=True)
-    module_types = ManyToManyField("api.ModuleType", related_name="activities", null=True, blank=True)
+    module_types = ManyToManyField("api.ModuleType", related_name="activities")
 
     climate_t2 = ForeignKey(Climate, on_delete=CASCADE, null=True, blank=True)
     moisture_t2 = ForeignKey(Moisture, on_delete=CASCADE, null=True, blank=True)
@@ -1188,13 +1190,13 @@ class ForestManagement(LandModule, MultiBiomassModule):
     bgb_growth_rate_gt_20_yrs_t2_w = FloatField(null=True, blank=True)
     bgb_growth_rate_gt_20_yrs_t2_wo = FloatField(null=True, blank=True)
 
-    rotation_start_year_t2_start = IntegerField(default=1)
-    rotation_start_year_t2_w = IntegerField(default=1)
-    rotation_start_year_t2_wo = IntegerField(default=1)
+    rotation_start_year_t2_start = IntegerField(default=0)
+    rotation_start_year_t2_w = IntegerField(default=0)
+    rotation_start_year_t2_wo = IntegerField(default=0)
 
-    logging_start_year_t2_start = IntegerField(default=1)
-    logging_start_year_t2_w = IntegerField(default=1)
-    logging_start_year_t2_wo = IntegerField(default=1)
+    logging_start_year_t2_start = IntegerField(default=0)
+    logging_start_year_t2_w = IntegerField(default=0)
+    logging_start_year_t2_wo = IntegerField(default=0)
 
     logging_dry_matter_logged_t2_start = FloatField(null=True, blank=True)
     logging_dry_matter_logged_t2_w = FloatField(null=True, blank=True)

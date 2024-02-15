@@ -209,3 +209,5 @@ LOGGING = {
 }
 
 APPEND_SLASH = False
+
+AUTH_USER_MODEL = "api.CustomUser"

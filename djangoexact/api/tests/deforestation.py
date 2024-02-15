@@ -1,13 +1,18 @@
-from django.test import TestCase
-from api.models import *
-from ipcc.models import GlobalWarmingPotential
-from rest_framework.test import APIRequestFactory, force_authenticate
-from api.views import *
-from rest_framework.test import APITestCase
-from rest_framework.test import APIClient
 import json
-import factory.fuzzy as fuzzy
 import logging
+
+import factory.fuzzy as fuzzy
+from api.models import *
+from api.models import CustomUser as User
+from api.views import *
+from django.test import TestCase
+from ipcc.models import GlobalWarmingPotential
+from rest_framework.test import (
+    APIClient,
+    APIRequestFactory,
+    APITestCase,
+    force_authenticate,
+)
 
 client = APIClient()
 
@@ -24,18 +29,9 @@ implementation_years = 5
 capitalization_years = 15
 
 # Generate random name
-post_project = {
-    "name": fuzzy.FuzzyText().fuzz(),
-    "country": country.id,
-    "climate": climate.id,
-    "moisture": moisture.id,
-    "soil_type": soil_type.id,
-    "gw_potential": gw_potential.id,
-    "implementation_years": implementation_years,
-    "capitalization_years": capitalization_years
-}
+post_project = {"name": fuzzy.FuzzyText().fuzz(), "country": country.id, "climate": climate.id, "moisture": moisture.id, "soil_type": soil_type.id, "gw_potential": gw_potential.id, "implementation_years": implementation_years, "capitalization_years": capitalization_years}
 
-project_response = client.post('/api/projects/', json.dumps(post_project), content_type='application/json')
+project_response = client.post("/api/projects/", json.dumps(post_project), content_type="application/json")
 logging.debug(project_response)
 
 
@@ -59,7 +55,7 @@ post_activity = {
     "area": 150,
 }
 
-activity_response = client.post('/api/activities/build/', post_activity, format='json')
+activity_response = client.post("/api/activities/build/", post_activity, format="json")
 logging.debug(activity_response.data)
 
 luc = client.get(f'/api/land-use-changes/?activity_id={activity_response.data["id"]}')
@@ -81,14 +77,14 @@ post_annual_cropland = {
 
 forest_management = client.get(f'/api/forest-managements/?activity_id={activity_response.data["id"]}')
 logging.debug(forest_management)
-forest_response = client.patch(f'/api/forest-managements/{forest_management.data[0]["id"]}/', post_forest_management, format='json')
+forest_response = client.patch(f'/api/forest-managements/{forest_management.data[0]["id"]}/', post_forest_management, format="json")
 logging.debug(forest_response)
 
 forest_results_response = client.get(f'/api/forest-managements/{forest_response.data["id"]}/results/')
 logging.debug(forest_results_response)
 
 annualcropping = client.get(f'/api/annual-croppings/?activity_id={activity_response.data["id"]}')
-annualcropping_response = client.patch(f'/api/annual-croppings/{annualcropping.data[0]["id"]}/', post_annual_cropland, format='json')
+annualcropping_response = client.patch(f'/api/annual-croppings/{annualcropping.data[0]["id"]}/', post_annual_cropland, format="json")
 logging.debug(annualcropping_response)
 
 annualcropping_results_response = client.get(f'/api/annual-croppings/{annualcropping_response.data["id"]}/results/')
@@ -133,20 +129,22 @@ logging.debug(f"Results: {annualcropping_results_response.data}\n\n")
 
 logging.debug("##### TOTAL EMISSIONS FOR PROJECT #####\n\n")
 
+
 class Result:
     def __init__(self, total_w, total_wo, balance=None) -> None:
         self.w = float(total_w)
         self.wo = float(total_wo)
-        self.balance = total_w-total_wo if not balance else float(balance)
+        self.balance = total_w - total_wo if not balance else float(balance)
 
     def __str__(self) -> str:
         return f"w: {self.w}, wo: {self.wo}, balance: {self.balance}"
-    
+
     def __add__(self, other):
         return Result(self.w + other.w, self.wo + other.wo, self.balance + other.balance)
-    
+
     def __sub__(self, other):
         return Result(self.w - other.w, self.wo - other.wo, self.balance - other.balance)
+
 
 # Grassland
 grassland_results = Result(**forest_results_response.data)
@@ -165,5 +163,3 @@ total_balance = total_w - total_wo
 total_results = Result(total_w, total_wo, total_balance)
 
 logging.debug(f"Total results: {total_results}\n\n")
-
-

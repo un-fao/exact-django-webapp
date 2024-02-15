@@ -1,16 +1,19 @@
-from django.test import TestCase
-from rest_framework.test import APIRequestFactory
-from model_bakery import baker
-from api.models import *
-from ipcc.models import *
-from .factories import *
-from api.calculators import *
-import openpyxl as xl
-from openpyxl import load_workbook
-from time import sleep
-import xlwings as xw
 import math
+from time import sleep
+
+import openpyxl as xl
+import xlwings as xw
+from api.calculators import *
+from api.models import *
+from api.models import CustomUser as User
 from api.serializers import *
+from django.test import TestCase
+from ipcc.models import *
+from model_bakery import baker
+from openpyxl import load_workbook
+from rest_framework.test import APIRequestFactory
+
+from .factories import *
 
 BATCH_SIZE = 10
 TEST_SM_FISHERY = False
@@ -39,7 +42,6 @@ f = APIRequestFactory()
 
 # User Creation
 u = User.objects.get(username="admin")
-
 
 
 while True:
@@ -147,9 +149,9 @@ if TEST_SM_FISHERY:
         # sheet_w = float(fishery_sheet["AG30"].value)
         # sheet_balance = float(fishery_sheet["AI30"].value)
 
-            # assert math.isclose(result.total_w, sheet_w, rel_tol=0.02)
-            # assert math.isclose(result.total_wo, sheet_wo, rel_tol=0.02)
-            # assert math.isclose(result.balance, sheet_balance, rel_tol=0.02)
+        # assert math.isclose(result.total_w, sheet_w, rel_tol=0.02)
+        # assert math.isclose(result.total_wo, sheet_wo, rel_tol=0.02)
+        # assert math.isclose(result.balance, sheet_balance, rel_tol=0.02)
         except Exception as e:
             # print("Results do not match the Excel")
             # print(f"total_w: {result.total_w}, total_wo: {result.total_wo}")
@@ -157,7 +159,6 @@ if TEST_SM_FISHERY:
             # print(f"sheet_w: {sheet_w}, sheet_wo: {sheet_wo}")
             # print(f"sheet_balance: {sheet_balance}")
             pass
-
 
     print(f"\nTotal Tested Small Fisheries: {total_fisheries}")
     print(f"Passed Tests: {passed_fisheries}\n\n")
@@ -224,7 +225,6 @@ if TEST_ANNUAL_CROPPING:
         # print("-----------------------------------")
         # print(get_module_serializer(AnnualCropping)(annual_cropping).data)
         try:
-
             results = CalculatorFactory().calculate_result(annual_cropping)
             # print(results)
 
