@@ -1,11 +1,11 @@
+from api.models import CustomUser as User
 from rest_framework import generics
-from rest_framework.permissions import AllowAny
-from rest_framework_simplejwt.views import TokenObtainPairView
-from .serializers import RegisterSerializer, MyTokenObtainPairSerializer
-from django.contrib.auth.models import User
-from rest_framework.response import Response
-from .serializers import UserSerializer
 from rest_framework.decorators import authentication_classes, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+from .serializers import MyTokenObtainPairSerializer, RegisterSerializer, UserSerializer
 
 
 @authentication_classes([])
@@ -19,9 +19,7 @@ class RegisterView(generics.GenericAPIView):
         user = serializer.save()
         return Response(
             {
-                "user": UserSerializer(
-                    user, context=self.get_serializer_context()
-                ).data,
+                "user": UserSerializer(user, context=self.get_serializer_context()).data,
                 "message": "User Created Successfully.  Now perform Login to get your token",
             }
         )

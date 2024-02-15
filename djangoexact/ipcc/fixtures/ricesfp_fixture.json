@@ -1,0 +1,1 @@
+[{"model": "ipcc.ricesfp", "pk": 1, "fields": {"water_management_type_before_cultivation": 2, "value": 1.0}}, {"model": "ipcc.ricesfp", "pk": 2, "fields": {"water_management_type_before_cultivation": 3, "value": 0.89}}, {"model": "ipcc.ricesfp", "pk": 3, "fields": {"water_management_type_before_cultivation": 4, "value": 2.41}}]
