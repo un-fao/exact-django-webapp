@@ -2969,161 +2969,224 @@ class LivestockCalculator(BaseCalculator):
         print("manure management type", utils.ManureManagementTypes.PRP.value)
 
         # TAM Values
-        tam_ch4_start = ipcc.LivestockTAM.objects.get(
-            livestock_production_type=module.livestock_production_type_start,
-            livestock_category_type=module.livestock_category_type,
-            ipcc_region=country.ipcc_region,
-        )
-        tam_ch4_w = ipcc.LivestockTAM.objects.get(
-            livestock_production_type=module.livestock_production_type_w,
-            livestock_category_type=module.livestock_category_type,
-            ipcc_region=country.ipcc_region,
-        )
-        tam_ch4_wo = ipcc.LivestockTAM.objects.get(
-            livestock_production_type=module.livestock_production_type_wo,
-            livestock_category_type=module.livestock_category_type,
-            ipcc_region=country.ipcc_region,
-        )
+
+        try:
+            tam_ch4_start = ipcc.LivestockTAM.objects.get(
+                livestock_production_type=module.livestock_production_type_start,
+                livestock_category_type=module.livestock_category_type,
+                ipcc_region=country.ipcc_region,
+            )
+        except ipcc.LivestockTAM.DoesNotExist:
+            raise ValueError(f"Could not find TAM (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
+
+        try:
+            tam_ch4_w = ipcc.LivestockTAM.objects.get(
+                livestock_production_type=module.livestock_production_type_w,
+                livestock_category_type=module.livestock_category_type,
+                ipcc_region=country.ipcc_region,
+            )
+        except ipcc.LivestockTAM.DoesNotExist:
+            raise ValueError(f"Could not find TAM (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
+
+        try:
+            tam_ch4_wo = ipcc.LivestockTAM.objects.get(
+                livestock_production_type=module.livestock_production_type_wo,
+                livestock_category_type=module.livestock_category_type,
+                ipcc_region=country.ipcc_region,
+            )
+        except ipcc.LivestockTAM.DoesNotExist:
+            raise ValueError(f"Could not find TAM (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
 
         # VSER Values
-        vser_ch4_start = ipcc.LivestockVSER.objects.get(
-            livestock_production_type=module.livestock_production_type_start,
-            livestock_category_type=module.livestock_category_type,
-            ipcc_region=country.ipcc_region,
-        )
-        vser_ch4_w = ipcc.LivestockVSER.objects.get(
-            livestock_production_type=module.livestock_production_type_w,
-            livestock_category_type=module.livestock_category_type,
-            ipcc_region=country.ipcc_region,
-        )
-        vser_ch4_wo = ipcc.LivestockVSER.objects.get(
-            livestock_production_type=module.livestock_production_type_wo,
-            livestock_category_type=module.livestock_category_type,
-            ipcc_region=country.ipcc_region,
-        )
+
+        try:
+            vser_ch4_start = ipcc.LivestockVSER.objects.get(
+                livestock_production_type=module.livestock_production_type_start,
+                livestock_category_type=module.livestock_category_type,
+                ipcc_region=country.ipcc_region,
+            )
+        except ipcc.LivestockVSER.DoesNotExist:
+            raise ValueError(f"Could not find VSER (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
+
+        try:
+            vser_ch4_w = ipcc.LivestockVSER.objects.get(
+                livestock_production_type=module.livestock_production_type_w,
+                livestock_category_type=module.livestock_category_type,
+                ipcc_region=country.ipcc_region,
+            )
+        except ipcc.LivestockVSER.DoesNotExist:
+            raise ValueError(f"Could not find VSER (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
+
+        try:
+            vser_ch4_wo = ipcc.LivestockVSER.objects.get(
+                livestock_production_type=module.livestock_production_type_wo,
+                livestock_category_type=module.livestock_category_type,
+                ipcc_region=country.ipcc_region,
+            )
+        except ipcc.LivestockVSER.DoesNotExist:
+            raise ValueError(f"Could not find VSER (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
 
         # EF CH4 PRP Values
-        ef_ch4_prp_start = ipcc.LivestockManureEF.objects.get(
-            emission_type__name=utils.EmissionTypes.CH4.value,
-            livestock_category_type=module.livestock_category_type,
-            livestock_production_type=module.livestock_production_type_start,
-            climate=climate,
-            moisture=moisture,
-            manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-        )
 
-        ef_ch4_prp_w = ipcc.LivestockManureEF.objects.get(
-            emission_type__name=utils.EmissionTypes.CH4.value,
-            livestock_category_type=module.livestock_category_type,
-            livestock_production_type=module.livestock_production_type_w,
-            climate=climate,
-            moisture=moisture,
-            manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-        )
-
-        ef_ch4_prp_wo = ipcc.LivestockManureEF.objects.get(
-            emission_type__name=utils.EmissionTypes.CH4.value,
-            livestock_category_type=module.livestock_category_type,
-            livestock_production_type=module.livestock_production_type_wo,
-            climate=climate,
-            moisture=moisture,
-            manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-        )
-
-        # EF CH4 Systems Values
-        ef_ch4_systems_start = (
-            ipcc.LivestockManureEF.objects.filter(
+        try:
+            ef_ch4_prp_start = ipcc.LivestockManureEF.objects.get(
                 emission_type__name=utils.EmissionTypes.CH4.value,
                 livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_start,
                 climate=climate,
                 moisture=moisture,
+                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
             )
-            .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
-            .order_by("manure_management_type__name")
-        )
+        except ipcc.LivestockManureEF.DoesNotExist:
+            raise ValueError(f"Could not find EF CH4 PRP (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
-        ef_ch4_systems_w = (
-            ipcc.LivestockManureEF.objects.filter(
+        try:
+            ef_ch4_prp_w = ipcc.LivestockManureEF.objects.get(
                 emission_type__name=utils.EmissionTypes.CH4.value,
                 livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_w,
                 climate=climate,
                 moisture=moisture,
+                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
             )
-            .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
-            .order_by("manure_management_type__name")
-        )
+        except ipcc.LivestockManureEF.DoesNotExist:
+            raise ValueError(f"Could not find EF CH4 PRP (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
-        ef_ch4_systems_wo = (
-            ipcc.LivestockManureEF.objects.filter(
+        try:
+            ef_ch4_prp_wo = ipcc.LivestockManureEF.objects.get(
                 emission_type__name=utils.EmissionTypes.CH4.value,
                 livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_wo,
                 climate=climate,
                 moisture=moisture,
+                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
             )
-            .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
-            .order_by("manure_management_type__name")
-        )
+        except ipcc.LivestockManureEF.DoesNotExist:
+            raise ValueError(f"Could not find EF CH4 PRP (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
+
+        # EF CH4 Systems Values
+
+        try:
+            ef_ch4_systems_start = (
+                ipcc.LivestockManureEF.objects.filter(
+                    emission_type__name=utils.EmissionTypes.CH4.value,
+                    livestock_category_type=module.livestock_category_type,
+                    livestock_production_type=module.livestock_production_type_start,
+                    climate=climate,
+                    moisture=moisture,
+                )
+                .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
+                .order_by("manure_management_type__name")
+            )
+        except ipcc.LivestockManureEF.DoesNotExist:
+            raise ValueError(f"Could not find EF CH4 Systems (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
+
+        try:
+            ef_ch4_systems_w = (
+                ipcc.LivestockManureEF.objects.filter(
+                    emission_type__name=utils.EmissionTypes.CH4.value,
+                    livestock_category_type=module.livestock_category_type,
+                    livestock_production_type=module.livestock_production_type_w,
+                    climate=climate,
+                    moisture=moisture,
+                )
+                .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
+                .order_by("manure_management_type__name")
+            )
+        except ipcc.LivestockManureEF.DoesNotExist:
+            raise ValueError(f"Could not find EF CH4 Systems (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
+
+        try:
+            ef_ch4_systems_wo = (
+                ipcc.LivestockManureEF.objects.filter(
+                    emission_type__name=utils.EmissionTypes.CH4.value,
+                    livestock_category_type=module.livestock_category_type,
+                    livestock_production_type=module.livestock_production_type_wo,
+                    climate=climate,
+                    moisture=moisture,
+                )
+                .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
+                .order_by("manure_management_type__name")
+            )
+        except ipcc.LivestockManureEF.DoesNotExist:
+            raise ValueError(f"Could not find EF CH4 Systems (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
         ef_ch4_system_values_start = [system.value for system in ef_ch4_systems_start]
         ef_ch4_system_values_w = [system.value for system in ef_ch4_systems_w]
         ef_ch4_system_values_wo = [system.value for system in ef_ch4_systems_wo]
 
         # Animal Waste PRP Values
-        animal_waste_prp_start = ipcc.LivestockAnimalWasteManagementSystem.objects.get(
-            livestock_category_type=module.livestock_category_type,
-            livestock_production_type=module.livestock_production_type_start,
-            ipcc_region=country.ipcc_region,
-            manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-        )
 
-        animal_waste_prp_w = ipcc.LivestockAnimalWasteManagementSystem.objects.get(
-            livestock_category_type=module.livestock_category_type,
-            livestock_production_type=module.livestock_production_type_w,
-            ipcc_region=country.ipcc_region,
-            manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-        )
-
-        animal_waste_prp_wo = ipcc.LivestockAnimalWasteManagementSystem.objects.get(
-            livestock_category_type=module.livestock_category_type,
-            livestock_production_type=module.livestock_production_type_wo,
-            ipcc_region=country.ipcc_region,
-            manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-        )
-
-        ##### Animal Waste Management Systems Values #####
-
-        animal_waste_management_systems_start = (
-            ipcc.LivestockAnimalWasteManagementSystem.objects.filter(
+        try:
+            animal_waste_prp_start = ipcc.LivestockAnimalWasteManagementSystem.objects.get(
                 livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_start,
                 ipcc_region=country.ipcc_region,
+                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
             )
-            .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
-            .order_by("manure_management_type__name")
-        )
+        except ipcc.LivestockAnimalWasteManagementSystem.DoesNotExist:
+            raise ValueError(f"Could not find Animal Waste PRP (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
 
-        animal_waste_management_systems_w = (
-            ipcc.LivestockAnimalWasteManagementSystem.objects.filter(
+        try:
+            animal_waste_prp_w = ipcc.LivestockAnimalWasteManagementSystem.objects.get(
                 livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_w,
                 ipcc_region=country.ipcc_region,
+                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
             )
-            .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
-            .order_by("manure_management_type__name")
-        )
+        except ipcc.LivestockAnimalWasteManagementSystem.DoesNotExist:
+            raise ValueError(f"Could not find Animal Waste PRP (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
 
-        animal_waste_management_systems_wo = (
-            ipcc.LivestockAnimalWasteManagementSystem.objects.filter(
+        try:
+            animal_waste_prp_wo = ipcc.LivestockAnimalWasteManagementSystem.objects.get(
                 livestock_category_type=module.livestock_category_type,
                 livestock_production_type=module.livestock_production_type_wo,
                 ipcc_region=country.ipcc_region,
+                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
             )
-            .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
-            .order_by("manure_management_type__name")
-        )
+        except ipcc.LivestockAnimalWasteManagementSystem.DoesNotExist:
+            raise ValueError(f"Could not find Animal Waste PRP (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
+
+        ##### Animal Waste Management Systems Values #####
+
+        try:
+            animal_waste_management_systems_start = (
+                ipcc.LivestockAnimalWasteManagementSystem.objects.filter(
+                    livestock_category_type=module.livestock_category_type,
+                    livestock_production_type=module.livestock_production_type_start,
+                    ipcc_region=country.ipcc_region,
+                )
+                .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
+                .order_by("manure_management_type__name")
+            )
+        except ipcc.LivestockAnimalWasteManagementSystem.DoesNotExist:
+            raise ValueError(f"Could not find Animal Waste Management Systems (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
+
+        try:
+            animal_waste_management_systems_w = (
+                ipcc.LivestockAnimalWasteManagementSystem.objects.filter(
+                    livestock_category_type=module.livestock_category_type,
+                    livestock_production_type=module.livestock_production_type_w,
+                    ipcc_region=country.ipcc_region,
+                )
+                .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
+                .order_by("manure_management_type__name")
+            )
+        except ipcc.LivestockAnimalWasteManagementSystem.DoesNotExist:
+            raise ValueError(f"Could not find Animal Waste Management Systems (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
+
+        try:
+            animal_waste_management_systems_wo = (
+                ipcc.LivestockAnimalWasteManagementSystem.objects.filter(
+                    livestock_category_type=module.livestock_category_type,
+                    livestock_production_type=module.livestock_production_type_wo,
+                    ipcc_region=country.ipcc_region,
+                )
+                .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
+                .order_by("manure_management_type__name")
+            )
+        except ipcc.LivestockAnimalWasteManagementSystem.DoesNotExist:
+            raise ValueError(f"Could not find Animal Waste Management Systems (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
 
         # list comprehension to get the animal waste management systems values
         animal_waste_management_systems_values_start = [system.value for system in animal_waste_management_systems_start]
@@ -3132,110 +3195,146 @@ class LivestockCalculator(BaseCalculator):
 
         ##### Enteric CH4 Values #####
 
-        ch4_enteric_start = ipcc.MethaneEntericFermentationFactor.objects.get(
-            livestock_category_type=module.livestock_category_type,
-            livestock_production_type=module.livestock_production_type_start,
-            ipcc_region=country.ipcc_region,
-        )
+        try:
+            ch4_enteric_start = ipcc.MethaneEntericFermentationFactor.objects.get(
+                livestock_category_type=module.livestock_category_type,
+                livestock_production_type=module.livestock_production_type_start,
+                ipcc_region=country.ipcc_region,
+            )
+        except ipcc.MethaneEntericFermentationFactor.DoesNotExist:
+            raise ValueError(f"Could not find Enteric CH4 (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
 
-        ch4_enteric_w = ipcc.MethaneEntericFermentationFactor.objects.get(
-            livestock_category_type=module.livestock_category_type,
-            livestock_production_type=module.livestock_production_type_w,
-            ipcc_region=country.ipcc_region,
-        )
+        try:
+            ch4_enteric_w = ipcc.MethaneEntericFermentationFactor.objects.get(
+                livestock_category_type=module.livestock_category_type,
+                livestock_production_type=module.livestock_production_type_w,
+                ipcc_region=country.ipcc_region,
+            )
+        except ipcc.MethaneEntericFermentationFactor.DoesNotExist:
+            raise ValueError(f"Could not find Enteric CH4 (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
 
-        ch4_enteric_wo = ipcc.MethaneEntericFermentationFactor.objects.get(
-            livestock_category_type=module.livestock_category_type,
-            livestock_production_type=module.livestock_production_type_wo,
-            ipcc_region=country.ipcc_region,
-        )
+        try:
+            ch4_enteric_wo = ipcc.MethaneEntericFermentationFactor.objects.get(
+                livestock_category_type=module.livestock_category_type,
+                livestock_production_type=module.livestock_production_type_wo,
+                ipcc_region=country.ipcc_region,
+            )
+        except ipcc.MethaneEntericFermentationFactor.DoesNotExist:
+            raise ValueError(f"Could not find Enteric CH4 (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
 
         ##### PRP N2O Direct EF Values #####
 
-        prp_n2o_direct_ef_start = ipcc.LivestockManureEF.objects.get(
-            emission_type__name=utils.EmissionTypes.N2O.value,
-            livestock_category_type=module.livestock_category_type,
-            livestock_production_type=module.livestock_production_type_start,
-            climate=climate,
-            moisture=moisture,
-            manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-        )
+        try:
+            prp_n2o_direct_ef_start = ipcc.LivestockManureEF.objects.get(
+                emission_type__name=utils.EmissionTypes.N2O.value,
+                livestock_category_type=module.livestock_category_type,
+                livestock_production_type=module.livestock_production_type_start,
+                climate=climate,
+                moisture=moisture,
+                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
+            )
+        except ipcc.LivestockManureEF.DoesNotExist:
+            raise ValueError(f"Could not find PRP N2O Direct EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
-        prp_n2o_direct_ef_w = ipcc.LivestockManureEF.objects.get(
-            emission_type__name=utils.EmissionTypes.N2O.value,
-            livestock_category_type=module.livestock_category_type,
-            livestock_production_type=module.livestock_production_type_w,
-            climate=climate,
-            moisture=moisture,
-            manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-        )
+        try:
+            prp_n2o_direct_ef_w = ipcc.LivestockManureEF.objects.get(
+                emission_type__name=utils.EmissionTypes.N2O.value,
+                livestock_category_type=module.livestock_category_type,
+                livestock_production_type=module.livestock_production_type_w,
+                climate=climate,
+                moisture=moisture,
+                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
+            )
+        except ipcc.LivestockManureEF.DoesNotExist:
+            raise ValueError(f"Could not find PRP N2O Direct EF (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
-        prp_n2o_direct_ef_wo = ipcc.LivestockManureEF.objects.get(
-            emission_type__name=utils.EmissionTypes.N2O.value,
-            livestock_category_type=module.livestock_category_type,
-            livestock_production_type=module.livestock_production_type_wo,
-            climate=climate,
-            moisture=moisture,
-            manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-        )
+        try:
+            prp_n2o_direct_ef_wo = ipcc.LivestockManureEF.objects.get(
+                emission_type__name=utils.EmissionTypes.N2O.value,
+                livestock_category_type=module.livestock_category_type,
+                livestock_production_type=module.livestock_production_type_wo,
+                climate=climate,
+                moisture=moisture,
+                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
+            )
+        except ipcc.LivestockManureEF.DoesNotExist:
+            raise ValueError(f"Could not find PRP N2O Direct EF (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
         ##### PRP N2O Volatilization EF Values #####
 
-        prp_n2o_volatilization_ef_start = ipcc.LivestockManureEF.objects.get(
-            emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
-            livestock_category_type=module.livestock_category_type,
-            livestock_production_type=module.livestock_production_type_start,
-            climate=climate,
-            moisture=moisture,
-            manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-        )
+        try:
+            prp_n2o_volatilization_ef_start = ipcc.LivestockManureEF.objects.get(
+                emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
+                livestock_category_type=module.livestock_category_type,
+                livestock_production_type=module.livestock_production_type_start,
+                climate=climate,
+                moisture=moisture,
+                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
+            )
+        except ipcc.LivestockManureEF.DoesNotExist:
+            raise ValueError(f"Could not find PRP N2O Volatilization EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
-        prp_n2o_volatilization_ef_w = ipcc.LivestockManureEF.objects.get(
-            emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
-            livestock_category_type=module.livestock_category_type,
-            livestock_production_type=module.livestock_production_type_w,
-            climate=climate,
-            moisture=moisture,
-            manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-        )
+        try:
+            prp_n2o_volatilization_ef_w = ipcc.LivestockManureEF.objects.get(
+                emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
+                livestock_category_type=module.livestock_category_type,
+                livestock_production_type=module.livestock_production_type_w,
+                climate=climate,
+                moisture=moisture,
+                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
+            )
+        except ipcc.LivestockManureEF.DoesNotExist:
+            raise ValueError(f"Could not find PRP N2O Volatilization EF (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
-        prp_n2o_volatilization_ef_wo = ipcc.LivestockManureEF.objects.get(
-            emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
-            livestock_category_type=module.livestock_category_type,
-            livestock_production_type=module.livestock_production_type_wo,
-            climate=climate,
-            moisture=moisture,
-            manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-        )
+        try:
+            prp_n2o_volatilization_ef_wo = ipcc.LivestockManureEF.objects.get(
+                emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
+                livestock_category_type=module.livestock_category_type,
+                livestock_production_type=module.livestock_production_type_wo,
+                climate=climate,
+                moisture=moisture,
+                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
+            )
+        except ipcc.LivestockManureEF.DoesNotExist:
+            raise ValueError(f"Could not find PRP N2O Volatilization EF (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
         ##### PRP N2O Leaching EF Values #####
 
-        prp_n2o_leaching_ef_start = ipcc.LivestockManureEF.objects.get(
-            emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
-            livestock_category_type=module.livestock_category_type,
-            livestock_production_type=module.livestock_production_type_wo,
-            climate=climate,
-            moisture=moisture,
-            manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-        )
+        try:
+            prp_n2o_leaching_ef_start = ipcc.LivestockManureEF.objects.get(
+                emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
+                livestock_category_type=module.livestock_category_type,
+                livestock_production_type=module.livestock_production_type_wo,
+                climate=climate,
+                moisture=moisture,
+                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
+            )
+        except ipcc.LivestockManureEF.DoesNotExist:
+            raise ValueError(f"Could not find PRP N2O Leaching EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
-        prp_n2o_leaching_ef_w = ipcc.LivestockManureEF.objects.get(
-            emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
-            livestock_category_type=module.livestock_category_type,
-            livestock_production_type=module.livestock_production_type_wo,
-            climate=climate,
-            moisture=moisture,
-            manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-        )
+        try:
+            prp_n2o_leaching_ef_w = ipcc.LivestockManureEF.objects.get(
+                emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
+                livestock_category_type=module.livestock_category_type,
+                livestock_production_type=module.livestock_production_type_wo,
+                climate=climate,
+                moisture=moisture,
+                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
+            )
+        except ipcc.LivestockManureEF.DoesNotExist:
+            raise ValueError(f"Could not find PRP N2O Leaching EF (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
-        prp_n2o_leaching_ef_wo = ipcc.LivestockManureEF.objects.get(
-            emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
-            livestock_category_type=module.livestock_category_type,
-            livestock_production_type=module.livestock_production_type_wo,
-            climate=climate,
-            moisture=moisture,
-            manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-        )
+        try:
+            prp_n2o_leaching_ef_wo = ipcc.LivestockManureEF.objects.get(
+                emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
+                livestock_category_type=module.livestock_category_type,
+                livestock_production_type=module.livestock_production_type_wo,
+                climate=climate,
+                moisture=moisture,
+                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
+            )
+        except ipcc.LivestockManureEF.DoesNotExist:
+            raise ValueError(f"Could not find PRP N2O Leaching EF (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
         ##### N2O Direct EF Values #####
 
@@ -3250,6 +3349,8 @@ class LivestockCalculator(BaseCalculator):
             .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
             .order_by("manure_management_type__name")
         )
+        if not ef_n2o_direct_systems_start:
+            raise ValueError(f"Could not find N2O Direct EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
         ef_n2o_direct_systems_w = (
             ipcc.LivestockManureEF.objects.filter(
@@ -3262,6 +3363,8 @@ class LivestockCalculator(BaseCalculator):
             .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
             .order_by("manure_management_type__name")
         )
+        if not ef_n2o_direct_systems_w:
+            raise ValueError(f"Could not find N2O Direct EF (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
         ef_n2o_direct_systems_wo = (
             ipcc.LivestockManureEF.objects.filter(
@@ -3274,6 +3377,8 @@ class LivestockCalculator(BaseCalculator):
             .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
             .order_by("manure_management_type__name")
         )
+        if not ef_n2o_direct_systems_wo:
+            raise ValueError(f"Could not find N2O Direct EF (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
         ef_n2o_direct_systems_start = [s.value for s in ef_n2o_direct_systems_start]
         ef_n2o_direct_systems_w = [s.value for s in ef_n2o_direct_systems_w]
@@ -3292,6 +3397,8 @@ class LivestockCalculator(BaseCalculator):
             .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
             .order_by("manure_management_type__name")
         )
+        if not ef_n2o_volatilization_systems_start:
+            raise ValueError(f"Could not find N2O Volatilization EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
         ef_n2o_volatilization_systems_w = (
             ipcc.LivestockManureEF.objects.filter(
@@ -3304,6 +3411,8 @@ class LivestockCalculator(BaseCalculator):
             .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
             .order_by("manure_management_type__name")
         )
+        if not ef_n2o_volatilization_systems_w:
+            raise ValueError(f"Could not find N2O Volatilization EF (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
         ef_n2o_volatilization_systems_wo = (
             ipcc.LivestockManureEF.objects.filter(
@@ -3316,6 +3425,8 @@ class LivestockCalculator(BaseCalculator):
             .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
             .order_by("manure_management_type__name")
         )
+        if not ef_n2o_volatilization_systems_wo:
+            raise ValueError(f"Could not find N2O Volatilization EF (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
         ef_n2o_volatilization_systems_start = [s.value for s in ef_n2o_volatilization_systems_start]
         ef_n2o_volatilization_systems_w = [s.value for s in ef_n2o_volatilization_systems_w]
@@ -3334,6 +3445,8 @@ class LivestockCalculator(BaseCalculator):
             .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
             .order_by("manure_management_type__name")
         )
+        if not ef_n2o_leaching_systems_start:
+            raise ValueError(f"Could not find N2O Leaching EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
         ef_n2o_leaching_systems_w = (
             ipcc.LivestockManureEF.objects.filter(
@@ -3346,6 +3459,8 @@ class LivestockCalculator(BaseCalculator):
             .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
             .order_by("manure_management_type__name")
         )
+        if not ef_n2o_leaching_systems_w:
+            raise ValueError(f"Could not find N2O Leaching EF (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
         ef_n2o_leaching_systems_wo = (
             ipcc.LivestockManureEF.objects.filter(
@@ -3358,6 +3473,8 @@ class LivestockCalculator(BaseCalculator):
             .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
             .order_by("manure_management_type__name")
         )
+        if not ef_n2o_leaching_systems_wo:
+            raise ValueError(f"Could not find N2O Leaching EF (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
         ef_n2o_leaching_systems_start = [s.value for s in ef_n2o_leaching_systems_start]
         ef_n2o_leaching_systems_w = [s.value for s in ef_n2o_leaching_systems_w]
@@ -3365,23 +3482,32 @@ class LivestockCalculator(BaseCalculator):
 
         ##### NER Values #####
 
-        ner_start = ipcc.LivestockNER.objects.get(
-            livestock_category_type=module.livestock_category_type,
-            livestock_production_type=module.livestock_production_type_start,
-            ipcc_region=project.country.ipcc_region,
-        )
+        try:
+            ner_start = ipcc.LivestockNER.objects.get(
+                livestock_category_type=module.livestock_category_type,
+                livestock_production_type=module.livestock_production_type_start,
+                ipcc_region=project.country.ipcc_region,
+            )
+        except ipcc.LivestockNER.DoesNotExist:
+            raise ValueError(f"Could not find NER (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {project.country.ipcc_region.name}")
 
-        ner_w = ipcc.LivestockNER.objects.get(
-            livestock_category_type=module.livestock_category_type,
-            livestock_production_type=module.livestock_production_type_w,
-            ipcc_region=project.country.ipcc_region,
-        )
+        try:
+            ner_w = ipcc.LivestockNER.objects.get(
+                livestock_category_type=module.livestock_category_type,
+                livestock_production_type=module.livestock_production_type_w,
+                ipcc_region=project.country.ipcc_region,
+            )
+        except ipcc.LivestockNER.DoesNotExist:
+            raise ValueError(f"Could not find NER (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {project.country.ipcc_region.name}")
 
-        ner_wo = ipcc.LivestockNER.objects.get(
-            livestock_category_type=module.livestock_category_type,
-            livestock_production_type=module.livestock_production_type_wo,
-            ipcc_region=project.country.ipcc_region,
-        )
+        try:
+            ner_wo = ipcc.LivestockNER.objects.get(
+                livestock_category_type=module.livestock_category_type,
+                livestock_production_type=module.livestock_production_type_wo,
+                ipcc_region=project.country.ipcc_region,
+            )
+        except ipcc.LivestockNER.DoesNotExist:
+            raise ValueError(f"Could not find NER (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {project.country.ipcc_region.name}")
 
         ##### Complementary Manure Management Values #####
 
@@ -3390,147 +3516,184 @@ class LivestockCalculator(BaseCalculator):
         n2o_leaching_ef_t2_start = None
         ch4_ef_t2_start = None
         if module.complementary_manure_management_type_start is not None:
-            n2o_ef_t2_start = ipcc.LivestockManureEF.objects.get(
-                emission_type__name=utils.EmissionTypes.N2O.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_start,
-                climate=climate,
-                moisture=moisture,
-                manure_management_type=module.complementary_manure_management_type_start,
-            )
-            if n2o_ef_t2_start:
-                n2o_ef_t2_start = n2o_ef_t2_start.value
 
-            n2o_volatilization_ef_t2_start = ipcc.LivestockManureEF.objects.get(
-                emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_start,
-                climate=climate,
-                moisture=moisture,
-                manure_management_type=module.complementary_manure_management_type_start,
-            )
-            if n2o_volatilization_ef_t2_start:
-                n2o_volatilization_ef_t2_start = n2o_volatilization_ef_t2_start.value
+            try:
+                n2o_ef_t2_start = ipcc.LivestockManureEF.objects.get(
+                    emission_type__name=utils.EmissionTypes.N2O.value,
+                    livestock_category_type=module.livestock_category_type,
+                    livestock_production_type=module.livestock_production_type_start,
+                    climate=climate,
+                    moisture=moisture,
+                    manure_management_type=module.complementary_manure_management_type_start,
+                )
+                if n2o_ef_t2_start:
+                    n2o_ef_t2_start = n2o_ef_t2_start.value
+            except ipcc.LivestockManureEF.DoesNotExist:
+                raise ValueError(f"Could not find N2O EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
-            n2o_leaching_ef_t2_start = ipcc.LivestockManureEF.objects.get(
-                emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_start,
-                climate=climate,
-                moisture=moisture,
-                manure_management_type=module.complementary_manure_management_type_start,
-            )
-            if n2o_leaching_ef_t2_start:
-                n2o_leaching_ef_t2_start = n2o_leaching_ef_t2_start.value
+            try:
+                n2o_volatilization_ef_t2_start = ipcc.LivestockManureEF.objects.get(
+                    emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
+                    livestock_category_type=module.livestock_category_type,
+                    livestock_production_type=module.livestock_production_type_start,
+                    climate=climate,
+                    moisture=moisture,
+                    manure_management_type=module.complementary_manure_management_type_start,
+                )
+                if n2o_volatilization_ef_t2_start:
+                    n2o_volatilization_ef_t2_start = n2o_volatilization_ef_t2_start.value
+            except ipcc.LivestockManureEF.DoesNotExist:
+                raise ValueError(f"Could not find N2O Volatilization EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
-            ch4_ef_t2_start = ipcc.LivestockManureEF.objects.get(
-                emission_type__name=utils.EmissionTypes.CH4.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_start,
-                climate=climate,
-                moisture=moisture,
-                manure_management_type=module.complementary_manure_management_type_start,
-            )
-            if ch4_ef_t2_start:
-                ch4_ef_t2_start = ch4_ef_t2_start.value
+            try:
+                n2o_leaching_ef_t2_start = ipcc.LivestockManureEF.objects.get(
+                    emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
+                    livestock_category_type=module.livestock_category_type,
+                    livestock_production_type=module.livestock_production_type_start,
+                    climate=climate,
+                    moisture=moisture,
+                    manure_management_type=module.complementary_manure_management_type_start,
+                )
+                if n2o_leaching_ef_t2_start:
+                    n2o_leaching_ef_t2_start = n2o_leaching_ef_t2_start.value
+            except ipcc.LivestockManureEF.DoesNotExist:
+                raise ValueError(f"Could not find N2O Leaching EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
+
+            try:
+                ch4_ef_t2_start = ipcc.LivestockManureEF.objects.get(
+                    emission_type__name=utils.EmissionTypes.CH4.value,
+                    livestock_category_type=module.livestock_category_type,
+                    livestock_production_type=module.livestock_production_type_start,
+                    climate=climate,
+                    moisture=moisture,
+                    manure_management_type=module.complementary_manure_management_type_start,
+                )
+                if ch4_ef_t2_start:
+                    ch4_ef_t2_start = ch4_ef_t2_start.value
+            except ipcc.LivestockManureEF.DoesNotExist:
+                raise ValueError(f"Could not find CH4 EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
         n2o_ef_t2_w = None
         n2o_volatilization_ef_t2_w = None
         n2o_leaching_ef_t2_w = None
         ch4_ef_t2_w = None
         if module.complementary_manure_management_type_w is not None:
-            n2o_ef_t2_w = ipcc.LivestockManureEF.objects.get(
-                emission_type__name=utils.EmissionTypes.N2O.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_w,
-                climate=climate,
-                moisture=moisture,
-                manure_management_type=module.complementary_manure_management_type_w,
-            )
-            if n2o_ef_t2_w:
-                n2o_ef_t2_w = n2o_ef_t2_w.value
+            try:
+                n2o_ef_t2_w = ipcc.LivestockManureEF.objects.get(
+                    emission_type__name=utils.EmissionTypes.N2O.value,
+                    livestock_category_type=module.livestock_category_type,
+                    livestock_production_type=module.livestock_production_type_w,
+                    climate=climate,
+                    moisture=moisture,
+                    manure_management_type=module.complementary_manure_management_type_w,
+                )
+                if n2o_ef_t2_w:
+                    n2o_ef_t2_w = n2o_ef_t2_w.value
+            except ipcc.LivestockManureEF.DoesNotExist:
+                raise ValueError(f"Could not find N2O EF (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
-            n2o_volatilization_ef_t2_w = ipcc.LivestockManureEF.objects.get(
-                emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_w,
-                climate=climate,
-                moisture=moisture,
-                manure_management_type=module.complementary_manure_management_type_w,
-            )
-            if n2o_volatilization_ef_t2_w:
-                n2o_volatilization_ef_t2_w = n2o_volatilization_ef_t2_w.value
+            try:
+                n2o_volatilization_ef_t2_w = ipcc.LivestockManureEF.objects.get(
+                    emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
+                    livestock_category_type=module.livestock_category_type,
+                    livestock_production_type=module.livestock_production_type_w,
+                    climate=climate,
+                    moisture=moisture,
+                    manure_management_type=module.complementary_manure_management_type_w,
+                )
+                if n2o_volatilization_ef_t2_w:
+                    n2o_volatilization_ef_t2_w = n2o_volatilization_ef_t2_w.value
+            except ipcc.LivestockManureEF.DoesNotExist:
+                raise ValueError(f"Could not find N2O Volatilization EF (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
-            n2o_leaching_ef_t2_w = ipcc.LivestockManureEF.objects.get(
-                emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_w,
-                climate=climate,
-                moisture=moisture,
-                manure_management_type=module.complementary_manure_management_type_w,
-            )
-            if n2o_leaching_ef_t2_w:
-                n2o_leaching_ef_t2_w = n2o_leaching_ef_t2_w.value
+            try:
+                n2o_leaching_ef_t2_w = ipcc.LivestockManureEF.objects.get(
+                    emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
+                    livestock_category_type=module.livestock_category_type,
+                    livestock_production_type=module.livestock_production_type_w,
+                    climate=climate,
+                    moisture=moisture,
+                    manure_management_type=module.complementary_manure_management_type_w,
+                )
+                if n2o_leaching_ef_t2_w:
+                    n2o_leaching_ef_t2_w = n2o_leaching_ef_t2_w.value
+            except ipcc.LivestockManureEF.DoesNotExist:
+                raise ValueError(f"Could not find N2O Leaching EF (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
-            ch4_ef_t2_w = ipcc.LivestockManureEF.objects.get(
-                emission_type__name=utils.EmissionTypes.CH4.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_w,
-                climate=climate,
-                moisture=moisture,
-                manure_management_type=module.complementary_manure_management_type_w,
-            )
-            if ch4_ef_t2_w:
-                ch4_ef_t2_w = ch4_ef_t2_w.value
+            try:
+                ch4_ef_t2_w = ipcc.LivestockManureEF.objects.get(
+                    emission_type__name=utils.EmissionTypes.CH4.value,
+                    livestock_category_type=module.livestock_category_type,
+                    livestock_production_type=module.livestock_production_type_w,
+                    climate=climate,
+                    moisture=moisture,
+                    manure_management_type=module.complementary_manure_management_type_w,
+                )
+                if ch4_ef_t2_w:
+                    ch4_ef_t2_w = ch4_ef_t2_w.value
+            except ipcc.LivestockManureEF.DoesNotExist:
+                raise ValueError(f"Could not find CH4 EF (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
         n2o_ef_t2_wo = None
         n2o_volatilization_ef_t2_wo = None
         n2o_leaching_ef_t2_wo = None
         ch4_ef_t2_wo = None
         if module.complementary_manure_management_type_wo is not None:
-            n2o_ef_t2_wo = ipcc.LivestockManureEF.objects.get(
-                emission_type__name=utils.EmissionTypes.N2O.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_wo,
-                climate=climate,
-                moisture=moisture,
-                manure_management_type=module.complementary_manure_management_type_wo,
-            )
-            if n2o_ef_t2_wo:
-                n2o_ef_t2_wo = n2o_ef_t2_wo.value
+            try:
+                n2o_ef_t2_wo = ipcc.LivestockManureEF.objects.get(
+                    emission_type__name=utils.EmissionTypes.N2O.value,
+                    livestock_category_type=module.livestock_category_type,
+                    livestock_production_type=module.livestock_production_type_wo,
+                    climate=climate,
+                    moisture=moisture,
+                    manure_management_type=module.complementary_manure_management_type_wo,
+                )
+                if n2o_ef_t2_wo:
+                    n2o_ef_t2_wo = n2o_ef_t2_wo.value
+            except ipcc.LivestockManureEF.DoesNotExist:
+                raise ValueError(f"Could not find N2O EF (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
-            n2o_volatilization_ef_t2_wo = ipcc.LivestockManureEF.objects.get(
-                emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_wo,
-                climate=climate,
-                moisture=moisture,
-                manure_management_type=module.complementary_manure_management_type_wo,
-            )
-            if n2o_volatilization_ef_t2_wo:
-                n2o_volatilization_ef_t2_wo = n2o_volatilization_ef_t2_wo.value
+            try:
+                n2o_volatilization_ef_t2_wo = ipcc.LivestockManureEF.objects.get(
+                    emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
+                    livestock_category_type=module.livestock_category_type,
+                    livestock_production_type=module.livestock_production_type_wo,
+                    climate=climate,
+                    moisture=moisture,
+                    manure_management_type=module.complementary_manure_management_type_wo,
+                )
+                if n2o_volatilization_ef_t2_wo:
+                    n2o_volatilization_ef_t2_wo = n2o_volatilization_ef_t2_wo.value
+            except ipcc.LivestockManureEF.DoesNotExist:
+                raise ValueError(f"Could not find N2O Volatilization EF (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
-            n2o_leaching_ef_t2_wo = ipcc.LivestockManureEF.objects.get(
-                emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_wo,
-                climate=climate,
-                moisture=moisture,
-                manure_management_type=module.complementary_manure_management_type_wo,
-            )
-            if n2o_leaching_ef_t2_wo:
-                n2o_leaching_ef_t2_wo = n2o_leaching_ef_t2_wo.value
+            try:
+                n2o_leaching_ef_t2_wo = ipcc.LivestockManureEF.objects.get(
+                    emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
+                    livestock_category_type=module.livestock_category_type,
+                    livestock_production_type=module.livestock_production_type_wo,
+                    climate=climate,
+                    moisture=moisture,
+                    manure_management_type=module.complementary_manure_management_type_wo,
+                )
+                if n2o_leaching_ef_t2_wo:
+                    n2o_leaching_ef_t2_wo = n2o_leaching_ef_t2_wo.value
+            except ipcc.LivestockManureEF.DoesNotExist:
+                raise ValueError(f"Could not find N2O Leaching EF (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
-            ch4_ef_t2_wo = ipcc.LivestockManureEF.objects.get(
-                emission_type__name=utils.EmissionTypes.CH4.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_wo,
-                climate=climate,
-                moisture=moisture,
-                manure_management_type=module.complementary_manure_management_type_wo,
-            )
-            if ch4_ef_t2_wo:
-                ch4_ef_t2_wo = ch4_ef_t2_wo.value
+            try:
+                ch4_ef_t2_wo = ipcc.LivestockManureEF.objects.get(
+                    emission_type__name=utils.EmissionTypes.CH4.value,
+                    livestock_category_type=module.livestock_category_type,
+                    livestock_production_type=module.livestock_production_type_wo,
+                    climate=climate,
+                    moisture=moisture,
+                    manure_management_type=module.complementary_manure_management_type_wo,
+                )
+                if ch4_ef_t2_wo:
+                    ch4_ef_t2_wo = ch4_ef_t2_wo.value
+            except ipcc.LivestockManureEF.DoesNotExist:
+                raise ValueError(f"Could not find CH4 EF (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
 
         math_w = None
         math_wo = None
@@ -4560,6 +4723,7 @@ class ForestManagementCalculator(BaseCalculator):
         flu_w = SimpleNamespace(value=1)
 
         # TODO: What reference values do I choose for the start scenario?
+        # TODO: Add litter start, litter end. Affo -> start=0, end=reference_values. Forest -> start=reference_values, end=refernce_values
 
         agb_max_wo = statistics.mean([agb_over_20.agb_min, agb_over_20.agb_max])
         agb_growth_over_20_wo = statistics.mean([agb_over_20.agb_growth_max, agb_over_20.agb_growth_min])
@@ -4584,106 +4748,8 @@ class ForestManagementCalculator(BaseCalculator):
 
         disturbances: list[ForestDisturbance] = input.disturbances.all()
 
-        math_start_w = None
-        math_start_wo = None
         math_w = None
         math_wo = None
-
-        inputs_start_w = [
-            project.capitalization_years,
-            project.implementation_years,
-            input.activity.change_rate.name,
-            area,
-            0,
-            forest_mgmt.rotation_length_yrs_start,
-            forest_mgmt.rotation_start_year_t2_start,
-            forest_mgmt.rotation_percentage_biomass_for_energy_start,
-            bgb_before_20_yrs.threshold,
-            bgb_before_20_yrs.value,
-            bgb_after_20_yrs.value,
-            forest_mgmt.bgb_growth_rate_le_20_yrs_t2_start,
-            forest_mgmt.bgb_growth_rate_gt_20_yrs_t2_start,
-            agb_start_w,
-            forest_mgmt.agb_t2_start,
-            agb_growth_under_20_w,
-            forest_mgmt.agb_growth_rate_le_20_yrs_t2_start,
-            agb_growth_over_20_w,
-            forest_mgmt.agb_growth_rate_gt_20_yrs_t2_start,
-            agb_max_w,
-            None,  # TODO: max_bgb_value ?? Unused in math model
-            disturbances.values_list("recurrence_yrs_start", flat=True),
-            disturbances.values_list("percentage_biomass_destruction_start", flat=True),
-            disturbances.values_list("start_year_t2_start", flat=True),
-            forest_mgmt.logging_recurrence_yrs_start,
-            forest_mgmt.logging_percentage_agb_logged_start,
-            forest_mgmt.logging_percentage_biomass_for_energy_start,
-            forest_mgmt.logging_start_year_t2_start,
-            litter_dw.litter,
-            forest_mgmt.litter_t2_start,
-            litter_dw.dw,
-            forest_mgmt.deadwood_t2_start,
-            socref.value,
-            project.soc_ref_t2,
-            forest_mgmt.flu_t2_start,
-            forest_mgmt.fi_t2_start,
-            forest_mgmt.fmg_t2_start,
-            flu_start.value,
-            1,  # FI
-            1,  # FMG
-            project.gw_potential.ch4,
-            project.gw_potential.n2o,
-        ]
-
-        math_start_w = MathForestManagement(*inputs_start_w)
-        math_start_w.calculate_emissions()
-
-        inputs_start_wo = [
-            project.capitalization_years,
-            project.implementation_years,
-            input.activity.change_rate.name,
-            area,
-            0,
-            forest_mgmt.rotation_length_yrs_start,
-            forest_mgmt.rotation_start_year_t2_start,
-            forest_mgmt.rotation_percentage_biomass_for_energy_start,
-            bgb_before_20_yrs.threshold,
-            bgb_before_20_yrs.value,
-            bgb_after_20_yrs.value,
-            forest_mgmt.bgb_growth_rate_le_20_yrs_t2_start,
-            forest_mgmt.bgb_growth_rate_gt_20_yrs_t2_start,
-            agb_start_wo,
-            forest_mgmt.agb_t2_start,
-            agb_growth_under_20_wo,
-            forest_mgmt.agb_growth_rate_le_20_yrs_t2_start,
-            agb_growth_over_20_wo,
-            forest_mgmt.agb_growth_rate_gt_20_yrs_t2_start,
-            agb_max_wo,
-            None,  # TODO: max_bgb_value ?? Unused in math model
-            disturbances.values_list("recurrence_yrs_start", flat=True),
-            disturbances.values_list("percentage_biomass_destruction_start", flat=True),
-            disturbances.values_list("start_year_t2_start", flat=True),
-            forest_mgmt.logging_recurrence_yrs_start,
-            forest_mgmt.logging_percentage_agb_logged_start,
-            forest_mgmt.logging_percentage_biomass_for_energy_start,
-            forest_mgmt.logging_start_year_t2_start,
-            litter_dw.litter,
-            forest_mgmt.litter_t2_start,
-            litter_dw.dw,
-            forest_mgmt.deadwood_t2_start,
-            socref.value,
-            project.soc_ref_t2,
-            forest_mgmt.flu_t2_start,
-            forest_mgmt.fi_t2_start,
-            forest_mgmt.fmg_t2_start,
-            flu_start.value,
-            1,  # FI # TODO: Not yet implemented
-            1,  # FMG # TODO: Not yet implemented
-            project.gw_potential.ch4,
-            project.gw_potential.n2o,
-        ]
-
-        math_start_wo = MathForestManagement(*inputs_start_wo)
-        math_start_wo.calculate_emissions()
 
         inputs_w = [
             project.capitalization_years,
@@ -4781,12 +4847,13 @@ class ForestManagementCalculator(BaseCalculator):
         math_wo = MathForestManagement(*inputs_wo)
         math_wo.calculate_emissions()
 
-        results_start_w = math_start_w.result if math_start_w else MathResult(project.implementation_years, project.capitalization_years)
         results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
-        results_start_wo = math_start_wo.result if math_start_wo else MathResult(project.implementation_years, project.capitalization_years)
         results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
-        results_tuple = (results_w + results_start_w, results_wo + results_start_wo)
+        results_tuple = (results_w, results_wo)
+
+        print("w", inputs_w)
+        print("wo", inputs_wo)
 
         return results_tuple
 
