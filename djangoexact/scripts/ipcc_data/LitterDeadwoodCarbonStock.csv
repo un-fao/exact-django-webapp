@@ -1,36 +1,39 @@
-land_use_type,litter,deadwood
-Tropical rainforest,4.8,14.8
-Tropical moist deciduous forest,5.9,8
-Tropical dry forest,2.4,9
-Tropical shrubland,0,0
-Mangrove Forest,0.7,10.7
-Subtropical humid forest,8.7,13.2
-Subtropical dry forest,0,64.4
-Subtropical steppe,0,6.8
-Subtropical mountain systems,0,11.8
-Temperate oceanic forest,2.9,36.8
-Temperate continental forest,47.8,23
-Temperate mountain systems,3.7,37.6
-Temperate desert,0,10.5
-Temperate steppe,28.7,21.7
-Boreal coniferous forest,31.4,19.7
-Boreal tundra woodland,49.5,3.1
-Boreal mountain systems,0,0
-Tropical mountain systems,0,3.3
-Planted Tropical rainforest,4.8,14.8
-Planted Tropical moist deciduous forest,5.9,8
-Planted Tropical dry forest,2.4,9
-Planted  Tropical shrubland,0,0
-Planted Subtropical humid forest,8.7,13.2
-Planted Subtropical dry forest,0,64.4
-Planted Subtropical steppe,0,6.8
-Planted Subtropical mountain systems,0,11.8
-Planted Temperate oceanic forest,2.9,36.8
-Planted Temperate continental forest,47.8,23
-Planted Temperate mountain systems,3.7,37.6
-Planted Temperate desert,0,10.5
-Planted Temperate steppe,28.7,21.7
-Planted Boreal coniferous forest,31.4,19.7
-Planted Boreal tundra woodland,49.5,3.1
-Planted Boreal mountain systems,0,0
-Planted Tropical mountain systems,0,3.3
+climate;forest_type;land_use_type;litter;deadwood
+Tropical;Natural;Rainforest;4.8;14.8
+Tropical;Natural;Moist Deciduous Forest;5.9;8
+Tropical;Natural;Dry Forest;2.4;9
+Tropical;Natural;Shrubland;0;0
+Warm Temperate;Natural;Humid Forest;8.7;13.2
+Warm Temperate;Natural;Dry Forest;0;64.4
+Warm Temperate;Natural;Steppe;0;6.8
+Warm Temperate;Natural;Mountain System;0;11.8
+Cool Temperate;Natural;Oceanic Forest;2.9;36.8
+Cool Temperate;Natural;Continental Forest;47.8;23
+Cool Temperate;Natural;Mountain System;3.7;37.6
+Cool Temperate;Natural;Desert;0;10.5
+Cool Temperate;Natural;Steppe;28.7;21.7
+Boreal;Natural;Coniferous Forest;31.4;19.7
+Boreal;Natural;Tundra Woodland;49.5;3.1
+Boreal;Natural;Mountain System;0;0
+Tropical;Natural;Mountain System;0;3.3
+Tropical;Plantation;Rainforest;4.8;14.8
+Tropical;Plantation;Moist Deciduous Forest;5.9;8
+Tropical;Plantation;Dry Forest;2.4;9
+Tropical;Plantation;Shrubland;0;0
+Warm Temperate;Plantation;Humid Forest;8.7;13.2
+Warm Temperate;Plantation;Dry Forest;0;64.4
+Warm Temperate;Plantation;Steppe;0;6.8
+Warm Temperate;Plantation;Mountain System;0;11.8
+Cool Temperate;Plantation;Oceanic Forest;2.9;36.8
+Cool Temperate;Plantation;Continental Forest;47.8;23
+Cool Temperate;Plantation;Mountain System;3.7;37.6
+Cool Temperate;Plantation;Desert;0;10.5
+Cool Temperate;Plantation;Steppe;28.7;21.7
+Boreal;Plantation;Coniferous Forest;31.4;19.7
+Boreal;Plantation;Tundra Woodland;49.5;3.1
+Boreal;Plantation;Mountain System;0;0
+Boreal;Plantation;Mountain System;0;3.3
+Tropical;Natural;Mangrove Forest;0.7;10.7
+Warm Temperate;Natural;Mangrove Forest;0.7;10.7
+Cool Temperate;Natural;Mangrove Forest;0.7;10.7
+Boreal;Natural;Mangrove Forest;0.7;10.7

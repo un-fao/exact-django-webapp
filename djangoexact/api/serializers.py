@@ -2,13 +2,15 @@ import logging
 from enum import Enum
 
 from django.apps import apps
-from django.contrib.auth.models import Group, Permission, User
+from django.contrib.auth.models import Group, Permission
 from django.db import transaction
 from django.db.models import Model
 from ipcc.models import GlobalWarmingPotential
 from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
 from rest_framework import serializers
 from rest_framework.fields import empty
+
+from api.models import CustomUser as User
 
 from .models import (
     Activity,
@@ -52,6 +54,7 @@ from .models import (
     SmallFishery,
     SoilType,
     StatusType,
+    UserProjectGroup,
     Waterbody,
 )
 
@@ -1303,13 +1306,32 @@ class ProjectInvitationWriteSerializer(serializers.Serializer):
     project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(), required=True)
 
 
+class ProjectNameIdSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = ["id", "name"]
+
+
+class PermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Permission
+        fields = ["name"]
+        ref_name = "Permission"
+
+
+class GroupSerializer(serializers.ModelSerializer):
+    permissions = PermissionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Group
+        fields = "__all__"
+        ref_name = "Group"
+
+
 class ProjectInvitationReadSerializer(serializers.ModelSerializer):
     user = UserSerializer(many=False, read_only=True)
-    # Only show project name
-    project = serializers.SerializerMethodField()
-
-    def get_project(self, obj):
-        return obj.project.name
+    project = ProjectNameIdSerializer(many=False, read_only=True)
+    group = GroupSerializer(many=False, read_only=True)
 
     class Meta:
         model = ProjectInvitation
@@ -1407,22 +1429,6 @@ class DynamicResultSerializer(serializers.Serializer):
                 raise ValueError("Invalid breakdown type")
 
 
-class PermissionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Permission
-        fields = "__all__"
-        ref_name = "Permission"
-
-
-class GroupSerializer(serializers.ModelSerializer):
-    permissions = PermissionSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Group
-        fields = "__all__"
-        ref_name = "Group"
-
-
 class MacroInputTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = MacroInputType
@@ -1437,3 +1443,13 @@ class InputTypeSerializer(serializers.ModelSerializer):
         model = InputType
         fields = "__all__"
         ref_name = "InputType"
+
+
+class UserProjectGroupSerializer(serializers.ModelSerializer):
+    user = UserSerializer(many=False, read_only=True)
+    group = GroupSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = UserProjectGroup
+        fields = "__all__"
+        ref_name = "UserProjectGroup"

@@ -72,7 +72,9 @@ class DataOnMangrove(Model):
         return f"{self.climate.name} {self.moisture.name}, dry_matter: {self.agb_dry_matter}, c_fraction: {self.c_fraction}, agb_c: {self.agb_c}, agb_growth: {self.agb_growth}, r: {self.r}, bgb: {self.bgb}, litter: {self.litter}, dw: {self.dw}, soc_ref: {self.soc_ref}"
 
 
-class CombustionFactor(Model):
+class ForestCombustionFactor(Model):
+    climate = ForeignKey("api.Climate", on_delete=CASCADE)
+    forest_type = ForeignKey("api.ForestType", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     co2 = FloatField(null=True)
     ch4 = FloatField(null=True)
@@ -118,6 +120,8 @@ class DefaultEmissionFactor(Model):
 
 
 class LitterDeadwoodCarbonStock(Model):
+    climate = ForeignKey("api.Climate", on_delete=CASCADE)
+    forest_type = ForeignKey("api.ForestType", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     litter = FloatField()
     dw = FloatField()
@@ -159,30 +163,17 @@ class SoilOrcanicCarbonCNRatio(Model):
     value = FloatField()
 
 
-class AboveGroundBiomass(Model):
-    continent = ForeignKey("api.Region", on_delete=CASCADE)
-    land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
-    value = FloatField()
-
-    def __str__(self):
-        return f"{self.continent.name} {self.land_use_type.name}, value: {self.value}"
-
-
-class ForestAGB(Model):
-    continent = ForeignKey("api.Region", on_delete=CASCADE)
-    land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
-    value = FloatField()
-
-
-class BelowGroundBiomassManager(Manager):
-    def get_max_below_threshold(self, continent, land_use_type, threshold):
+class ForestManagementBGBManager(Manager):
+    def get_max_below_threshold(self, climate, forest_type, region, land_use_type, threshold):
         """
         Returns the highest value below the threshold.
         NOTE: If a new, highest threshold is added to the db, this can return the wrong value unless the old highest threshold is set to a proper value
         """
         return (
             self.filter(
-                continent=continent,
+                forest_type=forest_type,
+                climate=climate,
+                region=region,
                 land_use_type=land_use_type,
             )
             .filter(Q(threshold__gt=threshold) | Q(threshold__isnull=True))
@@ -190,13 +181,15 @@ class BelowGroundBiomassManager(Manager):
             .first()
         )
 
-    def get_first_above_threshold(self, continent, land_use_type, threshold) -> "BelowGroundBiomass":
+    def get_first_above_threshold(self, climate, forest_type, region, land_use_type, threshold) -> "ForestManagementBGB":
         """
         Returns the first value above the threshold.
         """
         return (
             self.filter(
-                continent=continent,
+                forest_type=forest_type,
+                climate=climate,
+                region=region,
                 land_use_type=land_use_type,
             )
             .filter(threshold__lt=threshold)
@@ -204,10 +197,12 @@ class BelowGroundBiomassManager(Manager):
             .first()
         )
 
-    def get_highest_value(self, continent, land_use_type):
+    def get_highest_value(self, climate, forest_type, region, land_use_type):
         return (
             self.filter(
-                continent=continent,
+                forest_type=forest_type,
+                climate=climate,
+                region=region,
                 land_use_type=land_use_type,
                 threshold__isnull=True,
             )
@@ -215,10 +210,12 @@ class BelowGroundBiomassManager(Manager):
             .first()
         )
 
-    def get_lowest_value(self, continent, land_use_type):
+    def get_lowest_value(self, climate, forest_type, region, land_use_type):
         return (
             self.filter(
-                continent=continent,
+                forest_type=forest_type,
+                climate=climate,
+                region=region,
                 land_use_type=land_use_type,
                 threshold__isnull=False,
             )
@@ -227,15 +224,17 @@ class BelowGroundBiomassManager(Manager):
         )
 
 
-class BelowGroundBiomass(Model):
-    continent = ForeignKey("api.Region", on_delete=CASCADE)
+class ForestManagementBGB(Model):
+    climate = ForeignKey("api.Climate", on_delete=CASCADE)
+    region = ForeignKey("api.Region", on_delete=CASCADE)
+    forest_type = ForeignKey("api.ForestType", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     threshold = FloatField(null=True, blank=True)  # Maximum acceptable ag_biomass needed for this value to be chosen
     value = FloatField()
-    objects = BelowGroundBiomassManager()
+    objects = ForestManagementBGBManager()
 
     def __str__(self):
-        return f"{self.continent.name} {self.land_use_type.name}, threshold: {self.threshold}, value: {self.value}"
+        return f"{self.region.name} {self.land_use_type.name}, threshold: {self.threshold}, value: {self.value}"
 
 
 class SoilOrganicCarbon(Model):
@@ -307,14 +306,16 @@ class AfforestationLandUseStockExchangeFactor(Model):
         return f"{self.climate} {self.moisture} for {self.land_use_type}, value {self.value}"
 
 
-class AboveGroundNetBiomassGrowth(Model):
+class ForestManagementAGBGrowth(Model):
+    climate = ForeignKey("api.Climate", on_delete=CASCADE)
+    forest_type = ForeignKey("api.ForestType", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
-    continent = ForeignKey("api.Region", on_delete=CASCADE)
+    region = ForeignKey("api.Region", on_delete=CASCADE)
     value_after_20_years = FloatField()
     value_upto_20_years = FloatField()
 
     def __str__(self):
-        return f"{self.continent} {self.land_use_type}, value after 20 years: {self.value_after_20_years}, value upto 20 years: {self.value_upto_20_years}"
+        return f"{self.region} {self.land_use_type}, value after 20 years: {self.value_after_20_years}, value upto 20 years: {self.value_upto_20_years}"
 
 
 class EmissionFactorCategory(Model):
@@ -670,6 +671,9 @@ class AfforestationFLU(Model):
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField(default=0)
+
+    class Meta:
+        unique_together = ("climate", "moisture", "land_use_type")
 
     def __str__(self):
         return f"{self.value} for {self.climate.name} {self.moisture.name} {self.land_use_type.name}"
@@ -1257,8 +1261,9 @@ class OrganicSoilRewettingEmissionFactor(Model):
 
 
 class ForestManagementAGB(Model):
+    climate = ForeignKey("api.Climate", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
-    continent = ForeignKey("api.Region", on_delete=CASCADE)
+    region = ForeignKey("api.Region", on_delete=CASCADE)
     forest_condition_type = ForeignKey("api.ForestConditionType", on_delete=CASCADE)
     forest_type = ForeignKey("api.ForestType", on_delete=CASCADE)
     agb_min = FloatField(default=0)
@@ -1268,7 +1273,7 @@ class ForestManagementAGB(Model):
     agb_unit = CharField(max_length=100, default="tonnes d.m./ha")
 
     def __str__(self):
-        return f"({self.pk}) {self.land_use_type.name} {self.continent.name} {self.forest_condition_type.name} {self.forest_type.name}"
+        return f"({self.pk}) {self.land_use_type.name} {self.region.name} {self.forest_condition_type.name} {self.forest_type.name}"
 
 
 class FMGData(Model):
