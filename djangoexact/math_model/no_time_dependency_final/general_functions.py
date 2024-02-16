@@ -117,6 +117,8 @@ def yearly_time_dependent_full_year(start_value, end_value, years_implementation
 
     return delta_yearly
 
+import matplotlib.pyplot as plt
+
 
 def yearly_time_dependent_matrix(start_value, end_value, years_implementation, years_capitalization, function, interim_values=True):
     years_total = years_implementation + years_capitalization
@@ -127,11 +129,12 @@ def yearly_time_dependent_matrix(start_value, end_value, years_implementation, y
     matrix = np.full((years_total, years_total), 0.0)
     n = len(half_year)
 
-    for i in range(n):
-        matrix[i][i] = half_year[i]
+    for i in range(matrix.shape[0]):
+        matrix[i][i] = half_year[2]
         for j in range(i + 1, n):
-            matrix[i][j] = full_year[j]
-
+            matrix[i][j] = full_year[1]
+    
+    # NOTE: now it does what is needed, but it is not very readable. Has to be fixed further on
     return matrix
 
 

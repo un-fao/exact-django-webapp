@@ -523,11 +523,8 @@ class ForestManagement(BaseModule):
                     self.yearly_rotation_emissions = rotation_yearly_emissions
 
                     self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in agb_fire_component], activity=ActivityTypes.ROTATION))
-
                     self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in bgb_fire_component], activity=ActivityTypes.ROTATION))
-
                     self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in nitrous_fire_component], activity=ActivityTypes.ROTATION))
-
                     self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in methane_fire_component], activity=ActivityTypes.ROTATION))
 
                 else:
@@ -576,11 +573,8 @@ class ForestManagement(BaseModule):
                     methane_fire_component = [x * -44 / 12 * self.logging_percentage_energy * self.ef_methane for x in logging_times_hectares_agb]
 
                     self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in agb_fire_component], activity=ActivityTypes.LOGGING))
-
                     self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in bgb_fire_component], activity=ActivityTypes.LOGGING))
-
                     self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in nitrous_fire_component], activity=ActivityTypes.LOGGING))
-
                     self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in methane_fire_component], activity=ActivityTypes.LOGGING))
 
                 # TODO: find a way to check if agb_matrix has negative values just not this wa
@@ -588,29 +582,29 @@ class ForestManagement(BaseModule):
                 if np.any(np.sum(agb_matrix < 0), axis=0):
                     raise ValueError(f"Negative values in agb_matrix, check the parameters for logging and disturbance % over 100")
 
-                # agb_times_hectares = multiply_matrix_by_matrix(delta_agb_matrix, self.hectares_matrix)
-                # yearly_agb_emissions = [x * -44/12 for x in agb_times_hectares]
-                # self.yearly_agb_emissions = yearly_agb_emissions
-                # self.total_agb_emissions = sum(yearly_agb_emissions)
+                agb_times_hectares = multiply_matrix_by_matrix(delta_agb_matrix, self.hectares_matrix)
+                yearly_agb_emissions = [x * -44/12 for x in agb_times_hectares]
+                self.yearly_agb_emissions = yearly_agb_emissions
+                self.total_agb_emissions = sum(yearly_agb_emissions)
 
-                # bgb_times_hectares = multiply_matrix_by_matrix(delta_bgb_matrix, self.hectares_matrix)
-                # yearly_bgb_emissions = [x * -44/12 for x in bgb_times_hectares]
-                # self.yearly_bgb_emissions = yearly_bgb_emissions
-                # self.total_bgb_emissions = sum(yearly_bgb_emissions)
+                bgb_times_hectares = multiply_matrix_by_matrix(delta_bgb_matrix, self.hectares_matrix)
+                yearly_bgb_emissions = [x * -44/12 for x in bgb_times_hectares]
+                self.yearly_bgb_emissions = yearly_bgb_emissions
+                self.total_bgb_emissions = sum(yearly_bgb_emissions)
 
-                # self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
-                #                     year = 0,
-                #                     gas_type = GasTypes.CO2,
-                #                     emissions = [Emission(e, GasTypes.CO2) for e in self.yearly_agb_emissions],
-                #                     activity = ActivityTypes.ROTATION_AGB
-                #                 ))
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
+                                    year = 0,
+                                    gas_type = GasTypes.CO2,
+                                    emissions = [Emission(e, GasTypes.CO2) for e in self.yearly_agb_emissions],
+                                    activity = ActivityTypes.AGB_GROWTH
+                                ))
 
-                # self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
-                #                     year = 0,
-                #                     gas_type = GasTypes.CO2,
-                #                     emissions = [Emission(e, GasTypes.CO2) for e in self.yearly_bgb_emissions],
-                #                     activity = ActivityTypes.ROTATION_BGB
-                #                 ))
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
+                                    year = 0,
+                                    gas_type = GasTypes.CO2,
+                                    emissions = [Emission(e, GasTypes.CO2) for e in self.yearly_bgb_emissions],
+                                    activity = ActivityTypes.BGB_GROWTH
+                                ))
 
             except Exception as e:
                 traceback.print_exc()
