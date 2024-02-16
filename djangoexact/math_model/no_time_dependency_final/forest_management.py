@@ -45,6 +45,7 @@ def create_agb_matrix(years_impl, years_cap, delta_agb_yearly_below_20, delta_ag
     # NOTE: no check is made to verify that the agb is not over the maximum value possible
     return agb_matrix, delta_agb_matrix
 
+
 def create_litter_deadwood_matrix(years_impl, years_cap, delta_agb_yearly_below_20, delta_agb_yearly_after_20, agb_start, max_agb_value):
     years_total = years_impl + years_cap
     delta_agb_matrix = np.full((years_total, years_total), 0.0)
@@ -64,8 +65,9 @@ def create_litter_deadwood_matrix(years_impl, years_cap, delta_agb_yearly_below_
             agb_matrix[i, j] = agb_start + delta_agb_matrix[i][j] + np.sum(delta_agb_matrix[i, i:j])
 
     agb_matrix, delta_agb_matrix = check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value)
-    
+
     return agb_matrix, delta_agb_matrix
+
 
 def create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, bgb_ratio_under_threshold, bgb_ratio_over_threshold, threshold, bgb_start):
     delta_bgb_matrix = delta_agb_matrix * bgb_ratio_under_threshold
@@ -80,7 +82,6 @@ def create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, bgb_ratio_under_thr
             bgb_matrix[i][j] = value_to_assign
 
     return bgb_matrix, delta_bgb_matrix
-
 
 
 def plot_matrix(matrix):
@@ -121,7 +122,6 @@ def plot_matrix(matrix):
 
     # Show the plot
     plt.show()
-
 
 
 def check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value):
@@ -262,16 +262,16 @@ def calculate_logging_effect(original_agb_matrix, original_delta_agb_matrix, max
         agb_matrix, delta_agb_matrix = update_agb_matrix_logging(agb_matrix, delta_agb_matrix, original_delta_agb_matrix, max_agb_value, logging_impact, i * recurrence - 1)
         agb_matrix, delta_agb_matrix = check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value)
 
-    #plot_matrix(agb_matrix)
-    #plot_matrix(logging_impact)
+    # plot_matrix(agb_matrix)
+    # plot_matrix(logging_impact)
 
     return result, logging_impact, delta_agb_matrix
 
 
 def multiply_matrix_by_matrix(matrix1, matrix2):
 
-    #plot_annotated_matrix(matrix1)
-    #plot_annotated_matrix(matrix2)
+    # plot_annotated_matrix(matrix1)
+    # plot_annotated_matrix(matrix2)
 
     if matrix1.shape != matrix2.shape:
         raise ValueError("Both matrices must have the same dimensions!")
@@ -291,48 +291,50 @@ def multiply_matrix_by_matrix(matrix1, matrix2):
 # #results, rotation_impact = calculate_rotation_effect(agb_matrix, delta_agb_matrix, 100, 5, 1)
 # results, logging_matrix, agb_matrix = calculate_logging_effect(agb_matrix, delta_agb_matrix, 100, 5, 0.5)
 
+
 def plot_annotated_matrix(matrix):
     """
     Plot a given matrix (list of lists) with each value annotated in the corresponding cell,
     rounding the numbers to two decimal points.
-    
+
     Parameters:
     - matrix: List of lists representing the matrix to plot.
     """
     # Convert the matrix to a NumPy array for ease of use
     np_matrix = np.array(matrix)
-    
+
     # Determine the size of the matrix
     nrows, ncols = np_matrix.shape
-    
+
     # Create the plot
     fig, ax = plt.subplots()
     # Using matshow to display the matrix
-    cax = ax.matshow(np_matrix, cmap='viridis')
-    
+    cax = ax.matshow(np_matrix, cmap="viridis")
+
     # Add a color bar
     fig.colorbar(cax)
-    
+
     # Annotate each cell with the corresponding value, rounded to two decimal places
     for i in range(nrows):
         for j in range(ncols):
             # Format the number with two decimal places for annotation
             value = f"{np_matrix[i, j]:.2f}"
-            ax.text(j, i, value, va='center', ha='center', color='white')
-    
+            ax.text(j, i, value, va="center", ha="center", color="white")
+
     # Optionally, adjust x and y ticks if needed
     ax.set_xticks(np.arange(ncols))
     ax.set_yticks(np.arange(nrows))
     ax.set_xticklabels(range(ncols))
     ax.set_yticklabels(range(nrows))
-    
+
     # Add labels and title if needed
-    plt.xlabel('Column Index')
-    plt.ylabel('Row Index')
-    plt.title('Annotated Matrix')
-    
+    plt.xlabel("Column Index")
+    plt.ylabel("Row Index")
+    plt.title("Annotated Matrix")
+
     # Show the plot
     plt.show()
+
 
 class ForestManagement(BaseModule):
     def __init__(
@@ -367,11 +369,11 @@ class ForestManagement(BaseModule):
         logging_year_of_start,
         litter_20_years_default,
         litter_start,  # -----> added litter start, initial value, if forest is already there it is value of litter if afforestation it is 0
-        litter_max,    # -----> added litter max, maximum value of litter, value of forest being present
+        litter_max,  # -----> added litter max, maximum value of litter, value of forest being present
         litter_20_years_tier_2,
         deadwood_20_years_default,
-        deadwood_start, # -----> added deadwood start, initial value, if forest is already there it is value of deadwood if afforestation it is 0
-        deadwood_max,   # -----> added deadwood max, maximum value of deadwood, value of forest being present
+        deadwood_start,  # -----> added deadwood start, initial value, if forest is already there it is value of deadwood if afforestation it is 0
+        deadwood_max,  # -----> added deadwood max, maximum value of deadwood, value of forest being present
         deadwood_20_years_tier_2,
         socref_default,
         soc_tier_2,
@@ -424,7 +426,6 @@ class ForestManagement(BaseModule):
         self.deadwood_20_years = deadwood_20_years_default if not deadwood_20_years_tier_2 else deadwood_20_years_tier_2
         self.deadwood_start = deadwood_start
         self.deadwood_max = deadwood_max
-        
 
         self.socref = socref_default if not soc_tier_2 else soc_tier_2
         self.soc_tier_2 = soc_tier_2
@@ -489,15 +490,14 @@ class ForestManagement(BaseModule):
                 else:
                     bgb_matrix, delta_bgb_matrix = create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, self.bgb_ratio_under_threshold, self.bgb_ratio_over_threshold, self.bgb_ratio_threshold, self.bgb_start)
 
-                #plot_annotated_matrix(agb_matrix)
-                #plot_annotated_matrix(bgb_matrix)
+                # plot_annotated_matrix(agb_matrix)
+                # plot_annotated_matrix(bgb_matrix)
                 # agb_matrix, delta_agb_matrix = check_agb_matrices(agb_matrix, delta_agb_matrix, self.max_agb_value)
                 # if there is rotation there is not logging or disturbance
 
                 if self.rotation_recurrence:
                     result_rotation_agb, rotation_matrix_agb, delta_agb_matrix = calculate_rotation_effect(agb_matrix, delta_agb_matrix, self.max_agb_value, self.rotation_recurrence, self.rotation_start_year)
                     result_rotation_bgb, rotation_matrix_bgb, delta_bgb_matrix = calculate_rotation_effect(bgb_matrix, delta_bgb_matrix, self.max_bgb_value, self.rotation_recurrence, self.rotation_start_year)
-
 
                     rotation_times_hectares_agb = multiply_matrix_by_matrix(rotation_matrix_agb, self.hectares_matrix)
                     rotation_times_hectares_bgb = multiply_matrix_by_matrix(rotation_matrix_bgb, self.hectares_matrix)
@@ -583,28 +583,18 @@ class ForestManagement(BaseModule):
                     raise ValueError(f"Negative values in agb_matrix, check the parameters for logging and disturbance % over 100")
 
                 agb_times_hectares = multiply_matrix_by_matrix(delta_agb_matrix, self.hectares_matrix)
-                yearly_agb_emissions = [x * -44/12 for x in agb_times_hectares]
+                yearly_agb_emissions = [x * -44 / 12 for x in agb_times_hectares]
                 self.yearly_agb_emissions = yearly_agb_emissions
                 self.total_agb_emissions = sum(yearly_agb_emissions)
 
                 bgb_times_hectares = multiply_matrix_by_matrix(delta_bgb_matrix, self.hectares_matrix)
-                yearly_bgb_emissions = [x * -44/12 for x in bgb_times_hectares]
+                yearly_bgb_emissions = [x * -44 / 12 for x in bgb_times_hectares]
                 self.yearly_bgb_emissions = yearly_bgb_emissions
                 self.total_bgb_emissions = sum(yearly_bgb_emissions)
 
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
-                                    year = 0,
-                                    gas_type = GasTypes.CO2,
-                                    emissions = [Emission(e, GasTypes.CO2) for e in self.yearly_agb_emissions],
-                                    activity = ActivityTypes.AGB_GROWTH
-                                ))
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in self.yearly_agb_emissions], activity=ActivityTypes.AGB_GROWTH))
 
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(
-                                    year = 0,
-                                    gas_type = GasTypes.CO2,
-                                    emissions = [Emission(e, GasTypes.CO2) for e in self.yearly_bgb_emissions],
-                                    activity = ActivityTypes.BGB_GROWTH
-                                ))
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in self.yearly_bgb_emissions], activity=ActivityTypes.BGB_GROWTH))
 
             except Exception as e:
                 traceback.print_exc()
@@ -614,12 +604,12 @@ class ForestManagement(BaseModule):
             try:
                 # TODO: add maximum value for litter to get to in create_agb_matrix and ch
                 litter_matrix, delta_litter_matrix = create_litter_deadwood_matrix(self.years_impl, self.years_cap, self.litter_20_years / 20, self.litter_20_years / 20, self.litter_start, self.litter_max)
-                self.yearly_litter_emissions = [x * - 44 / 12 for x in multiply_matrix_by_matrix(delta_litter_matrix, self.hectares_matrix)]
+                self.yearly_litter_emissions = [x * -44 / 12 for x in multiply_matrix_by_matrix(delta_litter_matrix, self.hectares_matrix)]
                 self.total_litter_emissions = sum(self.yearly_litter_emissions)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in self.yearly_litter_emissions], activity=ActivityTypes.LITTER))
 
-                #plot_matrix(litter_matrix)
+                # plot_matrix(litter_matrix)
 
             except Exception as e:
                 traceback.print_exc()
@@ -672,13 +662,11 @@ class ForestManagement(BaseModule):
             return
 
 
+# w = [2, 8, 'D', 0, 100.0, 7, 1, 1.0, 125.0, 0.284, 0.284, None, None, 131.0, None, 2.7, None, 2.7, None, 131.0, None,[], [], [], None, None, None, 1, 5.9, None, 8.0, None, 50.0, None, None, None, None, 1, 1, 1, 28.0, 265.0]
+# wo = [2, 8, 'D', 0, 100.0, 7, 1, 1.0, 125.0, 0.284, 0.284, None, None, 131.0, None, 2.7, None, 2.7, None, 131.0, None,[], [], [], None, None, None, 1, 5.9, None, 8.0, None, 50.0, None, None, None, None, 1, 1, 1, 28.0, 265.0]
 
-w = [2, 8, 'D', 0, 100.0, 7, 1, 1.0, 125.0, 0.284, 0.284, None, None, 131.0, None, 2.7, None, 2.7, None, 131.0, None,[], [], [], None, None, None, 1, 5.9, None, 8.0, None, 50.0, None, None, None, None, 1, 1, 1, 28.0, 265.0]
-wo = [2, 8, 'D', 0, 100.0, 7, 1, 1.0, 125.0, 0.284, 0.284, None, None, 131.0, None, 2.7, None, 2.7, None, 131.0, None,[], [], [], None, None, None, 1, 5.9, None, 8.0, None, 50.0, None, None, None, None, 1, 1, 1, 28.0, 265.0]
+# f_w = ForestManagement(*w)
+# f_wo = ForestManagement(*wo)
 
-f_w = ForestManagement(*w)
-f_wo = ForestManagement(*wo)
-
-f_w.calculate_emissions()
-f_wo.calculate_emissions()
-
+# f_w.calculate_emissions()
+# f_wo.calculate_emissions()
