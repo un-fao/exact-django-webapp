@@ -234,7 +234,7 @@ class ForestManagementBGB(Model):
     objects = ForestManagementBGBManager()
 
     def __str__(self):
-        return f"{self.region.name} {self.land_use_type.name}, threshold: {self.threshold}, value: {self.value}"
+        return f"({self.forest_type.name}) {self.land_use_type.name} {self.climate.name} {self.region.name}, threshold: {self.threshold}, value: {self.value}"
 
 
 class SoilOrganicCarbon(Model):
@@ -357,7 +357,7 @@ class FiresCombustionFactor(Model):
     IPCC:A84
     """
 
-    land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
+    land_use_type = OneToOneField("api.LandUseType", on_delete=CASCADE, limit_choices_to={"module_types__class_name": "PerennialCropping"})
     value = FloatField()
 
     objects = FiresCombustionFactorManager()
@@ -567,7 +567,7 @@ class PerennialAGBManager(Manager):
                 climate=climate,
                 moisture=moisture,
                 continent=continent,
-                land_use_type__name="Agroforestry",
+                land_use_type__name="Agroforestry - Default",
             )
 
 
@@ -585,7 +585,7 @@ class PerennialAGB(Model):
     objects = PerennialAGBManager()
 
     def __str__(self):
-        return f"{self.value} for {self.climate.name} {self.moisture.name} in {self.continent.name} {self.land_use_type.name}"
+        return f"{self.land_use_type.name} = {self.value} for {self.climate.name} {self.moisture.name} in {self.continent.name}"
 
 
 class PerennialBGBManager(Manager):
@@ -602,7 +602,7 @@ class PerennialBGBManager(Manager):
                 climate=climate,
                 moisture=moisture,
                 continent=continent,
-                land_use_type__name="Agroforestry",
+                land_use_type__name="Agroforestry - Default",
             )
 
 
@@ -619,6 +619,20 @@ class PerennialBGB(Model):
         return f"{self.value} for {self.climate.name} {self.moisture.name} in {self.continent.name} for {self.land_use_type.name}"
 
 
+class PerennialMaxAGBManager(Manager):
+    def get_or_default(self, climate, land_use_type):
+        try:
+            return self.get(
+                climate=climate,
+                land_use_type=land_use_type,
+            )
+        except PerennialMaxAGB.DoesNotExist:
+            return PerennialMaxAGB.objects.get(
+                climate=climate,
+                land_use_type__name="Agroforestry - Default",
+            )
+
+
 class PerennialMaxAGB(Model):
     """
     IPCC A3237
@@ -627,6 +641,11 @@ class PerennialMaxAGB(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField(default=0, null=True, blank=True)
+
+    objects = PerennialMaxAGBManager()
+
+    class Meta:
+        unique_together = ("climate", "land_use_type")
 
     def __str__(self):
         return f"{self.value} for {self.climate.name} {self.land_use_type.name}"
@@ -942,7 +961,6 @@ class LivestockVSER(Model):
     class Meta:
         unique_together = ("livestock_production_type", "livestock_category_type", "ipcc_region")
 
-    emission_type = ForeignKey(EmissionType, on_delete=CASCADE, null=True, blank=True)
     livestock_production_type = ForeignKey("api.LivestockProductionType", on_delete=CASCADE)
     livestock_category_type = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
     ipcc_region = ForeignKey("api.IPCCRegion", on_delete=CASCADE)
@@ -951,7 +969,6 @@ class LivestockVSER(Model):
     @staticmethod
     def get_average_value(emission_type, production_type, livestock_category, ipcc_region):
         values = LivestockVSER.objects.filter(
-            emission_type=emission_type,
             livestock_production_type=production_type,
             livestock_category_type=livestock_category,
             ipcc_region=ipcc_region,
