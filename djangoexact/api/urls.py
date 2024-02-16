@@ -99,6 +99,8 @@ router.register(r"organic-amendment-types", views.generic_viewset(models.Organic
 router.register(r"livestock-category-types", views.generic_viewset(models.LivestockCategoryType), basename="livestock-category-types")
 router.register(r"livestock-production-types", views.generic_viewset(models.LivestockProductionType), basename="livestock-production-types")
 router.register(r"manure-management-types", views.generic_viewset(models.ManureManagementType), basename="manure-management-types")
+router.register(r"disturbance-types", views.generic_viewset(models.DisturbanceType), basename="disturbance-types")
+router.register(r"forest-types", views.generic_viewset(models.ForestType), basename="forest-types")
 
 urlpatterns = [
     path("docs/", include_docs_urls(title="EX-ACT Docs")),
