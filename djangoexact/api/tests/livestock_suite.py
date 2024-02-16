@@ -21,7 +21,7 @@ from api.models import CustomUser as User
 from api.tests.factories import ActivityFactory, LivestockFactory, ProjectFactory
 from ipcc.models import GlobalWarmingPotential, SoilOrganicCarbon
 
-BATCH_SIZE = 1
+BATCH_SIZE = 5
 
 climates = Climate.objects.all()
 countries = Country.objects.all()
