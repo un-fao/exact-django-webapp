@@ -10,14 +10,14 @@ for model in [model for model in dir() if not model.startswith("_") and not mode
 
 
 class AGBAdmin(admin.ModelAdmin):
-    search_fields = ["climate__name", "moisture__name", "crop_type__name"]
+    search_fields = ["climate__name", "moisture__name", "land_use_type__name", "value"]
 
 
 class BGBAdmin(admin.ModelAdmin):
     search_fields = [
         "climate__name",
         "moisture__name",
-        "crop_type__name",
+        "land_use_type__name",
         "continent__name",
     ]
 
@@ -76,7 +76,6 @@ class ForestManagementAGBAdmin(admin.ModelAdmin):
 
 class LivestockVSERAdmin(admin.ModelAdmin):
     list_display = [
-        "emission_type",
         "livestock_production_type",
         "livestock_category_type",
         "ipcc_region",
@@ -84,14 +83,12 @@ class LivestockVSERAdmin(admin.ModelAdmin):
     ]
 
     list_select_related = [
-        "emission_type",
         "livestock_production_type",
         "livestock_category_type",
         "ipcc_region",
     ]
 
     search_fields = [
-        "emission_type__name",
         "livestock_production_type__name",
         "livestock_category_type__name",
         "ipcc_region__name",
