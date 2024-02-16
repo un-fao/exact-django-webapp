@@ -1217,9 +1217,12 @@ class PerennialCropCalculator(BaseCalculator):
         change_rate = activity.change_rate
 
         soc = ipcc.SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=project.soil_type)
-        grassland_soc = get_grassland_soc(luc)
 
-        soc_start = grassland_soc.value if grassland_soc else soc.value
+        soc_start = soc.value
+        if luc:
+            grassland_soc = get_grassland_soc(luc)
+            soc_start = grassland_soc.value
+
         soc_w = soc.value
         soc_wo = soc.value
 
@@ -1241,9 +1244,9 @@ class PerennialCropCalculator(BaseCalculator):
         ag_default_w = ipcc.PerennialAGB.objects.get_or_default(**cmc, land_use_type=module.land_use_type_w)
         ag_default_wo = ipcc.PerennialAGB.objects.get_or_default(**cmc, land_use_type=module.land_use_type_wo)
 
-        agb_max_c_start = ipcc.PerennialMaxAGB.objects.get(climate=climate, land_use_type=module.land_use_type_start)
-        agb_max_c_w = ipcc.PerennialMaxAGB.objects.get(climate=climate, land_use_type=module.land_use_type_w)
-        agb_max_c_wo = ipcc.PerennialMaxAGB.objects.get(climate=climate, land_use_type=module.land_use_type_wo)
+        agb_max_c_start = ipcc.PerennialMaxAGB.objects.get_or_default(climate=climate, land_use_type=module.land_use_type_start)
+        agb_max_c_w = ipcc.PerennialMaxAGB.objects.get_or_default(climate=climate, land_use_type=module.land_use_type_w)
+        agb_max_c_wo = ipcc.PerennialMaxAGB.objects.get_or_default(climate=climate, land_use_type=module.land_use_type_wo)
 
         bg_default_start = ipcc.PerennialBGB.objects.get_or_default(**cmc, land_use_type=module.land_use_type_start)
         bg_default_w = ipcc.PerennialBGB.objects.get_or_default(**cmc, land_use_type=module.land_use_type_w)
@@ -1465,10 +1468,13 @@ class PerennialCroppingCalculator(BaseCalculator):
     def calculate(self):
         module: PerennialCropping = self.data
 
-        res_w = MathResult(input.activity.project.implementation_years, input.activity.project.capitalization_years)
-        res_wo = MathResult(input.activity.project.implementation_years, input.activity.project.capitalization_years)
+        res_w = MathResult(module.activity.project.implementation_years, module.activity.project.capitalization_years)
+        res_wo = MathResult(module.activity.project.implementation_years, module.activity.project.capitalization_years)
 
         r_w, r_wo = PerennialCropCalculator(module).calculate()
+
+        res_w += r_w
+        res_wo += r_wo
 
         for season in module.minor_seasons.all():
             r_w, r_wo = PerennialCropCalculator(season).calculate()
@@ -4680,14 +4686,12 @@ class ForestManagementCalculator(BaseCalculator):
         before_2_yrs = agb_growth.value_upto_20_years
         after_20_yrs = agb_growth.value_after_20_years
 
-        try:
-            bgb_before_20_yrs = ipcc.ForestManagementBGB.objects.get_max_below_threshold(**crluft, threshold=before_2_yrs)
-        except ipcc.ForestManagementBGB.DoesNotExist:
+        bgb_before_20_yrs = ipcc.ForestManagementBGB.objects.get_max_below_threshold(**crluft, threshold=before_2_yrs)
+        if not bgb_before_20_yrs:
             raise ValueError(BGB_UNDER_20_NOT_FOUND)
 
-        try:
-            bgb_after_20_yrs = ipcc.ForestManagementBGB.objects.get_max_below_threshold(**crluft, threshold=after_20_yrs)
-        except ipcc.ForestManagementBGB.DoesNotExist:
+        bgb_after_20_yrs = ipcc.ForestManagementBGB.objects.get_max_below_threshold(**crluft, threshold=after_20_yrs)
+        if not bgb_after_20_yrs:
             raise ValueError(BGB_OVER_20_NOT_FOUND)
 
         # ForestManagement start/w/wo forest is the same
@@ -4733,14 +4737,14 @@ class ForestManagementCalculator(BaseCalculator):
         # END - Reference Values for forest remaining forest
 
         if is_afforestation_w:
-            agb_max_w = statistics.mean(agb_over_20.agb_min, agb_over_20.agb_max) if project.implementation_years > 20 else statistics.mean(agb_under_20.agb_min, agb_under_20.agb_max)
+            agb_max_w = statistics.mean([agb_over_20.agb_min, agb_over_20.agb_max]) if project.implementation_years > 20 else statistics.mean([agb_under_20.agb_min, agb_under_20.agb_max])
             agb_growth_under_20_w = statistics.mean([agb_under_20.agb_growth_max, agb_under_20.agb_growth_min])
             agb_growth_over_20_w = agb_growth_under_20_w
             agb_start_w = 0
             flu_w = flu_start
 
         if is_afforestation_wo:
-            agb_max_wo = statistics.mean(agb_over_20.agb_min, agb_over_20.agb_max) if project.implementation_years > 20 else statistics.mean(agb_under_20.agb_min, agb_under_20.agb_max)
+            agb_max_wo = statistics.mean([agb_over_20.agb_min, agb_over_20.agb_max]) if project.implementation_years > 20 else statistics.mean([agb_under_20.agb_min, agb_under_20.agb_max])
             agb_growth_under_20_wo = statistics.mean([agb_under_20.agb_growth_max, agb_under_20.agb_growth_min])
             agb_growth_over_20_wo = agb_growth_under_20_wo
             agb_start_wo = 0
