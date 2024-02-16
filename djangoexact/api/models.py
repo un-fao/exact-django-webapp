@@ -912,13 +912,13 @@ class PerennialCrop(Model):
     flu_t2_w = FloatField(null=True, blank=True)
     flu_t2_wo = FloatField(null=True, blank=True)
 
-    def save(self, *args, **kwargs):
-        if not self.land_use_type_start:
-            self.land_use_type_start = LandUseType.objects.get(name="Agroforestry - Default")
-            self.land_use_type_w = self.land_use_type_start
-            self.land_use_type_wo = self.land_use_type_start
+    # def save(self, *args, **kwargs):
+    #     if not self.land_use_type_start:
+    #         self.land_use_type_start = LandUseType.objects.get(name="Agroforestry - Default")
+    #         self.land_use_type_w = self.land_use_type_start
+    #         self.land_use_type_wo = self.land_use_type_start
 
-        super().save(*args, **kwargs)
+    #     super().save(*args, **kwargs)
 
 
 class PerennialCropping(PerennialCrop, LandModule, DoubleBiomassModule):
@@ -1165,14 +1165,6 @@ class ForestManagement(LandModule, MultiBiomassModule):
     average_yearly_degradation_percentage_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_average_yearly_degradation_percentage_thread")
 
     ##### TIER 2 #####
-
-    soil_carbon_t2_start = FloatField(null=True, blank=True)
-    soil_carbon_t2_w = FloatField(null=True, blank=True)
-    soil_carbon_t2_wo = FloatField(null=True, blank=True)
-
-    land_use_factor_t2_start = FloatField(null=True, blank=True)
-    land_use_factor_t2_w = FloatField(null=True, blank=True)
-    land_use_factor_t2_wo = FloatField(null=True, blank=True)
 
     agb_growth_rate_le_20_yrs_t2_start = FloatField(null=True, blank=True)
     agb_growth_rate_le_20_yrs_t2_w = FloatField(null=True, blank=True)
