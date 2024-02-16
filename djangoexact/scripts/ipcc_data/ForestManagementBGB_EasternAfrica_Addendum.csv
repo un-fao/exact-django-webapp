@@ -1,0 +1,67 @@
+climate;region;forest_type;land_use_type;threshold;value
+Tropical;Eastern Africa;Natural;Rainforest;‚â§ 125;0.825
+Tropical;Eastern Africa;Natural;Moist Deciduous Forest;‚â§ 125;0.232
+Tropical;Eastern Africa;Natural;Dry Forest;‚â§ 125;0.332
+Tropical;Eastern Africa;Natural;Shrubland;‚â§ 125;0.4
+Tropical;Eastern Africa;Plantation;Rainforest;‚â§ 125;0.37
+Tropical;Eastern Africa;Plantation;Moist Deciduous Forest;‚â§ 125;0.2
+Tropical;Eastern Africa;Plantation;Dry Forest;‚â§ 125;0.56
+Tropical;Eastern Africa;Plantation;Shrubland;‚â§ 125;0.4
+Warm Temperate;Eastern Africa;Natural;Humid Forest;‚â§ 125;0.232
+Warm Temperate;Eastern Africa;Natural;Dry Forest;‚â§ 125;0.56
+Warm Temperate;Eastern Africa;Natural;Steppe;‚â§ 125;0.32
+Warm Temperate;Eastern Africa;Natural;Mountain System;‚â§ 125;0.27
+Warm Temperate;Eastern Africa;Plantation;Humid Forest;‚â§ 125;0.2
+Warm Temperate;Eastern Africa;Plantation;Dry Forest;‚â§ 125;0.56
+Warm Temperate;Eastern Africa;Plantation;Steppe;‚â§ 125;0.32
+Warm Temperate;Eastern Africa;Plantation;Mountain System;‚â§ 125;0.27
+Cool Temperate;Eastern Africa;Natural;Oceanic Forest;‚â§ 125;0.44
+Cool Temperate;Eastern Africa;Natural;Continental Forest;‚â§ 125;0.44
+Cool Temperate;Eastern Africa;Natural;Mountain System;‚â§ 125;0.44
+Cool Temperate;Eastern Africa;Natural;Steppe;‚â§ 125;0.44
+Cool Temperate;Eastern Africa;Plantation;Oceanic Forest;‚â§ 125;0.44
+Cool Temperate;Eastern Africa;Plantation;Continental Forest;‚â§ 125;0.44
+Cool Temperate;Eastern Africa;Plantation;Mountain System;‚â§ 125;0.44
+Cool Temperate;Eastern Africa;Plantation;Desert;‚â§ 125;0.44
+Boreal;Eastern Africa;Natural;Coniferous Forest;‚â§ 75;0.39
+Boreal;Eastern Africa;Natural;Tundra Woodland;‚â§ 75;0.39
+Boreal;Eastern Africa;Natural;Mountain System;‚â§ 75;0.39
+Boreal;Eastern Africa;Plantation;Coniferous Forest;‚â§ 75;0.39
+Boreal;Eastern Africa;Plantation;Tundra Woodland;‚â§ 75;0.39
+Boreal;Eastern Africa;Plantation;Mountain System;‚â§ 75;0.39
+Tropical;Eastern Africa;Natural;Mountain System;‚â§ 125;0.27
+Tropical;Eastern Africa;Plantation;Mountain System;‚â§ 125;0.27
+Tropical;Eastern Africa;Natural;Rainforest;> 125;0.532
+Tropical;Eastern Africa;Natural;Moist Deciduous Forest;> 125;0.232
+Tropical;Eastern Africa;Natural;Dry Forest;> 125;0.379
+Tropical;Eastern Africa;Natural;Shrubland;> 125;0.4
+Tropical;Eastern Africa;Plantation;Rainforest;> 125;0.37
+Tropical;Eastern Africa;Plantation;Moist Deciduous Forest;> 125;0.24
+Tropical;Eastern Africa;Plantation;Dry Forest;> 125;0.28
+Tropical;Eastern Africa;Plantation;Shrubland;> 125;0.4
+Warm Temperate;Eastern Africa;Natural;Humid Forest;> 125;0.232
+Warm Temperate;Eastern Africa;Natural;Dry Forest;> 125;0.28
+Warm Temperate;Eastern Africa;Natural;Steppe;> 125;0.32
+Warm Temperate;Eastern Africa;Natural;Mountain System;> 125;0.27
+Warm Temperate;Eastern Africa;Plantation;Humid Forest;> 125;0.24
+Warm Temperate;Eastern Africa;Plantation;Dry Forest;> 125;0.28
+Warm Temperate;Eastern Africa;Plantation;Steppe;> 125;0.32
+Warm Temperate;Eastern Africa;Plantation;Mountain System;> 125;0.27
+Cool Temperate;Eastern Africa;Natural;Oceanic Forest;> 125;0.22
+Cool Temperate;Eastern Africa;Natural;Continental Forest;> 125;0.22
+Cool Temperate;Eastern Africa;Natural;Mountain System;> 125;0.22
+Cool Temperate;Eastern Africa;Natural;Desert;> 125;0.22
+Cool Temperate;Eastern Africa;Natural;Steppe;> 125;0.22
+Cool Temperate;Eastern Africa;Plantation;Oceanic Forest;> 125;0.22
+Cool Temperate;Eastern Africa;Plantation;Continental Forest;> 125;0.22
+Cool Temperate;Eastern Africa;Plantation;Mountain System;> 125;0.22
+Cool Temperate;Eastern Africa;Plantation;Desert;> 125;0.22
+Cool Temperate;Eastern Africa;Plantation;Steppe;> 125;0.22
+Boreal;Eastern Africa;Natural;Coniferous Forest;>75;0.24
+Boreal;Eastern Africa;Natural;Tundra Woodland;>75;0.24
+Boreal;Eastern Africa;Natural;Mountain System;>75;0.24
+Boreal;Eastern Africa;Plantation;Coniferous Forest;>75;0.24
+Boreal;Eastern Africa;Plantation;Tundra Woodland;>75;0.24
+Boreal;Eastern Africa;Plantation;Mountain System;>75;0.24
+Tropical;Eastern Africa;Natural;Mountain System;> 125;0.27
+Tropical;Eastern Africa;Plantation;Mountain System;> 125;0.27

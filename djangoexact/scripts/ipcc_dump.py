@@ -3521,36 +3521,6 @@ for i, row in df.iterrows():
         value=value,
     )
 
-# ForestManagementBGB.objects.all().delete()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestManagementBGB.csv"),
-    header=[0],
-    sep=",",
-)
-
-for i, row in df.iterrows():
-    try:
-        climate = Climate.objects.get(name=row["climate"])
-        region = Region.objects.get(name=row["region"])
-        forest_type = ForestType.objects.get(name=row["forest_type"])
-        land_use_type = LandUseType.objects.get(name=row["land_use_type"])
-        threshold = row["threshold"]
-        if threshold == "> 125" or threshold == ">75":
-            threshold = None
-        elif "125" in threshold:
-            threshold = 125
-        elif "75" in threshold:
-            threshold = 75
-        value = parse_csv_number(row["value"])
-
-        print(climate, region, forest_type, land_use_type, threshold, value)
-
-        ForestManagementBGB.objects.get_or_create(climate=climate, region=region, forest_type=forest_type, land_use_type=land_use_type, threshold=threshold, value=value)
-    except Exception as e:
-        print(row)
-        print(e)
-
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestManagementAGBGrowth.csv"),
     header=[0],
@@ -3623,6 +3593,108 @@ with open("scripts/ipcc_data/AfforestationFLU.csv", "r") as f:
                 moisture=moisture,
                 value=value,
             )
+
+lct = LivestockCategoryType.objects.all()
+lpt = LivestockProductionType.objects.all()
+tropicalmontane = Climate.objects.get(name="Tropical Montane")
+dry = Moisture.objects.get(name="Dry")
+emissiontypes = EmissionType.objects.all()
+manuremanagementtypes = ManureManagementType.objects.all()
+
+for livestock_category in lct:
+    for livestock_production_type in lpt:
+        for emission_type in emissiontypes:
+            for manure_management_type in manuremanagementtypes:
+                foo = LivestockManureEF.objects.filter(
+                    livestock_category_type=livestock_category,
+                    livestock_production_type=livestock_production_type,
+                    emission_type=emission_type,
+                    climate=tropicalmontane,
+                    moisture=dry,
+                    manure_management_type=manure_management_type,
+                )
+
+                if not foo:
+                    LivestockManureEF.objects.create(
+                        livestock_category_type=livestock_category,
+                        livestock_production_type=livestock_production_type,
+                        emission_type=emission_type,
+                        climate=tropicalmontane,
+                        moisture=dry,
+                        manure_management_type=manure_management_type,
+                        value=0,
+                    )
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "LivestockManureEFPROPER.csv"),
+    header=0,
+    sep=";",
+)
+
+
+headers = df.columns.values.tolist()
+rows = df.to_dict("records")
+
+for i, row in enumerate(rows):
+
+    print(row["climate"])
+    print(row["moisture"])
+
+    if row["moisture"] == "Montane":
+        continue
+
+    lcts = []
+    if row["livestock_category_type"] == "All":
+        lcts = LivestockCategoryType.objects.all()
+    else:
+        lcts = [LivestockCategoryType.objects.get(name=row["livestock_category_type"])]
+
+    livestock_production_type = LivestockProductionType.objects.get(name=row["livestock_production_type"])
+    climate = Climate.objects.get(name=row["climate"])
+    moisture = Moisture.objects.get(name=row["moisture"])
+    emission_type = EmissionType.objects.get(name=row["emission_type"])
+
+    for j, header in enumerate(headers, start=5):
+
+        if j == len(headers):
+            break
+
+        manure_management_type = ManureManagementType.objects.get(name=headers[j])
+        value = parse_csv_number(row[headers[j]])
+
+        for lct in lcts:
+            print(
+                livestock_production_type,
+                lct,
+                emission_type,
+                manure_management_type,
+                climate,
+                moisture,
+                value,
+            )
+
+            foo = LivestockManureEF.objects.filter(
+                livestock_category_type=lct,
+                livestock_production_type=livestock_production_type,
+                emission_type=emission_type,
+                manure_management_type=manure_management_type,
+                climate=climate,
+                moisture=moisture,
+            ).first()
+
+            if not foo:
+                LivestockManureEF.objects.get_or_create(
+                    livestock_category_type=lct,
+                    livestock_production_type=livestock_production_type,
+                    emission_type=emission_type,
+                    manure_management_type=manure_management_type,
+                    climate=climate,
+                    moisture=moisture,
+                    value=value,
+                )
+            else:
+                foo.value = value
+                foo.save()
 
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestManagementAGB.csv"),
@@ -3741,105 +3813,38 @@ for i, row in df.iterrows():
                     agb_growth_max=agb_growth_max,
                 )
 
-lct = LivestockCategoryType.objects.all()
-lpt = LivestockProductionType.objects.all()
-tropicalmontane = Climate.objects.get(name="Tropical Montane")
-dry = Moisture.objects.get(name="Dry")
-emissiontypes = EmissionType.objects.all()
-manuremanagementtypes = ManureManagementType.objects.all()
-
-for livestock_category in lct:
-    for livestock_production_type in lpt:
-        for emission_type in emissiontypes:
-            for manure_management_type in manuremanagementtypes:
-                foo = LivestockManureEF.objects.filter(
-                    livestock_category_type=livestock_category,
-                    livestock_production_type=livestock_production_type,
-                    emission_type=emission_type,
-                    climate=tropicalmontane,
-                    moisture=dry,
-                    manure_management_type=manure_management_type,
-                )
-
-                if not foo:
-                    LivestockManureEF.objects.create(
-                        livestock_category_type=livestock_category,
-                        livestock_production_type=livestock_production_type,
-                        emission_type=emission_type,
-                        climate=tropicalmontane,
-                        moisture=dry,
-                        manure_management_type=manure_management_type,
-                        value=0,
-                    )
-"""
+# ForestManagementBGB.objects.all().delete()
 
 df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "LivestockManureEFPROPER.csv"),
-    header=0,
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestManagementBGB_EasternAfrica_Addendum.csv"),
+    header=[0],
     sep=";",
 )
 
+for i, row in df.iterrows():
+    try:
+        climate = Climate.objects.get(name=row["climate"])
+        region = Region.objects.get(name=row["region"])
+        forest_type = ForestType.objects.get(name=row["forest_type"])
+        land_use_type = LandUseType.objects.get(name=row["land_use_type"])
+        threshold = row["threshold"]
+        if threshold == "> 125" or threshold == ">75":
+            threshold = None
+        elif "125" in threshold:
+            threshold = 125
+        elif "75" in threshold:
+            threshold = 75
+        value = parse_csv_number(row["value"])
 
-headers = df.columns.values.tolist()
-rows = df.to_dict("records")
+        print(climate, region, forest_type, land_use_type, threshold, value)
 
-for i, row in enumerate(rows):
+        ForestManagementBGB.objects.get_or_create(climate=climate, region=region, forest_type=forest_type, land_use_type=land_use_type, threshold=threshold, value=value)
+    except Exception as e:
+        print(row)
+        print(e)
+"""
 
-    print(row["climate"])
-    print(row["moisture"])
-
-    if row["moisture"] == "Montane":
-        continue
-
-    lcts = []
-    if row["livestock_category_type"] == "All":
-        lcts = LivestockCategoryType.objects.all()
-    else:
-        lcts = [LivestockCategoryType.objects.get(name=row["livestock_category_type"])]
-
-    livestock_production_type = LivestockProductionType.objects.get(name=row["livestock_production_type"])
-    climate = Climate.objects.get(name=row["climate"])
-    moisture = Moisture.objects.get(name=row["moisture"])
-    emission_type = EmissionType.objects.get(name=row["emission_type"])
-
-    for j, header in enumerate(headers, start=5):
-
-        if j == len(headers):
-            break
-
-        manure_management_type = ManureManagementType.objects.get(name=headers[j])
-        value = parse_csv_number(row[headers[j]])
-
-        for lct in lcts:
-            print(
-                livestock_production_type,
-                lct,
-                emission_type,
-                manure_management_type,
-                climate,
-                moisture,
-                value,
-            )
-
-            foo = LivestockManureEF.objects.filter(
-                livestock_category_type=lct,
-                livestock_production_type=livestock_production_type,
-                emission_type=emission_type,
-                manure_management_type=manure_management_type,
-                climate=climate,
-                moisture=moisture,
-            ).first()
-
-            if not foo:
-                LivestockManureEF.objects.get_or_create(
-                    livestock_category_type=lct,
-                    livestock_production_type=livestock_production_type,
-                    emission_type=emission_type,
-                    manure_management_type=manure_management_type,
-                    climate=climate,
-                    moisture=moisture,
-                    value=value,
-                )
-            else:
-                foo.value = value
-                foo.save()
+soil = SoilType.objects.get(name="Mineral")
+for climate in Climate.objects.all():
+    for moisture in climate.moistures.all():
+        SoilOrganicCarbon.objects.get_or_create(climate=climate, moisture=moisture, soil_type=soil, value=0)

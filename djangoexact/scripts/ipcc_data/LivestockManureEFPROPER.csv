@@ -1058,3 +1058,36 @@ N2O Leaching;Tropical Montane;Dry;All;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,03
 N2O Leaching;Tropical;Wet;All;Default;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 N2O Leaching;Tropical;Moist;All;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 N2O Leaching;Tropical;Dry;All;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+N2O Volatilization;Cool Temperate;Moist;Dairy Buffalo;Low-Productivity;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Cool Temperate;Dry;Dairy Buffalo;Low-Productivity;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Boreal;Moist;Dairy Buffalo;Low-Productivity;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Boreal;Dry;Dairy Buffalo;Low-Productivity;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Warm Temperate;Moist;Dairy Buffalo;Low-Productivity;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Warm Temperate;Dry;Dairy Buffalo;Low-Productivity;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Tropical Montane;Dry;Dairy Buffalo;Low-Productivity;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Tropical Montane;Moist;Dairy Buffalo;Low-Productivity;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Tropical;Wet;Dairy Buffalo;Low-Productivity;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Tropical;Moist;Dairy Buffalo;Low-Productivity;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Tropical;Dry;Dairy Buffalo;Low-Productivity;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Cool Temperate;Moist;Dairy Buffalo;High-Productivity;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Cool Temperate;Dry;Dairy Buffalo;High-Productivity;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Boreal;Moist;Dairy Buffalo;High-Productivity;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Boreal;Dry;Dairy Buffalo;High-Productivity;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Warm Temperate;Moist;Dairy Buffalo;High-Productivity;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Warm Temperate;Dry;Dairy Buffalo;High-Productivity;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Tropical Montane;Dry;Dairy Buffalo;High-Productivity;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Tropical Montane;Moist;Dairy Buffalo;High-Productivity;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Tropical;Wet;Dairy Buffalo;High-Productivity;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Tropical;Moist;Dairy Buffalo;High-Productivity;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Tropical;Dry;Dairy Buffalo;High-Productivity;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Cool Temperate;Moist;Dairy Buffalo;Default;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Cool Temperate;Dry;Dairy Buffalo;Default;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Boreal;Moist;Dairy Buffalo;Default;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Boreal;Dry;Dairy Buffalo;Default;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Warm Temperate;Moist;Dairy Buffalo;Default;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Warm Temperate;Dry;Dairy Buffalo;Default;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Tropical Montane;Dry;Dairy Buffalo;Default;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Tropical Montane;Moist;Dairy Buffalo;Default;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Tropical;Wet;Dairy Buffalo;Default;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Tropical;Moist;Dairy Buffalo;Default;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
+N2O Volatilization;Tropical;Dry;Dairy Buffalo;Default;0,35;0,09;0,09;0,3;0,21;0,07;0,275;0;0,25;0,25;0;0,4;0,19;0,27
