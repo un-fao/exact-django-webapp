@@ -66,3 +66,6 @@ requirements.txt.old
 djangoexact/api/old_models.py
 djangoexact/api/non_generic_viewsets.py
 djangoexact/math_model/cropland_annual.xlsb
+
+your_directory_for_saving_plots
+path_to_combined_image.png
