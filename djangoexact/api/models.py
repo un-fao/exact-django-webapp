@@ -225,6 +225,7 @@ class TillageType(Model):
 
 class OrganicInputType(Model):
     name = CharField(max_length=100, unique=True)
+    is_active = BooleanField(default=True)
 
     def __str__(self):
         return f"({self.pk}) {self.name}"
