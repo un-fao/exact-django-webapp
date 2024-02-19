@@ -513,10 +513,10 @@ class ForestManagement(BaseModule):
                     # TODO:check if this is correct
                     rotation_yearly_emissions_bgb = [x * -44 / 12 * (1 - self.rotation_percentage_energy) for x in rotation_times_hectares_bgb]
 
-                    agb_fire_component = [x * -44 / 12 * self.rotation_percentage_energy for x in rotation_times_hectares_agb]
-                    bgb_fire_component = [x * -44 / 12 * self.rotation_percentage_energy for x in rotation_times_hectares_bgb]
-                    nitrous_fire_component = [x * -44 / 12 * self.rotation_percentage_energy * self.ef_nitrous for x in rotation_times_hectares_agb]
-                    methane_fire_component = [x * -44 / 12 * self.rotation_percentage_energy * self.ef_methane for x in rotation_times_hectares_agb]
+                    agb_fire_component = [x * -44 / 12 * (1 - self.rotation_percentage_energy) for x in rotation_times_hectares_agb]
+                    bgb_fire_component = [x * -44 / 12 * (1 - self.rotation_percentage_energy) for x in rotation_times_hectares_bgb]
+                    nitrous_fire_component = [x * -44 / 12 *  (1 - self.rotation_percentage_energy) * self.ef_nitrous for x in rotation_times_hectares_agb]
+                    methane_fire_component = [x * -44 / 12 * (1 - self.rotation_percentage_energy) * self.ef_methane for x in rotation_times_hectares_agb]
 
                     self.yearly_fire_rotation_emissions = [x + y + z + w for x, y, z, w in zip(agb_fire_component, bgb_fire_component, nitrous_fire_component, methane_fire_component)]
                     self.total_fire_rotation_emissions = sum(self.yearly_fire_rotation_emissions)
@@ -666,11 +666,11 @@ class ForestManagement(BaseModule):
             return
 
 
-# w = [10, 5, 'D', 0, 100.0, 10, 0, 0.0, 125.0, 0.207, 0.207, None, None, 131.6, None, 2.7, None, 2.7, None, 131.6, None, [], [], [], 0, 0.0, 0.0, 0, 4.8, 4.8, 4.8, None, 14.8, 14.8, 14.8, None, 40.0, None, None, None, None, 1, 1, 1, 28.0, 265.0]
-# wo = [10, 5, 'D', 0, 100.0, 5, 0, 0.0, 125.0, 0.207, 0.207, None, None, 131.6, None, 2.7, None, 2.7, None, 131.6, None, [], [], [], 0, 0.0, 0.0, 0, 4.8, 4.8, 4.8, None, 14.8, 14.8, 14.8, None, 40.0, None, None, None, None, 1, 1, 1, 28.0, 265.0]
+w = [10, 5, 'D', 0, 100.0, 10, 0, 0.0, 125.0, 0.207, 0.207, None, None, 131.6, None, 2.7, None, 2.7, None, 131.6, None, [], [], [], 0, 0.0, 0.0, 0, 4.8, 4.8, 4.8, None, 14.8, 14.8, 14.8, None, 40.0, None, None, None, None, 1, 1, 1, 28.0, 265.0]
+wo = [10, 5, 'D', 0, 100.0, 5, 0, 0.0, 125.0, 0.207, 0.207, None, None, 131.6, None, 2.7, None, 2.7, None, 131.6, None, [], [], [], 0, 0.0, 0.0, 0, 4.8, 4.8, 4.8, None, 14.8, 14.8, 14.8, None, 40.0, None, None, None, None, 1, 1, 1, 28.0, 265.0]
 
-# f_w = ForestManagement(*w)
-# f_wo = ForestManagement(*wo)
+f_w = ForestManagement(*w)
+f_wo = ForestManagement(*wo)
 
-# f_w.calculate_emissions()
-# f_wo.calculate_emissions()
+f_w.calculate_emissions()
+f_wo.calculate_emissions()
