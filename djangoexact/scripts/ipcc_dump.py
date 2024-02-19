@@ -87,24 +87,6 @@ with open("scripts/ipcc_data/LitterDeadwoodCarbonStock.csv", "r") as f:
             vegetation_type=vegtype, litter=row[1], dw=row[2]
         )
 
-with open("scripts/ipcc_data/LandUseStockExchangeFactor.csv", "r") as f:
-    reader = csv.reader(f)
-    header = next(reader, None)
-    data = list(reader)
-
-    for i, head in enumerate(header):
-        land_use_type = LandUseType.objects.get_or_create(name=sanitize(head))[0]
-        for row in data:
-            climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
-            moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
-            value = row[i + 2] if row[i + 2] != "" else None
-            LandUseCarbonStockExchangeFactor.objects.get_or_create(
-                climate=climate,
-                moisture=moisture,
-                land_use_type=land_use_type,
-                value=value,
-            )
-
 with open("scripts/ipcc_data//Countries.csv", "r") as f:
     reader = csv.reader(f)
     data = list(reader)
@@ -3249,51 +3231,6 @@ for i, row in enumerate(df_dict2):
         agb_growth_max=agb_growth_max,
     )
 
-
-with open("scripts/ipcc_data/TotalBiomassAfterDefo.csv", "r") as f:
-    reader = csv.reader(f)
-    header = next(reader, None)
-    data = list(reader)
-
-    for i, head in enumerate(header):
-        head = sanitize(head)
-        land_use_type = LandUseType.objects.get(name=head)
-
-        for row in data:
-            climate_name = sanitize(row[0])
-            moisture_name = sanitize(row[1])
-            continent_name = sanitize(row[2])
-            value = parse_csv_number(row[i + 3]) if row[i + 3] != "" else None
-            year = 1
-
-            climate = Climate.objects.get(name=climate_name)
-            moisture = Moisture.objects.get(name=moisture_name)
-            continent = Region.objects.get(name=continent_name)
-
-            # if land_use_type == annualcropland:
-            #     for crop in crops:
-            #         print(f"{crop}, {climate_name}, {moisture_name}, {continent_name}, {value}")
-
-            #         TotalBiomassAfterDefo.objects.get_or_create(
-            #             land_use_type=crop,
-            #             climate=climate,
-            #             moisture=moisture,
-            #             continent=continent,
-            #             value=value,
-            #             year=year,
-            #         )
-
-            print(f"{land_use_type}, {climate_name}, {moisture_name}, {continent_name}, {value}")
-
-            TotalBiomassAfterDefo.objects.get_or_create(
-                land_use_type=land_use_type,
-                climate=climate,
-                moisture=moisture,
-                continent=continent,
-                value=value,
-                year=year,
-            )
-
 FLUData.objects.all().delete()
 
 df = pd.read_csv(
@@ -3842,9 +3779,87 @@ for i, row in df.iterrows():
     except Exception as e:
         print(row)
         print(e)
-"""
 
 soil = SoilType.objects.get(name="Mineral")
 for climate in Climate.objects.all():
     for moisture in climate.moistures.all():
         SoilOrganicCarbon.objects.get_or_create(climate=climate, moisture=moisture, soil_type=soil, value=0)
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "TotalBiomassAfterDefo.csv"),
+    header=0,
+    sep=",",
+)
+
+headers = df.columns.values.tolist()
+rows = df.to_dict("records")
+
+for i, row in enumerate(rows):
+    climate = Climate.objects.get(name=sanitize(row["climate"]))
+    moisture = Moisture.objects.get(name=sanitize(row["moisture"]))
+    region = Region.objects.get(name=sanitize(row["region"]))
+
+    for j, header in enumerate(headers, start=3):
+
+        if j == len(headers):
+            break
+
+        print(headers[j])
+        land_use_type = LandUseType.objects.get(name=sanitize(headers[j]))
+        value = parse_csv_number(row[headers[j]])
+        if not value:
+            continue
+
+        print(
+            land_use_type,
+            climate,
+            moisture,
+            region,
+            value,
+        )
+
+        TotalBiomassAfterDefo.objects.get_or_create(
+            land_use_type=land_use_type,
+            climate=climate,
+            moisture=moisture,
+            continent=region,
+            value=value,
+        )
+"""
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "LandUseStockExchangeFactor.csv"),
+    header=[0],
+    sep=",",
+)
+
+headers = df.columns.values.tolist()
+rows = df.to_dict("records")
+
+for i, row in enumerate(rows):
+    climate = Climate.objects.get(name=sanitize(row["climate"]))
+    moisture = Moisture.objects.get(name=sanitize(row["moisture"]))
+
+    for j, header in enumerate(headers, start=2):
+
+        if j == len(headers):
+            break
+
+        land_use_type = LandUseType.objects.get(name=sanitize(headers[j]))
+        value = parse_csv_number(row[headers[j]])
+        if not value:
+            continue
+
+        print(
+            land_use_type,
+            climate,
+            moisture,
+            value,
+        )
+
+        LandUseCarbonStockExchangeFactor.objects.get_or_create(
+            land_use_type=land_use_type,
+            climate=climate,
+            moisture=moisture,
+            value=value,
+        )
