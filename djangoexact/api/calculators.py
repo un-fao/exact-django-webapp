@@ -939,6 +939,55 @@ class OtherLandUseCalculator(BaseCalculator):
 
 
 class AnnualCroppingCalculator(BaseCalculator):
+    def calculate(self):
+        module: AnnualCropping = self.data
+
+        res_w = MathResult(module.activity.project.implementation_years, module.activity.project.capitalization_years)
+        res_wo = MathResult(module.activity.project.implementation_years, module.activity.project.capitalization_years)
+
+        r_w, r_wo = AnnualCropCalculator(module).calculate()
+
+        res_w += r_w
+        res_wo += r_wo
+
+        for season in module.minor_seasons.all():
+            r_w, r_wo = AnnualCropCalculator(season).calculate()
+
+            res_w += r_w
+            res_wo += r_wo
+
+        return (res_w, res_wo)
+
+    def defaults(self) -> DefaultData:
+        self.calculate()
+
+        module: AnnualCropping = self.data
+
+        defaults_start = {}
+        defaults_w = {}
+        defaults_wo = {}
+
+        math_start = AnnualCropland(*self.inputs_start)
+        math_start_defaults = math_start.evaluate_tier_2_defaults()
+        defaults_start.update(math_start_defaults.start)
+        defaults_start.update(math_start_defaults.other)
+
+        if is_with(module):
+            math_w = AnnualCropland(*self.inputs_w)
+            math_w_defaults = math_w.evaluate_tier_2_defaults()
+            defaults_w.update(math_w_defaults.start)
+            defaults_w.update(math_w_defaults.other)
+
+        if is_without(module):
+            math_wo = AnnualCropland(*self.inputs_wo)
+            math_wo_defaults = math_wo.evaluate_tier_2_defaults()
+            defaults_wo.update(math_wo_defaults.start)
+            defaults_wo.update(math_wo_defaults.other)
+
+        return DefaultData(defaults_start, defaults_w, defaults_wo)
+
+
+class AnnualCropCalculator(BaseCalculator):
     """
     Calculator for annual cropping modules.
     """
