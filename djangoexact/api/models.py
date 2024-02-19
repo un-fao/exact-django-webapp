@@ -1130,38 +1130,38 @@ class ForestManagement(LandModule, MultiBiomassModule):
 
     ##### ROTATION #####
 
-    rotation_length_yrs_start = IntegerField(null=True, blank=True)
-    rotation_length_yrs_w = IntegerField(null=True, blank=True)
-    rotation_length_yrs_wo = IntegerField(null=True, blank=True)
+    rotation_length_yrs_start = IntegerField(null=True, blank=True, default=0)
+    rotation_length_yrs_w = IntegerField(null=True, blank=True, default=0)
+    rotation_length_yrs_wo = IntegerField(null=True, blank=True, default=0)
     rotation_length_yrs_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_rotation_length_yrs_thread")
 
-    rotation_percentage_biomass_for_energy_start = FloatField(null=True, blank=True)
-    rotation_percentage_biomass_for_energy_w = FloatField(null=True, blank=True)
-    rotation_percentage_biomass_for_energy_wo = FloatField(null=True, blank=True)
+    rotation_percentage_biomass_for_energy_start = FloatField(null=True, blank=True, default=0)
+    rotation_percentage_biomass_for_energy_w = FloatField(null=True, blank=True, default=0)
+    rotation_percentage_biomass_for_energy_wo = FloatField(null=True, blank=True, default=0)
     rotation_percentage_biomass_for_energy_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_rotation_percentage_biomass_for_energy_thread")
 
     ##### LOGGING #####
 
-    logging_recurrence_yrs_start = IntegerField(null=True, blank=True)
-    logging_recurrence_yrs_w = IntegerField(null=True, blank=True)
-    logging_recurrence_yrs_wo = IntegerField(null=True, blank=True)
+    logging_recurrence_yrs_start = IntegerField(null=True, blank=True, default=0)
+    logging_recurrence_yrs_w = IntegerField(null=True, blank=True, default=0)
+    logging_recurrence_yrs_wo = IntegerField(null=True, blank=True, default=0)
     logging_recurrence_yrs_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_logging_recurrence_yrs_thread")
 
-    logging_percentage_agb_logged_start = FloatField(null=True, blank=True)
-    logging_percentage_agb_logged_w = FloatField(null=True, blank=True)
-    logging_percentage_agb_logged_wo = FloatField(null=True, blank=True)
+    logging_percentage_agb_logged_start = FloatField(null=True, blank=True, default=0)
+    logging_percentage_agb_logged_w = FloatField(null=True, blank=True, default=0)
+    logging_percentage_agb_logged_wo = FloatField(null=True, blank=True, default=0)
     logging_percentage_agb_logged_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_logging_percentage_agb_logged_thread")
 
-    logging_percentage_biomass_for_energy_start = FloatField(null=True, blank=True)
-    logging_percentage_biomass_for_energy_w = FloatField(null=True, blank=True)
-    logging_percentage_biomass_for_energy_wo = FloatField(null=True, blank=True)
+    logging_percentage_biomass_for_energy_start = FloatField(null=True, blank=True, default=0)
+    logging_percentage_biomass_for_energy_w = FloatField(null=True, blank=True, default=0)
+    logging_percentage_biomass_for_energy_wo = FloatField(null=True, blank=True, default=0)
     logging_percentage_biomass_for_energy_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_logging_percentage_biomass_for_energy_thread")
 
     ##### DEGRADATION #####
 
-    average_yearly_degradation_percentage_start = FloatField(null=True, blank=True)
-    average_yearly_degradation_percentage_w = FloatField(null=True, blank=True)
-    average_yearly_degradation_percentage_wo = FloatField(null=True, blank=True)
+    average_yearly_degradation_percentage_start = FloatField(null=True, blank=True, default=0)
+    average_yearly_degradation_percentage_w = FloatField(null=True, blank=True, default=0)
+    average_yearly_degradation_percentage_wo = FloatField(null=True, blank=True, default=0)
     average_yearly_degradation_percentage_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_average_yearly_degradation_percentage_thread")
 
     ##### TIER 2 #####
