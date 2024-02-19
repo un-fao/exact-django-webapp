@@ -462,7 +462,9 @@ class DeforestationCalculator(BaseCalculator):
         region = project.country.region
         soil_type = project.soil_type
 
-        forest: ForestManagement = module.activity.forestmanagement
+        forest: ForestManagement = module.activity.forestmanagement.first()
+        module_wo: LandModule = getattr(luc.activity, luc.module_type_wo.class_name.lower(), None).first()
+        module_w: LandModule = getattr(luc.activity, luc.module_type_w.class_name.lower(), None).first()
 
         # TODO: Maybe generalise this on a higher level
         if not forest:
@@ -478,41 +480,114 @@ class DeforestationCalculator(BaseCalculator):
 
         mangroves_data = None
 
+        dry_matter_start = luc.dry_matter_start if luc else None
+        dry_matter_w = luc.dry_matter_w if luc else None
+        dry_matter_wo = luc.dry_matter_wo if luc else None
+
         soc_ref = ipcc.SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
 
-        total_biomass_start = ipcc.TotalBiomassAfterDefo.objects.get(**cmc, land_use_type=module.land_use_type_start)
-        total_biomass_end = ipcc.TotalBiomassAfterDefo.objects.get(**cmc, land_use_type=module.land_use_type_w)
+        try:
+            total_biomass_start = ipcc.TotalBiomassAfterDefo.objects.get_or_default(**cmc, land_use_type=module.land_use_type_start)
+        except ipcc.TotalBiomassAfterDefo.DoesNotExist:
+            raise Exception(f"TotalBiomassAfterDefo for {module.land_use_type_start.name} in {climate.name} climate, {moisture.name} moisture, and {region.name} region does not exist")
+
+        try:
+            total_biomass_w = ipcc.TotalBiomassAfterDefo.objects.get_or_default(**cmc, land_use_type=module.land_use_type_w)
+        except ipcc.TotalBiomassAfterDefo.DoesNotExist:
+            raise Exception(f"TotalBiomassAfterDefo for {module.land_use_type_w.name} in {climate.name} climate, {moisture.name} moisture, and {region.name} region does not exist")
+
+        try:
+            total_biomass_wo = ipcc.TotalBiomassAfterDefo.objects.get_or_default(**cmc, land_use_type=module.land_use_type_wo)
+        except ipcc.TotalBiomassAfterDefo.DoesNotExist:
+            raise Exception(f"TotalBiomassAfterDefo for {module.land_use_type_wo.name} in {climate.name} climate, {moisture.name} moisture, and {region.name} region does not exist")
 
         # NOTE: Maybe merge the mangroves and deforestation IPCC tables into one table?
         # TODO: Review with new forest management data
-        if self.data.vegetation_type != utils.MANGROVES:
-            defo_table_start = ipcc.LitterDeadwoodCarbonStock.objects.get(vegetation_type=module.land_use_type_start)
-            defo_table_end = ipcc.LitterDeadwoodCarbonStock.objects.get(vegetation_type=module.land_use_type_w)
+        if forest.land_use_type_start.name != utils.MANGROVES:
 
-            ag_biomass_start = ipcc.ForestManagementAGB.objects.get(climate=climate, region=region, forest_type=forest.forest_type, land_use_type=forest.land_use_type_start)
-            ag_biomass_end = ipcc.ForestManagementAGB.objects.get(continent=region, vegetation_type=module.land_use_type_w)
+            try:
+                litter_dw_start = ipcc.LitterDeadwoodCarbonStock.objects.get(land_use_type=module.land_use_type_start, climate=climate, forest_type=forest.forest_type)
+            except ipcc.LitterDeadwoodCarbonStock.DoesNotExist:
+                raise Exception(f"LitterDeadwoodCarbonStock for {module.land_use_type_start.name} in {climate.name} climate, {forest.forest_type.name} forest type does not exist")
 
-            bg_biomass_start = ipcc.ForestManagementBGB.objects.get_first_above_threshold(
-                continent=region,
-                vegetation_type=module.land_use_type_start,
-                threshold=ag_biomass_start.value,
-            )
-            bg_biomass_end = ipcc.ForestManagementBGB.objects.get_first_above_threshold(
-                continent=region,
-                vegetation_type=module.land_use_type_w,
-                threshold=ag_biomass_end.value,
-            )
+            try:
+                litter_dw_w = ipcc.LitterDeadwoodCarbonStock.objects.get(land_use_type=module.land_use_type_w, climate=climate, forest_type=forest.forest_type)
+            except ipcc.LitterDeadwoodCarbonStock.DoesNotExist:
+                raise Exception(f"LitterDeadwoodCarbonStock for {module.land_use_type_w.name} in {climate.name} climate, {forest.forest_type.name} forest type does not exist")
+            try:
+                litter_dw_wo = ipcc.LitterDeadwoodCarbonStock.objects.get(land_use_type=module.land_use_type_wo, climate=climate, forest_type=forest.forest_type)
+            except ipcc.LitterDeadwoodCarbonStock.DoesNotExist:
+                raise Exception(f"LitterDeadwoodCarbonStock for {module.land_use_type_wo.name} in {climate.name} climate, {forest.forest_type.name} forest type does not exist")
+
+            agb_start = ipcc.ForestManagementAGB.objects.filter(climate=climate, region=region, forest_type=forest.forest_type, land_use_type=forest.land_use_type_start, forest_condition_type__name="Secondary >20 Years").first()
+            agb_w = 0
+            agb_wo = 0
+
+            try:
+                agb_w = ipcc.ForestManagementAGB.objects.get(climate=climate, region=region, forest_type=forest.forest_type, land_use_type=forest.land_use_type_w, forest_condition_type__name="Secondary >20 Years")
+            except ipcc.ForestManagementAGB.DoesNotExist:
+                raise Exception(f"ForestManagementAGB for {forest.land_use_type_w.name} in {climate.name} climate, {region.name} region, {forest.forest_type.name} forest type, and Secondary >20 Years forest condition type does not exist")
+            try:
+                agb_wo = ipcc.ForestManagementAGB.objects.get(climate=climate, region=region, forest_type=forest.forest_type, land_use_type=forest.land_use_type_wo, forest_condition_type__name="Secondary >20 Years")
+            except ipcc.ForestManagementAGB.DoesNotExist:
+                raise Exception(f"ForestManagementAGB for {forest.land_use_type_wo.name} in {climate.name} climate, {region.name} region, {forest.forest_type.name} forest type, and Secondary >20 Years forest condition type does not exist")
+
+            bgb_start = ipcc.ForestManagementBGB.objects.get_first_above_threshold(region=region, land_use_type=module.land_use_type_start, threshold=statistics.mean([agb_start.agb_min, agb_start.agb_max]), climate=climate, forest_type=forest.forest_type)
+            if not bgb_start:
+                raise Exception(f"ForestManagementBGB for {module.land_use_type_start.name} in {climate.name} climate, {region.name} region, and {forest.forest_type.name} forest type does not exist")
+
+            bgb_w = ipcc.ForestManagementBGB.objects.get_first_above_threshold(region=region, land_use_type=module.land_use_type_start, threshold=statistics.mean([agb_w.agb_min, agb_w.agb_max]), climate=climate, forest_type=forest.forest_type)
+            if not bgb_w:
+                raise Exception(f"ForestManagementBGB for {module.land_use_type_w.name} in {climate.name} climate, {region.name} region, and {forest.forest_type.name} forest type does not exist")
+
+            bgb_wo = ipcc.ForestManagementBGB.objects.get_first_above_threshold(region=region, land_use_type=module.land_use_type_w, threshold=statistics.mean([agb_wo.agb_min, agb_wo.agb_max]), climate=climate, forest_type=forest.forest_type)
+            if not bgb_wo:
+                raise Exception(f"ForestManagementBGB for {module.land_use_type_wo.name} in {climate.name} climate, {region.name} region, and {forest.forest_type.name} forest type does not exist")
         else:
             mangroves_data = ipcc.DataOnMangrove.objects.get(continent=region)
 
-        combustion_factor_start = ipcc.ForestCombustionFactor.objects.get(vegetation_type=module.land_use_type_start)
-        combustion_factor_end = ipcc.ForestCombustionFactor.objects.get(vegetation_type=module.land_use_type_w)
+        combustion_factor_start = ipcc.ForestCombustionFactor.objects.get(land_use_type=module.land_use_type_start, climate=climate, forest_type=forest.forest_type)
+        combustion_factor_w = ipcc.ForestCombustionFactor.objects.get(land_use_type=module.land_use_type_w, climate=climate, forest_type=forest.forest_type)
+        combustion_factor_wo = ipcc.ForestCombustionFactor.objects.get(land_use_type=module.land_use_type_wo, climate=climate, forest_type=forest.forest_type)
 
         moisture_factor = ipcc.DefaultEmissionFactor.objects.filter(moisture=moisture)
-        moisture_factor = moisture_factor.filter(Q(input__name__icontains="Other N Inputs") | Q(input__name__icontains="All N Inputs")).first()
+        moisture_factor = moisture_factor.filter(Q(organic_input_type__name__icontains="Other N Inputs") | Q(organic_input_type__name__icontains="All N Inputs")).first()
 
-        flu_start = ipcc.LandUseCarbonStockExchangeFactor.objects.get(climate=climate, moisture=moisture, land_use_type=module.land_use_type_start)
-        flu_end = ipcc.LandUseCarbonStockExchangeFactor.objects.get(climate=climate, moisture=moisture, land_use_type=module.land_use_type_w)
+        flu_start = ipcc.LandUseCarbonStockExchangeFactor.objects.get_or_default(climate=climate, moisture=moisture, land_use_type=module.land_use_type_start)
+        flu_w = ipcc.LandUseCarbonStockExchangeFactor.objects.get_or_default(climate=climate, moisture=moisture, land_use_type=module.land_use_type_w)
+        flu_wo = ipcc.LandUseCarbonStockExchangeFactor.objects.get_or_default(climate=climate, moisture=moisture, land_use_type=module.land_use_type_wo)
+
+        # BUG: Values for scenarios should be taken from the respective modules
+        fi_start = SimpleNamespace(value=1)
+        fi_w = SimpleNamespace(value=1)
+        fi_wo = SimpleNamespace(value=1)
+
+        fmg_start = SimpleNamespace(value=1)
+        fmg_w = SimpleNamespace(value=1)
+        fmg_wo = SimpleNamespace(value=1)
+
+        soc_w = soc_ref
+        soc_wo = soc_ref
+
+        if luc.module_type_w.name == "Grassland":
+            soc_w = ipcc.GrasslandStockExchangeFactor.objects.get(
+                grassland_management_type=module_w.grassland_management_type_start,
+                climate=project.climate,
+            )
+            flu_w = SimpleNamespace(value=soc_w.flu)
+            fi_w = SimpleNamespace(value=soc_w.fi)
+            fmg_w = SimpleNamespace(value=soc_w.fmg)
+            soc_w = SimpleNamespace(value=soc_w.flu * soc_w.fi * soc_w.fmg)
+
+        if luc.module_type_wo.name == "Grassland":
+            soc_wo = ipcc.GrasslandStockExchangeFactor.objects.get(
+                grassland_management_type=module_wo.grassland_management_type_start,
+                climate=project.climate,
+            )
+            flu_wo = SimpleNamespace(value=soc_wo.flu)
+            fi_wo = SimpleNamespace(value=soc_wo.fi)
+            fmg_wo = SimpleNamespace(value=soc_wo.fmg)
+            soc_wo = SimpleNamespace(value=soc_wo.flu * soc_wo.fi * soc_wo.fmg)
 
         self.inputs_start = [
             luc.area,
@@ -529,22 +604,40 @@ class DeforestationCalculator(BaseCalculator):
             combustion_factor_start.ch4,
             combustion_factor_start.value,
             moisture_factor.value,
-            defo_table_start.litter if mangroves_data is None else mangroves_data.litter,
+            litter_dw_start.litter if mangroves_data is None else mangroves_data.litter,
             forest.litter_t2_start,
-            defo_table_start.dw if mangroves_data is None else mangroves_data.dw,
+            litter_dw_start.dw if mangroves_data is None else mangroves_data.dw,
             forest.deadwood_t2_start,
-            module.hwp_start,  # TODO: What's hwp in the new forest? # FIXME: This is dry_matter from LUC module
+            dry_matter_start,
             utils.MANGROVE_FACTOR if mangroves_data is not None else utils.NON_MANGROVE_FACTOR,
-            forest.agb_t2_start,
             forest.bgb_t2_start,
-            flu_start.value,
-            mangroves_data.agb_c if mangroves_data is not None else ag_biomass_start.value,
-            mangroves_data.bgb if mangroves_data is not None else bg_biomass_start.value,
+            forest.agb_t2_start,
+            statistics.mean([agb_start.agb_min, agb_start.agb_max]),
+            bgb_start.value,
             utils.CN_RATIO_GRASSLAND,  # TODO: Ratio might be different, see OtherLandUseCalculator
-            module.soc_after_defo_t2_start,  # TODO: soil after defo t2 #FIXME:
+            0,  # NOTE: SOC After Defo T2
             soc_ref.value,
             project.soc_ref_t2,
+            module.fmg_t2_start,
+            module.fmg_t2_start,
+            module.fi_t2_start,
+            module.fi_t2_start,
+            module.flu_t2_start,
+            module.flu_t2_start,
+            forest.soc_t2_start,
+            module.soc_t2_start,
+            fmg_start.value,
+            fmg_start.value,
+            fi_start.value,
+            fi_start.value,
+            flu_start.value,
+            flu_start.value,
+            soc_ref.value,
+            soc_ref.value,
         ]
+
+        math_start = MathDeforestation(*self.inputs_start)
+        math_start.calculate_emissions()
 
         self.inputs_w = [
             0,
@@ -552,31 +645,49 @@ class DeforestationCalculator(BaseCalculator):
             project.implementation_years,
             project.capitalization_years,
             change_rate.name,
-            total_biomass_end.value,
-            forest.get_biomass_t2(utils.ScenarioTypes.WITH),
+            total_biomass_w.value,
+            forest.get_biomass_t2(utils.ScenarioTypes.START),
             project.gw_potential.n2o,
             project.gw_potential.ch4,
-            luc.is_fire_used_w,
-            combustion_factor_end.n2o,
-            combustion_factor_end.ch4,
-            combustion_factor_end.value,
+            luc.is_fire_used_start,
+            combustion_factor_w.n2o,
+            combustion_factor_w.ch4,
+            combustion_factor_w.value,
             moisture_factor.value,
-            defo_table_end.litter if mangroves_data is None else mangroves_data.litter,
-            forest.litter_t2_w,
-            defo_table_end.dw if mangroves_data is None else mangroves_data.dw,
-            forest.deadwood_t2_w,
-            module.hwp_end,
+            litter_dw_w.litter if mangroves_data is None else mangroves_data.litter,
+            forest.litter_t2_start,
+            litter_dw_w.dw if mangroves_data is None else mangroves_data.dw,
+            forest.deadwood_t2_start,
+            dry_matter_w,
             utils.MANGROVE_FACTOR if mangroves_data is not None else utils.NON_MANGROVE_FACTOR,
-            forest.agb_t2_w,
-            forest.bgb_t2_w,
-            flu_end.value,
-            mangroves_data.agb_c if mangroves_data is not None else ag_biomass_end.value,
-            mangroves_data.bgb if mangroves_data is not None else bg_biomass_end.value,
-            utils.CN_RATIO_GRASSLAND,
-            module.soc_after_defo_t2_end,  # soil after defo t2
+            forest.bgb_t2_start,
+            forest.agb_t2_start,
+            statistics.mean([agb_w.agb_min, agb_w.agb_max]),
+            bgb_w.value,
+            utils.CN_RATIO_GRASSLAND,  # TODO: Ratio might be different, see OtherLandUseCalculator
+            module_w.soc_t2_start,  # NOTE: SOC After Defo T2
             soc_ref.value,
             project.soc_ref_t2,
+            module.fmg_t2_start,
+            module.fmg_t2_w,
+            module.fi_t2_start,
+            module.fi_t2_w,
+            module.flu_t2_start,
+            module.flu_t2_w,
+            forest.soc_t2_start,
+            module_w.soc_t2_w,
+            fmg_start.value,
+            fmg_w.value,
+            fi_start.value,
+            fi_w.value,
+            flu_start.value,
+            flu_w.value,
+            soc_ref.value,
+            soc_w.value,
         ]
+
+        math_w = MathDeforestation(*self.inputs_w)
+        math_w.calculate_emissions()
 
         self.inputs_wo = [
             0,
@@ -584,38 +695,48 @@ class DeforestationCalculator(BaseCalculator):
             project.implementation_years,
             project.capitalization_years,
             change_rate.name,
-            total_biomass_start.value,
-            forest.get_biomass_t2(utils.ScenarioTypes.WITHOUT),
+            total_biomass_wo.value,
+            forest.get_biomass_t2(utils.ScenarioTypes.START),
             project.gw_potential.n2o,
             project.gw_potential.ch4,
             luc.is_fire_used_start,
-            combustion_factor_start.n2o,
-            combustion_factor_start.ch4,
-            combustion_factor_start.value,
+            combustion_factor_wo.n2o,
+            combustion_factor_wo.ch4,
+            combustion_factor_wo.value,
             moisture_factor.value,
-            defo_table_start.litter if mangroves_data is None else mangroves_data.litter,
-            forest.litter_t2_wo,
-            defo_table_start.dw if mangroves_data is None else mangroves_data.dw,
-            forest.deadwood_t2_wo,
-            module.hwp_start,
+            litter_dw_wo.litter if mangroves_data is None else mangroves_data.litter,
+            forest.litter_t2_start,
+            litter_dw_wo.dw if mangroves_data is None else mangroves_data.dw,
+            forest.deadwood_t2_start,
+            dry_matter_wo,
             utils.MANGROVE_FACTOR if mangroves_data is not None else utils.NON_MANGROVE_FACTOR,
-            forest.agb_t2_wo,
-            forest.bgb_t2_wo,
-            flu_start.value,
-            mangroves_data.agb_c if mangroves_data is not None else ag_biomass_start.value,
-            mangroves_data.bgb if mangroves_data is not None else bg_biomass_start.value,
+            forest.bgb_t2_start,
+            forest.agb_t2_start,
+            statistics.mean([agb_wo.agb_min, agb_wo.agb_max]),
+            bgb_wo.value,
             utils.CN_RATIO_GRASSLAND,
-            module.soc_after_defo_t2_start,  # soil after defo t2
+            module_wo.soc_t2_start,  # NOTE: SOC After Defo T2
             soc_ref.value,
             project.soc_ref_t2,
+            module.fmg_t2_start,
+            module.fmg_t2_wo,
+            module.fi_t2_start,
+            module.fi_t2_wo,
+            module.flu_t2_start,
+            module.flu_t2_wo,
+            forest.soc_t2_start,
+            module_wo.soc_t2_wo,
+            fmg_start.value,
+            fmg_wo.value,
+            fi_start.value,
+            fi_wo.value,
+            flu_start.value,
+            flu_wo.value,
+            soc_ref.value,
+            soc_wo.value,
         ]
 
-        math_start = MathDeforestation(*self.inputs_start)
-        math_w = MathDeforestation(*self.inputs_w)
         math_wo = MathDeforestation(*self.inputs_wo)
-
-        math_start.calculate_emissions()
-        math_w.calculate_emissions()
         math_wo.calculate_emissions()
 
         res_start = math_start.result if math_start else MathResult(project.implementation_years, project.capitalization_years)
@@ -4632,7 +4753,7 @@ class ForestManagementCalculator(BaseCalculator):
 
         # TODO: Review
         if luc:
-            land_use_type = input.land_use_type if luc.module_type_start.class_name == "ForestManagement" else input.land_use_type_start
+            land_use_type = input.land_use_type_start if luc.module_type_start.class_name == "ForestManagement" else input.land_use_type_start
             land_use_type = LandUseType.objects.get(name=land_use_type.name)
         else:
             land_use_type = input.land_use_type_start
