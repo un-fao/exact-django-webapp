@@ -338,9 +338,9 @@ if TEST_GRASSLAND:
     total_grasslands = grassland.__len__()
     passed_grasslands = 0
 
-    print("Testing Grassland...")
+    print("Testing module...")
     for i, grassland in enumerate(grassland):
-        # print(f"\n\nTesting Grassland {i+1}...")
+        # print(f"\n\nTesting module {i+1}...")
         # print("-----------------------------------")
 
         results = CalculatorFactory().calculate_result(grassland)

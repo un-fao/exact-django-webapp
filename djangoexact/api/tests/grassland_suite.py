@@ -80,9 +80,9 @@ grassland: Grassland = GrasslandFactory.create_batch(BATCH_SIZE, activity=a)
 total_livestocks = grassland.__len__()
 passed_livestocks = 0
 
-print("Testing Grassland...")
+print("Testing module...")
 for i, grassland in enumerate(grassland):
-    print(f"\n\nTesting Grassland {i+1}...")
+    print(f"\n\nTesting module {i+1}...")
     print("-----------------------------------")
 
     print(f"grassland: {grassland}")
