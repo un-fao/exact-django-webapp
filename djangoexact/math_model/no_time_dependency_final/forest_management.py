@@ -42,7 +42,6 @@ def create_agb_matrix(years_impl, years_cap, delta_agb_yearly_below_20, delta_ag
         for j in range(i, years_total):
             agb_matrix[i, j] = agb_start + delta_agb_matrix[i][j] + np.sum(delta_agb_matrix[i, i:j])
 
-    # NOTE: no check is made to verify that the agb is not over the maximum value possible
     return agb_matrix, delta_agb_matrix
 
 
@@ -65,6 +64,9 @@ def create_litter_deadwood_matrix(years_impl, years_cap, delta_agb_yearly_below_
             agb_matrix[i, j] = agb_start + delta_agb_matrix[i][j] + np.sum(delta_agb_matrix[i, i:j])
 
     agb_matrix, delta_agb_matrix = check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value)
+
+    #plot_annotated_matrix(agb_matrix)
+    #plot_annotated_matrix(delta_agb_matrix)
 
     return agb_matrix, delta_agb_matrix
 
@@ -127,12 +129,12 @@ def plot_matrix(matrix):
 def check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value):
     for i in range(agb_matrix.shape[0]):
         for j in range(i, agb_matrix.shape[1]):
-            if agb_matrix[i][j] > max_agb_value:
+            if agb_matrix[i][j] >= max_agb_value:
                 # Update agb_matrix
                 agb_matrix[i][j:] = max_agb_value
 
                 # Update delta_agb_matrix
-                if j == 0:
+                if j == 0 or i==j:
                     delta_agb_matrix[i][j] = 0
                 else:
                     delta_agb_matrix[i][j] = max_agb_value - agb_matrix[i][j - 1]
@@ -209,12 +211,14 @@ def calculate_rotation_effect(original_agb_matrix, original_delta_agb_matrix, ma
     for row_index in range(maximum_row):
         # sum up the values from column 0 to column recurrence excluded, then multiply by percentage
         i = 1
-        while row_start + start_year + recurrence * i <= maximum_column:
+        while row_start + start_year + recurrence * i < maximum_column:
             row = agb_matrix[row_index]
             agb_matrix, delta_agb_matrix = check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value)
 
             row_at_maximum = max(agb_matrix[row_index]) == max_agb_value
 
+            print(row_index)
+            print(row_start + recurrence * i)
             # TODO: make the function a bit NICERRRRR
             if results.get(row_start + recurrence * i) is None:
                 results[row_start + recurrence * i] = -row[row_start + recurrence * i - 1] * percentage
@@ -662,8 +666,8 @@ class ForestManagement(BaseModule):
             return
 
 
-# w = [2, 8, 'D', 0, 100.0, 7, 1, 1.0, 125.0, 0.284, 0.284, None, None, 131.0, None, 2.7, None, 2.7, None, 131.0, None,[], [], [], None, None, None, 1, 5.9, None, 8.0, None, 50.0, None, None, None, None, 1, 1, 1, 28.0, 265.0]
-# wo = [2, 8, 'D', 0, 100.0, 7, 1, 1.0, 125.0, 0.284, 0.284, None, None, 131.0, None, 2.7, None, 2.7, None, 131.0, None,[], [], [], None, None, None, 1, 5.9, None, 8.0, None, 50.0, None, None, None, None, 1, 1, 1, 28.0, 265.0]
+# w = [10, 5, 'D', 0, 100.0, 10, 0, 0.0, 125.0, 0.207, 0.207, None, None, 131.6, None, 2.7, None, 2.7, None, 131.6, None, [], [], [], 0, 0.0, 0.0, 0, 4.8, 4.8, 4.8, None, 14.8, 14.8, 14.8, None, 40.0, None, None, None, None, 1, 1, 1, 28.0, 265.0]
+# wo = [10, 5, 'D', 0, 100.0, 5, 0, 0.0, 125.0, 0.207, 0.207, None, None, 131.6, None, 2.7, None, 2.7, None, 131.6, None, [], [], [], 0, 0.0, 0.0, 0, 4.8, 4.8, 4.8, None, 14.8, 14.8, 14.8, None, 40.0, None, None, None, None, 1, 1, 1, 28.0, 265.0]
 
 # f_w = ForestManagement(*w)
 # f_wo = ForestManagement(*wo)
