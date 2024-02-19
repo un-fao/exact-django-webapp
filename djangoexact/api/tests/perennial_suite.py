@@ -85,9 +85,9 @@ perennials: PerennialCropping = PerennialCroppingFactory.create_batch(BATCH_SIZE
 total_livestocks = perennials.__len__()
 passed_livestocks = 0
 
-print("Testing Livestock...")
+print("Testing module...")
 for i, perennial in enumerate(perennials):
-    print(f"\n\nTesting Livestock {i+1}...")
+    print(f"\n\nTesting module {i+1}...")
     print("-----------------------------------")
 
     print(f"livestock: {perennial}")
