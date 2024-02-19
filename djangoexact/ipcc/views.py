@@ -25,8 +25,8 @@ def generic_viewset(_model: Model):
 
         def get_queryset(self):
 
-            # If list operation, filter out inactive objects
-            if self.action == "list":
+            # If list operation, filter out inactive objects, unless ?filter_inactive=true
+            if self.action == "list" and not self.request.query_params.get("filter_inactive"):
                 try:
                     is_active_field = self.queryset.model._meta.get_field("is_active")
                     return self.queryset.filter(is_active=True)
