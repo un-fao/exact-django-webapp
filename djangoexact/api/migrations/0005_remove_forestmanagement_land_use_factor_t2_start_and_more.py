@@ -6,32 +6,32 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0004_alter_forestmanagement_logging_start_year_t2_start_and_more'),
+        ("api", "0004_alter_forestmanagement_logging_start_year_t2_start_and_more"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='forestmanagement',
-            name='land_use_factor_t2_start',
+            model_name="forestmanagement",
+            name="land_use_factor_t2_start",
         ),
         migrations.RemoveField(
-            model_name='forestmanagement',
-            name='land_use_factor_t2_w',
+            model_name="forestmanagement",
+            name="land_use_factor_t2_w",
         ),
         migrations.RemoveField(
-            model_name='forestmanagement',
-            name='land_use_factor_t2_wo',
+            model_name="forestmanagement",
+            name="land_use_factor_t2_wo",
         ),
         migrations.RemoveField(
-            model_name='forestmanagement',
-            name='soil_carbon_t2_start',
+            model_name="forestmanagement",
+            name="soil_carbon_t2_start",
         ),
         migrations.RemoveField(
-            model_name='forestmanagement',
-            name='soil_carbon_t2_w',
+            model_name="forestmanagement",
+            name="soil_carbon_t2_w",
         ),
         migrations.RemoveField(
-            model_name='forestmanagement',
-            name='soil_carbon_t2_wo',
+            model_name="forestmanagement",
+            name="soil_carbon_t2_wo",
         ),
     ]
