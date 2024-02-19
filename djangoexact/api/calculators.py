@@ -4725,6 +4725,8 @@ class ForestManagementCalculator(BaseCalculator):
         agb_growth_under_20_w = agb_growth_over_20_w
         agb_start_w = agb_max_w
         flu_w = SimpleNamespace(value=1)
+        litter_dw_start_w = litter_dw
+        litter_dw_max_w = litter_dw
 
         # TODO: What reference values do I choose for the start scenario?
         # TODO: Add litter start, litter end. Affo -> start=0, end=reference_values. Forest -> start=reference_values, end=refernce_values
@@ -4734,6 +4736,8 @@ class ForestManagementCalculator(BaseCalculator):
         agb_growth_under_20_wo = agb_growth_over_20_wo
         agb_start_wo = agb_max_wo
         flu_wo = SimpleNamespace(value=1)
+        litter_dw_start_wo = litter_dw
+        litter_dw_max_wo = litter_dw
         # END - Reference Values for forest remaining forest
 
         if is_afforestation_w:
@@ -4742,6 +4746,7 @@ class ForestManagementCalculator(BaseCalculator):
             agb_growth_over_20_w = agb_growth_under_20_w
             agb_start_w = 0
             flu_w = flu_start
+            litter_dw_start_w = SimpleNamespace(litter=0, dw=0)
 
         if is_afforestation_wo:
             agb_max_wo = statistics.mean([agb_over_20.agb_min, agb_over_20.agb_max]) if project.implementation_years > 20 else statistics.mean([agb_under_20.agb_min, agb_under_20.agb_max])
@@ -4749,6 +4754,7 @@ class ForestManagementCalculator(BaseCalculator):
             agb_growth_over_20_wo = agb_growth_under_20_wo
             agb_start_wo = 0
             flu_wo = flu_start
+            litter_dw_start_wo = SimpleNamespace(litter=0, dw=0)
 
         disturbances: list[ForestDisturbance] = input.disturbances.all()
 
@@ -4785,8 +4791,12 @@ class ForestManagementCalculator(BaseCalculator):
             forest_mgmt.logging_percentage_biomass_for_energy_w,
             forest_mgmt.logging_start_year_t2_w,
             litter_dw.litter,
+            litter_dw_start_w.litter,
+            litter_dw_max_w.litter,
             forest_mgmt.litter_t2_w,
             litter_dw.dw,
+            litter_dw_start_w.dw,
+            litter_dw_max_w.dw,
             forest_mgmt.deadwood_t2_w,
             socref.value,
             project.soc_ref_t2,
@@ -4833,8 +4843,12 @@ class ForestManagementCalculator(BaseCalculator):
             forest_mgmt.logging_percentage_biomass_for_energy_wo,
             forest_mgmt.logging_start_year_t2_wo,
             litter_dw.litter,
+            litter_dw_start_wo.litter,
+            litter_dw_max_wo.litter,
             forest_mgmt.litter_t2_wo,
             litter_dw.dw,
+            litter_dw_start_wo.dw,
+            litter_dw_max_wo.dw,
             forest_mgmt.deadwood_t2_wo,
             socref.value,
             project.soc_ref_t2,
