@@ -527,7 +527,7 @@ class ForestManagement(BaseModule):
                     self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in nitrous_fire_component], activity=ActivityTypes.ROTATION))
                     self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in methane_fire_component], activity=ActivityTypes.ROTATION))
 
-                else:
+                elif self.disturbance_recurrence!=[] or self.logging_recurrence:
                     # NOTE: here we can add percentage_fire easily, for now defaulted to 0
                     for recurrence, percentage, percentage_fire, start_year in zip(self.disturbance_recurrence, self.disturbance_percentage, [0 for i in self.disturbance_percentage], self.disturbance_year_of_start):
                         # NOTE: As logging and disturbance are the same, we can use the same function, also the variable names can be logging due to this
