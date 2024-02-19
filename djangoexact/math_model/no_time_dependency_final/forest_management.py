@@ -238,8 +238,8 @@ def calculate_rotation_effect(original_agb_matrix, original_delta_agb_matrix, ma
     # order results by key
     results = dict(sorted(results.items()))
 
-    plot_matrix(agb_matrix)
-    plot_matrix(rotation_impact)
+    # plot_matrix(agb_matrix)
+    # plot_matrix(rotation_impact)
 
     # add to each year
     return results, rotation_matrix, delta_agb_matrix
@@ -677,3 +677,12 @@ class ForestManagement(BaseModule):
 
 # f_w.calculate_emissions()
 # f_wo.calculate_emissions()
+
+w = [9, 4, "D", 0, 107.0, 7, 0, 1.0, 125.0, 0.284, 0.284, None, None, 131.0, None, 2.7, None, 2.7, None, 131.0, None, [], [], [], 0, 0.0, 0.0, 0, 5.9, 5.9, 5.9, None, 8.0, 8.0, 8.0, None, 68.0, None, None, None, None, 1, 1, 1, 28.0, 265.0]
+wo = [9, 4, "D", 0, 107.0, 7, 0, 1.0, 125.0, 0.284, 0.284, None, None, 131.0, None, 2.7, None, 2.7, None, 131.0, None, [], [], [], 0, 0.0, 0.0, 0, 5.9, 5.9, 5.9, None, 8.0, 8.0, 8.0, None, 68.0, None, None, None, None, 1, 1, 1, 28.0, 265.0]
+
+f_w = ForestManagement(*w)
+f_wo = ForestManagement(*wo)
+
+f_w.calculate_emissions()
+f_wo.calculate_emissions()
