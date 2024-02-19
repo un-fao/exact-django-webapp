@@ -39,6 +39,7 @@ from .models import (
     LargeFishery,
     Livestock,
     MacroInputType,
+    MinorSeasonAnnualCropping,
     MinorSeasonFloodedRice,
     MinorSeasonPerennialCropping,
     ModuleType,
@@ -647,6 +648,39 @@ class GrasslandReadSerializer(LandModuleReadSerializer):
 
 
 # Annual Cropping
+
+
+class MinorSeasonAnnualCroppingWriteSerializer(SubmoduleBaseSerializer):
+    class Meta:
+        model = MinorSeasonAnnualCropping
+        fields = "__all__"
+        ref_name = "MinorSeasonAnnualCropping"
+        mandatory_fields = [
+            "land_use_type",
+            "tillage_management_type",
+            "organic_input_type",
+            "residue_management_type",
+        ]
+
+    def validate(self, data):
+        mandatory_fields = []
+
+        lut_scenarios = get_filled_scenarios(data, ["land_use_type"])
+
+        for scenario in lut_scenarios:
+            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
+
+        if not are_fields_filled(data, mandatory_fields):
+            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
+
+        return super().validate(data)
+
+
+class MinorSeasonAnnualCroppingReadSerializer(SubmoduleBaseSerializer):
+    class Meta:
+        model = MinorSeasonAnnualCropping
+        fields = "__all__"
+        ref_name = "MinorSeasonAnnualCropping"
 
 
 class AnnualCroppingWriteSerializer(LandModuleWriteSerializer):

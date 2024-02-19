@@ -926,8 +926,33 @@ class PerennialCropping(PerennialCrop, LandModule, DoubleBiomassModule):
     pass
 
 
-class MinorSeasonPerennialCropping(PerennialCrop, LandSubmodule):
+class CroplandMinorSeason(Model):
+    class Meta:
+        abstract = True
+
+    land_use_type_start = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_start", limit_choices_to={"land_use_type__parent__class_name": "PerennialCropping"})
+    land_use_type_w = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_w", limit_choices_to={"land_use_type__parent__class_name": "PerennialCropping"})
+    land_use_type_wo = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_wo", limit_choices_to={"land_use_type__parent__class_name": "PerennialCropping"})
+
+    residue_management_type_start = ForeignKey(ResidueManagementType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_residue_management_type_start")
+    residue_management_type_w = ForeignKey(ResidueManagementType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_residue_management_type_w")
+    residue_management_type_wo = ForeignKey(ResidueManagementType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_residue_management_type_wo")
+
+    yield_start = FloatField(null=True, blank=True)
+    yield_w = FloatField(null=True, blank=True)
+    yield_wo = FloatField(null=True, blank=True)
+
+    biomass_factor_t2_start = FloatField(null=True, blank=True)
+    biomass_factor_t2_w = FloatField(null=True, blank=True)
+    biomass_factor_t2_wo = FloatField(null=True, blank=True)
+
+
+class MinorSeasonPerennialCropping(CroplandMinorSeason, LandSubmodule):
     parent = ForeignKey(PerennialCropping, on_delete=CASCADE, related_name="minor_seasons", null=True, blank=True)
+
+
+class MinorSeasonAnnualCropping(CroplandMinorSeason, LandSubmodule):
+    parent = ForeignKey(AnnualCropping, on_delete=CASCADE, related_name="minor_seasons", null=True, blank=True)
 
 
 class Rice(Model):
