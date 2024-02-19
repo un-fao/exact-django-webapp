@@ -87,6 +87,7 @@ def create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, bgb_ratio_under_thr
 
 
 def plot_matrix(matrix):
+    import math
     # Number of rows and columns in the matrix
     num_rows, num_cols = matrix.shape
 
@@ -107,7 +108,7 @@ def plot_matrix(matrix):
         # Add text labels inside bars
         for i, (value, cum_value) in enumerate(zip(matrix[row], cumulative_height)):
             if value != 0:  # Skip label if value is zero
-                plt.text(i, cum_value + value / 2, str(value), ha="center", va="center")
+                plt.text(i, cum_value + value / 2, str(round(value, 2)), ha="center", va="center")
 
         # Update cumulative height
         cumulative_height += matrix[row]
@@ -203,6 +204,7 @@ def calculate_rotation_effect(original_agb_matrix, original_delta_agb_matrix, ma
             agb_matrix[row_index][row_index:] -= max_agb_value
             rotation_matrix[row_index][row_index] = -max_agb_value
             results[row_index] = -max_agb_value * percentage
+            rotation_impact[row_index, row_index] = -max_agb_value
 
     agb_matrix, delta_agb_matrix = check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value)
 
@@ -216,9 +218,6 @@ def calculate_rotation_effect(original_agb_matrix, original_delta_agb_matrix, ma
             agb_matrix, delta_agb_matrix = check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value)
 
             row_at_maximum = max(agb_matrix[row_index]) == max_agb_value
-
-            print(row_index)
-            print(row_start + recurrence * i)
             # TODO: make the function a bit NICERRRRR
             if results.get(row_start + recurrence * i) is None:
                 results[row_start + recurrence * i] = -row[row_start + recurrence * i - 1] * percentage
@@ -238,7 +237,9 @@ def calculate_rotation_effect(original_agb_matrix, original_delta_agb_matrix, ma
     # order results by key
     results = dict(sorted(results.items()))
 
-    print(results)
+    plot_matrix(agb_matrix)
+    plot_matrix(rotation_impact)
+
 
     # add to each year
     return results, rotation_matrix, delta_agb_matrix
@@ -313,7 +314,7 @@ def plot_annotated_matrix(matrix):
     # Create the plot
     fig, ax = plt.subplots()
     # Using matshow to display the matrix
-    cax = ax.matshow(np_matrix, cmap="viridis")
+    cax = ax.matshow(np_matrix, cmap="Dark2")
 
     # Add a color bar
     fig.colorbar(cax)
@@ -495,6 +496,8 @@ class ForestManagement(BaseModule):
                     bgb_matrix, delta_bgb_matrix = create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, self.bgb_ratio_under_threshold, self.bgb_ratio_over_threshold, self.bgb_ratio_threshold, self.bgb_start)
 
                 # plot_annotated_matrix(agb_matrix)
+                # plot_annotated_matrix(delta_agb_matrix)
+                # plot_annotated_matrix(agb_matrix)
                 # plot_annotated_matrix(bgb_matrix)
                 # agb_matrix, delta_agb_matrix = check_agb_matrices(agb_matrix, delta_agb_matrix, self.max_agb_value)
                 # if there is rotation there is not logging or disturbance
@@ -506,17 +509,17 @@ class ForestManagement(BaseModule):
                     rotation_times_hectares_agb = multiply_matrix_by_matrix(rotation_matrix_agb, self.hectares_matrix)
                     rotation_times_hectares_bgb = multiply_matrix_by_matrix(rotation_matrix_bgb, self.hectares_matrix)
 
-                    print(rotation_times_hectares_agb)
-                    print(rotation_times_hectares_bgb)
+                    # plot_annotated_matrix(rotation_matrix_agb)
+                    # plot_annotated_matrix(delta_agb_matrix)
                     # NOTE: which one is it??!?!? This one or the one below
-                    rotation_yearly_emissions_agb = [x * -44 / 12 * (1 - self.rotation_percentage_energy) for x in rotation_times_hectares_agb]
+                    rotation_yearly_emissions_agb = [x * 44 / 12 * (1 - self.rotation_percentage_energy) for x in rotation_times_hectares_agb]
                     # TODO:check if this is correct
-                    rotation_yearly_emissions_bgb = [x * -44 / 12 * (1 - self.rotation_percentage_energy) for x in rotation_times_hectares_bgb]
+                    rotation_yearly_emissions_bgb = [x * 44 / 12 * (1 - self.rotation_percentage_energy) for x in rotation_times_hectares_bgb]
 
-                    agb_fire_component = [x * -44 / 12 * (1 - self.rotation_percentage_energy) for x in rotation_times_hectares_agb]
-                    bgb_fire_component = [x * -44 / 12 * (1 - self.rotation_percentage_energy) for x in rotation_times_hectares_bgb]
-                    nitrous_fire_component = [x * -44 / 12 *  (1 - self.rotation_percentage_energy) * self.ef_nitrous for x in rotation_times_hectares_agb]
-                    methane_fire_component = [x * -44 / 12 * (1 - self.rotation_percentage_energy) * self.ef_methane for x in rotation_times_hectares_agb]
+                    agb_fire_component = [x * 44 / 12 * (1 - self.rotation_percentage_energy) for x in rotation_times_hectares_agb]
+                    bgb_fire_component = [x * 44 / 12  for x in rotation_times_hectares_bgb]
+                    nitrous_fire_component = [x * 44 / 12 *  self.rotation_percentage_energy * self.ef_nitrous for x in rotation_times_hectares_agb]
+                    methane_fire_component = [x * 44 / 12 *  self.rotation_percentage_energy * self.ef_methane for x in rotation_times_hectares_agb]
 
                     self.yearly_fire_rotation_emissions = [x + y + z + w for x, y, z, w in zip(agb_fire_component, bgb_fire_component, nitrous_fire_component, methane_fire_component)]
                     self.total_fire_rotation_emissions = sum(self.yearly_fire_rotation_emissions)
@@ -541,10 +544,10 @@ class ForestManagement(BaseModule):
                         logging_times_hectares_agb = multiply_matrix_by_matrix(logging_matrix_agb, self.hectares_matrix)
                         logging_times_hectares_bgb = multiply_matrix_by_matrix(logging_matrix_bgb, self.hectares_matrix)
 
-                        agb_fire_component = [x * -44 / 12 * percentage_fire for x in logging_times_hectares_agb]
-                        bgb_fire_component = [x * -44 / 12 * percentage_fire for x in logging_times_hectares_bgb]
-                        nitrous_fire_component = [x * -44 / 12 * percentage_fire * self.ef_nitrous for x in logging_times_hectares_agb]
-                        methane_fire_component = [x * -44 / 12 * percentage_fire * self.ef_methane for x in logging_times_hectares_agb]
+                        agb_fire_component = [x * 44 / 12 * (1 - self.rotation_percentage_energy) for x in logging_times_hectares_agb]
+                        bgb_fire_component = [x * 44 / 12  for x in logging_times_hectares_bgb]
+                        nitrous_fire_component = [x * 44 / 12 *  self.rotation_percentage_energy * self.ef_nitrous for x in logging_times_hectares_agb]
+                        methane_fire_component = [x * 44 / 12 *  self.rotation_percentage_energy * self.ef_methane for x in logging_times_hectares_agb]
 
                         self.yearly_fire_disturbance_emissions.append([x + y + z + w for x, y, z, w in zip(agb_fire_component, bgb_fire_component, nitrous_fire_component, methane_fire_component)])
                         self.total_fire_disturbance_emissions = sum(self.yearly_fire_disturbance_emissions[-1])
@@ -587,7 +590,7 @@ class ForestManagement(BaseModule):
                     raise ValueError(f"Negative values in agb_matrix, check the parameters for logging and disturbance % over 100")
 
                 agb_times_hectares = multiply_matrix_by_matrix(delta_agb_matrix, self.hectares_matrix)
-                yearly_agb_emissions = [x * -44 / 12 for x in agb_times_hectares]
+                yearly_agb_emissions = [x * - 44 / 12 for x in agb_times_hectares]
                 self.yearly_agb_emissions = yearly_agb_emissions
                 self.total_agb_emissions = sum(yearly_agb_emissions)
 
@@ -608,7 +611,7 @@ class ForestManagement(BaseModule):
             try:
                 # TODO: add maximum value for litter to get to in create_agb_matrix and ch
                 litter_matrix, delta_litter_matrix = create_litter_deadwood_matrix(self.years_impl, self.years_cap, self.litter_20_years / 20, self.litter_20_years / 20, self.litter_start, self.litter_max)
-                self.yearly_litter_emissions = [x * -44 / 12 for x in multiply_matrix_by_matrix(delta_litter_matrix, self.hectares_matrix)]
+                self.yearly_litter_emissions = [x * - 44 / 12 for x in multiply_matrix_by_matrix(delta_litter_matrix, self.hectares_matrix)]
                 self.total_litter_emissions = sum(self.yearly_litter_emissions)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in self.yearly_litter_emissions], activity=ActivityTypes.LITTER))
@@ -622,7 +625,7 @@ class ForestManagement(BaseModule):
         def calculate_deadwood():
             try:
                 deadwood_matrix, delta_deadwood_matrix = create_litter_deadwood_matrix(self.years_impl, self.years_cap, self.deadwood_20_years / 20, self.deadwood_20_years / 20, self.deadwood_start, self.deadwood_max)
-                self.yearly_deadwood_emissions = [x * -44 / 12 for x in multiply_matrix_by_matrix(delta_deadwood_matrix, self.hectares_matrix)]
+                self.yearly_deadwood_emissions = [x * - 44 / 12 for x in multiply_matrix_by_matrix(delta_deadwood_matrix, self.hectares_matrix)]
                 self.total_deadwood_emissions = sum(self.yearly_deadwood_emissions)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in self.yearly_deadwood_emissions], activity=ActivityTypes.DEADWOOD))
@@ -666,11 +669,11 @@ class ForestManagement(BaseModule):
             return
 
 
-w = [10, 5, 'D', 0, 100.0, 10, 0, 0.0, 125.0, 0.207, 0.207, None, None, 131.6, None, 2.7, None, 2.7, None, 131.6, None, [], [], [], 0, 0.0, 0.0, 0, 4.8, 4.8, 4.8, None, 14.8, 14.8, 14.8, None, 40.0, None, None, None, None, 1, 1, 1, 28.0, 265.0]
-wo = [10, 5, 'D', 0, 100.0, 5, 0, 0.0, 125.0, 0.207, 0.207, None, None, 131.6, None, 2.7, None, 2.7, None, 131.6, None, [], [], [], 0, 0.0, 0.0, 0, 4.8, 4.8, 4.8, None, 14.8, 14.8, 14.8, None, 40.0, None, None, None, None, 1, 1, 1, 28.0, 265.0]
+# w = [10, 5, 'D', 0, 100.0, 10, 0, 0.0, 125.0, 0.207, 0.207, None, None, 131.6, None, 2.7, None, 2.7, None, 131.6, None, [], [], [], 0, 0.0, 0.0, 0, 4.8, 4.8, 4.8, None, 14.8, 14.8, 14.8, None, 40.0, None, None, None, None, 1, 1, 1, 28.0, 265.0]
+# wo = [10, 5, 'D', 0, 100.0, 5, 0, 0.0, 125.0, 0.207, 0.207, None, None, 131.6, None, 2.7, None, 2.7, None, 131.6, None, [], [], [], 0, 0.0, 0.0, 0, 4.8, 4.8, 4.8, None, 14.8, 14.8, 14.8, None, 40.0, None, None, None, None, 1, 1, 1, 28.0, 265.0]
 
-f_w = ForestManagement(*w)
-f_wo = ForestManagement(*wo)
+# f_w = ForestManagement(*w)
+# f_wo = ForestManagement(*wo)
 
-f_w.calculate_emissions()
-f_wo.calculate_emissions()
+# f_w.calculate_emissions()
+# f_wo.calculate_emissions()
