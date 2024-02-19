@@ -36,7 +36,7 @@ class TotalBiomassAfterDefoManager(Manager):
                 climate=climate,
                 moisture=moisture,
                 continent=continent,
-                land_use_type__name__icontains="Default",
+                land_use_type__name="Agroforestry - Default",
             )
 
 
@@ -153,6 +153,9 @@ class LandUseCarbonStockExchangeFactor(Model):
     value = FloatField()
 
     objects = LandUseCarbonStockExchangeFactorManager()
+
+    class Meta:
+        unique_together = ("climate", "moisture", "land_use_type")
 
     def __str__(self):
         return f"{self.climate.name} {self.moisture.name} {self.land_use_type.name}, value: {self.value}"
