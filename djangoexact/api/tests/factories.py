@@ -252,3 +252,31 @@ class ForestManagementFactory(DjangoModelFactory):
     rotation_percentage_biomass_for_energy_start = 1
     rotation_percentage_biomass_for_energy_w = 1
     rotation_percentage_biomass_for_energy_wo = 1
+
+
+water_mgmt_types_before_cultivation = [water for water in WaterManagementTypeBeforeCultivation.objects.all()]
+water_mgmt_types_after_cultivation = [water for water in WaterManagementTypeAfterCultivation.objects.all()]
+organic_amendment_types = [organic for organic in OrganicAmendmentType.objects.all()]
+
+
+class FloodedRiceFactory(DjangoModelFactory):
+    class Meta:
+        model = FloodedRice
+
+    area = factory.fuzzy.FuzzyInteger(1, 150)
+
+    water_management_type_before_cultivation_start = factory.fuzzy.FuzzyChoice(water_mgmt_types_before_cultivation)
+    water_management_type_before_cultivation_w = factory.fuzzy.FuzzyChoice(water_mgmt_types_before_cultivation)
+    water_management_type_before_cultivation_wo = factory.fuzzy.FuzzyChoice(water_mgmt_types_before_cultivation)
+
+    water_management_type_after_cultivation_start = factory.fuzzy.FuzzyChoice(water_mgmt_types_after_cultivation)
+    water_management_type_after_cultivation_w = factory.fuzzy.FuzzyChoice(water_mgmt_types_after_cultivation)
+    water_management_type_after_cultivation_wo = factory.fuzzy.FuzzyChoice(water_mgmt_types_after_cultivation)
+
+    organic_amendment_type_start = factory.fuzzy.FuzzyChoice(organic_amendment_types)
+    organic_amendment_type_w = factory.fuzzy.FuzzyChoice(organic_amendment_types)
+    organic_amendment_type_wo = factory.fuzzy.FuzzyChoice(organic_amendment_types)
+
+    crop_yield_start = factory.fuzzy.FuzzyInteger(1, 10)
+    crop_yield_w = factory.fuzzy.FuzzyInteger(1, 10)
+    crop_yield_wo = factory.fuzzy.FuzzyInteger(1, 10)

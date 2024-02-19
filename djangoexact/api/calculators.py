@@ -1646,18 +1646,33 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
         activity: Activity = module.activity
         project: Project = activity.project
         luc: LandUseChange = module.land_use_change
-        area = luc.area if luc.area else module.area
+        area = luc.area if luc else module.area
 
         climate: Climate = activity.climate_t2 or project.climate
         moisture: Moisture = activity.moisture_t2 or project.moisture
         region: Region = project.country.region
         soil_type: SoilType = project.soil_type
 
-        soc = ipcc.SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
-        grassland_soc = get_grassland_soc(luc)
+        try:
+            soc = ipcc.SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
+            if not soc.value and not project.soc_ref_t2 and not (module.soc_t2_start and module.soc_t2_w and module.soc_t2_wo):
+                raise ValueError("Soil organic carbon is not defined for this climate, moisture and soil type. Please define a tier 2 for all scenarios.")
+        except ipcc.SoilOrganicCarbon.DoesNotExist:
+            raise ValueError(f"Soil organic carbon is not defined for {climate.name}, {moisture.name} and {soil_type.name}. Please define a tier 2 for all scenarios.")
 
-        rice_ef = ipcc.RiceDefaultEmissionFactor.objects.get(continent=region)
-        yield_ref = ipcc.RiceYield.objects.get(continent=region)
+        grassland_soc = None
+        if luc:
+            grassland_soc = get_grassland_soc(luc)
+
+        try:
+            rice_ef = ipcc.RiceDefaultEmissionFactor.objects.get(continent=region)
+        except ipcc.RiceDefaultEmissionFactor.DoesNotExist:
+            raise ValueError(f"Rice emission factor is not defined for {region.name}. Please change region or define a tier 2 for all scenarios.")
+
+        try:
+            yield_ref = ipcc.RiceYield.objects.get(continent=region)
+        except ipcc.RiceYield.DoesNotExist:
+            raise ValueError(f"Rice yield reference value is not defined for {region.name}. Please change region or define a tier 2 for all scenarios.")
 
         soc_start = grassland_soc.value if grassland_soc else soc.value
         soc_w = soc.value
@@ -1675,21 +1690,65 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
         fi_w = get_fi_data(module, climate, moisture, utils.ScenarioTypes.WITH)
         fi_wo = get_fi_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
 
-        sfw_start = ipcc.RiceSFW.objects.get(water_management_type_after_cultivation=module.water_management_type_after_cultivation_start)
-        sfw_w = ipcc.RiceSFW.objects.get(water_management_type_after_cultivation=module.water_management_type_after_cultivation_w)
-        sfw_wo = ipcc.RiceSFW.objects.get(water_management_type_after_cultivation=module.water_management_type_after_cultivation_wo)
+        try:
+            sfw_start = ipcc.RiceSFW.objects.get(water_management_type_after_cultivation=module.water_management_type_after_cultivation_start)
+        except ipcc.RiceSFW.DoesNotExist:
+            raise ValueError(f"Water management type after cultivation is not defined for {module.water_management_type_after_cultivation_start}.")
 
-        sfp_start = ipcc.RiceSFP.objects.get(water_management_type_before_cultivation=module.water_management_type_before_cultivation_start)
-        sfp_w = ipcc.RiceSFP.objects.get(water_management_type_before_cultivation=module.water_management_type_before_cultivation_w)
-        sfp_wo = ipcc.RiceSFP.objects.get(water_management_type_before_cultivation=module.water_management_type_before_cultivation_wo)
+        try:
+            sfw_w = ipcc.RiceSFW.objects.get(water_management_type_after_cultivation=module.water_management_type_after_cultivation_w)
+        except ipcc.RiceSFW.DoesNotExist:
+            raise ValueError(f"Water management type after cultivation is not defined for {module.water_management_type_after_cultivation_w}.")
 
-        cfoa_start = ipcc.RiceSFO.objects.get(organic_amendment_type=module.organic_amendment_type_start)
-        cfoa_w = ipcc.RiceSFO.objects.get(organic_amendment_type=module.organic_amendment_type_w)
-        cfoa_wo = ipcc.RiceSFO.objects.get(organic_amendment_type=module.organic_amendment_type_wo)
+        try:
+            sfw_wo = ipcc.RiceSFW.objects.get(water_management_type_after_cultivation=module.water_management_type_after_cultivation_wo)
+        except ipcc.RiceSFW.DoesNotExist:
+            raise ValueError(f"Water management type after cultivation is not defined for {module.water_management_type_after_cultivation_wo}.")
 
-        n_estimation_factor = ipcc.CropNitrousEstimationDefaultFactor.objects.get(land_use_type__name="Rice")
-        burning_emission_factor = ipcc.BurningEmissionFactor.objects.get(category__name="Agricultural residues")
-        rice_cf = ipcc.FiresCombustionFactor.objects.get(land_use_type__name="Rice")
+        try:
+            sfp_start = ipcc.RiceSFP.objects.get(water_management_type_before_cultivation=module.water_management_type_before_cultivation_start)
+        except ipcc.RiceSFP.DoesNotExist:
+            raise ValueError(f"Water management type before cultivation is not defined for {module.water_management_type_before_cultivation_start}.")
+
+        try:
+            sfp_w = ipcc.RiceSFP.objects.get(water_management_type_before_cultivation=module.water_management_type_before_cultivation_w)
+        except ipcc.RiceSFP.DoesNotExist:
+            raise ValueError(f"Water management type before cultivation is not defined for {module.water_management_type_before_cultivation_w}.")
+
+        try:
+            sfp_wo = ipcc.RiceSFP.objects.get(water_management_type_before_cultivation=module.water_management_type_before_cultivation_wo)
+        except ipcc.RiceSFP.DoesNotExist:
+            raise ValueError(f"Water management type before cultivation is not defined for {module.water_management_type_before_cultivation_wo}.")
+
+        try:
+            cfoa_start = ipcc.RiceSFO.objects.get(organic_amendment_type=module.organic_amendment_type_start)
+        except ipcc.RiceSFO.DoesNotExist:
+            raise ValueError(f"Organic amendment type is not defined for {module.organic_amendment_type_start}.")
+
+        try:
+            cfoa_w = ipcc.RiceSFO.objects.get(organic_amendment_type=module.organic_amendment_type_w)
+        except ipcc.RiceSFO.DoesNotExist:
+            raise ValueError(f"Organic amendment type is not defined for {module.organic_amendment_type_w}.")
+
+        try:
+            cfoa_wo = ipcc.RiceSFO.objects.get(organic_amendment_type=module.organic_amendment_type_wo)
+        except ipcc.RiceSFO.DoesNotExist:
+            raise ValueError(f"Organic amendment type is not defined for {module.organic_amendment_type_wo}.")
+
+        try:
+            n_estimation_factor = ipcc.CropNitrousEstimationDefaultFactor.objects.get(land_use_type__name="Rice")
+        except ipcc.CropNitrousEstimationDefaultFactor.DoesNotExist:
+            raise ValueError("Default nitrous estimation factor is not defined for rice.")
+
+        try:
+            burning_emission_factor = ipcc.BurningEmissionFactor.objects.get(category__name="Agricultural residues")
+        except ipcc.BurningEmissionFactor.DoesNotExist:
+            raise ValueError("Burning emission factor is not defined for agricultural residues.")
+
+        try:
+            rice_cf = ipcc.FiresCombustionFactor.objects.get(land_use_type__name="Rice")
+        except ipcc.FiresCombustionFactor.DoesNotExist:
+            raise ValueError("Fires combustion factor is not defined for rice.")
 
         math_start_w = None
         math_start_wo = None
