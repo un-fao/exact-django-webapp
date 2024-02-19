@@ -2,7 +2,7 @@ import logging
 
 from django.apps import apps
 from django.contrib.auth.models import Group
-from django.core.exceptions import ValidationError
+from django.core.exceptions import FieldDoesNotExist, ValidationError
 from django.db import transaction
 from django.db.models import Model
 from django.shortcuts import get_object_or_404
@@ -136,6 +136,18 @@ def get_modules(activity: Activity, serialized=True) -> list:
 
 class AuthenticatedViewSet(viewsets.GenericViewSet):
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+
+        # If list operation, filter out inactive objects
+        if self.action == "list":
+            try:
+                is_active_field = self.queryset.model._meta.get_field("is_active")
+                return self.queryset.filter(is_active=True)
+            except FieldDoesNotExist:
+                return super().get_queryset()
+
+        return super().get_queryset()
 
 
 class GroupViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
