@@ -63,9 +63,9 @@ logging.debug(luc)
 
 post_forest_management = {
     "activity": activity_response.data["id"],
-    "land_use_type_start": 114,
-    "land_use_type_w": 114,
-    "land_use_type_wo": 114,
+    "land_use_type_start": LandUseType.objects.get(name="Rainforest").id,
+    "land_use_type_w": LandUseType.objects.get(name="Rainforest").id,
+    "land_use_type_wo": LandUseType.objects.get(name="Rainforest").id,
 }
 
 post_annual_cropland = {
@@ -96,7 +96,7 @@ logging.debug("##### Test Suite for COP28 Demo #####\n\n")
 
 logging.debug("##### PARAMETERS #####\n\n")
 
-logging.debug(f"Hectars: {area}")
+logging.debug(f"Hectars: {activity_response.data['area']}")
 logging.debug(f"Country: {country}")
 logging.debug(f"Region: {country.region}")
 logging.debug(f"Climate: {climate}")
