@@ -83,9 +83,9 @@ for i in range(PROJECT_SIZE):
     total_livestocks = annuals.__len__()
     passed_livestocks = 0
 
-    print("Testing Grassland...")
+    print("Testing module...")
     for i, annual in enumerate(annuals):
-        print(f"\n\nTesting Grassland {i+1}...")
+        print(f"\n\nTesting module {i+1}...")
         print("-----------------------------------")
 
         print(f"grassland: {annual}")
