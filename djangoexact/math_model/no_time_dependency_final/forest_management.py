@@ -65,8 +65,8 @@ def create_litter_deadwood_matrix(years_impl, years_cap, delta_agb_yearly_below_
 
     agb_matrix, delta_agb_matrix = check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value)
 
-    #plot_annotated_matrix(agb_matrix)
-    #plot_annotated_matrix(delta_agb_matrix)
+    # plot_annotated_matrix(agb_matrix)
+    # plot_annotated_matrix(delta_agb_matrix)
 
     return agb_matrix, delta_agb_matrix
 
@@ -88,6 +88,7 @@ def create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, bgb_ratio_under_thr
 
 def plot_matrix(matrix):
     import math
+
     # Number of rows and columns in the matrix
     num_rows, num_cols = matrix.shape
 
@@ -135,7 +136,7 @@ def check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value):
                 agb_matrix[i][j:] = max_agb_value
 
                 # Update delta_agb_matrix
-                if j == 0 or i==j:
+                if j == 0 or i == j:
                     delta_agb_matrix[i][j] = 0
                 else:
                     delta_agb_matrix[i][j] = max_agb_value - agb_matrix[i][j - 1]
@@ -239,7 +240,6 @@ def calculate_rotation_effect(original_agb_matrix, original_delta_agb_matrix, ma
 
     plot_matrix(agb_matrix)
     plot_matrix(rotation_impact)
-
 
     # add to each year
     return results, rotation_matrix, delta_agb_matrix
@@ -517,9 +517,9 @@ class ForestManagement(BaseModule):
                     rotation_yearly_emissions_bgb = [x * 44 / 12 * (1 - self.rotation_percentage_energy) for x in rotation_times_hectares_bgb]
 
                     agb_fire_component = [x * 44 / 12 * (1 - self.rotation_percentage_energy) for x in rotation_times_hectares_agb]
-                    bgb_fire_component = [x * 44 / 12  for x in rotation_times_hectares_bgb]
-                    nitrous_fire_component = [x * 44 / 12 *  self.rotation_percentage_energy * self.ef_nitrous for x in rotation_times_hectares_agb]
-                    methane_fire_component = [x * 44 / 12 *  self.rotation_percentage_energy * self.ef_methane for x in rotation_times_hectares_agb]
+                    bgb_fire_component = [x * 44 / 12 for x in rotation_times_hectares_bgb]
+                    nitrous_fire_component = [x * 44 / 12 * self.rotation_percentage_energy * self.ef_nitrous for x in rotation_times_hectares_agb]
+                    methane_fire_component = [x * 44 / 12 * self.rotation_percentage_energy * self.ef_methane for x in rotation_times_hectares_agb]
 
                     self.yearly_fire_rotation_emissions = [x + y + z + w for x, y, z, w in zip(agb_fire_component, bgb_fire_component, nitrous_fire_component, methane_fire_component)]
                     self.total_fire_rotation_emissions = sum(self.yearly_fire_rotation_emissions)
@@ -545,9 +545,9 @@ class ForestManagement(BaseModule):
                         logging_times_hectares_bgb = multiply_matrix_by_matrix(logging_matrix_bgb, self.hectares_matrix)
 
                         agb_fire_component = [x * 44 / 12 * (1 - self.rotation_percentage_energy) for x in logging_times_hectares_agb]
-                        bgb_fire_component = [x * 44 / 12  for x in logging_times_hectares_bgb]
-                        nitrous_fire_component = [x * 44 / 12 *  self.rotation_percentage_energy * self.ef_nitrous for x in logging_times_hectares_agb]
-                        methane_fire_component = [x * 44 / 12 *  self.rotation_percentage_energy * self.ef_methane for x in logging_times_hectares_agb]
+                        bgb_fire_component = [x * 44 / 12 for x in logging_times_hectares_bgb]
+                        nitrous_fire_component = [x * 44 / 12 * self.rotation_percentage_energy * self.ef_nitrous for x in logging_times_hectares_agb]
+                        methane_fire_component = [x * 44 / 12 * self.rotation_percentage_energy * self.ef_methane for x in logging_times_hectares_agb]
 
                         self.yearly_fire_disturbance_emissions.append([x + y + z + w for x, y, z, w in zip(agb_fire_component, bgb_fire_component, nitrous_fire_component, methane_fire_component)])
                         self.total_fire_disturbance_emissions = sum(self.yearly_fire_disturbance_emissions[-1])
@@ -590,7 +590,7 @@ class ForestManagement(BaseModule):
                     raise ValueError(f"Negative values in agb_matrix, check the parameters for logging and disturbance % over 100")
 
                 agb_times_hectares = multiply_matrix_by_matrix(delta_agb_matrix, self.hectares_matrix)
-                yearly_agb_emissions = [x * - 44 / 12 for x in agb_times_hectares]
+                yearly_agb_emissions = [x * -44 / 12 for x in agb_times_hectares]
                 self.yearly_agb_emissions = yearly_agb_emissions
                 self.total_agb_emissions = sum(yearly_agb_emissions)
 
@@ -611,7 +611,7 @@ class ForestManagement(BaseModule):
             try:
                 # TODO: add maximum value for litter to get to in create_agb_matrix and ch
                 litter_matrix, delta_litter_matrix = create_litter_deadwood_matrix(self.years_impl, self.years_cap, self.litter_20_years / 20, self.litter_20_years / 20, self.litter_start, self.litter_max)
-                self.yearly_litter_emissions = [x * - 44 / 12 for x in multiply_matrix_by_matrix(delta_litter_matrix, self.hectares_matrix)]
+                self.yearly_litter_emissions = [x * -44 / 12 for x in multiply_matrix_by_matrix(delta_litter_matrix, self.hectares_matrix)]
                 self.total_litter_emissions = sum(self.yearly_litter_emissions)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in self.yearly_litter_emissions], activity=ActivityTypes.LITTER))
@@ -625,7 +625,7 @@ class ForestManagement(BaseModule):
         def calculate_deadwood():
             try:
                 deadwood_matrix, delta_deadwood_matrix = create_litter_deadwood_matrix(self.years_impl, self.years_cap, self.deadwood_20_years / 20, self.deadwood_20_years / 20, self.deadwood_start, self.deadwood_max)
-                self.yearly_deadwood_emissions = [x * - 44 / 12 for x in multiply_matrix_by_matrix(delta_deadwood_matrix, self.hectares_matrix)]
+                self.yearly_deadwood_emissions = [x * -44 / 12 for x in multiply_matrix_by_matrix(delta_deadwood_matrix, self.hectares_matrix)]
                 self.total_deadwood_emissions = sum(self.yearly_deadwood_emissions)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in self.yearly_deadwood_emissions], activity=ActivityTypes.DEADWOOD))
