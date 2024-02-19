@@ -79,9 +79,9 @@ rices: FloodedRice = FloodedRiceFactory.create_batch(BATCH_SIZE, activity=a)
 total_livestocks = rices.__len__()
 passed_livestocks = 0
 
-print("Testing Livestock...")
+print("Testing module...")
 for i, rice in enumerate(rices):
-    print(f"\n\nTesting Livestock {i+1}...")
+    print(f"\n\nTesting module {i+1}...")
     print("-----------------------------------")
 
     print(f"livestock: {rice}")

@@ -79,9 +79,9 @@ livestock: Livestock = LivestockFactory.create_batch(BATCH_SIZE, activity=a)
 total_livestocks = livestock.__len__()
 passed_livestocks = 0
 
-print("Testing Livestock...")
+print("Testing module...")
 for i, livestock in enumerate(livestock):
-    print(f"\n\nTesting Livestock {i+1}...")
+    print(f"\n\nTesting module {i+1}...")
     print("-----------------------------------")
 
     print(f"livestock: {livestock}")
