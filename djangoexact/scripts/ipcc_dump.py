@@ -3785,6 +3785,8 @@ for climate in Climate.objects.all():
     for moisture in climate.moistures.all():
         SoilOrganicCarbon.objects.get_or_create(climate=climate, moisture=moisture, soil_type=soil, value=0)
 
+TotalBiomassAfterDefo.objects.all().delete()
+
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "TotalBiomassAfterDefo.csv"),
     header=0,
@@ -3825,7 +3827,8 @@ for i, row in enumerate(rows):
             continent=region,
             value=value,
         )
-"""
+
+LandUseCarbonStockExchangeFactor.objects.all().delete()
 
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "LandUseStockExchangeFactor.csv"),
@@ -3863,3 +3866,4 @@ for i, row in enumerate(rows):
             moisture=moisture,
             value=value,
         )
+"""
