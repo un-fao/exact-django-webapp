@@ -71,18 +71,21 @@ def create_litter_deadwood_matrix(years_impl, years_cap, delta_agb_yearly_below_
     return agb_matrix, delta_agb_matrix
 
 
-def create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, bgb_ratio_under_threshold, bgb_ratio_over_threshold, threshold, bgb_start):
+def create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, bgb_ratio_under_threshold, bgb_ratio_over_threshold, threshold, bgb_start, time_impl):
+    
     delta_bgb_matrix = delta_agb_matrix * bgb_ratio_under_threshold
     bgb_matrix = np.full((agb_matrix.shape[0], agb_matrix.shape[1]), 0.0)
 
-    for i in range(agb_matrix.shape[0]):
+    for i in range(time_impl):
         for j in range(i, agb_matrix.shape[1]):
+            print(f"i: {i}, j: {j}")
             value_to_assign = bgb_start + delta_bgb_matrix[i][j] + np.sum(delta_bgb_matrix[i, i:j])
             if value_to_assign > threshold:
                 delta_bgb_matrix[i][j] = delta_bgb_matrix[i][j] * bgb_ratio_over_threshold
                 value_to_assign = bgb_start + delta_bgb_matrix[i][j] + np.sum(delta_bgb_matrix[i, i:j])
             bgb_matrix[i][j] = value_to_assign
 
+    plot_annotated_matrix(bgb_matrix)
     return bgb_matrix, delta_bgb_matrix
 
 
@@ -493,7 +496,7 @@ class ForestManagement(BaseModule):
                 if self.bgb_yearly_growth_over_20_tier_2 and self.bgb_yearly_growth_under_20_tier_2:
                     bgb_matrix, delta_bgb_matrix = create_agb_matrix(self.years_impl, self.years_cap, self.bgb_yearly_growth_under_20_tier_2, self.bgb_yearly_growth_over_20_tier_2, self.bgb_start)
                 else:
-                    bgb_matrix, delta_bgb_matrix = create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, self.bgb_ratio_under_threshold, self.bgb_ratio_over_threshold, self.bgb_ratio_threshold, self.bgb_start)
+                    bgb_matrix, delta_bgb_matrix = create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, self.bgb_ratio_under_threshold, self.bgb_ratio_over_threshold, self.bgb_ratio_threshold, self.bgb_start, self.years_impl)
 
                 # plot_annotated_matrix(agb_matrix)
                 # plot_annotated_matrix(delta_agb_matrix)
@@ -509,12 +512,13 @@ class ForestManagement(BaseModule):
                     rotation_times_hectares_agb = multiply_matrix_by_matrix(rotation_matrix_agb, self.hectares_matrix)
                     rotation_times_hectares_bgb = multiply_matrix_by_matrix(rotation_matrix_bgb, self.hectares_matrix)
 
-                    # plot_annotated_matrix(rotation_matrix_agb)
-                    # plot_annotated_matrix(delta_agb_matrix)
+                    #plot_annotated_matrix(rotation_matrix_agb)
+                    #plot_annotated_matrix(rotation_matrix_bgb)
+
                     # NOTE: which one is it??!?!? This one or the one below
-                    rotation_yearly_emissions_agb = [x * 44 / 12 * (1 - self.rotation_percentage_energy) for x in rotation_times_hectares_agb]
+                    rotation_yearly_emissions_agb = [x * - 44 / 12 * (1 - self.rotation_percentage_energy) for x in rotation_times_hectares_agb]
                     # TODO:check if this is correct
-                    rotation_yearly_emissions_bgb = [x * 44 / 12 * (1 - self.rotation_percentage_energy) for x in rotation_times_hectares_bgb]
+                    rotation_yearly_emissions_bgb = [x * - 44 / 12 * (1 - self.rotation_percentage_energy) for x in rotation_times_hectares_bgb]
 
                     agb_fire_component = [x * 44 / 12 * (1 - self.rotation_percentage_energy) for x in rotation_times_hectares_agb]
                     bgb_fire_component = [x * 44 / 12 for x in rotation_times_hectares_bgb]
@@ -584,6 +588,7 @@ class ForestManagement(BaseModule):
                     logging_times_hectares_agb = multiply_matrix_by_matrix(logging_matrix_agb, self.hectares_matrix)
                     logging_times_hectares_bgb = multiply_matrix_by_matrix(logging_matrix_bgb, self.hectares_matrix)
 
+
                     agb_fire_component = [x * 44 / 12 * self.logging_percentage_energy for x in logging_times_hectares_agb]
                     bgb_fire_component = [x * 44 / 12 * self.logging_percentage_energy for x in logging_times_hectares_bgb]
                     nitrous_fire_component_agb = [x * 44 / 12 * self.logging_percentage_energy * self.ef_nitrous for x in logging_times_hectares_agb]
@@ -604,6 +609,8 @@ class ForestManagement(BaseModule):
                 # check if agb_matrix has negative values
                 if np.any(np.sum(agb_matrix < 0), axis=0):
                     raise ValueError(f"Negative values in agb_matrix, check the parameters for logging and disturbance % over 100")
+
+                #plot_matrix(delta_agb_matrix)
 
                 agb_times_hectares = multiply_matrix_by_matrix(delta_agb_matrix, self.hectares_matrix)
                 yearly_agb_emissions = [x * -44 / 12 for x in agb_times_hectares]
@@ -684,8 +691,8 @@ class ForestManagement(BaseModule):
             traceback.print_exc()
             return
 
-w = [10, 5, 'D', 0, 100.0, 10, 0, 0.0, 125.0, 0.207, 0.207, None, None, 131.6, None, 2.7, None, 2.7, None, 131.6, None, [], [], [], 0, 0.0, 0.0, 0, 4.8, 4.8, 4.8, None, 14.8, 14.8, 14.8, None, 40.0, None, None, None, None, 1, 1, 1, 28.0, 265.0]
-wo = [10, 5, 'D', 0, 100.0, 5, 0, 0.0, 125.0, 0.207, 0.207, None, None, 131.6, None, 2.7, None, 2.7, None, 131.6, None, [], [], [], 0, 0.0, 0.0, 0, 4.8, 4.8, 4.8, None, 14.8, 14.8, 14.8, None, 40.0, None, None, None, None, 1, 1, 1, 28.0, 265.0]
+w =  [10, 5, 'D', 0, 100.0, 10, 0, 0.0, 125.0, 0.207, 0.207, None, None, 131.6, None, 2.7, None, 2.7, None, 131.6, None, [], [], [], 0, 0.0, 0.0, 0, 4.8, 4.8, 4.8, None, 14.8, 14.8, 14.8, None, 40.0, None, None, None, None, 1, 1, 1, 28.0, 265.0]
+wo =  [10, 5, 'D', 0, 100.0, 5, 0, 0.0, 125.0, 0.207, 0.207, None, None, 131.6, None, 2.7, None, 2.7, None, 131.6, None, [], [], [], 0, 0.0, 0.0, 0, 4.8, 4.8, 4.8, None, 14.8, 14.8, 14.8, None, 40.0, None, None, None, None, 1, 1, 1, 28.0, 265.0]
 
 f_w = ForestManagement(*w)
 f_wo = ForestManagement(*wo)
