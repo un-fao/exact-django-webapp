@@ -80,6 +80,7 @@ from .models import (
     GrasslandParameter,
     Input,
     InputEntry,
+    InputType,
     Irrigation,
     IrrigationParameter,
     IrrigationPhase,
@@ -577,105 +578,110 @@ class DeforestationCalculator(BaseCalculator):
             fmg_wo = SimpleNamespace(value=soc_wo.fmg)
             soc_wo = SimpleNamespace(value=soc_wo.flu * soc_wo.fi * soc_wo.fmg)
 
-        self.inputs_w = [
-            0,
-            luc.area,
-            project.implementation_years,
-            project.capitalization_years,
-            change_rate.name,
-            total_biomass_w.value,
-            forest.get_biomass_t2(utils.ScenarioTypes.START),
-            project.gw_potential.n2o,
-            project.gw_potential.ch4,
-            luc.is_fire_used_start,
-            combustion_factor_w.n2o,
-            combustion_factor_w.ch4,
-            combustion_factor_w.value,
-            moisture_factor.value,
-            litter_dw_w.litter if mangroves_data is None else mangroves_data.litter,
-            forest.litter_t2_start,
-            litter_dw_w.dw if mangroves_data is None else mangroves_data.dw,
-            forest.deadwood_t2_start,
-            dry_matter_w,
-            utils.MANGROVE_FACTOR if mangroves_data is not None else utils.NON_MANGROVE_FACTOR,
-            forest.bgb_t2_start,
-            forest.agb_t2_start,
-            statistics.mean([agb_w.agb_min, agb_w.agb_max]),
-            bgb_w.value,
-            utils.CN_RATIO_GRASSLAND,  # TODO: Ratio might be different, see OtherLandUseCalculator
-            module_w.soc_t2_start,  # NOTE: SOC After Defo T2
-            soc_ref.value,
-            project.soc_ref_t2,
-            module.fmg_t2_start,
-            module.fmg_t2_w,
-            module.fi_t2_start,
-            module.fi_t2_w,
-            module.flu_t2_start,
-            module.flu_t2_w,
-            forest.soc_t2_start,
-            module_w.soc_t2_w,
-            fmg_start.value,
-            fmg_w.value,
-            fi_start.value,
-            fi_w.value,
-            flu_start.value,
-            flu_w.value,
-            soc_ref.value,
-            soc_w.value,
-        ]
+        math_w = None
+        math_wo = None
 
-        math_w = MathDeforestation(*self.inputs_w)
-        math_w.calculate_emissions()
+        if not is_luc_remaining_same(module):
+            self.inputs_w = [
+                0,
+                luc.area,
+                project.implementation_years,
+                project.capitalization_years,
+                change_rate.name,
+                total_biomass_w.value,
+                forest.get_biomass_t2(utils.ScenarioTypes.START),
+                project.gw_potential.n2o,
+                project.gw_potential.ch4,
+                luc.is_fire_used_start,
+                combustion_factor_w.n2o,
+                combustion_factor_w.ch4,
+                combustion_factor_w.value,
+                moisture_factor.value,
+                litter_dw_w.litter if mangroves_data is None else mangroves_data.litter,
+                forest.litter_t2_start,
+                litter_dw_w.dw if mangroves_data is None else mangroves_data.dw,
+                forest.deadwood_t2_start,
+                dry_matter_w,
+                utils.MANGROVE_FACTOR if mangroves_data is not None else utils.NON_MANGROVE_FACTOR,
+                forest.bgb_t2_start,
+                forest.agb_t2_start,
+                statistics.mean([agb_w.agb_min, agb_w.agb_max]),
+                bgb_w.value,
+                utils.CN_RATIO_GRASSLAND,  # TODO: Ratio might be different, see OtherLandUseCalculator
+                module_w.soc_t2_start,  # NOTE: SOC After Defo T2
+                soc_ref.value,
+                project.soc_ref_t2,
+                module.fmg_t2_start,
+                module.fmg_t2_w,
+                module.fi_t2_start,
+                module.fi_t2_w,
+                module.flu_t2_start,
+                module.flu_t2_w,
+                forest.soc_t2_start,
+                module_w.soc_t2_w,
+                fmg_start.value,
+                fmg_w.value,
+                fi_start.value,
+                fi_w.value,
+                flu_start.value,
+                flu_w.value,
+                soc_ref.value,
+                soc_w.value,
+            ]
 
-        self.inputs_wo = [
-            0,
-            luc.area,
-            project.implementation_years,
-            project.capitalization_years,
-            change_rate.name,
-            total_biomass_wo.value,
-            forest.get_biomass_t2(utils.ScenarioTypes.START),
-            project.gw_potential.n2o,
-            project.gw_potential.ch4,
-            luc.is_fire_used_start,
-            combustion_factor_wo.n2o,
-            combustion_factor_wo.ch4,
-            combustion_factor_wo.value,
-            moisture_factor.value,
-            litter_dw_wo.litter if mangroves_data is None else mangroves_data.litter,
-            forest.litter_t2_start,
-            litter_dw_wo.dw if mangroves_data is None else mangroves_data.dw,
-            forest.deadwood_t2_start,
-            dry_matter_wo,
-            utils.MANGROVE_FACTOR if mangroves_data is not None else utils.NON_MANGROVE_FACTOR,
-            forest.bgb_t2_start,
-            forest.agb_t2_start,
-            statistics.mean([agb_wo.agb_min, agb_wo.agb_max]),
-            bgb_wo.value,
-            utils.CN_RATIO_GRASSLAND,
-            module_wo.soc_t2_start,  # NOTE: SOC After Defo T2
-            soc_ref.value,
-            project.soc_ref_t2,
-            module.fmg_t2_start,
-            module.fmg_t2_wo,
-            module.fi_t2_start,
-            module.fi_t2_wo,
-            module.flu_t2_start,
-            module.flu_t2_wo,
-            forest.soc_t2_start,
-            module_wo.soc_t2_wo,
-            fmg_start.value,
-            fmg_wo.value,
-            fi_start.value,
-            fi_wo.value,
-            flu_start.value,
-            flu_wo.value,
-            soc_ref.value,
-            soc_wo.value,
-        ]
+            math_w = MathDeforestation(*self.inputs_w)
+            math_w.calculate_emissions()
 
-        math_wo = MathDeforestation(*self.inputs_wo)
-        math_wo.calculate_emissions()
+        if not is_business_as_usual(module):
+            self.inputs_wo = [
+                0,
+                luc.area,
+                project.implementation_years,
+                project.capitalization_years,
+                change_rate.name,
+                total_biomass_wo.value,
+                forest.get_biomass_t2(utils.ScenarioTypes.START),
+                project.gw_potential.n2o,
+                project.gw_potential.ch4,
+                luc.is_fire_used_start,
+                combustion_factor_wo.n2o,
+                combustion_factor_wo.ch4,
+                combustion_factor_wo.value,
+                moisture_factor.value,
+                litter_dw_wo.litter if mangroves_data is None else mangroves_data.litter,
+                forest.litter_t2_start,
+                litter_dw_wo.dw if mangroves_data is None else mangroves_data.dw,
+                forest.deadwood_t2_start,
+                dry_matter_wo,
+                utils.MANGROVE_FACTOR if mangroves_data is not None else utils.NON_MANGROVE_FACTOR,
+                forest.bgb_t2_start,
+                forest.agb_t2_start,
+                statistics.mean([agb_wo.agb_min, agb_wo.agb_max]),
+                bgb_wo.value,
+                utils.CN_RATIO_GRASSLAND,
+                module_wo.soc_t2_start,  # NOTE: SOC After Defo T2
+                soc_ref.value,
+                project.soc_ref_t2,
+                module.fmg_t2_start,
+                module.fmg_t2_wo,
+                module.fi_t2_start,
+                module.fi_t2_wo,
+                module.flu_t2_start,
+                module.flu_t2_wo,
+                forest.soc_t2_start,
+                module_wo.soc_t2_wo,
+                fmg_start.value,
+                fmg_wo.value,
+                fi_start.value,
+                fi_wo.value,
+                flu_start.value,
+                flu_wo.value,
+                soc_ref.value,
+                soc_wo.value,
+            ]
+
+            math_wo = MathDeforestation(*self.inputs_wo)
+            math_wo.calculate_emissions()
 
         res_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
         res_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
@@ -2634,7 +2640,8 @@ class InputCalculator(BaseCalculator):
         results_w = MathResult(project.implementation_years, project.capitalization_years)
         results_wo = MathResult(project.implementation_years, project.capitalization_years)
 
-        for entry in input.input_entries.all():
+        entries = input.input_entries.all()
+        for entry in entries:
             r_w, r_wo = InputEntryCalculator(entry).calculate()
 
             results_w += r_w
@@ -2671,8 +2678,22 @@ class InputEntryCalculator(BaseCalculator):
         activity: Activity = module.parent.activity
         project: Project = activity.project
 
-        ref = ipcc.InputReference.objects.get(gw_potential=project.gw_potential, input_type=module.input_type)
-        ef = ipcc.InputEmissionFactor.objects.get(input_type=module.input_type, climate=project.climate, moisture=project.moisture)
+        input_type: InputType = module.input_type
+
+        needs_co2_ref = input_type.has_co2_emissions and not module.co2_emissions_t2
+        needs_n2o_ref = input_type.has_n2o_emissions and not module.n2o_emissions_t2
+        needs_co2_e_ref = input_type.has_co2_e_emissions and not module.co2_e_emissions_t2
+
+        try:
+            ref = ipcc.InputReference.objects.get(gw_potential=project.gw_potential, input_type=module.input_type)
+        except ipcc.InputReference.DoesNotExist:
+            raise ValueError(f"Reference for {module.input_type.name} does not exist for {project.gw_potential.name}.")
+
+        try:
+            ef = ipcc.InputEmissionFactor.objects.get(input_type=module.input_type, climate=project.climate, moisture=project.moisture)
+        except ipcc.InputEmissionFactor.DoesNotExist:
+            if needs_co2_ref or needs_n2o_ref or needs_co2_e_ref:
+                raise ValueError(f"Emission factor for {module.input_type.name} does not exist for {project.climate.name} and {project.moisture.name}. Please define tier 2 values.")
 
         math_w = None
         math_wo = None
@@ -2699,7 +2720,7 @@ class InputEntryCalculator(BaseCalculator):
             ]
 
             math_w = MathInputs(*self.inputs_w)
-            math_w = math_w.calculate_emissions()
+            math_w.calculate_emissions()
 
         if is_without(module):
             self.inputs_wo = [
@@ -2723,7 +2744,7 @@ class InputEntryCalculator(BaseCalculator):
             ]
 
             math_wo = MathInputs(*self.inputs_wo)
-            math_wo = math_wo.calculate_emissions()
+            math_wo.calculate_emissions()
 
         results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
         results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
