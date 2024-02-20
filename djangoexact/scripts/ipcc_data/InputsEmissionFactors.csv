@@ -194,21 +194,21 @@ Fungicides;Cool Temperate;Moist;;;14,3
 Fungicides;Warm Temperate;Dry;;;14,3
 Fungicides;Warm Temperate;Wet;;;14,3
 Fungicides;Warm Temperate;Moist;;;14,3
-Pesticides;Tropical;Dry;;;23,1
-Pesticides;Tropical;Wet;;;23,1
-Pesticides;Tropical;Moist;;;23,1
-Pesticides;Tropical Montane;Dry;;;23,1
-Pesticides;Tropical Montane;Wet;;;23,1
-Pesticides;Tropical Montane;Moist;;;23,1
-Pesticides;Boreal;Dry;;;23,1
-Pesticides;Boreal;Wet;;;23,1
-Pesticides;Boreal;Moist;;;23,1
-Pesticides;Cool Temperate;Dry;;;23,1
-Pesticides;Cool Temperate;Wet;;;23,1
-Pesticides;Cool Temperate;Moist;;;23,1
-Pesticides;Warm Temperate;Dry;;;23,1
-Pesticides;Warm Temperate;Wet;;;23,1
-Pesticides;Warm Temperate;Moist;;;23,1
+Herbicides;Tropical;Dry;;;23,1
+Herbicides;Tropical;Wet;;;23,1
+Herbicides;Tropical;Moist;;;23,1
+Herbicides;Tropical Montane;Dry;;;23,1
+Herbicides;Tropical Montane;Wet;;;23,1
+Herbicides;Tropical Montane;Moist;;;23,1
+Herbicides;Boreal;Dry;;;23,1
+Herbicides;Boreal;Wet;;;23,1
+Herbicides;Boreal;Moist;;;23,1
+Herbicides;Cool Temperate;Dry;;;23,1
+Herbicides;Cool Temperate;Wet;;;23,1
+Herbicides;Cool Temperate;Moist;;;23,1
+Herbicides;Warm Temperate;Dry;;;23,1
+Herbicides;Warm Temperate;Wet;;;23,1
+Herbicides;Warm Temperate;Moist;;;23,1
 Insecticides;Tropical;Dry;;;18,7
 Insecticides;Tropical;Wet;;;18,7
 Insecticides;Tropical;Moist;;;18,7
