@@ -26,8 +26,8 @@ class CustomUser(auth_models.AbstractUser):
     class Meta:
         permissions = (
             ("can_view_modules", "Can view modules"),
-            ("can_create_modules", "Can create modules"),
-            ("can_change_modules", "Can edit modules"),
+            ("can_add_modules", "Can add modules"),
+            ("can_change_modules", "Can change modules"),
             ("can_delete_modules", "Can delete modules"),
         )
 

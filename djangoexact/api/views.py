@@ -419,6 +419,8 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         invitation.status = "accepted"
         invitation.save()
 
+        UserProjectGroup.objects.create(user=user, project=project, group=group)
+
         logging.debug("END ProjectInvitationViewset.create")
         return Response({"message": f"Invitation for {user.email} sent successfully"})
 
@@ -900,7 +902,7 @@ def generic_module_viewset(model: Model):
             else:
                 activity = module_serializer.validated_data["activity"]
 
-            if not utils.has_project_permission("can_create_modules", self.request.user, activity.project):
+            if not utils.has_project_permission("can_add_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to add this module to the project")
                 return utils.ErrorResponse("Selected user does not have permission to add this module to the project", status=status.HTTP_403_FORBIDDEN)
 
