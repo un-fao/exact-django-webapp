@@ -136,9 +136,7 @@ def get_modules(activity: Activity, serialized=True) -> list:
     return module_serializers_list if serialized else modules
 
 
-class AuthenticatedViewSet(viewsets.GenericViewSet):
-    permission_classes = [permissions.IsAuthenticated]
-
+class BaseWiewSet(viewsets.GenericViewSet):
     def get_queryset(self):
 
         # If list operation, filter out inactive objects, unless ?filter_inactive=true
@@ -150,6 +148,14 @@ class AuthenticatedViewSet(viewsets.GenericViewSet):
                 return super().get_queryset()
 
         return super().get_queryset()
+
+
+class AuthenticatedViewSet(BaseWiewSet):
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class PublicViewSet(BaseWiewSet):
+    permission_classes = [permissions.AllowAny]
 
 
 class GroupViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
@@ -773,7 +779,7 @@ class ModuleTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return super().list(request)
 
 
-class CountryViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+class CountryViewSet(viewsets.ModelViewSet, PublicViewSet):
     """
     API endpoint that allows countries to be viewed or edited.
     """
@@ -1028,3 +1034,11 @@ def generic_viewset(model: Model):
         serializer_class = get_model_serializer(model)
 
     return GenericViewSet
+
+
+def public_generic_viewset(model: Model):
+    class PublicGenericViewSet(viewsets.ModelViewSet, PublicViewSet):
+        queryset = model.objects.all()
+        serializer_class = get_model_serializer(model)
+
+    return PublicGenericViewSet
