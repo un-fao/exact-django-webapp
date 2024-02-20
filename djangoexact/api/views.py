@@ -51,7 +51,8 @@ from .serializers import (
     ProjectInvitationWriteSerializer,
     ReadProjectSerializer,
     UserProjectGroupSerializer,
-    UserSerializer,
+    UserReadSerializer,
+    UserWriteSerializer,
     WriteActivitySerializer,
     WriteProjectSerializer,
     get_model_serializer,
@@ -165,13 +166,17 @@ class GroupViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
 class UserViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = CustomUser.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserReadSerializer
 
     # If user is not an admin, only return the user's own data
     def get_queryset(self):
         if self.request.user.is_superuser:
             return self.queryset
         return self.queryset.filter(pk=self.request.user.pk)
+
+    def update(self, request, *args, **kwargs):
+        self.serializer_class = UserWriteSerializer
+        return super().update(request, *args, **kwargs)
 
 
 class LandUseTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
