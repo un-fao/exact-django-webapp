@@ -106,6 +106,8 @@ router.register(r"disturbance-types", views.generic_viewset(models.DisturbanceTy
 router.register(r"forest-types", views.generic_viewset(models.ForestType), basename="forest-types")
 router.register(r"forest-disturbances", views.generic_viewset(models.ForestDisturbance), basename="forest-disturbances")
 
+router.register(r"users", views.UserViewSet, basename="users")
+
 urlpatterns = [
     path("docs/", include_docs_urls(title="EX-ACT Docs")),
     re_path(r"^swagger(?P<format>\.json|\.yaml)$", schema_view.without_ui(cache_timeout=0), name="schema-json"),
