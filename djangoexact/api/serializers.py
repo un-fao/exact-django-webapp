@@ -276,9 +276,15 @@ class ResultSerializer(serializers.Serializer):
         super().__init__(*args, **kwargs)
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserReadSerializer(serializers.ModelSerializer):
     country = get_model_serializer(Country)(many=False, read_only=True)
 
+    class Meta:
+        model = CustomUser
+        fields = ["id", "username", "email", "first_name", "last_name", "country"]
+
+
+class UserWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ["id", "username", "email", "first_name", "last_name", "country"]
@@ -302,7 +308,7 @@ class ReadProjectSerializer(serializers.ModelSerializer):
     soil_type = get_model_serializer(SoilType)(many=False, read_only=True)
     gw_potential = get_model_serializer(GlobalWarmingPotential)(many=False, read_only=True)
     status = get_model_serializer(ProjectStatus)(many=False, required=False, read_only=True)
-    user = UserSerializer(many=False, read_only=True)
+    user = UserReadSerializer(many=False, read_only=True)
 
     class Meta:
         model = Project
@@ -333,7 +339,7 @@ class ProjectResultSerializer(serializers.Serializer):
 class ActivitySerializer(serializers.ModelSerializer):
     name = serializers.CharField(max_length=255, read_only=True)
     project = ReadProjectSerializer(many=False, read_only=True)
-    user = UserSerializer(many=False, read_only=True)
+    user = UserReadSerializer(many=False, read_only=True)
     climate_t2 = get_model_serializer(Climate)(read_only=True)
     soil_type_t2 = get_model_serializer(SoilType)(read_only=True)
     module_types = get_model_serializer(ModuleType)(many=True, read_only=True)
@@ -1366,7 +1372,7 @@ class GroupSerializer(serializers.ModelSerializer):
 
 
 class ProjectInvitationReadSerializer(serializers.ModelSerializer):
-    user = UserSerializer(many=False, read_only=True)
+    user = UserReadSerializer(many=False, read_only=True)
     project = ProjectNameIdSerializer(many=False, read_only=True)
     group = GroupSerializer(many=False, read_only=True)
 
@@ -1483,7 +1489,7 @@ class InputTypeSerializer(serializers.ModelSerializer):
 
 
 class UserProjectGroupSerializer(serializers.ModelSerializer):
-    user = UserSerializer(many=False, read_only=True)
+    user = UserReadSerializer(many=False, read_only=True)
     group = GroupSerializer(many=False, read_only=True)
 
     class Meta:
