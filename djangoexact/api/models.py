@@ -930,9 +930,9 @@ class CroplandMinorSeason(Model):
     class Meta:
         abstract = True
 
-    land_use_type_start = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_start", limit_choices_to={"land_use_type__parent__class_name": "PerennialCropping"})
-    land_use_type_w = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_w", limit_choices_to={"land_use_type__parent__class_name": "PerennialCropping"})
-    land_use_type_wo = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_wo", limit_choices_to={"land_use_type__parent__class_name": "PerennialCropping"})
+    land_use_type_start = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_start")
+    land_use_type_w = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_w")
+    land_use_type_wo = ForeignKey(LandUseType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_wo")
 
     residue_management_type_start = ForeignKey(ResidueManagementType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_residue_management_type_start")
     residue_management_type_w = ForeignKey(ResidueManagementType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_residue_management_type_w")
