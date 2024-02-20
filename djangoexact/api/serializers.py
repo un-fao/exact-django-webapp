@@ -21,6 +21,7 @@ from .models import (
     Comment,
     CommentThread,
     Country,
+    CustomUser,
     Energy,
     FloodedRice,
     ForestManagement,
@@ -276,9 +277,11 @@ class ResultSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    country = get_model_serializer(Country)(many=False, read_only=True)
+
     class Meta:
-        model = User
-        fields = ["id", "username", "email", "first_name", "last_name"]
+        model = CustomUser
+        fields = ["id", "username", "email", "first_name", "last_name", "country"]
 
 
 class CountrySerializer(serializers.ModelSerializer):

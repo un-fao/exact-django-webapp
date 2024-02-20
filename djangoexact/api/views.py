@@ -22,6 +22,7 @@ from .models import (
     Comment,
     CommentThread,
     Country,
+    CustomUser,
     InputType,
     LandUseChange,
     LandUseType,
@@ -50,6 +51,7 @@ from .serializers import (
     ProjectInvitationWriteSerializer,
     ReadProjectSerializer,
     UserProjectGroupSerializer,
+    UserSerializer,
     WriteActivitySerializer,
     WriteProjectSerializer,
     get_model_serializer,
@@ -153,6 +155,17 @@ class AuthenticatedViewSet(viewsets.GenericViewSet):
 class GroupViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
+
+
+class UserViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSerializer
+
+    # If user is not an admin, only return the user's own data
+    def get_queryset(self):
+        if self.request.user.is_superuser:
+            return self.queryset
+        return self.queryset.filter(pk=self.request.user.pk)
 
 
 class LandUseTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
