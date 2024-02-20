@@ -280,3 +280,22 @@ class FloodedRiceFactory(DjangoModelFactory):
     crop_yield_start = factory.fuzzy.FuzzyInteger(1, 10)
     crop_yield_w = factory.fuzzy.FuzzyInteger(1, 10)
     crop_yield_wo = factory.fuzzy.FuzzyInteger(1, 10)
+
+
+class InputFactory(DjangoModelFactory):
+    class Meta:
+        model = Input
+
+
+input_types = [input for input in InputType.objects.all().exclude(name="User Defined Animal Feed")]
+
+
+class InputEntryFactory(DjangoModelFactory):
+    class Meta:
+        model = InputEntry
+
+    input_type = factory.fuzzy.FuzzyChoice(input_types)
+
+    value_start = factory.fuzzy.FuzzyFloat(0, 100)
+    value_w = factory.fuzzy.FuzzyFloat(0, 100)
+    value_wo = factory.fuzzy.FuzzyFloat(0, 100)
