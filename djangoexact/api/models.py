@@ -1153,6 +1153,7 @@ class Livestock(Module):
 
 class ForestManagement(LandModule, MultiBiomassModule):
     forest_type = ForeignKey(ForestType, on_delete=CASCADE, null=True, blank=True)
+    forest_condition_type = ForeignKey(ForestConditionType, on_delete=CASCADE, null=True, blank=True)
 
     ##### ROTATION #####
 
@@ -1224,11 +1225,10 @@ class ForestManagement(LandModule, MultiBiomassModule):
     degradation_dry_matter_impacted_t2_w = FloatField(null=True, blank=True)
     degradation_dry_matter_impacted_t2_wo = FloatField(null=True, blank=True)
 
-    # def save(self, *args, **kwargs):
-    #     if not self.land_use_type_start:
-    #         self.land_use_type_start = LandUseType.objects.get(name="Agroforestry")
-    #         self.land_use_type_w = self.land_use_type_start
-    #         self.land_use_type_wo = self.land_use_type_start
+    def save(self, *args, **kwargs):
+        if self.land_use_type_start:
+            self.land_use_type_w = self.land_use_type_start
+            self.land_use_type_wo = self.land_use_type_start
 
 
 class DisturbanceType(Model):
@@ -1241,7 +1241,7 @@ class DisturbanceType(Model):
 class ForestDisturbance(Model):
     forest_management = ForeignKey(ForestManagement, on_delete=CASCADE, related_name="disturbances")
 
-    disturbance_type = ForeignKey(DisturbanceType, on_delete=CASCADE)
+    disturbance_type = ForeignKey(DisturbanceType, on_delete=CASCADE, null=True, blank=True)
     disturbance_type_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_disturbance_type_thread")
 
     recurrence_yrs_start = IntegerField(null=True, blank=True)
