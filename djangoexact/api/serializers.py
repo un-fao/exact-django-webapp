@@ -1390,10 +1390,6 @@ class ForestManagementWriteSerializer(LandModuleWriteSerializer):
         model = ForestManagement
         fields = "__all__"
         ref_name = "ForestManagement"
-        mandatory_fields = [
-            "forest_management_type",
-            "area",
-        ]
 
     def validate(self, data):
         return super().validate(data)

@@ -4824,29 +4824,29 @@ class ForestManagementCalculator(BaseCalculator):
         else:
             land_use_type = input.land_use_type_start
 
-        forest_mgmt: ForestManagement = luc.forestmanagement if luc else input
+        forest: ForestManagement = luc.forestmanagement if luc else input
 
-        AGB_GROWTH_NOT_FOUND = f"AGB Growth not found for ({forest_mgmt.forest_type.name}) {land_use_type.name} in {project.climate.name} climate, {project.country.region.name} region. Please insert t2 values for AGB Growth Rate for all scenarios."
-        BGB_UNDER_20_NOT_FOUND = f"BGB (under 20 years) not found for ({forest_mgmt.forest_type.name}) {land_use_type.name} in {project.climate.name} climate, {project.country.region.name} region. Please insert t2 values for BGB (under 20 years) for all scenarios."
-        BGB_OVER_20_NOT_FOUND = f"BGB (over 20 years) not found for ({forest_mgmt.forest_type.name}) {land_use_type.name} in {project.climate.name} climate, {project.country.region.name} region. Please insert t2 values for BGB (over 20 years) for all scenarios."
-        AGB_UNDER_20_NOT_FOUND = f"AGB (under 20 years) not found for ({forest_mgmt.forest_type.name}) {land_use_type.name} in {project.climate.name} climate, {project.country.region.name} region. Please insert t2 values for AGB (under 20 years) for all scenarios."
-        AGB_OVER_20_NOT_FOUND = f"AGB (over 20 years) not found for ({forest_mgmt.forest_type.name}) {land_use_type.name} in {project.climate.name} climate, {project.country.region.name} region. Please insert t2 values for AGB (over 20 years) for all scenarios."
-        LITTER_DW_NOT_FOUND = f"Litter/Deadwood Carbon Stock reference value not found for ({forest_mgmt.forest_type.name}) {land_use_type.name} in {project.climate.name} climate, {project.country.region.name} region."
-        FLU_START_NOT_FOUND = f"FLU reference value not found for ({forest_mgmt.forest_type.name}) {land_use_type.name} in {project.climate.name} climate, {project.country.region.name} region."
+        AGB_GROWTH_NOT_FOUND = f"AGB Growth not found for ({forest.forest_type.name}) {land_use_type.name} in {project.climate.name} climate, {project.country.region.name} region. Please insert t2 values for AGB Growth Rate for all scenarios."
+        BGB_UNDER_20_NOT_FOUND = f"BGB (under 20 years) not found for ({forest.forest_type.name}) {land_use_type.name} in {project.climate.name} climate, {project.country.region.name} region. Please insert t2 values for BGB (under 20 years) for all scenarios."
+        BGB_OVER_20_NOT_FOUND = f"BGB (over 20 years) not found for ({forest.forest_type.name}) {land_use_type.name} in {project.climate.name} climate, {project.country.region.name} region. Please insert t2 values for BGB (over 20 years) for all scenarios."
+        AGB_UNDER_20_NOT_FOUND = f"AGB (under 20 years) not found for ({forest.forest_type.name}) {land_use_type.name} in {project.climate.name} climate, {project.country.region.name} region. Please insert t2 values for AGB (under 20 years) for all scenarios."
+        AGB_OVER_20_NOT_FOUND = f"AGB (over 20 years) not found for ({forest.forest_type.name}) {land_use_type.name} in {project.climate.name} climate, {project.country.region.name} region. Please insert t2 values for AGB (over 20 years) for all scenarios."
+        LITTER_DW_NOT_FOUND = f"Litter/Deadwood Carbon Stock reference value not found for ({forest.forest_type.name}) {land_use_type.name} in {project.climate.name} climate, {project.country.region.name} region."
+        FLU_START_NOT_FOUND = f"FLU reference value not found for ({forest.forest_type.name}) {land_use_type.name} in {project.climate.name} climate, {project.country.region.name} region."
         SOC_NOT_FOUND = f"Soil Organic Carbon reference value not found for the given parameters in {project.climate.name} climate, {project.moisture.name} moisture, {project.soil_type.name} soil type."
 
         is_afforestation_w = luc and luc.module_type_w.class_name == "ForestManagement"
         is_afforestation_wo = luc and luc.module_type_wo.class_name == "ForestManagement"
 
-        has_t2_growth_start = forest_mgmt.agb_growth_rate_gt_20_yrs_t2_start and forest_mgmt.agb_growth_rate_le_20_yrs_t2_start
-        has_t2_growth_w = forest_mgmt.agb_growth_rate_gt_20_yrs_t2_w and forest_mgmt.agb_growth_rate_le_20_yrs_t2_w
-        has_t2_growth_wo = forest_mgmt.agb_growth_rate_gt_20_yrs_t2_wo and forest_mgmt.agb_growth_rate_le_20_yrs_t2_wo
+        has_t2_growth_start = forest.agb_growth_rate_gt_20_yrs_t2_start and forest.agb_growth_rate_le_20_yrs_t2_start
+        has_t2_growth_w = forest.agb_growth_rate_gt_20_yrs_t2_w and forest.agb_growth_rate_le_20_yrs_t2_w
+        has_t2_growth_wo = forest.agb_growth_rate_gt_20_yrs_t2_wo and forest.agb_growth_rate_le_20_yrs_t2_wo
 
         crluft = {
             "climate": project.climate,
             "region": project.country.region,
             "land_use_type": land_use_type,
-            "forest_type": forest_mgmt.forest_type,
+            "forest_type": forest.forest_type,
         }
 
         try:
@@ -4858,7 +4858,7 @@ class ForestManagementCalculator(BaseCalculator):
             raise ValueError(SOC_NOT_FOUND)
 
         try:
-            litter_dw = ipcc.LitterDeadwoodCarbonStock.objects.get(climate=project.climate, forest_type=forest_mgmt.forest_type, land_use_type=land_use_type)
+            litter_dw = ipcc.LitterDeadwoodCarbonStock.objects.get(climate=project.climate, forest_type=forest.forest_type, land_use_type=land_use_type)
         except ipcc.LitterDeadwoodCarbonStock.DoesNotExist:
             raise ValueError(LITTER_DW_NOT_FOUND)
 
@@ -4888,13 +4888,18 @@ class ForestManagementCalculator(BaseCalculator):
         Se parliamo di forest management invece usiamo i valori di Secondary > 20 sia per AGB growth che per AGB max.
         """
 
+        forest_options = { "forest_condition_type": forest.forest_condition_type, "from_year": 0 }
+
         try:
-            agb_under_20 = ipcc.ForestManagementAGB.objects.get(**crluft, forest_condition_type__name="Secondary ≤20 Years")
+            agb_under_20 = ipcc.ForestManagementAGB.objects.get(**crluft, **forest_options)
         except ipcc.ForestManagementAGB.DoesNotExist:
             raise ValueError(AGB_UNDER_20_NOT_FOUND)
 
         try:
-            agb_over_20 = ipcc.ForestManagementAGB.objects.get(**crluft, forest_condition_type__name="Secondary >20 Years")
+            if forest.forest_condition_type.name == "Secondary":
+                forest_options.update({"from_year": 21})
+
+            agb_over_20 = ipcc.ForestManagementAGB.objects.get(**crluft, **forest_options)
         except ipcc.ForestManagementAGB.DoesNotExist:
             raise ValueError(AGB_OVER_20_NOT_FOUND)
 
@@ -4954,42 +4959,42 @@ class ForestManagementCalculator(BaseCalculator):
             input.activity.change_rate.name,
             0,
             area,
-            forest_mgmt.rotation_length_yrs_w,
-            forest_mgmt.rotation_start_year_t2_w,
-            forest_mgmt.rotation_percentage_biomass_for_energy_w,
+            forest.rotation_length_yrs_w,
+            forest.rotation_start_year_t2_w,
+            forest.rotation_percentage_biomass_for_energy_w,
             bgb_before_20_yrs.threshold,
             bgb_before_20_yrs.value,
             bgb_after_20_yrs.value,
-            forest_mgmt.bgb_growth_rate_le_20_yrs_t2_w,
-            forest_mgmt.bgb_growth_rate_gt_20_yrs_t2_w,
+            forest.bgb_growth_rate_le_20_yrs_t2_w,
+            forest.bgb_growth_rate_gt_20_yrs_t2_w,
             agb_start_w,
-            forest_mgmt.agb_t2_w,
+            forest.agb_t2_w,
             agb_growth_under_20_w,
-            forest_mgmt.agb_growth_rate_le_20_yrs_t2_w,
+            forest.agb_growth_rate_le_20_yrs_t2_w,
             agb_growth_over_20_w,
-            forest_mgmt.agb_growth_rate_gt_20_yrs_t2_w,
+            forest.agb_growth_rate_gt_20_yrs_t2_w,
             agb_max_w,
             None,  # TODO: max_bgb_value ?? Unused in math model
             list(disturbances.values_list("recurrence_yrs_w", flat=True)),
             list(disturbances.values_list("percentage_biomass_destruction_w", flat=True)),
             list(disturbances.values_list("start_year_t2_w", flat=True)),
-            forest_mgmt.logging_recurrence_yrs_w,
-            forest_mgmt.logging_percentage_agb_logged_w,
-            forest_mgmt.logging_percentage_biomass_for_energy_w,
-            forest_mgmt.logging_start_year_t2_w,
+            forest.logging_recurrence_yrs_w,
+            forest.logging_percentage_agb_logged_w,
+            forest.logging_percentage_biomass_for_energy_w,
+            forest.logging_start_year_t2_w,
             litter_dw.litter,
             litter_dw_start_w.litter,
             litter_dw_max_w.litter,
-            forest_mgmt.litter_t2_w,
+            forest.litter_t2_w,
             litter_dw.dw,
             litter_dw_start_w.dw,
             litter_dw_max_w.dw,
-            forest_mgmt.deadwood_t2_w,
+            forest.deadwood_t2_w,
             socref.value,
             project.soc_ref_t2,
-            forest_mgmt.flu_t2_w,
-            forest_mgmt.fi_t2_w,
-            forest_mgmt.fmg_t2_w,
+            forest.flu_t2_w,
+            forest.fi_t2_w,
+            forest.fmg_t2_w,
             flu_w.value,
             1,  # FI # TODO: Not yet implemented
             1,  # FMG # TODO: Not yet implemented
@@ -5006,42 +5011,42 @@ class ForestManagementCalculator(BaseCalculator):
             input.activity.change_rate.name,
             0,
             area,
-            forest_mgmt.rotation_length_yrs_wo,
-            forest_mgmt.rotation_start_year_t2_wo,
-            forest_mgmt.rotation_percentage_biomass_for_energy_wo,
+            forest.rotation_length_yrs_wo,
+            forest.rotation_start_year_t2_wo,
+            forest.rotation_percentage_biomass_for_energy_wo,
             bgb_before_20_yrs.threshold,
             bgb_before_20_yrs.value,
             bgb_after_20_yrs.value,
-            forest_mgmt.bgb_growth_rate_le_20_yrs_t2_wo,
-            forest_mgmt.bgb_growth_rate_gt_20_yrs_t2_wo,
+            forest.bgb_growth_rate_le_20_yrs_t2_wo,
+            forest.bgb_growth_rate_gt_20_yrs_t2_wo,
             agb_start_wo,
-            forest_mgmt.agb_t2_wo,
+            forest.agb_t2_wo,
             agb_growth_under_20_wo,
-            forest_mgmt.agb_growth_rate_le_20_yrs_t2_wo,
+            forest.agb_growth_rate_le_20_yrs_t2_wo,
             agb_growth_over_20_wo,
-            forest_mgmt.agb_growth_rate_gt_20_yrs_t2_wo,
+            forest.agb_growth_rate_gt_20_yrs_t2_wo,
             agb_max_wo,
             None,  # TODO: max_bgb_value ?? Unused in math model
             list(disturbances.values_list("recurrence_yrs_wo", flat=True)),
             list(disturbances.values_list("percentage_biomass_destruction_wo", flat=True)),
             list(disturbances.values_list("start_year_t2_wo", flat=True)),
-            forest_mgmt.logging_recurrence_yrs_wo,
-            forest_mgmt.logging_percentage_agb_logged_wo,
-            forest_mgmt.logging_percentage_biomass_for_energy_wo,
-            forest_mgmt.logging_start_year_t2_wo,
+            forest.logging_recurrence_yrs_wo,
+            forest.logging_percentage_agb_logged_wo,
+            forest.logging_percentage_biomass_for_energy_wo,
+            forest.logging_start_year_t2_wo,
             litter_dw.litter,
             litter_dw_start_wo.litter,
             litter_dw_max_wo.litter,
-            forest_mgmt.litter_t2_wo,
+            forest.litter_t2_wo,
             litter_dw.dw,
             litter_dw_start_wo.dw,
             litter_dw_max_wo.dw,
-            forest_mgmt.deadwood_t2_wo,
+            forest.deadwood_t2_wo,
             socref.value,
             project.soc_ref_t2,
-            forest_mgmt.flu_t2_wo,
-            forest_mgmt.fi_t2_wo,
-            forest_mgmt.fmg_t2_wo,
+            forest.flu_t2_wo,
+            forest.fi_t2_wo,
+            forest.fmg_t2_wo,
             flu_wo.value,
             1,  # FI # TODO: Not yet implemented
             1,  # FMG # TODO: Not yet implemented

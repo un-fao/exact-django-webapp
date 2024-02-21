@@ -3866,4 +3866,13 @@ for i, row in enumerate(rows):
             moisture=moisture,
             value=value,
         )
+
+agbs = ForestManagementAGB.objects.all()
+foo = ForestConditionType.objects.get(name="Secondary ≤20 Years")
+
+for agb in agbs:
+    if ">20" in agb.forest_condition_type.name:
+        print(agb)
+        agb.forest_condition_type = foo
+        agb.save()
 """

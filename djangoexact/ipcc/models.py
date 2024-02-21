@@ -1285,6 +1285,7 @@ class ForestManagementAGB(Model):
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     region = ForeignKey("api.Region", on_delete=CASCADE)
     forest_condition_type = ForeignKey("api.ForestConditionType", on_delete=CASCADE)
+    from_year = IntegerField(default=0)
     forest_type = ForeignKey("api.ForestType", on_delete=CASCADE)
     agb_min = FloatField(default=0)
     agb_max = FloatField(default=0)
@@ -1292,8 +1293,11 @@ class ForestManagementAGB(Model):
     agb_growth_max = FloatField(default=0)
     agb_unit = CharField(max_length=100, default="tonnes d.m./ha")
 
+    class Meta:
+        unique_together = ("climate", "land_use_type", "region", "forest_condition_type", "from_year", "forest_type")
+
     def __str__(self):
-        return f"({self.pk}) {self.land_use_type.name} {self.region.name} {self.forest_condition_type.name} {self.forest_type.name}"
+        return f"({self.pk}) ({self.forest_type.name}) {self.land_use_type.name} {self.forest_condition_type.name} from {self.from_year} years in {self.region.name}"
 
 
 class FMGData(Model):
