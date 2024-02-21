@@ -49,10 +49,11 @@ class LivestockTAMAdmin(admin.ModelAdmin):
 
 class ForestManagementAGBAdmin(admin.ModelAdmin):
     list_display = [
-        "land_use_type",
-        "region",
         "forest_type",
+        "land_use_type",
         "forest_condition_type",
+        "from_year",
+        "region",
         "agb_min",
         "agb_max",
         "agb_growth_min",
