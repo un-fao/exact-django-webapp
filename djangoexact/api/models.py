@@ -1153,7 +1153,7 @@ class Livestock(Module):
 
 class ForestManagement(LandModule, MultiBiomassModule):
     forest_type = ForeignKey(ForestType, on_delete=CASCADE, null=True, blank=True)
-    forest_condition_type = ForeignKey(ForestConditionType, on_delete=CASCADE, null=True, blank=True)
+    forest_condition_type = ForeignKey(ForestConditionType, on_delete=CASCADE)
 
     ##### ROTATION #####
 
@@ -1229,6 +1229,7 @@ class ForestManagement(LandModule, MultiBiomassModule):
         if self.land_use_type_start:
             self.land_use_type_w = self.land_use_type_start
             self.land_use_type_wo = self.land_use_type_start
+        return super().save(*args, **kwargs)
 
 
 class DisturbanceType(Model):
