@@ -1,5 +1,11 @@
 from enum import Enum
 import copy
+import matplotlib.pyplot as plt
+from collections import defaultdict
+import os
+from tempfile import TemporaryDirectory
+from PIL import Image
+
 class GasTypes(Enum):
     CO2 = "CO2"
     CH4 = "CH4"
@@ -127,7 +133,9 @@ class Result:
     
     def breakdown_by_activity(self):
 
-        aggregated_emissions = {activity.value: YearlyActivityEmissionSet(0, [Emission(gas_type=None) for i in range(self.time_tot)], activity.value) for activity in [i.activity for i in self.yearly_emissions_by_sector_by_gas]}
+        aggregated_emissions = {activity.value: 
+                                YearlyActivityEmissionSet(0, [Emission(gas_type=None) for i in range(self.time_tot)], activity.value) 
+                                for activity in [i.activity for i in self.yearly_emissions_by_sector_by_gas]}
 
         for yearly_emission in self.yearly_emissions_by_sector_by_gas:
             aggregated_emissions[yearly_emission.activity.value].emissions = [x + y for x,y in zip(aggregated_emissions[yearly_emission.activity.value].emissions, yearly_emission.emissions)]
@@ -192,6 +200,53 @@ class Result:
                 )
 
         return result_obj
+    
+    def plot_emissions_and_aggregate_by_activity(result):
+        emissions_data = result.breakdown(by=BreakdownTypes.ACTIVITY_GAS)
+        
+        # Aggregate the data by activity
+        activity_data = defaultdict(list)
+        for item in emissions_data:
+            activity_data[item.activity].append(item)
+        
+        with TemporaryDirectory() as tmpdirname:
+            plot_filenames = []
+            
+            # Create a plot for each activity and save to temp directory
+            for activity, data in activity_data.items():
+                plt.figure()
+                plt.title('Activity: {}, Total Emissions: {}'.format(activity, round(sum([sum([e.value for e in item.emissions]) for item in data]), 2)))
+                plt.xlabel("Year (starting from 0)")
+                plt.ylabel("Emission Value")
 
+                for item in data:
+                    plt.plot(range(len(item.emissions)), [e.value for e in item.emissions], label=item.gas_type.value, marker = 'o')
 
-    # Here add all necessary functions for result aggregation depending on what Claudio needs
+                plt.legend()
+                plt.xticks(range(0, len(item.emissions)))
+            
+                
+                # Save the plot
+                plot_filename = os.path.join(tmpdirname, '{}.png'.format(activity))
+                plt.savefig(plot_filename)
+                plt.close()  # Close the plot to free memory
+                plot_filenames.append(plot_filename)
+            
+            # Aggregate all saved plots into a single image
+            images = [Image.open(filename) for filename in plot_filenames]
+            widths, heights = zip(*(i.size for i in images))
+            
+            total_width = max(widths)
+            total_height = sum(heights)
+            combined_image = Image.new('RGB', (total_width, total_height))
+            
+            y_offset = 0
+            for img in images:
+                combined_image.paste(img, (0, y_offset))
+                y_offset += img.size[1]
+            
+            # Display the aggregated image
+            combined_image.show()
+            
+            # The TemporaryDirectory context manager automatically cleans up the directory once done
+
