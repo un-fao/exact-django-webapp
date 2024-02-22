@@ -104,6 +104,7 @@ router.register(r"livestock-production-types", views.generic_viewset(models.Live
 router.register(r"manure-management-types", views.generic_viewset(models.ManureManagementType), basename="manure-management-types")
 router.register(r"disturbance-types", views.generic_viewset(models.DisturbanceType), basename="disturbance-types")
 router.register(r"forest-types", views.generic_viewset(models.ForestType), basename="forest-types")
+router.register(r"forest-condition-types", views.generic_viewset(models.ForestConditionType), basename="forest-condition-types")
 router.register(r"forest-disturbances", views.generic_viewset(models.ForestDisturbance), basename="forest-disturbances")
 
 router.register(r"users", views.UserViewSet, basename="users")
