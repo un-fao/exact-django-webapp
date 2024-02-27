@@ -1,11 +1,9 @@
 from api.models import CustomUser as User
 from rest_framework import generics
 from rest_framework.decorators import authentication_classes, permission_classes
-from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework_simplejwt.views import TokenObtainPairView
 
-from .serializers import MyTokenObtainPairSerializer, RegisterSerializer, UserSerializer
+from .serializers import RegisterSerializer, UserSerializer
 
 
 @authentication_classes([])
