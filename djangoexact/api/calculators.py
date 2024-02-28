@@ -1946,17 +1946,50 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
         soc_w = soc.value
         soc_wo = soc.value
 
-        flu_start = get_flu_data(module, climate, moisture, utils.ScenarioTypes.START)
-        flu_w = get_flu_data(module, climate, moisture, utils.ScenarioTypes.WITH)
-        flu_wo = get_flu_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
+        try:
+            flu_start = get_flu_data(module, climate, moisture, utils.ScenarioTypes.START)
+        except ipcc.FLUData.DoesNotExist:
+            raise ValueError(f"FLUData for {module.land_use_type_start.name} in {climate.name} climate, {moisture.name} moisture does not exist")
 
-        fmg_start = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.START)
-        fmg_w = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.WITH)
-        fmg_wo = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
+        try:
+            flu_w = get_flu_data(module, climate, moisture, utils.ScenarioTypes.WITH)
+        except ipcc.FLUData.DoesNotExist:
+            raise ValueError(f"FLUData for {module.land_use_type_w.name} in {climate.name} climate, {moisture.name} moisture does not exist")
 
-        fi_start = get_fi_data(module, climate, moisture, utils.ScenarioTypes.START)
-        fi_w = get_fi_data(module, climate, moisture, utils.ScenarioTypes.WITH)
-        fi_wo = get_fi_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
+        try:
+            flu_wo = get_flu_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
+        except ipcc.FLUData.DoesNotExist:
+            raise ValueError(f"FLUData for {module.land_use_type_wo.name} in {climate.name} climate, {moisture.name} moisture does not exist")
+
+        try:
+            fmg_start = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.START)
+        except ipcc.FMGData.DoesNotExist:
+            raise ValueError(f"FMGData for {module.tillage_management_type_start.name} in {climate.name} climate, {moisture.name} moisture does not exist")
+
+        try:
+            fmg_w = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.WITH)
+        except ipcc.FMGData.DoesNotExist:
+            raise ValueError(f"FMGData for {module.tillage_management_type_w.name} in {climate.name} climate, {moisture.name} moisture does not exist")
+
+        try:
+            fmg_wo = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
+        except ipcc.FMGData.DoesNotExist:
+            raise ValueError(f"FMGData for {module.tillage_management_type_wo.name} in {climate.name} climate, {moisture.name} moisture does not exist")
+
+        try:
+            fi_start = get_fi_data(module, climate, moisture, utils.ScenarioTypes.START)
+        except ipcc.FIData.DoesNotExist:
+            raise ValueError(f"FIData for {module.organic_input_type_start.name} in {climate.name} climate, {moisture.name} moisture does not exist")
+
+        try:
+            fi_w = get_fi_data(module, climate, moisture, utils.ScenarioTypes.WITH)
+        except ipcc.FIData.DoesNotExist:
+            raise ValueError(f"FIData for {module.organic_input_type_w.name} in {climate.name} climate, {moisture.name} moisture does not exist")
+
+        try:
+            fi_wo = get_fi_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
+        except ipcc.FIData.DoesNotExist:
+            raise ValueError(f"FIData for {module.organic_input_type_wo.name} in {climate.name} climate, {moisture.name} moisture does not exist")
 
         try:
             sfw_start = ipcc.RiceSFW.objects.get(water_management_type_after_cultivation=module.water_management_type_after_cultivation_start)
