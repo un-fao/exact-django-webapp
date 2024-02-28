@@ -3417,8 +3417,15 @@ class BuildingCalculator(BaseCalculator):
         input: Building = self.data
         project: Project = input.activity.project
 
-        ef_w: ipcc.BuildingEmissionFactor = ipcc.BuildingEmissionFactor.objects.get(building_type=input.building_type_w)
-        ef_wo: ipcc.BuildingEmissionFactor = ipcc.BuildingEmissionFactor.objects.get(building_type=input.building_type_wo)
+        try:
+            ef_w: ipcc.BuildingEmissionFactor = ipcc.BuildingEmissionFactor.objects.get(building_type=input.building_type_w)
+        except ipcc.BuildingEmissionFactor.DoesNotExist:
+            raise ValueError(f"Building emission factor for {input.building_type_w.name} does not exist")
+
+        try:
+            ef_wo: ipcc.BuildingEmissionFactor = ipcc.BuildingEmissionFactor.objects.get(building_type=input.building_type_wo)
+        except ipcc.BuildingEmissionFactor.DoesNotExist:
+            raise ValueError(f"Building emission factor for {input.building_type_wo.name} does not exist")
 
         math_w = None
         math_wo = None
@@ -3473,8 +3480,15 @@ class RoadCalculator(BaseCalculator):
         input: Road = self.data
         project: Project = input.activity.project
 
-        ef_w: ipcc.RoadEmissionFactor = ipcc.RoadEmissionFactor.objects.get(road_type=input.road_type_w)
-        ef_wo: ipcc.RoadEmissionFactor = ipcc.RoadEmissionFactor.objects.get(road_type=input.road_type_wo)
+        try:
+            ef_w: ipcc.RoadEmissionFactor = ipcc.RoadEmissionFactor.objects.get(road_type=input.road_type_w)
+        except ipcc.RoadEmissionFactor.DoesNotExist:
+            raise ValueError(f"Road emission factor for {input.road_type_w.name} does not exist")
+
+        try:
+            ef_wo: ipcc.RoadEmissionFactor = ipcc.RoadEmissionFactor.objects.get(road_type=input.road_type_wo)
+        except ipcc.RoadEmissionFactor.DoesNotExist:
+            raise ValueError(f"Road emission factor for {input.road_type_wo.name} does not exist")
 
         math_w = None
         math_wo = None
