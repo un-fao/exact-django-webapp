@@ -4504,37 +4504,40 @@ class IrrigationSystemCalculator(BaseCalculator):
         Calculates the emissions of the irrigation system
         """
 
-        _input: IrrigationSystem = self.data
-        project: Project = _input.activity.project
+        module: IrrigationSystem = self.data
+        project: Project = module.activity.project
 
-        ef = ipcc.IrrigationSystemData.objects.get(irrigation_system_type=_input.irrigation_system_type)
+        try:
+            ef = ipcc.IrrigationSystemData.objects.get(irrigation_system_type=module.irrigation_system_type)
+        except ipcc.IrrigationSystemData.DoesNotExist:
+            raise ValueError(f"Could not find EF for {module.irrigation_system_type.name}")
 
         math_w = None
         math_wo = None
 
-        if is_with(_input):
+        if is_with(module):
             inputs_w = [
                 ef.value,
-                _input.ef_t2_start,
-                _input.ha_start,
-                _input.ha_w,
+                module.ef_t2_start,
+                module.ha_start,
+                module.ha_w,
                 project.implementation_years,
                 project.capitalization_years,
-                _input.activity.change_rate.name,
+                module.activity.change_rate.name,
             ]
 
             math_w = NewIrrigation(*inputs_w)
             math_w.calculate_emissions()
 
-        if is_without(_input):
+        if is_without(module):
             inputs_wo = [
                 ef.value,
-                _input.ef_t2_wo,
-                _input.ha_start,
-                _input.ha_wo,
+                module.ef_t2_wo,
+                module.ha_start,
+                module.ha_wo,
                 project.implementation_years,
                 project.capitalization_years,
-                _input.activity.change_rate.name,
+                module.activity.change_rate.name,
             ]
 
             math_wo = NewIrrigation(*inputs_wo)
@@ -4556,13 +4559,35 @@ class IrrigationPhaseCalculator(BaseCalculator):
         input: IrrigationPhase = self.data
         project: Project = input.activity.project
 
-        ef = ipcc.IrrigationPhaseData.objects.get(fuel_type=input.fuel_type)
-        energy_db = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=input.fuel_type)
-        pressure = ipcc.IrrigationPressureRequirement.objects.get(irrigation_system_type=input.irrigation_system_type)
+        try:
+            ef = ipcc.IrrigationPhaseData.objects.get(fuel_type=input.fuel_type)
+        except ipcc.IrrigationPhaseData.DoesNotExist:
+            raise ValueError(f"Could not find EF for {input.fuel_type.name}")
 
-        erh_electricity = IrrigationParameter.objects.get(name="ERH_ELECTRICITY").value if input.fuel_type.name == "Electricity" else None
-        transportation_loss = IrrigationParameter.objects.get(name="TRANSPORTATION_LOSS")
-        pumping_efficiency = IrrigationParameter.objects.get(name="PUMPING_EFFICIENCY")
+        try:
+            energy_db = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=input.fuel_type)
+        except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
+            raise ValueError(f"Could not find Energy Default Emission Factor for {input.fuel_type.name}")
+
+        try:
+            pressure = ipcc.IrrigationPressureRequirement.objects.get(irrigation_system_type=input.irrigation_system_type)
+        except ipcc.IrrigationPressureRequirement.DoesNotExist:
+            raise ValueError(f"Could not find Pressure Requirement for {input.irrigation_system_type.name}")
+
+        try:
+            erh_electricity = IrrigationParameter.objects.get(name="ERH_ELECTRICITY").value if input.fuel_type.name == "Electricity" else None
+        except IrrigationParameter.DoesNotExist:
+            raise ValueError(f"Could not find ERH_ELECTRICITY")
+
+        try:
+            transportation_loss = IrrigationParameter.objects.get(name="TRANSPORTATION_LOSS")
+        except IrrigationParameter.DoesNotExist:
+            raise ValueError(f"Could not find TRANSPORTATION_LOSS")
+
+        try:
+            pumping_efficiency = IrrigationParameter.objects.get(name="PUMPING_EFFICIENCY")
+        except IrrigationParameter.DoesNotExist:
+            raise ValueError(f"Could not find PUMPING_EFFICIENCY")
 
         math_start = None
         math_w = None
