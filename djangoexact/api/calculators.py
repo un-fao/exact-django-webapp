@@ -1025,12 +1025,12 @@ class AnnualCropCalculator(BaseCalculator):
             fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
         except ipcc.FIData.DoesNotExist:
             raise Exception(f"FIData for {module_start.organic_input_type_start.name} in {climate.name} climate, {moisture.name} moisture does not exist")
-        
+
         try:
             fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
         except ipcc.FMGData.DoesNotExist:
             raise Exception(f"FMGData for {module_start.tillage_management_type_start.name} in {climate.name} climate, {moisture.name} moisture does not exist")
-        
+
         try:
             flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
         except ipcc.FLUData.DoesNotExist:
@@ -1040,27 +1040,27 @@ class AnnualCropCalculator(BaseCalculator):
             fi_w = get_fi_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
         except ipcc.FIData.DoesNotExist:
             raise Exception(f"FIData for {module_w.organic_input_type_w.name} in {climate.name} climate, {moisture.name} moisture does not exist")
-        
+
         try:
             fmg_w = get_fmg_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
         except ipcc.FMGData.DoesNotExist:
             raise Exception(f"FMGData for {module_w.tillage_management_type_w.name} in {climate.name} climate, {moisture.name} moisture does not exist")
-        
+
         try:
             flu_w = get_flu_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
         except ipcc.FLUData.DoesNotExist:
             raise Exception(f"FLUData for {module_w.land_use_type_w.name} in {climate.name} climate, {moisture.name} moisture does not exist")
-        
+
         try:
             fi_wo = get_fi_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
         except ipcc.FIData.DoesNotExist:
             raise Exception(f"FIData for {module_wo.organic_input_type_wo.name} in {climate.name} climate, {moisture.name} moisture does not exist")
-        
+
         try:
             fmg_wo = get_fmg_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
         except ipcc.FMGData.DoesNotExist:
             raise Exception(f"FMGData for {module_wo.tillage_management_type_wo.name} in {climate.name} climate, {moisture.name} moisture does not exist")
-        
+
         try:
             flu_wo = get_flu_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
         except ipcc.FLUData.DoesNotExist:
@@ -1070,29 +1070,29 @@ class AnnualCropCalculator(BaseCalculator):
             crop_yield_start = input.crop_yield_start if input.crop_yield_start else ipcc.CropYieldStats.objects.get_or_region_average(continent=project.country.region, land_use_type=input.land_use_type_start).average
         except ipcc.CropYieldStats.DoesNotExist:
             raise Exception(f"CropYieldStats for {input.land_use_type_start.name} in {project.country.region.name} region does not exist")
-        
+
         try:
             crop_yield_w = input.crop_yield_w if input.crop_yield_w else ipcc.CropYieldStats.objects.get_or_region_average(continent=project.country.region, land_use_type=input.land_use_type_w).average
         except ipcc.CropYieldStats.DoesNotExist:
             raise Exception(f"CropYieldStats for {input.land_use_type_w.name} in {project.country.region.name} region does not exist")
-        
+
         try:
             crop_yield_wo = input.crop_yield_wo if input.crop_yield_wo else ipcc.CropYieldStats.objects.get_or_region_average(continent=project.country.region, land_use_type=input.land_use_type_wo).average
         except ipcc.CropYieldStats.DoesNotExist:
             raise Exception(f"CropYieldStats for {input.land_use_type_wo.name} in {project.country.region.name} region does not exist")
 
             # General
-        
+
         try:
             soc = ipcc.SoilOrganicCarbon.objects.get(**cm, soil_type=soil_type)
         except ipcc.SoilOrganicCarbon.DoesNotExist:
             raise Exception(f"SoilOrganicCarbon for {soil_type.name} soil type in {climate.name} climate and {moisture.name} moisture does not exist")
-        
+
         try:
             flu = ipcc.CroplandFLU.objects.get(**cm, land_use_type__name__icontains="Long-Term Cultivated")
         except ipcc.CroplandFLU.DoesNotExist:
             raise Exception(f"CroplandFLU for Long-Term Cultivated in {climate.name} climate and {moisture.name} moisture does not exist")
-        
+
         try:
             burning_emission_factor = ipcc.BurningEmissionFactor.objects.get(category__name="Agricultural residues")
         except ipcc.BurningEmissionFactor.DoesNotExist:
@@ -1118,7 +1118,7 @@ class AnnualCropCalculator(BaseCalculator):
                 fires_start = ipcc.FiresCombustionFactor.objects.get(land_use_type=lut_start)
             except ipcc.FiresCombustionFactor.DoesNotExist:
                 raise Exception(f"FiresCombustionFactor for {lut_start.name} does not exist")
-        
+
             try:
                 n_estimation_factor_start = ipcc.CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=lut_start)
             except ipcc.CropNitrousEstimationDefaultFactor.DoesNotExist:
@@ -1198,7 +1198,7 @@ class AnnualCropCalculator(BaseCalculator):
                 fires_w = ipcc.FiresCombustionFactor.objects.get(land_use_type=lut_w)
             except ipcc.FiresCombustionFactor.DoesNotExist:
                 raise Exception(f"FiresCombustionFactor for {lut_w.name} does not exist")
-            
+
             try:
                 n_estimation_factor_w = ipcc.CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=lut_w)
             except ipcc.CropNitrousEstimationDefaultFactor.DoesNotExist:
@@ -1281,7 +1281,7 @@ class AnnualCropCalculator(BaseCalculator):
                 fires_start = ipcc.FiresCombustionFactor.objects.get(land_use_type=lut_start)
             except ipcc.FiresCombustionFactor.DoesNotExist:
                 raise Exception(f"FiresCombustionFactor for {lut_start.name} does not exist")
-            
+
             try:
                 n_estimation_factor_start = ipcc.CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=lut_start)
             except ipcc.CropNitrousEstimationDefaultFactor.DoesNotExist:
@@ -1364,7 +1364,7 @@ class AnnualCropCalculator(BaseCalculator):
                 fires_wo = ipcc.FiresCombustionFactor.objects.get(land_use_type=lut_wo)
             except ipcc.FiresCombustionFactor.DoesNotExist:
                 raise Exception(f"FiresCombustionFactor for {lut_wo.name} does not exist")
-            
+
             try:
                 n_estimation_factor_wo = ipcc.CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=lut_wo)
             except ipcc.CropNitrousEstimationDefaultFactor.DoesNotExist:
@@ -1514,37 +1514,146 @@ class PerennialCropCalculator(BaseCalculator):
             "continent": region,
         }
 
-        burning_emission_factor = ipcc.BurningEmissionFactor.objects.get(category__name="Savanna and grassland")
+        try:
+            burning_emission_factor = ipcc.BurningEmissionFactor.objects.get(category__name="Savanna and grassland")
+        except ipcc.BurningEmissionFactor.DoesNotExist:
+            raise Exception(f"BurningEmissionFactor for Savanna and grassland does not exist")
 
-        fires_combustion_factor_start = ipcc.FiresCombustionFactor.objects.get_or_other(land_use_type=module.land_use_type_start)
-        fires_combustion_factor_w = ipcc.FiresCombustionFactor.objects.get_or_other(land_use_type=module.land_use_type_w)
-        fires_combustion_factor_wo = ipcc.FiresCombustionFactor.objects.get_or_other(land_use_type=module.land_use_type_wo)
+        try:
+            fires_combustion_factor_start = ipcc.FiresCombustionFactor.objects.get_or_other(land_use_type=module.land_use_type_start)
+        except ipcc.FiresCombustionFactor.DoesNotExist:
+            raise Exception(f"FiresCombustionFactor for {module.land_use_type_start.name} does not exist")
 
-        ag_default_start = ipcc.PerennialAGB.objects.get_or_default(**cmc, land_use_type=module.land_use_type_start)
-        ag_default_w = ipcc.PerennialAGB.objects.get_or_default(**cmc, land_use_type=module.land_use_type_w)
-        ag_default_wo = ipcc.PerennialAGB.objects.get_or_default(**cmc, land_use_type=module.land_use_type_wo)
+        try:
+            fires_combustion_factor_w = ipcc.FiresCombustionFactor.objects.get_or_other(land_use_type=module.land_use_type_w)
+        except ipcc.FiresCombustionFactor.DoesNotExist:
+            raise Exception(f"FiresCombustionFactor for {module.land_use_type_w.name} does not exist")
 
-        agb_max_c_start = ipcc.PerennialMaxAGB.objects.get_or_default(climate=climate, land_use_type=module.land_use_type_start)
-        agb_max_c_w = ipcc.PerennialMaxAGB.objects.get_or_default(climate=climate, land_use_type=module.land_use_type_w)
-        agb_max_c_wo = ipcc.PerennialMaxAGB.objects.get_or_default(climate=climate, land_use_type=module.land_use_type_wo)
+        try:
+            fires_combustion_factor_wo = ipcc.FiresCombustionFactor.objects.get_or_other(land_use_type=module.land_use_type_wo)
+        except ipcc.FiresCombustionFactor.DoesNotExist:
+            raise Exception(f"FiresCombustionFactor for {module.land_use_type_wo.name} does not exist")
 
-        bg_default_start = ipcc.PerennialBGB.objects.get_or_default(**cmc, land_use_type=module.land_use_type_start)
-        bg_default_w = ipcc.PerennialBGB.objects.get_or_default(**cmc, land_use_type=module.land_use_type_w)
-        bg_default_wo = ipcc.PerennialBGB.objects.get_or_default(**cmc, land_use_type=module.land_use_type_wo)
+            # ag_default_start = ipcc.PerennialAGB.objects.get_or_default(**cmc, land_use_type=module.land_use_type_start)
+            # ag_default_w = ipcc.PerennialAGB.objects.get_or_default(**cmc, land_use_type=module.land_use_type_w)
+            # ag_default_wo = ipcc.PerennialAGB.objects.get_or_default(**cmc, land_use_type=module.land_use_type_wo)
 
-        flu_start = get_flu_data(module, climate, moisture, utils.ScenarioTypes.START)
-        flu_w = get_flu_data(module, climate, moisture, utils.ScenarioTypes.WITH)
-        flu_wo = get_flu_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
+            # agb_max_c_start = ipcc.PerennialMaxAGB.objects.get_or_default(climate=climate, land_use_type=module.land_use_type_start)
+            # agb_max_c_w = ipcc.PerennialMaxAGB.objects.get_or_default(climate=climate, land_use_type=module.land_use_type_w)
+            # agb_max_c_wo = ipcc.PerennialMaxAGB.objects.get_or_default(climate=climate, land_use_type=module.land_use_type_wo)
 
-        fi_start = get_fi_data(module, climate, moisture, utils.ScenarioTypes.START)
-        fi_w = get_fi_data(module, climate, moisture, utils.ScenarioTypes.WITH)
-        fi_wo = get_fi_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
+            # bg_default_start = ipcc.PerennialBGB.objects.get_or_default(**cmc, land_use_type=module.land_use_type_start)
+            # bg_default_w = ipcc.PerennialBGB.objects.get_or_default(**cmc, land_use_type=module.land_use_type_w)
+            # bg_default_wo = ipcc.PerennialBGB.objects.get_or_default(**cmc, land_use_type=module.land_use_type_wo)
 
-        fmg_start = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.START)
-        fmg_w = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.WITH)
-        fmg_wo = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
+            # flu_start = get_flu_data(module, climate, moisture, utils.ScenarioTypes.START)
+            # flu_w = get_flu_data(module, climate, moisture, utils.ScenarioTypes.WITH)
+            # flu_wo = get_flu_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
 
-        default_fire_periodicity = AnnualCroplandParameter.objects.get(name="default_fire_periodicity")
+            # fi_start = get_fi_data(module, climate, moisture, utils.ScenarioTypes.START)
+            # fi_w = get_fi_data(module, climate, moisture, utils.ScenarioTypes.WITH)
+            # fi_wo = get_fi_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
+
+            # fmg_start = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.START)
+            # fmg_w = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.WITH)
+            # fmg_wo = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
+
+        # Redo commented out code with try/except blocks
+
+        try:
+            ag_default_start = ipcc.PerennialAGB.objects.get_or_default(**cmc, land_use_type=module.land_use_type_start)
+        except ipcc.PerennialAGB.DoesNotExist:
+            raise Exception(f"PerennialAGB for {module.land_use_type_start.name} in {climate.name} climate and {moisture.name} moisture does not exist")
+
+        try:
+            ag_default_w = ipcc.PerennialAGB.objects.get_or_default(**cmc, land_use_type=module.land_use_type_w)
+        except ipcc.PerennialAGB.DoesNotExist:
+            raise Exception(f"PerennialAGB for {module.land_use_type_w.name} in {climate.name} climate and {moisture.name} moisture does not exist")
+
+        try:
+            ag_default_wo = ipcc.PerennialAGB.objects.get_or_default(**cmc, land_use_type=module.land_use_type_wo)
+        except ipcc.PerennialAGB.DoesNotExist:
+            raise Exception(f"PerennialAGB for {module.land_use_type_wo.name} in {climate.name} climate and {moisture.name} moisture does not exist")
+
+        try:
+            agb_max_c_start = ipcc.PerennialMaxAGB.objects.get_or_default(climate=climate, land_use_type=module.land_use_type_start)
+        except ipcc.PerennialMaxAGB.DoesNotExist:
+            raise Exception(f"PerennialMaxAGB for {module.land_use_type_start.name} in {climate.name} climate does not exist")
+
+        try:
+            agb_max_c_w = ipcc.PerennialMaxAGB.objects.get_or_default(climate=climate, land_use_type=module.land_use_type_w)
+        except ipcc.PerennialMaxAGB.DoesNotExist:
+            raise Exception(f"PerennialMaxAGB for {module.land_use_type_w.name} in {climate.name} climate does not exist")
+
+        try:
+            agb_max_c_wo = ipcc.PerennialMaxAGB.objects.get_or_default(climate=climate, land_use_type=module.land_use_type_wo)
+        except ipcc.PerennialMaxAGB.DoesNotExist:
+            raise Exception(f"PerennialMaxAGB for {module.land_use_type_wo.name} in {climate.name} climate does not exist")
+
+        try:
+            bg_default_start = ipcc.PerennialBGB.objects.get_or_default(**cmc, land_use_type=module.land_use_type_start)
+        except ipcc.PerennialBGB.DoesNotExist:
+            raise Exception(f"PerennialBGB for {module.land_use_type_start.name} in {climate.name} climate and {moisture.name} moisture does not exist")
+
+        try:
+            bg_default_w = ipcc.PerennialBGB.objects.get_or_default(**cmc, land_use_type=module.land_use_type_w)
+        except ipcc.PerennialBGB.DoesNotExist:
+            raise Exception(f"PerennialBGB for {module.land_use_type_w.name} in {climate.name} climate and {moisture.name} moisture does not exist")
+
+        try:
+            bg_default_wo = ipcc.PerennialBGB.objects.get_or_default(**cmc, land_use_type=module.land_use_type_wo)
+        except ipcc.PerennialBGB.DoesNotExist:
+            raise Exception(f"PerennialBGB for {module.land_use_type_wo.name} in {climate.name} climate and {moisture.name} moisture does not exist")
+
+        try:
+            flu_start = get_flu_data(module, climate, moisture, utils.ScenarioTypes.START)
+        except ipcc.FLUData.DoesNotExist:
+            raise Exception(f"FLUData for {module.land_use_type_start.name} in {climate.name} climate, {moisture.name} moisture does not exist")
+
+        try:
+            fi_start = get_fi_data(module, climate, moisture, utils.ScenarioTypes.START)
+        except ipcc.FIData.DoesNotExist:
+            raise Exception(f"FIData for {module.organic_input_type_start.name} in {climate.name} climate, {moisture.name} moisture does not exist")
+
+        try:
+            fmg_start = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.START)
+        except ipcc.FMGData.DoesNotExist:
+            raise Exception(f"FMGData for {module.tillage_management_type_start.name} in {climate.name} climate, {moisture.name} moisture does not exist")
+
+        try:
+            flu_w = get_flu_data(module, climate, moisture, utils.ScenarioTypes.WITH)
+        except ipcc.FLUData.DoesNotExist:
+            raise Exception(f"FLUData for {module.land_use_type_w.name} in {climate.name} climate, {moisture.name} moisture does not exist")
+
+        try:
+            fi_w = get_fi_data(module, climate, moisture, utils.ScenarioTypes.WITH)
+        except ipcc.FIData.DoesNotExist:
+            raise Exception(f"FIData for {module.organic_input_type_w.name} in {climate.name} climate, {moisture.name} moisture does not exist")
+
+        try:
+            fmg_w = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.WITH)
+        except ipcc.FMGData.DoesNotExist:
+            raise Exception(f"FMGData for {module.tillage_management_type_w.name} in {climate.name} climate, {moisture.name} moisture does not exist")
+
+        try:
+            flu_wo = get_flu_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
+        except ipcc.FLUData.DoesNotExist:
+            raise Exception(f"FLUData for {module.land_use_type_wo.name} in {climate.name} climate, {moisture.name} moisture does not exist")
+
+        try:
+            fi_wo = get_fi_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
+        except ipcc.FIData.DoesNotExist:
+            raise Exception(f"FIData for {module.organic_input_type_wo.name} in {climate.name} climate, {moisture.name} moisture does not exist")
+
+        try:
+            fmg_wo = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
+        except ipcc.FMGData.DoesNotExist:
+            raise Exception(f"FMGData for {module.tillage_management_type_wo.name} in {climate.name} climate, {moisture.name} moisture does not exist")
+
+        try:
+            default_fire_periodicity = AnnualCroplandParameter.objects.get(name="default_fire_periodicity")
+        except AnnualCroplandParameter.DoesNotExist:
+            raise Exception(f"AnnualCroplandParameter for default_fire_periodicity does not exist")
 
         math_start_w = None
         math_start_wo = None
