@@ -1021,30 +1021,89 @@ class AnnualCropCalculator(BaseCalculator):
 
         cm = {"climate": climate, "moisture": moisture}
 
-        fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-        fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-        flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+        try:
+            fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+        except ipcc.FIData.DoesNotExist:
+            raise Exception(f"FIData for {module_start.organic_input_type_start.name} in {climate.name} climate, {moisture.name} moisture does not exist")
+        
+        try:
+            fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+        except ipcc.FMGData.DoesNotExist:
+            raise Exception(f"FMGData for {module_start.tillage_management_type_start.name} in {climate.name} climate, {moisture.name} moisture does not exist")
+        
+        try:
+            flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+        except ipcc.FLUData.DoesNotExist:
+            raise Exception(f"FLUData for {module_start.land_use_type_start.name} in {climate.name} climate, {moisture.name} moisture does not exist")
 
-        fi_w = get_fi_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
-        fmg_w = get_fmg_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
-        flu_w = get_flu_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
+        try:
+            fi_w = get_fi_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
+        except ipcc.FIData.DoesNotExist:
+            raise Exception(f"FIData for {module_w.organic_input_type_w.name} in {climate.name} climate, {moisture.name} moisture does not exist")
+        
+        try:
+            fmg_w = get_fmg_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
+        except ipcc.FMGData.DoesNotExist:
+            raise Exception(f"FMGData for {module_w.tillage_management_type_w.name} in {climate.name} climate, {moisture.name} moisture does not exist")
+        
+        try:
+            flu_w = get_flu_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
+        except ipcc.FLUData.DoesNotExist:
+            raise Exception(f"FLUData for {module_w.land_use_type_w.name} in {climate.name} climate, {moisture.name} moisture does not exist")
+        
+        try:
+            fi_wo = get_fi_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
+        except ipcc.FIData.DoesNotExist:
+            raise Exception(f"FIData for {module_wo.organic_input_type_wo.name} in {climate.name} climate, {moisture.name} moisture does not exist")
+        
+        try:
+            fmg_wo = get_fmg_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
+        except ipcc.FMGData.DoesNotExist:
+            raise Exception(f"FMGData for {module_wo.tillage_management_type_wo.name} in {climate.name} climate, {moisture.name} moisture does not exist")
+        
+        try:
+            flu_wo = get_flu_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
+        except ipcc.FLUData.DoesNotExist:
+            raise Exception(f"FLUData for {module_wo.land_use_type_wo.name} in {climate.name} climate, {moisture.name} moisture does not exist")
 
-        fi_wo = get_fi_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
-        fmg_wo = get_fmg_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
-        flu_wo = get_flu_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
+        try:
+            crop_yield_start = input.crop_yield_start if input.crop_yield_start else ipcc.CropYieldStats.objects.get_or_region_average(continent=project.country.region, land_use_type=input.land_use_type_start).average
+        except ipcc.CropYieldStats.DoesNotExist:
+            raise Exception(f"CropYieldStats for {input.land_use_type_start.name} in {project.country.region.name} region does not exist")
+        
+        try:
+            crop_yield_w = input.crop_yield_w if input.crop_yield_w else ipcc.CropYieldStats.objects.get_or_region_average(continent=project.country.region, land_use_type=input.land_use_type_w).average
+        except ipcc.CropYieldStats.DoesNotExist:
+            raise Exception(f"CropYieldStats for {input.land_use_type_w.name} in {project.country.region.name} region does not exist")
+        
+        try:
+            crop_yield_wo = input.crop_yield_wo if input.crop_yield_wo else ipcc.CropYieldStats.objects.get_or_region_average(continent=project.country.region, land_use_type=input.land_use_type_wo).average
+        except ipcc.CropYieldStats.DoesNotExist:
+            raise Exception(f"CropYieldStats for {input.land_use_type_wo.name} in {project.country.region.name} region does not exist")
 
-        crop_yield_start = input.crop_yield_start if input.crop_yield_start else ipcc.CropYieldStats.objects.get_or_region_average(continent=project.country.region, land_use_type=input.land_use_type_start).average
-        crop_yield_w = input.crop_yield_w if input.crop_yield_w else ipcc.CropYieldStats.objects.get_or_region_average(continent=project.country.region, land_use_type=input.land_use_type_w).average
-        crop_yield_wo = input.crop_yield_wo if input.crop_yield_wo else ipcc.CropYieldStats.objects.get_or_region_average(continent=project.country.region, land_use_type=input.land_use_type_wo).average
-
-        # General
-        soc = ipcc.SoilOrganicCarbon.objects.get(**cm, soil_type=soil_type)
-        flu = ipcc.CroplandFLU.objects.get(**cm, land_use_type__name__icontains="Long-Term Cultivated")
-        burning_emission_factor = ipcc.BurningEmissionFactor.objects.get(category__name="Agricultural residues")
+            # General
+        
+        try:
+            soc = ipcc.SoilOrganicCarbon.objects.get(**cm, soil_type=soil_type)
+        except ipcc.SoilOrganicCarbon.DoesNotExist:
+            raise Exception(f"SoilOrganicCarbon for {soil_type.name} soil type in {climate.name} climate and {moisture.name} moisture does not exist")
+        
+        try:
+            flu = ipcc.CroplandFLU.objects.get(**cm, land_use_type__name__icontains="Long-Term Cultivated")
+        except ipcc.CroplandFLU.DoesNotExist:
+            raise Exception(f"CroplandFLU for Long-Term Cultivated in {climate.name} climate and {moisture.name} moisture does not exist")
+        
+        try:
+            burning_emission_factor = ipcc.BurningEmissionFactor.objects.get(category__name="Agricultural residues")
+        except ipcc.BurningEmissionFactor.DoesNotExist:
+            raise Exception(f"BurningEmissionFactor for Agricultural residues does not exist")
 
         minor_burning_emission_factor = None
         if input.minor_land_use_type_start or input.minor_land_use_type_w or input.minor_land_use_type_wo:
-            minor_burning_emission_factor = ipcc.BurningEmissionFactor.objects.get(category__name="Agricultural residues")
+            try:
+                minor_burning_emission_factor = ipcc.BurningEmissionFactor.objects.get(category__name="Agricultural residues")
+            except ipcc.BurningEmissionFactor.DoesNotExist:
+                raise Exception(f"BurningEmissionFactor for Agricultural residues does not exist")
 
         math_start_w = None
         math_start_wo = None
@@ -1054,8 +1113,16 @@ class AnnualCropCalculator(BaseCalculator):
         if is_luc_remaining_same(input):
             lut_start = input.land_use_type_start
             minor_lut_start = input.minor_land_use_type_start
-            fires_start = ipcc.FiresCombustionFactor.objects.get(land_use_type=lut_start)
-            n_estimation_factor_start = ipcc.CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=lut_start)
+
+            try:
+                fires_start = ipcc.FiresCombustionFactor.objects.get(land_use_type=lut_start)
+            except ipcc.FiresCombustionFactor.DoesNotExist:
+                raise Exception(f"FiresCombustionFactor for {lut_start.name} does not exist")
+        
+            try:
+                n_estimation_factor_start = ipcc.CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=lut_start)
+            except ipcc.CropNitrousEstimationDefaultFactor.DoesNotExist:
+                raise Exception(f"CropNitrousEstimationDefaultFactor for {lut_start.name} does not exist")
 
             try:
                 minor_fires_start = ipcc.FiresCombustionFactor.objects.get(land_use_type=minor_lut_start)
@@ -1064,7 +1131,10 @@ class AnnualCropCalculator(BaseCalculator):
                 minor_fires_start = None
                 minor_n_estimation_factor_start = None
 
-            emission_factors_start = ipcc.DefaultEmissionFactor.objects.get(moisture=moisture, organic_input_type=input.organic_input_type_start)
+            try:
+                emission_factors_start = ipcc.DefaultEmissionFactor.objects.get(moisture=moisture, organic_input_type=input.organic_input_type_start)
+            except ipcc.DefaultEmissionFactor.DoesNotExist:
+                raise Exception(f"DefaultEmissionFactor for {moisture.name} moisture and {input.organic_input_type_start.name} does not exist")
 
             self.inputs_start_w = [
                 *[area, 0],
@@ -1123,8 +1193,16 @@ class AnnualCropCalculator(BaseCalculator):
         if is_with(input):
             lut_w = input.land_use_type_w
             minor_lut_w = input.minor_land_use_type_w
-            fires_w = ipcc.FiresCombustionFactor.objects.get(land_use_type=lut_w)
-            n_estimation_factor_w = ipcc.CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=lut_w)
+
+            try:
+                fires_w = ipcc.FiresCombustionFactor.objects.get(land_use_type=lut_w)
+            except ipcc.FiresCombustionFactor.DoesNotExist:
+                raise Exception(f"FiresCombustionFactor for {lut_w.name} does not exist")
+            
+            try:
+                n_estimation_factor_w = ipcc.CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=lut_w)
+            except ipcc.CropNitrousEstimationDefaultFactor.DoesNotExist:
+                raise Exception(f"CropNitrousEstimationDefaultFactor for {lut_w.name} does not exist")
 
             try:
                 minor_fires_w = ipcc.FiresCombustionFactor.objects.get(land_use_type=lut_w)
@@ -1135,7 +1213,10 @@ class AnnualCropCalculator(BaseCalculator):
 
                 minor_n_estimation_factor_w = None
 
-            emission_factors_w = ipcc.DefaultEmissionFactor.objects.get(moisture=moisture, organic_input_type=input.organic_input_type_w)
+            try:
+                emission_factors_w = ipcc.DefaultEmissionFactor.objects.get(moisture=moisture, organic_input_type=input.organic_input_type_w)
+            except ipcc.DefaultEmissionFactor.DoesNotExist:
+                raise Exception(f"DefaultEmissionFactor for {moisture.name} moisture and {input.organic_input_type_w.name} does not exist")
 
             self.inputs_w = [
                 *[0, area],
@@ -1195,8 +1276,16 @@ class AnnualCropCalculator(BaseCalculator):
             lut_start = input.land_use_type_start
             lut_wo = input.land_use_type_wo
             minor_lut_start = input.minor_land_use_type_start
-            fires_start = ipcc.FiresCombustionFactor.objects.get(land_use_type=lut_start)
-            n_estimation_factor_start = ipcc.CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=lut_start)
+
+            try:
+                fires_start = ipcc.FiresCombustionFactor.objects.get(land_use_type=lut_start)
+            except ipcc.FiresCombustionFactor.DoesNotExist:
+                raise Exception(f"FiresCombustionFactor for {lut_start.name} does not exist")
+            
+            try:
+                n_estimation_factor_start = ipcc.CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=lut_start)
+            except ipcc.CropNitrousEstimationDefaultFactor.DoesNotExist:
+                raise Exception(f"CropNitrousEstimationDefaultFactor for {lut_start.name} does not exist")
 
             try:
                 minor_fires_start = ipcc.FiresCombustionFactor.objects.get(land_use_type=minor_lut_start)
@@ -1205,7 +1294,10 @@ class AnnualCropCalculator(BaseCalculator):
                 minor_fires_start = None
                 minor_n_estimation_factor_start = None
 
-            emission_factors_start = ipcc.DefaultEmissionFactor.objects.get(moisture=moisture, organic_input_type=input.organic_input_type_start)
+            try:
+                emission_factors_start = ipcc.DefaultEmissionFactor.objects.get(moisture=moisture, organic_input_type=input.organic_input_type_start)
+            except ipcc.DefaultEmissionFactor.DoesNotExist:
+                raise Exception(f"DefaultEmissionFactor for {moisture.name} moisture and {input.organic_input_type_start.name} does not exist")
 
             self.inputs_start_wo = [
                 *[area, 0],
@@ -1268,8 +1360,15 @@ class AnnualCropCalculator(BaseCalculator):
             minor_lut_start = input.minor_land_use_type_start
             minor_lut_wo = input.minor_land_use_type_wo
 
-            fires_wo = ipcc.FiresCombustionFactor.objects.get(land_use_type=lut_wo)
-            n_estimation_factor_wo = ipcc.CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=lut_wo)
+            try:
+                fires_wo = ipcc.FiresCombustionFactor.objects.get(land_use_type=lut_wo)
+            except ipcc.FiresCombustionFactor.DoesNotExist:
+                raise Exception(f"FiresCombustionFactor for {lut_wo.name} does not exist")
+            
+            try:
+                n_estimation_factor_wo = ipcc.CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=lut_wo)
+            except ipcc.CropNitrousEstimationDefaultFactor.DoesNotExist:
+                raise Exception(f"CropNitrousEstimationDefaultFactor for {lut_wo.name} does not exist")
 
             try:
                 minor_fires_wo = ipcc.FiresCombustionFactor.objects.get(land_use_type=lut_wo)
@@ -1281,7 +1380,10 @@ class AnnualCropCalculator(BaseCalculator):
 
                 minor_n_estimation_factor_wo = None
 
-            emission_factors_wo = ipcc.DefaultEmissionFactor.objects.get(moisture=moisture, organic_input_type=input.organic_input_type_wo)
+            try:
+                emission_factors_wo = ipcc.DefaultEmissionFactor.objects.get(moisture=moisture, organic_input_type=input.organic_input_type_wo)
+            except ipcc.DefaultEmissionFactor.DoesNotExist:
+                raise Exception(f"DefaultEmissionFactor for {moisture.name} moisture and {input.organic_input_type_wo.name} does not exist")
 
             self.inputs_wo = [
                 *[0, area],
