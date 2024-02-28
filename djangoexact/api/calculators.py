@@ -763,34 +763,99 @@ class OtherLandUseCalculator(BaseCalculator):
                 climate=project.climate,
             )
 
-        luc_start = LandUseType.objects.get(name=luc.module_type_start.name)
-        luc_w = LandUseType.objects.get(name=luc.module_type_w.name)
-        luc_wo = LandUseType.objects.get(name=luc.module_type_wo.name)
+        try:
+            luc_start = LandUseType.objects.get(name=luc.module_type_start.name)
+        except LandUseType.DoesNotExist:
+            raise Exception(f"LandUseType for {luc.module_type_start.name} does not exist")
 
-        biomass_initial = ipcc.ForestTotalBiomass.objects.get_or_default(**cmc, land_use_type=luc_start)
-        biomass_final_w = ipcc.TotalBiomassAfterDefo.objects.get_or_default(**cmc, land_use_type=luc_w)
-        biomass_final_wo = ipcc.TotalBiomassAfterDefo.objects.get_or_default(**cmc, land_use_type=luc_wo)
+        try:
+            luc_w = LandUseType.objects.get(name=luc.module_type_w.name)
+        except LandUseType.DoesNotExist:
+            raise Exception(f"LandUseType for {luc.module_type_w.name} does not exist")
+
+        try:
+            luc_wo = LandUseType.objects.get(name=luc.module_type_wo.name)
+        except LandUseType.DoesNotExist:
+            raise Exception(f"LandUseType for {luc.module_type_wo.name} does not exist")
+
+        try:
+            biomass_initial = ipcc.ForestTotalBiomass.objects.get_or_default(**cmc, land_use_type=luc_start)
+        except ipcc.ForestTotalBiomass.DoesNotExist:
+            raise Exception(f"ForestTotalBiomass for {luc_start.name} in {climate.name} climate, {moisture.name} moisture, and {continent.name} continent does not exist")
+
+        try:
+            biomass_final_w = ipcc.TotalBiomassAfterDefo.objects.get_or_default(**cmc, land_use_type=luc_w)
+        except ipcc.TotalBiomassAfterDefo.DoesNotExist:
+            raise Exception(f"TotalBiomassAfterDefo for {luc_w.name} in {climate.name} climate, {moisture.name} moisture, and {continent.name} continent does not exist")
+
+        try:
+            biomass_final_wo = ipcc.TotalBiomassAfterDefo.objects.get_or_default(**cmc, land_use_type=luc_wo)
+        except ipcc.TotalBiomassAfterDefo.DoesNotExist:
+            raise Exception(f"TotalBiomassAfterDefo for {luc_wo.name} in {climate.name} climate, {moisture.name} moisture, and {continent.name} continent does not exist")
 
         soc = ipcc.SoilOrganicCarbon.objects.get(**cm, soil_type=project.soil_type)
 
-        fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-        fmg_final_w = get_fmg_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
-        fmg_final_wo = get_fmg_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
+        try:
+            fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+        except ipcc.FMGData.DoesNotExist:
+            raise Exception(f"FMGData for {module_start.tillage_management_type_start.name} in {climate.name} climate, {moisture.name} moisture does not exist")
 
-        flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-        flu_final_w = get_flu_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
-        flu_final_wo = get_flu_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
+        try:
+            fmg_final_w = get_fmg_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
+        except ipcc.FMGData.DoesNotExist:
+            raise Exception(f"FMGData for {module_w.tillage_management_type_w.name} in {climate.name} climate, {moisture.name} moisture does not exist")
 
-        fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-        fi_final_w = get_fi_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
-        fi_final_wo = get_fi_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
+        try:
+            fmg_final_wo = get_fmg_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
+        except ipcc.FMGData.DoesNotExist:
+            raise Exception(f"FMGData for {module_wo.tillage_management_type_wo.name} in {climate.name} climate, {moisture.name} moisture does not exist")
+
+        try:
+            flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+        except ipcc.FLUData.DoesNotExist:
+            raise Exception(f"FLUData for {module_start.land_use_type_start.name} in {climate.name} climate, {moisture.name} moisture does not exist")
+
+        try:
+            flu_final_w = get_flu_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
+        except ipcc.FLUData.DoesNotExist:
+            raise Exception(f"FLUData for {module_w.land_use_type_w.name} in {climate.name} climate, {moisture.name} moisture does not exist")
+
+        try:
+            flu_final_wo = get_flu_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
+        except ipcc.FLUData.DoesNotExist:
+            raise Exception(f"FLUData for {module_wo.land_use_type_wo.name} in {climate.name} climate, {moisture.name} moisture does not exist")
+
+        try:
+            fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+        except ipcc.FIData.DoesNotExist:
+            raise Exception(f"FIData for {module_start.organic_input_type_start.name} in {climate.name} climate, {moisture.name} moisture does not exist")
+
+        try:
+            fi_final_w = get_fi_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
+        except ipcc.FIData.DoesNotExist:
+            raise Exception(f"FIData for {module_w.organic_input_type_w.name} in {climate.name} climate, {moisture.name} moisture does not exist")
+
+        try:
+            fi_final_wo = get_fi_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
+        except ipcc.FIData.DoesNotExist:
+            raise Exception(f"FIData for {module_wo.organic_input_type_wo.name} in {climate.name} climate, {moisture.name} moisture does not exist")
 
         c_n_ratio = utils.CN_RATIO_GRASSLAND if luc.module_type_start.class_name in ["Grassland", "ForestManagement"] else utils.CN_RATIO_CROP
 
-        moisture_factor = ipcc.NitrousEmissionFactor.objects.get(moisture=moisture, name__icontains="Other N Inputs")
+        try:
+            moisture_factor = ipcc.NitrousEmissionFactor.objects.get(moisture=moisture, name__icontains="Other N Inputs")
+        except ipcc.NitrousEmissionFactor.DoesNotExist:
+            raise Exception(f"NitrousEmissionFactor for {moisture.name} moisture and Other N Inputs does not exist")
 
-        combustion_factor_w = ipcc.AfforestationCombustionFactor.objects.get_or_default(land_use_type=luc_w)
-        combustion_factor_wo = ipcc.AfforestationCombustionFactor.objects.get_or_default(land_use_type=luc_wo)
+        try:
+            combustion_factor_w = ipcc.AfforestationCombustionFactor.objects.get_or_default(land_use_type=luc_w)
+        except ipcc.AfforestationCombustionFactor.DoesNotExist:
+            raise Exception(f"AfforestationCombustionFactor for {luc_w.name} does not exist")
+
+        try:
+            combustion_factor_wo = ipcc.AfforestationCombustionFactor.objects.get_or_default(land_use_type=luc_wo)
+        except ipcc.AfforestationCombustionFactor.DoesNotExist:
+            raise Exception(f"AfforestationCombustionFactor for {luc_wo.name} does not exist")
 
         inputs_w = [
             biomass_initial.value,
@@ -4888,7 +4953,7 @@ class ForestManagementCalculator(BaseCalculator):
         Se parliamo di forest management invece usiamo i valori di Secondary > 20 sia per AGB growth che per AGB max.
         """
 
-        forest_options = { "forest_condition_type": forest.forest_condition_type, "from_year": 0 }
+        forest_options = {"forest_condition_type": forest.forest_condition_type, "from_year": 0}
 
         try:
             agb_under_20 = ipcc.ForestManagementAGB.objects.get(**crluft, **forest_options)
