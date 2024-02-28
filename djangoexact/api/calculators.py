@@ -2347,10 +2347,26 @@ class GrasslandCalculator(BaseCalculator):
         # capitalization = project.implementation_years - duration + project.capitalization_years
 
         change_rate = module.activity.change_rate
-        ef = ipcc.BurningEmissionFactor.objects.get(category__name="Savanna and grassland")
-        agb = ipcc.GrasslandAGB.objects.get(climate=project.climate, moisture=project.moisture)
-        cf = GrasslandParameter.objects.get(name="default_combustion_factor").value
-        soc = ipcc.SoilOrganicCarbon.objects.get(climate=project.climate, moisture=project.moisture, soil_type=project.soil_type)
+
+        try:
+            ef = ipcc.BurningEmissionFactor.objects.get(category__name="Savanna and grassland")
+        except ipcc.BurningEmissionFactor.DoesNotExist:
+            raise Exception("Burning emission factor for savanna and grassland does not exist")
+
+        try:
+            agb = ipcc.GrasslandAGB.objects.get(climate=project.climate, moisture=project.moisture)
+        except ipcc.GrasslandAGB.DoesNotExist:
+            raise Exception(f"AGB for {project.climate.name} climate and {project.moisture.name} moisture does not exist")
+
+        try:
+            cf = GrasslandParameter.objects.get(name="default_combustion_factor").value
+        except GrasslandParameter.DoesNotExist:
+            raise Exception("Default combustion factor does not exist")
+
+        try:
+            soc = ipcc.SoilOrganicCarbon.objects.get(climate=project.climate, moisture=project.moisture, soil_type=project.soil_type)
+        except ipcc.SoilOrganicCarbon.DoesNotExist:
+            raise Exception(f"Soil organic carbon for {project.climate.name} climate, {project.moisture.name} moisture and {project.soil_type.name} soil type does not exist")
 
         area = luc.area if luc and luc.area else module.area
 
@@ -2360,14 +2376,16 @@ class GrasslandCalculator(BaseCalculator):
         math_wo = None
 
         if is_luc_remaining_same(module):
-            soc_start = ipcc.GrasslandStockExchangeFactor.objects.get(
-                grassland_management_type=module.grassland_management_type_start,
-                climate=project.climate,
-            )
-            soc_w = ipcc.GrasslandStockExchangeFactor.objects.get(
-                grassland_management_type=module.grassland_management_type_w,
-                climate=project.climate,
-            )
+
+            try:
+                soc_start = ipcc.GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_start, climate=project.climate)
+            except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
+                raise Exception(f"Stock exchange factor for {module.grassland_management_type_start.name} in {project.climate.name} climate does not exist")
+
+            try:
+                soc_w = ipcc.GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_w, climate=project.climate)
+            except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
+                raise Exception(f"Stock exchange factor for {module.grassland_management_type_w.name} in {project.climate.name} climate does not exist")
 
             self.inputs_start_w = [
                 *[area, 0],
@@ -2456,14 +2474,16 @@ class GrasslandCalculator(BaseCalculator):
             math_w.calculate_emissions()
 
         if is_business_as_usual(module):
-            soc_start = ipcc.GrasslandStockExchangeFactor.objects.get(
-                grassland_management_type=module.grassland_management_type_start,
-                climate=project.climate,
-            )
-            soc_wo = ipcc.GrasslandStockExchangeFactor.objects.get(
-                grassland_management_type=module.grassland_management_type_wo,
-                climate=project.climate,
-            )
+
+            try:
+                soc_start = ipcc.GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_start, climate=project.climate)
+            except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
+                raise Exception(f"Stock exchange factor for {module.grassland_management_type_start.name} in {project.climate.name} climate does not exist")
+
+            try:
+                soc_wo = ipcc.GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_wo, climate=project.climate)
+            except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
+                raise Exception(f"Stock exchange factor for {module.grassland_management_type_wo.name} in {project.climate.name} climate does not exist")
 
             self.inputs_start_wo = [
                 *[area, 0],
@@ -2504,14 +2524,16 @@ class GrasslandCalculator(BaseCalculator):
             math_start_wo.calculate_emissions()
 
         if is_without(module):
-            soc_start = ipcc.GrasslandStockExchangeFactor.objects.get(
-                grassland_management_type=module.grassland_management_type_start,
-                climate=project.climate,
-            )
-            soc_wo = ipcc.GrasslandStockExchangeFactor.objects.get(
-                grassland_management_type=module.grassland_management_type_wo,
-                climate=project.climate,
-            )
+
+            try:
+                soc_start = ipcc.GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_start, climate=project.climate)
+            except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
+                raise Exception(f"Stock exchange factor for {module.grassland_management_type_start.name} in {project.climate.name} climate does not exist")
+
+            try:
+                soc_wo = ipcc.GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_wo, climate=project.climate)
+            except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
+                raise Exception(f"Stock exchange factor for {module.grassland_management_type_wo.name} in {project.climate.name} climate does not exist")
 
             self.inputs_wo = [
                 *[0, area],
