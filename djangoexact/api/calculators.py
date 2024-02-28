@@ -4990,33 +4990,97 @@ class OrganicSoilCalculator(BaseCalculator):
 
         ##### Organic Soil Inputs #####
 
-        ef_onsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cm, module_type_name=luc.module_type_start.name, peat_type=input.peat_type_start, site_location_type_name="On-Site")
-        ef_onsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cm, module_type_name=luc.module_type_w.name, peat_type=input.peat_type_w, site_location_type_name="On-Site")
-        ef_onsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cm, module_type_name=luc.module_type_wo.name, peat_type=input.peat_type_wo, site_location_type_name="On-Site")
+        try:
+            ef_onsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cm, module_type_name=luc.module_type_start.name, peat_type=input.peat_type_start, site_location_type_name="On-Site")
+        except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
+            raise ValueError(f"Could not find EF On-Site Start for {luc.module_type_start.name}, {input.peat_type_start.name}, {project.climate.name}, {project.moisture.name}")
 
-        ef_offsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cm, module_type_name=luc.module_type_start.name, peat_type=input.peat_type_start, site_location_type_name="Off-Site")
-        ef_offsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cm, module_type_name=luc.module_type_w.name, peat_type=input.peat_type_w, site_location_type_name="Off-Site")
-        ef_offsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cm, module_type_name=luc.module_type_wo.name, peat_type=input.peat_type_wo, site_location_type_name="Off-Site")
+        try:
+            ef_onsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cm, module_type_name=luc.module_type_w.name, peat_type=input.peat_type_w, site_location_type_name="On-Site")
+        except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
+            raise ValueError(f"Could not find EF On-Site W for {luc.module_type_w.name}, {input.peat_type_w.name}, {project.climate.name}, {project.moisture.name}")
 
-        dry_matter_w = ipcc.OrganicSoilFuelConsumption.objects.get(**cm, fire_type=input.fire_type_w)
-        dry_matter_wo = ipcc.OrganicSoilFuelConsumption.objects.get(**cm, fire_type=input.fire_type_wo)
+        try:
+            ef_onsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cm, module_type_name=luc.module_type_wo.name, peat_type=input.peat_type_wo, site_location_type_name="On-Site")
+        except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
+            raise ValueError(f"Could not find EF On-Site WO for {luc.module_type_wo.name}, {input.peat_type_wo.name}, {project.climate.name}, {project.moisture.name}")
 
-        fire_ref = ipcc.OrganicSoilGefEmissionFactor.objects.get(**cm)
+        try:
+            ef_offsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cm, module_type_name=luc.module_type_start.name, peat_type=input.peat_type_start, site_location_type_name="Off-Site")
+        except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
+            raise ValueError(f"Could not find EF Off-Site Start for {luc.module_type_start.name}, {input.peat_type_start.name}, {project.climate.name}, {project.moisture.name}")
 
-        rewetting_start = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=input.peat_type_start, module_type__name=relative_class)
-        rewetting_w = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=input.peat_type_w, module_type__name=relative_class)
-        rewetting_wo = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=input.peat_type_wo, module_type__name=relative_class)
+        try:
+            ef_offsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cm, module_type_name=luc.module_type_w.name, peat_type=input.peat_type_w, site_location_type_name="Off-Site")
+        except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
+            raise ValueError(f"Could not find EF Off-Site W for {luc.module_type_w.name}, {input.peat_type_w.name}, {project.climate.name}, {project.moisture.name}")
+
+        try:
+            ef_offsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cm, module_type_name=luc.module_type_wo.name, peat_type=input.peat_type_wo, site_location_type_name="Off-Site")
+        except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
+            raise ValueError(f"Could not find EF Off-Site WO for {luc.module_type_wo.name}, {input.peat_type_wo.name}, {project.climate.name}, {project.moisture.name}")
+
+        try:
+            dry_matter_w = ipcc.OrganicSoilFuelConsumption.objects.get(**cm, fire_type=input.fire_type_w)
+        except ipcc.OrganicSoilFuelConsumption.DoesNotExist:
+            raise ValueError(f"Could not find Dry Matter W for {input.fire_type_w.name}, {project.climate.name}, {project.moisture.name}")
+
+        try:
+            dry_matter_wo = ipcc.OrganicSoilFuelConsumption.objects.get(**cm, fire_type=input.fire_type_wo)
+        except ipcc.OrganicSoilFuelConsumption.DoesNotExist:
+            raise ValueError(f"Could not find Dry Matter WO for {input.fire_type_wo.name}, {project.climate.name}, {project.moisture.name}")
+
+        try:
+            fire_ref = ipcc.OrganicSoilGefEmissionFactor.objects.get(**cm)
+        except ipcc.OrganicSoilGefEmissionFactor.DoesNotExist:
+            raise ValueError(f"Could not find Fire Reference for {project.climate.name}, {project.moisture.name}")
+
+        try:
+            rewetting_start = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=input.peat_type_start, module_type__name=relative_class)
+        except ipcc.OrganicSoilRewettingEmissionFactor.DoesNotExist:
+            raise ValueError(f"Could not find Rewetting Start for {input.peat_type_start.name}, {relative_class}, {project.climate.name}, {project.moisture.name}")
+
+        try:
+            rewetting_w = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=input.peat_type_w, module_type__name=relative_class)
+        except ipcc.OrganicSoilRewettingEmissionFactor.DoesNotExist:
+            raise ValueError(f"Could not find Rewetting W for {input.peat_type_w.name}, {relative_class}, {project.climate.name}, {project.moisture.name}")
+
+        try:
+            rewetting_wo = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=input.peat_type_wo, module_type__name=relative_class)
+        except ipcc.OrganicSoilRewettingEmissionFactor.DoesNotExist:
+            raise ValueError(f"Could not find Rewetting WO for {input.peat_type_wo.name}, {relative_class}, {project.climate.name}, {project.moisture.name}")
 
         ##### Peat Extraction Inputs #####
 
-        onsite_ef_w = ipcc.PeatExtractionEmissionFactor.objects.get(**cm, peat_type=input.peat_type_w, site_location_type__name="On-Site")
-        onsite_ef_wo = ipcc.PeatExtractionEmissionFactor.objects.get(**cm, peat_type=input.peat_type_wo, site_location_type__name="On-Site")
+        try:
+            onsite_ef_w = ipcc.PeatExtractionEmissionFactor.objects.get(**cm, peat_type=input.peat_type_w, site_location_type__name="On-Site")
+        except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
+            raise ValueError(f"Could not find On-Site EF W for {input.peat_type_w.name}, {project.climate.name}, {project.moisture.name}")
 
-        offsite_ef_w = ipcc.PeatExtractionEmissionFactor.objects.get(**cm, peat_type=input.peat_type_w, site_location_type__name="Off-Site")
-        offsite_ef_wo = ipcc.PeatExtractionEmissionFactor.objects.get(**cm, peat_type=input.peat_type_wo, site_location_type__name="Off-Site")
+        try:
+            onsite_ef_wo = ipcc.PeatExtractionEmissionFactor.objects.get(**cm, peat_type=input.peat_type_wo, site_location_type__name="On-Site")
+        except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
+            raise ValueError(f"Could not find On-Site EF WO for {input.peat_type_wo.name}, {project.climate.name}, {project.moisture.name}")
 
-        conversion_factor_w = ipcc.PeatExtractionConversionFactor.objects.get(**cm, peat_type=input.peat_type_w)
-        conversion_factor_wo = ipcc.PeatExtractionConversionFactor.objects.get(**cm, peat_type=input.peat_type_wo)
+        try:
+            offsite_ef_w = ipcc.PeatExtractionEmissionFactor.objects.get(**cm, peat_type=input.peat_type_w, site_location_type__name="Off-Site")
+        except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
+            raise ValueError(f"Could not find Off-Site EF W for {input.peat_type_w.name}, {project.climate.name}, {project.moisture.name}")
+
+        try:
+            offsite_ef_wo = ipcc.PeatExtractionEmissionFactor.objects.get(**cm, peat_type=input.peat_type_wo, site_location_type__name="Off-Site")
+        except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
+            raise ValueError(f"Could not find Off-Site EF WO for {input.peat_type_wo.name}, {project.climate.name}, {project.moisture.name}")
+
+        try:
+            conversion_factor_w = ipcc.PeatExtractionConversionFactor.objects.get(**cm, peat_type=input.peat_type_w)
+        except ipcc.PeatExtractionConversionFactor.DoesNotExist:
+            raise ValueError(f"Could not find Conversion Factor W for {input.peat_type_w.name}, {project.climate.name}, {project.moisture.name}")
+
+        try:
+            conversion_factor_wo = ipcc.PeatExtractionConversionFactor.objects.get(**cm, peat_type=input.peat_type_wo)
+        except ipcc.PeatExtractionConversionFactor.DoesNotExist:
+            raise ValueError(f"Could not find Conversion Factor WO for {input.peat_type_wo.name}, {project.climate.name}, {project.moisture.name}")
 
         ##### Calculate Emissions #####
 
