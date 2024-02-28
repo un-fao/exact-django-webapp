@@ -2953,10 +2953,16 @@ class AquacultureCalculator(BaseCalculator):
         change_rate = module.activity.change_rate
         project: Project = module.activity.project
 
-        NITROUS_EF_DEFAULT = AquacultureParameter.objects.get(name="nitrous_ef_default").value
+        try:
+            NITROUS_EF_DEFAULT = AquacultureParameter.objects.get(name="nitrous_ef_default").value
+        except AquacultureParameter.DoesNotExist:
+            raise ValueError("Default nitrous emission factor does not exist")
 
-        # TODO: This will now be used in the inputs module for feed
-        FEED_EF_DEFAULT = AquacultureParameter.objects.get(name="feed_ef_default").value
+        try:
+            # TODO: This will now be used in the inputs module for feed
+            FEED_EF_DEFAULT = AquacultureParameter.objects.get(name="feed_ef_default").value
+        except AquacultureParameter.DoesNotExist:
+            raise ValueError("Default feed emission factor does not exist")
 
         math_w = None
         math_wo = None
