@@ -3212,7 +3212,10 @@ class ElectricityCalculator(BaseCalculator):
         project: Project = self.data.activity.project
         change_rate = activity.change_rate
 
-        elec = ipcc.ElectricityEmission.objects.get(country=project.country)
+        try:
+            elec = ipcc.ElectricityEmission.objects.get(country=project.country)
+        except ipcc.ElectricityEmission.DoesNotExist:
+            raise ValueError(f"Electricity emission for {project.country.name} does not exist")
 
         math_w = None
         math_wo = None
@@ -3274,7 +3277,11 @@ class FuelCalculator(BaseCalculator):
         change_rate = activity.change_rate
 
         macro_fuel_type = input.fuel_type.macro_fuel_type.name
-        ef = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=input.fuel_type)
+
+        try:
+            ef = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=input.fuel_type)
+        except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
+            raise ValueError(f"Default emission factor for {input.fuel_type.name} does not exist")
 
         math_w = None
         math_wo = None
