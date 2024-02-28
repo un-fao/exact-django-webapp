@@ -23,6 +23,9 @@ class CustomUser(auth_models.AbstractUser):
     country = ForeignKey("api.Country", on_delete=CASCADE, null=True, blank=True, related_name="users")
     email = EmailField(unique=True)
 
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []
+
     class Meta:
         permissions = (
             ("can_view_modules", "Can view modules"),
