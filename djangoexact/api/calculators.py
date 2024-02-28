@@ -4699,16 +4699,50 @@ class CoastalWetlandCalculator(BaseCalculator):
 
         soil_type_name = module.soil_type_t2.name if module.soil_type_t2 else "Mineral Soil"
 
-        agb = ipcc.CoastalAGB.objects.get(**cm, vegetation_type=module.vegetation_type)
-        bgb = ipcc.CoastalBGB.objects.get(**cm, vegetation_type=module.vegetation_type)
-        litter = ipcc.CoastalLitter.objects.get(**cm, vegetation_type=module.vegetation_type)
-        dw = ipcc.CoastalDeadwood.objects.get(**cm, vegetation_type=module.vegetation_type)
-        soil_1m = ipcc.DefaultSoilCarbonStock1Meter.objects.get(**cm, vegetation_type=module.vegetation_type, soil_type__name=soil_type_name)
-        ef_drainage = ipcc.DrainageEmissionFactor.objects.get(**cm, vegetation_type=module.vegetation_type)
-        pc_c_lost_excavation = CoastalWetlandParameter.objects.get(name="PERCENTAGE_C_LOST_EXCAVATION")
+        try:
+            agb = ipcc.CoastalAGB.objects.get(**cm, vegetation_type=module.vegetation_type)
+        except ipcc.CoastalAGB.DoesNotExist:
+            raise ValueError(f"Could not find AGB for {module.vegetation_type.name}, {project.climate.name}, {project.moisture.name}")
 
-        rewetting_c = ipcc.RewettingCarbonFactor.objects.get(**cm, vegetation_type=module.vegetation_type)
-        rewetting_ch4 = ipcc.RewettingMethaneFactor.objects.get(**cm, vegetation_type=module.vegetation_type)
+        try:
+            bgb = ipcc.CoastalBGB.objects.get(**cm, vegetation_type=module.vegetation_type)
+        except ipcc.CoastalBGB.DoesNotExist:
+            raise ValueError(f"Could not find BGB for {module.vegetation_type.name}, {project.climate.name}, {project.moisture.name}")
+
+        try:
+            litter = ipcc.CoastalLitter.objects.get(**cm, vegetation_type=module.vegetation_type)
+        except ipcc.CoastalLitter.DoesNotExist:
+            raise ValueError(f"Could not find Litter for {module.vegetation_type.name}, {project.climate.name}, {project.moisture.name}")
+
+        try:
+            dw = ipcc.CoastalDeadwood.objects.get(**cm, vegetation_type=module.vegetation_type)
+        except ipcc.CoastalDeadwood.DoesNotExist:
+            raise ValueError(f"Could not find Deadwood for {module.vegetation_type.name}, {project.climate.name}, {project.moisture.name}")
+
+        try:
+            soil_1m = ipcc.DefaultSoilCarbonStock1Meter.objects.get(**cm, vegetation_type=module.vegetation_type, soil_type__name=soil_type_name)
+        except ipcc.DefaultSoilCarbonStock1Meter.DoesNotExist:
+            raise ValueError(f"Could not find Soil 1m for {module.vegetation_type.name}, {project.climate.name}, {project.moisture.name}, {soil_type_name}")
+
+        try:
+            ef_drainage = ipcc.DrainageEmissionFactor.objects.get(**cm, vegetation_type=module.vegetation_type)
+        except ipcc.DrainageEmissionFactor.DoesNotExist:
+            raise ValueError(f"Could not find EF Drainage for {module.vegetation_type.name}, {project.climate.name}, {project.moisture.name}")
+
+        try:
+            pc_c_lost_excavation = CoastalWetlandParameter.objects.get(name="PERCENTAGE_C_LOST_EXCAVATION")
+        except CoastalWetlandParameter.DoesNotExist:
+            raise ValueError(f"Could not find PC C Lost Excavation")
+
+        try:
+            rewetting_c = ipcc.RewettingCarbonFactor.objects.get(**cm, vegetation_type=module.vegetation_type)
+        except ipcc.RewettingCarbonFactor.DoesNotExist:
+            raise ValueError(f"Could not find Rewetting C for {module.vegetation_type.name}, {project.climate.name}, {project.moisture.name}")
+
+        try:
+            rewetting_ch4 = ipcc.RewettingMethaneFactor.objects.get(**cm, vegetation_type=module.vegetation_type)
+        except ipcc.RewettingMethaneFactor.DoesNotExist:
+            raise ValueError(f"Could not find Rewetting CH4 for {module.vegetation_type.name}, {project.climate.name}, {project.moisture.name}")
 
         math_w = None
         math_wo = None
