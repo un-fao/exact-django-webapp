@@ -2629,20 +2629,47 @@ class SmallFisheryCalculator(BaseCalculator):
         activity: Activity = module.activity
         project: Project = activity.project
 
-        ef_diesel_default_list = ipcc.EnergyDefaultEmissionFactor.objects.filter(fuel_type__fuel_use_type__name__contains="Off-Road")
+        try:
+            ef_diesel_default_list = ipcc.EnergyDefaultEmissionFactor.objects.filter(fuel_type__fuel_use_type__name__contains="Off-Road")
+            # Average of all default emission factors for gasoil/diesel
+            ef_diesel_default = sum([ef.t_co2_eq for ef in ef_diesel_default_list]) / len(ef_diesel_default_list)
+        except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
+            raise ValueError("Default emission factors for off-road diesel do not exist")
 
-        # Average of all default emission factors for gasoil/diesel
-        ef_diesel_default = sum([ef.t_co2_eq for ef in ef_diesel_default_list]) / len(ef_diesel_default_list)
+        try:
+            fui_default_start = ipcc.SmallFisheryFUI.objects.get_value_or_average(fishery_type=module.fishery_type, gear_type=module.gear_type_start)
+        except ipcc.SmallFisheryFUI.DoesNotExist:
+            fui_default_start = ipcc.SmallFisheryFUI.objects.get_value_or_average(fishery_type=module.fishery_type, gear_type=module.gear_type_start)
 
-        fui_default_start = ipcc.SmallFisheryFUI.objects.get_value_or_average(fishery_type=module.fishery_type, gear_type=module.gear_type_start)
-        fui_default_w = ipcc.SmallFisheryFUI.objects.get_value_or_average(fishery_type=module.fishery_type, gear_type=module.gear_type_w)
-        fui_default_wo = ipcc.SmallFisheryFUI.objects.get_value_or_average(fishery_type=module.fishery_type, gear_type=module.gear_type_wo)
+        try:
+            fui_default_w = ipcc.SmallFisheryFUI.objects.get_value_or_average(fishery_type=module.fishery_type, gear_type=module.gear_type_w)
+        except ipcc.SmallFisheryFUI.DoesNotExist:
+            fui_default_w = ipcc.SmallFisheryFUI.objects.get_value_or_average(fishery_type=module.fishery_type, gear_type=module.gear_type_w)
 
-        lost_refrigerant_default = SmallFisheryParameter.objects.get(name="lost_refrigerant_default").value
-        tonnes_ice_default = SmallFisheryParameter.objects.get(name="tonnes_ice_default").value
-        kw_tonnes = SmallFisheryParameter.objects.get(name="kw_tonnes").value
+        try:
+            fui_default_wo = ipcc.SmallFisheryFUI.objects.get_value_or_average(fishery_type=module.fishery_type, gear_type=module.gear_type_wo)
+        except ipcc.SmallFisheryFUI.DoesNotExist:
+            fui_default_wo = ipcc.SmallFisheryFUI.objects.get_value_or_average(fishery_type=module.fishery_type, gear_type=module.gear_type_wo)
 
-        electricity_emission = ipcc.ElectricityEmission.objects.get(country=project.country, continent=project.country.region)
+        try:
+            lost_refrigerant_default = SmallFisheryParameter.objects.get(name="lost_refrigerant_default").value
+        except SmallFisheryParameter.DoesNotExist:
+            raise ValueError("Default lost refrigerant does not exist")
+
+        try:
+            tonnes_ice_default = SmallFisheryParameter.objects.get(name="tonnes_ice_default").value
+        except SmallFisheryParameter.DoesNotExist:
+            raise ValueError("Default tonnes of ice does not exist")
+
+        try:
+            kw_tonnes = SmallFisheryParameter.objects.get(name="kw_tonnes").value
+        except SmallFisheryParameter.DoesNotExist:
+            raise ValueError("Default kw per tonne does not exist")
+
+        try:
+            electricity_emission = ipcc.ElectricityEmission.objects.get(country=project.country, continent=project.country.region)
+        except ipcc.ElectricityEmission.DoesNotExist:
+            raise ValueError(f"Electricity emission for {project.country.name} does not exist")
 
         math_w = None
         math_wo = None
@@ -2762,31 +2789,49 @@ class LargeFisheryCalculator(BaseCalculator):
 
         module: LargeFishery = self.data
         project = module.activity.project
-        ef_diesel_default_list = ipcc.EnergyDefaultEmissionFactor.objects.filter(fuel_type__fuel_use_type__name__contains="Off-Road")
 
-        # Average of all default emission factors for gasoil/diesel
-        ef_diesel_default = sum([ef.t_co2_eq for ef in ef_diesel_default_list]) / len(ef_diesel_default_list)
+        try:
+            ef_diesel_default_list = ipcc.EnergyDefaultEmissionFactor.objects.filter(fuel_type__fuel_use_type__name__contains="Off-Road")
+            # Average of all default emission factors for gasoil/diesel
+            ef_diesel_default = sum([ef.t_co2_eq for ef in ef_diesel_default_list]) / len(ef_diesel_default_list)
+        except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
+            raise ValueError("Default emission factors for off-road diesel do not exist")
 
-        fui_default_start = ipcc.LargeFisheryFUI.objects.get_value_or_average(
-            fish_type=module.fish_type,
-            gear_type=module.gear_type_start,
-        )
-        fui_default_w = ipcc.LargeFisheryFUI.objects.get_value_or_average(
-            fish_type=module.fish_type,
-            gear_type=module.gear_type_w,
-        )
-        fui_default_wo = ipcc.LargeFisheryFUI.objects.get_value_or_average(
-            fish_type=module.fish_type,
-            gear_type=module.gear_type_wo,
-        )
+        try:
+            fui_default_start = ipcc.LargeFisheryFUI.objects.get_value_or_average(fish_type=module.fish_type, gear_type=module.gear_type_start)
+        except ipcc.LargeFisheryFUI.DoesNotExist:
+            raise ValueError(f"Fishery FUI for {module.fish_type.name} and {module.gear_type_start.name} does not exist")
 
-        lost_refrigerant_default = LargeFisheryParameter.objects.get(name="lost_refrigerant_default").value
-        tonnes_ice_default = LargeFisheryParameter.objects.get(name="tonnes_ice_default").value
-        kw_tonnes = LargeFisheryParameter.objects.get(name="kw_tonnes").value
+        try:
+            fui_default_w = ipcc.LargeFisheryFUI.objects.get_value_or_average(fish_type=module.fish_type, gear_type=module.gear_type_w)
+        except ipcc.LargeFisheryFUI.DoesNotExist:
+            raise ValueError(f"Fishery FUI for {module.fish_type.name} and {module.gear_type_w.name} does not exist")
 
-        electricity_country = module.inshore_ice_production_country_t2 if module.inshore_ice_production_country_t2 else project.country
+        try:
+            fui_default_wo = ipcc.LargeFisheryFUI.objects.get_value_or_average(fish_type=module.fish_type, gear_type=module.gear_type_wo)
+        except ipcc.LargeFisheryFUI.DoesNotExist:
+            raise ValueError(f"Fishery FUI for {module.fish_type.name} and {module.gear_type_wo.name} does not exist")
 
-        electricity_emission = ipcc.ElectricityEmission.objects.get(country=electricity_country, continent=project.country.region)
+        try:
+            lost_refrigerant_default = LargeFisheryParameter.objects.get(name="lost_refrigerant_default").value
+        except LargeFisheryParameter.DoesNotExist:
+            raise ValueError("Default lost refrigerant does not exist")
+
+        try:
+            tonnes_ice_default = LargeFisheryParameter.objects.get(name="tonnes_ice_default").value
+        except LargeFisheryParameter.DoesNotExist:
+            raise ValueError("Default tonnes of ice does not exist")
+
+        try:
+            kw_tonnes = LargeFisheryParameter.objects.get(name="kw_tonnes").value
+        except LargeFisheryParameter.DoesNotExist:
+            raise ValueError("Default kw per tonne does not exist")
+
+        try:
+            electricity_country = module.inshore_ice_production_country_t2 if module.inshore_ice_production_country_t2 else project.country
+            electricity_emission = ipcc.ElectricityEmission.objects.get(country=electricity_country, continent=project.country.region)
+        except ipcc.ElectricityEmission.DoesNotExist:
+            raise ValueError(f"Electricity emission for {electricity_country.name} does not exist")
 
         math_w = None
         math_wo = None
