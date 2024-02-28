@@ -4870,15 +4870,26 @@ class WaterbodyCalculator(BaseCalculator):
         """
         module: Waterbody = self.data
         project = module.activity.project
-        methane_emission_factor = ipcc.OtherConstructedWaterbodiesEmissionFactor.objects.get(
-            climate=project.climate,
-            moisture=project.moisture,
-            waterbody_type=module.waterbody_type,
-        )
 
-        trophic_state_start = ipcc.TrophicStateFactor.objects.get(trophic_type=module.trophic_type_start)
-        trophic_state_w = ipcc.TrophicStateFactor.objects.get(trophic_type=module.trophic_type_w)
-        trophic_state_wo = ipcc.TrophicStateFactor.objects.get(trophic_type=module.trophic_type_wo)
+        try:
+            methane_emission_factor = ipcc.OtherConstructedWaterbodiesEmissionFactor.objects.get(climate=project.climate, moisture=project.moisture, waterbody_type=module.waterbody_type)
+        except ipcc.OtherConstructedWaterbodiesEmissionFactor.DoesNotExist:
+            raise ValueError(f"Could not find Methane Emission Factor for {module.waterbody_type.name}, {project.climate.name}, {project.moisture.name}")
+
+        try:
+            trophic_state_start = ipcc.TrophicStateFactor.objects.get(trophic_type=module.trophic_type_start)
+        except ipcc.TrophicStateFactor.DoesNotExist:
+            raise ValueError(f"Could not find Trophic State Factor for {module.trophic_type_start.name}")
+
+        try:
+            trophic_state_w = ipcc.TrophicStateFactor.objects.get(trophic_type=module.trophic_type_w)
+        except ipcc.TrophicStateFactor.DoesNotExist:
+            raise ValueError(f"Could not find Trophic State Factor for {module.trophic_type_w.name}")
+
+        try:
+            trophic_state_wo = ipcc.TrophicStateFactor.objects.get(trophic_type=module.trophic_type_wo)
+        except ipcc.TrophicStateFactor.DoesNotExist:
+            raise ValueError(f"Could not find Trophic State Factor for {module.trophic_type_wo.name}")
 
         math_start = None
         math_w = None
