@@ -6,6 +6,7 @@ from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db.models import *
+from django.utils import timezone
 from simple_history.models import HistoricalRecords
 
 from .utilities import *
@@ -466,9 +467,16 @@ class Project(Historical):
     moisture = ForeignKey(Moisture, on_delete=CASCADE)
     soil_type = ForeignKey(SoilType, on_delete=CASCADE)
 
+    is_locked = BooleanField(default=False)
+    locked_at = DateTimeField(null=True, blank=True)
+    locked_by = ForeignKey(CustomUser, on_delete=CASCADE, null=True, blank=True, related_name="locked_projects")
+
     gw_potential = ForeignKey("ipcc.GlobalWarmingPotential", on_delete=CASCADE)
 
     soc_ref_t2 = FloatField(null=True, blank=True)
+
+    created_at = DateTimeField(auto_now_add=True, null=True)
+    updated_at = DateTimeField(auto_now=True, null=True)
 
     def save(self, *args, **kwargs):
         if self.pk:
@@ -479,6 +487,18 @@ class Project(Historical):
 
     def __str__(self):
         return f"({self.pk}) {self.name}"
+
+    def lock(self, user: CustomUser):
+        self.is_locked = True
+        self.locked_at = timezone.now()
+        self.locked_by = user
+        self.save()
+
+    def unlock(self):
+        self.is_locked = False
+        self.locked_at = None
+        self.locked_by = None
+        self.save()
 
 
 class ProjectInvitation(Historical):
