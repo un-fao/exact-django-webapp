@@ -28,8 +28,8 @@ class ManureManagementTypes(Enum):
 
 class ScenarioTypes(Enum):
     START = "start"
-    WITH = "with"
-    WITHOUT = "without"
+    WITH = "w"
+    WITHOUT = "wo"
 
 
 class EmissionTypes(Enum):
