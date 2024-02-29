@@ -5,6 +5,7 @@ from django.apps import apps
 from django.contrib.auth.models import Group, Permission
 from django.db import transaction
 from django.db.models import Model
+from django.utils import timezone
 from ipcc.models import GlobalWarmingPotential
 from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
 from rest_framework import serializers
@@ -373,6 +374,11 @@ class WriteActivitySerializer(serializers.ModelSerializer):
 
         return super().validate(data)
 
+    def save(self, **kwargs):
+        self.instance.project.lock_updated_at = timezone.now()
+        self.instance.project.save()
+        return super().save(**kwargs)
+
 
 class ActivityBuilderSerializer(serializers.Serializer):
     """
@@ -585,6 +591,11 @@ class ModuleBaseSerializer(serializers.ModelSerializer):
 
         logging.debug(f"END ModuleBaseSerializer[{self.Meta.ref_name}].validate")
         return super().validate(data)
+
+    def save(self, **kwargs):
+        self.instance.project.lock_updated_at = timezone.now()
+        self.instance.project.save()
+        return super().save(**kwargs)
 
 
 class LandModuleWriteSerializer(ModuleBaseSerializer):
