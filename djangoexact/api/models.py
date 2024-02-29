@@ -469,6 +469,7 @@ class Project(Historical):
 
     is_locked = BooleanField(default=False)
     locked_at = DateTimeField(null=True, blank=True)
+    lock_updated_at = DateTimeField(null=True, blank=True)
     locked_by = ForeignKey(CustomUser, on_delete=CASCADE, null=True, blank=True, related_name="locked_projects")
 
     gw_potential = ForeignKey("ipcc.GlobalWarmingPotential", on_delete=CASCADE)
