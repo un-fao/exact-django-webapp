@@ -1,4 +1,5 @@
 import logging
+from datetime import timedelta
 
 from django.apps import apps
 from django.contrib.auth.models import Group
@@ -6,6 +7,7 @@ from django.core.exceptions import FieldDoesNotExist, ValidationError
 from django.db import transaction
 from django.db.models import Model
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
@@ -310,9 +312,10 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     @transaction.atomic
     def partial_update(self, request, *args, **kwargs):
         new_years = request.data.get("implementation_years", None)
-        project = self.get_object()
+        project: Project = self.get_object()
+        user: CustomUser = self.request.user
 
-        if not utils.has_project_permission("change_project", self.request.user, project):
+        if not utils.has_project_permission("change_project", user, project):
             logging.error("Selected user does not have permission to update the project")
             return utils.ErrorResponse("Selected user does not have permission to update the project", status=status.HTTP_403_FORBIDDEN)
 
@@ -324,6 +327,36 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                     activity.duration_t2 = new_years
                     activity.save()
             project.save()
+
+        # Auto lock the project if no lock is set
+        if not project.is_locked:
+
+            project.lock(user)
+
+        else:
+
+            is_locking = request.data.get("is_locked")
+
+            if is_locking is True:  # User is trying to lock the project
+
+                if project.is_locked and project.locked_by != user:
+                    logging.warning(f"Project is already locked by: {project.locked_by.email}")
+                    return Response({"message": "Project is already locked"}, status=status.HTTP_200_OK)
+
+                project.lock(user)
+
+            elif is_locking is False:  # User is trying to unlock the project
+                is_user_authorized = user.is_superuser or project.locked_by == user or user.memberships.filter(user=user, project=project, group__name="Admin").exists()
+
+                if not is_user_authorized:
+                    logging.error("User does not have permission to unlock the project")
+                    return Response({"message": "User does not have permission to unlock the project"}, status=status.HTTP_403_FORBIDDEN)
+
+                project.unlock()
+
+        # Auto unlock the project if it has been locked for more than 30 minutes
+        if project.is_locked and timezone.now() - project.updated_at > timedelta(minutes=30):
+            project.unlock()
 
         return super().partial_update(request, *args, **kwargs)
 
