@@ -333,6 +333,15 @@ class WriteProjectSerializer(serializers.ModelSerializer):
         fields = "__all__"
         ref_name = "Project"
 
+    def validate(self, data):
+        if self.instance and data.get("cost", None):
+            total_activity_cost = self.instance.activities.all().values_list("cost", flat=True)
+
+            if sum(total_activity_cost) > data.get("cost"):
+                raise serializers.ValidationError("Total cost of activities cannot be greater than project cost")
+
+        return super().validate(data)
+
 
 class ProjectResultSerializer(serializers.Serializer):
     # TODO: This can probably be removed and the fields moved to ProjectSerializer as read_only
@@ -371,6 +380,20 @@ class WriteActivitySerializer(serializers.ModelSerializer):
             new_duration = data.get("duration_t2", None)
             if new_duration and new_duration > self.instance.project.duration_years:
                 raise serializers.ValidationError("Activity duration cannot be greater than project duration")
+
+        if data.get("cost", None):
+
+            project_cost = self.instance.project.cost
+            activity_cost = data.get("cost")
+
+            if project_cost and activity_cost > project_cost:
+                raise serializers.ValidationError("Activity cost cannot be greater than project cost")
+
+            total_activity_cost = self.instance.project.activities.all().values_list("cost", flat=True)
+            total_activity_cost.append(activity_cost)
+
+            if project_cost and sum(total_activity_cost) > project_cost:
+                raise serializers.ValidationError("Total cost of activities cannot be greater than project cost")
 
         return super().validate(data)
 
