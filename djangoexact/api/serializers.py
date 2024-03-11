@@ -441,6 +441,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
     project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(), required=True)
     name = serializers.CharField(max_length=255, required=True)
+    cost = serializers.FloatField(required=False)
     climate = serializers.PrimaryKeyRelatedField(queryset=Climate.objects.all(), required=True)
     soil_type = serializers.PrimaryKeyRelatedField(queryset=SoilType.objects.all(), required=True)
     duration = serializers.IntegerField(required=True)
@@ -473,12 +474,19 @@ class ActivityBuilderSerializer(serializers.Serializer):
         if Activity.objects.filter(name=self.validated_data["name"], project=self.validated_data["project"]).exists():
             raise serializers.ValidationError("An activity with this name already exists for this project")
 
+        activities_cost = list(self.validated_data["project"].activities.all().values_list("cost", flat=True))
+        activities_cost.append(self.validated_data.get("cost", 0))
+
+        if sum(activities_cost) > self.validated_data["project"].cost:
+            raise serializers.ValidationError("Total cost of activities cannot be greater than project cost")
+
         activity: Activity = Activity.objects.create(
             name=self.validated_data["name"],
             project=self.validated_data["project"],
             climate_t2=self.validated_data["climate"],
             soil_type_t2=self.validated_data["soil_type"],
             duration_t2=self.validated_data["duration"],
+            cost=self.validated_data.get("cost"),
         )
         activity.module_types.set(self.validated_data.get("module_types", []))
 
