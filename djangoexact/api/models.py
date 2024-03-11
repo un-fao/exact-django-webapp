@@ -544,7 +544,7 @@ class Activity(Historical):
     description = TextField(null=True, blank=True)
     # user = ForeignKey(CustomUser, on_delete=CASCADE) # TODO: Define when it's useful to have this
     status = ForeignKey(StatusType, on_delete=CASCADE, null=True, blank=True)
-    cost = FloatField(null=True, blank=True)
+    cost = FloatField(default=0)
 
     change_rate = ForeignKey(ChangeRate, on_delete=CASCADE, related_name="activities", null=True, blank=True)
     module_types = ManyToManyField("api.ModuleType", related_name="activities")
