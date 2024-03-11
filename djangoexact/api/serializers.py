@@ -372,8 +372,10 @@ class WriteActivitySerializer(serializers.ModelSerializer):
     def validate(self, data):
         if self.instance:
             luc_module: ModuleType = ModuleType.objects.filter(name="Land Use Change").first()
+
             if luc_module and luc_module in data.get("module_types", []):
                 raise serializers.ValidationError("Land Use Change module cannot be added manually")
+
             if self.instance.landusechange.exists() and len(list(filter(lambda module: module.is_luc, data.get("module_types", [])))) > 0:
                 raise serializers.ValidationError("Land Modules cannot be independently added to activities with a Land Use Change")
 
@@ -381,15 +383,17 @@ class WriteActivitySerializer(serializers.ModelSerializer):
             if new_duration and new_duration > self.instance.project.duration_years:
                 raise serializers.ValidationError("Activity duration cannot be greater than project duration")
 
-        if data.get("cost", None):
+        activity_cost = data.get("cost", None)
 
-            project_cost = self.instance.project.cost
-            activity_cost = data.get("cost")
+        if activity_cost:
 
-            if project_cost and activity_cost > project_cost:
+            project = getattr(self.instance, "project", data.get("project"))
+            project_cost = project.cost
+
+            if self.instance and activity_cost > project_cost:
                 raise serializers.ValidationError("Activity cost cannot be greater than project cost")
 
-            total_activity_cost = self.instance.project.activities.all().values_list("cost", flat=True)
+            total_activity_cost = list(project.activities.all().values_list("cost", flat=True))
             total_activity_cost.append(activity_cost)
 
             if project_cost and sum(total_activity_cost) > project_cost:
