@@ -3,7 +3,7 @@ from datetime import timedelta
 
 from django.apps import apps
 from django.contrib.auth.models import Group
-from django.core.exceptions import FieldDoesNotExist, ValidationError
+from django.core.exceptions import FieldDoesNotExist
 from django.db import transaction
 from django.db.models import Model
 from django.shortcuts import get_object_or_404
@@ -14,6 +14,7 @@ from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownT
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.serializers import ValidationError
 
 import api.utilities as utils
 from api.models import CustomUser as User
@@ -706,27 +707,21 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         Builds a new activity and the modules associated with it.
         """
 
+        serializer = ActivityBuilderSerializer(data=request.data)
+
+        if not serializer.is_valid():
+            return utils.ErrorResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        project = serializer.validated_data["project"]
+
+        if not utils.has_project_permission("add_activity", self.request.user, project):
+            logging.error("Selected user does not have permission to add activities to the project")
+            return utils.ErrorResponse("Selected user does not have permission to add activities to the project", status=status.HTTP_403_FORBIDDEN)
+
         try:
-            serializer = ActivityBuilderSerializer(data=request.data)
-
-            if not serializer.is_valid():
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-            project = serializer.validated_data["project"]
-
-            if not utils.has_project_permission("add_activity", self.request.user, project):
-                logging.error("Selected user does not have permission to add activities to the project")
-                return utils.ErrorResponse("Selected user does not have permission to add activities to the project", status=status.HTTP_403_FORBIDDEN)
-
             activity = serializer.save()
-
         except ValidationError as e:
-            logger.error("Error building activity:", e.get_full_details())
-            return Response(e.get_full_details(), status=status.HTTP_400_BAD_REQUEST)
-
-        except Exception as e:
-            logger.error("Error building activity:", e)
-            return utils.ErrorResponse(str(e), status=status.HTTP_400_BAD_REQUEST)
+            return utils.ErrorResponse(e.detail, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(ActivitySerializer(activity).data, status=status.HTTP_200_OK)
 
