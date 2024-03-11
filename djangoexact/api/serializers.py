@@ -402,8 +402,10 @@ class WriteActivitySerializer(serializers.ModelSerializer):
         return super().validate(data)
 
     def save(self, **kwargs):
-        self.instance.project.lock_updated_at = timezone.now()
-        self.instance.project.save()
+
+        project: Project = getattr(self.instance, "project", self.validated_data.get("project"))
+        project.refresh_lock()
+
         return super().save(**kwargs)
 
 

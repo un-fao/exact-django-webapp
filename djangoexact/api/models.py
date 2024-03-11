@@ -501,6 +501,10 @@ class Project(Historical):
         self.locked_by = None
         self.save()
 
+    def refresh_lock(self):
+        self.lock_updated_at = timezone.now()
+        self.save()
+
 
 class ProjectInvitation(Historical):
     STATUS_CHOICES = (("sent", "Sent"), ("accepted", "Accepted"), ("declined", "Declined"))
