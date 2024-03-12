@@ -630,8 +630,8 @@ class ModuleBaseSerializer(serializers.ModelSerializer):
         return super().validate(data)
 
     def save(self, **kwargs):
-        self.instance.project.lock_updated_at = timezone.now()
-        self.instance.project.save()
+        self.instance.activity.project.lock_updated_at = timezone.now()
+        self.instance.activity.project.save()
         return super().save(**kwargs)
 
 
