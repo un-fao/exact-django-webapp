@@ -180,6 +180,7 @@ def get_fi_data(module: LandModule, climate: Climate, moisture: Moisture, scenar
         or a SimpleNamespace object with a value of 1 if no match is found.
     """
     attr = getattr(module, f"organic_input_type_{scenario.value}", None)
+
     try:
         if attr:
             return ipcc.FIData.objects.get(climate=climate, moisture=moisture, organic_input_type=attr)
