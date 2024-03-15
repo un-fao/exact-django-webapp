@@ -180,11 +180,13 @@ def get_fi_data(module: LandModule, climate: Climate, moisture: Moisture, scenar
         or a SimpleNamespace object with a value of 1 if no match is found.
     """
     attr = getattr(module, f"organic_input_type_{scenario.value}", None)
-    print(attr)
-    if attr:
-        return ipcc.FIData.objects.get(climate=climate, moisture=moisture, organic_input_type=attr)
-    else:
-        return SimpleNamespace(value=1)
+    try:
+        if attr:
+            return ipcc.FIData.objects.get(climate=climate, moisture=moisture, organic_input_type=attr)
+    except ipcc.FIData.DoesNotExist:
+        pass
+
+    return SimpleNamespace(value=1)
 
 
 def get_fmg_data(module: LandModule, climate: Climate, moisture: Moisture, scenario: utils.ScenarioTypes):
@@ -202,11 +204,14 @@ def get_fmg_data(module: LandModule, climate: Climate, moisture: Moisture, scena
         or a SimpleNamespace object with a value of 1 if no match is found.
     """
     attr = getattr(module, f"tillage_management_type_{scenario.value}", None)
-    print(attr)
-    if attr:
-        return ipcc.FMGData.objects.get(climate=climate, moisture=moisture, tillage_management_type=attr)
-    else:
-        return SimpleNamespace(value=1)
+
+    try:
+        if attr:
+            return ipcc.FMGData.objects.get(climate=climate, moisture=moisture, tillage_management_type=attr)
+    except ipcc.FMGData.DoesNotExist:
+        pass
+
+    return SimpleNamespace(value=1)
 
 
 def get_flu_data(module: LandModule, climate: Climate, moisture: Moisture, scenario: utils.ScenarioTypes):
@@ -224,11 +229,14 @@ def get_flu_data(module: LandModule, climate: Climate, moisture: Moisture, scena
         or a SimpleNamespace object with a value of 1 if no match is found.
     """
     attr = getattr(module, f"land_use_type_{scenario.value}", None)
-    print(attr)
-    if attr:
-        return ipcc.FLUData.objects.get(climate=climate, moisture=moisture, land_use_type=attr)
-    else:
-        return SimpleNamespace(value=1)
+
+    try:
+        if attr:
+            return ipcc.FLUData.objects.get(climate=climate, moisture=moisture, land_use_type=attr)
+    except ipcc.FLUData.DoesNotExist:
+        pass
+
+    return SimpleNamespace(value=1)
 
 
 def get_luc_modules(luc: LandUseChange) -> tuple[LandModule]:
