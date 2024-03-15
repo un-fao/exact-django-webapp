@@ -345,14 +345,14 @@ class BurningEmissionFactor(Model):
 
 
 class FiresCombustionFactorManager(Manager):
-    def get_or_other(self, land_use_type):
+    def get_or_default(self, land_use_type):
         """
         Returns the factor for the given land_use_type or the factor for 'other' if the factor for land_use_type does not exists.
         """
         try:
             return self.get(land_use_type=land_use_type)
         except self.model.DoesNotExist:
-            return self.get(land_use_type__name="Other")
+            return self.get(land_use_type__name="Default")
 
 
 class FiresCombustionFactor(Model):
@@ -360,7 +360,7 @@ class FiresCombustionFactor(Model):
     IPCC:A84
     """
 
-    land_use_type = OneToOneField("api.LandUseType", on_delete=CASCADE, limit_choices_to={"module_types__class_name": "PerennialCropping"})
+    land_use_type = OneToOneField("api.LandUseType", on_delete=CASCADE)
     value = FloatField()
 
     objects = FiresCombustionFactorManager()

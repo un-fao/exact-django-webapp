@@ -986,14 +986,13 @@ def generic_module_viewset(model: Model):
             module: Module = get_object_or_404(model, pk=pk)
             module_type = ModuleType.objects.get(class_name=model.__name__)
 
-            activity = module.parent.activity if module_type.is_submodule else module.activity
+            activity: Activity = module.parent.activity if module_type.is_submodule else module.activity
 
             if not utils.has_project_permission("can_view_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to view this module in the project")
                 return utils.ErrorResponse("Selected user does not have permission to view this module in the project", status=status.HTTP_403_FORBIDDEN)
 
             if module_type.class_name == LandUseChange.__name__:
-                activity: Activity = module.activity
 
                 status_start = utils.get_module_status(self, activity, module.module_type_start)
                 status_w = utils.get_module_status(self, activity, module.module_type_w)
@@ -1001,6 +1000,11 @@ def generic_module_viewset(model: Model):
 
                 if not all(status == StatusType.objects.get(name="READY") for status in [status_start, status_w, status_wo]):
                     return utils.ErrorResponse("Not all modules are ready. Land Use Change module cannot be calculated.")
+            else:
+                status: StatusType = module.status
+
+                if not status or status.name != "READY":
+                    return utils.ErrorResponse("Module is not ready. Cannot calculate result.")
 
             try:
                 aggregate_by = BreakdownTypes(request.query_params.get("aggregate", BreakdownTypes.TOTAL))
