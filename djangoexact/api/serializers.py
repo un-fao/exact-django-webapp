@@ -11,6 +11,7 @@ from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownT
 from rest_framework import serializers
 from rest_framework.fields import empty
 
+import api.utilities as utils
 from api.models import CustomUser as User
 
 from .models import (
@@ -478,7 +479,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
         activities_cost = list(self.validated_data["project"].activities.all().values_list("cost", flat=True))
         activities_cost.append(self.validated_data.get("cost", 0))
 
-        if sum(activities_cost) > self.validated_data["project"].cost:
+        if self.validated_data["project"].cost and sum(activities_cost) > self.validated_data["project"].cost:
             raise serializers.ValidationError("Total cost of activities cannot be greater than project cost")
 
         activity: Activity = Activity.objects.create(
@@ -513,15 +514,19 @@ class ActivityBuilderSerializer(serializers.Serializer):
             logging.debug(f"Creating module {module_type.class_name}")
 
             ModuleClass = apps.get_model("api", module_type.class_name)
+            module_instance = None
 
             if module_type.is_luc:
-                ModuleClass.objects.create(
+                module_instance = ModuleClass.objects.create(
                     activity=activity,
                     land_use_change=luc,
                     area=self.validated_data.get("area"),
                 )
             else:
-                ModuleClass.objects.create(activity=activity)
+                module_instance = ModuleClass.objects.create(activity=activity)
+
+            utils.create_module_threads(module_instance)
+            module_instance.save()
 
         activity.save()
 

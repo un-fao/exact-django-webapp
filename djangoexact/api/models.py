@@ -616,10 +616,6 @@ class Module(Historical):
         if not self.status:
             self.status = StatusType.objects.get_or_create(name="EMPTY")[0]
 
-        for attr in dir(self):
-            if attr.endswith("_thread") and getattr(self, attr, None):
-                setattr(self, attr, CommentThread.objects.create())
-
         super().save(*args, **kwargs)
 
 
