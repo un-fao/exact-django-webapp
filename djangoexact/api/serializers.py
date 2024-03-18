@@ -54,6 +54,7 @@ from .models import (
     ProjectStatus,
     Region,
     Road,
+    SetAside,
     SmallFishery,
     SoilType,
     StatusType,
@@ -1543,3 +1544,20 @@ class UserProjectGroupSerializer(serializers.ModelSerializer):
         model = UserProjectGroup
         fields = "__all__"
         ref_name = "UserProjectGroup"
+
+
+class SetAsideWriteSerializer(LandModuleWriteSerializer):
+    class Meta:
+        model = SetAside
+        fields = "__all__"
+        ref_name = "SetAside"
+
+    def validate(self, data):
+        return super().validate(data)
+
+
+class SetAsideReadSerializer(LandModuleReadSerializer):
+    class Meta:
+        model = SetAside
+        fields = "__all__"
+        ref_name = "SetAside"
