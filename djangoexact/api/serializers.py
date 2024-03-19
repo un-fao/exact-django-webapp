@@ -131,7 +131,6 @@ def validate_module_fields(data, mandatory_fields: list):
 
 
 def get_model_serializer(model_arg):
-    print(f"Getting serializer for {model_arg.__name__}")
 
     class GenericSerializer(serializers.ModelSerializer):
         class Meta:
@@ -146,7 +145,6 @@ def get_model_serializer(model_arg):
 
 
 def get_module_serializer(model_arg: Model, action=ActionTypes.RETRIEVE) -> serializers.ModelSerializer:
-    print(f"Getting serializer for {model_arg.__name__}")
     try:
         match action:
             case ActionTypes.CREATE | ActionTypes.UPDATE:
