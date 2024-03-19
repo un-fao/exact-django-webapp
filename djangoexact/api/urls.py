@@ -81,7 +81,6 @@ router.register(r"organic-input-types", views.generic_viewset(models.OrganicInpu
 router.register(r"macro-input-types", views.generic_viewset(models.MacroInputType), basename="macro-input-types")
 router.register(r"input-types", views.InputTypeViewSet, basename="input-types")
 router.register(r"residue-management-types", views.generic_viewset(models.ResidueManagementType), basename="residue-management-types")
-router.register(r"notes", views.generic_module_viewset(models.Note), basename="notes")
 
 router.register(r"status-types", views.generic_viewset(models.StatusType), basename="status-types")
 

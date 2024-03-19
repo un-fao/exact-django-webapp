@@ -591,16 +591,12 @@ class Submodule(Historical):
         super().save(*args, **kwargs)
 
 
-class Note(Historical):
-    notes = TextField(null=True, blank=True)
-
-
 class Module(Historical):
     class Meta:
         abstract = True
 
     activity = ForeignKey(Activity, on_delete=CASCADE, related_name="%(class)s")
-    notes = ForeignKey(Note, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s")
+    notes = TextField(null=True, blank=True)
     start_year = IntegerField(default=1)
 
     soc_t2_start = FloatField(null=True, blank=True)
