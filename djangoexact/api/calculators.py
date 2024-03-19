@@ -1507,10 +1507,9 @@ class PerennialCropCalculator(BaseCalculator):
 
         soc = ipcc.SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=project.soil_type)
 
-        soc_start = soc.value
-        if luc:
-            grassland_soc = get_grassland_soc(luc)
-            soc_start = grassland_soc.value
+        grassland_soc = get_grassland_soc(luc)
+
+        soc_start = grassland_soc if grassland_soc else soc.value
 
         soc_w = soc.value
         soc_wo = soc.value
@@ -1529,17 +1528,17 @@ class PerennialCropCalculator(BaseCalculator):
             raise Exception(f"BurningEmissionFactor for Savanna and grassland does not exist")
 
         try:
-            fires_combustion_factor_start = ipcc.FiresCombustionFactor.objects.get_or_other(land_use_type=module.land_use_type_start)
+            fires_combustion_factor_start = ipcc.FiresCombustionFactor.objects.get_or_default(land_use_type=module.land_use_type_start)
         except ipcc.FiresCombustionFactor.DoesNotExist:
             raise Exception(f"FiresCombustionFactor for {module.land_use_type_start.name} does not exist")
 
         try:
-            fires_combustion_factor_w = ipcc.FiresCombustionFactor.objects.get_or_other(land_use_type=module.land_use_type_w)
+            fires_combustion_factor_w = ipcc.FiresCombustionFactor.objects.get_or_default(land_use_type=module.land_use_type_w)
         except ipcc.FiresCombustionFactor.DoesNotExist:
             raise Exception(f"FiresCombustionFactor for {module.land_use_type_w.name} does not exist")
 
         try:
-            fires_combustion_factor_wo = ipcc.FiresCombustionFactor.objects.get_or_other(land_use_type=module.land_use_type_wo)
+            fires_combustion_factor_wo = ipcc.FiresCombustionFactor.objects.get_or_default(land_use_type=module.land_use_type_wo)
         except ipcc.FiresCombustionFactor.DoesNotExist:
             raise Exception(f"FiresCombustionFactor for {module.land_use_type_wo.name} does not exist")
 
