@@ -277,6 +277,10 @@ def get_grassland_soc(luc: LandUseChange) -> ipcc.GrasslandStockExchangeFactor |
         grassland_soc (GrasslandStockExchangeFactor): The grassland SOC object.
     """
     grassland_soc = None
+
+    if not luc or not luc.activity:
+        return grassland_soc
+
     module_start: Grassland = getattr(luc.activity, luc.module_type_start.class_name.lower(), None).first()
     if luc.module_type_start.name == "Grassland" and module_start:
         grassland_soc = ipcc.GrasslandStockExchangeFactor.objects.get(
