@@ -277,12 +277,23 @@ def get_grassland_soc(luc: LandUseChange) -> ipcc.GrasslandStockExchangeFactor |
         grassland_soc (GrasslandStockExchangeFactor): The grassland SOC object.
     """
     grassland_soc = None
+
+    if not luc or not luc.activity:
+        return grassland_soc
+
     module_start: Grassland = getattr(luc.activity, luc.module_type_start.class_name.lower(), None).first()
     if luc.module_type_start.name == "Grassland" and module_start:
-        grassland_soc = ipcc.GrasslandStockExchangeFactor.objects.get(
-            grassland_management_type=module_start.grassland_management_type_start,
-            climate=luc.activity.project.climate,
-        )
+
+        if module_start.status.name != "READY":
+            raise Exception("Cannot retrieve Grassland SOC as the starting Grassland module is not ready to perform the calculation")
+
+        try:
+            grassland_soc = ipcc.GrasslandStockExchangeFactor.objects.get(
+                grassland_management_type=module_start.grassland_management_type_start,
+                climate=luc.activity.project.climate,
+            )
+        except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
+            raise Exception(f"GrasslandStockExchangeFactor for {module_start.grassland_management_type_start.name} in {luc.activity.project.climate.name} climate does not exist")
 
     return grassland_soc
 
