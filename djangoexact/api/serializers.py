@@ -26,6 +26,7 @@ from .models import (
     CustomUser,
     Energy,
     FloodedRice,
+    ForestDisturbance,
     ForestManagement,
     Fuel,
     GasType,
@@ -78,17 +79,20 @@ def are_fields_filled(data, mandatory_fields):
     return all(list(map(lambda field: data.get(field, None) is not None, mandatory_fields)))
 
 
-def generate_fields_for_scenario(scenario: str, mandatory_fields: list):
-    fields = []
-    for field in mandatory_fields:
-        fields.append(f"{field}_{scenario}")
-    return fields
-
-
 def generate_fields_for_scenarios(scenarios: list[str], mandatory_fields: list):
     fields = []
     for scenario in scenarios:
         fields += generate_fields_for_scenario(scenario, mandatory_fields)
+    return fields
+
+
+def generate_fields_for_scenario(scenario: str, mandatory_fields: list):
+    fields = []
+    for field in mandatory_fields:
+        if scenario:
+            fields.append(f"{field}_{scenario}")
+        else:
+            fields.append(field)
     return fields
 
 
@@ -625,10 +629,19 @@ class ModuleBaseSerializer(serializers.ModelSerializer):
             logging.error(f"Module type {self.Meta.ref_name} is not present for this activity")
             raise serializers.ValidationError("This module type is not present for this activity")
 
-        if self.instance:
-            self.instance.status = StatusType.objects.get(name="READY")
-        else:
-            data["status"] = StatusType.objects.get(name="READY")
+        # Mandatory fields validation
+        # TODO: Probably not enough as each module has its own nuances
+        # mandatory_fields = []
+
+        # for field in self.Meta.mandatory_fields:
+        #     scenarios = get_filled_scenarios(data, [field])
+        #     for scenario in scenarios:
+        #         mandatory_fields += generate_fields_for_scenario(scenario, [field])
+
+        # if not are_fields_filled(data, mandatory_fields):
+        #     raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
+
+        data["status"] = StatusType.objects.get(name="READY")
 
         logging.debug(f"END ModuleBaseSerializer[{self.Meta.ref_name}].validate")
         return super().validate(data)
@@ -953,6 +966,7 @@ class FloodedRiceWriteSerializer(LandModuleWriteSerializer):
         ]
 
     def validate(self, data):
+
         mandatory_fields = []
 
         water_mgmt_before_scenarios = get_filled_scenarios(data, ["water_management_type_before_cultivation"])
@@ -1442,8 +1456,53 @@ class ForestManagementWriteSerializer(LandModuleWriteSerializer):
         model = ForestManagement
         fields = "__all__"
         ref_name = "ForestManagement"
+        mandatory_fields = [
+            "forest_type",
+            "forest_condition_type",
+        ]
 
     def validate(self, data):
+        mandatory_fields = []
+        errors = []
+
+        mandatory_fields += self.Meta.mandatory_fields
+
+        # Rotation mandatory fields
+        rotation_length_yrs = get_filled_scenarios(data, ["rotation_length_yrs"])
+        mandatory_fields += generate_fields_for_scenarios(rotation_length_yrs, ["rotation_percentage_biomass_for_energy"])
+
+        # Logging mandatory fields
+        logging_recurrence_yrs = get_filled_scenarios(data, ["logging_recurrence_yrs"])
+        mandatory_fields += generate_fields_for_scenarios(logging_recurrence_yrs, ["logging_percentage_agb_logged", "logging_percentage_biomass_for_energy"])
+
+        if not are_fields_filled(data, mandatory_fields):
+            errors += [f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}"]
+
+        if self.instance and self.instance.disturbances.count() > 0:
+            if logging_recurrence_yrs:
+                errors += ["Cannot have logging and other disturbances at the same time"]
+
+            pc_biomass_destruction_start = data.get("logging_percentage_agb_logged_start", 0)
+            pc_biomass_destruction_wo = data.get("logging_percentage_agb_logged_wo", 0)
+            pc_biomass_destruction_w = data.get("logging_percentage_agb_logged_w", 0)
+
+            for disturbance in self.instance.disturbances.all():
+                pc_biomass_destruction_start += disturbance.percentage_biomass_destruction_start
+                pc_biomass_destruction_wo += disturbance.percentage_biomass_destruction_wo
+                pc_biomass_destruction_w += disturbance.percentage_biomass_destruction_w
+
+            if pc_biomass_destruction_start > 1:
+                errors += [serializers.ValidationError("Total percentage of biomass destruction (start) cannot be greater than 100%")]
+
+            if pc_biomass_destruction_wo > 1:
+                errors += [serializers.ValidationError("Total percentage of biomass destruction (without) cannot be greater than 100%")]
+
+            if pc_biomass_destruction_w > 1:
+                errors += [serializers.ValidationError("Total percentage of biomass destruction (with) cannot be greater than 100%")]
+
+        if errors:
+            raise serializers.ValidationError(errors)
+
         return super().validate(data)
 
 
