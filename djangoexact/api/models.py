@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from django.contrib.auth import models as auth_models
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
-from django.core.validators import RegexValidator
+from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 from django.db.models import *
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
@@ -1195,9 +1195,9 @@ class ForestManagement(LandModule, MultiBiomassModule):
     logging_recurrence_yrs_wo = IntegerField(null=True, blank=True, default=0)
     logging_recurrence_yrs_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_logging_recurrence_yrs_thread")
 
-    logging_percentage_agb_logged_start = FloatField(null=True, blank=True, default=0)
-    logging_percentage_agb_logged_w = FloatField(null=True, blank=True, default=0)
-    logging_percentage_agb_logged_wo = FloatField(null=True, blank=True, default=0)
+    logging_percentage_agb_logged_start = FloatField(null=True, blank=True, default=0, validators=[MinValueValidator(0), MaxValueValidator(1)])
+    logging_percentage_agb_logged_w = FloatField(null=True, blank=True, default=0, validators=[MinValueValidator(0), MaxValueValidator(1)])
+    logging_percentage_agb_logged_wo = FloatField(null=True, blank=True, default=0, validators=[MinValueValidator(0), MaxValueValidator(1)])
     logging_percentage_agb_logged_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_logging_percentage_agb_logged_thread")
 
     logging_percentage_biomass_for_energy_start = FloatField(null=True, blank=True, default=0)
