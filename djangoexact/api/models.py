@@ -1822,31 +1822,11 @@ class Settlement(LandModuleFixed):
     bgb_t2_wo = FloatField(null=True, blank=True)
 
 
-class SetAside(SingleBiomassModule):
-    ha_start = FloatField(null=True, blank=True)
-    ha_w = FloatField(null=True, blank=True)
-    ha_wo = FloatField(null=True, blank=True)
-    ha_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_ha_thread", on_delete=SET_NULL)
+class SetAside(LandModule, DoubleBiomassModule):
 
     is_set_aside_start = BooleanField(default=False)
     is_set_aside_w = BooleanField(default=False)
     is_set_aside_wo = BooleanField(default=False)
-
-    soc_t2_start = FloatField(null=True, blank=True)
-    soc_t2_w = FloatField(null=True, blank=True)
-    soc_t2_wo = FloatField(null=True, blank=True)
-
-    flu_t2_start = FloatField(null=True, blank=True)
-    flu_t2_w = FloatField(null=True, blank=True)
-    flu_t2_wo = FloatField(null=True, blank=True)
-
-    agb_t2_start = FloatField(null=True, blank=True)
-    agb_t2_w = FloatField(null=True, blank=True)
-    agb_t2_wo = FloatField(null=True, blank=True)
-
-    bgb_t2_start = FloatField(null=True, blank=True)
-    bgb_t2_w = FloatField(null=True, blank=True)
-    bgb_t2_wo = FloatField(null=True, blank=True)
 
 
 class DegradedLand(LandModule, SingleBiomassModule):
