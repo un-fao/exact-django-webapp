@@ -24,6 +24,7 @@ from .models import (
     CommentThread,
     Country,
     CustomUser,
+    DegradedLand,
     Energy,
     FloodedRice,
     ForestDisturbance,
@@ -1625,6 +1626,23 @@ class SetAsideReadSerializer(LandModuleReadSerializer):
         model = SetAside
         fields = "__all__"
         ref_name = "SetAside"
+
+
+class DegradedLandWriteSerializer(LandModuleWriteSerializer):
+    class Meta:
+        model = DegradedLand
+        fields = "__all__"
+        ref_name = "DegradedLand"
+
+    def validate(self, data):
+        return super().validate(data)
+
+
+class DegradedLandReadSerializer(LandModuleReadSerializer):
+    class Meta:
+        model = DegradedLand
+        fields = "__all__"
+        ref_name = "DegradedLand"
 
 
 class SettlementWriteSerializer(ModuleBaseSerializer):
