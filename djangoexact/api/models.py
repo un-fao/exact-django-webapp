@@ -1796,10 +1796,6 @@ class OrganicSoil(LandModuleFixed):
 
 
 class Settlement(LandModuleFixed):
-    ha_start = FloatField(null=True, blank=True)
-    ha_w = FloatField(null=True, blank=True)
-    ha_wo = FloatField(null=True, blank=True)
-    ha_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_ha_thread", on_delete=SET_NULL)
 
     is_settlement_start = BooleanField(default=False)
     is_settlement_w = BooleanField(default=False)
