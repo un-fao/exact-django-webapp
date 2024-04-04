@@ -37,46 +37,56 @@ router.register(r"statuses", views.generic_viewset(models.ProjectStatus), basena
 router.register(r"regions", views.generic_viewset(models.Region), basename="regions")
 router.register(r"countries", views.CountryViewSet, basename="countries")
 router.register(r"global-warming-potentials", views.generic_viewset(GlobalWarmingPotential), basename="global-warming-potentials")
+router.register(r"change-rates", views.generic_viewset(models.ChangeRate), basename="change-rates")
 
+# Annual Cropland
 router.register(r"annual-croppings", views.generic_module_viewset(models.AnnualCropping), basename="annualcroppings")
 router.register(r"annual-croppings-minor-seasons", views.generic_module_viewset(models.MinorSeasonAnnualCropping), basename="annualcroppingminorseasons")
+router.register(r"tillage-management-types", views.generic_viewset(models.TillageManagementType), basename="tillage-management-types")
 
+# Perennial Cropland
 router.register(r"perennial-croppings", views.generic_module_viewset(models.PerennialCropping), basename="perennialcroppings")
 router.register(r"perennial-croppings-minor-seasons", views.generic_module_viewset(models.MinorSeasonPerennialCropping), basename="perennialcroppingminorseasons")
 
-router.register(r"flooded-rices", views.generic_module_viewset(models.FloodedRice), basename="floodedrices")
-router.register(r"flooded-rices-minor-seasons", views.generic_module_viewset(models.MinorSeasonFloodedRice), basename="floodedriceminorseasons")
+# Grassland
 router.register(r"grasslands", views.generic_module_viewset(models.Grassland), basename="grasslands")
 router.register(r"grassland-management-types", views.generic_viewset(models.GrasslandManagementType), basename="grasslandmanagementtypes")
-router.register(r"livestocks", views.generic_module_viewset(models.Livestock), basename="livestocks")
-router.register(r"forest-managements", views.generic_module_viewset(models.ForestManagement), basename="forests")
 
+# Fishery
 router.register(r"small-fisheries", views.generic_module_viewset(models.SmallFishery), basename="small-fisheries")
-router.register(r"large-fisheries", views.generic_module_viewset(models.LargeFishery), basename="large-fisheries")
-router.register(r"aquacultures", views.generic_module_viewset(models.Aquaculture), basename="aquacultures")
-router.register(r"inputs", views.generic_module_viewset(models.Input), basename="inputs")
-router.register(r"input-entries", views.generic_module_viewset(models.InputEntry), basename="input-entries")
-router.register(r"buildings", views.generic_module_viewset(models.Building), basename="buildings")
-router.register(r"roads", views.generic_module_viewset(models.Road), basename="roads")
-router.register(r"change-rates", views.generic_viewset(models.ChangeRate), basename="change-rates")
 router.register(r"small-fishery-gear-types", views.generic_viewset(models.SmallFisheryGearType), basename="small-fishery-gear-types")
+
+router.register(r"large-fisheries", views.generic_module_viewset(models.LargeFishery), basename="large-fisheries")
 router.register(r"large-fishery-gear-types", views.generic_viewset(models.LargeFisheryGearType), basename="large-fishery-gear-types")
+
 router.register(r"fish-types", views.generic_viewset(models.FishType), basename="fish-types")
 router.register(r"fishery-types", views.generic_viewset(models.FisheryType), basename="fishery-types")
-router.register(r"electricities", views.generic_module_viewset(models.Electricity), basename="electricities")
 
+
+# Aquaculture
+router.register(r"aquacultures", views.generic_module_viewset(models.Aquaculture), basename="aquacultures")
+
+# Inputs
+router.register(r"inputs", views.generic_module_viewset(models.Input), basename="inputs")
+router.register(r"input-entries", views.generic_module_viewset(models.InputEntry), basename="input-entries")
+
+# Fuel
 router.register(r"fuels", views.generic_module_viewset(models.Fuel), basename="fuels")
+
+# Irrigation
+router.register(r"irrigations", views.generic_module_viewset(models.Irrigation), basename="irrigations")
 router.register(r"irrigation-systems", views.generic_module_viewset(models.IrrigationSystem), basename="irrigation-systems")
 router.register(r"irrigation-phases", views.generic_module_viewset(models.IrrigationPhase), basename="irrigation-phases")
-router.register(r"flooded-rices", views.generic_module_viewset(models.FloodedRice), basename="flooded-rices")
-router.register(r"crop-types", views.generic_viewset(models.CropType), basename="crop-types")
-router.register(r"waterbodies", views.generic_module_viewset(models.Waterbody), basename="waterbodies")
+
+# Set Aside
 router.register(r"set-asides", views.generic_module_viewset(models.SetAside), basename="set-asides")
+
+# Degraded Land
 router.register(r"degraded-lands", views.generic_module_viewset(models.DegradedLand), basename="degraded-lands")
+
+# Coastal Wetland
 router.register(r"coastal-wetlands", views.generic_module_viewset(models.CoastalWetland), basename="coastal-wetlands")
-router.register(r"energies", views.generic_viewset(models.Energy), basename="energies")
-router.register(r"irrigations", views.generic_module_viewset(models.Irrigation), basename="irrigations")
-router.register(r"tillage-management-types", views.generic_viewset(models.TillageManagementType), basename="tillage-management-types")
+
 router.register(r"organic-input-types", views.generic_viewset(models.OrganicInputType), basename="organic-input-types")
 router.register(r"macro-input-types", views.generic_viewset(models.MacroInputType), basename="macro-input-types")
 router.register(r"input-types", views.InputTypeViewSet, basename="input-types")
@@ -84,7 +94,6 @@ router.register(r"residue-management-types", views.generic_viewset(models.Residu
 
 router.register(r"status-types", views.generic_viewset(models.StatusType), basename="status-types")
 
-router.register(r"settlements", views.generic_module_viewset(models.Settlement), basename="settlements")
 router.register(r"land-use-changes", views.generic_module_viewset(models.LandUseChange), basename="land-use-changes")
 router.register(r"organic-soils", views.generic_module_viewset(models.OrganicSoil), basename="organic-soils")
 router.register(r"soil-types", views.generic_viewset(models.SoilType), basename="soil-types")
@@ -94,25 +103,43 @@ router.register(r"moistures", views.generic_viewset(models.Moisture), basename="
 router.register(r"funding-agencies", views.generic_viewset(models.FundingAgency), basename="funding-agencies")
 router.register(r"executing-agencies", views.generic_viewset(models.ExecutingAgency), basename="executing-agencies")
 
+# Flooded Rice
+router.register(r"flooded-rices", views.generic_module_viewset(models.FloodedRice), basename="floodedrices")
+router.register(r"flooded-rices-minor-seasons", views.generic_module_viewset(models.MinorSeasonFloodedRice), basename="floodedriceminorseasons")
+router.register(r"crop-types", views.generic_viewset(models.CropType), basename="crop-types")
 router.register(r"water-management-types-before-cultivation", views.generic_viewset(models.WaterManagementTypeBeforeCultivation), basename="water-management-types-before-cultivation")
 router.register(r"water-management-types-after-cultivation", views.generic_viewset(models.WaterManagementTypeAfterCultivation), basename="water-management-types-after-cultivation")
 router.register(r"organic-amendment-types", views.generic_viewset(models.OrganicAmendmentType), basename="organic-amendment-types")
 
+# Livestock
+router.register(r"livestocks", views.generic_module_viewset(models.Livestock), basename="livestocks")
 router.register(r"livestock-category-types", views.generic_viewset(models.LivestockCategoryType), basename="livestock-category-types")
 router.register(r"livestock-production-types", views.generic_viewset(models.LivestockProductionType), basename="livestock-production-types")
 router.register(r"manure-management-types", views.generic_viewset(models.ManureManagementType), basename="manure-management-types")
+
+# Forest Management
+router.register(r"forest-managements", views.generic_module_viewset(models.ForestManagement), basename="forests")
 router.register(r"disturbance-types", views.generic_viewset(models.DisturbanceType), basename="disturbance-types")
 router.register(r"forest-types", views.generic_viewset(models.ForestType), basename="forest-types")
 router.register(r"forest-condition-types", views.generic_viewset(models.ForestConditionType), basename="forest-condition-types")
 router.register(r"forest-disturbances", views.generic_viewset(models.ForestDisturbance), basename="forest-disturbances")
 
 # Waterbodies
+router.register(r"waterbodies", views.generic_module_viewset(models.Waterbody), basename="waterbodies")
 router.register(r"waterbody-types", views.generic_viewset(models.WaterbodyType), basename="waterbody-types")
 router.register(r"trophic-types", views.generic_viewset(models.TrophicType), basename="trophic-types")
 
 # Settlements
+router.register(r"settlements", views.generic_module_viewset(models.Settlement), basename="settlements")
+router.register(r"buildings", views.generic_module_viewset(models.Building), basename="buildings")
+router.register(r"roads", views.generic_module_viewset(models.Road), basename="roads")
 router.register(r"road-types", views.generic_viewset(models.RoadType), basename="road-types")
 router.register(r"building-types", views.generic_viewset(models.BuildingType), basename="building-types")
+
+# Energy
+router.register(r"energies", views.generic_viewset(models.Energy), basename="energies")
+router.register(r"electricities", views.generic_module_viewset(models.Electricity), basename="electricities")
+
 
 router.register(r"users", views.UserViewSet, basename="users")
 
