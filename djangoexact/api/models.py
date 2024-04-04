@@ -1178,9 +1178,9 @@ class ForestManagement(LandModule, MultiBiomassModule):
 
     ##### ROTATION #####
 
-    rotation_length_yrs_start = IntegerField(null=True, blank=True, default=0)
-    rotation_length_yrs_w = IntegerField(null=True, blank=True, default=0)
-    rotation_length_yrs_wo = IntegerField(null=True, blank=True, default=0)
+    rotation_length_yrs_start = IntegerField(null=True, blank=True)
+    rotation_length_yrs_w = IntegerField(null=True, blank=True)
+    rotation_length_yrs_wo = IntegerField(null=True, blank=True)
     rotation_length_yrs_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_rotation_length_yrs_thread")
 
     rotation_percentage_biomass_for_energy_start = FloatField(null=True, blank=True, default=0)
@@ -1190,9 +1190,9 @@ class ForestManagement(LandModule, MultiBiomassModule):
 
     ##### LOGGING #####
 
-    logging_recurrence_yrs_start = IntegerField(null=True, blank=True, default=0)
-    logging_recurrence_yrs_w = IntegerField(null=True, blank=True, default=0)
-    logging_recurrence_yrs_wo = IntegerField(null=True, blank=True, default=0)
+    logging_recurrence_yrs_start = IntegerField(null=True, blank=True)
+    logging_recurrence_yrs_w = IntegerField(null=True, blank=True)
+    logging_recurrence_yrs_wo = IntegerField(null=True, blank=True)
     logging_recurrence_yrs_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_logging_recurrence_yrs_thread")
 
     logging_percentage_agb_logged_start = FloatField(null=True, blank=True, default=0, validators=[MinValueValidator(0), MaxValueValidator(1)])

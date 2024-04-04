@@ -1487,9 +1487,9 @@ class ForestManagementWriteSerializer(LandModuleWriteSerializer):
             pc_biomass_destruction_w = data.get("logging_percentage_agb_logged_w", 0)
 
             for disturbance in self.instance.disturbances.all():
-                pc_biomass_destruction_start += disturbance.percentage_biomass_destruction_start
-                pc_biomass_destruction_wo += disturbance.percentage_biomass_destruction_wo
-                pc_biomass_destruction_w += disturbance.percentage_biomass_destruction_w
+                pc_biomass_destruction_start += disturbance.percentage_biomass_destruction_start if disturbance.percentage_biomass_destruction_start else 0
+                pc_biomass_destruction_wo += disturbance.percentage_biomass_destruction_wo if disturbance.percentage_biomass_destruction_wo else 0
+                pc_biomass_destruction_w += disturbance.percentage_biomass_destruction_w if disturbance.percentage_biomass_destruction_w else 0
 
             if pc_biomass_destruction_start > 1:
                 errors += [serializers.ValidationError("Total percentage of biomass destruction (start) cannot be greater than 100%")]
