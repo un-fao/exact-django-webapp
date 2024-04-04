@@ -106,6 +106,10 @@ router.register(r"forest-types", views.generic_viewset(models.ForestType), basen
 router.register(r"forest-condition-types", views.generic_viewset(models.ForestConditionType), basename="forest-condition-types")
 router.register(r"forest-disturbances", views.generic_viewset(models.ForestDisturbance), basename="forest-disturbances")
 
+# Waterbodies
+router.register(r"waterbody-types", views.generic_viewset(models.WaterbodyType), basename="waterbody-types")
+router.register(r"trophic-types", views.generic_viewset(models.TrophicType), basename="trophic-types")
+
 router.register(r"users", views.UserViewSet, basename="users")
 
 urlpatterns = [
