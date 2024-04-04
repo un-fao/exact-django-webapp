@@ -57,6 +57,7 @@ from .models import (
     Region,
     Road,
     SetAside,
+    Settlement,
     SmallFishery,
     SoilType,
     StatusType,
@@ -1623,3 +1624,17 @@ class SetAsideReadSerializer(LandModuleReadSerializer):
         model = SetAside
         fields = "__all__"
         ref_name = "SetAside"
+
+
+class SettlementWriteSerializer(ModuleBaseSerializer):
+    class Meta:
+        model = Settlement
+        fields = "__all__"
+        ref_name = "Settlement"
+
+
+class SettlementReadSerializer(ModuleBaseSerializer):
+    class Meta:
+        model = Settlement
+        fields = "__all__"
+        ref_name = "Settlement"
