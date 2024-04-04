@@ -1387,11 +1387,12 @@ class WaterbodyWriteSerializer(LandModuleWriteSerializer):
 
         waterbody_type_scenarios = get_filled_scenarios(data, ["trophic_type"])
 
-        if waterbody_type_scenarios != []:
-            mandatory_fields += "area"
+        mandatory_fields += generate_fields_for_scenarios(waterbody_type_scenarios, mandatory_fields)
 
-        for scenario in waterbody_type_scenarios:
-            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
+        mandatory_fields += ["waterbody_type"]
+
+        if waterbody_type_scenarios:
+            mandatory_fields += ["area"]
 
         if not are_fields_filled(data, mandatory_fields):
             raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
