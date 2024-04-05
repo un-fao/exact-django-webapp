@@ -603,7 +603,17 @@ class LandUseTypeSerializer(serializers.ModelSerializer):
 
 class SubmoduleBaseSerializer(serializers.ModelSerializer):
     class Meta:
-        mandatory_fields = []
+        mandatory_fields = ["parent"]
+
+    def validate(self, data):
+        logging.debug(f"START SubmoduleBaseSerializer[{self.Meta.ref_name}].validate")
+
+        if not data.get("parent", None) and (not self.instance or not self.instance.parent):
+            logging.error(f"Parent field is required for {self.Meta.ref_name}")
+            raise serializers.ValidationError("Parent field is required")
+
+        logging.debug(f"END SubmoduleBaseSerializer[{self.Meta.ref_name}].validate")
+        return super().validate(data)
 
 
 class ModuleBaseSerializer(serializers.ModelSerializer):
@@ -1013,7 +1023,7 @@ class FloodedRiceReadSerializer(LandModuleReadSerializer):
 
 
 # Building
-class BuildingWriteSerializer(LandModuleWriteSerializer):
+class BuildingWriteSerializer(SubmoduleBaseSerializer):
     class Meta:
         model = Building
         fields = "__all__"
@@ -1033,21 +1043,29 @@ class BuildingWriteSerializer(LandModuleWriteSerializer):
 
         if not are_fields_filled(data, mandatory_fields):
             raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
+        elif mandatory_fields:
+            data["status"] = StatusType.objects.get(name="READY")
 
         return super().validate(data)
 
 
-class BuildingReadSerializer(LandModuleReadSerializer):
+class BuildingReadSerializer(SubmoduleBaseSerializer):
     class Meta:
         model = Building
         fields = "__all__"
         ref_name = "Building"
 
+    def validate(self, data):
+        if not self.instance.status.name == "READY":
+            raise serializers.ValidationError("A building module is not ready")
+
+        return super().validate(data)
+
 
 # Road
 
 
-class RoadWriteSerializer(LandModuleWriteSerializer):
+class RoadWriteSerializer(SubmoduleBaseSerializer):
     class Meta:
         model = Road
         fields = "__all__"
@@ -1068,21 +1086,29 @@ class RoadWriteSerializer(LandModuleWriteSerializer):
 
         if not are_fields_filled(data, mandatory_fields):
             raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
+        elif mandatory_fields:
+            data["status"] = StatusType.objects.get(name="READY")
 
         return super().validate(data)
 
 
-class RoadReadSerializer(LandModuleReadSerializer):
+class RoadReadSerializer(SubmoduleBaseSerializer):
     class Meta:
         model = Road
         fields = "__all__"
         ref_name = "Road"
 
+    def validate(self, data):
+        if not self.instance.status.name == "READY":
+            raise serializers.ValidationError("A road module is not ready")
+
+        return super().validate(data)
+
 
 # Other
 
 
-class OtherInfrastructureWriteSerializer(LandModuleWriteSerializer):
+class OtherInfrastructureWriteSerializer(SubmoduleBaseSerializer):
     class Meta:
         model = OtherInfrastructure
         fields = "__all__"
@@ -1101,15 +1127,23 @@ class OtherInfrastructureWriteSerializer(LandModuleWriteSerializer):
 
         if not are_fields_filled(data, mandatory_fields):
             raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
+        elif mandatory_fields:
+            data["status"] = StatusType.objects.get(name="READY")
 
         return super().validate(data)
 
 
-class OtherInfrastructureReadSerializer(LandModuleReadSerializer):
+class OtherInfrastructureReadSerializer(SubmoduleBaseSerializer):
     class Meta:
         model = OtherInfrastructure
         fields = "__all__"
         ref_name = "Other"
+
+    def validate(self, data):
+        if not self.instance.status.name == "READY":
+            raise serializers.ValidationError("An other infrastructure module is not ready")
+
+        return super().validate(data)
 
 
 # IrrigationSystem
@@ -1657,3 +1691,26 @@ class SettlementReadSerializer(ModuleBaseSerializer):
         model = Settlement
         fields = "__all__"
         ref_name = "Settlement"
+
+    def validate(self, data):
+
+        buildings = Building.objects.filter(parent=self.instance).all()
+
+        for building in buildings:
+            building_serializer = BuildingReadSerializer(data=building.__dict__, instance=building)
+            if not building_serializer.is_valid():
+                raise serializers.ValidationError(building_serializer.errors)
+
+        roads = Road.objects.filter(parent=self.instance).all()
+        for road in roads:
+            road_serializer = RoadReadSerializer(data=road.__dict__, instance=road)
+            if not road_serializer.is_valid():
+                raise serializers.ValidationError(road_serializer.errors)
+
+        other_infrastructures = OtherInfrastructure.objects.filter(parent=self.instance).all()
+        for other_infrastructure in other_infrastructures:
+            other_infrastructure_serializer = OtherInfrastructureReadSerializer(data=other_infrastructure.__dict__, instance=other_infrastructure)
+            if not other_infrastructure_serializer.is_valid():
+                raise serializers.ValidationError(other_infrastructure_serializer.errors)
+
+        return super().validate(data)
