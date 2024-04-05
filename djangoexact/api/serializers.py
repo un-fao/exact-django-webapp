@@ -386,7 +386,7 @@ class WriteActivitySerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("Land Modules cannot be independently added to activities with a Land Use Change")
 
             new_duration = data.get("duration_t2", None)
-            if new_duration and new_duration > self.instance.project.duration_years:
+            if new_duration and new_duration > (self.instance.project.implementation_years + self.instance.project.capitalization_years):
                 raise serializers.ValidationError("Activity duration cannot be greater than project duration")
 
         activity_cost = data.get("cost", None)
