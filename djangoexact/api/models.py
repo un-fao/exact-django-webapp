@@ -576,17 +576,17 @@ class Activity(Historical):
 
 class Submodule(Historical):
     # module_type = ForeignKey("api.ModuleType", on_delete=CASCADE, related_name="%(class)s")
+    status = ForeignKey(StatusType, on_delete=CASCADE, null=True, blank=True)
 
     class Meta:
         abstract = True
 
     def save(self, *args, **kwargs):
-        if not self.parent and self.pk:
+        if not self.parent:
             raise ValidationError("Submodule must have a parent field specified in the model")
 
-        for attr in dir(self):
-            if attr.endswith("_thread") and getattr(self, attr) is None:
-                setattr(self, attr, CommentThread.objects.create())
+        if not self.status:
+            self.status = StatusType.objects.get_or_create(name="EMPTY")[0]
 
         super().save(*args, **kwargs)
 
@@ -1624,8 +1624,8 @@ class RoadType(Model):
         return f"({self.id}) {self.name}"
 
 
-class Building(SingleBiomassModule):
-    settlement = ForeignKey("api.Settlement", on_delete=CASCADE, null=True, blank=True, related_name="buildings")
+class Building(Submodule):
+    parent = ForeignKey("api.Settlement", on_delete=CASCADE, null=True, blank=True, related_name="buildings")
 
     building_type_start = ForeignKey(BuildingType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_building_type_start")
     building_type_w = ForeignKey(BuildingType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_building_type_w")
@@ -1641,8 +1641,8 @@ class Building(SingleBiomassModule):
     ef_t2_wo = FloatField(null=True, blank=True)
 
 
-class Road(Module):
-    settlement = ForeignKey("api.Settlement", on_delete=CASCADE, null=True, blank=True, related_name="roads")
+class Road(Submodule):
+    parent = ForeignKey("api.Settlement", on_delete=CASCADE, null=True, blank=True, related_name="roads")
 
     road_type_start = ForeignKey(RoadType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_road_type_start")
     road_type_w = ForeignKey(RoadType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_road_type_w")
@@ -1663,8 +1663,8 @@ class Road(Module):
     ef_t2_wo = FloatField(null=True, blank=True)
 
 
-class OtherInfrastructure(Module):
-    settlement = ForeignKey("api.Settlement", on_delete=CASCADE, null=True, blank=True, related_name="other_infrastructure")
+class OtherInfrastructure(Submodule):
+    parent = ForeignKey("api.Settlement", on_delete=CASCADE, null=True, blank=True, related_name="other_infrastructures")
 
     area_m2_start = FloatField(null=True, blank=True)
     area_m2_w = FloatField(null=True, blank=True)
