@@ -70,9 +70,6 @@ router.register(r"aquacultures", views.generic_module_viewset(models.Aquaculture
 router.register(r"inputs", views.generic_module_viewset(models.Input), basename="inputs")
 router.register(r"input-entries", views.generic_module_viewset(models.InputEntry), basename="input-entries")
 
-# Fuel
-router.register(r"fuels", views.generic_module_viewset(models.Fuel), basename="fuels")
-
 # Irrigation
 router.register(r"irrigations", views.generic_module_viewset(models.Irrigation), basename="irrigations")
 router.register(r"irrigation-systems", views.generic_module_viewset(models.IrrigationSystem), basename="irrigation-systems")
@@ -139,6 +136,11 @@ router.register(r"building-types", views.generic_viewset(models.BuildingType), b
 # Energy
 router.register(r"energies", views.generic_viewset(models.Energy), basename="energies")
 router.register(r"electricities", views.generic_module_viewset(models.Electricity), basename="electricities")
+router.register(r"fuels", views.generic_module_viewset(models.Fuel), basename="fuels")
+
+# Fuel
+router.register(r"macro-fuel-types", views.generic_viewset(models.MacroFuelType), basename="macro-fuel-types")
+router.register(r"fuel-types", views.generic_viewset(models.FuelType), basename="fuel-types")
 
 
 router.register(r"users", views.UserViewSet, basename="users")
