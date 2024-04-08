@@ -25,6 +25,7 @@ from .models import (
     Country,
     CustomUser,
     DegradedLand,
+    Electricity,
     Energy,
     FloodedRice,
     ForestDisturbance,
@@ -1216,7 +1217,7 @@ class IrrigationPhaseReadSerializer(LandModuleReadSerializer):
         ref_name = "IrrigationPhase"
 
 
-class EnergyWriteSerializer(SubmoduleBaseSerializer):
+class EnergyWriteSerializer(LandModuleWriteSerializer):
     class Meta:
         model = Energy
         fields = "__all__"
@@ -1239,7 +1240,7 @@ class EnergyWriteSerializer(SubmoduleBaseSerializer):
         return super().validate(data)
 
 
-class EnergyReadSerializer(SubmoduleBaseSerializer):
+class EnergyReadSerializer(LandModuleReadSerializer):
     class Meta:
         model = Energy
         fields = "__all__"
@@ -1278,6 +1279,24 @@ class FuelReadSerializer(SubmoduleBaseSerializer):
         model = Fuel
         fields = "__all__"
         ref_name = "Fuel"
+
+
+class ElectricityWriteSerializer(SubmoduleBaseSerializer):
+    class Meta:
+        model = Electricity
+        fields = "__all__"
+        ref_name = "Electricity"
+        mandatory_fields = []
+
+    def validate(self, data):
+        return super().validate(data)
+
+
+class ElectricityReadSerializer(SubmoduleBaseSerializer):
+    class Meta:
+        model = Electricity
+        fields = "__all__"
+        ref_name = "Electricity"
 
 
 # Livestock
