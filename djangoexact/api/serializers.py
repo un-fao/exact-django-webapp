@@ -1216,7 +1216,7 @@ class IrrigationPhaseReadSerializer(LandModuleReadSerializer):
         ref_name = "IrrigationPhase"
 
 
-class EnergyWriteSerializer(LandModuleWriteSerializer):
+class EnergyWriteSerializer(SubmoduleBaseSerializer):
     class Meta:
         model = Energy
         fields = "__all__"
@@ -1239,7 +1239,7 @@ class EnergyWriteSerializer(LandModuleWriteSerializer):
         return super().validate(data)
 
 
-class EnergyReadSerializer(LandModuleReadSerializer):
+class EnergyReadSerializer(SubmoduleBaseSerializer):
     class Meta:
         model = Energy
         fields = "__all__"
@@ -1249,7 +1249,7 @@ class EnergyReadSerializer(LandModuleReadSerializer):
 # Fuel
 
 
-class FuelWriteSerializer(LandModuleWriteSerializer):
+class FuelWriteSerializer(SubmoduleBaseSerializer):
     class Meta:
         model = Fuel
         fields = "__all__"
@@ -1273,7 +1273,7 @@ class FuelWriteSerializer(LandModuleWriteSerializer):
         return super().validate(data)
 
 
-class FuelReadSerializer(LandModuleReadSerializer):
+class FuelReadSerializer(SubmoduleBaseSerializer):
     class Meta:
         model = Fuel
         fields = "__all__"
