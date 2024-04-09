@@ -1899,16 +1899,19 @@ class LandUseChange(Module):
     module_type_start = ForeignKey(ModuleType, on_delete=CASCADE, related_name="start")
     module_type_w = ForeignKey(ModuleType, on_delete=CASCADE, related_name="w")
     module_type_wo = ForeignKey(ModuleType, on_delete=CASCADE, related_name="wo")
+    module_type_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="land_use_change_module_type_thread")
 
     area = FloatField()
 
     is_fire_used_start = BooleanField(default=False)
     is_fire_used_w = BooleanField(default=False)
     is_fire_used_wo = BooleanField(default=False)
+    is_fire_used_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="land_use_change_is_fire_used_thread")
 
     dry_matter_start = FloatField(null=True, blank=True)
     dry_matter_w = FloatField(null=True, blank=True)
     dry_matter_wo = FloatField(null=True, blank=True)
+    dry_matter_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="land_use_change_dry_matter_thread")
 
     def is_filled(self):
         return self.area is not None and self.module_type_start is not None and self.module_type_w is not None and self.module_type_wo is not None
