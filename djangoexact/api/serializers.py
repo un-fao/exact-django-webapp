@@ -33,6 +33,7 @@ from .models import (
     ForestDisturbance,
     ForestManagement,
     Fuel,
+    FuelType,
     GasType,
     GLEAMRegion,
     Grassland,
@@ -46,6 +47,7 @@ from .models import (
     LandUseType,
     LargeFishery,
     Livestock,
+    MacroFuelType,
     MacroInputType,
     MinorSeasonAnnualCropping,
     MinorSeasonFloodedRice,
@@ -1760,3 +1762,19 @@ class ConfigParamSerializer(serializers.ModelSerializer):
     def validate(self, data):
         if not self.context["request"].user.is_staff:
             raise serializers.ValidationError("You do not have permission to change this parameter")
+
+
+class MacroFuelTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MacroFuelType
+        fields = "__all__"
+        ref_name = "MacroFuelType"
+
+
+class FuelTypeSerializer(serializers.ModelSerializer):
+    macro_fuel_type = MacroFuelTypeSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = FuelType
+        fields = "__all__"
+        ref_name = "FuelType"
