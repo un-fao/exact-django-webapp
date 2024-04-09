@@ -8,6 +8,8 @@ from django.db import models
 from rest_framework import exceptions, status
 from rest_framework.response import Response
 
+import api.models as api_models
+
 CN_RATIO_CROP = 10
 CN_RATIO_GRASSLAND = 15
 MANGROVE_FACTOR = 0.451
@@ -243,11 +245,11 @@ def copy_activity(activity, new_project=None):
 def create_module_threads(module_instance):
     for attr in dir(module_instance):
         if attr.endswith("_thread") and getattr(module_instance, attr, None) is None:
-            setattr(module_instance, attr, models.CommentThread.objects.create())
+            setattr(module_instance, attr, api_models.CommentThread.objects.create())
     module_instance.save()
 
 
-def getany(*args: list[object], key: str):
+def getany(objects: list[object], key: str):
     """
     Returns the value of the specified key from the first object in the arguments list that has the key attribute.
 
@@ -261,10 +263,17 @@ def getany(*args: list[object], key: str):
     Raises:
         ValueError: If any argument in the args list is not an object.
     """
-    if not all([isinstance(arg, object) for arg in args]):
+    if not all([isinstance(obj, object) for obj in objects]):
         raise ValueError("All arguments must be objects")
 
-    for arg in args:
-        if hasattr(arg, key):
-            return getattr(arg, key)
+    for obj in objects:
+
+        obj_type = type(obj)
+
+        if obj_type is dict:
+            if key in obj:
+                return obj[key]
+        else:
+            if hasattr(obj, key):
+                return getattr(obj, key)
     return None
