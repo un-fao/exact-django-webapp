@@ -17,6 +17,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
+import api.filters as filters
 import api.utilities as utils
 from api.models import CustomUser as User
 
@@ -1069,6 +1070,7 @@ def generic_viewset(model: Model):
     class GenericViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         queryset = model.objects.all()
         serializer_class = get_model_serializer(model)
+        filterset_class = filters.get_model_filter(model)
 
     return GenericViewSet
 
