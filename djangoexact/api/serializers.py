@@ -14,6 +14,7 @@ from rest_framework.fields import empty
 import api.utilities as utils
 from api.models import CustomUser as User
 
+from . import labels
 from .models import (
     Activity,
     AnnualCropping,
@@ -22,7 +23,7 @@ from .models import (
     Climate,
     Comment,
     CommentThread,
-    ConfigParams,
+    ConfigParam,
     Country,
     CustomUser,
     DegradedLand,
@@ -1272,6 +1273,12 @@ class FuelWriteSerializer(SubmoduleBaseSerializer):
         if not are_fields_filled(data, mandatory_fields):
             raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
 
+        parent = utils.getany(self.instance, data, "parent")
+        max_elements = ConfigParam.objects.get(name=labels.FUEL_MODULES_LIMIT).get_parsed_value()
+
+        if parent.fuels.count() + 1 > max_elements:
+            raise serializers.ValidationError(f"Only {max_elements} fuel modules are allowed")
+
         return super().validate(data)
 
 
@@ -1293,7 +1300,7 @@ class ElectricityWriteSerializer(SubmoduleBaseSerializer):
         super().validate(data)
 
         parent = utils.getany(self.instance, data, "parent")
-        max_elements = ConfigParams.objects.get(name="ELECTRICITY_MODULES_MAX").value
+        max_elements = ConfigParam.objects.get(name=labels.ELECTRICITY_MODULES_LIMIT).get_parsed_value()
 
         if parent.electricities.count() + 1 > max_elements:
             raise serializers.ValidationError(f"Only {max_elements} electricity modules are allowed")
@@ -1740,3 +1747,14 @@ class SettlementReadSerializer(ModuleBaseSerializer):
                 raise serializers.ValidationError(other_infrastructure_serializer.errors)
 
         return super().validate(data)
+
+
+class ConfigParamSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ConfigParam
+        fields = "__all__"
+        ref_name = "ConfigParams"
+
+    def validate(self, data):
+        if not self.context["request"].user.is_staff:
+            raise serializers.ValidationError("You do not have permission to change this parameter")
