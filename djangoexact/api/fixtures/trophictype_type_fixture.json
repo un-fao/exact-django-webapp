@@ -1,1 +1,0 @@
-[{"model": "api.trophictype", "pk": 1, "fields": {"name": "Default"}}, {"model": "api.trophictype", "pk": 2, "fields": {"name": "Oligotrophic"}}, {"model": "api.trophictype", "pk": 3, "fields": {"name": "Eutrophic"}}, {"model": "api.trophictype", "pk": 4, "fields": {"name": "Mesotrophic"}}, {"model": "api.trophictype", "pk": 5, "fields": {"name": "Hypereutrophic"}}]

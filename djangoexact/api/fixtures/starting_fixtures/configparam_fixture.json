@@ -1,0 +1,1 @@
+[{"model": "api.configparam", "pk": 1, "fields": {"name": "MAX_PC_BIOMASS_DESTRUCTION", "value": "100%"}}, {"model": "api.configparam", "pk": 2, "fields": {"name": "ELECTRICITY_MODULES_LIMIT", "value": "1"}}, {"model": "api.configparam", "pk": 3, "fields": {"name": "FUEL_MODULES_LIMIT", "value": "10"}}]

@@ -1,1 +1,0 @@
-[{"model": "api.tillagemanagementtype", "pk": 1, "fields": {"name": "Full Tillage"}}, {"model": "api.tillagemanagementtype", "pk": 2, "fields": {"name": "Reduced Tillage"}}, {"model": "api.tillagemanagementtype", "pk": 3, "fields": {"name": "No Tillage"}}]

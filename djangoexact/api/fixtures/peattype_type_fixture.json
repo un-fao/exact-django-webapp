@@ -1,1 +1,0 @@
-[{"model": "api.peattype", "pk": 1, "fields": {"name": "Nutrient Rich"}}, {"model": "api.peattype", "pk": 2, "fields": {"name": "Nutrient Poor"}}]

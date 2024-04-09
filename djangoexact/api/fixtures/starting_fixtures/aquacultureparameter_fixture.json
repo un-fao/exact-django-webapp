@@ -1,0 +1,1 @@
+[{"model": "api.aquacultureparameter", "pk": 1, "fields": {"name": "nitrous_ef_default", "value": 0.00169, "unit": null}}, {"model": "api.aquacultureparameter", "pk": 2, "fields": {"name": "feed_ef_default", "value": 0.0, "unit": null}}]

@@ -1,1 +1,0 @@
-[{"model": "api.foresttype", "pk": 1, "fields": {"name": "Natural"}}, {"model": "api.foresttype", "pk": 2, "fields": {"name": "Plantation"}}]

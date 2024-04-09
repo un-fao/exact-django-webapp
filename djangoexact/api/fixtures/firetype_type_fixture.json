@@ -1,1 +1,0 @@
-[{"model": "api.firetype", "pk": 1, "fields": {"name": "Wildfire Undrained Peat"}}, {"model": "api.firetype", "pk": 2, "fields": {"name": "Wildfire Drained Peat"}}, {"model": "api.firetype", "pk": 3, "fields": {"name": "Prescribed Fire (E.G. Land Mgnt)"}}]

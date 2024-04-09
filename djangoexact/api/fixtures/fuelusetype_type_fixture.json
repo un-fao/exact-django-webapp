@@ -1,1 +1,0 @@
-[{"model": "api.fuelusetype", "pk": 1, "fields": {"name": "Stationary"}}, {"model": "api.fuelusetype", "pk": 2, "fields": {"name": "Mobile"}}, {"model": "api.fuelusetype", "pk": 3, "fields": {"name": "Off-Road"}}]
