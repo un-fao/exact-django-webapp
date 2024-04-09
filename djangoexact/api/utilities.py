@@ -121,12 +121,6 @@ def is_start_with_changed(_class: object, luc):
     return luc.module_type_start.class_name == _class.__name__ and luc.module_type_start != luc.module_type_wo
 
 
-class ScenarioTypes(Enum):
-    START = "start"
-    WITH = "w"
-    WITHOUT = "wo"
-
-
 def get_thread_attributes(module: models.Model):
     return [attr for attr in module._meta.get_fields() if attr.name.endswith("_thread")]
 
