@@ -1520,13 +1520,16 @@ class Energy(Module):
 class Electricity(Submodule):
     parent = ForeignKey(Energy, on_delete=CASCADE, null=True, blank=True, related_name="electricities")
     country = ForeignKey(Country, on_delete=CASCADE, null=True, blank=True)
+
     mwh_start = FloatField(null=True, blank=True)
     mwh_w = FloatField(null=True, blank=True)
     mwh_wo = FloatField(null=True, blank=True)
+    mwh_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_mwh_thread")
 
     mwh_renewables_start = FloatField(null=True, blank=True)
     mwh_renewables_w = FloatField(null=True, blank=True)
     mwh_renewables_wo = FloatField(null=True, blank=True)
+    mwh_renewables_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_mwh_renewables_thread")
 
     ef_t2 = FloatField(null=True, blank=True)
     transmission_loss = FloatField(default=0.1)
@@ -1536,9 +1539,11 @@ class Electricity(Submodule):
 class Fuel(Submodule):
     parent = ForeignKey(Energy, on_delete=CASCADE, null=True, blank=True, related_name="fuels")
     fuel_type = ForeignKey(FuelType, on_delete=CASCADE, null=True, blank=True)
+
     fuel_consumption_start = FloatField(null=True, blank=True)
     fuel_consumption_w = FloatField(null=True, blank=True)
     fuel_consumption_wo = FloatField(null=True, blank=True)
+    fuel_consumption_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_fuel_consumption_thread")
 
     ef_t2 = FloatField(null=True, blank=True)
     account_for_co2 = BooleanField(default=False)
@@ -1565,9 +1570,11 @@ class Irrigation(Module):
 class IrrigationSystem(Submodule):
     parent = ForeignKey(Irrigation, on_delete=CASCADE, null=True, blank=True, related_name="irrigation_systems")
     irrigation_system_type = ForeignKey(IrrigationSystemType, on_delete=CASCADE, null=True, blank=True, related_name="irrigation_systems")
+
     ha_start = FloatField(null=True, blank=True)
     ha_w = FloatField(null=True, blank=True)
     ha_wo = FloatField(null=True, blank=True)
+    ha_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_thread")
 
     ef_t2_start = FloatField(null=True, blank=True)
     ef_t2_w = FloatField(null=True, blank=True)
@@ -1584,13 +1591,16 @@ class IrrigationPhase(Submodule):
     irrigation_system_type = ForeignKey(IrrigationSystemType, on_delete=CASCADE, null=True, blank=True, related_name="irrigation_phases")
     fuel_type = ForeignKey(FuelType, on_delete=CASCADE, null=True, blank=True)
     well_depth = FloatField(null=True, blank=True)
+
     ha_start = FloatField(null=True, blank=True)
     ha_w = FloatField(null=True, blank=True)
     ha_wo = FloatField(null=True, blank=True)
+    ha_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_ha_thread")
 
     gross_irrigation_water_start = FloatField(null=True, blank=True)
     gross_irrigation_water_w = FloatField(null=True, blank=True)
     gross_irrigation_water_wo = FloatField(null=True, blank=True)
+    gross_irrigation_water_thread = ForeignKey(CommentThread, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_gross_irrigation_water_thread")
 
     power_origin_country_t2 = ForeignKey(Country, on_delete=CASCADE, null=True, blank=True)
     ef_t2_start = FloatField(null=True, blank=True)
@@ -1630,6 +1640,7 @@ class Building(Submodule):
     building_type_start = ForeignKey(BuildingType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_building_type_start")
     building_type_w = ForeignKey(BuildingType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_building_type_w")
     building_type_wo = ForeignKey(BuildingType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_building_type_wo")
+    building_type_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_building_type_thread", on_delete=SET_NULL)
 
     area_m2_start = FloatField(null=True, blank=True)
     area_m2_w = FloatField(null=True, blank=True)
@@ -1647,6 +1658,7 @@ class Road(Submodule):
     road_type_start = ForeignKey(RoadType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_road_type_start")
     road_type_w = ForeignKey(RoadType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_road_type_w")
     road_type_wo = ForeignKey(RoadType, on_delete=CASCADE, null=True, blank=True, related_name="%(class)s_road_type_wo")
+    road_type_thread = OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_road_type_thread", on_delete=SET_NULL)
 
     length_km_start = FloatField(null=True, blank=True)
     length_km_w = FloatField(null=True, blank=True)
