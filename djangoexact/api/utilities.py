@@ -252,3 +252,26 @@ def create_module_threads(module_instance):
         if attr.endswith("_thread") and getattr(module_instance, attr, None) is None:
             setattr(module_instance, attr, models.CommentThread.objects.create())
     module_instance.save()
+
+
+def getany(*args: list[object], key: str):
+    """
+    Returns the value of the specified key from the first object in the arguments list that has the key attribute.
+
+    Args:
+        *args (list[object]): The list of objects to search for the key attribute.
+        key (str): The name of the key attribute to retrieve.
+
+    Returns:
+        object: The value of the specified key from the first object that has the key attribute, or None if no object has the key attribute.
+
+    Raises:
+        ValueError: If any argument in the args list is not an object.
+    """
+    if not all([isinstance(arg, object) for arg in args]):
+        raise ValueError("All arguments must be objects")
+
+    for arg in args:
+        if hasattr(arg, key):
+            return getattr(arg, key)
+    return None
