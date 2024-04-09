@@ -1165,6 +1165,7 @@ class IrrigationSystemWriteSerializer(LandModuleWriteSerializer):
         ]
 
     def validate(self, data):
+        super().validate(data)
         mandatory_fields = []
 
         irrigation_type_scenarios = get_filled_scenarios(data, ["irrigation_type"])
@@ -1175,7 +1176,12 @@ class IrrigationSystemWriteSerializer(LandModuleWriteSerializer):
         if not are_fields_filled(data, mandatory_fields):
             raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
 
-        return super().validate(data)
+        max_entries = ConfigParam.objects.get(name=labels.IRRIGATION_SYSTEMS_LIMIT).get_parsed_value()
+
+        if self.instance and self.instance.parent.irrigation_systems.count() + 1 > max_entries:
+            raise serializers.ValidationError(f"Only {max_entries} irrigation systems are allowed")
+
+        return data
 
 
 class IrrigationSystemReadSerializer(LandModuleReadSerializer):
@@ -1201,6 +1207,8 @@ class IrrigationPhaseWriteSerializer(LandModuleWriteSerializer):
         ]
 
     def validate(self, data):
+        super().validate(data)
+
         mandatory_fields = []
 
         irrigation_phase_type_scenarios = get_filled_scenarios(data, ["irrigation_phase_type"])
@@ -1211,7 +1219,12 @@ class IrrigationPhaseWriteSerializer(LandModuleWriteSerializer):
         if not are_fields_filled(data, mandatory_fields):
             raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
 
-        return super().validate(data)
+        max_entries = ConfigParam.objects.get(name=labels.IRRIGATION_PHASES_LIMIT).get_parsed_value()
+
+        if self.instance and self.instance.parent.irrigation_phases.count() + 1 > max_entries:
+            raise serializers.ValidationError(f"Only {max_entries} irrigation phases are allowed")
+
+        return data
 
 
 class IrrigationPhaseReadSerializer(LandModuleReadSerializer):
@@ -1609,6 +1622,17 @@ class InputEntryWriteSerializer(serializers.ModelSerializer):
         model = InputEntry
         fields = "__all__"
         ref_name = "InputEntry"
+
+    def validate(self, data):
+        super().validate(data)
+
+        parent = utils.getany([self.instance, data], "parent")
+        max_entries = ConfigParam.objects.get(name=labels.INPUT_ENTRIES_LIMIT).get_parsed_value()
+
+        if parent.input_entries.count() + 1 > max_entries:
+            raise serializers.ValidationError(f"Only {max_entries} input entries are allowed")
+
+        return data
 
 
 class InputEntryReadSerializer(serializers.ModelSerializer):
