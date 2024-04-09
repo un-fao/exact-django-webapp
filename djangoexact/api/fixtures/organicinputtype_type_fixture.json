@@ -1,1 +1,0 @@
-[{"model": "api.organicinputtype", "pk": 8, "fields": {"name": "Low C input"}}, {"model": "api.organicinputtype", "pk": 9, "fields": {"name": "Medium C input"}}, {"model": "api.organicinputtype", "pk": 10, "fields": {"name": "High C input, no manure"}}, {"model": "api.organicinputtype", "pk": 11, "fields": {"name": "High C input, with manure"}}]
