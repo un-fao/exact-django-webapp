@@ -1,1 +1,0 @@
-[{"model": "api.roadtype", "pk": 1, "fields": {"name": "Road (Bitumen)"}}, {"model": "api.roadtype", "pk": 2, "fields": {"name": "Road (Asphalt)"}}, {"model": "api.roadtype", "pk": 3, "fields": {"name": "Road (Reinforced Concrete)"}}, {"model": "api.roadtype", "pk": 4, "fields": {"name": "Road Rehabilitated (Pavement)"}}]
