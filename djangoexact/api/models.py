@@ -52,6 +52,17 @@ class Group(auth_models.Group):
 ##############################
 
 
+class ConfigParams(Model):
+    name = CharField(max_length=255)
+    value = TextField()
+
+    def __str__(self):
+        return f"({self.pk}) {self.name}"
+
+    class Meta:
+        verbose_name_plural = "Config parameters"
+
+
 class CommentThread(Model):
     def __str__(self):
         return f"({self.pk})"
