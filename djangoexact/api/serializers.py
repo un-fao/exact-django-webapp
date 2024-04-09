@@ -1561,13 +1561,15 @@ class ForestManagementWriteSerializer(LandModuleWriteSerializer):
                 pc_biomass_destruction_wo += disturbance.percentage_biomass_destruction_wo if disturbance.percentage_biomass_destruction_wo else 0
                 pc_biomass_destruction_w += disturbance.percentage_biomass_destruction_w if disturbance.percentage_biomass_destruction_w else 0
 
-            if pc_biomass_destruction_start > 1:
+            max_pc = ConfigParam.objects.get(name=labels.MAX_PC_BIOMASS_DESTRUCTION).get_parsed_value()
+
+            if pc_biomass_destruction_start > max_pc:
                 errors += [serializers.ValidationError("Total percentage of biomass destruction (start) cannot be greater than 100%")]
 
-            if pc_biomass_destruction_wo > 1:
+            if pc_biomass_destruction_wo > max_pc:
                 errors += [serializers.ValidationError("Total percentage of biomass destruction (without) cannot be greater than 100%")]
 
-            if pc_biomass_destruction_w > 1:
+            if pc_biomass_destruction_w > max_pc:
                 errors += [serializers.ValidationError("Total percentage of biomass destruction (with) cannot be greater than 100%")]
 
         if errors:
