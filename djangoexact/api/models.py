@@ -58,7 +58,7 @@ class ConfigParam(models.Model):
         return f"({self.pk}) {self.name}"
 
     def get_parsed_value(self):
-        value_lower = self.value.lower()
+        value_lower = self.value.lower().strip()
         if value_lower == "true":
             return True
         elif value_lower == "false":
