@@ -1265,6 +1265,7 @@ class FuelWriteSerializer(SubmoduleBaseSerializer):
         ]
 
     def validate(self, data):
+        super().validate(data)
         mandatory_fields = []
 
         fuel_type_scenarios = get_filled_scenarios(data, ["fuel_type"])
@@ -1275,13 +1276,13 @@ class FuelWriteSerializer(SubmoduleBaseSerializer):
         if not are_fields_filled(data, mandatory_fields):
             raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
 
-        parent = utils.getany(self.instance, data, "parent")
+        parent = utils.getany([self.instance, data], "parent")
         max_elements = ConfigParam.objects.get(name=labels.FUEL_MODULES_LIMIT).get_parsed_value()
 
         if parent.fuels.count() + 1 > max_elements:
             raise serializers.ValidationError(f"Only {max_elements} fuel modules are allowed")
 
-        return super().validate(data)
+        return data
 
 
 class FuelReadSerializer(SubmoduleBaseSerializer):
@@ -1301,11 +1302,13 @@ class ElectricityWriteSerializer(SubmoduleBaseSerializer):
     def validate(self, data):
         super().validate(data)
 
-        parent = utils.getany(self.instance, data, "parent")
+        parent = utils.getany([self.instance, dict(data)], "parent")
         max_elements = ConfigParam.objects.get(name=labels.ELECTRICITY_MODULES_LIMIT).get_parsed_value()
 
         if parent.electricities.count() + 1 > max_elements:
             raise serializers.ValidationError(f"Only {max_elements} electricity modules are allowed")
+
+        return data
 
 
 class ElectricityReadSerializer(SubmoduleBaseSerializer):
