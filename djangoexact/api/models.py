@@ -58,24 +58,21 @@ class ConfigParam(models.Model):
         return f"({self.pk}) {self.name}"
 
     def get_parsed_value(self):
-        if self.value.lower() == "true":
+        value_lower = self.value.lower()
+        if value_lower == "true":
             return True
-        elif self.value.lower() == "false":
+        elif value_lower == "false":
             return False
 
-        if "%" in self.value:
-            try:
-                return float(self.value.replace("%", "")) / 100
-            except ValueError:
-                return self.value
-
         try:
-            return int(self.value)
+            if "%" in value_lower:
+                return float(value_lower.replace("%", "")) / 100
+            elif "." in value_lower:
+                return float(value_lower)
+            else:
+                return int(value_lower)
         except ValueError:
-            try:
-                return float(self.value)
-            except ValueError:
-                return self.value
+            return self.value
 
     class Meta:
         verbose_name_plural = "Config parameters"
