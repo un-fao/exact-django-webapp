@@ -62,6 +62,10 @@ class ConfigParam(models.Model):
             return True
         elif self.value.lower() == "false":
             return False
+
+        if "%" in self.value:
+            return float(self.value.replace("%", "")) / 100
+
         try:
             return int(self.value)
         except ValueError:
