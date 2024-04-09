@@ -22,6 +22,7 @@ from .models import (
     Climate,
     Comment,
     CommentThread,
+    ConfigParams,
     Country,
     CustomUser,
     DegradedLand,
@@ -1289,7 +1290,13 @@ class ElectricityWriteSerializer(SubmoduleBaseSerializer):
         mandatory_fields = []
 
     def validate(self, data):
-        return super().validate(data)
+        super().validate(data)
+
+        parent = utils.getany(self.instance, data, "parent")
+        max_elements = ConfigParams.objects.get(name="ELECTRICITY_MODULES_MAX").value
+
+        if parent.electricities.count() + 1 > max_elements:
+            raise serializers.ValidationError(f"Only {max_elements} electricity modules are allowed")
 
 
 class ElectricityReadSerializer(SubmoduleBaseSerializer):
