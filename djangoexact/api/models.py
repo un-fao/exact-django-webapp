@@ -52,12 +52,25 @@ class Group(auth_models.Group):
 ##############################
 
 
-class ConfigParams(Model):
+class ConfigParam(Model):
     name = CharField(max_length=255)
     value = TextField()
 
     def __str__(self):
         return f"({self.pk}) {self.name}"
+
+    def get_parsed_value(self):
+        if self.value.lower() == "true":
+            return True
+        elif self.value.lower() == "false":
+            return False
+        try:
+            return int(self.value)
+        except ValueError:
+            try:
+                return float(self.value)
+            except ValueError:
+                return self.value
 
     class Meta:
         verbose_name_plural = "Config parameters"
