@@ -939,9 +939,9 @@ def generic_module_viewset(model: Model):
                 logging.error("Selected user does not have permission to add this module to the project")
                 return utils.ErrorResponse("Selected user does not have permission to add this module to the project", status=http_status.HTTP_403_FORBIDDEN)
 
-            utils.create_module_threads(module_serializer.validated_data)
-
             module_serializer.save()
+
+            utils.create_module_threads(module_serializer.instance)
 
             read_serializer = get_module_serializer(model)(instance=module_serializer.instance)
 
