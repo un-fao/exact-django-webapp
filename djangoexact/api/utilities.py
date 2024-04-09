@@ -4,10 +4,9 @@ import uuid
 from enum import Enum
 
 from django.apps import apps
+from django.db import models
 from rest_framework import exceptions, status
 from rest_framework.response import Response
-
-import api.models as models
 
 CN_RATIO_CROP = 10
 CN_RATIO_GRASSLAND = 15
