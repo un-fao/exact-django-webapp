@@ -251,3 +251,4 @@ def create_module_threads(module_instance):
     for attr in dir(module_instance):
         if attr.endswith("_thread") and getattr(module_instance, attr, None) is None:
             setattr(module_instance, attr, models.CommentThread.objects.create())
+    module_instance.save()
