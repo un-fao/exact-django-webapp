@@ -75,7 +75,7 @@ class ConfigParam(models.Model):
             return self.value
 
     class Meta:
-        verbose_name_plural = "Config parameters"
+        verbose_name_plural = "Configuration parameters"
 
 
 class CommentThread(models.Model):
