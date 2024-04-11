@@ -19,6 +19,7 @@ from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
 import api.filters as filters
+import api.labels as labels
 import api.utilities as utils
 from api.defaults import DefaultsFactory
 from api.models import CustomUser as User
@@ -673,11 +674,11 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
             try:
                 viewset = generic_module_viewset(model_ref).results(self, request, pk=object.pk)
-                module_dict[utils.RESULTS] = viewset.data
+                module_dict[labels.RESULTS] = viewset.data
 
             except Exception as e:
                 logger.error("Error calculating result in ActivityViewSet.results", e)
-                module_dict[utils.RESULTS] = utils.error(str(e))
+                module_dict[labels.RESULTS] = utils.error(str(e))
 
             modules.append(module_dict)
 
@@ -987,7 +988,6 @@ def generic_module_viewset(model: Model):
         def results(self, request, pk=None):
             """
             Calculates and returns total emissions for a single module.
-            TODO: Define structure and format of the real response.
             """
 
             module: Module = get_object_or_404(model, pk=pk)
