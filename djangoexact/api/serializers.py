@@ -1630,7 +1630,7 @@ class InputEntryWriteSerializer(serializers.ModelSerializer):
     def validate(self, data):
         super().validate(data)
 
-        parent = utils.getany([self.instance, data], "parent")
+        parent = utils.getany([self.instance, dict(data)], "parent")
         max_entries = ConfigParam.objects.get(name=labels.INPUT_ENTRIES_LIMIT).get_parsed_value()
 
         if parent.input_entries.count() + 1 > max_entries:
