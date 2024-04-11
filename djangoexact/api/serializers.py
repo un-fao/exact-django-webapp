@@ -1289,7 +1289,7 @@ class FuelWriteSerializer(SubmoduleBaseSerializer):
         if not are_fields_filled(data, mandatory_fields):
             raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
 
-        parent = utils.getany([self.instance, data], "parent")
+        parent = utils.getany([self.instance, dict(data)], "parent")
         max_elements = ConfigParam.objects.get(name=labels.FUEL_MODULES_LIMIT).get_parsed_value()
 
         if parent.fuels.count() + 1 > max_elements:
