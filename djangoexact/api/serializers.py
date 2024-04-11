@@ -647,6 +647,9 @@ class ModuleBaseSerializer(serializers.ModelSerializer):
             logging.error(f"Module type {self.Meta.ref_name} is not present for this activity")
             raise serializers.ValidationError("This module type is not present for this activity")
 
+        # Checking if the mandatory fields are already filled in the instance or have been provided in the new data
+        # And setting the status of the module accordingly
+
         has_w = False
         has_wo = False
         has_same = False
