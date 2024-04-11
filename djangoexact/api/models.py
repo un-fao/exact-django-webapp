@@ -568,7 +568,6 @@ class Activity(Historical):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="activities")
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
-    # user = models.ForeignKey(CustomUser, on_delete=models.CASCADE) # TODO: Define when it's useful to have this
     status = models.ForeignKey(StatusType, on_delete=models.CASCADE, null=True, blank=True)
     cost = models.FloatField(default=0)
 
