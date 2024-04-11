@@ -164,69 +164,7 @@ def get_module_serializer(model_arg: Model, action=ActionTypes.RETRIEVE) -> seri
             case ActionTypes.RETRIEVE:
                 return globals()[model_arg.__name__ + "ReadSerializer"]
     except KeyError:
-        # TODO: Remove this once all modules have been implemented
-        if action == ActionTypes.RETRIEVE:
-
-            class GenericSerializer(serializers.ModelSerializer):
-                module_type = get_model_serializer(ModuleType)(many=False, read_only=True)
-                activity = ActivitySerializer(many=False, read_only=True)
-                land_use_change = get_model_serializer(LandUseChange)(many=False, read_only=True, required=False)
-                status = get_model_serializer(StatusType)(many=False, read_only=True)
-
-                class Meta:
-                    model = model_arg
-                    fields = "__all__"
-                    extra_fields = ["module_type"]
-                    ref_name = model_arg.__name__
-
-                def __init__(self, *args, **kwargs):
-                    super().__init__(*args, **kwargs)
-                    self.fields["module_type"].default = ModuleType.objects.get(class_name=model_arg.__name__)
-
-        else:
-
-            class GenericSerializer(serializers.ModelSerializer):
-                class Meta:
-                    model = model_arg
-                    fields = "__all__"
-                    ref_name = model_arg.__name__
-
-                def validate(self, data):
-                    logging.info(f"Validating {model_arg.__name__}")
-                    activity = data["activity"]
-                    luc = activity.landusechange.first()
-                    module_types = list(map(lambda module: module.class_name, activity.module_types.all()))
-
-                    logging.info(f"Module types: {module_types}")
-
-                    # TODO: Make activity OneToOneField and remove this check
-                    if getattr(activity, model_arg.__name__.lower(), None).exists():
-                        logging.error(f"Activity already has a {model_arg.__name__}")
-                        raise serializers.ValidationError("A module of this type is already present for this activity")
-
-                    if luc:
-                        logging.info("Activity has a Land Use Change")
-                        module_type = ModuleType.objects.get(class_name=model_arg.__name__)
-                        luc_module_types = [
-                            luc.module_type_start.class_name,
-                            luc.module_type_w.class_name,
-                            luc.module_type_wo.class_name,
-                        ]
-
-                        # NOTE: Redundant as it's already checked in ActivityBuilderSerializer, but just in case
-                        if module_type.is_luc and module_type.class_name not in luc_module_types:
-                            logging.error(f"Cannot add {module_type.class_name} to an activity with a Land Use Change")
-                            raise serializers.ValidationError("Cannot add this module to an activity with a Land Use Change")
-
-                        module_types += luc_module_types
-
-                    if model_arg.__name__ not in module_types and model_arg.__name__ != "LandUseChange":
-                        logging.error(f"Module type {model_arg.__name__} is not present for this activity")
-                        raise serializers.ValidationError("This module type is not present for this activity")
-
-                    return super().validate(data)
-
-        return GenericSerializer
+        raise ValueError(f"Serializer for {model_arg.__name__} not found")
 
 
 class EmissionSerializer(serializers.Serializer):
