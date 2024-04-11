@@ -647,6 +647,43 @@ class ModuleBaseSerializer(serializers.ModelSerializer):
             logging.error(f"Module type {self.Meta.ref_name} is not present for this activity")
             raise serializers.ValidationError("This module type is not present for this activity")
 
+        logging.debug(f"END ModuleBaseSerializer[{self.Meta.ref_name}].validate")
+        return super().validate(data)
+
+    def save(self, **kwargs):
+        if self.instance:
+            self.instance.activity.project.lock_updated_at = timezone.now()
+            self.instance.activity.project.save()
+        else:
+            self.validated_data["activity"].project.lock_updated_at = timezone.now()
+            self.validated_data["activity"].project.save()
+        return super().save(**kwargs)
+
+
+class LandModuleWriteSerializer(ModuleBaseSerializer):
+    def validate(self, data):
+        logging.debug(f"START LandModuleSerializer[{self.Meta.ref_name}].validate")
+        logging.debug(f"Data: {data}")
+
+        activity = data["activity"] if "activity" in data else self.instance.activity
+        luc = activity.landusechange.first()
+        module_types = list(map(lambda module: module.class_name, activity.module_types.all()))
+
+        if luc:
+            module_type = ModuleType.objects.get(class_name=self.Meta.ref_name)
+            luc_module_types = [
+                luc.module_type_start.class_name,
+                luc.module_type_w.class_name,
+                luc.module_type_wo.class_name,
+            ]
+
+            # NOTE: Redundant as it's already checked in ActivityBuilderSerializer, but just in case
+            if module_type.is_luc and module_type.class_name not in luc_module_types:
+                logging.error(f"Cannot add {module_type.class_name} to an activity with a Land Use Change")
+                raise serializers.ValidationError("Cannot add this module to an activity with a Land Use Change")
+
+            module_types += luc_module_types
+
         # Checking if the mandatory fields are already filled in the instance or have been provided in the new data
         # And setting the status of the module accordingly
 
@@ -685,43 +722,6 @@ class ModuleBaseSerializer(serializers.ModelSerializer):
             data["status"] = StatusType.objects.get(name="EMPTY")
         else:
             data["status"] = StatusType.objects.get(name="READY")
-
-        logging.debug(f"END ModuleBaseSerializer[{self.Meta.ref_name}].validate")
-        return super().validate(data)
-
-    def save(self, **kwargs):
-        if self.instance:
-            self.instance.activity.project.lock_updated_at = timezone.now()
-            self.instance.activity.project.save()
-        else:
-            self.validated_data["activity"].project.lock_updated_at = timezone.now()
-            self.validated_data["activity"].project.save()
-        return super().save(**kwargs)
-
-
-class LandModuleWriteSerializer(ModuleBaseSerializer):
-    def validate(self, data):
-        logging.debug(f"START LandModuleSerializer[{self.Meta.ref_name}].validate")
-        logging.debug(f"Data: {data}")
-
-        activity = data["activity"] if "activity" in data else self.instance.activity
-        luc = activity.landusechange.first()
-        module_types = list(map(lambda module: module.class_name, activity.module_types.all()))
-
-        if luc:
-            module_type = ModuleType.objects.get(class_name=self.Meta.ref_name)
-            luc_module_types = [
-                luc.module_type_start.class_name,
-                luc.module_type_w.class_name,
-                luc.module_type_wo.class_name,
-            ]
-
-            # NOTE: Redundant as it's already checked in ActivityBuilderSerializer, but just in case
-            if module_type.is_luc and module_type.class_name not in luc_module_types:
-                logging.error(f"Cannot add {module_type.class_name} to an activity with a Land Use Change")
-                raise serializers.ValidationError("Cannot add this module to an activity with a Land Use Change")
-
-            module_types += luc_module_types
 
         logging.debug(f"END LandModuleSerializer[{self.Meta.ref_name}].validate")
         return super().validate(data)
