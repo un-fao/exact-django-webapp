@@ -1,5 +1,6 @@
 import logging
 from datetime import timedelta
+from types import SimpleNamespace
 
 from django.apps import apps
 from django.contrib.auth.models import Group
@@ -19,6 +20,7 @@ from rest_framework.serializers import ValidationError
 
 import api.filters as filters
 import api.utilities as utils
+from api.defaults import DefaultsFactory
 from api.models import CustomUser as User
 
 from .calculators import CalculatorFactory
@@ -37,6 +39,7 @@ from .models import (
     Project,
     ProjectInvitation,
     StatusType,
+    Submodule,
     UserProjectGroup,
 )
 from .serializers import (
@@ -1040,26 +1043,28 @@ def generic_module_viewset(model: Model):
 
             ex. GET /annual-croplands/1/defaults/
             """
-
-            module: Module = get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
             module_type = ModuleType.objects.get(class_name=model.__name__)
 
-            activity = module.parent.activity if module_type.is_submodule else module.activity
+            if module_type.is_submodule:
+                module: Submodule = get_object_or_404(model, pk=pk, parent__activity__project__user=self.request.user)
+                activity = module.parent.activity
+                if module.parent.status.name != "READY":
+                    return utils.ErrorResponse("Parent module is not ready. Cannot fetch defaults.")
+
+            else:
+                module: Module = get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
+                activity = module.activity
+                # TODO: Maybe move all status checks to middleware
+                if module.status.name != "READY":
+                    return utils.ErrorResponse("Module is not ready. Cannot fetch defaults.")
 
             if not utils.has_project_permission("can_view_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to view this module in the project")
                 return utils.ErrorResponse("Selected user does not have permission to view this module in the project", status=http_status.HTTP_403_FORBIDDEN)
 
             try:
-                # TODO: Implement defaults
-                defaults = CalculatorFactory().get_defaults(module)
-                return Response(
-                    {
-                        "start": defaults.start,
-                        "w": defaults.w,
-                        "wo": defaults.wo,
-                    }
-                )
+                defaults: SimpleNamespace = DefaultsFactory.get_defaults(module)
+                return Response(defaults.__dict__)
             except Exception as e:
                 return utils.ErrorResponse(str(e))
 
