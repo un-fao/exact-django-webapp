@@ -1023,34 +1023,34 @@ class AnnualCropCalculator(BaseCalculator):
     def __init__(self, input) -> None:
         super().__init__(input)
 
-        self.fi_start = SimpleNamespace(value=0)
-        self.fmg_start = SimpleNamespace(value=0)
-        self.flu_start = SimpleNamespace(value=0)
-        self.fi_w = SimpleNamespace(value=0)
-        self.fmg_w = SimpleNamespace(value=0)
-        self.flu_w = SimpleNamespace(value=0)
-        self.fi_wo = SimpleNamespace(value=0)
-        self.fmg_wo = SimpleNamespace(value=0)
-        self.flu_wo = SimpleNamespace(value=0)
-        self.crop_yield_start = SimpleNamespace(value=0)
-        self.crop_yield_w = SimpleNamespace(value=0)
-        self.crop_yield_wo = SimpleNamespace(value=0)
-        self.soc = SimpleNamespace(value=0)
-        self.flu = SimpleNamespace(value=0)
-        self.burning_emission_factor = SimpleNamespace(value=0)
-        self.minor_burning_emission_factor = SimpleNamespace(value=0)
-        self.fires_start = SimpleNamespace(value=0)
-        self.fires_w = SimpleNamespace(value=0)
-        self.fires_wo = SimpleNamespace(value=0)
-        self.n_estimation_factor_start = SimpleNamespace(value=0)
-        self.n_estimation_factor_w = SimpleNamespace(value=0)
-        self.n_estimation_factor_wo = SimpleNamespace(value=0)
-        self.minor_fires_start = SimpleNamespace(value=0)
-        self.minor_fires_w = SimpleNamespace(value=0)
-        self.minor_fires_wo = SimpleNamespace(value=0)
-        self.minor_n_estimation_factor_start = SimpleNamespace(value=0)
-        self.minor_n_estimation_factor_w = SimpleNamespace(value=0)
-        self.minor_n_estimation_factor_wo = SimpleNamespace(value=0)
+        self.fi_start: SimpleNamespace | ipcc.FIData = SimpleNamespace(value=0)
+        self.fmg_start: SimpleNamespace | ipcc.FMGData = SimpleNamespace(value=0)
+        self.flu_start: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=0)
+        self.fi_w: SimpleNamespace | ipcc.FIData = SimpleNamespace(value=0)
+        self.fmg_w: SimpleNamespace | ipcc.FMGData = SimpleNamespace(value=0)
+        self.flu_w: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=0)
+        self.fi_wo: SimpleNamespace | ipcc.FIData = SimpleNamespace(value=0)
+        self.fmg_wo: SimpleNamespace | ipcc.FMGData = SimpleNamespace(value=0)
+        self.flu_wo: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=0)
+        self.crop_yield_start: SimpleNamespace | ipcc.CropYieldStats = SimpleNamespace(value=0)
+        self.crop_yield_w: SimpleNamespace | ipcc.CropYieldStats = SimpleNamespace(value=0)
+        self.crop_yield_wo: SimpleNamespace | ipcc.CropYieldStats = SimpleNamespace(value=0)
+        self.soc: SimpleNamespace | ipcc.SoilOrganicCarbon = SimpleNamespace(value=0)
+        self.flu: SimpleNamespace | ipcc.CroplandFLU = SimpleNamespace(value=0)
+        self.burning_emission_factor: SimpleNamespace | ipcc.BurningEmissionFactor = SimpleNamespace(value=0)
+        self.minor_burning_emission_factor: SimpleNamespace | ipcc.BurningEmissionFactor = SimpleNamespace(value=0)
+        self.fires_start: SimpleNamespace | ipcc.FiresCombustionFactor = SimpleNamespace(value=0)
+        self.fires_w: SimpleNamespace | ipcc.FiresCombustionFactor = SimpleNamespace(value=0)
+        self.fires_wo: SimpleNamespace | ipcc.FiresCombustionFactor = SimpleNamespace(value=0)
+        self.n_estimation_factor_start: SimpleNamespace | ipcc.CropNitrousEstimationDefaultFactor = SimpleNamespace(value=0)
+        self.n_estimation_factor_w: SimpleNamespace | ipcc.CropNitrousEstimationDefaultFactor = SimpleNamespace(value=0)
+        self.n_estimation_factor_wo: SimpleNamespace | ipcc.CropNitrousEstimationDefaultFactor = SimpleNamespace(value=0)
+        self.minor_fires_start: SimpleNamespace | ipcc.FiresCombustionFactor = SimpleNamespace(value=0)
+        self.minor_fires_w: SimpleNamespace | ipcc.FiresCombustionFactor = SimpleNamespace(value=0)
+        self.minor_fires_wo: SimpleNamespace | ipcc.FiresCombustionFactor = SimpleNamespace(value=0)
+        self.minor_n_estimation_factor_start: SimpleNamespace | ipcc.CropNitrousEstimationDefaultFactor = SimpleNamespace(value=0)
+        self.minor_n_estimation_factor_w: SimpleNamespace | ipcc.CropNitrousEstimationDefaultFactor = SimpleNamespace(value=0)
+        self.minor_n_estimation_factor_wo: SimpleNamespace | ipcc.CropNitrousEstimationDefaultFactor = SimpleNamespace(value=0)
 
     def get_defaults(self) -> SimpleNamespace:
         input: AnnualCropping = self.data
@@ -1279,95 +1279,8 @@ class AnnualCropCalculator(BaseCalculator):
 
         area = luc.area if luc else input.area
         change_rate = input.activity.change_rate
-        climate = project.climate
-        moisture = project.moisture
-        soil_type = project.soil_type
 
-        cm = {"climate": climate, "moisture": moisture}
-
-        try:
-            fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-        except ipcc.FIData.DoesNotExist:
-            raise Exception(f"FIData for {module_start.organic_input_type_start.name} in {climate.name} climate, {moisture.name} moisture does not exist")
-
-        try:
-            fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-        except ipcc.FMGData.DoesNotExist:
-            raise Exception(f"FMGData for {module_start.tillage_management_type_start.name} in {climate.name} climate, {moisture.name} moisture does not exist")
-
-        try:
-            flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-        except ipcc.FLUData.DoesNotExist:
-            raise Exception(f"FLUData for {module_start.land_use_type_start.name} in {climate.name} climate, {moisture.name} moisture does not exist")
-
-        try:
-            fi_w = get_fi_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
-        except ipcc.FIData.DoesNotExist:
-            raise Exception(f"FIData for {module_w.organic_input_type_w.name} in {climate.name} climate, {moisture.name} moisture does not exist")
-
-        try:
-            fmg_w = get_fmg_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
-        except ipcc.FMGData.DoesNotExist:
-            raise Exception(f"FMGData for {module_w.tillage_management_type_w.name} in {climate.name} climate, {moisture.name} moisture does not exist")
-
-        try:
-            flu_w = get_flu_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
-        except ipcc.FLUData.DoesNotExist:
-            raise Exception(f"FLUData for {module_w.land_use_type_w.name} in {climate.name} climate, {moisture.name} moisture does not exist")
-
-        try:
-            fi_wo = get_fi_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
-        except ipcc.FIData.DoesNotExist:
-            raise Exception(f"FIData for {module_wo.organic_input_type_wo.name} in {climate.name} climate, {moisture.name} moisture does not exist")
-
-        try:
-            fmg_wo = get_fmg_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
-        except ipcc.FMGData.DoesNotExist:
-            raise Exception(f"FMGData for {module_wo.tillage_management_type_wo.name} in {climate.name} climate, {moisture.name} moisture does not exist")
-
-        try:
-            flu_wo = get_flu_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
-        except ipcc.FLUData.DoesNotExist:
-            raise Exception(f"FLUData for {module_wo.land_use_type_wo.name} in {climate.name} climate, {moisture.name} moisture does not exist")
-
-        try:
-            crop_yield_start = input.crop_yield_start if input.crop_yield_start else ipcc.CropYieldStats.objects.get_or_region_average(continent=project.country.region, land_use_type=input.land_use_type_start).average
-        except ipcc.CropYieldStats.DoesNotExist:
-            raise Exception(f"CropYieldStats for {input.land_use_type_start.name} in {project.country.region.name} region does not exist")
-
-        try:
-            crop_yield_w = input.crop_yield_w if input.crop_yield_w else ipcc.CropYieldStats.objects.get_or_region_average(continent=project.country.region, land_use_type=input.land_use_type_w).average
-        except ipcc.CropYieldStats.DoesNotExist:
-            raise Exception(f"CropYieldStats for {input.land_use_type_w.name} in {project.country.region.name} region does not exist")
-
-        try:
-            crop_yield_wo = input.crop_yield_wo if input.crop_yield_wo else ipcc.CropYieldStats.objects.get_or_region_average(continent=project.country.region, land_use_type=input.land_use_type_wo).average
-        except ipcc.CropYieldStats.DoesNotExist:
-            raise Exception(f"CropYieldStats for {input.land_use_type_wo.name} in {project.country.region.name} region does not exist")
-
-        # General
-
-        try:
-            soc = ipcc.SoilOrganicCarbon.objects.get(**cm, soil_type=soil_type)
-        except ipcc.SoilOrganicCarbon.DoesNotExist:
-            raise Exception(f"SoilOrganicCarbon for {soil_type.name} soil type in {climate.name} climate and {moisture.name} moisture does not exist")
-
-        try:
-            flu = ipcc.CroplandFLU.objects.get(**cm, land_use_type__name__icontains="Long-Term Cultivated")
-        except ipcc.CroplandFLU.DoesNotExist:
-            raise Exception(f"CroplandFLU for Long-Term Cultivated in {climate.name} climate and {moisture.name} moisture does not exist")
-
-        try:
-            burning_emission_factor = ipcc.BurningEmissionFactor.objects.get(category__name="Agricultural residues")
-        except ipcc.BurningEmissionFactor.DoesNotExist:
-            raise Exception(f"BurningEmissionFactor for Agricultural residues does not exist")
-
-        minor_burning_emission_factor = None
-        if input.minor_land_use_type_start or input.minor_land_use_type_w or input.minor_land_use_type_wo:
-            try:
-                minor_burning_emission_factor = ipcc.BurningEmissionFactor.objects.get(category__name="Agricultural residues")
-            except ipcc.BurningEmissionFactor.DoesNotExist:
-                raise Exception(f"BurningEmissionFactor for Agricultural residues does not exist")
+        self.get_defaults()
 
         math_start_w = None
         math_start_wo = None
@@ -1375,30 +1288,6 @@ class AnnualCropCalculator(BaseCalculator):
         math_wo = None
 
         if is_luc_remaining_same(input):
-            lut_start = input.land_use_type_start
-            minor_lut_start = input.minor_land_use_type_start
-
-            try:
-                fires_start = ipcc.FiresCombustionFactor.objects.get(land_use_type=lut_start)
-            except ipcc.FiresCombustionFactor.DoesNotExist:
-                raise Exception(f"FiresCombustionFactor for {lut_start.name} does not exist")
-
-            try:
-                n_estimation_factor_start = ipcc.CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=lut_start)
-            except ipcc.CropNitrousEstimationDefaultFactor.DoesNotExist:
-                raise Exception(f"CropNitrousEstimationDefaultFactor for {lut_start.name} does not exist")
-
-            try:
-                minor_fires_start = ipcc.FiresCombustionFactor.objects.get(land_use_type=minor_lut_start)
-                minor_n_estimation_factor_start = ipcc.CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=minor_lut_start)
-            except Exception:
-                minor_fires_start = None
-                minor_n_estimation_factor_start = None
-
-            try:
-                emission_factors_start = ipcc.DefaultEmissionFactor.objects.get(moisture=moisture, organic_input_type=input.organic_input_type_start)
-            except ipcc.DefaultEmissionFactor.DoesNotExist:
-                raise Exception(f"DefaultEmissionFactor for {moisture.name} moisture and {input.organic_input_type_start.name} does not exist")
 
             self.inputs_start_w = [
                 *[area, 0],
@@ -1406,48 +1295,48 @@ class AnnualCropCalculator(BaseCalculator):
                 project.capitalization_years,
                 change_rate.name,
                 change_rate.value,
-                soc.value,
-                soc.value,
+                self.soc.value,
+                self.soc.value,
                 input.soc_t2_start,
                 input.soc_t2_w,
-                fmg_start.value,
-                fmg_w.value,
+                self.fmg_start.value,
+                self.fmg_w.value,
                 module_start.fmg_t2_start,
                 input.fmg_t2_w,
-                flu_start.value,
-                flu_w.value,
+                self.flu_start.value,
+                self.flu_w.value,
                 module_start.flu_t2_start,
                 input.flu_t2_w,
-                fi_start.value,
-                fi_w.value,
+                self.fi_start.value,
+                self.fi_w.value,
                 module_start.fi_t2_start,
                 input.fi_t2_w,
                 False,
-                emission_factors_start.value,
+                self.emission_factors_start.value,
                 project.gw_potential.n2o,
                 project.gw_potential.ch4,
-                burning_emission_factor.ch4 if input.residue_management_type_start.name == "Burned" else None,
-                fires_start.value,
+                self.burning_emission_factor.ch4 if input.residue_management_type_start.name == "Burned" else None,
+                self.fires_start.value,
                 input.main_biomass_factor_t2_start,
-                n_estimation_factor_start.slope,
-                n_estimation_factor_start.intercept,
-                crop_yield_start,
-                getattr(minor_burning_emission_factor, "ch4", None),
-                getattr(minor_fires_start, "value", None),
+                self.n_estimation_factor_start.slope,
+                self.n_estimation_factor_start.intercept,
+                self.crop_yield_start,
+                getattr(self.minor_burning_emission_factor, "ch4", None),
+                getattr(self.minor_fires_start, "value", None),
                 input.minor_biomass_factor_t2_start,
-                getattr(minor_n_estimation_factor_start, "slope", None),
-                getattr(minor_n_estimation_factor_start, "intercept", None),
+                getattr(self.minor_n_estimation_factor_start, "slope", None),
+                getattr(self.minor_n_estimation_factor_start, "intercept", None),
                 input.minor_yield_start,
-                burning_emission_factor.n2o if input.residue_management_type_start.name == "Burned" else None,
+                self.burning_emission_factor.n2o if input.residue_management_type_start.name == "Burned" else None,
                 input.residue_management_type_start.name == "Retained",
-                getattr(minor_burning_emission_factor, "n2o", None),
+                getattr(self.minor_burning_emission_factor, "n2o", None),
                 getattr(input.minor_residue_management_type_start, "name", None) == "Retained",
-                n_estimation_factor_start.n_ag_residues,
-                n_estimation_factor_start.rs_t,
-                n_estimation_factor_start.n_bg_t,
-                getattr(minor_n_estimation_factor_start, "n_ag_residues", None),
-                getattr(minor_n_estimation_factor_start, "rs_t", None),
-                getattr(minor_n_estimation_factor_start, "n_bg_t", None),
+                self.n_estimation_factor_start.n_ag_residues,
+                self.n_estimation_factor_start.rs_t,
+                self.n_estimation_factor_start.n_bg_t,
+                getattr(self.minor_n_estimation_factor_start, "n_ag_residues", None),
+                getattr(self.minor_n_estimation_factor_start, "rs_t", None),
+                getattr(self.minor_n_estimation_factor_start, "n_bg_t", None),
                 0,
             ]
 
@@ -1455,32 +1344,6 @@ class AnnualCropCalculator(BaseCalculator):
             math_start_w.calculate_emissions()
 
         if is_with(input):
-            lut_w = input.land_use_type_w
-            minor_lut_w = input.minor_land_use_type_w
-
-            try:
-                fires_w = ipcc.FiresCombustionFactor.objects.get(land_use_type=lut_w)
-            except ipcc.FiresCombustionFactor.DoesNotExist:
-                raise Exception(f"FiresCombustionFactor for {lut_w.name} does not exist")
-
-            try:
-                n_estimation_factor_w = ipcc.CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=lut_w)
-            except ipcc.CropNitrousEstimationDefaultFactor.DoesNotExist:
-                raise Exception(f"CropNitrousEstimationDefaultFactor for {lut_w.name} does not exist")
-
-            try:
-                minor_fires_w = ipcc.FiresCombustionFactor.objects.get(land_use_type=lut_w)
-
-                minor_n_estimation_factor_w = ipcc.CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=minor_lut_w)
-            except Exception:
-                minor_fires_w = None
-
-                minor_n_estimation_factor_w = None
-
-            try:
-                emission_factors_w = ipcc.DefaultEmissionFactor.objects.get(moisture=moisture, organic_input_type=input.organic_input_type_w)
-            except ipcc.DefaultEmissionFactor.DoesNotExist:
-                raise Exception(f"DefaultEmissionFactor for {moisture.name} moisture and {input.organic_input_type_w.name} does not exist")
 
             self.inputs_w = [
                 *[0, area],
@@ -1488,48 +1351,48 @@ class AnnualCropCalculator(BaseCalculator):
                 project.capitalization_years,
                 change_rate.name,
                 change_rate.value,
-                soc.value,
-                soc.value,
+                self.soc.value,
+                self.soc.value,
                 input.soc_t2_start,
                 input.soc_t2_w,
-                fmg_start.value,
-                fmg_w.value,
-                module_start.fmg_t2_start,
+                self.fmg_start.value,
+                self.fmg_w.value,
+                module_w.fmg_t2_start,
                 input.fmg_t2_w,
-                flu_start.value,
-                flu_w.value,
-                module_start.flu_t2_start,
+                self.flu_start.value,
+                self.flu_w.value,
+                module_w.flu_t2_start,
                 input.flu_t2_w,
-                fi_start.value,
-                fi_w.value,
-                module_start.fi_t2_start,
+                self.fi_start.value,
+                self.fi_w.value,
+                module_w.fi_t2_start,
                 input.fi_t2_w,
                 True,
-                emission_factors_w.value,
+                self.emission_factors_w.value,
                 project.gw_potential.n2o,
                 project.gw_potential.ch4,
-                burning_emission_factor.ch4 if input.residue_management_type_w.name == "Burned" else None,
-                fires_w.value,
+                self.burning_emission_factor.ch4 if input.residue_management_type_w.name == "Burned" else None,
+                self.fires_w.value,
                 input.main_biomass_factor_t2_start,
-                n_estimation_factor_w.slope,
-                n_estimation_factor_w.intercept,
-                crop_yield_w,
-                getattr(minor_burning_emission_factor, "ch4", None),
-                getattr(minor_fires_w, "value", None),
+                self.n_estimation_factor_w.slope,
+                self.n_estimation_factor_w.intercept,
+                self.crop_yield_w,
+                getattr(self.minor_burning_emission_factor, "ch4", None),
+                getattr(self.minor_fires_w, "value", None),
                 input.minor_biomass_factor_t2_w,
-                getattr(minor_n_estimation_factor_w, "slope", None),
-                getattr(minor_n_estimation_factor_w, "intercept", None),
+                getattr(self.minor_n_estimation_factor_w, "slope", None),
+                getattr(self.minor_n_estimation_factor_w, "intercept", None),
                 input.minor_yield_w,
-                burning_emission_factor.n2o if input.residue_management_type_w.name == "Burned" else None,
+                self.burning_emission_factor.n2o if input.residue_management_type_w.name == "Burned" else None,
                 input.residue_management_type_w.name == "Retained",
-                getattr(minor_burning_emission_factor, "n2o", None),
+                getattr(self.minor_burning_emission_factor, "n2o", None),
                 getattr(input.minor_residue_management_type_w, "name", None) == "Retained",
-                n_estimation_factor_w.n_ag_residues,
-                n_estimation_factor_w.rs_t,
-                n_estimation_factor_w.n_bg_t,
-                getattr(minor_n_estimation_factor_w, "n_ag_residues", None),
-                getattr(minor_n_estimation_factor_w, "rs_t", None),
-                getattr(minor_n_estimation_factor_w, "n_bg_t", None),
+                self.n_estimation_factor_w.n_ag_residues,
+                self.n_estimation_factor_w.rs_t,
+                self.n_estimation_factor_w.n_bg_t,
+                getattr(self.minor_n_estimation_factor_w, "n_ag_residues", None),
+                getattr(self.minor_n_estimation_factor_w, "rs_t", None),
+                getattr(self.minor_n_estimation_factor_w, "n_bg_t", None),
                 0,
             ]
 
@@ -1537,31 +1400,6 @@ class AnnualCropCalculator(BaseCalculator):
             math_w.calculate_emissions()
 
         if is_business_as_usual(input):
-            lut_start = input.land_use_type_start
-            lut_wo = input.land_use_type_wo
-            minor_lut_start = input.minor_land_use_type_start
-
-            try:
-                fires_start = ipcc.FiresCombustionFactor.objects.get(land_use_type=lut_start)
-            except ipcc.FiresCombustionFactor.DoesNotExist:
-                raise Exception(f"FiresCombustionFactor for {lut_start.name} does not exist")
-
-            try:
-                n_estimation_factor_start = ipcc.CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=lut_start)
-            except ipcc.CropNitrousEstimationDefaultFactor.DoesNotExist:
-                raise Exception(f"CropNitrousEstimationDefaultFactor for {lut_start.name} does not exist")
-
-            try:
-                minor_fires_start = ipcc.FiresCombustionFactor.objects.get(land_use_type=minor_lut_start)
-                minor_n_estimation_factor_start = ipcc.CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=minor_lut_start)
-            except Exception:
-                minor_fires_start = None
-                minor_n_estimation_factor_start = None
-
-            try:
-                emission_factors_start = ipcc.DefaultEmissionFactor.objects.get(moisture=moisture, organic_input_type=input.organic_input_type_start)
-            except ipcc.DefaultEmissionFactor.DoesNotExist:
-                raise Exception(f"DefaultEmissionFactor for {moisture.name} moisture and {input.organic_input_type_start.name} does not exist")
 
             self.inputs_start_wo = [
                 *[area, 0],
@@ -1569,48 +1407,48 @@ class AnnualCropCalculator(BaseCalculator):
                 project.capitalization_years,
                 change_rate.name,
                 change_rate.value,
-                soc.value,
-                soc.value,
+                self.soc.value,
+                self.soc.value,
                 input.soc_t2_start,
                 input.soc_t2_wo,
-                fmg_start.value,
-                fmg_wo.value,
+                self.fmg_start.value,
+                self.fmg_wo.value,
                 input.fmg_t2_start,
                 input.fmg_t2_wo,
-                flu_start.value,
-                flu_wo.value,
+                self.flu_start.value,
+                self.flu_wo.value,
                 input.flu_t2_start,
                 input.flu_t2_wo,
-                fi_start.value,
-                fi_wo.value,
+                self.fi_start.value,
+                self.fi_wo.value,
                 input.fi_t2_start,
                 input.fi_t2_wo,
                 False,
-                emission_factors_start.value,
+                self.emission_factors_start.value,
                 project.gw_potential.n2o,
                 project.gw_potential.ch4,
-                burning_emission_factor.ch4 if input.residue_management_type_start.name == "Burned" else None,
-                fires_start.value,
+                self.burning_emission_factor.ch4 if input.residue_management_type_start.name == "Burned" else None,
+                self.fires_start.value,
                 input.main_biomass_factor_t2_start,
-                n_estimation_factor_start.slope,
-                n_estimation_factor_start.intercept,
-                crop_yield_start,
-                getattr(minor_burning_emission_factor, "ch4", None),
-                getattr(minor_fires_start, "value", None),
+                self.n_estimation_factor_start.slope,
+                self.n_estimation_factor_start.intercept,
+                self.crop_yield_start,
+                getattr(self.minor_burning_emission_factor, "ch4", None),
+                getattr(self.minor_fires_start, "value", None),
                 input.minor_biomass_factor_t2_start,
-                getattr(minor_n_estimation_factor_start, "slope", None),
-                getattr(minor_n_estimation_factor_start, "intercept", None),
+                getattr(self.minor_n_estimation_factor_start, "slope", None),
+                getattr(self.minor_n_estimation_factor_start, "intercept", None),
                 input.minor_yield_start,
-                burning_emission_factor.n2o if input.residue_management_type_start.name == "Burned" else None,
+                self.burning_emission_factor.n2o if input.residue_management_type_start.name == "Burned" else None,
                 input.residue_management_type_start.name == "Retained",
-                getattr(minor_burning_emission_factor, "n2o", None),
+                getattr(self.minor_burning_emission_factor, "n2o", None),
                 getattr(input.minor_residue_management_type_start, "name", None) == "Retained",
-                n_estimation_factor_start.n_ag_residues,
-                n_estimation_factor_start.rs_t,
-                n_estimation_factor_start.n_bg_t,
-                getattr(minor_n_estimation_factor_start, "n_ag_residues", None),
-                getattr(minor_n_estimation_factor_start, "rs_t", None),
-                getattr(minor_n_estimation_factor_start, "n_bg_t", None),
+                self.n_estimation_factor_start.n_ag_residues,
+                self.n_estimation_factor_start.rs_t,
+                self.n_estimation_factor_start.n_bg_t,
+                getattr(self.minor_n_estimation_factor_start, "n_ag_residues", None),
+                getattr(self.minor_n_estimation_factor_start, "rs_t", None),
+                getattr(self.minor_n_estimation_factor_start, "n_bg_t", None),
                 0,
             ]
 
@@ -1618,36 +1456,6 @@ class AnnualCropCalculator(BaseCalculator):
             math_start_wo.calculate_emissions()
 
         if is_without(input):
-            lut_start = input.land_use_type_start
-            lut_wo = input.land_use_type_wo
-
-            minor_lut_start = input.minor_land_use_type_start
-            minor_lut_wo = input.minor_land_use_type_wo
-
-            try:
-                fires_wo = ipcc.FiresCombustionFactor.objects.get(land_use_type=lut_wo)
-            except ipcc.FiresCombustionFactor.DoesNotExist:
-                raise Exception(f"FiresCombustionFactor for {lut_wo.name} does not exist")
-
-            try:
-                n_estimation_factor_wo = ipcc.CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=lut_wo)
-            except ipcc.CropNitrousEstimationDefaultFactor.DoesNotExist:
-                raise Exception(f"CropNitrousEstimationDefaultFactor for {lut_wo.name} does not exist")
-
-            try:
-                minor_fires_wo = ipcc.FiresCombustionFactor.objects.get(land_use_type=lut_wo)
-
-                minor_n_estimation_factor_wo = ipcc.CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=minor_lut_wo)
-
-            except Exception:
-                minor_fires_wo = None
-
-                minor_n_estimation_factor_wo = None
-
-            try:
-                emission_factors_wo = ipcc.DefaultEmissionFactor.objects.get(moisture=moisture, organic_input_type=input.organic_input_type_wo)
-            except ipcc.DefaultEmissionFactor.DoesNotExist:
-                raise Exception(f"DefaultEmissionFactor for {moisture.name} moisture and {input.organic_input_type_wo.name} does not exist")
 
             self.inputs_wo = [
                 *[0, area],
@@ -1655,48 +1463,48 @@ class AnnualCropCalculator(BaseCalculator):
                 project.capitalization_years,
                 change_rate.name,
                 change_rate.value,
-                soc.value,
-                soc.value,
+                self.soc.value,
+                self.soc.value,
                 input.soc_t2_start,
                 input.soc_t2_wo,
-                fmg_start.value,
-                fmg_wo.value,
-                module_start.fmg_t2_start,
+                self.fmg_start.value,
+                self.fmg_wo.value,
+                module_wo.fmg_t2_start,
                 input.fmg_t2_wo,
-                flu.value,
-                flu.value,
-                module_start.flu_t2_start,
+                self.flu.value,
+                self.flu.value,
+                module_wo.flu_t2_start,
                 input.flu_t2_wo,
-                fi_start.value,
-                fi_wo.value,
-                module_start.fi_t2_start,
+                self.fi_start.value,
+                self.fi_wo.value,
+                module_wo.fi_t2_start,
                 input.fi_t2_wo,
                 True,
-                emission_factors_wo.value,
+                self.emission_factors_wo.value,
                 project.gw_potential.n2o,
                 project.gw_potential.ch4,
-                burning_emission_factor.ch4 if input.residue_management_type_start.name == "Burned" else None,
-                fires_wo.value,
+                self.burning_emission_factor.ch4 if input.residue_management_type_start.name == "Burned" else None,
+                self.fires_wo.value,
                 input.main_biomass_factor_t2_start,
-                n_estimation_factor_wo.slope,
-                n_estimation_factor_wo.intercept,
-                crop_yield_wo,
-                getattr(minor_burning_emission_factor, "ch4", None),
-                getattr(minor_fires_wo, "value", None),
+                self.n_estimation_factor_wo.slope,
+                self.n_estimation_factor_wo.intercept,
+                self.crop_yield_wo,
+                getattr(self.minor_burning_emission_factor, "ch4", None),
+                getattr(self.minor_fires_wo, "value", None),
                 input.minor_biomass_factor_t2_wo,
-                getattr(minor_n_estimation_factor_wo, "slope", None),
-                getattr(minor_n_estimation_factor_wo, "intercept", None),
+                getattr(self.minor_n_estimation_factor_wo, "slope", None),
+                getattr(self.minor_n_estimation_factor_wo, "intercept", None),
                 input.minor_yield_wo,
-                burning_emission_factor.n2o if input.residue_management_type_wo.name == "Burned" else None,
+                self.burning_emission_factor.n2o if input.residue_management_type_wo.name == "Burned" else None,
                 input.residue_management_type_wo.name == "Retained",
-                getattr(minor_burning_emission_factor, "n2o", None),
+                getattr(self.minor_burning_emission_factor, "n2o", None),
                 getattr(input.minor_residue_management_type_wo, "name", None) == "Retained",
-                n_estimation_factor_wo.n_ag_residues,
-                n_estimation_factor_wo.rs_t,
-                n_estimation_factor_wo.n_bg_t,
-                getattr(minor_n_estimation_factor_wo, "n_ag_residues", None),
-                getattr(minor_n_estimation_factor_wo, "rs_t", None),
-                getattr(minor_n_estimation_factor_wo, "n_bg_t", None),
+                self.n_estimation_factor_wo.n_ag_residues,
+                self.n_estimation_factor_wo.rs_t,
+                self.n_estimation_factor_wo.n_bg_t,
+                getattr(self.minor_n_estimation_factor_wo, "n_ag_residues", None),
+                getattr(self.minor_n_estimation_factor_wo, "rs_t", None),
+                getattr(self.minor_n_estimation_factor_wo, "n_bg_t", None),
                 0,
             ]
 
