@@ -1348,7 +1348,7 @@ class ElectricityWriteSerializer(SubmoduleBaseSerializer):
         parent = utils.getany([self.instance, dict(data)], "parent")
         max_elements = ConfigParam.objects.get(name=labels.ELECTRICITY_MODULES_LIMIT).get_parsed_value()
 
-        if parent.electricities.count() + 1 > max_elements:
+        if not self.instance and parent.electricities.count() + 1 > max_elements:
             raise serializers.ValidationError(f"Only {max_elements} electricity modules are allowed")
 
         return data
