@@ -103,14 +103,14 @@ def generate_fields_for_scenario(scenario: str, mandatory_fields: list):
     return fields
 
 
-def is_scenario_filled(data, scenario: str, mandatory_fields: list):
+def is_scenario_filled(data: dict, scenario: str, mandatory_fields: list):
     """
     Returns true if any of the fields for the given scenario are filled
     """
     return all(
         list(
             map(
-                lambda field: data.get(f"{field}_{scenario}", None) is not None,
+                lambda field: data.get(f"{field}_{scenario}", data.get(f"{field}_{scenario}_id", None)) is not None,
                 mandatory_fields,
             )
         )
