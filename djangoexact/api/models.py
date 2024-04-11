@@ -881,10 +881,6 @@ class AnnualCropping(LandModule, SingleBiomassModule):
     minor_biomass_factor_t2_w = models.FloatField(null=True, blank=True)
     minor_biomass_factor_t2_wo = models.FloatField(null=True, blank=True)
 
-    soc_ref_t2_start = models.FloatField(null=True, blank=True)
-    soc_ref_t2_w = models.FloatField(null=True, blank=True)
-    soc_ref_t2_wo = models.FloatField(null=True, blank=True)
-
 
 class PerennialCrop(models.Model):
     class Meta:
