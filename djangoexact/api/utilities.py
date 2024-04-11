@@ -76,29 +76,6 @@ def get_query_param_or_validation_error(request, param_name):
     return param
 
 
-def get_relative(module) -> tuple[models.Model, str]:
-    """
-    Looks for the assessment class in the module and returns a tuple (module, relationship).
-    Returns (None, None) if no assessment class is found.
-    """
-
-    relative = (None, None)
-
-    # NOTE: To add new assessments, make sure you follow the naming convention of the Assessment class in models.py
-    # NOTE: Refer to documentation for more information (WIP)
-    for attr in dir(module):
-        if getattr(module, attr, None) is not None:
-            if "_assessment" in attr:
-                relative = (getattr(module, attr), "child")
-                break
-            # Matches all attributes with 'parent_' prefix and not ending with '_id'
-            elif re.match("parent_[^_]*[^_id]", attr):
-                relative = (getattr(module, attr), "parent")
-                break
-
-    return relative
-
-
 def get_url_name(model_name):
     url_name = model_name
 
