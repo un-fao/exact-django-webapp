@@ -22,6 +22,7 @@ from .models import (
     Aquaculture,
     Building,
     Climate,
+    CoastalWetland,
     Comment,
     CommentThread,
     ConfigParam,
@@ -42,6 +43,7 @@ from .models import (
     InputEntry,
     InputType,
     IPCCRegion,
+    Irrigation,
     IrrigationPhase,
     IrrigationSystem,
     LandUseChange,
@@ -1119,6 +1121,24 @@ class OtherInfrastructureReadSerializer(SubmoduleBaseSerializer):
         return super().validate(data)
 
 
+class IrrigationWriteSerializer(ModuleBaseSerializer):
+    class Meta:
+        model = Irrigation
+        fields = "__all__"
+        ref_name = "Irrigation"
+        mandatory_fields = [
+            "irrigation_type",
+            "ha",
+        ]
+
+
+class IrrigationReadSerializer(ModuleBaseSerializer):
+    class Meta:
+        model = Irrigation
+        fields = "__all__"
+        ref_name = "Irrigation"
+
+
 # IrrigationSystem
 
 
@@ -1331,6 +1351,13 @@ class LivestockWriteSerializer(LandModuleWriteSerializer):
             raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
 
         return super().validate(data)
+
+
+class LivestockReadSerializer(LandModuleReadSerializer):
+    class Meta:
+        model = Livestock
+        fields = "__all__"
+        ref_name = "Livestock"
 
 
 # Aquaculture
@@ -1773,3 +1800,20 @@ class FuelTypeSerializer(serializers.ModelSerializer):
         model = FuelType
         fields = "__all__"
         ref_name = "FuelType"
+
+
+class CoastalWetlandWriteSerializer(ModuleBaseSerializer):
+    class Meta:
+        model = CoastalWetland
+        fields = "__all__"
+        ref_name = "CoastalWetland"
+
+    def validate(self, data):
+        return super().validate(data)
+
+
+class CoastalWetlandReadSerializer(ModuleBaseSerializer):
+    class Meta:
+        model = CoastalWetland
+        fields = "__all__"
+        ref_name = "CoastalWetland"
