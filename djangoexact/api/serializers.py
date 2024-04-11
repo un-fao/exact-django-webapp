@@ -11,6 +11,7 @@ from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownT
 from rest_framework import serializers
 from rest_framework.fields import empty
 
+import api.calculators as calcs
 import api.utilities as utils
 from api.models import CustomUser as User
 
@@ -646,19 +647,41 @@ class ModuleBaseSerializer(serializers.ModelSerializer):
             logging.error(f"Module type {self.Meta.ref_name} is not present for this activity")
             raise serializers.ValidationError("This module type is not present for this activity")
 
-        # Mandatory fields validation
-        # TODO: Probably not enough as each module has its own nuances
-        # mandatory_fields = []
+        has_w = False
+        has_wo = False
+        has_same = False
+        has_usual = False
 
-        # for field in self.Meta.mandatory_fields:
-        #     scenarios = get_filled_scenarios(data, [field])
-        #     for scenario in scenarios:
-        #         mandatory_fields += generate_fields_for_scenario(scenario, [field])
+        needs_w = False
+        needs_wo = False
+        needs_same = False
+        needs_usual = False
 
-        # if not are_fields_filled(data, mandatory_fields):
-        #     raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
+        if self.instance:
 
-        data["status"] = StatusType.objects.get(name="READY")
+            needs_wo = calcs.is_without(self.instance) and not is_scenario_filled(dict(self.instance.__dict__), "wo", self.Meta.mandatory_fields)
+            needs_w = calcs.is_with(self.instance) and not is_scenario_filled(dict(self.instance.__dict__), "w", self.Meta.mandatory_fields)
+            needs_same = calcs.is_luc_remaining_same(self.instance) and not is_scenario_filled(dict(self.instance.__dict__), "start", self.Meta.mandatory_fields) and is_scenario_filled(self.instance.__dict__, "w", self.Meta.mandatory_fields)
+            needs_usual = calcs.is_business_as_usual(self.instance) and not is_scenario_filled(dict(self.instance.__dict__), "start", self.Meta.mandatory_fields) and is_scenario_filled(self.instance.__dict__, "wo", self.Meta.mandatory_fields)
+
+            has_w = calcs.is_with(self.instance) and is_scenario_filled(dict(self.instance.__dict__), "w", self.Meta.mandatory_fields)
+            has_wo = calcs.is_without(self.instance) and is_scenario_filled(dict(self.instance.__dict__), "wo", self.Meta.mandatory_fields)
+            has_same = calcs.is_luc_remaining_same(self.instance) and is_scenario_filled(dict(self.instance.__dict__), "start", self.Meta.mandatory_fields) and is_scenario_filled(self.instance.__dict__, "w", self.Meta.mandatory_fields)
+            has_usual = calcs.is_business_as_usual(self.instance) and is_scenario_filled(dict(self.instance.__dict__), "start", self.Meta.mandatory_fields) and is_scenario_filled(self.instance.__dict__, "wo", self.Meta.mandatory_fields)
+
+        if needs_w or has_w:
+            needs_w = calcs.is_with(data) and not is_scenario_filled(dict(data), "w", self.Meta.mandatory_fields)
+        if needs_wo or has_wo:
+            needs_wo = calcs.is_without(data) and not is_scenario_filled(dict(data), "wo", self.Meta.mandatory_fields)
+        if needs_same or has_same:
+            needs_same = calcs.is_luc_remaining_same(data) and not is_scenario_filled(dict(data), "start", self.Meta.mandatory_fields) and is_scenario_filled(data, "w", self.Meta.mandatory_fields)
+        if needs_usual or has_usual:
+            needs_usual = calcs.is_business_as_usual(data) and not is_scenario_filled(dict(data), "start", self.Meta.mandatory_fields) and is_scenario_filled(data, "wo", self.Meta.mandatory_fields)
+
+        if needs_w or needs_wo or needs_same or needs_usual:
+            data["status"] = StatusType.objects.get(name="EMPTY")
+        else:
+            data["status"] = StatusType.objects.get(name="READY")
 
         logging.debug(f"END ModuleBaseSerializer[{self.Meta.ref_name}].validate")
         return super().validate(data)
