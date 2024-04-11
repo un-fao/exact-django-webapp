@@ -11,7 +11,7 @@ import api.utilities as utils
 class Defaults:
     def __init__(self, input: api.Module):
         self.input = input
-        self.activity = input.parent.activity if input.parent else input.activity
+        self.activity = input.parent.activity if getattr(input, "parent", None) else input.activity
         self.climate: api.Climate = self.activity.climate_t2 if self.activity.climate_t2 else self.activity.project.climate
         self.moisture: api.Moisture = self.activity.moisture_t2 if self.activity.moisture_t2 else self.activity.project.moisture
 
