@@ -142,6 +142,10 @@ router.register(r"fuels", views.generic_module_viewset(models.Fuel), basename="f
 router.register(r"macro-fuel-types", views.generic_viewset(models.MacroFuelType), basename="macro-fuel-types")
 router.register(r"fuel-types", views.generic_viewset(models.FuelType), basename="fuel-types")
 
+# Organic Soil
+router.register(r"fire-types", views.generic_viewset(models.FireType), basename="fire-types")
+router.register(r"peat-types", views.generic_viewset(models.PeatType), basename="peat-types")
+
 
 router.register(r"users", views.UserViewSet, basename="users")
 
