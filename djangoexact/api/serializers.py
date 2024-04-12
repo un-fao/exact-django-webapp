@@ -858,6 +858,7 @@ class LandUseChangeWriteSerializer(LandModuleWriteSerializer):
         model = LandUseChange
         fields = "__all__"
         ref_name = "LandUseChange"
+        mandatory_fields = []
 
 
 class LandUseChangeReadSerializer(LandModuleReadSerializer):
@@ -1730,6 +1731,7 @@ class DegradedLandWriteSerializer(LandModuleWriteSerializer):
         model = DegradedLand
         fields = "__all__"
         ref_name = "DegradedLand"
+        mandatory_fields = []
 
     def validate(self, data):
         return super().validate(data)
@@ -1747,6 +1749,7 @@ class SettlementWriteSerializer(ModuleBaseSerializer):
         model = Settlement
         fields = "__all__"
         ref_name = "Settlement"
+        mandatory_fields = []
 
 
 class SettlementReadSerializer(ModuleBaseSerializer):
@@ -1811,6 +1814,7 @@ class CoastalWetlandWriteSerializer(ModuleBaseSerializer):
         model = CoastalWetland
         fields = "__all__"
         ref_name = "CoastalWetland"
+        mandatory_fields = []
 
     def validate(self, data):
         return super().validate(data)
