@@ -875,6 +875,10 @@ class OrganicSoilWriteSerializer(LandModuleWriteSerializer):
         model = OrganicSoil
         fields = "__all__"
         ref_name = "OrganicSoil"
+        mandatory_fields = [
+            "peat_type",
+            "fire_type",
+        ]
 
     def validate(self, data):
         mandatory_fields = []
@@ -885,7 +889,7 @@ class OrganicSoilWriteSerializer(LandModuleWriteSerializer):
         for scenario in peat_scenarios:
             mandatory_fields += generate_fields_for_scenario(scenario, ["peat_extraction_height", "peat_area"])
         for scenario in fire_scenarios:
-            mandatory_fields += generate_fields_for_scenario(scenario, ["fire_periodicity", "soil_fire_impact_percentage"])
+            mandatory_fields += generate_fields_for_scenario(scenario, ["soil_fire_periodicity", "soil_fire_impact_percentage"])
 
         if not are_fields_filled(data, mandatory_fields):
             raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
