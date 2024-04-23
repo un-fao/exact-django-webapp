@@ -74,6 +74,7 @@ router.register(r"input-entries", views.generic_module_viewset(models.InputEntry
 router.register(r"irrigations", views.generic_module_viewset(models.Irrigation), basename="irrigations")
 router.register(r"irrigation-systems", views.generic_module_viewset(models.IrrigationSystem), basename="irrigation-systems")
 router.register(r"irrigation-phases", views.generic_module_viewset(models.IrrigationPhase), basename="irrigation-phases")
+router.register(r"irrigation-system-types", views.generic_viewset(models.IrrigationSystemType), basename="irrigation-system-types")
 
 # Set Aside
 router.register(r"set-asides", views.generic_module_viewset(models.SetAside), basename="set-asides")
