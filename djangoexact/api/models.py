@@ -1794,9 +1794,7 @@ class OrganicSoil(LandModuleFixed):
 
     ##### Peat Extraction #####
 
-    peat_type_start = models.ForeignKey(PeatType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_peat_type_start")
-    peat_type_w = models.ForeignKey(PeatType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_peat_type_w")
-    peat_type_wo = models.ForeignKey(PeatType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_peat_type_wo")
+    peat_type = models.ForeignKey(PeatType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_peat_type")
     peat_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_type_thread", on_delete=models.SET_NULL)
 
     peat_area_start = models.FloatField(null=True, blank=True)
@@ -1819,11 +1817,21 @@ class OrganicSoil(LandModuleFixed):
     is_peat_for_energy_wo = models.BooleanField(default=False)
     is_peat_for_energy_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_is_for_energy_thread", on_delete=models.SET_NULL)
 
-    onsite_co2_peat_t2 = models.FloatField(null=True, blank=True)
-    onsite_ch4_peat_t2 = models.FloatField(null=True, blank=True)
-    onsite_n2o_peat_t2 = models.FloatField(null=True, blank=True)
-    offsite_doc_peat_t2 = models.FloatField(null=True, blank=True)
-    offsite_ch4_peat_t2 = models.FloatField(null=True, blank=True)
+    onsite_co2_peat_t2_start = models.FloatField(null=True, blank=True)
+    onsite_co2_peat_t2_w = models.FloatField(null=True, blank=True)
+    onsite_co2_peat_t2_wo = models.FloatField(null=True, blank=True)
+
+    onsite_n2o_peat_t2_start = models.FloatField(null=True, blank=True)
+    onsite_n2o_peat_t2_w = models.FloatField(null=True, blank=True)
+    onsite_n2o_peat_t2_wo = models.FloatField(null=True, blank=True)
+
+    offsite_doc_peat_t2_start = models.FloatField(null=True, blank=True)
+    offsite_doc_peat_t2_w = models.FloatField(null=True, blank=True)
+    offsite_doc_peat_t2_wo = models.FloatField(null=True, blank=True)
+
+    offsite_ch4_peat_t2_start = models.FloatField(null=True, blank=True)
+    offsite_ch4_peat_t2_w = models.FloatField(null=True, blank=True)
+    offsite_ch4_peat_t2_wo = models.FloatField(null=True, blank=True)
 
     peat_density_t2 = models.FloatField(null=True, blank=True)
 
