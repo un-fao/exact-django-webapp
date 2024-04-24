@@ -1714,6 +1714,7 @@ class SetAsideWriteSerializer(LandModuleWriteSerializer):
         model = SetAside
         fields = "__all__"
         ref_name = "SetAside"
+        mandatory_fields = []
 
     def validate(self, data):
         return super().validate(data)
@@ -1724,6 +1725,7 @@ class SetAsideReadSerializer(LandModuleReadSerializer):
         model = SetAside
         fields = "__all__"
         ref_name = "SetAside"
+        mandatory_fields = []
 
 
 class DegradedLandWriteSerializer(LandModuleWriteSerializer):
