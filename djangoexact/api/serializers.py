@@ -877,14 +877,13 @@ class OrganicSoilWriteSerializer(LandModuleWriteSerializer):
         fields = "__all__"
         ref_name = "OrganicSoil"
         mandatory_fields = [
-            "peat_type",
             "fire_type",
         ]
 
     def validate(self, data):
-        mandatory_fields = []
+        mandatory_fields = ["peat_type"]
 
-        peat_scenarios = get_filled_scenarios(data, ["peat_type"])
+        peat_scenarios = ["start", "w", "wo"]
         fire_scenarios = get_filled_scenarios(data, ["fire_type"])
 
         for scenario in peat_scenarios:
