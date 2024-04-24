@@ -1147,7 +1147,7 @@ class IrrigationReadSerializer(ModuleBaseSerializer):
 # IrrigationSystem
 
 
-class IrrigationSystemWriteSerializer(LandModuleWriteSerializer):
+class IrrigationSystemWriteSerializer(SubmoduleBaseSerializer):
     class Meta:
         model = IrrigationSystem
         fields = "__all__"
@@ -1177,7 +1177,7 @@ class IrrigationSystemWriteSerializer(LandModuleWriteSerializer):
         return data
 
 
-class IrrigationSystemReadSerializer(LandModuleReadSerializer):
+class IrrigationSystemReadSerializer(SubmoduleBaseSerializer):
     class Meta:
         model = IrrigationSystem
         fields = "__all__"
@@ -1187,7 +1187,7 @@ class IrrigationSystemReadSerializer(LandModuleReadSerializer):
 # IrrigationPhase
 
 
-class IrrigationPhaseWriteSerializer(LandModuleWriteSerializer):
+class IrrigationPhaseWriteSerializer(SubmoduleBaseSerializer):
     class Meta:
         model = IrrigationPhase
         fields = "__all__"
@@ -1220,7 +1220,7 @@ class IrrigationPhaseWriteSerializer(LandModuleWriteSerializer):
         return data
 
 
-class IrrigationPhaseReadSerializer(LandModuleReadSerializer):
+class IrrigationPhaseReadSerializer(SubmoduleBaseSerializer):
     class Meta:
         model = IrrigationPhase
         fields = "__all__"
