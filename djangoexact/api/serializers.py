@@ -658,7 +658,7 @@ class LandModuleWriteSerializer(ModuleBaseSerializer):
         if needs_usual or has_usual:
             needs_usual = calcs.is_business_as_usual(data) and not is_scenario_filled(dict(data), "start", self.Meta.mandatory_fields) and is_scenario_filled(data, "wo", self.Meta.mandatory_fields)
 
-        if needs_w or needs_wo or needs_same or needs_usual:
+        if (needs_w and not has_w) or (needs_wo and not has_wo) or (needs_same and not has_same) or (needs_usual and not has_usual):
             data["status"] = StatusType.objects.get(name="EMPTY")
         else:
             data["status"] = StatusType.objects.get(name="READY")
@@ -1466,7 +1466,7 @@ class WaterbodyWriteSerializer(LandModuleWriteSerializer):
         model = Waterbody
         fields = "__all__"
         ref_name = "Waterbody"
-        mandatory_fields = ["waterbody_type", "trophic_type"]
+        mandatory_fields = ["trophic_type"]
 
     def validate(self, data):
         mandatory_fields = []
