@@ -1284,8 +1284,8 @@ class DisturbanceType(models.Model):
         return f"({self.pk}) {self.name}"
 
 
-class ForestDisturbance(models.Model):
-    forest_management = models.ForeignKey(ForestManagement, on_delete=models.CASCADE, related_name="disturbances")
+class ForestDisturbance(Submodule):
+    parent = models.ForeignKey(ForestManagement, on_delete=models.CASCADE, related_name="disturbances")
 
     disturbance_type = models.ForeignKey(DisturbanceType, on_delete=models.CASCADE, null=True, blank=True)
     disturbance_type_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_disturbance_type_thread")
