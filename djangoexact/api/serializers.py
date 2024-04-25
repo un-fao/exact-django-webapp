@@ -1826,3 +1826,33 @@ class CoastalWetlandReadSerializer(ModuleBaseSerializer):
         model = CoastalWetland
         fields = "__all__"
         ref_name = "CoastalWetland"
+
+
+class ForestDisturbanceWriteSerializer(SubmoduleBaseSerializer):
+    class Meta:
+        model = ForestDisturbance
+        fields = "__all__"
+        ref_name = "ForestDisturbance"
+        mandatory_fields = [
+            "disturbance_type",
+        ]
+
+    def validate(self, data):
+        mandatory_fields = []
+
+        disturbance_type_scenarios = get_filled_scenarios(data, ["disturbance_type"])
+
+        for scenario in disturbance_type_scenarios:
+            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
+
+        if not are_fields_filled(data, mandatory_fields):
+            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
+
+        return super().validate(data)
+
+
+class ForestDisturbanceReadSerializer(SubmoduleBaseSerializer):
+    class Meta:
+        model = ForestDisturbance
+        fields = "__all__"
+        ref_name = "ForestDisturbance"
