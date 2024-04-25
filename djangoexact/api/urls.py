@@ -121,7 +121,7 @@ router.register(r"forest-managements", views.generic_module_viewset(models.Fores
 router.register(r"disturbance-types", views.generic_viewset(models.DisturbanceType), basename="disturbance-types")
 router.register(r"forest-types", views.generic_viewset(models.ForestType), basename="forest-types")
 router.register(r"forest-condition-types", views.generic_viewset(models.ForestConditionType), basename="forest-condition-types")
-router.register(r"forest-disturbances", views.generic_viewset(models.ForestDisturbance), basename="forest-disturbances")
+router.register(r"forest-disturbances", views.generic_module_viewset(models.ForestDisturbance), basename="forest-disturbances")
 
 # Waterbodies
 router.register(r"waterbodies", views.generic_module_viewset(models.Waterbody), basename="waterbodies")
