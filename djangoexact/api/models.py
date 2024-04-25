@@ -975,14 +975,17 @@ class CroplandMinorSeason(models.Model):
     land_use_type_start = models.ForeignKey(LandUseType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_start")
     land_use_type_w = models.ForeignKey(LandUseType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_w")
     land_use_type_wo = models.ForeignKey(LandUseType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_wo")
+    land_use_type_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_thread")
 
     residue_management_type_start = models.ForeignKey(ResidueManagementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_residue_management_type_start")
     residue_management_type_w = models.ForeignKey(ResidueManagementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_residue_management_type_w")
     residue_management_type_wo = models.ForeignKey(ResidueManagementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_residue_management_type_wo")
+    residue_management_type_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_residue_management_type_thread")
 
     yield_start = models.FloatField(null=True, blank=True)
     yield_w = models.FloatField(null=True, blank=True)
     yield_wo = models.FloatField(null=True, blank=True)
+    yield_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_yield_thread")
 
     biomass_factor_t2_start = models.FloatField(null=True, blank=True)
     biomass_factor_t2_w = models.FloatField(null=True, blank=True)
