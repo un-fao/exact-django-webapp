@@ -84,6 +84,7 @@ router.register(r"degraded-lands", views.generic_module_viewset(models.DegradedL
 
 # Coastal Wetland
 router.register(r"coastal-wetlands", views.generic_module_viewset(models.CoastalWetland), basename="coastal-wetlands")
+router.register(r"salinity-types", views.generic_viewset(models.SalinityType), basename="salinity-types")
 
 router.register(r"organic-input-types", views.generic_viewset(models.OrganicInputType), basename="organic-input-types")
 router.register(r"macro-input-types", views.generic_viewset(models.MacroInputType), basename="macro-input-types")
