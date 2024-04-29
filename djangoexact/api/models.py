@@ -1605,7 +1605,7 @@ class IrrigationSystem(Submodule):
     ef_t2_wo = models.FloatField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
-        if self.irrigation and self.irrigation_phases:
+        if self.parent and self.irrigation_phases:
             raise exceptions.ValidationError("Cannot have both irrigation system and irrigation phases in the same irrigation module")
         super().save(*args, **kwargs)
 
@@ -1642,6 +1642,11 @@ class IrrigationPhase(Submodule):
     pumping_efficiency_t2_start = models.FloatField(null=True, blank=True)
     pumping_efficiency_t2_w = models.FloatField(null=True, blank=True)
     pumping_efficiency_t2_wo = models.FloatField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if self.parent and self.irrigation_systems:
+            raise exceptions.ValidationError("Cannot have both irrigation system and irrigation phases in the same irrigation module")
+        super().save(*args, **kwargs)
 
 
 class BuildingType(models.Model):
