@@ -1841,7 +1841,9 @@ class OrganicSoil(LandModuleFixed):
     offsite_ch4_peat_t2_w = models.FloatField(null=True, blank=True)
     offsite_ch4_peat_t2_wo = models.FloatField(null=True, blank=True)
 
-    peat_density_t2 = models.FloatField(null=True, blank=True)
+    peat_density_t2_start = models.FloatField(null=True, blank=True)
+    peat_density_t2_w = models.FloatField(null=True, blank=True)
+    peat_density_t2_wo = models.FloatField(null=True, blank=True)
 
 
 class Settlement(LandModuleFixed):
