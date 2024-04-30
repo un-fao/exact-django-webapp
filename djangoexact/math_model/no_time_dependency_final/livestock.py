@@ -227,6 +227,9 @@ class Livestock(BaseModule):
 
         def calculate_methane_manure_management_emissions():
             try:
+                if len(self.ef_system_methane_start) != len(self.percentage_system_default_start):
+                    raise Exception("Length of ef_system_methane_start and percentage_system_default_start should be same")
+                
                 ch4_head_start = ch4_head_calculation_general(self.tam_start, self.vser_start, self.ef_prp_methane_start, self.percentage_prp_default_start, self.percentage_prp_tier_2_start, self.ef_system_methane_start, self.ch4_prp_tier_2_start, self.percentage_system_default_start, self.ch4_system_default_start, self.ch4_system_tier_2_start, 1000)
                 ch4_head_end = ch4_head_calculation_general(self.tam_end, self.vser_end, self.ef_prp_methane_end, self.percentage_prp_default_end, self.percentage_prp_tier_2_end, self.ef_system_methane_end, self.ch4_prp_tier_2_end, self.percentage_system_default_end, self.ch4_system_default_end, self.ch4_system_tier_2_end, 1000)
 
@@ -244,6 +247,9 @@ class Livestock(BaseModule):
 
         def calculate_nitrous_manure_management_direct():
             try:
+                if len(self.ef_system_nitrous_direct_start) != len(self.percentage_system_default_start):
+                    raise Exception("Length of ef_system_nitrous_direct_start and percentage_system_default_start should be same")
+                
                 n2o_head_start = ch4_head_calculation_general(self.tam_start, self.ner_start, self.ef_prp_nitrous_direct_start, self.percentage_prp_default_start, self.percentage_prp_tier_2_start, self.ef_system_nitrous_direct_start, self.n2o_prp_tier_2_start_direct, self.percentage_system_default_start, self.n2o_system_direct_default_start, self.n2o_system_direct_tier_2_start)
                 n2o_head_end = ch4_head_calculation_general(self.tam_end, self.ner_end, self.ef_prp_nitrous_direct_end, self.percentage_prp_default_end, self.percentage_prp_tier_2_end, self.ef_system_nitrous_direct_end, self.n2o_prp_tier_2_end_direct, self.percentage_system_default_end, self.n2o_system_direct_default_end, self.n2o_system_direct_tier_2_end)
 
@@ -261,6 +267,10 @@ class Livestock(BaseModule):
 
         def calculate_nitrous_manure_management_indirect_volatization():
             try:
+
+                if len(self.ef_system_nitrous_indirect_volatization_start) != len(self.percentage_system_default_start):
+                    raise Exception("Length of ef_system_nitrous_indirect_volatization_start and percentage_system_default_start should be same")
+                
                 n2o_head_start = ch4_head_calculation_general(self.tam_start, self.ner_start, self.ef_prp_nitrous_indirect_volatization_start, self.percentage_prp_default_start, self.percentage_prp_tier_2_start, self.ef_system_nitrous_indirect_volatization_start, self.n2o_prp_tier_2_start_indirect_volatization, self.percentage_system_default_start, self.n20_system_indirect_volatization_default_start, self.n20_system_indirect_volatization_tier_2_start)
                 n2o_head_end = ch4_head_calculation_general(self.tam_end, self.ner_end, self.ef_prp_nitrous_indirect_volatization_end, self.percentage_prp_default_end, self.percentage_prp_tier_2_end, self.ef_system_nitrous_indirect_volatization_end, self.n2o_prp_tier_2_end_indirect_volatization, self.percentage_system_default_end, self.n20_system_indirect_volatization_default_end, self.n20_system_indirect_volatization_tier_2_end)
 
@@ -279,6 +289,10 @@ class Livestock(BaseModule):
 
         def calculate_nitrous_manure_management_indirect_leaching():
             try:
+
+                if len(self.ef_system_nitrous_indirect_leaching_start) != len(self.percentage_system_default_start):
+                    raise Exception("Length of ef_system_nitrous_indirect_leaching_start and percentage_system_default_start should be same")
+                
                 n2o_head_start = ch4_head_calculation_general(self.tam_start, self.ner_start, self.ef_prp_nitrous_indirect_leaching_start, self.percentage_prp_default_start, self.percentage_prp_tier_2_start, self.ef_system_nitrous_indirect_leaching_start, self.n2o_prp_tier_2_start_indirect_leaching, self.percentage_system_default_start, self.n20_system_indirect_leaching_default_start, self.n20_system_indirect_leaching_tier_2_start)
                 n2o_head_end = ch4_head_calculation_general(self.tam_end, self.ner_end, self.ef_prp_nitrous_indirect_leaching_end, self.percentage_prp_default_end, self.percentage_prp_tier_2_end, self.ef_system_nitrous_indirect_leaching_end, self.n2o_prp_tier_2_end_indirect_leaching, self.percentage_system_default_end, self.n20_system_indirect_leaching_default_end, self.n20_system_indirect_leaching_tier_2_end)
 
@@ -307,3 +321,4 @@ class Livestock(BaseModule):
             return self.total_emissions
         except Exception as e:
             traceback.print_exc()
+
