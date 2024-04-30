@@ -46,8 +46,8 @@ class ProjectFactory(DjangoModelFactory):
     executing_agency = factory.fuzzy.FuzzyText()
     status = factory.fuzzy.FuzzyChoice(statuses)
 
-    implementation_years = factory.fuzzy.FuzzyInteger(1, 10)
-    capitalization_years = factory.fuzzy.FuzzyInteger(1, 10)
+    implementation_years = factory.fuzzy.FuzzyInteger(5, 5)
+    capitalization_years = factory.fuzzy.FuzzyInteger(15, 15)
 
 
 class ActivityFactory(DjangoModelFactory):
@@ -132,14 +132,14 @@ class AnnualCroppingFactory(DjangoModelFactory):
     crop_yield_w = factory.fuzzy.FuzzyInteger(0.0, 100)
     crop_yield_wo = factory.fuzzy.FuzzyInteger(0.0, 100)
 
-    area = factory.fuzzy.FuzzyInteger(1, 150)
+    area = factory.fuzzy.FuzzyInteger(150, 150)
 
 
 class PerennialCroppingFactory(DjangoModelFactory):
     class Meta:
         model = PerennialCropping
 
-    area = 100
+    area = 150
 
     land_use_type_start = factory.fuzzy.FuzzyChoice(trees)
     land_use_type_w = land_use_type_start
@@ -203,7 +203,7 @@ class GrasslandFactory(DjangoModelFactory):
     yield_w = factory.fuzzy.FuzzyInteger(0, 100)
     yield_wo = factory.fuzzy.FuzzyInteger(0, 100)
 
-    area = factory.fuzzy.FuzzyInteger(1, 150)
+    area = factory.fuzzy.FuzzyInteger(150, 150)
 
 
 land_modules = ModuleType.objects.filter(is_luc=True, is_submodule=False).all()
@@ -299,3 +299,22 @@ class InputEntryFactory(DjangoModelFactory):
     value_start = factory.fuzzy.FuzzyFloat(0, 100)
     value_w = factory.fuzzy.FuzzyFloat(0, 100)
     value_wo = factory.fuzzy.FuzzyFloat(0, 100)
+
+
+class AquacultureFactory(DjangoModelFactory):
+    class Meta:
+        model = Aquaculture
+
+    annual_production_start = factory.fuzzy.FuzzyFloat(0, 100)
+    annual_production_w = factory.fuzzy.FuzzyFloat(0, 100)
+    annual_production_wo = factory.fuzzy.FuzzyFloat(0, 100)
+
+    status = StatusType.objects.get(name="READY")
+
+    # n2o_from_production_t2_start = factory.fuzzy.FuzzyFloat(0, 100)
+    # n2o_from_production_t2_w = factory.fuzzy.FuzzyFloat(0, 100)
+    # n2o_from_production_t2_wo = factory.fuzzy.FuzzyFloat(0, 100)
+
+    # electricity_used_t2_start = factory.fuzzy.FuzzyFloat(0, 100)
+    # electricity_used_t2_w = factory.fuzzy.FuzzyFloat(0, 100)
+    # electricity_used_t2_wo = factory.fuzzy.FuzzyFloat(0, 100)

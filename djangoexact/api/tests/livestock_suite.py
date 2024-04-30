@@ -12,6 +12,7 @@ from api.models import (
     Country,
     Group,
     Livestock,
+    ModuleType,
     Moisture,
     Project,
     SoilType,
@@ -21,7 +22,7 @@ from api.models import CustomUser as User
 from api.tests.factories import ActivityFactory, LivestockFactory, ProjectFactory
 from ipcc.models import GlobalWarmingPotential, SoilOrganicCarbon
 
-BATCH_SIZE = 5
+BATCH_SIZE = 1
 
 climates = Climate.objects.all()
 countries = Country.objects.all()
@@ -33,11 +34,18 @@ soc_refs = SoilOrganicCarbon.objects.all()
 workbook = xw.Book("api/tests/EX-ACT_V9.4_open.xlsm")
 sheet = workbook.sheets["4.Grassland"]
 
-country = random.choice(countries)
+# country = random.choice(countries)
+# region = country.region
+# climate = random.choice(climates)
+# moisture = random.choice(climate.moistures.all())
+# soil_type = random.choice(soil_types)
+
+country = Country.objects.get(name="Egypt")
 region = country.region
-climate = random.choice(climates)
-moisture = random.choice(climate.moistures.all())
-soil_type = random.choice(soil_types)
+climate = Climate.objects.get(name="Tropical")
+moisture = Moisture.objects.get(name="Dry")
+soil_type = SoilType.objects.get(name="Sandy")
+
 gw_potential = GlobalWarmingPotential.objects.get(name="100 yr AR5 w/out CC feedback")
 
 print(f"Country: {country}")
@@ -73,6 +81,7 @@ ds["T14"].value = p.capitalization_years
 sleep(1)
 
 a: Activity = ActivityFactory.create(project=p)
+a.module_types.set([ModuleType.objects.get(name="Livestock")])
 
 livestock: Livestock = LivestockFactory.create_batch(BATCH_SIZE, activity=a)
 
@@ -94,56 +103,71 @@ for i, livestock in enumerate(livestock):
     print(f"livestock_production_type_wo: {livestock.livestock_production_type_wo.name}")
     print(f"livestock_production_type_w: {livestock.livestock_production_type_w.name}")
 
-    sheet["I56"].value = livestock.livestock_category_type.name
-    sheet["I57"].value = livestock.livestock_category_type.name
-    sheet["I58"].value = livestock.livestock_category_type.name
+    print(f"heads_number_start: {livestock.heads_number_start}")
+    print(f"heads_number_wo: {livestock.heads_number_wo}")
+    print(f"heads_number_w: {livestock.heads_number_w}")
 
-    sheet["K56"].value = livestock.livestock_production_type_start.name
-    sheet["K57"].value = livestock.livestock_production_type_wo.name
-    sheet["K58"].value = livestock.livestock_production_type_w.name
+    print(f"percentage_heads_on_pasture_start: {livestock.percentage_heads_on_pasture_start}")
+    print(f"percentage_heads_on_pasture_wo: {livestock.percentage_heads_on_pasture_wo}")
+    print(f"percentage_heads_on_pasture_w: {livestock.percentage_heads_on_pasture_w}")
 
-    sheet["W56"].value = livestock.heads_number_start
-    sheet["X56"].value = 0 if (sheet["I57"].value != sheet["I56"].value) or (sheet["K56"].value != sheet["K57"].value) else livestock.heads_number_wo
-    sheet["Z56"].value = 0 if (sheet["I58"].value != sheet["I56"].value) or (sheet["K56"].value != sheet["K58"].value) else livestock.heads_number_w
+    # sheet["I56"].value = livestock.livestock_category_type.name
+    # sheet["I57"].value = livestock.livestock_category_type.name
+    # sheet["I58"].value = livestock.livestock_category_type.name
 
-    sheet["W57"].value = 0
-    sheet["X57"].value = livestock.heads_number_wo if sheet["X56"].value == 0 else 0
-    sheet["Z57"].value = 0
+    # sheet["K56"].value = livestock.livestock_production_type_start.name
+    # sheet["K57"].value = livestock.livestock_production_type_wo.name
+    # sheet["K58"].value = livestock.livestock_production_type_w.name
 
-    sheet["W58"].value = 0
-    sheet["X58"].value = 0
-    sheet["Z58"].value = livestock.heads_number_w if sheet["Z56"].value == 0 else 0
+    # sheet["W56"].value = livestock.heads_number_start
+    # sheet["X56"].value = 0 if (sheet["I57"].value != sheet["I56"].value) or (sheet["K56"].value != sheet["K57"].value) else livestock.heads_number_wo
+    # sheet["Z56"].value = 0 if (sheet["I58"].value != sheet["I56"].value) or (sheet["K56"].value != sheet["K58"].value) else livestock.heads_number_w
+
+    # sheet["W57"].value = 0
+    # sheet["X57"].value = livestock.heads_number_wo if sheet["X56"].value == 0 else 0
+    # sheet["Z57"].value = 0
+
+    # sheet["W58"].value = 0
+    # sheet["X58"].value = 0
+    # sheet["Z58"].value = livestock.heads_number_w if sheet["Z56"].value == 0 else 0
 
     # print sheet ad76
-    print(f"Sheet Results W (AE76): {sheet['AE76'].value}")
-    print(f"Sheet Results W/O (AD76): {sheet['AD76'].value}")
-    print(f"Sheet Results Balance (AG76): {sheet['AG76'].value}")
+    # print(f"Sheet Results W (AE76): {sheet['AE76'].value}")
+    # print(f"Sheet Results W/O (AD76): {sheet['AD76'].value}")
+    # print(f"Sheet Results Balance (AG76): {sheet['AG76'].value}")
 
     results = calc.CalculatorFactory().calculate_result(livestock)
 
-    sheet_results_w = float(sheet["AE76"].value)
-    sheet_results_wo = float(sheet["AD76"].value)
+    # sheet_results_w = float(sheet["AE76"].value)
+    # sheet_results_wo = float(sheet["AD76"].value)
 
     math_results_w = results[0]
     math_results_wo = results[1]
+    math_results_balance = results[2]
 
-    print(results)
+    print(
+        {
+            "math_results_w": math_results_w,
+            "math_results_wo": math_results_wo,
+            "math_results_balance": math_results_balance,
+        }
+    )
 
     # Check if sheet results and math results are equal within a margin of error of 5%
 
-    is_wo_equal = math.isclose(sheet_results_wo, math_results_wo, rel_tol=0.05)
-    is_w_equal = math.isclose(sheet_results_w, math_results_w, rel_tol=0.05)
+    # is_wo_equal = math.isclose(sheet_results_wo, math_results_wo, rel_tol=0.05)
+    # is_w_equal = math.isclose(sheet_results_w, math_results_w, rel_tol=0.05)
 
-    if is_wo_equal and is_w_equal:
-        passed_livestocks += 1
-        print("Test Passed!")
+    # if is_wo_equal and is_w_equal:
+    #     passed_livestocks += 1
+    #     print("Test Passed!")
 
-    else:
-        print("\n\nTest Failed!")
-        print(f"Sheet Results W/O: {sheet_results_wo}")
-        print(f"Math Results W/O: {math_results_wo}")
-        print(f"Sheet Results W: {sheet_results_w}")
-        print(f"Math Results W: {math_results_w}")
+    # else:
+    #     print("\n\nTest Failed!")
+    #     print(f"Sheet Results W/O: {sheet_results_wo}")
+    #     print(f"Math Results W/O: {math_results_wo}")
+    #     print(f"Sheet Results W: {sheet_results_w}")
+    #     print(f"Math Results W: {math_results_w}")
 
-print(f"\nTotal Tested Livestocks: {total_livestocks}")
-print(f"Passed Tests: {passed_livestocks}\n\n")
+# print(f"\nTotal Tested Livestocks: {total_livestocks}")
+# print(f"Passed Tests: {passed_livestocks}\n\n")

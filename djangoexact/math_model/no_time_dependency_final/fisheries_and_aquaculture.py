@@ -197,6 +197,9 @@ class CoastalAquaculture:
 
                 self.emissions_nitrous_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.time_impl, self.time_cap, self.rate_type)
                 self.emissions_nitrous_total = sum(self.emissions_nitrous_yearly)
+
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(x, GasTypes.N2O) for x in self.emissions_nitrous_yearly], activity=ActivityTypes.N20_FIELD, delay=0))
+
             except Exception as e:
                 traceback.print_exc()
 
