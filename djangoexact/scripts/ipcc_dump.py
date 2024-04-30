@@ -1346,57 +1346,6 @@ for i, row in enumerate(df_dict):
         country.save()
 
 df2 = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "LivestockManureEFDeer.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers2 = df2.columns.values.tolist()
-df_dict2 = df2.to_dict("records")
-
-for i, row in enumerate(df_dict2):
-    emission_type = EmissionType.objects.get_or_create(
-        name=capitalize_all(row["emission_type"])
-    )[0]
-    livestock_category = LivestockCategoryType.objects.get_or_create(
-        name=sanitize(row["livestock_category_type"])
-    )[0]
-
-    livestock_production_type = LivestockProductionType.objects.get_or_create(
-        name=sanitize(row["livestock_production_type"])
-    )[0]
-    climate = Climate.objects.get_or_create(name=sanitize(row["climate"]))[0]
-    moisture = Moisture.objects.get_or_create(name=sanitize(row["moisture"]))[0]
-
-    for j, header in enumerate(df_headers2, start=5):
-        manure_management_type = ManureManagementType.objects.get_or_create(
-            name=sanitize(df_headers2[j])
-        )[0]
-
-        print(
-            emission_type,
-            livestock_production_type,
-            livestock_category,
-            climate,
-            moisture,
-            manure_management_type,
-            row[df_headers2[j]],
-        )
-
-        LivestockManureEF.objects.get_or_create(
-            emission_type=emission_type,
-            livestock_category_type=livestock_category,
-            livestock_production_type=livestock_production_type,
-            climate=climate,
-            moisture=moisture,
-            manure_management_type=manure_management_type,
-            value=parse_csv_number(row[df_headers2[j]]),
-        )
-
-        if j == len(df_headers2) - 1:
-            break
-
-df2 = pd.read_csv(
     os.path.join(
         os.path.dirname(__file__), "ipcc_data", "LivestockManureEFLeeching.csv"
     ),
@@ -3875,4 +3824,83 @@ for agb in agbs:
         print(agb)
         agb.forest_condition_type = foo
         agb.save()
+
+LivestockManureEF.objects.filter(livestock_category_type__name="Deer").all().delete()
+LivestockManureEF.objects.filter(livestock_category_type__name="Ostrich").all().delete()
+
+df2 = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "LivestockManureEFDeer.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers2 = df2.columns.values.tolist()
+df_dict2 = df2.to_dict("records")
+
+for i, row in enumerate(df_dict2):
+    emission_type = EmissionType.objects.get_or_create(name=capitalize_all(row["emission_type"]))[0]
+    livestock_category = LivestockCategoryType.objects.get_or_create(name=sanitize(row["livestock_category_type"]))[0]
+
+    livestock_production_type = LivestockProductionType.objects.get_or_create(name=sanitize(row["livestock_production_type"]))[0]
+    climate = Climate.objects.get_or_create(name=sanitize(row["climate"]))[0]
+    moisture = Moisture.objects.get_or_create(name=sanitize(row["moisture"]))[0]
+
+    for j, header in enumerate(df_headers2, start=5):
+        manure_management_type = ManureManagementType.objects.get_or_create(name=sanitize(df_headers2[j]))[0]
+
+        print(
+            emission_type,
+            livestock_production_type,
+            livestock_category,
+            climate,
+            moisture,
+            manure_management_type,
+            row[df_headers2[j]],
+        )
+
+        LivestockManureEF.objects.get_or_create(
+            emission_type=emission_type,
+            livestock_category_type=livestock_category,
+            livestock_production_type=livestock_production_type,
+            climate=climate,
+            moisture=moisture,
+            manure_management_type=manure_management_type,
+            value=parse_csv_number(row[df_headers2[j]]),
+        )
+
+        if j == len(df_headers2) - 1:
+            break
+
+
+# deer = LivestockCategoryType.objects.get(name="Deer")
+# ostrich = LivestockCategoryType.objects.get(name="Ostrich")
+
+# LivestockManureEF.objects.filter(livestock_category_type=deer).all().delete()
+# LivestockManureEF.objects.filter(livestock_category_type=ostrich).all().delete()
+
+# for climate in Climate.objects.all():
+#     for moisture in Moisture.objects.all():
+#         for mmt in ManureManagementType.objects.all().exclude(name="Other (Pls. Go Tier 2)"):
+#             for lpt in LivestockProductionType.objects.all():
+#                 foo = LivestockManureEF.objects.get_or_create(
+#                     livestock_category_type=deer,
+#                     livestock_production_type=lpt,
+#                     emission_type=EmissionType.objects.get(name="CH4"),
+#                     climate=climate,
+#                     moisture=moisture,
+#                     manure_management_type=mmt,
+#                     value=0.22,
+#                 )
+#                 print(foo)
+
+#                 foo2 = LivestockManureEF.objects.get_or_create(
+#                     livestock_category_type=ostrich,
+#                     livestock_production_type=lpt,
+#                     emission_type=EmissionType.objects.get(name="CH4"),
+#                     climate=climate,
+#                     moisture=moisture,
+#                     manure_management_type=mmt,
+#                     value=5.67,
+#                 )
+#                 print(foo2)
 """
