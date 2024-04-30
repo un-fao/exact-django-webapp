@@ -1,4 +1,5 @@
 import copy
+import logging as log
 import math
 import statistics
 import sys
@@ -325,6 +326,8 @@ class Result:
         return self.add(other)
 
     def breakdown(self, by=BreakdownTypes.TOTAL):
+        log.debug(f"Breakdown by: {by}")
+
         breakdown = (
             self.total_w.breakdown(by=by),
             self.total_wo.breakdown(by=by),
@@ -412,12 +415,12 @@ class BaseCalculator(ABC):
             if any(module.status != StatusType.objects.get(name="READY") for module in modules):
                 raise Exception("At least one module is not ready to perform the calculation")
 
-    @abstractmethod
-    def defaults(self) -> DefaultData:
-        """
-        Get the default values for a given module.
-        """
-        pass
+    # @abstractmethod
+    # def defaults(self) -> DefaultData:
+    #     """
+    #     Get the default values for a given module.
+    #     """
+    #     pass
 
     @abstractmethod
     def get_defaults(self, input: Module) -> dict:
@@ -974,6 +977,10 @@ class OtherLandUseCalculator(BaseCalculator):
 
 
 class AnnualCroppingCalculator(BaseCalculator):
+
+    def get_defaults(self, input: Module) -> dict:
+        return super().get_defaults(input)
+
     def calculate(self):
         module: AnnualCropping = self.data
 
@@ -1275,6 +1282,7 @@ class AnnualCropCalculator(BaseCalculator):
         """
         Calculate emissions for a single AnnualCropping module.
         """
+        log.debug("START AnnualCropCalculator.calculate")
 
         input: AnnualCropping = self.data
         project: Project = input.activity.project
@@ -1295,6 +1303,7 @@ class AnnualCropCalculator(BaseCalculator):
         math_wo = None
 
         if is_luc_remaining_same(input):
+            log.debug("Is LUC remaining the same")
 
             self.inputs_start_w = [
                 *[area, 0],
@@ -1346,11 +1355,13 @@ class AnnualCropCalculator(BaseCalculator):
                 getattr(self.minor_n_estimation_factor_start, "n_bg_t", None),
                 0,
             ]
+            log.debug("Inputs start w: %s", self.inputs_start_w)
 
             math_start_w = AnnualCropland(*self.inputs_start_w)
             math_start_w.calculate_emissions()
 
         if is_with(input):
+            log.debug("Is with")
 
             self.inputs_w = [
                 *[0, area],
@@ -1402,11 +1413,13 @@ class AnnualCropCalculator(BaseCalculator):
                 getattr(self.minor_n_estimation_factor_w, "n_bg_t", None),
                 0,
             ]
+            log.debug("Inputs w: %s", self.inputs_w)
 
             math_w = AnnualCropland(*self.inputs_w)
             math_w.calculate_emissions()
 
         if is_business_as_usual(input):
+            log.debug("Is business as usual")
 
             self.inputs_start_wo = [
                 *[area, 0],
@@ -1458,11 +1471,13 @@ class AnnualCropCalculator(BaseCalculator):
                 getattr(self.minor_n_estimation_factor_start, "n_bg_t", None),
                 0,
             ]
+            log.debug("Inputs start wo: %s", self.inputs_start_wo)
 
             math_start_wo = AnnualCropland(*self.inputs_start_wo)
             math_start_wo.calculate_emissions()
 
         if is_without(input):
+            log.debug("Is without")
 
             self.inputs_wo = [
                 *[0, area],
@@ -1490,7 +1505,7 @@ class AnnualCropCalculator(BaseCalculator):
                 self.emission_factors_wo.value,
                 project.gw_potential.n2o,
                 project.gw_potential.ch4,
-                self.burning_emission_factor.ch4 if input.residue_management_type_start.name == "Burned" else None,
+                self.burning_emission_factor.ch4 if input.residue_management_type_wo.name == "Burned" else None,
                 self.fires_wo.value,
                 input.main_biomass_factor_t2_start,
                 self.n_estimation_factor_wo.slope,
@@ -1514,6 +1529,7 @@ class AnnualCropCalculator(BaseCalculator):
                 getattr(self.minor_n_estimation_factor_wo, "n_bg_t", None),
                 0,
             ]
+            log.debug("Inputs wo: %s", self.inputs_wo)
 
             math_wo = AnnualCropland(*self.inputs_wo)
             math_wo.calculate_emissions()
@@ -1523,6 +1539,19 @@ class AnnualCropCalculator(BaseCalculator):
         res_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
         res_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
+        log.debug("start_w breakdown")
+        res_start_w.breakdown(by=BreakdownTypes.ACTIVITY)
+
+        log.debug("start_wo breakdown")
+        res_start_wo.breakdown(by=BreakdownTypes.ACTIVITY)
+
+        log.debug("w breakdown")
+        res_w.breakdown(by=BreakdownTypes.ACTIVITY)
+
+        log.debug("wo breakdown")
+        res_wo.breakdown(by=BreakdownTypes.ACTIVITY)
+
+        log.debug("END AnnualCropCalculator.calculate")
         return (res_w + res_start_w, res_wo + res_start_wo)
 
     def defaults(self) -> DefaultData:
@@ -1561,10 +1590,15 @@ class AnnualCropCalculator(BaseCalculator):
 
 
 class PerennialCropCalculator(BaseCalculator):
+
+    def get_defaults(self, input: Module) -> dict:
+        return super().get_defaults(input)
+
     def calculate(self, aggregate_by=BreakdownTypes.TOTAL) -> list[Result]:
         """
         Calculate emissions for a single PerennialCropping module.
         """
+        log.debug("START PerennialCropCalculator.calculate")
 
         module: PerennialCropping = self.data
         project = module.activity.project
@@ -1594,6 +1628,21 @@ class PerennialCropCalculator(BaseCalculator):
 
         try:
             burning_emission_factor = ipcc.BurningEmissionFactor.objects.get(category__name="Savanna and grassland")
+        except ipcc.BurningEmissionFactor.DoesNotExist:
+            raise Exception(f"BurningEmissionFactor for Savanna and grassland does not exist")
+
+        try:
+            default_emission_factor_start = ipcc.DefaultEmissionFactor.objects.get(organic_input_type=module.organic_input_type_start, moisture=moisture)
+        except ipcc.BurningEmissionFactor.DoesNotExist:
+            raise Exception(f"BurningEmissionFactor for Savanna and grassland does not exist")
+        
+        try:
+            default_emission_factor_w = ipcc.DefaultEmissionFactor.objects.get(organic_input_type=module.organic_input_type_w, moisture=moisture)
+        except ipcc.BurningEmissionFactor.DoesNotExist:
+            raise Exception(f"BurningEmissionFactor for Savanna and grassland does not exist")
+        
+        try:
+            default_emission_factor_wo = ipcc.DefaultEmissionFactor.objects.get(organic_input_type=module.organic_input_type_wo, moisture=moisture)
         except ipcc.BurningEmissionFactor.DoesNotExist:
             raise Exception(f"BurningEmissionFactor for Savanna and grassland does not exist")
 
@@ -1739,6 +1788,7 @@ class PerennialCropCalculator(BaseCalculator):
         math_wo = None
 
         if is_luc_remaining_same(module):
+            log.debug("Is LUC remaining the same")
             self.inputs_start_w = [
                 area,
                 0,
@@ -1748,7 +1798,7 @@ class PerennialCropCalculator(BaseCalculator):
                 project.gw_potential.n2o,
                 project.gw_potential.ch4,
                 module.is_biomass_burned_start,
-                burning_emission_factor.n2o,
+                default_emission_factor_start.value,
                 burning_emission_factor.ch4,
                 fires_combustion_factor_start.value,
                 default_fire_periodicity.value,
@@ -1778,11 +1828,13 @@ class PerennialCropCalculator(BaseCalculator):
                 False,
                 0,  # Delay
             ]
+            log.debug("Inputs start w: %s", self.inputs_start_w)
 
             math_start_w = PerennialCropland(*self.inputs_start_w)
             math_start_w.calculate_emissions()
 
         if is_business_as_usual(module):
+            log.debug("Is business as usual")
             self.input_start_wo = [
                 area,
                 0,
@@ -1792,7 +1844,7 @@ class PerennialCropCalculator(BaseCalculator):
                 project.gw_potential.n2o,
                 project.gw_potential.ch4,
                 module.is_biomass_burned_start,
-                burning_emission_factor.n2o,
+                default_emission_factor_start.value,
                 burning_emission_factor.ch4,
                 fires_combustion_factor_start.value,
                 default_fire_periodicity.value,
@@ -1822,11 +1874,13 @@ class PerennialCropCalculator(BaseCalculator):
                 False,
                 0,  # Delay
             ]
+            log.debug("Input start wo: %s", self.input_start_wo)
 
             math_start_wo = PerennialCropland(*self.input_start_wo)
             math_start_wo.calculate_emissions()
 
         if is_with(module):
+            log.debug("Is with")
             self.inputs_w = [
                 0,
                 area,
@@ -1836,7 +1890,7 @@ class PerennialCropCalculator(BaseCalculator):
                 project.gw_potential.n2o,
                 project.gw_potential.ch4,
                 module.is_biomass_burned_w,
-                burning_emission_factor.n2o,
+                default_emission_factor_w.value,
                 burning_emission_factor.ch4,
                 fires_combustion_factor_w.value,
                 default_fire_periodicity.value,
@@ -1866,11 +1920,13 @@ class PerennialCropCalculator(BaseCalculator):
                 True,
                 0,  # Delay
             ]
+            log.debug("Inputs w: %s", self.inputs_w)
 
             math_w = PerennialCropland(*self.inputs_w)
             math_w.calculate_emissions()
 
         if is_without(module):
+            log.debug("Is without")
             self.inputs_wo = [
                 0,
                 area,
@@ -1880,7 +1936,7 @@ class PerennialCropCalculator(BaseCalculator):
                 project.gw_potential.n2o,
                 project.gw_potential.ch4,
                 module.is_biomass_burned_wo,
-                burning_emission_factor.n2o,
+                default_emission_factor_wo.value,
                 burning_emission_factor.ch4,
                 fires_combustion_factor_wo.value,
                 default_fire_periodicity.value,
@@ -1907,9 +1963,10 @@ class PerennialCropCalculator(BaseCalculator):
                 fi_wo.value,
                 module.fi_t2_start,
                 module.fi_t2_wo,
-                False,
+                True,
                 0,  # Delay
             ]
+            log.debug("Inputs wo: %s", self.inputs_wo)
 
             math_wo = PerennialCropland(*self.inputs_wo)
             math_wo.calculate_emissions()
@@ -1918,6 +1975,18 @@ class PerennialCropCalculator(BaseCalculator):
         results_start_wo = math_start_wo.result if math_start_wo else MathResult(project.implementation_years, project.capitalization_years)
         results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
         results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+
+        log.debug("start_w breakdown")
+        results_start_w.breakdown(by=BreakdownTypes.ACTIVITY)
+
+        log.debug("start_wo breakdown")
+        results_start_wo.breakdown(by=BreakdownTypes.ACTIVITY)
+
+        log.debug("w breakdown")
+        results_w.breakdown(by=BreakdownTypes.ACTIVITY)
+
+        log.debug("wo breakdown")
+        results_wo.breakdown(by=BreakdownTypes.ACTIVITY)
 
         results_tuple = (results_w + results_start_w, results_wo + results_start_wo)
 
@@ -1932,7 +2001,12 @@ class PerennialCroppingCalculator(BaseCalculator):
     Calculator for perennial cropping.
     """
 
+    def get_defaults(self, input: Module) -> dict:
+        return super().get_defaults(input)
+
     def calculate(self):
+        log.debug("START PerennialCroppingCalculator.calculate")
+
         module: PerennialCropping = self.data
 
         res_w = MathResult(module.activity.project.implementation_years, module.activity.project.capitalization_years)
@@ -1949,6 +2023,7 @@ class PerennialCroppingCalculator(BaseCalculator):
             res_w += r_w
             res_wo += r_wo
 
+        log.debug("END PerennialCroppingCalculator.calculate")
         return (res_w, res_wo)
 
     def defaults(self) -> DefaultData:
@@ -2500,6 +2575,7 @@ class GrasslandCalculator(BaseCalculator):
         """
         Calculate emissions for a single Grassland module.
         """
+        log.debug("START GrasslandCalculator.calculate")
 
         module: Grassland = self.data
         activity: Activity = module.activity
@@ -2522,6 +2598,7 @@ class GrasslandCalculator(BaseCalculator):
         math_wo = None
 
         if is_luc_remaining_same(module):
+            log.debug("LUC remaining same")
 
             self.inputs_start_w = [
                 *[area, 0],
@@ -2558,10 +2635,13 @@ class GrasslandCalculator(BaseCalculator):
                 0,
             ]
 
+            log.debug("Inputs start w: %s", self.inputs_start_w)
+
             math_start_w = MathGrassland(*self.inputs_start_w)
             math_start_w.calculate_emissions()
 
         if is_with(module):
+            log.debug("With")
 
             self.inputs_w = [
                 *[0, area],
@@ -2598,10 +2678,13 @@ class GrasslandCalculator(BaseCalculator):
                 0,
             ]
 
+            log.debug("Inputs w: %s", self.inputs_w)
+
             math_w = MathGrassland(*self.inputs_w)
             math_w.calculate_emissions()
 
         if is_business_as_usual(module):
+            log.debug("Business as usual")
 
             self.inputs_start_wo = [
                 *[area, 0],
@@ -2638,10 +2721,13 @@ class GrasslandCalculator(BaseCalculator):
                 0,
             ]
 
+            log.debug("Inputs start wo: %s", self.inputs_start_wo)
+
             math_start_wo = MathGrassland(*self.inputs_start_wo)
             math_start_wo.calculate_emissions()
 
         if is_without(module):
+            log.debug("Without")
 
             self.inputs_wo = [
                 *[0, area],
@@ -2678,6 +2764,8 @@ class GrasslandCalculator(BaseCalculator):
                 0,
             ]
 
+            log.debug("Inputs wo: %s", self.inputs_wo)
+
             math_wo = MathGrassland(*self.inputs_wo)
             math_wo.calculate_emissions()
 
@@ -2686,6 +2774,22 @@ class GrasslandCalculator(BaseCalculator):
         res_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
         res_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
+        log.debug("start_w breakdown")
+        res_start_w.breakdown(by=BreakdownTypes.ACTIVITY)
+
+        log.debug("w breakdown")
+        res_w.breakdown(by=BreakdownTypes.ACTIVITY)
+
+        log.debug("start_wo breakdown")
+        res_start_wo.breakdown(by=BreakdownTypes.ACTIVITY)
+
+        log.debug("wo breakdown")
+        res_wo.breakdown(by=BreakdownTypes.ACTIVITY)
+
+        log.debug("Total WITH: %s", (res_w + res_start_w).breakdown(by=BreakdownTypes.TOTAL))
+        log.debug("Total WITHOUT: %s", (res_wo + res_start_wo).breakdown(by=BreakdownTypes.TOTAL))
+
+        log.debug("END GrasslandCalculator.calculate")
         return (res_w + res_start_w, res_wo + res_start_wo)
 
     def defaults(self):
@@ -2728,10 +2832,14 @@ class SmallFisheryCalculator(BaseCalculator):
     Calculator for small fishery.
     """
 
+    def get_defaults(self, input: Module) -> dict:
+        return super().get_defaults(input)
+
     def calculate(self) -> list[Result]:
         """
         Calculate emissions for a single SmallFishery module.
         """
+        log.debug("START SmallFisheryCalculator.calculate")
 
         module: SmallFishery = self.data
         activity: Activity = module.activity
@@ -2775,7 +2883,7 @@ class SmallFisheryCalculator(BaseCalculator):
             raise ValueError("Default kw per tonne does not exist")
 
         try:
-            electricity_emission = ipcc.ElectricityEmission.objects.get(country=project.country, continent=project.country.region)
+            electricity_emission = ipcc.ElectricityEmission.objects.get(country=project.country)
         except ipcc.ElectricityEmission.DoesNotExist:
             raise ValueError(f"Electricity emission for {project.country.name} does not exist")
 
@@ -2783,6 +2891,7 @@ class SmallFisheryCalculator(BaseCalculator):
         math_wo = None
 
         if is_with(module):
+            log.debug("IS WITH")
             self.inputs_w = [
                 project.implementation_years,
                 project.capitalization_years,
@@ -2814,11 +2923,13 @@ class SmallFisheryCalculator(BaseCalculator):
                 module.ice_preserved_catch_pc_start,
                 module.ice_preserved_catch_pc_w,
             ]
+            log.debug("Inputs with: %s", self.inputs_w)
 
             math_w = MathFishery(*self.inputs_w)
             math_w.calculate_emissions()
 
         if is_without(module):
+            log.debug("IS WITHOUT")
             self.inputs_wo = [
                 project.implementation_years,
                 project.capitalization_years,
@@ -2850,6 +2961,7 @@ class SmallFisheryCalculator(BaseCalculator):
                 module.ice_preserved_catch_pc_start,
                 module.ice_preserved_catch_pc_wo,
             ]
+            log.debug("Inputs without: %s", self.inputs_wo)
 
             math_wo = MathFishery(*self.inputs_wo)
             math_wo.calculate_emissions()
@@ -2857,32 +2969,39 @@ class SmallFisheryCalculator(BaseCalculator):
         results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
         results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
+        log.debug("Results WITH")
+        results_w.breakdown(by=BreakdownTypes.ACTIVITY)
+
+        log.debug("Results WITHOUT")
+        results_wo.breakdown(by=BreakdownTypes.ACTIVITY)
+
         results_tuple = (results_w, results_wo)
 
+        log.debug("END SmallFisheryCalculator.calculate")
         return results_tuple
 
-    def defaults(self):
-        self.calculate()
+    # def get_defaults(self):
+    #     self.calculate()
 
-        module: SmallFishery = self.data
+    #     module: SmallFishery = self.data
 
-        defaults_start = {}
-        defaults_w = {}
-        defaults_wo = {}
+    #     defaults_start = {}
+    #     defaults_w = {}
+    #     defaults_wo = {}
 
-        if is_with(module):
-            math_w = MathFishery(*self.inputs_w)
-            math_w_defaults = math_w.evaluate_tier_2_defaults()
-            defaults_w.update(math_w_defaults.end)
-            defaults_w.update(math_w_defaults.other)
+    #     if is_with(module):
+    #         math_w = MathFishery(*self.inputs_w)
+    #         math_w_defaults = math_w.evaluate_tier_2_defaults()
+    #         defaults_w.update(math_w_defaults.end)
+    #         defaults_w.update(math_w_defaults.other)
 
-        if is_without(module):
-            math_wo = MathFishery(*self.inputs_wo)
-            math_wo_defaults = math_wo.evaluate_tier_2_defaults()
-            defaults_wo.update(math_wo_defaults.end)
-            defaults_wo.update(math_wo_defaults.other)
+    #     if is_without(module):
+    #         math_wo = MathFishery(*self.inputs_wo)
+    #         math_wo_defaults = math_wo.evaluate_tier_2_defaults()
+    #         defaults_wo.update(math_wo_defaults.end)
+    #         defaults_wo.update(math_wo_defaults.other)
 
-        return DefaultData(defaults_start, defaults_w, defaults_wo)
+    #     return DefaultData(defaults_start, defaults_w, defaults_wo)
 
 
 class LargeFisheryCalculator(BaseCalculator):
@@ -2890,10 +3009,14 @@ class LargeFisheryCalculator(BaseCalculator):
     Calculator for large fishery.
     """
 
+    def get_defaults(self, input: Module) -> dict:
+        return super().get_defaults(input)
+
     def calculate(self) -> list[Result]:
         """
         Calculate emissions for a single LargeFishery module.
         """
+        log.debug("START LargeFisheryCalculator.calculate")
 
         module: LargeFishery = self.data
         project = module.activity.project
@@ -2937,7 +3060,7 @@ class LargeFisheryCalculator(BaseCalculator):
 
         try:
             electricity_country = module.inshore_ice_production_country_t2 if module.inshore_ice_production_country_t2 else project.country
-            electricity_emission = ipcc.ElectricityEmission.objects.get(country=electricity_country, continent=project.country.region)
+            electricity_emission = ipcc.ElectricityEmission.objects.get(country=electricity_country)
         except ipcc.ElectricityEmission.DoesNotExist:
             raise ValueError(f"Electricity emission for {electricity_country.name} does not exist")
 
@@ -2945,6 +3068,7 @@ class LargeFisheryCalculator(BaseCalculator):
         math_wo = None
 
         if is_with(module):
+            log.debug("IS WITH")
             self.inputs_w = [
                 project.implementation_years,
                 project.capitalization_years,
@@ -2976,11 +3100,13 @@ class LargeFisheryCalculator(BaseCalculator):
                 module.ice_preserved_catch_pc_start,
                 module.ice_preserved_catch_pc_w,
             ]
+            log.debug("Inputs with: %s", self.inputs_w)
 
             math_w = MathFishery(*self.inputs_w)
             math_w.calculate_emissions()
 
         if is_without(module):
+            log.debug("IS WITHOUT")
             self.inputs_wo = [
                 project.implementation_years,
                 project.capitalization_years,
@@ -3012,6 +3138,7 @@ class LargeFisheryCalculator(BaseCalculator):
                 module.ice_preserved_catch_pc_start,
                 module.ice_preserved_catch_pc_wo,
             ]
+            log.debug("Inputs without: %s", self.inputs_wo)
 
             math_wo = MathFishery(*self.inputs_wo)
             math_wo.calculate_emissions()
@@ -3019,8 +3146,15 @@ class LargeFisheryCalculator(BaseCalculator):
         results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
         results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
+        log.debug("Results WITH")
+        results_w.breakdown(by=BreakdownTypes.ACTIVITY)
+
+        log.debug("Results WITHOUT")
+        results_wo.breakdown(by=BreakdownTypes.ACTIVITY)
+
         results_tuple = (results_w, results_wo)
 
+        log.debug("END LargeFisheryCalculator.calculate")
         return results_tuple
 
     def defaults(self):
@@ -3052,6 +3186,9 @@ class AquacultureCalculator(BaseCalculator):
     Calculator for aquaculture.
     """
 
+    def get_defaults(self, input: Module) -> dict:
+        return super().get_defaults(input)
+
     def calculate(self) -> list[Result]:
         """
         Calculate emissions for a single Aquaculture module.
@@ -3076,6 +3213,7 @@ class AquacultureCalculator(BaseCalculator):
         math_wo = None
 
         if is_with(module):
+            log.debug("IS WITH")
             inputs_w = [
                 module.annual_production_start,
                 module.annual_production_w,
@@ -3087,11 +3225,13 @@ class AquacultureCalculator(BaseCalculator):
                 project.capitalization_years,
                 change_rate.name,
             ]
+            log.debug("Inputs with: %s", inputs_w)
 
             math_w = MathAquaculture(*inputs_w)
             math_w.calculate_emissions()
 
         if is_without(module):
+            log.debug("IS WITHOUT")
             inputs_wo = [
                 module.annual_production_start,
                 module.annual_production_wo,
@@ -3103,12 +3243,19 @@ class AquacultureCalculator(BaseCalculator):
                 project.capitalization_years,
                 change_rate.name,
             ]
+            log.debug("Inputs without: %s", inputs_wo)
 
             math_wo = MathAquaculture(*inputs_wo)
             math_wo.calculate_emissions()
 
         results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
         results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+
+        log.debug("Results WITH")
+        results_w.breakdown(by=BreakdownTypes.ACTIVITY)
+
+        log.debug("Results WITHOUT")
+        results_wo.breakdown(by=BreakdownTypes.ACTIVITY)
 
         results_tuple = (results_w, results_wo)
 
@@ -3654,10 +3801,14 @@ class LivestockCalculator(BaseCalculator):
     where each entry of [LivestockManureEF] matches an entry of [LivestockAnimalWasteManagementSystem]
     """
 
+    def get_defaults(self, input: Module) -> dict:
+        return super().get_defaults(input)
+
     def calculate(self) -> list[Result]:
         """
         Calculate emissions for a single Livestock module.
         """
+        log.debug("START LivestockCalculator.calculate")
 
         module: Livestock = self.data
         activity: Activity = module.activity
@@ -4410,6 +4561,8 @@ class LivestockCalculator(BaseCalculator):
         math_wo = None
 
         if is_with(module):
+            log.debug("Calculating emissions for WITH")
+
             self.inputs_w = [
                 project.implementation_years,
                 project.capitalization_years,
@@ -4478,10 +4631,14 @@ class LivestockCalculator(BaseCalculator):
                 LEACHING_MULTI,
             ]
 
+            log.debug(f"Inputs for WITH: {self.inputs_w}")
+
             math_w = MathLivestock(*self.inputs_w)
             math_w.calculate_emissions()
 
         if is_without(module):
+            log.debug("Calculating emissions for WITHOUT")
+
             self.inputs_wo = [
                 project.implementation_years,
                 project.capitalization_years,
@@ -4549,6 +4706,7 @@ class LivestockCalculator(BaseCalculator):
                 volatilization_multi.value,
                 LEACHING_MULTI,
             ]
+            log.debug(f"Inputs for WITHOUT: {self.inputs_wo}")
 
             math_wo = MathLivestock(*self.inputs_wo)
             math_wo.calculate_emissions()
@@ -4556,6 +4714,12 @@ class LivestockCalculator(BaseCalculator):
         results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
         results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
+        log.debug("WITH breakdown")
+        results_w.breakdown(by=BreakdownTypes.ACTIVITY)
+        log.debug("WITHOUT breakdown")
+        results_wo.breakdown(by=BreakdownTypes.ACTIVITY)
+
+        log.debug(f"Results for WITH: {results_w}")
         return (results_w, results_wo)
 
     def defaults(self) -> DefaultData:
