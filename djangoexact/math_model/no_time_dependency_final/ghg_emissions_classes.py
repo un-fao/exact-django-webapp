@@ -1,10 +1,13 @@
-from enum import Enum
 import copy
-import matplotlib.pyplot as plt
-from collections import defaultdict
+import logging as log
 import os
+from collections import defaultdict
+from enum import Enum
 from tempfile import TemporaryDirectory
+
+import matplotlib.pyplot as plt
 from PIL import Image
+
 
 class GasTypes(Enum):
     CO2 = "CO2"
@@ -13,6 +16,7 @@ class GasTypes(Enum):
     CO = "CO"
     OTHER = "Other"
     DOC = "DOC"
+
 
 class ActivityTypes(Enum):
     SOIL_CO2_CHANGE = "Soil CO2 Change"
@@ -66,9 +70,10 @@ class Emission:
 
     def __add__(self, other):
         return Emission(self.value + other.value, self.gas_type)
-    
+
     def __sub__(self, other):
         return Emission(self.value - other.value, self.gas_type)
+
 
 class YearlyGasEmissionSet:
 
@@ -82,6 +87,8 @@ class YearlyGasEmissionSet:
             self.emissions.append(Emission(0, emissions[0].gas_type))
 
         self.emissions.extend(emissions)
+
+
 class YearlyGasActivityEmissionSet(YearlyGasEmissionSet):
 
     def __init__(self, year, gas_type, emissions, activity, delay=0):
@@ -89,18 +96,21 @@ class YearlyGasActivityEmissionSet(YearlyGasEmissionSet):
         # Can be a sub-activity, e.g. "Fire on Soil"
         self.activity: ActivityTypes = activity
 
+
 class YearlyActivityEmissionSet:
-    
+
     def __init__(self, year, emissions, activity):
         self.year: int = year
         self.emissions: list[Emission] = emissions
         self.activity: ActivityTypes = activity
+
 
 class BreakdownTypes(Enum):
     TOTAL = "total"
     ACTIVITY = "activity"
     ACTIVITY_GAS = "activity_gas"
     GAS = "gas"
+
 
 class Result:
 
@@ -112,12 +122,20 @@ class Result:
     def breakdown(self, by=BreakdownTypes.TOTAL):
         match by:
             case BreakdownTypes.TOTAL:
+                breakdown = self.compute_balance()
+                log.debug(breakdown)
                 return self.compute_balance()
             case BreakdownTypes.GAS:
+                breakdown = self.breakdown_by_gas()
+                log.debug({item.gas_type: sum([emission.value for emission in item.emissions]) for item in breakdown})
                 return self.breakdown_by_gas()
             case BreakdownTypes.ACTIVITY:
+                breakdown = self.breakdown_by_activity()
+                log.debug({item.activity: sum([emission.value for emission in item.emissions]) for item in breakdown})
                 return self.breakdown_by_activity()
             case BreakdownTypes.ACTIVITY_GAS:
+                breakdown = self.breakdown_by_activity_by_gas()
+                log.debug({item.activity: sum([emission.value for emission in item.emissions]) for item in breakdown})
                 return self.breakdown_by_activity_by_gas()
             case _:
                 raise Exception("Invalid breakdown type")
@@ -127,18 +145,16 @@ class Result:
         aggregated_emissions = {gas_type: YearlyGasEmissionSet(0, gas_type, [Emission(gas_type=gas_type) for i in range(self.time_tot)]) for gas_type in GasTypes}
 
         for yearly_emission in self.yearly_emissions_by_sector_by_gas:
-            aggregated_emissions[yearly_emission.gas_type].emissions = [x + y for x,y in zip(aggregated_emissions[yearly_emission.gas_type].emissions, yearly_emission.emissions)]
-        
+            aggregated_emissions[yearly_emission.gas_type].emissions = [x + y for x, y in zip(aggregated_emissions[yearly_emission.gas_type].emissions, yearly_emission.emissions)]
+
         return aggregated_emissions.values()
-    
+
     def breakdown_by_activity(self):
 
-        aggregated_emissions = {activity.value: 
-                                YearlyActivityEmissionSet(0, [Emission(gas_type=None) for i in range(self.time_tot)], activity.value) 
-                                for activity in [i.activity for i in self.yearly_emissions_by_sector_by_gas]}
+        aggregated_emissions = {activity.value: YearlyActivityEmissionSet(0, [Emission(gas_type=None) for i in range(self.time_tot)], activity.value) for activity in [i.activity for i in self.yearly_emissions_by_sector_by_gas]}
 
         for yearly_emission in self.yearly_emissions_by_sector_by_gas:
-            aggregated_emissions[yearly_emission.activity.value].emissions = [x + y for x,y in zip(aggregated_emissions[yearly_emission.activity.value].emissions, yearly_emission.emissions)]
+            aggregated_emissions[yearly_emission.activity.value].emissions = [x + y for x, y in zip(aggregated_emissions[yearly_emission.activity.value].emissions, yearly_emission.emissions)]
 
         return aggregated_emissions.values()
 
@@ -164,18 +180,15 @@ class Result:
         for other_yearly_emission in other.yearly_emissions_by_sector_by_gas:
             match_found = False
             for self_yearly_emission in result_obj.yearly_emissions_by_sector_by_gas:
-                if (other_yearly_emission.year == self_yearly_emission.year and 
-                    other_yearly_emission.gas_type == self_yearly_emission.gas_type and 
-                    other_yearly_emission.activity == self_yearly_emission.activity):
+                if other_yearly_emission.year == self_yearly_emission.year and other_yearly_emission.gas_type == self_yearly_emission.gas_type and other_yearly_emission.activity == self_yearly_emission.activity:
                     self_yearly_emission.emissions = [x + y for x, y in zip(self_yearly_emission.emissions, other_yearly_emission.emissions)]
                     match_found = True
                     break
-            
+
             if not match_found:
                 result_obj.yearly_emissions_by_sector_by_gas.append(other_yearly_emission)
 
         return result_obj
-
 
     def __sub__(self, other):
         result_obj = copy.deepcopy(self)
@@ -183,70 +196,61 @@ class Result:
         for other_yearly_emission in other.yearly_emissions_by_sector_by_gas:
             match_found = False
             for self_yearly_emission in result_obj.yearly_emissions_by_sector_by_gas:
-                if (other_yearly_emission.year == self_yearly_emission.year and 
-                    other_yearly_emission.gas_type == self_yearly_emission.gas_type and 
-                    other_yearly_emission.activity == self_yearly_emission.activity):
+                if other_yearly_emission.year == self_yearly_emission.year and other_yearly_emission.gas_type == self_yearly_emission.gas_type and other_yearly_emission.activity == self_yearly_emission.activity:
                     self_yearly_emission.emissions = [x - y for x, y in zip(self_yearly_emission.emissions, other_yearly_emission.emissions)]
                     match_found = True
                     break
-            
+
             if not match_found:
                 negated_emissions = [Emission(-emission.value, emission.gas_type) for emission in other_yearly_emission.emissions]
-                result_obj.yearly_emissions_by_sector_by_gas.append(
-                    YearlyGasActivityEmissionSet(other_yearly_emission.year, 
-                                                other_yearly_emission.gas_type, 
-                                                negated_emissions, 
-                                                other_yearly_emission.activity)
-                )
+                result_obj.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(other_yearly_emission.year, other_yearly_emission.gas_type, negated_emissions, other_yearly_emission.activity))
 
         return result_obj
-    
+
     def plot_emissions_and_aggregate_by_activity(result):
         emissions_data = result.breakdown(by=BreakdownTypes.ACTIVITY_GAS)
-        
+
         # Aggregate the data by activity
         activity_data = defaultdict(list)
         for item in emissions_data:
             activity_data[item.activity].append(item)
-        
+
         with TemporaryDirectory() as tmpdirname:
             plot_filenames = []
-            
+
             # Create a plot for each activity and save to temp directory
             for activity, data in activity_data.items():
                 plt.figure()
-                plt.title('Activity: {}, Total Emissions: {}'.format(activity, round(sum([sum([e.value for e in item.emissions]) for item in data]), 2)))
+                plt.title("Activity: {}, Total Emissions: {}".format(activity, round(sum([sum([e.value for e in item.emissions]) for item in data]), 2)))
                 plt.xlabel("Year (starting from 0)")
                 plt.ylabel("Emission Value")
 
                 for item in data:
-                    plt.plot(range(len(item.emissions)), [e.value for e in item.emissions], label=item.gas_type.value, marker = 'o')
+                    plt.plot(range(len(item.emissions)), [e.value for e in item.emissions], label=item.gas_type.value, marker="o")
 
                 plt.legend()
                 plt.xticks(range(0, len(item.emissions)))
-            
-                
+
                 # Save the plot
-                plot_filename = os.path.join(tmpdirname, '{}.png'.format(activity))
+                plot_filename = os.path.join(tmpdirname, "{}.png".format(activity))
                 plt.savefig(plot_filename)
                 plt.close()  # Close the plot to free memory
                 plot_filenames.append(plot_filename)
-            
+
             # Aggregate all saved plots into a single image
             images = [Image.open(filename) for filename in plot_filenames]
             widths, heights = zip(*(i.size for i in images))
-            
+
             total_width = max(widths)
             total_height = sum(heights)
-            combined_image = Image.new('RGB', (total_width, total_height))
-            
+            combined_image = Image.new("RGB", (total_width, total_height))
+
             y_offset = 0
             for img in images:
                 combined_image.paste(img, (0, y_offset))
                 y_offset += img.size[1]
-            
+
             # Display the aggregated image
             combined_image.show()
-            
-            # The TemporaryDirectory context manager automatically cleans up the directory once done
 
+            # The TemporaryDirectory context manager automatically cleans up the directory once done
