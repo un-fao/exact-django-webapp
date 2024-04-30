@@ -97,9 +97,11 @@ def yearly_time_dependent_20_year_breakdown(start_value, end_value, years_implem
 
 
 def breakdown_according_to_values(maximum, list_of_proportions):
-    result = [maximum * i / sum(list_of_proportions) for i in list_of_proportions]
-    return result
-
+    if sum(list_of_proportions) == 0:
+        return [0 for i in list_of_proportions]
+    else:
+        result = [maximum * i / sum(list_of_proportions) for i in list_of_proportions]
+        return result
 
 def yearly_time_dependent_increase_half_year(start_value, end_value, years_implementation, years_capitalization, function):
     result_interim = yearly_time_dependent_parameter_breakdown(start_value, end_value, years_implementation, years_capitalization, function, interim_values=True)
