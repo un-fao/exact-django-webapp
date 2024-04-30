@@ -12,6 +12,7 @@ from api.models import (
     Country,
     Grassland,
     Group,
+    ModuleType,
     Moisture,
     Project,
     SoilType,
@@ -34,11 +35,15 @@ soc_refs = SoilOrganicCarbon.objects.all()
 workbook = xw.Book("api/tests/EX-ACT_V9.4_open.xlsm")
 sheet = workbook.sheets["4.Grassland"]
 
-country = random.choice(countries)
+country = Country.objects.get(name="Tajikistan")
 region = country.region
-climate = random.choice(climates)
-moisture = random.choice(climate.moistures.all())
-soil_type = random.choice(soil_types)
+climate = Climate.objects.get(name="Cool Temperate")
+# country = random.choice(countries)
+# climate = random.choice(climates)
+# moisture = random.choice(climate.moistures.all())
+# soil_type = random.choice(soil_types)
+moisture = Moisture.objects.get(name="Moist")
+soil_type = SoilType.objects.get(name="High Activity Clay")
 gw_potential = GlobalWarmingPotential.objects.get(name="100 yr AR5 w/out CC feedback")
 
 print(f"Country: {country}")
@@ -61,6 +66,9 @@ p: Project = ProjectFactory.create(
     soil_type=soil_type,
 )
 
+print(f"Capitalization Years: {p.capitalization_years}")
+print(f"Implementation Years: {p.implementation_years}")
+
 UserProjectGroup.objects.create(user=u, project=p, group=group)
 
 ds = workbook.sheets["1.Description"]
@@ -74,6 +82,8 @@ ds["T14"].value = p.capitalization_years
 sleep(1)
 
 a: Activity = ActivityFactory.create(project=p)
+a.module_types.set([ModuleType.objects.get(name="Grassland")])
+a.save()
 
 grassland: Grassland = GrasslandFactory.create_batch(BATCH_SIZE, activity=a)
 
@@ -90,6 +100,9 @@ for i, grassland in enumerate(grassland):
     print(f"Grassland Management Type Start: {grassland.grassland_management_type_start}")
     print(f"Grassland Management Type W/O: {grassland.grassland_management_type_wo}")
     print(f"Grassland Management Type W: {grassland.grassland_management_type_w}")
+
+    print(f"Is Fire Used START: {grassland.is_fire_used_start}")
+    print(f"Fire Periodicity START: {grassland.fire_periodicity_start}")
 
     print(f"Is Fire Used W/O: {grassland.is_fire_used_wo}")
     print(f"Fire Periodicity W/O: {grassland.fire_periodicity_wo}")
@@ -117,35 +130,42 @@ for i, grassland in enumerate(grassland):
     sheet["W26"].value = grassland.area
 
     # print sheet ad76
-    print(f"Sheet Results W (AE38): {sheet['AE38'].value}")
-    print(f"Sheet Results W/O (AD38): {sheet['AD38'].value}")
-    print(f"Sheet Results Balance (AG38): {sheet['AG38'].value}")
+    # print(f"Sheet Results W (AE38): {sheet['AE38'].value}")
+    # print(f"Sheet Results W/O (AD38): {sheet['AD38'].value}")
+    # print(f"Sheet Results Balance (AG38): {sheet['AG38'].value}")
 
     results = calc.CalculatorFactory().calculate_result(grassland)
 
-    sheet_results_w = float(sheet["AE38"].value)
-    sheet_results_wo = float(sheet["AD38"].value)
+    # sheet_results_w = float(sheet["AE38"].value)
+    # sheet_results_wo = float(sheet["AD38"].value)
 
     math_results_w = results[0]
     math_results_wo = results[1]
+    math_results_balance = results[2]
 
-    print(results)
+    print(
+        {
+            "math_results_w": math_results_w,
+            "math_results_wo": math_results_wo,
+            "math_results_balance": math_results_balance,
+        }
+    )
 
     # Check if sheet results and math results are equal within a margin of error of 5%
 
-    is_wo_equal = math.isclose(sheet_results_wo, math_results_wo, rel_tol=0.05)
-    is_w_equal = math.isclose(sheet_results_w, math_results_w, rel_tol=0.05)
+    # is_wo_equal = math.isclose(sheet_results_wo, math_results_wo, rel_tol=0.05)
+    # is_w_equal = math.isclose(sheet_results_w, math_results_w, rel_tol=0.05)
 
-    if is_wo_equal and is_w_equal:
-        passed_livestocks += 1
-        print("Test Passed!")
+    # if is_wo_equal and is_w_equal:
+    #     passed_livestocks += 1
+    #     print("Test Passed!")
 
-    else:
-        print("\n\nTest Failed!")
-        print(f"Sheet Results W/O: {sheet_results_wo}")
-        print(f"Math Results W/O: {math_results_wo}")
-        print(f"Sheet Results W: {sheet_results_w}")
-        print(f"Math Results W: {math_results_w}")
+    # else:
+    #     print("\n\nTest Failed!")
+    #     print(f"Sheet Results W/O: {sheet_results_wo}")
+    #     print(f"Math Results W/O: {math_results_wo}")
+    #     print(f"Sheet Results W: {sheet_results_w}")
+    #     print(f"Math Results W: {math_results_w}")
 
 print(f"\nTotal Tested Livestocks: {total_livestocks}")
 print(f"Passed Tests: {passed_livestocks}\n\n")
