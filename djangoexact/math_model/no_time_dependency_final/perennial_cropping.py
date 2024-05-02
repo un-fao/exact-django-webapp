@@ -1,6 +1,6 @@
 import traceback
 
-from general_functions import (
+from .general_functions import (
     BaseModule,
     breakdown_according_to_values,
     soil_emissions_2,
@@ -9,7 +9,7 @@ from general_functions import (
     yearly_time_dependent_20_year_breakdown,
     yearly_time_dependent_parameter_breakdown,
 )
-from ghg_emissions_classes import (
+from .ghg_emissions_classes import (
     ActivityTypes,
     Emission,
     GasTypes,
@@ -238,17 +238,3 @@ class PerennialCropping(BaseModule):
         except Exception as e:
             traceback.print_exc()
 
-
-start_w =  [150.0, 0, 5, 15, 'D', 265.0, 28.0, False, 0.005, 2.3, 0.85, 1.0, None, None, 2.4, None, 60.0, 0.0, None, 9.0, 9.0, None, None, 1.0, 0.99, None, None, 1.01, 1.01, None, None, 1.0, 1.0, None, None, False, 0]
-start_wo = [150.0, 0, 5, 15, 'D', 265.0, 28.0, False, 0.005, 2.3, 0.85, 1.0, None, None, 2.4, None, 60.0, 0.0, None, 9.0, 9.0, None, None, 1.0, 0.99, None, None, 1.01, 1.01, None, None, 1.0, 1.04, None, None, False, 0]
-w = [0, 150.0, 5, 15, 'D', 265.0, 28.0, True, 0.005, 2.3, 0.85, 1.0, None, None, 0.48, None, 9.4, 0.12, None, 9.0, 9.0, None, None, 1.0, 0.99, None, None, 1.01, 1.01, None, None, 1.0, 1.0, None, None, True, 0]
-wo = [0, 150.0, 5, 15, 'D', 265.0, 28.0, False, 0.005, 2.3, 0.85, 1.0, None, None, 2.4, None, 60.0, 0.0, None, 9.0, 9.0, None, None, 1.0, 0.99, None, None, 1.01, 1.01, None, None, 1.0, 1.04, None, None, True, 0]
-
-perennial_start_w = PerennialCropping(*start_w)
-perennial_start_wo = PerennialCropping(*start_wo)
-perennial_w = PerennialCropping(*w)
-perennial_wo = PerennialCropping(*wo)
-
-perennial_start_w.calculate_emissions()
-perennial_start_wo.calculate_emissions()
-perennial_w.calculate_emissions()
