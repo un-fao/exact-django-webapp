@@ -44,7 +44,6 @@ class AnnualCropland(BaseModule):
         fi_start_tier_2,
         fi_end_tier_2,
         calculate_soc_som,
-        emission_factor_nitrous_residue,
         emission_factor_nitrous_som,
         nitrous_constant,
         methane_constant,
@@ -98,7 +97,6 @@ class AnnualCropland(BaseModule):
 
         self.calculate_soc_som = calculate_soc_som
 
-        self.emission_factor_nitrous_residue = emission_factor_nitrous_residue
         self.emission_factor_nitrous_som = emission_factor_nitrous_som
         self.nitrous_constant = nitrous_constant
         self.methane_constant = methane_constant
@@ -225,7 +223,7 @@ class AnnualCropland(BaseModule):
             # this means if "Retained"
             elif self.retained_main:
                 n2o_n_conversion = 44 / 28
-                main_season_nitrous = annual_n_residues_main * self.emission_factor_nitrous_residue * n2o_n_conversion
+                main_season_nitrous = annual_n_residues_main * self.ef_nitrous_agr_residues_main * n2o_n_conversion
             else:
                 main_season_nitrous = 0
             # COMPUTATION FOR MINOR
@@ -238,7 +236,7 @@ class AnnualCropland(BaseModule):
             # this means if "Retained" BUT IN REALITY NOT REALLY, AT LEAST IT SEEMS TO WORK (WITHOUT A MINOR)
             elif self.retained_minor:
                 n2o_n_conversion = 44 / 28
-                minor_season_nitrous = annual_n_residues_minor * self.emission_factor_nitrous_residue * n2o_n_conversion
+                minor_season_nitrous = annual_n_residues_minor * self.ef_nitrous_agr_residues_main * n2o_n_conversion
             else:
                 minor_season_nitrous = 0
 
