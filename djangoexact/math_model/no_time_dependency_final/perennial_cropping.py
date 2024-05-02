@@ -1,6 +1,6 @@
 import traceback
 
-from .general_functions import (
+from general_functions import (
     BaseModule,
     breakdown_according_to_values,
     soil_emissions_2,
@@ -9,7 +9,7 @@ from .general_functions import (
     yearly_time_dependent_20_year_breakdown,
     yearly_time_dependent_parameter_breakdown,
 )
-from .ghg_emissions_classes import (
+from ghg_emissions_classes import (
     ActivityTypes,
     Emission,
     GasTypes,
@@ -29,7 +29,8 @@ class PerennialCropping(BaseModule):
         nitrous_constant,
         methane_constant,
         residue_burnt,
-        emission_factor_burning_nitrous,
+        emission_factor_burning_nitrous_residue,
+        emission_factor_burning_nitrous_som,
         emission_factor_burning_methane,
         combustion_factor,
         fire_periodicity_default,
@@ -67,7 +68,8 @@ class PerennialCropping(BaseModule):
         self.nitrous_constant = nitrous_constant
         self.methane_constant = methane_constant
         self.residue_burnt = residue_burnt
-        self.emission_factor_burning_nitrous = emission_factor_burning_nitrous
+        self.emission_factor_burning_nitrous_residue = emission_factor_burning_nitrous_residue
+        self.emission_factor_burning_nitrous_som = emission_factor_burning_nitrous_som
         self.emission_factor_burning_methane = emission_factor_burning_methane
         self.combustion_factor = combustion_factor
         self.fire_periodicity_default = fire_periodicity_default
@@ -160,7 +162,7 @@ class PerennialCropping(BaseModule):
 
                 #################### COMPUTATION OF AMOUNT OF KG OF NITROUS ######################
 
-                kg_nitrous = t_biomass * self.emission_factor_burning_nitrous * self.combustion_factor / fire_periodicity if self.residue_burnt else 0
+                kg_nitrous = t_biomass * self.emission_factor_burning_nitrous_residue * self.combustion_factor / fire_periodicity if self.residue_burnt else 0
 
                 co2_crop = (kg_nitrous * self.nitrous_constant + kg_methane * self.methane_constant) / 1000
 
@@ -206,7 +208,7 @@ class PerennialCropping(BaseModule):
         def calculate_som():
             try:
                 if self.calculate_soc_som:
-                    self.yearly_som_emissions, self.total_som_emissions = som_emissions(self.soc_end, self.soc_start, self.emission_factor_burning_nitrous, self.nitrous_constant, self.hectars_before_20)
+                    self.yearly_som_emissions, self.total_som_emissions = som_emissions(self.soc_end, self.soc_start, self.emission_factor_burning_nitrous_som, self.nitrous_constant, self.hectars_before_20)
 
                     som_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in self.yearly_som_emissions], ActivityTypes.SOM, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
@@ -237,8 +239,16 @@ class PerennialCropping(BaseModule):
             traceback.print_exc()
 
 
-# wo = [0, 88.0, 5, 15, 'D', 265.0, 28.0, False, 2.3, 0.21, 0.85, 1, None, None, 2.97, None, 27.3, 0.77, None, 76.0, None, 0.72, None, 1.44, None, 1.04, None]
-# peren_start = PerennialCropping(*wo)
-# peren_start.calculate_emissions()
-# print(peren_start.total_emissions)
-# print(peren_start.emissions_total_yearly)
+start_w =  [150.0, 0, 5, 15, 'D', 265.0, 28.0, False, 0.005, 2.3, 0.85, 1.0, None, None, 2.4, None, 60.0, 0.0, None, 9.0, 9.0, None, None, 1.0, 0.99, None, None, 1.01, 1.01, None, None, 1.0, 1.0, None, None, False, 0]
+start_wo = [150.0, 0, 5, 15, 'D', 265.0, 28.0, False, 0.005, 2.3, 0.85, 1.0, None, None, 2.4, None, 60.0, 0.0, None, 9.0, 9.0, None, None, 1.0, 0.99, None, None, 1.01, 1.01, None, None, 1.0, 1.04, None, None, False, 0]
+w = [0, 150.0, 5, 15, 'D', 265.0, 28.0, True, 0.005, 2.3, 0.85, 1.0, None, None, 0.48, None, 9.4, 0.12, None, 9.0, 9.0, None, None, 1.0, 0.99, None, None, 1.01, 1.01, None, None, 1.0, 1.0, None, None, True, 0]
+wo = [0, 150.0, 5, 15, 'D', 265.0, 28.0, False, 0.005, 2.3, 0.85, 1.0, None, None, 2.4, None, 60.0, 0.0, None, 9.0, 9.0, None, None, 1.0, 0.99, None, None, 1.01, 1.01, None, None, 1.0, 1.04, None, None, True, 0]
+
+perennial_start_w = PerennialCropping(*start_w)
+perennial_start_wo = PerennialCropping(*start_wo)
+perennial_w = PerennialCropping(*w)
+perennial_wo = PerennialCropping(*wo)
+
+perennial_start_w.calculate_emissions()
+perennial_start_wo.calculate_emissions()
+perennial_w.calculate_emissions()
