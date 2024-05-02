@@ -164,7 +164,6 @@ class Fishery(BaseModule):
 
 class CoastalAquaculture:
     def __init__(self, production_start, production_w, nitrous_ef_default, nitrous_ef_start_tier_2, nitrous_ef_end_tier_2, nitrous_constant, 
-                 electricity_used_default, electricity_used_start_tier_2, electricity_used_end_tier_2, ef_electricity_default, ef_electricity_start_tier_2, ef_electricity_end_tier_2,
                  time_impl, time_cap, rate_type):
         self.time_impl = time_impl
         self.time_cap = time_cap
@@ -174,12 +173,6 @@ class CoastalAquaculture:
         self.nitrous_ef_start_tier_2 = nitrous_ef_start_tier_2
         self.nitrous_ef_end_tier_2 = nitrous_ef_end_tier_2
         self.nitrous_constant = nitrous_constant
-        self.electricity_used_default = electricity_used_default
-        self.electricity_used_start_tier_2 = electricity_used_start_tier_2
-        self.electricity_used_end_tier_2 = electricity_used_end_tier_2
-        self.ef_electricity_default = ef_electricity_default
-        self.ef_electricity_start_tier_2 = ef_electricity_start_tier_2
-        self.ef_electricity_end_tier_2 = ef_electricity_end_tier_2
         self.rate_type = rate_type
 
         # DEFINITION OF TIER 2 DEFAULTS
@@ -188,10 +181,8 @@ class CoastalAquaculture:
 
         self.emissions_nitrous_yearly = []
         self.emissions_total_yearly = []
-        self.emissions_co2_yearly = []
 
         self.emissions_nitrous_total = 0
-        self.emissions_co2_total = 0
         self.total_emissions = 0
 
 
@@ -214,29 +205,10 @@ class CoastalAquaculture:
             except Exception as e:
                 traceback.print_exc()
 
-        def calculate_co2_emissions():
-            try:
-                electricity_used_start = self.electricity_used_default if not self.electricity_used_start_tier_2 else self.electricity_used_start_tier_2
-                electricity_used_end = self.electricity_used_default if not self.electricity_used_end_tier_2 else self.electricity_used_end_tier_2
-                ef_electricity_start = self.ef_electricity_default if not self.ef_electricity_start_tier_2 else self.ef_electricity_start_tier_2
-                ef_electricity_end = self.ef_electricity_default if not self.ef_electricity_end_tier_2 else self.ef_electricity_end_tier_2
-
-                annual_start = electricity_used_start * self.production_start * ef_electricity_start
-                annual_end = electricity_used_end * self.production_end * ef_electricity_end
-
-                self.emissions_co2_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.time_impl, self.time_cap, self.rate_type)
-                self.emissions_co2_total = sum(self.emissions_co2_yearly)
-
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(x, GasTypes.CO2) for x in self.emissions_co2_yearly], activity=ActivityTypes.ELECTRICITY, delay=0))
-
-            except Exception as e:
-                traceback.print_exc()
-
         calculate_nitrous_emissions()
-        calculate_co2_emissions()
 
         try:
-            self.emissions_total_yearly = [sum(x + y) for x, y in zip(self.emissions_nitrous_yearly, self.emissions_co2_yearly)]
+            self.emissions_total_yearly = [sum(x) for x in zip(self.emissions_nitrous_yearly)]
             self.total_emissions = sum(self.emissions_total_yearly)
         except Exception as e:
             traceback.print_exc()
