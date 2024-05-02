@@ -103,6 +103,7 @@ def breakdown_according_to_values(maximum, list_of_proportions):
         result = [maximum * i / sum(list_of_proportions) for i in list_of_proportions]
         return result
 
+
 def yearly_time_dependent_increase_half_year(start_value, end_value, years_implementation, years_capitalization, function):
     result_interim = yearly_time_dependent_parameter_breakdown(start_value, end_value, years_implementation, years_capitalization, function, interim_values=True)
     result_not_interim = yearly_time_dependent_parameter_breakdown(start_value, end_value, years_implementation, years_capitalization, function, interim_values=False)
@@ -118,6 +119,7 @@ def yearly_time_dependent_full_year(start_value, end_value, years_implementation
     delta_yearly = [values_at_year[i] - values_at_year[i - 1] for i in range(1, len(values_at_year))]
 
     return delta_yearly
+
 
 import matplotlib.pyplot as plt
 
@@ -135,7 +137,7 @@ def yearly_time_dependent_matrix(start_value, end_value, years_implementation, y
         matrix[i][i] = half_year[2]
         for j in range(i + 1, n):
             matrix[i][j] = full_year[1]
-    
+
     # NOTE: now it does what is needed, but it is not very readable. Has to be fixed further on
     return matrix
 
@@ -201,7 +203,8 @@ def soil_emissions(hectars_before_20, area_start, area_end, socref, soc_tier_2, 
 def soil_emissions_2(soc_start, soc_end, total_hectares, area_start, area_end, hectares_before_20):
     delta_co2_mineral_per_ha_per_yr = -(soc_end - soc_start) / 20 * (44 / 12)
 
-    calculated = delta_co2_mineral_per_ha_per_yr * sum(total_hectares)
+    sum_total_hectars = sum(total_hectares)
+    calculated = delta_co2_mineral_per_ha_per_yr * sum_total_hectars
     tabular = max(area_start, area_end) * delta_co2_mineral_per_ha_per_yr * 20
 
     total = tabular if abs(calculated) >= abs(tabular) else calculated
