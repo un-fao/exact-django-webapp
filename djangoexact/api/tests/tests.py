@@ -19,10 +19,16 @@ from .factories import *
 BATCH_SIZE = 1
 TEST_SM_FISHERY = False
 TEST_LG_FISHERY = False
-TEST_ANNUAL_CROPPING = False
-TEST_PERENNIAL_CROPPING = True
+TEST_ANNUAL_CROPPING = True
+TEST_PERENNIAL_CROPPING = False
 TEST_LIVESTOCK = False
 TEST_GRASSLAND = False
+TEST_INPUTS = False
+INPUTS_BATCH_SIZE = 3
+
+TEST_ENERGY = False
+ENERGY_ELECTRICITY_BATCH_SIZE = 0
+ENERGY_FUEL_BATCH_SIZE = 2
 
 
 def verbose_print(obj):
@@ -33,7 +39,7 @@ def verbose_print(obj):
 climates = Climate.objects.all()
 moistures = Moisture.objects.all()
 countries = Country.objects.all()
-soil_types = SoilType.objects.all()
+soil_types = SoilType.objects.all().exclude(active=False)
 gw_potentials = GlobalWarmingPotential.objects.all()
 soc_refs = SoilOrganicCarbon.objects.all()
 
@@ -47,36 +53,29 @@ u = User.objects.get(username="admin")
 
 while True:
     try:
-        # country = random.choice(countries)
-        # continent = country.continent
-        # climate = random.choice(climates)
-        # moisture = random.choice(moistures)
-        # soil_type = random.choice(soil_types)
+        country = random.choice(countries)
+        continent = country.region
+        climate = random.choice(climates)
+        moisture = random.choice(moistures)
+        soil_type = random.choice(soil_types)
         gw_potential = GlobalWarmingPotential.objects.get(name="100 yr AR5 w/out CC feedback")
         # socref = SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
 
-        country = Country.objects.get(name="Egypt")
-        region = country.region
-        climate = Climate.objects.get(name="Tropical")
-        moisture = Moisture.objects.get(name="Dry")
-        soil_type = SoilType.objects.get(name="Sandy")
+        # country = Country.objects.get(name="Egypt")
+        # region = country.region
+        # climate = Climate.objects.get(name="Tropical")
+        # moisture = Moisture.objects.get(name="Dry")
+        # soil_type = SoilType.objects.get(name="Sandy")
         socref = SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
 
         if socref.value is None:
             # TODO: Define behaviour for when socref is None (either input T2 or what?)
             print("socref is None")
             raise Exception
-        print(f"Country: {country}")
-        print(f"Continent: {country.region}")
-        print(f"Climate: {climate}")
-        print(f"Moisture: {moisture}")
-        print(f"Soil Type: {soil_type}")
-        print(f"GW Potential: {gw_potential}")
-        print(f"Soil Organic Carbon: {socref}")
         break
     except Exception as e:
         print(e)
-        break
+        continue
 
 
 # Project Creation
@@ -88,6 +87,16 @@ p: ProjectFactory = ProjectFactory.create(
     gw_potential=gw_potential,
     soil_type=soil_type,
 )
+
+print(f"Country: {country}")
+print(f"Continent: {country.region}")
+print(f"Climate: {climate}")
+print(f"Moisture: {moisture}")
+print(f"Soil Type: {soil_type}")
+print(f"GW Potential: {gw_potential}")
+print(f"Soil Organic Carbon: {socref}")
+print(f"Implementation years: {p.implementation_years}")
+print(f"Capitalization years: {p.capitalization_years}")
 
 UserProjectGroup.objects.create(user=u, project=p, group=Group.objects.get(name="Admin"))
 
@@ -275,6 +284,9 @@ if TEST_ANNUAL_CROPPING:
     total_croplands = annual_croppings.__len__()
     passed_croplands = 0
 
+    a.module_types.add(ModuleType.objects.get(name="Annual Cropping"))
+    a.save()
+
     print("Testing AnnualCropping...")
     for i, annual_cropping in enumerate(annual_croppings):
         # print(f"\n\nTesting AnnualCropping {i+1}...")
@@ -371,6 +383,8 @@ if TEST_ANNUAL_CROPPING:
 
 if TEST_PERENNIAL_CROPPING:
     perennials = PerennialCroppingFactory.create_batch(BATCH_SIZE, activity=a)
+    a.module_types.add(ModuleType.objects.get(name="Perennial Cropping"))
+    a.save()
 
     total_perennials = perennials.__len__()
     passed_perennials = 0
@@ -419,7 +433,7 @@ if TEST_PERENNIAL_CROPPING:
         try:
             results = CalculatorFactory().calculate_result(perennial)
 
-            print(json.dumps({"math_results_w": results[0], "math_results_wo": results[1], "math_results_balance": results[2]}, indent=4))
+            print(json.dumps({"math_results_w": f"{results[0]:,f}", "math_results_wo": f"{results[1]:,f}", "math_results_balance": f"{results[2]:,f}"}, indent=4))
 
             passed_perennials += 1
 
@@ -478,3 +492,98 @@ if TEST_GRASSLAND:
 
     print(f"\nTotal Tested Grasslands: {total_grasslands}")
     print(f"Passed Tests: {passed_grasslands}\n\n")
+
+if TEST_INPUTS:
+    inputs = InputFactory.create_batch(BATCH_SIZE, activity=a)
+
+    total_inputs = inputs.__len__()
+    passed_inputs = 0
+
+    print("Testing module...")
+    for i, input in enumerate(inputs):
+        print(f"\n\nTesting module {i+1}...")
+        print("-----------------------------------")
+
+        for i in range(INPUTS_BATCH_SIZE):
+            input_entry = InputEntryFactory.create(parent=input)
+
+            log.debug(f"Input Entry n. {i+1}")
+            log.debug("-----------------------------------")
+
+            log.debug("\n")
+
+            log.debug(f"Input Type: {input_entry.input_type}")
+
+            log.debug(f"Value start: {input_entry.value_start:,f}")
+            log.debug(f"Value wo: {input_entry.value_wo:,f}")
+            log.debug(f"Value w: {input_entry.value_w:,f}")
+
+            log.debug("\n")
+
+        results = CalculatorFactory().calculate_result(input)
+
+        log.debug("Total Results")
+        log.debug("-----------------------------------")
+        log.debug("\n")
+        log.debug(json.dumps({"math_results_w": f"{results[0]:,f}", "math_results_wo": f"{results[1]:,f}", "math_results_balance": f"{results[2]:,f}"}, indent=4))
+
+        passed_inputs += 1
+
+    print(f"\nTotal Tested Inputs: {total_inputs}")
+    print(f"Passed Tests: {passed_inputs}\n\n")
+
+if TEST_ENERGY:
+    energy = EnergyFactory.create_batch(BATCH_SIZE, activity=a)
+
+    total_energy = energy.__len__()
+    passed_energy = 0
+
+    print("Testing module...")
+    for i, energy in enumerate(energy):
+        print(f"\n\nTesting module {i+1}...")
+        print("-----------------------------------")
+
+        for i in range(ENERGY_ELECTRICITY_BATCH_SIZE):
+            electricity_entry: Electricity = ElectricityFactory.create(parent=energy)
+
+            log.debug(f"Electricity Entry n. {i+1}")
+            log.debug("-----------------------------------")
+
+            log.debug("\n")
+
+            log.debug(f"Country: {electricity_entry.country}")
+            log.debug(f"MWH start: {electricity_entry.mwh_start:,f}")
+            log.debug(f"MWH wo: {electricity_entry.mwh_wo:,f}")
+            log.debug(f"MWH w: {electricity_entry.mwh_w:,f}")
+            log.debug(f"MWH Renewables start: {electricity_entry.mwh_renewables_start:,f}")
+            log.debug(f"MWH Renewables wo: {electricity_entry.mwh_renewables_wo:,f}")
+            log.debug(f"MWH Renewables w: {electricity_entry.mwh_renewables_w:,f}")
+
+            log.debug("\n")
+
+        for i in range(ENERGY_FUEL_BATCH_SIZE):
+            fuel_entry: Fuel = FuelFactory.create(parent=energy)
+
+            log.debug(f"Fuel Entry n. {i+1}")
+            log.debug("-----------------------------------")
+
+            log.debug("\n")
+
+            log.debug(f"Fuel Type: {fuel_entry.fuel_type}")
+            log.debug(f"Fuel consumption start: {fuel_entry.fuel_consumption_start:,f}")
+            log.debug(f"Fuel consumption wo: {fuel_entry.fuel_consumption_wo:,f}")
+            log.debug(f"Fuel consumption w: {fuel_entry.fuel_consumption_w:,f}")
+
+            log.debug("\n")
+
+        results = CalculatorFactory().calculate_result(energy)
+
+        log.debug("Total Results")
+        log.debug("-----------------------------------")
+        log.debug("")
+        log.debug(json.dumps({"math_results_w": f"{results[0]:,f}", "math_results_wo": f"{results[1]:,f}", "math_results_balance": f"{results[2]:,f}"}, indent=4))
+
+        passed_energy += 1
+
+    print(f"\nTotal Tested Energy: {total_energy}")
+    print(f"Passed Tests: {passed_energy}\n\n")

@@ -24,10 +24,15 @@ forests = [forest for forest in LandUseType.objects.filter(module_types__class_n
 
 livestock_category_types = [c for c in LivestockCategoryType.objects.filter(is_active=True).all()]
 livestock_production_types = [c for c in LivestockProductionType.objects.all()]
+fuels = [fuel for fuel in FuelType.objects.exclude(macro_fuel_type__name="Liquid or gaseous").all()]
+
+countries = [country for country in Country.objects.all()]
 
 def_rate = ChangeRate.objects.get(name="D")
 sm_gear_type = random.choice(sma_gear_types)
 lge_gear_type = random.choice(lge_gear_types)
+
+READY = StatusType.objects.get(name="READY")
 
 
 class UserFactory(DjangoModelFactory):
@@ -46,8 +51,8 @@ class ProjectFactory(DjangoModelFactory):
     executing_agency = factory.fuzzy.FuzzyText()
     status = factory.fuzzy.FuzzyChoice(statuses)
 
-    implementation_years = factory.fuzzy.FuzzyInteger(5, 5)
-    capitalization_years = factory.fuzzy.FuzzyInteger(15, 15)
+    implementation_years = factory.fuzzy.FuzzyInteger(1, 7)
+    capitalization_years = factory.fuzzy.FuzzyInteger(7, 7)
 
 
 class ActivityFactory(DjangoModelFactory):
@@ -112,6 +117,10 @@ class AnnualCroppingFactory(DjangoModelFactory):
     class Meta:
         model = AnnualCropping
 
+    area = 150
+
+    status = READY
+
     land_use_type_w = factory.fuzzy.FuzzyChoice(crop_types)
     land_use_type_start = land_use_type_w
     land_use_type_wo = land_use_type_w
@@ -140,6 +149,8 @@ class PerennialCroppingFactory(DjangoModelFactory):
         model = PerennialCropping
 
     area = 150
+
+    status = READY
 
     land_use_type_start = factory.fuzzy.FuzzyChoice(trees)
     land_use_type_w = land_use_type_start
@@ -286,6 +297,8 @@ class InputFactory(DjangoModelFactory):
     class Meta:
         model = Input
 
+    status = READY
+
 
 input_types = [input for input in InputType.objects.all().exclude(name="User Defined Animal Feed")]
 
@@ -295,6 +308,8 @@ class InputEntryFactory(DjangoModelFactory):
         model = InputEntry
 
     input_type = factory.fuzzy.FuzzyChoice(input_types)
+
+    status = READY
 
     value_start = factory.fuzzy.FuzzyFloat(0, 100)
     value_w = factory.fuzzy.FuzzyFloat(0, 100)
@@ -309,12 +324,63 @@ class AquacultureFactory(DjangoModelFactory):
     annual_production_w = factory.fuzzy.FuzzyFloat(0, 100)
     annual_production_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
-    status = StatusType.objects.get(name="READY")
+    status = READY
 
-    # n2o_from_production_t2_start = factory.fuzzy.FuzzyFloat(0, 100)
-    # n2o_from_production_t2_w = factory.fuzzy.FuzzyFloat(0, 100)
-    # n2o_from_production_t2_wo = factory.fuzzy.FuzzyFloat(0, 100)
+    n2o_from_production_t2_start = factory.fuzzy.FuzzyFloat(0, 1)
+    n2o_from_production_t2_w = factory.fuzzy.FuzzyFloat(0, 1)
+    n2o_from_production_t2_wo = factory.fuzzy.FuzzyFloat(0, 1)
 
-    # electricity_used_t2_start = factory.fuzzy.FuzzyFloat(0, 100)
-    # electricity_used_t2_w = factory.fuzzy.FuzzyFloat(0, 100)
-    # electricity_used_t2_wo = factory.fuzzy.FuzzyFloat(0, 100)
+    electricity_used_t2_start = factory.fuzzy.FuzzyFloat(0, 100)
+    electricity_used_t2_w = factory.fuzzy.FuzzyFloat(0, 100)
+    electricity_used_t2_wo = factory.fuzzy.FuzzyFloat(0, 100)
+
+    # electricity_ef_t2_start = factory.fuzzy.FuzzyFloat(0, 100)
+    # electricity_ef_t2_w = factory.fuzzy.FuzzyFloat(0, 100)
+    # electricity_ef_t2_wo = factory.fuzzy.FuzzyFloat(0, 100)
+
+
+class EnergyFactory(DjangoModelFactory):
+    class Meta:
+        model = Energy
+
+    status = READY
+
+
+ef_sources = [source for source in EmissionFactorSource.objects.all()]
+
+
+class ElectricityFactory(DjangoModelFactory):
+    class Meta:
+        model = Electricity
+
+    status = READY
+
+    country = factory.fuzzy.FuzzyChoice(countries)
+
+    mwh_start = factory.fuzzy.FuzzyFloat(0, 100)
+    mwh_w = factory.fuzzy.FuzzyFloat(0, 100)
+    mwh_wo = factory.fuzzy.FuzzyFloat(0, 100)
+
+    mwh_renewables_start = factory.fuzzy.FuzzyFloat(0, 100)
+    mwh_renewables_w = factory.fuzzy.FuzzyFloat(0, 100)
+    mwh_renewables_wo = factory.fuzzy.FuzzyFloat(0, 100)
+
+    # ef_t2 = factory.fuzzy.FuzzyFloat(0, 100)
+    # transmission_loss = factory.fuzzy.FuzzyFloat(0, 100)
+    ef_source = factory.fuzzy.FuzzyChoice(ef_sources)
+
+
+class FuelFactory(DjangoModelFactory):
+    class Meta:
+        model = Fuel
+
+    status = READY
+
+    fuel_type = factory.fuzzy.FuzzyChoice(fuels)
+
+    fuel_consumption_start = factory.fuzzy.FuzzyFloat(0, 100)
+    fuel_consumption_w = factory.fuzzy.FuzzyFloat(0, 100)
+    fuel_consumption_wo = factory.fuzzy.FuzzyFloat(0, 100)
+
+    # ef_t2 = factory.fuzzy.FuzzyFloat(0, 100)
+    # account_for_co2 = factory.fuzzy.FuzzyChoice([True, False])

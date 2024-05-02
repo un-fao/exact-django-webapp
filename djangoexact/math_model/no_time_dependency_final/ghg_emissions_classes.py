@@ -123,7 +123,7 @@ class Result:
         match by:
             case BreakdownTypes.TOTAL:
                 breakdown = self.compute_balance()
-                log.debug(breakdown)
+                log.debug(f"Total emissions: {breakdown:,f}")
                 return self.compute_balance()
             case BreakdownTypes.GAS:
                 breakdown = self.breakdown_by_gas()

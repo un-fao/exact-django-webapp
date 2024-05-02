@@ -441,7 +441,8 @@ class FuelType(models.Model):
 
     def __str__(self):
         macro = getattr(self.macro_fuel_type, "name", None)
-        return f"({self.pk}) {macro} - {self.name}"
+        use = getattr(self.fuel_use_type, "name", None)
+        return f"({self.pk}) {macro} - {use} - {self.name}"
 
 
 class SalinityType(models.Model):
@@ -1486,6 +1487,10 @@ class Aquaculture(Module):
     electricity_used_t2_start = models.FloatField(null=True, blank=True)
     electricity_used_t2_w = models.FloatField(null=True, blank=True)
     electricity_used_t2_wo = models.FloatField(null=True, blank=True)
+
+    electricity_ef_t2_start = models.FloatField(null=True, blank=True)
+    electricity_ef_t2_w = models.FloatField(null=True, blank=True)
+    electricity_ef_t2_wo = models.FloatField(null=True, blank=True)
 
 
 class MacroInputType(models.Model):
