@@ -1,4 +1,5 @@
 import copy
+import json
 import logging as log
 import math
 import statistics
@@ -326,6 +327,7 @@ class Result:
         return self.add(other)
 
     def breakdown(self, by=BreakdownTypes.TOTAL):
+        log.debug("START Result.breakdown")
         log.debug(f"Breakdown by: {by}")
 
         breakdown = (
@@ -333,6 +335,9 @@ class Result:
             self.total_wo.breakdown(by=by),
             self.balance.breakdown(by=by),
         )
+
+        log.debug("END Result.breakdown")
+        log.debug("")
         return breakdown
 
 
@@ -1051,6 +1056,9 @@ class AnnualCropCalculator(BaseCalculator):
         self.crop_yield_wo: SimpleNamespace | ipcc.CropYieldStats = SimpleNamespace(value=0)
         self.soc: SimpleNamespace | ipcc.SoilOrganicCarbon = SimpleNamespace(value=0)
         self.flu: SimpleNamespace | ipcc.CroplandFLU = SimpleNamespace(value=0)
+        self.default_emission_factor_start: SimpleNamespace | ipcc.DefaultEmissionFactor = SimpleNamespace(value=0)
+        self.default_emission_factor_w: SimpleNamespace | ipcc.DefaultEmissionFactor = SimpleNamespace(value=0)
+        self.default_emission_factor_wo: SimpleNamespace | ipcc.DefaultEmissionFactor = SimpleNamespace(value=0)
         self.burning_emission_factor: SimpleNamespace | ipcc.BurningEmissionFactor = SimpleNamespace(value=0)
         self.minor_burning_emission_factor: SimpleNamespace | ipcc.BurningEmissionFactor = SimpleNamespace(value=0)
         self.fires_start: SimpleNamespace | ipcc.FiresCombustionFactor = SimpleNamespace(value=0)
@@ -1080,6 +1088,21 @@ class AnnualCropCalculator(BaseCalculator):
         soil_type = project.soil_type
 
         cm = {"climate": climate, "moisture": moisture}
+
+        try:
+            self.default_emission_factor_start = ipcc.DefaultEmissionFactor.objects.get(organic_input_type=input.organic_input_type_start, moisture=moisture)
+        except ipcc.BurningEmissionFactor.DoesNotExist:
+            raise Exception(f"BurningEmissionFactor for Savanna and grassland does not exist")
+
+        try:
+            self.default_emission_factor_w = ipcc.DefaultEmissionFactor.objects.get(organic_input_type=input.organic_input_type_w, moisture=moisture)
+        except ipcc.BurningEmissionFactor.DoesNotExist:
+            raise Exception(f"BurningEmissionFactor for Savanna and grassland does not exist")
+
+        try:
+            self.default_emission_factor_wo = ipcc.DefaultEmissionFactor.objects.get(organic_input_type=input.organic_input_type_wo, moisture=moisture)
+        except ipcc.BurningEmissionFactor.DoesNotExist:
+            raise Exception(f"BurningEmissionFactor for Savanna and grassland does not exist")
 
         try:
             self.fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
@@ -1635,12 +1658,12 @@ class PerennialCropCalculator(BaseCalculator):
             default_emission_factor_start = ipcc.DefaultEmissionFactor.objects.get(organic_input_type=module.organic_input_type_start, moisture=moisture)
         except ipcc.BurningEmissionFactor.DoesNotExist:
             raise Exception(f"BurningEmissionFactor for Savanna and grassland does not exist")
-        
+
         try:
             default_emission_factor_w = ipcc.DefaultEmissionFactor.objects.get(organic_input_type=module.organic_input_type_w, moisture=moisture)
         except ipcc.BurningEmissionFactor.DoesNotExist:
             raise Exception(f"BurningEmissionFactor for Savanna and grassland does not exist")
-        
+
         try:
             default_emission_factor_wo = ipcc.DefaultEmissionFactor.objects.get(organic_input_type=module.organic_input_type_wo, moisture=moisture)
         except ipcc.BurningEmissionFactor.DoesNotExist:
@@ -1798,6 +1821,7 @@ class PerennialCropCalculator(BaseCalculator):
                 project.gw_potential.n2o,
                 project.gw_potential.ch4,
                 module.is_biomass_burned_start,
+                burning_emission_factor.n2o,
                 default_emission_factor_start.value,
                 burning_emission_factor.ch4,
                 fires_combustion_factor_start.value,
@@ -1844,6 +1868,7 @@ class PerennialCropCalculator(BaseCalculator):
                 project.gw_potential.n2o,
                 project.gw_potential.ch4,
                 module.is_biomass_burned_start,
+                burning_emission_factor.n2o,
                 default_emission_factor_start.value,
                 burning_emission_factor.ch4,
                 fires_combustion_factor_start.value,
@@ -1890,6 +1915,7 @@ class PerennialCropCalculator(BaseCalculator):
                 project.gw_potential.n2o,
                 project.gw_potential.ch4,
                 module.is_biomass_burned_w,
+                burning_emission_factor.n2o,
                 default_emission_factor_w.value,
                 burning_emission_factor.ch4,
                 fires_combustion_factor_w.value,
@@ -1936,6 +1962,7 @@ class PerennialCropCalculator(BaseCalculator):
                 project.gw_potential.n2o,
                 project.gw_potential.ch4,
                 module.is_biomass_burned_wo,
+                burning_emission_factor.n2o,
                 default_emission_factor_wo.value,
                 burning_emission_factor.ch4,
                 fires_combustion_factor_wo.value,
@@ -3198,6 +3225,8 @@ class AquacultureCalculator(BaseCalculator):
         change_rate = module.activity.change_rate
         project: Project = module.activity.project
 
+        ELECTRICITY_USED_DEFAULT = 0  # TODO: Add as database parameter
+
         try:
             NITROUS_EF_DEFAULT = AquacultureParameter.objects.get(name="nitrous_ef_default").value
         except AquacultureParameter.DoesNotExist:
@@ -3208,6 +3237,12 @@ class AquacultureCalculator(BaseCalculator):
             FEED_EF_DEFAULT = AquacultureParameter.objects.get(name="feed_ef_default").value
         except AquacultureParameter.DoesNotExist:
             raise ValueError("Default feed emission factor does not exist")
+
+        try:
+            elec = ipcc.ElectricityEmission.objects.get(country=project.country)
+            log.debug(f"Operating margin: {elec.operating_margin}")
+        except ipcc.ElectricityEmission.DoesNotExist:
+            raise ValueError(f"Electricity emission for {project.country.name} does not exist")
 
         math_w = None
         math_wo = None
@@ -3221,6 +3256,12 @@ class AquacultureCalculator(BaseCalculator):
                 module.n2o_from_production_t2_start,
                 module.n2o_from_production_t2_w,
                 project.gw_potential.n2o,
+                ELECTRICITY_USED_DEFAULT,
+                module.electricity_used_t2_start,
+                module.electricity_used_t2_w,
+                elec.operating_margin,
+                module.electricity_ef_t2_start,
+                module.electricity_ef_t2_w,
                 project.implementation_years,
                 project.capitalization_years,
                 change_rate.name,
@@ -3239,6 +3280,12 @@ class AquacultureCalculator(BaseCalculator):
                 module.n2o_from_production_t2_start,
                 module.n2o_from_production_t2_wo,
                 project.gw_potential.n2o,
+                ELECTRICITY_USED_DEFAULT,
+                module.electricity_used_t2_start,
+                module.electricity_used_t2_wo,
+                elec.operating_margin,
+                module.electricity_ef_t2_start,
+                module.electricity_ef_t2_w,
                 project.implementation_years,
                 project.capitalization_years,
                 change_rate.name,
@@ -3269,6 +3316,9 @@ class InputCalculator(BaseCalculator):
     """
     Calculator for Inputs macromodule
     """
+
+    def get_defaults(self, input: Module) -> dict:
+        return super().get_defaults(input)
 
     def calculate(self) -> list[MathResult]:
         input: Input = self.data
@@ -3309,6 +3359,9 @@ class InputEntryCalculator(BaseCalculator):
     """
     Calculator for single input entries.
     """
+
+    def get_defaults(self, input: Module) -> dict:
+        return super().get_defaults(input)
 
     def calculate(self) -> list[Result]:
         module: InputEntry = self.data
@@ -3419,6 +3472,9 @@ class EnergyCalculator(BaseCalculator):
     Calculator for Energy module
     """
 
+    def get_defaults(self, input: Module) -> dict:
+        return super().get_defaults(input)
+
     def calculate(self) -> list[Result]:
         """
         Calculate emissions for a single Energy module.
@@ -3434,13 +3490,13 @@ class EnergyCalculator(BaseCalculator):
             input.activity.project.capitalization_years,
         )
 
-        for elec in input.electricities:
+        for elec in input.electricities.all():
             r_w, r_wo = ElectricityCalculator(elec).calculate()
 
             res_w += r_w
             res_wo += r_wo
 
-        for fuel in input.fuels:
+        for fuel in input.fuels.all():
             r_w, r_wo = FuelCalculator(fuel).calculate()
 
             res_w += r_w
@@ -3457,18 +3513,26 @@ class ElectricityCalculator(BaseCalculator):
     Calculator for energy.
     """
 
+    def get_defaults(self, input: Module) -> dict:
+        return super().get_defaults(input)
+
     def calculate(self) -> list[Result]:
         """
         Calculate emissions for a single Energy module.
         """
+        log.debug("START ElectricityCalculator.calculate")
 
         input: Electricity = self.data
         activity: Activity = input.parent.activity
-        project: Project = self.data.activity.project
+        project: Project = activity.project
         change_rate = activity.change_rate
 
         try:
-            elec = ipcc.ElectricityEmission.objects.get(country=project.country)
+            elec = ipcc.ElectricityEmission.objects.get(country=input.country)
+            if input.ef_source.name == "Operating Margin":
+                log.debug(f"Operating margin: {elec.operating_margin}")
+            else:
+                log.debug(f"Combined margin: {elec.combined_margin}")
         except ipcc.ElectricityEmission.DoesNotExist:
             raise ValueError(f"Electricity emission for {project.country.name} does not exist")
 
@@ -3476,6 +3540,7 @@ class ElectricityCalculator(BaseCalculator):
         math_wo = None
 
         if is_with(input):
+            log.debug("IS WITH")
             inputs_w = [
                 elec.operating_margin if input.ef_source.name == "Operating Margin" else elec.combined_margin,
                 input.ef_t2,
@@ -3486,11 +3551,13 @@ class ElectricityCalculator(BaseCalculator):
                 project.implementation_years,
                 project.capitalization_years,
             ]
+            log.debug("Inputs with: %s", inputs_w)
 
             math_w = ElectryicityConsumption(*inputs_w)
             math_w.calculate_emissions()
 
         if is_without(input):
+            log.debug("IS WITHOUT")
             inputs_wo = [
                 elec.operating_margin if input.ef_source.name == "Operating Margin" else elec.combined_margin,
                 input.ef_t2,
@@ -3501,6 +3568,7 @@ class ElectricityCalculator(BaseCalculator):
                 project.implementation_years,
                 project.capitalization_years,
             ]
+            log.debug("Inputs without: %s", inputs_wo)
 
             math_wo = ElectryicityConsumption(*inputs_wo)
             math_wo.calculate_emissions()
@@ -3510,6 +3578,14 @@ class ElectricityCalculator(BaseCalculator):
 
         results_tuple = (results_w, results_wo)
 
+        log.debug("Results WITH")
+        results_w.breakdown(by=BreakdownTypes.ACTIVITY)
+
+        log.debug("Results WITHOUT")
+        results_wo.breakdown(by=BreakdownTypes.ACTIVITY)
+
+        log.debug("END ElectricityCalculator.calculate")
+        log.debug("")
         return results_tuple
 
     def defaults(self) -> DefaultData:
@@ -3521,10 +3597,14 @@ class FuelCalculator(BaseCalculator):
     Calculator for fuel
     """
 
+    def get_defaults(self, input: Module) -> dict:
+        return super().get_defaults(input)
+
     def calculate(self) -> list[Result]:
         """
         Calculate emissions for a single Fuel module.
         """
+        log.debug("START FuelCalculator.calculate")
 
         input: Fuel = self.data
         activity: Activity = input.parent.activity
@@ -3535,14 +3615,17 @@ class FuelCalculator(BaseCalculator):
 
         try:
             ef = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=input.fuel_type)
+            log.debug(f"Default emission factor: {ef.t_co2_eq}")
         except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
-            raise ValueError(f"Default emission factor for {input.fuel_type.name} does not exist")
+            raise ValueError(f"Default emission factor for {input.fuel_type.name} does not exist. Please select tier 2 value.")
 
         math_w = None
         math_wo = None
 
-        if macro_fuel_type == "Liquid":
+        if macro_fuel_type == "Liquid or gaseous":
+            log.debug("Liquid or gaseous fuel")
             if is_with(input):
+                log.debug("IS WITH")
                 input_w = [
                     ef.t_co2_eq,
                     input.ef_t2,
@@ -3552,11 +3635,13 @@ class FuelCalculator(BaseCalculator):
                     project.implementation_years,
                     project.capitalization_years,
                 ]
+                log.debug("Inputs with: %s", input_w)
 
                 math_w = FuelConsumption(*input_w)
                 math_w.calculate_emissions()
 
             if is_without(input):
+                log.debug("IS WITHOUT")
                 input_wo = [
                     ef.t_co2_eq,
                     input.ef_t2,
@@ -3566,12 +3651,15 @@ class FuelCalculator(BaseCalculator):
                     project.implementation_years,
                     project.capitalization_years,
                 ]
+                log.debug("Inputs without: %s", input_wo)
 
                 math_wo = FuelConsumption(*input_wo)
                 math_wo.calculate_emissions()
 
         elif macro_fuel_type == "Solid":
+            log.debug("Solid fuel")
             if is_with(input):
+                log.debug("IS WITH")
                 input_w = [
                     ef.net_calorific_value,
                     ef.co2,
@@ -3583,15 +3671,17 @@ class FuelCalculator(BaseCalculator):
                     input.ef_t2,
                     input.fuel_consumption_start,
                     input.fuel_consumption_w,
-                    input.activity.change_rate.name,
+                    activity.change_rate.name,
                     project.implementation_years,
                     project.capitalization_years,
                 ]
+                log.debug("Inputs with: %s", input_w)
 
                 math_w = SolidConsumption(*input_w)
                 math_w.calculate_emissions()
 
             if is_without(input):
+                log.debug("IS WITHOUT")
                 input_wo = [
                     ef.net_calorific_value,
                     ef.co2,
@@ -3603,10 +3693,11 @@ class FuelCalculator(BaseCalculator):
                     input.ef_t2,
                     input.fuel_consumption_start,
                     input.fuel_consumption_wo,
-                    input.activity.change_rate.name,
+                    activity.change_rate.name,
                     project.implementation_years,
                     project.capitalization_years,
                 ]
+                log.debug("Inputs without: %s", input_wo)
 
                 math_wo = SolidConsumption(*input_wo)
                 math_wo.calculate_emissions()
@@ -3619,6 +3710,14 @@ class FuelCalculator(BaseCalculator):
 
         results_tuple = (results_w, results_wo)
 
+        log.debug("Results WITH")
+        results_w.breakdown(by=BreakdownTypes.ACTIVITY)
+
+        log.debug("Results WITHOUT")
+        results_wo.breakdown(by=BreakdownTypes.ACTIVITY)
+
+        log.debug("END FuelCalculator.calculate")
+        log.debug("")
         return results_tuple
 
     def defaults(self) -> DefaultData:
