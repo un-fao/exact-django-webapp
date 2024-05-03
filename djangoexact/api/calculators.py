@@ -4868,6 +4868,9 @@ class IrrigationCalculator(BaseCalculator):
 
         return (res_w, res_wo)
 
+    def get_defaults(self, input: Module) -> dict:
+        return super().get_defaults(input)
+
     def defaults(self) -> DefaultData:
         return super().defaults()
 
@@ -4883,7 +4886,8 @@ class IrrigationSystemCalculator(BaseCalculator):
         """
 
         module: IrrigationSystem = self.data
-        project: Project = module.activity.project
+        activity: Activity = module.parent.activity
+        project: Project = activity.project
 
         try:
             ef = ipcc.IrrigationSystemData.objects.get(irrigation_system_type=module.irrigation_system_type)
@@ -4901,7 +4905,7 @@ class IrrigationSystemCalculator(BaseCalculator):
                 module.ha_w,
                 project.implementation_years,
                 project.capitalization_years,
-                module.activity.change_rate.name,
+                activity.change_rate.name,
             ]
 
             math_w = NewIrrigation(*inputs_w)
@@ -4915,7 +4919,7 @@ class IrrigationSystemCalculator(BaseCalculator):
                 module.ha_wo,
                 project.implementation_years,
                 project.capitalization_years,
-                module.activity.change_rate.name,
+                activity.change_rate.name,
             ]
 
             math_wo = NewIrrigation(*inputs_wo)
@@ -4928,6 +4932,9 @@ class IrrigationSystemCalculator(BaseCalculator):
 
         return results_tuple
 
+    def get_defaults(self, input: Module) -> dict:
+        return super().get_defaults(input)
+
     def defaults(self) -> DefaultData:
         return super().defaults()
 
@@ -4935,7 +4942,8 @@ class IrrigationSystemCalculator(BaseCalculator):
 class IrrigationPhaseCalculator(BaseCalculator):
     def calculate(self) -> list[Result]:
         input: IrrigationPhase = self.data
-        project: Project = input.activity.project
+        activity: Activity = input.parent.activity
+        project: Project = activity.project
 
         try:
             ef = ipcc.IrrigationPhaseData.objects.get(fuel_type=input.fuel_type)
@@ -4985,7 +4993,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
             input.well_depth,
             input.ha_start,
             0,
-            input.activity.change_rate.name,
+            activity.change_rate.name,
             project.implementation_years,
             project.capitalization_years,
             transportation_loss.value if input.fuel_type.name == "Electricity" else 0,
@@ -5010,7 +5018,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
                 input.well_depth,
                 0,
                 input.ha_w,
-                input.activity.change_rate.name,
+                activity.change_rate.name,
                 project.implementation_years,
                 project.capitalization_years,
                 transportation_loss.value if input.fuel_type.name == "Electricity" else 0,
@@ -5035,7 +5043,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
                 input.well_depth,
                 0,
                 input.ha_wo,
-                input.activity.change_rate.name,
+                activity.change_rate.name,
                 project.implementation_years,
                 project.capitalization_years,
                 transportation_loss.value if input.fuel_type.name == "Electricity" else 0,
@@ -5052,6 +5060,9 @@ class IrrigationPhaseCalculator(BaseCalculator):
         results_tuple = (results_w + results_start, results_wo + results_start)
 
         return results_tuple
+
+    def get_defaults(self, input: Module) -> dict:
+        return super().get_defaults(input)
 
     def defaults(self) -> DefaultData:
         return super().defaults()
