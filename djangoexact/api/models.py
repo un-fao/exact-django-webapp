@@ -34,7 +34,7 @@ class CustomUser(auth_models.AbstractUser):
         )
 
     def __str__(self):
-        return f"{self.username}"
+        return f"({self.pk}) {self.email}"
 
 
 class Group(auth_models.Group):
@@ -1609,10 +1609,8 @@ class IrrigationSystem(Submodule):
     ef_t2_w = models.FloatField(null=True, blank=True)
     ef_t2_wo = models.FloatField(null=True, blank=True)
 
-    def save(self, *args, **kwargs):
-        if self.parent and self.parent.irrigation_phases:
-            raise exceptions.ValidationError("Cannot have both irrigation system and irrigation phases in the same irrigation module")
-        super().save(*args, **kwargs)
+    def __str__(self):
+        return f"({self.id}) {self.irrigation_system_type}"
 
 
 class IrrigationPhase(Submodule):
@@ -1648,10 +1646,8 @@ class IrrigationPhase(Submodule):
     pumping_efficiency_t2_w = models.FloatField(null=True, blank=True)
     pumping_efficiency_t2_wo = models.FloatField(null=True, blank=True)
 
-    def save(self, *args, **kwargs):
-        if self.parent and self.parent.irrigation_systems:
-            raise exceptions.ValidationError("Cannot have both irrigation system and irrigation phases in the same irrigation module")
-        super().save(*args, **kwargs)
+    def __str__(self):
+        return f"({self.id}) {self.irrigation_system_type}"
 
 
 class BuildingType(models.Model):
