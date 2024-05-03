@@ -254,3 +254,18 @@ def getany(objects: list[object], key: str):
             if hasattr(obj, key):
                 return getattr(obj, key)
     return None
+
+
+def getattr_or_default(obj, key, default=0):
+    """
+    Returns the value of the specified key from the object, or 0 if the object does not have the key attribute.
+
+    Args:
+        obj (object): The object to retrieve the key attribute from.
+        key (str): The name of the key attribute to retrieve.
+
+    Returns:
+        object: The value of the specified key from the object, or 0 if the object does not have the key attribute.
+    """
+    _attr = getattr(obj, key, 0)
+    return _attr if _attr else default
