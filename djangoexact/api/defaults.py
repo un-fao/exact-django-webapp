@@ -44,8 +44,6 @@ class DefaultsFactory:
             return GrasslandDefaults(input).get_defaults(calculate=calculate)
         elif isinstance(input, api.AnnualCropping):
             return AnnualCroppingDefaults(input).get_defaults(calculate=calculate)
-        elif isinstance(input, api.MinorSeasonAnnualCropping):
-            return MinorSeasonAnnualCroppingDefaults(input).get_defaults(calculate=calculate)
         else:
             try:
                 getattr(api, input.__class__.__name__)
@@ -109,9 +107,3 @@ class AnnualCroppingDefaults(Defaults):
             minor_biomass_t2_w_default=defaults.minor_biomass_w.value,
             minor_biomass_t2_wo_default=defaults.minor_biomass_wo.value,
         )
-
-
-class MinorSeasonAnnualCroppingDefaults(AnnualCroppingDefaults):
-
-    def get_defaults(self, calculate=False) -> dict:
-        return super().get_defaults(calculate)
