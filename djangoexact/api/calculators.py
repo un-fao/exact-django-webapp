@@ -59,6 +59,8 @@ from math_model.no_time_dependency_final.waterbodies import (
     CoastalWaterbodies as MathWaterbodies,
 )
 
+from api.utilities import getattr_or_default
+
 from . import utilities as utils
 from .models import (
     Activity,
@@ -997,12 +999,6 @@ class AnnualCroppingCalculator(BaseCalculator):
         res_w += r_w
         res_wo += r_wo
 
-        for season in module.minor_seasons.all():
-            r_w, r_wo = AnnualCropCalculator(season).calculate()
-
-            res_w += r_w
-            res_wo += r_wo
-
         return (res_w, res_wo)
 
     def defaults(self) -> DefaultData:
@@ -1076,6 +1072,9 @@ class AnnualCropCalculator(BaseCalculator):
         self.minor_n_estimation_factor_start: SimpleNamespace | ipcc.CropNitrousEstimationDefaultFactor = SimpleNamespace(value=0)
         self.minor_n_estimation_factor_w: SimpleNamespace | ipcc.CropNitrousEstimationDefaultFactor = SimpleNamespace(value=0)
         self.minor_n_estimation_factor_wo: SimpleNamespace | ipcc.CropNitrousEstimationDefaultFactor = SimpleNamespace(value=0)
+        self.minor_biomass_start: SimpleNamespace = SimpleNamespace(value=0)
+        self.minor_biomass_w: SimpleNamespace = SimpleNamespace(value=0)
+        self.minor_biomass_wo: SimpleNamespace = SimpleNamespace(value=0)
 
         self.math_start_w = None
         self.math_start_wo = None
@@ -1084,7 +1083,8 @@ class AnnualCropCalculator(BaseCalculator):
 
     def get_defaults(self, calculate=False) -> SimpleNamespace:
         input: AnnualCropping = self.data
-        project: Project = input.activity.project
+        activity: Activity = getattr(input, "parent", input).activity
+        project: Project = activity.project
         module_start = module_w = module_wo = input
         luc: LandUseChange = input.land_use_change
 
@@ -1094,23 +1094,12 @@ class AnnualCropCalculator(BaseCalculator):
         if input.status.name == "READY" and calculate:
             self.calculate()
 
-            try:
-                self.biomass_start = SimpleNamespace(value=self.math_start_w.ag_residue_main_tier_2_default)
-            except AttributeError:
-                try:
-                    self.biomass_start = SimpleNamespace(value=self.math_start_wo.ag_residue_main_tier_2_default)
-                except AttributeError:
-                    self.biomass_start = SimpleNamespace(value=0)
-
-            try:
-                self.biomass_w = SimpleNamespace(value=self.math_w.ag_residue_main_tier_2_default)
-            except AttributeError:
-                self.biomass_w = SimpleNamespace(value=0)
-
-            try:
-                self.biomass_wo = SimpleNamespace(value=self.math_wo.ag_residue_main_tier_2_default)
-            except AttributeError:
-                self.biomass_wo = SimpleNamespace(value=0)
+            self.biomass_start = SimpleNamespace(value=getattr_or_default(self.math_start_w, "ag_residue_main_tier_2_default") or getattr_or_default(self.math_start_wo, "ag_residue_main_tier_2_default"))
+            self.biomass_w = SimpleNamespace(value=getattr_or_default(self.math_w, "ag_residue_main_tier_2_default") or getattr_or_default(self.math_wo, "ag_residue_main_tier_2_default"))
+            self.biomass_wo = SimpleNamespace(value=getattr_or_default(self.math_wo, "ag_residue_main_tier_2_default") or getattr_or_default(self.math_wo, "ag_residue_main_tier_2_default"))
+            self.minor_biomass_start = SimpleNamespace(value=getattr_or_default(self.math_start_w, "ag_residue_minor_tier_2_default") or getattr_or_default(self.math_start_wo, "ag_residue_minor_tier_2_default"))
+            self.minor_biomass_w = SimpleNamespace(value=getattr_or_default(self.math_w, "ag_residue_minor_tier_2_default") or getattr_or_default(self.math_wo, "ag_residue_minor_tier_2_default"))
+            self.minor_biomass_wo = SimpleNamespace(value=getattr_or_default(self.math_wo, "ag_residue_minor_tier_2_default") or getattr_or_default(self.math_wo, "ag_residue_minor_tier_2_default"))
 
         climate = project.climate
         moisture = project.moisture
