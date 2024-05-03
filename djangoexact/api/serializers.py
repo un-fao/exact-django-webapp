@@ -1164,11 +1164,6 @@ class IrrigationSystemWriteSerializer(SubmoduleBaseSerializer):
         if self.instance and self.instance.parent.irrigation_systems.count() + 1 > max_entries:
             raise serializers.ValidationError(f"Only {max_entries} irrigation systems are allowed")
 
-        parent = utils.getany([self.instance, dict(data)], "parent")
-
-        if parent.irrigation_phases.count() > 0:
-            raise serializers.ValidationError("Cannot add an irrigation system to an activity that already has irrigation phases")
-
         if not are_fields_filled(data, mandatory_fields):
             data["status"] = StatusType.objects.get(name="EMPTY")
         else:
@@ -1210,11 +1205,6 @@ class IrrigationPhaseWriteSerializer(SubmoduleBaseSerializer):
 
         if self.instance and self.instance.parent.irrigation_phases.count() + 1 > max_entries:
             raise serializers.ValidationError(f"Only {max_entries} irrigation phases are allowed")
-
-        parent = utils.getany([self.instance, dict(data)], "parent")
-
-        if parent.irrigation_systems.count() > 0:
-            raise serializers.ValidationError("Cannot add an irrigation phase to an activity that already has irrigation systems")
 
         if not are_fields_filled(data, mandatory_fields):
             data["status"] = StatusType.objects.get(name="EMPTY")
