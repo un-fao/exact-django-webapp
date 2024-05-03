@@ -1152,26 +1152,27 @@ class IrrigationSystemWriteSerializer(SubmoduleBaseSerializer):
         fields = "__all__"
         ref_name = "IrrigationSystem"
         mandatory_fields = [
-            "irrigation_type",
             "ha",
         ]
 
     def validate(self, data):
         super().validate(data)
-        mandatory_fields = []
-
-        irrigation_type_scenarios = get_filled_scenarios(data, ["irrigation_type"])
-
-        for scenario in irrigation_type_scenarios:
-            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
-
-        if not are_fields_filled(data, mandatory_fields):
-            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
+        mandatory_fields = ["irrigation_system_type", "ha_start", "ha_w", "ha_wo"]
 
         max_entries = ConfigParam.objects.get(name=labels.IRRIGATION_SYSTEMS_LIMIT).get_parsed_value()
 
         if self.instance and self.instance.parent.irrigation_systems.count() + 1 > max_entries:
             raise serializers.ValidationError(f"Only {max_entries} irrigation systems are allowed")
+
+        parent = utils.getany([self.instance, dict(data)], "parent")
+
+        if parent.irrigation_phases.count() > 0:
+            raise serializers.ValidationError("Cannot add an irrigation system to an activity that already has irrigation phases")
+
+        if not are_fields_filled(data, mandatory_fields):
+            data["status"] = StatusType.objects.get(name="EMPTY")
+        else:
+            data["status"] = StatusType.objects.get(name="READY")
 
         return data
 
@@ -1192,29 +1193,33 @@ class IrrigationPhaseWriteSerializer(SubmoduleBaseSerializer):
         fields = "__all__"
         ref_name = "IrrigationPhase"
         mandatory_fields = [
-            "irrigation_phase_type",
-            "fuel_type",
-            "ha",
             "gross_irrigation_water",
+            "ha",
         ]
 
     def validate(self, data):
         super().validate(data)
+        mandatory_fields = ["irrigation_system_type", "well_depth"]
 
-        mandatory_fields = []
+        scenarios = ["start", "w", "wo"]
 
-        irrigation_phase_type_scenarios = get_filled_scenarios(data, ["irrigation_phase_type"])
-
-        for scenario in irrigation_phase_type_scenarios:
+        for scenario in scenarios:
             mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
-
-        if not are_fields_filled(data, mandatory_fields):
-            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
 
         max_entries = ConfigParam.objects.get(name=labels.IRRIGATION_PHASES_LIMIT).get_parsed_value()
 
         if self.instance and self.instance.parent.irrigation_phases.count() + 1 > max_entries:
             raise serializers.ValidationError(f"Only {max_entries} irrigation phases are allowed")
+
+        parent = utils.getany([self.instance, dict(data)], "parent")
+
+        if parent.irrigation_systems.count() > 0:
+            raise serializers.ValidationError("Cannot add an irrigation phase to an activity that already has irrigation systems")
+
+        if not are_fields_filled(data, mandatory_fields):
+            data["status"] = StatusType.objects.get(name="EMPTY")
+        elif mandatory_fields:
+            data["status"] = StatusType.objects.get(name="READY")
 
         return data
 
