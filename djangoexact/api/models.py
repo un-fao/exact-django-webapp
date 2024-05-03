@@ -21,6 +21,7 @@ RICE_CULTIVATION_DAYS = 113
 class CustomUser(auth_models.AbstractUser):
     country = models.ForeignKey("api.Country", on_delete=models.CASCADE, null=True, blank=True, related_name="users")
     email = models.EmailField(unique=True)
+    firebase_uid = models.CharField(max_length=255, unique=True, validators=[alphanumeric], null=True, verbose_name="Firebase UID")
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
@@ -34,7 +35,7 @@ class CustomUser(auth_models.AbstractUser):
         )
 
     def __str__(self):
-        return f"{self.username}"
+        return f"({self.pk}) {self.email}"
 
 
 class Group(auth_models.Group):
@@ -441,7 +442,8 @@ class FuelType(models.Model):
 
     def __str__(self):
         macro = getattr(self.macro_fuel_type, "name", None)
-        return f"({self.pk}) {macro} - {self.name}"
+        use = getattr(self.fuel_use_type, "name", None)
+        return f"({self.pk}) {macro} - {use} - {self.name}"
 
 
 class SalinityType(models.Model):
@@ -843,26 +845,6 @@ class AnnualCropping(LandModule, SingleBiomassModule):
     crop_yield_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_crop_yield_thread")
 
     area = models.FloatField(null=True, blank=True)
-
-    main_soil_carbon_t2_start = models.FloatField(null=True, blank=True)
-    main_soil_carbon_t2_w = models.FloatField(null=True, blank=True)
-    main_soil_carbon_t2_wo = models.FloatField(null=True, blank=True)
-
-    main_tillage_factor_t2_start = models.FloatField(null=True, blank=True)
-    main_tillage_factor_t2_w = models.FloatField(null=True, blank=True)
-    main_tillage_factor_t2_wo = models.FloatField(null=True, blank=True)
-
-    main_organic_input_factor_t2_start = models.FloatField(null=True, blank=True)
-    main_organic_input_factor_t2_w = models.FloatField(null=True, blank=True)
-    main_organic_input_factor_t2_wo = models.FloatField(null=True, blank=True)
-
-    main_biomass_factor_t2_start = models.FloatField(null=True, blank=True)
-    main_biomass_factor_t2_w = models.FloatField(null=True, blank=True)
-    main_biomass_factor_t2_wo = models.FloatField(null=True, blank=True)
-
-    main_land_use_factor_t2_start = models.FloatField(null=True, blank=True)
-    main_land_use_factor_t2_w = models.FloatField(null=True, blank=True)
-    main_land_use_factor_t2_wo = models.FloatField(null=True, blank=True)
 
     minor_land_use_type_start = models.ForeignKey(LandUseType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_minor_land_use_type_start")
     minor_land_use_type_w = models.ForeignKey(LandUseType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_minor_land_use_type_w")
@@ -1487,6 +1469,10 @@ class Aquaculture(Module):
     electricity_used_t2_w = models.FloatField(null=True, blank=True)
     electricity_used_t2_wo = models.FloatField(null=True, blank=True)
 
+    electricity_ef_t2_start = models.FloatField(null=True, blank=True)
+    electricity_ef_t2_w = models.FloatField(null=True, blank=True)
+    electricity_ef_t2_wo = models.FloatField(null=True, blank=True)
+
 
 class MacroInputType(models.Model):
     name = models.CharField(max_length=255, unique=True)
@@ -1604,10 +1590,8 @@ class IrrigationSystem(Submodule):
     ef_t2_w = models.FloatField(null=True, blank=True)
     ef_t2_wo = models.FloatField(null=True, blank=True)
 
-    def save(self, *args, **kwargs):
-        if self.parent and self.parent.irrigation_phases:
-            raise exceptions.ValidationError("Cannot have both irrigation system and irrigation phases in the same irrigation module")
-        super().save(*args, **kwargs)
+    def __str__(self):
+        return f"({self.id}) {self.irrigation_system_type}"
 
 
 class IrrigationPhase(Submodule):
@@ -1643,10 +1627,8 @@ class IrrigationPhase(Submodule):
     pumping_efficiency_t2_w = models.FloatField(null=True, blank=True)
     pumping_efficiency_t2_wo = models.FloatField(null=True, blank=True)
 
-    def save(self, *args, **kwargs):
-        if self.parent and self.parent.irrigation_systems:
-            raise exceptions.ValidationError("Cannot have both irrigation system and irrigation phases in the same irrigation module")
-        super().save(*args, **kwargs)
+    def __str__(self):
+        return f"({self.id}) {self.irrigation_system_type}"
 
 
 class BuildingType(models.Model):
