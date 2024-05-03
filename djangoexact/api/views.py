@@ -1063,7 +1063,7 @@ def generic_module_viewset(model: Model):
                 return utils.ErrorResponse("Selected user does not have permission to view this module in the project", status=http_status.HTTP_403_FORBIDDEN)
 
             try:
-                defaults: SimpleNamespace = DefaultsFactory.get_defaults(module)
+                defaults: SimpleNamespace = DefaultsFactory.get_defaults(module, calculate=True)
                 return Response(defaults.__dict__)
             except Exception as e:
                 return utils.ErrorResponse(str(e))
