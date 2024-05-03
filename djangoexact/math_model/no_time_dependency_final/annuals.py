@@ -223,7 +223,7 @@ class AnnualCropland(BaseModule):
             # this means if "Retained"
             elif self.retained_main:
                 n2o_n_conversion = 44 / 28
-                main_season_nitrous = annual_n_residues_main * self.ef_nitrous_agr_residues_main * n2o_n_conversion
+                main_season_nitrous = annual_n_residues_main * self.emission_factor_nitrous_som * n2o_n_conversion
             else:
                 main_season_nitrous = 0
             # COMPUTATION FOR MINOR
@@ -236,7 +236,7 @@ class AnnualCropland(BaseModule):
             # this means if "Retained" BUT IN REALITY NOT REALLY, AT LEAST IT SEEMS TO WORK (WITHOUT A MINOR)
             elif self.retained_minor:
                 n2o_n_conversion = 44 / 28
-                minor_season_nitrous = annual_n_residues_minor * self.ef_nitrous_agr_residues_main * n2o_n_conversion
+                minor_season_nitrous = annual_n_residues_minor * self.emission_factor_nitrous_som * n2o_n_conversion
             else:
                 minor_season_nitrous = 0
 
