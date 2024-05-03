@@ -846,26 +846,6 @@ class AnnualCropping(LandModule, SingleBiomassModule):
 
     area = models.FloatField(null=True, blank=True)
 
-    main_soil_carbon_t2_start = models.FloatField(null=True, blank=True)
-    main_soil_carbon_t2_w = models.FloatField(null=True, blank=True)
-    main_soil_carbon_t2_wo = models.FloatField(null=True, blank=True)
-
-    main_tillage_factor_t2_start = models.FloatField(null=True, blank=True)
-    main_tillage_factor_t2_w = models.FloatField(null=True, blank=True)
-    main_tillage_factor_t2_wo = models.FloatField(null=True, blank=True)
-
-    main_organic_input_factor_t2_start = models.FloatField(null=True, blank=True)
-    main_organic_input_factor_t2_w = models.FloatField(null=True, blank=True)
-    main_organic_input_factor_t2_wo = models.FloatField(null=True, blank=True)
-
-    main_biomass_factor_t2_start = models.FloatField(null=True, blank=True)
-    main_biomass_factor_t2_w = models.FloatField(null=True, blank=True)
-    main_biomass_factor_t2_wo = models.FloatField(null=True, blank=True)
-
-    main_land_use_factor_t2_start = models.FloatField(null=True, blank=True)
-    main_land_use_factor_t2_w = models.FloatField(null=True, blank=True)
-    main_land_use_factor_t2_wo = models.FloatField(null=True, blank=True)
-
     minor_land_use_type_start = models.ForeignKey(LandUseType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_minor_land_use_type_start")
     minor_land_use_type_w = models.ForeignKey(LandUseType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_minor_land_use_type_w")
     minor_land_use_type_wo = models.ForeignKey(LandUseType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_minor_land_use_type_wo")

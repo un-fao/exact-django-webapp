@@ -1051,6 +1051,9 @@ class AnnualCropCalculator(BaseCalculator):
         self.fi_wo: SimpleNamespace | ipcc.FIData = SimpleNamespace(value=0)
         self.fmg_wo: SimpleNamespace | ipcc.FMGData = SimpleNamespace(value=0)
         self.flu_wo: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=0)
+        self.biomass_start: SimpleNamespace = SimpleNamespace(value=0)
+        self.biomass_w: SimpleNamespace = SimpleNamespace(value=0)
+        self.biomass_wo: SimpleNamespace = SimpleNamespace(value=0)
         self.crop_yield_start: SimpleNamespace | ipcc.CropYieldStats = SimpleNamespace(value=0)
         self.crop_yield_w: SimpleNamespace | ipcc.CropYieldStats = SimpleNamespace(value=0)
         self.crop_yield_wo: SimpleNamespace | ipcc.CropYieldStats = SimpleNamespace(value=0)
@@ -1074,7 +1077,12 @@ class AnnualCropCalculator(BaseCalculator):
         self.minor_n_estimation_factor_w: SimpleNamespace | ipcc.CropNitrousEstimationDefaultFactor = SimpleNamespace(value=0)
         self.minor_n_estimation_factor_wo: SimpleNamespace | ipcc.CropNitrousEstimationDefaultFactor = SimpleNamespace(value=0)
 
-    def get_defaults(self) -> SimpleNamespace:
+        self.math_start_w = None
+        self.math_start_wo = None
+        self.math_w = None
+        self.math_wo = None
+
+    def get_defaults(self, calculate=False) -> SimpleNamespace:
         input: AnnualCropping = self.data
         project: Project = input.activity.project
         module_start = module_w = module_wo = input
@@ -1082,6 +1090,27 @@ class AnnualCropCalculator(BaseCalculator):
 
         if luc:
             module_start, module_w, module_wo = get_luc_modules(luc)
+
+        if input.status.name == "READY" and calculate:
+            self.calculate()
+
+            try:
+                self.biomass_start = SimpleNamespace(value=self.math_start_w.ag_residue_main_tier_2_default)
+            except AttributeError:
+                try:
+                    self.biomass_start = SimpleNamespace(value=self.math_start_wo.ag_residue_main_tier_2_default)
+                except AttributeError:
+                    self.biomass_start = SimpleNamespace(value=0)
+
+            try:
+                self.biomass_w = SimpleNamespace(value=self.math_w.ag_residue_main_tier_2_default)
+            except AttributeError:
+                self.biomass_w = SimpleNamespace(value=0)
+
+            try:
+                self.biomass_wo = SimpleNamespace(value=self.math_wo.ag_residue_main_tier_2_default)
+            except AttributeError:
+                self.biomass_wo = SimpleNamespace(value=0)
 
         climate = project.climate
         moisture = project.moisture
@@ -1305,11 +1334,6 @@ class AnnualCropCalculator(BaseCalculator):
 
         self.get_defaults()
 
-        math_start_w = None
-        math_start_wo = None
-        math_w = None
-        math_wo = None
-
         if is_luc_remaining_same(input):
             log.debug("Is LUC remaining the same")
 
@@ -1341,7 +1365,7 @@ class AnnualCropCalculator(BaseCalculator):
                 project.gw_potential.ch4,
                 self.burning_emission_factor.ch4 if input.residue_management_type_start.name == "Burned" else None,
                 self.fires_start.value,
-                input.main_biomass_factor_t2_start,
+                input.biomass_t2_start,
                 self.n_estimation_factor_start.slope,
                 self.n_estimation_factor_start.intercept,
                 self.crop_yield_start,
@@ -1365,8 +1389,8 @@ class AnnualCropCalculator(BaseCalculator):
             ]
             log.debug("Inputs start w: %s", self.inputs_start_w)
 
-            math_start_w = AnnualCropland(*self.inputs_start_w)
-            math_start_w.calculate_emissions()
+            self.math_start_w = AnnualCropland(*self.inputs_start_w)
+            self.math_start_w.calculate_emissions()
 
         if is_with(input):
             log.debug("Is with")
@@ -1399,7 +1423,7 @@ class AnnualCropCalculator(BaseCalculator):
                 project.gw_potential.ch4,
                 self.burning_emission_factor.ch4 if input.residue_management_type_w.name == "Burned" else None,
                 self.fires_w.value,
-                input.main_biomass_factor_t2_start,
+                input.biomass_t2_w,
                 self.n_estimation_factor_w.slope,
                 self.n_estimation_factor_w.intercept,
                 self.crop_yield_w,
@@ -1423,8 +1447,8 @@ class AnnualCropCalculator(BaseCalculator):
             ]
             log.debug("Inputs w: %s", self.inputs_w)
 
-            math_w = AnnualCropland(*self.inputs_w)
-            math_w.calculate_emissions()
+            self.math_w = AnnualCropland(*self.inputs_w)
+            self.math_w.calculate_emissions()
 
         if is_business_as_usual(input):
             log.debug("Is business as usual")
@@ -1457,7 +1481,7 @@ class AnnualCropCalculator(BaseCalculator):
                 project.gw_potential.ch4,
                 self.burning_emission_factor.ch4 if input.residue_management_type_start.name == "Burned" else None,
                 self.fires_start.value,
-                input.main_biomass_factor_t2_start,
+                input.biomass_t2_start,
                 self.n_estimation_factor_start.slope,
                 self.n_estimation_factor_start.intercept,
                 self.crop_yield_start,
@@ -1481,8 +1505,8 @@ class AnnualCropCalculator(BaseCalculator):
             ]
             log.debug("Inputs start wo: %s", self.inputs_start_wo)
 
-            math_start_wo = AnnualCropland(*self.inputs_start_wo)
-            math_start_wo.calculate_emissions()
+            self.math_start_wo = AnnualCropland(*self.inputs_start_wo)
+            self.math_start_wo.calculate_emissions()
 
         if is_without(input):
             log.debug("Is without")
@@ -1515,7 +1539,7 @@ class AnnualCropCalculator(BaseCalculator):
                 project.gw_potential.ch4,
                 self.burning_emission_factor.ch4 if input.residue_management_type_wo.name == "Burned" else None,
                 self.fires_wo.value,
-                input.main_biomass_factor_t2_start,
+                input.biomass_t2_wo,
                 self.n_estimation_factor_wo.slope,
                 self.n_estimation_factor_wo.intercept,
                 self.crop_yield_wo,
@@ -1539,13 +1563,13 @@ class AnnualCropCalculator(BaseCalculator):
             ]
             log.debug("Inputs wo: %s", self.inputs_wo)
 
-            math_wo = AnnualCropland(*self.inputs_wo)
-            math_wo.calculate_emissions()
+            self.math_wo = AnnualCropland(*self.inputs_wo)
+            self.math_wo.calculate_emissions()
 
-        res_start_w = math_start_w.result if math_start_w else MathResult(project.implementation_years, project.capitalization_years)
-        res_start_wo = math_start_wo.result if math_start_wo else MathResult(project.implementation_years, project.capitalization_years)
-        res_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
-        res_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+        res_start_w = self.math_start_w.result if self.math_start_w else MathResult(project.implementation_years, project.capitalization_years)
+        res_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(project.implementation_years, project.capitalization_years)
+        res_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
+        res_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
         log.debug("start_w breakdown")
         res_start_w.breakdown(by=BreakdownTypes.ACTIVITY)
