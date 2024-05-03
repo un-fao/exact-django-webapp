@@ -25,6 +25,19 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=255, required=True)
+    password = serializers.CharField(max_length=255, required=True)
+
+
+class LoginResponseSerializer(serializers.Serializer):
+    firebase_uid = serializers.CharField(max_length=255, required=True)
+    access_token = serializers.CharField(max_length=255, required=True)
+    refresh_token = serializers.CharField(max_length=255, required=True)
+    expires_in = serializers.IntegerField(required=True)
+    kind = serializers.CharField(max_length=255, required=True)
+
+
 # User serializer
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
