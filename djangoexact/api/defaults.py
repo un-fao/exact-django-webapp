@@ -35,15 +35,15 @@ class DefaultsFactory:
     """
 
     @staticmethod
-    def get_defaults(input: api.Module) -> Defaults:
+    def get_defaults(input: api.Module, calculate=False) -> Defaults:
         """
         Creates a Defaults object for a given module.
         """
 
         if isinstance(input, api.Grassland):
-            return GrasslandDefaults(input).get_defaults()
+            return GrasslandDefaults(input).get_defaults(calculate=calculate)
         elif isinstance(input, api.AnnualCropping):
-            return AnnualCroppingDefaults(input).get_defaults()
+            return AnnualCroppingDefaults(input).get_defaults(calculate=calculate)
         else:
             try:
                 getattr(api, input.__class__.__name__)
@@ -81,11 +81,11 @@ class GrasslandDefaults(Defaults):
 class AnnualCroppingDefaults(Defaults):
     pass
 
-    def get_defaults(self) -> dict:
+    def get_defaults(self, calculate=False) -> dict:
         self.input: api.AnnualCropping
 
         defaults = calcs.AnnualCropCalculator(self.input)
-        defaults.get_defaults()
+        defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
             soc_t2_start_default=defaults.soc.value,
@@ -100,7 +100,10 @@ class AnnualCroppingDefaults(Defaults):
             flu_t2_start_default=defaults.flu_start.value,
             flu_t2_w_default=defaults.flu_w.value,
             flu_t2_wo_default=defaults.flu_wo.value,
-            burning_emission_factor_t2_start_default=defaults.fires_start.value,
-            burning_emission_factor_t2_w_default=defaults.fires_w.value,
-            burning_emission_factor_t2_wo_default=defaults.fires_wo.value,
+            biomass_t2_start_default=defaults.biomass_start.value,
+            biomass_t2_w_default=defaults.biomass_w.value,
+            biomass_t2_wo_default=defaults.biomass_wo.value,
+            # burning_emission_factor_t2_start_default=defaults.fires_start.value,
+            # burning_emission_factor_t2_w_default=defaults.fires_w.value,
+            # burning_emission_factor_t2_wo_default=defaults.fires_wo.value,
         )
