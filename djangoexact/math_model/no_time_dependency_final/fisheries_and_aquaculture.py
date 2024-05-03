@@ -163,8 +163,7 @@ class Fishery(BaseModule):
 
 
 class CoastalAquaculture:
-    def __init__(self, production_start, production_w, nitrous_ef_default, nitrous_ef_start_tier_2, nitrous_ef_end_tier_2, nitrous_constant, 
-                 time_impl, time_cap, rate_type):
+    def __init__(self, production_start, production_w, nitrous_ef_default, nitrous_ef_start_tier_2, nitrous_ef_end_tier_2, nitrous_constant, time_impl, time_cap, rate_type):
         self.time_impl = time_impl
         self.time_cap = time_cap
         self.production_start = production_start
@@ -184,7 +183,6 @@ class CoastalAquaculture:
 
         self.emissions_nitrous_total = 0
         self.total_emissions = 0
-
 
         self.result = Result(self.time_impl, self.time_cap)
 
@@ -208,7 +206,7 @@ class CoastalAquaculture:
         calculate_nitrous_emissions()
 
         try:
-            self.emissions_total_yearly = [sum(x) for x in zip(self.emissions_nitrous_yearly)]
+            self.emissions_total_yearly = [sum(x) for x in zip(self.emissions_nitrous_yearly, self.emissions_co2_yearly)]
             self.total_emissions = sum(self.emissions_total_yearly)
         except Exception as e:
             traceback.print_exc()
