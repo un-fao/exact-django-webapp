@@ -964,14 +964,14 @@ class CroplandMinorSeason(models.Model):
     residue_management_type_wo = models.ForeignKey(ResidueManagementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_residue_management_type_wo")
     residue_management_type_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_residue_management_type_thread")
 
-    yield_start = models.FloatField(null=True, blank=True)
-    yield_w = models.FloatField(null=True, blank=True)
-    yield_wo = models.FloatField(null=True, blank=True)
-    yield_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_yield_thread")
+    crop_yield_start = models.FloatField(null=True, blank=True)
+    crop_yield_w = models.FloatField(null=True, blank=True)
+    crop_yield_wo = models.FloatField(null=True, blank=True)
+    crop_yield_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_yield_thread")
 
-    biomass_factor_t2_start = models.FloatField(null=True, blank=True)
-    biomass_factor_t2_w = models.FloatField(null=True, blank=True)
-    biomass_factor_t2_wo = models.FloatField(null=True, blank=True)
+    biomass_t2_start = models.FloatField(null=True, blank=True)
+    biomass_t2_w = models.FloatField(null=True, blank=True)
+    biomass_t2_wo = models.FloatField(null=True, blank=True)
 
 
 class MinorSeasonPerennialCropping(CroplandMinorSeason, LandSubmodule):

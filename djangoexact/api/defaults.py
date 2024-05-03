@@ -103,7 +103,7 @@ class AnnualCroppingDefaults(Defaults):
             biomass_t2_start_default=defaults.biomass_start.value,
             biomass_t2_w_default=defaults.biomass_w.value,
             biomass_t2_wo_default=defaults.biomass_wo.value,
-            # burning_emission_factor_t2_start_default=defaults.fires_start.value,
-            # burning_emission_factor_t2_w_default=defaults.fires_w.value,
-            # burning_emission_factor_t2_wo_default=defaults.fires_wo.value,
+            minor_biomass_t2_start_default=defaults.minor_biomass_start.value,
+            minor_biomass_t2_w_default=defaults.minor_biomass_w.value,
+            minor_biomass_t2_wo_default=defaults.minor_biomass_wo.value,
         )
