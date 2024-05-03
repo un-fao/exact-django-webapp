@@ -1090,21 +1090,6 @@ class AnnualCropCalculator(BaseCalculator):
         cm = {"climate": climate, "moisture": moisture}
 
         try:
-            self.default_emission_factor_start = ipcc.DefaultEmissionFactor.objects.get(organic_input_type=input.organic_input_type_start, moisture=moisture)
-        except ipcc.BurningEmissionFactor.DoesNotExist:
-            raise Exception(f"BurningEmissionFactor for Savanna and grassland does not exist")
-
-        try:
-            self.default_emission_factor_w = ipcc.DefaultEmissionFactor.objects.get(organic_input_type=input.organic_input_type_w, moisture=moisture)
-        except ipcc.BurningEmissionFactor.DoesNotExist:
-            raise Exception(f"BurningEmissionFactor for Savanna and grassland does not exist")
-
-        try:
-            self.default_emission_factor_wo = ipcc.DefaultEmissionFactor.objects.get(organic_input_type=input.organic_input_type_wo, moisture=moisture)
-        except ipcc.BurningEmissionFactor.DoesNotExist:
-            raise Exception(f"BurningEmissionFactor for Savanna and grassland does not exist")
-
-        try:
             self.fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
         except ipcc.FIData.DoesNotExist:
             raise Exception(f"FIData for {module_start.organic_input_type_start.name} in {climate.name} climate, {moisture.name} moisture does not exist")
