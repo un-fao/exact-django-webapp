@@ -356,15 +356,34 @@ class CalculatorFactory:
     def __get_calculator(self, input):
         """
         Finds the calculator class for a given module.
+
+        Args:
+            input: The input module for which the calculator class needs to be found.
+
+        Returns:
+            CalculatorClass: The calculator class corresponding to the input module.
+
+        Raises:
+            Exception: If no calculator class is found for the input module.
         """
         CalculatorClass = getattr(sys.modules[__name__], f"{input.__class__.__name__}Calculator", None)
-        if not CalculatorClass:
+        if CalculatorClass is None:
             raise Exception(f"No calculator found for {input.__class__.__name__}")
         return CalculatorClass
 
     def calculate_result(self, input, aggregate_by=BreakdownTypes.TOTAL):
         """
         Calculates the results for a given module.
+
+        Args:
+            input: The input data for the calculation.
+            aggregate_by (optional): The breakdown type to aggregate the results by. Defaults to BreakdownTypes.TOTAL.
+
+        Returns:
+            The calculated result, broken down by the specified breakdown type.
+
+        Raises:
+            Exception: If an error occurs during the calculation.
         """
         try:
             calculator: BaseCalculator = self.__get_calculator(input)(input)
@@ -372,19 +391,26 @@ class CalculatorFactory:
             return Result(*result).breakdown(by=aggregate_by)
 
         except Exception as e:
-            traceback.print_exc()
             raise Exception(f"Error in {input.__class__.__name__}: {e}")
 
     def get_defaults(self, input):
         """
         Gets the default values for a given module.
+
+        Args:
+            input: The input module for which to retrieve the default values.
+
+        Returns:
+            A dictionary containing the default values for the given module.
+
+        Raises:
+            Exception: If an error occurs while retrieving the default values.
         """
         try:
             calculator: BaseCalculator = self.__get_calculator(input)(input)
             return calculator.defaults()
 
         except Exception as e:
-            traceback.print_exc()
             raise Exception(f"Error in {input.__class__.__name__}: {e}")
 
 
@@ -421,13 +447,6 @@ class BaseCalculator(ABC):
 
             if any(module.status != StatusType.objects.get(name="READY") for module in modules):
                 raise Exception("At least one module is not ready to perform the calculation")
-
-    # @abstractmethod
-    # def defaults(self) -> DefaultData:
-    #     """
-    #     Get the default values for a given module.
-    #     """
-    #     pass
 
     @abstractmethod
     def get_defaults(self, input: Module) -> dict:
@@ -2521,7 +2540,7 @@ class GrasslandCalculator(BaseCalculator):
         self.soc_w = SimpleNamespace(value=0)
         self.soc_wo = SimpleNamespace(value=0)
 
-    def get_defaults(self):
+    def get_defaults(self, calculate=False):
         module: Grassland = self.data
         activity: Activity = module.activity
         project: Project = activity.project
