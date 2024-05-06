@@ -1006,18 +1006,6 @@ class Rice(models.Model):
     crop_yield_w = models.FloatField(null=True, blank=True)
     crop_yield_wo = models.FloatField(null=True, blank=True)
 
-    main_biomass_factor_t2_start = models.FloatField(null=True, blank=True)
-    main_biomass_factor_t2_w = models.FloatField(null=True, blank=True)
-    main_biomass_factor_t2_wo = models.FloatField(null=True, blank=True)
-
-    soc_t2_start = models.FloatField(null=True, blank=True)
-    soc_t2_w = models.FloatField(null=True, blank=True)
-    soc_t2_wo = models.FloatField(null=True, blank=True)
-
-    land_use_factor_t2_start = models.FloatField(null=True, blank=True)
-    land_use_factor_t2_w = models.FloatField(null=True, blank=True)
-    land_use_factor_t2_wo = models.FloatField(null=True, blank=True)
-
     efc_t2_start = models.FloatField(null=True, blank=True)
     efc_t2_w = models.FloatField(null=True, blank=True)
     efc_t2_wo = models.FloatField(null=True, blank=True)

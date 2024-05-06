@@ -269,3 +269,30 @@ def getattr_or_default(obj, key, default=0):
     """
     _attr = getattr(obj, key, 0)
     return _attr if _attr else default
+
+
+def get_or_raise(model, filter_criteria, error_message, method="get"):
+    """
+    Retrieves a single instance of the given model that matches the filter criteria,
+    or raises an exception with the specified error message if no instance is found.
+
+    Args:
+        model (django.db.models.Model): The model class to query.
+        filter_criteria (dict): The filter criteria to apply when querying the model.
+        error_message (str): The error message to raise if no instance is found.
+        method (str, optional): The method to use for querying the model. Defaults to "get".
+
+    Returns:
+        django.db.models.Model: The retrieved instance.
+
+    Raises:
+        Exception: If no instance is found and the input status name is "READY".
+    """
+    try:
+        attr = getattr(model.objects, method)
+        if not callable(attr):
+            raise AttributeError(f"Method '{method}' is not callable on {model.__name__} objects.")
+        return attr(**filter_criteria)
+    except model.DoesNotExist:
+        if input.status.name == "READY":
+            raise Exception(error_message)
