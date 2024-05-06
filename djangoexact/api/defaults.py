@@ -22,7 +22,7 @@ class Defaults:
         if luc:
             self.module_start, self.module_w, self.module_wo = calcs.get_luc_modules(luc)
 
-    def get_defaults(self) -> dict:
+    def get_defaults(self, calculate=False) -> dict:
         """
         Gets the default tier2 values for a given module.
         """
@@ -45,6 +45,10 @@ class DefaultsFactory:
                 return GrasslandDefaults(input).get_defaults(calculate=calculate)
             case api.AnnualCropping:
                 return AnnualCroppingDefaults(input).get_defaults(calculate=calculate)
+            case api.PerennialCropping:
+                return PerennialCroppingDefaults(input).get_defaults(calculate=calculate)
+            case api.FloodedRice:
+                return FloodedRiceDefaults(input).get_defaults(calculate=calculate)
             case _:
                 raise NotImplementedError(f"Defaults for {input.__class__.__name__} have not been implemented.")
 
@@ -101,4 +105,84 @@ class AnnualCroppingDefaults(Defaults):
             minor_biomass_t2_start_default=defaults.minor_biomass_start.value,
             minor_biomass_t2_w_default=defaults.minor_biomass_w.value,
             minor_biomass_t2_wo_default=defaults.minor_biomass_wo.value,
+        )
+
+
+class PerennialCroppingDefaults(Defaults):
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.PerennialCropping
+
+        defaults = calcs.PerennialCropCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace(
+            agb_t2_start_default=defaults.ag_default_start.value,
+            agb_t2_w_default=defaults.ag_default_w.value,
+            agb_t2_wo_default=defaults.ag_default_wo.value,
+            agb_max_t2_start_default=defaults.agb_max_c_start.value,
+            agb_max_t2_w_default=defaults.agb_max_c_w.value,
+            agb_max_t2_wo_default=defaults.agb_max_c_wo.value,
+            bgb_t2_start_default=defaults.bg_default_start.value,
+            bgb_t2_w_default=defaults.bg_default_w.value,
+            bgb_t2_wo_default=defaults.bg_default_wo.value,
+            flu_t2_start_default=defaults.flu_start.value,
+            flu_t2_w_default=defaults.flu_w.value,
+            flu_t2_wo_default=defaults.flu_wo.value,
+            fi_t2_start_default=defaults.fi_start.value,
+            fi_t2_w_default=defaults.fi_w.value,
+            fi_t2_wo_default=defaults.fi_wo.value,
+            fmg_t2_start_default=defaults.fmg_start.value,
+            fmg_t2_w_default=defaults.fmg_w.value,
+            fmg_t2_wo_default=defaults.fmg_wo.value,
+            residue_burned_t2_start_default=defaults.residue_burned_t2_start.value,
+            residue_burned_t2_w_default=defaults.residue_burned_t2_w.value,
+            residue_burned_t2_wo_default=defaults.residue_burned_t2_wo.value,
+            fire_periodicity_t2_start_default=defaults.default_fire_periodicity.value,
+            fire_periodicity_t2_w_default=defaults.default_fire_periodicity.value,
+            fire_periodicity_t2_wo_default=defaults.default_fire_periodicity.value,
+        )
+
+
+class FloodedRiceDefaults(Defaults):
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.FloodedRice
+
+        defaults = calcs.FloodedRiceSeasonCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace(
+            # TODO: Ask Lorenzo about mapping of commented out fields
+            soc_t2_start_default=defaults.soc.value,
+            soc_t2_w_default=defaults.soc.value,
+            soc_t2_wo_default=defaults.soc.value,
+            flu_t2_start_default=defaults.flu_start.value,
+            flu_t2_w_default=defaults.flu_w.value,
+            flu_t2_wo_default=defaults.flu_wo.value,
+            # biomass_t2_start_default=defaults.biomass_start.value,
+            # biomass_t2_w_default=defaults.biomass_w.value,
+            # biomass_t2_wo_default=defaults.biomass_wo.value,
+            fmg_t2_start_default=defaults.fmg_start.value,
+            fmg_t2_w_default=defaults.fmg_w.value,
+            fmg_t2_wo_default=defaults.fmg_wo.value,
+            fi_t2_start_default=defaults.fi_start.value,
+            fi_t2_w_default=defaults.fi_w.value,
+            fi_t2_wo_default=defaults.fi_wo.value,
+            # efc_t2_start_default=defaults.efc_start.value,
+            # efc_t2_w_default=defaults.efc_w.value,
+            # efc_t2_wo_default=defaults.efc_wo.value,
+            sfw_t2_start_default=defaults.sfw_start.value,
+            sfw_t2_w_default=defaults.sfw_w.value,
+            sfw_t2_wo_default=defaults.sfw_wo.value,
+            sfp_t2_start_default=defaults.sfp_start.value,
+            sfp_t2_w_default=defaults.sfp_w.value,
+            sfp_t2_wo_default=defaults.sfp_wo.value,
+            sfo_t2_start_default=defaults.sfo_start.value,
+            sfo_t2_w_default=defaults.sfo_w.value,
+            sfo_t2_wo_default=defaults.sfo_wo.value,
+            # efi_t2_start_default=defaults.efi_start.value,
+            # efi_t2_w_default=defaults.efi_w.value,
+            # efi_t2_wo_default=defaults.efi_wo.value,
+            # rice_straw_t2_defaults=defaults.rice_straw_t2_start.value,
+            # rice_straw_t2_w_defaults=defaults.rice_straw_t2_w.value,
+            # rice_straw_t2_wo_defaults=defaults.rice_straw_t2_wo.value,
         )
