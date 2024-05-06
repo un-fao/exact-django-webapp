@@ -274,7 +274,8 @@ class FloodedRiceFactory(DjangoModelFactory):
     class Meta:
         model = FloodedRice
 
-    area = factory.fuzzy.FuzzyInteger(1, 150)
+    area = factory.fuzzy.FuzzyInteger(150, 150)
+    status = READY
 
     water_management_type_before_cultivation_start = factory.fuzzy.FuzzyChoice(water_mgmt_types_before_cultivation)
     water_management_type_before_cultivation_w = factory.fuzzy.FuzzyChoice(water_mgmt_types_before_cultivation)

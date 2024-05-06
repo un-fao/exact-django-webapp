@@ -1,8 +1,10 @@
+import json
 import math
 import random
 from time import sleep
 
 import api.calculators as calc
+import api.defaults as defaults
 import openpyxl as xl
 import pandas as pd
 import xlwings as xw
@@ -12,6 +14,7 @@ from api.models import (
     Country,
     FloodedRice,
     Group,
+    ModuleType,
     Moisture,
     Project,
     SoilType,
@@ -40,14 +43,6 @@ moisture = random.choice(climate.moistures.all())
 soil_type = random.choice(soil_types)
 gw_potential = GlobalWarmingPotential.objects.get(name="100 yr AR5 w/out CC feedback")
 
-print(f"Country: {country}")
-print(f"Region: {region}")
-print(f"IPCC Region: {country.ipcc_region}")
-print(f"Climate: {climate}")
-print(f"Moisture: {moisture}")
-print(f"Soil Type: {soil_type}")
-print(f"GW Potential: {gw_potential}")
-
 u = User.objects.get(username="admin")
 group: Group = Group.objects.get(name="Admin")
 
@@ -62,6 +57,16 @@ p: Project = ProjectFactory.create(
 
 UserProjectGroup.objects.create(user=u, project=p, group=group)
 
+print(f"Country: {country}")
+print(f"Region: {region}")
+print(f"IPCC Region: {country.ipcc_region}")
+print(f"Climate: {climate}")
+print(f"Moisture: {moisture}")
+print(f"Soil Type: {soil_type}")
+print(f"GW Potential: {gw_potential}")
+print(f"Implementation Years: {p.implementation_years}")
+print(f"Capitalization Years: {p.capitalization_years}")
+
 # ds = workbook.sheets["1.Description"]
 # ds["Q8"].value = p.country.region.name
 # ds["Q9"].value = p.country.name
@@ -73,8 +78,10 @@ UserProjectGroup.objects.create(user=u, project=p, group=group)
 # sleep(1)
 
 a: Activity = ActivityFactory.create(project=p)
+a.module_types.add(ModuleType.objects.get(name="Flooded Rice"))
+a.save()
 
-rices: FloodedRice = FloodedRiceFactory.create_batch(BATCH_SIZE, activity=a)
+rices: list[FloodedRice] = FloodedRiceFactory.create_batch(BATCH_SIZE, activity=a)
 
 total_livestocks = rices.__len__()
 passed_livestocks = 0
@@ -84,7 +91,24 @@ for i, rice in enumerate(rices):
     print(f"\n\nTesting module {i+1}...")
     print("-----------------------------------")
 
-    print(f"livestock: {rice}")
+    print(f"Rice: {rice}")
+    print(f"Area: {rice.area}")
+
+    print(f"H2O Mgmt Before START: {rice.water_management_type_after_cultivation_start}")
+    print(f"H2O Mgmt Before W/O: {rice.water_management_type_after_cultivation_wo}")
+    print(f"H2O Mgmt Before W: {rice.water_management_type_after_cultivation_w}")
+
+    print(f"H2O Mgmt After START: {rice.water_management_type_after_cultivation_start}")
+    print(f"H2O Mgmt After W/O: {rice.water_management_type_after_cultivation_wo}")
+    print(f"H2O Mgmt After W: {rice.water_management_type_after_cultivation_w}")
+
+    print(f"Organic Amendment START: {rice.organic_amendment_type_start}")
+    print(f"Organic Amendment W/O: {rice.organic_amendment_type_wo}")
+    print(f"Organic Amendment W: {rice.organic_amendment_type_w}")
+
+    print(f"Crop Yield START: {rice.crop_yield_start}")
+    print(f"Crop Yield W/O: {rice.crop_yield_wo}")
+    print(f"Crop Yield W: {rice.crop_yield_w}")
 
     # print(f"livestock_category_type_start: {rice.livestock_category_type.name}")
     # print(f"livestock_category_type_wo: {rice.livestock_category_type.name}")
@@ -120,6 +144,10 @@ for i, rice in enumerate(rices):
     # print(f"Sheet Results Balance (AG76): {sheet['AG76'].value}")
 
     results = calc.CalculatorFactory().calculate_result(rice)
+    _defaults = defaults.DefaultsFactory.get_defaults(rice)
+
+    print("Defaults: ")
+    print(json.dumps(_defaults.__dict__, indent=4))
 
     # sheet_results_w = float(sheet["AE76"].value)
     # sheet_results_wo = float(sheet["AD76"].value)
@@ -127,6 +155,7 @@ for i, rice in enumerate(rices):
     math_results_w = results[0]
     math_results_wo = results[1]
 
+    print("Math Results: ")
     print(results)
 
     # Check if sheet results and math results are equal within a margin of error of 5%
