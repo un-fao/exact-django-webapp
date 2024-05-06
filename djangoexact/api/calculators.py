@@ -1839,6 +1839,9 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
         self.math_wo = None
 
         self.soc: SimpleNamespace | ipcc.SoilOrganicCarbon = SimpleNamespace(value=0)
+        self.soc_start: SimpleNamespace | ipcc.SoilOrganicCarbon = SimpleNamespace(value=0)
+        self.soc_w: SimpleNamespace | ipcc.SoilOrganicCarbon = SimpleNamespace(value=0)
+        self.soc_wo: SimpleNamespace | ipcc.SoilOrganicCarbon = SimpleNamespace(value=0)
         self.rice_ef: SimpleNamespace | ipcc.RiceDefaultEmissionFactor = SimpleNamespace(value=0)
         self.yield_ref: SimpleNamespace | ipcc.RiceYield = SimpleNamespace(value=0)
         self.flu_start: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=0)
@@ -1870,56 +1873,7 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
         luc: LandUseChange = module.land_use_change
         area = luc.area if luc else module.area
 
-        climate: Climate = activity.climate_t2 or project.climate
-        moisture: Moisture = activity.moisture_t2 or project.moisture
-        region: Region = project.country.region
-        soil_type: SoilType = project.soil_type
-
-        climate_flt = {"climate": climate}
-        moisture_flt = {"moisture": moisture}
-        soil_flt = {"soil_type": soil_type}
-        region_flt = {"continent": region}
-        h2o_mgmt_before_start_flt = {"water_management_type_before_cultivation": module.water_management_type_before_cultivation_start}
-        h2o_mgmt_before_w_flt = {"water_management_type_before_cultivation": module.water_management_type_before_cultivation_w}
-        h2o_mgmt_before_wo_flt = {"water_management_type_before_cultivation": module.water_management_type_before_cultivation_wo}
-        h2o_mgmt_after_start_flt = {"water_management_type_after_cultivation": module.water_management_type_after_cultivation_start}
-        h2o_mgmt_after_w_flt = {"water_management_type_after_cultivation": module.water_management_type_after_cultivation_w}
-        h2o_mgmt_after_wo_flt = {"water_management_type_after_cultivation": module.water_management_type_after_cultivation_wo}
-        organic_amendment_start_flt = {"organic_amendment_type": module.organic_amendment_type_start}
-        organic_amendment_w_flt = {"organic_amendment_type": module.organic_amendment_type_w}
-        organic_amendment_wo_flt = {"organic_amendment_type": module.organic_amendment_type_wo}
-        lut_name_rice_flt = {"land_use_type__name": "Rice"}
-
-        self.soc = utils.get_or_raise(ipcc.SoilOrganicCarbon, climate_flt | moisture_flt | soil_flt, f"SoilOrganicCarbon for {climate.name}, {moisture.name} and {soil_type.name} does not exist")
-
-        grassland_soc = get_grassland_soc(luc)
-        soc_start = grassland_soc.value if grassland_soc else self.soc.value
-        soc_w = self.soc.value
-        soc_wo = self.soc.value
-
-        self.rice_ef = utils.get_or_raise(ipcc.RiceDefaultEmissionFactor, region_flt, f"RiceDefaultEmissionFactor for {region.name} does not exist")
-        self.yield_ref = utils.get_or_raise(ipcc.RiceYield, region_flt, f"RiceYield for {region.name} does not exist")
-        self.flu_start = get_flu_data(module, climate, moisture, utils.ScenarioTypes.START)
-        self.flu_w = get_flu_data(module, climate, moisture, utils.ScenarioTypes.WITH)
-        self.flu_wo = get_flu_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
-        self.fmg_start = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.START)
-        self.fmg_w = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.WITH)
-        self.fmg_wo = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
-        self.fi_start = get_fi_data(module, climate, moisture, utils.ScenarioTypes.START)
-        self.fi_w = get_fi_data(module, climate, moisture, utils.ScenarioTypes.WITH)
-        self.fi_wo = get_fi_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
-        self.sfw_start = utils.get_or_raise(ipcc.RiceSFW, h2o_mgmt_after_start_flt, f"RiceSFW for {module.water_management_type_after_cultivation_start} does not exist")
-        self.sfw_w = utils.get_or_raise(ipcc.RiceSFW, h2o_mgmt_after_w_flt, f"RiceSFW for {module.water_management_type_after_cultivation_w} does not exist")
-        self.sfw_wo = utils.get_or_raise(ipcc.RiceSFW, h2o_mgmt_after_wo_flt, f"RiceSFW for {module.water_management_type_after_cultivation_wo} does not exist")
-        self.sfp_start = utils.get_or_raise(ipcc.RiceSFP, h2o_mgmt_before_start_flt, f"RiceSFP for {module.water_management_type_before_cultivation_start} does not exist")
-        self.sfp_w = utils.get_or_raise(ipcc.RiceSFP, h2o_mgmt_before_w_flt, f"RiceSFP for {module.water_management_type_before_cultivation_start} does not exist")
-        self.sfp_wo = utils.get_or_raise(ipcc.RiceSFP, h2o_mgmt_before_wo_flt, f"RiceSFP for {module.water_management_type_before_cultivation_start} does not exist")
-        self.sfo_start = utils.get_or_raise(ipcc.RiceSFO, organic_amendment_start_flt, f"RiceSFO for {module.organic_amendment_type_start} does not exist")
-        self.sfo_w = utils.get_or_raise(ipcc.RiceSFO, organic_amendment_w_flt, f"RiceSFO for {module.organic_amendment_type_start} does not exist")
-        self.sfo_wo = utils.get_or_raise(ipcc.RiceSFO, organic_amendment_wo_flt, f"RiceSFO for {module.organic_amendment_type_start} does not exist")
-        self.n_estimation_factor = utils.get_or_raise(ipcc.CropNitrousEstimationDefaultFactor, lut_name_rice_flt, "Default nitrous estimation factor is not defined for rice")
-        self.burning_emission_factor = utils.get_or_raise(ipcc.BurningEmissionFactor, {"category__name": "Agricultural residues"}, "Burning emission factor is not defined for agricultural residues")
-        self.rice_cf = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_name_rice_flt, "Fires combustion factor is not defined for rice")
+        self.get_defaults()
 
         if is_luc_remaining_same(module):
             self.inputs_start_w = [
@@ -1948,8 +1902,8 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 project.gw_potential.ch4,
                 self.rice_ef.cultivation_period,
                 module.cultivation_period_start,
-                soc_start,
-                soc_w,
+                self.soc_start,
+                self.soc_w,
                 module.soc_t2_start,
                 module.soc_t2_w,
                 self.fmg_start.value,
@@ -1998,8 +1952,8 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 project.gw_potential.ch4,
                 self.rice_ef.cultivation_period,
                 module.cultivation_period_start,
-                soc_start,
-                soc_wo,
+                self.soc_start,
+                self.soc_wo,
                 module.soc_t2_start,
                 module.soc_t2_wo,
                 self.fmg_start.value,
@@ -2048,8 +2002,8 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 project.gw_potential.ch4,
                 self.rice_ef.cultivation_period,
                 module.cultivation_period_w,
-                soc_start,
-                soc_w,
+                self.soc_start,
+                self.soc_w,
                 module.soc_t2_start,
                 module.soc_t2_w,
                 self.fmg_start.value,
@@ -2098,8 +2052,8 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 project.gw_potential.ch4,
                 self.rice_ef.cultivation_period,
                 module.cultivation_period_wo,
-                soc_start,
-                soc_wo,
+                self.soc_start,
+                self.soc_wo,
                 module.soc_t2_start,
                 module.soc_t2_wo,
                 self.fmg_start.value,
@@ -2126,12 +2080,80 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
         results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
         results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
+        log.debug("start_w breakdown")
+        results_start_w.breakdown(by=BreakdownTypes.ACTIVITY)
+
+        log.debug("start_wo breakdown")
+        results_start_wo.breakdown(by=BreakdownTypes.ACTIVITY)
+
+        log.debug("w breakdown")
+        results_w.breakdown(by=BreakdownTypes.ACTIVITY)
+
+        log.debug("wo breakdown")
+        results_wo.breakdown(by=BreakdownTypes.ACTIVITY)
+
         results_tuple = (results_w + results_start_w, results_wo + results_start_wo)
 
         return results_tuple
 
-    def defaults(self) -> DefaultData:
-        pass
+    def get_defaults(self, calculate=False) -> dict:
+        module: FloodedRice = self.data
+        activity: Activity = getattr(module, "parent", module).activity
+        project: Project = activity.project
+        luc: LandUseChange = module.land_use_change
+
+        climate: Climate = activity.climate_t2 or project.climate
+        moisture: Moisture = activity.moisture_t2 or project.moisture
+        region: Region = project.country.region
+        soil_type: SoilType = project.soil_type
+
+        climate_flt = {"climate": climate}
+        moisture_flt = {"moisture": moisture}
+        soil_flt = {"soil_type": soil_type}
+        region_flt = {"continent": region}
+        h2o_mgmt_before_start_flt = {"water_management_type_before_cultivation": module.water_management_type_before_cultivation_start}
+        h2o_mgmt_before_w_flt = {"water_management_type_before_cultivation": module.water_management_type_before_cultivation_w}
+        h2o_mgmt_before_wo_flt = {"water_management_type_before_cultivation": module.water_management_type_before_cultivation_wo}
+        h2o_mgmt_after_start_flt = {"water_management_type_after_cultivation": module.water_management_type_after_cultivation_start}
+        h2o_mgmt_after_w_flt = {"water_management_type_after_cultivation": module.water_management_type_after_cultivation_w}
+        h2o_mgmt_after_wo_flt = {"water_management_type_after_cultivation": module.water_management_type_after_cultivation_wo}
+        organic_amendment_start_flt = {"organic_amendment_type": module.organic_amendment_type_start}
+        organic_amendment_w_flt = {"organic_amendment_type": module.organic_amendment_type_w}
+        organic_amendment_wo_flt = {"organic_amendment_type": module.organic_amendment_type_wo}
+        lut_name_rice_flt = {"land_use_type__name": "Rice"}
+
+        self.soc = utils.get_or_raise(ipcc.SoilOrganicCarbon, climate_flt | moisture_flt | soil_flt, f"SoilOrganicCarbon for {climate.name}, {moisture.name} and {soil_type.name} does not exist")
+
+        self.grassland_soc = get_grassland_soc(luc)
+        self.soc_start = self.grassland_soc.value if self.grassland_soc else self.soc.value
+        if not self.soc_start:
+            raise ValueError(f"SoilOrganicCarbon for {climate.name}, {moisture.name} and {soil_type.name} does not exist")
+        self.soc_w = self.soc.value
+        self.soc_wo = self.soc.value
+
+        self.rice_ef = utils.get_or_raise(ipcc.RiceDefaultEmissionFactor, region_flt, f"RiceDefaultEmissionFactor for {region.name} does not exist")
+        self.yield_ref = utils.get_or_raise(ipcc.RiceYield, region_flt, f"RiceYield for {region.name} does not exist")
+        self.flu_start = get_flu_data(module, climate, moisture, utils.ScenarioTypes.START)
+        self.flu_w = get_flu_data(module, climate, moisture, utils.ScenarioTypes.WITH)
+        self.flu_wo = get_flu_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
+        self.fmg_start = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.START)
+        self.fmg_w = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.WITH)
+        self.fmg_wo = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
+        self.fi_start = get_fi_data(module, climate, moisture, utils.ScenarioTypes.START)
+        self.fi_w = get_fi_data(module, climate, moisture, utils.ScenarioTypes.WITH)
+        self.fi_wo = get_fi_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
+        self.sfw_start = utils.get_or_raise(ipcc.RiceSFW, h2o_mgmt_after_start_flt, f"RiceSFW for {module.water_management_type_after_cultivation_start} does not exist")
+        self.sfw_w = utils.get_or_raise(ipcc.RiceSFW, h2o_mgmt_after_w_flt, f"RiceSFW for {module.water_management_type_after_cultivation_w} does not exist")
+        self.sfw_wo = utils.get_or_raise(ipcc.RiceSFW, h2o_mgmt_after_wo_flt, f"RiceSFW for {module.water_management_type_after_cultivation_wo} does not exist")
+        self.sfp_start = utils.get_or_raise(ipcc.RiceSFP, h2o_mgmt_before_start_flt, f"RiceSFP for {module.water_management_type_before_cultivation_start} does not exist")
+        self.sfp_w = utils.get_or_raise(ipcc.RiceSFP, h2o_mgmt_before_w_flt, f"RiceSFP for {module.water_management_type_before_cultivation_start} does not exist")
+        self.sfp_wo = utils.get_or_raise(ipcc.RiceSFP, h2o_mgmt_before_wo_flt, f"RiceSFP for {module.water_management_type_before_cultivation_start} does not exist")
+        self.sfo_start = utils.get_or_raise(ipcc.RiceSFO, organic_amendment_start_flt, f"RiceSFO for {module.organic_amendment_type_start} does not exist")
+        self.sfo_w = utils.get_or_raise(ipcc.RiceSFO, organic_amendment_w_flt, f"RiceSFO for {module.organic_amendment_type_start} does not exist")
+        self.sfo_wo = utils.get_or_raise(ipcc.RiceSFO, organic_amendment_wo_flt, f"RiceSFO for {module.organic_amendment_type_start} does not exist")
+        self.n_estimation_factor = utils.get_or_raise(ipcc.CropNitrousEstimationDefaultFactor, lut_name_rice_flt, "Default nitrous estimation factor is not defined for rice")
+        self.burning_emission_factor = utils.get_or_raise(ipcc.BurningEmissionFactor, {"category__name": "Agricultural residues"}, "Burning emission factor is not defined for agricultural residues")
+        self.rice_cf = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_name_rice_flt, "Fires combustion factor is not defined for rice")
 
 
 class FloodedRiceCalculator(BaseCalculator):
@@ -2157,7 +2179,7 @@ class FloodedRiceCalculator(BaseCalculator):
         return (res_w, res_wo)
 
     def get_defaults(self, calculate=calculate) -> dict:
-        return super().get_defaults(calculate)
+        FloodedRiceSeasonCalculator(input).get_defaults(calculate=calculate)
 
 
 class GrasslandCalculator(BaseCalculator):
