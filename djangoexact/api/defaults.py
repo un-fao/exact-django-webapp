@@ -22,11 +22,11 @@ class Defaults:
         if luc:
             self.module_start, self.module_w, self.module_wo = calcs.get_luc_modules(luc)
 
-    def get_defaults() -> dict:
+    def get_defaults(self) -> dict:
         """
         Gets the default tier2 values for a given module.
         """
-        pass
+        raise NotImplementedError(f"get_defaults() method must be implemented for {self.__class__.__name__}.")
 
 
 class DefaultsFactory:
@@ -40,17 +40,13 @@ class DefaultsFactory:
         Creates a Defaults object for a given module.
         """
 
-        if isinstance(input, api.Grassland):
-            return GrasslandDefaults(input).get_defaults(calculate=calculate)
-        elif isinstance(input, api.AnnualCropping):
-            return AnnualCroppingDefaults(input).get_defaults(calculate=calculate)
-        else:
-            try:
-                getattr(api, input.__class__.__name__)
-            except AttributeError:
-                raise ValueError("Invalid module type.")
-
-            raise NotImplementedError(f"Defaults for {input.__class__.__name__} have not been implemented.")
+        match type(input):
+            case api.Grassland:
+                return GrasslandDefaults(input).get_defaults(calculate=calculate)
+            case api.AnnualCropping:
+                return AnnualCroppingDefaults(input).get_defaults(calculate=calculate)
+            case _:
+                raise NotImplementedError(f"Defaults for {input.__class__.__name__} have not been implemented.")
 
 
 class GrasslandDefaults(Defaults):
@@ -61,7 +57,6 @@ class GrasslandDefaults(Defaults):
         """
         self.input: api.Grassland  # type hinting
 
-        # TODO: This can be generalized even more by directly returning a simplenamespace from the calculator
         defaults = calcs.GrasslandCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
