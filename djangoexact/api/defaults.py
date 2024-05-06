@@ -55,7 +55,7 @@ class DefaultsFactory:
 
 class GrasslandDefaults(Defaults):
 
-    def get_defaults(self) -> dict:
+    def get_defaults(self, calculate=False) -> dict:
         """
         Gets the default tier2 values for a Grassland module.
         """
@@ -63,7 +63,7 @@ class GrasslandDefaults(Defaults):
 
         # TODO: This can be generalized even more by directly returning a simplenamespace from the calculator
         defaults = calcs.GrasslandCalculator(self.input)
-        defaults.get_defaults()
+        defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
             soc_t2_start_default=defaults.soc.value,
