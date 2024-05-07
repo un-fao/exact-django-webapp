@@ -65,7 +65,8 @@ class CoastalWetland(BaseModule):
 
         # HECTARES DRAINED
         # TODO: ask Lorenzo why this is done
-        self.hectares_drained_before_20, self.hectares_drained_after_20 = yearly_time_dependent_20_year_breakdown(0, self.area_drained_end, self.time_impl, self.time_cap, self.rate_type)
+        # NOTE: set to 0 and self.area_drained_end - self.area_excavated_end as if not we have double counting. No need for checks as area_drained_end is always greater than area_excavated_end
+        self.hectares_drained_before_20, self.hectares_drained_after_20 = yearly_time_dependent_20_year_breakdown(0, self.area_drained_end - self.area_excavated_end, self.time_impl, self.time_cap, self.rate_type)
         self.hectares_drained = yearly_time_dependent_parameter_breakdown(0, self.area_drained_end, self.time_impl, self.time_cap, self.rate_type)
 
         # TIER 2 DEFAULTS
