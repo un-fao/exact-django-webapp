@@ -21,6 +21,7 @@ organic_input_types = [organic for organic in OrganicInputType.objects.filter(is
 residue_management_types = [residue for residue in ResidueManagementType.objects.all()]
 grassland_management_types = GrasslandManagementType.objects.all()
 forests = [forest for forest in LandUseType.objects.filter(module_types__class_name="ForestManagement").exclude(is_active=False)]
+coastal_vegetations = [coastal for coastal in LandUseType.objects.filter(module_types__class_name="CoastalWetland").exclude(is_active=False)]
 
 livestock_category_types = [c for c in LivestockCategoryType.objects.filter(is_active=True).all()]
 livestock_production_types = [c for c in LivestockProductionType.objects.all()]
@@ -385,3 +386,26 @@ class FuelFactory(DjangoModelFactory):
 
     # ef_t2 = factory.fuzzy.FuzzyFloat(0, 100)
     # account_for_co2 = factory.fuzzy.FuzzyChoice([True, False])
+
+
+class CoastalWetlandFactory(DjangoModelFactory):
+    class Meta:
+        model = CoastalWetland
+
+    status = READY
+
+    ha_start = 150
+    ha_w = 150
+    ha_wo = 150
+
+    land_use_type = factory.fuzzy.FuzzyChoice(coastal_vegetations)
+
+    area_under_drainage_start = factory.fuzzy.FuzzyFloat(0, ha_start)
+    area_under_drainage_w = factory.fuzzy.FuzzyFloat(0, ha_w)
+    area_under_drainage_wo = factory.fuzzy.FuzzyFloat(0, ha_wo)
+
+    avg_salinity_t2 = SalinityType.objects.get(name="<18")
+
+
+class WaterbodyFactory(DjangoModelFactory):
+    pass

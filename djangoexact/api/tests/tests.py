@@ -19,11 +19,12 @@ from .factories import *
 BATCH_SIZE = 1
 TEST_SM_FISHERY = False
 TEST_LG_FISHERY = False
-TEST_ANNUAL_CROPPING = True
+TEST_ANNUAL_CROPPING = False
 TEST_PERENNIAL_CROPPING = False
 TEST_LIVESTOCK = False
 TEST_GRASSLAND = False
 TEST_INPUTS = False
+TEST_COASTAL_WETLAND = True
 INPUTS_BATCH_SIZE = 3
 
 TEST_ENERGY = False
@@ -587,3 +588,73 @@ if TEST_ENERGY:
 
     print(f"\nTotal Tested Energy: {total_energy}")
     print(f"Passed Tests: {passed_energy}\n\n")
+
+if TEST_COASTAL_WETLAND:
+    pass
+
+    coastals: list[CoastalWetland] = CoastalWetlandFactory.create_batch(BATCH_SIZE, activity=a)
+    a.module_types.add(ModuleType.objects.get(name="Coastal Wetland"))
+    a.save()
+
+    total_coastals = coastals.__len__()
+    passed_coastals = 0
+
+    print("Testing module...")
+
+    for i, coastal in enumerate(coastals):
+        print(f"\n\nTesting module {i+1}...")
+        print("-----------------------------------")
+
+        """
+        drained_area_excavated_start = factory.fuzzy.FuzzyFloat(0, area_under_drainage_start)
+        drained_area_excavated_w = factory.fuzzy.FuzzyFloat(0, area_under_drainage_w)
+        drained_area_excavated_wo = factory.fuzzy.FuzzyFloat(0, area_under_drainage_wo)
+
+        area_not_drained_or_rewetted_start = factory.fuzzy.FuzzyFloat(0, ha_start - area_under_drainage_start)
+        area_not_drained_or_rewetted_w = factory.fuzzy.FuzzyFloat(0, ha_w - area_under_drainage_w)
+        area_not_drained_or_rewetted_wo = factory.fuzzy.FuzzyFloat(0, ha_wo - area_under_drainage_wo)
+
+        area_w_restored_vegetation_start = factory.fuzzy.FuzzyFloat(0, area_not_drained_or_rewetted_start)
+        area_w_restored_vegetation_w = factory.fuzzy.FuzzyFloat(0, area_not_drained_or_rewetted_w)
+        area_w_restored_vegetation_wo = factory.fuzzy.FuzzyFloat(0, area_not_drained_or_rewetted_wo)
+        """
+
+        coastal.drained_area_excavated_start = 0
+        coastal.drained_area_excavated_w = random.uniform(0, coastal.area_under_drainage_w)
+        coastal.drained_area_excavated_wo = random.uniform(0, coastal.area_under_drainage_wo)
+
+        coastal.area_not_drained_or_rewetted_start = coastal.ha_start - coastal.area_under_drainage_start
+        coastal.area_not_drained_or_rewetted_w = coastal.ha_w - coastal.area_under_drainage_w
+        coastal.area_not_drained_or_rewetted_wo = coastal.ha_wo - coastal.area_under_drainage_wo
+
+        coastal.area_w_restored_vegetation_start = random.uniform(0, coastal.area_not_drained_or_rewetted_start)
+        coastal.area_w_restored_vegetation_w = random.uniform(0, coastal.area_not_drained_or_rewetted_w)
+        coastal.area_w_restored_vegetation_wo = random.uniform(0, coastal.area_not_drained_or_rewetted_wo)
+
+        coastal.save()
+
+        print(f"Vegetation Type: {coastal.land_use_type}")
+
+        print(f"Area: {coastal.ha_start:,f}")
+
+        print(f"Area under drainage START: {coastal.area_under_drainage_start:,f}")
+        print(f"Area under drainage WO: {coastal.area_under_drainage_wo:,f}")
+        print(f"Area under drainage W: {coastal.area_under_drainage_w:,f}")
+
+        print(f"Drained Area Excavated START: {coastal.drained_area_excavated_start:,f}")
+        print(f"Drained Area Excavated WO: {coastal.drained_area_excavated_wo:,f}")
+        print(f"Drained Area Excavated W: {coastal.drained_area_excavated_w:,f}")
+
+        print(f"Area not drained or rewetted START: {coastal.area_not_drained_or_rewetted_start:,f}")
+        print(f"Area not drained or rewetted WO: {coastal.area_not_drained_or_rewetted_wo:,f}")
+        print(f"Area not drained or rewetted W: {coastal.area_not_drained_or_rewetted_w:,f}")
+
+        print(f"Area w restored vegetation START: {coastal.area_w_restored_vegetation_start:,f}")
+        print(f"Area w restored vegetation WO: {coastal.area_w_restored_vegetation_wo:,f}")
+        print(f"Area w restored vegetation W: {coastal.area_w_restored_vegetation_w:,f}")
+
+        results = CalculatorFactory().calculate_result(coastal)
+
+        print(json.dumps({"math_results_w": f"{results[0]:,f}", "math_results_wo": f"{results[1]:,f}", "math_results_balance": f"{results[2]:,f}"}, indent=4))
+
+        passed_coastals += 1

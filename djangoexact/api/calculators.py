@@ -1553,7 +1553,7 @@ class PerennialCropCalculator(BaseCalculator):
         self.ag_default_start = utils.get_or_raise(ipcc.PerennialAGB, cmc | lut_start_flt, f"PerennialAGB for {module.land_use_type_start.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_default")
         self.agb_max_c_start = utils.get_or_raise(ipcc.PerennialMaxAGB, climate_flt | lut_start_flt, f"PerennialMaxAGB for {module.land_use_type_start.name} in {climate.name} climate does not exist", method="get_or_default")
         self.bg_default_start = utils.get_or_raise(ipcc.PerennialBGB, cmc | lut_start_flt, f"PerennialBGB for {module.land_use_type_start.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_default")
-        self.default_fire_periodicity = utils.get_or_raise(AnnualCroplandParameter, {"name": "Default fire periodicity"}, "Default fire periodicity does not exist")
+        self.default_fire_periodicity = AnnualCroplandParameter.objects.get(name="default_fire_periodicity")
 
         self.flu_start = get_flu_data(module, climate, moisture, utils.ScenarioTypes.START)
         self.fi_start = get_fi_data(module, climate, moisture, utils.ScenarioTypes.START)
@@ -1570,7 +1570,7 @@ class PerennialCropCalculator(BaseCalculator):
             self.fmg_w = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.WITH)
 
         if is_without(module):
-            self.default_emission_factor_wo = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_flt, f"DefaultEmissionFactor for {moisture.name} moisture and {module.organic_input_type_wo.name} does not exist", method="get_or_default")
+            self.default_emission_factor_wo = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_flt, f"DefaultEmissionFactor for {moisture.name} moisture and {module.organic_input_type_wo.name} does not exist")
             self.fires_combustion_factor_wo = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_wo_flt, f"FiresCombustionFactor for {module.land_use_type_wo.name} does not exist")
             self.ag_default_wo = utils.get_or_raise(ipcc.PerennialAGB, cmc | lut_wo_flt, f"PerennialAGB for {module.land_use_type_wo.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_default")
             self.agb_max_c_wo = utils.get_or_raise(ipcc.PerennialMaxAGB, climate_flt | lut_wo_flt, f"PerennialMaxAGB for {module.land_use_type_wo.name} in {climate.name} climate does not exist", method="get_or_default")
@@ -4768,6 +4768,9 @@ class CoastalWetlandCalculator(BaseCalculator):
     Calculates the emissions of the coastal wetland
     """
 
+    def get_defaults(self, calculate=False) -> dict:
+        return super().get_defaults(calculate)
+
     def calculate(self) -> Result:
         """
         Calculates the emissions of the coastal wetland
@@ -4781,37 +4784,37 @@ class CoastalWetlandCalculator(BaseCalculator):
             "moisture": project.moisture,
         }
 
-        soil_type_name = module.soil_type_t2.name if module.soil_type_t2 else "Mineral Soil"
+        soil_type_name = module.soil_type_t2.name if module.soil_type_t2 else "Mineral"
 
         try:
-            agb = ipcc.CoastalAGB.objects.get(**cm, vegetation_type=module.vegetation_type)
+            agb = ipcc.CoastalAGB.objects.get(**cm, land_use_type=module.land_use_type)
         except ipcc.CoastalAGB.DoesNotExist:
-            raise ValueError(f"Could not find AGB for {module.vegetation_type.name}, {project.climate.name}, {project.moisture.name}")
+            raise ValueError(f"Could not find AGB for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}")
 
         try:
-            bgb = ipcc.CoastalBGB.objects.get(**cm, vegetation_type=module.vegetation_type)
+            bgb = ipcc.CoastalBGB.objects.get(**cm, land_use_type=module.land_use_type)
         except ipcc.CoastalBGB.DoesNotExist:
-            raise ValueError(f"Could not find BGB for {module.vegetation_type.name}, {project.climate.name}, {project.moisture.name}")
+            raise ValueError(f"Could not find BGB for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}")
 
         try:
-            litter = ipcc.CoastalLitter.objects.get(**cm, vegetation_type=module.vegetation_type)
+            litter = ipcc.CoastalLitter.objects.get(**cm, land_use_type=module.land_use_type)
         except ipcc.CoastalLitter.DoesNotExist:
-            raise ValueError(f"Could not find Litter for {module.vegetation_type.name}, {project.climate.name}, {project.moisture.name}")
+            raise ValueError(f"Could not find Litter for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}")
 
         try:
-            dw = ipcc.CoastalDeadwood.objects.get(**cm, vegetation_type=module.vegetation_type)
+            dw = ipcc.CoastalDeadwood.objects.get(**cm, land_use_type=module.land_use_type)
         except ipcc.CoastalDeadwood.DoesNotExist:
-            raise ValueError(f"Could not find Deadwood for {module.vegetation_type.name}, {project.climate.name}, {project.moisture.name}")
+            raise ValueError(f"Could not find Deadwood for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}")
 
         try:
-            soil_1m = ipcc.DefaultSoilCarbonStock1Meter.objects.get(**cm, vegetation_type=module.vegetation_type, soil_type__name=soil_type_name)
+            soil_1m = ipcc.DefaultSoilCarbonStock1Meter.objects.get(**cm, land_use_type=module.land_use_type, soil_type__name=soil_type_name)
         except ipcc.DefaultSoilCarbonStock1Meter.DoesNotExist:
-            raise ValueError(f"Could not find Soil 1m for {module.vegetation_type.name}, {project.climate.name}, {project.moisture.name}, {soil_type_name}")
+            raise ValueError(f"Could not find Soil 1m for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}, {soil_type_name}")
 
         try:
-            ef_drainage = ipcc.DrainageEmissionFactor.objects.get(**cm, vegetation_type=module.vegetation_type)
+            ef_drainage = ipcc.DrainageEmissionFactor.objects.get(**cm, land_use_type=module.land_use_type)
         except ipcc.DrainageEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find EF Drainage for {module.vegetation_type.name}, {project.climate.name}, {project.moisture.name}")
+            raise ValueError(f"Could not find EF Drainage for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}")
 
         try:
             pc_c_lost_excavation = CoastalWetlandParameter.objects.get(name="PERCENTAGE_C_LOST_EXCAVATION")
@@ -4819,14 +4822,14 @@ class CoastalWetlandCalculator(BaseCalculator):
             raise ValueError(f"Could not find PC C Lost Excavation")
 
         try:
-            rewetting_c = ipcc.RewettingCarbonFactor.objects.get(**cm, vegetation_type=module.vegetation_type)
+            rewetting_c = ipcc.RewettingCarbonFactor.objects.get(**cm, land_use_type=module.land_use_type, soil_type__name=soil_type_name)
         except ipcc.RewettingCarbonFactor.DoesNotExist:
-            raise ValueError(f"Could not find Rewetting C for {module.vegetation_type.name}, {project.climate.name}, {project.moisture.name}")
+            raise ValueError(f"Could not find Rewetting C for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}")
 
         try:
-            rewetting_ch4 = ipcc.RewettingMethaneFactor.objects.get(**cm, vegetation_type=module.vegetation_type)
+            rewetting_ch4 = ipcc.RewettingMethaneFactor.objects.get(**cm, land_use_type=module.land_use_type)
         except ipcc.RewettingMethaneFactor.DoesNotExist:
-            raise ValueError(f"Could not find Rewetting CH4 for {module.vegetation_type.name}, {project.climate.name}, {project.moisture.name}")
+            raise ValueError(f"Could not find Rewetting CH4 for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}")
 
         math_w = None
         math_wo = None
@@ -4853,13 +4856,15 @@ class CoastalWetlandCalculator(BaseCalculator):
                 module.drainage_ef_t2_w,
                 module.drained_area_excavated_start,
                 module.drained_area_excavated_w,
+                module.area_w_restored_vegetation_start,
+                module.area_w_restored_vegetation_w,
                 pc_c_lost_excavation.value,
                 module.pc_c_lost_after_excavation_t2_w,
                 rewetting_c.value,
                 rewetting_ch4.value,
                 module.co2_rewetting_t2_start,
                 module.ch4_rewetting_t2_w,
-                module.avg_salinity_t2.value,
+                module.avg_salinity_t2.value if module.avg_salinity_t2 else None,
                 project.gw_potential.ch4,
             ]
 
@@ -4888,13 +4893,15 @@ class CoastalWetlandCalculator(BaseCalculator):
                 module.drainage_ef_t2_wo,
                 module.drained_area_excavated_start,
                 module.drained_area_excavated_wo,
+                module.area_w_restored_vegetation_start,
+                module.area_w_restored_vegetation_wo,
                 pc_c_lost_excavation.value,
                 module.pc_c_lost_after_excavation_t2_wo,
                 rewetting_c.value,
                 rewetting_ch4.value,
                 module.co2_rewetting_t2_wo,
                 module.ch4_rewetting_t2_wo,
-                module.avg_salinity_t2.value,
+                module.avg_salinity_t2.value if module.avg_salinity_t2 else None,
                 project.gw_potential.ch4,
             ]
 
@@ -4903,6 +4910,12 @@ class CoastalWetlandCalculator(BaseCalculator):
 
         results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
         results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+
+        log.debug("WITH breakdown")
+        results_w.breakdown(by=BreakdownTypes.ACTIVITY)
+
+        log.debug("WITHOUT breakdown")
+        results_wo.breakdown(by=BreakdownTypes.ACTIVITY)
 
         results_tuple = (results_w, results_wo)
 
