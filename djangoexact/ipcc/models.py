@@ -469,6 +469,9 @@ class CoastalDeadwood(Model):
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField(default=0)
 
+    def __str__(self) -> str:
+        return f"{self.value} for {self.climate.name} {self.moisture.name} {self.land_use_type.name}"
+
 
 class DefaultSoilCarbonStock1Meter(Model):
     """
@@ -493,8 +496,12 @@ class RewettingCarbonFactor(Model):
 
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
+    soil_type = ForeignKey("api.SoilType", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField(default=0)
+
+    def __str__(self):
+        return f"{self.value} for {self.climate.name} {self.moisture.name} {self.soil_type.name} {self.land_use_type.name}"
 
 
 class RewettingMethaneFactor(Model):
@@ -553,7 +560,7 @@ class DrainageEmissionFactor(Model):
     value = FloatField(default=0)
 
     def __str__(self):
-        return f"{self.value} for {self.climate.name} {self.moisture.name}"
+        return f"{self.value} for {self.land_use_type} {self.climate} {self.moisture}"
 
 
 class PerennialAGBManager(Manager):
