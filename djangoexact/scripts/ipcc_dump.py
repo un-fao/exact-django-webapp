@@ -304,32 +304,6 @@ with open("scripts/ipcc_data/CoastalLitter.csv", "r") as f:
                 value=value,
             )
 
-with open("scripts/ipcc_data/CoastalDeadwood.csv", "r") as f:
-    reader = csv.reader(f)
-    header = next(reader, None)
-    data = list(reader)
-
-    for i, head in enumerate(header):
-        head = sanitize(head).title()
-        vegetation_type = VegetationType.objects.get_or_create(name=head)[0]
-        for row in data:
-            if sanitize(row[0]) == "":
-                continue
-
-            climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
-            moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
-
-            value = row[i + 2]
-
-            print(f"{vegetation_type}, {climate}, {moisture}, {value}")
-
-            CoastalDeadwood.objects.get_or_create(
-                vegetation_type=vegetation_type,
-                climate=climate,
-                moisture=moisture,
-                value=value,
-            )
-
 with open("scripts/ipcc_data/RewettingEmissionFactors.csv", "r") as f:
     reader = csv.reader(f)
     header = next(reader, None)
@@ -432,34 +406,6 @@ with open("scripts/ipcc_data/Atwood.csv", "r") as f:
             sd=sd,
             score=score,
         )
-
-with open("scripts/ipcc_data/DrainageEmissionFactors.csv", "r") as f:
-    reader = csv.reader(f)
-    header = next(reader, None)
-    data = list(reader)
-
-    for i, head in enumerate(header):
-        head = sanitize(head).title()
-        vegetation_type = VegetationType.objects.get_or_create(name=head)[0]
-        for row in data:
-            if sanitize(row[0]) == "":
-                continue
-
-            climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
-            moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
-
-            value = row[i + 2]
-
-            print(f"{vegetation_type}, {climate}, {moisture}, {value}")
-
-            DrainageEmissionFactor.objects.get_or_create(
-                vegetation_type=vegetation_type,
-                climate=climate,
-                moisture=moisture,
-                value=value,
-            )
-
-
 
 with open("scripts/ipcc_data/CroplandFMG.csv", "r") as f:
     reader = csv.reader(f)
@@ -2683,34 +2629,7 @@ with open("scripts/ipcc_data/RewettingEmissionFactors.csv", "r") as f:
 
 # RewettingMethaneFactor
 
-RewettingMethaneFactor.objects.all().delete()
-with open("scripts/ipcc_data/RewettingMethaneFactors_salinity-lt18.csv", "r") as f:
-    reader = csv.reader(f)
-    header = next(reader, None)
-    data = list(reader)
 
-    for i, head in enumerate(header):
-        head = sanitize(head).title()
-        land_use_type = LandUseType.objects.get_or_create(name=head)[0]
-        for row in data:
-            if sanitize(row[0]) == "":
-                continue
-
-            climate = Climate.objects.get_or_create(name=sanitize(row[0]))[0]
-            moisture = Moisture.objects.get_or_create(name=sanitize(row[1]))[0]
-            salinity = SalinityType.objects.get_or_create(value="<18")[0]
-
-            value = parse_csv_number(row[i + 2])
-
-            print(f"{land_use_type}, {climate}, {moisture}, {value}")
-
-            RewettingMethaneFactor.objects.get_or_create(
-                land_use_type=land_use_type,
-                climate=climate,
-                moisture=moisture,
-                salinity=salinity,
-                value=value,
-            )
 
 # DefaultSoilCarbonStock
 
@@ -3903,4 +3822,158 @@ for i, row in enumerate(df_dict2):
 #                     value=5.67,
 #                 )
 #                 print(foo2)
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "DrainageEmissionFactors.csv"),
+    header=[0],
+    sep=",",
+)
+
+headers = df.columns.values.tolist()
+rows = df.to_dict("records")
+
+for i, row in enumerate(rows):
+    climate = Climate.objects.get(name=sanitize(row["climate"]))
+    moisture = Moisture.objects.get(name=sanitize(row["moisture"]))
+
+    for j, header in enumerate(headers, start=2):
+
+        if j == len(headers):
+            break
+
+        land_use_type = LandUseType.objects.get(name=sanitize(headers[j]))
+        value = parse_csv_number(row[headers[j]])
+        if not value:
+            continue
+
+        print(
+            land_use_type,
+            climate,
+            moisture,
+            value,
+        )
+
+        DrainageEmissionFactor.objects.get_or_create(
+            land_use_type=land_use_type,
+            climate=climate,
+            moisture=moisture,
+            value=value,
+        )
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "RewettingCarbonEmissionFactor.csv"),
+    header=[0],
+    sep=";",
+)
+
+headers = df.columns.values.tolist()
+rows = df.to_dict("records")
+
+for i, row in enumerate(rows):
+    climate = Climate.objects.get(name=sanitize(row["climate"]))
+    moisture = Moisture.objects.get(name=sanitize(row["moisture"]))
+    soil_type = SoilType.objects.get(name=sanitize(row["soil_type"]))
+
+    for j, header in enumerate(headers, start=4):
+
+        if j == len(headers):
+            break
+
+        land_use_type = LandUseType.objects.get(name=sanitize(headers[j]))
+        value = parse_csv_number(row[headers[j]])
+        if not value:
+            continue
+
+        print(
+            land_use_type,
+            climate,
+            moisture,
+            soil_type,
+            value,
+        )
+
+        RewettingCarbonFactor.objects.get_or_create(
+            land_use_type=land_use_type,
+            climate=climate,
+            moisture=moisture,
+            soil_type=soil_type,
+            value=value,
+            # unit="tC/ha/yr",
+        )
+
+CoastalDeadwood.objects.all().delete()
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "CoastalDeadwood.csv"),
+    header=[0],
+    sep=",",
+)
+
+headers = df.columns.values.tolist()
+rows = df.to_dict("records")
+
+for i, row in enumerate(rows):
+    climate = Climate.objects.get(name=sanitize(row["climate"]))
+    moisture = Moisture.objects.get(name=sanitize(row["moisture"]))
+
+    for j, header in enumerate(headers, start=2):
+
+        if j == len(headers):
+            break
+
+        lut = LandUseType.objects.get(name=sanitize(headers[j]))
+        value = parse_csv_number(row[headers[j]])
+
+        print(
+            lut,
+            climate,
+            moisture,
+            value,
+        )
+
+        CoastalDeadwood.objects.get_or_create(
+            land_use_type=lut,
+            climate=climate,
+            moisture=moisture,
+            value=value,
+        )
 """
+
+RewettingMethaneFactor.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "RewettingMethaneFactors_salinity-lt18.csv"),
+    header=[0],
+    sep=",",
+)
+
+headers = df.columns.values.tolist()
+rows = df.to_dict("records")
+
+for i, row in enumerate(rows):
+    climate = Climate.objects.get(name=sanitize(row["climate"]))
+    moisture = Moisture.objects.get(name=sanitize(row["moisture"]))
+    salinity = SalinityType.objects.get_or_create(value=sanitize(row["salinity_type"]))[0]
+
+    for j, header in enumerate(headers, start=3):
+
+        if j == len(headers):
+            break
+
+        land_use_type = LandUseType.objects.get(name=sanitize(headers[j]))
+        value = parse_csv_number(row[headers[j]])
+
+        print(
+            land_use_type,
+            climate,
+            moisture,
+            salinity,
+            value,
+        )
+
+        RewettingMethaneFactor.objects.get_or_create(
+            land_use_type=land_use_type,
+            climate=climate,
+            moisture=moisture,
+            salinity=salinity,
+            value=value,
+        )

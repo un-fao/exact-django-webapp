@@ -1,31 +1,31 @@
 ﻿climate;moisture;soil_type;unit;Tidal Marsh;Seagrass;Mangrove
-Boreal;Dry;Mineral Soil;tC/ha/yr;-0,91;-0,43;0
-Boreal;Moist;Mineral Soil;tC/ha/yr;-0,91;-0,43;0
-Cool Temperate;Dry;Mineral Soil;tC/ha/yr;-0,91;-0,43;0
-Cool Temperate;Moist;Mineral Soil;tC/ha/yr;-0,91;-0,43;0
-Warm Temperate;Dry;Mineral Soil;tC/ha/yr;-0,91;-0,43;-1,62
-Warm Temperate;Moist;Mineral Soil;tC/ha/yr;-0,91;-0,43;-1,62
-Tropical;Dry;Mineral Soil;tC/ha/yr;-0,91;-0,43;-1,62
-Tropical;Moist;Mineral Soil;tC/ha/yr;-0,91;-0,43;-1,62
-Tropical;Wet;Mineral Soil;tC/ha/yr;-0,91;-0,43;-1,62
-Tropical Montane;Dry;Mineral Soil;tC/ha/yr;-0,91;-0,43;-1,62
-Boreal;Dry;Organic Soil;tC/ha/yr;-0,91;-0,43;0
-Boreal;Moist;Organic Soil;tC/ha/yr;-0,91;-0,43;0
-Cool Temperate;Dry;Organic Soil;tC/ha/yr;-0,91;-0,43;0
-Cool Temperate;Moist;Organic Soil;tC/ha/yr;-0,91;-0,43;0
-Warm Temperate;Dry;Organic Soil;tC/ha/yr;-0,91;-0,43;-1,62
-Warm Temperate;Moist;Organic Soil;tC/ha/yr;-0,91;-0,43;-1,62
-Tropical;Dry;Organic Soil;tC/ha/yr;-0,91;-0,43;-1,62
-Tropical;Moist;Organic Soil;tC/ha/yr;-0,91;-0,43;-1,62
-Tropical;Wet;Organic Soil;tC/ha/yr;-0,91;-0,43;-1,62
-Tropical Montane;Dry;Organic Soil;tC/ha/yr;-0,91;-0,43;-1,62
-Boreal;Dry;Aggregated Soil;tC/ha/yr;-0,91;-0,43;0
-Boreal;Moist;Aggregated Soil;tC/ha/yr;-0,91;-0,43;0
-Cool Temperate;Dry;Aggregated Soil;tC/ha/yr;-0,91;-0,43;0
-Cool Temperate;Moist;Aggregated Soil;tC/ha/yr;-0,91;-0,43;0
-Warm Temperate;Dry;Aggregated Soil;tC/ha/yr;-0,91;-0,43;-1,62
-Warm Temperate;Moist;Aggregated Soil;tC/ha/yr;-0,91;-0,43;-1,62
-Tropical;Dry;Aggregated Soil;tC/ha/yr;-0,91;-0,43;-1,62
-Tropical;Moist;Aggregated Soil;tC/ha/yr;-0,91;-0,43;-1,62
-Tropical;Wet;Aggregated Soil;tC/ha/yr;-0,91;-0,43;-1,62
-Tropical Montane;Dry;Aggregated Soil;tC/ha/yr;-0,91;-0,43;-1,62
+Boreal;Dry;Mineral;tC/ha/yr;-0,91;-0,43;0
+Boreal;Moist;Mineral;tC/ha/yr;-0,91;-0,43;0
+Cool Temperate;Dry;Mineral;tC/ha/yr;-0,91;-0,43;0
+Cool Temperate;Moist;Mineral;tC/ha/yr;-0,91;-0,43;0
+Warm Temperate;Dry;Mineral;tC/ha/yr;-0,91;-0,43;-1,62
+Warm Temperate;Moist;Mineral;tC/ha/yr;-0,91;-0,43;-1,62
+Tropical;Dry;Mineral;tC/ha/yr;-0,91;-0,43;-1,62
+Tropical;Moist;Mineral;tC/ha/yr;-0,91;-0,43;-1,62
+Tropical;Wet;Mineral;tC/ha/yr;-0,91;-0,43;-1,62
+Tropical Montane;Dry;Mineral;tC/ha/yr;-0,91;-0,43;-1,62
+Boreal;Dry;Organic;tC/ha/yr;-0,91;-0,43;0
+Boreal;Moist;Organic;tC/ha/yr;-0,91;-0,43;0
+Cool Temperate;Dry;Organic;tC/ha/yr;-0,91;-0,43;0
+Cool Temperate;Moist;Organic;tC/ha/yr;-0,91;-0,43;0
+Warm Temperate;Dry;Organic;tC/ha/yr;-0,91;-0,43;-1,62
+Warm Temperate;Moist;Organic;tC/ha/yr;-0,91;-0,43;-1,62
+Tropical;Dry;Organic;tC/ha/yr;-0,91;-0,43;-1,62
+Tropical;Moist;Organic;tC/ha/yr;-0,91;-0,43;-1,62
+Tropical;Wet;Organic;tC/ha/yr;-0,91;-0,43;-1,62
+Tropical Montane;Dry;Organic;tC/ha/yr;-0,91;-0,43;-1,62
+Boreal;Dry;Aggregated;tC/ha/yr;-0,91;-0,43;0
+Boreal;Moist;Aggregated;tC/ha/yr;-0,91;-0,43;0
+Cool Temperate;Dry;Aggregated;tC/ha/yr;-0,91;-0,43;0
+Cool Temperate;Moist;Aggregated;tC/ha/yr;-0,91;-0,43;0
+Warm Temperate;Dry;Aggregated;tC/ha/yr;-0,91;-0,43;-1,62
+Warm Temperate;Moist;Aggregated;tC/ha/yr;-0,91;-0,43;-1,62
+Tropical;Dry;Aggregated;tC/ha/yr;-0,91;-0,43;-1,62
+Tropical;Moist;Aggregated;tC/ha/yr;-0,91;-0,43;-1,62
+Tropical;Wet;Aggregated;tC/ha/yr;-0,91;-0,43;-1,62
+Tropical Montane;Dry;Aggregated;tC/ha/yr;-0,91;-0,43;-1,62

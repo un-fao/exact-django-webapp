@@ -1,11 +1,21 @@
-Tidal marsh,Seagrass,Mangrove
-Boreal,Dry,193.7,0,0,<18
-Boreal,Moist,193.7,0,0,<18
-Cool Temperate,Dry,193.7,0,0,<18
-Cool Temperate,Moist,193.7,0,0,<18
-Warm Temperate,Dry,193.7,0,193.7,<18
-Warm Temperate,Moist,193.7,0,193.7,<18
-Tropical,Dry,193.7,0,193.7,<18
-Tropical,Moist,193.7,0,193.7,<18
-Tropical,Wet,193.7,0,193.7,<18
-Tropical,Montane,193.7,0,193.7,<18
+climate,moisture,salinity_type,Tidal Marsh,Seagrass,Mangrove
+Boreal,Dry,<18,193.7,0,0
+Boreal,Moist,<18,193.7,0,0
+Cool Temperate,Dry,<18,193.7,0,0
+Cool Temperate,Moist,<18,193.7,0,0
+Warm Temperate,Dry,<18,193.7,0,193.7
+Warm Temperate,Moist,<18,193.7,0,193.7
+Tropical,Dry,<18,193.7,0,193.7
+Tropical,Moist,<18,193.7,0,193.7
+Tropical,Wet,<18,193.7,0,193.7
+Tropical,Montane,<18,193.7,0,193.7
+Boreal,Dry,>18,0,0,0
+Boreal,Moist,>18,0,0,0
+Cool Temperate,Dry,>18,0,0,0
+Cool Temperate,Moist,>18,0,0,0
+Warm Temperate,Dry,>18,0,0,0
+Warm Temperate,Moist,>18,0,0,0
+Tropical,Dry,>18,0,0,0
+Tropical,Moist,>18,0,0,0
+Tropical,Wet,>18,0,0,0
+Tropical,Montane,>18,0,0,0
