@@ -986,10 +986,6 @@ class Rice(models.Model):
     class Meta:
         abstract = True
 
-    cultivation_period_start = models.IntegerField(default=RICE_CULTIVATION_DAYS)
-    cultivation_period_w = models.IntegerField(default=RICE_CULTIVATION_DAYS)
-    cultivation_period_wo = models.IntegerField(default=RICE_CULTIVATION_DAYS)
-
     water_management_type_before_cultivation_start = models.ForeignKey(WaterManagementTypeBeforeCultivation, on_delete=models.CASCADE, related_name="%(class)s_water_management_type_before_cultivation_start", null=True)
     water_management_type_before_cultivation_w = models.ForeignKey(WaterManagementTypeBeforeCultivation, on_delete=models.CASCADE, related_name="%(class)s_water_management_type_before_cultivation_w", null=True)
     water_management_type_before_cultivation_wo = models.ForeignKey(WaterManagementTypeBeforeCultivation, on_delete=models.CASCADE, related_name="%(class)s_water_management_type_before_cultivation_wo", null=True)
@@ -1033,6 +1029,10 @@ class Rice(models.Model):
     rice_straw_t2_start = models.FloatField(null=True, blank=True)
     rice_straw_t2_w = models.FloatField(null=True, blank=True)
     rice_straw_t2_wo = models.FloatField(null=True, blank=True)
+
+    cultivation_period_t2_start = models.IntegerField(null=True, blank=True)
+    cultivation_period_t2_w = models.IntegerField(null=True, blank=True)
+    cultivation_period_t2_wo = models.IntegerField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:
