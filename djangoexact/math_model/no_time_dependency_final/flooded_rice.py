@@ -169,7 +169,7 @@ class FloodedRice(BaseModule):
                 SFp = self.SFp_ref if not self.SFp_tier_2 else self.SFp_tier_2
                 yield_value = self.yield_ref if not self.yield_tier_2 else self.yield_tier_2
                 straw_tonnes_ref = yield_value * self.rice_slope + self.rice_intercept if not self.straw_tonnes_tier_2 else self.straw_tonnes_tier_2
-                SFo = 1 + straw_tonnes_ref * self.cfoa * 0.59 if not self.SFo_tier_2 else self.SFo_tier_2
+                SFo = (1 + straw_tonnes_ref * self.cfoa) ** 0.59 if not self.SFo_tier_2 else self.SFo_tier_2
 
                 if self.area_start == 0 and self.area_end == 0:
                     adjusted_daily_ef_methane_ref = 0
