@@ -105,7 +105,7 @@ class CoastalWetland(BaseModule):
         self.hectares_drained_before_20, self.hectares_drained_after_20 = yearly_time_dependent_20_year_breakdown(0, self.area_drained_end - self.area_excavated_end, self.time_impl, self.time_cap, self.rate_type)
         self.hectares_drained = yearly_time_dependent_parameter_breakdown(0, self.area_drained_end, self.time_impl, self.time_cap, self.rate_type)
 
-        self.hectares_revegetated_before_20, self.hectares_revegetated_after_20 = yearly_time_dependent_20_year_breakdown(0, self.area_revegated_end - self.area_revegated_start, self.time_impl, self.time_cap, self.rate_type)
+        self.hectares_revegetated_before_20, self.hectares_revegetated_after_20 = yearly_time_dependent_20_year_breakdown(0, self.area_revegated_end, self.time_impl, self.time_cap, self.rate_type)
         self.hectares_revegated = yearly_time_dependent_parameter_breakdown(0, self.area_revegated_end, self.time_impl, self.time_cap, self.rate_type)
         # TIER 2 DEFAULTS
         self.agb_tier_2_default = self.agb_default * 0.451
