@@ -163,7 +163,7 @@ class CoastalWetland(BaseModule):
 
                     stock_c_biomass_end = (agb + bgb + litter + deadwood) * area_drained_end
 
-                    self.emissions_biomass_total_drainage = -44/12 * (stock_c_biomass_start - stock_c_biomass_end) * (44 / 12)
+                    self.emissions_biomass_total_drainage = (stock_c_biomass_start - stock_c_biomass_end) * (44 / 12)
 
                     # soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_soil_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
                     # self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
@@ -259,7 +259,7 @@ class CoastalWetland(BaseModule):
                     litter = self.litter_default if not self.litter_tier_2 else self.litter_tier_2
                     deadwood = self.deadwood_default if not self.deadwood_tier_2 else self.deadwood_tier_2
 
-                    biomass_emissions_total = (agb + bgb + litter + deadwood) / (20) * sum(self.hectares_revegetated_before_20)
+                    biomass_emissions_total = -44/12 * (agb + bgb + litter + deadwood) / (20) * sum(self.hectares_revegetated_before_20)
 
                     yearly_biomass = breakdown_according_to_values(biomass_emissions_total, self.hectares_revegetated_before_20)
 
