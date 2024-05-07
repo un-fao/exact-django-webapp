@@ -24,7 +24,7 @@ from api.models import CustomUser as User
 from api.tests.factories import ActivityFactory, FloodedRiceFactory, ProjectFactory
 from ipcc.models import GlobalWarmingPotential, SoilOrganicCarbon
 
-BATCH_SIZE = 5
+BATCH_SIZE = 1
 
 climates = Climate.objects.all()
 countries = Country.objects.all()
@@ -94,9 +94,9 @@ for i, rice in enumerate(rices):
     print(f"Rice: {rice}")
     print(f"Area: {rice.area}")
 
-    print(f"H2O Mgmt Before START: {rice.water_management_type_after_cultivation_start}")
-    print(f"H2O Mgmt Before W/O: {rice.water_management_type_after_cultivation_wo}")
-    print(f"H2O Mgmt Before W: {rice.water_management_type_after_cultivation_w}")
+    print(f"H2O Mgmt Before START: {rice.water_management_type_before_cultivation_start}")
+    print(f"H2O Mgmt Before W/O: {rice.water_management_type_before_cultivation_wo}")
+    print(f"H2O Mgmt Before W: {rice.water_management_type_before_cultivation_w}")
 
     print(f"H2O Mgmt After START: {rice.water_management_type_after_cultivation_start}")
     print(f"H2O Mgmt After W/O: {rice.water_management_type_after_cultivation_wo}")
