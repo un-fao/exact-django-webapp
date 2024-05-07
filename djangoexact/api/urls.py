@@ -40,7 +40,7 @@ router.register(r"global-warming-potentials", views.generic_viewset(GlobalWarmin
 router.register(r"change-rates", views.generic_viewset(models.ChangeRate), basename="change-rates")
 
 # Annual Cropland
-router.register(r"annual-croppings", views.generic_module_viewset(models.AnnualCropping), basename="annualcroppings")
+router.register(r"annual-croppings", views.generic_module_viewset(models.AnnualCropping), basename="annual-croppings")
 router.register(r"annual-croppings-minor-seasons", views.generic_module_viewset(models.MinorSeasonAnnualCropping), basename="annualcroppingminorseasons")
 router.register(r"tillage-management-types", views.generic_viewset(models.TillageManagementType), basename="tillage-management-types")
 
