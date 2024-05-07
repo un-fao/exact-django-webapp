@@ -18,7 +18,37 @@ from .ghg_emissions_classes import (
 
 
 class CoastalWetland(BaseModule):
-    def __init__(self, maximum_area_for_water_management, area_drained_start, area_drained_end, rate_type, time_impl, time_cap, agb_default, bgb_default, litter_default, deadwood_default, soil_1m_default, EF_drainage_default, agb_tier_2, bgb_tier_2, litter_tier_2, deadwood_tier_2, soil_1m_tier_2, EF_drainage_tier_2, area_excavated_start, area_excavated_end, percentage_c_lost_excavation_default, percentage_c_lost_excavation_tier_2, ef_rewetting_carbon_default, ef_rewetting_methane_default, ef_rewetting_carbon_tier_2, ef_rewetting_methane_tier_2, soil_type, methane_constant):
+    def __init__(
+        self,
+        maximum_area_for_water_management,
+        area_drained_start,
+        area_drained_end,
+        rate_type,
+        time_impl,
+        time_cap,
+        agb_default,
+        bgb_default,
+        litter_default,
+        deadwood_default,
+        soil_1m_default,
+        EF_drainage_default,
+        agb_tier_2,
+        bgb_tier_2,
+        litter_tier_2,
+        deadwood_tier_2,
+        soil_1m_tier_2,
+        EF_drainage_tier_2,
+        area_excavated_start,
+        area_excavated_end,
+        percentage_c_lost_excavation_default,
+        percentage_c_lost_excavation_tier_2,
+        ef_rewetting_carbon_default,
+        ef_rewetting_methane_default,
+        ef_rewetting_carbon_tier_2,
+        ef_rewetting_methane_tier_2,
+        soil_type,
+        methane_constant,
+    ):
         self.maximum_area_for_water_management = maximum_area_for_water_management  # front_end input
         self.area_drained_start = area_drained_start  # area drained start, expects float
         self.area_drained_end = area_drained_end  # area drained end, expects float
@@ -222,7 +252,10 @@ class CoastalWetland(BaseModule):
                 self.emissions_yearly_rewetting_carbon = yearly_time_dependent_parameter_breakdown(0, 44 / 12 * self.area_end_rewetting * ef_rewetting_carbon, self.time_impl, self.time_cap, self.rate_type)
                 self.emissions_yearly_rewetting_methane = yearly_time_dependent_parameter_breakdown(0, self.methane_constant * self.area_end_rewetting * ef_rewetting_methane / 1000, self.time_impl, self.time_cap, self.rate_type)
 
-                self.emissions_total_rewetting = sum(self.emissions_yearly_rewetting_carbon) + sum(self.emissions_yearly_rewetting_methane)
+                total_emission_yearly_rewetting_carbon = sum(self.emissions_yearly_rewetting_carbon)
+                total_emission_yearly_rewetting_methane = sum(self.emissions_yearly_rewetting_methane)
+
+                self.emissions_total_rewetting = total_emission_yearly_rewetting_carbon + total_emission_yearly_rewetting_methane
 
                 rewetting_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_yearly_rewetting_carbon], ActivityTypes.REWETTING_REVEGETATION, delay=0)
                 self.result.yearly_emissions_by_sector_by_gas.append(rewetting_emission_set)
