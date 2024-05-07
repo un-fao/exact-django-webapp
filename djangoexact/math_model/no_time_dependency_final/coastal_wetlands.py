@@ -40,6 +40,8 @@ class CoastalWetland(BaseModule):
         EF_drainage_tier_2,
         area_excavated_start,
         area_excavated_end,
+        area_revegated_start,
+        area_revegated_end,
         percentage_c_lost_excavation_default,
         percentage_c_lost_excavation_tier_2,
         ef_rewetting_carbon_default,
@@ -91,6 +93,10 @@ class CoastalWetland(BaseModule):
         self.soil_type = soil_type  # front end input expects string
         self.area_start_rewetting = 0 if self.area_drained_start == 0 else max(0, -self.area_drained_end + self.area_drained_start)
         self.area_end_rewetting = 0 if self.area_drained_end == 0 else max(0, -self.area_drained_end + self.area_drained_start)
+
+        self.area_revegated_start = area_revegated_start  # area revegetated start, expects float
+        self.area_revegated_end = area_revegated_end    # area revegetated end, expects float
+
         self.methane_constant = methane_constant  # front end input
 
         # HECTARES DRAINED
@@ -99,6 +105,8 @@ class CoastalWetland(BaseModule):
         self.hectares_drained_before_20, self.hectares_drained_after_20 = yearly_time_dependent_20_year_breakdown(0, self.area_drained_end - self.area_excavated_end, self.time_impl, self.time_cap, self.rate_type)
         self.hectares_drained = yearly_time_dependent_parameter_breakdown(0, self.area_drained_end, self.time_impl, self.time_cap, self.rate_type)
 
+        self.hectares_revegetated_before_20, self.hectares_revegetated_after_20 = yearly_time_dependent_20_year_breakdown(0, self.area_revegated_end - self.area_revegated_start, self.time_impl, self.time_cap, self.rate_type)
+        self.hectares_revegated = yearly_time_dependent_parameter_breakdown(0, self.area_revegated_end, self.time_impl, self.time_cap, self.rate_type)
         # TIER 2 DEFAULTS
         self.agb_tier_2_default = self.agb_default * 0.451
         self.bgb_tier_2_default = self.bgb_default * self.agb_tier_2_default
@@ -155,7 +163,6 @@ class CoastalWetland(BaseModule):
 
                     stock_c_biomass_end = (agb + bgb + litter + deadwood) * area_drained_end
 
-                    # TODO: ask Lorenzo how the biomass emissions should be divided across the years
                     self.emissions_biomass_total_drainage = (stock_c_biomass_start - stock_c_biomass_end) * (44 / 12)
 
                     # soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_soil_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
@@ -177,7 +184,7 @@ class CoastalWetland(BaseModule):
                     maximum_soil_emissions = soil_1m * 44 / 12
 
                     # TODO: ask lorenzo: HERE THERE IS A 0 IN AREA_DRAINED_START ERROR?
-                    calculated = EF_drainage * 44 / 12 * sum(self.hectares_drained_before_20)
+                    calculated = EF_drainage * 44 / 12 * sum(self.hectares_drained)
                     maximum = max(0, self.area_drained_end) * maximum_soil_emissions
 
                     total = calculated if abs(calculated) < abs(maximum) else maximum
@@ -244,6 +251,24 @@ class CoastalWetland(BaseModule):
             pass
 
         def calculate_rewetting_revegetation():
+
+            def calculate_biomass():
+                try:
+                    agb = self.agb_default * 0.451 if not self.agb_tier_2 else self.agb_tier_2
+                    bgb = self.bgb_default * agb if not self.bgb_tier_2 else self.bgb_tier_2
+                    litter = self.litter_default if not self.litter_tier_2 else self.litter_tier_2
+                    deadwood = self.deadwood_default if not self.deadwood_tier_2 else self.deadwood_tier_2
+
+                    biomass_emissions_total = (agb + bgb + litter + deadwood) / (20) * sum(self.hectares_revegetated_before_20)
+
+                    yearly_biomass = breakdown_according_to_values(biomass_emissions_total, self.hectares_revegetated_before_20)
+
+                    return yearly_biomass
+
+                except:
+                    traceback.print_exc()
+                    pass
+            
             try:
                 self.ef_rewetting_methane_default = 0 if not self.soil_type == "<18" else self.ef_rewetting_methane_default
                 ef_rewetting_carbon = self.ef_rewetting_carbon_default if not self.ef_rewetting_carbon_tier_2 else self.ef_rewetting_carbon_tier_2
@@ -262,6 +287,10 @@ class CoastalWetland(BaseModule):
 
                 rewetting_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in self.emissions_yearly_rewetting_methane], ActivityTypes.REWETTING_REVEGETATION, delay=0)
                 self.result.yearly_emissions_by_sector_by_gas.append(rewetting_emission_set)
+
+                biomass_emissions = calculate_biomass()
+                biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in biomass_emissions], ActivityTypes.BIOMASS, delay=0)
+                self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
 
             except Exception as e:
                 traceback.print_exc()
