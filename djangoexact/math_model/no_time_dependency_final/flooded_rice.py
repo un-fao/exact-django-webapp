@@ -195,7 +195,7 @@ class FloodedRice(BaseModule):
 
         def calculate_straw_burning():
             try:
-                if self.area_start == 0 and self.area_end == 0 and self.straw_burnt == 0:
+                if not self.straw_burnt or (self.area_start == 0 and self.area_end == 0):
                     self.straw_burning_yearly = [0 for i in range(self.time_impl + self.time_cap)]
                     self.straw_burning_total = 0
 
@@ -216,7 +216,7 @@ class FloodedRice(BaseModule):
 
                     straw_burning_set_methane = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(total_methane, GasTypes.CH4)], ActivityTypes.STRAW_BURNING, delay=self.delay)
                     straw_burning_set_nitrous = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(total_nitrous, GasTypes.N2O)], ActivityTypes.STRAW_BURNING, delay=self.delay)
-                    
+
                     self.result.yearly_emissions_by_sector_by_gas.append(straw_burning_set_methane)
                     self.result.yearly_emissions_by_sector_by_gas.append(straw_burning_set_nitrous)
             except:
