@@ -1101,6 +1101,10 @@ class IrrigationPressureRequirement(Model):
 
 
 class RiceDefaultEmissionFactor(Model):
+    """
+    IPCC:A515
+    """
+
     continent = ForeignKey("api.Region", on_delete=CASCADE)
     cultivation_period = IntegerField()
     value = FloatField()
@@ -1110,6 +1114,10 @@ class RiceDefaultEmissionFactor(Model):
 
 
 class RiceSFO(Model):
+    """
+    IPCC:J512
+    """
+
     organic_amendment_type = ForeignKey("api.OrganicAmendmentType", on_delete=CASCADE)
     value = FloatField()
 
@@ -1118,6 +1126,10 @@ class RiceSFO(Model):
 
 
 class RiceSFP(Model):
+    """
+    IPCC:E524
+    """
+
     water_management_type_before_cultivation = ForeignKey("api.WaterManagementTypeBeforeCultivation", on_delete=CASCADE)
     value = FloatField()
 
@@ -1126,6 +1138,10 @@ class RiceSFP(Model):
 
 
 class RiceSFW(Model):
+    """
+    IPCC:E512
+    """
+
     water_management_type_after_cultivation = ForeignKey("api.WaterManagementTypeAfterCultivation", on_delete=CASCADE)
     value = FloatField()
 
@@ -1134,6 +1150,10 @@ class RiceSFW(Model):
 
 
 class RiceYield(Model):
+    """
+    Rice!AC3
+    """
+
     continent = ForeignKey("api.Region", on_delete=CASCADE)
     value = FloatField()
 

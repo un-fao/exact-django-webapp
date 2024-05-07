@@ -1842,7 +1842,7 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
         self.soc_start: SimpleNamespace | ipcc.SoilOrganicCarbon = SimpleNamespace(value=0)
         self.soc_w: SimpleNamespace | ipcc.SoilOrganicCarbon = SimpleNamespace(value=0)
         self.soc_wo: SimpleNamespace | ipcc.SoilOrganicCarbon = SimpleNamespace(value=0)
-        self.rice_ef: SimpleNamespace | ipcc.RiceDefaultEmissionFactor = SimpleNamespace(value=0)
+        self.efc: SimpleNamespace | ipcc.RiceDefaultEmissionFactor = SimpleNamespace(value=0)
         self.yield_ref: SimpleNamespace | ipcc.RiceYield = SimpleNamespace(value=0)
         self.flu_start: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=0)
         self.flu_w: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=0)
@@ -1862,6 +1862,9 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
         self.sfo_start: SimpleNamespace | ipcc.RiceSFO = SimpleNamespace(value=0)
         self.sfo_w: SimpleNamespace | ipcc.RiceSFO = SimpleNamespace(value=0)
         self.sfo_wo: SimpleNamespace | ipcc.RiceSFO = SimpleNamespace(value=0)
+        self.efi_start: SimpleNamespace = SimpleNamespace(value=0)
+        self.efi_w: SimpleNamespace = SimpleNamespace(value=0)
+        self.efi_wo: SimpleNamespace = SimpleNamespace(value=0)
         self.n_estimation_factor: SimpleNamespace | ipcc.CropNitrousEstimationDefaultFactor = SimpleNamespace(value=0)
         self.burning_emission_factor: SimpleNamespace | ipcc.BurningEmissionFactor = SimpleNamespace(value=0)
         self.rice_cf: SimpleNamespace | ipcc.FiresCombustionFactor = SimpleNamespace(value=0)
@@ -1878,7 +1881,7 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
         if is_luc_remaining_same(module):
             self.inputs_start_w = [
                 *[area, 0],
-                self.rice_ef.value,
+                self.efc.value,
                 module.efc_t2_start,
                 self.sfw_start.value,
                 module.sfw_t2_start,
@@ -1900,8 +1903,8 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 project.capitalization_years,
                 module.activity.change_rate.name,
                 project.gw_potential.ch4,
-                self.rice_ef.cultivation_period,
-                module.cultivation_period_start,
+                self.efc.cultivation_period,
+                module.cultivation_period_t2_start,
                 self.soc_start,
                 self.soc_w,
                 module.soc_t2_start,
@@ -1919,6 +1922,7 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 module.fi_t2_start,
                 module.fi_t2_w,
                 True,
+                module.organic_amendment_type_start.name == "Straw Burnt",
                 0,  # Delay
             ]
 
@@ -1928,7 +1932,7 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
         if is_business_as_usual(module):
             self.inputs_start_wo = [
                 *[area, 0],
-                self.rice_ef.value,
+                self.efc.value,
                 module.efc_t2_start,
                 self.sfw_start.value,
                 module.sfw_t2_start,
@@ -1950,8 +1954,8 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 project.capitalization_years,
                 module.activity.change_rate.name,
                 project.gw_potential.ch4,
-                self.rice_ef.cultivation_period,
-                module.cultivation_period_start,
+                self.efc.cultivation_period,
+                module.cultivation_period_t2_start,
                 self.soc_start,
                 self.soc_wo,
                 module.soc_t2_start,
@@ -1969,6 +1973,7 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 module.fi_t2_start,
                 module.fi_t2_wo,
                 True,
+                module.organic_amendment_type_start.name == "Straw Burnt",
                 0,  # Delay
             ]
 
@@ -1978,7 +1983,7 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
         if is_with(module):
             self.inputs_w = [
                 *[0, area],
-                self.rice_ef.value,
+                self.efc.value,
                 module.efc_t2_w,
                 self.sfw_w.value,
                 module.sfw_t2_w,
@@ -2000,8 +2005,8 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 project.capitalization_years,
                 module.activity.change_rate.name,
                 project.gw_potential.ch4,
-                self.rice_ef.cultivation_period,
-                module.cultivation_period_w,
+                self.efc.cultivation_period,
+                module.cultivation_period_t2_w,
                 self.soc_start,
                 self.soc_w,
                 module.soc_t2_start,
@@ -2019,6 +2024,7 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 module.fi_t2_start,
                 module.fi_t2_w,
                 True,
+                module.organic_amendment_type_w.name == "Straw Burnt",
                 0,  # Delay
             ]
 
@@ -2028,7 +2034,7 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
         if is_without(module):
             self.inputs_wo = [
                 *[0, area],
-                self.rice_ef.value,
+                self.efc.value,
                 module.efc_t2_wo,
                 self.sfw_wo.value,
                 module.sfw_t2_wo,
@@ -2050,8 +2056,8 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 project.capitalization_years,
                 module.activity.change_rate.name,
                 project.gw_potential.ch4,
-                self.rice_ef.cultivation_period,
-                module.cultivation_period_wo,
+                self.efc.cultivation_period,
+                module.cultivation_period_t2_wo,
                 self.soc_start,
                 self.soc_wo,
                 module.soc_t2_start,
@@ -2069,6 +2075,7 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 module.fi_t2_start,
                 module.fi_t2_wo,
                 False,
+                module.organic_amendment_type_wo.name == "Straw Burnt",
                 0,  # Delay
             ]
 
@@ -2122,6 +2129,18 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
         organic_amendment_wo_flt = {"organic_amendment_type": module.organic_amendment_type_wo}
         lut_name_rice_flt = {"land_use_type__name": "Rice"}
 
+        if module.status.name == "READY" and calculate:
+            self.calculate()
+            self.efi_start.value = getattr(self.math_start_w, "adjusted_daily_ef_methane_tier_2_default", 0) or getattr(self.math_start_wo, "adjusted_daily_ef_methane_tier_2_default", 0)
+            self.efi_w.value = getattr(self.math_w, "adjusted_daily_ef_methane_tier_2_default", 0)
+            self.efi_wo.value = getattr(self.math_wo, "adjusted_daily_ef_methane_tier_2_default", 0)
+            self.straw_burned_start = SimpleNamespace(value=getattr(self.math_start_w, "straw_tonnes_tier_2_default", 0) or getattr(self.math_start_wo, "straw_tonnes_tier_2_default", 0))
+            self.straw_burned_w = SimpleNamespace(value=getattr(self.math_w, "straw_tonnes_tier_2_default", 0))
+            self.straw_burned_wo = SimpleNamespace(value=getattr(self.math_wo, "straw_tonnes_tier_2_default", 0))
+            self.sfo_start.value = getattr(self.math_start_w, "SFo_tier_2_default", 0) or getattr(self.math_start_wo, "SFo_tier_2_default", 0)
+            self.sfo_w.value = getattr(self.math_w, "SFo_tier_2_default", 0)
+            self.sfo_wo.value = getattr(self.math_wo, "SFo_tier_2_default", 0)
+
         self.soc = utils.get_or_raise(ipcc.SoilOrganicCarbon, climate_flt | moisture_flt | soil_flt, f"SoilOrganicCarbon for {climate.name}, {moisture.name} and {soil_type.name} does not exist")
 
         self.grassland_soc = get_grassland_soc(luc)
@@ -2131,7 +2150,7 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
         self.soc_w = self.soc.value
         self.soc_wo = self.soc.value
 
-        self.rice_ef = utils.get_or_raise(ipcc.RiceDefaultEmissionFactor, region_flt, f"RiceDefaultEmissionFactor for {region.name} does not exist")
+        self.efc = utils.get_or_raise(ipcc.RiceDefaultEmissionFactor, region_flt, f"RiceDefaultEmissionFactor for {region.name} does not exist")
         self.yield_ref = utils.get_or_raise(ipcc.RiceYield, region_flt, f"RiceYield for {region.name} does not exist")
         self.flu_start = get_flu_data(module, climate, moisture, utils.ScenarioTypes.START)
         self.flu_w = get_flu_data(module, climate, moisture, utils.ScenarioTypes.WITH)
