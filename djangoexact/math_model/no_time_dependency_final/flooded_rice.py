@@ -64,6 +64,7 @@ class FloodedRice(BaseModule):
         fi_start_tier_2,
         fi_end_tier_2,
         calculate_soc_som,
+        straw_burnt,
         delay=0,
     ):
         self.area_start = area_start
@@ -112,6 +113,8 @@ class FloodedRice(BaseModule):
         self.fi_end_tier_2 = fi_end_tier_2  # tier 2 value, expects float or None
 
         self.calculate_soc_som = calculate_soc_som
+
+        self.straw_burnt = straw_burnt
 
         self.delay = delay
 
@@ -192,7 +195,7 @@ class FloodedRice(BaseModule):
 
         def calculate_straw_burning():
             try:
-                if self.area_start == 0 and self.area_end == 0:
+                if self.area_start == 0 and self.area_end == 0 and self.straw_burnt == 0:
                     self.straw_burning_yearly = [0 for i in range(self.time_impl + self.time_cap)]
                     self.straw_burning_total = 0
 
@@ -208,9 +211,14 @@ class FloodedRice(BaseModule):
                     self.straw_burning_yearly = breakdown_according_to_values(total, self.hectares_total)
                     self.straw_burning_total = sum(self.straw_burning_yearly)
 
-                    straw_burning_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.straw_burning_yearly], ActivityTypes.STRAW_BURNING, delay=self.delay)
-                    self.result.yearly_emissions_by_sector_by_gas.append(straw_burning_set)
+                    total_methane = straw_methane_co2 * sum(self.hectares_total)
+                    total_nitrous = straw_nitrous_co2 * sum(self.hectares_total)
 
+                    straw_burning_set_methane = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(total_methane, GasTypes.CH4)], ActivityTypes.STRAW_BURNING, delay=self.delay)
+                    straw_burning_set_nitrous = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(total_nitrous, GasTypes.N2O)], ActivityTypes.STRAW_BURNING, delay=self.delay)
+                    
+                    self.result.yearly_emissions_by_sector_by_gas.append(straw_burning_set_methane)
+                    self.result.yearly_emissions_by_sector_by_gas.append(straw_burning_set_nitrous)
             except:
                 traceback.print_exc()
                 return
