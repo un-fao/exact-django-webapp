@@ -1302,9 +1302,7 @@ class Waterbody(Module):
 class CoastalWetland(Module):
     land_use_type = models.ForeignKey(LandUseType, on_delete=models.CASCADE, null=True, blank=True)
 
-    ha_start = models.FloatField(null=True, blank=True)
-    ha_w = models.FloatField(null=True, blank=True)
-    ha_wo = models.FloatField(null=True, blank=True)
+    area = models.FloatField(null=True, blank=True)
     ha_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_ha_thread")
 
     area_under_drainage_start = models.FloatField(null=True, blank=True)
