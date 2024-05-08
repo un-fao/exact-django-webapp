@@ -1,4 +1,4 @@
-import logging
+import logging as log
 from enum import Enum
 
 from django.apps import apps
@@ -463,7 +463,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
             if module_type.class_name == "LandUseChange":
                 continue
 
-            logging.debug(f"Creating module {module_type.class_name}")
+            log.debug(f"Creating module {module_type.class_name}")
 
             ModuleClass = apps.get_model("api", module_type.class_name)
             module_instance = None
@@ -658,10 +658,10 @@ class SubmoduleBaseSerializer(AllModulesBaseSerializer):
     #     return True
 
     def validate(self, data):
-        logging.debug(f"START SubmoduleBaseSerializer[{self.Meta.ref_name}].validate")
+        log.debug(f"START SubmoduleBaseSerializer[{self.Meta.ref_name}].validate")
 
         if not data.get("parent", None) and (not self.instance or not self.instance.parent):
-            logging.error(f"Parent field is required for {self.Meta.ref_name}")
+            log.error(f"Parent field is required for {self.Meta.ref_name}")
             raise serializers.ValidationError("Parent field is required")
 
         if self.instance:
@@ -676,7 +676,7 @@ class SubmoduleBaseSerializer(AllModulesBaseSerializer):
 
         data["status"] = StatusType.objects.get(name="READY")
 
-        logging.debug(f"END SubmoduleBaseSerializer[{self.Meta.ref_name}].validate")
+        log.debug(f"END SubmoduleBaseSerializer[{self.Meta.ref_name}].validate")
         return super().validate(data)
 
 
@@ -721,20 +721,20 @@ class ModuleBaseSerializer(AllModulesBaseSerializer):
     #     return True
 
     def validate(self, data):
-        logging.debug(f"START ModuleBaseSerializer[{self.Meta.ref_name}].validate")
+        log.debug(f"START ModuleBaseSerializer[{self.Meta.ref_name}].validate")
 
         activity = data["activity"] if "activity" in data else self.instance.activity
         module_types = list(map(lambda module: module.class_name, activity.module_types.all()))
 
         if getattr(activity, self.Meta.ref_name.lower(), None).exists() and not self.instance:
-            logging.error(f"Activity already has a {self.Meta.ref_name}")
+            log.error(f"Activity already has a {self.Meta.ref_name}")
             raise serializers.ValidationError("A module of this type is already present for this activity")
 
         if self.Meta.ref_name not in module_types and self.Meta.ref_name != "LandUseChange":
-            logging.error(f"Module type {self.Meta.ref_name} is not present for this activity")
+            log.error(f"Module type {self.Meta.ref_name} is not present for this activity")
             raise serializers.ValidationError("This module type is not present for this activity")
 
-        logging.debug(f"END ModuleBaseSerializer[{self.Meta.ref_name}].validate")
+        log.debug(f"END ModuleBaseSerializer[{self.Meta.ref_name}].validate")
         return super().validate(data)
 
     def save(self, **kwargs):
@@ -748,9 +748,15 @@ class ModuleBaseSerializer(AllModulesBaseSerializer):
 
 
 class LandModuleWriteSerializer(ModuleBaseSerializer):
+    class Meta:
+        model = None
+        fields = "__all__"
+        ref_name = None
+        mandatory_fields = {}
+
     def validate(self, data):
-        logging.debug(f"START LandModuleSerializer[{self.Meta.ref_name}].validate")
-        logging.debug(f"Data: {data}")
+        log.debug(f"START LandModuleSerializer[{self.Meta.ref_name}].validate")
+        log.debug(f"Data: {data}")
 
         activity = data["activity"] if "activity" in data else self.instance.activity
         luc = activity.landusechange.first()
@@ -766,7 +772,7 @@ class LandModuleWriteSerializer(ModuleBaseSerializer):
 
             # NOTE: Redundant as it's already checked in ActivityBuilderSerializer, but just in case
             if module_type.is_luc and module_type.class_name not in luc_module_types:
-                logging.error(f"Cannot add {module_type.class_name} to an activity with a Land Use Change")
+                log.error(f"Cannot add {module_type.class_name} to an activity with a Land Use Change")
                 raise serializers.ValidationError("Cannot add this module to an activity with a Land Use Change")
 
             module_types += luc_module_types
@@ -775,12 +781,13 @@ class LandModuleWriteSerializer(ModuleBaseSerializer):
         data.update({key: value for key, value in self.instance.__dict__.items() if key not in data}) if self.instance else None
 
         if not self.is_ready_for_calculations(data, self.Meta.mandatory_fields):
+            log.debug(f"Module {self.Meta.ref_name} is not ready for calculations")
             data["status"] = StatusType.objects.get(name="EMPTY")
             return super().validate(data)
 
         data["status"] = StatusType.objects.get(name="READY")
 
-        logging.debug(f"END LandModuleSerializer[{self.Meta.ref_name}].validate")
+        log.debug(f"END LandModuleSerializer[{self.Meta.ref_name}].validate")
         return super().validate(data)
 
 
