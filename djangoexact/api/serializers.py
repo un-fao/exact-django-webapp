@@ -1009,20 +1009,16 @@ class BuildingWriteSerializer(SubmoduleBaseSerializer):
         ref_name = "Building"
         mandatory_fields = [
             "building_type",
-            "area_m2",
+            "area_m2_start",
+            "area_m2_w",
+            "area_m2_wo",
         ]
 
     def validate(self, data):
-        mandatory_fields = []
 
-        building_type_scenarios = get_filled_scenarios(data, ["building_type"])
-
-        for scenario in building_type_scenarios:
-            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
-
-        if not are_fields_filled(data, mandatory_fields):
-            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
-        elif mandatory_fields:
+        if not all([data.get(field, None) for field in self.Meta.mandatory_fields]):
+            data["status"] = StatusType.objects.get(name="EMPTY")
+        else:
             data["status"] = StatusType.objects.get(name="READY")
 
         return super().validate(data)
@@ -1740,7 +1736,7 @@ class DegradedLandReadSerializer(LandModuleReadSerializer):
         ref_name = "DegradedLand"
 
 
-class SettlementWriteSerializer(ModuleBaseSerializer):
+class SettlementWriteSerializer(LandModuleReadSerializer):
     class Meta:
         model = Settlement
         fields = "__all__"
@@ -1748,7 +1744,7 @@ class SettlementWriteSerializer(ModuleBaseSerializer):
         mandatory_fields = []
 
 
-class SettlementReadSerializer(ModuleBaseSerializer):
+class SettlementReadSerializer(LandModuleWriteSerializer):
     class Meta:
         model = Settlement
         fields = "__all__"
