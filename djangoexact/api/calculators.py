@@ -453,7 +453,7 @@ class BaseCalculator(ABC):
                 raise Exception("At least one module is not ready to perform the calculation")
 
     @abstractmethod
-    def get_defaults(self, calculate=calculate) -> dict:
+    def get_defaults(self, calculate=False) -> dict:
         """
         Get the default values for a given module.
         """
@@ -3464,48 +3464,40 @@ class BuildingCalculator(BaseCalculator):
         """
 
         input: Building = self.data
-        project: Project = input.parent.activity.project
+        parent: Settlement = input.parent
+        activity: Activity = parent.activity
+        project: Project = activity.project
 
         math_w = None
         math_wo = None
 
         # TODO: What do we need the start scenario for?
         # TODO: Define if all the fields of an input are required after creation
-        if input.building_type_w and input.area_m2_w:
-            try:
-                ef_w: ipcc.BuildingEmissionFactor = ipcc.BuildingEmissionFactor.objects.get(building_type=input.building_type_w)
-            except ipcc.BuildingEmissionFactor.DoesNotExist:
-                raise ValueError(f"Building emission factor for {input.building_type_w.name} does not exist")
+        ef = utils.get_or_raise(ipcc.BuildingEmissionFactor, {"building_type": input.building_type})
 
-            inputs_w = [
-                ef_w.value,
-                input.ef_t2_w,
-                input.area_m2_w,
-                project.implementation_years,
-                project.capitalization_years,
-                input.activity.change_rate.name,
-            ]
+        inputs_w = [
+            ef.value,
+            input.ef_t2_w,
+            input.area_m2_w,
+            project.implementation_years,
+            project.capitalization_years,
+            activity.change_rate.name,
+        ]
 
-            math_w = MathRoads(*inputs_w)
-            math_w.calculate_emissions()
+        math_w = MathRoads(*inputs_w)
+        math_w.calculate_emissions()
 
-        if input.building_type_wo and input.area_m2_wo:
-            try:
-                ef_wo: ipcc.BuildingEmissionFactor = ipcc.BuildingEmissionFactor.objects.get(building_type=input.building_type_wo)
-            except ipcc.BuildingEmissionFactor.DoesNotExist:
-                raise ValueError(f"Building emission factor for {input.building_type_wo.name} does not exist")
+        inputs_wo = [
+            ef.value,
+            input.ef_t2_wo,
+            input.area_m2_wo,
+            project.implementation_years,
+            project.capitalization_years,
+            activity.change_rate.name,
+        ]
 
-            inputs_wo = [
-                ef_wo.value,
-                input.ef_t2_wo,
-                input.area_m2_wo,
-                project.implementation_years,
-                project.capitalization_years,
-                input.activity.change_rate.name,
-            ]
-
-            math_wo = MathRoads(*inputs_wo)
-            math_wo.calculate_emissions()
+        math_wo = MathRoads(*inputs_wo)
+        math_wo.calculate_emissions()
 
         results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
         results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
@@ -3514,8 +3506,8 @@ class BuildingCalculator(BaseCalculator):
 
         return results_tuple
 
-    def defaults(self) -> DefaultData:
-        return super().defaults()
+    def get_defaults(self, calculate=False) -> dict:
+        return super().get_defaults(calculate)
 
 
 class RoadCalculator(BaseCalculator):
@@ -3529,51 +3521,43 @@ class RoadCalculator(BaseCalculator):
         """
 
         input: Road = self.data
-        project: Project = input.parent.activity.project
+        parent: Settlement = input.parent
+        activity: Activity = parent.activity
+        project: Project = activity.project
 
         math_w = None
         math_wo = None
 
-        if input.road_type_w and input.length_km_w and input.width_m_w:
-            try:
-                ef_w: ipcc.RoadEmissionFactor = ipcc.RoadEmissionFactor.objects.get(road_type=input.road_type_w)
-            except ipcc.RoadEmissionFactor.DoesNotExist:
-                raise ValueError(f"Road emission factor for {input.road_type_w.name} does not exist")
+        ef = utils.get_or_raise(ipcc.RoadEmissionFactor, {"road_type": input.road_type})
 
-            # TODO: Tell Peter to add this to the model
-            area = input.length_km_w * input.width_m_start
+        # TODO: Tell Peter to add this to the model
+        area = input.length_km_w * input.width_m_start
 
-            inputs_w = [
-                ef_w.value,
-                input.ef_t2_w,
-                area,
-                project.implementation_years,
-                project.capitalization_years,
-                input.activity.change_rate.name,
-            ]
+        inputs_w = [
+            ef.value,
+            input.ef_t2_w,
+            area,
+            project.implementation_years,
+            project.capitalization_years,
+            activity.change_rate.name,
+        ]
 
-            math_w = MathRoads(*inputs_w)
-            math_w.calculate_emissions()
+        math_w = MathRoads(*inputs_w)
+        math_w.calculate_emissions()
 
-        if input.road_type_wo and input.length_km_wo and input.width_m_wo:
-            try:
-                ef_wo: ipcc.RoadEmissionFactor = ipcc.RoadEmissionFactor.objects.get(road_type=input.road_type_wo)
-            except ipcc.RoadEmissionFactor.DoesNotExist:
-                raise ValueError(f"Road emission factor for {input.road_type_wo.name} does not exist")
+        area = input.length_km_wo * input.width_m_start
 
-            area = input.length_km_wo * input.width_m_start
+        inputs_wo = [
+            ef.value,
+            input.ef_t2_wo,
+            area,
+            project.implementation_years,
+            project.capitalization_years,
+            activity.change_rate.name,
+        ]
 
-            inputs_wo = [
-                ef_wo.value,
-                input.ef_t2_wo,
-                area,
-                project.implementation_years,
-                project.capitalization_years,
-                input.activity.change_rate.name,
-            ]
-
-            math_wo = MathRoads(*inputs_wo)
-            math_wo.calculate_emissions()
+        math_wo = MathRoads(*inputs_wo)
+        math_wo.calculate_emissions()
 
         results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
         results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
@@ -3582,8 +3566,8 @@ class RoadCalculator(BaseCalculator):
 
         return results_tuple
 
-    def defaults(self) -> DefaultData:
-        return super().defaults()
+    def get_defaults(self, calculate=False) -> dict:
+        return super().get_defaults(calculate)
 
 
 class LivestockCalculator(BaseCalculator):
