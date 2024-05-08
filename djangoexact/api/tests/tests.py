@@ -623,9 +623,9 @@ if TEST_COASTAL_WETLAND:
         coastal.drained_area_excavated_w = random.uniform(0, coastal.area_under_drainage_w)
         coastal.drained_area_excavated_wo = random.uniform(0, coastal.area_under_drainage_wo)
 
-        coastal.area_not_drained_or_rewetted_start = coastal.ha_start - coastal.area_under_drainage_start
-        coastal.area_not_drained_or_rewetted_w = coastal.ha_w - coastal.area_under_drainage_w
-        coastal.area_not_drained_or_rewetted_wo = coastal.ha_wo - coastal.area_under_drainage_wo
+        coastal.area_not_drained_or_rewetted_start = coastal.area - coastal.area_under_drainage_start
+        coastal.area_not_drained_or_rewetted_w = coastal.area - coastal.area_under_drainage_w
+        coastal.area_not_drained_or_rewetted_wo = coastal.area - coastal.area_under_drainage_wo
 
         coastal.area_w_restored_vegetation_start = random.uniform(0, coastal.area_not_drained_or_rewetted_start)
         coastal.area_w_restored_vegetation_w = random.uniform(0, coastal.area_not_drained_or_rewetted_w)
@@ -635,7 +635,7 @@ if TEST_COASTAL_WETLAND:
 
         print(f"Vegetation Type: {coastal.land_use_type}")
 
-        print(f"Area: {coastal.ha_start:,f}")
+        print(f"Area: {coastal.area:,f}")
 
         print(f"Area under drainage START: {coastal.area_under_drainage_start:,f}")
         print(f"Area under drainage WO: {coastal.area_under_drainage_wo:,f}")
