@@ -3473,7 +3473,7 @@ class BuildingCalculator(BaseCalculator):
 
         # TODO: What do we need the start scenario for?
         # TODO: Define if all the fields of an input are required after creation
-        ef = utils.get_or_raise(ipcc.BuildingEmissionFactor, {"building_type": input.building_type})
+        ef = utils.get_or_raise(ipcc.BuildingEmissionFactor, {"building_type": input.building_type}, f"Could not find Building EF for {input.building_type.name}")
 
         inputs_w = [
             ef.value,
@@ -3528,7 +3528,7 @@ class RoadCalculator(BaseCalculator):
         math_w = None
         math_wo = None
 
-        ef = utils.get_or_raise(ipcc.RoadEmissionFactor, {"road_type": input.road_type})
+        ef = utils.get_or_raise(ipcc.RoadEmissionFactor, {"road_type": input.road_type}, f"Could not find Road EF for {input.road_type.name}")
 
         # TODO: Tell Peter to add this to the model
         area = input.length_km_w * input.width_m_start
