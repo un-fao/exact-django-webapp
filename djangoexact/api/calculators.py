@@ -4820,7 +4820,7 @@ class CoastalWetlandCalculator(BaseCalculator):
 
         if is_with(module):
             self.inputs_w = [
-                module.ha_start,
+                module.area,
                 module.area_under_drainage_start,
                 module.area_under_drainage_w,
                 module.activity.change_rate.name,
@@ -4857,7 +4857,7 @@ class CoastalWetlandCalculator(BaseCalculator):
 
         if is_without(module):
             self.inputs_wo = [
-                module.ha_start,
+                module.area,
                 module.area_under_drainage_start,
                 module.area_under_drainage_wo,
                 module.activity.change_rate.name,
