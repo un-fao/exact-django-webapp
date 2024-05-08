@@ -1636,9 +1636,7 @@ class RoadType(models.Model):
 class Building(Submodule):
     parent = models.ForeignKey("api.Settlement", on_delete=models.CASCADE, null=True, blank=True, related_name="buildings")
 
-    building_type_start = models.ForeignKey(BuildingType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_building_type_start")
-    building_type_w = models.ForeignKey(BuildingType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_building_type_w")
-    building_type_wo = models.ForeignKey(BuildingType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_building_type_wo")
+    building_type = models.ForeignKey(BuildingType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_building_type")
     building_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_building_type_thread", on_delete=models.SET_NULL)
 
     area_m2_start = models.FloatField(null=True, blank=True)
@@ -1654,9 +1652,7 @@ class Building(Submodule):
 class Road(Submodule):
     parent = models.ForeignKey("api.Settlement", on_delete=models.CASCADE, null=True, blank=True, related_name="roads")
 
-    road_type_start = models.ForeignKey(RoadType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_road_type_start")
-    road_type_w = models.ForeignKey(RoadType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_road_type_w")
-    road_type_wo = models.ForeignKey(RoadType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_road_type_wo")
+    road_type = models.ForeignKey(RoadType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_road_type")
     road_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_road_type_thread", on_delete=models.SET_NULL)
 
     length_km_start = models.FloatField(null=True, blank=True)
