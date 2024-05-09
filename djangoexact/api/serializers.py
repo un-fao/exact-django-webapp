@@ -545,6 +545,31 @@ class AllModulesBaseSerializer(serializers.ModelSerializer):
         mandatory_fields = {}
         extra_fields = []
 
+    def merge_instance_data(self, data: dict) -> dict:
+        """
+        Merges the instance data with the new data and returns the merged data.
+
+        Args:
+            data (dict): The new data to be merged with the instance data.
+
+        Returns:
+            dict: The merged data.
+
+        """
+
+        if not self.instance:
+            return data
+
+        # Merge the instance data with the new data
+        data.update({key: value for key, value in self.instance.__dict__.items() if key not in data})
+
+        # If the keys in data have a counterpart in the instance with an _id suffix, add the value from the data.id to the data as a new key with the _id suffix
+        for key, value in data.items():
+            if key + "_id" in self.instance.__dict__:
+                data[key + "_id"] = value.id if hasattr(value, "id") else value
+
+        return data
+
     def is_ready_for_calculations(self, data, mandatory_fields: dict, first=True):
         """
         Checks if the given data is ready based on the provided mandatory fields.
@@ -664,11 +689,7 @@ class SubmoduleBaseSerializer(AllModulesBaseSerializer):
             log.error(f"Parent field is required for {self.Meta.ref_name}")
             raise serializers.ValidationError("Parent field is required")
 
-        if self.instance:
-            # Merge the instance data with the new data
-            for key, value in self.instance.__dict__.items():
-                if key not in data and "_id" not in key:
-                    data[key] = value
+        data = self.merge_instance_data(data)
 
         if not self.is_ready_for_calculations(data, self.Meta.mandatory_fields):
             data["status"] = StatusType.objects.get(name="EMPTY")
@@ -777,8 +798,7 @@ class LandModuleWriteSerializer(ModuleBaseSerializer):
 
             module_types += luc_module_types
 
-        # Merge the instance data with the new data if the instance exists
-        data.update({key: value for key, value in self.instance.__dict__.items() if key not in data}) if self.instance else None
+        self.merge_instance_data(data)
 
         if not self.is_ready_for_calculations(data, self.Meta.mandatory_fields):
             log.debug(f"Module {self.Meta.ref_name} is not ready for calculations")
@@ -808,7 +828,6 @@ class GrasslandWriteSerializer(LandModuleWriteSerializer):
 
         mandatory_fields = {
             "grassland_management_type_start": [
-                "yield_start",
                 {
                     "is_fire_used_start": [
                         "fire_periodicity_start",
@@ -817,7 +836,6 @@ class GrasslandWriteSerializer(LandModuleWriteSerializer):
                 },
             ],
             "grassland_management_type_w": [
-                "yield_w",
                 {
                     "is_fire_used_w": [
                         "fire_periodicity_w",
@@ -826,7 +844,6 @@ class GrasslandWriteSerializer(LandModuleWriteSerializer):
                 },
             ],
             "grassland_management_type_wo": [
-                "yield_wo",
                 {
                     "is_fire_used_wo": [
                         "fire_periodicity_wo",
