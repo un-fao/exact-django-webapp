@@ -397,8 +397,10 @@ class ActivityBuilderSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=255, required=True)
     cost = serializers.FloatField(required=False)
     climate = serializers.PrimaryKeyRelatedField(queryset=Climate.objects.all(), required=True)
+    moisture = serializers.PrimaryKeyRelatedField(queryset=Moisture.objects.all(), required=True)
     soil_type = serializers.PrimaryKeyRelatedField(queryset=SoilType.objects.all(), required=True)
     duration = serializers.IntegerField(required=True)
+    start_year = serializers.IntegerField(required=False)
     land_use_change = LandUseChangeBuilderSerializer(many=False, required=False, allow_null=True)
     module_types = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
     area = serializers.FloatField(required=False)
@@ -437,10 +439,12 @@ class ActivityBuilderSerializer(serializers.Serializer):
         activity: Activity = Activity.objects.create(
             name=self.validated_data["name"],
             project=self.validated_data["project"],
-            climate_t2=self.validated_data["climate"],
-            soil_type_t2=self.validated_data["soil_type"],
-            duration_t2=self.validated_data["duration"],
-            cost=self.validated_data.get("cost"),
+            cost=self.validated_data["cost"],
+            climate_t2=self.validated_data.get("climate", None),
+            moisture_t2=self.validated_data.get("moisture", None),
+            duration_t2=self.validated_data.get("duration", None),
+            soil_type_t2=self.validated_data.get("soil_type", None),
+            start_year_t2=self.validated_data.get("start_year", None),
         )
         activity.module_types.set(self.validated_data.get("module_types", []))
 
@@ -651,38 +655,6 @@ class AllModulesBaseSerializer(serializers.ModelSerializer):
 
 class SubmoduleBaseSerializer(AllModulesBaseSerializer):
 
-    # def are_mandatory_fields_valid(self, data, mandatory_fields, first_call=True):
-
-    #     main_fields = [data.get(field, None) for field in mandatory_fields.keys()]
-
-    #     print("foo")
-
-    #     # If it's first call and no
-
-    #     # Check if all main fields are filled (fields can be bool, so check if they are not None)
-    #     if not any(filter(lambda field: field is not None, main_fields)) and first_call:
-    #         return True
-
-    #     for main_key, field in mandatory_fields.items():
-    #         if main_key not in data or data.get(main_key, None) is None:
-    #             return False
-
-    #         if isinstance(field, dict) and bool(data.get(main_key, None)):
-    #             for key, value in field.items():
-    #                 if key not in data:
-    #                     return False
-
-    #                 if value is False:
-    #                     break  # If the field is present, but the value is not required, skip the check
-
-    #                 if isinstance(value, dict):
-    #                     return self.are_mandatory_fields_valid(data, value, first_call=False)
-
-    #                 elif data.get(key, None) is None:
-    #                     return False
-
-    #     return True
-
     def validate(self, data):
         log.debug(f"START SubmoduleBaseSerializer[{self.Meta.ref_name}].validate")
 
@@ -711,36 +683,6 @@ class ModuleBaseSerializer(AllModulesBaseSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["module_type"].default = ModuleType.objects.get(class_name=self.Meta.ref_name)
-
-    # def are_mandatory_fields_valid(self, data, mandatory_fields, first_call=True):
-
-    #     main_fields = [data.get(field, None) for field in mandatory_fields.keys()]
-
-    #     print("foo")
-
-    #     # Check if all main fields are filled (fields can be bool, so check if they are not None)
-    #     if not any(filter(lambda field: field is not None, main_fields)) and first_call:
-    #         return True
-
-    #     for main_key, field in mandatory_fields.items():
-    #         if main_key not in data or data.get(main_key, None) is None:
-    #             return False
-
-    #         if isinstance(field, dict) and bool(data.get(main_key, None)):
-    #             for key, value in field.items():
-    #                 if key not in data:
-    #                     return False
-
-    #                 if value is False:
-    #                     break  # If the field is present, but the value is not required, skip the check
-
-    #                 if isinstance(value, dict):
-    #                     return self.are_mandatory_fields_valid(data, value, first_call=False)
-
-    #                 elif data.get(key, None) is None:
-    #                     return False
-
-    #     return True
 
     def validate(self, data):
         log.debug(f"START ModuleBaseSerializer[{self.Meta.ref_name}].validate")
