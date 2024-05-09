@@ -563,10 +563,11 @@ class AllModulesBaseSerializer(serializers.ModelSerializer):
         # Merge the instance data with the new data
         data.update({key: value for key, value in self.instance.__dict__.items() if key not in data})
 
-        # If the keys in data have a counterpart in the instance with an _id suffix, add the value from the data.id to the data as a new key with the _id suffix
-        for key, value in data.items():
+        # If the keys in data have a counterpart in the instance with an _id suffix,
+        # add the value from the data.id to the data as a new key with the _id suffix
+        for key, value in list(data.items()):
             if key + "_id" in self.instance.__dict__:
-                data[key + "_id"] = value.id if hasattr(value, "id") else value
+                data[key + "_id"] = getattr(value, "id", value)
 
         return data
 
