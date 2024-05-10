@@ -68,6 +68,24 @@ grassland_mandatory_fields = {
     ],
 }
 
+rice_mandatory_fields = {
+    "land_use_type_start": [
+        "water_management_type_before_cultivation_start",
+        "water_management_type_after_cultivation_start",
+        "organic_amendment_type_start",
+    ],
+    "land_use_type_w": [
+        "water_management_type_before_cultivation_w",
+        "water_management_type_after_cultivation_w",
+        "organic_amendment_type_w",
+    ],
+    "land_use_type_wo": [
+        "water_management_type_before_cultivation_wo",
+        "water_management_type_after_cultivation_wo",
+        "organic_amendment_type_wo",
+    ],
+}
+
 
 def is_ready(data, mandatory_fields: dict, first=True):
 
@@ -134,6 +152,84 @@ def is_ready(data, mandatory_fields: dict, first=True):
     return True
 
 
+def is_ready_for_calculations(data, mandatory_fields: dict, first=True):
+    """
+    Checks if the given data is ready based on the provided mandatory fields.
+
+    Args:
+        data (dict): The data to be validated.
+        mandatory_fields (dict): A dictionary specifying the mandatory fields and their validation rules.
+        first (bool, optional): Indicates if this is the first call to the function. Defaults to True.
+
+    Returns:
+        bool: True if the data is ready for calculations, False otherwise.
+    """
+
+    if first and not isinstance(mandatory_fields, (dict)):
+        raise ValueError(f"Entry point must be a dictionary, got {type(mandatory_fields)}")
+
+    if isinstance(mandatory_fields, list):
+        for field in mandatory_fields:
+            if data.get(field) in (None, False):
+                return False
+
+    if isinstance(mandatory_fields, dict):
+
+        # If mandatory_fields is empty, return True
+        if first and mandatory_fields == {}:
+            return True
+
+        # If this is the first call and no mandatory fields are present, return False
+        if not any(data.get(f) for f in mandatory_fields.keys()) and first:
+            return False
+
+        for field, items in mandatory_fields.items():
+
+            # If the main field is None or False, skip validation for this field
+            if data.get(field) in (None, False):
+                continue
+
+            # If items is a list, iterate over its elements
+            if isinstance(items, list):
+                for sub_field in items:
+                    if isinstance(sub_field, list):
+                        # If sub_field is a list of dictionaries, validate all of them
+                        if all(isinstance(f, dict) for f in sub_field):
+
+                            # If none of the main fields were provided, return False
+                            main_fields = [list(f.keys())[0] for f in sub_field]
+                            if not any(data.get(f) for f in main_fields):
+                                return False
+
+                            # Only validate the main fields that were provided and recursively validate nested data
+                            available_main_fields = [f for f in sub_field if data.get(list(f.keys())[0])]
+                            for main_field in available_main_fields:
+                                for f, v in main_field.items():
+                                    if data.get(f) is None or not is_ready_for_calculations(data, v, first=False):
+                                        return False
+
+                        # If sub_field is a list of strings, validate all of them
+                        elif all(isinstance(f, str) for f in sub_field):
+                            if not any(data.get(f) for f in sub_field):
+                                return False
+
+                    # If sub_field is a dictionary, validate nested data recursively
+                    elif isinstance(sub_field, dict):
+                        if not is_ready_for_calculations(data, sub_field, first=False):
+                            return False
+
+                    # If sub_field is a string, validate the field
+                    elif data.get(sub_field) in (None, False):
+                        return False
+
+            # If items is a dictionary, recursively validate nested data
+            elif isinstance(items, dict):
+                if not is_ready_for_calculations(data, items, first=False):
+                    return False
+
+    return True
+
+
 def main():
     data = {
         "drainage_area_start": 1,
@@ -159,7 +255,7 @@ def main():
         "peat_area_wo": None,
         "peat_ditches_area_wo": None,
     }
-    print("Organic Soil Valid: ", is_ready(data, organic_mandatory_fields))
+    # print("Organic Soil Valid: ", is_ready(data, organic_mandatory_fields))
 
     data = {
         "building_type": 1,
@@ -167,7 +263,7 @@ def main():
         "area_m2_w": None,
         "area_m2_wo": None,
     }
-    print("Building Valid: ", is_ready(data, building_mandatory_fields))
+    # print("Building Valid: ", is_ready(data, building_mandatory_fields))
 
     data = {
         "grassland_management_type_start": 1,
@@ -188,11 +284,29 @@ def main():
         "fire_periodicity_wo": None,
         "fire_impact_wo": None,
     }
-    print("Grassland Valid: ", is_ready(data, grassland_mandatory_fields))
+    # print("Grassland Valid: ", is_ready(data, grassland_mandatory_fields))
 
     empty_mandatory_fields = {}
     data = {}
-    print("Empty Valid: ", is_ready(data, empty_mandatory_fields))
+    # print("Empty Valid: ", is_ready(data, empty_mandatory_fields))
+
+    data = {
+        "land_use_type_start": 1,
+        "water_management_type_before_cultivation_start": 1,
+        "water_management_type_after_cultivation_start": 1,
+        "organic_amendment_type_start": 1,
+        #
+        "land_use_type_w": None,
+        "water_management_type_before_cultivation_w": None,
+        "water_management_type_after_cultivation_w": None,
+        "organic_amendment_type_w": None,
+        #
+        "land_use_type_wo": None,
+        "water_management_type_before_cultivation_wo": None,
+        "water_management_type_after_cultivation_wo": None,
+        "organic_amendment_type_wo": None,
+    }
+    print("Rice Valid: ", is_ready_for_calculations(data, rice_mandatory_fields))
 
 
 main()
