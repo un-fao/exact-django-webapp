@@ -294,5 +294,4 @@ def get_or_raise(model, filter_criteria, error_message, method="get"):
             raise AttributeError(f"Method '{method}' is not callable on {model.__name__} objects.")
         return attr(**filter_criteria)
     except model.DoesNotExist:
-        if model.status and model.status.name == "READY":
-            raise Exception(error_message)
+        raise Exception(error_message)
