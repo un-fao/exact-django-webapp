@@ -126,15 +126,15 @@ class Result:
                 log.debug(f"Total emissions: {breakdown:,f}")
                 return self.compute_balance()
             case BreakdownTypes.GAS:
-                breakdown = self.breakdown_by_gas()
+                breakdown = copy.deepcopy(self.breakdown_by_gas())
                 log.debug({item.gas_type: sum([emission.value for emission in item.emissions]) for item in breakdown})
                 return self.breakdown_by_gas()
             case BreakdownTypes.ACTIVITY:
-                breakdown = self.breakdown_by_activity()
+                breakdown = copy.deepcopy(self.breakdown_by_activity())
                 log.debug({item.activity: sum([emission.value for emission in item.emissions]) for item in breakdown})
                 return self.breakdown_by_activity()
             case BreakdownTypes.ACTIVITY_GAS:
-                breakdown = self.breakdown_by_activity_by_gas()
+                breakdown = copy.deepcopy(self.breakdown_by_activity_by_gas())
                 log.debug({item.activity: sum([emission.value for emission in item.emissions]) for item in breakdown})
                 return self.breakdown_by_activity_by_gas()
             case _:
