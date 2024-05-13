@@ -21,7 +21,7 @@ RICE_CULTIVATION_DAYS = 113
 class CustomUser(auth_models.AbstractUser):
     country = models.ForeignKey("api.Country", on_delete=models.CASCADE, null=True, blank=True, related_name="users")
     email = models.EmailField(unique=True)
-    firebase_uid = models.CharField(max_length=255, unique=True, validators=[alphanumeric], null=True, verbose_name="Firebase UID")
+    firebase_uid = models.CharField(max_length=255, unique=True, validators=[alphanumeric], null=True, blank=True, verbose_name="Firebase UID")
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
