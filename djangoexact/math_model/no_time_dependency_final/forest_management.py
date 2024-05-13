@@ -4,7 +4,7 @@ import traceback
 import matplotlib.pyplot as plt
 import numpy as np
 
-from general_functions import (
+from .general_functions import (
     BaseModule,
     breakdown_according_to_values,
     soil_emissions,
@@ -15,7 +15,7 @@ from general_functions import (
     yearly_time_dependent_matrix,
     yearly_time_dependent_parameter_breakdown,
 )
-from ghg_emissions_classes import (
+from .ghg_emissions_classes import (
     ActivityTypes,
     Emission,
     GasTypes,
@@ -583,8 +583,8 @@ class ForestManagement(BaseModule):
         def multiply_matrix_by_matrix(matrix1, matrix2):
             
             try:
-                plot_annotated_matrix(matrix1)
-                plot_annotated_matrix(matrix2)
+                # plot_annotated_matrix(matrix1)
+                # plot_annotated_matrix(matrix2)
                 if matrix1.shape != matrix2.shape:
                     raise ValueError("Both matrices must have the same dimensions!")
 
@@ -689,126 +689,126 @@ class ForestManagement(BaseModule):
         calculate_deadwood()
         calculate_soc()
 
-years_cap = 18
-years_impl = 5
-rate = 'D'
-hectares_start = 0
-hectares_end = 100
-rotation_recurrence = 7
-rotation_start_year = 0
-rotation_percentage_energy = 0
-bgb_ratio_threshold = 125
-bgb_ratio_under_threshold = 0.3
-bgb_ratio_over_threshold = 0.27
-bgb_yearly_growth_under_20_tier_2 = None
-bgb_yearly_growth_over_20_tier_2 = None
-agb_start_default = 67
-agb_start_tier_2 = None
-agb_yearly_growth_under_20_default = 3.5
-agb_yearly_growth_under_20_tier_2 = None
-agb_yearly_growth_over_20_default = 2.5
-agb_yearly_growth_over_20_tier_2 = None
-max_agb_value = 67
-max_bgb_value = max_agb_value * bgb_ratio_under_threshold
-disturbance_recurrence = None
-disturbance_percentage = []
-disturbance_year_of_start = []
-logging_recurrence = None
-logging_percentage = 0.5
-logging_percentage_energy = 0.3
-logging_year_of_start = 0
-litter_20_years_default = 43.9
-litter_start = 43.9
-litter_max = 43.9
-litter_20_years_tier_2 = None
-deadwood_20_years_default = 43.4
-deadwood_start = 43.4
-deadwood_max = 43.4
-deadwood_20_years_tier_2 = None
-socref_default = 27
-soc_tier_2 = None
-f_lu_tier_2 = None
-f_i_tier_2 = None
-f_mg_tier_2 = None
-f_lu_ref = 1
-f_i_ref = 1
-f_mg_ref = 1
-ef_methane = 28
-ef_nitrous = 265
-forest_cf = 0.32
-forest_gef_ch4 = 6.8
-forest_gef_n2o = 0.2
-forest_gef_co2 = None
+# years_cap = 18
+# years_impl = 5
+# rate = 'D'
+# hectares_start = 0
+# hectares_end = 100
+# rotation_recurrence = 7
+# rotation_start_year = 0
+# rotation_percentage_energy = 0
+# bgb_ratio_threshold = 125
+# bgb_ratio_under_threshold = 0.3
+# bgb_ratio_over_threshold = 0.27
+# bgb_yearly_growth_under_20_tier_2 = None
+# bgb_yearly_growth_over_20_tier_2 = None
+# agb_start_default = 67
+# agb_start_tier_2 = None
+# agb_yearly_growth_under_20_default = 3.5
+# agb_yearly_growth_under_20_tier_2 = None
+# agb_yearly_growth_over_20_default = 2.5
+# agb_yearly_growth_over_20_tier_2 = None
+# max_agb_value = 67
+# max_bgb_value = max_agb_value * bgb_ratio_under_threshold
+# disturbance_recurrence = None
+# disturbance_percentage = []
+# disturbance_year_of_start = []
+# logging_recurrence = None
+# logging_percentage = 0.5
+# logging_percentage_energy = 0.3
+# logging_year_of_start = 0
+# litter_20_years_default = 43.9
+# litter_start = 43.9
+# litter_max = 43.9
+# litter_20_years_tier_2 = None
+# deadwood_20_years_default = 43.4
+# deadwood_start = 43.4
+# deadwood_max = 43.4
+# deadwood_20_years_tier_2 = None
+# socref_default = 27
+# soc_tier_2 = None
+# f_lu_tier_2 = None
+# f_i_tier_2 = None
+# f_mg_tier_2 = None
+# f_lu_ref = 1
+# f_i_ref = 1
+# f_mg_ref = 1
+# ef_methane = 28
+# ef_nitrous = 265
+# forest_cf = 0.32
+# forest_gef_ch4 = 6.8
+# forest_gef_n2o = 0.2
+# forest_gef_co2 = None
 
-# create instance of the class
+# # create instance of the class
 
-forest_management = ForestManagement(
-    years_cap,
-    years_impl,
-    rate,
-    hectares_start,
-    hectares_end,
-    rotation_recurrence,
-    rotation_start_year,
-    rotation_percentage_energy,
-    bgb_ratio_threshold,
-    bgb_ratio_under_threshold,
-    bgb_ratio_over_threshold,
-    bgb_yearly_growth_under_20_tier_2,
-    bgb_yearly_growth_over_20_tier_2,
-    agb_start_default,
-    agb_start_tier_2,
-    agb_yearly_growth_under_20_default,
-    agb_yearly_growth_under_20_tier_2,
-    agb_yearly_growth_over_20_default,
-    agb_yearly_growth_over_20_tier_2,
-    max_agb_value,
-    max_bgb_value,
-    disturbance_recurrence,
-    disturbance_percentage,
-    disturbance_year_of_start,
-    logging_recurrence,
-    logging_percentage,
-    logging_percentage_energy,
-    logging_year_of_start,
-    litter_20_years_default,
-    litter_start,
-    litter_max,
-    litter_20_years_tier_2,
-    deadwood_20_years_default,
-    deadwood_start,
-    deadwood_max,
-    deadwood_20_years_tier_2,
-    socref_default,
-    soc_tier_2,
-    f_lu_tier_2,
-    f_i_tier_2,
-    f_mg_tier_2,
-    f_lu_ref,
-    f_i_ref,
-    f_mg_ref,
-    ef_methane,
-    ef_nitrous,
-    forest_cf,
-    forest_gef_ch4,
-    forest_gef_n2o,
-    forest_gef_co2,
-)
-import json
+# forest_management = ForestManagement(
+#     years_cap,
+#     years_impl,
+#     rate,
+#     hectares_start,
+#     hectares_end,
+#     rotation_recurrence,
+#     rotation_start_year,
+#     rotation_percentage_energy,
+#     bgb_ratio_threshold,
+#     bgb_ratio_under_threshold,
+#     bgb_ratio_over_threshold,
+#     bgb_yearly_growth_under_20_tier_2,
+#     bgb_yearly_growth_over_20_tier_2,
+#     agb_start_default,
+#     agb_start_tier_2,
+#     agb_yearly_growth_under_20_default,
+#     agb_yearly_growth_under_20_tier_2,
+#     agb_yearly_growth_over_20_default,
+#     agb_yearly_growth_over_20_tier_2,
+#     max_agb_value,
+#     max_bgb_value,
+#     disturbance_recurrence,
+#     disturbance_percentage,
+#     disturbance_year_of_start,
+#     logging_recurrence,
+#     logging_percentage,
+#     logging_percentage_energy,
+#     logging_year_of_start,
+#     litter_20_years_default,
+#     litter_start,
+#     litter_max,
+#     litter_20_years_tier_2,
+#     deadwood_20_years_default,
+#     deadwood_start,
+#     deadwood_max,
+#     deadwood_20_years_tier_2,
+#     socref_default,
+#     soc_tier_2,
+#     f_lu_tier_2,
+#     f_i_tier_2,
+#     f_mg_tier_2,
+#     f_lu_ref,
+#     f_i_ref,
+#     f_mg_ref,
+#     ef_methane,
+#     ef_nitrous,
+#     forest_cf,
+#     forest_gef_ch4,
+#     forest_gef_n2o,
+#     forest_gef_co2,
+# )
+# import json
 
-def complex_object_to_json(obj):
-    if hasattr(obj, "to_dict"):
-        return obj.to_dict()  # Custom method to convert to dictionary
-    elif isinstance(obj, list):
-        return [complex_object_to_json(item) for item in obj]
-    elif isinstance(obj, dict):
-        return {k: complex_object_to_json(v) for k, v in obj.items()}
-    else:
-        return str(obj)  # Fallback to converting to string if not otherwise serializable
+# def complex_object_to_json(obj):
+#     if hasattr(obj, "to_dict"):
+#         return obj.to_dict()  # Custom method to convert to dictionary
+#     elif isinstance(obj, list):
+#         return [complex_object_to_json(item) for item in obj]
+#     elif isinstance(obj, dict):
+#         return {k: complex_object_to_json(v) for k, v in obj.items()}
+#     else:
+#         return str(obj)  # Fallback to converting to string if not otherwise serializable
 
-forest_management.calculate_emissions()
+# forest_management.calculate_emissions()
 
-forest_management.result.plot_emissions_and_aggregate_by_activity()
+# forest_management.result.plot_emissions_and_aggregate_by_activity()
 
 
 
