@@ -132,6 +132,7 @@ router.register(r"trophic-types", views.generic_viewset(models.TrophicType), bas
 router.register(r"settlements", views.generic_module_viewset(models.Settlement), basename="settlements")
 router.register(r"buildings", views.generic_module_viewset(models.Building), basename="buildings")
 router.register(r"roads", views.generic_module_viewset(models.Road), basename="roads")
+router.register(r"other-infrastructures", views.generic_module_viewset(models.OtherInfrastructure), basename="other-infrastructures")
 router.register(r"road-types", views.generic_viewset(models.RoadType), basename="road-types")
 router.register(r"building-types", views.generic_viewset(models.BuildingType), basename="building-types")
 
