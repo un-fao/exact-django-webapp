@@ -123,23 +123,59 @@ def yearly_time_dependent_full_year(start_value, end_value, years_implementation
 
 import matplotlib.pyplot as plt
 
-
+# TODO: these functions basically only work with 'D' as a rate. has to be generalized
 def yearly_time_dependent_matrix(start_value, end_value, years_implementation, years_capitalization, function, interim_values=True):
-    years_total = years_implementation + years_capitalization
 
-    half_year = yearly_time_dependent_increase_half_year(start_value, end_value, years_implementation, years_capitalization, function)
-    full_year = yearly_time_dependent_full_year(start_value, end_value, years_implementation, years_capitalization, function)
+    if function == "D":
+        years_total = years_implementation + years_capitalization
 
-    matrix = np.full((years_total, years_total), 0.0)
-    n = len(half_year)
+        half_year = yearly_time_dependent_increase_half_year(start_value, end_value, years_implementation, years_capitalization, function)
+        full_year = yearly_time_dependent_full_year(start_value, end_value, years_implementation, years_capitalization, function)
 
-    for i in range(matrix.shape[0]):
-        matrix[i][i] = half_year[2]
-        for j in range(i + 1, n):
-            matrix[i][j] = full_year[1]
+        matrix = np.full((years_implementation, years_total), 0.0)
+        n = len(half_year)
 
-    # NOTE: now it does what is needed, but it is not very readable. Has to be fixed further on
-    return matrix
+        for i in range(matrix.shape[0]):
+            matrix[i][i] = half_year[0]
+            for j in range(i + 1, n):
+                matrix[i][j] = full_year[0]
+
+        # NOTE: now it does what is needed, but it is not very readable. Has to be fixed further on
+
+        return matrix
+    
+    elif function == "immediate":
+        years_total = years_implementation + years_capitalization
+
+        matrix = np.full((years_implementation, years_total), end_value)
+
+        return matrix
+
+def yearly_time_dependent_matrix_log_rec_dis(start_value, end_value, years_implementation, years_capitalization, function, interim_values=True):
+
+    if function == "D":
+        # NOTE: Basically the same as above, however rather than having the values of half a year of hectares across the diagonal (i.e. we intervene at half of the year),
+        # we have the value of a full year at each cell. This is due to the fact that we are cutting all the hectares at the beginning of the year
+        years_total = years_implementation + years_capitalization
+
+        full_year = yearly_time_dependent_full_year(start_value, end_value, years_implementation, years_capitalization, function)
+
+        matrix = np.full((years_implementation, years_total), 0.0)
+        n = len(full_year)
+
+        for i in range(matrix.shape[0]):
+            for j in range(i, n):
+                matrix[i][j] = full_year[1]
+
+        return matrix
+    
+    elif function == "immediate":
+        years_total = years_implementation + years_capitalization
+
+        matrix = np.full((years_implementation, years_total), end_value)
+
+        return matrix
+    
 
 
 # LIVESTOCK CH4 HEAD GENERAL FUNCTION
