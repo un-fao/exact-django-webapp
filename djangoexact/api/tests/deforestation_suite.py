@@ -85,6 +85,10 @@ for i in range(PROJECT_SIZE):
 
     a: Activity = ActivityFactory.create(project=p)
 
+    a.module_types.add(ModuleType.objects.get(name="Forest Management"))
+    a.module_types.add(ModuleType.objects.get(name="Grassland"))
+    a.save()
+
     luc: LandUseChange = LandUseChangeFactory.create(activity=a)
     luc.module_type_start = ModuleType.objects.get(name="Forest Management")
     luc.module_type_wo = ModuleType.objects.get(name="Grassland")
@@ -100,11 +104,15 @@ for i in range(PROJECT_SIZE):
         forest.status = StatusType.objects.get(name="READY")
         forest.save()
 
+        print(f"Forest: {forest}")
+
     grasslands: list[Grassland] = GrasslandFactory.create_batch(BATCH_SIZE, activity=a)
     for grassland in grasslands:
         grassland.land_use_change = luc
         grassland.status = StatusType.objects.get(name="READY")
         grassland.save()
+
+        print(f"Grassland: {grassland}")
 
     total_livestocks = forests.__len__()
     passed_livestocks = 0
