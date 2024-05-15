@@ -564,14 +564,21 @@ class AllModulesBaseSerializer(serializers.ModelSerializer):
         if not self.instance:
             return data
 
-        # Merge the instance data with the new data
-        data.update({key: value for key, value in self.instance.__dict__.items() if key not in data})
+        self.instance: Model
 
-        # If the keys in data have a counterpart in the instance with an _id suffix,
-        # add the value from the data.id to the data as a new key with the _id suffix
-        for key, value in list(data.items()):
-            if key + "_id" in self.instance.__dict__:
-                data[key + "_id"] = getattr(value, "id", value)
+        # Get instance attributes
+        instance_fields = self.instance._meta.get_fields()
+        # Exclude the fields that are not editable
+        instance_fields = [field for field in instance_fields if field.editable]
+
+        # Merge the instance data with the new data
+        data.update({key: getattr(self.instance, key) for key in [field.name for field in instance_fields if field.name not in data]})
+
+        # # If the keys in data have a counterpart in the instance with an _id suffix,
+        # # add the value from the data.id to the data as a new key with the _id suffix
+        # for key, value in list(data.items()):
+        #     if key + "_id" in self.instance.__dict__:
+        #         data[key + "_id"] = getattr(value, "id", value)
 
         return data
 
@@ -676,6 +683,7 @@ class SubmoduleBaseSerializer(AllModulesBaseSerializer):
 
 class ModuleBaseSerializer(AllModulesBaseSerializer):
     module_type = get_model_serializer(ModuleType)(many=False, read_only=True)
+    status = get_model_serializer(StatusType)(many=False, read_only=True)
 
     class Meta:
         extra_fields = ["module_type"]
@@ -697,6 +705,15 @@ class ModuleBaseSerializer(AllModulesBaseSerializer):
         if self.Meta.ref_name not in module_types and self.Meta.ref_name != "LandUseChange":
             log.error(f"Module type {self.Meta.ref_name} is not present for this activity")
             raise serializers.ValidationError("This module type is not present for this activity")
+
+        self.merge_instance_data(data)
+
+        if not self.is_ready_for_calculations(data, self.Meta.mandatory_fields):
+            log.debug(f"Module {self.Meta.ref_name} is not ready for calculations")
+            data["status"] = StatusType.objects.get(name="EMPTY")
+            return super().validate(data)
+
+        data["status"] = StatusType.objects.get(name="READY")
 
         log.debug(f"END ModuleBaseSerializer[{self.Meta.ref_name}].validate")
         return super().validate(data)
@@ -1187,6 +1204,7 @@ class IrrigationWriteSerializer(ModuleBaseSerializer):
         model = Irrigation
         fields = "__all__"
         ref_name = "Irrigation"
+        mandatory_fields = {}
 
 
 class IrrigationReadSerializer(ModuleBaseSerializer):
@@ -1194,6 +1212,19 @@ class IrrigationReadSerializer(ModuleBaseSerializer):
         model = Irrigation
         fields = "__all__"
         ref_name = "Irrigation"
+
+    def validate(self, data):
+
+        irrigation_systems = self.instance.irrigation_systems.all()
+        irrigation_phases = self.instance.irrigation_phases.all()
+
+        if any([system.status.name == "EMPTY" for system in irrigation_systems]):
+            raise serializers.ValidationError("Irrigation systems are not ready for calculations")
+
+        if any([phase.status.name == "EMPTY" for phase in irrigation_phases]):
+            raise serializers.ValidationError("Irrigation phases are not ready for calculations")
+
+        return super().validate(data)
 
 
 # IrrigationSystem
@@ -1797,18 +1828,29 @@ class SettlementReadSerializer(LandModuleReadSerializer):
 
         buildings = Building.objects.filter(parent=self.instance).all()
 
+        if any(building.status.name == "EMPTY" for building in buildings):
+            raise serializers.ValidationError("At least one building is not ready for calculations")
+
         for building in buildings:
             building_serializer = BuildingReadSerializer(data=building.__dict__, instance=building)
             if not building_serializer.is_valid():
                 raise serializers.ValidationError(building_serializer.errors)
 
         roads = Road.objects.filter(parent=self.instance).all()
+
+        if any(road.status.name == "EMPTY" for road in roads):
+            raise serializers.ValidationError("At least one road is not ready for calculations")
+
         for road in roads:
             road_serializer = RoadReadSerializer(data=road.__dict__, instance=road)
             if not road_serializer.is_valid():
                 raise serializers.ValidationError(road_serializer.errors)
 
         other_infrastructures = OtherInfrastructure.objects.filter(parent=self.instance).all()
+
+        if any(other_infrastructure.status.name == "EMPTY" for other_infrastructure in other_infrastructures):
+            raise serializers.ValidationError("At least one other infrastructure is not ready for calculations")
+
         for other_infrastructure in other_infrastructures:
             other_infrastructure_serializer = OtherInfrastructureReadSerializer(data=other_infrastructure.__dict__, instance=other_infrastructure)
             if not other_infrastructure_serializer.is_valid():

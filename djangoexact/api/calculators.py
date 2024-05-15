@@ -3445,8 +3445,8 @@ class SettlementCalculator(BaseCalculator):
 
         return (res_w, res_wo)
 
-    def defaults(self) -> DefaultData:
-        pass
+    def get_defaults(self, calculate=False) -> dict:
+        return super().get_defaults(calculate)
 
 
 class BuildingCalculator(BaseCalculator):
@@ -3469,7 +3469,7 @@ class BuildingCalculator(BaseCalculator):
 
         # TODO: What do we need the start scenario for?
         # TODO: Define if all the fields of an input are required after creation
-        ef = utils.get_or_raise(ipcc.BuildingEmissionFactor, {"building_type": input.building_type}, f"Could not find Building EF for {input.building_type.name}")
+        ef = utils.get_or_raise(ipcc.BuildingEmissionFactor, {"building_type": input.building_type}, f"Could not find Building EF for {input.building_type}")
 
         inputs_w = [
             ef.value,
