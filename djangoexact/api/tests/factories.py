@@ -95,6 +95,8 @@ class SmallFisheryFactory(FisheryFactory):
         model = SmallFishery
         abstract = False
 
+    status = READY
+
     fishery_type = factory.fuzzy.FuzzyChoice(fishery_types)
 
     gear_type_start = sm_gear_type
@@ -106,6 +108,8 @@ class LargeFisheryFactory(FisheryFactory):
     class Meta:
         model = LargeFishery
         abstract = False
+
+    status = READY
 
     fish_type = factory.fuzzy.FuzzyChoice(fish_types)
 
@@ -394,17 +398,15 @@ class CoastalWetlandFactory(DjangoModelFactory):
 
     status = READY
 
-    ha_start = 150
-    ha_w = 150
-    ha_wo = 150
+    area = 150
 
     land_use_type = factory.fuzzy.FuzzyChoice(coastal_vegetations)
 
-    area_under_drainage_start = factory.fuzzy.FuzzyFloat(0, ha_start)
-    area_under_drainage_w = factory.fuzzy.FuzzyFloat(0, ha_w)
-    area_under_drainage_wo = factory.fuzzy.FuzzyFloat(0, ha_wo)
+    area_under_drainage_start = factory.fuzzy.FuzzyFloat(0, area)
+    area_under_drainage_w = factory.fuzzy.FuzzyFloat(0, area)
+    area_under_drainage_wo = factory.fuzzy.FuzzyFloat(0, area)
 
-    avg_salinity_t2 = SalinityType.objects.get(name="<18")
+    avg_salinity_t2 = SalinityType.objects.get(value="<18")
 
 
 class WaterbodyFactory(DjangoModelFactory):
