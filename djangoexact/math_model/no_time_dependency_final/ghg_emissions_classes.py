@@ -122,20 +122,12 @@ class Result:
     def breakdown(self, by=BreakdownTypes.TOTAL):
         match by:
             case BreakdownTypes.TOTAL:
-                breakdown = self.compute_balance()
-                log.debug(f"Total emissions: {breakdown:,f}")
                 return self.compute_balance()
             case BreakdownTypes.GAS:
-                breakdown = copy.deepcopy(self.breakdown_by_gas())
-                log.debug({item.gas_type: sum([emission.value for emission in item.emissions]) for item in breakdown})
                 return self.breakdown_by_gas()
             case BreakdownTypes.ACTIVITY:
-                breakdown = copy.deepcopy(self.breakdown_by_activity())
-                log.debug({item.activity: sum([emission.value for emission in item.emissions]) for item in breakdown})
                 return self.breakdown_by_activity()
             case BreakdownTypes.ACTIVITY_GAS:
-                breakdown = copy.deepcopy(self.breakdown_by_activity_by_gas())
-                log.debug({item.activity: sum([emission.value for emission in item.emissions]) for item in breakdown})
                 return self.breakdown_by_activity_by_gas()
             case _:
                 raise Exception("Invalid breakdown type")
