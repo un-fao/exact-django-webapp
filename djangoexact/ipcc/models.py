@@ -728,12 +728,23 @@ class GrasslandSOC(Model):
         return f"{self.value} for {self.grassland_management_type.name}"
 
 
+class GrasslandStockExchangeFactorManager(Manager):
+    # get or default: try getting it, otherwise return the default value (all values are 1)
+    def get_or_default(self, grassland_management_type, climate):
+        try:
+            return self.get(grassland_management_type=grassland_management_type, climate=climate)
+        except GrasslandStockExchangeFactor.DoesNotExist:
+            return SimpleNamespace(fmg=1, flu=1, fi=1, grassland_management_type=grassland_management_type, climate=climate)
+
+
 class GrasslandStockExchangeFactor(Model):
     grassland_management_type = ForeignKey("api.GrasslandManagementType", on_delete=CASCADE)
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     fmg = FloatField(default=1)
     flu = FloatField(default=1)
     fi = FloatField(default=1)
+
+    objects = GrasslandStockExchangeFactorManager()
 
     def __str__(self):
         return f"{self.fmg} {self.flu} {self.fi} for {self.grassland_management_type.name} {self.climate.name}"

@@ -465,6 +465,9 @@ class LandUseChangeCalculator(BaseCalculator):
     Calculator for land use change modules.
     """
 
+    def get_defaults(self, calculate=False) -> dict:
+        return super().get_defaults(calculate)
+
     def luc_based_calculation(self, module_start: Module, module_end: Module, aggregate_by=BreakdownTypes.TOTAL) -> Result:
         if type(module_start) == ForestManagement:
             return DeforestationCalculator(module_start).calculate()
@@ -508,6 +511,9 @@ class DeforestationCalculator(BaseCalculator):
     TODO: Refactor with new logic
     Calculator for deforestation modules.
     """
+
+    def get_defaults(self, calculate=False) -> dict:
+        return super().get_defaults(calculate)
 
     def calculate(self) -> Result:
         """
@@ -2213,10 +2219,10 @@ class GrasslandCalculator(BaseCalculator):
         self.agb = SimpleNamespace(value=0)
         self.cf = SimpleNamespace(value=0)
         self.soc = SimpleNamespace(value=0)
-        self.soc_start = SimpleNamespace(value=0)
-        self.soc_w = SimpleNamespace(value=0)
-        self.soc_w = SimpleNamespace(value=0)
-        self.soc_wo = SimpleNamespace(value=0)
+        self.soc_start = SimpleNamespace(fi=1, fmg=1, flu=1)
+        self.soc_w = SimpleNamespace(fi=1, fmg=1, flu=1)
+        self.soc_w = SimpleNamespace(fi=1, fmg=1, flu=1)
+        self.soc_wo = SimpleNamespace(fi=1, fmg=1, flu=1)
 
     def get_defaults(self, calculate=False):
         module: Grassland = self.data
@@ -2251,45 +2257,35 @@ class GrasslandCalculator(BaseCalculator):
         if is_luc_remaining_same(module):
 
             try:
-                self.soc_start = ipcc.GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_start, climate=project.climate)
+                self.soc_start = ipcc.GrasslandStockExchangeFactor.objects.get_or_default(grassland_management_type=module.grassland_management_type_start, climate=project.climate)
             except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
                 raise Exception(f"Stock exchange factor for {module.grassland_management_type_start.name} in {project.climate.name} climate does not exist")
 
             try:
-                self.soc_w = ipcc.GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_w, climate=project.climate)
+                self.soc_w = ipcc.GrasslandStockExchangeFactor.objects.get_or_default(grassland_management_type=module.grassland_management_type_w, climate=project.climate)
             except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
                 raise Exception(f"Stock exchange factor for {module.grassland_management_type_w.name} in {project.climate.name} climate does not exist")
 
         if is_with(module):
             try:
-                self.soc_start = ipcc.GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_start, climate=project.climate)
+                self.soc_start = ipcc.GrasslandStockExchangeFactor.objects.get_or_default(grassland_management_type=module.grassland_management_type_start, climate=project.climate)
             except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
                 raise Exception(f"Stock exchange factor for {module.grassland_management_type_start.name} in {project.climate.name} climate does not exist")
 
             try:
-                self.soc_w = ipcc.GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_w, climate=project.climate)
+                self.soc_w = ipcc.GrasslandStockExchangeFactor.objects.get_or_default(grassland_management_type=module.grassland_management_type_w, climate=project.climate)
             except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
                 raise Exception(f"Stock exchange factor for {module.grassland_management_type_w.name} in {project.climate.name} climate does not exist")
 
         if is_business_as_usual(module):
 
             try:
-                self.soc_start = ipcc.GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_start, climate=project.climate)
+                self.soc_start = ipcc.GrasslandStockExchangeFactor.objects.get_or_default(grassland_management_type=module.grassland_management_type_start, climate=project.climate)
             except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
                 raise Exception(f"Stock exchange factor for {module.grassland_management_type_start.name} in {project.climate.name} climate does not exist")
 
             try:
-                self.soc_wo = ipcc.GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_wo, climate=project.climate)
-            except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
-                raise Exception(f"Stock exchange factor for {module.grassland_management_type_wo.name} in {project.climate.name} climate does not exist")
-
-            try:
-                self.soc_start = ipcc.GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_start, climate=project.climate)
-            except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
-                raise Exception(f"Stock exchange factor for {module.grassland_management_type_start.name} in {project.climate.name} climate does not exist")
-
-            try:
-                self.soc_wo = ipcc.GrasslandStockExchangeFactor.objects.get(grassland_management_type=module.grassland_management_type_wo, climate=project.climate)
+                self.soc_wo = ipcc.GrasslandStockExchangeFactor.objects.get_or_default(grassland_management_type=module.grassland_management_type_wo, climate=project.climate)
             except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
                 raise Exception(f"Stock exchange factor for {module.grassland_management_type_wo.name} in {project.climate.name} climate does not exist")
 
