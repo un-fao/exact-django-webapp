@@ -24,7 +24,7 @@ TEST_PERENNIAL_CROPPING = False
 TEST_LIVESTOCK = False
 TEST_GRASSLAND = False
 TEST_INPUTS = False
-TEST_COASTAL_WETLAND = True
+TEST_COASTAL_WETLAND = False
 INPUTS_BATCH_SIZE = 3
 
 TEST_ENERGY = False
@@ -115,7 +115,7 @@ print(f"Project: {p}")
 # sleep(1)
 
 # Activity Creation
-a = ActivityFactory.create(project=p)
+a: Activity = ActivityFactory.create(project=p)
 print(f"Activity: {a}")
 
 # Fishery Sheet
@@ -126,9 +126,12 @@ print(f"Activity: {a}")
 
 if TEST_SM_FISHERY:
     # Small Fishery Creation
-    sm_fisheries = SmallFisheryFactory.build_batch(BATCH_SIZE, activity=a)
+    sm_fisheries = SmallFisheryFactory.create_batch(BATCH_SIZE, activity=a)
     total_fisheries = sm_fisheries.__len__()
     passed_fisheries = 0
+
+    a.module_types.add(ModuleType.objects.get(name="Small Fishery"))
+    a.save()
 
     # Small Fishery Testing
     print("Testing SmallFishery...")
@@ -137,6 +140,8 @@ if TEST_SM_FISHERY:
         # print("-----------------------------------")
 
         small_fishery: SmallFishery
+
+        print(small_fishery)
 
         print(f"Type of fishery: {small_fishery.fishery_type}")
 
@@ -207,6 +212,9 @@ if TEST_LG_FISHERY:
     lg_fisheries = LargeFisheryFactory.build_batch(BATCH_SIZE, activity=a)
     total_lg_fisheries = lg_fisheries.__len__()
     passed_lg_fisheries = 0
+
+    a.module_types.add(ModuleType.objects.get(name="Large Fishery"))
+    a.save()
 
     # Large Fishery Testing
     print("Testing LargeFishery...")
@@ -447,6 +455,9 @@ if TEST_LIVESTOCK:
 
     livestock = LivestockFactory.create_batch(BATCH_SIZE, activity=a)
 
+    a.module_types.add(ModuleType.objects.get(name="Livestock"))
+    a.save()
+
     total_livestocks = livestock.__len__()
     passed_livestocks = 0
 
@@ -478,6 +489,9 @@ if TEST_LIVESTOCK:
 if TEST_GRASSLAND:
     grassland = GrasslandFactory.build_batch(BATCH_SIZE, activity=a)
 
+    a.module_types.add(ModuleType.objects.get(name="Grassland"))
+    a.save()
+
     total_grasslands = grassland.__len__()
     passed_grasslands = 0
 
@@ -496,6 +510,9 @@ if TEST_GRASSLAND:
 
 if TEST_INPUTS:
     inputs = InputFactory.create_batch(BATCH_SIZE, activity=a)
+
+    a.module_types.add(ModuleType.objects.get(name="Inputs"))
+    a.save()
 
     total_inputs = inputs.__len__()
     passed_inputs = 0
@@ -535,6 +552,9 @@ if TEST_INPUTS:
 
 if TEST_ENERGY:
     energy = EnergyFactory.create_batch(BATCH_SIZE, activity=a)
+
+    a.module_types.add(ModuleType.objects.get(name="Energy"))
+    a.save()
 
     total_energy = energy.__len__()
     passed_energy = 0
