@@ -4945,6 +4945,9 @@ class WaterbodyCalculator(BaseCalculator):
     Calculator for waterbody modules.
     """
 
+    def get_defaults(self, calculate=False) -> dict:
+        return super().get_defaults(calculate)
+
     def calculate(self) -> Result:
         """
         Calculate emissions for a single Waterbody module.
@@ -5051,6 +5054,10 @@ class WaterbodyCalculator(BaseCalculator):
 
 
 class OrganicSoilCalculator(BaseCalculator):
+
+    def get_defaults(self, calculate=False) -> dict:
+        return super().get_defaults(calculate)
+
     def calculate(self) -> Result:
         input: OrganicSoil = self.data
         project: Project = input.activity.project
@@ -5426,6 +5433,9 @@ class ForestManagementCalculator(BaseCalculator):
     """
     # TODO: Review
     """
+
+    def get_defaults(self, calculate=False) -> dict:
+        return super().get_defaults(calculate)
 
     def calculate(self) -> Result:
         """"""
