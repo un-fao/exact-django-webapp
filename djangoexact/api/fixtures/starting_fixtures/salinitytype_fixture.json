@@ -1,1 +1,1 @@
-[{"model": "api.salinitytype", "pk": 1, "fields": {"value": "<18"}}]
+[{"model": "api.salinitytype", "pk": 1, "fields": {"value": "<18"}}, {"model": "api.salinitytype", "pk": 2, "fields": {"value": ">18"}}]

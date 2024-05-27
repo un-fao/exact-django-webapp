@@ -1,1 +1,1 @@
-[{"model": "api.macrofueltype", "pk": 1, "fields": {"name": "Liquid"}}, {"model": "api.macrofueltype", "pk": 2, "fields": {"name": "Solid"}}]
+[{"model": "api.macrofueltype", "pk": 1, "fields": {"name": "Liquid or gaseous"}}, {"model": "api.macrofueltype", "pk": 2, "fields": {"name": "Solid"}}]
