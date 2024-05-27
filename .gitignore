@@ -72,3 +72,11 @@ path_to_combined_image.png
 djangoexact/forest_agb.csv
 djangoexact/scripts/participants.csv
 djangoexact/scripts/lsipt_participants.py
+
+
+**/fixtures/
+**/starting_fixtures/
+load_starting_fixtures.py
+djangoexact/api/fixtures/
+
+
