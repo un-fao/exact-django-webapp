@@ -819,6 +819,7 @@ class GrasslandReadSerializer(LandModuleReadSerializer):
         model = Grassland
         fields = "__all__"
         ref_name = "Grassland"
+        mandatory_fields = {}
 
 
 # Annual Cropping
@@ -855,6 +856,7 @@ class MinorSeasonAnnualCroppingReadSerializer(serializers.ModelSerializer):
         model = MinorSeasonAnnualCropping
         fields = "__all__"
         ref_name = "MinorSeasonAnnualCropping"
+        mandatory_fields = {}
 
 
 class AnnualCroppingWriteSerializer(LandModuleWriteSerializer):
@@ -889,6 +891,7 @@ class AnnualCroppingReadSerializer(LandModuleReadSerializer):
         model = AnnualCropping
         fields = "__all__"
         ref_name = "AnnualCropping"
+        mandatory_fields = {}
 
 
 # Perennial Cropping
@@ -920,6 +923,7 @@ class MinorSeasonPerennialCroppingReadSerializer(serializers.ModelSerializer):
         model = MinorSeasonPerennialCropping
         fields = "__all__"
         ref_name = "MinorSeasonPerennialCropping"
+        mandatory_fields = {}
 
 
 class PerennialCroppingWriteSerializer(LandModuleWriteSerializer):
@@ -951,6 +955,7 @@ class PerennialCroppingReadSerializer(LandModuleReadSerializer):
         fields = "__all__"
         ref_name = "PerennialCropping"
         extra_fields = ["minor_seasons"]
+        mandatory_fields = {}
 
 
 # Land Use Change
@@ -968,6 +973,7 @@ class LandUseChangeReadSerializer(LandModuleReadSerializer):
         model = LandUseChange
         fields = "__all__"
         ref_name = "LandUseChange"
+        mandatory_fields = {}
 
 
 # Organic Soil
@@ -1016,6 +1022,7 @@ class OrganicSoilReadSerializer(LandModuleReadSerializer):
         model = OrganicSoil
         fields = "__all__"
         ref_name = "OrganicSoil"
+        mandatory_fields = {}
 
 
 # Flooded Rice
@@ -1050,6 +1057,7 @@ class MinorSeasonFloodedRiceReadSerializer(serializers.ModelSerializer):
         model = MinorSeasonFloodedRice
         fields = "__all__"
         ref_name = "MinorSeasonFloodedRice"
+        mandatory_fields = {}
 
 
 class FloodedRiceWriteSerializer(LandModuleWriteSerializer):
@@ -1102,6 +1110,7 @@ class FloodedRiceReadSerializer(LandModuleReadSerializer):
         fields = "__all__"
         ref_name = "FloodedRice"
         extra_fields = ["minor_seasons"]
+        mandatory_fields = {}
 
 
 # Building
@@ -1126,6 +1135,7 @@ class BuildingReadSerializer(serializers.ModelSerializer):
         model = Building
         fields = "__all__"
         ref_name = "Building"
+        mandatory_fields = {}
 
 
 # Road
@@ -1177,6 +1187,7 @@ class RoadReadSerializer(serializers.ModelSerializer):
         model = Road
         fields = "__all__"
         ref_name = "Road"
+        mandatory_fields = {}
 
 
 # Other
@@ -1197,6 +1208,7 @@ class OtherInfrastructureReadSerializer(serializers.ModelSerializer):
         model = OtherInfrastructure
         fields = "__all__"
         ref_name = "Other"
+        mandatory_fields = {}
 
 
 class IrrigationWriteSerializer(ModuleBaseSerializer):
@@ -1212,6 +1224,7 @@ class IrrigationReadSerializer(ModuleBaseSerializer):
         model = Irrigation
         fields = "__all__"
         ref_name = "Irrigation"
+        mandatory_fields = {}
 
     def validate(self, data):
 
@@ -1257,6 +1270,7 @@ class IrrigationSystemReadSerializer(serializers.ModelSerializer):
         model = IrrigationSystem
         fields = "__all__"
         ref_name = "IrrigationSystem"
+        mandatory_fields = {}
 
 
 # IrrigationPhase
@@ -1291,6 +1305,7 @@ class IrrigationPhaseReadSerializer(serializers.ModelSerializer):
         model = IrrigationPhase
         fields = "__all__"
         ref_name = "IrrigationPhase"
+        mandatory_fields = {}
 
 
 class EnergyWriteSerializer(ModuleBaseSerializer):
@@ -1305,6 +1320,7 @@ class EnergyReadSerializer(ModuleBaseSerializer):
         model = Energy
         fields = "__all__"
         ref_name = "Energy"
+        mandatory_fields = {}
 
 
 # Fuel
@@ -1343,6 +1359,7 @@ class FuelReadSerializer(serializers.ModelSerializer):
         model = Fuel
         fields = "__all__"
         ref_name = "Fuel"
+        mandatory_fields = {}
 
 
 class ElectricityWriteSerializer(SubmoduleBaseSerializer):
@@ -1369,6 +1386,7 @@ class ElectricityReadSerializer(serializers.ModelSerializer):
         model = Electricity
         fields = "__all__"
         ref_name = "Electricity"
+        mandatory_fields = {}
 
 
 # Livestock
@@ -1416,6 +1434,7 @@ class LivestockReadSerializer(LandModuleReadSerializer):
         model = Livestock
         fields = "__all__"
         ref_name = "Livestock"
+        mandatory_fields = {}
 
 
 # Aquaculture
@@ -1441,6 +1460,7 @@ class AquacultureReadSerializer(LandModuleReadSerializer):
         model = Aquaculture
         fields = "__all__"
         ref_name = "Aquaculture"
+        mandatory_fields = {}
 
 
 # SmllFishery
@@ -1479,6 +1499,7 @@ class SmallFisheryReadSerializer(LandModuleReadSerializer):
         model = SmallFishery
         fields = "__all__"
         ref_name = "SmallFishery"
+        mandatory_fields = {}
 
 
 # LargeFishery
@@ -1517,6 +1538,7 @@ class LargeFisheryReadSerializer(LandModuleReadSerializer):
         model = LargeFishery
         fields = "__all__"
         ref_name = "LargeFishery"
+        mandatory_fields = {}
 
 
 # Waterbody
@@ -1540,6 +1562,7 @@ class WaterbodyReadSerializer(LandModuleReadSerializer):
         model = Waterbody
         fields = "__all__"
         ref_name = "Waterbody"
+        mandatory_fields = {}
 
 
 class ProjectInvitationModelSerializer(serializers.ModelSerializer):
@@ -1666,6 +1689,7 @@ class ForestManagementReadSerializer(LandModuleReadSerializer):
         model = ForestManagement
         fields = "__all__"
         ref_name = "ForestManagement"
+        mandatory_fields = {}
 
 
 class InputWriteSerializer(ModuleBaseSerializer):
@@ -1680,6 +1704,7 @@ class InputReadSerializer(ModuleBaseSerializer):
         model = Input
         fields = "__all__"
         ref_name = "Input"
+        mandatory_fields = {}
 
 
 class InputEntryWriteSerializer(SubmoduleBaseSerializer):
@@ -1792,7 +1817,7 @@ class SetAsideReadSerializer(LandModuleReadSerializer):
         model = SetAside
         fields = "__all__"
         ref_name = "SetAside"
-        mandatory_fields = []
+        mandatory_fields = {}
 
 
 class DegradedLandWriteSerializer(LandModuleWriteSerializer):
@@ -1808,9 +1833,10 @@ class DegradedLandReadSerializer(LandModuleReadSerializer):
         model = DegradedLand
         fields = "__all__"
         ref_name = "DegradedLand"
+        mandatory_fields = {}
 
 
-class SettlementWriteSerializer(LandModuleReadSerializer):
+class SettlementWriteSerializer(LandModuleWriteSerializer):
     class Meta:
         model = Settlement
         fields = "__all__"
@@ -1823,6 +1849,7 @@ class SettlementReadSerializer(LandModuleReadSerializer):
         model = Settlement
         fields = "__all__"
         ref_name = "Settlement"
+        mandatory_fields = {}
 
     def validate(self, data):
 
@@ -1903,6 +1930,7 @@ class CoastalWetlandReadSerializer(ModuleBaseSerializer):
         model = CoastalWetland
         fields = "__all__"
         ref_name = "CoastalWetland"
+        mandatory_fields = {}
 
 
 class ForestDisturbanceWriteSerializer(SubmoduleBaseSerializer):
@@ -1945,3 +1973,4 @@ class ForestDisturbanceReadSerializer(serializers.ModelSerializer):
         model = ForestDisturbance
         fields = "__all__"
         ref_name = "ForestDisturbance"
+        mandatory_fields = {}
