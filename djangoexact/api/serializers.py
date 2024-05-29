@@ -1350,7 +1350,7 @@ class ElectricityWriteSerializer(SubmoduleBaseSerializer):
         model = Electricity
         fields = "__all__"
         ref_name = "Electricity"
-        mandatory_fields = []
+        mandatory_fields = {}
 
     def validate(self, data):
         super().validate(data)
