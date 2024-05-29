@@ -576,7 +576,7 @@ class ProjectInvitation(Historical):
     updated_at = models.DateTimeField(auto_now=True, null=True)
 
     class Meta:
-        unique_together = (("project", "user"),)
+        unique_together = (("project", "user", "group"),)
 
     def __str__(self):
         return f"({self.pk}) {self.project.name} - {self.user.email}"
