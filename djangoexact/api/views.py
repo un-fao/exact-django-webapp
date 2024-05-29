@@ -456,6 +456,10 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         group = serializer.validated_data["group"]
         invitation, created = ProjectInvitation.objects.get_or_create(project=project, user=user, group=group)
 
+        if not created and invitation.group == group:
+            logging.warning(f"Invitation for {user.email} already sent with id {invitation.id}")
+            return Response({"message": f"Invitation for {user.email} already sent for group {invitation.group.name}"}, status=http_status.HTTP_200_OK)
+
         if not created:
             logging.error(f"Invitation for {user.email} already sent with id {invitation.id}")
             return utils.ErrorResponse({"error": f"Invitation for {user.email} already sent"}, status=http_status.HTTP_400_BAD_REQUEST)
