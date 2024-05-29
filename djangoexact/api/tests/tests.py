@@ -49,7 +49,7 @@ f = APIRequestFactory()
 # wbook = xw.Book("EX-ACT_V9.4.1_open[1298].xlsb")
 
 # User Creation
-u = User.objects.get(username="admin")
+u = User.objects.get(username="admin@admin.com")
 
 
 while True:
@@ -612,8 +612,9 @@ if TEST_ENERGY:
 if TEST_COASTAL_WETLAND:
     pass
 
+    # NOTE: QUESTO è AGGIORNATO
     coastals: list[CoastalWetland] = CoastalWetlandFactory.create_batch(BATCH_SIZE, activity=a)
-    a.module_types.add(ModuleType.objects.get(name="Coastal Wetland"))
+    a.module_types.add(ModuleType.objects.get(name="Coastal Wetland")) # ------------------> questo forse non c'è ovunque
     a.save()
 
     total_coastals = coastals.__len__()

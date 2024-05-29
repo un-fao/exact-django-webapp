@@ -396,9 +396,9 @@ class CoastalWetlandFactory(DjangoModelFactory):
     class Meta:
         model = CoastalWetland
 
-    status = READY
+    status = READY # --------------> NOTE: Add to all factories if not
 
-    area = 150
+    area = 150 
 
     land_use_type = factory.fuzzy.FuzzyChoice(coastal_vegetations)
 
