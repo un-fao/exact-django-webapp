@@ -4531,12 +4531,12 @@ class IrrigationCalculator(BaseCalculator):
             input.activity.project.implementation_years,
             input.activity.project.capitalization_years,
         )
-        for system in input.irrigation_systems:
+        for system in input.irrigation_systems.all():
             r_w, r_wo = IrrigationSystemCalculator(system).calculate()
             res_w += r_w
             res_wo += r_wo
 
-        for phase in input.irrigation_phases:
+        for phase in input.irrigation_phases.all():
             r_w, r_wo = IrrigationPhaseCalculator(phase).calculate()
             res_w += r_w
             res_wo += r_wo
