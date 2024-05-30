@@ -1006,7 +1006,7 @@ def generic_module_viewset(model: Model):
             serializer = get_module_serializer(model)(instance=module)
             if not serializer.validate(module.__dict__):
                 return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
-
+            
             if module_type.class_name == LandUseChange.__name__:
 
                 status_start = utils.get_module_status(self, activity, module.module_type_start)
@@ -1016,7 +1016,7 @@ def generic_module_viewset(model: Model):
                 if not all(status == StatusType.objects.get(name="READY") for status in [status_start, status_w, status_wo]):
                     return utils.ErrorResponse("Not all modules are ready. Land Use Change module cannot be calculated.")
             else:
-                status: StatusType = module.status
+                status: StatusType = module.__dict__.get("status")
 
                 if not status or status.name != "READY":
                     return utils.ErrorResponse("Module is not ready. Cannot calculate result.")
