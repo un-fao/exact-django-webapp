@@ -3073,6 +3073,7 @@ class InputEntryCalculator(BaseCalculator):
         try:
             ef = ipcc.InputEmissionFactor.objects.get(input_type=module.input_type, climate=project.climate, moisture=project.moisture)
         except ipcc.InputEmissionFactor.DoesNotExist:
+            ef = None
             if needs_co2_ref or needs_n2o_ref or needs_co2_e_ref:
                 raise ValueError(f"Emission factor for {module.input_type.name} does not exist for {project.climate.name} and {project.moisture.name}. Please define tier 2 values.")
 
@@ -3084,17 +3085,17 @@ class InputEntryCalculator(BaseCalculator):
                 module.value_start,
                 module.value_w,
                 activity.change_rate.name,
-                ef.co2_value,
+                ef.co2_value if ef else None,
                 module.co2_emissions_t2,
                 ref.co2_multiplier,
                 ref.co2_emissions_multiplier,
                 project.implementation_years,
                 project.capitalization_years,
-                ef.n2o_value,
+                ef.n2o_value if ef else None,
                 module.n2o_emissions_t2,
                 ref.n2o_quantity_multiplier,
                 ref.n2o_emissions_multiplier,
-                ef.co2_eq_value,
+                ef.co2_eq_value if ef else None,
                 module.co2_e_emissions_t2,
                 ref.production_quantity_multiplier,
                 ref.production_emissions_multiplier,
@@ -3108,17 +3109,17 @@ class InputEntryCalculator(BaseCalculator):
                 module.value_start,
                 module.value_wo,
                 activity.change_rate.name,
-                ef.co2_value,
+                ef.co2_value if ef else None,
                 module.co2_emissions_t2,
                 ref.co2_multiplier,
                 ref.co2_emissions_multiplier,
                 project.implementation_years,
                 project.capitalization_years,
-                ef.n2o_value,
+                ef.n2o_value if ef else None,
                 module.n2o_emissions_t2,
                 ref.n2o_quantity_multiplier,
                 ref.n2o_emissions_multiplier,
-                ef.co2_eq_value,
+                ef.co2_eq_value if ef else None,
                 module.co2_e_emissions_t2,
                 ref.production_quantity_multiplier,
                 ref.production_emissions_multiplier,
