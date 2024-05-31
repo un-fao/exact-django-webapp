@@ -1067,10 +1067,13 @@ class FloodedRiceWriteSerializer(LandModuleWriteSerializer):
         ref_name = "FloodedRice"
         mandatory_fields = {
             "land_use_type_start": [
+                "area"
             ],
             "land_use_type_w": [
+                "area"
             ],
             "land_use_type_wo": [
+                "area"
             ],
         }
 
