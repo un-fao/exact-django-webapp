@@ -3220,7 +3220,7 @@ class ElectricityCalculator(BaseCalculator):
 
         try:
             elec = ipcc.ElectricityEmission.objects.get(country=input.country)
-            if input.ef_source.name == "Operating Margin":
+            if input.ef_source:  # NOTE: previously was input.ef_source.name == "Operating margin", however it is nullable and is set to None unless selected in the Tier2. This check works and effectively does the same thing
                 log.debug(f"Operating margin: {elec.operating_margin}")
             else:
                 log.debug(f"Combined margin: {elec.combined_margin}")
@@ -3233,7 +3233,7 @@ class ElectricityCalculator(BaseCalculator):
         if is_with(input):
             log.debug("IS WITH")
             inputs_w = [
-                elec.operating_margin if input.ef_source.name == "Operating Margin" else elec.combined_margin,
+                elec.operating_margin if input.ef_source else elec.combined_margin,
                 input.ef_t2,
                 input.mwh_start,
                 input.mwh_w,
@@ -3250,7 +3250,7 @@ class ElectricityCalculator(BaseCalculator):
         if is_without(input):
             log.debug("IS WITHOUT")
             inputs_wo = [
-                elec.operating_margin if input.ef_source.name == "Operating Margin" else elec.combined_margin,
+                elec.operating_margin if input.ef_source else elec.combined_margin,
                 input.ef_t2,
                 input.mwh_start,
                 input.mwh_wo,
