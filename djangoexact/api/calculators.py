@@ -1877,10 +1877,10 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
 
     def calculate(self) -> Result:
         module: FloodedRice = self.data
-        activity: Activity = module.activity
+        activity: Activity = module.parent.activity
         project: Project = activity.project
         luc: LandUseChange = module.land_use_change
-        area = luc.area if luc else module.area
+        area = luc.area if luc else module.parent.area
 
         self.get_defaults()
 
@@ -1907,14 +1907,14 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 project.gw_potential.n2o,
                 project.implementation_years,
                 project.capitalization_years,
-                module.activity.change_rate.name,
+                module.parent.activity.change_rate.name,
                 project.gw_potential.ch4,
                 self.efc.cultivation_period,
                 module.cultivation_period_t2_start,
                 self.soc_start,
                 self.soc_w,
-                module.soc_t2_start,
-                module.soc_t2_w,
+                module.parent.soc_t2_start,
+                module.parent.soc_t2_w,
                 self.fmg_start.value,
                 self.fmg_w.value,
                 module.fmg_t2_start,
@@ -1958,14 +1958,14 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 project.gw_potential.n2o,
                 project.implementation_years,
                 project.capitalization_years,
-                module.activity.change_rate.name,
+                module.parent.activity.change_rate.name,
                 project.gw_potential.ch4,
                 self.efc.cultivation_period,
                 module.cultivation_period_t2_start,
                 self.soc_start,
                 self.soc_wo,
-                module.soc_t2_start,
-                module.soc_t2_wo,
+                module.parent.soc_t2_start,
+                module.parent.soc_t2_wo,
                 self.fmg_start.value,
                 self.fmg_wo.value,
                 module.fmg_t2_start,
@@ -2009,14 +2009,14 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 project.gw_potential.n2o,
                 project.implementation_years,
                 project.capitalization_years,
-                module.activity.change_rate.name,
+                module.parent.activity.change_rate.name,
                 project.gw_potential.ch4,
                 self.efc.cultivation_period,
                 module.cultivation_period_t2_w,
                 self.soc_start,
                 self.soc_w,
-                module.soc_t2_start,
-                module.soc_t2_w,
+                module.parent.soc_t2_start,
+                module.parent.soc_t2_w,
                 self.fmg_start.value,
                 self.fmg_w.value,
                 module.fmg_t2_start,
@@ -2060,14 +2060,14 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 project.gw_potential.n2o,
                 project.implementation_years,
                 project.capitalization_years,
-                module.activity.change_rate.name,
+                module.parent.activity.change_rate.name,
                 project.gw_potential.ch4,
                 self.efc.cultivation_period,
                 module.cultivation_period_t2_wo,
                 self.soc_start,
                 self.soc_wo,
-                module.soc_t2_start,
-                module.soc_t2_wo,
+                module.parent.soc_t2_start,
+                module.parent.soc_t2_wo,
                 self.fmg_start.value,
                 self.fmg_wo.value,
                 module.fmg_t2_start,
@@ -2191,10 +2191,10 @@ class FloodedRiceCalculator(BaseCalculator):
         res_w = MathResult(module.activity.project.implementation_years, module.activity.project.capitalization_years)
         res_wo = MathResult(module.activity.project.implementation_years, module.activity.project.capitalization_years)
 
-        r_w, r_wo = FloodedRiceSeasonCalculator(module).calculate()
+        # r_w, r_wo = FloodedRiceSeasonCalculator(module).calculate()
 
-        res_w += r_w
-        res_wo += r_wo
+        # res_w += r_w
+        # res_wo += r_wo
 
         for season in module.minor_seasons.all():
             r_w, r_wo = FloodedRiceSeasonCalculator(season).calculate()
