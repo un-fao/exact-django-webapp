@@ -131,6 +131,7 @@ class OtherLandUseChanges(BaseModule):
         self.result = Result(self.time_impl, self.time_cap)
 
     def calculate_emissions(self):
+       
         def calculate_biomass():
             try:
                 # TODO: talk to Claudio, there is a problem here where there is a value for biomass change in emissions, even though initial and final should be the same
