@@ -62,6 +62,8 @@ class ActivityTypes(Enum):
     COASTAL_WATERBODIES = "Coastal Waterbodies"
     DEGRADATION_AGB = "Degradation AGB"
     DEGRADATION_BGB = "Degradation BGB"
+    DEGRADATION_LITTER = "Degradation Litter"
+    DEGRADATION_DEADWOOD = "Degradation Deadwood"
 
 
 class Emission:
