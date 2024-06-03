@@ -194,7 +194,6 @@ class ForestManagement(BaseModule):
                 
                 # TODO: forest_gef_co2 is not used as of now
 
-                ao = 2
                 agb_action_component = [x * - 44 / 12 * (1 - percentage_energy) for x in rotation_times_hectares_agb]
                 bgb_action_component = [x * - 44 / 12 * (1 - percentage_energy) for x in rotation_times_hectares_bgb]
                 nitrous_fire_component_agb = [x / mangrove_factor * - 44 / 12 * percentage_energy * forest_cf * forest_gef_n2o * self.ef_nitrous / 1000 for x in rotation_times_hectares_agb]
@@ -246,13 +245,9 @@ class ForestManagement(BaseModule):
                     # CALCULATION FOR DISTURBANCE
                     for recurrence, percentage, percentage_fire, start_year in zip(self.disturbance_recurrence, self.disturbance_percentage, [0 for i in self.disturbance_percentage], self.disturbance_year_of_start):
                         # NOTE: As logging and disturbance are the same, we can use the same function
+
                         result_disturbance_agb, logging_matrix_agb, delta_agb_matrix = calculate_logging_effect(agb_matrix, delta_agb_matrix, self.max_agb_value, recurrence, start_year, percentage)
                         result_disturbance_bgb, logging_matrix_bgb, delta_bgb_matrix = calculate_logging_effect(bgb_matrix, delta_bgb_matrix, self.max_bgb_value, recurrence, start_year, percentage)
-
-
-                        plot_annotated_matrix(degradation_matrix_agb, "Degradation Matrix AGB")
-                        plot_annotated_matrix(degradation_matrix_bgb, "Degradation Matrix BGB")
-
 
                         disturbance_times_hectares_agb = multiply_matrix_by_matrix(logging_matrix_agb, self.hectares_for_rot_log_dis)
                         disturbance_times_hectares_bgb = multiply_matrix_by_matrix(logging_matrix_bgb, self.hectares_for_rot_log_dis)
@@ -283,8 +278,6 @@ class ForestManagement(BaseModule):
                     logging_times_hectares_agb = multiply_matrix_by_matrix(logging_matrix_agb, self.hectares_for_rot_log_dis)
                     logging_times_hectares_bgb = multiply_matrix_by_matrix(logging_matrix_bgb, self.hectares_for_rot_log_dis)
 
-                    plot_annotated_matrix(logging_matrix_agb, "Logging Matrix AGB")
-                    plot_annotated_matrix(logging_matrix_bgb, "Logging Matrix BGB")
 
                     (
                         agb_logging_component, 
@@ -309,34 +302,14 @@ class ForestManagement(BaseModule):
                     result_degradation_agb, degradation_matrix_agb, delta_agb_matrix = calculate_logging_effect(agb_matrix, delta_agb_matrix, self.max_agb_value, 1, 0, self.degradation_percentage)
                     result_degradation_bgb, degradation_matrix_bgb, delta_bgb_matrix = calculate_logging_effect(bgb_matrix, delta_bgb_matrix, self.max_bgb_value, 1, 0, self.degradation_percentage)
 
-                    plot_annotated_matrix(degradation_matrix_agb, "Degradation Matrix AGB")
-                    plot_annotated_matrix(degradation_matrix_bgb, "Degradation Matrix BGB")
-
                     degradation_times_hectares_agb = multiply_matrix_by_matrix(degradation_matrix_agb, self.hectares_for_rot_log_dis)
                     degradation_times_hectares_bgb = multiply_matrix_by_matrix(degradation_matrix_bgb, self.hectares_for_rot_log_dis)
 
-                    (
-                        agb_degradation_component, 
-                        bgb_degradation_component,
-                        nitrous_fire_component_agb, 
-                        methane_fire_component_agb,
-                        nitrous_fire_component_bgb, 
-                        methane_fire_component_bgb
-                    ) = breakdown_agb_bgb_emissions(degradation_times_hectares_agb, degradation_times_hectares_bgb, 0,
-                                                    self.forest_cf, self.forest_gef_ch4, self.forest_gef_n2o, self.forest_gef_co2, self.mangrove_factor)
+                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in degradation_times_hectares_agb], activity=ActivityTypes.DEGRADATION_AGB))
+                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in degradation_times_hectares_bgb], activity=ActivityTypes.DEGRADATION_BGB))
 
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in agb_degradation_component], activity=ActivityTypes.DEGRADATION_AGB))
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in bgb_degradation_component], activity=ActivityTypes.DEGRADATION_BGB))
+                    plot_annotated_matrix(degradation_matrix_agb, "degradation agb matrix")
 
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in nitrous_fire_component_agb], activity=ActivityTypes.DEGRADATION_AGB))
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in methane_fire_component_agb], activity=ActivityTypes.DEGRADATION_AGB))
-
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in nitrous_fire_component_bgb], activity=ActivityTypes.DEGRADATION_BGB))
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in methane_fire_component_bgb], activity=ActivityTypes.DEGRADATION_BGB))
-
-
-                agb_matrix, delta_agb_matrix = check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value)
-                bgb_matrix, delta_bgb_matrix = check_agb_matrices(bgb_matrix, delta_bgb_matrix, max_bgb_value)
                 
                 # check if agb_matrix has negative values
                 if np.any(np.sum(agb_matrix < 0), axis=0):
@@ -362,7 +335,19 @@ class ForestManagement(BaseModule):
 
         def calculate_litter():
             try:
+
                 litter_matrix, delta_litter_matrix = create_litter_deadwood_matrix(self.years_impl, self.years_cap, self.litter_20_years / 20, self.litter_20_years / 20, self.litter_start, self.litter_max)
+
+                if self.degradation_percentage:
+                    # NOTE: This means we have degradation, which has an impact on litter and deadwood as well
+                    result_litter, degradation_litter_matrix, delta_litter_matrix = calculate_logging_effect(litter_matrix, delta_litter_matrix, self.litter_max, 1, 0, self.degradation_percentage)
+
+                    degradation_times_hectares_litter = multiply_matrix_by_matrix(degradation_litter_matrix, self.hectares_for_rot_log_dis)
+                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in degradation_times_hectares_litter], activity=ActivityTypes.DEGRADATION_LITTER))
+
+                    plot_annotated_matrix(degradation_litter_matrix, "degradation litter matrix")
+
+                
                 self.yearly_litter_emissions = [x * -44 / 12 for x in multiply_matrix_by_matrix(delta_litter_matrix, self.hectares_matrix)]
                 self.total_litter_emissions = sum(self.yearly_litter_emissions)
 
@@ -375,6 +360,14 @@ class ForestManagement(BaseModule):
         def calculate_deadwood():
             try:
                 deadwood_matrix, delta_deadwood_matrix = create_litter_deadwood_matrix(self.years_impl, self.years_cap, self.deadwood_20_years / 20, self.deadwood_20_years / 20, self.deadwood_start, self.deadwood_max)
+
+                if self.degradation_percentage:
+                    # NOTE: This means we have degradation, which has an impact on litter and deadwood as well
+                    result_deadwood, deadwood_matrix, delta_deadwood_matrix = calculate_logging_effect(deadwood_matrix, delta_deadwood_matrix, self.deadwood_max, 1, 0, self.degradation_percentage)
+
+                    degradation_times_hectares_deadwood = multiply_matrix_by_matrix(deadwood_matrix, self.hectares_for_rot_log_dis)
+                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in degradation_times_hectares_deadwood], activity=ActivityTypes.DEGRADATION_DEADWOOD))
+
                 self.yearly_deadwood_emissions = [x * -44 / 12 for x in multiply_matrix_by_matrix(delta_deadwood_matrix, self.hectares_matrix)]
                 self.total_deadwood_emissions = sum(self.yearly_deadwood_emissions)
 
@@ -615,7 +608,6 @@ class ForestManagement(BaseModule):
             try:
                 agb_matrix = copy.deepcopy(original_agb_matrix)
                 delta_agb_matrix = copy.deepcopy(original_delta_agb_matrix)
-                # plot_annotated_matrix(delta_agb_matrix, "delta_agb_matrix")
                 # Determine the maximum number of intervals given the shape of the matrix
                 max_intervals = (agb_matrix.shape[1] - start_year) // recurrence
                 # Dictionary to hold the results
@@ -626,8 +618,6 @@ class ForestManagement(BaseModule):
                 for i in range(0, max_intervals):
                     # Check if the agb_matrix is still below the maximum value
                     agb_matrix, delta_agb_matrix = check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value)
-                    # plot_annotated_matrix(delta_agb_matrix, "delta_agb_matrix")
-                    # plot_annotated_matrix(agb_matrix, "agb_matrix")
 
                     # i represents the column of our matrix. When there is logging we are cutting down a percentage of the forest present in year i
                     # We are cutting down a percentage of the forest present in year i
@@ -639,13 +629,11 @@ class ForestManagement(BaseModule):
                         ao =  i * recurrence - 1 + start_year
                         logging_impact[:, i * recurrence + start_year] = -agb_matrix[:, i * recurrence - 1 + start_year] * percentage
 
-                    #plot_annotated_matrix(logging_impact, "logging_impact")
 
                     # Update the agb_matrix
                     agb_matrix, delta_agb_matrix = update_agb_matrix_logging(agb_matrix, delta_agb_matrix, original_delta_agb_matrix, max_agb_value, logging_impact, i * recurrence, recurrence)
                     agb_matrix, delta_agb_matrix = check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value)
-                    # plot_annotated_matrix(delta_agb_matrix, "Updated delta_agb_matrix")
-                    # plot_annotated_matrix(agb_matrix, "Updated agb_matrix")
+                    
                 
                 
                 return result, logging_impact, delta_agb_matrix
@@ -763,8 +751,8 @@ class ForestManagement(BaseModule):
         calculate_deadwood()
         calculate_soc()
 
-years_cap = 20
-years_impl = 10
+years_cap = 15
+years_impl = 5
 rate = 'D'
 hectares_start = 0
 hectares_end = 100
@@ -796,7 +784,7 @@ litter_start = 43.9
 litter_max = 43.9
 litter_20_years_tier_2 = None
 deadwood_20_years_default = 43.4
-deadwood_start = 43.4
+deadwood_start = 43.9
 deadwood_max = 43.4
 deadwood_20_years_tier_2 = None
 socref_default = 27
