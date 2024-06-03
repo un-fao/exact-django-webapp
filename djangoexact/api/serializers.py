@@ -977,6 +977,7 @@ class LandUseChangeWriteSerializer(LandModuleWriteSerializer):
         model = LandUseChange
         fields = "__all__"
         ref_name = "LandUseChange"
+        mandatory_fields = {}
 
 
 class LandUseChangeReadSerializer(LandModuleReadSerializer):
