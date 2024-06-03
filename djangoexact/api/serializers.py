@@ -479,7 +479,18 @@ class ActivityBuilderSerializer(serializers.Serializer):
                     area=self.validated_data.get("area"),
                 )
             else:
-                module_instance = ModuleClass.objects.create(activity=activity)
+                # NOTE: This is necessary due to a miss-allignment between what 
+                # constitutes a land module and what doesn't between front and back-end. 
+                # Coastal cannot as of now be present as a land use module for the 
+                # front-end as it should not be included as Land Use Change. 
+                # This is due to the fact that a methodology for SOC calculcation
+                # is not present in the mathematical model yet. This is a temporary 
+                # solution until the methodology is implemented, after that Coastal Wetland 
+                # will have .is_luc = True and all will be solved
+                if module_type.name == "Coastal Wetland":
+                    module_instance = ModuleClass.objects.create(activity=activity, area=self.validated_data.get("area"))
+                else:
+                    module_instance = ModuleClass.objects.create(activity=activity)
 
             utils.create_module_threads(module_instance)
             module_instance.save()
