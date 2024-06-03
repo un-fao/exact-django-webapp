@@ -1067,13 +1067,19 @@ class FloodedRiceWriteSerializer(LandModuleWriteSerializer):
         ref_name = "FloodedRice"
         mandatory_fields = {
             "land_use_type_start": [
-                "area"
+                "water_management_type_before_cultivation_start",
+                "water_management_type_after_cultivation_start",
+                "organic_amendment_type_start",
             ],
             "land_use_type_w": [
-                "area"
+                "water_management_type_before_cultivation_w",
+                "water_management_type_after_cultivation_w",
+                "organic_amendment_type_w",
             ],
             "land_use_type_wo": [
-                "area"
+                "water_management_type_before_cultivation_wo",
+                "water_management_type_after_cultivation_wo",
+                "organic_amendment_type_wo",
             ],
         }
 
