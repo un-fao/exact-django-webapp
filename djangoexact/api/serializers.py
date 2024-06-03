@@ -1324,6 +1324,8 @@ class EnergyWriteSerializer(ModuleBaseSerializer):
         model = Energy
         fields = "__all__"
         ref_name = "Energy"
+        mandatory_fields = {}
+
 
 
 class EnergyReadSerializer(ModuleBaseSerializer):
@@ -1737,6 +1739,7 @@ class InputWriteSerializer(ModuleBaseSerializer):
         model = Input
         fields = "__all__"
         ref_name = "Input"
+        mandatory_fields = {}
 
 
 class InputReadSerializer(ModuleBaseSerializer):
