@@ -295,3 +295,28 @@ def get_or_raise(model, filter_criteria, error_message, method="get"):
         return attr(**filter_criteria)
     except model.DoesNotExist:
         raise Exception(error_message)
+    
+
+def update_activity_status(activity):
+    """
+    Updates the status of the activity based on the status of its modules.
+
+    Args:
+        activity (Activity): The activity object to update.
+    """
+    statuses = [module.status for module in find_modules(activity)]
+
+    ready_count = statuses.count(api_models.StatusType.objects.get(name="READY"))
+    percentage_complete = (ready_count / len(statuses))
+
+    if percentage_complete == 1:
+        activity.status = api_models.StatusType.objects.get(name="READY")
+    elif percentage_complete > 0:
+        activity.status = api_models.StatusType.objects.get(name="IN PROGRESS")
+    else:
+        activity.status = api_models.StatusType.objects.get(name="EMPTY")
+
+    activity.completion_percentage = percentage_complete
+    activity.save()
+
+    return activity.status
