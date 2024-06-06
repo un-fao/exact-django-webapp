@@ -895,6 +895,9 @@ def generic_module_viewset(model: Model):
 
             read_serializer = get_module_serializer(model)(instance=module, context={"request": request})
 
+            # Update Activity status and completion percentage
+            utils.update_activity_status(activity)
+
             return Response(read_serializer.data, status=http_status.HTTP_200_OK)
 
         def partial_update(self, request, *args, **kwargs):
