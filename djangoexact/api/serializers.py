@@ -307,6 +307,7 @@ class ActivitySerializer(serializers.ModelSerializer):
     name = serializers.CharField(max_length=255, read_only=True)
     project = ReadProjectSerializer(many=False, read_only=True)
     user = UserReadSerializer(many=False, read_only=True)
+    status = get_model_serializer(StatusType)(many=False, read_only=True)
     climate_t2 = get_model_serializer(Climate)(read_only=True)
     soil_type_t2 = get_model_serializer(SoilType)(read_only=True)
     module_types = get_model_serializer(ModuleType)(many=True, read_only=True)
