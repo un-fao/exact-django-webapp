@@ -600,7 +600,7 @@ class Activity(Historical):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="activities")
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
-    status = models.ForeignKey(StatusType, on_delete=models.CASCADE, null=True, blank=True)
+    status = models.ForeignKey(StatusType, on_delete=models.CASCADE, null=True, blank=True, default=utilities.get_activity_default_status)
     completion_percentage = models.FloatField(null=True, blank=True, default=0)
     cost = models.FloatField(default=0)
 
