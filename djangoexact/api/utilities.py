@@ -320,3 +320,6 @@ def update_activity_status(activity):
     activity.save()
 
     return activity.status
+
+def get_activity_default_status():
+    return api_models.StatusType.objects.get_or_create(name='EMPTY')[0]
