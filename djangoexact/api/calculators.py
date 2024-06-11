@@ -3205,22 +3205,21 @@ class ElectricityCalculator(BaseCalculator):
     Calculator for energy.
     """
 
-    def get_defaults(self, input: Module) -> dict:
+    def get_defaults(self, calculate=False) -> dict:
 
-        module: Electricity = self.data
+        input: Electricity = self.data
         activity: Activity = input.parent.activity
         project: Project = activity.project
-        change_rate = activity.change_rate
 
-        self.ef_source = "Combined Margin" # NOTE: Here it should be added to the DB and set as default value in my opinion
+        try:
+            elec = ipcc.ElectricityEmission.objects.get(country=input.country)
 
+            self.ef_source = "Combined Margin" # NOTE: Here it should be added to the DB and set as default value in my opinion
+            self.ef_country = elec.operating_margin if input.ef_source else elec.combined_margin
+            self.transmission_loss = 0.1 # NOTE: don't know how this should be done in the best way, hardcoded for now, but can't be retrieved from the DB (maybe create a value in the DB for this as well?)
 
-
-
-
-
-
-        return super().get_defaults(input)
+        except ipcc.ElectricityEmission.DoesNotExist:
+            raise ValueError(f"Electricity emission for {project.country.name} does not exist")
 
     def calculate(self) -> list[Result]:
         """

@@ -49,6 +49,8 @@ class DefaultsFactory:
                 return PerennialCroppingDefaults(input).get_defaults(calculate=calculate)
             case api.FloodedRice:
                 return FloodedRiceDefaults(input).get_defaults(calculate=calculate)
+            case api.Electricity:
+                return ElectricityDefaults(input).get_defaults(calculate=calculate)
             case _:
                 raise NotImplementedError(f"Defaults for {input.__class__.__name__} have not been implemented.")
 
@@ -194,7 +196,11 @@ class ElectricityDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            electricity_t2_start_default=defaults.electricity_t2_start.value,
-            electricity_t2_w_default=defaults.electricity_t2_w.value,
-            electricity_t2_wo_default=defaults.electricity_t2_wo.value,
+            scope_of_emission_factor = defaults.ef_source,
+            ef_for_selected_country_start = defaults.ef_country,
+            ef_for_selected_country_w = defaults.ef_country,
+            ef_for_selected_country_wo = defaults.ef_country,
+            transmission_loss_start = defaults.transmission_loss,
+            transmission_loss_w = defaults.transmission_loss,
+            transmission_loss_wo = defaults.transmission_loss,
         )
