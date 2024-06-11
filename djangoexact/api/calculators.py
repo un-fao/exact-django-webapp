@@ -3206,6 +3206,20 @@ class ElectricityCalculator(BaseCalculator):
     """
 
     def get_defaults(self, input: Module) -> dict:
+
+        module: Electricity = self.data
+        activity: Activity = input.parent.activity
+        project: Project = activity.project
+        change_rate = activity.change_rate
+
+        self.ef_source = "Combined Margin" # NOTE: Here it should be added to the DB and set as default value in my opinion
+
+
+
+
+
+
+
         return super().get_defaults(input)
 
     def calculate(self) -> list[Result]:
@@ -3235,10 +3249,12 @@ class ElectricityCalculator(BaseCalculator):
             log.debug("IS WITH")
             inputs_w = [
                 elec.operating_margin if input.ef_source else elec.combined_margin,
-                input.ef_t2,
+                input.ef_t2_start,
+                input.ef_t2_w,
                 input.mwh_start,
                 input.mwh_w,
-                input.transmission_loss,
+                input.transmission_loss_start,
+                input.transmission_loss_w,
                 change_rate.name,
                 project.implementation_years,
                 project.capitalization_years,
@@ -3252,10 +3268,12 @@ class ElectricityCalculator(BaseCalculator):
             log.debug("IS WITHOUT")
             inputs_wo = [
                 elec.operating_margin if input.ef_source else elec.combined_margin,
-                input.ef_t2,
+                input.ef_t2_start,
+                input.ef_t2_wo,
                 input.mwh_start,
                 input.mwh_wo,
-                input.transmission_loss,
+                input.transmission_loss_start,
+                input.transmission_loss_wo,
                 change_rate.name,
                 project.implementation_years,
                 project.capitalization_years,
