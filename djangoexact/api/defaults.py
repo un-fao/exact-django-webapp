@@ -184,3 +184,17 @@ class FloodedRiceDefaults(Defaults):
             rice_straw_t2_w_defaults=defaults.sfo_w.value,
             rice_straw_t2_wo_defaults=defaults.sfo_wo.value,
         )
+
+
+class ElectricityDefaults(Defaults):
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.Electricity
+
+        defaults = calcs.ElectricityCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace(
+            electricity_t2_start_default=defaults.electricity_t2_start.value,
+            electricity_t2_w_default=defaults.electricity_t2_w.value,
+            electricity_t2_wo_default=defaults.electricity_t2_wo.value,
+        )
