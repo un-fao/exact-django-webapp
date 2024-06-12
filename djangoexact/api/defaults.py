@@ -51,6 +51,8 @@ class DefaultsFactory:
                 return FloodedRiceDefaults(input).get_defaults(calculate=calculate)
             case api.Electricity:
                 return ElectricityDefaults(input).get_defaults(calculate=calculate)
+            case api.Fuel:
+                return FuelDefaults(input).get_defaults(calculate=calculate)
             case _:
                 raise NotImplementedError(f"Defaults for {input.__class__.__name__} have not been implemented.")
 
@@ -203,4 +205,16 @@ class ElectricityDefaults(Defaults):
             transmission_loss_start = defaults.transmission_loss,
             transmission_loss_w = defaults.transmission_loss,
             transmission_loss_wo = defaults.transmission_loss,
+        )
+    
+
+class FuelDefaults(Defaults):
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.Fuel
+
+        defaults = calcs.FuelCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace(
+            ef_of_fuel = defaults.ef_fuel_t_co2_eq
         )
