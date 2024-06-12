@@ -66,6 +66,7 @@ class FloodedRice(BaseModule):
         calculate_soc_som,
         straw_burnt,
         delay=0,
+        is_minor_season=True,
     ):
         self.area_start = area_start
         self.area_end = area_end
@@ -117,6 +118,9 @@ class FloodedRice(BaseModule):
         self.straw_burnt = straw_burnt
 
         self.delay = delay
+
+        # NOTE: in the case in which it is a minor season, soil and som emissions are not to be calculated
+        self.is_minor_season = is_minor_season
 
         # TODO: Assigned FMG, FLU, FI values. Maybe once everything has been done change this structure
         self.fmg_start = self.fmg_start_tier_2 if self.fmg_start_tier_2 else self.fmg_start_default
@@ -225,7 +229,7 @@ class FloodedRice(BaseModule):
 
         def calculate_soil_emissions():
             try:
-                if self.calculate_soc_som:
+                if self.calculate_soc_som and not self.is_minor_season:
                     self.soil_emissions_yearly, self.soil_emissions_total = soil_emissions_2(self.soc_start, self.soc_end, self.hectares_total, self.area_start, self.area_end, self.hectares_before_20)
 
                     soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.soil_emissions_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
