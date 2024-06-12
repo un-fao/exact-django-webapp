@@ -3051,8 +3051,25 @@ class InputEntryCalculator(BaseCalculator):
     Calculator for single input entries.
     """
 
-    def get_defaults(self, input: Module) -> dict:
-        return super().get_defaults(input)
+    def get_defaults(self,  calculate=False) -> dict:
+
+        module: InputEntry = self.data
+        activity: Activity = module.parent.activity
+        project: Project = activity.project
+
+        input_type: InputType = module.input_type
+
+        needs_co2_ref = input_type.has_co2_emissions and not module.co2_emissions_t2
+        needs_n2o_ref = input_type.has_n2o_emissions and not module.n2o_emissions_t2
+        needs_co2_e_ref = input_type.has_co2_e_emissions and not module.co2_e_emissions_t2
+
+        try:
+            self.ef = ipcc.InputEmissionFactor.objects.get(input_type=module.input_type, climate=project.climate, moisture=project.moisture)
+        except ipcc.InputEmissionFactor.DoesNotExist:
+            self.ef = None
+            if needs_co2_ref or needs_n2o_ref or needs_co2_e_ref:
+                raise ValueError(f"Emission factor for {module.input_type.name} does not exist for {project.climate.name} and {project.moisture.name}. Please define tier 2 values.")
+            
 
     def calculate(self) -> list[Result]:
         module: InputEntry = self.data

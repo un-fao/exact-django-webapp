@@ -53,6 +53,8 @@ class DefaultsFactory:
                 return ElectricityDefaults(input).get_defaults(calculate=calculate)
             case api.Fuel:
                 return FuelDefaults(input).get_defaults(calculate=calculate)
+            case api.InputEntry:
+                return InputEntryDefaults(input).get_defaults(calculate=calculate)
             case _:
                 raise NotImplementedError(f"Defaults for {input.__class__.__name__} have not been implemented.")
 
@@ -217,4 +219,18 @@ class FuelDefaults(Defaults):
 
         return SimpleNamespace(
             ef_of_fuel = defaults.ef_fuel_t_co2_eq
+        )
+    
+
+class InputEntryDefaults(Defaults):
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.InputEntry
+
+        defaults = calcs.InputEntryCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace(
+            ef_co2 = defaults.ef.co2_value if defaults.ef else None,
+            ef_n2o = defaults.ef.n2o_value if defaults.ef else None,
+            ef_co2_eq = defaults.ef.co2_eq_value if defaults.ef else None
         )
