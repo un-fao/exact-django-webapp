@@ -3306,8 +3306,16 @@ class FuelCalculator(BaseCalculator):
     Calculator for fuel
     """
 
-    def get_defaults(self, input: Module) -> dict:
-        return super().get_defaults(input)
+    def get_defaults(self, calculate=False) -> dict:
+        input: Fuel = self.data
+        activity: Activity = input.parent.activity
+        project: Project = activity.project
+        change_rate = activity.change_rate
+
+        try:
+            self.ef_fuel_t_co2_eq = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=input.fuel_type).t_co2_eq
+        except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
+            raise ValueError(f"Default emission factor for {input.fuel_type.name} does not exist. Please select tier 2 value.")
 
     def calculate(self) -> list[Result]:
         """
