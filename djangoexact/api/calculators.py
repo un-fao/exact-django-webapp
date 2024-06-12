@@ -1526,7 +1526,9 @@ class PerennialCropCalculator(BaseCalculator):
 
         soil_flt = {"soil_type": project.soil_type}
         savanna_flt = {"category__name": "Savanna and grassland"}
-        organic_input_flt = {"organic_input_type": module.organic_input_type_start}
+        organic_input_flt_start = {"organic_input_type": module.organic_input_type_start}
+        organic_input_flt_w = {"organic_input_type": module.organic_input_type_w}
+        organic_input_flt_wo = {"organic_input_type": module.organic_input_type_wo}
         moisture_flt = {"moisture": moisture}
         climate_flt = {"climate": climate}
 
@@ -1554,19 +1556,30 @@ class PerennialCropCalculator(BaseCalculator):
 
         self.soc = utils.get_or_raise(ipcc.SoilOrganicCarbon, cm | soil_flt, f"SoilOrganicCarbon for {project.soil_type.name} soil type in {climate.name} climate and {moisture.name} moisture does not exist")
         self.burning_emission_factor = utils.get_or_raise(ipcc.BurningEmissionFactor, savanna_flt, "BurningEmissionFactor for Savanna and grassland does not exist")
-        self.default_emission_factor_start = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_flt, f"DefaultEmissionFactor for {moisture.name} moisture and {module.organic_input_type_start.name} does not exist")
-        self.fires_combustion_factor_start = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_start_flt, f"FiresCombustionFactor for {module.land_use_type_start.name} does not exist", method="get_or_default")
-        self.ag_default_start = utils.get_or_raise(ipcc.PerennialAGB, cmc | lut_start_flt, f"PerennialAGB for {module.land_use_type_start.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_default")
-        self.agb_max_c_start = utils.get_or_raise(ipcc.PerennialMaxAGB, climate_flt | lut_start_flt, f"PerennialMaxAGB for {module.land_use_type_start.name} in {climate.name} climate does not exist", method="get_or_default")
-        self.bg_default_start = utils.get_or_raise(ipcc.PerennialBGB, cmc | lut_start_flt, f"PerennialBGB for {module.land_use_type_start.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_default")
         self.default_fire_periodicity = AnnualCroplandParameter.objects.get(name="default_fire_periodicity")
 
-        self.flu_start = get_flu_data(module, climate, moisture, utils.ScenarioTypes.START)
-        self.fi_start = get_fi_data(module, climate, moisture, utils.ScenarioTypes.START)
-        self.fmg_start = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.START)
+        if is_luc_remaining_same(module):
+            self.flu_start = get_flu_data(module, climate, moisture, utils.ScenarioTypes.START)
+            self.fi_start = get_fi_data(module, climate, moisture, utils.ScenarioTypes.START)
+            self.fmg_start = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.START)
+            self.default_emission_factor_start = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_flt_start, f"DefaultEmissionFactor for {moisture.name} moisture and {module.organic_input_type_start.name} does not exist")
+            self.fires_combustion_factor_start = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_start_flt, f"FiresCombustionFactor for {module.land_use_type_start.name} does not exist", method="get_or_default")
+            self.ag_default_start = utils.get_or_raise(ipcc.PerennialAGB, cmc | lut_start_flt, f"PerennialAGB for {module.land_use_type_start.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_default")
+            self.agb_max_c_start = utils.get_or_raise(ipcc.PerennialMaxAGB, climate_flt | lut_start_flt, f"PerennialMaxAGB for {module.land_use_type_start.name} in {climate.name} climate does not exist", method="get_or_default")
+            self.bg_default_start = utils.get_or_raise(ipcc.PerennialBGB, cmc | lut_start_flt, f"PerennialBGB for {module.land_use_type_start.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_default")
+
+        if is_business_as_usual(module):
+            self.flu_start = get_flu_data(module, climate, moisture, utils.ScenarioTypes.START)
+            self.fi_start = get_fi_data(module, climate, moisture, utils.ScenarioTypes.START)
+            self.fmg_start = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.START)
+            self.default_emission_factor_start = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_flt_start, f"DefaultEmissionFactor for {moisture.name} moisture and {module.organic_input_type_start.name} does not exist")
+            self.fires_combustion_factor_start = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_start_flt, f"FiresCombustionFactor for {module.land_use_type_start.name} does not exist", method="get_or_default")
+            self.ag_default_start = utils.get_or_raise(ipcc.PerennialAGB, cmc | lut_start_flt, f"PerennialAGB for {module.land_use_type_start.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_default")
+            self.agb_max_c_start = utils.get_or_raise(ipcc.PerennialMaxAGB, climate_flt | lut_start_flt, f"PerennialMaxAGB for {module.land_use_type_start.name} in {climate.name} climate does not exist", method="get_or_default")
+            self.bg_default_start = utils.get_or_raise(ipcc.PerennialBGB, cmc | lut_start_flt, f"PerennialBGB for {module.land_use_type_start.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_default")
 
         if is_with(module):
-            self.default_emission_factor_w = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_flt, f"DefaultEmissionFactor for {moisture.name} moisture and {module.organic_input_type_w.name} does not exist")
+            self.default_emission_factor_w = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_flt_w, f"DefaultEmissionFactor for {moisture.name} moisture and {module.organic_input_type_w.name} does not exist")
             self.fires_combustion_factor_w = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_w_flt, f"FiresCombustionFactor for {module.land_use_type_w.name} does not exist", method="get_or_default")
             self.ag_default_w = utils.get_or_raise(ipcc.PerennialAGB, cmc | lut_w_flt, f"PerennialAGB for {module.land_use_type_w.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_default")
             self.agb_max_c_w = utils.get_or_raise(ipcc.PerennialMaxAGB, climate_flt | lut_w_flt, f"PerennialMaxAGB for {module.land_use_type_w.name} in {climate.name} climate does not exist", method="get_or_default")
@@ -1576,7 +1589,7 @@ class PerennialCropCalculator(BaseCalculator):
             self.fmg_w = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.WITH)
 
         if is_without(module):
-            self.default_emission_factor_wo = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_flt, f"DefaultEmissionFactor for {moisture.name} moisture and {module.organic_input_type_wo.name} does not exist")
+            self.default_emission_factor_wo = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_flt_wo, f"DefaultEmissionFactor for {moisture.name} moisture and {module.organic_input_type_wo.name} does not exist")
             self.fires_combustion_factor_wo = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_wo_flt, f"FiresCombustionFactor for {module.land_use_type_wo.name} does not exist")
             self.ag_default_wo = utils.get_or_raise(ipcc.PerennialAGB, cmc | lut_wo_flt, f"PerennialAGB for {module.land_use_type_wo.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_default")
             self.agb_max_c_wo = utils.get_or_raise(ipcc.PerennialMaxAGB, climate_flt | lut_wo_flt, f"PerennialMaxAGB for {module.land_use_type_wo.name} in {climate.name} climate does not exist", method="get_or_default")
@@ -3670,8 +3683,18 @@ class LivestockCalculator(BaseCalculator):
     where each entry of [LivestockManureEF] matches an entry of [LivestockAnimalWasteManagementSystem]
     """
 
-    def get_defaults(self, input: Module) -> dict:
-        return super().get_defaults(input)
+    def get_defaults(self, calculate = False) -> dict:
+
+        module: Livestock = self.data
+        activity: Activity = module.activity
+        project: Project = activity.project
+        country: Country = project.country
+
+        climate: Climate = activity.climate_t2 or project.climate
+        moisture: Moisture = activity.moisture_t2 or project.moisture
+        region: Region = project.country.region
+
+        return 
 
     def calculate(self) -> list[Result]:
         """
