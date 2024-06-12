@@ -2727,8 +2727,34 @@ class LargeFisheryCalculator(BaseCalculator):
     Calculator for large fishery.
     """
 
-    def get_defaults(self, input: Module) -> dict:
-        return super().get_defaults(input)
+    def get_defaults(self, calculate = False) -> dict:
+
+        module: LargeFishery = self.data
+        project = module.activity.project
+
+        try:
+            ef_diesel_default_list = ipcc.EnergyDefaultEmissionFactor.objects.filter(fuel_type__fuel_use_type__name__contains="Off-Road")
+            # Average of all default emission factors for gasoil/diesel
+            self.ef_diesel_default = sum([ef.t_co2_eq for ef in ef_diesel_default_list]) / len(ef_diesel_default_list)
+        except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
+            raise ValueError("Default emission factors for off-road diesel do not exist")
+
+        try:
+            self.lost_refrigerant_default = LargeFisheryParameter.objects.get(name="lost_refrigerant_default").value
+        except LargeFisheryParameter.DoesNotExist:
+            raise ValueError("Default lost refrigerant does not exist")
+
+        try:
+            self.tonnes_ice_default = LargeFisheryParameter.objects.get(name="tonnes_ice_default").value
+        except LargeFisheryParameter.DoesNotExist:
+            raise ValueError("Default tonnes of ice does not exist")
+
+        try:
+            self.kw_tonnes = LargeFisheryParameter.objects.get(name="kw_tonnes").value
+        except LargeFisheryParameter.DoesNotExist:
+            raise ValueError("Default kw per tonne does not exist")
+
+
 
     def calculate(self) -> list[Result]:
         """
