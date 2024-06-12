@@ -55,6 +55,8 @@ class DefaultsFactory:
                 return FuelDefaults(input).get_defaults(calculate=calculate)
             case api.InputEntry:
                 return InputEntryDefaults(input).get_defaults(calculate=calculate)
+            case api.LargeFishery:
+                return LargeFisheryDefaults(input).get_defaults(calculate=calculate)
             case _:
                 raise NotImplementedError(f"Defaults for {input.__class__.__name__} have not been implemented.")
 
@@ -233,4 +235,36 @@ class InputEntryDefaults(Defaults):
             ef_co2 = defaults.ef.co2_value if defaults.ef else None,
             ef_n2o = defaults.ef.n2o_value if defaults.ef else None,
             ef_co2_eq = defaults.ef.co2_eq_value if defaults.ef else None
+        )
+    
+
+class LargeFisheryDefaults(Defaults):
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.LargeFishery
+
+        defaults = calcs.LargeFisheryCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace(
+            ef_fuel_used_start = defaults.ef_diesel_default,
+            ef_fuel_used_w = defaults.ef_diesel_default,
+            ef_fuel_used_wo = defaults.ef_diesel_default,
+
+            refrigerant_lost_start = defaults.lost_refrigerant_default,
+            refrigerant_lost_w = defaults.lost_refrigerant_default,
+            refrigerant_lost_wo = defaults.lost_refrigerant_default,
+
+            gwp_refrigerant_start = self.input.refrigerant_gwp,
+            gwp_refrigerant_w = self.input.refrigerant_gwp,
+            gwp_refrigerant_wo = self.input.refrigerant_gwp,
+
+            quantity_ice_start = defaults.tonnes_ice_default,
+            quantity_ice_w = defaults.tonnes_ice_default,
+            quantity_ice_wo = defaults.tonnes_ice_default,
+
+            kwh_electricity_start = defaults.kw_tonnes,
+            kwh_electricity_w = defaults.kw_tonnes,
+            kwh_electricity_wo = defaults.kw_tonnes,
+
+
         )
