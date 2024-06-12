@@ -1663,23 +1663,46 @@ class ForestManagementWriteSerializer(LandModuleWriteSerializer):
         mandatory_fields = {
             "land_use_type_start": [
                 "forest_type",
-                [
-                    {"rotation_length_yrs_start": ["rotation_percentage_biomass_for_energy_start"]},
-                    {"rotation_length_yrs_w": ["rotation_percentage_biomass_for_energy_w"]},
-                    {"rotation_length_yrs_wo": ["rotation_percentage_biomass_for_energy_wo"]},
-                ],
-                [
-                    {
-                        "logging_recurrence_yrs_start": ["logging_percentage_agb_logged_start", "logging_percentage_biomass_for_energy_start"],
-                    },
-                    {
-                        "logging_recurrence_yrs_w": ["logging_percentage_agb_logged_w", "logging_percentage_biomass_for_energy_w"],
-                    },
-                    {
-                        "logging_recurrence_yrs_wo": ["logging_percentage_agb_logged_wo", "logging_percentage_biomass_for_energy_wo"],
-                    },
-                ],
-            ],
+                {
+                    "rotation_length_yrs_start": [
+                        "rotation_length_yrs_start",
+                        "rotation_percentage_biomass_for_energy_start",
+                    ]
+                },
+                {
+                    "rotation_length_yrs_w": [
+                        "rotation_length_yrs_w",
+                        "rotation_percentage_biomass_for_energy_w",
+                    ]
+                },
+                {
+                    "rotation_length_yrs_wo": [
+                        "rotation_length_yrs_wo",
+                        "rotation_percentage_biomass_for_energy_wo"
+                    ]
+                },
+                {
+                    "logging_recurrence_yrs_start": [
+                        "logging_recurrence_yrs_start",
+                        "logging_percentage_agb_logged_start",
+                        "logging_percentage_biomass_for_energy_start",
+                    ]
+                },
+                {
+                    "logging_recurrence_yrs_w": [
+                        "logging_recurrence_yrs_w",
+                        "logging_percentage_agb_logged_w",
+                        "logging_percentage_biomass_for_energy_w",
+                    ]
+                },
+                {
+                    "logging_recurrence_yrs_wo": [
+                        "logging_recurrence_yrs_wo",
+                        "logging_percentage_agb_logged_wo",
+                        "logging_percentage_biomass_for_energy_wo"
+                    ]
+                }
+            ]
         }
 
     def validate(self, data):
