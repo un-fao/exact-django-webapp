@@ -1888,16 +1888,17 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
         self.burning_emission_factor: SimpleNamespace | ipcc.BurningEmissionFactor = SimpleNamespace(value=0)
         self.rice_cf: SimpleNamespace | ipcc.FiresCombustionFactor = SimpleNamespace(value=0)
 
-    def calculate(self) -> Result:
+    def calculate(self, is_minor_season = True) -> Result:
         module: FloodedRice = self.data
-        activity: Activity = module.activity
+        module_for_checks = getattr(module, "parent", module)
+        activity: Activity = getattr(module, "parent", module).activity
         project: Project = activity.project
-        luc: LandUseChange = module.land_use_change
-        area = luc.area if luc else module.area
+        luc: LandUseChange = getattr(module, "parent", module).land_use_change
+        area = luc.area if luc else getattr(module, "parent", module).area
 
         self.get_defaults()
 
-        if is_luc_remaining_same(module):
+        if is_luc_remaining_same(module_for_checks):
             self.inputs_start_w = [
                 *[area, 0],
                 self.efc.value,
@@ -1920,14 +1921,14 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 project.gw_potential.n2o,
                 project.implementation_years,
                 project.capitalization_years,
-                module.activity.change_rate.name,
+                activity.change_rate.name,
                 project.gw_potential.ch4,
                 self.efc.cultivation_period,
                 module.cultivation_period_t2_start,
                 self.soc_start,
                 self.soc_w,
-                module.soc_t2_start,
-                module.soc_t2_w,
+                getattr(module, "soc_t2_start", None),
+                getattr(module, "soc_t2_w", None),
                 self.fmg_start.value,
                 self.fmg_w.value,
                 module.fmg_t2_start,
@@ -1943,12 +1944,13 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 True,
                 module.organic_amendment_type_start.name == "Straw Burnt",
                 0,  # Delay
+                is_minor_season
             ]
 
             self.math_start_w = MathFloodedRice(*self.inputs_start_w)
             self.math_start_w.calculate_emissions()
 
-        if is_business_as_usual(module):
+        if is_business_as_usual(module_for_checks):
             self.inputs_start_wo = [
                 *[area, 0],
                 self.efc.value,
@@ -1971,14 +1973,14 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 project.gw_potential.n2o,
                 project.implementation_years,
                 project.capitalization_years,
-                module.activity.change_rate.name,
+                activity.change_rate.name,
                 project.gw_potential.ch4,
                 self.efc.cultivation_period,
                 module.cultivation_period_t2_start,
                 self.soc_start,
                 self.soc_wo,
-                module.soc_t2_start,
-                module.soc_t2_wo,
+                getattr(module, "soc_t2_start", None),
+                getattr(module, "soc_t2_wo", None),
                 self.fmg_start.value,
                 self.fmg_wo.value,
                 module.fmg_t2_start,
@@ -1994,12 +1996,13 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 True,
                 module.organic_amendment_type_start.name == "Straw Burnt",
                 0,  # Delay
+                is_minor_season
             ]
 
             self.math_start_wo = MathFloodedRice(*self.inputs_start_wo)
             self.math_start_wo.calculate_emissions()
 
-        if is_with(module):
+        if is_with(module_for_checks):
             self.inputs_w = [
                 *[0, area],
                 self.efc.value,
@@ -2022,14 +2025,14 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 project.gw_potential.n2o,
                 project.implementation_years,
                 project.capitalization_years,
-                module.activity.change_rate.name,
+                activity.change_rate.name,
                 project.gw_potential.ch4,
                 self.efc.cultivation_period,
                 module.cultivation_period_t2_w,
                 self.soc_start,
                 self.soc_w,
-                module.soc_t2_start,
-                module.soc_t2_w,
+                getattr(module, "soc_t2_start", None),
+                getattr(module, "soc_t2_w", None),
                 self.fmg_start.value,
                 self.fmg_w.value,
                 module.fmg_t2_start,
@@ -2045,12 +2048,13 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 True,
                 module.organic_amendment_type_w.name == "Straw Burnt",
                 0,  # Delay
+                is_minor_season
             ]
 
             self.math_w = MathFloodedRice(*self.inputs_w)
             self.math_w.calculate_emissions()
 
-        if is_without(module):
+        if is_without(module_for_checks):
             self.inputs_wo = [
                 *[0, area],
                 self.efc.value,
@@ -2073,14 +2077,14 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 project.gw_potential.n2o,
                 project.implementation_years,
                 project.capitalization_years,
-                module.activity.change_rate.name,
+                activity.change_rate.name,
                 project.gw_potential.ch4,
                 self.efc.cultivation_period,
                 module.cultivation_period_t2_wo,
                 self.soc_start,
                 self.soc_wo,
-                module.soc_t2_start,
-                module.soc_t2_wo,
+                getattr(module, "soc_t2_start", None),
+                getattr(module, "soc_t2_wo", None),                
                 self.fmg_start.value,
                 self.fmg_wo.value,
                 module.fmg_t2_start,
@@ -2096,6 +2100,7 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 False,
                 module.organic_amendment_type_wo.name == "Straw Burnt",
                 0,  # Delay
+                is_minor_season
             ]
 
             self.math_wo = MathFloodedRice(*self.inputs_wo)
@@ -2124,6 +2129,7 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
 
     def get_defaults(self, calculate=False) -> dict:
         module: FloodedRice = self.data
+        module_for_checks = getattr(module, "parent", module)
         activity: Activity = getattr(module, "parent", module).activity
         project: Project = activity.project
         luc: LandUseChange = module.land_use_change
@@ -2138,7 +2144,7 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
         soil_flt = {"soil_type": soil_type}
         region_flt = {"continent": region}
 
-        if is_luc_remaining_same(module):
+        if is_luc_remaining_same(module_for_checks):
             h2o_mgmt_before_start_flt = {"water_management_type_before_cultivation": module.water_management_type_before_cultivation_start}
             h2o_mgmt_after_start_flt = {"water_management_type_after_cultivation": module.water_management_type_after_cultivation_start}
             organic_amendment_start_flt = {"organic_amendment_type": module.organic_amendment_type_start}
@@ -2149,7 +2155,7 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
             self.sfp_start = utils.get_or_raise(ipcc.RiceSFP, h2o_mgmt_before_start_flt, f"RiceSFP for {module.water_management_type_before_cultivation_start} does not exist")
             self.sfo_start = utils.get_or_raise(ipcc.RiceSFO, organic_amendment_start_flt, f"RiceSFO for {module.organic_amendment_type_start} does not exist")
 
-        if is_business_as_usual(module):
+        if is_business_as_usual(module_for_checks):
             h2o_mgmt_before_start_flt = {"water_management_type_before_cultivation": module.water_management_type_before_cultivation_start}
             h2o_mgmt_after_start_flt = {"water_management_type_after_cultivation": module.water_management_type_after_cultivation_start}
             organic_amendment_start_flt = {"organic_amendment_type": module.organic_amendment_type_start}
@@ -2160,7 +2166,7 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
             self.sfp_start = utils.get_or_raise(ipcc.RiceSFP, h2o_mgmt_before_start_flt, f"RiceSFP for {module.water_management_type_before_cultivation_start} does not exist")
             self.sfo_start = utils.get_or_raise(ipcc.RiceSFO, organic_amendment_start_flt, f"RiceSFO for {module.organic_amendment_type_start} does not exist")
 
-        if is_with(module):
+        if is_with(module_for_checks):
             h2o_mgmt_before_w_flt = {"water_management_type_before_cultivation": module.water_management_type_before_cultivation_w}
             h2o_mgmt_after_w_flt = {"water_management_type_after_cultivation": module.water_management_type_after_cultivation_w}
             organic_amendment_w_flt = {"organic_amendment_type": module.organic_amendment_type_w}
@@ -2171,7 +2177,7 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
             self.sfp_w = utils.get_or_raise(ipcc.RiceSFP, h2o_mgmt_before_w_flt, f"RiceSFP for {module.water_management_type_before_cultivation_w} does not exist")
             self.sfo_w = utils.get_or_raise(ipcc.RiceSFO, organic_amendment_w_flt, f"RiceSFO for {module.organic_amendment_type_w} does not exist")
 
-        if is_without(module):
+        if is_without(module_for_checks):
             h2o_mgmt_before_wo_flt = {"water_management_type_before_cultivation": module.water_management_type_before_cultivation_wo}
             h2o_mgmt_after_wo_flt = {"water_management_type_after_cultivation": module.water_management_type_after_cultivation_wo}
             organic_amendment_wo_flt = {"organic_amendment_type": module.organic_amendment_type_wo}
@@ -2223,7 +2229,7 @@ class FloodedRiceCalculator(BaseCalculator):
         res_w = MathResult(module.activity.project.implementation_years, module.activity.project.capitalization_years)
         res_wo = MathResult(module.activity.project.implementation_years, module.activity.project.capitalization_years)
 
-        r_w, r_wo = FloodedRiceSeasonCalculator(module).calculate()
+        r_w, r_wo = FloodedRiceSeasonCalculator(module).calculate(False)
 
         res_w += r_w
         res_wo += r_wo
