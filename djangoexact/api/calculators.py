@@ -4750,10 +4750,20 @@ class IrrigationSystemCalculator(BaseCalculator):
 
         return results_tuple
 
-    def get_defaults(self, input: Module) -> dict:
-        return super().get_defaults(input)
+    def get_defaults(self, calculate = False) -> dict:
+        
+        module: IrrigationSystem = self.data
+        activity: Activity = module.parent.activity
+        project: Project = activity.project
+
+        try:
+            self.ef = ipcc.IrrigationSystemData.objects.get(irrigation_system_type=module.irrigation_system_type)
+        except ipcc.IrrigationSystemData.DoesNotExist:
+            raise ValueError(f"Could not find EF for {module.irrigation_system_type.name}")
+        
 
     def defaults(self) -> DefaultData:
+        
         return super().defaults()
 
 

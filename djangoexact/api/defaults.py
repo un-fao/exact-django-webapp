@@ -59,6 +59,8 @@ class DefaultsFactory:
                 return LargeFisheryDefaults(input).get_defaults(calculate=calculate)
             case api.SmallFishery:
                 return SmallFisheryDefaults(input).get_defaults(calculate=calculate)
+            case api.IrrigationSystem:
+                return IrrigationSystemDefaults(input).get_defaults(calculate=calculate)
             case _:
                 raise NotImplementedError(f"Defaults for {input.__class__.__name__} have not been implemented.")
 
@@ -299,4 +301,18 @@ class SmallFisheryDefaults(Defaults):
             kwh_electricity_w = defaults.kw_tonnes,
             kwh_electricity_wo = defaults.kw_tonnes,
 
+        )
+    
+
+class IrrigationSystemDefaults(Defaults):
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.IrrigationSystem
+
+        defaults = calcs.IrrigationSystemCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace(
+            ef_default_start = defaults.ef.value,
+            ef_default_w = defaults.ef.value,
+            ef_default_wo = defaults.ef.value,
         )
