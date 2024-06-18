@@ -1110,7 +1110,7 @@ class AnnualCropCalculator(BaseCalculator):
         region_flt = {"continent": project.country.region}
         soil_flt = {"soil_type": soil_type}
         moisture_flt = {"moisture": moisture}
-        organic_input_flt = {"organic_input_type": input.organic_input_type_start}
+        # organic_input_flt = {"organic_input_type": input.organic_input_type_start}
         lut_start_flt = {"land_use_type": module_start.land_use_type_start}
         lut_w_flt = {"land_use_type": module_w.land_use_type_w}
         lut_wo_flt = {"land_use_type": module_wo.land_use_type_wo}
@@ -1129,19 +1129,21 @@ class AnnualCropCalculator(BaseCalculator):
         self.flu_wo = get_flu_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
 
         self.soc = utils.get_or_raise(ipcc.SoilOrganicCarbon, cm | soil_flt, f"SoilOrganicCarbon for {soil_type.name} soil type in {climate.name} climate and {moisture.name} moisture does not exist")
-        self.flu = utils.get_or_raise(ipcc.CroplandFLU, cm | long_term_cultivated_flt, f"CroplandFLU for {input.land_use_type_start.name} in {climate.name} climate and {moisture.name} moisture does not exist")
         self.burning_emission_factor = utils.get_or_raise(ipcc.BurningEmissionFactor, agricultural_residues_flt, "BurningEmissionFactor for Agricultural residues does not exist")
 
         if input.minor_land_use_type_start or input.minor_land_use_type_w or input.minor_land_use_type_wo:
             self.minor_burning_emission_factor = utils.get_or_raise(ipcc.BurningEmissionFactor, agricultural_residues_flt, "BurningEmissionFactor for Agricultural residues for minor crop does not exist")
 
         if is_luc_remaining_same(input):
+            
             lut_start = input.land_use_type_start
             minor_lut_start = input.minor_land_use_type_start
+            organic_input_flt_start = {"organic_input_type": input.organic_input_type_start}
 
+            self.flu = utils.get_or_raise(ipcc.CroplandFLU, cm | long_term_cultivated_flt, f"CroplandFLU for {lut_start.name} in {climate.name} climate and {moisture.name} moisture does not exist")
             self.fires_start = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_start_flt, f"FiresCombustionFactor for {lut_start.name} does not exist")
             self.n_estimation_factor_start = utils.get_or_raise(ipcc.CropNitrousEstimationDefaultFactor, lut_start_flt, f"CropNitrousEstimationDefaultFactor for {lut_start.name} does not exist", method="get_or_grains")
-            self.emission_factors_start = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_flt, f"DefaultEmissionFactor for {moisture.name} moisture and {input.organic_input_type_start.name} does not exist")
+            self.emission_factors_start = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_flt_start, f"DefaultEmissionFactor for {moisture.name} moisture and {input.organic_input_type_start.name} does not exist")
             self.crop_yield_start = input.crop_yield_start or utils.get_or_raise(ipcc.CropYieldStats, region_flt | lut_start_flt, f"CropYieldStats for {module_start.land_use_type_start.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_region_average").average
 
             try:
@@ -1154,10 +1156,12 @@ class AnnualCropCalculator(BaseCalculator):
         if is_with(input):
             lut_w = input.land_use_type_w
             minor_lut_w = input.minor_land_use_type_w
+            organic_input_flt_w = {"organic_input_type": input.organic_input_type_w}
 
+            self.flu = utils.get_or_raise(ipcc.CroplandFLU, cm | long_term_cultivated_flt, f"CroplandFLU for {lut_w.name} in {climate.name} climate and {moisture.name} moisture does not exist")
             self.fires_w = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_w_flt, f"FiresCombustionFactor for {lut_w.name} does not exist")
             self.n_estimation_factor_w = utils.get_or_raise(ipcc.CropNitrousEstimationDefaultFactor, lut_w_flt, f"CropNitrousEstimationDefaultFactor for {lut_w.name} does not exist", method="get_or_grains")
-            self.emission_factors_w = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_flt, f"DefaultEmissionFactor for {moisture.name} moisture and {input.organic_input_type_w.name} does not exist")
+            self.emission_factors_w = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_flt_w, f"DefaultEmissionFactor for {moisture.name} moisture and {input.organic_input_type_w.name} does not exist")
             self.crop_yield_w = input.crop_yield_w or utils.get_or_raise(ipcc.CropYieldStats, region_flt | lut_w_flt, f"CropYieldStats for {module_w.land_use_type_w.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_region_average").average
 
             try:
@@ -1170,10 +1174,12 @@ class AnnualCropCalculator(BaseCalculator):
         if is_business_as_usual(input):
             lut_start = input.land_use_type_start
             minor_lut_start = input.minor_land_use_type_start
+            organic_input_flt_start = {"organic_input_type": input.organic_input_type_start}
 
+            self.flu = utils.get_or_raise(ipcc.CroplandFLU, cm | long_term_cultivated_flt, f"CroplandFLU for {lut_start.name} in {climate.name} climate and {moisture.name} moisture does not exist")
             self.fires_start = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_start_flt, f"FiresCombustionFactor for {lut_start.name} does not exist")
             self.n_estimation_factor_start = utils.get_or_raise(ipcc.CropNitrousEstimationDefaultFactor, lut_start_flt, f"CropNitrousEstimationDefaultFactor for {lut_start.name} does not exist", method="get_or_grains")
-            self.emission_factors_start = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_flt, f"DefaultEmissionFactor for {moisture.name} moisture and {input.organic_input_type_start.name} does not exist")
+            self.emission_factors_start = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_flt_start, f"DefaultEmissionFactor for {moisture.name} moisture and {input.organic_input_type_start.name} does not exist")
             self.crop_yield_start = input.crop_yield_start or utils.get_or_raise(ipcc.CropYieldStats, region_flt | lut_start_flt, f"CropYieldStats for {module_start.land_use_type_start.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_region_average").average
 
             try:
@@ -1186,10 +1192,12 @@ class AnnualCropCalculator(BaseCalculator):
         if is_without(input):
             lut_wo = input.land_use_type_wo
             minor_lut_wo = input.minor_land_use_type_wo
+            organic_input_flt_wo = {"organic_input_type": input.organic_input_type_wo}
 
+            self.flu = utils.get_or_raise(ipcc.CroplandFLU, cm | long_term_cultivated_flt, f"CroplandFLU for {lut_wo.name} in {climate.name} climate and {moisture.name} moisture does not exist")
             self.fires_wo = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_wo_flt, f"FiresCombustionFactor for {lut_wo.name} does not exist")
             self.n_estimation_factor_wo = utils.get_or_raise(ipcc.CropNitrousEstimationDefaultFactor, lut_wo_flt, f"CropNitrousEstimationDefaultFactor for {lut_wo.name} does not exist", method="get_or_grains")
-            self.emission_factors_wo = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_flt, f"DefaultEmissionFactor for {moisture.name} moisture and {input.organic_input_type_wo.name} does not exist")
+            self.emission_factors_wo = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_flt_wo, f"DefaultEmissionFactor for {moisture.name} moisture and {input.organic_input_type_wo.name} does not exist")
             self.crop_yield_wo = input.crop_yield_wo or utils.get_or_raise(ipcc.CropYieldStats, region_flt | lut_wo_flt, f"CropYieldStats for {module_wo.land_use_type_wo.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_region_average").average
 
             try:
