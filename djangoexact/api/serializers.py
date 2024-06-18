@@ -1414,35 +1414,41 @@ class LivestockWriteSerializer(LandModuleWriteSerializer):
         ref_name = "Livestock"
         mandatory_fields = {
             "livestock_category_type": [
-                [
-                    {
-                        "livestock_production_type_start": [
-                            "production_start",
-                            "heads_number_start",
-                            "complementary_manure_management_type_start",
-                            "percentage_heads_on_pasture_start",
-                        ]
-                    },
-                    {
-                        "livestock_production_type_w": [
-                            "production_w",
-                            "heads_number_w",
-                            "complementary_manure_management_type_w",
-                            "percentage_heads_on_pasture_w",
-                        ]
-                    },
-                    {
-                        "livestock_production_type_wo": [
-                            "production_wo",
-                            "heads_number_wo",
-                            "complementary_manure_management_type_wo",
-                            "percentage_heads_on_pasture_wo",
-                        ]
-                    },
-                ]
-            ],
+                {
+                    "livestock_production_type_start": [
+                        "production_start",
+                        "heads_number_start",
+                        {
+                            "complementary_manure_management_type_start": [
+                                "percentage_heads_on_pasture_start"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "livestock_production_type_w": [
+                        "production_w",
+                        "heads_number_w",
+                        {
+                            "complementary_manure_management_type_w": [
+                                "percentage_heads_on_pasture_w"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "livestock_production_type_wo": [
+                        "production_wo",
+                        "heads_number_wo",
+                        {
+                            "complementary_manure_management_type_wo": [
+                                "percentage_heads_on_pasture_wo"
+                            ]
+                        }
+                    ]
+                }
+            ]
         }
-
 
 class LivestockReadSerializer(LandModuleReadSerializer):
     class Meta:
@@ -1451,35 +1457,41 @@ class LivestockReadSerializer(LandModuleReadSerializer):
         ref_name = "Livestock"
         mandatory_fields = {
             "livestock_category_type": [
-                [
-                    {
-                        "livestock_production_type_start": [
-                            "production_start",
-                            "heads_number_start",
-                            "complementary_manure_management_type_start",
-                            "percentage_heads_on_pasture_start",
-                        ]
-                    },
-                    {
-                        "livestock_production_type_w": [
-                            "production_w",
-                            "heads_number_w",
-                            "complementary_manure_management_type_w",
-                            "percentage_heads_on_pasture_w",
-                        ]
-                    },
-                    {
-                        "livestock_production_type_wo": [
-                            "production_wo",
-                            "heads_number_wo",
-                            "complementary_manure_management_type_wo",
-                            "percentage_heads_on_pasture_wo",
-                        ]
-                    },
-                ]
-            ],
+                {
+                    "livestock_production_type_start": [
+                        "production_start",
+                        "heads_number_start",
+                        {
+                            "complementary_manure_management_type_start": [
+                                "percentage_heads_on_pasture_start"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "livestock_production_type_w": [
+                        "production_w",
+                        "heads_number_w",
+                        {
+                            "complementary_manure_management_type_w": [
+                                "percentage_heads_on_pasture_w"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "livestock_production_type_wo": [
+                        "production_wo",
+                        "heads_number_wo",
+                        {
+                            "complementary_manure_management_type_wo": [
+                                "percentage_heads_on_pasture_wo"
+                            ]
+                        }
+                    ]
+                }
+            ]
         }
-
 
 # Aquaculture
 
