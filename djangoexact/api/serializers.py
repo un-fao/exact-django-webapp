@@ -1416,7 +1416,7 @@ class LivestockWriteSerializer(LandModuleWriteSerializer):
             "livestock_category_type": [
                 {
                     "livestock_production_type_start": [
-                        "production_start",
+                        #"production_start",
                         "heads_number_start",
                         {
                             "complementary_manure_management_type_start": [
@@ -1427,7 +1427,7 @@ class LivestockWriteSerializer(LandModuleWriteSerializer):
                 },
                 {
                     "livestock_production_type_w": [
-                        "production_w",
+                        #"production_w",
                         "heads_number_w",
                         {
                             "complementary_manure_management_type_w": [
@@ -1438,7 +1438,7 @@ class LivestockWriteSerializer(LandModuleWriteSerializer):
                 },
                 {
                     "livestock_production_type_wo": [
-                        "production_wo",
+                        #"production_wo",
                         "heads_number_wo",
                         {
                             "complementary_manure_management_type_wo": [
@@ -1459,7 +1459,7 @@ class LivestockReadSerializer(LandModuleReadSerializer):
             "livestock_category_type": [
                 {
                     "livestock_production_type_start": [
-                        "production_start",
+                        #"production_start",
                         "heads_number_start",
                         {
                             "complementary_manure_management_type_start": [
@@ -1470,7 +1470,7 @@ class LivestockReadSerializer(LandModuleReadSerializer):
                 },
                 {
                     "livestock_production_type_w": [
-                        "production_w",
+                        #"production_w",
                         "heads_number_w",
                         {
                             "complementary_manure_management_type_w": [
@@ -1481,7 +1481,7 @@ class LivestockReadSerializer(LandModuleReadSerializer):
                 },
                 {
                     "livestock_production_type_wo": [
-                        "production_wo",
+                        #"production_wo",
                         "heads_number_wo",
                         {
                             "complementary_manure_management_type_wo": [
