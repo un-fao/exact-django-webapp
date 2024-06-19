@@ -1007,20 +1007,20 @@ class OrganicSoilWriteSerializer(LandModuleWriteSerializer):
             ],
             "peat_type": [
                 {
-                    "peat_extraction_height_start": [
-                        "peat_area_start",
+                    "peat_area_start": [
+                        "peat_extraction_height_start",
                         "peat_ditches_area_start",
                     ],
                 },
                 {
-                    "peat_extraction_height_w": [
-                        "peat_area_w",
+                    "peat_area_w": [
+                        "peat_extraction_height_w",
                         "peat_ditches_area_w",
                     ],
                 },
                 {
-                    "peat_extraction_height_wo": [
-                        "peat_area_wo",
+                    "peat_area_wo": [
+                        "peat_extraction_height_wo",
                         "peat_ditches_area_wo",
                     ],
                 },
