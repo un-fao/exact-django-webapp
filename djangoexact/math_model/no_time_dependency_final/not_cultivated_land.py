@@ -30,15 +30,15 @@ class NotCultivatedLand(BaseModule):
         time_cap,
         rate,
         nitrous_constant,
-        methane_constant,
-        fire_interval,
-        fire_used,
-        methane_ef,
+        # methane_constant,
+        # fire_interval,
+        # fire_used,
+        # methane_ef,
         nitrous_ef,
-        agb_ref,
-        agb_tier_2,
-        cf_ref,
-        cf_tier_2,
+        # agb_ref,
+        # agb_tier_2,
+        # cf_ref,
+        # cf_tier_2,
         soc_start_default,
         soc_end_default,
         soc_start_tier_2,
@@ -64,15 +64,15 @@ class NotCultivatedLand(BaseModule):
         self.time_cap = time_cap
         self.rate = rate
         self.nitrous_constant = nitrous_constant
-        self.methane_constant = methane_constant
-        self.fire_interval = fire_interval  # front-end input, years between two fires, default is 5 (on front-end)
-        self.fire_used = fire_used  # front-end input, states whether fire has been used
-        self.methane_ef = methane_ef  # tabulated value IPCC D75 (value for Savanna and Grassland)
+        # self.methane_constant = methane_constant
+        # self.fire_interval = fire_interval  # front-end input, years between two fires, default is 5 (on front-end)
+        # self.fire_used = fire_used  # front-end input, states whether fire has been used
+        # self.methane_ef = methane_ef  # tabulated value IPCC D75 (value for Savanna and Grassland)
         self.nitrous_ef = nitrous_ef  # tabulated value IPCC E75 (value for Savanna and Grassland)
-        self.agb_ref = agb_ref  # taken from IPCC A553 matching clim_moist to rows
-        self.agb_tier_2 = agb_tier_2  # tier 2 value, expects float or None
-        self.cf_ref = cf_ref  # default is 77%, not tabulated
-        self.cf_tier_2 = cf_tier_2  # tier 2 value, expects float or None
+        # self.agb_ref = agb_ref  # taken from IPCC A553 matching clim_moist to rows
+        # self.agb_tier_2 = agb_tier_2  # tier 2 value, expects float or None
+        # self.cf_ref = cf_ref  # default is 77%, not tabulated
+        # self.cf_tier_2 = cf_tier_2  # tier 2 value, expects float or None
         self.soc_start_default = soc_start_default
         self.soc_end_default = soc_end_default
         self.soc_start_tier_2 = soc_start_tier_2  # tier 2 value, expects float or None
@@ -127,50 +127,50 @@ class NotCultivatedLand(BaseModule):
         self.calculate_soc = calculate_soc
 
         # TIER 2 DEFAULTS
-        self.soc_start_tier_2_default = self.soc_start_default * self.fmg_start * self.fi_start * self.flu_start
-        self.soc_end_tier_2_default = self.soc_end_default * self.fmg_end * self.fi_end * self.flu_end
-        self.agb_tier_2_default = self.agb_ref
-        self.combustion_factor_tier_2_default = self.cf_ref
+        # self.soc_start_tier_2_default = self.soc_start_default * self.fmg_start * self.fi_start * self.flu_start
+        # self.soc_end_tier_2_default = self.soc_end_default * self.fmg_end * self.fi_end * self.flu_end
+        # self.agb_tier_2_default = self.agb_ref
+        # self.combustion_factor_tier_2_default = self.cf_ref
 
         return
 
     def calculate_emissions(
         self,
     ):
-        def calculate_residue_burning():
-            try:
-                if not self.fire_used or self.time_impl + self.time_cap < self.fire_interval or self.fire_interval == None:
-                    self.emissions_residue_burning_yearly = [0 for i in range(self.time_impl + self.time_cap)]
-                    self.emissions_residue_burning_total = 0
+        # def calculate_residue_burning():
+        #     try:
+        #         if not self.fire_used or self.time_impl + self.time_cap < self.fire_interval or self.fire_interval == None:
+        #             self.emissions_residue_burning_yearly = [0 for i in range(self.time_impl + self.time_cap)]
+        #             self.emissions_residue_burning_total = 0
 
-                    # NOTE: needed? Or no?
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(0, GasTypes.N2O) for i in range(self.time_impl + self.time_cap)], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
+        #             # NOTE: needed? Or no?
+        #             self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(0, GasTypes.N2O) for i in range(self.time_impl + self.time_cap)], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
 
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(0, GasTypes.CH4) for i in range(self.time_impl + self.time_cap)], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
+        #             self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(0, GasTypes.CH4) for i in range(self.time_impl + self.time_cap)], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
 
-                else:
-                    agb = self.agb_ref if not self.agb_tier_2 else self.agb_tier_2
-                    cf = self.cf_ref if not self.cf_tier_2 else self.cf_tier_2
-                    agb_cf_gef = agb * cf * (self.methane_ef * self.methane_constant + self.nitrous_ef * self.nitrous_constant) / 1000
-                    annual_co2 = agb_cf_gef / self.fire_interval
+        #         else:
+        #             agb = self.agb_ref if not self.agb_tier_2 else self.agb_tier_2
+        #             cf = self.cf_ref if not self.cf_tier_2 else self.cf_tier_2
+        #             agb_cf_gef = agb * cf * (self.methane_ef * self.methane_constant + self.nitrous_ef * self.nitrous_constant) / 1000
+        #             annual_co2 = agb_cf_gef / self.fire_interval
 
-                    total = annual_co2 * sum(self.total_hectars)
-                    self.emissions_residue_burning_yearly = breakdown_according_to_values(total, self.total_hectars)
-                    self.emissions_residue_burning_total = total
+        #             total = annual_co2 * sum(self.total_hectars)
+        #             self.emissions_residue_burning_yearly = breakdown_according_to_values(total, self.total_hectars)
+        #             self.emissions_residue_burning_total = total
 
-                    annual_nitrous = (agb * cf * self.nitrous_ef * self.nitrous_constant / 1000) / self.fire_interval
-                    annual_methane = (agb * cf * self.methane_ef * self.methane_constant / 1000) / self.fire_interval
+        #             annual_nitrous = (agb * cf * self.nitrous_ef * self.nitrous_constant / 1000) / self.fire_interval
+        #             annual_methane = (agb * cf * self.methane_ef * self.methane_constant / 1000) / self.fire_interval
 
-                    total_nitrous = annual_nitrous * sum(self.total_hectars)
-                    total_methane = annual_methane * sum(self.total_hectars)
+        #             total_nitrous = annual_nitrous * sum(self.total_hectars)
+        #             total_methane = annual_methane * sum(self.total_hectars)
 
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in breakdown_according_to_values(total_nitrous, self.total_hectars)], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
+        #             self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in breakdown_according_to_values(total_nitrous, self.total_hectars)], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
 
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in breakdown_according_to_values(total_methane, self.total_hectars)], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
-                return
-            except:
-                traceback.print_exc()
-                return
+        #             self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in breakdown_according_to_values(total_methane, self.total_hectars)], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
+        #         return
+        #     except:
+        #         traceback.print_exc()
+        #         return
 
         def calculate_soil_emissions():
             try:
@@ -193,7 +193,7 @@ class NotCultivatedLand(BaseModule):
             except Exception as e:
                 traceback.print_exc()
 
-        calculate_residue_burning()
+        # calculate_residue_burning()
         calculate_soil_emissions()
         calculate_emissions_som()
 

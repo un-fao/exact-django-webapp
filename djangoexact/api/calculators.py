@@ -104,6 +104,7 @@ from .models import (
     LivestockParameter,
     Module,
     Moisture,
+    OrganicInputType,
     OrganicSoil,
     PerennialCropping,
     Project,
@@ -5872,8 +5873,193 @@ class ForestManagementCalculator(BaseCalculator):
     def defaults(self) -> DefaultData:
         return super().defaults()
 
+class DegradedLandCalculator(BaseCalculator):
+    """
+    Calculator for annual cropping modules.
+    """
+
+    def __init__(self, input) -> None:
+        super().__init__(input)
+
+        # NOTE: I think these should all be defaulted to 1, instead of 0
+        self.fi_start: SimpleNamespace | ipcc.FIData = SimpleNamespace(value=1)
+        self.fmg_start: SimpleNamespace | ipcc.FMGData = SimpleNamespace(value=1)
+        self.flu_start: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=1)
+        self.fi_w: SimpleNamespace | ipcc.FIData = SimpleNamespace(value=1)
+        self.fmg_w: SimpleNamespace | ipcc.FMGData = SimpleNamespace(value=1)
+        self.flu_w: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=1)
+        self.fi_wo: SimpleNamespace | ipcc.FIData = SimpleNamespace(value=1)
+        self.fmg_wo: SimpleNamespace | ipcc.FMGData = SimpleNamespace(value=1)
+        self.flu_wo: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=1)
+        
+
+        self.math_start_w = None
+        self.math_start_wo = None
+        self.math_w = None
+        self.math_wo = None
+
+    def calculate(self, is_minor_season = True) -> Result:
+        input: DegradedLand = self.data
+        activity: Activity = input.activity
+        project: Project = activity.project
+        luc: LandUseChange = input.land_use_change
+        area = luc.area if luc else input.area
+
+        self.get_defaults()
+
+        module_start = module_w = module_wo = input
+
+        if luc:
+            module_start, module_w, module_wo = get_luc_modules(luc)
+
+        if is_luc_remaining_same(input):
+            self.inputs_start_w = [
+                *[area, 0],
+                project.implementation_years,
+                project.capitalization_years,
+                activity.change_rate.name,
+                project.gw_potential.n2o,
+                self.emission_factors_start.value,
+                self.soc.value,
+                self.soc.value,
+                module_start.soc_t2_start,
+                module_w.soc_t2_w,
+                False,
+                self.fmg_start.value,
+                self.fmg_w.value,
+                module_start.fmg_t2_start,
+                module_w.fmg_t2_w,
+                self.flu_start.value,
+                self.flu_w.value,
+                module_start.flu_t2_start,
+                module_w.flu_t2_w,
+                self.fi_start.value,
+                self.fi_w.value,
+                module_start.fi_t2_start,
+                module_w.fi_t2_w,
+                0 # delay
+            ]
+
+            self.math_start_w = MathNotCultivatedLand(*self.inputs_start_w)
+            self.math_start_w.calculate_emissions()
+
+        if is_business_as_usual(input):
+            self.inputs_start_wo = [
+                *[area, 0],
+                project.implementation_years,
+                project.capitalization_years,
+                activity.change_rate.name,
+                project.gw_potential.n2o,
+                self.emission_factors_start.value,
+                self.soc.value,
+                self.soc.value,
+                module_start.soc_t2_start,
+                module_wo.soc_t2_wo,
+                False,
+                self.fmg_start.value,
+                self.fmg_wo.value,
+                module_start.fmg_t2_start,
+                module_wo.fmg_t2_wo,
+                self.flu_start.value,
+                self.flu_wo.value,
+                module_start.flu_t2_start,
+                module_wo.flu_t2_wo,
+                self.fi_start.value,
+                self.fi_wo.value,
+                module_start.fi_t2_start,
+                module_wo.fi_t2_wo,
+                0 # delay
+            ]
+
+            self.math_start_wo = MathNotCultivatedLand(*self.inputs_start_wo)
+            self.math_start_wo.calculate_emissions()
+
+        if is_with(input):
+            self.inputs_w = [
+                *[0, area],
+                project.implementation_years,
+                project.capitalization_years,
+                activity.change_rate.name,
+                project.gw_potential.n2o,
+                self.emission_factors_w.value,
+                self.soc.value,
+                self.soc.value,
+                module_start.soc_t2_start,
+                module_w.soc_t2_w,
+                True,
+                self.fmg_start.value,
+                self.fmg_w.value,
+                module_start.fmg_t2_start,
+                module_w.fmg_t2_w,
+                self.flu_start.value,
+                self.flu_w.value,
+                module_start.flu_t2_start,
+                module_w.flu_t2_w,
+                self.fi_start.value,
+                self.fi_w.value,
+                module_start.fi_t2_start,
+                module_w.fi_t2_w,
+                0, # delay   
+            ]       
+
+            self.math_w = MathNotCultivatedLand(*self.inputs_w)
+            self.math_w.calculate_emissions()      
+
+        if is_without(input):
+            self.inputs_wo = [
+                *[0, area],
+                project.implementation_years,
+                project.capitalization_years,
+                activity.change_rate.name,
+                project.gw_potential.n2o,
+                self.emission_factors_wo.value,
+                self.soc.value,
+                self.soc.value,
+                module_start.soc_t2_start,
+                module_wo.soc_t2_wo,
+                True,
+                self.fmg_start.value,
+                self.fmg_wo.value,
+                module_start.fmg_t2_start,
+                module_wo.fmg_t2_wo,
+                self.flu_start.value,
+                self.flu_wo.value,
+                module_start.flu_t2_start,
+                module_wo.flu_t2_wo,
+                self.fi_start.value,
+                self.fi_wo.value,
+                module_start.fi_t2_start,
+                module_wo.fi_t2_wo,
+                0, # delay
+            ]
+
+            self.math_wo = MathNotCultivatedLand(*self.inputs_wo)
+            self.math_wo.calculate_emissions()
 
 
+
+        results_start_w = self.math_start_w.result if self.math_start_w else MathResult(project.implementation_years, project.capitalization_years)
+        results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(project.implementation_years, project.capitalization_years)
+        results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
+        results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
+
+        log.debug("start_w breakdown")
+        results_start_w.breakdown(by=BreakdownTypes.ACTIVITY)
+
+        log.debug("start_wo breakdown")
+        results_start_wo.breakdown(by=BreakdownTypes.ACTIVITY)
+
+        log.debug("w breakdown")
+        results_w.breakdown(by=BreakdownTypes.ACTIVITY)
+
+        log.debug("wo breakdown")
+        results_wo.breakdown(by=BreakdownTypes.ACTIVITY)
+
+        results_tuple = (results_w + results_start_w, results_wo + results_start_wo)
+
+        return results_tuple
+
+    def get_defaults(self, calculate=False) -> dict:
         module: DegradedLand = self.data
         activity: Activity = module.activity
         project: Project = activity.project
@@ -5892,6 +6078,10 @@ class ForestManagementCalculator(BaseCalculator):
 
         module_start = module_w = module_wo = input
 
+        # NOTE: Here we have a hardcoded organic_input_flt. This is due to the fact that it should not be present in the table (it isn't in the Excel)
+        retrieved_input = OrganicInputType.objects.get(name="Medium C input")
+        organic_input_hardcoded = {"organic_input_type": retrieved_input}
+
         if luc:
             module_start, module_w, module_wo = get_luc_modules(luc)
 
@@ -5899,21 +6089,30 @@ class ForestManagementCalculator(BaseCalculator):
             self.flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
             self.fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
             self.fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+            self.emission_factors_start = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_hardcoded, f"DefaultEmissionFactor for {moisture.name} moisture and Medium C input does not exist")
+
 
         if is_business_as_usual(module):
             self.flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
             self.fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
             self.fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+            self.emission_factors_start = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_hardcoded, f"DefaultEmissionFactor for {moisture.name} moisture and Medium C input does not exist")
+
 
         if is_with(module):
             self.flu_w = get_flu_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
             self.fmg_w = get_fmg_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
             self.fi_w = get_fi_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
+            self.emission_factors_w = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_hardcoded, f"DefaultEmissionFactor for {moisture.name} moisture and Medium C input does not exist")
+
 
         if is_without(module):
             self.flu_wo = get_flu_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
             self.fmg_wo = get_fmg_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
             self.fi_wo = get_fi_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
+            self.emission_factors_wo = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_hardcoded, f"DefaultEmissionFactor for {moisture.name} moisture and Medium C input does not exist")
+
+            
         
         self.soc = utils.get_or_raise(ipcc.SoilOrganicCarbon, cm | soil_flt, f"SoilOrganicCarbon for {soil_type.name} soil type in {climate.name} climate and {moisture.name} moisture does not exist")
 
