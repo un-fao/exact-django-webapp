@@ -246,6 +246,10 @@ def get_flu_data(module: LandModule, climate: Climate, moisture: Moisture, scena
     """
     attr = getattr(module, f"land_use_type_{scenario.value}", None)
 
+    if not attr:
+        # return an error message
+        raise AttributeError (f"Land use type {scenario.value} is missing")
+
     try:
         if attr:
             return ipcc.FLUData.objects.get(climate=climate, moisture=moisture, land_use_type=attr)
@@ -291,6 +295,9 @@ def get_grassland_soc(luc: LandUseChange) -> ipcc.GrasslandStockExchangeFactor |
     Returns:
         grassland_soc (GrasslandStockExchangeFactor): The grassland SOC object.
     """
+    # NOTE: This approach is wrong at the moment. Instead of having tabulated set values 
+    # for SOC we should have tabulated values for multipliers to the SOC. What 
+    # was done now is with multipliers, only just with one SOC reference value.
     grassland_soc = None
 
     if not luc or not luc.activity:
@@ -1623,9 +1630,9 @@ class PerennialCropCalculator(BaseCalculator):
         activity: Activity = module.activity
         luc: LandUseChange = module.land_use_change
         change_rate = activity.change_rate
-        self.grassland_soc = get_grassland_soc(luc)
-        soc_start = self.grassland_soc.value if self.grassland_soc else self.soc.value
-        # soc_start = self.soc.value
+        # self.grassland_soc = get_grassland_soc(luc)
+        # soc_start = self.grassland_soc.value if self.grassland_soc else self.soc.value
+        soc_start = self.soc.value
         soc_w = self.soc.value
         soc_wo = self.soc.value
         area = luc.area if luc else module.area
@@ -2220,9 +2227,9 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
 
         self.soc = utils.get_or_raise(ipcc.SoilOrganicCarbon, climate_flt | moisture_flt | soil_flt, f"SoilOrganicCarbon for {climate.name}, {moisture.name} and {soil_type.name} does not exist")
 
-        self.grassland_soc = get_grassland_soc(luc)
-        self.soc_start = self.grassland_soc.value if self.grassland_soc else self.soc.value
-        # self.soc_start = self.soc.value
+        # self.grassland_soc = get_grassland_soc(luc)
+        # self.soc_start = self.grassland_soc.value if self.grassland_soc else self.soc.value
+        self.soc_start = self.soc.value
         if not self.soc_start:
             raise ValueError(f"SoilOrganicCarbon for {climate.name}, {moisture.name} and {soil_type.name} does not exist")
         self.soc_w = self.soc.value
