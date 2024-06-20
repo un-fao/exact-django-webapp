@@ -301,11 +301,10 @@ def get_grassland_soc(luc: LandUseChange) -> ipcc.GrasslandStockExchangeFactor |
             raise Exception("Cannot retrieve Grassland SOC as the starting Grassland module is not ready to perform the calculation")
 
         try:
-            grassland_soc = ipcc.GrasslandStockExchangeFactor.objects.get(
+            grassland_soc = ipcc.GrasslandSOC.objects.get(
                 grassland_management_type=module_start.grassland_management_type_start,
-                climate=luc.activity.project.climate,
             )
-        except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
+        except ipcc.GrasslandSOC.DoesNotExist:
             raise Exception(f"GrasslandStockExchangeFactor for {module_start.grassland_management_type_start.name} in {luc.activity.project.climate.name} climate does not exist")
 
     return grassland_soc
@@ -1623,8 +1622,8 @@ class PerennialCropCalculator(BaseCalculator):
         luc: LandUseChange = module.land_use_change
         change_rate = activity.change_rate
         self.grassland_soc = get_grassland_soc(luc)
-        #soc_start = self.grassland_soc.value if self.grassland_soc else self.soc.value
-        soc_start = self.soc.value
+        soc_start = self.grassland_soc.value if self.grassland_soc else self.soc.value
+        # soc_start = self.soc.value
         soc_w = self.soc.value
         soc_wo = self.soc.value
         area = luc.area if luc else module.area
@@ -2220,8 +2219,8 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
         self.soc = utils.get_or_raise(ipcc.SoilOrganicCarbon, climate_flt | moisture_flt | soil_flt, f"SoilOrganicCarbon for {climate.name}, {moisture.name} and {soil_type.name} does not exist")
 
         self.grassland_soc = get_grassland_soc(luc)
-        #self.soc_start = self.grassland_soc.value if self.grassland_soc else self.soc.value
-        self.soc_start = self.soc.value
+        self.soc_start = self.grassland_soc.value if self.grassland_soc else self.soc.value
+        # self.soc_start = self.soc.value
         if not self.soc_start:
             raise ValueError(f"SoilOrganicCarbon for {climate.name}, {moisture.name} and {soil_type.name} does not exist")
         self.soc_w = self.soc.value
