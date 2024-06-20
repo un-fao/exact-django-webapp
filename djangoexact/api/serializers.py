@@ -884,9 +884,9 @@ class AnnualCroppingWriteSerializer(LandModuleWriteSerializer):
                 
             ],
             "land_use_type_w": [
-                "tillage_management_type_wo",
-                "organic_input_type_wo",
-                "residue_management_type_wo",
+                "tillage_management_type_w",
+                "organic_input_type_w",
+                "residue_management_type_w",
             ],
             "land_use_type_wo": [
                 "tillage_management_type_wo",
