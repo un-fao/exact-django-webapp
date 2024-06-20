@@ -110,7 +110,9 @@ class DefaultEmissionFactor(Model):
     """
     IPCC:A96
     """
-
+    # NOTE: organic_input_type is not used in the excel file, look into this. 
+    # In order to make DegradedLand and SetAside work, I hardcoded it. 
+    # This has to be removed, and then we can change there as well
     organic_input_type = ForeignKey("api.OrganicInputType", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     value = FloatField()
