@@ -428,8 +428,20 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
     @transaction.atomic
     def save(self, **kwargs):
+        
         if Activity.objects.filter(name=self.validated_data["name"], project=self.validated_data["project"]).exists():
-            raise serializers.ValidationError("An activity with this name already exists for this project")
+            base_name = self.validated_data["name"]
+            project = self.validated_data["project"]
+            suffix = 1
+
+            # Find a unique name by appending a suffix
+            while Activity.objects.filter(name=f"{base_name} ({suffix})", project=project).exists():
+                suffix += 1
+
+            # Update the name in the validated data
+            self.validated_data["name"] = f"{base_name} ({suffix})"
+            # raise serializers.ValidationError("An activity with this name already exists for this project")
+        
 
         activities_cost = list(self.validated_data["project"].activities.all().values_list("cost", flat=True))
         activities_cost.append(self.validated_data.get("cost", 0))
