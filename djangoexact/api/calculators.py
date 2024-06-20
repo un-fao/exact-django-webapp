@@ -59,6 +59,10 @@ from math_model.no_time_dependency_final.waterbodies import (
     CoastalWaterbodies as MathWaterbodies,
 )
 
+from math_model.no_time_dependency_final.not_cultivated_land import (
+    NotCultivatedLand as MathNotCultivatedLand,
+)
+
 from api.utilities import getattr_or_default
 
 from . import utilities as utils
@@ -74,6 +78,7 @@ from .models import (
     CoastalWetland,
     CoastalWetlandParameter,
     Country,
+    DegradedLand,
     Electricity,
     Energy,
     FloodedRice,
@@ -1617,7 +1622,9 @@ class PerennialCropCalculator(BaseCalculator):
         activity: Activity = module.activity
         luc: LandUseChange = module.land_use_change
         change_rate = activity.change_rate
-        soc_start = get_grassland_soc(luc) or self.soc.value
+        self.grassland_soc = get_grassland_soc(luc)
+        #soc_start = self.grassland_soc.value if self.grassland_soc else self.soc.value
+        soc_start = self.soc.value
         soc_w = self.soc.value
         soc_wo = self.soc.value
         area = luc.area if luc else module.area
@@ -2213,7 +2220,8 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
         self.soc = utils.get_or_raise(ipcc.SoilOrganicCarbon, climate_flt | moisture_flt | soil_flt, f"SoilOrganicCarbon for {climate.name}, {moisture.name} and {soil_type.name} does not exist")
 
         self.grassland_soc = get_grassland_soc(luc)
-        self.soc_start = self.grassland_soc.value if self.grassland_soc else self.soc.value
+        #self.soc_start = self.grassland_soc.value if self.grassland_soc else self.soc.value
+        self.soc_start = self.soc.value
         if not self.soc_start:
             raise ValueError(f"SoilOrganicCarbon for {climate.name}, {moisture.name} and {soil_type.name} does not exist")
         self.soc_w = self.soc.value
@@ -5864,3 +5872,51 @@ class ForestManagementCalculator(BaseCalculator):
 
     def defaults(self) -> DefaultData:
         return super().defaults()
+
+
+
+        module: DegradedLand = self.data
+        activity: Activity = module.activity
+        project: Project = activity.project
+        luc: LandUseChange = module.land_use_change
+
+        climate: Climate = activity.climate_t2 or project.climate
+        moisture: Moisture = activity.moisture_t2 or project.moisture
+        region: Region = project.country.region
+        soil_type: SoilType = project.soil_type
+
+        climate_flt = {"climate": climate}
+        moisture_flt = {"moisture": moisture}
+        soil_flt = {"soil_type": soil_type}
+        region_flt = {"continent": region}
+        cm = {"climate": climate, "moisture": moisture}
+
+        module_start = module_w = module_wo = input
+
+        if luc:
+            module_start, module_w, module_wo = get_luc_modules(luc)
+
+        if is_luc_remaining_same(module):
+            self.flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+            self.fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+            self.fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+
+        if is_business_as_usual(module):
+            self.flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+            self.fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+            self.fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+
+        if is_with(module):
+            self.flu_w = get_flu_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
+            self.fmg_w = get_fmg_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
+            self.fi_w = get_fi_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
+
+        if is_without(module):
+            self.flu_wo = get_flu_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
+            self.fmg_wo = get_fmg_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
+            self.fi_wo = get_fi_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
+        
+        self.soc = utils.get_or_raise(ipcc.SoilOrganicCarbon, cm | soil_flt, f"SoilOrganicCarbon for {soil_type.name} soil type in {climate.name} climate and {moisture.name} moisture does not exist")
+
+        if module.status.name == "READY" and calculate:
+            self.calculate()
