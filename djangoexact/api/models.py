@@ -1803,7 +1803,7 @@ class OrganicSoil(LandModuleFixed):
 
     ##### Peat Extraction #####
 
-    peat_type = models.ForeignKey(PeatType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_peat_type")
+    peat_type = models.ForeignKey(PeatType, on_delete=models.CASCADE, null=True, blank=True,  default=utilities.get_default_peat_type, related_name="%(class)s_peat_type")
     peat_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_type_thread", on_delete=models.SET_NULL)
 
     peat_area_start = models.FloatField(null=True, blank=True)
