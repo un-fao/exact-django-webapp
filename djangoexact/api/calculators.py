@@ -246,10 +246,6 @@ def get_flu_data(module: LandModule, climate: Climate, moisture: Moisture, scena
     """
     attr = getattr(module, f"land_use_type_{scenario.value}", None)
 
-    if not attr:
-        # return an error message
-        raise AttributeError (f"Land use type {scenario.value} is missing")
-
     try:
         if attr:
             return ipcc.FLUData.objects.get(climate=climate, moisture=moisture, land_use_type=attr)
