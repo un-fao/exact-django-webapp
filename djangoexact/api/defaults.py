@@ -128,6 +128,9 @@ class PerennialCroppingDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
+            soc_t2_start_default=defaults.soc.value,
+            soc_t2_w_default=defaults.soc.value,
+            soc_t2_wo_default=defaults.soc.value,
             agb_t2_start_default=defaults.ag_default_start.value,
             agb_t2_w_default=defaults.ag_default_w.value,
             agb_t2_wo_default=defaults.ag_default_wo.value,
