@@ -22,12 +22,13 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.core.validators import RegexValidator
 
-alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', 'Only alphanumeric characters are allowed.')
+alphanumeric = RegexValidator(r"^[0-9a-zA-Z]*$", "Only alphanumeric characters are allowed.")
+
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
-            raise ValueError('The Email field must be set')
+            raise ValueError("The Email field must be set")
         email = self.normalize_email(email)
         username = email  # Automatically set username as email
         user = self.model(email=email, username=username, **extra_fields)
@@ -36,15 +37,16 @@ class CustomUserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
 
-        if extra_fields.get('is_staff') is not True:
-            raise ValueError('Superuser must have is_staff=True.')
-        if extra_fields.get('is_superuser') is not True:
-            raise ValueError('Superuser must have is_superuser=True.')
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("Superuser must have is_staff=True.")
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError("Superuser must have is_superuser=True.")
 
         return self.create_user(email, password, **extra_fields)
+
 
 class CustomUser(AbstractUser):
     country = models.ForeignKey("api.Country", on_delete=models.CASCADE, null=True, blank=True, related_name="users")
@@ -1803,7 +1805,7 @@ class OrganicSoil(LandModuleFixed):
 
     ##### Peat Extraction #####
 
-    peat_type = models.ForeignKey(PeatType, on_delete=models.CASCADE, null=True, blank=True,  default=utilities.get_default_peat_type, related_name="%(class)s_peat_type")
+    peat_type = models.ForeignKey(PeatType, on_delete=models.CASCADE, null=True, blank=True, default=utilities.get_default_peat_type, related_name="%(class)s_peat_type")
     peat_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_type_thread", on_delete=models.SET_NULL)
 
     peat_area_start = models.FloatField(null=True, blank=True)
@@ -1876,6 +1878,15 @@ class SetAside(LandModule, DoubleBiomassModule):
     is_set_aside_w = models.BooleanField(default=False)
     is_set_aside_wo = models.BooleanField(default=False)
 
+    def save(self, *args, **kwargs):
+
+        if not self.land_use_type_start:
+            self.land_use_type_start = LandUseType.objects.get(name="Set Aside")
+            self.land_use_type_w = self.land_use_type_start
+            self.land_use_type_wo = self.land_use_type_start
+
+        return super().save(*args, **kwargs)
+
 
 class DegradedLand(LandModule, SingleBiomassModule):
     ha_start = models.FloatField(null=True, blank=True)
@@ -1908,7 +1919,7 @@ class DegradedLand(LandModule, SingleBiomassModule):
             self.land_use_type_w = self.land_use_type_start
             self.land_use_type_wo = self.land_use_type_start
 
-        super().save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
 
 class LandUseChange(Module):
