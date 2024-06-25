@@ -1,0 +1,510 @@
+climate;moisture;emission_type;livestock_category_type;livestock_production_type;Lagoon;Liquid/slurry;Solid storage;Dry lot;Pasture/Range/Paddock;Daily spread;Digester;Burned for fuel;Pit<1Month;Pit>1 month;Poultry manure;Deep bedding;Composting;Aerobic treatment
+Cool Temperate;Moist;CH4;Dairy Cattle;High-Productivity;96,5;33,8;3,2;1,6;0,6;0,2;3,2;16,1;0;33,8;0;0;0;0
+Cool Temperate;Dry;CH4;Dairy Cattle;High-Productivity;107,07;41,8;3,2;1,6;0,6;0,2;3,2;16,1;0;41,8;0;0;0;0
+Boreal;Moist;CH4;Dairy Cattle;High-Productivity;80,4;22,5;3,2;1,6;0,6;0,2;3,2;16,1;0;22,5;0;0;0;0
+Boreal;Dry;CH4;Dairy Cattle;High-Productivity;78,8;22,5;3,2;1,6;0,6;0,2;3,2;16,1;0;22,5;0;0;0;0
+Warm Temperate;Moist;CH4;Dairy Cattle;High-Productivity;117,4;59,5;6,4;2,4;0,6;0,8;3,7;16,1;0;59,5;0;0;0;0
+Warm Temperate;Dry;CH4;Dairy Cattle;High-Productivity;122,2;65,9;6,4;2,4;0,6;0,8;3,7;16,1;0;65,9;0;0;0;0
+Tropical;Montane;CH4;Dairy Cattle;High-Productivity;122,2;94,9;8;3,2;0,6;1,6;3,7;16,1;0;94,9;0;0;0;0
+Tropical;Wet;CH4;Dairy Cattle;High-Productivity;128,6;122,2;8;3,2;0,6;1,6;3,7;16,1;0;122,2;0;0;0;0
+Tropical;Moist;CH4;Dairy Cattle;High-Productivity;128,6;117,4;8;3,2;0,6;1,6;3,7;16,1;0;117,4;0;0;0;0
+Tropical;Dry;CH4;Dairy Cattle;High-Productivity;128,6;119;8;3,2;0,6;1,6;3,7;16,1;0;119;0;0;0;0
+Cool Temperate;Moist;CH4;Dairy Cattle;Low-Productivity;52,3;18,3;1,7;0,9;0,6;0,1;9,2;8,7;0;18,3;0;0;0;0
+Cool Temperate;Dry;CH4;Dairy Cattle;Low-Productivity;58,4;22,6;1,7;0,9;0,6;0,1;9,2;8,7;0;22,6;0;0;0;0
+Boreal;Moist;CH4;Dairy Cattle;Low-Productivity;43,6;12,2;1,7;0,9;0,6;0,1;9,2;8,7;0;12,2;0;0;0;0
+Boreal;Dry;CH4;Dairy Cattle;Low-Productivity;42,7;12,2;1,7;0,9;0,6;0,1;9,2;8,7;0;12,2;0;0;0;0
+Warm Temperate;Moist;CH4;Dairy Cattle;Low-Productivity;63,6;32,2;3,5;1,3;0,6;0,4;9,5;8,7;0;32,2;0;0;0;0
+Warm Temperate;Dry;CH4;Dairy Cattle;Low-Productivity;66,2;35,7;3,5;1,3;0,6;0,4;9,5;8,7;0;35,7;0;0;0;0
+Tropical;Montane;CH4;Dairy Cattle;Low-Productivity;66,2;51,4;4,4;1,7;0,6;0,9;9,5;8,7;0;51,4;0;0;0;0
+Tropical;Wet;CH4;Dairy Cattle;Low-Productivity;69,7;66,2;4,4;1,7;0,6;0,9;9,5;8,7;0;66,2;0;0;0;0
+Tropical;Moist;CH4;Dairy Cattle;Low-Productivity;69,7;63,6;4,4;1,7;0,6;0,9;9,5;8,7;0;63,6;0;0;0;0
+Tropical;Dry;CH4;Dairy Cattle;Low-Productivity;69,7;64,5;4,4;1,7;0,6;0,9;9,5;8,7;0;64,5;0;0;0;0
+Cool Temperate;Moist;CH4;Dairy Cattle;Default;52,3;18,3;1,7;0,9;0,6;0,1;9,2;8,7;0;18,3;0;0;0;0
+Cool Temperate;Dry;CH4;Dairy Cattle;Default;58,4;22,6;1,7;0,9;0,6;0,1;9,2;8,7;0;22,6;0;0;0;0
+Boreal;Moist;CH4;Dairy Cattle;Default;43,6;12,2;1,7;0,9;0,6;0,1;9,2;8,7;0;12,2;0;0;0;0
+Boreal;Dry;CH4;Dairy Cattle;Default;42,7;12,2;1,7;0,9;0,6;0,1;9,2;8,7;0;12,2;0;0;0;0
+Warm Temperate;Moist;CH4;Dairy Cattle;Default;63,6;32,2;3,5;1,3;0,6;0,4;9,5;8,7;0;32,2;0;0;0;0
+Warm Temperate;Dry;CH4;Dairy Cattle;Default;66,2;35,7;3,5;1,3;0,6;0,4;9,5;8,7;0;35,7;0;0;0;0
+Tropical;Montane;CH4;Dairy Cattle;Default;66,2;51,4;4,4;1,7;0,6;0,9;9,5;8,7;0;51,4;0;0;0;0
+Tropical;Wet;CH4;Dairy Cattle;Default;69,7;66,2;4,4;1,7;0,6;0,9;9,5;8,7;0;66,2;0;0;0;0
+Tropical;Moist;CH4;Dairy Cattle;Default;69,7;63,6;4,4;1,7;0,6;0,9;9,5;8,7;0;63,6;0;0;0;0
+Tropical;Dry;CH4;Dairy Cattle;Default;69,7;64,5;4,4;1,7;0,6;0,9;9,5;8,7;0;64,5;0;0;0;0
+Cool Temperate;Moist;CH4;Other Cattle;High-Productivity;72,4;25,3;2,4;1,2;0,6;0,1;2,4;12,1;0;25,3;0;0;0;0
+Cool Temperate;Dry;CH4;Other Cattle;High-Productivity;80,8;31,4;2,4;1,2;0,6;0,1;2,4;12,1;0;31,4;0;0;0;0
+Boreal;Moist;CH4;Other Cattle;High-Productivity;60,3;16,9;2,4;1,2;0,6;0,1;2,4;12,1;0;16,9;0;0;0;0
+Boreal;Dry;CH4;Other Cattle;High-Productivity;59,1;16,9;2,4;1,2;0,6;0,1;2,4;12,1;0;16,9;0;0;0;0
+Warm Temperate;Moist;CH4;Other Cattle;High-Productivity;88;44,6;4,8;1,8;0,6;0,6;2,7;12,1;0;44,6;0;0;0;0
+Warm Temperate;Dry;CH4;Other Cattle;High-Productivity;91,7;49,4;4,8;1,8;0,6;0,6;2,7;12,1;0;49,4;0;0;0;0
+Tropical;Montane;CH4;Other Cattle;High-Productivity;91,7;71,2;6;2,4;0,6;1,2;2,8;12,1;0;71,2;0;0;0;0
+Tropical;Wet;CH4;Other Cattle;High-Productivity;96,5;91,7;6;2,4;0,6;1,2;2,8;12,1;0;91,7;0;0;0;0
+Tropical;Moist;CH4;Other Cattle;High-Productivity;96,5;88;6;2,4;0,6;1,2;2,8;12,1;0;88;0;0;0;0
+Tropical;Dry;CH4;Other Cattle;High-Productivity;96,5;89,2;6;2,4;0,6;1,2;2,8;12,1;0;89,2;0;0;0;0
+Cool Temperate;Moist;CH4;Other Cattle;Low-Productivity;52,3;18,3;1,7;0,9;0,6;0,1;9,2;8,7;0;18,3;0;0;0;0
+Cool Temperate;Dry;CH4;Other Cattle;Low-Productivity;58,4;22,6;1,7;0,9;0,6;0,1;9,2;8,7;0;22,6;0;0;0;0
+Boreal;Moist;CH4;Other Cattle;Low-Productivity;43,6;12,2;1,7;0,9;0,6;0,1;9,2;8,7;0;12,2;0;0;0;0
+Boreal;Dry;CH4;Other Cattle;Low-Productivity;42,7;12,2;1,7;0,9;0,6;0,1;9,2;8,7;0;12,2;0;0;0;0
+Warm Temperate;Moist;CH4;Other Cattle;Low-Productivity;63,6;32,2;3,5;1,3;0,6;0,4;9,5;8,7;0;32,2;0;0;0;0
+Warm Temperate;Dry;CH4;Other Cattle;Low-Productivity;66,2;35,7;3,5;1,3;0,6;0,4;9,5;8,7;0;35,7;0;0;0;0
+Tropical;Montane;CH4;Other Cattle;Low-Productivity;66,2;51,4;4,4;1,7;0,6;0,9;9,5;8,7;0;51,4;0;0;0;0
+Tropical;Wet;CH4;Other Cattle;Low-Productivity;69,7;66,2;4,4;1,7;0,6;0,9;9,5;8,7;0;66,2;0;0;0;0
+Tropical;Moist;CH4;Other Cattle;Low-Productivity;69,7;63,6;4,4;1,7;0,6;0,9;9,5;8,7;0;63,6;0;0;0;0
+Tropical;Dry;CH4;Other Cattle;Low-Productivity;69,7;64,5;4,4;1,7;0,6;0,9;9,5;8,7;0;64,5;0;0;0;0
+Cool Temperate;Moist;CH4;Other Cattle;Default;52,3;18,3;1,7;0,9;0,6;0,1;9,2;8,7;0;18,3;0;0;0;0
+Cool Temperate;Dry;CH4;Other Cattle;Default;58,4;22,6;1,7;0,9;0,6;0,1;9,2;8,7;0;22,6;0;0;0;0
+Boreal;Moist;CH4;Other Cattle;Default;43,6;12,2;1,7;0,9;0,6;0,1;9,2;8,7;0;12,2;0;0;0;0
+Boreal;Dry;CH4;Other Cattle;Default;42,7;12,2;1,7;0,9;0,6;0,1;9,2;8,7;0;12,2;0;0;0;0
+Warm Temperate;Moist;CH4;Other Cattle;Default;63,6;32,2;3,5;1,3;0,6;0,4;9,5;8,7;0;32,2;0;0;0;0
+Warm Temperate;Dry;CH4;Other Cattle;Default;66,2;35,7;3,5;1,3;0,6;0,4;9,5;8,7;0;35,7;0;0;0;0
+Tropical;Montane;CH4;Other Cattle;Default;66,2;51,4;4,4;1,7;0,6;0,9;9,5;8,7;0;51,4;0;0;0;0
+Tropical;Wet;CH4;Other Cattle;Default;69,7;66,2;4,4;1,7;0,6;0,9;9,5;8,7;0;66,2;0;0;0;0
+Tropical;Moist;CH4;Other Cattle;Default;69,7;63,6;4,4;1,7;0,6;0,9;9,5;8,7;0;63,6;0;0;0;0
+Tropical;Dry;CH4;Other Cattle;Default;69,7;64,5;4,4;1,7;0,6;0,9;9,5;8,7;0;64,5;0;0;0;0
+Cool Temperate;Moist;CH4;Dairy Buffalo;High-Productivity;52,3;18,3;1,7;0,9;0,6;0,1;9,2;8,7;0;18,3;0;0;0;0
+Cool Temperate;Dry;CH4;Dairy Buffalo;High-Productivity;58,4;22,6;1,7;0,9;0,6;0,1;9,2;8,7;0;22,6;0;0;0;0
+Boreal;Moist;CH4;Dairy Buffalo;High-Productivity;43,6;12,2;1,7;0,9;0,6;0,1;9,2;8,7;0;12,2;0;0;0;0
+Boreal;Dry;CH4;Dairy Buffalo;High-Productivity;42,7;12,2;1,7;0,9;0,6;0,1;9,2;8,7;0;12,2;0;0;0;0
+Warm Temperate;Moist;CH4;Dairy Buffalo;High-Productivity;63,6;32,2;3,5;1,3;0,6;0,4;9,5;8,7;0;32,2;0;0;0;0
+Warm Temperate;Dry;CH4;Dairy Buffalo;High-Productivity;66,2;35,7;3,5;1,3;0,6;0,4;9,5;8,7;0;35,7;0;0;0;0
+Tropical;Montane;CH4;Dairy Buffalo;High-Productivity;66,2;51,4;4,4;1,7;0,6;0,9;9,5;8,7;0;51,4;0;0;0;0
+Tropical;Wet;CH4;Dairy Buffalo;High-Productivity;69,7;66,2;4,4;1,7;0,6;0,9;9,5;8,7;0;66,2;0;0;0;0
+Tropical;Moist;CH4;Dairy Buffalo;High-Productivity;69,7;63,6;4,4;1,7;0,6;0,9;9,5;8,7;0;63,6;0;0;0;0
+Tropical;Dry;CH4;Dairy Buffalo;High-Productivity;69,7;64,5;4,4;1,7;0,6;0,9;9,5;8,7;0;64,5;0;0;0;0
+Cool Temperate;Moist;CH4;Dairy Buffalo;Low-Productivity;52,3;18,3;1,7;0,9;0,6;0,1;9,2;8,7;0;18,3;0;0;0;0
+Cool Temperate;Dry;CH4;Dairy Buffalo;Low-Productivity;58,4;22,6;1,7;0,9;0,6;0,1;9,2;8,7;0;22,6;0;0;0;0
+Boreal;Moist;CH4;Dairy Buffalo;Low-Productivity;43,6;12,2;1,7;0,9;0,6;0,1;9,2;8,7;0;12,2;0;0;0;0
+Boreal;Dry;CH4;Dairy Buffalo;Low-Productivity;42,7;12,2;1,7;0,9;0,6;0,1;9,2;8,7;0;12,2;0;0;0;0
+Warm Temperate;Moist;CH4;Dairy Buffalo;Low-Productivity;63,6;32,2;3,5;1,3;0,6;0,4;9,5;8,7;0;32,2;0;0;0;0
+Warm Temperate;Dry;CH4;Dairy Buffalo;Low-Productivity;66,2;35,7;3,5;1,3;0,6;0,4;9,5;8,7;0;35,7;0;0;0;0
+Tropical;Montane;CH4;Dairy Buffalo;Low-Productivity;66,2;51,4;4,4;1,7;0,6;0,9;9,5;8,7;0;51,4;0;0;0;0
+Tropical;Wet;CH4;Dairy Buffalo;Low-Productivity;69,7;66,2;4,4;1,7;0,6;0,9;9,5;8,7;0;66,2;0;0;0;0
+Tropical;Moist;CH4;Dairy Buffalo;Low-Productivity;69,7;63,6;4,4;1,7;0,6;0,9;9,5;8,7;0;63,6;0;0;0;0
+Tropical;Dry;CH4;Dairy Buffalo;Low-Productivity;69,7;64,5;4,4;1,7;0,6;0,9;9,5;8,7;0;64,5;0;0;0;0
+Cool Temperate;Moist;CH4;Dairy Buffalo;Default;52,3;18,3;1,7;0,9;0,6;0,1;9,2;8,7;0;18,3;0;0;0;0
+Cool Temperate;Dry;CH4;Dairy Buffalo;Default;58,4;22,6;1,7;0,9;0,6;0,1;9,2;8,7;0;22,6;0;0;0;0
+Boreal;Moist;CH4;Dairy Buffalo;Default;43,6;12,2;1,7;0,9;0,6;0,1;9,2;8,7;0;12,2;0;0;0;0
+Boreal;Dry;CH4;Dairy Buffalo;Default;42,7;12,2;1,7;0,9;0,6;0,1;9,2;8,7;0;12,2;0;0;0;0
+Warm Temperate;Moist;CH4;Dairy Buffalo;Default;63,6;32,2;3,5;1,3;0,6;0,4;9,5;8,7;0;32,2;0;0;0;0
+Warm Temperate;Dry;CH4;Dairy Buffalo;Default;66,2;35,7;3,5;1,3;0,6;0,4;9,5;8,7;0;35,7;0;0;0;0
+Tropical;Montane;CH4;Dairy Buffalo;Default;66,2;51,4;4,4;1,7;0,6;0,9;9,5;8,7;0;51,4;0;0;0;0
+Tropical;Wet;CH4;Dairy Buffalo;Default;69,7;66,2;4,4;1,7;0,6;0,9;9,5;8,7;0;66,2;0;0;0;0
+Tropical;Moist;CH4;Dairy Buffalo;Default;69,7;63,6;4,4;1,7;0,6;0,9;9,5;8,7;0;63,6;0;0;0;0
+Tropical;Dry;CH4;Dairy Buffalo;Default;69,7;64,5;4,4;1,7;0,6;0,9;9,5;8,7;0;64,5;0;0;0;0
+Cool Temperate;Moist;CH4;Other Buffalo;High-Productivity;52,3;18,3;1,7;0,9;0,6;0,1;9,2;8,7;0;18,3;0;0;0;0
+Cool Temperate;Dry;CH4;Other Buffalo;High-Productivity;58,4;22,6;1,7;0,9;0,6;0,1;9,2;8,7;0;22,6;0;0;0;0
+Boreal;Moist;CH4;Other Buffalo;High-Productivity;43,6;12,2;1,7;0,9;0,6;0,1;9,2;8,7;0;12,2;0;0;0;0
+Boreal;Dry;CH4;Other Buffalo;High-Productivity;42,7;12,2;1,7;0,9;0,6;0,1;9,2;8,7;0;12,2;0;0;0;0
+Warm Temperate;Moist;CH4;Other Buffalo;High-Productivity;63,6;32,2;3,5;1,3;0,6;0,4;9,5;8,7;0;32,2;0;0;0;0
+Warm Temperate;Dry;CH4;Other Buffalo;High-Productivity;66,2;35,7;3,5;1,3;0,6;0,4;9,5;8,7;0;35,7;0;0;0;0
+Tropical;Montane;CH4;Other Buffalo;High-Productivity;66,2;51,4;4,4;1,7;0,6;0,9;9,5;8,7;0;51,4;0;0;0;0
+Tropical;Wet;CH4;Other Buffalo;High-Productivity;69,7;66,2;4,4;1,7;0,6;0,9;9,5;8,7;0;66,2;0;0;0;0
+Tropical;Moist;CH4;Other Buffalo;High-Productivity;69,7;63,6;4,4;1,7;0,6;0,9;9,5;8,7;0;63,6;0;0;0;0
+Tropical;Dry;CH4;Other Buffalo;High-Productivity;69,7;64,5;4,4;1,7;0,6;0,9;9,5;8,7;0;64,5;0;0;0;0
+Cool Temperate;Moist;CH4;Other Buffalo;Low-Productivity;52,3;18,3;1,7;0,9;0,6;0,1;9,2;8,7;0;18,3;0;0;0;0
+Cool Temperate;Dry;CH4;Other Buffalo;Low-Productivity;58,4;22,6;1,7;0,9;0,6;0,1;9,2;8,7;0;22,6;0;0;0;0
+Boreal;Moist;CH4;Other Buffalo;Low-Productivity;43,6;12,2;1,7;0,9;0,6;0,1;9,2;8,7;0;12,2;0;0;0;0
+Boreal;Dry;CH4;Other Buffalo;Low-Productivity;42,7;12,2;1,7;0,9;0,6;0,1;9,2;8,7;0;12,2;0;0;0;0
+Warm Temperate;Moist;CH4;Other Buffalo;Low-Productivity;63,6;32,2;3,5;1,3;0,6;0,4;9,5;8,7;0;32,2;0;0;0;0
+Warm Temperate;Dry;CH4;Other Buffalo;Low-Productivity;66,2;35,7;3,5;1,3;0,6;0,4;9,5;8,7;0;35,7;0;0;0;0
+Tropical;Montane;CH4;Other Buffalo;Low-Productivity;66,2;51,4;4,4;1,7;0,6;0,9;9,5;8,7;0;51,4;0;0;0;0
+Tropical;Wet;CH4;Other Buffalo;Low-Productivity;69,7;66,2;4,4;1,7;0,6;0,9;9,5;8,7;0;66,2;0;0;0;0
+Tropical;Moist;CH4;Other Buffalo;Low-Productivity;69,7;63,6;4,4;1,7;0,6;0,9;9,5;8,7;0;63,6;0;0;0;0
+Tropical;Dry;CH4;Other Buffalo;Low-Productivity;69,7;64,5;4,4;1,7;0,6;0,9;9,5;8,7;0;64,5;0;0;0;0
+Cool Temperate;Moist;CH4;Other Buffalo;Default;52,3;18,3;1,7;0,9;0,6;0,1;9,2;8,7;0;18,3;0;0;0;0
+Cool Temperate;Dry;CH4;Other Buffalo;Default;58,4;22,6;1,7;0,9;0,6;0,1;9,2;8,7;0;22,6;0;0;0;0
+Boreal;Moist;CH4;Other Buffalo;Default;43,6;12,2;1,7;0,9;0,6;0,1;9,2;8,7;0;12,2;0;0;0;0
+Boreal;Dry;CH4;Other Buffalo;Default;42,7;12,2;1,7;0,9;0,6;0,1;9,2;8,7;0;12,2;0;0;0;0
+Warm Temperate;Moist;CH4;Other Buffalo;Default;63,6;32,2;3,5;1,3;0,6;0,4;9,5;8,7;0;32,2;0;0;0;0
+Warm Temperate;Dry;CH4;Other Buffalo;Default;66,2;35,7;3,5;1,3;0,6;0,4;9,5;8,7;0;35,7;0;0;0;0
+Tropical;Montane;CH4;Other Buffalo;Default;66,2;51,4;4,4;1,7;0,6;0,9;9,5;8,7;0;51,4;0;0;0;0
+Tropical;Wet;CH4;Other Buffalo;Default;69,7;66,2;4,4;1,7;0,6;0,9;9,5;8,7;0;66,2;0;0;0;0
+Tropical;Moist;CH4;Other Buffalo;Default;69,7;63,6;4,4;1,7;0,6;0,9;9,5;8,7;0;63,6;0;0;0;0
+Tropical;Dry;CH4;Other Buffalo;Default;69,7;64,5;4,4;1,7;0,6;0,9;9,5;8,7;0;64,5;0;0;0;0
+Cool Temperate;Moist;CH4;Growing Swine;High-Productivity;180,9;63,3;6;3;0,6;0,3;6;30,2;18,1;63,3;0;0;0;0
+Cool Temperate;Dry;CH4;Growing Swine;High-Productivity;202;78,4;6;3;0,6;0,3;6;30,2;24,1;78,4;0;0;0;0
+Boreal;Moist;CH4;Growing Swine;High-Productivity;150,8;42,2;6;3;0,6;0,3;6;30,2;12,1;42,2;0;0;0;0
+Boreal;Dry;CH4;Growing Swine;High-Productivity;147,7;42,2;6;3;0,6;0,3;6;30,2;12,1;42,2;0;0;0;0
+Warm Temperate;Moist;CH4;Growing Swine;High-Productivity;220,1;111,6;12,1;4,5;0,6;1,5;6,8;30,2;39,2;111,6;0;0;0;0
+Warm Temperate;Dry;CH4;Growing Swine;High-Productivity;229,1;123,6;12,1;4,5;0,6;1,5;6,8;30,2;45,2;123,6;0;0;0;0
+Tropical;Montane;CH4;Growing Swine;High-Productivity;229,1;177,9;15,1;6;0,6;3;7;30,2;75,4;177,9;0;0;0;0
+Tropical;Wet;CH4;Growing Swine;High-Productivity;241,2;229,1;15,1;6;0,6;3;7;30,2;114,6;229,1;0;0;0;0
+Tropical;Moist;CH4;Growing Swine;High-Productivity;241,2;220,1;15,1;6;0,6;3;7;30,2;108,5;220,1;0;0;0;0
+Tropical;Dry;CH4;Growing Swine;High-Productivity;241,2;223,1;15,1;6;0,6;3;7;30,2;126,6;223,1;0;0;0;0
+Cool Temperate;Moist;CH4;Growing Swine;Low-Productivity;116,6;40,8;3,9;1,9;0,6;0,2;20,6;19,4;11,7;40,8;0;0;0;0
+Cool Temperate;Dry;CH4;Growing Swine;Low-Productivity;130,2;50,5;3,9;1,9;0,6;0,2;20,6;19,4;15,5;50,5;0;0;0;0
+Boreal;Moist;CH4;Growing Swine;Low-Productivity;97,2;27,2;3,9;1,9;0,6;0,2;20,6;19,4;7,8;27,2;0;0;0;0
+Boreal;Dry;CH4;Growing Swine;Low-Productivity;95,2;27,2;3,9;1,9;0,6;0,2;20,6;19,4;7,8;27,2;0;0;0;0
+Warm Temperate;Moist;CH4;Growing Swine;Low-Productivity;141,8;71,9;7,8;2,9;0,6;1;21,1;19,4;25,3;71,9;0;0;0;0
+Warm Temperate;Dry;CH4;Growing Swine;Low-Productivity;147,7;79,7;7,8;2,9;0,6;1;21,1;19,4;29,1;79,7;0;0;0;0
+Tropical;Montane;CH4;Growing Swine;Low-Productivity;147,7;114,6;9,7;3,9;0,6;1,9;21,2;19,4;48,6;114,6;0;0;0;0
+Tropical;Wet;CH4;Growing Swine;Low-Productivity;155,4;147,7;9,7;3,9;0,6;1,9;21,2;19,4;73,8;147,7;0;0;0;0
+Tropical;Moist;CH4;Growing Swine;Low-Productivity;155,4;141,8;9,7;3,9;0,6;1,9;21,2;19,4;69,9;141,8;0;0;0;0
+Tropical;Dry;CH4;Growing Swine;Low-Productivity;155,4;143,8;9,7;3,9;0,6;1,9;21,2;19,4;81,6;143,8;0;0;0;0
+Cool Temperate;Dry;CH4;Growing Swine;Default;130,2;50,5;3,9;1,9;0,6;0,2;20,6;19,4;15,5;50,5;0;0;0;0
+Boreal;Moist;CH4;Growing Swine;Default;97,2;27,2;3,9;1,9;0,6;0,2;20,6;19,4;7,8;27,2;0;0;0;0
+Boreal;Dry;CH4;Growing Swine;Default;95,2;27,2;3,9;1,9;0,6;0,2;20,6;19,4;7,8;27,2;0;0;0;0
+Warm Temperate;Moist;CH4;Growing Swine;Default;141,8;71,9;7,8;2,9;0,6;1;21,1;19,4;25,3;71,9;0;0;0;0
+Warm Temperate;Dry;CH4;Growing Swine;Default;147,7;79,7;7,8;2,9;0,6;1;21,1;19,4;29,1;79,7;0;0;0;0
+Tropical;Montane;CH4;Growing Swine;Default;147,7;114,6;9,7;3,9;0,6;1,9;21,2;19,4;48,6;114,6;0;0;0;0
+Tropical;Wet;CH4;Growing Swine;Default;155,4;147,7;9,7;3,9;0,6;1,9;21,2;19,4;73,8;147,7;0;0;0;0
+Tropical;Moist;CH4;Growing Swine;Default;155,4;141,8;9,7;3,9;0,6;1,9;21,2;19,4;69,9;141,8;0;0;0;0
+Tropical;Dry;CH4;Growing Swine;Default;155,4;143,8;9,7;3,9;0,6;1,9;21,2;19,4;81,6;143,8;0;0;0;0
+Cool Temperate;Moist;CH4;Breeding Swine;High-Productivity;180,9;63,3;6;3;0,6;0,3;6;30,2;18,1;63,3;0;0;0;0
+Cool Temperate;Dry;CH4;Breeding Swine;High-Productivity;202;78,4;6;3;0,6;0,3;6;30,2;24,1;78,4;0;0;0;0
+Boreal;Moist;CH4;Breeding Swine;High-Productivity;150,8;42,2;6;3;0,6;0,3;6;30,2;12,1;42,2;0;0;0;0
+Boreal;Dry;CH4;Breeding Swine;High-Productivity;147,7;42,2;6;3;0,6;0,3;6;30,2;12,1;42,2;0;0;0;0
+Warm Temperate;Moist;CH4;Breeding Swine;High-Productivity;220,1;111,6;12,1;4,5;0,6;1,5;6,8;30,2;39,2;111,6;0;0;0;0
+Warm Temperate;Dry;CH4;Breeding Swine;High-Productivity;229,1;123,6;12,1;4,5;0,6;1,5;6,8;30,2;45,2;123,6;0;0;0;0
+Tropical;Montane;CH4;Breeding Swine;High-Productivity;229,1;177,9;15,1;6;0,6;3;7;30,2;75,4;177,9;0;0;0;0
+Tropical;Wet;CH4;Breeding Swine;High-Productivity;241,2;229,1;15,1;6;0,6;3;7;30,2;114,6;229,1;0;0;0;0
+Tropical;Moist;CH4;Breeding Swine;High-Productivity;241,2;220,1;15,1;6;0,6;3;7;30,2;108,5;220,1;0;0;0;0
+Tropical;Dry;CH4;Breeding Swine;High-Productivity;241,2;223,1;15,1;6;0,6;3;7;30,2;126,6;223,1;0;0;0;0
+Cool Temperate;Moist;CH4;Breeding Swine;Low-Productivity;116,6;40,8;3,9;1,9;0,6;0,2;20,6;19,4;11,7;40,8;0;0;0;0
+Cool Temperate;Dry;CH4;Breeding Swine;Low-Productivity;130,2;50,5;3,9;1,9;0,6;0,2;20,6;19,4;15,5;50,5;0;0;0;0
+Boreal;Moist;CH4;Breeding Swine;Low-Productivity;97,2;27,2;3,9;1,9;0,6;0,2;20,6;19,4;7,8;27,2;0;0;0;0
+Boreal;Dry;CH4;Breeding Swine;Low-Productivity;95,2;27,2;3,9;1,9;0,6;0,2;20,6;19,4;7,8;27,2;0;0;0;0
+Warm Temperate;Moist;CH4;Breeding Swine;Low-Productivity;141,8;71,9;7,8;2,9;0,6;1;21,1;19,4;25,3;71,9;0;0;0;0
+Warm Temperate;Dry;CH4;Breeding Swine;Low-Productivity;147,7;79,7;7,8;2,9;0,6;1;21,1;19,4;29,1;79,7;0;0;0;0
+Tropical;Montane;CH4;Breeding Swine;Low-Productivity;147,7;114,6;9,7;3,9;0,6;1,9;21,2;19,4;48,6;114,6;0;0;0;0
+Tropical;Wet;CH4;Breeding Swine;Low-Productivity;155,4;147,7;9,7;3,9;0,6;1,9;21,2;19,4;73,8;147,7;0;0;0;0
+Tropical;Moist;CH4;Breeding Swine;Low-Productivity;155,4;141,8;9,7;3,9;0,6;1,9;21,2;19,4;69,9;141,8;0;0;0;0
+Tropical;Dry;CH4;Breeding Swine;Low-Productivity;155,4;143,8;9,7;3,9;0,6;1,9;21,2;19,4;81,6;143,8;0;0;0;0
+Cool Temperate;Moist;CH4;Breeding Swine;Default;116,6;40,8;3,9;1,9;0,6;0,2;20,6;19,4;11,7;40,8;0;0;0;0
+Cool Temperate;Dry;CH4;Breeding Swine;Default;130,2;50,5;3,9;1,9;0,6;0,2;20,6;19,4;15,5;50,5;0;0;0;0
+Boreal;Moist;CH4;Breeding Swine;Default;97,2;27,2;3,9;1,9;0,6;0,2;20,6;19,4;7,8;27,2;0;0;0;0
+Boreal;Dry;CH4;Breeding Swine;Default;95,2;27,2;3,9;1,9;0,6;0,2;20,6;19,4;7,8;27,2;0;0;0;0
+Warm Temperate;Moist;CH4;Breeding Swine;Default;141,8;71,9;7,8;2,9;0,6;1;21,1;19,4;25,3;71,9;0;0;0;0
+Warm Temperate;Dry;CH4;Breeding Swine;Default;147,7;79,7;7,8;2,9;0,6;1;21,1;19,4;29,1;79,7;0;0;0;0
+Tropical;Montane;CH4;Breeding Swine;Default;147,7;114,6;9,7;3,9;0,6;1,9;21,2;19,4;48,6;114,6;0;0;0;0
+Tropical;Wet;CH4;Breeding Swine;Default;155,4;147,7;9,7;3,9;0,6;1,9;21,2;19,4;73,8;147,7;0;0;0;0
+Tropical;Moist;CH4;Breeding Swine;Default;155,4;141,8;9,7;3,9;0,6;1,9;21,2;19,4;69,9;141,8;0;0;0;0
+Tropical;Dry;CH4;Breeding Swine;Default;155,4;143,8;9,7;3,9;0,6;1,9;21,2;19,4;81,6;143,8;0;0;0;0
+Cool Temperate;Moist;CH4;Chicken Layer;High-Productivity;156,8;54,9;5,2;2,6;0,6;0;5,2;2,6;0;54,9;0;0;0;0
+Cool Temperate;Dry;CH4;Chicken Layer;High-Productivity;175,1;67,9;5,2;2,6;0,6;0;5,2;2,6;0;67,9;0;0;0;0
+Boreal;Moist;CH4;Chicken Layer;High-Productivity;130,7;36,6;5,2;2,6;0,6;0;5,2;2,6;0;36,6;0;0;0;0
+Boreal;Dry;CH4;Chicken Layer;High-Productivity;128;36,6;5,2;2,6;0,6;0;5,2;2,6;0;36,6;0;0;0;0
+Warm Temperate;Moist;CH4;Chicken Layer;High-Productivity;190,7;96,7;10,5;3,9;0,6;0;10,5;2,6;0;96,7;0;0;0;0
+Warm Temperate;Dry;CH4;Chicken Layer;High-Productivity;198,6;107,1;10,5;3,9;0,6;0;10,5;2,6;0;107,1;0;0;0;0
+Tropical;Montane;CH4;Chicken Layer;High-Productivity;198,6;154,2;13,1;5,2;0,6;0;13,1;2,6;0;154,2;0;0;0;0
+Tropical;Wet;CH4;Chicken Layer;High-Productivity;209;198,6;13,1;5,2;0,6;0;13,1;2,6;0;198,6;0;0;0;0
+Tropical;Moist;CH4;Chicken Layer;High-Productivity;209;190,7;13,1;5,2;0,6;0;13,1;2,6;0;190,7;0;0;0;0
+Tropical;Dry;CH4;Chicken Layer;High-Productivity;209;193,4;13,1;5,2;0,6;0;13,1;2,6;0;193,4;0;0;0;0
+Cool Temperate;Moist;CH4;Chicken Layer;Low-Productivity;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Cool Temperate;Dry;CH4;Chicken Layer;Low-Productivity;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Boreal;Moist;CH4;Chicken Layer;Low-Productivity;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Boreal;Dry;CH4;Chicken Layer;Low-Productivity;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Warm Temperate;Moist;CH4;Chicken Layer;Low-Productivity;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Warm Temperate;Dry;CH4;Chicken Layer;Low-Productivity;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Tropical;Montane;CH4;Chicken Layer;Low-Productivity;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Tropical;Wet;CH4;Chicken Layer;Low-Productivity;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Tropical;Moist;CH4;Chicken Layer;Low-Productivity;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Tropical;Dry;CH4;Chicken Layer;Low-Productivity;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Cool Temperate;Moist;CH4;Chicken Layer;Default;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Cool Temperate;Dry;CH4;Chicken Layer;Default;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Boreal;Moist;CH4;Chicken Layer;Default;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Boreal;Dry;CH4;Chicken Layer;Default;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Warm Temperate;Moist;CH4;Chicken Layer;Default;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Warm Temperate;Dry;CH4;Chicken Layer;Default;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Tropical;Montane;CH4;Chicken Layer;Default;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Tropical;Wet;CH4;Chicken Layer;Default;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Tropical;Moist;CH4;Chicken Layer;Default;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Tropical;Dry;CH4;Chicken Layer;Default;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Cool Temperate;Moist;CH4;Chicken Broiler;High-Productivity;156,8;54,9;5,2;2,6;0,6;0;5,2;2,6;0;54,9;0;0;0;0
+Cool Temperate;Dry;CH4;Chicken Broiler;High-Productivity;175,1;67,9;5,2;2,6;0,6;0;5,2;2,6;0;67,9;0;0;0;0
+Boreal;Moist;CH4;Chicken Broiler;High-Productivity;130,7;36,6;5,2;2,6;0,6;0;5,2;2,6;0;36,6;0;0;0;0
+Boreal;Dry;CH4;Chicken Broiler;High-Productivity;128;36,6;5,2;2,6;0,6;0;5,2;2,6;0;36,6;0;0;0;0
+Warm Temperate;Moist;CH4;Chicken Broiler;High-Productivity;190,7;96,7;10,5;3,9;0,6;0;10,5;2,6;0;96,7;0;0;0;0
+Warm Temperate;Dry;CH4;Chicken Broiler;High-Productivity;198,6;107,1;10,5;3,9;0,6;0;10,5;2,6;0;107,1;0;0;0;0
+Tropical;Montane;CH4;Chicken Broiler;High-Productivity;198,6;154,2;13,1;5,2;0,6;0;13,1;2,6;0;154,2;0;0;0;0
+Tropical;Wet;CH4;Chicken Broiler;High-Productivity;209;198,6;13,1;5,2;0,6;0;13,1;2,6;0;198,6;0;0;0;0
+Tropical;Moist;CH4;Chicken Broiler;High-Productivity;209;190,7;13,1;5,2;0,6;0;13,1;2,6;0;190,7;0;0;0;0
+Tropical;Dry;CH4;Chicken Broiler;High-Productivity;209;193,4;13,1;5,2;0,6;0;13,1;2,6;0;193,4;0;0;0;0
+Cool Temperate;Moist;CH4;Chicken Broiler;Low-Productivity;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Cool Temperate;Dry;CH4;Chicken Broiler;Low-Productivity;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Boreal;Moist;CH4;Chicken Broiler;Low-Productivity;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Boreal;Dry;CH4;Chicken Broiler;Low-Productivity;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Warm Temperate;Moist;CH4;Chicken Broiler;Low-Productivity;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Warm Temperate;Dry;CH4;Chicken Broiler;Low-Productivity;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Tropical;Montane;CH4;Chicken Broiler;Low-Productivity;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Tropical;Wet;CH4;Chicken Broiler;Low-Productivity;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Tropical;Moist;CH4;Chicken Broiler;Low-Productivity;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Tropical;Dry;CH4;Chicken Broiler;Low-Productivity;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Cool Temperate;Moist;CH4;Chicken Broiler;Default;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Cool Temperate;Dry;CH4;Chicken Broiler;Default;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Boreal;Moist;CH4;Chicken Broiler;Default;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Boreal;Dry;CH4;Chicken Broiler;Default;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Warm Temperate;Moist;CH4;Chicken Broiler;Default;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Warm Temperate;Dry;CH4;Chicken Broiler;Default;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Tropical;Montane;CH4;Chicken Broiler;Default;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Tropical;Wet;CH4;Chicken Broiler;Default;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Tropical;Moist;CH4;Chicken Broiler;Default;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Tropical;Dry;CH4;Chicken Broiler;Default;2,4;2,4;2,4;2,4;0,6;2,4;2,4;2,4;2,4;2,4;2,4;0;0;0
+Cool Temperate;Moist;CH4;Dairy Sheep;High-Productivity;0;0;2,5;1,3;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Dry;CH4;Dairy Sheep;High-Productivity;0;0;2,5;1,3;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Moist;CH4;Dairy Sheep;High-Productivity;0;0;2,5;1,3;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Dry;CH4;Dairy Sheep;High-Productivity;0;0;2,5;1,3;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Moist;CH4;Dairy Sheep;High-Productivity;0;0;5,1;1,9;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Dry;CH4;Dairy Sheep;High-Productivity;0;0;5,1;1,9;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Montane;CH4;Dairy Sheep;High-Productivity;0;0;6,4;2,5;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Wet;CH4;Dairy Sheep;High-Productivity;0;0;6,4;2,5;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Moist;CH4;Dairy Sheep;High-Productivity;0;0;6,4;2,5;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Dry;CH4;Dairy Sheep;High-Productivity;0;0;6,4;2,5;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Moist;CH4;Dairy Sheep;Low-Productivity;0;0;1,7;0,9;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Dry;CH4;Dairy Sheep;Low-Productivity;0;0;1,7;0,9;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Moist;CH4;Dairy Sheep;Low-Productivity;0;0;1,7;0,9;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Dry;CH4;Dairy Sheep;Low-Productivity;0;0;1,7;0,9;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Moist;CH4;Dairy Sheep;Low-Productivity;0;0;3,5;1,3;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Dry;CH4;Dairy Sheep;Low-Productivity;0;0;3,5;1,3;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Montane;CH4;Dairy Sheep;Low-Productivity;0;0;4,4;1,7;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Wet;CH4;Dairy Sheep;Low-Productivity;0;0;4,4;1,7;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Moist;CH4;Dairy Sheep;Low-Productivity;0;0;4,4;1,7;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Dry;CH4;Dairy Sheep;Low-Productivity;0;0;4,4;1,7;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Moist;CH4;Dairy Sheep;Default;0;0;1,7;0,9;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Dry;CH4;Dairy Sheep;Default;0;0;1,7;0,9;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Moist;CH4;Dairy Sheep;Default;0;0;1,7;0,9;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Dry;CH4;Dairy Sheep;Default;0;0;1,7;0,9;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Moist;CH4;Dairy Sheep;Default;0;0;3,5;1,3;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Dry;CH4;Dairy Sheep;Default;0;0;3,5;1,3;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Montane;CH4;Dairy Sheep;Default;0;0;4,4;1,7;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Wet;CH4;Dairy Sheep;Default;0;0;4,4;1,7;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Moist;CH4;Dairy Sheep;Default;0;0;4,4;1,7;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Dry;CH4;Dairy Sheep;Default;0;0;4,4;1,7;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Moist;CH4;Other Sheep;High-Productivity;0;0;2,5;1,3;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Dry;CH4;Other Sheep;High-Productivity;0;0;2,5;1,3;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Moist;CH4;Other Sheep;High-Productivity;0;0;2,5;1,3;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Dry;CH4;Other Sheep;High-Productivity;0;0;2,5;1,3;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Moist;CH4;Other Sheep;High-Productivity;0;0;5,1;1,9;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Dry;CH4;Other Sheep;High-Productivity;0;0;5,1;1,9;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Montane;CH4;Other Sheep;High-Productivity;0;0;6,4;2,5;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Wet;CH4;Other Sheep;High-Productivity;0;0;6,4;2,5;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Moist;CH4;Other Sheep;High-Productivity;0;0;6,4;2,5;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Dry;CH4;Other Sheep;High-Productivity;0;0;6,4;2,5;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Moist;CH4;Other Sheep;Low-Productivity;0;0;1,7;0,9;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Dry;CH4;Other Sheep;Low-Productivity;0;0;1,7;0,9;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Moist;CH4;Other Sheep;Low-Productivity;0;0;1,7;0,9;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Dry;CH4;Other Sheep;Low-Productivity;0;0;1,7;0,9;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Moist;CH4;Other Sheep;Low-Productivity;0;0;3,5;1,3;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Dry;CH4;Other Sheep;Low-Productivity;0;0;3,5;1,3;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Montane;CH4;Other Sheep;Low-Productivity;0;0;4,4;1,7;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Wet;CH4;Other Sheep;Low-Productivity;0;0;4,4;1,7;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Moist;CH4;Other Sheep;Low-Productivity;0;0;4,4;1,7;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Dry;CH4;Other Sheep;Low-Productivity;0;0;4,4;1,7;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Moist;CH4;Other Sheep;Default;0;0;1,7;0,9;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Dry;CH4;Other Sheep;Default;0;0;1,7;0,9;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Moist;CH4;Other Sheep;Default;0;0;1,7;0,9;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Dry;CH4;Other Sheep;Default;0;0;1,7;0,9;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Moist;CH4;Other Sheep;Default;0;0;3,5;1,3;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Dry;CH4;Other Sheep;Default;0;0;3,5;1,3;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Montane;CH4;Other Sheep;Default;0;0;4,4;1,7;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Wet;CH4;Other Sheep;Default;0;0;4,4;1,7;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Moist;CH4;Other Sheep;Default;0;0;4,4;1,7;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Dry;CH4;Other Sheep;Default;0;0;4,4;1,7;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Moist;CH4;Goats;High-Productivity;0;0;2,4;1,2;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Dry;CH4;Goats;High-Productivity;0;0;2,4;1,2;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Moist;CH4;Goats;High-Productivity;0;0;2,4;1,2;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Dry;CH4;Goats;High-Productivity;0;0;2,4;1,2;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Moist;CH4;Goats;High-Productivity;0;0;4,8;1,8;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Dry;CH4;Goats;High-Productivity;0;0;4,8;1,8;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Montane;CH4;Goats;High-Productivity;0;0;6;2,4;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Wet;CH4;Goats;High-Productivity;0;0;6;2,4;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Moist;CH4;Goats;High-Productivity;0;0;6;2,4;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Dry;CH4;Goats;High-Productivity;0;0;6;2,4;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Moist;CH4;Goats;Low-Productivity;0;0;1,7;0,9;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Dry;CH4;Goats;Low-Productivity;0;0;1,7;0,9;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Moist;CH4;Goats;Low-Productivity;0;0;1,7;0,9;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Dry;CH4;Goats;Low-Productivity;0;0;1,7;0,9;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Moist;CH4;Goats;Low-Productivity;0;0;3,5;1,3;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Dry;CH4;Goats;Low-Productivity;0;0;3,5;1,3;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Montane;CH4;Goats;Low-Productivity;0;0;4,4;1,7;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Wet;CH4;Goats;Low-Productivity;0;0;4,4;1,7;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Moist;CH4;Goats;Low-Productivity;0;0;4,4;1,7;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Dry;CH4;Goats;Low-Productivity;0;0;4,4;1,7;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Moist;CH4;Goats;Default;0;0;1,7;0,9;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Dry;CH4;Goats;Default;0;0;1,7;0,9;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Moist;CH4;Goats;Default;0;0;1,7;0,9;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Dry;CH4;Goats;Default;0;0;1,7;0,9;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Moist;CH4;Goats;Default;0;0;3,5;1,3;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Dry;CH4;Goats;Default;0;0;3,5;1,3;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Montane;CH4;Goats;Default;0;0;4,4;1,7;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Wet;CH4;Goats;Default;0;0;4,4;1,7;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Moist;CH4;Goats;Default;0;0;4,4;1,7;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Dry;CH4;Goats;Default;0;0;4,4;1,7;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Moist;CH4;Camels;High-Productivity;0;0;3,5;1,7;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Dry;CH4;Camels;High-Productivity;0;0;3,5;1,7;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Moist;CH4;Camels;High-Productivity;0;0;3,5;1,7;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Dry;CH4;Camels;High-Productivity;0;0;3,5;1,7;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Moist;CH4;Camels;High-Productivity;0;0;7;2,6;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Dry;CH4;Camels;High-Productivity;0;0;7;2,6;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Montane;CH4;Camels;High-Productivity;0;0;8,7;0;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Wet;CH4;Camels;High-Productivity;0;0;8,7;0;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Moist;CH4;Camels;High-Productivity;0;0;8,7;0;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Dry;CH4;Camels;High-Productivity;0;0;8,7;0;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Moist;CH4;Camels;Low-Productivity;0;0;2,8;1,4;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Dry;CH4;Camels;Low-Productivity;0;0;2,8;1,4;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Moist;CH4;Camels;Low-Productivity;0;0;2,8;1,4;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Dry;CH4;Camels;Low-Productivity;0;0;2,8;1,4;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Moist;CH4;Camels;Low-Productivity;0;0;5,6;2,1;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Dry;CH4;Camels;Low-Productivity;0;0;5,6;2,1;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Montane;CH4;Camels;Low-Productivity;0;0;7;2,8;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Wet;CH4;Camels;Low-Productivity;0;0;7;2,8;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Moist;CH4;Camels;Low-Productivity;0;0;7;2,8;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Dry;CH4;Camels;Low-Productivity;0;0;7;2,8;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Moist;CH4;Camels;Default;0;0;2,8;1,4;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Dry;CH4;Camels;Default;0;0;2,8;1,4;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Moist;CH4;Camels;Default;0;0;2,8;1,4;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Dry;CH4;Camels;Default;0;0;2,8;1,4;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Moist;CH4;Camels;Default;0;0;5,6;2,1;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Dry;CH4;Camels;Default;0;0;5,6;2,1;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Montane;CH4;Camels;Default;0;0;7;2,8;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Wet;CH4;Camels;Default;0;0;7;2,8;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Moist;CH4;Camels;Default;0;0;7;2,8;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Dry;CH4;Camels;Default;0;0;7;2,8;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Moist;CH4;Horses;High-Productivity;0;0;4;2;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Dry;CH4;Horses;High-Productivity;0;0;4;2;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Moist;CH4;Horses;High-Productivity;0;0;4;2;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Dry;CH4;Horses;High-Productivity;0;0;4;2;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Moist;CH4;Horses;High-Productivity;0;0;8;3;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Dry;CH4;Horses;High-Productivity;0;0;8;3;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Montane;CH4;Horses;High-Productivity;0;0;10,1;4;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Wet;CH4;Horses;High-Productivity;0;0;10,1;4;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Moist;CH4;Horses;High-Productivity;0;0;10,1;4;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Dry;CH4;Horses;High-Productivity;0;0;10,1;4;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Moist;CH4;Horses;Low-Productivity;0;0;3,5;1,7;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Dry;CH4;Horses;Low-Productivity;0;0;3,5;1,7;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Moist;CH4;Horses;Low-Productivity;0;0;3,5;1,7;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Dry;CH4;Horses;Low-Productivity;0;0;3,5;1,7;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Moist;CH4;Horses;Low-Productivity;0;0;7;2,6;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Dry;CH4;Horses;Low-Productivity;0;0;7;2,6;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Montane;CH4;Horses;Low-Productivity;0;0;8,7;3,5;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Wet;CH4;Horses;Low-Productivity;0;0;8,7;3,5;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Moist;CH4;Horses;Low-Productivity;0;0;8,7;3,5;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Dry;CH4;Horses;Low-Productivity;0;0;8,7;3,5;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Moist;CH4;Horses;Default;0;0;3,5;1,7;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Dry;CH4;Horses;Default;0;0;3,5;1,7;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Moist;CH4;Horses;Default;0;0;3,5;1,7;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Dry;CH4;Horses;Default;0;0;3,5;1,7;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Moist;CH4;Horses;Default;0;0;7;2,6;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Dry;CH4;Horses;Default;0;0;7;2,6;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Montane;CH4;Horses;Default;0;0;8,7;3,5;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Wet;CH4;Horses;Default;0;0;8,7;3,5;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Moist;CH4;Horses;Default;0;0;8,7;3,5;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Dry;CH4;Horses;Default;0;0;8,7;3,5;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Moist;CH4;Mules And Asses;High-Productivity;0;0;4,4;2,2;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Dry;CH4;Mules And Asses;High-Productivity;0;0;4,4;2,2;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Moist;CH4;Mules And Asses;High-Productivity;0;0;4,4;2,2;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Dry;CH4;Mules And Asses;High-Productivity;0;0;4,4;2,2;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Moist;CH4;Mules And Asses;High-Productivity;0;0;8,8;3,3;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Dry;CH4;Mules And Asses;High-Productivity;0;0;8,8;3,3;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Montane;CH4;Mules And Asses;High-Productivity;0;0;11,1;4,4;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Wet;CH4;Mules And Asses;High-Productivity;0;0;11,1;4,4;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Moist;CH4;Mules And Asses;High-Productivity;0;0;11,1;4,4;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Dry;CH4;Mules And Asses;High-Productivity;0;0;11,1;4,4;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Moist;CH4;Mules And Asses;Low-Productivity;0;0;3,5;1,7;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Dry;CH4;Mules And Asses;Low-Productivity;0;0;3,5;1,7;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Moist;CH4;Mules And Asses;Low-Productivity;0;0;3,5;1,7;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Dry;CH4;Mules And Asses;Low-Productivity;0;0;3,5;1,7;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Moist;CH4;Mules And Asses;Low-Productivity;0;0;7;2,6;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Dry;CH4;Mules And Asses;Low-Productivity;0;0;7;2,6;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Montane;CH4;Mules And Asses;Low-Productivity;0;0;8,7;3,5;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Wet;CH4;Mules And Asses;Low-Productivity;0;0;8,7;3,5;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Moist;CH4;Mules And Asses;Low-Productivity;0;0;8,7;3,5;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Dry;CH4;Mules And Asses;Low-Productivity;0;0;8,7;3,5;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Moist;CH4;Mules And Asses;Default;0;0;3,5;1,7;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Dry;CH4;Mules And Asses;Default;0;0;3,5;1,7;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Moist;CH4;Mules And Asses;Default;0;0;3,5;1,7;0,6;0;0;0;0;0;0;0;0;0
+Boreal;Dry;CH4;Mules And Asses;Default;0;0;3,5;1,7;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Moist;CH4;Mules And Asses;Default;0;0;7;2,6;0,6;0;0;0;0;0;0;0;0;0
+Warm Temperate;Dry;CH4;Mules And Asses;Default;0;0;7;2,6;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Montane;CH4;Mules And Asses;Default;0;0;8,7;3,5;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Wet;CH4;Mules And Asses;Default;0;0;8,7;3,5;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Moist;CH4;Mules And Asses;Default;0;0;8,7;3,5;0,6;0;0;0;0;0;0;0;0;0
+Tropical;Dry;CH4;Mules And Asses;Default;0;0;8,7;3,5;0,6;0;0;0;0;0;0;0;0;0
+Cool Temperate;Moist;CH4;Deer;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Cool Temperate;Dry;CH4;Deer;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Boreal;Moist;CH4;Deer;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Boreal;Dry;CH4;Deer;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Warm Temperate;Moist;CH4;Deer;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Warm Temperate;Dry;CH4;Deer;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Montane;CH4;Deer;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Wet;CH4;Deer;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Moist;CH4;Deer;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Dry;CH4;Deer;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Cool Temperate;Moist;CH4;Deer;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Cool Temperate;Dry;CH4;Deer;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Boreal;Moist;CH4;Deer;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Boreal;Dry;CH4;Deer;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Warm Temperate;Moist;CH4;Deer;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Warm Temperate;Dry;CH4;Deer;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Montane;CH4;Deer;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Wet;CH4;Deer;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Moist;CH4;Deer;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Dry;CH4;Deer;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Cool Temperate;Moist;CH4;Deer;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Cool Temperate;Dry;CH4;Deer;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Boreal;Moist;CH4;Deer;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Boreal;Dry;CH4;Deer;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Warm Temperate;Moist;CH4;Deer;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Warm Temperate;Dry;CH4;Deer;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Montane;CH4;Deer;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Wet;CH4;Deer;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Moist;CH4;Deer;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Dry;CH4;Deer;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Cool Temperate;Moist;CH4;Ostrich;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Cool Temperate;Dry;CH4;Ostrich;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Boreal;Moist;CH4;Ostrich;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Boreal;Dry;CH4;Ostrich;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Warm Temperate;Moist;CH4;Ostrich;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Warm Temperate;Dry;CH4;Ostrich;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Montane;CH4;Ostrich;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Wet;CH4;Ostrich;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Moist;CH4;Ostrich;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Dry;CH4;Ostrich;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Cool Temperate;Moist;CH4;Ostrich;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Cool Temperate;Dry;CH4;Ostrich;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Boreal;Moist;CH4;Ostrich;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Boreal;Dry;CH4;Ostrich;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Warm Temperate;Moist;CH4;Ostrich;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Warm Temperate;Dry;CH4;Ostrich;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Montane;CH4;Ostrich;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Wet;CH4;Ostrich;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Moist;CH4;Ostrich;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Dry;CH4;Ostrich;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Cool Temperate;Moist;CH4;Ostrich;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Cool Temperate;Dry;CH4;Ostrich;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Boreal;Moist;CH4;Ostrich;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Boreal;Dry;CH4;Ostrich;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Warm Temperate;Moist;CH4;Ostrich;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Warm Temperate;Dry;CH4;Ostrich;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Montane;CH4;Ostrich;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Wet;CH4;Ostrich;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Moist;CH4;Ostrich;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Dry;CH4;Ostrich;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Cool Temperate;Moist;CH4;Llamas And Alpacas;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Cool Temperate;Dry;CH4;Llamas And Alpacas;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Boreal;Moist;CH4;Llamas And Alpacas;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Boreal;Dry;CH4;Llamas And Alpacas;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Warm Temperate;Moist;CH4;Llamas And Alpacas;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Warm Temperate;Dry;CH4;Llamas And Alpacas;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Montane;CH4;Llamas And Alpacas;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Wet;CH4;Llamas And Alpacas;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Moist;CH4;Llamas And Alpacas;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Dry;CH4;Llamas And Alpacas;High-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Cool Temperate;Moist;CH4;Llamas And Alpacas;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Cool Temperate;Dry;CH4;Llamas And Alpacas;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Boreal;Moist;CH4;Llamas And Alpacas;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Boreal;Dry;CH4;Llamas And Alpacas;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Warm Temperate;Moist;CH4;Llamas And Alpacas;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Warm Temperate;Dry;CH4;Llamas And Alpacas;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Montane;CH4;Llamas And Alpacas;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Wet;CH4;Llamas And Alpacas;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Moist;CH4;Llamas And Alpacas;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Dry;CH4;Llamas And Alpacas;Low-Productivity;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Cool Temperate;Moist;CH4;Llamas And Alpacas;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Cool Temperate;Dry;CH4;Llamas And Alpacas;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Boreal;Moist;CH4;Llamas And Alpacas;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Boreal;Dry;CH4;Llamas And Alpacas;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Warm Temperate;Moist;CH4;Llamas And Alpacas;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Warm Temperate;Dry;CH4;Llamas And Alpacas;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Montane;CH4;Llamas And Alpacas;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Wet;CH4;Llamas And Alpacas;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Moist;CH4;Llamas And Alpacas;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Tropical;Dry;CH4;Llamas And Alpacas;Default;0;0;0;0;0;0;0;0;0;0;0;0;0;0
