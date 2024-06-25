@@ -1871,6 +1871,15 @@ class Settlement(LandModuleFixed):
     bgb_t2_w = models.FloatField(null=True, blank=True)
     bgb_t2_wo = models.FloatField(null=True, blank=True)
 
+    def save(self, *args, **kwargs):
+
+        if not self.land_use_type_start:
+            self.land_use_type_start = LandUseType.objects.get(name="Organic Soil")
+            self.land_use_type_w = self.land_use_type_start
+            self.land_use_type_wo = self.land_use_type_start
+
+        return super().save(*args, **kwargs)
+
 
 class SetAside(LandModule, DoubleBiomassModule):
 
