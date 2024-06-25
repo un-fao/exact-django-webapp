@@ -1,0 +1,511 @@
+livestock_category_type;livestock_production_type;ipcc_region;Lagoon;Liquid/slurry;Solid storage;Dry lot;Pasture/Range/Paddock;Daily spread;Digester;Burned for fuel;Pit<1Month;Pit>1 month;Poultry manure;Deep bedding;Composting;Aerobic treatment
+Dairy Cattle;High-Productivity;Sub-Saharan Africa;0;0;20;29;45;0;0;6;0;0;0;0;0;0
+Dairy Cattle;High-Productivity;East Asia and South-East Asia;0;1;21;29;38;0;0;11;0;0;0;0;0;0
+Dairy Cattle;High-Productivity;North America;26;24;24;0;15;11;0;0;0;0;0;0;0;0
+Dairy Cattle;High-Productivity;Latin America and the Caribbean;0;0;5;38;57;0;0;0;0;0;0;0;0;0
+Dairy Cattle;High-Productivity;Western Europe;0;43;29;0;26;2;0;0;0;0;0;0;0;0
+Dairy Cattle;High-Productivity;Eastern Europe;0;5;74;0;20;1;0;0;0;0;0;0;0;0
+Dairy Cattle;High-Productivity;Russian Federation;0;5;74;0;20;1;0;0;0;0;0;0;0;0
+Dairy Cattle;High-Productivity;Oceania;5;0;0;0;94;1;0;0;0;0;0;0;0;0
+Dairy Cattle;High-Productivity;NENA/Middle East;0;0;14;35;46;0;0;5;0;0;0;0;0;0
+Dairy Cattle;High-Productivity;South Asia;0;0;1;49;30;0;0;20;0;0;0;0;0;0
+Dairy Cattle;Low-Productivity;Sub-Saharan Africa;0;0;20;29;45;0;0;6;0;0;0;0;0;0
+Dairy Cattle;Low-Productivity;East Asia and South-East Asia;0;1;21;29;38;0;0;11;0;0;0;0;0;0
+Dairy Cattle;Low-Productivity;North America;26;24;24;0;15;11;0;0;0;0;0;0;0;0
+Dairy Cattle;Low-Productivity;Latin America and the Caribbean;0;0;5;38;57;0;0;0;0;0;0;0;0;0
+Dairy Cattle;Low-Productivity;Western Europe;0;43;29;0;26;2;0;0;0;0;0;0;0;0
+Dairy Cattle;Low-Productivity;Eastern Europe;0;5;74;0;20;1;0;0;0;0;0;0;0;0
+Dairy Cattle;Low-Productivity;Russian Federation;0;5;74;0;20;1;0;0;0;0;0;0;0;0
+Dairy Cattle;Low-Productivity;Oceania;5;0;0;0;94;1;0;0;0;0;0;0;0;0
+Dairy Cattle;Low-Productivity;NENA/Middle East;0;0;14;35;46;0;0;5;0;0;0;0;0;0
+Dairy Cattle;Low-Productivity;South Asia;0;0;1;49;30;0;0;20;0;0;0;0;0;0
+Dairy Cattle;Default;Sub-Saharan Africa;0;0;20;29;45;0;0;6;0;0;0;0;0;0
+Dairy Cattle;Default;East Asia and South-East Asia;0;1;21;29;38;0;0;11;0;0;0;0;0;0
+Dairy Cattle;Default;North America;26;24;24;0;15;11;0;0;0;0;0;0;0;0
+Dairy Cattle;Default;Latin America and the Caribbean;0;0;5;38;57;0;0;0;0;0;0;0;0;0
+Dairy Cattle;Default;Western Europe;0;43;29;0;26;2;0;0;0;0;0;0;0;0
+Dairy Cattle;Default;Eastern Europe;0;5;74;0;20;1;0;0;0;0;0;0;0;0
+Dairy Cattle;Default;Russian Federation;0;5;74;0;20;1;0;0;0;0;0;0;0;0
+Dairy Cattle;Default;Oceania;5;0;0;0;94;1;0;0;0;0;0;0;0;0
+Dairy Cattle;Default;NENA/Middle East;0;0;14;35;46;0;0;5;0;0;0;0;0;0
+Dairy Cattle;Default;South Asia;0;0;1;49;30;0;0;20;0;0;0;0;0;0
+Other Cattle;High-Productivity;Sub-Saharan Africa;0;0;15;30;50;0;0;5;0;0;0;0;0;0
+Other Cattle;High-Productivity;East Asia and South-East Asia;0;0;29;28;36;0;0;7;0;0;0;0;0;0
+Other Cattle;High-Productivity;North America;0;1;43;14;42;0;0;0;0;0;0;0;0;0
+Other Cattle;High-Productivity;Latin America and the Caribbean;0;0;3;5;92;0;0;0;0;0;0;0;0;0
+Other Cattle;High-Productivity;Western Europe;0;22;26;0;48;4;0;0;0;0;0;0;0;0
+Other Cattle;High-Productivity;Eastern Europe;0;64;5;0;31;0;0;0;0;0;0;0;0;0
+Other Cattle;High-Productivity;Russian Federation;0;64;5;0;31;0;0;0;0;0;0;0;0;0
+Other Cattle;High-Productivity;Oceania;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Other Cattle;High-Productivity;NENA/Middle East;0;0;5;46;42;0;0;7;0;0;0;0;0;0
+Other Cattle;High-Productivity;South Asia;0;0;1;49;30;0;0;20;0;0;0;0;0;0
+Other Cattle;Low-Productivity;Sub-Saharan Africa;0;0;15;30;50;0;0;5;0;0;0;0;0;0
+Other Cattle;Low-Productivity;East Asia and South-East Asia;0;0;29;28;36;0;0;7;0;0;0;0;0;0
+Other Cattle;Low-Productivity;North America;0;1;43;14;42;0;0;0;0;0;0;0;0;0
+Other Cattle;Low-Productivity;Latin America and the Caribbean;0;0;3;5;92;0;0;0;0;0;0;0;0;0
+Other Cattle;Low-Productivity;Western Europe;0;22;26;0;48;4;0;0;0;0;0;0;0;0
+Other Cattle;Low-Productivity;Eastern Europe;0;64;5;0;31;0;0;0;0;0;0;0;0;0
+Other Cattle;Low-Productivity;Russian Federation;0;64;5;0;31;0;0;0;0;0;0;0;0;0
+Other Cattle;Low-Productivity;Oceania;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Other Cattle;Low-Productivity;NENA/Middle East;0;0;5;46;42;0;0;7;0;0;0;0;0;0
+Other Cattle;Low-Productivity;South Asia;0;0;1;49;30;0;0;20;0;0;0;0;0;0
+Other Cattle;Default;Sub-Saharan Africa;0;0;15;30;50;0;0;5;0;0;0;0;0;0
+Other Cattle;Default;East Asia and South-East Asia;0;0;29;28;36;0;0;7;0;0;0;0;0;0
+Other Cattle;Default;North America;0;1;43;14;42;0;0;0;0;0;0;0;0;0
+Other Cattle;Default;Latin America and the Caribbean;0;0;3;5;92;0;0;0;0;0;0;0;0;0
+Other Cattle;Default;Western Europe;0;22;26;0;48;4;0;0;0;0;0;0;0;0
+Other Cattle;Default;Eastern Europe;0;64;5;0;31;0;0;0;0;0;0;0;0;0
+Other Cattle;Default;Russian Federation;0;64;5;0;31;0;0;0;0;0;0;0;0;0
+Other Cattle;Default;Oceania;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Other Cattle;Default;NENA/Middle East;0;0;5;46;42;0;0;7;0;0;0;0;0;0
+Other Cattle;Default;South Asia;0;0;1;49;30;0;0;20;0;0;0;0;0;0
+Dairy Buffalo;High-Productivity;Sub-Saharan Africa;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Dairy Buffalo;High-Productivity;East Asia and South-East Asia;0;0;10;58;29;0;0;3;0;0;0;0;0;0
+Dairy Buffalo;High-Productivity;North America;0;43;40;0;17;0;0;0;0;0;0;0;0;0
+Dairy Buffalo;High-Productivity;Latin America and the Caribbean;0;0;2;48;50;0;0;0;0;0;0;0;0;0
+Dairy Buffalo;High-Productivity;Western Europe;0;34;63;0;3;0;0;0;0;0;0;0;0;0
+Dairy Buffalo;High-Productivity;Eastern Europe;0;18;68;0;13;1;0;0;0;0;0;0;0;0
+Dairy Buffalo;High-Productivity;Russian Federation;0;18;68;0;13;1;0;0;0;0;0;0;0;0
+Dairy Buffalo;High-Productivity;Oceania;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Dairy Buffalo;High-Productivity;NENA/Middle East;0;0;18;35;46;0;0;1;0;0;0;0;0;0
+Dairy Buffalo;High-Productivity;South Asia;0;0;1;41;38;0;0;20;0;0;0;0;0;0
+Dairy Buffalo;Low-Productivity;Sub-Saharan Africa;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Dairy Buffalo;Low-Productivity;East Asia and South-East Asia;0;0;10;58;29;0;0;3;0;0;0;0;0;0
+Dairy Buffalo;Low-Productivity;North America;0;43;40;0;17;0;0;0;0;0;0;0;0;0
+Dairy Buffalo;Low-Productivity;Latin America and the Caribbean;0;0;2;48;50;0;0;0;0;0;0;0;0;0
+Dairy Buffalo;Low-Productivity;Western Europe;0;34;63;0;3;0;0;0;0;0;0;0;0;0
+Dairy Buffalo;Low-Productivity;Eastern Europe;0;18;68;0;13;1;0;0;0;0;0;0;0;0
+Dairy Buffalo;Low-Productivity;Russian Federation;0;18;68;0;13;1;0;0;0;0;0;0;0;0
+Dairy Buffalo;Low-Productivity;Oceania;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Dairy Buffalo;Low-Productivity;NENA/Middle East;0;0;18;35;46;0;0;1;0;0;0;0;0;0
+Dairy Buffalo;Low-Productivity;South Asia;0;0;1;41;38;0;0;20;0;0;0;0;0;0
+Dairy Buffalo;Default;Sub-Saharan Africa;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Dairy Buffalo;Default;East Asia and South-East Asia;0;0;10;58;29;0;0;3;0;0;0;0;0;0
+Dairy Buffalo;Default;North America;0;43;40;0;17;0;0;0;0;0;0;0;0;0
+Dairy Buffalo;Default;Latin America and the Caribbean;0;0;2;48;50;0;0;0;0;0;0;0;0;0
+Dairy Buffalo;Default;Western Europe;0;34;63;0;3;0;0;0;0;0;0;0;0;0
+Dairy Buffalo;Default;Eastern Europe;0;18;68;0;13;1;0;0;0;0;0;0;0;0
+Dairy Buffalo;Default;Russian Federation;0;18;68;0;13;1;0;0;0;0;0;0;0;0
+Dairy Buffalo;Default;Oceania;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Dairy Buffalo;Default;NENA/Middle East;0;0;18;35;46;0;0;1;0;0;0;0;0;0
+Dairy Buffalo;Default;South Asia;0;0;1;41;38;0;0;20;0;0;0;0;0;0
+Other Buffalo;High-Productivity;Sub-Saharan Africa;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Other Buffalo;High-Productivity;East Asia and South-East Asia;0;0;6;64;28;0;0;2;0;0;0;0;0;0
+Other Buffalo;High-Productivity;North America;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Other Buffalo;High-Productivity;Latin America and the Caribbean;0;0;2;5;93;0;0;0;0;0;0;0;0;0
+Other Buffalo;High-Productivity;Western Europe;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Other Buffalo;High-Productivity;Eastern Europe;0;9;64;0;27;0;0;0;0;0;0;0;0;0
+Other Buffalo;High-Productivity;Russian Federation;0;9;64;0;27;0;0;0;0;0;0;0;0;0
+Other Buffalo;High-Productivity;Oceania;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Other Buffalo;High-Productivity;NENA/Middle East;0;0;16;12;57;0;0;15;0;0;0;0;0;0
+Other Buffalo;High-Productivity;South Asia;0;0;1;40;39;0;0;20;0;0;0;0;0;0
+Other Buffalo;Low-Productivity;Sub-Saharan Africa;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Other Buffalo;Low-Productivity;East Asia and South-East Asia;0;0;6;64;28;0;0;2;0;0;0;0;0;0
+Other Buffalo;Low-Productivity;North America;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Other Buffalo;Low-Productivity;Latin America and the Caribbean;0;0;2;5;93;0;0;0;0;0;0;0;0;0
+Other Buffalo;Low-Productivity;Western Europe;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Other Buffalo;Low-Productivity;Eastern Europe;0;9;64;0;27;0;0;0;0;0;0;0;0;0
+Other Buffalo;Low-Productivity;Russian Federation;0;9;64;0;27;0;0;0;0;0;0;0;0;0
+Other Buffalo;Low-Productivity;Oceania;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Other Buffalo;Low-Productivity;NENA/Middle East;0;0;16;12;57;0;0;15;0;0;0;0;0;0
+Other Buffalo;Low-Productivity;South Asia;0;0;1;40;39;0;0;20;0;0;0;0;0;0
+Other Buffalo;Default;Sub-Saharan Africa;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Other Buffalo;Default;East Asia and South-East Asia;0;0;6;64;28;0;0;2;0;0;0;0;0;0
+Other Buffalo;Default;North America;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Other Buffalo;Default;Latin America and the Caribbean;0;0;2;5;93;0;0;0;0;0;0;0;0;0
+Other Buffalo;Default;Western Europe;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Other Buffalo;Default;Eastern Europe;0;9;64;0;27;0;0;0;0;0;0;0;0;0
+Other Buffalo;Default;Russian Federation;0;9;64;0;27;0;0;0;0;0;0;0;0;0
+Other Buffalo;Default;Oceania;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Other Buffalo;Default;NENA/Middle East;0;0;16;12;57;0;0;15;0;0;0;0;0;0
+Other Buffalo;Default;South Asia;0;0;1;40;39;0;0;20;0;0;0;0;0;0
+Growing Swine;High-Productivity;Sub-Saharan Africa;0;7;6;86;0;0;0;0;1;0;0;0;0;0
+Growing Swine;High-Productivity;East Asia and South-East Asia;35;21;0;2;0;0;7;0;35;0;0;0;0;0
+Growing Swine;High-Productivity;North America;28;31;4;3;0;0;0;0;0;34;0;0;0;0
+Growing Swine;High-Productivity;Latin America and the Caribbean;11;34;12;41;0;2;0;0;0;0;0;0;0;0
+Growing Swine;High-Productivity;Western Europe;6;51;14;0;0;1;0;0;2;26;0;0;0;0
+Growing Swine;High-Productivity;Eastern Europe;5;31;55;1;0;0;0;0;4;4;0;0;0;0
+Growing Swine;High-Productivity;Russian Federation;0;24;76;0;0;0;0;0;0;0;0;0;0;0
+Growing Swine;High-Productivity;Oceania;91;0;1;8;0;0;0;0;0;0;0;0;0;0
+Growing Swine;High-Productivity;NENA/Middle East;10;29;0;54;0;0;7;0;0;0;0;0;0;0
+Growing Swine;High-Productivity;South Asia;12;23;13;35;0;7;8;2;2;0;0;0;0;0
+Growing Swine;Low-Productivity;Sub-Saharan Africa;5;30;15;15;5;5;5;0;15;5;0;0;0;0
+Growing Swine;Low-Productivity;East Asia and South-East Asia;5;27;18;14;6;6;5;0;14;5;0;0;0;0
+Growing Swine;Low-Productivity;North America;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Growing Swine;Low-Productivity;Latin America and the Caribbean;5;30;15;15;5;5;5;0;15;5;0;0;0;0
+Growing Swine;Low-Productivity;Western Europe;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Growing Swine;Low-Productivity;Eastern Europe;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Growing Swine;Low-Productivity;Russian Federation;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Growing Swine;Low-Productivity;Oceania;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Growing Swine;Low-Productivity;NENA/Middle East;5;30;15;15;5;5;5;0;15;5;0;0;0;0
+Growing Swine;Low-Productivity;South Asia;5;30;15;15;5;5;5;0;15;5;0;0;0;0
+Growing Swine;Default;Sub-Saharan Africa;5;30;15;15;5;5;5;0;15;5;0;0;0;0
+Growing Swine;Default;East Asia and South-East Asia;5;27;18;14;6;6;5;0;14;5;0;0;0;0
+Growing Swine;Default;North America;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Growing Swine;Default;Latin America and the Caribbean;5;30;15;15;5;5;5;0;15;5;0;0;0;0
+Growing Swine;Default;Western Europe;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Growing Swine;Default;Eastern Europe;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Growing Swine;Default;Russian Federation;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Growing Swine;Default;Oceania;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Growing Swine;Default;NENA/Middle East;5;30;15;15;5;5;5;0;15;5;0;0;0;0
+Growing Swine;Default;South Asia;5;30;15;15;5;5;5;0;15;5;0;0;0;0
+Breeding Swine;High-Productivity;Sub-Saharan Africa;0;7;6;86;0;0;0;0;1;0;0;0;0;0
+Breeding Swine;High-Productivity;East Asia and South-East Asia;35;21;0;2;0;0;7;0;35;0;0;0;0;0
+Breeding Swine;High-Productivity;North America;28;31;4;3;0;0;0;0;0;34;0;0;0;0
+Breeding Swine;High-Productivity;Latin America and the Caribbean;11;34;12;41;0;2;0;0;0;0;0;0;0;0
+Breeding Swine;High-Productivity;Western Europe;6;51;15;0;0;1;0;0;2;25;0;0;0;0
+Breeding Swine;High-Productivity;Eastern Europe;5;31;55;1;0;0;0;0;4;4;0;0;0;0
+Breeding Swine;High-Productivity;Russian Federation;0;24;76;0;0;0;0;0;0;0;0;0;0;0
+Breeding Swine;High-Productivity;Oceania;91;0;1;8;0;0;0;0;0;0;0;0;0;0
+Breeding Swine;High-Productivity;NENA/Middle East;10;29;0;54;0;0;7;0;0;0;0;0;0;0
+Breeding Swine;High-Productivity;South Asia;12;23;14;32;0;8;8;0;3;0;0;0;0;0
+Breeding Swine;Low-Productivity;Sub-Saharan Africa;5;30;15;15;5;5;5;0;15;5;0;0;0;0
+Breeding Swine;Low-Productivity;East Asia and South-East Asia;4;28;22;13;6;6;4;0;13;4;0;0;0;0
+Breeding Swine;Low-Productivity;North America;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Breeding Swine;Low-Productivity;Latin America and the Caribbean;5;30;15;15;5;5;5;0;15;5;0;0;0;0
+Breeding Swine;Low-Productivity;Western Europe;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Breeding Swine;Low-Productivity;Eastern Europe;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Breeding Swine;Low-Productivity;Russian Federation;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Breeding Swine;Low-Productivity;Oceania;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Breeding Swine;Low-Productivity;NENA/Middle East;5;30;15;15;5;5;5;0;15;5;0;0;0;0
+Breeding Swine;Low-Productivity;South Asia;5;30;15;15;5;5;5;0;15;5;0;0;0;0
+Breeding Swine;Default;Sub-Saharan Africa;5;30;15;15;5;5;5;0;15;5;0;0;0;0
+Breeding Swine;Default;East Asia and South-East Asia;4;28;22;13;6;6;4;0;13;4;0;0;0;0
+Breeding Swine;Default;North America;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Breeding Swine;Default;Latin America and the Caribbean;5;30;15;15;5;5;5;0;15;5;0;0;0;0
+Breeding Swine;Default;Western Europe;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Breeding Swine;Default;Eastern Europe;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Breeding Swine;Default;Russian Federation;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Breeding Swine;Default;Oceania;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Breeding Swine;Default;NENA/Middle East;5;30;15;15;5;5;5;0;15;5;0;0;0;0
+Breeding Swine;Default;South Asia;5;30;15;15;5;5;5;0;15;5;0;0;0;0
+Chicken Layer;High-Productivity;Sub-Saharan Africa;0;0;0;0;0;0;0;0;0;90;10;0;0;0
+Chicken Layer;High-Productivity;East Asia and South-East Asia;0;4;0;0;1;1;0;0;0;94;0;0;0;0
+Chicken Layer;High-Productivity;North America;1;29;70;0;0;0;0;0;0;0;0;0;0;0
+Chicken Layer;High-Productivity;Latin America and the Caribbean;0;58;42;0;0;0;0;0;0;0;0;0;0;0
+Chicken Layer;High-Productivity;Western Europe;0;1;20;21;0;1;0;0;0;43;14;0;0;0
+Chicken Layer;High-Productivity;Eastern Europe;0;0;0;47;0;0;0;0;0;34;19;0;0;0
+Chicken Layer;High-Productivity;Russian Federation;0;0;0;0;0;0;0;0;0;100;0;0;0;0
+Chicken Layer;High-Productivity;Oceania;0;0;0;0;23;0;0;0;0;77;0;0;0;0
+Chicken Layer;High-Productivity;NENA/Middle East;11;7;11;0;0;0;0;0;0;67;4;0;0;0
+Chicken Layer;High-Productivity;South Asia;0;0;100;0;0;0;0;0;0;0;0;0;0;0
+Chicken Layer;Low-Productivity;Sub-Saharan Africa;0;0;0;0;0;0;0;0;0;90;10;0;0;0
+Chicken Layer;Low-Productivity;East Asia and South-East Asia;0;4;0;0;1;1;0;0;0;94;0;0;0;0
+Chicken Layer;Low-Productivity;North America;1;29;70;0;0;0;0;0;0;0;0;0;0;0
+Chicken Layer;Low-Productivity;Latin America and the Caribbean;0;58;42;0;0;0;0;0;0;0;0;0;0;0
+Chicken Layer;Low-Productivity;Western Europe;0;1;20;21;0;1;0;0;0;43;14;0;0;0
+Chicken Layer;Low-Productivity;Eastern Europe;0;0;0;47;0;0;0;0;0;34;19;0;0;0
+Chicken Layer;Low-Productivity;Russian Federation;0;0;0;0;0;0;0;0;0;100;0;0;0;0
+Chicken Layer;Low-Productivity;Oceania;0;0;0;0;23;0;0;0;0;77;0;0;0;0
+Chicken Layer;Low-Productivity;NENA/Middle East;11;7;11;0;0;0;0;0;0;67;4;0;0;0
+Chicken Layer;Low-Productivity;South Asia;0;0;100;0;0;0;0;0;0;0;0;0;0;0
+Chicken Layer;Default;Sub-Saharan Africa;0;0;0;0;0;0;0;0;0;90;10;0;0;0
+Chicken Layer;Default;East Asia and South-East Asia;0;4;0;0;1;1;0;0;0;94;0;0;0;0
+Chicken Layer;Default;North America;1;29;70;0;0;0;0;0;0;0;0;0;0;0
+Chicken Layer;Default;Latin America and the Caribbean;0;58;42;0;0;0;0;0;0;0;0;0;0;0
+Chicken Layer;Default;Western Europe;0;1;20;21;0;1;0;0;0;43;14;0;0;0
+Chicken Layer;Default;Eastern Europe;0;0;0;47;0;0;0;0;0;34;19;0;0;0
+Chicken Layer;Default;Russian Federation;0;0;0;0;0;0;0;0;0;100;0;0;0;0
+Chicken Layer;Default;Oceania;0;0;0;0;23;0;0;0;0;77;0;0;0;0
+Chicken Layer;Default;NENA/Middle East;11;7;11;0;0;0;0;0;0;67;4;0;0;0
+Chicken Layer;Default;South Asia;0;0;100;0;0;0;0;0;0;0;0;0;0;0
+Chicken Broiler;High-Productivity;Sub-Saharan Africa;0;0;0;0;0;0;0;0;0;0;100;0;0;0
+Chicken Broiler;High-Productivity;East Asia and South-East Asia;0;0;0;0;0;0;0;0;0;0;100;0;0;0
+Chicken Broiler;High-Productivity;North America;0;0;0;0;0;0;0;0;0;0;100;0;0;0
+Chicken Broiler;High-Productivity;Latin America and the Caribbean;0;0;0;0;0;0;0;0;0;0;100;0;0;0
+Chicken Broiler;High-Productivity;Western Europe;0;0;0;0;0;0;0;0;0;0;100;0;0;0
+Chicken Broiler;High-Productivity;Eastern Europe;0;0;0;0;0;0;0;0;0;0;100;0;0;0
+Chicken Broiler;High-Productivity;Russian Federation;0;0;0;0;0;0;0;0;0;0;100;0;0;0
+Chicken Broiler;High-Productivity;Oceania;0;0;0;0;0;0;0;0;0;0;100;0;0;0
+Chicken Broiler;High-Productivity;NENA/Middle East;0;0;0;0;0;0;0;0;0;0;100;0;0;0
+Chicken Broiler;High-Productivity;South Asia;0;0;0;0;0;0;0;0;0;0;100;0;0;0
+Chicken Broiler;Low-Productivity;Sub-Saharan Africa;0;0;0;0;50;50;0;0;0;0;0;0;0;0
+Chicken Broiler;Low-Productivity;East Asia and South-East Asia;0;0;0;0;50;50;0;0;0;0;0;0;0;0
+Chicken Broiler;Low-Productivity;North America;0;0;0;0;50;50;0;0;0;0;0;0;0;0
+Chicken Broiler;Low-Productivity;Latin America and the Caribbean;0;0;0;0;50;50;0;0;0;0;0;0;0;0
+Chicken Broiler;Low-Productivity;Western Europe;0;0;0;0;50;50;0;0;0;0;0;0;0;0
+Chicken Broiler;Low-Productivity;Eastern Europe;0;0;0;0;50;50;0;0;0;0;0;0;0;0
+Chicken Broiler;Low-Productivity;Russian Federation;0;0;0;0;50;50;0;0;0;0;0;0;0;0
+Chicken Broiler;Low-Productivity;Oceania;0;0;0;0;50;50;0;0;0;0;0;0;0;0
+Chicken Broiler;Low-Productivity;NENA/Middle East;0;0;0;0;50;50;0;0;0;0;0;0;0;0
+Chicken Broiler;Low-Productivity;South Asia;0;0;0;0;50;50;0;0;0;0;0;0;0;0
+Chicken Broiler;Default;Sub-Saharan Africa;0;0;0;0;50;50;0;0;0;0;0;0;0;0
+Chicken Broiler;Default;East Asia and South-East Asia;0;0;0;0;50;50;0;0;0;0;0;0;0;0
+Chicken Broiler;Default;North America;0;0;0;0;50;50;0;0;0;0;0;0;0;0
+Chicken Broiler;Default;Latin America and the Caribbean;0;0;0;0;50;50;0;0;0;0;0;0;0;0
+Chicken Broiler;Default;Western Europe;0;0;0;0;50;50;0;0;0;0;0;0;0;0
+Chicken Broiler;Default;Eastern Europe;0;0;0;0;50;50;0;0;0;0;0;0;0;0
+Chicken Broiler;Default;Russian Federation;0;0;0;0;50;50;0;0;0;0;0;0;0;0
+Chicken Broiler;Default;Oceania;0;0;0;0;50;50;0;0;0;0;0;0;0;0
+Chicken Broiler;Default;NENA/Middle East;0;0;0;0;50;50;0;0;0;0;0;0;0;0
+Chicken Broiler;Default;South Asia;0;0;0;0;50;50;0;0;0;0;0;0;0;0
+Dairy Sheep;High-Productivity;Sub-Saharan Africa;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Dairy Sheep;High-Productivity;East Asia and South-East Asia;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Dairy Sheep;High-Productivity;North America;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Dairy Sheep;High-Productivity;Latin America and the Caribbean;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Dairy Sheep;High-Productivity;Western Europe;0;0;21;0;78;0;0;0;0;0;0;0;0;0
+Dairy Sheep;High-Productivity;Eastern Europe;0;0;42;0;58;0;0;0;0;0;0;0;0;0
+Dairy Sheep;High-Productivity;Russian Federation;0;0;42;0;58;0;0;0;0;0;0;0;0;0
+Dairy Sheep;High-Productivity;Oceania;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Dairy Sheep;High-Productivity;NENA/Middle East;0;0;0;50;50;0;0;0;0;0;0;0;0;0
+Dairy Sheep;High-Productivity;South Asia;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Dairy Sheep;Low-Productivity;Sub-Saharan Africa;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Dairy Sheep;Low-Productivity;East Asia and South-East Asia;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Dairy Sheep;Low-Productivity;North America;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Dairy Sheep;Low-Productivity;Latin America and the Caribbean;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Dairy Sheep;Low-Productivity;Western Europe;0;0;21;0;78;0;0;0;0;0;0;0;0;0
+Dairy Sheep;Low-Productivity;Eastern Europe;0;0;42;0;58;0;0;0;0;0;0;0;0;0
+Dairy Sheep;Low-Productivity;Russian Federation;0;0;42;0;58;0;0;0;0;0;0;0;0;0
+Dairy Sheep;Low-Productivity;Oceania;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Dairy Sheep;Low-Productivity;NENA/Middle East;0;0;0;50;50;0;0;0;0;0;0;0;0;0
+Dairy Sheep;Low-Productivity;South Asia;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Dairy Sheep;Default;Sub-Saharan Africa;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Dairy Sheep;Default;East Asia and South-East Asia;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Dairy Sheep;Default;North America;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Dairy Sheep;Default;Latin America and the Caribbean;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Dairy Sheep;Default;Western Europe;0;0;21;0;78;0;0;0;0;0;0;0;0;0
+Dairy Sheep;Default;Eastern Europe;0;0;42;0;58;0;0;0;0;0;0;0;0;0
+Dairy Sheep;Default;Russian Federation;0;0;42;0;58;0;0;0;0;0;0;0;0;0
+Dairy Sheep;Default;Oceania;0;0;0;0;0;0;0;0;0;0;0;0;0;0
+Dairy Sheep;Default;NENA/Middle East;0;0;0;50;50;0;0;0;0;0;0;0;0;0
+Dairy Sheep;Default;South Asia;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Other Sheep;High-Productivity;Sub-Saharan Africa;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Other Sheep;High-Productivity;East Asia and South-East Asia;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Other Sheep;High-Productivity;North America;0;0;54;0;46;0;0;0;0;0;0;0;0;0
+Other Sheep;High-Productivity;Latin America and the Caribbean;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Other Sheep;High-Productivity;Western Europe;0;0;13;0;87;0;0;0;0;0;0;0;0;0
+Other Sheep;High-Productivity;Eastern Europe;0;0;54;0;46;0;0;0;0;0;0;0;0;0
+Other Sheep;High-Productivity;Russian Federation;0;0;54;0;46;0;0;0;0;0;0;0;0;0
+Other Sheep;High-Productivity;Oceania;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Other Sheep;High-Productivity;NENA/Middle East;0;0;0;50;50;0;0;0;0;0;0;0;0;0
+Other Sheep;High-Productivity;South Asia;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Other Sheep;Low-Productivity;Sub-Saharan Africa;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Other Sheep;Low-Productivity;East Asia and South-East Asia;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Other Sheep;Low-Productivity;North America;0;0;54;0;46;0;0;0;0;0;0;0;0;0
+Other Sheep;Low-Productivity;Latin America and the Caribbean;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Other Sheep;Low-Productivity;Western Europe;0;0;13;0;87;0;0;0;0;0;0;0;0;0
+Other Sheep;Low-Productivity;Eastern Europe;0;0;54;0;46;0;0;0;0;0;0;0;0;0
+Other Sheep;Low-Productivity;Russian Federation;0;0;54;0;46;0;0;0;0;0;0;0;0;0
+Other Sheep;Low-Productivity;Oceania;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Other Sheep;Low-Productivity;NENA/Middle East;0;0;0;50;50;0;0;0;0;0;0;0;0;0
+Other Sheep;Low-Productivity;South Asia;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Other Sheep;Default;Sub-Saharan Africa;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Other Sheep;Default;East Asia and South-East Asia;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Other Sheep;Default;North America;0;0;54;0;46;0;0;0;0;0;0;0;0;0
+Other Sheep;Default;Latin America and the Caribbean;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Other Sheep;Default;Western Europe;0;0;13;0;87;0;0;0;0;0;0;0;0;0
+Other Sheep;Default;Eastern Europe;0;0;54;0;46;0;0;0;0;0;0;0;0;0
+Other Sheep;Default;Russian Federation;0;0;54;0;46;0;0;0;0;0;0;0;0;0
+Other Sheep;Default;Oceania;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Other Sheep;Default;NENA/Middle East;0;0;0;50;50;0;0;0;0;0;0;0;0;0
+Other Sheep;Default;South Asia;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Goats;High-Productivity;Sub-Saharan Africa;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Goats;High-Productivity;East Asia and South-East Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Goats;High-Productivity;North America;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Goats;High-Productivity;Latin America and the Caribbean;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Goats;High-Productivity;Western Europe;0;0;28;0;72;0;0;0;0;0;0;0;0;0
+Goats;High-Productivity;Eastern Europe;0;0;9;0;91;0;0;0;0;0;0;0;0;0
+Goats;High-Productivity;Russian Federation;0;0;82;0;18;0;0;0;0;0;0;0;0;0
+Goats;High-Productivity;Oceania;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Goats;High-Productivity;NENA/Middle East;0;0;0;50;50;0;0;0;0;0;0;0;0;0
+Goats;High-Productivity;South Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Goats;Low-Productivity;Sub-Saharan Africa;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Goats;Low-Productivity;East Asia and South-East Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Goats;Low-Productivity;North America;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Goats;Low-Productivity;Latin America and the Caribbean;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Goats;Low-Productivity;Western Europe;0;0;28;0;72;0;0;0;0;0;0;0;0;0
+Goats;Low-Productivity;Eastern Europe;0;0;9;0;91;0;0;0;0;0;0;0;0;0
+Goats;Low-Productivity;Russian Federation;0;0;82;0;18;0;0;0;0;0;0;0;0;0
+Goats;Low-Productivity;Oceania;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Goats;Low-Productivity;NENA/Middle East;0;0;0;50;50;0;0;0;0;0;0;0;0;0
+Goats;Low-Productivity;South Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Goats;Default;Sub-Saharan Africa;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Goats;Default;East Asia and South-East Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Goats;Default;North America;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Goats;Default;Latin America and the Caribbean;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Goats;Default;Western Europe;0;0;28;0;72;0;0;0;0;0;0;0;0;0
+Goats;Default;Eastern Europe;0;0;9;0;91;0;0;0;0;0;0;0;0;0
+Goats;Default;Russian Federation;0;0;82;0;18;0;0;0;0;0;0;0;0;0
+Goats;Default;Oceania;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Goats;Default;NENA/Middle East;0;0;0;50;50;0;0;0;0;0;0;0;0;0
+Goats;Default;South Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Camels;High-Productivity;Sub-Saharan Africa;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Camels;High-Productivity;East Asia and South-East Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Camels;High-Productivity;North America;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Camels;High-Productivity;Latin America and the Caribbean;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Camels;High-Productivity;Western Europe;0;0;28;0;72;0;0;0;0;0;0;0;0;0
+Camels;High-Productivity;Eastern Europe;0;0;9;0;91;0;0;0;0;0;0;0;0;0
+Camels;High-Productivity;Russian Federation;0;0;82;0;18;0;0;0;0;0;0;0;0;0
+Camels;High-Productivity;Oceania;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Camels;High-Productivity;NENA/Middle East;0;0;0;50;50;0;0;0;0;0;0;0;0;0
+Camels;High-Productivity;South Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Camels;Low-Productivity;Sub-Saharan Africa;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Camels;Low-Productivity;East Asia and South-East Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Camels;Low-Productivity;North America;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Camels;Low-Productivity;Latin America and the Caribbean;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Camels;Low-Productivity;Western Europe;0;0;28;0;72;0;0;0;0;0;0;0;0;0
+Camels;Low-Productivity;Eastern Europe;0;0;9;0;91;0;0;0;0;0;0;0;0;0
+Camels;Low-Productivity;Russian Federation;0;0;82;0;18;0;0;0;0;0;0;0;0;0
+Camels;Low-Productivity;Oceania;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Camels;Low-Productivity;NENA/Middle East;0;0;0;50;50;0;0;0;0;0;0;0;0;0
+Camels;Low-Productivity;South Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Camels;Default;Sub-Saharan Africa;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Camels;Default;East Asia and South-East Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Camels;Default;North America;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Camels;Default;Latin America and the Caribbean;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Camels;Default;Western Europe;0;0;28;0;72;0;0;0;0;0;0;0;0;0
+Camels;Default;Eastern Europe;0;0;9;0;91;0;0;0;0;0;0;0;0;0
+Camels;Default;Russian Federation;0;0;82;0;18;0;0;0;0;0;0;0;0;0
+Camels;Default;Oceania;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Camels;Default;NENA/Middle East;0;0;0;50;50;0;0;0;0;0;0;0;0;0
+Camels;Default;South Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Horses;High-Productivity;Sub-Saharan Africa;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Horses;High-Productivity;East Asia and South-East Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Horses;High-Productivity;North America;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Horses;High-Productivity;Latin America and the Caribbean;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Horses;High-Productivity;Western Europe;0;0;28;0;72;0;0;0;0;0;0;0;0;0
+Horses;High-Productivity;Eastern Europe;0;0;9;0;91;0;0;0;0;0;0;0;0;0
+Horses;High-Productivity;Russian Federation;0;0;82;0;18;0;0;0;0;0;0;0;0;0
+Horses;High-Productivity;Oceania;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Horses;High-Productivity;NENA/Middle East;0;0;0;50;50;0;0;0;0;0;0;0;0;0
+Horses;High-Productivity;South Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Horses;Low-Productivity;Sub-Saharan Africa;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Horses;Low-Productivity;East Asia and South-East Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Horses;Low-Productivity;North America;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Horses;Low-Productivity;Latin America and the Caribbean;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Horses;Low-Productivity;Western Europe;0;0;28;0;72;0;0;0;0;0;0;0;0;0
+Horses;Low-Productivity;Eastern Europe;0;0;9;0;91;0;0;0;0;0;0;0;0;0
+Horses;Low-Productivity;Russian Federation;0;0;82;0;18;0;0;0;0;0;0;0;0;0
+Horses;Low-Productivity;Oceania;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Horses;Low-Productivity;NENA/Middle East;0;0;0;50;50;0;0;0;0;0;0;0;0;0
+Horses;Low-Productivity;South Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Horses;Default;Sub-Saharan Africa;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Horses;Default;East Asia and South-East Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Horses;Default;North America;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Horses;Default;Latin America and the Caribbean;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Horses;Default;Western Europe;0;0;28;0;72;0;0;0;0;0;0;0;0;0
+Horses;Default;Eastern Europe;0;0;9;0;91;0;0;0;0;0;0;0;0;0
+Horses;Default;Russian Federation;0;0;82;0;18;0;0;0;0;0;0;0;0;0
+Horses;Default;Oceania;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Horses;Default;NENA/Middle East;0;0;0;50;50;0;0;0;0;0;0;0;0;0
+Horses;Default;South Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Mules And Asses;High-Productivity;Sub-Saharan Africa;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Mules And Asses;High-Productivity;East Asia and South-East Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Mules And Asses;High-Productivity;North America;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Mules And Asses;High-Productivity;Latin America and the Caribbean;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Mules And Asses;High-Productivity;Western Europe;0;0;28;0;72;0;0;0;0;0;0;0;0;0
+Mules And Asses;High-Productivity;Eastern Europe;0;0;9;0;91;0;0;0;0;0;0;0;0;0
+Mules And Asses;High-Productivity;Russian Federation;0;0;82;0;18;0;0;0;0;0;0;0;0;0
+Mules And Asses;High-Productivity;Oceania;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Mules And Asses;High-Productivity;NENA/Middle East;0;0;0;50;50;0;0;0;0;0;0;0;0;0
+Mules And Asses;High-Productivity;South Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Mules And Asses;Low-Productivity;Sub-Saharan Africa;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Mules And Asses;Low-Productivity;East Asia and South-East Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Mules And Asses;Low-Productivity;North America;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Mules And Asses;Low-Productivity;Latin America and the Caribbean;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Mules And Asses;Low-Productivity;Western Europe;0;0;28;0;72;0;0;0;0;0;0;0;0;0
+Mules And Asses;Low-Productivity;Eastern Europe;0;0;9;0;91;0;0;0;0;0;0;0;0;0
+Mules And Asses;Low-Productivity;Russian Federation;0;0;82;0;18;0;0;0;0;0;0;0;0;0
+Mules And Asses;Low-Productivity;Oceania;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Mules And Asses;Low-Productivity;NENA/Middle East;0;0;0;50;50;0;0;0;0;0;0;0;0;0
+Mules And Asses;Low-Productivity;South Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Mules And Asses;Default;Sub-Saharan Africa;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Mules And Asses;Default;East Asia and South-East Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Mules And Asses;Default;North America;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Mules And Asses;Default;Latin America and the Caribbean;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Mules And Asses;Default;Western Europe;0;0;28;0;72;0;0;0;0;0;0;0;0;0
+Mules And Asses;Default;Eastern Europe;0;0;9;0;91;0;0;0;0;0;0;0;0;0
+Mules And Asses;Default;Russian Federation;0;0;82;0;18;0;0;0;0;0;0;0;0;0
+Mules And Asses;Default;Oceania;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Mules And Asses;Default;NENA/Middle East;0;0;0;50;50;0;0;0;0;0;0;0;0;0
+Mules And Asses;Default;South Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Deer;High-Productivity;Sub-Saharan Africa;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Deer;High-Productivity;East Asia and South-East Asia;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Deer;High-Productivity;North America;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Deer;High-Productivity;Latin America and the Caribbean;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Deer;High-Productivity;Western Europe;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Deer;High-Productivity;Eastern Europe;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Deer;High-Productivity;Russian Federation;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Deer;High-Productivity;Oceania;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Deer;High-Productivity;NENA/Middle East;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Deer;High-Productivity;South Asia;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Deer;Low-Productivity;Sub-Saharan Africa;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Deer;Low-Productivity;East Asia and South-East Asia;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Deer;Low-Productivity;North America;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Deer;Low-Productivity;Latin America and the Caribbean;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Deer;Low-Productivity;Western Europe;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Deer;Low-Productivity;Eastern Europe;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Deer;Low-Productivity;Russian Federation;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Deer;Low-Productivity;Oceania;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Deer;Low-Productivity;NENA/Middle East;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Deer;Low-Productivity;South Asia;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Deer;Default;Sub-Saharan Africa;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Deer;Default;East Asia and South-East Asia;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Deer;Default;North America;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Deer;Default;Latin America and the Caribbean;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Deer;Default;Western Europe;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Deer;Default;Eastern Europe;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Deer;Default;Russian Federation;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Deer;Default;Oceania;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Deer;Default;NENA/Middle East;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Deer;Default;South Asia;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Ostrich;High-Productivity;Sub-Saharan Africa;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Ostrich;High-Productivity;East Asia and South-East Asia;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Ostrich;High-Productivity;North America;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Ostrich;High-Productivity;Latin America and the Caribbean;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Ostrich;High-Productivity;Western Europe;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Ostrich;High-Productivity;Eastern Europe;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Ostrich;High-Productivity;Russian Federation;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Ostrich;High-Productivity;Oceania;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Ostrich;High-Productivity;NENA/Middle East;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Ostrich;High-Productivity;South Asia;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Ostrich;Low-Productivity;Sub-Saharan Africa;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Ostrich;Low-Productivity;East Asia and South-East Asia;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Ostrich;Low-Productivity;North America;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Ostrich;Low-Productivity;Latin America and the Caribbean;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Ostrich;Low-Productivity;Western Europe;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Ostrich;Low-Productivity;Eastern Europe;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Ostrich;Low-Productivity;Russian Federation;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Ostrich;Low-Productivity;Oceania;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Ostrich;Low-Productivity;NENA/Middle East;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Ostrich;Low-Productivity;South Asia;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Ostrich;Default;Sub-Saharan Africa;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Ostrich;Default;East Asia and South-East Asia;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Ostrich;Default;North America;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Ostrich;Default;Latin America and the Caribbean;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Ostrich;Default;Western Europe;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Ostrich;Default;Eastern Europe;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Ostrich;Default;Russian Federation;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Ostrich;Default;Oceania;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Ostrich;Default;NENA/Middle East;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Ostrich;Default;South Asia;0;0;20;0;80;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;High-Productivity;Sub-Saharan Africa;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;High-Productivity;East Asia and South-East Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;High-Productivity;North America;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;High-Productivity;Latin America and the Caribbean;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;High-Productivity;Western Europe;0;0;28;0;72;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;High-Productivity;Eastern Europe;0;0;9;0;91;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;High-Productivity;Russian Federation;0;0;82;0;18;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;High-Productivity;Oceania;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;High-Productivity;NENA/Middle East;0;0;0;50;50;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;High-Productivity;South Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;Low-Productivity;Sub-Saharan Africa;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;Low-Productivity;East Asia and South-East Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;Low-Productivity;North America;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;Low-Productivity;Latin America and the Caribbean;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;Low-Productivity;Western Europe;0;0;28;0;72;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;Low-Productivity;Eastern Europe;0;0;9;0;91;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;Low-Productivity;Russian Federation;0;0;82;0;18;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;Low-Productivity;Oceania;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;Low-Productivity;NENA/Middle East;0;0;0;50;50;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;Low-Productivity;South Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;Default;Sub-Saharan Africa;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;Default;East Asia and South-East Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;Default;North America;0;0;50;0;50;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;Default;Latin America and the Caribbean;0;0;17;3;80;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;Default;Western Europe;0;0;28;0;72;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;Default;Eastern Europe;0;0;9;0;91;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;Default;Russian Federation;0;0;82;0;18;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;Default;Oceania;0;0;0;0;100;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;Default;NENA/Middle East;0;0;0;50;50;0;0;0;0;0;0;0;0;0
+Llamas And Alpacas;Default;South Asia;0;0;50;0;50;0;0;0;0;0;0;0;0;0
