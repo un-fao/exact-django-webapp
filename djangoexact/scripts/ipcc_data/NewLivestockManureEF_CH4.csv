@@ -1,4 +1,4 @@
-climate;moisture;emission_type;livestock_category_type;livestock_production_type;Lagoon;Liquid/slurry;Solid storage;Dry lot;Pasture/Range/Paddock;Daily spread;Digester;Burned for fuel;Pit<1Month;Pit>1 month;Poultry manure;Deep bedding;Composting;Aerobic treatment
+climate;moisture;emission_type;livestock_category_type;livestock_production_type;Lagoon;Liquid/slurry;Solid storage;Dry lot;Pasture/Range/Paddock;Daily spread;Digester;Burned for fuel;Pit<1Month;Pit>1Month;Poultry manure;Deep bedding;Composting;Aerobic treatment
 Cool Temperate;Moist;CH4;Dairy Cattle;High-Productivity;96,5;33,8;3,2;1,6;0,6;0,2;3,2;16,1;0;33,8;0;0;0;0
 Cool Temperate;Dry;CH4;Dairy Cattle;High-Productivity;107,07;41,8;3,2;1,6;0,6;0,2;3,2;16,1;0;41,8;0;0;0;0
 Boreal;Moist;CH4;Dairy Cattle;High-Productivity;80,4;22,5;3,2;1,6;0,6;0,2;3,2;16,1;0;22,5;0;0;0;0
