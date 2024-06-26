@@ -74,6 +74,7 @@ from .models import (
     StatusType,
     UserProjectGroup,
     Waterbody,
+    LandModule,
 )
 
 
@@ -403,6 +404,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
     duration = serializers.IntegerField(required=True)
     start_year = serializers.IntegerField(required=False)
     land_use_change = LandUseChangeBuilderSerializer(many=False, required=False, allow_null=True)
+    organic_soil = serializers.BooleanField(required=False)
     module_types = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
     area = serializers.FloatField(required=False)
     module_types = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
@@ -422,13 +424,18 @@ class ActivityBuilderSerializer(serializers.Serializer):
         if land_use_change and not area or (any(module.is_luc for module in module_types) and not area):
             raise serializers.ValidationError("Area must be provided")
 
+        # NOTE: This is artificial and should be removed if multiple independent land use modules are allowed
+        if len(list(filter(lambda module: module.is_luc, module_types))) > 1:
+            raise serializers.ValidationError("Only one independent Land Use Change module is allowed per activity")
+
         super().validate(data)
 
         return data
 
     @transaction.atomic
     def save(self, **kwargs):
-        
+        has_organic_soil = self.validated_data.get("organic_soil", False)
+
         if Activity.objects.filter(name=self.validated_data["name"], project=self.validated_data["project"]).exists():
             base_name = self.validated_data["name"]
             project = self.validated_data["project"]
@@ -441,7 +448,6 @@ class ActivityBuilderSerializer(serializers.Serializer):
             # Update the name in the validated data
             self.validated_data["name"] = f"{base_name} ({suffix})"
             # raise serializers.ValidationError("An activity with this name already exists for this project")
-        
 
         activities_cost = list(self.validated_data["project"].activities.all().values_list("cost", flat=True))
         activities_cost.append(self.validated_data.get("cost", 0))
@@ -464,7 +470,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
         luc = None
 
         if self.validated_data.get("land_use_change", None):
-            luc = LandUseChange.objects.create(
+            luc: LandUseChange = LandUseChange.objects.create(
                 **self.validated_data["land_use_change"],
                 activity=activity,
                 area=self.validated_data["area"],
@@ -474,6 +480,12 @@ class ActivityBuilderSerializer(serializers.Serializer):
             activity.module_types.add(luc.module_type_wo.id)
             activity.module_types.add(ModuleType.objects.get(name="Land Use Change").id)
             luc.status = StatusType.objects.get(name="READY")
+
+            if has_organic_soil:
+                organic_soil = OrganicSoil.objects.create(activity=activity, area=self.validated_data.get("area"))
+                activity.module_types.add(ModuleType.objects.get(name="Organic Soil").id)
+                luc.organic_soil = organic_soil
+
             luc.save()
 
         for module_type in activity.module_types.all():
@@ -486,19 +498,21 @@ class ActivityBuilderSerializer(serializers.Serializer):
             module_instance = None
 
             if module_type.is_luc:
-                module_instance = ModuleClass.objects.create(
-                    activity=activity,
-                    land_use_change=luc,
-                    area=self.validated_data.get("area"),
-                )
+                module_instance: LandModule = ModuleClass.objects.create(activity=activity, land_use_change=luc, area=self.validated_data.get("area"))
+                if has_organic_soil:
+                    # NOTE: This works because in the current implementation, only one independent land use module is allowed
+                    # per activity. This will need to be changed if multiple independent land use modules are allowed.
+                    organic_soil = OrganicSoil.objects.create(activity=activity, area=self.validated_data.get("area"))
+                    activity.module_types.add(ModuleType.objects.get(name="Organic Soil").id)
+                    module_instance.organic_soil = organic_soil
             else:
-                # NOTE: This is necessary due to a miss-allignment between what 
-                # constitutes a land module and what doesn't between front and back-end. 
-                # Coastal cannot as of now be present as a land use module for the 
-                # front-end as it should not be included as Land Use Change. 
+                # NOTE: This is necessary due to a miss-allignment between what
+                # constitutes a land module and what doesn't between front and back-end.
+                # Coastal cannot as of now be present as a land use module for the
+                # front-end as it should not be included as Land Use Change.
                 # This is due to the fact that a methodology for SOC calculcation
-                # is not present in the mathematical model yet. This is a temporary 
-                # solution until the methodology is implemented, after that Coastal Wetland 
+                # is not present in the mathematical model yet. This is a temporary
+                # solution until the methodology is implemented, after that Coastal Wetland
                 # will have .is_luc = True and all will be solved
                 if module_type.name == "Coastal Wetland":
                     module_instance = ModuleClass.objects.create(activity=activity, area=self.validated_data.get("area"))
@@ -893,7 +907,6 @@ class AnnualCroppingWriteSerializer(LandModuleWriteSerializer):
                 "tillage_management_type_start",
                 "organic_input_type_start",
                 "residue_management_type_start",
-                
             ],
             "land_use_type_w": [
                 "tillage_management_type_w",
@@ -1339,7 +1352,6 @@ class EnergyWriteSerializer(ModuleBaseSerializer):
         mandatory_fields = {}
 
 
-
 class EnergyReadSerializer(ModuleBaseSerializer):
     class Meta:
         model = Energy
@@ -1426,39 +1438,28 @@ class LivestockWriteSerializer(LandModuleWriteSerializer):
             "livestock_category_type": [
                 {
                     "livestock_production_type_start": [
-                        #"production_start",
+                        # "production_start",
                         "heads_number_start",
-                        {
-                            "complementary_manure_management_type_start": [
-                                "percentage_heads_on_pasture_start"
-                            ]
-                        }
+                        {"complementary_manure_management_type_start": ["percentage_heads_on_pasture_start"]},
                     ]
                 },
                 {
                     "livestock_production_type_w": [
-                        #"production_w",
+                        # "production_w",
                         "heads_number_w",
-                        {
-                            "complementary_manure_management_type_w": [
-                                "percentage_heads_on_pasture_w"
-                            ]
-                        }
+                        {"complementary_manure_management_type_w": ["percentage_heads_on_pasture_w"]},
                     ]
                 },
                 {
                     "livestock_production_type_wo": [
-                        #"production_wo",
+                        # "production_wo",
                         "heads_number_wo",
-                        {
-                            "complementary_manure_management_type_wo": [
-                                "percentage_heads_on_pasture_wo"
-                            ]
-                        }
+                        {"complementary_manure_management_type_wo": ["percentage_heads_on_pasture_wo"]},
                     ]
-                }
+                },
             ]
         }
+
 
 class LivestockReadSerializer(LandModuleReadSerializer):
     class Meta:
@@ -1469,39 +1470,28 @@ class LivestockReadSerializer(LandModuleReadSerializer):
             "livestock_category_type": [
                 {
                     "livestock_production_type_start": [
-                        #"production_start",
+                        # "production_start",
                         "heads_number_start",
-                        {
-                            "complementary_manure_management_type_start": [
-                                "percentage_heads_on_pasture_start"
-                            ]
-                        }
+                        {"complementary_manure_management_type_start": ["percentage_heads_on_pasture_start"]},
                     ]
                 },
                 {
                     "livestock_production_type_w": [
-                        #"production_w",
+                        # "production_w",
                         "heads_number_w",
-                        {
-                            "complementary_manure_management_type_w": [
-                                "percentage_heads_on_pasture_w"
-                            ]
-                        }
+                        {"complementary_manure_management_type_w": ["percentage_heads_on_pasture_w"]},
                     ]
                 },
                 {
                     "livestock_production_type_wo": [
-                        #"production_wo",
+                        # "production_wo",
                         "heads_number_wo",
-                        {
-                            "complementary_manure_management_type_wo": [
-                                "percentage_heads_on_pasture_wo"
-                            ]
-                        }
+                        {"complementary_manure_management_type_wo": ["percentage_heads_on_pasture_wo"]},
                     ]
-                }
+                },
             ]
         }
+
 
 # Aquaculture
 
@@ -1697,12 +1687,7 @@ class ForestManagementWriteSerializer(LandModuleWriteSerializer):
                         "rotation_percentage_biomass_for_energy_w",
                     ]
                 },
-                {
-                    "rotation_length_yrs_wo": [
-                        "rotation_length_yrs_wo",
-                        "rotation_percentage_biomass_for_energy_wo"
-                    ]
-                },
+                {"rotation_length_yrs_wo": ["rotation_length_yrs_wo", "rotation_percentage_biomass_for_energy_wo"]},
                 {
                     "logging_recurrence_yrs_start": [
                         "logging_recurrence_yrs_start",
@@ -1717,13 +1702,7 @@ class ForestManagementWriteSerializer(LandModuleWriteSerializer):
                         "logging_percentage_biomass_for_energy_w",
                     ]
                 },
-                {
-                    "logging_recurrence_yrs_wo": [
-                        "logging_recurrence_yrs_wo",
-                        "logging_percentage_agb_logged_wo",
-                        "logging_percentage_biomass_for_energy_wo"
-                    ]
-                }
+                {"logging_recurrence_yrs_wo": ["logging_recurrence_yrs_wo", "logging_percentage_agb_logged_wo", "logging_percentage_biomass_for_energy_wo"]},
             ]
         }
 
