@@ -30,8 +30,9 @@ class CustomUserManager(BaseUserManager):
         if not email:
             raise ValueError("The Email field must be set")
         email = self.normalize_email(email)
-        username = email  # Automatically set username as email
-        user = self.model(email=email, username=username, **extra_fields)
+        # username = email  # Automatically set username as email
+        # user = self.model(email=email, username=username, **extra_fields)
+        user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -51,6 +52,7 @@ class CustomUserManager(BaseUserManager):
 class CustomUser(AbstractUser):
     country = models.ForeignKey("api.Country", on_delete=models.CASCADE, null=True, blank=True, related_name="users")
     email = models.EmailField(unique=True)
+    username = None
     firebase_uid = models.CharField(max_length=255, unique=True, validators=[alphanumeric], null=True, blank=True, verbose_name="Firebase UID")
 
     USERNAME_FIELD = "email"
@@ -763,6 +765,7 @@ class OtherLandUse(Module):
 
 class LandModule(Module):
     land_use_change = models.OneToOneField("api.LandUseChange", on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s")
+    organic_soil = models.OneToOneField("api.OrganicSoil", on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s")
 
     area = models.FloatField(null=True, blank=True)
 
@@ -1948,6 +1951,8 @@ class LandUseChange(Module):
     dry_matter_w = models.FloatField(null=True, blank=True)
     dry_matter_wo = models.FloatField(null=True, blank=True)
     dry_matter_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="land_use_change_dry_matter_thread")
+
+    organic_soil = models.OneToOneField(OrganicSoil, on_delete=models.CASCADE, null=True, blank=True)
 
     def is_filled(self):
         return self.area is not None and self.module_type_start is not None and self.module_type_w is not None and self.module_type_wo is not None
