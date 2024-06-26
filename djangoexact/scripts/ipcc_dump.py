@@ -3854,7 +3854,6 @@ for i, row in enumerate(rows):
             salinity=salinity,
             value=value,
         )
-"""
 
 LivestockTAM.objects.all().delete()
 
@@ -3959,8 +3958,11 @@ for i, row in enumerate(df_dict):
             ipcc_region=region,
             value=parse_csv_number(row[df_headers[j]]),
         )
+"""
 
+print("Deleting all LivestockManureEF...")
 LivestockManureEF.objects.all().delete()
+print("Deleted all LivestockManureEF.")
 
 df2 = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "NewLivestockManureEF_CH4.csv"),
@@ -4092,8 +4094,6 @@ for i, row in enumerate(df_dict2):
             value=parse_csv_number(row[df_headers2[j]]),
         )
 
-LivestockManureEF.objects.filter(emission_type__name="N2O Leaching").all().delete()
-
 df2 = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "NewNewLivestockManureEF_Leaching.csv"),
     header=0,
@@ -4137,7 +4137,9 @@ for i, row in enumerate(df_dict2):
             value=parse_csv_number(row[df_headers2[j]]),
         )
 
+print("Deleting all MethaneEntericFermentationFactor...")
 MethaneEntericFermentationFactor.objects.all().delete()
+print("Deleted all MethaneEntericFermentationFactor.")
 
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "NewLivestockMethaneEntericFermentationFactor.csv"),
@@ -4171,7 +4173,9 @@ for i, row in enumerate(df_dict):
             value=parse_csv_number(row[df_headers[j]]),
         )
 
+print("Deleting all MethaneManureManagementFactor...")
 LivestockAWMS.objects.all().delete()
+print("Deleted all MethaneManureManagementFactor.")
 
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "NewLivestockAWMS.csv"),
