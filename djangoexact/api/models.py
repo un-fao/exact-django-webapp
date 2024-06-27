@@ -128,7 +128,7 @@ class Comment(models.Model):
     # We can add other fields like 'is_active', 'likes', etc.
 
     def __str__(self):
-        return f"({self.pk}) {self.author.username}: {self.content[:40]}..."
+        return f"({self.pk}) {self.author.email}: {self.content[:40]}..."
 
 
 class IPCCRegion(models.Model):
@@ -592,7 +592,7 @@ class UserProjectGroup(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"({self.pk}) {self.project.name} - {self.user.username} - {self.group.name}"
+        return f"({self.pk}) {self.project.name} - {self.user.email} - {self.group.name}"
 
 
 ##############################
@@ -765,7 +765,7 @@ class OtherLandUse(Module):
 
 class LandModule(Module):
     land_use_change = models.OneToOneField("api.LandUseChange", on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s")
-    organic_soil = models.OneToOneField("api.OrganicSoil", on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s")
+    organic_soil = models.OneToOneField("api.OrganicSoil", on_delete=models.CASCADE, null=True, blank=True, related_name="organic_soil_%(class)s")
 
     area = models.FloatField(null=True, blank=True)
 
@@ -1850,6 +1850,14 @@ class OrganicSoil(LandModuleFixed):
     peat_density_t2_start = models.FloatField(null=True, blank=True)
     peat_density_t2_w = models.FloatField(null=True, blank=True)
     peat_density_t2_wo = models.FloatField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.land_use_type_start:
+            self.land_use_type_start = LandUseType.objects.get(name="Organic Soil")
+            self.land_use_type_w = self.land_use_type_start
+            self.land_use_type_wo = self.land_use_type_start
+
+        return super().save(*args, **kwargs)
 
 
 class Settlement(LandModuleFixed):
