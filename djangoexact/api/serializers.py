@@ -482,6 +482,9 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
             if has_organic_soil:
                 organic_soil = OrganicSoil.objects.create(activity=activity, area=self.validated_data.get("area"))
+                organic_soil.land_use_change = luc
+                organic_soil.save()
+
                 activity.module_types.add(ModuleType.objects.get(name="Organic Soil").id)
                 luc.organic_soil = organic_soil
 
