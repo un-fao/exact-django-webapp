@@ -7,7 +7,7 @@ from django.db import models as models
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
 
-from . import utilities
+from api import utilities as utils
 
 alphanumeric = validators.RegexValidator(r"^[0-9a-zA-Z]*$", "Only alphanumeric characters are allowed.")
 letters_only = validators.RegexValidator(r"^[a-zA-Z]*$", "Only letters are allowed.")
@@ -604,7 +604,7 @@ class Activity(Historical):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="activities")
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
-    status = models.ForeignKey(StatusType, on_delete=models.CASCADE, null=True, blank=True, default=utilities.get_activity_default_status)
+    status = models.ForeignKey(StatusType, on_delete=models.CASCADE, null=True, blank=True, default=utils.get_activity_default_status)
     completion_percentage = models.FloatField(null=True, blank=True, default=0)
     cost = models.FloatField(default=0)
 
@@ -682,7 +682,7 @@ class BiomassModule(Module):
         abstract = True
 
     @abstractmethod
-    def get_biomass_t2(self, scenario: utilities.ScenarioTypes):
+    def get_biomass_t2(self, scenario: utils.ScenarioTypes):
         try:
             return getattr(self, f"soc_t2_{scenario.value}")
         except TypeError:
@@ -697,7 +697,7 @@ class SingleBiomassModule(BiomassModule):
     class Meta:
         abstract = True
 
-    def get_biomass_t2(self, scenario: utilities.ScenarioTypes):
+    def get_biomass_t2(self, scenario: utils.ScenarioTypes):
         try:
             return super().get_biomass_t2(scenario) + getattr(self, f"biomass_t2_{scenario.value}")
         except TypeError:
@@ -716,7 +716,7 @@ class DoubleBiomassModule(BiomassModule):
     class Meta:
         abstract = True
 
-    def get_biomass_t2(self, scenario: utilities.ScenarioTypes):
+    def get_biomass_t2(self, scenario: utils.ScenarioTypes):
         try:
             return super().get_biomass_t2(scenario) + getattr(self, f"agb_t2_{scenario.value}") + getattr(self, f"bgb_t2_{scenario.value}")
         except TypeError:
@@ -735,7 +735,7 @@ class MultiBiomassModule(DoubleBiomassModule):
     class Meta:
         abstract = True
 
-    def get_biomass_t2(self, scenario: utilities.ScenarioTypes):
+    def get_biomass_t2(self, scenario: utils.ScenarioTypes):
         try:
             return super().get_biomass_t2(scenario) + getattr(self, f"litter_t2_{scenario.value}") + getattr(self, f"deadwood_t2_{scenario.value}")
         except TypeError:
@@ -1808,7 +1808,7 @@ class OrganicSoil(LandModuleFixed):
 
     ##### Peat Extraction #####
 
-    peat_type = models.ForeignKey(PeatType, on_delete=models.CASCADE, null=True, blank=True, default=utilities.get_default_peat_type, related_name="%(class)s_peat_type")
+    peat_type = models.ForeignKey(PeatType, on_delete=models.CASCADE, null=True, blank=True, default=utils.get_default_peat_type, related_name="%(class)s_peat_type")
     peat_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_type_thread", on_delete=models.SET_NULL)
 
     peat_area_start = models.FloatField(null=True, blank=True)
