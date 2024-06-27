@@ -330,3 +330,26 @@ def get_activity_default_status():
 
 def get_default_peat_type():
     return api_models.PeatType.objects.get_or_create(name="Nutrient Poor")[0]
+
+
+def find_organic_soil_parent_module(organic_soil) -> tuple:
+    """
+    Find the parent module of the Organic Soil module.
+    """
+
+    # NOTE: This is always true as long as Organic Soil is a OneToOneField of LandModule
+    parent_module: api_models.LandModule = next(attr for attr in dir(organic_soil) if attr.startswith("organic_soil_") and attr not in ["organicsoil"])
+
+    if not parent_module:
+        raise ValueError(f"Could not find parent module for Organic Soil")
+
+    parent_module_name = parent_module.split("_")[-1]
+    parent_module_type: api_models.ModuleType = api_models.ModuleType.objects.filter(class_name__iexact=parent_module_name).first()
+
+    if not parent_module_type:
+        raise ValueError(f"Could not find module type for {parent_module_name}")
+
+    ParentModule = apps.get_model(app_label="api", model_name=parent_module_type.class_name)
+    parent_module = ParentModule.objects.get(organic_soil=organic_soil)
+
+    return parent_module, parent_module_type
