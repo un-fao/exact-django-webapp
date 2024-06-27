@@ -8,8 +8,10 @@ import traceback
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from types import SimpleNamespace
+from django.apps import apps
 
 from django.db.models import Q
+import django.db.models as models
 from ipcc import models as ipcc
 from math_model.no_time_dependency_final.annuals import AnnualCropland
 from math_model.no_time_dependency_final.coastal_wetlands import (
@@ -117,6 +119,7 @@ from .models import (
     SoilType,
     StatusType,
     Waterbody,
+    ModuleType,
 )
 
 
@@ -5227,15 +5230,38 @@ class OrganicSoilCalculator(BaseCalculator):
         project: Project = input.activity.project
         luc: LandUseChange = input.land_use_change
 
-        if not luc:
-            raise ValueError("Organic Soil is missing a land use from a parent module")
+        area_affected_by_module = 0
+        module_type_start = None
+        module_type_w = None
+        module_type_wo = None
 
-        relative_class = luc.module_type_start.name
-
-        if luc.module_type_start.name == "ForestManagement":
-            area_affected_by_module = 0
-        else:
+        if luc:
+            print("Land Use Change: ", luc)
+            module_type_start = luc.module_type_start.name
+            module_type_w = luc.module_type_w.name
+            module_type_wo = luc.module_type_wo.name
             area_affected_by_module = luc.area
+        else:
+            print("No Land Use Change")
+            # Find organic soil parent module
+            # NOTE: This is always true as long as Organic Soil is a OneToOneField of LandModule
+            parent_module: LandModule = next(attr for attr in dir(input) if attr.startswith("organic_soil_"))
+            if not parent_module:
+                raise ValueError(f"Could not find parent module for Organic Soil")
+
+            parent_module_name = parent_module.split("_")[-1]
+            parent_module_type: ModuleType = ModuleType.objects.filter(class_name__iexact=parent_module_name).first()
+
+            if not parent_module_type:
+                raise ValueError(f"Could not find module type for {parent_module_name}")
+
+            module_type_start = module_type_w = module_type_wo = parent_module_type.name
+
+            ParentModule = apps.get_model(app_label="api", model_name=parent_module_type.class_name)
+            parent_module = ParentModule.objects.get(organic_soil=input)
+
+            print("Parent module name: ", module_type_start)
+            area_affected_by_module = 0 if module_type_start.class_name == "ForestManagement" else parent_module.area
 
         cm = {
             "climate": project.climate,
@@ -5245,34 +5271,34 @@ class OrganicSoilCalculator(BaseCalculator):
         ##### Organic Soil Inputs #####
 
         try:
-            ef_onsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cm, module_type_name=luc.module_type_start.name, peat_type=input.peat_type, site_location_type_name="On-Site")
+            ef_onsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_start, peat_type=input.peat_type, site_location_type__name="On-Site")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find EF On-Site Start for {luc.module_type_start.name}, {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+            raise ValueError(f"Could not find EF On-Site Start for {module_type_start}, {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
 
         try:
-            ef_onsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cm, module_type_name=luc.module_type_w.name, peat_type=input.peat_type, site_location_type_name="On-Site")
+            ef_onsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_w, peat_type=input.peat_type, site_location_type__name="On-Site")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find EF On-Site W for {luc.module_type_w.name}, {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+            raise ValueError(f"Could not find EF On-Site W for {module_type_w}, {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
 
         try:
-            ef_onsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cm, module_type_name=luc.module_type_wo.name, peat_type=input.peat_type, site_location_type_name="On-Site")
+            ef_onsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_wo, peat_type=input.peat_type, site_location_type__name="On-Site")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find EF On-Site WO for {luc.module_type_wo.name}, {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+            raise ValueError(f"Could not find EF On-Site WO for {module_type_wo}, {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
 
         try:
-            ef_offsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cm, module_type_name=luc.module_type_start.name, peat_type=input.peat_type, site_location_type_name="Off-Site")
+            ef_offsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_start, peat_type=input.peat_type, site_location_type__name="Off-Site")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find EF Off-Site Start for {luc.module_type_start.name}, {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+            raise ValueError(f"Could not find EF Off-Site Start for {module_type_start}, {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
 
         try:
-            ef_offsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cm, module_type_name=luc.module_type_w.name, peat_type=input.peat_type, site_location_type_name="Off-Site")
+            ef_offsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_w, peat_type=input.peat_type, site_location_type__name="Off-Site")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find EF Off-Site W for {luc.module_type_w.name}, {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+            raise ValueError(f"Could not find EF Off-Site W for {module_type_w}, {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
 
         try:
-            ef_offsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get_or_other_luc(**cm, module_type_name=luc.module_type_wo.name, peat_type=input.peat_type, site_location_type_name="Off-Site")
+            ef_offsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_wo, peat_type=input.peat_type, site_location_type__name="Off-Site")
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find EF Off-Site WO for {luc.module_type_wo.name}, {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+            raise ValueError(f"Could not find EF Off-Site WO for {module_type_wo}, {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
 
         try:
             dry_matter_w = ipcc.OrganicSoilFuelConsumption.objects.get(**cm, fire_type=input.fire_type_w)
@@ -5290,19 +5316,19 @@ class OrganicSoilCalculator(BaseCalculator):
             raise ValueError(f"Could not find Fire Reference for {project.climate.name}, {project.moisture.name}")
 
         try:
-            rewetting_start = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=input.peat_type, module_type__name=relative_class)
+            rewetting_start = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=input.peat_type, module_type__name=module_type_start)
         except ipcc.OrganicSoilRewettingEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find Rewetting Start for {input.peat_type.name}, {relative_class}, {project.climate.name}, {project.moisture.name}")
+            raise ValueError(f"Could not find Rewetting Start for {input.peat_type.name}, {module_type_start}, {project.climate.name}, {project.moisture.name}")
 
         try:
-            rewetting_w = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=input.peat_type, module_type__name=relative_class)
+            rewetting_w = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=input.peat_type, module_type__name=module_type_w)
         except ipcc.OrganicSoilRewettingEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find Rewetting W for {input.peat_type.name}, {relative_class}, {project.climate.name}, {project.moisture.name}")
+            raise ValueError(f"Could not find Rewetting W for {input.peat_type.name}, {module_type_w}, {project.climate.name}, {project.moisture.name}")
 
         try:
-            rewetting_wo = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=input.peat_type, module_type__name=relative_class)
+            rewetting_wo = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=input.peat_type, module_type__name=module_type_wo)
         except ipcc.OrganicSoilRewettingEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find Rewetting WO for {input.peat_type.name}, {relative_class}, {project.climate.name}, {project.moisture.name}")
+            raise ValueError(f"Could not find Rewetting WO for {input.peat_type.name}, {module_type_wo}, {project.climate.name}, {project.moisture.name}")
 
         ##### Peat Extraction Inputs #####
 

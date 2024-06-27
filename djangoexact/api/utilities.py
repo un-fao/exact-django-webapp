@@ -295,7 +295,7 @@ def get_or_raise(model, filter_criteria, error_message, method="get"):
         return attr(**filter_criteria)
     except model.DoesNotExist:
         raise Exception(error_message)
-    
+
 
 def update_activity_status(activity):
     """
@@ -307,7 +307,7 @@ def update_activity_status(activity):
     statuses = [module.status for module in find_modules(activity)]
 
     ready_count = statuses.count(api_models.StatusType.objects.get(name="READY"))
-    percentage_complete = (ready_count / len(statuses))
+    percentage_complete = ready_count / len(statuses)
 
     if percentage_complete == 1:
         activity.status = api_models.StatusType.objects.get(name="READY")
@@ -321,10 +321,12 @@ def update_activity_status(activity):
 
     return activity.status
 
-# NOTE: This could be done with signals, but I saw there are no signals as of now 
+
+# NOTE: This could be done with signals, but I saw there are no signals as of now
 # so I kept this approach for consistency. Can be changed later if needed.
 def get_activity_default_status():
-    return api_models.StatusType.objects.get_or_create(name='EMPTY')[0]
+    return api_models.StatusType.objects.get_or_create(name="EMPTY")[0]
+
 
 def get_default_peat_type():
-    return api_models.PeatType.objects.get_or_create(name='Nutrient Poor')[0]
+    return api_models.PeatType.objects.get_or_create(name="Nutrient Poor")[0]

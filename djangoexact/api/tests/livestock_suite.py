@@ -22,7 +22,7 @@ from api.models import CustomUser as User
 from api.tests.factories import ActivityFactory, LivestockFactory, ProjectFactory
 from ipcc.models import GlobalWarmingPotential, SoilOrganicCarbon
 
-BATCH_SIZE = 1
+BATCH_SIZE = 10
 
 climates = Climate.objects.all()
 countries = Country.objects.all()
@@ -56,7 +56,7 @@ print(f"Moisture: {moisture}")
 print(f"Soil Type: {soil_type}")
 print(f"GW Potential: {gw_potential}")
 
-u = User.objects.get(username="admin")
+u = User.objects.get(email="admin@admin.com")
 group: Group = Group.objects.get(name="Admin")
 
 p: Project = ProjectFactory.create(
