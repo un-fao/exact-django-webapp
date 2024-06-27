@@ -409,23 +409,25 @@ class ActivityBuilderSerializer(serializers.Serializer):
     module_types = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
 
     def validate(self, data):
-        luc_module = ModuleType.objects.filter(name="Land Use Change").first()
+        luc_module = ModuleType.objects.get(name="Land Use Change")
         module_types = data.get("module_types", [])
         land_use_change = data.get("land_use_change", None)
         area = data.get("area", None)
 
-        if luc_module and luc_module in module_types:
+        if luc_module in module_types:
             raise serializers.ValidationError("Land Use Change module cannot be added manually")
 
         if land_use_change and any(module.is_luc for module in module_types):
             raise serializers.ValidationError("Land Modules cannot be independently added to activities with a Land Use Change")
 
-        if land_use_change and not area or (any(module.is_luc for module in module_types) and not area):
+        if (land_use_change or any(module.is_luc for module in module_types)) and not area:
             raise serializers.ValidationError("Area must be provided")
 
-        # NOTE: This is artificial and should be removed if multiple independent land use modules are allowed
-        if len(list(filter(lambda module: module.is_luc, module_types))) > 1:
+        if sum(module.is_luc for module in module_types) > 1:
             raise serializers.ValidationError("Only one independent Land Use module is allowed per activity")
+
+        if land_use_change and any(not module.is_luc for module in land_use_change.values()):
+            raise serializers.ValidationError("Only land-based modules are allowed in the Land Use Change")
 
         super().validate(data)
 
@@ -1057,11 +1059,40 @@ class OrganicSoilWriteSerializer(LandModuleWriteSerializer):
 
 
 class OrganicSoilReadSerializer(LandModuleReadSerializer):
+
+    parent_land_use_type_start = get_model_serializer(ModuleType)(many=False, read_only=True)
+    parent_land_use_type_w = get_model_serializer(ModuleType)(many=False, read_only=True)
+    parent_land_use_type_wo = get_model_serializer(ModuleType)(many=False, read_only=True)
+
     class Meta:
         model = OrganicSoil
         fields = "__all__"
         ref_name = "OrganicSoil"
         mandatory_fields = {}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.instance:
+            return
+
+        self.instance: OrganicSoil
+
+        if self.instance.land_use_change:
+            self.parent_module_type_start = self.instance.land_use_change.module_type_start
+            self.parent_module_type_w = self.instance.land_use_change.module_type_w
+            self.parent_module_type_wo = self.instance.land_use_change.module_type_wo
+        else:
+            _, parent_module_type = utils.find_organic_soil_parent_module(self.instance)
+            self.parent_module_type_start = parent_module_type
+            self.parent_module_type_w = parent_module_type
+            self.parent_module_type_wo = parent_module_type
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation["parent_land_use_type_start"] = get_model_serializer(ModuleType)(self.parent_module_type_start).data
+        representation["parent_land_use_type_w"] = get_model_serializer(ModuleType)(self.parent_module_type_w).data
+        representation["parent_land_use_type_wo"] = get_model_serializer(ModuleType)(self.parent_module_type_wo).data
+        return representation
 
 
 # Flooded Rice

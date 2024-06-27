@@ -5243,22 +5243,9 @@ class OrganicSoilCalculator(BaseCalculator):
             area_affected_by_module = luc.area
         else:
             print("No Land Use Change")
-            # Find organic soil parent module
-            # NOTE: This is always true as long as Organic Soil is a OneToOneField of LandModule
-            parent_module: LandModule = next(attr for attr in dir(input) if attr.startswith("organic_soil_"))
-            if not parent_module:
-                raise ValueError(f"Could not find parent module for Organic Soil")
-
-            parent_module_name = parent_module.split("_")[-1]
-            parent_module_type: ModuleType = ModuleType.objects.filter(class_name__iexact=parent_module_name).first()
-
-            if not parent_module_type:
-                raise ValueError(f"Could not find module type for {parent_module_name}")
-
+            
+            parent_module, parent_module_type = utils.find_organic_soil_parent_module(input)
             module_type_start = module_type_w = module_type_wo = parent_module_type.name
-
-            ParentModule = apps.get_model(app_label="api", model_name=parent_module_type.class_name)
-            parent_module = ParentModule.objects.get(organic_soil=input)
 
             print("Parent module name: ", module_type_start)
             area_affected_by_module = 0 if module_type_start.class_name == "ForestManagement" else parent_module.area
