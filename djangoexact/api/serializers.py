@@ -404,7 +404,6 @@ class ActivityBuilderSerializer(serializers.Serializer):
     duration = serializers.IntegerField(required=True)
     start_year = serializers.IntegerField(required=False)
     land_use_change = LandUseChangeBuilderSerializer(many=False, required=False, allow_null=True)
-    organic_soil = serializers.BooleanField(required=False)
     module_types = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
     area = serializers.FloatField(required=False)
     module_types = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
@@ -426,7 +425,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
         # NOTE: This is artificial and should be removed if multiple independent land use modules are allowed
         if len(list(filter(lambda module: module.is_luc, module_types))) > 1:
-            raise serializers.ValidationError("Only one independent Land Use Change module is allowed per activity")
+            raise serializers.ValidationError("Only one independent Land Use module is allowed per activity")
 
         super().validate(data)
 
@@ -434,7 +433,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
     @transaction.atomic
     def save(self, **kwargs):
-        has_organic_soil = self.validated_data.get("organic_soil", False)
+        has_organic_soil = "OrganicSoil" in [module.class_name for module in self.validated_data["module_types"]]
 
         if Activity.objects.filter(name=self.validated_data["name"], project=self.validated_data["project"]).exists():
             base_name = self.validated_data["name"]
@@ -489,7 +488,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
             luc.save()
 
         for module_type in activity.module_types.all():
-            if module_type.class_name == "LandUseChange":
+            if module_type.class_name in ["LandUseChange", "OrganicSoil"]:
                 continue
 
             log.debug(f"Creating module {module_type.class_name}")
@@ -500,6 +499,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
             if module_type.is_luc:
                 module_instance: LandModule = ModuleClass.objects.create(activity=activity, land_use_change=luc, area=self.validated_data.get("area"))
                 if has_organic_soil:
+                    log.debug(f"Creating Organic Soil module for {module_type.class_name}")
                     # NOTE: This works because in the current implementation, only one independent land use module is allowed
                     # per activity. This will need to be changed if multiple independent land use modules are allowed.
                     organic_soil = OrganicSoil.objects.create(activity=activity, area=self.validated_data.get("area"))
