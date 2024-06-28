@@ -5248,7 +5248,7 @@ class OrganicSoilCalculator(BaseCalculator):
             module_type_start = module_type_w = module_type_wo = parent_module_type.name
 
             print("Parent module name: ", module_type_start)
-            area_affected_by_module = 0 if module_type_start.class_name == "ForestManagement" else parent_module.area
+            area_affected_by_module = 0 if module_type_start == "ForestManagement" else parent_module.area
 
         cm = {
             "climate": project.climate,
@@ -5417,7 +5417,7 @@ class OrganicSoilCalculator(BaseCalculator):
             input.onsite_ch4_rewetting_t2_w,
             rewetting_w.n2o,
             input.onsite_n2o_rewetting_t2_w,
-            luc.area,
+            area_affected_by_module,
         ]
 
         organic_soil_math_w = MathOrganicSoil(*organic_soil_inputs_w)
@@ -5513,7 +5513,7 @@ class OrganicSoilCalculator(BaseCalculator):
             input.onsite_ch4_rewetting_t2_wo,
             rewetting_wo.n2o,
             input.onsite_n2o_rewetting_t2_wo,
-            luc.area,
+            area_affected_by_module,
         ]
 
         organic_soil_math_wo = MathOrganicSoil(*organic_soil_inputs_wo)
