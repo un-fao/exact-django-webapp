@@ -174,16 +174,22 @@ def copy_activity(activity, new_project=None):
     activity_copy.save()
 
     luc_copy = None
+    organic_soil_copy = None
 
     for module in find_modules(activity):
+        # if module.__class__.__name__ == "LandUseChange" or module.__class__.__name__ == "OrganicSoil":
+        #     continue
+
         module_copy = copy.deepcopy(module)
         module_copy.pk = None
         module_copy.activity = activity_copy
         module_copy._state.adding = True
         module_copy.land_use_change = None
+        module_copy.organic_soil = None
         module_copy.save()
 
         has_luc = getattr(module, "land_use_change", None)
+        has_organic_soil = getattr(module, "organic_soil", None)
 
         if has_luc:
             if not luc_copy:
@@ -194,6 +200,17 @@ def copy_activity(activity, new_project=None):
                 luc_copy.save()
 
             module_copy.land_use_change = luc_copy
+            module_copy.save()
+
+        if has_organic_soil:
+            if not organic_soil_copy:
+                organic_soil_copy = copy.deepcopy(module.organic_soil)
+                organic_soil_copy.pk = None
+                organic_soil_copy.activity = activity_copy
+                organic_soil_copy._state.adding = True
+                organic_soil_copy.save()
+            
+            module_copy.organic_soil = organic_soil_copy
             module_copy.save()
 
         submodules = None
