@@ -767,7 +767,7 @@ class LandModule(Module):
     land_use_change = models.OneToOneField("api.LandUseChange", on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s")
     organic_soil = models.OneToOneField("api.OrganicSoil", on_delete=models.CASCADE, null=True, blank=True, related_name="organic_soil_%(class)s")
 
-    area = models.FloatField(null=True, blank=True)
+    area = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
 
     land_use_type_start = models.ForeignKey(LandUseType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_start")
     land_use_type_w = models.ForeignKey(LandUseType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_w")
