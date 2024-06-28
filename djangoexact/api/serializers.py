@@ -405,7 +405,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
     start_year = serializers.IntegerField(required=False)
     land_use_change = LandUseChangeBuilderSerializer(many=False, required=False, allow_null=True)
     module_types = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
-    area = serializers.FloatField(required=False)
+    area = serializers.FloatField(required=False, min_value=0)
     module_types = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
 
     def validate(self, data):
