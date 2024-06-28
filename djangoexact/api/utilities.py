@@ -335,6 +335,15 @@ def get_default_peat_type():
 def find_organic_soil_parent_module(organic_soil) -> tuple:
     """
     Find the parent module of the Organic Soil module.
+
+    Args:
+        organic_soil: The Organic Soil module.
+
+    Returns:
+        A tuple containing the parent module [api.models.LandModule] and its module type [api.models.ModuleType]
+
+    Raises:
+        ValueError: If the parent module or module type cannot be found.
     """
 
     # NOTE: This is always true as long as Organic Soil is a OneToOneField of LandModule

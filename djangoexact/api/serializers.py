@@ -1060,9 +1060,9 @@ class OrganicSoilWriteSerializer(LandModuleWriteSerializer):
 
 class OrganicSoilReadSerializer(LandModuleReadSerializer):
 
-    parent_land_use_type_start = get_model_serializer(ModuleType)(many=False, read_only=True)
-    parent_land_use_type_w = get_model_serializer(ModuleType)(many=False, read_only=True)
-    parent_land_use_type_wo = get_model_serializer(ModuleType)(many=False, read_only=True)
+    parent_land_use_type_start = serializers.IntegerField(read_only=True)
+    parent_land_use_type_w = serializers.IntegerField(read_only=True)
+    parent_land_use_type_wo = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = OrganicSoil
@@ -1077,21 +1077,23 @@ class OrganicSoilReadSerializer(LandModuleReadSerializer):
 
         self.instance: OrganicSoil
 
-        if self.instance.land_use_change:
-            self.parent_module_type_start = self.instance.land_use_change.module_type_start
-            self.parent_module_type_w = self.instance.land_use_change.module_type_w
-            self.parent_module_type_wo = self.instance.land_use_change.module_type_wo
+        luc = self.instance.land_use_change
+
+        if luc:
+            self.parent_land_use_type_start = luc.module_type_start.id if luc.module_type_start else None
+            self.parent_land_use_type_w = luc.module_type_w.id if luc.module_type_w else None
+            self.parent_land_use_type_wo = luc.module_type_wo.id if luc.module_type_wo else None
         else:
             _, parent_module_type = utils.find_organic_soil_parent_module(self.instance)
-            self.parent_module_type_start = parent_module_type
-            self.parent_module_type_w = parent_module_type
-            self.parent_module_type_wo = parent_module_type
+            self.parent_land_use_type_start = parent_module_type.id if parent_module_type else None
+            self.parent_land_use_type_w = parent_module_type.id
+            self.parent_land_use_type_wo = parent_module_type.id
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation["parent_land_use_type_start"] = get_model_serializer(ModuleType)(self.parent_module_type_start).data
-        representation["parent_land_use_type_w"] = get_model_serializer(ModuleType)(self.parent_module_type_w).data
-        representation["parent_land_use_type_wo"] = get_model_serializer(ModuleType)(self.parent_module_type_wo).data
+        representation["parent_land_use_type_start"] = self.parent_land_use_type_start
+        representation["parent_land_use_type_w"] = self.parent_land_use_type_w
+        representation["parent_land_use_type_wo"] = self.parent_land_use_type_wo
         return representation
 
 
