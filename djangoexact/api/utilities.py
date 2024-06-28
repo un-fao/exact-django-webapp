@@ -347,7 +347,8 @@ def find_organic_soil_parent_module(organic_soil) -> tuple:
     """
 
     # NOTE: This is always true as long as Organic Soil is a OneToOneField of LandModule
-    parent_module: api_models.LandModule = next(attr for attr in dir(organic_soil) if attr.startswith("organic_soil_") and attr not in ["organicsoil"])
+    parent_module: api_models.LandModule = next(attr for attr in dir(organic_soil) if attr.startswith("organic_soil_") and 
+                                                (attr not in ["organicsoil"] and isinstance(getattr(organic_soil, attr, None), api_models.LandModule)))
 
     if not parent_module:
         raise ValueError(f"Could not find parent module for Organic Soil")
