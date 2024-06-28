@@ -177,8 +177,8 @@ def copy_activity(activity, new_project=None):
     organic_soil_copy = None
 
     for module in find_modules(activity):
-        # if module.__class__.__name__ == "LandUseChange" or module.__class__.__name__ == "OrganicSoil":
-        #     continue
+        if module.__class__.__name__ == "LandUseChange" or module.__class__.__name__ == "OrganicSoil":
+            continue
 
         module_copy = copy.deepcopy(module)
         module_copy.pk = None
