@@ -5287,15 +5287,20 @@ class OrganicSoilCalculator(BaseCalculator):
         except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
             raise ValueError(f"Could not find EF Off-Site WO for {module_type_wo}, {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
 
-        try:
-            dry_matter_w = ipcc.OrganicSoilFuelConsumption.objects.get(**cm, fire_type=input.fire_type_w)
-        except ipcc.OrganicSoilFuelConsumption.DoesNotExist:
-            raise ValueError(f"Could not find Dry Matter W for {input.fire_type_w.name}, {project.climate.name}, {project.moisture.name}")
+        fire_used_w = input.fire_type_w is not None
+        fire_used_wo = input.fire_type_wo is not None
 
-        try:
-            dry_matter_wo = ipcc.OrganicSoilFuelConsumption.objects.get(**cm, fire_type=input.fire_type_wo)
-        except ipcc.OrganicSoilFuelConsumption.DoesNotExist:
-            raise ValueError(f"Could not find Dry Matter WO for {input.fire_type_wo.name}, {project.climate.name}, {project.moisture.name}")
+        if fire_used_w:
+            try:
+                dry_matter_w = ipcc.OrganicSoilFuelConsumption.objects.get(**cm, fire_type=input.fire_type_w)
+            except ipcc.OrganicSoilFuelConsumption.DoesNotExist:
+                raise ValueError(f"Could not find Dry Matter W for {input.fire_type_w.name}, {project.climate.name}, {project.moisture.name}")
+
+        if fire_used_wo:
+            try:
+                dry_matter_wo = ipcc.OrganicSoilFuelConsumption.objects.get(**cm, fire_type=input.fire_type_wo)
+            except ipcc.OrganicSoilFuelConsumption.DoesNotExist:
+                raise ValueError(f"Could not find Dry Matter WO for {input.fire_type_wo.name}, {project.climate.name}, {project.moisture.name}")
 
         try:
             fire_ref = ipcc.OrganicSoilGefEmissionFactor.objects.get(**cm)
@@ -5363,7 +5368,7 @@ class OrganicSoilCalculator(BaseCalculator):
             input.fire_type_w is not None,
             input.soil_fire_periodicity_w,
             area_affected_by_module,
-            dry_matter_w.value,
+            dry_matter_w.value if fire_used_w else None,
             input.mean_dry_matter_t2_w,
             input.soil_fire_impact_percentage_w,
             fire_ref.co2,
@@ -5459,7 +5464,7 @@ class OrganicSoilCalculator(BaseCalculator):
             input.fire_type_wo is not None,
             input.soil_fire_periodicity_wo,
             area_affected_by_module,
-            dry_matter_wo.value,
+            dry_matter_wo.value if fire_used_wo else None,
             input.mean_dry_matter_t2_wo,
             input.soil_fire_impact_percentage_wo,
             fire_ref.co2,
