@@ -43,7 +43,7 @@ moisture = random.choice(climate.moistures.all())
 soil_type = random.choice(soil_types)
 gw_potential = GlobalWarmingPotential.objects.get(name="100 yr AR5 w/out CC feedback")
 
-u = User.objects.get(username="admin")
+u = User.objects.get(email="admin@admin.com")
 group: Group = Group.objects.get(name="Admin")
 
 p: Project = ProjectFactory.create(
