@@ -3958,7 +3958,6 @@ for i, row in enumerate(df_dict):
             ipcc_region=region,
             value=parse_csv_number(row[df_headers[j]]),
         )
-"""
 
 print("Deleting all LivestockManureEF...")
 LivestockManureEF.objects.all().delete()
@@ -4211,3 +4210,24 @@ for i, row in enumerate(df_dict):
             ipcc_region=ipcc_region,
             value=parse_csv_number(row[df_headers[j]]),
         )
+
+"""
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "LandUseNitrousEmissionFactor.csv"),
+    header=0,
+    sep=",",
+)
+
+df_headers = df.columns.values.tolist()
+df_dict = df.to_dict("records")
+
+for i, row in enumerate(df_dict):
+    moisture = Moisture.objects.get(name=sanitize(row["moisture"]))
+
+    print(moisture, row["value"])
+
+    LandUseNitrousEmissionFactor.objects.create(
+        moisture=moisture,
+        value=parse_csv_number(row["value"]),
+    )

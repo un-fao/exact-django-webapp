@@ -19,10 +19,10 @@ from .factories import *
 BATCH_SIZE = 1
 TEST_SM_FISHERY = False
 TEST_LG_FISHERY = False
-TEST_ANNUAL_CROPPING = False
-TEST_PERENNIAL_CROPPING = False
+TEST_ANNUAL_CROPPING = True
+TEST_PERENNIAL_CROPPING = True
 TEST_LIVESTOCK = False
-TEST_GRASSLAND = False
+TEST_GRASSLAND = True
 TEST_INPUTS = False
 TEST_COASTAL_WETLAND = False
 INPUTS_BATCH_SIZE = 3
@@ -49,7 +49,7 @@ f = APIRequestFactory()
 # wbook = xw.Book("EX-ACT_V9.4.1_open[1298].xlsb")
 
 # User Creation
-u = User.objects.get(username="admin@admin.com")
+u = User.objects.get(email="admin@admin.com")
 
 
 while True:
@@ -293,7 +293,7 @@ if TEST_ANNUAL_CROPPING:
     total_croplands = annual_croppings.__len__()
     passed_croplands = 0
 
-    a.module_types.add(ModuleType.objects.get(name="Annual Cropping"))
+    a.module_types.add(ModuleType.objects.get(class_name="AnnualCropping"))
     a.save()
 
     print("Testing AnnualCropping...")
@@ -392,7 +392,7 @@ if TEST_ANNUAL_CROPPING:
 
 if TEST_PERENNIAL_CROPPING:
     perennials = PerennialCroppingFactory.create_batch(BATCH_SIZE, activity=a)
-    a.module_types.add(ModuleType.objects.get(name="Perennial Cropping"))
+    a.module_types.add(ModuleType.objects.get(class_name="PerennialCropping"))
     a.save()
 
     total_perennials = perennials.__len__()
@@ -614,7 +614,7 @@ if TEST_COASTAL_WETLAND:
 
     # NOTE: QUESTO è AGGIORNATO
     coastals: list[CoastalWetland] = CoastalWetlandFactory.create_batch(BATCH_SIZE, activity=a)
-    a.module_types.add(ModuleType.objects.get(name="Coastal Wetland")) # ------------------> questo forse non c'è ovunque
+    a.module_types.add(ModuleType.objects.get(name="Coastal Wetland"))  # ------------------> questo forse non c'è ovunque
     a.save()
 
     total_coastals = coastals.__len__()

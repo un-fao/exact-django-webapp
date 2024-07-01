@@ -108,7 +108,7 @@ class AfforestationCombustionFactor(Model):
 
 class DefaultEmissionFactor(Model):
     """
-    IPCC:A96
+    IPCC:A97;A98;A101
     """
 
     # NOTE: organic_input_type is not used in the excel file, look into this.
@@ -120,6 +120,18 @@ class DefaultEmissionFactor(Model):
 
     def __str__(self):
         return f"Factor for {self.moisture.name}, {self.organic_input_type}, value: {self.value}"
+
+
+class LandUseNitrousEmissionFactor(Model):
+    """
+    IPCC:A99:A101
+    """
+
+    moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
+    value = FloatField()
+
+    def __str__(self):
+        return f"Factor for {self.moisture.name}, value: {self.value}"
 
 
 class LitterDeadwoodCarbonStock(Model):

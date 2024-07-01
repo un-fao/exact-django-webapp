@@ -16,7 +16,7 @@ from rest_framework.test import (
 
 client = APIClient()
 
-u = User.objects.get(username="admin")
+u = User.objects.get(email="admin@admin.com")
 
 client.force_authenticate(user=u)
 
@@ -53,12 +53,15 @@ post_activity = {
         "module_type_wo": module_type_wo.id,
     },
     "area": 150,
+    "cost": 1000,
 }
 
 activity_response = client.post("/api/activities/build/", post_activity, format="json")
 logging.debug(activity_response.data)
 
-luc = client.get(f'/api/land-use-changes/?activity_id={activity_response.data["id"]}')
+logging.debug(f"Activity ID: {activity_response.data['id']}")
+
+luc = client.get(f'/api/land-use-changes/?activity={activity_response.data["id"]}')
 logging.debug(luc)
 
 post_forest_management = {
@@ -75,7 +78,7 @@ post_annual_cropland = {
     "residue_management_type_w": ResidueManagementType.objects.get(name="Retained").id,
 }
 
-forest_management = client.get(f'/api/forest-managements/?activity_id={activity_response.data["id"]}')
+forest_management = client.get(f'/api/forest-managements/?activity={activity_response.data["id"]}')
 logging.debug(forest_management)
 forest_response = client.patch(f'/api/forest-managements/{forest_management.data[0]["id"]}/', post_forest_management, format="json")
 logging.debug(forest_response)
@@ -83,7 +86,7 @@ logging.debug(forest_response)
 forest_results_response = client.get(f'/api/forest-managements/{forest_response.data["id"]}/results/')
 logging.debug(forest_results_response)
 
-annualcropping = client.get(f'/api/annual-croppings/?activity_id={activity_response.data["id"]}')
+annualcropping = client.get(f'/api/annual-croppings/?activity={activity_response.data["id"]}')
 annualcropping_response = client.patch(f'/api/annual-croppings/{annualcropping.data[0]["id"]}/', post_annual_cropland, format="json")
 logging.debug(annualcropping_response)
 

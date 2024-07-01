@@ -1713,17 +1713,18 @@ class ForestManagementWriteSerializer(LandModuleWriteSerializer):
                     ]
                 },
                 {
-                    "rotation_length_yrs_w": [
-                        "rotation_length_yrs_w",
-                        "rotation_percentage_biomass_for_energy_w",
-                    ]
-                },
-                {"rotation_length_yrs_wo": ["rotation_length_yrs_wo", "rotation_percentage_biomass_for_energy_wo"]},
-                {
                     "logging_recurrence_yrs_start": [
                         "logging_recurrence_yrs_start",
                         "logging_percentage_agb_logged_start",
                         "logging_percentage_biomass_for_energy_start",
+                    ]
+                },
+            ],
+            "land_use_type_w": [
+                {
+                    "rotation_length_yrs_w": [
+                        "rotation_length_yrs_w",
+                        "rotation_percentage_biomass_for_energy_w",
                     ]
                 },
                 {
@@ -1733,8 +1734,22 @@ class ForestManagementWriteSerializer(LandModuleWriteSerializer):
                         "logging_percentage_biomass_for_energy_w",
                     ]
                 },
-                {"logging_recurrence_yrs_wo": ["logging_recurrence_yrs_wo", "logging_percentage_agb_logged_wo", "logging_percentage_biomass_for_energy_wo"]},
-            ]
+            ],
+            "land_use_type_wo": [
+                {
+                    "rotation_length_yrs_wo": [
+                        "rotation_length_yrs_wo",
+                        "rotation_percentage_biomass_for_energy_wo",
+                    ]
+                },
+                {
+                    "logging_recurrence_yrs_wo": [
+                        "logging_recurrence_yrs_wo",
+                        "logging_percentage_agb_logged_wo",
+                        "logging_percentage_biomass_for_energy_wo",
+                    ]
+                },
+            ],
         }
 
     def validate(self, data):
