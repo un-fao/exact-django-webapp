@@ -7,7 +7,8 @@ import numpy as np
 from general_functions import (
     BaseModule,
     breakdown_according_to_values,
-    soil_emissions,
+    soil_emissions_2,
+    som_emissions,
     yearly_constant_emissions_breakdown,
     yearly_time_dependent_20_year_breakdown,
     yearly_time_dependent_full_year,
@@ -65,14 +66,22 @@ class ForestManagement(BaseModule):
         deadwood_start,  # -----> added deadwood start, initial value, if forest is already there it is value of deadwood if afforestation it is 0
         deadwood_max,  # -----> added deadwood max, maximum value of deadwood, value of forest being present
         deadwood_20_years_tier_2,
-        socref_default,
-        soc_tier_2,
-        f_lu_tier_2,
-        f_i_tier_2,
-        f_mg_tier_2,
-        f_lu_ref,
-        f_i_ref,
-        f_mg_ref,
+        soc_start_default,
+        soc_end_default,
+        soc_start_tier_2,
+        soc_end_tier_2,
+        fmg_start_default,
+        fmg_end_default,
+        fmg_start_tier_2,
+        fmg_end_tier_2,
+        flu_start_default,
+        flu_end_default,
+        flu_start_tier_2,
+        flu_end_tier_2,
+        fi_start_default,
+        fi_end_default,
+        fi_start_tier_2,
+        fi_end_tier_2,
         ef_methane,
         ef_nitrous,
         forest_cf, 
@@ -81,6 +90,9 @@ class ForestManagement(BaseModule):
         forest_gef_co2,
         mangrove_factor, # set to 0.47 if not mangrove else 0.451
         degradation_percentage,
+        ef_nitrous_som,
+        nitrous_constant,
+        delay
     ):
         self.years_cap = years_cap if not rate == 'immediate' else years_cap + years_impl - 1
         self.years_impl = years_impl if not rate == 'immediate' else 1
@@ -122,14 +134,25 @@ class ForestManagement(BaseModule):
         self.deadwood_start = deadwood_start
         self.deadwood_max = deadwood_max
 
-        self.socref = socref_default if not soc_tier_2 else soc_tier_2
-        self.soc_tier_2 = soc_tier_2
-        self.f_lu_tier_2 = f_lu_tier_2
-        self.f_i_tier_2 = f_i_tier_2
-        self.f_mg_tier_2 = f_mg_tier_2
-        self.f_lu_ref = f_lu_ref
-        self.f_i_ref = f_i_ref
-        self.f_mg_ref = f_mg_ref
+        self.soc_start_default = soc_start_default
+        self.soc_end_default = soc_end_default
+        self.soc_start_tier_2 = soc_start_tier_2
+        self.soc_end_tier_2 = soc_end_tier_2
+        self.fmg_start_default = fmg_start_default  # defaulted to 1 in case there are None, if not float value
+        self.fmg_end_default = fmg_end_default  # defaulted to 1 in case there are None, if not float value
+        self.fmg_start_tier_2 = fmg_start_tier_2  # tier 2 value, expects float or None
+        self.fmg_end_tier_2 = fmg_end_tier_2  # tier 2 value, expects float or None
+        self.flu_start_default = flu_start_default  # defaulted to 1 in case there are None, if not float value
+        self.flu_end_default = flu_end_default  # defaulted to 1 in case there are None, if not float value
+        self.flu_start_tier_2 = flu_start_tier_2  # tier 2 value, expects float or None
+        self.flu_end_tier_2 = flu_end_tier_2  # tier 2 value, expects float or None
+        self.fi_start_default = fi_start_default  # defaulted to 1 in case there are None, if not float value
+        self.fi_end_default = fi_end_default  # defaulted to 1 in case there are None, if not float value
+        self.fi_start_tier_2 = fi_start_tier_2  # tier 2 value, expects float or None
+        self.fi_end_tier_2 = fi_end_tier_2  # tier 2 value, expects float or None
+
+        self.soc_start = self.soc_start_default * self.fmg_start * self.flu_start * self.fi_start if not self.soc_start_tier_2 else self.soc_start_tier_2
+        self.soc_end = self.soc_end_default * self.fmg_end * self.flu_end * self.fi_end if not self.soc_end_tier_2 else self.soc_end_tier_2
 
         self.ef_methane = ef_methane
         self.ef_nitrous = ef_nitrous
@@ -141,6 +164,10 @@ class ForestManagement(BaseModule):
 
         self.mangrove_factor = mangrove_factor
         self.degradation_percentage = degradation_percentage
+
+        self.ef_nitrous_som = ef_nitrous_som
+        self.nitrous_constant = nitrous_constant
+        self.delay = delay
 
 
         # Hectares breakdown
@@ -377,15 +404,24 @@ class ForestManagement(BaseModule):
                 traceback.print_exc()
                 return
 
-        def calculate_soc():
+        def calculate_emissions_soil():
             try:
-                self.yearly_soc_emissions, self.total_soc_emissions = soil_emissions(self.hectares_before_20, self.hectares_start, self.hectares_end, self.socref, self.soc_tier_2, self.f_lu_tier_2, self.f_i_tier_2, self.f_mg_tier_2, self.f_lu_ref, self.f_i_ref, self.f_mg_ref)
+                emissions_soil_yearly, emissions_soil_total = soil_emissions_2(self.soc_start, self.soc_end, self.hectares_total, self.hectares_start, self.hectares_end, self.hectares_before_20)
 
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in self.yearly_soc_emissions], activity=ActivityTypes.SOIL_CO2_CHANGE))
+                soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_soil_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
+                self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
 
             except Exception as e:
                 traceback.print_exc()
-                return
+
+        def calculate_emissions_som():
+            try:
+                emissions_som_yearly, emissions_som_total = som_emissions(self.soc_end, self.soc_start, self.ef_nitrous_som, self.nitrous_constant, self.hectares_before_20)
+
+                som_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in emissions_som_yearly], ActivityTypes.SOM, delay=self.delay)
+                self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
+            except Exception as e:
+                traceback.print_exc()
 
         def create_agb_matrix(years_impl, years_cap, delta_agb_yearly_below_20, delta_agb_yearly_after_20, agb_start):
 
@@ -749,121 +785,122 @@ class ForestManagement(BaseModule):
         calculate_agb_bgb_rotation_disturbance_emissions()
         calculate_litter()
         calculate_deadwood()
-        calculate_soc()
+        calculate_emissions_soil()
+        calculate_emissions_som()
 
-years_cap = 15
-years_impl = 5
-rate = 'D'
-hectares_start = 0
-hectares_end = 100
-rotation_recurrence = None
-rotation_start_year = 0
-rotation_percentage_energy = 0.3
-bgb_ratio_threshold = 125
-bgb_ratio_under_threshold = 0.3
-bgb_ratio_over_threshold = 0.27
-bgb_yearly_growth_under_20_tier_2 = None
-bgb_yearly_growth_over_20_tier_2 = None
-agb_start_default = 67
-agb_start_tier_2 = None
-agb_yearly_growth_under_20_default = 3.5
-agb_yearly_growth_under_20_tier_2 = None
-agb_yearly_growth_over_20_default = 2.5
-agb_yearly_growth_over_20_tier_2 = None
-max_agb_value = 67
-max_bgb_value = max_agb_value * bgb_ratio_under_threshold
-disturbance_recurrence = []
-disturbance_percentage = []
-disturbance_year_of_start = []
-logging_recurrence = None
-logging_percentage = 0.7
-logging_percentage_energy = 0
-logging_year_of_start = 0
-litter_20_years_default = 43.9
-litter_start = 43.9
-litter_max = 43.9
-litter_20_years_tier_2 = None
-deadwood_20_years_default = 43.4
-deadwood_start = 43.9
-deadwood_max = 43.4
-deadwood_20_years_tier_2 = None
-socref_default = 27
-soc_tier_2 = None
-f_lu_tier_2 = None
-f_i_tier_2 = None
-f_mg_tier_2 = None
-f_lu_ref = 1
-f_i_ref = 1
-f_mg_ref = 1
-ef_methane = 28
-ef_nitrous = 265
-forest_cf = 0.32
-forest_gef_ch4 = 6.8
-forest_gef_n2o = 0.2
-forest_gef_co2 = None
-mangrove_factor = 0.47
-degradation_percentage = 0.2
+# years_cap = 15
+# years_impl = 5
+# rate = 'D'
+# hectares_start = 0
+# hectares_end = 100
+# rotation_recurrence = None
+# rotation_start_year = 0
+# rotation_percentage_energy = 0.3
+# bgb_ratio_threshold = 125
+# bgb_ratio_under_threshold = 0.3
+# bgb_ratio_over_threshold = 0.27
+# bgb_yearly_growth_under_20_tier_2 = None
+# bgb_yearly_growth_over_20_tier_2 = None
+# agb_start_default = 67
+# agb_start_tier_2 = None
+# agb_yearly_growth_under_20_default = 3.5
+# agb_yearly_growth_under_20_tier_2 = None
+# agb_yearly_growth_over_20_default = 2.5
+# agb_yearly_growth_over_20_tier_2 = None
+# max_agb_value = 67
+# max_bgb_value = max_agb_value * bgb_ratio_under_threshold
+# disturbance_recurrence = []
+# disturbance_percentage = []
+# disturbance_year_of_start = []
+# logging_recurrence = None
+# logging_percentage = 0.7
+# logging_percentage_energy = 0
+# logging_year_of_start = 0
+# litter_20_years_default = 43.9
+# litter_start = 43.9
+# litter_max = 43.9
+# litter_20_years_tier_2 = None
+# deadwood_20_years_default = 43.4
+# deadwood_start = 43.9
+# deadwood_max = 43.4
+# deadwood_20_years_tier_2 = None
+# socref_default = 27
+# soc_tier_2 = None
+# f_lu_tier_2 = None
+# f_i_tier_2 = None
+# f_mg_tier_2 = None
+# f_lu_ref = 1
+# f_i_ref = 1
+# f_mg_ref = 1
+# ef_methane = 28
+# ef_nitrous = 265
+# forest_cf = 0.32
+# forest_gef_ch4 = 6.8
+# forest_gef_n2o = 0.2
+# forest_gef_co2 = None
+# mangrove_factor = 0.47
+# degradation_percentage = 0.2
 
-# create instance of the class
+# # create instance of the class
 
-forest_management = ForestManagement(
-    years_cap,
-    years_impl,
-    rate,
-    hectares_start,
-    hectares_end,
-    rotation_recurrence,
-    rotation_start_year,
-    rotation_percentage_energy,
-    bgb_ratio_threshold,
-    bgb_ratio_under_threshold,
-    bgb_ratio_over_threshold,
-    bgb_yearly_growth_under_20_tier_2,
-    bgb_yearly_growth_over_20_tier_2,
-    agb_start_default,
-    agb_start_tier_2,
-    agb_yearly_growth_under_20_default,
-    agb_yearly_growth_under_20_tier_2,
-    agb_yearly_growth_over_20_default,
-    agb_yearly_growth_over_20_tier_2,
-    max_agb_value,
-    max_bgb_value,
-    disturbance_recurrence,
-    disturbance_percentage,
-    disturbance_year_of_start,
-    logging_recurrence,
-    logging_percentage,
-    logging_percentage_energy,
-    logging_year_of_start,
-    litter_20_years_default,
-    litter_start,
-    litter_max,
-    litter_20_years_tier_2,
-    deadwood_20_years_default,
-    deadwood_start,
-    deadwood_max,
-    deadwood_20_years_tier_2,
-    socref_default,
-    soc_tier_2,
-    f_lu_tier_2,
-    f_i_tier_2,
-    f_mg_tier_2,
-    f_lu_ref,
-    f_i_ref,
-    f_mg_ref,
-    ef_methane,
-    ef_nitrous,
-    forest_cf,
-    forest_gef_ch4,
-    forest_gef_n2o,
-    forest_gef_co2,
-    mangrove_factor,
-    degradation_percentage
-)
+# forest_management = ForestManagement(
+#     years_cap,
+#     years_impl,
+#     rate,
+#     hectares_start,
+#     hectares_end,
+#     rotation_recurrence,
+#     rotation_start_year,
+#     rotation_percentage_energy,
+#     bgb_ratio_threshold,
+#     bgb_ratio_under_threshold,
+#     bgb_ratio_over_threshold,
+#     bgb_yearly_growth_under_20_tier_2,
+#     bgb_yearly_growth_over_20_tier_2,
+#     agb_start_default,
+#     agb_start_tier_2,
+#     agb_yearly_growth_under_20_default,
+#     agb_yearly_growth_under_20_tier_2,
+#     agb_yearly_growth_over_20_default,
+#     agb_yearly_growth_over_20_tier_2,
+#     max_agb_value,
+#     max_bgb_value,
+#     disturbance_recurrence,
+#     disturbance_percentage,
+#     disturbance_year_of_start,
+#     logging_recurrence,
+#     logging_percentage,
+#     logging_percentage_energy,
+#     logging_year_of_start,
+#     litter_20_years_default,
+#     litter_start,
+#     litter_max,
+#     litter_20_years_tier_2,
+#     deadwood_20_years_default,
+#     deadwood_start,
+#     deadwood_max,
+#     deadwood_20_years_tier_2,
+#     socref_default,
+#     soc_tier_2,
+#     f_lu_tier_2,
+#     f_i_tier_2,
+#     f_mg_tier_2,
+#     f_lu_ref,
+#     f_i_ref,
+#     f_mg_ref,
+#     ef_methane,
+#     ef_nitrous,
+#     forest_cf,
+#     forest_gef_ch4,
+#     forest_gef_n2o,
+#     forest_gef_co2,
+#     mangrove_factor,
+#     degradation_percentage
+# )
 
-forest_management.calculate_emissions()
+# forest_management.calculate_emissions()
 
-forest_management.result.plot_emissions_and_aggregate_by_activity()
+# forest_management.result.plot_emissions_and_aggregate_by_activity()
 
 
 
