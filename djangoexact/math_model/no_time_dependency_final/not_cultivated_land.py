@@ -34,7 +34,7 @@ class NotCultivatedLand(BaseModule):
         # fire_interval,
         # fire_used,
         # methane_ef,
-        nitrous_ef,
+        ef_nitrous_som,
         # agb_ref,
         # agb_tier_2,
         # cf_ref,
@@ -43,7 +43,7 @@ class NotCultivatedLand(BaseModule):
         soc_end_default,
         soc_start_tier_2,
         soc_end_tier_2,
-        calculate_soc,
+        calculate_soc_som,
         fmg_start_default,
         fmg_end_default,
         fmg_start_tier_2,
@@ -68,7 +68,7 @@ class NotCultivatedLand(BaseModule):
         # self.fire_interval = fire_interval  # front-end input, years between two fires, default is 5 (on front-end)
         # self.fire_used = fire_used  # front-end input, states whether fire has been used
         # self.methane_ef = methane_ef  # tabulated value IPCC D75 (value for Savanna and Grassland)
-        self.nitrous_ef = nitrous_ef  # tabulated value IPCC E75 (value for Savanna and Grassland)
+        self.ef_nitrous_som = ef_nitrous_som  # tabulated value IPCC E75 (value for Savanna and Grassland)
         # self.agb_ref = agb_ref  # taken from IPCC A553 matching clim_moist to rows
         # self.agb_tier_2 = agb_tier_2  # tier 2 value, expects float or None
         # self.cf_ref = cf_ref  # default is 77%, not tabulated
@@ -124,7 +124,7 @@ class NotCultivatedLand(BaseModule):
 
         self.result = Result(self.time_impl, self.time_cap)
 
-        self.calculate_soc = calculate_soc
+        self.calculate_soc_som = calculate_soc_som
 
         # TIER 2 DEFAULTS
         # self.soc_start_tier_2_default = self.soc_start_default * self.fmg_start * self.fi_start * self.flu_start
@@ -174,7 +174,7 @@ class NotCultivatedLand(BaseModule):
 
         def calculate_soil_emissions():
             try:
-                if self.calculate_soc:
+                if self.calculate_soc_som:
                     self.emissions_soil_yearly, self.emissions_soil_total = soil_emissions_2(self.soc_start, self.soc_end, self.total_hectars, self.area_start, self.area_end, self.hectars_before_20)
 
                     soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_soil_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
@@ -185,8 +185,8 @@ class NotCultivatedLand(BaseModule):
 
         def calculate_emissions_som():
             try:
-                if self.calculate_soc:
-                    self.emissions_som_yearly, self.emissions_som_total = som_emissions(self.soc_end, self.soc_start, self.nitrous_ef, self.nitrous_constant, self.hectars_before_20)
+                if self.calculate_soc_som:
+                    self.emissions_som_yearly, self.emissions_som_total = som_emissions(self.soc_end, self.soc_start, self.ef_nitrous_som, self.nitrous_constant, self.hectars_before_20)
 
                     som_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in self.emissions_som_yearly], ActivityTypes.SOM, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
