@@ -8,6 +8,7 @@ from .general_functions import (
     yearly_constant_emissions_breakdown,
     yearly_time_dependent_20_year_breakdown,
     yearly_time_dependent_parameter_breakdown,
+    som_emissions,
 )
 from .ghg_emissions_classes import (
     ActivityTypes,
@@ -65,7 +66,8 @@ class FloodedRice(BaseModule):
         fi_end_tier_2,
         calculate_soc_som,
         straw_burnt,
-        delay=0,
+        delay,
+        ef_nitrous_som,
         is_minor_season=True,
     ):
         self.area_start = area_start
@@ -113,6 +115,8 @@ class FloodedRice(BaseModule):
         self.fi_start_tier_2 = fi_start_tier_2  # tier 2 value, expects float or None
         self.fi_end_tier_2 = fi_end_tier_2  # tier 2 value, expects float or None
 
+        self.ef_nitrous_som = ef_nitrous_som
+
         self.calculate_soc_som = calculate_soc_som
 
         self.straw_burnt = straw_burnt
@@ -159,6 +163,9 @@ class FloodedRice(BaseModule):
 
         self.soil_emissions_yearly = []
         self.soil_emissions_total = 0
+
+        self.emissions_som_yearly = []
+        self.emissions_som_total = 0
 
         self.emissions_total_yearly = []
         self.total_emissions = 0
@@ -239,9 +246,20 @@ class FloodedRice(BaseModule):
                 traceback.print_exc()
                 return
 
+        def calculate_emissions_som():
+            try:
+                if self.calculate_soc_som and not self.is_minor_season:
+                    self.emissions_som_yearly, self.emissions_som_total = som_emissions(self.soc_end, self.soc_start, self.ef_nitrous_som, self.nitrous_constant, self.hectares_before_20)
+
+                    som_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in self.emissions_som_yearly], ActivityTypes.SOM, delay=self.delay)
+                    self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
+            except Exception as e:
+                traceback.print_exc()
+
         calculate_ch4_emitted()
         calculate_straw_burning()
         calculate_soil_emissions()
+        calculate_emissions_som()
 
         self.emissions_total_yearly = [i + j + k for i, j, k in zip(self.ch4_emitted_yearly, self.straw_burning_yearly, self.soil_emissions_yearly)]
         self.total_emissions = self.ch4_emitted_total + self.straw_burning_total + self.soil_emissions_total
