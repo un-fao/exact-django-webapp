@@ -122,6 +122,11 @@ from .models import (
     ModuleType,
 )
 
+CALCULATE_SOC_SOM_START_W = False
+CALCULATE_SOC_SOM_START_WO = False
+CALCULATE_SOC_SOM_W = True
+CALCULATE_SOC_SOM_WO = True
+
 
 def is_luc_remaining_same(module: LandModule) -> bool:
     """
@@ -617,8 +622,7 @@ class DeforestationCalculator(BaseCalculator):
         combustion_factor_w = ipcc.ForestCombustionFactor.objects.get(land_use_type=module.land_use_type_w, climate=climate, forest_type=forest.forest_type)
         combustion_factor_wo = ipcc.ForestCombustionFactor.objects.get(land_use_type=module.land_use_type_wo, climate=climate, forest_type=forest.forest_type)
 
-        moisture_factor = ipcc.DefaultEmissionFactor.objects.filter(moisture=moisture)
-        moisture_factor = moisture_factor.filter(Q(organic_input_type__name__icontains="Other N Inputs") | Q(organic_input_type__name__icontains="All N Inputs")).first()
+        som = ipcc.LandUseNitrousEmissionFactor.objects.filter(moisture=moisture)
 
         flu_start = ipcc.LandUseCarbonStockExchangeFactor.objects.get_or_default(climate=climate, moisture=moisture, land_use_type=module.land_use_type_start)
         flu_w = ipcc.LandUseCarbonStockExchangeFactor.objects.get_or_default(climate=climate, moisture=moisture, land_use_type=module.land_use_type_w)
@@ -659,6 +663,9 @@ class DeforestationCalculator(BaseCalculator):
         math_w = None
         math_wo = None
 
+        DELAY_W = 0
+        DELAY_WO = 0
+
         if not is_luc_remaining_same(module):
             self.inputs_w = [
                 0,
@@ -674,7 +681,7 @@ class DeforestationCalculator(BaseCalculator):
                 combustion_factor_w.n2o,
                 combustion_factor_w.ch4,
                 combustion_factor_w.value,
-                moisture_factor.value,
+                som.value,
                 litter_dw_w.litter if mangroves_data is None else mangroves_data.litter,
                 forest.litter_t2_start,
                 litter_dw_w.dw if mangroves_data is None else mangroves_data.dw,
@@ -705,6 +712,8 @@ class DeforestationCalculator(BaseCalculator):
                 flu_w.value,
                 soc_ref.value,
                 soc_w.value,
+                CALCULATE_SOC_SOM_W,
+                DELAY_W,
             ]
 
             math_w = MathDeforestation(*self.inputs_w)
@@ -725,7 +734,7 @@ class DeforestationCalculator(BaseCalculator):
                 combustion_factor_wo.n2o,
                 combustion_factor_wo.ch4,
                 combustion_factor_wo.value,
-                moisture_factor.value,
+                som.value,
                 litter_dw_wo.litter if mangroves_data is None else mangroves_data.litter,
                 forest.litter_t2_start,
                 litter_dw_wo.dw if mangroves_data is None else mangroves_data.dw,
@@ -756,6 +765,8 @@ class DeforestationCalculator(BaseCalculator):
                 flu_wo.value,
                 soc_ref.value,
                 soc_wo.value,
+                CALCULATE_SOC_SOM_WO,
+                DELAY_WO,
             ]
 
             math_wo = MathDeforestation(*self.inputs_wo)
@@ -921,9 +932,9 @@ class OtherLandUseCalculator(BaseCalculator):
         c_n_ratio = utils.CN_RATIO_GRASSLAND if luc.module_type_start.class_name in ["Grassland", "ForestManagement"] else utils.CN_RATIO_CROP
 
         try:
-            moisture_factor = ipcc.NitrousEmissionFactor.objects.get(moisture=moisture, name__icontains="Other N Inputs")
-        except ipcc.NitrousEmissionFactor.DoesNotExist:
-            raise Exception(f"NitrousEmissionFactor for {moisture.name} moisture and Other N Inputs does not exist")
+            som = ipcc.LandUseNitrousEmissionFactor.objects.get(moisture=moisture)
+        except ipcc.LandUseNitrousEmissionFactor.DoesNotExist:
+            raise Exception(f"LandUseNitrousEmissionFactor for {moisture.name} moisture does not exist")
 
         try:
             combustion_factor_w = ipcc.AfforestationCombustionFactor.objects.get_or_default(land_use_type=luc_w)
@@ -935,13 +946,16 @@ class OtherLandUseCalculator(BaseCalculator):
         except ipcc.AfforestationCombustionFactor.DoesNotExist:
             raise Exception(f"AfforestationCombustionFactor for {luc_wo.name} does not exist")
 
+        DELAY_W = 0
+        DELAY_WO = 0
+
         inputs_w = [
             biomass_initial.value,
             module_start.get_biomass_t2(utils.ScenarioTypes.START),
             biomass_final_w.value,
             module_w.get_biomass_t2(utils.ScenarioTypes.WITH),
             c_n_ratio,
-            moisture_factor.value,
+            som.value,
             combustion_factor_w.value,
             combustion_factor_w.n2o,
             combustion_factor_w.ch4,
@@ -964,12 +978,12 @@ class OtherLandUseCalculator(BaseCalculator):
             fi_final_w.value,
             module_start.fi_t2_start,
             module_w.fi_t2_w,
-            False,
+            CALCULATE_SOC_SOM_W,
             luc.area,
             project.implementation_years,
             project.capitalization_years,
             input.activity.change_rate.name,
-            0,
+            DELAY_W,
         ]
 
         results_w = MathOtherLandUseChanges(*inputs_w)
@@ -981,7 +995,7 @@ class OtherLandUseCalculator(BaseCalculator):
             biomass_final_wo.value,
             module_wo.get_biomass_t2(utils.ScenarioTypes.WITHOUT),
             c_n_ratio,
-            moisture_factor.value,
+            som.value,
             combustion_factor_wo.value,
             combustion_factor_wo.ch4,
             combustion_factor_wo.n2o,
@@ -1004,12 +1018,12 @@ class OtherLandUseCalculator(BaseCalculator):
             fi_final_wo.value,
             module_start.fi_t2_start,
             module_wo.fi_t2_wo,
-            False,
+            CALCULATE_SOC_SOM_WO,
             luc.area,
             project.implementation_years,
             project.capitalization_years,
             input.activity.change_rate.name,
-            0,
+            DELAY_WO,
         ]
 
         results_wo = MathOtherLandUseChanges(*inputs_wo)
@@ -1068,9 +1082,9 @@ class AnnualCropCalculator(BaseCalculator):
         self.crop_yield_wo: SimpleNamespace | ipcc.CropYieldStats = SimpleNamespace(value=0)
         self.soc: SimpleNamespace | ipcc.SoilOrganicCarbon = SimpleNamespace(value=0)
         self.flu: SimpleNamespace | ipcc.CroplandFLU = SimpleNamespace(value=0)
-        self.default_emission_factor_start: SimpleNamespace | ipcc.DefaultEmissionFactor = SimpleNamespace(value=0)
-        self.default_emission_factor_w: SimpleNamespace | ipcc.DefaultEmissionFactor = SimpleNamespace(value=0)
-        self.default_emission_factor_wo: SimpleNamespace | ipcc.DefaultEmissionFactor = SimpleNamespace(value=0)
+        self.som_start: SimpleNamespace | ipcc.LandUseNitrousEmissionFactor = SimpleNamespace(value=0)
+        self.som_w: SimpleNamespace | ipcc.LandUseNitrousEmissionFactor = SimpleNamespace(value=0)
+        self.som_wo: SimpleNamespace | ipcc.LandUseNitrousEmissionFactor = SimpleNamespace(value=0)
         self.burning_emission_factor: SimpleNamespace | ipcc.BurningEmissionFactor = SimpleNamespace(value=0)
         self.minor_burning_emission_factor: SimpleNamespace | ipcc.BurningEmissionFactor = SimpleNamespace(value=0)
         self.fires_start: SimpleNamespace | ipcc.FiresCombustionFactor = SimpleNamespace(value=0)
@@ -1155,7 +1169,7 @@ class AnnualCropCalculator(BaseCalculator):
             self.flu = utils.get_or_raise(ipcc.CroplandFLU, cm | long_term_cultivated_flt, f"CroplandFLU for {lut_start.name} in {climate.name} climate and {moisture.name} moisture does not exist")
             self.fires_start = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_start_flt, f"FiresCombustionFactor for {lut_start.name} does not exist")
             self.n_estimation_factor_start = utils.get_or_raise(ipcc.CropNitrousEstimationDefaultFactor, lut_start_flt, f"CropNitrousEstimationDefaultFactor for {lut_start.name} does not exist", method="get_or_grains")
-            self.emission_factors_start = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_flt_start, f"DefaultEmissionFactor for {moisture.name} moisture and {input.organic_input_type_start.name} does not exist")
+            self.som_start = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, moisture_flt, f"LandUseNitrousEmissionFactor for {moisture.name} moisture and {input.organic_input_type_start.name} does not exist")
             self.crop_yield_start = input.crop_yield_start or utils.get_or_raise(ipcc.CropYieldStats, region_flt | lut_start_flt, f"CropYieldStats for {module_start.land_use_type_start.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_region_average").average
 
             try:
@@ -1173,7 +1187,7 @@ class AnnualCropCalculator(BaseCalculator):
             self.flu = utils.get_or_raise(ipcc.CroplandFLU, cm | long_term_cultivated_flt, f"CroplandFLU for {lut_w.name} in {climate.name} climate and {moisture.name} moisture does not exist")
             self.fires_w = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_w_flt, f"FiresCombustionFactor for {lut_w.name} does not exist")
             self.n_estimation_factor_w = utils.get_or_raise(ipcc.CropNitrousEstimationDefaultFactor, lut_w_flt, f"CropNitrousEstimationDefaultFactor for {lut_w.name} does not exist", method="get_or_grains")
-            self.emission_factors_w = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_flt_w, f"DefaultEmissionFactor for {moisture.name} moisture and {input.organic_input_type_w.name} does not exist")
+            self.som_w = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, moisture_flt, f"LandUseNitrousEmissionFactor for {moisture.name} moisture and {input.organic_input_type_w.name} does not exist")
             self.crop_yield_w = input.crop_yield_w or utils.get_or_raise(ipcc.CropYieldStats, region_flt | lut_w_flt, f"CropYieldStats for {module_w.land_use_type_w.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_region_average").average
 
             try:
@@ -1191,7 +1205,7 @@ class AnnualCropCalculator(BaseCalculator):
             self.flu = utils.get_or_raise(ipcc.CroplandFLU, cm | long_term_cultivated_flt, f"CroplandFLU for {lut_start.name} in {climate.name} climate and {moisture.name} moisture does not exist")
             self.fires_start = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_start_flt, f"FiresCombustionFactor for {lut_start.name} does not exist")
             self.n_estimation_factor_start = utils.get_or_raise(ipcc.CropNitrousEstimationDefaultFactor, lut_start_flt, f"CropNitrousEstimationDefaultFactor for {lut_start.name} does not exist", method="get_or_grains")
-            self.emission_factors_start = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_flt_start, f"DefaultEmissionFactor for {moisture.name} moisture and {input.organic_input_type_start.name} does not exist")
+            self.som_start = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, moisture_flt, f"LandUseNitrousEmissionFactor for {moisture.name} moisture and {input.organic_input_type_start.name} does not exist")
             self.crop_yield_start = input.crop_yield_start or utils.get_or_raise(ipcc.CropYieldStats, region_flt | lut_start_flt, f"CropYieldStats for {module_start.land_use_type_start.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_region_average").average
 
             try:
@@ -1209,7 +1223,7 @@ class AnnualCropCalculator(BaseCalculator):
             self.flu = utils.get_or_raise(ipcc.CroplandFLU, cm | long_term_cultivated_flt, f"CroplandFLU for {lut_wo.name} in {climate.name} climate and {moisture.name} moisture does not exist")
             self.fires_wo = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_wo_flt, f"FiresCombustionFactor for {lut_wo.name} does not exist")
             self.n_estimation_factor_wo = utils.get_or_raise(ipcc.CropNitrousEstimationDefaultFactor, lut_wo_flt, f"CropNitrousEstimationDefaultFactor for {lut_wo.name} does not exist", method="get_or_grains")
-            self.emission_factors_wo = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_flt_wo, f"DefaultEmissionFactor for {moisture.name} moisture and {input.organic_input_type_wo.name} does not exist")
+            self.som_wo = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, moisture_flt, f"LandUseNitrousEmissionFactor for {moisture.name} moisture and {input.organic_input_type_wo.name} does not exist")
             self.crop_yield_wo = input.crop_yield_wo or utils.get_or_raise(ipcc.CropYieldStats, region_flt | lut_wo_flt, f"CropYieldStats for {module_wo.land_use_type_wo.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_region_average").average
 
             try:
@@ -1239,6 +1253,11 @@ class AnnualCropCalculator(BaseCalculator):
 
         self.get_defaults()
 
+        DELAY_START_W = 0
+        DELAY_START_WO = 0
+        DELAY_W = 0
+        DELAY_WO = 0
+
         if is_luc_remaining_same(input):
             log.debug("Is LUC remaining the same")
 
@@ -1264,8 +1283,8 @@ class AnnualCropCalculator(BaseCalculator):
                 self.fi_w.value,
                 module_start.fi_t2_start,
                 input.fi_t2_w,
-                False,
-                self.emission_factors_start.value,
+                CALCULATE_SOC_SOM_START_W,
+                self.som_start.value,
                 project.gw_potential.n2o,
                 project.gw_potential.ch4,
                 self.burning_emission_factor.ch4 if input.residue_management_type_start.name == "Burned" else None,
@@ -1290,7 +1309,7 @@ class AnnualCropCalculator(BaseCalculator):
                 getattr(self.minor_n_estimation_factor_start, "n_ag_residues", None),
                 getattr(self.minor_n_estimation_factor_start, "rs_t", None),
                 getattr(self.minor_n_estimation_factor_start, "n_bg_t", None),
-                0,
+                DELAY_START_W,
             ]
             log.debug("Inputs start w: %s", self.inputs_start_w)
 
@@ -1322,8 +1341,8 @@ class AnnualCropCalculator(BaseCalculator):
                 self.fi_w.value,
                 module_w.fi_t2_start,
                 input.fi_t2_w,
-                True,
-                self.emission_factors_w.value,
+                CALCULATE_SOC_SOM_W,
+                self.som_w.value,
                 project.gw_potential.n2o,
                 project.gw_potential.ch4,
                 self.burning_emission_factor.ch4 if input.residue_management_type_w.name == "Burned" else None,
@@ -1348,7 +1367,7 @@ class AnnualCropCalculator(BaseCalculator):
                 getattr(self.minor_n_estimation_factor_w, "n_ag_residues", None),
                 getattr(self.minor_n_estimation_factor_w, "rs_t", None),
                 getattr(self.minor_n_estimation_factor_w, "n_bg_t", None),
-                0,
+                DELAY_W,
             ]
             log.debug("Inputs w: %s", self.inputs_w)
 
@@ -1380,8 +1399,8 @@ class AnnualCropCalculator(BaseCalculator):
                 self.fi_wo.value,
                 input.fi_t2_start,
                 input.fi_t2_wo,
-                False,
-                self.emission_factors_start.value,
+                CALCULATE_SOC_SOM_START_WO,
+                self.som_start.value,
                 project.gw_potential.n2o,
                 project.gw_potential.ch4,
                 self.burning_emission_factor.ch4 if input.residue_management_type_start.name == "Burned" else None,
@@ -1406,7 +1425,7 @@ class AnnualCropCalculator(BaseCalculator):
                 getattr(self.minor_n_estimation_factor_start, "n_ag_residues", None),
                 getattr(self.minor_n_estimation_factor_start, "rs_t", None),
                 getattr(self.minor_n_estimation_factor_start, "n_bg_t", None),
-                0,
+                DELAY_START_WO,
             ]
             log.debug("Inputs start wo: %s", self.inputs_start_wo)
 
@@ -1438,8 +1457,8 @@ class AnnualCropCalculator(BaseCalculator):
                 self.fi_wo.value,
                 module_wo.fi_t2_start,
                 input.fi_t2_wo,
-                True,
-                self.emission_factors_wo.value,
+                CALCULATE_SOC_SOM_WO,
+                self.som_wo.value,
                 project.gw_potential.n2o,
                 project.gw_potential.ch4,
                 self.burning_emission_factor.ch4 if input.residue_management_type_wo.name == "Burned" else None,
@@ -1464,7 +1483,7 @@ class AnnualCropCalculator(BaseCalculator):
                 getattr(self.minor_n_estimation_factor_wo, "n_ag_residues", None),
                 getattr(self.minor_n_estimation_factor_wo, "rs_t", None),
                 getattr(self.minor_n_estimation_factor_wo, "n_bg_t", None),
-                0,
+                DELAY_WO,
             ]
             log.debug("Inputs wo: %s", self.inputs_wo)
 
@@ -1499,9 +1518,9 @@ class PerennialCropCalculator(BaseCalculator):
 
         self.soc: SimpleNamespace | ipcc.SoilOrganicCarbon = SimpleNamespace(value=0)
         self.burning_emission_factor: SimpleNamespace | ipcc.BurningEmissionFactor = SimpleNamespace(value=0)
-        self.default_emission_factor_start: ipcc.DefaultEmissionFactor | SimpleNamespace = SimpleNamespace(value=0)
-        self.default_emission_factor_w: ipcc.DefaultEmissionFactor | SimpleNamespace = SimpleNamespace(value=0)
-        self.default_emission_factor_wo: ipcc.DefaultEmissionFactor | SimpleNamespace = SimpleNamespace(value=0)
+        self.som_start: ipcc.LandUseNitrousEmissionFactor | SimpleNamespace = SimpleNamespace(value=0)
+        self.som_w: ipcc.LandUseNitrousEmissionFactor | SimpleNamespace = SimpleNamespace(value=0)
+        self.som_wo: ipcc.LandUseNitrousEmissionFactor | SimpleNamespace = SimpleNamespace(value=0)
         self.fires_combustion_factor_start: ipcc.FiresCombustionFactor | SimpleNamespace = SimpleNamespace(value=0)
         self.fires_combustion_factor_w: ipcc.FiresCombustionFactor | SimpleNamespace = SimpleNamespace(value=0)
         self.fires_combustion_factor_wo: ipcc.FiresCombustionFactor | SimpleNamespace = SimpleNamespace(value=0)
@@ -1582,7 +1601,7 @@ class PerennialCropCalculator(BaseCalculator):
             self.flu_start = get_flu_data(module, climate, moisture, utils.ScenarioTypes.START)
             self.fi_start = get_fi_data(module, climate, moisture, utils.ScenarioTypes.START)
             self.fmg_start = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.START)
-            self.default_emission_factor_start = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_flt_start, f"DefaultEmissionFactor for {moisture.name} moisture and {module.organic_input_type_start.name} does not exist")
+            self.som_start = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, moisture_flt, f"LandUseNitrousEmissionFactor for {moisture.name} moisture and {module.organic_input_type_start.name} does not exist")
             self.fires_combustion_factor_start = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_start_flt, f"FiresCombustionFactor for {module.land_use_type_start.name} does not exist", method="get_or_default")
             self.ag_default_start = utils.get_or_raise(ipcc.PerennialAGB, cmc | lut_start_flt, f"PerennialAGB for {module.land_use_type_start.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_default")
             self.agb_max_c_start = utils.get_or_raise(ipcc.PerennialMaxAGB, climate_flt | lut_start_flt, f"PerennialMaxAGB for {module.land_use_type_start.name} in {climate.name} climate does not exist", method="get_or_default")
@@ -1592,14 +1611,14 @@ class PerennialCropCalculator(BaseCalculator):
             self.flu_start = get_flu_data(module, climate, moisture, utils.ScenarioTypes.START)
             self.fi_start = get_fi_data(module, climate, moisture, utils.ScenarioTypes.START)
             self.fmg_start = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.START)
-            self.default_emission_factor_start = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_flt_start, f"DefaultEmissionFactor for {moisture.name} moisture and {module.organic_input_type_start.name} does not exist")
+            self.som_start = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, moisture_flt, f"LandUseNitrousEmissionFactor for {moisture.name} moisture and {module.organic_input_type_start.name} does not exist")
             self.fires_combustion_factor_start = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_start_flt, f"FiresCombustionFactor for {module.land_use_type_start.name} does not exist", method="get_or_default")
             self.ag_default_start = utils.get_or_raise(ipcc.PerennialAGB, cmc | lut_start_flt, f"PerennialAGB for {module.land_use_type_start.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_default")
             self.agb_max_c_start = utils.get_or_raise(ipcc.PerennialMaxAGB, climate_flt | lut_start_flt, f"PerennialMaxAGB for {module.land_use_type_start.name} in {climate.name} climate does not exist", method="get_or_default")
             self.bg_default_start = utils.get_or_raise(ipcc.PerennialBGB, cmc | lut_start_flt, f"PerennialBGB for {module.land_use_type_start.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_default")
 
         if is_with(module):
-            self.default_emission_factor_w = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_flt_w, f"DefaultEmissionFactor for {moisture.name} moisture and {module.organic_input_type_w.name} does not exist")
+            self.som_w = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, moisture_flt, f"LandUseNitrousEmissionFactor for {moisture.name} moisture and {module.organic_input_type_w.name} does not exist")
             self.fires_combustion_factor_w = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_w_flt, f"FiresCombustionFactor for {module.land_use_type_w.name} does not exist", method="get_or_default")
             self.ag_default_w = utils.get_or_raise(ipcc.PerennialAGB, cmc | lut_w_flt, f"PerennialAGB for {module.land_use_type_w.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_default")
             self.agb_max_c_w = utils.get_or_raise(ipcc.PerennialMaxAGB, climate_flt | lut_w_flt, f"PerennialMaxAGB for {module.land_use_type_w.name} in {climate.name} climate does not exist", method="get_or_default")
@@ -1609,7 +1628,7 @@ class PerennialCropCalculator(BaseCalculator):
             self.fmg_w = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.WITH)
 
         if is_without(module):
-            self.default_emission_factor_wo = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_flt_wo, f"DefaultEmissionFactor for {moisture.name} moisture and {module.organic_input_type_wo.name} does not exist")
+            self.som_wo = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, moisture_flt, f"LandUseNitrousEmissionFactor for {moisture.name} moisture and {module.organic_input_type_wo.name} does not exist")
             self.fires_combustion_factor_wo = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_wo_flt, f"FiresCombustionFactor for {module.land_use_type_wo.name} does not exist")
             self.ag_default_wo = utils.get_or_raise(ipcc.PerennialAGB, cmc | lut_wo_flt, f"PerennialAGB for {module.land_use_type_wo.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_default")
             self.agb_max_c_wo = utils.get_or_raise(ipcc.PerennialMaxAGB, climate_flt | lut_wo_flt, f"PerennialMaxAGB for {module.land_use_type_wo.name} in {climate.name} climate does not exist", method="get_or_default")
@@ -1638,6 +1657,11 @@ class PerennialCropCalculator(BaseCalculator):
 
         self.get_defaults()
 
+        DELAY_START_W = 0
+        DELAY_START_WO = 0
+        DELAY_W = 0
+        DELAY_WO = 0
+
         if is_luc_remaining_same(module):
             self.inputs_start_w = [
                 area,
@@ -1649,7 +1673,7 @@ class PerennialCropCalculator(BaseCalculator):
                 project.gw_potential.ch4,
                 module.is_biomass_burned_start,
                 self.burning_emission_factor.n2o,
-                self.default_emission_factor_start.value,
+                self.som_start.value,
                 self.burning_emission_factor.ch4,
                 self.fires_combustion_factor_start.value,
                 self.default_fire_periodicity.value,
@@ -1676,8 +1700,8 @@ class PerennialCropCalculator(BaseCalculator):
                 self.fi_w.value,
                 module.fi_t2_start,
                 module.fi_t2_w,
-                False,
-                0,  # Delay
+                CALCULATE_SOC_SOM_START_W,
+                DELAY_START_W,
             ]
             log.debug("Inputs start w: %s", self.inputs_start_w)
 
@@ -1695,7 +1719,7 @@ class PerennialCropCalculator(BaseCalculator):
                 project.gw_potential.ch4,
                 module.is_biomass_burned_start,
                 self.burning_emission_factor.n2o,
-                self.default_emission_factor_start.value,
+                self.som_start.value,
                 self.burning_emission_factor.ch4,
                 self.fires_combustion_factor_start.value,
                 self.default_fire_periodicity.value,
@@ -1722,8 +1746,8 @@ class PerennialCropCalculator(BaseCalculator):
                 self.fi_wo.value,
                 module.fi_t2_start,
                 module.fi_t2_wo,
-                False,
-                0,  # Delay
+                CALCULATE_SOC_SOM_START_WO,
+                DELAY_START_WO,
             ]
             log.debug("Input start wo: %s", self.input_start_wo)
 
@@ -1741,7 +1765,7 @@ class PerennialCropCalculator(BaseCalculator):
                 project.gw_potential.ch4,
                 module.is_biomass_burned_w,
                 self.burning_emission_factor.n2o,
-                self.default_emission_factor_w.value,
+                self.som_w.value,
                 self.burning_emission_factor.ch4,
                 self.fires_combustion_factor_w.value,
                 self.default_fire_periodicity.value,
@@ -1768,8 +1792,8 @@ class PerennialCropCalculator(BaseCalculator):
                 self.fi_w.value,
                 module.fi_t2_start,
                 module.fi_t2_w,
-                True,
-                0,  # Delay
+                CALCULATE_SOC_SOM_W,
+                DELAY_W,
             ]
             log.debug("Inputs w: %s", self.inputs_w)
 
@@ -1787,7 +1811,7 @@ class PerennialCropCalculator(BaseCalculator):
                 project.gw_potential.ch4,
                 module.is_biomass_burned_wo,
                 self.burning_emission_factor.n2o,
-                self.default_emission_factor_wo.value,
+                self.som_wo.value,
                 self.burning_emission_factor.ch4,
                 self.fires_combustion_factor_wo.value,
                 self.default_fire_periodicity.value,
@@ -1814,8 +1838,8 @@ class PerennialCropCalculator(BaseCalculator):
                 self.fi_wo.value,
                 module.fi_t2_start,
                 module.fi_t2_wo,
-                True,
-                0,  # Delay
+                CALCULATE_SOC_SOM_WO,
+                DELAY_WO,
             ]
             log.debug("Inputs wo: %s", self.inputs_wo)
 
@@ -1909,6 +1933,7 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
         self.n_estimation_factor: SimpleNamespace | ipcc.CropNitrousEstimationDefaultFactor = SimpleNamespace(value=0)
         self.burning_emission_factor: SimpleNamespace | ipcc.BurningEmissionFactor = SimpleNamespace(value=0)
         self.rice_cf: SimpleNamespace | ipcc.FiresCombustionFactor = SimpleNamespace(value=0)
+        self.som: SimpleNamespace | ipcc.LandUseNitrousEmissionFactor = SimpleNamespace(value=0)
 
     def calculate(self, is_minor_season=True) -> Result:
         module: FloodedRice = self.data
@@ -1920,54 +1945,13 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
 
         self.get_defaults()
 
+        DELAY_START_W = 0
+        DELAY_START_WO = 0
+        DELAY_W = 0
+        DELAY_WO = 0
+
         if is_luc_remaining_same(module_for_checks):
-            self.inputs_start_w = [
-                *[area, 0],
-                self.efc.value,
-                module.efc_t2_start,
-                self.sfw_start.value,
-                module.sfw_t2_start,
-                self.sfp_start.value,
-                module.sfp_t2_start,
-                self.sfo_start.value,
-                module.sfo_t2_start,
-                module.efi_t2_start,
-                self.yield_ref.value,
-                module.crop_yield_start,
-                self.n_estimation_factor.slope,
-                self.n_estimation_factor.intercept,
-                module.rice_straw_t2_start,
-                self.burning_emission_factor.ch4,
-                self.rice_cf.value,
-                self.burning_emission_factor.n2o,
-                project.gw_potential.n2o,
-                project.implementation_years,
-                project.capitalization_years,
-                activity.change_rate.name,
-                project.gw_potential.ch4,
-                self.efc.cultivation_period,
-                module.cultivation_period_t2_start,
-                self.soc_start,
-                self.soc_w,
-                getattr(module, "soc_t2_start", None),
-                getattr(module, "soc_t2_w", None),
-                self.fmg_start.value,
-                self.fmg_w.value,
-                module.fmg_t2_start,
-                module.fmg_t2_w,
-                self.flu_start.value,
-                self.flu_w.value,
-                module.flu_t2_start,
-                module.flu_t2_w,
-                self.fi_start.value,
-                self.fi_w.value,
-                module.fi_t2_start,
-                module.fi_t2_w,
-                True,
-                module.organic_amendment_type_start.name == "Straw Burnt",
-                0,  # Delay
-                is_minor_season,
-            ]
+            self.inputs_start_w = [*[area, 0], self.efc.value, module.efc_t2_start, self.sfw_start.value, module.sfw_t2_start, self.sfp_start.value, module.sfp_t2_start, self.sfo_start.value, module.sfo_t2_start, module.efi_t2_start, self.yield_ref.value, module.crop_yield_start, self.n_estimation_factor.slope, self.n_estimation_factor.intercept, module.rice_straw_t2_start, self.burning_emission_factor.ch4, self.rice_cf.value, self.burning_emission_factor.n2o, project.gw_potential.n2o, project.implementation_years, project.capitalization_years, activity.change_rate.name, project.gw_potential.ch4, self.efc.cultivation_period, module.cultivation_period_t2_start, self.soc_start, self.soc_w, getattr(module, "soc_t2_start", None), getattr(module, "soc_t2_w", None), self.fmg_start.value, self.fmg_w.value, module.fmg_t2_start, module.fmg_t2_w, self.flu_start.value, self.flu_w.value, module.flu_t2_start, module.flu_t2_w, self.fi_start.value, self.fi_w.value, module.fi_t2_start, module.fi_t2_w, CALCULATE_SOC_SOM_START_W, module.organic_amendment_type_start.name == "Straw Burnt", DELAY_START_W, is_minor_season, self.som]
 
             self.math_start_w = MathFloodedRice(*self.inputs_start_w)
             self.math_start_w.calculate_emissions()
@@ -2015,9 +1999,10 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 self.fi_wo.value,
                 module.fi_t2_start,
                 module.fi_t2_wo,
-                True,
+                CALCULATE_SOC_SOM_START_WO,
                 module.organic_amendment_type_start.name == "Straw Burnt",
-                0,  # Delay
+                DELAY_START_WO,
+                self.som.value,
                 is_minor_season,
             ]
 
@@ -2067,9 +2052,10 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 self.fi_w.value,
                 module.fi_t2_start,
                 module.fi_t2_w,
-                True,
+                CALCULATE_SOC_SOM_W,
                 module.organic_amendment_type_w.name == "Straw Burnt",
-                0,  # Delay
+                DELAY_W,
+                self.som.value,
                 is_minor_season,
             ]
 
@@ -2119,9 +2105,10 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 self.fi_wo.value,
                 module.fi_t2_start,
                 module.fi_t2_wo,
-                False,
+                CALCULATE_SOC_SOM_WO,
                 module.organic_amendment_type_wo.name == "Straw Burnt",
-                0,  # Delay
+                DELAY_WO,
+                self.som.value,
                 is_minor_season,
             ]
 
@@ -2225,6 +2212,7 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
             self.sfo_wo.value = getattr(self.math_wo, "SFo_tier_2_default", 0)
 
         self.soc = utils.get_or_raise(ipcc.SoilOrganicCarbon, climate_flt | moisture_flt | soil_flt, f"SoilOrganicCarbon for {climate.name}, {moisture.name} and {soil_type.name} does not exist")
+        self.som = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, moisture_flt, f"LandUseNitrousEmissionFactor for {moisture.name} does not exist")
 
         # self.grassland_soc = get_grassland_soc(luc)
         # self.soc_start = self.grassland_soc.value if self.grassland_soc else self.soc.value
@@ -2284,6 +2272,7 @@ class GrasslandCalculator(BaseCalculator):
         self.soc_w = SimpleNamespace(fi=1, fmg=1, flu=1)
         self.soc_w = SimpleNamespace(fi=1, fmg=1, flu=1)
         self.soc_wo = SimpleNamespace(fi=1, fmg=1, flu=1)
+        self.som: SimpleNamespace | ipcc.LandUseNitrousEmissionFactor = SimpleNamespace(value=0)
 
     def get_defaults(self, calculate=False):
         module: Grassland = self.data
@@ -2295,60 +2284,21 @@ class GrasslandCalculator(BaseCalculator):
         # delay = ((activity.start_year_t2 or 0) - project.start_year) or 0
         # capitalization = project.implementation_years - duration + project.capitalization_years
 
-        try:
-            self.ef = ipcc.BurningEmissionFactor.objects.get(category__name="Savanna and grassland")
-        except ipcc.BurningEmissionFactor.DoesNotExist:
-            raise Exception("Burning emission factor for savanna and grassland does not exist")
+        self.ef = utils.get_or_raise(ipcc.BurningEmissionFactor, {"category__name": "Savanna and grassland"}, "Burning emission factor for savanna and grassland does not exist")
+        self.agb = utils.get_or_raise(ipcc.GrasslandAGB, {"climate": project.climate, "moisture": project.moisture}, f"AGB for {project.climate.name} climate and {project.moisture.name} moisture does not exist")
+        self.cf = utils.get_or_raise(GrasslandParameter, {"name": "default_combustion_factor"}, "Default combustion factor does not exist")
+        self.soc = utils.get_or_raise(ipcc.SoilOrganicCarbon, {"climate": project.climate, "moisture": project.moisture, "soil_type": project.soil_type}, f"Soil organic carbon for {project.climate.name} climate, {project.moisture.name} moisture and {project.soil_type.name} soil type does not exist")
+        self.som = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, {"moisture": project.moisture}, f"Land use nitrous emission factor for {project.moisture.name} moisture does not exist")
 
-        try:
-            self.agb = ipcc.GrasslandAGB.objects.get(climate=project.climate, moisture=project.moisture)
-        except ipcc.GrasslandAGB.DoesNotExist:
-            raise Exception(f"AGB for {project.climate.name} climate and {project.moisture.name} moisture does not exist")
+        if is_luc_remaining_same(module) or is_with(module):
 
-        try:
-            self.cf = GrasslandParameter.objects.get(name="default_combustion_factor")
-        except GrasslandParameter.DoesNotExist:
-            raise Exception("Default combustion factor does not exist")
-
-        try:
-            self.soc = ipcc.SoilOrganicCarbon.objects.get(climate=project.climate, moisture=project.moisture, soil_type=project.soil_type)
-        except ipcc.SoilOrganicCarbon.DoesNotExist:
-            raise Exception(f"Soil organic carbon for {project.climate.name} climate, {project.moisture.name} moisture and {project.soil_type.name} soil type does not exist")
-
-        if is_luc_remaining_same(module):
-
-            try:
-                self.soc_start = ipcc.GrasslandStockExchangeFactor.objects.get_or_default(grassland_management_type=module.grassland_management_type_start, climate=project.climate)
-            except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
-                raise Exception(f"Stock exchange factor for {module.grassland_management_type_start.name} in {project.climate.name} climate does not exist")
-
-            try:
-                self.soc_w = ipcc.GrasslandStockExchangeFactor.objects.get_or_default(grassland_management_type=module.grassland_management_type_w, climate=project.climate)
-            except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
-                raise Exception(f"Stock exchange factor for {module.grassland_management_type_w.name} in {project.climate.name} climate does not exist")
-
-        if is_with(module):
-            try:
-                self.soc_start = ipcc.GrasslandStockExchangeFactor.objects.get_or_default(grassland_management_type=module.grassland_management_type_start, climate=project.climate)
-            except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
-                raise Exception(f"Stock exchange factor for {module.grassland_management_type_start.name} in {project.climate.name} climate does not exist")
-
-            try:
-                self.soc_w = ipcc.GrasslandStockExchangeFactor.objects.get_or_default(grassland_management_type=module.grassland_management_type_w, climate=project.climate)
-            except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
-                raise Exception(f"Stock exchange factor for {module.grassland_management_type_w.name} in {project.climate.name} climate does not exist")
+            self.soc_start = utils.get_or_raise(ipcc.GrasslandStockExchangeFactor, {"grassland_management_type": module.grassland_management_type_start, "climate": project.climate}, f"Stock exchange factor for {module.grassland_management_type_start.name} in {project.climate.name} climate does not exist")
+            self.soc_w = utils.get_or_raise(ipcc.GrasslandStockExchangeFactor, {"grassland_management_type": module.grassland_management_type_w, "climate": project.climate}, f"Stock exchange factor for {module.grassland_management_type_w.name} in {project.climate.name} climate does not exist")
 
         if is_business_as_usual(module):
 
-            try:
-                self.soc_start = ipcc.GrasslandStockExchangeFactor.objects.get_or_default(grassland_management_type=module.grassland_management_type_start, climate=project.climate)
-            except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
-                raise Exception(f"Stock exchange factor for {module.grassland_management_type_start.name} in {project.climate.name} climate does not exist")
-
-            try:
-                self.soc_wo = ipcc.GrasslandStockExchangeFactor.objects.get_or_default(grassland_management_type=module.grassland_management_type_wo, climate=project.climate)
-            except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
-                raise Exception(f"Stock exchange factor for {module.grassland_management_type_wo.name} in {project.climate.name} climate does not exist")
+            self.soc_start = utils.get_or_raise(ipcc.GrasslandStockExchangeFactor, {"grassland_management_type": module.grassland_management_type_start, "climate": project.climate}, f"Stock exchange factor for {module.grassland_management_type_start.name} in {project.climate.name} climate does not exist")
+            self.soc_wo = utils.get_or_raise(ipcc.GrasslandStockExchangeFactor, {"grassland_management_type": module.grassland_management_type_wo, "climate": project.climate}, f"Stock exchange factor for {module.grassland_management_type_wo.name} in {project.climate.name} climate does not exist")
 
     def calculate(self) -> list[Result]:
         """
@@ -2376,6 +2326,11 @@ class GrasslandCalculator(BaseCalculator):
         math_w = None
         math_wo = None
 
+        DELAY_START_W = 0
+        DELAY_START_WO = 0
+        DELAY_W = 0
+        DELAY_WO = 0
+
         if is_luc_remaining_same(module):
             log.debug("LUC remaining same")
 
@@ -2398,7 +2353,7 @@ class GrasslandCalculator(BaseCalculator):
                 self.soc.value,
                 module.soc_t2_start,
                 module.soc_t2_w,
-                False,
+                CALCULATE_SOC_SOM_START_W,
                 self.soc_start.fmg,
                 self.soc_w.fmg,
                 module.fmg_t2_start,
@@ -2411,7 +2366,8 @@ class GrasslandCalculator(BaseCalculator):
                 self.soc_w.fi,
                 module.fi_t2_start,
                 module.fi_t2_w,
-                0,
+                DELAY_START_W,
+                self.som.value,
             ]
 
             log.debug("Inputs start w: %s", self.inputs_start_w)
@@ -2441,7 +2397,7 @@ class GrasslandCalculator(BaseCalculator):
                 self.soc.value,
                 module.soc_t2_start,
                 module.soc_t2_w,
-                True,
+                CALCULATE_SOC_SOM_W,
                 self.soc_start.fmg,
                 self.soc_w.fmg,
                 module.fmg_t2_start,
@@ -2454,7 +2410,8 @@ class GrasslandCalculator(BaseCalculator):
                 self.soc_w.fi,
                 module.fi_t2_start,
                 module.fi_t2_w,
-                0,
+                DELAY_W,
+                self.som.value,
             ]
 
             log.debug("Inputs w: %s", self.inputs_w)
@@ -2484,7 +2441,7 @@ class GrasslandCalculator(BaseCalculator):
                 self.soc.value,
                 module.soc_t2_start,
                 module.soc_t2_wo,
-                False,
+                CALCULATE_SOC_SOM_START_WO,
                 self.soc_start.fmg,
                 self.soc_wo.fmg,
                 module.fmg_t2_start,
@@ -2497,7 +2454,8 @@ class GrasslandCalculator(BaseCalculator):
                 self.soc_wo.fi,
                 module.fi_t2_start,
                 module.fi_t2_wo,
-                0,
+                DELAY_START_WO,
+                self.som.value,
             ]
 
             log.debug("Inputs start wo: %s", self.inputs_start_wo)
@@ -2527,7 +2485,7 @@ class GrasslandCalculator(BaseCalculator):
                 self.soc.value,
                 module.soc_t2_start,
                 module.soc_t2_wo,
-                True,
+                CALCULATE_SOC_SOM_WO,
                 self.soc_start.fmg,
                 self.soc_wo.fmg,
                 module.fmg_t2_start,
@@ -2540,7 +2498,8 @@ class GrasslandCalculator(BaseCalculator):
                 self.soc_wo.fi,
                 module.fi_t2_start,
                 module.fi_t2_wo,
-                0,
+                DELAY_WO,
+                self.som.value,
             ]
 
             log.debug("Inputs wo: %s", self.inputs_wo)
@@ -5243,7 +5202,7 @@ class OrganicSoilCalculator(BaseCalculator):
             area_affected_by_module = luc.area
         else:
             print("No Land Use Change")
-            
+
             parent_module, parent_module_type = utils.find_organic_soil_parent_module(input)
             module_type_start = module_type_w = module_type_wo = parent_module_type.name
 
@@ -5635,8 +5594,14 @@ class ForestManagementCalculator(BaseCalculator):
         project: Project = input.activity.project
         area = luc.area if luc else input.area
 
+        DELAY_START_W = 0
+        DELAY_START_WO = 0
+        DELAY_W = 0
+        DELAY_WO = 0
+
         # TODO: Review
         if luc:
+            # NOTE: This if is useless. It's always True
             land_use_type = input.land_use_type_start if luc.module_type_start.class_name == "ForestManagement" else input.land_use_type_start
             land_use_type = LandUseType.objects.get(name=land_use_type.name)
         else:
@@ -5768,6 +5733,8 @@ class ForestManagementCalculator(BaseCalculator):
 
         disturbances: list[ForestDisturbance] = input.disturbances.all()
 
+        som: ipcc.LandUseNitrousEmissionFactor = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, {"moisture": project.moisture}, f"SOM not found for {project.moisture.name} moisture.")
+
         math_w = None
         math_wo = None
 
@@ -5808,16 +5775,34 @@ class ForestManagementCalculator(BaseCalculator):
             litter_dw_start_w.dw,
             litter_dw_max_w.dw,
             forest.deadwood_t2_w,
+            socref.value,  ##### REFACTOR STARTS HERE
             socref.value,
             project.soc_ref_t2,
-            forest.flu_t2_w,
-            forest.fi_t2_w,
+            project.soc_ref_t2,
+            1,  # FMG_start
+            1,  # FMG_w
+            forest.fmg_t2_start,
             forest.fmg_t2_w,
+            flu_start.value,
             flu_w.value,
-            1,  # FI # TODO: Not yet implemented
-            1,  # FMG # TODO: Not yet implemented
+            forest.flu_t2_start,
+            forest.flu_t2_w,
+            1,  # FI_start
+            1,  # FI_w
+            forest.fi_t2_start,
+            forest.fi_t2_w,
             project.gw_potential.ch4,
             project.gw_potential.n2o,
+            1,  # forest_cf
+            1,  # forest_gef_ch4
+            1,  # forest_gef_n2o
+            1,  # forest_gef_co2
+            1,  # mangrove_factor (see mangrove implementation elsewhere)
+            forest.average_yearly_degradation_percentage_w,
+            som.value,
+            project.gw_potential.n2o,
+            project.gw_potential.ch4,
+            DELAY_WO,
         ]
 
         math_w = MathForestManagement(*inputs_w)
@@ -5861,15 +5846,33 @@ class ForestManagementCalculator(BaseCalculator):
             litter_dw_max_wo.dw,
             forest.deadwood_t2_wo,
             socref.value,
+            socref.value,
             project.soc_ref_t2,
-            forest.flu_t2_wo,
-            forest.fi_t2_wo,
-            forest.fmg_t2_wo,
+            project.soc_ref_t2,
+            1,  # FMG_start
+            1,  # FMG_w
+            forest.fmg_t2_start,
+            forest.fmg_t2_w,
+            flu_start.value,
             flu_wo.value,
-            1,  # FI # TODO: Not yet implemented
-            1,  # FMG # TODO: Not yet implemented
+            forest.flu_t2_start,
+            forest.flu_t2_wo,
+            1,  # FI_start
+            1,  # FI_w
+            forest.fi_t2_start,
+            forest.fi_t2_wo,
             project.gw_potential.ch4,
             project.gw_potential.n2o,
+            1,  # forest_cf
+            1,  # forest_gef_ch4
+            1,  # forest_gef_n2o
+            1,  # forest_gef_co2
+            1,  # mangrove_factor (see mangrove implementation elsewhere)
+            forest.average_yearly_degradation_percentage_w,
+            som.value,
+            project.gw_potential.n2o,
+            project.gw_potential.ch4,
+            DELAY_WO,
         ]
 
         math_wo = MathForestManagement(*inputs_wo)
@@ -5907,6 +5910,7 @@ class DegradedLandCalculator(BaseCalculator):
         self.fi_wo: SimpleNamespace | ipcc.FIData = SimpleNamespace(value=1)
         self.fmg_wo: SimpleNamespace | ipcc.FMGData = SimpleNamespace(value=1)
         self.flu_wo: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=1)
+        self.som: SimpleNamespace | ipcc.LandUseNitrousEmissionFactor = SimpleNamespace(value=1)
 
         self.math_start_w = None
         self.math_start_wo = None
@@ -5919,6 +5923,11 @@ class DegradedLandCalculator(BaseCalculator):
         project: Project = activity.project
         luc: LandUseChange = input.land_use_change
         area = luc.area if luc else input.area
+
+        DELAY_START_W = 0
+        DELAY_START_WO = 0
+        DELAY_W = 0
+        DELAY_WO = 0
 
         self.get_defaults()
 
@@ -5934,12 +5943,12 @@ class DegradedLandCalculator(BaseCalculator):
                 project.capitalization_years,
                 activity.change_rate.name,
                 project.gw_potential.n2o,
-                self.emission_factors_start.value,
+                self.som.value,
                 self.soc.value,
                 self.soc.value,
                 module_start.soc_t2_start,
                 module_w.soc_t2_w,
-                False,
+                CALCULATE_SOC_SOM_START_W,
                 self.fmg_start.value,
                 self.fmg_w.value,
                 module_start.fmg_t2_start,
@@ -5952,7 +5961,7 @@ class DegradedLandCalculator(BaseCalculator):
                 self.fi_w.value,
                 module_start.fi_t2_start,
                 module_w.fi_t2_w,
-                0,  # delay
+                DELAY_START_W,
             ]
 
             self.math_start_w = MathNotCultivatedLand(*self.inputs_start_w)
@@ -5965,12 +5974,12 @@ class DegradedLandCalculator(BaseCalculator):
                 project.capitalization_years,
                 activity.change_rate.name,
                 project.gw_potential.n2o,
-                self.emission_factors_start.value,
+                self.som.value,
                 self.soc.value,
                 self.soc.value,
                 module_start.soc_t2_start,
                 module_wo.soc_t2_wo,
-                False,
+                CALCULATE_SOC_SOM_START_WO,
                 self.fmg_start.value,
                 self.fmg_wo.value,
                 module_start.fmg_t2_start,
@@ -5983,7 +5992,7 @@ class DegradedLandCalculator(BaseCalculator):
                 self.fi_wo.value,
                 module_start.fi_t2_start,
                 module_wo.fi_t2_wo,
-                0,  # delay
+                DELAY_START_WO,
             ]
 
             self.math_start_wo = MathNotCultivatedLand(*self.inputs_start_wo)
@@ -5996,12 +6005,12 @@ class DegradedLandCalculator(BaseCalculator):
                 project.capitalization_years,
                 activity.change_rate.name,
                 project.gw_potential.n2o,
-                self.emission_factors_w.value,
+                self.som.value,
                 self.soc.value,
                 self.soc.value,
                 module_start.soc_t2_start,
                 module_w.soc_t2_w,
-                True,
+                CALCULATE_SOC_SOM_W,
                 self.fmg_start.value,
                 self.fmg_w.value,
                 module_start.fmg_t2_start,
@@ -6014,7 +6023,7 @@ class DegradedLandCalculator(BaseCalculator):
                 self.fi_w.value,
                 module_start.fi_t2_start,
                 module_w.fi_t2_w,
-                0,  # delay
+                DELAY_W,
             ]
 
             self.math_w = MathNotCultivatedLand(*self.inputs_w)
@@ -6027,12 +6036,12 @@ class DegradedLandCalculator(BaseCalculator):
                 project.capitalization_years,
                 activity.change_rate.name,
                 project.gw_potential.n2o,
-                self.emission_factors_wo.value,
+                self.som.value,
                 self.soc.value,
                 self.soc.value,
                 module_start.soc_t2_start,
                 module_wo.soc_t2_wo,
-                True,
+                CALCULATE_SOC_SOM_WO,
                 self.fmg_start.value,
                 self.fmg_wo.value,
                 module_start.fmg_t2_start,
@@ -6045,7 +6054,7 @@ class DegradedLandCalculator(BaseCalculator):
                 self.fi_wo.value,
                 module_start.fi_t2_start,
                 module_wo.fi_t2_wo,
-                0,  # delay
+                DELAY_WO,
             ]
 
             self.math_wo = MathNotCultivatedLand(*self.inputs_wo)
@@ -6102,27 +6111,24 @@ class DegradedLandCalculator(BaseCalculator):
             self.flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
             self.fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
             self.fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-            self.emission_factors_start = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_hardcoded, f"DefaultEmissionFactor for {moisture.name} moisture and Medium C input does not exist")
 
         if is_business_as_usual(module):
             self.flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
             self.fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
             self.fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-            self.emission_factors_start = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_hardcoded, f"DefaultEmissionFactor for {moisture.name} moisture and Medium C input does not exist")
 
         if is_with(module):
             self.flu_w = get_flu_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
             self.fmg_w = get_fmg_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
             self.fi_w = get_fi_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
-            self.emission_factors_w = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_hardcoded, f"DefaultEmissionFactor for {moisture.name} moisture and Medium C input does not exist")
 
         if is_without(module):
             self.flu_wo = get_flu_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
             self.fmg_wo = get_fmg_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
             self.fi_wo = get_fi_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
-            self.emission_factors_wo = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_hardcoded, f"DefaultEmissionFactor for {moisture.name} moisture and Medium C input does not exist")
 
         self.soc = utils.get_or_raise(ipcc.SoilOrganicCarbon, cm | soil_flt, f"SoilOrganicCarbon for {soil_type.name} soil type in {climate.name} climate and {moisture.name} moisture does not exist")
+        self.som = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, moisture_flt, f"LandUseNitrousEmissionFactor for {moisture.name} moisture and Medium C input does not exist")
 
         if module.status.name == "READY" and calculate:
             self.calculate()
@@ -6146,6 +6152,7 @@ class SetAsideCalculator(BaseCalculator):
         self.fi_wo: SimpleNamespace | ipcc.FIData = SimpleNamespace(value=1)
         self.fmg_wo: SimpleNamespace | ipcc.FMGData = SimpleNamespace(value=1)
         self.flu_wo: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=1)
+        self.som: SimpleNamespace | ipcc.LandUseNitrousEmissionFactor = SimpleNamespace(value=1)
 
         self.math_start_w = None
         self.math_start_wo = None
@@ -6158,6 +6165,11 @@ class SetAsideCalculator(BaseCalculator):
         project: Project = activity.project
         luc: LandUseChange = input.land_use_change
         area = luc.area if luc else input.area
+
+        DELAY_START_W = 0
+        DELAY_START_WO = 0
+        DELAY_W = 0
+        DELAY_WO = 0
 
         self.get_defaults()
 
@@ -6173,12 +6185,12 @@ class SetAsideCalculator(BaseCalculator):
                 project.capitalization_years,
                 activity.change_rate.name,
                 project.gw_potential.n2o,
-                self.emission_factors_start.value,
+                self.som_start.value,
                 self.soc.value,
                 self.soc.value,
                 module_start.soc_t2_start,
                 module_w.soc_t2_w,
-                False,
+                CALCULATE_SOC_SOM_START_W,
                 self.fmg_start.value,
                 self.fmg_w.value,
                 module_start.fmg_t2_start,
@@ -6191,7 +6203,7 @@ class SetAsideCalculator(BaseCalculator):
                 self.fi_w.value,
                 module_start.fi_t2_start,
                 module_w.fi_t2_w,
-                0,  # delay
+                DELAY_START_W,
             ]
 
             self.math_start_w = MathNotCultivatedLand(*self.inputs_start_w)
@@ -6204,12 +6216,12 @@ class SetAsideCalculator(BaseCalculator):
                 project.capitalization_years,
                 activity.change_rate.name,
                 project.gw_potential.n2o,
-                self.emission_factors_start.value,
+                self.som_start.value,
                 self.soc.value,
                 self.soc.value,
                 module_start.soc_t2_start,
                 module_wo.soc_t2_wo,
-                False,
+                CALCULATE_SOC_SOM_START_WO,
                 self.fmg_start.value,
                 self.fmg_wo.value,
                 module_start.fmg_t2_start,
@@ -6222,7 +6234,7 @@ class SetAsideCalculator(BaseCalculator):
                 self.fi_wo.value,
                 module_start.fi_t2_start,
                 module_wo.fi_t2_wo,
-                0,  # delay
+                DELAY_START_WO,
             ]
 
             self.math_start_wo = MathNotCultivatedLand(*self.inputs_start_wo)
@@ -6235,12 +6247,12 @@ class SetAsideCalculator(BaseCalculator):
                 project.capitalization_years,
                 activity.change_rate.name,
                 project.gw_potential.n2o,
-                self.emission_factors_w.value,
+                self.som_w.value,
                 self.soc.value,
                 self.soc.value,
                 module_start.soc_t2_start,
                 module_w.soc_t2_w,
-                True,
+                CALCULATE_SOC_SOM_W,
                 self.fmg_start.value,
                 self.fmg_w.value,
                 module_start.fmg_t2_start,
@@ -6253,7 +6265,7 @@ class SetAsideCalculator(BaseCalculator):
                 self.fi_w.value,
                 module_start.fi_t2_start,
                 module_w.fi_t2_w,
-                0,  # delay
+                DELAY_W,
             ]
 
             self.math_w = MathNotCultivatedLand(*self.inputs_w)
@@ -6266,12 +6278,12 @@ class SetAsideCalculator(BaseCalculator):
                 project.capitalization_years,
                 activity.change_rate.name,
                 project.gw_potential.n2o,
-                self.emission_factors_wo.value,
+                self.som_wo.value,
                 self.soc.value,
                 self.soc.value,
                 module_start.soc_t2_start,
                 module_wo.soc_t2_wo,
-                True,
+                CALCULATE_SOC_SOM_WO,
                 self.fmg_start.value,
                 self.fmg_wo.value,
                 module_start.fmg_t2_start,
@@ -6284,7 +6296,7 @@ class SetAsideCalculator(BaseCalculator):
                 self.fi_wo.value,
                 module_start.fi_t2_start,
                 module_wo.fi_t2_wo,
-                0,  # delay
+                DELAY_WO,
             ]
 
             self.math_wo = MathNotCultivatedLand(*self.inputs_wo)
@@ -6341,25 +6353,25 @@ class SetAsideCalculator(BaseCalculator):
             self.flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
             self.fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
             self.fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-            self.emission_factors_start = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_hardcoded, f"DefaultEmissionFactor for {moisture.name} moisture and Medium C input does not exist")
+            self.som_start = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, moisture_flt, f"LandUseNitrousEmissionFactor for {moisture.name} moisture and Medium C input does not exist")
 
         if is_business_as_usual(module):
             self.flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
             self.fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
             self.fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-            self.emission_factors_start = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_hardcoded, f"DefaultEmissionFactor for {moisture.name} moisture and Medium C input does not exist")
+            self.som_start = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, moisture_flt, f"LandUseNitrousEmissionFactor for {moisture.name} moisture and Medium C input does not exist")
 
         if is_with(module):
             self.flu_w = get_flu_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
             self.fmg_w = get_fmg_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
             self.fi_w = get_fi_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
-            self.emission_factors_w = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_hardcoded, f"DefaultEmissionFactor for {moisture.name} moisture and Medium C input does not exist")
+            self.som_w = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, moisture_flt, f"LandUseNitrousEmissionFactor for {moisture.name} moisture and Medium C input does not exist")
 
         if is_without(module):
             self.flu_wo = get_flu_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
             self.fmg_wo = get_fmg_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
             self.fi_wo = get_fi_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
-            self.emission_factors_wo = utils.get_or_raise(ipcc.DefaultEmissionFactor, moisture_flt | organic_input_hardcoded, f"DefaultEmissionFactor for {moisture.name} moisture and Medium C input does not exist")
+            self.som_wo = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, moisture_flt, f"LandUseNitrousEmissionFactor for {moisture.name} moisture and Medium C input does not exist")
 
         self.soc = utils.get_or_raise(ipcc.SoilOrganicCarbon, cm | soil_flt, f"SoilOrganicCarbon for {soil_type.name} soil type in {climate.name} climate and {moisture.name} moisture does not exist")
 
