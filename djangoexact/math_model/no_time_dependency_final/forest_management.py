@@ -152,6 +152,14 @@ class ForestManagement(BaseModule):
         self.fi_start_tier_2 = fi_start_tier_2  # tier 2 value, expects float or None
         self.fi_end_tier_2 = fi_end_tier_2  # tier 2 value, expects float or None
 
+        # TODO: Assigned FMG, FLU, FI values. Maybe once everything has been done change this structure
+        self.fmg_start = self.fmg_start_tier_2 if self.fmg_start_tier_2 else self.fmg_start_default
+        self.fmg_end = self.fmg_end_tier_2 if self.fmg_end_tier_2 else self.fmg_end_default
+        self.flu_start = self.flu_start_tier_2 if self.flu_start_tier_2 else self.flu_start_default
+        self.flu_end = self.flu_end_tier_2 if self.flu_end_tier_2 else self.flu_end_default
+        self.fi_start = self.fi_start_tier_2 if self.fi_start_tier_2 else self.fi_start_default
+        self.fi_end = self.fi_end_tier_2 if self.fi_end_tier_2 else self.fi_end_default
+
         self.soc_start = self.soc_start_default * self.fmg_start * self.flu_start * self.fi_start if not self.soc_start_tier_2 else self.soc_start_tier_2
         self.soc_end = self.soc_end_default * self.fmg_end * self.flu_end * self.fi_end if not self.soc_end_tier_2 else self.soc_end_tier_2
 
