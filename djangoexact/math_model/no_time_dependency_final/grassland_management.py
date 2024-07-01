@@ -10,6 +10,7 @@ from .general_functions import (
     yearly_constant_emissions_breakdown,
     yearly_time_dependent_20_year_breakdown,
     yearly_time_dependent_parameter_breakdown,
+    som_emissions,
 )
 from .ghg_emissions_classes import (
     ActivityTypes,
@@ -42,7 +43,7 @@ class GrasslandManagement(BaseModule):
         soc_end_default,
         soc_start_tier_2,
         soc_end_tier_2,
-        calculate_soc,
+        calculate_soc_som,
         fmg_start_default,
         fmg_end_default,
         fmg_start_tier_2,
@@ -56,6 +57,7 @@ class GrasslandManagement(BaseModule):
         fi_start_tier_2,
         fi_end_tier_2,
         delay,
+        ef_nitrous_som,
     ):
         self.area_start = area_start
         self.area_end = area_end
@@ -99,6 +101,7 @@ class GrasslandManagement(BaseModule):
         self.fi_end = self.fi_end_tier_2 if self.fi_end_tier_2 else self.fi_end_default
 
         self.delay = delay  # defaulted to 0 in case there are None, if not float value
+        self.ef_nitrous_som = ef_nitrous_som  # tabulated value IPCC E75 (value for Savanna and Grassland)
 
         # Space for the results
         self.hectars_before_20, self.hectars_after_20 = yearly_time_dependent_20_year_breakdown(area_start, area_end, self.time_impl, self.time_cap, self.rate)
@@ -115,12 +118,15 @@ class GrasslandManagement(BaseModule):
         self.emissions_soil_yearly = []
         self.emissions_soil_total = 0
 
+        self.emissions_som_yearly = []
+        self.emissions_som_total = 0
+
         self.emissions_total_yearly = []
         self.total_emissions = 0
 
         self.result = Result(self.time_impl, self.time_cap)
 
-        self.calculate_soc = calculate_soc
+        self.calculate_soc_som = calculate_soc_som
 
         # TIER 2 DEFAULTS
         self.soc_start_tier_2_default = self.soc_start_default * self.fmg_start * self.fi_start * self.flu_start
@@ -170,7 +176,7 @@ class GrasslandManagement(BaseModule):
 
         def calculate_soil_emissions():
             try:
-                if self.calculate_soc:
+                if self.calculate_soc_som:
                     self.emissions_soil_yearly, self.emissions_soil_total = soil_emissions_2(self.soc_start, self.soc_end, self.total_hectars, self.area_start, self.area_end, self.hectars_before_20)
 
                     soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_soil_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
@@ -179,8 +185,20 @@ class GrasslandManagement(BaseModule):
             except Exception as e:
                 traceback.print_exc()
 
+        def calculate_emissions_som():
+            try:
+                if self.calculate_soc_som:
+                    self.emissions_som_yearly, self.emissions_som_total = som_emissions(self.soc_end, self.soc_start, self.ef_nitrous_som, self.nitrous_constant, self.hectars_before_20)
+
+                    som_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in self.emissions_som_yearly], ActivityTypes.SOM, delay=self.delay)
+                    self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
+            except Exception as e:
+                traceback.print_exc()
+
         calculate_residue_burning()
         calculate_soil_emissions()
+        calculate_emissions_som()
+
 
         try:
             self.emissions_total_yearly = [x + y for x, y in zip(self.emissions_residue_burning_yearly, self.emissions_soil_yearly)]
