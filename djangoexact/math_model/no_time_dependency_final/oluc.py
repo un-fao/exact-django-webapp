@@ -171,15 +171,12 @@ class OtherLandUseChanges(BaseModule):
 
             initial_biomass = self.initial_lu_biomass if not self.initial_lu_biomass_tier_2 else self.initial_lu_biomass_tier_2
             fire_mb = initial_biomass / 0.4
-            fsom = 0 if delta_c_soc >= 0 else -(1000 * delta_c_soc) / self.c_n_ratio
 
             kg_methane_fire = fire_mb * self.combustion_factor * self.emission_factor_methane if self.fire_bool else 0
             kg_nitrous_fire = initial_biomass * 2.5 * self.combustion_factor * self.emission_factor_nitrous if self.fire_bool else 0
 
-            kg_nitrous_soil = fsom * self.moisture_emission_factor * (44 / 28)
-
             methane_emissions = kg_methane_fire * self.methane_constant
-            nitrous_emissions = (kg_nitrous_fire + kg_nitrous_soil) * self.nitrous_constant
+            nitrous_emissions = kg_nitrous_fire * self.nitrous_constant
 
             total_em_per_hectar = (methane_emissions + nitrous_emissions) / 1000
 
@@ -197,9 +194,7 @@ class OtherLandUseChanges(BaseModule):
             yearly_methane_fire_emissions = yearly_constant_emissions_breakdown(methane_fire_emissions, self.time_impl, self.time_cap)
             yearly_nitrous_fire_emissions = yearly_constant_emissions_breakdown(nitrous_fire_emissions, self.time_impl, self.time_cap)
 
-            # TODO: check if this is indeed residue burning
             self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in yearly_methane_fire_emissions], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
-
             self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in yearly_nitrous_fire_emissions], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
 
         try:
