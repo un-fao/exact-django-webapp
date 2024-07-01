@@ -4,7 +4,7 @@ import traceback
 import matplotlib.pyplot as plt
 import numpy as np
 
-from general_functions import (
+from .general_functions import (
     BaseModule,
     breakdown_according_to_values,
     soil_emissions_2,
@@ -17,7 +17,7 @@ from general_functions import (
     yearly_time_dependent_parameter_breakdown,
     yearly_time_dependent_matrix_log_rec_dis
 )
-from ghg_emissions_classes import (
+from .ghg_emissions_classes import (
     ActivityTypes,
     Emission,
     GasTypes,
