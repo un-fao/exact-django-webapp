@@ -92,6 +92,7 @@ class ForestManagement(BaseModule):
         degradation_percentage,
         ef_nitrous_som,
         nitrous_constant,
+        methane_constant,
         delay
     ):
         self.years_cap = years_cap if not rate == 'immediate' else years_cap + years_impl - 1
@@ -167,6 +168,7 @@ class ForestManagement(BaseModule):
 
         self.ef_nitrous_som = ef_nitrous_som
         self.nitrous_constant = nitrous_constant
+        self.methane_constant = methane_constant
         self.delay = delay
 
 
