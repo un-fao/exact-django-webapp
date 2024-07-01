@@ -209,7 +209,7 @@ def copy_activity(activity, new_project=None):
                 organic_soil_copy.activity = activity_copy
                 organic_soil_copy._state.adding = True
                 organic_soil_copy.save()
-            
+
             module_copy.organic_soil = organic_soil_copy
             module_copy.save()
 
@@ -236,7 +236,7 @@ def copy_activity(activity, new_project=None):
     return activity
 
 
-def create_module_threads(module_instance):
+def create_comment_threads(module_instance):
     for attr in dir(module_instance):
         if attr.endswith("_thread") and getattr(module_instance, attr, None) is None:
             setattr(module_instance, attr, api_models.CommentThread.objects.create())
@@ -364,8 +364,7 @@ def find_organic_soil_parent_module(organic_soil) -> tuple:
     """
 
     # NOTE: This is always true as long as Organic Soil is a OneToOneField of LandModule
-    parent_module: api_models.LandModule = next(attr for attr in dir(organic_soil) if attr.startswith("organic_soil_") and 
-                                                (attr not in ["organicsoil"] and isinstance(getattr(organic_soil, attr, None), api_models.LandModule)))
+    parent_module: api_models.LandModule = next(attr for attr in dir(organic_soil) if attr.startswith("organic_soil_") and (attr not in ["organicsoil"] and isinstance(getattr(organic_soil, attr, None), api_models.LandModule)))
 
     if not parent_module:
         raise ValueError(f"Could not find parent module for Organic Soil")

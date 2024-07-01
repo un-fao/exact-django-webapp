@@ -953,7 +953,7 @@ def generic_module_viewset(model: Model):
 
             module_serializer.save()
 
-            utils.create_module_threads(module_serializer.instance)
+            utils.create_comment_threads(module_serializer.instance)
 
             read_serializer = get_module_serializer(model)(instance=module_serializer.instance)
 
@@ -1009,7 +1009,7 @@ def generic_module_viewset(model: Model):
             serializer = get_module_serializer(model)(instance=module)
             if not serializer.validate(module.__dict__):
                 return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
-            
+
             if module_type.class_name == LandUseChange.__name__:
 
                 status_start = utils.get_module_status(self, activity, module.module_type_start)
