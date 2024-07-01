@@ -9,6 +9,7 @@ from .general_functions import (
     yearly_constant_emissions_breakdown,
     yearly_time_dependent_20_year_breakdown,
     yearly_time_dependent_parameter_breakdown,
+    som_emissions,
 )
 from .ghg_emissions_classes import (
     ActivityTypes,
@@ -66,6 +67,8 @@ class Deforestation(BaseModule):
         flu_end_default,
         soc_start_default,
         soc_end_default,
+        calculate_soc_som,
+        delay
     ):
         self.ha_start = ha_start
         self.ha_end = ha_end
@@ -112,6 +115,8 @@ class Deforestation(BaseModule):
         self.flu_end_default = flu_end_default
         self.soc_start_default = soc_start_default
         self.soc_end_default = soc_end_default
+        self.calculate_soc_som = calculate_soc_som
+        self.delay = delay
 
         # TODO: Assigned FMG, FLU, FI values. Maybe once everything has been done change this structure
         self.fmg_start = self.fmg_start_tier_2 if self.fmg_start_tier_2 else self.fmg_start_default
@@ -154,6 +159,9 @@ class Deforestation(BaseModule):
 
         self.emissions_fire_fsom_yearly = []
         self.emissions_fire_fsom_total = 0
+
+        self.emissions_som_yearly = []
+        self.emissions_som_total = 0
 
         self.emissions_total_yearly = []
         self.total_emissions = 0
@@ -251,11 +259,22 @@ class Deforestation(BaseModule):
             except Exception as e:
                 traceback.print_exc()
 
+        def calculate_emissions_som():
+            try:
+                if self.calculate_soc_som:
+                    self.emissions_som_yearly, self.emissions_som_total = som_emissions(self.soc_end, self.soc_start, self.moisture_emission_factor, self.nitrous_constant, self.hectars_before_20)
+
+                    som_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in self.emissions_som_yearly], ActivityTypes.SOM, delay=self.delay)
+                    self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
+            except Exception as e:
+                traceback.print_exc()
+
         calculate_biomass_loss_emissions()
         calculate_biomass_gain_emissions()
         calculate_dom_emissions()
         calculate_soil_emissions()
         calculate_fire_emissions()
+        calculate_emissions_som()
 
         try:
             self.emissions_total_yearly = [sum(x) for x in zip(self.emissions_biomass_gain_yearly, self.emissions_biomass_loss_yearly, self.emissions_dom_yearly, self.emissions_soil_yearly, self.emissions_fire_fsom_yearly)]
