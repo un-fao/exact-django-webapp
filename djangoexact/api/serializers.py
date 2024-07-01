@@ -433,101 +433,95 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
         return data
 
-    @transaction.atomic
-    def save(self, **kwargs):
-        has_organic_soil = "OrganicSoil" in [module.class_name for module in self.validated_data["module_types"]]
-        has_luc_module = self.validated_data.get("land_use_change", False)
-
-        if Activity.objects.filter(name=self.validated_data["name"], project=self.validated_data["project"]).exists():
-            base_name = self.validated_data["name"]
-            project = self.validated_data["project"]
-            suffix = 1
-
-            # Find a unique name by appending a suffix
-            while Activity.objects.filter(name=f"{base_name} ({suffix})", project=project).exists():
-                suffix += 1
-
-            # Update the name in the validated data
-            self.validated_data["name"] = f"{base_name} ({suffix})"
-            # raise serializers.ValidationError("An activity with this name already exists for this project")
-
-        activities_cost = list(self.validated_data["project"].activities.all().values_list("cost", flat=True))
-        activities_cost.append(self.validated_data.get("cost", 0))
-
-        if self.validated_data["project"].cost and sum(activities_cost) > self.validated_data["project"].cost:
-            raise serializers.ValidationError("Total cost of activities cannot be greater than project cost")
-
-        activity: Activity = Activity.objects.create(
+    def create_activity(self):
+        return Activity.objects.create(
             name=self.validated_data["name"],
             project=self.validated_data["project"],
             cost=self.validated_data["cost"],
-            climate_t2=self.validated_data.get("climate", None),
-            moisture_t2=self.validated_data.get("moisture", None),
-            duration_t2=self.validated_data.get("duration", None),
-            soil_type_t2=self.validated_data.get("soil_type", None),
-            start_year_t2=self.validated_data.get("start_year", None),
+            climate_t2=self.validated_data.get("climate"),
+            moisture_t2=self.validated_data.get("moisture"),
+            duration_t2=self.validated_data.get("duration"),
+            soil_type_t2=self.validated_data.get("soil_type"),
+            start_year_t2=self.validated_data.get("start_year"),
         )
-        activity.module_types.set(self.validated_data.get("module_types", []))
 
-        luc = None
+    def handle_luc_module(self, activity, has_organic_soil):
+        luc = LandUseChange.objects.create(
+            **self.validated_data["land_use_change"],
+            activity=activity,
+            area=self.validated_data["area"],
+        )
+        activity.module_types.add(
+            luc.module_type_start.id,
+            luc.module_type_w.id,
+            luc.module_type_wo.id,
+            ModuleType.objects.get(name="Land Use Change").id,
+        )
+        luc.status = StatusType.objects.get(name="READY")
 
-        if has_luc_module:
-            luc: LandUseChange = LandUseChange.objects.create(
-                **self.validated_data["land_use_change"],
-                activity=activity,
-                area=self.validated_data["area"],
-            )
-            activity.module_types.add(luc.module_type_start.id)
-            activity.module_types.add(luc.module_type_w.id)
-            activity.module_types.add(luc.module_type_wo.id)
-            activity.module_types.add(ModuleType.objects.get(name="Land Use Change").id)
-            luc.status = StatusType.objects.get(name="READY")
+        if has_organic_soil:
+            organic_soil = OrganicSoil.objects.create(activity=activity, area=self.validated_data.get("area"))
+            organic_soil.land_use_change = luc
+            organic_soil.save()
+            activity.module_types.add(ModuleType.objects.get(name="Organic Soil").id)
+            luc.organic_soil = organic_soil
 
-            if has_organic_soil:
-                organic_soil = OrganicSoil.objects.create(activity=activity, area=self.validated_data.get("area"))
-                organic_soil.land_use_change = luc
-                organic_soil.save()
+        luc.save()
+        return luc
 
-                activity.module_types.add(ModuleType.objects.get(name="Organic Soil").id)
-                luc.organic_soil = organic_soil
-
-            luc.save()
-
+    def create_modules(self, activity, luc, has_organic_soil, has_luc_module):
         for module_type in activity.module_types.all():
             if module_type.class_name in ["LandUseChange", "OrganicSoil"]:
                 continue
 
-            log.debug(f"Creating module {module_type.class_name}")
-
             ModuleClass = apps.get_model("api", module_type.class_name)
-            module_instance = None
-
             if module_type.is_luc:
-                module_instance: LandModule = ModuleClass.objects.create(activity=activity, land_use_change=luc, area=self.validated_data.get("area"))
+                module_instance = ModuleClass.objects.create(activity=activity, land_use_change=luc, area=self.validated_data.get("area"))
                 if has_organic_soil and not has_luc_module:
-                    # NOTE: This works because in the current implementation, only one independent land use module is allowed
-                    # per activity. This logic will need to be reviewed if multiple independent land use modules are allowed.
-                    log.debug(f"Creating Organic Soil module for {module_type.class_name}")
                     organic_soil = OrganicSoil.objects.create(activity=activity, area=self.validated_data.get("area"))
                     activity.module_types.add(ModuleType.objects.get(name="Organic Soil").id)
                     module_instance.organic_soil = organic_soil
             else:
-                # NOTE: This is necessary due to a miss-allignment between what
-                # constitutes a land module and what doesn't between front and back-end.
-                # Coastal cannot as of now be present as a land use module for the
-                # front-end as it should not be included as Land Use Change.
-                # This is due to the fact that a methodology for SOC calculcation
-                # is not present in the mathematical model yet. This is a temporary
-                # solution until the methodology is implemented, after that Coastal Wetland
-                # will have .is_luc = True and all will be solved
-                if module_type.name == "Coastal Wetland":
-                    module_instance = ModuleClass.objects.create(activity=activity, area=self.validated_data.get("area"))
-                else:
-                    module_instance = ModuleClass.objects.create(activity=activity)
+                module_instance = ModuleClass.objects.create(activity=activity, area=self.validated_data.get("area") if module_type.name == "Coastal Wetland" else None)
 
             utils.create_comment_threads(module_instance)
             module_instance.save()
 
+    def unique_activity_name(self):
+        base_name = self.validated_data["name"]
+        project = self.validated_data["project"]
+        suffix = 1
+
+        while Activity.objects.filter(name=f"{base_name} ({suffix})", project=project).exists():
+            suffix += 1
+
+        return f"{base_name} ({suffix})"
+
+    def validate_total_project_cost(self):
+        project = self.validated_data["project"]
+        total_cost = sum(project.activities.values_list("cost", flat=True)) + self.validated_data.get("cost", 0)
+
+        if project.cost and total_cost > project.cost:
+            raise serializers.ValidationError("Total cost of activities cannot be greater than project cost")
+
+    @transaction.atomic
+    def save(self, **kwargs):
+        self.validate_total_project_cost()
+
+        if Activity.objects.filter(name=self.validated_data["name"], project=self.validated_data["project"]).exists():
+            self.validated_data["name"] = self.unique_activity_name()
+
+        has_organic_soil = "OrganicSoil" in [module.class_name for module in self.validated_data["module_types"]]
+        has_luc_module = self.validated_data.get("land_use_change", False)
+
+        activity = self.create_activity()
+        activity.module_types.set(self.validated_data.get("module_types", []))
+
+        luc = None
+        if has_luc_module:
+            luc = self.handle_luc_module(activity, has_organic_soil)
+
+        self.create_modules(activity, luc, has_organic_soil, has_luc_module)
         activity.save()
 
         return activity
