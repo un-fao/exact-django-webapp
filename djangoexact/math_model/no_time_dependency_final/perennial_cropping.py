@@ -30,7 +30,7 @@ class PerennialCropping(BaseModule):
         methane_constant,
         residue_burnt,
         emission_factor_burning_nitrous_residue,
-        emission_factor_burning_nitrous_som,
+        ef_nitrous_som,
         emission_factor_burning_methane,
         combustion_factor,
         fire_periodicity_default,
@@ -69,7 +69,7 @@ class PerennialCropping(BaseModule):
         self.methane_constant = methane_constant
         self.residue_burnt = residue_burnt
         self.emission_factor_burning_nitrous_residue = emission_factor_burning_nitrous_residue
-        self.emission_factor_burning_nitrous_som = emission_factor_burning_nitrous_som
+        self.ef_nitrous_som = ef_nitrous_som
         self.emission_factor_burning_methane = emission_factor_burning_methane
         self.combustion_factor = combustion_factor
         self.fire_periodicity_default = fire_periodicity_default
@@ -208,7 +208,7 @@ class PerennialCropping(BaseModule):
         def calculate_som():
             try:
                 if self.calculate_soc_som:
-                    self.yearly_som_emissions, self.total_som_emissions = som_emissions(self.soc_end, self.soc_start, self.emission_factor_burning_nitrous_som, self.nitrous_constant, self.hectars_before_20)
+                    self.yearly_som_emissions, self.total_som_emissions = som_emissions(self.soc_end, self.soc_start, self.ef_nitrous_som, self.nitrous_constant, self.hectars_before_20)
 
                     som_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in self.yearly_som_emissions], ActivityTypes.SOM, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
