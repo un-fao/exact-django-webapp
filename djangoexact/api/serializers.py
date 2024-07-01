@@ -436,6 +436,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
     @transaction.atomic
     def save(self, **kwargs):
         has_organic_soil = "OrganicSoil" in [module.class_name for module in self.validated_data["module_types"]]
+        has_luc_module = self.validated_data.get("land_use_change", False)
 
         if Activity.objects.filter(name=self.validated_data["name"], project=self.validated_data["project"]).exists():
             base_name = self.validated_data["name"]
@@ -470,7 +471,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
         luc = None
 
-        if self.validated_data.get("land_use_change", None):
+        if has_luc_module:
             luc: LandUseChange = LandUseChange.objects.create(
                 **self.validated_data["land_use_change"],
                 activity=activity,
@@ -503,10 +504,10 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
             if module_type.is_luc:
                 module_instance: LandModule = ModuleClass.objects.create(activity=activity, land_use_change=luc, area=self.validated_data.get("area"))
-                if has_organic_soil and not self.validated_data.get("land_use_change", None):
-                    log.debug(f"Creating Organic Soil module for {module_type.class_name}")
+                if has_organic_soil and not has_luc_module:
                     # NOTE: This works because in the current implementation, only one independent land use module is allowed
-                    # per activity. This will need to be changed if multiple independent land use modules are allowed.
+                    # per activity. This logic will need to be reviewed if multiple independent land use modules are allowed.
+                    log.debug(f"Creating Organic Soil module for {module_type.class_name}")
                     organic_soil = OrganicSoil.objects.create(activity=activity, area=self.validated_data.get("area"))
                     activity.module_types.add(ModuleType.objects.get(name="Organic Soil").id)
                     module_instance.organic_soil = organic_soil
@@ -524,7 +525,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
                 else:
                     module_instance = ModuleClass.objects.create(activity=activity)
 
-            utils.create_module_threads(module_instance)
+            utils.create_comment_threads(module_instance)
             module_instance.save()
 
         activity.save()
