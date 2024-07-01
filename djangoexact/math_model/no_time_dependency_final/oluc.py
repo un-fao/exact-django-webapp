@@ -8,6 +8,7 @@ from .general_functions import (
     yearly_constant_emissions_breakdown,
     yearly_time_dependent_20_year_breakdown,
     yearly_time_dependent_parameter_breakdown,
+    som_emissions,
 )
 from .ghg_emissions_classes import (
     ActivityTypes,
@@ -121,6 +122,9 @@ class OtherLandUseChanges(BaseModule):
         self.yearly_fire_emissions = []
         self.total_fire_emissions = 0
 
+        self.emissions_som_yearly = []
+        self.emissions_som_total = 0
+
         self.emissions_total_yearly = []
         self.total_emissions = 0
 
@@ -197,10 +201,22 @@ class OtherLandUseChanges(BaseModule):
             self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in yearly_methane_fire_emissions], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
             self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in yearly_nitrous_fire_emissions], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
 
+        def calculate_emissions_som():
+            try:
+                if self.calculate_soc_som:
+                    self.emissions_som_yearly, self.emissions_som_total = som_emissions(self.soc_end, self.soc_start, self.moisture_emission_factor, self.nitrous_constant, self.hectars_before_20)
+
+                    som_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in self.emissions_som_yearly], ActivityTypes.SOM, delay=self.delay)
+                    self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
+            except Exception as e:
+                traceback.print_exc()
+
+
         try:
             calculate_biomass()
             calculate_soc()
             calculate_fire()
+            calculate_emissions_som()
 
             self.emissions_total_yearly = [x + y + z for x, y, z in zip(self.yearly_biomass_emissions, self.yearly_soc_emissions, self.yearly_fire_emissions)]
             self.total_emissions = sum(self.emissions_total_yearly)
