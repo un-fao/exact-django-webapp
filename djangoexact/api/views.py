@@ -43,6 +43,7 @@ from .models import (
     StatusType,
     Submodule,
     UserProjectGroup,
+    InvitationStatusType,
 )
 from .serializers import (
     ActionTypes,
@@ -56,7 +57,7 @@ from .serializers import (
     GroupSerializer,
     InputTypeSerializer,
     LandUseTypeSerializer,
-    ProjectInvitationModelSerializer,
+    ProjectInvitationModelReadSerializer,
     ProjectInvitationReadSerializer,
     ProjectInvitationWriteSerializer,
     ReadProjectSerializer,
@@ -68,6 +69,8 @@ from .serializers import (
     get_model_serializer,
     get_module_serializer,
     ChangeHistorySerializer,
+    ProjectInvitationModelWriteSerializer,
+    ProjectInvitationModelReadSerializer,
 )
 
 logger = logging.getLogger("console")
@@ -475,7 +478,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return utils.ErrorResponse(f"User with email {email} does not exist", status=http_status.HTTP_400_BAD_REQUEST)
 
         group = serializer.validated_data["group"]
-        invitation, created = ProjectInvitation.objects.get_or_create(project=project, user=user, group=group)
+        invitation, created = ProjectInvitation.objects.get_or_create(project=project, user=user, group=group, status=InvitationStatusType.objects.get(name="pending"))
 
         if not created and invitation.group == group:
             logging.warning(f"Invitation for {user.email} already sent with id {invitation.id}")
@@ -485,16 +488,11 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error(f"Invitation for {user.email} already sent with id {invitation.id}")
             return utils.ErrorResponse({"error": f"Invitation for {user.email} already sent"}, status=http_status.HTTP_400_BAD_REQUEST)
 
-        invitation.status = "accepted"
-        invitation.save()
-
-        UserProjectGroup.objects.create(user=user, project=project, group=group)
-
         logging.debug("END ProjectInvitationViewset.create")
-        return Response({"message": f"Invitation for {user.email} sent successfully"})
+        return Response({"message": f"Invitation for {user.email} sent successfully", "id": invitation.id}, status=http_status.HTTP_201_CREATED)
 
     @swagger_auto_schema(
-        request_body=ProjectInvitationModelSerializer,
+        request_body=ProjectInvitationModelReadSerializer,
         responses={
             400: "Bad request",
             200: "Invitation updated successfully",
@@ -503,7 +501,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     )
     def partial_update(self, request, *args, **kwargs):
         invitation = get_object_or_404(ProjectInvitation, pk=kwargs["pk"])
-        data = ProjectInvitationModelSerializer(invitation, data=request.data, partial=True)
+        data = ProjectInvitationModelWriteSerializer(invitation, data=request.data, partial=True)
 
         if not utils.has_project_permission("change_projectinvitation", self.request.user, invitation.project):
             logging.error("Selected user does not have permission to update invitations")
@@ -513,22 +511,36 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return Response(data.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
         if invitation.status == "declined" or invitation.status == "accepted":
-            logger.warning(f"Invitation already {invitation.status}. No further action is possible.")
-            return Response({"message": f"Invitation already {invitation.status}. No further action is possible."}, status=http_status.HTTP_200_OK)
+            logger.warning(f"Invitation already {invitation.status.name}. No further action is possible.")
+            return Response({"message": f"Invitation already {invitation.status.name}. No further action is possible."}, status=http_status.HTTP_200_OK)
 
         new_status = data.validated_data.get("status", None)
 
         if new_status == invitation.status:
-            logger.warning(f"Invitation already {new_status}")
+            logger.warning(f"Invitation already {new_status.name}")
             return Response({"message": f"Invitation already {new_status}"}, status=http_status.HTTP_200_OK)
 
-        if new_status == "accepted":
-            UserProjectGroup.objects.create(user=self.request.user, project=invitation.project, group=invitation.group)
+        if new_status.name == utils.InvitationStatus.ACCEPTED.value:
+            UserProjectGroup.objects.create(user=invitation.user, project=invitation.project, group=invitation.group)
+        else:
+            UserProjectGroup.objects.filter(user=invitation.user, project=invitation.project, group=invitation.group).delete()
 
-        invitation.status = new_status
-        invitation.save()
+        data.save()
 
-        return super().partial_update(request, *args, **kwargs)
+        resp = ProjectInvitationModelReadSerializer(invitation).data
+
+        return Response(resp, status=http_status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        request_body=ProjectInvitationModelReadSerializer,
+        responses={
+            400: "Bad request",
+            200: "Invitation updated successfully",
+            403: "Selected user does not have permission to update invitations",
+        },
+    )
+    def update(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
 
     @swagger_auto_schema(
         manual_parameters=[project_id],

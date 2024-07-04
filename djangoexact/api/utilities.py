@@ -49,6 +49,13 @@ class ChangeReasons(Enum):
     DELETE = "delete"
 
 
+class InvitationStatus(Enum):
+    PENDING = "pending"
+    ACCEPTED = "accepted"
+    REJECTED = "rejected"
+    CANCELLED = "cancelled"
+
+
 def avg(lst):
     return sum(lst) / len(lst)
 

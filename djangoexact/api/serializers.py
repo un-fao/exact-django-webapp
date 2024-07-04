@@ -76,6 +76,7 @@ from .models import (
     UserProjectGroup,
     Waterbody,
     LandModule,
+    InvitationStatusType,
 )
 
 
@@ -1655,19 +1656,6 @@ class WaterbodyReadSerializer(LandModuleReadSerializer):
         mandatory_fields = {}
 
 
-class ProjectInvitationModelSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProjectInvitation
-        fields = "__all__"
-        ref_name = "ProjectInvitation"
-
-
-class ProjectInvitationWriteSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True)
-    group = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all(), required=True)
-    project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(), required=True)
-
-
 class ProjectNameIdSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
@@ -2108,3 +2096,27 @@ class ChangeHistorySerializer(serializers.Serializer):
     date = serializers.DateTimeField()
     user = serializers.EmailField()
     changes = ChangeSerializer(many=True)
+
+
+class ProjectInvitationModelReadSerializer(serializers.ModelSerializer):
+    project = ReadProjectSerializer(many=False, read_only=True)
+    group = GroupSerializer(many=False, read_only=True)
+    status = get_model_serializer(InvitationStatusType)(many=False, read_only=True)
+
+    class Meta:
+        model = ProjectInvitation
+        fields = "__all__"
+        ref_name = "ProjectInvitation"
+
+
+class ProjectInvitationModelWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectInvitation
+        fields = "__all__"
+        ref_name = "ProjectInvitation"
+
+
+class ProjectInvitationWriteSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    group = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all(), required=True)
+    project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(), required=True)

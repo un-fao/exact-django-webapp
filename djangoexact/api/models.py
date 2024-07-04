@@ -25,6 +25,13 @@ from django.core.validators import RegexValidator
 alphanumeric = RegexValidator(r"^[0-9a-zA-Z]*$", "Only alphanumeric characters are allowed.")
 
 
+class InvitationStatusType(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return f"({self.pk}) {self.name}"
+
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
@@ -575,7 +582,7 @@ class ProjectInvitation(Historical):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="invitations")
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="invitations")
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="sent")
+    status = models.ForeignKey(InvitationStatusType, on_delete=models.CASCADE)
 
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
