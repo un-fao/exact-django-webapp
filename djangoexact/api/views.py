@@ -17,6 +17,7 @@ from rest_framework import status as http_status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
+from simple_history.utils import update_change_reason
 
 import api.filters as filters
 import api.labels as labels
@@ -66,6 +67,7 @@ from .serializers import (
     WriteProjectSerializer,
     get_model_serializer,
     get_module_serializer,
+    ChangeHistorySerializer,
 )
 
 logger = logging.getLogger("console")
@@ -247,6 +249,8 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         project = serializer.save()
 
+        update_change_reason(project, utils.ChangeReasons.CREATE.value)
+
         UserProjectGroup.objects.create(user=self.request.user, project=project, group=Group.objects.get(name="Admin"))
 
         read_serializer = ReadProjectSerializer(instance=project)
@@ -266,6 +270,8 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return utils.ErrorResponse("Only the owner can delete a project.", status=http_status.HTTP_403_FORBIDDEN)
 
         project.delete()
+
+        update_change_reason(project, utils.ChangeReasons.DELETE.value)
 
         return Response(status=http_status.HTTP_204_NO_CONTENT)
 
@@ -328,7 +334,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return utils.ErrorResponse("Selected user does not have permission to update the project", status=http_status.HTTP_403_FORBIDDEN)
 
         # Unlock the project if it has been locked for more than 30 minutes from the last project update
-        if project.is_locked and timezone.now() - project.lock_updated_at > timedelta(minutes=30):
+        if project.is_locked and project.lock_updated_at and timezone.now() - project.lock_updated_at > timedelta(minutes=30):
             project.unlock()
 
         # If the project is not locked, or a lock is requested
@@ -357,6 +363,8 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                     activity.duration_t2 = new_years
                     activity.save()
             project.save()
+
+        update_change_reason(project, utils.ChangeReasons.UPDATE.value)
 
         return super().partial_update(request, *args, **kwargs)
 
@@ -398,6 +406,19 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         serializer = ProjectInvitationReadSerializer(project.invitations.all(), many=True)
 
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"])
+    @swagger_auto_schema(responses={400: "Bad request", 403: "The current user does not have permission to view project changes", 200: ChangeHistorySerializer})
+    def history(self, request, pk=None):
+        project: Project = self.get_object()
+
+        if not utils.has_project_permission("view_project", self.request.user, project):
+            logging.error("Selected user does not have permission to view the project")
+            return utils.ErrorResponse("Selected user does not have permission to view the project", status=http_status.HTTP_403_FORBIDDEN)
+
+        changes = utils.get_changes(project.history.all())
+
+        return Response(data=ChangeHistorySerializer(changes, many=True).data, status=http_status.HTTP_200_OK)
 
 
 class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
@@ -556,6 +577,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
         activity = serializer.save()
+        update_change_reason(activity, utils.ChangeReasons.UPDATE.value)
 
         read_serializer = ActivitySerializer(instance=activity)
 
@@ -574,6 +596,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
         activity = serializer.save()
+        update_change_reason(activity, utils.ChangeReasons.UPDATE.value)
 
         read_serializer = ActivitySerializer(instance=activity)
 
@@ -593,6 +616,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return utils.ErrorResponse("Selected user does not have permission to add activities to the project", status=http_status.HTTP_403_FORBIDDEN)
 
         activity = serializer.save()
+        update_change_reason(activity, utils.ChangeReasons.CREATE.value)
 
         read_serializer = ActivitySerializer(instance=activity)
 
@@ -748,6 +772,19 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         return Response(data=ActivitySerializer(new_activity).data, status=http_status.HTTP_201_CREATED)
 
+    @action(detail=True, methods=["get"])
+    @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view activity changes", 200: ChangeHistorySerializer})
+    def history(self, request, pk=None):
+        activity: Activity = self.get_object()
+
+        if not utils.has_project_permission("view_activity", self.request.user, activity.project):
+            logging.error("Selected user does not have permission to view the activity")
+            return utils.ErrorResponse("Selected user does not have permission to view the activity", status=http_status.HTTP_403_FORBIDDEN)
+
+        changes = utils.get_changes(activity.history.all())
+
+        return Response(data=ChangeHistorySerializer(changes, many=True).data, status=http_status.HTTP_200_OK)
+
 
 class CommentThreadViewSet(viewsets.ModelViewSet):
     queryset = CommentThread.objects.all()
@@ -892,11 +929,12 @@ def generic_module_viewset(model: Model):
                 return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
             module = serializer.save()
+            update_change_reason(module, utils.ChangeReasons.UPDATE.value)
 
             read_serializer = get_module_serializer(model)(instance=module, context={"request": request})
 
-            # Update Activity status and completion percentage
-            utils.update_activity_status(activity)
+            # TODO: Move this to a signal or a post_save method
+            utils.update_activity_status_and_completion(activity)
 
             return Response(read_serializer.data, status=http_status.HTTP_200_OK)
 
@@ -920,6 +958,7 @@ def generic_module_viewset(model: Model):
                 return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
             module = serializer.save()
+            update_change_reason(module, utils.ChangeReasons.UPDATE.value)
 
             read_serializer = get_module_serializer(model)(instance=module, context={"request": request})
 
@@ -956,6 +995,8 @@ def generic_module_viewset(model: Model):
             utils.create_comment_threads(module_serializer.instance)
 
             read_serializer = get_module_serializer(model)(instance=module_serializer.instance)
+
+            update_change_reason(module_serializer.instance, utils.ChangeReasons.CREATE.value)
 
             logging.debug(f"END GenericModuleViewSet[{model.__name__}].create")
 
@@ -1074,6 +1115,19 @@ def generic_module_viewset(model: Model):
                 return Response(defaults.__dict__)
             except Exception as e:
                 return utils.ErrorResponse(str(e))
+
+        @action(detail=True, methods=["get"])
+        @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view module changes", 200: ChangeHistorySerializer})
+        def history(self, request, pk=None):
+            module: Module = self.get_object()
+
+            if not utils.has_project_permission("can_view_modules", self.request.user, module.activity.project):
+                logging.error("Selected user does not have permission to view this module in the project")
+                return utils.ErrorResponse("Selected user does not have permission to view this module in the project", status=http_status.HTTP_403_FORBIDDEN)
+
+            changes = utils.get_changes(module.history.all())
+
+            return Response(data=ChangeHistorySerializer(changes, many=True).data, status=http_status.HTTP_200_OK)
 
     return GenericModuleViewSet
 

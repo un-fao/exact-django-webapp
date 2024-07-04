@@ -7,6 +7,8 @@ from django.apps import apps
 from django.db import models
 from rest_framework import exceptions, status
 from rest_framework.response import Response
+from simple_history.models import HistoricalRecords
+from simple_history.utils import update_change_reason
 
 import api.models as api_models
 
@@ -39,6 +41,12 @@ class EmissionTypes(Enum):
     N2O = "N2O"
     N2O_VOLATILIZATION = "N2O Volatilization"
     N2O_LEACHING = "N2O Leaching"
+
+
+class ChangeReasons(Enum):
+    CREATE = "create"
+    UPDATE = "update"
+    DELETE = "delete"
 
 
 def avg(lst):
@@ -241,6 +249,7 @@ def create_comment_threads(module_instance):
         if attr.endswith("_thread") and getattr(module_instance, attr, None) is None:
             setattr(module_instance, attr, api_models.CommentThread.objects.create())
     module_instance.save()
+    update_change_reason(module_instance, "update")
 
 
 def getany(objects: list[object], key: str):
@@ -314,7 +323,7 @@ def get_or_raise(model, filter_criteria, error_message, method="get"):
         raise Exception(error_message)
 
 
-def update_activity_status(activity):
+def update_activity_status_and_completion(activity):
     """
     Updates the status of the activity based on the status of its modules.
 
@@ -379,3 +388,34 @@ def find_organic_soil_parent_module(organic_soil) -> tuple:
     parent_module = ParentModule.objects.get(organic_soil=organic_soil)
 
     return parent_module, parent_module_type
+
+
+def get_changes(records: list[HistoricalRecords]):
+
+    class ChangeLog:
+        def __init__(self, date, user, reason, changes):
+            self.date = date
+            self.user = user
+            self.reason = reason
+            self.changes: list[Change] = changes
+
+    class Change:
+        def __init__(self, field, old, new):
+            self.field = field
+            self.old = old
+            self.new = new
+
+    changes = []
+    for record in records:
+        if record.prev_record is None:
+            changes.append(ChangeLog(record.history_date, record.history_user.email, ChangeReasons.CREATE.value, []))
+            continue
+
+        delta = record.diff_against(record.prev_record)
+        change_log: ChangeLog = ChangeLog(record.history_date, record.history_user.email, record.history_change_reason, [])
+        for change in delta.changes:
+            change_log.changes.append(Change(change.field, change.old, change.new))
+
+        changes.append(change_log)
+
+    return changes
