@@ -703,7 +703,7 @@ class SingleBiomassModule(BiomassModule):
             return None
 
 
-class DoubleBiomassModule(BiomassModule):
+class AboveBelowGroundBiomassModule(BiomassModule):
     agb_t2_start = models.FloatField(null=True, blank=True)
     agb_t2_w = models.FloatField(null=True, blank=True)
     agb_t2_wo = models.FloatField(null=True, blank=True)
@@ -722,7 +722,7 @@ class DoubleBiomassModule(BiomassModule):
             return None
 
 
-class MultiBiomassModule(DoubleBiomassModule):
+class LitterDeadwoodBiomassModule(AboveBelowGroundBiomassModule):
     litter_t2_start = models.FloatField(null=True, blank=True)
     litter_t2_w = models.FloatField(null=True, blank=True)
     litter_t2_wo = models.FloatField(null=True, blank=True)
@@ -981,7 +981,7 @@ class PerennialCrop(models.Model):
     #     super().save(*args, **kwargs)
 
 
-class PerennialCropping(PerennialCrop, LandModule, DoubleBiomassModule):
+class PerennialCropping(PerennialCrop, LandModule, AboveBelowGroundBiomassModule):
     pass
 
 
@@ -1201,7 +1201,7 @@ class Livestock(Module):
 ##### Forest Management #####
 
 
-class ForestManagement(LandModule, MultiBiomassModule):
+class ForestManagement(LandModule, LitterDeadwoodBiomassModule):
     forest_type = models.ForeignKey(ForestType, on_delete=models.CASCADE, null=True, blank=True)
     forest_condition_type = models.ForeignKey(ForestConditionType, on_delete=models.CASCADE, null=True, blank=True)
 
@@ -1891,7 +1891,7 @@ class Settlement(LandModuleFixed):
         return super().save(*args, **kwargs)
 
 
-class SetAside(LandModule, DoubleBiomassModule):
+class SetAside(LandModule, AboveBelowGroundBiomassModule):
 
     is_set_aside_start = models.BooleanField(default=False)
     is_set_aside_w = models.BooleanField(default=False)
