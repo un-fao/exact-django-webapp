@@ -483,7 +483,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
                     activity.module_types.add(ModuleType.objects.get(name="Organic Soil").id)
                     module_instance.organic_soil = organic_soil
             else:
-                module_instance = ModuleClass.objects.create(activity=activity, area=self.validated_data.get("area") if module_type.name == "Coastal Wetland" else None)
+                module_instance = ModuleClass.objects.create(activity=activity, area=self.validated_data.get("area") if module_type.name in ["Coastal Wetland", "Waterbody"] else None)
 
             utils.create_comment_threads(module_instance)
 
