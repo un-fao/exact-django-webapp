@@ -8,6 +8,7 @@ from .general_functions import (
     yearly_constant_emissions_breakdown,
     yearly_time_dependent_20_year_breakdown,
     yearly_time_dependent_parameter_breakdown,
+    biomass_emissions
 )
 from .ghg_emissions_classes import (
     ActivityTypes,
@@ -69,7 +70,11 @@ class AnnualCropland(BaseModule):
         n_content_ag_minor,
         ratio_bg_ag_minor,
         n_content_bg_minor,
-        delay=0,
+        delay,
+        biomass_start_default,
+        biomass_end_default,
+        biomass_start_tier_2,
+        biomass_end_tier_2,
     ):
         self.area_start = area_start
         self.area_end = area_end
@@ -138,6 +143,10 @@ class AnnualCropland(BaseModule):
 
         self.soc_start = self.soc_start_default * self.fmg_start * self.flu_start * self.fi_start if not self.soc_start_tier_2 else self.soc_start_tier_2
         self.soc_end = self.soc_end_default * self.fmg_end * self.flu_end * self.fi_end if not self.soc_end_tier_2 else self.soc_end_tier_2
+
+        # AUXILIARY VARIABLES FOR BIOMASS CALCULATION
+        self.biomass_start = biomass_start_default if not biomass_start_tier_2 else biomass_start_tier_2
+        self.biomass_end = biomass_end_default if not biomass_end_tier_2 else biomass_end_tier_2
         # DEFAULTS FOR TIER 2 VALUES INITIALIZATION
         self.soc_start_tier_2_default = self.soc_start_default * self.fmg_start * self.flu_start * self.fi_start
         self.soc_end_tier_2_default = self.soc_end_default * self.fmg_end * self.flu_end * self.fi_end
@@ -165,6 +174,9 @@ class AnnualCropland(BaseModule):
 
         self.emissions_residue_burning_yearly = []
         self.emissions_residue_burning_total = 0
+
+        self.emissions_biomass_yearly = []
+        self.emissions_biomass_total = 0
 
         self.emissions_total_yearly = []
         self.total_emissions = 0
@@ -258,9 +270,19 @@ class AnnualCropland(BaseModule):
             self.result.yearly_emissions_by_sector_by_gas.append(residue_burning_nitrous_emission_set)
             self.result.yearly_emissions_by_sector_by_gas.append(residue_burning_methane_emission_set)
 
+        def calculate_biomass_emissions():
+            try:
+                self.emissions_biomass_yearly, self.emissions_biomass_total = biomass_emissions(self.biomass_start, self.biomass_end, self.area_start, self.area_end, self.rate, self.time_impl, self.time_cap)
+                biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_biomass_yearly], ActivityTypes.BIOMASS, delay=self.delay)
+                self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
+
+            except Exception as e:
+                traceback.print_exc()
+
         calculate_emissions_soil()
         calculate_emissions_som()
         calculate_emissions_residue_burning()
+        calculate_biomass_emissions()
 
         try:
             self.emissions_total_yearly = [sum(x) for x in zip(self.emissions_residue_burning_yearly, self.emissions_soil_yearly, self.emissions_som_yearly)]

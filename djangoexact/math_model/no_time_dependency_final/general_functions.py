@@ -265,6 +265,16 @@ def som_emissions(soc_final, soc_initial, emission_factor_nitrous, nitrous_const
 
     return emissions_som_yearly, emissions_som_total
 
+def biomass_emissions(biomass_final, biomass_initial, hectares_start, hectares_end, rate_type, time_implementation, time_capitalization,):
+
+    yearly_variation_hectares = yearly_time_dependent_increase_half_year(hectares_start, hectares_end, time_implementation, time_capitalization, rate_type)
+
+    biomass_variation = biomass_final - biomass_initial
+
+    biomass_emissions_total = biomass_variation * -(44/12) * sum(yearly_variation_hectares)
+    biomass_emissions_yearly = breakdown_according_to_values(biomass_emissions_total, yearly_variation_hectares)
+
+    return biomass_emissions_yearly, biomass_emissions_total
 
 # INPUT SINGLE MODULE CALCULATION
 def input_single_calculation(unit_start, unit_end, ipcc_factor, tier_2_factor, unit_factor, emissions_factor, time_implementation, time_capitalization, rate_type):
