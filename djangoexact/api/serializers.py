@@ -1765,15 +1765,18 @@ class ForestManagementWriteSerializer(LandModuleWriteSerializer):
         rotations = get_filled_scenarios(data, ["rotation_length_yrs"])
         disturbances = self.instance.disturbances.all().count() if self.instance else None
 
-        if not loggings and not rotations and not disturbances:
+        if rotations and (loggings or disturbances):
+            errors += ["Forest rotation cannot be used with logging or other disturbances at the same time"]
+
+        if loggings and disturbances:
+            errors += ["Cannot have logging and other disturbances at the same time"]
+
+        if not loggings and not rotations:
             degradations = get_filled_scenarios(data, ["average_yearly_degradation_percentage"])
             if not degradations:
                 errors += ["With no logging, rotation or disturbances, average yearly degradation percentage is required"]
 
         if instance and instance.disturbances.count() > 0:
-            if loggings:
-                errors += ["Cannot have logging and other disturbances at the same time"]
-
             pc_biomass_destruction_start = data.get("logging_percentage_agb_logged_start", 0)
             pc_biomass_destruction_wo = data.get("logging_percentage_agb_logged_wo", 0)
             pc_biomass_destruction_w = data.get("logging_percentage_agb_logged_w", 0)
