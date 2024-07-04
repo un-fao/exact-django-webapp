@@ -499,7 +499,7 @@ class BaseModel(models.Model):
 
 
 class Historical(models.Model):
-    history = HistoricalRecords(related_name="%(class)s_history")
+    history = HistoricalRecords(inherit=True, related_name="%(class)s_history")
 
     class Meta:
         abstract = True
@@ -553,12 +553,14 @@ class Project(Historical):
     def lock(self, user: CustomUser):
         self.is_locked = True
         self.locked_at = timezone.now()
+        self.lock_updated_at = self.locked_at
         self.locked_by = user
         self.save()
 
     def unlock(self):
         self.is_locked = False
         self.locked_at = None
+        self.lock_updated_at = None
         self.locked_by = None
         self.save()
 

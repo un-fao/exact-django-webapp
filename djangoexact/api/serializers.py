@@ -12,6 +12,7 @@ from ipcc.models import GlobalWarmingPotential
 from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
 from rest_framework import serializers
 from rest_framework.fields import empty
+from simple_history.utils import update_change_reason
 
 import api.calculators as calcs
 import api.utilities as utils
@@ -485,7 +486,9 @@ class ActivityBuilderSerializer(serializers.Serializer):
                 module_instance = ModuleClass.objects.create(activity=activity, area=self.validated_data.get("area") if module_type.name == "Coastal Wetland" else None)
 
             utils.create_comment_threads(module_instance)
+
             module_instance.save()
+            update_change_reason(module_instance, "update")
 
     def unique_activity_name(self):
         base_name = self.validated_data["name"]
@@ -2089,3 +2092,16 @@ class ForestDisturbanceReadSerializer(serializers.ModelSerializer):
         fields = "__all__"
         ref_name = "ForestDisturbance"
         mandatory_fields = {}
+
+
+class ChangeSerializer(serializers.Serializer):
+    field = serializers.CharField()
+    new = serializers.JSONField()
+    old = serializers.JSONField()
+
+
+class ChangeHistorySerializer(serializers.Serializer):
+    reason = serializers.CharField()
+    date = serializers.DateTimeField()
+    user = serializers.EmailField()
+    changes = ChangeSerializer(many=True)
