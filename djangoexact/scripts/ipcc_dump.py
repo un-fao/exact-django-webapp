@@ -4211,6 +4211,7 @@ for i, row in enumerate(df_dict):
             value=parse_csv_number(row[df_headers[j]]),
         )
 """
+
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestClimateAssociationTable.csv"),
     header=0,
@@ -4231,3 +4232,17 @@ for i, row in enumerate(rows):
     lut.climates.add(climate)
     lut.save()
     print(f"Added {climate} to {lut}")
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "SettlementTypes.csv"),
+    header=0,
+    sep=";",
+)
+
+headers = df.columns.values.tolist()
+rows = df.to_dict("records")
+
+for i, row in enumerate(rows):
+    name = row["name"]
+    SettlementType.objects.create(name=name)
+    print(f"Added {name}")

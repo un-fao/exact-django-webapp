@@ -217,6 +217,11 @@ class LandUseType(models.Model):
         module_types = ", ".join([str(x.name) for x in self.module_types.all()])
         return f"({self.pk}) {self.name} - Active: {self.is_active}" + (f" ({module_types})" if module_types else "")
 
+class SettlementType(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"({self.pk}) {self.name}"
 
 class ChangeRate(models.Model):
     name = models.CharField(max_length=25)
@@ -1873,6 +1878,11 @@ class Settlement(LandModuleFixed):
     is_settlement_start = models.BooleanField(default=False)
     is_settlement_w = models.BooleanField(default=False)
     is_settlement_wo = models.BooleanField(default=False)
+
+    settlement_type_start = models.ForeignKey(SettlementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_settlement_type_start")
+    settlement_type_w = models.ForeignKey(SettlementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_settlement_type_w")
+    settlement_type_wo = models.ForeignKey(SettlementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_settlement_type_wo")
+    settlement_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_settlement_type_thread", on_delete=models.SET_NULL)
 
     soil_carbon_t2_start = models.FloatField(null=True, blank=True)
     soil_carbon_t2_w = models.FloatField(null=True, blank=True)
