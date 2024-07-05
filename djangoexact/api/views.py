@@ -1069,13 +1069,9 @@ def generic_module_viewset(model: Model):
 
             data = []
 
-            paginator = DefaultPagination()
-            page = paginator.paginate_queryset(modules, request)
-            if page is not None:
-                for i, module in enumerate(page):
-                    serializer = get_module_serializer(model)(instance=module)
-                    data.append({**serializer.data})
-                return paginator.get_paginated_response(data)
+            for i, module in enumerate(modules):
+                serializer = get_module_serializer(model)(instance=module)
+                data.append({**serializer.data})
 
             return Response(data)
 
