@@ -40,7 +40,7 @@ router.register(r"global-warming-potentials", views.generic_viewset(GlobalWarmin
 router.register(r"change-rates", views.generic_viewset(models.ChangeRate), basename="change-rates")
 
 # Annual Cropland
-router.register(r"annual-croppings", views.generic_module_viewset(models.AnnualCropping), basename="annualcroppings")
+router.register(r"annual-croppings", views.generic_module_viewset(models.AnnualCropping), basename="annual-croppings")
 router.register(r"annual-croppings-minor-seasons", views.generic_module_viewset(models.MinorSeasonAnnualCropping), basename="annualcroppingminorseasons")
 router.register(r"tillage-management-types", views.generic_viewset(models.TillageManagementType), basename="tillage-management-types")
 
@@ -132,13 +132,15 @@ router.register(r"trophic-types", views.generic_viewset(models.TrophicType), bas
 router.register(r"settlements", views.generic_module_viewset(models.Settlement), basename="settlements")
 router.register(r"buildings", views.generic_module_viewset(models.Building), basename="buildings")
 router.register(r"roads", views.generic_module_viewset(models.Road), basename="roads")
+router.register(r"other-infrastructures", views.generic_module_viewset(models.OtherInfrastructure), basename="other-infrastructures")
 router.register(r"road-types", views.generic_viewset(models.RoadType), basename="road-types")
 router.register(r"building-types", views.generic_viewset(models.BuildingType), basename="building-types")
 
 # Energy
-router.register(r"energies", views.generic_viewset(models.Energy), basename="energies")
+router.register(r"energies", views.generic_module_viewset(models.Energy), basename="energies")
 router.register(r"electricities", views.generic_module_viewset(models.Electricity), basename="electricities")
 router.register(r"fuels", views.generic_module_viewset(models.Fuel), basename="fuels")
+router.register(r"emission-factor-sources", views.generic_viewset(models.EmissionFactorSource), basename="emission-factor-sources")
 
 # Fuel
 router.register(r"macro-fuel-types", views.generic_viewset(models.MacroFuelType), basename="macro-fuel-types")

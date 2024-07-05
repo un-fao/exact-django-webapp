@@ -1,0 +1,31 @@
+livestock_production_type;ipcc_region;Dairy Cattle;Other Cattle;Dairy Buffalo;Other Buffalo;Dairy Sheep;Other Sheep;Growing Swine;Breeding Swine;Goats;Horses;Camels;Mules and Asses;Deer;Ostrich;Chicken layer;Chicken broiler;Llamas and Alpacas
+High-productivity;Sub-Saharan Africa;86;60;81;81;9;9;1,5;1,5;9;18;46;10;20;5;4,86831E-05;4,86831E-05;8
+High-productivity;East Asia And South-East Asia;96;43;76;76;9;9;1,5;1,5;9;18;46;10;20;5;4,86831E-05;4,86831E-05;8
+High-productivity;North America;138;64;0;0;9;9;1,5;1,5;9;18;46;10;20;5;4,86831E-05;4,86831E-05;8
+High-productivity;Latin America And The Caribbean;103;55;68;68;9;9;1,5;1,5;9;18;46;10;20;5;4,86831E-05;4,86831E-05;8
+High-productivity;Western Europe;126;52;78;78;9;9;1,5;1,5;9;18;46;10;20;5;4,86831E-05;4,86831E-05;8
+High-productivity;Eastern Europe;93;58;68;68;9;9;1,5;1,5;9;18;46;10;20;5;4,86831E-05;4,86831E-05;8
+High-productivity;Russian Federation;93;58;68;68;9;9;1,5;1,5;9;18;46;10;20;5;4,86831E-05;4,86831E-05;8
+High-productivity;Oceania;93;63;0;0;9;9;1,5;1,5;9;18;46;10;20;5;4,86831E-05;4,86831E-05;8
+High-productivity;NENA/Middle East;94;61;67;67;9;9;1,5;1,5;9;18;46;10;20;5;4,86831E-05;4,86831E-05;8
+High-productivity;South Asia;70;41;85;85;9;9;1,5;1,5;9;18;46;10;20;5;4,86831E-05;4,86831E-05;8
+Low-productivity;Sub-Saharan Africa;66;48;81;81;5;5;1;1;5;18;46;10;20;5;4,86831E-05;4,86831E-05;8
+Low-productivity;East Asia And South-East Asia;71;56;76;76;5;5;1;1;5;18;46;10;20;5;4,86831E-05;4,86831E-05;8
+Low-productivity;North America;138;64;0;0;5;5;1;1;5;18;46;10;20;5;4,86831E-05;4,86831E-05;8
+Low-productivity;Latin America And The Caribbean;78;58;68;68;5;5;1;1;5;18;46;10;20;5;4,86831E-05;4,86831E-05;8
+Low-productivity;Western Europe;126;52;78;78;5;5;1;1;5;18;46;10;20;5;4,86831E-05;4,86831E-05;8
+Low-productivity;Eastern Europe;93;58;68;68;5;5;1;1;5;18;46;10;20;5;4,86831E-05;4,86831E-05;8
+Low-productivity;Russian Federation;93;58;68;68;5;5;1;1;5;18;46;10;20;5;4,86831E-05;4,86831E-05;8
+Low-productivity;Oceania;93;63;0;0;5;5;1;1;5;18;46;10;20;5;4,86831E-05;4,86831E-05;8
+Low-productivity;NENA/Middle East;62;55;67;67;5;5;1;1;5;18;46;10;20;5;4,86831E-05;4,86831E-05;8
+Low-productivity;South Asia;74;47;85;85;5;5;1;1;5;18;46;10;20;5;4,86831E-05;4,86831E-05;8
+Default;Sub-Saharan Africa;76;52;81;81;5;5;1;1;5;18;46;10;20;5;4,86831E-05;4,86831E-05;8
+Default;East Asia And South-East Asia;78;54;76;76;5;5;1;1;5;18;46;10;20;5;4,86831E-05;4,86831E-05;8
+Default;North America;138;64;0;0;5;5;1;1;5;18;46;10;20;5;4,86831E-05;4,86831E-05;8
+Default;Latin America And The Caribbean;87;56;68;68;5;5;1;1;5;18;46;10;20;5;4,86831E-05;4,86831E-05;8
+Default;Western Europe;126;52;78;78;5;5;1;1;5;18;46;10;20;5;4,86831E-05;4,86831E-05;8
+Default;Eastern Europe;93;58;68;68;5;5;1;1;5;18;46;10;20;5;4,86831E-05;4,86831E-05;8
+Default;Russian Federation;93;58;68;68;5;5;1;1;5;18;46;10;20;5;4,86831E-05;4,86831E-05;8
+Default;Oceania;93;63;0;0;5;5;1;1;5;18;46;10;20;5;4,86831E-05;4,86831E-05;8
+Default;NENA/Middle East;76;60;67;67;5;5;1;1;5;18;46;10;20;5;4,86831E-05;4,86831E-05;8
+Default;South Asia;73;46;85;85;5;5;1;1;5;18;46;10;20;5;4,86831E-05;4,86831E-05;8

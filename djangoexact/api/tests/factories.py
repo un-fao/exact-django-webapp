@@ -21,6 +21,7 @@ organic_input_types = [organic for organic in OrganicInputType.objects.filter(is
 residue_management_types = [residue for residue in ResidueManagementType.objects.all()]
 grassland_management_types = GrasslandManagementType.objects.all()
 forests = [forest for forest in LandUseType.objects.filter(module_types__class_name="ForestManagement").exclude(is_active=False)]
+coastal_vegetations = [coastal for coastal in LandUseType.objects.filter(module_types__class_name="CoastalWetland").exclude(is_active=False)]
 
 livestock_category_types = [c for c in LivestockCategoryType.objects.filter(is_active=True).all()]
 livestock_production_types = [c for c in LivestockProductionType.objects.all()]
@@ -94,6 +95,8 @@ class SmallFisheryFactory(FisheryFactory):
         model = SmallFishery
         abstract = False
 
+    status = READY
+
     fishery_type = factory.fuzzy.FuzzyChoice(fishery_types)
 
     gear_type_start = sm_gear_type
@@ -105,6 +108,8 @@ class LargeFisheryFactory(FisheryFactory):
     class Meta:
         model = LargeFishery
         abstract = False
+
+    status = READY
 
     fish_type = factory.fuzzy.FuzzyChoice(fish_types)
 
@@ -274,7 +279,8 @@ class FloodedRiceFactory(DjangoModelFactory):
     class Meta:
         model = FloodedRice
 
-    area = factory.fuzzy.FuzzyInteger(1, 150)
+    area = factory.fuzzy.FuzzyInteger(150, 150)
+    status = READY
 
     water_management_type_before_cultivation_start = factory.fuzzy.FuzzyChoice(water_mgmt_types_before_cultivation)
     water_management_type_before_cultivation_w = factory.fuzzy.FuzzyChoice(water_mgmt_types_before_cultivation)
@@ -384,3 +390,58 @@ class FuelFactory(DjangoModelFactory):
 
     # ef_t2 = factory.fuzzy.FuzzyFloat(0, 100)
     # account_for_co2 = factory.fuzzy.FuzzyChoice([True, False])
+
+
+class CoastalWetlandFactory(DjangoModelFactory):
+    class Meta:
+        model = CoastalWetland
+
+    status = READY  # --------------> NOTE: Add to all factories if not
+
+    area = 150
+
+    land_use_type = factory.fuzzy.FuzzyChoice(coastal_vegetations)
+
+    area_under_drainage_start = factory.fuzzy.FuzzyFloat(0, area)
+    area_under_drainage_w = factory.fuzzy.FuzzyFloat(0, area)
+    area_under_drainage_wo = factory.fuzzy.FuzzyFloat(0, area)
+
+    avg_salinity_t2 = SalinityType.objects.get(value="<18")
+
+
+class WaterbodyFactory(DjangoModelFactory):
+    pass
+
+
+fire_types = [fire for fire in FireType.objects.all()]
+
+
+class OrganicSoilFactory(DjangoModelFactory):
+    class Meta:
+        model = OrganicSoil
+
+    status = READY
+
+    drainage_area_start = factory.fuzzy.FuzzyFloat(0, 100)
+    drainage_area_w = factory.fuzzy.FuzzyFloat(0, 100)
+    drainage_area_wo = factory.fuzzy.FuzzyFloat(0, 100)
+
+    area_not_drained_start = factory.fuzzy.FuzzyFloat(0, 100)
+    area_not_drained_w = factory.fuzzy.FuzzyFloat(0, 100)
+    area_not_drained_wo = factory.fuzzy.FuzzyFloat(0, 100)
+
+    ditches_area_start = factory.fuzzy.FuzzyFloat(0, 100)
+    ditches_area_w = factory.fuzzy.FuzzyFloat(0, 100)
+    ditches_area_wo = factory.fuzzy.FuzzyFloat(0, 100)
+
+    fire_type_start = factory.fuzzy.FuzzyChoice(fire_types)
+    fire_type_w = factory.fuzzy.FuzzyChoice(fire_types)
+    fire_type_wo = factory.fuzzy.FuzzyChoice(fire_types)
+
+    soil_fire_periodicity_start = factory.fuzzy.FuzzyFloat(0, 10)
+    soil_fire_periodicity_w = factory.fuzzy.FuzzyFloat(0, 10)
+    soil_fire_periodicity_wo = factory.fuzzy.FuzzyFloat(0, 10)
+
+    soil_fire_impact_percentage_start = factory.fuzzy.FuzzyFloat(0, 1)
+    soil_fire_impact_percentage_w = factory.fuzzy.FuzzyFloat(0, 1)
+    soil_fire_impact_percentage_wo = factory.fuzzy.FuzzyFloat(0, 1)

@@ -522,7 +522,7 @@ class PeatExtraction(BaseModule):
                 self.drainage_ch4_yearly = yearly_time_dependent_parameter_breakdown(ch4_onsite_emissions_start + ch4_offsite_emissions_start, ch4_onsite_emissions_end + ch4_offsite_emissions_end, self.time_impl, self.time_cap, self.rate_coefficient_end, interim_values=True)
                 self.drainage_n2o_yearly = yearly_time_dependent_parameter_breakdown(n2o_onsite_emissions_start, n2o_onsite_emissions_end, self.time_impl, self.time_cap, self.rate_coefficient_end, interim_values=True)
 
-                self.drainage_co2_doc_total = sum(self.drainage_co2_doc_total)
+                self.drainage_co2_doc_total = sum(self.drainage_co2_doc_yearly)
                 self.drainage_ch4_total = sum(self.drainage_ch4_yearly)
                 self.drainage_n2o_total = sum(self.drainage_n2o_yearly)
 

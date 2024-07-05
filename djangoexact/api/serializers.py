@@ -1,15 +1,18 @@
-import logging
+import logging as log
 from enum import Enum
 
 from django.apps import apps
 from django.contrib.auth.models import Group, Permission
 from django.db import transaction
 from django.db.models import Model
+from django.db.models.query import QuerySet
+from django.forms.models import model_to_dict
 from django.utils import timezone
 from ipcc.models import GlobalWarmingPotential
 from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
 from rest_framework import serializers
 from rest_framework.fields import empty
+from simple_history.utils import update_change_reason
 
 import api.calculators as calcs
 import api.utilities as utils
@@ -72,6 +75,8 @@ from .models import (
     StatusType,
     UserProjectGroup,
     Waterbody,
+    LandModule,
+    InvitationStatusType,
 )
 
 
@@ -265,6 +270,21 @@ class ReadProjectSerializer(serializers.ModelSerializer):
     gw_potential = get_model_serializer(GlobalWarmingPotential)(many=False, read_only=True)
     status = get_model_serializer(ProjectStatus)(many=False, required=False, read_only=True)
     user = UserReadSerializer(many=False, read_only=True)
+    role = serializers.SerializerMethodField()
+
+    def get_role(self, obj):
+        ctx = self.context.get("request", None)
+
+        if not ctx:
+            return []
+
+        user = ctx.user
+        user_project_group = UserProjectGroup.objects.filter(user=user, project=obj).all()
+
+        if not user_project_group:
+            return []
+
+        return [group.group.name for group in user_project_group]
 
     class Meta:
         model = Project
@@ -305,6 +325,7 @@ class ActivitySerializer(serializers.ModelSerializer):
     name = serializers.CharField(max_length=255, read_only=True)
     project = ReadProjectSerializer(many=False, read_only=True)
     user = UserReadSerializer(many=False, read_only=True)
+    status = get_model_serializer(StatusType)(many=False, read_only=True)
     climate_t2 = get_model_serializer(Climate)(read_only=True)
     soil_type_t2 = get_model_serializer(SoilType)(read_only=True)
     module_types = get_model_serializer(ModuleType)(many=True, read_only=True)
@@ -395,101 +416,134 @@ class ActivityBuilderSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=255, required=True)
     cost = serializers.FloatField(required=False)
     climate = serializers.PrimaryKeyRelatedField(queryset=Climate.objects.all(), required=True)
+    moisture = serializers.PrimaryKeyRelatedField(queryset=Moisture.objects.all(), required=True)
     soil_type = serializers.PrimaryKeyRelatedField(queryset=SoilType.objects.all(), required=True)
     duration = serializers.IntegerField(required=True)
+    start_year = serializers.IntegerField(required=False)
     land_use_change = LandUseChangeBuilderSerializer(many=False, required=False, allow_null=True)
     module_types = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
-    area = serializers.FloatField(required=False)
+    area = serializers.FloatField(required=False, min_value=0)
     module_types = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
 
     def validate(self, data):
-        luc_module = ModuleType.objects.filter(name="Land Use Change").first()
+        luc_module = ModuleType.objects.get(name="Land Use Change")
         module_types = data.get("module_types", [])
         land_use_change = data.get("land_use_change", None)
         area = data.get("area", None)
 
-        if luc_module and luc_module in module_types:
+        if luc_module in module_types:
             raise serializers.ValidationError("Land Use Change module cannot be added manually")
 
         if land_use_change and any(module.is_luc for module in module_types):
             raise serializers.ValidationError("Land Modules cannot be independently added to activities with a Land Use Change")
 
-        if land_use_change and not area or (any(module.is_luc for module in module_types) and not area):
+        if (land_use_change or any(module.is_luc for module in module_types)) and not area:
             raise serializers.ValidationError("Area must be provided")
+
+        if sum(module.is_luc for module in module_types) > 1:
+            raise serializers.ValidationError("Only one independent Land Use module is allowed per activity")
+
+        if land_use_change and any(not module.is_luc for module in land_use_change.values()):
+            raise serializers.ValidationError("Only land-based modules are allowed in the Land Use Change")
 
         super().validate(data)
 
         return data
 
-    @transaction.atomic
-    def save(self, **kwargs):
-        if Activity.objects.filter(name=self.validated_data["name"], project=self.validated_data["project"]).exists():
-            raise serializers.ValidationError("An activity with this name already exists for this project")
-
-        activities_cost = list(self.validated_data["project"].activities.all().values_list("cost", flat=True))
-        activities_cost.append(self.validated_data.get("cost", 0))
-
-        if self.validated_data["project"].cost and sum(activities_cost) > self.validated_data["project"].cost:
-            raise serializers.ValidationError("Total cost of activities cannot be greater than project cost")
-
-        activity: Activity = Activity.objects.create(
+    def create_activity(self):
+        return Activity.objects.create(
             name=self.validated_data["name"],
             project=self.validated_data["project"],
-            climate_t2=self.validated_data["climate"],
-            soil_type_t2=self.validated_data["soil_type"],
-            duration_t2=self.validated_data["duration"],
-            cost=self.validated_data.get("cost"),
+            cost=self.validated_data["cost"],
+            climate_t2=self.validated_data.get("climate"),
+            moisture_t2=self.validated_data.get("moisture"),
+            duration_t2=self.validated_data.get("duration"),
+            soil_type_t2=self.validated_data.get("soil_type"),
+            start_year_t2=self.validated_data.get("start_year"),
         )
+
+    def handle_luc_module(self, activity, has_organic_soil):
+        luc = LandUseChange.objects.create(
+            **self.validated_data["land_use_change"],
+            activity=activity,
+            area=self.validated_data["area"],
+        )
+        activity.module_types.add(
+            luc.module_type_start.id,
+            luc.module_type_w.id,
+            luc.module_type_wo.id,
+            ModuleType.objects.get(name="Land Use Change").id,
+        )
+        luc.status = StatusType.objects.get(name="READY")
+
+        if has_organic_soil:
+            organic_soil = OrganicSoil.objects.create(activity=activity, area=self.validated_data.get("area"))
+            organic_soil.land_use_change = luc
+            organic_soil.save()
+            activity.module_types.add(ModuleType.objects.get(name="Organic Soil").id)
+            luc.organic_soil = organic_soil
+
+        luc.save()
+        return luc
+
+    def create_modules(self, activity, luc, has_organic_soil, has_luc_module):
+        for module_type in activity.module_types.all():
+            if module_type.class_name in ["LandUseChange", "OrganicSoil"]:
+                continue
+
+            ModuleClass = apps.get_model("api", module_type.class_name)
+            if module_type.is_luc:
+                module_instance = ModuleClass.objects.create(activity=activity, land_use_change=luc, area=self.validated_data.get("area"))
+                if has_organic_soil and not has_luc_module:
+                    organic_soil = OrganicSoil.objects.create(activity=activity, area=self.validated_data.get("area"))
+                    activity.module_types.add(ModuleType.objects.get(name="Organic Soil").id)
+                    module_instance.organic_soil = organic_soil
+            else:
+                module_instance = ModuleClass.objects.create(activity=activity, area=self.validated_data.get("area") if module_type.name in ["Coastal Wetland", "Waterbody"] else None)
+
+            utils.create_comment_threads(module_instance)
+
+            module_instance.save()
+            update_change_reason(module_instance, "update")
+
+    def unique_activity_name(self):
+        base_name = self.validated_data["name"]
+        project = self.validated_data["project"]
+        suffix = 1
+
+        while Activity.objects.filter(name=f"{base_name} ({suffix})", project=project).exists():
+            suffix += 1
+
+        return f"{base_name} ({suffix})"
+
+    def validate_total_project_cost(self):
+        project = self.validated_data["project"]
+        total_cost = sum(project.activities.values_list("cost", flat=True)) + self.validated_data.get("cost", 0)
+
+        if project.cost and total_cost > project.cost:
+            raise serializers.ValidationError("Total cost of activities cannot be greater than project cost")
+
+    @transaction.atomic
+    def save(self, **kwargs):
+        self.validate_total_project_cost()
+
+        if Activity.objects.filter(name=self.validated_data["name"], project=self.validated_data["project"]).exists():
+            self.validated_data["name"] = self.unique_activity_name()
+
+        has_organic_soil = "OrganicSoil" in [module.class_name for module in self.validated_data["module_types"]]
+        has_luc_module = self.validated_data.get("land_use_change", False)
+
+        activity = self.create_activity()
         activity.module_types.set(self.validated_data.get("module_types", []))
 
         luc = None
+        if has_luc_module:
+            luc = self.handle_luc_module(activity, has_organic_soil)
 
-        if self.validated_data.get("land_use_change", None):
-            luc = LandUseChange.objects.create(
-                **self.validated_data["land_use_change"],
-                activity=activity,
-                area=self.validated_data["area"],
-            )
-            activity.module_types.add(luc.module_type_start.id)
-            activity.module_types.add(luc.module_type_w.id)
-            activity.module_types.add(luc.module_type_wo.id)
-            activity.module_types.add(ModuleType.objects.get(name="Land Use Change").id)
-            luc.status = StatusType.objects.get(name="READY")
-            luc.save()
-
-        for module_type in activity.module_types.all():
-            if module_type.class_name == "LandUseChange":
-                continue
-
-            logging.debug(f"Creating module {module_type.class_name}")
-
-            ModuleClass = apps.get_model("api", module_type.class_name)
-            module_instance = None
-
-            if module_type.is_luc:
-                module_instance = ModuleClass.objects.create(
-                    activity=activity,
-                    land_use_change=luc,
-                    area=self.validated_data.get("area"),
-                )
-            else:
-                module_instance = ModuleClass.objects.create(activity=activity)
-
-            utils.create_module_threads(module_instance)
-            module_instance.save()
-
+        self.create_modules(activity, luc, has_organic_soil, has_luc_module)
         activity.save()
 
         return activity
-
-
-class InputTypeSerializer(serializers.ModelSerializer):
-    macro_input_type = get_model_serializer(MacroInputType)(many=False, read_only=True)
-
-    class Meta:
-        model = InputType
-        fields = "__all__"
-        ref_name = "InputType"
 
 
 class RecursiveField(serializers.Serializer):
@@ -547,26 +601,148 @@ class LandUseTypeSerializer(serializers.ModelSerializer):
         ref_name = "LandUseType"
 
 
-class SubmoduleBaseSerializer(serializers.ModelSerializer):
+class AllModulesBaseSerializer(serializers.ModelSerializer):
     class Meta:
-        mandatory_fields = ["parent"]
+        mandatory_fields = {}
+        extra_fields = []
+
+    def merge_instance_data(self, data: dict) -> dict:
+        """
+        Merges the instance data with the new data and returns the merged data.
+
+        Args:
+            data (dict): The new data to be merged with the instance data.
+
+        Returns:
+            dict: The merged data.
+
+        """
+
+        if not self.instance:
+            return data
+
+        self.instance: Model
+
+        # Get instance attributes
+        instance_fields = self.instance._meta.get_fields()
+        # Exclude the fields that are not editable
+        instance_fields = [field for field in instance_fields if field.editable]
+
+        # Merge the instance data with the new data
+        data.update({key: getattr(self.instance, key) for key in [field.name for field in instance_fields if field.name not in data]})
+
+        # # If the keys in data have a counterpart in the instance with an _id suffix,
+        # # add the value from the data.id to the data as a new key with the _id suffix
+        # for key, value in list(data.items()):
+        #     if key + "_id" in self.instance.__dict__:
+        #         data[key + "_id"] = getattr(value, "id", value)
+
+        return data
+
+    def is_ready_for_calculations(self, data, mandatory_fields: dict, first=True):
+        """
+        Checks if the given data is ready based on the provided mandatory fields.
+
+        Args:
+            data (dict): The data to be validated.
+            mandatory_fields (dict): A dictionary specifying the mandatory fields and their validation rules.
+            first (bool, optional): Indicates if this is the first call to the function. Defaults to True.
+
+        Returns:
+            bool: True if the data is ready for calculations, False otherwise.
+        """
+
+        if first and not isinstance(mandatory_fields, (dict)):
+            raise ValueError(f"Entry point must be a dictionary, got {type(mandatory_fields)}")
+
+        if isinstance(mandatory_fields, list):
+            for field in mandatory_fields:
+                if data.get(field) in (None, False):
+                    return False
+
+        if isinstance(mandatory_fields, dict):
+
+            # If mandatory_fields is empty, return True
+            if first and mandatory_fields == {}:
+                return True
+
+            # If this is the first call and no mandatory fields are present, return False
+            if not any(data.get(f) for f in mandatory_fields.keys()) and first:
+                return False
+
+            for field, items in mandatory_fields.items():
+
+                # If the main field is None or False, skip validation for this field
+                if data.get(field) in (None, False):
+                    continue
+
+                # If items is a list, iterate over its elements
+                if isinstance(items, list):
+                    for sub_field in items:
+                        if isinstance(sub_field, list):
+                            # If sub_field is a list of dictionaries, validate all of them
+                            if all(isinstance(f, dict) for f in sub_field):
+
+                                # If none of the main fields were provided, return False
+                                main_fields = [list(f.keys())[0] for f in sub_field]
+                                if not any(data.get(f) for f in main_fields):
+                                    return False
+
+                                # Only validate the main fields that were provided and recursively validate nested data
+                                available_main_fields = [f for f in sub_field if data.get(list(f.keys())[0])]
+                                for main_field in available_main_fields:
+                                    for f, v in main_field.items():
+                                        if data.get(f) is None or not self.is_ready_for_calculations(data, v, first=False):
+                                            return False
+
+                            # If sub_field is a list of strings, validate all of them
+                            elif all(isinstance(f, str) for f in sub_field):
+                                if not any(data.get(f) for f in sub_field):
+                                    return False
+
+                        # If sub_field is a dictionary, validate nested data recursively
+                        elif isinstance(sub_field, dict):
+                            if not self.is_ready_for_calculations(data, sub_field, first=False):
+                                return False
+
+                        # If sub_field is a string, validate the field
+                        elif data.get(sub_field) in (None, False):
+                            return False
+
+                # If items is a dictionary, recursively validate nested data
+                elif isinstance(items, dict):
+                    if not self.is_ready_for_calculations(data, items, first=False):
+                        return False
+
+        return True
+
+
+class SubmoduleBaseSerializer(AllModulesBaseSerializer):
 
     def validate(self, data):
-        logging.debug(f"START SubmoduleBaseSerializer[{self.Meta.ref_name}].validate")
+        log.debug(f"START SubmoduleBaseSerializer[{self.Meta.ref_name}].validate")
 
         if not data.get("parent", None) and (not self.instance or not self.instance.parent):
-            logging.error(f"Parent field is required for {self.Meta.ref_name}")
+            log.error(f"Parent field is required for {self.Meta.ref_name}")
             raise serializers.ValidationError("Parent field is required")
 
-        logging.debug(f"END SubmoduleBaseSerializer[{self.Meta.ref_name}].validate")
+        data = self.merge_instance_data(data)
+
+        if not self.is_ready_for_calculations(data, self.Meta.mandatory_fields):
+            data["status"] = StatusType.objects.get(name="EMPTY")
+            return super().validate(data)
+
+        data["status"] = StatusType.objects.get(name="READY")
+
+        log.debug(f"END SubmoduleBaseSerializer[{self.Meta.ref_name}].validate")
         return super().validate(data)
 
 
-class ModuleBaseSerializer(serializers.ModelSerializer):
+class ModuleBaseSerializer(AllModulesBaseSerializer):
     module_type = get_model_serializer(ModuleType)(many=False, read_only=True)
+    status = get_model_serializer(StatusType)(many=False, read_only=True)
 
     class Meta:
-        mandatory_fields = []
         extra_fields = ["module_type"]
 
     def __init__(self, *args, **kwargs):
@@ -574,20 +750,29 @@ class ModuleBaseSerializer(serializers.ModelSerializer):
         self.fields["module_type"].default = ModuleType.objects.get(class_name=self.Meta.ref_name)
 
     def validate(self, data):
-        logging.debug(f"START ModuleBaseSerializer[{self.Meta.ref_name}].validate")
+        log.debug(f"START ModuleBaseSerializer[{self.Meta.ref_name}].validate")
 
         activity = data["activity"] if "activity" in data else self.instance.activity
         module_types = list(map(lambda module: module.class_name, activity.module_types.all()))
 
         if getattr(activity, self.Meta.ref_name.lower(), None).exists() and not self.instance:
-            logging.error(f"Activity already has a {self.Meta.ref_name}")
+            log.error(f"Activity already has a {self.Meta.ref_name}")
             raise serializers.ValidationError("A module of this type is already present for this activity")
 
         if self.Meta.ref_name not in module_types and self.Meta.ref_name != "LandUseChange":
-            logging.error(f"Module type {self.Meta.ref_name} is not present for this activity")
+            log.error(f"Module type {self.Meta.ref_name} is not present for this activity")
             raise serializers.ValidationError("This module type is not present for this activity")
 
-        logging.debug(f"END ModuleBaseSerializer[{self.Meta.ref_name}].validate")
+        self.merge_instance_data(data)
+
+        if not self.is_ready_for_calculations(data, self.Meta.mandatory_fields):
+            log.debug(f"Module {self.Meta.ref_name} is not ready for calculations")
+            data["status"] = StatusType.objects.get(name="EMPTY")
+            return super().validate(data)
+
+        data["status"] = StatusType.objects.get(name="READY")
+
+        log.debug(f"END ModuleBaseSerializer[{self.Meta.ref_name}].validate")
         return super().validate(data)
 
     def save(self, **kwargs):
@@ -601,9 +786,15 @@ class ModuleBaseSerializer(serializers.ModelSerializer):
 
 
 class LandModuleWriteSerializer(ModuleBaseSerializer):
+    class Meta:
+        model = None
+        fields = "__all__"
+        ref_name = None
+        mandatory_fields = {}
+
     def validate(self, data):
-        logging.debug(f"START LandModuleSerializer[{self.Meta.ref_name}].validate")
-        logging.debug(f"Data: {data}")
+        log.debug(f"START LandModuleSerializer[{self.Meta.ref_name}].validate")
+        log.debug(f"Data: {data}")
 
         activity = data["activity"] if "activity" in data else self.instance.activity
         luc = activity.landusechange.first()
@@ -619,51 +810,21 @@ class LandModuleWriteSerializer(ModuleBaseSerializer):
 
             # NOTE: Redundant as it's already checked in ActivityBuilderSerializer, but just in case
             if module_type.is_luc and module_type.class_name not in luc_module_types:
-                logging.error(f"Cannot add {module_type.class_name} to an activity with a Land Use Change")
+                log.error(f"Cannot add {module_type.class_name} to an activity with a Land Use Change")
                 raise serializers.ValidationError("Cannot add this module to an activity with a Land Use Change")
 
             module_types += luc_module_types
 
-        # Checking if the mandatory fields are already filled in the instance or have been provided in the new data
-        # And setting the status of the module accordingly
+        self.merge_instance_data(data)
 
-        has_w = False
-        has_wo = False
-        has_same = False
-        has_usual = False
-
-        needs_w = False
-        needs_wo = False
-        needs_same = False
-        needs_usual = False
-
-        if self.instance:
-
-            needs_wo = calcs.is_without(self.instance) and not is_scenario_filled(dict(self.instance.__dict__), "wo", self.Meta.mandatory_fields)
-            needs_w = calcs.is_with(self.instance) and not is_scenario_filled(dict(self.instance.__dict__), "w", self.Meta.mandatory_fields)
-            needs_same = calcs.is_luc_remaining_same(self.instance) and not is_scenario_filled(dict(self.instance.__dict__), "start", self.Meta.mandatory_fields) and is_scenario_filled(self.instance.__dict__, "w", self.Meta.mandatory_fields)
-            needs_usual = calcs.is_business_as_usual(self.instance) and not is_scenario_filled(dict(self.instance.__dict__), "start", self.Meta.mandatory_fields) and is_scenario_filled(self.instance.__dict__, "wo", self.Meta.mandatory_fields)
-
-            has_w = calcs.is_with(self.instance) and is_scenario_filled(dict(self.instance.__dict__), "w", self.Meta.mandatory_fields)
-            has_wo = calcs.is_without(self.instance) and is_scenario_filled(dict(self.instance.__dict__), "wo", self.Meta.mandatory_fields)
-            has_same = calcs.is_luc_remaining_same(self.instance) and is_scenario_filled(dict(self.instance.__dict__), "start", self.Meta.mandatory_fields) and is_scenario_filled(self.instance.__dict__, "w", self.Meta.mandatory_fields)
-            has_usual = calcs.is_business_as_usual(self.instance) and is_scenario_filled(dict(self.instance.__dict__), "start", self.Meta.mandatory_fields) and is_scenario_filled(self.instance.__dict__, "wo", self.Meta.mandatory_fields)
-
-        if needs_w or has_w:
-            needs_w = calcs.is_with(data) and not is_scenario_filled(dict(data), "w", self.Meta.mandatory_fields)
-        if needs_wo or has_wo:
-            needs_wo = calcs.is_without(data) and not is_scenario_filled(dict(data), "wo", self.Meta.mandatory_fields)
-        if needs_same or has_same:
-            needs_same = calcs.is_luc_remaining_same(data) and not is_scenario_filled(dict(data), "start", self.Meta.mandatory_fields) and is_scenario_filled(data, "w", self.Meta.mandatory_fields)
-        if needs_usual or has_usual:
-            needs_usual = calcs.is_business_as_usual(data) and not is_scenario_filled(dict(data), "start", self.Meta.mandatory_fields) and is_scenario_filled(data, "wo", self.Meta.mandatory_fields)
-
-        if (needs_w and not has_w) or (needs_wo and not has_wo) or (needs_same and not has_same) or (needs_usual and not has_usual):
+        if not self.is_ready_for_calculations(data, self.Meta.mandatory_fields):
+            log.debug(f"Module {self.Meta.ref_name} is not ready for calculations")
             data["status"] = StatusType.objects.get(name="EMPTY")
-        else:
-            data["status"] = StatusType.objects.get(name="READY")
+            return super().validate(data)
 
-        logging.debug(f"END LandModuleSerializer[{self.Meta.ref_name}].validate")
+        data["status"] = StatusType.objects.get(name="READY")
+
+        log.debug(f"END LandModuleSerializer[{self.Meta.ref_name}].validate")
         return super().validate(data)
 
 
@@ -682,26 +843,32 @@ class GrasslandWriteSerializer(LandModuleWriteSerializer):
         fields = "__all__"
         ref_name = "Grassland"
 
-        mandatory_fields = [
-            "grassland_management_type",
-            "is_fire_used",
-        ]
-
-    def validate(self, data):
-        mandatory_fields = []
-
-        grassland_mgmt_scenarios = get_filled_scenarios(data, ["grassland_management_type"])
-        fire_scenarios = get_filled_scenarios(data, ["is_fire_used"])
-
-        for scenario in grassland_mgmt_scenarios:
-            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
-            if scenario in fire_scenarios and data.get("is_fire_used", None):
-                mandatory_fields += generate_fields_for_scenario(scenario, ["fire_periodicity", "fire_impact"])
-
-        if not are_fields_filled(data, mandatory_fields):
-            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
-
-        return super().validate(data)
+        mandatory_fields = {
+            "grassland_management_type_start": [
+                {
+                    "is_fire_used_start": [
+                        "fire_periodicity_start",
+                        "fire_impact_start",
+                    ]
+                },
+            ],
+            "grassland_management_type_w": [
+                {
+                    "is_fire_used_w": [
+                        "fire_periodicity_w",
+                        "fire_impact_w",
+                    ]
+                },
+            ],
+            "grassland_management_type_wo": [
+                {
+                    "is_fire_used_wo": [
+                        "fire_periodicity_wo",
+                        "fire_impact_wo",
+                    ]
+                },
+            ],
+        }
 
 
 class GrasslandReadSerializer(LandModuleReadSerializer):
@@ -709,6 +876,7 @@ class GrasslandReadSerializer(LandModuleReadSerializer):
         model = Grassland
         fields = "__all__"
         ref_name = "Grassland"
+        mandatory_fields = {}
 
 
 # Annual Cropping
@@ -740,11 +908,12 @@ class MinorSeasonAnnualCroppingWriteSerializer(SubmoduleBaseSerializer):
         return super().validate(data)
 
 
-class MinorSeasonAnnualCroppingReadSerializer(SubmoduleBaseSerializer):
+class MinorSeasonAnnualCroppingReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = MinorSeasonAnnualCropping
         fields = "__all__"
         ref_name = "MinorSeasonAnnualCropping"
+        mandatory_fields = {}
 
 
 class AnnualCroppingWriteSerializer(LandModuleWriteSerializer):
@@ -752,25 +921,23 @@ class AnnualCroppingWriteSerializer(LandModuleWriteSerializer):
         model = AnnualCropping
         fields = "__all__"
         ref_name = "AnnualCropping"
-        mandatory_fields = [
-            "land_use_type",
-            "tillage_management_type",
-            "organic_input_type",
-            "residue_management_type",
-        ]
-
-    def validate(self, data):
-        mandatory_fields = []
-
-        lut_scenarios = get_filled_scenarios(data, ["land_use_type"])
-
-        for scenario in lut_scenarios:
-            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
-
-        if not are_fields_filled(data, mandatory_fields):
-            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
-
-        return super().validate(data)
+        mandatory_fields = {
+            "land_use_type_start": [
+                "tillage_management_type_start",
+                "organic_input_type_start",
+                "residue_management_type_start",
+            ],
+            "land_use_type_w": [
+                "tillage_management_type_w",
+                "organic_input_type_w",
+                "residue_management_type_w",
+            ],
+            "land_use_type_wo": [
+                "tillage_management_type_wo",
+                "organic_input_type_wo",
+                "residue_management_type_wo",
+            ],
+        }
 
 
 class AnnualCroppingReadSerializer(LandModuleReadSerializer):
@@ -778,6 +945,7 @@ class AnnualCroppingReadSerializer(LandModuleReadSerializer):
         model = AnnualCropping
         fields = "__all__"
         ref_name = "AnnualCropping"
+        mandatory_fields = {}
 
 
 # Perennial Cropping
@@ -788,31 +956,28 @@ class MinorSeasonPerennialCroppingWriteSerializer(SubmoduleBaseSerializer):
         model = MinorSeasonPerennialCropping
         fields = "__all__"
         ref_name = "MinorSeasonPerennialCropping"
-        mandatory_fields = [
-            "land_use_type",
-            "tillage_management_type",
-            "organic_input_type",
-        ]
-
-    def validate(self, data):
-        mandatory_fields = []
-
-        lut_scenarios = get_filled_scenarios(data, ["land_use_type"])
-
-        for scenario in lut_scenarios:
-            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
-
-        if not are_fields_filled(data, mandatory_fields):
-            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
-
-        return super().validate(data)
+        mandatory_fields = {
+            "land_use_type_start": [
+                "tillage_management_type_start",
+                "organic_input_type_start",
+            ],
+            "land_use_type_w": [
+                "tillage_management_type_w",
+                "organic_input_type_w",
+            ],
+            "land_use_type_wo": [
+                "tillage_management_type_wo",
+                "organic_input_type_wo",
+            ],
+        }
 
 
-class MinorSeasonPerennialCroppingReadSerializer(SubmoduleBaseSerializer):
+class MinorSeasonPerennialCroppingReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = MinorSeasonPerennialCropping
         fields = "__all__"
         ref_name = "MinorSeasonPerennialCropping"
+        mandatory_fields = {}
 
 
 class PerennialCroppingWriteSerializer(LandModuleWriteSerializer):
@@ -820,24 +985,20 @@ class PerennialCroppingWriteSerializer(LandModuleWriteSerializer):
         model = PerennialCropping
         fields = "__all__"
         ref_name = "PerennialCropping"
-        mandatory_fields = [
-            "land_use_type",
-            "tillage_management_type",
-            "organic_input_type",
-        ]
-
-    def validate(self, data):
-        mandatory_fields = []
-
-        lut_scenarios = get_filled_scenarios(data, ["land_use_type"])
-
-        for scenario in lut_scenarios:
-            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
-
-        if not are_fields_filled(data, mandatory_fields):
-            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
-
-        return super().validate(data)
+        mandatory_fields = {
+            "land_use_type_start": [
+                "tillage_management_type_start",
+                "organic_input_type_start",
+            ],
+            "land_use_type_w": [
+                "tillage_management_type_w",
+                "organic_input_type_w",
+            ],
+            "land_use_type_wo": [
+                "tillage_management_type_wo",
+                "organic_input_type_wo",
+            ],
+        }
 
 
 class PerennialCroppingReadSerializer(LandModuleReadSerializer):
@@ -848,6 +1009,7 @@ class PerennialCroppingReadSerializer(LandModuleReadSerializer):
         fields = "__all__"
         ref_name = "PerennialCropping"
         extra_fields = ["minor_seasons"]
+        mandatory_fields = {}
 
 
 # Land Use Change
@@ -858,7 +1020,7 @@ class LandUseChangeWriteSerializer(LandModuleWriteSerializer):
         model = LandUseChange
         fields = "__all__"
         ref_name = "LandUseChange"
-        mandatory_fields = []
+        mandatory_fields = {}
 
 
 class LandUseChangeReadSerializer(LandModuleReadSerializer):
@@ -866,6 +1028,7 @@ class LandUseChangeReadSerializer(LandModuleReadSerializer):
         model = LandUseChange
         fields = "__all__"
         ref_name = "LandUseChange"
+        mandatory_fields = {}
 
 
 # Organic Soil
@@ -876,32 +1039,76 @@ class OrganicSoilWriteSerializer(LandModuleWriteSerializer):
         model = OrganicSoil
         fields = "__all__"
         ref_name = "OrganicSoil"
-        mandatory_fields = [
-            "fire_type",
-        ]
-
-    def validate(self, data):
-        mandatory_fields = ["peat_type"]
-
-        peat_scenarios = ["start", "w", "wo"]
-        fire_scenarios = get_filled_scenarios(data, ["fire_type"])
-
-        for scenario in peat_scenarios:
-            mandatory_fields += generate_fields_for_scenario(scenario, ["peat_extraction_height", "peat_area"])
-        for scenario in fire_scenarios:
-            mandatory_fields += generate_fields_for_scenario(scenario, ["soil_fire_periodicity", "soil_fire_impact_percentage"])
-
-        if not are_fields_filled(data, mandatory_fields):
-            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
-
-        return super().validate(data)
+        mandatory_fields = {
+            "drainage_area_start": [
+                "area_not_drained_start",
+            ],
+            "drainage_area_w": [
+                "area_not_drained_w",
+            ],
+            "drainage_area_wo": [
+                "area_not_drained_wo",
+            ],
+            "peat_type": [
+                {
+                    "peat_area_start": [
+                        "peat_extraction_height_start",
+                        "peat_ditches_area_start",
+                    ],
+                },
+                {
+                    "peat_area_w": [
+                        "peat_extraction_height_w",
+                        "peat_ditches_area_w",
+                    ],
+                },
+                {
+                    "peat_area_wo": [
+                        "peat_extraction_height_wo",
+                        "peat_ditches_area_wo",
+                    ],
+                },
+            ],
+        }
 
 
 class OrganicSoilReadSerializer(LandModuleReadSerializer):
+
+    parent_land_use_type_start = serializers.IntegerField(read_only=True)
+    parent_land_use_type_w = serializers.IntegerField(read_only=True)
+    parent_land_use_type_wo = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = OrganicSoil
         fields = "__all__"
         ref_name = "OrganicSoil"
+        mandatory_fields = {}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.instance:
+            return
+
+        self.instance: OrganicSoil
+
+        luc = self.instance.land_use_change
+
+        if luc:
+            self.parent_land_use_type_start = luc.module_type_start.id if luc.module_type_start else None
+            self.parent_land_use_type_w = luc.module_type_w.id if luc.module_type_w else None
+            self.parent_land_use_type_wo = luc.module_type_wo.id if luc.module_type_wo else None
+        else:
+            _, parent_module_type = utils.find_organic_soil_parent_module(self.instance)
+            self.parent_land_use_type_start = parent_module_type.id if parent_module_type else None
+            self.parent_land_use_type_w = parent_module_type.id
+            self.parent_land_use_type_wo = parent_module_type.id
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation["parent_land_use_type_start"] = self.parent_land_use_type_start
+        representation["parent_land_use_type_w"] = self.parent_land_use_type_w
+        representation["parent_land_use_type_wo"] = self.parent_land_use_type_wo
+        return representation
 
 
 # Flooded Rice
@@ -912,37 +1119,31 @@ class MinorSeasonFloodedRiceWriteSerializer(SubmoduleBaseSerializer):
         model = MinorSeasonFloodedRice
         fields = "__all__"
         ref_name = "MinorSeasonFloodedRice"
-        mandatory_fields = [
-            "water_management_type_before_cultivation",
-            "water_management_type_after_cultivation",
-            "organic_amendment_type",
-        ]
-
-    def validate(self, data):
-        mandatory_fields = []
-
-        water_mgmt_before_scenarios = get_filled_scenarios(data, ["water_management_type_before_cultivation"])
-        water_mgmt_after_scenarios = get_filled_scenarios(data, ["water_management_type_after_cultivation"])
-        organic_amendment_scenarios = get_filled_scenarios(data, ["organic_amendment_type"])
-
-        for scenario in water_mgmt_before_scenarios:
-            mandatory_fields += generate_fields_for_scenario(scenario, ["water_management_type_before_cultivation"])
-        for scenario in water_mgmt_after_scenarios:
-            mandatory_fields += generate_fields_for_scenario(scenario, ["water_management_type_after_cultivation"])
-        for scenario in organic_amendment_scenarios:
-            mandatory_fields += generate_fields_for_scenario(scenario, ["organic_amendment_type"])
-
-        if not are_fields_filled(data, mandatory_fields):
-            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
-
-        return super().validate(data)
+        mandatory_fields = {
+            "water_management_type_before_cultivation_start": [
+                "water_management_type_before_cultivation_start",
+                "water_management_type_after_cultivation_start",
+                "organic_amendment_type_start",
+            ],
+            "water_management_type_before_cultivation_w": [
+                "water_management_type_before_cultivation_w",
+                "water_management_type_after_cultivation_w",
+                "organic_amendment_type_w",
+            ],
+            "water_management_type_before_cultivation_wo": [
+                "water_management_type_before_cultivation_wo",
+                "water_management_type_after_cultivation_wo",
+                "organic_amendment_type_wo",
+            ],
+        }
 
 
-class MinorSeasonFloodedRiceReadSerializer(SubmoduleBaseSerializer):
+class MinorSeasonFloodedRiceReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = MinorSeasonFloodedRice
         fields = "__all__"
         ref_name = "MinorSeasonFloodedRice"
+        mandatory_fields = {}
 
 
 class FloodedRiceWriteSerializer(LandModuleWriteSerializer):
@@ -950,40 +1151,36 @@ class FloodedRiceWriteSerializer(LandModuleWriteSerializer):
         model = FloodedRice
         fields = "__all__"
         ref_name = "FloodedRice"
-        mandatory_fields = [
-            "water_management_type_before_cultivation",
-            "water_management_type_after_cultivation",
-            "organic_amendment_type",
-        ]
+        mandatory_fields = {
+            "water_management_type_before_cultivation_start": [
+                "water_management_type_before_cultivation_start",
+                "water_management_type_after_cultivation_start",
+                "organic_amendment_type_start",
+            ],
+            "water_management_type_before_cultivation_w": [
+                "water_management_type_before_cultivation_w",
+                "water_management_type_after_cultivation_w",
+                "organic_amendment_type_w",
+            ],
+            "water_management_type_before_cultivation_wo": [
+                "water_management_type_before_cultivation_wo",
+                "water_management_type_after_cultivation_wo",
+                "organic_amendment_type_wo",
+            ],
+        }
 
     def validate(self, data):
 
-        mandatory_fields = []
-
-        water_mgmt_before_scenarios = get_filled_scenarios(data, ["water_management_type_before_cultivation"])
-        water_mgmt_after_scenarios = get_filled_scenarios(data, ["water_management_type_after_cultivation"])
-        organic_amendment_scenarios = get_filled_scenarios(data, ["organic_amendment_type"])
-
-        for scenario in water_mgmt_before_scenarios:
-            mandatory_fields += generate_fields_for_scenario(scenario, ["water_management_type_before_cultivation"])
-        for scenario in water_mgmt_after_scenarios:
-            mandatory_fields += generate_fields_for_scenario(scenario, ["water_management_type_after_cultivation"])
-        for scenario in organic_amendment_scenarios:
-            mandatory_fields += generate_fields_for_scenario(scenario, ["organic_amendment_type"])
-
-        if not are_fields_filled(data, mandatory_fields):
-            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
-
         # Get cultivation_days of all minor_seasons and check that they are not greater than 365 including the main season
-        cultivation_days = data.get("cultivation_days", 0)
+        cultivation_days = data.get("cultivation_days", 0)  # TODO: This must be fetched from IPCC data (or t2)
         minor_seasons = data.get("minor_seasons", None)
 
         if minor_seasons:
             if minor_seasons.count() > 4:
                 raise serializers.ValidationError(f"Minor seasons cannot be more than 4")
 
-            for season in minor_seasons:
-                cultivation_days += season.get("cultivation_days", 0)
+            # for season in minor_seasons:
+            #     cultivation_days += season.get("cultivation_days", 0)
 
         if cultivation_days > 365:
             raise serializers.ValidationError(f"Cultivation days cannot be greater than 365 (one year)")
@@ -999,6 +1196,7 @@ class FloodedRiceReadSerializer(LandModuleReadSerializer):
         fields = "__all__"
         ref_name = "FloodedRice"
         extra_fields = ["minor_seasons"]
+        mandatory_fields = {}
 
 
 # Building
@@ -1007,38 +1205,23 @@ class BuildingWriteSerializer(SubmoduleBaseSerializer):
         model = Building
         fields = "__all__"
         ref_name = "Building"
-        mandatory_fields = [
-            "building_type",
-            "area_m2",
-        ]
+        mandatory_fields = {
+            "building_type": [
+                ["area_m2_start", "area_m2_w", "area_m2_wo"],
+            ],
+        }
 
     def validate(self, data):
-        mandatory_fields = []
-
-        building_type_scenarios = get_filled_scenarios(data, ["building_type"])
-
-        for scenario in building_type_scenarios:
-            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
-
-        if not are_fields_filled(data, mandatory_fields):
-            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
-        elif mandatory_fields:
-            data["status"] = StatusType.objects.get(name="READY")
 
         return super().validate(data)
 
 
-class BuildingReadSerializer(SubmoduleBaseSerializer):
+class BuildingReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Building
         fields = "__all__"
         ref_name = "Building"
-
-    def validate(self, data):
-        if not self.instance.status.name == "READY":
-            raise serializers.ValidationError("A building module is not ready")
-
-        return super().validate(data)
+        mandatory_fields = {}
 
 
 # Road
@@ -1049,11 +1232,25 @@ class RoadWriteSerializer(SubmoduleBaseSerializer):
         model = Road
         fields = "__all__"
         ref_name = "Road"
-        mandatory_fields = [
-            "road_type",
-            "length_km",
-            "width_m",
-        ]
+        mandatory_fields = {
+            "road_type": [
+                {
+                    "length_km_start": [
+                        "width_m_start",
+                    ],
+                },
+                {
+                    "length_km_w": [
+                        "width_m_w",
+                    ],
+                },
+                {
+                    "length_km_wo": [
+                        "width_m_wo",
+                    ],
+                },
+            ],
+        }
 
     def validate(self, data):
         mandatory_fields = []
@@ -1071,17 +1268,12 @@ class RoadWriteSerializer(SubmoduleBaseSerializer):
         return super().validate(data)
 
 
-class RoadReadSerializer(SubmoduleBaseSerializer):
+class RoadReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Road
         fields = "__all__"
         ref_name = "Road"
-
-    def validate(self, data):
-        if not self.instance.status.name == "READY":
-            raise serializers.ValidationError("A road module is not ready")
-
-        return super().validate(data)
+        mandatory_fields = {}
 
 
 # Other
@@ -1092,37 +1284,17 @@ class OtherInfrastructureWriteSerializer(SubmoduleBaseSerializer):
         model = OtherInfrastructure
         fields = "__all__"
         ref_name = "Other"
-        mandatory_fields = [
-            "area_m2",
-        ]
-
-    def validate(self, data):
-        mandatory_fields = []
-
-        areas = get_filled_scenarios(data, self.Meta.mandatory_fields)
-
-        for scenario in areas:
-            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
-
-        if not are_fields_filled(data, mandatory_fields):
-            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
-        elif mandatory_fields:
-            data["status"] = StatusType.objects.get(name="READY")
-
-        return super().validate(data)
+        mandatory_fields = {
+            "parent": [["area_m2_start", "area_m2_w", "area_m2_wo"]],
+        }
 
 
-class OtherInfrastructureReadSerializer(SubmoduleBaseSerializer):
+class OtherInfrastructureReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = OtherInfrastructure
         fields = "__all__"
         ref_name = "Other"
-
-    def validate(self, data):
-        if not self.instance.status.name == "READY":
-            raise serializers.ValidationError("An other infrastructure module is not ready")
-
-        return super().validate(data)
+        mandatory_fields = {}
 
 
 class IrrigationWriteSerializer(ModuleBaseSerializer):
@@ -1130,10 +1302,7 @@ class IrrigationWriteSerializer(ModuleBaseSerializer):
         model = Irrigation
         fields = "__all__"
         ref_name = "Irrigation"
-        mandatory_fields = [
-            "irrigation_type",
-            "ha",
-        ]
+        mandatory_fields = {}
 
 
 class IrrigationReadSerializer(ModuleBaseSerializer):
@@ -1141,6 +1310,20 @@ class IrrigationReadSerializer(ModuleBaseSerializer):
         model = Irrigation
         fields = "__all__"
         ref_name = "Irrigation"
+        mandatory_fields = {}
+
+    def validate(self, data):
+
+        irrigation_systems = self.instance.irrigation_systems.all()
+        irrigation_phases = self.instance.irrigation_phases.all()
+
+        if any([system.status.name == "EMPTY" for system in irrigation_systems]):
+            raise serializers.ValidationError("Irrigation systems are not ready for calculations")
+
+        if any([phase.status.name == "EMPTY" for phase in irrigation_phases]):
+            raise serializers.ValidationError("Irrigation phases are not ready for calculations")
+
+        return super().validate(data)
 
 
 # IrrigationSystem
@@ -1151,36 +1334,29 @@ class IrrigationSystemWriteSerializer(SubmoduleBaseSerializer):
         model = IrrigationSystem
         fields = "__all__"
         ref_name = "IrrigationSystem"
-        mandatory_fields = [
-            "irrigation_type",
-            "ha",
-        ]
+        mandatory_fields = {
+            "irrigation_system_type": [
+                ["ha_start", "ha_w", "ha_wo"],
+            ],
+        }
 
     def validate(self, data):
         super().validate(data)
-        mandatory_fields = []
-
-        irrigation_type_scenarios = get_filled_scenarios(data, ["irrigation_type"])
-
-        for scenario in irrigation_type_scenarios:
-            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
-
-        if not are_fields_filled(data, mandatory_fields):
-            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
 
         max_entries = ConfigParam.objects.get(name=labels.IRRIGATION_SYSTEMS_LIMIT).get_parsed_value()
 
-        if self.instance and self.instance.parent.irrigation_systems.count() + 1 > max_entries:
+        if self.instance and self.instance.parent.irrigation_systems.all().count() + 1 > max_entries:
             raise serializers.ValidationError(f"Only {max_entries} irrigation systems are allowed")
 
         return data
 
 
-class IrrigationSystemReadSerializer(SubmoduleBaseSerializer):
+class IrrigationSystemReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = IrrigationSystem
         fields = "__all__"
         ref_name = "IrrigationSystem"
+        mandatory_fields = {}
 
 
 # IrrigationPhase
@@ -1191,69 +1367,47 @@ class IrrigationPhaseWriteSerializer(SubmoduleBaseSerializer):
         model = IrrigationPhase
         fields = "__all__"
         ref_name = "IrrigationPhase"
-        mandatory_fields = [
-            "irrigation_phase_type",
-            "fuel_type",
-            "ha",
-            "gross_irrigation_water",
-        ]
+        mandatory_fields = {
+            "irrigation_system_type": [
+                "fuel_type",
+                "well_depth",
+                ["ha_start", "ha_w", "ha_wo"],
+            ],
+        }
 
     def validate(self, data):
         super().validate(data)
 
-        mandatory_fields = []
-
-        irrigation_phase_type_scenarios = get_filled_scenarios(data, ["irrigation_phase_type"])
-
-        for scenario in irrigation_phase_type_scenarios:
-            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
-
-        if not are_fields_filled(data, mandatory_fields):
-            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
-
         max_entries = ConfigParam.objects.get(name=labels.IRRIGATION_PHASES_LIMIT).get_parsed_value()
 
-        if self.instance and self.instance.parent.irrigation_phases.count() + 1 > max_entries:
+        if self.instance and self.instance.parent.irrigation_phases.all().count() + 1 > max_entries:
             raise serializers.ValidationError(f"Only {max_entries} irrigation phases are allowed")
 
         return data
 
 
-class IrrigationPhaseReadSerializer(SubmoduleBaseSerializer):
+class IrrigationPhaseReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = IrrigationPhase
         fields = "__all__"
         ref_name = "IrrigationPhase"
+        mandatory_fields = {}
 
 
-class EnergyWriteSerializer(LandModuleWriteSerializer):
+class EnergyWriteSerializer(ModuleBaseSerializer):
     class Meta:
         model = Energy
         fields = "__all__"
         ref_name = "Energy"
-        mandatory_fields = [
-            "mwh",
-        ]
-
-    def validate(self, data):
-        mandatory_fields = []
-
-        energy_type_scenarios = get_filled_scenarios(data, ["mwh"])
-
-        if energy_type_scenarios != []:
-            mandatory_fields += "country"
-
-        if not are_fields_filled(data, mandatory_fields):
-            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
-
-        return super().validate(data)
+        mandatory_fields = {}
 
 
-class EnergyReadSerializer(LandModuleReadSerializer):
+class EnergyReadSerializer(ModuleBaseSerializer):
     class Meta:
         model = Energy
         fields = "__all__"
         ref_name = "Energy"
+        mandatory_fields = {}
 
 
 # Fuel
@@ -1264,22 +1418,19 @@ class FuelWriteSerializer(SubmoduleBaseSerializer):
         model = Fuel
         fields = "__all__"
         ref_name = "Fuel"
-        mandatory_fields = [
-            "fuel_type",
-            "fuel",
-        ]
+        mandatory_fields = {
+            "fuel_type": [
+                ["fuel_consumption_start", "fuel_consumption_w", "fuel_consumption_wo"],
+            ],
+        }
+
+        # [
+        #     "fuel_type",
+        #     "fuel",
+        # ]
 
     def validate(self, data):
         super().validate(data)
-        mandatory_fields = []
-
-        fuel_type_scenarios = get_filled_scenarios(data, ["fuel_type"])
-
-        for scenario in fuel_type_scenarios:
-            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
-
-        if not are_fields_filled(data, mandatory_fields):
-            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
 
         parent = utils.getany([self.instance, dict(data)], "parent")
         max_elements = ConfigParam.objects.get(name=labels.FUEL_MODULES_LIMIT).get_parsed_value()
@@ -1290,11 +1441,12 @@ class FuelWriteSerializer(SubmoduleBaseSerializer):
         return data
 
 
-class FuelReadSerializer(SubmoduleBaseSerializer):
+class FuelReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Fuel
         fields = "__all__"
         ref_name = "Fuel"
+        mandatory_fields = {}
 
 
 class ElectricityWriteSerializer(SubmoduleBaseSerializer):
@@ -1302,7 +1454,7 @@ class ElectricityWriteSerializer(SubmoduleBaseSerializer):
         model = Electricity
         fields = "__all__"
         ref_name = "Electricity"
-        mandatory_fields = []
+        mandatory_fields = {}
 
     def validate(self, data):
         super().validate(data)
@@ -1316,11 +1468,12 @@ class ElectricityWriteSerializer(SubmoduleBaseSerializer):
         return data
 
 
-class ElectricityReadSerializer(SubmoduleBaseSerializer):
+class ElectricityReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Electricity
         fields = "__all__"
         ref_name = "Electricity"
+        mandatory_fields = {}
 
 
 # Livestock
@@ -1331,30 +1484,31 @@ class LivestockWriteSerializer(LandModuleWriteSerializer):
         model = Livestock
         fields = "__all__"
         ref_name = "Livestock"
-        mandatory_fields = [
-            "livestock_category_type",
-            "heads_number",
-            "livestock_production_type",
-        ]
-
-    def validate(self, data):
-        mandatory_fields = []
-
-        livestock_type_scenarios = get_filled_scenarios(data, ["livestock_category_type"])
-        complementary_manure_mngt_scenarios = get_filled_scenarios(data, ["complementary_manure_management_type_t2"])
-
-        for scenario in livestock_type_scenarios:
-            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
-            if scenario in complementary_manure_mngt_scenarios:
-                mandatory_fields += generate_fields_for_scenario(
-                    scenario,
-                    ["complementary_manure_management_type_t2, percentage_heads_on_pasture"],
-                )
-
-        if not are_fields_filled(data, mandatory_fields):
-            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
-
-        return super().validate(data)
+        mandatory_fields = {
+            "livestock_category_type": [
+                {
+                    "livestock_production_type_start": [
+                        # "production_start",
+                        "heads_number_start",
+                        {"complementary_manure_management_type_start": ["percentage_heads_on_pasture_start"]},
+                    ]
+                },
+                {
+                    "livestock_production_type_w": [
+                        # "production_w",
+                        "heads_number_w",
+                        {"complementary_manure_management_type_w": ["percentage_heads_on_pasture_w"]},
+                    ]
+                },
+                {
+                    "livestock_production_type_wo": [
+                        # "production_wo",
+                        "heads_number_wo",
+                        {"complementary_manure_management_type_wo": ["percentage_heads_on_pasture_wo"]},
+                    ]
+                },
+            ]
+        }
 
 
 class LivestockReadSerializer(LandModuleReadSerializer):
@@ -1362,6 +1516,31 @@ class LivestockReadSerializer(LandModuleReadSerializer):
         model = Livestock
         fields = "__all__"
         ref_name = "Livestock"
+        mandatory_fields = {
+            "livestock_category_type": [
+                {
+                    "livestock_production_type_start": [
+                        # "production_start",
+                        "heads_number_start",
+                        {"complementary_manure_management_type_start": ["percentage_heads_on_pasture_start"]},
+                    ]
+                },
+                {
+                    "livestock_production_type_w": [
+                        # "production_w",
+                        "heads_number_w",
+                        {"complementary_manure_management_type_w": ["percentage_heads_on_pasture_w"]},
+                    ]
+                },
+                {
+                    "livestock_production_type_wo": [
+                        # "production_wo",
+                        "heads_number_wo",
+                        {"complementary_manure_management_type_wo": ["percentage_heads_on_pasture_wo"]},
+                    ]
+                },
+            ]
+        }
 
 
 # Aquaculture
@@ -1372,9 +1551,11 @@ class AquacultureWriteSerializer(LandModuleWriteSerializer):
         model = Aquaculture
         fields = "__all__"
         ref_name = "Aquaculture"
-        mandatory_fields = [
-            "annual_production",
-        ]
+        mandatory_fields = {
+            "annual_production_start": [],
+            "annual_production_w": [],
+            "annual_production_wo": [],
+        }
 
     def validate(self, data):
         return super().validate(data)
@@ -1385,6 +1566,7 @@ class AquacultureReadSerializer(LandModuleReadSerializer):
         model = Aquaculture
         fields = "__all__"
         ref_name = "Aquaculture"
+        mandatory_fields = {}
 
 
 # SmllFishery
@@ -1395,24 +1577,27 @@ class SmallFisheryWriteSerializer(LandModuleWriteSerializer):
         model = SmallFishery
         fields = "__all__"
         ref_name = "SmallFishery"
-        mandatory_fields = [
-            "fishery_type",
-            "gear_type",
-            "total_catch_yr",
-        ]
-
-    def validate(self, data):
-        mandatory_fields = []
-
-        fishery_type_scenarios = get_filled_scenarios(data, self.Meta.mandatory_fields)
-
-        for scenario in fishery_type_scenarios:
-            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
-
-        if not are_fields_filled(data, mandatory_fields):
-            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
-
-        return super().validate(data)
+        mandatory_fields = {
+            "fishery_type": [
+                [
+                    {
+                        "gear_type_start": [
+                            "total_catch_yr_start",
+                        ],
+                    },
+                    {
+                        "gear_type_w": [
+                            "total_catch_yr_w",
+                        ],
+                    },
+                    {
+                        "gear_type_wo": [
+                            "total_catch_yr_wo",
+                        ],
+                    },
+                ]
+            ]
+        }
 
 
 class SmallFisheryReadSerializer(LandModuleReadSerializer):
@@ -1420,6 +1605,7 @@ class SmallFisheryReadSerializer(LandModuleReadSerializer):
         model = SmallFishery
         fields = "__all__"
         ref_name = "SmallFishery"
+        mandatory_fields = {}
 
 
 # LargeFishery
@@ -1430,24 +1616,27 @@ class LargeFisheryWriteSerializer(LandModuleWriteSerializer):
         model = LargeFishery
         fields = "__all__"
         ref_name = "LargeFishery"
-        mandatory_fields = [
-            "fish_type",
-            "gear_type",
-            "total_catch_yr",
-        ]
-
-    def validate(self, data):
-        mandatory_fields = []
-
-        fishery_type_scenarios = get_filled_scenarios(data, self.Meta.mandatory_fields)
-
-        for scenario in fishery_type_scenarios:
-            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
-
-        if not are_fields_filled(data, mandatory_fields):
-            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
-
-        return super().validate(data)
+        mandatory_fields = {
+            "fish_type": [
+                [
+                    {
+                        "gear_type_start": [
+                            "total_catch_yr_start",
+                        ],
+                    },
+                    {
+                        "gear_type_w": [
+                            "total_catch_yr_w",
+                        ],
+                    },
+                    {
+                        "gear_type_wo": [
+                            "total_catch_yr_wo",
+                        ],
+                    },
+                ],
+            ],
+        }
 
 
 class LargeFisheryReadSerializer(LandModuleReadSerializer):
@@ -1455,6 +1644,7 @@ class LargeFisheryReadSerializer(LandModuleReadSerializer):
         model = LargeFishery
         fields = "__all__"
         ref_name = "LargeFishery"
+        mandatory_fields = {}
 
 
 # Waterbody
@@ -1465,24 +1655,12 @@ class WaterbodyWriteSerializer(LandModuleWriteSerializer):
         model = Waterbody
         fields = "__all__"
         ref_name = "Waterbody"
-        mandatory_fields = ["trophic_type"]
-
-    def validate(self, data):
-        mandatory_fields = []
-
-        waterbody_type_scenarios = get_filled_scenarios(data, ["trophic_type"])
-
-        mandatory_fields += generate_fields_for_scenarios(waterbody_type_scenarios, mandatory_fields)
-
-        mandatory_fields += ["waterbody_type"]
-
-        if waterbody_type_scenarios:
-            mandatory_fields += ["area"]
-
-        if not are_fields_filled(data, mandatory_fields):
-            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
-
-        return super().validate(data)
+        mandatory_fields = {
+            "waterbody_type": [
+                "area",
+                ["trophic_type_start", "trophic_type_w", "trophic_type_wo"],
+            ],
+        }
 
 
 class WaterbodyReadSerializer(LandModuleReadSerializer):
@@ -1490,19 +1668,7 @@ class WaterbodyReadSerializer(LandModuleReadSerializer):
         model = Waterbody
         fields = "__all__"
         ref_name = "Waterbody"
-
-
-class ProjectInvitationModelSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProjectInvitation
-        fields = "__all__"
-        ref_name = "ProjectInvitation"
-
-
-class ProjectInvitationWriteSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True)
-    group = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all(), required=True)
-    project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(), required=True)
+        mandatory_fields = {}
 
 
 class ProjectNameIdSerializer(serializers.ModelSerializer):
@@ -1543,37 +1709,68 @@ class ForestManagementWriteSerializer(LandModuleWriteSerializer):
         model = ForestManagement
         fields = "__all__"
         ref_name = "ForestManagement"
-        mandatory_fields = [
-            "forest_type",
-            "forest_condition_type",
-        ]
+        mandatory_fields = {
+            "land_use_type_start": [
+                "forest_type",
+                {
+                    "rotation_length_yrs_start": [
+                        "rotation_length_yrs_start",
+                        "rotation_percentage_biomass_for_energy_start",
+                    ]
+                },
+                {
+                    "rotation_length_yrs_w": [
+                        "rotation_length_yrs_w",
+                        "rotation_percentage_biomass_for_energy_w",
+                    ]
+                },
+                {"rotation_length_yrs_wo": ["rotation_length_yrs_wo", "rotation_percentage_biomass_for_energy_wo"]},
+                {
+                    "logging_recurrence_yrs_start": [
+                        "logging_recurrence_yrs_start",
+                        "logging_percentage_agb_logged_start",
+                        "logging_percentage_biomass_for_energy_start",
+                    ]
+                },
+                {
+                    "logging_recurrence_yrs_w": [
+                        "logging_recurrence_yrs_w",
+                        "logging_percentage_agb_logged_w",
+                        "logging_percentage_biomass_for_energy_w",
+                    ]
+                },
+                {"logging_recurrence_yrs_wo": ["logging_recurrence_yrs_wo", "logging_percentage_agb_logged_wo", "logging_percentage_biomass_for_energy_wo"]},
+            ]
+        }
 
     def validate(self, data):
-        mandatory_fields = []
         errors = []
 
-        mandatory_fields += self.Meta.mandatory_fields
-
-        # Rotation mandatory fields
-        rotation_length_yrs = get_filled_scenarios(data, ["rotation_length_yrs"])
-        mandatory_fields += generate_fields_for_scenarios(rotation_length_yrs, ["rotation_percentage_biomass_for_energy"])
+        instance: ForestManagement = self.instance
 
         # Logging mandatory fields
-        logging_recurrence_yrs = get_filled_scenarios(data, ["logging_recurrence_yrs"])
-        mandatory_fields += generate_fields_for_scenarios(logging_recurrence_yrs, ["logging_percentage_agb_logged", "logging_percentage_biomass_for_energy"])
+        loggings = get_filled_scenarios(data, ["logging_recurrence_yrs"])
+        rotations = get_filled_scenarios(data, ["rotation_length_yrs"])
+        disturbances = self.instance.disturbances.all().count() if self.instance else None
 
-        if not are_fields_filled(data, mandatory_fields):
-            errors += [f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}"]
+        if rotations and (loggings or disturbances):
+            errors += ["Forest rotation cannot be used with logging or other disturbances at the same time"]
 
-        if self.instance and self.instance.disturbances.count() > 0:
-            if logging_recurrence_yrs:
-                errors += ["Cannot have logging and other disturbances at the same time"]
+        if loggings and disturbances:
+            errors += ["Cannot have logging and other disturbances at the same time"]
 
+        if not loggings and not rotations:
+            degradations = get_filled_scenarios(data, ["average_yearly_degradation_percentage"])
+            if not degradations:
+                errors += ["With no logging, rotation or disturbances, average yearly degradation percentage is required"]
+
+        if instance and instance.disturbances.count() > 0:
             pc_biomass_destruction_start = data.get("logging_percentage_agb_logged_start", 0)
             pc_biomass_destruction_wo = data.get("logging_percentage_agb_logged_wo", 0)
             pc_biomass_destruction_w = data.get("logging_percentage_agb_logged_w", 0)
 
-            for disturbance in self.instance.disturbances.all():
+            for disturbance in instance.disturbances.all():
+                disturbance: ForestDisturbance
                 pc_biomass_destruction_start += disturbance.percentage_biomass_destruction_start if disturbance.percentage_biomass_destruction_start else 0
                 pc_biomass_destruction_wo += disturbance.percentage_biomass_destruction_wo if disturbance.percentage_biomass_destruction_wo else 0
                 pc_biomass_destruction_w += disturbance.percentage_biomass_destruction_w if disturbance.percentage_biomass_destruction_w else 0
@@ -1600,6 +1797,7 @@ class ForestManagementReadSerializer(LandModuleReadSerializer):
         model = ForestManagement
         fields = "__all__"
         ref_name = "ForestManagement"
+        mandatory_fields = {}
 
 
 class InputWriteSerializer(ModuleBaseSerializer):
@@ -1607,6 +1805,7 @@ class InputWriteSerializer(ModuleBaseSerializer):
         model = Input
         fields = "__all__"
         ref_name = "Input"
+        mandatory_fields = {}
 
 
 class InputReadSerializer(ModuleBaseSerializer):
@@ -1614,13 +1813,19 @@ class InputReadSerializer(ModuleBaseSerializer):
         model = Input
         fields = "__all__"
         ref_name = "Input"
+        mandatory_fields = {}
 
 
-class InputEntryWriteSerializer(serializers.ModelSerializer):
+class InputEntryWriteSerializer(SubmoduleBaseSerializer):
     class Meta:
         model = InputEntry
         fields = "__all__"
         ref_name = "InputEntry"
+        mandatory_fields = {
+            "input_type": [
+                ["value_start", "value_w", "value_wo"],
+            ],
+        }
 
     def validate(self, data):
         super().validate(data)
@@ -1713,10 +1918,7 @@ class SetAsideWriteSerializer(LandModuleWriteSerializer):
         model = SetAside
         fields = "__all__"
         ref_name = "SetAside"
-        mandatory_fields = []
-
-    def validate(self, data):
-        return super().validate(data)
+        mandatory_fields = {}
 
 
 class SetAsideReadSerializer(LandModuleReadSerializer):
@@ -1724,7 +1926,7 @@ class SetAsideReadSerializer(LandModuleReadSerializer):
         model = SetAside
         fields = "__all__"
         ref_name = "SetAside"
-        mandatory_fields = []
+        mandatory_fields = {}
 
 
 class DegradedLandWriteSerializer(LandModuleWriteSerializer):
@@ -1732,10 +1934,7 @@ class DegradedLandWriteSerializer(LandModuleWriteSerializer):
         model = DegradedLand
         fields = "__all__"
         ref_name = "DegradedLand"
-        mandatory_fields = []
-
-    def validate(self, data):
-        return super().validate(data)
+        mandatory_fields = {}
 
 
 class DegradedLandReadSerializer(LandModuleReadSerializer):
@@ -1743,25 +1942,30 @@ class DegradedLandReadSerializer(LandModuleReadSerializer):
         model = DegradedLand
         fields = "__all__"
         ref_name = "DegradedLand"
+        mandatory_fields = {}
 
 
-class SettlementWriteSerializer(ModuleBaseSerializer):
+class SettlementWriteSerializer(LandModuleWriteSerializer):
     class Meta:
         model = Settlement
         fields = "__all__"
         ref_name = "Settlement"
-        mandatory_fields = []
+        mandatory_fields = {}
 
 
-class SettlementReadSerializer(ModuleBaseSerializer):
+class SettlementReadSerializer(LandModuleReadSerializer):
     class Meta:
         model = Settlement
         fields = "__all__"
         ref_name = "Settlement"
+        mandatory_fields = {}
 
     def validate(self, data):
 
         buildings = Building.objects.filter(parent=self.instance).all()
+
+        if any(building.status.name == "EMPTY" for building in buildings):
+            raise serializers.ValidationError("At least one building is not ready for calculations")
 
         for building in buildings:
             building_serializer = BuildingReadSerializer(data=building.__dict__, instance=building)
@@ -1769,12 +1973,20 @@ class SettlementReadSerializer(ModuleBaseSerializer):
                 raise serializers.ValidationError(building_serializer.errors)
 
         roads = Road.objects.filter(parent=self.instance).all()
+
+        if any(road.status.name == "EMPTY" for road in roads):
+            raise serializers.ValidationError("At least one road is not ready for calculations")
+
         for road in roads:
             road_serializer = RoadReadSerializer(data=road.__dict__, instance=road)
             if not road_serializer.is_valid():
                 raise serializers.ValidationError(road_serializer.errors)
 
         other_infrastructures = OtherInfrastructure.objects.filter(parent=self.instance).all()
+
+        if any(other_infrastructure.status.name == "EMPTY" for other_infrastructure in other_infrastructures):
+            raise serializers.ValidationError("At least one other infrastructure is not ready for calculations")
+
         for other_infrastructure in other_infrastructures:
             other_infrastructure_serializer = OtherInfrastructureReadSerializer(data=other_infrastructure.__dict__, instance=other_infrastructure)
             if not other_infrastructure_serializer.is_valid():
@@ -1815,10 +2027,11 @@ class CoastalWetlandWriteSerializer(ModuleBaseSerializer):
         model = CoastalWetland
         fields = "__all__"
         ref_name = "CoastalWetland"
-        mandatory_fields = []
-
-    def validate(self, data):
-        return super().validate(data)
+        mandatory_fields = {
+            "land_use_type": [
+                "area",
+            ],
+        }
 
 
 class CoastalWetlandReadSerializer(ModuleBaseSerializer):
@@ -1826,6 +2039,7 @@ class CoastalWetlandReadSerializer(ModuleBaseSerializer):
         model = CoastalWetland
         fields = "__all__"
         ref_name = "CoastalWetland"
+        mandatory_fields = {}
 
 
 class ForestDisturbanceWriteSerializer(SubmoduleBaseSerializer):
@@ -1833,16 +2047,76 @@ class ForestDisturbanceWriteSerializer(SubmoduleBaseSerializer):
         model = ForestDisturbance
         fields = "__all__"
         ref_name = "ForestDisturbance"
-        mandatory_fields = [
-            "disturbance_type",
-        ]
+        mandatory_fields = {
+            "disturbance_type": [
+                [
+                    {
+                        "recurrence_yrs_start": [
+                            "percentage_biomass_destruction_start",
+                        ]
+                    },
+                    {
+                        "recurrence_yrs_w": [
+                            "percentage_biomass_destruction_w",
+                        ]
+                    },
+                    {
+                        "recurrence_yrs_wo": [
+                            "percentage_biomass_destruction_wo",
+                        ]
+                    },
+                ],
+            ],
+        }
+
+        # [
+        #     "disturbance_type",
+        # ]
 
     def validate(self, data):
         return super().validate(data)
 
 
-class ForestDisturbanceReadSerializer(SubmoduleBaseSerializer):
+class ForestDisturbanceReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = ForestDisturbance
         fields = "__all__"
         ref_name = "ForestDisturbance"
+        mandatory_fields = {}
+
+
+class ChangeSerializer(serializers.Serializer):
+    field = serializers.CharField()
+    new = serializers.CharField()
+    old = serializers.CharField()
+
+
+class ChangeHistorySerializer(serializers.Serializer):
+    reason = serializers.CharField()
+    date = serializers.DateTimeField()
+    user = serializers.EmailField()
+    changes = ChangeSerializer(many=True)
+
+
+class ProjectInvitationModelReadSerializer(serializers.ModelSerializer):
+    project = ReadProjectSerializer(many=False, read_only=True)
+    group = GroupSerializer(many=False, read_only=True)
+    status = get_model_serializer(InvitationStatusType)(many=False, read_only=True)
+
+    class Meta:
+        model = ProjectInvitation
+        fields = "__all__"
+        ref_name = "ProjectInvitation"
+
+
+class ProjectInvitationModelWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectInvitation
+        fields = "__all__"
+        ref_name = "ProjectInvitation"
+
+
+class ProjectInvitationWriteSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    group = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all(), required=True)
+    project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(), required=True)
