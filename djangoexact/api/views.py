@@ -18,6 +18,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from simple_history.utils import update_change_reason
+from rest_framework.pagination import PageNumberPagination
 
 import api.filters as filters
 import api.labels as labels
@@ -132,6 +133,20 @@ macro_input_type = openapi.Parameter(
     type=openapi.TYPE_INTEGER,
 )
 
+page_size = openapi.Parameter(
+    "page_size",
+    openapi.IN_QUERY,
+    description="Number of items per page",
+    type=openapi.TYPE_INTEGER,
+)
+
+page = openapi.Parameter(
+    "page",
+    openapi.IN_QUERY,
+    description="Page number",
+    type=openapi.TYPE_INTEGER,
+)
+
 
 def get_modules(activity: Activity, serialized=True) -> list:
     modules = []
@@ -149,6 +164,12 @@ def get_modules(activity: Activity, serialized=True) -> list:
             module_serializers_list.append(module_dict)
 
     return module_serializers_list if serialized else modules
+
+
+class DefaultPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = "page_size"
+    max_page_size = 100
 
 
 class BaseWiewSet(viewsets.GenericViewSet):
@@ -237,6 +258,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
     queryset = Project.objects.all()
     serializer_class = WriteProjectSerializer
+    pagination_class = DefaultPagination
 
     def create(self, request, *args, **kwargs):
         """
@@ -300,6 +322,12 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         shared_projects = request.user.memberships.all()
         list = [share.project for share in shared_projects if utils.has_project_permission("view_project", self.request.user, share.project)]
+
+        paginator = DefaultPagination()
+        page = paginator.paginate_queryset(list, request)
+        if page is not None:
+            return paginator.get_paginated_response(ReadProjectSerializer(page, many=True, context={"request": request}).data)
+
         return Response(data=ReadProjectSerializer(list, many=True, context={"request": request}).data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])
@@ -673,14 +701,12 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         list = Activity.objects.filter(project__id=project_id)
 
-        response = []
+        paginator = DefaultPagination()
+        page = paginator.paginate_queryset(list, request)
+        if page is not None:
+            return paginator.get_paginated_response(ActivitySerializer(page, many=True).data)
 
-        for activity in list:
-            activity_dict = ActivitySerializer(activity).data
-            activity_dict["modules"] = get_modules(activity)
-            response.append(activity_dict)
-
-        return Response(data=response, status=http_status.HTTP_200_OK)
+        return Response(data=ActivitySerializer(list, many=True).data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])
     def results(self, request, pk=None):
@@ -739,6 +765,11 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return utils.ErrorResponse("Selected user does not have permission to view the activity", status=http_status.HTTP_403_FORBIDDEN)
 
         modules = get_modules(activity)
+
+        paginator = DefaultPagination()
+        page = paginator.paginate_queryset(modules, request)
+        if page is not None:
+            return paginator.get_paginated_response(page)
 
         return Response(data=modules, status=http_status.HTTP_200_OK)
 
@@ -1014,7 +1045,7 @@ def generic_module_viewset(model: Model):
 
             return Response(read_serializer.data, status=http_status.HTTP_201_CREATED)
 
-        @swagger_auto_schema(manual_parameters=[activity_id, module_type])
+        @swagger_auto_schema(manual_parameters=[activity_id, module_type, page_size, page], responses={400: "Bad request", 403: "Selected user does not have permission to view the module", 200: get_module_serializer(model)})
         def list(self, request):
             """
             Lists the module(s) of a given activity
@@ -1038,9 +1069,13 @@ def generic_module_viewset(model: Model):
 
             data = []
 
-            for i, module in enumerate(modules):
-                serializer = get_module_serializer(model)(instance=module)
-                data.append({**serializer.data})
+            paginator = DefaultPagination()
+            page = paginator.paginate_queryset(modules, request)
+            if page is not None:
+                for i, module in enumerate(page):
+                    serializer = get_module_serializer(model)(instance=module)
+                    data.append({**serializer.data})
+                return paginator.get_paginated_response(data)
 
             return Response(data)
 
