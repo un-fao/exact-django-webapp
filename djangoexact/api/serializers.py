@@ -273,7 +273,12 @@ class ReadProjectSerializer(serializers.ModelSerializer):
     role = serializers.SerializerMethodField()
 
     def get_role(self, obj):
-        user = self.context["request"].user
+        ctx = self.context.get("request", None)
+
+        if not ctx:
+            return []
+
+        user = ctx.user
         user_project_group = UserProjectGroup.objects.filter(user=user, project=obj).all()
 
         if not user_project_group:
