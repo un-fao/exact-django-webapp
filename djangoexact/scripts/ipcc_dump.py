@@ -3958,7 +3958,6 @@ for i, row in enumerate(df_dict):
             ipcc_region=region,
             value=parse_csv_number(row[df_headers[j]]),
         )
-"""
 
 print("Deleting all LivestockManureEF...")
 LivestockManureEF.objects.all().delete()
@@ -4211,3 +4210,24 @@ for i, row in enumerate(df_dict):
             ipcc_region=ipcc_region,
             value=parse_csv_number(row[df_headers[j]]),
         )
+"""
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestClimateAssociationTable.csv"),
+    header=0,
+    sep=";",
+)
+
+headers = df.columns.values.tolist()
+rows = df.to_dict("records")
+
+for lut in LandUseType.objects.filter(module_types__name__in=["Forest Management"]).all():
+    print(f"Clearing climates for {lut.name}")
+    lut.climates.clear()
+    lut.save()
+
+for i, row in enumerate(rows):
+    lut = LandUseType.objects.get(name=sanitize(row["forest_type"]))
+    climate = Climate.objects.get(name=sanitize(row["climate"]))
+    lut.climates.add(climate)
+    lut.save()
+    print(f"Added {climate} to {lut}")
