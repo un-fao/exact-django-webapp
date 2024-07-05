@@ -300,7 +300,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         shared_projects = request.user.memberships.all()
         list = [share.project for share in shared_projects if utils.has_project_permission("view_project", self.request.user, share.project)]
-        return Response(data=ReadProjectSerializer(list, many=True).data, status=http_status.HTTP_200_OK)
+        return Response(data=ReadProjectSerializer(list, many=True, context={"request": request}).data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])
     @swagger_auto_schema(manual_parameters=[project_id], responses={404: "Project not found"})
