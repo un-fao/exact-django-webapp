@@ -4210,24 +4210,24 @@ for i, row in enumerate(df_dict):
             ipcc_region=ipcc_region,
             value=parse_csv_number(row[df_headers[j]]),
         )
-
 """
-
 df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "LandUseNitrousEmissionFactor.csv"),
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestClimateAssociationTable.csv"),
     header=0,
-    sep=",",
+    sep=";",
 )
 
-df_headers = df.columns.values.tolist()
-df_dict = df.to_dict("records")
+headers = df.columns.values.tolist()
+rows = df.to_dict("records")
 
-for i, row in enumerate(df_dict):
-    moisture = Moisture.objects.get(name=sanitize(row["moisture"]))
+for lut in LandUseType.objects.filter(module_types__name__in=["Forest Management"]).all():
+    print(f"Clearing climates for {lut.name}")
+    lut.climates.clear()
+    lut.save()
 
-    print(moisture, row["value"])
-
-    LandUseNitrousEmissionFactor.objects.create(
-        moisture=moisture,
-        value=parse_csv_number(row["value"]),
-    )
+for i, row in enumerate(rows):
+    lut = LandUseType.objects.get(name=sanitize(row["forest_type"]))
+    climate = Climate.objects.get(name=sanitize(row["climate"]))
+    lut.climates.add(climate)
+    lut.save()
+    print(f"Added {climate} to {lut}")
