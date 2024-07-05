@@ -7,6 +7,8 @@ from django.apps import apps
 from django.db import models
 from rest_framework import exceptions, status
 from rest_framework.response import Response
+from simple_history.models import HistoricalRecords
+from simple_history.utils import update_change_reason
 
 import api.models as api_models
 
@@ -39,6 +41,19 @@ class EmissionTypes(Enum):
     N2O = "N2O"
     N2O_VOLATILIZATION = "N2O Volatilization"
     N2O_LEACHING = "N2O Leaching"
+
+
+class ChangeReasons(Enum):
+    CREATE = "create"
+    UPDATE = "update"
+    DELETE = "delete"
+
+
+class InvitationStatus(Enum):
+    PENDING = "pending"
+    ACCEPTED = "accepted"
+    REJECTED = "rejected"
+    CANCELLED = "cancelled"
 
 
 def avg(lst):
@@ -125,7 +140,7 @@ def has_project_permission(permission, user, project):
     membership: models.UserProjectGroup = project.members.filter(user=user).first()
     can_access = membership and membership.group.permissions.filter(codename=permission).exists()
 
-    return can_access
+    return can_access or user.is_superuser
 
 
 def find_modules(activity):
@@ -174,16 +189,22 @@ def copy_activity(activity, new_project=None):
     activity_copy.save()
 
     luc_copy = None
+    organic_soil_copy = None
 
     for module in find_modules(activity):
+        if module.__class__.__name__ == "LandUseChange" or module.__class__.__name__ == "OrganicSoil":
+            continue
+
         module_copy = copy.deepcopy(module)
         module_copy.pk = None
         module_copy.activity = activity_copy
         module_copy._state.adding = True
         module_copy.land_use_change = None
+        module_copy.organic_soil = None
         module_copy.save()
 
         has_luc = getattr(module, "land_use_change", None)
+        has_organic_soil = getattr(module, "organic_soil", None)
 
         if has_luc:
             if not luc_copy:
@@ -194,6 +215,17 @@ def copy_activity(activity, new_project=None):
                 luc_copy.save()
 
             module_copy.land_use_change = luc_copy
+            module_copy.save()
+
+        if has_organic_soil:
+            if not organic_soil_copy:
+                organic_soil_copy = copy.deepcopy(module.organic_soil)
+                organic_soil_copy.pk = None
+                organic_soil_copy.activity = activity_copy
+                organic_soil_copy._state.adding = True
+                organic_soil_copy.save()
+
+            module_copy.organic_soil = organic_soil_copy
             module_copy.save()
 
         submodules = None
@@ -219,11 +251,12 @@ def copy_activity(activity, new_project=None):
     return activity
 
 
-def create_module_threads(module_instance):
+def create_comment_threads(module_instance):
     for attr in dir(module_instance):
         if attr.endswith("_thread") and getattr(module_instance, attr, None) is None:
             setattr(module_instance, attr, api_models.CommentThread.objects.create())
     module_instance.save()
+    update_change_reason(module_instance, "update")
 
 
 def getany(objects: list[object], key: str):
@@ -254,3 +287,142 @@ def getany(objects: list[object], key: str):
             if hasattr(obj, key):
                 return getattr(obj, key)
     return None
+
+
+def getattr_or_default(obj, key, default=0):
+    """
+    Returns the value of the specified key from the object, or 0 if the object does not have the key attribute.
+
+    Args:
+        obj (object): The object to retrieve the key attribute from.
+        key (str): The name of the key attribute to retrieve.
+
+    Returns:
+        object: The value of the specified key from the object, or 0 if the object does not have the key attribute.
+    """
+    _attr = getattr(obj, key, 0)
+    return _attr if _attr else default
+
+
+def get_or_raise(model, filter_criteria, error_message, method="get"):
+    """
+    Retrieves a single instance of the given model that matches the filter criteria,
+    or raises an exception with the specified error message if no instance is found.
+
+    Args:
+        model (django.db.models.Model): The model class to query.
+        filter_criteria (dict): The filter criteria to apply when querying the model.
+        error_message (str): The error message to raise if no instance is found.
+        method (str, optional): The method to use for querying the model. Defaults to "get".
+
+    Returns:
+        django.db.models.Model: The retrieved instance.
+
+    Raises:
+        Exception: If no instance is found and the input status name is "READY".
+    """
+    try:
+        attr = getattr(model.objects, method)
+        if not callable(attr):
+            raise AttributeError(f"Method '{method}' is not callable on {model.__name__} objects.")
+        return attr(**filter_criteria)
+    except model.DoesNotExist:
+        raise Exception(error_message)
+
+
+def update_activity_status_and_completion(activity):
+    """
+    Updates the status of the activity based on the status of its modules.
+
+    Args:
+        activity (Activity): The activity object to update.
+    """
+    statuses = [module.status for module in find_modules(activity)]
+
+    ready_count = statuses.count(api_models.StatusType.objects.get(name="READY"))
+    percentage_complete = ready_count / len(statuses)
+
+    if percentage_complete == 1:
+        activity.status = api_models.StatusType.objects.get(name="READY")
+    elif percentage_complete > 0:
+        activity.status = api_models.StatusType.objects.get(name="IN PROGRESS")
+    else:
+        activity.status = api_models.StatusType.objects.get(name="EMPTY")
+
+    activity.completion_percentage = percentage_complete
+    activity.save()
+
+    return activity.status
+
+
+# NOTE: This could be done with signals, but I saw there are no signals as of now
+# so I kept this approach for consistency. Can be changed later if needed.
+def get_activity_default_status():
+    return api_models.StatusType.objects.get_or_create(name="EMPTY")[0]
+
+
+def get_default_peat_type():
+    return api_models.PeatType.objects.get_or_create(name="Nutrient Poor")[0]
+
+
+def find_organic_soil_parent_module(organic_soil) -> tuple:
+    """
+    Find the parent module of the Organic Soil module.
+
+    Args:
+        organic_soil: The Organic Soil module.
+
+    Returns:
+        A tuple containing the parent module [api.models.LandModule] and its module type [api.models.ModuleType]
+
+    Raises:
+        ValueError: If the parent module or module type cannot be found.
+    """
+
+    # NOTE: This is always true as long as Organic Soil is a OneToOneField of LandModule
+    parent_module: api_models.LandModule = next(attr for attr in dir(organic_soil) if attr.startswith("organic_soil_") and (attr not in ["organicsoil"] and isinstance(getattr(organic_soil, attr, None), api_models.LandModule)))
+
+    if not parent_module:
+        raise ValueError(f"Could not find parent module for Organic Soil")
+
+    parent_module_name = parent_module.split("_")[-1]
+    parent_module_type: api_models.ModuleType = api_models.ModuleType.objects.filter(class_name__iexact=parent_module_name).first()
+
+    if not parent_module_type:
+        raise ValueError(f"Could not find module type for {parent_module_name}")
+
+    ParentModule = apps.get_model(app_label="api", model_name=parent_module_type.class_name)
+    parent_module = ParentModule.objects.get(organic_soil=organic_soil)
+
+    return parent_module, parent_module_type
+
+
+def get_changes(records: list[HistoricalRecords]):
+
+    class ChangeLog:
+        def __init__(self, date, user, reason, changes):
+            self.date = date
+            self.user = user
+            self.reason = reason
+            self.changes: list[Change] = changes
+
+    class Change:
+        def __init__(self, field, old, new):
+            self.field = field
+            self.old = old
+            self.new = new
+
+    changes = []
+    for record in records:
+        if record.prev_record is None:
+            changes.append(ChangeLog(record.history_date, record.history_user.email, ChangeReasons.CREATE.value, []))
+            continue
+
+        delta = record.diff_against(record.prev_record)
+        change_log: ChangeLog = ChangeLog(record.history_date, record.history_user.email, record.history_change_reason, [])
+        for change in delta.changes:
+            change_log.changes.append(Change(change.field, change.old, change.new))
+
+        changes.append(change_log)
+
+    return changes

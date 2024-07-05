@@ -7,7 +7,7 @@ from django.db import models as models
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
 
-from . import utilities
+from api import utilities as utils
 
 alphanumeric = validators.RegexValidator(r"^[0-9a-zA-Z]*$", "Only alphanumeric characters are allowed.")
 letters_only = validators.RegexValidator(r"^[a-zA-Z]*$", "Only letters are allowed.")
@@ -18,20 +18,61 @@ RICE_CULTIVATION_DAYS = 113
 
 
 # Create your models here.
-class CustomUser(auth_models.AbstractUser):
+from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.db import models
+from django.core.validators import RegexValidator
+
+alphanumeric = RegexValidator(r"^[0-9a-zA-Z]*$", "Only alphanumeric characters are allowed.")
+
+
+class InvitationStatusType(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return f"({self.pk}) {self.name}"
+
+
+class CustomUserManager(BaseUserManager):
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError("The Email field must be set")
+        email = self.normalize_email(email)
+        # username = email  # Automatically set username as email
+        # user = self.model(email=email, username=username, **extra_fields)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("Superuser must have is_staff=True.")
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError("Superuser must have is_superuser=True.")
+
+        return self.create_user(email, password, **extra_fields)
+
+
+class CustomUser(AbstractUser):
     country = models.ForeignKey("api.Country", on_delete=models.CASCADE, null=True, blank=True, related_name="users")
     email = models.EmailField(unique=True)
+    username = None
     firebase_uid = models.CharField(max_length=255, unique=True, validators=[alphanumeric], null=True, verbose_name="UID")
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
+    objects = CustomUserManager()
+
     class Meta:
         permissions = (
             ("can_view_modules", "Can view modules"),
             ("can_add_modules", "Can add modules"),
-            ("can_change_modules", "Can change modules"),
-            ("can_delete_modules", "Can delete modules"),
+            ("can change_modules", "Can change modules"),
+            ("can delete_modules", "Can delete modules"),
         )
 
     def __str__(self):
@@ -94,7 +135,7 @@ class Comment(models.Model):
     # We can add other fields like 'is_active', 'likes', etc.
 
     def __str__(self):
-        return f"({self.pk}) {self.author.username}: {self.content[:40]}..."
+        return f"({self.pk}) {self.author.email}: {self.content[:40]}..."
 
 
 class IPCCRegion(models.Model):
@@ -176,6 +217,13 @@ class LandUseType(models.Model):
     def __str__(self):
         module_types = ", ".join([str(x.name) for x in self.module_types.all()])
         return f"({self.pk}) {self.name} - Active: {self.is_active}" + (f" ({module_types})" if module_types else "")
+
+
+class SettlementType(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"({self.pk}) {self.name}"
 
 
 class ChangeRate(models.Model):
@@ -466,7 +514,7 @@ class BaseModel(models.Model):
 
 
 class Historical(models.Model):
-    history = HistoricalRecords(related_name="%(class)s_history")
+    history = HistoricalRecords(inherit=True, related_name="%(class)s_history")
 
     class Meta:
         abstract = True
@@ -520,12 +568,14 @@ class Project(Historical):
     def lock(self, user: CustomUser):
         self.is_locked = True
         self.locked_at = timezone.now()
+        self.lock_updated_at = self.locked_at
         self.locked_by = user
         self.save()
 
     def unlock(self):
         self.is_locked = False
         self.locked_at = None
+        self.lock_updated_at = None
         self.locked_by = None
         self.save()
 
@@ -540,13 +590,13 @@ class ProjectInvitation(Historical):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="invitations")
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="invitations")
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="sent")
+    status = models.ForeignKey(InvitationStatusType, on_delete=models.CASCADE)
 
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
 
     class Meta:
-        unique_together = (("project", "user"),)
+        unique_together = (("project", "user", "group"),)
 
     def __str__(self):
         return f"({self.pk}) {self.project.name} - {self.user.email}"
@@ -558,7 +608,7 @@ class UserProjectGroup(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"({self.pk}) {self.project.name} - {self.user.username} - {self.group.name}"
+        return f"({self.pk}) {self.project.name} - {self.user.email} - {self.group.name}"
 
 
 ##############################
@@ -570,7 +620,8 @@ class Activity(Historical):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="activities")
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
-    status = models.ForeignKey(StatusType, on_delete=models.CASCADE, null=True, blank=True)
+    status = models.ForeignKey(StatusType, on_delete=models.CASCADE, null=True, blank=True, default=utils.get_activity_default_status)
+    completion_percentage = models.FloatField(null=True, blank=True, default=0)
     cost = models.FloatField(default=0)
 
     change_rate = models.ForeignKey(ChangeRate, on_delete=models.CASCADE, related_name="activities", null=True, blank=True)
@@ -647,7 +698,7 @@ class BiomassModule(Module):
         abstract = True
 
     @abstractmethod
-    def get_biomass_t2(self, scenario: utilities.ScenarioTypes):
+    def get_biomass_t2(self, scenario: utils.ScenarioTypes):
         try:
             return getattr(self, f"soc_t2_{scenario.value}")
         except TypeError:
@@ -662,14 +713,14 @@ class SingleBiomassModule(BiomassModule):
     class Meta:
         abstract = True
 
-    def get_biomass_t2(self, scenario: utilities.ScenarioTypes):
+    def get_biomass_t2(self, scenario: utils.ScenarioTypes):
         try:
             return super().get_biomass_t2(scenario) + getattr(self, f"biomass_t2_{scenario.value}")
         except TypeError:
             return None
 
 
-class DoubleBiomassModule(BiomassModule):
+class AboveBelowGroundBiomassModule(BiomassModule):
     agb_t2_start = models.FloatField(null=True, blank=True)
     agb_t2_w = models.FloatField(null=True, blank=True)
     agb_t2_wo = models.FloatField(null=True, blank=True)
@@ -681,14 +732,14 @@ class DoubleBiomassModule(BiomassModule):
     class Meta:
         abstract = True
 
-    def get_biomass_t2(self, scenario: utilities.ScenarioTypes):
+    def get_biomass_t2(self, scenario: utils.ScenarioTypes):
         try:
             return super().get_biomass_t2(scenario) + getattr(self, f"agb_t2_{scenario.value}") + getattr(self, f"bgb_t2_{scenario.value}")
         except TypeError:
             return None
 
 
-class MultiBiomassModule(DoubleBiomassModule):
+class LitterDeadwoodBiomassModule(AboveBelowGroundBiomassModule):
     litter_t2_start = models.FloatField(null=True, blank=True)
     litter_t2_w = models.FloatField(null=True, blank=True)
     litter_t2_wo = models.FloatField(null=True, blank=True)
@@ -700,7 +751,7 @@ class MultiBiomassModule(DoubleBiomassModule):
     class Meta:
         abstract = True
 
-    def get_biomass_t2(self, scenario: utilities.ScenarioTypes):
+    def get_biomass_t2(self, scenario: utils.ScenarioTypes):
         try:
             return super().get_biomass_t2(scenario) + getattr(self, f"litter_t2_{scenario.value}") + getattr(self, f"deadwood_t2_{scenario.value}")
         except TypeError:
@@ -730,8 +781,9 @@ class OtherLandUse(Module):
 
 class LandModule(Module):
     land_use_change = models.OneToOneField("api.LandUseChange", on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s")
+    organic_soil = models.OneToOneField("api.OrganicSoil", on_delete=models.CASCADE, null=True, blank=True, related_name="organic_soil_%(class)s")
 
-    area = models.FloatField(null=True, blank=True)
+    area = models.FloatField(null=True, blank=True, validators=[validators.MinValueValidator(0)])
 
     land_use_type_start = models.ForeignKey(LandUseType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_start")
     land_use_type_w = models.ForeignKey(LandUseType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_w")
@@ -846,26 +898,6 @@ class AnnualCropping(LandModule, SingleBiomassModule):
 
     area = models.FloatField(null=True, blank=True)
 
-    main_soil_carbon_t2_start = models.FloatField(null=True, blank=True)
-    main_soil_carbon_t2_w = models.FloatField(null=True, blank=True)
-    main_soil_carbon_t2_wo = models.FloatField(null=True, blank=True)
-
-    main_tillage_factor_t2_start = models.FloatField(null=True, blank=True)
-    main_tillage_factor_t2_w = models.FloatField(null=True, blank=True)
-    main_tillage_factor_t2_wo = models.FloatField(null=True, blank=True)
-
-    main_organic_input_factor_t2_start = models.FloatField(null=True, blank=True)
-    main_organic_input_factor_t2_w = models.FloatField(null=True, blank=True)
-    main_organic_input_factor_t2_wo = models.FloatField(null=True, blank=True)
-
-    main_biomass_factor_t2_start = models.FloatField(null=True, blank=True)
-    main_biomass_factor_t2_w = models.FloatField(null=True, blank=True)
-    main_biomass_factor_t2_wo = models.FloatField(null=True, blank=True)
-
-    main_land_use_factor_t2_start = models.FloatField(null=True, blank=True)
-    main_land_use_factor_t2_w = models.FloatField(null=True, blank=True)
-    main_land_use_factor_t2_wo = models.FloatField(null=True, blank=True)
-
     minor_land_use_type_start = models.ForeignKey(LandUseType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_minor_land_use_type_start")
     minor_land_use_type_w = models.ForeignKey(LandUseType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_minor_land_use_type_w")
     minor_land_use_type_wo = models.ForeignKey(LandUseType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_minor_land_use_type_wo")
@@ -966,7 +998,7 @@ class PerennialCrop(models.Model):
     #     super().save(*args, **kwargs)
 
 
-class PerennialCropping(PerennialCrop, LandModule, DoubleBiomassModule):
+class PerennialCropping(PerennialCrop, LandModule, AboveBelowGroundBiomassModule):
     pass
 
 
@@ -984,14 +1016,14 @@ class CroplandMinorSeason(models.Model):
     residue_management_type_wo = models.ForeignKey(ResidueManagementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_residue_management_type_wo")
     residue_management_type_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_residue_management_type_thread")
 
-    yield_start = models.FloatField(null=True, blank=True)
-    yield_w = models.FloatField(null=True, blank=True)
-    yield_wo = models.FloatField(null=True, blank=True)
-    yield_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_yield_thread")
+    crop_yield_start = models.FloatField(null=True, blank=True)
+    crop_yield_w = models.FloatField(null=True, blank=True)
+    crop_yield_wo = models.FloatField(null=True, blank=True)
+    crop_yield_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_yield_thread")
 
-    biomass_factor_t2_start = models.FloatField(null=True, blank=True)
-    biomass_factor_t2_w = models.FloatField(null=True, blank=True)
-    biomass_factor_t2_wo = models.FloatField(null=True, blank=True)
+    biomass_t2_start = models.FloatField(null=True, blank=True)
+    biomass_t2_w = models.FloatField(null=True, blank=True)
+    biomass_t2_wo = models.FloatField(null=True, blank=True)
 
 
 class MinorSeasonPerennialCropping(CroplandMinorSeason, LandSubmodule):
@@ -1005,10 +1037,6 @@ class MinorSeasonAnnualCropping(CroplandMinorSeason, LandSubmodule):
 class Rice(models.Model):
     class Meta:
         abstract = True
-
-    cultivation_period_start = models.IntegerField(default=RICE_CULTIVATION_DAYS)
-    cultivation_period_w = models.IntegerField(default=RICE_CULTIVATION_DAYS)
-    cultivation_period_wo = models.IntegerField(default=RICE_CULTIVATION_DAYS)
 
     water_management_type_before_cultivation_start = models.ForeignKey(WaterManagementTypeBeforeCultivation, on_delete=models.CASCADE, related_name="%(class)s_water_management_type_before_cultivation_start", null=True)
     water_management_type_before_cultivation_w = models.ForeignKey(WaterManagementTypeBeforeCultivation, on_delete=models.CASCADE, related_name="%(class)s_water_management_type_before_cultivation_w", null=True)
@@ -1025,18 +1053,6 @@ class Rice(models.Model):
     crop_yield_start = models.FloatField(null=True, blank=True)
     crop_yield_w = models.FloatField(null=True, blank=True)
     crop_yield_wo = models.FloatField(null=True, blank=True)
-
-    main_biomass_factor_t2_start = models.FloatField(null=True, blank=True)
-    main_biomass_factor_t2_w = models.FloatField(null=True, blank=True)
-    main_biomass_factor_t2_wo = models.FloatField(null=True, blank=True)
-
-    soc_t2_start = models.FloatField(null=True, blank=True)
-    soc_t2_w = models.FloatField(null=True, blank=True)
-    soc_t2_wo = models.FloatField(null=True, blank=True)
-
-    land_use_factor_t2_start = models.FloatField(null=True, blank=True)
-    land_use_factor_t2_w = models.FloatField(null=True, blank=True)
-    land_use_factor_t2_wo = models.FloatField(null=True, blank=True)
 
     efc_t2_start = models.FloatField(null=True, blank=True)
     efc_t2_w = models.FloatField(null=True, blank=True)
@@ -1065,6 +1081,10 @@ class Rice(models.Model):
     rice_straw_t2_start = models.FloatField(null=True, blank=True)
     rice_straw_t2_w = models.FloatField(null=True, blank=True)
     rice_straw_t2_wo = models.FloatField(null=True, blank=True)
+
+    cultivation_period_t2_start = models.IntegerField(null=True, blank=True)
+    cultivation_period_t2_w = models.IntegerField(null=True, blank=True)
+    cultivation_period_t2_wo = models.IntegerField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:
@@ -1198,7 +1218,7 @@ class Livestock(Module):
 ##### Forest Management #####
 
 
-class ForestManagement(LandModule, MultiBiomassModule):
+class ForestManagement(LandModule, LitterDeadwoodBiomassModule):
     forest_type = models.ForeignKey(ForestType, on_delete=models.CASCADE, null=True, blank=True)
     forest_condition_type = models.ForeignKey(ForestConditionType, on_delete=models.CASCADE, null=True, blank=True)
 
@@ -1334,9 +1354,7 @@ class Waterbody(Module):
 class CoastalWetland(Module):
     land_use_type = models.ForeignKey(LandUseType, on_delete=models.CASCADE, null=True, blank=True)
 
-    ha_start = models.FloatField(null=True, blank=True)
-    ha_w = models.FloatField(null=True, blank=True)
-    ha_wo = models.FloatField(null=True, blank=True)
+    area = models.FloatField(null=True, blank=True)
     ha_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_ha_thread")
 
     area_under_drainage_start = models.FloatField(null=True, blank=True)
@@ -1561,8 +1579,14 @@ class Electricity(Submodule):
     mwh_renewables_wo = models.FloatField(null=True, blank=True)
     mwh_renewables_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_mwh_renewables_thread")
 
-    ef_t2 = models.FloatField(null=True, blank=True)
-    transmission_loss = models.FloatField(default=0.1)
+    ef_t2_start = models.FloatField(null=True, blank=True)
+    ef_t2_w = models.FloatField(null=True, blank=True)
+    ef_t2_wo = models.FloatField(null=True, blank=True)
+
+    transmission_loss_start = models.FloatField(default=0.1)
+    transmission_loss_w = models.FloatField(default=0.1)
+    transmission_loss_wo = models.FloatField(default=0.1)
+
     ef_source = models.ForeignKey(EmissionFactorSource, on_delete=models.CASCADE, null=True, blank=True)
 
 
@@ -1610,10 +1634,8 @@ class IrrigationSystem(Submodule):
     ef_t2_w = models.FloatField(null=True, blank=True)
     ef_t2_wo = models.FloatField(null=True, blank=True)
 
-    def save(self, *args, **kwargs):
-        if self.parent and self.parent.irrigation_phases:
-            raise exceptions.ValidationError("Cannot have both irrigation system and irrigation phases in the same irrigation module")
-        super().save(*args, **kwargs)
+    def __str__(self):
+        return f"({self.id}) {self.irrigation_system_type}"
 
 
 class IrrigationPhase(Submodule):
@@ -1649,10 +1671,8 @@ class IrrigationPhase(Submodule):
     pumping_efficiency_t2_w = models.FloatField(null=True, blank=True)
     pumping_efficiency_t2_wo = models.FloatField(null=True, blank=True)
 
-    def save(self, *args, **kwargs):
-        if self.parent and self.parent.irrigation_systems:
-            raise exceptions.ValidationError("Cannot have both irrigation system and irrigation phases in the same irrigation module")
-        super().save(*args, **kwargs)
+    def __str__(self):
+        return f"({self.id}) {self.irrigation_system_type}"
 
 
 class BuildingType(models.Model):
@@ -1672,9 +1692,7 @@ class RoadType(models.Model):
 class Building(Submodule):
     parent = models.ForeignKey("api.Settlement", on_delete=models.CASCADE, null=True, blank=True, related_name="buildings")
 
-    building_type_start = models.ForeignKey(BuildingType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_building_type_start")
-    building_type_w = models.ForeignKey(BuildingType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_building_type_w")
-    building_type_wo = models.ForeignKey(BuildingType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_building_type_wo")
+    building_type = models.ForeignKey(BuildingType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_building_type")
     building_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_building_type_thread", on_delete=models.SET_NULL)
 
     area_m2_start = models.FloatField(null=True, blank=True)
@@ -1690,9 +1708,7 @@ class Building(Submodule):
 class Road(Submodule):
     parent = models.ForeignKey("api.Settlement", on_delete=models.CASCADE, null=True, blank=True, related_name="roads")
 
-    road_type_start = models.ForeignKey(RoadType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_road_type_start")
-    road_type_w = models.ForeignKey(RoadType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_road_type_w")
-    road_type_wo = models.ForeignKey(RoadType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_road_type_wo")
+    road_type = models.ForeignKey(RoadType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_road_type")
     road_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_road_type_thread", on_delete=models.SET_NULL)
 
     length_km_start = models.FloatField(null=True, blank=True)
@@ -1808,7 +1824,7 @@ class OrganicSoil(LandModuleFixed):
 
     ##### Peat Extraction #####
 
-    peat_type = models.ForeignKey(PeatType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_peat_type")
+    peat_type = models.ForeignKey(PeatType, on_delete=models.CASCADE, null=True, blank=True, default=utils.get_default_peat_type, related_name="%(class)s_peat_type")
     peat_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_type_thread", on_delete=models.SET_NULL)
 
     peat_area_start = models.FloatField(null=True, blank=True)
@@ -1851,12 +1867,25 @@ class OrganicSoil(LandModuleFixed):
     peat_density_t2_w = models.FloatField(null=True, blank=True)
     peat_density_t2_wo = models.FloatField(null=True, blank=True)
 
+    def save(self, *args, **kwargs):
+        if not self.land_use_type_start:
+            self.land_use_type_start = LandUseType.objects.get(name="Organic Soil")
+            self.land_use_type_w = self.land_use_type_start
+            self.land_use_type_wo = self.land_use_type_start
+
+        return super().save(*args, **kwargs)
+
 
 class Settlement(LandModuleFixed):
 
     is_settlement_start = models.BooleanField(default=False)
     is_settlement_w = models.BooleanField(default=False)
     is_settlement_wo = models.BooleanField(default=False)
+
+    settlement_type_start = models.ForeignKey(SettlementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_settlement_type_start")
+    settlement_type_w = models.ForeignKey(SettlementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_settlement_type_w")
+    settlement_type_wo = models.ForeignKey(SettlementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_settlement_type_wo")
+    settlement_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_settlement_type_thread", on_delete=models.SET_NULL)
 
     soil_carbon_t2_start = models.FloatField(null=True, blank=True)
     soil_carbon_t2_w = models.FloatField(null=True, blank=True)
@@ -1874,12 +1903,30 @@ class Settlement(LandModuleFixed):
     bgb_t2_w = models.FloatField(null=True, blank=True)
     bgb_t2_wo = models.FloatField(null=True, blank=True)
 
+    def save(self, *args, **kwargs):
 
-class SetAside(LandModule, DoubleBiomassModule):
+        if not self.land_use_type_start:
+            self.land_use_type_start = LandUseType.objects.get(name="Organic Soil")
+            self.land_use_type_w = self.land_use_type_start
+            self.land_use_type_wo = self.land_use_type_start
+
+        return super().save(*args, **kwargs)
+
+
+class SetAside(LandModule, AboveBelowGroundBiomassModule):
 
     is_set_aside_start = models.BooleanField(default=False)
     is_set_aside_w = models.BooleanField(default=False)
     is_set_aside_wo = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+
+        if not self.land_use_type_start:
+            self.land_use_type_start = LandUseType.objects.get(name="Set Aside")
+            self.land_use_type_w = self.land_use_type_start
+            self.land_use_type_wo = self.land_use_type_start
+
+        return super().save(*args, **kwargs)
 
 
 class DegradedLand(LandModule, SingleBiomassModule):
@@ -1913,7 +1960,7 @@ class DegradedLand(LandModule, SingleBiomassModule):
             self.land_use_type_w = self.land_use_type_start
             self.land_use_type_wo = self.land_use_type_start
 
-        super().save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
 
 class LandUseChange(Module):
@@ -1933,6 +1980,8 @@ class LandUseChange(Module):
     dry_matter_w = models.FloatField(null=True, blank=True)
     dry_matter_wo = models.FloatField(null=True, blank=True)
     dry_matter_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="land_use_change_dry_matter_thread")
+
+    organic_soil = models.OneToOneField(OrganicSoil, on_delete=models.CASCADE, null=True, blank=True)
 
     def is_filled(self):
         return self.area is not None and self.module_type_start is not None and self.module_type_w is not None and self.module_type_wo is not None
