@@ -59,6 +59,10 @@ class PerennialCropping(BaseModule):
         fi_end_tier_2,
         calculate_soc_som,
         delay,
+        biomass_start_default,
+        biomass_end_default,
+        biomass_start_tier_2,
+        biomass_end_tier_2,
     ):
         self.area_start = area_start
         self.area_end = area_end
