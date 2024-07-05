@@ -12,6 +12,8 @@ from simple_history.utils import update_change_reason
 
 import api.models as api_models
 
+import logging as log
+
 CN_RATIO_CROP = 10
 CN_RATIO_GRASSLAND = 15
 MANGROVE_FACTOR = 0.451
@@ -426,3 +428,23 @@ def get_changes(records: list[HistoricalRecords]):
         changes.append(change_log)
 
     return changes
+
+
+def get_modules(activity, serialized=True) -> list:
+    modules = []
+    module_serializers_list = []
+    for module in activity.module_types.all():
+        try:
+            module_model = apps.get_model(API, module.class_name)
+        except LookupError:
+            log.warning(f"get_modules: Module {module.name} not found")
+            continue
+        module_object = module_model.objects.filter(activity__id=activity.pk).first()
+        if module_object:
+            modules.append(module_object)
+            from api.serializers import get_module_serializer
+
+            module_dict = get_module_serializer(module_model)(module_object).data
+            module_serializers_list.append(module_dict)
+
+    return module_serializers_list if serialized else modules
