@@ -140,7 +140,7 @@ def has_project_permission(permission, user, project):
     membership: models.UserProjectGroup = project.members.filter(user=user).first()
     can_access = membership and membership.group.permissions.filter(codename=permission).exists()
 
-    return can_access
+    return can_access or user.is_superuser
 
 
 def find_modules(activity):
