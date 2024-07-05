@@ -12,7 +12,7 @@ from .general_functions import (
     yearly_constant_emissions_breakdown,
     yearly_time_dependent_20_year_breakdown,
     yearly_time_dependent_full_year,
-    yearly_time_dependent_increase_half_year,
+    yearly_time_dependent_increase,
     yearly_time_dependent_matrix,
     yearly_time_dependent_parameter_breakdown,
     yearly_time_dependent_matrix_log_rec_dis

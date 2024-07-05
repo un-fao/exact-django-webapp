@@ -69,6 +69,61 @@ def yearly_time_dependent_parameter_breakdown(start_value, end_value, years_impl
     else:
         raise Exception(f'Function "{function}" not recognized')
 
+def yearly_time_dependent_parameter_breakdown_new_test(start_value, end_value, years_implementation, years_capitalization, function, interim_values=True):
+    # UTILIZING THIS FUNCTION WE ARE RETURNING THE MIDDLE VALUE BETWEEN THE CALCULATED VALUES AT THE BEGINNING OF EACH YEAR.
+    # THIS IS DONE SO THAT THE YEARLY BREAKDOWN IS A LIST OF THE SAME LENGTH AS THE NUMBER OF YEARS IMPLEMENTATION + CAPITALIZATION
+    # ALSO, THIS WAY THE RESULTS ARE THE SAME AS THE EXCEL RESULTS
+
+    # EXPONENTIAL CASE
+    if function == "exponential":
+        # calculate the parameters for the function a*b^x
+        a = min(start_value, end_value)
+        b = (max(start_value, end_value) / min(start_value, end_value)) ** (1 / years_implementation)
+
+        # Calculate the yearly breakdown
+        if start_value < end_value:
+            yearly_breakdown = [a * b**i for i in range(years_implementation + 1)]
+        else:
+            yearly_breakdown = [a * b**i for i in range(years_implementation + 1)]
+            yearly_breakdown.reverse()
+
+        yearly_breakdown.extend([yearly_breakdown[-1] for i in range(years_capitalization)])
+
+        # return the yearly breakdown
+        if interim_values:
+            return average_yearly_value(yearly_breakdown)
+        else:
+            return yearly_breakdown
+
+    elif function == "D":
+        # calculate the parameters for the function a + bx
+        a = min(start_value, end_value)
+        b = (abs(start_value - end_value)) / years_implementation
+
+        # Calculate the yearly breakdown
+        if start_value < end_value:
+            yearly_breakdown = [a + b * i for i in range(1, years_implementation + 1)]
+        else:
+            yearly_breakdown = [a + b * i for i in range(1, years_implementation + 1)]
+            yearly_breakdown.reverse()
+
+        yearly_breakdown.extend([yearly_breakdown[-1] for i in range(years_capitalization)])
+
+        # return the yearly breakdown
+        if interim_values:
+            return average_yearly_value(yearly_breakdown)
+        else:
+            return yearly_breakdown
+
+    elif function == "immediate":
+        if interim_values:
+            return average_yearly_value([end_value for i in range(years_implementation + years_capitalization + 1)])
+        else:
+            return [end_value for i in range(years_implementation + years_capitalization + 1)]
+
+    else:
+        raise Exception(f'Function "{function}" not recognized')
+    
 
 def yearly_constant_emissions_breakdown(total_emissions, years_implementation, years_capitalization):
     # TODO: add logic for breakdown according to rate type
@@ -95,6 +150,23 @@ def yearly_time_dependent_20_year_breakdown(start_value, end_value, years_implem
 
     return average_before_20, average_after_20
 
+def yearly_time_dependent_20_year_breakdown_new_test(start_value, end_value, years_implementation, years_capitalization, function):
+
+    breakdown = yearly_time_dependent_parameter_breakdown_new_test(start_value, end_value, years_implementation, years_capitalization, function, interim_values=False)
+
+    after_20 = [0 for i in range(21)]
+    after_20.extend(breakdown)
+
+    before_20 = [i - j for i, j in zip(breakdown, after_20[0 : len(breakdown)])]
+
+    # NOTE: remove all negative values and replace them with 0
+    before_20 = [0 if i < 0 else i for i in before_20]
+
+    # average_before_20 = average_yearly_value(before_20)
+    # average_after_20 = average_yearly_value(after_20)[0 : len(breakdown) - 1]
+
+    return before_20, after_20
+
 
 def breakdown_according_to_values(maximum, list_of_proportions):
     if sum(list_of_proportions) == 0:
@@ -104,7 +176,7 @@ def breakdown_according_to_values(maximum, list_of_proportions):
         return result
 
 
-def yearly_time_dependent_increase_half_year(start_value, end_value, years_implementation, years_capitalization, function):
+def yearly_time_dependent_increase(start_value, end_value, years_implementation, years_capitalization, function):
     result_interim = yearly_time_dependent_parameter_breakdown(start_value, end_value, years_implementation, years_capitalization, function, interim_values=True)
     result_not_interim = yearly_time_dependent_parameter_breakdown(start_value, end_value, years_implementation, years_capitalization, function, interim_values=False)
 
@@ -129,7 +201,7 @@ def yearly_time_dependent_matrix(start_value, end_value, years_implementation, y
     if function == "D":
         years_total = years_implementation + years_capitalization
 
-        half_year = yearly_time_dependent_increase_half_year(start_value, end_value, years_implementation, years_capitalization, function)
+        half_year = yearly_time_dependent_increase(start_value, end_value, years_implementation, years_capitalization, function)
         full_year = yearly_time_dependent_full_year(start_value, end_value, years_implementation, years_capitalization, function)
 
         matrix = np.full((years_implementation, years_total), 0.0)
@@ -267,7 +339,7 @@ def som_emissions(soc_final, soc_initial, emission_factor_nitrous, nitrous_const
 
 def biomass_emissions(biomass_final, biomass_initial, hectares_start, hectares_end, rate_type, time_implementation, time_capitalization,):
 
-    yearly_variation_hectares = yearly_time_dependent_increase_half_year(hectares_start, hectares_end, time_implementation, time_capitalization, rate_type)
+    yearly_variation_hectares = yearly_time_dependent_increase(hectares_start, hectares_end, time_implementation, time_capitalization, rate_type)
 
     biomass_variation = biomass_final - biomass_initial
 
