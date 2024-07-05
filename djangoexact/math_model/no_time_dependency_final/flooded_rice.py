@@ -64,7 +64,9 @@ class FloodedRice(BaseModule):
         fi_start_tier_2,
         fi_end_tier_2,
         calculate_soc_som,
+        straw_burnt,
         delay=0,
+        is_minor_season=True,
     ):
         self.area_start = area_start
         self.area_end = area_end
@@ -113,7 +115,12 @@ class FloodedRice(BaseModule):
 
         self.calculate_soc_som = calculate_soc_som
 
+        self.straw_burnt = straw_burnt
+
         self.delay = delay
+
+        # NOTE: in the case in which it is a minor season, soil and som emissions are not to be calculated
+        self.is_minor_season = is_minor_season
 
         # TODO: Assigned FMG, FLU, FI values. Maybe once everything has been done change this structure
         self.fmg_start = self.fmg_start_tier_2 if self.fmg_start_tier_2 else self.fmg_start_default
@@ -169,7 +176,7 @@ class FloodedRice(BaseModule):
                 SFp = self.SFp_ref if not self.SFp_tier_2 else self.SFp_tier_2
                 yield_value = self.yield_ref if not self.yield_tier_2 else self.yield_tier_2
                 straw_tonnes_ref = yield_value * self.rice_slope + self.rice_intercept if not self.straw_tonnes_tier_2 else self.straw_tonnes_tier_2
-                SFo = 1 + straw_tonnes_ref * self.cfoa * 0.59 if not self.SFo_tier_2 else self.SFo_tier_2
+                SFo = (1 + straw_tonnes_ref * self.cfoa) ** 0.59 if not self.SFo_tier_2 else self.SFo_tier_2
 
                 if self.area_start == 0 and self.area_end == 0:
                     adjusted_daily_ef_methane_ref = 0
@@ -192,7 +199,7 @@ class FloodedRice(BaseModule):
 
         def calculate_straw_burning():
             try:
-                if self.area_start == 0 and self.area_end == 0:
+                if not self.straw_burnt or (self.area_start == 0 and self.area_end == 0):
                     self.straw_burning_yearly = [0 for i in range(self.time_impl + self.time_cap)]
                     self.straw_burning_total = 0
 
@@ -208,16 +215,21 @@ class FloodedRice(BaseModule):
                     self.straw_burning_yearly = breakdown_according_to_values(total, self.hectares_total)
                     self.straw_burning_total = sum(self.straw_burning_yearly)
 
-                    straw_burning_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.straw_burning_yearly], ActivityTypes.STRAW_BURNING, delay=self.delay)
-                    self.result.yearly_emissions_by_sector_by_gas.append(straw_burning_set)
+                    total_methane = straw_methane_co2 * sum(self.hectares_total)
+                    total_nitrous = straw_nitrous_co2 * sum(self.hectares_total)
 
+                    straw_burning_set_methane = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(total_methane, GasTypes.CH4)], ActivityTypes.STRAW_BURNING, delay=self.delay)
+                    straw_burning_set_nitrous = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(total_nitrous, GasTypes.N2O)], ActivityTypes.STRAW_BURNING, delay=self.delay)
+
+                    self.result.yearly_emissions_by_sector_by_gas.append(straw_burning_set_methane)
+                    self.result.yearly_emissions_by_sector_by_gas.append(straw_burning_set_nitrous)
             except:
                 traceback.print_exc()
                 return
 
         def calculate_soil_emissions():
             try:
-                if self.calculate_soc_som:
+                if self.calculate_soc_som and not self.is_minor_season:
                     self.soil_emissions_yearly, self.soil_emissions_total = soil_emissions_2(self.soc_start, self.soc_end, self.hectares_total, self.area_start, self.area_end, self.hectares_before_20)
 
                     soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.soil_emissions_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)

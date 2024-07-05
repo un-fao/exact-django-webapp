@@ -111,6 +111,9 @@ class DefaultEmissionFactor(Model):
     IPCC:A96
     """
 
+    # NOTE: organic_input_type is not used in the excel file, look into this.
+    # In order to make DegradedLand and SetAside work, I hardcoded it.
+    # This has to be removed, and then we can change there as well
     organic_input_type = ForeignKey("api.OrganicInputType", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     value = FloatField()
@@ -469,6 +472,9 @@ class CoastalDeadwood(Model):
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField(default=0)
 
+    def __str__(self) -> str:
+        return f"{self.value} for {self.climate.name} {self.moisture.name} {self.land_use_type.name}"
+
 
 class DefaultSoilCarbonStock1Meter(Model):
     """
@@ -493,8 +499,12 @@ class RewettingCarbonFactor(Model):
 
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
+    soil_type = ForeignKey("api.SoilType", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     value = FloatField(default=0)
+
+    def __str__(self):
+        return f"{self.value} for {self.climate.name} {self.moisture.name} {self.soil_type.name} {self.land_use_type.name}"
 
 
 class RewettingMethaneFactor(Model):
@@ -553,7 +563,7 @@ class DrainageEmissionFactor(Model):
     value = FloatField(default=0)
 
     def __str__(self):
-        return f"{self.value} for {self.climate.name} {self.moisture.name}"
+        return f"{self.value} for {self.land_use_type} {self.climate} {self.moisture}"
 
 
 class PerennialAGBManager(Manager):
@@ -721,12 +731,23 @@ class GrasslandSOC(Model):
         return f"{self.value} for {self.grassland_management_type.name}"
 
 
+class GrasslandStockExchangeFactorManager(Manager):
+    # get or default: try getting it, otherwise return the default value (all values are 1)
+    def get_or_default(self, grassland_management_type, climate):
+        try:
+            return self.get(grassland_management_type=grassland_management_type, climate=climate)
+        except GrasslandStockExchangeFactor.DoesNotExist:
+            return SimpleNamespace(fmg=1, flu=1, fi=1, grassland_management_type=grassland_management_type, climate=climate)
+
+
 class GrasslandStockExchangeFactor(Model):
     grassland_management_type = ForeignKey("api.GrasslandManagementType", on_delete=CASCADE)
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     fmg = FloatField(default=1)
     flu = FloatField(default=1)
     fi = FloatField(default=1)
+
+    objects = GrasslandStockExchangeFactorManager()
 
     def __str__(self):
         return f"{self.fmg} {self.flu} {self.fi} for {self.grassland_management_type.name} {self.climate.name}"
@@ -982,19 +1003,7 @@ class LivestockVSER(Model):
         return f"({self.id}) {self.livestock_category_type} {self.livestock_production_type} {self.ipcc_region.name} {self.value}"
 
 
-class LivestockNER(Model):
-    """
-    IPCC 3012:3061
-    """
-
-    emission_type = ForeignKey(EmissionType, on_delete=CASCADE)
-    livestock_production_type = ForeignKey("api.LivestockProductionType", on_delete=CASCADE)
-    livestock_category_type = ForeignKey("api.LivestockCategoryType", on_delete=CASCADE)
-    continent = ForeignKey("api.Region", on_delete=CASCADE)
-    value = FloatField()
-
-
-class LivestockAnimalWasteManagementSystem(Model):
+class LivestockAWMS(Model):
     """
     IPCC 2417:2704
 
@@ -1101,6 +1110,10 @@ class IrrigationPressureRequirement(Model):
 
 
 class RiceDefaultEmissionFactor(Model):
+    """
+    IPCC:A515
+    """
+
     continent = ForeignKey("api.Region", on_delete=CASCADE)
     cultivation_period = IntegerField()
     value = FloatField()
@@ -1110,6 +1123,10 @@ class RiceDefaultEmissionFactor(Model):
 
 
 class RiceSFO(Model):
+    """
+    IPCC:J512
+    """
+
     organic_amendment_type = ForeignKey("api.OrganicAmendmentType", on_delete=CASCADE)
     value = FloatField()
 
@@ -1118,6 +1135,10 @@ class RiceSFO(Model):
 
 
 class RiceSFP(Model):
+    """
+    IPCC:E524
+    """
+
     water_management_type_before_cultivation = ForeignKey("api.WaterManagementTypeBeforeCultivation", on_delete=CASCADE)
     value = FloatField()
 
@@ -1126,6 +1147,10 @@ class RiceSFP(Model):
 
 
 class RiceSFW(Model):
+    """
+    IPCC:E512
+    """
+
     water_management_type_after_cultivation = ForeignKey("api.WaterManagementTypeAfterCultivation", on_delete=CASCADE)
     value = FloatField()
 
@@ -1134,6 +1159,10 @@ class RiceSFW(Model):
 
 
 class RiceYield(Model):
+    """
+    Rice!AC3
+    """
+
     continent = ForeignKey("api.Region", on_delete=CASCADE)
     value = FloatField()
 

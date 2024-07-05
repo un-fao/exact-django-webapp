@@ -225,35 +225,27 @@ class Deforestation(BaseModule):
             except Exception as e:
                 traceback.print_exc()
 
-        def calculate_fire_fsom_emissions():
+        def calculate_fire_emissions():
             try:
                 fire_t_dm_per_ha = self.agb_t_dm_per_ha_default - self.hwp_before_t_dm_per_ha if self.fire_bool else 0
-
-                soc_reference = self.soc_reference_tier_2 if self.soc_reference_tier_2 else self.soc_reference_default
-                delta_c_mineral_per_ha = self.soc_end - self.soc_start if not self.soc_after_defo_tier_2 else self.soc_after_defo_tier_2 - soc_reference
-
-                som_luc_kg_n_per_year = 0 if delta_c_mineral_per_ha >= 0 else -(delta_c_mineral_per_ha / (20 * self.c_n_ratio)) * 1000
-
-                soil_kg_n2o = self.moisture_emission_factor * 44 / 28 * som_luc_kg_n_per_year
 
                 fire_kg_n2o = fire_t_dm_per_ha * self.n2o_vegetation * self.cf_vegetation if self.fire_bool else 0
                 fire_kg_ch4 = fire_t_dm_per_ha * self.ch4_vegetation * self.cf_vegetation if self.fire_bool else 0
 
-                total_ch4_n2o_per_ha = (fire_kg_ch4 * self.methane_constant + (fire_kg_n2o + soil_kg_n2o) * self.nitrous_constant) / 1000
+                total_ch4_n2o_per_ha = (fire_kg_ch4 * self.methane_constant + fire_kg_n2o  * self.nitrous_constant) / 1000
 
-                fire_fsom_N_w = total_ch4_n2o_per_ha * self.area_deforested
+                fire_N_w = total_ch4_n2o_per_ha * self.area_deforested
 
-                self.emissions_fire_fsom_yearly = yearly_constant_emissions_breakdown(fire_fsom_N_w, self.time_impl, self.time_cap)
-                self.emissions_fire_fsom_total = fire_fsom_N_w
+                self.emissions_fire_fsom_yearly = yearly_constant_emissions_breakdown(fire_N_w, self.time_impl, self.time_cap)
+                self.emissions_fire_fsom_total = fire_N_w
 
                 total_ch4_per_ha = fire_kg_ch4 * self.methane_constant / 1000
-                total_n2o_per_ha = (fire_kg_n2o + soil_kg_n2o) * self.nitrous_constant / 1000
+                total_n2o_per_ha = fire_kg_n2o * self.nitrous_constant / 1000
 
                 emissions_ch4 = yearly_constant_emissions_breakdown(total_ch4_per_ha * self.area_deforested, self.time_impl, self.time_cap)
                 emissions_n2o = yearly_constant_emissions_breakdown(total_n2o_per_ha * self.area_deforested, self.time_impl, self.time_cap)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in emissions_ch4], activity=ActivityTypes.RESIDUE_BURNING))
-
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in emissions_n2o], activity=ActivityTypes.RESIDUE_BURNING))
 
             except Exception as e:
@@ -263,7 +255,7 @@ class Deforestation(BaseModule):
         calculate_biomass_gain_emissions()
         calculate_dom_emissions()
         calculate_soil_emissions()
-        calculate_fire_fsom_emissions()
+        calculate_fire_emissions()
 
         try:
             self.emissions_total_yearly = [sum(x) for x in zip(self.emissions_biomass_gain_yearly, self.emissions_biomass_loss_yearly, self.emissions_dom_yearly, self.emissions_soil_yearly, self.emissions_fire_fsom_yearly)]

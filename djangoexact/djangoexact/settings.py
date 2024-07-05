@@ -169,11 +169,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        # "rest_framework.authentication.BasicAuthentication",
+        "rest_framework.authentication.BasicAuthentication",
         # "rest_framework.authentication.SessionAuthentication",
-        # "rest_framework_simplejwt.authentication.JWTAuthentication",
-        # "rest_framework.authentication.TokenAuthentication",
-        "accounts.firebase.FirebaseAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
 }
@@ -215,6 +213,11 @@ LOGGING = {
 APPEND_SLASH = False
 
 AUTH_USER_MODEL = "api.CustomUser"
+
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
 
 # Firebase settings
 try:
