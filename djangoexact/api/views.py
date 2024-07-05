@@ -256,7 +256,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         UserProjectGroup.objects.create(user=self.request.user, project=project, group=Group.objects.get(name="Admin"))
 
-        read_serializer = ReadProjectSerializer(instance=project)
+        read_serializer = ReadProjectSerializer(instance=project, context={"request": request})
 
         return Response(read_serializer.data, status=http_status.HTTP_201_CREATED)
 
@@ -290,7 +290,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error("Selected user does not have permission to view the project")
             return utils.ErrorResponse("Selected user does not have permission to view the project", status=http_status.HTTP_403_FORBIDDEN)
 
-        return Response(data=ReadProjectSerializer(project).data, status=http_status.HTTP_200_OK)
+        return Response(data=ReadProjectSerializer(project, context={"request": request}).data, status=http_status.HTTP_200_OK)
 
     @swagger_auto_schema(manual_parameters=[project_id], responses={404: "Project not found"}, serializer_class=ReadProjectSerializer)
     def list(self, request):
@@ -315,7 +315,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error("Selected user does not have permission to view the project")
             return utils.ErrorResponse("Selected user does not have permission to view the project", status=http_status.HTTP_403_FORBIDDEN)
 
-        serialized_project = ReadProjectSerializer(project).data
+        serialized_project = ReadProjectSerializer(project, context={"request": request}).data
 
         response = serialized_project
         response["activities"] = []
@@ -383,7 +383,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         new_project = utils.copy_project(project)
         UserProjectGroup.objects.create(user=self.request.user, project=new_project, group=Group.objects.get(name="Admin"))
 
-        return Response(data=ReadProjectSerializer(new_project).data, status=http_status.HTTP_201_CREATED)
+        return Response(data=ReadProjectSerializer(new_project, context={"request": request}).data, status=http_status.HTTP_201_CREATED)
 
     @action(detail=True, methods=["get"])
     def users(self, request, pk=None):
