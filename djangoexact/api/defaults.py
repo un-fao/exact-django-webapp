@@ -209,10 +209,10 @@ class ElectricityDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            scope_of_emission_factor_default = defaults.ef_source,
-            ef_for_selected_country_start_default = defaults.ef_country,
-            ef_for_selected_country_w_default = defaults.ef_country,
-            ef_for_selected_country_wo_default = defaults.ef_country,
+            ef_source_default = defaults.ef_source,
+            ef_t2_start_default = defaults.ef_country,
+            ef_t2_w_default = defaults.ef_country,
+            ef_t2_wo_default = defaults.ef_country,
             transmission_loss_start_default = defaults.transmission_loss,
             transmission_loss_w_default = defaults.transmission_loss,
             transmission_loss_wo_default = defaults.transmission_loss,
@@ -227,7 +227,7 @@ class FuelDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            ef_of_fuel_default = defaults.ef_fuel_t_co2_eq
+            ef_t2_default = defaults.ef_fuel_t_co2_eq
         )
     
 
@@ -239,9 +239,9 @@ class InputEntryDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            ef_co2_default = defaults.ef.co2_value if defaults.ef else None,
-            ef_n2o_default = defaults.ef.n2o_value if defaults.ef else None,
-            ef_co2_eq_default = defaults.ef.co2_eq_value if defaults.ef else None
+            co2_emissions_t2_default = defaults.ef.co2_value if defaults.ef else None,
+            n2o_emissions_t2_default = defaults.ef.n2o_value if defaults.ef else None,
+            co2_e_emissions_t2_default = defaults.ef.co2_eq_value if defaults.ef else None
         )
     
 
@@ -314,7 +314,7 @@ class IrrigationSystemDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            ef_default_start_default = defaults.ef.value,
-            ef_default_w_default = defaults.ef.value,
-            ef_default_wo_default = defaults.ef.value,
+            ef_t2_start_default = defaults.ef.value,
+            ef_t2_w_default = defaults.ef.value,
+            ef_t2_wo_default = defaults.ef.value,
         )
