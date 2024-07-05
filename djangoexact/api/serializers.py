@@ -270,6 +270,16 @@ class ReadProjectSerializer(serializers.ModelSerializer):
     gw_potential = get_model_serializer(GlobalWarmingPotential)(many=False, read_only=True)
     status = get_model_serializer(ProjectStatus)(many=False, required=False, read_only=True)
     user = UserReadSerializer(many=False, read_only=True)
+    role = serializers.SerializerMethodField()
+
+    def get_role(self, obj):
+        user = self.context["request"].user
+        user_project_group = UserProjectGroup.objects.filter(user=user, project=obj).all()
+
+        if not user_project_group:
+            return []
+
+        return [group.group.name for group in user_project_group]
 
     class Meta:
         model = Project
@@ -2087,8 +2097,8 @@ class ForestDisturbanceReadSerializer(serializers.ModelSerializer):
 
 class ChangeSerializer(serializers.Serializer):
     field = serializers.CharField()
-    new = serializers.JSONField()
-    old = serializers.JSONField()
+    new = serializers.CharField()
+    old = serializers.CharField()
 
 
 class ChangeHistorySerializer(serializers.Serializer):
