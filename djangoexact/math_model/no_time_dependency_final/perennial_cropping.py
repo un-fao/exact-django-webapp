@@ -8,6 +8,7 @@ from .general_functions import (
     yearly_constant_emissions_breakdown,
     yearly_time_dependent_20_year_breakdown,
     yearly_time_dependent_parameter_breakdown,
+    biomass_emissions,
 )
 from .ghg_emissions_classes import (
     ActivityTypes,
@@ -113,6 +114,9 @@ class PerennialCropping(BaseModule):
         self.fi_start = self.fi_start_tier_2 if self.fi_start_tier_2 else self.fi_start_default
         self.fi_end = self.fi_end_tier_2 if self.fi_end_tier_2 else self.fi_end_default
 
+        self.biomass_start = biomass_start_default if not biomass_start_tier_2 else biomass_start_tier_2
+        self.biomass_end = biomass_end_default if not biomass_end_tier_2 else biomass_end_tier_2
+
         # Added values
         self.total_hectars = yearly_time_dependent_parameter_breakdown(area_start, area_end, self.time_impl, self.time_cap, self.rate)
         self.hectars_before_20, self.hectars_after_20 = yearly_time_dependent_20_year_breakdown(area_start, area_end, self.time_impl, self.time_cap, self.rate)
@@ -145,6 +149,9 @@ class PerennialCropping(BaseModule):
 
         self.yearly_soil_emissions = []
         self.total_soil_emissions = 0
+
+        self.emissions_biomass_yearly = []
+        self.emissions_biomass_total = 0
 
         self.emissions_total_yearly = []
         self.total_emissions = 0
@@ -180,35 +187,6 @@ class PerennialCropping(BaseModule):
             except Exception as e:
                 traceback.print_exc()
 
-        def calculate_bio():
-            try:
-                agb_rate = self.agb_rate_default * 44 / 12 if not self.agb_rate_tier_2 else self.agb_rate_tier_2 * 44 / 12
-                bgb_rate = self.bgb_rate_default * 44 / 12 if not self.bgb_rate_tier_2 else self.bgb_rate_tier_2 * 44 / 12
-
-                if self.agb_rate_tier_2:
-                    max_agb = 0 if self.agb_rate_default < self.agb_rate_tier_2 else self.agb_maximum_c * 44 / 12
-                else:
-                    max_agb = self.agb_maximum_c * 44 / 12
-
-                biomass_accumulation_rate = agb_rate + bgb_rate
-
-                max_years_growth = max_agb / agb_rate
-
-                calculated = biomass_accumulation_rate * sum(self.total_hectars)
-
-                tabular = (max_agb + bgb_rate * max_years_growth) * self.area_end
-
-                total = -min(calculated, tabular) if (max_agb != 0 and self.area_end != 0) else -calculated
-
-                self.yearly_bio_emissions = breakdown_according_to_values(total, self.total_hectars)
-                self.total_bio_emissions = total
-
-                bio_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.yearly_bio_emissions], ActivityTypes.BIOMASS, delay=self.delay)
-                self.result.yearly_emissions_by_sector_by_gas.append(bio_emission_set)
-
-            except Exception as e:
-                traceback.print_exc()
-
         def calculate_som():
             try:
                 if self.calculate_soc_som:
@@ -230,10 +208,51 @@ class PerennialCropping(BaseModule):
             except Exception as e:
                 traceback.print_exc()
 
+        def calculate_biomass_emissions():
+
+            # NOTE: should this be calculated only for main season?
+            try:
+                if self.biomass_start and self.biomass_end:
+                    # NOTE: This means that we have received values for both (or we have tier 2 values for both)
+                    self.emissions_biomass_yearly, self.emissions_biomass_total = biomass_emissions(self.biomass_end, self.biomass_start, self.total_hectars, self.area_start, self.area_end, self.hectars_before_20)
+
+                    biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_biomass_yearly], ActivityTypes.BIOMASS, delay=self.delay)
+                    self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
+
+                else:
+                    # NOTE: In this case we are in the situation where biomass_final has to be calculated and is not tabulated
+                    agb_rate = self.agb_rate_default * 44 / 12 if not self.agb_rate_tier_2 else self.agb_rate_tier_2 * 44 / 12
+                    bgb_rate = self.bgb_rate_default * 44 / 12 if not self.bgb_rate_tier_2 else self.bgb_rate_tier_2 * 44 / 12
+
+                    if self.agb_rate_tier_2:
+                        max_agb = 0 if self.agb_rate_default < self.agb_rate_tier_2 else self.agb_maximum_c * 44 / 12
+                    else:
+                        max_agb = self.agb_maximum_c * 44 / 12
+
+                    biomass_accumulation_rate = agb_rate + bgb_rate
+
+                    max_years_growth = max_agb / agb_rate
+
+                    calculated = biomass_accumulation_rate * sum(self.total_hectars)
+
+                    tabular = (max_agb + bgb_rate * max_years_growth) * self.area_end
+
+                    total = -min(calculated, tabular) if (max_agb != 0 and self.area_end != 0) else -calculated
+
+                    # NOTE: maybe this should be broken down over max_years_growth or over all years of project depending on whether calculated or tabular is used
+                    self.yearly_bio_emissions = breakdown_according_to_values(total, self.total_hectars)
+                    self.total_bio_emissions = total
+
+                    biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.yearly_bio_emissions], ActivityTypes.BIOMASS, delay=self.delay)
+                    self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
+
+            except Exception as e:
+                traceback.print_exc()
+
         calculate_residue()
-        calculate_bio()
         calculate_som()
         calculate_soil()
+        calculate_biomass_emissions()
 
         try:
             self.emissions_total_yearly = [i + j + k + l for i, j, k, l in zip(self.yearly_residue_emissions, self.yearly_bio_emissions, self.yearly_som_emissions, self.yearly_soil_emissions)]
