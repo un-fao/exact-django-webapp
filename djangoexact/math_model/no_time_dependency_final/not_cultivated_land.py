@@ -198,7 +198,7 @@ class NotCultivatedLand(BaseModule):
         calculate_emissions_som()
 
         try:
-            self.emissions_total_yearly = [x + y for x, y in zip(self.emissions_residue_burning_yearly, self.emissions_soil_yearly)]
+            self.emissions_total_yearly = [x + y for x, y in zip(self.emissions_som_yearly, self.emissions_soil_yearly)]
             self.total_emissions = sum(self.emissions_total_yearly)
             return self.total_emissions
 

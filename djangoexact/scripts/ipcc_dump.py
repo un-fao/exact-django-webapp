@@ -4246,3 +4246,90 @@ for i, row in enumerate(rows):
     name = row["name"]
     SettlementType.objects.create(name=name)
     print(f"Added {name}")
+
+SettlementEF.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "SettlementEF.csv"),
+    header=0,
+    sep=";",
+)
+
+headers = df.columns.values.tolist()
+rows = df.to_dict("records")
+
+climates = Climate.objects.filter(name__in=["Tropical", "Warm Temperate", "Cool Temperate", "Boreal"]).all()
+moistures = Moisture.objects.filter(name__in=["Wet", "Dry", "Moist"]).all()
+
+for i, row in enumerate(rows):
+    settlement_type = SettlementType.objects.get(name__iexact=row["settlement_type"])
+    str_climate = row["climate"]
+    str_moisture = row["moisture"]
+
+    print(settlement_type, str_climate, str_moisture, row["flu"], row["fi"], row["fmg"], row["biomass"])
+
+    if str_climate == "All" and str_moisture == "All":
+        for climate in climates:
+            print(f"Creating for {climate}")
+            for moisture in moistures:
+                print(f"Creating for {moisture}")
+                SettlementEF.objects.create(
+                    settlement_type=settlement_type,
+                    climate=climate,
+                    moisture=moisture,
+                    flu=parse_csv_number(row["flu"]),
+                    fi=parse_csv_number(row["fi"]),
+                    fmg=parse_csv_number(row["fmg"]),
+                    biomass=parse_csv_number(row["biomass"]),
+                )
+    elif str_climate == "All":
+        for climate in climates:
+            print(f"Creating for {climate}")
+            moisture = Moisture.objects.get(name__iexact=str_moisture)
+            SettlementEF.objects.create(
+                settlement_type=settlement_type,
+                climate=climate,
+                moisture=moisture,
+                flu=parse_csv_number(row["flu"]),
+                fi=parse_csv_number(row["fi"]),
+                fmg=parse_csv_number(row["fmg"]),
+                biomass=parse_csv_number(row["biomass"]),
+            )
+    elif str_moisture == "All":
+        for moisture in moistures:
+            print(f"Creating for {moisture}")
+            if str_climate == "Temperate":
+                for climate in Climate.objects.filter(name__in=["Warm Temperate", "Cool Temperate"]).all():
+                    SettlementEF.objects.create(
+                        settlement_type=settlement_type,
+                        climate=climate,
+                        moisture=moisture,
+                        flu=parse_csv_number(row["flu"]),
+                        fi=parse_csv_number(row["fi"]),
+                        fmg=parse_csv_number(row["fmg"]),
+                        biomass=parse_csv_number(row["biomass"]),
+                    )
+            else:
+                climate = Climate.objects.get(name__iexact=str_climate)
+                SettlementEF.objects.create(
+                    settlement_type=settlement_type,
+                    climate=climate,
+                    moisture=moisture,
+                    flu=parse_csv_number(row["flu"]),
+                    fi=parse_csv_number(row["fi"]),
+                    fmg=parse_csv_number(row["fmg"]),
+                    biomass=parse_csv_number(row["biomass"]),
+                )
+    else:
+        climate = Climate.objects.get(name__iexact=str_climate)
+        moisture = Moisture.objects.get(name__iexact=str_moisture)
+
+        SettlementEF.objects.create(
+            settlement_type=settlement_type,
+            climate=climate,
+            moisture=moisture,
+            flu=parse_csv_number(row["flu"]),
+            fi=parse_csv_number(row["fi"]),
+            fmg=parse_csv_number(row["fmg"]),
+            biomass=parse_csv_number(row["biomass"]),
+        )
