@@ -1877,10 +1877,6 @@ class OrganicSoil(LandModuleFixed):
 
 class Settlement(LandModuleFixed, SingleBiomassModule):
 
-    is_settlement_start = models.BooleanField(default=False)
-    is_settlement_w = models.BooleanField(default=False)
-    is_settlement_wo = models.BooleanField(default=False)
-
     settlement_type_start = models.ForeignKey(SettlementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_settlement_type_start")
     settlement_type_w = models.ForeignKey(SettlementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_settlement_type_w")
     settlement_type_wo = models.ForeignKey(SettlementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_settlement_type_wo")
