@@ -217,11 +217,13 @@ class LandUseType(models.Model):
         module_types = ", ".join([str(x.name) for x in self.module_types.all()])
         return f"({self.pk}) {self.name} - Active: {self.is_active}" + (f" ({module_types})" if module_types else "")
 
+
 class SettlementType(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return f"({self.pk}) {self.name}"
+
 
 class ChangeRate(models.Model):
     name = models.CharField(max_length=25)
@@ -1873,7 +1875,7 @@ class OrganicSoil(LandModuleFixed):
         return super().save(*args, **kwargs)
 
 
-class Settlement(LandModuleFixed):
+class Settlement(LandModuleFixed, SingleBiomassModule):
 
     is_settlement_start = models.BooleanField(default=False)
     is_settlement_w = models.BooleanField(default=False)
@@ -1892,18 +1894,18 @@ class Settlement(LandModuleFixed):
     flu_t2_w = models.FloatField(null=True, blank=True)
     flu_t2_wo = models.FloatField(null=True, blank=True)
 
-    agb_t2_start = models.FloatField(null=True, blank=True)
-    agb_t2_w = models.FloatField(null=True, blank=True)
-    agb_t2_wo = models.FloatField(null=True, blank=True)
+    fi_t2_start = models.FloatField(null=True, blank=True)
+    fi_t2_w = models.FloatField(null=True, blank=True)
+    fi_t2_wo = models.FloatField(null=True, blank=True)
 
-    bgb_t2_start = models.FloatField(null=True, blank=True)
-    bgb_t2_w = models.FloatField(null=True, blank=True)
-    bgb_t2_wo = models.FloatField(null=True, blank=True)
+    fmg_t2_start = models.FloatField(null=True, blank=True)
+    fmg_t2_w = models.FloatField(null=True, blank=True)
+    fmg_t2_wo = models.FloatField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
 
         if not self.land_use_type_start:
-            self.land_use_type_start = LandUseType.objects.get(name="Organic Soil")
+            self.land_use_type_start = LandUseType.objects.get(name="Settlement")
             self.land_use_type_w = self.land_use_type_start
             self.land_use_type_wo = self.land_use_type_start
 

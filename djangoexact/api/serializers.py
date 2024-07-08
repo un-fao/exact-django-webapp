@@ -1969,15 +1969,13 @@ class SettlementWriteSerializer(LandModuleWriteSerializer):
         model = Settlement
         fields = "__all__"
         ref_name = "Settlement"
-        mandatory_fields = {}
-
-
-class SettlementReadSerializer(LandModuleReadSerializer):
-    class Meta:
-        model = Settlement
-        fields = "__all__"
-        ref_name = "Settlement"
-        mandatory_fields = {}
+        mandatory_fields = {
+            "land_use_type_start": [
+                "settlement_type_start",
+                "settlement_type_w",
+                "settlement_type_wo",
+            ],
+        }
 
     def validate(self, data):
 
@@ -2012,6 +2010,14 @@ class SettlementReadSerializer(LandModuleReadSerializer):
                 raise serializers.ValidationError(other_infrastructure_serializer.errors)
 
         return super().validate(data)
+
+
+class SettlementReadSerializer(LandModuleReadSerializer):
+    class Meta:
+        model = Settlement
+        fields = "__all__"
+        ref_name = "Settlement"
+        mandatory_fields = {}
 
 
 class ConfigParamSerializer(serializers.ModelSerializer):

@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from .models import *
 
-for model in [model for model in dir() if not model.startswith("_") and not model.startswith("ForestManagementAGB") and not model.startswith("PerennialAGB") and not model.startswith("PerennialBGB") and not model.startswith("AfforestationFLU") and not model.startswith("LivestockTAM") and not model.startswith("LivestockVSER") and not model.startswith("LivestockManureEF")]:
+for model in [model for model in dir() if not model.startswith("_") and not model.startswith("ForestManagementAGB") and not model.startswith("PerennialAGB") and not model.startswith("PerennialBGB") and not model.startswith("AfforestationFLU") and not model.startswith("LivestockTAM") and not model.startswith("LivestockVSER") and not model.startswith("LivestockManureEF") and not model.startswith("FLUData")]:
     try:
         admin.site.register(eval(model))
     except:
@@ -124,6 +124,13 @@ class LivestockManureEFAdmin(admin.ModelAdmin):
         "climate__name",
         "moisture__name",
     ]
+
+
+class FLUDataAdmin(admin.ModelAdmin):
+    search_fields = ["climate__name", "moisture__name", "land_use_type__name", "value"]
+
+
+admin.site.register(FLUData, FLUDataAdmin)
 
 
 admin.site.register(PerennialAGB, AGBAdmin)

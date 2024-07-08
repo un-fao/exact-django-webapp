@@ -13,15 +13,6 @@ class GlobalWarmingPotential(Model):
         return self.name
 
 
-class NitrousEmissionFactor(Model):
-    name = CharField(max_length=100)
-    moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
-    value = FloatField()
-
-    def __str__(self):
-        return self.name
-
-
 class TotalBiomassAfterDefoManager(Manager):
     def get_or_default(self, climate, moisture, continent, land_use_type):
         try:
@@ -1372,3 +1363,35 @@ class FLUData(Model):
 
     class Meta:
         unique_together = ("climate", "moisture", "land_use_type")
+
+
+class SettlementEF(Model):
+    settlement_type = ForeignKey("api.SettlementType", on_delete=CASCADE)
+    climate = ForeignKey("api.Climate", on_delete=CASCADE)
+    moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
+    flu = FloatField(default=1)
+    fmg = FloatField(default=1)
+    fi = FloatField(default=1)
+    biomass = FloatField(default=0)
+
+    class Meta:
+        unique_together = ("settlement_type", "climate", "moisture")
+
+    def __str__(self):
+        return f"({self.pk}) {self.settlement_type.name} {self.climate.name} {self.moisture.name}"
+
+
+class NitrousEmissionFactor(Model):
+    moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
+    value = FloatField(default=0)
+
+    def __str__(self):
+        return f"({self.pk}) {self.moisture.name} {self.value}"
+
+
+class InputsNitrousEmissionFactor(Model):
+    moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
+    value = FloatField(default=0)
+
+    def __str__(self):
+        return f"({self.pk}) {self.moisture.name} {self.value}"

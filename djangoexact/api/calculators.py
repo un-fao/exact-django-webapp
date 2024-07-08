@@ -64,6 +64,7 @@ from math_model.no_time_dependency_final.waterbodies import (
 from math_model.no_time_dependency_final.not_cultivated_land import (
     NotCultivatedLand as MathNotCultivatedLand,
 )
+from math_model.no_time_dependency_final.not_cultivated_land import NotCultivatedLand
 
 from api.utilities import getattr_or_default
 
@@ -258,6 +259,7 @@ def get_flu_data(module: LandModule, climate: Climate, moisture: Moisture, scena
         if attr:
             return ipcc.FLUData.objects.get(climate=climate, moisture=moisture, land_use_type=attr)
     except ipcc.FLUData.DoesNotExist:
+        log.debug(f"FLUData for {attr} in {climate.name} climate and {moisture.name} moisture does not exist")
         pass
 
     return SimpleNamespace(value=1)
@@ -3531,8 +3533,91 @@ class SettlementCalculator(BaseCalculator):
     Calculator for settlements
     """
 
-    def calculate(self) -> Result:
+    def __init__(self, input) -> None:
+        super().__init__(input)
+        input: Settlement = input
+
+        self.inputs_start_w = []
+        self.inputs_start_wo = []
+        self.inputs_w = []
+        self.inputs_wo = []
+        self.soc = SimpleNamespace(value=0)
+
+        self.nitrous_ef = SimpleNamespace(value=0)
+
+        self.ef_start = SimpleNamespace(value=0)
+        self.ef_w = SimpleNamespace(value=0)
+        self.ef_wo = SimpleNamespace(value=0)
+
+        self.flu_start = SimpleNamespace(value=1)
+        self.fi_start = SimpleNamespace(value=1)
+        self.fmg_start = SimpleNamespace(value=1)
+
+        self.flu_w = SimpleNamespace(value=1)
+        self.fi_w = SimpleNamespace(value=1)
+        self.fmg_w = SimpleNamespace(value=1)
+
+        self.flu_wo = SimpleNamespace(value=1)
+        self.fi_wo = SimpleNamespace(value=1)
+        self.fmg_wo = SimpleNamespace(value=1)
+
+        self.math_start_w = None
+        self.math_start_wo = None
+        self.math_w = None
+        self.math_wo = None
+
+    def get_defaults(self, calculate=False) -> dict:
+        log.debug("START SettlementCalculator.get_defaults")
         input: Settlement = self.data
+        activity: Activity = input.activity
+        project: Project = activity.project
+        luc: LandUseChange = input.land_use_change
+
+        climate: Climate = input.activity.climate_t2 or input.activity.project.climate
+        moisture: Moisture = input.activity.moisture_t2 or input.activity.project.moisture
+
+        cm = {
+            "climate": climate,
+            "moisture": moisture,
+        }
+
+        self.soc = ipcc.SoilOrganicCarbon.objects.get(**cm, soil_type=project.soil_type)
+        self.nitrous_ef = utils.get_or_raise(ipcc.NitrousEmissionFactor, {"moisture": moisture}, f"Nitrous EF not found for {moisture.name} moisture")
+
+        if is_business_as_usual(luc) or is_luc_remaining_same(luc):
+            self.ef_start: ipcc.SettlementEF = utils.get_or_raise(ipcc.SettlementEF, {"settlement_type": input.settlement_type_start, "climate": climate, "moisture": moisture}, f"Settlement EF not found for {input.settlement_type_start.name}")
+            self.flu_start = SimpleNamespace(value=self.ef_start.flu)
+            self.fi_start = SimpleNamespace(value=self.ef_start.fi)
+            self.fmg_start = SimpleNamespace(value=self.ef_start.fmg)
+
+        if is_with(luc):
+            self.ef_w: ipcc.SettlementEF = utils.get_or_raise(ipcc.SettlementEF, {"settlement_type": input.settlement_type_w, "climate": climate, "moisture": moisture}, f"Settlement EF not found for {input.settlement_type_w.name}")
+            self.flu_w = SimpleNamespace(value=self.ef_w.flu)
+            self.fi_w = SimpleNamespace(value=self.ef_w.fi)
+            self.fmg_w = SimpleNamespace(value=self.ef_w.fmg)
+
+        if is_without(luc):
+            self.ef_wo: ipcc.SettlementEF = utils.get_or_raise(ipcc.SettlementEF, {"settlement_type": input.settlement_type_wo, "climate": climate, "moisture": moisture}, f"Settlement EF not found for {input.settlement_type_wo.name}")
+            self.flu_wo = SimpleNamespace(value=self.ef_wo.flu)
+            self.fi_wo = SimpleNamespace(value=self.ef_wo.fi)
+            self.fmg_wo = SimpleNamespace(value=self.ef_wo.fmg)
+
+        if luc and input.settlement_type_start.name.casefold() == "paved settlement":
+            start_module, _, _ = get_luc_modules(luc)
+
+            self.flu_start = get_flu_data(start_module, climate, moisture, utils.ScenarioTypes.START)
+            self.fi_start = get_fi_data(start_module, climate, moisture, utils.ScenarioTypes.START)
+            self.fmg_start = get_fmg_data(start_module, climate, moisture, utils.ScenarioTypes.START)
+
+        log.debug("END SettlementCalculator.get_defaults")
+
+    def calculate(self) -> Result:
+        log.debug("START SettlementCalculator.calculate")
+        input: Settlement = self.data
+        activity: Activity = input.activity
+        project: Project = activity.project
+        luc: LandUseChange = input.land_use_change
+
         res_w = MathResult(
             input.activity.project.implementation_years,
             input.activity.project.capitalization_years,
@@ -3541,6 +3626,148 @@ class SettlementCalculator(BaseCalculator):
             input.activity.project.implementation_years,
             input.activity.project.capitalization_years,
         )
+
+        self.get_defaults()
+
+        if is_luc_remaining_same(input):
+            log.debug("LUC remaining same")
+
+            self.inputs_start_w = [
+                *[input.area, 0],
+                project.implementation_years,
+                project.capitalization_years,
+                activity.change_rate.name,
+                project.gw_potential.n2o,
+                self.nitrous_ef.value,
+                self.soc.value,
+                self.soc.value,
+                input.soc_t2_start,
+                input.soc_t2_w,
+                False,
+                self.fmg_start.value,
+                self.fmg_w.value,
+                input.fmg_t2_start,
+                input.fmg_t2_w,
+                self.flu_start.value,
+                self.flu_w.value,
+                input.flu_t2_start,
+                input.flu_t2_w,
+                self.fi_start.value,
+                self.fi_w.value,
+                input.fi_t2_start,
+                input.fi_t2_w,
+                0,  # Delay
+            ]
+
+            self.math_start_w = NotCultivatedLand(*self.inputs_start_w)
+            self.math_start_w.calculate_emissions()
+
+        if is_business_as_usual(input):
+
+            self.inputs_start_wo = [
+                *[input.area, 0],
+                project.implementation_years,
+                project.capitalization_years,
+                activity.change_rate.name,
+                project.gw_potential.n2o,
+                self.nitrous_ef.value,
+                self.soc.value,
+                self.soc.value,
+                input.soc_t2_start,
+                input.soc_t2_wo,
+                False,
+                self.fmg_start.value,
+                self.fmg_wo.value,
+                input.fmg_t2_start,
+                input.fmg_t2_wo,
+                self.flu_start.value,
+                self.flu_wo.value,
+                input.flu_t2_start,
+                input.flu_t2_wo,
+                self.fi_start.value,
+                self.fi_wo.value,
+                input.fi_t2_start,
+                input.fi_t2_wo,
+                0,  # Delay
+            ]
+
+            self.math_start_wo = NotCultivatedLand(*self.inputs_start_wo)
+            self.math_start_wo.calculate_emissions()
+
+        if is_with(input):
+
+            self.inputs_w = [
+                *[0, input.area],
+                project.implementation_years,
+                project.capitalization_years,
+                activity.change_rate.name,
+                project.gw_potential.n2o,
+                self.nitrous_ef.value,
+                self.soc.value,
+                self.soc.value,
+                input.soc_t2_start,
+                input.soc_t2_w,
+                True,
+                self.fmg_start.value,
+                self.fmg_w.value,
+                input.fmg_t2_start,
+                input.fmg_t2_w,
+                self.flu_start.value,
+                self.flu_w.value,
+                input.flu_t2_start,
+                input.flu_t2_w,
+                self.fi_start.value,
+                self.fi_w.value,
+                input.fi_t2_start,
+                input.fi_t2_w,
+                0,  # Delay
+            ]
+
+            self.math_w = NotCultivatedLand(*self.inputs_w)
+            self.math_w.calculate_emissions()
+
+        if is_without(input):
+
+            self.inputs_wo = [
+                *[0, input.area],
+                project.implementation_years,
+                project.capitalization_years,
+                activity.change_rate.name,
+                project.gw_potential.n2o,
+                self.nitrous_ef.value,
+                self.soc.value,
+                self.soc.value,
+                input.soc_t2_start,
+                input.soc_t2_wo,
+                True,
+                self.fmg_start.value,
+                self.fmg_wo.value,
+                input.fmg_t2_start,
+                input.fmg_t2_wo,
+                self.flu_start.value,
+                self.flu_wo.value,
+                input.flu_t2_start,
+                input.flu_t2_wo,
+                self.fi_start.value,
+                self.fi_wo.value,
+                input.fi_t2_start,
+                input.fi_t2_wo,
+                0,  # Delay
+            ]
+
+            self.math_wo = NotCultivatedLand(*self.inputs_wo)
+            self.math_wo.calculate_emissions()
+
+        results_start_w = self.math_start_w.result if self.math_start_w else MathResult(project.implementation_years, project.capitalization_years)
+        results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(project.implementation_years, project.capitalization_years)
+        results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
+        results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
+
+        res_w += results_start_w
+        res_wo += results_start_wo
+
+        res_w += results_w
+        res_wo += results_wo
 
         for building in input.buildings.all():
             r_w, r_wo = BuildingCalculator(building).calculate()
@@ -3554,10 +3781,8 @@ class SettlementCalculator(BaseCalculator):
             res_w += r_w
             res_wo += r_wo
 
+        log.debug("END SettlementCalculator.calculate")
         return (res_w, res_wo)
-
-    def get_defaults(self, calculate=False) -> dict:
-        return super().get_defaults(calculate)
 
 
 class BuildingCalculator(BaseCalculator):
@@ -6098,7 +6323,7 @@ class DegradedLandCalculator(BaseCalculator):
         region_flt = {"continent": region}
         cm = {"climate": climate, "moisture": moisture}
 
-        module_start = module_w = module_wo = input
+        module_start = module_w = module_wo = module
 
         # NOTE: Here we have a hardcoded organic_input_flt. This is due to the fact that it should not be present in the table (it isn't in the Excel)
         retrieved_input = OrganicInputType.objects.get(name="Medium C input")
