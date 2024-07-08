@@ -3616,7 +3616,6 @@ class SettlementCalculator(BaseCalculator):
         input: Settlement = self.data
         activity: Activity = input.activity
         project: Project = activity.project
-        luc: LandUseChange = input.land_use_change
 
         res_w = MathResult(
             input.activity.project.implementation_years,
