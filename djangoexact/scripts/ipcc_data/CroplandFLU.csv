@@ -1,4 +1,4 @@
-﻿Long-Term Cultivated,Flooded Rice,Perennial/Tree Crop,Set aside (< 20 yrs)
+climate,moisture,Long-Term Cultivated,Flooded Rice,Perennial/Tree Crop,Set aside (< 20 yrs)
 Boreal,Moist,0.70,1.35,0.72,0.82
 Boreal,Dry,0.77,1.35,0.72,0.93
 Cool temperate,dry,0.77,1.35,0.72,0.93
@@ -8,4 +8,4 @@ Warm temperate,moist,0.69,1.35,0.72,0.82
 Tropical,dry,0.92,1.35,1.01,0.93
 Tropical,moist,0.83,1.35,1.01,0.82
 Tropical,wet,0.83,1.35,1.01,0.82
-Tropical,Montane,0.64,1.35,1.00,0.88
+Tropical Montane,Dry,0.64,1.35,1.00,0.88

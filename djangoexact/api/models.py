@@ -267,6 +267,7 @@ class Country(models.Model):
 class Climate(models.Model):
     name = models.CharField(max_length=100)
     moistures = models.ManyToManyField("api.Moisture", related_name="climates")
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"({self.pk}) {self.name}"
@@ -274,6 +275,7 @@ class Climate(models.Model):
 
 class Moisture(models.Model):
     name = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"({self.pk}) {self.name}"
