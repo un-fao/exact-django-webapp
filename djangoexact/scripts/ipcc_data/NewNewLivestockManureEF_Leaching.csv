@@ -5,7 +5,7 @@ Boreal;Moist;N2O Leaching;Dairy Cattle;High-Productivity;0;0;0,015;0,035;0,12;0;
 Boreal;Dry;N2O Leaching;Dairy Cattle;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Dairy Cattle;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Dairy Cattle;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Dairy Cattle;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Dairy Cattle;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Dairy Cattle;High-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Dairy Cattle;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Dairy Cattle;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -15,7 +15,7 @@ Boreal;Moist;N2O Leaching;Dairy Cattle;Low-Productivity;0;0;0,015;0,035;0,12;0;0
 Boreal;Dry;N2O Leaching;Dairy Cattle;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Dairy Cattle;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Dairy Cattle;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Dairy Cattle;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Dairy Cattle;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Dairy Cattle;Low-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Dairy Cattle;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Dairy Cattle;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -25,7 +25,7 @@ Boreal;Moist;N2O Leaching;Other Cattle;High-Productivity;0;0;0,015;0,035;0,12;0;
 Boreal;Dry;N2O Leaching;Other Cattle;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Other Cattle;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Other Cattle;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Other Cattle;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Other Cattle;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Other Cattle;High-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Other Cattle;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Other Cattle;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -35,7 +35,7 @@ Boreal;Moist;N2O Leaching;Other Cattle;Low-Productivity;0;0;0,015;0,035;0,12;0;0
 Boreal;Dry;N2O Leaching;Other Cattle;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Other Cattle;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Other Cattle;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Other Cattle;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Other Cattle;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Other Cattle;Low-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Other Cattle;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Other Cattle;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -45,7 +45,7 @@ Boreal;Moist;N2O Leaching;Dairy Buffalo;High-Productivity;0;0;0,015;0,035;0,12;0
 Boreal;Dry;N2O Leaching;Dairy Buffalo;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Dairy Buffalo;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Dairy Buffalo;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Dairy Buffalo;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Dairy Buffalo;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Dairy Buffalo;High-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Dairy Buffalo;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Dairy Buffalo;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -55,7 +55,7 @@ Boreal;Moist;N2O Leaching;Dairy Buffalo;Low-Productivity;0;0;0,015;0,035;0,12;0;
 Boreal;Dry;N2O Leaching;Dairy Buffalo;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Dairy Buffalo;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Dairy Buffalo;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Dairy Buffalo;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Dairy Buffalo;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Dairy Buffalo;Low-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Dairy Buffalo;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Dairy Buffalo;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -65,7 +65,7 @@ Boreal;Moist;N2O Leaching;Other Buffalo;High-Productivity;0;0;0,015;0,035;0,12;0
 Boreal;Dry;N2O Leaching;Other Buffalo;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Other Buffalo;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Other Buffalo;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Other Buffalo;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Other Buffalo;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Other Buffalo;High-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Other Buffalo;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Other Buffalo;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -75,7 +75,7 @@ Boreal;Moist;N2O Leaching;Other Buffalo;Low-Productivity;0;0;0,015;0,035;0,12;0;
 Boreal;Dry;N2O Leaching;Other Buffalo;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Other Buffalo;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Other Buffalo;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Other Buffalo;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Other Buffalo;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Other Buffalo;Low-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Other Buffalo;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Other Buffalo;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -85,7 +85,7 @@ Boreal;Moist;N2O Leaching;Growing Swine;High-Productivity;0;0;0,015;0,035;0,12;0
 Boreal;Dry;N2O Leaching;Growing Swine;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Growing Swine;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Growing Swine;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Growing Swine;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Growing Swine;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Growing Swine;High-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Growing Swine;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Growing Swine;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -95,7 +95,7 @@ Boreal;Moist;N2O Leaching;Growing Swine;Low-Productivity;0;0;0,015;0,035;0,12;0;
 Boreal;Dry;N2O Leaching;Growing Swine;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Growing Swine;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Growing Swine;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Growing Swine;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Growing Swine;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Growing Swine;Low-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Growing Swine;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Growing Swine;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -105,7 +105,7 @@ Boreal;Moist;N2O Leaching;Breeding Swine;High-Productivity;0;0;0,015;0,035;0,12;
 Boreal;Dry;N2O Leaching;Breeding Swine;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Breeding Swine;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Breeding Swine;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Breeding Swine;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Breeding Swine;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Breeding Swine;High-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Breeding Swine;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Breeding Swine;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -115,7 +115,7 @@ Boreal;Moist;N2O Leaching;Breeding Swine;Low-Productivity;0;0;0,015;0,035;0,12;0
 Boreal;Dry;N2O Leaching;Breeding Swine;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Breeding Swine;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Breeding Swine;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Breeding Swine;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Breeding Swine;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Breeding Swine;Low-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Breeding Swine;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Breeding Swine;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -125,7 +125,7 @@ Boreal;Moist;N2O Leaching;Chicken Layer;High-Productivity;0;0;0,015;0,035;0,12;0
 Boreal;Dry;N2O Leaching;Chicken Layer;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Chicken Layer;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Chicken Layer;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Chicken Layer;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Chicken Layer;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Chicken Layer;High-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Chicken Layer;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Chicken Layer;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -135,7 +135,7 @@ Boreal;Moist;N2O Leaching;Chicken Layer;Low-Productivity;0;0;0,015;0,035;0,12;0;
 Boreal;Dry;N2O Leaching;Chicken Layer;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Chicken Layer;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Chicken Layer;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Chicken Layer;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Chicken Layer;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Chicken Layer;Low-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Chicken Layer;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Chicken Layer;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -145,7 +145,7 @@ Boreal;Moist;N2O Leaching;Chicken Broiler;High-Productivity;0;0;0,015;0,035;0,12
 Boreal;Dry;N2O Leaching;Chicken Broiler;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Chicken Broiler;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Chicken Broiler;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Chicken Broiler;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Chicken Broiler;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Chicken Broiler;High-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Chicken Broiler;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Chicken Broiler;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -155,7 +155,7 @@ Boreal;Moist;N2O Leaching;Chicken Broiler;Low-Productivity;0;0;0,015;0,035;0,12;
 Boreal;Dry;N2O Leaching;Chicken Broiler;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Chicken Broiler;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Chicken Broiler;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Chicken Broiler;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Chicken Broiler;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Chicken Broiler;Low-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Chicken Broiler;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Chicken Broiler;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -165,7 +165,7 @@ Boreal;Moist;N2O Leaching;Dairy Sheep;High-Productivity;0;0;0,015;0,035;0,12;0;0
 Boreal;Dry;N2O Leaching;Dairy Sheep;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Dairy Sheep;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Dairy Sheep;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Dairy Sheep;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Dairy Sheep;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Dairy Sheep;High-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Dairy Sheep;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Dairy Sheep;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -175,7 +175,7 @@ Boreal;Moist;N2O Leaching;Dairy Sheep;Low-Productivity;0;0;0,015;0,035;0,12;0;0;
 Boreal;Dry;N2O Leaching;Dairy Sheep;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Dairy Sheep;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Dairy Sheep;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Dairy Sheep;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Dairy Sheep;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Dairy Sheep;Low-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Dairy Sheep;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Dairy Sheep;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -185,7 +185,7 @@ Boreal;Moist;N2O Leaching;Other Sheep;High-Productivity;0;0;0,015;0,035;0,12;0;0
 Boreal;Dry;N2O Leaching;Other Sheep;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Other Sheep;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Other Sheep;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Other Sheep;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Other Sheep;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Other Sheep;High-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Other Sheep;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Other Sheep;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -195,7 +195,7 @@ Boreal;Moist;N2O Leaching;Other Sheep;Low-Productivity;0;0;0,015;0,035;0,12;0;0;
 Boreal;Dry;N2O Leaching;Other Sheep;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Other Sheep;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Other Sheep;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Other Sheep;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Other Sheep;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Other Sheep;Low-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Other Sheep;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Other Sheep;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -205,7 +205,7 @@ Boreal;Moist;N2O Leaching;Goats;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0
 Boreal;Dry;N2O Leaching;Goats;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Goats;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Goats;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Goats;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Goats;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Goats;High-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Goats;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Goats;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -215,7 +215,7 @@ Boreal;Moist;N2O Leaching;Goats;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;
 Boreal;Dry;N2O Leaching;Goats;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Goats;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Goats;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Goats;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Goats;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Goats;Low-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Goats;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Goats;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -225,7 +225,7 @@ Boreal;Moist;N2O Leaching;Camels;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;
 Boreal;Dry;N2O Leaching;Camels;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Camels;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Camels;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Camels;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Camels;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Camels;High-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Camels;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Camels;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -235,7 +235,7 @@ Boreal;Moist;N2O Leaching;Camels;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0
 Boreal;Dry;N2O Leaching;Camels;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Camels;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Camels;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Camels;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Camels;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Camels;Low-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Camels;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Camels;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -245,7 +245,7 @@ Boreal;Moist;N2O Leaching;Horses;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;
 Boreal;Dry;N2O Leaching;Horses;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Horses;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Horses;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Horses;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Horses;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Horses;High-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Horses;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Horses;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -255,7 +255,7 @@ Boreal;Moist;N2O Leaching;Horses;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0
 Boreal;Dry;N2O Leaching;Horses;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Horses;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Horses;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Horses;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Horses;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Horses;Low-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Horses;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Horses;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -265,7 +265,7 @@ Boreal;Moist;N2O Leaching;Mules And Asses;High-Productivity;0;0;0,015;0,035;0,12
 Boreal;Dry;N2O Leaching;Mules And Asses;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Mules And Asses;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Mules And Asses;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Mules And Asses;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Mules And Asses;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Mules And Asses;High-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Mules And Asses;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Mules And Asses;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -275,7 +275,7 @@ Boreal;Moist;N2O Leaching;Mules And Asses;Low-Productivity;0;0;0,015;0,035;0,12;
 Boreal;Dry;N2O Leaching;Mules And Asses;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Mules And Asses;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Mules And Asses;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Mules And Asses;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Mules And Asses;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Mules And Asses;Low-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Mules And Asses;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Mules And Asses;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -285,7 +285,7 @@ Boreal;Moist;N2O Leaching;Deer;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;
 Boreal;Dry;N2O Leaching;Deer;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Deer;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Deer;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Deer;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Deer;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Deer;High-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Deer;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Deer;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -295,7 +295,7 @@ Boreal;Moist;N2O Leaching;Deer;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0
 Boreal;Dry;N2O Leaching;Deer;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Deer;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Deer;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Deer;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Deer;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Deer;Low-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Deer;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Deer;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -305,7 +305,7 @@ Boreal;Moist;N2O Leaching;Ostrich;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0
 Boreal;Dry;N2O Leaching;Ostrich;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Ostrich;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Ostrich;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Ostrich;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Ostrich;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Ostrich;High-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Ostrich;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Ostrich;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -315,7 +315,7 @@ Boreal;Moist;N2O Leaching;Ostrich;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;
 Boreal;Dry;N2O Leaching;Ostrich;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Ostrich;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Ostrich;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Ostrich;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Ostrich;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Ostrich;Low-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Ostrich;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Ostrich;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -325,7 +325,7 @@ Boreal;Moist;N2O Leaching;Llamas And Alpacas;High-Productivity;0;0;0,015;0,035;0
 Boreal;Dry;N2O Leaching;Llamas And Alpacas;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Llamas And Alpacas;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Llamas And Alpacas;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Llamas And Alpacas;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Llamas And Alpacas;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Llamas And Alpacas;High-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Llamas And Alpacas;High-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Llamas And Alpacas;High-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -335,7 +335,7 @@ Boreal;Moist;N2O Leaching;Llamas And Alpacas;Low-Productivity;0;0;0,015;0,035;0,
 Boreal;Dry;N2O Leaching;Llamas And Alpacas;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Llamas And Alpacas;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Llamas And Alpacas;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Llamas And Alpacas;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Llamas And Alpacas;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Llamas And Alpacas;Low-Productivity;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Llamas And Alpacas;Low-Productivity;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Llamas And Alpacas;Low-Productivity;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -345,7 +345,7 @@ Boreal;Moist;N2O Leaching;Dairy Cattle;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;
 Boreal;Dry;N2O Leaching;Dairy Cattle;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Dairy Cattle;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Dairy Cattle;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Dairy Cattle;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Dairy Cattle;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Dairy Cattle;Default;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Dairy Cattle;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Dairy Cattle;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -355,7 +355,7 @@ Boreal;Moist;N2O Leaching;Other Cattle;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;
 Boreal;Dry;N2O Leaching;Other Cattle;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Other Cattle;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Other Cattle;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Other Cattle;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Other Cattle;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Other Cattle;Default;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Other Cattle;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Other Cattle;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -365,7 +365,7 @@ Boreal;Moist;N2O Leaching;Dairy Buffalo;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0
 Boreal;Dry;N2O Leaching;Dairy Buffalo;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Dairy Buffalo;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Dairy Buffalo;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Dairy Buffalo;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Dairy Buffalo;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Dairy Buffalo;Default;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Dairy Buffalo;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Dairy Buffalo;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -375,7 +375,7 @@ Boreal;Moist;N2O Leaching;Other Buffalo;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0
 Boreal;Dry;N2O Leaching;Other Buffalo;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Other Buffalo;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Other Buffalo;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Other Buffalo;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Other Buffalo;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Other Buffalo;Default;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Other Buffalo;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Other Buffalo;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -385,7 +385,7 @@ Boreal;Moist;N2O Leaching;Growing Swine;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0
 Boreal;Dry;N2O Leaching;Growing Swine;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Growing Swine;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Growing Swine;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Growing Swine;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Growing Swine;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Growing Swine;Default;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Growing Swine;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Growing Swine;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -395,7 +395,7 @@ Boreal;Moist;N2O Leaching;Breeding Swine;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;
 Boreal;Dry;N2O Leaching;Breeding Swine;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Breeding Swine;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Breeding Swine;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Breeding Swine;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Breeding Swine;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Breeding Swine;Default;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Breeding Swine;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Breeding Swine;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -405,7 +405,7 @@ Boreal;Moist;N2O Leaching;Chicken Layer;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0
 Boreal;Dry;N2O Leaching;Chicken Layer;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Chicken Layer;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Chicken Layer;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Chicken Layer;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Chicken Layer;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Chicken Layer;Default;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Chicken Layer;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Chicken Layer;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -415,7 +415,7 @@ Boreal;Moist;N2O Leaching;Chicken Broiler;Default;0;0;0,015;0,035;0,12;0;0;0;0;0
 Boreal;Dry;N2O Leaching;Chicken Broiler;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Chicken Broiler;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Chicken Broiler;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Chicken Broiler;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Chicken Broiler;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Chicken Broiler;Default;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Chicken Broiler;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Chicken Broiler;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -425,7 +425,7 @@ Boreal;Moist;N2O Leaching;Dairy Sheep;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0
 Boreal;Dry;N2O Leaching;Dairy Sheep;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Dairy Sheep;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Dairy Sheep;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Dairy Sheep;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Dairy Sheep;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Dairy Sheep;Default;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Dairy Sheep;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Dairy Sheep;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -435,7 +435,7 @@ Boreal;Moist;N2O Leaching;Other Sheep;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0
 Boreal;Dry;N2O Leaching;Other Sheep;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Other Sheep;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Other Sheep;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Other Sheep;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Other Sheep;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Other Sheep;Default;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Other Sheep;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Other Sheep;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -445,7 +445,7 @@ Boreal;Moist;N2O Leaching;Goats;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0
 Boreal;Dry;N2O Leaching;Goats;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Goats;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Goats;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Goats;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Goats;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Goats;Default;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Goats;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Goats;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -455,7 +455,7 @@ Boreal;Moist;N2O Leaching;Camels;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;
 Boreal;Dry;N2O Leaching;Camels;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Camels;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Camels;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Camels;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Camels;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Camels;Default;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Camels;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Camels;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -465,7 +465,7 @@ Boreal;Moist;N2O Leaching;Horses;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;
 Boreal;Dry;N2O Leaching;Horses;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Horses;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Horses;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Horses;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Horses;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Horses;Default;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Horses;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Horses;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -475,7 +475,7 @@ Boreal;Moist;N2O Leaching;Mules And Asses;Default;0;0;0,015;0,035;0,12;0;0;0;0;0
 Boreal;Dry;N2O Leaching;Mules And Asses;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Mules And Asses;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Mules And Asses;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Mules And Asses;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Mules And Asses;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Mules And Asses;Default;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Mules And Asses;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Mules And Asses;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -485,7 +485,7 @@ Boreal;Moist;N2O Leaching;Deer;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,
 Boreal;Dry;N2O Leaching;Deer;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Deer;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Deer;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Deer;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Deer;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Deer;Default;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Deer;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Deer;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -495,7 +495,7 @@ Boreal;Moist;N2O Leaching;Ostrich;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035
 Boreal;Dry;N2O Leaching;Ostrich;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Ostrich;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Ostrich;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Ostrich;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Ostrich;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Ostrich;Default;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Ostrich;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Ostrich;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
@@ -505,7 +505,7 @@ Boreal;Moist;N2O Leaching;Llamas And Alpacas;Default;0;0;0,015;0,035;0,12;0;0;0;
 Boreal;Dry;N2O Leaching;Llamas And Alpacas;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Moist;N2O Leaching;Llamas And Alpacas;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Warm Temperate;Dry;N2O Leaching;Llamas And Alpacas;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
-Tropical;Montane;N2O Leaching;Llamas And Alpacas;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
+Tropical Montane;Dry;N2O Leaching;Llamas And Alpacas;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Wet;N2O Leaching;Llamas And Alpacas;Default;0;0;0,015;0,035;0,24;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Moist;N2O Leaching;Llamas And Alpacas;Default;0;0;0,015;0,035;0,12;0;0;0;0;0;0;0,035;0,04;0
 Tropical;Dry;N2O Leaching;Llamas And Alpacas;Default;0;0;0,015;0,035;0;0;0;0;0;0;0;0,035;0,04;0

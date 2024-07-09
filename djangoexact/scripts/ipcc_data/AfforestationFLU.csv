@@ -1,4 +1,4 @@
-Annual Cropland,Annual Fallow,Flooded Rice,Grassland,Other Land (Non-Vegetated),Agroforestry - Default,Alley Cropping,Perennial Fallow,Hedgerow,Multistrata,Parkland,Shaded Perennial,Silvoarable,Silvopasture,Degraded Land,Oil Palm,Rubber,Tea,Olive,Orchard,Short Rotation Coppice,Vine
+climate,moisture,Annual Cropland,Annual Fallow,Flooded Rice,Grassland,Other Land (Non-Vegetated),Agroforestry - Default,Alley Cropping,Perennial Fallow,Hedgerow,Multistrata,Parkland,Shaded Perennial,Silvoarable,Silvopasture,Degraded Land,Oil Palm,Rubber,Tea,Olive,Orchard,Short Rotation Coppice,Vine
 Boreal,Dry,0.77,0.93,1.35,1.0,1.0,0.72,0.72,0.72,0.72,0.72,0.72,0.72,0.72,0.72,0.33,0.72,0.72,0.72,0.72,0.72,0.72,0.72
 Boreal,Moist,0.7,0.82,1.35,1.0,1.0,0.72,0.72,0.72,0.72,0.72,0.72,0.72,0.72,0.72,0.33,0.72,0.72,0.72,0.72,0.72,0.72,0.72
 Cool Temperate,Dry,0.77,0.93,1.35,1.0,1.0,0.72,0.72,0.72,0.72,0.72,0.72,0.72,0.72,0.72,0.33,0.72,0.72,0.72,0.72,0.72,0.72,0.72
@@ -6,6 +6,6 @@ Cool Temperate,Moist,0.7,0.82,1.35,1.0,1.0,0.72,0.72,0.72,0.72,0.72,0.72,0.72,0.
 Tropical,Dry,0.92,0.93,1.35,1.0,1.0,1.01,1.01,1.01,1.01,1.01,1.01,1.01,1.01,1.01,0.33,1.01,1.01,1.01,1.01,1.01,1.01,1.01
 Tropical,Moist,0.83,0.82,1.35,1.0,1.0,1.01,1.01,1.01,1.01,1.01,1.01,1.01,1.01,1.01,0.33,1.01,1.01,1.01,1.01,1.01,1.01,1.01
 Tropical,Wet,0.83,0.82,1.35,1.0,1.0,1.01,1.01,1.01,1.01,1.01,1.01,1.01,1.01,1.01,0.33,1.01,1.01,1.01,1.01,1.01,1.01,1.01
-Tropical,Montane,0.64,0.88,1.35,1.0,1.0,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,0.33,1.00,1.00,1.00,1.00,1.00,1.00,1.00
+Tropical Montane,Dry,0.64,0.88,1.35,1.0,1.0,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,1.00,0.33,1.00,1.00,1.00,1.00,1.00,1.00,1.00
 Warm Temperate,Dry,0.76,0.93,1.35,1.0,1.0,0.72,0.72,0.72,0.72,0.72,0.72,0.72,0.72,0.72,0.33,0.72,0.72,0.72,0.72,0.72,0.72,0.72
 Warm Temperate,Moist,0.69,0.82,1.35,1.0,1.0,0.72,0.72,0.72,0.72,0.72,0.72,0.72,0.72,0.72,0.33,0.72,0.72,0.72,0.72,0.72,0.72,0.72
