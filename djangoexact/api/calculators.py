@@ -3605,6 +3605,8 @@ class SettlementCalculator(BaseCalculator):
         if luc and input.settlement_type_start.name.casefold() == "paved settlement":
             start_module, _, _ = get_luc_modules(luc)
 
+            self.soc.value *= utils.PAVED_SETTLEMENT_SOC_MULTIPLIER
+
             self.flu_start = get_flu_data(start_module, climate, moisture, utils.ScenarioTypes.START)
             self.fi_start = get_fi_data(start_module, climate, moisture, utils.ScenarioTypes.START)
             self.fmg_start = get_fmg_data(start_module, climate, moisture, utils.ScenarioTypes.START)
