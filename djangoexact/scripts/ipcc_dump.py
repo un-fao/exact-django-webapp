@@ -3022,6 +3022,13 @@ for i, row in enumerate(df_dict):
         )
 """
 
+
+"""
+
+# Climate.objects.get(name__iexact="Tropical Montane").delete()
+Moisture.objects.get(name__iexact="Montane").delete()
+Climate.objects.create(name="Tropical Montane")
+
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestClimateAssociationTable.csv"),
     header=0,
@@ -3796,7 +3803,6 @@ for i, row in df.iterrows():
         fi=fi,
     )
 
-
 InputEmissionFactor.objects.all().delete()
 
 df2 = pd.read_csv(
@@ -4380,3 +4386,4 @@ for i, row in enumerate(df_dict2):
             manure_management_type=manure_management_type,
             value=parse_csv_number(row[df_headers2[j]]),
         )
+"""
