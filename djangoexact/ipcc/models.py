@@ -97,34 +97,6 @@ class AfforestationCombustionFactor(Model):
         return f"Factor for {self.land_use_type.name}, value: {self.value}"
 
 
-class DefaultEmissionFactor(Model):
-    """
-    IPCC:A97;A98;A101
-    """
-
-    # NOTE: organic_input_type is not used in the excel file, look into this.
-    # In order to make DegradedLand and SetAside work, I hardcoded it.
-    # This has to be removed, and then we can change there as well
-    organic_input_type = ForeignKey("api.OrganicInputType", on_delete=CASCADE)
-    moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
-    value = FloatField()
-
-    def __str__(self):
-        return f"Factor for {self.moisture.name}, {self.organic_input_type}, value: {self.value}"
-
-
-class LandUseNitrousEmissionFactor(Model):
-    """
-    IPCC:A99:A101
-    """
-
-    moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
-    value = FloatField()
-
-    def __str__(self):
-        return f"Factor for {self.moisture.name}, value: {self.value}"
-
-
 class LitterDeadwoodCarbonStock(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     forest_type = ForeignKey("api.ForestType", on_delete=CASCADE)
