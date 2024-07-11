@@ -1140,15 +1140,10 @@ def generic_module_viewset(model: Model):
             if module_type.is_submodule:
                 module: Submodule = get_object_or_404(model, pk=pk, parent__activity__project__user=self.request.user)
                 activity = module.parent.activity
-                # if module.parent.status.name != "READY":
-                #     return utils.ErrorResponse("Parent module is not ready. Cannot fetch defaults.")
 
             else:
                 module: Module = get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
                 activity = module.activity
-                # TODO: Maybe move all status checks to middleware
-                # if module.status.name != "READY":
-                #     return utils.ErrorResponse("Module is not ready. Cannot fetch defaults.")
 
             if not utils.has_project_permission("can_view_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to view this module in the project")
