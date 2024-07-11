@@ -3135,6 +3135,14 @@ class InputEntryCalculator(BaseCalculator):
         needs_n2o_ref = input_type.has_n2o_emissions and not module.n2o_emissions_t2
         needs_co2_e_ref = input_type.has_co2_e_emissions and not module.co2_e_emissions_t2
 
+        if module.status.name == "READY" and calculate:
+            self.calculate()
+
+        try:
+            self.ref = ipcc.InputReference.objects.get(gw_potential=project.gw_potential, input_type=module.input_type)
+        except ipcc.InputReference.DoesNotExist:
+            raise ValueError(f"Reference for {module.input_type.name} does not exist for {project.gw_potential.name}.")
+
         try:
             self.ef = ipcc.InputEmissionFactor.objects.get(input_type=module.input_type, climate=project.climate, moisture=project.moisture)
         except ipcc.InputEmissionFactor.DoesNotExist:
@@ -3142,51 +3150,33 @@ class InputEntryCalculator(BaseCalculator):
             if needs_co2_ref or needs_n2o_ref or needs_co2_e_ref:
                 raise ValueError(f"Emission factor for {module.input_type.name} does not exist for {project.climate.name} and {project.moisture.name}. Please define tier 2 values.")
 
+        self.math_w = None
+        self.math_wo = None
+
     def calculate(self) -> list[Result]:
         module: InputEntry = self.data
         activity: Activity = module.parent.activity
         project: Project = activity.project
-
-        input_type: InputType = module.input_type
-
-        needs_co2_ref = input_type.has_co2_emissions and not module.co2_emissions_t2
-        needs_n2o_ref = input_type.has_n2o_emissions and not module.n2o_emissions_t2
-        needs_co2_e_ref = input_type.has_co2_e_emissions and not module.co2_e_emissions_t2
-
-        try:
-            ref = ipcc.InputReference.objects.get(gw_potential=project.gw_potential, input_type=module.input_type)
-        except ipcc.InputReference.DoesNotExist:
-            raise ValueError(f"Reference for {module.input_type.name} does not exist for {project.gw_potential.name}.")
-
-        try:
-            ef = ipcc.InputEmissionFactor.objects.get(input_type=module.input_type, climate=project.climate, moisture=project.moisture)
-        except ipcc.InputEmissionFactor.DoesNotExist:
-            ef = None
-            if needs_co2_ref or needs_n2o_ref or needs_co2_e_ref:
-                raise ValueError(f"Emission factor for {module.input_type.name} does not exist for {project.climate.name} and {project.moisture.name}. Please define tier 2 values.")
-
-        math_w = None
-        math_wo = None
 
         if is_with(module):
             self.inputs_w = [
                 module.value_start,
                 module.value_w,
                 activity.change_rate.name,
-                ef.co2_value if ef else None,
+                self.ef.co2_value if self.ef else None,
                 module.co2_emissions_t2,
-                ref.co2_multiplier,
-                ref.co2_emissions_multiplier,
+                self.ref.co2_multiplier,
+                self.ref.co2_emissions_multiplier,
                 project.implementation_years,
                 project.capitalization_years,
-                ef.n2o_value if ef else None,
+                self.ef.n2o_value if self.ef else None,
                 module.n2o_emissions_t2,
-                ref.n2o_quantity_multiplier,
-                ref.n2o_emissions_multiplier,
-                ef.co2_eq_value if ef else None,
+                self.ref.n2o_quantity_multiplier,
+                self.ref.n2o_emissions_multiplier,
+                self.ef.co2_eq_value if self.ef else None,
                 module.co2_e_emissions_t2,
-                ref.production_quantity_multiplier,
-                ref.production_emissions_multiplier,
+                self.ref.production_quantity_multiplier,
+                self.ref.production_emissions_multiplier,
             ]
 
             math_w = MathInputs(*self.inputs_w)
@@ -3197,20 +3187,20 @@ class InputEntryCalculator(BaseCalculator):
                 module.value_start,
                 module.value_wo,
                 activity.change_rate.name,
-                ef.co2_value if ef else None,
+                self.ef.co2_value if self.ef else None,
                 module.co2_emissions_t2,
-                ref.co2_multiplier,
-                ref.co2_emissions_multiplier,
+                self.ref.co2_multiplier,
+                self.ref.co2_emissions_multiplier,
                 project.implementation_years,
                 project.capitalization_years,
-                ef.n2o_value if ef else None,
+                self.ef.n2o_value if self.ef else None,
                 module.n2o_emissions_t2,
-                ref.n2o_quantity_multiplier,
-                ref.n2o_emissions_multiplier,
-                ef.co2_eq_value if ef else None,
+                self.ref.n2o_quantity_multiplier,
+                self.ref.n2o_emissions_multiplier,
+                self.ef.co2_eq_value if self.ef else None,
                 module.co2_e_emissions_t2,
-                ref.production_quantity_multiplier,
-                ref.production_emissions_multiplier,
+                self.ref.production_quantity_multiplier,
+                self.ref.production_emissions_multiplier,
             ]
 
             math_wo = MathInputs(*self.inputs_wo)
@@ -3610,17 +3600,22 @@ class SettlementCalculator(BaseCalculator):
         """
 
         if luc and input.settlement_type_start.name.casefold() != "paved settlement":
-            _, module_w, module_wo = luc.get_modules()
+            module_start, module_w, module_wo = luc.get_modules()
 
             if is_with(input) and input.settlement_type_w.name.casefold() == "paved settlement":
-                self.flu_w = get_flu_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
-                self.fi_w = get_fi_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
-                self.fmg_w = get_fmg_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
+
+                flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.WITH)
+                fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.WITH)
+                fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.WITH)
+
+                self.soc.value = self.soc.value * flu_start * fi_start * fmg_start  # SOCinitial
 
             if is_without(input) and input.settlement_type_wo.name.casefold() == "paved settlement":
-                self.flu_wo = get_flu_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
-                self.fi_wo = get_fi_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
-                self.fmg_wo = get_fmg_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
+                flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.WITHOUT)
+                fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.WITHOUT)
+                fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.WITHOUT)
+
+                self.soc.value = self.soc.value * flu_start * fi_start * fmg_start  # SOCinitial
 
         log.debug("END SettlementCalculator.get_defaults")
 
@@ -3715,7 +3710,7 @@ class SettlementCalculator(BaseCalculator):
                 activity.change_rate.name,
                 project.gw_potential.n2o,
                 self.nitrous_ef.value,
-                self.soc.value,
+                self.soc.value,  # SOCinitial
                 self.soc.value,
                 input.soc_t2_start,
                 input.soc_t2_w,
