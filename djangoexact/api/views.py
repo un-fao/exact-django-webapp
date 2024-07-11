@@ -45,6 +45,7 @@ from .models import (
     Submodule,
     UserProjectGroup,
     InvitationStatusType,
+    Definition,
 )
 from .serializers import (
     ActionTypes,
@@ -1190,3 +1191,54 @@ def public_generic_viewset(model: Model):
         serializer_class = get_model_serializer(model)
 
     return PublicGenericViewSet
+
+
+class DefinitionViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    queryset = Definition.objects.all()
+    serializer_class = get_model_serializer(Definition)
+
+    def list(self, request):
+        """
+        Get all definitions.
+        """
+
+        # Get model_name query parameter
+        model_name = request.query_params.get("model_name", None)
+
+        if model_name:
+            definitions = Definition.objects.filter(model_name=model_name).all()
+            serializer = get_model_serializer(Definition)(definitions, many=True)
+            return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+
+        return super().list(request)
+
+    def retrieve(self, request, pk=None):
+        """
+        Get a single definition.
+        """
+
+        return super().retrieve(request, pk)
+
+    def create(self, request):
+        """
+        Create a new definition.
+        """
+        return super().create(request)
+
+    def update(self, request, pk=None):
+        """
+        Update a definition.
+        """
+        return super().update(request, pk)
+
+    def partial_update(self, request, pk=None):
+        """
+        Partially update a definition.
+        """
+        return super().partial_update(request, pk)
+
+    def destroy(self, request, pk=None):
+        """
+        Delete a definition.
+        """
+        return super().destroy(request, pk)
