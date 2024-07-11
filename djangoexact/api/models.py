@@ -6,6 +6,7 @@ from django.core import exceptions, validators
 from django.db import models as models
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
+import logging as log
 
 from api import utilities as utils
 
@@ -692,6 +693,62 @@ class Module(Historical):
             self.status = StatusType.objects.get_or_create(name="EMPTY")[0]
 
         super().save(*args, **kwargs)
+
+    def is_luc_remaining_same(self) -> bool:
+        """
+        Checks if the land use change for a given module remains the same.
+
+        Args:
+            module (LandModule): The land module to check.
+
+        Returns:
+            bool: True if the land use change remains the same, False otherwise.
+        """
+        log.debug("Is LUC remaining the same")
+        luc: LandUseChange = getattr(self, "land_use_change", None)
+        return not luc or (luc and luc.module_type_start.class_name == self.__class__.__name__ and luc.module_type_w.class_name == self.__class__.__name__)
+
+    def is_business_as_usual(self) -> bool:
+        """
+        Checks if the given module represents a business-as-usual scenario.
+
+        Args:
+            module (LandModule): The land module to check.
+
+        Returns:
+            bool: True if the module represents a business-as-usual scenario, False otherwise.
+        """
+        log.debug("Is business as usual")
+        luc: LandUseChange = getattr(self, "land_use_change", None)
+        return not luc or (luc and luc.module_type_start.class_name == self.__class__.__name__ and luc.module_type_wo.class_name == self.__class__.__name__)
+
+    def is_without(self) -> bool:
+        """
+        Checks if the given module is without a land use change or if the module type without land use change matches the module's class name.
+
+        Args:
+            module (LandModule): The module to check.
+
+        Returns:
+            bool: True if the module is associated with the land use change or if the provided module types the LandUseChange "WITHOUT" scenario. False otherwise.
+        """
+        log.debug("Is without")
+        luc: LandUseChange = getattr(self, "land_use_change", None)
+        return not luc or (luc.module_type_wo.class_name == self.__class__.__name__)
+
+    def is_with(self) -> bool:
+        """
+        Checks if the given module is associated with a specific land use change.
+
+        Args:
+            module (LandModule): The module to check.
+
+        Returns:
+            bool: True if the module is associated with the land use change or if the provided module types the LandUseChange "WITH" scenario. False otherwise.
+        """
+        log.debug("Is with")
+        luc: LandUseChange = getattr(self, "land_use_change", None)
+        return not luc or (luc.module_type_w.class_name == self.__class__.__name__)
 
 
 class BiomassModule(Module):
