@@ -1983,6 +1983,30 @@ class LandUseChange(Module):
     def is_filled(self):
         return self.area is not None and self.module_type_start is not None and self.module_type_w is not None and self.module_type_wo is not None
 
+    def get_modules(self) -> tuple[LandModule]:
+        """
+        Retrieves the land use change modules associated with each scenario of a given LandUseChange object.
+
+        Args:
+            luc (LandUseChange): The LandUseChange object.
+
+        Returns:
+            tuple[LandModule]: A tuple containing the land use change modules for each scenario.
+
+        Raises:
+            Exception: If at least one module is missing.
+        """
+        modules = (
+            getattr(self.activity, self.module_type_start.class_name.lower(), None).first(),
+            getattr(self.activity, self.module_type_w.class_name.lower(), None).first(),
+            getattr(self.activity, self.module_type_wo.class_name.lower(), None).first(),
+        )
+
+        if not all(modules):
+            raise Exception("At least one module is missing")
+
+        return modules
+
 
 ### MODEL PARAMETERS TABLES ###
 

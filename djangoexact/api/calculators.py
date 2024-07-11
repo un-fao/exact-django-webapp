@@ -463,7 +463,7 @@ class BaseCalculator(ABC):
 
         if input.__class__ == LandUseChange or input.luc:
             luc: LandUseChange = input if input.__class__ == LandUseChange else input.luc
-            modules = get_luc_modules(luc)
+            modules = luc.get_modules()
 
             if not all(modules):
                 raise Exception("At least one module is missing")
@@ -1118,7 +1118,7 @@ class AnnualCropCalculator(BaseCalculator):
         luc: LandUseChange = input.land_use_change
 
         if luc:
-            module_start, module_w, module_wo = get_luc_modules(luc)
+            module_start, module_w, module_wo = luc.get_modules()
 
         if input.status.name == "READY" and calculate:
             self.calculate()
@@ -1248,7 +1248,7 @@ class AnnualCropCalculator(BaseCalculator):
         luc: LandUseChange = input.land_use_change
 
         if luc:
-            module_start, module_w, module_wo = get_luc_modules(luc)
+            module_start, module_w, module_wo = luc.get_modules()
 
         area = luc.area if luc else input.area
         change_rate = input.activity.change_rate
@@ -3602,14 +3602,24 @@ class SettlementCalculator(BaseCalculator):
             self.fi_wo = SimpleNamespace(value=self.ef_wo.fi)
             self.fmg_wo = SimpleNamespace(value=self.ef_wo.fmg)
 
-        if luc and input.settlement_type_start.name.casefold() == "paved settlement":
-            start_module, _, _ = get_luc_modules(luc)
+        """
+            Again just for further clarification on paved settlement:
+                We have Paved Settlement at start: SOC is SOCref*0.8. It remains like this in all scenarios where Paved Settlement is still there.
+                We have Paved Settlement at With/Without but not at start: SOC is SOCinitial * 0.8.
+        """
 
-            self.soc.value *= utils.PAVED_SETTLEMENT_SOC_MULTIPLIER
+        if luc and input.settlement_type_start.name.casefold() != "paved settlement":
+            _, module_w, module_wo = luc.get_modules()
 
-            self.flu_start = get_flu_data(start_module, climate, moisture, utils.ScenarioTypes.START)
-            self.fi_start = get_fi_data(start_module, climate, moisture, utils.ScenarioTypes.START)
-            self.fmg_start = get_fmg_data(start_module, climate, moisture, utils.ScenarioTypes.START)
+            if is_with(input) and input.settlement_type_w.name.casefold() == "paved settlement":
+                self.flu_w = get_flu_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
+                self.fi_w = get_fi_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
+                self.fmg_w = get_fmg_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
+
+            if is_without(input) and input.settlement_type_wo.name.casefold() == "paved settlement":
+                self.flu_wo = get_flu_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
+                self.fi_wo = get_fi_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
+                self.fmg_wo = get_fmg_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
 
         log.debug("END SettlementCalculator.get_defaults")
 
@@ -6160,7 +6170,7 @@ class DegradedLandCalculator(BaseCalculator):
         module_start = module_w = module_wo = input
 
         if luc:
-            module_start, module_w, module_wo = get_luc_modules(luc)
+            module_start, module_w, module_wo = luc.get_modules()
 
         if is_luc_remaining_same(input):
             self.inputs_start_w = [
@@ -6318,10 +6328,8 @@ class DegradedLandCalculator(BaseCalculator):
         region: Region = project.country.region
         soil_type: SoilType = project.soil_type
 
-        climate_flt = {"climate": climate}
         moisture_flt = {"moisture": moisture}
         soil_flt = {"soil_type": soil_type}
-        region_flt = {"continent": region}
         cm = {"climate": climate, "moisture": moisture}
 
         module_start = module_w = module_wo = module
@@ -6331,7 +6339,7 @@ class DegradedLandCalculator(BaseCalculator):
         organic_input_hardcoded = {"organic_input_type": retrieved_input}
 
         if luc:
-            module_start, module_w, module_wo = get_luc_modules(luc)
+            module_start, module_w, module_wo = luc.get_modules()
 
         if is_luc_remaining_same(module):
             self.flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
@@ -6402,7 +6410,7 @@ class SetAsideCalculator(BaseCalculator):
         module_start = module_w = module_wo = input
 
         if luc:
-            module_start, module_w, module_wo = get_luc_modules(luc)
+            module_start, module_w, module_wo = luc.get_modules()
 
         if is_luc_remaining_same(input):
             self.inputs_start_w = [
@@ -6573,7 +6581,7 @@ class SetAsideCalculator(BaseCalculator):
         organic_input_hardcoded = {"organic_input_type": retrieved_input}
 
         if luc:
-            module_start, module_w, module_wo = get_luc_modules(luc)
+            module_start, module_w, module_wo = luc.get_modules()
 
         if is_luc_remaining_same(module):
             self.flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
