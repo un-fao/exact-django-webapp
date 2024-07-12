@@ -1104,9 +1104,7 @@ def generic_module_viewset(model: Model):
                 if not all(status == StatusType.objects.get(name="READY") for status in [status_start, status_w, status_wo]):
                     return utils.ErrorResponse("Not all modules are ready. Land Use Change module cannot be calculated.")
             else:
-                status: StatusType = module.__dict__.get("status")
-
-                if not status or status.name != "READY":
+                if not module.is_ready():
                     return utils.ErrorResponse("Module is not ready. Cannot calculate result.")
 
             try:
@@ -1144,6 +1142,9 @@ def generic_module_viewset(model: Model):
             else:
                 module: Module = get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
                 activity = module.activity
+
+            if not module.is_ready():
+                return utils.ErrorResponse("Module is not ready. Cannot calculate defaults.")
 
             if not utils.has_project_permission("can_view_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to view this module in the project")

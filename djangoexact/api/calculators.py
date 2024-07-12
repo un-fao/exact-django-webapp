@@ -3603,7 +3603,7 @@ class SettlementCalculator(BaseCalculator):
             "moisture": moisture,
         }
 
-        self.soc = utils.get_or_raise(ipcc.SOC, cm | {"soil_type": project.soil_type}, f"SOC not found for {climate.name} climate, {moisture.name} moisture and {project.soil_type.name} soil type not found. Please enter tier 2 value.")
+        self.soc = utils.get_or_raise(ipcc.SoilOrganicCarbon, cm | {"soil_type": project.soil_type}, f"SOC not found for {climate.name} climate, {moisture.name} moisture and {project.soil_type.name} soil type not found. Please enter tier 2 value.")
         self.nitrous_ef = utils.get_or_raise(ipcc.NitrousEmissionFactor, {"moisture": moisture}, f"Nitrous EF not found for {moisture.name} moisture")
 
         if module.is_business_as_usual() or module.is_luc_remaining_same():

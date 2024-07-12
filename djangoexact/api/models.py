@@ -669,6 +669,9 @@ class Submodule(Historical):
             self.status = StatusType.objects.get_or_create(name="EMPTY")[0]
 
         super().save(*args, **kwargs)
+    
+    def is_ready(self) -> bool:
+        return self.status and self.status.name == "READY"
 
 
 class Module(Historical):
@@ -687,6 +690,9 @@ class Module(Historical):
 
     def __str__(self):
         return f"({self.pk}) {self._meta.object_name} in {self.activity.name}"
+
+    def is_ready(self) -> bool:
+        return self.status and self.status.name == "READY"
 
     def save(self, *args, **kwargs):
         if not self.status:
