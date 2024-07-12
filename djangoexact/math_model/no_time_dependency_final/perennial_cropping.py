@@ -9,6 +9,7 @@ from .general_functions import (
     yearly_time_dependent_20_year_breakdown,
     yearly_time_dependent_parameter_breakdown,
     biomass_emissions,
+    breakdown_according_to_values_for_x_years
 )
 from .ghg_emissions_classes import (
     ActivityTypes,
@@ -233,14 +234,14 @@ class PerennialCropping(BaseModule):
 
                     max_years_growth = max_agb / agb_rate
 
-                    calculated = biomass_accumulation_rate * sum(self.total_hectars)
-
+                    calculated = self.biomass_start + biomass_accumulation_rate * sum(self.total_hectars) 
                     tabular = (max_agb + bgb_rate * max_years_growth) * self.area_end
 
                     total = -min(calculated, tabular) if (max_agb != 0 and self.area_end != 0) else -calculated
 
+
                     # NOTE: maybe this should be broken down over max_years_growth or over all years of project depending on whether calculated or tabular is used
-                    self.yearly_bio_emissions = breakdown_according_to_values(total, self.total_hectars)
+                    self.yearly_bio_emissions = breakdown_according_to_values_for_x_years(total, self.total_hectars)
                     self.total_bio_emissions = total
 
                     biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.yearly_bio_emissions], ActivityTypes.BIOMASS, delay=self.delay)
