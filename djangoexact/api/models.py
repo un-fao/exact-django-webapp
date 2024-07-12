@@ -2054,7 +2054,7 @@ class LandUseChange(Module):
     dry_matter_wo = models.FloatField(null=True, blank=True)
     dry_matter_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="land_use_change_dry_matter_thread")
 
-    organic_soil = models.OneToOneField(OrganicSoil, on_delete=models.CASCADE, null=True, blank=True)
+    organic_soil = models.OneToOneField(OrganicSoil, on_delete=models.CASCADE, null=True, blank=True, related_name="land_use_change_organic_soil")
 
     def is_filled(self):
         return self.area is not None and self.module_type_start is not None and self.module_type_w is not None and self.module_type_wo is not None
