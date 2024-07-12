@@ -174,6 +174,19 @@ def breakdown_according_to_values(maximum, list_of_proportions):
     else:
         result = [maximum * i / sum(list_of_proportions) for i in list_of_proportions]
         return result
+    
+def breakdown_according_to_values_for_x_years(maximum, list_of_proportions, years):
+    # The breakdown has to be done for x years of the project, after which it is 0
+    # set list of proportions to 0 after x years
+    list_of_proportions_new = [0 for i in range(len(list_of_proportions))]
+    for i in range(years):
+        list_of_proportions_new[i] = list_of_proportions[i]
+    
+    if sum(list_of_proportions_new) == 0:
+        return [0 for i in list_of_proportions_new]
+    else:
+        result = [maximum * i / sum(list_of_proportions_new) for i in list_of_proportions_new]
+        return result
 
 
 def yearly_time_dependent_increase(start_value, end_value, years_implementation, years_capitalization, function):
