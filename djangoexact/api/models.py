@@ -395,7 +395,6 @@ class ModuleType(models.Model):
     class_name = models.CharField(max_length=255, null=True, blank=True)
     is_luc = models.BooleanField(default=False)
     is_submodule = models.BooleanField(default=False)
-    is_fixed_assessment = models.BooleanField(default=False)
 
     def __str__(self):
         return f"({self.pk}) {self.name}" + (" (LUC)" if self.is_luc else "")
@@ -669,7 +668,7 @@ class Submodule(Historical):
             self.status = StatusType.objects.get_or_create(name="EMPTY")[0]
 
         super().save(*args, **kwargs)
-    
+
     def is_ready(self) -> bool:
         return self.status and self.status.name == "READY"
 
@@ -727,6 +726,20 @@ class Module(Historical):
         log.debug("Is business as usual")
         luc: LandUseChange = getattr(self, "land_use_change", None)
         return not luc or (luc and luc.module_type_start.class_name == self.__class__.__name__ and luc.module_type_wo.class_name == self.__class__.__name__)
+
+    def is_start(self) -> bool:
+        """
+        Checks if the given module represents the start of a land use change.
+
+        Args:
+            module (LandModule): The land module to check.
+
+        Returns:
+            bool: True if the module represents the start of a land use change, False otherwise.
+        """
+        log.debug("Is start")
+        luc: LandUseChange = getattr(self, "land_use_change", None)
+        return not luc or (luc and luc.module_type_start.class_name == self.__class__.__name__)
 
     def is_without(self) -> bool:
         """
