@@ -705,7 +705,12 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         paginator = DefaultPagination()
         page = paginator.paginate_queryset(list, request)
         if page is not None:
-            return paginator.get_paginated_response(ActivitySerializer(page, many=True).data)
+            response = []
+            for activity in page:
+                activity_dict = ActivitySerializer(activity).data
+                activity_dict["modules"] = get_modules(activity)
+                response.append(activity_dict)
+            return paginator.get_paginated_response(response)
 
         return Response(data=ActivitySerializer(list, many=True).data, status=http_status.HTTP_200_OK)
 
