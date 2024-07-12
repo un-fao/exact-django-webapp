@@ -1161,8 +1161,11 @@ def generic_module_viewset(model: Model):
         @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view module changes", 200: ChangeHistorySerializer})
         def history(self, request, pk=None):
             module: Module = self.get_object()
+            module_type = ModuleType.objects.get(class_name=model.__name__)
 
-            if not utils.has_project_permission("can_view_modules", self.request.user, module.activity.project):
+            activity: Activity = module.parent.activity if module_type.is_submodule else module.activity
+
+            if not utils.has_project_permission("can_view_modules", self.request.user, activity):
                 logging.error("Selected user does not have permission to view this module in the project")
                 return utils.ErrorResponse("Selected user does not have permission to view this module in the project", status=http_status.HTTP_403_FORBIDDEN)
 
