@@ -130,8 +130,32 @@ class LoginExistingUserView(APIView):
             return Response(extra_data, status=status.HTTP_200_OK)
 
         except User.DoesNotExist:
-            auth.delete_user(user["localId"])
+            auth.delete_user_account(user["localId"])
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class VerifyUserEmail(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    @swagger_auto_schema(
+        responses={200: "OK", 400: "Bad Request"},
+    )
+    @transaction.atomic
+    def post(self, request):
+        data = request.data
+
+        try:
+            email = data.get("email")
+
+            user = firebase_admin_auth.get_user_by_email(email)
+
+            # Verify user email
+            firebase_admin_auth.update_user(user.uid, email_verified=True)
+
+            return Response({"message": "Email verified"}, status=status.HTTP_200_OK)
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -163,3 +187,32 @@ class TokenRefreshView(APIView):
         except Exception as e:
             foo = json.loads(e.strerror)
             return Response({"details": foo["error"]["message"]}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class TransferUser(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    @swagger_auto_schema(
+        responses={200: "OK", 400: "Bad Request"},
+    )
+    @transaction.atomic
+    def post(self, request):
+
+        if not request.user.is_staff:
+            return Response({"error": "You are not authorized to perform this action"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        users = User.objects.all()
+
+        for user in users:
+            if user.firebase_uid is None:
+                try:
+                    firebase_user = firebase_admin_auth.create_user(email=user.email, password=user.password)
+                    user.firebase_uid = firebase_user.uid
+                    user.is_active = True
+                    firebase_admin_auth.update_user(firebase_user.uid, email_verified=True)
+                    user.save()
+                except Exception as e:
+                    print(e)
+                    continue
+
+        return Response({"message": "Users transferred"}, status=status.HTTP_200_OK)
