@@ -8,7 +8,7 @@ Warm Temperate,Moist,<18,193.7,0,193.7
 Tropical,Dry,<18,193.7,0,193.7
 Tropical,Moist,<18,193.7,0,193.7
 Tropical,Wet,<18,193.7,0,193.7
-Tropical,Montane,<18,193.7,0,193.7
+Tropical Montane,Dry,<18,193.7,0,193.7
 Boreal,Dry,>18,0,0,0
 Boreal,Moist,>18,0,0,0
 Cool Temperate,Dry,>18,0,0,0
@@ -18,4 +18,4 @@ Warm Temperate,Moist,>18,0,0,0
 Tropical,Dry,>18,0,0,0
 Tropical,Moist,>18,0,0,0
 Tropical,Wet,>18,0,0,0
-Tropical,Montane,>18,0,0,0
+Tropical Montane,Dry,>18,0,0,0
