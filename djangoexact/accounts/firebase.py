@@ -1,5 +1,6 @@
 import os
-
+import json
+import base64
 import firebase_admin
 from api.models import CustomUser as User
 from firebase_admin import auth as firebase_admin_auth
@@ -9,7 +10,8 @@ from rest_framework import authentication, exceptions
 from djangoexact.settings import auth
 
 try:
-    cred = credentials.Certificate(os.getenv("FIREBASE_ADMIN_SDK_CREDENTIALS_PATH"))
+    f = json.loads(base64.b64decode(os.getenv("FIREBASE_SERVICE_ACCOUNT")).decode("utf-8"))
+    cred = credentials.Certificate(f)
     auth = firebase_admin.initialize_app(cred)
 except Exception as e:
     raise Exception(f"Firebase config not found: {e}") from e

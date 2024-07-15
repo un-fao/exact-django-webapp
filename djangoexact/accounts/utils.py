@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.core.mail import send_mail
 
-from accounts.firebase import auth as firebase_admin_auth
+from accounts.firebase import firebase_admin_auth
 
 
 # Create custom email verification link
