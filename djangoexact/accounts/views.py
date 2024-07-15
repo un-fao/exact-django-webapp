@@ -1,6 +1,8 @@
 import json
 
 import firebase_admin
+import firebase_admin.firestore
+import firebase_admin.messaging
 from api.models import CustomUser as User
 from django.contrib.auth import login
 from django.contrib.auth.hashers import check_password
@@ -137,6 +139,29 @@ class LoginExistingUserView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class PasswordResetView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    @swagger_auto_schema(
+        responses={200: "OK", 400: "Bad Request"},
+    )
+    @transaction.atomic
+    def post(self, request):
+        data = request.data
+
+        try:
+            email = data.get("email", None)
+
+            firebase_admin_auth.get_user_by_email(email)
+
+            utils.send_password_reset_link(email)
+
+            return Response({"message": "Password reset email sent"}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
 class VerifyUserEmail(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -199,7 +224,7 @@ class TransferUser(APIView):
     def post(self, request):
 
         if not request.user.is_staff:
-            return Response({"error": "You are not authorized to perform this action"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"error": "Only staff members can perform this action"}, status=status.HTTP_401_UNAUTHORIZED)
 
         users = User.objects.all()
 

@@ -60,7 +60,8 @@ class CustomUserManager(BaseUserManager):
 class CustomUser(AbstractUser):
     country = models.ForeignKey("api.Country", on_delete=models.CASCADE, null=True, blank=True, related_name="users")
     email = models.EmailField(unique=True)
-    firebase_uid = models.CharField(max_length=255, unique=True, validators=[alphanumeric], null=True, verbose_name="UID")
+    username = None
+    firebase_uid = models.CharField(max_length=255, unique=True, validators=[alphanumeric], null=True, blank=True, verbose_name="Firebase UID")
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
