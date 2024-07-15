@@ -18,6 +18,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from simple_history.utils import update_change_reason
+from rest_framework.pagination import PageNumberPagination
 
 import api.filters as filters
 import api.labels as labels
@@ -44,6 +45,7 @@ from .models import (
     Submodule,
     UserProjectGroup,
     InvitationStatusType,
+    Definition,
 )
 from .serializers import (
     ActionTypes,
@@ -132,6 +134,20 @@ macro_input_type = openapi.Parameter(
     type=openapi.TYPE_INTEGER,
 )
 
+page_size = openapi.Parameter(
+    "page_size",
+    openapi.IN_QUERY,
+    description="Number of items per page",
+    type=openapi.TYPE_INTEGER,
+)
+
+page = openapi.Parameter(
+    "page",
+    openapi.IN_QUERY,
+    description="Page number",
+    type=openapi.TYPE_INTEGER,
+)
+
 
 def get_modules(activity: Activity, serialized=True) -> list:
     modules = []
@@ -149,6 +165,12 @@ def get_modules(activity: Activity, serialized=True) -> list:
             module_serializers_list.append(module_dict)
 
     return module_serializers_list if serialized else modules
+
+
+class DefaultPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = "page_size"
+    max_page_size = 100
 
 
 class BaseWiewSet(viewsets.GenericViewSet):
@@ -237,6 +259,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
     queryset = Project.objects.all()
     serializer_class = WriteProjectSerializer
+    pagination_class = DefaultPagination
 
     def create(self, request, *args, **kwargs):
         """
@@ -300,6 +323,12 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         shared_projects = request.user.memberships.all()
         list = [share.project for share in shared_projects if utils.has_project_permission("view_project", self.request.user, share.project)]
+
+        paginator = DefaultPagination()
+        page = paginator.paginate_queryset(list, request)
+        if page is not None:
+            return paginator.get_paginated_response(ReadProjectSerializer(page, many=True, context={"request": request}).data)
+
         return Response(data=ReadProjectSerializer(list, many=True, context={"request": request}).data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])
@@ -673,14 +702,17 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         list = Activity.objects.filter(project__id=project_id)
 
-        response = []
+        paginator = DefaultPagination()
+        page = paginator.paginate_queryset(list, request)
+        if page is not None:
+            response = []
+            for activity in page:
+                activity_dict = ActivitySerializer(activity).data
+                activity_dict["modules"] = get_modules(activity)
+                response.append(activity_dict)
+            return paginator.get_paginated_response(response)
 
-        for activity in list:
-            activity_dict = ActivitySerializer(activity).data
-            activity_dict["modules"] = get_modules(activity)
-            response.append(activity_dict)
-
-        return Response(data=response, status=http_status.HTTP_200_OK)
+        return Response(data=ActivitySerializer(list, many=True).data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])
     def results(self, request, pk=None):
@@ -739,6 +771,11 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return utils.ErrorResponse("Selected user does not have permission to view the activity", status=http_status.HTTP_403_FORBIDDEN)
 
         modules = get_modules(activity)
+
+        paginator = DefaultPagination()
+        page = paginator.paginate_queryset(modules, request)
+        if page is not None:
+            return paginator.get_paginated_response(page)
 
         return Response(data=modules, status=http_status.HTTP_200_OK)
 
@@ -1014,7 +1051,7 @@ def generic_module_viewset(model: Model):
 
             return Response(read_serializer.data, status=http_status.HTTP_201_CREATED)
 
-        @swagger_auto_schema(manual_parameters=[activity_id, module_type])
+        @swagger_auto_schema(manual_parameters=[activity_id, module_type, page_size, page], responses={400: "Bad request", 403: "Selected user does not have permission to view the module", 200: get_module_serializer(model)})
         def list(self, request):
             """
             Lists the module(s) of a given activity
@@ -1059,9 +1096,10 @@ def generic_module_viewset(model: Model):
                 logging.error("Selected user does not have permission to view this module in the project")
                 return utils.ErrorResponse("Selected user does not have permission to view this module in the project", status=http_status.HTTP_403_FORBIDDEN)
 
-            serializer = get_module_serializer(model)(instance=module)
-            if not serializer.validate(module.__dict__):
+            serializer = get_module_serializer(model)(data={}, instance=module)
+            if not serializer.is_valid():
                 return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
+            module = serializer.save()
 
             if module_type.class_name == LandUseChange.__name__:
 
@@ -1072,9 +1110,7 @@ def generic_module_viewset(model: Model):
                 if not all(status == StatusType.objects.get(name="READY") for status in [status_start, status_w, status_wo]):
                     return utils.ErrorResponse("Not all modules are ready. Land Use Change module cannot be calculated.")
             else:
-                status: StatusType = module.__dict__.get("status")
-
-                if not status or status.name != "READY":
+                if not module.is_ready():
                     return utils.ErrorResponse("Module is not ready. Cannot calculate result.")
 
             try:
@@ -1108,15 +1144,13 @@ def generic_module_viewset(model: Model):
             if module_type.is_submodule:
                 module: Submodule = get_object_or_404(model, pk=pk, parent__activity__project__user=self.request.user)
                 activity = module.parent.activity
-                # if module.parent.status.name != "READY":
-                #     return utils.ErrorResponse("Parent module is not ready. Cannot fetch defaults.")
 
             else:
                 module: Module = get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
                 activity = module.activity
-                # TODO: Maybe move all status checks to middleware
-                # if module.status.name != "READY":
-                #     return utils.ErrorResponse("Module is not ready. Cannot fetch defaults.")
+
+            if not module.is_ready():
+                return utils.ErrorResponse("Module is not ready. Cannot calculate defaults.")
 
             if not utils.has_project_permission("can_view_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to view this module in the project")
@@ -1132,8 +1166,11 @@ def generic_module_viewset(model: Model):
         @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view module changes", 200: ChangeHistorySerializer})
         def history(self, request, pk=None):
             module: Module = self.get_object()
+            module_type = ModuleType.objects.get(class_name=model.__name__)
 
-            if not utils.has_project_permission("can_view_modules", self.request.user, module.activity.project):
+            activity: Activity = module.parent.activity if module_type.is_submodule else module.activity
+
+            if not utils.has_project_permission("can_view_modules", self.request.user, activity):
                 logging.error("Selected user does not have permission to view this module in the project")
                 return utils.ErrorResponse("Selected user does not have permission to view this module in the project", status=http_status.HTTP_403_FORBIDDEN)
 
@@ -1159,3 +1196,54 @@ def public_generic_viewset(model: Model):
         serializer_class = get_model_serializer(model)
 
     return PublicGenericViewSet
+
+
+class DefinitionViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    queryset = Definition.objects.all()
+    serializer_class = get_model_serializer(Definition)
+
+    def list(self, request):
+        """
+        Get all definitions.
+        """
+
+        # Get model_name query parameter
+        model_name = request.query_params.get("model_name", None)
+
+        if model_name:
+            definitions = Definition.objects.filter(model_name=model_name).all()
+            serializer = get_model_serializer(Definition)(definitions, many=True)
+            return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+
+        return super().list(request)
+
+    def retrieve(self, request, pk=None):
+        """
+        Get a single definition.
+        """
+
+        return super().retrieve(request, pk)
+
+    def create(self, request):
+        """
+        Create a new definition.
+        """
+        return super().create(request)
+
+    def update(self, request, pk=None):
+        """
+        Update a definition.
+        """
+        return super().update(request, pk)
+
+    def partial_update(self, request, pk=None):
+        """
+        Partially update a definition.
+        """
+        return super().partial_update(request, pk)
+
+    def destroy(self, request, pk=None):
+        """
+        Delete a definition.
+        """
+        return super().destroy(request, pk)

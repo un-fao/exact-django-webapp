@@ -209,10 +209,10 @@ class ElectricityDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            scope_of_emission_factor_default = defaults.ef_source,
-            ef_for_selected_country_start_default = defaults.ef_country,
-            ef_for_selected_country_w_default = defaults.ef_country,
-            ef_for_selected_country_wo_default = defaults.ef_country,
+            ef_source_default = defaults.ef_source,
+            ef_t2_start_default = defaults.ef_country,
+            ef_t2_w_default = defaults.ef_country,
+            ef_t2_wo_default = defaults.ef_country,
             transmission_loss_start_default = defaults.transmission_loss,
             transmission_loss_w_default = defaults.transmission_loss,
             transmission_loss_wo_default = defaults.transmission_loss,
@@ -227,7 +227,7 @@ class FuelDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            ef_of_fuel_default = defaults.ef_fuel_t_co2_eq
+            ef_t2_default = defaults.ef_fuel_t_co2_eq
         )
     
 
@@ -239,9 +239,9 @@ class InputEntryDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            ef_co2_default = defaults.ef.co2_value if defaults.ef else None,
-            ef_n2o_default = defaults.ef.n2o_value if defaults.ef else None,
-            ef_co2_eq_default = defaults.ef.co2_eq_value if defaults.ef else None
+            co2_emissions_t2_default = defaults.ef.co2_value if defaults.ef else None,
+            n2o_emissions_t2_default = defaults.ef.n2o_value if defaults.ef else None,
+            co2_e_emissions_t2_default = defaults.ef.co2_eq_value if defaults.ef else None
         )
     
 
@@ -253,25 +253,25 @@ class LargeFisheryDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            ef_fuel_used_start_default = defaults.ef_diesel_default,
-            ef_fuel_used_w_default = defaults.ef_diesel_default,
-            ef_fuel_used_wo_default = defaults.ef_diesel_default,
+            energy_emission_factor_t2_start_default = defaults.ef_diesel_default,
+            energy_emission_factor_t2_w_default = defaults.ef_diesel_default,
+            energy_emission_factor_t2_wo_default = defaults.ef_diesel_default,
 
-            refrigerant_lost_start_default = defaults.lost_refrigerant_default,
-            refrigerant_lost_w_default = defaults.lost_refrigerant_default,
-            refrigerant_lost_wo_default = defaults.lost_refrigerant_default,
+            refrigerant_lost_per_tonne_t2_start_default = defaults.lost_refrigerant_default,
+            refrigerant_lost_per_tonne_t2_w_default = defaults.lost_refrigerant_default,
+            refrigerant_lost_per_tonne_t2_wo_default = defaults.lost_refrigerant_default,
 
-            gwp_refrigerant_start_default = self.input.refrigerant_gwp,
-            gwp_refrigerant_w_default = self.input.refrigerant_gwp,
-            gwp_refrigerant_wo_default = self.input.refrigerant_gwp,
+            refrigerant_gwp_t2_start_default = self.input.refrigerant_gwp,
+            refrigerant_gwp_t2_w_default = self.input.refrigerant_gwp,
+            refrigerant_gwp_t2_wo_default = self.input.refrigerant_gwp,
 
-            quantity_ice_start_default = defaults.tonnes_ice_default,
-            quantity_ice_w_default = defaults.tonnes_ice_default,
-            quantity_ice_wo_default = defaults.tonnes_ice_default,
+            tonnes_of_ice_t2_start_default = defaults.tonnes_ice_default,
+            tonnes_of_ice_t2_w_default = defaults.tonnes_ice_default,
+            tonnes_of_ice_t2_wo_default = defaults.tonnes_ice_default,
 
-            kwh_electricity_start_default = defaults.kw_tonnes,
-            kwh_electricity_w_default = defaults.kw_tonnes,
-            kwh_electricity_wo_default = defaults.kw_tonnes,
+            inshore_ice_production_kwh_per_tonne_t2_start_default = defaults.kw_tonnes,
+            inshore_ice_production_kwh_per_tonne_t2_w_default = defaults.kw_tonnes,
+            inshore_ice_production_kwh_per_tonne_t2_wo_default = defaults.kw_tonnes,
 
         )
     
@@ -284,26 +284,25 @@ class SmallFisheryDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            ef_fuel_used_start_default = defaults.ef_diesel_default,
-            ef_fuel_used_w_default = defaults.ef_diesel_default,
-            ef_fuel_used_wo_default = defaults.ef_diesel_default,
+            energy_emission_factor_t2_start_default = defaults.ef_diesel_default,
+            energy_emission_factor_t2_w_default = defaults.ef_diesel_default,
+            energy_emission_factor_t2_wo_default = defaults.ef_diesel_default,
 
-            refrigerant_lost_start_default = defaults.lost_refrigerant_default,
-            refrigerant_lost_w_default = defaults.lost_refrigerant_default,
-            refrigerant_lost_wo_default = defaults.lost_refrigerant_default,
+            refrigerant_lost_per_tonne_t2_start_default = defaults.lost_refrigerant_default,
+            refrigerant_lost_per_tonne_t2_w_default = defaults.lost_refrigerant_default,
+            refrigerant_lost_per_tonne_t2_wo_default = defaults.lost_refrigerant_default,
 
-            gwp_refrigerant_start_default = self.input.refrigerant_gwp,
-            gwp_refrigerant_w_default = self.input.refrigerant_gwp,
-            gwp_refrigerant_wo_default = self.input.refrigerant_gwp,
+            refrigerant_gwp_t2_start_default = self.input.refrigerant_gwp,
+            refrigerant_gwp_t2_w_default = self.input.refrigerant_gwp,
+            refrigerant_gwp_t2_wo_default = self.input.refrigerant_gwp,
 
-            quantity_ice_start_default = defaults.tonnes_ice_default,
-            quantity_ice_w_default = defaults.tonnes_ice_default,
-            quantity_ice_wo_default = defaults.tonnes_ice_default,
+            tonnes_of_ice_t2_start_default = defaults.tonnes_ice_default,
+            tonnes_of_ice_t2_w_default = defaults.tonnes_ice_default,
+            tonnes_of_ice_t2_wo_default = defaults.tonnes_ice_default,
 
-            kwh_electricity_start_default = defaults.kw_tonnes,
-            kwh_electricity_w_default = defaults.kw_tonnes,
-            kwh_electricity_wo_default = defaults.kw_tonnes,
-
+            inshore_ice_production_kwh_per_tonne_t2_start_default = defaults.kw_tonnes,
+            inshore_ice_production_kwh_per_tonne_t2_w_default = defaults.kw_tonnes,
+            inshore_ice_production_kwh_per_tonne_t2_wo_default = defaults.kw_tonnes,
         )
     
 
@@ -315,7 +314,7 @@ class IrrigationSystemDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            ef_default_start_default = defaults.ef.value,
-            ef_default_w_default = defaults.ef.value,
-            ef_default_wo_default = defaults.ef.value,
+            ef_t2_start_default = defaults.ef.value,
+            ef_t2_w_default = defaults.ef.value,
+            ef_t2_wo_default = defaults.ef.value,
         )

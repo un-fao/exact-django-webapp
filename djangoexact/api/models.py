@@ -6,6 +6,7 @@ from django.core import exceptions, validators
 from django.db import models as models
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
+import logging as log
 
 from api import utilities as utils
 
@@ -268,6 +269,7 @@ class Country(models.Model):
 class Climate(models.Model):
     name = models.CharField(max_length=100)
     moistures = models.ManyToManyField("api.Moisture", related_name="climates")
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"({self.pk}) {self.name}"
@@ -275,6 +277,7 @@ class Climate(models.Model):
 
 class Moisture(models.Model):
     name = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"({self.pk}) {self.name}"
@@ -393,7 +396,6 @@ class ModuleType(models.Model):
     class_name = models.CharField(max_length=255, null=True, blank=True)
     is_luc = models.BooleanField(default=False)
     is_submodule = models.BooleanField(default=False)
-    is_fixed_assessment = models.BooleanField(default=False)
 
     def __str__(self):
         return f"({self.pk}) {self.name}" + (" (LUC)" if self.is_luc else "")
@@ -668,6 +670,9 @@ class Submodule(Historical):
 
         super().save(*args, **kwargs)
 
+    def is_ready(self) -> bool:
+        return self.status and self.status.name == "READY"
+
 
 class Module(Historical):
     class Meta:
@@ -686,11 +691,84 @@ class Module(Historical):
     def __str__(self):
         return f"({self.pk}) {self._meta.object_name} in {self.activity.name}"
 
+    def is_ready(self) -> bool:
+        return self.status and self.status.name == "READY"
+
     def save(self, *args, **kwargs):
         if not self.status:
             self.status = StatusType.objects.get_or_create(name="EMPTY")[0]
 
         super().save(*args, **kwargs)
+
+    def is_luc_remaining_same(self) -> bool:
+        """
+        Checks if the land use change for a given module remains the same.
+
+        Args:
+            module (LandModule): The land module to check.
+
+        Returns:
+            bool: True if the land use change remains the same, False otherwise.
+        """
+        log.debug("Is LUC remaining the same")
+        luc: LandUseChange = getattr(self, "land_use_change", None)
+        return not luc or (luc and luc.module_type_start.class_name == self.__class__.__name__ and luc.module_type_w.class_name == self.__class__.__name__)
+
+    def is_business_as_usual(self) -> bool:
+        """
+        Checks if the given module represents a business-as-usual scenario.
+
+        Args:
+            module (LandModule): The land module to check.
+
+        Returns:
+            bool: True if the module represents a business-as-usual scenario, False otherwise.
+        """
+        log.debug("Is business as usual")
+        luc: LandUseChange = getattr(self, "land_use_change", None)
+        return not luc or (luc and luc.module_type_start.class_name == self.__class__.__name__ and luc.module_type_wo.class_name == self.__class__.__name__)
+
+    def is_start(self) -> bool:
+        """
+        Checks if the given module represents the start of a land use change.
+
+        Args:
+            module (LandModule): The land module to check.
+
+        Returns:
+            bool: True if the module represents the start of a land use change, False otherwise.
+        """
+        log.debug("Is start")
+        luc: LandUseChange = getattr(self, "land_use_change", None)
+        return not luc or (luc and luc.module_type_start.class_name == self.__class__.__name__)
+
+    def is_without(self) -> bool:
+        """
+        Checks if the given module is without a land use change or if the module type without land use change matches the module's class name.
+
+        Args:
+            module (LandModule): The module to check.
+
+        Returns:
+            bool: True if the module is associated with the land use change or if the provided module types the LandUseChange "WITHOUT" scenario. False otherwise.
+        """
+        log.debug("Is without")
+        luc: LandUseChange = getattr(self, "land_use_change", None)
+        return not luc or (luc.module_type_wo.class_name == self.__class__.__name__)
+
+    def is_with(self) -> bool:
+        """
+        Checks if the given module is associated with a specific land use change.
+
+        Args:
+            module (LandModule): The module to check.
+
+        Returns:
+            bool: True if the module is associated with the land use change or if the provided module types the LandUseChange "WITH" scenario. False otherwise.
+        """
+        log.debug("Is with")
+        luc: LandUseChange = getattr(self, "land_use_change", None)
+        return not luc or (luc.module_type_w.class_name == self.__class__.__name__)
 
 
 class BiomassModule(Module):
@@ -1876,11 +1954,7 @@ class OrganicSoil(LandModuleFixed):
         return super().save(*args, **kwargs)
 
 
-class Settlement(LandModuleFixed):
-
-    is_settlement_start = models.BooleanField(default=False)
-    is_settlement_w = models.BooleanField(default=False)
-    is_settlement_wo = models.BooleanField(default=False)
+class Settlement(LandModuleFixed, SingleBiomassModule):
 
     settlement_type_start = models.ForeignKey(SettlementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_settlement_type_start")
     settlement_type_w = models.ForeignKey(SettlementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_settlement_type_w")
@@ -1895,18 +1969,18 @@ class Settlement(LandModuleFixed):
     flu_t2_w = models.FloatField(null=True, blank=True)
     flu_t2_wo = models.FloatField(null=True, blank=True)
 
-    agb_t2_start = models.FloatField(null=True, blank=True)
-    agb_t2_w = models.FloatField(null=True, blank=True)
-    agb_t2_wo = models.FloatField(null=True, blank=True)
+    fi_t2_start = models.FloatField(null=True, blank=True)
+    fi_t2_w = models.FloatField(null=True, blank=True)
+    fi_t2_wo = models.FloatField(null=True, blank=True)
 
-    bgb_t2_start = models.FloatField(null=True, blank=True)
-    bgb_t2_w = models.FloatField(null=True, blank=True)
-    bgb_t2_wo = models.FloatField(null=True, blank=True)
+    fmg_t2_start = models.FloatField(null=True, blank=True)
+    fmg_t2_w = models.FloatField(null=True, blank=True)
+    fmg_t2_wo = models.FloatField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
 
         if not self.land_use_type_start:
-            self.land_use_type_start = LandUseType.objects.get(name="Organic Soil")
+            self.land_use_type_start = LandUseType.objects.get(name="Settlement")
             self.land_use_type_w = self.land_use_type_start
             self.land_use_type_wo = self.land_use_type_start
 
@@ -1981,10 +2055,34 @@ class LandUseChange(Module):
     dry_matter_wo = models.FloatField(null=True, blank=True)
     dry_matter_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="land_use_change_dry_matter_thread")
 
-    organic_soil = models.OneToOneField(OrganicSoil, on_delete=models.CASCADE, null=True, blank=True)
+    organic_soil = models.OneToOneField(OrganicSoil, on_delete=models.CASCADE, null=True, blank=True, related_name="land_use_change_organic_soil")
 
     def is_filled(self):
         return self.area is not None and self.module_type_start is not None and self.module_type_w is not None and self.module_type_wo is not None
+
+    def get_modules(self) -> tuple[LandModule]:
+        """
+        Retrieves the land use change modules associated with each scenario of a given LandUseChange object.
+
+        Args:
+            luc (LandUseChange): The LandUseChange object.
+
+        Returns:
+            tuple[LandModule]: A tuple containing the land use change modules for each scenario.
+
+        Raises:
+            Exception: If at least one module is missing.
+        """
+        modules = (
+            getattr(self.activity, self.module_type_start.class_name.lower(), None).first(),
+            getattr(self.activity, self.module_type_w.class_name.lower(), None).first(),
+            getattr(self.activity, self.module_type_wo.class_name.lower(), None).first(),
+        )
+
+        if not all(modules):
+            raise Exception("At least one module is missing")
+
+        return modules
 
 
 ### MODEL PARAMETERS TABLES ###
@@ -2048,3 +2146,11 @@ class ExecutingAgency(models.Model):
 
     def __str__(self):
         return f"({self.pk}) {self.name}"
+
+
+class Definition(models.Model):
+    model_name = models.CharField(max_length=255, unique=True)
+    definitions = models.JSONField()
+
+    def __str__(self):
+        return f"({self.pk}) {self.model_name}"

@@ -130,6 +130,7 @@ router.register(r"trophic-types", views.generic_viewset(models.TrophicType), bas
 
 # Settlements
 router.register(r"settlements", views.generic_module_viewset(models.Settlement), basename="settlements")
+router.register(r"settlement-types", views.generic_viewset(models.SettlementType), basename="settlement-types")
 router.register(r"buildings", views.generic_module_viewset(models.Building), basename="buildings")
 router.register(r"roads", views.generic_module_viewset(models.Road), basename="roads")
 router.register(r"other-infrastructures", views.generic_module_viewset(models.OtherInfrastructure), basename="other-infrastructures")
@@ -152,6 +153,7 @@ router.register(r"peat-types", views.generic_viewset(models.PeatType), basename=
 
 
 router.register(r"users", views.UserViewSet, basename="users")
+router.register(r"definitions", views.DefinitionViewSet, basename="definitions")
 
 urlpatterns = [
     path("docs/", include_docs_urls(title="EX-ACT Docs")),
