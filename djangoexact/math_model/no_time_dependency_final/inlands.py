@@ -353,7 +353,6 @@ class AnnexedModule(BaseModule):
                 doc_total = [i + j for i, j in zip(doc_initial, doc_final)]
                 co2_total = [i + j for i, j in zip(co2_initial, co2_final)]
 
-
                 co2_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in co2_total], ActivityTypes.DRAINAGE, delay=0)
                 doc_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.DOC, [Emission(e, GasTypes.DOC) for e in doc_total], ActivityTypes.DRAINAGE, delay=0)
                 ch4_onsite_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in ch4_onsite_total], ActivityTypes.DRAINAGE, delay=0)
@@ -402,7 +401,7 @@ class AnnexedModule(BaseModule):
                     area_rewet_initial = 0
                 else:
                     area_rewet_initial = max(0, area_not_drained_end - area_not_drained_start - self.area_affected_by_action_end)
-                    area_rewet_final = area_not_drained_end - area_not_drained_start
+                    area_rewet_final = max(0, area_not_drained_end - area_not_drained_start)
 
                 ef_doc_rewetting_initial = self.ef_doc_rewetting_initial if not self.ef_doc_rewetting_initial_tier_2 else self.ef_doc_rewetting_initial_tier_2
                 ef_co2_rewetting_initial = self.ef_co2_rewetting_initial if not self.ef_co2_rewetting_initial_tier_2 else self.ef_co2_rewetting_initial_tier_2
