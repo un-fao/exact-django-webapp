@@ -289,18 +289,6 @@ class AnnexedModule(BaseModule):
                     total_doc = yearly_time_dependent_parameter_breakdown(doc_start, doc_end, self.time_impl, self.time_cap, self.rate, interim_values=True)
                     total_co2 = yearly_time_dependent_parameter_breakdown(co2_start, co2_end, self.time_impl, self.time_cap, self.rate, interim_values=True)
 
-                    co2_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in total_co2], ActivityTypes.DRAINAGE, delay=0)
-                    doc_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.DOC, [Emission(e, GasTypes.DOC) for e in total_doc], ActivityTypes.DRAINAGE, delay=0)
-                    ch4_onsite_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in total_ch4_onsite], ActivityTypes.DRAINAGE, delay=0)
-                    ch4_offsite_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in total_ch4_off_site], ActivityTypes.DRAINAGE, delay=0)
-                    n2o_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in total_n2o], ActivityTypes.DRAINAGE, delay=0)
-
-                    self.result.yearly_emissions_by_sector_by_gas.append(co2_emission_set)
-                    self.result.yearly_emissions_by_sector_by_gas.append(doc_emission_set)
-                    self.result.yearly_emissions_by_sector_by_gas.append(ch4_onsite_emission_set)
-                    self.result.yearly_emissions_by_sector_by_gas.append(ch4_offsite_emission_set)
-                    self.result.yearly_emissions_by_sector_by_gas.append(n2o_emission_set)
-
                     return total_n2o, total_ch4_onsite, total_ch4_off_site, total_doc, total_co2, sum(total_n2o) + sum(total_ch4_onsite) + sum(total_ch4_off_site) + sum(total_doc) + sum(total_co2)
 
                 except:
@@ -365,6 +353,19 @@ class AnnexedModule(BaseModule):
                 doc_total = [i + j for i, j in zip(doc_initial, doc_final)]
                 co2_total = [i + j for i, j in zip(co2_initial, co2_final)]
 
+
+                co2_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in co2_total], ActivityTypes.DRAINAGE, delay=0)
+                doc_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.DOC, [Emission(e, GasTypes.DOC) for e in doc_total], ActivityTypes.DRAINAGE, delay=0)
+                ch4_onsite_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in ch4_onsite_total], ActivityTypes.DRAINAGE, delay=0)
+                ch4_offsite_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in ch4_offsite_total], ActivityTypes.DRAINAGE, delay=0)
+                n2o_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in n2o_total], ActivityTypes.DRAINAGE, delay=0)
+
+                self.result.yearly_emissions_by_sector_by_gas.append(co2_emission_set)
+                self.result.yearly_emissions_by_sector_by_gas.append(doc_emission_set)
+                self.result.yearly_emissions_by_sector_by_gas.append(ch4_onsite_emission_set)
+                self.result.yearly_emissions_by_sector_by_gas.append(ch4_offsite_emission_set)
+                self.result.yearly_emissions_by_sector_by_gas.append(n2o_emission_set)
+
                 self.emissions_drainage_yearly = [i + j + k + l + m for i, j, k, l, m in zip(n2o_total, ch4_onsite_total, ch4_offsite_total, doc_total, co2_total)]
                 self.emissions_drainage_total = total_initial + total_final
 
@@ -401,7 +402,7 @@ class AnnexedModule(BaseModule):
                     area_rewet_initial = 0
                 else:
                     area_rewet_initial = max(0, area_not_drained_end - area_not_drained_start - self.area_affected_by_action_end)
-                    area_rewet_final = area_not_drained_end - area_rewet_initial
+                    area_rewet_final = area_not_drained_end - area_not_drained_start
 
                 ef_doc_rewetting_initial = self.ef_doc_rewetting_initial if not self.ef_doc_rewetting_initial_tier_2 else self.ef_doc_rewetting_initial_tier_2
                 ef_co2_rewetting_initial = self.ef_co2_rewetting_initial if not self.ef_co2_rewetting_initial_tier_2 else self.ef_co2_rewetting_initial_tier_2
