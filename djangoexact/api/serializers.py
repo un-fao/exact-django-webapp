@@ -81,10 +81,11 @@ from .models import (
     Waterbody,
     LandModule,
     InvitationStatusType,
-    ChangeRate,
-    Note,
-    FieldDefinition,
-    ProjectTag,
+    ValueChain,
+    Storage,
+    Processing,
+    Packaging,
+    Transport,
 )
 from datetime import timedelta
 
@@ -2925,93 +2926,147 @@ class ProjectInvitationWriteSerializer(serializers.Serializer):
     project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(), required=True)
 
 
-class NewNoteSerializer(serializers.ModelSerializer):
-    content = serializers.CharField(required=True)
-    module_type_id = serializers.IntegerField(required=True)
-    module_id = serializers.IntegerField(required=True)
+class StorageSerializer(SubmoduleBaseSerializer):
+    class Meta:
+        model = Storage
+        fields = "__all__"
+        ref_name = "Storage"
+        mandatory_fields = {
+            "with": {
+                "mandatory": [
+                    "electricity_use_per_year_w",
+                ],
+                "conditional": {
+                    "is_refrigerant_used": [
+                        "regrigerant_type_w",
+                        "total_refrigerant_leakage_w",
+                    ]
+                },
+            },
+            "without": {
+                "mandatory": [
+                    "electricity_use_per_year_wo",
+                ],
+                "conditional": {
+                    "is_refrigerant_used": [
+                        "regrigerant_type_wo",
+                        "total_refrigerant_leakage_wo",
+                    ]
+                },
+            },
+        }
+
+
+class ProcessingSerializer(SubmoduleBaseSerializer):
+    class Meta:
+        model = Processing
+        fields = "__all__"
+        ref_name = "Processing"
+        mandatory_fields = {
+            "with": {
+                "mandatory": [
+                    "energy_type_w",
+                    "energy_use_per_year_w",
+                ],
+                "conditional": {
+                    "is_water_used": [
+                        "water_use_per_year_w",
+                    ]
+                },
+            },
+            "without": {
+                "mandatory": ["energy_type_wo", "energy_use_per_year_wo"],
+                "conditional": {
+                    "is_water_used": [
+                        "water_use_per_year_wo",
+                    ]
+                },
+            },
+        }
+
+
+class PackagingSerializer(SubmoduleBaseSerializer):
+    class Meta:
+        model = Packaging
+        fields = "__all__"
+        ref_name = "Packaging"
+        mandatory_fields = {
+            "with": {
+                "mandatory": [
+                    "packaging_material_w",
+                    "kg_of_packaging_material_w",
+                ],
+                "conditional": {
+                    "is_electric": ["kwh_energy_per_year_w"],
+                },
+            },
+            "without": {
+                "mandatory": [
+                    "packaging_material_wo",
+                    "kg_of_packaging_material_wo",
+                ],
+                "conditional": {
+                    "is_electric": [
+                        "kwh_energy_per_year_wo",
+                    ]
+                },
+            },
+        }
+
+
+class TransportSerializer(SubmoduleBaseSerializer):
+    class Meta:
+        model = Transport
+        fields = "__all__"
+        ref_name = "Transport"
+        mandatory_fields = {
+            "with": {
+                "mandatory": [
+                    "fuel_type_w",
+                    "fuel_used_per_year_w",
+                ]
+            },
+            "without": {
+                "mandatory": [
+                    "fuel_type_wo",
+                    "fuel_used_per_year_wo",
+                ]
+            },
+        }
+
+
+class ValueChainSerializer(BaseModuleSerializer):
+
+    value_chain_commodity = serializers.SerializerMethodField()
+    initial_product = serializers.SerializerMethodField()
+    final_product = serializers.SerializerMethodField()
 
     class Meta:
-        model = Note
-        fields = ["content", "module_type_id", "module_id"]
-        ref_name = "Note"
+        model = ValueChain
+        fields = "__all__"
+        ref_name = "ValueChain"
+
+    def get_value_chain_commodity(self, obj):
+        pass
+
+    def get_initial_product(self, obj):
+        pass
+
+    def get_final_product(self, obj):
+        pass
 
     def validate(self, data):
+        super().validate(data)
 
-        try:
-            module_type = ModuleType.objects.get(pk=data["module_type_id"])
-        except ModuleType.DoesNotExist:
-            raise serializers.ValidationError("Module type does not exist")
+        if not self.instance:
+            return data
 
-        ModuleClass = utils.get_model(module_type.class_name, suffix=None)
-        try:
-            module: Module | Submodule = ModuleClass.objects.get(pk=data["module_id"])
-        except ModuleClass.DoesNotExist:
-            raise serializers.ValidationError("Module does not exist")
+        storages = StorageSerializer(self.instance.storages.all(), many=True)
+        processings = ProcessingSerializer(self.instance.processings.all(), mnany=True)
+        packagings = PackagingSerializer(self.instance.packagings.all(), mnany=True)
+        transports = TransportSerializer(self.instance.transports.all(), mnany=True)
 
-        if module.note.exists():
-            raise serializers.ValidationError(f"Note already exists for this module. Use PUT with id {module.note.pk} to update")
+        if any(lambda x: not x.is_valid(), [storages, processings, packagings, transports]):
+            data["status"] = StatusType.objects.get(name="SUBMODULES_EMPTY")
 
-        return super().validate(data)
-
-    def save(self, **kwargs):
-        module_type = ModuleType.objects.get(pk=self.validated_data["module_type_id"])
-        ModuleClass = utils.get_model(module_type.class_name, suffix=None)
-        module: Module | Submodule = ModuleClass.objects.get(pk=self.validated_data["module_id"])
-
-        note = Note.objects.create(
-            author=self.context["request"].user,
-            content=self.validated_data["content"],
-            content_object=module,
-        )
-
-        return note
-
-
-class NoteSerializer(serializers.ModelSerializer):
-    module_type = serializers.SerializerMethodField(read_only=True)
-    module_id = serializers.SerializerMethodField(read_only=True)
-
-    def get_module_type(self, obj):
-        module_type = ModuleType.objects.get(class_name=obj.content_object.__class__.__name__)
-        return get_model_serializer(ModuleType)(module_type, many=False).data
-
-    def get_module_id(self, obj):
-        return obj.content_object.id
-
-    class Meta:
-        model = Note
-        fields = ["id", "content", "module_type", "module_id"]
-        ref_name = "Note"
-
-
-class ResetPasswordSerializer(serializers.Serializer):
-    password_old = serializers.CharField(required=True)
-    password_new = serializers.CharField(required=True)
-
-    def validate(self, data):
-        user: CustomUser = self.context["request"].user
-        psasword_old = data.get("password_old", None)
-        password_new = data.get("password_new", None)
-
-        if not user.check_password(data["password_old"]):
-            raise serializers.ValidationError("Old password is incorrect")
-
-        if password_new is None or psasword_old is None:
-            raise serializers.ValidationError("Old and new password are required")
-
-        return super().validate(data)
-
-
-class FieldDefinitionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = FieldDefinition
-        fields = ("field_name", "description")
-        ref_name = "FieldDefinition"
-
-
-class FieldMetadataSerializer(serializers.Serializer):
-    description = serializers.CharField()
-
-
-class FieldDefinitionResponseSerializer(serializers.Serializer):
-    field_name = FieldMetadataSerializer(many=True)
+        return data

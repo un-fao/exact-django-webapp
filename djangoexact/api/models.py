@@ -2739,25 +2739,99 @@ class Definition(models.Model):
     definitions = models.JSONField()
 
     def __str__(self):
-        return f"({self.pk}) {self.module_type}"
+        return f"({self.pk}) {self.model_name}"
 
 
-class OrganizationType(models.Model):
+class RefrigerantType(models.Model):
     name = models.CharField(max_length=255, unique=True)
 
     def __str__(self):
         return f"({self.pk}) {self.name}"
 
 
-class FieldDefinition(models.Model):
-    module_type = models.ForeignKey(ModuleType, on_delete=models.CASCADE, related_name="field_definitions")
-    field_name = models.CharField(max_length=255, verbose_name=_("Field Name"))
-    description = models.TextField(verbose_name=_("Field Description"))
-
-    class Meta:
-        unique_together = ("module_type", "field_name")
-        verbose_name = _("Field Definition")
-        verbose_name_plural = _("Field Definitions")
+class PackagingMaterialType(models.Model):
+    name = models.CharField(max_length=255, unique=True)
 
     def __str__(self):
-        return f"{self.module_type}.{self.field_name}"
+        return f"({self.pk}) {self.name}"
+
+
+class ValueChain(Module):
+    pass
+
+
+class Storage(Submodule):
+    parent = models.ForeignKey(ValueChain, null=True, blank=True, related_name="storages")
+
+    electricity_use_per_year_start = models.FloatField(null=True, blank=True)
+    electricity_use_per_year_w = models.FloatField(null=True, blank=True)
+    electricity_use_per_year_wo = models.FloatField(null=True, blank=True)
+    electricity_use_per_year_thread = models.ForeignKey(CommentThread, null=True, blank=True)
+
+    is_refrigerant_used = models.BooleanField(default=False)
+
+    refrigerant_type_start = models.ForeignKey(RefrigerantType, null=True, blank=True)
+    refrigerant_type_w = models.ForeignKey(RefrigerantType, null=True, blank=True)
+    refrigerant_type_wo = models.ForeignKey(RefrigerantType, null=True, blank=True)
+    refrigerant_type_thread = models.ForeignKey(CommentThread, null=True, blank=True)
+
+    total_refrigerant_leakage_start = models.FloatField(null=True, blank=True)
+    total_refrigerant_leakage_w = models.FloatField(null=True, blank=True)
+    total_refrigerant_leakage_wo = models.FloatField(null=True, blank=True)
+    total_refrigerant_leakage_thread = models.ForeignKey(CommentThread, null=True, blank=True)
+
+
+class Processing(Submodule):
+    parent = models.ForeignKey(ValueChain, null=True, blank=True, related_name="processings")
+
+    energy_type_start = models.ForeignKey(EnergySourceType, null=True, blank=True)
+    energy_type_w = models.ForeignKey(EnergySourceType, null=True, blank=True)
+    energy_type_wo = models.ForeignKey(EnergySourceType, null=True, blank=True)
+    energy_type_thread = models.ForeignKey(CommentThread, null=True, blank=True)
+
+    energy_use_per_year_start = models.FloatField(null=True, blank=True)
+    energy_use_per_year_w = models.FloatField(null=True, blank=True)
+    energy_use_per_year_wo = models.FloatField(null=True, blank=True)
+    energy_use_per_year_thread = models.ForeignKey(CommentThread, null=True, blank=True)
+
+    is_water_used = models.BooleanField(default=False)
+
+    water_use_per_year_start = models.FloatField(null=True, blank=True)
+    water_use_per_year_w = models.FloatField(null=True, blank=True)
+    water_use_per_year_wo = models.FloatField(null=True, blank=True)
+    water_use_per_year_thread = models.ForeignKey(CommentThread, null=True, blank=True)
+
+
+class Packaging(Submodule):
+    parent = models.ForeignKey(ValueChain, null=True, blank=True, related_name="packagings")
+
+    packaging_material_type_start = models.ForeignKey(PackagingMaterialType, null=True, blank=True)
+    packaging_material_type_w = models.ForeignKey(PackagingMaterialType, null=True, blank=True)
+    packaging_material_type_wo = models.ForeignKey(PackagingMaterialType, null=True, blank=True)
+    packaging_material_type_thread = models.ForeignKey(CommentThread, null=True, blank=True)
+
+    kf_of_packaging_material_start = models.FloatField(null=True, blank=True)
+    kf_of_packaging_material_w = models.FloatField(null=True, blank=True)
+    kf_of_packaging_material_wo = models.FloatField(null=True, blank=True)
+    kf_of_packaging_material_thread = models.ForeignKey(CommentThread, null=True, blank=True)
+
+    is_electric = models.BooleanField(default=False)
+
+    kwh_energy_per_year_start = models.FloatField(null=True, blank=True)
+    kwh_energy_per_year_w = models.FloatField(null=True, blank=True)
+    kwh_energy_per_year_wo = models.FloatField(null=True, blank=True)
+    kwh_energy_per_year_thread = models.ForeignKey(CommentThread, null=True, blank=True)
+
+
+class Transport(Submodule):
+    parent = models.ForeignKey(ValueChain, null=True, blank=True, related_name="transports")
+
+    fuel_type_start = models.ForeignKey(FuelType, null=True, blank=True)
+    fuel_type_w = models.ForeignKey(FuelType, null=True, blank=True)
+    fuel_type_wo = models.ForeignKey(FuelType, null=True, blank=True)
+    fuel_type_thread = models.ForeignKey(CommentThread, null=True, blank=True)
+
+    fuel_used_per_year_start = models.FloatField(null=True, blank=True)
+    fuel_used_per_year_w = models.FloatField(null=True, blank=True)
+    fuel_used_per_year_wo = models.FloatField(null=True, blank=True)
+    fueò_used_per_year_thread = models.ForeignKey(CommentThread, null=True, blank=True)
