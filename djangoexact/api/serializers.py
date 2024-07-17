@@ -78,6 +78,11 @@ from .models import (
     Waterbody,
     LandModule,
     InvitationStatusType,
+    ValueChain,
+    Storage,
+    Processing,
+    Packaging,
+    Transport,
 )
 
 
@@ -2622,3 +2627,149 @@ class ProjectInvitationWriteSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     group = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all(), required=True)
     project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(), required=True)
+
+
+class StorageSerializer(SubmoduleBaseSerializer):
+    class Meta:
+        model = Storage
+        fields = "__all__"
+        ref_name = "Storage"
+        mandatory_fields = {
+            "with": {
+                "mandatory": [
+                    "electricity_use_per_year_w",
+                ],
+                "conditional": {
+                    "is_refrigerant_used": [
+                        "regrigerant_type_w",
+                        "total_refrigerant_leakage_w",
+                    ]
+                },
+            },
+            "without": {
+                "mandatory": [
+                    "electricity_use_per_year_wo",
+                ],
+                "conditional": {
+                    "is_refrigerant_used": [
+                        "regrigerant_type_wo",
+                        "total_refrigerant_leakage_wo",
+                    ]
+                },
+            },
+        }
+
+
+class ProcessingSerializer(SubmoduleBaseSerializer):
+    class Meta:
+        model = Processing
+        fields = "__all__"
+        ref_name = "Processing"
+        mandatory_fields = {
+            "with": {
+                "mandatory": [
+                    "energy_type_w",
+                    "energy_use_per_year_w",
+                ],
+                "conditional": {
+                    "is_water_used": [
+                        "water_use_per_year_w",
+                    ]
+                },
+            },
+            "without": {
+                "mandatory": ["energy_type_wo", "energy_use_per_year_wo"],
+                "conditional": {
+                    "is_water_used": [
+                        "water_use_per_year_wo",
+                    ]
+                },
+            },
+        }
+
+
+class PackagingSerializer(SubmoduleBaseSerializer):
+    class Meta:
+        model = Packaging
+        fields = "__all__"
+        ref_name = "Packaging"
+        mandatory_fields = {
+            "with": {
+                "mandatory": [
+                    "packaging_material_w",
+                    "kg_of_packaging_material_w",
+                ],
+                "conditional": {
+                    "is_electric": ["kwh_energy_per_year_w"],
+                },
+            },
+            "without": {
+                "mandatory": [
+                    "packaging_material_wo",
+                    "kg_of_packaging_material_wo",
+                ],
+                "conditional": {
+                    "is_electric": [
+                        "kwh_energy_per_year_wo",
+                    ]
+                },
+            },
+        }
+
+
+class TransportSerializer(SubmoduleBaseSerializer):
+    class Meta:
+        model = Transport
+        fields = "__all__"
+        ref_name = "Transport"
+        mandatory_fields = {
+            "with": {
+                "mandatory": [
+                    "fuel_type_w",
+                    "fuel_used_per_year_w",
+                ]
+            },
+            "without": {
+                "mandatory": [
+                    "fuel_type_wo",
+                    "fuel_used_per_year_wo",
+                ]
+            },
+        }
+
+
+class ValueChainSerializer(BaseModuleSerializer):
+
+    value_chain_commodity = serializers.SerializerMethodField()
+    initial_product = serializers.SerializerMethodField()
+    final_product = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ValueChain
+        fields = "__all__"
+        ref_name = "ValueChain"
+
+    def get_value_chain_commodity(self, obj):
+        pass
+
+    def get_initial_product(self, obj):
+        pass
+
+    def get_final_product(self, obj):
+        pass
+
+    def validate(self, data):
+        super().validate(data)
+
+        if not self.instance:
+            return data
+
+        storages = StorageSerializer(self.instance.storages.all(), many=True)
+        processings = ProcessingSerializer(self.instance.processings.all(), mnany=True)
+        packagings = PackagingSerializer(self.instance.packagings.all(), mnany=True)
+        transports = TransportSerializer(self.instance.transports.all(), mnany=True)
+
+        if any(lambda x: not x.is_valid(), [storages, processings, packagings, transports]):
+            data["status"] = StatusType.objects.get(name="SUBMODULES_EMPTY")
+
+        return data
