@@ -40,29 +40,13 @@ class DefaultsFactory:
         Creates a Defaults object for a given module.
         """
 
-        match type(input):
-            case api.Grassland:
-                return GrasslandDefaults(input).get_defaults(calculate=calculate)
-            case api.AnnualCropping:
-                return AnnualCroppingDefaults(input).get_defaults(calculate=calculate)
-            case api.PerennialCropping:
-                return PerennialCroppingDefaults(input).get_defaults(calculate=calculate)
-            case api.FloodedRice:
-                return FloodedRiceDefaults(input).get_defaults(calculate=calculate)
-            case api.Electricity:
-                return ElectricityDefaults(input).get_defaults(calculate=calculate)
-            case api.Fuel:
-                return FuelDefaults(input).get_defaults(calculate=calculate)
-            case api.InputEntry:
-                return InputEntryDefaults(input).get_defaults(calculate=calculate)
-            case api.LargeFishery:
-                return LargeFisheryDefaults(input).get_defaults(calculate=calculate)
-            case api.SmallFishery:
-                return SmallFisheryDefaults(input).get_defaults(calculate=calculate)
-            case api.IrrigationSystem:
-                return IrrigationSystemDefaults(input).get_defaults(calculate=calculate)
-            case _:
-                raise NotImplementedError(f"Defaults for {input.__class__.__name__} have not been implemented.")
+        module_type = type(input).__name__
+        DefaultClass = globals().get(f"{module_type}Defaults", None)
+
+        if DefaultClass is not None:
+            return DefaultClass(input).get_defaults(calculate=calculate)
+        else:
+            raise NotImplementedError(f"Defaults for {module_type} have not been implemented.")
 
 
 class GrasslandDefaults(Defaults):
@@ -209,15 +193,15 @@ class ElectricityDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            ef_source_default = defaults.ef_source,
-            ef_t2_start_default = defaults.ef_country,
-            ef_t2_w_default = defaults.ef_country,
-            ef_t2_wo_default = defaults.ef_country,
-            transmission_loss_start_default = defaults.transmission_loss,
-            transmission_loss_w_default = defaults.transmission_loss,
-            transmission_loss_wo_default = defaults.transmission_loss,
+            ef_source_default=defaults.ef_source,
+            ef_t2_start_default=defaults.ef_country,
+            ef_t2_w_default=defaults.ef_country,
+            ef_t2_wo_default=defaults.ef_country,
+            transmission_loss_start_default=defaults.transmission_loss,
+            transmission_loss_w_default=defaults.transmission_loss,
+            transmission_loss_wo_default=defaults.transmission_loss,
         )
-    
+
 
 class FuelDefaults(Defaults):
     def get_defaults(self, calculate=False) -> dict:
@@ -226,10 +210,8 @@ class FuelDefaults(Defaults):
         defaults = calcs.FuelCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
-        return SimpleNamespace(
-            ef_t2_default = defaults.ef_fuel_t_co2_eq
-        )
-    
+        return SimpleNamespace(ef_t2_default=defaults.ef_fuel_t_co2_eq)
+
 
 class InputEntryDefaults(Defaults):
     def get_defaults(self, calculate=False) -> dict:
@@ -238,12 +220,8 @@ class InputEntryDefaults(Defaults):
         defaults = calcs.InputEntryCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
-        return SimpleNamespace(
-            co2_emissions_t2_default = defaults.ef.co2_value if defaults.ef else None,
-            n2o_emissions_t2_default = defaults.ef.n2o_value if defaults.ef else None,
-            co2_e_emissions_t2_default = defaults.ef.co2_eq_value if defaults.ef else None
-        )
-    
+        return SimpleNamespace(co2_emissions_t2_default=defaults.ef.co2_value if defaults.ef else None, n2o_emissions_t2_default=defaults.ef.n2o_value if defaults.ef else None, co2_e_emissions_t2_default=defaults.ef.co2_eq_value if defaults.ef else None)
+
 
 class LargeFisheryDefaults(Defaults):
     def get_defaults(self, calculate=False) -> dict:
@@ -253,28 +231,23 @@ class LargeFisheryDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            energy_emission_factor_t2_start_default = defaults.ef_diesel_default,
-            energy_emission_factor_t2_w_default = defaults.ef_diesel_default,
-            energy_emission_factor_t2_wo_default = defaults.ef_diesel_default,
-
-            refrigerant_lost_per_tonne_t2_start_default = defaults.lost_refrigerant_default,
-            refrigerant_lost_per_tonne_t2_w_default = defaults.lost_refrigerant_default,
-            refrigerant_lost_per_tonne_t2_wo_default = defaults.lost_refrigerant_default,
-
-            refrigerant_gwp_t2_start_default = self.input.refrigerant_gwp,
-            refrigerant_gwp_t2_w_default = self.input.refrigerant_gwp,
-            refrigerant_gwp_t2_wo_default = self.input.refrigerant_gwp,
-
-            tonnes_of_ice_t2_start_default = defaults.tonnes_ice_default,
-            tonnes_of_ice_t2_w_default = defaults.tonnes_ice_default,
-            tonnes_of_ice_t2_wo_default = defaults.tonnes_ice_default,
-
-            inshore_ice_production_kwh_per_tonne_t2_start_default = defaults.kw_tonnes,
-            inshore_ice_production_kwh_per_tonne_t2_w_default = defaults.kw_tonnes,
-            inshore_ice_production_kwh_per_tonne_t2_wo_default = defaults.kw_tonnes,
-
+            energy_emission_factor_t2_start_default=defaults.ef_diesel_default,
+            energy_emission_factor_t2_w_default=defaults.ef_diesel_default,
+            energy_emission_factor_t2_wo_default=defaults.ef_diesel_default,
+            refrigerant_lost_per_tonne_t2_start_default=defaults.lost_refrigerant_default,
+            refrigerant_lost_per_tonne_t2_w_default=defaults.lost_refrigerant_default,
+            refrigerant_lost_per_tonne_t2_wo_default=defaults.lost_refrigerant_default,
+            refrigerant_gwp_t2_start_default=self.input.refrigerant_gwp,
+            refrigerant_gwp_t2_w_default=self.input.refrigerant_gwp,
+            refrigerant_gwp_t2_wo_default=self.input.refrigerant_gwp,
+            tonnes_of_ice_t2_start_default=defaults.tonnes_ice_default,
+            tonnes_of_ice_t2_w_default=defaults.tonnes_ice_default,
+            tonnes_of_ice_t2_wo_default=defaults.tonnes_ice_default,
+            inshore_ice_production_kwh_per_tonne_t2_start_default=defaults.kw_tonnes,
+            inshore_ice_production_kwh_per_tonne_t2_w_default=defaults.kw_tonnes,
+            inshore_ice_production_kwh_per_tonne_t2_wo_default=defaults.kw_tonnes,
         )
-    
+
 
 class SmallFisheryDefaults(Defaults):
     def get_defaults(self, calculate=False) -> dict:
@@ -284,27 +257,23 @@ class SmallFisheryDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            energy_emission_factor_t2_start_default = defaults.ef_diesel_default,
-            energy_emission_factor_t2_w_default = defaults.ef_diesel_default,
-            energy_emission_factor_t2_wo_default = defaults.ef_diesel_default,
-
-            refrigerant_lost_per_tonne_t2_start_default = defaults.lost_refrigerant_default,
-            refrigerant_lost_per_tonne_t2_w_default = defaults.lost_refrigerant_default,
-            refrigerant_lost_per_tonne_t2_wo_default = defaults.lost_refrigerant_default,
-
-            refrigerant_gwp_t2_start_default = self.input.refrigerant_gwp,
-            refrigerant_gwp_t2_w_default = self.input.refrigerant_gwp,
-            refrigerant_gwp_t2_wo_default = self.input.refrigerant_gwp,
-
-            tonnes_of_ice_t2_start_default = defaults.tonnes_ice_default,
-            tonnes_of_ice_t2_w_default = defaults.tonnes_ice_default,
-            tonnes_of_ice_t2_wo_default = defaults.tonnes_ice_default,
-
-            inshore_ice_production_kwh_per_tonne_t2_start_default = defaults.kw_tonnes,
-            inshore_ice_production_kwh_per_tonne_t2_w_default = defaults.kw_tonnes,
-            inshore_ice_production_kwh_per_tonne_t2_wo_default = defaults.kw_tonnes,
+            energy_emission_factor_t2_start_default=defaults.ef_diesel_default,
+            energy_emission_factor_t2_w_default=defaults.ef_diesel_default,
+            energy_emission_factor_t2_wo_default=defaults.ef_diesel_default,
+            refrigerant_lost_per_tonne_t2_start_default=defaults.lost_refrigerant_default,
+            refrigerant_lost_per_tonne_t2_w_default=defaults.lost_refrigerant_default,
+            refrigerant_lost_per_tonne_t2_wo_default=defaults.lost_refrigerant_default,
+            refrigerant_gwp_t2_start_default=self.input.refrigerant_gwp,
+            refrigerant_gwp_t2_w_default=self.input.refrigerant_gwp,
+            refrigerant_gwp_t2_wo_default=self.input.refrigerant_gwp,
+            tonnes_of_ice_t2_start_default=defaults.tonnes_ice_default,
+            tonnes_of_ice_t2_w_default=defaults.tonnes_ice_default,
+            tonnes_of_ice_t2_wo_default=defaults.tonnes_ice_default,
+            inshore_ice_production_kwh_per_tonne_t2_start_default=defaults.kw_tonnes,
+            inshore_ice_production_kwh_per_tonne_t2_w_default=defaults.kw_tonnes,
+            inshore_ice_production_kwh_per_tonne_t2_wo_default=defaults.kw_tonnes,
         )
-    
+
 
 class IrrigationSystemDefaults(Defaults):
     def get_defaults(self, calculate=False) -> dict:
@@ -314,7 +283,7 @@ class IrrigationSystemDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            ef_t2_start_default = defaults.ef.value,
-            ef_t2_w_default = defaults.ef.value,
-            ef_t2_wo_default = defaults.ef.value,
+            ef_t2_start_default=defaults.ef.value,
+            ef_t2_w_default=defaults.ef.value,
+            ef_t2_wo_default=defaults.ef.value,
         )
