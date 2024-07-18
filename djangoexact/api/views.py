@@ -1142,11 +1142,11 @@ def generic_module_viewset(model: Model):
             module_type = ModuleType.objects.get(class_name=model.__name__)
 
             if module_type.is_submodule:
-                module: Submodule = get_object_or_404(model, pk=pk, parent__activity__project__user=self.request.user)
+                module: Submodule = get_object_or_404(model, pk=pk)
                 activity = module.parent.activity
 
             else:
-                module: Module = get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
+                module: Module = get_object_or_404(model, pk=pk)
                 activity = module.activity
 
             if not module.is_ready():
