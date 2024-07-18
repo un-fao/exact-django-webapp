@@ -307,7 +307,7 @@ def getattr_or_default(obj, key, default=0):
     return _attr if _attr else default
 
 
-def get_or_raise(model, filter_criteria, error_message, method="get"):
+def get_or_raise(model, filter_criteria, error_message, method="get") -> models.QuerySet | models.Model:
     """
     Retrieves a single instance of the given model that matches the filter criteria,
     or raises an exception with the specified error message if no instance is found.

@@ -185,6 +185,21 @@ class FloodedRiceDefaults(Defaults):
         )
 
 
+class LivestockDefaults(Defaults):
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.Livestock
+
+        defaults = calcs.LivestockCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace(
+            enteric_fermentation_t2_start_default=defaults.enteric_ch4_start.value,
+            enteric_fermentation_t2_w_default=defaults.enteric_ch4_w.value,
+            enteric_fermentation_t2_wo_default=defaults.enteric_ch4_wo.value,
+            # TODO: Wait for Lorenzo to communicate which fields to get from math model
+        )
+
+
 class ElectricityDefaults(Defaults):
     def get_defaults(self, calculate=False) -> dict:
         self.input: api.Electricity
