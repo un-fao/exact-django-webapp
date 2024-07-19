@@ -507,7 +507,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return utils.ErrorResponse(f"User with email {email} does not exist", status=http_status.HTTP_400_BAD_REQUEST)
 
         group = serializer.validated_data["group"]
-        invitation, created = ProjectInvitation.objects.get_or_create(project=project, user=user, group=group, status=InvitationStatusType.objects.get(name="pending"))
+        invitation, created = ProjectInvitation.objects.get_or_create(project=project, user=user, group=group, status=InvitationStatusType.objects.get(name="accepted"))  # TODO: Change status to pending when SMTP is implemented
 
         if not created and invitation.group == group:
             logging.warning(f"Invitation for {user.email} already sent with id {invitation.id}")
