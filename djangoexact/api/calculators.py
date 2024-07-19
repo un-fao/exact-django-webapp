@@ -4756,8 +4756,8 @@ class CoastalWetlandCalculator(BaseCalculator):
             raise ValueError(f"Could not find Deadwood for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}")
 
         try:
-            soil_1m = ipcc.DefaultSoilCarbonStock1Meter.objects.get(**cm, land_use_type=module.land_use_type, soil_type__name=soil_type_name)
-        except ipcc.DefaultSoilCarbonStock1Meter.DoesNotExist:
+            soil_1m = ipcc.DefaultSoilCarbonStock.objects.get(**cm, land_use_type=module.land_use_type, soil_type__name=soil_type_name)
+        except ipcc.DefaultSoilCarbonStock.DoesNotExist:
             raise ValueError(f"Could not find Soil 1m for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}, {soil_type_name}")
 
         try:
