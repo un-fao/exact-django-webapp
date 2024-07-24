@@ -288,7 +288,7 @@ def ch4_head_calculation_general(tam: float, vser: float, ef_prp: float, percent
 
         ch4_head = sum(ch4_system) + ch4_prp
 
-        return ch4_head
+        return ch4_head, ch4_system, ch4_prp
 
     except:
         traceback.print_exc()
