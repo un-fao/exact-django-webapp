@@ -46,7 +46,7 @@ six==1.16.0
 sqlparse==0.4.4
 tzdata==2023.3
 uritemplate==4.1.1
-urllib3==2.0.2
+urllib3==2.0
 django-simple-history==3.4.0
 django-archive==0.2.0
 matplotlib==3.8.2
