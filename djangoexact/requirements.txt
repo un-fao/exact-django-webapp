@@ -54,3 +54,4 @@ matplotlib==3.8.2
 Pyrebase4==4.8.0
 firebase-admin==6.5.0
 Pyrebase4==4.8.0
+requests==2.31.0
