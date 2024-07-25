@@ -421,6 +421,9 @@ def get_changes(records: list[HistoricalRecords]):
             changes.append(ChangeLog(record.history_date, record.history_user.email, ChangeReasons.CREATE.value, []))
             continue
 
+        if record.next_record is None:
+            continue
+
         delta = record.diff_against(record.prev_record)
         change_log: ChangeLog = ChangeLog(record.history_date, record.history_user.email, record.history_change_reason, [])
         for change in delta.changes:

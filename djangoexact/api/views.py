@@ -1149,6 +1149,10 @@ def generic_module_viewset(model: Model):
                 module: Module = get_object_or_404(model, pk=pk)
                 activity = module.activity
 
+            serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data={}, instance=module)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+
             if not utils.has_project_permission("can_view_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to view this module in the project")
                 return utils.ErrorResponse("Selected user does not have permission to view this module in the project", status=http_status.HTTP_403_FORBIDDEN)
@@ -1170,7 +1174,7 @@ def generic_module_viewset(model: Model):
 
             activity: Activity = module.parent.activity if module_type.is_submodule else module.activity
 
-            if not utils.has_project_permission("can_view_modules", self.request.user, activity):
+            if not utils.has_project_permission("can_view_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to view this module in the project")
                 return utils.ErrorResponse("Selected user does not have permission to view this module in the project", status=http_status.HTTP_403_FORBIDDEN)
 
