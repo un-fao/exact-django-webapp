@@ -721,23 +721,35 @@ class SubmoduleBaseSerializer(BaseGenericModuleSerializer):
 
 class NoScenarioBaseSerializer(BaseGenericModuleSerializer):
     def is_ready(self, data, mandatory_fields, instance=None):
-        combined_data = {**{field.name: getattr(instance, field.name) for field in instance._meta.fields}, **data} if instance else data.copy()
+        combined_data = self.merge_instance_data(data, instance=instance)
 
-        errors = []
+        model_instance = self.Meta.model(**combined_data)
+        errors = {}
 
-        # Validate mandatory fields
-        mandatory_fields = mandatory_fields.get("mandatory", [])
-        missing_mandatory_fields = [field for field in mandatory_fields if not combined_data.get(field)]
-        if missing_mandatory_fields:
-            errors.append(f"Missing mandatory fields: {', '.join(missing_mandatory_fields)}")
+        # If the module is a submodule, the parent module must be retrieved for the scenario checks
+        module_type = ModuleType.objects.get(class_name=self.Meta.ref_name)
 
-        # Validate conditional fields
-        conditional_fields = mandatory_fields.get("conditional", {})
-        for field, dependent_fields in conditional_fields.items():
-            if combined_data.get(field):
-                missing_dependent_fields = [dep_field for dep_field in dependent_fields if not combined_data.get(dep_field)]
-                if missing_dependent_fields:
-                    errors.append(f"Since '{field}' is filled, the following fields are also mandatory: {', '.join(missing_dependent_fields)}")
+        if module_type.is_submodule:
+            model_instance = model_instance.parent
+
+        for scenario, config in mandatory_fields.items():
+            scenario_check_method = f"is_{scenario}"
+            if hasattr(model_instance, scenario_check_method) and getattr(model_instance, scenario_check_method)():
+                # Validate mandatory fields
+                mandatory_fields = config.get("mandatory", [])
+                missing_mandatory_fields = [field for field in mandatory_fields if not combined_data.get(field)]
+                if missing_mandatory_fields:
+                    errors[scenario] = f"Missing mandatory fields: {', '.join(missing_mandatory_fields)}"
+
+                # Validate conditional fields
+                conditional_fields = config.get("conditional", {})
+                for field, dependent_fields in conditional_fields.items():
+                    if combined_data.get(field):
+                        missing_dependent_fields = [dep_field for dep_field in dependent_fields if not combined_data.get(dep_field)]
+                        if missing_dependent_fields:
+                            if scenario not in errors:
+                                errors[scenario] = []
+                            errors[scenario].append(f"Since '{field}' is filled, the following fields are also mandatory: {', '.join(missing_dependent_fields)}")
 
         return not errors, errors
 
@@ -1866,7 +1878,26 @@ class FuelReadSerializer(BaseGenericModuleSerializer):
         model = Fuel
         fields = "__all__"
         ref_name = "Fuel"
-        mandatory_fields = {}
+        mandatory_fields = {
+            "start": {
+                "mandatory": [
+                    "fuel_type",
+                    "fuel_consumption_start",
+                ],
+            },
+            "with": {
+                "mandatory": [
+                    "fuel_type",
+                    "fuel_consumption_w",
+                ],
+            },
+            "without": {
+                "mandatory": [
+                    "fuel_type",
+                    "fuel_consumption_wo",
+                ],
+            },
+        }
 
 
 class ElectricityWriteSerializer(NoScenarioSubmoduleSerializer):
@@ -1874,7 +1905,26 @@ class ElectricityWriteSerializer(NoScenarioSubmoduleSerializer):
         model = Electricity
         fields = "__all__"
         ref_name = "Electricity"
-        mandatory_fields = {}
+        mandatory_fields = {
+            "start": {
+                "mandatory": [
+                    "mwh_start",
+                    "transmission_loss_start",
+                ],
+            },
+            "with": {
+                "mandatory": [
+                    "mwh_w",
+                    "transmission_loss_w",
+                ],
+            },
+            "without": {
+                "mandatory": [
+                    "mwh_wo",
+                    "transmission_loss_wo",
+                ],
+            },
+        }
 
     def validate(self, data):
         super().validate(data)
@@ -1888,12 +1938,31 @@ class ElectricityWriteSerializer(NoScenarioSubmoduleSerializer):
         return data
 
 
-class ElectricityReadSerializer(BaseGenericModuleSerializer):
+class ElectricityReadSerializer(NoScenarioSubmoduleSerializer):
     class Meta:
         model = Electricity
         fields = "__all__"
         ref_name = "Electricity"
-        mandatory_fields = {}
+        mandatory_fields = {
+            "start": {
+                "mandatory": [
+                    "mwh_start",
+                    "transmission_loss_start",
+                ],
+            },
+            "with": {
+                "mandatory": [
+                    "mwh_w",
+                    "transmission_loss_w",
+                ],
+            },
+            "without": {
+                "mandatory": [
+                    "mwh_wo",
+                    "transmission_loss_wo",
+                ],
+            },
+        }
 
 
 # Livestock
