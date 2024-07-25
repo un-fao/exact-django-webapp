@@ -127,6 +127,7 @@ class LoginExistingUserView(APIView):
                 "refresh_token": user["refreshToken"],
                 "expires_in": user["expiresIn"],
                 "kind": user["kind"],
+                "user": UserSerializer(existing_user).data,
             }
 
             return Response(extra_data, status=status.HTTP_200_OK)
