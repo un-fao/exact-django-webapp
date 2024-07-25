@@ -10,7 +10,7 @@ from rest_framework import authentication, exceptions
 from djangoexact.settings import auth
 
 try:
-    f = json.loads(os.getenv("FIREBASE_SERVICE_ACCOUNT"))
+    f = json.loads(base64.b64decode(os.getenv("FIREBASE_SERVICE_ACCOUNT")).decode("utf-8"))
     FIREBASE_CONFIG = {
         "type": "service_account",
         "project_id": os.getenv("FIREBASE_PROJECT_ID"),
