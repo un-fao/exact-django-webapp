@@ -330,6 +330,7 @@ class ActivitySerializer(serializers.ModelSerializer):
     change_rate = get_model_serializer(ChangeRate)(many=False, read_only=True)
     status = get_model_serializer(StatusType)(many=False, read_only=True)
     climate_t2 = get_model_serializer(Climate)(read_only=True)
+    moisture_t2 = get_model_serializer(Moisture)(read_only=True)
     soil_type_t2 = get_model_serializer(SoilType)(read_only=True)
     module_types = get_model_serializer(ModuleType)(many=True, read_only=True)
     modules = serializers.JSONField(read_only=True)
