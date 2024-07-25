@@ -1096,9 +1096,8 @@ def generic_module_viewset(model: Model):
                 logging.error("Selected user does not have permission to view this module in the project")
                 return utils.ErrorResponse("Selected user does not have permission to view this module in the project", status=http_status.HTTP_403_FORBIDDEN)
 
-            serializer = get_module_serializer(model)(data={}, instance=module)
-            if not serializer.is_valid():
-                return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
+            serializer = get_module_serializer(model)(data={"activity": activity.pk}, instance=module)
+            serializer.is_valid(raise_exception=True)
             module = serializer.save()
 
             if module_type.class_name == LandUseChange.__name__:
