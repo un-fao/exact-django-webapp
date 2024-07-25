@@ -78,6 +78,7 @@ from .models import (
     Waterbody,
     LandModule,
     InvitationStatusType,
+    ChangeRate,
 )
 
 
@@ -326,6 +327,7 @@ class ActivitySerializer(serializers.ModelSerializer):
     name = serializers.CharField(max_length=255, read_only=True)
     project = ReadProjectSerializer(many=False, read_only=True)
     user = UserReadSerializer(many=False, read_only=True)
+    change_rate = get_model_serializer(ChangeRate)(many=False, read_only=True)
     status = get_model_serializer(StatusType)(many=False, read_only=True)
     climate_t2 = get_model_serializer(Climate)(read_only=True)
     soil_type_t2 = get_model_serializer(SoilType)(read_only=True)
@@ -426,6 +428,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
     module_types = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
     area = serializers.FloatField(required=False, min_value=0)
     module_types = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
+    change_rate = serializers.PrimaryKeyRelatedField(queryset=ChangeRate.objects.all(), many=False, required=False)
 
     def validate(self, data):
         luc_module = ModuleType.objects.get(name="Land Use Change")
@@ -453,10 +456,14 @@ class ActivityBuilderSerializer(serializers.Serializer):
         return data
 
     def create_activity(self):
+
+        default_change_rate = ChangeRate.objects.get(name="D")
+
         return Activity.objects.create(
             name=self.validated_data["name"],
             project=self.validated_data["project"],
             cost=self.validated_data["cost"],
+            change_rate=self.validated_data.get("change_rate", default_change_rate),
             climate_t2=self.validated_data.get("climate"),
             moisture_t2=self.validated_data.get("moisture"),
             duration_t2=self.validated_data.get("duration"),
