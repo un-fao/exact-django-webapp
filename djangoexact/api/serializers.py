@@ -1816,7 +1816,7 @@ class IrrigationPhaseReadSerializer(BaseGenericModuleSerializer):
         mandatory_fields = {}
 
 
-class EnergyWriteSerializer(BaseModuleSerializer):
+class EnergyWriteSerializer(ScenarioModuleSerializer):
     class Meta:
         model = Energy
         fields = "__all__"
@@ -1824,12 +1824,26 @@ class EnergyWriteSerializer(BaseModuleSerializer):
         mandatory_fields = {}
 
 
-class EnergyReadSerializer(BaseModuleSerializer):
+class EnergyReadSerializer(ScenarioModuleSerializer):
     class Meta:
         model = Energy
         fields = "__all__"
         ref_name = "Energy"
         mandatory_fields = {}
+
+    def validate(self, data):
+        super().validate(data)
+
+        electricities = self.instance.electricities.all()
+        fuels = self.instance.fuels.all()
+
+        if any([electricity.status.name == "EMPTY" for electricity in electricities]):
+            raise serializers.ValidationError("Electricity modules are not ready for calculations")
+
+        if any([fuel.status.name == "EMPTY" for fuel in fuels]):
+            raise serializers.ValidationError("Fuel modules are not ready for calculations")
+
+        return data
 
 
 # Fuel
