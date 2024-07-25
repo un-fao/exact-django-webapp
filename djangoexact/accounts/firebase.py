@@ -10,6 +10,7 @@ from rest_framework import authentication, exceptions
 from djangoexact.settings import auth
 
 try:
+    f = json.loads(os.getenv("FIREBASE_SERVICE_ACCOUNT"))
     FIREBASE_CONFIG = {
         "type": "service_account",
         "project_id": os.getenv("FIREBASE_PROJECT_ID"),
@@ -24,7 +25,7 @@ try:
         "universe_domain": "googleapis.com",
     }
 
-    cred = credentials.Certificate(FIREBASE_CONFIG)
+    cred = credentials.Certificate(f)
     auth = firebase_admin.initialize_app(cred)
 except Exception as e:
     raise Exception(f"Firebase config not found: {e}") from e
