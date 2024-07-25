@@ -507,7 +507,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return utils.ErrorResponse(f"User with email {email} does not exist", status=http_status.HTTP_400_BAD_REQUEST)
 
         group = serializer.validated_data["group"]
-        invitation, created = ProjectInvitation.objects.get_or_create(project=project, user=user, group=group, status=InvitationStatusType.objects.get(name="pending"))
+        invitation, created = ProjectInvitation.objects.get_or_create(project=project, user=user, group=group, status=InvitationStatusType.objects.get(name="accepted"))  # TODO: Change status to pending when SMTP is implemented
 
         if not created and invitation.group == group:
             logging.warning(f"Invitation for {user.email} already sent with id {invitation.id}")
@@ -1142,19 +1142,23 @@ def generic_module_viewset(model: Model):
             module_type = ModuleType.objects.get(class_name=model.__name__)
 
             if module_type.is_submodule:
-                module: Submodule = get_object_or_404(model, pk=pk, parent__activity__project__user=self.request.user)
+                module: Submodule = get_object_or_404(model, pk=pk)
                 activity = module.parent.activity
 
             else:
-                module: Module = get_object_or_404(model, pk=pk, activity__project__user=self.request.user)
+                module: Module = get_object_or_404(model, pk=pk)
                 activity = module.activity
 
-            if not module.is_ready():
-                return utils.ErrorResponse("Module is not ready. Cannot calculate defaults.")
+            serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data={}, instance=module)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
 
             if not utils.has_project_permission("can_view_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to view this module in the project")
                 return utils.ErrorResponse("Selected user does not have permission to view this module in the project", status=http_status.HTTP_403_FORBIDDEN)
+
+            if not module.is_ready():
+                return utils.ErrorResponse("Module is not ready. Cannot calculate defaults.")
 
             try:
                 defaults: SimpleNamespace = DefaultsFactory.get_defaults(module, calculate=True)
@@ -1170,7 +1174,7 @@ def generic_module_viewset(model: Model):
 
             activity: Activity = module.parent.activity if module_type.is_submodule else module.activity
 
-            if not utils.has_project_permission("can_view_modules", self.request.user, activity):
+            if not utils.has_project_permission("can_view_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to view this module in the project")
                 return utils.ErrorResponse("Selected user does not have permission to view this module in the project", status=http_status.HTTP_403_FORBIDDEN)
 
