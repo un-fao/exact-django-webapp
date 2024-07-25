@@ -78,6 +78,7 @@ from .models import (
     Waterbody,
     LandModule,
     InvitationStatusType,
+    ChangeRate,
 )
 
 
@@ -326,8 +327,10 @@ class ActivitySerializer(serializers.ModelSerializer):
     name = serializers.CharField(max_length=255, read_only=True)
     project = ReadProjectSerializer(many=False, read_only=True)
     user = UserReadSerializer(many=False, read_only=True)
+    change_rate = get_model_serializer(ChangeRate)(many=False, read_only=True)
     status = get_model_serializer(StatusType)(many=False, read_only=True)
     climate_t2 = get_model_serializer(Climate)(read_only=True)
+    moisture_t2 = get_model_serializer(Moisture)(read_only=True)
     soil_type_t2 = get_model_serializer(SoilType)(read_only=True)
     module_types = get_model_serializer(ModuleType)(many=True, read_only=True)
     modules = serializers.JSONField(read_only=True)
@@ -426,6 +429,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
     module_types = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
     area = serializers.FloatField(required=False, min_value=0)
     module_types = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
+    change_rate = serializers.PrimaryKeyRelatedField(queryset=ChangeRate.objects.all(), many=False, required=False)
 
     def validate(self, data):
         luc_module = ModuleType.objects.get(name="Land Use Change")
@@ -453,10 +457,14 @@ class ActivityBuilderSerializer(serializers.Serializer):
         return data
 
     def create_activity(self):
+
+        default_change_rate = ChangeRate.objects.get(name="D")
+
         return Activity.objects.create(
             name=self.validated_data["name"],
             project=self.validated_data["project"],
             cost=self.validated_data["cost"],
+            change_rate=self.validated_data.get("change_rate", default_change_rate),
             climate_t2=self.validated_data.get("climate"),
             moisture_t2=self.validated_data.get("moisture"),
             duration_t2=self.validated_data.get("duration"),
@@ -713,23 +721,35 @@ class SubmoduleBaseSerializer(BaseGenericModuleSerializer):
 
 class NoScenarioBaseSerializer(BaseGenericModuleSerializer):
     def is_ready(self, data, mandatory_fields, instance=None):
-        combined_data = {**{field.name: getattr(instance, field.name) for field in instance._meta.fields}, **data} if instance else data.copy()
+        combined_data = self.merge_instance_data(data, instance=instance)
 
-        errors = []
+        model_instance = self.Meta.model(**combined_data)
+        errors = {}
 
-        # Validate mandatory fields
-        mandatory_fields = mandatory_fields.get("mandatory", [])
-        missing_mandatory_fields = [field for field in mandatory_fields if not combined_data.get(field)]
-        if missing_mandatory_fields:
-            errors.append(f"Missing mandatory fields: {', '.join(missing_mandatory_fields)}")
+        # If the module is a submodule, the parent module must be retrieved for the scenario checks
+        module_type = ModuleType.objects.get(class_name=self.Meta.ref_name)
 
-        # Validate conditional fields
-        conditional_fields = mandatory_fields.get("conditional", {})
-        for field, dependent_fields in conditional_fields.items():
-            if combined_data.get(field):
-                missing_dependent_fields = [dep_field for dep_field in dependent_fields if not combined_data.get(dep_field)]
-                if missing_dependent_fields:
-                    errors.append(f"Since '{field}' is filled, the following fields are also mandatory: {', '.join(missing_dependent_fields)}")
+        if module_type.is_submodule:
+            model_instance = model_instance.parent
+
+        for scenario, config in mandatory_fields.items():
+            scenario_check_method = f"is_{scenario}"
+            if hasattr(model_instance, scenario_check_method) and getattr(model_instance, scenario_check_method)():
+                # Validate mandatory fields
+                mandatory_fields = config.get("mandatory", [])
+                missing_mandatory_fields = [field for field in mandatory_fields if not combined_data.get(field)]
+                if missing_mandatory_fields:
+                    errors[scenario] = f"Missing mandatory fields: {', '.join(missing_mandatory_fields)}"
+
+                # Validate conditional fields
+                conditional_fields = config.get("conditional", {})
+                for field, dependent_fields in conditional_fields.items():
+                    if combined_data.get(field):
+                        missing_dependent_fields = [dep_field for dep_field in dependent_fields if not combined_data.get(dep_field)]
+                        if missing_dependent_fields:
+                            if scenario not in errors:
+                                errors[scenario] = []
+                            errors[scenario].append(f"Since '{field}' is filled, the following fields are also mandatory: {', '.join(missing_dependent_fields)}")
 
         return not errors, errors
 
@@ -1858,7 +1878,26 @@ class FuelReadSerializer(BaseGenericModuleSerializer):
         model = Fuel
         fields = "__all__"
         ref_name = "Fuel"
-        mandatory_fields = {}
+        mandatory_fields = {
+            "start": {
+                "mandatory": [
+                    "fuel_type",
+                    "fuel_consumption_start",
+                ],
+            },
+            "with": {
+                "mandatory": [
+                    "fuel_type",
+                    "fuel_consumption_w",
+                ],
+            },
+            "without": {
+                "mandatory": [
+                    "fuel_type",
+                    "fuel_consumption_wo",
+                ],
+            },
+        }
 
 
 class ElectricityWriteSerializer(NoScenarioSubmoduleSerializer):
@@ -1866,7 +1905,26 @@ class ElectricityWriteSerializer(NoScenarioSubmoduleSerializer):
         model = Electricity
         fields = "__all__"
         ref_name = "Electricity"
-        mandatory_fields = {}
+        mandatory_fields = {
+            "start": {
+                "mandatory": [
+                    "mwh_start",
+                    "transmission_loss_start",
+                ],
+            },
+            "with": {
+                "mandatory": [
+                    "mwh_w",
+                    "transmission_loss_w",
+                ],
+            },
+            "without": {
+                "mandatory": [
+                    "mwh_wo",
+                    "transmission_loss_wo",
+                ],
+            },
+        }
 
     def validate(self, data):
         super().validate(data)
@@ -1880,12 +1938,31 @@ class ElectricityWriteSerializer(NoScenarioSubmoduleSerializer):
         return data
 
 
-class ElectricityReadSerializer(BaseGenericModuleSerializer):
+class ElectricityReadSerializer(NoScenarioSubmoduleSerializer):
     class Meta:
         model = Electricity
         fields = "__all__"
         ref_name = "Electricity"
-        mandatory_fields = {}
+        mandatory_fields = {
+            "start": {
+                "mandatory": [
+                    "mwh_start",
+                    "transmission_loss_start",
+                ],
+            },
+            "with": {
+                "mandatory": [
+                    "mwh_w",
+                    "transmission_loss_w",
+                ],
+            },
+            "without": {
+                "mandatory": [
+                    "mwh_wo",
+                    "transmission_loss_wo",
+                ],
+            },
+        }
 
 
 # Livestock
@@ -1899,7 +1976,7 @@ class LivestockWriteSerializer(LandModuleWriteSerializer):
         mandatory_fields = {
             "start": {
                 "mandatory": [
-                    "livestock_category_type_start",
+                    "livestock_category_type",
                     "livestock_production_type_start",
                     "heads_number_start",
                 ],
@@ -1911,7 +1988,7 @@ class LivestockWriteSerializer(LandModuleWriteSerializer):
             },
             "with": {
                 "mandatory": [
-                    "livestock_category_type_w",
+                    "livestock_category_type",
                     "livestock_production_type_w",
                     "heads_number_w",
                 ],
@@ -1923,7 +2000,7 @@ class LivestockWriteSerializer(LandModuleWriteSerializer):
             },
             "without": {
                 "mandatory": [
-                    "livestock_category_type_wo",
+                    "livestock_category_type",
                     "livestock_production_type_wo",
                     "heads_number_wo",
                 ],
@@ -1941,7 +2018,44 @@ class LivestockReadSerializer(LandModuleReadSerializer):
         model = Livestock
         fields = "__all__"
         ref_name = "Livestock"
-        mandatory_fields = {}
+        mandatory_fields = {
+            "start": {
+                "mandatory": [
+                    "livestock_category_type",
+                    "livestock_production_type_start",
+                    "heads_number_start",
+                ],
+                "conditional": {
+                    "complementary_manure_management_type_start": [
+                        "percentage_heads_on_pasture_start",
+                    ],
+                },
+            },
+            "with": {
+                "mandatory": [
+                    "livestock_category_type",
+                    "livestock_production_type_w",
+                    "heads_number_w",
+                ],
+                "conditional": {
+                    "complementary_manure_management_type_w": [
+                        "percentage_heads_on_pasture_w",
+                    ],
+                },
+            },
+            "without": {
+                "mandatory": [
+                    "livestock_category_type",
+                    "livestock_production_type_wo",
+                    "heads_number_wo",
+                ],
+                "conditional": {
+                    "complementary_manure_management_type_wo": [
+                        "percentage_heads_on_pasture_wo",
+                    ],
+                },
+            },
+        }
 
 
 # Aquaculture

@@ -7,13 +7,13 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0076_remove_moduletype_is_fixed_assessment'),
+        ("api", "0076_remove_moduletype_is_fixed_assessment"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='landusechange',
-            name='organic_soil',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='land_use_change_organic_soil', to='api.organicsoil'),
+            model_name="landusechange",
+            name="organic_soil",
+            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name="land_use_change_organic_soil", to="api.organicsoil"),
         ),
     ]
