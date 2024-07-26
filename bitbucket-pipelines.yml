@@ -37,6 +37,7 @@ definitions:
           - sed -i "s|\$FIREBASE_API_KEY|$FIREBASE_API_KEY|g" app.yaml
           - echo $FIREBASE_API_KEY
           - sed -i "s|\$FIREBASE_SERVICE_ACCOUNT|$FIREBASE_SERVICE_ACCOUNT|g" app.yaml
+          - echo app.yaml
 
           - sed -i "s|\$DB_ENGINE|$DB_ENGINE|g" djangoexact/settings.py
           - sed -i "s|\$DB_INSTANCE_CONNECTION|$DB_INSTANCE_CONNECTION|g" djangoexact/settings.py

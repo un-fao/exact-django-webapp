@@ -14,6 +14,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from datetime import timedelta
 from pathlib import Path
+import json
+import base64
 
 import firebase_admin
 import pyrebase
@@ -226,10 +228,14 @@ try:
         "appId": os.getenv("FIREBASE_APP_ID"),
         "measurementId": os.getenv("FIREBASE_MEASUREMENT_ID"),
         "databaseURL": "",
+        "serviceAccount": json.loads(base64.b64decode(os.getenv("FIREBASE_SERVICE_ACCOUNT")).decode()),
     }
+
+    print(FIREBASE_CONFIG)
 
     firebase = pyrebase.initialize_app(FIREBASE_CONFIG)
     auth = firebase.auth()
+    firebase_admin.initialize_app(firebase_admin.credentials.Certificate(FIREBASE_CONFIG["serviceAccount"]))
 except Exception as e:
     raise Exception(f"Firebase config not found: {e}") from e
 
