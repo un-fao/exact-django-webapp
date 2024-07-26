@@ -49,8 +49,8 @@ definitions:
           - sed -i "s|\$SECRET_KEY|$SECRET_KEY|g" djangoexact/settings.py
           - sed -i "s|\\\$EMAIL_HOST|$EMAIL_HOST|g" djangoexact/settings.py
           - sed -i "s|\\\$EMAIL_PORT|$EMAIL_PORT|g" djangoexact/settings.py
-          - sed -i "s|\\\$EMAIL_HOST_USER|$EMAIL_HOST_USER|g" djangoexact/settings.py
-          - sed -i "s|\\\$EMAIL_HOST_PASSWORD|$EMAIL_HOST_PASSWORD|g" djangoexact/settings.py
+          - sed -i "s|\\\$SMTP_USER_EMAIL|$SMTP_USER_EMAIL|g" djangoexact/settings.py
+          - sed -i "s|\\\$SMTP_USER_PASSWORD|$SMTP_USER_PASSWORD|g" djangoexact/settings.py
           - sed -i "s|\$FIREBASE_API_KEY|$FIREBASE_API_KEY|g" djangoexact/settings.py
           - sed -i "s|\$FIREBASE_AUTH_DOMAIN|$FIREBASE_AUTH_DOMAIN|g" djangoexact/settings.py
           - sed -i "s|\$FIREBASE_PROJECT_ID|$FIREBASE_PROJECT_ID|g" djangoexact/settings.py
