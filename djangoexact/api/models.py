@@ -525,9 +525,9 @@ class Historical(models.Model):
 class Project(Historical):
     class Meta:
         verbose_name_plural = "Projects"
-        unique_together = ("name", "user")
+        unique_together = ("name", "owner")
 
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="projects")
+    owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="projects")
     date = models.DateTimeField(null=True, blank=True)
     name = models.CharField(max_length=100)
     code = models.CharField(max_length=100, null=True, blank=True)
@@ -560,7 +560,7 @@ class Project(Historical):
     def save(self, *args, **kwargs):
         if self.pk:
             old = Project.objects.get(pk=self.pk)
-            if old.user != self.user:
+            if old.owner != self.owner:
                 raise exceptions.ValidationError("User cannot be changed")
         super().save(*args, **kwargs)
 
