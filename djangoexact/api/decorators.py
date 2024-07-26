@@ -17,10 +17,10 @@ def can_access(resource: str):
             match resource:
                 case "project":
                     project = Project.objects.get(pk=kwargs["pk"], user=request.user)
-                    can_access = project.user == request.user
+                    can_access = project.owner == request.user
                 case "activity":
                     activity = Activity.objects.get(pk=kwargs["pk"], project__user=request.user)
-                    can_access = activity.project.user == request.user
+                    can_access = activity.project.owner == request.user
                 case "module":
                     module = getattr(func, "model").objects.get(pk=kwargs["pk"], activity__project__user=request.user)
                     can_access = module.activity.project.user == request.user
