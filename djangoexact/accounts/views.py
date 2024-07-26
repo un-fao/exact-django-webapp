@@ -229,15 +229,18 @@ class TransferUser(APIView):
         users = User.objects.all()
 
         for user in users:
-            if user.firebase_uid is None:
+            try:
                 try:
+                    existing_user = firebase_admin_auth.get_user_by_email(user.email)
+                except firebase_admin_auth.UserNotFoundError:
                     firebase_user = firebase_admin_auth.create_user(email=user.email, password=user.password)
-                    user.firebase_uid = firebase_user.uid
-                    user.is_active = True
-                    firebase_admin_auth.update_user(firebase_user.uid, email_verified=True)
-                    user.save()
-                except Exception as e:
-                    print(e)
-                    continue
+
+                user.firebase_uid = firebase_user.uid
+                user.is_active = True
+                firebase_admin_auth.update_user(firebase_user.uid, email_verified=True)
+                user.save()
+            except Exception as e:
+                print(e)
+                continue
 
         return Response({"message": "Users transferred"}, status=status.HTTP_200_OK)
