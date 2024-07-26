@@ -104,7 +104,6 @@ class LoginExistingUserView(APIView):
         try:
             email = data.get("email")
             password = data.get("password")
-
             user = firebase_admin_auth.get_user_by_email(email)
 
             if not user.email_verified:
