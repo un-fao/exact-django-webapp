@@ -222,6 +222,14 @@ ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 
+# Email settings
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = os.getenv("EMAIL_HOST", "$EMAIL_HOST")
+EMAIL_PORT = os.getenv("EMAIL_PORT", "$EMAIL_PORT")
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "$EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "$EMAIL_HOST_PASSWORD")
+
 # Firebase settings
 try:
     FIREBASE_CONFIG = {
@@ -241,11 +249,3 @@ try:
     firebase_admin.initialize_app(firebase_admin.credentials.Certificate(FIREBASE_CONFIG["serviceAccount"]))
 except Exception as e:
     raise Exception(f"Firebase config not found: {e}") from e
-
-# Email settings
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = os.getenv("EMAIL_HOST")
-EMAIL_PORT = os.getenv("EMAIL_PORT")
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
