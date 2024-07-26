@@ -231,7 +231,7 @@ class TransferUser(APIView):
         for user in users:
             try:
                 try:
-                    existing_user = firebase_admin_auth.get_user_by_email(user.email)
+                    firebase_user = firebase_admin_auth.get_user_by_email(user.email)
                 except firebase_admin_auth.UserNotFoundError:
                     firebase_user = firebase_admin_auth.create_user(email=user.email, password=user.password)
 
