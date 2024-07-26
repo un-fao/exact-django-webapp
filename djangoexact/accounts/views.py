@@ -73,7 +73,6 @@ class CreateNewUserView(APIView):
             firebase_uid = firebase_user.uid
 
             db_user.firebase_uid = firebase_uid
-            db_user.is_active = True
             db_user.save()
 
             utils.send_email_verification_link(email, db_user.first_name.capitalize() + " " + db_user.last_name.capitalize())
