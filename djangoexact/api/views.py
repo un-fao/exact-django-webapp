@@ -656,7 +656,10 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error("Selected user does not have permission to add activities to the project")
             return utils.ErrorResponse("Selected user does not have permission to add activities to the project", status=http_status.HTTP_403_FORBIDDEN)
 
-        activity = serializer.save()
+        activity: Activity = serializer.save()
+        activity.owner = self.request.user
+        activity.save()
+
         update_change_reason(activity, utils.ChangeReasons.CREATE.value)
 
         read_serializer = ActivitySerializer(instance=activity)
@@ -790,7 +793,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         Builds a new activity and the modules associated with it.
         """
 
-        serializer = ActivityBuilderSerializer(data=request.data)
+        serializer = ActivityBuilderSerializer(data=request.data, context={"request": request})
 
         if not serializer.is_valid():
             return utils.ErrorResponse(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
