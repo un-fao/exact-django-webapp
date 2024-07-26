@@ -244,7 +244,7 @@ class UserReadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ["id", "username", "email", "first_name", "last_name", "country"]
+        fields = ["id", "email", "first_name", "last_name", "country"]
 
 
 class UserWriteSerializer(serializers.ModelSerializer):
@@ -334,6 +334,7 @@ class ActivitySerializer(serializers.ModelSerializer):
     soil_type_t2 = get_model_serializer(SoilType)(read_only=True)
     module_types = get_model_serializer(ModuleType)(many=True, read_only=True)
     modules = serializers.JSONField(read_only=True)
+    owner = UserReadSerializer(many=False, read_only=True)
 
     class Meta:
         model = Activity
@@ -470,6 +471,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
             duration_t2=self.validated_data.get("duration"),
             soil_type_t2=self.validated_data.get("soil_type"),
             start_year_t2=self.validated_data.get("start_year"),
+            owner=self.context["request"].user,
         )
 
     def handle_luc_module(self, activity, has_organic_soil):

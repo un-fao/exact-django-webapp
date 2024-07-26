@@ -635,6 +635,10 @@ class Activity(Historical):
     duration_t2 = models.IntegerField(default=0)
     start_year_t2 = models.IntegerField(null=True, blank=True)
 
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True)
+    owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="activities", null=True, blank=True)
+
     def __str__(self):
         return f"({self.pk}) {self.name} in {self.project.name}"
 
