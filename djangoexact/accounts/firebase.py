@@ -6,30 +6,24 @@ from api.models import CustomUser as User
 from firebase_admin import auth as firebase_admin_auth
 from firebase_admin import credentials
 from rest_framework import authentication, exceptions
+import pyrebase
 
-from djangoexact.settings import auth
-
-try:
-    f = json.loads(base64.b64decode(os.getenv("FIREBASE_SERVICE_ACCOUNT")).decode("utf-8"))
-    cred = credentials.Certificate(f)
-    auth = firebase_admin.initialize_app(cred)
-except Exception as e:
-    raise Exception(f"Firebase config not found: {e}") from e
+from djangoexact.settings import FIREBASE_CONFIG
 
 
 class FirebaseAuthentication(authentication.BaseAuthentication):
     keyword = "Bearer"
 
     def authenticate(self, request):
-        auth = request.META.get("HTTP_AUTHORIZATION")
-        if not auth:
+        token = request.META.get("HTTP_AUTHORIZATION")
+        if not token:
             return None
 
         # If request is for login or register, or admin, skip authentication
         if request.path in ["/api/accounts/register/", "/api/accounts/login/", "/admin"]:
             return None
 
-        parts = auth.split()
+        parts = token.split()
 
         if parts[0].lower() != self.keyword.lower():
             return None
@@ -45,6 +39,6 @@ class FirebaseAuthentication(authentication.BaseAuthentication):
             uid = decoded_token["uid"]
             user = User.objects.get(firebase_uid=uid)
         except Exception as e:
-            raise exceptions.AuthenticationFailed("Invalid token.")
+            raise exceptions.AuthenticationFailed(str(e))
 
         return (user, None)
