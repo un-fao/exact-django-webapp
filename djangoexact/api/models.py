@@ -1164,6 +1164,10 @@ class Rice(models.Model):
     cultivation_period_t2_w = models.IntegerField(null=True, blank=True)
     cultivation_period_t2_wo = models.IntegerField(null=True, blank=True)
 
+    residue_availability_t2_start = models.FloatField(null=True, blank=True)
+    residue_availability_t2_w = models.FloatField(null=True, blank=True)
+    residue_availability_t2_wo = models.FloatField(null=True, blank=True)
+
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:
             self.land_use_type_start = LandUseType.objects.get(name="Flooded Rice")

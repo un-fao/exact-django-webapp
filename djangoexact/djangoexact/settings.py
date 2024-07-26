@@ -231,8 +231,6 @@ try:
         "serviceAccount": json.loads(base64.b64decode(os.getenv("FIREBASE_SERVICE_ACCOUNT", "$FIREBASE_SERVICE_ACCOUNT")).decode()),
     }
 
-    print(FIREBASE_CONFIG)
-
     firebase = pyrebase.initialize_app(FIREBASE_CONFIG)
     auth = firebase.auth()
     firebase_admin.initialize_app(firebase_admin.credentials.Certificate(FIREBASE_CONFIG["serviceAccount"]))
