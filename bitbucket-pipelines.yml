@@ -56,6 +56,8 @@ definitions:
           - sed -i "s|\$FIREBASE_MEASUREMENT_ID|$FIREBASE_MEASUREMENT_ID|g" djangoexact/settings.py
           - sed -i "s|\$FIREBASE_SERVICE_ACCOUNT|$FIREBASE_SERVICE_ACCOUNT|g" app.yaml
 
+          - echo "$(cat djangoexact/settings.py)"
+
           - pip install -r requirements.txt
           # - yes | python manage.py makemigrations --merge
           - python manage.py migrate
