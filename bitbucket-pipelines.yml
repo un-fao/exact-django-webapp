@@ -59,6 +59,7 @@ definitions:
           - sed -i "s|\$FIREBASE_APP_ID|$FIREBASE_APP_ID|g" djangoexact/settings.py
           - sed -i "s|\$FIREBASE_MEASUREMENT_ID|$FIREBASE_MEASUREMENT_ID|g" djangoexact/settings.py
           - sed -i "s|\$FIREBASE_SERVICE_ACCOUNT|$FIREBASE_SERVICE_ACCOUNT|g" djangoexact/settings.py
+          - echo "$(cat djangoexact/settings.py)"
 
           - pip install -r requirements.txt
           # - yes | python manage.py makemigrations --merge
