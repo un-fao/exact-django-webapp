@@ -271,7 +271,7 @@ class ReadProjectSerializer(serializers.ModelSerializer):
     soil_type = get_model_serializer(SoilType)(many=False, read_only=True)
     gw_potential = get_model_serializer(GlobalWarmingPotential)(many=False, read_only=True)
     status = get_model_serializer(ProjectStatus)(many=False, required=False, read_only=True)
-    user = UserReadSerializer(many=False, read_only=True)
+    owner = UserReadSerializer(many=False, read_only=True)
     role = serializers.SerializerMethodField()
 
     def get_role(self, obj):
@@ -300,11 +300,10 @@ class WriteProjectSerializer(serializers.ModelSerializer):
     moisture = serializers.PrimaryKeyRelatedField(queryset=Moisture.objects.all(), required=True, write_only=True)
     soil_type = serializers.PrimaryKeyRelatedField(queryset=SoilType.objects.all(), required=True, write_only=True)
     gw_potential = serializers.PrimaryKeyRelatedField(queryset=GlobalWarmingPotential.objects.all(), required=True, write_only=True)
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=True, write_only=True)
 
     class Meta:
         model = Project
-        fields = "__all__"
+        exclude = ["owner"]
         ref_name = "Project"
 
     def validate(self, data):
@@ -313,6 +312,12 @@ class WriteProjectSerializer(serializers.ModelSerializer):
 
             if sum(total_activity_cost) > data.get("cost"):
                 raise serializers.ValidationError("Total cost of activities cannot be greater than project cost")
+
+        if not self.instance:
+            if self.context["request"].user.projects.filter(name=data.get("name")).exists():
+                raise serializers.ValidationError("Project with the same name already exists")
+
+            data["owner"] = self.context["request"].user
 
         return super().validate(data)
 
