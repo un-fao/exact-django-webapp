@@ -267,7 +267,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
 
         request.data["user"] = self.request.user.pk
-        serializer = WriteProjectSerializer(data=request.data)
+        serializer = WriteProjectSerializer(data=request.data, context={"request": request})
 
         if not serializer.is_valid():
             logging.error("Error creating project:", serializer.errors)
