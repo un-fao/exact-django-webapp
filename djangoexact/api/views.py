@@ -419,6 +419,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(data=ReadProjectSerializer(new_project, context={"request": request}).data, status=http_status.HTTP_201_CREATED)
 
     @action(detail=True, methods=["get"])
+    @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view project memberships", 200: ProjectMembershipSerializer})
     def memberships(self, request, pk=None):
         project = self.get_object()
 
@@ -429,6 +430,12 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         serializer = ProjectMembershipSerializer(project.members.all(), many=True)
 
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+
+    # TODO: Remove this action when the frontend is updated
+    @action(detail=True, methods=["get"])
+    @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view project memberships", 200: ProjectMembershipSerializer})
+    def users(self, request, pk=None):
+        return self.memberships(request, pk)
 
     @action(detail=True, methods=["get"])
     @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view invitations", 200: ProjectInvitationReadSerializer})
