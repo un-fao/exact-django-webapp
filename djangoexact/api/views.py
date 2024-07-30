@@ -43,7 +43,7 @@ from .models import (
     ProjectInvitation,
     StatusType,
     Submodule,
-    UserProjectGroup,
+    ProjectMembership,
     InvitationStatusType,
     Definition,
 )
@@ -63,7 +63,7 @@ from .serializers import (
     ProjectInvitationReadSerializer,
     ProjectInvitationWriteSerializer,
     ReadProjectSerializer,
-    UserProjectGroupSerializer,
+    ProjectMembershipSerializer,
     UserReadSerializer,
     UserWriteSerializer,
     WriteActivitySerializer,
@@ -261,6 +261,8 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     serializer_class = WriteProjectSerializer
     pagination_class = DefaultPagination
 
+    @transaction.atomic
+    @swagger_auto_schema(responses={400: "Bad request", 201: ReadProjectSerializer})
     def create(self, request, *args, **kwargs):
         """
         Creates a new project for a given user.
@@ -277,12 +279,14 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         update_change_reason(project, utils.ChangeReasons.CREATE.value)
 
-        UserProjectGroup.objects.create(user=self.request.user, project=project, group=Group.objects.get(name="Admin"))
+        ProjectMembership.objects.create(user=self.request.user, project=project, group=Group.objects.get(name="Admin"))
 
         read_serializer = ReadProjectSerializer(instance=project, context={"request": request})
 
         return Response(read_serializer.data, status=http_status.HTTP_201_CREATED)
 
+    @transaction.atomic
+    @swagger_auto_schema(responses={400: "Bad request", 204: "Project deleted successfully"})
     def destroy(self, request, *args, **kwargs):
         project = self.get_object()
         user = self.request.user
@@ -410,19 +414,19 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return utils.ErrorResponse("Selected user does not have permission to copy the project", status=http_status.HTTP_403_FORBIDDEN)
 
         new_project = utils.copy_project(project)
-        UserProjectGroup.objects.create(user=self.request.user, project=new_project, group=Group.objects.get(name="Admin"))
+        ProjectMembership.objects.create(user=self.request.user, project=new_project, group=Group.objects.get(name="Admin"))
 
         return Response(data=ReadProjectSerializer(new_project, context={"request": request}).data, status=http_status.HTTP_201_CREATED)
 
     @action(detail=True, methods=["get"])
-    def users(self, request, pk=None):
+    def memberships(self, request, pk=None):
         project = self.get_object()
 
         if not utils.has_project_permission("view_project", self.request.user, project):
             logging.error("Selected user does not have permission to copy the project")
             return utils.ErrorResponse("Selected user does not have permission to copy the project", status=http_status.HTTP_403_FORBIDDEN)
 
-        serializer = UserProjectGroupSerializer(project.members.all(), many=True)
+        serializer = ProjectMembershipSerializer(project.members.all(), many=True)
 
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
@@ -451,6 +455,122 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         changes = utils.get_changes(project.history.all())
 
         return Response(data=ChangeHistorySerializer(changes, many=True).data, status=http_status.HTTP_200_OK)
+
+
+class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    queryset = ProjectMembership.objects.all()
+    serializer_class = ProjectMembershipSerializer
+
+    @swagger_auto_schema(
+        operation_description="Get a single project membership by id",
+        responses={
+            400: "Bad request",
+            403: "Selected user does not have permission to view project memberships",
+            200: ProjectMembershipSerializer,
+        },
+    )
+    def retrieve(self, request, *args, **kwargs):
+        membership: ProjectMembership = self.get_object()
+
+        if not utils.has_project_permission("view_projectmembership", self.request.user, membership.project):
+            logging.error("Selected user does not have permission to view project memberships")
+            return utils.ErrorResponse("Selected user does not have permission to view project memberships", status=http_status.HTTP_403_FORBIDDEN)
+
+        return super().retrieve(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_description="Get all project memberships for a given project",
+        responses={
+            400: "Bad request",
+            403: "Selected user does not have permission to view project memberships",
+            200: ProjectMembershipSerializer,
+        },
+    )
+    def list(self, request, *args, **kwargs):
+        project_id = self.request.query_params.get("project_id", None)
+
+        if not project_id:
+            logging.error("Project id not provided")
+            return utils.ErrorResponse("Project id not provided", status=http_status.HTTP_400_BAD_REQUEST)
+
+        project = get_object_or_404(Project, pk=project_id)
+
+        if not utils.has_project_permission("view_projectmembership", self.request.user, project):
+            logging.error("Selected user does not have permission to view project memberships")
+            return utils.ErrorResponse("Selected user does not have permission to view project memberships", status=http_status.HTTP_403_FORBIDDEN)
+
+        serializer = ProjectMembershipSerializer(project.members.all(), many=True)
+
+        return Response(serializer.data, status=http_status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_description="Create a new project membership",
+        request_body=ProjectMembershipSerializer,
+        responses={
+            400: "Bad request",
+            201: "Project membership created successfully",
+            403: "Selected user does not have permission to add project memberships",
+        },
+    )
+    def create(self, request, *args, **kwargs):
+        serializer = ProjectMembershipSerializer(data=request.data)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
+
+        project = serializer.validated_data["project"]
+
+        if not utils.has_project_permission("add_projectmembership", self.request.user, project):
+            logging.error("Selected user does not have permission to add project memberships")
+            return utils.ErrorResponse("Selected user does not have permission to add project memberships", status=http_status.HTTP_403_FORBIDDEN)
+
+        membership = serializer.save()
+
+        return Response(ProjectMembershipSerializer(membership).data, status=http_status.HTTP_201_CREATED)
+
+    @swagger_auto_schema(
+        operation_description="Update a project membership",
+        request_body=ProjectMembershipSerializer,
+        responses={
+            400: "Bad request",
+            200: "Project membership updated successfully",
+            403: "Selected user does not have permission to change project memberships",
+        },
+    )
+    def update(self, request, *args, **kwargs):
+        membership = self.get_object()
+
+        if not utils.has_project_permission("change_projectmembership", self.request.user, membership.project):
+            logging.error("Selected user does not have permission to change project memberships")
+            return utils.ErrorResponse("Selected user does not have permission to change project memberships", status=http_status.HTTP_403_FORBIDDEN)
+
+        serializer = ProjectMembershipSerializer(data=request.data, instance=membership)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+
+        return Response(ProjectMembershipSerializer(membership).data, status=http_status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_description="Delete a project membership",
+        responses={
+            400: "Bad request",
+            204: "Project membership deleted successfully",
+            403: "Selected user does not have permission to delete project memberships",
+        },
+    )
+    def destroy(self, request, *args, **kwargs):
+        membership = self.get_object()
+
+        if not utils.has_project_permission("delete_projectmembership", self.request.user, membership.project):
+            logging.error("Selected user does not have permission to delete project memberships")
+            return utils.ErrorResponse("Selected user does not have permission to delete project memberships", status=http_status.HTTP_403_FORBIDDEN)
+
+        membership.delete()
+
+        return Response(status=http_status.HTTP_204_NO_CONTENT)
 
 
 class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
@@ -517,6 +637,8 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error(f"Invitation for {user.email} already sent with id {invitation.id}")
             return utils.ErrorResponse({"error": f"Invitation for {user.email} already sent"}, status=http_status.HTTP_400_BAD_REQUEST)
 
+        membership = ProjectMembership.objects.create(user=user, project=project, group=group)
+
         logging.debug("END ProjectInvitationViewset.create")
         return Response({"message": f"Invitation for {user.email} sent successfully", "id": invitation.id}, status=http_status.HTTP_201_CREATED)
 
@@ -550,9 +672,9 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return Response({"message": f"Invitation already {new_status}"}, status=http_status.HTTP_200_OK)
 
         if new_status.name == utils.InvitationStatus.ACCEPTED.value:
-            UserProjectGroup.objects.create(user=invitation.user, project=invitation.project, group=invitation.group)
+            ProjectMembership.objects.create(user=invitation.user, project=invitation.project, group=invitation.group)
         else:
-            UserProjectGroup.objects.filter(user=invitation.user, project=invitation.project, group=invitation.group).delete()
+            ProjectMembership.objects.filter(user=invitation.user, project=invitation.project, group=invitation.group).delete()
 
         data.save()
 
