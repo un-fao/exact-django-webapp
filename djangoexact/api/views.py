@@ -1151,7 +1151,7 @@ def generic_module_viewset(model: Model):
                 module: Module = get_object_or_404(model, pk=pk)
                 activity = module.activity
 
-            serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data={}, instance=module)
+            serializer = get_module_serializer(model)(data={}, instance=module)
             serializer.is_valid(raise_exception=True)
             serializer.save()
 
