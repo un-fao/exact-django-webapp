@@ -20,7 +20,7 @@ class FirebaseAuthentication(authentication.BaseAuthentication):
             return None
 
         # If request is for login or register, or admin, skip authentication
-        if request.path in ["/api/accounts/register/", "/api/accounts/login/", "/admin", "/api/swagger/", "/api/accounts/password-reset/"]:
+        if request.path in ["/api/accounts/register/", "/api/accounts/login/", "/api/token/refresh/" "/admin", "/api/swagger/", "/api/accounts/password-reset/"]:
             return None
 
         parts = token.split()
