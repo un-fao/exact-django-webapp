@@ -99,7 +99,7 @@ print(f"Soil Organic Carbon: {socref}")
 print(f"Implementation years: {p.implementation_years}")
 print(f"Capitalization years: {p.capitalization_years}")
 
-UserProjectGroup.objects.create(user=u, project=p, group=Group.objects.get(name="Admin"))
+ProjectMembership.objects.create(user=u, project=p, group=Group.objects.get(name="Admin"))
 
 print(f"Project: {p}")
 
@@ -614,7 +614,7 @@ if TEST_COASTAL_WETLAND:
 
     # NOTE: QUESTO è AGGIORNATO
     coastals: list[CoastalWetland] = CoastalWetlandFactory.create_batch(BATCH_SIZE, activity=a)
-    a.module_types.add(ModuleType.objects.get(name="Coastal Wetland")) # ------------------> questo forse non c'è ovunque
+    a.module_types.add(ModuleType.objects.get(name="Coastal Wetland"))  # ------------------> questo forse non c'è ovunque
     a.save()
 
     total_coastals = coastals.__len__()
