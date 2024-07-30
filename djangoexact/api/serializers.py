@@ -632,6 +632,7 @@ class BaseGenericModuleSerializer(serializers.ModelSerializer):
         super().__init__(*args, **kwargs)
         if not hasattr(self.Meta, "ref_name") or not hasattr(self.Meta, "mandatory_fields"):
             raise ValueError(f"Meta class of {self.__class__.__name__} must have a ref_name and a mandatory_fields attribute")
+        log.debug(f"START BaseGenericModuleSerializer[{self.Meta.ref_name}].init")
         self.fields["module_type"].default = ModuleType.objects.get(class_name=self.Meta.ref_name)
 
     def merge_instance_data(self, data: dict, instance=None) -> dict:
@@ -1670,7 +1671,7 @@ class OtherInfrastructureWriteSerializer(ScenarioSubmoduleSerializer):
     class Meta:
         model = OtherInfrastructure
         fields = "__all__"
-        ref_name = "Other"
+        ref_name = "OtherInfrastructure"
         mandatory_fields = {
             "start": {
                 "mandatory": ["area_m2_start"],
@@ -1688,7 +1689,7 @@ class OtherInfrastructureReadSerializer(BaseGenericModuleSerializer):
     class Meta:
         model = OtherInfrastructure
         fields = "__all__"
-        ref_name = "Other"
+        ref_name = "OtherInfrastructure"
         mandatory_fields = {}
 
 
@@ -2466,6 +2467,27 @@ class InputEntryReadSerializer(BaseGenericModuleSerializer):
         fields = "__all__"
         ref_name = "InputEntry"
         extra_fields = ["module_type"]
+        mandatory_fields = {
+            "start": {
+                "mandatory": [
+                    "input_type_start",
+                    "value_start",
+                ],
+            },
+            "with": {
+                "mandatory": [
+                    "input_type_w",
+                    "value_w",
+                ],
+            },
+            "without": {
+                "mandatory": [
+                    "input_type_wo",
+                    "value_wo",
+                ],
+            },
+        }
+        ref_name = "InputEntry"
 
 
 class DynamicResultSerializer(serializers.Serializer):
