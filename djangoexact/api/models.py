@@ -802,6 +802,15 @@ class SingleBiomassModule(BiomassModule):
             return None
 
 
+class ResidueAvailability(models.Model):
+    residue_availability_t2_start = models.FloatField(null=True, blank=True)
+    residue_availability_t2_w = models.FloatField(null=True, blank=True)
+    residue_availability_t2_wo = models.FloatField(null=True, blank=True)
+
+    class Meta:
+        abstract = True
+
+
 class AboveBelowGroundBiomassModule(BiomassModule):
     agb_t2_start = models.FloatField(null=True, blank=True)
     agb_t2_w = models.FloatField(null=True, blank=True)
@@ -951,7 +960,7 @@ class CropType(models.Model):
         return f"({self.pk}) {self.name}"
 
 
-class AnnualCropping(LandModule, SingleBiomassModule):
+class AnnualCropping(LandModule, SingleBiomassModule, ResidueAvailability):
     tillage_management_type_start = models.ForeignKey(
         TillageManagementType,
         on_delete=models.CASCADE,
@@ -1116,7 +1125,7 @@ class MinorSeasonAnnualCropping(CroplandMinorSeason, LandSubmodule):
     parent = models.ForeignKey(AnnualCropping, on_delete=models.CASCADE, related_name="minor_seasons", null=True, blank=True)
 
 
-class Rice(models.Model):
+class Rice(ResidueAvailability):
     class Meta:
         abstract = True
 
@@ -1167,10 +1176,6 @@ class Rice(models.Model):
     cultivation_period_t2_start = models.IntegerField(null=True, blank=True)
     cultivation_period_t2_w = models.IntegerField(null=True, blank=True)
     cultivation_period_t2_wo = models.IntegerField(null=True, blank=True)
-
-    residue_availability_t2_start = models.FloatField(null=True, blank=True)
-    residue_availability_t2_w = models.FloatField(null=True, blank=True)
-    residue_availability_t2_wo = models.FloatField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:
