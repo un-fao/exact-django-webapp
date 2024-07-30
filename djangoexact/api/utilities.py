@@ -140,10 +140,15 @@ def has_project_permission(permission, user, project):
     Returns:
         bool: True if the user has the permission, False otherwise.
     """
-    membership: models.UserProjectGroup = project.members.filter(user=user).first()
-    can_access = membership and membership.group.permissions.filter(codename=permission).exists()
 
-    return can_access or user.is_superuser
+    if user.is_superuser:
+        return True
+
+    memberships: list[api_models.ProjectMembership] = project.members.filter(user=user)
+
+    can_access = memberships and any([membership.group.permissions.filter(codename=permission).exists() for membership in memberships])
+
+    return can_access
 
 
 def find_modules(activity):

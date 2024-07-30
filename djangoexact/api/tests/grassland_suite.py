@@ -16,7 +16,7 @@ from api.models import (
     Moisture,
     Project,
     SoilType,
-    UserProjectGroup,
+    ProjectMembership,
 )
 from api.models import CustomUser as User
 from api.tests.factories import ActivityFactory, GrasslandFactory, ProjectFactory
@@ -69,7 +69,7 @@ p: Project = ProjectFactory.create(
 print(f"Capitalization Years: {p.capitalization_years}")
 print(f"Implementation Years: {p.implementation_years}")
 
-UserProjectGroup.objects.create(user=u, project=p, group=group)
+ProjectMembership.objects.create(user=u, project=p, group=group)
 
 ds = workbook.sheets["1.Description"]
 ds["Q8"].value = p.country.region.name

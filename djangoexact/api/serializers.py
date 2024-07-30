@@ -74,7 +74,7 @@ from .models import (
     SmallFishery,
     SoilType,
     StatusType,
-    UserProjectGroup,
+    ProjectMembership,
     Waterbody,
     LandModule,
     InvitationStatusType,
@@ -149,6 +149,7 @@ def validate_module_fields(data, mandatory_fields: list):
 
     if not are_fields_filled(data, mandatory_fields):
         raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
+
 
 def get_model_serializer(model_arg):
 
@@ -280,7 +281,7 @@ class ReadProjectSerializer(serializers.ModelSerializer):
             return []
 
         user = ctx.user
-        user_project_group = UserProjectGroup.objects.filter(user=user, project=obj).all()
+        user_project_group = ProjectMembership.objects.filter(user=user, project=obj).all()
 
         if not user_project_group:
             return []
@@ -2284,6 +2285,7 @@ class ProjectInvitationReadSerializer(serializers.ModelSerializer):
     user = UserReadSerializer(many=False, read_only=True)
     project = ProjectNameIdSerializer(many=False, read_only=True)
     group = GroupSerializer(many=False, read_only=True)
+    status = get_model_serializer(InvitationStatusType)(many=False, read_only=True)
 
     class Meta:
         model = ProjectInvitation
@@ -2540,14 +2542,14 @@ class InputTypeSerializer(serializers.ModelSerializer):
         ref_name = "InputType"
 
 
-class UserProjectGroupSerializer(serializers.ModelSerializer):
+class ProjectMembershipSerializer(serializers.ModelSerializer):
     user = UserReadSerializer(many=False, read_only=True)
     group = GroupSerializer(many=False, read_only=True)
 
     class Meta:
-        model = UserProjectGroup
+        model = ProjectMembership
         fields = "__all__"
-        ref_name = "UserProjectGroup"
+        ref_name = "ProjectMembership"
 
 
 class SetAsideWriteSerializer(LandModuleWriteSerializer):

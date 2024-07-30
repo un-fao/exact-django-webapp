@@ -604,7 +604,7 @@ class ProjectInvitation(Historical):
         return f"({self.pk}) {self.project.name} - {self.user.email}"
 
 
-class UserProjectGroup(models.Model):
+class ProjectMembership(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="memberships")
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="members")
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
