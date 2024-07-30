@@ -2162,8 +2162,8 @@ class ExecutingAgency(models.Model):
 
 
 class Definition(models.Model):
-    model_name = models.CharField(max_length=255, unique=True)
+    module_type = models.ForeignKey(ModuleType, on_delete=models.CASCADE, related_name="definitions")
     definitions = models.JSONField()
 
     def __str__(self):
-        return f"({self.pk}) {self.model_name}"
+        return f"({self.pk}) {self.module_type}"

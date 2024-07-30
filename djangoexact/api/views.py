@@ -1213,11 +1213,16 @@ class DefinitionViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         Get all definitions.
         """
 
-        # Get model_name query parameter
-        model_name = request.query_params.get("model_name", None)
+        module_type_id = request.query_params.get("module_type_id", None)
 
-        if model_name:
-            definitions = Definition.objects.filter(model_name=model_name).all()
+        if module_type_id:
+            try:
+                module_type = ModuleType.objects.get(pk=module_type_id)
+            except ModuleType.DoesNotExist:
+                logging.error(f"Module type with id {module_type_id} not found")
+                return utils.ErrorResponse(f"Module type with id {module_type_id} not found", status=http_status.HTTP_400_BAD_REQUEST)
+
+            definitions = Definition.objects.filter(module_type=module_type).all()
             serializer = get_model_serializer(Definition)(definitions, many=True)
             return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
