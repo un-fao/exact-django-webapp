@@ -150,7 +150,6 @@ def validate_module_fields(data, mandatory_fields: list):
     if not are_fields_filled(data, mandatory_fields):
         raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
 
-
 def get_model_serializer(model_arg):
 
     class GenericSerializer(serializers.ModelSerializer):
