@@ -22,6 +22,7 @@ from .serializers import (
     LoginSerializer,
     RegisterSerializer,
     UserSerializer,
+    PasswordResetSerializer,
 )
 
 
@@ -142,6 +143,7 @@ class PasswordResetView(APIView):
     permission_classes = [permissions.AllowAny]
 
     @swagger_auto_schema(
+        request_body=PasswordResetSerializer,
         responses={200: "OK", 400: "Bad Request"},
     )
     @transaction.atomic

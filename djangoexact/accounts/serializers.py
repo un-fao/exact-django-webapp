@@ -58,3 +58,18 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         data["access"] = str(refresh.access_token)
         data["user"] = UserSerializer(self.user).data
         return data
+
+
+class PasswordResetSerializer(serializers.Serializer):
+    email = serializers.EmailField(
+        required=True,
+        validators=[UniqueValidator(queryset=User.objects.all())],
+    )
+
+    def validate(self, data):
+        email = data.get("email")
+
+        if not User.objects.filter(email=email).exists():
+            raise serializers.ValidationError("User with this email does not exist.")
+
+        return data
