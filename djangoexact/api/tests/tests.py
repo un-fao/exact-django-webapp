@@ -99,7 +99,7 @@ print(f"Soil Organic Carbon: {socref}")
 print(f"Implementation years: {p.implementation_years}")
 print(f"Capitalization years: {p.capitalization_years}")
 
-UserProjectGroup.objects.create(user=u, project=p, group=Group.objects.get(name="Admin"))
+ProjectMembership.objects.create(user=u, project=p, group=Group.objects.get(name="Admin"))
 
 print(f"Project: {p}")
 
