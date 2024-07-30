@@ -434,7 +434,8 @@ def get_changes(records: list[HistoricalRecords]):
         for change in delta.changes:
             change_log.changes.append(Change(change.field, change.old, change.new))
 
-        changes.append(change_log)
+        if len(change_log.changes) > 0:
+            changes.append(change_log)
 
     return changes
 
