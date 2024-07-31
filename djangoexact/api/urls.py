@@ -32,6 +32,7 @@ router.register(r"threads", views.CommentThreadViewSet, basename="threads")
 router.register(r"comments", views.CommentViewSet, basename="comments")
 router.register(r"land-use-types", views.LandUseTypeViewSet, basename="land-use-types")
 router.register(r"module-types", views.ModuleTypeViewSet, basename="modules")
+router.register(r"notes", views.NoteViewSet, basename="notes")
 
 router.register(r"statuses", views.generic_viewset(models.ProjectStatus), basename="statuses")
 router.register(r"regions", views.generic_viewset(models.Region), basename="regions")
