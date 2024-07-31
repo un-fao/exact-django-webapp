@@ -1359,9 +1359,6 @@ def generic_module_viewset(model: Model):
                 logging.error("Selected user does not have permission to view this module in the project")
                 return utils.ErrorResponse("Selected user does not have permission to view this module in the project", status=http_status.HTTP_403_FORBIDDEN)
 
-            if not module.is_ready():
-                return utils.ErrorResponse("Module is not ready. Cannot calculate defaults.")
-
             try:
                 defaults: SimpleNamespace = DefaultsFactory.get_defaults(module, calculate=True)
                 return Response(defaults.__dict__)
