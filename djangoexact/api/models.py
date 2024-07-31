@@ -7,6 +7,8 @@ from django.db import models as models
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
 import logging as log
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.models import ContentType
 
 from api import utilities as utils
 
@@ -661,6 +663,7 @@ class Activity(Historical):
 class Submodule(Historical):
     # module_type = models.ForeignKey("api.ModuleType", on_delete=models.CASCADE, related_name="%(class)s")
     status = models.ForeignKey(StatusType, on_delete=models.CASCADE, null=True, blank=True)
+    note = GenericRelation("api.Note")
 
     class Meta:
         abstract = True
@@ -677,14 +680,46 @@ class Submodule(Historical):
     def is_ready(self) -> bool:
         return self.status and self.status.name == "READY"
 
+    def get_project(self):
+        if "parent" in self.__dict__:
+            raise exceptions.ValidationError("Submodule must have a parent field specified in the model")
+        return self.parent.activity.project
+
+
+class Note(Historical):
+    content = models.TextField()
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey("content_type", "object_id")
+
+    def __str__(self):
+        return f"({self.pk}) {self.author.email}: {self.content[:40]}..."
+
+    def get_parent(self):
+        return self.content_object
+
+    def get_project(self):
+        match self.content_object.__class__.__name__:
+            case "Project":
+                return self.content_object
+            case "Activity":
+                return self.content_object.project
+            case "Module":
+                return self.content_object.activity.project
+            case "Submodule":
+                return self.content_object.parent.activity.project
+
 
 class Module(Historical):
     class Meta:
         abstract = True
 
     activity = models.ForeignKey(Activity, on_delete=models.CASCADE, related_name="%(class)s")
-    notes = models.TextField(null=True, blank=True)
     start_year = models.IntegerField(default=1)
+    note = GenericRelation(Note)
 
     soc_t2_start = models.FloatField(null=True, blank=True)
     soc_t2_w = models.FloatField(null=True, blank=True)
@@ -703,6 +738,9 @@ class Module(Historical):
             self.status = StatusType.objects.get_or_create(name="EMPTY")[0]
 
         super().save(*args, **kwargs)
+
+    def get_project(self):
+        return self.activity.project
 
     def is_luc_remaining_same(self) -> bool:
         """

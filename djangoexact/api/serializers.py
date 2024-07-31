@@ -21,6 +21,8 @@ from api.models import CustomUser as User
 
 from . import labels
 from .models import (
+    Module,
+    Submodule,
     Activity,
     AnnualCropping,
     Aquaculture,
@@ -79,6 +81,7 @@ from .models import (
     LandModule,
     InvitationStatusType,
     ChangeRate,
+    Note,
 )
 
 
@@ -622,8 +625,9 @@ class LandUseTypeSerializer(serializers.ModelSerializer):
 
 
 class BaseGenericModuleSerializer(serializers.ModelSerializer):
-    module_type = get_model_serializer(ModuleType)(many=False, read_only=True)
-    status = get_model_serializer(StatusType)(many=False, read_only=True)
+    module_type = get_model_serializer(ModuleType)(read_only=True)
+    status = get_model_serializer(StatusType)(read_only=True)
+    note = serializers.SerializerMethodField()
 
     class Meta:
         extra_fields = ["module_type"]
@@ -634,6 +638,9 @@ class BaseGenericModuleSerializer(serializers.ModelSerializer):
             raise ValueError(f"Meta class of {self.__class__.__name__} must have a ref_name and a mandatory_fields attribute")
         log.debug(f"START BaseGenericModuleSerializer[{self.Meta.ref_name}].init")
         self.fields["module_type"].default = ModuleType.objects.get(class_name=self.Meta.ref_name)
+
+    def get_note(self, obj):
+        return NoteSerializer(obj.note.first(), many=False).data if obj.note.exists() else None
 
     def merge_instance_data(self, data: dict, instance=None) -> dict:
         """
@@ -650,12 +657,21 @@ class BaseGenericModuleSerializer(serializers.ModelSerializer):
         return combined_data
 
     def get_scenario(self, field_name: str):
+        """
+        Returns the scenario based on the given field name.
+
+        Args:
+            field_name (str): The name of the field.
+
+        Returns:
+            str: The scenario corresponding to the field name. Possible values are 'start', 'w', 'wo', or None if no match is found.
+        """
         if field_name.endswith("_start"):
-            return "start"
+            return utils.ScenarioTypes.START.value
         elif field_name.endswith("_w"):
-            return "w"
+            return utils.ScenarioTypes.WITH.value
         elif field_name.endswith("_wo"):
-            return "wo"
+            return utils.ScenarioTypes.WITHOUT.value
         return None
 
     @abstractmethod
@@ -668,13 +684,10 @@ class BaseModuleSerializer(BaseGenericModuleSerializer):
     def validate(self, data):
         log.debug(f"START ModuleBaseSerializer[{self.Meta.ref_name}].validate")
 
-        if data.get("parent", None):
-            activity = data["parent"].activity
-
-        else:
-            activity = data["activity"] if "activity" in data else self.instance.activity
+        activity = data["parent"].activity if data.get("parent") else data.get("activity", self.instance.activity)
 
         module_types = list(map(lambda module: module.class_name, activity.module_types.all()))
+
         if getattr(activity, self.Meta.ref_name.lower(), None).exists() and not self.instance:
             log.error(f"Activity already has a {self.Meta.ref_name}")
             raise serializers.ValidationError("A module of this type is already present for this activity")
@@ -2780,3 +2793,59 @@ class ProjectInvitationWriteSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     group = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all(), required=True)
     project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(), required=True)
+
+
+class NewNoteSerializer(serializers.ModelSerializer):
+    content = serializers.CharField(required=True)
+    module_type_id = serializers.IntegerField(required=True)
+    module_id = serializers.IntegerField(required=True)
+
+    class Meta:
+        model = Note
+        fields = ["content", "module_type_id", "module_id"]
+        ref_name = "Note"
+
+    def validate(self, data):
+
+        try:
+            module_type = ModuleType.objects.get(pk=data["module_type_id"])
+        except ModuleType.DoesNotExist:
+            raise serializers.ValidationError("Module type does not exist")
+
+        ModuleClass = utils.get_model(module_type.class_name, suffix=None)
+        module: Module | Submodule = ModuleClass.objects.get(pk=data["module_id"])
+
+        if module.note.exists():
+            raise serializers.ValidationError("Note already exists for this module")
+
+        return super().validate(data)
+
+    def save(self, **kwargs):
+        module_type = ModuleType.objects.get(pk=self.validated_data["module_type_id"])
+        ModuleClass = utils.get_model(module_type.class_name, suffix=None)
+        module: Module | Submodule = ModuleClass.objects.get(pk=self.validated_data["module_id"])
+
+        note = Note.objects.create(
+            author=self.context["request"].user,
+            content=self.validated_data["content"],
+            content_object=module,
+        )
+
+        return note
+
+
+class NoteSerializer(serializers.ModelSerializer):
+    module_type = serializers.SerializerMethodField(read_only=True)
+    module_id = serializers.SerializerMethodField(read_only=True)
+
+    def get_module_type(self, obj):
+        module_type = ModuleType.objects.get(class_name=obj.content_object.__class__.__name__)
+        return get_model_serializer(ModuleType)(module_type, many=False).data
+
+    def get_module_id(self, obj):
+        return obj.content_object.id
+
+    class Meta:
+        model = Note
+        fields = ["id", "content", "module_type", "module_id"]
+        ref_name = "Note"
