@@ -84,7 +84,10 @@ def error(msg):
 
 
 def get_model(name, app_name="api", suffix="Input"):
-    return apps.get_model(app_name, sanitize_for_model(name + suffix))
+    full_name = name
+    if suffix:
+        full_name += suffix
+    return apps.get_model(app_name, sanitize_for_model(full_name))
 
 
 def get_query_param_or_validation_error(request, param_name):

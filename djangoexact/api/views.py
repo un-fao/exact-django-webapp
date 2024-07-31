@@ -46,6 +46,7 @@ from .models import (
     ProjectMembership,
     InvitationStatusType,
     Definition,
+    Note,
 )
 from .serializers import (
     ActionTypes,
@@ -73,6 +74,8 @@ from .serializers import (
     ChangeHistorySerializer,
     ProjectInvitationModelWriteSerializer,
     ProjectInvitationModelReadSerializer,
+    NewNoteSerializer,
+    NoteSerializer,
 )
 
 logger = logging.getLogger("console")
@@ -981,6 +984,74 @@ class CommentThreadViewSet(viewsets.ModelViewSet):
         comments = thread.comments.all()
 
         return Response(data=CommentSerializer(comments, many=True).data, status=http_status.HTTP_200_OK)
+
+
+class NoteViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    queryset = Note.objects.all()
+    serializer_class = NoteSerializer
+
+    @transaction.atomic
+    @swagger_auto_schema(responses={400: "Bad request", 201: NoteSerializer}, request_body=NewNoteSerializer)
+    def create(self, request, *args, **kwargs):
+        serializer = NewNoteSerializer(data=request.data, context={"request": request})
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
+
+        try:
+            module_type = ModuleType.objects.get(pk=serializer.validated_data["module_type_id"])
+        except ModuleType.DoesNotExist:
+            logging.error("Module type not found")
+            return utils.ErrorResponse("Module type not found", status=http_status.HTTP_400_BAD_REQUEST)
+
+        ModuleClass = utils.get_model(module_type.class_name, suffix=None)
+        module: Module | Submodule = ModuleClass.objects.get(pk=serializer.validated_data["module_id"])
+
+        if not utils.has_project_permission("add_note", self.request.user, module.get_project()):
+            logging.error("Selected user does not have permission to add notes to the project")
+            return utils.ErrorResponse("Selected user does not have permission to add notes to the project", status=http_status.HTTP_403_FORBIDDEN)
+
+        note = serializer.save()
+
+        return Response(self.serializer_class(note).data, status=http_status.HTTP_201_CREATED)
+
+    @transaction.atomic
+    @swagger_auto_schema(responses={400: "Bad request", 200: NoteSerializer}, request_body=NoteSerializer)
+    def update(self, request, *args, **kwargs):
+        note: Note = self.get_object()
+
+        if not utils.has_project_permission("change_note", self.request.user, note.get_project()):
+            logging.error("Selected user does not have permission to update notes in the project")
+            return utils.ErrorResponse("Selected user does not have permission to update notes in the project", status=http_status.HTTP_403_FORBIDDEN)
+
+        serializer = self.serializer_class(data=request.data, instance=note)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
+
+        note = serializer.save()
+        update_change_reason(note, utils.ChangeReasons.UPDATE.value)
+
+        return Response(self.serializer_class(note).data, status=http_status.HTTP_200_OK)
+
+    @transaction.atomic
+    @swagger_auto_schema(responses={400: "Bad request", 200: NoteSerializer}, request_body=NoteSerializer)
+    def partial_update(self, request, *args, **kwargs):
+        note: Note = self.get_object()
+
+        if not utils.has_project_permission("change_note", self.request.user, note.get_project()):
+            logging.error("Selected user does not have permission to update notes in the project")
+            return utils.ErrorResponse("Selected user does not have permission to update notes in the project", status=http_status.HTTP_403_FORBIDDEN)
+
+        serializer = self.serializer_class(data=request.data, partial=True, instance=note)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
+
+        note = serializer.save()
+        update_change_reason(note, utils.ChangeReasons.UPDATE.value)
+
+        return Response(self.serializer_class(note).data, status=http_status.HTTP_200_OK)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
