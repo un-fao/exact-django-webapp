@@ -12,6 +12,7 @@ import api.utilities as utils
 class Defaults:
     def __init__(self, input: api.Module):
         self.input = input
+        self.values = SimpleNamespace()
         self.activity = input.parent.activity if getattr(input, "parent", None) else input.activity
         self.climate: api.Climate = self.activity.climate_t2 if self.activity.climate_t2 else self.activity.project.climate
         self.moisture: api.Moisture = self.activity.moisture_t2 if self.activity.moisture_t2 else self.activity.project.moisture
@@ -41,9 +42,13 @@ class DefaultsFactory:
         """
 
         module_type = type(input).__name__
-        DefaultClass = globals().get(f"{module_type}Defaults", None)
+        DefaultClass: Defaults = globals().get(f"{module_type}Defaults", None)
 
         if DefaultClass is not None:
+
+            if not input.is_ready():
+                return DefaultClass(input).values
+
             return DefaultClass(input).get_defaults(calculate=calculate)
         else:
             raise NotImplementedError(f"Defaults for {module_type} have not been implemented.")
@@ -51,11 +56,26 @@ class DefaultsFactory:
 
 class GrasslandDefaults(Defaults):
 
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace(
+            soc_t2_start_default=0,
+            soc_t2_w_default=0,
+            soc_t2_wo_default=0,
+            biomass_t2_start_default=0,
+            biomass_t2_w_default=0,
+            biomass_t2_wo_default=0,
+            combustion_factor_t2_start_default=0,
+            combustion_factor_t2_w_default=0,
+            combustion_factor_t2_wo_default=0,
+        )
+
     def get_defaults(self, calculate=False) -> dict:
         """
         Gets the default tier2 values for a Grassland module.
         """
-        self.input: api.Grassland  # type hinting
+        self.input: api.Grassland
 
         defaults = calcs.GrasslandCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
@@ -74,9 +94,32 @@ class GrasslandDefaults(Defaults):
 
 
 class AnnualCroppingDefaults(Defaults):
-    pass
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace(
+            soc_t2_start_default=0,
+            soc_t2_w_default=0,
+            soc_t2_wo_default=0,
+            fi_t2_start_default=0,
+            fi_t2_w_default=0,
+            fi_t2_wo_default=0,
+            fmg_t2_start_default=0,
+            fmg_t2_w_default=0,
+            fmg_t2_wo_default=0,
+            flu_t2_start_default=0,
+            flu_t2_w_default=0,
+            flu_t2_wo_default=0,
+            biomass_t2_start_default=0,
+            biomass_t2_w_default=0,
+            biomass_t2_wo_default=0,
+            minor_biomass_t2_start_default=0,
+            minor_biomass_t2_w_default=0,
+            minor_biomass_t2_wo_default=0,
+        )
 
     def get_defaults(self, calculate=False) -> dict:
+
         self.input: api.AnnualCropping
 
         defaults = calcs.AnnualCropCalculator(self.input)
@@ -105,6 +148,40 @@ class AnnualCroppingDefaults(Defaults):
 
 
 class PerennialCroppingDefaults(Defaults):
+
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace(
+            soc_t2_start_default=0,
+            soc_t2_w_default=0,
+            soc_t2_wo_default=0,
+            agb_t2_start_default=0,
+            agb_t2_w_default=0,
+            agb_t2_wo_default=0,
+            agb_max_t2_start_default=0,
+            agb_max_t2_w_default=0,
+            agb_max_t2_wo_default=0,
+            bgb_t2_start_default=0,
+            bgb_t2_w_default=0,
+            bgb_t2_wo_default=0,
+            flu_t2_start_default=0,
+            flu_t2_w_default=0,
+            flu_t2_wo_default=0,
+            fi_t2_start_default=0,
+            fi_t2_w_default=0,
+            fi_t2_wo_default=0,
+            fmg_t2_start_default=0,
+            fmg_t2_w_default=0,
+            fmg_t2_wo_default=0,
+            residue_burned_t2_start_default=0,
+            residue_burned_t2_w_default=0,
+            residue_burned_t2_wo_default=0,
+            fire_periodicity_t2_start_default=0,
+            fire_periodicity_t2_w_default=0,
+            fire_periodicity_t2_wo_default=0,
+        )
+
     def get_defaults(self, calculate=False) -> dict:
         self.input: api.PerennialCropping
 
@@ -143,6 +220,43 @@ class PerennialCroppingDefaults(Defaults):
 
 
 class FloodedRiceDefaults(Defaults):
+
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace(
+            soc_t2_start_default=0,
+            soc_t2_w_default=0,
+            soc_t2_wo_default=0,
+            flu_t2_start_default=0,
+            flu_t2_w_default=0,
+            flu_t2_wo_default=0,
+            biomass_t2_start_default=0,
+            biomass_t2_w_default=0,
+            biomass_t2_wo_default=0,
+            fmg_t2_start_default=0,
+            fmg_t2_w_default=0,
+            fmg_t2_wo_default=0,
+            fi_t2_start_default=0,
+            fi_t2_w_default=0,
+            fi_t2_wo_default=0,
+            efc_t2_start_default=0,
+            efc_t2_w_default=0,
+            efc_t2_wo_default=0,
+            sfw_t2_start_default=0,
+            sfw_t2_w_default=0,
+            sfw_t2_wo_default=0,
+            sfp_t2_start_default=0,
+            sfp_t2_w_default=0,
+            sfp_t2_wo_default=0,
+            efi_t2_start_default=0,
+            efi_t2_w_default=0,
+            efi_t2_wo_default=0,
+            rice_straw_t2_start_defaults=0,
+            rice_straw_t2_w_defaults=0,
+            rice_straw_t2_wo_defaults=0,
+        )
+
     def get_defaults(self, calculate=False) -> dict:
         self.input: api.FloodedRice
 
@@ -186,6 +300,16 @@ class FloodedRiceDefaults(Defaults):
 
 
 class LivestockDefaults(Defaults):
+
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace(
+            enteric_fermentation_t2_start_default=0,
+            enteric_fermentation_t2_w_default=0,
+            enteric_fermentation_t2_wo_default=0,
+        )
+
     def get_defaults(self, calculate=False) -> dict:
         self.input: api.Livestock
 
@@ -201,6 +325,20 @@ class LivestockDefaults(Defaults):
 
 
 class ElectricityDefaults(Defaults):
+
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace(
+            ef_source_default=0,
+            ef_t2_start_default=0,
+            ef_t2_w_default=0,
+            ef_t2_wo_default=0,
+            transmission_loss_start_default=0,
+            transmission_loss_w_default=0,
+            transmission_loss_wo_default=0,
+        )
+
     def get_defaults(self, calculate=False) -> dict:
         self.input: api.Electricity
 
@@ -219,6 +357,14 @@ class ElectricityDefaults(Defaults):
 
 
 class FuelDefaults(Defaults):
+
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace(
+            ef_t2_default=0,
+        )
+
     def get_defaults(self, calculate=False) -> dict:
         self.input: api.Fuel
 
@@ -229,6 +375,16 @@ class FuelDefaults(Defaults):
 
 
 class InputEntryDefaults(Defaults):
+
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace(
+            co2_emissions_t2_default=0,
+            n2o_emissions_t2_default=0,
+            co2_e_emissions_t2_default=0,
+        )
+
     def get_defaults(self, calculate=False) -> dict:
         self.input: api.InputEntry
 
@@ -239,6 +395,28 @@ class InputEntryDefaults(Defaults):
 
 
 class LargeFisheryDefaults(Defaults):
+
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace(
+            energy_emission_factor_t2_start_default=0,
+            energy_emission_factor_t2_w_default=0,
+            energy_emission_factor_t2_wo_default=0,
+            refrigerant_lost_per_tonne_t2_start_default=0,
+            refrigerant_lost_per_tonne_t2_w_default=0,
+            refrigerant_lost_per_tonne_t2_wo_default=0,
+            refrigerant_gwp_t2_start_default=0,
+            refrigerant_gwp_t2_w_default=0,
+            refrigerant_gwp_t2_wo_default=0,
+            tonnes_of_ice_t2_start_default=0,
+            tonnes_of_ice_t2_w_default=0,
+            tonnes_of_ice_t2_wo_default=0,
+            inshore_ice_production_kwh_per_tonne_t2_start_default=0,
+            inshore_ice_production_kwh_per_tonne_t2_w_default=0,
+            inshore_ice_production_kwh_per_tonne_t2_wo_default=0,
+        )
+
     def get_defaults(self, calculate=False) -> dict:
         self.input: api.LargeFishery
 
@@ -265,6 +443,28 @@ class LargeFisheryDefaults(Defaults):
 
 
 class SmallFisheryDefaults(Defaults):
+
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace(
+            energy_emission_factor_t2_start_default=0,
+            energy_emission_factor_t2_w_default=0,
+            energy_emission_factor_t2_wo_default=0,
+            refrigerant_lost_per_tonne_t2_start_default=0,
+            refrigerant_lost_per_tonne_t2_w_default=0,
+            refrigerant_lost_per_tonne_t2_wo_default=0,
+            refrigerant_gwp_t2_start_default=0,
+            refrigerant_gwp_t2_w_default=0,
+            refrigerant_gwp_t2_wo_default=0,
+            tonnes_of_ice_t2_start_default=0,
+            tonnes_of_ice_t2_w_default=0,
+            tonnes_of_ice_t2_wo_default=0,
+            inshore_ice_production_kwh_per_tonne_t2_start_default=0,
+            inshore_ice_production_kwh_per_tonne_t2_w_default=0,
+            inshore_ice_production_kwh_per_tonne_t2_wo_default=0,
+        )
+
     def get_defaults(self, calculate=False) -> dict:
         self.input: api.SmallFishery
 
@@ -291,6 +491,16 @@ class SmallFisheryDefaults(Defaults):
 
 
 class IrrigationSystemDefaults(Defaults):
+
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace(
+            ef_t2_start_default=0,
+            ef_t2_w_default=0,
+            ef_t2_wo_default=0,
+        )
+
     def get_defaults(self, calculate=False) -> dict:
         self.input: api.IrrigationSystem
 
