@@ -1,5 +1,6 @@
 import csv
 
+from django.apps import apps
 from ipcc.models import ForestManagementAGB
 
 
@@ -19,10 +20,11 @@ def export_to_csv(model):
         data.append(row)
 
     # Write data to a CSV file
-    with open("forest_agb.csv", "w", newline="") as csvfile:
+    with open(f"csv/{model.__name__}.csv", "w", newline="") as csvfile:
         writer = csv.writer(csvfile)
         writer.writerows(data)
 
 
-# Call the function with your model
-export_to_csv(ForestManagementAGB)
+# Loop through all models in ipcc.models and export them to CSV
+for model in apps.get_app_config("ipcc").get_models():
+    export_to_csv(model)
