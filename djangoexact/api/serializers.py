@@ -1582,7 +1582,7 @@ class FloodedRiceReadSerializer(LandModuleReadSerializer):
 
 
 # Building
-class BuildingWriteSerializer(ScenarioSubmoduleSerializer):
+class BuildingSerializer(ScenarioSubmoduleSerializer):
     class Meta:
         model = Building
         fields = "__all__"
@@ -1590,19 +1590,19 @@ class BuildingWriteSerializer(ScenarioSubmoduleSerializer):
         mandatory_fields = {
             "start": {
                 "mandatory": [
-                    "building_type_start",
+                    "building_type",
                     "area_m2_start",
                 ],
             },
             "with": {
                 "mandatory": [
-                    "building_type_w",
+                    "building_type",
                     "area_m2_w",
                 ],
             },
             "without": {
                 "mandatory": [
-                    "building_type_wo",
+                    "building_type",
                     "area_m2_wo",
                 ],
             },
@@ -1613,18 +1613,18 @@ class BuildingWriteSerializer(ScenarioSubmoduleSerializer):
         return super().validate(data)
 
 
-class BuildingReadSerializer(BaseGenericModuleSerializer):
-    class Meta:
-        model = Building
-        fields = "__all__"
-        ref_name = "Building"
-        mandatory_fields = {}
+class BuildingWriteSerializer(BuildingSerializer):
+    pass
+
+
+class BuildingReadSerializer(BuildingSerializer):
+    pass
 
 
 # Road
 
 
-class RoadWriteSerializer(ScenarioSubmoduleSerializer):
+class RoadSerializer(ScenarioSubmoduleSerializer):
     class Meta:
         model = Road
         fields = "__all__"
@@ -1632,21 +1632,21 @@ class RoadWriteSerializer(ScenarioSubmoduleSerializer):
         mandatory_fields = {
             "start": {
                 "mandatory": [
-                    "road_type_start",
+                    "road_type",
                     "length_km_start",
                     "width_m_start",
                 ],
             },
             "with": {
                 "mandatory": [
-                    "road_type_w",
+                    "road_type",
                     "length_km_w",
                     "width_m_w",
                 ],
             },
             "without": {
                 "mandatory": [
-                    "road_type_wo",
+                    "road_type",
                     "length_km_wo",
                     "width_m_wo",
                 ],
@@ -1654,33 +1654,21 @@ class RoadWriteSerializer(ScenarioSubmoduleSerializer):
         }
 
     def validate(self, data):
-        mandatory_fields = []
-
-        road_type_scenarios = get_filled_scenarios(data, ["road_type"])
-
-        for scenario in road_type_scenarios:
-            mandatory_fields += generate_fields_for_scenario(scenario, self.Meta.mandatory_fields)
-
-        if not are_fields_filled(data, mandatory_fields):
-            raise serializers.ValidationError(f"Missing fields. Check that all mandatory fields are present: {mandatory_fields}")
-        elif mandatory_fields:
-            data["status"] = StatusType.objects.get(name="READY")
-
         return super().validate(data)
 
 
-class RoadReadSerializer(BaseGenericModuleSerializer):
-    class Meta:
-        model = Road
-        fields = "__all__"
-        ref_name = "Road"
-        mandatory_fields = {}
+class RoadWriteSerializer(RoadSerializer):
+    pass
+
+
+class RoadReadSerializer(RoadSerializer):
+    pass
 
 
 # Other
 
 
-class OtherInfrastructureWriteSerializer(ScenarioSubmoduleSerializer):
+class OtherInfrastructureSerializer(ScenarioSubmoduleSerializer):
     class Meta:
         model = OtherInfrastructure
         fields = "__all__"
@@ -1698,12 +1686,12 @@ class OtherInfrastructureWriteSerializer(ScenarioSubmoduleSerializer):
         }
 
 
-class OtherInfrastructureReadSerializer(BaseGenericModuleSerializer):
-    class Meta:
-        model = OtherInfrastructure
-        fields = "__all__"
-        ref_name = "OtherInfrastructure"
-        mandatory_fields = {}
+class OtherInfrastructureWriteSerializer(OtherInfrastructureSerializer):
+    pass
+
+
+class OtherInfrastructureReadSerializer(OtherInfrastructureSerializer):
+    pass
 
 
 class IrrigationWriteSerializer(BaseModuleSerializer):
@@ -2587,7 +2575,7 @@ class DegradedLandReadSerializer(LandModuleReadSerializer):
         mandatory_fields = {}
 
 
-class SettlementWriteSerializer(LandModuleWriteSerializer):
+class SettlementSerializer(LandModuleWriteSerializer):
     class Meta:
         model = Settlement
         fields = "__all__"
@@ -2614,43 +2602,43 @@ class SettlementWriteSerializer(LandModuleWriteSerializer):
 
         buildings = Building.objects.filter(parent=self.instance).all()
 
-        if any(building.status.name == "EMPTY" for building in buildings):
+        if any(not building.is_ready() for building in buildings):
             raise serializers.ValidationError("At least one building is not ready for calculations")
 
         for building in buildings:
-            building_serializer = BuildingReadSerializer(data=building.__dict__, instance=building)
+            building_serializer = BuildingReadSerializer(data={}, partial=True, instance=building)
             if not building_serializer.is_valid():
                 raise serializers.ValidationError(building_serializer.errors)
 
         roads = Road.objects.filter(parent=self.instance).all()
 
-        if any(road.status.name == "EMPTY" for road in roads):
+        if any(not road.is_ready() for road in roads):
             raise serializers.ValidationError("At least one road is not ready for calculations")
 
         for road in roads:
-            road_serializer = RoadReadSerializer(data=road.__dict__, instance=road)
+            road_serializer = RoadReadSerializer(data={}, partial=True, instance=road)
             if not road_serializer.is_valid():
                 raise serializers.ValidationError(road_serializer.errors)
 
         other_infrastructures = OtherInfrastructure.objects.filter(parent=self.instance).all()
 
-        if any(other_infrastructure.status.name == "EMPTY" for other_infrastructure in other_infrastructures):
+        if any(not other_infrastructure.is_ready() for other_infrastructure in other_infrastructures):
             raise serializers.ValidationError("At least one other infrastructure is not ready for calculations")
 
         for other_infrastructure in other_infrastructures:
-            other_infrastructure_serializer = OtherInfrastructureReadSerializer(data=other_infrastructure.__dict__, instance=other_infrastructure)
+            other_infrastructure_serializer = OtherInfrastructureReadSerializer(data={}, partial=True, instance=other_infrastructure)
             if not other_infrastructure_serializer.is_valid():
                 raise serializers.ValidationError(other_infrastructure_serializer.errors)
 
         return super().validate(data)
 
 
-class SettlementReadSerializer(LandModuleReadSerializer):
-    class Meta:
-        model = Settlement
-        fields = "__all__"
-        ref_name = "Settlement"
-        mandatory_fields = {}
+class SettlementWriteSerializer(SettlementSerializer):
+    pass
+
+
+class SettlementReadSerializer(SettlementSerializer):
+    pass
 
 
 class ConfigParamSerializer(serializers.ModelSerializer):
