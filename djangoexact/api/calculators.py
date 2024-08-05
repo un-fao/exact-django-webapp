@@ -4765,11 +4765,6 @@ class CoastalWetlandCalculator(BaseCalculator):
         self.soil_type_name = module.soil_type_t2.name if module.soil_type_t2 else "Mineral"
 
         try:
-            self.soc = ipcc.SoilOrganicCarbon.objects.get(**cm, soil_type__name=self.soil_type_name)
-        except ipcc.SoilOrganicCarbon.DoesNotExist:
-            raise ValueError(f"Could not find SOC for {project.climate.name}, {project.moisture.name}, {self.soil_type_name}")
-
-        try:
             self.agb = ipcc.CoastalAGB.objects.get(**cm, land_use_type=module.land_use_type)
         except ipcc.CoastalAGB.DoesNotExist:
             raise ValueError(f"Could not find AGB for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}")
