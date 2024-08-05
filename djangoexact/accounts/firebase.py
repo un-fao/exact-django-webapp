@@ -38,6 +38,8 @@ class FirebaseAuthentication(authentication.BaseAuthentication):
             decoded_token = firebase_admin_auth.verify_id_token(token)
             uid = decoded_token["uid"]
             user = User.objects.get(firebase_uid=uid)
+        except firebase_admin_auth.ExpiredIdTokenError:
+            raise exceptions.AuthenticationFailed("Token is expired")
         except Exception as e:
             raise exceptions.AuthenticationFailed(str(e))
 
