@@ -1061,6 +1061,10 @@ class ModuleBaseSerializer(AllModulesBaseSerializer):
 
 
 class LandModuleWriteSerializer(ScenarioModuleSerializer):
+    activity = ActivitySerializer(many=False, read_only=True)
+    land_use_change = get_model_serializer(LandUseChange)(many=False, read_only=True, required=False)
+    status = get_model_serializer(StatusType)(many=False, read_only=True)
+
     class Meta:
         model = None
         fields = "__all__"
@@ -2202,7 +2206,7 @@ class LargeFisheryReadSerializer(LandModuleReadSerializer):
 # Waterbody
 
 
-class WaterbodyWriteSerializer(LandModuleWriteSerializer):
+class WaterbodySerializer(LandModuleWriteSerializer):
     class Meta:
         model = Waterbody
         fields = "__all__"
@@ -2232,12 +2236,12 @@ class WaterbodyWriteSerializer(LandModuleWriteSerializer):
         }
 
 
-class WaterbodyReadSerializer(LandModuleReadSerializer):
-    class Meta:
-        model = Waterbody
-        fields = "__all__"
-        ref_name = "Waterbody"
-        mandatory_fields = {}
+class WaterbodyWriteSerializer(WaterbodySerializer):
+    pass
+
+
+class WaterbodyReadSerializer(WaterbodySerializer):
+    pass
 
 
 class ProjectNameIdSerializer(serializers.ModelSerializer):
@@ -2648,22 +2652,22 @@ class FuelTypeSerializer(serializers.ModelSerializer):
         ref_name = "FuelType"
 
 
-class CoastalWetlandWriteSerializer(NoScenarioModuleSerializer):
+class CoastalWetlandSerializer(NoScenarioModuleSerializer):
     class Meta:
         model = CoastalWetland
         fields = "__all__"
         ref_name = "CoastalWetland"
         mandatory_fields = {
-            "mandatory": ["land_use_type_start", "area"],
+            "mandatory": ["land_use_type", "area"],
         }
 
 
-class CoastalWetlandReadSerializer(BaseGenericModuleSerializer):
-    class Meta:
-        model = CoastalWetland
-        fields = "__all__"
-        ref_name = "CoastalWetland"
-        mandatory_fields = {}
+class CoastalWetlandWriteSerializer(CoastalWetlandSerializer):
+    pass
+
+
+class CoastalWetlandReadSerializer(CoastalWetlandSerializer):
+    pass
 
 
 class ForestDisturbanceWriteSerializer(ScenarioSubmoduleSerializer):
