@@ -1209,7 +1209,7 @@ class MinorSeasonAnnualCroppingReadSerializer(BaseGenericModuleSerializer):
         mandatory_fields = {}
 
 
-class AnnualCroppingWriteSerializer(LandModuleWriteSerializer):
+class AnnualCroppingSerializer(LandModuleWriteSerializer):
     class Meta:
         model = AnnualCropping
         fields = "__all__"
@@ -1242,35 +1242,25 @@ class AnnualCroppingWriteSerializer(LandModuleWriteSerializer):
         }
 
     def validate(self, data):
-        super().validate(data)
 
-        for minor_season in self.instance.minor_seasons.all():
-            minor_season: MinorSeasonAnnualCropping
-            if not minor_season.is_ready():
-                data["status"] = StatusType.objects.get(name="SUBMODULES_EMPTY")
-
-        return data
-
-
-class AnnualCroppingReadSerializer(LandModuleReadSerializer):
-    class Meta:
-        model = AnnualCropping
-        fields = "__all__"
-        ref_name = "AnnualCropping"
-        mandatory_fields = {}
-
-    def validate(self, data):
         for minor_season in self.instance.minor_seasons.all():
             minor_season: MinorSeasonAnnualCropping
             if not minor_season.is_ready():
                 data["status"] = StatusType.objects.get(name="SUBMODULES_EMPTY")
                 return data
+
         return super().validate(data)
 
 
+class AnnualCroppingWriteSerializer(AnnualCroppingSerializer):
+    pass
+
+
+class AnnualCroppingReadSerializer(AnnualCroppingSerializer):
+    pass
+
+
 # Perennial Cropping
-
-
 class MinorSeasonPerennialCroppingWriteSerializer(ScenarioSubmoduleSerializer):
     class Meta:
         model = MinorSeasonPerennialCropping
