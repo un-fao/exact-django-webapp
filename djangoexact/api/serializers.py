@@ -2440,19 +2440,19 @@ class InputEntryWriteSerializer(ScenarioSubmoduleSerializer):
         mandatory_fields = {
             "start": {
                 "mandatory": [
-                    "input_type_start",
+                    "input_type",
                     "value_start",
                 ],
             },
             "with": {
                 "mandatory": [
-                    "input_type_w",
+                    "input_type",
                     "value_w",
                 ],
             },
             "without": {
                 "mandatory": [
-                    "input_type_wo",
+                    "input_type",
                     "value_wo",
                 ],
             },
