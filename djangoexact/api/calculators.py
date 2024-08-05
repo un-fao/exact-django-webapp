@@ -3431,14 +3431,20 @@ class FuelCalculator(BaseCalculator):
     Calculator for fuel
     """
 
+    def __init__(self, input) -> None:
+        super().__init__(input)
+
+        self.ef = SimpleNamespace(t_co2_eq=0, net_calorific_value=0, co2=0, ch4=0, n2o=0)
+
+        self.math_w = None
+        self.math_wo = None
+
     def get_defaults(self, calculate=False) -> dict:
         input: Fuel = self.data
         activity: Activity = input.parent.activity
-        project: Project = activity.project
-        change_rate = activity.change_rate
 
         try:
-            self.ef_fuel_t_co2_eq = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=input.fuel_type).t_co2_eq
+            self.ef = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=input.fuel_type)
         except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
             raise ValueError(f"Default emission factor for {input.fuel_type.name} does not exist. Please select tier 2 value.")
 
@@ -3455,19 +3461,10 @@ class FuelCalculator(BaseCalculator):
 
         macro_fuel_type = module.fuel_type.macro_fuel_type.name
 
-        try:
-            ef = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=module.fuel_type)
-            log.debug(f"Default emission factor: {ef.t_co2_eq}")
-        except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
-            raise ValueError(f"Default emission factor for {module.fuel_type.name} does not exist. Please select tier 2 value.")
-
-        math_w = None
-        math_wo = None
-
         if macro_fuel_type == "Liquid or gaseous":
             log.debug("Liquid or gaseous fuel")
             input_w = [
-                ef.t_co2_eq,
+                self.ef.t_co2_eq,
                 module.ef_t2,
                 module.fuel_consumption_start,
                 module.fuel_consumption_w,
@@ -3477,11 +3474,11 @@ class FuelCalculator(BaseCalculator):
             ]
             log.debug("Inputs with: %s", input_w)
 
-            math_w = FuelConsumption(*input_w)
-            math_w.calculate_emissions()
+            self.math_w = FuelConsumption(*input_w)
+            self.math_w.calculate_emissions()
 
             input_wo = [
-                ef.t_co2_eq,
+                self.ef.t_co2_eq,
                 module.ef_t2,
                 module.fuel_consumption_start,
                 module.fuel_consumption_wo,
@@ -3491,16 +3488,16 @@ class FuelCalculator(BaseCalculator):
             ]
             log.debug("Inputs without: %s", input_wo)
 
-            math_wo = FuelConsumption(*input_wo)
-            math_wo.calculate_emissions()
+            self.math_wo = FuelConsumption(*input_wo)
+            self.math_wo.calculate_emissions()
 
         elif macro_fuel_type == "Solid":
             log.debug("Solid fuel")
             input_w = [
-                ef.net_calorific_value,
-                ef.co2,
-                ef.ch4,
-                ef.n2o,
+                self.ef.net_calorific_value,
+                self.ef.co2,
+                self.ef.ch4,
+                self.ef.n2o,
                 module.account_for_co2,
                 project.gw_potential.ch4,
                 project.gw_potential.n2o,
@@ -3513,14 +3510,14 @@ class FuelCalculator(BaseCalculator):
             ]
             log.debug("Inputs with: %s", input_w)
 
-            math_w = SolidConsumption(*input_w)
-            math_w.calculate_emissions()
+            self.math_w = SolidConsumption(*input_w)
+            self.math_w.calculate_emissions()
 
             input_wo = [
-                ef.net_calorific_value,
-                ef.co2,
-                ef.ch4,
-                ef.n2o,
+                self.ef.net_calorific_value,
+                self.ef.co2,
+                self.ef.ch4,
+                self.ef.n2o,
                 module.account_for_co2,
                 project.gw_potential.ch4,
                 project.gw_potential.n2o,
@@ -3533,14 +3530,14 @@ class FuelCalculator(BaseCalculator):
             ]
             log.debug("Inputs without: %s", input_wo)
 
-            math_wo = SolidConsumption(*input_wo)
-            math_wo.calculate_emissions()
+            self.math_wo = SolidConsumption(*input_wo)
+            self.math_wo.calculate_emissions()
 
         else:
             raise ValueError(f"Fuel type {macro_fuel_type} not supported by calculations.")
 
-        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
-        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+        results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
+        results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
         results_tuple = (results_w, results_wo)
 
@@ -3553,9 +3550,6 @@ class FuelCalculator(BaseCalculator):
         log.debug("END FuelCalculator.calculate")
         log.debug("")
         return results_tuple
-
-    def defaults(self) -> DefaultData:
-        pass
 
 
 class SettlementCalculator(BaseCalculator):

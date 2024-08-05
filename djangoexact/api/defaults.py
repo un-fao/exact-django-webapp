@@ -371,7 +371,7 @@ class FuelDefaults(Defaults):
         defaults = calcs.FuelCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
-        return SimpleNamespace(ef_t2_default=defaults.ef_fuel_t_co2_eq)
+        return self.values
 
 
 class InputEntryDefaults(Defaults):
