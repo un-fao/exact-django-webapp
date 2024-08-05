@@ -1825,15 +1825,16 @@ class IrrigationPhaseReadSerializer(BaseGenericModuleSerializer):
         mandatory_fields = {}
 
 
-class EnergyWriteSerializer(ScenarioModuleSerializer):
-    class Meta:
-        model = Energy
-        fields = "__all__"
-        ref_name = "Energy"
-        mandatory_fields = {}
+class EnergySerializer(ScenarioModuleSerializer):
+    fuels = serializers.SerializerMethodField(read_only=True)
+    electricities = serializers.SerializerMethodField(read_only=True)
 
+    def get_fuels(self, instance):
+        return FuelReadSerializer(instance.fuels.all(), many=True).data
 
-class EnergyReadSerializer(ScenarioModuleSerializer):
+    def get_electricities(self, instance):
+        return ElectricityReadSerializer(instance.electricities.all(), many=True).data
+
     class Meta:
         model = Energy
         fields = "__all__"
@@ -1843,22 +1844,30 @@ class EnergyReadSerializer(ScenarioModuleSerializer):
     def validate(self, data):
         super().validate(data)
 
-        electricities = self.instance.electricities.all()
-        fuels = self.instance.fuels.all()
+        electricities: QuerySet[Electricity] = self.instance.electricities.all()
+        fuels: QuerySet[Fuel] = self.instance.fuels.all()
 
-        if any([electricity.status.name == "EMPTY" for electricity in electricities]):
+        if any([not electricity.is_ready() for electricity in electricities]):
             raise serializers.ValidationError("Electricity modules are not ready for calculations")
 
-        if any([fuel.status.name == "EMPTY" for fuel in fuels]):
+        if any([not fuel.is_ready() for fuel in fuels]):
             raise serializers.ValidationError("Fuel modules are not ready for calculations")
 
         return data
 
 
+class EnergyWriteSerializer(EnergySerializer):
+    pass
+
+
+class EnergyReadSerializer(EnergySerializer):
+    pass
+
+
 # Fuel
 
 
-class FuelWriteSerializer(ScenarioSubmoduleSerializer):
+class FuelSerializer(ScenarioSubmoduleSerializer):
     class Meta:
         model = Fuel
         fields = "__all__"
@@ -1896,31 +1905,12 @@ class FuelWriteSerializer(ScenarioSubmoduleSerializer):
         return data
 
 
-class FuelReadSerializer(BaseGenericModuleSerializer):
-    class Meta:
-        model = Fuel
-        fields = "__all__"
-        ref_name = "Fuel"
-        mandatory_fields = {
-            "start": {
-                "mandatory": [
-                    "fuel_type",
-                    "fuel_consumption_start",
-                ],
-            },
-            "with": {
-                "mandatory": [
-                    "fuel_type",
-                    "fuel_consumption_w",
-                ],
-            },
-            "without": {
-                "mandatory": [
-                    "fuel_type",
-                    "fuel_consumption_wo",
-                ],
-            },
-        }
+class FuelWriteSerializer(FuelSerializer):
+    pass
+
+
+class FuelReadSerializer(FuelSerializer):
+    pass
 
 
 class ElectricityWriteSerializer(NoScenarioSubmoduleSerializer):
