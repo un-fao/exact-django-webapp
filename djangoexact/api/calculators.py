@@ -3172,6 +3172,12 @@ class InputEntryCalculator(BaseCalculator):
     Calculator for single input entries.
     """
 
+    def __init__(self, input) -> None:
+        super().__init__(input)
+
+        self.ref = SimpleNamespace(co2_multiplier=0, co2_emissions_multiplier=0, n2o_quantity_multiplier=0, n2o_emissions_multiplier=0, production_quantity_multiplier=0, production_emissions_multiplier=0)
+        self.ef = SimpleNamespace(co2_value=0, n2o_value=0, co2_eq_value=0)
+
     def get_defaults(self, calculate=False) -> dict:
 
         module: InputEntry = self.data
@@ -3206,6 +3212,8 @@ class InputEntryCalculator(BaseCalculator):
         module: InputEntry = self.data
         activity: Activity = module.parent.activity
         project: Project = activity.project
+
+        self.get_defaults()
 
         self.inputs_w = [
             module.value_start,

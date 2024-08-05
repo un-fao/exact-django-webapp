@@ -2416,27 +2416,43 @@ class ForestManagementReadSerializer(LandModuleReadSerializer):
         mandatory_fields = {}
 
 
-class InputWriteSerializer(BaseModuleSerializer):
+class InputSerializer(ScenarioModuleSerializer):
     class Meta:
         model = Input
         fields = "__all__"
         ref_name = "Input"
         mandatory_fields = {}
 
+    def validate(self, data):
+        entries = InputEntry.objects.filter(parent=self.instance).all()
+        for entry in entries:
+            entry: InputEntry
+            if not entry.is_ready():
+                data["status"] = StatusType.objects.get(name="SUBMODULES_EMPTY")
+                return data
 
-class InputReadSerializer(BaseModuleSerializer):
-    class Meta:
-        model = Input
-        fields = "__all__"
-        ref_name = "Input"
-        mandatory_fields = {}
+        return super().validate(data)
 
 
-class InputEntryWriteSerializer(ScenarioSubmoduleSerializer):
+class InputWriteSerializer(InputSerializer):
+    pass
+
+
+class InputReadSerializer(InputSerializer):
+    pass
+
+
+class InputEntrySerializer(ScenarioSubmoduleSerializer):
+    module_type = serializers.SerializerMethodField(read_only=True)
+
+    def get_module_type(self, obj):
+        return get_model_serializer(ModuleType)(ModuleType.objects.get(class_name=obj.__class__.__name__), many=False).data
+
     class Meta:
         model = InputEntry
         fields = "__all__"
         ref_name = "InputEntry"
+        extra_fields = ["module_type"]
         mandatory_fields = {
             "start": {
                 "mandatory": [
@@ -2470,38 +2486,12 @@ class InputEntryWriteSerializer(ScenarioSubmoduleSerializer):
         return data
 
 
-class InputEntryReadSerializer(BaseGenericModuleSerializer):
-    module_type = serializers.SerializerMethodField()
+class InputEntryWriteSerializer(InputEntrySerializer):
+    pass
 
-    def get_module_type(self, obj):
-        return get_model_serializer(ModuleType)(ModuleType.objects.get(class_name=obj.__class__.__name__), many=False).data
 
-    class Meta:
-        model = InputEntry
-        fields = "__all__"
-        ref_name = "InputEntry"
-        extra_fields = ["module_type"]
-        mandatory_fields = {
-            "start": {
-                "mandatory": [
-                    "input_type_start",
-                    "value_start",
-                ],
-            },
-            "with": {
-                "mandatory": [
-                    "input_type_w",
-                    "value_w",
-                ],
-            },
-            "without": {
-                "mandatory": [
-                    "input_type_wo",
-                    "value_wo",
-                ],
-            },
-        }
-        ref_name = "InputEntry"
+class InputEntryReadSerializer(InputEntrySerializer):
+    pass
 
 
 class DynamicResultSerializer(serializers.Serializer):
