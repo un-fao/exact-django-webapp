@@ -446,14 +446,28 @@ class BaseCalculator(ABC):
         model = None
 
     def __init__(self, input) -> None:
+        super().__init__()
+
         self.Meta.model = input.__class__
         self.data = input
+
         self.inputs_start_w = None
         self.inputs_start_wo = None
         self.inputs_start = None
         self.inputs_w = None
         self.inputs_wo = None
-        super().__init__()
+
+        self.math_start_w = None
+        self.math_start_wo = None
+        self.math_start = None
+        self.math_w = None
+        self.math_wo = None
+
+        self.results_start_w = None
+        self.results_start_wo = None
+        self.results_start = None
+        self.results_w = None
+        self.results_wo = None
 
     @abstractmethod
     def calculate(self, input: Module, aggregate_by=BreakdownTypes.TOTAL) -> Result:
@@ -476,7 +490,10 @@ class BaseCalculator(ABC):
         """
         Get the default values for a given module.
         """
-        raise NotImplementedError(f"get_defaults() method must be implemented for {self.__class__.__name__}.")
+        self.data: Module
+
+        if self.data.is_ready() and calculate:
+            self.calculate()
 
 
 class LandUseChangeCalculator(BaseCalculator):
@@ -4291,10 +4308,6 @@ class LivestockCalculator(BaseCalculator):
         module: Livestock = self.data
         activity: Activity = module.activity
         project: Project = activity.project
-        country: Country = project.country
-
-        climate: Climate = activity.climate_t2 or project.climate
-        moisture: Moisture = activity.moisture_t2 or project.moisture
 
         self.math_w = None
         self.math_wo = None
@@ -4463,29 +4476,6 @@ class LivestockCalculator(BaseCalculator):
         log.debug(f"Results for WITH: {results_w}")
         return (results_w, results_wo)
 
-    def defaults(self) -> DefaultData:
-        self.calculate()
-
-        module: Livestock = self.data
-
-        defaults_start = {}
-        defaults_w = {}
-        defaults_wo = {}
-
-        if is_with(module):
-            math_w = MathLivestock(*self.inputs_w)
-            math_w_defaults = math_w.evaluate_tier_2_defaults()
-            defaults_w.update(math_w_defaults.start)
-            defaults_w.update(math_w_defaults.other)
-
-        if is_without(module):
-            math_wo = MathLivestock(*self.inputs_wo)
-            math_wo_defaults = math_wo.evaluate_tier_2_defaults()
-            defaults_wo.update(math_wo_defaults.start)
-            defaults_wo.update(math_wo_defaults.other)
-
-        return DefaultData(defaults_start, defaults_w, defaults_wo)
-
 
 class IrrigationCalculator(BaseCalculator):
     def calculate(self) -> list[Result]:
@@ -4510,17 +4500,35 @@ class IrrigationCalculator(BaseCalculator):
 
         return (res_w, res_wo)
 
-    def get_defaults(self, input: Module) -> dict:
-        return super().get_defaults(input)
-
-    def defaults(self) -> DefaultData:
-        return super().defaults()
-
 
 class IrrigationSystemCalculator(BaseCalculator):
     """
     Calculates the emissions of the irrigation system
     """
+
+    def __init__(self, input) -> None:
+        super().__init__(input)
+
+        self.ef = SimpleNamespace(value=0)
+
+        self.inputs_w = []
+        self.inputs_wo = []
+
+        self.math_w = None
+        self.math_wo = None
+
+        self.results_w = None
+        self.results_wo = None
+
+    def get_defaults(self, calculate=False) -> dict:
+        super().get_defaults(calculate)
+
+        module: IrrigationSystem = self.data
+
+        try:
+            self.ef = ipcc.IrrigationSystemData.objects.get(irrigation_system_type=module.irrigation_system_type)
+        except ipcc.IrrigationSystemData.DoesNotExist:
+            raise ValueError(f"Could not find EF for {module.irrigation_system_type.name}")
 
     def calculate(self) -> list[Result]:
         """
@@ -4531,16 +4539,10 @@ class IrrigationSystemCalculator(BaseCalculator):
         activity: Activity = module.parent.activity
         project: Project = activity.project
 
-        try:
-            ef = ipcc.IrrigationSystemData.objects.get(irrigation_system_type=module.irrigation_system_type)
-        except ipcc.IrrigationSystemData.DoesNotExist:
-            raise ValueError(f"Could not find EF for {module.irrigation_system_type.name}")
+        self.get_defaults()
 
-        math_w = None
-        math_wo = None
-
-        inputs_w = [
-            ef.value,
+        self.inputs_w = [
+            self.ef.value,
             module.ef_t2_start,
             module.ha_start,
             module.ha_w,
@@ -4549,11 +4551,11 @@ class IrrigationSystemCalculator(BaseCalculator):
             activity.change_rate.name,
         ]
 
-        math_w = NewIrrigation(*inputs_w)
-        math_w.calculate_emissions()
+        self.math_w = NewIrrigation(*self.inputs_w)
+        self.math_w.calculate_emissions()
 
-        inputs_wo = [
-            ef.value,
+        self.inputs_wo = [
+            self.ef.value,
             module.ef_t2_wo,
             module.ha_start,
             module.ha_wo,
@@ -4562,156 +4564,162 @@ class IrrigationSystemCalculator(BaseCalculator):
             activity.change_rate.name,
         ]
 
-        math_wo = NewIrrigation(*inputs_wo)
-        math_wo.calculate_emissions()
+        self.math_wo = NewIrrigation(*self.inputs_wo)
+        self.math_wo.calculate_emissions()
 
-        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
-        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
-        results_tuple = (results_w, results_wo)
+        results_tuple = (self.results_w, self.results_wo)
 
         return results_tuple
 
-    def get_defaults(self, calculate=False) -> dict:
-
-        module: IrrigationSystem = self.data
-        activity: Activity = module.parent.activity
-
-        try:
-            self.ef = ipcc.IrrigationSystemData.objects.get(irrigation_system_type=module.irrigation_system_type)
-        except ipcc.IrrigationSystemData.DoesNotExist:
-            raise ValueError(f"Could not find EF for {module.irrigation_system_type.name}")
-
-    def defaults(self) -> DefaultData:
-
-        return super().defaults()
-
 
 class IrrigationPhaseCalculator(BaseCalculator):
+
+    def __init__(self, input) -> None:
+        super().__init__(input)
+
+        self.ef = SimpleNamespace(value=0)
+        self.energy_db = SimpleNamespace(net_calorific_value=0, density=0)
+        self.pressure = SimpleNamespace(avg_pressure=0)
+        self.erh_electricity = SimpleNamespace(value=0)
+        self.transportation_loss = SimpleNamespace(value=0)
+        self.pumping_efficiency = SimpleNamespace(value=0)
+
+        self.inputs_start = []
+        self.inputs_w = []
+        self.inputs_wo = []
+
+        self.math_start = None
+        self.math_w = None
+        self.math_wo = None
+
+        self.results_start = None
+        self.results_w = None
+        self.results_wo = None
+
+    def get_defaults(self, calculate=False) -> dict:
+        super().get_defaults(calculate)
+
+        module: IrrigationPhase = self.data
+
+        try:
+            self.ef = ipcc.IrrigationPhaseData.objects.get(fuel_type=module.fuel_type)
+        except ipcc.IrrigationPhaseData.DoesNotExist:
+            raise ValueError(f"Could not find EF for {module.fuel_type.name}")
+
+        try:
+            self.energy_db = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=module.fuel_type)
+        except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
+            raise ValueError(f"Could not find Energy Default Emission Factor for {module.fuel_type.name}")
+
+        try:
+            self.pressure = ipcc.IrrigationPressureRequirement.objects.get(irrigation_system_type=module.irrigation_system_type)
+        except ipcc.IrrigationPressureRequirement.DoesNotExist:
+            raise ValueError(f"Could not find Pressure Requirement for {module.irrigation_system_type.name}")
+
+        try:
+            self.erh_electricity = IrrigationParameter.objects.get(name="ERH_ELECTRICITY").value if module.fuel_type.name == "Electricity" else None
+        except IrrigationParameter.DoesNotExist:
+            raise ValueError(f"Could not find ERH_ELECTRICITY")
+
+        try:
+            self.transportation_loss = IrrigationParameter.objects.get(name="TRANSPORTATION_LOSS")
+        except IrrigationParameter.DoesNotExist:
+            raise ValueError(f"Could not find TRANSPORTATION_LOSS")
+
+        try:
+            self.pumping_efficiency = IrrigationParameter.objects.get(name="PUMPING_EFFICIENCY")
+        except IrrigationParameter.DoesNotExist:
+            raise ValueError(f"Could not find PUMPING_EFFICIENCY")
+
     def calculate(self) -> list[Result]:
         module: IrrigationPhase = self.data
         activity: Activity = module.parent.activity
         project: Project = activity.project
 
-        try:
-            ef = ipcc.IrrigationPhaseData.objects.get(fuel_type=module.fuel_type)
-        except ipcc.IrrigationPhaseData.DoesNotExist:
-            raise ValueError(f"Could not find EF for {module.fuel_type.name}")
+        self.get_defaults()
 
-        try:
-            energy_db = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=module.fuel_type)
-        except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find Energy Default Emission Factor for {module.fuel_type.name}")
-
-        try:
-            pressure = ipcc.IrrigationPressureRequirement.objects.get(irrigation_system_type=module.irrigation_system_type)
-        except ipcc.IrrigationPressureRequirement.DoesNotExist:
-            raise ValueError(f"Could not find Pressure Requirement for {module.irrigation_system_type.name}")
-
-        try:
-            erh_electricity = IrrigationParameter.objects.get(name="ERH_ELECTRICITY").value if module.fuel_type.name == "Electricity" else None
-        except IrrigationParameter.DoesNotExist:
-            raise ValueError(f"Could not find ERH_ELECTRICITY")
-
-        try:
-            transportation_loss = IrrigationParameter.objects.get(name="TRANSPORTATION_LOSS")
-        except IrrigationParameter.DoesNotExist:
-            raise ValueError(f"Could not find TRANSPORTATION_LOSS")
-
-        try:
-            pumping_efficiency = IrrigationParameter.objects.get(name="PUMPING_EFFICIENCY")
-        except IrrigationParameter.DoesNotExist:
-            raise ValueError(f"Could not find PUMPING_EFFICIENCY")
-
-        math_start = None
-        math_w = None
-        math_wo = None
-
-        inputs_start = [
-            ef.emission_factor,
+        self.inputs_start = [
+            self.ef.emission_factor,
             module.ef_t2_start,
             module.total_dynamic_head_t2,
-            pressure.avg_pressure,
+            self.pressure.avg_pressure,
             module.average_pressure_t2,
-            pumping_efficiency.value,
+            self.pumping_efficiency.value,
             module.pumping_efficiency_t2_start,
-            erh_electricity,
-            energy_db.net_calorific_value,
-            energy_db.density,
+            self.erh_electricity,
+            self.energy_db.net_calorific_value,
+            self.energy_db.density,
             module.well_depth,
             module.ha_start,
             0,
             activity.change_rate.name,
             project.implementation_years,
             project.capitalization_years,
-            transportation_loss.value if module.fuel_type.name == "Electricity" else 0,
+            self.transportation_loss.value if module.fuel_type.name == "Electricity" else 0,
             module.gross_irrigation_water_start,
         ]
 
-        math_start = OperationPhaseIrrigation(*inputs_start)
+        math_start = OperationPhaseIrrigation(*self.inputs_start)
         math_start.calculate_emissions()
 
-        inputs_w = [
-            ef.emission_factor,
+        self.inputs_w = [
+            self.ef.emission_factor,
             module.ef_t2_w,
             module.total_dynamic_head_t2,
-            pressure.avg_pressure,
+            self.pressure.avg_pressure,
             module.average_pressure_t2,
-            pumping_efficiency.value,
+            self.pumping_efficiency.value,
             module.pumping_efficiency_t2_w,
-            erh_electricity,
-            energy_db.net_calorific_value,
-            energy_db.density,
+            self.erh_electricity,
+            self.energy_db.net_calorific_value,
+            self.energy_db.density,
             module.well_depth,
             0,
             module.ha_w,
             activity.change_rate.name,
             project.implementation_years,
             project.capitalization_years,
-            transportation_loss.value if module.fuel_type.name == "Electricity" else 0,
+            self.transportation_loss.value if module.fuel_type.name == "Electricity" else 0,
             module.gross_irrigation_water_w,
         ]
 
-        math_w = OperationPhaseIrrigation(*inputs_w)
-        math_w.calculate_emissions()
+        self.math_w = OperationPhaseIrrigation(*self.inputs_w)
+        self.math_w.calculate_emissions()
 
-        inputs_wo = [
-            ef.emission_factor,
+        self.inputs_wo = [
+            self.ef.emission_factor,
             module.ef_t2_wo,
             module.total_dynamic_head_t2,
-            pressure.avg_pressure,
+            self.pressure.avg_pressure,
             module.average_pressure_t2,
-            pumping_efficiency.value,
+            self.pumping_efficiency.value,
             module.pumping_efficiency_t2_wo,
-            erh_electricity,
-            energy_db.net_calorific_value,
-            energy_db.density,
+            self.erh_electricity,
+            self.energy_db.net_calorific_value,
+            self.energy_db.density,
             module.well_depth,
             0,
             module.ha_wo,
             activity.change_rate.name,
             project.implementation_years,
             project.capitalization_years,
-            transportation_loss.value if module.fuel_type.name == "Electricity" else 0,
+            self.transportation_loss.value if module.fuel_type.name == "Electricity" else 0,
             module.gross_irrigation_water_wo,
         ]
 
-        math_wo = OperationPhaseIrrigation(*inputs_wo)
-        math_wo.calculate_emissions()
+        self.math_wo = OperationPhaseIrrigation(*self.inputs_wo)
+        self.math_wo.calculate_emissions()
 
-        results_start = math_start.result if math_start else MathResult(project.implementation_years, project.capitalization_years)
-        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
-        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_start = self.math_start.result if self.math_start else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
-        results_tuple = (results_w + results_start, results_wo + results_start)
+        results_tuple = (self.results_w + self.results_start, self.results_wo + self.results_start)
 
         return results_tuple
-
-    def get_defaults(self, input: Module) -> dict:
-        return super().get_defaults(input)
-
-    def defaults(self) -> DefaultData:
-        return super().defaults()
 
 
 class CoastalWetlandCalculator(BaseCalculator):
@@ -4719,13 +4727,32 @@ class CoastalWetlandCalculator(BaseCalculator):
     Calculates the emissions of the coastal wetland
     """
 
-    def get_defaults(self, calculate=False) -> dict:
-        return super().get_defaults(calculate)
+    def __init__(self, input) -> None:
+        super().__init__(input)
 
-    def calculate(self) -> Result:
-        """
-        Calculates the emissions of the coastal wetland
-        """
+        self.agb = SimpleNamespace(value=0)
+        self.bgb = SimpleNamespace(value=0)
+        self.litter = SimpleNamespace(value=0)
+        self.dw = SimpleNamespace(value=0)
+        self.soil_1m = SimpleNamespace(value=0)
+        self.ef_drainage = SimpleNamespace(value=0)
+        self.pc_c_lost_excavation = SimpleNamespace(value=0)
+        self.rewetting_c = SimpleNamespace(value=0)
+        self.rewetting_ch4 = SimpleNamespace(value=0)
+
+        self.soil_type_name = ""
+
+        self.inputs_w = []
+        self.inputs_wo = []
+
+        self.math_w = None
+        self.math_wo = None
+
+        self.results_w = None
+        self.results_wo = None
+
+    def get_defaults(self, calculate=False) -> dict:
+        super().get_defaults(calculate)
 
         module: CoastalWetland = self.data
         project: Project = module.activity.project
@@ -4735,55 +4762,67 @@ class CoastalWetlandCalculator(BaseCalculator):
             "moisture": project.moisture,
         }
 
-        soil_type_name = module.soil_type_t2.name if module.soil_type_t2 else "Mineral"
+        self.soil_type_name = module.soil_type_t2.name if module.soil_type_t2 else "Mineral"
 
         try:
-            agb = ipcc.CoastalAGB.objects.get(**cm, land_use_type=module.land_use_type)
+            self.soc = ipcc.SoilOrganicCarbon.objects.get(**cm, soil_type__name=self.soil_type_name)
+        except ipcc.SoilOrganicCarbon.DoesNotExist:
+            raise ValueError(f"Could not find SOC for {project.climate.name}, {project.moisture.name}, {self.soil_type_name}")
+
+        try:
+            self.agb = ipcc.CoastalAGB.objects.get(**cm, land_use_type=module.land_use_type)
         except ipcc.CoastalAGB.DoesNotExist:
             raise ValueError(f"Could not find AGB for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}")
 
         try:
-            bgb = ipcc.CoastalBGB.objects.get(**cm, land_use_type=module.land_use_type)
+            self.bgb = ipcc.CoastalBGB.objects.get(**cm, land_use_type=module.land_use_type)
         except ipcc.CoastalBGB.DoesNotExist:
             raise ValueError(f"Could not find BGB for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}")
 
         try:
-            litter = ipcc.CoastalLitter.objects.get(**cm, land_use_type=module.land_use_type)
+            self.litter = ipcc.CoastalLitter.objects.get(**cm, land_use_type=module.land_use_type)
         except ipcc.CoastalLitter.DoesNotExist:
             raise ValueError(f"Could not find Litter for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}")
 
         try:
-            dw = ipcc.CoastalDeadwood.objects.get(**cm, land_use_type=module.land_use_type)
+            self.dw = ipcc.CoastalDeadwood.objects.get(**cm, land_use_type=module.land_use_type)
         except ipcc.CoastalDeadwood.DoesNotExist:
             raise ValueError(f"Could not find Deadwood for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}")
 
         try:
-            soil_1m = ipcc.DefaultSoilCarbonStock.objects.get(**cm, land_use_type=module.land_use_type, soil_type__name=soil_type_name)
+            self.soil_1m = ipcc.DefaultSoilCarbonStock.objects.get(**cm, land_use_type=module.land_use_type, soil_type__name=self.soil_type_name)
         except ipcc.DefaultSoilCarbonStock.DoesNotExist:
-            raise ValueError(f"Could not find Soil 1m for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}, {soil_type_name}")
+            raise ValueError(f"Could not find Soil 1m for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}, {self.soil_type_name}")
 
         try:
-            ef_drainage = ipcc.DrainageEmissionFactor.objects.get(**cm, land_use_type=module.land_use_type)
+            self.ef_drainage = ipcc.DrainageEmissionFactor.objects.get(**cm, land_use_type=module.land_use_type)
         except ipcc.DrainageEmissionFactor.DoesNotExist:
             raise ValueError(f"Could not find EF Drainage for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}")
 
         try:
-            pc_c_lost_excavation = CoastalWetlandParameter.objects.get(name="PERCENTAGE_C_LOST_EXCAVATION")
+            self.pc_c_lost_excavation = CoastalWetlandParameter.objects.get(name="PERCENTAGE_C_LOST_EXCAVATION")
         except CoastalWetlandParameter.DoesNotExist:
             raise ValueError(f"Could not find PC C Lost Excavation")
 
         try:
-            rewetting_c = ipcc.RewettingCarbonFactor.objects.get(**cm, land_use_type=module.land_use_type, soil_type__name=soil_type_name)
+            self.rewetting_c = ipcc.RewettingCarbonFactor.objects.get(**cm, land_use_type=module.land_use_type, soil_type__name=self.soil_type_name)
         except ipcc.RewettingCarbonFactor.DoesNotExist:
             raise ValueError(f"Could not find Rewetting C for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}")
 
         try:
-            rewetting_ch4 = ipcc.RewettingMethaneFactor.objects.get(**cm, land_use_type=module.land_use_type)
+            self.rewetting_ch4 = ipcc.RewettingMethaneFactor.objects.get(**cm, land_use_type=module.land_use_type)
         except ipcc.RewettingMethaneFactor.DoesNotExist:
             raise ValueError(f"Could not find Rewetting CH4 for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}")
 
-        math_w = None
-        math_wo = None
+    def calculate(self) -> Result:
+        """
+        Calculates the emissions of the coastal wetland
+        """
+
+        module: CoastalWetland = self.data
+        project: Project = module.activity.project
+
+        self.get_defaults()
 
         if module.is_with():
             self.inputs_w = [
@@ -4793,12 +4832,12 @@ class CoastalWetlandCalculator(BaseCalculator):
                 module.activity.change_rate.name,
                 project.implementation_years,
                 project.capitalization_years,
-                agb.value,
-                bgb.value,
-                litter.value,
-                dw.value,
-                soil_1m.value,
-                ef_drainage.value,
+                self.agb.value,
+                self.bgb.value,
+                self.litter.value,
+                self.dw.value,
+                self.soil_1m.value,
+                self.ef_drainage.value,
                 module.agb_t2_w,
                 module.bgb_t2_w,
                 module.litter_t2_w,
@@ -4809,18 +4848,18 @@ class CoastalWetlandCalculator(BaseCalculator):
                 module.drained_area_excavated_w,
                 module.area_w_restored_vegetation_start,
                 module.area_w_restored_vegetation_w,
-                pc_c_lost_excavation.value,
+                self.pc_c_lost_excavation.value,
                 module.pc_c_lost_after_excavation_t2_w,
-                rewetting_c.value,
-                rewetting_ch4.value,
+                self.rewetting_c.value,
+                self.rewetting_ch4.value,
                 module.co2_rewetting_t2_start,
                 module.ch4_rewetting_t2_w,
                 module.avg_salinity_t2.value if module.avg_salinity_t2 else None,
                 project.gw_potential.ch4,
             ]
 
-            math_w = MathCoastalWetland(*self.inputs_w)
-            math_w.calculate_emissions()
+            self.math_w = MathCoastalWetland(*self.inputs_w)
+            self.math_w.calculate_emissions()
 
         if module.is_without():
             self.inputs_wo = [
@@ -4830,12 +4869,12 @@ class CoastalWetlandCalculator(BaseCalculator):
                 module.activity.change_rate.name,
                 project.implementation_years,
                 project.capitalization_years,
-                agb.value,
-                bgb.value,
-                litter.value,
-                dw.value,
-                soil_1m.value,
-                ef_drainage.value,
+                self.agb.value,
+                self.bgb.value,
+                self.litter.value,
+                self.dw.value,
+                self.soil_1m.value,
+                self.ef_drainage.value,
                 module.agb_t2_wo,
                 module.bgb_t2_wo,
                 module.litter_t2_wo,
@@ -4846,29 +4885,23 @@ class CoastalWetlandCalculator(BaseCalculator):
                 module.drained_area_excavated_wo,
                 module.area_w_restored_vegetation_start,
                 module.area_w_restored_vegetation_wo,
-                pc_c_lost_excavation.value,
+                self.pc_c_lost_excavation.value,
                 module.pc_c_lost_after_excavation_t2_wo,
-                rewetting_c.value,
-                rewetting_ch4.value,
+                self.rewetting_c.value,
+                self.rewetting_ch4.value,
                 module.co2_rewetting_t2_wo,
                 module.ch4_rewetting_t2_wo,
                 module.avg_salinity_t2.value if module.avg_salinity_t2 else None,
                 project.gw_potential.ch4,
             ]
 
-            math_wo = MathCoastalWetland(*self.inputs_wo)
-            math_wo.calculate_emissions()
+            self.math_wo = MathCoastalWetland(*self.inputs_wo)
+            self.math_wo.calculate_emissions()
 
-        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
-        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
-        log.debug("WITH breakdown")
-        results_w.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        log.debug("WITHOUT breakdown")
-        results_wo.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        results_tuple = (results_w, results_wo)
+        results_tuple = (self.results_w, self.results_wo)
 
         return results_tuple
 
@@ -4912,45 +4945,71 @@ class WaterbodyCalculator(BaseCalculator):
     Calculator for waterbody modules.
     """
 
+    def __init__(self, input) -> None:
+        super().__init__(input)
+
+        self.methane_emission_factor = SimpleNamespace(value=0)
+        self.trophic_state_start = SimpleNamespace(value=0)
+        self.trophic_state_w = SimpleNamespace(value=0)
+        self.trophic_state_wo = SimpleNamespace(value=0)
+
+        self.inputs_start = []
+        self.inputs_w = []
+        self.inputs_wo = []
+
+        self.math_start = None
+        self.math_w = None
+        self.math_wo = None
+
+        self.results_start = None
+        self.results_w = None
+        self.results_wo = None
+
     def get_defaults(self, calculate=False) -> dict:
-        return super().get_defaults(calculate)
+        super().get_defaults(calculate)
+
+        module: Waterbody = self.data
+        project = module.activity.project
+
+        try:
+            self.methane_emission_factor = ipcc.OtherConstructedWaterbodiesEmissionFactor.objects.get(climate=project.climate, moisture=project.moisture, waterbody_type=module.waterbody_type)
+        except ipcc.OtherConstructedWaterbodiesEmissionFactor.DoesNotExist:
+            raise ValueError(f"Could not find Methane Emission Factor for {module.waterbody_type.name}, {project.climate.name}, {project.moisture.name}")
+
+        if module.is_start():
+            try:
+                self.trophic_state_start = ipcc.TrophicStateFactor.objects.get(trophic_type=module.trophic_type_start)
+            except ipcc.TrophicStateFactor.DoesNotExist:
+                raise ValueError(f"Could not find Trophic State Factor for {module.trophic_type_start.name}")
+
+        if module.is_with():
+            try:
+                self.trophic_state_w = ipcc.TrophicStateFactor.objects.get(trophic_type=module.trophic_type_w)
+            except ipcc.TrophicStateFactor.DoesNotExist:
+                raise ValueError(f"Could not find Trophic State Factor for {module.trophic_type_w.name}")
+
+        if module.is_without():
+            try:
+                self.trophic_state_wo = ipcc.TrophicStateFactor.objects.get(trophic_type=module.trophic_type_wo)
+            except ipcc.TrophicStateFactor.DoesNotExist:
+                raise ValueError(f"Could not find Trophic State Factor for {module.trophic_type_wo.name}")
 
     def calculate(self) -> Result:
         """
         Calculate emissions for a single Waterbody module.
         """
+
         module: Waterbody = self.data
-        project = module.activity.project
+        activity: Activity = module.activity
+        project: Project = activity.project
 
-        try:
-            methane_emission_factor = ipcc.OtherConstructedWaterbodiesEmissionFactor.objects.get(climate=project.climate, moisture=project.moisture, waterbody_type=module.waterbody_type)
-        except ipcc.OtherConstructedWaterbodiesEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find Methane Emission Factor for {module.waterbody_type.name}, {project.climate.name}, {project.moisture.name}")
+        self.get_defaults()
 
-        try:
-            trophic_state_start = ipcc.TrophicStateFactor.objects.get(trophic_type=module.trophic_type_start)
-        except ipcc.TrophicStateFactor.DoesNotExist:
-            raise ValueError(f"Could not find Trophic State Factor for {module.trophic_type_start.name}")
-
-        try:
-            trophic_state_w = ipcc.TrophicStateFactor.objects.get(trophic_type=module.trophic_type_w)
-        except ipcc.TrophicStateFactor.DoesNotExist:
-            raise ValueError(f"Could not find Trophic State Factor for {module.trophic_type_w.name}")
-
-        try:
-            trophic_state_wo = ipcc.TrophicStateFactor.objects.get(trophic_type=module.trophic_type_wo)
-        except ipcc.TrophicStateFactor.DoesNotExist:
-            raise ValueError(f"Could not find Trophic State Factor for {module.trophic_type_wo.name}")
-
-        math_start = None
-        math_w = None
-        math_wo = None
-
-        inputs_start = [
+        self.inputs_start = [
             module.area,
             0,
-            trophic_state_start.value,
-            methane_emission_factor.value,
+            self.trophic_state_start.value,
+            self.methane_emission_factor.value,
             module.alpha_t2_start,
             0,
             module.ch4_ef_t2_start,
@@ -4963,15 +5022,15 @@ class WaterbodyCalculator(BaseCalculator):
             0,
         ]
 
-        math_start = MathWaterbodies(*inputs_start)
-        math_start.calculate_emissions()
+        self.math_start = MathWaterbodies(*self.inputs_start)
+        self.math_start.calculate_emissions()
 
         if module.is_with():
-            inputs_w = [
+            self.inputs_w = [
                 0,
                 module.area,
-                trophic_state_w.value,
-                methane_emission_factor.value,
+                self.trophic_state_w.value,
+                self.methane_emission_factor.value,
                 module.alpha_t2_start,
                 module.alpha_t2_w,
                 module.ch4_ef_t2_start,
@@ -4984,15 +5043,15 @@ class WaterbodyCalculator(BaseCalculator):
                 module.mean_annual_t2_w,
             ]
 
-            math_w = MathWaterbodies(*inputs_w)
-            math_w.calculate_emissions()
+            self.math_w = MathWaterbodies(*self.inputs_w)
+            self.math_w.calculate_emissions()
 
         if module.is_without():
-            inputs_wo = [
+            self.inputs_wo = [
                 0,
                 module.area,
-                trophic_state_wo.value,
-                methane_emission_factor.value,
+                self.trophic_state_wo.value,
+                self.methane_emission_factor.value,
                 module.alpha_t2_start,
                 module.alpha_t2_wo,
                 module.ch4_ef_t2_start,
@@ -5005,46 +5064,87 @@ class WaterbodyCalculator(BaseCalculator):
                 module.mean_annual_t2_wo,
             ]
 
-            math_wo = MathWaterbodies(*inputs_wo)
-            math_wo.calculate_emissions()
+            self.math_wo = MathWaterbodies(*self.inputs_wo)
+            self.math_wo.calculate_emissions()
 
-        results_start = math_start.result if math_start else MathResult(project.implementation_years, project.capitalization_years)
-        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
-        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_start = self.math_start.result if self.math_start else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
-        results_tuple = (results_w + results_start, results_wo + results_start)
+        results_tuple = (self.results_w + self.results_start, self.results_wo + self.results_start)
 
         return results_tuple
-
-    def defaults(self) -> DefaultData:
-        return super().defaults()
 
 
 class OrganicSoilCalculator(BaseCalculator):
 
+    def __init__(self, input) -> None:
+        super().__init__(input)
+
+        self.ef_onsite_start = SimpleNamespace(value=0)
+        self.ef_onsite_w = SimpleNamespace(value=0)
+        self.ef_onsite_wo = SimpleNamespace(value=0)
+
+        self.ef_offsite_start = SimpleNamespace(value=0)
+        self.ef_offsite_w = SimpleNamespace(value=0)
+        self.ef_offsite_wo = SimpleNamespace(value=0)
+
+        self.dry_matter_w = SimpleNamespace(value=0)
+        self.dry_matter_wo = SimpleNamespace(value=0)
+
+        self.fire_ref = SimpleNamespace(value=0)
+
+        self.rewetting_start = SimpleNamespace(value=0)
+        self.rewetting_w = SimpleNamespace(value=0)
+        self.rewetting_wo = SimpleNamespace(value=0)
+
+        self.onsite_ef_w = SimpleNamespace(value=0)
+        self.onsite_ef_wo = SimpleNamespace(value=0)
+
+        self.offsite_ef_w = SimpleNamespace(value=0)
+        self.offsite_ef_wo = SimpleNamespace(value=0)
+
+        self.conversion_factor_w = SimpleNamespace(value=0)
+        self.conversion_factor_wo = SimpleNamespace(value=0)
+
+        self.organic_soil_math_w = None
+        self.organic_soil_math_wo = None
+        self.peat_extraction_math_w = None
+        self.peat_extraction_math_wo = None
+
+        self.organic_soil_inputs_w = []
+        self.organic_soil_inputs_wo = []
+        self.peat_extraction_inputs_w = []
+        self.peat_extraction_inputs_wo = []
+
+        self.organic_soil_results_w = None
+        self.organic_soil_results_wo = None
+
+        self.peat_extraction_results_w = None
+        self.peat_extraction_results_wo = None
+
+        self.area_affected_by_module = 0
+
+        self.is_fire_used_w = False
+        self.is_fire_used_wo = False
+
     def get_defaults(self, calculate=False) -> dict:
-        return super().get_defaults(calculate)
+        super().get_defaults(calculate)
 
-    def calculate(self) -> Result:
-        input: OrganicSoil = self.data
-        project: Project = input.activity.project
-        luc: LandUseChange = input.land_use_change
-
-        area_affected_by_module = 0
-        module_type_start = None
-        module_type_w = None
-        module_type_wo = None
+        module: OrganicSoil = self.data
+        project: Project = module.activity.project
+        luc: LandUseChange = module.land_use_change
 
         if luc:
             module_type_start = luc.module_type_start.name
             module_type_w = luc.module_type_w.name
             module_type_wo = luc.module_type_wo.name
-            area_affected_by_module = luc.area
+            self.area_affected_by_module = luc.area
         else:
-            parent_module, parent_module_type = utils.find_organic_soil_parent_module(input)
+            parent_module, parent_module_type = utils.find_organic_soil_parent_module(module)
             module_type_start = module_type_w = module_type_wo = parent_module_type.name
 
-            area_affected_by_module = 0 if module_type_start == "ForestManagement" else parent_module.area
+            self.area_affected_by_module = 0 if module_type_start == "ForestManagement" else parent_module.area
 
         cm = {
             "climate": project.climate,
@@ -5052,366 +5152,328 @@ class OrganicSoilCalculator(BaseCalculator):
         }
 
         ##### Organic Soil Inputs #####
-
         try:
-            ef_onsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_start, peat_type=input.peat_type, site_location_type__name="On-Site")
-        except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find EF On-Site Start for {module_type_start}, {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
-
-        try:
-            ef_onsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_w, peat_type=input.peat_type, site_location_type__name="On-Site")
-        except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find EF On-Site W for {module_type_w}, {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
-
-        try:
-            ef_onsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_wo, peat_type=input.peat_type, site_location_type__name="On-Site")
-        except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find EF On-Site WO for {module_type_wo}, {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
-
-        try:
-            ef_offsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_start, peat_type=input.peat_type, site_location_type__name="Off-Site")
-        except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find EF Off-Site Start for {module_type_start}, {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
-
-        try:
-            ef_offsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_w, peat_type=input.peat_type, site_location_type__name="Off-Site")
-        except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find EF Off-Site W for {module_type_w}, {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
-
-        try:
-            ef_offsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_wo, peat_type=input.peat_type, site_location_type__name="Off-Site")
-        except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find EF Off-Site WO for {module_type_wo}, {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
-
-        fire_used_w = input.fire_type_w is not None
-        fire_used_wo = input.fire_type_wo is not None
-
-        if fire_used_w:
-            try:
-                dry_matter_w = ipcc.OrganicSoilFuelConsumption.objects.get(**cm, fire_type=input.fire_type_w)
-            except ipcc.OrganicSoilFuelConsumption.DoesNotExist:
-                raise ValueError(f"Could not find Dry Matter W for {input.fire_type_w.name}, {project.climate.name}, {project.moisture.name}")
-
-        if fire_used_wo:
-            try:
-                dry_matter_wo = ipcc.OrganicSoilFuelConsumption.objects.get(**cm, fire_type=input.fire_type_wo)
-            except ipcc.OrganicSoilFuelConsumption.DoesNotExist:
-                raise ValueError(f"Could not find Dry Matter WO for {input.fire_type_wo.name}, {project.climate.name}, {project.moisture.name}")
-
-        try:
-            fire_ref = ipcc.OrganicSoilGefEmissionFactor.objects.get(**cm)
+            self.fire_ref = ipcc.OrganicSoilGefEmissionFactor.objects.get(**cm)
         except ipcc.OrganicSoilGefEmissionFactor.DoesNotExist:
             raise ValueError(f"Could not find Fire Reference for {project.climate.name}, {project.moisture.name}")
 
-        try:
-            rewetting_start = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=input.peat_type, module_type__name=module_type_start)
-        except ipcc.OrganicSoilRewettingEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find Rewetting Start for {input.peat_type.name}, {module_type_start}, {project.climate.name}, {project.moisture.name}")
+        if module.is_start():
+            try:
+                self.ef_onsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_start, peat_type=module.peat_type, site_location_type__name="On-Site")
+            except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
+                raise ValueError(f"Could not find EF On-Site Start for {module_type_start}, {module.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+            try:
+                self.ef_offsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_start, peat_type=module.peat_type, site_location_type__name="Off-Site")
+            except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
+                raise ValueError(f"Could not find EF Off-Site Start for {module_type_start}, {module.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+            try:
+                self.rewetting_start = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=module.peat_type, module_type__name=module_type_start)
+            except ipcc.OrganicSoilRewettingEmissionFactor.DoesNotExist:
+                raise ValueError(f"Could not find Rewetting Start for {module.peat_type.name}, {module_type_start}, {project.climate.name}, {project.moisture.name}")
 
-        try:
-            rewetting_w = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=input.peat_type, module_type__name=module_type_w)
-        except ipcc.OrganicSoilRewettingEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find Rewetting W for {input.peat_type.name}, {module_type_w}, {project.climate.name}, {project.moisture.name}")
+        if module.is_with():
+            try:
+                self.ef_onsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_w, peat_type=module.peat_type, site_location_type__name="On-Site")
+            except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
+                raise ValueError(f"Could not find EF On-Site W for {module_type_w}, {module.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+            try:
+                self.ef_offsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_w, peat_type=module.peat_type, site_location_type__name="Off-Site")
+            except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
+                raise ValueError(f"Could not find EF Off-Site W for {module_type_w}, {module.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+            self.fire_used_w = module.fire_type_w is not None
+            if self.fire_used_w:
+                try:
+                    self.dry_matter_w = ipcc.OrganicSoilFuelConsumption.objects.get(**cm, fire_type=module.fire_type_w)
+                except ipcc.OrganicSoilFuelConsumption.DoesNotExist:
+                    raise ValueError(f"Could not find Dry Matter W for {module.fire_type_w.name}, {project.climate.name}, {project.moisture.name}")
+            try:
+                self.rewetting_w = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=module.peat_type, module_type__name=module_type_w)
+            except ipcc.OrganicSoilRewettingEmissionFactor.DoesNotExist:
+                raise ValueError(f"Could not find Rewetting W for {module.peat_type.name}, {module_type_w}, {project.climate.name}, {project.moisture.name}")
+            try:
+                self.onsite_ef_w = ipcc.PeatExtractionEmissionFactor.objects.get(**cm, peat_type=module.peat_type, site_location_type__name="On-Site")
+            except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
+                raise ValueError(f"Could not find On-Site EF W for {module.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+            try:
+                self.offsite_ef_w = ipcc.PeatExtractionEmissionFactor.objects.get(**cm, peat_type=module.peat_type, site_location_type__name="Off-Site")
+            except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
+                raise ValueError(f"Could not find Off-Site EF W for {module.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+            try:
+                self.conversion_factor_w = ipcc.PeatExtractionConversionFactor.objects.get(**cm, peat_type=module.peat_type)
+            except ipcc.PeatExtractionConversionFactor.DoesNotExist:
+                raise ValueError(f"Could not find Conversion Factor W for {module.peat_type.name}, {project.climate.name}, {project.moisture.name}")
 
-        try:
-            rewetting_wo = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=input.peat_type, module_type__name=module_type_wo)
-        except ipcc.OrganicSoilRewettingEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find Rewetting WO for {input.peat_type.name}, {module_type_wo}, {project.climate.name}, {project.moisture.name}")
+        if module.is_without():
+            try:
+                self.ef_onsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_wo, peat_type=module.peat_type, site_location_type__name="On-Site")
+            except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
+                raise ValueError(f"Could not find EF On-Site WO for {module_type_wo}, {module.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+            try:
+                self.ef_offsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_wo, peat_type=module.peat_type, site_location_type__name="Off-Site")
+            except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
+                raise ValueError(f"Could not find EF Off-Site WO for {module_type_wo}, {module.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+            self.fire_used_wo = module.fire_type_wo is not None
+            if self.fire_used_wo:
+                try:
+                    self.dry_matter_wo = ipcc.OrganicSoilFuelConsumption.objects.get(**cm, fire_type=module.fire_type_wo)
+                except ipcc.OrganicSoilFuelConsumption.DoesNotExist:
+                    raise ValueError(f"Could not find Dry Matter WO for {module.fire_type_wo.name}, {project.climate.name}, {project.moisture.name}")
+            try:
+                self.rewetting_wo = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=module.peat_type, module_type__name=module_type_wo)
+            except ipcc.OrganicSoilRewettingEmissionFactor.DoesNotExist:
+                raise ValueError(f"Could not find Rewetting WO for {module.peat_type.name}, {module_type_wo}, {project.climate.name}, {project.moisture.name}")
 
-        ##### Peat Extraction Inputs #####
+            ##### Peat Extraction Inputs #####
+            try:
+                self.onsite_ef_wo = ipcc.PeatExtractionEmissionFactor.objects.get(**cm, peat_type=module.peat_type, site_location_type__name="On-Site")
+            except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
+                raise ValueError(f"Could not find On-Site EF WO for {module.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+            try:
+                self.offsite_ef_wo = ipcc.PeatExtractionEmissionFactor.objects.get(**cm, peat_type=module.peat_type, site_location_type__name="Off-Site")
+            except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
+                raise ValueError(f"Could not find Off-Site EF WO for {module.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+            try:
+                self.conversion_factor_wo = ipcc.PeatExtractionConversionFactor.objects.get(**cm, peat_type=module.peat_type)
+            except ipcc.PeatExtractionConversionFactor.DoesNotExist:
+                raise ValueError(f"Could not find Conversion Factor WO for {module.peat_type.name}, {project.climate.name}, {project.moisture.name}")
 
-        try:
-            onsite_ef_w = ipcc.PeatExtractionEmissionFactor.objects.get(**cm, peat_type=input.peat_type, site_location_type__name="On-Site")
-        except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find On-Site EF W for {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+    def calculate(self) -> Result:
+        super().calculate()
 
-        try:
-            onsite_ef_wo = ipcc.PeatExtractionEmissionFactor.objects.get(**cm, peat_type=input.peat_type, site_location_type__name="On-Site")
-        except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find On-Site EF WO for {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+        input: OrganicSoil = self.data
+        project: Project = input.activity.project
 
-        try:
-            offsite_ef_w = ipcc.PeatExtractionEmissionFactor.objects.get(**cm, peat_type=input.peat_type, site_location_type__name="Off-Site")
-        except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find Off-Site EF W for {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
-
-        try:
-            offsite_ef_wo = ipcc.PeatExtractionEmissionFactor.objects.get(**cm, peat_type=input.peat_type, site_location_type__name="Off-Site")
-        except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find Off-Site EF WO for {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
-
-        try:
-            conversion_factor_w = ipcc.PeatExtractionConversionFactor.objects.get(**cm, peat_type=input.peat_type)
-        except ipcc.PeatExtractionConversionFactor.DoesNotExist:
-            raise ValueError(f"Could not find Conversion Factor W for {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
-
-        try:
-            conversion_factor_wo = ipcc.PeatExtractionConversionFactor.objects.get(**cm, peat_type=input.peat_type)
-        except ipcc.PeatExtractionConversionFactor.DoesNotExist:
-            raise ValueError(f"Could not find Conversion Factor WO for {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+        self.get_defaults()
 
         ##### Calculate Emissions #####
 
-        total_results_w = MathResult(project.implementation_years, project.capitalization_years)
-        total_results_wo = MathResult(project.implementation_years, project.capitalization_years)
+        self.results_w = MathResult(project.implementation_years, project.capitalization_years)
+        self.results_wo = MathResult(project.implementation_years, project.capitalization_years)
 
-        organic_soil_math_w = None
-        organic_soil_math_wo = None
-        peat_extraction_math_w = None
-        peat_extraction_math_wo = None
+        self.organic_soil_math_w = None
+        self.organic_soil_math_wo = None
+        self.peat_extraction_math_w = None
+        self.peat_extraction_math_wo = None
 
-        organic_soil_inputs_w = [
+        self.organic_soil_inputs_w = [
             input.fire_type_w is not None,
             input.soil_fire_periodicity_w,
-            area_affected_by_module,
-            dry_matter_w.value if fire_used_w else None,
+            self.area_affected_by_module,
+            self.dry_matter_w.value if self.fire_used_w else None,
             input.mean_dry_matter_t2_w,
             input.soil_fire_impact_percentage_w,
-            fire_ref.co2,
+            self.fire_ref.co2,
             input.fire_on_soil_co2_t2_w,
-            fire_ref.co,
+            self.fire_ref.co,
             input.fire_on_soil_co_t2_w,
-            fire_ref.ch4,
+            self.fire_ref.ch4,
             input.fire_on_soil_ch4_t2_w,
             project.gw_potential.ch4,
             input.activity.change_rate.name,
             project.implementation_years,
             project.capitalization_years,
             project.gw_potential.n2o,
-            ef_offsite_start.doc,
+            self.ef_offsite_start.doc,
             input.offsite_doc_drainge_t2_start,
             input.drainage_area_start,
             input.drainage_area_w,
-            ef_onsite_start.co2,
+            self.ef_onsite_start.co2,
             input.onsite_co2_drainge_t2_start,
             input.ditches_area_start,
             input.ditches_area_w,
-            ef_onsite_start.ch4,
+            self.ef_onsite_start.ch4,
             input.onsite_ch4_drainge_t2_start,
-            ef_offsite_start.ch4,
+            self.ef_offsite_start.ch4,
             input.offsite_ch4_drainge_t2_start,
-            ef_onsite_start.n2o,
+            self.ef_onsite_start.n2o,
             input.onsite_n2o_drainge_t2_start,
-            ef_offsite_w.doc,
+            self.ef_offsite_w.doc,
             input.offsite_doc_drainge_t2_start,
-            ef_onsite_w.co2,
+            self.ef_onsite_w.co2,
             input.onsite_co2_drainge_t2_w,
-            ef_onsite_w.ch4,
+            self.ef_onsite_w.ch4,
             input.onsite_ch4_drainge_t2_w,
-            ef_offsite_w.ch4,
+            self.ef_offsite_w.ch4,
             input.offsite_ch4_drainge_t2_w,
-            ef_onsite_w.n2o,
+            self.ef_onsite_w.n2o,
             input.onsite_n2o_drainge_t2_w,
-            rewetting_start.doc,
+            self.rewetting_start.doc,
             input.offsite_doc_rewetting_t2_start,
-            rewetting_start.co2,
+            self.rewetting_start.co2,
             input.onsite_co2_rewetting_t2_start,
-            rewetting_start.ch4,
+            self.rewetting_start.ch4,
             input.onsite_ch4_rewetting_t2_start,
-            rewetting_start.n2o,
+            self.rewetting_start.n2o,
             input.onsite_n2o_rewetting_t2_start,
-            rewetting_w.doc,
+            self.rewetting_w.doc,
             input.offsite_doc_rewetting_t2_w,
-            rewetting_w.co2,
+            self.rewetting_w.co2,
             input.onsite_co2_rewetting_t2_w,
-            rewetting_w.ch4,
+            self.rewetting_w.ch4,
             input.onsite_ch4_rewetting_t2_w,
-            rewetting_w.n2o,
+            self.rewetting_w.n2o,
             input.onsite_n2o_rewetting_t2_w,
-            area_affected_by_module,
+            self.area_affected_by_module,
         ]
 
-        organic_soil_math_w = MathOrganicSoil(*organic_soil_inputs_w)
-        organic_soil_math_w.calculate_emissions()
+        self.organic_soil_math_w = MathOrganicSoil(*self.organic_soil_inputs_w)
+        self.organic_soil_math_w.calculate_emissions()
 
         if input.peat_area_start:
-            peat_extraction_inputs_w = [
+            self.peat_extraction_inputs_w = [
                 input.peat_area_start,
                 input.peat_area_w,
                 input.peat_ditches_area_start,
                 input.peat_ditches_area_w,
                 input.activity.change_rate.name,
-                onsite_ef_w.co2,
+                self.onsite_ef_w.co2,
                 input.onsite_co2_peat_t2_w,
-                onsite_ef_w.ch4,
+                self.onsite_ef_w.ch4,
                 None,
-                onsite_ef_w.n2o,
+                self.onsite_ef_w.n2o,
                 input.onsite_n2o_peat_t2_w,
-                offsite_ef_w.doc,
+                self.offsite_ef_w.doc,
                 input.offsite_doc_peat_t2_w,
-                offsite_ef_w.ch4,
+                self.offsite_ef_w.ch4,
                 input.offsite_ch4_peat_t2_w,
                 project.gw_potential.ch4,
                 project.gw_potential.n2o,
                 project.implementation_years,
                 project.capitalization_years,
-                conversion_factor_w.volume,
+                self.conversion_factor_w.volume,
                 input.peat_density_t2_w,
                 1,  # TODO: Should be conversion_factor_w.volume,
-                conversion_factor_w.weight,
+                self.conversion_factor_w.weight,
                 input.peat_extraction_height_start,
                 input.peat_extraction_height_w,
             ]
 
-            peat_extraction_math_w = MathPeatExtraction(*peat_extraction_inputs_w)
-            peat_extraction_math_w.calculate_emissions()
+            self.peat_extraction_math_w = MathPeatExtraction(*self.peat_extraction_inputs_w)
+            self.peat_extraction_math_w.calculate_emissions()
 
-        organic_soil_inputs_wo = [
+        self.organic_soil_inputs_wo = [
             input.fire_type_wo is not None,
             input.soil_fire_periodicity_wo,
-            area_affected_by_module,
-            dry_matter_wo.value if fire_used_wo else None,
+            self.area_affected_by_module,
+            self.dry_matter_wo.value if self.fire_used_wo else None,
             input.mean_dry_matter_t2_wo,
             input.soil_fire_impact_percentage_wo,
-            fire_ref.co2,
+            self.fire_ref.co2,
             input.fire_on_soil_co2_t2_wo,
-            fire_ref.co,
+            self.fire_ref.co,
             input.fire_on_soil_co_t2_wo,
-            fire_ref.ch4,
+            self.fire_ref.ch4,
             input.fire_on_soil_ch4_t2_wo,
             project.gw_potential.ch4,
             input.activity.change_rate.name,
             project.implementation_years,
             project.capitalization_years,
             project.gw_potential.n2o,
-            ef_offsite_start.doc,
+            self.ef_offsite_start.doc,
             input.offsite_doc_drainge_t2_start,
             input.drainage_area_start,
             input.drainage_area_wo,
-            ef_onsite_start.co2,
+            self.ef_onsite_start.co2,
             input.onsite_co2_drainge_t2_start,
             input.ditches_area_start,
             input.ditches_area_wo,
-            ef_onsite_start.ch4,
+            self.ef_onsite_start.ch4,
             input.onsite_ch4_drainge_t2_start,
-            ef_offsite_start.ch4,
+            self.ef_offsite_start.ch4,
             input.offsite_ch4_drainge_t2_start,
-            ef_onsite_start.n2o,
+            self.ef_onsite_start.n2o,
             input.onsite_n2o_drainge_t2_start,
-            ef_offsite_start.doc,
+            self.ef_offsite_start.doc,
             input.offsite_doc_drainge_t2_start,
-            ef_onsite_wo.co2,
+            self.ef_onsite_wo.co2,
             input.onsite_co2_drainge_t2_wo,
-            ef_onsite_wo.ch4,
+            self.ef_onsite_wo.ch4,
             input.onsite_ch4_drainge_t2_wo,
-            ef_offsite_wo.ch4,
+            self.ef_offsite_wo.ch4,
             input.offsite_ch4_drainge_t2_wo,
-            ef_onsite_wo.n2o,
+            self.ef_onsite_wo.n2o,
             input.onsite_n2o_drainge_t2_wo,
-            rewetting_start.doc,
+            self.rewetting_start.doc,
             input.offsite_doc_rewetting_t2_start,
-            rewetting_start.co2,
+            self.rewetting_start.co2,
             input.onsite_co2_rewetting_t2_start,
-            rewetting_start.ch4,
+            self.rewetting_start.ch4,
             input.onsite_ch4_rewetting_t2_start,
-            rewetting_start.n2o,
+            self.rewetting_start.n2o,
             input.onsite_n2o_rewetting_t2_start,
-            rewetting_wo.doc,
+            self.rewetting_wo.doc,
             input.offsite_doc_rewetting_t2_wo,
-            rewetting_wo.co2,
+            self.rewetting_wo.co2,
             input.onsite_co2_rewetting_t2_wo,
-            rewetting_wo.ch4,
+            self.rewetting_wo.ch4,
             input.onsite_ch4_rewetting_t2_wo,
-            rewetting_wo.n2o,
+            self.rewetting_wo.n2o,
             input.onsite_n2o_rewetting_t2_wo,
-            area_affected_by_module,
+            self.area_affected_by_module,
         ]
 
-        organic_soil_math_wo = MathOrganicSoil(*organic_soil_inputs_wo)
-        organic_soil_math_wo.calculate_emissions()
+        self.organic_soil_math_wo = MathOrganicSoil(*self.organic_soil_inputs_wo)
+        self.organic_soil_math_wo.calculate_emissions()
 
         if input.peat_area_start:
-            peat_extraction_inputs_wo = [
+            self.peat_extraction_inputs_wo = [
                 input.peat_area_start,
                 input.peat_area_wo,
                 input.peat_ditches_area_start,
                 input.peat_ditches_area_wo,
                 input.activity.change_rate.name,
-                onsite_ef_wo.co2,
+                self.onsite_ef_wo.co2,
                 input.onsite_co2_peat_t2_wo,
-                onsite_ef_wo.ch4,
+                self.onsite_ef_wo.ch4,
                 None,
-                onsite_ef_wo.n2o,
+                self.onsite_ef_wo.n2o,
                 input.onsite_n2o_peat_t2_wo,
-                offsite_ef_wo.doc,
+                self.offsite_ef_wo.doc,
                 input.offsite_doc_peat_t2_wo,
-                offsite_ef_wo.ch4,
+                self.offsite_ef_wo.ch4,
                 input.offsite_ch4_peat_t2_wo,
                 project.gw_potential.ch4,
                 project.gw_potential.n2o,
                 project.implementation_years,
                 project.capitalization_years,
-                conversion_factor_wo.volume,
+                self.conversion_factor_wo.volume,
                 input.peat_density_t2_wo,
                 1,  # TODO: Should be conversion_factor_wo.volume,
-                conversion_factor_wo.weight,
+                self.conversion_factor_wo.weight,
                 input.peat_extraction_height_start,
                 input.peat_extraction_height_wo,
             ]
 
-            peat_extraction_math_wo = MathPeatExtraction(*peat_extraction_inputs_wo)
-            peat_extraction_math_wo.calculate_emissions()
+            self.peat_extraction_math_wo = MathPeatExtraction(*self.peat_extraction_inputs_wo)
+            self.peat_extraction_math_wo.calculate_emissions()
 
         self.inputs_w = {
-            "organic_soil": organic_soil_inputs_w,
-            "peat_extraction": peat_extraction_inputs_w,
+            "organic_soil": self.organic_soil_inputs_w,
+            "peat_extraction": self.peat_extraction_inputs_w,
         }
 
         self.inputs_wo = {
-            "organic_soil": organic_soil_inputs_wo,
-            "peat_extraction": peat_extraction_inputs_wo,
+            "organic_soil": self.organic_soil_inputs_wo,
+            "peat_extraction": self.peat_extraction_inputs_wo,
         }
 
-        organic_soil_results_w = organic_soil_math_w.result if organic_soil_math_w else MathResult(project.implementation_years, project.capitalization_years)
-        organic_soil_results_wo = organic_soil_math_wo.result if organic_soil_math_wo else MathResult(project.implementation_years, project.capitalization_years)
+        self.organic_soil_results_w = self.organic_soil_math_w.result if self.organic_soil_math_w else MathResult(project.implementation_years, project.capitalization_years)
+        self.organic_soil_results_wo = self.organic_soil_math_wo.result if self.organic_soil_math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
         if input.peat_area_start:
-            peat_extraction_results_w = peat_extraction_math_w.result if peat_extraction_math_w else MathResult(project.implementation_years, project.capitalization_years)
-            peat_extraction_results_wo = peat_extraction_math_wo.result if peat_extraction_math_wo else MathResult(project.implementation_years, project.capitalization_years)
+            self.peat_extraction_results_w = self.peat_extraction_math_w.result if self.peat_extraction_math_w else MathResult(project.implementation_years, project.capitalization_years)
+            self.peat_extraction_results_wo = self.peat_extraction_math_wo.result if self.peat_extraction_math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
-            total_results_w += organic_soil_results_w + peat_extraction_results_w
-            total_results_wo += organic_soil_results_wo + peat_extraction_results_wo
+            self.results_w += self.organic_soil_results_w + self.peat_extraction_results_w
+            self.results_wo += self.organic_soil_results_wo + self.peat_extraction_results_wo
 
         else:
-            total_results_w += organic_soil_results_w
-            total_results_wo += organic_soil_results_wo
+            self.results_w += self.organic_soil_results_w
+            self.results_wo += self.organic_soil_results_wo
 
-        results_tuple = (total_results_w, total_results_wo)
+        results_tuple = (self.results_w, self.results_wo)
 
         return results_tuple
-
-    def defaults(self) -> DefaultData:
-        self.calculate()
-
-        module: OrganicSoil = self.data
-
-        defaults_start = {}
-        defaults_w = {}
-        defaults_wo = {}
-
-        if is_with(module):
-            math_w = MathOrganicSoil(*self.inputs_w["organic_soil"])
-            math_w_defaults = math_w.evaluate_tier_2_defaults()
-            defaults_w.update(math_w_defaults.start)
-            defaults_w.update(math_w_defaults.other)
-
-            math_w = MathPeatExtraction(*self.inputs_w["peat_extraction"])
-            math_w_defaults = math_w.evaluate_tier_2_defaults()
-            defaults_w.update(math_w_defaults.start)
-            defaults_w.update(math_w_defaults.other)
-
-        if is_without(module):
-            math_wo = MathOrganicSoil(*self.inputs_wo["organic_soil"])
-            math_wo_defaults = math_wo.evaluate_tier_2_defaults()
-            defaults_wo.update(math_wo_defaults.start)
-            defaults_wo.update(math_wo_defaults.other)
-
-            math_wo = MathPeatExtraction(*self.inputs_wo["peat_extraction"])
-            math_wo_defaults = math_wo.evaluate_tier_2_defaults()
-            defaults_wo.update(math_wo_defaults.start)
-            defaults_wo.update(math_wo_defaults.other)
-
-        return DefaultData(defaults_start, defaults_w, defaults_wo)
 
 
 class ForestManagementCalculator(BaseCalculator):

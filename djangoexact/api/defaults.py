@@ -492,7 +492,7 @@ class SmallFisheryDefaults(Defaults):
 
 class IrrigationSystemDefaults(Defaults):
 
-    def __init__(self, input: calcs.Module):
+    def __init__(self, input: calcs.IrrigationSystem):
         super().__init__(input)
 
         self.values = SimpleNamespace(
@@ -511,4 +511,305 @@ class IrrigationSystemDefaults(Defaults):
             ef_t2_start_default=defaults.ef.value,
             ef_t2_w_default=defaults.ef.value,
             ef_t2_wo_default=defaults.ef.value,
+        )
+
+
+class IrrigationPhaseDefaults(Defaults):
+
+    def __init__(self, input: calcs.IrrigationPhase):
+        super().__init__(input)
+
+        self.values = SimpleNamespace(
+            ef_t2_start_default=0,
+            ef_t2_w_default=0,
+            ef_t2_wo_default=0,
+        )
+
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.IrrigationPhase
+
+        defaults = calcs.IrrigationPhaseCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace(
+            ef_t2_start_default=defaults.ef.value,
+            ef_t2_w_default=defaults.ef.value,
+            ef_t2_wo_default=defaults.ef.value,
+        )
+
+
+class SettlementDefaults(Defaults):
+    def __init__(self, input: calcs.Settlement):
+        super().__init__(input)
+
+        self.values = SimpleNamespace(
+            soc_t2_start_default=0,
+            soc_t2_w_default=0,
+            soc_t2_wo_default=0,
+            flu_t2_start_default=0,
+            flu_t2_w_default=0,
+            flu_t2_wo_default=0,
+            fi_t2_start_default=0,
+            fi_t2_w_default=0,
+            fi_t2_wo_default=0,
+            fmg_t2_start_default=0,
+            fmg_t2_w_default=0,
+            fmg_t2_wo_default=0,
+            agb_t2_start_default=0,
+            agb_t2_w_default=0,
+            agb_t2_wo_default=0,
+            bgb_t2_start_default=0,
+            bgb_t2_w_default=0,
+            bgb_t2_wo_default=0,
+        )
+
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.Settlement
+
+        defaults = calcs.SettlementCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace(
+            soc_t2_start_default=defaults.soc.value,
+            soc_t2_w_default=defaults.soc.value,
+            soc_t2_wo_default=defaults.soc.value,
+            flu_t2_start_default=defaults.flu_start.value,
+            flu_t2_w_default=defaults.flu_w.value,
+            flu_t2_wo_default=defaults.flu_wo.value,
+            fi_t2_start_default=defaults.fi_start.value,
+            fi_t2_w_default=defaults.fi_w.value,
+            fi_t2_wo_default=defaults.fi_wo.value,
+            fmg_t2_start_default=defaults.fmg_start.value,
+            fmg_t2_w_default=defaults.fmg_w.value,
+            fmg_t2_wo_default=defaults.fmg_wo.value,
+            # TODO: Ask Lorenzo about mapping of commented out fields
+            # agb_t2_start_default=defaults.agb_start.value,
+            # agb_t2_w_default=defaults.agb_w.value,
+            # agb_t2_wo_default=defaults.agb_wo.value,
+            # bgb_t2_start_default=defaults.bgb_start.value,
+            # bgb_t2_w_default=defaults.bgb_w.value,
+            # bgb_t2_wo_default=defaults.bgb_wo.value,
+        )
+
+
+class CoastalWetlandDefaults(Defaults):
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace(
+            agb_t2_start_default=0,
+            agb_t2_w_default=0,
+            agb_t2_wo_default=0,
+            bgb_t2_start_default=0,
+            bgb_t2_w_default=0,
+            bgb_t2_wo_default=0,
+            soc_t2_start_default=0,
+            soc_t2_w_default=0,
+            soc_t2_wo_default=0,
+            pc_c_lost_after_excavation_t2_start_default=0,
+            pc_c_lost_after_excavation_t2_w_default=0,
+            pc_c_lost_after_excavation_t2_wo_default=0,
+            drainage_ef_t2_start_default=0,
+            drainage_ef_t2_w_default=0,
+            drainage_ef_t2_wo_default=0,
+            co2_rewetting_t2_start_default=0,
+            co2_rewetting_t2_w_default=0,
+            co2_rewetting_t2_wo_default=0,
+            ch4_rewetting_t2_start_default=0,
+            ch4_rewetting_t2_w_default=0,
+            ch4_rewetting_t2_wo_default=0,
+            avg_salinity_t2_default=0,
+        )
+
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.CoastalWetland
+
+        defaults = calcs.CoastalWetlandCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace(
+            agb_t2_start_default=defaults.agb.value,
+            agb_t2_w_default=defaults.agb.value,
+            agb_t2_wo_default=defaults.agb.value,
+            bgb_t2_start_default=defaults.bgb.value,
+            bgb_t2_w_default=defaults.bgb.value,
+            bgb_t2_wo_default=defaults.bgb.value,
+            soc_t2_start_default=defaults.soc.value,
+            soc_t2_w_default=defaults.soc.value,
+            soc_t2_wo_default=defaults.soc.value,
+            pc_c_lost_after_excavation_t2_start_default=defaults.pc_c_lost_excavation.value,
+            pc_c_lost_after_excavation_t2_w_default=defaults.pc_c_lost_excavation.value,
+            pc_c_lost_after_excavation_t2_wo_default=defaults.pc_c_lost_excavation.value,
+            drainage_ef_t2_start_default=defaults.ef_drainage.value,
+            drainage_ef_t2_w_default=defaults.ef_drainage.value,
+            drainage_ef_t2_wo_default=defaults.ef_drainage.value,
+            co2_rewetting_t2_start_default=defaults.rewetting_c.value,
+            co2_rewetting_t2_w_default=defaults.rewetting_c.value,
+            co2_rewetting_t2_wo_default=defaults.rewetting_c.value,
+            ch4_rewetting_t2_start_default=defaults.rewetting_ch4.value,
+            ch4_rewetting_t2_w_default=defaults.rewetting_ch4.value,
+            ch4_rewetting_t2_wo_default=defaults.rewetting_ch4.value,
+        )
+
+
+class WaterbodyDefaults(Defaults):
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace(
+            ch4_ef_t2_start_default=0,
+            ch4_ef_t2_w_default=0,
+            ch4_ef_t2_wo_default=0,
+            alpha_t2_start_default=0,
+            alpha_t2_w_default=0,
+            alpha_t2_wo_default=0,
+            mean_annual_t2_start_default=0,
+            mean_annual_t2_w_default=0,
+            mean_annual_t2_wo_default=0,
+        )
+
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.Waterbody
+
+        defaults = calcs.WaterbodyCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace(
+            ch4_ef_t2_start_default=defaults.methane_emission_factor.value,
+            ch4_ef_t2_w_default=defaults.methane_emission_factor.value,
+            ch4_ef_t2_wo_default=defaults.methane_emission_factor.value,
+            # TODO: Ask Lorenzo about mapping of commented out fields
+            # alpha_t2_start_default=defaults.alpha.value,
+            # alpha_t2_w_default=defaults.alpha.value,
+            # alpha_t2_wo_default=defaults.alpha.value,
+            # mean_annual_t2_start_default=0,
+            # mean_annual_t2_w_default=0,
+            # mean_annual_t2_wo_default=0,
+        )
+
+
+class OrganicSoil(Defaults):
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace(
+            onsite_co2_drainage_t2_start_default=0,
+            onsite_co2_drainage_t2_w_default=0,
+            onsite_co2_drainage_t2_wo_default=0,
+            onsite_ch4_drainage_t2_start_default=0,
+            onsite_ch4_drainage_t2_w_default=0,
+            onsite_ch4_drainage_t2_wo_default=0,
+            onsite_n2o_drainage_t2_start_default=0,
+            onsite_n2o_drainage_t2_w_default=0,
+            onsite_n2o_drainage_t2_wo_default=0,
+            offsite_doc_drainage_t2_start_default=0,
+            offsite_doc_drainage_t2_w_default=0,
+            offsite_doc_drainage_t2_wo_default=0,
+            offsite_ch4_drainage_t2_start_default=0,
+            offsite_ch4_drainage_t2_w_default=0,
+            offsite_ch4_drainage_t2_wo_default=0,
+            onsite_co2_rewetting_t2_start_default=0,
+            onsite_co2_rewetting_t2_w_default=0,
+            onsite_co2_rewetting_t2_wo_default=0,
+            onsite_ch4_rewetting_t2_start_default=0,
+            onsite_ch4_rewetting_t2_w_default=0,
+            onsite_ch4_rewetting_t2_wo_default=0,
+            onsite_n2o_rewetting_t2_start_default=0,
+            onsite_n2o_rewetting_t2_w_default=0,
+            onsite_n2o_rewetting_t2_wo_default=0,
+            offsite_doc_rewetting_t2_start_default=0,
+            offsite_doc_rewetting_t2_w_default=0,
+            offsite_doc_rewetting_t2_wo_default=0,
+            mean_dry_matter_t2_start_default=0,
+            mean_dry_matter_t2_w_default=0,
+            mean_dry_matter_t2_wo_default=0,
+            fire_on_soil_co2_t2_start_default=0,
+            fire_on_soil_co2_t2_w_default=0,
+            fire_on_soil_co2_t2_wo_default=0,
+            fire_on_soil_co_t2_start_default=0,
+            fire_on_soil_co_t2_w_default=0,
+            fire_on_soil_co_t2_wo_default=0,
+            fire_on_soil_ch4_t2_start_default=0,
+            fire_on_soil_ch4_t2_w_default=0,
+            fire_on_soil_ch4_t2_wo_default=0,
+            onsite_co2_peat_t2_start_default=0,
+            onsite_co2_peat_t2_w_default=0,
+            onsite_co2_peat_t2_wo_default=0,
+            onsite_n2o_peat_t2_start_default=0,
+            onsite_n2o_peat_t2_w_default=0,
+            onsite_n2o_peat_t2_wo_default=0,
+            offsite_doc_peat_t2_start_default=0,
+            offsite_doc_peat_t2_w_default=0,
+            offsite_doc_peat_t2_wo_default=0,
+            offsite_ch4_peat_t2_start_default=0,
+            offsite_ch4_peat_t2_w_default=0,
+            offsite_ch4_peat_t2_wo_default=0,
+            peat_density_t2_start_default=0,
+            peat_density_t2_w_default=0,
+            peat_density_t2_wo_default=0,
+        )
+
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.OrganicSoil
+
+        defaults = calcs.OrganicSoilCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace(
+            onsite_co2_drainage_t2_start_default=defaults.ef_onsite_start.co2,
+            onsite_co2_drainage_t2_w_default=defaults.ef_onsite_w.co2,
+            onsite_co2_drainage_t2_wo_default=defaults.ef_onsite_wo.co2,
+            onsite_ch4_drainage_t2_start_default=defaults.ef_onsite_start.ch4,
+            onsite_ch4_drainage_t2_w_default=defaults.ef_onsite_w.ch4,
+            onsite_ch4_drainage_t2_wo_default=defaults.ef_onsite_wo.ch4,
+            onsite_n2o_drainage_t2_start_default=defaults.ef_onsite_start.n2o,
+            onsite_n2o_drainage_t2_w_default=defaults.ef_onsite_w.n2o,
+            onsite_n2o_drainage_t2_wo_default=defaults.ef_onsite_wo.n2o,
+            offsite_doc_drainage_t2_start_default=defaults.ef_offsite_start.doc,
+            offsite_doc_drainage_t2_w_default=defaults.ef_offsite_w.doc,
+            offsite_doc_drainage_t2_wo_default=defaults.ef_offsite_wo.doc,
+            offsite_ch4_drainage_t2_start_default=defaults.ef_offsite_start.ch4,
+            offsite_ch4_drainage_t2_w_default=defaults.ef_offsite_w.ch4,
+            offsite_ch4_drainage_t2_wo_default=defaults.ef_offsite_wo.ch4,
+            onsite_co2_rewetting_t2_start_default=defaults.rewetting_start.co2,
+            onsite_co2_rewetting_t2_w_default=defaults.rewetting_w.co2,
+            onsite_co2_rewetting_t2_wo_default=defaults.rewetting_wo.co2,
+            onsite_ch4_rewetting_t2_start_default=defaults.rewetting_start.ch4,
+            onsite_ch4_rewetting_t2_w_default=defaults.rewetting_w.ch4,
+            onsite_ch4_rewetting_t2_wo_default=defaults.rewetting_wo.ch4,
+            onsite_n2o_rewetting_t2_start_default=defaults.rewetting_start.n2o,
+            onsite_n2o_rewetting_t2_w_default=defaults.rewetting_w.n2o,
+            onsite_n2o_rewetting_t2_wo_default=defaults.rewetting_wo.n2o,
+            offsite_doc_rewetting_t2_start_default=defaults.rewetting_start.doc,
+            offsite_doc_rewetting_t2_w_default=defaults.rewetting_w.doc,
+            offsite_doc_rewetting_t2_wo_default=defaults.rewetting_wo.doc,
+            mean_dry_matter_t2_start_default=0,
+            mean_dry_matter_t2_w_default=defaults.dry_matter_w.value,
+            mean_dry_matter_t2_wo_default=defaults.dry_matter_wo.value,
+            # TODO: Ask Lorenzo about mapping of commented out fields
+            # fire_on_soil_co2_t2_start_default=defaults.fire_on_soil_co2.value,
+            # fire_on_soil_co2_t2_w_default=defaults.fire_on_soil_co2.value,
+            # fire_on_soil_co2_t2_wo_default=defaults.fire_on_soil_co2.value,
+            # fire_on_soil_co_t2_start_default=defaults.fire_on_soil_co.value,
+            # fire_on_soil_co_t2_w_default=defaults.fire_on_soil_co.value,
+            # fire_on_soil_co_t2_wo_default=defaults.fire_on_soil_co.value,
+            # fire_on_soil_ch4_t2_start_default=defaults.fire_on_soil_ch4.value,
+            # fire_on_soil_ch4_t2_w_default=defaults.fire_on_soil_ch4.value,
+            # fire_on_soil_ch4_t2_wo_default=defaults.fire_on_soil_ch4.value,
+            onsite_co2_peat_t2_start_default=0,
+            onsite_co2_peat_t2_w_default=defaults.onsite_ef_w.co2,
+            onsite_co2_peat_t2_wo_default=defaults.onsite_ef_wo.co2,
+            onsite_n2o_peat_t2_start_default=0,
+            onsite_n2o_peat_t2_w_default=defaults.onsite_ef_w.n2o,
+            onsite_n2o_peat_t2_wo_default=defaults.onsite_ef_wo.n2o,
+            offsite_doc_peat_t2_start_default=0,
+            offsite_doc_peat_t2_w_default=defaults.offsite_ef_w.doc,
+            offsite_doc_peat_t2_wo_default=defaults.offsite_ef_wo.doc,
+            offsite_ch4_peat_t2_start_default=0,
+            offsite_ch4_peat_t2_w_default=defaults.offsite_ef_w.ch4,
+            offsite_ch4_peat_t2_wo_default=defaults.offsite_ef_wo.ch4,
+            # TODO: Ask Lorenzo about mapping of commented out fields
+            # peat_density_t2_start_default=defaults.peat_density.value,
+            # peat_density_t2_w_default=defaults.peat_density.value,
+            # peat_density_t2_wo_default=defaults.peat_density.value,
         )
