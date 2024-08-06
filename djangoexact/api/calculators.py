@@ -3834,6 +3834,20 @@ class BuildingCalculator(BaseCalculator):
     Calculator for buildings and roads.
     """
 
+    def __init__(self, input) -> None:
+        super().__init__(input)
+
+        self.ef: ipcc.BuildingEmissionFactor = None
+
+    def get_defaults(self, calculate=False) -> dict:
+        super().get_defaults(calculate)
+
+        module: Building = self.data
+
+        # TODO: What do we need the start scenario for?
+        # TODO: Define if all the fields of an input are required after creation
+        self.ef = utils.get_or_raise(ipcc.BuildingEmissionFactor, {"building_type": module.building_type}, f"Could not find Building EF for {module.building_type}")
+
     def calculate(self) -> list[Result]:
         """
         Calculate emissions for a single Building module.
@@ -3844,15 +3858,10 @@ class BuildingCalculator(BaseCalculator):
         activity: Activity = parent.activity
         project: Project = activity.project
 
-        math_w = None
-        math_wo = None
+        self.get_defaults()
 
-        # TODO: What do we need the start scenario for?
-        # TODO: Define if all the fields of an input are required after creation
-        ef = utils.get_or_raise(ipcc.BuildingEmissionFactor, {"building_type": module.building_type}, f"Could not find Building EF for {module.building_type}")
-
-        inputs_w = [
-            ef.value,
+        self.inputs_w = [
+            self.ef.value,
             module.ef_t2_w,
             module.area_m2_w,
             project.implementation_years,
@@ -3860,11 +3869,11 @@ class BuildingCalculator(BaseCalculator):
             activity.change_rate.name,
         ]
 
-        math_w = MathRoads(*inputs_w)
-        math_w.calculate_emissions()
+        self.math_w = MathRoads(*self.inputs_w)
+        self.math_w.calculate_emissions()
 
-        inputs_wo = [
-            ef.value,
+        self.inputs_wo = [
+            self.ef.value,
             module.ef_t2_wo,
             module.area_m2_wo,
             project.implementation_years,
@@ -3872,18 +3881,15 @@ class BuildingCalculator(BaseCalculator):
             activity.change_rate.name,
         ]
 
-        math_wo = MathRoads(*inputs_wo)
-        math_wo.calculate_emissions()
+        self.math_wo = MathRoads(*self.inputs_wo)
+        self.math_wo.calculate_emissions()
 
-        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
-        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
-        results_tuple = (results_w, results_wo)
+        results_tuple = (self.results_w, self.results_wo)
 
         return results_tuple
-
-    def get_defaults(self, calculate=False) -> dict:
-        return super().get_defaults(calculate)
 
 
 class RoadCalculator(BaseCalculator):
