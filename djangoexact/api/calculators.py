@@ -3042,8 +3042,35 @@ class AquacultureCalculator(BaseCalculator):
     Calculator for aquaculture.
     """
 
+    def __init__(self, input) -> None:
+        super().__init__(input)
+
+        self.ELECTRICITY_USED_DEFAULT = 0  # TODO: Add as database parameter
+        self.NITROUS_EF_DEFAULT = 0
+        self.FEED_EF_DEFAULT = 0
+
     def get_defaults(self, input: Module) -> dict:
-        return super().get_defaults(input)
+        super().get_defaults(input)
+
+        module: Aquaculture = self.data
+        project: Project = module.activity.project
+
+        try:
+            self.NITROUS_EF_DEFAULT = AquacultureParameter.objects.get(name="nitrous_ef_default").value
+        except AquacultureParameter.DoesNotExist:
+            raise ValueError("Default nitrous emission factor does not exist")
+
+        try:
+            # TODO: This will now be used in the inputs module for feed
+            self.FEED_EF_DEFAULT = AquacultureParameter.objects.get(name="feed_ef_default").value
+        except AquacultureParameter.DoesNotExist:
+            raise ValueError("Default feed emission factor does not exist")
+
+        try:
+            self.elec = ipcc.ElectricityEmission.objects.get(country=project.country)
+            log.debug(f"Operating margin: {self.elec.operating_margin}")
+        except ipcc.ElectricityEmission.DoesNotExist:
+            raise ValueError(f"Electricity emission for {project.country.name} does not exist")
 
     def calculate(self) -> list[Result]:
         """
@@ -3054,91 +3081,62 @@ class AquacultureCalculator(BaseCalculator):
         change_rate = module.activity.change_rate
         project: Project = module.activity.project
 
-        ELECTRICITY_USED_DEFAULT = 0  # TODO: Add as database parameter
-
-        try:
-            NITROUS_EF_DEFAULT = AquacultureParameter.objects.get(name="nitrous_ef_default").value
-        except AquacultureParameter.DoesNotExist:
-            raise ValueError("Default nitrous emission factor does not exist")
-
-        try:
-            # TODO: This will now be used in the inputs module for feed
-            FEED_EF_DEFAULT = AquacultureParameter.objects.get(name="feed_ef_default").value
-        except AquacultureParameter.DoesNotExist:
-            raise ValueError("Default feed emission factor does not exist")
-
-        try:
-            elec = ipcc.ElectricityEmission.objects.get(country=project.country)
-            log.debug(f"Operating margin: {elec.operating_margin}")
-        except ipcc.ElectricityEmission.DoesNotExist:
-            raise ValueError(f"Electricity emission for {project.country.name} does not exist")
-
-        math_w = None
-        math_wo = None
+        self.get_defaults()
 
         if module.is_with():
             log.debug("IS WITH")
-            inputs_w = [
+            self.inputs_w = [
                 module.annual_production_start,
                 module.annual_production_w,
-                NITROUS_EF_DEFAULT,
+                self.NITROUS_EF_DEFAULT,
                 module.n2o_from_production_t2_start,
                 module.n2o_from_production_t2_w,
                 project.gw_potential.n2o,
-                ELECTRICITY_USED_DEFAULT,
+                self.ELECTRICITY_USED_DEFAULT,
                 module.electricity_used_t2_start,
                 module.electricity_used_t2_w,
-                elec.operating_margin,
+                self.elec.operating_margin,
                 module.electricity_ef_t2_start,
                 module.electricity_ef_t2_w,
                 project.implementation_years,
                 project.capitalization_years,
                 change_rate.name,
             ]
-            log.debug("Inputs with: %s", inputs_w)
+            log.debug("Inputs with: %s", self.inputs_w)
 
-            math_w = MathAquaculture(*inputs_w)
-            math_w.calculate_emissions()
+            self.math_w = MathAquaculture(*self.inputs_w)
+            self.math_w.calculate_emissions()
 
         if module.is_without():
             log.debug("IS WITHOUT")
-            inputs_wo = [
+            self.inputs_wo = [
                 module.annual_production_start,
                 module.annual_production_wo,
-                NITROUS_EF_DEFAULT,
+                self.NITROUS_EF_DEFAULT,
                 module.n2o_from_production_t2_start,
                 module.n2o_from_production_t2_wo,
                 project.gw_potential.n2o,
-                ELECTRICITY_USED_DEFAULT,
+                self.ELECTRICITY_USED_DEFAULT,
                 module.electricity_used_t2_start,
                 module.electricity_used_t2_wo,
-                elec.operating_margin,
+                self.elec.operating_margin,
                 module.electricity_ef_t2_start,
                 module.electricity_ef_t2_w,
                 project.implementation_years,
                 project.capitalization_years,
                 change_rate.name,
             ]
-            log.debug("Inputs without: %s", inputs_wo)
+            log.debug("Inputs without: %s", self.inputs_wo)
 
-            math_wo = MathAquaculture(*inputs_wo)
-            math_wo.calculate_emissions()
+            self.math_wo = MathAquaculture(*self.inputs_wo)
+            self.math_wo.calculate_emissions()
 
-        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
-        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
-        log.debug("Results WITH")
-        results_w.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        log.debug("Results WITHOUT")
-        results_wo.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        results_tuple = (results_w, results_wo)
+        results_tuple = (self.results_w, self.results_wo)
 
         return results_tuple
-
-    def defaults(self):
-        pass
 
 
 class InputCalculator(BaseCalculator):

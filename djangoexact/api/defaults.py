@@ -813,3 +813,34 @@ class OrganicSoil(Defaults):
             # peat_density_t2_w_default=defaults.peat_density.value,
             # peat_density_t2_wo_default=defaults.peat_density.value,
         )
+
+
+class AquacultureDefaults(Defaults):
+
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace(
+            electricity_used_t2_start_default=0,
+            electricity_used_t2_w_default=0,
+            electricity_used_t2_wo_default=0,
+            electricity_ef_t2_start_default=0,
+            electricity_ef_t2_w_default=0,
+            electricity_ef_t2_wo_default=0,
+        )
+
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.Aquaculture
+
+        defaults = calcs.AquacultureCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace(
+            # TODO: Ask Lorenzo about mapping of fields
+            electricity_used_t2_start_default=0,
+            electricity_used_t2_w_default=0,
+            electricity_used_t2_wo_default=0,
+            electricity_ef_t2_start_default=0,
+            electricity_ef_t2_w_default=0,
+            electricity_ef_t2_wo_default=0,
+        )
