@@ -5801,7 +5801,7 @@ class DegradedLandCalculator(BaseCalculator):
         self.fi_wo: SimpleNamespace | ipcc.FIData = SimpleNamespace(value=1)
         self.fmg_wo: SimpleNamespace | ipcc.FMGData = SimpleNamespace(value=1)
         self.flu_wo: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=1)
-        self.som: SimpleNamespace | ipcc.LandUseNitrousEmissionFactor = SimpleNamespace(value=1)
+        self.soc: SimpleNamespace | ipcc.SoilOrganicCarbon = SimpleNamespace(value=1)
 
         self.math_start_w = None
         self.math_start_wo = None
@@ -5956,18 +5956,6 @@ class DegradedLandCalculator(BaseCalculator):
         results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
         results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
-        log.debug("start_w breakdown")
-        results_start_w.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        log.debug("start_wo breakdown")
-        results_start_wo.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        log.debug("w breakdown")
-        results_w.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        log.debug("wo breakdown")
-        results_wo.breakdown(by=BreakdownTypes.ACTIVITY)
-
         results_tuple = (results_w + results_start_w, results_wo + results_start_wo)
 
         return results_tuple
@@ -5980,7 +5968,6 @@ class DegradedLandCalculator(BaseCalculator):
 
         climate: Climate = activity.climate_t2 or project.climate
         moisture: Moisture = activity.moisture_t2 or project.moisture
-        region: Region = project.country.region
         soil_type: SoilType = project.soil_type
 
         moisture_flt = {"moisture": moisture}
@@ -5988,10 +5975,6 @@ class DegradedLandCalculator(BaseCalculator):
         cm = {"climate": climate, "moisture": moisture}
 
         module_start = module_w = module_wo = module
-
-        # NOTE: Here we have a hardcoded organic_input_flt. This is due to the fact that it should not be present in the table (it isn't in the Excel)
-        retrieved_input = OrganicInputType.objects.get(name="Medium C input")
-        organic_input_hardcoded = {"organic_input_type": retrieved_input}
 
         if luc:
             module_start, module_w, module_wo = luc.get_modules()
