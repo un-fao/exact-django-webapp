@@ -904,3 +904,26 @@ class DegradedLandDefaults(Defaults):
             # biomass_t2_w_default=defaults.biomass_w.value,
             # biomass_t2_wo_default=defaults.biomass_wo.value,
         )
+
+
+class RoadDefaults(Defaults):
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace(
+            ef_t2_start_default=0,
+            ef_t2_w_default=0,
+            ef_t2_wo_default=0,
+        )
+
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.Road
+
+        defaults = calcs.RoadCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace(
+            ef_t2_start_default=defaults.ef.value,
+            ef_t2_w_default=defaults.ef.value,
+            ef_t2_wo_default=defaults.ef.value,
+        )

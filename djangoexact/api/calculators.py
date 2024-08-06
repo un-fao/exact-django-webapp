@@ -3891,6 +3891,17 @@ class RoadCalculator(BaseCalculator):
     Calculator for buildings and roads.
     """
 
+    def __init__(self, input) -> None:
+        super().__init__(input)
+
+        self.ef: ipcc.RoadEmissionFactor = None
+
+    def get_defaults(self, calculate=False) -> dict:
+        super().get_defaults(calculate)
+
+        module: Road = self.data
+        self.ef = utils.get_or_raise(ipcc.RoadEmissionFactor, {"road_type": module.road_type}, f"Could not find Road EF for {module.road_type.name}")
+
     def calculate(self) -> list[Result]:
         """
         Calculate emissions for a single Building module.
@@ -3901,49 +3912,40 @@ class RoadCalculator(BaseCalculator):
         activity: Activity = parent.activity
         project: Project = activity.project
 
-        math_w = None
-        math_wo = None
+        self.get_defaults()
 
-        ef = utils.get_or_raise(ipcc.RoadEmissionFactor, {"road_type": module.road_type}, f"Could not find Road EF for {module.road_type.name}")
-
-        # TODO: Tell Peter to add this to the model
-        area = module.length_km_w * module.width_m_start
-
-        inputs_w = [
-            ef.value,
+        self.inputs_w = [
+            self.ef.value,
             module.ef_t2_w,
-            area,
+            module.length_km_w,
+            module.width_m_start,
             project.implementation_years,
             project.capitalization_years,
             activity.change_rate.name,
         ]
 
-        math_w = MathRoads(*inputs_w)
-        math_w.calculate_emissions()
+        self.math_w = MathRoads(*self.inputs_w)
+        self.math_w.calculate_emissions()
 
-        area = module.length_km_wo * module.width_m_start
-
-        inputs_wo = [
-            ef.value,
+        self.inputs_wo = [
+            self.ef.value,
             module.ef_t2_wo,
-            area,
+            module.length_km_wo,
+            module.width_m_start,
             project.implementation_years,
             project.capitalization_years,
             activity.change_rate.name,
         ]
 
-        math_wo = MathRoads(*inputs_wo)
-        math_wo.calculate_emissions()
+        self.math_wo = MathRoads(*self.inputs_wo)
+        self.math_wo.calculate_emissions()
 
-        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
-        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
-        results_tuple = (results_w, results_wo)
+        results_tuple = (self.results_w, self.results_wo)
 
         return results_tuple
-
-    def get_defaults(self, calculate=False) -> dict:
-        return super().get_defaults(calculate)
 
 
 class LivestockCalculator(BaseCalculator):
