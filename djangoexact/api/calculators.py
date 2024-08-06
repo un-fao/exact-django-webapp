@@ -521,9 +521,7 @@ class LandUseChangeCalculator(BaseCalculator):
 
         luc: LandUseChange = self.data
 
-        module_start = getattr(luc.activity, luc.module_type_start.class_name.lower(), None)
-        module_w = getattr(luc.activity, luc.module_type_w.class_name.lower(), None)
-        module_wo = getattr(luc.activity, luc.module_type_wo.class_name.lower(), None)
+        module_start, module_w, module_wo = luc.get_modules()
 
         if not module_start or not module_w or not module_wo:
             missing_modules = ["Start" if not module_start else "With" if not module_w else "Without" for module in [module_start, module_w, module_wo] if not module].join(", ")
@@ -535,9 +533,9 @@ class LandUseChangeCalculator(BaseCalculator):
 
         # TODO: DeforestationCalculator now expects the ForestManagement module only. Refactor the calculator accordingly (check T2 values!)
         # results_start = CalculatorFactory().calculate_result(module_start, aggregate_by=aggregate_by)
-        results_w, results_wo = self.luc_based_calculation(module_start, module_w, aggregate_by=aggregate_by)
+        self.results_w, self.results_wo = self.luc_based_calculation(module_start, module_w, aggregate_by=aggregate_by)
 
-        return (results_w, results_wo)
+        return (self.results_w, self.results_wo)
 
     def defaults(self) -> DefaultData:
         pass
