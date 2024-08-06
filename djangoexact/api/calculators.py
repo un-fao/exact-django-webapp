@@ -6026,7 +6026,6 @@ class SetAsideCalculator(BaseCalculator):
     def __init__(self, input) -> None:
         super().__init__(input)
 
-        # NOTE: I think these should all be defaulted to 1, instead of 0
         self.fi_start: SimpleNamespace | ipcc.FIData = SimpleNamespace(value=1)
         self.fmg_start: SimpleNamespace | ipcc.FMGData = SimpleNamespace(value=1)
         self.flu_start: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=1)
@@ -6036,12 +6035,60 @@ class SetAsideCalculator(BaseCalculator):
         self.fi_wo: SimpleNamespace | ipcc.FIData = SimpleNamespace(value=1)
         self.fmg_wo: SimpleNamespace | ipcc.FMGData = SimpleNamespace(value=1)
         self.flu_wo: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=1)
-        self.som: SimpleNamespace | ipcc.LandUseNitrousEmissionFactor = SimpleNamespace(value=1)
+        self.soc: SimpleNamespace | ipcc.SoilOrganicCarbon = SimpleNamespace(value=1)
 
         self.math_start_w = None
         self.math_start_wo = None
         self.math_w = None
         self.math_wo = None
+
+    def get_defaults(self, calculate=False) -> dict:
+        module: SetAside = self.data
+        activity: Activity = module.activity
+        project: Project = activity.project
+        luc: LandUseChange = module.land_use_change
+
+        climate: Climate = activity.climate_t2 or project.climate
+        moisture: Moisture = activity.moisture_t2 or project.moisture
+        soil_type: SoilType = project.soil_type
+
+        moisture_flt = {"moisture": moisture}
+        soil_flt = {"soil_type": soil_type}
+        cm = {"climate": climate, "moisture": moisture}
+
+        module_start = module_w = module_wo = input
+
+        if luc:
+            module_start, module_w, module_wo = luc.get_modules()
+
+        if module.is_luc_remaining_same():
+            self.flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+            self.fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+            self.fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+            self.emission_factors_start = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
+
+        if module.is_business_as_usual():
+            self.flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+            self.fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+            self.fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+            self.emission_factors_start = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
+
+        if module.is_with():
+            self.flu_w = get_flu_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
+            self.fmg_w = get_fmg_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
+            self.fi_w = get_fi_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
+            self.emission_factors_w = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
+
+        if module.is_without():
+            self.flu_wo = get_flu_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
+            self.fmg_wo = get_fmg_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
+            self.fi_wo = get_fi_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
+            self.emission_factors_wo = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
+
+        self.soc = utils.get_or_raise(ipcc.SoilOrganicCarbon, cm | soil_flt, f"SoilOrganicCarbon for {soil_type.name} soil type in {climate.name} climate and {moisture.name} moisture does not exist")
+
+        if module.status.name == "READY" and calculate:
+            self.calculate()
 
     def calculate(self) -> Result:
         module: SetAside = self.data
@@ -6186,78 +6233,11 @@ class SetAsideCalculator(BaseCalculator):
             self.math_wo = MathNotCultivatedLand(*self.inputs_wo)
             self.math_wo.calculate_emissions()
 
-        results_start_w = self.math_start_w.result if self.math_start_w else MathResult(project.implementation_years, project.capitalization_years)
-        results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(project.implementation_years, project.capitalization_years)
-        results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
-        results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
-        log.debug("start_w breakdown")
-        results_start_w.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        log.debug("start_wo breakdown")
-        results_start_wo.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        log.debug("w breakdown")
-        results_w.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        log.debug("wo breakdown")
-        results_wo.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        results_tuple = (results_w + results_start_w, results_wo + results_start_wo)
+        results_tuple = (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
 
         return results_tuple
-
-    def get_defaults(self, calculate=False) -> dict:
-        module: SetAside = self.data
-        activity: Activity = module.activity
-        project: Project = activity.project
-        luc: LandUseChange = module.land_use_change
-
-        climate: Climate = activity.climate_t2 or project.climate
-        moisture: Moisture = activity.moisture_t2 or project.moisture
-        region: Region = project.country.region
-        soil_type: SoilType = project.soil_type
-
-        climate_flt = {"climate": climate}
-        moisture_flt = {"moisture": moisture}
-        soil_flt = {"soil_type": soil_type}
-        region_flt = {"continent": region}
-        cm = {"climate": climate, "moisture": moisture}
-
-        module_start = module_w = module_wo = input
-
-        # NOTE: Here we have a hardcoded organic_input_flt. This is due to the fact that it should not be present in the table (it isn't in the Excel)
-        retrieved_input = OrganicInputType.objects.get(name="Medium C input")
-        organic_input_hardcoded = {"organic_input_type": retrieved_input}
-
-        if luc:
-            module_start, module_w, module_wo = luc.get_modules()
-
-        if module.is_luc_remaining_same():
-            self.flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-            self.fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-            self.fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-            self.emission_factors_start = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
-
-        if module.is_business_as_usual():
-            self.flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-            self.fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-            self.fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-            self.emission_factors_start = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
-
-        if module.is_with():
-            self.flu_w = get_flu_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
-            self.fmg_w = get_fmg_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
-            self.fi_w = get_fi_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
-            self.emission_factors_w = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
-
-        if module.is_without():
-            self.flu_wo = get_flu_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
-            self.fmg_wo = get_fmg_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
-            self.fi_wo = get_fi_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
-            self.emission_factors_wo = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
-
-        self.soc = utils.get_or_raise(ipcc.SoilOrganicCarbon, cm | soil_flt, f"SoilOrganicCarbon for {soil_type.name} soil type in {climate.name} climate and {moisture.name} moisture does not exist")
-
-        if module.status.name == "READY" and calculate:
-            self.calculate()

@@ -950,3 +950,63 @@ class BuildingDefaults(Defaults):
             ef_t2_w_default=defaults.ef.value,
             ef_t2_wo_default=defaults.ef.value,
         )
+
+
+class SetAsideDefaults(Defaults):
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace(
+            soc_t2_start_default=0,
+            soc_t2_w_default=0,
+            soc_t2_wo_default=0,
+            flu_t2_start_default=0,
+            flu_t2_w_default=0,
+            flu_t2_wo_default=0,
+            fi_t2_start_default=0,
+            fi_t2_w_default=0,
+            fi_t2_wo_default=0,
+            fmg_t2_start_default=0,
+            fmg_t2_w_default=0,
+            fmg_t2_wo_default=0,
+            agb_t2_start_default=0,
+            agb_t2_w_default=0,
+            agb_t2_wo_default=0,
+            bgb_t2_start_default=0,
+            bgb_t2_w_default=0,
+            bgb_t2_wo_default=0,
+            biomass_t2_start_default=0,
+            biomass_t2_w_default=0,
+            biomass_t2_wo_default=0,
+        )
+
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.SetAside
+
+        defaults = calcs.SetAsideCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace(
+            soc_t2_start_default=defaults.soc.value,
+            soc_t2_w_default=defaults.soc.value,
+            soc_t2_wo_default=defaults.soc.value,
+            flu_t2_start_default=defaults.flu_start.value,
+            flu_t2_w_default=defaults.flu_w.value,
+            flu_t2_wo_default=defaults.flu_wo.value,
+            fi_t2_start_default=defaults.fi_start.value,
+            fi_t2_w_default=defaults.fi_w.value,
+            fi_t2_wo_default=defaults.fi_wo.value,
+            fmg_t2_start_default=defaults.fmg_start.value,
+            fmg_t2_w_default=defaults.fmg_w.value,
+            fmg_t2_wo_default=defaults.fmg_wo.value,
+            # TODO: Ask Lorenzo about mapping of commented out fields
+            # agb_t2_start_default=defaults.agb_start.value,
+            # agb_t2_w_default=defaults.agb_w.value,
+            # agb_t2_wo_default=defaults.agb_wo.value,
+            # bgb_t2_start_default=defaults.bgb_start.value,
+            # bgb_t2_w_default=defaults.bgb_w.value,
+            # bgb_t2_wo_default=defaults.bgb_wo.value,
+            # biomass_t2_start_default=defaults.biomass_start.value,
+            # biomass_t2_w_default=defaults.biomass_w.value,
+            # biomass_t2_wo_default=defaults.biomass_wo.value,
+        )
