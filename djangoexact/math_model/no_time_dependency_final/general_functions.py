@@ -15,6 +15,8 @@ def average_yearly_value(yearly_breakdown: list):
 
 
 def yearly_time_dependent_parameter_breakdown(start_value, end_value, years_implementation, years_capitalization, function, interim_values=True):
+
+    # IMPORTANT NOTE:
     # UTILIZING THIS FUNCTION WE ARE RETURNING THE MIDDLE VALUE BETWEEN THE CALCULATED VALUES AT THE BEGINNING OF EACH YEAR.
     # THIS IS DONE SO THAT THE YEARLY BREAKDOWN IS A LIST OF THE SAME LENGTH AS THE NUMBER OF YEARS IMPLEMENTATION + CAPITALIZATION
     # ALSO, THIS WAY THE RESULTS ARE THE SAME AS THE EXCEL RESULTS
@@ -40,7 +42,7 @@ def yearly_time_dependent_parameter_breakdown(start_value, end_value, years_impl
         else:
             return yearly_breakdown
 
-    elif function == "D":
+    elif function == "linear":
         # calculate the parameters for the function a + bx
         a = min(start_value, end_value)
         b = (abs(start_value - end_value)) / years_implementation
@@ -211,7 +213,7 @@ import matplotlib.pyplot as plt
 # TODO: these functions basically only work with 'D' as a rate. has to be generalized
 def yearly_time_dependent_matrix(start_value, end_value, years_implementation, years_capitalization, function, interim_values=True):
 
-    if function == "D":
+    if function == "linear":
         years_total = years_implementation + years_capitalization
 
         half_year = yearly_time_dependent_increase(start_value, end_value, years_implementation, years_capitalization, function)
@@ -235,10 +237,30 @@ def yearly_time_dependent_matrix(start_value, end_value, years_implementation, y
         matrix = np.full((years_implementation, years_total), end_value)
 
         return matrix
+    
+    elif function == "exponential":
+        # NOTE: same as Linear, but kept on a different function for readability
+        years_total = years_implementation + years_capitalization
+
+        half_year = yearly_time_dependent_increase_half_year(start_value, end_value, years_implementation, years_capitalization, function)
+        full_year = yearly_time_dependent_full_year(start_value, end_value, years_implementation, years_capitalization, function)
+
+        matrix = np.full((years_implementation, years_total), 0.0)
+        n = len(half_year)
+
+        for i in range(matrix.shape[0]):
+            matrix[i][i] = half_year[0]
+            for j in range(i + 1, n):
+                matrix[i][j] = full_year[0]
+
+        # NOTE: now it does what is needed, but it is not very readable. Has to be fixed further on
+
+        return matrix
+
 
 def yearly_time_dependent_matrix_log_rec_dis(start_value, end_value, years_implementation, years_capitalization, function, interim_values=True):
 
-    if function == "D":
+    if function == "linear":
         # NOTE: Basically the same as above, however rather than having the values of half a year of hectares across the diagonal (i.e. we intervene at half of the year),
         # we have the value of a full year at each cell. This is due to the fact that we are cutting all the hectares at the beginning of the year
         years_total = years_implementation + years_capitalization
@@ -261,10 +283,31 @@ def yearly_time_dependent_matrix_log_rec_dis(start_value, end_value, years_imple
 
         return matrix
     
+    elif function == "exponential":
+
+        # NOTE: Basically the same as above, however rather than having the values of half a year of hectares across the diagonal (i.e. we intervene at half of the year),
+        # we have the value of a full year at each cell. This is due to the fact that we are cutting all the hectares at the beginning of the year.
+        # Again, same as above for linear just kept separate for readability
+        years_total = years_implementation + years_capitalization
+
+        full_year = yearly_time_dependent_full_year(start_value, end_value, years_implementation, years_capitalization, function)
+
+        matrix = np.full((years_implementation, years_total), 0.0)
+        n = len(full_year)
+
+        for i in range(matrix.shape[0]):
+            for j in range(i, n):
+                matrix[i][j] = full_year[1]
+
+        return matrix
+    
+
+    
 
 
 # LIVESTOCK CH4 HEAD GENERAL FUNCTION
 def ch4_head_calculation_general(tam: float, vser: float, ef_prp: float, percentage_prp_default: float, percentage_prp_tier_2: float, ef_system_default: list, ch4_prp_tier_2: float, percentage_system_default: list, ef_single_system, ch4_system_tier_2, ch4_dividing_parameter=1):
+
     try:
         # TODO: check how various tier 2 inputs of ef_system have to be handled
         if not ch4_system_tier_2:
