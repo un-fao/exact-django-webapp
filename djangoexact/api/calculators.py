@@ -3151,35 +3151,17 @@ class InputCalculator(BaseCalculator):
         module: Input = self.data
         project: Project = module.activity.project
 
-        results_w = MathResult(project.implementation_years, project.capitalization_years)
-        results_wo = MathResult(project.implementation_years, project.capitalization_years)
+        self.results_w = MathResult(project.implementation_years, project.capitalization_years)
+        self.results_wo = MathResult(project.implementation_years, project.capitalization_years)
 
         entries = module.input_entries.all()
         for entry in entries:
             r_w, r_wo = InputEntryCalculator(entry).calculate()
 
-            results_w += r_w
-            results_wo += r_wo
+            self.results_w += r_w
+            self.results_wo += r_wo
 
-        return (results_w, results_wo)
-
-    def defaults(self) -> DefaultData:
-        self.calculate()
-
-        input: Input = self.data
-
-        defaults_start = {}
-        defaults_w = {}
-        defaults_wo = {}
-
-        for entry in input.input_entries.all():
-            defaults_start_entry, defaults_w_entry, defaults_wo_entry = InputEntryCalculator(entry).defaults()
-
-            defaults_start.update(defaults_start_entry)
-            defaults_w.update(defaults_w_entry)
-            defaults_wo.update(defaults_wo_entry)
-
-        return DefaultData(defaults_start, defaults_w, defaults_wo)
+        return (self.results_w, self.results_wo)
 
 
 class InputEntryCalculator(BaseCalculator):
@@ -3317,11 +3299,11 @@ class EnergyCalculator(BaseCalculator):
         """
 
         module: Energy = self.data
-        res_w = MathResult(
+        self.results_w = MathResult(
             module.activity.project.implementation_years,
             module.activity.project.capitalization_years,
         )
-        res_wo = MathResult(
+        self.results_wo = MathResult(
             module.activity.project.implementation_years,
             module.activity.project.capitalization_years,
         )
@@ -3329,19 +3311,16 @@ class EnergyCalculator(BaseCalculator):
         for elec in module.electricities.all():
             r_w, r_wo = ElectricityCalculator(elec).calculate()
 
-            res_w += r_w
-            res_wo += r_wo
+            self.results_w += r_w
+            self.results_wo += r_wo
 
         for fuel in module.fuels.all():
             r_w, r_wo = FuelCalculator(fuel).calculate()
 
-            res_w += r_w
-            res_wo += r_wo
+            self.results_w += r_w
+            self.results_wo += r_wo
 
-        return (res_w, res_wo)
-
-    def defaults(self) -> DefaultData:
-        pass
+        return (self.results_w, self.results_wo)
 
 
 class ElectricityCalculator(BaseCalculator):
@@ -4486,25 +4465,25 @@ class LivestockCalculator(BaseCalculator):
 class IrrigationCalculator(BaseCalculator):
     def calculate(self) -> list[Result]:
         module: Irrigation = self.data
-        res_w = MathResult(
+        self.results_w = MathResult(
             module.activity.project.implementation_years,
             module.activity.project.capitalization_years,
         )
-        res_wo = MathResult(
+        self.results_wo = MathResult(
             module.activity.project.implementation_years,
             module.activity.project.capitalization_years,
         )
         for system in module.irrigation_systems.all():
             r_w, r_wo = IrrigationSystemCalculator(system).calculate()
-            res_w += r_w
-            res_wo += r_wo
+            self.results_w += r_w
+            self.results_wo += r_wo
 
         for phase in module.irrigation_phases.all():
             r_w, r_wo = IrrigationPhaseCalculator(phase).calculate()
-            res_w += r_w
-            res_wo += r_wo
+            self.results_w += r_w
+            self.results_wo += r_wo
 
-        return (res_w, res_wo)
+        return (self.results_w, self.results_wo)
 
 
 class IrrigationSystemCalculator(BaseCalculator):
