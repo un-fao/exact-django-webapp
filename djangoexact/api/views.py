@@ -78,6 +78,9 @@ from .serializers import (
     NoteSerializer,
 )
 
+from djangoexact.settings import auth
+
+
 logger = logging.getLogger("console")
 
 activity_id = openapi.Parameter(
@@ -216,6 +219,15 @@ class UserViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     def update(self, request, *args, **kwargs):
         self.serializer_class = UserWriteSerializer
         return super().update(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        user: CustomUser = self.get_object()
+        if user == self.request.user or self.request.user.is_superuser or self.request.user.is_staff:
+            user.delete()
+            auth.delete_user_account(user.firebase_uid)
+            return Response(status=http_status.HTTP_204_NO_CONTENT)
+
+        return utils.ErrorResponse("Selected user does not have permission to delete the user", status=http_status.HTTP_403_FORBIDDEN)
 
 
 class LandUseTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
