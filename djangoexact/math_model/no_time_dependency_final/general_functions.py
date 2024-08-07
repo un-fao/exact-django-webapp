@@ -21,17 +21,18 @@ def yearly_time_dependent_parameter_breakdown(start_value, end_value, years_impl
     # THIS IS DONE SO THAT THE YEARLY BREAKDOWN IS A LIST OF THE SAME LENGTH AS THE NUMBER OF YEARS IMPLEMENTATION + CAPITALIZATION
     # ALSO, THIS WAY THE RESULTS ARE THE SAME AS THE EXCEL RESULTS
 
-    # EXPONENTIAL CASE
+    # Exponential case
     if function == "exponential":
-        # calculate the parameters for the function a*b^x
-        a = min(start_value, end_value)
-        b = (max(start_value, end_value) / min(start_value, end_value)) ** (1 / years_implementation)
+        # NOTE: the function is y = b + a * e^(kx) where k = -0.519349 this was calculated as the integral between 0 and 1 of a*e^(bx) = 0.78
+        # where 0.78 was selected from the exact team, as it shows natural decay
+        k = -0.519349
+        a = end_value/(math.exp(k * years_implementation) - 1)
+        b = start_value - a
 
-        # Calculate the yearly breakdown
         if start_value < end_value:
-            yearly_breakdown = [a * b**i for i in range(years_implementation + 1)]
+            yearly_breakdown = [b + a * math.exp(k * i) for i in range(years_implementation + 1)]
         else:
-            yearly_breakdown = [a * b**i for i in range(years_implementation + 1)]
+            yearly_breakdown = [b + a * math.exp(k * i) for i in range(years_implementation + 1)]
             yearly_breakdown.reverse()
 
         yearly_breakdown.extend([yearly_breakdown[-1] for i in range(years_capitalization)])
@@ -40,7 +41,9 @@ def yearly_time_dependent_parameter_breakdown(start_value, end_value, years_impl
         if interim_values:
             return average_yearly_value(yearly_breakdown)
         else:
-            return yearly_breakdown
+            yearly_breakdown
+
+        return yearly_breakdown
 
     elif function == "linear":
         # calculate the parameters for the function a + bx
@@ -127,11 +130,31 @@ def yearly_time_dependent_parameter_breakdown_new_test(start_value, end_value, y
         raise Exception(f'Function "{function}" not recognized')
     
 
-def yearly_constant_emissions_breakdown(total_emissions, years_implementation, years_capitalization):
-    # TODO: add logic for breakdown according to rate type
-    # total emissions are broken down across impl with 0 in cap
-    yearly_breakdown = [total_emissions / years_implementation for i in range(years_implementation)]
-    yearly_breakdown.extend([0 for i in range(years_capitalization)])
+def yearly_constant_emissions_breakdown(total_emissions, years_implementation, years_capitalization, rate_type):
+    
+    if rate_type == "linear":
+        yearly_breakdown = [total_emissions / years_implementation for _ in range(years_implementation)]
+        yearly_breakdown.extend([0 for _ in range(years_capitalization)])
+    
+    elif rate_type == "exponential":
+        # NOTE: this is changed to -k (as k=-0.519349) as I believe we should have a larger part towards to end than the beginning
+        k = -0.519349  # growth rate determined from the previous calculation
+        # Calculate the total area under the exponential curve from 0 to years_implementation
+        total_area = (math.exp(k * years_implementation) - 1) / k
+        
+        yearly_breakdown = []
+        for year in range(1, years_implementation + 1):
+            # Calculate the area for each year interval
+            area_start = (math.exp(k * (year - 1)) - 1) / k
+            area_end = (math.exp(k * year) - 1) / k
+            yearly_emissions = total_emissions * (area_end - area_start) / total_area
+            yearly_breakdown.append(yearly_emissions)
+        
+        yearly_breakdown.extend([0 for _ in range(years_capitalization)])
+
+    elif rate_type == "immediate":
+        yearly_breakdown = [total_emissions] + [0 for _ in range(years_implementation - 1)]
+        yearly_breakdown.extend([0 for _ in range(years_capitalization)])
 
     return yearly_breakdown
 
@@ -256,6 +279,9 @@ def yearly_time_dependent_matrix(start_value, end_value, years_implementation, y
         # NOTE: now it does what is needed, but it is not very readable. Has to be fixed further on
 
         return matrix
+    
+    else:
+        raise Exception(f'Function "{function}" not recognized')
 
 
 def yearly_time_dependent_matrix_log_rec_dis(start_value, end_value, years_implementation, years_capitalization, function, interim_values=True):
@@ -301,9 +327,8 @@ def yearly_time_dependent_matrix_log_rec_dis(start_value, end_value, years_imple
 
         return matrix
     
-
-    
-
+    else:
+        raise Exception(f'Function "{function}" not recognized')
 
 # LIVESTOCK CH4 HEAD GENERAL FUNCTION
 def ch4_head_calculation_general(tam: float, vser: float, ef_prp: float, percentage_prp_default: float, percentage_prp_tier_2: float, ef_system_default: list, ch4_prp_tier_2: float, percentage_system_default: list, ef_single_system, ch4_system_tier_2, ch4_dividing_parameter=1):
