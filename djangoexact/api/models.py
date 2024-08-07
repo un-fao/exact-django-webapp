@@ -69,6 +69,7 @@ class CustomUser(AbstractUser):
     REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
+    history = HistoricalRecords()
 
     class Meta:
         permissions = (
