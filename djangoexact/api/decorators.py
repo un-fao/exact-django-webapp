@@ -23,7 +23,7 @@ def can_access(resource: str):
                     can_access = activity.project.owner == request.user
                 case "module":
                     module = getattr(func, "model").objects.get(pk=kwargs["pk"], activity__project__user=request.user)
-                    can_access = module.activity.project.user == request.user
+                    can_access = module.activity.project.owner == request.user
                 case _:
                     raise Exception(f"Invalid resource in @can_access decorator: {resource}")
 

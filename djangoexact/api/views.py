@@ -303,14 +303,14 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     @transaction.atomic
     @swagger_auto_schema(responses={400: "Bad request", 204: "Project deleted successfully"})
     def destroy(self, request, *args, **kwargs):
-        project = self.get_object()
+        project: Project = self.get_object()
         user = self.request.user
 
         if not utils.has_project_permission("delete_project", user, project):
             logging.error("Selected user does not have permission to delete the project")
             return utils.ErrorResponse("Selected user does not have permission to delete the project", status=http_status.HTTP_403_FORBIDDEN)
 
-        if user != project.user:
+        if user != project.owner:
             logging.error("Selected user is not the owner of the project")
             return utils.ErrorResponse("Only the owner can delete a project.", status=http_status.HTTP_403_FORBIDDEN)
 
