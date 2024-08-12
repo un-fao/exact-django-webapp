@@ -1,19 +1,20 @@
 from django.contrib import admin
+from unfold.admin import ModelAdmin
 
 from .models import *
 
 for model in [model for model in dir() if not model.startswith("_") and not model.startswith("ForestManagementAGB") and not model.startswith("PerennialAGB") and not model.startswith("PerennialBGB") and not model.startswith("AfforestationFLU") and not model.startswith("LivestockTAM") and not model.startswith("LivestockVSER") and not model.startswith("LivestockManureEF") and not model.startswith("FLUData")]:
     try:
-        admin.site.register(eval(model))
+        admin.site.register(eval(model), ModelAdmin)
     except:
         pass
 
 
-class AGBAdmin(admin.ModelAdmin):
+class AGBAdmin(ModelAdmin):
     search_fields = ["climate__name", "moisture__name", "land_use_type__name", "value"]
 
 
-class BGBAdmin(admin.ModelAdmin):
+class BGBAdmin(ModelAdmin):
     search_fields = [
         "climate__name",
         "moisture__name",
@@ -22,11 +23,11 @@ class BGBAdmin(admin.ModelAdmin):
     ]
 
 
-class AfforestationFLUAdmin(admin.ModelAdmin):
+class AfforestationFLUAdmin(ModelAdmin):
     search_fields = ["climate__name", "moisture__name", "land_use_type__name"]
 
 
-class LivestockTAMAdmin(admin.ModelAdmin):
+class LivestockTAMAdmin(ModelAdmin):
     list_display = [
         "livestock_production_type",
         "livestock_category_type",
@@ -47,7 +48,7 @@ class LivestockTAMAdmin(admin.ModelAdmin):
     ]
 
 
-class ForestManagementAGBAdmin(admin.ModelAdmin):
+class ForestManagementAGBAdmin(ModelAdmin):
     list_display = [
         "forest_type",
         "land_use_type",
@@ -75,7 +76,7 @@ class ForestManagementAGBAdmin(admin.ModelAdmin):
     ]
 
 
-class LivestockVSERAdmin(admin.ModelAdmin):
+class LivestockVSERAdmin(ModelAdmin):
     list_display = [
         "livestock_production_type",
         "livestock_category_type",
@@ -96,7 +97,7 @@ class LivestockVSERAdmin(admin.ModelAdmin):
     ]
 
 
-class LivestockManureEFAdmin(admin.ModelAdmin):
+class LivestockManureEFAdmin(ModelAdmin):
     list_display = [
         "emission_type",
         "livestock_production_type",
@@ -126,7 +127,7 @@ class LivestockManureEFAdmin(admin.ModelAdmin):
     ]
 
 
-class FLUDataAdmin(admin.ModelAdmin):
+class FLUDataAdmin(ModelAdmin):
     search_fields = ["climate__name", "moisture__name", "land_use_type__name", "value"]
 
 
