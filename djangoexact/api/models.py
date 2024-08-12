@@ -1128,7 +1128,7 @@ class PerennialCrop(models.Model):
     #     super().save(*args, **kwargs)
 
 
-class PerennialCropping(PerennialCrop, LandModule, AboveBelowGroundBiomassModule):
+class PerennialCropping(PerennialCrop, LandModule, AboveBelowGroundBiomassModule, ResidueAvailability):
     pass
 
 
@@ -1150,10 +1150,6 @@ class CroplandMinorSeason(models.Model):
     crop_yield_w = models.FloatField(null=True, blank=True)
     crop_yield_wo = models.FloatField(null=True, blank=True)
     crop_yield_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_yield_thread")
-
-    biomass_t2_start = models.FloatField(null=True, blank=True)
-    biomass_t2_w = models.FloatField(null=True, blank=True)
-    biomass_t2_wo = models.FloatField(null=True, blank=True)
 
 
 class MinorSeasonPerennialCropping(CroplandMinorSeason, LandSubmodule):
@@ -2006,7 +2002,7 @@ class OrganicSoil(LandModuleFixed):
         return super().save(*args, **kwargs)
 
 
-class Settlement(LandModuleFixed, SingleBiomassModule):
+class Settlement(LandModuleFixed, AboveBelowGroundBiomassModule):
 
     settlement_type_start = models.ForeignKey(SettlementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_settlement_type_start")
     settlement_type_w = models.ForeignKey(SettlementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_settlement_type_w")
