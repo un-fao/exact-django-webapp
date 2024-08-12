@@ -166,7 +166,7 @@ class PerennialCropping(BaseModule):
             try:
                 fire_periodicity = self.fire_periodicity_default if not self.fire_periodicity_tier_2 else self.fire_periodicity_tier_2
                 ag_tc = self.agb_rate_default if not self.agb_rate_tier_2 else self.agb_rate_tier_2
-                t_biomass = ag_tc * 0.5 / 0.47 if not self.t_biomass_tier_2 else self.t_biomass_tier_2
+                t_biomass = ag_tc * 0.5 / 0.47 if not self.t_biomass_tier_2 else self.t_biomass_tier_2  # Default
 
                 ################## COMPUTATION OF AMOUNT OF KG OF METHANE ###################
 
@@ -261,4 +261,3 @@ class PerennialCropping(BaseModule):
             return self.total_emissions
         except Exception as e:
             traceback.print_exc()
-

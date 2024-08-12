@@ -1130,6 +1130,10 @@ class RiceYield(Model):
 
 
 class TrophicStateFactor(Model):
+    """
+    IPCC:3222
+    """
+
     trophic_type = ForeignKey("api.TrophicType", on_delete=CASCADE)
     value = FloatField()
     chloa = FloatField()
