@@ -144,6 +144,9 @@ class AnnualCroppingDefaults(Defaults):
             minor_biomass_t2_start_default=defaults.minor_biomass_start.value,
             minor_biomass_t2_w_default=defaults.minor_biomass_w.value,
             minor_biomass_t2_wo_default=defaults.minor_biomass_wo.value,
+            # residue_availability_t2_start_default=defaults.residue_availability_start.value,  # TODO: Computed @Peter
+            # residue_availability_t2_w_default=defaults.residue_availability_w.value,  # TODO: Computed @Peter
+            # residue_availability_t2_wo_default=defaults.residue_availability_wo.value,  # TODO: Computed @Peter
         )
 
 
@@ -216,6 +219,9 @@ class PerennialCroppingDefaults(Defaults):
             fire_periodicity_t2_start_default=defaults.default_fire_periodicity.value,
             fire_periodicity_t2_w_default=defaults.default_fire_periodicity.value,
             fire_periodicity_t2_wo_default=defaults.default_fire_periodicity.value,
+            # residue_availability_t2_start_default=defaults.residue_availability_start.value,  # TODO: Computed @Peter (should be t_biomass)
+            # residue_availability_t2_w_default=defaults.residue_availability_w.value,  # TODO: Computed @Peter
+            # residue_availability_t2_wo_default=defaults.residue_availability_wo.value,  # TODO: Computed @Peter
         )
 
 
@@ -321,6 +327,14 @@ class LivestockDefaults(Defaults):
             enteric_fermentation_t2_w_default=defaults.enteric_ch4_w.value,
             enteric_fermentation_t2_wo_default=defaults.enteric_ch4_wo.value,
             # TODO: Wait for Lorenzo to communicate which fields to get from math model
+            # self.ch4_prp_head_start_tier_2_default = None
+            # self.ch4_prp_head_end_tier_2_default = None
+            # self.ch4_system_head_start_tier_2_default = None
+            # self.ch4_system_head_end_tier_2_default = None
+            # self.n2o_prp_direct_head_start_tier_2_default = None
+            # self.n2o_prp_direct_head_end_tier_2_default = None
+            # self.n2o_system_direct_head_start_tier_2_default = None
+            # self.n2o_system_direct_head_end_tier_2_default = None
         )
 
 
@@ -391,7 +405,11 @@ class InputEntryDefaults(Defaults):
         defaults = calcs.InputEntryCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
-        return SimpleNamespace(co2_emissions_t2_default=defaults.ef.co2_value if defaults.ef else None, n2o_emissions_t2_default=defaults.ef.n2o_value if defaults.ef else None, co2_e_emissions_t2_default=defaults.ef.co2_eq_value if defaults.ef else None)
+        return SimpleNamespace(
+            co2_emissions_t2_default=defaults.ef.co2_value if defaults.ef else None,
+            n2o_emissions_t2_default=defaults.ef.n2o_value if defaults.ef else None,
+            co2_e_emissions_t2_default=defaults.ef.co2_eq_value if defaults.ef else None,
+        )
 
 
 class LargeFisheryDefaults(Defaults):
@@ -582,13 +600,12 @@ class SettlementDefaults(Defaults):
             fmg_t2_start_default=defaults.fmg_start.value,
             fmg_t2_w_default=defaults.fmg_w.value,
             fmg_t2_wo_default=defaults.fmg_wo.value,
-            # TODO: Ask Lorenzo about mapping of commented out fields
-            # agb_t2_start_default=defaults.agb_start.value,
-            # agb_t2_w_default=defaults.agb_w.value,
-            # agb_t2_wo_default=defaults.agb_wo.value,
-            # bgb_t2_start_default=defaults.bgb_start.value,
-            # bgb_t2_w_default=defaults.bgb_w.value,
-            # bgb_t2_wo_default=defaults.bgb_wo.value,
+            agb_t2_start_default=defaults.ef_start.biomass,  # TODO: Tell @Peter about agb/bgb implementation for NotCultivatedLand model
+            agb_t2_w_default=defaults.ef_w.biomass,  # TODO: Tell @Peter about agb/bgb implementation for NotCultivatedLand model
+            agb_t2_wo_default=defaults.ef_wo.biomass,  # TODO: Tell @Peter about agb/bgb implementation for NotCultivatedLand model
+            bgb_t2_start_default=defaults.ef_start.biomass,  # TODO: Tell @Peter about agb/bgb implementation for NotCultivatedLand model
+            bgb_t2_w_default=defaults.ef_w.biomass,  # TODO: Tell @Peter about agb/bgb implementation for NotCultivatedLand model
+            bgb_t2_wo_default=defaults.ef_wo.biomass,  # TODO: Tell @Peter about agb/bgb implementation for NotCultivatedLand model
         )
 
 
@@ -634,9 +651,9 @@ class CoastalWetlandDefaults(Defaults):
             bgb_t2_start_default=defaults.bgb.value,
             bgb_t2_w_default=defaults.bgb.value,
             bgb_t2_wo_default=defaults.bgb.value,
-            soc_t2_start_default=defaults.soc.value,
-            soc_t2_w_default=defaults.soc.value,
-            soc_t2_wo_default=defaults.soc.value,
+            soc_t2_start_default=defaults.soil_1m.value,
+            soc_t2_w_default=defaults.soil_1m.value,
+            soc_t2_wo_default=defaults.soil_1m.value,
             pc_c_lost_after_excavation_t2_start_default=defaults.pc_c_lost_excavation.value,
             pc_c_lost_after_excavation_t2_w_default=defaults.pc_c_lost_excavation.value,
             pc_c_lost_after_excavation_t2_wo_default=defaults.pc_c_lost_excavation.value,
@@ -678,13 +695,12 @@ class WaterbodyDefaults(Defaults):
             ch4_ef_t2_start_default=defaults.methane_emission_factor.value,
             ch4_ef_t2_w_default=defaults.methane_emission_factor.value,
             ch4_ef_t2_wo_default=defaults.methane_emission_factor.value,
-            # TODO: Ask Lorenzo about mapping of commented out fields
-            # alpha_t2_start_default=defaults.alpha.value,
-            # alpha_t2_w_default=defaults.alpha.value,
-            # alpha_t2_wo_default=defaults.alpha.value,
-            # mean_annual_t2_start_default=0,
-            # mean_annual_t2_w_default=0,
-            # mean_annual_t2_wo_default=0,
+            alpha_t2_start_default=defaults.trophic_state_start.value,
+            alpha_t2_w_default=defaults.trophic_state_w.value,
+            alpha_t2_wo_default=defaults.trophic_state_wo.value,
+            mean_annual_t2_start_default=defaults.trophic_state_start.chloa,
+            mean_annual_t2_w_default=defaults.trophic_state_w.chloa,
+            mean_annual_t2_wo_default=defaults.trophic_state_wo.chloa,
         )
 
 
@@ -786,16 +802,15 @@ class OrganicSoil(Defaults):
             mean_dry_matter_t2_start_default=0,
             mean_dry_matter_t2_w_default=defaults.dry_matter_w.value,
             mean_dry_matter_t2_wo_default=defaults.dry_matter_wo.value,
-            # TODO: Ask Lorenzo about mapping of commented out fields
-            # fire_on_soil_co2_t2_start_default=defaults.fire_on_soil_co2.value,
-            # fire_on_soil_co2_t2_w_default=defaults.fire_on_soil_co2.value,
-            # fire_on_soil_co2_t2_wo_default=defaults.fire_on_soil_co2.value,
-            # fire_on_soil_co_t2_start_default=defaults.fire_on_soil_co.value,
-            # fire_on_soil_co_t2_w_default=defaults.fire_on_soil_co.value,
-            # fire_on_soil_co_t2_wo_default=defaults.fire_on_soil_co.value,
-            # fire_on_soil_ch4_t2_start_default=defaults.fire_on_soil_ch4.value,
-            # fire_on_soil_ch4_t2_w_default=defaults.fire_on_soil_ch4.value,
-            # fire_on_soil_ch4_t2_wo_default=defaults.fire_on_soil_ch4.value,
+            fire_on_soil_co2_t2_start_default=defaults.fire_ref.co2,
+            fire_on_soil_co2_t2_w_default=defaults.fire_ref.co2,
+            fire_on_soil_co2_t2_wo_default=defaults.fire_ref.co2,
+            fire_on_soil_co_t2_start_default=defaults.fire_ref.co,
+            fire_on_soil_co_t2_w_default=defaults.fire_ref.co,
+            fire_on_soil_co_t2_wo_default=defaults.fire_ref.co,
+            fire_on_soil_ch4_t2_start_default=defaults.fire_ref.ch4,
+            fire_on_soil_ch4_t2_w_default=defaults.fire_ref.ch4,
+            fire_on_soil_ch4_t2_wo_default=defaults.fire_ref.ch4,
             onsite_co2_peat_t2_start_default=0,
             onsite_co2_peat_t2_w_default=defaults.onsite_ef_w.co2,
             onsite_co2_peat_t2_wo_default=defaults.onsite_ef_wo.co2,
@@ -809,9 +824,9 @@ class OrganicSoil(Defaults):
             offsite_ch4_peat_t2_w_default=defaults.offsite_ef_w.ch4,
             offsite_ch4_peat_t2_wo_default=defaults.offsite_ef_wo.ch4,
             # TODO: Ask Lorenzo about mapping of commented out fields
-            # peat_density_t2_start_default=defaults.peat_density.value,
-            # peat_density_t2_w_default=defaults.peat_density.value,
-            # peat_density_t2_wo_default=defaults.peat_density.value,
+            # peat_density_t2_start_default=defaults.peat_density.value, # TODO: Ask @Peter
+            # peat_density_t2_w_default=defaults.peat_density.value, # TODO: Ask @Peter
+            # peat_density_t2_wo_default=defaults.peat_density.value, # TODO: Ask @Peter
         )
 
 
