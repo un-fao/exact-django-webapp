@@ -44,6 +44,8 @@ CORS_ORIGIN_ALLOW_ALL = True
 # Application definition
 
 INSTALLED_APPS = [
+    "unfold",  # before django.contrib.admin
+    "unfold.contrib.simple_history",  # optional, if django-simple-history package is used
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -249,3 +251,10 @@ try:
     firebase_admin.initialize_app(firebase_admin.credentials.Certificate(FIREBASE_CONFIG["serviceAccount"]))
 except Exception as e:
     raise Exception(f"Firebase config not found: {e}") from e
+
+UNFOLD = {
+    "SIDEBAR": {
+        "show_search": True,  # Search in applications and models names
+        "show_all_applications": True,  # Dropdown with all applications and models
+    },
+}
