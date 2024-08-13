@@ -1633,7 +1633,7 @@ class Aquaculture(Module):
     electricity_used_t2_w = models.FloatField(null=True, blank=True)
     electricity_used_t2_wo = models.FloatField(null=True, blank=True)
 
-    electricity_ef_t2_start = models.FloatField(null=True, blank=True)
+    electricity_ef_t2_start = models.FloatField(null=True, blank=True) # TODO: Rename to n2o_fish_production
     electricity_ef_t2_w = models.FloatField(null=True, blank=True)
     electricity_ef_t2_wo = models.FloatField(null=True, blank=True)
 

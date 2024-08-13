@@ -824,9 +824,9 @@ class OrganicSoil(Defaults):
             offsite_ch4_peat_t2_w_default=defaults.offsite_ef_w.ch4,
             offsite_ch4_peat_t2_wo_default=defaults.offsite_ef_wo.ch4,
             # TODO: Ask Lorenzo about mapping of commented out fields
-            # peat_density_t2_start_default=defaults.peat_density.value, # TODO: Ask @Peter
-            # peat_density_t2_w_default=defaults.peat_density.value, # TODO: Ask @Peter
-            # peat_density_t2_wo_default=defaults.peat_density.value, # TODO: Ask @Peter
+            # peat_density_t2_start_default=defaults.peat_density.value, # TODO: Ask @Peter m/V
+            # peat_density_t2_w_default=defaults.peat_density.value, # TODO: Ask @Peter m/V
+            # peat_density_t2_wo_default=defaults.peat_density.value, # TODO: Ask @Peter m/V
         )
 
 
@@ -851,13 +851,12 @@ class AquacultureDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            # TODO: Ask Lorenzo about mapping of fields
-            electricity_used_t2_start_default=0,
-            electricity_used_t2_w_default=0,
-            electricity_used_t2_wo_default=0,
-            electricity_ef_t2_start_default=0,
-            electricity_ef_t2_w_default=0,
-            electricity_ef_t2_wo_default=0,
+            electricity_used_t2_start_default=defaults.elec.operating_margin,
+            electricity_used_t2_w_default=defaults.elec.operating_margin,
+            electricity_used_t2_wo_default=defaults.elec.operating_margin,
+            electricity_ef_t2_start_default=defaults.NITROUS_EF_DEFAULT,
+            electricity_ef_t2_w_default=defaults.NITROUS_EF_DEFAULT,
+            electricity_ef_t2_wo_default=defaults.NITROUS_EF_DEFAULT,
         )
 
 
