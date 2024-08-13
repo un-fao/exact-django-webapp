@@ -3194,46 +3194,6 @@ for i, row in enumerate(rows):
             value=value,
         )
 
-SoilOrganicCarbon.objects.all().delete()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "SoilOrganicCarbon.csv"),
-    header=0,
-    sep=",",
-)
-
-headers = df.columns.values.tolist()
-rows = df.to_dict("records")
-
-for i, row in enumerate(rows):
-    climate = Climate.objects.get(name__iexact=row["climate"])
-    moisture = Moisture.objects.get(name__iexact=row["moisture"])
-
-    for j, header in enumerate(headers, start=3):
-
-        if j == len(headers):
-            break
-
-        soil_type = SoilType.objects.get(name__iexact=headers[j])
-        value = row[headers[j]]
-
-        if not value or value in ["", "N/A", "NO"]:
-            continue
-
-        print(
-            climate,
-            moisture,
-            soil_type,
-            value,
-        )
-
-        SoilOrganicCarbon.objects.create(
-            climate=climate,
-            moisture=moisture,
-            soil_type=soil_type,
-            value=value,
-        )
-
 ForestTotalBiomass.objects.all().delete()
 
 df = pd.read_csv(
@@ -4212,6 +4172,48 @@ for i, row in enumerate(rows):
             value=value,
         )
 
+
+SoilOrganicCarbon.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "SoilOrganicCarbon.csv"),
+    header=0,
+    sep=",",
+)
+
+headers = df.columns.values.tolist()
+rows = df.to_dict("records")
+
+for i, row in enumerate(rows):
+    climate = Climate.objects.get(name__iexact=row["climate"])
+    moisture = Moisture.objects.get(name__iexact=row["moisture"])
+
+    for j, header in enumerate(headers, start=2):
+
+        if j == len(headers):
+            break
+
+        soil_type = SoilType.objects.get(name__iexact=headers[j])
+        value = row[headers[j]]
+
+        if not value or value in ["", "N/A", "NO"] or pd.isna(value):
+            continue
+
+        print(
+            climate,
+            moisture,
+            soil_type,
+            value,
+        )
+
+        SoilOrganicCarbon.objects.create(
+            climate=climate,
+            moisture=moisture,
+            soil_type=soil_type,
+            value=value,
+        )
+
+
 LivestockManureEF.objects.all().delete()
 
 df2 = pd.read_csv(
@@ -4343,7 +4345,6 @@ for i, row in enumerate(df_dict2):
             manure_management_type=manure_management_type,
             value=parse_csv_number(row[df_headers2[j]]),
         )
-"""
 
 # Delete all LivestockManureEF where emission_type is CH4
 LivestockManureEF.objects.filter(emission_type__name__iexact="CH4").delete()
@@ -4390,3 +4391,4 @@ for i, row in enumerate(df_dict2):
             manure_management_type=manure_management_type,
             value=parse_csv_number(row[df_headers2[j]]),
         )
+"""

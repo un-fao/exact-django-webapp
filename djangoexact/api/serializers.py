@@ -286,10 +286,7 @@ class ReadProjectSerializer(serializers.ModelSerializer):
         user = ctx.user
         user_project_group = ProjectMembership.objects.filter(user=user, project=obj).all()
 
-        if not user_project_group:
-            return []
-
-        return [group.group.name for group in user_project_group]
+        return [group.group.name for group in user_project_group] if user_project_group else []
 
     class Meta:
         model = Project
