@@ -42,6 +42,8 @@ for sheet_name in wb.sheetnames:
     # Create a dictionary from the data
     definitions = {snake_case(key): value for key, value in data}
 
+    log.debug(f"Definitions: {definitions}")
+
     # Update the definition object with the new definitions
     pre_existing_def.definitions = definitions
     pre_existing_def.save()
