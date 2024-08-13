@@ -860,7 +860,7 @@ class AquacultureDefaults(Defaults):
         )
 
 
-class DegradedLandDefaults(Defaults):
+class DegradedLandDefaults(Defaults):  # TODO: Rename to OtherLand
     def __init__(self, input: calcs.Module):
         super().__init__(input)
 
@@ -1042,13 +1042,7 @@ class EnergyDefaults(Defaults):
         defaults = calcs.EnergyCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
-        return SimpleNamespace(
-            # TODO: Ask Lorenzo about mapping of fields
-            # There's no EF or calculations for energy, only for the submodules (electricity, fuel)
-            # ef_t2_start_default=defaults.ef_start.value,
-            # ef_t2_w_default=defaults.ef_w.value,
-            # ef_t2_wo_default=defaults.ef_wo.value,
-        )
+        return SimpleNamespace()
 
 
 class IrrigationDefaults(Defaults):
@@ -1067,13 +1061,7 @@ class IrrigationDefaults(Defaults):
         defaults = calcs.IrrigationCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
-        return SimpleNamespace(
-            # TODO: Ask Lorenzo about mapping of fields
-            # There's no EF or calculations for irrigation, only for the submodules (system, phase)
-            # ef_t2_start_default=defaults.ef.value,
-            # ef_t2_w_default=defaults.ef.value,
-            # ef_t2_wo_default=defaults.ef.value,
-        )
+        return SimpleNamespace()
 
 
 class InputDefaults(Defaults):
@@ -1092,10 +1080,4 @@ class InputDefaults(Defaults):
         defaults = calcs.InputCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
-        return SimpleNamespace(
-            # TODO: Ask Lorenzo about mapping of fields
-            # There's no EF or calculations for input, only for the submodules (entry)
-            # co2_emissions_t2_default=defaults.ef.co2_value if defaults.ef else None,
-            # n2o_emissions_t2_default=defaults.ef.n2o_value if defaults.ef else None,
-            # co2_e_emissions_t2_default=defaults.ef.co2_eq_value if defaults.ef else None,
-        )
+        return SimpleNamespace()
