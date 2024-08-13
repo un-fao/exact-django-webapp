@@ -334,13 +334,21 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         return Response(data=ReadProjectSerializer(project, context={"request": request}).data, status=http_status.HTTP_200_OK)
 
-    @swagger_auto_schema(manual_parameters=[project_id], responses={404: "Project not found"}, serializer_class=ReadProjectSerializer)
+    name = openapi.Parameter("name", openapi.IN_QUERY, description="Name of the project", type=openapi.TYPE_STRING)
+
+    @swagger_auto_schema(manual_parameters=[name], responses={404: "Project not found"}, serializer_class=ReadProjectSerializer)
     def list(self, request):
         """
         Get all projects for a given user.
         """
 
-        shared_projects = request.user.memberships.all()
+        search_query = request.query_params.get("name", None)
+
+        filters = {}
+        if search_query:
+            filters["project__name__icontains"] = search_query
+
+        shared_projects = request.user.memberships.filter(**filters).all()
         list = [share.project for share in shared_projects if utils.has_project_permission("view_project", self.request.user, share.project)]
 
         paginator = DefaultPagination()
