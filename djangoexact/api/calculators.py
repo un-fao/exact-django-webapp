@@ -93,6 +93,7 @@ from .models import (
     Input,
     InputEntry,
     InputType,
+    SalinityType,
     Irrigation,
     IrrigationParameter,
     IrrigationPhase,
@@ -3633,7 +3634,7 @@ class SettlementCalculator(BaseCalculator):
             self.fmg_wo = SimpleNamespace(value=self.ef_wo.fmg)
             self.biomass_ef_wo = utils.get_or_raise(ipcc.ForestTotalBiomass, cm | {"continent": project.country.region, "land_use_type": module.land_use_type_wo}, f"Forest total biomass not found for {climate.name} climate, {moisture.name} moisture, {project.country.region.name} region and {module.land_use_type_wo.name} land use type")
 
-        if luc and module.settlement_type_start.name.casefold() != "paved settlement":
+        if luc and module.is_start() and module.settlement_type_start.name.casefold() != "paved settlement":
             module_start, module_w, module_wo = luc.get_modules()
 
             is_paved_w = module.is_with() and module.settlement_type_w.name.casefold() == "paved settlement"
@@ -3868,29 +3869,35 @@ class BuildingCalculator(BaseCalculator):
 
         self.get_defaults()
 
-        self.inputs_w = [
-            self.ef.value,
-            module.ef_t2_w,
-            module.area_m2_w,
-            project.implementation_years,
-            project.capitalization_years,
-            activity.change_rate.name,
-        ]
+        self.results_w = MathResult(project.implementation_years, project.capitalization_years)
+        self.results_wo = MathResult(project.implementation_years, project.capitalization_years)
 
-        self.math_w = MathRoads(*self.inputs_w)
-        self.math_w.calculate_emissions()
+        if module.is_with():
+            self.inputs_w = [
+                self.ef.value,
+                module.ef_t2_w,
+                module.area_m2_w,
+                project.implementation_years,
+                project.capitalization_years,
+                activity.change_rate.name,
+            ]
 
-        self.inputs_wo = [
-            self.ef.value,
-            module.ef_t2_wo,
-            module.area_m2_wo,
-            project.implementation_years,
-            project.capitalization_years,
-            activity.change_rate.name,
-        ]
+            self.math_w = MathRoads(*self.inputs_w)
+            self.math_w.calculate_emissions()
 
-        self.math_wo = MathRoads(*self.inputs_wo)
-        self.math_wo.calculate_emissions()
+        if module.is_without():
+
+            self.inputs_wo = [
+                self.ef.value,
+                module.ef_t2_wo,
+                module.area_m2_wo,
+                project.implementation_years,
+                project.capitalization_years,
+                activity.change_rate.name,
+            ]
+
+            self.math_wo = MathRoads(*self.inputs_wo)
+            self.math_wo.calculate_emissions()
 
         self.results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
         self.results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
@@ -3928,31 +3935,34 @@ class RoadCalculator(BaseCalculator):
 
         self.get_defaults()
 
-        self.inputs_w = [
-            self.ef.value,
-            module.ef_t2_w,
-            module.length_km_w,
-            module.width_m_start,
-            project.implementation_years,
-            project.capitalization_years,
-            activity.change_rate.name,
-        ]
+        self.results_w = MathResult(project.implementation_years, project.capitalization_years)
+        self.results_wo = MathResult(project.implementation_years, project.capitalization_years)
 
-        self.math_w = MathRoads(*self.inputs_w)
-        self.math_w.calculate_emissions()
+        if module.is_with():
+            self.inputs_w = [
+                self.ef.value,
+                module.ef_t2_w,
+                module.length_km_w * module.width_m_w,
+                project.implementation_years,
+                project.capitalization_years,
+                activity.change_rate.name,
+            ]
 
-        self.inputs_wo = [
-            self.ef.value,
-            module.ef_t2_wo,
-            module.length_km_wo,
-            module.width_m_start,
-            project.implementation_years,
-            project.capitalization_years,
-            activity.change_rate.name,
-        ]
+            self.math_w = MathRoads(*self.inputs_w)
+            self.math_w.calculate_emissions()
 
-        self.math_wo = MathRoads(*self.inputs_wo)
-        self.math_wo.calculate_emissions()
+        if module.is_without():
+            self.inputs_wo = [
+                self.ef.value,
+                module.ef_t2_wo,
+                module.length_km_wo * module.width_m_wo,
+                project.implementation_years,
+                project.capitalization_years,
+                activity.change_rate.name,
+            ]
+
+            self.math_wo = MathRoads(*self.inputs_wo)
+            self.math_wo.calculate_emissions()
 
         self.results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
         self.results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
@@ -4778,6 +4788,8 @@ class CoastalWetlandCalculator(BaseCalculator):
 
         self.soil_type_name = module.soil_type_t2.name if module.soil_type_t2 else "Mineral"
 
+        self.salinity_type = module.avg_salinity_t2 if module.avg_salinity_t2 else SalinityType.objects.get(value=">18")
+
         try:
             self.agb = ipcc.CoastalAGB.objects.get(**cm, land_use_type=module.land_use_type)
         except ipcc.CoastalAGB.DoesNotExist:
@@ -4819,7 +4831,7 @@ class CoastalWetlandCalculator(BaseCalculator):
             raise ValueError(f"Could not find Rewetting C for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}")
 
         try:
-            self.rewetting_ch4 = ipcc.RewettingMethaneFactor.objects.get(**cm, land_use_type=module.land_use_type)
+            self.rewetting_ch4 = ipcc.RewettingMethaneFactor.objects.get(**cm, land_use_type=module.land_use_type, salinity=self.salinity_type)
         except ipcc.RewettingMethaneFactor.DoesNotExist:
             raise ValueError(f"Could not find Rewetting CH4 for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}")
 

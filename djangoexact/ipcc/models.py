@@ -465,6 +465,9 @@ class RewettingCarbonFactor(Model):
     def __str__(self):
         return f"{self.value} for {self.climate.name} {self.moisture.name} {self.soil_type.name} {self.land_use_type.name}"
 
+    class Meta:
+        unique_together = ("climate", "moisture", "soil_type", "land_use_type")
+
 
 class RewettingMethaneFactor(Model):
     """
@@ -479,6 +482,9 @@ class RewettingMethaneFactor(Model):
 
     def __str__(self):
         return f"{self.value} for {self.climate.name} {self.moisture.name} {self.land_use_type.name} {self.salinity.value}"
+
+    class Meta:
+        unique_together = ("climate", "moisture", "land_use_type", "salinity")
 
 
 class OtherConstructedWaterbodiesEmissionFactor(Model):
@@ -523,6 +529,9 @@ class DrainageEmissionFactor(Model):
 
     def __str__(self):
         return f"{self.value} for {self.land_use_type} {self.climate} {self.moisture}"
+
+    class Meta:
+        unique_together = ("climate", "moisture", "land_use_type")
 
 
 class PerennialAGBManager(Manager):
