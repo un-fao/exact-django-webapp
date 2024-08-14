@@ -464,7 +464,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
     def create_activity(self):
 
-        default_change_rate = ChangeRate.objects.get(name="D")
+        default_change_rate = ChangeRate.objects.get(name="linear")
 
         return Activity.objects.create(
             name=self.validated_data["name"],

@@ -649,7 +649,7 @@ class Activity(Historical):
         if not self.pk:
             self.state = StatusType.objects.get_or_create(name="EMPTY")[0]
             if not self.change_rate:
-                self.change_rate = ChangeRate.objects.get_or_create(name="D")[0]
+                self.change_rate = ChangeRate.objects.get_or_create(name="linear")[0]
         super().save(*args, **kwargs)
 
     class Meta:
@@ -1633,7 +1633,7 @@ class Aquaculture(Module):
     electricity_used_t2_w = models.FloatField(null=True, blank=True)
     electricity_used_t2_wo = models.FloatField(null=True, blank=True)
 
-    electricity_ef_t2_start = models.FloatField(null=True, blank=True) # TODO: Rename to n2o_fish_production
+    electricity_ef_t2_start = models.FloatField(null=True, blank=True)  # TODO: Rename to n2o_fish_production
     electricity_ef_t2_w = models.FloatField(null=True, blank=True)
     electricity_ef_t2_wo = models.FloatField(null=True, blank=True)
 
