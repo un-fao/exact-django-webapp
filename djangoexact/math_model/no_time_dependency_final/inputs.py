@@ -175,10 +175,10 @@ class OperationPhaseIrrigation(BaseModule):
 
 
 class Roads(BaseModule):
-    def __init__(self, ef_ipcc: float, ef_tier_2, road_length, road_width, time_impl, time_cap, rate_type):
+    def __init__(self, ef_ipcc: float, ef_tier_2, area, time_impl, time_cap, rate_type):
         self.ef_ipcc = ef_ipcc  # Match Building and Roads type to Energy DB Sheet Table A26-B45
         self.ef_tier_2 = ef_tier_2  # Tier 2 Value
-        self.units_end = road_length * road_width  # Input
+        self.units_end = area  # User Input
         self.time_impl = time_impl  # Project Input
         self.time_cap = time_cap  # Project Input
         self.rate_type = rate_type  # Rate Type
