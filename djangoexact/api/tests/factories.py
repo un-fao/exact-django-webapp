@@ -29,7 +29,7 @@ fuels = [fuel for fuel in FuelType.objects.exclude(macro_fuel_type__name="Liquid
 
 countries = [country for country in Country.objects.all()]
 
-def_rate = ChangeRate.objects.get(name="D")
+def_rate = ChangeRate.objects.get(name="linear")
 sm_gear_type = random.choice(sma_gear_types)
 lge_gear_type = random.choice(lge_gear_types)
 
