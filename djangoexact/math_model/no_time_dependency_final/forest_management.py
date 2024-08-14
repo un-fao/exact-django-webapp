@@ -437,7 +437,7 @@ class ForestManagement(BaseModule):
 
             try:
 
-                if rotation_recurrence and rotation_recurrence < 20:
+                if self.rotation_recurrence and self.rotation_recurrence < 20:
                     # NOTE: This is due to the fact that it does not have time to grow past 20 years. EVER. As it's relative to the patch of land. Biomass under any 
                     # hectar never grows to be 20 years old. Always killed before hand
                     delta_agb_yearly_after_20 = delta_agb_yearly_below_20
