@@ -64,6 +64,7 @@ from math_model.no_time_dependency_final.waterbodies import (
 from math_model.no_time_dependency_final.not_cultivated_land import (
     NotCultivatedLand as MathNotCultivatedLand,
 )
+from math_model.no_time_dependency_final.not_cultivated_land import NotCultivatedLand
 
 from api.utilities import getattr_or_default
 
@@ -120,6 +121,7 @@ from .models import (
     StatusType,
     Waterbody,
     ModuleType,
+    MinorSeasonFloodedRice,
 )
 
 CALCULATE_SOC_SOM_START_W = False
@@ -258,6 +260,7 @@ def get_flu_data(module: LandModule, climate: Climate, moisture: Moisture, scena
         if attr:
             return ipcc.FLUData.objects.get(climate=climate, moisture=moisture, land_use_type=attr)
     except ipcc.FLUData.DoesNotExist:
+        log.debug(f"FLUData for {attr} in {climate.name} climate and {moisture.name} moisture does not exist")
         pass
 
     return SimpleNamespace(value=1)
@@ -444,14 +447,28 @@ class BaseCalculator(ABC):
         model = None
 
     def __init__(self, input) -> None:
+        super().__init__()
+
         self.Meta.model = input.__class__
         self.data = input
+
         self.inputs_start_w = None
         self.inputs_start_wo = None
         self.inputs_start = None
         self.inputs_w = None
         self.inputs_wo = None
-        super().__init__()
+
+        self.math_start_w = None
+        self.math_start_wo = None
+        self.math_start = None
+        self.math_w = None
+        self.math_wo = None
+
+        self.results_start_w = None
+        self.results_start_wo = None
+        self.results_start = None
+        self.results_w = None
+        self.results_wo = None
 
     @abstractmethod
     def calculate(self, input: Module, aggregate_by=BreakdownTypes.TOTAL) -> Result:
@@ -461,7 +478,7 @@ class BaseCalculator(ABC):
 
         if input.__class__ == LandUseChange or input.luc:
             luc: LandUseChange = input if input.__class__ == LandUseChange else input.luc
-            modules = get_luc_modules(luc)
+            modules = luc.get_modules()
 
             if not all(modules):
                 raise Exception("At least one module is missing")
@@ -474,7 +491,10 @@ class BaseCalculator(ABC):
         """
         Get the default values for a given module.
         """
-        raise NotImplementedError(f"get_defaults() method must be implemented for {self.__class__.__name__}.")
+        self.data: Module
+
+        if self.data.is_ready() and calculate:
+            self.calculate()
 
 
 class LandUseChangeCalculator(BaseCalculator):
@@ -499,25 +519,23 @@ class LandUseChangeCalculator(BaseCalculator):
         Calculate emissions for a single LandUseChange module.
         """
 
-        input: LandUseChange = self.data
+        luc: LandUseChange = self.data
 
-        module_start = getattr(input.activity, input.module_type_start.class_name.lower(), None)
-        module_w = getattr(input.activity, input.module_type_w.class_name.lower(), None)
-        module_wo = getattr(input.activity, input.module_type_wo.class_name.lower(), None)
+        module_start, module_w, module_wo = luc.get_modules()
 
         if not module_start or not module_w or not module_wo:
             missing_modules = ["Start" if not module_start else "With" if not module_w else "Without" for module in [module_start, module_w, module_wo] if not module].join(", ")
             raise Exception(f"LandUseChange module must have a start with and without module. Missing {missing_modules} module(s).")
 
-        module_start = module_start.get(land_use_change=input)
-        module_w = module_w.get(land_use_change=input)
-        module_wo = module_wo.get(land_use_change=input)
+        module_start = module_start.get(land_use_change=luc)
+        module_w = module_w.get(land_use_change=luc)
+        module_wo = module_wo.get(land_use_change=luc)
 
         # TODO: DeforestationCalculator now expects the ForestManagement module only. Refactor the calculator accordingly (check T2 values!)
         # results_start = CalculatorFactory().calculate_result(module_start, aggregate_by=aggregate_by)
-        results_w, results_wo = self.luc_based_calculation(module_start, module_w, aggregate_by=aggregate_by)
+        self.results_w, self.results_wo = self.luc_based_calculation(module_start, module_w, aggregate_by=aggregate_by)
 
-        return (results_w, results_wo)
+        return (self.results_w, self.results_wo)
 
     def defaults(self) -> DefaultData:
         pass
@@ -622,7 +640,8 @@ class DeforestationCalculator(BaseCalculator):
         combustion_factor_w = ipcc.ForestCombustionFactor.objects.get(land_use_type=module.land_use_type_w, climate=climate, forest_type=forest.forest_type)
         combustion_factor_wo = ipcc.ForestCombustionFactor.objects.get(land_use_type=module.land_use_type_wo, climate=climate, forest_type=forest.forest_type)
 
-        som = ipcc.LandUseNitrousEmissionFactor.objects.filter(moisture=moisture)
+        moisture_factor = ipcc.NitrousEmissionFactor.objects.filter(moisture=moisture)
+        moisture_factor = moisture_factor.filter(Q(organic_input_type__name__icontains="Other N Inputs") | Q(organic_input_type__name__icontains="All N Inputs")).first()
 
         flu_start = ipcc.LandUseCarbonStockExchangeFactor.objects.get_or_default(climate=climate, moisture=moisture, land_use_type=module.land_use_type_start)
         flu_w = ipcc.LandUseCarbonStockExchangeFactor.objects.get_or_default(climate=climate, moisture=moisture, land_use_type=module.land_use_type_w)
@@ -663,10 +682,7 @@ class DeforestationCalculator(BaseCalculator):
         math_w = None
         math_wo = None
 
-        DELAY_W = 0
-        DELAY_WO = 0
-
-        if not is_luc_remaining_same(module):
+        if not module.is_luc_remaining_same():
             self.inputs_w = [
                 0,
                 luc.area,
@@ -719,7 +735,7 @@ class DeforestationCalculator(BaseCalculator):
             math_w = MathDeforestation(*self.inputs_w)
             math_w.calculate_emissions()
 
-        if not is_business_as_usual(module):
+        if not module.is_business_as_usual():
             self.inputs_wo = [
                 0,
                 luc.area,
@@ -1082,9 +1098,9 @@ class AnnualCropCalculator(BaseCalculator):
         self.crop_yield_wo: SimpleNamespace | ipcc.CropYieldStats = SimpleNamespace(value=0)
         self.soc: SimpleNamespace | ipcc.SoilOrganicCarbon = SimpleNamespace(value=0)
         self.flu: SimpleNamespace | ipcc.CroplandFLU = SimpleNamespace(value=0)
-        self.som_start: SimpleNamespace | ipcc.LandUseNitrousEmissionFactor = SimpleNamespace(value=0)
-        self.som_w: SimpleNamespace | ipcc.LandUseNitrousEmissionFactor = SimpleNamespace(value=0)
-        self.som_wo: SimpleNamespace | ipcc.LandUseNitrousEmissionFactor = SimpleNamespace(value=0)
+        self.default_emission_factor_start: SimpleNamespace | ipcc.NitrousEmissionFactor = SimpleNamespace(value=0)
+        self.default_emission_factor_w: SimpleNamespace | ipcc.NitrousEmissionFactor = SimpleNamespace(value=0)
+        self.default_emission_factor_wo: SimpleNamespace | ipcc.NitrousEmissionFactor = SimpleNamespace(value=0)
         self.burning_emission_factor: SimpleNamespace | ipcc.BurningEmissionFactor = SimpleNamespace(value=0)
         self.minor_burning_emission_factor: SimpleNamespace | ipcc.BurningEmissionFactor = SimpleNamespace(value=0)
         self.fires_start: SimpleNamespace | ipcc.FiresCombustionFactor = SimpleNamespace(value=0)
@@ -1116,7 +1132,7 @@ class AnnualCropCalculator(BaseCalculator):
         luc: LandUseChange = input.land_use_change
 
         if luc:
-            module_start, module_w, module_wo = get_luc_modules(luc)
+            module_start, module_w, module_wo = luc.get_modules()
 
         if input.status.name == "READY" and calculate:
             self.calculate()
@@ -1136,7 +1152,6 @@ class AnnualCropCalculator(BaseCalculator):
         region_flt = {"continent": project.country.region}
         soil_flt = {"soil_type": soil_type}
         moisture_flt = {"moisture": moisture}
-        # organic_input_flt = {"organic_input_type": input.organic_input_type_start}
         lut_start_flt = {"land_use_type": module_start.land_use_type_start}
         lut_w_flt = {"land_use_type": module_w.land_use_type_w}
         lut_wo_flt = {"land_use_type": module_wo.land_use_type_wo}
@@ -1160,7 +1175,7 @@ class AnnualCropCalculator(BaseCalculator):
         if input.minor_land_use_type_start or input.minor_land_use_type_w or input.minor_land_use_type_wo:
             self.minor_burning_emission_factor = utils.get_or_raise(ipcc.BurningEmissionFactor, agricultural_residues_flt, "BurningEmissionFactor for Agricultural residues for minor crop does not exist")
 
-        if is_luc_remaining_same(input):
+        if input.is_luc_remaining_same():
 
             lut_start = input.land_use_type_start
             minor_lut_start = input.minor_land_use_type_start
@@ -1169,7 +1184,7 @@ class AnnualCropCalculator(BaseCalculator):
             self.flu = utils.get_or_raise(ipcc.CroplandFLU, cm | long_term_cultivated_flt, f"CroplandFLU for {lut_start.name} in {climate.name} climate and {moisture.name} moisture does not exist")
             self.fires_start = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_start_flt, f"FiresCombustionFactor for {lut_start.name} does not exist")
             self.n_estimation_factor_start = utils.get_or_raise(ipcc.CropNitrousEstimationDefaultFactor, lut_start_flt, f"CropNitrousEstimationDefaultFactor for {lut_start.name} does not exist", method="get_or_grains")
-            self.som_start = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, moisture_flt, f"LandUseNitrousEmissionFactor for {moisture.name} moisture and {input.organic_input_type_start.name} does not exist")
+            self.emission_factors_start = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
             self.crop_yield_start = input.crop_yield_start or utils.get_or_raise(ipcc.CropYieldStats, region_flt | lut_start_flt, f"CropYieldStats for {module_start.land_use_type_start.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_region_average").average
 
             try:
@@ -1179,15 +1194,14 @@ class AnnualCropCalculator(BaseCalculator):
                 self.minor_fires_start = None
                 self.minor_n_estimation_factor_start = None
 
-        if is_with(input):
+        if input.is_with():
             lut_w = input.land_use_type_w
             minor_lut_w = input.minor_land_use_type_w
-            organic_input_flt_w = {"organic_input_type": input.organic_input_type_w}
 
             self.flu = utils.get_or_raise(ipcc.CroplandFLU, cm | long_term_cultivated_flt, f"CroplandFLU for {lut_w.name} in {climate.name} climate and {moisture.name} moisture does not exist")
             self.fires_w = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_w_flt, f"FiresCombustionFactor for {lut_w.name} does not exist")
             self.n_estimation_factor_w = utils.get_or_raise(ipcc.CropNitrousEstimationDefaultFactor, lut_w_flt, f"CropNitrousEstimationDefaultFactor for {lut_w.name} does not exist", method="get_or_grains")
-            self.som_w = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, moisture_flt, f"LandUseNitrousEmissionFactor for {moisture.name} moisture and {input.organic_input_type_w.name} does not exist")
+            self.emission_factors_w = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
             self.crop_yield_w = input.crop_yield_w or utils.get_or_raise(ipcc.CropYieldStats, region_flt | lut_w_flt, f"CropYieldStats for {module_w.land_use_type_w.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_region_average").average
 
             try:
@@ -1197,15 +1211,14 @@ class AnnualCropCalculator(BaseCalculator):
                 self.minor_fires_w = None
                 self.minor_n_estimation_factor_w = None
 
-        if is_business_as_usual(input):
+        if input.is_business_as_usual():
             lut_start = input.land_use_type_start
             minor_lut_start = input.minor_land_use_type_start
-            organic_input_flt_start = {"organic_input_type": input.organic_input_type_start}
 
             self.flu = utils.get_or_raise(ipcc.CroplandFLU, cm | long_term_cultivated_flt, f"CroplandFLU for {lut_start.name} in {climate.name} climate and {moisture.name} moisture does not exist")
             self.fires_start = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_start_flt, f"FiresCombustionFactor for {lut_start.name} does not exist")
             self.n_estimation_factor_start = utils.get_or_raise(ipcc.CropNitrousEstimationDefaultFactor, lut_start_flt, f"CropNitrousEstimationDefaultFactor for {lut_start.name} does not exist", method="get_or_grains")
-            self.som_start = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, moisture_flt, f"LandUseNitrousEmissionFactor for {moisture.name} moisture and {input.organic_input_type_start.name} does not exist")
+            self.emission_factors_start = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
             self.crop_yield_start = input.crop_yield_start or utils.get_or_raise(ipcc.CropYieldStats, region_flt | lut_start_flt, f"CropYieldStats for {module_start.land_use_type_start.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_region_average").average
 
             try:
@@ -1215,15 +1228,14 @@ class AnnualCropCalculator(BaseCalculator):
                 self.minor_fires_start = None
                 self.minor_n_estimation_factor_start = None
 
-        if is_without(input):
+        if input.is_without():
             lut_wo = input.land_use_type_wo
             minor_lut_wo = input.minor_land_use_type_wo
-            organic_input_flt_wo = {"organic_input_type": input.organic_input_type_wo}
 
             self.flu = utils.get_or_raise(ipcc.CroplandFLU, cm | long_term_cultivated_flt, f"CroplandFLU for {lut_wo.name} in {climate.name} climate and {moisture.name} moisture does not exist")
             self.fires_wo = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_wo_flt, f"FiresCombustionFactor for {lut_wo.name} does not exist")
             self.n_estimation_factor_wo = utils.get_or_raise(ipcc.CropNitrousEstimationDefaultFactor, lut_wo_flt, f"CropNitrousEstimationDefaultFactor for {lut_wo.name} does not exist", method="get_or_grains")
-            self.som_wo = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, moisture_flt, f"LandUseNitrousEmissionFactor for {moisture.name} moisture and {input.organic_input_type_wo.name} does not exist")
+            self.emission_factors_wo = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
             self.crop_yield_wo = input.crop_yield_wo or utils.get_or_raise(ipcc.CropYieldStats, region_flt | lut_wo_flt, f"CropYieldStats for {module_wo.land_use_type_wo.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_region_average").average
 
             try:
@@ -1246,19 +1258,14 @@ class AnnualCropCalculator(BaseCalculator):
         luc: LandUseChange = input.land_use_change
 
         if luc:
-            module_start, module_w, module_wo = get_luc_modules(luc)
+            module_start, module_w, module_wo = luc.get_modules()
 
         area = luc.area if luc else input.area
         change_rate = input.activity.change_rate
 
         self.get_defaults()
 
-        DELAY_START_W = 0
-        DELAY_START_WO = 0
-        DELAY_W = 0
-        DELAY_WO = 0
-
-        if is_luc_remaining_same(input):
+        if input.is_luc_remaining_same():
             log.debug("Is LUC remaining the same")
 
             self.inputs_start_w = [
@@ -1316,7 +1323,7 @@ class AnnualCropCalculator(BaseCalculator):
             self.math_start_w = AnnualCropland(*self.inputs_start_w)
             self.math_start_w.calculate_emissions()
 
-        if is_with(input):
+        if input.is_with():
             log.debug("Is with")
 
             self.inputs_w = [
@@ -1374,7 +1381,7 @@ class AnnualCropCalculator(BaseCalculator):
             self.math_w = AnnualCropland(*self.inputs_w)
             self.math_w.calculate_emissions()
 
-        if is_business_as_usual(input):
+        if input.is_business_as_usual():
             log.debug("Is business as usual")
 
             self.inputs_start_wo = [
@@ -1432,7 +1439,7 @@ class AnnualCropCalculator(BaseCalculator):
             self.math_start_wo = AnnualCropland(*self.inputs_start_wo)
             self.math_start_wo.calculate_emissions()
 
-        if is_without(input):
+        if input.is_without():
             log.debug("Is without")
 
             self.inputs_wo = [
@@ -1518,9 +1525,9 @@ class PerennialCropCalculator(BaseCalculator):
 
         self.soc: SimpleNamespace | ipcc.SoilOrganicCarbon = SimpleNamespace(value=0)
         self.burning_emission_factor: SimpleNamespace | ipcc.BurningEmissionFactor = SimpleNamespace(value=0)
-        self.som_start: ipcc.LandUseNitrousEmissionFactor | SimpleNamespace = SimpleNamespace(value=0)
-        self.som_w: ipcc.LandUseNitrousEmissionFactor | SimpleNamespace = SimpleNamespace(value=0)
-        self.som_wo: ipcc.LandUseNitrousEmissionFactor | SimpleNamespace = SimpleNamespace(value=0)
+        self.default_emission_factor_start: ipcc.NitrousEmissionFactor | SimpleNamespace = SimpleNamespace(value=0)
+        self.default_emission_factor_w: ipcc.NitrousEmissionFactor | SimpleNamespace = SimpleNamespace(value=0)
+        self.default_emission_factor_wo: ipcc.NitrousEmissionFactor | SimpleNamespace = SimpleNamespace(value=0)
         self.fires_combustion_factor_start: ipcc.FiresCombustionFactor | SimpleNamespace = SimpleNamespace(value=0)
         self.fires_combustion_factor_w: ipcc.FiresCombustionFactor | SimpleNamespace = SimpleNamespace(value=0)
         self.fires_combustion_factor_wo: ipcc.FiresCombustionFactor | SimpleNamespace = SimpleNamespace(value=0)
@@ -1597,28 +1604,28 @@ class PerennialCropCalculator(BaseCalculator):
         self.burning_emission_factor = utils.get_or_raise(ipcc.BurningEmissionFactor, savanna_flt, "BurningEmissionFactor for Savanna and grassland does not exist")
         self.default_fire_periodicity = AnnualCroplandParameter.objects.get(name="default_fire_periodicity")
 
-        if is_luc_remaining_same(module):
+        if module.is_luc_remaining_same():
             self.flu_start = get_flu_data(module, climate, moisture, utils.ScenarioTypes.START)
             self.fi_start = get_fi_data(module, climate, moisture, utils.ScenarioTypes.START)
             self.fmg_start = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.START)
-            self.som_start = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, moisture_flt, f"LandUseNitrousEmissionFactor for {moisture.name} moisture and {module.organic_input_type_start.name} does not exist")
+            self.default_emission_factor_start = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
             self.fires_combustion_factor_start = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_start_flt, f"FiresCombustionFactor for {module.land_use_type_start.name} does not exist", method="get_or_default")
             self.ag_default_start = utils.get_or_raise(ipcc.PerennialAGB, cmc | lut_start_flt, f"PerennialAGB for {module.land_use_type_start.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_default")
             self.agb_max_c_start = utils.get_or_raise(ipcc.PerennialMaxAGB, climate_flt | lut_start_flt, f"PerennialMaxAGB for {module.land_use_type_start.name} in {climate.name} climate does not exist", method="get_or_default")
             self.bg_default_start = utils.get_or_raise(ipcc.PerennialBGB, cmc | lut_start_flt, f"PerennialBGB for {module.land_use_type_start.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_default")
 
-        if is_business_as_usual(module):
+        if module.is_business_as_usual():
             self.flu_start = get_flu_data(module, climate, moisture, utils.ScenarioTypes.START)
             self.fi_start = get_fi_data(module, climate, moisture, utils.ScenarioTypes.START)
             self.fmg_start = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.START)
-            self.som_start = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, moisture_flt, f"LandUseNitrousEmissionFactor for {moisture.name} moisture and {module.organic_input_type_start.name} does not exist")
+            self.default_emission_factor_start = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
             self.fires_combustion_factor_start = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_start_flt, f"FiresCombustionFactor for {module.land_use_type_start.name} does not exist", method="get_or_default")
             self.ag_default_start = utils.get_or_raise(ipcc.PerennialAGB, cmc | lut_start_flt, f"PerennialAGB for {module.land_use_type_start.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_default")
             self.agb_max_c_start = utils.get_or_raise(ipcc.PerennialMaxAGB, climate_flt | lut_start_flt, f"PerennialMaxAGB for {module.land_use_type_start.name} in {climate.name} climate does not exist", method="get_or_default")
             self.bg_default_start = utils.get_or_raise(ipcc.PerennialBGB, cmc | lut_start_flt, f"PerennialBGB for {module.land_use_type_start.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_default")
 
-        if is_with(module):
-            self.som_w = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, moisture_flt, f"LandUseNitrousEmissionFactor for {moisture.name} moisture and {module.organic_input_type_w.name} does not exist")
+        if module.is_with():
+            self.default_emission_factor_w = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
             self.fires_combustion_factor_w = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_w_flt, f"FiresCombustionFactor for {module.land_use_type_w.name} does not exist", method="get_or_default")
             self.ag_default_w = utils.get_or_raise(ipcc.PerennialAGB, cmc | lut_w_flt, f"PerennialAGB for {module.land_use_type_w.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_default")
             self.agb_max_c_w = utils.get_or_raise(ipcc.PerennialMaxAGB, climate_flt | lut_w_flt, f"PerennialMaxAGB for {module.land_use_type_w.name} in {climate.name} climate does not exist", method="get_or_default")
@@ -1627,8 +1634,8 @@ class PerennialCropCalculator(BaseCalculator):
             self.fi_w = get_fi_data(module, climate, moisture, utils.ScenarioTypes.WITH)
             self.fmg_w = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.WITH)
 
-        if is_without(module):
-            self.som_wo = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, moisture_flt, f"LandUseNitrousEmissionFactor for {moisture.name} moisture and {module.organic_input_type_wo.name} does not exist")
+        if module.is_without():
+            self.default_emission_factor_wo = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
             self.fires_combustion_factor_wo = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_wo_flt, f"FiresCombustionFactor for {module.land_use_type_wo.name} does not exist")
             self.ag_default_wo = utils.get_or_raise(ipcc.PerennialAGB, cmc | lut_wo_flt, f"PerennialAGB for {module.land_use_type_wo.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_default")
             self.agb_max_c_wo = utils.get_or_raise(ipcc.PerennialMaxAGB, climate_flt | lut_wo_flt, f"PerennialMaxAGB for {module.land_use_type_wo.name} in {climate.name} climate does not exist", method="get_or_default")
@@ -1657,12 +1664,7 @@ class PerennialCropCalculator(BaseCalculator):
 
         self.get_defaults()
 
-        DELAY_START_W = 0
-        DELAY_START_WO = 0
-        DELAY_W = 0
-        DELAY_WO = 0
-
-        if is_luc_remaining_same(module):
+        if module.is_luc_remaining_same():
             self.inputs_start_w = [
                 area,
                 0,
@@ -1708,7 +1710,7 @@ class PerennialCropCalculator(BaseCalculator):
             self.math_start_w = PerennialCropland(*self.inputs_start_w)
             self.math_start_w.calculate_emissions()
 
-        if is_business_as_usual(module):
+        if module.is_business_as_usual():
             self.input_start_wo = [
                 area,
                 0,
@@ -1754,7 +1756,7 @@ class PerennialCropCalculator(BaseCalculator):
             self.math_start_wo = PerennialCropland(*self.input_start_wo)
             self.math_start_wo.calculate_emissions()
 
-        if is_with(module):
+        if module.is_with():
             self.inputs_w = [
                 0,
                 area,
@@ -1800,7 +1802,7 @@ class PerennialCropCalculator(BaseCalculator):
             self.math_w = PerennialCropland(*self.inputs_w)
             self.math_w.calculate_emissions()
 
-        if is_without(module):
+        if module.is_without():
             self.inputs_wo = [
                 0,
                 area,
@@ -1933,7 +1935,100 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
         self.n_estimation_factor: SimpleNamespace | ipcc.CropNitrousEstimationDefaultFactor = SimpleNamespace(value=0)
         self.burning_emission_factor: SimpleNamespace | ipcc.BurningEmissionFactor = SimpleNamespace(value=0)
         self.rice_cf: SimpleNamespace | ipcc.FiresCombustionFactor = SimpleNamespace(value=0)
-        self.som: SimpleNamespace | ipcc.LandUseNitrousEmissionFactor = SimpleNamespace(value=0)
+        self.straw_burned_start: SimpleNamespace = SimpleNamespace(value=0)
+        self.straw_burned_w: SimpleNamespace = SimpleNamespace(value=0)
+        self.straw_burned_wo: SimpleNamespace = SimpleNamespace(value=0)
+
+    def get_defaults(self, calculate=False) -> dict:
+        module: FloodedRice | MinorSeasonFloodedRice = self.data
+        module_for_checks = getattr(module, "parent", module)
+        activity: Activity = getattr(module, "parent", module).activity
+        project: Project = activity.project
+
+        climate: Climate = activity.climate_t2 or project.climate
+        moisture: Moisture = activity.moisture_t2 or project.moisture
+        region: Region = project.country.region
+        soil_type: SoilType = project.soil_type
+
+        climate_flt = {"climate": climate}
+        moisture_flt = {"moisture": moisture}
+        soil_flt = {"soil_type": soil_type}
+        region_flt = {"continent": region}
+
+        if module_for_checks.is_luc_remaining_same():
+            h2o_mgmt_before_start_flt = {"water_management_type_before_cultivation": module.water_management_type_before_cultivation_start}
+            h2o_mgmt_after_start_flt = {"water_management_type_after_cultivation": module.water_management_type_after_cultivation_start}
+            organic_amendment_start_flt = {"organic_amendment_type": module.organic_amendment_type_start}
+            self.flu_start = get_flu_data(module, climate, moisture, utils.ScenarioTypes.START)
+            self.fmg_start = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.START)
+            self.fi_start = get_fi_data(module, climate, moisture, utils.ScenarioTypes.START)
+            self.sfw_start = utils.get_or_raise(ipcc.RiceSFW, h2o_mgmt_after_start_flt, f"RiceSFW for {module.water_management_type_after_cultivation_start} does not exist")
+            self.sfp_start = utils.get_or_raise(ipcc.RiceSFP, h2o_mgmt_before_start_flt, f"RiceSFP for {module.water_management_type_before_cultivation_start} does not exist")
+            self.sfo_start = utils.get_or_raise(ipcc.RiceSFO, organic_amendment_start_flt, f"RiceSFO for {module.organic_amendment_type_start} does not exist")
+
+        if module_for_checks.is_business_as_usual():
+            h2o_mgmt_before_start_flt = {"water_management_type_before_cultivation": module.water_management_type_before_cultivation_start}
+            h2o_mgmt_after_start_flt = {"water_management_type_after_cultivation": module.water_management_type_after_cultivation_start}
+            organic_amendment_start_flt = {"organic_amendment_type": module.organic_amendment_type_start}
+            self.flu_start = get_flu_data(module, climate, moisture, utils.ScenarioTypes.START)
+            self.fmg_start = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.START)
+            self.fi_start = get_fi_data(module, climate, moisture, utils.ScenarioTypes.START)
+            self.sfw_start = utils.get_or_raise(ipcc.RiceSFW, h2o_mgmt_after_start_flt, f"RiceSFW for {module.water_management_type_after_cultivation_start} does not exist")
+            self.sfp_start = utils.get_or_raise(ipcc.RiceSFP, h2o_mgmt_before_start_flt, f"RiceSFP for {module.water_management_type_before_cultivation_start} does not exist")
+            self.sfo_start = utils.get_or_raise(ipcc.RiceSFO, organic_amendment_start_flt, f"RiceSFO for {module.organic_amendment_type_start} does not exist")
+
+        if module_for_checks.is_with():
+            h2o_mgmt_before_w_flt = {"water_management_type_before_cultivation": module.water_management_type_before_cultivation_w}
+            h2o_mgmt_after_w_flt = {"water_management_type_after_cultivation": module.water_management_type_after_cultivation_w}
+            organic_amendment_w_flt = {"organic_amendment_type": module.organic_amendment_type_w}
+            self.flu_w = get_flu_data(module, climate, moisture, utils.ScenarioTypes.WITH)
+            self.fmg_w = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.WITH)
+            self.fi_w = get_fi_data(module, climate, moisture, utils.ScenarioTypes.WITH)
+            self.sfw_w = utils.get_or_raise(ipcc.RiceSFW, h2o_mgmt_after_w_flt, f"RiceSFW for {module.water_management_type_after_cultivation_w} does not exist")
+            self.sfp_w = utils.get_or_raise(ipcc.RiceSFP, h2o_mgmt_before_w_flt, f"RiceSFP for {module.water_management_type_before_cultivation_w} does not exist")
+            self.sfo_w = utils.get_or_raise(ipcc.RiceSFO, organic_amendment_w_flt, f"RiceSFO for {module.organic_amendment_type_w} does not exist")
+
+        if module_for_checks.is_without():
+            h2o_mgmt_before_wo_flt = {"water_management_type_before_cultivation": module.water_management_type_before_cultivation_wo}
+            h2o_mgmt_after_wo_flt = {"water_management_type_after_cultivation": module.water_management_type_after_cultivation_wo}
+            organic_amendment_wo_flt = {"organic_amendment_type": module.organic_amendment_type_wo}
+            self.flu_wo = get_flu_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
+            self.fmg_wo = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
+            self.fi_wo = get_fi_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
+            self.sfw_wo = utils.get_or_raise(ipcc.RiceSFW, h2o_mgmt_after_wo_flt, f"RiceSFW for {module.water_management_type_after_cultivation_wo} does not exist")
+            self.sfp_wo = utils.get_or_raise(ipcc.RiceSFP, h2o_mgmt_before_wo_flt, f"RiceSFP for {module.water_management_type_before_cultivation_wo} does not exist")
+            self.sfo_wo = utils.get_or_raise(ipcc.RiceSFO, organic_amendment_wo_flt, f"RiceSFO for {module.organic_amendment_type_wo} does not exist")
+
+        if module.is_ready() and calculate:
+            self.calculate()
+            self.efi_start.value = getattr(self.math_start_w, "adjusted_daily_ef_methane_tier_2_default", 0) or getattr(self.math_start_wo, "adjusted_daily_ef_methane_tier_2_default", 0)
+            self.efi_w.value = getattr(self.math_w, "adjusted_daily_ef_methane_tier_2_default", 0)
+            self.efi_wo.value = getattr(self.math_wo, "adjusted_daily_ef_methane_tier_2_default", 0)
+            self.straw_burned_start.value = getattr(self.math_start_w, "straw_tonnes_tier_2_default", 0) or getattr(self.math_start_wo, "straw_tonnes_tier_2_default", 0)
+            self.straw_burned_w.value = getattr(self.math_w, "straw_tonnes_tier_2_default", 0)
+            self.straw_burned_wo.value = getattr(self.math_wo, "straw_tonnes_tier_2_default", 0)
+            self.sfo_start.value = getattr(self.math_start_w, "SFo_tier_2_default", 0) or getattr(self.math_start_wo, "SFo_tier_2_default", 0)
+            self.sfo_w.value = getattr(self.math_w, "SFo_tier_2_default", 0)
+            self.sfo_wo.value = getattr(self.math_wo, "SFo_tier_2_default", 0)
+
+        self.soc = utils.get_or_raise(ipcc.SoilOrganicCarbon, climate_flt | moisture_flt | soil_flt, f"SoilOrganicCarbon for {climate.name}, {moisture.name} and {soil_type.name} does not exist")
+
+        # self.grassland_soc = get_grassland_soc(luc)
+        # self.soc_start = self.grassland_soc.value if self.grassland_soc else self.soc.value
+        self.soc_start = self.soc.value
+        if not self.soc_start:
+            raise ValueError(f"SoilOrganicCarbon for {climate.name}, {moisture.name} and {soil_type.name} does not exist")
+        self.soc_w = self.soc.value
+        self.soc_wo = self.soc.value
+
+        self.efc = utils.get_or_raise(ipcc.RiceDefaultEmissionFactor, region_flt, f"RiceDefaultEmissionFactor for {region.name} does not exist")
+        self.yield_ref = utils.get_or_raise(ipcc.RiceYield, region_flt, f"RiceYield for {region.name} does not exist")
+
+        lut_name_rice_flt = {"land_use_type__name": "Rice"}
+
+        self.n_estimation_factor = utils.get_or_raise(ipcc.CropNitrousEstimationDefaultFactor, lut_name_rice_flt, "Default nitrous estimation factor is not defined for rice")
+        self.burning_emission_factor = utils.get_or_raise(ipcc.BurningEmissionFactor, {"category__name": "Agricultural residues"}, "Burning emission factor is not defined for agricultural residues")
+        self.rice_cf = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_name_rice_flt, "Fires combustion factor is not defined for rice")
 
     def calculate(self, is_minor_season=True) -> Result:
         module: FloodedRice = self.data
@@ -1945,18 +2040,59 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
 
         self.get_defaults()
 
-        DELAY_START_W = 0
-        DELAY_START_WO = 0
-        DELAY_W = 0
-        DELAY_WO = 0
-
-        if is_luc_remaining_same(module_for_checks):
-            self.inputs_start_w = [*[area, 0], self.efc.value, module.efc_t2_start, self.sfw_start.value, module.sfw_t2_start, self.sfp_start.value, module.sfp_t2_start, self.sfo_start.value, module.sfo_t2_start, module.efi_t2_start, self.yield_ref.value, module.crop_yield_start, self.n_estimation_factor.slope, self.n_estimation_factor.intercept, module.rice_straw_t2_start, self.burning_emission_factor.ch4, self.rice_cf.value, self.burning_emission_factor.n2o, project.gw_potential.n2o, project.implementation_years, project.capitalization_years, activity.change_rate.name, project.gw_potential.ch4, self.efc.cultivation_period, module.cultivation_period_t2_start, self.soc_start, self.soc_w, getattr(module, "soc_t2_start", None), getattr(module, "soc_t2_w", None), self.fmg_start.value, self.fmg_w.value, module.fmg_t2_start, module.fmg_t2_w, self.flu_start.value, self.flu_w.value, module.flu_t2_start, module.flu_t2_w, self.fi_start.value, self.fi_w.value, module.fi_t2_start, module.fi_t2_w, CALCULATE_SOC_SOM_START_W, module.organic_amendment_type_start.name == "Straw Burnt", DELAY_START_W, is_minor_season, self.som]
+        if module_for_checks.is_luc_remaining_same():
+            self.inputs_start_w = [
+                *[area, 0],
+                self.efc.value,
+                module.efc_t2_start,
+                self.sfw_start.value,
+                module.sfw_t2_start,
+                self.sfp_start.value,
+                module.sfp_t2_start,
+                self.sfo_start.value,
+                module.sfo_t2_start,
+                module.efi_t2_start,
+                self.yield_ref.value,
+                module.crop_yield_start,
+                self.n_estimation_factor.slope,
+                self.n_estimation_factor.intercept,
+                module.rice_straw_t2_start,
+                self.burning_emission_factor.ch4,
+                self.rice_cf.value,
+                self.burning_emission_factor.n2o,
+                project.gw_potential.n2o,
+                project.implementation_years,
+                project.capitalization_years,
+                activity.change_rate.name,
+                project.gw_potential.ch4,
+                self.efc.cultivation_period,
+                module.cultivation_period_t2_start,
+                self.soc_start,
+                self.soc_w,
+                getattr(module, "soc_t2_start", None),
+                getattr(module, "soc_t2_w", None),
+                self.fmg_start.value,
+                self.fmg_w.value,
+                module.fmg_t2_start,
+                module.fmg_t2_w,
+                self.flu_start.value,
+                self.flu_w.value,
+                module.flu_t2_start,
+                module.flu_t2_w,
+                self.fi_start.value,
+                self.fi_w.value,
+                module.fi_t2_start,
+                module.fi_t2_w,
+                True,
+                module.organic_amendment_type_start.name == "Straw Burnt",
+                0,  # Delay
+                is_minor_season,
+            ]
 
             self.math_start_w = MathFloodedRice(*self.inputs_start_w)
             self.math_start_w.calculate_emissions()
 
-        if is_business_as_usual(module_for_checks):
+        if module_for_checks.is_business_as_usual():
             self.inputs_start_wo = [
                 *[area, 0],
                 self.efc.value,
@@ -2009,7 +2145,7 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
             self.math_start_wo = MathFloodedRice(*self.inputs_start_wo)
             self.math_start_wo.calculate_emissions()
 
-        if is_with(module_for_checks):
+        if module_for_checks.is_with():
             self.inputs_w = [
                 *[0, area],
                 self.efc.value,
@@ -2062,7 +2198,7 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
             self.math_w = MathFloodedRice(*self.inputs_w)
             self.math_w.calculate_emissions()
 
-        if is_without(module_for_checks):
+        if module_for_checks.is_without():
             self.inputs_wo = [
                 *[0, area],
                 self.efc.value,
@@ -2115,119 +2251,14 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
             self.math_wo = MathFloodedRice(*self.inputs_wo)
             self.math_wo.calculate_emissions()
 
-        results_start_w = self.math_start_w.result if self.math_start_w else MathResult(project.implementation_years, project.capitalization_years)
-        results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(project.implementation_years, project.capitalization_years)
-        results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
-        results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
-        log.debug("start_w breakdown")
-        results_start_w.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        log.debug("start_wo breakdown")
-        results_start_wo.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        log.debug("w breakdown")
-        results_w.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        log.debug("wo breakdown")
-        results_wo.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        results_tuple = (results_w + results_start_w, results_wo + results_start_wo)
+        results_tuple = (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
 
         return results_tuple
-
-    def get_defaults(self, calculate=False) -> dict:
-        module: FloodedRice = self.data
-        module_for_checks = getattr(module, "parent", module)
-        activity: Activity = getattr(module, "parent", module).activity
-        project: Project = activity.project
-        luc: LandUseChange = module.land_use_change
-
-        climate: Climate = activity.climate_t2 or project.climate
-        moisture: Moisture = activity.moisture_t2 or project.moisture
-        region: Region = project.country.region
-        soil_type: SoilType = project.soil_type
-
-        climate_flt = {"climate": climate}
-        moisture_flt = {"moisture": moisture}
-        soil_flt = {"soil_type": soil_type}
-        region_flt = {"continent": region}
-
-        if is_luc_remaining_same(module_for_checks):
-            h2o_mgmt_before_start_flt = {"water_management_type_before_cultivation": module.water_management_type_before_cultivation_start}
-            h2o_mgmt_after_start_flt = {"water_management_type_after_cultivation": module.water_management_type_after_cultivation_start}
-            organic_amendment_start_flt = {"organic_amendment_type": module.organic_amendment_type_start}
-            self.flu_start = get_flu_data(module, climate, moisture, utils.ScenarioTypes.START)
-            self.fmg_start = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.START)
-            self.fi_start = get_fi_data(module, climate, moisture, utils.ScenarioTypes.START)
-            self.sfw_start = utils.get_or_raise(ipcc.RiceSFW, h2o_mgmt_after_start_flt, f"RiceSFW for {module.water_management_type_after_cultivation_start} does not exist")
-            self.sfp_start = utils.get_or_raise(ipcc.RiceSFP, h2o_mgmt_before_start_flt, f"RiceSFP for {module.water_management_type_before_cultivation_start} does not exist")
-            self.sfo_start = utils.get_or_raise(ipcc.RiceSFO, organic_amendment_start_flt, f"RiceSFO for {module.organic_amendment_type_start} does not exist")
-
-        if is_business_as_usual(module_for_checks):
-            h2o_mgmt_before_start_flt = {"water_management_type_before_cultivation": module.water_management_type_before_cultivation_start}
-            h2o_mgmt_after_start_flt = {"water_management_type_after_cultivation": module.water_management_type_after_cultivation_start}
-            organic_amendment_start_flt = {"organic_amendment_type": module.organic_amendment_type_start}
-            self.flu_start = get_flu_data(module, climate, moisture, utils.ScenarioTypes.START)
-            self.fmg_start = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.START)
-            self.fi_start = get_fi_data(module, climate, moisture, utils.ScenarioTypes.START)
-            self.sfw_start = utils.get_or_raise(ipcc.RiceSFW, h2o_mgmt_after_start_flt, f"RiceSFW for {module.water_management_type_after_cultivation_start} does not exist")
-            self.sfp_start = utils.get_or_raise(ipcc.RiceSFP, h2o_mgmt_before_start_flt, f"RiceSFP for {module.water_management_type_before_cultivation_start} does not exist")
-            self.sfo_start = utils.get_or_raise(ipcc.RiceSFO, organic_amendment_start_flt, f"RiceSFO for {module.organic_amendment_type_start} does not exist")
-
-        if is_with(module_for_checks):
-            h2o_mgmt_before_w_flt = {"water_management_type_before_cultivation": module.water_management_type_before_cultivation_w}
-            h2o_mgmt_after_w_flt = {"water_management_type_after_cultivation": module.water_management_type_after_cultivation_w}
-            organic_amendment_w_flt = {"organic_amendment_type": module.organic_amendment_type_w}
-            self.flu_w = get_flu_data(module, climate, moisture, utils.ScenarioTypes.WITH)
-            self.fmg_w = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.WITH)
-            self.fi_w = get_fi_data(module, climate, moisture, utils.ScenarioTypes.WITH)
-            self.sfw_w = utils.get_or_raise(ipcc.RiceSFW, h2o_mgmt_after_w_flt, f"RiceSFW for {module.water_management_type_after_cultivation_w} does not exist")
-            self.sfp_w = utils.get_or_raise(ipcc.RiceSFP, h2o_mgmt_before_w_flt, f"RiceSFP for {module.water_management_type_before_cultivation_w} does not exist")
-            self.sfo_w = utils.get_or_raise(ipcc.RiceSFO, organic_amendment_w_flt, f"RiceSFO for {module.organic_amendment_type_w} does not exist")
-
-        if is_without(module_for_checks):
-            h2o_mgmt_before_wo_flt = {"water_management_type_before_cultivation": module.water_management_type_before_cultivation_wo}
-            h2o_mgmt_after_wo_flt = {"water_management_type_after_cultivation": module.water_management_type_after_cultivation_wo}
-            organic_amendment_wo_flt = {"organic_amendment_type": module.organic_amendment_type_wo}
-            self.flu_wo = get_flu_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
-            self.fmg_wo = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
-            self.fi_wo = get_fi_data(module, climate, moisture, utils.ScenarioTypes.WITHOUT)
-            self.sfw_wo = utils.get_or_raise(ipcc.RiceSFW, h2o_mgmt_after_wo_flt, f"RiceSFW for {module.water_management_type_after_cultivation_wo} does not exist")
-            self.sfp_wo = utils.get_or_raise(ipcc.RiceSFP, h2o_mgmt_before_wo_flt, f"RiceSFP for {module.water_management_type_before_cultivation_wo} does not exist")
-            self.sfo_wo = utils.get_or_raise(ipcc.RiceSFO, organic_amendment_wo_flt, f"RiceSFO for {module.organic_amendment_type_wo} does not exist")
-
-        lut_name_rice_flt = {"land_use_type__name": "Rice"}
-
-        if module.status.name == "READY" and calculate:
-            self.calculate()
-            self.efi_start.value = getattr(self.math_start_w, "adjusted_daily_ef_methane_tier_2_default", 0) or getattr(self.math_start_wo, "adjusted_daily_ef_methane_tier_2_default", 0)
-            self.efi_w.value = getattr(self.math_w, "adjusted_daily_ef_methane_tier_2_default", 0)
-            self.efi_wo.value = getattr(self.math_wo, "adjusted_daily_ef_methane_tier_2_default", 0)
-            self.straw_burned_start = SimpleNamespace(value=getattr(self.math_start_w, "straw_tonnes_tier_2_default", 0) or getattr(self.math_start_wo, "straw_tonnes_tier_2_default", 0))
-            self.straw_burned_w = SimpleNamespace(value=getattr(self.math_w, "straw_tonnes_tier_2_default", 0))
-            self.straw_burned_wo = SimpleNamespace(value=getattr(self.math_wo, "straw_tonnes_tier_2_default", 0))
-            self.sfo_start.value = getattr(self.math_start_w, "SFo_tier_2_default", 0) or getattr(self.math_start_wo, "SFo_tier_2_default", 0)
-            self.sfo_w.value = getattr(self.math_w, "SFo_tier_2_default", 0)
-            self.sfo_wo.value = getattr(self.math_wo, "SFo_tier_2_default", 0)
-
-        self.soc = utils.get_or_raise(ipcc.SoilOrganicCarbon, climate_flt | moisture_flt | soil_flt, f"SoilOrganicCarbon for {climate.name}, {moisture.name} and {soil_type.name} does not exist")
-        self.som = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, moisture_flt, f"LandUseNitrousEmissionFactor for {moisture.name} does not exist")
-
-        # self.grassland_soc = get_grassland_soc(luc)
-        # self.soc_start = self.grassland_soc.value if self.grassland_soc else self.soc.value
-        self.soc_start = self.soc.value
-        if not self.soc_start:
-            raise ValueError(f"SoilOrganicCarbon for {climate.name}, {moisture.name} and {soil_type.name} does not exist")
-        self.soc_w = self.soc.value
-        self.soc_wo = self.soc.value
-
-        self.efc = utils.get_or_raise(ipcc.RiceDefaultEmissionFactor, region_flt, f"RiceDefaultEmissionFactor for {region.name} does not exist")
-        self.yield_ref = utils.get_or_raise(ipcc.RiceYield, region_flt, f"RiceYield for {region.name} does not exist")
-
-        self.n_estimation_factor = utils.get_or_raise(ipcc.CropNitrousEstimationDefaultFactor, lut_name_rice_flt, "Default nitrous estimation factor is not defined for rice")
-        self.burning_emission_factor = utils.get_or_raise(ipcc.BurningEmissionFactor, {"category__name": "Agricultural residues"}, "Burning emission factor is not defined for agricultural residues")
-        self.rice_cf = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_name_rice_flt, "Fires combustion factor is not defined for rice")
 
 
 class FloodedRiceCalculator(BaseCalculator):
@@ -2237,20 +2268,20 @@ class FloodedRiceCalculator(BaseCalculator):
 
     def calculate(self) -> Result:
         module: FloodedRice = self.data
-        res_w = MathResult(module.activity.project.implementation_years, module.activity.project.capitalization_years)
-        res_wo = MathResult(module.activity.project.implementation_years, module.activity.project.capitalization_years)
+        self.results_w = MathResult(module.activity.project.implementation_years, module.activity.project.capitalization_years)
+        self.results_wo = MathResult(module.activity.project.implementation_years, module.activity.project.capitalization_years)
 
         r_w, r_wo = FloodedRiceSeasonCalculator(module).calculate(False)
 
-        res_w += r_w
-        res_wo += r_wo
+        self.results_w += r_w
+        self.results_wo += r_wo
 
         for season in module.minor_seasons.all():
             r_w, r_wo = FloodedRiceSeasonCalculator(season).calculate()
-            res_w += r_w
-            res_wo += r_wo
+            self.results_w += r_w
+            self.results_wo += r_wo
 
-        return (res_w, res_wo)
+        return (self.results_w, self.results_wo)
 
     def get_defaults(self, calculate=calculate) -> dict:
         FloodedRiceSeasonCalculator(input).get_defaults(calculate=calculate)
@@ -2292,10 +2323,40 @@ class GrasslandCalculator(BaseCalculator):
 
         if is_luc_remaining_same(module) or is_with(module):
 
-            self.soc_start = utils.get_or_raise(ipcc.GrasslandStockExchangeFactor, {"grassland_management_type": module.grassland_management_type_start, "climate": project.climate}, f"Stock exchange factor for {module.grassland_management_type_start.name} in {project.climate.name} climate does not exist")
-            self.soc_w = utils.get_or_raise(ipcc.GrasslandStockExchangeFactor, {"grassland_management_type": module.grassland_management_type_w, "climate": project.climate}, f"Stock exchange factor for {module.grassland_management_type_w.name} in {project.climate.name} climate does not exist")
+        try:
+            self.cf = GrasslandParameter.objects.get(name="default_combustion_factor")
+        except GrasslandParameter.DoesNotExist:
+            raise Exception("Default combustion factor does not exist")
 
-        if is_business_as_usual(module):
+        try:
+            self.soc = ipcc.SoilOrganicCarbon.objects.get(climate=project.climate, moisture=project.moisture, soil_type=project.soil_type)
+        except ipcc.SoilOrganicCarbon.DoesNotExist:
+            raise Exception(f"Soil organic carbon for {project.climate.name} climate, {project.moisture.name} moisture and {project.soil_type.name} soil type does not exist")
+
+        if module.is_luc_remaining_same():
+
+            try:
+                self.soc_start = ipcc.GrasslandStockExchangeFactor.objects.get_or_default(grassland_management_type=module.grassland_management_type_start, climate=project.climate)
+            except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
+                raise Exception(f"Stock exchange factor for {module.grassland_management_type_start.name} in {project.climate.name} climate does not exist")
+
+            try:
+                self.soc_w = ipcc.GrasslandStockExchangeFactor.objects.get_or_default(grassland_management_type=module.grassland_management_type_w, climate=project.climate)
+            except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
+                raise Exception(f"Stock exchange factor for {module.grassland_management_type_w.name} in {project.climate.name} climate does not exist")
+
+        if module.is_with():
+            try:
+                self.soc_start = ipcc.GrasslandStockExchangeFactor.objects.get_or_default(grassland_management_type=module.grassland_management_type_start, climate=project.climate)
+            except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
+                raise Exception(f"Stock exchange factor for {module.grassland_management_type_start.name} in {project.climate.name} climate does not exist")
+
+            try:
+                self.soc_w = ipcc.GrasslandStockExchangeFactor.objects.get_or_default(grassland_management_type=module.grassland_management_type_w, climate=project.climate)
+            except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
+                raise Exception(f"Stock exchange factor for {module.grassland_management_type_w.name} in {project.climate.name} climate does not exist")
+
+        if module.is_business_as_usual():
 
             self.soc_start = utils.get_or_raise(ipcc.GrasslandStockExchangeFactor, {"grassland_management_type": module.grassland_management_type_start, "climate": project.climate}, f"Stock exchange factor for {module.grassland_management_type_start.name} in {project.climate.name} climate does not exist")
             self.soc_wo = utils.get_or_raise(ipcc.GrasslandStockExchangeFactor, {"grassland_management_type": module.grassland_management_type_wo, "climate": project.climate}, f"Stock exchange factor for {module.grassland_management_type_wo.name} in {project.climate.name} climate does not exist")
@@ -2326,12 +2387,7 @@ class GrasslandCalculator(BaseCalculator):
         math_w = None
         math_wo = None
 
-        DELAY_START_W = 0
-        DELAY_START_WO = 0
-        DELAY_W = 0
-        DELAY_WO = 0
-
-        if is_luc_remaining_same(module):
+        if module.is_luc_remaining_same():
             log.debug("LUC remaining same")
 
             self.inputs_start_w = [
@@ -2375,7 +2431,7 @@ class GrasslandCalculator(BaseCalculator):
             math_start_w = MathGrassland(*self.inputs_start_w)
             math_start_w.calculate_emissions()
 
-        if is_with(module):
+        if module.is_with():
             log.debug("With")
 
             self.inputs_w = [
@@ -2419,7 +2475,7 @@ class GrasslandCalculator(BaseCalculator):
             math_w = MathGrassland(*self.inputs_w)
             math_w.calculate_emissions()
 
-        if is_business_as_usual(module):
+        if module.is_business_as_usual():
             log.debug("Business as usual")
 
             self.inputs_start_wo = [
@@ -2463,7 +2519,7 @@ class GrasslandCalculator(BaseCalculator):
             math_start_wo = MathGrassland(*self.inputs_start_wo)
             math_start_wo.calculate_emissions()
 
-        if is_without(module):
+        if module.is_without():
             log.debug("Without")
 
             self.inputs_wo = [
@@ -2539,24 +2595,24 @@ class GrasslandCalculator(BaseCalculator):
         defaults_w = {}
         defaults_wo = {}
 
-        if is_luc_remaining_same(module):
+        if module.is_luc_remaining_same():
             math_start = MathGrassland(*self.inputs_start_w)
             math_start_defaults = math_start.evaluate_tier_2_defaults()
             defaults_start.update(math_start_defaults.start)
             defaults_start.update(math_start_defaults.other)
-        elif is_business_as_usual(module):
+        elif module.is_business_as_usual():
             math_start = MathGrassland(*self.inputs_start_wo)
             math_start_defaults = math_start.evaluate_tier_2_defaults()
             defaults_start.update(math_start_defaults.start)
             defaults_start.update(math_start_defaults.other)
 
-        if is_with(module):
+        if module.is_with():
             math_w = MathGrassland(*self.inputs_w)
             math_w_defaults = math_w.evaluate_tier_2_defaults()
             defaults_w.update(math_w_defaults.end)
             defaults_w.update(math_w_defaults.other)
 
-        if is_without(module):
+        if module.is_without():
             math_wo = MathGrassland(*self.inputs_wo)
             math_wo_defaults = math_wo.evaluate_tier_2_defaults()
             defaults_wo.update(math_wo_defaults.end)
@@ -2653,7 +2709,7 @@ class SmallFisheryCalculator(BaseCalculator):
         math_w = None
         math_wo = None
 
-        if is_with(module):
+        if module.is_with():
             log.debug("IS WITH")
             self.inputs_w = [
                 project.implementation_years,
@@ -2691,7 +2747,7 @@ class SmallFisheryCalculator(BaseCalculator):
             math_w = MathFishery(*self.inputs_w)
             math_w.calculate_emissions()
 
-        if is_without(module):
+        if module.is_without():
             log.debug("IS WITHOUT")
             self.inputs_wo = [
                 project.implementation_years,
@@ -2854,7 +2910,7 @@ class LargeFisheryCalculator(BaseCalculator):
         math_w = None
         math_wo = None
 
-        if is_with(module):
+        if module.is_with():
             log.debug("IS WITH")
             self.inputs_w = [
                 project.implementation_years,
@@ -2892,7 +2948,7 @@ class LargeFisheryCalculator(BaseCalculator):
             math_w = MathFishery(*self.inputs_w)
             math_w.calculate_emissions()
 
-        if is_without(module):
+        if module.is_without():
             log.debug("IS WITHOUT")
             self.inputs_wo = [
                 project.implementation_years,
@@ -2953,13 +3009,13 @@ class LargeFisheryCalculator(BaseCalculator):
         defaults_w = {}
         defaults_wo = {}
 
-        if is_with(module):
+        if module.is_with():
             math_w = MathFishery(*self.inputs_w)
             math_w_defaults = math_w.evaluate_tier_2_defaults()
             defaults_w.update(math_w_defaults.end)
             defaults_w.update(math_w_defaults.other)
 
-        if is_without(module):
+        if module.is_without():
             math_wo = MathFishery(*self.inputs_wo)
             math_wo_defaults = math_wo.evaluate_tier_2_defaults()
             defaults_wo.update(math_wo_defaults.end)
@@ -2973,8 +3029,35 @@ class AquacultureCalculator(BaseCalculator):
     Calculator for aquaculture.
     """
 
+    def __init__(self, input) -> None:
+        super().__init__(input)
+
+        self.ELECTRICITY_USED_DEFAULT = 0  # TODO: Add as database parameter
+        self.NITROUS_EF_DEFAULT = 0
+        self.FEED_EF_DEFAULT = 0
+
     def get_defaults(self, input: Module) -> dict:
-        return super().get_defaults(input)
+        super().get_defaults(input)
+
+        module: Aquaculture = self.data
+        project: Project = module.activity.project
+
+        try:
+            self.NITROUS_EF_DEFAULT = AquacultureParameter.objects.get(name="nitrous_ef_default").value
+        except AquacultureParameter.DoesNotExist:
+            raise ValueError("Default nitrous emission factor does not exist")
+
+        try:
+            # TODO: This will now be used in the inputs module for feed
+            self.FEED_EF_DEFAULT = AquacultureParameter.objects.get(name="feed_ef_default").value
+        except AquacultureParameter.DoesNotExist:
+            raise ValueError("Default feed emission factor does not exist")
+
+        try:
+            self.elec = ipcc.ElectricityEmission.objects.get(country=project.country)
+            log.debug(f"Operating margin: {self.elec.operating_margin}")
+        except ipcc.ElectricityEmission.DoesNotExist:
+            raise ValueError(f"Electricity emission for {project.country.name} does not exist")
 
     def calculate(self) -> list[Result]:
         """
@@ -2985,91 +3068,62 @@ class AquacultureCalculator(BaseCalculator):
         change_rate = module.activity.change_rate
         project: Project = module.activity.project
 
-        ELECTRICITY_USED_DEFAULT = 0  # TODO: Add as database parameter
+        self.get_defaults()
 
-        try:
-            NITROUS_EF_DEFAULT = AquacultureParameter.objects.get(name="nitrous_ef_default").value
-        except AquacultureParameter.DoesNotExist:
-            raise ValueError("Default nitrous emission factor does not exist")
-
-        try:
-            # TODO: This will now be used in the inputs module for feed
-            FEED_EF_DEFAULT = AquacultureParameter.objects.get(name="feed_ef_default").value
-        except AquacultureParameter.DoesNotExist:
-            raise ValueError("Default feed emission factor does not exist")
-
-        try:
-            elec = ipcc.ElectricityEmission.objects.get(country=project.country)
-            log.debug(f"Operating margin: {elec.operating_margin}")
-        except ipcc.ElectricityEmission.DoesNotExist:
-            raise ValueError(f"Electricity emission for {project.country.name} does not exist")
-
-        math_w = None
-        math_wo = None
-
-        if is_with(module):
+        if module.is_with():
             log.debug("IS WITH")
-            inputs_w = [
+            self.inputs_w = [
                 module.annual_production_start,
                 module.annual_production_w,
-                NITROUS_EF_DEFAULT,
+                self.NITROUS_EF_DEFAULT,
                 module.n2o_from_production_t2_start,
                 module.n2o_from_production_t2_w,
                 project.gw_potential.n2o,
-                ELECTRICITY_USED_DEFAULT,
+                self.ELECTRICITY_USED_DEFAULT,
                 module.electricity_used_t2_start,
                 module.electricity_used_t2_w,
-                elec.operating_margin,
+                self.elec.operating_margin,
                 module.electricity_ef_t2_start,
                 module.electricity_ef_t2_w,
                 project.implementation_years,
                 project.capitalization_years,
                 change_rate.name,
             ]
-            log.debug("Inputs with: %s", inputs_w)
+            log.debug("Inputs with: %s", self.inputs_w)
 
-            math_w = MathAquaculture(*inputs_w)
-            math_w.calculate_emissions()
+            self.math_w = MathAquaculture(*self.inputs_w)
+            self.math_w.calculate_emissions()
 
-        if is_without(module):
+        if module.is_without():
             log.debug("IS WITHOUT")
-            inputs_wo = [
+            self.inputs_wo = [
                 module.annual_production_start,
                 module.annual_production_wo,
-                NITROUS_EF_DEFAULT,
+                self.NITROUS_EF_DEFAULT,
                 module.n2o_from_production_t2_start,
                 module.n2o_from_production_t2_wo,
                 project.gw_potential.n2o,
-                ELECTRICITY_USED_DEFAULT,
+                self.ELECTRICITY_USED_DEFAULT,
                 module.electricity_used_t2_start,
                 module.electricity_used_t2_wo,
-                elec.operating_margin,
+                self.elec.operating_margin,
                 module.electricity_ef_t2_start,
                 module.electricity_ef_t2_w,
                 project.implementation_years,
                 project.capitalization_years,
                 change_rate.name,
             ]
-            log.debug("Inputs without: %s", inputs_wo)
+            log.debug("Inputs without: %s", self.inputs_wo)
 
-            math_wo = MathAquaculture(*inputs_wo)
-            math_wo.calculate_emissions()
+            self.math_wo = MathAquaculture(*self.inputs_wo)
+            self.math_wo.calculate_emissions()
 
-        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
-        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
-        log.debug("Results WITH")
-        results_w.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        log.debug("Results WITHOUT")
-        results_wo.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        results_tuple = (results_w, results_wo)
+        results_tuple = (self.results_w, self.results_wo)
 
         return results_tuple
-
-    def defaults(self):
-        pass
 
 
 class InputCalculator(BaseCalculator):
@@ -3081,44 +3135,32 @@ class InputCalculator(BaseCalculator):
         return super().get_defaults(input)
 
     def calculate(self) -> list[MathResult]:
-        input: Input = self.data
-        project: Project = input.activity.project
+        module: Input = self.data
+        project: Project = module.activity.project
 
-        results_w = MathResult(project.implementation_years, project.capitalization_years)
-        results_wo = MathResult(project.implementation_years, project.capitalization_years)
+        self.results_w = MathResult(project.implementation_years, project.capitalization_years)
+        self.results_wo = MathResult(project.implementation_years, project.capitalization_years)
 
-        entries = input.input_entries.all()
+        entries = module.input_entries.all()
         for entry in entries:
             r_w, r_wo = InputEntryCalculator(entry).calculate()
 
-            results_w += r_w
-            results_wo += r_wo
+            self.results_w += r_w
+            self.results_wo += r_wo
 
-        return (results_w, results_wo)
-
-    def defaults(self) -> DefaultData:
-        self.calculate()
-
-        input: Input = self.data
-
-        defaults_start = {}
-        defaults_w = {}
-        defaults_wo = {}
-
-        for entry in input.input_entries.all():
-            defaults_start_entry, defaults_w_entry, defaults_wo_entry = InputEntryCalculator(entry).defaults()
-
-            defaults_start.update(defaults_start_entry)
-            defaults_w.update(defaults_w_entry)
-            defaults_wo.update(defaults_wo_entry)
-
-        return DefaultData(defaults_start, defaults_w, defaults_wo)
+        return (self.results_w, self.results_wo)
 
 
 class InputEntryCalculator(BaseCalculator):
     """
     Calculator for single input entries.
     """
+
+    def __init__(self, input) -> None:
+        super().__init__(input)
+
+        self.ref = SimpleNamespace(co2_multiplier=0, co2_emissions_multiplier=0, n2o_quantity_multiplier=0, n2o_emissions_multiplier=0, production_quantity_multiplier=0, production_emissions_multiplier=0)
+        self.ef = SimpleNamespace(co2_value=0, n2o_value=0, co2_eq_value=0)
 
     def get_defaults(self, calculate=False) -> dict:
 
@@ -3132,6 +3174,14 @@ class InputEntryCalculator(BaseCalculator):
         needs_n2o_ref = input_type.has_n2o_emissions and not module.n2o_emissions_t2
         needs_co2_e_ref = input_type.has_co2_e_emissions and not module.co2_e_emissions_t2
 
+        if module.status.name == "READY" and calculate:
+            self.calculate()
+
+        try:
+            self.ref = ipcc.InputReference.objects.get(gw_potential=project.gw_potential, input_type=module.input_type)
+        except ipcc.InputReference.DoesNotExist:
+            raise ValueError(f"Reference for {module.input_type.name} does not exist for {project.gw_potential.name}.")
+
         try:
             self.ef = ipcc.InputEmissionFactor.objects.get(input_type=module.input_type, climate=project.climate, moisture=project.moisture)
         except ipcc.InputEmissionFactor.DoesNotExist:
@@ -3139,79 +3189,61 @@ class InputEntryCalculator(BaseCalculator):
             if needs_co2_ref or needs_n2o_ref or needs_co2_e_ref:
                 raise ValueError(f"Emission factor for {module.input_type.name} does not exist for {project.climate.name} and {project.moisture.name}. Please define tier 2 values.")
 
+        self.math_w = None
+        self.math_wo = None
+
     def calculate(self) -> list[Result]:
         module: InputEntry = self.data
         activity: Activity = module.parent.activity
         project: Project = activity.project
 
-        input_type: InputType = module.input_type
+        self.get_defaults()
 
-        needs_co2_ref = input_type.has_co2_emissions and not module.co2_emissions_t2
-        needs_n2o_ref = input_type.has_n2o_emissions and not module.n2o_emissions_t2
-        needs_co2_e_ref = input_type.has_co2_e_emissions and not module.co2_e_emissions_t2
+        self.inputs_w = [
+            module.value_start,
+            module.value_w,
+            activity.change_rate.name,
+            self.ef.co2_value if self.ef else None,
+            module.co2_emissions_t2,
+            self.ref.co2_multiplier,
+            self.ref.co2_emissions_multiplier,
+            project.implementation_years,
+            project.capitalization_years,
+            self.ef.n2o_value if self.ef else None,
+            module.n2o_emissions_t2,
+            self.ref.n2o_quantity_multiplier,
+            self.ref.n2o_emissions_multiplier,
+            self.ef.co2_eq_value if self.ef else None,
+            module.co2_e_emissions_t2,
+            self.ref.production_quantity_multiplier,
+            self.ref.production_emissions_multiplier,
+        ]
 
-        try:
-            ref = ipcc.InputReference.objects.get(gw_potential=project.gw_potential, input_type=module.input_type)
-        except ipcc.InputReference.DoesNotExist:
-            raise ValueError(f"Reference for {module.input_type.name} does not exist for {project.gw_potential.name}.")
+        math_w = MathInputs(*self.inputs_w)
+        math_w.calculate_emissions()
 
-        try:
-            ef = ipcc.InputEmissionFactor.objects.get(input_type=module.input_type, climate=project.climate, moisture=project.moisture)
-        except ipcc.InputEmissionFactor.DoesNotExist:
-            ef = None
-            if needs_co2_ref or needs_n2o_ref or needs_co2_e_ref:
-                raise ValueError(f"Emission factor for {module.input_type.name} does not exist for {project.climate.name} and {project.moisture.name}. Please define tier 2 values.")
+        self.inputs_wo = [
+            module.value_start,
+            module.value_wo,
+            activity.change_rate.name,
+            self.ef.co2_value if self.ef else None,
+            module.co2_emissions_t2,
+            self.ref.co2_multiplier,
+            self.ref.co2_emissions_multiplier,
+            project.implementation_years,
+            project.capitalization_years,
+            self.ef.n2o_value if self.ef else None,
+            module.n2o_emissions_t2,
+            self.ref.n2o_quantity_multiplier,
+            self.ref.n2o_emissions_multiplier,
+            self.ef.co2_eq_value if self.ef else None,
+            module.co2_e_emissions_t2,
+            self.ref.production_quantity_multiplier,
+            self.ref.production_emissions_multiplier,
+        ]
 
-        math_w = None
-        math_wo = None
-
-        if is_with(module):
-            self.inputs_w = [
-                module.value_start,
-                module.value_w,
-                activity.change_rate.name,
-                ef.co2_value if ef else None,
-                module.co2_emissions_t2,
-                ref.co2_multiplier,
-                ref.co2_emissions_multiplier,
-                project.implementation_years,
-                project.capitalization_years,
-                ef.n2o_value if ef else None,
-                module.n2o_emissions_t2,
-                ref.n2o_quantity_multiplier,
-                ref.n2o_emissions_multiplier,
-                ef.co2_eq_value if ef else None,
-                module.co2_e_emissions_t2,
-                ref.production_quantity_multiplier,
-                ref.production_emissions_multiplier,
-            ]
-
-            math_w = MathInputs(*self.inputs_w)
-            math_w.calculate_emissions()
-
-        if is_without(module):
-            self.inputs_wo = [
-                module.value_start,
-                module.value_wo,
-                activity.change_rate.name,
-                ef.co2_value if ef else None,
-                module.co2_emissions_t2,
-                ref.co2_multiplier,
-                ref.co2_emissions_multiplier,
-                project.implementation_years,
-                project.capitalization_years,
-                ef.n2o_value if ef else None,
-                module.n2o_emissions_t2,
-                ref.n2o_quantity_multiplier,
-                ref.n2o_emissions_multiplier,
-                ef.co2_eq_value if ef else None,
-                module.co2_e_emissions_t2,
-                ref.production_quantity_multiplier,
-                ref.production_emissions_multiplier,
-            ]
-
-            math_wo = MathInputs(*self.inputs_wo)
-            math_wo.calculate_emissions()
+        math_wo = MathInputs(*self.inputs_wo)
+        math_wo.calculate_emissions()
 
         results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
         results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
@@ -3223,23 +3255,19 @@ class InputEntryCalculator(BaseCalculator):
     def defaults(self) -> DefaultData:
         self.calculate()
 
-        module: InputEntry = self.data
-
         defaults_start = {}
         defaults_w = {}
         defaults_wo = {}
 
-        if is_with(module):
-            math_w = MathInputs(*self.inputs_w)
-            math_w_defaults = math_w.evaluate_tier_2_defaults()
-            defaults_w.update(math_w_defaults.start)
-            defaults_w.update(math_w_defaults.other)
+        math_w = MathInputs(*self.inputs_w)
+        math_w_defaults = math_w.evaluate_tier_2_defaults()
+        defaults_w.update(math_w_defaults.start)
+        defaults_w.update(math_w_defaults.other)
 
-        if is_without(module):
-            math_wo = MathInputs(*self.inputs_wo)
-            math_wo_defaults = math_wo.evaluate_tier_2_defaults()
-            defaults_wo.update(math_wo_defaults.start)
-            defaults_wo.update(math_wo_defaults.other)
+        math_wo = MathInputs(*self.inputs_wo)
+        math_wo_defaults = math_wo.evaluate_tier_2_defaults()
+        defaults_wo.update(math_wo_defaults.start)
+        defaults_wo.update(math_wo_defaults.other)
 
         return DefaultData(defaults_start, defaults_w, defaults_wo)
 
@@ -3257,32 +3285,29 @@ class EnergyCalculator(BaseCalculator):
         Calculate emissions for a single Energy module.
         """
 
-        input: Energy = self.data
-        res_w = MathResult(
-            input.activity.project.implementation_years,
-            input.activity.project.capitalization_years,
+        module: Energy = self.data
+        self.results_w = MathResult(
+            module.activity.project.implementation_years,
+            module.activity.project.capitalization_years,
         )
-        res_wo = MathResult(
-            input.activity.project.implementation_years,
-            input.activity.project.capitalization_years,
+        self.results_wo = MathResult(
+            module.activity.project.implementation_years,
+            module.activity.project.capitalization_years,
         )
 
-        for elec in input.electricities.all():
+        for elec in module.electricities.all():
             r_w, r_wo = ElectricityCalculator(elec).calculate()
 
-            res_w += r_w
-            res_wo += r_wo
+            self.results_w += r_w
+            self.results_wo += r_wo
 
-        for fuel in input.fuels.all():
+        for fuel in module.fuels.all():
             r_w, r_wo = FuelCalculator(fuel).calculate()
 
-            res_w += r_w
-            res_wo += r_wo
+            self.results_w += r_w
+            self.results_wo += r_wo
 
-        return (res_w, res_wo)
-
-    def defaults(self) -> DefaultData:
-        pass
+        return (self.results_w, self.results_wo)
 
 
 class ElectricityCalculator(BaseCalculator):
@@ -3292,15 +3317,15 @@ class ElectricityCalculator(BaseCalculator):
 
     def get_defaults(self, calculate=False) -> dict:
 
-        input: Electricity = self.data
-        activity: Activity = input.parent.activity
+        module: Electricity = self.data
+        activity: Activity = module.parent.activity
         project: Project = activity.project
 
         try:
-            elec = ipcc.ElectricityEmission.objects.get(country=input.country)
+            elec = ipcc.ElectricityEmission.objects.get(country=module.country)
 
             self.ef_source = "Combined Margin"  # NOTE: Here it should be added to the DB and set as default value in my opinion
-            self.ef_country = elec.operating_margin if input.ef_source else elec.combined_margin
+            self.ef_country = elec.operating_margin if module.ef_source else elec.combined_margin
             self.transmission_loss = 0.1  # NOTE: don't know how this should be done in the best way, hardcoded for now, but can't be retrieved from the DB (maybe create a value in the DB for this as well?)
 
         except ipcc.ElectricityEmission.DoesNotExist:
@@ -3312,14 +3337,14 @@ class ElectricityCalculator(BaseCalculator):
         """
         log.debug("START ElectricityCalculator.calculate")
 
-        input: Electricity = self.data
-        activity: Activity = input.parent.activity
+        module: Electricity = self.data
+        activity: Activity = module.parent.activity
         project: Project = activity.project
         change_rate = activity.change_rate
 
         try:
-            elec = ipcc.ElectricityEmission.objects.get(country=input.country)
-            if input.ef_source:  # NOTE: previously was input.ef_source.name == "Operating margin", however it is nullable and is set to None unless selected in the Tier2. This check works and effectively does the same thing
+            elec = ipcc.ElectricityEmission.objects.get(country=module.country)
+            if module.ef_source:  # NOTE: previously was input.ef_source.name == "Operating margin", however it is nullable and is set to None unless selected in the Tier2. This check works and effectively does the same thing
                 log.debug(f"Operating margin: {elec.operating_margin}")
             else:
                 log.debug(f"Combined margin: {elec.combined_margin}")
@@ -3329,43 +3354,39 @@ class ElectricityCalculator(BaseCalculator):
         math_w = None
         math_wo = None
 
-        if is_with(input):
-            log.debug("IS WITH")
-            inputs_w = [
-                elec.operating_margin if input.ef_source else elec.combined_margin,
-                input.ef_t2_start,
-                input.ef_t2_w,
-                input.mwh_start,
-                input.mwh_w,
-                input.transmission_loss_start,
-                input.transmission_loss_w,
-                change_rate.name,
-                project.implementation_years,
-                project.capitalization_years,
-            ]
-            log.debug("Inputs with: %s", inputs_w)
+        inputs_w = [
+            elec.operating_margin if module.ef_source else elec.combined_margin,
+            module.ef_t2_start,
+            module.ef_t2_w,
+            module.mwh_start,
+            module.mwh_w,
+            module.transmission_loss_start,
+            module.transmission_loss_w,
+            change_rate.name,
+            project.implementation_years,
+            project.capitalization_years,
+        ]
+        log.debug("Inputs with: %s", inputs_w)
 
-            math_w = ElectryicityConsumption(*inputs_w)
-            math_w.calculate_emissions()
+        math_w = ElectryicityConsumption(*inputs_w)
+        math_w.calculate_emissions()
 
-        if is_without(input):
-            log.debug("IS WITHOUT")
-            inputs_wo = [
-                elec.operating_margin if input.ef_source else elec.combined_margin,
-                input.ef_t2_start,
-                input.ef_t2_wo,
-                input.mwh_start,
-                input.mwh_wo,
-                input.transmission_loss_start,
-                input.transmission_loss_wo,
-                change_rate.name,
-                project.implementation_years,
-                project.capitalization_years,
-            ]
-            log.debug("Inputs without: %s", inputs_wo)
+        inputs_wo = [
+            elec.operating_margin if module.ef_source else elec.combined_margin,
+            module.ef_t2_start,
+            module.ef_t2_wo,
+            module.mwh_start,
+            module.mwh_wo,
+            module.transmission_loss_start,
+            module.transmission_loss_wo,
+            change_rate.name,
+            project.implementation_years,
+            project.capitalization_years,
+        ]
+        log.debug("Inputs without: %s", inputs_wo)
 
-            math_wo = ElectryicityConsumption(*inputs_wo)
-            math_wo.calculate_emissions()
+        math_wo = ElectryicityConsumption(*inputs_wo)
+        math_wo.calculate_emissions()
 
         results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
         results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
@@ -3391,14 +3412,20 @@ class FuelCalculator(BaseCalculator):
     Calculator for fuel
     """
 
+    def __init__(self, input) -> None:
+        super().__init__(input)
+
+        self.ef = SimpleNamespace(t_co2_eq=0, net_calorific_value=0, co2=0, ch4=0, n2o=0)
+
+        self.math_w = None
+        self.math_wo = None
+
     def get_defaults(self, calculate=False) -> dict:
         input: Fuel = self.data
         activity: Activity = input.parent.activity
-        project: Project = activity.project
-        change_rate = activity.change_rate
 
         try:
-            self.ef_fuel_t_co2_eq = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=input.fuel_type).t_co2_eq
+            self.ef = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=input.fuel_type)
         except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
             raise ValueError(f"Default emission factor for {input.fuel_type.name} does not exist. Please select tier 2 value.")
 
@@ -3408,107 +3435,90 @@ class FuelCalculator(BaseCalculator):
         """
         log.debug("START FuelCalculator.calculate")
 
-        input: Fuel = self.data
-        activity: Activity = input.parent.activity
+        module: Fuel = self.data
+        activity: Activity = module.parent.activity
         project: Project = activity.project
         change_rate = activity.change_rate
 
-        macro_fuel_type = input.fuel_type.macro_fuel_type.name
-
-        try:
-            ef = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=input.fuel_type)
-            log.debug(f"Default emission factor: {ef.t_co2_eq}")
-        except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
-            raise ValueError(f"Default emission factor for {input.fuel_type.name} does not exist. Please select tier 2 value.")
-
-        math_w = None
-        math_wo = None
+        macro_fuel_type = module.fuel_type.macro_fuel_type.name
 
         if macro_fuel_type == "Liquid or gaseous":
             log.debug("Liquid or gaseous fuel")
-            if is_with(input):
-                log.debug("IS WITH")
-                input_w = [
-                    ef.t_co2_eq,
-                    input.ef_t2,
-                    input.fuel_consumption_start,
-                    input.fuel_consumption_w,
-                    change_rate.name,
-                    project.implementation_years,
-                    project.capitalization_years,
-                ]
-                log.debug("Inputs with: %s", input_w)
+            input_w = [
+                self.ef.t_co2_eq,
+                module.ef_t2,
+                module.fuel_consumption_start,
+                module.fuel_consumption_w,
+                change_rate.name,
+                project.implementation_years,
+                project.capitalization_years,
+            ]
+            log.debug("Inputs with: %s", input_w)
 
-                math_w = FuelConsumption(*input_w)
-                math_w.calculate_emissions()
+            self.math_w = FuelConsumption(*input_w)
+            self.math_w.calculate_emissions()
 
-            if is_without(input):
-                log.debug("IS WITHOUT")
-                input_wo = [
-                    ef.t_co2_eq,
-                    input.ef_t2,
-                    input.fuel_consumption_start,
-                    input.fuel_consumption_wo,
-                    change_rate.name,
-                    project.implementation_years,
-                    project.capitalization_years,
-                ]
-                log.debug("Inputs without: %s", input_wo)
+            input_wo = [
+                self.ef.t_co2_eq,
+                module.ef_t2,
+                module.fuel_consumption_start,
+                module.fuel_consumption_wo,
+                change_rate.name,
+                project.implementation_years,
+                project.capitalization_years,
+            ]
+            log.debug("Inputs without: %s", input_wo)
 
-                math_wo = FuelConsumption(*input_wo)
-                math_wo.calculate_emissions()
+            self.math_wo = FuelConsumption(*input_wo)
+            self.math_wo.calculate_emissions()
 
         elif macro_fuel_type == "Solid":
             log.debug("Solid fuel")
-            if is_with(input):
-                log.debug("IS WITH")
-                input_w = [
-                    ef.net_calorific_value,
-                    ef.co2,
-                    ef.ch4,
-                    ef.n2o,
-                    input.account_for_co2,
-                    project.gw_potential.ch4,
-                    project.gw_potential.n2o,
-                    input.ef_t2,
-                    input.fuel_consumption_start,
-                    input.fuel_consumption_w,
-                    activity.change_rate.name,
-                    project.implementation_years,
-                    project.capitalization_years,
-                ]
-                log.debug("Inputs with: %s", input_w)
+            input_w = [
+                self.ef.net_calorific_value,
+                self.ef.co2,
+                self.ef.ch4,
+                self.ef.n2o,
+                module.account_for_co2,
+                project.gw_potential.ch4,
+                project.gw_potential.n2o,
+                module.ef_t2,
+                module.fuel_consumption_start,
+                module.fuel_consumption_w,
+                activity.change_rate.name,
+                project.implementation_years,
+                project.capitalization_years,
+            ]
+            log.debug("Inputs with: %s", input_w)
 
-                math_w = SolidConsumption(*input_w)
-                math_w.calculate_emissions()
+            self.math_w = SolidConsumption(*input_w)
+            self.math_w.calculate_emissions()
 
-            if is_without(input):
-                log.debug("IS WITHOUT")
-                input_wo = [
-                    ef.net_calorific_value,
-                    ef.co2,
-                    ef.ch4,
-                    ef.n2o,
-                    input.account_for_co2,
-                    project.gw_potential.ch4,
-                    project.gw_potential.n2o,
-                    input.ef_t2,
-                    input.fuel_consumption_start,
-                    input.fuel_consumption_wo,
-                    activity.change_rate.name,
-                    project.implementation_years,
-                    project.capitalization_years,
-                ]
-                log.debug("Inputs without: %s", input_wo)
+            input_wo = [
+                self.ef.net_calorific_value,
+                self.ef.co2,
+                self.ef.ch4,
+                self.ef.n2o,
+                module.account_for_co2,
+                project.gw_potential.ch4,
+                project.gw_potential.n2o,
+                module.ef_t2,
+                module.fuel_consumption_start,
+                module.fuel_consumption_wo,
+                activity.change_rate.name,
+                project.implementation_years,
+                project.capitalization_years,
+            ]
+            log.debug("Inputs without: %s", input_wo)
 
-                math_wo = SolidConsumption(*input_wo)
-                math_wo.calculate_emissions()
+            self.math_wo = SolidConsumption(*input_wo)
+            self.math_wo.calculate_emissions()
 
         else:
             raise ValueError(f"Fuel type {macro_fuel_type} not supported by calculations.")
 
-        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
-        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+        results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
+        results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
         results_tuple = (results_w, results_wo)
 
@@ -3522,42 +3532,267 @@ class FuelCalculator(BaseCalculator):
         log.debug("")
         return results_tuple
 
-    def defaults(self) -> DefaultData:
-        pass
-
 
 class SettlementCalculator(BaseCalculator):
     """
     Calculator for settlements
     """
 
+    def __init__(self, module) -> None:
+        super().__init__(module)
+        module: Settlement = module
+
+        self.inputs_start_w = []
+        self.inputs_start_wo = []
+        self.inputs_w = []
+        self.inputs_wo = []
+        self.soc = SimpleNamespace(value=0)
+
+        self.nitrous_ef = SimpleNamespace(value=0)
+
+        self.ef_start = SimpleNamespace(value=0)
+        self.ef_w = SimpleNamespace(value=0)
+        self.ef_wo = SimpleNamespace(value=0)
+
+        self.flu_start = SimpleNamespace(value=1)
+        self.fi_start = SimpleNamespace(value=1)
+        self.fmg_start = SimpleNamespace(value=1)
+
+        self.flu_w = SimpleNamespace(value=1)
+        self.fi_w = SimpleNamespace(value=1)
+        self.fmg_w = SimpleNamespace(value=1)
+
+        self.flu_wo = SimpleNamespace(value=1)
+        self.fi_wo = SimpleNamespace(value=1)
+        self.fmg_wo = SimpleNamespace(value=1)
+
+        self.math_start_w = None
+        self.math_start_wo = None
+        self.math_w = None
+        self.math_wo = None
+
+    def get_defaults(self, calculate=False) -> dict:
+        log.debug("START SettlementCalculator.get_defaults")
+        module: Settlement = self.data
+        activity: Activity = module.activity
+        project: Project = activity.project
+        luc: LandUseChange = module.land_use_change
+
+        climate: Climate = module.activity.climate_t2 or module.activity.project.climate
+        moisture: Moisture = module.activity.moisture_t2 or module.activity.project.moisture
+
+        cm = {
+            "climate": climate,
+            "moisture": moisture,
+        }
+
+        self.soc = utils.get_or_raise(ipcc.SoilOrganicCarbon, cm | {"soil_type": project.soil_type}, f"SOC not found for {climate.name} climate, {moisture.name} moisture and {project.soil_type.name} soil type not found. Please enter tier 2 value.")
+        self.nitrous_ef = utils.get_or_raise(ipcc.NitrousEmissionFactor, {"moisture": moisture}, f"Nitrous EF not found for {moisture.name} moisture")
+
+        if module.is_business_as_usual() or module.is_luc_remaining_same():
+            self.ef_start: ipcc.SettlementEF = utils.get_or_raise(ipcc.SettlementEF, {"settlement_type": module.settlement_type_start, "climate": climate, "moisture": moisture}, f"Settlement EF not found for {module.settlement_type_start.name}")
+            self.flu_start = SimpleNamespace(value=self.ef_start.flu)
+            self.fi_start = SimpleNamespace(value=self.ef_start.fi)
+            self.fmg_start = SimpleNamespace(value=self.ef_start.fmg)
+
+        if module.is_with():
+            self.ef_w: ipcc.SettlementEF = utils.get_or_raise(ipcc.SettlementEF, {"settlement_type": module.settlement_type_w, "climate": climate, "moisture": moisture}, f"Settlement EF not found for {module.settlement_type_w.name}")
+            self.flu_w = SimpleNamespace(value=self.ef_w.flu)
+            self.fi_w = SimpleNamespace(value=self.ef_w.fi)
+            self.fmg_w = SimpleNamespace(value=self.ef_w.fmg)
+
+        if module.is_without():
+            self.ef_wo: ipcc.SettlementEF = utils.get_or_raise(ipcc.SettlementEF, {"settlement_type": module.settlement_type_wo, "climate": climate, "moisture": moisture}, f"Settlement EF not found for {module.settlement_type_wo.name}")
+            self.flu_wo = SimpleNamespace(value=self.ef_wo.flu)
+            self.fi_wo = SimpleNamespace(value=self.ef_wo.fi)
+            self.fmg_wo = SimpleNamespace(value=self.ef_wo.fmg)
+
+        if luc and module.settlement_type_start.name.casefold() != "paved settlement":
+            module_start, module_w, module_wo = luc.get_modules()
+
+            is_paved_w = module.is_with() and module.settlement_type_w.name.casefold() == "paved settlement"
+            is_paved_wo = module.is_without() and module.settlement_type_wo.name.casefold() == "paved settlement"
+
+            if is_paved_w or is_paved_wo:
+                flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.WITHOUT)
+                fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.WITHOUT)
+                fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.WITHOUT)
+
+                self.soc.value = self.soc.value * flu_start * fi_start * fmg_start  # SOCinitial
+
+        log.debug("END SettlementCalculator.get_defaults")
+
     def calculate(self) -> Result:
-        input: Settlement = self.data
+        log.debug("START SettlementCalculator.calculate")
+        module: Settlement = self.data
+        activity: Activity = module.activity
+        project: Project = activity.project
+
         res_w = MathResult(
-            input.activity.project.implementation_years,
-            input.activity.project.capitalization_years,
+            module.activity.project.implementation_years,
+            module.activity.project.capitalization_years,
         )
         res_wo = MathResult(
-            input.activity.project.implementation_years,
-            input.activity.project.capitalization_years,
+            module.activity.project.implementation_years,
+            module.activity.project.capitalization_years,
         )
 
-        for building in input.buildings.all():
+        self.get_defaults()
+
+        if module.is_luc_remaining_same():
+            log.debug("LUC remaining same")
+
+            self.inputs_start_w = [
+                *[module.area, 0],
+                project.implementation_years,
+                project.capitalization_years,
+                activity.change_rate.name,
+                project.gw_potential.n2o,
+                self.nitrous_ef.value,
+                self.soc.value,
+                self.soc.value,
+                module.soc_t2_start,
+                module.soc_t2_w,
+                False,
+                self.fmg_start.value,
+                self.fmg_w.value,
+                module.fmg_t2_start,
+                module.fmg_t2_w,
+                self.flu_start.value,
+                self.flu_w.value,
+                module.flu_t2_start,
+                module.flu_t2_w,
+                self.fi_start.value,
+                self.fi_w.value,
+                module.fi_t2_start,
+                module.fi_t2_w,
+                0,  # Delay
+            ]
+
+            self.math_start_w = NotCultivatedLand(*self.inputs_start_w)
+            self.math_start_w.calculate_emissions()
+
+        if module.is_business_as_usual():
+
+            self.inputs_start_wo = [
+                *[module.area, 0],
+                project.implementation_years,
+                project.capitalization_years,
+                activity.change_rate.name,
+                project.gw_potential.n2o,
+                self.nitrous_ef.value,
+                self.soc.value,
+                self.soc.value,
+                module.soc_t2_start,
+                module.soc_t2_wo,
+                False,
+                self.fmg_start.value,
+                self.fmg_wo.value,
+                module.fmg_t2_start,
+                module.fmg_t2_wo,
+                self.flu_start.value,
+                self.flu_wo.value,
+                module.flu_t2_start,
+                module.flu_t2_wo,
+                self.fi_start.value,
+                self.fi_wo.value,
+                module.fi_t2_start,
+                module.fi_t2_wo,
+                0,  # Delay
+            ]
+
+            self.math_start_wo = NotCultivatedLand(*self.inputs_start_wo)
+            self.math_start_wo.calculate_emissions()
+
+        if module.is_with():
+
+            self.inputs_w = [
+                *[0, module.area],
+                project.implementation_years,
+                project.capitalization_years,
+                activity.change_rate.name,
+                project.gw_potential.n2o,
+                self.nitrous_ef.value,
+                self.soc.value,  # SOCinitial
+                self.soc.value,
+                module.soc_t2_start,
+                module.soc_t2_w,
+                True,
+                self.fmg_start.value,
+                self.fmg_w.value,
+                module.fmg_t2_start,
+                module.fmg_t2_w,
+                self.flu_start.value,
+                self.flu_w.value,
+                module.flu_t2_start,
+                module.flu_t2_w,
+                self.fi_start.value,
+                self.fi_w.value,
+                module.fi_t2_start,
+                module.fi_t2_w,
+                0,  # Delay
+            ]
+
+            self.math_w = NotCultivatedLand(*self.inputs_w)
+            self.math_w.calculate_emissions()
+
+        if module.is_without():
+
+            self.inputs_wo = [
+                *[0, module.area],
+                project.implementation_years,
+                project.capitalization_years,
+                activity.change_rate.name,
+                project.gw_potential.n2o,
+                self.nitrous_ef.value,
+                self.soc.value,
+                self.soc.value,
+                module.soc_t2_start,
+                module.soc_t2_wo,
+                True,
+                self.fmg_start.value,
+                self.fmg_wo.value,
+                module.fmg_t2_start,
+                module.fmg_t2_wo,
+                self.flu_start.value,
+                self.flu_wo.value,
+                module.flu_t2_start,
+                module.flu_t2_wo,
+                self.fi_start.value,
+                self.fi_wo.value,
+                module.fi_t2_start,
+                module.fi_t2_wo,
+                0,  # Delay
+            ]
+
+            self.math_wo = NotCultivatedLand(*self.inputs_wo)
+            self.math_wo.calculate_emissions()
+
+        results_start_w = self.math_start_w.result if self.math_start_w else MathResult(project.implementation_years, project.capitalization_years)
+        results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(project.implementation_years, project.capitalization_years)
+        results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
+        results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
+
+        res_w += results_start_w
+        res_wo += results_start_wo
+
+        res_w += results_w
+        res_wo += results_wo
+
+        for building in module.buildings.all():
             r_w, r_wo = BuildingCalculator(building).calculate()
 
             res_w += r_w
             res_wo += r_wo
 
-        for road in input.roads.all():
+        for road in module.roads.all():
             r_w, r_wo = RoadCalculator(road).calculate()
 
             res_w += r_w
             res_wo += r_wo
 
+        log.debug("END SettlementCalculator.calculate")
         return (res_w, res_wo)
-
-    def get_defaults(self, calculate=False) -> dict:
-        return super().get_defaults(calculate)
 
 
 class BuildingCalculator(BaseCalculator):
@@ -3565,56 +3800,62 @@ class BuildingCalculator(BaseCalculator):
     Calculator for buildings and roads.
     """
 
+    def __init__(self, input) -> None:
+        super().__init__(input)
+
+        self.ef: ipcc.BuildingEmissionFactor = None
+
+    def get_defaults(self, calculate=False) -> dict:
+        super().get_defaults(calculate)
+
+        module: Building = self.data
+
+        # TODO: What do we need the start scenario for?
+        # TODO: Define if all the fields of an input are required after creation
+        self.ef = utils.get_or_raise(ipcc.BuildingEmissionFactor, {"building_type": module.building_type}, f"Could not find Building EF for {module.building_type}")
+
     def calculate(self) -> list[Result]:
         """
         Calculate emissions for a single Building module.
         """
 
-        input: Building = self.data
-        parent: Settlement = input.parent
+        module: Building = self.data
+        parent: Settlement = module.parent
         activity: Activity = parent.activity
         project: Project = activity.project
 
-        math_w = None
-        math_wo = None
+        self.get_defaults()
 
-        # TODO: What do we need the start scenario for?
-        # TODO: Define if all the fields of an input are required after creation
-        ef = utils.get_or_raise(ipcc.BuildingEmissionFactor, {"building_type": input.building_type}, f"Could not find Building EF for {input.building_type}")
-
-        inputs_w = [
-            ef.value,
-            input.ef_t2_w,
-            input.area_m2_w,
+        self.inputs_w = [
+            self.ef.value,
+            module.ef_t2_w,
+            module.area_m2_w,
             project.implementation_years,
             project.capitalization_years,
             activity.change_rate.name,
         ]
 
-        math_w = MathRoads(*inputs_w)
-        math_w.calculate_emissions()
+        self.math_w = MathRoads(*self.inputs_w)
+        self.math_w.calculate_emissions()
 
-        inputs_wo = [
-            ef.value,
-            input.ef_t2_wo,
-            input.area_m2_wo,
+        self.inputs_wo = [
+            self.ef.value,
+            module.ef_t2_wo,
+            module.area_m2_wo,
             project.implementation_years,
             project.capitalization_years,
             activity.change_rate.name,
         ]
 
-        math_wo = MathRoads(*inputs_wo)
-        math_wo.calculate_emissions()
+        self.math_wo = MathRoads(*self.inputs_wo)
+        self.math_wo.calculate_emissions()
 
-        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
-        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
-        results_tuple = (results_w, results_wo)
+        results_tuple = (self.results_w, self.results_wo)
 
         return results_tuple
-
-    def get_defaults(self, calculate=False) -> dict:
-        return super().get_defaults(calculate)
 
 
 class RoadCalculator(BaseCalculator):
@@ -3622,59 +3863,61 @@ class RoadCalculator(BaseCalculator):
     Calculator for buildings and roads.
     """
 
+    def __init__(self, input) -> None:
+        super().__init__(input)
+
+        self.ef: ipcc.RoadEmissionFactor = None
+
+    def get_defaults(self, calculate=False) -> dict:
+        super().get_defaults(calculate)
+
+        module: Road = self.data
+        self.ef = utils.get_or_raise(ipcc.RoadEmissionFactor, {"road_type": module.road_type}, f"Could not find Road EF for {module.road_type.name}")
+
     def calculate(self) -> list[Result]:
         """
         Calculate emissions for a single Building module.
         """
 
-        input: Road = self.data
-        parent: Settlement = input.parent
+        module: Road = self.data
+        parent: Settlement = module.parent
         activity: Activity = parent.activity
         project: Project = activity.project
 
-        math_w = None
-        math_wo = None
+        self.get_defaults()
 
-        ef = utils.get_or_raise(ipcc.RoadEmissionFactor, {"road_type": input.road_type}, f"Could not find Road EF for {input.road_type.name}")
-
-        # TODO: Tell Peter to add this to the model
-        area = input.length_km_w * input.width_m_start
-
-        inputs_w = [
-            ef.value,
-            input.ef_t2_w,
-            area,
+        self.inputs_w = [
+            self.ef.value,
+            module.ef_t2_w,
+            module.length_km_w,
+            module.width_m_start,
             project.implementation_years,
             project.capitalization_years,
             activity.change_rate.name,
         ]
 
-        math_w = MathRoads(*inputs_w)
-        math_w.calculate_emissions()
+        self.math_w = MathRoads(*self.inputs_w)
+        self.math_w.calculate_emissions()
 
-        area = input.length_km_wo * input.width_m_start
-
-        inputs_wo = [
-            ef.value,
-            input.ef_t2_wo,
-            area,
+        self.inputs_wo = [
+            self.ef.value,
+            module.ef_t2_wo,
+            module.length_km_wo,
+            module.width_m_start,
             project.implementation_years,
             project.capitalization_years,
             activity.change_rate.name,
         ]
 
-        math_wo = MathRoads(*inputs_wo)
-        math_wo.calculate_emissions()
+        self.math_wo = MathRoads(*self.inputs_wo)
+        self.math_wo.calculate_emissions()
 
-        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
-        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
-        results_tuple = (results_w, results_wo)
+        results_tuple = (self.results_w, self.results_wo)
 
         return results_tuple
-
-    def get_defaults(self, calculate=False) -> dict:
-        return super().get_defaults(calculate)
 
 
 class LivestockCalculator(BaseCalculator):
@@ -3695,7 +3938,336 @@ class LivestockCalculator(BaseCalculator):
 
         climate: Climate = activity.climate_t2 or project.climate
         moisture: Moisture = activity.moisture_t2 or project.moisture
-        region: Region = project.country.region
+
+        self.LEACHING_MULTI = LivestockParameter.objects.get(name="LEACHING_MULTIPLIER").value
+        self.volatilization_multi = ipcc.ManureManagementVolatilizationMultiplier.objects.get(moisture=moisture)
+
+        if module.is_start():
+
+            production_category_region_flt = {
+                "livestock_production_type": module.livestock_production_type_start,
+                "livestock_category_type": module.livestock_category_type,
+                "ipcc_region": country.ipcc_region,
+            }
+
+            manure_ef_flt = {
+                "livestock_category_type": module.livestock_category_type,
+                "livestock_production_type": module.livestock_production_type_start,
+                "climate": climate,
+                "moisture": moisture,
+            }
+
+            ch4 = {
+                "emission_type__name": utils.EmissionTypes.CH4.value,
+            }
+
+            n2o = {
+                "emission_type__name": utils.EmissionTypes.N2O.value,
+            }
+
+            volatilization = {
+                "emission_type__name": utils.EmissionTypes.N2O_VOLATILIZATION.value,
+            }
+
+            leaching = {
+                "emission_type__name": utils.EmissionTypes.N2O_LEACHING.value,
+            }
+
+            prp = {
+                "manure_management_type__name": utils.ManureManagementTypes.PRP.value,
+            }
+
+            # TAM
+            self.tam_ch4_start = utils.get_or_raise(ipcc.LivestockTAM, production_category_region_flt, f"Could not find TAM (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
+
+            # VSER
+            self.vser_ch4_start = utils.get_or_raise(ipcc.LivestockVSER, production_category_region_flt, f"Could not find VSER (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
+
+            # EF CH4 PRP
+            self.ef_ch4_prp_start = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | ch4 | prp, f"Could not find EF CH4 PRP (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
+
+            # EF CH4 PRP of other systems
+            self.ef_ch4_systems_start = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | ch4, f"Could not find EF CH4 Systems (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}", method="filter").exclude(**prp).order_by("manure_management_type__name")
+            self.ef_ch4_system_values_start = [system.value for system in self.ef_ch4_systems_start]
+
+            # Animal Waste PRP
+            self.animal_waste_prp_start = utils.get_or_raise(ipcc.LivestockAWMS, production_category_region_flt | prp | {"manure_management_type__name": utils.ManureManagementTypes.PRP.value}, f"Could not find Animal Waste PRP (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
+
+            # Animal Waste PRP of other systems
+            self.animal_waste_management_systems_start = utils.get_or_raise(ipcc.LivestockAWMS, production_category_region_flt, f"Could not find Animal Waste Management Systems (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}", method="filter").exclude(**prp).order_by("manure_management_type__name")
+            self.animal_waste_management_systems_values_start = [system.value for system in self.animal_waste_management_systems_start]
+
+            # Enteric CH4
+            self.enteric_ch4_start = utils.get_or_raise(ipcc.MethaneEntericFermentationFactor, production_category_region_flt, f"Could not find Enteric CH4 (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
+
+            # PRP N2O Direct EF
+            self.prp_n2o_direct_ef_start = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | n2o | prp, f"Could not find PRP N2O Direct EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
+
+            # PRP N2O Volatilization EF
+            self.prp_n2o_volatilization_ef_start = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | prp | volatilization, f"Could not find PRP N2O Volatilization EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
+
+            # PRP N2O Leaching EF
+            self.prp_n2o_leaching_ef_start = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | prp | leaching, f"Could not find PRP N2O Leaching EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
+
+            # PRP N2O Direct EF of other systems
+            self.ef_n2o_direct_systems_start = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | n2o, f"Could not find N2O Direct EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}", method="filter").exclude(**prp).order_by("manure_management_type__name")
+            self.ef_n2o_direct_systems_start = [s.value for s in self.ef_n2o_direct_systems_start]
+
+            # PRP N2O Volatilization EF of other systems
+            self.ef_n2o_volatilization_systems_start = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | volatilization, f"Could not find N2O Volatilization EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}", method="filter").exclude(**prp).order_by("manure_management_type__name")
+            self.ef_n2o_volatilization_systems_start = [s.value for s in self.ef_n2o_volatilization_systems_start]
+
+            # PRP N2O Leaching EF of other systems
+            self.ef_n2o_leaching_systems_start = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | leaching, f"Could not find N2O Leaching EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}", method="filter").exclude(**prp).order_by("manure_management_type__name")
+            self.ef_n2o_leaching_systems_start = [s.value for s in self.ef_n2o_leaching_systems_start]
+
+            # NER
+            self.ner_start = utils.get_or_raise(ipcc.LivestockNER, production_category_region_flt, f"Could not find NER (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
+
+            # Complementary Manure Management
+
+            self.n2o_ef_t2_start = None
+            self.n2o_volatilization_ef_t2_start = None
+            self.n2o_leaching_ef_t2_start = None
+            self.ch4_ef_t2_start = None
+
+            complementary_mm = {"manure_management_type": module.complementary_manure_management_type_start}
+
+            if module.complementary_manure_management_type_start is not None:
+
+                self.n2o_ef_t2_start = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | n2o | complementary_mm, f"Could not find N2O EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
+                if self.n2o_ef_t2_start:
+                    self.n2o_ef_t2_start = self.n2o_ef_t2_start.value
+
+                self.n2o_volatilization_ef_t2_start = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | volatilization | complementary_mm, f"Could not find N2O Volatilization EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
+                if self.n2o_volatilization_ef_t2_start:
+                    self.n2o_volatilization_ef_t2_start = self.n2o_volatilization_ef_t2_start.value
+
+                self.n2o_leaching_ef_t2_start = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | leaching | complementary_mm, f"Could not find N2O Leaching EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
+                if self.n2o_leaching_ef_t2_start:
+                    self.n2o_leaching_ef_t2_start = self.n2o_leaching_ef_t2_start.value
+
+                self.ch4_ef_t2_start = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | ch4 | complementary_mm, f"Could not find CH4 EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
+                if self.ch4_ef_t2_start:
+                    self.ch4_ef_t2_start = self.ch4_ef_t2_start.value
+
+        if module.is_with():
+
+            production_category_region_flt = {
+                "livestock_production_type": module.livestock_production_type_w,
+                "livestock_category_type": module.livestock_category_type,
+                "ipcc_region": country.ipcc_region,
+            }
+
+            manure_ef_flt = {
+                "livestock_category_type": module.livestock_category_type,
+                "livestock_production_type": module.livestock_production_type_w,
+                "climate": climate,
+                "moisture": moisture,
+            }
+
+            ch4 = {
+                "emission_type__name": utils.EmissionTypes.CH4.value,
+            }
+
+            n2o = {
+                "emission_type__name": utils.EmissionTypes.N2O.value,
+            }
+
+            volatilization = {
+                "emission_type__name": utils.EmissionTypes.N2O_VOLATILIZATION.value,
+            }
+
+            leaching = {
+                "emission_type__name": utils.EmissionTypes.N2O_LEACHING.value,
+            }
+
+            prp = {
+                "manure_management_type__name": utils.ManureManagementTypes.PRP.value,
+            }
+
+            # TAM
+            self.tam_ch4_w = utils.get_or_raise(ipcc.LivestockTAM, production_category_region_flt, f"Could not find TAM (START) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
+
+            # VSER
+            self.vser_ch4_w = utils.get_or_raise(ipcc.LivestockVSER, production_category_region_flt, f"Could not find VSER (START) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
+
+            # EF CH4 PRP
+            self.ef_ch4_prp_w = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | ch4 | prp, f"Could not find EF CH4 PRP (START) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
+
+            # EF CH4 PRP of other systems
+            self.ef_ch4_systems_w = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | ch4, f"Could not find EF CH4 Systems (START) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}", method="filter").exclude(**prp).order_by("manure_management_type__name")
+            self.ef_ch4_system_values_w = [system.value for system in self.ef_ch4_systems_w]
+
+            # Animal Waste PRP
+            self.animal_waste_prp_w = utils.get_or_raise(ipcc.LivestockAWMS, production_category_region_flt | prp | {"manure_management_type__name": utils.ManureManagementTypes.PRP.value}, f"Could not find Animal Waste PRP (START) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
+
+            # Animal Waste PRP of other systems
+            self.animal_waste_management_systems_w = utils.get_or_raise(ipcc.LivestockAWMS, production_category_region_flt, f"Could not find Animal Waste Management Systems (START) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}", method="filter").exclude(**prp).order_by("manure_management_type__name")
+            self.animal_waste_management_systems_values_w = [system.value for system in self.animal_waste_management_systems_w]
+
+            # Enteric CH4
+            self.enteric_ch4_w = utils.get_or_raise(ipcc.MethaneEntericFermentationFactor, production_category_region_flt, f"Could not find Enteric CH4 (START) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
+
+            # PRP N2O Direct EF
+            self.prp_n2o_direct_ef_w = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | n2o | prp, f"Could not find PRP N2O Direct EF (START) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
+
+            # PRP N2O Volatilization EF
+            self.prp_n2o_volatilization_ef_w = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | prp | volatilization, f"Could not find PRP N2O Volatilization EF (START) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
+
+            # PRP N2O Leaching EF
+            self.prp_n2o_leaching_ef_w = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | prp | leaching, f"Could not find PRP N2O Leaching EF (START) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
+
+            # PRP N2O Direct EF of other systems
+            self.ef_n2o_direct_systems_w = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | n2o, f"Could not find N2O Direct EF (START) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}", method="filter").exclude(**prp).order_by("manure_management_type__name")
+            self.ef_n2o_direct_systems_w = [s.value for s in self.ef_n2o_direct_systems_w]
+
+            # PRP N2O Volatilization EF of other systems
+            self.ef_n2o_volatilization_systems_w = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | volatilization, f"Could not find N2O Volatilization EF (START) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}", method="filter").exclude(**prp).order_by("manure_management_type__name")
+            self.ef_n2o_volatilization_systems_w = [s.value for s in self.ef_n2o_volatilization_systems_w]
+
+            # PRP N2O Leaching EF of other systems
+            self.ef_n2o_leaching_systems_w = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | leaching, f"Could not find N2O Leaching EF (START) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}", method="filter").exclude(**prp).order_by("manure_management_type__name")
+            self.ef_n2o_leaching_systems_w = [s.value for s in self.ef_n2o_leaching_systems_w]
+
+            # NER
+            self.ner_w = utils.get_or_raise(ipcc.LivestockNER, production_category_region_flt, f"Could not find NER (START) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
+
+            # Complementary Manure Management
+
+            self.n2o_ef_t2_w = None
+            self.n2o_volatilization_ef_t2_w = None
+            self.n2o_leaching_ef_t2_w = None
+            self.ch4_ef_t2_w = None
+
+            complementary_mm = {"manure_management_type": module.complementary_manure_management_type_w}
+
+            if module.complementary_manure_management_type_w is not None:
+
+                self.n2o_ef_t2_w = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | n2o | complementary_mm, f"Could not find N2O EF (START) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
+                if self.n2o_ef_t2_w:
+                    self.n2o_ef_t2_w = self.n2o_ef_t2_w.value
+
+                self.n2o_volatilization_ef_t2_w = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | volatilization | complementary_mm, f"Could not find N2O Volatilization EF (START) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
+                if self.n2o_volatilization_ef_t2_w:
+                    self.n2o_volatilization_ef_t2_w = self.n2o_volatilization_ef_t2_w.value
+
+                self.n2o_leaching_ef_t2_w = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | leaching | complementary_mm, f"Could not find N2O Leaching EF (START) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
+                if self.n2o_leaching_ef_t2_w:
+                    self.n2o_leaching_ef_t2_w = self.n2o_leaching_ef_t2_w.value
+
+                self.ch4_ef_t2_w = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | ch4 | complementary_mm, f"Could not find CH4 EF (START) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
+                if self.ch4_ef_t2_w:
+                    self.ch4_ef_t2_w = self.ch4_ef_t2_w.value
+
+        if module.is_without():
+
+            production_category_region_flt = {
+                "livestock_production_type": module.livestock_production_type_wo,
+                "livestock_category_type": module.livestock_category_type,
+                "ipcc_region": country.ipcc_region,
+            }
+
+            manure_ef_flt = {
+                "livestock_category_type": module.livestock_category_type,
+                "livestock_production_type": module.livestock_production_type_wo,
+                "climate": climate,
+                "moisture": moisture,
+            }
+
+            ch4 = {
+                "emission_type__name": utils.EmissionTypes.CH4.value,
+            }
+
+            n2o = {
+                "emission_type__name": utils.EmissionTypes.N2O.value,
+            }
+
+            volatilization = {
+                "emission_type__name": utils.EmissionTypes.N2O_VOLATILIZATION.value,
+            }
+
+            leaching = {
+                "emission_type__name": utils.EmissionTypes.N2O_LEACHING.value,
+            }
+
+            prp = {
+                "manure_management_type__name": utils.ManureManagementTypes.PRP.value,
+            }
+
+            # TAM
+            self.tam_ch4_wo = utils.get_or_raise(ipcc.LivestockTAM, production_category_region_flt, f"Could not find TAM (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
+
+            # VSER
+            self.vser_ch4_wo = utils.get_or_raise(ipcc.LivestockVSER, production_category_region_flt, f"Could not find VSER (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
+
+            # EF CH4 PRP
+            self.ef_ch4_prp_wo = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | ch4 | prp, f"Could not find EF CH4 PRP (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
+
+            # EF CH4 PRP of other systems
+            self.ef_ch4_systems_wo = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | ch4, f"Could not find EF CH4 Systems (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}", method="filter").exclude(**prp).order_by("manure_management_type__name")
+            self.ef_ch4_system_values_wo = [system.value for system in self.ef_ch4_systems_wo]
+
+            # Animal Waste PRP
+            self.animal_waste_prp_wo = utils.get_or_raise(ipcc.LivestockAWMS, production_category_region_flt | prp | {"manure_management_type__name": utils.ManureManagementTypes.PRP.value}, f"Could not find Animal Waste PRP (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
+
+            # Animal Waste PRP of other systems
+            self.animal_waste_management_systems_wo = utils.get_or_raise(ipcc.LivestockAWMS, production_category_region_flt, f"Could not find Animal Waste Management Systems (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}", method="filter").exclude(**prp).order_by("manure_management_type__name")
+            self.animal_waste_management_systems_values_wo = [system.value for system in self.animal_waste_management_systems_wo]
+
+            # Enteric CH4
+            self.enteric_ch4_wo = utils.get_or_raise(ipcc.MethaneEntericFermentationFactor, production_category_region_flt, f"Could not find Enteric CH4 (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
+
+            # PRP N2O Direct EF
+            self.prp_n2o_direct_ef_wo = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | n2o | prp, f"Could not find PRP N2O Direct EF (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
+
+            # PRP N2O Volatilization EF
+            self.prp_n2o_volatilization_ef_wo = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | prp | volatilization, f"Could not find PRP N2O Volatilization EF (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
+
+            # PRP N2O Leaching EF
+            self.prp_n2o_leaching_ef_wo = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | prp | leaching, f"Could not find PRP N2O Leaching EF (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
+
+            # PRP N2O Direct EF of other systems
+            self.ef_n2o_direct_systems_wo = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | n2o, f"Could not find N2O Direct EF (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}", method="filter").exclude(**prp).order_by("manure_management_type__name")
+            self.ef_n2o_direct_systems_wo = [s.value for s in self.ef_n2o_direct_systems_wo]
+
+            # PRP N2O Volatilization EF of other systems
+            self.ef_n2o_volatilization_systems_wo = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | volatilization, f"Could not find N2O Volatilization EF (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}", method="filter").exclude(**prp).order_by("manure_management_type__name")
+            self.ef_n2o_volatilization_systems_wo = [s.value for s in self.ef_n2o_volatilization_systems_wo]
+
+            # PRP N2O Leaching EF of other systems
+            self.ef_n2o_leaching_systems_wo = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | leaching, f"Could not find N2O Leaching EF (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}", method="filter").exclude(**prp).order_by("manure_management_type__name")
+            self.ef_n2o_leaching_systems_wo = [s.value for s in self.ef_n2o_leaching_systems_wo]
+
+            # NER
+            self.ner_wo = utils.get_or_raise(ipcc.LivestockNER, production_category_region_flt, f"Could not find NER (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
+
+            # Complementary Manure Management
+
+            self.n2o_ef_t2_wo = None
+            self.n2o_volatilization_ef_t2_wo = None
+            self.n2o_leaching_ef_t2_wo = None
+            self.ch4_ef_t2_wo = None
+
+            complementary_mm = {"manure_management_type": module.complementary_manure_management_type_wo}
+
+            if module.complementary_manure_management_type_wo is not None:
+
+                self.n2o_ef_t2_wo = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | n2o | complementary_mm, f"Could not find N2O EF (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
+                if self.n2o_ef_t2_wo:
+                    self.n2o_ef_t2_wo = self.n2o_ef_t2_wo.value
+
+                self.n2o_volatilization_ef_t2_wo = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | volatilization | complementary_mm, f"Could not find N2O Volatilization EF (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
+                if self.n2o_volatilization_ef_t2_wo:
+                    self.n2o_volatilization_ef_t2_wo = self.n2o_volatilization_ef_t2_wo.value
+
+                self.n2o_leaching_ef_t2_wo = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | leaching | complementary_mm, f"Could not find N2O Leaching EF (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
+                if self.n2o_leaching_ef_t2_wo:
+                    self.n2o_leaching_ef_t2_wo = self.n2o_leaching_ef_t2_wo.value
+
+                self.ch4_ef_t2_wo = utils.get_or_raise(ipcc.LivestockManureEF, manure_ef_flt | ch4 | complementary_mm, f"Could not find CH4 EF (START) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
+                if self.ch4_ef_t2_wo:
+                    self.ch4_ef_t2_wo = self.ch4_ef_t2_wo.value
 
         return
 
@@ -3708,754 +4280,13 @@ class LivestockCalculator(BaseCalculator):
         module: Livestock = self.data
         activity: Activity = module.activity
         project: Project = activity.project
-        country: Country = project.country
 
-        climate: Climate = activity.climate_t2 or project.climate
-        moisture: Moisture = activity.moisture_t2 or project.moisture
-        region: Region = project.country.region
+        self.math_w = None
+        self.math_wo = None
 
-        LEACHING_MULTI = LivestockParameter.objects.get(name="LEACHING_MULTIPLIER").value
-        volatilization_multi = ipcc.ManureManagementVolatilizationMultiplier.objects.get(moisture=moisture)
+        self.get_defaults()
 
-        print("emission type", utils.EmissionTypes.CH4.value)
-        print("livestock category type", module.livestock_category_type)
-        print("livestock production type", module.livestock_production_type_start)
-        print("climate", climate)
-        print("moisture", moisture)
-        print("IPCC Region", country.ipcc_region)
-        print("manure management type", utils.ManureManagementTypes.PRP.value)
-
-        # TAM Values
-
-        try:
-            tam_ch4_start = ipcc.LivestockTAM.objects.get(
-                livestock_production_type=module.livestock_production_type_start,
-                livestock_category_type=module.livestock_category_type,
-                ipcc_region=country.ipcc_region,
-            )
-        except ipcc.LivestockTAM.DoesNotExist:
-            raise ValueError(f"Could not find TAM (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
-
-        try:
-            tam_ch4_w = ipcc.LivestockTAM.objects.get(
-                livestock_production_type=module.livestock_production_type_w,
-                livestock_category_type=module.livestock_category_type,
-                ipcc_region=country.ipcc_region,
-            )
-        except ipcc.LivestockTAM.DoesNotExist:
-            raise ValueError(f"Could not find TAM (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
-
-        try:
-            tam_ch4_wo = ipcc.LivestockTAM.objects.get(
-                livestock_production_type=module.livestock_production_type_wo,
-                livestock_category_type=module.livestock_category_type,
-                ipcc_region=country.ipcc_region,
-            )
-        except ipcc.LivestockTAM.DoesNotExist:
-            raise ValueError(f"Could not find TAM (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
-
-        # VSER Values
-
-        try:
-            vser_ch4_start = ipcc.LivestockVSER.objects.get(
-                livestock_production_type=module.livestock_production_type_start,
-                livestock_category_type=module.livestock_category_type,
-                ipcc_region=country.ipcc_region,
-            )
-        except ipcc.LivestockVSER.DoesNotExist:
-            raise ValueError(f"Could not find VSER (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
-
-        try:
-            vser_ch4_w = ipcc.LivestockVSER.objects.get(
-                livestock_production_type=module.livestock_production_type_w,
-                livestock_category_type=module.livestock_category_type,
-                ipcc_region=country.ipcc_region,
-            )
-        except ipcc.LivestockVSER.DoesNotExist:
-            raise ValueError(f"Could not find VSER (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
-
-        try:
-            vser_ch4_wo = ipcc.LivestockVSER.objects.get(
-                livestock_production_type=module.livestock_production_type_wo,
-                livestock_category_type=module.livestock_category_type,
-                ipcc_region=country.ipcc_region,
-            )
-        except ipcc.LivestockVSER.DoesNotExist:
-            raise ValueError(f"Could not find VSER (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
-
-        # EF CH4 PRP Values
-
-        try:
-            ef_ch4_prp_start = ipcc.LivestockManureEF.objects.get(
-                emission_type__name=utils.EmissionTypes.CH4.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_start,
-                climate=climate,
-                moisture=moisture,
-                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-            )
-        except ipcc.LivestockManureEF.DoesNotExist:
-            raise ValueError(f"Could not find EF CH4 PRP (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-        try:
-            ef_ch4_prp_w = ipcc.LivestockManureEF.objects.get(
-                emission_type__name=utils.EmissionTypes.CH4.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_w,
-                climate=climate,
-                moisture=moisture,
-                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-            )
-        except ipcc.LivestockManureEF.DoesNotExist:
-            raise ValueError(f"Could not find EF CH4 PRP (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-        try:
-            ef_ch4_prp_wo = ipcc.LivestockManureEF.objects.get(
-                emission_type__name=utils.EmissionTypes.CH4.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_wo,
-                climate=climate,
-                moisture=moisture,
-                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-            )
-        except ipcc.LivestockManureEF.DoesNotExist:
-            raise ValueError(f"Could not find EF CH4 PRP (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-        # EF CH4 Systems Values
-
-        try:
-            ef_ch4_systems_start = (
-                ipcc.LivestockManureEF.objects.filter(
-                    emission_type__name=utils.EmissionTypes.CH4.value,
-                    livestock_category_type=module.livestock_category_type,
-                    livestock_production_type=module.livestock_production_type_start,
-                    climate=climate,
-                    moisture=moisture,
-                )
-                .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
-                .order_by("manure_management_type__name")
-            )
-        except ipcc.LivestockManureEF.DoesNotExist:
-            raise ValueError(f"Could not find EF CH4 Systems (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-        try:
-            ef_ch4_systems_w = (
-                ipcc.LivestockManureEF.objects.filter(
-                    emission_type__name=utils.EmissionTypes.CH4.value,
-                    livestock_category_type=module.livestock_category_type,
-                    livestock_production_type=module.livestock_production_type_w,
-                    climate=climate,
-                    moisture=moisture,
-                )
-                .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
-                .order_by("manure_management_type__name")
-            )
-        except ipcc.LivestockManureEF.DoesNotExist:
-            raise ValueError(f"Could not find EF CH4 Systems (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-        try:
-            ef_ch4_systems_wo = (
-                ipcc.LivestockManureEF.objects.filter(
-                    emission_type__name=utils.EmissionTypes.CH4.value,
-                    livestock_category_type=module.livestock_category_type,
-                    livestock_production_type=module.livestock_production_type_wo,
-                    climate=climate,
-                    moisture=moisture,
-                )
-                .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
-                .order_by("manure_management_type__name")
-            )
-        except ipcc.LivestockManureEF.DoesNotExist:
-            raise ValueError(f"Could not find EF CH4 Systems (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-        ef_ch4_system_values_start = [system.value for system in ef_ch4_systems_start]
-        ef_ch4_system_values_w = [system.value for system in ef_ch4_systems_w]
-        ef_ch4_system_values_wo = [system.value for system in ef_ch4_systems_wo]
-
-        # Animal Waste PRP Values
-
-        try:
-            animal_waste_prp_start = ipcc.LivestockAWMS.objects.get(
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_start,
-                ipcc_region=country.ipcc_region,
-                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-            )
-        except ipcc.LivestockAWMS.DoesNotExist:
-            raise ValueError(f"Could not find Animal Waste PRP (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
-
-        try:
-            animal_waste_prp_w = ipcc.LivestockAWMS.objects.get(
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_w,
-                ipcc_region=country.ipcc_region,
-                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-            )
-        except ipcc.LivestockAWMS.DoesNotExist:
-            raise ValueError(f"Could not find Animal Waste PRP (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
-
-        try:
-            animal_waste_prp_wo = ipcc.LivestockAWMS.objects.get(
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_wo,
-                ipcc_region=country.ipcc_region,
-                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-            )
-        except ipcc.LivestockAWMS.DoesNotExist:
-            raise ValueError(f"Could not find Animal Waste PRP (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
-
-        ##### Animal Waste Management Systems Values #####
-
-        try:
-            animal_waste_management_systems_start = (
-                ipcc.LivestockAWMS.objects.filter(
-                    livestock_category_type=module.livestock_category_type,
-                    livestock_production_type=module.livestock_production_type_start,
-                    ipcc_region=country.ipcc_region,
-                )
-                .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
-                .order_by("manure_management_type__name")
-            )
-        except ipcc.LivestockAWMS.DoesNotExist:
-            raise ValueError(f"Could not find Animal Waste Management Systems (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
-
-        try:
-            animal_waste_management_systems_w = (
-                ipcc.LivestockAWMS.objects.filter(
-                    livestock_category_type=module.livestock_category_type,
-                    livestock_production_type=module.livestock_production_type_w,
-                    ipcc_region=country.ipcc_region,
-                )
-                .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
-                .order_by("manure_management_type__name")
-            )
-        except ipcc.LivestockAWMS.DoesNotExist:
-            raise ValueError(f"Could not find Animal Waste Management Systems (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
-
-        try:
-            animal_waste_management_systems_wo = (
-                ipcc.LivestockAWMS.objects.filter(
-                    livestock_category_type=module.livestock_category_type,
-                    livestock_production_type=module.livestock_production_type_wo,
-                    ipcc_region=country.ipcc_region,
-                )
-                .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
-                .order_by("manure_management_type__name")
-            )
-        except ipcc.LivestockAWMS.DoesNotExist:
-            raise ValueError(f"Could not find Animal Waste Management Systems (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
-
-        # list comprehension to get the animal waste management systems values
-        animal_waste_management_systems_values_start = [system.value for system in animal_waste_management_systems_start]
-        animal_waste_management_systems_values_w = [system.value for system in animal_waste_management_systems_w]
-        animal_waste_management_systems_values_wo = [system.value for system in animal_waste_management_systems_wo]
-
-        ##### Enteric CH4 Values #####
-
-        try:
-            ch4_enteric_start = ipcc.MethaneEntericFermentationFactor.objects.get(
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_start,
-                ipcc_region=country.ipcc_region,
-            )
-        except ipcc.MethaneEntericFermentationFactor.DoesNotExist:
-            raise ValueError(f"Could not find Enteric CH4 (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
-
-        try:
-            ch4_enteric_w = ipcc.MethaneEntericFermentationFactor.objects.get(
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_w,
-                ipcc_region=country.ipcc_region,
-            )
-        except ipcc.MethaneEntericFermentationFactor.DoesNotExist:
-            raise ValueError(f"Could not find Enteric CH4 (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
-
-        try:
-            ch4_enteric_wo = ipcc.MethaneEntericFermentationFactor.objects.get(
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_wo,
-                ipcc_region=country.ipcc_region,
-            )
-        except ipcc.MethaneEntericFermentationFactor.DoesNotExist:
-            raise ValueError(f"Could not find Enteric CH4 (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {country.ipcc_region.name}")
-
-        ##### PRP N2O Direct EF Values #####
-
-        try:
-            prp_n2o_direct_ef_start = ipcc.LivestockManureEF.objects.get(
-                emission_type__name=utils.EmissionTypes.N2O.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_start,
-                climate=climate,
-                moisture=moisture,
-                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-            )
-        except ipcc.LivestockManureEF.DoesNotExist:
-            raise ValueError(f"Could not find PRP N2O Direct EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-        try:
-            prp_n2o_direct_ef_w = ipcc.LivestockManureEF.objects.get(
-                emission_type__name=utils.EmissionTypes.N2O.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_w,
-                climate=climate,
-                moisture=moisture,
-                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-            )
-        except ipcc.LivestockManureEF.DoesNotExist:
-            raise ValueError(f"Could not find PRP N2O Direct EF (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-        try:
-            prp_n2o_direct_ef_wo = ipcc.LivestockManureEF.objects.get(
-                emission_type__name=utils.EmissionTypes.N2O.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_wo,
-                climate=climate,
-                moisture=moisture,
-                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-            )
-        except ipcc.LivestockManureEF.DoesNotExist:
-            raise ValueError(f"Could not find PRP N2O Direct EF (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-        ##### PRP N2O Volatilization EF Values #####
-
-        try:
-            prp_n2o_volatilization_ef_start = ipcc.LivestockManureEF.objects.get(
-                emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_start,
-                climate=climate,
-                moisture=moisture,
-                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-            )
-        except ipcc.LivestockManureEF.DoesNotExist:
-            raise ValueError(f"Could not find PRP N2O Volatilization EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-        try:
-            prp_n2o_volatilization_ef_w = ipcc.LivestockManureEF.objects.get(
-                emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_w,
-                climate=climate,
-                moisture=moisture,
-                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-            )
-        except ipcc.LivestockManureEF.DoesNotExist:
-            raise ValueError(f"Could not find PRP N2O Volatilization EF (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-        try:
-            prp_n2o_volatilization_ef_wo = ipcc.LivestockManureEF.objects.get(
-                emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_wo,
-                climate=climate,
-                moisture=moisture,
-                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-            )
-        except ipcc.LivestockManureEF.DoesNotExist:
-            raise ValueError(f"Could not find PRP N2O Volatilization EF (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-        ##### PRP N2O Leaching EF Values #####
-
-        try:
-            prp_n2o_leaching_ef_start = ipcc.LivestockManureEF.objects.get(
-                emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_wo,
-                climate=climate,
-                moisture=moisture,
-                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-            )
-        except ipcc.LivestockManureEF.DoesNotExist:
-            raise ValueError(f"Could not find PRP N2O Leaching EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-        try:
-            prp_n2o_leaching_ef_w = ipcc.LivestockManureEF.objects.get(
-                emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_wo,
-                climate=climate,
-                moisture=moisture,
-                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-            )
-        except ipcc.LivestockManureEF.DoesNotExist:
-            raise ValueError(f"Could not find PRP N2O Leaching EF (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-        try:
-            prp_n2o_leaching_ef_wo = ipcc.LivestockManureEF.objects.get(
-                emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_wo,
-                climate=climate,
-                moisture=moisture,
-                manure_management_type__name=utils.ManureManagementTypes.PRP.value,
-            )
-        except ipcc.LivestockManureEF.DoesNotExist:
-            raise ValueError(f"Could not find PRP N2O Leaching EF (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-        ##### N2O Direct EF Values #####
-
-        ef_n2o_direct_systems_start = (
-            ipcc.LivestockManureEF.objects.filter(
-                emission_type__name=utils.EmissionTypes.N2O.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_start,
-                climate=climate,
-                moisture=moisture,
-            )
-            .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
-            .order_by("manure_management_type__name")
-        )
-        if not ef_n2o_direct_systems_start:
-            raise ValueError(f"Could not find N2O Direct EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-        ef_n2o_direct_systems_w = (
-            ipcc.LivestockManureEF.objects.filter(
-                emission_type__name=utils.EmissionTypes.N2O.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_w,
-                climate=climate,
-                moisture=moisture,
-            )
-            .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
-            .order_by("manure_management_type__name")
-        )
-        if not ef_n2o_direct_systems_w:
-            raise ValueError(f"Could not find N2O Direct EF (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-        ef_n2o_direct_systems_wo = (
-            ipcc.LivestockManureEF.objects.filter(
-                emission_type__name=utils.EmissionTypes.N2O.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_wo,
-                climate=climate,
-                moisture=moisture,
-            )
-            .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
-            .order_by("manure_management_type__name")
-        )
-        if not ef_n2o_direct_systems_wo:
-            raise ValueError(f"Could not find N2O Direct EF (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-        ef_n2o_direct_systems_start = [s.value for s in ef_n2o_direct_systems_start]
-        ef_n2o_direct_systems_w = [s.value for s in ef_n2o_direct_systems_w]
-        ef_n2o_direct_systems_wo = [s.value for s in ef_n2o_direct_systems_wo]
-
-        ##### N2O Volatilization EF Values #####
-
-        ef_n2o_volatilization_systems_start = (
-            ipcc.LivestockManureEF.objects.filter(
-                emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_start,
-                climate=climate,
-                moisture=moisture,
-            )
-            .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
-            .order_by("manure_management_type__name")
-        )
-        if not ef_n2o_volatilization_systems_start:
-            raise ValueError(f"Could not find N2O Volatilization EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-        ef_n2o_volatilization_systems_w = (
-            ipcc.LivestockManureEF.objects.filter(
-                emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_w,
-                climate=climate,
-                moisture=moisture,
-            )
-            .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
-            .order_by("manure_management_type__name")
-        )
-        if not ef_n2o_volatilization_systems_w:
-            raise ValueError(f"Could not find N2O Volatilization EF (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-        ef_n2o_volatilization_systems_wo = (
-            ipcc.LivestockManureEF.objects.filter(
-                emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_wo,
-                climate=climate,
-                moisture=moisture,
-            )
-            .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
-            .order_by("manure_management_type__name")
-        )
-        if not ef_n2o_volatilization_systems_wo:
-            raise ValueError(f"Could not find N2O Volatilization EF (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-        ef_n2o_volatilization_systems_start = [s.value for s in ef_n2o_volatilization_systems_start]
-        ef_n2o_volatilization_systems_w = [s.value for s in ef_n2o_volatilization_systems_w]
-        ef_n2o_volatilization_systems_wo = [s.value for s in ef_n2o_volatilization_systems_wo]
-
-        ##### N2O Leaching EF Values #####
-
-        ef_n2o_leaching_systems_start = (
-            ipcc.LivestockManureEF.objects.filter(
-                emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_start,
-                climate=climate,
-                moisture=moisture,
-            )
-            .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
-            .order_by("manure_management_type__name")
-        )
-        if not ef_n2o_leaching_systems_start:
-            raise ValueError(f"Could not find N2O Leaching EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-        ef_n2o_leaching_systems_w = (
-            ipcc.LivestockManureEF.objects.filter(
-                emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_w,
-                climate=climate,
-                moisture=moisture,
-            )
-            .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
-            .order_by("manure_management_type__name")
-        )
-        if not ef_n2o_leaching_systems_w:
-            raise ValueError(f"Could not find N2O Leaching EF (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-        ef_n2o_leaching_systems_wo = (
-            ipcc.LivestockManureEF.objects.filter(
-                emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_wo,
-                climate=climate,
-                moisture=moisture,
-            )
-            .exclude(manure_management_type__name=utils.ManureManagementTypes.PRP.value)
-            .order_by("manure_management_type__name")
-        )
-        if not ef_n2o_leaching_systems_wo:
-            raise ValueError(f"Could not find N2O Leaching EF (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-        ef_n2o_leaching_systems_start = [s.value for s in ef_n2o_leaching_systems_start]
-        ef_n2o_leaching_systems_w = [s.value for s in ef_n2o_leaching_systems_w]
-        ef_n2o_leaching_systems_wo = [s.value for s in ef_n2o_leaching_systems_wo]
-
-        ##### NER Values #####
-
-        try:
-            ner_start = ipcc.LivestockNER.objects.get(
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_start,
-                ipcc_region=project.country.ipcc_region,
-            )
-        except ipcc.LivestockNER.DoesNotExist:
-            raise ValueError(f"Could not find NER (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {project.country.ipcc_region.name}")
-
-        try:
-            ner_w = ipcc.LivestockNER.objects.get(
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_w,
-                ipcc_region=project.country.ipcc_region,
-            )
-        except ipcc.LivestockNER.DoesNotExist:
-            raise ValueError(f"Could not find NER (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {project.country.ipcc_region.name}")
-
-        try:
-            ner_wo = ipcc.LivestockNER.objects.get(
-                livestock_category_type=module.livestock_category_type,
-                livestock_production_type=module.livestock_production_type_wo,
-                ipcc_region=project.country.ipcc_region,
-            )
-        except ipcc.LivestockNER.DoesNotExist:
-            raise ValueError(f"Could not find NER (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {project.country.ipcc_region.name}")
-
-        ##### Complementary Manure Management Values #####
-
-        n2o_ef_t2_start = None
-        n2o_volatilization_ef_t2_start = None
-        n2o_leaching_ef_t2_start = None
-        ch4_ef_t2_start = None
-        if module.complementary_manure_management_type_start is not None:
-
-            try:
-                n2o_ef_t2_start = ipcc.LivestockManureEF.objects.get(
-                    emission_type__name=utils.EmissionTypes.N2O.value,
-                    livestock_category_type=module.livestock_category_type,
-                    livestock_production_type=module.livestock_production_type_start,
-                    climate=climate,
-                    moisture=moisture,
-                    manure_management_type=module.complementary_manure_management_type_start,
-                )
-                if n2o_ef_t2_start:
-                    n2o_ef_t2_start = n2o_ef_t2_start.value
-            except ipcc.LivestockManureEF.DoesNotExist:
-                raise ValueError(f"Could not find N2O EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-            try:
-                n2o_volatilization_ef_t2_start = ipcc.LivestockManureEF.objects.get(
-                    emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
-                    livestock_category_type=module.livestock_category_type,
-                    livestock_production_type=module.livestock_production_type_start,
-                    climate=climate,
-                    moisture=moisture,
-                    manure_management_type=module.complementary_manure_management_type_start,
-                )
-                if n2o_volatilization_ef_t2_start:
-                    n2o_volatilization_ef_t2_start = n2o_volatilization_ef_t2_start.value
-            except ipcc.LivestockManureEF.DoesNotExist:
-                raise ValueError(f"Could not find N2O Volatilization EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-            try:
-                n2o_leaching_ef_t2_start = ipcc.LivestockManureEF.objects.get(
-                    emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
-                    livestock_category_type=module.livestock_category_type,
-                    livestock_production_type=module.livestock_production_type_start,
-                    climate=climate,
-                    moisture=moisture,
-                    manure_management_type=module.complementary_manure_management_type_start,
-                )
-                if n2o_leaching_ef_t2_start:
-                    n2o_leaching_ef_t2_start = n2o_leaching_ef_t2_start.value
-            except ipcc.LivestockManureEF.DoesNotExist:
-                raise ValueError(f"Could not find N2O Leaching EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-            try:
-                ch4_ef_t2_start = ipcc.LivestockManureEF.objects.get(
-                    emission_type__name=utils.EmissionTypes.CH4.value,
-                    livestock_category_type=module.livestock_category_type,
-                    livestock_production_type=module.livestock_production_type_start,
-                    climate=climate,
-                    moisture=moisture,
-                    manure_management_type=module.complementary_manure_management_type_start,
-                )
-                if ch4_ef_t2_start:
-                    ch4_ef_t2_start = ch4_ef_t2_start.value
-            except ipcc.LivestockManureEF.DoesNotExist:
-                raise ValueError(f"Could not find CH4 EF (START) for {module.livestock_production_type_start.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-        n2o_ef_t2_w = None
-        n2o_volatilization_ef_t2_w = None
-        n2o_leaching_ef_t2_w = None
-        ch4_ef_t2_w = None
-        if module.complementary_manure_management_type_w is not None:
-            try:
-                n2o_ef_t2_w = ipcc.LivestockManureEF.objects.get(
-                    emission_type__name=utils.EmissionTypes.N2O.value,
-                    livestock_category_type=module.livestock_category_type,
-                    livestock_production_type=module.livestock_production_type_w,
-                    climate=climate,
-                    moisture=moisture,
-                    manure_management_type=module.complementary_manure_management_type_w,
-                )
-                if n2o_ef_t2_w:
-                    n2o_ef_t2_w = n2o_ef_t2_w.value
-            except ipcc.LivestockManureEF.DoesNotExist:
-                raise ValueError(f"Could not find N2O EF (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-            try:
-                n2o_volatilization_ef_t2_w = ipcc.LivestockManureEF.objects.get(
-                    emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
-                    livestock_category_type=module.livestock_category_type,
-                    livestock_production_type=module.livestock_production_type_w,
-                    climate=climate,
-                    moisture=moisture,
-                    manure_management_type=module.complementary_manure_management_type_w,
-                )
-                if n2o_volatilization_ef_t2_w:
-                    n2o_volatilization_ef_t2_w = n2o_volatilization_ef_t2_w.value
-            except ipcc.LivestockManureEF.DoesNotExist:
-                raise ValueError(f"Could not find N2O Volatilization EF (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-            try:
-                n2o_leaching_ef_t2_w = ipcc.LivestockManureEF.objects.get(
-                    emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
-                    livestock_category_type=module.livestock_category_type,
-                    livestock_production_type=module.livestock_production_type_w,
-                    climate=climate,
-                    moisture=moisture,
-                    manure_management_type=module.complementary_manure_management_type_w,
-                )
-                if n2o_leaching_ef_t2_w:
-                    n2o_leaching_ef_t2_w = n2o_leaching_ef_t2_w.value
-            except ipcc.LivestockManureEF.DoesNotExist:
-                raise ValueError(f"Could not find N2O Leaching EF (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-            try:
-                ch4_ef_t2_w = ipcc.LivestockManureEF.objects.get(
-                    emission_type__name=utils.EmissionTypes.CH4.value,
-                    livestock_category_type=module.livestock_category_type,
-                    livestock_production_type=module.livestock_production_type_w,
-                    climate=climate,
-                    moisture=moisture,
-                    manure_management_type=module.complementary_manure_management_type_w,
-                )
-                if ch4_ef_t2_w:
-                    ch4_ef_t2_w = ch4_ef_t2_w.value
-            except ipcc.LivestockManureEF.DoesNotExist:
-                raise ValueError(f"Could not find CH4 EF (WITH) for {module.livestock_production_type_w.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-        n2o_ef_t2_wo = None
-        n2o_volatilization_ef_t2_wo = None
-        n2o_leaching_ef_t2_wo = None
-        ch4_ef_t2_wo = None
-        if module.complementary_manure_management_type_wo is not None:
-            try:
-                n2o_ef_t2_wo = ipcc.LivestockManureEF.objects.get(
-                    emission_type__name=utils.EmissionTypes.N2O.value,
-                    livestock_category_type=module.livestock_category_type,
-                    livestock_production_type=module.livestock_production_type_wo,
-                    climate=climate,
-                    moisture=moisture,
-                    manure_management_type=module.complementary_manure_management_type_wo,
-                )
-                if n2o_ef_t2_wo:
-                    n2o_ef_t2_wo = n2o_ef_t2_wo.value
-            except ipcc.LivestockManureEF.DoesNotExist:
-                raise ValueError(f"Could not find N2O EF (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-            try:
-                n2o_volatilization_ef_t2_wo = ipcc.LivestockManureEF.objects.get(
-                    emission_type__name=utils.EmissionTypes.N2O_VOLATILIZATION.value,
-                    livestock_category_type=module.livestock_category_type,
-                    livestock_production_type=module.livestock_production_type_wo,
-                    climate=climate,
-                    moisture=moisture,
-                    manure_management_type=module.complementary_manure_management_type_wo,
-                )
-                if n2o_volatilization_ef_t2_wo:
-                    n2o_volatilization_ef_t2_wo = n2o_volatilization_ef_t2_wo.value
-            except ipcc.LivestockManureEF.DoesNotExist:
-                raise ValueError(f"Could not find N2O Volatilization EF (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-            try:
-                n2o_leaching_ef_t2_wo = ipcc.LivestockManureEF.objects.get(
-                    emission_type__name=utils.EmissionTypes.N2O_LEACHING.value,
-                    livestock_category_type=module.livestock_category_type,
-                    livestock_production_type=module.livestock_production_type_wo,
-                    climate=climate,
-                    moisture=moisture,
-                    manure_management_type=module.complementary_manure_management_type_wo,
-                )
-                if n2o_leaching_ef_t2_wo:
-                    n2o_leaching_ef_t2_wo = n2o_leaching_ef_t2_wo.value
-            except ipcc.LivestockManureEF.DoesNotExist:
-                raise ValueError(f"Could not find N2O Leaching EF (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-            try:
-                ch4_ef_t2_wo = ipcc.LivestockManureEF.objects.get(
-                    emission_type__name=utils.EmissionTypes.CH4.value,
-                    livestock_category_type=module.livestock_category_type,
-                    livestock_production_type=module.livestock_production_type_wo,
-                    climate=climate,
-                    moisture=moisture,
-                    manure_management_type=module.complementary_manure_management_type_wo,
-                )
-                if ch4_ef_t2_wo:
-                    ch4_ef_t2_wo = ch4_ef_t2_wo.value
-            except ipcc.LivestockManureEF.DoesNotExist:
-                raise ValueError(f"Could not find CH4 EF (WITHOUT) for {module.livestock_production_type_wo.name}, {module.livestock_category_type.name}, {climate.name}, {moisture.name}")
-
-        math_w = None
-        math_wo = None
-
-        if is_with(module):
+        if module.is_with():
             log.debug("Calculating emissions for WITH")
 
             self.inputs_w = [
@@ -4465,73 +4296,73 @@ class LivestockCalculator(BaseCalculator):
                 project.gw_potential.ch4,
                 module.heads_number_start,
                 module.heads_number_w,
-                ch4_enteric_start.value,
-                ch4_enteric_w.value,
+                self.enteric_ch4_start.value,
+                self.enteric_ch4_w.value,
                 module.enteric_fermentation_t2_start,
                 module.enteric_fermentation_t2_w,
-                ef_ch4_prp_start.value,
-                ef_ch4_prp_w.value,
-                animal_waste_prp_start.value,
-                animal_waste_prp_w.value,
+                self.ef_ch4_prp_start.value,
+                self.ef_ch4_prp_w.value,
+                self.animal_waste_prp_start.value,
+                self.animal_waste_prp_w.value,
                 module.prp_percentage_t2_start,
                 module.prp_percentage_t2_w,
-                ef_ch4_system_values_start,
-                ef_ch4_system_values_w,
+                self.ef_ch4_system_values_start,
+                self.ef_ch4_system_values_w,
                 module.prp_ch4_t2_start,
                 module.prp_ch4_t2_w,
-                ch4_ef_t2_start,  ###
-                ch4_ef_t2_w,
+                self.ch4_ef_t2_start,  ###
+                self.ch4_ef_t2_w,
                 module.emission_factor_ch4_t2_start,
                 module.emission_factor_ch4_t2_w,
-                animal_waste_management_systems_values_start,
-                animal_waste_management_systems_values_w,
-                tam_ch4_start.value,
-                tam_ch4_w.value,
-                vser_ch4_start.value,
-                vser_ch4_w.value,
-                prp_n2o_direct_ef_start.value,
-                prp_n2o_direct_ef_w.value,
-                ef_n2o_direct_systems_start,
-                ef_n2o_direct_systems_w,
+                self.animal_waste_management_systems_values_start,
+                self.animal_waste_management_systems_values_w,
+                self.tam_ch4_start.value,
+                self.tam_ch4_w.value,
+                self.vser_ch4_start.value,
+                self.vser_ch4_w.value,
+                self.prp_n2o_direct_ef_start.value,
+                self.prp_n2o_direct_ef_w.value,
+                self.ef_n2o_direct_systems_start,
+                self.ef_n2o_direct_systems_w,
                 module.prp_n2o_t2_start,
                 module.prp_n2o_t2_w,
-                n2o_ef_t2_start,  ###
-                n2o_ef_t2_w,
+                self.n2o_ef_t2_start,  ###
+                self.n2o_ef_t2_w,
                 module.emission_factor_n2o_t2_start,
                 module.emission_factor_n2o_t2_w,
-                ner_start.value,
-                ner_w.value,
-                prp_n2o_volatilization_ef_start.value,
-                prp_n2o_volatilization_ef_w.value,
-                ef_n2o_volatilization_systems_start,
-                ef_n2o_volatilization_systems_w,
+                self.ner_start.value,
+                self.ner_w.value,
+                self.prp_n2o_volatilization_ef_start.value,
+                self.prp_n2o_volatilization_ef_w.value,
+                self.ef_n2o_volatilization_systems_start,
+                self.ef_n2o_volatilization_systems_w,
                 module.prp_n2o_t2_start,  # TODO: Maybe add specific t2 for volatilization
                 module.prp_n2o_t2_w,
-                n2o_volatilization_ef_t2_start,  ###
-                n2o_volatilization_ef_t2_w,
+                self.n2o_volatilization_ef_t2_start,  ###
+                self.n2o_volatilization_ef_t2_w,
                 module.emission_factor_n2o_t2_start,
                 module.emission_factor_n2o_t2_w,
-                prp_n2o_leaching_ef_start.value,
-                prp_n2o_leaching_ef_w.value,
-                ef_n2o_leaching_systems_start,
-                ef_n2o_leaching_systems_w,
+                self.prp_n2o_leaching_ef_start.value,
+                self.prp_n2o_leaching_ef_w.value,
+                self.ef_n2o_leaching_systems_start,
+                self.ef_n2o_leaching_systems_w,
                 module.prp_n2o_t2_start,  # TODO: Maybe add specific t2 for leaching
                 module.prp_n2o_t2_w,
-                n2o_leaching_ef_t2_start,  ###
-                n2o_leaching_ef_t2_w,
+                self.n2o_leaching_ef_t2_start,  ###
+                self.n2o_leaching_ef_t2_w,
                 module.emission_factor_n2o_t2_start,
                 module.emission_factor_n2o_t2_w,
                 project.gw_potential.n2o,
-                volatilization_multi.value,
-                LEACHING_MULTI,
+                self.volatilization_multi.value,
+                self.LEACHING_MULTI,
             ]
 
             log.debug(f"Inputs for WITH: {self.inputs_w}")
 
-            math_w = MathLivestock(*self.inputs_w)
-            math_w.calculate_emissions()
+            self.math_w = MathLivestock(*self.inputs_w)
+            self.math_w.calculate_emissions()
 
-        if is_without(module):
+        if module.is_without():
             log.debug("Calculating emissions for WITHOUT")
 
             self.inputs_wo = [
@@ -4541,73 +4372,73 @@ class LivestockCalculator(BaseCalculator):
                 project.gw_potential.ch4,
                 module.heads_number_start,
                 module.heads_number_wo,
-                ch4_enteric_start.value,
-                ch4_enteric_wo.value,
+                self.enteric_ch4_start.value,
+                self.enteric_ch4_wo.value,
                 module.enteric_fermentation_t2_start,
                 module.enteric_fermentation_t2_wo,
-                ef_ch4_prp_start.value,
-                ef_ch4_prp_wo.value,
-                animal_waste_prp_start.value,
-                animal_waste_prp_wo.value,
+                self.ef_ch4_prp_start.value,
+                self.ef_ch4_prp_wo.value,
+                self.animal_waste_prp_start.value,
+                self.animal_waste_prp_wo.value,
                 module.prp_percentage_t2_start,
                 module.prp_percentage_t2_wo,
-                ef_ch4_system_values_start,
-                ef_ch4_system_values_wo,
+                self.ef_ch4_system_values_start,
+                self.ef_ch4_system_values_wo,
                 module.prp_ch4_t2_start,
                 module.prp_ch4_t2_wo,
-                ch4_ef_t2_start,  ###
-                ch4_ef_t2_wo,
+                self.ch4_ef_t2_start,  ###
+                self.ch4_ef_t2_wo,
                 module.emission_factor_ch4_t2_start,
                 module.emission_factor_ch4_t2_wo,
-                animal_waste_management_systems_values_start,
-                animal_waste_management_systems_values_wo,
-                tam_ch4_start.value,
-                tam_ch4_wo.value,
-                vser_ch4_start.value,
-                vser_ch4_wo.value,
-                prp_n2o_direct_ef_start.value,
-                prp_n2o_direct_ef_wo.value,
-                ef_n2o_direct_systems_start,
-                ef_n2o_direct_systems_wo,
+                self.animal_waste_management_systems_values_start,
+                self.animal_waste_management_systems_values_wo,
+                self.tam_ch4_start.value,
+                self.tam_ch4_wo.value,
+                self.vser_ch4_start.value,
+                self.vser_ch4_wo.value,
+                self.prp_n2o_direct_ef_start.value,
+                self.prp_n2o_direct_ef_wo.value,
+                self.ef_n2o_direct_systems_start,
+                self.ef_n2o_direct_systems_wo,
                 module.prp_n2o_t2_start,
                 module.prp_n2o_t2_wo,
-                n2o_ef_t2_start,  ###
-                n2o_ef_t2_wo,
+                self.n2o_ef_t2_start,  ###
+                self.n2o_ef_t2_wo,
                 module.emission_factor_n2o_t2_start,
                 module.emission_factor_n2o_t2_wo,
-                ner_start.value,
-                ner_wo.value,
-                prp_n2o_volatilization_ef_start.value,
-                prp_n2o_volatilization_ef_wo.value,
-                ef_n2o_volatilization_systems_start,
-                ef_n2o_volatilization_systems_wo,
+                self.ner_start.value,
+                self.ner_wo.value,
+                self.prp_n2o_volatilization_ef_start.value,
+                self.prp_n2o_volatilization_ef_wo.value,
+                self.ef_n2o_volatilization_systems_start,
+                self.ef_n2o_volatilization_systems_wo,
                 module.prp_n2o_t2_start,  # TODO: Maybe add specific t2 for volatilization
                 module.prp_n2o_t2_wo,
-                n2o_volatilization_ef_t2_start,  ###
-                n2o_volatilization_ef_t2_wo,
+                self.n2o_volatilization_ef_t2_start,  ###
+                self.n2o_volatilization_ef_t2_wo,
                 module.emission_factor_n2o_t2_start,
                 module.emission_factor_n2o_t2_wo,
-                prp_n2o_leaching_ef_start.value,
-                prp_n2o_leaching_ef_wo.value,
-                ef_n2o_leaching_systems_start,
-                ef_n2o_leaching_systems_wo,
+                self.prp_n2o_leaching_ef_start.value,
+                self.prp_n2o_leaching_ef_wo.value,
+                self.ef_n2o_leaching_systems_start,
+                self.ef_n2o_leaching_systems_wo,
                 module.prp_n2o_t2_start,  # TODO: Maybe add specific t2 for leaching
                 module.prp_n2o_t2_wo,
-                n2o_leaching_ef_t2_start,  ###
-                n2o_leaching_ef_t2_wo,
+                self.n2o_leaching_ef_t2_start,  ###
+                self.n2o_leaching_ef_t2_wo,
                 module.emission_factor_n2o_t2_start,
                 module.emission_factor_n2o_t2_wo,
                 project.gw_potential.n2o,
-                volatilization_multi.value,
-                LEACHING_MULTI,
+                self.volatilization_multi.value,
+                self.LEACHING_MULTI,
             ]
             log.debug(f"Inputs for WITHOUT: {self.inputs_wo}")
 
-            math_wo = MathLivestock(*self.inputs_wo)
-            math_wo.calculate_emissions()
+            self.math_wo = MathLivestock(*self.inputs_wo)
+            self.math_wo.calculate_emissions()
 
-        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
-        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+        results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
+        results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
         log.debug("WITH breakdown")
         results_w.breakdown(by=BreakdownTypes.ACTIVITY)
@@ -4617,64 +4448,59 @@ class LivestockCalculator(BaseCalculator):
         log.debug(f"Results for WITH: {results_w}")
         return (results_w, results_wo)
 
-    def defaults(self) -> DefaultData:
-        self.calculate()
-
-        module: Livestock = self.data
-
-        defaults_start = {}
-        defaults_w = {}
-        defaults_wo = {}
-
-        if is_with(module):
-            math_w = MathLivestock(*self.inputs_w)
-            math_w_defaults = math_w.evaluate_tier_2_defaults()
-            defaults_w.update(math_w_defaults.start)
-            defaults_w.update(math_w_defaults.other)
-
-        if is_without(module):
-            math_wo = MathLivestock(*self.inputs_wo)
-            math_wo_defaults = math_wo.evaluate_tier_2_defaults()
-            defaults_wo.update(math_wo_defaults.start)
-            defaults_wo.update(math_wo_defaults.other)
-
-        return DefaultData(defaults_start, defaults_w, defaults_wo)
-
 
 class IrrigationCalculator(BaseCalculator):
     def calculate(self) -> list[Result]:
-        input: Irrigation = self.data
-        res_w = MathResult(
-            input.activity.project.implementation_years,
-            input.activity.project.capitalization_years,
+        module: Irrigation = self.data
+        self.results_w = MathResult(
+            module.activity.project.implementation_years,
+            module.activity.project.capitalization_years,
         )
-        res_wo = MathResult(
-            input.activity.project.implementation_years,
-            input.activity.project.capitalization_years,
+        self.results_wo = MathResult(
+            module.activity.project.implementation_years,
+            module.activity.project.capitalization_years,
         )
-        for system in input.irrigation_systems.all():
+        for system in module.irrigation_systems.all():
             r_w, r_wo = IrrigationSystemCalculator(system).calculate()
-            res_w += r_w
-            res_wo += r_wo
+            self.results_w += r_w
+            self.results_wo += r_wo
 
-        for phase in input.irrigation_phases.all():
+        for phase in module.irrigation_phases.all():
             r_w, r_wo = IrrigationPhaseCalculator(phase).calculate()
-            res_w += r_w
-            res_wo += r_wo
+            self.results_w += r_w
+            self.results_wo += r_wo
 
-        return (res_w, res_wo)
-
-    def get_defaults(self, input: Module) -> dict:
-        return super().get_defaults(input)
-
-    def defaults(self) -> DefaultData:
-        return super().defaults()
+        return (self.results_w, self.results_wo)
 
 
 class IrrigationSystemCalculator(BaseCalculator):
     """
     Calculates the emissions of the irrigation system
     """
+
+    def __init__(self, input) -> None:
+        super().__init__(input)
+
+        self.ef = SimpleNamespace(value=0)
+
+        self.inputs_w = []
+        self.inputs_wo = []
+
+        self.math_w = None
+        self.math_wo = None
+
+        self.results_w = None
+        self.results_wo = None
+
+    def get_defaults(self, calculate=False) -> dict:
+        super().get_defaults(calculate)
+
+        module: IrrigationSystem = self.data
+
+        try:
+            self.ef = ipcc.IrrigationSystemData.objects.get(irrigation_system_type=module.irrigation_system_type)
+        except ipcc.IrrigationSystemData.DoesNotExist:
+            raise ValueError(f"Could not find EF for {module.irrigation_system_type.name}")
 
     def calculate(self) -> list[Result]:
         """
@@ -4685,192 +4511,187 @@ class IrrigationSystemCalculator(BaseCalculator):
         activity: Activity = module.parent.activity
         project: Project = activity.project
 
-        try:
-            ef = ipcc.IrrigationSystemData.objects.get(irrigation_system_type=module.irrigation_system_type)
-        except ipcc.IrrigationSystemData.DoesNotExist:
-            raise ValueError(f"Could not find EF for {module.irrigation_system_type.name}")
+        self.get_defaults()
 
-        math_w = None
-        math_wo = None
+        self.inputs_w = [
+            self.ef.value,
+            module.ef_t2_start,
+            module.ha_start,
+            module.ha_w,
+            project.implementation_years,
+            project.capitalization_years,
+            activity.change_rate.name,
+        ]
 
-        if is_with(module):
-            inputs_w = [
-                ef.value,
-                module.ef_t2_start,
-                module.ha_start,
-                module.ha_w,
-                project.implementation_years,
-                project.capitalization_years,
-                activity.change_rate.name,
-            ]
+        self.math_w = NewIrrigation(*self.inputs_w)
+        self.math_w.calculate_emissions()
 
-            math_w = NewIrrigation(*inputs_w)
-            math_w.calculate_emissions()
+        self.inputs_wo = [
+            self.ef.value,
+            module.ef_t2_wo,
+            module.ha_start,
+            module.ha_wo,
+            project.implementation_years,
+            project.capitalization_years,
+            activity.change_rate.name,
+        ]
 
-        if is_without(module):
-            inputs_wo = [
-                ef.value,
-                module.ef_t2_wo,
-                module.ha_start,
-                module.ha_wo,
-                project.implementation_years,
-                project.capitalization_years,
-                activity.change_rate.name,
-            ]
+        self.math_wo = NewIrrigation(*self.inputs_wo)
+        self.math_wo.calculate_emissions()
 
-            math_wo = NewIrrigation(*inputs_wo)
-            math_wo.calculate_emissions()
+        self.results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
-        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
-        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
-
-        results_tuple = (results_w, results_wo)
+        results_tuple = (self.results_w, self.results_wo)
 
         return results_tuple
 
-    def get_defaults(self, calculate=False) -> dict:
-
-        module: IrrigationSystem = self.data
-        activity: Activity = module.parent.activity
-        project: Project = activity.project
-
-        try:
-            self.ef = ipcc.IrrigationSystemData.objects.get(irrigation_system_type=module.irrigation_system_type)
-        except ipcc.IrrigationSystemData.DoesNotExist:
-            raise ValueError(f"Could not find EF for {module.irrigation_system_type.name}")
-
-    def defaults(self) -> DefaultData:
-
-        return super().defaults()
-
 
 class IrrigationPhaseCalculator(BaseCalculator):
-    def calculate(self) -> list[Result]:
-        input: IrrigationPhase = self.data
-        activity: Activity = input.parent.activity
-        project: Project = activity.project
+
+    def __init__(self, input) -> None:
+        super().__init__(input)
+
+        self.ef = SimpleNamespace(value=0)
+        self.energy_db = SimpleNamespace(net_calorific_value=0, density=0)
+        self.pressure = SimpleNamespace(avg_pressure=0)
+        self.erh_electricity = SimpleNamespace(value=0)
+        self.transportation_loss = SimpleNamespace(value=0)
+        self.pumping_efficiency = SimpleNamespace(value=0)
+
+        self.inputs_start = []
+        self.inputs_w = []
+        self.inputs_wo = []
+
+        self.math_start = None
+        self.math_w = None
+        self.math_wo = None
+
+        self.results_start = None
+        self.results_w = None
+        self.results_wo = None
+
+    def get_defaults(self, calculate=False) -> dict:
+        super().get_defaults(calculate)
+
+        module: IrrigationPhase = self.data
 
         try:
-            ef = ipcc.IrrigationPhaseData.objects.get(fuel_type=input.fuel_type)
+            self.ef = ipcc.IrrigationPhaseData.objects.get(fuel_type=module.fuel_type)
         except ipcc.IrrigationPhaseData.DoesNotExist:
-            raise ValueError(f"Could not find EF for {input.fuel_type.name}")
+            raise ValueError(f"Could not find EF for {module.fuel_type.name}")
 
         try:
-            energy_db = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=input.fuel_type)
+            self.energy_db = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=module.fuel_type)
         except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find Energy Default Emission Factor for {input.fuel_type.name}")
+            raise ValueError(f"Could not find Energy Default Emission Factor for {module.fuel_type.name}")
 
         try:
-            pressure = ipcc.IrrigationPressureRequirement.objects.get(irrigation_system_type=input.irrigation_system_type)
+            self.pressure = ipcc.IrrigationPressureRequirement.objects.get(irrigation_system_type=module.irrigation_system_type)
         except ipcc.IrrigationPressureRequirement.DoesNotExist:
-            raise ValueError(f"Could not find Pressure Requirement for {input.irrigation_system_type.name}")
+            raise ValueError(f"Could not find Pressure Requirement for {module.irrigation_system_type.name}")
 
         try:
-            erh_electricity = IrrigationParameter.objects.get(name="ERH_ELECTRICITY").value if input.fuel_type.name == "Electricity" else None
+            self.erh_electricity = IrrigationParameter.objects.get(name="ERH_ELECTRICITY").value if module.fuel_type.name == "Electricity" else None
         except IrrigationParameter.DoesNotExist:
             raise ValueError(f"Could not find ERH_ELECTRICITY")
 
         try:
-            transportation_loss = IrrigationParameter.objects.get(name="TRANSPORTATION_LOSS")
+            self.transportation_loss = IrrigationParameter.objects.get(name="TRANSPORTATION_LOSS")
         except IrrigationParameter.DoesNotExist:
             raise ValueError(f"Could not find TRANSPORTATION_LOSS")
 
         try:
-            pumping_efficiency = IrrigationParameter.objects.get(name="PUMPING_EFFICIENCY")
+            self.pumping_efficiency = IrrigationParameter.objects.get(name="PUMPING_EFFICIENCY")
         except IrrigationParameter.DoesNotExist:
             raise ValueError(f"Could not find PUMPING_EFFICIENCY")
 
-        math_start = None
-        math_w = None
-        math_wo = None
+    def calculate(self) -> list[Result]:
+        module: IrrigationPhase = self.data
+        activity: Activity = module.parent.activity
+        project: Project = activity.project
 
-        inputs_start = [
-            ef.emission_factor,
-            input.ef_t2_start,
-            input.total_dynamic_head_t2,
-            pressure.avg_pressure,
-            input.average_pressure_t2,
-            pumping_efficiency.value,
-            input.pumping_efficiency_t2_start,
-            erh_electricity,
-            energy_db.net_calorific_value,
-            energy_db.density,
-            input.well_depth,
-            input.ha_start,
+        self.get_defaults()
+
+        self.inputs_start = [
+            self.ef.emission_factor,
+            module.ef_t2_start,
+            module.total_dynamic_head_t2,
+            self.pressure.avg_pressure,
+            module.average_pressure_t2,
+            self.pumping_efficiency.value,
+            module.pumping_efficiency_t2_start,
+            self.erh_electricity,
+            self.energy_db.net_calorific_value,
+            self.energy_db.density,
+            module.well_depth,
+            module.ha_start,
             0,
             activity.change_rate.name,
             project.implementation_years,
             project.capitalization_years,
-            transportation_loss.value if input.fuel_type.name == "Electricity" else 0,
-            input.gross_irrigation_water_start,
+            self.transportation_loss.value if module.fuel_type.name == "Electricity" else 0,
+            module.gross_irrigation_water_start,
         ]
 
-        math_start = OperationPhaseIrrigation(*inputs_start)
+        math_start = OperationPhaseIrrigation(*self.inputs_start)
         math_start.calculate_emissions()
 
-        if is_with(input):
-            inputs_w = [
-                ef.emission_factor,
-                input.ef_t2_w,
-                input.total_dynamic_head_t2,
-                pressure.avg_pressure,
-                input.average_pressure_t2,
-                pumping_efficiency.value,
-                input.pumping_efficiency_t2_w,
-                erh_electricity,
-                energy_db.net_calorific_value,
-                energy_db.density,
-                input.well_depth,
-                0,
-                input.ha_w,
-                activity.change_rate.name,
-                project.implementation_years,
-                project.capitalization_years,
-                transportation_loss.value if input.fuel_type.name == "Electricity" else 0,
-                input.gross_irrigation_water_w,
-            ]
+        self.inputs_w = [
+            self.ef.emission_factor,
+            module.ef_t2_w,
+            module.total_dynamic_head_t2,
+            self.pressure.avg_pressure,
+            module.average_pressure_t2,
+            self.pumping_efficiency.value,
+            module.pumping_efficiency_t2_w,
+            self.erh_electricity,
+            self.energy_db.net_calorific_value,
+            self.energy_db.density,
+            module.well_depth,
+            0,
+            module.ha_w,
+            activity.change_rate.name,
+            project.implementation_years,
+            project.capitalization_years,
+            self.transportation_loss.value if module.fuel_type.name == "Electricity" else 0,
+            module.gross_irrigation_water_w,
+        ]
 
-            math_w = OperationPhaseIrrigation(*inputs_w)
-            math_w.calculate_emissions()
+        self.math_w = OperationPhaseIrrigation(*self.inputs_w)
+        self.math_w.calculate_emissions()
 
-        if is_without(input):
-            inputs_wo = [
-                ef.emission_factor,
-                input.ef_t2_wo,
-                input.total_dynamic_head_t2,
-                pressure.avg_pressure,
-                input.average_pressure_t2,
-                pumping_efficiency.value,
-                input.pumping_efficiency_t2_wo,
-                erh_electricity,
-                energy_db.net_calorific_value,
-                energy_db.density,
-                input.well_depth,
-                0,
-                input.ha_wo,
-                activity.change_rate.name,
-                project.implementation_years,
-                project.capitalization_years,
-                transportation_loss.value if input.fuel_type.name == "Electricity" else 0,
-                input.gross_irrigation_water_wo,
-            ]
+        self.inputs_wo = [
+            self.ef.emission_factor,
+            module.ef_t2_wo,
+            module.total_dynamic_head_t2,
+            self.pressure.avg_pressure,
+            module.average_pressure_t2,
+            self.pumping_efficiency.value,
+            module.pumping_efficiency_t2_wo,
+            self.erh_electricity,
+            self.energy_db.net_calorific_value,
+            self.energy_db.density,
+            module.well_depth,
+            0,
+            module.ha_wo,
+            activity.change_rate.name,
+            project.implementation_years,
+            project.capitalization_years,
+            self.transportation_loss.value if module.fuel_type.name == "Electricity" else 0,
+            module.gross_irrigation_water_wo,
+        ]
 
-            math_wo = OperationPhaseIrrigation(*inputs_wo)
-            math_wo.calculate_emissions()
+        self.math_wo = OperationPhaseIrrigation(*self.inputs_wo)
+        self.math_wo.calculate_emissions()
 
-        results_start = math_start.result if math_start else MathResult(project.implementation_years, project.capitalization_years)
-        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
-        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_start = self.math_start.result if self.math_start else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
-        results_tuple = (results_w + results_start, results_wo + results_start)
+        results_tuple = (self.results_w + self.results_start, self.results_wo + self.results_start)
 
         return results_tuple
-
-    def get_defaults(self, input: Module) -> dict:
-        return super().get_defaults(input)
-
-    def defaults(self) -> DefaultData:
-        return super().defaults()
 
 
 class CoastalWetlandCalculator(BaseCalculator):
@@ -4878,13 +4699,32 @@ class CoastalWetlandCalculator(BaseCalculator):
     Calculates the emissions of the coastal wetland
     """
 
-    def get_defaults(self, calculate=False) -> dict:
-        return super().get_defaults(calculate)
+    def __init__(self, input) -> None:
+        super().__init__(input)
 
-    def calculate(self) -> Result:
-        """
-        Calculates the emissions of the coastal wetland
-        """
+        self.agb = SimpleNamespace(value=0)
+        self.bgb = SimpleNamespace(value=0)
+        self.litter = SimpleNamespace(value=0)
+        self.dw = SimpleNamespace(value=0)
+        self.soil_1m = SimpleNamespace(value=0)
+        self.ef_drainage = SimpleNamespace(value=0)
+        self.pc_c_lost_excavation = SimpleNamespace(value=0)
+        self.rewetting_c = SimpleNamespace(value=0)
+        self.rewetting_ch4 = SimpleNamespace(value=0)
+
+        self.soil_type_name = ""
+
+        self.inputs_w = []
+        self.inputs_wo = []
+
+        self.math_w = None
+        self.math_wo = None
+
+        self.results_w = None
+        self.results_wo = None
+
+    def get_defaults(self, calculate=False) -> dict:
+        super().get_defaults(calculate)
 
         module: CoastalWetland = self.data
         project: Project = module.activity.project
@@ -4894,57 +4734,64 @@ class CoastalWetlandCalculator(BaseCalculator):
             "moisture": project.moisture,
         }
 
-        soil_type_name = module.soil_type_t2.name if module.soil_type_t2 else "Mineral"
+        self.soil_type_name = module.soil_type_t2.name if module.soil_type_t2 else "Mineral"
 
         try:
-            agb = ipcc.CoastalAGB.objects.get(**cm, land_use_type=module.land_use_type)
+            self.agb = ipcc.CoastalAGB.objects.get(**cm, land_use_type=module.land_use_type)
         except ipcc.CoastalAGB.DoesNotExist:
             raise ValueError(f"Could not find AGB for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}")
 
         try:
-            bgb = ipcc.CoastalBGB.objects.get(**cm, land_use_type=module.land_use_type)
+            self.bgb = ipcc.CoastalBGB.objects.get(**cm, land_use_type=module.land_use_type)
         except ipcc.CoastalBGB.DoesNotExist:
             raise ValueError(f"Could not find BGB for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}")
 
         try:
-            litter = ipcc.CoastalLitter.objects.get(**cm, land_use_type=module.land_use_type)
+            self.litter = ipcc.CoastalLitter.objects.get(**cm, land_use_type=module.land_use_type)
         except ipcc.CoastalLitter.DoesNotExist:
             raise ValueError(f"Could not find Litter for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}")
 
         try:
-            dw = ipcc.CoastalDeadwood.objects.get(**cm, land_use_type=module.land_use_type)
+            self.dw = ipcc.CoastalDeadwood.objects.get(**cm, land_use_type=module.land_use_type)
         except ipcc.CoastalDeadwood.DoesNotExist:
             raise ValueError(f"Could not find Deadwood for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}")
 
         try:
-            soil_1m = ipcc.DefaultSoilCarbonStock1Meter.objects.get(**cm, land_use_type=module.land_use_type, soil_type__name=soil_type_name)
-        except ipcc.DefaultSoilCarbonStock1Meter.DoesNotExist:
-            raise ValueError(f"Could not find Soil 1m for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}, {soil_type_name}")
+            self.soil_1m = ipcc.DefaultSoilCarbonStock.objects.get(**cm, land_use_type=module.land_use_type, soil_type__name=self.soil_type_name)
+        except ipcc.DefaultSoilCarbonStock.DoesNotExist:
+            raise ValueError(f"Could not find Soil 1m for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}, {self.soil_type_name}")
 
         try:
-            ef_drainage = ipcc.DrainageEmissionFactor.objects.get(**cm, land_use_type=module.land_use_type)
+            self.ef_drainage = ipcc.DrainageEmissionFactor.objects.get(**cm, land_use_type=module.land_use_type)
         except ipcc.DrainageEmissionFactor.DoesNotExist:
             raise ValueError(f"Could not find EF Drainage for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}")
 
         try:
-            pc_c_lost_excavation = CoastalWetlandParameter.objects.get(name="PERCENTAGE_C_LOST_EXCAVATION")
+            self.pc_c_lost_excavation = CoastalWetlandParameter.objects.get(name="PERCENTAGE_C_LOST_EXCAVATION")
         except CoastalWetlandParameter.DoesNotExist:
             raise ValueError(f"Could not find PC C Lost Excavation")
 
         try:
-            rewetting_c = ipcc.RewettingCarbonFactor.objects.get(**cm, land_use_type=module.land_use_type, soil_type__name=soil_type_name)
+            self.rewetting_c = ipcc.RewettingCarbonFactor.objects.get(**cm, land_use_type=module.land_use_type, soil_type__name=self.soil_type_name)
         except ipcc.RewettingCarbonFactor.DoesNotExist:
             raise ValueError(f"Could not find Rewetting C for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}")
 
         try:
-            rewetting_ch4 = ipcc.RewettingMethaneFactor.objects.get(**cm, land_use_type=module.land_use_type)
+            self.rewetting_ch4 = ipcc.RewettingMethaneFactor.objects.get(**cm, land_use_type=module.land_use_type)
         except ipcc.RewettingMethaneFactor.DoesNotExist:
             raise ValueError(f"Could not find Rewetting CH4 for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}")
 
-        math_w = None
-        math_wo = None
+    def calculate(self) -> Result:
+        """
+        Calculates the emissions of the coastal wetland
+        """
 
-        if is_with(module):
+        module: CoastalWetland = self.data
+        project: Project = module.activity.project
+
+        self.get_defaults()
+
+        if module.is_with():
             self.inputs_w = [
                 module.area,
                 module.area_under_drainage_start,
@@ -4952,12 +4799,12 @@ class CoastalWetlandCalculator(BaseCalculator):
                 module.activity.change_rate.name,
                 project.implementation_years,
                 project.capitalization_years,
-                agb.value,
-                bgb.value,
-                litter.value,
-                dw.value,
-                soil_1m.value,
-                ef_drainage.value,
+                self.agb.value,
+                self.bgb.value,
+                self.litter.value,
+                self.dw.value,
+                self.soil_1m.value,
+                self.ef_drainage.value,
                 module.agb_t2_w,
                 module.bgb_t2_w,
                 module.litter_t2_w,
@@ -4968,20 +4815,20 @@ class CoastalWetlandCalculator(BaseCalculator):
                 module.drained_area_excavated_w,
                 module.area_w_restored_vegetation_start,
                 module.area_w_restored_vegetation_w,
-                pc_c_lost_excavation.value,
+                self.pc_c_lost_excavation.value,
                 module.pc_c_lost_after_excavation_t2_w,
-                rewetting_c.value,
-                rewetting_ch4.value,
+                self.rewetting_c.value,
+                self.rewetting_ch4.value,
                 module.co2_rewetting_t2_start,
                 module.ch4_rewetting_t2_w,
                 module.avg_salinity_t2.value if module.avg_salinity_t2 else None,
                 project.gw_potential.ch4,
             ]
 
-            math_w = MathCoastalWetland(*self.inputs_w)
-            math_w.calculate_emissions()
+            self.math_w = MathCoastalWetland(*self.inputs_w)
+            self.math_w.calculate_emissions()
 
-        if is_without(module):
+        if module.is_without():
             self.inputs_wo = [
                 module.area,
                 module.area_under_drainage_start,
@@ -4989,12 +4836,12 @@ class CoastalWetlandCalculator(BaseCalculator):
                 module.activity.change_rate.name,
                 project.implementation_years,
                 project.capitalization_years,
-                agb.value,
-                bgb.value,
-                litter.value,
-                dw.value,
-                soil_1m.value,
-                ef_drainage.value,
+                self.agb.value,
+                self.bgb.value,
+                self.litter.value,
+                self.dw.value,
+                self.soil_1m.value,
+                self.ef_drainage.value,
                 module.agb_t2_wo,
                 module.bgb_t2_wo,
                 module.litter_t2_wo,
@@ -5005,29 +4852,23 @@ class CoastalWetlandCalculator(BaseCalculator):
                 module.drained_area_excavated_wo,
                 module.area_w_restored_vegetation_start,
                 module.area_w_restored_vegetation_wo,
-                pc_c_lost_excavation.value,
+                self.pc_c_lost_excavation.value,
                 module.pc_c_lost_after_excavation_t2_wo,
-                rewetting_c.value,
-                rewetting_ch4.value,
+                self.rewetting_c.value,
+                self.rewetting_ch4.value,
                 module.co2_rewetting_t2_wo,
                 module.ch4_rewetting_t2_wo,
                 module.avg_salinity_t2.value if module.avg_salinity_t2 else None,
                 project.gw_potential.ch4,
             ]
 
-            math_wo = MathCoastalWetland(*self.inputs_wo)
-            math_wo.calculate_emissions()
+            self.math_wo = MathCoastalWetland(*self.inputs_wo)
+            self.math_wo.calculate_emissions()
 
-        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
-        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
-        log.debug("WITH breakdown")
-        results_w.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        log.debug("WITHOUT breakdown")
-        results_wo.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        results_tuple = (results_w, results_wo)
+        results_tuple = (self.results_w, self.results_wo)
 
         return results_tuple
 
@@ -5040,24 +4881,24 @@ class CoastalWetlandCalculator(BaseCalculator):
         defaults_w = {}
         defaults_wo = {}
 
-        if is_luc_remaining_same(module):
+        if module.is_luc_remaining_same():
             math_start = MathCoastalWetland(*self.inputs_start_w)
             math_start_defaults = math_start.evaluate_tier_2_defaults()
             defaults_start.update(math_start_defaults.start)
             defaults_start.update(math_start_defaults.other)
-        elif is_business_as_usual(module):
+        elif module.is_business_as_usual():
             math_start_wo = MathCoastalWetland(*self.inputs_start_wo)
             math_start_wo_defaults = math_start_wo.evaluate_tier_2_defaults()
             defaults_start.update(math_start_wo_defaults.start)
             defaults_start.update(math_start_wo_defaults.other)
 
-        if is_with(module):
+        if module.is_with():
             math_w = MathCoastalWetland(*self.inputs_w)
             math_w_defaults = math_w.evaluate_tier_2_defaults()
             defaults_w.update(math_w_defaults.start)
             defaults_w.update(math_w_defaults.other)
 
-        if is_without(module):
+        if module.is_without():
             math_wo = MathCoastalWetland(*self.inputs_wo)
             math_wo_defaults = math_wo.evaluate_tier_2_defaults()
             defaults_wo.update(math_wo_defaults.start)
@@ -5071,45 +4912,71 @@ class WaterbodyCalculator(BaseCalculator):
     Calculator for waterbody modules.
     """
 
+    def __init__(self, input) -> None:
+        super().__init__(input)
+
+        self.methane_emission_factor = SimpleNamespace(value=0)
+        self.trophic_state_start = SimpleNamespace(value=0)
+        self.trophic_state_w = SimpleNamespace(value=0)
+        self.trophic_state_wo = SimpleNamespace(value=0)
+
+        self.inputs_start = []
+        self.inputs_w = []
+        self.inputs_wo = []
+
+        self.math_start = None
+        self.math_w = None
+        self.math_wo = None
+
+        self.results_start = None
+        self.results_w = None
+        self.results_wo = None
+
     def get_defaults(self, calculate=False) -> dict:
-        return super().get_defaults(calculate)
+        super().get_defaults(calculate)
+
+        module: Waterbody = self.data
+        project = module.activity.project
+
+        try:
+            self.methane_emission_factor = ipcc.OtherConstructedWaterbodiesEmissionFactor.objects.get(climate=project.climate, moisture=project.moisture, waterbody_type=module.waterbody_type)
+        except ipcc.OtherConstructedWaterbodiesEmissionFactor.DoesNotExist:
+            raise ValueError(f"Could not find Methane Emission Factor for {module.waterbody_type.name}, {project.climate.name}, {project.moisture.name}")
+
+        if module.is_start():
+            try:
+                self.trophic_state_start = ipcc.TrophicStateFactor.objects.get(trophic_type=module.trophic_type_start)
+            except ipcc.TrophicStateFactor.DoesNotExist:
+                raise ValueError(f"Could not find Trophic State Factor for {module.trophic_type_start.name}")
+
+        if module.is_with():
+            try:
+                self.trophic_state_w = ipcc.TrophicStateFactor.objects.get(trophic_type=module.trophic_type_w)
+            except ipcc.TrophicStateFactor.DoesNotExist:
+                raise ValueError(f"Could not find Trophic State Factor for {module.trophic_type_w.name}")
+
+        if module.is_without():
+            try:
+                self.trophic_state_wo = ipcc.TrophicStateFactor.objects.get(trophic_type=module.trophic_type_wo)
+            except ipcc.TrophicStateFactor.DoesNotExist:
+                raise ValueError(f"Could not find Trophic State Factor for {module.trophic_type_wo.name}")
 
     def calculate(self) -> Result:
         """
         Calculate emissions for a single Waterbody module.
         """
+
         module: Waterbody = self.data
-        project = module.activity.project
+        activity: Activity = module.activity
+        project: Project = activity.project
 
-        try:
-            methane_emission_factor = ipcc.OtherConstructedWaterbodiesEmissionFactor.objects.get(climate=project.climate, moisture=project.moisture, waterbody_type=module.waterbody_type)
-        except ipcc.OtherConstructedWaterbodiesEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find Methane Emission Factor for {module.waterbody_type.name}, {project.climate.name}, {project.moisture.name}")
+        self.get_defaults()
 
-        try:
-            trophic_state_start = ipcc.TrophicStateFactor.objects.get(trophic_type=module.trophic_type_start)
-        except ipcc.TrophicStateFactor.DoesNotExist:
-            raise ValueError(f"Could not find Trophic State Factor for {module.trophic_type_start.name}")
-
-        try:
-            trophic_state_w = ipcc.TrophicStateFactor.objects.get(trophic_type=module.trophic_type_w)
-        except ipcc.TrophicStateFactor.DoesNotExist:
-            raise ValueError(f"Could not find Trophic State Factor for {module.trophic_type_w.name}")
-
-        try:
-            trophic_state_wo = ipcc.TrophicStateFactor.objects.get(trophic_type=module.trophic_type_wo)
-        except ipcc.TrophicStateFactor.DoesNotExist:
-            raise ValueError(f"Could not find Trophic State Factor for {module.trophic_type_wo.name}")
-
-        math_start = None
-        math_w = None
-        math_wo = None
-
-        inputs_start = [
+        self.inputs_start = [
             module.area,
             0,
-            trophic_state_start.value,
-            methane_emission_factor.value,
+            self.trophic_state_start.value,
+            self.methane_emission_factor.value,
             module.alpha_t2_start,
             0,
             module.ch4_ef_t2_start,
@@ -5122,15 +4989,15 @@ class WaterbodyCalculator(BaseCalculator):
             0,
         ]
 
-        math_start = MathWaterbodies(*inputs_start)
-        math_start.calculate_emissions()
+        self.math_start = MathWaterbodies(*self.inputs_start)
+        self.math_start.calculate_emissions()
 
-        if is_with(module):
-            inputs_w = [
+        if module.is_with():
+            self.inputs_w = [
                 0,
                 module.area,
-                trophic_state_w.value,
-                methane_emission_factor.value,
+                self.trophic_state_w.value,
+                self.methane_emission_factor.value,
                 module.alpha_t2_start,
                 module.alpha_t2_w,
                 module.ch4_ef_t2_start,
@@ -5143,15 +5010,15 @@ class WaterbodyCalculator(BaseCalculator):
                 module.mean_annual_t2_w,
             ]
 
-            math_w = MathWaterbodies(*inputs_w)
-            math_w.calculate_emissions()
+            self.math_w = MathWaterbodies(*self.inputs_w)
+            self.math_w.calculate_emissions()
 
-        if is_without(module):
-            inputs_wo = [
+        if module.is_without():
+            self.inputs_wo = [
                 0,
                 module.area,
-                trophic_state_wo.value,
-                methane_emission_factor.value,
+                self.trophic_state_wo.value,
+                self.methane_emission_factor.value,
                 module.alpha_t2_start,
                 module.alpha_t2_wo,
                 module.ch4_ef_t2_start,
@@ -5164,50 +5031,87 @@ class WaterbodyCalculator(BaseCalculator):
                 module.mean_annual_t2_wo,
             ]
 
-            math_wo = MathWaterbodies(*inputs_wo)
-            math_wo.calculate_emissions()
+            self.math_wo = MathWaterbodies(*self.inputs_wo)
+            self.math_wo.calculate_emissions()
 
-        results_start = math_start.result if math_start else MathResult(project.implementation_years, project.capitalization_years)
-        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
-        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_start = self.math_start.result if self.math_start else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
-        results_tuple = (results_w + results_start, results_wo + results_start)
+        results_tuple = (self.results_w + self.results_start, self.results_wo + self.results_start)
 
         return results_tuple
-
-    def defaults(self) -> DefaultData:
-        return super().defaults()
 
 
 class OrganicSoilCalculator(BaseCalculator):
 
+    def __init__(self, input) -> None:
+        super().__init__(input)
+
+        self.ef_onsite_start = SimpleNamespace(value=0)
+        self.ef_onsite_w = SimpleNamespace(value=0)
+        self.ef_onsite_wo = SimpleNamespace(value=0)
+
+        self.ef_offsite_start = SimpleNamespace(value=0)
+        self.ef_offsite_w = SimpleNamespace(value=0)
+        self.ef_offsite_wo = SimpleNamespace(value=0)
+
+        self.dry_matter_w = SimpleNamespace(value=0)
+        self.dry_matter_wo = SimpleNamespace(value=0)
+
+        self.fire_ref = SimpleNamespace(value=0)
+
+        self.rewetting_start = SimpleNamespace(value=0)
+        self.rewetting_w = SimpleNamespace(value=0)
+        self.rewetting_wo = SimpleNamespace(value=0)
+
+        self.onsite_ef_w = SimpleNamespace(value=0)
+        self.onsite_ef_wo = SimpleNamespace(value=0)
+
+        self.offsite_ef_w = SimpleNamespace(value=0)
+        self.offsite_ef_wo = SimpleNamespace(value=0)
+
+        self.conversion_factor_w = SimpleNamespace(value=0)
+        self.conversion_factor_wo = SimpleNamespace(value=0)
+
+        self.organic_soil_math_w = None
+        self.organic_soil_math_wo = None
+        self.peat_extraction_math_w = None
+        self.peat_extraction_math_wo = None
+
+        self.organic_soil_inputs_w = []
+        self.organic_soil_inputs_wo = []
+        self.peat_extraction_inputs_w = []
+        self.peat_extraction_inputs_wo = []
+
+        self.organic_soil_results_w = None
+        self.organic_soil_results_wo = None
+
+        self.peat_extraction_results_w = None
+        self.peat_extraction_results_wo = None
+
+        self.area_affected_by_module = 0
+
+        self.is_fire_used_w = False
+        self.is_fire_used_wo = False
+
     def get_defaults(self, calculate=False) -> dict:
-        return super().get_defaults(calculate)
+        super().get_defaults(calculate)
 
-    def calculate(self) -> Result:
-        input: OrganicSoil = self.data
-        project: Project = input.activity.project
-        luc: LandUseChange = input.land_use_change
-
-        area_affected_by_module = 0
-        module_type_start = None
-        module_type_w = None
-        module_type_wo = None
+        module: OrganicSoil = self.data
+        project: Project = module.activity.project
+        luc: LandUseChange = module.land_use_change
 
         if luc:
-            print("Land Use Change: ", luc)
             module_type_start = luc.module_type_start.name
             module_type_w = luc.module_type_w.name
             module_type_wo = luc.module_type_wo.name
-            area_affected_by_module = luc.area
+            self.area_affected_by_module = luc.area
         else:
-            print("No Land Use Change")
-
-            parent_module, parent_module_type = utils.find_organic_soil_parent_module(input)
+            parent_module, parent_module_type = utils.find_organic_soil_parent_module(module)
             module_type_start = module_type_w = module_type_wo = parent_module_type.name
 
-            print("Parent module name: ", module_type_start)
-            area_affected_by_module = 0 if module_type_start == "ForestManagement" else parent_module.area
+            self.area_affected_by_module = 0 if module_type_start == "ForestManagement" else parent_module.area
 
         cm = {
             "climate": project.climate,
@@ -5215,367 +5119,328 @@ class OrganicSoilCalculator(BaseCalculator):
         }
 
         ##### Organic Soil Inputs #####
-
         try:
-            ef_onsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_start, peat_type=input.peat_type, site_location_type__name="On-Site")
-        except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find EF On-Site Start for {module_type_start}, {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
-
-        try:
-            ef_onsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_w, peat_type=input.peat_type, site_location_type__name="On-Site")
-        except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find EF On-Site W for {module_type_w}, {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
-
-        try:
-            ef_onsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_wo, peat_type=input.peat_type, site_location_type__name="On-Site")
-        except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find EF On-Site WO for {module_type_wo}, {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
-
-        try:
-            ef_offsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_start, peat_type=input.peat_type, site_location_type__name="Off-Site")
-        except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find EF Off-Site Start for {module_type_start}, {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
-
-        try:
-            ef_offsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_w, peat_type=input.peat_type, site_location_type__name="Off-Site")
-        except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find EF Off-Site W for {module_type_w}, {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
-
-        try:
-            ef_offsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_wo, peat_type=input.peat_type, site_location_type__name="Off-Site")
-        except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find EF Off-Site WO for {module_type_wo}, {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
-
-        fire_used_w = input.fire_type_w is not None
-        fire_used_wo = input.fire_type_wo is not None
-
-        if fire_used_w:
-            try:
-                dry_matter_w = ipcc.OrganicSoilFuelConsumption.objects.get(**cm, fire_type=input.fire_type_w)
-            except ipcc.OrganicSoilFuelConsumption.DoesNotExist:
-                raise ValueError(f"Could not find Dry Matter W for {input.fire_type_w.name}, {project.climate.name}, {project.moisture.name}")
-
-        if fire_used_wo:
-            try:
-                dry_matter_wo = ipcc.OrganicSoilFuelConsumption.objects.get(**cm, fire_type=input.fire_type_wo)
-            except ipcc.OrganicSoilFuelConsumption.DoesNotExist:
-                raise ValueError(f"Could not find Dry Matter WO for {input.fire_type_wo.name}, {project.climate.name}, {project.moisture.name}")
-
-        try:
-            fire_ref = ipcc.OrganicSoilGefEmissionFactor.objects.get(**cm)
+            self.fire_ref = ipcc.OrganicSoilGefEmissionFactor.objects.get(**cm)
         except ipcc.OrganicSoilGefEmissionFactor.DoesNotExist:
             raise ValueError(f"Could not find Fire Reference for {project.climate.name}, {project.moisture.name}")
 
-        try:
-            rewetting_start = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=input.peat_type, module_type__name=module_type_start)
-        except ipcc.OrganicSoilRewettingEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find Rewetting Start for {input.peat_type.name}, {module_type_start}, {project.climate.name}, {project.moisture.name}")
+        if module.is_start():
+            try:
+                self.ef_onsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_start, peat_type=module.peat_type, site_location_type__name="On-Site")
+            except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
+                raise ValueError(f"Could not find EF On-Site Start for {module_type_start}, {module.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+            try:
+                self.ef_offsite_start = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_start, peat_type=module.peat_type, site_location_type__name="Off-Site")
+            except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
+                raise ValueError(f"Could not find EF Off-Site Start for {module_type_start}, {module.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+            try:
+                self.rewetting_start = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=module.peat_type, module_type__name=module_type_start)
+            except ipcc.OrganicSoilRewettingEmissionFactor.DoesNotExist:
+                raise ValueError(f"Could not find Rewetting Start for {module.peat_type.name}, {module_type_start}, {project.climate.name}, {project.moisture.name}")
 
-        try:
-            rewetting_w = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=input.peat_type, module_type__name=module_type_w)
-        except ipcc.OrganicSoilRewettingEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find Rewetting W for {input.peat_type.name}, {module_type_w}, {project.climate.name}, {project.moisture.name}")
+        if module.is_with():
+            try:
+                self.ef_onsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_w, peat_type=module.peat_type, site_location_type__name="On-Site")
+            except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
+                raise ValueError(f"Could not find EF On-Site W for {module_type_w}, {module.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+            try:
+                self.ef_offsite_w = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_w, peat_type=module.peat_type, site_location_type__name="Off-Site")
+            except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
+                raise ValueError(f"Could not find EF Off-Site W for {module_type_w}, {module.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+            self.fire_used_w = module.fire_type_w is not None
+            if self.fire_used_w:
+                try:
+                    self.dry_matter_w = ipcc.OrganicSoilFuelConsumption.objects.get(**cm, fire_type=module.fire_type_w)
+                except ipcc.OrganicSoilFuelConsumption.DoesNotExist:
+                    raise ValueError(f"Could not find Dry Matter W for {module.fire_type_w.name}, {project.climate.name}, {project.moisture.name}")
+            try:
+                self.rewetting_w = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=module.peat_type, module_type__name=module_type_w)
+            except ipcc.OrganicSoilRewettingEmissionFactor.DoesNotExist:
+                raise ValueError(f"Could not find Rewetting W for {module.peat_type.name}, {module_type_w}, {project.climate.name}, {project.moisture.name}")
+            try:
+                self.onsite_ef_w = ipcc.PeatExtractionEmissionFactor.objects.get(**cm, peat_type=module.peat_type, site_location_type__name="On-Site")
+            except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
+                raise ValueError(f"Could not find On-Site EF W for {module.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+            try:
+                self.offsite_ef_w = ipcc.PeatExtractionEmissionFactor.objects.get(**cm, peat_type=module.peat_type, site_location_type__name="Off-Site")
+            except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
+                raise ValueError(f"Could not find Off-Site EF W for {module.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+            try:
+                self.conversion_factor_w = ipcc.PeatExtractionConversionFactor.objects.get(**cm, peat_type=module.peat_type)
+            except ipcc.PeatExtractionConversionFactor.DoesNotExist:
+                raise ValueError(f"Could not find Conversion Factor W for {module.peat_type.name}, {project.climate.name}, {project.moisture.name}")
 
-        try:
-            rewetting_wo = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=input.peat_type, module_type__name=module_type_wo)
-        except ipcc.OrganicSoilRewettingEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find Rewetting WO for {input.peat_type.name}, {module_type_wo}, {project.climate.name}, {project.moisture.name}")
+        if module.is_without():
+            try:
+                self.ef_onsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_wo, peat_type=module.peat_type, site_location_type__name="On-Site")
+            except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
+                raise ValueError(f"Could not find EF On-Site WO for {module_type_wo}, {module.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+            try:
+                self.ef_offsite_wo = ipcc.OrganicSoilDrainageEmissionFactor.objects.get(**cm, module_type__name=module_type_wo, peat_type=module.peat_type, site_location_type__name="Off-Site")
+            except ipcc.OrganicSoilDrainageEmissionFactor.DoesNotExist:
+                raise ValueError(f"Could not find EF Off-Site WO for {module_type_wo}, {module.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+            self.fire_used_wo = module.fire_type_wo is not None
+            if self.fire_used_wo:
+                try:
+                    self.dry_matter_wo = ipcc.OrganicSoilFuelConsumption.objects.get(**cm, fire_type=module.fire_type_wo)
+                except ipcc.OrganicSoilFuelConsumption.DoesNotExist:
+                    raise ValueError(f"Could not find Dry Matter WO for {module.fire_type_wo.name}, {project.climate.name}, {project.moisture.name}")
+            try:
+                self.rewetting_wo = ipcc.OrganicSoilRewettingEmissionFactor.objects.get(**cm, peat_type=module.peat_type, module_type__name=module_type_wo)
+            except ipcc.OrganicSoilRewettingEmissionFactor.DoesNotExist:
+                raise ValueError(f"Could not find Rewetting WO for {module.peat_type.name}, {module_type_wo}, {project.climate.name}, {project.moisture.name}")
 
-        ##### Peat Extraction Inputs #####
+            ##### Peat Extraction Inputs #####
+            try:
+                self.onsite_ef_wo = ipcc.PeatExtractionEmissionFactor.objects.get(**cm, peat_type=module.peat_type, site_location_type__name="On-Site")
+            except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
+                raise ValueError(f"Could not find On-Site EF WO for {module.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+            try:
+                self.offsite_ef_wo = ipcc.PeatExtractionEmissionFactor.objects.get(**cm, peat_type=module.peat_type, site_location_type__name="Off-Site")
+            except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
+                raise ValueError(f"Could not find Off-Site EF WO for {module.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+            try:
+                self.conversion_factor_wo = ipcc.PeatExtractionConversionFactor.objects.get(**cm, peat_type=module.peat_type)
+            except ipcc.PeatExtractionConversionFactor.DoesNotExist:
+                raise ValueError(f"Could not find Conversion Factor WO for {module.peat_type.name}, {project.climate.name}, {project.moisture.name}")
 
-        try:
-            onsite_ef_w = ipcc.PeatExtractionEmissionFactor.objects.get(**cm, peat_type=input.peat_type, site_location_type__name="On-Site")
-        except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find On-Site EF W for {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+    def calculate(self) -> Result:
+        super().calculate()
 
-        try:
-            onsite_ef_wo = ipcc.PeatExtractionEmissionFactor.objects.get(**cm, peat_type=input.peat_type, site_location_type__name="On-Site")
-        except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find On-Site EF WO for {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+        input: OrganicSoil = self.data
+        project: Project = input.activity.project
 
-        try:
-            offsite_ef_w = ipcc.PeatExtractionEmissionFactor.objects.get(**cm, peat_type=input.peat_type, site_location_type__name="Off-Site")
-        except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find Off-Site EF W for {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
-
-        try:
-            offsite_ef_wo = ipcc.PeatExtractionEmissionFactor.objects.get(**cm, peat_type=input.peat_type, site_location_type__name="Off-Site")
-        except ipcc.PeatExtractionEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find Off-Site EF WO for {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
-
-        try:
-            conversion_factor_w = ipcc.PeatExtractionConversionFactor.objects.get(**cm, peat_type=input.peat_type)
-        except ipcc.PeatExtractionConversionFactor.DoesNotExist:
-            raise ValueError(f"Could not find Conversion Factor W for {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
-
-        try:
-            conversion_factor_wo = ipcc.PeatExtractionConversionFactor.objects.get(**cm, peat_type=input.peat_type)
-        except ipcc.PeatExtractionConversionFactor.DoesNotExist:
-            raise ValueError(f"Could not find Conversion Factor WO for {input.peat_type.name}, {project.climate.name}, {project.moisture.name}")
+        self.get_defaults()
 
         ##### Calculate Emissions #####
 
-        total_results_w = MathResult(project.implementation_years, project.capitalization_years)
-        total_results_wo = MathResult(project.implementation_years, project.capitalization_years)
+        self.results_w = MathResult(project.implementation_years, project.capitalization_years)
+        self.results_wo = MathResult(project.implementation_years, project.capitalization_years)
 
-        organic_soil_math_w = None
-        organic_soil_math_wo = None
-        peat_extraction_math_w = None
-        peat_extraction_math_wo = None
+        self.organic_soil_math_w = None
+        self.organic_soil_math_wo = None
+        self.peat_extraction_math_w = None
+        self.peat_extraction_math_wo = None
 
-        organic_soil_inputs_w = [
+        self.organic_soil_inputs_w = [
             input.fire_type_w is not None,
             input.soil_fire_periodicity_w,
-            area_affected_by_module,
-            dry_matter_w.value if fire_used_w else None,
+            self.area_affected_by_module,
+            self.dry_matter_w.value if self.fire_used_w else None,
             input.mean_dry_matter_t2_w,
             input.soil_fire_impact_percentage_w,
-            fire_ref.co2,
+            self.fire_ref.co2,
             input.fire_on_soil_co2_t2_w,
-            fire_ref.co,
+            self.fire_ref.co,
             input.fire_on_soil_co_t2_w,
-            fire_ref.ch4,
+            self.fire_ref.ch4,
             input.fire_on_soil_ch4_t2_w,
             project.gw_potential.ch4,
             input.activity.change_rate.name,
             project.implementation_years,
             project.capitalization_years,
             project.gw_potential.n2o,
-            ef_offsite_start.doc,
+            self.ef_offsite_start.doc,
             input.offsite_doc_drainge_t2_start,
             input.drainage_area_start,
             input.drainage_area_w,
-            ef_onsite_start.co2,
+            self.ef_onsite_start.co2,
             input.onsite_co2_drainge_t2_start,
             input.ditches_area_start,
             input.ditches_area_w,
-            ef_onsite_start.ch4,
+            self.ef_onsite_start.ch4,
             input.onsite_ch4_drainge_t2_start,
-            ef_offsite_start.ch4,
+            self.ef_offsite_start.ch4,
             input.offsite_ch4_drainge_t2_start,
-            ef_onsite_start.n2o,
+            self.ef_onsite_start.n2o,
             input.onsite_n2o_drainge_t2_start,
-            ef_offsite_w.doc,
+            self.ef_offsite_w.doc,
             input.offsite_doc_drainge_t2_start,
-            ef_onsite_w.co2,
+            self.ef_onsite_w.co2,
             input.onsite_co2_drainge_t2_w,
-            ef_onsite_w.ch4,
+            self.ef_onsite_w.ch4,
             input.onsite_ch4_drainge_t2_w,
-            ef_offsite_w.ch4,
+            self.ef_offsite_w.ch4,
             input.offsite_ch4_drainge_t2_w,
-            ef_onsite_w.n2o,
+            self.ef_onsite_w.n2o,
             input.onsite_n2o_drainge_t2_w,
-            rewetting_start.doc,
+            self.rewetting_start.doc,
             input.offsite_doc_rewetting_t2_start,
-            rewetting_start.co2,
+            self.rewetting_start.co2,
             input.onsite_co2_rewetting_t2_start,
-            rewetting_start.ch4,
+            self.rewetting_start.ch4,
             input.onsite_ch4_rewetting_t2_start,
-            rewetting_start.n2o,
+            self.rewetting_start.n2o,
             input.onsite_n2o_rewetting_t2_start,
-            rewetting_w.doc,
+            self.rewetting_w.doc,
             input.offsite_doc_rewetting_t2_w,
-            rewetting_w.co2,
+            self.rewetting_w.co2,
             input.onsite_co2_rewetting_t2_w,
-            rewetting_w.ch4,
+            self.rewetting_w.ch4,
             input.onsite_ch4_rewetting_t2_w,
-            rewetting_w.n2o,
+            self.rewetting_w.n2o,
             input.onsite_n2o_rewetting_t2_w,
-            area_affected_by_module,
+            self.area_affected_by_module,
         ]
 
-        organic_soil_math_w = MathOrganicSoil(*organic_soil_inputs_w)
-        organic_soil_math_w.calculate_emissions()
+        self.organic_soil_math_w = MathOrganicSoil(*self.organic_soil_inputs_w)
+        self.organic_soil_math_w.calculate_emissions()
 
         if input.peat_area_start:
-            peat_extraction_inputs_w = [
+            self.peat_extraction_inputs_w = [
                 input.peat_area_start,
                 input.peat_area_w,
                 input.peat_ditches_area_start,
                 input.peat_ditches_area_w,
                 input.activity.change_rate.name,
-                onsite_ef_w.co2,
+                self.onsite_ef_w.co2,
                 input.onsite_co2_peat_t2_w,
-                onsite_ef_w.ch4,
+                self.onsite_ef_w.ch4,
                 None,
-                onsite_ef_w.n2o,
+                self.onsite_ef_w.n2o,
                 input.onsite_n2o_peat_t2_w,
-                offsite_ef_w.doc,
+                self.offsite_ef_w.doc,
                 input.offsite_doc_peat_t2_w,
-                offsite_ef_w.ch4,
+                self.offsite_ef_w.ch4,
                 input.offsite_ch4_peat_t2_w,
                 project.gw_potential.ch4,
                 project.gw_potential.n2o,
                 project.implementation_years,
                 project.capitalization_years,
-                conversion_factor_w.volume,
+                self.conversion_factor_w.volume,
                 input.peat_density_t2_w,
                 1,  # TODO: Should be conversion_factor_w.volume,
-                conversion_factor_w.weight,
+                self.conversion_factor_w.weight,
                 input.peat_extraction_height_start,
                 input.peat_extraction_height_w,
             ]
 
-            peat_extraction_math_w = MathPeatExtraction(*peat_extraction_inputs_w)
-            peat_extraction_math_w.calculate_emissions()
+            self.peat_extraction_math_w = MathPeatExtraction(*self.peat_extraction_inputs_w)
+            self.peat_extraction_math_w.calculate_emissions()
 
-        organic_soil_inputs_wo = [
+        self.organic_soil_inputs_wo = [
             input.fire_type_wo is not None,
             input.soil_fire_periodicity_wo,
-            area_affected_by_module,
-            dry_matter_wo.value if fire_used_wo else None,
+            self.area_affected_by_module,
+            self.dry_matter_wo.value if self.fire_used_wo else None,
             input.mean_dry_matter_t2_wo,
             input.soil_fire_impact_percentage_wo,
-            fire_ref.co2,
+            self.fire_ref.co2,
             input.fire_on_soil_co2_t2_wo,
-            fire_ref.co,
+            self.fire_ref.co,
             input.fire_on_soil_co_t2_wo,
-            fire_ref.ch4,
+            self.fire_ref.ch4,
             input.fire_on_soil_ch4_t2_wo,
             project.gw_potential.ch4,
             input.activity.change_rate.name,
             project.implementation_years,
             project.capitalization_years,
             project.gw_potential.n2o,
-            ef_offsite_start.doc,
+            self.ef_offsite_start.doc,
             input.offsite_doc_drainge_t2_start,
             input.drainage_area_start,
             input.drainage_area_wo,
-            ef_onsite_start.co2,
+            self.ef_onsite_start.co2,
             input.onsite_co2_drainge_t2_start,
             input.ditches_area_start,
             input.ditches_area_wo,
-            ef_onsite_start.ch4,
+            self.ef_onsite_start.ch4,
             input.onsite_ch4_drainge_t2_start,
-            ef_offsite_start.ch4,
+            self.ef_offsite_start.ch4,
             input.offsite_ch4_drainge_t2_start,
-            ef_onsite_start.n2o,
+            self.ef_onsite_start.n2o,
             input.onsite_n2o_drainge_t2_start,
-            ef_offsite_start.doc,
+            self.ef_offsite_start.doc,
             input.offsite_doc_drainge_t2_start,
-            ef_onsite_wo.co2,
+            self.ef_onsite_wo.co2,
             input.onsite_co2_drainge_t2_wo,
-            ef_onsite_wo.ch4,
+            self.ef_onsite_wo.ch4,
             input.onsite_ch4_drainge_t2_wo,
-            ef_offsite_wo.ch4,
+            self.ef_offsite_wo.ch4,
             input.offsite_ch4_drainge_t2_wo,
-            ef_onsite_wo.n2o,
+            self.ef_onsite_wo.n2o,
             input.onsite_n2o_drainge_t2_wo,
-            rewetting_start.doc,
+            self.rewetting_start.doc,
             input.offsite_doc_rewetting_t2_start,
-            rewetting_start.co2,
+            self.rewetting_start.co2,
             input.onsite_co2_rewetting_t2_start,
-            rewetting_start.ch4,
+            self.rewetting_start.ch4,
             input.onsite_ch4_rewetting_t2_start,
-            rewetting_start.n2o,
+            self.rewetting_start.n2o,
             input.onsite_n2o_rewetting_t2_start,
-            rewetting_wo.doc,
+            self.rewetting_wo.doc,
             input.offsite_doc_rewetting_t2_wo,
-            rewetting_wo.co2,
+            self.rewetting_wo.co2,
             input.onsite_co2_rewetting_t2_wo,
-            rewetting_wo.ch4,
+            self.rewetting_wo.ch4,
             input.onsite_ch4_rewetting_t2_wo,
-            rewetting_wo.n2o,
+            self.rewetting_wo.n2o,
             input.onsite_n2o_rewetting_t2_wo,
-            area_affected_by_module,
+            self.area_affected_by_module,
         ]
 
-        organic_soil_math_wo = MathOrganicSoil(*organic_soil_inputs_wo)
-        organic_soil_math_wo.calculate_emissions()
+        self.organic_soil_math_wo = MathOrganicSoil(*self.organic_soil_inputs_wo)
+        self.organic_soil_math_wo.calculate_emissions()
 
         if input.peat_area_start:
-            peat_extraction_inputs_wo = [
+            self.peat_extraction_inputs_wo = [
                 input.peat_area_start,
                 input.peat_area_wo,
                 input.peat_ditches_area_start,
                 input.peat_ditches_area_wo,
                 input.activity.change_rate.name,
-                onsite_ef_wo.co2,
+                self.onsite_ef_wo.co2,
                 input.onsite_co2_peat_t2_wo,
-                onsite_ef_wo.ch4,
+                self.onsite_ef_wo.ch4,
                 None,
-                onsite_ef_wo.n2o,
+                self.onsite_ef_wo.n2o,
                 input.onsite_n2o_peat_t2_wo,
-                offsite_ef_wo.doc,
+                self.offsite_ef_wo.doc,
                 input.offsite_doc_peat_t2_wo,
-                offsite_ef_wo.ch4,
+                self.offsite_ef_wo.ch4,
                 input.offsite_ch4_peat_t2_wo,
                 project.gw_potential.ch4,
                 project.gw_potential.n2o,
                 project.implementation_years,
                 project.capitalization_years,
-                conversion_factor_wo.volume,
+                self.conversion_factor_wo.volume,
                 input.peat_density_t2_wo,
                 1,  # TODO: Should be conversion_factor_wo.volume,
-                conversion_factor_wo.weight,
+                self.conversion_factor_wo.weight,
                 input.peat_extraction_height_start,
                 input.peat_extraction_height_wo,
             ]
 
-            peat_extraction_math_wo = MathPeatExtraction(*peat_extraction_inputs_wo)
-            peat_extraction_math_wo.calculate_emissions()
+            self.peat_extraction_math_wo = MathPeatExtraction(*self.peat_extraction_inputs_wo)
+            self.peat_extraction_math_wo.calculate_emissions()
 
-        # NOTE: commented, don't know why it's here
-        # self.inputs_w = {
-        #     "organic_soil": organic_soil_inputs_w,
-        #     "peat_extraction": peat_extraction_inputs_w,
-        # }
+        self.inputs_w = {
+            "organic_soil": self.organic_soil_inputs_w,
+            "peat_extraction": self.peat_extraction_inputs_w,
+        }
 
-        # self.inputs_wo = {
-        #     "organic_soil": organic_soil_inputs_wo,
-        #     "peat_extraction": peat_extraction_inputs_wo,
-        # }
+        self.inputs_wo = {
+            "organic_soil": self.organic_soil_inputs_wo,
+            "peat_extraction": self.peat_extraction_inputs_wo,
+        }
 
-        organic_soil_results_w = organic_soil_math_w.result if organic_soil_math_w else MathResult(project.implementation_years, project.capitalization_years)
-        organic_soil_results_wo = organic_soil_math_wo.result if organic_soil_math_wo else MathResult(project.implementation_years, project.capitalization_years)
+        self.organic_soil_results_w = self.organic_soil_math_w.result if self.organic_soil_math_w else MathResult(project.implementation_years, project.capitalization_years)
+        self.organic_soil_results_wo = self.organic_soil_math_wo.result if self.organic_soil_math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
         if input.peat_area_start:
-            peat_extraction_results_w = peat_extraction_math_w.result if peat_extraction_math_w else MathResult(project.implementation_years, project.capitalization_years)
-            peat_extraction_results_wo = peat_extraction_math_wo.result if peat_extraction_math_wo else MathResult(project.implementation_years, project.capitalization_years)
+            self.peat_extraction_results_w = self.peat_extraction_math_w.result if self.peat_extraction_math_w else MathResult(project.implementation_years, project.capitalization_years)
+            self.peat_extraction_results_wo = self.peat_extraction_math_wo.result if self.peat_extraction_math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
-            total_results_w += organic_soil_results_w + peat_extraction_results_w
-            total_results_wo += organic_soil_results_wo + peat_extraction_results_wo
+            self.results_w += self.organic_soil_results_w + self.peat_extraction_results_w
+            self.results_wo += self.organic_soil_results_wo + self.peat_extraction_results_wo
 
         else:
-            total_results_w += organic_soil_results_w
-            total_results_wo += organic_soil_results_wo
+            self.results_w += self.organic_soil_results_w
+            self.results_wo += self.organic_soil_results_wo
 
-        results_tuple = (total_results_w, total_results_wo)
+        results_tuple = (self.results_w, self.results_wo)
 
         return results_tuple
-
-    def defaults(self) -> DefaultData:
-        self.calculate()
-
-        module: OrganicSoil = self.data
-
-        defaults_start = {}
-        defaults_w = {}
-        defaults_wo = {}
-
-        if is_with(module):
-            math_w = MathOrganicSoil(*self.inputs_w["organic_soil"])
-            math_w_defaults = math_w.evaluate_tier_2_defaults()
-            defaults_w.update(math_w_defaults.start)
-            defaults_w.update(math_w_defaults.other)
-
-            math_w = MathPeatExtraction(*self.inputs_w["peat_extraction"])
-            math_w_defaults = math_w.evaluate_tier_2_defaults()
-            defaults_w.update(math_w_defaults.start)
-            defaults_w.update(math_w_defaults.other)
-
-        if is_without(module):
-            math_wo = MathOrganicSoil(*self.inputs_wo["organic_soil"])
-            math_wo_defaults = math_wo.evaluate_tier_2_defaults()
-            defaults_wo.update(math_wo_defaults.start)
-            defaults_wo.update(math_wo_defaults.other)
-
-            math_wo = MathPeatExtraction(*self.inputs_wo["peat_extraction"])
-            math_wo_defaults = math_wo.evaluate_tier_2_defaults()
-            defaults_wo.update(math_wo_defaults.start)
-            defaults_wo.update(math_wo_defaults.other)
-
-        return DefaultData(defaults_start, defaults_w, defaults_wo)
 
 
 class ForestManagementCalculator(BaseCalculator):
@@ -5910,7 +5775,7 @@ class DegradedLandCalculator(BaseCalculator):
         self.fi_wo: SimpleNamespace | ipcc.FIData = SimpleNamespace(value=1)
         self.fmg_wo: SimpleNamespace | ipcc.FMGData = SimpleNamespace(value=1)
         self.flu_wo: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=1)
-        self.som: SimpleNamespace | ipcc.LandUseNitrousEmissionFactor = SimpleNamespace(value=1)
+        self.soc: SimpleNamespace | ipcc.SoilOrganicCarbon = SimpleNamespace(value=1)
 
         self.math_start_w = None
         self.math_start_wo = None
@@ -5934,9 +5799,9 @@ class DegradedLandCalculator(BaseCalculator):
         module_start = module_w = module_wo = input
 
         if luc:
-            module_start, module_w, module_wo = get_luc_modules(luc)
+            module_start, module_w, module_wo = luc.get_modules()
 
-        if is_luc_remaining_same(input):
+        if input.is_luc_remaining_same():
             self.inputs_start_w = [
                 *[area, 0],
                 project.implementation_years,
@@ -5967,7 +5832,7 @@ class DegradedLandCalculator(BaseCalculator):
             self.math_start_w = MathNotCultivatedLand(*self.inputs_start_w)
             self.math_start_w.calculate_emissions()
 
-        if is_business_as_usual(input):
+        if input.is_business_as_usual():
             self.inputs_start_wo = [
                 *[area, 0],
                 project.implementation_years,
@@ -5998,7 +5863,7 @@ class DegradedLandCalculator(BaseCalculator):
             self.math_start_wo = MathNotCultivatedLand(*self.inputs_start_wo)
             self.math_start_wo.calculate_emissions()
 
-        if is_with(input):
+        if input.is_with():
             self.inputs_w = [
                 *[0, area],
                 project.implementation_years,
@@ -6029,7 +5894,7 @@ class DegradedLandCalculator(BaseCalculator):
             self.math_w = MathNotCultivatedLand(*self.inputs_w)
             self.math_w.calculate_emissions()
 
-        if is_without(input):
+        if input.is_without():
             self.inputs_wo = [
                 *[0, area],
                 project.implementation_years,
@@ -6065,18 +5930,6 @@ class DegradedLandCalculator(BaseCalculator):
         results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
         results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
-        log.debug("start_w breakdown")
-        results_start_w.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        log.debug("start_wo breakdown")
-        results_start_wo.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        log.debug("w breakdown")
-        results_w.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        log.debug("wo breakdown")
-        results_wo.breakdown(by=BreakdownTypes.ACTIVITY)
-
         results_tuple = (results_w + results_start_w, results_wo + results_start_wo)
 
         return results_tuple
@@ -6089,43 +5942,40 @@ class DegradedLandCalculator(BaseCalculator):
 
         climate: Climate = activity.climate_t2 or project.climate
         moisture: Moisture = activity.moisture_t2 or project.moisture
-        region: Region = project.country.region
         soil_type: SoilType = project.soil_type
 
-        climate_flt = {"climate": climate}
         moisture_flt = {"moisture": moisture}
         soil_flt = {"soil_type": soil_type}
-        region_flt = {"continent": region}
         cm = {"climate": climate, "moisture": moisture}
 
-        module_start = module_w = module_wo = input
-
-        # NOTE: Here we have a hardcoded organic_input_flt. This is due to the fact that it should not be present in the table (it isn't in the Excel)
-        retrieved_input = OrganicInputType.objects.get(name="Medium C input")
-        organic_input_hardcoded = {"organic_input_type": retrieved_input}
+        module_start = module_w = module_wo = module
 
         if luc:
-            module_start, module_w, module_wo = get_luc_modules(luc)
+            module_start, module_w, module_wo = luc.get_modules()
 
-        if is_luc_remaining_same(module):
+        if module.is_luc_remaining_same():
             self.flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
             self.fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
             self.fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+            self.emission_factors_start = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
 
-        if is_business_as_usual(module):
+        if module.is_business_as_usual():
             self.flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
             self.fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
             self.fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+            self.emission_factors_start = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
 
-        if is_with(module):
+        if module.is_with():
             self.flu_w = get_flu_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
             self.fmg_w = get_fmg_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
             self.fi_w = get_fi_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
+            self.emission_factors_w = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
 
-        if is_without(module):
+        if module.is_without():
             self.flu_wo = get_flu_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
             self.fmg_wo = get_fmg_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
             self.fi_wo = get_fi_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
+            self.emission_factors_wo = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
 
         self.soc = utils.get_or_raise(ipcc.SoilOrganicCarbon, cm | soil_flt, f"SoilOrganicCarbon for {soil_type.name} soil type in {climate.name} climate and {moisture.name} moisture does not exist")
         self.som = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, moisture_flt, f"LandUseNitrousEmissionFactor for {moisture.name} moisture and Medium C input does not exist")
@@ -6142,7 +5992,6 @@ class SetAsideCalculator(BaseCalculator):
     def __init__(self, input) -> None:
         super().__init__(input)
 
-        # NOTE: I think these should all be defaulted to 1, instead of 0
         self.fi_start: SimpleNamespace | ipcc.FIData = SimpleNamespace(value=1)
         self.fmg_start: SimpleNamespace | ipcc.FMGData = SimpleNamespace(value=1)
         self.flu_start: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=1)
@@ -6152,33 +6001,76 @@ class SetAsideCalculator(BaseCalculator):
         self.fi_wo: SimpleNamespace | ipcc.FIData = SimpleNamespace(value=1)
         self.fmg_wo: SimpleNamespace | ipcc.FMGData = SimpleNamespace(value=1)
         self.flu_wo: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=1)
-        self.som: SimpleNamespace | ipcc.LandUseNitrousEmissionFactor = SimpleNamespace(value=1)
+        self.soc: SimpleNamespace | ipcc.SoilOrganicCarbon = SimpleNamespace(value=1)
 
         self.math_start_w = None
         self.math_start_wo = None
         self.math_w = None
         self.math_wo = None
 
-    def calculate(self) -> Result:
-        input: SetAside = self.data
-        activity: Activity = input.activity
+    def get_defaults(self, calculate=False) -> dict:
+        module: SetAside = self.data
+        activity: Activity = module.activity
         project: Project = activity.project
-        luc: LandUseChange = input.land_use_change
-        area = luc.area if luc else input.area
+        luc: LandUseChange = module.land_use_change
 
-        DELAY_START_W = 0
-        DELAY_START_WO = 0
-        DELAY_W = 0
-        DELAY_WO = 0
+        climate: Climate = activity.climate_t2 or project.climate
+        moisture: Moisture = activity.moisture_t2 or project.moisture
+        soil_type: SoilType = project.soil_type
 
-        self.get_defaults()
+        moisture_flt = {"moisture": moisture}
+        soil_flt = {"soil_type": soil_type}
+        cm = {"climate": climate, "moisture": moisture}
 
         module_start = module_w = module_wo = input
 
         if luc:
-            module_start, module_w, module_wo = get_luc_modules(luc)
+            module_start, module_w, module_wo = luc.get_modules()
 
-        if is_luc_remaining_same(input):
+        if module.is_luc_remaining_same():
+            self.flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+            self.fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+            self.fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+            self.emission_factors_start = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
+
+        if module.is_business_as_usual():
+            self.flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+            self.fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+            self.fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+            self.emission_factors_start = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
+
+        if module.is_with():
+            self.flu_w = get_flu_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
+            self.fmg_w = get_fmg_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
+            self.fi_w = get_fi_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
+            self.emission_factors_w = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
+
+        if module.is_without():
+            self.flu_wo = get_flu_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
+            self.fmg_wo = get_fmg_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
+            self.fi_wo = get_fi_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
+            self.emission_factors_wo = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
+
+        self.soc = utils.get_or_raise(ipcc.SoilOrganicCarbon, cm | soil_flt, f"SoilOrganicCarbon for {soil_type.name} soil type in {climate.name} climate and {moisture.name} moisture does not exist")
+
+        if module.status.name == "READY" and calculate:
+            self.calculate()
+
+    def calculate(self) -> Result:
+        module: SetAside = self.data
+        activity: Activity = module.activity
+        project: Project = activity.project
+        luc: LandUseChange = module.land_use_change
+        area = luc.area if luc else module.area
+
+        self.get_defaults()
+
+        module_start = module_w = module_wo = module
+
+        if luc:
+            module_start, module_w, module_wo = luc.get_modules()
+
+        if module.is_luc_remaining_same():
             self.inputs_start_w = [
                 *[area, 0],
                 project.implementation_years,
@@ -6209,7 +6101,7 @@ class SetAsideCalculator(BaseCalculator):
             self.math_start_w = MathNotCultivatedLand(*self.inputs_start_w)
             self.math_start_w.calculate_emissions()
 
-        if is_business_as_usual(input):
+        if module.is_business_as_usual():
             self.inputs_start_wo = [
                 *[area, 0],
                 project.implementation_years,
@@ -6240,7 +6132,7 @@ class SetAsideCalculator(BaseCalculator):
             self.math_start_wo = MathNotCultivatedLand(*self.inputs_start_wo)
             self.math_start_wo.calculate_emissions()
 
-        if is_with(input):
+        if module.is_with():
             self.inputs_w = [
                 *[0, area],
                 project.implementation_years,
@@ -6271,7 +6163,7 @@ class SetAsideCalculator(BaseCalculator):
             self.math_w = MathNotCultivatedLand(*self.inputs_w)
             self.math_w.calculate_emissions()
 
-        if is_without(input):
+        if module.is_without():
             self.inputs_wo = [
                 *[0, area],
                 project.implementation_years,
@@ -6302,78 +6194,11 @@ class SetAsideCalculator(BaseCalculator):
             self.math_wo = MathNotCultivatedLand(*self.inputs_wo)
             self.math_wo.calculate_emissions()
 
-        results_start_w = self.math_start_w.result if self.math_start_w else MathResult(project.implementation_years, project.capitalization_years)
-        results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(project.implementation_years, project.capitalization_years)
-        results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
-        results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
-        log.debug("start_w breakdown")
-        results_start_w.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        log.debug("start_wo breakdown")
-        results_start_wo.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        log.debug("w breakdown")
-        results_w.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        log.debug("wo breakdown")
-        results_wo.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        results_tuple = (results_w + results_start_w, results_wo + results_start_wo)
+        results_tuple = (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
 
         return results_tuple
-
-    def get_defaults(self, calculate=False) -> dict:
-        module: SetAside = self.data
-        activity: Activity = module.activity
-        project: Project = activity.project
-        luc: LandUseChange = module.land_use_change
-
-        climate: Climate = activity.climate_t2 or project.climate
-        moisture: Moisture = activity.moisture_t2 or project.moisture
-        region: Region = project.country.region
-        soil_type: SoilType = project.soil_type
-
-        climate_flt = {"climate": climate}
-        moisture_flt = {"moisture": moisture}
-        soil_flt = {"soil_type": soil_type}
-        region_flt = {"continent": region}
-        cm = {"climate": climate, "moisture": moisture}
-
-        module_start = module_w = module_wo = input
-
-        # NOTE: Here we have a hardcoded organic_input_flt. This is due to the fact that it should not be present in the table (it isn't in the Excel)
-        retrieved_input = OrganicInputType.objects.get(name="Medium C input")
-        organic_input_hardcoded = {"organic_input_type": retrieved_input}
-
-        if luc:
-            module_start, module_w, module_wo = get_luc_modules(luc)
-
-        if is_luc_remaining_same(module):
-            self.flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-            self.fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-            self.fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-            self.som_start = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, moisture_flt, f"LandUseNitrousEmissionFactor for {moisture.name} moisture and Medium C input does not exist")
-
-        if is_business_as_usual(module):
-            self.flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-            self.fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-            self.fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-            self.som_start = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, moisture_flt, f"LandUseNitrousEmissionFactor for {moisture.name} moisture and Medium C input does not exist")
-
-        if is_with(module):
-            self.flu_w = get_flu_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
-            self.fmg_w = get_fmg_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
-            self.fi_w = get_fi_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
-            self.som_w = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, moisture_flt, f"LandUseNitrousEmissionFactor for {moisture.name} moisture and Medium C input does not exist")
-
-        if is_without(module):
-            self.flu_wo = get_flu_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
-            self.fmg_wo = get_fmg_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
-            self.fi_wo = get_fi_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
-            self.som_wo = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, moisture_flt, f"LandUseNitrousEmissionFactor for {moisture.name} moisture and Medium C input does not exist")
-
-        self.soc = utils.get_or_raise(ipcc.SoilOrganicCarbon, cm | soil_flt, f"SoilOrganicCarbon for {soil_type.name} soil type in {climate.name} climate and {moisture.name} moisture does not exist")
-
-        if module.status.name == "READY" and calculate:
-            self.calculate()

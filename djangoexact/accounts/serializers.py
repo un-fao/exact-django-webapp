@@ -25,6 +25,19 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=255, required=True)
+    password = serializers.CharField(max_length=255, required=True)
+
+
+class LoginResponseSerializer(serializers.Serializer):
+    firebase_uid = serializers.CharField(max_length=255, required=True)
+    access_token = serializers.CharField(max_length=255, required=True)
+    refresh_token = serializers.CharField(max_length=255, required=True)
+    expires_in = serializers.IntegerField(required=True)
+    kind = serializers.CharField(max_length=255, required=True)
+
+
 # User serializer
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -44,4 +57,19 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         data["refresh"] = str(refresh)
         data["access"] = str(refresh.access_token)
         data["user"] = UserSerializer(self.user).data
+        return data
+
+
+class PasswordResetSerializer(serializers.Serializer):
+    email = serializers.EmailField(
+        required=True,
+        validators=[UniqueValidator(queryset=User.objects.all())],
+    )
+
+    def validate(self, data):
+        email = data.get("email")
+
+        if not User.objects.filter(email=email).exists():
+            raise serializers.ValidationError("User with this email does not exist.")
+
         return data

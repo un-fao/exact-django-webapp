@@ -1,5 +1,4 @@
-﻿High Activity Clay,Low Activity Clay,Sandy,Spodic,Volcanic,Wetland,Organic
-Default,Default,0,0,0,0,0,0,NO
+climate,moisture,High Activity Clay,Low Activity Clay,Sandy,Spodic,Volcanic,Wetland,Organic
 Boreal,Moist,63,N/A,10,117,20,116,NO
 Boreal,Dry,63,N/A,10,117,20,116,NO
 Cool temperate,Dry,43,33,13,NO,20,87,NO
@@ -9,4 +8,4 @@ Warm temperate,Moist,64,55,36,143,138,135,NO
 Tropical,Dry,21,19,9,NO,50,22,NO
 Tropical,Moist,40,38,27,NO,70,68,NO
 Tropical,Wet,60,52,46,NO,77,49,NO
-Tropical,Montane,51,44,52,NO,96,82,NO
+Tropical Montane,Dry,51,44,52,NO,96,82,NO

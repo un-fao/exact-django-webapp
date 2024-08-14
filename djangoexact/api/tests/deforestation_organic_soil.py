@@ -17,7 +17,7 @@ from api.models import (
     Project,
     SoilType,
     StatusType,
-    UserProjectGroup,
+    ProjectMembership,
     OrganicSoil,
 )
 from api.models import CustomUser as User
@@ -73,7 +73,7 @@ for i in range(PROJECT_SIZE):
         soil_type=soil_type,
     )
 
-    UserProjectGroup.objects.create(user=u, project=p, group=group)
+    ProjectMembership.objects.create(user=u, project=p, group=group)
 
     # ds = workbook.sheets["1.Description"]
     # ds["Q8"].value = p.country.region.name
