@@ -597,11 +597,20 @@ class ProjectInvitation(Historical):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     status = models.ForeignKey(InvitationStatusType, on_delete=models.CASCADE)
 
+    token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    token_expiry = models.DateTimeField(null=True, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
 
     class Meta:
         unique_together = (("project", "user", "group"),)
+
+    def save(self, *args, **kwargs):
+        if not self.token_expiry:
+            self.token_expiry = timezone.now() + timezone.timedelta(days=3)  # Token valid for 3 days
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"({self.pk}) {self.project.name} - {self.user.email}"
@@ -1633,7 +1642,7 @@ class Aquaculture(Module):
     electricity_used_t2_w = models.FloatField(null=True, blank=True)
     electricity_used_t2_wo = models.FloatField(null=True, blank=True)
 
-    electricity_ef_t2_start = models.FloatField(null=True, blank=True) # TODO: Rename to n2o_fish_production
+    electricity_ef_t2_start = models.FloatField(null=True, blank=True)  # TODO: Rename to n2o_fish_production
     electricity_ef_t2_w = models.FloatField(null=True, blank=True)
     electricity_ef_t2_wo = models.FloatField(null=True, blank=True)
 
