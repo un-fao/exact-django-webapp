@@ -2327,15 +2327,17 @@ class GrasslandCalculator(BaseCalculator):
     def __init__(self, input) -> None:
         super().__init__(input)
 
-        self.ef = SimpleNamespace(value=0)
-        self.agb = SimpleNamespace(value=0)
-        self.cf = SimpleNamespace(value=0)
-        self.soc = SimpleNamespace(value=0)
-        self.soc_start = SimpleNamespace(fi=1, fmg=1, flu=1)
-        self.soc_w = SimpleNamespace(fi=1, fmg=1, flu=1)
-        self.soc_w = SimpleNamespace(fi=1, fmg=1, flu=1)
-        self.soc_wo = SimpleNamespace(fi=1, fmg=1, flu=1)
+        self.ef: SimpleNamespace | ipcc.BurningEmissionFactor = SimpleNamespace(value=0)
+        self.agb: SimpleNamespace | ipcc.GrasslandAGB = SimpleNamespace(value=0)
+        self.cf: SimpleNamespace | GrasslandParameter = SimpleNamespace(value=0)
+        self.soc: SimpleNamespace | ipcc.SoilOrganicCarbon = SimpleNamespace(value=0)
+        self.soc_start: SimpleNamespace | ipcc.GrasslandStockExchangeFactor = SimpleNamespace(fi=1, fmg=1, flu=1)
+        self.soc_w: SimpleNamespace | ipcc.GrasslandStockExchangeFactor = SimpleNamespace(fi=1, fmg=1, flu=1)
+        self.soc_wo: SimpleNamespace | ipcc.GrasslandStockExchangeFactor = SimpleNamespace(fi=1, fmg=1, flu=1)
         self.som: SimpleNamespace | ipcc.NitrousEmissionFactor = SimpleNamespace(value=0)
+        self.biomass_ef_start: SimpleNamespace | ipcc.ForestTotalBiomass = SimpleNamespace(value=0)
+        self.biomass_ef_w: SimpleNamespace | ipcc.ForestTotalBiomass = SimpleNamespace(value=0)
+        self.biomass_ef_wo: SimpleNamespace | ipcc.ForestTotalBiomass = SimpleNamespace(value=0)
 
     def get_defaults(self, calculate=False):
         module: Grassland = self.data
@@ -2353,44 +2355,13 @@ class GrasslandCalculator(BaseCalculator):
         self.soc = utils.get_or_raise(ipcc.SoilOrganicCarbon, {"climate": project.climate, "moisture": project.moisture, "soil_type": project.soil_type}, f"Soil organic carbon for {project.climate.name} climate, {project.moisture.name} moisture and {project.soil_type.name} soil type does not exist")
         self.som = utils.get_or_raise(ipcc.NitrousEmissionFactor, {"moisture": project.moisture}, f"Land use nitrous emission factor for {project.moisture.name} moisture does not exist")
 
-        if is_luc_remaining_same(module) or is_with(module):
-
-            try:
-                self.cf = GrasslandParameter.objects.get(name="default_combustion_factor")
-            except GrasslandParameter.DoesNotExist:
-                raise Exception("Default combustion factor does not exist")
-
-            try:
-                self.soc = ipcc.SoilOrganicCarbon.objects.get(climate=project.climate, moisture=project.moisture, soil_type=project.soil_type)
-            except ipcc.SoilOrganicCarbon.DoesNotExist:
-                raise Exception(f"Soil organic carbon for {project.climate.name} climate, {project.moisture.name} moisture and {project.soil_type.name} soil type does not exist")
-
-        if module.is_luc_remaining_same():
-
-            try:
-                self.soc_start = ipcc.GrasslandStockExchangeFactor.objects.get_or_default(grassland_management_type=module.grassland_management_type_start, climate=project.climate)
-            except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
-                raise Exception(f"Stock exchange factor for {module.grassland_management_type_start.name} in {project.climate.name} climate does not exist")
-
-            try:
-                self.soc_w = ipcc.GrasslandStockExchangeFactor.objects.get_or_default(grassland_management_type=module.grassland_management_type_w, climate=project.climate)
-            except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
-                raise Exception(f"Stock exchange factor for {module.grassland_management_type_w.name} in {project.climate.name} climate does not exist")
+        if module.is_luc_remaining_same() or module.is_business_as_usual():
+            self.soc_start = utils.get_or_raise(ipcc.GrasslandStockExchangeFactor, {"grassland_management_type": module.grassland_management_type_start, "climate": project.climate}, f"Stock exchange factor for {module.grassland_management_type_start.name} in {project.climate.name} climate does not exist")
 
         if module.is_with():
-            try:
-                self.soc_start = ipcc.GrasslandStockExchangeFactor.objects.get_or_default(grassland_management_type=module.grassland_management_type_start, climate=project.climate)
-            except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
-                raise Exception(f"Stock exchange factor for {module.grassland_management_type_start.name} in {project.climate.name} climate does not exist")
+            self.soc_w = utils.get_or_raise(ipcc.GrasslandStockExchangeFactor, {"grassland_management_type": module.grassland_management_type_w, "climate": project.climate}, f"Stock exchange factor for {module.grassland_management_type_w.name} in {project.climate.name} climate does not exist")
 
-            try:
-                self.soc_w = ipcc.GrasslandStockExchangeFactor.objects.get_or_default(grassland_management_type=module.grassland_management_type_w, climate=project.climate)
-            except ipcc.GrasslandStockExchangeFactor.DoesNotExist:
-                raise Exception(f"Stock exchange factor for {module.grassland_management_type_w.name} in {project.climate.name} climate does not exist")
-
-        if module.is_business_as_usual():
-
-            self.soc_start = utils.get_or_raise(ipcc.GrasslandStockExchangeFactor, {"grassland_management_type": module.grassland_management_type_start, "climate": project.climate}, f"Stock exchange factor for {module.grassland_management_type_start.name} in {project.climate.name} climate does not exist")
+        if module.is_without():
             self.soc_wo = utils.get_or_raise(ipcc.GrasslandStockExchangeFactor, {"grassland_management_type": module.grassland_management_type_wo, "climate": project.climate}, f"Stock exchange factor for {module.grassland_management_type_wo.name} in {project.climate.name} climate does not exist")
 
     def calculate(self) -> list[Result]:
@@ -2456,6 +2427,10 @@ class GrasslandCalculator(BaseCalculator):
                 module.fi_t2_w,
                 DELAY_START_W,
                 self.som.value,
+                self.biomass_ef_start.value,
+                self.biomass_ef_w.value,
+                module.biomass_t2_start,
+                module.biomass_t2_w,
             ]
 
             log.debug("Inputs start w: %s", self.inputs_start_w)
@@ -2500,6 +2475,10 @@ class GrasslandCalculator(BaseCalculator):
                 module.fi_t2_w,
                 DELAY_W,
                 self.som.value,
+                self.biomass_ef_start.value,
+                self.biomass_ef_w.value,
+                module.biomass_t2_start,
+                module.biomass_t2_w,
             ]
 
             log.debug("Inputs w: %s", self.inputs_w)
@@ -2544,6 +2523,10 @@ class GrasslandCalculator(BaseCalculator):
                 module.fi_t2_wo,
                 DELAY_START_WO,
                 self.som.value,
+                self.biomass_ef_start.value,
+                self.biomass_ef_wo.value,
+                module.biomass_t2_start,
+                module.biomass_t2_wo,
             ]
 
             log.debug("Inputs start wo: %s", self.inputs_start_wo)
@@ -2588,6 +2571,10 @@ class GrasslandCalculator(BaseCalculator):
                 module.fi_t2_wo,
                 DELAY_WO,
                 self.som.value,
+                self.biomass_ef_start.value,
+                self.biomass_ef_wo.value,
+                module.biomass_t2_start,
+                module.biomass_t2_wo,
             ]
 
             log.debug("Inputs wo: %s", self.inputs_wo)
