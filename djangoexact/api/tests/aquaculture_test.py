@@ -45,7 +45,7 @@ p: api_models.Project = factories.ProjectFactory.create(
     soil_type=soil_type,
 )
 
-api_models.UserProjectGroup.objects.create(user=u, project=p, group=group)
+api_models.ProjectMembership.objects.create(user=u, project=p, group=group)
 
 print(f"Capitalization Years: {p.capitalization_years}")
 print(f"Implementation Years: {p.implementation_years}")

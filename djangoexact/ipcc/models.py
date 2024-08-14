@@ -13,15 +13,6 @@ class GlobalWarmingPotential(Model):
         return self.name
 
 
-class NitrousEmissionFactor(Model):
-    name = CharField(max_length=100)
-    moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
-    value = FloatField()
-
-    def __str__(self):
-        return self.name
-
-
 class TotalBiomassAfterDefoManager(Manager):
     def get_or_default(self, climate, moisture, continent, land_use_type):
         try:
@@ -104,34 +95,6 @@ class AfforestationCombustionFactor(Model):
 
     def __str__(self):
         return f"Factor for {self.land_use_type.name}, value: {self.value}"
-
-
-class DefaultEmissionFactor(Model):
-    """
-    IPCC:A97;A98;A101
-    """
-
-    # NOTE: organic_input_type is not used in the excel file, look into this.
-    # In order to make DegradedLand and SetAside work, I hardcoded it.
-    # This has to be removed, and then we can change there as well
-    organic_input_type = ForeignKey("api.OrganicInputType", on_delete=CASCADE)
-    moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
-    value = FloatField()
-
-    def __str__(self):
-        return f"Factor for {self.moisture.name}, {self.organic_input_type}, value: {self.value}"
-
-
-class LandUseNitrousEmissionFactor(Model):
-    """
-    IPCC:A99:A101
-    """
-
-    moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
-    value = FloatField()
-
-    def __str__(self):
-        return f"Factor for {self.moisture.name}, value: {self.value}"
 
 
 class LitterDeadwoodCarbonStock(Model):
@@ -486,22 +449,6 @@ class CoastalDeadwood(Model):
 
     def __str__(self) -> str:
         return f"{self.value} for {self.climate.name} {self.moisture.name} {self.land_use_type.name}"
-
-
-class DefaultSoilCarbonStock1Meter(Model):
-    """
-    IPCC 2164
-    """
-
-    climate = ForeignKey("api.Climate", on_delete=CASCADE)
-    moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
-    land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
-    soil_type = ForeignKey("api.SoilType", on_delete=CASCADE)
-    unit = CharField(max_length=10)
-    value = FloatField(default=0)
-
-    def __str__(self):
-        return f"{self.value} for {self.climate.name} {self.moisture.name} {self.land_use_type.name} {self.soil_type.name}"
 
 
 class RewettingCarbonFactor(Model):
@@ -1183,6 +1130,10 @@ class RiceYield(Model):
 
 
 class TrophicStateFactor(Model):
+    """
+    IPCC:3222
+    """
+
     trophic_type = ForeignKey("api.TrophicType", on_delete=CASCADE)
     value = FloatField()
     chloa = FloatField()
@@ -1372,3 +1323,35 @@ class FLUData(Model):
 
     class Meta:
         unique_together = ("climate", "moisture", "land_use_type")
+
+
+class SettlementEF(Model):
+    settlement_type = ForeignKey("api.SettlementType", on_delete=CASCADE)
+    climate = ForeignKey("api.Climate", on_delete=CASCADE)
+    moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
+    flu = FloatField(default=1)
+    fmg = FloatField(default=1)
+    fi = FloatField(default=1)
+    biomass = FloatField(default=0)
+
+    class Meta:
+        unique_together = ("settlement_type", "climate", "moisture")
+
+    def __str__(self):
+        return f"({self.pk}) {self.settlement_type.name} {self.climate.name} {self.moisture.name}"
+
+
+class NitrousEmissionFactor(Model):
+    moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
+    value = FloatField(default=0)
+
+    def __str__(self):
+        return f"({self.pk}) {self.moisture.name} {self.value}"
+
+
+class InputsNitrousEmissionFactor(Model):
+    moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
+    value = FloatField(default=0)
+
+    def __str__(self):
+        return f"({self.pk}) {self.moisture.name} {self.value}"
