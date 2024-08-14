@@ -1,6 +1,11 @@
 import logging
 from datetime import timedelta
 from types import SimpleNamespace
+import uuid
+from django.core.mail import send_mail
+from django.urls import reverse
+from django.conf import settings
+from django.shortcuts import render
 
 from django.apps import apps
 from django.contrib.auth.models import Group
@@ -643,7 +648,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not serializer.is_valid():
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
-        project = serializer.validated_data["project"]
+        project: Project = serializer.validated_data["project"]
 
         if not utils.has_project_permission("add_projectinvitation", self.request.user, project):
             logging.error("Selected user does not have permission to invite users to the project")
@@ -657,17 +662,23 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return utils.ErrorResponse(f"User with email {email} does not exist", status=http_status.HTTP_400_BAD_REQUEST)
 
         group = serializer.validated_data["group"]
-        invitation, created = ProjectInvitation.objects.get_or_create(project=project, user=user, group=group, status=InvitationStatusType.objects.get(name="accepted"))  # TODO: Change status to pending when SMTP is implemented
+        invitation = ProjectInvitation.objects.filter(project=project, user=user, group=group).first()
 
-        if not created and invitation.group == group:
+        if invitation:
             logging.warning(f"Invitation for {user.email} already sent with id {invitation.id}")
             return Response({"message": f"Invitation for {user.email} already sent for group {invitation.group.name}"}, status=http_status.HTTP_200_OK)
 
-        if not created:
-            logging.error(f"Invitation for {user.email} already sent with id {invitation.id}")
-            return utils.ErrorResponse({"error": f"Invitation for {user.email} already sent"}, status=http_status.HTTP_400_BAD_REQUEST)
+        invitation = ProjectInvitation(project=project, user=user, group=group)
+        invitation.status = InvitationStatusType.objects.get(name=utils.InvitationStatus.PENDING.value)
+        invitation.save()
 
-        membership = ProjectMembership.objects.create(user=user, project=project, group=group)
+        invitation_link = reverse("project-invitations-accept", args=[invitation.token])
+        send_mail(
+            f"You have been invited to join the project {project.name}",
+            f"Click the link to accept the invitation: {request.build_absolute_uri(invitation_link)}",
+            settings.EMAIL_HOST_USER,
+            [invitation.user.email],
+        )
 
         logging.debug("END ProjectInvitationViewset.create")
         return Response({"message": f"Invitation for {user.email} sent successfully", "id": invitation.id}, status=http_status.HTTP_201_CREATED)
@@ -747,6 +758,51 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         serializer = ProjectInvitationReadSerializer(project.invitations.all(), many=True)
 
         return Response(serializer.data, status=http_status.HTTP_200_OK)
+
+    @transaction.atomic
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter("token", openapi.IN_PATH, description="Token of the invitation", type=openapi.TYPE_STRING)],
+        responses={
+            400: "Bad request",
+            200: "Invitations deleted successfully",
+            403: "Selected user does not have permission to delete invitations",
+        },
+    )
+    @action(detail=False, methods=["get"], url_path="accept/(?P<token>[0-9a-f-]+)", permission_classes=[permissions.AllowAny])
+    def accept(self, request, token=None):
+
+        if not token:
+            return utils.ErrorResponse("Token not provided", status=http_status.HTTP_400_BAD_REQUEST)
+
+        try:
+            uuid.UUID(token)
+        except ValueError:
+            return utils.ErrorResponse("Invalid token", status=http_status.HTTP_400_BAD_REQUEST)
+
+        invitation: ProjectInvitation = get_object_or_404(ProjectInvitation, token=token)
+
+        # NOTE: This is not possible since clicking the link will not authenticate the user
+        # user: CustomUser = self.request.user
+        # if user != invitation.user and not any([user.is_staff, user.is_superuser]):
+        #     return utils.ErrorResponse("Selected user does not have permission to accept the invitation", status=http_status.HTTP_403_FORBIDDEN)
+
+        if invitation.status.name != utils.InvitationStatus.PENDING.value:
+            return utils.ErrorResponse("Invitation is not pending", status=http_status.HTTP_400_BAD_REQUEST)
+
+        # NOTE: This clashes with the uniqueness of the invitations for the same user and the same role in the same project
+        # If we want to allow multiple invitations for the same user and the same role in the same project, we need to change the invitation logic
+        # Possibly removing the error in case of multiple invitation, and instead refreshing the token and sending a new invitation email
+        # if invitation.token_expiry < timezone.now():
+        #     return utils.ErrorResponse("Invitation link has expired", status=http_status.HTTP_400_BAD_REQUEST)
+
+        invitation.status = InvitationStatusType.objects.get(name=utils.InvitationStatus.ACCEPTED.value)
+
+        ProjectMembership.objects.create(user=invitation.user, project=invitation.project, group=invitation.group)
+
+        invitation.save()
+
+        # Teturn simple html page with message
+        return render(request, "invitation_accepted.html", {"project_name": invitation.project.name, "group": invitation.group.name})
 
 
 class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):

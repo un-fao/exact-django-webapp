@@ -24,7 +24,7 @@ schema_view = get_schema_view(
 router = routers.DefaultRouter()
 
 router.register(r"projects", views.ProjectViewSet)
-router.register(r"project-invitations", views.ProjectInvitationViewSet)
+router.register(r"project-invitations", views.ProjectInvitationViewSet, basename="project-invitations")
 router.register(r"project-memberships", views.ProjectMembershipViewSet)
 router.register(r"groups", views.GroupViewSet)
 router.register(r"activities", views.ActivityViewSet, basename="activities")
