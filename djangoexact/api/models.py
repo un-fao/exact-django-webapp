@@ -2011,28 +2011,12 @@ class OrganicSoil(LandModuleFixed):
         return super().save(*args, **kwargs)
 
 
-class Settlement(LandModuleFixed, AboveBelowGroundBiomassModule):
+class Settlement(LandModuleFixed, AboveBelowGroundBiomassModule, SingleBiomassModule):
 
     settlement_type_start = models.ForeignKey(SettlementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_settlement_type_start")
     settlement_type_w = models.ForeignKey(SettlementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_settlement_type_w")
     settlement_type_wo = models.ForeignKey(SettlementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_settlement_type_wo")
     settlement_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_settlement_type_thread", on_delete=models.SET_NULL)
-
-    soil_carbon_t2_start = models.FloatField(null=True, blank=True)
-    soil_carbon_t2_w = models.FloatField(null=True, blank=True)
-    soil_carbon_t2_wo = models.FloatField(null=True, blank=True)
-
-    flu_t2_start = models.FloatField(null=True, blank=True)
-    flu_t2_w = models.FloatField(null=True, blank=True)
-    flu_t2_wo = models.FloatField(null=True, blank=True)
-
-    fi_t2_start = models.FloatField(null=True, blank=True)
-    fi_t2_w = models.FloatField(null=True, blank=True)
-    fi_t2_wo = models.FloatField(null=True, blank=True)
-
-    fmg_t2_start = models.FloatField(null=True, blank=True)
-    fmg_t2_w = models.FloatField(null=True, blank=True)
-    fmg_t2_wo = models.FloatField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
 
