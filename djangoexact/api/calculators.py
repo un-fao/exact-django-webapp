@@ -5496,25 +5496,19 @@ class ForestManagementCalculator(BaseCalculator):
     def calculate(self) -> Result:
         """"""
 
-        input: LandModule = self.data
-        luc: LandUseChange = input.land_use_change
-        project: Project = input.activity.project
-        area = luc.area if luc else input.area
-
-        DELAY_START_W = 0
-        DELAY_START_WO = 0
-        DELAY_W = 0
-        DELAY_WO = 0
+        module: LandModule = self.data
+        luc: LandUseChange = module.land_use_change
+        project: Project = module.activity.project
+        area = luc.area if luc else module.area
 
         # TODO: Review
+        land_use_type = module.land_use_type_start
         if luc:
             # NOTE: This if is useless. It's always True
-            land_use_type = input.land_use_type_start if luc.module_type_start.class_name == "ForestManagement" else input.land_use_type_start
+            land_use_type = module.land_use_type_start if luc.module_type_start.class_name == "ForestManagement" else module.land_use_type_start
             land_use_type = LandUseType.objects.get(name=land_use_type.name)
-        else:
-            land_use_type = input.land_use_type_start
 
-        forest: ForestManagement = luc.forestmanagement if luc else input
+        forest: ForestManagement = luc.forestmanagement if luc else module
 
         AGB_GROWTH_NOT_FOUND = f"AGB Growth not found for ({forest.forest_type.name}) {land_use_type.name} in {project.climate.name} climate, {project.country.region.name} region. Please insert t2 values for AGB Growth Rate for all scenarios."
         BGB_UNDER_20_NOT_FOUND = f"BGB (under 20 years) not found for ({forest.forest_type.name}) {land_use_type.name} in {project.climate.name} climate, {project.country.region.name} region. Please insert t2 values for BGB (under 20 years) for all scenarios."
@@ -5538,6 +5532,29 @@ class ForestManagementCalculator(BaseCalculator):
             "land_use_type": land_use_type,
             "forest_type": forest.forest_type,
         }
+
+        module_start = module_w = module_wo = module
+
+        if luc:
+            module_start, module_w, module_wo = luc.get_modules()
+
+        fi_start = get_fi_data(module_start, project.climate, project.moisture, utils.ScenarioTypes.START)
+        fi_w = get_fi_data(module_w, project.climate, project.moisture, utils.ScenarioTypes.WITH)
+        fi_wo = get_fi_data(module_wo, project.climate, project.moisture, utils.ScenarioTypes.WITHOUT)
+
+        fmg_start = get_fmg_data(module_start, project.climate, project.moisture, utils.ScenarioTypes.START)
+        fmg_w = get_fmg_data(module_w, project.climate, project.moisture, utils.ScenarioTypes.WITH)
+        fmg_wo = get_fmg_data(module_wo, project.climate, project.moisture, utils.ScenarioTypes.WITHOUT)
+
+        # NOTE: For non-forest is ipcc.AfforestationCombustionFactor (used in OLUC?)
+        combustion_factor_w: ipcc.ForestCombustionFactor = utils.get_or_raise(ipcc.ForestCombustionFactor, {"land_use_type": module.land_use_type_w, "climate": project.climate, "forest_type": forest.forest_type}, f"Combustion Factor W not found for {module.land_use_type_w.name}, {project.climate.name}, {forest.forest_type.name}")
+        combustion_factor_wo: ipcc.ForestCombustionFactor = utils.get_or_raise(ipcc.ForestCombustionFactor, {"land_use_type": module.land_use_type_wo, "climate": project.climate, "forest_type": forest.forest_type}, f"Combustion Factor WO not found for {module.land_use_type_wo.name}, {project.climate.name}, {forest.forest_type.name}")
+
+        mangroves_data = None
+        try:
+            mangroves_data = ipcc.DataOnMangrove.objects.get(continent=project.country.region)
+        except ipcc.DataOnMangrove.DoesNotExist:
+            pass
 
         try:
             socref = ipcc.SoilOrganicCarbon.objects.get(climate=project.climate, moisture=project.moisture, soil_type=project.soil_type)
@@ -5638,9 +5655,9 @@ class ForestManagementCalculator(BaseCalculator):
             flu_wo = flu_start
             litter_dw_start_wo = SimpleNamespace(litter=0, dw=0)
 
-        disturbances: list[ForestDisturbance] = input.disturbances.all()
+        disturbances: list[ForestDisturbance] = module.disturbances.all()
 
-        som: ipcc.LandUseNitrousEmissionFactor = utils.get_or_raise(ipcc.LandUseNitrousEmissionFactor, {"moisture": project.moisture}, f"SOM not found for {project.moisture.name} moisture.")
+        som: ipcc.NitrousEmissionFactor = utils.get_or_raise(ipcc.NitrousEmissionFactor, {"moisture": project.moisture}, f"SOM not found for {project.moisture.name} moisture.")
 
         math_w = None
         math_wo = None
@@ -5648,7 +5665,7 @@ class ForestManagementCalculator(BaseCalculator):
         inputs_w = [
             project.capitalization_years,
             project.implementation_years,
-            input.activity.change_rate.name,
+            module.activity.change_rate.name,
             0,
             area,
             forest.rotation_length_yrs_w,
@@ -5686,25 +5703,25 @@ class ForestManagementCalculator(BaseCalculator):
             socref.value,
             project.soc_ref_t2,
             project.soc_ref_t2,
-            1,  # FMG_start
-            1,  # FMG_w
+            fmg_start.value,
+            fmg_w.value,
             forest.fmg_t2_start,
             forest.fmg_t2_w,
             flu_start.value,
             flu_w.value,
             forest.flu_t2_start,
             forest.flu_t2_w,
-            1,  # FI_start
-            1,  # FI_w
+            fi_start.value,
+            fi_w.value,
             forest.fi_t2_start,
             forest.fi_t2_w,
             project.gw_potential.ch4,
             project.gw_potential.n2o,
-            1,  # forest_cf
-            1,  # forest_gef_ch4
-            1,  # forest_gef_n2o
-            1,  # forest_gef_co2
-            1,  # mangrove_factor (see mangrove implementation elsewhere)
+            combustion_factor_w.value,
+            combustion_factor_w.ch4,
+            combustion_factor_w.n2o,
+            combustion_factor_w.co2,
+            utils.MANGROVE_FACTOR if mangroves_data is not None else utils.NON_MANGROVE_FACTOR,
             forest.average_yearly_degradation_percentage_w,
             som.value,
             project.gw_potential.n2o,
@@ -5718,7 +5735,7 @@ class ForestManagementCalculator(BaseCalculator):
         inputs_wo = [
             project.capitalization_years,
             project.implementation_years,
-            input.activity.change_rate.name,
+            module.activity.change_rate.name,
             0,
             area,
             forest.rotation_length_yrs_wo,
@@ -5756,25 +5773,25 @@ class ForestManagementCalculator(BaseCalculator):
             socref.value,
             project.soc_ref_t2,
             project.soc_ref_t2,
-            1,  # FMG_start
-            1,  # FMG_w
+            fmg_start.value,
+            fmg_wo.value,
             forest.fmg_t2_start,
             forest.fmg_t2_w,
             flu_start.value,
             flu_wo.value,
             forest.flu_t2_start,
             forest.flu_t2_wo,
-            1,  # FI_start
-            1,  # FI_w
+            fi_start.value,
+            fi_wo.value,
             forest.fi_t2_start,
             forest.fi_t2_wo,
             project.gw_potential.ch4,
             project.gw_potential.n2o,
-            1,  # forest_cf
-            1,  # forest_gef_ch4
-            1,  # forest_gef_n2o
-            1,  # forest_gef_co2
-            1,  # mangrove_factor (see mangrove implementation elsewhere)
+            combustion_factor_wo.value,
+            combustion_factor_wo.ch4,
+            combustion_factor_wo.n2o,
+            combustion_factor_wo.co2,
+            utils.MANGROVE_FACTOR if mangroves_data is not None else utils.NON_MANGROVE_FACTOR,
             forest.average_yearly_degradation_percentage_w,
             som.value,
             project.gw_potential.n2o,
