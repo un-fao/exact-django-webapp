@@ -3585,6 +3585,10 @@ class SettlementCalculator(BaseCalculator):
         self.fi_wo = SimpleNamespace(value=1)
         self.fmg_wo = SimpleNamespace(value=1)
 
+        self.biomass_ef_start: SimpleNamespace | ipcc.ForestTotalBiomass = SimpleNamespace(value=0)
+        self.biomass_ef_w: SimpleNamespace | ipcc.ForestTotalBiomass = SimpleNamespace(value=0)
+        self.biomass_ef_wo: SimpleNamespace | ipcc.ForestTotalBiomass = SimpleNamespace(value=0)
+
         self.math_start_w = None
         self.math_start_wo = None
         self.math_w = None
@@ -3613,18 +3617,21 @@ class SettlementCalculator(BaseCalculator):
             self.flu_start = SimpleNamespace(value=self.ef_start.flu)
             self.fi_start = SimpleNamespace(value=self.ef_start.fi)
             self.fmg_start = SimpleNamespace(value=self.ef_start.fmg)
+            self.biomass_ef_start = utils.get_or_raise(ipcc.ForestTotalBiomass, cm | {"continent": project.country.region, "land_use_type": module.land_use_type_start}, f"Forest total biomass not found for {climate.name} climate, {moisture.name} moisture, {project.country.region.name} region and {module.land_use_type_start.name} land use type")
 
         if module.is_with():
             self.ef_w: ipcc.SettlementEF = utils.get_or_raise(ipcc.SettlementEF, {"settlement_type": module.settlement_type_w, "climate": climate, "moisture": moisture}, f"Settlement EF not found for {module.settlement_type_w.name}")
             self.flu_w = SimpleNamespace(value=self.ef_w.flu)
             self.fi_w = SimpleNamespace(value=self.ef_w.fi)
             self.fmg_w = SimpleNamespace(value=self.ef_w.fmg)
+            self.biomass_ef_w = utils.get_or_raise(ipcc.ForestTotalBiomass, cm | {"continent": project.country.region, "land_use_type": module.land_use_type_w}, f"Forest total biomass not found for {climate.name} climate, {moisture.name} moisture, {project.country.region.name} region and {module.land_use_type_w.name} land use type")
 
         if module.is_without():
             self.ef_wo: ipcc.SettlementEF = utils.get_or_raise(ipcc.SettlementEF, {"settlement_type": module.settlement_type_wo, "climate": climate, "moisture": moisture}, f"Settlement EF not found for {module.settlement_type_wo.name}")
             self.flu_wo = SimpleNamespace(value=self.ef_wo.flu)
             self.fi_wo = SimpleNamespace(value=self.ef_wo.fi)
             self.fmg_wo = SimpleNamespace(value=self.ef_wo.fmg)
+            self.biomass_ef_wo = utils.get_or_raise(ipcc.ForestTotalBiomass, cm | {"continent": project.country.region, "land_use_type": module.land_use_type_wo}, f"Forest total biomass not found for {climate.name} climate, {moisture.name} moisture, {project.country.region.name} region and {module.land_use_type_wo.name} land use type")
 
         if luc and module.settlement_type_start.name.casefold() != "paved settlement":
             module_start, module_w, module_wo = luc.get_modules()
@@ -3686,6 +3693,10 @@ class SettlementCalculator(BaseCalculator):
                 module.fi_t2_start,
                 module.fi_t2_w,
                 0,  # Delay
+                self.biomass_ef_start.value,
+                self.biomass_ef_w.value,
+                module.biomass_t2_start,
+                module.biomass_t2_w,
             ]
 
             self.math_start_w = NotCultivatedLand(*self.inputs_start_w)
@@ -3718,6 +3729,10 @@ class SettlementCalculator(BaseCalculator):
                 module.fi_t2_start,
                 module.fi_t2_wo,
                 0,  # Delay
+                self.biomass_ef_start.value,
+                self.biomass_ef_wo.value,
+                module.biomass_t2_start,
+                module.biomass_t2_wo,
             ]
 
             self.math_start_wo = NotCultivatedLand(*self.inputs_start_wo)
@@ -3750,6 +3765,10 @@ class SettlementCalculator(BaseCalculator):
                 module.fi_t2_start,
                 module.fi_t2_w,
                 0,  # Delay
+                self.biomass_ef_start.value,
+                self.biomass_ef_w.value,
+                module.biomass_t2_start,
+                module.biomass_t2_w,
             ]
 
             self.math_w = NotCultivatedLand(*self.inputs_w)
@@ -3782,6 +3801,10 @@ class SettlementCalculator(BaseCalculator):
                 module.fi_t2_start,
                 module.fi_t2_wo,
                 0,  # Delay
+                self.biomass_ef_start.value,
+                self.biomass_ef_wo.value,
+                module.biomass_t2_start,
+                module.biomass_t2_wo,
             ]
 
             self.math_wo = NotCultivatedLand(*self.inputs_wo)
