@@ -1137,7 +1137,7 @@ class PerennialCrop(models.Model):
     #     super().save(*args, **kwargs)
 
 
-class PerennialCropping(PerennialCrop, LandModule, AboveBelowGroundBiomassModule, ResidueAvailability):
+class PerennialCropping(PerennialCrop, LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule, ResidueAvailability):
     pass
 
 
