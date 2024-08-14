@@ -6062,6 +6062,9 @@ class SetAsideCalculator(BaseCalculator):
         self.flu_wo: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=1)
         self.soc: SimpleNamespace | ipcc.SoilOrganicCarbon = SimpleNamespace(value=1)
 
+        self.biomass_ef_start: SimpleNamespace | ipcc.ForestTotalBiomass = SimpleNamespace(value=0)
+        self.biomass_ef_w: SimpleNamespace | ipcc.ForestTotalBiomass = SimpleNamespace(value=0)
+
         self.math_start_w = None
         self.math_start_wo = None
         self.math_w = None
@@ -6086,29 +6089,26 @@ class SetAsideCalculator(BaseCalculator):
         if luc:
             module_start, module_w, module_wo = luc.get_modules()
 
-        if module.is_luc_remaining_same():
+        if module.is_luc_remaining_same() or module.is_business_as_usual():
             self.flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
             self.fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
             self.fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
             self.emission_factors_start = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
-
-        if module.is_business_as_usual():
-            self.flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-            self.fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-            self.fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-            self.emission_factors_start = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
+            self.biomass_ef_start = utils.get_or_raise(ipcc.ForestTotalBiomass, cm | {"continent": project.country.region, "land_use_type": module.land_use_type_start}, f"ForestTotalBiomass for {module.land_use_type_start.name} land use type in {project.climate.name} climate and {moisture.name} moisture in {project.country.region.name} region does not exist")
 
         if module.is_with():
             self.flu_w = get_flu_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
             self.fmg_w = get_fmg_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
             self.fi_w = get_fi_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
             self.emission_factors_w = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
+            self.biomass_ef_w = utils.get_or_raise(ipcc.ForestTotalBiomass, cm | {"continent": project.country.region, "land_use_type": module.land_use_type_w}, f"ForestTotalBiomass for {module.land_use_type_w.name} land use type in {project.climate.name} climate and {moisture.name} moisture in {project.country.region.name} region does not exist")
 
         if module.is_without():
             self.flu_wo = get_flu_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
             self.fmg_wo = get_fmg_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
             self.fi_wo = get_fi_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
             self.emission_factors_wo = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
+            self.biomass_ef_wo = utils.get_or_raise(ipcc.ForestTotalBiomass, cm | {"continent": project.country.region, "land_use_type": module.land_use_type_wo}, f"ForestTotalBiomass for {module.land_use_type_wo.name} land use type in {project.climate.name} climate and {moisture.name} moisture in {project.country.region.name} region does not exist")
 
         self.soc = utils.get_or_raise(ipcc.SoilOrganicCarbon, cm | soil_flt, f"SoilOrganicCarbon for {soil_type.name} soil type in {climate.name} climate and {moisture.name} moisture does not exist")
 
@@ -6160,6 +6160,10 @@ class SetAsideCalculator(BaseCalculator):
                 module_start.fi_t2_start,
                 module_w.fi_t2_w,
                 DELAY_START_W,
+                self.biomass_ef_start.value,
+                self.biomass_ef_w.value,
+                module.biomass_t2_start,
+                module.biomass_t2_w,
             ]
 
             self.math_start_w = MathNotCultivatedLand(*self.inputs_start_w)
@@ -6191,6 +6195,10 @@ class SetAsideCalculator(BaseCalculator):
                 module_start.fi_t2_start,
                 module_wo.fi_t2_wo,
                 DELAY_START_WO,
+                self.biomass_ef_start.value,
+                self.biomass_ef_wo.value,
+                module.biomass_t2_start,
+                module.biomass_t2_wo,
             ]
 
             self.math_start_wo = MathNotCultivatedLand(*self.inputs_start_wo)
@@ -6222,6 +6230,10 @@ class SetAsideCalculator(BaseCalculator):
                 module_start.fi_t2_start,
                 module_w.fi_t2_w,
                 DELAY_W,
+                self.biomass_ef_start.value,
+                self.biomass_ef_w.value,
+                module.biomass_t2_start,
+                module.biomass_t2_w,
             ]
 
             self.math_w = MathNotCultivatedLand(*self.inputs_w)
@@ -6253,6 +6265,10 @@ class SetAsideCalculator(BaseCalculator):
                 module_start.fi_t2_start,
                 module_wo.fi_t2_wo,
                 DELAY_WO,
+                self.biomass_ef_start.value,
+                self.biomass_ef_wo.value,
+                module.biomass_t2_start,
+                module.biomass_t2_wo,
             ]
 
             self.math_wo = MathNotCultivatedLand(*self.inputs_wo)

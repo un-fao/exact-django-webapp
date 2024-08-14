@@ -2028,7 +2028,7 @@ class Settlement(LandModuleFixed, AboveBelowGroundBiomassModule, SingleBiomassMo
         return super().save(*args, **kwargs)
 
 
-class SetAside(LandModule, AboveBelowGroundBiomassModule):
+class SetAside(LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule):
 
     is_set_aside_start = models.BooleanField(default=False)
     is_set_aside_w = models.BooleanField(default=False)
