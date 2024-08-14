@@ -3055,7 +3055,7 @@ class AquacultureCalculator(BaseCalculator):
         self.NITROUS_EF_DEFAULT = 0
         self.FEED_EF_DEFAULT = 0
 
-    def get_defaults(self, input: Module) -> dict:
+    def get_defaults(self, calculate=False) -> dict:
         super().get_defaults(input)
 
         module: Aquaculture = self.data
