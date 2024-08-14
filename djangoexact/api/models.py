@@ -690,6 +690,15 @@ class Submodule(Historical):
     def is_ready(self) -> bool:
         return self.status and self.status.name == "READY"
 
+    def is_start(self) -> bool:
+        return self.parent.is_start()
+
+    def is_with(self) -> bool:
+        return self.parent.is_with()
+
+    def is_without(self) -> bool:
+        return self.parent.is_without()
+
     def get_project(self):
         if "parent" in self.__dict__:
             raise exceptions.ValidationError("Submodule must have a parent field specified in the model")
@@ -1492,24 +1501,24 @@ class CoastalWetland(Module):
     area = models.FloatField(null=True, blank=True)
     ha_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_ha_thread")
 
-    area_under_drainage_start = models.FloatField(null=True, blank=True)
-    area_under_drainage_w = models.FloatField(null=True, blank=True)
-    area_under_drainage_wo = models.FloatField(null=True, blank=True)
+    area_under_drainage_start = models.FloatField(null=True, blank=True, default=0)
+    area_under_drainage_w = models.FloatField(null=True, blank=True, default=0)
+    area_under_drainage_wo = models.FloatField(null=True, blank=True, default=0)
     area_under_drainage_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_area_under_drainage_thread")
 
-    drained_area_excavated_start = models.FloatField(null=True, blank=True)
-    drained_area_excavated_w = models.FloatField(null=True, blank=True)
-    drained_area_excavated_wo = models.FloatField(null=True, blank=True)
+    drained_area_excavated_start = models.FloatField(null=True, blank=True, default=0)
+    drained_area_excavated_w = models.FloatField(null=True, blank=True, default=0)
+    drained_area_excavated_wo = models.FloatField(null=True, blank=True, default=0)
     drained_area_excavated_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_drained_area_excavated_thread")
 
-    area_not_drained_or_rewetted_start = models.FloatField(null=True, blank=True)
-    area_not_drained_or_rewetted_w = models.FloatField(null=True, blank=True)
-    area_not_drained_or_rewetted_wo = models.FloatField(null=True, blank=True)
+    area_not_drained_or_rewetted_start = models.FloatField(null=True, blank=True, default=0)
+    area_not_drained_or_rewetted_w = models.FloatField(null=True, blank=True, default=0)
+    area_not_drained_or_rewetted_wo = models.FloatField(null=True, blank=True, default=0)
     area_not_drained_or_rewetted_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_area_not_drained_or_rewetted_thread")
 
-    area_w_restored_vegetation_start = models.FloatField(null=True, blank=True)
-    area_w_restored_vegetation_w = models.FloatField(null=True, blank=True)
-    area_w_restored_vegetation_wo = models.FloatField(null=True, blank=True)
+    area_w_restored_vegetation_start = models.FloatField(null=True, blank=True, default=0)
+    area_w_restored_vegetation_w = models.FloatField(null=True, blank=True, default=0)
+    area_w_restored_vegetation_wo = models.FloatField(null=True, blank=True, default=0)
     area_w_restored_vegetation_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_area_w_restored_vegetation_thread")
 
     soil_type_t2 = models.ForeignKey(SoilType, null=True, blank=True, on_delete=models.SET_NULL)
