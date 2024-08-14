@@ -7,13 +7,18 @@ from django.apps import apps
 from django.db import models
 from rest_framework import exceptions, status
 from rest_framework.response import Response
+from simple_history.models import HistoricalRecords
+from simple_history.utils import update_change_reason
 
 import api.models as api_models
+
+import logging as log
 
 CN_RATIO_CROP = 10
 CN_RATIO_GRASSLAND = 15
 MANGROVE_FACTOR = 0.451
 NON_MANGROVE_FACTOR = 0.47
+PAVED_SETTLEMENT_SOC_MULTIPLIER = 0.8
 MANGROVES = "Mangroves"
 DATA = "data"
 RESULTS = "results"
@@ -41,6 +46,19 @@ class EmissionTypes(Enum):
     N2O_LEACHING = "N2O Leaching"
 
 
+class ChangeReasons(Enum):
+    CREATE = "create"
+    UPDATE = "update"
+    DELETE = "delete"
+
+
+class InvitationStatus(Enum):
+    PENDING = "pending"
+    ACCEPTED = "accepted"
+    REJECTED = "rejected"
+    CANCELLED = "cancelled"
+
+
 def avg(lst):
     return sum(lst) / len(lst)
 
@@ -66,7 +84,10 @@ def error(msg):
 
 
 def get_model(name, app_name="api", suffix="Input"):
-    return apps.get_model(app_name, sanitize_for_model(name + suffix))
+    full_name = name
+    if suffix:
+        full_name += suffix
+    return apps.get_model(app_name, sanitize_for_model(full_name))
 
 
 def get_query_param_or_validation_error(request, param_name):
@@ -122,8 +143,13 @@ def has_project_permission(permission, user, project):
     Returns:
         bool: True if the user has the permission, False otherwise.
     """
-    membership: models.UserProjectGroup = project.members.filter(user=user).first()
-    can_access = membership and membership.group.permissions.filter(codename=permission).exists()
+
+    if user.is_superuser:
+        return True
+
+    memberships: list[api_models.ProjectMembership] = project.members.filter(user=user)
+
+    can_access = memberships and any([membership.group.permissions.filter(codename=permission).exists() for membership in memberships])
 
     return can_access
 
@@ -241,6 +267,7 @@ def create_comment_threads(module_instance):
         if attr.endswith("_thread") and getattr(module_instance, attr, None) is None:
             setattr(module_instance, attr, api_models.CommentThread.objects.create())
     module_instance.save()
+    update_change_reason(module_instance, "update")
 
 
 def getany(objects: list[object], key: str):
@@ -288,7 +315,7 @@ def getattr_or_default(obj, key, default=0):
     return _attr if _attr else default
 
 
-def get_or_raise(model, filter_criteria, error_message, method="get"):
+def get_or_raise(model, filter_criteria, error_message, method="get") -> models.QuerySet | models.Model:
     """
     Retrieves a single instance of the given model that matches the filter criteria,
     or raises an exception with the specified error message if no instance is found.
@@ -314,7 +341,7 @@ def get_or_raise(model, filter_criteria, error_message, method="get"):
         raise Exception(error_message)
 
 
-def update_activity_status(activity):
+def update_activity_status_and_completion(activity):
     """
     Updates the status of the activity based on the status of its modules.
 
@@ -379,3 +406,58 @@ def find_organic_soil_parent_module(organic_soil) -> tuple:
     parent_module = ParentModule.objects.get(organic_soil=organic_soil)
 
     return parent_module, parent_module_type
+
+
+def get_changes(records: list[HistoricalRecords]):
+
+    class ChangeLog:
+        def __init__(self, date, user, reason, changes):
+            self.date = date
+            self.user = user
+            self.reason = reason
+            self.changes: list[Change] = changes
+
+    class Change:
+        def __init__(self, field, old, new):
+            self.field = field
+            self.old = old
+            self.new = new
+
+    changes = []
+    for record in records:
+        if record.prev_record is None:
+            changes.append(ChangeLog(record.history_date, record.history_user.email, ChangeReasons.CREATE.value, []))
+            continue
+
+        if record.next_record is None:
+            continue
+
+        delta = record.diff_against(record.prev_record)
+        change_log: ChangeLog = ChangeLog(record.history_date, record.history_user.email, record.history_change_reason, [])
+        for change in delta.changes:
+            change_log.changes.append(Change(change.field, change.old, change.new))
+
+        if len(change_log.changes) > 0:
+            changes.append(change_log)
+
+    return changes
+
+
+def get_modules(activity, serialized=True) -> list:
+    modules = []
+    module_serializers_list = []
+    for module in activity.module_types.all():
+        try:
+            module_model = apps.get_model(API, module.class_name)
+        except LookupError:
+            log.warning(f"get_modules: Module {module.name} not found")
+            continue
+        module_object = module_model.objects.filter(activity__id=activity.pk).first()
+        if module_object:
+            modules.append(module_object)
+            from api.serializers import get_module_serializer
+
+            module_dict = get_module_serializer(module_model)(module_object).data
+            module_serializers_list.append(module_dict)
+
+    return module_serializers_list if serialized else modules

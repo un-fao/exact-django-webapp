@@ -19,19 +19,20 @@ schema_view = get_schema_view(
         # license=openapi.License(name="BSD License"),
     ),
     public=True,
-    permission_classes=[permissions.IsAuthenticated],
 )
 
 router = routers.DefaultRouter()
 
 router.register(r"projects", views.ProjectViewSet)
-router.register(r"project-invitations", views.ProjectInvitationViewSet)
+router.register(r"project-invitations", views.ProjectInvitationViewSet, basename="project-invitations")
+router.register(r"project-memberships", views.ProjectMembershipViewSet)
 router.register(r"groups", views.GroupViewSet)
 router.register(r"activities", views.ActivityViewSet, basename="activities")
 router.register(r"threads", views.CommentThreadViewSet, basename="threads")
 router.register(r"comments", views.CommentViewSet, basename="comments")
 router.register(r"land-use-types", views.LandUseTypeViewSet, basename="land-use-types")
 router.register(r"module-types", views.ModuleTypeViewSet, basename="modules")
+router.register(r"notes", views.NoteViewSet, basename="notes")
 
 router.register(r"statuses", views.generic_viewset(models.ProjectStatus), basename="statuses")
 router.register(r"regions", views.generic_viewset(models.Region), basename="regions")
@@ -130,6 +131,7 @@ router.register(r"trophic-types", views.generic_viewset(models.TrophicType), bas
 
 # Settlements
 router.register(r"settlements", views.generic_module_viewset(models.Settlement), basename="settlements")
+router.register(r"settlement-types", views.generic_viewset(models.SettlementType), basename="settlement-types")
 router.register(r"buildings", views.generic_module_viewset(models.Building), basename="buildings")
 router.register(r"roads", views.generic_module_viewset(models.Road), basename="roads")
 router.register(r"other-infrastructures", views.generic_module_viewset(models.OtherInfrastructure), basename="other-infrastructures")
@@ -152,6 +154,7 @@ router.register(r"peat-types", views.generic_viewset(models.PeatType), basename=
 
 
 router.register(r"users", views.UserViewSet, basename="users")
+router.register(r"definitions", views.DefinitionViewSet, basename="definitions")
 
 urlpatterns = [
     path("docs/", include_docs_urls(title="EX-ACT Docs")),

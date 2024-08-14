@@ -18,7 +18,7 @@ from api.models import (
     Moisture,
     Project,
     SoilType,
-    UserProjectGroup,
+    ProjectMembership,
 )
 from api.models import CustomUser as User
 from api.tests.factories import ActivityFactory, FloodedRiceFactory, ProjectFactory
@@ -55,7 +55,7 @@ p: Project = ProjectFactory.create(
     soil_type=soil_type,
 )
 
-UserProjectGroup.objects.create(user=u, project=p, group=group)
+ProjectMembership.objects.create(user=u, project=p, group=group)
 
 print(f"Country: {country}")
 print(f"Region: {region}")
