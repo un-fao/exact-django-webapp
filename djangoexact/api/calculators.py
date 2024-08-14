@@ -1962,6 +1962,10 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
         self.straw_burned_w: SimpleNamespace = SimpleNamespace(value=0)
         self.straw_burned_wo: SimpleNamespace = SimpleNamespace(value=0)
 
+        self.biomass_ef_start: SimpleNamespace | ipcc.ForestTotalBiomass = SimpleNamespace(value=0)
+        self.biomass_ef_w: SimpleNamespace | ipcc.ForestTotalBiomass = SimpleNamespace(value=0)
+        self.biomass_ef_wo: SimpleNamespace | ipcc.ForestTotalBiomass = SimpleNamespace(value=0)
+
     def get_defaults(self, calculate=False) -> dict:
         module: FloodedRice | MinorSeasonFloodedRice = self.data
         module_for_checks = getattr(module, "parent", module)
@@ -1978,7 +1982,7 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
         soil_flt = {"soil_type": soil_type}
         region_flt = {"continent": region}
 
-        if module_for_checks.is_luc_remaining_same():
+        if module_for_checks.is_luc_remaining_same() or module_for_checks.is_business_as_usual():
             h2o_mgmt_before_start_flt = {"water_management_type_before_cultivation": module.water_management_type_before_cultivation_start}
             h2o_mgmt_after_start_flt = {"water_management_type_after_cultivation": module.water_management_type_after_cultivation_start}
             organic_amendment_start_flt = {"organic_amendment_type": module.organic_amendment_type_start}
@@ -1988,17 +1992,7 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
             self.sfw_start = utils.get_or_raise(ipcc.RiceSFW, h2o_mgmt_after_start_flt, f"RiceSFW for {module.water_management_type_after_cultivation_start} does not exist")
             self.sfp_start = utils.get_or_raise(ipcc.RiceSFP, h2o_mgmt_before_start_flt, f"RiceSFP for {module.water_management_type_before_cultivation_start} does not exist")
             self.sfo_start = utils.get_or_raise(ipcc.RiceSFO, organic_amendment_start_flt, f"RiceSFO for {module.organic_amendment_type_start} does not exist")
-
-        if module_for_checks.is_business_as_usual():
-            h2o_mgmt_before_start_flt = {"water_management_type_before_cultivation": module.water_management_type_before_cultivation_start}
-            h2o_mgmt_after_start_flt = {"water_management_type_after_cultivation": module.water_management_type_after_cultivation_start}
-            organic_amendment_start_flt = {"organic_amendment_type": module.organic_amendment_type_start}
-            self.flu_start = get_flu_data(module, climate, moisture, utils.ScenarioTypes.START)
-            self.fmg_start = get_fmg_data(module, climate, moisture, utils.ScenarioTypes.START)
-            self.fi_start = get_fi_data(module, climate, moisture, utils.ScenarioTypes.START)
-            self.sfw_start = utils.get_or_raise(ipcc.RiceSFW, h2o_mgmt_after_start_flt, f"RiceSFW for {module.water_management_type_after_cultivation_start} does not exist")
-            self.sfp_start = utils.get_or_raise(ipcc.RiceSFP, h2o_mgmt_before_start_flt, f"RiceSFP for {module.water_management_type_before_cultivation_start} does not exist")
-            self.sfo_start = utils.get_or_raise(ipcc.RiceSFO, organic_amendment_start_flt, f"RiceSFO for {module.organic_amendment_type_start} does not exist")
+            self.biomass_ef_start = utils.get_or_raise(ipcc.ForestTotalBiomass, climate_flt | region_flt, f"ForestTotalBiomass for {climate.name} in {region.name} does not exist")
 
         if module_for_checks.is_with():
             h2o_mgmt_before_w_flt = {"water_management_type_before_cultivation": module.water_management_type_before_cultivation_w}
@@ -2010,6 +2004,7 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
             self.sfw_w = utils.get_or_raise(ipcc.RiceSFW, h2o_mgmt_after_w_flt, f"RiceSFW for {module.water_management_type_after_cultivation_w} does not exist")
             self.sfp_w = utils.get_or_raise(ipcc.RiceSFP, h2o_mgmt_before_w_flt, f"RiceSFP for {module.water_management_type_before_cultivation_w} does not exist")
             self.sfo_w = utils.get_or_raise(ipcc.RiceSFO, organic_amendment_w_flt, f"RiceSFO for {module.organic_amendment_type_w} does not exist")
+            self.biomass_ef_w = utils.get_or_raise(ipcc.ForestTotalBiomass, climate_flt | region_flt, f"ForestTotalBiomass for {climate.name} in {region.name} does not exist")
 
         if module_for_checks.is_without():
             h2o_mgmt_before_wo_flt = {"water_management_type_before_cultivation": module.water_management_type_before_cultivation_wo}
@@ -2021,6 +2016,7 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
             self.sfw_wo = utils.get_or_raise(ipcc.RiceSFW, h2o_mgmt_after_wo_flt, f"RiceSFW for {module.water_management_type_after_cultivation_wo} does not exist")
             self.sfp_wo = utils.get_or_raise(ipcc.RiceSFP, h2o_mgmt_before_wo_flt, f"RiceSFP for {module.water_management_type_before_cultivation_wo} does not exist")
             self.sfo_wo = utils.get_or_raise(ipcc.RiceSFO, organic_amendment_wo_flt, f"RiceSFO for {module.organic_amendment_type_wo} does not exist")
+            self.biomass_ef_wo = utils.get_or_raise(ipcc.ForestTotalBiomass, climate_flt | region_flt, f"ForestTotalBiomass for {climate.name} in {region.name} does not exist")
 
         if module.is_ready() and calculate:
             self.calculate()
@@ -2109,6 +2105,10 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 True,
                 module.organic_amendment_type_start.name == "Straw Burnt",
                 0,  # Delay
+                self.biomass_ef_start.value,
+                self.biomass_ef_w.value,
+                module.biomass_t2_start,
+                module.biomass_t2_w,
                 is_minor_season,
             ]
 
@@ -2161,7 +2161,10 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 CALCULATE_SOC_SOM_START_WO,
                 module.organic_amendment_type_start.name == "Straw Burnt",
                 DELAY_START_WO,
-                self.som.value,
+                self.biomass_ef_start.value,
+                self.biomass_ef_wo.value,
+                module.biomass_t2_start,
+                module.biomass_t2_wo,
                 is_minor_season,
             ]
 
@@ -2214,7 +2217,10 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 CALCULATE_SOC_SOM_W,
                 module.organic_amendment_type_w.name == "Straw Burnt",
                 DELAY_W,
-                self.som.value,
+                self.biomass_ef_start.value,
+                self.biomass_ef_w.value,
+                module.biomass_t2_start,
+                module.biomass_t2_w,
                 is_minor_season,
             ]
 
@@ -2267,7 +2273,10 @@ class FloodedRiceSeasonCalculator(BaseCalculator):
                 CALCULATE_SOC_SOM_WO,
                 module.organic_amendment_type_wo.name == "Straw Burnt",
                 DELAY_WO,
-                self.som.value,
+                self.biomass_ef_start.value,
+                self.biomass_ef_wo.value,
+                module.biomass_t2_start,
+                module.biomass_t2_wo,
                 is_minor_season,
             ]
 
