@@ -1286,44 +1286,6 @@ for i, row in enumerate(df_dict):
         density=parse_csv_number(row["density"], nan_value=None),
     )
 
-df = pd.read_csv(
-    os.path.join(
-        os.path.dirname(__file__), "ipcc_data", "IrrigationPressureRequirements.csv"
-    ),
-    header=0,
-    sep=";",
-)
-
-df_headers = df.columns.values.tolist()
-df_dict = df.to_dict("records")
-
-for i, row in enumerate(df_dict):
-    irrigation_system_type = IrrigationSystemType.objects.get(
-        name__iexact=sanitize(row["irrigation_system_type"])
-    )
-
-    print(
-        irrigation_system_type,
-        row["bar"],
-        row["avg_pressure"],
-        row["head"],
-    )
-
-    try:
-        bar_ranges = row["bar"].split("-")
-    except AttributeError:
-        bar_ranges = [row["bar"], row["bar"]]
-
-    bar_start = parse_csv_number(bar_ranges[0], nan_value=None)
-    bar_end = parse_csv_number(bar_ranges[1], nan_value=None)
-
-    data = IrrigationPressureRequirement.objects.get(
-        irrigation_system_type=irrigation_system_type,
-        bar_start=bar_start,
-        bar_end=bar_end,
-        avg_pressure=parse_csv_number(row["avg_pressure"], nan_value=None),
-        head=parse_csv_number(row["head"], nan_value=None),
-    )
 PerennialMaxAGB.objects.all().delete()
 
 
@@ -4391,4 +4353,93 @@ for i, row in enumerate(df_dict2):
             manure_management_type=manure_management_type,
             value=parse_csv_number(row[df_headers2[j]]),
         )
+
+
+IrrigationPressureRequirement.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "IrrigationPressureRequirements.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers = df.columns.values.tolist()
+df_dict = df.to_dict("records")
+
+irrigation_system_types = df["irrigation_system_type"].unique()
+irrigation_system_types = irrigation_system_types[irrigation_system_types != "Other"]
+
+for i, row in enumerate(df_dict):
+    irrigation_system_type = IrrigationSystemType.objects.get(name__iexact=sanitize(row["irrigation_system_type"]))
+
+    print(
+        irrigation_system_type,
+        row["bar"],
+        row["avg_pressure"],
+        row["head"],
+    )
+
+    if irrigation_system_type.name == "Other":
+        bar_start = None
+        bar_end = None
+
+        for system in IrrigationSystemType.objects.all().exclude(name__in=irrigation_system_types):
+            IrrigationPressureRequirement.objects.create(
+                irrigation_system_type=system,
+                bar_start=bar_start,
+                bar_end=bar_end,
+                avg_pressure=parse_csv_number(row["avg_pressure"], nan_value=None),
+                head=parse_csv_number(row["head"], nan_value=None),
+            )
+
+    else:
+        try:
+            bar_ranges = row["bar"].split("-")
+        except AttributeError:
+            bar_ranges = [row["bar"], row["bar"]]
+
+        bar_start = parse_csv_number(bar_ranges[0], nan_value=None)
+        bar_end = parse_csv_number(bar_ranges[1], nan_value=None)
+
+        IrrigationPressureRequirement.objects.create(
+            irrigation_system_type=irrigation_system_type,
+            bar_start=bar_start,
+            bar_end=bar_end,
+            avg_pressure=parse_csv_number(row["avg_pressure"], nan_value=None),
+            head=parse_csv_number(row["head"], nan_value=None),
+        )
 """
+
+# TODO: Run in review
+
+log.debug("Deleting all GlobalWarmingPotential objects...")
+GlobalWarmingPotential.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "GlobalWarmingPotential.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers = df.columns.values.tolist()
+df_dict = df.to_dict("records")
+
+for i, row in enumerate(df_dict):
+    name = row["name"]
+    co2 = parse_csv_number(row["co2"])
+    ch4 = parse_csv_number(row["ch4"])
+    n2o = parse_csv_number(row["n2o"])
+
+    print(
+        name,
+        co2,
+        ch4,
+        n2o,
+    )
+
+    GlobalWarmingPotential.objects.create(
+        name=name,
+        co2=co2,
+        ch4=ch4,
+        n2o=n2o,
+    )
