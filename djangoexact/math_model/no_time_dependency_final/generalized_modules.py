@@ -10,27 +10,25 @@ from .ghg_emissions_classes import (
     YearlyGasActivityEmissionSet,
 )
 
+from dataclasses import dataclass, field
 
-class BaseModule(ABC):
+@dataclass
+class BaseModule:
+    implementation_time: int
+    capitalization_time: int
+    rate_type: str
+    delay: int = 0
 
-    def __init__(self, time_impl, time_cap, rate_type, delay):
-
-        self.implementation_time = time_impl
-        self.capitalization_time = time_cap
-        self.rate_type = rate_type
-        self.delay = delay
+    def __post_init__(self):
         self.result = Result(self.implementation_time, self.capitalization_time)
 
     def evaluate_tier_2_defaults(self):
         try:
-            # TODO: evaluate tier 2 defaults based on the front-end necessities
-
             t2_start = {re.sub("_start_tier_2_default", "", k): v for k, v in self.__dict__.items() if "start_tier_2_default" in k}
             t2_end = {re.sub("_end_tier_2_default", "", k): v for k, v in self.__dict__.items() if "end_tier_2_default" in k}
             t2_other = {re.sub("_tier_2_default", "", k): v for k, v in self.__dict__.items() if "_tier_2_default" in k and "start" not in k and "end" not in k}
 
             return Tier2Defaults(t2_start, t2_end, t2_other)
-
         except Exception as e:
             traceback.print_exc()
             return {}
