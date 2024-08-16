@@ -3057,7 +3057,7 @@ class AquacultureCalculator(BaseCalculator):
         self.FEED_EF_DEFAULT = 0
 
     def get_defaults(self, calculate=False) -> dict:
-        super().get_defaults(input)
+        super().get_defaults(input, calculate)
 
         module: Aquaculture = self.data
         project: Project = module.activity.project
