@@ -1062,9 +1062,9 @@ class IrrigationPhaseData(Model):
 
 class IrrigationPressureRequirement(Model):
     irrigation_system_type = ForeignKey("api.IrrigationSystemType", on_delete=CASCADE)
-    initial_denomination = CharField(max_length=255)
-    bar_start = FloatField()
-    bar_end = FloatField()
+    initial_denomination = CharField(max_length=255, null=True, blank=True)
+    bar_start = FloatField(null=True, blank=True)
+    bar_end = FloatField(null=True, blank=True)
     avg_pressure = FloatField()
     head = FloatField()
 

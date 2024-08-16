@@ -4640,6 +4640,8 @@ class IrrigationPhaseCalculator(BaseCalculator):
 
         try:
             self.pressure = ipcc.IrrigationPressureRequirement.objects.get(irrigation_system_type=module.irrigation_system_type)
+            if self.pressure.bar_start is None or self.pressure.bar_end is None:
+                raise ValueError(f"Please insert the tier 2 pressure requirement for {module.irrigation_system_type.name}")
         except ipcc.IrrigationPressureRequirement.DoesNotExist:
             raise ValueError(f"Could not find Pressure Requirement for {module.irrigation_system_type.name}")
 
