@@ -4,7 +4,7 @@ import traceback
 import matplotlib.pyplot as plt
 import numpy as np
 
-from general_functions import (
+from .general_functions import (
     BaseModule,
     breakdown_according_to_values,
     soil_emissions_2,
@@ -17,7 +17,7 @@ from general_functions import (
     yearly_time_dependent_parameter_breakdown,
     yearly_time_dependent_matrix_log_rec_dis
 )
-from ghg_emissions_classes import (
+from .ghg_emissions_classes import (
     ActivityTypes,
     Emission,
     GasTypes,
@@ -150,6 +150,14 @@ class ForestManagement(BaseModule):
         self.fi_end_default = fi_end_default  # defaulted to 1 in case there are None, if not float value
         self.fi_start_tier_2 = fi_start_tier_2  # tier 2 value, expects float or None
         self.fi_end_tier_2 = fi_end_tier_2  # tier 2 value, expects float or None
+
+        self.fmg_start = self.fmg_start_default if not self.fmg_start_tier_2 else self.fmg_start_tier_2
+        self.fmg_end = self.fmg_end_default if not self.fmg_end_tier_2 else self.fmg_end_tier_2
+        self.flu_start = self.flu_start_default if not self.flu_start_tier_2 else self.flu_start_tier_2
+        self.flu_end = self.flu_end_default if not self.flu_end_tier_2 else self.flu_end_tier_2
+        self.fi_start = self.fi_start_default if not self.fi_start_tier_2 else self.fi_start_tier_2
+        self.fi_end = self.fi_end_default if not self.fi_end_tier_2 else self.fi_end_tier_2
+
 
         self.soc_start = self.soc_start_default * self.fmg_start * self.flu_start * self.fi_start if not self.soc_start_tier_2 else self.soc_start_tier_2
         self.soc_end = self.soc_end_default * self.fmg_end * self.flu_end * self.fi_end if not self.soc_end_tier_2 else self.soc_end_tier_2
@@ -335,7 +343,7 @@ class ForestManagement(BaseModule):
                     self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in degradation_times_hectares_agb], activity=ActivityTypes.DEGRADATION_AGB))
                     self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in degradation_times_hectares_bgb], activity=ActivityTypes.DEGRADATION_BGB))
 
-                    plot_annotated_matrix(degradation_matrix_agb, "degradation agb matrix")
+                    #plot_annotated_matrix(degradation_matrix_agb, "degradation agb matrix")
 
                 
                 # check if agb_matrix has negative values
@@ -372,7 +380,7 @@ class ForestManagement(BaseModule):
                     degradation_times_hectares_litter = multiply_matrix_by_matrix(degradation_litter_matrix, self.hectares_for_rot_log_dis)
                     self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in degradation_times_hectares_litter], activity=ActivityTypes.DEGRADATION_LITTER))
 
-                    plot_annotated_matrix(degradation_litter_matrix, "degradation litter matrix")
+                    #plot_annotated_matrix(degradation_litter_matrix, "degradation litter matrix")
 
                 
                 self.yearly_litter_emissions = [x * -44 / 12 for x in multiply_matrix_by_matrix(delta_litter_matrix, self.hectares_matrix)]
