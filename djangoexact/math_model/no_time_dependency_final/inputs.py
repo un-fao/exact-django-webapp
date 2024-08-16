@@ -16,32 +16,23 @@ from .ghg_emissions_classes import (
     YearlyGasActivityEmissionSet,
 )
 
-
+from dataclasses import dataclass
+@dataclass
 class Inputs(BaseModule):
-    def __init__(self, unit_start, unit_end, rate_type, ipcc_factor_co2, tier_2_factor_co2, unit_factor_co2, emissions_factor_co2, time_impl, time_cap, ipcc_factor_n2o, tier_2_factor_n2o, unit_factor_n2o, emissions_factor_n2o, ipcc_factor_eq, tier_2_factor_eq, unit_factor_eq, emissions_factor_eq, delay):
-
-        super().__init__(time_impl, time_cap, rate_type, delay)
-
-        self.unit_start = unit_start
-        self.unit_end = unit_end
-
-        self.ipcc_factor_co2 = ipcc_factor_co2
-        self.tier_2_factor_co2 = tier_2_factor_co2
-        self.unit_factor_co2 = unit_factor_co2
-        self.emissions_factor_co2 = emissions_factor_co2
-
-        self.ipcc_factor_n2o = ipcc_factor_n2o
-        self.tier_2_factor_n2o = tier_2_factor_n2o
-        self.unit_factor_n2o = unit_factor_n2o
-        self.emissions_factor_n2o = emissions_factor_n2o
-
-        self.ipcc_factor_eq = ipcc_factor_eq
-        self.tier_2_factor_eq = tier_2_factor_eq
-        self.unit_factor_eq = unit_factor_eq
-        self.emissions_factor_eq = emissions_factor_eq
-
-
-        pass
+    unit_start: float
+    unit_end: float
+    ipcc_factor_co2: float
+    tier_2_factor_co2: float
+    unit_factor_co2: float
+    emissions_factor_co2: float
+    ipcc_factor_n2o: float
+    tier_2_factor_n2o: float
+    unit_factor_n2o: float
+    emissions_factor_n2o: float
+    ipcc_factor_eq: float
+    tier_2_factor_eq: float
+    unit_factor_eq: float
+    emissions_factor_eq: float
 
     def calculate_emissions(self):
         try:
@@ -72,28 +63,23 @@ class Inputs(BaseModule):
         except Exception as e:
             traceback.print_exc()
 
-
+@dataclass
 class OperationPhaseIrrigation(BaseModule):
-    def __init__(self, ef_default, ef_tier_2, total_dynamic_head_tier_2, average_pressure_default, average_pressure_tier_2, pumping_efficiency_default, pumping_efficiency_tier_2, erh_electricity, fuel_density, fuel_net_calorific_values, depth, units_start, units_end, rate_type, time_impl, time_cap, transportation_loss, gwir):
-        
-        self.units_start = units_start
-        self.units_end = units_end
-    
-        self.ef_default = ef_default  # Match Source of Energy to table EnergyDB G7-H13 column 2
-        self.ef_tier_2 = ef_tier_2  # Tier 2 Value
-        self.total_dynamic_head_tier_2 = total_dynamic_head_tier_2  # Tier 2 Value
-        self.average_pressure_default = average_pressure_default  # Match Irrigation System type to Energy DB Table O7-S12, column 4
-        self.average_pressure_tier_2 = average_pressure_tier_2  # Tier 2 Value
-        self.pumping_efficiency_default = pumping_efficiency_default  # Fixed value at 45% for all pumps
-        self.pumping_efficiency_tier_2 = pumping_efficiency_tier_2  # Tier 2 Value
-        self.erh_electricity = erh_electricity  # Fixed value, Energy DB value AJ4 if Electricity else None
-        self.fuel_net_calorific_values = fuel_net_calorific_values  # Energy DB Table G6-M13, match row to Fuel Type and Column 'Net Calorific Value'
-        self.fuel_density = fuel_density  # Energy DB Table G6-M13, match row to Fuel Type and Column 'Density'
-        self.depth = depth  # Front-End Input
-
-        self.transportation_loss = transportation_loss  # Float, Fixed at 0.1 (10%) on Excel (could become front-end Input)
-        self.gwir = gwir  # Front-End input Gross Water Irrigation Requirement
-
+    ef_default: float
+    ef_tier_2: float
+    total_dynamic_head_tier_2: float
+    average_pressure_default: float
+    average_pressure_tier_2: float
+    pumping_efficiency_default: float
+    pumping_efficiency_tier_2: float
+    erh_electricity: float
+    fuel_density: float
+    fuel_net_calorific_values: float
+    depth: float
+    units_start: float
+    units_end: float
+    transportation_loss: float
+    gwir: float
 
     def calculate_emissions(
         self,
@@ -135,15 +121,12 @@ class OperationPhaseIrrigation(BaseModule):
         except:
             traceback.print_exc()
 
-
+@dataclass
 class Roads(BaseModule):
-    def __init__(self, ef_ipcc: float, ef_tier_2, area, time_impl, time_cap, rate_type, delay=0):
 
-        super().__init__(time_impl, time_cap, rate_type, delay)
-
-        self.ef_ipcc = ef_ipcc  # Match Building and Roads type to Energy DB Sheet Table A26-B45
-        self.ef_tier_2 = ef_tier_2  # Tier 2 Value
-        self.units_end = area  # User Input
+    ef_ipcc: float
+    ef_tier_2: float
+    units_end: float  # This will be used to set `units_end`
         
     def calculate_emissions(self):
         try:
@@ -159,19 +142,16 @@ class Roads(BaseModule):
         except:
             traceback.print_exc()
 
+@dataclass
+class ElectricityConsumption(BaseModule):
 
-class ElectryicityConsumption(BaseModule):
-    def __init__(self, emissions_factor, specific_factor_start, specific_factor_end, mwh_start, mwh_end, percent_loss_transportation_start, percent_loss_transportation_end, rate_type, time_impl, time_cap, delay=0):
-
-        super().__init__(time_impl, time_cap, rate_type, delay)
-
-        self.emissions_factor = emissions_factor  # Match Country and Source of Emission Factor to Elec Table (columns 6 or 7)
-        self.specific_factor_start = specific_factor_start  # Tier 2 Value
-        self.specific_factor_end = specific_factor_end  # Tier 2 Value
-        self.mwh_start = mwh_start  # User Input
-        self.mwh_end = mwh_end  # User Input
-        self.percent_loss_transportation_start = percent_loss_transportation_start  # User Input expects number between 0 and 1
-        self.percent_loss_transportation_end = percent_loss_transportation_end
+    emissions_factor: float
+    specific_factor_start: float
+    specific_factor_end: float
+    mwh_start: float
+    mwh_end: float
+    percent_loss_transportation_start: float
+    percent_loss_transportation_end: float
 
     def calculate_emissions(
         self,
@@ -192,15 +172,12 @@ class ElectryicityConsumption(BaseModule):
         except:
             traceback.print_exc()
 
+@dataclass
 class FuelConsumption(BaseModule):
-    def __init__(self, emissions_factor, specific_factor, mwh_start, mwh_end, rate_type, time_impl, time_cap, delay=0):
-
-        super().__init__(time_impl, time_cap, rate_type, delay)
-
-        self.emissions_factor = emissions_factor  # Match Fuel Type to table IPCC A1727-B1741
-        self.specific_factor = specific_factor  # Tier 2 Value
-        self.mwh_start = mwh_start  # User Input
-        self.mwh_end = mwh_end  # User Input
+    emissions_factor: float
+    specific_factor: float
+    mwh_start: float
+    mwh_end: float
 
     def calculate_emissions(
         self,
@@ -219,23 +196,18 @@ class FuelConsumption(BaseModule):
         except:
             traceback.print_exc()
 
+@dataclass
 class SolidConsumption(BaseModule):
-    def __init__(self, joules_factor, co2_factor, ch4_factor, n2o_factor, account_for_co2_boolean, methane_constant, nitrous_constant, specific_factor, mwh_start, mwh_end, rate_type, time_impl, time_cap, delay=0):
-
-        super().__init__(time_impl, time_cap, rate_type, delay)
-
-        self.joules_factor = joules_factor  # Match Fuel Type to table IPCC A1750 COLUMN C
-        self.co2_factor = co2_factor  # Match Fuel Type to table IPCC A1750 COLUMN D
-        self.ch4_factor = ch4_factor  # Match Fuel Type to table IPCC A1750 COLUMN E
-        self.n2o_factor = n2o_factor  # Match Fuel Type to table IPCC A1750 COLUMN F
-        self.account_for_co2_boolean = account_for_co2_boolean  # Tier 2 Value
-        self.methane_constant = methane_constant  # Tier 2 Value
-        self.nitrous_constant = nitrous_constant  # Tier 2 Value
-        self.specific_factor = specific_factor  # Tier 2 Value
-        self.mwh_start = mwh_start  # User Input
-        self.mwh_end = mwh_end  # User Input
-        
-        
+    joules_factor: float
+    co2_factor: float
+    ch4_factor: float
+    n2o_factor: float
+    account_for_co2_boolean: bool
+    methane_constant: float
+    nitrous_constant: float
+    specific_factor: float
+    mwh_start: float
+    mwh_end: float
 
     def calculate_emissions(
         self,
@@ -263,17 +235,12 @@ class SolidConsumption(BaseModule):
         except:
             traceback.print_exc()
 
+@dataclass
 class NewIrrigation(BaseModule):
-    def __init__(self, ef_ref, ef_tier_2, units_start, units_end, time_impl, time_cap, rate_type, delay=0):
-
-        super().__init__(time_impl, time_cap, rate_type, delay)
-        
-        # TODO: ADD HECTARS START AND REMOVE FROM FINAL
-        self.units_start = units_start
-        self.units_end = units_end
-    
-        self.ef_ref = ef_ref  # Match Irrigation Type to Energy DB A7:B16 column 2
-        self.ef_tier_2 = ef_tier_2
+    ef_ref: float
+    ef_tier_2: float
+    units_start: float
+    units_end: float
 
     def calculate_emissions(
         self,
