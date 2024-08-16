@@ -704,7 +704,7 @@ class WaterbodyDefaults(Defaults):
         )
 
 
-class OrganicSoil(Defaults):
+class OrganicSoilDefaults(Defaults):
     def __init__(self, input: calcs.Module):
         super().__init__(input)
 
