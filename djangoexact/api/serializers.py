@@ -622,6 +622,7 @@ class LandUseTypeSerializer(serializers.ModelSerializer):
 
 
 class BaseGenericModuleSerializer(serializers.ModelSerializer):
+    activity = ActivitySerializer(many=False, read_only=True)
     module_type = get_model_serializer(ModuleType)(read_only=True)
     status = get_model_serializer(StatusType)(read_only=True)
     note = serializers.SerializerMethodField()
@@ -2655,7 +2656,15 @@ class CoastalWetlandSerializer(NoScenarioModuleSerializer):
         fields = "__all__"
         ref_name = "CoastalWetland"
         mandatory_fields = {
-            "mandatory": ["land_use_type", "area"],
+            "start": {
+                "mandatory": ["land_use_type", "area"],
+            },
+            "with": {
+                "mandatory": ["land_use_type", "area"],
+            },
+            "without": {
+                "mandatory": ["land_use_type", "area"],
+            },
         }
 
 
