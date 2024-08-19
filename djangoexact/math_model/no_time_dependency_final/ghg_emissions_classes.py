@@ -68,7 +68,7 @@ class ActivityTypes(Enum):
 
 class Emission:
 
-    def __init__(self, value=0, gas_type=None):
+    def __init__(self, value=0.0, gas_type=None):
         self.gas_type: GasTypes | None = gas_type
         self.value: float = value
 

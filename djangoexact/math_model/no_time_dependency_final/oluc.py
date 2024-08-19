@@ -110,24 +110,6 @@ class OtherLandUseChanges(BaseModule):
         self.soc_start = self.soc_start_default * self.fmg_start * self.flu_start * self.fi_start if not self.soc_start_tier_2 else self.soc_start_tier_2
         self.soc_end = self.soc_end_default * self.fmg_end * self.flu_end * self.fi_end if not self.soc_end_tier_2 else self.soc_end_tier_2
 
-        # TIER 2 VALUE DEFAULTS
-
-        # RESULTS
-        self.yearly_biomass_emissions = []
-        self.total_biomass_emissions = 0
-
-        self.yearly_soc_emissions = []
-        self.total_soc_emissions = 0
-
-        self.yearly_fire_emissions = []
-        self.total_fire_emissions = 0
-
-        self.emissions_som_yearly = []
-        self.emissions_som_total = 0
-
-        self.emissions_total_yearly = []
-        self.total_emissions = 0
-
         self.result = Result(self.time_impl, self.time_cap)
 
     def calculate_emissions(self):
@@ -145,7 +127,7 @@ class OtherLandUseChanges(BaseModule):
 
                 self.total_biomass_emissions = total
                 # TODO: change so only in implementation years but proportionate to the hectars addressed in that year
-                self.yearly_biomass_emissions = yearly_constant_emissions_breakdown(total, self.time_impl, self.time_cap)
+                self.yearly_biomass_emissions = yearly_constant_emissions_breakdown(total, self.time_impl, self.time_cap, self.rate)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(
                     YearlyGasActivityEmissionSet(
@@ -157,16 +139,6 @@ class OtherLandUseChanges(BaseModule):
                         delay=self.delay,
                     )
                 )
-
-            except Exception as e:
-                traceback.print_exc()
-
-        def calculate_soc():
-            try:
-                if self.calculate_soc_som:
-                    self.yearly_soc_emissions, self.total_soc_emissions = soil_emissions_2(self.soc_start, self.soc_end, self.total_hectars, 0, self.area, self.hectars_before_20)
-
-                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in self.yearly_soc_emissions], activity=ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay))
 
             except Exception as e:
                 traceback.print_exc()
@@ -186,7 +158,7 @@ class OtherLandUseChanges(BaseModule):
             total_em_per_hectar = (methane_emissions + nitrous_emissions) / 1000
 
             self.total_fire_emissions = total_em_per_hectar * self.area
-            self.yearly_fire_emissions = yearly_constant_emissions_breakdown(self.total_fire_emissions, self.time_impl, self.time_cap)
+            self.yearly_fire_emissions = yearly_constant_emissions_breakdown(self.total_fire_emissions, self.time_impl, self.time_cap, self.rate)
 
             # CALCULATE FOR INDIVIDUAL METHANE AND NITROUS EMISSIONS(the calculation on top can be removed in the future)
             methane_em_per_hectar = methane_emissions / 1000
@@ -202,28 +174,10 @@ class OtherLandUseChanges(BaseModule):
             self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in yearly_methane_fire_emissions], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
             self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in yearly_nitrous_fire_emissions], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
 
-        def calculate_emissions_som():
-            try:
-                if self.calculate_soc_som:
-                    self.emissions_som_yearly, self.emissions_som_total = som_emissions(self.soc_end, self.soc_start, self.moisture_emission_factor, self.nitrous_constant, self.hectars_before_20)
-
-                    som_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in self.emissions_som_yearly], ActivityTypes.SOM, delay=self.delay)
-                    self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
-            except Exception as e:
-                traceback.print_exc()
-
-
         try:
             calculate_biomass()
-            calculate_soc()
             calculate_fire()
-            calculate_emissions_som()
-
-            self.emissions_total_yearly = [x + y + z for x, y, z in zip(self.yearly_biomass_emissions, self.yearly_soc_emissions, self.yearly_fire_emissions)]
-            self.total_emissions = sum(self.emissions_total_yearly)
 
         except Exception as e:
             traceback.print_exc()
 
-    def evaluate_tier_2_defaults():
-        pass
