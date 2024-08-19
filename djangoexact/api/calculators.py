@@ -6095,6 +6095,8 @@ class SetAsideCalculator(BaseCalculator):
 
         self.biomass_ef_start: SimpleNamespace | ipcc.ForestTotalBiomass = SimpleNamespace(value=0)
         self.biomass_ef_w: SimpleNamespace | ipcc.ForestTotalBiomass = SimpleNamespace(value=0)
+        self.som: SimpleNamespace | ipcc.NitrousEmissionFactor = SimpleNamespace(value=0)
+        
 
         self.math_start_w = None
         self.math_start_wo = None
@@ -6119,6 +6121,8 @@ class SetAsideCalculator(BaseCalculator):
 
         if luc:
             module_start, module_w, module_wo = luc.get_modules()
+
+        self.som = utils.get_or_raise(ipcc.NitrousEmissionFactor, {"moisture": project.moisture}, f"Land use nitrous emission factor for {project.moisture.name} moisture does not exist")
 
         if module.is_luc_remaining_same() or module.is_business_as_usual():
             self.flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
@@ -6167,7 +6171,7 @@ class SetAsideCalculator(BaseCalculator):
                 project.capitalization_years,
                 activity.change_rate.name,
                 project.gw_potential.n2o,
-                self.som_start.value,
+                self.som.value,
                 self.soc.value,
                 self.soc.value,
                 module_start.soc_t2_start,
@@ -6202,7 +6206,7 @@ class SetAsideCalculator(BaseCalculator):
                 project.capitalization_years,
                 activity.change_rate.name,
                 project.gw_potential.n2o,
-                self.som_start.value,
+                self.som.value,
                 self.soc.value,
                 self.soc.value,
                 module_start.soc_t2_start,
@@ -6237,7 +6241,7 @@ class SetAsideCalculator(BaseCalculator):
                 project.capitalization_years,
                 activity.change_rate.name,
                 project.gw_potential.n2o,
-                self.som_w.value,
+                self.som.value,
                 self.soc.value,
                 self.soc.value,
                 module_start.soc_t2_start,
@@ -6272,7 +6276,7 @@ class SetAsideCalculator(BaseCalculator):
                 project.capitalization_years,
                 activity.change_rate.name,
                 project.gw_potential.n2o,
-                self.som_wo.value,
+                self.som.value,
                 self.soc.value,
                 self.soc.value,
                 module_start.soc_t2_start,
