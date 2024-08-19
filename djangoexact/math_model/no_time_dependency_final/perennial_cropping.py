@@ -97,7 +97,7 @@ class PerennialCropping(LandModule):
             try:
                 if self.biomass_start and self.biomass_end:
                     # NOTE: This means that we have received values for both (or we have tier 2 values for both)
-                    emissions_biomass_yearly, emissions_biomass_total = biomass_emissions(self.biomass_end, self.biomass_start, self.hectares_start, self.hectares_end, self.rate_type, self.implementation_time, self.capitalization_time)
+                    self.emissions_biomass_yearly, self.emissions_biomass_total = biomass_emissions(self.biomass_end, self.biomass_start, self.area_start, self.area_end, self.rate, self.time_impl, self.time_cap)
 
                     biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_biomass_yearly], ActivityTypes.BIOMASS, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
@@ -123,7 +123,8 @@ class PerennialCropping(LandModule):
 
 
                     # NOTE: maybe this should be broken down over max_years_growth or over all years of project depending on whether calculated or tabular is used
-                    yearly_bio_emissions = breakdown_according_to_values_for_x_years(total, self.hectares_total, len(self.hectares_total))
+                    self.yearly_bio_emissions = breakdown_according_to_values_for_x_years(total, self.total_hectars, len(self.total_hectars))
+                    self.total_bio_emissions = total
 
                     biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_bio_emissions], ActivityTypes.BIOMASS, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
