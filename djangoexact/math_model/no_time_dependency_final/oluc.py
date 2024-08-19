@@ -70,8 +70,27 @@ class OtherLandUseChanges(BaseModule):
         soc_ref_start = self.soc_start_tier_2_default or self.soc_start_default
         soc_ref_end = self.soc_end_tier_2_default or self.soc_end_default
 
-        self.soc_start = soc_ref_start * fmg_start * fi_start * flu_start
-        self.soc_end = soc_ref_end * fmg_end * fi_end * flu_end
+        self.area = area
+        self.time_impl = time_impl - delay
+        self.time_cap = time_cap
+        self.rate = rate
+        self.delay = delay
+
+        self.fmg_start = self.fmg_start_tier_2 if self.fmg_start_tier_2 else self.fmg_start_default
+        self.fmg_end = self.fmg_end_tier_2 if self.fmg_end_tier_2 else self.fmg_end_default
+        self.flu_start = self.flu_start_tier_2 if self.flu_start_tier_2 else self.flu_start_default
+        self.flu_end = self.flu_end_tier_2 if self.flu_end_tier_2 else self.flu_end_default
+        self.fi_start = self.fi_start_tier_2 if self.fi_start_tier_2 else self.fi_start_default
+        self.fi_end = self.fi_end_tier_2 if self.fi_end_tier_2 else self.fi_end_default
+
+        # AUXILIARY VARIABLES FOR SOIL CALCULATION
+        self.hectars_before_20, self.hectars_after_20 = yearly_time_dependent_20_year_breakdown(0, self.area, self.time_impl, self.time_cap, self.rate)
+        self.total_hectars = yearly_time_dependent_parameter_breakdown(0, self.area, self.time_impl, self.time_cap, self.rate, interim_values=True)
+
+        self.soc_start = self.soc_start_default * self.fmg_start * self.flu_start * self.fi_start if not self.soc_start_tier_2 else self.soc_start_tier_2
+        self.soc_end = self.soc_end_default * self.fmg_end * self.flu_end * self.fi_end if not self.soc_end_tier_2 else self.soc_end_tier_2
+
+        self.result = Result(self.time_impl, self.time_cap)
 
     def calculate_emissions(self):
        
@@ -95,7 +114,7 @@ class OtherLandUseChanges(BaseModule):
 
                 total_biomass_emissions = total
                 # TODO: change so only in implementation years but proportionate to the hectars addressed in that year
-                yearly_biomass_emissions = yearly_constant_emissions_breakdown(total, self.time_impl, self.capitalization_time, self.implementation_time)
+                yearly_biomass_emissions = yearly_constant_emissions_breakdown(total, self.time_impl, self.time_cap, self.rate)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(
                     YearlyGasActivityEmissionSet(
@@ -126,7 +145,7 @@ class OtherLandUseChanges(BaseModule):
             total_em_per_hectar = (methane_emissions + nitrous_emissions) / 1000
 
             total_fire_emissions = total_em_per_hectar * self.area
-            yearly_fire_emissions = yearly_constant_emissions_breakdown(total_fire_emissions, self.time_impl, self.capitalization_time, self.implementation_time)
+            yearly_fire_emissions = yearly_constant_emissions_breakdown(total_fire_emissions, self.time_impl, self.time_cap, self.rate)
 
             # CALCULATE FOR INDIVIDUAL METHANE AND NITROUS EMISSIONS(the calculation on top can be removed in the future)
             methane_em_per_hectar = methane_emissions / 1000
@@ -136,8 +155,8 @@ class OtherLandUseChanges(BaseModule):
             methane_fire_emissions = methane_em_per_hectar * self.area
             nitrous_fire_emissions = nitrous_em_per_hectar * self.area
 
-            yearly_methane_fire_emissions = yearly_constant_emissions_breakdown(methane_fire_emissions, self.time_impl, self.capitalization_time, self.rate_type)
-            yearly_nitrous_fire_emissions = yearly_constant_emissions_breakdown(nitrous_fire_emissions, self.time_impl, self.capitalization_time, self.rate_type)
+            yearly_methane_fire_emissions = yearly_constant_emissions_breakdown(methane_fire_emissions, self.time_impl, self.time_cap, self.rate)
+            yearly_nitrous_fire_emissions = yearly_constant_emissions_breakdown(nitrous_fire_emissions, self.time_impl, self.time_cap, self.rate)
 
             self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in yearly_methane_fire_emissions], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
             self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in yearly_nitrous_fire_emissions], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
