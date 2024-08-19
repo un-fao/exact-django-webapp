@@ -185,7 +185,12 @@ class OtherLandUseChanges(BaseModule):
         def calculate_fire():
             delta_c_soc = (self.soc_end - self.soc_start) / 20
 
-            initial_biomass = self.initial_lu_biomass if not self.initial_lu_biomass_tier_2 else self.initial_lu_biomass_tier_2
+            initial_biomass_without_removal = self.initial_lu_biomass if not self.initial_lu_biomass_tier_2 else self.initial_lu_biomass_tier_2
+
+            conversion_factor_dry_matter = 0.47
+
+            initial_biomass = initial_biomass_without_removal - self.dry_matter_end * conversion_factor_dry_matter
+
             fire_mb = initial_biomass / 0.4
 
             kg_methane_fire = fire_mb * self.combustion_factor * self.emission_factor_methane if self.fire_bool else 0
