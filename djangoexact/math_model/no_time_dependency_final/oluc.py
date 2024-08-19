@@ -24,6 +24,56 @@ from typing import Optional
 
 @dataclass
 class OtherLandUseChanges(BaseModule):
+    def __init__(
+        self,
+        initial_lu_biomass,
+        initial_lu_biomass_tier_2,
+        final_lu_biomass,
+        final_lu_biomass_tier_2,
+        c_n_ratio,
+        moisture_emission_factor,
+        combustion_factor,
+        emission_factor_nitrous,
+        emission_factor_methane,
+        nitrous_constant,
+        methane_constant,
+        fire_bool,
+        soc_start_default,
+        soc_end_default,
+        soc_start_tier_2,
+        soc_end_tier_2,
+        fmg_start_default,
+        fmg_end_default,
+        fmg_start_tier_2,
+        fmg_end_tier_2,
+        flu_start_default,
+        flu_end_default,
+        flu_start_tier_2,
+        flu_end_tier_2,
+        fi_start_default,
+        fi_end_default,
+        fi_start_tier_2,
+        fi_end_tier_2,
+        calculate_soc_som,
+        area,
+        time_impl,
+        time_cap,
+        rate,
+        dry_matter_end,
+        delay=0,
+    ):
+        self.initial_lu_biomass = initial_lu_biomass
+        self.initial_lu_biomass_tier_2 = initial_lu_biomass_tier_2
+        self.final_lu_biomass = final_lu_biomass
+        self.final_lu_biomass_tier_2 = final_lu_biomass_tier_2
+        self.c_n_ratio = c_n_ratio
+        self.moisture_emission_factor = moisture_emission_factor
+        self.combustion_factor = combustion_factor
+        self.emission_factor_nitrous = emission_factor_nitrous
+        self.emission_factor_methane = emission_factor_methane
+        self.nitrous_constant = nitrous_constant
+        self.methane_constant = methane_constant
+        self.fire_bool = fire_bool
 
     # NOTE: I can't utilize LandModule for this as it does not have area_start and area_end. Maybe we could change LandModule? Not worth it I think
     initial_lu_biomass: float
@@ -75,6 +125,8 @@ class OtherLandUseChanges(BaseModule):
         self.time_cap = time_cap
         self.rate = rate
         self.delay = delay
+
+        self.dry_matter_end = dry_matter_end
 
         self.fmg_start = self.fmg_start_tier_2 if self.fmg_start_tier_2 else self.fmg_start_default
         self.fmg_end = self.fmg_end_tier_2 if self.fmg_end_tier_2 else self.fmg_end_default
