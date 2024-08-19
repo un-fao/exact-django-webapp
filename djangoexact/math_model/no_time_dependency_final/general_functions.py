@@ -223,7 +223,7 @@ def yearly_time_dependent_increase(start_value, end_value, years_implementation,
     return result
 
 
-def yearly_time_dependent_full_year(start_value, end_value, years_implementation, years_capitalization, function):
+def yearly_time_dependent_increase_full_year(start_value, end_value, years_implementation, years_capitalization, function):
     values_at_year = yearly_time_dependent_parameter_breakdown(start_value, end_value, years_implementation, years_capitalization, function, interim_values=False)
     delta_yearly = [values_at_year[i] - values_at_year[i - 1] for i in range(1, len(values_at_year))]
 
@@ -239,7 +239,7 @@ def yearly_time_dependent_matrix(start_value, end_value, years_implementation, y
         years_total = years_implementation + years_capitalization
 
         half_year = yearly_time_dependent_increase(start_value, end_value, years_implementation, years_capitalization, function)
-        full_year = yearly_time_dependent_full_year(start_value, end_value, years_implementation, years_capitalization, function)
+        full_year = yearly_time_dependent_increase_full_year(start_value, end_value, years_implementation, years_capitalization, function)
 
         matrix = np.full((years_implementation, years_total), 0.0)
         n = len(half_year)
@@ -265,7 +265,7 @@ def yearly_time_dependent_matrix(start_value, end_value, years_implementation, y
         years_total = years_implementation + years_capitalization
 
         half_year = yearly_time_dependent_increase(start_value, end_value, years_implementation, years_capitalization, function)
-        full_year = yearly_time_dependent_full_year(start_value, end_value, years_implementation, years_capitalization, function)
+        full_year = yearly_time_dependent_increase_full_year(start_value, end_value, years_implementation, years_capitalization, function)
 
         matrix = np.full((years_implementation, years_total), 0.0)
         n = len(half_year)
@@ -290,7 +290,7 @@ def yearly_time_dependent_matrix_log_rec_dis(start_value, end_value, years_imple
         # we have the value of a full year at each cell. This is due to the fact that we are cutting all the hectares at the beginning of the year
         years_total = years_implementation + years_capitalization
 
-        full_year = yearly_time_dependent_full_year(start_value, end_value, years_implementation, years_capitalization, function)
+        full_year = yearly_time_dependent_increase_full_year(start_value, end_value, years_implementation, years_capitalization, function)
 
         matrix = np.full((years_implementation, years_total), 0.0)
         n = len(full_year)
@@ -315,7 +315,7 @@ def yearly_time_dependent_matrix_log_rec_dis(start_value, end_value, years_imple
         # Again, same as above for linear just kept separate for readability
         years_total = years_implementation + years_capitalization
 
-        full_year = yearly_time_dependent_full_year(start_value, end_value, years_implementation, years_capitalization, function)
+        full_year = yearly_time_dependent_increase_full_year(start_value, end_value, years_implementation, years_capitalization, function)
 
         matrix = np.full((years_implementation, years_total), 0.0)
         n = len(full_year)
@@ -421,7 +421,7 @@ def som_emissions(soc_final, soc_initial, emission_factor_nitrous, nitrous_const
 
 def biomass_emissions(biomass_final, biomass_initial, hectares_start, hectares_end, rate_type, time_implementation, time_capitalization,):
 
-    yearly_variation_hectares = yearly_time_dependent_increase(hectares_start, hectares_end, time_implementation, time_capitalization, rate_type)
+    yearly_variation_hectares = yearly_time_dependent_increase_full_year(hectares_start, hectares_end, time_implementation, time_capitalization, rate_type)
 
     biomass_variation = biomass_final - biomass_initial
 
