@@ -17,20 +17,21 @@ from .ghg_emissions_classes import (
 )
 
 from dataclasses import dataclass
+from typing import Optional
 @dataclass
 class Inputs(BaseModule):
     unit_start: float
     unit_end: float
     ipcc_factor_co2: float
-    tier_2_factor_co2: float
+    tier_2_factor_co2: Optional[float]
     unit_factor_co2: float
     emissions_factor_co2: float
     ipcc_factor_n2o: float
-    tier_2_factor_n2o: float
+    tier_2_factor_n2o: Optional[float]
     unit_factor_n2o: float
     emissions_factor_n2o: float
     ipcc_factor_eq: float
-    tier_2_factor_eq: float
+    tier_2_factor_eq: Optional[float]
     unit_factor_eq: float
     emissions_factor_eq: float
 
@@ -66,12 +67,12 @@ class Inputs(BaseModule):
 @dataclass
 class OperationPhaseIrrigation(BaseModule):
     ef_default: float
-    ef_tier_2: float
-    total_dynamic_head_tier_2: float
+    ef_tier_2: Optional[float]
+    total_dynamic_head_tier_2: Optional[float]
     average_pressure_default: float
-    average_pressure_tier_2: float
+    average_pressure_tier_2: Optional[float]
     pumping_efficiency_default: float
-    pumping_efficiency_tier_2: float
+    pumping_efficiency_tier_2: Optional[float]
     erh_electricity: float
     fuel_density: float
     fuel_net_calorific_values: float
@@ -86,10 +87,10 @@ class OperationPhaseIrrigation(BaseModule):
     ):
         def ef_calculation(ef_default, ef_tier_2, total_dynamic_head_tier_2, average_pressure_default, average_pressure_tier_2, pumping_efficiency_default, pumping_efficiency_tier_2, erh_electricity, fuel_net_calorific_values, fuel_density, depth, gwir):
             try:
-                pumping_efficiency = pumping_efficiency_default if not pumping_efficiency_tier_2 else pumping_efficiency_tier_2
-                average_pressure = average_pressure_default if not average_pressure_tier_2 else average_pressure_tier_2
+                pumping_efficiency = self.pumping_efficiency_tier_2 or self.pumping_efficiency_default
+                average_pressure = self.average_pressure_tier_2 or self.average_pressure_default
                 total_dynamic_head_default = average_pressure * 10.19
-                total_dynamic_head = total_dynamic_head_default if not total_dynamic_head_tier_2 else total_dynamic_head_tier_2
+                total_dynamic_head = total_dynamic_head_tier_2 or total_dynamic_head_default
                 ef = ef_default if not ef_tier_2 else ef_tier_2
                 gwir = gwir * 10
                 erh = erh_electricity if erh_electricity else 9.81 / (fuel_net_calorific_values * fuel_density) / math.pow(10, 3)
@@ -125,16 +126,16 @@ class OperationPhaseIrrigation(BaseModule):
 class Roads(BaseModule):
 
     ef_ipcc: float
-    ef_tier_2: float
+    ef_tier_2: Optional[float]
     units_end: float  # This will be used to set `units_end`
         
     def calculate_emissions(self):
         try:
             # NOTE: check this, looks weird
-            ef = self.ef_ipcc if self.ef_ipcc else self.ef_tier_2
+            ef = self.ef_tier_2 or self.ef_ipcc
 
             self.total_emissions = self.units_end * ef / 1000  # to convert the ef from kg to g
-            self.emissions_total_yearly = yearly_constant_emissions_breakdown(self.total_emissions, self.implementation_time, self.capitalization_time)
+            self.emissions_total_yearly = yearly_constant_emissions_breakdown(self.total_emissions, self.implementation_time, self.capitalization_time, self.rate_type)
 
             roads_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_total_yearly], ActivityTypes.ROADS, delay=self.delay) 
             self.result.yearly_emissions_by_sector_by_gas.append(roads_emission_set)
@@ -146,8 +147,8 @@ class Roads(BaseModule):
 class ElectricityConsumption(BaseModule):
 
     emissions_factor: float
-    specific_factor_start: float
-    specific_factor_end: float
+    specific_factor_start: Optional[float]
+    specific_factor_end: Optional[float]
     mwh_start: float
     mwh_end: float
     percent_loss_transportation_start: float
@@ -157,8 +158,8 @@ class ElectricityConsumption(BaseModule):
         self,
     ):
         try:
-            factor_start = self.specific_factor_start if self.specific_factor_start else self.emissions_factor
-            factor_end = self.specific_factor_end if self.specific_factor_end else self.emissions_factor
+            factor_start = self.specific_factor_start or self.emissions_factor
+            factor_end = self.specific_factor_end or self.emissions_factor
 
             annual_start = (factor_start * self.mwh_start) * (1 + self.percent_loss_transportation_start)
             annual_end = (factor_end * self.mwh_end) * (1 + self.percent_loss_transportation_end)
@@ -175,7 +176,7 @@ class ElectricityConsumption(BaseModule):
 @dataclass
 class FuelConsumption(BaseModule):
     emissions_factor: float
-    specific_factor: float
+    specific_factor: Optional[float]
     mwh_start: float
     mwh_end: float
 
@@ -183,7 +184,7 @@ class FuelConsumption(BaseModule):
         self,
     ):
         try:
-            factor = self.specific_factor if self.specific_factor else self.emissions_factor
+            factor = self.specific_factor or self.emissions_factor
 
             annual_start = factor * self.mwh_start
             annual_end = factor * self.mwh_end
@@ -205,7 +206,7 @@ class SolidConsumption(BaseModule):
     account_for_co2_boolean: bool
     methane_constant: float
     nitrous_constant: float
-    specific_factor: float
+    specific_factor: Optional[float]
     mwh_start: float
     mwh_end: float
 
@@ -222,7 +223,7 @@ class SolidConsumption(BaseModule):
                 traceback.print_exc()
 
         try:
-            factor = self.specific_factor if self.specific_factor else calculate_factor(self.joules_factor, self.co2_factor, self.ch4_factor, self.n2o_factor, self.account_for_co2_boolean, self.methane_constant, self.nitrous_constant)
+            factor = self.specific_factor or calculate_factor(self.joules_factor, self.co2_factor, self.ch4_factor, self.n2o_factor, self.account_for_co2_boolean, self.methane_constant, self.nitrous_constant)
 
             annual_start = factor * self.mwh_start
             annual_end = factor * self.mwh_end
@@ -238,7 +239,7 @@ class SolidConsumption(BaseModule):
 @dataclass
 class NewIrrigation(BaseModule):
     ef_ref: float
-    ef_tier_2: float
+    ef_tier_2: Optional[float]
     units_start: float
     units_end: float
 
@@ -246,13 +247,14 @@ class NewIrrigation(BaseModule):
         self,
     ):
         try:
-            ef = self.ef_ref if not self.ef_tier_2 else self.ef_tier_2
+            ef = self.ef_tier_2 or self.ef_ref
 
             self.total_emissions = ef * (self.units_end - self.units_start) / 1000
-            emissions_total_yearly = yearly_constant_emissions_breakdown(self.total_emissions, self.implementation_time, self.capitalization_time)
+            emissions_total_yearly = yearly_constant_emissions_breakdown(self.total_emissions, self.implementation_time, self.capitalization_time, self.rate_type)
 
             new_irrigation_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_total_yearly], ActivityTypes.NEW_IRRIGATION, delay=self.delay)
             self.result.yearly_emissions_by_sector_by_gas.append(new_irrigation_emission_set)
 
         except:
             traceback.print_exc()
+

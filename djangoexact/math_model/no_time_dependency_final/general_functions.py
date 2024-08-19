@@ -264,7 +264,7 @@ def yearly_time_dependent_matrix(start_value, end_value, years_implementation, y
         # NOTE: same as Linear, but kept on a different function for readability
         years_total = years_implementation + years_capitalization
 
-        half_year = yearly_time_dependent_increase_half_year(start_value, end_value, years_implementation, years_capitalization, function)
+        half_year = yearly_time_dependent_increase(start_value, end_value, years_implementation, years_capitalization, function)
         full_year = yearly_time_dependent_full_year(start_value, end_value, years_implementation, years_capitalization, function)
 
         matrix = np.full((years_implementation, years_total), 0.0)
@@ -431,7 +431,7 @@ def biomass_emissions(biomass_final, biomass_initial, hectares_start, hectares_e
 # INPUT SINGLE MODULE CALCULATION
 def input_single_calculation(unit_start, unit_end, ipcc_factor, tier_2_factor, unit_factor, emissions_factor, time_implementation, time_capitalization, rate_type):
     try:
-        ipcc_or_tier_2_factor = tier_2_factor if tier_2_factor else ipcc_factor
+        ipcc_or_tier_2_factor = tier_2_factor or ipcc_factor
 
         unit_start = unit_start * unit_factor
         unit_end = unit_end * unit_factor
@@ -443,7 +443,7 @@ def input_single_calculation(unit_start, unit_end, ipcc_factor, tier_2_factor, u
 
     except:
         traceback.print_exc()
-        return None
+        return [], []
 
     return annual_emissions, sum(annual_emissions)
 
