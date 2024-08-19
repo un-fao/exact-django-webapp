@@ -11,32 +11,33 @@ from .ghg_emissions_classes import (
     YearlyGasActivityEmissionSet,
 )
 from dataclasses import dataclass
+from typing import Optional
 
 @dataclass
 class Fishery(BaseModule):
     catch_start: float
     catch_end: float
     ef_diesel_default: float
-    ef_diesel_start_tier_2: float
-    ef_diesel_tier_2_end: float
+    ef_diesel_start_tier_2: Optional[float]
+    ef_diesel_tier_2_end: Optional[float]
     fui_default_start: float
     fui_default_end: float
-    fui_start_tier_2: float
-    fui_end_tier_2: float
+    fui_start_tier_2: Optional[float]
+    fui_end_tier_2: Optional[float]
     gwp_refrigerant_default: float
-    gwp_refrigerant_start_tier_2: float
-    gwp_refrigerant_end_tier_2: float
+    gwp_refrigerant_start_tier_2: Optional[float]
+    gwp_refrigerant_end_tier_2: Optional[float]
     quantity_lost_refrigerant_default: float
-    quantity_lost_refrigerant_start_tier_2: float
-    quantity_lost_refrigerant_end_tier_2: float
+    quantity_lost_refrigerant_start_tier_2: Optional[float]
+    quantity_lost_refrigerant_end_tier_2: Optional[float]
     percentage_refrigerant_start: float
     percentage_refrigerant_end: float
     tonnes_ice_default: float
-    tonnes_ice_start_tier_2: float
-    tonnes_ice_end_tier_2: float
+    tonnes_ice_start_tier_2: Optional[float]
+    tonnes_ice_end_tier_2: Optional[float]
     kwh_ice_per_tonne_default: float
-    kwh_ice_per_tonne_start_tier_2: float
-    kwh_ice_per_tonne_end_tier_2: float
+    kwh_ice_per_tonne_start_tier_2: Optional[float]
+    kwh_ice_per_tonne_end_tier_2: Optional[float]
     operating_margin: float
     percentage_ice_start: float
     percentage_ice_end: float
@@ -202,3 +203,75 @@ class CoastalAquaculture(BaseModule):
 
         calculate_nitrous_emissions()
         calculate_co2_emissions()
+
+
+
+# # TEST FISHERIES
+# implementation_time = 5
+# capitalization_time = 10
+# rate_type = "linear"
+# delay = 0
+
+# catch_start = 100
+# catch_end = 200
+# ef_diesel_default = 10
+# ef_diesel_start_tier_2 = None
+# ef_diesel_tier_2_end = None
+# fui_default_start = 5
+# fui_default_end = 10
+# fui_start_tier_2 = None
+# fui_end_tier_2 = None
+# gwp_refrigerant_default = 100
+# gwp_refrigerant_start_tier_2 = None
+# gwp_refrigerant_end_tier_2 = None
+# quantity_lost_refrigerant_default = 10
+# quantity_lost_refrigerant_start_tier_2 = None
+# quantity_lost_refrigerant_end_tier_2 = None
+# percentage_refrigerant_start = 0.1
+# percentage_refrigerant_end = 0.2
+# tonnes_ice_default = 100
+# tonnes_ice_start_tier_2 = None
+# tonnes_ice_end_tier_2 = None
+# kwh_ice_per_tonne_default = 10
+# kwh_ice_per_tonne_start_tier_2 = None
+# kwh_ice_per_tonne_end_tier_2 = None
+# operating_margin = 0.1
+# percentage_ice_start = 0.1
+# percentage_ice_end = 0.2
+
+# fishery = Fishery(
+#     implementation_time = implementation_time,
+#     capitalization_time = capitalization_time,
+#     rate_type = rate_type,
+#     delay = delay,
+#     catch_start = catch_start,
+#     catch_end = catch_end,
+#     ef_diesel_default = ef_diesel_default,
+#     ef_diesel_start_tier_2 = ef_diesel_start_tier_2,
+#     ef_diesel_tier_2_end = ef_diesel_tier_2_end,
+#     fui_default_start = fui_default_start,
+#     fui_default_end = fui_default_end,
+#     fui_start_tier_2 = fui_start_tier_2,
+#     fui_end_tier_2 = fui_end_tier_2,
+#     gwp_refrigerant_default = gwp_refrigerant_default,
+#     gwp_refrigerant_start_tier_2 = gwp_refrigerant_start_tier_2,
+#     gwp_refrigerant_end_tier_2 = gwp_refrigerant_end_tier_2,
+#     quantity_lost_refrigerant_default = quantity_lost_refrigerant_default,
+#     quantity_lost_refrigerant_start_tier_2 = quantity_lost_refrigerant_start_tier_2,
+#     quantity_lost_refrigerant_end_tier_2 = quantity_lost_refrigerant_end_tier_2,
+#     percentage_refrigerant_start = percentage_refrigerant_start,
+#     percentage_refrigerant_end = percentage_refrigerant_end,
+#     tonnes_ice_default = tonnes_ice_default,
+#     tonnes_ice_start_tier_2 = tonnes_ice_start_tier_2,
+#     tonnes_ice_end_tier_2 = tonnes_ice_end_tier_2,
+#     kwh_ice_per_tonne_default = kwh_ice_per_tonne_default,
+#     kwh_ice_per_tonne_start_tier_2 = kwh_ice_per_tonne_start_tier_2,
+#     kwh_ice_per_tonne_end_tier_2 = kwh_ice_per_tonne_end_tier_2,
+#     operating_margin = operating_margin,
+#     percentage_ice_start = percentage_ice_start,
+#     percentage_ice_end = percentage_ice_end
+# )
+
+# fishery.calculate_emissions()
+
+
