@@ -55,6 +55,7 @@ class OtherLandUseChanges(BaseModule):
         time_impl,
         time_cap,
         rate,
+        dry_matter_end,
         delay=0,
     ):
         self.initial_lu_biomass = initial_lu_biomass
@@ -96,6 +97,8 @@ class OtherLandUseChanges(BaseModule):
         self.rate = rate
         self.delay = delay
 
+        self.dry_matter_end = dry_matter_end
+
         self.fmg_start = self.fmg_start_tier_2 if self.fmg_start_tier_2 else self.fmg_start_default
         self.fmg_end = self.fmg_end_tier_2 if self.fmg_end_tier_2 else self.fmg_end_default
         self.flu_start = self.flu_start_tier_2 if self.flu_start_tier_2 else self.flu_start_default
@@ -117,8 +120,15 @@ class OtherLandUseChanges(BaseModule):
         def calculate_biomass():
             try:
                 # TODO: talk to Claudio, there is a problem here where there is a value for biomass change in emissions, even though initial and final should be the same
-                initial_biomass = self.initial_lu_biomass if not self.initial_lu_biomass_tier_2 else self.initial_lu_biomass_tier_2
+                initial_biomass_without_removal = self.initial_lu_biomass if not self.initial_lu_biomass_tier_2 else self.initial_lu_biomass_tier_2
                 final_biomass = self.final_lu_biomass if not self.final_lu_biomass_tier_2 else self.final_lu_biomass_tier_2
+
+                conversion_factor_dry_matter = 0.47
+
+                initial_biomass = initial_biomass_without_removal - self.dry_matter_end * conversion_factor_dry_matter
+
+                if initial_biomass < 0:
+                    raise ValueError("Initial biomass cannot be negative, dry_matter * 0.47 (conversion factor) should be less than initial biomass")
 
                 delta_c_biomass = (final_biomass - initial_biomass) * (-44 / 12)
 
