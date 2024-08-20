@@ -38,7 +38,7 @@ def verbose_print(obj):
 
 
 climates = Climate.objects.all()
-moistures = Moisture.objects.all()
+moisture = Moisture.objects.all()
 countries = Country.objects.all()
 soil_types = SoilType.objects.all().exclude(active=False)
 gw_potentials = GlobalWarmingPotential.objects.all()
@@ -57,7 +57,7 @@ while True:
         country = random.choice(countries)
         continent = country.region
         climate = random.choice(climates)
-        moisture = random.choice(moistures)
+        moisture = random.choice(moisture)
         soil_type = random.choice(soil_types)
         gw_potential = GlobalWarmingPotential.objects.get(name="100 yr AR5 w/out CC feedback")
         # socref = SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type)
