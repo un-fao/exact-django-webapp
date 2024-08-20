@@ -4145,6 +4145,8 @@ for i, row in enumerate(df_dict):
 
 """
 
+# TODO: Run in review
+
 annualcropland = LandUseType.objects.get(name__iexact="Annual Cropland")
 crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropping").all()
 
@@ -4201,9 +4203,6 @@ crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropp
 #             continent=region,
 #             value=value,
 #         )
-
-# TODO: Run in review
-
 
 # TotalBiomassAfterDefo.objects.all().delete()
 
@@ -4418,45 +4417,45 @@ crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropp
 #         )
 
 
-PerennialBGB.objects.all().delete()
+# PerennialBGB.objects.all().delete()
 
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "PerennialBGB.csv"),
-    header=0,
-    sep=";",
-)
+# df = pd.read_csv(
+#     os.path.join(os.path.dirname(__file__), "ipcc_data", "PerennialBGB.csv"),
+#     header=0,
+#     sep=";",
+# )
 
-headers = df.columns.values.tolist()
-rows = df.to_dict("records")
+# headers = df.columns.values.tolist()
+# rows = df.to_dict("records")
 
-for i, row in enumerate(rows):
-    climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
-    moisture = Moisture.objects.get(name__iexact=sanitize(row["moisture"]))
-    continent = Region.objects.get(name__iexact=sanitize(row["region"]))
+# for i, row in enumerate(rows):
+#     climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
+#     moisture = Moisture.objects.get(name__iexact=sanitize(row["moisture"]))
+#     continent = Region.objects.get(name__iexact=sanitize(row["region"]))
 
-    for j, header in enumerate(headers, start=3):
+#     for j, header in enumerate(headers, start=3):
 
-        if j == len(headers):
-            break
+#         if j == len(headers):
+#             break
 
-        land_use_type = LandUseType.objects.get(name__iexact=sanitize(headers[j]))
-        value = parse_csv_number(row[headers[j]])
+#         land_use_type = LandUseType.objects.get(name__iexact=sanitize(headers[j]))
+#         value = parse_csv_number(row[headers[j]])
 
-        if pd.isna(value):
-            continue
+#         if pd.isna(value):
+#             continue
 
-        print(
-            land_use_type,
-            climate,
-            moisture,
-            continent,
-            value,
-        )
+#         print(
+#             land_use_type,
+#             climate,
+#             moisture,
+#             continent,
+#             value,
+#         )
 
-        PerennialBGB.objects.create(
-            land_use_type=land_use_type,
-            climate=climate,
-            moisture=moisture,
-            continent=continent,
-            value=value,
-        )
+#         PerennialBGB.objects.create(
+#             land_use_type=land_use_type,
+#             climate=climate,
+#             moisture=moisture,
+#             continent=continent,
+#             value=value,
+#         )
