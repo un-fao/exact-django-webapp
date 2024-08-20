@@ -2088,51 +2088,6 @@ for i, row in df.iterrows():
 
 
 
-# annualcropland = LandUseType.objects.get(name__iexact="Annual Cropland")
-# crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropping").all()
-
-with open("scripts/ipcc_data/ForestTotalBiomass.csv", "r") as f:
-    reader = csv.reader(f)
-    header = next(reader, None)
-    data = list(reader)
-
-    for i, head in enumerate(header):
-        head = sanitize(head)
-        if head == "":
-            continue
-        land_use_type = LandUseType.objects.get(name__iexact=head)
-
-        for row in data:
-            if row[i + 3] == "":
-                continue
-
-            climate = Climate.objects.get(name__iexact=sanitize(row[0]))
-            moisture = Moisture.objects.get(name__iexact=sanitize(row[1]))
-            continent = Region.objects.get(name__iexact=sanitize(row[2]))
-            value = parse_csv_number(row[i + 3])
-
-            # if land_use_type == annualcropland:
-            #     for crop in crops:
-            #         print(f"{crop}, {climate}, {moisture}, {continent}, {value}")
-
-            #         ForestTotalBiomass.objects.get(
-            #             land_use_type=crop,
-            #             climate=climate,
-            #             moisture=moisture,
-            #             continent=continent,
-            #             value=value,
-            #         )
-
-            print(f"{land_use_type}, {climate}, {moisture}, {continent}, {value}")
-
-            ForestTotalBiomass.objects.get(
-                land_use_type=land_use_type,
-                climate=climate,
-                moisture=moisture,
-                continent=continent,
-                value=value,
-            )
-
 LargeFisheryFUI.objects.all().delete()
 
 df = pd.read_csv(
@@ -3073,50 +3028,6 @@ for i, row in enumerate(rows):
             biomass=parse_csv_number(row["biomass"]),
         )
 
-TotalBiomassAfterDefo.objects.all().delete()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "TotalBiomassAfterDefo.csv"),
-    header=0,
-    sep=",",
-)
-
-headers = df.columns.values.tolist()
-rows = df.to_dict("records")
-
-for i, row in enumerate(rows):
-    climate = Climate.objects.get(name__iexact=row["climate"])
-    moisture = Moisture.objects.get(name__iexact=row["moisture"])
-    region = Region.objects.get(name__iexact=row["region"])
-
-    for j, header in enumerate(headers, start=3):
-
-        if j == len(headers):
-            break
-
-        print(headers[j])
-        land_use_type = LandUseType.objects.get(name__iexact=headers[j])
-        value = parse_csv_number(row[headers[j]])
-        if not value:
-            continue
-
-        print(
-            land_use_type,
-            climate,
-            moisture,
-            region,
-            value,
-        )
-
-        TotalBiomassAfterDefo.objects.create(
-            land_use_type=land_use_type,
-            climate=climate,
-            moisture=moisture,
-            continent=region,
-            value=value,
-        )
-
-
 LandUseCarbonStockExchangeFactor.objects.all().delete()
 
 df = pd.read_csv(
@@ -3153,48 +3064,6 @@ for i, row in enumerate(rows):
             land_use_type=land_use_type,
             climate=climate,
             moisture=moisture,
-            value=value,
-        )
-
-ForestTotalBiomass.objects.all().delete()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestTotalBiomass.csv"),
-    header=0,
-    sep=";",
-)
-
-headers = df.columns.values.tolist()
-rows = df.to_dict("records")
-
-for i, row in enumerate(rows):
-    climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
-    moisture = Moisture.objects.get(name__iexact=sanitize(row["moisture"]))
-    region = Region.objects.get(name__iexact=sanitize(row["region"]))
-
-    for j, header in enumerate(headers, start=3):
-
-        if j == len(headers):
-            break
-
-        land_use_type = LandUseType.objects.get(name__iexact=headers[j])
-        value = parse_csv_number(row[headers[j]])
-        if pd.isna(value):
-            continue
-
-        print(
-            land_use_type,
-            climate,
-            moisture,
-            region,
-            value,
-        )
-
-        ForestTotalBiomass.objects.create(
-            land_use_type=land_use_type,
-            climate=climate,
-            moisture=moisture,
-            continent=region,
             value=value,
         )
 
@@ -3469,49 +3338,6 @@ for i, row in enumerate(rows):
         )
 
         PerennialAGB.objects.create(
-            land_use_type=land_use_type,
-            climate=climate,
-            moisture=moisture,
-            continent=continent,
-            value=value,
-        )
-
-PerennialBGB.objects.all().delete()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "PerennialBGB.csv"),
-    header=0,
-    sep=";",
-)
-
-headers = df.columns.values.tolist()
-rows = df.to_dict("records")
-
-for i, row in enumerate(rows):
-    climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
-    moisture = Moisture.objects.get(name__iexact=sanitize(row["moisture"]))
-    continent = Region.objects.get(name__iexact=sanitize(row["region"]))
-
-    for j, header in enumerate(headers, start=3):
-
-        if j == len(headers):
-            break
-
-        land_use_type = LandUseType.objects.get(name__iexact=sanitize(headers[j]))
-        value = parse_csv_number(row[headers[j]])
-
-        if pd.isna(value):
-            continue
-
-        print(
-            land_use_type,
-            climate,
-            moisture,
-            continent,
-            value,
-        )
-
-        PerennialBGB.objects.create(
             land_use_type=land_use_type,
             climate=climate,
             moisture=moisture,
@@ -3891,131 +3717,6 @@ for i, row in enumerate(df_dict2):
         doc=doc,
         n2o=n2o,
     )
-
-FMGData.objects.all().delete()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "FMG.csv"),
-    header=[0],
-    sep=";",
-)
-
-for i, row in df.iterrows():
-    print(i, row)
-    climate = Climate.objects.get(name__iexact=row["climate"])
-    moisture = Moisture.objects.get(name__iexact=row["moisture"])
-    tillage_management_type = TillageManagementType.objects.get(name__iexact=row["tillage_management_type"])
-
-    value = parse_csv_number(row["value"])
-
-    print(
-        climate,
-        moisture,
-        tillage_management_type,
-        value,
-    )
-
-    FMGData.objects.create(
-        climate=climate,
-        moisture=moisture,
-        tillage_management_type=tillage_management_type,
-        value=value,
-    )
-
-FIData.objects.all().delete()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "FI.csv"),
-    header=[0],
-    sep=";",
-)
-
-for i, row in df.iterrows():
-    climate = Climate.objects.get(name__iexact=row["climate"])
-    moisture = Moisture.objects.get(name__iexact=row["moisture"])
-    organic_input_type = OrganicInputType.objects.get(name__iexact=row["organic_input_type"])
-
-    value = parse_csv_number(row["value"])
-
-    print(
-        climate,
-        moisture,
-        organic_input_type,
-        value,
-    )
-
-    FIData.objects.create(
-        climate=climate,
-        moisture=moisture,
-        organic_input_type=organic_input_type,
-        value=value,
-    )
-
-    if i == len(df) - 1:
-        break
-
-FLUData.objects.all().delete()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "FLU.csv"),
-    header=[0],
-    sep=";",
-)
-
-annualcropland = LandUseType.objects.get(name__iexact="Annual Cropland")
-crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropping").all()
-perennials = LandUseType.objects.filter(module_types__class_name__iexact="PerennialCropping").all()
-perennials = perennials.exclude(name__in=["Agroforestry - Default", "Alley Cropping", "Perennial Fallow", "Hedgerow", "Multistrata", "Parkland", "Shaded Perennial", "Silvoarable", "Silvopasture", "Oil Palm", "Rubber", "Tea", "Olive", "Orchard", "Short Rotation Coppice", "Vine"])
-for i, row in df.iterrows():
-    print(row)
-    climate = Climate.objects.get(name__iexact=row["climate"])
-    moisture = Moisture.objects.get(name__iexact=row["moisture"])
-    if row["land_use_type"] != "Perennial Cropland":
-        land_use_type = LandUseType.objects.get(name__iexact=row["land_use_type"])
-    value = parse_csv_number(row["value"])
-
-    if land_use_type == annualcropland:
-        for crop in crops:
-            print(
-                climate,
-                moisture,
-                crop,
-                value,
-            )
-            FLUData.objects.create(
-                climate=climate,
-                moisture=moisture,
-                land_use_type=crop,
-                value=value,
-            )
-    elif row["land_use_type"] == "Perennial Cropland":
-        for perennial in perennials:
-            print(
-                climate,
-                moisture,
-                perennial,
-                value,
-            )
-            FLUData.objects.create(
-                climate=climate,
-                moisture=moisture,
-                land_use_type=perennial,
-                value=value,
-            )
-    else:
-        print(
-            climate,
-            moisture,
-            land_use_type,
-            value,
-        )
-
-        FLUData.objects.create(
-            climate=climate,
-            moisture=moisture,
-            land_use_type=land_use_type,
-            value=value,
-        )
 
 CoastalDeadwood.objects.all().delete()
 df = pd.read_csv(
@@ -4408,9 +4109,7 @@ for i, row in enumerate(df_dict):
             avg_pressure=parse_csv_number(row["avg_pressure"], nan_value=None),
             head=parse_csv_number(row["head"], nan_value=None),
         )
-"""
 
-# TODO: Run in review
 
 log.debug("Deleting all GlobalWarmingPotential objects...")
 GlobalWarmingPotential.objects.all().delete()
@@ -4443,3 +4142,321 @@ for i, row in enumerate(df_dict):
         ch4=ch4,
         n2o=n2o,
     )
+
+"""
+
+annualcropland = LandUseType.objects.get(name__iexact="Annual Cropland")
+crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropping").all()
+
+# ForestTotalBiomass.objects.all().delete()
+
+# df = pd.read_csv(
+#     os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestTotalBiomass.csv"),
+#     header=0,
+#     sep=";",
+# )
+
+# headers = df.columns.values.tolist()
+# rows = df.to_dict("records")
+
+# for i, row in enumerate(rows):
+#     climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
+#     moisture = Moisture.objects.get(name__iexact=sanitize(row["moisture"]))
+#     region = Region.objects.get(name__iexact=sanitize(row["region"]))
+
+#     for j, header in enumerate(headers, start=3):
+
+#         if j == len(headers):
+#             break
+
+#         land_use_type = LandUseType.objects.get(name__iexact=headers[j])
+#         value = parse_csv_number(row[headers[j]])
+#         if pd.isna(value):
+#             continue
+
+#         if land_use_type == annualcropland:
+#             for crop in crops:
+#                 print(f"{crop}, {climate}, {moisture}, {region}, {value}")
+
+#                 ForestTotalBiomass.objects.create(
+#                     land_use_type=crop,
+#                     climate=climate,
+#                     moisture=moisture,
+#                     continent=region,
+#                     value=value,
+#                 )
+
+#         print(
+#             land_use_type,
+#             climate,
+#             moisture,
+#             region,
+#             value,
+#         )
+
+#         ForestTotalBiomass.objects.create(
+#             land_use_type=land_use_type,
+#             climate=climate,
+#             moisture=moisture,
+#             continent=region,
+#             value=value,
+#         )
+
+# TODO: Run in review
+
+
+# TotalBiomassAfterDefo.objects.all().delete()
+
+# df = pd.read_csv(
+#     os.path.join(os.path.dirname(__file__), "ipcc_data", "TotalBiomassAfterDefo.csv"),
+#     header=0,
+#     sep=";",
+# )
+
+# headers = df.columns.values.tolist()
+# rows = df.to_dict("records")
+
+# for i, row in enumerate(rows):
+#     climate = Climate.objects.get(name__iexact=row["climate"])
+#     moisture = Moisture.objects.get(name__iexact=row["moisture"])
+#     region = Region.objects.get(name__iexact=row["region"])
+
+#     for j, header in enumerate(headers, start=3):
+
+#         if j == len(headers):
+#             break
+
+#         print(headers[j])
+#         land_use_type = LandUseType.objects.get(name__iexact=headers[j])
+#         value = parse_csv_number(row[headers[j]])
+#         if not value:
+#             continue
+
+#         if land_use_type == annualcropland:
+#             for crop in crops:
+#                 print(
+#                     crop,
+#                     climate,
+#                     moisture,
+#                     region,
+#                     value,
+#                 )
+
+#                 TotalBiomassAfterDefo.objects.create(
+#                     land_use_type=crop,
+#                     climate=climate,
+#                     moisture=moisture,
+#                     continent=region,
+#                     value=value,
+#                 )
+
+#         print(
+#             land_use_type,
+#             climate,
+#             moisture,
+#             region,
+#             value,
+#         )
+
+#         TotalBiomassAfterDefo.objects.create(
+#             land_use_type=land_use_type,
+#             climate=climate,
+#             moisture=moisture,
+#             continent=region,
+#             value=value,
+#         )
+
+
+# FMGData.objects.all().delete()
+
+# df = pd.read_csv(
+#     os.path.join(os.path.dirname(__file__), "ipcc_data", "FMG.csv"),
+#     header=[0],
+#     sep=";",
+# )
+
+# for i, row in df.iterrows():
+#     climate = Climate.objects.get(name__iexact=row["climate"])
+#     moisture = Moisture.objects.get(name__iexact=row["moisture"])
+
+#     grassland_management_type = None
+#     tillage_management_type = None
+
+#     if not pd.isna(row["grassland_management_type"]):
+#         grassland_management_type = GrasslandManagementType.objects.get(name__iexact=row["grassland_management_type"])
+
+#     if not pd.isna(row["tillage_management_type"]):
+#         tillage_management_type = TillageManagementType.objects.get(name__iexact=row["tillage_management_type"])
+
+#     value = parse_csv_number(row["value"])
+
+#     print(
+#         climate,
+#         moisture,
+#         tillage_management_type,
+#         grassland_management_type,
+#         value,
+#     )
+
+#     FMGData.objects.create(
+#         climate=climate,
+#         moisture=moisture,
+#         tillage_management_type=tillage_management_type,
+#         grassland_management_type=grassland_management_type,
+#         value=value,
+#     )
+
+# FIData.objects.all().delete()
+
+# df = pd.read_csv(
+#     os.path.join(os.path.dirname(__file__), "ipcc_data", "FI.csv"),
+#     header=[0],
+#     sep=";",
+# )
+
+# for i, row in df.iterrows():
+#     climate = Climate.objects.get(name__iexact=row["climate"])
+#     moisture = Moisture.objects.get(name__iexact=row["moisture"])
+
+#     grassland_management_type = None
+#     organic_input_type = None
+
+#     if not pd.isna(row["grassland_management_type"]):
+#         grassland_management_type = GrasslandManagementType.objects.get(name__iexact=row["grassland_management_type"])
+
+#     if not pd.isna(row["organic_input_type"]):
+#         organic_input_type = OrganicInputType.objects.get(name__iexact=row["organic_input_type"])
+
+#     value = parse_csv_number(row["value"])
+
+#     print(
+#         climate,
+#         moisture,
+#         organic_input_type,
+#         grassland_management_type,
+#         value,
+#     )
+
+#     FIData.objects.create(
+#         climate=climate,
+#         moisture=moisture,
+#         organic_input_type=organic_input_type,
+#         grassland_management_type=grassland_management_type,
+#         value=value,
+#     )
+
+#     if i == len(df) - 1:
+#         break
+
+# FLUData.objects.all().delete()
+
+# df = pd.read_csv(
+#     os.path.join(os.path.dirname(__file__), "ipcc_data", "FLU.csv"),
+#     header=[0],
+#     sep=";",
+# )
+
+# annualcropland = LandUseType.objects.get(name__iexact="Annual Cropland")
+# crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropping").all()
+# perennials = LandUseType.objects.filter(module_types__class_name__iexact="PerennialCropping").all()
+# perennials = perennials.exclude(name__in=["Agroforestry - Default", "Alley Cropping", "Perennial Fallow", "Hedgerow", "Multistrata", "Parkland", "Shaded Perennial", "Silvoarable", "Silvopasture", "Oil Palm", "Rubber", "Tea", "Olive", "Orchard", "Short Rotation Coppice", "Vine"])
+# for i, row in df.iterrows():
+#     climate = Climate.objects.get(name__iexact=row["climate"])
+#     moisture = Moisture.objects.get(name__iexact=row["moisture"])
+#     land_use_type = None
+#     if not pd.isna(row["land_use_type"]) and row["land_use_type"] != "Perennial Cropland":
+#         land_use_type = LandUseType.objects.get(name__iexact=row["land_use_type"])
+#     value = parse_csv_number(row["value"])
+
+#     if land_use_type == annualcropland:
+#         for crop in crops:
+#             print(
+#                 climate,
+#                 moisture,
+#                 crop,
+#                 value,
+#             )
+#             FLUData.objects.create(
+#                 climate=climate,
+#                 moisture=moisture,
+#                 land_use_type=crop,
+#                 value=value,
+#             )
+#     elif row["land_use_type"] == "Perennial Cropland":
+#         for perennial in perennials:
+#             print(
+#                 climate,
+#                 moisture,
+#                 perennial,
+#                 value,
+#             )
+#             FLUData.objects.create(
+#                 climate=climate,
+#                 moisture=moisture,
+#                 land_use_type=perennial,
+#                 value=value,
+#             )
+#     else:
+#         grassland_management_type = None
+#         if not pd.isna(row["grassland_management_type"]):
+#             grassland_management_type = GrasslandManagementType.objects.get(name__iexact=row["grassland_management_type"])
+
+#         print(
+#             climate,
+#             moisture,
+#             land_use_type,
+#             grassland_management_type,
+#             value,
+#         )
+
+#         FLUData.objects.create(
+#             climate=climate,
+#             moisture=moisture,
+#             land_use_type=land_use_type,
+#             grassland_management_type=grassland_management_type,
+#             value=value,
+#         )
+
+
+PerennialBGB.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "PerennialBGB.csv"),
+    header=0,
+    sep=";",
+)
+
+headers = df.columns.values.tolist()
+rows = df.to_dict("records")
+
+for i, row in enumerate(rows):
+    climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
+    moisture = Moisture.objects.get(name__iexact=sanitize(row["moisture"]))
+    continent = Region.objects.get(name__iexact=sanitize(row["region"]))
+
+    for j, header in enumerate(headers, start=3):
+
+        if j == len(headers):
+            break
+
+        land_use_type = LandUseType.objects.get(name__iexact=sanitize(headers[j]))
+        value = parse_csv_number(row[headers[j]])
+
+        if pd.isna(value):
+            continue
+
+        print(
+            land_use_type,
+            climate,
+            moisture,
+            continent,
+            value,
+        )
+
+        PerennialBGB.objects.create(
+            land_use_type=land_use_type,
+            climate=climate,
+            moisture=moisture,
+            continent=continent,
+            value=value,
+        )

@@ -1,49 +1,121 @@
-climate;moisture;organic_input_type;value
-Boreal;Moist;Low C input;0,92
-Boreal;Dry;Low C input;0,95
-Cool Temperate;Moist;Low C input;0,92
-Cool Temperate;Dry;Low C input;0,95
-Warm Temperate;Moist;Low C input;0,92
-Warm Temperate;Dry;Low C input;0,95
-Tropical;Moist;Low C input;0,92
-Tropical;Dry;Low C input;0,95
-Tropical;Wet;Low C input;0,92
-Tropical Montane;Moist;Low C input;0,94
-Tropical Montane;Dry;Low C input;0,94
-Tropical Montane;Wet;Low C input;0,94
-Boreal;Moist;High C input, no manure;1,11
-Boreal;Dry;High C input, no manure;1,04
-Cool Temperate;Moist;High C input, no manure;1,11
-Cool Temperate;Dry;High C input, no manure;1,04
-Warm Temperate;Moist;High C input, no manure;1,11
-Warm Temperate;Dry;High C input, no manure;1,04
-Tropical;Moist;High C input, no manure;1,11
-Tropical;Dry;High C input, no manure;1,04
-Tropical;Wet;High C input, no manure;1,11
-Tropical Montane;Moist;High C input, no manure;1,08
-Tropical Montane;Dry;High C input, no manure;1,08
-Tropical Montane;Wet;High C input, no manure;1,08
-Boreal;Moist;High C input, with manure;1,44
-Boreal;Dry;High C input, with manure;1,37
-Cool Temperate;Moist;High C input, with manure;1,44
-Cool Temperate;Dry;High C input, with manure;1,37
-Warm Temperate;Moist;High C input, with manure;1,44
-Warm Temperate;Dry;High C input, with manure;1,37
-Tropical;Moist;High C input, with manure;1,44
-Tropical;Dry;High C input, with manure;1,37
-Tropical;Wet;High C input, with manure;1,44
-Tropical Montane;Moist;High C input, with manure;1,41
-Tropical Montane;Dry;High C input, with manure;1,41
-Tropical Montane;Wet;High C input, with manure;1,41
-Boreal;Moist;Medium C input;1
-Boreal;Dry;Medium C input;1
-Cool Temperate;Moist;Medium C input;1
-Cool Temperate;Dry;Medium C input;1
-Warm Temperate;Moist;Medium C input;1
-Warm Temperate;Dry;Medium C input;1
-Tropical;Moist;Medium C input;1
-Tropical;Dry;Medium C input;1
-Tropical;Wet;Medium C input;1
-Tropical Montane;Moist;Medium C input;1
-Tropical Montane;Dry;Medium C input;1
-Tropical Montane;Wet;Medium C input;1
+climate;moisture;organic_input_type;grassland_management_type;value
+Boreal;Moist;Low C input;;0,92
+Boreal;Dry;Low C input;;0,95
+Cool Temperate;Moist;Low C input;;0,92
+Cool Temperate;Dry;Low C input;;0,95
+Warm Temperate;Moist;Low C input;;0,92
+Warm Temperate;Dry;Low C input;;0,95
+Tropical;Moist;Low C input;;0,92
+Tropical;Dry;Low C input;;0,95
+Tropical;Wet;Low C input;;0,92
+Tropical Montane;Moist;Low C input;;0,94
+Tropical Montane;Dry;Low C input;;0,94
+Tropical Montane;Wet;Low C input;;0,94
+Boreal;Moist;High C input, no manure;;1,11
+Boreal;Dry;High C input, no manure;;1,04
+Cool Temperate;Moist;High C input, no manure;;1,11
+Cool Temperate;Dry;High C input, no manure;;1,04
+Warm Temperate;Moist;High C input, no manure;;1,11
+Warm Temperate;Dry;High C input, no manure;;1,04
+Tropical;Moist;High C input, no manure;;1,11
+Tropical;Dry;High C input, no manure;;1,04
+Tropical;Wet;High C input, no manure;;1,11
+Tropical Montane;Moist;High C input, no manure;;1,08
+Tropical Montane;Dry;High C input, no manure;;1,08
+Tropical Montane;Wet;High C input, no manure;;1,08
+Boreal;Moist;High C input, with manure;;1,44
+Boreal;Dry;High C input, with manure;;1,37
+Cool Temperate;Moist;High C input, with manure;;1,44
+Cool Temperate;Dry;High C input, with manure;;1,37
+Warm Temperate;Moist;High C input, with manure;;1,44
+Warm Temperate;Dry;High C input, with manure;;1,37
+Tropical;Moist;High C input, with manure;;1,44
+Tropical;Dry;High C input, with manure;;1,37
+Tropical;Wet;High C input, with manure;;1,44
+Tropical Montane;Moist;High C input, with manure;;1,41
+Tropical Montane;Dry;High C input, with manure;;1,41
+Tropical Montane;Wet;High C input, with manure;;1,41
+Boreal;Moist;Medium C input;;1
+Boreal;Dry;Medium C input;;1
+Cool Temperate;Moist;Medium C input;;1
+Cool Temperate;Dry;Medium C input;;1
+Warm Temperate;Moist;Medium C input;;1
+Warm Temperate;Dry;Medium C input;;1
+Tropical;Moist;Medium C input;;1
+Tropical;Dry;Medium C input;;1
+Tropical;Wet;Medium C input;;1
+Tropical Montane;Moist;Medium C input;;1
+Tropical Montane;Dry;Medium C input;;1
+Tropical Montane;Wet;Medium C input;;1
+Boreal;Moist;;Improved with high inputs;1,11
+Boreal;Dry;;Improved with high inputs;1,11
+Cool Temperate;Moist;;Improved with high inputs;1,11
+Cool Temperate;Dry;;Improved with high inputs;1,11
+Warm Temperate;Moist;;Improved with high inputs;1,11
+Warm Temperate;Dry;;Improved with high inputs;1,11
+Tropical;Moist;;Improved with high inputs;1,11
+Tropical;Dry;;Improved with high inputs;1,11
+Tropical;Wet;;Improved with high inputs;1,11
+Tropical Montane;Moist;;Improved with high inputs;1,11
+Tropical Montane;Dry;;Improved with high inputs;1,11
+Tropical Montane;Wet;;Improved with high inputs;1,11
+Boreal;Moist;;Non-Degraded;1
+Boreal;Dry;;Non-Degraded;1
+Cool Temperate;Moist;;Non-Degraded;1
+Cool Temperate;Dry;;Non-Degraded;1
+Warm Temperate;Moist;;Non-Degraded;1
+Warm Temperate;Dry;;Non-Degraded;1
+Tropical;Moist;;Non-Degraded;1
+Tropical;Dry;;Non-Degraded;1
+Tropical;Wet;;Non-Degraded;1
+Tropical Montane;Moist;;Non-Degraded;1
+Tropical Montane;Dry;;Non-Degraded;1
+Tropical Montane;Wet;;Non-Degraded;1
+Boreal;Moist;;High Intensity Grazing;1
+Boreal;Dry;;High Intensity Grazing;1
+Cool Temperate;Moist;;High Intensity Grazing;1
+Cool Temperate;Dry;;High Intensity Grazing;1
+Warm Temperate;Moist;;High Intensity Grazing;1
+Warm Temperate;Dry;;High Intensity Grazing;1
+Tropical;Moist;;High Intensity Grazing;1
+Tropical;Dry;;High Intensity Grazing;1
+Tropical;Wet;;High Intensity Grazing;1
+Tropical Montane;Moist;;High Intensity Grazing;1
+Tropical Montane;Dry;;High Intensity Grazing;1
+Tropical Montane;Wet;;High Intensity Grazing;1
+Boreal;Moist;;Severely Degraded;1
+Boreal;Dry;;Severely Degraded;1
+Cool Temperate;Moist;;Severely Degraded;1
+Cool Temperate;Dry;;Severely Degraded;1
+Warm Temperate;Moist;;Severely Degraded;1
+Warm Temperate;Dry;;Severely Degraded;1
+Tropical;Moist;;Severely Degraded;1
+Tropical;Dry;;Severely Degraded;1
+Tropical;Wet;;Severely Degraded;1
+Tropical Montane;Moist;;Severely Degraded;1
+Tropical Montane;Dry;;Severely Degraded;1
+Tropical Montane;Wet;;Severely Degraded;1
+Boreal;Moist;;Improved With Medium Inputs;1
+Boreal;Dry;;Improved With Medium Inputs;1
+Cool Temperate;Moist;;Improved With Medium Inputs;1
+Cool Temperate;Dry;;Improved With Medium Inputs;1
+Warm Temperate;Moist;;Improved With Medium Inputs;1
+Warm Temperate;Dry;;Improved With Medium Inputs;1
+Tropical;Moist;;Improved With Medium Inputs;1
+Tropical;Dry;;Improved With Medium Inputs;1
+Tropical;Wet;;Improved With Medium Inputs;1
+Tropical Montane;Moist;;Improved With Medium Inputs;1
+Tropical Montane;Dry;;Improved With Medium Inputs;1
+Tropical Montane;Wet;;Improved With Medium Inputs;1
+Boreal;Moist;;Improved Grassland;1
+Boreal;Dry;;Improved Grassland;1
+Cool Temperate;Moist;;Improved Grassland;1
+Cool Temperate;Dry;;Improved Grassland;1
+Warm Temperate;Moist;;Improved Grassland;1
+Warm Temperate;Dry;;Improved Grassland;1
+Tropical;Moist;;Improved Grassland;1
+Tropical;Dry;;Improved Grassland;1
+Tropical;Wet;;Improved Grassland;1
+Tropical Montane;Moist;;Improved Grassland;1
+Tropical Montane;Dry;;Improved Grassland;1
+Tropical Montane;Wet;;Improved Grassland;1
