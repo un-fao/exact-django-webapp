@@ -135,7 +135,7 @@ class Roads(BaseModule):
             ef = self.ef_tier_2 or self.ef_ipcc
 
             self.total_emissions = self.units_end * ef / 1000  # to convert the ef from kg to g
-            self.emissions_total_yearly = yearly_constant_emissions_breakdown(self.total_emissions, self.implementation_time, self.capitalization_time, self.rate_type)
+            self.emissions_total_yearly = yearly_constant_emissions_breakdown(self.total_emissions, self.time_impl, self.time_cap, self.rate_type)
 
             roads_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_total_yearly], ActivityTypes.ROADS, delay=self.delay) 
             self.result.yearly_emissions_by_sector_by_gas.append(roads_emission_set)
