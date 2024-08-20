@@ -123,6 +123,7 @@ from .models import (
     Waterbody,
     ModuleType,
     MinorSeasonFloodedRice,
+    SingleBiomassModule,
 )
 
 CALCULATE_SOC_SOM_START_W = False
@@ -522,6 +523,9 @@ class LandModuleCalculator(BaseCalculator):
     def __init__(self, module: LandModule) -> None:
         super().__init__(module)
 
+        self.soc: ipcc.SoilOrganicCarbon | SimpleNamespace = SimpleNamespace(value=0)
+        self.som: ipcc.NitrousEmissionFactor | SimpleNamespace = SimpleNamespace(value=0)
+
         self.fi_start: SimpleNamespace | ipcc.FIData = SimpleNamespace(value=1)
         self.fmg_start: SimpleNamespace | ipcc.FMGData = SimpleNamespace(value=1)
         self.flu_start: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=1)
@@ -532,12 +536,16 @@ class LandModuleCalculator(BaseCalculator):
         self.fmg_wo: SimpleNamespace | ipcc.FMGData = SimpleNamespace(value=1)
         self.flu_wo: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=1)
 
-        self.module: LandModule = module
+        self.module: LandModule | SingleBiomassModule = module
         self.luc: LandUseChange = self.module.land_use_change
         self.activity: Activity = self.module.activity
         self.project: Project = self.activity.project
 
         self.module_start = self.module_w = self.module_wo = self.module
+
+        self.module_start: LandModule | SingleBiomassModule
+        self.module_w: LandModule | SingleBiomassModule
+        self.module_wo: LandModule | SingleBiomassModule
 
         if self.luc:
             self.module_start, self.module_w, self.module_wo = self.luc.get_modules()
@@ -546,6 +554,14 @@ class LandModuleCalculator(BaseCalculator):
         return super().calculate(input, aggregate_by)
 
     def get_defaults(self, calculate=False) -> dict:
+
+        climate_flt = {"climate": self.project.climate}
+        moisture_flt = {"moisture": self.project.moisture}
+        soil_flt = {"soil_type": self.project.soil_type}
+
+        self.soc = utils.get_or_raise(ipcc.SoilOrganicCarbon, climate_flt | moisture_flt | soil_flt, f"SoilOrganicCarbon for {self.project.soil_type.name} soil type in {self.project.climate.name} climate and {self.project.moisture.name} moisture does not exist")
+        self.som = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {self.project.moisture.name} moisture does not exist")
+
         self.fi_start = get_fi_data(self.module_start, self.project.climate, self.project.moisture, utils.ScenarioTypes.START)
         self.fmg_start = get_fmg_data(self.module_start, self.project.climate, self.project.moisture, utils.ScenarioTypes.START)
         self.flu_start = get_flu_data(self.module_start, self.project.climate, self.project.moisture, utils.ScenarioTypes.START)
@@ -1139,7 +1155,7 @@ class AnnualCroppingCalculator(BaseCalculator):
         return (res_w, res_wo)
 
 
-class AnnualCropCalculator(BaseCalculator):
+class AnnualCropCalculator(LandModuleCalculator):
     """
     Calculator for annual cropping modules.
     """
@@ -1147,22 +1163,12 @@ class AnnualCropCalculator(BaseCalculator):
     def __init__(self, input) -> None:
         super().__init__(input)
 
-        self.fi_start: SimpleNamespace | ipcc.FIData = SimpleNamespace(value=0)
-        self.fmg_start: SimpleNamespace | ipcc.FMGData = SimpleNamespace(value=0)
-        self.flu_start: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=0)
-        self.fi_w: SimpleNamespace | ipcc.FIData = SimpleNamespace(value=0)
-        self.fmg_w: SimpleNamespace | ipcc.FMGData = SimpleNamespace(value=0)
-        self.flu_w: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=0)
-        self.fi_wo: SimpleNamespace | ipcc.FIData = SimpleNamespace(value=0)
-        self.fmg_wo: SimpleNamespace | ipcc.FMGData = SimpleNamespace(value=0)
-        self.flu_wo: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=0)
         self.biomass_start: SimpleNamespace = SimpleNamespace(value=0)
         self.biomass_w: SimpleNamespace = SimpleNamespace(value=0)
         self.biomass_wo: SimpleNamespace = SimpleNamespace(value=0)
         self.crop_yield_start: SimpleNamespace | ipcc.CropYieldStats = SimpleNamespace(value=0)
         self.crop_yield_w: SimpleNamespace | ipcc.CropYieldStats = SimpleNamespace(value=0)
         self.crop_yield_wo: SimpleNamespace | ipcc.CropYieldStats = SimpleNamespace(value=0)
-        self.soc: SimpleNamespace | ipcc.SoilOrganicCarbon = SimpleNamespace(value=0)
         self.flu: SimpleNamespace | ipcc.CroplandFLU = SimpleNamespace(value=0)
         self.default_emission_factor_start: SimpleNamespace | ipcc.NitrousEmissionFactor = SimpleNamespace(value=0)
         self.default_emission_factor_w: SimpleNamespace | ipcc.NitrousEmissionFactor = SimpleNamespace(value=0)
@@ -1184,7 +1190,6 @@ class AnnualCropCalculator(BaseCalculator):
         self.minor_biomass_start: SimpleNamespace = SimpleNamespace(value=0)
         self.minor_biomass_w: SimpleNamespace = SimpleNamespace(value=0)
         self.minor_biomass_wo: SimpleNamespace = SimpleNamespace(value=0)
-        self.som: SimpleNamespace | ipcc.NitrousEmissionFactor = SimpleNamespace(value=0)
 
         self.biomass_ef_start: SimpleNamespace | ipcc.ForestTotalBiomass = SimpleNamespace(value=0)
         self.biomass_ef_w: SimpleNamespace | ipcc.TotalBiomassAfterDefo = SimpleNamespace(value=0)
@@ -1199,17 +1204,10 @@ class AnnualCropCalculator(BaseCalculator):
         module: AnnualCropping = self.data
         activity: Activity = getattr(module, "parent", module).activity
         project: Project = activity.project
-        module_start = module_w = module_wo = module
-        luc: LandUseChange = module.land_use_change
 
-        module_start = module_w = module_wo = module
-
-        if luc:
-            module_start, module_w, module_wo = luc.get_modules()
-
-        lut_start = module_start.land_use_type_start
-        lut_w = module_w.land_use_type_w
-        lut_wo = module_wo.land_use_type_wo
+        lut_start = self.module_start.land_use_type_start
+        lut_w = self.module_w.land_use_type_w
+        lut_wo = self.module_wo.land_use_type_wo
 
         if module.is_ready() and calculate:
             self.calculate()
@@ -1223,30 +1221,17 @@ class AnnualCropCalculator(BaseCalculator):
 
         climate = project.climate
         moisture = project.moisture
-        soil_type = project.soil_type
 
         cm = {"climate": climate, "moisture": moisture}
         region_flt = {"continent": project.country.region}
-        soil_flt = {"soil_type": soil_type}
         moisture_flt = {"moisture": moisture}
-        lut_start_flt = {"land_use_type": module_start.land_use_type_start}
-        lut_w_flt = {"land_use_type": module_w.land_use_type_w}
-        lut_wo_flt = {"land_use_type": module_wo.land_use_type_wo}
+        lut_start_flt = {"land_use_type": self.module_start.land_use_type_start}
+        lut_w_flt = {"land_use_type": self.module_w.land_use_type_w}
+        lut_wo_flt = {"land_use_type": self.module_wo.land_use_type_wo}
 
         agricultural_residues_flt = {"category__name": "Agricultural residues"}
         long_term_cultivated_flt = {"land_use_type__name__icontains": "Long-Term Cultivated"}
 
-        self.fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-        self.fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-        self.flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-        self.fi_w = get_fi_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
-        self.fmg_w = get_fmg_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
-        self.flu_w = get_flu_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
-        self.fi_wo = get_fi_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
-        self.fmg_wo = get_fmg_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
-        self.flu_wo = get_flu_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
-
-        self.soc = utils.get_or_raise(ipcc.SoilOrganicCarbon, cm | soil_flt, f"SoilOrganicCarbon for {soil_type.name} soil type in {climate.name} climate and {moisture.name} moisture does not exist")
         self.burning_emission_factor = utils.get_or_raise(ipcc.BurningEmissionFactor, agricultural_residues_flt, "BurningEmissionFactor for Agricultural residues does not exist")
 
         if module.minor_land_use_type_start or module.minor_land_use_type_w or module.minor_land_use_type_wo:
@@ -1315,11 +1300,7 @@ class AnnualCropCalculator(BaseCalculator):
 
         input: AnnualCropping = self.data
         project: Project = input.activity.project
-        module_start = module_w = module_wo = input
         luc: LandUseChange = input.land_use_change
-
-        if luc:
-            module_start, module_w, module_wo = luc.get_modules()
 
         area = luc.area if luc else input.area
         change_rate = input.activity.change_rate
@@ -1337,27 +1318,27 @@ class AnnualCropCalculator(BaseCalculator):
                 change_rate.value,
                 self.soc.value,
                 self.soc.value,
-                input.soc_t2_start,
-                input.soc_t2_w,
+                self.module_start.soc_t2_start,
+                self.module_w.soc_t2_w,
                 self.fmg_start.value,
                 self.fmg_w.value,
-                module_start.fmg_t2_start,
-                input.fmg_t2_w,
+                self.module_start.fmg_t2_start,
+                self.module_w.fmg_t2_w,
                 self.flu_start.value,
                 self.flu_w.value,
-                module_start.flu_t2_start,
-                input.flu_t2_w,
+                self.module_start.flu_t2_start,
+                self.module_w.flu_t2_w,
                 self.fi_start.value,
                 self.fi_w.value,
-                module_start.fi_t2_start,
-                input.fi_t2_w,
+                self.module_start.fi_t2_start,
+                self.module_w.fi_t2_w,
                 CALCULATE_SOC_SOM_START_W,
                 self.som.value,
                 project.gw_potential.n2o,
                 project.gw_potential.ch4,
                 self.burning_emission_factor.ch4 if input.residue_management_type_start.name == "Burned" else None,
                 self.fires_start.value,
-                input.biomass_t2_start,
+                self.module_w.biomass_t2_start,
                 self.n_estimation_factor_start.slope,
                 self.n_estimation_factor_start.intercept,
                 self.crop_yield_start,
@@ -1380,8 +1361,8 @@ class AnnualCropCalculator(BaseCalculator):
                 DELAY_START_W,
                 self.biomass_ef_start.value,
                 self.biomass_ef_w.value,
-                input.biomass_t2_start,
-                input.biomass_t2_w,
+                self.module_w.biomass_t2_start,
+                self.module_w.biomass_t2_w,
             ]
             log.debug("Inputs start w: %s", self.inputs_start_w)
 
@@ -1399,20 +1380,20 @@ class AnnualCropCalculator(BaseCalculator):
                 change_rate.value,
                 self.soc.value,
                 self.soc.value,
-                input.soc_t2_start,
-                input.soc_t2_w,
+                self.module_start.soc_t2_start,
+                self.module_w.soc_t2_w,
                 self.fmg_start.value,
                 self.fmg_w.value,
-                module_w.fmg_t2_start,
-                input.fmg_t2_w,
+                self.module_start.fmg_t2_start,
+                self.module_w.fmg_t2_w,
                 self.flu_start.value,
                 self.flu_w.value,
-                module_w.flu_t2_start,
-                input.flu_t2_w,
+                self.module_start.flu_t2_start,
+                self.module_w.flu_t2_w,
                 self.fi_start.value,
                 self.fi_w.value,
-                module_w.fi_t2_start,
-                input.fi_t2_w,
+                self.module_start.fi_t2_start,
+                self.module_w.fi_t2_w,
                 CALCULATE_SOC_SOM_W,
                 self.som.value,
                 project.gw_potential.n2o,
@@ -1442,8 +1423,8 @@ class AnnualCropCalculator(BaseCalculator):
                 DELAY_W,
                 self.biomass_ef_start.value,
                 self.biomass_ef_w.value,
-                input.biomass_t2_start,
-                input.biomass_t2_w,
+                self.module_w.biomass_t2_start,
+                self.module_w.biomass_t2_w,
             ]
             log.debug("Inputs w: %s", self.inputs_w)
 
@@ -1461,27 +1442,27 @@ class AnnualCropCalculator(BaseCalculator):
                 change_rate.value,
                 self.soc.value,
                 self.soc.value,
-                input.soc_t2_start,
-                input.soc_t2_wo,
+                self.module_start.soc_t2_start,
+                self.module_wo.soc_t2_wo,
                 self.fmg_start.value,
                 self.fmg_wo.value,
-                input.fmg_t2_start,
-                input.fmg_t2_wo,
+                self.module_start.fmg_t2_start,
+                self.module_wo.fmg_t2_wo,
                 self.flu_start.value,
                 self.flu_wo.value,
-                input.flu_t2_start,
-                input.flu_t2_wo,
+                self.module_start.flu_t2_start,
+                self.module_wo.flu_t2_wo,
                 self.fi_start.value,
                 self.fi_wo.value,
-                input.fi_t2_start,
-                input.fi_t2_wo,
+                self.module_start.fi_t2_start,
+                self.module_wo.fi_t2_wo,
                 CALCULATE_SOC_SOM_START_WO,
                 self.som.value,
                 project.gw_potential.n2o,
                 project.gw_potential.ch4,
                 self.burning_emission_factor.ch4 if input.residue_management_type_start.name == "Burned" else None,
                 self.fires_start.value,
-                input.biomass_t2_start,
+                self.module_start.biomass_t2_start,
                 self.n_estimation_factor_start.slope,
                 self.n_estimation_factor_start.intercept,
                 self.crop_yield_start,
@@ -1504,8 +1485,8 @@ class AnnualCropCalculator(BaseCalculator):
                 DELAY_START_WO,
                 self.biomass_ef_start.value,
                 self.biomass_ef_wo.value,
-                input.biomass_t2_start,
-                input.biomass_t2_wo,
+                self.module_start.biomass_t2_start,
+                self.module_wo.biomass_t2_wo,
             ]
             log.debug("Inputs start wo: %s", self.inputs_start_wo)
 
@@ -1523,27 +1504,27 @@ class AnnualCropCalculator(BaseCalculator):
                 change_rate.value,
                 self.soc.value,
                 self.soc.value,
-                input.soc_t2_start,
-                input.soc_t2_wo,
+                self.module_start.soc_t2_start,
+                self.module_wo.soc_t2_wo,
                 self.fmg_start.value,
                 self.fmg_wo.value,
-                module_wo.fmg_t2_start,
-                input.fmg_t2_wo,
+                self.module_start.fmg_t2_start,
+                self.module_wo.fmg_t2_wo,
                 self.flu.value,
                 self.flu.value,
-                module_wo.flu_t2_start,
-                input.flu_t2_wo,
+                self.module_start.flu_t2_start,
+                self.module_wo.flu_t2_wo,
                 self.fi_start.value,
                 self.fi_wo.value,
-                module_wo.fi_t2_start,
-                input.fi_t2_wo,
+                self.module_start.fi_t2_start,
+                self.module_wo.fi_t2_wo,
                 CALCULATE_SOC_SOM_WO,
                 self.som.value,
                 project.gw_potential.n2o,
                 project.gw_potential.ch4,
                 self.burning_emission_factor.ch4 if input.residue_management_type_wo.name == "Burned" else None,
                 self.fires_wo.value,
-                input.biomass_t2_wo,
+                self.module_wo.biomass_t2_wo,
                 self.n_estimation_factor_wo.slope,
                 self.n_estimation_factor_wo.intercept,
                 self.crop_yield_wo,
@@ -1566,8 +1547,8 @@ class AnnualCropCalculator(BaseCalculator):
                 DELAY_WO,
                 self.biomass_ef_start.value,
                 self.biomass_ef_wo.value,
-                input.biomass_t2_start,
-                input.biomass_t2_wo,
+                self.module_start.biomass_t2_start,
+                self.module_wo.biomass_t2_wo,
             ]
             log.debug("Inputs wo: %s", self.inputs_wo)
 
