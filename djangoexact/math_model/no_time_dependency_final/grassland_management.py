@@ -63,6 +63,7 @@ class GrasslandManagement(BaseModule):
         biomass_end_default,
         biomass_start_tier_2,
         biomass_end_tier_2,
+        fire_impact,
     ):
         self.area_start = area_start
         self.area_end = area_end
@@ -83,6 +84,8 @@ class GrasslandManagement(BaseModule):
         self.soc_end_default = soc_end_default
         self.soc_start_tier_2 = soc_start_tier_2  # tier 2 value, expects float or None
         self.soc_end_tier_2 = soc_end_tier_2  # tier 2 value, expects float or None
+
+        self.fire_impact = fire_impact
 
         self.fmg_start_default = fmg_start_default  # defaulted to 1 in case there are None, if not float value
         self.fmg_end_default = fmg_end_default  # defaulted to 1 in case there are None, if not float value
@@ -171,14 +174,13 @@ class GrasslandManagement(BaseModule):
                     self.emissions_residue_burning_yearly = breakdown_according_to_values(total, self.total_hectars)
                     self.emissions_residue_burning_total = total
 
-                    annual_nitrous = (agb * cf * self.nitrous_ef * self.nitrous_constant / 1000) / self.fire_interval
-                    annual_methane = (agb * cf * self.methane_ef * self.methane_constant / 1000) / self.fire_interval
+                    annual_nitrous = ((agb * cf * self.nitrous_ef * self.nitrous_constant / 1000) / self.fire_interval) * self.fire_impact
+                    annual_methane = ((agb * cf * self.methane_ef * self.methane_constant / 1000) / self.fire_interval) * self.fire_impact
 
                     total_nitrous = annual_nitrous * sum(self.total_hectars)
                     total_methane = annual_methane * sum(self.total_hectars)
 
                     self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in breakdown_according_to_values(total_nitrous, self.total_hectars)], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
-
                     self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in breakdown_according_to_values(total_methane, self.total_hectars)], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
                 return
             except:
