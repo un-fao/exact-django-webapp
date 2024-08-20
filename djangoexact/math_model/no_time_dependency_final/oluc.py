@@ -2,7 +2,6 @@ import re
 import traceback
 
 from .general_functions import (
-    BaseModule,
     ch4_head_calculation_general,
     soil_emissions_2,
     yearly_constant_emissions_breakdown,
@@ -18,102 +17,61 @@ from .ghg_emissions_classes import (
     YearlyGasActivityEmissionSet,
 )
 
+from generalized_modules import BaseModule
 
+from dataclasses import dataclass
+from typing import Optional
+
+@dataclass
 class OtherLandUseChanges(BaseModule):
-    def __init__(
-        self,
-        initial_lu_biomass,
-        initial_lu_biomass_tier_2,
-        final_lu_biomass,
-        final_lu_biomass_tier_2,
-        c_n_ratio,
-        moisture_emission_factor,
-        combustion_factor,
-        emission_factor_nitrous,
-        emission_factor_methane,
-        nitrous_constant,
-        methane_constant,
-        fire_bool,
-        soc_start_default,
-        soc_end_default,
-        soc_start_tier_2,
-        soc_end_tier_2,
-        fmg_start_default,
-        fmg_end_default,
-        fmg_start_tier_2,
-        fmg_end_tier_2,
-        flu_start_default,
-        flu_end_default,
-        flu_start_tier_2,
-        flu_end_tier_2,
-        fi_start_default,
-        fi_end_default,
-        fi_start_tier_2,
-        fi_end_tier_2,
-        calculate_soc_som,
-        area,
-        time_impl,
-        time_cap,
-        rate,
-        dry_matter_end,
-        delay=0,
-    ):
-        self.initial_lu_biomass = initial_lu_biomass
-        self.initial_lu_biomass_tier_2 = initial_lu_biomass_tier_2
-        self.final_lu_biomass = final_lu_biomass
-        self.final_lu_biomass_tier_2 = final_lu_biomass_tier_2
-        self.c_n_ratio = c_n_ratio
-        self.moisture_emission_factor = moisture_emission_factor
-        self.combustion_factor = combustion_factor
-        self.emission_factor_nitrous = emission_factor_nitrous
-        self.emission_factor_methane = emission_factor_methane
-        self.nitrous_constant = nitrous_constant
-        self.methane_constant = methane_constant
-        self.fire_bool = fire_bool
 
-        self.soc_start_default = soc_start_default
-        self.soc_end_default = soc_end_default
-        self.soc_start_tier_2 = soc_start_tier_2
-        self.soc_end_tier_2 = soc_end_tier_2
+    # NOTE: I can't utilize LandModule for this as it does not have area_start and area_end. Maybe we could change LandModule? Not worth it I think
+    initial_lu_biomass: float
+    initial_lu_biomass_tier_2: Optional[float]
+    final_lu_biomass: float
+    final_lu_biomass_tier_2: Optional[float]
+    c_n_ratio: float
+    moisture_emission_factor: float
+    combustion_factor: float
+    emission_factor_nitrous: float
+    emission_factor_methane: float
+    nitrous_constant: float
+    methane_constant: float
+    fire_bool: bool
+    soc_start_default: float
+    soc_end_default: float
+    soc_start_tier_2_default: Optional[float]
+    soc_end_tier_2_default: Optional[float]
+    fmg_start_default: float
+    fmg_end_default: float
+    fmg_start_tier_2_default: Optional[float]
+    fmg_end_tier_2_default: Optional[float]
+    flu_start_default: float
+    flu_end_default: float
+    flu_start_tier_2_default: Optional[float]
+    flu_end_tier_2_default: Optional[float]
+    fi_start_default: float
+    fi_end_default: float
+    fi_start_tier_2_default: Optional[float]
+    fi_end_tier_2_default: Optional[float]
+    calculate_soc_som: bool
+    area: float
+    dry_matter_end: float
+    time_impl: int
 
-        self.fmg_start_default = fmg_start_default  # defaulted to 1 in case there are None, if not float value
-        self.fmg_end_default = fmg_end_default  # defaulted to 1 in case there are None, if not float value
-        self.fmg_start_tier_2 = fmg_start_tier_2  # tier 2 value, expects float or None
-        self.fmg_end_tier_2 = fmg_end_tier_2  # tier 2 value, expects float or None
-        self.flu_start_default = flu_start_default  # defaulted to 1 in case there are None, if not float value
-        self.flu_end_default = flu_end_default  # defaulted to 1 in case there are None, if not float value
-        self.flu_start_tier_2 = flu_start_tier_2  # tier 2 value, expects float or None
-        self.flu_end_tier_2 = flu_end_tier_2  # tier 2 value, expects float or None
-        self.fi_start_default = fi_start_default  # defaulted to 1 in case there are None, if not float value
-        self.fi_end_default = fi_end_default  # defaulted to 1 in case there are None, if not float value
-        self.fi_start_tier_2 = fi_start_tier_2  # tier 2 value, expects float or None
-        self.fi_end_tier_2 = fi_end_tier_2  # tier 2 value, expects float or None
+    def __post_init__(self):
 
-        self.calculate_soc_som = calculate_soc_som
+        fmg_start = self.fmg_start_tier_2_default or self.fmg_start_default
+        fmg_end = self.fmg_end_tier_2_default or self.fmg_end_default
+        flu_start = self.flu_start_tier_2_default or self.flu_start_default
+        flu_end = self.flu_end_tier_2_default or self.flu_end_default
+        fi_start = self.fi_start_tier_2_default or self.fi_start_default
+        fi_end = self.fi_end_tier_2_default or self.fi_end_default
+        soc_ref_start = self.soc_start_tier_2_default or self.soc_start_default
+        soc_ref_end = self.soc_end_tier_2_default or self.soc_end_default
 
-        self.area = area
-        self.time_impl = time_impl - delay
-        self.time_cap = time_cap
-        self.rate = rate
-        self.delay = delay
-
-        self.dry_matter_end = dry_matter_end
-
-        self.fmg_start = self.fmg_start_tier_2 if self.fmg_start_tier_2 else self.fmg_start_default
-        self.fmg_end = self.fmg_end_tier_2 if self.fmg_end_tier_2 else self.fmg_end_default
-        self.flu_start = self.flu_start_tier_2 if self.flu_start_tier_2 else self.flu_start_default
-        self.flu_end = self.flu_end_tier_2 if self.flu_end_tier_2 else self.flu_end_default
-        self.fi_start = self.fi_start_tier_2 if self.fi_start_tier_2 else self.fi_start_default
-        self.fi_end = self.fi_end_tier_2 if self.fi_end_tier_2 else self.fi_end_default
-
-        # AUXILIARY VARIABLES FOR SOIL CALCULATION
-        self.hectars_before_20, self.hectars_after_20 = yearly_time_dependent_20_year_breakdown(0, self.area, self.time_impl, self.time_cap, self.rate)
-        self.total_hectars = yearly_time_dependent_parameter_breakdown(0, self.area, self.time_impl, self.time_cap, self.rate, interim_values=True)
-
-        self.soc_start = self.soc_start_default * self.fmg_start * self.flu_start * self.fi_start if not self.soc_start_tier_2 else self.soc_start_tier_2
-        self.soc_end = self.soc_end_default * self.fmg_end * self.flu_end * self.fi_end if not self.soc_end_tier_2 else self.soc_end_tier_2
-
-        self.result = Result(self.time_impl, self.time_cap)
+        self.soc_start = soc_ref_start * fmg_start * fi_start * flu_start
+        self.soc_end = soc_ref_end * fmg_end * fi_end * flu_end
 
     def calculate_emissions(self):
        
@@ -137,7 +95,7 @@ class OtherLandUseChanges(BaseModule):
 
                 total_biomass_emissions = total
                 # TODO: change so only in implementation years but proportionate to the hectars addressed in that year
-                yearly_biomass_emissions = yearly_constant_emissions_breakdown(total, self.time_impl, self.time_cap, self.rate)
+                yearly_biomass_emissions = yearly_constant_emissions_breakdown(total, self.time_impl, self.capitalization_time, self.implementation_time)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(
                     YearlyGasActivityEmissionSet(
@@ -168,7 +126,7 @@ class OtherLandUseChanges(BaseModule):
             total_em_per_hectar = (methane_emissions + nitrous_emissions) / 1000
 
             total_fire_emissions = total_em_per_hectar * self.area
-            yearly_fire_emissions = yearly_constant_emissions_breakdown(total_fire_emissions, self.time_impl, self.time_cap, self.rate)
+            yearly_fire_emissions = yearly_constant_emissions_breakdown(total_fire_emissions, self.time_impl, self.capitalization_time, self.implementation_time)
 
             # CALCULATE FOR INDIVIDUAL METHANE AND NITROUS EMISSIONS(the calculation on top can be removed in the future)
             methane_em_per_hectar = methane_emissions / 1000
@@ -178,8 +136,8 @@ class OtherLandUseChanges(BaseModule):
             methane_fire_emissions = methane_em_per_hectar * self.area
             nitrous_fire_emissions = nitrous_em_per_hectar * self.area
 
-            yearly_methane_fire_emissions = yearly_constant_emissions_breakdown(methane_fire_emissions, self.time_impl, self.time_cap, self.rate)
-            yearly_nitrous_fire_emissions = yearly_constant_emissions_breakdown(nitrous_fire_emissions, self.time_impl, self.time_cap, self.rate)
+            yearly_methane_fire_emissions = yearly_constant_emissions_breakdown(methane_fire_emissions, self.time_impl, self.capitalization_time, self.rate_type)
+            yearly_nitrous_fire_emissions = yearly_constant_emissions_breakdown(nitrous_fire_emissions, self.time_impl, self.capitalization_time, self.rate_type)
 
             self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in yearly_methane_fire_emissions], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
             self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in yearly_nitrous_fire_emissions], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))

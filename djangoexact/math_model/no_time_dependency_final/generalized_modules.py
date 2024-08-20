@@ -93,7 +93,6 @@ class LandModule(BaseModule):
         self.biomass_start = self.biomass_start_tier_2_default or self.biomass_start_default
         self.biomass_end = self.biomass_end_tier_2_default or self.biomass_end_default
 
-        
         self.hectares_before_20, self.hectares_after_20 = yearly_time_dependent_20_year_breakdown(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
         self.hectares_total = yearly_time_dependent_parameter_breakdown(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
