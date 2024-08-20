@@ -2100,9 +2100,9 @@ class LandUseChange(Module):
     is_fire_used_wo = models.BooleanField(default=False)
     is_fire_used_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="land_use_change_is_fire_used_thread")
 
-    dry_matter_start = models.FloatField(null=True, blank=True)
-    dry_matter_w = models.FloatField(null=True, blank=True)
-    dry_matter_wo = models.FloatField(null=True, blank=True)
+    dry_matter_start = models.FloatField(null=True, blank=True, default=0)
+    dry_matter_w = models.FloatField(null=True, blank=True, default=0)
+    dry_matter_wo = models.FloatField(null=True, blank=True, default=0)
     dry_matter_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="land_use_change_dry_matter_thread")
 
     organic_soil = models.OneToOneField(OrganicSoil, on_delete=models.CASCADE, null=True, blank=True, related_name="land_use_change_organic_soil")
