@@ -1,37 +1,109 @@
-climate;moisture;tillage_management_type;value
-Boreal;Moist;Full tillage;1
-Boreal;Dry;Full tillage;1
-Cool Temperate;Moist;Full tillage;1
-Cool Temperate;Dry;Full tillage;1
-Warm Temperate;Moist;Full tillage;1
-Warm Temperate;Dry;Full tillage;1
-Tropical;Moist;Full tillage;1
-Tropical;Dry;Full tillage;1
-Tropical;Wet;Full tillage;1
-Tropical Montane;Moist;Full tillage;1
-Tropical Montane;Dry;Full tillage;1
-Tropical Montane;Wet;Full tillage;1
-Boreal;Moist;Reduced tillage;1,04
-Boreal;Dry;Reduced tillage;0,98
-Cool Temperate;Moist;Reduced tillage;1,04
-Cool Temperate;Dry;Reduced tillage;0,98
-Warm Temperate;Moist;Reduced tillage;1,05
-Warm Temperate;Dry;Reduced tillage;0,99
-Tropical;Moist;Reduced tillage;1,04
-Tropical;Dry;Reduced tillage;0,99
-Tropical;Wet;Reduced tillage;1,04
-Tropical Montane;Moist;Reduced tillage;1,09
-Tropical Montane;Dry;Reduced tillage;1,09
-Tropical Montane;Wet;Reduced tillage;1,09
-Boreal;Moist;No tillage;1,09
-Boreal;Dry;No tillage;1,03
-Cool Temperate;Moist;No tillage;1,09
-Cool Temperate;Dry;No tillage;1,03
-Warm Temperate;Moist;No tillage;1,1
-Warm Temperate;Dry;No tillage;1,04
-Tropical;Moist;No tillage;1,1
-Tropical;Dry;No tillage;1,04
-Tropical;Wet;No tillage;1,1
-Tropical Montane;Moist;No tillage;1,16
-Tropical Montane;Dry;No tillage;1,16
-Tropical Montane;Wet;No tillage;1,16
+climate;moisture;tillage_management_type;grassland_management_type;value
+Boreal;Moist;Full tillage;;1
+Boreal;Dry;Full tillage;;1
+Cool Temperate;Moist;Full tillage;;1
+Cool Temperate;Dry;Full tillage;;1
+Warm Temperate;Moist;Full tillage;;1
+Warm Temperate;Dry;Full tillage;;1
+Tropical;Moist;Full tillage;;1
+Tropical;Dry;Full tillage;;1
+Tropical;Wet;Full tillage;;1
+Tropical Montane;Moist;Full tillage;;1
+Tropical Montane;Dry;Full tillage;;1
+Tropical Montane;Wet;Full tillage;;1
+Boreal;Moist;Reduced tillage;;1,04
+Boreal;Dry;Reduced tillage;;0,98
+Cool Temperate;Moist;Reduced tillage;;1,04
+Cool Temperate;Dry;Reduced tillage;;0,98
+Warm Temperate;Moist;Reduced tillage;;1,05
+Warm Temperate;Dry;Reduced tillage;;0,99
+Tropical;Moist;Reduced tillage;;1,04
+Tropical;Dry;Reduced tillage;;0,99
+Tropical;Wet;Reduced tillage;;1,04
+Tropical Montane;Moist;Reduced tillage;;1,09
+Tropical Montane;Dry;Reduced tillage;;1,09
+Tropical Montane;Wet;Reduced tillage;;1,09
+Boreal;Moist;No tillage;;1,09
+Boreal;Dry;No tillage;;1,03
+Cool Temperate;Moist;No tillage;;1,09
+Cool Temperate;Dry;No tillage;;1,03
+Warm Temperate;Moist;No tillage;;1,1
+Warm Temperate;Dry;No tillage;;1,04
+Tropical;Moist;No tillage;;1,1
+Tropical;Dry;No tillage;;1,04
+Tropical;Wet;No tillage;;1,1
+Tropical Montane;Moist;No tillage;;1,16
+Tropical Montane;Dry;No tillage;;1,16
+Tropical Montane;Wet;No tillage;;1,16
+Boreal;Moist;;Improved with high inputs;1,14
+Boreal;Dry;;Improved with high inputs;1,14
+Cool Temperate;Moist;;Improved with high inputs;1,14
+Cool Temperate;Dry;;Improved with high inputs;1,14
+Warm Temperate;Moist;;Improved with high inputs;1,14
+Warm Temperate;Dry;;Improved with high inputs;1,14
+Tropical;Moist;;Improved with high inputs;1,17
+Tropical;Dry;;Improved with high inputs;1,17
+Tropical;Wet;;Improved with high inputs;1,17
+Tropical Montane;Moist;;Improved with high inputs;1,16
+Tropical Montane;Dry;;Improved with high inputs;1,16
+Tropical Montane;Wet;;Improved with high inputs;1,16
+Boreal;Moist;;Non-Degraded;1
+Boreal;Dry;;Non-Degraded;1
+Cool Temperate;Moist;;Non-Degraded;1
+Cool Temperate;Dry;;Non-Degraded;1
+Warm Temperate;Moist;;Non-Degraded;1
+Warm Temperate;Dry;;Non-Degraded;1
+Tropical;Moist;;Non-Degraded;1
+Tropical;Dry;;Non-Degraded;1
+Tropical;Wet;;Non-Degraded;1
+Tropical Montane;Moist;;Non-Degraded;1
+Tropical Montane;Dry;;Non-Degraded;1
+Tropical Montane;Wet;;Non-Degraded;1
+Boreal;Moist;;High Intensity Grazing;0,9
+Boreal;Dry;;High Intensity Grazing;0,9
+Cool Temperate;Moist;;High Intensity Grazing;0,9
+Cool Temperate;Dry;;High Intensity Grazing;0,9
+Warm Temperate;Moist;;High Intensity Grazing;0,9
+Warm Temperate;Dry;;High Intensity Grazing;0,9
+Tropical;Moist;;High Intensity Grazing;0,9
+Tropical;Dry;;High Intensity Grazing;0,9
+Tropical;Wet;;High Intensity Grazing;0,9
+Tropical Montane;Moist;;High Intensity Grazing;0,9
+Tropical Montane;Dry;;High Intensity Grazing;0,9
+Tropical Montane;Wet;;High Intensity Grazing;0,9
+Boreal;Moist;;Severely Degraded;0,7
+Boreal;Dry;;Severely Degraded;0,7
+Cool Temperate;Moist;;Severely Degraded;0,7
+Cool Temperate;Dry;;Severely Degraded;0,7
+Warm Temperate;Moist;;Severely Degraded;0,7
+Warm Temperate;Dry;;Severely Degraded;0,7
+Tropical;Moist;;Severely Degraded;0,7
+Tropical;Dry;;Severely Degraded;0,7
+Tropical;Wet;;Severely Degraded;0,7
+Tropical Montane;Moist;;Severely Degraded;0,7
+Tropical Montane;Dry;;Severely Degraded;0,7
+Tropical Montane;Wet;;Severely Degraded;0,7
+Boreal;Moist;;Improved With Medium Inputs;1,14
+Boreal;Dry;;Improved With Medium Inputs;1,14
+Cool Temperate;Moist;;Improved With Medium Inputs;1,14
+Cool Temperate;Dry;;Improved With Medium Inputs;1,14
+Warm Temperate;Moist;;Improved With Medium Inputs;1,14
+Warm Temperate;Dry;;Improved With Medium Inputs;1,14
+Tropical;Moist;;Improved With Medium Inputs;1,17
+Tropical;Dry;;Improved With Medium Inputs;1,17
+Tropical;Wet;;Improved With Medium Inputs;1,17
+Tropical Montane;Moist;;Improved With Medium Inputs;1,16
+Tropical Montane;Dry;;Improved With Medium Inputs;1,16
+Tropical Montane;Wet;;Improved With Medium Inputs;1,16
+Boreal;Moist;;Improved Grassland;1,14
+Boreal;Dry;;Improved Grassland;1,14
+Cool Temperate;Moist;;Improved Grassland;1,14
+Cool Temperate;Dry;;Improved Grassland;1,14
+Warm Temperate;Moist;;Improved Grassland;1,14
+Warm Temperate;Dry;;Improved Grassland;1,14
+Tropical;Moist;;Improved Grassland;1,17
+Tropical;Dry;;Improved Grassland;1,17
+Tropical;Wet;;Improved Grassland;1,17
+Tropical Montane;Moist;;Improved Grassland;1,16
+Tropical Montane;Dry;;Improved Grassland;1,16
+Tropical Montane;Wet;;Improved Grassland;1,16
