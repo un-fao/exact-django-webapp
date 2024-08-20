@@ -1238,6 +1238,9 @@ class Rice(ResidueAvailability):
 
         super().save(*args, **kwargs)
 
+    def is_minor_season(self) -> bool:
+        return hasattr(self, "parent")
+
 
 class FloodedRice(Rice, LandModuleFixed, SingleBiomassModule):
     pass
