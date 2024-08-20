@@ -258,6 +258,9 @@ class ForestTotalBiomass(Model):
     def __str__(self):
         return f"{self.climate} {self.moisture} for {self.continent} {self.land_use_type}, value {self.value}"
 
+    class Meta:
+        unique_together = ("climate", "moisture", "continent", "land_use_type")
+
 
 class AfforestationLandUseStockExchangeFactorManager(Manager):
     def get_or_default(self, climate, moisture, land_use_type):
@@ -1304,34 +1307,40 @@ class ForestManagementAGB(Model):
 class FMGData(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
-    tillage_management_type = ForeignKey("api.TillageManagementType", on_delete=CASCADE)
+    tillage_management_type = ForeignKey("api.TillageManagementType", on_delete=CASCADE, null=True)
+    grassland_management_type = ForeignKey("api.GrasslandManagementType", on_delete=CASCADE, null=True)
     value = FloatField(default=0)
 
     def __str__(self):
-        return f"({self.pk}) {self.climate.name} {self.moisture.name} {self.tillage_management_type.name} {self.value}"
+        return f"({self.pk}) {self.climate.name} {self.moisture.name} {self.tillage_management_type} {self.grassland_management_type} {self.value}"
 
 
 class FIData(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
-    organic_input_type = ForeignKey("api.OrganicInputType", on_delete=CASCADE)
+    organic_input_type = ForeignKey("api.OrganicInputType", on_delete=CASCADE, null=True)
+    grassland_management_type = ForeignKey("api.GrasslandManagementType", on_delete=CASCADE, null=True)
     value = FloatField(default=0)
 
     def __str__(self):
-        return f"({self.pk}) {self.climate.name} {self.moisture.name} {self.organic_input_type.name} {self.value}"
+        return f"({self.pk}) {self.climate.name} {self.moisture.name} {self.organic_input_type} {self.grassland_management_type} {self.value}"
+
+    class Meta:
+        unique_together = ("climate", "moisture", "organic_input_type", "grassland_management_type")
 
 
 class FLUData(Model):
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
-    land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
+    land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE, null=True)
+    grassland_management_type = ForeignKey("api.GrasslandManagementType", on_delete=CASCADE, null=True)
     value = FloatField(default=0)
 
     def __str__(self):
-        return f"({self.pk}) {self.climate.name} {self.moisture.name} {self.land_use_type.name} {self.value}"
+        return f"({self.pk}) {self.climate.name} {self.moisture.name} {self.land_use_type} {self.grassland_management_type} {self.value}"
 
     class Meta:
-        unique_together = ("climate", "moisture", "land_use_type")
+        unique_together = ("climate", "moisture", "land_use_type", "grassland_management_type")
 
 
 class SettlementEF(Model):
