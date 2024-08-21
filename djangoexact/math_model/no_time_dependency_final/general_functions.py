@@ -26,7 +26,7 @@ def yearly_time_dependent_parameter_breakdown(start_value, end_value, years_impl
         # NOTE: the function is y = b + a * e^(kx) where k = -0.519349 this was calculated as the integral between 0 and 1 of a*e^(bx) = 0.78
         # where 0.78 was selected from the exact team, as it shows natural decay
         k = -0.519349
-        a = end_value/(math.exp(k * years_implementation) - 1)
+        a = end_value / (math.exp(k * years_implementation) - 1)
         b = start_value - a
 
         if start_value < end_value:
@@ -73,6 +73,7 @@ def yearly_time_dependent_parameter_breakdown(start_value, end_value, years_impl
 
     else:
         raise Exception(f'Function "{function}" not recognized')
+
 
 def yearly_time_dependent_parameter_breakdown_new_test(start_value, end_value, years_implementation, years_capitalization, function, interim_values=True):
     # UTILIZING THIS FUNCTION WE ARE RETURNING THE MIDDLE VALUE BETWEEN THE CALCULATED VALUES AT THE BEGINNING OF EACH YEAR.
@@ -128,20 +129,20 @@ def yearly_time_dependent_parameter_breakdown_new_test(start_value, end_value, y
 
     else:
         raise Exception(f'Function "{function}" not recognized')
-    
+
 
 def yearly_constant_emissions_breakdown(total_emissions, years_implementation, years_capitalization, rate_type):
-    
+
     if rate_type == "linear":
         yearly_breakdown = [total_emissions / years_implementation for _ in range(years_implementation)]
         yearly_breakdown.extend([0 for _ in range(years_capitalization)])
-    
+
     elif rate_type == "exponential":
         # NOTE: this is changed to -k (as k=-0.519349) as I believe we should have a larger part towards to end than the beginning
         k = -0.519349  # growth rate determined from the previous calculation
         # Calculate the total area under the exponential curve from 0 to years_implementation
         total_area = (math.exp(k * years_implementation) - 1) / k
-        
+
         yearly_breakdown = []
         for year in range(1, years_implementation + 1):
             # Calculate the area for each year interval
@@ -149,7 +150,7 @@ def yearly_constant_emissions_breakdown(total_emissions, years_implementation, y
             area_end = (math.exp(k * year) - 1) / k
             yearly_emissions = total_emissions * (area_end - area_start) / total_area
             yearly_breakdown.append(yearly_emissions)
-        
+
         yearly_breakdown.extend([0 for _ in range(years_capitalization)])
 
     elif rate_type == "immediate":
@@ -175,6 +176,7 @@ def yearly_time_dependent_20_year_breakdown(start_value, end_value, years_implem
 
     return average_before_20, average_after_20
 
+
 def yearly_time_dependent_20_year_breakdown_new_test(start_value, end_value, years_implementation, years_capitalization, function):
 
     breakdown = yearly_time_dependent_parameter_breakdown_new_test(start_value, end_value, years_implementation, years_capitalization, function, interim_values=False)
@@ -199,14 +201,15 @@ def breakdown_according_to_values(maximum, list_of_proportions):
     else:
         result = [maximum * i / sum(list_of_proportions) for i in list_of_proportions]
         return result
-    
+
+
 def breakdown_according_to_values_for_x_years(maximum, list_of_proportions, years):
     # The breakdown has to be done for x years of the project, after which it is 0
     # set list of proportions to 0 after x years
     list_of_proportions_new = [0 for i in range(len(list_of_proportions))]
     for i in range(years):
         list_of_proportions_new[i] = list_of_proportions[i]
-    
+
     if sum(list_of_proportions_new) == 0:
         return [0 for i in list_of_proportions_new]
     else:
@@ -233,6 +236,7 @@ def yearly_time_dependent_increase_full_year(start_value, end_value, years_imple
 
 import matplotlib.pyplot as plt
 
+
 # TODO: these functions basically only work with 'D' as a rate. has to be generalized
 def yearly_time_dependent_matrix(start_value, end_value, years_implementation, years_capitalization, function, interim_values=True):
 
@@ -253,14 +257,14 @@ def yearly_time_dependent_matrix(start_value, end_value, years_implementation, y
         # NOTE: now it does what is needed, but it is not very readable. Has to be fixed further on
 
         return matrix
-    
+
     elif function == "immediate":
         years_total = years_implementation + years_capitalization
 
         matrix = np.full((years_implementation, years_total), end_value)
 
         return matrix
-    
+
     elif function == "exponential":
         # NOTE: same as Linear, but kept on a different function for readability
         years_total = years_implementation + years_capitalization
@@ -279,7 +283,7 @@ def yearly_time_dependent_matrix(start_value, end_value, years_implementation, y
         # NOTE: now it does what is needed, but it is not very readable. Has to be fixed further on
 
         return matrix
-    
+
     else:
         raise Exception(f'Function "{function}" not recognized')
 
@@ -301,19 +305,19 @@ def yearly_time_dependent_matrix_log_rec_dis(start_value, end_value, years_imple
                 matrix[i][j] = full_year[1]
 
         return matrix
-    
+
     elif function == "immediate":
         years_total = years_implementation + years_capitalization
 
         matrix = np.full((years_implementation, years_total), end_value)
 
         return matrix
-    
+
     elif function == "exponential":
 
         # NOTE: Basically the same as above, however rather than having the values of half a year of hectares across the diagonal (i.e. we intervene at half of the year),
         # we have the value of a full year at each cell. This is due to the fact that we are cutting all the hectares at the beginning of the year.
-        # Again, same as above for linear just kept separate for readability
+        # Again, same as above for linear just kept separate for readability
         years_total = years_implementation + years_capitalization
 
         full_year = yearly_time_dependent_increase_full_year(start_value, end_value, years_implementation, years_capitalization, function)
@@ -326,19 +330,20 @@ def yearly_time_dependent_matrix_log_rec_dis(start_value, end_value, years_imple
                 matrix[i][j] = full_year[1]
 
         return matrix
-    
+
     else:
         raise Exception(f'Function "{function}" not recognized')
 
+
 # LIVESTOCK CH4 HEAD GENERAL FUNCTION
-def ch4_head_calculation_general(tam: float, vser: float, ef_prp: float, percentage_prp_default: float, percentage_prp_tier_2: float, ef_system_default: list, ch4_prp_tier_2: float, percentage_system_default: list, ef_single_system, ch4_system_tier_2, ch4_dividing_parameter=1):
+def ch4_head_calculation_general(tam: float, vser: float, ef_prp: float, percentage_prp_default: float, percentage_prp_tier_2: float | None, ef_system_default: list, ch4_prp_tier_2: float, percentage_system_default: list, ef_single_system, ch4_system_tier_2, ch4_dividing_parameter=1):
 
     try:
         # TODO: check how various tier 2 inputs of ef_system have to be handled
-        if not ch4_system_tier_2:
-            ef_system = ef_system_default if not ef_single_system else [ef_single_system]
+        if ch4_system_tier_2 is None:
+            ef_system = ef_system_default if ef_single_system is None else [ef_single_system]
 
-            if not percentage_prp_tier_2:
+            if percentage_prp_tier_2 is None:
                 ch4_system = [i * (tam / 1000) * (vser) / ch4_dividing_parameter * 365 * j / 100 for (i, j) in zip(ef_system, percentage_system_default)]
             else:
                 # this recalculates percentages in the system as a function of percentage prp tier 2
@@ -348,7 +353,7 @@ def ch4_head_calculation_general(tam: float, vser: float, ef_prp: float, percent
             # TODO: check if this has to be recalculated as a function of percentage prp tier 2
             ch4_system = [ch4_system_tier_2]
 
-        percentage_prp = percentage_prp_default if not percentage_prp_tier_2 else percentage_prp_tier_2
+        percentage_prp = percentage_prp_default if percentage_prp_tier_2 is None else percentage_prp_tier_2
 
         # TODO: add tier 2 value for ef_prp
 
@@ -418,16 +423,26 @@ def som_emissions(soc_final, soc_initial, emission_factor_nitrous, nitrous_const
 
     return emissions_som_yearly, emissions_som_total
 
-def biomass_emissions(biomass_final, biomass_initial, hectares_start, hectares_end, rate_type, time_implementation, time_capitalization,):
+
+def biomass_emissions(
+    biomass_final,
+    biomass_initial,
+    hectares_start,
+    hectares_end,
+    rate_type,
+    time_implementation,
+    time_capitalization,
+):
 
     yearly_variation_hectares = yearly_time_dependent_increase_full_year(hectares_start, hectares_end, time_implementation, time_capitalization, rate_type)
 
     biomass_variation = biomass_final - biomass_initial
 
-    biomass_emissions_total = biomass_variation * -(44/12) * sum(yearly_variation_hectares)
+    biomass_emissions_total = biomass_variation * -(44 / 12) * sum(yearly_variation_hectares)
     biomass_emissions_yearly = breakdown_according_to_values(biomass_emissions_total, yearly_variation_hectares)
 
     return biomass_emissions_yearly, biomass_emissions_total
+
 
 # INPUT SINGLE MODULE CALCULATION
 def input_single_calculation(unit_start, unit_end, ipcc_factor, tier_2_factor, unit_factor, emissions_factor, time_implementation, time_capitalization, rate_type):
