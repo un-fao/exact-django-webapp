@@ -1231,28 +1231,6 @@ for i, row in enumerate(df_dict):
 
 
 df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "IrrigationSystems.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers = df.columns.values.tolist()
-df_dict = df.to_dict("records")
-
-for i, row in enumerate(df_dict):
-    irrigation_system = IrrigationSystemType.objects.get(
-        name__iexact=sanitize(row["irrigation_system_type"])
-    )
-    value = parse_csv_number(row["value"], nan_value=None)
-
-    print(irrigation_system, value)
-
-    IrrigationSystemData.objects.get(
-        irrigation_system_type=irrigation_system,
-        value=value,
-    )
-
-df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "IrrigationPhaseData.csv"),
     header=0,
     sep=";",
@@ -4459,3 +4437,27 @@ crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropp
 #             continent=continent,
 #             value=value,
 #         )
+
+# LivestockManureEF.objects.filter(value=None).all().update(value=0)
+
+IrrigationSystemData.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "IrrigationSystems.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers = df.columns.values.tolist()
+df_dict = df.to_dict("records")
+
+for i, row in enumerate(df_dict):
+    irrigation_system = IrrigationSystemType.objects.get(name__iexact=sanitize(row["irrigation_system_type"]))
+    value = parse_csv_number(row["value"], nan_value=None)
+
+    print(irrigation_system, value)
+
+    IrrigationSystemData.objects.create(
+        irrigation_system_type=irrigation_system,
+        value=value,
+    )
