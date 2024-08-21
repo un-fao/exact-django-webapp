@@ -5725,11 +5725,6 @@ class DegradedLandCalculator(LandModuleCalculator):
         self.biomass_ef_w: SimpleNamespace | ipcc.TotalBiomassAfterDefo = SimpleNamespace(value=0)
         self.biomass_ef_wo: SimpleNamespace | ipcc.TotalBiomassAfterDefo = SimpleNamespace(value=0)
 
-        self.math_start_w = None
-        self.math_start_wo = None
-        self.math_w = None
-        self.math_wo = None
-
     def calculate(self) -> Result:
         module: DegradedLand = self.data
         activity: Activity = module.activity
@@ -5933,7 +5928,7 @@ class DegradedLandCalculator(LandModuleCalculator):
             self.calculate()
 
 
-class SetAsideCalculator(BaseCalculator):
+class SetAsideCalculator(LandModuleCalculator):
     """
     Calculator for annual cropping modules.
     """
@@ -5941,91 +5936,43 @@ class SetAsideCalculator(BaseCalculator):
     def __init__(self, input) -> None:
         super().__init__(input)
 
-        self.fi_start: SimpleNamespace | ipcc.FIData = SimpleNamespace(value=1)
-        self.fmg_start: SimpleNamespace | ipcc.FMGData = SimpleNamespace(value=1)
-        self.flu_start: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=1)
-        self.fi_w: SimpleNamespace | ipcc.FIData = SimpleNamespace(value=1)
-        self.fmg_w: SimpleNamespace | ipcc.FMGData = SimpleNamespace(value=1)
-        self.flu_w: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=1)
-        self.fi_wo: SimpleNamespace | ipcc.FIData = SimpleNamespace(value=1)
-        self.fmg_wo: SimpleNamespace | ipcc.FMGData = SimpleNamespace(value=1)
-        self.flu_wo: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=1)
-        self.soc: SimpleNamespace | ipcc.SoilOrganicCarbon = SimpleNamespace(value=1)
-
         self.biomass_ef_start: SimpleNamespace | ipcc.ForestTotalBiomass = SimpleNamespace(value=0)
         self.biomass_ef_w: SimpleNamespace | ipcc.TotalBiomassAfterDefo = SimpleNamespace(value=0)
-        self.som: SimpleNamespace | ipcc.NitrousEmissionFactor = SimpleNamespace(value=0)
-
-        self.math_start_w = None
-        self.math_start_wo = None
-        self.math_w = None
-        self.math_wo = None
+        self.biomass_ef_wo: SimpleNamespace | ipcc.TotalBiomassAfterDefo = SimpleNamespace(value=0)
 
     def get_defaults(self, calculate=False) -> dict:
         module: SetAside = self.data
         activity: Activity = module.activity
         project: Project = activity.project
-        luc: LandUseChange = module.land_use_change
 
-        climate: Climate = activity.climate_t2 or project.climate
-        moisture: Moisture = activity.moisture_t2 or project.moisture
-        soil_type: SoilType = project.soil_type
-
-        moisture_flt = {"moisture": moisture}
-        soil_flt = {"soil_type": soil_type}
-        cm = {"climate": climate, "moisture": moisture}
-
-        module_start = module_w = module_wo = module
-
-        if luc:
-            module_start, module_w, module_wo = luc.get_modules()
-
-        self.som = utils.get_or_raise(ipcc.NitrousEmissionFactor, {"moisture": project.moisture}, f"Land use nitrous emission factor for {project.moisture.name} moisture does not exist")
-
-        self.flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-        self.fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-        self.fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-        self.flu_w = get_flu_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
-        self.fmg_w = get_fmg_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
-        self.fi_w = get_fi_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
-        self.flu_wo = get_flu_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
-        self.fmg_wo = get_fmg_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
-        self.fi_wo = get_fi_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
+        moisture_flt = {"moisture": self.moisture}
+        cm = {"climate": self.climate, "moisture": self.moisture}
 
         if module.is_luc_remaining_same() or module.is_business_as_usual():
-            self.emission_factors_start = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
+            self.emission_factors_start = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {self.moisture.name} moisture does not exist")
             self.biomass_ef_start = utils.get_or_raise(ipcc.ForestTotalBiomass, cm | {"continent": project.country.region, "land_use_type": module.land_use_type_start}, f"ForestTotalBiomass for {module.land_use_type_start.name} land use type in {project.climate.name} climate and {moisture.name} moisture in {project.country.region.name} region does not exist")
 
         if module.is_with():
-            self.emission_factors_w = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
+            self.emission_factors_w = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {self.moisture.name} moisture does not exist")
             self.biomass_ef_w = utils.get_or_raise(ipcc.TotalBiomassAfterDefo, cm | {"continent": project.country.region, "land_use_type": module.land_use_type_w}, f"ForestTotalBiomass for {module.land_use_type_w.name} land use type in {project.climate.name} climate and {moisture.name} moisture in {project.country.region.name} region does not exist")
 
         if module.is_without():
-            self.emission_factors_wo = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
+            self.emission_factors_wo = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {self.moisture.name} moisture does not exist")
             self.biomass_ef_wo = utils.get_or_raise(ipcc.TotalBiomassAfterDefo, cm | {"continent": project.country.region, "land_use_type": module.land_use_type_wo}, f"ForestTotalBiomass for {module.land_use_type_wo.name} land use type in {project.climate.name} climate and {moisture.name} moisture in {project.country.region.name} region does not exist")
 
-        self.soc = utils.get_or_raise(ipcc.SoilOrganicCarbon, cm | soil_flt, f"SoilOrganicCarbon for {soil_type.name} soil type in {climate.name} climate and {moisture.name} moisture does not exist")
-
-        if module.status.name == "READY" and calculate:
+        if module.is_ready() and calculate:
             self.calculate()
 
     def calculate(self) -> Result:
-        module: SetAside = self.data
+        module: SetAside = self.module
         activity: Activity = module.activity
         project: Project = activity.project
-        luc: LandUseChange = module.land_use_change
-        area = luc.area if luc else module.area
 
         self.get_defaults()
 
-        module_start = module_w = module_wo = module
-
-        if luc:
-            module_start, module_w, module_wo = luc.get_modules()
-
         if module.is_luc_remaining_same():
             self.inputs_start_w = [
-                *[area, 0],
+                *[self.area, 0],
                 project.implementation_years,
                 project.capitalization_years,
                 activity.change_rate.name,
@@ -6033,21 +5980,21 @@ class SetAsideCalculator(BaseCalculator):
                 self.som.value,
                 self.soc.value,
                 self.soc.value,
-                module_start.soc_t2_start,
-                module_w.soc_t2_w,
+                self.module_start.soc_t2_start,
+                self.module_w.soc_t2_w,
                 CALCULATE_SOC_SOM_START_W,
                 self.fmg_start.value,
                 self.fmg_w.value,
-                module_start.fmg_t2_start,
-                module_w.fmg_t2_w,
+                self.module_start.fmg_t2_start,
+                self.module_w.fmg_t2_w,
                 self.flu_start.value,
                 self.flu_w.value,
-                module_start.flu_t2_start,
-                module_w.flu_t2_w,
+                self.module_start.flu_t2_start,
+                self.module_w.flu_t2_w,
                 self.fi_start.value,
                 self.fi_w.value,
-                module_start.fi_t2_start,
-                module_w.fi_t2_w,
+                self.module_start.fi_t2_start,
+                self.module_w.fi_t2_w,
                 DELAY_START_W,
                 self.biomass_ef_start.value,
                 self.biomass_ef_w.value,
@@ -6060,7 +6007,7 @@ class SetAsideCalculator(BaseCalculator):
 
         if module.is_business_as_usual():
             self.inputs_start_wo = [
-                *[area, 0],
+                *[self.area, 0],
                 project.implementation_years,
                 project.capitalization_years,
                 activity.change_rate.name,
@@ -6068,21 +6015,21 @@ class SetAsideCalculator(BaseCalculator):
                 self.som.value,
                 self.soc.value,
                 self.soc.value,
-                module_start.soc_t2_start,
-                module_wo.soc_t2_wo,
+                self.module_start.soc_t2_start,
+                self.module_wo.soc_t2_wo,
                 CALCULATE_SOC_SOM_START_WO,
                 self.fmg_start.value,
                 self.fmg_wo.value,
-                module_start.fmg_t2_start,
-                module_wo.fmg_t2_wo,
+                self.module_start.fmg_t2_start,
+                self.module_wo.fmg_t2_wo,
                 self.flu_start.value,
                 self.flu_wo.value,
-                module_start.flu_t2_start,
-                module_wo.flu_t2_wo,
+                self.module_start.flu_t2_start,
+                self.module_wo.flu_t2_wo,
                 self.fi_start.value,
                 self.fi_wo.value,
-                module_start.fi_t2_start,
-                module_wo.fi_t2_wo,
+                self.module_start.fi_t2_start,
+                self.module_wo.fi_t2_wo,
                 DELAY_START_WO,
                 self.biomass_ef_start.value,
                 self.biomass_ef_wo.value,
@@ -6095,7 +6042,7 @@ class SetAsideCalculator(BaseCalculator):
 
         if module.is_with():
             self.inputs_w = [
-                *[0, area],
+                *[0, self.area],
                 project.implementation_years,
                 project.capitalization_years,
                 activity.change_rate.name,
@@ -6103,21 +6050,21 @@ class SetAsideCalculator(BaseCalculator):
                 self.som.value,
                 self.soc.value,
                 self.soc.value,
-                module_start.soc_t2_start,
-                module_w.soc_t2_w,
+                self.module_start.soc_t2_start,
+                self.module_w.soc_t2_w,
                 CALCULATE_SOC_SOM_W,
                 self.fmg_start.value,
                 self.fmg_w.value,
-                module_start.fmg_t2_start,
-                module_w.fmg_t2_w,
+                self.module_start.fmg_t2_start,
+                self.module_w.fmg_t2_w,
                 self.flu_start.value,
                 self.flu_w.value,
-                module_start.flu_t2_start,
-                module_w.flu_t2_w,
+                self.module_start.flu_t2_start,
+                self.module_w.flu_t2_w,
                 self.fi_start.value,
                 self.fi_w.value,
-                module_start.fi_t2_start,
-                module_w.fi_t2_w,
+                self.module_start.fi_t2_start,
+                self.module_w.fi_t2_w,
                 DELAY_W,
                 self.biomass_ef_start.value,
                 self.biomass_ef_w.value,
@@ -6130,7 +6077,7 @@ class SetAsideCalculator(BaseCalculator):
 
         if module.is_without():
             self.inputs_wo = [
-                *[0, area],
+                *[0, self.area],
                 project.implementation_years,
                 project.capitalization_years,
                 activity.change_rate.name,
@@ -6138,21 +6085,21 @@ class SetAsideCalculator(BaseCalculator):
                 self.som.value,
                 self.soc.value,
                 self.soc.value,
-                module_start.soc_t2_start,
-                module_wo.soc_t2_wo,
+                self.module_start.soc_t2_start,
+                self.module_wo.soc_t2_wo,
                 CALCULATE_SOC_SOM_WO,
                 self.fmg_start.value,
                 self.fmg_wo.value,
-                module_start.fmg_t2_start,
-                module_wo.fmg_t2_wo,
+                self.module_start.fmg_t2_start,
+                self.module_wo.fmg_t2_wo,
                 self.flu_start.value,
                 self.flu_wo.value,
-                module_start.flu_t2_start,
-                module_wo.flu_t2_wo,
+                self.module_start.flu_t2_start,
+                self.module_wo.flu_t2_wo,
                 self.fi_start.value,
                 self.fi_wo.value,
-                module_start.fi_t2_start,
-                module_wo.fi_t2_wo,
+                self.module_start.fi_t2_start,
+                self.module_wo.fi_t2_wo,
                 DELAY_WO,
                 self.biomass_ef_start.value,
                 self.biomass_ef_wo.value,
