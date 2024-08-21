@@ -195,6 +195,8 @@ class LivestockFactory(DjangoModelFactory):
     class Meta:
         model = Livestock
 
+    status = READY
+
     livestock_category_type = random.choice(livestock_category_types)
 
     livestock_production_type_start = factory.fuzzy.FuzzyChoice(livestock_production_types)
