@@ -4519,7 +4519,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
         try:
             self.energy_db = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=module.fuel_type)
         except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find Energy Default Emission Factor for {module.fuel_type.name}")
+            raise ValueError(f"Could not find Energy Default Emission Factor for {module.fuel_type.name}. Please insert tier 2 values")
 
         try:
             self.pressure = ipcc.IrrigationPressureRequirement.objects.get(irrigation_system_type=module.irrigation_system_type)
