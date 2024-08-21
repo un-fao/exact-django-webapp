@@ -124,6 +124,7 @@ from .models import (
     ModuleType,
     MinorSeasonFloodedRice,
     SingleBiomassModule,
+    ChangeRate,
 )
 
 CALCULATE_SOC_SOM_START_W = False
@@ -544,6 +545,7 @@ class LandModuleCalculator(BaseCalculator):
         self.climate: Climate = self.activity.climate_t2 or self.project.climate
         self.moisture: Moisture = self.activity.moisture_t2 or self.project.moisture
         self.region: Region = self.project.country.region
+        self.change_rate: ChangeRate = self.activity.change_rate
 
         self.area = self.luc.area if self.luc else getattr(module, "parent", module).area
 
@@ -2278,7 +2280,7 @@ class FloodedRiceCalculator(BaseCalculator):
         FloodedRiceSeasonCalculator(input).get_defaults(calculate=calculate)
 
 
-class GrasslandCalculator(BaseCalculator):
+class GrasslandCalculator(LandModuleCalculator):
     """
     Calculator for grassland.
     """
@@ -2289,11 +2291,6 @@ class GrasslandCalculator(BaseCalculator):
         self.ef: SimpleNamespace | ipcc.BurningEmissionFactor = SimpleNamespace(value=0)
         self.agb: SimpleNamespace | ipcc.GrasslandAGB = SimpleNamespace(value=0)
         self.cf: SimpleNamespace | GrasslandParameter = SimpleNamespace(value=0)
-        self.soc: SimpleNamespace | ipcc.SoilOrganicCarbon = SimpleNamespace(value=0)
-        self.soc_start: SimpleNamespace | ipcc.GrasslandStockExchangeFactor = SimpleNamespace(fi=1, fmg=1, flu=1)
-        self.soc_w: SimpleNamespace | ipcc.GrasslandStockExchangeFactor = SimpleNamespace(fi=1, fmg=1, flu=1)
-        self.soc_wo: SimpleNamespace | ipcc.GrasslandStockExchangeFactor = SimpleNamespace(fi=1, fmg=1, flu=1)
-        self.som: SimpleNamespace | ipcc.NitrousEmissionFactor = SimpleNamespace(value=0)
         self.biomass_ef_start: SimpleNamespace | ipcc.ForestTotalBiomass = SimpleNamespace(value=0)
         self.biomass_ef_w: SimpleNamespace | ipcc.TotalBiomassAfterDefo = SimpleNamespace(value=0)
         self.biomass_ef_wo: SimpleNamespace | ipcc.TotalBiomassAfterDefo = SimpleNamespace(value=0)
@@ -2311,17 +2308,6 @@ class GrasslandCalculator(BaseCalculator):
         self.ef = utils.get_or_raise(ipcc.BurningEmissionFactor, {"category__name": "Savanna and grassland"}, "Burning emission factor for savanna and grassland does not exist")
         self.agb = utils.get_or_raise(ipcc.GrasslandAGB, {"climate": project.climate, "moisture": project.moisture}, f"AGB for {project.climate.name} climate and {project.moisture.name} moisture does not exist")
         self.cf = utils.get_or_raise(GrasslandParameter, {"name": "default_combustion_factor"}, "Default combustion factor does not exist")
-        self.soc = utils.get_or_raise(ipcc.SoilOrganicCarbon, {"climate": project.climate, "moisture": project.moisture, "soil_type": project.soil_type}, f"Soil organic carbon for {project.climate.name} climate, {project.moisture.name} moisture and {project.soil_type.name} soil type does not exist")
-        self.som = utils.get_or_raise(ipcc.NitrousEmissionFactor, {"moisture": project.moisture}, f"Land use nitrous emission factor for {project.moisture.name} moisture does not exist")
-
-        if module.is_luc_remaining_same() or module.is_business_as_usual():
-            self.soc_start = utils.get_or_raise(ipcc.GrasslandStockExchangeFactor, {"grassland_management_type": module.grassland_management_type_start, "climate": project.climate}, f"Stock exchange factor for {module.grassland_management_type_start.name} in {project.climate.name} climate does not exist")
-
-        if module.is_with():
-            self.soc_w = utils.get_or_raise(ipcc.GrasslandStockExchangeFactor, {"grassland_management_type": module.grassland_management_type_w, "climate": project.climate}, f"Stock exchange factor for {module.grassland_management_type_w.name} in {project.climate.name} climate does not exist")
-
-        if module.is_without():
-            self.soc_wo = utils.get_or_raise(ipcc.GrasslandStockExchangeFactor, {"grassland_management_type": module.grassland_management_type_wo, "climate": project.climate}, f"Stock exchange factor for {module.grassland_management_type_wo.name} in {project.climate.name} climate does not exist")
 
     def calculate(self) -> list[Result]:
         """
@@ -2329,34 +2315,25 @@ class GrasslandCalculator(BaseCalculator):
         """
         log.debug("START GrasslandCalculator.calculate")
 
-        module: Grassland = self.data
+        module: Grassland = self.module
         activity: Activity = module.activity
         project: Project = activity.project
-        luc: LandUseChange = module.land_use_change
 
         # duration = activity.duration_t2 or project.implementation_years
         # # TODO: Is this assuming that the activity start_year must be > project start_year?
         # delay = ((activity.start_year_t2 or 0) - project.start_year) or 0
         # capitalization = project.implementation_years - duration + project.capitalization_years
 
-        change_rate = module.activity.change_rate
-        area = luc.area if luc and luc.area else module.area
-
         self.get_defaults()
-
-        math_start_w = None
-        math_start_wo = None
-        math_w = None
-        math_wo = None
 
         if module.is_luc_remaining_same():
             log.debug("LUC remaining same")
 
             self.inputs_start_w = [
-                *[area, 0],
+                *[self.area, 0],
                 project.implementation_years,
                 project.capitalization_years,
-                change_rate.name,
+                self.change_rate.name,
                 project.gw_potential.n2o,
                 project.gw_potential.ch4,
                 module.fire_periodicity_start,
@@ -2372,16 +2349,16 @@ class GrasslandCalculator(BaseCalculator):
                 module.soc_t2_start,
                 module.soc_t2_w,
                 CALCULATE_SOC_SOM_START_W,
-                self.soc_start.fmg,
-                self.soc_w.fmg,
+                self.fmg_start.value,
+                self.fmg_w.value,
                 module.fmg_t2_start,
                 module.fmg_t2_w,
-                self.soc_start.flu,
-                self.soc_w.flu,
+                self.flu_start.value,
+                self.flu_w.value,
                 module.flu_t2_start,
                 module.flu_t2_w,
-                self.soc_start.fi,
-                self.soc_w.fi,
+                self.fi_start.value,
+                self.fi_w.value,
                 module.fi_t2_start,
                 module.fi_t2_w,
                 DELAY_START_W,
@@ -2395,17 +2372,17 @@ class GrasslandCalculator(BaseCalculator):
 
             log.debug("Inputs start w: %s", self.inputs_start_w)
 
-            math_start_w = MathGrassland(*self.inputs_start_w)
-            math_start_w.calculate_emissions()
+            self.math_start_w = MathGrassland(*self.inputs_start_w)
+            self.math_start_w.calculate_emissions()
 
         if module.is_with():
             log.debug("With")
 
             self.inputs_w = [
-                *[0, area],
+                *[0, self.area],
                 project.implementation_years,
                 project.capitalization_years,
-                change_rate.name,
+                self.change_rate.name,
                 project.gw_potential.n2o,
                 project.gw_potential.ch4,
                 module.fire_periodicity_w,
@@ -2421,16 +2398,16 @@ class GrasslandCalculator(BaseCalculator):
                 module.soc_t2_start,
                 module.soc_t2_w,
                 CALCULATE_SOC_SOM_W,
-                self.soc_start.fmg,
-                self.soc_w.fmg,
+                self.fmg_start.value,
+                self.fmg_w.value,
                 module.fmg_t2_start,
                 module.fmg_t2_w,
-                self.soc_start.flu,
-                self.soc_w.flu,
+                self.flu_start.value,
+                self.flu_w.value,
                 module.flu_t2_start,
                 module.flu_t2_w,
-                self.soc_start.fi,
-                self.soc_w.fi,
+                self.fi_start.value,
+                self.fi_w.value,
                 module.fi_t2_start,
                 module.fi_t2_w,
                 DELAY_W,
@@ -2444,17 +2421,17 @@ class GrasslandCalculator(BaseCalculator):
 
             log.debug("Inputs w: %s", self.inputs_w)
 
-            math_w = MathGrassland(*self.inputs_w)
-            math_w.calculate_emissions()
+            self.math_w = MathGrassland(*self.inputs_w)
+            self.math_w.calculate_emissions()
 
         if module.is_business_as_usual():
             log.debug("Business as usual")
 
             self.inputs_start_wo = [
-                *[area, 0],
+                *[self.area, 0],
                 project.implementation_years,
                 project.capitalization_years,
-                change_rate.name,
+                self.change_rate.name,
                 project.gw_potential.n2o,
                 project.gw_potential.ch4,
                 module.fire_periodicity_start,
@@ -2470,16 +2447,16 @@ class GrasslandCalculator(BaseCalculator):
                 module.soc_t2_start,
                 module.soc_t2_wo,
                 CALCULATE_SOC_SOM_START_WO,
-                self.soc_start.fmg,
-                self.soc_wo.fmg,
+                self.fmg_start.value,
+                self.fmg_wo.value,
                 module.fmg_t2_start,
                 module.fmg_t2_wo,
-                self.soc_start.flu,
-                self.soc_wo.flu,
+                self.flu_start.value,
+                self.flu_wo.value,
                 module.flu_t2_start,
                 module.flu_t2_wo,
-                self.soc_start.fi,
-                self.soc_wo.fi,
+                self.fi_start.value,
+                self.fi_wo.value,
                 module.fi_t2_start,
                 module.fi_t2_wo,
                 DELAY_START_WO,
@@ -2493,17 +2470,17 @@ class GrasslandCalculator(BaseCalculator):
 
             log.debug("Inputs start wo: %s", self.inputs_start_wo)
 
-            math_start_wo = MathGrassland(*self.inputs_start_wo)
-            math_start_wo.calculate_emissions()
+            self.math_start_wo = MathGrassland(*self.inputs_start_wo)
+            self.math_start_wo.calculate_emissions()
 
         if module.is_without():
             log.debug("Without")
 
             self.inputs_wo = [
-                *[0, area],
+                *[0, self.area],
                 project.implementation_years,
                 project.capitalization_years,
-                change_rate.name,
+                self.change_rate.name,
                 project.gw_potential.n2o,
                 project.gw_potential.ch4,
                 module.fire_periodicity_wo,
@@ -2519,16 +2496,16 @@ class GrasslandCalculator(BaseCalculator):
                 module.soc_t2_start,
                 module.soc_t2_wo,
                 CALCULATE_SOC_SOM_WO,
-                self.soc_start.fmg,
-                self.soc_wo.fmg,
+                self.fmg_start.value,
+                self.fmg_wo.value,
                 module.fmg_t2_start,
                 module.fmg_t2_wo,
-                self.soc_start.flu,
-                self.soc_wo.flu,
+                self.flu_start.value,
+                self.flu_wo.value,
                 module.flu_t2_start,
                 module.flu_t2_wo,
-                self.soc_start.fi,
-                self.soc_wo.fi,
+                self.fi_start.value,
+                self.fi_wo.value,
                 module.fi_t2_start,
                 module.fi_t2_wo,
                 DELAY_WO,
@@ -2542,65 +2519,16 @@ class GrasslandCalculator(BaseCalculator):
 
             log.debug("Inputs wo: %s", self.inputs_wo)
 
-            math_wo = MathGrassland(*self.inputs_wo)
-            math_wo.calculate_emissions()
+            self.math_wo = MathGrassland(*self.inputs_wo)
+            self.math_wo.calculate_emissions()
 
-        res_start_w = math_start_w.result if math_start_w else MathResult(project.implementation_years, project.capitalization_years)
-        res_start_wo = math_start_wo.result if math_start_wo else MathResult(project.implementation_years, project.capitalization_years)
-        res_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
-        res_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
-
-        log.debug("start_w breakdown")
-        res_start_w.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        log.debug("w breakdown")
-        res_w.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        log.debug("start_wo breakdown")
-        res_start_wo.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        log.debug("wo breakdown")
-        res_wo.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        log.debug("Total WITH: %s", (res_w + res_start_w).breakdown(by=BreakdownTypes.TOTAL))
-        log.debug("Total WITHOUT: %s", (res_wo + res_start_wo).breakdown(by=BreakdownTypes.TOTAL))
+        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
         log.debug("END GrasslandCalculator.calculate")
-        return (res_w + res_start_w, res_wo + res_start_wo)
-
-    def defaults(self):
-        self.calculate()
-
-        module: Grassland = self.data
-
-        defaults_start = {}
-        defaults_w = {}
-        defaults_wo = {}
-
-        if module.is_luc_remaining_same():
-            math_start = MathGrassland(*self.inputs_start_w)
-            math_start_defaults = math_start.evaluate_tier_2_defaults()
-            defaults_start.update(math_start_defaults.start)
-            defaults_start.update(math_start_defaults.other)
-        elif module.is_business_as_usual():
-            math_start = MathGrassland(*self.inputs_start_wo)
-            math_start_defaults = math_start.evaluate_tier_2_defaults()
-            defaults_start.update(math_start_defaults.start)
-            defaults_start.update(math_start_defaults.other)
-
-        if module.is_with():
-            math_w = MathGrassland(*self.inputs_w)
-            math_w_defaults = math_w.evaluate_tier_2_defaults()
-            defaults_w.update(math_w_defaults.end)
-            defaults_w.update(math_w_defaults.other)
-
-        if module.is_without():
-            math_wo = MathGrassland(*self.inputs_wo)
-            math_wo_defaults = math_wo.evaluate_tier_2_defaults()
-            defaults_wo.update(math_wo_defaults.end)
-            defaults_wo.update(math_wo_defaults.other)
-
-        return DefaultData(defaults_start, defaults_w, defaults_wo)
+        return (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
 
 
 class SmallFisheryCalculator(BaseCalculator):
@@ -3526,7 +3454,7 @@ class FuelCalculator(BaseCalculator):
         return results_tuple
 
 
-class SettlementCalculator(BaseCalculator):
+class SettlementCalculator(LandModuleCalculator):
     """
     Calculator for settlements
     """
@@ -3535,38 +3463,15 @@ class SettlementCalculator(BaseCalculator):
         super().__init__(module)
         module: Settlement = module
 
-        self.inputs_start_w = []
-        self.inputs_start_wo = []
-        self.inputs_w = []
-        self.inputs_wo = []
-        self.soc = SimpleNamespace(value=0)
-
         self.nitrous_ef = SimpleNamespace(value=0)
 
         self.ef_start = SimpleNamespace(flu=0, fmg=0, fi=0, biomass=0)
         self.ef_w = SimpleNamespace(flu=0, fmg=0, fi=0, biomass=0)
         self.ef_wo = SimpleNamespace(flu=0, fmg=0, fi=0, biomass=0)
 
-        self.flu_start = SimpleNamespace(value=1)
-        self.fi_start = SimpleNamespace(value=1)
-        self.fmg_start = SimpleNamespace(value=1)
-
-        self.flu_w = SimpleNamespace(value=1)
-        self.fi_w = SimpleNamespace(value=1)
-        self.fmg_w = SimpleNamespace(value=1)
-
-        self.flu_wo = SimpleNamespace(value=1)
-        self.fi_wo = SimpleNamespace(value=1)
-        self.fmg_wo = SimpleNamespace(value=1)
-
         # self.biomass_ef_start: SimpleNamespace | ipcc.ForestTotalBiomass = SimpleNamespace(value=0)
         # self.biomass_ef_w: SimpleNamespace | ipcc.TotalBiomassAfterDefo = SimpleNamespace(value=0)
         # self.biomass_ef_wo: SimpleNamespace | ipcc.TotalBiomassAfterDefo = SimpleNamespace(value=0)
-
-        self.math_start_w = None
-        self.math_start_wo = None
-        self.math_w = None
-        self.math_wo = None
 
     def get_defaults(self, calculate=False) -> dict:
         log.debug("START SettlementCalculator.get_defaults")
@@ -3653,26 +3558,26 @@ class SettlementCalculator(BaseCalculator):
                 self.nitrous_ef.value,
                 self.soc.value,
                 self.soc.value,
-                module.soc_t2_start,
-                module.soc_t2_w,
+                self.module_start.soc_t2_start,
+                self.module_w.soc_t2_w,
                 False,
                 self.fmg_start.value,
                 self.fmg_w.value,
-                module.fmg_t2_start,
-                module.fmg_t2_w,
+                self.module_start.fmg_t2_start,
+                self.module_w.fmg_t2_w,
                 self.flu_start.value,
                 self.flu_w.value,
-                module.flu_t2_start,
-                module.flu_t2_w,
+                self.module_start.flu_t2_start,
+                self.module_w.flu_t2_w,
                 self.fi_start.value,
                 self.fi_w.value,
-                module.fi_t2_start,
-                module.fi_t2_w,
-                0,  # Delay
+                self.module_start.fi_t2_start,
+                self.module_w.fi_t2_w,
+                DELAY_START_W,
                 self.ef_start.biomass,
                 self.ef_w.biomass,
-                module.biomass_t2_start,
-                module.biomass_t2_w,
+                self.module_start.biomass_t2_start,
+                self.module_w.biomass_t2_w,
             ]
 
             self.math_start_w = NotCultivatedLand(*self.inputs_start_w)
@@ -3689,26 +3594,26 @@ class SettlementCalculator(BaseCalculator):
                 self.nitrous_ef.value,
                 self.soc.value,
                 self.soc.value,
-                module.soc_t2_start,
-                module.soc_t2_wo,
+                self.module_start.soc_t2_start,
+                self.module_wo.soc_t2_wo,
                 False,
                 self.fmg_start.value,
                 self.fmg_wo.value,
-                module.fmg_t2_start,
-                module.fmg_t2_wo,
+                self.module_start.fmg_t2_start,
+                self.module_wo.fmg_t2_wo,
                 self.flu_start.value,
                 self.flu_wo.value,
-                module.flu_t2_start,
-                module.flu_t2_wo,
+                self.module_start.flu_t2_start,
+                self.module_wo.flu_t2_wo,
                 self.fi_start.value,
                 self.fi_wo.value,
-                module.fi_t2_start,
-                module.fi_t2_wo,
-                0,  # Delay
+                self.module_start.fi_t2_start,
+                self.module_wo.fi_t2_wo,
+                DELAY_START_WO,
                 self.ef_start.biomass,
                 self.ef_wo.biomass,
-                module.biomass_t2_start,
-                module.biomass_t2_wo,
+                self.module_start.biomass_t2_start,
+                self.module_wo.biomass_t2_wo,
             ]
 
             self.math_start_wo = NotCultivatedLand(*self.inputs_start_wo)
@@ -3725,26 +3630,26 @@ class SettlementCalculator(BaseCalculator):
                 self.nitrous_ef.value,
                 self.soc.value,  # SOCinitial
                 self.soc.value,
-                module.soc_t2_start,
-                module.soc_t2_w,
+                self.module_start.soc_t2_start,
+                self.module_w.soc_t2_w,
                 True,
                 self.fmg_start.value,
                 self.fmg_w.value,
-                module.fmg_t2_start,
-                module.fmg_t2_w,
+                self.module_start.fmg_t2_start,
+                self.module_w.fmg_t2_w,
                 self.flu_start.value,
                 self.flu_w.value,
-                module.flu_t2_start,
-                module.flu_t2_w,
+                self.module_start.flu_t2_start,
+                self.module_w.flu_t2_w,
                 self.fi_start.value,
                 self.fi_w.value,
-                module.fi_t2_start,
-                module.fi_t2_w,
-                0,  # Delay
+                self.module_start.fi_t2_start,
+                self.module_w.fi_t2_w,
+                DELAY_W,
                 self.ef_start.biomass,
                 self.ef_w.biomass,
-                module.biomass_t2_start,
-                module.biomass_t2_w,
+                self.module_start.biomass_t2_start,
+                self.module_w.biomass_t2_w,
             ]
 
             self.math_w = NotCultivatedLand(*self.inputs_w)
@@ -3761,41 +3666,41 @@ class SettlementCalculator(BaseCalculator):
                 self.nitrous_ef.value,
                 self.soc.value,
                 self.soc.value,
-                module.soc_t2_start,
-                module.soc_t2_wo,
+                self.module_start.soc_t2_start,
+                self.module_wo.soc_t2_wo,
                 True,
                 self.fmg_start.value,
                 self.fmg_wo.value,
-                module.fmg_t2_start,
-                module.fmg_t2_wo,
+                self.module_start.fmg_t2_start,
+                self.module_wo.fmg_t2_wo,
                 self.flu_start.value,
                 self.flu_wo.value,
-                module.flu_t2_start,
-                module.flu_t2_wo,
+                self.module_start.flu_t2_start,
+                self.module_wo.flu_t2_wo,
                 self.fi_start.value,
                 self.fi_wo.value,
-                module.fi_t2_start,
-                module.fi_t2_wo,
-                0,  # Delay
+                self.module_start.fi_t2_start,
+                self.module_wo.fi_t2_wo,
+                DELAY_WO,
                 self.ef_start.biomass,
                 self.ef_wo.biomass,
-                module.biomass_t2_start,
-                module.biomass_t2_wo,
+                self.module_start.biomass_t2_start,
+                self.module_wo.biomass_t2_wo,
             ]
 
             self.math_wo = NotCultivatedLand(*self.inputs_wo)
             self.math_wo.calculate_emissions()
 
-        results_start_w = self.math_start_w.result if self.math_start_w else MathResult(project.implementation_years, project.capitalization_years)
-        results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(project.implementation_years, project.capitalization_years)
-        results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
-        results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
-        res_w += results_start_w
-        res_wo += results_start_wo
+        res_w += self.results_start_w
+        res_wo += self.results_start_wo
 
-        res_w += results_w
-        res_wo += results_wo
+        res_w += self.results_w
+        res_wo += self.results_wo
 
         for building in module.buildings.all():
             r_w, r_wo = BuildingCalculator(building).calculate()
