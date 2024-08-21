@@ -489,6 +489,7 @@ class FuelType(models.Model):
     name = models.CharField(max_length=100)
     fuel_use_type = models.ForeignKey(FuelUseType, on_delete=models.CASCADE, null=True, blank=True)
     macro_fuel_type = models.ForeignKey(MacroFuelType, on_delete=models.CASCADE, null=True, blank=True)
+    module_types = models.ManyToManyField(ModuleType, related_name="fuel_types")
 
     class Meta:
         unique_together = ("name", "fuel_use_type", "macro_fuel_type")
@@ -1751,6 +1752,7 @@ class Fuel(Submodule):
 
 
 class IrrigationSystemType(models.Model):
+    module_types = models.ManyToManyField(ModuleType, related_name="irrigation_system_types", null=True, blank=True)
     name = models.CharField(max_length=255, unique=True)
 
     def __str__(self):

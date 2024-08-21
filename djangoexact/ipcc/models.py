@@ -1043,11 +1043,11 @@ class EnergyDefaultEmissionFactor(Model):
 
 
 class IrrigationSystemData(Model):
-    irrigation_system_type = OneToOneField("api.IrrigationSystemType", on_delete=CASCADE)
+    irrigation_system_type = OneToOneField("api.IrrigationSystemType", on_delete=CASCADE, unique=True)
     value = FloatField()
 
     def __str__(self):
-        return f"({self.pk}) {self.irrigation_system_type.name} {self.value}"
+        return f"({self.pk}) {self.irrigation_system_type} {self.value}"
 
     class Meta:
         verbose_name_plural = "Irrigation system data"
