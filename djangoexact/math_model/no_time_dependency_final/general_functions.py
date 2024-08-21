@@ -330,14 +330,15 @@ def yearly_time_dependent_matrix_log_rec_dis(start_value, end_value, years_imple
         raise Exception(f'Function "{function}" not recognized')
 
 # LIVESTOCK CH4 HEAD GENERAL FUNCTION
-def ch4_head_calculation_general(tam: float, vser: float, ef_prp: float, percentage_prp_default: float, percentage_prp_tier_2: float, ef_system_default: list, ch4_prp_tier_2: float, percentage_system_default: list, ef_single_system, ch4_system_tier_2, ch4_dividing_parameter=1):
+# LIVESTOCK CH4 HEAD GENERAL FUNCTION
+def ch4_head_calculation_general(tam: float, vser: float, ef_prp: float, percentage_prp_default: float, percentage_prp_tier_2: float | None, ef_system_default: list, ch4_prp_tier_2: float, percentage_system_default: list, ef_single_system, ch4_system_tier_2, ch4_dividing_parameter=1):
 
     try:
         # TODO: check how various tier 2 inputs of ef_system have to be handled
-        if not ch4_system_tier_2:
-            ef_system = ef_system_default if not ef_single_system else [ef_single_system]
+        if ch4_system_tier_2 is None:
+            ef_system = ef_system_default if ef_single_system is None else [ef_single_system]
 
-            if not percentage_prp_tier_2:
+            if percentage_prp_tier_2 is None:
                 ch4_system = [i * (tam / 1000) * (vser) / ch4_dividing_parameter * 365 * j / 100 for (i, j) in zip(ef_system, percentage_system_default)]
             else:
                 # this recalculates percentages in the system as a function of percentage prp tier 2
@@ -347,7 +348,7 @@ def ch4_head_calculation_general(tam: float, vser: float, ef_prp: float, percent
             # TODO: check if this has to be recalculated as a function of percentage prp tier 2
             ch4_system = [ch4_system_tier_2]
 
-        percentage_prp = percentage_prp_default if not percentage_prp_tier_2 else percentage_prp_tier_2
+        percentage_prp = percentage_prp_default if percentage_prp_tier_2 is None else percentage_prp_tier_2
 
         # TODO: add tier 2 value for ef_prp
 
@@ -361,6 +362,7 @@ def ch4_head_calculation_general(tam: float, vser: float, ef_prp: float, percent
         traceback.print_exc()
         print("Error in ch4_head_calculation_general")
         return None
+
 
 
 def soil_emissions(hectars_before_20, area_start, area_end, socref, soc_tier_2, f_lu_tier_2, f_i_tier_2, f_mg_tier_2, f_lu_ref=1, f_i_ref=1, f_mg_ref=1):
