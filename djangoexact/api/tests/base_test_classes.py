@@ -10,6 +10,7 @@ import datetime
 from factory import fuzzy
 from .factories import *
 import api.tests.base_test_classes as t
+import uuid
 
 
 class ProjectTest:
@@ -53,7 +54,7 @@ class ProjectTest:
         Raises:
             None.
         """
-        self.project: ProjectFactory = ProjectFactory.create(owner=self.user, name=f"{self.date}", climate=self.climate, moisture=self.moisture)
+        self.project: ProjectFactory = ProjectFactory.create(owner=self.user, name=uuid.uuid4(), climate=self.climate, moisture=self.moisture)
         log.info(f"Created project with parameters {self.get_parameters(self.project)}")
 
     @abstractmethod
@@ -135,8 +136,24 @@ class ModuleTest(ActivityTest):
         self.module = None
         self.module_results = None
 
-    def create_module(self, module_type: ModuleType, **kwargs):
-        self.module = super().create_module(module_type, **kwargs)
+    def create_module(self, **kwargs):
+        """
+        Create a module with the specified keyword arguments.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the module creation method.
+
+        Raises:
+            ValueError: If the module type is not set.
+
+        Returns:
+            The created module.
+        """
+
+        if self.module_type is None:
+            raise ValueError("Module type not set")
+
+        self.module = super().create_module(self.module_type, **kwargs)
 
     def calculate_results(self):
         """
