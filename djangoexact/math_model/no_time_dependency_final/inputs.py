@@ -250,7 +250,7 @@ class NewIrrigation(BaseModule):
             ef = self.ef_tier_2 or self.ef_ref
 
             self.total_emissions = ef * (self.units_end - self.units_start) / 1000
-            emissions_total_yearly = yearly_constant_emissions_breakdown(self.total_emissions, self.implementation_time, self.capitalization_time, self.rate_type)
+            self.emissions_total_yearly = yearly_constant_emissions_breakdown(self.total_emissions, self.time_impl, self.time_cap, self.rate_type)
 
             new_irrigation_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_total_yearly], ActivityTypes.NEW_IRRIGATION, delay=self.delay)
             self.result.yearly_emissions_by_sector_by_gas.append(new_irrigation_emission_set)
