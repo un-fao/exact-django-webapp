@@ -5713,25 +5713,13 @@ class ForestManagementCalculator(BaseCalculator):
         return super().defaults()
 
 
-class DegradedLandCalculator(BaseCalculator):
+class DegradedLandCalculator(LandModuleCalculator):
     """
     Calculator for annual cropping modules.
     """
 
     def __init__(self, input) -> None:
         super().__init__(input)
-
-        # NOTE: I think these should all be defaulted to 1, instead of 0
-        self.fi_start: SimpleNamespace | ipcc.FIData = SimpleNamespace(value=1)
-        self.fmg_start: SimpleNamespace | ipcc.FMGData = SimpleNamespace(value=1)
-        self.flu_start: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=1)
-        self.fi_w: SimpleNamespace | ipcc.FIData = SimpleNamespace(value=1)
-        self.fmg_w: SimpleNamespace | ipcc.FMGData = SimpleNamespace(value=1)
-        self.flu_w: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=1)
-        self.fi_wo: SimpleNamespace | ipcc.FIData = SimpleNamespace(value=1)
-        self.fmg_wo: SimpleNamespace | ipcc.FMGData = SimpleNamespace(value=1)
-        self.flu_wo: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=1)
-        self.soc: SimpleNamespace | ipcc.SoilOrganicCarbon = SimpleNamespace(value=1)
 
         self.biomass_ef_start: SimpleNamespace | ipcc.ForestTotalBiomass = SimpleNamespace(value=0)
         self.biomass_ef_w: SimpleNamespace | ipcc.TotalBiomassAfterDefo = SimpleNamespace(value=0)
@@ -5746,24 +5734,12 @@ class DegradedLandCalculator(BaseCalculator):
         module: DegradedLand = self.data
         activity: Activity = module.activity
         project: Project = activity.project
-        luc: LandUseChange = module.land_use_change
-        area = luc.area if luc else module.area
-
-        DELAY_START_W = 0
-        DELAY_START_WO = 0
-        DELAY_W = 0
-        DELAY_WO = 0
 
         self.get_defaults()
 
-        module_start = module_w = module_wo = module
-
-        if luc:
-            module_start, module_w, module_wo = luc.get_modules()
-
         if module.is_luc_remaining_same():
             self.inputs_start_w = [
-                *[area, 0],
+                *[self.area, 0],
                 project.implementation_years,
                 project.capitalization_years,
                 activity.change_rate.name,
@@ -5771,21 +5747,21 @@ class DegradedLandCalculator(BaseCalculator):
                 self.som.value,
                 self.soc.value,
                 self.soc.value,
-                module_start.soc_t2_start,
-                module_w.soc_t2_w,
+                self.module_start.soc_t2_start,
+                self.module_w.soc_t2_w,
                 CALCULATE_SOC_SOM_START_W,
                 self.fmg_start.value,
                 self.fmg_w.value,
-                module_start.fmg_t2_start,
-                module_w.fmg_t2_w,
+                self.module_start.fmg_t2_start,
+                self.module_w.fmg_t2_w,
                 self.flu_start.value,
                 self.flu_w.value,
-                module_start.flu_t2_start,
-                module_w.flu_t2_w,
+                self.module_start.flu_t2_start,
+                self.module_w.flu_t2_w,
                 self.fi_start.value,
                 self.fi_w.value,
-                module_start.fi_t2_start,
-                module_w.fi_t2_w,
+                self.module_start.fi_t2_start,
+                self.module_w.fi_t2_w,
                 DELAY_START_W,
                 self.biomass_ef_start.value,
                 self.biomass_ef_w.value,
@@ -5798,7 +5774,7 @@ class DegradedLandCalculator(BaseCalculator):
 
         if module.is_business_as_usual():
             self.inputs_start_wo = [
-                *[area, 0],
+                *[self.area, 0],
                 project.implementation_years,
                 project.capitalization_years,
                 activity.change_rate.name,
@@ -5806,21 +5782,21 @@ class DegradedLandCalculator(BaseCalculator):
                 self.som.value,
                 self.soc.value,
                 self.soc.value,
-                module_start.soc_t2_start,
-                module_wo.soc_t2_wo,
+                self.module_start.soc_t2_start,
+                self.module_wo.soc_t2_wo,
                 CALCULATE_SOC_SOM_START_WO,
                 self.fmg_start.value,
                 self.fmg_wo.value,
-                module_start.fmg_t2_start,
-                module_wo.fmg_t2_wo,
+                self.module_start.fmg_t2_start,
+                self.module_wo.fmg_t2_wo,
                 self.flu_start.value,
                 self.flu_wo.value,
-                module_start.flu_t2_start,
-                module_wo.flu_t2_wo,
+                self.module_start.flu_t2_start,
+                self.module_wo.flu_t2_wo,
                 self.fi_start.value,
                 self.fi_wo.value,
-                module_start.fi_t2_start,
-                module_wo.fi_t2_wo,
+                self.module_start.fi_t2_start,
+                self.module_wo.fi_t2_wo,
                 DELAY_START_WO,
                 self.biomass_ef_start.value,
                 self.biomass_ef_wo.value,
@@ -5833,7 +5809,7 @@ class DegradedLandCalculator(BaseCalculator):
 
         if module.is_with():
             self.inputs_w = [
-                *[0, area],
+                *[0, self.area],
                 project.implementation_years,
                 project.capitalization_years,
                 activity.change_rate.name,
@@ -5841,21 +5817,21 @@ class DegradedLandCalculator(BaseCalculator):
                 self.som.value,
                 self.soc.value,
                 self.soc.value,
-                module_start.soc_t2_start,
-                module_w.soc_t2_w,
+                self.module_start.soc_t2_start,
+                self.module_w.soc_t2_w,
                 CALCULATE_SOC_SOM_W,
                 self.fmg_start.value,
                 self.fmg_w.value,
-                module_start.fmg_t2_start,
-                module_w.fmg_t2_w,
+                self.module_start.fmg_t2_start,
+                self.module_w.fmg_t2_w,
                 self.flu_start.value,
                 self.flu_w.value,
-                module_start.flu_t2_start,
-                module_w.flu_t2_w,
+                self.module_start.flu_t2_start,
+                self.module_w.flu_t2_w,
                 self.fi_start.value,
                 self.fi_w.value,
-                module_start.fi_t2_start,
-                module_w.fi_t2_w,
+                self.module_start.fi_t2_start,
+                self.module_w.fi_t2_w,
                 DELAY_W,
                 self.biomass_ef_start.value,
                 self.biomass_ef_w.value,
@@ -5868,7 +5844,7 @@ class DegradedLandCalculator(BaseCalculator):
 
         if module.is_without():
             self.inputs_wo = [
-                *[0, area],
+                *[0, self.area],
                 project.implementation_years,
                 project.capitalization_years,
                 activity.change_rate.name,
@@ -5876,21 +5852,21 @@ class DegradedLandCalculator(BaseCalculator):
                 self.som.value,
                 self.soc.value,
                 self.soc.value,
-                module_start.soc_t2_start,
-                module_wo.soc_t2_wo,
+                self.module_start.soc_t2_start,
+                self.module_wo.soc_t2_wo,
                 CALCULATE_SOC_SOM_WO,
                 self.fmg_start.value,
                 self.fmg_wo.value,
-                module_start.fmg_t2_start,
-                module_wo.fmg_t2_wo,
+                self.module_start.fmg_t2_start,
+                self.module_wo.fmg_t2_wo,
                 self.flu_start.value,
                 self.flu_wo.value,
-                module_start.flu_t2_start,
-                module_wo.flu_t2_wo,
+                self.module_start.flu_t2_start,
+                self.module_wo.flu_t2_wo,
                 self.fi_start.value,
                 self.fi_wo.value,
-                module_start.fi_t2_start,
-                module_wo.fi_t2_wo,
+                self.module_start.fi_t2_start,
+                self.module_wo.fi_t2_wo,
                 DELAY_WO,
                 self.biomass_ef_start.value,
                 self.biomass_ef_wo.value,
@@ -5901,12 +5877,12 @@ class DegradedLandCalculator(BaseCalculator):
             self.math_wo = MathNotCultivatedLand(*self.inputs_wo)
             self.math_wo.calculate_emissions()
 
-        results_start_w = self.math_start_w.result if self.math_start_w else MathResult(project.implementation_years, project.capitalization_years)
-        results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(project.implementation_years, project.capitalization_years)
-        results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
-        results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
-        results_tuple = (results_w + results_start_w, results_wo + results_start_wo)
+        results_tuple = (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
 
         return results_tuple
 
