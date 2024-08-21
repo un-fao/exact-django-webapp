@@ -78,7 +78,7 @@ class ActivityTest(ProjectTest):
         Raises:
             None.
         """
-        self.activity: Activity = ActivityFactory.create(project=self.project, name="Activity 1")
+        self.activity: Activity = ActivityFactory.create(project=self.project, name=uuid.uuid4())
         log.info(f"Created activity {self.activity.name} in project {self.project.name}")
 
     def add_activity_modules(self, module_types: list[ModuleType]):
@@ -134,7 +134,7 @@ class ModuleTest(ActivityTest):
         self.create_activity()
         self.module_type = None
         self.module = None
-        self.module_results = None
+        self.parent_module_results = None
 
     def create_module(self, **kwargs):
         """
@@ -166,14 +166,69 @@ class ModuleTest(ActivityTest):
             None
         """
         try:
-            self.module_results: tuple = CalculatorFactory().calculate_result(self.module)
-            log.info(f"{self.module.__class__.__name__} results: {self.module_results}")
+            self.parent_module_results: tuple = CalculatorFactory().calculate_result(self.module)
+            log.info(f"{self.module.__class__.__name__} results: {self.parent_module_results}")
         except Exception as e:
             log.error(traceback.format_exc())
             log.error(e)
 
             with open(os.path.join(os.getcwd(), "api", "tests", "test.log"), "a") as f:
                 f.write(f"Error in {self.__class__.__name__}: {e}\n")
+
+
+class ModuleWithSubmodulesTest(ModuleTest):
+    def __init__(self):
+        super().__init__()
+        self.create_activity()
+        self.submodule_types = None
+        self.submodules = None
+        self.submodule_results = None
+
+    def create_submodules(self):
+        """
+        Create submodules for the module.
+
+        Returns:
+            None
+
+        Raises:
+            None
+        """
+        self.submodules = []
+        for submodule_type in self.submodule_types:
+            submodule_type: ModuleType
+            try:
+                factory_name = f"{submodule_type.class_name}Factory"
+                Factory: DjangoModelFactory = globals()[factory_name]
+            except KeyError:
+                raise KeyError(f"Factory for module type {submodule_type} not found")
+
+            submodule = Factory.create(parent=self.module)
+            self.submodules.append(submodule)
+            log.info(f"Created submodule {submodule.__class__.__name__} with parameters {self.get_parameters(submodule)}")
+
+    def calculate_submodule_results(self):
+        """
+        Calculate the results for the submodules.
+
+        Returns:
+            None
+
+        Raises:
+            None
+        """
+        self.submodule_results = []
+        for submodule in self.submodules:
+            try:
+                result = CalculatorFactory().calculate_result(submodule)
+                self.submodule_results.append(result)
+                log.info(f"{submodule.__class__.__name__} results: {result}")
+            except Exception as e:
+                log.error(traceback.format_exc())
+                log.error(e)
+
+                with open(os.path.join(os.getcwd(), "api", "tests", "test.log"), "a") as f:
+                    f.write(f"Error in {self.__class__.__name__}: {e}\n")
 
 
 class LandUseChangeTest(ActivityTest):
