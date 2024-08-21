@@ -496,12 +496,15 @@ class IrrigationSystemFactory(DjangoModelFactory):
     ha_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
 
+fuel_types = [fuel for fuel in FuelType.objects.filter(module_types__class_name="IrrigationPhase").all()]
+
+
 class IrrigationPhaseFactory(DjangoModelFactory):
     class Meta:
         model = IrrigationPhase
 
     irrigation_system_type = factory.fuzzy.FuzzyChoice(IrrigationSystemType.objects.all())
-    fuel_type = factory.fuzzy.FuzzyChoice(fuels)
+    fuel_type = factory.fuzzy.FuzzyChoice(fuel_types)
     well_depth = factory.fuzzy.FuzzyFloat(0, 100)
 
     ha_start = factory.fuzzy.FuzzyFloat(0, 100)
