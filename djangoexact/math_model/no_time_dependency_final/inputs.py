@@ -211,7 +211,7 @@ class Roads(BaseModule):
             return None
 
 
-class ElectryicityConsumption(BaseModule):
+class ElectricityConsumption(BaseModule):
     def __init__(self, emissions_factor, specific_factor_start, specific_factor_end, mwh_start, mwh_end, percent_loss_transportation_start, percent_loss_transportation_end, rate_type, time_impl, time_cap):
 
         self.emissions_factor = emissions_factor  # Match Country and Source of Emission Factor to Elec Table (columns 6 or 7)
