@@ -3226,7 +3226,6 @@ class EnergyCalculator(BaseCalculator):
 
         return (self.results_w, self.results_wo)
 
-
 class ElectricityCalculator(BaseCalculator):
     """
     Calculator for energy.
@@ -3367,74 +3366,74 @@ class FuelCalculator(BaseCalculator):
 
         if macro_fuel_type == "Liquid or gaseous":
             log.debug("Liquid or gaseous fuel")
-            input_w = [
-                self.ef.t_co2_eq,
-                module.ef_t2,
-                module.fuel_consumption_start,
-                module.fuel_consumption_w,
-                change_rate.name,
-                project.implementation_years,
-                project.capitalization_years,
-            ]
-            log.debug("Inputs with: %s", input_w)
+            inputs_w = {
+                "emissions_factor": self.ef.t_co2_eq,
+                "specific_factor": module.ef_t2,
+                "mwh_start": module.fuel_consumption_start,
+                "mwh_end": module.fuel_consumption_w,
+                "rate_type": change_rate.name,
+                "time_impl": project.implementation_years,
+                "time_cap": project.capitalization_years,
+            }
+            log.debug("Inputs with: %s", inputs_w)
 
-            self.math_w = FuelConsumption(*input_w)
+            self.math_w = FuelConsumption(**inputs_w)
             self.math_w.calculate_emissions()
 
-            input_wo = [
-                self.ef.t_co2_eq,
-                module.ef_t2,
-                module.fuel_consumption_start,
-                module.fuel_consumption_wo,
-                change_rate.name,
-                project.implementation_years,
-                project.capitalization_years,
-            ]
-            log.debug("Inputs without: %s", input_wo)
+            inputs_wo = {
+                "emissions_factor": self.ef.t_co2_eq,
+                "specific_factor": module.ef_t2,
+                "mwh_start": module.fuel_consumption_start,
+                "mwh_end": module.fuel_consumption_wo,
+                "rate_type": change_rate.name,
+                "time_impl": project.implementation_years,
+                "time_cap": project.capitalization_years,
+            }
+            log.debug("Inputs without: %s", inputs_wo)
 
-            self.math_wo = FuelConsumption(*input_wo)
+            self.math_wo = FuelConsumption(**inputs_wo)
             self.math_wo.calculate_emissions()
 
         elif macro_fuel_type == "Solid":
             log.debug("Solid fuel")
-            input_w = [
-                self.ef.net_calorific_value,
-                self.ef.co2,
-                self.ef.ch4,
-                self.ef.n2o,
-                module.account_for_co2,
-                project.gw_potential.ch4,
-                project.gw_potential.n2o,
-                module.ef_t2,
-                module.fuel_consumption_start,
-                module.fuel_consumption_w,
-                activity.change_rate.name,
-                project.implementation_years,
-                project.capitalization_years,
-            ]
-            log.debug("Inputs with: %s", input_w)
+            inputs_w = {
+                "joules_factor": self.ef.net_calorific_value,
+                "co2_factor": self.ef.co2,
+                "ch4_factor": self.ef.ch4,
+                "n2o_factor": self.ef.n2o,
+                "account_for_co2_boolean": module.account_for_co2,
+                "methane_constant": project.gw_potential.ch4,
+                "nitrous_constant": project.gw_potential.n2o,
+                "specific_factor": module.ef_t2,
+                "mwh_start": module.fuel_consumption_start,
+                "mwh_end": module.fuel_consumption_w,
+                "rate_type": change_rate.name,
+                "time_impl": project.implementation_years,
+                "time_cap": project.capitalization_years,
+            }
+            log.debug("Inputs with: %s", inputs_w)
 
-            self.math_w = SolidConsumption(*input_w)
+            self.math_w = SolidConsumption(**inputs_w)
             self.math_w.calculate_emissions()
 
-            input_wo = [
-                self.ef.net_calorific_value,
-                self.ef.co2,
-                self.ef.ch4,
-                self.ef.n2o,
-                module.account_for_co2,
-                project.gw_potential.ch4,
-                project.gw_potential.n2o,
-                module.ef_t2,
-                module.fuel_consumption_start,
-                module.fuel_consumption_wo,
-                activity.change_rate.name,
-                project.implementation_years,
-                project.capitalization_years,
-            ]
-            log.debug("Inputs without: %s", input_wo)
+            inputs_wo = {
+                "joules_factor": self.ef.net_calorific_value,
+                "co2_factor": self.ef.co2,
+                "ch4_factor": self.ef.ch4,
+                "n2o_factor": self.ef.n2o,
+                "account_for_co2_boolean": module.account_for_co2,
+                "methane_constant": project.gw_potential.ch4,
+                "nitrous_constant": project.gw_potential.n2o,
+                "specific_factor": module.ef_t2,
+                "mwh_start": module.fuel_consumption_start,
+                "mwh_end": module.fuel_consumption_wo,
+                "rate_type": change_rate.name,
+                "time_impl": project.implementation_years,
+                "time_cap": project.capitalization_years,
+            }
+            log.debug("Inputs without: %s", inputs_wo)
 
-            self.math_wo = SolidConsumption(*input_wo)
+            self.math_wo = SolidConsumption(**inputs_wo)
             self.math_wo.calculate_emissions()
 
         else:
@@ -3454,7 +3453,6 @@ class FuelCalculator(BaseCalculator):
         log.debug("END FuelCalculator.calculate")
         log.debug("")
         return results_tuple
-
 
 class SettlementCalculator(LandModuleCalculator):
     """
