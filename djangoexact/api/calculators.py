@@ -4501,9 +4501,9 @@ class IrrigationPhaseCalculator(BaseCalculator):
         self.transportation_loss = SimpleNamespace(value=0)
         self.pumping_efficiency = SimpleNamespace(value=0)
 
-        self.inputs_start = []
-        self.inputs_w = []
-        self.inputs_wo = []
+        self.inputs_start = {}
+        self.inputs_w = {}
+        self.inputs_wo = {}
 
         self.math_start = None
         self.math_w = None
@@ -4557,76 +4557,76 @@ class IrrigationPhaseCalculator(BaseCalculator):
 
         self.get_defaults()
 
-        self.inputs_start = [
-            self.ef.emission_factor,
-            module.ef_t2_start,
-            module.total_dynamic_head_t2,
-            self.pressure.avg_pressure,
-            module.average_pressure_t2,
-            self.pumping_efficiency.value,
-            module.pumping_efficiency_t2_start,
-            self.erh_electricity,
-            self.energy_db.net_calorific_value,
-            self.energy_db.density,
-            module.well_depth,
-            module.ha_start,
-            0,
-            activity.change_rate.name,
-            project.implementation_years,
-            project.capitalization_years,
-            self.transportation_loss.value if module.fuel_type.name == "Electricity" else 0,
-            module.gross_irrigation_water_start,
-        ]
+        self.inputs_start = {
+            "ef_default": self.ef.emission_factor,
+            "ef_tier_2": module.ef_t2_start,
+            "total_dynamic_head_tier_2": module.total_dynamic_head_t2,
+            "average_pressure_default": self.pressure.avg_pressure,
+            "average_pressure_tier_2": module.average_pressure_t2,
+            "pumping_efficiency_default": self.pumping_efficiency.value,
+            "pumping_efficiency_tier_2": module.pumping_efficiency_t2_start,
+            "erh_electricity": self.erh_electricity,
+            "fuel_net_calorific_values": self.energy_db.net_calorific_value,
+            "fuel_density": self.energy_db.density,
+            "depth": module.well_depth,
+            "units_start": module.ha_start,
+            "units_end": 0,
+            "rate_type": activity.change_rate.name,
+            "time_impl": project.implementation_years,
+            "time_cap": project.capitalization_years,
+            "transportation_loss": self.transportation_loss.value if module.fuel_type.name == "Electricity" else 0,
+            "gwir": module.gross_irrigation_water_start,
+        }
 
-        math_start = OperationPhaseIrrigation(*self.inputs_start)
-        math_start.calculate_emissions()
+        self.math_start = OperationPhaseIrrigation(**self.inputs_start)
+        self.math_start.calculate_emissions()
 
-        self.inputs_w = [
-            self.ef.emission_factor,
-            module.ef_t2_w,
-            module.total_dynamic_head_t2,
-            self.pressure.avg_pressure,
-            module.average_pressure_t2,
-            self.pumping_efficiency.value,
-            module.pumping_efficiency_t2_w,
-            self.erh_electricity,
-            self.energy_db.net_calorific_value,
-            self.energy_db.density,
-            module.well_depth,
-            0,
-            module.ha_w,
-            activity.change_rate.name,
-            project.implementation_years,
-            project.capitalization_years,
-            self.transportation_loss.value if module.fuel_type.name == "Electricity" else 0,
-            module.gross_irrigation_water_w,
-        ]
+        self.inputs_w = {
+            "ef_default": self.ef.emission_factor,
+            "ef_tier_2": module.ef_t2_w,
+            "total_dynamic_head_tier_2": module.total_dynamic_head_t2,
+            "average_pressure_default": self.pressure.avg_pressure,
+            "average_pressure_tier_2": module.average_pressure_t2,
+            "pumping_efficiency_default": self.pumping_efficiency.value,
+            "pumping_efficiency_tier_2": module.pumping_efficiency_t2_w,
+            "erh_electricity": self.erh_electricity,
+            "fuel_net_calorific_values": self.energy_db.net_calorific_value,
+            "fuel_density": self.energy_db.density,
+            "depth": module.well_depth,
+            "units_start": 0,
+            "units_end": module.ha_w,
+            "rate_type": activity.change_rate.name,
+            "time_impl": project.implementation_years,
+            "time_cap": project.capitalization_years,
+            "transportation_loss": self.transportation_loss.value if module.fuel_type.name == "Electricity" else 0,
+            "gwir": module.gross_irrigation_water_w,
+        }
 
-        self.math_w = OperationPhaseIrrigation(*self.inputs_w)
+        self.math_w = OperationPhaseIrrigation(**self.inputs_w)
         self.math_w.calculate_emissions()
 
-        self.inputs_wo = [
-            self.ef.emission_factor,
-            module.ef_t2_wo,
-            module.total_dynamic_head_t2,
-            self.pressure.avg_pressure,
-            module.average_pressure_t2,
-            self.pumping_efficiency.value,
-            module.pumping_efficiency_t2_wo,
-            self.erh_electricity,
-            self.energy_db.net_calorific_value,
-            self.energy_db.density,
-            module.well_depth,
-            0,
-            module.ha_wo,
-            activity.change_rate.name,
-            project.implementation_years,
-            project.capitalization_years,
-            self.transportation_loss.value if module.fuel_type.name == "Electricity" else 0,
-            module.gross_irrigation_water_wo,
-        ]
+        self.inputs_wo = {
+            "ef_default": self.ef.emission_factor,
+            "ef_tier_2": module.ef_t2_wo,
+            "total_dynamic_head_tier_2": module.total_dynamic_head_t2,
+            "average_pressure_default": self.pressure.avg_pressure,
+            "average_pressure_tier_2": module.average_pressure_t2,
+            "pumping_efficiency_default": self.pumping_efficiency.value,
+            "pumping_efficiency_tier_2": module.pumping_efficiency_t2_wo,
+            "erh_electricity": self.erh_electricity,
+            "fuel_net_calorific_values": self.energy_db.net_calorific_value,
+            "fuel_density": self.energy_db.density,
+            "depth": module.well_depth,
+            "units_start": 0,
+            "units_end": module.ha_wo,
+            "rate_type": activity.change_rate.name,
+            "time_impl": project.implementation_years,
+            "time_cap": project.capitalization_years,
+            "transportation_loss": self.transportation_loss.value if module.fuel_type.name == "Electricity" else 0,
+            "gwir": module.gross_irrigation_water_wo,
+        }
 
-        self.math_wo = OperationPhaseIrrigation(*self.inputs_wo)
+        self.math_wo = OperationPhaseIrrigation(**self.inputs_wo)
         self.math_wo.calculate_emissions()
 
         self.results_start = self.math_start.result if self.math_start else MathResult(project.implementation_years, project.capitalization_years)
@@ -4636,7 +4636,6 @@ class IrrigationPhaseCalculator(BaseCalculator):
         results_tuple = (self.results_w + self.results_start, self.results_wo + self.results_start)
 
         return results_tuple
-
 
 class CoastalWetlandCalculator(BaseCalculator):
     """
