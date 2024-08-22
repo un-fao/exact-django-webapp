@@ -2540,7 +2540,6 @@ class SmallFisheryCalculator(BaseCalculator):
     """
 
     def get_defaults(self, calculate=False) -> dict:
-
         module: SmallFishery = self.data
         activity: Activity = module.activity
         project: Project = activity.project
@@ -2624,78 +2623,78 @@ class SmallFisheryCalculator(BaseCalculator):
 
         if module.is_with():
             log.debug("IS WITH")
-            self.inputs_w = [
-                project.implementation_years,
-                project.capitalization_years,
-                module.activity.change_rate.name,
-                module.total_catch_yr_start,
-                module.total_catch_yr_w,
-                ef_diesel_default,
-                module.energy_emission_factor_t2_start,
-                module.energy_emission_factor_t2_w,
-                fui_default_start,
-                fui_default_w,
-                module.fui_start,
-                module.fui_w,
-                module.refrigerant_gwp,
-                module.refrigerant_gwp_t2_start,
-                module.refrigerant_gwp_t2_w,
-                lost_refrigerant_default,
-                module.refrigerant_lost_per_tonne_t2_start,
-                module.refrigerant_lost_per_tonne_t2_w,
-                module.refrigerant_pc_start,
-                module.refrigerant_pc_w,
-                tonnes_ice_default,
-                module.tonnes_of_ice_t2_start,
-                module.tonnes_of_ice_t2_w,
-                kw_tonnes,
-                module.inshore_ice_production_kwh_per_tonne_t2_start,
-                module.inshore_ice_production_kwh_per_tonne_t2_w,
-                electricity_emission.operating_margin,
-                module.ice_preserved_catch_pc_start,
-                module.ice_preserved_catch_pc_w,
-            ]
+            self.inputs_w = {
+                "time_impl": project.implementation_years,
+                "time_cap": project.capitalization_years,
+                "rate_type": module.activity.change_rate.name,
+                "catch_start": module.total_catch_yr_start,
+                "catch_end": module.total_catch_yr_w,
+                "ef_diesel_default": ef_diesel_default,
+                "ef_diesel_start_tier_2": module.energy_emission_factor_t2_start,
+                "ef_diesel_tier_2_end": module.energy_emission_factor_t2_w,
+                "fui_default_start": fui_default_start,
+                "fui_default_end": fui_default_w,
+                "fui_start_tier_2": module.fui_start,
+                "fui_end_tier_2": module.fui_w,
+                "gwp_refrigerant_default": module.refrigerant_gwp,
+                "gwp_refrigerant_start_tier_2": module.refrigerant_gwp_t2_start,
+                "gwp_refrigerant_end_tier_2": module.refrigerant_gwp_t2_w,
+                "quantity_lost_refrigerant_default": lost_refrigerant_default,
+                "quantity_lost_refrigerant_start_tier_2": module.refrigerant_lost_per_tonne_t2_start,
+                "quantity_lost_refrigerant_end_tier_2": module.refrigerant_lost_per_tonne_t2_w,
+                "percentage_refrigerant_start": module.refrigerant_pc_start,
+                "percentage_refrigerant_end": module.refrigerant_pc_w,
+                "tonnes_ice_default": tonnes_ice_default,
+                "tonnes_ice_start_tier_2": module.tonnes_of_ice_t2_start,
+                "tonnes_ice_end_tier_2": module.tonnes_of_ice_t2_w,
+                "kwh_ice_per_tonne_default": kw_tonnes,
+                "kwh_ice_per_tonne_start_tier_2": module.inshore_ice_production_kwh_per_tonne_t2_start,
+                "kwh_ice_per_tonne_end_tier_2": module.inshore_ice_production_kwh_per_tonne_t2_w,
+                "operating_margin": electricity_emission.operating_margin,
+                "percentage_ice_start": module.ice_preserved_catch_pc_start,
+                "percentage_ice_end": module.ice_preserved_catch_pc_w,
+            }
             log.debug("Inputs with: %s", self.inputs_w)
 
-            math_w = MathFishery(*self.inputs_w)
+            math_w = MathFishery(**self.inputs_w)
             math_w.calculate_emissions()
 
         if module.is_without():
             log.debug("IS WITHOUT")
-            self.inputs_wo = [
-                project.implementation_years,
-                project.capitalization_years,
-                module.activity.change_rate.name,
-                module.total_catch_yr_start,
-                module.total_catch_yr_wo,
-                ef_diesel_default,
-                module.energy_emission_factor_t2_start,
-                module.energy_emission_factor_t2_wo,
-                fui_default_start,
-                fui_default_wo,
-                module.fui_start,
-                module.fui_wo,
-                module.refrigerant_gwp,
-                module.refrigerant_gwp_t2_start,
-                module.refrigerant_gwp_t2_wo,
-                lost_refrigerant_default,
-                module.refrigerant_lost_per_tonne_t2_start,
-                module.refrigerant_lost_per_tonne_t2_wo,
-                module.refrigerant_pc_start,
-                module.refrigerant_pc_wo,
-                tonnes_ice_default,
-                module.tonnes_of_ice_t2_start,
-                module.tonnes_of_ice_t2_wo,
-                kw_tonnes,
-                module.inshore_ice_production_kwh_per_tonne_t2_start,
-                module.inshore_ice_production_kwh_per_tonne_t2_wo,
-                electricity_emission.operating_margin,
-                module.ice_preserved_catch_pc_start,
-                module.ice_preserved_catch_pc_wo,
-            ]
+            self.inputs_wo = {
+                "time_impl": project.implementation_years,
+                "time_cap": project.capitalization_years,
+                "rate_type": module.activity.change_rate.name,
+                "catch_start": module.total_catch_yr_start,
+                "catch_end": module.total_catch_yr_wo,
+                "ef_diesel_default": ef_diesel_default,
+                "ef_diesel_start_tier_2": module.energy_emission_factor_t2_start,
+                "ef_diesel_tier_2_end": module.energy_emission_factor_t2_wo,
+                "fui_default_start": fui_default_start,
+                "fui_default_end": fui_default_wo,
+                "fui_start_tier_2": module.fui_start,
+                "fui_end_tier_2": module.fui_wo,
+                "gwp_refrigerant_default": module.refrigerant_gwp,
+                "gwp_refrigerant_start_tier_2": module.refrigerant_gwp_t2_start,
+                "gwp_refrigerant_end_tier_2": module.refrigerant_gwp_t2_wo,
+                "quantity_lost_refrigerant_default": lost_refrigerant_default,
+                "quantity_lost_refrigerant_start_tier_2": module.refrigerant_lost_per_tonne_t2_start,
+                "quantity_lost_refrigerant_end_tier_2": module.refrigerant_lost_per_tonne_t2_wo,
+                "percentage_refrigerant_start": module.refrigerant_pc_start,
+                "percentage_refrigerant_end": module.refrigerant_pc_wo,
+                "tonnes_ice_default": tonnes_ice_default,
+                "tonnes_ice_start_tier_2": module.tonnes_of_ice_t2_start,
+                "tonnes_ice_end_tier_2": module.tonnes_of_ice_t2_wo,
+                "kwh_ice_per_tonne_default": kw_tonnes,
+                "kwh_ice_per_tonne_start_tier_2": module.inshore_ice_production_kwh_per_tonne_t2_start,
+                "kwh_ice_per_tonne_end_tier_2": module.inshore_ice_production_kwh_per_tonne_t2_wo,
+                "operating_margin": electricity_emission.operating_margin,
+                "percentage_ice_start": module.ice_preserved_catch_pc_start,
+                "percentage_ice_end": module.ice_preserved_catch_pc_wo,
+            }
             log.debug("Inputs without: %s", self.inputs_wo)
 
-            math_wo = MathFishery(*self.inputs_wo)
+            math_wo = MathFishery(**self.inputs_wo)
             math_wo.calculate_emissions()
 
         results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
@@ -2711,7 +2710,7 @@ class SmallFisheryCalculator(BaseCalculator):
 
         log.debug("END SmallFisheryCalculator.calculate")
         return results_tuple
-
+    
     # def get_defaults(self):
     #     self.calculate()
 
