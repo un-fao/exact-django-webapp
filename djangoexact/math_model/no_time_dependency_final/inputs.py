@@ -146,13 +146,26 @@ class Roads(BaseModule):
 @dataclass
 class ElectricityConsumption(BaseModule):
 
-    emissions_factor: float
-    specific_factor_start: Optional[float]
-    specific_factor_end: Optional[float]
-    mwh_start: float
-    mwh_end: float
-    percent_loss_transportation_start: float
-    percent_loss_transportation_end: float
+
+class ElectricityConsumption(BaseModule):
+    def __init__(self, emissions_factor, specific_factor_start, specific_factor_end, mwh_start, mwh_end, percent_loss_transportation_start, percent_loss_transportation_end, rate_type, time_impl, time_cap):
+
+        self.emissions_factor = emissions_factor  # Match Country and Source of Emission Factor to Elec Table (columns 6 or 7)
+        self.specific_factor_start = specific_factor_start  # Tier 2 Value
+        self.specific_factor_end = specific_factor_end  # Tier 2 Value
+        self.mwh_start = mwh_start  # User Input
+        self.mwh_end = mwh_end  # User Input
+        self.percent_loss_transportation_start = percent_loss_transportation_start  # User Input expects number between 0 and 1
+        self.percent_loss_transportation_end = percent_loss_transportation_end
+        self.rate_type = rate_type  # Activity Input
+        self.time_impl = time_impl  # Project/Activity Input
+        self.time_cap = time_cap  # Project/Activity Input
+
+        # RESULTS
+        self.emissions_total_yearly = []
+        self.total_emissions = 0
+
+        self.result = Result(self.time_impl, self.time_cap)
 
     def calculate_emissions(
         self,

@@ -42,7 +42,7 @@ from math_model.no_time_dependency_final.inlands import (
     PeatExtraction as MathPeatExtraction,
 )
 from math_model.no_time_dependency_final.inputs import (
-    ElectryicityConsumption,
+    ElectricityConsumption,
     FuelConsumption,
     NewIrrigation,
     OperationPhaseIrrigation,
@@ -3233,7 +3233,6 @@ class ElectricityCalculator(BaseCalculator):
     """
 
     def get_defaults(self, calculate=False) -> dict:
-
         module: Electricity = self.data
         activity: Activity = module.parent.activity
         project: Project = activity.project
@@ -3279,41 +3278,38 @@ class ElectricityCalculator(BaseCalculator):
         except ipcc.ElectricityEmission.DoesNotExist:
             raise ValueError(f"Electricity emission for {project.country.name} does not exist")
 
-        math_w = None
-        math_wo = None
-
-        inputs_w = [
-            margin,
-            module.ef_t2_start,
-            module.ef_t2_w,
-            module.mwh_start,
-            module.mwh_w,
-            module.transmission_loss_start,
-            module.transmission_loss_w,
-            change_rate.name,
-            project.implementation_years,
-            project.capitalization_years,
-        ]
+        inputs_w = {
+            "emissions_factor": margin,
+            "specific_factor_start": module.ef_t2_start,
+            "specific_factor_end": module.ef_t2_w,
+            "mwh_start": module.mwh_start,
+            "mwh_end": module.mwh_w,
+            "percent_loss_transportation_start": module.transmission_loss_start,
+            "percent_loss_transportation_end": module.transmission_loss_w,
+            "rate_type": change_rate.name,
+            "time_impl": project.implementation_years,
+            "time_cap": project.capitalization_years,
+        }
         log.debug("Inputs with: %s", inputs_w)
 
-        math_w = ElectryicityConsumption(*inputs_w)
+        math_w = ElectricityConsumption(**inputs_w)
         math_w.calculate_emissions()
 
-        inputs_wo = [
-            margin,
-            module.ef_t2_start,
-            module.ef_t2_wo,
-            module.mwh_start,
-            module.mwh_wo,
-            module.transmission_loss_start,
-            module.transmission_loss_wo,
-            change_rate.name,
-            project.implementation_years,
-            project.capitalization_years,
-        ]
+        inputs_wo = {
+            "emissions_factor": margin,
+            "specific_factor_start": module.ef_t2_start,
+            "specific_factor_end": module.ef_t2_wo,
+            "mwh_start": module.mwh_start,
+            "mwh_end": module.mwh_wo,
+            "percent_loss_transportation_start": module.transmission_loss_start,
+            "percent_loss_transportation_end": module.transmission_loss_wo,
+            "rate_type": change_rate.name,
+            "time_impl": project.implementation_years,
+            "time_cap": project.capitalization_years,
+        }
         log.debug("Inputs without: %s", inputs_wo)
 
-        math_wo = ElectryicityConsumption(*inputs_wo)
+        math_wo = ElectricityConsumption(**inputs_wo)
         math_wo.calculate_emissions()
 
         results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
@@ -3333,7 +3329,6 @@ class ElectricityCalculator(BaseCalculator):
 
     def defaults(self) -> DefaultData:
         pass
-
 
 class FuelCalculator(BaseCalculator):
     """
