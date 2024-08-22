@@ -4417,7 +4417,7 @@ class IrrigationCalculator(BaseCalculator):
 
 class IrrigationSystemCalculator(BaseCalculator):
     """
-    Calculates the emissions of the irrigation system
+    Calculates the emissions of the irrigation system.
     """
 
     def __init__(self, input) -> None:
@@ -4425,8 +4425,8 @@ class IrrigationSystemCalculator(BaseCalculator):
 
         self.ef = SimpleNamespace(value=0)
 
-        self.inputs_w = []
-        self.inputs_wo = []
+        self.inputs_w = {}
+        self.inputs_wo = {}
 
         self.math_w = None
         self.math_wo = None
@@ -4446,7 +4446,7 @@ class IrrigationSystemCalculator(BaseCalculator):
 
     def calculate(self) -> list[Result]:
         """
-        Calculates the emissions of the irrigation system
+        Calculates the emissions of the irrigation system.
         """
 
         module: IrrigationSystem = self.data
@@ -4455,30 +4455,30 @@ class IrrigationSystemCalculator(BaseCalculator):
 
         self.get_defaults()
 
-        self.inputs_w = [
-            self.ef.value,
-            module.ef_t2_start,
-            module.ha_start,
-            module.ha_w,
-            project.implementation_years,
-            project.capitalization_years,
-            activity.change_rate.name,
-        ]
+        self.inputs_w = {
+            "ef_ref": self.ef.value,
+            "ef_tier_2": module.ef_t2_start,
+            "units_start": module.ha_start,
+            "units_end": module.ha_w,
+            "time_impl": project.implementation_years,
+            "time_cap": project.capitalization_years,
+            "rate_type": activity.change_rate.name,
+        }
 
-        self.math_w = NewIrrigation(*self.inputs_w)
+        self.math_w = NewIrrigation(**self.inputs_w)
         self.math_w.calculate_emissions()
 
-        self.inputs_wo = [
-            self.ef.value,
-            module.ef_t2_wo,
-            module.ha_start,
-            module.ha_wo,
-            project.implementation_years,
-            project.capitalization_years,
-            activity.change_rate.name,
-        ]
+        self.inputs_wo = {
+            "ef_ref": self.ef.value,
+            "ef_tier_2": module.ef_t2_wo,
+            "units_start": module.ha_start,
+            "units_end": module.ha_wo,
+            "time_impl": project.implementation_years,
+            "time_cap": project.capitalization_years,
+            "rate_type": activity.change_rate.name,
+        }
 
-        self.math_wo = NewIrrigation(*self.inputs_wo)
+        self.math_wo = NewIrrigation(**self.inputs_wo)
         self.math_wo.calculate_emissions()
 
         self.results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
@@ -4487,7 +4487,6 @@ class IrrigationSystemCalculator(BaseCalculator):
         results_tuple = (self.results_w, self.results_wo)
 
         return results_tuple
-
 
 class IrrigationPhaseCalculator(BaseCalculator):
 
