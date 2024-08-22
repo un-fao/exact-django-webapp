@@ -2311,6 +2311,7 @@ class GrasslandCalculator(LandModuleCalculator):
         # delay = ((activity.start_year_t2 or 0) - project.start_year) or 0
         # capitalization = project.implementation_years - duration + project.capitalization_years
 
+
         self.ef = utils.get_or_raise(ipcc.BurningEmissionFactor, {"category__name": "Savanna and grassland"}, "Burning emission factor for savanna and grassland does not exist")
         self.agb = utils.get_or_raise(ipcc.GrasslandAGB, {"climate": project.climate, "moisture": project.moisture}, f"AGB for {project.climate.name} climate and {project.moisture.name} moisture does not exist")
         self.cf = utils.get_or_raise(GrasslandParameter, {"name": "default_combustion_factor"}, "Default combustion factor does not exist")
@@ -2324,7 +2325,7 @@ class GrasslandCalculator(LandModuleCalculator):
         module: Grassland = self.module
         activity: Activity = module.activity
         project: Project = activity.project
-
+        
         # duration = activity.duration_t2 or project.implementation_years
         # # TODO: Is this assuming that the activity start_year must be > project start_year?
         # delay = ((activity.start_year_t2 or 0) - project.start_year) or 0
@@ -2335,197 +2336,201 @@ class GrasslandCalculator(LandModuleCalculator):
         if module.is_luc_remaining_same():
             log.debug("LUC remaining same")
 
-            self.inputs_start_w = [
-                *[self.area, 0],
-                project.implementation_years,
-                project.capitalization_years,
-                self.change_rate.name,
-                project.gw_potential.n2o,
-                project.gw_potential.ch4,
-                module.fire_periodicity_start,
-                module.is_fire_used_start,
-                self.ef.ch4,
-                self.ef.n2o,
-                self.agb.value,
-                module.get_biomass_t2(utils.ScenarioTypes.START),
-                self.cf.value,
-                module.combustion_factor_t2_start,
-                self.soc.value,
-                self.soc.value,
-                module.soc_t2_start,
-                module.soc_t2_w,
-                CALCULATE_SOC_SOM_START_W,
-                self.fmg_start.value,
-                self.fmg_w.value,
-                module.fmg_t2_start,
-                module.fmg_t2_w,
-                self.flu_start.value,
-                self.flu_w.value,
-                module.flu_t2_start,
-                module.flu_t2_w,
-                self.fi_start.value,
-                self.fi_w.value,
-                module.fi_t2_start,
-                module.fi_t2_w,
-                DELAY_START_W,
-                self.som.value,
-                self.biomass_ef_start.value,
-                self.biomass_ef_w.value,
-                module.biomass_t2_start,
-                module.biomass_t2_w,
-                module.fire_impact_start,
-            ]
+            self.inputs_start_w = {
+                "area_start": self.area,
+                "area_end": 0,
+                "time_impl": project.implementation_years,
+                "time_cap": project.capitalization_years,
+                "rate": self.change_rate.name,
+                "nitrous_constant": project.gw_potential.n2o,
+                "methane_constant": project.gw_potential.ch4,
+                "fire_interval": module.fire_periodicity_start,
+                "fire_used": module.is_fire_used_start,
+                "methane_ef": self.ef.ch4,
+                "nitrous_ef": self.ef.n2o,
+                "agb_ref": self.agb.value,
+                "agb_tier_2": module.get_biomass_t2(utils.ScenarioTypes.START),
+                "cf_ref": self.cf.value,
+                "cf_tier_2": module.combustion_factor_t2_start,
+                "soc_start_default": self.soc.value,
+                "soc_end_default": self.soc.value,
+                "soc_start_tier_2": module.soc_t2_start,
+                "soc_end_tier_2": module.soc_t2_w,
+                "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
+                "fmg_start_default": self.fmg_start.value,
+                "fmg_end_default": self.fmg_w.value,
+                "fmg_start_tier_2": module.fmg_t2_start,
+                "fmg_end_tier_2": module.fmg_t2_w,
+                "flu_start_default": self.flu_start.value,
+                "flu_end_default": self.flu_w.value,
+                "flu_start_tier_2": module.flu_t2_start,
+                "flu_end_tier_2": module.flu_t2_w,
+                "fi_start_default": self.fi_start.value,
+                "fi_end_default": self.fi_w.value,
+                "fi_start_tier_2": module.fi_t2_start,
+                "fi_end_tier_2": module.fi_t2_w,
+                "delay": DELAY_START_W,
+                "ef_nitrous_som": self.som.value,
+                "biomass_start_default": self.biomass_ef_start.value,
+                "biomass_end_default": self.biomass_ef_w.value,
+                "biomass_start_tier_2": module.biomass_t2_start,
+                "biomass_end_tier_2": module.biomass_t2_w,
+                "fire_impact": module.fire_impact_start,
+            }
 
             log.debug("Inputs start w: %s", self.inputs_start_w)
 
-            self.math_start_w = MathGrassland(*self.inputs_start_w)
+            self.math_start_w = MathGrassland(**self.inputs_start_w)
             self.math_start_w.calculate_emissions()
 
         if module.is_with():
             log.debug("With")
 
-            self.inputs_w = [
-                *[0, self.area],
-                project.implementation_years,
-                project.capitalization_years,
-                self.change_rate.name,
-                project.gw_potential.n2o,
-                project.gw_potential.ch4,
-                module.fire_periodicity_w,
-                module.is_fire_used_w,
-                self.ef.ch4,
-                self.ef.n2o,
-                self.agb.value,
-                module.get_biomass_t2(utils.ScenarioTypes.WITH),
-                self.cf.value,
-                module.combustion_factor_t2_start,
-                self.soc.value,
-                self.soc.value,
-                module.soc_t2_start,
-                module.soc_t2_w,
-                CALCULATE_SOC_SOM_W,
-                self.fmg_start.value,
-                self.fmg_w.value,
-                module.fmg_t2_start,
-                module.fmg_t2_w,
-                self.flu_start.value,
-                self.flu_w.value,
-                module.flu_t2_start,
-                module.flu_t2_w,
-                self.fi_start.value,
-                self.fi_w.value,
-                module.fi_t2_start,
-                module.fi_t2_w,
-                DELAY_W,
-                self.som.value,
-                self.biomass_ef_start.value,
-                self.biomass_ef_w.value,
-                module.biomass_t2_start,
-                module.biomass_t2_w,
-                module.fire_impact_w,
-            ]
+            self.inputs_w = {
+                "area_start": 0,
+                "area_end": self.area,
+                "time_impl": project.implementation_years,
+                "time_cap": project.capitalization_years,
+                "rate": self.change_rate.name,
+                "nitrous_constant": project.gw_potential.n2o,
+                "methane_constant": project.gw_potential.ch4,
+                "fire_interval": module.fire_periodicity_w,
+                "fire_used": module.is_fire_used_w,
+                "methane_ef": self.ef.ch4,
+                "nitrous_ef": self.ef.n2o,
+                "agb_ref": self.agb.value,
+                "agb_tier_2": module.get_biomass_t2(utils.ScenarioTypes.WITH),
+                "cf_ref": self.cf.value,
+                "cf_tier_2": module.combustion_factor_t2_start,
+                "soc_start_default": self.soc.value,
+                "soc_end_default": self.soc.value,
+                "soc_start_tier_2": module.soc_t2_start,
+                "soc_end_tier_2": module.soc_t2_w,
+                "calculate_soc_som": CALCULATE_SOC_SOM_W,
+                "fmg_start_default": self.fmg_start.value,
+                "fmg_end_default": self.fmg_w.value,
+                "fmg_start_tier_2": module.fmg_t2_start,
+                "fmg_end_tier_2": module.fmg_t2_w,
+                "flu_start_default": self.flu_start.value,
+                "flu_end_default": self.flu_w.value,
+                "flu_start_tier_2": module.flu_t2_start,
+                "flu_end_tier_2": module.flu_t2_w,
+                "fi_start_default": self.fi_start.value,
+                "fi_end_default": self.fi_w.value,
+                "fi_start_tier_2": module.fi_t2_start,
+                "fi_end_tier_2": module.fi_t2_w,
+                "delay": DELAY_W,
+                "ef_nitrous_som": self.som.value,
+                "biomass_start_default": self.biomass_ef_start.value,
+                "biomass_end_default": self.biomass_ef_w.value,
+                "biomass_start_tier_2": module.biomass_t2_start,
+                "biomass_end_tier_2": module.biomass_t2_w,
+                "fire_impact": module.fire_impact_w,
+            }
 
             log.debug("Inputs w: %s", self.inputs_w)
 
-            self.math_w = MathGrassland(*self.inputs_w)
+            self.math_w = MathGrassland(**self.inputs_w)
             self.math_w.calculate_emissions()
 
         if module.is_business_as_usual():
             log.debug("Business as usual")
 
-            self.inputs_start_wo = [
-                *[self.area, 0],
-                project.implementation_years,
-                project.capitalization_years,
-                self.change_rate.name,
-                project.gw_potential.n2o,
-                project.gw_potential.ch4,
-                module.fire_periodicity_start,
-                module.is_fire_used_start,
-                self.ef.ch4,
-                self.ef.n2o,
-                self.agb.value,
-                module.get_biomass_t2(utils.ScenarioTypes.START),
-                self.cf.value,
-                module.combustion_factor_t2_start,
-                self.soc.value,
-                self.soc.value,
-                module.soc_t2_start,
-                module.soc_t2_wo,
-                CALCULATE_SOC_SOM_START_WO,
-                self.fmg_start.value,
-                self.fmg_wo.value,
-                module.fmg_t2_start,
-                module.fmg_t2_wo,
-                self.flu_start.value,
-                self.flu_wo.value,
-                module.flu_t2_start,
-                module.flu_t2_wo,
-                self.fi_start.value,
-                self.fi_wo.value,
-                module.fi_t2_start,
-                module.fi_t2_wo,
-                DELAY_START_WO,
-                self.som.value,
-                self.biomass_ef_start.value,
-                self.biomass_ef_wo.value,
-                module.biomass_t2_start,
-                module.biomass_t2_wo,
-                module.fire_impact_start,
-            ]
+            self.inputs_start_wo = {
+                "area_start": self.area,
+                "area_end": 0,
+                "time_impl": project.implementation_years,
+                "time_cap": project.capitalization_years,
+                "rate": self.change_rate.name,
+                "nitrous_constant": project.gw_potential.n2o,
+                "methane_constant": project.gw_potential.ch4,
+                "fire_interval": module.fire_periodicity_start,
+                "fire_used": module.is_fire_used_start,
+                "methane_ef": self.ef.ch4,
+                "nitrous_ef": self.ef.n2o,
+                "agb_ref": self.agb.value,
+                "agb_tier_2": module.get_biomass_t2(utils.ScenarioTypes.START),
+                "cf_ref": self.cf.value,
+                "cf_tier_2": module.combustion_factor_t2_start,
+                "soc_start_default": self.soc.value,
+                "soc_end_default": self.soc.value,
+                "soc_start_tier_2": module.soc_t2_start,
+                "soc_end_tier_2": module.soc_t2_wo,
+                "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
+                "fmg_start_default": self.fmg_start.value,
+                "fmg_end_default": self.fmg_wo.value,
+                "fmg_start_tier_2": module.fmg_t2_start,
+                "fmg_end_tier_2": module.fmg_t2_wo,
+                "flu_start_default": self.flu_start.value,
+                "flu_end_default": self.flu_wo.value,
+                "flu_start_tier_2": module.flu_t2_start,
+                "flu_end_tier_2": module.flu_t2_wo,
+                "fi_start_default": self.fi_start.value,
+                "fi_end_default": self.fi_wo.value,
+                "fi_start_tier_2": module.fi_t2_start,
+                "fi_end_tier_2": module.fi_t2_wo,
+                "delay": DELAY_START_WO,
+                "ef_nitrous_som": self.som.value,
+                "biomass_start_default": self.biomass_ef_start.value,
+                "biomass_end_default": self.biomass_ef_wo.value,
+                "biomass_start_tier_2": module.biomass_t2_start,
+                "biomass_end_tier_2": module.biomass_t2_wo,
+                "fire_impact": module.fire_impact_start,
+            }
 
             log.debug("Inputs start wo: %s", self.inputs_start_wo)
 
-            self.math_start_wo = MathGrassland(*self.inputs_start_wo)
+            self.math_start_wo = MathGrassland(**self.inputs_start_wo)
             self.math_start_wo.calculate_emissions()
 
         if module.is_without():
             log.debug("Without")
 
-            self.inputs_wo = [
-                *[0, self.area],
-                project.implementation_years,
-                project.capitalization_years,
-                self.change_rate.name,
-                project.gw_potential.n2o,
-                project.gw_potential.ch4,
-                module.fire_periodicity_wo,
-                module.is_fire_used_wo,
-                self.ef.ch4,
-                self.ef.n2o,
-                self.agb.value,
-                module.get_biomass_t2(utils.ScenarioTypes.WITHOUT),
-                self.cf.value,
-                module.combustion_factor_t2_start,
-                self.soc.value,
-                self.soc.value,
-                module.soc_t2_start,
-                module.soc_t2_wo,
-                CALCULATE_SOC_SOM_WO,
-                self.fmg_start.value,
-                self.fmg_wo.value,
-                module.fmg_t2_start,
-                module.fmg_t2_wo,
-                self.flu_start.value,
-                self.flu_wo.value,
-                module.flu_t2_start,
-                module.flu_t2_wo,
-                self.fi_start.value,
-                self.fi_wo.value,
-                module.fi_t2_start,
-                module.fi_t2_wo,
-                DELAY_WO,
-                self.som.value,
-                self.biomass_ef_start.value,
-                self.biomass_ef_wo.value,
-                module.biomass_t2_start,
-                module.biomass_t2_wo,
-                module.fire_impact_wo,
-            ]
+            self.inputs_wo = {
+                "area_start": 0,
+                "area_end": self.area,
+                "time_impl": project.implementation_years,
+                "time_cap": project.capitalization_years,
+                "rate": self.change_rate.name,
+                "nitrous_constant": project.gw_potential.n2o,
+                "methane_constant": project.gw_potential.ch4,
+                "fire_interval": module.fire_periodicity_wo,
+                "fire_used": module.is_fire_used_wo,
+                "methane_ef": self.ef.ch4,
+                "nitrous_ef": self.ef.n2o,
+                "agb_ref": self.agb.value,
+                "agb_tier_2": module.get_biomass_t2(utils.ScenarioTypes.WITHOUT),
+                "cf_ref": self.cf.value,
+                "cf_tier_2": module.combustion_factor_t2_start,
+                "soc_start_default": self.soc.value,
+                "soc_end_default": self.soc.value,
+                "soc_start_tier_2": module.soc_t2_start,
+                "soc_end_tier_2": module.soc_t2_wo,
+                "calculate_soc_som": CALCULATE_SOC_SOM_WO,
+                "fmg_start_default": self.fmg_start.value,
+                "fmg_end_default": self.fmg_wo.value,
+                "fmg_start_tier_2": module.fmg_t2_start,
+                "fmg_end_tier_2": module.fmg_t2_wo,
+                "flu_start_default": self.flu_start.value,
+                "flu_end_default": self.flu_wo.value,
+                "flu_start_tier_2": module.flu_t2_start,
+                "flu_end_tier_2": module.flu_t2_wo,
+                "fi_start_default": self.fi_start.value,
+                "fi_end_default": self.fi_wo.value,
+                "fi_start_tier_2": module.fi_t2_start,
+                "fi_end_tier_2": module.fi_t2_wo,
+                "delay": DELAY_WO,
+                "ef_nitrous_som": self.som.value,
+                "biomass_start_default": self.biomass_ef_start.value,
+                "biomass_end_default": self.biomass_ef_wo.value,
+                "biomass_start_tier_2": module.biomass_t2_start,
+                "biomass_end_tier_2": module.biomass_t2_wo,
+                "fire_impact": module.fire_impact_wo,
+            }
 
             log.debug("Inputs wo: %s", self.inputs_wo)
 
-            self.math_wo = MathGrassland(*self.inputs_wo)
+            self.math_wo = MathGrassland(**self.inputs_wo)
             self.math_wo.calculate_emissions()
 
         self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(project.implementation_years, project.capitalization_years)
@@ -2535,7 +2540,6 @@ class GrasslandCalculator(LandModuleCalculator):
 
         log.debug("END GrasslandCalculator.calculate")
         return (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
-
 
 class SmallFisheryCalculator(BaseCalculator):
     """
