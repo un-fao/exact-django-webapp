@@ -3117,54 +3117,54 @@ class InputEntryCalculator(BaseCalculator):
 
         self.get_defaults()
 
-        self.inputs_w = [
-            module.value_start,
-            module.value_w,
-            activity.change_rate.name,
-            self.ef.co2_value if self.ef else None,
-            module.co2_emissions_t2,
-            self.ref.co2_multiplier,
-            self.ref.co2_emissions_multiplier,
-            project.implementation_years,
-            project.capitalization_years,
-            self.ef.n2o_value if self.ef else None,
-            module.n2o_emissions_t2,
-            self.ref.n2o_quantity_multiplier,
-            self.ref.n2o_emissions_multiplier,
-            self.ef.co2_eq_value if self.ef else None,
-            module.co2_e_emissions_t2,
-            self.ref.production_quantity_multiplier,
-            self.ref.production_emissions_multiplier,
-        ]
+        self.inputs_w = {
+            "unit_start": module.value_start,
+            "unit_end": module.value_w,
+            "rate_type": activity.change_rate.name,
+            "ipcc_factor_co2": self.ef.co2_value if self.ef else None,
+            "tier_2_factor_co2": module.co2_emissions_t2,
+            "unit_factor_co2": self.ref.co2_multiplier,
+            "emissions_factor_co2": self.ref.co2_emissions_multiplier,
+            "time_impl": project.implementation_years,
+            "time_cap": project.capitalization_years,
+            "ipcc_factor_n2o": self.ef.n2o_value if self.ef else None,
+            "tier_2_factor_n2o": module.n2o_emissions_t2,
+            "unit_factor_n2o": self.ref.n2o_quantity_multiplier,
+            "emissions_factor_n2o": self.ref.n2o_emissions_multiplier,
+            "ipcc_factor_eq": self.ef.co2_eq_value if self.ef else None,
+            "tier_2_factor_eq": module.co2_e_emissions_t2,
+            "unit_factor_eq": self.ref.production_quantity_multiplier,
+            "emissions_factor_eq": self.ref.production_emissions_multiplier,
+        }
 
-        math_w = MathInputs(*self.inputs_w)
-        math_w.calculate_emissions()
+        self.math_w = MathInputs(**self.inputs_w)
+        self.math_w.calculate_emissions()
 
-        self.inputs_wo = [
-            module.value_start,
-            module.value_wo,
-            activity.change_rate.name,
-            self.ef.co2_value if self.ef else None,
-            module.co2_emissions_t2,
-            self.ref.co2_multiplier,
-            self.ref.co2_emissions_multiplier,
-            project.implementation_years,
-            project.capitalization_years,
-            self.ef.n2o_value if self.ef else None,
-            module.n2o_emissions_t2,
-            self.ref.n2o_quantity_multiplier,
-            self.ref.n2o_emissions_multiplier,
-            self.ef.co2_eq_value if self.ef else None,
-            module.co2_e_emissions_t2,
-            self.ref.production_quantity_multiplier,
-            self.ref.production_emissions_multiplier,
-        ]
+        self.inputs_wo = {
+            "unit_start": module.value_start,
+            "unit_end": module.value_wo,
+            "rate_type": activity.change_rate.name,
+            "ipcc_factor_co2": self.ef.co2_value if self.ef else None,
+            "tier_2_factor_co2": module.co2_emissions_t2,
+            "unit_factor_co2": self.ref.co2_multiplier,
+            "emissions_factor_co2": self.ref.co2_emissions_multiplier,
+            "time_impl": project.implementation_years,
+            "time_cap": project.capitalization_years,
+            "ipcc_factor_n2o": self.ef.n2o_value if self.ef else None,
+            "tier_2_factor_n2o": module.n2o_emissions_t2,
+            "unit_factor_n2o": self.ref.n2o_quantity_multiplier,
+            "emissions_factor_n2o": self.ref.n2o_emissions_multiplier,
+            "ipcc_factor_eq": self.ef.co2_eq_value if self.ef else None,
+            "tier_2_factor_eq": module.co2_e_emissions_t2,
+            "unit_factor_eq": self.ref.production_quantity_multiplier,
+            "emissions_factor_eq": self.ref.production_emissions_multiplier,
+        }
 
-        math_wo = MathInputs(*self.inputs_wo)
-        math_wo.calculate_emissions()
+        self.math_wo = MathInputs(**self.inputs_wo)
+        self.math_wo.calculate_emissions()
 
-        results_w = math_w.result if math_w else MathResult(project.implementation_years, project.capitalization_years)
-        results_wo = math_wo.result if math_wo else MathResult(project.implementation_years, project.capitalization_years)
+        results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
+        results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
         results_tuple = (results_w, results_wo)
 
@@ -3177,18 +3177,17 @@ class InputEntryCalculator(BaseCalculator):
         defaults_w = {}
         defaults_wo = {}
 
-        math_w = MathInputs(*self.inputs_w)
+        math_w = MathInputs(**self.inputs_w)
         math_w_defaults = math_w.evaluate_tier_2_defaults()
         defaults_w.update(math_w_defaults.start)
         defaults_w.update(math_w_defaults.other)
 
-        math_wo = MathInputs(*self.inputs_wo)
+        math_wo = MathInputs(**self.inputs_wo)
         math_wo_defaults = math_wo.evaluate_tier_2_defaults()
         defaults_wo.update(math_wo_defaults.start)
         defaults_wo.update(math_wo_defaults.other)
 
         return DefaultData(defaults_start, defaults_w, defaults_wo)
-
 
 class EnergyCalculator(BaseCalculator):
     """
