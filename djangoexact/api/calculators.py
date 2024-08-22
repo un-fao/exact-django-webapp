@@ -1046,100 +1046,102 @@ class OtherLandUseCalculator(BaseCalculator):
         try:
             combustion_factor_wo = ipcc.AfforestationCombustionFactor.objects.get_or_default(land_use_type=luc_wo)
         except ipcc.AfforestationCombustionFactor.DoesNotExist:
-            raise Exception(f"AfforestationCombustionFactor for {luc_wo.name} does not exist")
-
+            raise Exception(f"AfforestationCombustionFactor for {luc_wo.name} does not exist")  
+        
         DELAY_W = 0
         DELAY_WO = 0
 
         if input.is_with():
-            inputs_w = [
-                biomass_initial.value,
-                module_start.get_biomass_t2(utils.ScenarioTypes.START),
-                biomass_final_w.value,
-                module_w.get_biomass_t2(utils.ScenarioTypes.WITH),
-                c_n_ratio,
-                som.value,
-                combustion_factor_w.value,
-                combustion_factor_w.n2o,
-                combustion_factor_w.ch4,
-                input.activity.project.gw_potential.n2o,
-                input.activity.project.gw_potential.ch4,
-                luc.is_fire_used_w,
-                soc.value,
-                soc.value,
-                module_start.soc_t2_start,
-                module_w.soc_t2_w,
-                soc_start.fmg if soc_start else fmg_start.value,
-                fmg_final_w.value,
-                module_start.fmg_t2_start,  # TODO: Start module has 3 fmg values. What to choose?
-                module_w.fmg_t2_w,
-                soc_start.flu if soc_start else flu_start.value,
-                flu_final_w.value,
-                module_start.flu_t2_start,
-                module_w.flu_t2_w,
-                soc_start.fi if soc_start else fi_start.value,
-                fi_final_w.value,
-                module_start.fi_t2_start,
-                module_w.fi_t2_w,
-                CALCULATE_SOC_SOM_W,
-                luc.area,
-                project.implementation_years,
-                project.capitalization_years,
-                input.activity.change_rate.name,
-                luc.dry_matter_w,
-                DELAY_W,
-            ]
+            inputs_w = {
+                "initial_lu_biomass": biomass_initial.value,
+                "initial_lu_biomass_tier_2": module_start.get_biomass_t2(utils.ScenarioTypes.START),
+                "final_lu_biomass": biomass_final_w.value,
+                "final_lu_biomass_tier_2": module_w.get_biomass_t2(utils.ScenarioTypes.WITH),
+                "c_n_ratio": c_n_ratio,
+                "moisture_emission_factor": som.value,
+                "combustion_factor": combustion_factor_w.value,
+                "emission_factor_nitrous": combustion_factor_w.n2o,
+                "emission_factor_methane": combustion_factor_w.ch4,
+                "nitrous_constant": input.activity.project.gw_potential.n2o,
+                "methane_constant": input.activity.project.gw_potential.ch4,
+                "fire_bool": luc.is_fire_used_w,
+                "soc_start_default": soc.value,
+                "soc_end_default": soc.value,
+                "soc_start_tier_2": module_start.soc_t2_start,
+                "soc_end_tier_2": module_w.soc_t2_w,
+                "fmg_start_default": soc_start.fmg if soc_start else fmg_start.value,
+                "fmg_end_default": fmg_final_w.value,
+                "fmg_start_tier_2": module_start.fmg_t2_start, # TODO: Start module has 3 fmg (also fi and flu) values. What to choose?
+                "fmg_end_tier_2": module_w.fmg_t2_w,
+                "flu_start_default": soc_start.flu if soc_start else flu_start.value,
+                "flu_end_default": flu_final_w.value,
+                "flu_start_tier_2": module_start.flu_t2_start,
+                "flu_end_tier_2": module_w.flu_t2_w,
+                "fi_start_default": soc_start.fi if soc_start else fi_start.value,
+                "fi_end_default": fi_final_w.value,
+                "fi_start_tier_2": module_start.fi_t2_start,
+                "fi_end_tier_2": module_w.fi_t2_w,
+                "calculate_soc_som": CALCULATE_SOC_SOM_W,
+                "area": luc.area,
+                "time_impl": project.implementation_years,
+                "time_cap": project.capitalization_years,
+                "rate": input.activity.change_rate.name,
+                "dry_matter_end": luc.dry_matter_w,
+                "delay": DELAY_W,
+            }
 
-            self.results_w = MathOtherLandUseChanges(*inputs_w)
+            self.results_w = MathOtherLandUseChanges(**inputs_w)
             self.results_w.calculate_emissions()
 
         if input.is_without():
-            inputs_wo = [
-                biomass_initial.value,
-                module_start.get_biomass_t2(utils.ScenarioTypes.START),
-                biomass_final_wo.value,
-                module_wo.get_biomass_t2(utils.ScenarioTypes.WITHOUT),
-                c_n_ratio,
-                som.value,
-                combustion_factor_wo.value,
-                combustion_factor_wo.ch4,
-                combustion_factor_wo.n2o,
-                input.activity.project.gw_potential.ch4,
-                input.activity.project.gw_potential.n2o,
-                luc.is_fire_used_wo,
-                soc.value,
-                soc.value,
-                module_start.soc_t2_start,
-                module_wo.soc_t2_wo,
-                fmg_start.value,
-                fmg_final_wo.value,
-                module_start.fmg_t2_start,  # TODO: Start module has 3 fmg (also fi and flu) values. What to choose?
-                module_wo.fmg_t2_wo,
-                flu_start.value,
-                flu_final_wo.value,
-                module_start.flu_t2_start,
-                module_wo.flu_t2_wo,
-                fi_start.value,
-                fi_final_wo.value,
-                module_start.fi_t2_start,
-                module_wo.fi_t2_wo,
-                CALCULATE_SOC_SOM_WO,
-                luc.area,
-                project.implementation_years,
-                project.capitalization_years,
-                input.activity.change_rate.name,
-                luc.dry_matter_wo,
-                DELAY_WO,
-            ]
+            inputs_wo = {
+                "initial_lu_biomass": biomass_initial.value,
+                "initial_lu_biomass_tier_2": module_start.get_biomass_t2(utils.ScenarioTypes.START),
+                "final_lu_biomass": biomass_final_wo.value,
+                "final_lu_biomass_tier_2": module_wo.get_biomass_t2(utils.ScenarioTypes.WITHOUT),
+                "c_n_ratio": c_n_ratio,
+                "moisture_emission_factor": som.value,
+                "combustion_factor": combustion_factor_wo.value,
+                "emission_factor_nitrous": combustion_factor_wo.n2o,
+                "emission_factor_methane": combustion_factor_wo.ch4,
+                "nitrous_constant": input.activity.project.gw_potential.n2o,
+                "methane_constant": input.activity.project.gw_potential.ch4,
+                "fire_bool": luc.is_fire_used_wo,
+                "soc_start_default": soc.value,
+                "soc_end_default": soc.value,
+                "soc_start_tier_2": module_start.soc_t2_start,
+                "soc_end_tier_2": module_wo.soc_t2_wo,
+                "fmg_start_default": fmg_start.value,
+                "fmg_end_default": fmg_final_wo.value,
+                "fmg_start_tier_2": module_start.fmg_t2_start, # TODO: Start module has 3 fmg (also fi and flu) values. What to choose?
+                "fmg_end_tier_2": module_wo.fmg_t2_wo,
+                "flu_start_default": flu_start.value,
+                "flu_end_default": flu_final_wo.value,
+                "flu_start_tier_2": module_start.flu_t2_start,
+                "flu_end_tier_2": module_wo.flu_t2_wo,
+                "fi_start_default": fi_start.value,
+                "fi_end_default": fi_final_wo.value,
+                "fi_start_tier_2": module_start.fi_t2_start,
+                "fi_end_tier_2": module_wo.fi_t2_wo,
+                "calculate_soc_som": CALCULATE_SOC_SOM_WO,
+                "area": luc.area,
+                "time_impl": project.implementation_years,
+                "time_cap": project.capitalization_years,
+                "rate": input.activity.change_rate.name,
+                "dry_matter_end": luc.dry_matter_wo,
+                "delay": DELAY_WO,
+            }
 
-            self.results_wo = MathOtherLandUseChanges(*inputs_wo)
+            self.results_wo = MathOtherLandUseChanges(**inputs_wo)
             self.results_wo.calculate_emissions()
 
         res_w = self.results_w.result if self.results_w else MathResult(project.implementation_years, project.capitalization_years)
         res_wo = self.results_wo.result if self.results_wo else MathResult(project.implementation_years, project.capitalization_years)
 
         return (res_w, res_wo)
-
+        
+        
+        
     def get_defaults(self, calculate=False) -> dict:
         return super().get_defaults(calculate)
 
