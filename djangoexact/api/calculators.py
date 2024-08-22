@@ -4914,72 +4914,77 @@ class WaterbodyCalculator(BaseCalculator):
 
         self.get_defaults()
 
-        self.inputs_start = [
-            module.area,
-            0,
-            self.trophic_state_start.value,
-            self.methane_emission_factor.value,
-            module.alpha_t2_start,
-            0,
-            module.ch4_ef_t2_start,
-            0,
-            project.gw_potential.ch4,
-            project.capitalization_years,
-            project.implementation_years,
-            module.activity.change_rate.name,
-            module.mean_annual_t2_start,
-            0,
-        ]
+        # Inputs for the starting scenario
+        inputs_start = {
+            "area_start": module.area,
+            "area_end": 0,
+            "trophic_state_default": self.trophic_state_start.value,
+            "methane_emission_factor_default": self.methane_emission_factor.value,
+            "trophic_state_tier_2_start": module.alpha_t2_start,
+            "trophic_state_tier_2_end": 0,
+            "methane_emission_factor_start_tier_2": module.ch4_ef_t2_start,
+            "methane_emission_factor_end_tier_2": 0,
+            "methane_constant": project.gw_potential.ch4,
+            "time_cap": project.capitalization_years,
+            "time_impl": project.implementation_years,
+            "rate": module.activity.change_rate.name,
+            "chlo_A_start": module.mean_annual_t2_start,
+            "chlo_A_end": 0,
+        }
 
-        self.math_start = MathWaterbodies(*self.inputs_start)
+        self.math_start = MathWaterbodies(**inputs_start)
         self.math_start.calculate_emissions()
 
         if module.is_with():
-            self.inputs_w = [
-                0,
-                module.area,
-                self.trophic_state_w.value,
-                self.methane_emission_factor.value,
-                module.alpha_t2_start,
-                module.alpha_t2_w,
-                module.ch4_ef_t2_start,
-                module.ch4_ef_t2_w,
-                project.gw_potential.ch4,
-                project.capitalization_years,
-                project.implementation_years,
-                module.activity.change_rate.name,
-                module.mean_annual_t2_start,
-                module.mean_annual_t2_w,
-            ]
+            # Inputs for the "with" scenario
+            inputs_w = {
+                "area_start": 0,
+                "area_end": module.area,
+                "trophic_state_default": self.trophic_state_w.value,
+                "methane_emission_factor_default": self.methane_emission_factor.value,
+                "trophic_state_tier_2_start": module.alpha_t2_start,
+                "trophic_state_tier_2_end": module.alpha_t2_w,
+                "methane_emission_factor_start_tier_2": module.ch4_ef_t2_start,
+                "methane_emission_factor_end_tier_2": module.ch4_ef_t2_w,
+                "methane_constant": project.gw_potential.ch4,
+                "time_cap": project.capitalization_years,
+                "time_impl": project.implementation_years,
+                "rate": module.activity.change_rate.name,
+                "chlo_A_start": module.mean_annual_t2_start,
+                "chlo_A_end": module.mean_annual_t2_w,
+            }
 
-            self.math_w = MathWaterbodies(*self.inputs_w)
+            self.math_w = MathWaterbodies(**inputs_w)
             self.math_w.calculate_emissions()
 
         if module.is_without():
-            self.inputs_wo = [
-                0,
-                module.area,
-                self.trophic_state_wo.value,
-                self.methane_emission_factor.value,
-                module.alpha_t2_start,
-                module.alpha_t2_wo,
-                module.ch4_ef_t2_start,
-                module.ch4_ef_t2_wo,
-                project.gw_potential.ch4,
-                project.capitalization_years,
-                project.implementation_years,
-                module.activity.change_rate.name,
-                module.mean_annual_t2_start,
-                module.mean_annual_t2_wo,
-            ]
+            # Inputs for the "without" scenario
+            inputs_wo = {
+                "area_start": 0,
+                "area_end": module.area,
+                "trophic_state_default": self.trophic_state_wo.value,
+                "methane_emission_factor_default": self.methane_emission_factor.value,
+                "trophic_state_tier_2_start": module.alpha_t2_start,
+                "trophic_state_tier_2_end": module.alpha_t2_wo,
+                "methane_emission_factor_start_tier_2": module.ch4_ef_t2_start,
+                "methane_emission_factor_end_tier_2": module.ch4_ef_t2_wo,
+                "methane_constant": project.gw_potential.ch4,
+                "time_cap": project.capitalization_years,
+                "time_impl": project.implementation_years,
+                "rate": module.activity.change_rate.name,
+                "chlo_A_start": module.mean_annual_t2_start,
+                "chlo_A_end": module.mean_annual_t2_wo,
+            }
 
-            self.math_wo = MathWaterbodies(*self.inputs_wo)
+            self.math_wo = MathWaterbodies(**inputs_wo)
             self.math_wo.calculate_emissions()
 
+        # Collect results
         self.results_start = self.math_start.result if self.math_start else MathResult(project.implementation_years, project.capitalization_years)
         self.results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
         self.results_wo = self.math_wo.result if self.math_wo else MathResult(project.implementation_years, project.capitalization_years)
 
+        # Combine results
         results_tuple = (self.results_w + self.results_start, self.results_wo + self.results_start)
 
         return results_tuple
