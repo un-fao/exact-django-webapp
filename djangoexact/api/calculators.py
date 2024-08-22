@@ -3741,7 +3741,7 @@ class BuildingCalculator(BaseCalculator):
         module: Building = self.data
 
         # TODO: What do we need the start scenario for?
-        # TODO: Define if all the fields of an input are required after creation
+        # TODO: Define if all the fields of an input are required after creation        
         self.ef = utils.get_or_raise(ipcc.BuildingEmissionFactor, {"building_type": module.building_type}, f"Could not find Building EF for {module.building_type}")
 
     def calculate(self) -> list[Result]:
@@ -3760,30 +3760,29 @@ class BuildingCalculator(BaseCalculator):
         self.results_wo = MathResult(project.implementation_years, project.capitalization_years)
 
         if module.is_with():
-            self.inputs_w = [
-                self.ef.value,
-                module.ef_t2_w,
-                module.area_m2_w,
-                project.implementation_years,
-                project.capitalization_years,
-                activity.change_rate.name,
-            ]
+            self.inputs_w = {
+                "ef_ipcc": self.ef.value,
+                "ef_tier_2": module.ef_t2_w,
+                "area": module.area_m2_w,
+                "time_impl": project.implementation_years,
+                "time_cap": project.capitalization_years,
+                "rate_type": activity.change_rate.name,
+            }
 
-            self.math_w = MathRoads(*self.inputs_w)
+            self.math_w = MathRoads(**self.inputs_w)
             self.math_w.calculate_emissions()
 
         if module.is_without():
+            self.inputs_wo = {
+                "ef_ipcc": self.ef.value,
+                "ef_tier_2": module.ef_t2_wo,
+                "area": module.area_m2_wo,
+                "time_impl": project.implementation_years,
+                "time_cap": project.capitalization_years,
+                "rate_type": activity.change_rate.name,
+            }
 
-            self.inputs_wo = [
-                self.ef.value,
-                module.ef_t2_wo,
-                module.area_m2_wo,
-                project.implementation_years,
-                project.capitalization_years,
-                activity.change_rate.name,
-            ]
-
-            self.math_wo = MathRoads(*self.inputs_wo)
+            self.math_wo = MathRoads(**self.inputs_wo)
             self.math_wo.calculate_emissions()
 
         self.results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
@@ -3792,7 +3791,6 @@ class BuildingCalculator(BaseCalculator):
         results_tuple = (self.results_w, self.results_wo)
 
         return results_tuple
-
 
 class RoadCalculator(BaseCalculator):
     """
@@ -3812,7 +3810,7 @@ class RoadCalculator(BaseCalculator):
 
     def calculate(self) -> list[Result]:
         """
-        Calculate emissions for a single Building module.
+        Calculate emissions for a single Road module.
         """
 
         module: Road = self.data
@@ -3826,29 +3824,29 @@ class RoadCalculator(BaseCalculator):
         self.results_wo = MathResult(project.implementation_years, project.capitalization_years)
 
         if module.is_with():
-            self.inputs_w = [
-                self.ef.value,
-                module.ef_t2_w,
-                module.length_km_w * module.width_m_w,
-                project.implementation_years,
-                project.capitalization_years,
-                activity.change_rate.name,
-            ]
+            self.inputs_w = {
+                "ef_ipcc": self.ef.value,
+                "ef_tier_2": module.ef_t2_w,
+                "area": module.length_km_w * module.width_m_w,
+                "time_impl": project.implementation_years,
+                "time_cap": project.capitalization_years,
+                "rate_type": activity.change_rate.name,
+            }
 
-            self.math_w = MathRoads(*self.inputs_w)
+            self.math_w = MathRoads(**self.inputs_w)
             self.math_w.calculate_emissions()
 
         if module.is_without():
-            self.inputs_wo = [
-                self.ef.value,
-                module.ef_t2_wo,
-                module.length_km_wo * module.width_m_wo,
-                project.implementation_years,
-                project.capitalization_years,
-                activity.change_rate.name,
-            ]
+            self.inputs_wo = {
+                "ef_ipcc": self.ef.value,
+                "ef_tier_2": module.ef_t2_wo,
+                "area": module.length_km_wo * module.width_m_wo,
+                "time_impl": project.implementation_years,
+                "time_cap": project.capitalization_years,
+                "rate_type": activity.change_rate.name,
+            }
 
-            self.math_wo = MathRoads(*self.inputs_wo)
+            self.math_wo = MathRoads(**self.inputs_wo)
             self.math_wo.calculate_emissions()
 
         self.results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
@@ -3857,7 +3855,6 @@ class RoadCalculator(BaseCalculator):
         results_tuple = (self.results_w, self.results_wo)
 
         return results_tuple
-
 
 class LivestockCalculator(BaseCalculator):
     """
