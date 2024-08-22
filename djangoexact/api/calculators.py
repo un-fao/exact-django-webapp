@@ -4651,8 +4651,8 @@ class CoastalWetlandCalculator(BaseCalculator):
 
         self.soil_type_name = ""
 
-        self.inputs_w = []
-        self.inputs_wo = []
+        self.inputs_w = {}
+        self.inputs_wo = {}
 
         self.math_w = None
         self.math_wo = None
@@ -4672,7 +4672,6 @@ class CoastalWetlandCalculator(BaseCalculator):
         }
 
         self.soil_type_name = module.soil_type_t2.name if module.soil_type_t2 else "Mineral"
-
         self.salinity_type = module.avg_salinity_t2 if module.avg_salinity_t2 else SalinityType.objects.get(value=">18")
 
         try:
@@ -4731,77 +4730,77 @@ class CoastalWetlandCalculator(BaseCalculator):
         self.get_defaults()
 
         if module.is_with():
-            self.inputs_w = [
-                module.area,
-                module.area_under_drainage_start,
-                module.area_under_drainage_w,
-                module.activity.change_rate.name,
-                project.implementation_years,
-                project.capitalization_years,
-                self.agb.value,
-                self.bgb.value,
-                self.litter.value,
-                self.dw.value,
-                self.soil_1m.value,
-                self.ef_drainage.value,
-                module.agb_t2_w,
-                module.bgb_t2_w,
-                module.litter_t2_w,
-                module.deadwood_t2_w,
-                module.soc_t2_w,
-                module.drainage_ef_t2_w,
-                module.drained_area_excavated_start,
-                module.drained_area_excavated_w,
-                module.area_w_restored_vegetation_start,
-                module.area_w_restored_vegetation_w,
-                self.pc_c_lost_excavation.value,
-                module.pc_c_lost_after_excavation_t2_w,
-                self.rewetting_c.value,
-                self.rewetting_ch4.value,
-                module.co2_rewetting_t2_start,
-                module.ch4_rewetting_t2_w,
-                module.avg_salinity_t2.value if module.avg_salinity_t2 else None,
-                project.gw_potential.ch4,
-            ]
+            self.inputs_w = {
+                "maximum_area_for_water_management": module.area,
+                "area_drained_start": module.area_under_drainage_start,
+                "area_drained_end": module.area_under_drainage_w,
+                "rate_type": module.activity.change_rate.name,
+                "time_impl": project.implementation_years,
+                "time_cap": project.capitalization_years,
+                "agb_default": self.agb.value,
+                "bgb_default": self.bgb.value,
+                "litter_default": self.litter.value,
+                "deadwood_default": self.dw.value,
+                "soil_1m_default": self.soil_1m.value,
+                "EF_drainage_default": self.ef_drainage.value,
+                "agb_tier_2": module.agb_t2_w,
+                "bgb_tier_2": module.bgb_t2_w,
+                "litter_tier_2": module.litter_t2_w,
+                "deadwood_tier_2": module.deadwood_t2_w,
+                "soil_1m_tier_2": module.soc_t2_w,
+                "EF_drainage_tier_2": module.drainage_ef_t2_w,
+                "area_excavated_start": module.drained_area_excavated_start,
+                "area_excavated_end": module.drained_area_excavated_w,
+                "area_revegated_start": module.area_w_restored_vegetation_start,
+                "area_revegated_end": module.area_w_restored_vegetation_w,
+                "percentage_c_lost_excavation_default": self.pc_c_lost_excavation.value,
+                "percentage_c_lost_excavation_tier_2": module.pc_c_lost_after_excavation_t2_w,
+                "ef_rewetting_carbon_default": self.rewetting_c.value,
+                "ef_rewetting_methane_default": self.rewetting_ch4.value,
+                "ef_rewetting_carbon_tier_2": module.co2_rewetting_t2_start,
+                "ef_rewetting_methane_tier_2": module.ch4_rewetting_t2_w,
+                "soil_type": module.avg_salinity_t2.value if module.avg_salinity_t2 else None,
+                "methane_constant": project.gw_potential.ch4,
+            }
 
-            self.math_w = MathCoastalWetland(*self.inputs_w)
+            self.math_w = MathCoastalWetland(**self.inputs_w)
             self.math_w.calculate_emissions()
 
         if module.is_without():
-            self.inputs_wo = [
-                module.area,
-                module.area_under_drainage_start,
-                module.area_under_drainage_wo,
-                module.activity.change_rate.name,
-                project.implementation_years,
-                project.capitalization_years,
-                self.agb.value,
-                self.bgb.value,
-                self.litter.value,
-                self.dw.value,
-                self.soil_1m.value,
-                self.ef_drainage.value,
-                module.agb_t2_wo,
-                module.bgb_t2_wo,
-                module.litter_t2_wo,
-                module.deadwood_t2_wo,
-                module.soc_t2_wo,
-                module.drainage_ef_t2_wo,
-                module.drained_area_excavated_start,
-                module.drained_area_excavated_wo,
-                module.area_w_restored_vegetation_start,
-                module.area_w_restored_vegetation_wo,
-                self.pc_c_lost_excavation.value,
-                module.pc_c_lost_after_excavation_t2_wo,
-                self.rewetting_c.value,
-                self.rewetting_ch4.value,
-                module.co2_rewetting_t2_wo,
-                module.ch4_rewetting_t2_wo,
-                module.avg_salinity_t2.value if module.avg_salinity_t2 else None,
-                project.gw_potential.ch4,
-            ]
+            self.inputs_wo = {
+                "maximum_area_for_water_management": module.area,
+                "area_drained_start": module.area_under_drainage_start,
+                "area_drained_end": module.area_under_drainage_wo,
+                "rate_type": module.activity.change_rate.name,
+                "time_impl": project.implementation_years,
+                "time_cap": project.capitalization_years,
+                "agb_default": self.agb.value,
+                "bgb_default": self.bgb.value,
+                "litter_default": self.litter.value,
+                "deadwood_default": self.dw.value,
+                "soil_1m_default": self.soil_1m.value,
+                "EF_drainage_default": self.ef_drainage.value,
+                "agb_tier_2": module.agb_t2_wo,
+                "bgb_tier_2": module.bgb_t2_wo,
+                "litter_tier_2": module.litter_t2_wo,
+                "deadwood_tier_2": module.deadwood_t2_wo,
+                "soil_1m_tier_2": module.soc_t2_wo,
+                "EF_drainage_tier_2": module.drainage_ef_t2_wo,
+                "area_excavated_start": module.drained_area_excavated_start,
+                "area_excavated_end": module.drained_area_excavated_wo,
+                "area_revegated_start": module.area_w_restored_vegetation_start,
+                "area_revegated_end": module.area_w_restored_vegetation_wo,
+                "percentage_c_lost_excavation_default": self.pc_c_lost_excavation.value,
+                "percentage_c_lost_excavation_tier_2": module.pc_c_lost_after_excavation_t2_wo,
+                "ef_rewetting_carbon_default": self.rewetting_c.value,
+                "ef_rewetting_methane_default": self.rewetting_ch4.value,
+                "ef_rewetting_carbon_tier_2": module.co2_rewetting_t2_wo,
+                "ef_rewetting_methane_tier_2": module.ch4_rewetting_t2_wo,
+                "soil_type": module.avg_salinity_t2.value if module.avg_salinity_t2 else None,
+                "methane_constant": project.gw_potential.ch4,
+            }
 
-            self.math_wo = MathCoastalWetland(*self.inputs_wo)
+            self.math_wo = MathCoastalWetland(**self.inputs_wo)
             self.math_wo.calculate_emissions()
 
         self.results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
@@ -4821,24 +4820,24 @@ class CoastalWetlandCalculator(BaseCalculator):
         defaults_wo = {}
 
         if module.is_luc_remaining_same():
-            math_start = MathCoastalWetland(*self.inputs_start_w)
+            math_start = MathCoastalWetland(**self.inputs_w)
             math_start_defaults = math_start.evaluate_tier_2_defaults()
             defaults_start.update(math_start_defaults.start)
             defaults_start.update(math_start_defaults.other)
         elif module.is_business_as_usual():
-            math_start_wo = MathCoastalWetland(*self.inputs_start_wo)
+            math_start_wo = MathCoastalWetland(**self.inputs_wo)
             math_start_wo_defaults = math_start_wo.evaluate_tier_2_defaults()
             defaults_start.update(math_start_wo_defaults.start)
             defaults_start.update(math_start_wo_defaults.other)
 
         if module.is_with():
-            math_w = MathCoastalWetland(*self.inputs_w)
+            math_w = MathCoastalWetland(**self.inputs_w)
             math_w_defaults = math_w.evaluate_tier_2_defaults()
             defaults_w.update(math_w_defaults.start)
             defaults_w.update(math_w_defaults.other)
 
         if module.is_without():
-            math_wo = MathCoastalWetland(*self.inputs_wo)
+            math_wo = MathCoastalWetland(**self.inputs_wo)
             math_wo_defaults = math_wo.evaluate_tier_2_defaults()
             defaults_wo.update(math_wo_defaults.start)
             defaults_wo.update(math_wo_defaults.other)
