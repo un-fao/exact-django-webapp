@@ -2987,50 +2987,50 @@ class AquacultureCalculator(BaseCalculator):
 
         if module.is_with():
             log.debug("IS WITH")
-            self.inputs_w = [
-                module.annual_production_start,
-                module.annual_production_w,
-                self.NITROUS_EF_DEFAULT,
-                module.n2o_from_production_t2_start,
-                module.n2o_from_production_t2_w,
-                project.gw_potential.n2o,
-                self.ELECTRICITY_USED_DEFAULT,
-                module.electricity_used_t2_start,
-                module.electricity_used_t2_w,
-                self.elec.operating_margin,
-                module.electricity_ef_t2_start,
-                module.electricity_ef_t2_w,
-                project.implementation_years,
-                project.capitalization_years,
-                change_rate.name,
-            ]
+            self.inputs_w = {
+                "production_start": module.annual_production_start,
+                "production_w": module.annual_production_w,
+                "nitrous_ef_default": self.NITROUS_EF_DEFAULT,
+                "nitrous_ef_start_tier_2": module.n2o_from_production_t2_start,
+                "nitrous_ef_end_tier_2": module.n2o_from_production_t2_w,
+                "nitrous_constant": project.gw_potential.n2o,
+                "electricity_used_default": self.ELECTRICITY_USED_DEFAULT,
+                "electricity_used_start_tier_2": module.electricity_used_t2_start,
+                "electricity_used_end_tier_2": module.electricity_used_t2_w,
+                "ef_electricity_default": self.elec.operating_margin,
+                "ef_electricity_start_tier_2": module.electricity_ef_t2_start,
+                "ef_electricity_end_tier_2": module.electricity_ef_t2_w,
+                "time_impl": project.implementation_years,
+                "time_cap": project.capitalization_years,
+                "rate_type": change_rate.name,
+            }
             log.debug("Inputs with: %s", self.inputs_w)
 
-            self.math_w = MathAquaculture(*self.inputs_w)
+            self.math_w = MathAquaculture(**self.inputs_w)
             self.math_w.calculate_emissions()
 
         if module.is_without():
             log.debug("IS WITHOUT")
-            self.inputs_wo = [
-                module.annual_production_start,
-                module.annual_production_wo,
-                self.NITROUS_EF_DEFAULT,
-                module.n2o_from_production_t2_start,
-                module.n2o_from_production_t2_wo,
-                project.gw_potential.n2o,
-                self.ELECTRICITY_USED_DEFAULT,
-                module.electricity_used_t2_start,
-                module.electricity_used_t2_wo,
-                self.elec.operating_margin,
-                module.electricity_ef_t2_start,
-                module.electricity_ef_t2_w,
-                project.implementation_years,
-                project.capitalization_years,
-                change_rate.name,
-            ]
+            self.inputs_wo = {
+                "production_start": module.annual_production_start,
+                "production_w": module.annual_production_wo,
+                "nitrous_ef_default": self.NITROUS_EF_DEFAULT,
+                "nitrous_ef_start_tier_2": module.n2o_from_production_t2_start,
+                "nitrous_ef_end_tier_2": module.n2o_from_production_t2_wo,
+                "nitrous_constant": project.gw_potential.n2o,
+                "electricity_used_default": self.ELECTRICITY_USED_DEFAULT,
+                "electricity_used_start_tier_2": module.electricity_used_t2_start,
+                "electricity_used_end_tier_2": module.electricity_used_t2_wo,
+                "ef_electricity_default": self.elec.operating_margin,
+                "ef_electricity_start_tier_2": module.electricity_ef_t2_start,
+                "ef_electricity_end_tier_2": module.electricity_ef_t2_w,
+                "time_impl": project.implementation_years,
+                "time_cap": project.capitalization_years,
+                "rate_type": change_rate.name,
+            }
             log.debug("Inputs without: %s", self.inputs_wo)
 
-            self.math_wo = MathAquaculture(*self.inputs_wo)
+            self.math_wo = MathAquaculture(**self.inputs_wo)
             self.math_wo.calculate_emissions()
 
         self.results_w = self.math_w.result if self.math_w else MathResult(project.implementation_years, project.capitalization_years)
@@ -3039,7 +3039,6 @@ class AquacultureCalculator(BaseCalculator):
         results_tuple = (self.results_w, self.results_wo)
 
         return results_tuple
-
 
 class InputCalculator(BaseCalculator):
     """
