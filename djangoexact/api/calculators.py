@@ -2024,8 +2024,8 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
 
         if module_for_checks.is_luc_remaining_same():
             self.inputs_start_w = {
-                "area_start": self.area,
-                "area_end": 0,
+                "hectares_start": self.area,
+                "hectares_end": 0,
                 "EFc_ref": self.efc.value,
                 "EFc_tier_2": module.efc_t2_start,
                 "SFw_ref": self.sfw_start.value,
@@ -2082,8 +2082,8 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
 
         if module_for_checks.is_business_as_usual():
             self.inputs_start_wo = {
-                "area_start": self.area,
-                "area_end": 0,
+                "hectares_start": self.area,
+                "hectares_end": 0,
                 "EFc_ref": self.efc.value,
                 "EFc_tier_2": module.efc_t2_start,
                 "SFw_ref": self.sfw_start.value,
@@ -2140,8 +2140,8 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
 
         if module_for_checks.is_with():
             self.inputs_w = {
-                "area_start": 0,
-                "area_end": self.area,
+                "hectares_start": 0,
+                "hectares_end": self.area,
                 "EFc_ref": self.efc.value,
                 "EFc_tier_2": module.efc_t2_w,
                 "SFw_ref": self.sfw_w.value,
@@ -2198,8 +2198,8 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
 
         if module_for_checks.is_without():
             self.inputs_wo = {
-                "area_start": 0,
-                "area_end": self.area,
+                "hectares_start": 0,
+                "hectares_end": self.area,
                 "EFc_ref": self.efc.value,
                 "EFc_tier_2": module.efc_t2_wo,
                 "SFw_ref": self.sfw_wo.value,
