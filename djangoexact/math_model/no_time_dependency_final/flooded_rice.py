@@ -1,7 +1,7 @@
 import math
 import traceback
 
-from general_functions import (
+from .general_functions import (
     breakdown_according_to_values,
     soil_emissions_2,
     yearly_constant_emissions_breakdown,
@@ -10,7 +10,7 @@ from general_functions import (
     som_emissions,
     biomass_emissions
 )
-from ghg_emissions_classes import (
+from .ghg_emissions_classes import (
     ActivityTypes,
     Emission,
     GasTypes,
@@ -18,7 +18,7 @@ from ghg_emissions_classes import (
     YearlyGasActivityEmissionSet,
 )
 
-from generalized_modules import LandModule
+from .generalized_modules import LandModule
 from dataclasses import dataclass, field
 from typing import Optional
 
