@@ -541,8 +541,8 @@ class Project(Historical):
     status = models.ForeignKey(ProjectStatus, on_delete=models.CASCADE, null=True, blank=True)
 
     implementation_years = models.IntegerField()
-    capitalization_years = models.IntegerField()
-    start_year = models.IntegerField(null=True, blank=True)
+    start_year_of_activities = models.IntegerField(null=True, blank=True)
+    last_year_of_accounting = models.IntegerField(null=True, blank=True)
 
     country = models.ForeignKey(Country, on_delete=models.CASCADE)
     climate = models.ForeignKey(Climate, on_delete=models.CASCADE)
@@ -560,6 +560,10 @@ class Project(Historical):
 
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
+
+    @property
+    def capitalization_years(self) -> int:
+        return self.__get_capitalization_years()
 
     def save(self, *args, **kwargs):
         if self.pk:
@@ -588,6 +592,12 @@ class Project(Historical):
     def refresh_lock(self):
         self.lock_updated_at = timezone.now()
         self.save()
+
+    def __get_capitalization_years(self):
+        if any([self.last_year_of_accounting is None, self.start_year_of_activities is None, self.implementation_years is None]):
+            raise exceptions.ValidationError("Error calculating project capitalization period. Capitalization years, start year of activities, and implementation years must be set")
+
+        return self.last_year_of_accounting - (self.start_year_of_activities + self.implementation_years)
 
 
 class ProjectInvitation(Historical):
@@ -652,6 +662,18 @@ class Activity(Historical):
     updated_at = models.DateTimeField(auto_now=True, null=True)
     owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="activities", null=True, blank=True)
 
+    @property
+    def implementation_years(self) -> int:
+        return self.__get_duration()
+
+    @property
+    def capitalization_years(self) -> int:
+        return self.__get_capitalization_years()
+
+    @property
+    def delay(self) -> int:
+        return self.__get_delay()
+
     def __str__(self):
         return f"({self.pk}) {self.name} in {self.project.name}"
 
@@ -661,6 +683,24 @@ class Activity(Historical):
             if not self.change_rate:
                 self.change_rate = ChangeRate.objects.get_or_create(name="linear")[0]
         super().save(*args, **kwargs)
+
+    def __get_delay(self) -> int:
+        if self.start_year_t2 is None:
+            return 0
+
+        return self.project.start_year_of_activities - self.start_year_t2
+
+    def __get_duration(self) -> int:
+        if self.duration_t2 is None or self.duration_t2 == 0:
+            return self.project.implementation_years
+
+        return self.duration_t2
+
+    def __get_capitalization_years(self) -> int:
+        if any([self.start_year_t2 is None, self.duration_t2 is None]):
+            return self.project.implementation_years
+
+        return self.project.last_year_of_accounting - (self.start_year_t2 + self.duration_t2)
 
     class Meta:
         unique_together = ("name", "project")
@@ -2058,30 +2098,10 @@ class SetAside(LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule):
         return super().save(*args, **kwargs)
 
 
-class DegradedLand(LandModule, SingleBiomassModule):
-    ha_start = models.FloatField(null=True, blank=True)
-    ha_w = models.FloatField(null=True, blank=True)
-    ha_wo = models.FloatField(null=True, blank=True)
-
+class DegradedLand(LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule):
     is_degraded_land_start = models.BooleanField(default=False)
     is_degraded_land_w = models.BooleanField(default=False)
     is_degraded_land_wo = models.BooleanField(default=False)
-
-    soc_t2_start = models.FloatField(null=True, blank=True)
-    soc_t2_w = models.FloatField(null=True, blank=True)
-    soc_t2_wo = models.FloatField(null=True, blank=True)
-
-    flu_t2_start = models.FloatField(null=True, blank=True)
-    flu_t2_w = models.FloatField(null=True, blank=True)
-    flu_t2_wo = models.FloatField(null=True, blank=True)
-
-    agb_t2_start = models.FloatField(null=True, blank=True)
-    agb_t2_w = models.FloatField(null=True, blank=True)
-    agb_t2_wo = models.FloatField(null=True, blank=True)
-
-    bgb_t2_start = models.FloatField(null=True, blank=True)
-    bgb_t2_w = models.FloatField(null=True, blank=True)
-    bgb_t2_wo = models.FloatField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:

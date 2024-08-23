@@ -11,6 +11,7 @@ from simple_history.models import HistoricalRecords
 from simple_history.utils import update_change_reason
 
 import api.models as api_models
+import ipcc.models as ipcc_models
 
 import logging as log
 
@@ -339,6 +340,15 @@ def get_or_raise(model, filter_criteria, error_message, method="get") -> models.
         return attr(**filter_criteria)
     except model.DoesNotExist:
         raise Exception(error_message)
+
+
+def get_soc(module, climate, moisture, soil_type, scenario: ScenarioTypes) -> models.QuerySet | models.Model:
+
+    if hasattr(module, f"soc_t2_{scenario.value}"):
+        return getattr(module, f"soc_t2_{scenario.value}")
+
+    filter_criteria = {"climate": climate, "moisture": moisture, "soil_type": soil_type}
+    return get_or_raise(ipcc_models.SoilOrganicCarbon, filter_criteria, f"Could not find SOC for {module.__class__.__name__}). Please insert time 2 SOC values.")
 
 
 def update_activity_status_and_completion(activity):

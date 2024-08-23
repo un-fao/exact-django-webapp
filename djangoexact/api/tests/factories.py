@@ -58,7 +58,7 @@ class ProjectFactory(DjangoModelFactory):
     status = factory.fuzzy.FuzzyChoice(statuses)
 
     implementation_years = factory.fuzzy.FuzzyInteger(1, 7)
-    capitalization_years = factory.fuzzy.FuzzyInteger(7, 7)
+    start_year_of_activities = factory.fuzzy.FuzzyInteger(2021, 2024)
 
     climate = factory.fuzzy.FuzzyChoice(climates)
     moisture = factory.fuzzy.FuzzyChoice(moisture)
@@ -425,8 +425,21 @@ class CoastalWetlandFactory(DjangoModelFactory):
     avg_salinity_t2 = SalinityType.objects.get(value="<18")
 
 
+trophic_types = [trophic for trophic in TrophicType.objects.all()]
+
+
 class WaterbodyFactory(DjangoModelFactory):
-    pass
+    class Meta:
+        model = Waterbody
+
+    area = 150
+    status = READY
+
+    waterbody_type = factory.fuzzy.FuzzyChoice(WaterbodyType.objects.all())
+
+    trophic_type_start = factory.fuzzy.FuzzyChoice(trophic_types)
+    trophic_type_w = factory.fuzzy.FuzzyChoice(trophic_types)
+    trophic_type_wo = factory.fuzzy.FuzzyChoice(trophic_types)
 
 
 fire_types = [fire for fire in FireType.objects.all()]
@@ -489,7 +502,7 @@ class IrrigationSystemFactory(DjangoModelFactory):
 
     status = READY
 
-    irrigation_system_type = factory.fuzzy.FuzzyChoice(IrrigationSystemType.objects.all())
+    irrigation_system_type = factory.fuzzy.FuzzyChoice(IrrigationSystemType.objects.filter(module_types__class_name="IrrigationSystem").all())
 
     ha_start = factory.fuzzy.FuzzyFloat(0, 100)
     ha_w = factory.fuzzy.FuzzyFloat(0, 100)
@@ -503,7 +516,7 @@ class IrrigationPhaseFactory(DjangoModelFactory):
     class Meta:
         model = IrrigationPhase
 
-    irrigation_system_type = factory.fuzzy.FuzzyChoice(IrrigationSystemType.objects.all())
+    irrigation_system_type = factory.fuzzy.FuzzyChoice(IrrigationSystemType.objects.filter(module_types__class_name="IrrigationPhase").all())
     fuel_type = factory.fuzzy.FuzzyChoice(fuel_types)
     well_depth = factory.fuzzy.FuzzyFloat(0, 100)
 
@@ -548,3 +561,15 @@ class BuildingFactory(DjangoModelFactory):
     building_types_start = factory.fuzzy.FuzzyChoice(building_types)
     building_types_w = factory.fuzzy.FuzzyChoice(building_types)
     building_types_wo = factory.fuzzy.FuzzyChoice(building_types)
+
+
+class DegradedLandFactory(DjangoModelFactory):
+    class Meta:
+        model = DegradedLand
+
+    status = READY
+    area = 150
+
+    is_degraded_land_start = factory.fuzzy.FuzzyChoice([True, False])
+    is_degraded_land_w = factory.fuzzy.FuzzyChoice([True, False])
+    is_degraded_land_wo = factory.fuzzy.FuzzyChoice([True, False])

@@ -154,6 +154,8 @@ class ModuleTest(ActivityTest):
             raise ValueError("Module type not set")
 
         self.module = super().create_module(self.module_type, **kwargs)
+        self.activity.module_types.add(self.module_type)
+        self.activity.save()
 
     def calculate_results(self):
         """
