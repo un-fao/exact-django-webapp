@@ -115,6 +115,9 @@ if os.getenv("GAE_APPLICATION", None):
             "USER": "$DB_USERNAME",
             "PASSWORD": "$DB_PASSWORD",
             "NAME": "$DB_NAME",
+            "TEST": {
+                "NAME": "$DB_NAME",
+            },
         }
     }
 else:
