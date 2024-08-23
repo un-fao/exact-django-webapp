@@ -3553,8 +3553,8 @@ class SettlementCalculator(LandModuleCalculator):
             log.debug("LUC remaining same")
 
             inputs_start_w = {
-                "area_start": module.area,
-                "area_end": 0,
+                "hectares_start": module.area,
+                "hectares_end": 0,
                 "implementation_time": project.implementation_years,
                 "capitalization_time": project.capitalization_years,
                 "rate_type": activity.change_rate.name,
@@ -3590,8 +3590,8 @@ class SettlementCalculator(LandModuleCalculator):
         if module.is_business_as_usual():
 
             inputs_start_wo = {
-                "area_start": module.area,
-                "area_end": 0,
+                "hectares_start": module.area,
+                "hectares_end": 0,
                 "implementation_time": project.implementation_years,
                 "capitalization_time": project.capitalization_years,
                 "rate_type": activity.change_rate.name,
@@ -3627,8 +3627,8 @@ class SettlementCalculator(LandModuleCalculator):
         if module.is_with():
 
             inputs_w = {
-                "area_start": 0,
-                "area_end": module.area,
+                "hectares_start": 0,
+                "hectares_end": module.area,
                 "implementation_time": project.implementation_years,
                 "capitalization_time": project.capitalization_years,
                 "rate_type": activity.change_rate.name,
@@ -3664,8 +3664,8 @@ class SettlementCalculator(LandModuleCalculator):
         if module.is_without():
 
             inputs_wo = {
-                "area_start": 0,
-                "area_end": module.area,
+                "hectares_start": 0,
+                "hectares_end": module.area,
                 "implementation_time": project.implementation_years,
                 "capitalization_time": project.capitalization_years,
                 "rate_type": activity.change_rate.name,
