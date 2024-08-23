@@ -1680,8 +1680,8 @@ class PerennialCropCalculator(LandModuleCalculator):
 
         if module.is_luc_remaining_same():
             inputs_start_w = {
-                "area_start": self.area,
-                "area_end": 0,
+                "hectares_start": self.area,
+                "hectares_end": 0,
                 "implementation_time": project.implementation_years,
                 "capitalization_time": project.capitalization_years,
                 "rate_type": change_rate.name,
@@ -1730,8 +1730,8 @@ class PerennialCropCalculator(LandModuleCalculator):
 
         if module.is_business_as_usual():
             inputs_start_wo = {
-                "area_start": self.area,
-                "area_end": 0,
+                "hectares_start": self.area,
+                "hectares_end": 0,
                 "implementation_time": project.implementation_years,
                 "capitalization_time": project.capitalization_years,
                 "rate_type": change_rate.name,
@@ -1780,8 +1780,8 @@ class PerennialCropCalculator(LandModuleCalculator):
 
         if module.is_with():
             inputs_w = {
-                "area_start": 0,
-                "area_end": self.area,
+                "hectares_start": 0,
+                "hectares_end": self.area,
                 "implementation_time": project.implementation_years,
                 "capitalization_time": project.capitalization_years,
                 "rate_type": change_rate.name,
@@ -1830,8 +1830,8 @@ class PerennialCropCalculator(LandModuleCalculator):
 
         if module.is_without():
             inputs_wo = {
-                "area_start": 0,
-                "area_end": self.area,
+                "hectares_start": 0,
+                "hectares_end": self.area,
                 "implementation_time": project.implementation_years,
                 "capitalization_time": project.capitalization_years,
                 "rate_type": change_rate.name,
