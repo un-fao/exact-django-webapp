@@ -148,9 +148,6 @@ class CoastalAquaculture(BaseModule):
     ef_electricity_default: float
     ef_electricity_start_tier_2: float
     ef_electricity_end_tier_2: float
-    time_impl: int
-    time_cap: int
-    rate_type: str
 
     def calculate_emissions(self):
         def calculate_nitrous_emissions():
