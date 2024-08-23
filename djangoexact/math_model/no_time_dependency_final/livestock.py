@@ -86,6 +86,8 @@ class Livestock(BaseModule):
     leaching_multiplier: float
 
     def __post_init__(self):
+        super().__post_init__()
+
         self.ch4_system_head_start_tier_2_default = None
         self.percentage_prp_start_tier_2_default = None
         self.ch4_system_head_end_tier_2_default = None
