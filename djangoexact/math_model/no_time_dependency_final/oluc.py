@@ -107,7 +107,6 @@ class OtherLandUseChanges(BaseModule):
     calculate_soc_som: bool
     area: float
     dry_matter_end: float
-    time_impl: int
 
     def __post_init__(self):
 
