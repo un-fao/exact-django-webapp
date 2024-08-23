@@ -165,7 +165,7 @@ class OtherLandUseChanges(BaseModule):
 
                 total_biomass_emissions = total
                 # TODO: change so only in implementation years but proportionate to the hectars addressed in that year
-                yearly_biomass_emissions = yearly_constant_emissions_breakdown(total, self.time_impl, self.time_cap, self.rate)
+                yearly_biomass_emissions = yearly_constant_emissions_breakdown(total, self.implementation_time, self.capitalization_time, self.implementation_time)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(
                     YearlyGasActivityEmissionSet(
@@ -201,7 +201,7 @@ class OtherLandUseChanges(BaseModule):
             total_em_per_hectar = (methane_emissions + nitrous_emissions) / 1000
 
             total_fire_emissions = total_em_per_hectar * self.area
-            yearly_fire_emissions = yearly_constant_emissions_breakdown(total_fire_emissions, self.time_impl, self.time_cap, self.rate)
+            yearly_fire_emissions = yearly_constant_emissions_breakdown(total_fire_emissions, self.implementation_time, self.capitalization_time, self.implementation_time)
 
             # CALCULATE FOR INDIVIDUAL METHANE AND NITROUS EMISSIONS(the calculation on top can be removed in the future)
             methane_em_per_hectar = methane_emissions / 1000
@@ -211,8 +211,8 @@ class OtherLandUseChanges(BaseModule):
             methane_fire_emissions = methane_em_per_hectar * self.area
             nitrous_fire_emissions = nitrous_em_per_hectar * self.area
 
-            yearly_methane_fire_emissions = yearly_constant_emissions_breakdown(methane_fire_emissions, self.time_impl, self.time_cap, self.rate)
-            yearly_nitrous_fire_emissions = yearly_constant_emissions_breakdown(nitrous_fire_emissions, self.time_impl, self.time_cap, self.rate)
+            yearly_methane_fire_emissions = yearly_constant_emissions_breakdown(methane_fire_emissions, self.implementation_time, self.capitalization_time, self.rate_type)
+            yearly_nitrous_fire_emissions = yearly_constant_emissions_breakdown(nitrous_fire_emissions, self.implementation_time, self.capitalization_time, self.rate_type)
 
             self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in yearly_methane_fire_emissions], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
             self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in yearly_nitrous_fire_emissions], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
