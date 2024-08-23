@@ -11,7 +11,7 @@ from .general_functions import (
     som_emissions,
     yearly_constant_emissions_breakdown,
     yearly_time_dependent_20_year_breakdown,
-    yearly_time_dependent_full_year,
+    yearly_time_dependent_increase_full_year,
     yearly_time_dependent_increase,
     yearly_time_dependent_matrix,
     yearly_time_dependent_parameter_breakdown,
