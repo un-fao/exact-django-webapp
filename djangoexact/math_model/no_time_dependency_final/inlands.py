@@ -110,9 +110,9 @@ class AnnexedModule(BaseModule):
                     emissions_co_yearly = breakdown_according_to_values(co, yearly_time_dependent_parameter_breakdown(0, self.area_affected_by_action_end * dry_matter_ref_fire, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True))
                     emissions_ch4_yearly = breakdown_according_to_values(ch4, yearly_time_dependent_parameter_breakdown(0, self.area_affected_by_action_end * dry_matter_ref_fire, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True))
 
-                    co2_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_co2_yearly], ActivityTypes.FIRE_ON_SOIL, delay=0)
-                    co_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO, [Emission(e, GasTypes.CO) for e in emissions_co_yearly], ActivityTypes.FIRE_ON_SOIL, delay=0)
-                    ch4_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in emissions_ch4_yearly], ActivityTypes.FIRE_ON_SOIL, delay=0)
+                    co2_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_co2_yearly], ActivityTypes.FIRE_ON_SOIL, delay=self.delay)
+                    co_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO, [Emission(e, GasTypes.CO) for e in emissions_co_yearly], ActivityTypes.FIRE_ON_SOIL, delay=self.delay)
+                    ch4_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in emissions_ch4_yearly], ActivityTypes.FIRE_ON_SOIL, delay=self.delay)
 
                     self.result.yearly_emissions_by_sector_by_gas.append(co2_emission_set)
                     self.result.yearly_emissions_by_sector_by_gas.append(co_emission_set)
@@ -228,11 +228,11 @@ class AnnexedModule(BaseModule):
                 doc_total = [i + j for i, j in zip(doc_initial, doc_final)]
                 co2_total = [i + j for i, j in zip(co2_initial, co2_final)]
 
-                co2_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in co2_total], ActivityTypes.DRAINAGE, delay=0)
-                doc_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.DOC, [Emission(e, GasTypes.DOC) for e in doc_total], ActivityTypes.DRAINAGE, delay=0)
-                ch4_onsite_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in ch4_onsite_total], ActivityTypes.DRAINAGE, delay=0)
-                ch4_offsite_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in ch4_offsite_total], ActivityTypes.DRAINAGE, delay=0)
-                n2o_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in n2o_total], ActivityTypes.DRAINAGE, delay=0)
+                co2_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in co2_total], ActivityTypes.DRAINAGE, delay=self.delay)
+                doc_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.DOC, [Emission(e, GasTypes.DOC) for e in doc_total], ActivityTypes.DRAINAGE, delay=self.delay)
+                ch4_onsite_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in ch4_onsite_total], ActivityTypes.DRAINAGE, delay=self.delay)
+                ch4_offsite_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in ch4_offsite_total], ActivityTypes.DRAINAGE, delay=self.delay)
+                n2o_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in n2o_total], ActivityTypes.DRAINAGE, delay=self.delay)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(co2_emission_set)
                 self.result.yearly_emissions_by_sector_by_gas.append(doc_emission_set)
@@ -288,13 +288,13 @@ class AnnexedModule(BaseModule):
                 total_co2_doc_initial, total_ch4_initial, total_n2o_initital, total_rewetting_initial = rewetting_emissions(area_rewet_initial, ef_doc_rewetting_initial, ef_co2_rewetting_initial, ef_ch4_rewetting_initial, ef_n2o_rewetting_initial, self.methane_constant, self.nitrous_constant, self.rate_type, self.implementation_time, self.capitalization_time)
                 total_co2_doc_final, total_ch4_final, total_n2o_final, total_rewetting_final = rewetting_emissions(area_rewet_final, ef_doc_rewetting_final, ef_co2_rewetting_final, ef_ch4_rewetting_final, ef_n2o_rewetting_final, self.methane_constant, self.nitrous_constant, self.rate_type, self.implementation_time, self.capitalization_time)
 
-                co2_doc_emission_set_initial = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in total_co2_doc_initial], ActivityTypes.REWETTING, delay=0)
-                ch4_emission_set_initial = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in total_ch4_initial], ActivityTypes.REWETTING, delay=0)
-                n2o_emission_set_initial = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in total_n2o_initital], ActivityTypes.REWETTING, delay=0)
+                co2_doc_emission_set_initial = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in total_co2_doc_initial], ActivityTypes.REWETTING, delay=self.delay)
+                ch4_emission_set_initial = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in total_ch4_initial], ActivityTypes.REWETTING, delay=self.delay)
+                n2o_emission_set_initial = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in total_n2o_initital], ActivityTypes.REWETTING, delay=self.delay)
 
-                co2_doc_emission_set_final = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in total_co2_doc_final], ActivityTypes.REWETTING, delay=0)
-                ch4_emission_set_final = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in total_ch4_final], ActivityTypes.REWETTING, delay=0)
-                n2o_emission_set_final = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in total_n2o_final], ActivityTypes.REWETTING, delay=0)
+                co2_doc_emission_set_final = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in total_co2_doc_final], ActivityTypes.REWETTING, delay=self.delay)
+                ch4_emission_set_final = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in total_ch4_final], ActivityTypes.REWETTING, delay=self.delay)
+                n2o_emission_set_final = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in total_n2o_final], ActivityTypes.REWETTING, delay=self.delay)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(co2_doc_emission_set_initial)
                 self.result.yearly_emissions_by_sector_by_gas.append(ch4_emission_set_initial)
@@ -366,9 +366,9 @@ class PeatExtraction(BaseModule):
                 drainage_ch4_yearly = yearly_time_dependent_parameter_breakdown(ch4_onsite_emissions_start + ch4_offsite_emissions_start, ch4_onsite_emissions_end + ch4_offsite_emissions_end, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True)
                 drainage_n2o_yearly = yearly_time_dependent_parameter_breakdown(n2o_onsite_emissions_start, n2o_onsite_emissions_end, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True)
 
-                drainage_peat_co2_doc_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in drainage_co2_doc_yearly], ActivityTypes.DRAINAGE_PEAT, delay=0)
-                drainage_peat_ch4_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in drainage_ch4_yearly], ActivityTypes.DRAINAGE_PEAT, delay=0)
-                drainage_peat_n2o_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in drainage_n2o_yearly], ActivityTypes.DRAINAGE_PEAT, delay=0)
+                drainage_peat_co2_doc_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in drainage_co2_doc_yearly], ActivityTypes.DRAINAGE_PEAT, delay=self.delay)
+                drainage_peat_ch4_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in drainage_ch4_yearly], ActivityTypes.DRAINAGE_PEAT, delay=self.delay)
+                drainage_peat_n2o_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in drainage_n2o_yearly], ActivityTypes.DRAINAGE_PEAT, delay=self.delay)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(drainage_peat_co2_doc_emission_set)
                 self.result.yearly_emissions_by_sector_by_gas.append(drainage_peat_ch4_emission_set)
@@ -392,7 +392,7 @@ class PeatExtraction(BaseModule):
                 offsite_emissions_yearly = yearly_time_dependent_parameter_breakdown(em_start, em_end, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True)
                 offsite_emissions_total = sum(offsite_emissions_yearly)
 
-                offsite_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in offsite_emissions_yearly], ActivityTypes.OFFSITE_PEAT, delay=0)
+                offsite_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in offsite_emissions_yearly], ActivityTypes.OFFSITE_PEAT, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(offsite_emission_set)
 
             except:
