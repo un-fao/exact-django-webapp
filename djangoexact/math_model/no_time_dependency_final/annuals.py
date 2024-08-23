@@ -20,6 +20,7 @@ from .ghg_emissions_classes import (
 from .generalized_modules import LandModule
 
 from dataclasses import dataclass
+from typing import Optional
 @dataclass
 class AnnualCropland(LandModule):
 
@@ -27,13 +28,13 @@ class AnnualCropland(LandModule):
     methane_constant: float
     ef_methane_agr_residues_main: float
     combustion_factor_main: float
-    residue_main_tier_2: float
+    residue_main_tier_2: Optional [float]
     n_estimation_slope_main: float
     n_estimation_intercept_main: float
     yield_value_main: float
     ef_methane_agr_residues_minor: float
     combustion_factor_minor: float
-    residue_minor_tier_2: float
+    residue_minor_tier_2: Optional [float]
     n_estimation_slope_minor: float
     n_estimation_intercept_minor: float
     yield_value_minor: float
