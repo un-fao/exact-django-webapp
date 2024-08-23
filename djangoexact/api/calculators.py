@@ -1314,8 +1314,8 @@ class AnnualCropCalculator(LandModuleCalculator):
             log.debug("Is LUC remaining the same")
 
             self.inputs_start_w = {
-                "area_start": self.area,
-                "area_end": 0,
+                "hectares_start": self.area,
+                "hectares_end": 0,
                 "implementation_time": project.implementation_years,
                 "capitalization_time": project.capitalization_years,
                 "rate_type": change_rate.name,
@@ -1376,8 +1376,8 @@ class AnnualCropCalculator(LandModuleCalculator):
             log.debug("Is with")
 
             self.inputs_w = {
-                "area_start": 0,
-                "area_end": self.area,
+                "hectares_start": 0,
+                "hectares_end": self.area,
                 "implementation_time": project.implementation_years,
                 "capitalization_time": project.capitalization_years,
                 "rate_type": change_rate.name,
@@ -1438,8 +1438,8 @@ class AnnualCropCalculator(LandModuleCalculator):
             log.debug("Is business as usual")
 
             self.inputs_start_wo = {
-                "area_start": self.area,
-                "area_end": 0,
+                "hectares_start": self.area,
+                "hectares_end": 0,
                 "implementation_time": project.implementation_years,
                 "capitalization_time": project.capitalization_years,
                 "rate_type": change_rate.name,
@@ -1501,8 +1501,8 @@ class AnnualCropCalculator(LandModuleCalculator):
             log.debug("Is without")
 
             self.inputs_wo = {
-                "area_start": 0,
-                "area_end": self.area,
+                "hectares_start": 0,
+                "hectares_end": self.area,
                 "implementation_time": project.implementation_years,
                 "capitalization_time": project.capitalization_years,
                 "rate_type": change_rate.name,
