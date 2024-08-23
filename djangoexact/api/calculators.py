@@ -5985,10 +5985,10 @@ class SetAsideCalculator(LandModuleCalculator):
 
         if module.is_luc_remaining_same():
             self.inputs_start_w = {
-                "area_start": self.area,
-                "area_end": 0,
-                "time_impl": project.implementation_years,
-                "time_cap": project.capitalization_years,
+                "hectares_start": self.area,
+                "hectares_end": 0,
+                "implementation_time": project.implementation_years,
+                "capitaliazione_time": project.capitalization_years,
                 "rate": activity.change_rate.name,
                 "nitrous_constant": project.gw_potential.n2o,
                 "ef_nitrous_som": self.som.value,
@@ -6021,10 +6021,10 @@ class SetAsideCalculator(LandModuleCalculator):
 
         if module.is_business_as_usual():
             self.inputs_start_wo = {
-                "area_start": self.area,
-                "area_end": 0,
-                "time_impl": project.implementation_years,
-                "time_cap": project.capitalization_years,
+                "hectares_start": self.area,
+                "hectares_end": 0,
+                "implementation_time": project.implementation_years,
+                "capitalzione_time": project.capitalization_years,
                 "rate": activity.change_rate.name,
                 "nitrous_constant": project.gw_potential.n2o,
                 "ef_nitrous_som": self.som.value,
@@ -6057,10 +6057,10 @@ class SetAsideCalculator(LandModuleCalculator):
 
         if module.is_with():
             self.inputs_w = {
-                "area_start": 0,
-                "area_end": self.area,
-                "time_impl": project.implementation_years,
-                "time_cap": project.capitalization_years,
+                "hectares_start": 0,
+                "hectares_end": self.area,
+                "implementation_time": project.implementation_years,
+                "capitalization_time": project.capitalization_years,
                 "rate": activity.change_rate.name,
                 "nitrous_constant": project.gw_potential.n2o,
                 "ef_nitrous_som": self.som.value,
@@ -6093,10 +6093,10 @@ class SetAsideCalculator(LandModuleCalculator):
 
         if module.is_without():
             self.inputs_wo = {
-                "area_start": 0,
-                "area_end": self.area,
-                "time_impl": project.implementation_years,
-                "time_cap": project.capitalization_years,
+                "hectares_start": 0,
+                "hectares_end": self.area,
+                "implementation_time": project.implementation_years,
+                "capitalization_time": project.capitalization_years,
                 "rate": activity.change_rate.name,
                 "nitrous_constant": project.gw_potential.n2o,
                 "ef_nitrous_som": self.som.value,
