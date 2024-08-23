@@ -91,7 +91,7 @@ class CoastalWetland(BaseModule):
                     # soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_soil_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
                     # self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
 
-                    biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(emissions_biomass_total_drainage, GasTypes.CO2)], ActivityTypes.BIOMASS, delay=0)
+                    biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(emissions_biomass_total_drainage, GasTypes.CO2)], ActivityTypes.BIOMASS, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
 
                 except Exception as e:
@@ -116,7 +116,7 @@ class CoastalWetland(BaseModule):
 
                     emissions_soil_yearly_drainage = breakdown_according_to_values(total, self.hectares_drained)
 
-                    soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_soil_yearly_drainage], ActivityTypes.DRAINAGE, delay=0)
+                    soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_soil_yearly_drainage], ActivityTypes.DRAINAGE, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
 
                 except Exception as e:
@@ -157,10 +157,10 @@ class CoastalWetland(BaseModule):
                 emissions_yearly_biomass_extraction_excavation = breakdown_according_to_values(total_biomass, hectares_excavated)
                 emissions_yearly_soil_extraction_excavation = breakdown_according_to_values(total_soil, hectares_excavated)
 
-                biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_yearly_biomass_extraction_excavation], ActivityTypes.BIOMASS, delay=0)
+                biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_yearly_biomass_extraction_excavation], ActivityTypes.BIOMASS, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
 
-                soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_yearly_soil_extraction_excavation], ActivityTypes.SOIL_CO2_CHANGE, delay=0)
+                soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_yearly_soil_extraction_excavation], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
 
                 pass
@@ -201,14 +201,14 @@ class CoastalWetland(BaseModule):
 
                 emissions_total_rewetting = total_emission_yearly_rewetting_carbon + total_emission_yearly_rewetting_methane
 
-                rewetting_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_yearly_rewetting_carbon], ActivityTypes.REWETTING_REVEGETATION, delay=0)
+                rewetting_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_yearly_rewetting_carbon], ActivityTypes.REWETTING_REVEGETATION, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(rewetting_emission_set)
 
-                rewetting_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in emissions_yearly_rewetting_methane], ActivityTypes.REWETTING_REVEGETATION, delay=0)
+                rewetting_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in emissions_yearly_rewetting_methane], ActivityTypes.REWETTING_REVEGETATION, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(rewetting_emission_set)
 
                 biomass_emissions = calculate_biomass()
-                biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in biomass_emissions], ActivityTypes.BIOMASS, delay=0)
+                biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in biomass_emissions], ActivityTypes.BIOMASS, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
 
             except Exception as e:

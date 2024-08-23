@@ -108,7 +108,7 @@ class Livestock(BaseModule):
 
                 mef_emissions_yearly = yearly_time_dependent_parameter_breakdown(emissions_start, emissions_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
-                mef_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in mef_emissions_yearly], ActivityTypes.METHANE_ENTERIC_FERMENTATION, delay=0)
+                mef_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in mef_emissions_yearly], ActivityTypes.METHANE_ENTERIC_FERMENTATION, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(mef_emission_set)
 
             except Exception as e:
@@ -128,7 +128,7 @@ class Livestock(BaseModule):
                 mmm_emissions_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
                 mmm_emissions = sum(mmm_emissions_yearly)
 
-                mmm_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in mmm_emissions_yearly], ActivityTypes.METHANE_MANURE_MANAGEMENT, delay=0)
+                mmm_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in mmm_emissions_yearly], ActivityTypes.METHANE_MANURE_MANAGEMENT, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(mmm_emission_set)
 
             except Exception as e:
@@ -148,7 +148,7 @@ class Livestock(BaseModule):
                 nmm_direct_emissions_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
                 nmm_direct_emissions = sum(nmm_direct_emissions_yearly)
 
-                nmm_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in nmm_direct_emissions_yearly], ActivityTypes.NITROUS_MANURE_MANAGEMENT, delay=0)
+                nmm_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in nmm_direct_emissions_yearly], ActivityTypes.NITROUS_MANURE_MANAGEMENT, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(nmm_emission_set)
 
             except Exception as e:
@@ -169,7 +169,7 @@ class Livestock(BaseModule):
                 nmm_indirect_volatization_emissions_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
                 nmm_indirect_volatization_emissions = sum(nmm_indirect_volatization_emissions_yearly)
 
-                nmm_indirect_volatization_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in nmm_indirect_volatization_emissions_yearly], ActivityTypes.NITROUS_MANURE_MANAGEMENT_INDIRECT_VOLATILIZATION, delay=0)
+                nmm_indirect_volatization_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in nmm_indirect_volatization_emissions_yearly], ActivityTypes.NITROUS_MANURE_MANAGEMENT_INDIRECT_VOLATILIZATION, delay=self.delay)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(nmm_indirect_volatization_emission_set)
 
@@ -191,7 +191,7 @@ class Livestock(BaseModule):
                 nmm_indirect_leaching_emissions_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
                 nmm_indirect_leaching_emissions = sum(nmm_indirect_leaching_emissions_yearly)
 
-                nmm_indirect_leaching_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in nmm_indirect_leaching_emissions_yearly], ActivityTypes.NITROUS_MANURE_MANAGEMENT_INDIRECT_LEACHING, delay=0)
+                nmm_indirect_leaching_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in nmm_indirect_leaching_emissions_yearly], ActivityTypes.NITROUS_MANURE_MANAGEMENT_INDIRECT_LEACHING, delay=self.delay)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(nmm_indirect_leaching_emission_set)
 
