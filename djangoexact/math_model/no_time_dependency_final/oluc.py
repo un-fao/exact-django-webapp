@@ -17,7 +17,7 @@ from .ghg_emissions_classes import (
     YearlyGasActivityEmissionSet,
 )
 
-from generalized_modules import BaseModule
+from .generalized_modules import BaseModule
 
 from dataclasses import dataclass
 from typing import Optional
