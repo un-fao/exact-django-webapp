@@ -1815,7 +1815,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "fi_start_default": self.fi_start.value,
                 "fi_end_default": self.fi_w.value,
                 "fi_start_tier_2": self.module_start.fi_t2_start,
-                            "fi_end_tier_2": self.module_w.fi_t2_w,
+                "fi_end_tier_2": self.module_w.fi_t2_w,
                 "calculate_soc_som": CALCULATE_SOC_SOM_W,
                 "delay": DELAY_W,
                 "biomass_start_default": self.biomass_ef_start.value,
@@ -2959,7 +2959,7 @@ class AquacultureCalculator(BaseCalculator):
         self.FEED_EF_DEFAULT = 0
 
     def get_defaults(self, calculate=False) -> dict:
-        super().get_defaults(input, calculate)
+        super().get_defaults(calculate)
 
         module: Aquaculture = self.data
         project: Project = module.activity.project
