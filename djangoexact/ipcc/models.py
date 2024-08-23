@@ -496,6 +496,9 @@ class OtherConstructedWaterbodiesEmissionFactor(Model):
     waterbody_type = ForeignKey("api.WaterbodyType", on_delete=CASCADE)
     value = FloatField(default=0)
 
+    def __str__(self):
+        return f"{self.value} for {self.climate.name} {self.moisture.name} {self.waterbody_type.name}"
+
 
 class Atwood(Model):
     country = ForeignKey("api.Country", on_delete=CASCADE)
@@ -725,21 +728,12 @@ class GrasslandStockExchangeFactor(Model):
 
 
 class ElectricityEmission(Model):
-    country = ForeignKey("api.Country", on_delete=CASCADE)
-    year = IntegerField(null=True, blank=True)
-
-    ef_grid = FloatField(null=True, blank=True)
-    final_ef_grid = FloatField(null=True, blank=True)
+    country = ForeignKey("api.Country", on_delete=CASCADE, unique=True)
     operating_margin = FloatField(null=True, blank=True)
-
-    # TODO: In the Excel file this is calculated in Elec G5, but here I'm putting it as static. Ask about this.
     combined_margin = FloatField(null=True, blank=True)
 
-    # TODO: What is this exactly?
-    for_formulas = FloatField(null=True, blank=True)
-
     def __str__(self):
-        return f"Electricity Emissions for {self.country}"
+        return f"{self.country} {self.operating_margin} {self.combined_margin}"
 
 
 class SmallFisheryFUIManager(Manager):
@@ -1356,7 +1350,7 @@ class SettlementEF(Model):
         unique_together = ("settlement_type", "climate", "moisture")
 
     def __str__(self):
-        return f"({self.pk}) {self.settlement_type.name} {self.climate.name} {self.moisture.name}"
+        return f"({self.pk}) {self.flu} {self.fi} {self.fmg} for {self.settlement_type.name} {self.climate.name} {self.moisture.name}"
 
 
 class NitrousEmissionFactor(Model):
