@@ -126,8 +126,8 @@ class Deforestation(BaseModule):
         self.fi_start = self.fi_start_tier_2 if self.fi_start_tier_2 else self.fi_start_default
         self.fi_end = self.fi_end_tier_2 if self.fi_end_tier_2 else self.fi_end_default
 
-        self.soc_start = self.soc_start_default * self.fmg_start * self.flu_start * self.fi_start if not self.soc_start_tier_2 else self.soc_start_tier_2
-        self.soc_end = self.soc_end_default * self.fmg_end * self.flu_end * self.fi_end if not self.soc_end_tier_2 else self.soc_end_tier_2
+        self.soc_start = self.soc_start_default * self.fmg_start * self.flu_start * self.fi_start if not self.soc_start_tier_2 else self.soc_start_tier_2 * self.fmg_start * self.flu_start * self.fi_start
+        self.soc_end = self.soc_end_default * self.fmg_end * self.flu_end * self.fi_end if not self.soc_end_tier_2 else self.soc_end_tier_2 * self.fmg_end * self.flu_end * self.fi_end
 
         # AUXILIARY VARIABLES FOR SOIL CALCULATION
         self.hectars_before_20, self.hectars_after_20 = yearly_time_dependent_20_year_breakdown(0, self.area_deforested, self.time_impl, self.time_cap, self.rate_type_soil)
