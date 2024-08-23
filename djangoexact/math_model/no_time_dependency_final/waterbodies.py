@@ -48,10 +48,10 @@ class CoastalWaterbodies(BaseModule):
             self.emissions_yearly = yearly_time_dependent_parameter_breakdown(yearly_emissions_start, yearly_emissions_end, self.implementation_time, self.capitalization_time, self.rate_type)
             self.total_emissions = sum(self.emissions_yearly)
 
-            # offsite_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.offsite_emissions_yearly], ActivityTypes.OFFSITE_PEAT, delay=0)
+            # offsite_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.offsite_emissions_yearly], ActivityTypes.OFFSITE_PEAT, delay=self.delay)
             # self.result.yearly_emissions_by_sector_by_gas.append(offsite_emission_set)
 
-            emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in self.emissions_yearly], ActivityTypes.COASTAL_WATERBODIES, delay=0)
+            emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in self.emissions_yearly], ActivityTypes.COASTAL_WATERBODIES, delay=self.delay)
             self.result.yearly_emissions_by_sector_by_gas.append(emission_set)
             
         except Exception as e:
