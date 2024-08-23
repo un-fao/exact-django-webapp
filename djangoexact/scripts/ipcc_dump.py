@@ -473,41 +473,7 @@ with open("scripts/ipcc_data/EnergyDefaultEmissionFactors.csv", "r") as f:
             f"{fuel_type}, {row[1]}, {row[2]}, {row[3]}, {row[4]}, {row[5]}, {row[6]}, {row[7]}, {row[8]}"
         )
 
-
-with open("scripts/ipcc_data/ElectricityEmissions.csv", "r") as f:
-    reader = csv.reader(f)
-    data = list(reader)
-
-    for row in data:
-        country = Country.objects.get(name__iexact=sanitize(row[0]).title())
-        continent = Continent.objects.get(name__iexact=sanitize(row[1]).title())
-
-        i = 2
-
-        ef_grid = row[i + 0] if row[i + 0] != "" else None
-        year = row[i + 1] if row[i + 1] != "" else None
-        final_ef = row[i + 2] if row[i + 2] != "" else None
-        op_margin = row[i + 3] if row[i + 3] != "" else None
-        combined_margin = row[i + 4] if row[i + 4] != "" else None
-
-        print(
-            f"{country}, {continent}, {ef_grid}, {year}, {final_ef}, {op_margin}, {combined_margin}"
-        )
-
-        ElectricityEmission.objects.get(
-            country=country,
-            continent=continent,
-            ef_grid=ef_grid,
-            year=year,
-            final_ef_grid=final_ef,
-            operating_margin=op_margin,
-            combined_margin=combined_margin,
-        )
 LivestockManureEF.objects.all().delete()
-
-
-
-
 
 # print("AO")
 # nsed = LargeFisheryFUI.objects.filter(gear_type__name__iexact="Not Specified")
@@ -702,38 +668,6 @@ with open("scripts/ipcc_data/Atwood.csv", "r") as f:
             mg_c_ha=mg_c_ha,
             sd=sd,
             score=score,
-        )
-
-ElectricityEmission.objects.all().delete()
-
-with open("scripts/ipcc_data/ElectricityEmissions.csv", "r") as f:
-    reader = csv.reader(f)
-    data = list(reader)
-
-    for row in data:
-        country = Country.objects.get(name__iexact=capitalize_all(row[0]))
-        continent = Continent.objects.get(name__iexact=capitalize_all(row[1]))
-
-        i = 2
-
-        ef_grid = row[i + 0] if row[i + 0] != "" else None
-        year = row[i + 1] if row[i + 1] != "" else None
-        final_ef = row[i + 2] if row[i + 2] != "" else None
-        op_margin = row[i + 3] if row[i + 3] != "" else None
-        combined_margin = row[i + 4] if row[i + 4] != "" else None
-
-        print(
-            f"{country}, {continent}, {ef_grid}, {year}, {final_ef}, {op_margin}, {combined_margin}"
-        )
-
-        ElectricityEmission.objects.get(
-            country=country,
-            continent=continent,
-            ef_grid=ef_grid,
-            year=year,
-            final_ef_grid=final_ef,
-            operating_margin=op_margin,
-            combined_margin=combined_margin,
         )
 
 with open("scripts/ipcc_data/CroplandFMG.csv", "r") as f:
@@ -2063,32 +1997,6 @@ for i, row in df.iterrows():
         average=average,
     )
 
-
-
-
-LargeFisheryFUI.objects.all().delete()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "LargeFisheryFUI.csv"),
-    header=[0],
-    sep=";",
-)
-
-rows = df.to_dict("records")
-
-for row in rows:
-    gear_type = row["gear_type"]
-    fish_type = row["fish_type"]
-    value = parse_csv_number(row["value"])
-
-    print(f"{gear_type}, {fish_type}, {value}")
-
-    gear_type = LargeFisheryGearType.objects.get(name__iexact=capitalize_all(gear_type))
-    fish_type = FishType.objects.get(name__iexact=capitalize_all(fish_type))
-
-    LargeFisheryFUI.objects.get(fish_type=fish_type, gear_type=gear_type, value=value)
-
-
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "LivestockVSER.csv"),
     header=0,
@@ -2919,93 +2827,6 @@ for i, row in enumerate(rows):
     SettlementType.objects.create(name=name)
     print(f"Added {name}")
 
-SettlementEF.objects.all().delete()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "SettlementEF.csv"),
-    header=0,
-    sep=";",
-)
-
-headers = df.columns.values.tolist()
-rows = df.to_dict("records")
-
-climates = Climate.objects.filter(name__in=["Tropical", "Warm Temperate", "Cool Temperate", "Boreal"]).all()
-moistures = Moisture.objects.filter(name__in=["Wet", "Dry", "Moist"]).all()
-
-for i, row in enumerate(rows):
-    settlement_type = SettlementType.objects.get(name__iexact=row["settlement_type"])
-    str_climate = row["climate"]
-    str_moisture = row["moisture"]
-
-    print(settlement_type, str_climate, str_moisture, row["flu"], row["fi"], row["fmg"], row["biomass"])
-
-    if str_climate == "All" and str_moisture == "All":
-        for climate in climates:
-            print(f"Creating for {climate}")
-            for moisture in moistures:
-                print(f"Creating for {moisture}")
-                SettlementEF.objects.create(
-                    settlement_type=settlement_type,
-                    climate=climate,
-                    moisture=moisture,
-                    flu=parse_csv_number(row["flu"]),
-                    fi=parse_csv_number(row["fi"]),
-                    fmg=parse_csv_number(row["fmg"]),
-                    biomass=parse_csv_number(row["biomass"]),
-                )
-    elif str_climate == "All":
-        for climate in climates:
-            print(f"Creating for {climate}")
-            moisture = Moisture.objects.get(name__iexact=str_moisture)
-            SettlementEF.objects.create(
-                settlement_type=settlement_type,
-                climate=climate,
-                moisture=moisture,
-                flu=parse_csv_number(row["flu"]),
-                fi=parse_csv_number(row["fi"]),
-                fmg=parse_csv_number(row["fmg"]),
-                biomass=parse_csv_number(row["biomass"]),
-            )
-    elif str_moisture == "All":
-        for moisture in moistures:
-            print(f"Creating for {moisture}")
-            if str_climate == "Temperate":
-                for climate in Climate.objects.filter(name__in=["Warm Temperate", "Cool Temperate"]).all():
-                    SettlementEF.objects.create(
-                        settlement_type=settlement_type,
-                        climate=climate,
-                        moisture=moisture,
-                        flu=parse_csv_number(row["flu"]),
-                        fi=parse_csv_number(row["fi"]),
-                        fmg=parse_csv_number(row["fmg"]),
-                        biomass=parse_csv_number(row["biomass"]),
-                    )
-            else:
-                climate = Climate.objects.get(name__iexact=str_climate)
-                SettlementEF.objects.create(
-                    settlement_type=settlement_type,
-                    climate=climate,
-                    moisture=moisture,
-                    flu=parse_csv_number(row["flu"]),
-                    fi=parse_csv_number(row["fi"]),
-                    fmg=parse_csv_number(row["fmg"]),
-                    biomass=parse_csv_number(row["biomass"]),
-                )
-    else:
-        climate = Climate.objects.get(name__iexact=str_climate)
-        moisture = Moisture.objects.get(name__iexact=str_moisture)
-
-        SettlementEF.objects.create(
-            settlement_type=settlement_type,
-            climate=climate,
-            moisture=moisture,
-            flu=parse_csv_number(row["flu"]),
-            fi=parse_csv_number(row["fi"]),
-            fmg=parse_csv_number(row["fmg"]),
-            biomass=parse_csv_number(row["biomass"]),
-        )
-
 LandUseCarbonStockExchangeFactor.objects.all().delete()
 
 df = pd.read_csv(
@@ -3196,38 +3017,6 @@ for i, row in enumerate(rows):
             value=value,
             # unit="tC/ha/yr",
         )
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "OtherConstructedWaterbodiesEmissionFactors.csv"),
-    header=[0],
-    sep=",",
-)
-
-with open("scripts/ipcc_data/OtherConstructedWaterbodiesEmissionFactors.csv", "r") as f:
-    reader = csv.reader(f)
-    header = next(reader, None)
-    data = list(reader)
-
-    for i, head in enumerate(header):
-        head = sanitize(head).title()
-        waterbody_type = WaterbodyType.objects.get(name__iexact=head)
-        for row in data:
-            if sanitize(row[0]) == "":
-                continue
-
-            climate = Climate.objects.get(name__iexact=sanitize(row[0]))
-            moisture = Moisture.objects.get(name__iexact=sanitize(row[1]))
-
-            value = row[i + 2]
-
-            print(f"{waterbody_type}, {climate}, {moisture}, {value}")
-
-            OtherConstructedWaterbodiesEmissionFactor.objects.create(
-                waterbody_type=waterbody_type,
-                climate=climate,
-                moisture=moisture,
-                value=value,
-            )
 
 DefaultSoilCarbonStock1Meter.objects.all().delete()
 DefaultSoilCarbonStock.objects.all().delete()
@@ -4440,24 +4229,203 @@ crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropp
 
 # LivestockManureEF.objects.filter(value=None).all().update(value=0)
 
-IrrigationSystemData.objects.all().delete()
+# IrrigationSystemData.objects.all().delete()
 
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "IrrigationSystems.csv"),
-    header=0,
-    sep=";",
-)
+# df = pd.read_csv(
+#     os.path.join(os.path.dirname(__file__), "ipcc_data", "IrrigationSystems.csv"),
+#     header=0,
+#     sep=";",
+# )
 
-df_headers = df.columns.values.tolist()
-df_dict = df.to_dict("records")
+# df_headers = df.columns.values.tolist()
+# df_dict = df.to_dict("records")
 
-for i, row in enumerate(df_dict):
-    irrigation_system = IrrigationSystemType.objects.get(name__iexact=sanitize(row["irrigation_system_type"]))
-    value = parse_csv_number(row["value"], nan_value=None)
+# for i, row in enumerate(df_dict):
+#     irrigation_system = IrrigationSystemType.objects.get(name__iexact=sanitize(row["irrigation_system_type"]))
+#     value = parse_csv_number(row["value"], nan_value=None)
 
-    print(irrigation_system, value)
+#     print(irrigation_system, value)
 
-    IrrigationSystemData.objects.create(
-        irrigation_system_type=irrigation_system,
-        value=value,
-    )
+#     IrrigationSystemData.objects.create(
+#         irrigation_system_type=irrigation_system,
+#         value=value,
+#     )
+
+# OtherConstructedWaterbodiesEmissionFactor.objects.all().delete()
+
+# df = pd.read_csv(
+#     os.path.join(os.path.dirname(__file__), "ipcc_data", "OtherConstructedWaterbodiesEmissionFactors.csv"),
+#     header=[0],
+#     sep=";",
+# )
+
+# headers = df.columns.values.tolist()
+# rows = df.to_dict("records")
+
+# print(headers)
+
+# for i, row in enumerate(rows):
+#     climate = Climate.objects.get(name__iexact=row["climate"])
+#     moisture = Moisture.objects.get(name__iexact=row["moisture"])
+
+#     print(row)
+
+#     for j, header in enumerate(headers, start=2):
+
+#         if j == len(headers):
+#             break
+
+#         print(header)
+
+#         waterbody_type = WaterbodyType.objects.get(name__iexact=headers[j])
+
+#         value = parse_csv_number(row[headers[j]])
+
+#         print(
+#             waterbody_type,
+#             climate,
+#             moisture,
+#             value,
+#         )
+
+#         OtherConstructedWaterbodiesEmissionFactor.objects.create(
+#             waterbody_type=waterbody_type,
+#             climate=climate,
+#             moisture=moisture,
+#             value=value,
+#         )
+
+
+# LargeFisheryFUI.objects.all().delete()
+
+# df = pd.read_csv(
+#     os.path.join(os.path.dirname(__file__), "ipcc_data", "LargeFisheryFUI.csv"),
+#     header=[0],
+#     sep=";",
+# )
+
+# rows = df.to_dict("records")
+
+# for row in rows:
+#     gear_type = row["gear_type"]
+#     fish_type = row["fish_type"]
+#     value = parse_csv_number(row["value"])
+
+#     print(f"{gear_type}, {fish_type}, {value}")
+
+#     gear_type = LargeFisheryGearType.objects.get(name__iexact=gear_type)
+#     fish_type = FishType.objects.get(name__iexact=fish_type)
+
+#     LargeFisheryFUI.objects.create(fish_type=fish_type, gear_type=gear_type, value=value)
+
+
+# SettlementEF.objects.all().delete()
+
+# df = pd.read_csv(
+#     os.path.join(os.path.dirname(__file__), "ipcc_data", "SettlementEF.csv"),
+#     header=0,
+#     sep=";",
+# )
+
+# headers = df.columns.values.tolist()
+# rows = df.to_dict("records")
+
+# climates = Climate.objects.all()
+# moistures = Moisture.objects.all()
+
+# for i, row in enumerate(rows):
+#     settlement_type = SettlementType.objects.get(name__iexact=row["settlement_type"])
+#     str_climate = row["climate"]
+#     str_moisture = row["moisture"]
+
+#     print(settlement_type, str_climate, str_moisture, row["flu"], row["fi"], row["fmg"], row["biomass"])
+
+#     if str_climate == "All" and str_moisture == "All":
+#         for climate in climates:
+#             print(f"\t{climate}")
+#             for moisture in moistures:
+#                 print(f"\t\t{moisture}")
+#                 SettlementEF.objects.create(
+#                     settlement_type=settlement_type,
+#                     climate=climate,
+#                     moisture=moisture,
+#                     flu=parse_csv_number(row["flu"]),
+#                     fi=parse_csv_number(row["fi"]),
+#                     fmg=parse_csv_number(row["fmg"]),
+#                     biomass=parse_csv_number(row["biomass"]),
+#                 )
+#     elif str_climate == "All":
+#         for climate in climates:
+#             print(f"\t\t{climate}")
+#             moisture = Moisture.objects.get(name__iexact=str_moisture)
+#             SettlementEF.objects.create(
+#                 settlement_type=settlement_type,
+#                 climate=climate,
+#                 moisture=moisture,
+#                 flu=parse_csv_number(row["flu"]),
+#                 fi=parse_csv_number(row["fi"]),
+#                 fmg=parse_csv_number(row["fmg"]),
+#                 biomass=parse_csv_number(row["biomass"]),
+#             )
+#     elif str_moisture == "All":
+#         for moisture in moistures:
+#             print(f"\t\t{moisture}")
+#             if str_climate == "Temperate":
+#                 for climate in Climate.objects.filter(name__in=["Warm Temperate", "Cool Temperate"]).all():
+#                     SettlementEF.objects.create(
+#                         settlement_type=settlement_type,
+#                         climate=climate,
+#                         moisture=moisture,
+#                         flu=parse_csv_number(row["flu"]),
+#                         fi=parse_csv_number(row["fi"]),
+#                         fmg=parse_csv_number(row["fmg"]),
+#                         biomass=parse_csv_number(row["biomass"]),
+#                     )
+#             else:
+#                 climate = Climate.objects.get(name__iexact=str_climate)
+#                 SettlementEF.objects.create(
+#                     settlement_type=settlement_type,
+#                     climate=climate,
+#                     moisture=moisture,
+#                     flu=parse_csv_number(row["flu"]),
+#                     fi=parse_csv_number(row["fi"]),
+#                     fmg=parse_csv_number(row["fmg"]),
+#                     biomass=parse_csv_number(row["biomass"]),
+#                 )
+#     else:
+#         climate = Climate.objects.get(name__iexact=str_climate)
+#         moisture = Moisture.objects.get(name__iexact=str_moisture)
+
+#         SettlementEF.objects.create(
+#             settlement_type=settlement_type,
+#             climate=climate,
+#             moisture=moisture,
+#             flu=parse_csv_number(row["flu"]),
+#             fi=parse_csv_number(row["fi"]),
+#             fmg=parse_csv_number(row["fmg"]),
+#             biomass=parse_csv_number(row["biomass"]),
+#         )
+
+# ElectricityEmission.objects.all().delete()
+
+# df = pd.read_csv(
+#     os.path.join(os.path.dirname(__file__), "ipcc_data", "ElectricityEmissions.csv"),
+#     header=0,
+#     sep=";",
+# )
+
+# df_headers = df.columns.values.tolist()
+# rows = df.to_dict("records")
+
+# for row in rows:
+#     country = Country.objects.get(name__iexact=row["country"])
+#     operating_margin = parse_csv_number(row["operating_margin"])
+#     combined_margin = parse_csv_number(row["combined_margin"])
+
+#     print(country, operating_margin, combined_margin)
+
+#     ElectricityEmission.objects.create(
+#         country=country,
+#         operating_margin=operating_margin,
+#         combined_margin=combined_margin,
+#     )
