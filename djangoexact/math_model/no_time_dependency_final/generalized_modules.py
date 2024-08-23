@@ -1,5 +1,5 @@
 from abc import ABC
-from general_functions import Tier2Defaults
+from .general_functions import Tier2Defaults
 import re
 import traceback
 from .ghg_emissions_classes import (
