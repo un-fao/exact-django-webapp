@@ -74,8 +74,8 @@ class LandModule(BaseModule):
     # maybe we can send a parameter to the perennial or perennial.calculate_emissions() to avoid this
     biomass_start_default: Optional[float]
     biomass_end_default: Optional[float]
-    biomass_start_tier_2_default: Optional[float]
-    biomass_end_tier_2_default: Optional[float]
+    biomass_start_tier_2: Optional[float]
+    biomass_end_tier_2: Optional[float]
 
     def __post_init__(self):
         super().__post_init__()
@@ -92,8 +92,8 @@ class LandModule(BaseModule):
         self.soc_start = soc_ref_start * fmg_start * fi_start * flu_start
         self.soc_end = soc_ref_end * fmg_end * fi_end * flu_end
 
-        self.biomass_start = self.biomass_start_tier_2_default or self.biomass_start_default
-        self.biomass_end = self.biomass_end_tier_2_default or self.biomass_end_default
+        self.biomass_start = self.biomass_start_tier_2 or self.biomass_start_default
+        self.biomass_end = self.biomass_end_tier_2 or self.biomass_end_default
 
         self.hectares_before_20, self.hectares_after_20 = yearly_time_dependent_20_year_breakdown(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
         self.hectares_total = yearly_time_dependent_parameter_breakdown(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
