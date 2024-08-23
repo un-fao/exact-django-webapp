@@ -90,34 +90,34 @@ class OtherLandUseChanges(BaseModule):
     fire_bool: bool
     soc_start_default: float
     soc_end_default: float
-    soc_start_tier_2_default: Optional[float]
-    soc_end_tier_2_default: Optional[float]
+    soc_start_tier_2: Optional[float]
+    soc_end_tier_2: Optional[float]
     fmg_start_default: float
     fmg_end_default: float
-    fmg_start_tier_2_default: Optional[float]
-    fmg_end_tier_2_default: Optional[float]
+    fmg_start_tier_2: Optional[float]
+    fmg_end_tier_2: Optional[float]
     flu_start_default: float
     flu_end_default: float
-    flu_start_tier_2_default: Optional[float]
-    flu_end_tier_2_default: Optional[float]
+    flu_start_tier_2: Optional[float]
+    flu_end_tier_2: Optional[float]
     fi_start_default: float
     fi_end_default: float
-    fi_start_tier_2_default: Optional[float]
-    fi_end_tier_2_default: Optional[float]
+    fi_start_tier_2: Optional[float]
+    fi_end_tier_2: Optional[float]
     calculate_soc_som: bool
     area: float
     dry_matter_end: float
 
     def __post_init__(self):
 
-        fmg_start = self.fmg_start_tier_2_default or self.fmg_start_default
-        fmg_end = self.fmg_end_tier_2_default or self.fmg_end_default
-        flu_start = self.flu_start_tier_2_default or self.flu_start_default
-        flu_end = self.flu_end_tier_2_default or self.flu_end_default
-        fi_start = self.fi_start_tier_2_default or self.fi_start_default
-        fi_end = self.fi_end_tier_2_default or self.fi_end_default
-        soc_ref_start = self.soc_start_tier_2_default or self.soc_start_default
-        soc_ref_end = self.soc_end_tier_2_default or self.soc_end_default
+        fmg_start = self.fmg_start_tier_2 or self.fmg_start_default
+        fmg_end = self.fmg_end_tier_2 or self.fmg_end_default
+        flu_start = self.flu_start_tier_2 or self.flu_start_default
+        flu_end = self.flu_end_tier_2 or self.flu_end_default
+        fi_start = self.fi_start_tier_2 or self.fi_start_default
+        fi_end = self.fi_end_tier_2 or self.fi_end_default
+        soc_ref_start = self.soc_start_tier_2 or self.soc_start_default
+        soc_ref_end = self.soc_end_tier_2 or self.soc_end_default
 
         self.area = area
         self.time_impl = time_impl - delay
