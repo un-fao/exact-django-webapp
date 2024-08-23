@@ -160,8 +160,8 @@ class ForestManagement(BaseModule):
         self.fi_end = self.fi_end_default if not self.fi_end_tier_2 else self.fi_end_tier_2
 
 
-        self.soc_start = self.soc_start_default * self.fmg_start * self.flu_start * self.fi_start if not self.soc_start_tier_2 else self.soc_start_tier_2
-        self.soc_end = self.soc_end_default * self.fmg_end * self.flu_end * self.fi_end if not self.soc_end_tier_2 else self.soc_end_tier_2
+        self.soc_start = self.soc_start_default * self.fmg_start * self.flu_start * self.fi_start if not self.soc_start_tier_2 else self.soc_start_tier_2 * self.fmg_start * self.flu_start * self.fi_start
+        self.soc_end = self.soc_end_default * self.fmg_end * self.flu_end * self.fi_end if not self.soc_end_tier_2 else self.soc_end_tier_2 * self.fmg_end * self.flu_end * self.fi_end
 
         self.ef_methane = ef_methane
         self.ef_nitrous = ef_nitrous
