@@ -2996,7 +2996,7 @@ class AquacultureCalculator(BaseCalculator):
             log.debug("IS WITH")
             self.inputs_w = {
                 "production_start": module.annual_production_start,
-                "production_w": module.annual_production_w,
+                "production_end": module.annual_production_w,
                 "nitrous_ef_default": self.NITROUS_EF_DEFAULT,
                 "nitrous_ef_start_tier_2": module.n2o_from_production_t2_start,
                 "nitrous_ef_end_tier_2": module.n2o_from_production_t2_w,
@@ -3020,7 +3020,7 @@ class AquacultureCalculator(BaseCalculator):
             log.debug("IS WITHOUT")
             self.inputs_wo = {
                 "production_start": module.annual_production_start,
-                "production_w": module.annual_production_wo,
+                "production_end": module.annual_production_wo,
                 "nitrous_ef_default": self.NITROUS_EF_DEFAULT,
                 "nitrous_ef_start_tier_2": module.n2o_from_production_t2_start,
                 "nitrous_ef_end_tier_2": module.n2o_from_production_t2_wo,
