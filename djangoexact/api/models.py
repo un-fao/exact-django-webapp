@@ -489,6 +489,7 @@ class FuelType(models.Model):
     name = models.CharField(max_length=100)
     fuel_use_type = models.ForeignKey(FuelUseType, on_delete=models.CASCADE, null=True, blank=True)
     macro_fuel_type = models.ForeignKey(MacroFuelType, on_delete=models.CASCADE, null=True, blank=True)
+    module_types = models.ManyToManyField(ModuleType, related_name="fuel_types")
 
     class Meta:
         unique_together = ("name", "fuel_use_type", "macro_fuel_type")
@@ -1238,6 +1239,9 @@ class Rice(ResidueAvailability):
 
         super().save(*args, **kwargs)
 
+    def is_minor_season(self) -> bool:
+        return hasattr(self, "parent")
+
 
 class FloodedRice(Rice, LandModuleFixed, SingleBiomassModule):
     pass
@@ -1748,6 +1752,7 @@ class Fuel(Submodule):
 
 
 class IrrigationSystemType(models.Model):
+    module_types = models.ManyToManyField(ModuleType, related_name="irrigation_system_types", null=True, blank=True)
     name = models.CharField(max_length=255, unique=True)
 
     def __str__(self):
@@ -2100,9 +2105,9 @@ class LandUseChange(Module):
     is_fire_used_wo = models.BooleanField(default=False)
     is_fire_used_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="land_use_change_is_fire_used_thread")
 
-    dry_matter_start = models.FloatField(null=True, blank=True)
-    dry_matter_w = models.FloatField(null=True, blank=True)
-    dry_matter_wo = models.FloatField(null=True, blank=True)
+    dry_matter_start = models.FloatField(null=True, blank=True, default=0)
+    dry_matter_w = models.FloatField(null=True, blank=True, default=0)
+    dry_matter_wo = models.FloatField(null=True, blank=True, default=0)
     dry_matter_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="land_use_change_dry_matter_thread")
 
     organic_soil = models.OneToOneField(OrganicSoil, on_delete=models.CASCADE, null=True, blank=True, related_name="land_use_change_organic_soil")

@@ -37,6 +37,7 @@ class GrasslandManagement(LandModule):
     agb_tier_2: float
     cf_ref: float
     cf_tier_2: Optional[float]
+    
 
     def calculate_emissions(
         self,
