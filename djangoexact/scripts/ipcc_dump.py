@@ -450,29 +450,6 @@ with open("scripts/ipcc_data/GrasslandSOC.csv", "r") as f:
             grassland_management_type=grassland_management_type, value=value
         )
 
-with open("scripts/ipcc_data/EnergyDefaultEmissionFactors.csv", "r") as f:
-    reader = csv.reader(f)
-    data = list(reader)
-
-    for row in data:
-        fuel_type = FuelType.objects.get(name__iexact=sanitize(row[0]).title())
-
-        foo = EnergyDefaultEmissionFactor()
-        foo.fuel_type = fuel_type
-        foo.t_co2_eq_m3 = row[1] if row[1] != "" else None
-        foo.tj_gg = row[2] if row[2] != "" else None
-        foo.kg_ch4_tj = row[3] if row[3] != "" else None
-        foo.kg_n2o_tj = row[4] if row[4] != "" else None
-        foo.density_kg_m3 = row[5] if row[5] != "" else None
-        foo.co2_emissions = row[6] if row[6] != "" else None
-        foo.ch4_emissions = row[7] if row[7] != "" else None
-        foo.n2o_emissions = row[8] if row[8] != "" else None
-        foo.save()
-
-        print(
-            f"{fuel_type}, {row[1]}, {row[2]}, {row[3]}, {row[4]}, {row[5]}, {row[6]}, {row[7]}, {row[8]}"
-        )
-
 LivestockManureEF.objects.all().delete()
 
 # print("AO")
@@ -4398,38 +4375,73 @@ crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropp
 #     )
 
 
-log.debug("Deleting all GlobalWarmingPotential objects...")
-# NOTE: This will delete all projects in review. Change to iexact update
-GlobalWarmingPotential.objects.all().delete()
+# log.debug("Deleting all GlobalWarmingPotential objects...")
+# # NOTE: This will delete all projects in review. Change to iexact update
+# GlobalWarmingPotential.objects.all().delete()
 
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "GlobalWarmingPotential.csv"),
-    header=0,
-    sep=";",
-)
+# df = pd.read_csv(
+#     os.path.join(os.path.dirname(__file__), "ipcc_data", "GlobalWarmingPotential.csv"),
+#     header=0,
+#     sep=";",
+# )
 
-df_headers = df.columns.values.tolist()
-df_dict = df.to_dict("records")
+# df_headers = df.columns.values.tolist()
+# df_dict = df.to_dict("records")
 
-for i, row in enumerate(df_dict):
-    name = row["name"]
-    co2 = parse_csv_number(row["co2"])
-    ch4 = parse_csv_number(row["ch4"])
-    n2o = parse_csv_number(row["n2o"])
-    ch4_fossil = parse_csv_number(row["ch4_fossil"])
+# for i, row in enumerate(df_dict):
+#     name = row["name"]
+#     co2 = parse_csv_number(row["co2"])
+#     ch4 = parse_csv_number(row["ch4"])
+#     n2o = parse_csv_number(row["n2o"])
+#     ch4_fossil = parse_csv_number(row["ch4_fossil"])
 
-    print(
-        name,
-        co2,
-        ch4,
-        n2o,
-        ch4_fossil,
-    )
+#     print(
+#         name,
+#         co2,
+#         ch4,
+#         n2o,
+#         ch4_fossil,
+#     )
 
-    GlobalWarmingPotential.objects.create(
-        name=name,
-        co2=co2,
-        ch4=ch4,
-        n2o=n2o,
-        ch4_fossil=ch4_fossil,
-    )
+#     GlobalWarmingPotential.objects.create(
+#         name=name,
+#         co2=co2,
+#         ch4=ch4,
+#         n2o=n2o,
+#         ch4_fossil=ch4_fossil,
+#     )
+
+# log.debug("Deleting all InputEmissionFactor models...")
+# EnergyDefaultEmissionFactor.objects.all().delete()
+
+# df = pd.read_csv(
+#     os.path.join(os.path.dirname(__file__), "ipcc_data", "EnergyDefaultEmissionFactors.csv"),
+#     header=0,
+#     sep=";",
+# )
+
+# df_headers = df.columns.values.tolist()
+# df_dict = df.to_dict("records")
+
+# for i, row in enumerate(df_dict):
+#     fuel_use_type = FuelUseType.objects.get(name__iexact=row["fuel_use_type"])
+#     fuel_type = FuelType.objects.get(name__iexact=row["fuel_type"])
+#     co2 = parse_csv_number(row["co2"])
+#     ch4 = parse_csv_number(row["ch4"])
+#     n2o = parse_csv_number(row["n2o"])
+
+#     print(
+#         fuel_use_type,
+#         fuel_type,
+#         co2,
+#         ch4,
+#         n2o,
+#     )
+
+#     EnergyDefaultEmissionFactor.objects.create(
+#         fuel_use_type=fuel_use_type,
+#         fuel_type=fuel_type,
+#         co2=co2,
+#         ch4=ch4,
+#         n2o=n2o,
+#     )

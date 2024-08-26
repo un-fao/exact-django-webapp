@@ -1,14 +1,15 @@
-﻿Stationary - Motor Gasoline,2.289,44.3,69300,10,0.6,741,,,
-Stationary - Gasoil / Diesel Oil,2.683,43.0,74100,10,0.6,837,,,
-Stationary - Waste Oil / Lubrificants,2.816,40.2,73300,10,0.6,950,,,
-Stationary LPG,1.595,47.3,63100,5,0.1,533,,,
-Stationary - Natural Gas,0.002,48,56100,5,0.1,0.768,,,
-Mobile - Motor Gasoline,2.333,44.3,,,,741,69300,33,3.2
-Mobile - Gasoil / Diesel Oil,2.708,43,,,,837,74100,3.9,3.9
-Mobile - Natural Gas,0.002,48,,,,0.768,56100,92,3
-Mobile - LPG,1.636,47.3,,,,533,63100,62,0.2
-Mobile - Ethanol (cars),0.043,27,,,,788,1508,18,
-Mobile - Ethanol (trucks),0.418,27,,,,788,1508,260,41
-Off-road Diesel ,2.944,43,,,,837,74100,4.15,28.6
-Off-road Gasoline (2-stroke),2.407,44.3,,,,741,69300,140,0.4
-Off-road Gasoline (4-stroke),2.366,44.3,,,,741,69300,80,2
+﻿fuel_use_type;fuel_type;co2;ch4;n2o
+Stationary;Motor Gasoline;2,27486259;0,009191364;0,005219382
+Stationary;Gasoil /Diesel Oil;2,6669331;0,01007748;0,005722569
+Stationary;Waste Oil / Lubrificants;2,799327;0,0106932;0,00607221
+Stationary;LPG;1,59080779;0,003529526;0,000668089
+Stationary;Natural Gas;0,00206807;5,16096E-06;9,76896E-07
+Mobile;Motor Gasoline;2,27486259;0,030331501;0,027836702
+Mobile;Gasoil /Diesel Oil;2,6669331;0,003930217;0,037196699
+Mobile;Natural Gas;0,00206807;9,49617E-05;2,93069E-05
+Mobile;LPG;1,59080779;0,043766122;0,001336178
+Mobile;Ethanol (cars);0,032084208;0,010723104;0
+Mobile;Ethanol (trucks);0,032084208;0,15488928;0,23116374
+Off-Road;Diesel;2,6669331;0,004182154;0,272775789
+Off-Road;Gasoline (2-stroke);2,27486259;0,128679096;0,003479588
+Off-Road;Gasoline (4-stroke);2,27486259;0,073530912;0,017397939
