@@ -849,7 +849,6 @@ class CropYieldStats(Model):
 
 class InputReference(Model):
     # TODO: Maybe unify with InputEmissionFactor?
-    gw_potential = ForeignKey(GlobalWarmingPotential, on_delete=CASCADE)
     input_type = ForeignKey("api.InputType", on_delete=CASCADE)
     co2_multiplier = FloatField(null=True, blank=True)
     co2_emissions_multiplier = FloatField(null=True, blank=True)
@@ -859,7 +858,7 @@ class InputReference(Model):
     production_emissions_multiplier = FloatField(null=True, blank=True)
 
     def __str__(self):
-        return f"Input Reference for {self.input_type.name} and {self.gw_potential.name}"
+        return f"Input Reference for {self.input_type.name}"
 
 
 class InputEmissionFactor(Model):
@@ -1024,6 +1023,7 @@ class EnergyDefaultEmissionFactor(Model):
     IPCC 1724:1753
     """
 
+    fuel_use_type = ForeignKey("api.FuelUseType", on_delete=CASCADE)
     fuel_type = ForeignKey("api.FuelType", on_delete=CASCADE)
     co2 = FloatField(null=True, blank=True)
     ch4 = FloatField(null=True, blank=True)
@@ -1032,6 +1032,10 @@ class EnergyDefaultEmissionFactor(Model):
     def __str__(self):
         fuel_use_type = getattr(self.fuel_type.fuel_use_type, "name", None)
         return f"({self.pk}) {self.fuel_type} {fuel_use_type} {self.co2} {self.ch4} {self.n2o}"
+
+    class Meta:
+        verbose_name_plural = "Energy default emission factors"
+        unique_together = ("fuel_use_type", "fuel_type")
 
 
 class IrrigationSystemData(Model):
