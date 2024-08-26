@@ -9,14 +9,19 @@ from ..factories import *
 import api.tests.base_test_classes as t
 
 
-class EnergyTest(t.ModuleTest):
+class EnergyTest(t.ModuleWithSubmodulesTest):
     def __init__(self):
         super().__init__()
         self.module_type = ModuleType.objects.get(class_name="Energy")
+        self.submodule_types = [
+            ModuleType.objects.get(class_name="Fuel"),
+        ]
         self.create_module()
+        self.create_submodules()
 
     def test(self):
         self.calculate_results()
+        self.calculate_submodule_results()
 
 
 EnergyTest().test()
