@@ -3117,9 +3117,9 @@ class InputEntryCalculator(BaseCalculator):
             self.calculate()
 
         try:
-            self.ref = ipcc.InputReference.objects.get(gw_potential=project.gw_potential, input_type=module.input_type)
+            self.ref = ipcc.InputReference.objects.get(input_type=module.input_type)
         except ipcc.InputReference.DoesNotExist:
-            raise ValueError(f"Reference for {module.input_type.name} does not exist for {project.gw_potential.name}.")
+            raise ValueError(f"Reference for {module.input_type.name} does not exist.")
 
         try:
             self.ef = ipcc.InputEmissionFactor.objects.get(input_type=module.input_type, climate=project.climate, moisture=project.moisture)
@@ -3158,6 +3158,7 @@ class InputEntryCalculator(BaseCalculator):
             "emissions_factor_eq": self.ref.production_emissions_multiplier,
             "delay": self.activity.delay,
         }
+        log.debug("Inputs with: %s", self.inputs_w)
 
         self.math_w = MathInputs(**self.inputs_w)
         self.math_w.calculate_emissions()
@@ -3182,6 +3183,7 @@ class InputEntryCalculator(BaseCalculator):
             "emissions_factor_eq": self.ref.production_emissions_multiplier,
             "delay": self.activity.delay,
         }
+        log.debug("Inputs without: %s", self.inputs_wo)
 
         self.math_wo = MathInputs(**self.inputs_wo)
         self.math_wo.calculate_emissions()
@@ -3379,10 +3381,14 @@ class FuelCalculator(BaseCalculator):
         """
         log.debug("START FuelCalculator.calculate")
 
+        self.get_defaults()
+
         change_rate = self.activity.change_rate
         methane_constant = self.project.gw_potential.ch4
 
-        if ["Peat", "Charcoal"] in self.module.fuel_type.name:
+        log.debug(f"Fuel Type: {self.module.fuel_type.name}")
+
+        if self.module.fuel_type.name in ["Peat", "Charcoal"]:
             methane_constant = self.project.gw_potential.ch4_fossil
 
         inputs_w = {
@@ -3399,6 +3405,7 @@ class FuelCalculator(BaseCalculator):
             "capitalization_time": self.activity.capitalization_years,
             "methane_constant": methane_constant,
             "nitrous_constant": self.project.gw_potential.n2o,
+            "delay": self.activity.delay,
         }
         log.debug("Inputs with: %s", inputs_w)
 
@@ -3419,6 +3426,7 @@ class FuelCalculator(BaseCalculator):
             "capitalization_time": self.activity.capitalization_years,
             "methane_constant": methane_constant,
             "nitrous_constant": self.project.gw_potential.n2o,
+            "delay": self.activity.delay,
         }
         log.debug("Inputs without: %s", inputs_wo)
 
