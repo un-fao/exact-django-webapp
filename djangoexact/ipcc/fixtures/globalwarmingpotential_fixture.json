@@ -1,1 +1,22 @@
-[{"model": "ipcc.globalwarmingpotential", "pk": 1, "fields": {"name": "100 yr AR5 w/out CC feedback", "co2": 1.0, "ch4": 28.0, "n2o": 265.0}}, {"model": "ipcc.globalwarmingpotential", "pk": 2, "fields": {"name": "100 yr AR5 with CC feedback", "co2": 1.0, "ch4": 34.0, "n2o": 298.0}}]
+[
+    {
+        "model": "ipcc.globalwarmingpotential",
+        "pk": 1,
+        "fields": {
+            "name": "100 yr AR5 w/out CC feedback",
+            "co2": 1.0,
+            "ch4": 28.0,
+            "n2o": 265.0
+        }
+    },
+    {
+        "model": "ipcc.globalwarmingpotential",
+        "pk": 2,
+        "fields": {
+            "name": "100 yr AR5 with CC feedback",
+            "co2": 1.0,
+            "ch4": 34.0,
+            "n2o": 298.0
+        }
+    }
+]
