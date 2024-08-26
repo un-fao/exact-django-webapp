@@ -174,64 +174,47 @@ class ElectricityConsumption(BaseModule):
             traceback.print_exc()
 
 @dataclass
-class FuelConsumption(BaseModule):
-    emissions_factor: float
-    specific_factor: Optional[float]
+class SolidandLiquidFuelsConsumption(BaseModule):
+    # Now we have co2, ch4 and n2o factors
+    emissions_factor_co2: float
+    specific_factor_co2: Optional[float]
+    emissions_factor_ch4: float
+    specific_factor_ch4: Optional[float]
+    emissions_factor_n2o: float
+    specific_factor_n2o: Optional[float]
     mwh_start: float
     mwh_end: float
-
-    def calculate_emissions(
-        self,
-    ):
-        try:
-            factor = self.specific_factor or self.emissions_factor
-
-            annual_start = factor * self.mwh_start
-            annual_end = factor * self.mwh_end
-
-            emissions_total_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
-
-            fuel_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_total_yearly], ActivityTypes.FUEL, delay=self.delay)
-            self.result.yearly_emissions_by_sector_by_gas.append(fuel_emission_set)
-
-        except:
-            traceback.print_exc()
-
-@dataclass
-class SolidConsumption(BaseModule):
-    joules_factor: float
-    co2_factor: float
-    ch4_factor: float
-    n2o_factor: float
-    account_for_co2_boolean: bool
-    methane_constant: float
     nitrous_constant: float
-    specific_factor: Optional[float]
-    mwh_start: float
-    mwh_end: float
+    methane_constant: float
 
     def calculate_emissions(
         self,
     ):
-        def calculate_factor(joules_factor, co2_factor, ch4_factor, n2o_factor, account_for_co2_boolean, methane_constant, nitrous_constant):
-            try:
-                if account_for_co2_boolean:
-                    return joules_factor * (co2_factor + ch4_factor * methane_constant + n2o_factor * nitrous_constant) / math.pow(10, 6)
-                else:
-                    return joules_factor * (ch4_factor * methane_constant + n2o_factor * nitrous_constant) / math.pow(10, 6)
-            except:
-                traceback.print_exc()
-
         try:
-            factor = self.specific_factor or calculate_factor(self.joules_factor, self.co2_factor, self.ch4_factor, self.n2o_factor, self.account_for_co2_boolean, self.methane_constant, self.nitrous_constant)
+            factor_co2 = self.specific_factor_co2 or self.emissions_factor_co2
+            factor_ch4 = self.specific_factor_ch4  or self.emissions_factor_ch4 
+            factor_n2o = self.specific_factor_n2o  or self.emissions_factor_n2o 
 
-            annual_start = factor * self.mwh_start
-            annual_end = factor * self.mwh_end
+            annual_start_co2 = factor_co2 * self.mwh_start
+            annual_end_co2 = factor_co2 * self.mwh_end
 
-            emissions_total_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
+            annual_start_ch4 = factor_ch4 * self.mwh_start * self.methane_constant
+            annual_end_ch4 = factor_ch4 * self.mwh_end * self.methane_constant
 
-            solid_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_total_yearly], ActivityTypes.SOLID_CONSUMPTION, delay=self.delay)
-            self.result.yearly_emissions_by_sector_by_gas.append(solid_emission_set)
+            annual_start_n2o = factor_n2o * self.mwh_start * self.nitrous_constant
+            annual_end_n2o = factor_n2o * self.mwh_end * self.nitrous_constant
+
+            emissions_co2_yearly = yearly_time_dependent_parameter_breakdown(annual_start_co2, annual_end_co2, self.implementation_time, self.capitalization_time, self.rate_type)
+            emissions_ch4_yearly = yearly_time_dependent_parameter_breakdown(annual_start_ch4, annual_end_ch4, self.implementation_time, self.capitalization_time, self.rate_type)
+            emissions_n2o_yearly = yearly_time_dependent_parameter_breakdown(annual_start_n2o, annual_end_n2o, self.implementation_time, self.capitalization_time, self.rate_type)
+
+            fuel_emission_set_co2 = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_co2_yearly], ActivityTypes.FUEL, delay=self.delay)
+            fuel_emission_set_ch4 = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in emissions_ch4_yearly], ActivityTypes.FUEL, delay=self.delay)
+            fuel_emission_set_n2o = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in emissions_n2o_yearly], ActivityTypes.FUEL, delay=self.delay)
+            
+            self.result.yearly_emissions_by_sector_by_gas.append(fuel_emission_set_co2)
+            self.result.yearly_emissions_by_sector_by_gas.append(fuel_emission_set_ch4)
+            self.result.yearly_emissions_by_sector_by_gas.append(fuel_emission_set_n2o)
 
         except:
             traceback.print_exc()
