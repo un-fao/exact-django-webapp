@@ -1,6 +1,6 @@
-name;co2;ch4;n2o
-Second Assessment Report (SAR);1;21;310
-Fourth Assessment Report (AR4);1;25;298
-Fifth Assessment with climate carbon feedback Report (AR5);1;34;298
-Fifth Assessment without  climate carbon feedback Report (AR5);1;28;265
-Sixth Assessment Report (AR6);1;27;273
+name;co2;ch4;n2o;ch4_fossil
+Second Assessment Report (SAR);1;21;310;0
+Fourth Assessment Report (AR4);1;25;298;0
+Fifth Assessment with climate carbon feedback Report (AR5);1;34;298;0
+Fifth Assessment without  climate carbon feedback Report (AR5);1;28;265;0
+Sixth Assessment Report (AR6);1;27;273;29,8

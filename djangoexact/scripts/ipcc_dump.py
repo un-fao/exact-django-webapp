@@ -3877,39 +3877,6 @@ for i, row in enumerate(df_dict):
             head=parse_csv_number(row["head"], nan_value=None),
         )
 
-
-log.debug("Deleting all GlobalWarmingPotential objects...")
-GlobalWarmingPotential.objects.all().delete()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "GlobalWarmingPotential.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers = df.columns.values.tolist()
-df_dict = df.to_dict("records")
-
-for i, row in enumerate(df_dict):
-    name = row["name"]
-    co2 = parse_csv_number(row["co2"])
-    ch4 = parse_csv_number(row["ch4"])
-    n2o = parse_csv_number(row["n2o"])
-
-    print(
-        name,
-        co2,
-        ch4,
-        n2o,
-    )
-
-    GlobalWarmingPotential.objects.create(
-        name=name,
-        co2=co2,
-        ch4=ch4,
-        n2o=n2o,
-    )
-
 """
 
 # TODO: Run in review
@@ -4429,3 +4396,40 @@ crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropp
 #         operating_margin=operating_margin,
 #         combined_margin=combined_margin,
 #     )
+
+
+log.debug("Deleting all GlobalWarmingPotential objects...")
+# NOTE: This will delete all projects in review. Change to iexact update
+GlobalWarmingPotential.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "GlobalWarmingPotential.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers = df.columns.values.tolist()
+df_dict = df.to_dict("records")
+
+for i, row in enumerate(df_dict):
+    name = row["name"]
+    co2 = parse_csv_number(row["co2"])
+    ch4 = parse_csv_number(row["ch4"])
+    n2o = parse_csv_number(row["n2o"])
+    ch4_fossil = parse_csv_number(row["ch4_fossil"])
+
+    print(
+        name,
+        co2,
+        ch4,
+        n2o,
+        ch4_fossil,
+    )
+
+    GlobalWarmingPotential.objects.create(
+        name=name,
+        co2=co2,
+        ch4=ch4,
+        n2o=n2o,
+        ch4_fossil=ch4_fossil,
+    )
