@@ -18,6 +18,8 @@ from .ghg_emissions_classes import (
 
 from dataclasses import dataclass
 from typing import Optional
+
+
 @dataclass
 class Inputs(BaseModule):
     unit_start: float
@@ -63,6 +65,7 @@ class Inputs(BaseModule):
 
         except Exception as e:
             traceback.print_exc()
+
 
 @dataclass
 class OperationPhaseIrrigation(BaseModule):
@@ -122,13 +125,14 @@ class OperationPhaseIrrigation(BaseModule):
         except:
             traceback.print_exc()
 
+
 @dataclass
 class Roads(BaseModule):
 
     ef_ipcc: float
     ef_tier_2: Optional[float]
     units_end: float  # This will be used to set `units_end`
-        
+
     def calculate_emissions(self):
         try:
             # NOTE: check this, looks weird
@@ -137,11 +141,12 @@ class Roads(BaseModule):
             self.total_emissions = self.units_end * ef / 1000  # to convert the ef from kg to g
             self.emissions_total_yearly = yearly_constant_emissions_breakdown(self.total_emissions, self.time_impl, self.time_cap, self.rate_type)
 
-            roads_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_total_yearly], ActivityTypes.ROADS, delay=self.delay) 
+            roads_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_total_yearly], ActivityTypes.ROADS, delay=self.delay)
             self.result.yearly_emissions_by_sector_by_gas.append(roads_emission_set)
 
         except:
             traceback.print_exc()
+
 
 @dataclass
 class ElectricityConsumption(BaseModule):
@@ -182,12 +187,12 @@ class ElectricityConsumption(BaseModule):
             electricity_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_total_yearly], ActivityTypes.ELECTRICITY, delay=self.delay)
             self.result.yearly_emissions_by_sector_by_gas.append(electricity_emission_set)
 
-
         except:
             traceback.print_exc()
 
+
 @dataclass
-class SolidandLiquidFuelsConsumption(BaseModule):
+class SolidAndLiquidFuelsConsumption(BaseModule):
     # Now we have co2, ch4 and n2o factors
     emissions_factor_co2: float
     specific_factor_co2: Optional[float]
@@ -205,8 +210,8 @@ class SolidandLiquidFuelsConsumption(BaseModule):
     ):
         try:
             factor_co2 = self.specific_factor_co2 or self.emissions_factor_co2
-            factor_ch4 = self.specific_factor_ch4  or self.emissions_factor_ch4 
-            factor_n2o = self.specific_factor_n2o  or self.emissions_factor_n2o 
+            factor_ch4 = self.specific_factor_ch4 or self.emissions_factor_ch4
+            factor_n2o = self.specific_factor_n2o or self.emissions_factor_n2o
 
             annual_start_co2 = factor_co2 * self.mwh_start
             annual_end_co2 = factor_co2 * self.mwh_end
@@ -224,13 +229,14 @@ class SolidandLiquidFuelsConsumption(BaseModule):
             fuel_emission_set_co2 = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_co2_yearly], ActivityTypes.FUEL, delay=self.delay)
             fuel_emission_set_ch4 = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in emissions_ch4_yearly], ActivityTypes.FUEL, delay=self.delay)
             fuel_emission_set_n2o = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in emissions_n2o_yearly], ActivityTypes.FUEL, delay=self.delay)
-            
+
             self.result.yearly_emissions_by_sector_by_gas.append(fuel_emission_set_co2)
             self.result.yearly_emissions_by_sector_by_gas.append(fuel_emission_set_ch4)
             self.result.yearly_emissions_by_sector_by_gas.append(fuel_emission_set_n2o)
 
         except:
             traceback.print_exc()
+
 
 @dataclass
 class NewIrrigation(BaseModule):
@@ -253,4 +259,3 @@ class NewIrrigation(BaseModule):
 
         except:
             traceback.print_exc()
-

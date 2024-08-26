@@ -43,7 +43,7 @@ from math_model.no_time_dependency_final.inlands import (
 )
 from math_model.no_time_dependency_final.inputs import (
     ElectricityConsumption,
-    SoildAndLiquidFuelConsumption,
+    SolidAndLiquidFuelsConsumption,
     NewIrrigation,
     OperationPhaseIrrigation,
 )
@@ -3402,7 +3402,7 @@ class FuelCalculator(BaseCalculator):
         }
         log.debug("Inputs with: %s", inputs_w)
 
-        self.math_w = SoildAndLiquidFuelConsumption(**inputs_w)
+        self.math_w = SolidAndLiquidFuelsConsumption(**inputs_w)
         self.math_w.calculate_emissions()
 
         inputs_wo = {
@@ -3422,7 +3422,7 @@ class FuelCalculator(BaseCalculator):
         }
         log.debug("Inputs without: %s", inputs_wo)
 
-        self.math_wo = SoildAndLiquidFuelConsumption(**inputs_wo)
+        self.math_wo = SolidAndLiquidFuelsConsumption(**inputs_wo)
         self.math_wo.calculate_emissions()
 
         self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
