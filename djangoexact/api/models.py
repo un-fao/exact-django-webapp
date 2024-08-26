@@ -1787,7 +1787,18 @@ class Fuel(Submodule):
     fuel_consumption_wo = models.FloatField(null=True, blank=True)
     fuel_consumption_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_fuel_consumption_thread")
 
-    ef_t2 = models.FloatField(null=True, blank=True)
+    ef_co2_t2_start = models.FloatField(null=True, blank=True)
+    ef_co2_t2_w = models.FloatField(null=True, blank=True)
+    ef_co2_t2_wo = models.FloatField(null=True, blank=True)
+
+    ef_ch4_t2_start = models.FloatField(null=True, blank=True)
+    ef_ch4_t2_w = models.FloatField(null=True, blank=True)
+    ef_ch4_t2_wo = models.FloatField(null=True, blank=True)
+
+    ef_n2o_t2_start = models.FloatField(null=True, blank=True)
+    ef_n2o_t2_w = models.FloatField(null=True, blank=True)
+    ef_n2o_t2_wo = models.FloatField(null=True, blank=True)
+
     account_for_co2 = models.BooleanField(default=False)
 
 

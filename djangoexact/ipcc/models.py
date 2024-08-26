@@ -8,9 +8,10 @@ class GlobalWarmingPotential(Model):
     co2 = FloatField()
     ch4 = FloatField()
     n2o = FloatField()
+    ch4_fossil = FloatField(null=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return f"({self.id}) {self.name} - CO2: {self.co2}, CH4: {self.ch4}, N2O: {self.n2o}, CH4 Fossil: {self.ch4_fossil}"
 
 
 class TotalBiomassAfterDefoManager(Manager):
@@ -1024,16 +1025,13 @@ class EnergyDefaultEmissionFactor(Model):
     """
 
     fuel_type = ForeignKey("api.FuelType", on_delete=CASCADE)
-    t_co2_eq = FloatField(null=True, blank=True)
-    net_calorific_value = FloatField(null=True, blank=True)
     co2 = FloatField(null=True, blank=True)
     ch4 = FloatField(null=True, blank=True)
     n2o = FloatField(null=True, blank=True)
-    density = FloatField(null=True, blank=True)
 
     def __str__(self):
         fuel_use_type = getattr(self.fuel_type.fuel_use_type, "name", None)
-        return f"({self.pk}) {self.fuel_type.name} {fuel_use_type} {self.t_co2_eq} {self.net_calorific_value} {self.co2} {self.ch4} {self.n2o} {self.density}"
+        return f"({self.pk}) {self.fuel_type} {fuel_use_type} {self.co2} {self.ch4} {self.n2o}"
 
 
 class IrrigationSystemData(Model):
