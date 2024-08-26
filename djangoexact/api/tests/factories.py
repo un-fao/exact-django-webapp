@@ -26,7 +26,7 @@ coastal_vegetations = [coastal for coastal in LandUseType.objects.filter(module_
 
 livestock_category_types = [c for c in LivestockCategoryType.objects.filter(is_active=True).all()]
 livestock_production_types = [c for c in LivestockProductionType.objects.all()]
-fuels = [fuel for fuel in FuelType.objects.exclude(macro_fuel_type__name="Liquid or gaseous").all()]
+fuels = [fuel for fuel in FuelType.objects.all()]
 
 climates = [climate for climate in Climate.objects.all()]
 moisture = [moisture for moisture in Moisture.objects.all()]
@@ -57,8 +57,9 @@ class ProjectFactory(DjangoModelFactory):
     executing_agency = factory.fuzzy.FuzzyText()
     status = factory.fuzzy.FuzzyChoice(statuses)
 
-    implementation_years = factory.fuzzy.FuzzyInteger(1, 7)
-    start_year_of_activities = factory.fuzzy.FuzzyInteger(2021, 2024)
+    implementation_years = factory.fuzzy.FuzzyInteger(1, 10)
+    start_year_of_activities = factory.fuzzy.FuzzyInteger(2024, 2024)
+    last_year_of_accounting = factory.fuzzy.FuzzyInteger(2024, 2050)
 
     climate = factory.fuzzy.FuzzyChoice(climates)
     moisture = factory.fuzzy.FuzzyChoice(moisture)
