@@ -197,23 +197,25 @@ class SolidandLiquidFuelsConsumption(BaseModule):
     specific_factor_n2o: Optional[float]
     mwh_start: float
     mwh_end: float
+    nitrous_constant: float
+    methane_constant: float
 
     def calculate_emissions(
         self,
     ):
         try:
             factor_co2 = self.specific_factor_co2 or self.emissions_factor_co2
-            factor_ch4 = self.specific_factor_ch4 or self.emissions_factor_ch4
-            factor_n2o = self.specific_factor_n2o or self.emissions_factor_n2o
+            factor_ch4 = self.specific_factor_ch4  or self.emissions_factor_ch4 
+            factor_n2o = self.specific_factor_n2o  or self.emissions_factor_n2o 
 
             annual_start_co2 = factor_co2 * self.mwh_start
             annual_end_co2 = factor_co2 * self.mwh_end
 
-            annual_start_ch4 = factor_ch4 * self.mwh_start
-            annual_end_ch4 = factor_ch4 * self.mwh_end
+            annual_start_ch4 = factor_ch4 * self.mwh_start * self.methane_constant
+            annual_end_ch4 = factor_ch4 * self.mwh_end * self.methane_constant
 
-            annual_start_n2o = factor_n2o * self.mwh_start
-            annual_end_n2o = factor_n2o * self.mwh_end
+            annual_start_n2o = factor_n2o * self.mwh_start * self.nitrous_constant
+            annual_end_n2o = factor_n2o * self.mwh_end * self.nitrous_constant
 
             emissions_co2_yearly = yearly_time_dependent_parameter_breakdown(annual_start_co2, annual_end_co2, self.implementation_time, self.capitalization_time, self.rate_type)
             emissions_ch4_yearly = yearly_time_dependent_parameter_breakdown(annual_start_ch4, annual_end_ch4, self.implementation_time, self.capitalization_time, self.rate_type)
