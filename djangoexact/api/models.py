@@ -698,7 +698,7 @@ class Activity(Historical):
 
     def __get_capitalization_years(self) -> int:
         if any([self.start_year_t2 is None, self.duration_t2 is None]):
-            return self.project.implementation_years
+            return self.project.capitalization_years
 
         return self.project.last_year_of_accounting - (self.start_year_t2 + self.duration_t2)
 
