@@ -719,6 +719,10 @@ class Submodule(Historical):
     class Meta:
         abstract = True
 
+    @property
+    def module_type(self):
+        return ModuleType.objects.get(class_name=self.__class__.__name__)
+
     def save(self, *args, **kwargs):
         if not self.parent:
             raise exceptions.ValidationError("Submodule must have a parent field specified in the model")
@@ -2173,7 +2177,7 @@ class LandUseChange(Module):
             raise Exception("At least one module is missing")
 
         return modules
-    
+
     def get_module_types(self) -> tuple[ModuleType]:
         """
         Retrieves the module types associated with each scenario of a given LandUseChange object.
