@@ -719,6 +719,10 @@ class Submodule(Historical):
     class Meta:
         abstract = True
 
+    @property
+    def module_type(self):
+        return ModuleType.objects.get(class_name=self.__class__.__name__)
+
     def save(self, *args, **kwargs):
         if not self.parent:
             raise exceptions.ValidationError("Submodule must have a parent field specified in the model")
@@ -786,6 +790,10 @@ class Module(Historical):
     soc_t2_wo = models.FloatField(null=True, blank=True)
 
     status = models.ForeignKey(StatusType, on_delete=models.CASCADE, null=True, blank=True)
+
+    @property
+    def module_type(self):
+        return ModuleType.objects.get(class_name=self.__class__.__name__)
 
     def __str__(self):
         return f"({self.pk}) {self._meta.object_name} in {self.activity.name}"
@@ -2169,6 +2177,26 @@ class LandUseChange(Module):
             raise Exception("At least one module is missing")
 
         return modules
+
+    def get_module_types(self) -> tuple[ModuleType]:
+        """
+        Retrieves the module types associated with each scenario of a given LandUseChange object.
+
+        Args:
+            luc (LandUseChange): The LandUseChange object.
+
+        Returns:
+            tuple[ModuleType]: A tuple containing the module types for each scenario.
+
+        Raises:
+            Exception: If at least one module type is missing.
+        """
+        module_types = (self.module_type_start, self.module_type_w, self.module_type_wo)
+
+        if not all(module_types):
+            raise Exception("At least one module type is missing")
+
+        return module_types
 
 
 ### MODEL PARAMETERS TABLES ###
