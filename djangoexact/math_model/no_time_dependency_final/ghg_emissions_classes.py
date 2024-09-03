@@ -3,10 +3,13 @@ import logging as log
 import os
 from collections import defaultdict
 from enum import Enum
-from tempfile import TemporaryDirectory
-
+import tempfile
 import matplotlib.pyplot as plt
+import matplotlib
 from PIL import Image
+import json
+
+matplotlib.use('Agg')
 
 
 class GasTypes(Enum):
@@ -82,6 +85,11 @@ class Emission:
     def __sub__(self, other):
         return Emission(self.value - other.value, self.gas_type)
 
+    def to_dict(self):
+        return {
+            "gas_type": {"name": self.gas_type.name if self.gas_type else None},
+            "value": self.value
+        }
 
 class YearlyGasEmissionSet:
 
@@ -96,7 +104,6 @@ class YearlyGasEmissionSet:
 
         self.emissions.extend(emissions)
 
-
 class YearlyGasActivityEmissionSet(YearlyGasEmissionSet):
 
     def __init__(self, year, gas_type, emissions, activity, delay=0):
@@ -104,7 +111,14 @@ class YearlyGasActivityEmissionSet(YearlyGasEmissionSet):
         # Can be a sub-activity, e.g. "Fire on Soil"
         self.activity: ActivityTypes = activity
 
-
+    def to_dict(self):
+        return {
+            "year": self.year,
+            "gas_type": {"name": self.gas_type.name if self.gas_type else None},
+            "emissions": [emission.to_dict() for emission in self.emissions],
+            "activity": self.activity
+        }
+    
 class YearlyActivityEmissionSet:
 
     def __init__(self, year, emissions, activity):
@@ -112,7 +126,13 @@ class YearlyActivityEmissionSet:
         self.emissions: list[Emission] = emissions
         self.activity: ActivityTypes = activity
 
-
+    def to_dict(self):
+        return {
+            "year": self.year,
+            "emissions": [emission.to_dict() for emission in self.emissions],
+            "activity": self.activity.value
+        }
+    
 class BreakdownTypes(Enum):
     TOTAL = "total"
     ACTIVITY = "activity"
@@ -126,6 +146,9 @@ class Result:
         self.yearly_emissions_by_sector_by_gas: list[YearlyGasActivityEmissionSet] = []
         self.balance = 0
         self.time_tot = time_impl + time_cap
+
+    def to_dict(self):
+        return [emission_set.to_dict() for emission_set in self.yearly_emissions_by_sector_by_gas]
 
     def breakdown(self, by=BreakdownTypes.TOTAL):
         match by:
@@ -161,7 +184,7 @@ class Result:
     def breakdown_by_activity_by_gas(self):
 
         for yearly_emission in self.yearly_emissions_by_sector_by_gas:
-            yearly_emission.activity = yearly_emission.activity.value
+            yearly_emission.activity = ActivityTypes(yearly_emission.activity).value
 
         return self.yearly_emissions_by_sector_by_gas
 
@@ -207,50 +230,72 @@ class Result:
 
         return result_obj
 
-    def plot_emissions_and_aggregate_by_activity(result):
-        emissions_data = result.breakdown(by=BreakdownTypes.ACTIVITY_GAS)
+    def plot_emissions_and_aggregate_by_activity(self, with_or_without_string):
+        def save_emission_graphs_with_totals(save_path, emissions_data, with_or_without_string):
 
-        # Aggregate the data by activity
-        activity_data = defaultdict(list)
-        for item in emissions_data:
-            activity_data[item.activity].append(item)
 
-        with TemporaryDirectory() as tmpdirname:
-            plot_filenames = []
+            activity_data = defaultdict(lambda: defaultdict(list))
+            total_emissions_by_activity = defaultdict(float)
 
-            # Create a plot for each activity and save to temp directory
-            for activity, data in activity_data.items():
-                plt.figure()
-                plt.title("Activity: {}, Total Emissions: {}".format(activity, round(sum([sum([e.value for e in item.emissions]) for item in data]), 2)))
-                plt.xlabel("Year (starting from 0)")
-                plt.ylabel("Emission Value")
+            for entry in emissions_data:
+                activity = entry['activity']
+                emissions_list = entry['emissions']
 
-                for item in data:
-                    plt.plot(range(len(item.emissions)), [e.value for e in item.emissions], label=item.gas_type.value, marker="o")
+                for index, emission in enumerate(emissions_list):
+                    year = index  # Year starts from 0 and increases by 1 each year
+                    gas_type = emission['gas_type']['name']
+                    value = emission['value']
+                    activity_data[activity][gas_type].append((year, value))
+                    total_emissions_by_activity[activity] += value
 
+            for activity, gases in activity_data.items():
+                total_emissions = total_emissions_by_activity[activity]
+                plt.figure(figsize=(12, 6))
+                plt.title(f'{with_or_without_string} - Emissions for Activity: {activity} (Total: {total_emissions:.2f})')
+                plt.xlabel('Year (starting from 0)')
+                plt.ylabel('Emission Value')
+
+                max_years = max(len(data) for data in gases.values())
+
+                for gas_type, data in gases.items():
+                    years = [year for year, _ in data]
+                    values = [value for _, value in data]
+
+                    plt.plot(years, values, label=gas_type, marker='o')
+
+                plt.xticks(range(0, max_years))
                 plt.legend()
-                plt.xticks(range(0, len(item.emissions)))
 
-                # Save the plot
-                plot_filename = os.path.join(tmpdirname, "{}.png".format(activity))
-                plt.savefig(plot_filename)
-                plt.close()  # Close the plot to free memory
-                plot_filenames.append(plot_filename)
+                filename = f"{with_or_without_string}_emissions_{activity}.png"
+                plt.savefig(os.path.join(save_path, filename))
+                plt.close()
 
-            # Aggregate all saved plots into a single image
-            images = [Image.open(filename) for filename in plot_filenames]
+
+        # Convert the breakdown to a list of dictionaries
+        emission_data_dicts = [emission_set.to_dict() for emission_set in self.breakdown_by_activity_by_gas()]
+
+        # Use a temporary directory to save the plots
+        with tempfile.TemporaryDirectory() as save_directory:
+            # Pass the list of dictionaries instead of the raw objects to json.dumps()
+            save_emission_graphs_with_totals(save_directory, emission_data_dicts, with_or_without_string)
+
+            # Combining all images into a single large image
+            plot_files = [os.path.join(save_directory, file) for file in os.listdir(save_directory) if file.endswith('.png')]
+            images = [Image.open(file) for file in plot_files]
             widths, heights = zip(*(i.size for i in images))
 
             total_width = max(widths)
             total_height = sum(heights)
-            combined_image = Image.new("RGB", (total_width, total_height))
+            combined_image = Image.new('RGB', (total_width, total_height))
 
             y_offset = 0
             for img in images:
                 combined_image.paste(img, (0, y_offset))
                 y_offset += img.size[1]
 
-            # Display the aggregated image
-            combined_image.show()
+            combined_image_path = f'result_{with_or_without_string}.png'  # Update this path as needed
+            combined_image.save(combined_image_path)
 
-            # The TemporaryDirectory context manager automatically cleans up the directory once done
+
+
+
