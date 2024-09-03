@@ -1227,7 +1227,7 @@ class InputTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
 
-def generic_module_viewset(model: Model):
+def generic_module_viewset(model: Module):
     class GenericModuleViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         queryset = model.objects.all()
         serializer_class = get_module_serializer(model)
@@ -1243,9 +1243,7 @@ def generic_module_viewset(model: Model):
             """
 
             module: Module = self.get_object()
-            module_type = ModuleType.objects.get(class_name=model.__name__)
-
-            activity = module.parent.activity if module_type.is_submodule else module.activity
+            activity = module.parent.activity if module.module_type.is_submodule else module.activity
 
             if not utils.has_project_permission("can_change_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to update this module in the project")
@@ -1272,9 +1270,7 @@ def generic_module_viewset(model: Model):
             """
 
             module: Module = self.get_object()
-            module_type = ModuleType.objects.get(class_name=model.__name__)
-
-            activity = module.parent.activity if module_type.is_submodule else module.activity
+            activity = module.parent.activity if module.module_type.is_submodule else module.activity
 
             if not utils.has_project_permission("can_change_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to update this module in the project")
@@ -1302,12 +1298,11 @@ def generic_module_viewset(model: Model):
             logging.debug(f"request.data: {request.data}")
 
             module_serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data=request.data, many=request.data.__class__ == list)
+            module_type = ModuleType.objects.get(class_name=model.__name__)
 
             if not module_serializer.is_valid():
                 logger.error(f"Error creating module: {module_serializer.errors}")
                 return Response(module_serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
-
-            module_type = ModuleType.objects.get(class_name=model.__name__)
 
             if module_type.is_submodule:
                 activity = module_serializer.validated_data["parent"].activity
@@ -1340,12 +1335,11 @@ def generic_module_viewset(model: Model):
 
             activity_id = utils.get_query_param_or_validation_error(self.request, "activity")
             activity = get_object_or_404(Activity, pk=activity_id)
+            module_type = ModuleType.objects.get(class_name=model.__name__)
 
             if not utils.has_project_permission("can_view_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to view this module in the project")
                 return utils.ErrorResponse("Selected user does not have permission to view this module in the project", status=http_status.HTTP_403_FORBIDDEN)
-
-            module_type = ModuleType.objects.get(class_name=model.__name__)
 
             if module_type.is_submodule:
                 modules = model.objects.filter(parent__activity__id=activity_id).all()
@@ -1367,9 +1361,7 @@ def generic_module_viewset(model: Model):
             """
 
             module: Module = get_object_or_404(model, pk=pk)
-            module_type = ModuleType.objects.get(class_name=model.__name__)
-
-            activity: Activity = module.parent.activity if module_type.is_submodule else module.activity
+            activity: Activity = module.parent.activity if module.module_type.is_submodule else module.activity
 
             if not utils.has_project_permission("can_view_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to view this module in the project")
@@ -1379,7 +1371,7 @@ def generic_module_viewset(model: Model):
             serializer.is_valid(raise_exception=True)
             module = serializer.save()
 
-            if module_type.class_name == LandUseChange.__name__:
+            if module.module_type.class_name == LandUseChange.__name__:
 
                 status_start = utils.get_module_status(self, activity, module.module_type_start)
                 status_w = utils.get_module_status(self, activity, module.module_type_w)
@@ -1417,14 +1409,13 @@ def generic_module_viewset(model: Model):
 
             ex. GET /annual-croplands/1/defaults/
             """
-            module_type = ModuleType.objects.get(class_name=model.__name__)
 
-            if module_type.is_submodule:
-                module: Submodule = get_object_or_404(model, pk=pk)
+            module: Module | Submodule = get_object_or_404(model, pk=pk)
+
+            if module.module_type.is_submodule:
                 activity = module.parent.activity
 
             else:
-                module: Module = get_object_or_404(model, pk=pk)
                 activity = module.activity
 
             serializer = get_module_serializer(model)(data={}, instance=module)
@@ -1445,9 +1436,7 @@ def generic_module_viewset(model: Model):
         @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view module changes", 200: ChangeHistorySerializer})
         def history(self, request, pk=None):
             module: Module = self.get_object()
-            module_type = ModuleType.objects.get(class_name=model.__name__)
-
-            activity: Activity = module.parent.activity if module_type.is_submodule else module.activity
+            activity: Activity = module.parent.activity if module.module_type.is_submodule else module.activity
 
             if not utils.has_project_permission("can_view_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to view this module in the project")
