@@ -21,55 +21,7 @@ from .ghg_emissions_classes import (
 
 
 class Deforestation(BaseModule):
-    def __init__(
-        self,
-        ha_start,
-        ha_end,
-        time_impl,
-        time_cap,
-        rate_type_soil,
-        biomass_final_1_year_t_per_ha,
-        biomass_final_1_year_t_per_ha_tier_2,
-        nitrous_constant,
-        methane_constant,
-        fire_bool,
-        n2o_vegetation,
-        ch4_vegetation,
-        cf_vegetation,
-        moisture_emission_factor,
-        litter,
-        litter_tier_2,
-        dw,
-        dw_tier_2,
-        hwp_before_t_dm_per_ha,
-        mangrove_factor,
-        bgb_t_c_per_ha_tier_2,
-        agb_t_c_per_ha_tier_2,
-        agb_t_dm_per_ha_default,
-        bgb_t_dm_per_ha_default_input_parameter,
-        c_n_ratio,
-        soc_after_defo_tier_2,
-        soc_reference_default,
-        soc_reference_tier_2,
-        fmg_start_tier_2,
-        fmg_end_tier_2,
-        fi_start_tier_2,
-        fi_end_tier_2,
-        flu_start_tier_2,
-        flu_end_tier_2,
-        soc_start_tier_2,
-        soc_end_tier_2,
-        fmg_start_default,
-        fmg_end_default,
-        fi_start_default,
-        fi_end_default,
-        flu_start_default,
-        flu_end_default,
-        soc_start_default,
-        soc_end_default,
-        calculate_soc_som,
-        delay
-    ):
+    def __init__(self, ha_start, ha_end, time_impl, time_cap, rate_type_soil, biomass_final_1_year_t_per_ha, biomass_final_1_year_t_per_ha_tier_2, nitrous_constant, methane_constant, fire_bool, n2o_vegetation, ch4_vegetation, cf_vegetation, moisture_emission_factor, litter, litter_tier_2, dw, dw_tier_2, hwp_before_t_dm_per_ha, mangrove_factor, bgb_t_c_per_ha_tier_2, agb_t_c_per_ha_tier_2, agb_t_dm_per_ha_default, bgb_t_dm_per_ha_default_input_parameter, c_n_ratio, soc_after_defo_tier_2, soc_reference_default, soc_reference_tier_2, fmg_start_tier_2, fmg_end_tier_2, fi_start_tier_2, fi_end_tier_2, flu_start_tier_2, flu_end_tier_2, soc_start_tier_2, soc_end_tier_2, fmg_start_default, fmg_end_default, fi_start_default, fi_end_default, flu_start_default, flu_end_default, soc_start_default, soc_end_default, calculate_soc_som, delay):
         self.ha_start = ha_start
         self.ha_end = ha_end
         self.area_deforested = abs(ha_end - ha_start)
@@ -184,7 +136,7 @@ class Deforestation(BaseModule):
 
                 biomass_loss = biomass_forest_agb_bgb_t_co2 * self.area_deforested
 
-                self.emissions_biomass_loss_yearly = yearly_constant_emissions_breakdown(biomass_loss, self.time_impl, self.time_cap)
+                self.emissions_biomass_loss_yearly = yearly_constant_emissions_breakdown(biomass_loss, self.time_impl, self.time_cap, self.rate_type_soil)
                 self.emissions_biomass_loss_total = biomass_loss
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in self.emissions_biomass_loss_yearly], activity=ActivityTypes.BIOMASS))
@@ -200,7 +152,7 @@ class Deforestation(BaseModule):
                     biomass_final_1_year_t_per_ha = self.biomass_final_1_year_t_per_ha_default
 
                 self.emissions_biomass_gain_total = 0 if self.emissions_biomass_loss_total == 0 else -(biomass_final_1_year_t_per_ha * self.area_deforested * (44 / 12))
-                self.emissions_biomass_gain_yearly = yearly_constant_emissions_breakdown(self.emissions_biomass_gain_total, self.time_impl, self.time_cap)
+                self.emissions_biomass_gain_yearly = yearly_constant_emissions_breakdown(self.emissions_biomass_gain_total, self.time_impl, self.time_cap, self.rate_type_soil)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in self.emissions_biomass_gain_yearly], activity=ActivityTypes.BIOMASS))
 
@@ -216,7 +168,7 @@ class Deforestation(BaseModule):
                 biomass_forest_dom_t_co2_per_ha = biomass_forest_dom_t_c_per_ha * (44 / 12)
 
                 dom_loss = biomass_forest_dom_t_co2_per_ha * self.area_deforested
-                self.emissions_dom_yearly = yearly_constant_emissions_breakdown(dom_loss, self.time_impl, self.time_cap)
+                self.emissions_dom_yearly = yearly_constant_emissions_breakdown(dom_loss, self.time_impl, self.time_cap, self.rate_type_soil)
                 self.emissions_dom_total = dom_loss
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in self.emissions_dom_yearly], activity=ActivityTypes.DOM))
@@ -240,18 +192,18 @@ class Deforestation(BaseModule):
                 fire_kg_n2o = fire_t_dm_per_ha * self.n2o_vegetation * self.cf_vegetation if self.fire_bool else 0
                 fire_kg_ch4 = fire_t_dm_per_ha * self.ch4_vegetation * self.cf_vegetation if self.fire_bool else 0
 
-                total_ch4_n2o_per_ha = (fire_kg_ch4 * self.methane_constant + fire_kg_n2o  * self.nitrous_constant) / 1000
+                total_ch4_n2o_per_ha = (fire_kg_ch4 * self.methane_constant + fire_kg_n2o * self.nitrous_constant) / 1000
 
                 fire_N_w = total_ch4_n2o_per_ha * self.area_deforested
 
-                self.emissions_fire_fsom_yearly = yearly_constant_emissions_breakdown(fire_N_w, self.time_impl, self.time_cap)
+                self.emissions_fire_fsom_yearly = yearly_constant_emissions_breakdown(fire_N_w, self.time_impl, self.time_cap, self.rate_type_soil)
                 self.emissions_fire_fsom_total = fire_N_w
 
                 total_ch4_per_ha = fire_kg_ch4 * self.methane_constant / 1000
                 total_n2o_per_ha = fire_kg_n2o * self.nitrous_constant / 1000
 
-                emissions_ch4 = yearly_constant_emissions_breakdown(total_ch4_per_ha * self.area_deforested, self.time_impl, self.time_cap)
-                emissions_n2o = yearly_constant_emissions_breakdown(total_n2o_per_ha * self.area_deforested, self.time_impl, self.time_cap)
+                emissions_ch4 = yearly_constant_emissions_breakdown(total_ch4_per_ha * self.area_deforested, self.time_impl, self.time_cap, self.rate_type_soil)
+                emissions_n2o = yearly_constant_emissions_breakdown(total_n2o_per_ha * self.area_deforested, self.time_impl, self.time_cap, self.rate_type_soil)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in emissions_ch4], activity=ActivityTypes.RESIDUE_BURNING))
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in emissions_n2o], activity=ActivityTypes.RESIDUE_BURNING))
