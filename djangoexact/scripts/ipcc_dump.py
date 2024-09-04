@@ -2411,36 +2411,6 @@ for i, row in df.iterrows():
                     agb_growth_max=agb_growth_max,
                 )
 
-# ForestManagementBGB.objects.all().delete()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestManagementBGB_EasternAfrica_Addendum.csv"),
-    header=[0],
-    sep=";",
-)
-
-for i, row in df.iterrows():
-    try:
-        climate = Climate.objects.get(name__iexact=row["climate"])
-        region = Region.objects.get(name__iexact=row["region"])
-        forest_type = ForestType.objects.get(name__iexact=row["forest_type"])
-        land_use_type = LandUseType.objects.get(name__iexact=row["land_use_type"])
-        threshold = row["threshold"]
-        if threshold == "> 125" or threshold == ">75":
-            threshold = None
-        elif "125" in threshold:
-            threshold = 125
-        elif "75" in threshold:
-            threshold = 75
-        value = parse_csv_number(row["value"])
-
-        print(climate, region, forest_type, land_use_type, threshold, value)
-
-        ForestManagementBGB.objects.get(climate=climate, region=region, forest_type=forest_type, land_use_type=land_use_type, threshold=threshold, value=value)
-    except Exception as e:
-        print(row)
-        print(e)
-
 soil = SoilType.objects.get(name__iexact="Mineral")
 for climate in Climate.objects.all():
     for moisture in climate.moistures.all():
@@ -3854,9 +3824,6 @@ for i, row in enumerate(df_dict):
             head=parse_csv_number(row["head"], nan_value=None),
         )
 
-annualcropland = LandUseType.objects.get(name__iexact="Annual Cropland")
-crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropping").all()
-
 ForestTotalBiomass.objects.all().delete()
 
 df = pd.read_csv(
@@ -3910,68 +3877,6 @@ for i, row in enumerate(rows):
             continent=region,
             value=value,
         )
-
-TotalBiomassAfterDefo.objects.all().delete()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "TotalBiomassAfterDefo.csv"),
-    header=0,
-    sep=";",
-)
-
-headers = df.columns.values.tolist()
-rows = df.to_dict("records")
-
-for i, row in enumerate(rows):
-    climate = Climate.objects.get(name__iexact=row["climate"])
-    moisture = Moisture.objects.get(name__iexact=row["moisture"])
-    region = Region.objects.get(name__iexact=row["region"])
-
-    for j, header in enumerate(headers, start=3):
-
-        if j == len(headers):
-            break
-
-        print(headers[j])
-        land_use_type = LandUseType.objects.get(name__iexact=headers[j])
-        value = parse_csv_number(row[headers[j]])
-        if not value:
-            continue
-
-        if land_use_type == annualcropland:
-            for crop in crops:
-                print(
-                    crop,
-                    climate,
-                    moisture,
-                    region,
-                    value,
-                )
-
-                TotalBiomassAfterDefo.objects.create(
-                    land_use_type=crop,
-                    climate=climate,
-                    moisture=moisture,
-                    continent=region,
-                    value=value,
-                )
-
-        print(
-            land_use_type,
-            climate,
-            moisture,
-            region,
-            value,
-        )
-
-        TotalBiomassAfterDefo.objects.create(
-            land_use_type=land_use_type,
-            climate=climate,
-            moisture=moisture,
-            continent=region,
-            value=value,
-        )
-
 
 FMGData.objects.all().delete()
 
@@ -4459,6 +4364,101 @@ for i, row in enumerate(df_dict):
         ch4=ch4,
         n2o=n2o,
     )
+
+    ForestManagementBGB.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestManagementBGB.csv"),
+    header=[0],
+    sep=";",
+)
+
+for i, row in df.iterrows():
+    try:
+        climate = Climate.objects.get(name__iexact=row["climate"])
+        region = Region.objects.get(name__iexact=row["region"])
+        forest_type = ForestType.objects.get(name__iexact=row["forest_type"])
+        land_use_type = LandUseType.objects.get(name__iexact=row["land_use_type"])
+        threshold = row["threshold"]
+        if threshold == "> 125" or threshold == ">75":
+            threshold = None
+        elif "125" in threshold:
+            threshold = 125
+        elif "75" in threshold:
+            threshold = 75
+        value = parse_csv_number(row["value"])
+
+        print(climate, region, forest_type, land_use_type, threshold, value)
+
+        ForestManagementBGB.objects.create(climate=climate, region=region, forest_type=forest_type, land_use_type=land_use_type, threshold=threshold, value=value)
+    except Exception as e:
+        print(row)
+        print(e)
+
+        
+annualcropland = LandUseType.objects.get(name__iexact="Annual Cropland")
+crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropping").all()
+
+TotalBiomassAfterDefo.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "TotalBiomassAfterDefo.csv"),
+    header=0,
+    sep=";",
+)
+
+headers = df.columns.values.tolist()
+rows = df.to_dict("records")
+
+for i, row in enumerate(rows):
+    climate = Climate.objects.get(name__iexact=row["climate"])
+    moisture = Moisture.objects.get(name__iexact=row["moisture"])
+    region = Region.objects.get(name__iexact=row["region"])
+
+    for j, header in enumerate(headers, start=3):
+
+        if j == len(headers):
+            break
+
+        print(headers[j])
+        land_use_type = LandUseType.objects.get(name__iexact=headers[j])
+        value = parse_csv_number(row[headers[j]])
+        if not value:
+            continue
+
+        if land_use_type == annualcropland:
+            for crop in crops:
+                print(
+                    crop,
+                    climate,
+                    moisture,
+                    region,
+                    value,
+                )
+
+                TotalBiomassAfterDefo.objects.create(
+                    land_use_type=crop,
+                    climate=climate,
+                    moisture=moisture,
+                    continent=region,
+                    value=value,
+                )
+        else:
+            print(
+                land_use_type,
+                climate,
+                moisture,
+                region,
+                value,
+            )
+
+            TotalBiomassAfterDefo.objects.create(
+                land_use_type=land_use_type,
+                climate=climate,
+                moisture=moisture,
+                continent=region,
+                value=value,
+            )
 
 """
 
