@@ -665,8 +665,11 @@ class DeforestationCalculator(BaseCalculator):
         soil_type = project.soil_type
 
         forest: ForestManagement = module.activity.forestmanagement.first()
-        module_wo: LandModule = getattr(luc.activity, luc.module_type_wo.class_name.lower(), None).first()
-        module_w: LandModule = getattr(luc.activity, luc.module_type_w.class_name.lower(), None).first()
+
+        module_start, module_w, module_wo = luc.get_modules()
+        module_start: LandModule
+        module_w: LandModule
+        module_wo: LandModule
 
         # TODO: Maybe generalise this on a higher level
         if not forest:
@@ -689,12 +692,12 @@ class DeforestationCalculator(BaseCalculator):
         som = ipcc.NitrousEmissionFactor.objects.get(moisture=moisture)
 
         try:
-            total_biomass_w = ipcc.TotalBiomassAfterDefo.objects.get_or_default(**cmc, land_use_type=module.land_use_type_w)
+            total_biomass_w = ipcc.TotalBiomassAfterDefo.objects.get_or_default(**cmc, land_use_type=module_w.land_use_type_w)
         except ipcc.TotalBiomassAfterDefo.DoesNotExist:
             raise Exception(f"TotalBiomassAfterDefo for {module.land_use_type_w.name} in {climate.name} climate, {moisture.name} moisture, and {region.name} region does not exist")
 
         try:
-            total_biomass_wo = ipcc.TotalBiomassAfterDefo.objects.get_or_default(**cmc, land_use_type=module.land_use_type_wo)
+            total_biomass_wo = ipcc.TotalBiomassAfterDefo.objects.get_or_default(**cmc, land_use_type=module_wo.land_use_type_wo)
         except ipcc.TotalBiomassAfterDefo.DoesNotExist:
             raise Exception(f"TotalBiomassAfterDefo for {module.land_use_type_wo.name} in {climate.name} climate, {moisture.name} moisture, and {region.name} region does not exist")
 
@@ -711,20 +714,21 @@ class DeforestationCalculator(BaseCalculator):
             except ipcc.LitterDeadwoodCarbonStock.DoesNotExist:
                 raise Exception(f"LitterDeadwoodCarbonStock for {module.land_use_type_wo.name} in {climate.name} climate, {forest.forest_type.name} forest type does not exist")
 
-            agb_start = ipcc.ForestManagementAGB.objects.filter(climate=climate, region=region, forest_type=forest.forest_type, land_use_type=forest.land_use_type_start, forest_condition_type__name="Secondary >20 Years").first()
+            agb_start = ipcc.ForestManagementAGB.objects.get(climate=climate, region=region, forest_type=forest.forest_type, land_use_type=forest.land_use_type_start, forest_condition_type=forest.forest_condition_type)
             agb_w = 0
             agb_wo = 0
 
             try:
-                agb_w = ipcc.ForestManagementAGB.objects.get(climate=climate, region=region, forest_type=forest.forest_type, land_use_type=forest.land_use_type_w, forest_condition_type__name="Secondary >20 Years")
+                agb_w = ipcc.ForestManagementAGB.objects.get(climate=climate, region=region, forest_type=forest.forest_type, land_use_type=forest.land_use_type_w, forest_condition_type=forest.forest_condition_type)
             except ipcc.ForestManagementAGB.DoesNotExist:
                 raise Exception(f"ForestManagementAGB for {forest.land_use_type_w.name} in {climate.name} climate, {region.name} region, {forest.forest_type.name} forest type, and Secondary >20 Years forest condition type does not exist")
             try:
-                agb_wo = ipcc.ForestManagementAGB.objects.get(climate=climate, region=region, forest_type=forest.forest_type, land_use_type=forest.land_use_type_wo, forest_condition_type__name="Secondary >20 Years")
+                agb_wo = ipcc.ForestManagementAGB.objects.get(climate=climate, region=region, forest_type=forest.forest_type, land_use_type=forest.land_use_type_wo, forest_condition_type=forest.forest_condition_type)
             except ipcc.ForestManagementAGB.DoesNotExist:
                 raise Exception(f"ForestManagementAGB for {forest.land_use_type_wo.name} in {climate.name} climate, {region.name} region, {forest.forest_type.name} forest type, and Secondary >20 Years forest condition type does not exist")
 
-            bgb_start = ipcc.ForestManagementBGB.objects.get_first_above_threshold(region=region, land_use_type=module.land_use_type_start, threshold=statistics.mean([agb_start.agb_min, agb_start.agb_max]), climate=climate, forest_type=forest.forest_type)
+            mean = statistics.mean([agb_start.agb_min, agb_start.agb_max])
+            bgb_start = ipcc.ForestManagementBGB.objects.get_first_above_threshold(region=region, land_use_type=module.land_use_type_start, threshold=mean, climate=climate, forest_type=forest.forest_type)
             if not bgb_start:
                 raise Exception(f"ForestManagementBGB for {module.land_use_type_start.name} in {climate.name} climate, {region.name} region, and {forest.forest_type.name} forest type does not exist")
 
@@ -741,30 +745,27 @@ class DeforestationCalculator(BaseCalculator):
         combustion_factor_w = ipcc.ForestCombustionFactor.objects.get(land_use_type=module.land_use_type_w, climate=climate, forest_type=forest.forest_type)
         combustion_factor_wo = ipcc.ForestCombustionFactor.objects.get(land_use_type=module.land_use_type_wo, climate=climate, forest_type=forest.forest_type)
 
-        moisture_factor = ipcc.NitrousEmissionFactor.objects.filter(moisture=moisture)
-        moisture_factor = moisture_factor.filter(Q(organic_input_type__name__icontains="Other N Inputs") | Q(organic_input_type__name__icontains="All N Inputs")).first()
+        module_start = module_w = module_wo = module
+        if luc:
+            module_start, module_w, module_wo = luc.get_modules()
 
-        flu_start = ipcc.LandUseCarbonStockExchangeFactor.objects.get_or_default(climate=climate, moisture=moisture, land_use_type=module.land_use_type_start)
-        flu_w = ipcc.LandUseCarbonStockExchangeFactor.objects.get_or_default(climate=climate, moisture=moisture, land_use_type=module.land_use_type_w)
-        flu_wo = ipcc.LandUseCarbonStockExchangeFactor.objects.get_or_default(climate=climate, moisture=moisture, land_use_type=module.land_use_type_wo)
+        flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+        flu_w = get_flu_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
+        flu_wo = get_flu_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
 
-        # BUG: Values for scenarios should be taken from the respective modules
-        fi_start = SimpleNamespace(value=1)
-        fi_w = SimpleNamespace(value=1)
-        fi_wo = SimpleNamespace(value=1)
+        fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+        fi_w = get_fi_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
+        fi_wo = get_fi_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
 
-        fmg_start = SimpleNamespace(value=1)
-        fmg_w = SimpleNamespace(value=1)
-        fmg_wo = SimpleNamespace(value=1)
+        fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
+        fmg_w = get_fmg_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
+        fmg_wo = get_fmg_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
 
         soc_w = soc_ref
         soc_wo = soc_ref
 
         if luc.module_type_w.name == "Grassland":
-            soc_w = ipcc.GrasslandStockExchangeFactor.objects.get(
-                grassland_management_type=module_w.grassland_management_type_start,
-                climate=project.climate,
-            )
+            soc_w = ipcc.GrasslandStockExchangeFactor.objects.get(grassland_management_type=module_w.grassland_management_type_start, climate=project.climate)
             flu_w = SimpleNamespace(value=soc_w.flu)
             fi_w = SimpleNamespace(value=soc_w.fi)
             fmg_w = SimpleNamespace(value=soc_w.fmg)
@@ -891,6 +892,8 @@ class DeforestationCalculator(BaseCalculator):
 
         res_w = math_w.result if math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         res_wo = math_wo.result if math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+
+        res_w.plot_emissions_and_aggregate_by_activity("with")
 
         return (res_w, res_wo)
 
