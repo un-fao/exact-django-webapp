@@ -5421,8 +5421,8 @@ class ForestManagementCalculator(BaseCalculator):
         FLU_START_NOT_FOUND = f"FLU reference value not found for ({forest.forest_type.name}) {land_use_type.name} in {project.climate.name} climate, {project.country.region.name} region."
         SOC_NOT_FOUND = f"Soil Organic Carbon reference value not found for the given parameters in {project.climate.name} climate, {project.moisture.name} moisture, {project.soil_type.name} soil type."
 
-        is_afforestation_w = luc and luc.module_type_w.class_name == "ForestManagement"
-        is_afforestation_wo = luc and luc.module_type_wo.class_name == "ForestManagement"
+        is_afforestation_w = luc and luc.module_type_w.class_name == "ForestManagement" and luc.module_type_start.class_name != "ForestManagement"
+        is_afforestation_wo = luc and luc.module_type_wo.class_name == "ForestManagement" and luc.module_type_start.class_name != "ForestManagement"
 
         has_t2_growth_start = forest.agb_growth_rate_gt_20_yrs_t2_start and forest.agb_growth_rate_le_20_yrs_t2_start
         has_t2_growth_w = forest.agb_growth_rate_gt_20_yrs_t2_w and forest.agb_growth_rate_le_20_yrs_t2_w
@@ -5454,7 +5454,7 @@ class ForestManagementCalculator(BaseCalculator):
 
         mangroves_data = None
         try:
-            mangroves_data = ipcc.DataOnMangrove.objects.get(continent=project.country.region)
+            mangroves_data = ipcc.DataOnMangrove.objects.get(climate=project.climate, moisture=project.moisture)
         except ipcc.DataOnMangrove.DoesNotExist:
             pass
 
@@ -5512,13 +5512,7 @@ class ForestManagementCalculator(BaseCalculator):
         except ipcc.ForestManagementAGB.DoesNotExist:
             raise ValueError(AGB_OVER_20_NOT_FOUND)
 
-        try:
-            flu_start = ipcc.AfforestationFLU.objects.get(climate=project.climate, moisture=project.moisture, land_use_type=land_use_type)
-        except ipcc.AfforestationFLU.DoesNotExist:
-            try:
-                flu_start = ipcc.AfforestationFLU.objects.get(climate=project.climate, moisture=project.moisture, land_use_type__name="Agroforestry - Default")
-            except ipcc.AfforestationFLU.DoesNotExist:
-                raise ValueError(FLU_START_NOT_FOUND)
+        flu_start = get_flu_data(module_start, project.climate, project.moisture, utils.ScenarioTypes.START)
 
         # START - Reference Values for forest remaining forest
         agb_max_w = statistics.mean([agb_over_20.agb_min, agb_over_20.agb_max])
@@ -5678,7 +5672,7 @@ class ForestManagementCalculator(BaseCalculator):
             fmg_start.value,
             fmg_wo.value,
             forest.fmg_t2_start,
-            forest.fmg_t2_w,
+            forest.fmg_t2_wo,
             flu_start.value,
             flu_wo.value,
             forest.flu_t2_start,
