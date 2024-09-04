@@ -3,7 +3,7 @@ from unfold.admin import ModelAdmin
 
 from .models import *
 
-for model in [model for model in dir() if not model.startswith("_") and not model.startswith("ForestManagementAGB") and not model.startswith("PerennialAGB") and not model.startswith("PerennialBGB") and not model.startswith("AfforestationFLU") and not model.startswith("LivestockTAM") and not model.startswith("LivestockVSER") and not model.startswith("LivestockManureEF") and not model.startswith("FLUData")]:
+for model in [model for model in dir() if not model.startswith("_") and not model.startswith("ForestManagementAGB") and not model.startswith("PerennialAGB") and not model.startswith("PerennialBGB") and not model.startswith("AfforestationFLU") and not model.startswith("LivestockTAM") and not model.startswith("LivestockVSER") and not model.startswith("LivestockManureEF") and not model.startswith("FLUData") and not model.startswith("LivestockAWMS")]:
     try:
         admin.site.register(eval(model), ModelAdmin)
     except:
@@ -25,6 +25,30 @@ class BGBAdmin(ModelAdmin):
 
 class AfforestationFLUAdmin(ModelAdmin):
     search_fields = ["climate__name", "moisture__name", "land_use_type__name"]
+
+
+class LivestockAWMSAdmin(ModelAdmin):
+    list_display = [
+        "livestock_production_type",
+        "livestock_category_type",
+        "manure_management_type",
+        "ipcc_region",
+        "value",
+    ]
+
+    list_select_related = [
+        "livestock_production_type",
+        "livestock_category_type",
+        "manure_management_type",
+        "ipcc_region",
+    ]
+
+    search_fields = [
+        "livestock_production_type__name",
+        "livestock_category_type__name",
+        "manure_management_type__name",
+        "ipcc_region__name",
+    ]
 
 
 class LivestockTAMAdmin(ModelAdmin):
@@ -141,3 +165,4 @@ admin.site.register(LivestockTAM, LivestockTAMAdmin)
 admin.site.register(LivestockVSER, LivestockVSERAdmin)
 admin.site.register(LivestockManureEF, LivestockManureEFAdmin)
 admin.site.register(ForestManagementAGB, ForestManagementAGBAdmin)
+admin.site.register(LivestockAWMS, LivestockAWMSAdmin)
