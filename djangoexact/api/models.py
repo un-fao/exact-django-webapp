@@ -541,8 +541,8 @@ class Project(Historical):
     status = models.ForeignKey(ProjectStatus, on_delete=models.CASCADE, null=True, blank=True)
 
     implementation_years = models.IntegerField()
-    start_year_of_activities = models.IntegerField(null=True, blank=True)
-    last_year_of_accounting = models.IntegerField(null=True, blank=True)
+    start_year_of_activities = models.IntegerField()
+    last_year_of_accounting = models.IntegerField()
 
     country = models.ForeignKey(Country, on_delete=models.CASCADE)
     climate = models.ForeignKey(Climate, on_delete=models.CASCADE)
