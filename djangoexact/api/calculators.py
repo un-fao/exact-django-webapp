@@ -2317,6 +2317,8 @@ class GrasslandCalculator(LandModuleCalculator):
         self.biomass_ef_wo: SimpleNamespace | ipcc.TotalBiomassAfterDefo = SimpleNamespace(value=0)
 
     def get_defaults(self, calculate=False):
+        super().get_defaults(calculate)
+
         module: Grassland = self.data
         activity: Activity = module.activity
         project: Project = activity.project
@@ -3463,6 +3465,8 @@ class SettlementCalculator(LandModuleCalculator):
 
     def get_defaults(self, calculate=False) -> dict:
         log.debug("START SettlementCalculator.get_defaults")
+        super().get_defaults(calculate)
+
         module: Settlement = self.data
         activity: Activity = module.activity
         luc: LandUseChange = module.land_use_change
@@ -5887,6 +5891,8 @@ class DegradedLandCalculator(LandModuleCalculator):
         return results_tuple
 
     def get_defaults(self, calculate=False) -> dict:
+        super().get_defaults(calculate)
+
         module: DegradedLand = self.data
         activity: Activity = module.activity
         project: Project = activity.project
@@ -5943,6 +5949,8 @@ class SetAsideCalculator(LandModuleCalculator):
         self.biomass_ef_wo: SimpleNamespace | ipcc.TotalBiomassAfterDefo = SimpleNamespace(value=0)
 
     def get_defaults(self, calculate=False) -> dict:
+        super().get_defaults(calculate)
+
         module: SetAside = self.data
         activity: Activity = module.activity
         project: Project = activity.project
