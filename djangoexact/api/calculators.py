@@ -933,8 +933,8 @@ class OtherLandUseCalculator(BaseCalculator):
         Calculate emissions for a single OtherLandUse module.
         """
 
-        input: BiomassModule | LandModule = self.data
-        luc: LandUseChange = input.land_use_change
+        module: BiomassModule | LandModule = self.data
+        luc: LandUseChange = module.land_use_change
         project: Project = self.data.activity.project
         climate = project.climate
         moisture = project.moisture
@@ -953,9 +953,9 @@ class OtherLandUseCalculator(BaseCalculator):
             "continent": continent,
         }
 
-        module_start: BiomassModule | LandModule = getattr(input.activity, luc.module_type_start.class_name.lower(), None).first()
-        module_w: BiomassModule | LandModule = getattr(input.activity, luc.module_type_w.class_name.lower(), None).first()
-        module_wo: BiomassModule | LandModule = getattr(input.activity, luc.module_type_wo.class_name.lower(), None).first()
+        module_start: BiomassModule | LandModule = getattr(module.activity, luc.module_type_start.class_name.lower(), None).first()
+        module_w: BiomassModule | LandModule = getattr(module.activity, luc.module_type_w.class_name.lower(), None).first()
+        module_wo: BiomassModule | LandModule = getattr(module.activity, luc.module_type_wo.class_name.lower(), None).first()
 
         ready = all(module.status == StatusType.objects.get(name="READY") for module in [module_start, module_w, module_wo])
         if not ready:
@@ -1065,7 +1065,7 @@ class OtherLandUseCalculator(BaseCalculator):
         except ipcc.AfforestationCombustionFactor.DoesNotExist:
             raise Exception(f"AfforestationCombustionFactor for {luc_wo.name} does not exist")
 
-        if input.is_with():
+        if module.is_with():
             inputs_w = {
                 "initial_lu_biomass": biomass_initial.value,
                 "initial_lu_biomass_tier_2": module_start.get_biomass_t2(utils.ScenarioTypes.START),
@@ -1076,8 +1076,8 @@ class OtherLandUseCalculator(BaseCalculator):
                 "combustion_factor": combustion_factor_w.value,
                 "emission_factor_nitrous": combustion_factor_w.n2o,
                 "emission_factor_methane": combustion_factor_w.ch4,
-                "nitrous_constant": input.activity.project.gw_potential.n2o,
-                "methane_constant": input.activity.project.gw_potential.ch4,
+                "nitrous_constant": module.activity.project.gw_potential.n2o,
+                "methane_constant": module.activity.project.gw_potential.ch4,
                 "fire_bool": luc.is_fire_used_w,
                 "soc_start_default": soc.value,
                 "soc_end_default": soc.value,
@@ -1099,7 +1099,7 @@ class OtherLandUseCalculator(BaseCalculator):
                 "area": luc.area,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "rate_type": input.activity.change_rate.name,
+                "rate_type": module.activity.change_rate.name,
                 "dry_matter_end": luc.dry_matter_w,
                 "delay": self.activity.delay,
             }
@@ -1107,7 +1107,7 @@ class OtherLandUseCalculator(BaseCalculator):
             self.results_w = MathOtherLandUseChanges(**inputs_w)
             self.results_w.calculate_emissions()
 
-        if input.is_without():
+        if module.is_without():
             inputs_wo = {
                 "initial_lu_biomass": biomass_initial.value,
                 "initial_lu_biomass_tier_2": module_start.get_biomass_t2(utils.ScenarioTypes.START),
@@ -1118,8 +1118,8 @@ class OtherLandUseCalculator(BaseCalculator):
                 "combustion_factor": combustion_factor_wo.value,
                 "emission_factor_nitrous": combustion_factor_wo.n2o,
                 "emission_factor_methane": combustion_factor_wo.ch4,
-                "nitrous_constant": input.activity.project.gw_potential.n2o,
-                "methane_constant": input.activity.project.gw_potential.ch4,
+                "nitrous_constant": module.activity.project.gw_potential.n2o,
+                "methane_constant": module.activity.project.gw_potential.ch4,
                 "fire_bool": luc.is_fire_used_wo,
                 "soc_start_default": soc.value,
                 "soc_end_default": soc.value,
@@ -1141,7 +1141,7 @@ class OtherLandUseCalculator(BaseCalculator):
                 "area": luc.area,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "rate_type": input.activity.change_rate.name,
+                "rate_type": module.activity.change_rate.name,
                 "dry_matter_end": luc.dry_matter_wo,
                 "delay": self.activity.delay,
             }
