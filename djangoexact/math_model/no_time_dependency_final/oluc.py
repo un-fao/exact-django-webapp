@@ -22,6 +22,7 @@ from .generalized_modules import BaseModule
 from dataclasses import dataclass
 from typing import Optional
 
+
 @dataclass
 class OtherLandUseChanges(BaseModule):
     def __init__(
@@ -109,6 +110,7 @@ class OtherLandUseChanges(BaseModule):
     dry_matter_end: float
 
     def __post_init__(self):
+        super().__post_init__()
 
         fmg_start = self.fmg_start_tier_2 or self.fmg_start_default
         fmg_end = self.fmg_end_tier_2 or self.fmg_end_default
@@ -165,7 +167,7 @@ class OtherLandUseChanges(BaseModule):
 
                 total_biomass_emissions = total
                 # TODO: change so only in implementation years but proportionate to the hectars addressed in that year
-                yearly_biomass_emissions = yearly_constant_emissions_breakdown(total, self.implementation_time, self.capitalization_time, self.implementation_time)
+                yearly_biomass_emissions = yearly_constant_emissions_breakdown(total, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(
                     YearlyGasActivityEmissionSet(
@@ -223,4 +225,3 @@ class OtherLandUseChanges(BaseModule):
 
         except Exception as e:
             traceback.print_exc()
-

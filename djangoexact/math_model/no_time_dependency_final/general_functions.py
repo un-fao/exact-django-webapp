@@ -156,6 +156,9 @@ def yearly_constant_emissions_breakdown(total_emissions, years_implementation, y
         yearly_breakdown = [total_emissions] + [0 for _ in range(years_implementation - 1)]
         yearly_breakdown.extend([0 for _ in range(years_capitalization)])
 
+    else:
+        raise Exception(f'Function "{rate_type}" not recognized')
+
     return yearly_breakdown
 
 
@@ -368,7 +371,6 @@ def ch4_head_calculation_general(tam: float, vser: float, ef_prp: float, percent
         return None
 
 
-
 def soil_emissions(hectars_before_20, area_start, area_end, socref, soc_tier_2, f_lu_tier_2, f_i_tier_2, f_mg_tier_2, f_lu_ref=1, f_i_ref=1, f_mg_ref=1):
     # TODO: GENERALIZE SO IT CAN BE USED FOR ALL DIFFERENT KINDS OF CALCULATIONS, MEANING THAT SOCREF, FLU ecc ARE ASSIGNED IN THE MODULE SPECIFIC FUNCTION
     # f_mg and f_i are defaulted to 1 in case they are not inserted
@@ -504,7 +506,9 @@ class Tier2Defaults:
     end: dict
     other: dict
 
+
 from abc import ABC
+
 
 class BaseModule(ABC):
     def evaluate_tier_2_defaults(self):
@@ -520,6 +524,3 @@ class BaseModule(ABC):
         except Exception as e:
             traceback.print_exc()
             return {}
-
-
-
