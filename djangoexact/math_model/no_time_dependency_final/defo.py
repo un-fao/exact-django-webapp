@@ -176,15 +176,6 @@ class Deforestation(BaseModule):
             except Exception as e:
                 traceback.print_exc()
 
-        def calculate_soil_emissions():
-            try:
-                self.emissions_soil_yearly, self.emissions_soil_total = soil_emissions_2(self.soc_start, self.soc_end, self.total_hectares, self.area_deforested, 0, self.hectars_before_20)
-
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in self.emissions_soil_yearly], activity=ActivityTypes.SOIL_CO2_CHANGE))
-
-            except Exception as e:
-                traceback.print_exc()
-
         def calculate_fire_emissions():
             try:
                 fire_t_dm_per_ha = self.agb_t_dm_per_ha_default - self.hwp_before_t_dm_per_ha if self.fire_bool else 0
@@ -211,22 +202,10 @@ class Deforestation(BaseModule):
             except Exception as e:
                 traceback.print_exc()
 
-        def calculate_emissions_som():
-            try:
-                if self.calculate_soc_som:
-                    self.emissions_som_yearly, self.emissions_som_total = som_emissions(self.soc_end, self.soc_start, self.moisture_emission_factor, self.nitrous_constant, self.hectars_before_20)
-
-                    som_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in self.emissions_som_yearly], ActivityTypes.SOM, delay=self.delay)
-                    self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
-            except Exception as e:
-                traceback.print_exc()
-
         calculate_biomass_loss_emissions()
         calculate_biomass_gain_emissions()
         calculate_dom_emissions()
-        calculate_soil_emissions()
         calculate_fire_emissions()
-        calculate_emissions_som()
 
         try:
             self.emissions_total_yearly = [sum(x) for x in zip(self.emissions_biomass_gain_yearly, self.emissions_biomass_loss_yearly, self.emissions_dom_yearly, self.emissions_soil_yearly, self.emissions_fire_fsom_yearly)]
