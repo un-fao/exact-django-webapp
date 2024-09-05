@@ -2049,51 +2049,6 @@ for i, row in enumerate(df_dict2):
         if j + 5 == len(df_headers2) - 1:
             break
 
-ForestManagementAGB.objects.all().delete()
-
-df2 = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestManagementAGB.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers2 = df2.columns.values.tolist()
-df_dict2 = df2.to_dict("records")
-
-for i, row in enumerate(df_dict2):
-    print(row)
-
-    land_use_type = LandUseType.objects.get(name__iexact=sanitize(row["land_use_type"]))
-    continent = Region.objects.get(name__iexact=sanitize(row["continent"]))
-    forest_condition_type = ForestConditionType.objects.get(name__iexact=sanitize(row["forest_condition_type"]))
-    forest_type = ForestType.objects.get(name__iexact=sanitize(row["forest_type"]))
-    agb_min = parse_csv_number(row["agb_min"], nan_value=0)
-    agb_max = parse_csv_number(row["agb_max"], nan_value=0)
-    agb_growth_min = parse_csv_number(row["agb_growth_min"], nan_value=0)
-    agb_growth_max = parse_csv_number(row["agb_growth_max"], nan_value=0)
-
-    print(
-        land_use_type,
-        continent,
-        forest_condition_type,
-        forest_type,
-        agb_min,
-        agb_max,
-        agb_growth_min,
-        agb_growth_max,
-    )
-
-    ForestManagementAGB.objects.get(
-        land_use_type=land_use_type,
-        continent=continent,
-        forest_condition_type=forest_condition_type,
-        forest_type=forest_type,
-        agb_min=agb_min,
-        agb_max=agb_max,
-        agb_growth_min=agb_growth_min,
-        agb_growth_max=agb_growth_max,
-    )
-
 with open("scripts/ipcc_data/SoilOrganicCarbon.csv", "r") as f:
     reader = csv.reader(f)
     header = next(reader, None)
@@ -2293,123 +2248,6 @@ for i, row in enumerate(rows):
             else:
                 foo.value = value
                 foo.save()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestManagementAGB.csv"),
-    header=0,
-    sep=";",
-)
-
-for i, row in df.iterrows():
-    print(row)
-
-    # TODO: Clarify with Lorenzo what sub-tropical is in terms of climate. Skip for now.
-    if row["climate"] == "Sub-tropical":
-        continue
-
-    if row["climate"] == "Tropical":
-        climates = [climate for climate in Climate.objects.filter(name__in=["Tropical"]).all()]
-    elif row["climate"] == "Temperate":
-        climates = [climate for climate in Climate.objects.filter(name__in=["Temperate"]).all()]
-    else:
-        climates = [Climate.objects.get(name__iexact=row["climate"])]
-
-    print(row["land_use_type"])
-    land_use_type = LandUseType.objects.get(name__iexact=row["land_use_type"])
-
-    regions = []
-    if "South" in row["region"] and "America" in row["region"]:
-        print("South America")
-        regions += [region for region in Region.objects.filter(name__in=["South America", "Caribbean", "Central America"])]
-    if "North" in row["region"] and "America" in row["region"]:
-        print("North America")
-        regions += [region for region in Region.objects.filter(name__in=["North America"])]
-    if "Asia" in row["region"]:
-        print("Asia")
-        regions += [region for region in Region.objects.filter(name__in=["Southern Asia", "Eastern Asia", "South-Eastern Asia", "Western Asia", "Central Asia"])]
-    if "Africa" in row["region"]:
-        print("Africa")
-        regions += [region for region in Region.objects.filter(name__in=["Northern Africa", "Western Africa", "Central Africa", "Eastern Africa", "Southern Africa"])]
-
-    if not regions:
-        print("No regions found for ", row["region"])
-        regions += [Region.objects.get(name__iexact=row["region"])]
-
-    print(regions)
-
-    forest_condition_type = ForestConditionType.objects.get(name__iexact=row["forest_condition_type"])
-
-    forest_types = ForestType.objects.filter(name__in=["Natural", "Plantaion"]).all()
-
-    if not isinstance(row["agb_range"], float) and len(row["agb_range"].split("-")) == 2:
-        agb_range_min = parse_csv_number(row["agb_range"].split("-"))
-        agb_range_max = parse_csv_number(row["agb_range"].split("-")[1])
-    elif row["agb_range"] != "n.a.":
-        agb_range_min = parse_csv_number(row["agb_range"])
-        agb_range_max = parse_csv_number(row["agb_range"])
-
-    if not row["agb_growth"].startswith("-") and not isinstance(row["agb_growth"], float) and len(row["agb_growth"].split("-")) == 2:
-        agb_growth_min = parse_csv_number(row["agb_growth"].split("-"))
-        agb_growth_max = parse_csv_number(row["agb_growth"].split("-")[1])
-    elif row["agb_growth"] != "n.a.":
-        agb_growth_min = parse_csv_number(row["agb_growth"])
-        agb_growth_max = parse_csv_number(row["agb_growth"])
-
-    if not isinstance(row["agb_range_plantation"], float) and len(row["agb_range_plantation"].split("-")) == 2:
-        agb_range_min_plantation = parse_csv_number(row["agb_range_plantation"].split("-"))
-        agb_range_max_plantation = parse_csv_number(row["agb_range_plantation"].split("-")[1])
-    elif row["agb_range_plantation"] != "n.a.":
-        agb_range_min_plantation = parse_csv_number(row["agb_range_plantation"])
-        agb_range_max_plantation = parse_csv_number(row["agb_range_plantation"])
-
-    if not isinstance(row["agb_growth_plantation"], float) and len(row["agb_growth_plantation"].split("-")) == 2:
-        agb_growth_min_plantation = parse_csv_number(row["agb_growth_plantation"].split("-"))
-        agb_growth_max_plantation = parse_csv_number(row["agb_growth_plantation"].split("-")[1])
-    elif row["agb_growth_plantation"] != "n.a.":
-        agb_growth_min_plantation = parse_csv_number(row["agb_growth_plantation"])
-        agb_growth_max_plantation = parse_csv_number(row["agb_growth_plantation"])
-
-    print("Climates: ", climates)
-    print("Regions: ", regions)
-    print("Forest Types: ", forest_types)
-
-    for region in regions:
-        for climate in climates:
-            for type in forest_types:
-                if type.name == "Plantation" and row["agb_range_plantation"] == "n.a." and row["agb_growth_plantation"] == "n.a.":
-                    continue
-                if type.name == "Natural" and row["agb_range"] == "n.a." and row["agb_growth"] == "n.a.":
-                    continue
-                if type.name == "Plantation" and forest_condition_type.name == "Primary":
-                    continue
-
-                print(
-                    land_use_type,
-                    region,
-                    climate,
-                    forest_condition_type,
-                    type,
-                    agb_range_min,
-                    agb_range_max,
-                    agb_growth_min,
-                    agb_growth_max,
-                    agb_range_min_plantation,
-                    agb_range_max_plantation,
-                    agb_growth_min_plantation,
-                    agb_growth_max_plantation,
-                )
-
-                ForestManagementAGB.objects.get(
-                    land_use_type=land_use_type,
-                    region=region,
-                    climate=climate,
-                    forest_condition_type=forest_condition_type,
-                    forest_type=type,
-                    agb_min=agb_range_min,
-                    agb_max=agb_range_max,
-                    agb_growth_min=agb_growth_min,
-                    agb_growth_max=agb_growth_max,
-                )
 
 soil = SoilType.objects.get(name__iexact="Mineral")
 for climate in Climate.objects.all():
@@ -4395,11 +4233,10 @@ for i, row in df.iterrows():
         print(row)
         print(e)
 
-        
 annualcropland = LandUseType.objects.get(name__iexact="Annual Cropland")
 crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropping").all()
 
-TotalBiomassAfterDefo.objects.filter(land_use_type__name="Degraded Land").all().delete()
+TotalBiomassAfterDefo.objects.all().delete()
 
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "TotalBiomassAfterDefo.csv"),
@@ -4461,6 +4298,134 @@ for i, row in enumerate(rows):
             value=value,
         )
 
+        
 """
 
 # TODO: Run in review
+
+
+ForestManagementAGB.objects.filter(climate__name="Tropical", land_use_type__name="Rainforest", region__name__icontains="Africa").delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestManagementAGB.csv"),
+    header=0,
+    sep=";",
+)
+
+for i, row in df.iterrows():
+    print(row)
+
+    # TODO: Clarify with Lorenzo what sub-tropical is in terms of climate. Skip for now.
+    if row["climate"] == "Sub-tropical":
+        continue
+
+    if row["climate"] == "Tropical":
+        climates = [climate for climate in Climate.objects.filter(name__in=["Tropical"]).all()]
+    elif row["climate"] == "Temperate":
+        climates = [climate for climate in Climate.objects.filter(name__in=["Temperate"]).all()]
+    else:
+        climates = [Climate.objects.get(name__iexact=row["climate"])]
+
+    print(row["land_use_type"])
+    land_use_type = LandUseType.objects.get(name__iexact=row["land_use_type"])
+
+    regions = []
+    if "South" in row["region"] and "America" in row["region"]:
+        print("South America")
+        regions += [region for region in Region.objects.filter(name__in=["South America", "Caribbean", "Central America"])]
+    if "North" in row["region"] and "America" in row["region"]:
+        print("North America")
+        regions += [region for region in Region.objects.filter(name__in=["North America"])]
+    if "Asia" in row["region"]:
+        print("Asia")
+        regions += [region for region in Region.objects.filter(name__in=["Southern Asia", "Eastern Asia", "South-Eastern Asia", "Western Asia", "Central Asia"])]
+    if "Africa" in row["region"]:
+        print("Africa")
+        regions += [region for region in Region.objects.filter(name__in=["Northern Africa", "Western Africa", "Central Africa", "Eastern Africa", "Southern Africa"])]
+
+    if not regions:
+        print("No regions found for ", row["region"])
+        regions += [Region.objects.get(name__iexact=row["region"])]
+
+    forest_condition_type = ForestConditionType.objects.get(name__iexact=row["forest_condition_type"])
+
+    forest_types = ForestType.objects.filter(name__in=["Natural", "Plantaion"]).all()
+
+    agb_range_min = None
+    agb_range_max = None
+    agb_growth_min = None
+    agb_growth_max = None
+    agb_range_min_plantation = None
+    agb_range_max_plantation = None
+    agb_growth_min_plantation = None
+    agb_growth_max_plantation = None
+
+    if not isinstance(row["agb_range"], float) and len(row["agb_range"].split("-")) == 2:
+        agb_range_min = parse_csv_number(row["agb_range"].split("-")[0])
+        agb_range_max = parse_csv_number(row["agb_range"].split("-")[1])
+    elif row["agb_range"] != "n.a.":
+        agb_range_min = parse_csv_number(row["agb_range"])
+        agb_range_max = parse_csv_number(row["agb_range"])
+
+    if not row["agb_growth"].startswith("-") and not isinstance(row["agb_growth"], float) and len(row["agb_growth"].split("-")) == 2:
+        agb_growth_min = parse_csv_number(row["agb_growth"].split("-")[0])
+        agb_growth_max = parse_csv_number(row["agb_growth"].split("-")[1])
+    elif row["agb_growth"] != "n.a.":
+        agb_growth_min = parse_csv_number(row["agb_growth"])
+        agb_growth_max = parse_csv_number(row["agb_growth"])
+
+    if not isinstance(row["agb_range_plantation"], float) and len(row["agb_range_plantation"].split("-")) == 2:
+        agb_range_min_plantation = parse_csv_number(row["agb_range_plantation"].split("-")[0])
+        agb_range_max_plantation = parse_csv_number(row["agb_range_plantation"].split("-")[1])
+    elif row["agb_range_plantation"] != "n.a.":
+        agb_range_min_plantation = parse_csv_number(row["agb_range_plantation"])
+        agb_range_max_plantation = parse_csv_number(row["agb_range_plantation"])
+
+    if not isinstance(row["agb_growth_plantation"], float) and len(row["agb_growth_plantation"].split("-")) == 2:
+        agb_growth_min_plantation = parse_csv_number(row["agb_growth_plantation"].split("-")[0])
+        agb_growth_max_plantation = parse_csv_number(row["agb_growth_plantation"].split("-")[1])
+    elif row["agb_growth_plantation"] != "n.a.":
+        agb_growth_min_plantation = parse_csv_number(row["agb_growth_plantation"])
+        agb_growth_max_plantation = parse_csv_number(row["agb_growth_plantation"])
+
+    print("Climates: ", climates)
+    print("Regions: ", regions)
+    print("Forest Types: ", forest_types)
+
+    for region in regions:
+        for climate in climates:
+            for type in forest_types:
+                if type.name == "Plantation" and row["agb_range_plantation"] == "n.a." and row["agb_growth_plantation"] == "n.a.":
+                    continue
+                if type.name == "Natural" and row["agb_range"] == "n.a." and row["agb_growth"] == "n.a.":
+                    continue
+                if type.name == "Plantation" and forest_condition_type.name == "Primary":
+                    continue
+
+                print(
+                    land_use_type,
+                    region,
+                    climate,
+                    forest_condition_type,
+                    type,
+                    agb_range_min,
+                    agb_range_max,
+                    agb_growth_min,
+                    agb_growth_max,
+                    agb_range_min_plantation,
+                    agb_range_max_plantation,
+                    agb_growth_min_plantation,
+                    agb_growth_max_plantation,
+                )
+
+                ForestManagementAGB.objects.create(
+                    land_use_type=land_use_type,
+                    region=region,
+                    climate=climate,
+                    forest_condition_type=forest_condition_type,
+                    forest_type=type,
+                    agb_min=agb_range_min,
+                    agb_max=agb_range_max,
+                    agb_growth_min=agb_growth_min,
+                    agb_growth_max=agb_growth_max,
+                )
