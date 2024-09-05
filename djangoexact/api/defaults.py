@@ -113,6 +113,9 @@ class AnnualCroppingDefaults(Defaults):
             biomass_t2_start_default=0,
             biomass_t2_w_default=0,
             biomass_t2_wo_default=0,
+            residue_availability_t2_start_default=0,
+            residue_availability_t2_w_default=0,
+            residue_availability_t2_wo_default=0,
             minor_biomass_t2_start_default=0,
             minor_biomass_t2_w_default=0,
             minor_biomass_t2_wo_default=0,
@@ -138,15 +141,18 @@ class AnnualCroppingDefaults(Defaults):
             flu_t2_start_default=defaults.flu_start.value,
             flu_t2_w_default=defaults.flu_w.value,
             flu_t2_wo_default=defaults.flu_wo.value,
-            biomass_t2_start_default=defaults.biomass_start.value,
-            biomass_t2_w_default=defaults.biomass_w.value,
-            biomass_t2_wo_default=defaults.biomass_wo.value,
+            biomass_t2_start_default=defaults.biomass_ef_start.value,
+            biomass_t2_w_default=defaults.biomass_ef_w.value,
+            biomass_t2_wo_default=defaults.biomass_ef_wo.value,
+            residue_availability_t2_start_default=defaults.residue_availability_t2_start.value,
+            residue_availability_t2_w_default=defaults.residue_availability_t2_w.value,
+            residue_availability_t2_wo_default=defaults.residue_availability_t2_wo.value,
+            minor_residue_t2_start_default=defaults.minor_residue_availability_t2_start.value,
+            minor_residue_t2_w_default=defaults.minor_residue_availability_t2_w.value,
+            minor_residue_t2_wo_default=defaults.minor_residue_availability_t2_wo.value,
             minor_biomass_t2_start_default=defaults.minor_biomass_start.value,
             minor_biomass_t2_w_default=defaults.minor_biomass_w.value,
             minor_biomass_t2_wo_default=defaults.minor_biomass_wo.value,
-            # residue_availability_t2_start_default=defaults.residue_availability_start.value,  # TODO: Computed @Peter
-            # residue_availability_t2_w_default=defaults.residue_availability_w.value,  # TODO: Computed @Peter
-            # residue_availability_t2_wo_default=defaults.residue_availability_wo.value,  # TODO: Computed @Peter
         )
 
 
