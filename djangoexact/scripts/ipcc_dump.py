@@ -4399,7 +4399,7 @@ for i, row in df.iterrows():
 annualcropland = LandUseType.objects.get(name__iexact="Annual Cropland")
 crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropping").all()
 
-TotalBiomassAfterDefo.objects.all().delete()
+TotalBiomassAfterDefo.objects.filter(land_use_type__name="Degraded Land").all().delete()
 
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "TotalBiomassAfterDefo.csv"),
@@ -4423,7 +4423,8 @@ for i, row in enumerate(rows):
         print(headers[j])
         land_use_type = LandUseType.objects.get(name__iexact=headers[j])
         value = parse_csv_number(row[headers[j]])
-        if not value:
+        if value is None:
+            print(f"Skipping {land_use_type} {climate} {moisture} {region} {value}")
             continue
 
         if land_use_type == annualcropland:
@@ -4443,22 +4444,22 @@ for i, row in enumerate(rows):
                     continent=region,
                     value=value,
                 )
-        else:
-            print(
-                land_use_type,
-                climate,
-                moisture,
-                region,
-                value,
-            )
 
-            TotalBiomassAfterDefo.objects.create(
-                land_use_type=land_use_type,
-                climate=climate,
-                moisture=moisture,
-                continent=region,
-                value=value,
-            )
+        print(
+            land_use_type,
+            climate,
+            moisture,
+            region,
+            value,
+        )
+
+        TotalBiomassAfterDefo.objects.create(
+            land_use_type=land_use_type,
+            climate=climate,
+            moisture=moisture,
+            continent=region,
+            value=value,
+        )
 
 """
 
