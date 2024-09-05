@@ -1287,10 +1287,10 @@ class ForestManagementAGB(Model):
     forest_condition_type = ForeignKey("api.ForestConditionType", on_delete=CASCADE)
     from_year = IntegerField(default=0)
     forest_type = ForeignKey("api.ForestType", on_delete=CASCADE)
-    agb_min = FloatField(default=0)
-    agb_max = FloatField(default=0)
-    agb_growth_min = FloatField(default=0)
-    agb_growth_max = FloatField(default=0)
+    agb_min = FloatField(blank=True, null=True)
+    agb_max = FloatField(blank=True, null=True)
+    agb_growth_min = FloatField(blank=True, null=True)
+    agb_growth_max = FloatField(blank=True, null=True)
     agb_unit = CharField(max_length=100, default="tonnes d.m./ha")
 
     class Meta:
