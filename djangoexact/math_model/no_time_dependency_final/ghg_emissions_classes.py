@@ -9,7 +9,7 @@ import matplotlib
 from PIL import Image
 import json
 
-matplotlib.use('Agg')
+matplotlib.use("Agg")
 
 
 class GasTypes(Enum):
@@ -86,10 +86,8 @@ class Emission:
         return Emission(self.value - other.value, self.gas_type)
 
     def to_dict(self):
-        return {
-            "gas_type": {"name": self.gas_type.name if self.gas_type else None},
-            "value": self.value
-        }
+        return {"gas_type": {"name": self.gas_type.name if self.gas_type else None}, "value": self.value}
+
 
 class YearlyGasEmissionSet:
 
@@ -104,6 +102,7 @@ class YearlyGasEmissionSet:
 
         self.emissions.extend(emissions)
 
+
 class YearlyGasActivityEmissionSet(YearlyGasEmissionSet):
 
     def __init__(self, year, gas_type, emissions, activity, delay=0):
@@ -112,13 +111,9 @@ class YearlyGasActivityEmissionSet(YearlyGasEmissionSet):
         self.activity: ActivityTypes = activity
 
     def to_dict(self):
-        return {
-            "year": self.year,
-            "gas_type": {"name": self.gas_type.name if self.gas_type else None},
-            "emissions": [emission.to_dict() for emission in self.emissions],
-            "activity": self.activity
-        }
-    
+        return {"year": self.year, "gas_type": {"name": self.gas_type.name if self.gas_type else None}, "emissions": [emission.to_dict() for emission in self.emissions], "activity": self.activity}
+
+
 class YearlyActivityEmissionSet:
 
     def __init__(self, year, emissions, activity):
@@ -127,12 +122,9 @@ class YearlyActivityEmissionSet:
         self.activity: ActivityTypes = activity
 
     def to_dict(self):
-        return {
-            "year": self.year,
-            "emissions": [emission.to_dict() for emission in self.emissions],
-            "activity": self.activity.value
-        }
-    
+        return {"year": self.year, "emissions": [emission.to_dict() for emission in self.emissions], "activity": self.activity.value}
+
+
 class BreakdownTypes(Enum):
     TOTAL = "total"
     ACTIVITY = "activity"
@@ -233,27 +225,26 @@ class Result:
     def plot_emissions_and_aggregate_by_activity(self, with_or_without_string):
         def save_emission_graphs_with_totals(save_path, emissions_data, with_or_without_string):
 
-
             activity_data = defaultdict(lambda: defaultdict(list))
             total_emissions_by_activity = defaultdict(float)
 
             for entry in emissions_data:
-                activity = entry['activity']
-                emissions_list = entry['emissions']
+                activity = entry["activity"]
+                emissions_list = entry["emissions"]
 
                 for index, emission in enumerate(emissions_list):
                     year = index  # Year starts from 0 and increases by 1 each year
-                    gas_type = emission['gas_type']['name']
-                    value = emission['value']
+                    gas_type = emission["gas_type"]["name"]
+                    value = emission["value"]
                     activity_data[activity][gas_type].append((year, value))
                     total_emissions_by_activity[activity] += value
 
             for activity, gases in activity_data.items():
                 total_emissions = total_emissions_by_activity[activity]
                 plt.figure(figsize=(12, 6))
-                plt.title(f'{with_or_without_string} - Emissions for Activity: {activity} (Total: {total_emissions:.2f})')
-                plt.xlabel('Year (starting from 0)')
-                plt.ylabel('Emission Value')
+                plt.title(f"{with_or_without_string} - Emissions for Activity: {activity} (Total: {total_emissions:.2f})")
+                plt.xlabel("Year (starting from 0)")
+                plt.ylabel("Emission Value")
 
                 max_years = max(len(data) for data in gases.values())
 
@@ -261,7 +252,7 @@ class Result:
                     years = [year for year, _ in data]
                     values = [value for _, value in data]
 
-                    plt.plot(years, values, label=gas_type, marker='o')
+                    plt.plot(years, values, label=gas_type, marker="o")
 
                 plt.xticks(range(0, max_years))
                 plt.legend()
@@ -269,7 +260,6 @@ class Result:
                 filename = f"{with_or_without_string}_emissions_{activity}.png"
                 plt.savefig(os.path.join(save_path, filename))
                 plt.close()
-
 
         # Convert the breakdown to a list of dictionaries
         emission_data_dicts = [emission_set.to_dict() for emission_set in self.breakdown_by_activity_by_gas()]
@@ -280,22 +270,23 @@ class Result:
             save_emission_graphs_with_totals(save_directory, emission_data_dicts, with_or_without_string)
 
             # Combining all images into a single large image
-            plot_files = [os.path.join(save_directory, file) for file in os.listdir(save_directory) if file.endswith('.png')]
+            plot_files = [os.path.join(save_directory, file) for file in os.listdir(save_directory) if file.endswith(".png")]
             images = [Image.open(file) for file in plot_files]
+
+            if not images:
+                log.warning("No images found to combine. The results are likely empty.")
+                return
+
             widths, heights = zip(*(i.size for i in images))
 
             total_width = max(widths)
             total_height = sum(heights)
-            combined_image = Image.new('RGB', (total_width, total_height))
+            combined_image = Image.new("RGB", (total_width, total_height))
 
             y_offset = 0
             for img in images:
                 combined_image.paste(img, (0, y_offset))
                 y_offset += img.size[1]
 
-            combined_image_path = f'result_{with_or_without_string}.png'  # Update this path as needed
+            combined_image_path = f"result_{with_or_without_string}.png"  # Update this path as needed
             combined_image.save(combined_image_path)
-
-
-
-
