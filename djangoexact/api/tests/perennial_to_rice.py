@@ -13,15 +13,15 @@ from factory import fuzzy
 class PerennialToRice(t.LandUseChangeTest):
     def __init__(self):
         super().__init__()
-        self.module_type_start = ModuleType.objects.get(class_name="PerennialCropping")
-        self.module_type_wo = ModuleType.objects.get(class_name="PerennialCropping")
+        self.module_type_start = ModuleType.objects.get(class_name="PerennialCropland")
+        self.module_type_wo = ModuleType.objects.get(class_name="PerennialCropland")
         self.module_type_w = ModuleType.objects.get(class_name="FloodedRice")
         self.create_land_use_change(self.module_type_start, self.module_type_wo, self.module_type_w)
         self.add_activity_modules([self.module_type_start, self.module_type_wo, self.module_type_w])
 
         self.trees = LandUseType.objects.filter(climates=self.climate, moistures=self.moisture, module_types=self.module_type_start).all()
 
-        self.module_start: PerennialCropping = self.create_module(
+        self.module_start: PerennialCropland = self.create_module(
             self.module_type_start,
             land_use_change=self.land_use_change,
             land_use_type_start=fuzzy.FuzzyChoice(self.trees).fuzz(),
