@@ -54,7 +54,7 @@ class ProjectTest:
         Raises:
             None.
         """
-        self.project: ProjectFactory = ProjectFactory.create(owner=self.user, name=uuid.uuid4(), climate=self.climate, moisture=self.moisture)
+        self.project: Project = ProjectFactory.create(owner=self.user, name=uuid.uuid4(), climate=self.climate, moisture=self.moisture)
         log.info(f"Created project with parameters {self.get_parameters(self.project)}")
 
     @abstractmethod

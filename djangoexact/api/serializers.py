@@ -24,7 +24,7 @@ from .models import (
     Module,
     Submodule,
     Activity,
-    AnnualCropping,
+    AnnualCropland,
     Aquaculture,
     Building,
     Climate,
@@ -34,7 +34,7 @@ from .models import (
     ConfigParam,
     Country,
     CustomUser,
-    DegradedLand,
+    OtherLand,
     Electricity,
     Energy,
     FloodedRice,
@@ -58,14 +58,14 @@ from .models import (
     Livestock,
     MacroFuelType,
     MacroInputType,
-    MinorSeasonAnnualCropping,
+    MinorSeasonAnnualCropland,
     MinorSeasonFloodedRice,
-    MinorSeasonPerennialCropping,
+    MinorSeasonPerennialCropland,
     ModuleType,
     Moisture,
     OrganicSoil,
     OtherInfrastructure,
-    PerennialCropping,
+    PerennialCropland,
     Project,
     ProjectInvitation,
     ProjectStatus,
@@ -355,12 +355,14 @@ class WriteActivitySerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         if self.instance:
-            luc_module: ModuleType = ModuleType.objects.filter(name="Land Use Change").first()
+            luc_module: ModuleType = ModuleType.objects.get(name="Land Use Change")
 
-            if luc_module and luc_module in data.get("module_types", []):
+            module_types = data.get("module_types", [])
+
+            if luc_module in module_types:
                 raise serializers.ValidationError("Land Use Change module cannot be added manually")
 
-            if self.instance.landusechange.exists() and len(list(filter(lambda module: module.is_luc, data.get("module_types", [])))) > 0:
+            if self.instance.landusechange.exists() and len(list(filter(lambda module: module.is_luc, module_types))) > 0:
                 raise serializers.ValidationError("Land Modules cannot be independently added to activities with a Land Use Change")
 
             new_duration = data.get("duration_t2", None)
@@ -436,8 +438,12 @@ class ActivityBuilderSerializer(serializers.Serializer):
     area = serializers.FloatField(required=False, min_value=0)
     module_types = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
     change_rate = serializers.PrimaryKeyRelatedField(queryset=ChangeRate.objects.all(), many=False, required=False)
+    activity_id = serializers.PrimaryKeyRelatedField(queryset=Activity.objects.all(), many=False, required=False)
 
     def validate(self, data):
+        if data.get("activity_id", None):
+            self.instance = data.get("activity_id")
+
         luc_module = ModuleType.objects.get(name="Land Use Change")
         module_types = data.get("module_types", [])
         land_use_change = data.get("land_use_change", None)
@@ -543,27 +549,96 @@ class ActivityBuilderSerializer(serializers.Serializer):
         if project.cost and total_cost > project.cost:
             raise serializers.ValidationError("Total cost of activities cannot be greater than project cost")
 
+    def edit_existing_luc(self, activity):
+        luc: LandUseChange = activity.landusechange.first()
+
+        activity.module_types.remove(luc.module_type_start.id, luc.module_type_w.id, luc.module_type_wo.id)
+
+        luc_modules = luc.get_module_types()
+        new_modules = list(self.validated_data["land_use_change"].values())
+
+        difference = list(set(luc_modules) - set(new_modules))
+
+        for module in difference:
+            module_instance = getattr(activity, module.class_name.lower())
+            if module_instance.exists():
+                module_instance.first().delete()
+
+        luc.module_type_start = self.validated_data["land_use_change"]["module_type_start"]
+        luc.module_type_w = self.validated_data["land_use_change"]["module_type_w"]
+        luc.module_type_wo = self.validated_data["land_use_change"]["module_type_wo"]
+        luc.area = self.validated_data["area"]
+
+        activity.module_types.add(luc.module_type_start.id, luc.module_type_w.id, luc.module_type_wo.id)
+
+        luc.save()
+        activity.save()
+
+    def delete_existing_luc(self, activity):
+        luc: LandUseChange = activity.landusechange.first()
+        activity.module_types.remove(luc.module_type_start.id, luc.module_type_w.id, luc.module_type_wo.id, luc.module_type.id)
+        [module.delete() for module in luc.get_modules()]
+        luc.delete()
+
     @transaction.atomic
     def save(self, **kwargs):
         self.validate_total_project_cost()
 
-        if Activity.objects.filter(name=self.validated_data["name"], project=self.validated_data["project"]).exists():
-            self.validated_data["name"] = self.unique_activity_name()
-
         has_organic_soil = "OrganicSoil" in [module.class_name for module in self.validated_data["module_types"]]
         has_luc_module = self.validated_data.get("land_use_change", False)
 
-        activity = self.create_activity()
-        activity.module_types.set(self.validated_data.get("module_types", []))
+        if self.instance:
+            old_module_types = list(map(lambda module: module.class_name, self.instance.module_types.all()))
+            if self.instance.landusechange.exists():
+                luc = self.instance.landusechange.first()
+                if has_luc_module:
+                    self.edit_existing_luc(self.instance)
+                else:
+                    self.delete_existing_luc(self.instance)
 
-        luc = None
-        if has_luc_module:
-            luc = self.handle_luc_module(activity, has_organic_soil)
+            luc: LandUseChange = self.instance.landusechange.first()
+            luc_module_types = list(set([module for module in luc.get_module_types()])) + [ModuleType.objects.get(name="Land Use Change")] if luc else []
+            new_module_types = list(map(lambda module: module.class_name, self.validated_data["module_types"] + luc_module_types) if has_luc_module else self.validated_data["module_types"])
 
-        self.create_modules(activity, luc, has_organic_soil, has_luc_module)
-        activity.save()
+            has_different_module_types = list(set(old_module_types) - set(new_module_types))
 
-        return activity
+            if has_different_module_types:
+                removed_modules = list(filter(lambda module: module not in new_module_types, old_module_types))
+
+                for module in removed_modules:
+                    module_instance = getattr(self.instance, module.lower())
+                    if module_instance.exists():
+                        module_instance.first().delete()
+
+                for module in new_module_types:
+                    if module not in old_module_types:
+
+                        if module == "LandUseChange":
+                            raise serializers.ValidationError("Land Use Change module cannot be added manually")
+
+                        module_instance = getattr(self.instance, module.lower()).create(activity=self.instance)
+                        if luc and module in luc.get_module_types():
+                            module_instance.land_use_change = luc
+                            module_instance.save()
+
+            return self.instance
+
+        else:
+
+            if Activity.objects.filter(name=self.validated_data["name"], project=self.validated_data["project"]).exists():
+                self.validated_data["name"] = self.unique_activity_name()
+
+            activity = self.create_activity()
+            activity.module_types.set(self.validated_data.get("module_types", []))
+
+            luc = None
+            if has_luc_module:
+                luc = self.handle_luc_module(activity, has_organic_soil)
+
+            self.create_modules(activity, luc, has_organic_soil, has_luc_module)
+            activity.save()
+
+            return activity
 
 
 class RecursiveField(serializers.Serializer):
@@ -1169,11 +1244,11 @@ class GrasslandReadSerializer(LandModuleReadSerializer):
 # Annual Cropping
 
 
-class MinorSeasonAnnualCroppingWriteSerializer(ScenarioSubmoduleSerializer):
+class MinorSeasonAnnualCroplandWriteSerializer(ScenarioSubmoduleSerializer):
     class Meta:
-        model = MinorSeasonAnnualCropping
+        model = MinorSeasonAnnualCropland
         fields = "__all__"
-        ref_name = "MinorSeasonAnnualCropping"
+        ref_name = "MinorSeasonAnnualCropland"
 
         mandatory_fields = {
             "start": {
@@ -1203,19 +1278,19 @@ class MinorSeasonAnnualCroppingWriteSerializer(ScenarioSubmoduleSerializer):
         }
 
 
-class MinorSeasonAnnualCroppingReadSerializer(BaseGenericModuleSerializer):
+class MinorSeasonAnnualCroplandReadSerializer(BaseGenericModuleSerializer):
     class Meta:
-        model = MinorSeasonAnnualCropping
+        model = MinorSeasonAnnualCropland
         fields = "__all__"
-        ref_name = "MinorSeasonAnnualCropping"
+        ref_name = "MinorSeasonAnnualCropland"
         mandatory_fields = {}
 
 
-class AnnualCroppingSerializer(LandModuleWriteSerializer):
+class AnnualCroplandSerializer(LandModuleWriteSerializer):
     class Meta:
-        model = AnnualCropping
+        model = AnnualCropland
         fields = "__all__"
-        ref_name = "AnnualCropping"
+        ref_name = "AnnualCropland"
         mandatory_fields = {
             "start": {
                 "mandatory": [
@@ -1246,7 +1321,7 @@ class AnnualCroppingSerializer(LandModuleWriteSerializer):
     def validate(self, data):
 
         for minor_season in self.instance.minor_seasons.all():
-            minor_season: MinorSeasonAnnualCropping
+            minor_season: MinorSeasonAnnualCropland
             if not minor_season.is_ready():
                 data["status"] = StatusType.objects.get(name="SUBMODULES_EMPTY")
                 return data
@@ -1254,20 +1329,20 @@ class AnnualCroppingSerializer(LandModuleWriteSerializer):
         return super().validate(data)
 
 
-class AnnualCroppingWriteSerializer(AnnualCroppingSerializer):
+class AnnualCroplandWriteSerializer(AnnualCroplandSerializer):
     pass
 
 
-class AnnualCroppingReadSerializer(AnnualCroppingSerializer):
+class AnnualCroplandReadSerializer(AnnualCroplandSerializer):
     pass
 
 
 # Perennial Cropping
-class MinorSeasonPerennialCroppingWriteSerializer(ScenarioSubmoduleSerializer):
+class MinorSeasonPerennialCroplandWriteSerializer(ScenarioSubmoduleSerializer):
     class Meta:
-        model = MinorSeasonPerennialCropping
+        model = MinorSeasonPerennialCropland
         fields = "__all__"
-        ref_name = "MinorSeasonPerennialCropping"
+        ref_name = "MinorSeasonPerennialCropland"
         mandatory_fields = {
             "start": {
                 "mandatory": [
@@ -1293,19 +1368,19 @@ class MinorSeasonPerennialCroppingWriteSerializer(ScenarioSubmoduleSerializer):
         }
 
 
-class MinorSeasonPerennialCroppingReadSerializer(BaseGenericModuleSerializer):
+class MinorSeasonPerennialCroplandReadSerializer(BaseGenericModuleSerializer):
     class Meta:
-        model = MinorSeasonPerennialCropping
+        model = MinorSeasonPerennialCropland
         fields = "__all__"
-        ref_name = "MinorSeasonPerennialCropping"
+        ref_name = "MinorSeasonPerennialCropland"
         mandatory_fields = {}
 
 
-class PerennialCroppingWriteSerializer(LandModuleWriteSerializer):
+class PerennialCroplandWriteSerializer(LandModuleWriteSerializer):
     class Meta:
-        model = PerennialCropping
+        model = PerennialCropland
         fields = "__all__"
-        ref_name = "PerennialCropping"
+        ref_name = "PerennialCropland"
         mandatory_fields = {
             "start": {
                 "mandatory": [
@@ -1331,13 +1406,13 @@ class PerennialCroppingWriteSerializer(LandModuleWriteSerializer):
         }
 
 
-class PerennialCroppingReadSerializer(LandModuleReadSerializer):
-    minor_seasons = MinorSeasonPerennialCroppingReadSerializer(many=True, read_only=True)
+class PerennialCroplandReadSerializer(LandModuleReadSerializer):
+    minor_seasons = MinorSeasonPerennialCroplandReadSerializer(many=True, read_only=True)
 
     class Meta:
-        model = PerennialCropping
+        model = PerennialCropland
         fields = "__all__"
-        ref_name = "PerennialCropping"
+        ref_name = "PerennialCropland"
         extra_fields = ["minor_seasons"]
         mandatory_fields = {}
 
@@ -2541,19 +2616,19 @@ class SetAsideReadSerializer(LandModuleReadSerializer):
         mandatory_fields = {}
 
 
-class DegradedLandWriteSerializer(LandModuleWriteSerializer):
+class OtherLandWriteSerializer(LandModuleWriteSerializer):
     class Meta:
-        model = DegradedLand
+        model = OtherLand
         fields = "__all__"
-        ref_name = "DegradedLand"
+        ref_name = "OtherLand"
         mandatory_fields = {}
 
 
-class DegradedLandReadSerializer(LandModuleReadSerializer):
+class OtherLandReadSerializer(LandModuleReadSerializer):
     class Meta:
-        model = DegradedLand
+        model = OtherLand
         fields = "__all__"
-        ref_name = "DegradedLand"
+        ref_name = "OtherLand"
         mandatory_fields = {}
 
 
