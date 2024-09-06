@@ -557,6 +557,11 @@ class Project(Historical):
 
     gw_potential = models.ForeignKey("ipcc.GlobalWarmingPotential", on_delete=models.CASCADE)
 
+    gwp_co2_t2 = models.FloatField(null=True, blank=True)
+    gwp_ch4_t2 = models.FloatField(null=True, blank=True)
+    gwp_n2o_t2 = models.FloatField(null=True, blank=True)
+    gwp_ch4_fossil_t2 = models.FloatField(null=True, blank=True)
+
     soc_ref_t2 = models.FloatField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True, null=True)
@@ -599,6 +604,33 @@ class Project(Historical):
             raise exceptions.ValidationError("Error calculating project capitalization period. Capitalization years, start year of activities, and implementation years must be set")
 
         return self.last_year_of_accounting - (self.start_year_of_activities + self.implementation_years)
+
+    @property
+    def gwp(self):
+        self.gw_potential: ipcc.GlobalWarmingPotential
+
+        # NOTE: Fossil CH4 is not required but is used conditionally in the calculations. The specific case is handled in the calculations where needed.
+        # NOTE: Also, maybe this should be handle mathematical model-side as any other tier2 value.
+        if self.gw_potential.co2 is None and self.gwp_co2_t2 is None:
+            raise exceptions.ValidationError("Missing data for Global Warming Potential (CO2). Please provide tier2 value.")
+        if self.gw_potential.ch4 is None and self.gwp_ch4_t2 is None:
+            raise exceptions.ValidationError("Missing data for Global Warming Potential (CH4). Please provide tier2 value.")
+        if self.gw_potential.n2o is None and self.gwp_n2o_t2 is None:
+            raise exceptions.ValidationError("Missing data for Global Warming Potential (N2O). Please provide tier2 value.")
+
+        if self.gwp_co2_t2 is not None:
+            self.gw_potential.co2 = self.gwp_co2_t2
+
+        if self.gwp_ch4_t2 is not None:
+            self.gw_potential.ch4 = self.gwp_ch4_t2
+
+        if self.gwp_n2o_t2 is not None:
+            self.gw_potential.n2o = self.gwp_n2o_t2
+
+        if self.gwp_ch4_fossil_t2 is not None:
+            self.gw_potential.ch4_fossil = self.gwp_ch4_fossil_t2
+
+        return self.gw_potential
 
 
 class ProjectInvitation(Historical):
