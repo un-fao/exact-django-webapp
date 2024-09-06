@@ -24,7 +24,7 @@ from .models import (
     Module,
     Submodule,
     Activity,
-    AnnualCropping,
+    AnnualCropland,
     Aquaculture,
     Building,
     Climate,
@@ -58,14 +58,14 @@ from .models import (
     Livestock,
     MacroFuelType,
     MacroInputType,
-    MinorSeasonAnnualCropping,
+    MinorSeasonAnnualCropland,
     MinorSeasonFloodedRice,
-    MinorSeasonPerennialCropping,
+    MinorSeasonPerennialCropland,
     ModuleType,
     Moisture,
     OrganicSoil,
     OtherInfrastructure,
-    PerennialCropping,
+    PerennialCropland,
     Project,
     ProjectInvitation,
     ProjectStatus,
@@ -1244,11 +1244,11 @@ class GrasslandReadSerializer(LandModuleReadSerializer):
 # Annual Cropping
 
 
-class MinorSeasonAnnualCroppingWriteSerializer(ScenarioSubmoduleSerializer):
+class MinorSeasonAnnualCroplandWriteSerializer(ScenarioSubmoduleSerializer):
     class Meta:
-        model = MinorSeasonAnnualCropping
+        model = MinorSeasonAnnualCropland
         fields = "__all__"
-        ref_name = "MinorSeasonAnnualCropping"
+        ref_name = "MinorSeasonAnnualCropland"
 
         mandatory_fields = {
             "start": {
@@ -1278,19 +1278,19 @@ class MinorSeasonAnnualCroppingWriteSerializer(ScenarioSubmoduleSerializer):
         }
 
 
-class MinorSeasonAnnualCroppingReadSerializer(BaseGenericModuleSerializer):
+class MinorSeasonAnnualCroplandReadSerializer(BaseGenericModuleSerializer):
     class Meta:
-        model = MinorSeasonAnnualCropping
+        model = MinorSeasonAnnualCropland
         fields = "__all__"
-        ref_name = "MinorSeasonAnnualCropping"
+        ref_name = "MinorSeasonAnnualCropland"
         mandatory_fields = {}
 
 
-class AnnualCroppingSerializer(LandModuleWriteSerializer):
+class AnnualCroplandSerializer(LandModuleWriteSerializer):
     class Meta:
-        model = AnnualCropping
+        model = AnnualCropland
         fields = "__all__"
-        ref_name = "AnnualCropping"
+        ref_name = "AnnualCropland"
         mandatory_fields = {
             "start": {
                 "mandatory": [
@@ -1321,7 +1321,7 @@ class AnnualCroppingSerializer(LandModuleWriteSerializer):
     def validate(self, data):
 
         for minor_season in self.instance.minor_seasons.all():
-            minor_season: MinorSeasonAnnualCropping
+            minor_season: MinorSeasonAnnualCropland
             if not minor_season.is_ready():
                 data["status"] = StatusType.objects.get(name="SUBMODULES_EMPTY")
                 return data
@@ -1329,20 +1329,20 @@ class AnnualCroppingSerializer(LandModuleWriteSerializer):
         return super().validate(data)
 
 
-class AnnualCroppingWriteSerializer(AnnualCroppingSerializer):
+class AnnualCroplandWriteSerializer(AnnualCroplandSerializer):
     pass
 
 
-class AnnualCroppingReadSerializer(AnnualCroppingSerializer):
+class AnnualCroplandReadSerializer(AnnualCroplandSerializer):
     pass
 
 
 # Perennial Cropping
-class MinorSeasonPerennialCroppingWriteSerializer(ScenarioSubmoduleSerializer):
+class MinorSeasonPerennialCroplandWriteSerializer(ScenarioSubmoduleSerializer):
     class Meta:
-        model = MinorSeasonPerennialCropping
+        model = MinorSeasonPerennialCropland
         fields = "__all__"
-        ref_name = "MinorSeasonPerennialCropping"
+        ref_name = "MinorSeasonPerennialCropland"
         mandatory_fields = {
             "start": {
                 "mandatory": [
@@ -1368,19 +1368,19 @@ class MinorSeasonPerennialCroppingWriteSerializer(ScenarioSubmoduleSerializer):
         }
 
 
-class MinorSeasonPerennialCroppingReadSerializer(BaseGenericModuleSerializer):
+class MinorSeasonPerennialCroplandReadSerializer(BaseGenericModuleSerializer):
     class Meta:
-        model = MinorSeasonPerennialCropping
+        model = MinorSeasonPerennialCropland
         fields = "__all__"
-        ref_name = "MinorSeasonPerennialCropping"
+        ref_name = "MinorSeasonPerennialCropland"
         mandatory_fields = {}
 
 
-class PerennialCroppingWriteSerializer(LandModuleWriteSerializer):
+class PerennialCroplandWriteSerializer(LandModuleWriteSerializer):
     class Meta:
-        model = PerennialCropping
+        model = PerennialCropland
         fields = "__all__"
-        ref_name = "PerennialCropping"
+        ref_name = "PerennialCropland"
         mandatory_fields = {
             "start": {
                 "mandatory": [
@@ -1406,13 +1406,13 @@ class PerennialCroppingWriteSerializer(LandModuleWriteSerializer):
         }
 
 
-class PerennialCroppingReadSerializer(LandModuleReadSerializer):
-    minor_seasons = MinorSeasonPerennialCroppingReadSerializer(many=True, read_only=True)
+class PerennialCroplandReadSerializer(LandModuleReadSerializer):
+    minor_seasons = MinorSeasonPerennialCroplandReadSerializer(many=True, read_only=True)
 
     class Meta:
-        model = PerennialCropping
+        model = PerennialCropland
         fields = "__all__"
-        ref_name = "PerennialCropping"
+        ref_name = "PerennialCropland"
         extra_fields = ["minor_seasons"]
         mandatory_fields = {}
 
