@@ -54,7 +54,7 @@ from math_model.no_time_dependency_final.oluc import (
     OtherLandUseChanges as MathOtherLandUseChanges,
 )
 from math_model.no_time_dependency_final.perennial_cropping import (
-    PerennialCropping as PerennialCropland,
+    PerennialCropland as PerennialCropland,
 )
 from math_model.no_time_dependency_final.waterbodies import (
     CoastalWaterbodies as MathWaterbodies,
@@ -71,7 +71,7 @@ from .models import (
     Activity,
     Submodule,
     AnnualCroplandParameter,
-    AnnualCropping,
+    AnnualCropland,
     Aquaculture,
     AquacultureParameter,
     BiomassModule,
@@ -109,7 +109,7 @@ from .models import (
     Moisture,
     OrganicInputType,
     OrganicSoil,
-    PerennialCropping,
+    PerennialCropland,
     Project,
     Region,
     Road,
@@ -1172,13 +1172,13 @@ class OtherLandUseCalculator(BaseCalculator):
         return super().get_defaults(calculate)
 
 
-class AnnualCroppingCalculator(BaseCalculator):
+class AnnualCroplandCalculator(BaseCalculator):
 
     def get_defaults(self, input: Module) -> dict:
         return AnnualCropCalculator(input).get_defaults()
 
     def calculate(self):
-        module: AnnualCropping = self.data
+        module: AnnualCropland = self.data
 
         res_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         res_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
@@ -1242,7 +1242,7 @@ class AnnualCropCalculator(LandModuleCalculator):
     def get_defaults(self, calculate=False) -> SimpleNamespace:
         super().get_defaults(calculate)
 
-        module: AnnualCropping = self.data
+        module: AnnualCropland = self.data
 
         lut_start = self.module_start.land_use_type_start
         lut_w = self.module_w.land_use_type_w
@@ -1332,11 +1332,11 @@ class AnnualCropCalculator(LandModuleCalculator):
 
     def calculate(self, aggregate_by=BreakdownTypes.TOTAL) -> tuple[MathResult]:
         """
-        Calculate emissions for a single AnnualCropping module.
+        Calculate emissions for a single AnnualCropland module.
         """
         log.debug("START AnnualCropCalculator.calculate")
 
-        input: AnnualCropping = self.data
+        input: AnnualCropland = self.data
         project: Project = input.activity.project
         luc: LandUseChange = input.land_use_change
 
@@ -1647,7 +1647,7 @@ class PerennialCropCalculator(LandModuleCalculator):
     def get_defaults(self, calculate=False) -> dict:
         super().get_defaults(calculate)
 
-        module: PerennialCropping = self.data
+        module: PerennialCropland = self.data
         climate = self.climate
         moisture = self.moisture
         region = self.region
@@ -1700,11 +1700,11 @@ class PerennialCropCalculator(LandModuleCalculator):
 
     def calculate(self, aggregate_by=BreakdownTypes.TOTAL) -> list[Result]:
         """
-        Calculate emissions for a single PerennialCropping module.
+        Calculate emissions for a single PerennialCropland module.
         """
         log.debug("START PerennialCropCalculator.calculate")
 
-        module: PerennialCropping = self.data
+        module: PerennialCropland = self.data
         project = module.activity.project
         activity: Activity = module.activity
         change_rate = activity.change_rate
@@ -1933,7 +1933,7 @@ class PerennialCropCalculator(LandModuleCalculator):
         return results_tuple
 
 
-class PerennialCroppingCalculator(BaseCalculator):
+class PerennialCroplandCalculator(BaseCalculator):
     """
     Calculator for perennial cropping.
     """
@@ -1942,9 +1942,9 @@ class PerennialCroppingCalculator(BaseCalculator):
         return PerennialCropCalculator(input).get_defaults(calculate=calculate)
 
     def calculate(self):
-        log.debug("START PerennialCroppingCalculator.calculate")
+        log.debug("START PerennialCroplandCalculator.calculate")
 
-        module: PerennialCropping = self.data
+        module: PerennialCropland = self.data
 
         res_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         res_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
@@ -1954,7 +1954,7 @@ class PerennialCroppingCalculator(BaseCalculator):
         res_w += r_w
         res_wo += r_wo
 
-        log.debug("END PerennialCroppingCalculator.calculate")
+        log.debug("END PerennialCroplandCalculator.calculate")
         return (res_w, res_wo)
 
 
