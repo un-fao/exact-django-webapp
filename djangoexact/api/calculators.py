@@ -13,7 +13,7 @@ from django.apps import apps
 from django.db.models import Q
 import django.db.models as models
 from ipcc import models as ipcc
-from math_model.no_time_dependency_final.annuals import AnnualCropland
+from math_model.no_time_dependency_final.annuals import AnnualCropland as MathAnnualCropland
 from math_model.no_time_dependency_final.coastal_wetlands import (
     CoastalWetland as MathCoastalWetland,
 )
@@ -54,7 +54,7 @@ from math_model.no_time_dependency_final.oluc import (
     OtherLandUseChanges as MathOtherLandUseChanges,
 )
 from math_model.no_time_dependency_final.perennial_cropping import (
-    PerennialCropland as PerennialCropland,
+    PerennialCropland as MathPerennialCropland,
 )
 from math_model.no_time_dependency_final.waterbodies import (
     CoastalWaterbodies as MathWaterbodies,
@@ -1403,7 +1403,7 @@ class AnnualCropCalculator(LandModuleCalculator):
             }
             log.debug("Inputs start w: %s", self.inputs_start_w)
 
-            self.math_start_w = AnnualCropland(**self.inputs_start_w)
+            self.math_start_w = MathAnnualCropland(**self.inputs_start_w)
             self.math_start_w.calculate_emissions()
 
         if input.is_with():
@@ -1465,7 +1465,7 @@ class AnnualCropCalculator(LandModuleCalculator):
             }
             log.debug("Inputs w: %s", self.inputs_w)
 
-            self.math_w = AnnualCropland(**self.inputs_w)
+            self.math_w = MathAnnualCropland(**self.inputs_w)
             self.math_w.calculate_emissions()
 
         if input.is_business_as_usual():
@@ -1527,7 +1527,7 @@ class AnnualCropCalculator(LandModuleCalculator):
             }
             log.debug("Inputs start wo: %s", self.inputs_start_wo)
 
-            self.math_start_wo = AnnualCropland(**self.inputs_start_wo)
+            self.math_start_wo = MathAnnualCropland(**self.inputs_start_wo)
             self.math_start_wo.calculate_emissions()
 
         if input.is_without():
@@ -1589,7 +1589,7 @@ class AnnualCropCalculator(LandModuleCalculator):
             }
             log.debug("Inputs wo: %s", self.inputs_wo)
 
-            self.math_wo = AnnualCropland(**self.inputs_wo)
+            self.math_wo = MathAnnualCropland(**self.inputs_wo)
             self.math_wo.calculate_emissions()
 
         res_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
@@ -1758,7 +1758,7 @@ class PerennialCropCalculator(LandModuleCalculator):
             }
             log.debug("Inputs start w: %s", inputs_start_w)
 
-            self.math_start_w = PerennialCropland(**inputs_start_w)
+            self.math_start_w = MathPerennialCropland(**inputs_start_w)
             self.math_start_w.calculate_emissions()
 
         if module.is_business_as_usual():
@@ -1808,7 +1808,7 @@ class PerennialCropCalculator(LandModuleCalculator):
             }
             log.debug("Input start wo: %s", inputs_start_wo)
 
-            self.math_start_wo = PerennialCropland(**inputs_start_wo)
+            self.math_start_wo = MathPerennialCropland(**inputs_start_wo)
             self.math_start_wo.calculate_emissions()
 
         if module.is_with():
@@ -1858,7 +1858,7 @@ class PerennialCropCalculator(LandModuleCalculator):
             }
             log.debug("Inputs w: %s", inputs_w)
 
-            self.math_w = PerennialCropland(**inputs_w)
+            self.math_w = MathPerennialCropland(**inputs_w)
             self.math_w.calculate_emissions()
 
         if module.is_without():
@@ -1908,7 +1908,7 @@ class PerennialCropCalculator(LandModuleCalculator):
             }
             log.debug("Inputs wo: %s", inputs_wo)
 
-            self.math_wo = PerennialCropland(**inputs_wo)
+            self.math_wo = MathPerennialCropland(**inputs_wo)
             self.math_wo.calculate_emissions()
 
         results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
