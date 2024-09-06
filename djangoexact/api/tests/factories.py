@@ -564,9 +564,9 @@ class BuildingFactory(DjangoModelFactory):
     building_types_wo = factory.fuzzy.FuzzyChoice(building_types)
 
 
-class DegradedLandFactory(DjangoModelFactory):
+class OtherLandFactory(DjangoModelFactory):
     class Meta:
-        model = DegradedLand
+        model = OtherLand
 
     status = READY
     area = 150
