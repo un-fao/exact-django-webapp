@@ -80,8 +80,8 @@ router.register(r"irrigation-system-types", views.generic_viewset(models.Irrigat
 # Set Aside
 router.register(r"set-asides", views.generic_module_viewset(models.SetAside), basename="set-asides")
 
-# Degraded Land
-router.register(r"degraded-lands", views.generic_module_viewset(models.DegradedLand), basename="degraded-lands")
+# Other Land
+router.register(r"other-lands", views.generic_module_viewset(models.OtherLand), basename="other-lands")
 
 # Coastal Wetland
 router.register(r"coastal-wetlands", views.generic_module_viewset(models.CoastalWetland), basename="coastal-wetlands")
