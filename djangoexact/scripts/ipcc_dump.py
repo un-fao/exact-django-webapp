@@ -3806,8 +3806,8 @@ df = pd.read_csv(
 )
 
 annualcropland = LandUseType.objects.get(name__iexact="Annual Cropland")
-crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropping").all()
-perennials = LandUseType.objects.filter(module_types__class_name__iexact="PerennialCropping").all()
+crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropland").all()
+perennials = LandUseType.objects.filter(module_types__class_name__iexact="PerennialCropland").all()
 perennials = perennials.exclude(name__in=["Agroforestry - Default", "Alley Cropping", "Perennial Fallow", "Hedgerow", "Multistrata", "Parkland", "Shaded Perennial", "Silvoarable", "Silvopasture", "Oil Palm", "Rubber", "Tea", "Olive", "Orchard", "Short Rotation Coppice", "Vine"])
 for i, row in df.iterrows():
     climate = Climate.objects.get(name__iexact=row["climate"])
@@ -4234,7 +4234,7 @@ for i, row in df.iterrows():
         print(e)
 
 annualcropland = LandUseType.objects.get(name__iexact="Annual Cropland")
-crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropping").all()
+crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropland").all()
 
 TotalBiomassAfterDefo.objects.all().delete()
 
@@ -4430,6 +4430,12 @@ for i, row in df.iterrows():
 
 ModuleType.objects.filter(class_name="DegradedLand").update(name="Other Land", class_name="OtherLand")
 LandUseType.objects.filter(name="Degraded Land").update(name="Other Land")
+
+ModuleType.objects.filter(class_name="AnnualCropping").update(name="Annual Cropland", class_name="AnnualCropland")
+LandUseType.objects.filter(name="Annual Cropping").update(name="Annual Cropland")
+
+ModuleType.objects.filter(class_name="PerennialCropping").update(name="Perennial Cropland", class_name="PerennialCropland")
+LandUseType.objects.filter(name="Perennial Cropping").update(name="Perennial Cropland")
 
 
 # TODO: Run in develop
