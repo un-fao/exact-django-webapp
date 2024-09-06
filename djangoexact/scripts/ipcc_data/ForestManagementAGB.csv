@@ -1,4 +1,6 @@
 climate;land_use_type;region;forest_condition_type;agb_range;agb_growth;agb_range_plantation;agb_growth_plantation
+Tropical;Rainforest;Africa;Primary;404.2;1.3;n.a.;n.a.
+Tropical;Rainforest;Africa;Secondary >20 years;212.9;3.5;200-300;n.a.
 Tropical;Rainforest;Africa;Secondary ≤20 Years;52,8;7,6;60-100;05-08
 Tropical;Rainforest;North and South America;Primary;307,1;1;n.a.;n.a.
 Tropical;Rainforest;North and South America;Secondary >20 Years;206,4;2,3;150-300;05-40
@@ -51,24 +53,6 @@ Warm Temperate;Humid Forest;North and South America;Secondary ≤20 Years;84.5;2
 Warm Temperate;Humid Forest;Asia;Primary;323.0;n.a.;n.a.;n.a.
 Warm Temperate;Humid Forest;Asia;Secondary >20 Years;258.4;1.0;100-180;8
 Warm Temperate;Humid Forest;Asia;Secondary ≤20 Years;258.4;2.5;100-180;8
-Warm Temperate;Dry Forest;Africa;Primary;65.2;1.8;n.a.;n.a.
-Warm Temperate;Dry Forest;Africa;Secondary >20 Years;65.2;1.8;60-70;8
-Warm Temperate;Dry Forest;Africa;Secondary ≤20 Years;65.2;2.4;20-30;04-20
-Warm Temperate;Dry Forest;North and South America;Primary;115.9;1.0;n.a.;n.a.
-Warm Temperate;Dry Forest;North and South America;Secondary >20 Years;115.9;1.0;60-110;03-30
-Warm Temperate;Dry Forest;North and South America;Secondary ≤20 Years;115.9;4.0;60-110;03-30
-Warm Temperate;Dry Forest;Asia;Primary;70.9;1.5-2.0;n.a.;n.a.
-Warm Temperate;Dry Forest;Asia;Secondary >20 Years;70.9;1.5-2.0;60-163.5;02-25
-Warm Temperate;Dry Forest;Asia;Secondary ≤20 Years;70.9;6.0-7.0;54.8-69.5;02-25
-Warm Temperate;Dry Forest;Africa;Primary;65.2;1.8;n.a.;n.a.
-Warm Temperate;Dry Forest;Africa;Secondary >20 Years;65.2;1.8;60-70;8
-Warm Temperate;Dry Forest;Africa;Secondary ≤20 Years;65.2;2.4;20-30;04-20
-Warm Temperate;Dry Forest;North and South America;Primary;115.9;1.0;n.a.;n.a.
-Warm Temperate;Dry Forest;North and South America;Secondary >20 Years;115.9;1.0;60-110;03-30
-Warm Temperate;Dry Forest;North and South America;Secondary ≤20 Years;115.9;4.0;60-110;03-30
-Warm Temperate;Dry Forest;Asia;Primary;70.9;1.5-2.0;n.a.;n.a.
-Warm Temperate;Dry Forest;Asia;Secondary >20 Years;70.9;1.5-2.0;60-163.5;02-25
-Warm Temperate;Dry Forest;Asia;Secondary ≤20 Years;70.9;6.0-7.0;54.8-69.5;02-25
 Warm Temperate;Dry Forest;Africa;Primary;65.2;1.8;n.a.;n.a.
 Warm Temperate;Dry Forest;Africa;Secondary >20 Years;65.2;1.8;60-70;8
 Warm Temperate;Dry Forest;Africa;Secondary ≤20 Years;65.2;2.4;20-30;04-20

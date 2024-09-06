@@ -24,7 +24,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class PerennialCropping(LandModule):
+class PerennialCropland(LandModule):
 
     nitrous_constant: float
     methane_constant: float

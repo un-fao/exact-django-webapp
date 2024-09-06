@@ -8,7 +8,7 @@ import pandas as pd
 import xlwings as xw
 from api.models import (
     Activity,
-    AnnualCropping,
+    AnnualCropland,
     Climate,
     Country,
     Group,
@@ -18,7 +18,7 @@ from api.models import (
     ProjectMembership,
 )
 from api.models import CustomUser as User
-from api.tests.factories import ActivityFactory, AnnualCroppingFactory, ProjectFactory
+from api.tests.factories import ActivityFactory, AnnualCroplandFactory, ProjectFactory
 from ipcc.models import GlobalWarmingPotential, SoilOrganicCarbon
 
 PROJECT_SIZE = 5
@@ -78,7 +78,7 @@ for i in range(PROJECT_SIZE):
 
     a: Activity = ActivityFactory.create(project=p)
 
-    annuals: list[AnnualCropping] = AnnualCroppingFactory.create_batch(BATCH_SIZE, activity=a)
+    annuals: list[AnnualCropland] = AnnualCroplandFactory.create_batch(BATCH_SIZE, activity=a)
 
     total_livestocks = annuals.__len__()
     passed_livestocks = 0
