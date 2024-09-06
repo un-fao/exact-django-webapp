@@ -15,8 +15,8 @@ fishery_types = [fishery for fishery in FisheryType.objects.all()]
 fish_types = [fish for fish in FishType.objects.all()]
 statuses = [status for status in ProjectStatus.objects.all()]
 
-crop_types = [crop for crop in LandUseType.objects.filter(module_types__class_name="AnnualCropping").exclude(is_active=False)]
-trees = [tree for tree in LandUseType.objects.filter(module_types__class_name="PerennialCropping").exclude(is_active=False)]
+crop_types = [crop for crop in LandUseType.objects.filter(module_types__class_name="AnnualCropland").exclude(is_active=False)]
+trees = [tree for tree in LandUseType.objects.filter(module_types__class_name="PerennialCropland").exclude(is_active=False)]
 tillage_management_types = [tillage for tillage in TillageManagementType.objects.all()]
 organic_input_types = [organic for organic in OrganicInputType.objects.filter(is_active=True).all()]
 residue_management_types = [residue for residue in ResidueManagementType.objects.all()]
@@ -134,9 +134,9 @@ class LargeFisheryFactory(FisheryFactory):
     gear_type_wo = lge_gear_type
 
 
-class AnnualCroppingFactory(DjangoModelFactory):
+class AnnualCroplandFactory(DjangoModelFactory):
     class Meta:
-        model = AnnualCropping
+        model = AnnualCropland
 
     area = 150
 
@@ -165,9 +165,9 @@ class AnnualCroppingFactory(DjangoModelFactory):
     area = factory.fuzzy.FuzzyInteger(150, 150)
 
 
-class PerennialCroppingFactory(DjangoModelFactory):
+class PerennialCroplandFactory(DjangoModelFactory):
     class Meta:
-        model = PerennialCropping
+        model = PerennialCropland
 
     area = 150
 
@@ -564,9 +564,9 @@ class BuildingFactory(DjangoModelFactory):
     building_types_wo = factory.fuzzy.FuzzyChoice(building_types)
 
 
-class DegradedLandFactory(DjangoModelFactory):
+class OtherLandFactory(DjangoModelFactory):
     class Meta:
-        model = DegradedLand
+        model = OtherLand
 
     status = READY
     area = 150
