@@ -9,14 +9,14 @@ from ..factories import *
 import api.tests.base_test_classes as t
 
 
-class DegradedLandTest(t.ModuleTest):
+class OtherLandTest(t.ModuleTest):
     def __init__(self):
         super().__init__()
-        self.module_type = ModuleType.objects.get(class_name="DegradedLand")
+        self.module_type = ModuleType.objects.get(class_name="OtherLand")
         self.create_module()
 
     def test(self):
         self.calculate_results()
 
 
-DegradedLandTest().test()
+OtherLandTest().test()

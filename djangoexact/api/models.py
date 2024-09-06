@@ -2162,14 +2162,14 @@ class SetAside(LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule):
         return super().save(*args, **kwargs)
 
 
-class DegradedLand(LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule):
+class OtherLand(LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule):
     is_degraded_land_start = models.BooleanField(default=False)
     is_degraded_land_w = models.BooleanField(default=False)
     is_degraded_land_wo = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:
-            self.land_use_type_start = LandUseType.objects.get(name="Degraded Land")
+            self.land_use_type_start = LandUseType.objects.get(name="Other Land")
             self.land_use_type_w = self.land_use_type_start
             self.land_use_type_wo = self.land_use_type_start
 
