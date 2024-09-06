@@ -12,7 +12,7 @@ import api.tests.base_test_classes as t
 class AnnualCroplandTest(t.ModuleTest):
     def __init__(self):
         super().__init__()
-        self.module_type = ModuleType.objects.get(class_name="AnnualCropping")
+        self.module_type = ModuleType.objects.get(class_name="AnnualCropland")
         self.create_module()
 
     def test(self):

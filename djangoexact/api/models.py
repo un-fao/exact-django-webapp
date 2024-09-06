@@ -1087,7 +1087,7 @@ class CropType(models.Model):
         return f"({self.pk}) {self.name}"
 
 
-class AnnualCropping(LandModule, SingleBiomassModule, ResidueAvailability):
+class AnnualCropland(LandModule, SingleBiomassModule, ResidueAvailability):
     tillage_management_type_start = models.ForeignKey(
         TillageManagementType,
         on_delete=models.CASCADE,
@@ -1216,7 +1216,7 @@ class PerennialCrop(models.Model):
     #     super().save(*args, **kwargs)
 
 
-class PerennialCropping(PerennialCrop, LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule, ResidueAvailability):
+class PerennialCropland(PerennialCrop, LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule, ResidueAvailability):
     pass
 
 
@@ -1240,12 +1240,12 @@ class CroplandMinorSeason(models.Model):
     crop_yield_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_yield_thread")
 
 
-class MinorSeasonPerennialCropping(CroplandMinorSeason, LandSubmodule):
-    parent = models.ForeignKey(PerennialCropping, on_delete=models.CASCADE, related_name="minor_seasons", null=True, blank=True)
+class MinorSeasonPerennialCropland(CroplandMinorSeason, LandSubmodule):
+    parent = models.ForeignKey(PerennialCropland, on_delete=models.CASCADE, related_name="minor_seasons", null=True, blank=True)
 
 
-class MinorSeasonAnnualCropping(CroplandMinorSeason, LandSubmodule):
-    parent = models.ForeignKey(AnnualCropping, on_delete=models.CASCADE, related_name="minor_seasons", null=True, blank=True)
+class MinorSeasonAnnualCropland(CroplandMinorSeason, LandSubmodule):
+    parent = models.ForeignKey(AnnualCropland, on_delete=models.CASCADE, related_name="minor_seasons", null=True, blank=True)
 
 
 class Rice(ResidueAvailability):

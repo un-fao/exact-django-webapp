@@ -13,7 +13,7 @@ import factory.fuzzy as fuzzy
 class PerennialCroplandTest(t.ModuleTest):
     def __init__(self):
         super().__init__()
-        self.module_type = ModuleType.objects.get(class_name="PerennialCropping")
+        self.module_type = ModuleType.objects.get(class_name="PerennialCropland")
         self.trees = LandUseType.objects.filter(climates=self.climate, moistures=self.moisture, module_types=self.module_type)
         self.create_module(
             land_use_type_start=fuzzy.FuzzyChoice(self.trees).fuzz(),
