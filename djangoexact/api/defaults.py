@@ -93,7 +93,7 @@ class GrasslandDefaults(Defaults):
         )
 
 
-class AnnualCroppingDefaults(Defaults):
+class AnnualCroplandDefaults(Defaults):
     def __init__(self, input: calcs.Module):
         super().__init__(input)
 
@@ -123,7 +123,7 @@ class AnnualCroppingDefaults(Defaults):
 
     def get_defaults(self, calculate=False) -> dict:
 
-        self.input: api.AnnualCropping
+        self.input: api.AnnualCropland
 
         defaults = calcs.AnnualCropCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
@@ -156,7 +156,7 @@ class AnnualCroppingDefaults(Defaults):
         )
 
 
-class PerennialCroppingDefaults(Defaults):
+class PerennialCroplandDefaults(Defaults):
 
     def __init__(self, input: calcs.Module):
         super().__init__(input)
@@ -192,7 +192,7 @@ class PerennialCroppingDefaults(Defaults):
         )
 
     def get_defaults(self, calculate=False) -> dict:
-        self.input: api.PerennialCropping
+        self.input: api.PerennialCropland
 
         defaults = calcs.PerennialCropCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
