@@ -4298,13 +4298,7 @@ for i, row in enumerate(rows):
             value=value,
         )
 
-        
-"""
-
-# TODO: Run in review
-
-
-ForestManagementAGB.objects.filter(climate__name="Tropical", land_use_type__name="Rainforest", region__name__icontains="Africa").delete()
+        ForestManagementAGB.objects.all().delete()
 
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestManagementAGB.csv"),
@@ -4429,3 +4423,13 @@ for i, row in df.iterrows():
                     agb_growth_min=agb_growth_min,
                     agb_growth_max=agb_growth_max,
                 )
+        
+"""
+
+# TODO: Run in review
+
+ModuleType.objects.filter(class_name="DegradedLand").update(name="Other Land", class_name="OtherLand")
+LandUseType.objects.filter(name="Degraded Land").update(name="Other Land")
+
+
+# TODO: Run in develop

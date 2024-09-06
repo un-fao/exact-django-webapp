@@ -866,7 +866,7 @@ class AquacultureDefaults(Defaults):
         )
 
 
-class DegradedLandDefaults(Defaults):  # TODO: Rename to OtherLand
+class OtherLandDefaults(Defaults):  # TODO: Rename to OtherLand
     def __init__(self, input: calcs.Module):
         super().__init__(input)
 
@@ -895,9 +895,9 @@ class DegradedLandDefaults(Defaults):  # TODO: Rename to OtherLand
         )
 
     def get_defaults(self, calculate=False) -> dict:
-        self.input: api.DegradedLand
+        self.input: api.OtherLand
 
-        defaults = calcs.DegradedLandCalculator(self.input)
+        defaults = calcs.OtherLandCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
