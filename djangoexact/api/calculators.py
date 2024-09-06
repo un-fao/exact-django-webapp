@@ -80,7 +80,7 @@ from .models import (
     CoastalWetland,
     CoastalWetlandParameter,
     Country,
-    DegradedLand,
+    OtherLand,
     Electricity,
     Energy,
     FloodedRice,
@@ -5723,7 +5723,7 @@ class ForestManagementCalculator(BaseCalculator):
         return super().defaults()
 
 
-class DegradedLandCalculator(LandModuleCalculator):
+class OtherLandCalculator(LandModuleCalculator):
     """
     Calculator for annual cropping modules.
     """
@@ -5736,7 +5736,7 @@ class DegradedLandCalculator(LandModuleCalculator):
         self.biomass_ef_wo: SimpleNamespace | ipcc.TotalBiomassAfterDefo = SimpleNamespace(value=0)
 
     def calculate(self) -> Result:
-        module: DegradedLand = self.data
+        module: OtherLand = self.data
         activity: Activity = module.activity
         project: Project = activity.project
 
@@ -5898,7 +5898,7 @@ class DegradedLandCalculator(LandModuleCalculator):
     def get_defaults(self, calculate=False) -> dict:
         super().get_defaults(calculate)
 
-        module: DegradedLand = self.data
+        module: OtherLand = self.data
         activity: Activity = module.activity
         project: Project = activity.project
         luc: LandUseChange = module.land_use_change

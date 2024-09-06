@@ -34,7 +34,7 @@ from .models import (
     ConfigParam,
     Country,
     CustomUser,
-    DegradedLand,
+    OtherLand,
     Electricity,
     Energy,
     FloodedRice,
@@ -2616,19 +2616,19 @@ class SetAsideReadSerializer(LandModuleReadSerializer):
         mandatory_fields = {}
 
 
-class DegradedLandWriteSerializer(LandModuleWriteSerializer):
+class OtherLandWriteSerializer(LandModuleWriteSerializer):
     class Meta:
-        model = DegradedLand
+        model = OtherLand
         fields = "__all__"
-        ref_name = "DegradedLand"
+        ref_name = "OtherLand"
         mandatory_fields = {}
 
 
-class DegradedLandReadSerializer(LandModuleReadSerializer):
+class OtherLandReadSerializer(LandModuleReadSerializer):
     class Meta:
-        model = DegradedLand
+        model = OtherLand
         fields = "__all__"
-        ref_name = "DegradedLand"
+        ref_name = "OtherLand"
         mandatory_fields = {}
 
 
