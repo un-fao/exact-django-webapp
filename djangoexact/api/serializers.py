@@ -2063,9 +2063,7 @@ class LivestockWriteSerializer(LandModuleWriteSerializer):
                     "heads_number_start",
                 ],
                 "conditional": {
-                    "complementary_manure_management_type_start": [
-                        "percentage_heads_on_pasture_start",
-                    ],
+                    "complementary_manure_management_type_start": [],
                 },
             },
             "with": {
@@ -2075,9 +2073,7 @@ class LivestockWriteSerializer(LandModuleWriteSerializer):
                     "heads_number_w",
                 ],
                 "conditional": {
-                    "complementary_manure_management_type_w": [
-                        "percentage_heads_on_pasture_w",
-                    ],
+                    "complementary_manure_management_type_w": [],
                 },
             },
             "without": {
@@ -2087,9 +2083,7 @@ class LivestockWriteSerializer(LandModuleWriteSerializer):
                     "heads_number_wo",
                 ],
                 "conditional": {
-                    "complementary_manure_management_type_wo": [
-                        "percentage_heads_on_pasture_wo",
-                    ],
+                    "complementary_manure_management_type_wo": [],
                 },
             },
         }
