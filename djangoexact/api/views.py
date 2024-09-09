@@ -161,19 +161,12 @@ page = openapi.Parameter(
 
 
 def get_modules(activity: Activity, serialized=True) -> list:
-    modules = []
+    modules = activity.modules
     module_serializers_list = []
-    for module in activity.module_types.all():
-        try:
-            module_model = apps.get_model(utils.API, module.class_name)
-        except LookupError:
-            logger.warning(f"get_modules: Module {module.name} not found")
-            continue
-        module_object = module_model.objects.filter(activity__id=activity.pk).first()
-        if module_object:
-            modules.append(module_object)
-            module_dict = get_module_serializer(module_model)(module_object).data
-            module_serializers_list.append(module_dict)
+
+    for module in modules:
+        module_dict = get_module_serializer(module.__class__)(module).data
+        module_serializers_list.append(module_dict)
 
     return module_serializers_list if serialized else modules
 
@@ -886,10 +879,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error("Selected user does not have permission to view the activity")
             return utils.ErrorResponse("Selected user does not have permission to view the activity", status=http_status.HTTP_403_FORBIDDEN)
 
-        activity_dict = ActivitySerializer(activity).data
-        activity_dict["modules"] = get_modules(activity)
-
-        return Response(data=activity_dict, status=http_status.HTTP_200_OK)
+        return Response(data=ActivitySerializer(activity).data, status=http_status.HTTP_200_OK)
 
     @swagger_auto_schema(
         manual_parameters=[project_id],
