@@ -840,6 +840,10 @@ class Submodule(Historical):
     @property
     def project(self):
         return self.parent.activity.project
+    
+    @property
+    def threads(self):
+        return self.__get_threads()
 
     def save(self, *args, **kwargs):
         if not self.parent:
@@ -861,6 +865,9 @@ class Submodule(Historical):
 
     def is_without(self) -> bool:
         return self.parent.is_without()
+    
+    def __get_threads(self: models.Model):
+        return [attr for attr in self._meta.get_fields() if attr.name.endswith("_thread")]
 
 
 class Module(Historical):
@@ -884,6 +891,10 @@ class Module(Historical):
     @property
     def project(self):
         return self.activity.project
+    
+    @property
+    def threads(self):
+        return self.__get_threads()
 
     def __str__(self):
         return f"({self.pk}) {self._meta.object_name} in {self.activity.name}"
@@ -993,6 +1004,9 @@ class Module(Historical):
             scenarios.append(utils.ScenarioTypes.WITHOUT)
 
         return scenarios
+    
+    def __get_threads(self: models.Model):
+        return [attr for attr in self._meta.get_fields() if attr.name.endswith("_thread")]
 
 
 class BiomassModule(Module):
