@@ -715,8 +715,6 @@ class Activity(Historical, NoteMixin):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="activities")
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
-    status = models.ForeignKey(StatusType, on_delete=models.CASCADE, null=True, blank=True, default=utils.get_activity_default_status)
-    completion_percentage = models.FloatField(null=True, blank=True, default=0)
     cost = models.FloatField(default=0)
 
     change_rate = models.ForeignKey(ChangeRate, on_delete=models.CASCADE, related_name="activities", null=True, blank=True)
@@ -743,6 +741,21 @@ class Activity(Historical, NoteMixin):
     @property
     def delay(self) -> int:
         return self.__get_delay()
+
+    @property
+    def modules(self) -> list:
+        return self.__get_all_modules()
+
+    @property
+    def status(self):
+        return self.__get_status()
+
+    @property
+    def completion_percentage(self):
+        return self.__get_activity_status_and_completion()
+
+    class Meta:
+        unique_together = ("name", "project")
 
     def __str__(self):
         return f"({self.pk}) {self.name} in {self.project.name}"
@@ -772,8 +785,39 @@ class Activity(Historical, NoteMixin):
 
         return self.project.last_year_of_accounting - (self.start_year_t2 + self.duration_t2)
 
-    class Meta:
-        unique_together = ("name", "project")
+    def __get_all_modules(self):
+        module_types = self.module_types.all()
+        modules = []
+
+        for module_type in module_types:
+            modules.extend(getattr(self, module_type.class_name.lower()).all())
+
+        return modules
+
+    def __get_activity_status_and_completion(self):
+        """
+        Updates the status of the activity based on the status of its modules.
+
+        Args:
+        activity (Activity): The activity object to update.
+        """
+        statuses = [module.status for module in self.modules]
+
+        ready_count = statuses.count(StatusType.objects.get(name="READY"))
+        percentage_complete = ready_count / len(statuses)
+
+        return percentage_complete
+
+    def __get_status(self):
+        are_modules_ready = all([module.is_ready() for module in self.modules])
+        is_any_module_ready = any([module.is_ready() for module in self.modules])
+
+        if are_modules_ready:
+            return StatusType.objects.get(name="READY")
+        elif is_any_module_ready:
+            return StatusType.objects.get(name="IN PROGRESS")
+        else:
+            return StatusType.objects.get(name="EMPTY")
 
 
 ##############################
