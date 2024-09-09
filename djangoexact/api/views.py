@@ -1083,7 +1083,7 @@ class NoteViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         ModuleClass = utils.get_model(module_type.class_name, suffix=None)
         module: Module | Submodule = ModuleClass.objects.get(pk=serializer.validated_data["module_id"])
 
-        if not utils.has_project_permission("add_note", self.request.user, module.get_project()):
+        if not utils.has_project_permission("add_note", self.request.user, module.project):
             logging.error("Selected user does not have permission to add notes to the project")
             return utils.ErrorResponse("Selected user does not have permission to add notes to the project", status=http_status.HTTP_403_FORBIDDEN)
 
@@ -1096,7 +1096,7 @@ class NoteViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     def update(self, request, *args, **kwargs):
         note: Note = self.get_object()
 
-        if not utils.has_project_permission("change_note", self.request.user, note.get_project()):
+        if not utils.has_project_permission("change_note", self.request.user, note.project):
             logging.error("Selected user does not have permission to update notes in the project")
             return utils.ErrorResponse("Selected user does not have permission to update notes in the project", status=http_status.HTTP_403_FORBIDDEN)
 
@@ -1115,7 +1115,7 @@ class NoteViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     def partial_update(self, request, *args, **kwargs):
         note: Note = self.get_object()
 
-        if not utils.has_project_permission("change_note", self.request.user, note.get_project()):
+        if not utils.has_project_permission("change_note", self.request.user, note.project):
             logging.error("Selected user does not have permission to update notes in the project")
             return utils.ErrorResponse("Selected user does not have permission to update notes in the project", status=http_status.HTTP_403_FORBIDDEN)
 
@@ -1171,13 +1171,21 @@ class ModuleTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         Get all module types.
         """
         is_luc = self.request.query_params.get("is_luc", None) == "true"
+        is_submodule = self.request.query_params.get("is_submodule", None) == "true"
+        is_container = self.request.query_params.get("is_container", None) == "true"
 
+        # NOTE: Containers are hidden by default
+        filters = {"is_container": False}
         if is_luc:
-            module_types = ModuleType.objects.filter(is_luc=is_luc).all()
-            serializer = get_model_serializer(ModuleType)(module_types, many=True)
-            return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+            filters["is_luc"] = is_luc
+        if is_submodule:
+            filters["is_submodule"] = is_submodule
+        if is_container:
+            filters["is_container"] = is_container
 
-        return super().list(request)
+        module_types = ModuleType.objects.filter(**filters).all()
+        serializer = get_model_serializer(ModuleType)(module_types, many=True)
+        return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
 
 class CountryViewSet(viewsets.ModelViewSet, PublicViewSet):
