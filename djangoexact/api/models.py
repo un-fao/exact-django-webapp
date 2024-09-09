@@ -400,6 +400,7 @@ class ModuleType(models.Model):
     class_name = models.CharField(max_length=255, null=True, blank=True)
     is_luc = models.BooleanField(default=False)
     is_submodule = models.BooleanField(default=False)
+    is_container = models.BooleanField(default=False)
 
     def __str__(self):
         return f"({self.pk}) {self.name}" + (" (LUC)" if self.is_luc else "")
