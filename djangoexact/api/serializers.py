@@ -698,7 +698,7 @@ class LandUseTypeSerializer(serializers.ModelSerializer):
 
 class BaseGenericModuleSerializer(serializers.ModelSerializer):
     activity = ActivitySerializer(many=False, read_only=True)
-    module_type = get_model_serializer(ModuleType)(read_only=True)
+    module_type = serializers.SerializerMethodField()
     status = get_model_serializer(StatusType)(read_only=True)
     note = serializers.SerializerMethodField()
 
@@ -710,7 +710,9 @@ class BaseGenericModuleSerializer(serializers.ModelSerializer):
         if not hasattr(self.Meta, "ref_name") or not hasattr(self.Meta, "mandatory_fields"):
             raise ValueError(f"Meta class of {self.__class__.__name__} must have a ref_name and a mandatory_fields attribute")
         log.debug(f"START BaseGenericModuleSerializer[{self.Meta.ref_name}].init")
-        self.fields["module_type"].default = ModuleType.objects.get(class_name=self.Meta.ref_name)
+
+    def get_module_type(self, obj):
+        return get_model_serializer(ModuleType)(ModuleType.objects.get(class_name=self.Meta.ref_name), many=False).data
 
     def get_note(self, obj):
         return NoteSerializer(obj.note.first(), many=False).data if obj.note.exists() else None
