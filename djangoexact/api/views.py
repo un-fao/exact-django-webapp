@@ -1370,12 +1370,9 @@ def generic_module_viewset(model: Module):
             module = serializer.save()
 
             if module.module_type.class_name == LandUseChange.__name__:
+                module: LandUseChange
 
-                status_start = utils.get_module_status(self, activity, module.module_type_start)
-                status_w = utils.get_module_status(self, activity, module.module_type_w)
-                status_wo = utils.get_module_status(self, activity, module.module_type_wo)
-
-                if not all(status == StatusType.objects.get(name="READY") for status in [status_start, status_w, status_wo]):
+                if not all(m.is_ready() for m in module.get_modules()):
                     return utils.ErrorResponse("Not all modules are ready. Land Use Change module cannot be calculated.")
             else:
                 if not module.is_ready():
