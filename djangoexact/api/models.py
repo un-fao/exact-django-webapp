@@ -400,6 +400,7 @@ class ModuleType(models.Model):
     class_name = models.CharField(max_length=255, null=True, blank=True)
     is_luc = models.BooleanField(default=False)
     is_submodule = models.BooleanField(default=False)
+    is_container = models.BooleanField(default=False)
 
     def __str__(self):
         return f"({self.pk}) {self.name}" + (" (LUC)" if self.is_luc else "")
@@ -674,7 +675,43 @@ class ProjectMembership(models.Model):
 ##############################
 
 
-class Activity(Historical):
+class Note(Historical):
+    content = models.TextField()
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey("content_type", "object_id")
+
+    @property
+    def parent(self):
+        return self.content_object
+
+    @property
+    def project(self):
+        match self.content_object.__class__.__name__:
+            case "Project":
+                return self.content_object
+            case "Activity":
+                return self.content_object.project
+            case "Module":
+                return self.content_object.activity.project
+            case "Submodule":
+                return self.content_object.parent.activity.project
+
+    def __str__(self):
+        return f"({self.pk}) {self.author.email}: {self.content[:40]}..."
+
+
+class NoteMixin(models.Model):
+    note = GenericRelation(Note)
+
+    class Meta:
+        abstract = True
+
+
+class Activity(Historical, NoteMixin):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="activities")
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
@@ -756,6 +793,10 @@ class Submodule(Historical):
     def module_type(self):
         return ModuleType.objects.get(class_name=self.__class__.__name__)
 
+    @property
+    def project(self):
+        return self.parent.activity.project
+
     def save(self, *args, **kwargs):
         if not self.parent:
             raise exceptions.ValidationError("Submodule must have a parent field specified in the model")
@@ -777,38 +818,6 @@ class Submodule(Historical):
     def is_without(self) -> bool:
         return self.parent.is_without()
 
-    def get_project(self):
-        if "parent" in self.__dict__:
-            raise exceptions.ValidationError("Submodule must have a parent field specified in the model")
-        return self.parent.activity.project
-
-
-class Note(Historical):
-    content = models.TextField()
-    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey("content_type", "object_id")
-
-    def __str__(self):
-        return f"({self.pk}) {self.author.email}: {self.content[:40]}..."
-
-    def get_parent(self):
-        return self.content_object
-
-    def get_project(self):
-        match self.content_object.__class__.__name__:
-            case "Project":
-                return self.content_object
-            case "Activity":
-                return self.content_object.project
-            case "Module":
-                return self.content_object.activity.project
-            case "Submodule":
-                return self.content_object.parent.activity.project
-
 
 class Module(Historical):
     class Meta:
@@ -828,6 +837,10 @@ class Module(Historical):
     def module_type(self):
         return ModuleType.objects.get(class_name=self.__class__.__name__)
 
+    @property
+    def project(self):
+        return self.activity.project
+
     def __str__(self):
         return f"({self.pk}) {self._meta.object_name} in {self.activity.name}"
 
@@ -839,9 +852,6 @@ class Module(Historical):
             self.status = StatusType.objects.get_or_create(name="EMPTY")[0]
 
         super().save(*args, **kwargs)
-
-    def get_project(self):
-        return self.activity.project
 
     def is_luc_remaining_same(self) -> bool:
         """
