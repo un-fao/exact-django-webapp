@@ -277,6 +277,8 @@ class ReadProjectSerializer(serializers.ModelSerializer):
     owner = UserReadSerializer(many=False, read_only=True)
     role = serializers.SerializerMethodField()
 
+    capitalization_years = serializers.FloatField(read_only=True)
+
     def get_role(self, obj):
         ctx = self.context.get("request", None)
 
@@ -333,18 +335,23 @@ class ActivitySerializer(serializers.ModelSerializer):
     project = ReadProjectSerializer(many=False, read_only=True)
     user = UserReadSerializer(many=False, read_only=True)
     change_rate = get_model_serializer(ChangeRate)(many=False, read_only=True)
-    status = get_model_serializer(StatusType)(many=False, read_only=True)
     climate_t2 = get_model_serializer(Climate)(read_only=True)
     moisture_t2 = get_model_serializer(Moisture)(read_only=True)
     soil_type_t2 = get_model_serializer(SoilType)(read_only=True)
     module_types = get_model_serializer(ModuleType)(many=True, read_only=True)
-    modules = serializers.JSONField(read_only=True)
     owner = UserReadSerializer(many=False, read_only=True)
+
+    status = get_model_serializer(StatusType)(many=False, read_only=True)
+    modules = serializers.SerializerMethodField(read_only=True)
+    completion_percentage = serializers.FloatField(read_only=True)
 
     class Meta:
         model = Activity
         fields = "__all__"
         ref_name = "Activity"
+
+    def get_modules(self, obj: Activity):
+        return [get_model_serializer(module.__class__)(module, many=False).data for module in obj.modules]
 
 
 class WriteActivitySerializer(serializers.ModelSerializer):
