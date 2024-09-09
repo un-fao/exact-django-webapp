@@ -972,7 +972,7 @@ class LivestockAWMS(Model):
     """
     IPCC 2417:2704
 
-    Value is a percentage expressed as a decimal <= 1
+    Value is a percentage expressed as a decimal <= 100
     """
 
     livestock_production_type = ForeignKey("api.LivestockProductionType", on_delete=CASCADE)
@@ -983,6 +983,10 @@ class LivestockAWMS(Model):
 
     def __str__(self):
         return f"({self.pk}) {self.livestock_production_type.name} {self.livestock_category_type.name} {self.manure_management_type.name} {self.ipcc_region.name} {self.value}"
+
+    class Meta:
+        unique_together = ("livestock_production_type", "manure_management_type", "livestock_category_type", "ipcc_region")
+        verbose_name_plural = "Livestock Animal Waste Management Systems"
 
 
 class LivestockNER(Model):
