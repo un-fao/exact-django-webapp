@@ -2858,10 +2858,13 @@ class NewNoteSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Module type does not exist")
 
         ModuleClass = utils.get_model(module_type.class_name, suffix=None)
-        module: Module | Submodule = ModuleClass.objects.get(pk=data["module_id"])
+        try:
+            module: Module | Submodule = ModuleClass.objects.get(pk=data["module_id"])
+        except ModuleClass.DoesNotExist:
+            raise serializers.ValidationError("Module does not exist")
 
         if module.note.exists():
-            raise serializers.ValidationError("Note already exists for this module")
+            raise serializers.ValidationError(f"Note already exists for this module. Use PUT with id {module.note.pk} to update")
 
         return super().validate(data)
 
