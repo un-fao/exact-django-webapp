@@ -118,20 +118,6 @@ class ErrorResponse(Response):
         super().__init__(error(data), status=status)
 
 
-def is_start_with_changed(_class: object, luc):
-    return luc.module_type_start.class_name == _class.__name__ and luc.module_type_start != luc.module_type_wo
-
-
-def get_thread_attributes(module: models.Model):
-    return [attr for attr in module._meta.get_fields() if attr.name.endswith("_thread")]
-
-
-def get_module_status(self, activity, module_type):
-    module_attr = getattr(activity, module_type.class_name.lower(), None)
-    module = module_attr.first() if module_attr else None
-    return module.status if module else None
-
-
 def has_project_permission(permission, user, project):
     """
     Check if a user has a specific permission for a project.
@@ -203,7 +189,7 @@ def copy_activity(activity, new_project=None):
     luc_copy = None
     organic_soil_copy = None
 
-    for module in find_modules(activity):
+    for module in activity.modules:
         if module.__class__.__name__ == "LandUseChange" or module.__class__.__name__ == "OrganicSoil":
             continue
 
