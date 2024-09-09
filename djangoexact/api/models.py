@@ -1441,11 +1441,6 @@ class Livestock(Module):
     complementary_manure_management_type_wo = models.ForeignKey(ManureManagementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_manure_management_type_t2_wo")
     complementary_manure_management_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_complementary_manure_management_type_thread", on_delete=models.SET_NULL)
 
-    percentage_heads_on_pasture_start = models.FloatField(null=True, blank=True)
-    percentage_heads_on_pasture_w = models.FloatField(null=True, blank=True)
-    percentage_heads_on_pasture_wo = models.FloatField(null=True, blank=True)
-    percentage_heads_on_pasture_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_percentage_heads_on_pasture_thread", on_delete=models.SET_NULL)
-
     enteric_fermentation_t2_start = models.FloatField(null=True, blank=True)
     enteric_fermentation_t2_w = models.FloatField(null=True, blank=True)
     enteric_fermentation_t2_wo = models.FloatField(null=True, blank=True)
@@ -1453,6 +1448,7 @@ class Livestock(Module):
     prp_percentage_t2_start = models.FloatField(null=True, blank=True)
     prp_percentage_t2_w = models.FloatField(null=True, blank=True)
     prp_percentage_t2_wo = models.FloatField(null=True, blank=True)
+    prp_percentage_t2_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_prp_percentage_t2_thread", on_delete=models.SET_NULL)
 
     prp_ch4_t2_start = models.FloatField(null=True, blank=True)
     prp_ch4_t2_w = models.FloatField(null=True, blank=True)
