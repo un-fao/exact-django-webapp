@@ -107,10 +107,6 @@ for i, livestock in enumerate(livestock):
     print(f"heads_number_wo: {livestock.heads_number_wo}")
     print(f"heads_number_w: {livestock.heads_number_w}")
 
-    print(f"percentage_heads_on_pasture_start: {livestock.percentage_heads_on_pasture_start}")
-    print(f"percentage_heads_on_pasture_wo: {livestock.percentage_heads_on_pasture_wo}")
-    print(f"percentage_heads_on_pasture_w: {livestock.percentage_heads_on_pasture_w}")
-
     # sheet["I56"].value = livestock.livestock_category_type.name
     # sheet["I57"].value = livestock.livestock_category_type.name
     # sheet["I58"].value = livestock.livestock_category_type.name
