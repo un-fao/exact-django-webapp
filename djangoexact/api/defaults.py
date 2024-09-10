@@ -93,7 +93,7 @@ class GrasslandDefaults(Defaults):
         )
 
 
-class AnnualCroppingDefaults(Defaults):
+class AnnualCroplandDefaults(Defaults):
     def __init__(self, input: calcs.Module):
         super().__init__(input)
 
@@ -113,6 +113,9 @@ class AnnualCroppingDefaults(Defaults):
             biomass_t2_start_default=0,
             biomass_t2_w_default=0,
             biomass_t2_wo_default=0,
+            residue_availability_t2_start_default=0,
+            residue_availability_t2_w_default=0,
+            residue_availability_t2_wo_default=0,
             minor_biomass_t2_start_default=0,
             minor_biomass_t2_w_default=0,
             minor_biomass_t2_wo_default=0,
@@ -120,7 +123,7 @@ class AnnualCroppingDefaults(Defaults):
 
     def get_defaults(self, calculate=False) -> dict:
 
-        self.input: api.AnnualCropping
+        self.input: api.AnnualCropland
 
         defaults = calcs.AnnualCropCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
@@ -138,19 +141,22 @@ class AnnualCroppingDefaults(Defaults):
             flu_t2_start_default=defaults.flu_start.value,
             flu_t2_w_default=defaults.flu_w.value,
             flu_t2_wo_default=defaults.flu_wo.value,
-            biomass_t2_start_default=defaults.biomass_start.value,
-            biomass_t2_w_default=defaults.biomass_w.value,
-            biomass_t2_wo_default=defaults.biomass_wo.value,
+            biomass_t2_start_default=defaults.biomass_ef_start.value,
+            biomass_t2_w_default=defaults.biomass_ef_w.value,
+            biomass_t2_wo_default=defaults.biomass_ef_wo.value,
+            residue_availability_t2_start_default=defaults.residue_availability_t2_start.value,
+            residue_availability_t2_w_default=defaults.residue_availability_t2_w.value,
+            residue_availability_t2_wo_default=defaults.residue_availability_t2_wo.value,
+            minor_residue_t2_start_default=defaults.minor_residue_availability_t2_start.value,
+            minor_residue_t2_w_default=defaults.minor_residue_availability_t2_w.value,
+            minor_residue_t2_wo_default=defaults.minor_residue_availability_t2_wo.value,
             minor_biomass_t2_start_default=defaults.minor_biomass_start.value,
             minor_biomass_t2_w_default=defaults.minor_biomass_w.value,
             minor_biomass_t2_wo_default=defaults.minor_biomass_wo.value,
-            # residue_availability_t2_start_default=defaults.residue_availability_start.value,  # TODO: Computed @Peter
-            # residue_availability_t2_w_default=defaults.residue_availability_w.value,  # TODO: Computed @Peter
-            # residue_availability_t2_wo_default=defaults.residue_availability_wo.value,  # TODO: Computed @Peter
         )
 
 
-class PerennialCroppingDefaults(Defaults):
+class PerennialCroplandDefaults(Defaults):
 
     def __init__(self, input: calcs.Module):
         super().__init__(input)
@@ -186,7 +192,7 @@ class PerennialCroppingDefaults(Defaults):
         )
 
     def get_defaults(self, calculate=False) -> dict:
-        self.input: api.PerennialCropping
+        self.input: api.PerennialCropland
 
         defaults = calcs.PerennialCropCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
@@ -860,7 +866,7 @@ class AquacultureDefaults(Defaults):
         )
 
 
-class DegradedLandDefaults(Defaults):  # TODO: Rename to OtherLand
+class OtherLandDefaults(Defaults):  # TODO: Rename to OtherLand
     def __init__(self, input: calcs.Module):
         super().__init__(input)
 
@@ -889,9 +895,9 @@ class DegradedLandDefaults(Defaults):  # TODO: Rename to OtherLand
         )
 
     def get_defaults(self, calculate=False) -> dict:
-        self.input: api.DegradedLand
+        self.input: api.OtherLand
 
-        defaults = calcs.DegradedLandCalculator(self.input)
+        defaults = calcs.OtherLandCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(

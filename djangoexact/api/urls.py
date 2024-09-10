@@ -41,13 +41,13 @@ router.register(r"global-warming-potentials", views.generic_viewset(GlobalWarmin
 router.register(r"change-rates", views.generic_viewset(models.ChangeRate), basename="change-rates")
 
 # Annual Cropland
-router.register(r"annual-croppings", views.generic_module_viewset(models.AnnualCropping), basename="annual-croppings")
-router.register(r"annual-croppings-minor-seasons", views.generic_module_viewset(models.MinorSeasonAnnualCropping), basename="annualcroppingminorseasons")
+router.register(r"annual-croplands", views.generic_module_viewset(models.AnnualCropland), basename="annual-croppings")
+router.register(r"annual-croplands-minor-seasons", views.generic_module_viewset(models.MinorSeasonAnnualCropland), basename="annual-cropland-minor-seasons")
 router.register(r"tillage-management-types", views.generic_viewset(models.TillageManagementType), basename="tillage-management-types")
 
 # Perennial Cropland
-router.register(r"perennial-croppings", views.generic_module_viewset(models.PerennialCropping), basename="perennialcroppings")
-router.register(r"perennial-croppings-minor-seasons", views.generic_module_viewset(models.MinorSeasonPerennialCropping), basename="perennialcroppingminorseasons")
+router.register(r"perennial-croplands", views.generic_module_viewset(models.PerennialCropland), basename="perennial-croplands")
+router.register(r"perennial-croplands-minor-seasons", views.generic_module_viewset(models.MinorSeasonPerennialCropland), basename="perennial-cropland-minor-seasons")
 
 # Grassland
 router.register(r"grasslands", views.generic_module_viewset(models.Grassland), basename="grasslands")
@@ -80,8 +80,8 @@ router.register(r"irrigation-system-types", views.generic_viewset(models.Irrigat
 # Set Aside
 router.register(r"set-asides", views.generic_module_viewset(models.SetAside), basename="set-asides")
 
-# Degraded Land
-router.register(r"degraded-lands", views.generic_module_viewset(models.DegradedLand), basename="degraded-lands")
+# Other Land
+router.register(r"other-lands", views.generic_module_viewset(models.OtherLand), basename="other-lands")
 
 # Coastal Wetland
 router.register(r"coastal-wetlands", views.generic_module_viewset(models.CoastalWetland), basename="coastal-wetlands")
