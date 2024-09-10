@@ -604,8 +604,8 @@ class ActivityBuilderSerializer(serializers.Serializer):
                     self.delete_existing_luc(self.instance)
 
             luc: LandUseChange = self.instance.landusechange.first()
-            luc_module_types = list(set([module for module in luc.get_module_types()])) + [ModuleType.objects.get(name="Land Use Change")] if luc else []
-            new_module_types = list(map(lambda module: module.class_name, self.validated_data["module_types"] + luc_module_types) if has_luc_module else self.validated_data["module_types"])
+            luc_module_types = list(set([module.class_name for module in luc.get_module_types()])) + [ModuleType.objects.get(name="Land Use Change")] if luc else []
+            new_module_types = list(map(lambda module: module.class_name, self.validated_data["module_types"] + luc_module_types) if has_luc_module else [module.class_name for module in self.validated_data["module_types"]])
 
             has_different_module_types = list(set(old_module_types) - set(new_module_types))
 
@@ -616,18 +616,21 @@ class ActivityBuilderSerializer(serializers.Serializer):
                     module_instance = getattr(self.instance, module.lower())
                     if module_instance.exists():
                         module_instance.first().delete()
+                    self.instance.module_types.remove(ModuleType.objects.get(class_name=module))
+                    self.instance.save()
 
                 for module in new_module_types:
                     if module not in old_module_types:
-                        module_name = module.class_name
-
                         if module == "LandUseChange":
                             raise serializers.ValidationError("Land Use Change module cannot be added manually")
 
-                        module_instance = getattr(self.instance, module_name.lower()).create(activity=self.instance)
+                        module_instance = getattr(self.instance, module.lower()).create(activity=self.instance)
                         if luc and module in luc.get_module_types():
                             module_instance.land_use_change = luc
                             module_instance.save()
+
+                    self.instance.module_types.add(ModuleType.objects.get(class_name=module))
+                    self.instance.save()
 
             return self.instance
 
