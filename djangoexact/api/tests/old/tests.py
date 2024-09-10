@@ -320,9 +320,9 @@ if TEST_ANNUAL_CROPPING:
         print(f"Residue Management Type WO: {annual_cropping.residue_management_type_wo}")
         print(f"Residue Management Type W: {annual_cropping.residue_management_type_w}")
 
-        print(f"Crop Yield START: {annual_cropping.crop_yield_start}")
-        print(f"Crop Yield WO: {annual_cropping.crop_yield_wo}")
-        print(f"Crop Yield W: {annual_cropping.crop_yield_w}")
+        print(f"Crop Yield START: {annual_cropping.crop_yield_t2_start}")
+        print(f"Crop Yield WO: {annual_cropping.crop_yield_t2_wo}")
+        print(f"Crop Yield W: {annual_cropping.crop_yield_t2_w}")
 
         try:
             results: Result = CalculatorFactory().calculate_result(annual_cropping)
