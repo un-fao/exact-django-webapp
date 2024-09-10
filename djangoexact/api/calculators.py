@@ -5458,6 +5458,8 @@ class ForestManagementCalculator(BaseCalculator):
             module_start, module_w, module_wo = luc.get_modules()
 
         flu_start = get_flu_data(module_start, project.climate, project.moisture, utils.ScenarioTypes.START)
+        flu_w = get_flu_data(module_w, project.climate, project.moisture, utils.ScenarioTypes.WITH)
+        flu_wo = get_flu_data(module_wo, project.climate, project.moisture, utils.ScenarioTypes.WITHOUT)
 
         fi_start = get_fi_data(module_start, project.climate, project.moisture, utils.ScenarioTypes.START)
         fi_w = get_fi_data(module_w, project.climate, project.moisture, utils.ScenarioTypes.WITH)
@@ -5522,9 +5524,7 @@ class ForestManagementCalculator(BaseCalculator):
         # START - Reference Values for forest remaining forest
         agb_max_w = statistics.mean([agb_over_20.agb_min, agb_over_20.agb_max])
         agb_growth_over_20_w = statistics.mean([agb_over_20.agb_growth_max, agb_over_20.agb_growth_min])
-        agb_growth_under_20_w = agb_growth_over_20_w
         agb_start_w = agb_max_w
-        flu_w = SimpleNamespace(value=1)
         litter_dw_start_w = litter_dw
         litter_dw_max_w = litter_dw
 
@@ -5533,9 +5533,7 @@ class ForestManagementCalculator(BaseCalculator):
 
         agb_max_wo = statistics.mean([agb_over_20.agb_min, agb_over_20.agb_max])
         agb_growth_over_20_wo = statistics.mean([agb_over_20.agb_growth_max, agb_over_20.agb_growth_min])
-        agb_growth_under_20_wo = agb_growth_over_20_wo
         agb_start_wo = agb_max_wo
-        flu_wo = SimpleNamespace(value=1)
         litter_dw_start_wo = litter_dw
         litter_dw_max_wo = litter_dw
         # END - Reference Values for forest remaining forest
@@ -5543,17 +5541,13 @@ class ForestManagementCalculator(BaseCalculator):
         if is_afforestation_w:
             agb_max_w = statistics.mean([agb_over_20.agb_min, agb_over_20.agb_max]) if self.activity.implementation_years > 20 else statistics.mean([agb_under_20.agb_min, agb_under_20.agb_max])
             agb_growth_under_20_w = statistics.mean([agb_under_20.agb_growth_max, agb_under_20.agb_growth_min])
-            agb_growth_over_20_w = agb_growth_under_20_w
             agb_start_w = 0
-            flu_w = flu_start
             litter_dw_start_w = SimpleNamespace(litter=0, dw=0)
 
         if is_afforestation_wo:
             agb_max_wo = statistics.mean([agb_over_20.agb_min, agb_over_20.agb_max]) if self.activity.implementation_years > 20 else statistics.mean([agb_under_20.agb_min, agb_under_20.agb_max])
             agb_growth_under_20_wo = statistics.mean([agb_under_20.agb_growth_max, agb_under_20.agb_growth_min])
-            agb_growth_over_20_wo = agb_growth_under_20_wo
             agb_start_wo = 0
-            flu_wo = flu_start
             litter_dw_start_wo = SimpleNamespace(litter=0, dw=0)
 
         disturbances: list[ForestDisturbance] = module.disturbances.all()
@@ -5709,6 +5703,8 @@ class ForestManagementCalculator(BaseCalculator):
 
         results_w = math_w.result if math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         results_wo = math_wo.result if math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+
+        results_w.plot_emissions_and_aggregate_by_activity("forest_with")
 
         results_tuple = (results_w, results_wo)
 
