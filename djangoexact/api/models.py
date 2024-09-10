@@ -840,7 +840,7 @@ class Submodule(Historical):
     @property
     def project(self):
         return self.parent.activity.project
-    
+
     @property
     def threads(self):
         return self.__get_threads()
@@ -865,7 +865,7 @@ class Submodule(Historical):
 
     def is_without(self) -> bool:
         return self.parent.is_without()
-    
+
     def __get_threads(self: models.Model):
         return [attr for attr in self._meta.get_fields() if attr.name.endswith("_thread")]
 
@@ -891,7 +891,7 @@ class Module(Historical):
     @property
     def project(self):
         return self.activity.project
-    
+
     @property
     def threads(self):
         return self.__get_threads()
@@ -1004,7 +1004,7 @@ class Module(Historical):
             scenarios.append(utils.ScenarioTypes.WITHOUT)
 
         return scenarios
-    
+
     def __get_threads(self: models.Model):
         return [attr for attr in self._meta.get_fields() if attr.name.endswith("_thread")]
 
@@ -1209,9 +1209,9 @@ class AnnualCropland(LandModule, SingleBiomassModule, ResidueAvailability):
     residue_management_type_wo = models.ForeignKey(ResidueManagementType, on_delete=models.CASCADE, related_name="%(class)s_residue_management_type_wo", null=True, blank=True)
     residue_management_type_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_residue_management_type_thread")
 
-    crop_yield_start = models.FloatField(default=0)
-    crop_yield_w = models.FloatField(default=0)
-    crop_yield_wo = models.FloatField(default=0)
+    crop_yield_t2_start = models.FloatField(null=True, blank=True)
+    crop_yield_t2_w = models.FloatField(null=True, blank=True)
+    crop_yield_t2_wo = models.FloatField(null=True, blank=True)
     crop_yield_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_crop_yield_thread")
 
     area = models.FloatField(null=True, blank=True)
