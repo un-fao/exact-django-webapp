@@ -1560,7 +1560,6 @@ class ForestManagement(LandModule, LitterDeadwoodBiomassModule):
             "land_use_type": land_use_type,
             "forest_type": self.forest_type,
             "forest_condition_type": self.forest_condition_type,
-            "from_year": from_year,
         }
         ref: ipcc.ForestManagementAGB = utils.get_or_raise(ipcc.ForestManagementAGB, filters, error_msg)
 
