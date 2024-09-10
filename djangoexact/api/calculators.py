@@ -904,8 +904,6 @@ class DeforestationCalculator(BaseCalculator):
         res_w = math_w.result if math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         res_wo = math_wo.result if math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
 
-        res_w.plot_emissions_and_aggregate_by_activity("with")
-
         return (res_w, res_wo)
 
     def defaults(self) -> DefaultData:
@@ -5713,9 +5711,6 @@ class ForestManagementCalculator(BaseCalculator):
         results_wo = math_wo.result if math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
 
         results_tuple = (results_w, results_wo)
-
-        results_w.plot_emissions_and_aggregate_by_activity("forest_with")
-        results_wo.plot_emissions_and_aggregate_by_activity("forest_without")
 
         return results_tuple
 
