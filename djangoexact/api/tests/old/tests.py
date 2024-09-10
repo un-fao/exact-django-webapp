@@ -289,20 +289,20 @@ if TEST_LG_FISHERY:
     print(f"Passed Tests: {passed_lg_fisheries}\n\n")
 
 if TEST_ANNUAL_CROPPING:
-    annual_croppings = AnnualCroppingFactory.create_batch(BATCH_SIZE, activity=a)
+    annual_croppings = AnnualCroplandFactory.create_batch(BATCH_SIZE, activity=a)
     total_croplands = annual_croppings.__len__()
     passed_croplands = 0
 
-    a.module_types.add(ModuleType.objects.get(class_name="AnnualCropping"))
+    a.module_types.add(ModuleType.objects.get(class_name="AnnualCropland"))
     a.save()
 
-    print("Testing AnnualCropping...")
+    print("Testing AnnualCropland...")
     for i, annual_cropping in enumerate(annual_croppings):
-        # print(f"\n\nTesting AnnualCropping {i+1}...")
+        # print(f"\n\nTesting AnnualCropland {i+1}...")
         # print("-----------------------------------")
-        # print(get_module_serializer(AnnualCropping)(annual_cropping).data)
+        # print(get_module_serializer(AnnualCropland)(annual_cropping).data)
 
-        annual_cropping: AnnualCropping
+        annual_cropping: AnnualCropland
 
         print(f"Land Use Type START: {annual_cropping.land_use_type_start}")
         print(f"Land Use Type WO: {annual_cropping.land_use_type_wo}")
@@ -391,8 +391,8 @@ if TEST_ANNUAL_CROPPING:
     print(f"Passed Tests: {passed_croplands}\n\n")
 
 if TEST_PERENNIAL_CROPPING:
-    perennials = PerennialCroppingFactory.create_batch(BATCH_SIZE, activity=a)
-    a.module_types.add(ModuleType.objects.get(class_name="PerennialCropping"))
+    perennials = PerennialCroplandFactory.create_batch(BATCH_SIZE, activity=a)
+    a.module_types.add(ModuleType.objects.get(class_name="PerennialCropland"))
     a.save()
 
     total_perennials = perennials.__len__()
@@ -405,7 +405,7 @@ if TEST_PERENNIAL_CROPPING:
         print(f"\n\nTesting Perennial {i+1}...")
         print("-----------------------------------")
 
-        perennial: PerennialCropping
+        perennial: PerennialCropland
 
         print("\n")
 

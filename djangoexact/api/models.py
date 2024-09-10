@@ -11,6 +11,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 
 from api import utilities as utils
+import ipcc.models as ipcc
 
 alphanumeric = validators.RegexValidator(r"^[0-9a-zA-Z]*$", "Only alphanumeric characters are allowed.")
 letters_only = validators.RegexValidator(r"^[a-zA-Z]*$", "Only letters are allowed.")
@@ -541,8 +542,8 @@ class Project(Historical):
     status = models.ForeignKey(ProjectStatus, on_delete=models.CASCADE, null=True, blank=True)
 
     implementation_years = models.IntegerField()
-    start_year_of_activities = models.IntegerField(null=True, blank=True)
-    last_year_of_accounting = models.IntegerField(null=True, blank=True)
+    start_year_of_activities = models.IntegerField()
+    last_year_of_accounting = models.IntegerField()
 
     country = models.ForeignKey(Country, on_delete=models.CASCADE)
     climate = models.ForeignKey(Climate, on_delete=models.CASCADE)
@@ -555,6 +556,11 @@ class Project(Historical):
     locked_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True, related_name="locked_projects")
 
     gw_potential = models.ForeignKey("ipcc.GlobalWarmingPotential", on_delete=models.CASCADE)
+
+    gwp_co2_t2 = models.FloatField(null=True, blank=True)
+    gwp_ch4_t2 = models.FloatField(null=True, blank=True)
+    gwp_n2o_t2 = models.FloatField(null=True, blank=True)
+    gwp_ch4_fossil_t2 = models.FloatField(null=True, blank=True)
 
     soc_ref_t2 = models.FloatField(null=True, blank=True)
 
@@ -598,6 +604,33 @@ class Project(Historical):
             raise exceptions.ValidationError("Error calculating project capitalization period. Capitalization years, start year of activities, and implementation years must be set")
 
         return self.last_year_of_accounting - (self.start_year_of_activities + self.implementation_years)
+
+    @property
+    def gwp(self):
+        self.gw_potential: ipcc.GlobalWarmingPotential
+
+        # NOTE: Fossil CH4 is not required but is used conditionally in the calculations. The specific case is handled in the calculations where needed.
+        # NOTE: Also, maybe this should be handle mathematical model-side as any other tier2 value.
+        if self.gw_potential.co2 is None and self.gwp_co2_t2 is None:
+            raise exceptions.ValidationError("Missing data for Global Warming Potential (CO2). Please provide tier2 value.")
+        if self.gw_potential.ch4 is None and self.gwp_ch4_t2 is None:
+            raise exceptions.ValidationError("Missing data for Global Warming Potential (CH4). Please provide tier2 value.")
+        if self.gw_potential.n2o is None and self.gwp_n2o_t2 is None:
+            raise exceptions.ValidationError("Missing data for Global Warming Potential (N2O). Please provide tier2 value.")
+
+        if self.gwp_co2_t2 is not None:
+            self.gw_potential.co2 = self.gwp_co2_t2
+
+        if self.gwp_ch4_t2 is not None:
+            self.gw_potential.ch4 = self.gwp_ch4_t2
+
+        if self.gwp_n2o_t2 is not None:
+            self.gw_potential.n2o = self.gwp_n2o_t2
+
+        if self.gwp_ch4_fossil_t2 is not None:
+            self.gw_potential.ch4_fossil = self.gwp_ch4_fossil_t2
+
+        return self.gw_potential
 
 
 class ProjectInvitation(Historical):
@@ -719,6 +752,10 @@ class Submodule(Historical):
     class Meta:
         abstract = True
 
+    @property
+    def module_type(self):
+        return ModuleType.objects.get(class_name=self.__class__.__name__)
+
     def save(self, *args, **kwargs):
         if not self.parent:
             raise exceptions.ValidationError("Submodule must have a parent field specified in the model")
@@ -786,6 +823,10 @@ class Module(Historical):
     soc_t2_wo = models.FloatField(null=True, blank=True)
 
     status = models.ForeignKey(StatusType, on_delete=models.CASCADE, null=True, blank=True)
+
+    @property
+    def module_type(self):
+        return ModuleType.objects.get(class_name=self.__class__.__name__)
 
     def __str__(self):
         return f"({self.pk}) {self._meta.object_name} in {self.activity.name}"
@@ -872,17 +913,37 @@ class Module(Historical):
         luc: LandUseChange = getattr(self, "land_use_change", None)
         return not luc or (luc.module_type_w.class_name == self.__class__.__name__)
 
+    def get_relevant_scenarios(self):
+        """
+        Returns the relevant scenarios for a given field.
+
+        Args:
+            field (str): The field to check.
+
+        Returns:
+            list: The relevant scenarios for the given field.
+        """
+        log.debug("Get relevant scenarios for field")
+        luc: LandUseChange = getattr(self, "land_use_change", None)
+        module_start = module_w = module_wo = self
+        if luc:
+            module_start, module_w, module_wo = luc.get_modules()
+
+        scenarios = []
+
+        if self.__class__.__name__ == module_start.__class__.__name__:
+            scenarios.append(utils.ScenarioTypes.START)
+        if self.__class__.__name__ == module_w.__class__.__name__:
+            scenarios.append(utils.ScenarioTypes.WITH)
+        if self.__class__.__name__ == module_wo.__class__.__name__:
+            scenarios.append(utils.ScenarioTypes.WITHOUT)
+
+        return scenarios
+
 
 class BiomassModule(Module):
     class Meta:
         abstract = True
-
-    @abstractmethod
-    def get_biomass_t2(self, scenario: utils.ScenarioTypes):
-        try:
-            return getattr(self, f"soc_t2_{scenario.value}")
-        except TypeError:
-            return None
 
 
 class SingleBiomassModule(BiomassModule):
@@ -895,7 +956,7 @@ class SingleBiomassModule(BiomassModule):
 
     def get_biomass_t2(self, scenario: utils.ScenarioTypes):
         try:
-            return super().get_biomass_t2(scenario) + getattr(self, f"biomass_t2_{scenario.value}")
+            return getattr(self, f"biomass_t2_{scenario.value}")
         except TypeError:
             return None
 
@@ -923,7 +984,7 @@ class AboveBelowGroundBiomassModule(BiomassModule):
 
     def get_biomass_t2(self, scenario: utils.ScenarioTypes):
         try:
-            return super().get_biomass_t2(scenario) + getattr(self, f"agb_t2_{scenario.value}") + getattr(self, f"bgb_t2_{scenario.value}")
+            return getattr(self, f"agb_t2_{scenario.value}") + getattr(self, f"bgb_t2_{scenario.value}")
         except TypeError:
             return None
 
@@ -1058,7 +1119,7 @@ class CropType(models.Model):
         return f"({self.pk}) {self.name}"
 
 
-class AnnualCropping(LandModule, SingleBiomassModule, ResidueAvailability):
+class AnnualCropland(LandModule, SingleBiomassModule, ResidueAvailability):
     tillage_management_type_start = models.ForeignKey(
         TillageManagementType,
         on_delete=models.CASCADE,
@@ -1187,7 +1248,7 @@ class PerennialCrop(models.Model):
     #     super().save(*args, **kwargs)
 
 
-class PerennialCropping(PerennialCrop, LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule, ResidueAvailability):
+class PerennialCropland(PerennialCrop, LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule, ResidueAvailability):
     pass
 
 
@@ -1211,12 +1272,12 @@ class CroplandMinorSeason(models.Model):
     crop_yield_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_yield_thread")
 
 
-class MinorSeasonPerennialCropping(CroplandMinorSeason, LandSubmodule):
-    parent = models.ForeignKey(PerennialCropping, on_delete=models.CASCADE, related_name="minor_seasons", null=True, blank=True)
+class MinorSeasonPerennialCropland(CroplandMinorSeason, LandSubmodule):
+    parent = models.ForeignKey(PerennialCropland, on_delete=models.CASCADE, related_name="minor_seasons", null=True, blank=True)
 
 
-class MinorSeasonAnnualCropping(CroplandMinorSeason, LandSubmodule):
-    parent = models.ForeignKey(AnnualCropping, on_delete=models.CASCADE, related_name="minor_seasons", null=True, blank=True)
+class MinorSeasonAnnualCropland(CroplandMinorSeason, LandSubmodule):
+    parent = models.ForeignKey(AnnualCropland, on_delete=models.CASCADE, related_name="minor_seasons", null=True, blank=True)
 
 
 class Rice(ResidueAvailability):
@@ -1485,6 +1546,29 @@ class ForestManagement(LandModule, LitterDeadwoodBiomassModule):
             self.land_use_type_w = self.land_use_type_start
             self.land_use_type_wo = self.land_use_type_start
         return super().save(*args, **kwargs)
+
+    def get_agb_growth_ref(self, land_use_type: LandUseType, from_year: int = 0) -> ipcc.ForestManagementAGB:
+        AGB_UNDER_20_NOT_FOUND = f"AGB (under 20 years) not found for ({self.forest_type.name}) {land_use_type.name} in {self.activity.project.climate.name} climate, {self.activity.project.country.region.name} region. Please insert t2 values for AGB (under 20 years) for all scenarios."
+        AGB_OVER_20_NOT_FOUND = f"AGB (over 20 years) not found for ({self.forest_type.name}) {land_use_type.name} in {self.activity.project.climate.name} climate, {self.activity.project.country.region.name} region. Please insert t2 values for AGB (over 20 years) for all scenarios."
+
+        error_msg = AGB_UNDER_20_NOT_FOUND if from_year < 20 else AGB_OVER_20_NOT_FOUND
+        direction = ["le", "under"] if from_year < 20 else ["gt", "over"]
+
+        filters = {
+            "climate": self.activity.project.climate,
+            "region": self.activity.project.country.region,
+            "land_use_type": land_use_type,
+            "forest_type": self.forest_type,
+            "forest_condition_type": self.forest_condition_type,
+        }
+        ref: ipcc.ForestManagementAGB = utils.get_or_raise(ipcc.ForestManagementAGB, filters, error_msg)
+
+        relevant_scenarios = self.get_relevant_scenarios()
+
+        if ref.agb_growth_min is None and any([getattr(self, f"agb_growth_rate_{direction[0]}_20_yrs_t2_{s}", None) is None for s in relevant_scenarios]):
+            raise ValueError(f"Reference values for AGB Growth Rate {direction[1]} 20 years are missing. Please insert t2 values for the following scenarios: {relevant_scenarios}")
+
+        return ref
 
 
 class DisturbanceType(models.Model):
@@ -2109,14 +2193,14 @@ class SetAside(LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule):
         return super().save(*args, **kwargs)
 
 
-class DegradedLand(LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule):
+class OtherLand(LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule):
     is_degraded_land_start = models.BooleanField(default=False)
     is_degraded_land_w = models.BooleanField(default=False)
     is_degraded_land_wo = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:
-            self.land_use_type_start = LandUseType.objects.get(name="Degraded Land")
+            self.land_use_type_start = LandUseType.objects.get(name="Other Land")
             self.land_use_type_w = self.land_use_type_start
             self.land_use_type_wo = self.land_use_type_start
 
@@ -2169,6 +2253,26 @@ class LandUseChange(Module):
             raise Exception("At least one module is missing")
 
         return modules
+
+    def get_module_types(self) -> tuple[ModuleType]:
+        """
+        Retrieves the module types associated with each scenario of a given LandUseChange object.
+
+        Args:
+            luc (LandUseChange): The LandUseChange object.
+
+        Returns:
+            tuple[ModuleType]: A tuple containing the module types for each scenario.
+
+        Raises:
+            Exception: If at least one module type is missing.
+        """
+        module_types = (self.module_type_start, self.module_type_w, self.module_type_wo)
+
+        if not all(module_types):
+            raise Exception("At least one module type is missing")
+
+        return module_types
 
 
 ### MODEL PARAMETERS TABLES ###
