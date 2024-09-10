@@ -602,10 +602,15 @@ class ActivityBuilderSerializer(serializers.Serializer):
                     self.edit_existing_luc(self.instance)
                 else:
                     self.delete_existing_luc(self.instance)
+            else:
+                if has_luc_module:
+                    luc = self.handle_luc_module(self.instance, has_organic_soil)
+                    self.create_modules(self.instance, luc, has_organic_soil, has_luc_module)
+                    self.instance.save()
 
             luc: LandUseChange = self.instance.landusechange.first()
             luc_module_types = list(set([module.class_name for module in luc.get_module_types()])) + [ModuleType.objects.get(name="Land Use Change")] if luc else []
-            new_module_types = list(map(lambda module: module.class_name, self.validated_data["module_types"] + luc_module_types) if has_luc_module else [module.class_name for module in self.validated_data["module_types"]])
+            new_module_types = list(map(lambda module: module.class_name, self.validated_data["module_types"]) if has_luc_module else [module.class_name for module in self.validated_data["module_types"]]) + luc_module_types
 
             has_different_module_types = list(set(old_module_types) - set(new_module_types))
 
