@@ -619,11 +619,12 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
                 for module in new_module_types:
                     if module not in old_module_types:
+                        module_name = module.class_name
 
                         if module == "LandUseChange":
                             raise serializers.ValidationError("Land Use Change module cannot be added manually")
 
-                        module_instance = getattr(self.instance, module.lower()).create(activity=self.instance)
+                        module_instance = getattr(self.instance, module_name.lower()).create(activity=self.instance)
                         if luc and module in luc.get_module_types():
                             module_instance.land_use_change = luc
                             module_instance.save()
