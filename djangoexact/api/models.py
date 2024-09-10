@@ -956,7 +956,7 @@ class SingleBiomassModule(BiomassModule):
 
     def get_biomass_t2(self, scenario: utils.ScenarioTypes):
         try:
-            return super().get_biomass_t2(scenario) + getattr(self, f"biomass_t2_{scenario.value}")
+            return getattr(self, f"biomass_t2_{scenario.value}")
         except TypeError:
             return None
 
