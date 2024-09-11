@@ -469,38 +469,6 @@ with open("scripts/ipcc_data/ListRegionsIPCC.csv", "r") as f:
     for row in data:
         ipcc_region = IPCCRegion.objects.get(name__iexact=row[0])
 
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "ListCountries.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers = df.columns.values.tolist()
-df_dict = df.to_dict("records")
-
-for i, row in enumerate(df_dict):
-    continent = Continent.objects.get(name__iexact=row["EX-ACT"])
-    gleam_region = GLEAMRegion.objects.get(name__iexact=row["GLEAM"])
-    ipcc_region = IPCCRegion.objects.get(name__iexact=row["IPCC"])
-
-    country = Country.objects.filter(name__iexact=row["Countries"]).first()
-
-    if country:
-        country.continent = continent
-        country.gleam_region = gleam_region
-        country.ipcc_region = ipcc_region
-        country.save()
-
-
-
-
-
-
-
-
-
-
-
 
 with open("scripts/ipcc_data/SmallFisheryDatabaseFish.csv", "r") as f:
     reader = csv.reader(f)
@@ -955,35 +923,6 @@ for i, row in enumerate(df_dict):
             ipcc_region=ipcc_region,
             value=parse_csv_number(row[df_headers[j]]),
         )
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "ListCountries.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers = df.columns.values.tolist()
-df_dict = df.to_dict("records")
-
-for i, row in enumerate(df_dict):
-    continent = Continent.objects.get(name__iexact=sanitize(row["EX-ACT"]))
-    gleam_region = GLEAMRegion.objects.get(name__iexact=sanitize(row["GLEAM"]))
-    ipcc_region = IPCCRegion.objects.get(name__iexact=sanitize(row["IPCC"]))
-
-    country = Country.objects.get(name__iexact=sanitize(row["Countries"]))
-
-    print(
-        continent,
-        gleam_region,
-        ipcc_region,
-        country,
-    )
-
-    if country:
-        country.continent = continent
-        country.gleam_region = gleam_region
-        country.ipcc_region = ipcc_region
-        country.save()
 
 df2 = pd.read_csv(
     os.path.join(
@@ -4444,6 +4383,38 @@ for crop in crops:
 """
 
 # TODO: Run in review
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "ListCountries.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers = df.columns.values.tolist()
+df_dict = df.to_dict("records")
+
+for i, row in enumerate(df_dict):
+    region = Region.objects.get(name__iexact=sanitize(row["EX-ACT"]))
+    gleam_region = GLEAMRegion.objects.get(name__iexact=sanitize(row["GLEAM"]))
+    ipcc_region = IPCCRegion.objects.get(name__iexact=sanitize(row["IPCC"]))
+
+    try:
+        country = Country.objects.get(name__iexact=sanitize(row["Countries"]))
+    except Country.DoesNotExist:
+        country = Country.objects.create(name=sanitize(row["Countries"]), region=region, gleam_region=gleam_region, ipcc_region=ipcc_region)
+
+    print(
+        region,
+        gleam_region,
+        ipcc_region,
+        country,
+    )
+
+    if country:
+        country.region = region
+        country.gleam_region = gleam_region
+        country.ipcc_region = ipcc_region
+        country.save()
 
 
 # TODO: Run in develop
