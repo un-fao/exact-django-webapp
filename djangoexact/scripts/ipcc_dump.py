@@ -3367,186 +3367,6 @@ for i, row in enumerate(rows):
             value=value,
         )
 
-
-LivestockManureEF.objects.all().delete()
-
-df2 = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "NewNewLivestockManureEF_N2O_semicolon.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers2 = df2.columns.values.tolist()
-df_dict2 = df2.to_dict("records")
-
-for i, row in enumerate(df_dict2):
-    emission_type = EmissionType.objects.get(name__iexact=row["emission_type"])
-    livestock_category = LivestockCategoryType.objects.filter(name__iexact=row["livestock_category_type"]).first()
-
-    livestock_production_type = LivestockProductionType.objects.filter(name__iexact=row["livestock_production_type"]).first()
-    climate = Climate.objects.filter(name__iexact=row["climate"]).first()
-    moisture = Moisture.objects.filter(name__iexact=row["moisture"]).first()
-
-    for j, header in enumerate(df_headers2, start=5):
-        if j == len(df_headers2):
-            break
-
-        manure_management_type = ManureManagementType.objects.filter(name__iexact=df_headers2[j]).first()
-
-        print(
-            emission_type,
-            livestock_production_type,
-            livestock_category,
-            climate,
-            moisture,
-            manure_management_type,
-            row[df_headers2[j]],
-        )
-
-        LivestockManureEF.objects.create(
-            emission_type=emission_type,
-            livestock_category_type=livestock_category,
-            livestock_production_type=livestock_production_type,
-            climate=climate,
-            moisture=moisture,
-            manure_management_type=manure_management_type,
-            value=parse_csv_number(row[df_headers2[j]]),
-        )
-
-
-df2 = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "NewNewLivestockManureEF_Volatilization.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers2 = df2.columns.values.tolist()
-df_dict2 = df2.to_dict("records")
-
-for i, row in enumerate(df_dict2):
-    emission_type = EmissionType.objects.get(name__iexact=row["emission_type"])
-    livestock_category = LivestockCategoryType.objects.filter(name__iexact=row["livestock_category_type"]).first()
-
-    livestock_production_type = LivestockProductionType.objects.filter(name__iexact=row["livestock_production_type"]).first()
-    climate = Climate.objects.filter(name__iexact=row["climate"]).first()
-    moisture = Moisture.objects.filter(name__iexact=row["moisture"]).first()
-
-    for j, header in enumerate(df_headers2, start=5):
-        if j == len(df_headers2):
-            break
-
-        manure_management_type = ManureManagementType.objects.filter(name__iexact=df_headers2[j]).first()
-
-        print(
-            emission_type,
-            livestock_production_type,
-            livestock_category,
-            climate,
-            moisture,
-            manure_management_type,
-            row[df_headers2[j]],
-        )
-
-        LivestockManureEF.objects.create(
-            emission_type=emission_type,
-            livestock_category_type=livestock_category,
-            livestock_production_type=livestock_production_type,
-            climate=climate,
-            moisture=moisture,
-            manure_management_type=manure_management_type,
-            value=parse_csv_number(row[df_headers2[j]]),
-        )
-
-df2 = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "NewNewLivestockManureEF_Leaching.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers2 = df2.columns.values.tolist()
-df_dict2 = df2.to_dict("records")
-
-for i, row in enumerate(df_dict2):
-    emission_type = EmissionType.objects.get(name__iexact=row["emission_type"])
-    livestock_category = LivestockCategoryType.objects.filter(name__iexact=row["livestock_category_type"]).first()
-
-    livestock_production_type = LivestockProductionType.objects.filter(name__iexact=row["livestock_production_type"]).first()
-    climate = Climate.objects.filter(name__iexact=row["climate"]).first()
-    moisture = Moisture.objects.filter(name__iexact=row["moisture"]).first()
-
-    for j, header in enumerate(df_headers2, start=5):
-        if j == len(df_headers2):
-            break
-
-        manure_management_type = ManureManagementType.objects.filter(name__iexact=df_headers2[j]).first()
-
-        print(
-            emission_type,
-            livestock_production_type,
-            livestock_category,
-            climate,
-            moisture,
-            manure_management_type,
-            row[df_headers2[j]],
-        )
-
-        LivestockManureEF.objects.create(
-            emission_type=emission_type,
-            livestock_category_type=livestock_category,
-            livestock_production_type=livestock_production_type,
-            climate=climate,
-            moisture=moisture,
-            manure_management_type=manure_management_type,
-            value=parse_csv_number(row[df_headers2[j]]),
-        )
-
-# Delete all LivestockManureEF where emission_type is CH4
-LivestockManureEF.objects.filter(emission_type__name__iexact="CH4").delete()
-
-df2 = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "NewLivestockManureEF_CH4.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers2 = df2.columns.values.tolist()
-df_dict2 = df2.to_dict("records")
-
-for i, row in enumerate(df_dict2):
-    emission_type = EmissionType.objects.get(name__iexact=row["emission_type"])
-    livestock_category = LivestockCategoryType.objects.filter(name__iexact=sanitize(row["livestock_category_type"])).first()
-
-    livestock_production_type = LivestockProductionType.objects.filter(name__iexact=sanitize(row["livestock_production_type"])).first()
-    climate = Climate.objects.filter(name__iexact=sanitize(row["climate"])).first()
-    moisture = Moisture.objects.filter(name__iexact=sanitize(row["moisture"])).first()
-
-    for j, header in enumerate(df_headers2, start=5):
-        if j == len(df_headers2):
-            break
-
-        manure_management_type = ManureManagementType.objects.filter(name__iexact=sanitize(df_headers2[j])).first()
-
-        print(
-            emission_type,
-            livestock_production_type,
-            livestock_category,
-            climate,
-            moisture,
-            manure_management_type,
-            row[df_headers2[j]],
-        )
-
-        LivestockManureEF.objects.create(
-            emission_type=emission_type,
-            livestock_category_type=livestock_category,
-            livestock_production_type=livestock_production_type,
-            climate=climate,
-            moisture=moisture,
-            manure_management_type=manure_management_type,
-            value=parse_csv_number(row[df_headers2[j]]),
-        )
-
-
 IrrigationPressureRequirement.objects.all().delete()
 
 df = pd.read_csv(
@@ -4415,6 +4235,185 @@ for i, row in enumerate(df_dict):
         country.gleam_region = gleam_region
         country.ipcc_region = ipcc_region
         country.save()
+
+
+LivestockManureEF.objects.all().delete()
+
+df2 = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "NewNewLivestockManureEF_N2O_semicolon.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers2 = df2.columns.values.tolist()
+df_dict2 = df2.to_dict("records")
+
+for i, row in enumerate(df_dict2):
+    emission_type = EmissionType.objects.get(name__iexact=row["emission_type"])
+    livestock_category = LivestockCategoryType.objects.filter(name__iexact=row["livestock_category_type"]).first()
+
+    livestock_production_type = LivestockProductionType.objects.filter(name__iexact=row["livestock_production_type"]).first()
+    climate = Climate.objects.filter(name__iexact=row["climate"]).first()
+    moisture = Moisture.objects.filter(name__iexact=row["moisture"]).first()
+
+    for j, header in enumerate(df_headers2, start=5):
+        if j == len(df_headers2):
+            break
+
+        manure_management_type = ManureManagementType.objects.filter(name__iexact=df_headers2[j]).first()
+
+        print(
+            emission_type,
+            livestock_production_type,
+            livestock_category,
+            climate,
+            moisture,
+            manure_management_type,
+            row[df_headers2[j]],
+        )
+
+        LivestockManureEF.objects.create(
+            emission_type=emission_type,
+            livestock_category_type=livestock_category,
+            livestock_production_type=livestock_production_type,
+            climate=climate,
+            moisture=moisture,
+            manure_management_type=manure_management_type,
+            value=parse_csv_number(row[df_headers2[j]]),
+        )
+
+
+df2 = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "NewNewLivestockManureEF_Volatilization.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers2 = df2.columns.values.tolist()
+df_dict2 = df2.to_dict("records")
+
+for i, row in enumerate(df_dict2):
+    emission_type = EmissionType.objects.get(name__iexact=row["emission_type"])
+    livestock_category = LivestockCategoryType.objects.filter(name__iexact=row["livestock_category_type"]).first()
+
+    livestock_production_type = LivestockProductionType.objects.filter(name__iexact=row["livestock_production_type"]).first()
+    climate = Climate.objects.filter(name__iexact=row["climate"]).first()
+    moisture = Moisture.objects.filter(name__iexact=row["moisture"]).first()
+
+    for j, header in enumerate(df_headers2, start=5):
+        if j == len(df_headers2):
+            break
+
+        manure_management_type = ManureManagementType.objects.filter(name__iexact=df_headers2[j]).first()
+
+        print(
+            emission_type,
+            livestock_production_type,
+            livestock_category,
+            climate,
+            moisture,
+            manure_management_type,
+            row[df_headers2[j]],
+        )
+
+        LivestockManureEF.objects.create(
+            emission_type=emission_type,
+            livestock_category_type=livestock_category,
+            livestock_production_type=livestock_production_type,
+            climate=climate,
+            moisture=moisture,
+            manure_management_type=manure_management_type,
+            value=parse_csv_number(row[df_headers2[j]]),
+        )
+
+df2 = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "NewNewLivestockManureEF_Leaching.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers2 = df2.columns.values.tolist()
+df_dict2 = df2.to_dict("records")
+
+for i, row in enumerate(df_dict2):
+    emission_type = EmissionType.objects.get(name__iexact=row["emission_type"])
+    livestock_category = LivestockCategoryType.objects.filter(name__iexact=row["livestock_category_type"]).first()
+
+    livestock_production_type = LivestockProductionType.objects.filter(name__iexact=row["livestock_production_type"]).first()
+    climate = Climate.objects.filter(name__iexact=row["climate"]).first()
+    moisture = Moisture.objects.filter(name__iexact=row["moisture"]).first()
+
+    for j, header in enumerate(df_headers2, start=5):
+        if j == len(df_headers2):
+            break
+
+        manure_management_type = ManureManagementType.objects.filter(name__iexact=df_headers2[j]).first()
+
+        print(
+            emission_type,
+            livestock_production_type,
+            livestock_category,
+            climate,
+            moisture,
+            manure_management_type,
+            row[df_headers2[j]],
+        )
+
+        LivestockManureEF.objects.create(
+            emission_type=emission_type,
+            livestock_category_type=livestock_category,
+            livestock_production_type=livestock_production_type,
+            climate=climate,
+            moisture=moisture,
+            manure_management_type=manure_management_type,
+            value=parse_csv_number(row[df_headers2[j]]),
+        )
+
+# Delete all LivestockManureEF where emission_type is CH4
+LivestockManureEF.objects.filter(emission_type__name__iexact="CH4").delete()
+
+df2 = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "NewLivestockManureEF_CH4.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers2 = df2.columns.values.tolist()
+df_dict2 = df2.to_dict("records")
+
+for i, row in enumerate(df_dict2):
+    emission_type = EmissionType.objects.get(name__iexact=row["emission_type"])
+    livestock_category = LivestockCategoryType.objects.filter(name__iexact=sanitize(row["livestock_category_type"])).first()
+
+    livestock_production_type = LivestockProductionType.objects.filter(name__iexact=sanitize(row["livestock_production_type"])).first()
+    climate = Climate.objects.filter(name__iexact=sanitize(row["climate"])).first()
+    moisture = Moisture.objects.filter(name__iexact=sanitize(row["moisture"])).first()
+
+    for j, header in enumerate(df_headers2, start=5):
+        if j == len(df_headers2):
+            break
+
+        manure_management_type = ManureManagementType.objects.filter(name__iexact=sanitize(df_headers2[j])).first()
+
+        print(
+            emission_type,
+            livestock_production_type,
+            livestock_category,
+            climate,
+            moisture,
+            manure_management_type,
+            row[df_headers2[j]],
+        )
+
+        LivestockManureEF.objects.create(
+            emission_type=emission_type,
+            livestock_category_type=livestock_category,
+            livestock_production_type=livestock_production_type,
+            climate=climate,
+            moisture=moisture,
+            manure_management_type=manure_management_type,
+            value=parse_csv_number(row[df_headers2[j]]),
+        )
 
 
 # TODO: Run in develop
