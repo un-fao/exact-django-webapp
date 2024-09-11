@@ -1625,9 +1625,9 @@ class PerennialCropCalculator(LandModuleCalculator):
         self.biomass_ef_wo: ipcc.TotalBiomassAfterDefo | SimpleNamespace = SimpleNamespace(value=0)
 
         # Calculated by math model
-        self.residue_burned_t2_start: SimpleNamespace = SimpleNamespace(value=0)
-        self.residue_burned_t2_w: SimpleNamespace = SimpleNamespace(value=0)
-        self.residue_burned_t2_wo: SimpleNamespace = SimpleNamespace(value=0)
+        self.residue_availability_t2_start: SimpleNamespace = SimpleNamespace(value=0)
+        self.residue_availability_t2_w: SimpleNamespace = SimpleNamespace(value=0)
+        self.residue_availability_t2_wo: SimpleNamespace = SimpleNamespace(value=0)
 
     def get_defaults(self, calculate=False) -> dict:
         super().get_defaults(calculate)
@@ -1654,9 +1654,9 @@ class PerennialCropCalculator(LandModuleCalculator):
         if module.is_ready() and calculate:
             self.calculate()
 
-            self.residue_burned_t2_start = SimpleNamespace(value=getattr(self.math_start_w, "t_biomass_tier_2_default", 0) or getattr(self.math_start_wo, "t_biomass_tier_2_default", 0))
-            self.residue_burned_t2_w = SimpleNamespace(value=getattr(self.math_w, "t_biomass_tier_2_default", 0) or getattr(self.math_wo, "t_biomass_tier_2_default", 0))
-            self.residue_burned_t2_wo = SimpleNamespace(value=getattr(self.math_w, "t_biomass_tier_2_default", 0) or getattr(self.math_wo, "t_biomass_tier_2_default", 0))
+            self.residue_availability_t2_start = SimpleNamespace(value=getattr(self.math_start_w, "biomass_availability_tier_2_default", 0) or getattr(self.math_start_wo, "biomass_availability_tier_2_default", 0))
+            self.residue_availability_t2_w = SimpleNamespace(value=getattr(self.math_w, "biomass_availability_tier_2_default", 0) or getattr(self.math_wo, "biomass_availability_tier_2_default", 0))
+            self.residue_availability_t2_wo = SimpleNamespace(value=getattr(self.math_w, "biomass_availability_tier_2_default", 0) or getattr(self.math_wo, "biomass_availability_tier_2_default", 0))
 
         self.burning_emission_factor = utils.get_or_raise(ipcc.BurningEmissionFactor, savanna_flt, "BurningEmissionFactor for Savanna and grassland does not exist")
         self.default_fire_periodicity = AnnualCroplandParameter.objects.get(name="default_fire_periodicity")
@@ -1712,12 +1712,12 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "combustion_factor": self.fires_combustion_factor_start.value,
                 "fire_periodicity_default": self.default_fire_periodicity.value,
                 "fire_periodicity_tier_2": module.fire_periodicity_t2_start,
-                "t_biomass_tier_2": module.residue_burned_t2_start,
+                "t_biomass_tier_2": module.residue_availability_t2_start,
                 "agb_rate_default": self.ag_default_start.value,
-                "agb_rate_tier_2": module.ag_t2_start,
+                "agb_rate_tier_2": module.agb_t2_start,
                 "agb_maximum_c": self.agb_max_c_start.value,
                 "bgb_rate_default": self.bg_default_start.value,
-                "bgb_rate_tier_2": module.bg_t2_start,
+                "bgb_rate_tier_2": module.bgb_t2_start,
                 "soc_start_default": self.soc.value,
                 "soc_end_default": self.soc.value,
                 "soc_start_tier_2": module.soc_t2_start,
@@ -1764,10 +1764,10 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "fire_periodicity_tier_2": module.fire_periodicity_t2_start,
                 "t_biomass_tier_2": module.residue_burned_t2_start,
                 "agb_rate_default": self.ag_default_start.value,
-                "agb_rate_tier_2": module.ag_t2_start,
+                "agb_rate_tier_2": module.agb_t2_start,
                 "agb_maximum_c": self.agb_max_c_start.value,
                 "bgb_rate_default": self.bg_default_start.value,
-                "bgb_rate_tier_2": module.bg_t2_start,
+                "bgb_rate_tier_2": module.bgb_t2_start,
                 "soc_start_default": self.soc.value,
                 "soc_end_default": self.soc.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
@@ -1815,10 +1815,10 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "fire_periodicity_tier_2": module.fire_periodicity_t2_w,
                 "t_biomass_tier_2": module.residue_burned_t2_w,
                 "agb_rate_default": self.ag_default_w.value,
-                "agb_rate_tier_2": module.ag_t2_w,
+                "agb_rate_tier_2": module.agb_t2_w,
                 "agb_maximum_c": self.agb_max_c_w.value,
                 "bgb_rate_default": self.bg_default_w.value,
-                "bgb_rate_tier_2": module.bg_t2_w,
+                "bgb_rate_tier_2": module.bgb_t2_w,
                 "soc_start_default": self.soc.value,
                 "soc_end_default": self.soc.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
@@ -1865,10 +1865,10 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "fire_periodicity_tier_2": module.fire_periodicity_t2_wo,
                 "t_biomass_tier_2": module.residue_burned_t2_wo,
                 "agb_rate_default": self.ag_default_wo.value,
-                "agb_rate_tier_2": module.ag_t2_wo,
+                "agb_rate_tier_2": module.agb_t2_wo,
                 "agb_maximum_c": self.agb_max_c_wo.value,
                 "bgb_rate_default": self.bg_default_wo.value,
-                "bgb_rate_tier_2": module.bg_t2_wo,
+                "bgb_rate_tier_2": module.bgb_t2_wo,
                 "soc_start_default": self.soc.value,
                 "soc_end_default": self.soc.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
