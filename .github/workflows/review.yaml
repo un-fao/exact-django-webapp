@@ -55,11 +55,11 @@ jobs:
          
         sleep 5
 
-        # Ensure correct working directory
-        cd $GITHUB_WORKSPACE
         echo 'Print work directory'
         pwd
-        ls $GITHUB_WORKSPACE/djangoexact/
+        echo 'List current directory'
+        ls
+        ls $GITHUB_WORKSPACE
         
         sed -i 's|\$SERVICE_NAME|${{ vars.SERVICE_NAME }}|g' $GITHUB_WORKSPACE/djangoexact/app.yaml
         sed -i 's|\$PROJECT_ID|${{ vars.PROJECT_ID }}|g' $GITHUB_WORKSPACE/djangoexact/app.yaml
