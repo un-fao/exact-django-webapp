@@ -125,7 +125,7 @@ jobs:
         python djangoexact/manage.py collectstatic --noinput
 
         pip list
-        sed -i "s|127.0.0.1|${{ vars.SECONDARY_DB_PORT }}|g" djangoexact/djangoexact/settings.py
+        sed -i "s|127.0.0.1|${{ vars.DB_HOST }}|g" djangoexact/djangoexact/settings.py
 
         gcloud config set project ${{ vars.PROJECT_ID }}
         gcloud app deploy djangoexact/app.yaml --project ${{ vars.PROJECT_ID }} --verbosity=debug
