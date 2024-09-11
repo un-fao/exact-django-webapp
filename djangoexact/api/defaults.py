@@ -222,18 +222,15 @@ class PerennialCroplandDefaults(Defaults):
             fmg_t2_start_default=defaults.fmg_start.value,
             fmg_t2_w_default=defaults.fmg_w.value,
             fmg_t2_wo_default=defaults.fmg_wo.value,
-            residue_burned_t2_start_default=defaults.residue_burned_t2_start.value,
-            residue_burned_t2_w_default=defaults.residue_burned_t2_w.value,
-            residue_burned_t2_wo_default=defaults.residue_burned_t2_wo.value,
             fire_periodicity_t2_start_default=defaults.default_fire_periodicity.value,
             fire_periodicity_t2_w_default=defaults.default_fire_periodicity.value,
             fire_periodicity_t2_wo_default=defaults.default_fire_periodicity.value,
             biomass_t2_start_default=defaults.biomass_ef_start.value,
             biomass_t2_w_default=defaults.biomass_ef_w.value,
             biomass_t2_wo_default=defaults.biomass_ef_wo.value,
-            # residue_availability_t2_start_default=defaults.residue_availability_start.value,  # TODO: Computed @Peter (should be t_biomass)
-            # residue_availability_t2_w_default=defaults.residue_availability_w.value,  # TODO: Computed @Peter
-            # residue_availability_t2_wo_default=defaults.residue_availability_wo.value,  # TODO: Computed @Peter
+            residue_availability_t2_start_default=defaults.residue_availability_t2_start.value,
+            residue_availability_t2_w_default=defaults.residue_availability_t2_w.value,
+            residue_availability_t2_wo_default=defaults.residue_availability_t2_wo.value,
         )
 
 
