@@ -60,17 +60,19 @@ jobs:
         pwd
         echo 'List current directory'
         ls
-        
-        sed -i 's|\$SERVICE_NAME|${{ vars.SERVICE_NAME }}|g' djangoexact/app.yaml
-        sed -i 's|\$PROJECT_ID|${{ vars.PROJECT_ID }}|g' djangoexact/app.yaml
-        sed -i 's|\$DB_ENGINE|${{ vars.DB_ENGINE }}|g' djangoexact/app.yaml
-        sed -i 's|\$DB_HOST|${{ vars.DB_HOST }}|g' djangoexact/app.yaml
-        sed -i 's|\$DB_USERNAME|${{ vars.DB_USERNAME }}|g' djangoexact/app.yaml
-        sed -i 's|\$DB_PASSWORD|${{ secrets.DB_PASSWORD }}|g' djangoexact/app.yaml
-        sed -i 's|\$DB_NAME|${{ vars.DB_NAME }}|g' djangoexact/app.yaml
-        sed -i 's|\$DB_PORT|${{ vars.DB_PORT }}|g' djangoexact/app.yaml
 
-        echo "$(cat djangoexact/app.yaml)"
+        echo "$(cat app.yaml)"
+        
+        sed -i 's|\$SERVICE_NAME|${{ vars.SERVICE_NAME }}|g' app.yaml
+        sed -i 's|\$PROJECT_ID|${{ vars.PROJECT_ID }}|g' app.yaml
+        sed -i 's|\$DB_ENGINE|${{ vars.DB_ENGINE }}|g' app.yaml
+        sed -i 's|\$DB_HOST|${{ vars.DB_HOST }}|g' app.yaml
+        sed -i 's|\$DB_USERNAME|${{ vars.DB_USERNAME }}|g' app.yaml
+        sed -i 's|\$DB_PASSWORD|${{ secrets.DB_PASSWORD }}|g' app.yaml
+        sed -i 's|\$DB_NAME|${{ vars.DB_NAME }}|g' app.yaml
+        sed -i 's|\$DB_PORT|${{ vars.DB_PORT }}|g' app.yaml
+
+        
 
         sed -i 's|\$DB_ENGINE|${{ vars.DB_ENGINE }}|g' djangoexact/djangoexact/settings.py
         sed -i 's|\$DB_INSTANCE_CONNECTION|${{ vars.DB_INSTANCE_CONNECTION }}|g' djangoexact/djangoexact/settings.py
