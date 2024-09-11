@@ -52,6 +52,13 @@ jobs:
         wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
         chmod +x cloud_sql_proxy
         ./cloud_sql_proxy -instances=${{ vars.DB_INSTANCE_CONNECTION }}=tcp:${{ vars.DB_PORT }} > cloudsql.log 2>&1 &
+         
+        sleep 5
+
+        # Ensure correct working directory
+        cd $GITHUB_WORKSPACE
+        echo 'Print work directory'
+        pwd
         
         sed -i 's|\$SERVICE_NAME|${{ vars.SERVICE_NAME }}|g' djangoexact/app.yaml
         sed -i 's|\$PROJECT_ID|${{ vars.PROJECT_ID }}|g' djangoexact/app.yaml
