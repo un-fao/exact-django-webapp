@@ -48,10 +48,14 @@ jobs:
           wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
           chmod +x cloud_sql_proxy
 
+          
+
       - name: Start Cloud SQL Proxy
         run: |
           ./cloud_sql_proxy -instances=${{ vars.DB_INSTANCE_CONNECTION }}=tcp:${{ vars.SECONDARY_DB_PORT }} > cloudsql.log 2>&1 &
           sleep 10  # Ensure the proxy is up
+          echo 'cat cloudsql.log'
+          cat cloudsql.log
 
       - name: Save Cloud SQL Proxy as an artifact
         uses: actions/upload-artifact@v3
