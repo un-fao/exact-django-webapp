@@ -189,6 +189,9 @@ class PerennialCroplandDefaults(Defaults):
             fire_periodicity_t2_start_default=0,
             fire_periodicity_t2_w_default=0,
             fire_periodicity_t2_wo_default=0,
+            biomass_t2_start_default=0,
+            biomass_t2_w_default=0,
+            biomass_t2_wo_default=0,
         )
 
     def get_defaults(self, calculate=False) -> dict:
@@ -225,6 +228,9 @@ class PerennialCroplandDefaults(Defaults):
             fire_periodicity_t2_start_default=defaults.default_fire_periodicity.value,
             fire_periodicity_t2_w_default=defaults.default_fire_periodicity.value,
             fire_periodicity_t2_wo_default=defaults.default_fire_periodicity.value,
+            biomass_t2_start_default=defaults.biomass_ef_start.value,
+            biomass_t2_w_default=defaults.biomass_ef_w.value,
+            biomass_t2_wo_default=defaults.biomass_ef_wo.value,
             # residue_availability_t2_start_default=defaults.residue_availability_start.value,  # TODO: Computed @Peter (should be t_biomass)
             # residue_availability_t2_w_default=defaults.residue_availability_w.value,  # TODO: Computed @Peter
             # residue_availability_t2_wo_default=defaults.residue_availability_wo.value,  # TODO: Computed @Peter
@@ -279,7 +285,6 @@ class FloodedRiceDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            # TODO: Ask Lorenzo about mapping of commented out fields
             soc_t2_start_default=defaults.soc.value,
             soc_t2_w_default=defaults.soc.value,
             soc_t2_wo_default=defaults.soc.value,
@@ -287,9 +292,9 @@ class FloodedRiceDefaults(Defaults):
             flu_t2_w_default=defaults.flu_w.value,
             flu_t2_wo_default=defaults.flu_wo.value,
             # TODO: Biomass will be yield+rice_straw (to be included in the model)
-            # biomass_t2_start_default=defaults.yield_ref.value,
-            # biomass_t2_w_default=defaults.yield_ref.value,
-            # biomass_t2_wo_default=defaults.yield_ref.value,
+            biomass_t2_start_default=defaults.biomass_ef_start.value,
+            biomass_t2_w_default=defaults.biomass_ef_w.value,
+            biomass_t2_wo_default=defaults.biomass_ef_wo.value,
             fmg_t2_start_default=defaults.fmg_start.value,
             fmg_t2_w_default=defaults.fmg_w.value,
             fmg_t2_wo_default=defaults.fmg_wo.value,
@@ -326,6 +331,9 @@ class LivestockDefaults(Defaults):
             enteric_fermentation_t2_start_default=0,
             enteric_fermentation_t2_w_default=0,
             enteric_fermentation_t2_wo_default=0,
+            prp_percentage_t2_start_default=0,
+            prp_percentage_t2_w_default=0,
+            prp_percentage_t2_wo_default=0,
         )
 
     def get_defaults(self, calculate=False) -> dict:
@@ -338,6 +346,9 @@ class LivestockDefaults(Defaults):
             enteric_fermentation_t2_start_default=defaults.enteric_ch4_start.value,
             enteric_fermentation_t2_w_default=defaults.enteric_ch4_w.value,
             enteric_fermentation_t2_wo_default=defaults.enteric_ch4_wo.value,
+            prp_percentage_t2_start_default=defaults.animal_waste_prp_start.value,
+            prp_percentage_t2_w_default=defaults.animal_waste_prp_w.value,
+            prp_percentage_t2_wo_default=defaults.animal_waste_prp_wo.value,
             # TODO: Wait for Lorenzo to communicate which fields to get from math model
             # self.ch4_prp_head_start_tier_2_default = None
             # self.ch4_prp_head_end_tier_2_default = None
