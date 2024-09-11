@@ -50,7 +50,7 @@ jobs:
 
       - name: Start Cloud SQL Proxy
         run: |
-          ./cloud_sql_proxy -instances=${{ vars.DB_INSTANCE_CONNECTION }}=tcp:${{ vars.DB_PORT }} > cloudsql.log 2>&1 &
+          ./cloud_sql_proxy -instances=${{ vars.DB_INSTANCE_CONNECTION }}=tcp:${{ vars.SECONDARY_DB_PORT }} > cloudsql.log 2>&1 &
           sleep 10  # Ensure the proxy is up
 
       - name: Save Cloud SQL Proxy as an artifact
@@ -91,7 +91,7 @@ jobs:
         sed -i 's|\$DB_USERNAME|${{ vars.DB_USERNAME }}|g' djangoexact/app.yaml
         sed -i 's|\$DB_PASSWORD|${{ secrets.DB_PASSWORD }}|g' djangoexact/app.yaml
         sed -i 's|\$DB_NAME|${{ vars.DB_NAME }}|g' djangoexact/app.yaml
-        sed -i 's|\$DB_PORT|${{ vars.DB_PORT }}|g' djangoexact/app.yaml
+        sed -i 's|\$DB_PORT|${{ vars.SECONDARY_DB_PORT }}|g' djangoexact/app.yaml
 
         echo "$(cat djangoexact/app.yaml)"
 
@@ -101,7 +101,7 @@ jobs:
         sed -i 's|\$DB_USERNAME|${{ vars.DB_USERNAME  }}|g' djangoexact/djangoexact/settings.py
         sed -i 's|\$DB_PASSWORD|${{ secrets.DB_PASSWORD }}|g' djangoexact/djangoexact/settings.py
         sed -i 's|\$DB_NAME|${{ vars.DB_NAME }}|g' djangoexact/djangoexact/settings.py
-        sed -i 's|\$DB_PORT|${{ vars.DB_PORT }}|g' djangoexact/djangoexact/settings.py
+        sed -i 's|\$DB_PORT|${{ vars.SECONDARY_DB_PORT }}|g' djangoexact/djangoexact/settings.py
         sed -i 's|\$ALLOWED_HOST|${{ vars.ALLOWED_HOST }}|g' djangoexact/djangoexact/settings.py
         sed -i 's|\$SECRET_KEY|${{ secrets.SECRET_KEY }}|g' djangoexact/djangoexact/settings.py
         sed -i 's|\\\$EMAIL_HOST|${{ vars.EMAIL_HOST }}|g' djangoexact/djangoexact/settings.py
