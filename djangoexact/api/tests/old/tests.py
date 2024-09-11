@@ -433,9 +433,9 @@ if TEST_PERENNIAL_CROPPING:
 
         print("\n")
 
-        print(f"Crop Yield START: {perennial.crop_yield_start}")
-        print(f"Crop Yield WO: {perennial.crop_yield_wo}")
-        print(f"Crop Yield W: {perennial.crop_yield_w}")
+        print(f"Crop Yield START: {perennial.crop_yield_t2_start}")
+        print(f"Crop Yield WO: {perennial.crop_yield_t2_wo}")
+        print(f"Crop Yield W: {perennial.crop_yield_t2_w}")
 
         print("\n\n")
 
