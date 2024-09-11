@@ -427,8 +427,8 @@ def som_emissions(soc_final, soc_initial, emission_factor_nitrous, nitrous_const
 
 
 def biomass_emissions(
-    biomass_final,
     biomass_initial,
+    biomass_final,
     hectares_start,
     hectares_end,
     rate_type,
