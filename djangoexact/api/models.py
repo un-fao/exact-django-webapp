@@ -1216,7 +1216,7 @@ class AnnualCropland(LandModule, SingleBiomassModule, ResidueAvailability):
     crop_yield_t2_start = models.FloatField(null=True, blank=True)
     crop_yield_t2_w = models.FloatField(null=True, blank=True)
     crop_yield_t2_wo = models.FloatField(null=True, blank=True)
-    crop_yield_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_crop_yield_thread")
+    crop_yield_t2_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_crop_yield_t2_thread")
 
     area = models.FloatField(null=True, blank=True)
 
@@ -1264,15 +1264,15 @@ class PerennialCrop(models.Model):
 
     area = models.FloatField(null=True, blank=True)
 
-    crop_yield_start = models.FloatField(null=True, blank=True)
-    crop_yield_w = models.FloatField(null=True, blank=True)
-    crop_yield_wo = models.FloatField(null=True, blank=True)
-    crop_yield_thread = models.ForeignKey(
+    crop_yield_t2_start = models.FloatField(null=True, blank=True)
+    crop_yield_t2_w = models.FloatField(null=True, blank=True)
+    crop_yield_t2_wo = models.FloatField(null=True, blank=True)
+    crop_yield_t2_thread = models.ForeignKey(
         CommentThread,
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-        related_name="%(class)s_crop_yield_thread",
+        related_name="%(class)s_crop_yield_t2_thread",
     )
 
     ag_t2_start = models.FloatField(null=True, blank=True)
@@ -1338,10 +1338,10 @@ class CroplandMinorSeason(models.Model):
     residue_management_type_wo = models.ForeignKey(ResidueManagementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_residue_management_type_wo")
     residue_management_type_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_residue_management_type_thread")
 
-    crop_yield_start = models.FloatField(null=True, blank=True)
-    crop_yield_w = models.FloatField(null=True, blank=True)
-    crop_yield_wo = models.FloatField(null=True, blank=True)
-    crop_yield_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_yield_thread")
+    crop_yield_t2_start = models.FloatField(null=True, blank=True)
+    crop_yield_t2_w = models.FloatField(null=True, blank=True)
+    crop_yield_t2_wo = models.FloatField(null=True, blank=True)
+    crop_yield_t2_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_yield_t2_thread")
 
 
 class MinorSeasonPerennialCropland(CroplandMinorSeason, LandSubmodule):
@@ -1368,9 +1368,10 @@ class Rice(ResidueAvailability):
     organic_amendment_type_w = models.ForeignKey(OrganicAmendmentType, on_delete=models.CASCADE, related_name="%(class)s_organic_amendment_type_w", null=True)
     organic_amendment_type_wo = models.ForeignKey(OrganicAmendmentType, on_delete=models.CASCADE, related_name="%(class)s_organic_amendment_type_wo", null=True)
 
-    crop_yield_start = models.FloatField(null=True, blank=True)
-    crop_yield_w = models.FloatField(null=True, blank=True)
-    crop_yield_wo = models.FloatField(null=True, blank=True)
+    crop_yield_t2_start = models.FloatField(null=True, blank=True)
+    crop_yield_t2_w = models.FloatField(null=True, blank=True)
+    crop_yield_t2_wo = models.FloatField(null=True, blank=True)
+    crop_yield_t2_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_crop_yield_t2_thread")
 
     efc_t2_start = models.FloatField(null=True, blank=True)
     efc_t2_w = models.FloatField(null=True, blank=True)

@@ -4423,10 +4423,6 @@ for i, row in df.iterrows():
                     agb_growth_min=agb_growth_min,
                     agb_growth_max=agb_growth_max,
                 )
-        
-"""
-
-# TODO: Run in review
 
 ModuleType.objects.filter(class_name="DegradedLand").update(name="Other Land", class_name="OtherLand")
 LandUseType.objects.filter(name="Degraded Land").update(name="Other Land")
@@ -4436,6 +4432,18 @@ LandUseType.objects.filter(name="Annual Cropping").update(name="Annual Cropland"
 
 ModuleType.objects.filter(class_name="PerennialCropping").update(name="Perennial Cropland", class_name="PerennialCropland")
 LandUseType.objects.filter(name="Perennial Cropping").update(name="Perennial Cropland")
+
+# Get all LandUseTypes where module_type__class_name is AnnualCropland
+crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropland").all()
+
+# Set all crops to have all climates and moistures
+for crop in crops:
+    crop.climates.set(Climate.objects.all())
+    crop.moistures.set(Moisture.objects.all())
+    crop.save()
+"""
+
+# TODO: Run in review
 
 
 # TODO: Run in develop
