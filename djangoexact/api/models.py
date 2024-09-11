@@ -1254,70 +1254,22 @@ class PerennialCrop(models.Model):
     is_biomass_burned_start = models.BooleanField(null=True, blank=True)
     is_biomass_burned_w = models.BooleanField(null=True, blank=True)
     is_biomass_burned_wo = models.BooleanField(null=True, blank=True)
-    is_biomass_burned_thread = models.ForeignKey(
-        CommentThread,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="%(class)s_is_biomass_burned_thread",
-    )
+    is_biomass_burned_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_is_biomass_burned_thread")
 
     area = models.FloatField(null=True, blank=True)
 
     crop_yield_t2_start = models.FloatField(null=True, blank=True)
     crop_yield_t2_w = models.FloatField(null=True, blank=True)
     crop_yield_t2_wo = models.FloatField(null=True, blank=True)
-    crop_yield_t2_thread = models.ForeignKey(
-        CommentThread,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="%(class)s_crop_yield_t2_thread",
-    )
-
-    ag_t2_start = models.FloatField(null=True, blank=True)
-    ag_t2_w = models.FloatField(null=True, blank=True)
-    ag_t2_wo = models.FloatField(null=True, blank=True)
+    crop_yield_t2_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_crop_yield_t2_thread")
 
     agb_max_t2_start = models.FloatField(null=True, blank=True)
     agb_max_t2_w = models.FloatField(null=True, blank=True)
     agb_max_t2_wo = models.FloatField(null=True, blank=True)
 
-    bg_t2_start = models.FloatField(null=True, blank=True)
-    bg_t2_w = models.FloatField(null=True, blank=True)
-    bg_t2_wo = models.FloatField(null=True, blank=True)
-
-    soc_t2_start = models.FloatField(null=True, blank=True)
-    soc_t2_w = models.FloatField(null=True, blank=True)
-    soc_t2_wo = models.FloatField(null=True, blank=True)
-
-    tillage_factor_t2_start = models.FloatField(null=True, blank=True)
-    tillage_factor_t2_w = models.FloatField(null=True, blank=True)
-    tillage_factor_t2_wo = models.FloatField(null=True, blank=True)
-
-    input_factor_t2_start = models.FloatField(null=True, blank=True)
-    input_factor_t2_w = models.FloatField(null=True, blank=True)
-    input_factor_t2_wo = models.FloatField(null=True, blank=True)
-
-    residue_burned_t2_start = models.FloatField(null=True, blank=True)
-    residue_burned_t2_w = models.FloatField(null=True, blank=True)
-    residue_burned_t2_wo = models.FloatField(null=True, blank=True)
-
     fire_periodicity_t2_start = models.FloatField(null=True, blank=True)
     fire_periodicity_t2_w = models.FloatField(null=True, blank=True)
     fire_periodicity_t2_wo = models.FloatField(null=True, blank=True)
-
-    flu_t2_start = models.FloatField(null=True, blank=True)
-    flu_t2_w = models.FloatField(null=True, blank=True)
-    flu_t2_wo = models.FloatField(null=True, blank=True)
-
-    # def save(self, *args, **kwargs):
-    #     if not self.land_use_type_start:
-    #         self.land_use_type_start = LandUseType.objects.get(name="Agroforestry - Default")
-    #         self.land_use_type_w = self.land_use_type_start
-    #         self.land_use_type_wo = self.land_use_type_start
-
-    #     super().save(*args, **kwargs)
 
 
 class PerennialCropland(PerennialCrop, LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule, ResidueAvailability):
