@@ -68,9 +68,11 @@ class LandModule(BaseModule):
     fi_end_tier_2: Optional[float]
 
     calculate_soc_som: bool
+    calculate_biomass: bool
     ef_nitrous_som: float
 
-    # NOTE: biomass_start and biomass_end are set to Optional[float] only because in Perennial Biomass Emissions it is necessary for the calculations (if self.biomass_start and self.biomass_end:)
+    # NOTE: biomass_start and biomass_end are set to Optional[float] only because in 
+    # Perennial Biomass Emissions it is necessary for the calculations (if self.biomass_start and self.biomass_end:)
     # maybe we can send a parameter to the perennial or perennial.calculate_emissions() to avoid this
     biomass_start_default: Optional[float]
     biomass_end_default: Optional[float]
