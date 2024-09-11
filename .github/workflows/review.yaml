@@ -59,15 +59,16 @@ jobs:
         cd $GITHUB_WORKSPACE
         echo 'Print work directory'
         pwd
+        ls $GITHUB_WORKSPACE/djangoexact/
         
-        sed -i 's|\$SERVICE_NAME|${{ vars.SERVICE_NAME }}|g' djangoexact/app.yaml
-        sed -i 's|\$PROJECT_ID|${{ vars.PROJECT_ID }}|g' djangoexact/app.yaml
-        sed -i 's|\$DB_ENGINE|${{ vars.DB_ENGINE }}|g' djangoexact/app.yaml
-        sed -i 's|\$DB_HOST|${{ vars.DB_HOST }}|g' djangoexact/app.yaml
-        sed -i 's|\$DB_USERNAME|${{ vars.DB_USERNAME }}|g' djangoexact/app.yaml
-        sed -i 's|\$DB_PASSWORD|${{ secrets.DB_PASSWORD }}|g' djangoexact/app.yaml
-        sed -i 's|\$DB_NAME|${{ vars.DB_NAME }}|g' djangoexact/app.yaml
-        sed -i 's|\$DB_PORT|${{ vars.DB_PORT }}|g' djangoexact/app.yaml
+        sed -i 's|\$SERVICE_NAME|${{ vars.SERVICE_NAME }}|g' $GITHUB_WORKSPACE/djangoexact/app.yaml
+        sed -i 's|\$PROJECT_ID|${{ vars.PROJECT_ID }}|g' $GITHUB_WORKSPACE/djangoexact/app.yaml
+        sed -i 's|\$DB_ENGINE|${{ vars.DB_ENGINE }}|g' $GITHUB_WORKSPACE/djangoexact/app.yaml
+        sed -i 's|\$DB_HOST|${{ vars.DB_HOST }}|g' $GITHUB_WORKSPACE/djangoexact/app.yaml
+        sed -i 's|\$DB_USERNAME|${{ vars.DB_USERNAME }}|g' $GITHUB_WORKSPACE/djangoexact/app.yaml
+        sed -i 's|\$DB_PASSWORD|${{ secrets.DB_PASSWORD }}|g' $GITHUB_WORKSPACE/djangoexact/app.yaml
+        sed -i 's|\$DB_NAME|${{ vars.DB_NAME }}|g' $GITHUB_WORKSPACE/djangoexact/app.yaml
+        sed -i 's|\$DB_PORT|${{ vars.DB_PORT }}|g' $GITHUB_WORKSPACE/djangoexact/app.yaml
 
         echo "$(cat djangoexact/app.yaml)"
 
