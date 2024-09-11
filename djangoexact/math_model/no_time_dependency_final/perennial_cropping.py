@@ -42,6 +42,12 @@ class PerennialCropland(LandModule):
     bgb_rate_default: float
     bgb_rate_tier_2: Optional[float]
 
+    def __post_init__(self):
+        super().__post_init__()
+
+        # Tier 2 value
+        self.residue_availability_tier_2_default = None
+
     def calculate_emissions(
         self,
     ):
@@ -50,6 +56,7 @@ class PerennialCropland(LandModule):
                 fire_periodicity = self.fire_periodicity_default if not self.fire_periodicity_tier_2 else self.fire_periodicity_tier_2
                 ag_tc = self.agb_rate_default if not self.agb_rate_tier_2 else self.agb_rate_tier_2
                 t_biomass = ag_tc * 0.5 / 0.47 if not self.t_biomass_tier_2 else self.t_biomass_tier_2  # Default
+                self.residue_availability_tier_2_default = t_biomass
 
                 ################## COMPUTATION OF AMOUNT OF KG OF METHANE ###################
 
@@ -97,7 +104,7 @@ class PerennialCropland(LandModule):
             try:
                 if self.biomass_start and self.biomass_end:
                     # NOTE: This means that we have received values for both (or we have tier 2 values for both)
-                    emissions_biomass_yearly, emissions_biomass_total = biomass_emissions(self.biomass_start, self.biomass_end, self.hectares_start, self.hectares_end, self.rate_type, self.implementation_time, self.capitalization_time)
+                    emissions_biomass_yearly, emissions_biomass_total = biomass_emissions(self.biomass_end, self.biomass_start, self.hectares_start, self.hectares_end, self.rate_type, self.implementation_time, self.capitalization_time)
 
                     biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_biomass_yearly], ActivityTypes.BIOMASS, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
