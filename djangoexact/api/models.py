@@ -752,7 +752,7 @@ class Activity(Historical, NoteMixin):
 
     @property
     def completion_percentage(self):
-        return self.__get_activity_status_and_completion()
+        return self.__calculate_completion_percentage()
 
     class Meta:
         unique_together = ("name", "project")
@@ -794,9 +794,9 @@ class Activity(Historical, NoteMixin):
 
         return modules
 
-    def __get_activity_status_and_completion(self):
+    def __calculate_completion_percentage(self):
         """
-        Updates the status of the activity based on the status of its modules.
+        Calculates the completion percentage of an activity.
 
         Args:
         activity (Activity): The activity object to update.
@@ -804,6 +804,10 @@ class Activity(Historical, NoteMixin):
         statuses = [module.status for module in self.modules]
 
         ready_count = statuses.count(StatusType.objects.get(name="READY"))
+
+        if len(statuses) == 0:
+            return 1
+
         percentage_complete = ready_count / len(statuses)
 
         return percentage_complete
