@@ -54,7 +54,9 @@ jobs:
         ./cloud_sql_proxy -instances=${{ vars.DB_INSTANCE_CONNECTION }}=tcp:${{ vars.DB_PORT }} > cloudsql.log 2>&1 &
          
         sleep 5
-
+        cat cloud_sql_proxy
+        
+        cd ..
         echo 'Print work directory'
         pwd
         echo 'List current directory'
