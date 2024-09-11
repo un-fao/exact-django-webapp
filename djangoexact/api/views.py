@@ -81,6 +81,7 @@ from .serializers import (
     ProjectInvitationModelReadSerializer,
     NewNoteSerializer,
     NoteSerializer,
+    ActivitySerializerWithModules,
 )
 
 from djangoexact.settings import auth
@@ -804,7 +805,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
 
     queryset = Activity.objects.all()
-    serializer_class = ActivitySerializer
+    serializer_class = ActivitySerializerWithModules
 
     def update(self, request, *args, **kwargs):
         activity = self.get_object()
@@ -821,7 +822,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         activity = serializer.save()
         update_change_reason(activity, utils.ChangeReasons.UPDATE.value)
 
-        read_serializer = ActivitySerializer(instance=activity)
+        read_serializer = self.serializer_class(instance=activity)
 
         return Response(read_serializer.data, status=http_status.HTTP_200_OK)
 
@@ -840,7 +841,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         activity = serializer.save()
         update_change_reason(activity, utils.ChangeReasons.UPDATE.value)
 
-        read_serializer = ActivitySerializer(instance=activity)
+        read_serializer = self.serializer_class(instance=activity)
 
         return Response(read_serializer.data, status=http_status.HTTP_200_OK)
 
@@ -863,7 +864,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         update_change_reason(activity, utils.ChangeReasons.CREATE.value)
 
-        read_serializer = ActivitySerializer(instance=activity)
+        read_serializer = self.serializer_class(instance=activity)
 
         return Response(read_serializer.data, status=http_status.HTTP_201_CREATED)
 
@@ -879,7 +880,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error("Selected user does not have permission to view the activity")
             return utils.ErrorResponse("Selected user does not have permission to view the activity", status=http_status.HTTP_403_FORBIDDEN)
 
-        return Response(data=ActivitySerializer(activity).data, status=http_status.HTTP_200_OK)
+        return Response(data=self.serializer_class(activity).data, status=http_status.HTTP_200_OK)
 
     @swagger_auto_schema(
         manual_parameters=[project_id],
@@ -913,7 +914,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 response.append(activity_dict)
             return paginator.get_paginated_response(response)
 
-        return Response(data=ActivitySerializer(list, many=True).data, status=http_status.HTTP_200_OK)
+        return Response(data=self.serializer_class(list, many=True).data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])
     def results(self, request, pk=None):
@@ -1007,7 +1008,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         except ValidationError as e:
             return utils.ErrorResponse(e.detail, status=http_status.HTTP_400_BAD_REQUEST)
 
-        return Response(ActivitySerializer(activity).data, status=http_status.HTTP_200_OK)
+        return Response(self.serializer_class(activity).data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["post"])
     @swagger_auto_schema(responses={404: "Project not found", 403: "Selected user does not have permission to copy the activity", 201: ActivitySerializer}, request_body=EmptySerializer)
@@ -1020,7 +1021,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         new_activity = utils.copy_activity(activity)
 
-        return Response(data=ActivitySerializer(new_activity).data, status=http_status.HTTP_201_CREATED)
+        return Response(data=self.serializer_class(new_activity).data, status=http_status.HTTP_201_CREATED)
 
     @action(detail=True, methods=["get"])
     @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view activity changes", 200: ChangeHistorySerializer})
