@@ -102,39 +102,41 @@ class PerennialCropland(LandModule):
 
             # NOTE: should this be calculated only for main season?
             try:
-                if self.biomass_start and self.biomass_end:
-                    # NOTE: This means that we have received values for both (or we have tier 2 values for both)
-                    emissions_biomass_yearly, emissions_biomass_total = biomass_emissions(self.biomass_end, self.biomass_start, self.hectares_start, self.hectares_end, self.rate_type, self.implementation_time, self.capitalization_time)
+                if self.calculate_biomass:
+                    if self.biomass_start and self.biomass_end:
+                        # NOTE: This means that we have received values for both (or we have tier 2 values for both)
+                        emissions_biomass_yearly, emissions_biomass_total = biomass_emissions(self.biomass_end, self.biomass_start, self.hectares_start, self.hectares_end, self.rate_type, self.implementation_time, self.capitalization_time)
 
-                    biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_biomass_yearly], ActivityTypes.BIOMASS, delay=self.delay)
-                    self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
+                        biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_biomass_yearly], ActivityTypes.BIOMASS, delay=self.delay)
+                        self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
 
-                else:
-                    # NOTE: In this case we are in the situation where biomass_final has to be calculated and is not tabulated
-                    agb_rate = self.agb_rate_default * 44 / 12 if not self.agb_rate_tier_2 else self.agb_rate_tier_2 * 44 / 12
-                    bgb_rate = self.bgb_rate_default * 44 / 12 if not self.bgb_rate_tier_2 else self.bgb_rate_tier_2 * 44 / 12
-
-                    if self.agb_rate_tier_2:
-                        max_agb = 0 if self.agb_rate_default < self.agb_rate_tier_2 else self.agb_maximum_c * 44 / 12
                     else:
-                        max_agb = self.agb_maximum_c * 44 / 12
+                        # NOTE: In this case we are in the situation where biomass_final has to be calculated and is not tabulated
+                        agb_rate = self.agb_rate_default * 44 / 12 if not self.agb_rate_tier_2 else self.agb_rate_tier_2 * 44 / 12
+                        bgb_rate = self.bgb_rate_default * 44 / 12 if not self.bgb_rate_tier_2 else self.bgb_rate_tier_2 * 44 / 12
 
-                    biomass_accumulation_rate = agb_rate + bgb_rate
+                        if self.agb_rate_tier_2:
+                            max_agb = 0 if self.agb_rate_default < self.agb_rate_tier_2 else self.agb_maximum_c * 44 / 12
+                        else:
+                            max_agb = self.agb_maximum_c * 44 / 12
 
-                    max_years_growth = max_agb / agb_rate
+                        biomass_accumulation_rate = agb_rate + bgb_rate
 
-                    calculated = self.biomass_start + biomass_accumulation_rate * sum(self.hectares_total) 
-                    tabular = (max_agb + bgb_rate * max_years_growth) * self.hectares_end
+                        max_years_growth = max_agb / agb_rate
 
-                    total = -min(calculated, tabular) if (max_agb != 0 and self.hectares_end != 0) else -calculated
+                        calculated = self.biomass_start + biomass_accumulation_rate * sum(self.hectares_total) 
+                        tabular = (max_agb + bgb_rate * max_years_growth) * self.hectares_end
+
+                        total = -min(calculated, tabular) if (max_agb != 0 and self.hectares_end != 0) else -calculated
 
 
-                    # NOTE: maybe this should be broken down over max_years_growth or over all years of project depending on whether calculated or tabular is used
-                    self.yearly_bio_emissions = breakdown_according_to_values_for_x_years(total, self.total_hectars, len(self.total_hectars))
-                    self.total_bio_emissions = total
+                        # NOTE: maybe this should be broken down over max_years_growth or over all years of project depending on whether calculated or tabular is used
+                        yearly_bio_emissions = breakdown_according_to_values_for_x_years(total, self.hectares_total, len(self.hectares_total))
 
-                    biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_bio_emissions], ActivityTypes.BIOMASS, delay=self.delay)
-                    self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
+                        biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_bio_emissions], ActivityTypes.BIOMASS, delay=self.delay)
+                        self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
+                else:
+                    pass
 
             except Exception as e:
                 traceback.print_exc()
