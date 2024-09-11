@@ -3825,27 +3825,29 @@ class RoadCalculator(BaseCalculator):
         self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
 
-        if module.is_with():
+        if parent.is_with():
             self.inputs_w = {
                 "ef_ipcc": self.ef.value,
                 "ef_tier_2": module.ef_t2_w,
-                "area": module.length_km_w * module.width_m_w,
+                "units_end": module.length_km_w * module.width_m_w,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
                 "rate_type": activity.change_rate.name,
+                "delay": self.activity.delay,
             }
 
             self.math_w = MathRoads(**self.inputs_w)
             self.math_w.calculate_emissions()
 
-        if module.is_without():
+        if parent.is_without():
             self.inputs_wo = {
                 "ef_ipcc": self.ef.value,
                 "ef_tier_2": module.ef_t2_wo,
-                "area": module.length_km_wo * module.width_m_wo,
+                "units_end": module.length_km_wo * module.width_m_wo,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
                 "rate_type": activity.change_rate.name,
+                "delay": self.activity.delay,
             }
 
             self.math_wo = MathRoads(**self.inputs_wo)
