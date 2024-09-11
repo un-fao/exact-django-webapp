@@ -267,6 +267,9 @@ class FloodedRiceDefaults(Defaults):
             rice_straw_t2_start_defaults=0,
             rice_straw_t2_w_defaults=0,
             rice_straw_t2_wo_defaults=0,
+            crop_yield_t2_start_default=0,
+            crop_yield_t2_w_default=0,
+            crop_yield_t2_wo_default=0,
         )
 
     def get_defaults(self, calculate=False) -> dict:
@@ -308,6 +311,9 @@ class FloodedRiceDefaults(Defaults):
             rice_straw_t2_start_defaults=defaults.sfo_start.value,
             rice_straw_t2_w_defaults=defaults.sfo_w.value,
             rice_straw_t2_wo_defaults=defaults.sfo_wo.value,
+            crop_yield_t2_start_default=defaults.yield_ref.value,
+            crop_yield_t2_w_default=defaults.yield_ref.value,
+            crop_yield_t2_wo_default=defaults.yield_ref.value,
         )
 
 
