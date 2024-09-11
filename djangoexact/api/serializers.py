@@ -495,8 +495,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
             owner=self.context["request"].user,
         )
 
-    def handle_luc_module(self, has_organic_soil):
-        activity = self.instance
+    def handle_luc_module(self, activity, has_organic_soil):
         luc = LandUseChange.objects.create(
             **self.validated_data["land_use_change"],
             activity=activity,
@@ -645,18 +644,15 @@ class ActivityBuilderSerializer(serializers.Serializer):
             luc = self.instance.landusechange.first()
 
             luc_module_types = list(luc.get_module_types()) + [ModuleType.objects.get(class_name="LandUseChange")] if luc else []
-            new_module_types = list(map(lambda module: module, self.validated_data["module_types"] + luc_module_types) if has_luc_module else [module.class_name for module in self.validated_data["module_types"]])
+            new_module_types = list(map(lambda module: module, self.validated_data["module_types"] + luc_module_types) if has_luc_module else [module for module in self.validated_data["module_types"]])
 
             kept_module_types = list(set(old_module_types) & set(new_module_types))
             removed_module_types = list(set(old_module_types) - set(new_module_types))
             added_module_types = list(set(new_module_types) - set(old_module_types))
 
-            self.instance.module_types.clear()
-            self.instance.module_types.add(*new_module_types)
-            self.instance.save()
-
             for module in removed_module_types:
-                module_instance = getattr(self.instance, module.class_name.lower())
+                ModuleClass = apps.get_model("api", module.class_name)
+                module_instance = ModuleClass.objects.filter(activity=self.instance)
                 if module_instance.exists():
                     module_instance.first().delete()
 
@@ -664,7 +660,8 @@ class ActivityBuilderSerializer(serializers.Serializer):
                 if module.class_name == "LandUseChange":
                     continue
 
-                module_instance = getattr(self.instance, module.class_name.lower()).first()
+                ModuleClass = apps.get_model("api", module.class_name)
+                module_instance = ModuleClass.objects.filter(activity=self.instance).first()
                 if module_instance and module_instance.module_type in luc_module_types:
                     module_instance.land_use_change = luc
                     module_instance.save()
@@ -676,10 +673,15 @@ class ActivityBuilderSerializer(serializers.Serializer):
                 if module.class_name == "LandUseChange" and module in self.validated_data["module_types"]:
                     raise serializers.ValidationError("Land Use Change module cannot be added manually")
 
-                module_instance = getattr(self.instance, module.class_name.lower()).create(activity=self.instance, area=self.validated_data.get("area"))
+                ModuleClass = apps.get_model("api", module.class_name)
+                module_instance = ModuleClass.objects.create(activity=self.instance, area=self.validated_data.get("area"))
                 if luc and module in list(luc.get_module_types()):
                     module_instance.land_use_change = luc
                     module_instance.save()
+
+            self.instance.module_types.clear()
+            self.instance.module_types.add(*new_module_types)
+            self.instance.save()
 
             self.sanitize_input_entries()
 
@@ -695,7 +697,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
             luc = None
             if has_luc_module:
-                luc = self.handle_luc_module(has_organic_soil)
+                luc = self.handle_luc_module(activity, has_organic_soil)
 
             self.create_modules(activity, luc, has_organic_soil, has_luc_module)
             activity.save()
