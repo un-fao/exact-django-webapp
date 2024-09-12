@@ -109,6 +109,10 @@ class OtherLandUseChanges(BaseModule):
     area: float
     dry_matter_end: float
 
+    # NOTE: This is a check that implies that the final module has growth. Meaning it is either Perennial or Forest
+    # in this case the growth is calculated in the final module, hence the final_biomass has to be set to 0
+    end_module_has_growth : bool
+
     def __post_init__(self):
         super().__post_init__()
 
@@ -121,38 +125,22 @@ class OtherLandUseChanges(BaseModule):
         soc_ref_start = self.soc_start_tier_2 or self.soc_start_default
         soc_ref_end = self.soc_end_tier_2 or self.soc_end_default
 
-        self.area = area
-        self.time_impl = time_impl - delay
-        self.time_cap = time_cap
-        self.rate = rate
-        self.delay = delay
-
-        self.dry_matter_end = dry_matter_end
-
-        self.fmg_start = self.fmg_start_tier_2 if self.fmg_start_tier_2 else self.fmg_start_default
-        self.fmg_end = self.fmg_end_tier_2 if self.fmg_end_tier_2 else self.fmg_end_default
-        self.flu_start = self.flu_start_tier_2 if self.flu_start_tier_2 else self.flu_start_default
-        self.flu_end = self.flu_end_tier_2 if self.flu_end_tier_2 else self.flu_end_default
-        self.fi_start = self.fi_start_tier_2 if self.fi_start_tier_2 else self.fi_start_default
-        self.fi_end = self.fi_end_tier_2 if self.fi_end_tier_2 else self.fi_end_default
-
-        # AUXILIARY VARIABLES FOR SOIL CALCULATION
-        self.hectars_before_20, self.hectars_after_20 = yearly_time_dependent_20_year_breakdown(0, self.area, self.time_impl, self.time_cap, self.rate)
-        self.total_hectars = yearly_time_dependent_parameter_breakdown(0, self.area, self.time_impl, self.time_cap, self.rate, interim_values=True)
-
-        self.soc_start = self.soc_start_default * self.fmg_start * self.flu_start * self.fi_start if not self.soc_start_tier_2 else self.soc_start_tier_2
-        self.soc_end = self.soc_end_default * self.fmg_end * self.flu_end * self.fi_end if not self.soc_end_tier_2 else self.soc_end_tier_2
-
-        self.result = Result(self.time_impl, self.time_cap)
+        self.soc_start = soc_ref_start * fmg_start * fi_start * flu_start
+        self.soc_end = soc_ref_end * fmg_end * fi_end * flu_end
+        
 
     def calculate_emissions(self):
-       
+        
         def calculate_biomass():
             try:
                 # TODO: talk to Claudio, there is a problem here where there is a value for biomass change in emissions, even though initial and final should be the same
                 initial_biomass_without_removal = self.initial_lu_biomass if not self.initial_lu_biomass_tier_2 else self.initial_lu_biomass_tier_2
                 final_biomass = self.final_lu_biomass if not self.final_lu_biomass_tier_2 else self.final_lu_biomass_tier_2
 
+                # NOTE: here we can see the impact of end_module_has_growth, if it is true, the final_biomass is set to 0, it is Perennial or Forest
+                if self.end_module_has_growth:
+                    final_biomass = 0
+                
                 conversion_factor_dry_matter = 0.47
 
                 initial_biomass = initial_biomass_without_removal - self.dry_matter_end * conversion_factor_dry_matter
