@@ -90,11 +90,10 @@ jobs:
          
     - run: |
         sudo service postgresql start
-        ./cloud_sql_proxy_log -instances=${{ vars.DB_INSTANCE_CONNECTION }}=tcp:${{ vars.DB_PORT }} 2>&1 &
         sed -i 's|\$SERVICE_NAME|${{ vars.SERVICE_NAME }}|g' djangoexact/app.yaml
         sed -i 's|\$PROJECT_ID|${{ vars.PROJECT_ID }}|g' djangoexact/app.yaml
         sed -i 's|\$DB_ENGINE|${{ vars.DB_ENGINE }}|g' djangoexact/app.yaml
-        
+        sed -i 's|\$DB_HOST|${{ vars.DB_HOST }}|g' djangoexact/app.yaml
         sed -i 's|\$DB_USERNAME|${{ vars.DB_USERNAME }}|g' djangoexact/app.yaml
         sed -i 's|\$DB_PASSWORD|${{ secrets.DB_PASSWORD }}|g' djangoexact/app.yaml
         sed -i 's|\$DB_NAME|${{ vars.DB_NAME }}|g' djangoexact/app.yaml
@@ -104,7 +103,7 @@ jobs:
 
         sed -i 's|\$DB_ENGINE|${{ vars.DB_ENGINE }}|g' djangoexact/djangoexact/settings.py
         sed -i 's|\$DB_INSTANCE_CONNECTION|${{ vars.DB_INSTANCE_CONNECTION }}|g' djangoexact/djangoexact/settings.py
-       
+        sed -i 's|\$DB_HOST|${{ vars.DB_HOST }}|g' djangoexact/djangoexact/settings.py
         sed -i 's|\$DB_USERNAME|${{ vars.DB_USERNAME  }}|g' djangoexact/djangoexact/settings.py
         sed -i 's|\$DB_PASSWORD|${{ secrets.DB_PASSWORD }}|g' djangoexact/djangoexact/settings.py
         sed -i 's|\$DB_NAME|${{ vars.DB_NAME }}|g' djangoexact/djangoexact/settings.py
