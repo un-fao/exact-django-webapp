@@ -1179,15 +1179,15 @@ class AnnualCroplandCalculator(BaseCalculator):
     def calculate(self):
         module: AnnualCropland = self.data
 
-        res_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        res_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
 
         r_w, r_wo = AnnualCropCalculator(module).calculate()
 
-        res_w += r_w
-        res_wo += r_wo
+        self.results_w += r_w
+        self.results_wo += r_wo
 
-        return (res_w, res_wo)
+        return (self.results_w, self.results_wo)
 
 
 class AnnualCropCalculator(LandModuleCalculator):

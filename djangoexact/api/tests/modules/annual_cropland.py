@@ -8,6 +8,8 @@ from ipcc.models import *
 from ..factories import *
 import api.tests.base_test_classes as t
 
+import api.results as results
+
 
 class AnnualCroplandTest(t.ModuleTest):
     def __init__(self):
@@ -17,6 +19,9 @@ class AnnualCroplandTest(t.ModuleTest):
 
     def test(self):
         self.calculate_results()
+
+        res = results.AnnualCroplandResult(self.module)
+        res.get_result()
 
 
 AnnualCroplandTest().test()
