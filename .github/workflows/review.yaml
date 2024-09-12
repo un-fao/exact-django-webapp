@@ -54,7 +54,7 @@ jobs:
       # Step 3: Run Cloud SQL Proxy in background
       - name: Start Cloud SQL Proxy
         run: |
-          ./cloud-sql-proxy -g -p ${{ vars.DB_PORT }} ${{ vars.DB_INSTANCE_CONNECTION }} &
+          ./cloud-sql-proxy -p ${{ vars.DB_PORT }} ${{ vars.DB_INSTANCE_CONNECTION }} &
           sleep 5  # Wait for the proxy to start
 
       # Step 4: Run your application/database commands (example with PostgreSQL)
