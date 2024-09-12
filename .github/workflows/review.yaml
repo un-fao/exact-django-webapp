@@ -25,6 +25,38 @@ jobs:
       - name: Display Python version
         run: python -c "import sys; print(sys.version)"
   
+  test_db_connection:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout your repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Step 1: Set up Google Cloud authentication
+      - name: Set up Google Cloud authentication
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: ${{ secrets.PROJECT_KEYFILE }}
+      
+      # Step 2: Install Cloud SQL Proxy
+      - name: Install Cloud SQL Proxy
+        run: |
+          curl -o cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.11.4/cloud-sql-proxy.linux.amd64
+          chmod +x cloud-sql-proxy
+      
+      # Step 3: Run Cloud SQL Proxy in background
+      - name: Start Cloud SQL Proxy
+        run: |
+          ./cloud-sql-proxy -g -p ${{ vars.DB_PORT }} ${{ vars.DB_INSTANCE_CONNECTION }} &
+          sleep 5  # Wait for the proxy to start
+
+      # Step 4: Run your application/database commands (example with PostgreSQL)
+      - name: Run database migrations
+        run: |
+          psql -h 127.0.0.1 -U ${{ vars.DB_USERNAME }} -d ${{ vars.DB_NAME }} -c "SELECT 1;"
+        env:
+          PGPASSWORD: ${{ secrets.DB_PASSWORD }}
+          
   deploy:
     runs-on: ubuntu-latest
     environment:
