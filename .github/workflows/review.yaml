@@ -53,7 +53,7 @@ jobs:
         sudo apt-get install wget
         wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
         chmod +x cloud_sql_proxy
-        ./cloud_sql_proxy -instances=${{ vars.DB_INSTANCE_CONNECTION }}=tcp:${{ vars.SECONDARY_DB_PORT }} > cloudsql.log 2>&1 &
+        ./cloud_sql_proxy -instances=${{ vars.DB_INSTANCE_CONNECTION }}=tcp:${{ vars.DB_PORT }} > cloudsql.log 2>&1 &
        
         echo 'cat cloudsql.log'
         cat cloudsql.log
