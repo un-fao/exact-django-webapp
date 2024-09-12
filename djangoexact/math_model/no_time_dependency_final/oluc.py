@@ -59,6 +59,10 @@ class OtherLandUseChanges(BaseModule):
     area: float
     dry_matter_end: float
 
+    # NOTE: This is a check that implies that the final module has growth. Meaning it is either Perennial or Forest
+    # in this case the growth is calculated in the final module, hence the final_biomass has to be set to 0
+    end_module_has_growth : bool
+
     def __post_init__(self):
         super().__post_init__()
 
@@ -73,8 +77,10 @@ class OtherLandUseChanges(BaseModule):
 
         self.soc_start = soc_ref_start * fmg_start * fi_start * flu_start
         self.soc_end = soc_ref_end * fmg_end * fi_end * flu_end
+        
 
     def calculate_emissions(self):
+        
         def calculate_biomass():
             try:
                 # TODO: talk to Claudio, there is a problem here where there is a value for biomass change in emissions, even though initial and final should be the same
@@ -82,6 +88,10 @@ class OtherLandUseChanges(BaseModule):
                 initial_biomass_without_removal = self.initial_lu_biomass if not self.initial_lu_biomass_tier_2 else self.initial_lu_biomass_tier_2
                 final_biomass = self.final_lu_biomass if not self.final_lu_biomass_tier_2 else self.final_lu_biomass_tier_2
 
+                # NOTE: here we can see the impact of end_module_has_growth, if it is true, the final_biomass is set to 0, it is Perennial or Forest
+                if self.end_module_has_growth:
+                    final_biomass = 0
+                
                 conversion_factor_dry_matter = 0.47
 
                 initial_biomass = initial_biomass_without_removal - self.dry_matter_end * conversion_factor_dry_matter
