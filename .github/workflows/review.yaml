@@ -54,7 +54,7 @@ jobs:
 
       - name: Start Cloud SQL Proxy
         run: |
-          ./cloud_sql_proxy -instances=${{ vars.DB_INSTANCE_CONNECTION }}=tcp:3306 > cloudsql.log 2>&1 &
+          ./cloud_sql_proxy -instances=${{ vars.DB_INSTANCE_CONNECTION }}=tcp:${{ vars.DB_PORT }} > cloudsql.log 2>&1 &
           sleep 10  # Ensure the proxy is up
           echo 'cat cloudsql.log'
           cat cloudsql.log
@@ -83,13 +83,14 @@ jobs:
       run: 'gcloud auth list --filter=status:ACTIVE --format="value(account)"' 
     - name: 'gcloud deployment'
       uses: actions/checkout@v4
-    - uses: actions/checkout@v4
     - name: Download Cloud SQL Proxy log artifact
       uses: actions/download-artifact@v3
       with:
         name: cloud_sql_proxy_log 
          
     - run: |
+        sudo service postgresql status
+        ./cloud_sql_proxy_log -instances=${{ vars.DB_INSTANCE_CONNECTION }}=tcp:${{ vars.DB_PORT }} 2>&1 &
         sed -i 's|\$SERVICE_NAME|${{ vars.SERVICE_NAME }}|g' djangoexact/app.yaml
         sed -i 's|\$PROJECT_ID|${{ vars.PROJECT_ID }}|g' djangoexact/app.yaml
         sed -i 's|\$DB_ENGINE|${{ vars.DB_ENGINE }}|g' djangoexact/app.yaml
