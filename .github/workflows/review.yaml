@@ -44,17 +44,17 @@ jobs:
         
       - name: 'gcloud deployment'
         uses: actions/checkout@v4
-      
+
       # Step 2: Install Cloud SQL Proxy
       - name: Install Cloud SQL Proxy
         run: |
-          curl -o cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.13.0/cloud-sql-proxy.linux.amd64
-          chmod +x cloud-sql-proxy
+          wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
+          chmod +x cloud_sql_proxy
       
       # Step 3: Run Cloud SQL Proxy in background
       - name: Start Cloud SQL Proxy
         run: |
-          ./cloud-sql-proxy -g -p ${{ vars.DB_PORT }} ${{ vars.DB_INSTANCE_CONNECTION }} &
+          ./cloud_sql_proxy -instances="${{ vars.DB_INSTANCE_CONNECTION }}=tcp:${{ vars.DB_PORT }}" &
           sleep 5  # Wait for the proxy to start
 
       # Step 4: Run your application/database commands (example with PostgreSQL)
