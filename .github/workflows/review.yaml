@@ -50,13 +50,10 @@ jobs:
         curl -O -J https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/${SDK_FILENAME}
         tar -zxvf ${SDK_FILENAME} --directory ${HOME}
         export PATH=${PATH}:${HOME}/google-cloud-sdk/bin
-        sudo apt-get install wget
-        wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
-        chmod +x cloud_sql_proxy
-        ./cloud_sql_proxy -instances=${{ vars.DB_INSTANCE_CONNECTION }}=tcp:${{ vars.DB_PORT }} > cloudsql.log 2>&1 &
-       
-        echo 'cat cloudsql.log'
-        cat cloudsql.log
+
+        curl -o cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.11.4/cloud-sql-proxy.linux.amd64
+        chmod +x cloud-sql-proxy
+        ./cloud-sql-proxy -g -p ${{ vars.DB_PORT }} ${{ vars.DB_INSTANCE_CONNECTION }} &
 
         sed -i 's|\$SERVICE_NAME|${{ vars.SERVICE_NAME }}|g' djangoexact/app.yaml
         sed -i 's|\$PROJECT_ID|${{ vars.PROJECT_ID }}|g' djangoexact/app.yaml
@@ -95,7 +92,7 @@ jobs:
 
         pip install -r djangoexact/requirements.txt
 
-        
+        python djangoexact/manage.py migrate
         python djangoexact/manage.py collectstatic --noinput
 
         pip list
