@@ -99,13 +99,6 @@ class OtherLandUseChanges(BaseModule):
                 if initial_biomass < 0:
                     raise ValueError("Initial biomass cannot be negative, dry_matter * 0.47 (conversion factor) should be less than initial biomass")
 
-                conversion_factor_dry_matter = 0.47
-
-                initial_biomass = initial_biomass_without_removal - self.dry_matter_end * conversion_factor_dry_matter
-
-                if initial_biomass < 0:
-                    raise ValueError("Initial biomass cannot be negative, dry_matter * 0.47 (conversion factor) should be less than initial biomass")
-
                 delta_c_biomass = (final_biomass - initial_biomass) * (-44 / 12)
 
                 # TODO: add logic for comprehension of amount of hectars addressed in one year (not self.total_hectars) and use that for the breakdown and total
