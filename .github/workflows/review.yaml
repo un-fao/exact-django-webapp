@@ -95,7 +95,7 @@ jobs:
 
         pip install -r djangoexact/requirements.txt
 
-        python djangoexact/manage.py migrate
+        
         python djangoexact/manage.py collectstatic --noinput
 
         pip list
