@@ -48,13 +48,13 @@ jobs:
       # Step 2: Install Cloud SQL Proxy
       - name: Install Cloud SQL Proxy
         run: |
-          curl -o cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.11.4/cloud-sql-proxy.linux.amd64
+          curl -o cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.13.0/cloud-sql-proxy.linux.amd64
           chmod +x cloud-sql-proxy
       
       # Step 3: Run Cloud SQL Proxy in background
       - name: Start Cloud SQL Proxy
         run: |
-          ./cloud-sql-proxy -p ${{ vars.DB_PORT }} ${{ vars.DB_INSTANCE_CONNECTION }} &
+          ./cloud-sql-proxy -g -p ${{ vars.DB_PORT }} ${{ vars.DB_INSTANCE_CONNECTION }} &
           sleep 5  # Wait for the proxy to start
 
       # Step 4: Run your application/database commands (example with PostgreSQL)
