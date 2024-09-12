@@ -191,7 +191,6 @@ class OtherLandUseChanges(BaseModule):
             total_em_per_hectar = (methane_emissions + nitrous_emissions) / 1000
 
             total_fire_emissions = total_em_per_hectar * self.area
-            yearly_fire_emissions = yearly_constant_emissions_breakdown(total_fire_emissions, self.implementation_time, self.capitalization_time, self.implementation_time)
 
             # CALCULATE FOR INDIVIDUAL METHANE AND NITROUS EMISSIONS(the calculation on top can be removed in the future)
             methane_em_per_hectar = methane_emissions / 1000
