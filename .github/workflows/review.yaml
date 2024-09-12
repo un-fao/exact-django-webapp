@@ -27,16 +27,23 @@ jobs:
   
   test_db_connection:
     runs-on: ubuntu-latest
+    environment:
+      name: review
     steps:
-      # Checkout your repository
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
       # Step 1: Set up Google Cloud authentication
-      - name: Set up Google Cloud authentication
+      - id: 'Auth_And_Deploy'
         uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: ${{ secrets.PROJECT_KEYFILE }}
+          
+      - name: 'Set Up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+    
+      - name: 'Use gcloud CLI'
+        run: 'gcloud auth list --filter=status:ACTIVE --format="value(account)"' 
+        
+      - name: 'gcloud deployment'
+        uses: actions/checkout@v4
       
       # Step 2: Install Cloud SQL Proxy
       - name: Install Cloud SQL Proxy
