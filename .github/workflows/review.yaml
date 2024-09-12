@@ -32,6 +32,10 @@ jobs:
       name: review   
     steps:
       - uses: actions/checkout@v4
+      - id: 'Auth_And_Deploy'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: ${{ secrets.PROJECT_KEYFILE }}
       - name: Set up Cloud SDK
         run: |
           gcloud config set project ${{ vars.PROJECT_ID }}
