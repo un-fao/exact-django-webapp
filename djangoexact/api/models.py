@@ -1127,6 +1127,12 @@ class LandModule(Module):
     class Meta:
         abstract = True
 
+    def is_perennial(self) -> bool:
+        return self.module_type.class_name == ["PerennialCropland"]
+
+    def is_forest(self) -> bool:
+        return self.module_type.class_name == ["ForestManagement"]
+
 
 class LandSubmodule(Submodule):
     land_use_change = models.OneToOneField("api.LandUseChange", on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s")
