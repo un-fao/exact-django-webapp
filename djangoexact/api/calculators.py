@@ -898,9 +898,6 @@ class DeforestationCalculator(BaseCalculator):
         res_w = math_w.result if math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         res_wo = math_wo.result if math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
 
-        res_w.plot_emissions_and_aggregate_by_activity("defo_w")
-        res_wo.plot_emissions_and_aggregate_by_activity("defo_wo")
-
         return (res_w, res_wo)
 
     def defaults(self) -> DefaultData:
@@ -1163,9 +1160,6 @@ class OtherLandUseCalculator(BaseCalculator):
 
         res_w = self.results_w.result if self.results_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         res_wo = self.results_wo.result if self.results_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-
-        res_w.plot_emissions_and_aggregate_by_activity("oluc_w")
-        res_wo.plot_emissions_and_aggregate_by_activity("oluc_wo")
 
         return (res_w, res_wo)
 
@@ -1634,6 +1628,11 @@ class PerennialCropCalculator(LandModuleCalculator):
         self.residue_availability_t2_w: SimpleNamespace = SimpleNamespace(value=0)
         self.residue_availability_t2_wo: SimpleNamespace = SimpleNamespace(value=0)
 
+        self.calculate_start_w = True
+        self.calculate_start_wo = True
+        self.calculate_w = True
+        self.calculate_wo = True
+
     def get_defaults(self, calculate=False) -> dict:
         super().get_defaults(calculate)
 
@@ -1688,6 +1687,24 @@ class PerennialCropCalculator(LandModuleCalculator):
             self.bg_default_wo = utils.get_or_raise(ipcc.PerennialBGB, cmc | lut_wo_flt, f"PerennialBGB for {module.land_use_type_wo.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_default")
             self.biomass_ef_wo = utils.get_or_raise(ipcc.TotalBiomassAfterDefo, cmc | lut_wo_flt, f"ForestTotalBiomass for {module.land_use_type_wo.name} in {climate.name} climate, {moisture.name} moisture in {region.name} region does not exist", method="get_or_default")
 
+        # Perennial from LUC
+        if self.module_start.module_type.is_luc and module.is_with() and not module.is_start():
+            self.biomass_ef_start.value = 0
+            self.biomass_ef_w.value = None
+            self.calculate_start_w = False
+            self.calculate_start_wo = False
+            self.calculate_w = True
+            self.calculate_wo = False
+
+        # Perennial to LUC
+        if module.is_start() and not module.is_with() and self.module_w.module_type.is_luc and self.module_wo.module_type.is_luc:
+            self.biomass_ef_w.value = 0
+            self.biomass_ef_wo.value = 0
+            self.calculate_start_w = True
+            self.calculate_start_wo = True
+            self.calculate_w = False
+            self.calculate_wo = False
+
     def calculate(self, aggregate_by=BreakdownTypes.TOTAL) -> list[Result]:
         """
         Calculate emissions for a single PerennialCropland module.
@@ -1702,107 +1719,110 @@ class PerennialCropCalculator(LandModuleCalculator):
         self.get_defaults()
 
         if module.is_start():
-            inputs_start_w = {
-                "hectares_start": self.area,
-                "hectares_end": 0,
-                "implementation_time": self.activity.implementation_years,
-                "capitalization_time": self.activity.capitalization_years,
-                "rate_type": change_rate.name,
-                "nitrous_constant": project.gwp.n2o,
-                "methane_constant": project.gwp.ch4,
-                "residue_burnt": module.is_biomass_burned_start,
-                "emission_factor_burning_nitrous_residue": self.burning_emission_factor.n2o,
-                "ef_nitrous_som": self.som.value,
-                "emission_factor_burning_methane": self.burning_emission_factor.ch4,
-                "combustion_factor": self.fires_combustion_factor_start.value,
-                "fire_periodicity_default": self.default_fire_periodicity.value,
-                "fire_periodicity_tier_2": module.fire_periodicity_t2_start,
-                "t_biomass_tier_2": module.residue_availability_t2_start,
-                "agb_rate_default": self.ag_default_start.value,
-                "agb_rate_tier_2": module.agb_t2_start,
-                "agb_maximum_c": self.agb_max_c_start.value,
-                "bgb_rate_default": self.bg_default_start.value,
-                "bgb_rate_tier_2": module.bgb_t2_start,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
-                "soc_start_tier_2": module.soc_t2_start,
-                "soc_end_tier_2": module.soc_t2_w,
-                "fmg_start_default": self.fmg_start.value,
-                "fmg_end_default": self.fmg_w.value,
-                "fmg_start_tier_2": self.module_start.fmg_t2_start,
-                "fmg_end_tier_2": self.module_w.fmg_t2_w,
-                "flu_start_default": self.flu_start.value,
-                "flu_end_default": self.flu_w.value,
-                "flu_start_tier_2": self.module_start.flu_t2_start,
-                "flu_end_tier_2": self.module_w.flu_t2_w,
-                "fi_start_default": self.fi_start.value,
-                "fi_end_default": self.fi_w.value,
-                "fi_start_tier_2": self.module_start.fi_t2_start,
-                "fi_end_tier_2": self.module_w.fi_t2_w,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
-                "delay": self.activity.delay,
-                "biomass_start_default": self.biomass_ef_start.value,
-                "biomass_end_default": self.biomass_ef_w.value,
-                "calculate_biomass": False,
-                "biomass_start_tier_2": self.module_start.get_biomass_t2(utils.ScenarioTypes.START),
-                "biomass_end_tier_2": self.module_w.get_biomass_t2(utils.ScenarioTypes.WITH),
-            }
-            log.debug("Inputs start w: %s", inputs_start_w)
 
-            self.math_start_w = MathPerennialCropland(**inputs_start_w)
-            self.math_start_w.calculate_emissions()
+            if self.calculate_start_w:
+                inputs_start_w = {
+                    "hectares_start": self.area,
+                    "hectares_end": 0,
+                    "implementation_time": self.activity.implementation_years,
+                    "capitalization_time": self.activity.capitalization_years,
+                    "rate_type": change_rate.name,
+                    "nitrous_constant": project.gwp.n2o,
+                    "methane_constant": project.gwp.ch4,
+                    "residue_burnt": module.is_biomass_burned_start,
+                    "emission_factor_burning_nitrous_residue": self.burning_emission_factor.n2o,
+                    "ef_nitrous_som": self.som.value,
+                    "emission_factor_burning_methane": self.burning_emission_factor.ch4,
+                    "combustion_factor": self.fires_combustion_factor_start.value,
+                    "fire_periodicity_default": self.default_fire_periodicity.value,
+                    "fire_periodicity_tier_2": module.fire_periodicity_t2_start,
+                    "t_biomass_tier_2": module.residue_availability_t2_start,
+                    "agb_rate_default": self.ag_default_start.value,
+                    "agb_rate_tier_2": module.agb_t2_start,
+                    "agb_maximum_c": self.agb_max_c_start.value,
+                    "bgb_rate_default": self.bg_default_start.value,
+                    "bgb_rate_tier_2": module.bgb_t2_start,
+                    "soc_start_default": self.soc.value,
+                    "soc_end_default": self.soc.value,
+                    "soc_start_tier_2": module.soc_t2_start,
+                    "soc_end_tier_2": module.soc_t2_w,
+                    "fmg_start_default": self.fmg_start.value,
+                    "fmg_end_default": self.fmg_w.value,
+                    "fmg_start_tier_2": self.module_start.fmg_t2_start,
+                    "fmg_end_tier_2": self.module_w.fmg_t2_w,
+                    "flu_start_default": self.flu_start.value,
+                    "flu_end_default": self.flu_w.value,
+                    "flu_start_tier_2": self.module_start.flu_t2_start,
+                    "flu_end_tier_2": self.module_w.flu_t2_w,
+                    "fi_start_default": self.fi_start.value,
+                    "fi_end_default": self.fi_w.value,
+                    "fi_start_tier_2": self.module_start.fi_t2_start,
+                    "fi_end_tier_2": self.module_w.fi_t2_w,
+                    "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
+                    "delay": self.activity.delay,
+                    "biomass_start_default": self.biomass_ef_start.value,
+                    "biomass_end_default": self.biomass_ef_w.value,
+                    "calculate_biomass": False,
+                    "biomass_start_tier_2": self.module_start.get_biomass_t2(utils.ScenarioTypes.START),
+                    "biomass_end_tier_2": self.module_w.get_biomass_t2(utils.ScenarioTypes.WITH),
+                }
+                log.debug("Inputs start w: %s", inputs_start_w)
 
-            inputs_start_wo = {
-                "hectares_start": self.area,
-                "hectares_end": 0,
-                "implementation_time": self.activity.implementation_years,
-                "capitalization_time": self.activity.capitalization_years,
-                "rate_type": change_rate.name,
-                "nitrous_constant": project.gwp.n2o,
-                "methane_constant": project.gwp.ch4,
-                "residue_burnt": module.is_biomass_burned_start,
-                "emission_factor_burning_nitrous_residue": self.burning_emission_factor.n2o,
-                "ef_nitrous_som": self.som.value,
-                "emission_factor_burning_methane": self.burning_emission_factor.ch4,
-                "combustion_factor": self.fires_combustion_factor_start.value,
-                "fire_periodicity_default": self.default_fire_periodicity.value,
-                "fire_periodicity_tier_2": module.fire_periodicity_t2_start,
-                "t_biomass_tier_2": module.residue_availability_t2_start,
-                "agb_rate_default": self.ag_default_start.value,
-                "agb_rate_tier_2": module.agb_t2_start,
-                "agb_maximum_c": self.agb_max_c_start.value,
-                "bgb_rate_default": self.bg_default_start.value,
-                "bgb_rate_tier_2": module.bgb_t2_start,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
-                "soc_start_tier_2": self.module_start.soc_t2_start,
-                "soc_end_tier_2": self.module_wo.soc_t2_wo,
-                "fmg_start_default": self.fmg_start.value,
-                "fmg_end_default": self.fmg_wo.value,
-                "fmg_start_tier_2": self.module_start.fmg_t2_start,
-                "fmg_end_tier_2": self.module_wo.fmg_t2_wo,
-                "flu_start_default": self.flu_start.value,
-                "flu_end_default": self.flu_wo.value,
-                "flu_start_tier_2": self.module_start.flu_t2_start,
-                "flu_end_tier_2": self.module_wo.flu_t2_wo,
-                "fi_start_default": self.fi_start.value,
-                "fi_end_default": self.fi_wo.value,
-                "fi_start_tier_2": self.module_start.fi_t2_start,
-                "fi_end_tier_2": self.module_wo.fi_t2_wo,
-                "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
-                "delay": self.activity.delay,
-                "biomass_start_default": self.biomass_ef_start.value,
-                "biomass_end_default": self.biomass_ef_wo.value,
-                "calculate_biomass": False,
-                "biomass_start_tier_2": self.module_start.get_biomass_t2(utils.ScenarioTypes.START),
-                "biomass_end_tier_2": self.module_wo.get_biomass_t2(utils.ScenarioTypes.WITHOUT),
-            }
-            log.debug("Input start wo: %s", inputs_start_wo)
+                self.math_start_w = MathPerennialCropland(**inputs_start_w)
+                self.math_start_w.calculate_emissions()
 
-            self.math_start_wo = MathPerennialCropland(**inputs_start_wo)
-            self.math_start_wo.calculate_emissions()
+            if self.calculate_start_wo:
+                inputs_start_wo = {
+                    "hectares_start": self.area,
+                    "hectares_end": 0,
+                    "implementation_time": self.activity.implementation_years,
+                    "capitalization_time": self.activity.capitalization_years,
+                    "rate_type": change_rate.name,
+                    "nitrous_constant": project.gwp.n2o,
+                    "methane_constant": project.gwp.ch4,
+                    "residue_burnt": module.is_biomass_burned_start,
+                    "emission_factor_burning_nitrous_residue": self.burning_emission_factor.n2o,
+                    "ef_nitrous_som": self.som.value,
+                    "emission_factor_burning_methane": self.burning_emission_factor.ch4,
+                    "combustion_factor": self.fires_combustion_factor_start.value,
+                    "fire_periodicity_default": self.default_fire_periodicity.value,
+                    "fire_periodicity_tier_2": module.fire_periodicity_t2_start,
+                    "t_biomass_tier_2": module.residue_availability_t2_start,
+                    "agb_rate_default": self.ag_default_start.value,
+                    "agb_rate_tier_2": module.agb_t2_start,
+                    "agb_maximum_c": self.agb_max_c_start.value,
+                    "bgb_rate_default": self.bg_default_start.value,
+                    "bgb_rate_tier_2": module.bgb_t2_start,
+                    "soc_start_default": self.soc.value,
+                    "soc_end_default": self.soc.value,
+                    "soc_start_tier_2": self.module_start.soc_t2_start,
+                    "soc_end_tier_2": self.module_wo.soc_t2_wo,
+                    "fmg_start_default": self.fmg_start.value,
+                    "fmg_end_default": self.fmg_wo.value,
+                    "fmg_start_tier_2": self.module_start.fmg_t2_start,
+                    "fmg_end_tier_2": self.module_wo.fmg_t2_wo,
+                    "flu_start_default": self.flu_start.value,
+                    "flu_end_default": self.flu_wo.value,
+                    "flu_start_tier_2": self.module_start.flu_t2_start,
+                    "flu_end_tier_2": self.module_wo.flu_t2_wo,
+                    "fi_start_default": self.fi_start.value,
+                    "fi_end_default": self.fi_wo.value,
+                    "fi_start_tier_2": self.module_start.fi_t2_start,
+                    "fi_end_tier_2": self.module_wo.fi_t2_wo,
+                    "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
+                    "delay": self.activity.delay,
+                    "biomass_start_default": self.biomass_ef_start.value,
+                    "biomass_end_default": self.biomass_ef_wo.value,
+                    "calculate_biomass": False,
+                    "biomass_start_tier_2": self.module_start.get_biomass_t2(utils.ScenarioTypes.START),
+                    "biomass_end_tier_2": self.module_wo.get_biomass_t2(utils.ScenarioTypes.WITHOUT),
+                }
+                log.debug("Input start wo: %s", inputs_start_wo)
 
-        if module.is_with():
+                self.math_start_wo = MathPerennialCropland(**inputs_start_wo)
+                self.math_start_wo.calculate_emissions()
+
+        if module.is_with() and self.calculate_w:
             inputs_w = {
                 "hectares_start": 0,
                 "hectares_end": self.area,
@@ -1853,7 +1873,7 @@ class PerennialCropCalculator(LandModuleCalculator):
             self.math_w = MathPerennialCropland(**inputs_w)
             self.math_w.calculate_emissions()
 
-        if module.is_without():
+        if module.is_without() and self.calculate_wo:
             inputs_wo = {
                 "hectares_start": 0,
                 "hectares_end": self.area,
@@ -1908,11 +1928,6 @@ class PerennialCropCalculator(LandModuleCalculator):
         results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-
-        results_start_w.plot_emissions_and_aggregate_by_activity("perennial_start_w")
-        results_start_wo.plot_emissions_and_aggregate_by_activity("perennial_start_wo")
-        results_w.plot_emissions_and_aggregate_by_activity("perennial_w")
-        results_wo.plot_emissions_and_aggregate_by_activity("perennial_wo")
 
         results_tuple = (results_w + results_start_w, results_wo + results_start_wo)
 
@@ -2565,11 +2580,6 @@ class GrasslandCalculator(LandModuleCalculator):
         self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-
-        self.results_start_w.plot_emissions_and_aggregate_by_activity("grassland_start_w")
-        self.results_start_wo.plot_emissions_and_aggregate_by_activity("grassland_start_wo")
-        self.results_w.plot_emissions_and_aggregate_by_activity("grassland_w")
-        self.results_wo.plot_emissions_and_aggregate_by_activity("grassland_wo")
 
         log.debug("END GrasslandCalculator.calculate")
         return (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
@@ -5706,9 +5716,6 @@ class ForestManagementCalculator(BaseCalculator):
 
         results_w = math_w.result if math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         results_wo = math_wo.result if math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-
-        results_w.plot_emissions_and_aggregate_by_activity("forest_w")
-        results_wo.plot_emissions_and_aggregate_by_activity("forest_wo")
 
         results_tuple = (results_w, results_wo)
 
