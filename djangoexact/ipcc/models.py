@@ -33,6 +33,10 @@ class TotalBiomassAfterDefoManager(Manager):
 
 
 class TotalBiomassAfterDefo(Model):
+    """
+    IPCC:1515
+    """
+
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     continent = ForeignKey("api.Region", on_delete=CASCADE)
