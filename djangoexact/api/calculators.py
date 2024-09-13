@@ -1633,6 +1633,11 @@ class PerennialCropCalculator(LandModuleCalculator):
         self.calculate_w = True
         self.calculate_wo = True
 
+        self.end_module_has_growth_start_w = False
+        self.end_module_has_growth_start_wo = False
+        self.end_module_has_growth_w = False
+        self.end_module_has_growth_wo = False
+
     def get_defaults(self, calculate=False) -> dict:
         super().get_defaults(calculate)
 
@@ -1690,7 +1695,8 @@ class PerennialCropCalculator(LandModuleCalculator):
         # Perennial from LUC
         if self.module_start.module_type.is_luc and module.is_with() and not module.is_start():
             self.biomass_ef_start.value = 0
-            self.biomass_ef_w.value = None
+            self.biomass_ef_w.value = 0
+            self.end_module_has_growth_w = True
             self.calculate_start_w = False
             self.calculate_start_wo = False
             self.calculate_w = True
@@ -1765,6 +1771,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                     "calculate_biomass": False,
                     "biomass_start_tier_2": self.module_start.get_biomass_t2(utils.ScenarioTypes.START),
                     "biomass_end_tier_2": self.module_w.get_biomass_t2(utils.ScenarioTypes.WITH),
+                    "end_module_has_growth": self.end_module_has_growth_start_w,
                 }
                 log.debug("Inputs start w: %s", inputs_start_w)
 
@@ -1816,6 +1823,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                     "calculate_biomass": False,
                     "biomass_start_tier_2": self.module_start.get_biomass_t2(utils.ScenarioTypes.START),
                     "biomass_end_tier_2": self.module_wo.get_biomass_t2(utils.ScenarioTypes.WITHOUT),
+                    "end_module_has_growth": self.end_module_has_growth_start_wo,
                 }
                 log.debug("Input start wo: %s", inputs_start_wo)
 
@@ -1867,6 +1875,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "biomass_end_default": self.biomass_ef_w.value,
                 "biomass_start_tier_2": self.module_start.get_biomass_t2(utils.ScenarioTypes.START),
                 "biomass_end_tier_2": self.module_w.get_biomass_t2(utils.ScenarioTypes.WITH),
+                "end_module_has_growth": self.end_module_has_growth_w,
             }
             log.debug("Inputs w: %s", inputs_w)
 
@@ -1918,6 +1927,7 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "biomass_end_default": self.biomass_ef_wo.value,
                 "biomass_start_tier_2": self.module_start.get_biomass_t2(utils.ScenarioTypes.START),
                 "biomass_end_tier_2": self.module_wo.get_biomass_t2(utils.ScenarioTypes.WITHOUT),
+                "end_module_has_growth": self.end_module_has_growth_wo,
             }
             log.debug("Inputs wo: %s", inputs_wo)
 
