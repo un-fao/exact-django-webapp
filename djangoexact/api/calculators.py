@@ -131,6 +131,8 @@ CALCULATE_SOC_SOM_START_WO = False
 CALCULATE_SOC_SOM_W = True
 CALCULATE_SOC_SOM_WO = True
 
+PLOT_GRAPHS = False
+
 
 def is_luc_remaining_same(module: LandModule) -> bool:
     """
@@ -1161,6 +1163,10 @@ class OtherLandUseCalculator(BaseCalculator):
         res_w = self.results_w.result if self.results_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         res_wo = self.results_wo.result if self.results_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
 
+        if PLOT_GRAPHS:
+            res_w.plot_emissions_and_aggregate_by_activity("oluc_w")
+            res_wo.plot_emissions_and_aggregate_by_activity("oluc_wo")
+
         return (res_w, res_wo)
 
     def get_defaults(self, calculate=False) -> dict:
@@ -1941,6 +1947,12 @@ class PerennialCropCalculator(LandModuleCalculator):
         results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
 
+        if PLOT_GRAPHS:
+            results_start_w.plot_emissions_and_aggregate_by_activity("perennial_start_w")
+            results_start_wo.plot_emissions_and_aggregate_by_activity("perennial_start_wo")
+            results_w.plot_emissions_and_aggregate_by_activity("perennial_w")
+            results_wo.plot_emissions_and_aggregate_by_activity("perennial_wo")
+
         results_tuple = (results_w + results_start_w, results_wo + results_start_wo)
 
         return results_tuple
@@ -2592,6 +2604,12 @@ class GrasslandCalculator(LandModuleCalculator):
         self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+
+        if PLOT_GRAPHS:
+            self.results_start_w.plot_emissions_and_aggregate_by_activity("grassland_start_w")
+            self.results_start_wo.plot_emissions_and_aggregate_by_activity("grassland_start_wo")
+            self.results_w.plot_emissions_and_aggregate_by_activity("grassland_w")
+            self.results_wo.plot_emissions_and_aggregate_by_activity("grassland_wo")
 
         log.debug("END GrasslandCalculator.calculate")
         return (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
@@ -5541,6 +5559,7 @@ class ForestManagementCalculator(BaseCalculator):
         Se parliamo di forest management invece usiamo i valori di Secondary > 20 sia per AGB growth che per AGB max.
         """
 
+        # TODO: Delete <20 years logic
         agb_under_20 = forest.get_agb_growth_ref(land_use_type=land_use_type, from_year=0)
         agb_over_20 = forest.get_agb_growth_ref(land_use_type=land_use_type, from_year=21 if "Secondary" in forest.forest_condition_type.name else 0)
 
@@ -5728,6 +5747,10 @@ class ForestManagementCalculator(BaseCalculator):
 
         results_w = math_w.result if math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         results_wo = math_wo.result if math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+
+        if PLOT_GRAPHS:
+            results_w.plot_emissions_and_aggregate_by_activity("forest_w")
+            results_wo.plot_emissions_and_aggregate_by_activity("forest_wo")
 
         results_tuple = (results_w, results_wo)
 
