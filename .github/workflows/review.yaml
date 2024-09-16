@@ -43,7 +43,6 @@ jobs:
           
       - name: Set up Cloud SDK
         run: |
-          gcloud config set project ${{ vars.PROJECT_ID }}
           export CLOUDSDK_CORE_DISABLE_PROMPTS=1
           SDK_VERSION=420.0.0
           SDK_FILENAME=google-cloud-sdk-${SDK_VERSION}-linux-x86_64.tar.gz
@@ -142,7 +141,6 @@ jobs:
         pip list
         sed -i "s|127.0.0.1|${{ vars.DB_HOST }}|g" djangoexact/djangoexact/settings.py
 
-        gcloud config set project ${{ vars.PROJECT_ID }}
         gcloud app deploy djangoexact/app.yaml --project ${{ vars.PROJECT_ID }} --verbosity=debug
         gcloud app versions list --service=${{ vars.SERVICE_NAME }} --project=${{ vars.PROJECT_ID }} --format="value(version.id)" --sort-by="~version.createTime" | tail -n +100 | xargs -r gcloud app versions delete -q
 
