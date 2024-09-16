@@ -89,7 +89,8 @@ jobs:
         name: cloud_sql_proxy_log 
          
     - run: |
-        sudo service postgresql start
+        echo ${{ secrets.PROJECT_KEYFILE }} > /tmp/key-file.json
+        gcloud auth activate-service-account --key-file /tmp/key-file.json
         sed -i 's|\$SERVICE_NAME|${{ vars.SERVICE_NAME }}|g' djangoexact/app.yaml
         sed -i 's|\$PROJECT_ID|${{ vars.PROJECT_ID }}|g' djangoexact/app.yaml
         sed -i 's|\$DB_ENGINE|${{ vars.DB_ENGINE }}|g' djangoexact/app.yaml
@@ -136,3 +137,5 @@ jobs:
         gcloud config set project ${{ vars.PROJECT_ID }}
         gcloud app deploy djangoexact/app.yaml --project ${{ vars.PROJECT_ID }} --verbosity=debug
         gcloud app versions list --service=${{ vars.SERVICE_NAME }} --project=${{ vars.PROJECT_ID }} --format="value(version.id)" --sort-by="~version.createTime" | tail -n +100 | xargs -r gcloud app versions delete -q
+
+     #line 129    python djangoexact/manage.py migrate
