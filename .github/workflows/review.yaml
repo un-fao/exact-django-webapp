@@ -89,8 +89,7 @@ jobs:
         name: cloud_sql_proxy_log 
          
     - run: |
-        echo ${{ secrets.PROJECT_KEYFILE }} > /tmp/key-file.json
-        gcloud auth activate-service-account --key-file /tmp/key-file.json
+       
         sed -i 's|\$SERVICE_NAME|${{ vars.SERVICE_NAME }}|g' djangoexact/app.yaml
         sed -i 's|\$PROJECT_ID|${{ vars.PROJECT_ID }}|g' djangoexact/app.yaml
         sed -i 's|\$DB_ENGINE|${{ vars.DB_ENGINE }}|g' djangoexact/app.yaml
@@ -128,7 +127,7 @@ jobs:
 
         pip install -r djangoexact/requirements.txt
 
-        python djangoexact/manage.py migrate
+     
         python djangoexact/manage.py collectstatic --noinput
 
         pip list
