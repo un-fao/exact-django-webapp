@@ -28,6 +28,9 @@ jobs:
   workspace_ops:
     needs: setup
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     environment:
       name: review   
     steps:
@@ -70,6 +73,9 @@ jobs:
   deploy:
     needs: workspace_ops
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     environment:
       name: review
     steps:
