@@ -76,8 +76,8 @@ jobs:
     - name: Verify gcloud authentication
       run: gcloud run services list --filter=status:ACTIVE --format="value(account)"    
     
-    - name: 'Checkout Code'
-      uses: actions/checkout@v4  
+    # - name: 'Checkout Code'
+    #   uses: actions/checkout@v4  
 
     - run: |
 
