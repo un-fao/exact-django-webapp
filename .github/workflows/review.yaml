@@ -80,7 +80,7 @@ jobs:
         credentials_json: ${{ secrets.PROJECT_KEYFILE }}
     
     - name: Verify gcloud authentication
-      run: gcloud auth list 
+      run: gcloud run services list --project fao-exact-review
       #  --filter=status:ACTIVE --format="value(account)"    
         
     # - name: 'Set Up Cloud SDK'
