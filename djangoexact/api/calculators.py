@@ -131,7 +131,7 @@ CALCULATE_SOC_SOM_START_WO = False
 CALCULATE_SOC_SOM_W = True
 CALCULATE_SOC_SOM_WO = True
 
-PLOT_GRAPHS = True
+PLOT_GRAPHS = False
 
 
 def is_luc_remaining_same(module: LandModule) -> bool:
@@ -5650,6 +5650,8 @@ class ForestManagementCalculator(BaseCalculator):
                 self.activity.delay,
             ]
 
+            log.debug(f"Forest inputs with: {inputs_w}")
+
             math_w = MathForestManagement(*inputs_w)
             math_w.calculate_emissions()
 
@@ -5721,6 +5723,8 @@ class ForestManagementCalculator(BaseCalculator):
                 project.gwp.ch4,
                 self.activity.delay,
             ]
+
+            log.debug(f"Forest inputs without: {inputs_wo}")
 
             math_wo = MathForestManagement(*inputs_wo)
             math_wo.calculate_emissions()
