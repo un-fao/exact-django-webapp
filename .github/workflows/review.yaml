@@ -79,8 +79,8 @@ jobs:
         service_account: 'github-action-exact-django-web@fao-exact-review.iam.gserviceaccount.com'
     
     - name: Verify gcloud authentication
-      run: gcloud auth list --filter=status:ACTIVE --format="value(account)"    
-       
+      run: gcloud auth list 
+      #  --filter=status:ACTIVE --format="value(account)"    
         
     # - name: 'Set Up Cloud SDK'
     #   uses: 'google-github-actions/setup-gcloud@v2'
