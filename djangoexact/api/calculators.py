@@ -131,7 +131,7 @@ CALCULATE_SOC_SOM_START_WO = False
 CALCULATE_SOC_SOM_W = True
 CALCULATE_SOC_SOM_WO = True
 
-PLOT_GRAPHS = False
+PLOT_GRAPHS = True
 
 
 def is_luc_remaining_same(module: LandModule) -> bool:
@@ -901,34 +901,6 @@ class DeforestationCalculator(BaseCalculator):
         res_wo = math_wo.result if math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
 
         return (res_w, res_wo)
-
-    def defaults(self) -> DefaultData:
-        self.calculate()
-
-        module: CoastalWetland = self.data
-
-        defaults_start = {}
-        defaults_w = {}
-        defaults_wo = {}
-
-        math_start = MathCoastalWetland(*self.inputs_start)
-        math_start_defaults = math_start.evaluate_tier_2_defaults()
-        defaults_start.update(math_start_defaults.start)
-        defaults_start.update(math_start_defaults.other)
-
-        if is_with(module):
-            math_w = MathCoastalWetland(*self.inputs_w)
-            math_w_defaults = math_w.evaluate_tier_2_defaults()
-            defaults_w.update(math_w_defaults.start)
-            defaults_w.update(math_w_defaults.other)
-
-        if is_without(module):
-            math_wo = MathCoastalWetland(*self.inputs_wo)
-            math_wo_defaults = math_wo.evaluate_tier_2_defaults()
-            defaults_wo.update(math_wo_defaults.start)
-            defaults_wo.update(math_wo_defaults.other)
-
-        return DefaultData(defaults_start, defaults_w, defaults_wo)
 
 
 class OtherLandUseCalculator(BaseCalculator):
@@ -2032,6 +2004,7 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
             self.sfw_start = utils.get_or_raise(ipcc.RiceSFW, h2o_mgmt_after_start_flt, f"RiceSFW for {module.water_management_type_after_cultivation_start} does not exist")
             self.sfp_start = utils.get_or_raise(ipcc.RiceSFP, h2o_mgmt_before_start_flt, f"RiceSFP for {module.water_management_type_before_cultivation_start} does not exist")
             self.sfo_start = utils.get_or_raise(ipcc.RiceSFO, organic_amendment_start_flt, f"RiceSFO for {module.organic_amendment_type_start} does not exist")
+            self.biomass_ef_start = utils.get_or_raise(ipcc.ForestTotalBiomass, climate_flt | moisture_flt | region_flt | {"land_use_type": module.land_use_type_start}, f"ForestTotalBiomass for {self.climate.name} in {self.region.name} does not exist")
 
         if module_for_checks.is_with():
             h2o_mgmt_before_w_flt = {"water_management_type_before_cultivation": module.water_management_type_before_cultivation_w}
@@ -2246,7 +2219,7 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "straw_burnt": module.organic_amendment_type_w.name == "Straw Burnt",
                 "delay": self.activity.delay,
                 "ef_nitrous_som": self.som.value,
-                "calculate_biomass": module.is_luc_remaining_same(),
+                "calculate_biomass": module.is_start() and module.is_with(),
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_w.value,
                 "biomass_start_tier_2": module.biomass_t2_start,
@@ -2305,7 +2278,7 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "straw_burnt": module.organic_amendment_type_wo.name == "Straw Burnt",
                 "delay": self.activity.delay,
                 "ef_nitrous_som": self.som.value,
-                "calculate_biomass": module.is_business_as_usual(),
+                "calculate_biomass": module.is_start() and module.is_without(),
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
                 "biomass_start_tier_2": module.biomass_t2_start,
@@ -2320,6 +2293,12 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
         self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+
+        if PLOT_GRAPHS:
+            self.results_start_w.plot_emissions_and_aggregate_by_activity("flooded_rice_start_w")
+            self.results_start_wo.plot_emissions_and_aggregate_by_activity("flooded_rice_start_wo")
+            self.results_w.plot_emissions_and_aggregate_by_activity("flooded_rice_w")
+            self.results_wo.plot_emissions_and_aggregate_by_activity("flooded_rice_wo")
 
         results_tuple = (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
 
@@ -5515,10 +5494,11 @@ class ForestManagementCalculator(BaseCalculator):
         combustion_factor_wo: ipcc.ForestCombustionFactor = utils.get_or_raise(ipcc.ForestCombustionFactor, {"land_use_type": module.land_use_type_wo, "climate": project.climate, "forest_type": forest.forest_type}, f"Combustion Factor WO not found for {module.land_use_type_wo.name}, {project.climate.name}, {forest.forest_type.name}")
 
         mangroves_data = None
-        try:
-            mangroves_data = ipcc.DataOnMangrove.objects.get(climate=project.climate, moisture=project.moisture)
-        except ipcc.DataOnMangrove.DoesNotExist:
-            pass
+        if forest.land_use_type_start.name == "Mangrove Forest":
+            try:
+                mangroves_data = ipcc.DataOnMangrove.objects.get(climate=project.climate, moisture=project.moisture)
+            except ipcc.DataOnMangrove.DoesNotExist:
+                pass
 
         try:
             socref = ipcc.SoilOrganicCarbon.objects.get(climate=project.climate, moisture=project.moisture, soil_type=project.soil_type)
