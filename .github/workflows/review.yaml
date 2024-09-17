@@ -69,10 +69,10 @@ jobs:
     environment:
       name: review
     steps:
-    - id: 'Auth'
-      uses: 'google-github-actions/auth@v2'
-      with:
-        credentials_json: ${{ secrets.PROJECT_KEYFILE }}
+    # - id: 'Auth'
+    #   uses: 'google-github-actions/auth@v2'
+    #   with:
+    #     credentials_json: ${{ secrets.PROJECT_KEYFILE }}
         
     - name: 'Set Up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v2'
@@ -87,6 +87,9 @@ jobs:
     #     name: cloud_sql_proxy_log 
          
     - run: |
+        echo {${{ secrets.PROJECT_KEYFILE }}:0:120}  
+        echo ${{ secrets.PROJECT_KEYFILE }} > /tmp/key-file.json
+        gcloud auth activate-service-account --key-file /tmp/key-file.json
         sed -i 's|\$SERVICE_NAME|${{ vars.SERVICE_NAME }}|g' djangoexact/app.yaml
         sed -i 's|\$PROJECT_ID|${{ vars.PROJECT_ID }}|g' djangoexact/app.yaml
         sed -i 's|\$DB_ENGINE|${{ vars.DB_ENGINE }}|g' djangoexact/app.yaml
