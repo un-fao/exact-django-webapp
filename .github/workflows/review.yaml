@@ -86,9 +86,12 @@ jobs:
     #   with:
     #     name: cloud_sql_proxy_log 
          
+    - name: Sanitize and Write Keyfile
+      run: |
+        echo "${{ secrets.PROJECT_KEYFILE }}" | tr -d '\r' > /tmp/key-file.json
+
     - run: |
-        
-        echo ${{ secrets.PROJECT_KEYFILE }} > /tmp/key-file.json
+    
         gcloud auth activate-service-account --key-file /tmp/key-file.json
         sed -i 's|\$SERVICE_NAME|${{ vars.SERVICE_NAME }}|g' djangoexact/app.yaml
         sed -i 's|\$PROJECT_ID|${{ vars.PROJECT_ID }}|g' djangoexact/app.yaml
