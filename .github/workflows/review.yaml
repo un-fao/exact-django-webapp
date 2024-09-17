@@ -115,7 +115,6 @@ jobs:
 
         pip install -r djangoexact/requirements.txt
 
-        python djangoexact/manage.py migrate
         python djangoexact/manage.py collectstatic --noinput
 
         pip list
@@ -123,7 +122,3 @@ jobs:
         
         gcloud app deploy djangoexact/app.yaml --project ${{ vars.PROJECT_ID }} --verbosity=debug
         gcloud app versions list --service=${{ vars.SERVICE_NAME }} --project=${{ vars.PROJECT_ID }} --format="value(version.id)" --sort-by="~version.createTime" | tail -n +100 | xargs -r gcloud app versions delete -q
-
-     #line 138    python djangoexact/manage.py migrate
-    #  with:
-    #     credentials_json: ${{ secrets.PROJECT_KEYFILE }}
