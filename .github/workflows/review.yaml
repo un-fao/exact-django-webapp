@@ -79,11 +79,9 @@ jobs:
       run: gcloud auth list --filter=status:ACTIVE --format="value(account)"    
 
     - name: Set GOOGLE_APPLICATION_CREDENTIALS
-      run: echo '${{ secrets.PROJECT_KEYFILE }}' > ${HOME}/gcloud.json
-    - name: Authenticate with gcloud
-      run: |
-        export GOOGLE_APPLICATION_CREDENTIALS=${HOME}/gcloud.json
-        gcloud auth activate-service-account --key-file=${HOME}/gcloud.json  
+      run:  |
+        printf "%s" "${{ secrets.PROJECT_KEYFILE }}" > /tmp/key-file.json
+        gcloud auth activate-service-account -key-file /tmp/key-file.json    
     
     - name: Verify gcloud authentication
       run: gcloud auth list --filter=status:ACTIVE --format="value(account)"        
