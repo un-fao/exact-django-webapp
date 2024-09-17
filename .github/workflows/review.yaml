@@ -77,8 +77,8 @@ jobs:
     - name: 'Set Up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v2'
   
-    - name: 'Use gcloud CLI'
-      run:  'gcloud auth list --filter=status:ACTIVE --format="value(account)"' 
+    # - name: 'Use gcloud CLI'
+    #   run:  'gcloud auth list --filter=status:ACTIVE --format="value(account)"' 
     - name: 'gcloud deployment'
       uses: actions/checkout@v4
     # - name: Download Cloud SQL Proxy log artifact
@@ -87,7 +87,7 @@ jobs:
     #     name: cloud_sql_proxy_log 
          
     - run: |
-        echo {${{ secrets.PROJECT_KEYFILE }}:0:120}  
+        
         echo ${{ secrets.PROJECT_KEYFILE }} > /tmp/key-file.json
         gcloud auth activate-service-account --key-file /tmp/key-file.json
         sed -i 's|\$SERVICE_NAME|${{ vars.SERVICE_NAME }}|g' djangoexact/app.yaml
