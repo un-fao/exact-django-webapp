@@ -62,7 +62,7 @@ jobs:
     permissions:
       id-token: 'write'
       contents: 'read'
-      actions: 'write'
+      actions: 'read'
     environment:
       name: review
     steps:
