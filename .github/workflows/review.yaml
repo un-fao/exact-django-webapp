@@ -43,6 +43,7 @@ jobs:
           
       - name: Set up Cloud SDK
         run: |
+          gcloud config set project ${{ vars.PROJECT_ID }}
           export CLOUDSDK_CORE_DISABLE_PROMPTS=1
           SDK_VERSION=420.0.0
           SDK_FILENAME=google-cloud-sdk-${SDK_VERSION}-linux-x86_64.tar.gz
@@ -135,7 +136,7 @@ jobs:
 
         pip install -r djangoexact/requirements.txt
 
-     
+        python djangoexact/manage.py migrate
         python djangoexact/manage.py collectstatic --noinput
 
         pip list
