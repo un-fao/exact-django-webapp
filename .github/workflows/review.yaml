@@ -41,15 +41,6 @@ jobs:
           workload_identity_provider: 'projects/741920004150/locations/global/workloadIdentityPools/fao-exact-review-wip/providers/github'
           service_account: 'github-action-exact-django-web@fao-exact-review.iam.gserviceaccount.com'
           
-      # - name: Set up Cloud SDK
-      #   run: |
-      #     gcloud config set project ${{ vars.PROJECT_ID }}
-      #     export CLOUDSDK_CORE_DISABLE_PROMPTS=1
-      #     SDK_VERSION=420.0.0
-      #     SDK_FILENAME=google-cloud-sdk-${SDK_VERSION}-linux-x86_64.tar.gz
-      #     curl -O -J https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/${SDK_FILENAME}
-      #     tar -zxvf ${SDK_FILENAME} --directory ${HOME}
-      #     export PATH=${PATH}:${HOME}/google-cloud-sdk/bin
 
       - name: Download Cloud SQL Proxy
         run: |
@@ -64,11 +55,11 @@ jobs:
           echo 'cat cloudsql.log'
           cat cloudsql.log
 
-      - name: Save Cloud SQL Proxy as an artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: cloud_sql_proxy_log
-          path: ./cloudsql.log
+      # - name: Save Cloud SQL Proxy as an artifact
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: cloud_sql_proxy_log
+      #     path: ./cloudsql.log
   
   deploy:
     needs: workspace_ops
@@ -79,7 +70,7 @@ jobs:
     environment:
       name: review
     steps:
-    - id: 'Auth_And_Deploy'
+    - id: 'Auth'
       uses: 'google-github-actions/auth@v2'
       with:
         workload_identity_provider: 'projects/741920004150/locations/global/workloadIdentityPools/fao-exact-review-wip/providers/github'
@@ -89,13 +80,13 @@ jobs:
       uses: 'google-github-actions/setup-gcloud@v2'
   
     - name: 'Use gcloud CLI'
-      run: 'gcloud auth list --filter=status:ACTIVE --format="value(account)"' 
+      run:  'gcloud auth list --filter=status:ACTIVE --format="value(account)"' 
     - name: 'gcloud deployment'
       uses: actions/checkout@v4
-    - name: Download Cloud SQL Proxy log artifact
-      uses: actions/download-artifact@v3
-      with:
-        name: cloud_sql_proxy_log 
+    # - name: Download Cloud SQL Proxy log artifact
+    #   uses: actions/download-artifact@v3
+    #   with:
+    #     name: cloud_sql_proxy_log 
          
     - run: |
         sed -i 's|\$SERVICE_NAME|${{ vars.SERVICE_NAME }}|g' djangoexact/app.yaml
