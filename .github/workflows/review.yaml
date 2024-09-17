@@ -100,8 +100,6 @@ jobs:
         sed -i 's|\$DB_PORT|${{ vars.DB_PORT }}|g' djangoexact/djangoexact/settings.py
         sed -i 's|\$ALLOWED_HOST|${{ vars.ALLOWED_HOST }}|g' djangoexact/djangoexact/settings.py
         sed -i 's|\$SECRET_KEY|${{ secrets.GAE_APPLICATION }}|g' djangoexact/djangoexact/settings.py
-        echo "SECRET_KEY after substitution:"
-        grep SECRET_KEY djangoexact/djangoexact/settings.py
         sed -i 's|\\\$EMAIL_HOST|${{ vars.EMAIL_HOST }}|g' djangoexact/djangoexact/settings.py
         sed -i 's|\\\$EMAIL_PORT|${{ vars.EMAIL_PORT }}|g' djangoexact/djangoexact/settings.py
         sed -i 's|\\\$SMTP_USER_EMAIL|${{ vars.SMTP_USER_EMAIL }}|g' djangoexact/djangoexact/settings.py
