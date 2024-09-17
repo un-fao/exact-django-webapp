@@ -74,6 +74,19 @@ jobs:
       with:
         workload_identity_provider: 'projects/741920004150/locations/global/workloadIdentityPools/fao-exact-review-wip/providers/github'
         service_account: 'github-action-exact-django-web@fao-exact-review.iam.gserviceaccount.com'
+    
+    - name: Verify gcloud authentication
+      run: gcloud auth list --filter=status:ACTIVE --format="value(account)"    
+
+    - name: Set GOOGLE_APPLICATION_CREDENTIALS
+      run: echo "${{ secrets.PROJECT_KEYFILE }}" > ${HOME}/gcloud.json
+    - name: Authenticate with gcloud
+      run: |
+        export GOOGLE_APPLICATION_CREDENTIALS=${HOME}/gcloud.json
+        gcloud auth activate-service-account --key-file=${HOME}/gcloud.json  
+    
+    - name: Verify gcloud authentication
+      run: gcloud auth list --filter=status:ACTIVE --format="value(account)"        
         
     - name: 'Set Up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v2'
