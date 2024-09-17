@@ -21,7 +21,7 @@ from .ghg_emissions_classes import (
 
 
 class Deforestation(BaseModule):
-    def __init__(self, ha_start, ha_end, time_impl, time_cap, rate_type_soil, biomass_final_1_year_t_per_ha, biomass_final_1_year_t_per_ha_tier_2, nitrous_constant, methane_constant, fire_bool, n2o_vegetation, ch4_vegetation, cf_vegetation, moisture_emission_factor, litter, litter_tier_2, dw, dw_tier_2, hwp_before_t_dm_per_ha, mangrove_factor, bgb_t_c_per_ha_tier_2, agb_t_c_per_ha_tier_2, agb_t_dm_per_ha_default, bgb_t_dm_per_ha_default_input_parameter, c_n_ratio, soc_after_defo_tier_2, soc_reference_default, soc_reference_tier_2, fmg_start_tier_2, fmg_end_tier_2, fi_start_tier_2, fi_end_tier_2, flu_start_tier_2, flu_end_tier_2, soc_start_tier_2, soc_end_tier_2, fmg_start_default, fmg_end_default, fi_start_default, fi_end_default, flu_start_default, flu_end_default, soc_start_default, soc_end_default, calculate_soc_som, delay, end_module_has_growth):
+    def __init__(self, ha_start, ha_end, time_impl, time_cap, rate_type_soil, biomass_final_1_year_t_per_ha, biomass_final_1_year_t_per_ha_tier_2, nitrous_constant, methane_constant, fire_bool, n2o_vegetation, ch4_vegetation, cf_vegetation, moisture_emission_factor, litter, litter_tier_2, dw, dw_tier_2, hwp_before_t_dm_per_ha, mangrove_factor, bgb_t_c_per_ha_tier_2, agb_t_c_per_ha_tier_2, agb_t_c_per_ha_default, bgb_t_c_per_ha_default_input_parameter, c_n_ratio, soc_after_defo_tier_2, soc_reference_default, soc_reference_tier_2, fmg_start_tier_2, fmg_end_tier_2, fi_start_tier_2, fi_end_tier_2, flu_start_tier_2, flu_end_tier_2, soc_start_tier_2, soc_end_tier_2, fmg_start_default, fmg_end_default, fi_start_default, fi_end_default, flu_start_default, flu_end_default, soc_start_default, soc_end_default, calculate_soc_som, delay, end_module_has_growth):
         self.ha_start = ha_start
         self.ha_end = ha_end
         self.area_deforested = abs(ha_end - ha_start)
@@ -45,8 +45,8 @@ class Deforestation(BaseModule):
         self.mangrove_factor = mangrove_factor
         self.bgb_t_c_per_ha_tier_2 = bgb_t_c_per_ha_tier_2
         self.agb_t_c_per_ha_tier_2 = agb_t_c_per_ha_tier_2
-        self.agb_t_dm_per_ha_default = agb_t_dm_per_ha_default
-        self.bgb_t_dm_per_ha_default_input_parameter = bgb_t_dm_per_ha_default_input_parameter
+        self.agb_t_c_per_ha_default = agb_t_c_per_ha_default
+        self.bgb_t_c_per_ha_default_input_parameter = bgb_t_c_per_ha_default_input_parameter
         self.c_n_ratio = c_n_ratio
         self.soc_after_defo_tier_2 = soc_after_defo_tier_2
         self.soc_reference_default = soc_reference_default
@@ -91,9 +91,9 @@ class Deforestation(BaseModule):
         # self.hectars_before_20 = yearly_time_dependent_20_year_breakdown(0, self.area_deforested, self.time_impl, self.time_cap, self.rate_type_soil)
 
         # TIER 2 VALUES
-        self.agb_t_c_tier_2_default = self.agb_t_dm_per_ha_default * self.mangrove_factor
-        self.bgb_t_c_tier_2_default = self.bgb_t_dm_per_ha_default_input_parameter * self.agb_t_dm_per_ha_default * self.mangrove_factor
-        self.hwp_before_t_c_tier_2_default = self.agb_t_dm_per_ha_default * self.mangrove_factor if self.hwp_before_t_dm_per_ha > self.agb_t_dm_per_ha_default else self.hwp_before_t_dm_per_ha * self.mangrove_factor
+        self.agb_t_c_tier_2_default = self.agb_t_c_per_ha_default
+        self.bgb_t_c_tier_2_default = self.bgb_t_c_per_ha_default_input_parameter * self.agb_t_c_per_ha_default 
+        self.hwp_before_t_c_tier_2_default = self.agb_t_c_per_ha_default if self.hwp_before_t_dm_per_ha * self.mangrove_factor > self.agb_t_c_per_ha_default else self.hwp_before_t_dm_per_ha * self.mangrove_factor
         self.biomass_final_1_year_t_per_ha_tier_2_tier_2_default = self.biomass_final_1_year_t_per_ha_default
         self.litter_tier_2_default = self.litter if not self.litter_tier_2 else self.litter_tier_2
         self.dw_tier_2_default = self.dw if not self.dw_tier_2 else self.dw_tier_2
@@ -128,12 +128,12 @@ class Deforestation(BaseModule):
         def calculate_biomass():
             try:
                 # NOTE: try to make the variable names similar to OLUC
-                bgb_t_dm_per_ha_default = self.bgb_t_dm_per_ha_default_input_parameter * self.agb_t_dm_per_ha_default
+                bgb_t_c_per_ha_default = self.bgb_t_c_per_ha_default_input_parameter * self.agb_t_c_per_ha_default
 
-                agb_t_c = self.agb_t_dm_per_ha_default * self.mangrove_factor if not self.agb_t_c_per_ha_tier_2 else self.agb_t_c_per_ha_tier_2
-                bgb_t_c = bgb_t_dm_per_ha_default * self.mangrove_factor if not self.bgb_t_c_per_ha_tier_2 else self.bgb_t_c_per_ha_tier_2
+                agb_t_c = self.agb_t_c_per_ha_default if not self.agb_t_c_per_ha_tier_2 else self.agb_t_c_per_ha_tier_2
+                bgb_t_c = bgb_t_c_per_ha_default if not self.bgb_t_c_per_ha_tier_2 else self.bgb_t_c_per_ha_tier_2
 
-                hwp_before_t_c = self.agb_t_dm_per_ha_default * self.mangrove_factor if self.hwp_before_t_dm_per_ha > self.agb_t_dm_per_ha_default else self.hwp_before_t_dm_per_ha * self.mangrove_factor
+                hwp_before_t_c = self.agb_t_c_per_ha_default if self.hwp_before_t_dm_per_ha * self.mangrove_factor > self.agb_t_c_per_ha_default else self.hwp_before_t_dm_per_ha * self.mangrove_factor
 
                 if self.biomass_final_1_year_t_per_ha_tier_2:
                     biomass_final_1_year_t_per_ha = self.biomass_final_1_year_t_per_ha_tier_2
@@ -178,10 +178,10 @@ class Deforestation(BaseModule):
 
         def calculate_fire_emissions():
             try:
-                fire_t_dm_per_ha = self.agb_t_dm_per_ha_default - self.hwp_before_t_dm_per_ha if self.fire_bool else 0
+                fire_t_c_per_ha = self.agb_t_c_per_ha_default - self.hwp_before_t_dm_per_ha * self.mangrove_factor if self.fire_bool else 0
 
-                fire_kg_n2o = fire_t_dm_per_ha * self.n2o_vegetation * self.cf_vegetation if self.fire_bool else 0
-                fire_kg_ch4 = fire_t_dm_per_ha * self.ch4_vegetation * self.cf_vegetation if self.fire_bool else 0
+                fire_kg_n2o = fire_t_c_per_ha * self.n2o_vegetation * self.cf_vegetation if self.fire_bool else 0
+                fire_kg_ch4 = fire_t_c_per_ha * self.ch4_vegetation * self.cf_vegetation if self.fire_bool else 0
 
                 total_ch4_n2o_per_ha = (fire_kg_ch4 * self.methane_constant + fire_kg_n2o * self.nitrous_constant) / 1000
 
