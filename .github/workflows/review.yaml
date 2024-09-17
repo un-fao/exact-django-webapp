@@ -43,6 +43,11 @@ jobs:
           sudo apt-get install wget
           wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
           chmod +x cloud_sql_proxy
+          
+      - id: 'Auth'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: ${{ secrets.PROJECT_KEYFILE }}    
 
       - name: Start Cloud SQL Proxy
         run: |
