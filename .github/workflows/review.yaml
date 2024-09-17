@@ -31,6 +31,8 @@ jobs:
     permissions:
       id-token: write
       contents: read
+      actions: read
+  
     environment:
       name: review   
     steps:
@@ -66,22 +68,18 @@ jobs:
     permissions:
       id-token: write
       contents: read
+      actions: read
     environment:
       name: review
     steps:
     - id: 'Auth'
       uses: 'google-github-actions/auth@v2'
       with:
-        workload_identity_provider: 'projects/741920004150/locations/global/workloadIdentityPools/fao-exact-review-wip/providers/github'
-        service_account: 'github-action-exact-django-web@fao-exact-review.iam.gserviceaccount.com'
+        credentials_json: ${{ secrets.PROJECT_KEYFILE }}
     
     - name: Verify gcloud authentication
       run: gcloud auth list --filter=status:ACTIVE --format="value(account)"    
 
-    # - name: Set GOOGLE_APPLICATION_CREDENTIALS
-    #   run:  |
-    #     echo '${{ secrets.PROJECT_KEYFILE }}' > /tmp/key-file.json
-    #     gcloud auth activate-service-account -key-file /tmp/key-file.json    
     
     - name: Verify gcloud authentication
       run: gcloud auth list --filter=status:ACTIVE --format="value(account)"        
