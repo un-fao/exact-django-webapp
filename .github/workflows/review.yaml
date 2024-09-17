@@ -38,23 +38,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
           
-      - name: Download Cloud SQL Proxy
-        run: |
-          sudo apt-get install wget
-          wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
-          chmod +x cloud_sql_proxy
+      # - name: Download Cloud SQL Proxy
+      #   run: |
+      #     sudo apt-get install wget
+      #     wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
+      #     chmod +x cloud_sql_proxy
           
       - id: 'Auth'
         uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: ${{ secrets.PROJECT_KEYFILE }}    
-
-      - name: Start Cloud SQL Proxy
-        run: |
-          ./cloud_sql_proxy -instances=${{ vars.DB_INSTANCE_CONNECTION }}=tcp:3306 > cloudsql.log 2>&1 &
-          sleep 10  # Ensure the proxy is up
-          echo 'cat cloudsql.log'
-          cat cloudsql.log
+      # - name: Start Cloud SQL Proxy
+      #   run: |
+      #     ./cloud_sql_proxy -instances=${{ vars.DB_INSTANCE_CONNECTION }}=tcp:3306 > cloudsql.log 2>&1 &
+      #     sleep 10  # Ensure the proxy is up
+      #     echo 'cat cloudsql.log'
+      #     cat cloudsql.log
+      - name: 'Cloud SQL Proxy'
+        uses: ahmadnassri/action-google-cloud-sql-proxy@v1
+        with:
+          connection: ${{ vars.DB_INSTANCE_CONNECTION }}
+          port: ${{ vars.DB_PORT }}
   
   deploy:
     needs: workspace_ops
