@@ -29,9 +29,9 @@ jobs:
     needs: setup
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
-      contents: read
-      actions: read
+      id-token: 'write'
+      contents: 'read'
+      actions: 'write'
   
     environment:
       name: review   
@@ -66,9 +66,9 @@ jobs:
     needs: workspace_ops
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
-      contents: read
-      actions: read
+      id-token: 'write'
+      contents: 'read'
+      actions: 'write'
     environment:
       name: review
     steps:
