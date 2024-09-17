@@ -52,7 +52,7 @@ jobs:
 
   
   deploy:
-    # needs: workspace_ops
+    needs: setup
     runs-on: ubuntu-latest
     permissions:
       id-token: 'write'
@@ -115,7 +115,7 @@ jobs:
         echo "$(cat djangoexact/djangoexact/settings.py)"
 
         pip install -r djangoexact/requirements.txt
-        python djangoexact/manage.py migrate
+        
         python djangoexact/manage.py collectstatic --noinput
 
         pip list
