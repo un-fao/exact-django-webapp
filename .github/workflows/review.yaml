@@ -77,7 +77,8 @@ jobs:
     - id: 'Auth'
       uses: 'google-github-actions/auth@v2'
       with:
-        credentials_json: ${{ secrets.PROJECT_KEYFILE }}
+        workload_identity_provider: 'projects/741920004150/locations/global/workloadIdentityPools/fao-exact-review-wip/providers/github'
+        service_account: 'github-action-exact-django-web@fao-exact-review.iam.gserviceaccount.com'
     
     - name: Verify gcloud authentication
       run: gcloud run services list --filter=status:ACTIVE --format="value(account)"    
