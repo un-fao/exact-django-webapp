@@ -41,15 +41,15 @@ jobs:
           workload_identity_provider: 'projects/741920004150/locations/global/workloadIdentityPools/fao-exact-review-wip/providers/github'
           service_account: 'github-action-exact-django-web@fao-exact-review.iam.gserviceaccount.com'
           
-      - name: Set up Cloud SDK
-        run: |
-          gcloud config set project ${{ vars.PROJECT_ID }}
-          export CLOUDSDK_CORE_DISABLE_PROMPTS=1
-          SDK_VERSION=420.0.0
-          SDK_FILENAME=google-cloud-sdk-${SDK_VERSION}-linux-x86_64.tar.gz
-          curl -O -J https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/${SDK_FILENAME}
-          tar -zxvf ${SDK_FILENAME} --directory ${HOME}
-          export PATH=${PATH}:${HOME}/google-cloud-sdk/bin
+      # - name: Set up Cloud SDK
+      #   run: |
+      #     gcloud config set project ${{ vars.PROJECT_ID }}
+      #     export CLOUDSDK_CORE_DISABLE_PROMPTS=1
+      #     SDK_VERSION=420.0.0
+      #     SDK_FILENAME=google-cloud-sdk-${SDK_VERSION}-linux-x86_64.tar.gz
+      #     curl -O -J https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/${SDK_FILENAME}
+      #     tar -zxvf ${SDK_FILENAME} --directory ${HOME}
+      #     export PATH=${PATH}:${HOME}/google-cloud-sdk/bin
 
       - name: Download Cloud SQL Proxy
         run: |
@@ -98,7 +98,6 @@ jobs:
         name: cloud_sql_proxy_log 
          
     - run: |
-       
         sed -i 's|\$SERVICE_NAME|${{ vars.SERVICE_NAME }}|g' djangoexact/app.yaml
         sed -i 's|\$PROJECT_ID|${{ vars.PROJECT_ID }}|g' djangoexact/app.yaml
         sed -i 's|\$DB_ENGINE|${{ vars.DB_ENGINE }}|g' djangoexact/app.yaml
@@ -136,7 +135,7 @@ jobs:
 
         pip install -r djangoexact/requirements.txt
 
-        python djangoexact/manage.py migrate
+        
         python djangoexact/manage.py collectstatic --noinput
 
         pip list
@@ -145,4 +144,4 @@ jobs:
         gcloud app deploy djangoexact/app.yaml --project ${{ vars.PROJECT_ID }} --verbosity=debug
         gcloud app versions list --service=${{ vars.SERVICE_NAME }} --project=${{ vars.PROJECT_ID }} --format="value(version.id)" --sort-by="~version.createTime" | tail -n +100 | xargs -r gcloud app versions delete -q
 
-     #line 129    python djangoexact/manage.py migrate
+     #line 138    python djangoexact/manage.py migrate
