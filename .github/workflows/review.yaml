@@ -35,13 +35,12 @@ jobs:
       name: review   
     steps:
       - uses: actions/checkout@v4
-      - id: 'Auth_And_Deploy'
-        uses: 'google-github-actions/auth@v2'
-        with:
-          workload_identity_provider: 'projects/741920004150/locations/global/workloadIdentityPools/fao-exact-review-wip/providers/github'
-          service_account: 'github-action-exact-django-web@fao-exact-review.iam.gserviceaccount.com'
+      # - id: 'Auth_And_Deploy'
+      #   uses: 'google-github-actions/auth@v2'
+      #   with:
+      #     workload_identity_provider: 'projects/741920004150/locations/global/workloadIdentityPools/fao-exact-review-wip/providers/github'
+      #     service_account: 'github-action-exact-django-web@fao-exact-review.iam.gserviceaccount.com'
           
-
       - name: Download Cloud SQL Proxy
         run: |
           sudo apt-get install wget
@@ -73,8 +72,7 @@ jobs:
     - id: 'Auth'
       uses: 'google-github-actions/auth@v2'
       with:
-        workload_identity_provider: 'projects/741920004150/locations/global/workloadIdentityPools/fao-exact-review-wip/providers/github'
-        service_account: 'github-action-exact-django-web@fao-exact-review.iam.gserviceaccount.com'
+        credentials_json: ${{ secrets.PROJECT_KEYFILE }}
         
     - name: 'Set Up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v2'
