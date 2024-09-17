@@ -72,6 +72,8 @@ jobs:
     environment:
       name: review
     steps:
+    - name: 'Checkout Code'
+      uses: actions/checkout@v4  
     - id: 'Auth'
       uses: 'google-github-actions/auth@v2'
       with:
