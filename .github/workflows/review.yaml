@@ -86,9 +86,9 @@ jobs:
     #   with:
     #     name: cloud_sql_proxy_log 
          
-    - name: Sanitize and Write Keyfile
-      run: |
-        echo ${{ secrets.PROJECT_KEYFILE }} > /tmp/key-file.json
+    # - name: Sanitize and Write Keyfile
+    #   run: |
+    #     echo ${{ secrets.PROJECT_KEYFILE }} > /tmp/key-file.json
 
     - run: |
 
