@@ -74,6 +74,7 @@ jobs:
     - name: 'Cloud SQL Proxy'
       uses: ahmadnassri/action-google-cloud-sql-proxy@v1
       with:
+        key: ${{ secrets.PROJECT_KEYFILE }}
         connection: ${{ vars.DB_INSTANCE_CONNECTION }}
         port: ${{ vars.DB_PORT }}  
 
