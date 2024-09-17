@@ -72,7 +72,7 @@ jobs:
       run: gcloud run services list --filter=status:ACTIVE --format="value(account)"  
       
     - name: 'Cloud SQL Proxy'
-      uses: ahmadnassri/action-google-cloud-sql-proxy@v1
+      uses: ahmadnassri/action-google-cloud-sql-proxy@v1.4.0
       with:
         key: ${{ secrets.PROJECT_KEYFILE }}
         connection: ${{ vars.DB_INSTANCE_CONNECTION }}
