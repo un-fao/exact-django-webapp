@@ -3723,6 +3723,12 @@ class SettlementCalculator(LandModuleCalculator):
         self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
 
+        if PLOT_GRAPHS:
+            self.results_start_w.plot_emissions_and_aggregate_by_activity("settlement_start_w")
+            self.results_start_wo.plot_emissions_and_aggregate_by_activity("settlement_start_wo")
+            self.results_w.plot_emissions_and_aggregate_by_activity("settlement_w")
+            self.results_wo.plot_emissions_and_aggregate_by_activity("settlement_wo")
+
         res_w += self.results_start_w
         res_wo += self.results_start_wo
 
