@@ -57,9 +57,9 @@ class ProjectFactory(DjangoModelFactory):
     executing_agency = factory.fuzzy.FuzzyText()
     status = factory.fuzzy.FuzzyChoice(statuses)
 
-    implementation_years = factory.fuzzy.FuzzyInteger(1, 10)
+    implementation_years = factory.fuzzy.FuzzyInteger(5, 10)
     start_year_of_activities = factory.fuzzy.FuzzyInteger(2024, 2024)
-    last_year_of_accounting = factory.fuzzy.FuzzyInteger(2024, 2050)
+    last_year_of_accounting = factory.fuzzy.FuzzyInteger(2050, 2050)
 
     climate = factory.fuzzy.FuzzyChoice(climates)
     moisture = factory.fuzzy.FuzzyChoice(moisture)
