@@ -67,14 +67,22 @@ class PerennialCropland(LandModule):
 
                 kg_nitrous = t_biomass * self.emission_factor_burning_nitrous_residue * self.combustion_factor / fire_periodicity if self.residue_burnt else 0
 
-                co2_crop = (kg_nitrous * self.nitrous_constant + kg_methane * self.methane_constant) / 1000
+                #################### COMPUTATION OF TOTAL NITROUS AND METHANE EMISSIONS ######################
 
-                total = sum(self.hectares_total) * co2_crop
+                nitrous_component = kg_nitrous * self.nitrous_constant / 1000
+                methane_component = kg_methane * self.methane_constant / 1000
 
-                yearly_residue_emissions = breakdown_according_to_values(total, self.hectares_total)
+                total_nitrous = sum(self.hectares_total) * nitrous_component
+                total_methane = sum(self.hectares_total) * methane_component
 
-                residue_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_residue_emissions], ActivityTypes.RESIDUE_BURNING, delay=self.delay)
-                self.result.yearly_emissions_by_sector_by_gas.append(residue_emission_set)
+                yearly_nitrous_emissions = breakdown_according_to_values(total_nitrous, self.hectares_total)
+                yearly_methane_emissions = breakdown_according_to_values(total_methane, self.hectares_total)
+
+                nitrous_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_nitrous_emissions], ActivityTypes.RESIDUE_BURNING, delay=self.delay)
+                methane_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_methane_emissions], ActivityTypes.RESIDUE_BURNING, delay=self.delay)
+                
+                self.result.yearly_emissions_by_sector_by_gas.append(nitrous_emission_set)
+                self.result.yearly_emissions_by_sector_by_gas.append(methane_emission_set)
             except Exception as e:
                 traceback.print_exc()
 
