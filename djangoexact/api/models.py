@@ -723,7 +723,7 @@ class Activity(Historical, NoteMixin):
     climate_t2 = models.ForeignKey(Climate, on_delete=models.CASCADE, null=True, blank=True)
     moisture_t2 = models.ForeignKey(Moisture, on_delete=models.CASCADE, null=True, blank=True)
     soil_type_t2 = models.ForeignKey(SoilType, on_delete=models.CASCADE, null=True, blank=True)
-    duration_t2 = models.IntegerField(default=0)
+    duration_t2 = models.IntegerField(null=True, blank=True)
     start_year_t2 = models.IntegerField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True, null=True)
@@ -780,7 +780,7 @@ class Activity(Historical, NoteMixin):
         return self.duration_t2
 
     def __get_capitalization_years(self) -> int:
-        if any([self.start_year_t2 is None, self.duration_t2 is None]):
+        if any([self.start_year_t2 is None, self.start_year_t2 == 0, self.duration_t2 is None, self.duration_t2 == 0]):
             return self.project.capitalization_years
 
         return self.project.last_year_of_accounting - (self.start_year_t2 + self.duration_t2)
@@ -1126,6 +1126,12 @@ class LandModule(Module):
 
     class Meta:
         abstract = True
+
+    def is_perennial(self) -> bool:
+        return self.module_type.class_name == ["PerennialCropland"]
+
+    def is_forest(self) -> bool:
+        return self.module_type.class_name == ["ForestManagement"]
 
 
 class LandSubmodule(Submodule):

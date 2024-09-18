@@ -41,6 +41,7 @@ class PerennialCropland(LandModule):
     agb_maximum_c: float
     bgb_rate_default: float
     bgb_rate_tier_2: Optional[float]
+    end_module_has_growth: bool
 
     def __post_init__(self):
         super().__post_init__()
@@ -103,7 +104,7 @@ class PerennialCropland(LandModule):
             # NOTE: should this be calculated only for main season?
             try:
                 if self.calculate_biomass:
-                    if self.biomass_start and self.biomass_end:
+                    if not self.end_module_has_growth:
                         # NOTE: This means that we have received values for both (or we have tier 2 values for both)
                         emissions_biomass_yearly, emissions_biomass_total = biomass_emissions(self.biomass_end, self.biomass_start, self.hectares_start, self.hectares_end, self.rate_type, self.implementation_time, self.capitalization_time)
 
@@ -115,7 +116,7 @@ class PerennialCropland(LandModule):
                         agb_rate = self.agb_rate_default * 44 / 12 if not self.agb_rate_tier_2 else self.agb_rate_tier_2 * 44 / 12
                         bgb_rate = self.bgb_rate_default * 44 / 12 if not self.bgb_rate_tier_2 else self.bgb_rate_tier_2 * 44 / 12
 
-                        if self.agb_rate_tier_2:
+                        if self.agb_rate_tier_2:    
                             max_agb = 0 if self.agb_rate_default < self.agb_rate_tier_2 else self.agb_maximum_c * 44 / 12
                         else:
                             max_agb = self.agb_maximum_c * 44 / 12
