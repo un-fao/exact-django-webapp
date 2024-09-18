@@ -1145,25 +1145,6 @@ class OtherLandUseCalculator(BaseCalculator):
         return super().get_defaults(calculate)
 
 
-class AnnualCroplandCalculator(BaseCalculator):
-
-    def get_defaults(self, input: Module) -> dict:
-        return AnnualCropCalculator(input).get_defaults()
-
-    def calculate(self):
-        module: AnnualCropland = self.data
-
-        self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-
-        r_w, r_wo = AnnualCropCalculator(module).calculate()
-
-        self.results_w += r_w
-        self.results_wo += r_wo
-
-        return (self.results_w, self.results_wo)
-
-
 class AnnualCropCalculator(LandModuleCalculator):
     """
     Calculator for annual cropping modules.
@@ -1566,14 +1547,18 @@ class AnnualCropCalculator(LandModuleCalculator):
             self.math_wo = MathAnnualCropland(**self.inputs_wo)
             self.math_wo.calculate_emissions()
 
-        res_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        res_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        res_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        res_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
 
         log.debug("END AnnualCropCalculator.calculate")
 
-        return (res_w + res_start_w, res_wo + res_start_wo)
+        return (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
+
+
+class AnnualCroplandCalculator(AnnualCropCalculator):
+    pass
 
 
 class PerennialCropCalculator(LandModuleCalculator):
