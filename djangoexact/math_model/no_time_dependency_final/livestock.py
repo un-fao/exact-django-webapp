@@ -98,6 +98,8 @@ class Livestock(BaseModule):
         self.n2o_system_direct_head_end_tier_2_default = None
         self.n2o_prp_direct_head_end_tier_2_default = None
 
+        self.livestock_heads_yearly_breakdown = yearly_time_dependent_parameter_breakdown(self.head_number_start, self.head_number_end, self.implementation_time, self.capitalization_time, self.rate_type)
+
 
     def calculate_emissions(self):
         def calculate_methane_enteric_fermentation_emissions():

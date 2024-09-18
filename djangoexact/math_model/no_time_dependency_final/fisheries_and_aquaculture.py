@@ -42,6 +42,10 @@ class Fishery(BaseModule):
     percentage_ice_start: float
     percentage_ice_end: float
 
+    def __post_init__(self):
+        
+        self.tonnes_catch_yearly_breakdown = yearly_time_dependent_parameter_breakdown(self.catch_start, self.catch_end, self.implementation_time, self.capitalization_time, self.rate_type)
+
     def calculate_emissions(self):
         def calculate_catch_emissions():
             try:
