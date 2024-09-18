@@ -897,7 +897,7 @@ class NoScenarioBaseSerializer(BaseGenericModuleSerializer):
             if hasattr(model_instance, scenario_check_method) and getattr(model_instance, scenario_check_method)():
                 # Validate mandatory fields
                 mandatory_fields = config.get("mandatory", [])
-                missing_mandatory_fields = [field for field in mandatory_fields if not combined_data.get(field)]
+                missing_mandatory_fields = [field for field in mandatory_fields if combined_data.get(field) is None]
                 if missing_mandatory_fields:
                     errors[scenario] = f"Missing mandatory fields: {', '.join(missing_mandatory_fields)}"
 
@@ -932,7 +932,7 @@ class ScenarioBaseSerializer(BaseGenericModuleSerializer):
             if hasattr(model_instance, scenario_check_method) and getattr(model_instance, scenario_check_method)():
                 # Validate mandatory fields
                 mandatory_fields = config.get("mandatory", [])
-                missing_mandatory_fields = [field for field in mandatory_fields if not combined_data.get(field)]
+                missing_mandatory_fields = [field for field in mandatory_fields if combined_data.get(field) is None]
                 if missing_mandatory_fields:
                     errors[scenario] = f"Missing mandatory fields: {', '.join(missing_mandatory_fields)}"
 
@@ -1151,7 +1151,7 @@ class ModuleBaseSerializer(AllModulesBaseSerializer):
 
         # Validate mandatory fields
         mandatory_fields = mandatory_fields.get("mandatory", [])
-        missing_mandatory_fields = [field for field in mandatory_fields if not combined_data.get(field)]
+        missing_mandatory_fields = [field for field in mandatory_fields if combined_data.get(field) is None]
         if missing_mandatory_fields:
             errors.append(f"Missing mandatory fields: {', '.join(missing_mandatory_fields)}")
 
@@ -1558,7 +1558,7 @@ class OrganicSoilWriteSerializer(LandModuleWriteSerializer):
         for scenario, config in mandatory_fields.items():
             # Validate mandatory fields
             mandatory_fields = config.get("mandatory", [])
-            missing_mandatory_fields = [field for field in mandatory_fields if not combined_data.get(field)]
+            missing_mandatory_fields = [field for field in mandatory_fields if combined_data.get(field) is None]
             if missing_mandatory_fields:
                 errors[scenario] = f"Missing mandatory fields: {', '.join(missing_mandatory_fields)}"
 
@@ -1566,7 +1566,7 @@ class OrganicSoilWriteSerializer(LandModuleWriteSerializer):
             conditional_fields = config.get("conditional", {})
             for field, dependent_fields in conditional_fields.items():
                 if combined_data.get(field):
-                    missing_dependent_fields = [dep_field for dep_field in dependent_fields if not combined_data.get(dep_field)]
+                    missing_dependent_fields = [dep_field for dep_field in dependent_fields if combined_data.get(dep_field) is None]
                     if missing_dependent_fields:
                         if scenario not in errors:
                             errors[scenario] = []
