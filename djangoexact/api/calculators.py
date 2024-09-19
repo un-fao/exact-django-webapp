@@ -1899,45 +1899,28 @@ class PerennialCropCalculator(LandModuleCalculator):
             self.math_wo = MathPerennialCropland(**inputs_wo)
             self.math_wo.calculate_emissions()
 
-        results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
 
         if PLOT_GRAPHS:
-            results_start_w.plot_emissions_and_aggregate_by_activity("perennial_start_w")
-            results_start_wo.plot_emissions_and_aggregate_by_activity("perennial_start_wo")
-            results_w.plot_emissions_and_aggregate_by_activity("perennial_w")
-            results_wo.plot_emissions_and_aggregate_by_activity("perennial_wo")
+            self.results_start_w.plot_emissions_and_aggregate_by_activity("perennial_start_w")
+            self.results_start_wo.plot_emissions_and_aggregate_by_activity("perennial_start_wo")
+            self.results_w.plot_emissions_and_aggregate_by_activity("perennial_w")
+            self.results_wo.plot_emissions_and_aggregate_by_activity("perennial_wo")
 
-        results_tuple = (results_w + results_start_w, results_wo + results_start_wo)
+        results_tuple = (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
 
         return results_tuple
 
 
-class PerennialCroplandCalculator(BaseCalculator):
+class PerennialCroplandCalculator(PerennialCropCalculator):
     """
     Calculator for perennial cropping.
     """
 
-    def get_defaults(self, calculate=False) -> dict:
-        return PerennialCropCalculator(input).get_defaults(calculate=calculate)
-
-    def calculate(self):
-        log.debug("START PerennialCroplandCalculator.calculate")
-
-        module: PerennialCropland = self.data
-
-        res_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        res_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-
-        r_w, r_wo = PerennialCropCalculator(module).calculate()
-
-        res_w += r_w
-        res_wo += r_wo
-
-        log.debug("END PerennialCroplandCalculator.calculate")
-        return (res_w, res_wo)
+    pass
 
 
 class FloodedRiceSeasonCalculator(LandModuleCalculator):
