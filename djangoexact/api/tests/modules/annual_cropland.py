@@ -8,7 +8,7 @@ from ipcc.models import *
 from ..factories import *
 import api.tests.base_test_classes as t
 
-import djangoexact.api.reports as reports
+import api.reports as reports
 
 
 class AnnualCroplandTest(t.ModuleTest):
@@ -20,8 +20,8 @@ class AnnualCroplandTest(t.ModuleTest):
     def test(self):
         self.calculate_results()
 
-        res = reports.AnnualCroplandReport(self.module)
-        res.get_result()
+        res = reports.BaseProjectReport(self.project)
+        res.build_report()
 
 
 AnnualCroplandTest().test()
