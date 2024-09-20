@@ -70,8 +70,12 @@ class Inputs(BaseModule):
 
 @dataclass
 class OperationPhaseIrrigation(BaseModule):
-    ef_default: float
-    ef_tier_2: Optional[float]
+    ef_co2_default: float
+    ef_co2_tier_2: Optional[float]
+    ef_n2o_default: float
+    ef_n2o_tier_2: Optional[float]
+    ef_ch4_default: float
+    ef_ch4_tier_2: Optional[float]
     total_dynamic_head_tier_2: Optional[float]
     average_pressure_default: float
     average_pressure_tier_2: Optional[float]
@@ -89,13 +93,22 @@ class OperationPhaseIrrigation(BaseModule):
     def calculate_emissions(
         self,
     ):
-        def ef_calculation(ef_default, ef_tier_2, total_dynamic_head_tier_2, average_pressure_default, average_pressure_tier_2, pumping_efficiency_default, pumping_efficiency_tier_2, erh_electricity, fuel_net_calorific_values, fuel_density, depth, gwir):
+        def ef_calculation(ef_co2_default, ef_co2_tier_2, 
+                           ef_n2o_default, ef_n2o_tier_2,
+                            ef_ch4_default, ef_ch4_tier_2,
+                           total_dynamic_head_tier_2, average_pressure_default, 
+                           average_pressure_tier_2, pumping_efficiency_default, 
+                           pumping_efficiency_tier_2, erh_electricity, 
+                           fuel_net_calorific_values, fuel_density, 
+                           depth, gwir):
             try:
                 pumping_efficiency = self.pumping_efficiency_tier_2 or self.pumping_efficiency_default
                 average_pressure = self.average_pressure_tier_2 or self.average_pressure_default
                 total_dynamic_head_default = average_pressure * 10.19
                 total_dynamic_head = total_dynamic_head_tier_2 or total_dynamic_head_default
-                ef = ef_default if not ef_tier_2 else ef_tier_2
+                ef_co2 = ef_co2_tier_2 or ef_co2_default
+                ef_n2o = ef_n2o_tier_2 or ef_n2o_default
+                ef_ch4 = ef_ch4_tier_2 or ef_ch4_default
                 gwir = gwir * 10
                 erh = erh_electricity if erh_electricity else 9.81 / (fuel_net_calorific_values * fuel_density) / math.pow(10, 3)
 
@@ -103,24 +116,45 @@ class OperationPhaseIrrigation(BaseModule):
                 A_efficiency = total_energy / pumping_efficiency
 
                 b_depth_tph = A_efficiency * (depth + total_dynamic_head)
-                C_tco2 = b_depth_tph * ef  ### this is the equivalent of the ef_ipcc in general calculations for input
+                C_tco2_co2 = b_depth_tph * ef_co2  ### this is the equivalent of the ef_ipcc in general calculations for input
+                C_tco2_n2o = b_depth_tph * ef_n2o
+                C_tco2_ch4 = b_depth_tph * ef_ch4
 
-                return C_tco2
+                return C_tco2_co2, C_tco2_n2o, C_tco2_ch4
 
             except:
                 traceback.print_exc()
                 return None
 
         try:
-            ef = ef_calculation(self.ef_default, self.ef_tier_2, self.total_dynamic_head_tier_2, self.average_pressure_default, self.average_pressure_tier_2, self.pumping_efficiency_default, self.pumping_efficiency_tier_2, self.erh_electricity, self.fuel_net_calorific_values, self.fuel_density, self.depth, self.gwir)
+            ef_co2, ef_n2o, ef_ch4 = ef_calculation(self.ef_co2_default, self.ef_co2_tier_2,
+                                            self.ef_n2o_default, self.ef_n2o_tier_2,
+                                            self.ef_ch4_default, self.ef_ch4_tier_2,
+                                            self.total_dynamic_head_tier_2, self.average_pressure_default, 
+                                            self.average_pressure_tier_2, self.pumping_efficiency_default, 
+                                            self.pumping_efficiency_tier_2, self.erh_electricity, 
+                                            self.fuel_net_calorific_values, self.fuel_density, 
+                                            self.depth, self.gwir)
 
             # THESE ARE SAVED IN ORDER TO MULTIPLY BY ELECTRICITY MULTIPLIER
 
             # TODO: CHECK IF THIS CAN BE CHANGED TO HAVING MULTIPLE INPUTS FOR START AND END LIKE FISHERIES ECC (so backend changes from start to end and not start-0 0-end)
-            yearly_emissions, _ = input_single_calculation(self.units_start, self.units_end, ef, None, 1, 1, self.implementation_time, self.capitalization_time, self.rate_type)
-            yearly_emissions = [x * (1 + self.transportation_loss) for x in yearly_emissions] if self.transportation_loss else yearly_emissions
+            yearly_emissions_co2, _ = input_single_calculation(self.units_start, self.units_end, ef_co2, None, 1, 1, self.implementation_time, self.capitalization_time, self.rate_type)
+            yearly_emissions_co2 = [x * (1 + self.transportation_loss) for x in yearly_emissions_co2] if self.transportation_loss else yearly_emissions_co2
 
-            irrigation_operational_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_emissions], ActivityTypes.IRRIGATION_OPERATIONAL, delay=self.delay)
+            yearly_emissions_n2o, _ = input_single_calculation(self.units_start, self.units_end, ef_n2o, None, 1, 1, self.implementation_time, self.capitalization_time, self.rate_type)
+            yearly_emissions_n2o = [x * (1 + self.transportation_loss) for x in yearly_emissions_n2o] if self.transportation_loss else yearly_emissions_n2o
+
+            yearly_emissions_ch4, _ = input_single_calculation(self.units_start, self.units_end, ef_ch4, None, 1, 1, self.implementation_time, self.capitalization_time, self.rate_type)
+            yearly_emissions_ch4 = [x * (1 + self.transportation_loss) for x in yearly_emissions_ch4] if self.transportation_loss else yearly_emissions_ch4
+
+            irrigation_operational_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_emissions_co2], ActivityTypes.IRRIGATION_OPERATIONAL, delay=self.delay)
+            self.result.yearly_emissions_by_sector_by_gas.append(irrigation_operational_emission_set)
+
+            irrigation_operational_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in yearly_emissions_n2o], ActivityTypes.IRRIGATION_OPERATIONAL, delay=self.delay)
+            self.result.yearly_emissions_by_sector_by_gas.append(irrigation_operational_emission_set)
+
+            irrigation_operational_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in yearly_emissions_ch4], ActivityTypes.IRRIGATION_OPERATIONAL, delay=self.delay)
             self.result.yearly_emissions_by_sector_by_gas.append(irrigation_operational_emission_set)
 
         except:
