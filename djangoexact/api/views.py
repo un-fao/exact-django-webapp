@@ -1258,9 +1258,6 @@ def generic_module_viewset(model: Module):
 
             read_serializer = get_module_serializer(model)(instance=module, context={"request": request})
 
-            # TODO: Move this to a signal or a post_save method
-            utils.update_activity_status_and_completion(activity)
-
             return Response(read_serializer.data, status=http_status.HTTP_200_OK)
 
         def partial_update(self, request, *args, **kwargs):

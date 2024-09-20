@@ -358,6 +358,7 @@ class ActivitySerializerWithModules(ActivitySerializer):
 
 
 class WriteActivitySerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Activity
         fields = "__all__"
