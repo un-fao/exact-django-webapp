@@ -17,9 +17,15 @@ from typing import Optional
 class Fishery(BaseModule):
     catch_start: float
     catch_end: float
-    ef_diesel_default: float
-    ef_diesel_start_tier_2: Optional[float]
-    ef_diesel_tier_2_end: Optional[float]
+    ef_diesel_default_co2: float
+    ef_diesel_co2_start_tier_2: Optional[float]
+    ef_diesel_co2_end_tier_2: Optional[float]
+    ef_diesel_default_n2o: float
+    ef_diesel_n2o_start_tier_2: Optional[float]
+    ef_diesel_n2o_end_tier_2: Optional[float]
+    ef_diesel_default_ch4: float
+    ef_diesel_ch4_start_tier_2: Optional[float]
+    ef_diesel_ch4_end_tier_2: Optional[float]
     fui_default_start: float
     fui_default_end: float
     fui_start_tier_2: Optional[float]
@@ -49,29 +55,78 @@ class Fishery(BaseModule):
     def calculate_emissions(self):
         def calculate_catch_emissions():
             try:
-                ef_diesel_start = self.ef_diesel_start_tier_2 or self.ef_diesel_default
-                ef_diesel_end = self.ef_diesel_tier_2_end or self.ef_diesel_default
+                ef_diesel_co2_start = self.ef_diesel_co2_start_tier_2 or self.ef_diesel_default_co2
+                ef_diesel_co2_end = self.ef_diesel_co2_end_tier_2 or self.ef_diesel_default_co2
+
+                ef_diesel_n2o_start = self.ef_diesel_n2o_start_tier_2 or self.ef_diesel_default_n2o
+                ef_diesel_n2o_end = self.ef_diesel_n2o_end_tier_2 or self.ef_diesel_default_n2o
+
+                ef_diesel_ch4_start = self.ef_diesel_ch4_start_tier_2 or self.ef_diesel_default_ch4
+                ef_diesel_ch4_end = self.ef_diesel_ch4_end_tier_2 or self.ef_diesel_default_ch4
 
                 fui_start = self.fui_start_tier_2 or self.fui_default_start
                 fui_end = self.fui_end_tier_2 or self.fui_default_end
 
-                ef_start = fui_start * ef_diesel_start / 1000
-                ef_end = fui_end * ef_diesel_end / 1000
+                # co2 calculation
 
-                annual_start = self.catch_start * ef_start
-                annual_end = self.catch_end * ef_end
+                ef_co2_start = fui_start * ef_diesel_co2_start / 1000
+                ef_co2_end = fui_end * ef_diesel_co2_end / 1000
 
-                emissions_catch_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
+                annual_co2_start = self.catch_start * ef_co2_start
+                annual_co2_end = self.catch_end * ef_co2_end
+
+                emissions_co2_catch_yearly = yearly_time_dependent_parameter_breakdown(annual_co2_start, annual_co2_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(
                     YearlyGasActivityEmissionSet(
                         year=0,
                         gas_type=GasTypes.CO2,
-                        emissions=[Emission(x, GasTypes.CO2) for x in emissions_catch_yearly],
+                        emissions=[Emission(x, GasTypes.CO2) for x in emissions_co2_catch_yearly],
                         activity=ActivityTypes.CATCH,
                         delay=self.delay
                     )
                 )
+
+                # n2o calculation
+
+                ef_n2o_start = fui_start * ef_diesel_n2o_start / 1000
+                ef_n2o_end = fui_end * ef_diesel_n2o_end / 1000
+
+                annual_n2o_start = self.catch_start * ef_n2o_start
+                annual_n2o_end = self.catch_end * ef_n2o_end
+
+                emissions_n2o_catch_yearly = yearly_time_dependent_parameter_breakdown(annual_n2o_start, annual_n2o_end, self.implementation_time, self.capitalization_time, self.rate_type)
+
+                self.result.yearly_emissions_by_sector_by_gas.append(
+                    YearlyGasActivityEmissionSet(
+                        year=0,
+                        gas_type=GasTypes.N2O,
+                        emissions=[Emission(x, GasTypes.N2O) for x in emissions_n2o_catch_yearly],
+                        activity=ActivityTypes.CATCH,
+                        delay=self.delay
+                    )
+                )
+
+                # ch4 calculation
+
+                ef_ch4_start = fui_start * ef_diesel_ch4_start / 1000
+                ef_ch4_end = fui_end * ef_diesel_ch4_end / 1000
+
+                annual_ch4_start = self.catch_start * ef_ch4_start
+                annual_ch4_end = self.catch_end * ef_ch4_end
+
+                emissions_ch4_catch_yearly = yearly_time_dependent_parameter_breakdown(annual_ch4_start, annual_ch4_end, self.implementation_time, self.capitalization_time, self.rate_type)
+
+                self.result.yearly_emissions_by_sector_by_gas.append(
+                    YearlyGasActivityEmissionSet(
+                        year=0,
+                        gas_type=GasTypes.CH4,
+                        emissions=[Emission(x, GasTypes.CH4) for x in emissions_ch4_catch_yearly],
+                        activity=ActivityTypes.CATCH,
+                        delay=self.delay
+                    )
+                )
+
             except Exception as e:
                 traceback.print_exc()
 
