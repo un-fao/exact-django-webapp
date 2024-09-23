@@ -309,10 +309,6 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error("Selected user does not have permission to delete the project")
             return utils.ErrorResponse("Selected user does not have permission to delete the project", status=http_status.HTTP_403_FORBIDDEN)
 
-        if user != project.owner:
-            logging.error("Selected user is not the owner of the project")
-            return utils.ErrorResponse("Only the owner can delete a project.", status=http_status.HTTP_403_FORBIDDEN)
-
         project.delete()
 
         update_change_reason(project, utils.ChangeReasons.DELETE.value)
