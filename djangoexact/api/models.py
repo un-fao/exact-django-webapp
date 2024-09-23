@@ -856,6 +856,9 @@ class Submodule(Historical):
         if not self.status:
             self.status = StatusType.objects.get_or_create(name="EMPTY")[0]
 
+        if not self.pk:
+            utils.create_comment_threads(self)
+
         super().save(*args, **kwargs)
 
     def is_ready(self) -> bool:
@@ -909,6 +912,9 @@ class Module(Historical):
     def save(self, *args, **kwargs):
         if not self.status:
             self.status = StatusType.objects.get_or_create(name="EMPTY")[0]
+
+        if not self.pk:
+            utils.create_comment_threads(self)
 
         super().save(*args, **kwargs)
 

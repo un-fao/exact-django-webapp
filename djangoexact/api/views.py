@@ -1311,8 +1311,6 @@ def generic_module_viewset(model: Module):
 
             module_serializer.save()
 
-            utils.create_comment_threads(module_serializer.instance)
-
             read_serializer = get_module_serializer(model)(instance=module_serializer.instance)
 
             update_change_reason(module_serializer.instance, utils.ChangeReasons.CREATE.value)

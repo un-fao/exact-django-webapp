@@ -538,8 +538,6 @@ class ActivityBuilderSerializer(serializers.Serializer):
                     filters["area"] = self.validated_data.get("area")
                 module_instance = ModuleClass.objects.create(**filters)
 
-            utils.create_comment_threads(module_instance)
-
             module_instance.save()
             update_change_reason(module_instance, "update")
 
