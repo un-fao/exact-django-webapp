@@ -671,8 +671,10 @@ class ActivityBuilderSerializer(serializers.Serializer):
                     module_instance.save()
 
             for module in added_module_types:
-                if module.class_name == "LandUseChange" and module in self.validated_data["module_types"]:
-                    raise serializers.ValidationError("Land Use Change module cannot be added manually")
+                if module.class_name == "LandUseChange":
+                    if module in self.validated_data["module_types"]:
+                        raise serializers.ValidationError("Land Use Change module cannot be added manually")
+                    continue
 
                 ModuleClass = apps.get_model("api", module.class_name)
                 module_instance = ModuleClass.objects.create(activity=self.instance, area=self.validated_data.get("area"))
