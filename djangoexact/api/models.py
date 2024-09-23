@@ -1552,13 +1552,13 @@ class ForestManagement(LandModule, LitterDeadwoodBiomassModule):
     bgb_growth_rate_gt_20_yrs_t2_w = models.FloatField(null=True, blank=True)
     bgb_growth_rate_gt_20_yrs_t2_wo = models.FloatField(null=True, blank=True)
 
-    rotation_start_year_t2_start = models.IntegerField(default=0)
-    rotation_start_year_t2_w = models.IntegerField(default=0)
-    rotation_start_year_t2_wo = models.IntegerField(default=0)
+    rotation_start_year_t2_start = models.IntegerField(null=True, blank=True, default=0)
+    rotation_start_year_t2_w = models.IntegerField(null=True, blank=True, default=0)
+    rotation_start_year_t2_wo = models.IntegerField(null=True, blank=True, default=0)
 
-    logging_start_year_t2_start = models.IntegerField(default=0)
-    logging_start_year_t2_w = models.IntegerField(default=0)
-    logging_start_year_t2_wo = models.IntegerField(default=0)
+    logging_start_year_t2_start = models.IntegerField(null=True, blank=True, default=0)
+    logging_start_year_t2_w = models.IntegerField(null=True, blank=True, default=0)
+    logging_start_year_t2_wo = models.IntegerField(null=True, blank=True, default=0)
 
     logging_dry_matter_logged_t2_start = models.FloatField(null=True, blank=True)
     logging_dry_matter_logged_t2_w = models.FloatField(null=True, blank=True)
