@@ -1320,7 +1320,7 @@ class OrganicSoilReadSerializer(LandModuleSeralizer):
         model = OrganicSoil
         fields = "__all__"
         ref_name = "OrganicSoil"
-        mandatory_fields = {}
+        mandatory_fields = OrganicSoilWriteSerializer.Meta.mandatory_fields
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
