@@ -986,7 +986,7 @@ class LivestockAWMS(Model):
     value = FloatField()
 
     def __str__(self):
-        return f"({self.pk}) {self.livestock_production_type.name} {self.livestock_category_type.name} {self.manure_management_type.name} {self.ipcc_region.name} {self.value}"
+        return f"({self.pk}) {self.livestock_production_type} {self.livestock_category_type} {self.manure_management_type} {self.ipcc_region} {self.value}"
 
     class Meta:
         unique_together = ("livestock_production_type", "manure_management_type", "livestock_category_type", "ipcc_region")
