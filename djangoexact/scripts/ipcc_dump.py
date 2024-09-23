@@ -2466,49 +2466,6 @@ for i, row in enumerate(df_dict):
             value=parse_csv_number(row[df_headers[j]]),
         )
 
-print("Deleting all MethaneManureManagementFactor...")
-LivestockAWMS.objects.all().delete()
-print("Deleted all MethaneManureManagementFactor.")
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "NewLivestockAWMS.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers = df.columns.values.tolist()
-df_dict = df.to_dict("records")
-
-for i, row in enumerate(df_dict):
-    livestock_category_type = LivestockCategoryType.objects.filter(name__iexact=sanitize(row["livestock_category_type"])).first()
-
-    livestock_production_type = LivestockProductionType.objects.filter(name__iexact=sanitize(row["livestock_production_type"])).first()
-
-    ipcc_region = IPCCRegion.objects.filter(name__iexact=sanitize(row["ipcc_region"])).first()
-
-    print(f"{livestock_category_type}, {livestock_production_type}, {ipcc_region}")
-
-    for j, header in enumerate(df_headers, start=3):
-
-        if j == len(df_headers):
-            break
-
-        manure_management_type = ManureManagementType.objects.filter(name__iexact=sanitize(df_headers[j])).first()
-
-        print(manure_management_type)
-
-        LivestockAWMS.objects.create(
-            manure_management_type=manure_management_type,
-            livestock_category_type=livestock_category_type,
-            livestock_production_type=livestock_production_type,
-            ipcc_region=ipcc_region,
-            value=parse_csv_number(row[df_headers[j]]),
-        )
-"""
-
-
-"""
-
 # Climate.objects.get(name__iexact="Tropical Montane").delete()
 Moisture.objects.get(name__iexact="Montane").delete()
 Climate.objects.create(name="Tropical Montane")
@@ -4422,3 +4379,48 @@ for crop in crops:
 
 
 # TODO: Run in develop
+
+print("Deleting all MethaneManureManagementFactor...")
+LivestockAWMS.objects.all().delete()
+print("Deleted all MethaneManureManagementFactor.")
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "NewLivestockAWMS.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers = df.columns.values.tolist()
+df_dict = df.to_dict("records")
+
+awms_list = []
+
+for i, row in enumerate(df_dict):
+    livestock_category_type = LivestockCategoryType.objects.filter(name__iexact=sanitize(row["livestock_category_type"])).first()
+
+    livestock_production_type = LivestockProductionType.objects.filter(name__iexact=sanitize(row["livestock_production_type"])).first()
+
+    ipcc_region = IPCCRegion.objects.filter(name__iexact=sanitize(row["ipcc_region"])).first()
+
+    print(f"{livestock_category_type}, {livestock_production_type}, {ipcc_region}")
+
+    for j, header in enumerate(df_headers, start=3):
+
+        if j == len(df_headers):
+            break
+
+        manure_management_type = ManureManagementType.objects.filter(name__iexact=sanitize(df_headers[j])).first()
+
+        print(manure_management_type, row[df_headers[j]])
+
+        awms_list.append(
+            LivestockAWMS(
+                manure_management_type=manure_management_type,
+                livestock_category_type=livestock_category_type,
+                livestock_production_type=livestock_production_type,
+                ipcc_region=ipcc_region,
+                value=parse_csv_number(row[df_headers[j]]),
+            )
+        )
+
+LivestockAWMS.objects.bulk_create(awms_list)
