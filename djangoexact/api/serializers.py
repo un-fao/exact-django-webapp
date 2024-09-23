@@ -1438,7 +1438,35 @@ class FloodedRiceWriteSerializer(LandModuleSeralizer):
 
 class FloodedRiceReadSerializer(FloodedRiceWriteSerializer):
     minor_seasons = MinorSeasonFloodedRiceReadSerializer(many=True, read_only=True)
-    pass
+
+    class Meta:
+        model = FloodedRice
+        fields = "__all__"
+        ref_name = "FloodedRice"
+        extra_fields = ["minor_seasons"]
+        mandatory_fields = {
+            "start": {
+                "mandatory": [
+                    "water_management_type_before_cultivation_start",
+                    "water_management_type_after_cultivation_start",
+                    "organic_amendment_type_start",
+                ],
+            },
+            "with": {
+                "mandatory": [
+                    "water_management_type_before_cultivation_w",
+                    "water_management_type_after_cultivation_w",
+                    "organic_amendment_type_w",
+                ],
+            },
+            "without": {
+                "mandatory": [
+                    "water_management_type_before_cultivation_wo",
+                    "water_management_type_after_cultivation_wo",
+                    "organic_amendment_type_wo",
+                ],
+            },
+        }
 
 
 # Building

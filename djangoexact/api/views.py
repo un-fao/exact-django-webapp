@@ -1411,7 +1411,7 @@ def generic_module_viewset(model: Module):
             else:
                 activity = module.activity
 
-            serializer = get_module_serializer(model)(data={}, instance=module)
+            serializer = get_module_serializer(model, ActionTypes.UPDATE)(data={}, instance=module)
             serializer.is_valid(raise_exception=True)
             serializer.save()
 
