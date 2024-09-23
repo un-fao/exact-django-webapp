@@ -190,8 +190,13 @@ def copy_activity(activity, new_project=None):
     organic_soil_copy = None
 
     for module in activity.modules:
+        module: api_models.Module
         if module.__class__.__name__ == "LandUseChange" or module.__class__.__name__ == "OrganicSoil":
             continue
+
+        # Get all attributes ending with "_thread" set them to None
+        for thread in module.threads:
+            setattr(module, thread.attname, None)
 
         module_copy = copy.deepcopy(module)
         module_copy.pk = None
@@ -253,8 +258,8 @@ def create_comment_threads(module_instance):
     for attr in dir(module_instance):
         if attr.endswith("_thread") and getattr(module_instance, attr, None) is None:
             setattr(module_instance, attr, api_models.CommentThread.objects.create())
-    module_instance.save()
-    update_change_reason(module_instance, "update")
+    if not module_instance._state.adding:
+        update_change_reason(module_instance, "update")
 
 
 def getany(objects: list[object], key: str):
