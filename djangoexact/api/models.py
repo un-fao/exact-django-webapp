@@ -64,6 +64,7 @@ class CustomUser(AbstractUser):
     country = models.ForeignKey("api.Country", on_delete=models.CASCADE, null=True, blank=True, related_name="users")
     email = models.EmailField(unique=True)
     username = None
+    organization = models.CharField(max_length=255, null=True, blank=True)
     firebase_uid = models.CharField(max_length=255, unique=True, validators=[alphanumeric], null=True, blank=True, verbose_name="Firebase UID")
 
     USERNAME_FIELD = "email"
@@ -2377,3 +2378,10 @@ class Definition(models.Model):
 
     def __str__(self):
         return f"({self.pk}) {self.module_type}"
+
+
+class OrganizationType(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return f"({self.pk}) {self.name}"
