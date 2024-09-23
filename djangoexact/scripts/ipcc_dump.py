@@ -4377,13 +4377,6 @@ for i, row in df.iterrows():
                     agb_growth_max=agb_growth_max * utils.NON_MANGROVE_FACTOR if agb_growth_max else None,
                 )
 
-"""
-
-# TODO: Run in review
-
-
-# TODO: Run in develop
-
 print("Deleting all MethaneManureManagementFactor...")
 LivestockAWMS.objects.all().delete()
 print("Deleted all MethaneManureManagementFactor.")
@@ -4428,3 +4421,11 @@ for i, row in enumerate(df_dict):
         )
 
 LivestockAWMS.objects.bulk_create(awms_list)
+
+
+"""
+
+# TODO: Run in review
+
+
+# TODO: Run in develop
