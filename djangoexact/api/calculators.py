@@ -2648,9 +2648,6 @@ class SmallFisheryCalculator(BaseCalculator):
         except ipcc.ElectricityEmission.DoesNotExist:
             raise ValueError(f"Electricity emission for {project.country.name} does not exist")
 
-        math_w = None
-        math_wo = None
-
         if module.is_with():
             log.debug("IS WITH")
             self.inputs_w = {
@@ -2662,7 +2659,7 @@ class SmallFisheryCalculator(BaseCalculator):
                 "ef_diesel_default_co2": energy_ef_default_co2,
                 "ef_diesel_co2_start_tier_2": module.energy_emission_factor_co2_t2_start,
                 "ef_diesel_co2_end_tier_2": module.energy_emission_factor_co2_t2_w,
-                "ef_diese_default_n2o": energy_ef_default_n2o,
+                "ef_diesel_default_n2o": energy_ef_default_n2o,
                 "ef_diesel_n2o_start_tier_2": module.energy_emission_factor_n2o_t2_start,
                 "ef_diesel_n2o_end_tier_2": module.energy_emission_factor_n2o_t2_w,
                 "ef_diesel_default_ch4": energy_ef_default_ch4,
@@ -2693,8 +2690,8 @@ class SmallFisheryCalculator(BaseCalculator):
             }
             log.debug("Inputs with: %s", self.inputs_w)
 
-            math_w = MathFishery(**self.inputs_w)
-            math_w.calculate_emissions()
+            self.math_w = MathFishery(**self.inputs_w)
+            self.math_w.calculate_emissions()
 
         if module.is_without():
             log.debug("IS WITHOUT")
@@ -2707,7 +2704,7 @@ class SmallFisheryCalculator(BaseCalculator):
                 "ef_diesel_default_co2": energy_ef_default_co2,
                 "ef_diesel_co2_start_tier_2": module.energy_emission_factor_co2_t2_start,
                 "ef_diesel_co2_end_tier_2": module.energy_emission_factor_co2_t2_wo,
-                "ef_diese_default_n2o": energy_ef_default_n2o,
+                "ef_diesel_default_n2o": energy_ef_default_n2o,
                 "ef_diesel_n2o_start_tier_2": module.energy_emission_factor_n2o_t2_start,
                 "ef_diesel_n2o_end_tier_2": module.energy_emission_factor_n2o_t2_wo,
                 "ef_diesel_default_ch4": energy_ef_default_ch4,
@@ -2738,22 +2735,14 @@ class SmallFisheryCalculator(BaseCalculator):
             }
             log.debug("Inputs without: %s", self.inputs_wo)
 
-            math_wo = MathFishery(**self.inputs_wo)
-            math_wo.calculate_emissions()
+            self.math_wo = MathFishery(**self.inputs_wo)
+            self.math_wo.calculate_emissions()
 
-        results_w = math_w.result if math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        results_wo = math_wo.result if math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-
-        log.debug("Results WITH")
-        results_w.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        log.debug("Results WITHOUT")
-        results_wo.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        results_tuple = (results_w, results_wo)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
 
         log.debug("END SmallFisheryCalculator.calculate")
-        return results_tuple
+        return (self.results_w, self.results_wo)
 
     # def get_defaults(self):
     #     self.calculate()
@@ -2878,7 +2867,7 @@ class LargeFisheryCalculator(BaseCalculator):
                 "ef_diesel_default_co2": energy_ef_default_co2,
                 "ef_diesel_co2_start_tier_2": module.energy_emission_factor_co2_t2_start,
                 "ef_diesel_co2_end_tier_2": module.energy_emission_factor_co2_t2_w,
-                "ef_diese_default_n2o": energy_ef_default_n2o,
+                "ef_diesel_default_n2o": energy_ef_default_n2o,
                 "ef_diesel_n2o_start_tier_2": module.energy_emission_factor_n2o_t2_start,
                 "ef_diesel_n2o_end_tier_2": module.energy_emission_factor_n2o_t2_w,
                 "ef_diesel_default_ch4": energy_ef_default_ch4,
@@ -2923,7 +2912,7 @@ class LargeFisheryCalculator(BaseCalculator):
                 "ef_diesel_default_co2": energy_ef_default_co2,
                 "ef_diesel_co2_start_tier_2": module.energy_emission_factor_co2_t2_start,
                 "ef_diesel_co2_end_tier_2": module.energy_emission_factor_co2_t2_w,
-                "ef_diese_default_n2o": energy_ef_default_n2o,
+                "ef_diesel_default_n2o": energy_ef_default_n2o,
                 "ef_diesel_n2o_start_tier_2": module.energy_emission_factor_n2o_t2_start,
                 "ef_diesel_n2o_end_tier_2": module.energy_emission_factor_n2o_t2_w,
                 "ef_diesel_default_ch4": energy_ef_default_ch4,
