@@ -880,6 +880,9 @@ class Submodule(Historical):
     def __get_threads(self: models.Model):
         return [attr for attr in self._meta.get_fields() if attr.name.endswith("_thread")]
 
+    def get_activity(self) -> Activity:
+        return self.parent.activity
+
 
 class Module(Historical):
     class Meta:
@@ -1021,6 +1024,9 @@ class Module(Historical):
 
     def __get_threads(self: models.Model):
         return [attr for attr in self._meta.get_fields() if attr.name.endswith("_thread")]
+
+    def get_activity(self) -> Activity:
+        return self.activity
 
 
 class BiomassModule(Module):
