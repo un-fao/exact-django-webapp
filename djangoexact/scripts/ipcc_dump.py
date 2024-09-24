@@ -4387,11 +4387,6 @@ for i, row in enumerate(df_dict):
 
 LivestockAWMS.objects.bulk_create(awms_list)
 
-
-"""
-
-# TODO: Run in review
-
 log.debug("Deleting all InputEmissionFactor models...")
 EnergyDefaultEmissionFactor.objects.all().delete()
 
@@ -4433,5 +4428,9 @@ for i, row in enumerate(df_dict):
 
 EnergyDefaultEmissionFactor.objects.bulk_create(l)
 
+
+"""
+
+# TODO: Run in review
 
 # TODO: Run in develop
