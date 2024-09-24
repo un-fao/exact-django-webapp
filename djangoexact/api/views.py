@@ -85,6 +85,7 @@ from .serializers import (
 )
 
 from djangoexact.settings import auth
+from django.utils.translation import activate, get_language
 
 
 logger = logging.getLogger("console")
@@ -1433,6 +1434,30 @@ def generic_module_viewset(model: Module):
 
             return Response(data=ChangeHistorySerializer(changes, many=True).data, status=http_status.HTTP_200_OK)
 
+        @action(detail=True, methods=["get"])
+        def definitions(self, request, pk=None):
+            """
+            Returns the definitions for a module.
+            """
+
+            module: Module | Submodule = get_object_or_404(model, pk=pk)
+
+            if module.module_type.is_submodule:
+                activity = module.parent.activity
+
+            else:
+                activity = module.activity
+
+            if not utils.has_project_permission("can_view_modules", self.request.user, activity.project):
+                logging.error("Selected user does not have permission to view this module in the project")
+                return utils.ErrorResponse("Selected user does not have permission to view this module in the project", status=http_status.HTTP_403_FORBIDDEN)
+
+            try:
+                definitions = utils.get_entity_definitions(module.module_type.class_name)
+                return Response(definitions)
+            except Exception as e:
+                return utils.ErrorResponse(str(e))
+
     return GenericModuleViewSet
 
 
@@ -1463,19 +1488,22 @@ class DefinitionViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
 
         module_type_id = request.query_params.get("module_type_id", None)
+        lang = request.GET.get("lang", "en")
+        activate(lang)
 
-        if module_type_id:
-            try:
-                module_type = ModuleType.objects.get(pk=module_type_id)
-            except ModuleType.DoesNotExist:
-                logging.error(f"Module type with id {module_type_id} not found")
-                return utils.ErrorResponse(f"Module type with id {module_type_id} not found", status=http_status.HTTP_400_BAD_REQUEST)
+        if module_type_id is None:
+            return super().list(request)
 
-            definitions = Definition.objects.filter(module_type=module_type).all()
-            serializer = get_model_serializer(Definition)(definitions, many=True)
-            return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+        try:
+            module_type = ModuleType.objects.get(pk=module_type_id)
+        except ModuleType.DoesNotExist:
+            logging.error(f"Module type with id {module_type_id} not found")
+            return utils.ErrorResponse(f"Module type with id {module_type_id} not found", status=http_status.HTTP_400_BAD_REQUEST)
 
-        return super().list(request)
+        definitions = utils.get_entity_definitions(module_type.class_name)
+
+        serializer = get_model_serializer(Definition)(definitions, many=True)
+        return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None):
         """
