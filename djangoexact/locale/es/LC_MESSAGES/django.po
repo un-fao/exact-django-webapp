@@ -1,0 +1,2006 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-09-24 12:37+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+#: api/models.py:540 api/models.py:735
+msgid "owner"
+msgstr ""
+
+#: api/models.py:541
+msgid "date"
+msgstr ""
+
+#: api/models.py:542 api/models.py:720
+msgid "name"
+msgstr ""
+
+#: api/models.py:543
+msgid "code"
+msgstr ""
+
+#: api/models.py:544 api/models.py:722
+msgid "cost"
+msgstr ""
+
+#: api/models.py:545
+msgid "funding_agency"
+msgstr ""
+
+#: api/models.py:546
+msgid "executing_agency"
+msgstr ""
+
+#: api/models.py:547 api/models.py:899
+msgid "status"
+msgstr ""
+
+#: api/models.py:549
+msgid "implementation_years"
+msgstr ""
+
+#: api/models.py:550
+msgid "start_year_of_activities"
+msgstr ""
+
+#: api/models.py:551
+msgid "last_year_of_accounting"
+msgstr ""
+
+#: api/models.py:553 api/models.py:1866
+msgid "country"
+msgstr ""
+
+#: api/models.py:554
+msgid "climate"
+msgstr ""
+
+#: api/models.py:555
+msgid "moisture"
+msgstr ""
+
+#: api/models.py:556
+msgid "soil_type"
+msgstr ""
+
+#: api/models.py:558
+msgid "is_locked"
+msgstr ""
+
+#: api/models.py:559
+msgid "locked_at"
+msgstr ""
+
+#: api/models.py:560
+msgid "lock_updated_at"
+msgstr ""
+
+#: api/models.py:561
+msgid "locked_by"
+msgstr ""
+
+#: api/models.py:563
+msgid "gw_potential"
+msgstr ""
+
+#: api/models.py:565
+msgid "gwp_co2_t2"
+msgstr ""
+
+#: api/models.py:566
+msgid "gwp_ch4_t2"
+msgstr ""
+
+#: api/models.py:567
+msgid "gwp_n2o_t2"
+msgstr ""
+
+#: api/models.py:568
+msgid "gwp_ch4_fossil_t2"
+msgstr ""
+
+#: api/models.py:570
+msgid "soc_ref_t2"
+msgstr ""
+
+#: api/models.py:572 api/models.py:733
+msgid "created_at"
+msgstr ""
+
+#: api/models.py:573 api/models.py:734
+msgid "updated_at"
+msgstr ""
+
+#: api/models.py:719
+msgid "project"
+msgstr ""
+
+#: api/models.py:721
+msgid "description"
+msgstr ""
+
+#: api/models.py:724
+msgid "change_rate"
+msgstr ""
+
+#: api/models.py:725
+msgid "module_types"
+msgstr ""
+
+#: api/models.py:727
+msgid "climate_t2"
+msgstr ""
+
+#: api/models.py:728
+msgid "moisture_t2"
+msgstr ""
+
+#: api/models.py:729 api/models.py:1673
+msgid "soil_type_t2"
+msgstr ""
+
+#: api/models.py:730
+msgid "duration_t2"
+msgstr ""
+
+#: api/models.py:731
+msgid "start_year_t2"
+msgstr ""
+
+#: api/models.py:891
+msgid "activity"
+msgstr ""
+
+#: api/models.py:892
+msgid "start_year"
+msgstr ""
+
+#: api/models.py:895 api/models.py:1675
+msgid "soc_t2_start"
+msgstr ""
+
+#: api/models.py:896 api/models.py:1676
+msgid "soc_t2_w"
+msgstr ""
+
+#: api/models.py:897 api/models.py:1677
+msgid "soc_t2_wo"
+msgstr ""
+
+#: api/models.py:1038
+msgid "biomass_t2_start"
+msgstr ""
+
+#: api/models.py:1039
+msgid "biomass_t2_w"
+msgstr ""
+
+#: api/models.py:1040
+msgid "biomass_t2_wo"
+msgstr ""
+
+#: api/models.py:1053
+msgid "residue_availability_t2_start"
+msgstr ""
+
+#: api/models.py:1054
+msgid "residue_availability_t2_w"
+msgstr ""
+
+#: api/models.py:1055
+msgid "residue_availability_t2_wo"
+msgstr ""
+
+#: api/models.py:1062 api/models.py:1683
+msgid "agb_t2_start"
+msgstr ""
+
+#: api/models.py:1063 api/models.py:1684
+msgid "agb_t2_w"
+msgstr ""
+
+#: api/models.py:1064 api/models.py:1685
+msgid "agb_t2_wo"
+msgstr ""
+
+#: api/models.py:1066 api/models.py:1687
+msgid "bgb_t2_start"
+msgstr ""
+
+#: api/models.py:1067 api/models.py:1688
+msgid "bgb_t2_w"
+msgstr ""
+
+#: api/models.py:1068 api/models.py:1689
+msgid "bgb_t2_wo"
+msgstr ""
+
+#: api/models.py:1081 api/models.py:1691
+msgid "litter_t2_start"
+msgstr ""
+
+#: api/models.py:1082 api/models.py:1692
+msgid "litter_t2_w"
+msgstr ""
+
+#: api/models.py:1083 api/models.py:1693
+msgid "litter_t2_wo"
+msgstr ""
+
+#: api/models.py:1085 api/models.py:1695
+msgid "deadwood_t2_start"
+msgstr ""
+
+#: api/models.py:1086 api/models.py:1696
+msgid "deadwood_t2_w"
+msgstr ""
+
+#: api/models.py:1087 api/models.py:1697
+msgid "deadwood_t2_wo"
+msgstr ""
+
+#: api/models.py:1121
+msgid "land_use_change"
+msgstr ""
+
+#: api/models.py:1122 api/models.py:2261
+msgid "organic_soil"
+msgstr ""
+
+#: api/models.py:1124 api/models.py:1237 api/models.py:1275 api/models.py:1420
+#: api/models.py:1629 api/models.py:1650 api/models.py:2249
+msgid "area"
+msgstr ""
+
+#: api/models.py:1126 api/models.py:1299
+msgid "land_use_type_start"
+msgstr ""
+
+#: api/models.py:1127 api/models.py:1300
+msgid "land_use_type_w"
+msgstr ""
+
+#: api/models.py:1128 api/models.py:1301
+msgid "land_use_type_wo"
+msgstr ""
+
+#: api/models.py:1131
+msgid "flu_t2_start"
+msgstr ""
+
+#: api/models.py:1132
+msgid "flu_t2_w"
+msgstr ""
+
+#: api/models.py:1133
+msgid "flu_t2_wo"
+msgstr ""
+
+#: api/models.py:1135
+msgid "fi_t2_start"
+msgstr ""
+
+#: api/models.py:1136
+msgid "fi_t2_w"
+msgstr ""
+
+#: api/models.py:1137
+msgid "fi_t2_wo"
+msgstr ""
+
+#: api/models.py:1139
+msgid "fmg_t2_start"
+msgstr ""
+
+#: api/models.py:1140
+msgid "fmg_t2_w"
+msgstr ""
+
+#: api/models.py:1141
+msgid "fmg_t2_wo"
+msgstr ""
+
+#: api/models.py:1217 api/models.py:1260
+msgid "tillage_management_type_start"
+msgstr ""
+
+#: api/models.py:1218 api/models.py:1261
+msgid "tillage_management_type_w"
+msgstr ""
+
+#: api/models.py:1219 api/models.py:1262
+msgid "tillage_management_type_wo"
+msgstr ""
+
+#: api/models.py:1222 api/models.py:1265
+msgid "organic_input_type_start"
+msgstr ""
+
+#: api/models.py:1223 api/models.py:1266
+msgid "organic_input_type_w"
+msgstr ""
+
+#: api/models.py:1224 api/models.py:1267
+msgid "organic_input_type_wo"
+msgstr ""
+
+#: api/models.py:1227 api/models.py:1304
+msgid "residue_management_type_start"
+msgstr ""
+
+#: api/models.py:1228 api/models.py:1305
+msgid "residue_management_type_w"
+msgstr ""
+
+#: api/models.py:1229 api/models.py:1306
+msgid "residue_management_type_wo"
+msgstr ""
+
+#: api/models.py:1232 api/models.py:1277 api/models.py:1309 api/models.py:1339
+msgid "crop_yield_t2_start"
+msgstr ""
+
+#: api/models.py:1233 api/models.py:1278 api/models.py:1310 api/models.py:1340
+msgid "crop_yield_t2_w"
+msgstr ""
+
+#: api/models.py:1234 api/models.py:1279 api/models.py:1311 api/models.py:1341
+msgid "crop_yield_t2_wo"
+msgstr ""
+
+#: api/models.py:1239
+msgid "minor_land_use_type_start"
+msgstr ""
+
+#: api/models.py:1240
+msgid "minor_land_use_type_w"
+msgstr ""
+
+#: api/models.py:1241
+msgid "minor_land_use_type_wo"
+msgstr ""
+
+#: api/models.py:1243
+msgid "minor_yield_start"
+msgstr ""
+
+#: api/models.py:1244
+msgid "minor_yield_w"
+msgstr ""
+
+#: api/models.py:1245
+msgid "minor_yield_wo"
+msgstr ""
+
+#: api/models.py:1247
+msgid "minor_residue_management_type_start"
+msgstr ""
+
+#: api/models.py:1248
+msgid "minor_residue_management_type_w"
+msgstr ""
+
+#: api/models.py:1249
+msgid "minor_residue_management_type_wo"
+msgstr ""
+
+#: api/models.py:1251
+msgid "minor_biomass_factor_t2_start"
+msgstr ""
+
+#: api/models.py:1252
+msgid "minor_biomass_factor_t2_w"
+msgstr ""
+
+#: api/models.py:1253
+msgid "minor_biomass_factor_t2_wo"
+msgstr ""
+
+#: api/models.py:1270
+msgid "is_biomass_burned_start"
+msgstr ""
+
+#: api/models.py:1271
+msgid "is_biomass_burned_w"
+msgstr ""
+
+#: api/models.py:1272
+msgid "is_biomass_burned_wo"
+msgstr ""
+
+#: api/models.py:1282
+msgid "agb_max_t2_start"
+msgstr ""
+
+#: api/models.py:1283
+msgid "agb_max_t2_w"
+msgstr ""
+
+#: api/models.py:1284
+msgid "agb_max_t2_wo"
+msgstr ""
+
+#: api/models.py:1286
+msgid "fire_periodicity_t2_start"
+msgstr ""
+
+#: api/models.py:1287
+msgid "fire_periodicity_t2_w"
+msgstr ""
+
+#: api/models.py:1288
+msgid "fire_periodicity_t2_wo"
+msgstr ""
+
+#: api/models.py:1327
+msgid "water_management_type_before_cultivation_start"
+msgstr ""
+
+#: api/models.py:1328
+msgid "water_management_type_before_cultivation_w"
+msgstr ""
+
+#: api/models.py:1329
+msgid "water_management_type_before_cultivation_wo"
+msgstr ""
+
+#: api/models.py:1331
+msgid "water_management_type_after_cultivation_start"
+msgstr ""
+
+#: api/models.py:1332
+msgid "water_management_type_after_cultivation_w"
+msgstr ""
+
+#: api/models.py:1333
+msgid "water_management_type_after_cultivation_wo"
+msgstr ""
+
+#: api/models.py:1344
+msgid "efc_t2_start"
+msgstr ""
+
+#: api/models.py:1345
+msgid "efc_t2_w"
+msgstr ""
+
+#: api/models.py:1346
+msgid "efc_t2_wo"
+msgstr ""
+
+#: api/models.py:1348
+msgid "sfw_t2_start"
+msgstr ""
+
+#: api/models.py:1349
+msgid "sfw_t2_w"
+msgstr ""
+
+#: api/models.py:1350
+msgid "sfw_t2_wo"
+msgstr ""
+
+#: api/models.py:1352
+msgid "sfp_t2_start"
+msgstr ""
+
+#: api/models.py:1353
+msgid "sfp_t2_w"
+msgstr ""
+
+#: api/models.py:1354
+msgid "sfp_t2_wo"
+msgstr ""
+
+#: api/models.py:1356
+msgid "sfo_t2_start"
+msgstr ""
+
+#: api/models.py:1357
+msgid "sfo_t2_w"
+msgstr ""
+
+#: api/models.py:1358
+msgid "sfo_t2_wo"
+msgstr ""
+
+#: api/models.py:1360
+msgid "efi_t2_start"
+msgstr ""
+
+#: api/models.py:1361
+msgid "efi_t2_w"
+msgstr ""
+
+#: api/models.py:1362
+msgid "efi_t2_wo"
+msgstr ""
+
+#: api/models.py:1364
+msgid "rice_straw_t2_start"
+msgstr ""
+
+#: api/models.py:1365
+msgid "rice_straw_t2_w"
+msgstr ""
+
+#: api/models.py:1366
+msgid "rice_straw_t2_wo"
+msgstr ""
+
+#: api/models.py:1368
+msgid "cultivation_period_t2_start"
+msgstr ""
+
+#: api/models.py:1369
+msgid "cultivation_period_t2_w"
+msgstr ""
+
+#: api/models.py:1370
+msgid "cultivation_period_t2_wo"
+msgstr ""
+
+#: api/models.py:1396
+msgid "grassland_management_type_start"
+msgstr ""
+
+#: api/models.py:1397
+msgid "grassland_management_type_w"
+msgstr ""
+
+#: api/models.py:1398
+msgid "grassland_management_type_wo"
+msgstr ""
+
+#: api/models.py:1400 api/models.py:2251
+msgid "is_fire_used_start"
+msgstr ""
+
+#: api/models.py:1401 api/models.py:2252
+msgid "is_fire_used_w"
+msgstr ""
+
+#: api/models.py:1402 api/models.py:2253
+msgid "is_fire_used_wo"
+msgstr ""
+
+#: api/models.py:1405
+msgid "fire_periodicity_start"
+msgstr ""
+
+#: api/models.py:1406
+msgid "fire_periodicity_w"
+msgstr ""
+
+#: api/models.py:1407
+msgid "fire_periodicity_wo"
+msgstr ""
+
+#: api/models.py:1410
+msgid "fire_impact_start"
+msgstr ""
+
+#: api/models.py:1411
+msgid "fire_impact_w"
+msgstr ""
+
+#: api/models.py:1412
+msgid "fire_impact_wo"
+msgstr ""
+
+#: api/models.py:1415
+msgid "yield_start"
+msgstr ""
+
+#: api/models.py:1416
+msgid "yield_w"
+msgstr ""
+
+#: api/models.py:1417
+msgid "yield_wo"
+msgstr ""
+
+#: api/models.py:1422
+msgid "combustion_factor_t2_start"
+msgstr ""
+
+#: api/models.py:1423
+msgid "combustion_factor_t2_w"
+msgstr ""
+
+#: api/models.py:1424
+msgid "combustion_factor_t2_wo"
+msgstr ""
+
+#: api/models.py:1436
+msgid "livestock_category_type"
+msgstr ""
+
+#: api/models.py:1439
+msgid "livestock_production_type_start"
+msgstr ""
+
+#: api/models.py:1440
+msgid "livestock_production_type_w"
+msgstr ""
+
+#: api/models.py:1441
+msgid "livestock_production_type_wo"
+msgstr ""
+
+#: api/models.py:1444
+msgid "production_start"
+msgstr ""
+
+#: api/models.py:1445
+msgid "production_w"
+msgstr ""
+
+#: api/models.py:1446
+msgid "production_wo"
+msgstr ""
+
+#: api/models.py:1449
+msgid "heads_number_start"
+msgstr ""
+
+#: api/models.py:1450
+msgid "heads_number_w"
+msgstr ""
+
+#: api/models.py:1451
+msgid "heads_number_wo"
+msgstr ""
+
+#: api/models.py:1454
+msgid "complementary_manure_management_type_start"
+msgstr ""
+
+#: api/models.py:1455
+msgid "complementary_manure_management_type_w"
+msgstr ""
+
+#: api/models.py:1456
+msgid "complementary_manure_management_type_wo"
+msgstr ""
+
+#: api/models.py:1459
+msgid "enteric_fermentation_t2_start"
+msgstr ""
+
+#: api/models.py:1460
+msgid "enteric_fermentation_t2_w"
+msgstr ""
+
+#: api/models.py:1461
+msgid "enteric_fermentation_t2_wo"
+msgstr ""
+
+#: api/models.py:1463
+msgid "prp_percentage_t2_start"
+msgstr ""
+
+#: api/models.py:1464
+msgid "prp_percentage_t2_w"
+msgstr ""
+
+#: api/models.py:1465
+msgid "prp_percentage_t2_wo"
+msgstr ""
+
+#: api/models.py:1468
+msgid "prp_ch4_t2_start"
+msgstr ""
+
+#: api/models.py:1469
+msgid "prp_ch4_t2_w"
+msgstr ""
+
+#: api/models.py:1470
+msgid "prp_ch4_t2_wo"
+msgstr ""
+
+#: api/models.py:1472
+msgid "prp_n2o_t2_start"
+msgstr ""
+
+#: api/models.py:1473
+msgid "prp_n2o_t2_w"
+msgstr ""
+
+#: api/models.py:1474
+msgid "prp_n2o_t2_wo"
+msgstr ""
+
+#: api/models.py:1476
+msgid "emission_factor_ch4_t2_start"
+msgstr ""
+
+#: api/models.py:1477
+msgid "emission_factor_n2o_t2_start"
+msgstr ""
+
+#: api/models.py:1479
+msgid "emission_factor_ch4_t2_w"
+msgstr ""
+
+#: api/models.py:1480
+msgid "emission_factor_n2o_t2_w"
+msgstr ""
+
+#: api/models.py:1482
+msgid "emission_factor_ch4_t2_wo"
+msgstr ""
+
+#: api/models.py:1483
+msgid "emission_factor_n2o_t2_wo"
+msgstr ""
+
+#: api/models.py:1485
+msgid "implementation_year_start"
+msgstr ""
+
+#: api/models.py:1492
+msgid "forest_type"
+msgstr ""
+
+#: api/models.py:1493
+msgid "forest_condition_type"
+msgstr ""
+
+#: api/models.py:1497
+msgid "rotation_length_yrs_start"
+msgstr ""
+
+#: api/models.py:1498
+msgid "rotation_length_yrs_w"
+msgstr ""
+
+#: api/models.py:1499
+msgid "rotation_length_yrs_wo"
+msgstr ""
+
+#: api/models.py:1502
+msgid "rotation_percentage_biomass_for_energy_start"
+msgstr ""
+
+#: api/models.py:1503
+msgid "rotation_percentage_biomass_for_energy_w"
+msgstr ""
+
+#: api/models.py:1504
+msgid "rotation_percentage_biomass_for_energy_wo"
+msgstr ""
+
+#: api/models.py:1509
+msgid "logging_recurrence_yrs_start"
+msgstr ""
+
+#: api/models.py:1510
+msgid "logging_recurrence_yrs_w"
+msgstr ""
+
+#: api/models.py:1511
+msgid "logging_recurrence_yrs_wo"
+msgstr ""
+
+#: api/models.py:1514
+msgid "logging_percentage_agb_logged_start"
+msgstr ""
+
+#: api/models.py:1515
+msgid "logging_percentage_agb_logged_w"
+msgstr ""
+
+#: api/models.py:1516
+msgid "logging_percentage_agb_logged_wo"
+msgstr ""
+
+#: api/models.py:1519
+msgid "logging_percentage_biomass_for_energy_start"
+msgstr ""
+
+#: api/models.py:1520
+msgid "logging_percentage_biomass_for_energy_w"
+msgstr ""
+
+#: api/models.py:1521
+msgid "logging_percentage_biomass_for_energy_wo"
+msgstr ""
+
+#: api/models.py:1526
+msgid "average_yearly_degradation_percentage_start"
+msgstr ""
+
+#: api/models.py:1527
+msgid "average_yearly_degradation_percentage_w"
+msgstr ""
+
+#: api/models.py:1528
+msgid "average_yearly_degradation_percentage_wo"
+msgstr ""
+
+#: api/models.py:1533
+msgid "agb_growth_rate_le_20_yrs_t2_start"
+msgstr ""
+
+#: api/models.py:1534
+msgid "agb_growth_rate_le_20_yrs_t2_w"
+msgstr ""
+
+#: api/models.py:1535
+msgid "agb_growth_rate_le_20_yrs_t2_wo"
+msgstr ""
+
+#: api/models.py:1537
+msgid "agb_growth_rate_gt_20_yrs_t2_start"
+msgstr ""
+
+#: api/models.py:1538
+msgid "agb_growth_rate_gt_20_yrs_t2_w"
+msgstr ""
+
+#: api/models.py:1539
+msgid "agb_growth_rate_gt_20_yrs_t2_wo"
+msgstr ""
+
+#: api/models.py:1541
+msgid "bgb_growth_rate_le_20_yrs_t2_start"
+msgstr ""
+
+#: api/models.py:1542
+msgid "bgb_growth_rate_le_20_yrs_t2_w"
+msgstr ""
+
+#: api/models.py:1543
+msgid "bgb_growth_rate_le_20_yrs_t2_wo"
+msgstr ""
+
+#: api/models.py:1545
+msgid "bgb_growth_rate_gt_20_yrs_t2_start"
+msgstr ""
+
+#: api/models.py:1546
+msgid "bgb_growth_rate_gt_20_yrs_t2_w"
+msgstr ""
+
+#: api/models.py:1547
+msgid "bgb_growth_rate_gt_20_yrs_t2_wo"
+msgstr ""
+
+#: api/models.py:1549
+msgid "rotation_start_year_t2_start"
+msgstr ""
+
+#: api/models.py:1550
+msgid "rotation_start_year_t2_w"
+msgstr ""
+
+#: api/models.py:1551
+msgid "rotation_start_year_t2_wo"
+msgstr ""
+
+#: api/models.py:1553
+msgid "logging_start_year_t2_start"
+msgstr ""
+
+#: api/models.py:1554
+msgid "logging_start_year_t2_w"
+msgstr ""
+
+#: api/models.py:1555
+msgid "logging_start_year_t2_wo"
+msgstr ""
+
+#: api/models.py:1557
+msgid "logging_dry_matter_logged_t2_start"
+msgstr ""
+
+#: api/models.py:1558
+msgid "logging_dry_matter_logged_t2_w"
+msgstr ""
+
+#: api/models.py:1559
+msgid "logging_dry_matter_logged_t2_wo"
+msgstr ""
+
+#: api/models.py:1561
+msgid "degradation_dry_matter_impacted_t2_start"
+msgstr ""
+
+#: api/models.py:1562
+msgid "degradation_dry_matter_impacted_t2_w"
+msgstr ""
+
+#: api/models.py:1563
+msgid "degradation_dry_matter_impacted_t2_wo"
+msgstr ""
+
+#: api/models.py:1605
+msgid "disturbance_type"
+msgstr ""
+
+#: api/models.py:1608
+msgid "recurrence_yrs_start"
+msgstr ""
+
+#: api/models.py:1609
+msgid "recurrence_yrs_w"
+msgstr ""
+
+#: api/models.py:1610
+msgid "recurrence_yrs_wo"
+msgstr ""
+
+#: api/models.py:1613
+msgid "percentage_biomass_destruction_start"
+msgstr ""
+
+#: api/models.py:1614
+msgid "percentage_biomass_destruction_w"
+msgstr ""
+
+#: api/models.py:1615
+msgid "percentage_biomass_destruction_wo"
+msgstr ""
+
+#: api/models.py:1618
+msgid "start_year_t2_start"
+msgstr ""
+
+#: api/models.py:1619
+msgid "start_year_t2_w"
+msgstr ""
+
+#: api/models.py:1620
+msgid "start_year_t2_wo"
+msgstr ""
+
+#: api/models.py:1622
+msgid "dry_matter_impacted_t2_start"
+msgstr ""
+
+#: api/models.py:1623
+msgid "dry_matter_impacted_t2_w"
+msgstr ""
+
+#: api/models.py:1624
+msgid "dry_matter_impacted_t2_wo"
+msgstr ""
+
+#: api/models.py:1628
+msgid "waterbody_type"
+msgstr ""
+
+#: api/models.py:1630
+msgid "trophic_type_start"
+msgstr ""
+
+#: api/models.py:1631
+msgid "trophic_type_w"
+msgstr ""
+
+#: api/models.py:1632
+msgid "trophic_type_wo"
+msgstr ""
+
+#: api/models.py:1634
+msgid "ch4_ef_t2_start"
+msgstr ""
+
+#: api/models.py:1635
+msgid "ch4_ef_t2_w"
+msgstr ""
+
+#: api/models.py:1636
+msgid "ch4_ef_t2_wo"
+msgstr ""
+
+#: api/models.py:1638
+msgid "alpha_t2_start"
+msgstr ""
+
+#: api/models.py:1639
+msgid "alpha_t2_w"
+msgstr ""
+
+#: api/models.py:1640
+msgid "alpha_t2_wo"
+msgstr ""
+
+#: api/models.py:1642
+msgid "mean_annual_t2_start"
+msgstr ""
+
+#: api/models.py:1643
+msgid "mean_annual_t2_w"
+msgstr ""
+
+#: api/models.py:1644
+msgid "mean_annual_t2_wo"
+msgstr ""
+
+#: api/models.py:1648
+msgid "land_use_type"
+msgstr ""
+
+#: api/models.py:1653
+msgid "area_under_drainage_start"
+msgstr ""
+
+#: api/models.py:1654
+msgid "area_under_drainage_w"
+msgstr ""
+
+#: api/models.py:1655
+msgid "area_under_drainage_wo"
+msgstr ""
+
+#: api/models.py:1658
+msgid "drained_area_excavated_start"
+msgstr ""
+
+#: api/models.py:1659
+msgid "drained_area_excavated_w"
+msgstr ""
+
+#: api/models.py:1660
+msgid "drained_area_excavated_wo"
+msgstr ""
+
+#: api/models.py:1663
+msgid "area_not_drained_or_rewetted_start"
+msgstr ""
+
+#: api/models.py:1664
+msgid "area_not_drained_or_rewetted_w"
+msgstr ""
+
+#: api/models.py:1665
+msgid "area_not_drained_or_rewetted_wo"
+msgstr ""
+
+#: api/models.py:1668
+msgid "area_w_restored_vegetation_start"
+msgstr ""
+
+#: api/models.py:1669
+msgid "area_w_restored_vegetation_w"
+msgstr ""
+
+#: api/models.py:1670
+msgid "area_w_restored_vegetation_wo"
+msgstr ""
+
+#: api/models.py:1679
+msgid "pc_c_lost_after_excavation_t2_start"
+msgstr ""
+
+#: api/models.py:1680
+msgid "pc_c_lost_after_excavation_t2_w"
+msgstr ""
+
+#: api/models.py:1681
+msgid "pc_c_lost_after_excavation_t2_wo"
+msgstr ""
+
+#: api/models.py:1699
+msgid "drainage_ef_t2_start"
+msgstr ""
+
+#: api/models.py:1700
+msgid "drainage_ef_t2_w"
+msgstr ""
+
+#: api/models.py:1701
+msgid "drainage_ef_t2_wo"
+msgstr ""
+
+#: api/models.py:1703
+msgid "co2_rewetting_t2_start"
+msgstr ""
+
+#: api/models.py:1704
+msgid "co2_rewetting_t2_w"
+msgstr ""
+
+#: api/models.py:1705
+msgid "co2_rewetting_t2_wo"
+msgstr ""
+
+#: api/models.py:1707
+msgid "ch4_rewetting_t2_start"
+msgstr ""
+
+#: api/models.py:1708
+msgid "ch4_rewetting_t2_w"
+msgstr ""
+
+#: api/models.py:1709
+msgid "ch4_rewetting_t2_wo"
+msgstr ""
+
+#: api/models.py:1711
+msgid "avg_salinity_t2"
+msgstr ""
+
+#: api/models.py:1721
+msgid "refrigerant_pc_start"
+msgstr ""
+
+#: api/models.py:1722
+msgid "refrigerant_pc_w"
+msgstr ""
+
+#: api/models.py:1723
+msgid "refrigerant_pc_wo"
+msgstr ""
+
+#: api/models.py:1726
+msgid "refrigerant_gwp"
+msgstr ""
+
+#: api/models.py:1728
+msgid "fui_start"
+msgstr ""
+
+#: api/models.py:1729
+msgid "fui_w"
+msgstr ""
+
+#: api/models.py:1730
+msgid "fui_wo"
+msgstr ""
+
+#: api/models.py:1732
+msgid "total_catch_yr_start"
+msgstr ""
+
+#: api/models.py:1733
+msgid "total_catch_yr_w"
+msgstr ""
+
+#: api/models.py:1734
+msgid "total_catch_yr_wo"
+msgstr ""
+
+#: api/models.py:1737
+msgid "ice_preserved_catch_pc_start"
+msgstr ""
+
+#: api/models.py:1738
+msgid "ice_preserved_catch_pc_w"
+msgstr ""
+
+#: api/models.py:1739
+msgid "ice_preserved_catch_pc_wo"
+msgstr ""
+
+#: api/models.py:1742
+msgid "energy_emission_factor_co2_t2_start"
+msgstr ""
+
+#: api/models.py:1743
+msgid "energy_emission_factor_co2_t2_w"
+msgstr ""
+
+#: api/models.py:1744
+msgid "energy_emission_factor_co2_t2_wo"
+msgstr ""
+
+#: api/models.py:1746
+msgid "energy_emission_factor_ch4_t2_start"
+msgstr ""
+
+#: api/models.py:1747
+msgid "energy_emission_factor_ch4_t2_w"
+msgstr ""
+
+#: api/models.py:1748
+msgid "energy_emission_factor_ch4_t2_wo"
+msgstr ""
+
+#: api/models.py:1750
+msgid "energy_emission_factor_n2o_t2_start"
+msgstr ""
+
+#: api/models.py:1751
+msgid "energy_emission_factor_n2o_t2_w"
+msgstr ""
+
+#: api/models.py:1752
+msgid "energy_emission_factor_n2o_t2_wo"
+msgstr ""
+
+#: api/models.py:1754
+msgid "refrigerant_lost_per_tonne_t2_start"
+msgstr ""
+
+#: api/models.py:1755
+msgid "refrigerant_lost_per_tonne_t2_w"
+msgstr ""
+
+#: api/models.py:1756
+msgid "refrigerant_lost_per_tonne_t2_wo"
+msgstr ""
+
+#: api/models.py:1758
+msgid "refrigerant_gwp_t2_start"
+msgstr ""
+
+#: api/models.py:1759
+msgid "refrigerant_gwp_t2_w"
+msgstr ""
+
+#: api/models.py:1760
+msgid "refrigerant_gwp_t2_wo"
+msgstr ""
+
+#: api/models.py:1762
+msgid "tonnes_of_ice_t2_start"
+msgstr ""
+
+#: api/models.py:1763
+msgid "tonnes_of_ice_t2_w"
+msgstr ""
+
+#: api/models.py:1764
+msgid "tonnes_of_ice_t2_wo"
+msgstr ""
+
+#: api/models.py:1766
+msgid "inshore_ice_production_kwh_per_tonne_t2_start"
+msgstr ""
+
+#: api/models.py:1767
+msgid "inshore_ice_production_kwh_per_tonne_t2_w"
+msgstr ""
+
+#: api/models.py:1768
+msgid "inshore_ice_production_kwh_per_tonne_t2_wo"
+msgstr ""
+
+#: api/models.py:1770
+msgid "inshore_ice_production_country_t2"
+msgstr ""
+
+#: api/models.py:1772 api/models.py:1850
+msgid "implementation_year_t2"
+msgstr ""
+
+#: api/models.py:1776 api/models.py:1785
+msgid "gear_type_start"
+msgstr ""
+
+#: api/models.py:1777 api/models.py:1786
+msgid "gear_type_w"
+msgstr ""
+
+#: api/models.py:1778 api/models.py:1787
+msgid "gear_type_wo"
+msgstr ""
+
+#: api/models.py:1780
+msgid "fishery_type"
+msgstr ""
+
+#: api/models.py:1781 api/models.py:1790
+msgid "fui_default"
+msgstr ""
+
+#: api/models.py:1789
+msgid "fish_type"
+msgstr ""
+
+#: api/models.py:1794
+msgid "annual_production_start"
+msgstr ""
+
+#: api/models.py:1795
+msgid "annual_production_w"
+msgstr ""
+
+#: api/models.py:1796
+msgid "annual_production_wo"
+msgstr ""
+
+#: api/models.py:1798
+msgid "n2o_from_production_t2_start"
+msgstr ""
+
+#: api/models.py:1799
+msgid "n2o_from_production_t2_w"
+msgstr ""
+
+#: api/models.py:1800
+msgid "n2o_from_production_t2_wo"
+msgstr ""
+
+#: api/models.py:1802
+msgid "electricity_used_t2_start"
+msgstr ""
+
+#: api/models.py:1803
+msgid "electricity_used_t2_w"
+msgstr ""
+
+#: api/models.py:1804
+msgid "electricity_used_t2_wo"
+msgstr ""
+
+#: api/models.py:1806
+msgid "electricity_ef_t2_start"
+msgstr ""
+
+#: api/models.py:1807
+msgid "electricity_ef_t2_w"
+msgstr ""
+
+#: api/models.py:1808
+msgid "electricity_ef_t2_wo"
+msgstr ""
+
+#: api/models.py:1839
+msgid "input_type"
+msgstr ""
+
+#: api/models.py:1841
+msgid "value_start"
+msgstr ""
+
+#: api/models.py:1842
+msgid "value_w"
+msgstr ""
+
+#: api/models.py:1843
+msgid "value_wo"
+msgstr ""
+
+#: api/models.py:1846
+msgid "co2_emissions_t2"
+msgstr ""
+
+#: api/models.py:1847
+msgid "n2o_emissions_t2"
+msgstr ""
+
+#: api/models.py:1848
+msgid "co2_e_emissions_t2"
+msgstr ""
+
+#: api/models.py:1868
+msgid "mwh_start"
+msgstr ""
+
+#: api/models.py:1869
+msgid "mwh_w"
+msgstr ""
+
+#: api/models.py:1870
+msgid "mwh_wo"
+msgstr ""
+
+#: api/models.py:1873
+msgid "mwh_renewables_start"
+msgstr ""
+
+#: api/models.py:1874
+msgid "mwh_renewables_w"
+msgstr ""
+
+#: api/models.py:1875
+msgid "mwh_renewables_wo"
+msgstr ""
+
+#: api/models.py:1878 api/models.py:1941 api/models.py:2020 api/models.py:2041
+#: api/models.py:2054
+msgid "ef_t2_start"
+msgstr ""
+
+#: api/models.py:1879 api/models.py:1942 api/models.py:2021 api/models.py:2042
+#: api/models.py:2055
+msgid "ef_t2_w"
+msgstr ""
+
+#: api/models.py:1880 api/models.py:1943 api/models.py:2022 api/models.py:2043
+#: api/models.py:2056
+msgid "ef_t2_wo"
+msgstr ""
+
+#: api/models.py:1882
+msgid "transmission_loss_start"
+msgstr ""
+
+#: api/models.py:1883
+msgid "transmission_loss_w"
+msgstr ""
+
+#: api/models.py:1884
+msgid "transmission_loss_wo"
+msgstr ""
+
+#: api/models.py:1886
+msgid "ef_source"
+msgstr ""
+
+#: api/models.py:1891 api/models.py:1952
+msgid "fuel_type"
+msgstr ""
+
+#: api/models.py:1893
+msgid "fuel_consumption_start"
+msgstr ""
+
+#: api/models.py:1894
+msgid "fuel_consumption_w"
+msgstr ""
+
+#: api/models.py:1895
+msgid "fuel_consumption_wo"
+msgstr ""
+
+#: api/models.py:1898 api/models.py:1967
+msgid "ef_co2_t2_start"
+msgstr ""
+
+#: api/models.py:1899 api/models.py:1968
+msgid "ef_co2_t2_w"
+msgstr ""
+
+#: api/models.py:1900 api/models.py:1969
+msgid "ef_co2_t2_wo"
+msgstr ""
+
+#: api/models.py:1902 api/models.py:1971
+msgid "ef_ch4_t2_start"
+msgstr ""
+
+#: api/models.py:1903 api/models.py:1972
+msgid "ef_ch4_t2_w"
+msgstr ""
+
+#: api/models.py:1904 api/models.py:1973
+msgid "ef_ch4_t2_wo"
+msgstr ""
+
+#: api/models.py:1906 api/models.py:1975
+msgid "ef_n2o_t2_start"
+msgstr ""
+
+#: api/models.py:1907 api/models.py:1976
+msgid "ef_n2o_t2_w"
+msgstr ""
+
+#: api/models.py:1908 api/models.py:1977
+msgid "ef_n2o_t2_wo"
+msgstr ""
+
+#: api/models.py:1910
+msgid "account_for_co2"
+msgstr ""
+
+#: api/models.py:1934 api/models.py:1951
+msgid "irrigation_system_type"
+msgstr ""
+
+#: api/models.py:1936 api/models.py:1955
+msgid "ha_start"
+msgstr ""
+
+#: api/models.py:1937 api/models.py:1956
+msgid "ha_w"
+msgstr ""
+
+#: api/models.py:1938 api/models.py:1957
+msgid "ha_wo"
+msgstr ""
+
+#: api/models.py:1953
+msgid "well_depth"
+msgstr ""
+
+#: api/models.py:1960
+msgid "gross_irrigation_water_start"
+msgstr ""
+
+#: api/models.py:1961
+msgid "gross_irrigation_water_w"
+msgstr ""
+
+#: api/models.py:1962
+msgid "gross_irrigation_water_wo"
+msgstr ""
+
+#: api/models.py:1965
+msgid "power_origin_country_t2"
+msgstr ""
+
+#: api/models.py:1979
+msgid "transmission_loss_t2_start"
+msgstr ""
+
+#: api/models.py:1980
+msgid "transmission_loss_t2_w"
+msgstr ""
+
+#: api/models.py:1981
+msgid "transmission_loss_t2_wo"
+msgstr ""
+
+#: api/models.py:1983
+msgid "average_pressure_t2"
+msgstr ""
+
+#: api/models.py:1985
+msgid "total_dynamic_head_t2"
+msgstr ""
+
+#: api/models.py:1987
+msgid "pumping_efficiency_t2_start"
+msgstr ""
+
+#: api/models.py:1988
+msgid "pumping_efficiency_t2_w"
+msgstr ""
+
+#: api/models.py:1989
+msgid "pumping_efficiency_t2_wo"
+msgstr ""
+
+#: api/models.py:2012
+msgid "building_type"
+msgstr ""
+
+#: api/models.py:2015 api/models.py:2049
+msgid "area_m2_start"
+msgstr ""
+
+#: api/models.py:2016 api/models.py:2050
+msgid "area_m2_w"
+msgstr ""
+
+#: api/models.py:2017 api/models.py:2051
+msgid "area_m2_wo"
+msgstr ""
+
+#: api/models.py:2028
+msgid "road_type"
+msgstr ""
+
+#: api/models.py:2031
+msgid "length_km_start"
+msgstr ""
+
+#: api/models.py:2032
+msgid "length_km_w"
+msgstr ""
+
+#: api/models.py:2033
+msgid "length_km_wo"
+msgstr ""
+
+#: api/models.py:2036
+msgid "width_m_start"
+msgstr ""
+
+#: api/models.py:2037
+msgid "width_m_w"
+msgstr ""
+
+#: api/models.py:2038
+msgid "width_m_wo"
+msgstr ""
+
+#: api/models.py:2060
+msgid "drainage_area_start"
+msgstr ""
+
+#: api/models.py:2061
+msgid "drainage_area_w"
+msgstr ""
+
+#: api/models.py:2062
+msgid "drainage_area_wo"
+msgstr ""
+
+#: api/models.py:2065
+msgid "area_not_drained_start"
+msgstr ""
+
+#: api/models.py:2066
+msgid "area_not_drained_w"
+msgstr ""
+
+#: api/models.py:2067
+msgid "area_not_drained_wo"
+msgstr ""
+
+#: api/models.py:2070
+msgid "ditches_area_start"
+msgstr ""
+
+#: api/models.py:2071
+msgid "ditches_area_w"
+msgstr ""
+
+#: api/models.py:2072
+msgid "ditches_area_wo"
+msgstr ""
+
+#: api/models.py:2075
+msgid "fire_type_start"
+msgstr ""
+
+#: api/models.py:2076
+msgid "fire_type_w"
+msgstr ""
+
+#: api/models.py:2077
+msgid "fire_type_wo"
+msgstr ""
+
+#: api/models.py:2080
+msgid "soil_fire_periodicity_start"
+msgstr ""
+
+#: api/models.py:2081
+msgid "soil_fire_periodicity_w"
+msgstr ""
+
+#: api/models.py:2082
+msgid "soil_fire_periodicity_wo"
+msgstr ""
+
+#: api/models.py:2085
+msgid "soil_fire_impact_percentage_start"
+msgstr ""
+
+#: api/models.py:2086
+msgid "soil_fire_impact_percentage_w"
+msgstr ""
+
+#: api/models.py:2087
+msgid "soil_fire_impact_percentage_wo"
+msgstr ""
+
+#: api/models.py:2090
+msgid "onsite_co2_drainge_t2_start"
+msgstr ""
+
+#: api/models.py:2091
+msgid "onsite_co2_drainge_t2_w"
+msgstr ""
+
+#: api/models.py:2092
+msgid "onsite_co2_drainge_t2_wo"
+msgstr ""
+
+#: api/models.py:2094
+msgid "onsite_ch4_drainge_t2_start"
+msgstr ""
+
+#: api/models.py:2095
+msgid "onsite_ch4_drainge_t2_w"
+msgstr ""
+
+#: api/models.py:2096
+msgid "onsite_ch4_drainge_t2_wo"
+msgstr ""
+
+#: api/models.py:2098
+msgid "onsite_n2o_drainge_t2_start"
+msgstr ""
+
+#: api/models.py:2099
+msgid "onsite_n2o_drainge_t2_w"
+msgstr ""
+
+#: api/models.py:2100
+msgid "onsite_n2o_drainge_t2_wo"
+msgstr ""
+
+#: api/models.py:2102
+msgid "offsite_doc_drainge_t2_start"
+msgstr ""
+
+#: api/models.py:2103
+msgid "offsite_doc_drainge_t2_w"
+msgstr ""
+
+#: api/models.py:2104
+msgid "offsite_doc_drainge_t2_wo"
+msgstr ""
+
+#: api/models.py:2106
+msgid "offsite_ch4_drainge_t2_start"
+msgstr ""
+
+#: api/models.py:2107
+msgid "offsite_ch4_drainge_t2_w"
+msgstr ""
+
+#: api/models.py:2108
+msgid "offsite_ch4_drainge_t2_wo"
+msgstr ""
+
+#: api/models.py:2110
+msgid "onsite_co2_rewetting_t2_start"
+msgstr ""
+
+#: api/models.py:2111
+msgid "onsite_co2_rewetting_t2_w"
+msgstr ""
+
+#: api/models.py:2112
+msgid "onsite_co2_rewetting_t2_wo"
+msgstr ""
+
+#: api/models.py:2114
+msgid "onsite_ch4_rewetting_t2_start"
+msgstr ""
+
+#: api/models.py:2115
+msgid "onsite_ch4_rewetting_t2_w"
+msgstr ""
+
+#: api/models.py:2116
+msgid "onsite_ch4_rewetting_t2_wo"
+msgstr ""
+
+#: api/models.py:2118
+msgid "onsite_n2o_rewetting_t2_start"
+msgstr ""
+
+#: api/models.py:2119
+msgid "onsite_n2o_rewetting_t2_w"
+msgstr ""
+
+#: api/models.py:2120
+msgid "onsite_n2o_rewetting_t2_wo"
+msgstr ""
+
+#: api/models.py:2122
+msgid "offsite_doc_rewetting_t2_start"
+msgstr ""
+
+#: api/models.py:2123
+msgid "offsite_doc_rewetting_t2_w"
+msgstr ""
+
+#: api/models.py:2124
+msgid "offsite_doc_rewetting_t2_wo"
+msgstr ""
+
+#: api/models.py:2126
+msgid "mean_dry_matter_t2_start"
+msgstr ""
+
+#: api/models.py:2127
+msgid "mean_dry_matter_t2_w"
+msgstr ""
+
+#: api/models.py:2128
+msgid "mean_dry_matter_t2_wo"
+msgstr ""
+
+#: api/models.py:2130
+msgid "fire_on_soil_co2_t2_start"
+msgstr ""
+
+#: api/models.py:2131
+msgid "fire_on_soil_co2_t2_w"
+msgstr ""
+
+#: api/models.py:2132
+msgid "fire_on_soil_co2_t2_wo"
+msgstr ""
+
+#: api/models.py:2134
+msgid "fire_on_soil_co_t2_start"
+msgstr ""
+
+#: api/models.py:2135
+msgid "fire_on_soil_co_t2_w"
+msgstr ""
+
+#: api/models.py:2136
+msgid "fire_on_soil_co_t2_wo"
+msgstr ""
+
+#: api/models.py:2138
+msgid "fire_on_soil_ch4_t2_start"
+msgstr ""
+
+#: api/models.py:2139
+msgid "fire_on_soil_ch4_t2_w"
+msgstr ""
+
+#: api/models.py:2140
+msgid "fire_on_soil_ch4_t2_wo"
+msgstr ""
+
+#: api/models.py:2144
+msgid "peat_type"
+msgstr ""
+
+#: api/models.py:2147
+msgid "peat_area_start"
+msgstr ""
+
+#: api/models.py:2148
+msgid "peat_area_w"
+msgstr ""
+
+#: api/models.py:2149
+msgid "peat_area_wo"
+msgstr ""
+
+#: api/models.py:2152
+msgid "peat_ditches_area_start"
+msgstr ""
+
+#: api/models.py:2153
+msgid "peat_ditches_area_w"
+msgstr ""
+
+#: api/models.py:2154
+msgid "peat_ditches_area_wo"
+msgstr ""
+
+#: api/models.py:2157
+msgid "peat_extraction_height_start"
+msgstr ""
+
+#: api/models.py:2158
+msgid "peat_extraction_height_w"
+msgstr ""
+
+#: api/models.py:2159
+msgid "peat_extraction_height_wo"
+msgstr ""
+
+#: api/models.py:2162
+msgid "is_peat_for_energy_start"
+msgstr ""
+
+#: api/models.py:2163
+msgid "is_peat_for_energy_w"
+msgstr ""
+
+#: api/models.py:2164
+msgid "is_peat_for_energy_wo"
+msgstr ""
+
+#: api/models.py:2167
+msgid "onsite_co2_peat_t2_start"
+msgstr ""
+
+#: api/models.py:2168
+msgid "onsite_co2_peat_t2_w"
+msgstr ""
+
+#: api/models.py:2169
+msgid "onsite_co2_peat_t2_wo"
+msgstr ""
+
+#: api/models.py:2171
+msgid "onsite_n2o_peat_t2_start"
+msgstr ""
+
+#: api/models.py:2172
+msgid "onsite_n2o_peat_t2_w"
+msgstr ""
+
+#: api/models.py:2173
+msgid "onsite_n2o_peat_t2_wo"
+msgstr ""
+
+#: api/models.py:2175
+msgid "offsite_doc_peat_t2_start"
+msgstr ""
+
+#: api/models.py:2176
+msgid "offsite_doc_peat_t2_w"
+msgstr ""
+
+#: api/models.py:2177
+msgid "offsite_doc_peat_t2_wo"
+msgstr ""
+
+#: api/models.py:2179
+msgid "offsite_ch4_peat_t2_start"
+msgstr ""
+
+#: api/models.py:2180
+msgid "offsite_ch4_peat_t2_w"
+msgstr ""
+
+#: api/models.py:2181
+msgid "offsite_ch4_peat_t2_wo"
+msgstr ""
+
+#: api/models.py:2183
+msgid "peat_density_t2_start"
+msgstr ""
+
+#: api/models.py:2184
+msgid "peat_density_t2_w"
+msgstr ""
+
+#: api/models.py:2185
+msgid "peat_density_t2_wo"
+msgstr ""
+
+#: api/models.py:2198
+msgid "settlement_type_start"
+msgstr ""
+
+#: api/models.py:2199
+msgid "settlement_type_w"
+msgstr ""
+
+#: api/models.py:2200
+msgid "settlement_type_wo"
+msgstr ""
+
+#: api/models.py:2215
+msgid "is_set_aside_start"
+msgstr ""
+
+#: api/models.py:2216
+msgid "is_set_aside_w"
+msgstr ""
+
+#: api/models.py:2217
+msgid "is_set_aside_wo"
+msgstr ""
+
+#: api/models.py:2230
+msgid "is_degraded_land_start"
+msgstr ""
+
+#: api/models.py:2231
+msgid "is_degraded_land_w"
+msgstr ""
+
+#: api/models.py:2232
+msgid "is_degraded_land_wo"
+msgstr ""
+
+#: api/models.py:2244
+msgid "module_type_start"
+msgstr ""
+
+#: api/models.py:2245
+msgid "module_type_w"
+msgstr ""
+
+#: api/models.py:2246
+msgid "module_type_wo"
+msgstr ""
+
+#: api/models.py:2256
+msgid "dry_matter_start"
+msgstr ""
+
+#: api/models.py:2257
+msgid "dry_matter_w"
+msgstr ""
+
+#: api/models.py:2258
+msgid "dry_matter_wo"
+msgstr ""
