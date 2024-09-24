@@ -86,6 +86,8 @@ from .serializers import (
 
 from djangoexact.settings import auth
 from django.utils.translation import activate, get_language
+from firebase_admin import auth as firebase_admin_auth
+from django.contrib.auth import logout
 
 
 logger = logging.getLogger("console")
@@ -228,6 +230,39 @@ class UserViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return Response(status=http_status.HTTP_204_NO_CONTENT)
 
         return utils.ErrorResponse("Selected user does not have permission to delete the user", status=http_status.HTTP_403_FORBIDDEN)
+
+    @action(detail=True, methods=["post"], url_path="reset-password")
+    @swagger_auto_schema(
+        request_body=EmptySerializer,
+        manual_parameters=[openapi.Parameter("password_old", openapi.IN_BODY, description="Old password", type=openapi.TYPE_STRING), openapi.Parameter("password_new", openapi.IN_BODY, description="New password", type=openapi.TYPE_STRING)],
+    )
+    @transaction.atomic
+    def reset_password(self, request, pk=None):
+        user: CustomUser = self.get_object()
+
+        old_password = request.data.get("password_old", None)
+        new_password = request.data.get("password_new", None)
+
+        if not old_password or not new_password:
+            return utils.ErrorResponse("Old or new password not provided", status=http_status.HTTP_400_BAD_REQUEST)
+
+        if not user.check_password(old_password):
+            return utils.ErrorResponse("Old password is incorrect", status=http_status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(new_password)
+        user.save()
+
+        try:
+            firebase_admin_auth.update_user(user.firebase_uid, password=new_password)
+            firebase_admin_auth.revoke_refresh_tokens(user.firebase_uid)
+        except Exception as e:
+            return utils.ErrorResponse(str(e), status=http_status.HTTP_400_BAD_REQUEST)
+
+        return Response(status=http_status.HTTP_200_OK)
+
+    @action(detail=False, methods=["get"])
+    def whoami(self, request):
+        return Response(UserReadSerializer(request.user).data, status=http_status.HTTP_200_OK)
 
 
 class LandUseTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
