@@ -4555,6 +4555,8 @@ class IrrigationPhaseCalculator(BaseCalculator):
     def __init__(self, input) -> None:
         super().__init__(input)
 
+        self.module: IrrigationPhase
+
         self.ef = SimpleNamespace(value=0)
         self.energy_db = SimpleNamespace(net_calorific_value=0, density=0)
         self.pressure = SimpleNamespace(avg_pressure=0)
@@ -4562,81 +4564,46 @@ class IrrigationPhaseCalculator(BaseCalculator):
         self.transportation_loss = SimpleNamespace(value=0)
         self.pumping_efficiency = SimpleNamespace(value=0)
 
-        self.inputs_start = {}
-        self.inputs_w = {}
-        self.inputs_wo = {}
-
-        self.math_start = None
-        self.math_w = None
-        self.math_wo = None
-
-        self.results_start = None
-        self.results_w = None
-        self.results_wo = None
-
     def get_defaults(self, calculate=False) -> dict:
         super().get_defaults(calculate)
 
-        module: IrrigationPhase = self.data
+        self.ef: ipcc.IrrigationPhaseData = utils.get_or_raise(ipcc.IrrigationPhaseData, {"fuel_type": self.module.fuel_type}, f"Could not find EF for {self.module.fuel_type.name}")
+        self.energy_db: ipcc.EnergyDefaultEmissionFactor = utils.get_or_raise(ipcc.EnergyDefaultEmissionFactor, {"fuel_type": self.module.fuel_type}, f"Could not find Energy Default Emission Factor for {self.module.fuel_type.name}")
 
-        try:
-            self.ef = ipcc.IrrigationPhaseData.objects.get(fuel_type=module.fuel_type)
-        except ipcc.IrrigationPhaseData.DoesNotExist:
-            raise ValueError(f"Could not find EF for {module.fuel_type.name}")
+        self.pressure: ipcc.IrrigationPressureRequirement = utils.get_or_raise(ipcc.IrrigationPressureRequirement, {"irrigation_system_type": self.module.irrigation_system_type}, f"Could not find Pressure Requirement for {self.module.irrigation_system_type.name}")
+        if self.pressure.bar_start is None or self.pressure.bar_end is None:
+            raise ValueError(f"Please insert the tier 2 pressure requirement for {self.module.irrigation_system_type.name}")
 
-        try:
-            self.energy_db = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=module.fuel_type)
-        except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find Energy Default Emission Factor for {module.fuel_type.name}. Please insert tier 2 values")
-
-        try:
-            self.pressure = ipcc.IrrigationPressureRequirement.objects.get(irrigation_system_type=module.irrigation_system_type)
-            if self.pressure.bar_start is None or self.pressure.bar_end is None:
-                raise ValueError(f"Please insert the tier 2 pressure requirement for {module.irrigation_system_type.name}")
-        except ipcc.IrrigationPressureRequirement.DoesNotExist:
-            raise ValueError(f"Could not find Pressure Requirement for {module.irrigation_system_type.name}")
-
-        try:
-            self.erh_electricity = IrrigationParameter.objects.get(name="ERH_ELECTRICITY").value if module.fuel_type.name == "Electricity" else None
-        except IrrigationParameter.DoesNotExist:
-            raise ValueError(f"Could not find ERH_ELECTRICITY")
-
-        try:
-            self.transportation_loss = IrrigationParameter.objects.get(name="TRANSPORTATION_LOSS")
-        except IrrigationParameter.DoesNotExist:
-            raise ValueError(f"Could not find TRANSPORTATION_LOSS")
-
-        try:
-            self.pumping_efficiency = IrrigationParameter.objects.get(name="PUMPING_EFFICIENCY")
-        except IrrigationParameter.DoesNotExist:
-            raise ValueError(f"Could not find PUMPING_EFFICIENCY")
+        self.erh_electricity: IrrigationParameter = utils.get_or_raise(IrrigationParameter, {"name": "ERH_ELECTRICITY"}, f"Could not find ERH_ELECTRICITY")
+        self.transportation_loss: IrrigationParameter = utils.get_or_raise(IrrigationParameter, {"name": "TRANSPORTATION_LOSS"}, f"Could not find TRANSPORTATION_LOSS")
+        self.pumping_efficiency: IrrigationParameter = utils.get_or_raise(IrrigationParameter, {"name": "PUMPING_EFFICIENCY"}, f"Could not find PUMPING_EFFICIENCY")
 
     def calculate(self) -> list[Result]:
-        module: IrrigationPhase = self.data
-        activity: Activity = module.parent.activity
-        project: Project = activity.project
-
         self.get_defaults()
 
         self.inputs_start = {
-            "ef_default": self.ef.emission_factor,
-            "ef_tier_2": module.ef_t2_start,
-            "total_dynamic_head_tier_2": module.total_dynamic_head_t2,
+            "ef_co2_default": self.ef.co2_emissions,
+            "ef_co2_tier_2": self.module.ef_co2_t2_start,
+            "ef_ch4_default": self.ef.ch4_emissions,
+            "ef_ch4_tier_2": self.module.ef_ch4_t2_start,
+            "ef_n2o_default": self.ef.n2o_emissions,
+            "ef_n2o_tier_2": self.module.ef_n2o_t2_start,
+            "total_dynamic_head_tier_2": self.module.total_dynamic_head_t2,
             "average_pressure_default": self.pressure.avg_pressure,
-            "average_pressure_tier_2": module.average_pressure_t2,
+            "average_pressure_tier_2": self.module.average_pressure_t2,
             "pumping_efficiency_default": self.pumping_efficiency.value,
-            "pumping_efficiency_tier_2": module.pumping_efficiency_t2_start,
+            "pumping_efficiency_tier_2": self.module.pumping_efficiency_t2_start,
             "erh_electricity": self.erh_electricity,
-            "fuel_net_calorific_values": self.energy_db.net_calorific_value,
-            "fuel_density": self.energy_db.density,
-            "depth": module.well_depth,
-            "units_start": module.ha_start,
+            "fuel_net_calorific_values": self.ef.calorific_value,
+            "fuel_density": self.ef.density,
+            "depth": self.module.well_depth,
+            "units_start": self.module.ha_start,
             "units_end": 0,
-            "rate_type": activity.change_rate.name,
+            "rate_type": self.activity.change_rate.name,
             "implementation_time": self.activity.implementation_years,
             "capitalization_time": self.activity.capitalization_years,
-            "transportation_loss": self.transportation_loss.value if module.fuel_type.name == "Electricity" else 0,
-            "gwir": module.gross_irrigation_water_start,
+            "transportation_loss": self.transportation_loss.value if self.module.fuel_type.name == "Electricity" else 0,
+            "gwir": self.module.gross_irrigation_water_start,
             "delay": self.activity.delay,
         }
 
@@ -4644,24 +4611,28 @@ class IrrigationPhaseCalculator(BaseCalculator):
         self.math_start.calculate_emissions()
 
         self.inputs_w = {
-            "ef_default": self.ef.emission_factor,
-            "ef_tier_2": module.ef_t2_w,
-            "total_dynamic_head_tier_2": module.total_dynamic_head_t2,
+            "ef_co2_default": self.ef.co2_emissions,
+            "ef_co2_tier_2": self.module.ef_co2_t2_w,
+            "ef_ch4_default": self.ef.ch4_emissions,
+            "ef_ch4_tier_2": self.module.ef_ch4_t2_w,
+            "ef_n2o_default": self.ef.n2o_emissions,
+            "ef_n2o_tier_2": self.module.ef_n2o_t2_w,
+            "total_dynamic_head_tier_2": self.module.total_dynamic_head_t2,
             "average_pressure_default": self.pressure.avg_pressure,
-            "average_pressure_tier_2": module.average_pressure_t2,
+            "average_pressure_tier_2": self.module.average_pressure_t2,
             "pumping_efficiency_default": self.pumping_efficiency.value,
-            "pumping_efficiency_tier_2": module.pumping_efficiency_t2_w,
+            "pumping_efficiency_tier_2": self.module.pumping_efficiency_t2_w,
             "erh_electricity": self.erh_electricity,
-            "fuel_net_calorific_values": self.energy_db.net_calorific_value,
-            "fuel_density": self.energy_db.density,
-            "depth": module.well_depth,
+            "fuel_net_calorific_values": self.ef.calorific_value,
+            "fuel_density": self.ef.density,
+            "depth": self.module.well_depth,
             "units_start": 0,
-            "units_end": module.ha_w,
-            "rate_type": activity.change_rate.name,
+            "units_end": self.module.ha_w,
+            "rate_type": self.activity.change_rate.name,
             "implementation_time": self.activity.implementation_years,
             "capitalization_time": self.activity.capitalization_years,
-            "transportation_loss": self.transportation_loss.value if module.fuel_type.name == "Electricity" else 0,
-            "gwir": module.gross_irrigation_water_w,
+            "transportation_loss": self.transportation_loss.value if self.module.fuel_type.name == "Electricity" else 0,
+            "gwir": self.module.gross_irrigation_water_w,
             "delay": self.activity.delay,
         }
 
@@ -4669,24 +4640,28 @@ class IrrigationPhaseCalculator(BaseCalculator):
         self.math_w.calculate_emissions()
 
         self.inputs_wo = {
-            "ef_default": self.ef.emission_factor,
-            "ef_tier_2": module.ef_t2_wo,
-            "total_dynamic_head_tier_2": module.total_dynamic_head_t2,
+            "ef_co2_default": self.ef.co2_emissions,
+            "ef_co2_tier_2": self.module.ef_co2_t2_wo,
+            "ef_ch4_default": self.ef.ch4_emissions,
+            "ef_ch4_tier_2": self.module.ef_ch4_t2_wo,
+            "ef_n2o_default": self.ef.n2o_emissions,
+            "ef_n2o_tier_2": self.module.ef_n2o_t2_wo,
+            "total_dynamic_head_tier_2": self.module.total_dynamic_head_t2,
             "average_pressure_default": self.pressure.avg_pressure,
-            "average_pressure_tier_2": module.average_pressure_t2,
+            "average_pressure_tier_2": self.module.average_pressure_t2,
             "pumping_efficiency_default": self.pumping_efficiency.value,
-            "pumping_efficiency_tier_2": module.pumping_efficiency_t2_wo,
+            "pumping_efficiency_tier_2": self.module.pumping_efficiency_t2_wo,
             "erh_electricity": self.erh_electricity,
-            "fuel_net_calorific_values": self.energy_db.net_calorific_value,
-            "fuel_density": self.energy_db.density,
-            "depth": module.well_depth,
+            "fuel_net_calorific_values": self.ef.calorific_value,
+            "fuel_density": self.ef.density,
+            "depth": self.module.well_depth,
             "units_start": 0,
-            "units_end": module.ha_wo,
-            "rate_type": activity.change_rate.name,
+            "units_end": self.module.ha_wo,
+            "rate_type": self.activity.change_rate.name,
             "implementation_time": self.activity.implementation_years,
             "capitalization_time": self.activity.capitalization_years,
-            "transportation_loss": self.transportation_loss.value if module.fuel_type.name == "Electricity" else 0,
-            "gwir": module.gross_irrigation_water_wo,
+            "transportation_loss": self.transportation_loss.value if self.module.fuel_type.name == "Electricity" else 0,
+            "gwir": self.module.gross_irrigation_water_wo,
             "delay": self.activity.delay,
         }
 
