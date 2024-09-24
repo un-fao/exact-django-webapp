@@ -3830,42 +3830,7 @@ for i, row in enumerate(df_dict):
         )
 
 
-log.debug("Deleting all InputEmissionFactor models...")
-EnergyDefaultEmissionFactor.objects.all().delete()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "EnergyDefaultEmissionFactors.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers = df.columns.values.tolist()
-df_dict = df.to_dict("records")
-
-for i, row in enumerate(df_dict):
-    fuel_use_type = FuelUseType.objects.get(name__iexact=row["fuel_use_type"])
-    fuel_type = FuelType.objects.get(name__iexact=row["fuel_type"])
-    co2 = parse_csv_number(row["co2"])
-    ch4 = parse_csv_number(row["ch4"])
-    n2o = parse_csv_number(row["n2o"])
-
-    print(
-        fuel_use_type,
-        fuel_type,
-        co2,
-        ch4,
-        n2o,
-    )
-
-    EnergyDefaultEmissionFactor.objects.create(
-        fuel_use_type=fuel_use_type,
-        fuel_type=fuel_type,
-        co2=co2,
-        ch4=ch4,
-        n2o=n2o,
-    )
-
-    ForestManagementBGB.objects.all().delete()
+ForestManagementBGB.objects.all().delete()
 
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestManagementBGB.csv"),
@@ -4426,6 +4391,47 @@ LivestockAWMS.objects.bulk_create(awms_list)
 """
 
 # TODO: Run in review
+
+log.debug("Deleting all InputEmissionFactor models...")
+EnergyDefaultEmissionFactor.objects.all().delete()
+
+l = []
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "EnergyDefaultEmissionFactors.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers = df.columns.values.tolist()
+df_dict = df.to_dict("records")
+
+for i, row in enumerate(df_dict):
+    fuel_use_type = FuelUseType.objects.get(name__iexact=row["fuel_use_type"])
+    fuel_type = FuelType.objects.get(name__iexact=row["fuel_type"])
+    co2 = parse_csv_number(row["co2"])
+    ch4 = parse_csv_number(row["ch4"])
+    n2o = parse_csv_number(row["n2o"])
+
+    print(
+        fuel_use_type,
+        fuel_type,
+        co2,
+        ch4,
+        n2o,
+    )
+
+    l.append(
+        EnergyDefaultEmissionFactor(
+            fuel_use_type=fuel_use_type,
+            fuel_type=fuel_type,
+            co2=co2,
+            ch4=ch4,
+            n2o=n2o,
+        )
+    )
+
+EnergyDefaultEmissionFactor.objects.bulk_create(l)
 
 
 # TODO: Run in develop
