@@ -2605,9 +2605,11 @@ class SmallFisheryCalculator(BaseCalculator):
         project: Project = activity.project
 
         try:
-            ef_diesel_default_list = ipcc.EnergyDefaultEmissionFactor.objects.filter(fuel_type__fuel_use_type__name__contains="Off-Road")
+            energy_ef_default = ipcc.EnergyDefaultEmissionFactor.objects.filter(fuel_type__fuel_use_type__name__contains="Off-Road")
             # Average of all default emission factors for gasoil/diesel
-            ef_diesel_default = sum([ef.t_co2_eq for ef in ef_diesel_default_list]) / len(ef_diesel_default_list)
+            energy_ef_default_co2 = sum([ef.co2 for ef in energy_ef_default]) / len(energy_ef_default)
+            energy_ef_default_ch4 = sum([ef.ch4 for ef in energy_ef_default]) / len(energy_ef_default)
+            energy_ef_default_n2o = sum([ef.n2o for ef in energy_ef_default]) / len(energy_ef_default)
         except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
             raise ValueError("Default emission factors for off-road diesel do not exist")
 
@@ -2657,9 +2659,15 @@ class SmallFisheryCalculator(BaseCalculator):
                 "rate_type": module.activity.change_rate.name,
                 "catch_start": module.total_catch_yr_start,
                 "catch_end": module.total_catch_yr_w,
-                "ef_diesel_default": ef_diesel_default,
-                "ef_diesel_start_tier_2": module.energy_emission_factor_t2_start,
-                "ef_diesel_tier_2_end": module.energy_emission_factor_t2_w,
+                "ef_diesel_default_co2": energy_ef_default_co2,
+                "ef_diesel_co2_start_tier_2": module.energy_emission_factor_co2_t2_start,
+                "ef_diesel_co2_end_tier_2": module.energy_emission_factor_co2_t2_w,
+                "ef_diese_default_n2o": energy_ef_default_n2o,
+                "ef_diesel_n2o_start_tier_2": module.energy_emission_factor_n2o_t2_start,
+                "ef_diesel_n2o_end_tier_2": module.energy_emission_factor_n2o_t2_w,
+                "ef_diesel_default_ch4": energy_ef_default_ch4,
+                "ef_diesel_ch4_start_tier_2": module.energy_emission_factor_ch4_t2_start,
+                "ef_diesel_ch4_end_tier_2": module.energy_emission_factor_ch4_t2_w,
                 "fui_default_start": fui_default_start,
                 "fui_default_end": fui_default_w,
                 "fui_start_tier_2": module.fui_start,
@@ -2696,9 +2704,15 @@ class SmallFisheryCalculator(BaseCalculator):
                 "rate_type": module.activity.change_rate.name,
                 "catch_start": module.total_catch_yr_start,
                 "catch_end": module.total_catch_yr_wo,
-                "ef_diesel_default": ef_diesel_default,
-                "ef_diesel_start_tier_2": module.energy_emission_factor_t2_start,
-                "ef_diesel_tier_2_end": module.energy_emission_factor_t2_wo,
+                "ef_diesel_default_co2": energy_ef_default_co2,
+                "ef_diesel_co2_start_tier_2": module.energy_emission_factor_co2_t2_start,
+                "ef_diesel_co2_end_tier_2": module.energy_emission_factor_co2_t2_wo,
+                "ef_diese_default_n2o": energy_ef_default_n2o,
+                "ef_diesel_n2o_start_tier_2": module.energy_emission_factor_n2o_t2_start,
+                "ef_diesel_n2o_end_tier_2": module.energy_emission_factor_n2o_t2_wo,
+                "ef_diesel_default_ch4": energy_ef_default_ch4,
+                "ef_diesel_ch4_start_tier_2": module.energy_emission_factor_ch4_t2_start,
+                "ef_diesel_ch4_end_tier_2": module.energy_emission_factor_ch4_t2_wo,
                 "fui_default_start": fui_default_start,
                 "fui_default_end": fui_default_wo,
                 "fui_start_tier_2": module.fui_start,
@@ -2806,9 +2820,11 @@ class LargeFisheryCalculator(BaseCalculator):
         project = module.activity.project
 
         try:
-            ef_diesel_default_list = ipcc.EnergyDefaultEmissionFactor.objects.filter(fuel_type__fuel_use_type__name__contains="Off-Road")
+            energy_ef_default = ipcc.EnergyDefaultEmissionFactor.objects.filter(fuel_type__fuel_use_type__name__contains="Off-Road")
             # Average of all default emission factors for gasoil/diesel
-            ef_diesel_default = sum([ef.t_co2_eq for ef in ef_diesel_default_list]) / len(ef_diesel_default_list)
+            energy_ef_default_co2 = sum([ef.co2 for ef in energy_ef_default]) / len(energy_ef_default)
+            energy_ef_default_ch4 = sum([ef.ch4 for ef in energy_ef_default]) / len(energy_ef_default)
+            energy_ef_default_n2o = sum([ef.n2o for ef in energy_ef_default]) / len(energy_ef_default)
         except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
             raise ValueError("Default emission factors for off-road diesel do not exist")
 
@@ -2859,9 +2875,15 @@ class LargeFisheryCalculator(BaseCalculator):
                 "rate_type": module.activity.change_rate.name,
                 "catch_start": module.total_catch_yr_start,
                 "catch_end": module.total_catch_yr_w,
-                "ef_diesel_default": ef_diesel_default,
-                "ef_diesel_start_tier_2": module.energy_emission_factor_t2_start,
-                "ef_diesel_tier_2_end": module.energy_emission_factor_t2_w,
+                "ef_diesel_default_co2": energy_ef_default_co2,
+                "ef_diesel_co2_start_tier_2": module.energy_emission_factor_co2_t2_start,
+                "ef_diesel_co2_end_tier_2": module.energy_emission_factor_co2_t2_w,
+                "ef_diese_default_n2o": energy_ef_default_n2o,
+                "ef_diesel_n2o_start_tier_2": module.energy_emission_factor_n2o_t2_start,
+                "ef_diesel_n2o_end_tier_2": module.energy_emission_factor_n2o_t2_w,
+                "ef_diesel_default_ch4": energy_ef_default_ch4,
+                "ef_diesel_ch4_start_tier_2": module.energy_emission_factor_ch4_t2_start,
+                "ef_diesel_ch4_end_tier_2": module.energy_emission_factor_ch4_t2_w,
                 "fui_default_start": fui_default_start,
                 "fui_default_end": fui_default_w,
                 "fui_start_tier_2": module.fui_start,
@@ -2898,9 +2920,15 @@ class LargeFisheryCalculator(BaseCalculator):
                 "rate_type": module.activity.change_rate.name,
                 "catch_start": module.total_catch_yr_start,
                 "catch_end": module.total_catch_yr_wo,
-                "ef_diesel_default": ef_diesel_default,
-                "ef_diesel_start_tier_2": module.energy_emission_factor_t2_start,
-                "ef_diesel_tier_2_end": module.energy_emission_factor_t2_wo,
+                "ef_diesel_default_co2": energy_ef_default_co2,
+                "ef_diesel_co2_start_tier_2": module.energy_emission_factor_co2_t2_start,
+                "ef_diesel_co2_end_tier_2": module.energy_emission_factor_co2_t2_w,
+                "ef_diese_default_n2o": energy_ef_default_n2o,
+                "ef_diesel_n2o_start_tier_2": module.energy_emission_factor_n2o_t2_start,
+                "ef_diesel_n2o_end_tier_2": module.energy_emission_factor_n2o_t2_w,
+                "ef_diesel_default_ch4": energy_ef_default_ch4,
+                "ef_diesel_ch4_start_tier_2": module.energy_emission_factor_ch4_t2_start,
+                "ef_diesel_ch4_end_tier_2": module.energy_emission_factor_ch4_t2_w,
                 "fui_default_start": fui_default_start,
                 "fui_default_end": fui_default_wo,
                 "fui_start_tier_2": module.fui_start,

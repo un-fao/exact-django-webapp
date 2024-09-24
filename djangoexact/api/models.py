@@ -1753,9 +1753,17 @@ class Fishery(Module):
     ice_preserved_catch_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_ice_preserved_catch_thread", on_delete=models.SET_NULL)
 
     # TODO: Is the non-t2 value static for this specific module? It's always related to Gasoil/Diesel
-    energy_emission_factor_t2_start = models.FloatField(null=True, blank=True)
-    energy_emission_factor_t2_w = models.FloatField(null=True, blank=True)
-    energy_emission_factor_t2_wo = models.FloatField(null=True, blank=True)
+    energy_emission_factor_co2_t2_start = models.FloatField(null=True, blank=True)
+    energy_emission_factor_co2_t2_w = models.FloatField(null=True, blank=True)
+    energy_emission_factor_co2_t2_wo = models.FloatField(null=True, blank=True)
+
+    energy_emission_factor_ch4_t2_start = models.FloatField(null=True, blank=True)
+    energy_emission_factor_ch4_t2_w = models.FloatField(null=True, blank=True)
+    energy_emission_factor_ch4_t2_wo = models.FloatField(null=True, blank=True)
+
+    energy_emission_factor_n2o_t2_start = models.FloatField(null=True, blank=True)
+    energy_emission_factor_n2o_t2_w = models.FloatField(null=True, blank=True)
+    energy_emission_factor_n2o_t2_wo = models.FloatField(null=True, blank=True)
 
     refrigerant_lost_per_tonne_t2_start = models.FloatField(null=True, blank=True)
     refrigerant_lost_per_tonne_t2_w = models.FloatField(null=True, blank=True)
