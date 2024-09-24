@@ -3405,7 +3405,7 @@ class FuelCalculator(BaseCalculator):
         self.module: Fuel
 
         try:
-            self.ef = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=self.module.fuel_type)
+            self.ef = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=self.module.fuel_type, fuel_use_type=self.module.fuel_type.fuel_use_type)
         except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
             raise ValueError(f"Default emission factor for {self.module.fuel_type.name} does not exist. Please select tier 2 value.")
 
@@ -4402,17 +4402,14 @@ class LivestockCalculator(BaseCalculator):
             self.math_wo = MathLivestock(**inputs_wo)
             self.math_wo.calculate_emissions()
 
-        results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
 
-        log.debug("WITH breakdown")
-        results_w.breakdown(by=BreakdownTypes.ACTIVITY)
-        log.debug("WITHOUT breakdown")
-        results_wo.breakdown(by=BreakdownTypes.ACTIVITY)
+        if PLOT_GRAPHS:
+            self.results_w.plot_emissions_and_aggregate_by_activity("livestock_w")
+            self.results_wo.plot_emissions_and_aggregate_by_activity("livestock_wo")
 
-        log.debug(f"Results for WITH: {results_w}")
-        log.debug(f"Results for WITHOUT: {results_wo}")
-        return (results_w, results_wo)
+        return (self.results_w, self.results_wo)
 
 
 class IrrigationCalculator(BaseCalculator):
@@ -4435,6 +4432,10 @@ class IrrigationCalculator(BaseCalculator):
             r_w, r_wo = IrrigationPhaseCalculator(phase).calculate()
             self.results_w += r_w
             self.results_wo += r_wo
+
+        if PLOT_GRAPHS:
+            self.results_w.plot_emissions_and_aggregate_by_activity("irrigation_w")
+            self.results_wo.plot_emissions_and_aggregate_by_activity("irrigation_wo")
 
         return (self.results_w, self.results_wo)
 
@@ -4513,6 +4514,10 @@ class IrrigationSystemCalculator(BaseCalculator):
         self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
 
+        if PLOT_GRAPHS:
+            self.results_w.plot_emissions_and_aggregate_by_activity("irrigation_system_w")
+            self.results_wo.plot_emissions_and_aggregate_by_activity("irrigation_system_wo")
+
         results_tuple = (self.results_w, self.results_wo)
 
         return results_tuple
@@ -4536,7 +4541,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
         super().get_defaults(calculate)
 
         self.ef: ipcc.IrrigationPhaseData = utils.get_or_raise(ipcc.IrrigationPhaseData, {"fuel_type": self.module.fuel_type}, f"Could not find EF for {self.module.fuel_type.name}")
-        self.energy_db: ipcc.EnergyDefaultEmissionFactor = utils.get_or_raise(ipcc.EnergyDefaultEmissionFactor, {"fuel_type": self.module.fuel_type}, f"Could not find Energy Default Emission Factor for {self.module.fuel_type.name}")
+        self.energy_db: ipcc.EnergyDefaultEmissionFactor = utils.get_or_raise(ipcc.EnergyDefaultEmissionFactor, {"fuel_type": self.module.fuel_type, "fuel_use_type": self.module.fuel_type.fuel_use_type}, f"Could not find Energy Default Emission Factor for {self.module.fuel_type.name}")
 
         self.pressure: ipcc.IrrigationPressureRequirement = utils.get_or_raise(ipcc.IrrigationPressureRequirement, {"irrigation_system_type": self.module.irrigation_system_type}, f"Could not find Pressure Requirement for {self.module.irrigation_system_type.name}")
         if self.pressure.bar_start is None or self.pressure.bar_end is None:
@@ -4639,6 +4644,11 @@ class IrrigationPhaseCalculator(BaseCalculator):
         self.results_start = self.math_start.result if self.math_start else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+
+        if PLOT_GRAPHS:
+            self.results_start.plot_emissions_and_aggregate_by_activity("irrigation_phase_start")
+            self.results_w.plot_emissions_and_aggregate_by_activity("irrigation_phase_w")
+            self.results_wo.plot_emissions_and_aggregate_by_activity("irrigation_phase_wo")
 
         results_tuple = (self.results_w + self.results_start, self.results_wo + self.results_start)
 
