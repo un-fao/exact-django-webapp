@@ -1238,8 +1238,8 @@ def generic_module_viewset(model: Module):
             Updates a module.
             """
 
-            module: Module = self.get_object()
-            activity = module.parent.activity if module.module_type.is_submodule else module.activity
+            module: Module | Submodule = self.get_object()
+            activity = module.get_activity()
 
             if not utils.has_project_permission("can_change_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to update this module in the project")
@@ -1262,8 +1262,8 @@ def generic_module_viewset(model: Module):
             Partially updates a module.
             """
 
-            module: Module = self.get_object()
-            activity = module.parent.activity if module.module_type.is_submodule else module.activity
+            module: Module | Submodule = self.get_object()
+            activity = module.get_activity()
 
             if not utils.has_project_permission("can_change_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to update this module in the project")
@@ -1351,8 +1351,8 @@ def generic_module_viewset(model: Module):
             Calculates and returns total emissions for a single module.
             """
 
-            module: Module = get_object_or_404(model, pk=pk)
-            activity: Activity = module.parent.activity if module.module_type.is_submodule else module.activity
+            module: Module | Submodule = get_object_or_404(model, pk=pk)
+            activity = module.get_activity()
 
             if not utils.has_project_permission("can_view_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to view this module in the project")
@@ -1399,12 +1399,7 @@ def generic_module_viewset(model: Module):
             """
 
             module: Module | Submodule = get_object_or_404(model, pk=pk)
-
-            if module.module_type.is_submodule:
-                activity = module.parent.activity
-
-            else:
-                activity = module.activity
+            activity = module.get_activity()
 
             serializer = get_module_serializer(model, ActionTypes.UPDATE)(data={}, instance=module)
             serializer.is_valid(raise_exception=True)
@@ -1424,7 +1419,7 @@ def generic_module_viewset(model: Module):
         @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view module changes", 200: ChangeHistorySerializer})
         def history(self, request, pk=None):
             module: Module = self.get_object()
-            activity: Activity = module.parent.activity if module.module_type.is_submodule else module.activity
+            activity = module.get_activity()
 
             if not utils.has_project_permission("can_view_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to view this module in the project")
@@ -1441,12 +1436,7 @@ def generic_module_viewset(model: Module):
             """
 
             module: Module | Submodule = get_object_or_404(model, pk=pk)
-
-            if module.module_type.is_submodule:
-                activity = module.parent.activity
-
-            else:
-                activity = module.activity
+            activity = module.get_activity()
 
             if not utils.has_project_permission("can_view_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to view this module in the project")
