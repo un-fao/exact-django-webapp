@@ -234,7 +234,10 @@ class UserViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     @action(detail=True, methods=["post"], url_path="reset-password")
     @swagger_auto_schema(
         request_body=EmptySerializer,
-        manual_parameters=[openapi.Parameter("password_old", openapi.IN_BODY, description="Old password", type=openapi.TYPE_STRING), openapi.Parameter("password_new", openapi.IN_BODY, description="New password", type=openapi.TYPE_STRING)],
+        manual_parameters=[
+            openapi.Parameter("password_old", openapi.IN_BODY, description="Old password", type=openapi.TYPE_STRING),
+            openapi.Parameter("password_new", openapi.IN_BODY, description="New password", type=openapi.TYPE_STRING),
+        ],
     )
     @transaction.atomic
     def reset_password(self, request, pk=None):
@@ -253,6 +256,7 @@ class UserViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         user.save()
 
         try:
+            # NOTE: This makes the refresh token invalid but the current access token remains valid
             firebase_admin_auth.update_user(user.firebase_uid, password=new_password)
             firebase_admin_auth.revoke_refresh_tokens(user.firebase_uid)
         except Exception as e:
