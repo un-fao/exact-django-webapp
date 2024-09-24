@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     "django_filters",
     "accounts",
     "simple_history",
+    "modeltranslation",
     "ipcc",
     "api",
 ]
@@ -160,6 +161,11 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 LANGUAGE_CODE = "en-us"
 LOCALE_PATHS = [os.path.join(BASE_DIR, "locale")]
+LANGUAGES = [
+    ("en", "English"),
+    ("fr", "French"),
+    ("es", "Spanish"),
+]
 
 USE_TZ = True
 
