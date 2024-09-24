@@ -162,6 +162,10 @@ def get_model_serializer(model_arg):
             fields = "__all__"
             ref_name = model_arg.__name__
 
+        def __init__(self, *args, **kwargs):
+            log.debug(f"START GenericSerializer[{model_arg.__name__}].init")
+            super().__init__(*args, **kwargs)
+
     try:
         return globals()[model_arg.__name__ + "Serializer"]
     except KeyError:
@@ -2582,3 +2586,19 @@ class NoteSerializer(serializers.ModelSerializer):
         model = Note
         fields = ["id", "content", "module_type", "module_id"]
         ref_name = "Note"
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
+    def validate(self, data):
+        user: CustomUser = self.context["request"].user
+
+        if not user.check_password(data["old_password"]):
+            raise serializers.ValidationError("Old password is incorrect")
+
+        if not data["old_password"] or not data["new_password"]:
+            raise serializers.ValidationError("Old and new password are required")
+
+        return super().validate(data)

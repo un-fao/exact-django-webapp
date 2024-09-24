@@ -82,6 +82,7 @@ from .serializers import (
     NewNoteSerializer,
     NoteSerializer,
     ActivitySerializerWithModules,
+    ResetPasswordSerializer,
 )
 
 from djangoexact.settings import auth
@@ -232,25 +233,15 @@ class UserViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return utils.ErrorResponse("Selected user does not have permission to delete the user", status=http_status.HTTP_403_FORBIDDEN)
 
     @action(detail=True, methods=["post"], url_path="reset-password")
-    @swagger_auto_schema(
-        request_body=EmptySerializer,
-        manual_parameters=[
-            openapi.Parameter("password_old", openapi.IN_BODY, description="Old password", type=openapi.TYPE_STRING),
-            openapi.Parameter("password_new", openapi.IN_BODY, description="New password", type=openapi.TYPE_STRING),
-        ],
-    )
+    @swagger_auto_schema(request_body=ResetPasswordSerializer, responses={400: "Bad request", 200: "Password reset successfully"})
     @transaction.atomic
     def reset_password(self, request, pk=None):
         user: CustomUser = self.get_object()
 
-        old_password = request.data.get("password_old", None)
-        new_password = request.data.get("password_new", None)
+        serializer = ResetPasswordSerializer(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
 
-        if not old_password or not new_password:
-            return utils.ErrorResponse("Old or new password not provided", status=http_status.HTTP_400_BAD_REQUEST)
-
-        if not user.check_password(old_password):
-            return utils.ErrorResponse("Old password is incorrect", status=http_status.HTTP_400_BAD_REQUEST)
+        new_password = serializer.validated_data["password_new"]
 
         user.set_password(new_password)
         user.save()
@@ -1469,6 +1460,7 @@ def generic_module_viewset(model: Module):
             return Response(data=ChangeHistorySerializer(changes, many=True).data, status=http_status.HTTP_200_OK)
 
         @action(detail=True, methods=["get"])
+        @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view module definitions", 200: "Definitions"})
         def definitions(self, request, pk=None):
             """
             Returns the definitions for a module.
