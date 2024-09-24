@@ -309,10 +309,6 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error("Selected user does not have permission to delete the project")
             return utils.ErrorResponse("Selected user does not have permission to delete the project", status=http_status.HTTP_403_FORBIDDEN)
 
-        if user != project.owner:
-            logging.error("Selected user is not the owner of the project")
-            return utils.ErrorResponse("Only the owner can delete a project.", status=http_status.HTTP_403_FORBIDDEN)
-
         project.delete()
 
         update_change_reason(project, utils.ChangeReasons.DELETE.value)
@@ -1311,8 +1307,6 @@ def generic_module_viewset(model: Module):
 
             module_serializer.save()
 
-            utils.create_comment_threads(module_serializer.instance)
-
             read_serializer = get_module_serializer(model)(instance=module_serializer.instance)
 
             update_change_reason(module_serializer.instance, utils.ChangeReasons.CREATE.value)
@@ -1411,7 +1405,7 @@ def generic_module_viewset(model: Module):
             else:
                 activity = module.activity
 
-            serializer = get_module_serializer(model)(data={}, instance=module)
+            serializer = get_module_serializer(model, ActionTypes.UPDATE)(data={}, instance=module)
             serializer.is_valid(raise_exception=True)
             serializer.save()
 

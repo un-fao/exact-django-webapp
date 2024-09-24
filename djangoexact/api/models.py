@@ -64,6 +64,7 @@ class CustomUser(AbstractUser):
     country = models.ForeignKey("api.Country", on_delete=models.CASCADE, null=True, blank=True, related_name="users")
     email = models.EmailField(unique=True)
     username = None
+    organization = models.CharField(max_length=255, null=True, blank=True)
     firebase_uid = models.CharField(max_length=255, unique=True, validators=[alphanumeric], null=True, blank=True, verbose_name="Firebase UID")
 
     USERNAME_FIELD = "email"
@@ -856,6 +857,9 @@ class Submodule(Historical):
         if not self.status:
             self.status = StatusType.objects.get_or_create(name="EMPTY")[0]
 
+        if not self.pk:
+            utils.create_comment_threads(self)
+
         super().save(*args, **kwargs)
 
     def is_ready(self) -> bool:
@@ -909,6 +913,9 @@ class Module(Historical):
     def save(self, *args, **kwargs):
         if not self.status:
             self.status = StatusType.objects.get_or_create(name="EMPTY")[0]
+
+        if not self.pk:
+            utils.create_comment_threads(self)
 
         super().save(*args, **kwargs)
 
@@ -1552,13 +1559,13 @@ class ForestManagement(LandModule, LitterDeadwoodBiomassModule):
     bgb_growth_rate_gt_20_yrs_t2_w = models.FloatField(null=True, blank=True)
     bgb_growth_rate_gt_20_yrs_t2_wo = models.FloatField(null=True, blank=True)
 
-    rotation_start_year_t2_start = models.IntegerField(default=0)
-    rotation_start_year_t2_w = models.IntegerField(default=0)
-    rotation_start_year_t2_wo = models.IntegerField(default=0)
+    rotation_start_year_t2_start = models.IntegerField(null=True, blank=True, default=0)
+    rotation_start_year_t2_w = models.IntegerField(null=True, blank=True, default=0)
+    rotation_start_year_t2_wo = models.IntegerField(null=True, blank=True, default=0)
 
-    logging_start_year_t2_start = models.IntegerField(default=0)
-    logging_start_year_t2_w = models.IntegerField(default=0)
-    logging_start_year_t2_wo = models.IntegerField(default=0)
+    logging_start_year_t2_start = models.IntegerField(null=True, blank=True, default=0)
+    logging_start_year_t2_w = models.IntegerField(null=True, blank=True, default=0)
+    logging_start_year_t2_wo = models.IntegerField(null=True, blank=True, default=0)
 
     logging_dry_matter_logged_t2_start = models.FloatField(null=True, blank=True)
     logging_dry_matter_logged_t2_w = models.FloatField(null=True, blank=True)
@@ -2371,3 +2378,10 @@ class Definition(models.Model):
 
     def __str__(self):
         return f"({self.pk}) {self.module_type}"
+
+
+class OrganizationType(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return f"({self.pk}) {self.name}"
