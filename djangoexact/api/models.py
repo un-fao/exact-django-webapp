@@ -481,7 +481,7 @@ class MacroFuelType(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return f"({self.pk}) {_(self.name)}"
 
 
 class FuelUseType(models.Model):
