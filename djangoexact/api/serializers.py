@@ -2138,6 +2138,8 @@ class ForestManagementWriteSerializer(LandModuleSeralizer):
 
         instance: ForestManagement = self.instance
 
+        data = self.merge_instance_data(data, instance=instance)
+
         # Logging mandatory fields
         loggings = get_filled_scenarios(data, ["logging_recurrence_yrs"])
         rotations = get_filled_scenarios(data, ["rotation_length_yrs"])
