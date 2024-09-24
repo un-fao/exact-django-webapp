@@ -13,6 +13,7 @@ from .ghg_emissions_classes import (
 from dataclasses import dataclass
 from typing import Optional
 
+
 @dataclass
 class Fishery(BaseModule):
     catch_start: float
@@ -49,7 +50,8 @@ class Fishery(BaseModule):
     percentage_ice_end: float
 
     def __post_init__(self):
-        
+        super().__post_init__()
+
         self.tonnes_catch_yearly_breakdown = yearly_time_dependent_parameter_breakdown(self.catch_start, self.catch_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
     def calculate_emissions(self):
@@ -77,15 +79,7 @@ class Fishery(BaseModule):
 
                 emissions_co2_catch_yearly = yearly_time_dependent_parameter_breakdown(annual_co2_start, annual_co2_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
-                self.result.yearly_emissions_by_sector_by_gas.append(
-                    YearlyGasActivityEmissionSet(
-                        year=0,
-                        gas_type=GasTypes.CO2,
-                        emissions=[Emission(x, GasTypes.CO2) for x in emissions_co2_catch_yearly],
-                        activity=ActivityTypes.CATCH,
-                        delay=self.delay
-                    )
-                )
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(x, GasTypes.CO2) for x in emissions_co2_catch_yearly], activity=ActivityTypes.CATCH, delay=self.delay))
 
                 # n2o calculation
 
@@ -97,15 +91,7 @@ class Fishery(BaseModule):
 
                 emissions_n2o_catch_yearly = yearly_time_dependent_parameter_breakdown(annual_n2o_start, annual_n2o_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
-                self.result.yearly_emissions_by_sector_by_gas.append(
-                    YearlyGasActivityEmissionSet(
-                        year=0,
-                        gas_type=GasTypes.N2O,
-                        emissions=[Emission(x, GasTypes.N2O) for x in emissions_n2o_catch_yearly],
-                        activity=ActivityTypes.CATCH,
-                        delay=self.delay
-                    )
-                )
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(x, GasTypes.N2O) for x in emissions_n2o_catch_yearly], activity=ActivityTypes.CATCH, delay=self.delay))
 
                 # ch4 calculation
 
@@ -117,15 +103,7 @@ class Fishery(BaseModule):
 
                 emissions_ch4_catch_yearly = yearly_time_dependent_parameter_breakdown(annual_ch4_start, annual_ch4_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
-                self.result.yearly_emissions_by_sector_by_gas.append(
-                    YearlyGasActivityEmissionSet(
-                        year=0,
-                        gas_type=GasTypes.CH4,
-                        emissions=[Emission(x, GasTypes.CH4) for x in emissions_ch4_catch_yearly],
-                        activity=ActivityTypes.CATCH,
-                        delay=self.delay
-                    )
-                )
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(x, GasTypes.CH4) for x in emissions_ch4_catch_yearly], activity=ActivityTypes.CATCH, delay=self.delay))
 
             except Exception as e:
                 traceback.print_exc()
@@ -146,15 +124,7 @@ class Fishery(BaseModule):
 
                 emissions_refrigerant_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
-                self.result.yearly_emissions_by_sector_by_gas.append(
-                    YearlyGasActivityEmissionSet(
-                        year=0,
-                        gas_type=GasTypes.OTHER,
-                        emissions=[Emission(x, GasTypes.OTHER) for x in emissions_refrigerant_yearly],
-                        activity=ActivityTypes.REFRIGERANT,
-                        delay=self.delay
-                    )
-                )
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.OTHER, emissions=[Emission(x, GasTypes.OTHER) for x in emissions_refrigerant_yearly], activity=ActivityTypes.REFRIGERANT, delay=self.delay))
             except Exception as e:
                 traceback.print_exc()
 
@@ -177,21 +147,14 @@ class Fishery(BaseModule):
 
                 emissions_ice_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
-                self.result.yearly_emissions_by_sector_by_gas.append(
-                    YearlyGasActivityEmissionSet(
-                        year=0,
-                        gas_type=GasTypes.OTHER,
-                        emissions=[Emission(x, GasTypes.OTHER) for x in emissions_ice_yearly],
-                        activity=ActivityTypes.ICE,
-                        delay=self.delay
-                    )
-                )
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.OTHER, emissions=[Emission(x, GasTypes.OTHER) for x in emissions_ice_yearly], activity=ActivityTypes.ICE, delay=self.delay))
             except Exception as e:
                 traceback.print_exc()
 
         calculate_catch_emissions()
         calculate_refrigerant_emissions()
         calculate_ice_emissions()
+
 
 @dataclass
 class CoastalAquaculture(BaseModule):
@@ -217,17 +180,9 @@ class CoastalAquaculture(BaseModule):
                 annual_start = nitrous_ef_start * self.production_start * self.nitrous_constant * 44 / 28
                 annual_end = nitrous_ef_end * self.production_end * self.nitrous_constant * 44 / 28
 
-                emissions_nitrous_yearly = yearly_time_dependent_parameter_breakdown(
-                    annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type
-                )
+                emissions_nitrous_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
-                self.result.yearly_emissions_by_sector_by_gas.append(
-                    YearlyGasActivityEmissionSet(
-                        year=0, gas_type=GasTypes.N2O,
-                        emissions=[Emission(x, GasTypes.N2O) for x in emissions_nitrous_yearly],
-                        activity=ActivityTypes.N20_FIELD, delay=self.delay
-                    )
-                )
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(x, GasTypes.N2O) for x in emissions_nitrous_yearly], activity=ActivityTypes.N20_FIELD, delay=self.delay))
 
             except Exception as e:
                 traceback.print_exc()
@@ -242,24 +197,15 @@ class CoastalAquaculture(BaseModule):
                 annual_start = electricity_used_start * self.production_start * ef_electricity_start
                 annual_end = electricity_used_end * self.production_end * ef_electricity_end
 
-                emissions_co2_yearly = yearly_time_dependent_parameter_breakdown(
-                    annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type
-                )
+                emissions_co2_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
-                self.result.yearly_emissions_by_sector_by_gas.append(
-                    YearlyGasActivityEmissionSet(
-                        year=0, gas_type=GasTypes.CO2,
-                        emissions=[Emission(x, GasTypes.CO2) for x in emissions_co2_yearly],
-                        activity=ActivityTypes.ELECTRICITY, delay=self.delay
-                    )
-                )
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(x, GasTypes.CO2) for x in emissions_co2_yearly], activity=ActivityTypes.ELECTRICITY, delay=self.delay))
 
             except Exception as e:
                 traceback.print_exc()
 
         calculate_nitrous_emissions()
         calculate_co2_emissions()
-
 
 
 # # TEST FISHERIES
@@ -329,5 +275,3 @@ class CoastalAquaculture(BaseModule):
 # )
 
 # fishery.calculate_emissions()
-
-
