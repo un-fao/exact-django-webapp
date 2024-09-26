@@ -89,7 +89,7 @@ from djangoexact.settings import auth
 from django.utils.translation import activate, get_language
 from firebase_admin import auth as firebase_admin_auth
 from django.contrib.auth import logout
-
+from auditlog.context import disable_auditlog, LogEntry
 
 logger = logging.getLogger("console")
 
@@ -223,11 +223,17 @@ class UserViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         self.serializer_class = UserWriteSerializer
         return super().update(request, *args, **kwargs)
 
-    def delete(self, request, *args, **kwargs):
-        user: CustomUser = self.get_object()
+    @transaction.atomic
+    def destroy(self, request, pk=None):
+        logging.info("Deleting user")
+        user: CustomUser = CustomUser.objects.get(pk=pk)
         if user == self.request.user or self.request.user.is_superuser or self.request.user.is_staff:
-            user.delete()
-            auth.delete_user_account(user.firebase_uid)
+            LogEntry.objects.log_create(user, force_log=True, action=LogEntry.Action.DELETE)
+            with disable_auditlog():
+                ProjectInvitation.objects.filter(user=user).delete()
+                ProjectMembership.objects.filter(user=user).delete()
+                user.delete()
+            firebase_admin_auth.delete_user(user.firebase_uid)
             return Response(status=http_status.HTTP_204_NO_CONTENT)
 
         return utils.ErrorResponse("Selected user does not have permission to delete the user", status=http_status.HTTP_403_FORBIDDEN)
