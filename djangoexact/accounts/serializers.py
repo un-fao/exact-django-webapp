@@ -46,6 +46,12 @@ class UserSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class UserSummarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("id", "username", "first_name", "last_name", "email", "country", "organization")
+
+
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
