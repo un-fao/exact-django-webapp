@@ -74,7 +74,7 @@ class CustomUser(AbstractUser):
     REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
-    history = HistoricalRecords()
+    history = HistoricalRecords(cascade_delete_history=True)
 
     class Meta:
         permissions = (
@@ -526,7 +526,7 @@ class BaseModel(models.Model):
 
 
 class Historical(models.Model):
-    history = HistoricalRecords(inherit=True, related_name="%(class)s_history")
+    history = HistoricalRecords(inherit=True, related_name="%(class)s_history", cascade_delete_history=True)
 
     class Meta:
         abstract = True

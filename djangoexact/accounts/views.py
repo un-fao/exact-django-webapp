@@ -79,7 +79,7 @@ class CreateNewUserView(APIView):
 
             utils.send_email_verification_link(email, db_user.first_name.capitalize() + " " + db_user.last_name.capitalize())
 
-            return Response(UserSummarySerializer(db_user), status=status.HTTP_201_CREATED)
+            return Response(UserSummarySerializer(db_user).data, status=status.HTTP_201_CREATED)
 
         except Exception as e:
             try:
