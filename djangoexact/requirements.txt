@@ -55,3 +55,4 @@ firebase-admin==6.5.0
 Pyrebase4==4.8.0
 requests==2.31.0
 django-unfold==0.34.0
+django-modeltranslation==0.19.9
