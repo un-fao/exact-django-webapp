@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     "django_filters",
     "accounts",
     "simple_history",
+    "modeltranslation",
     "ipcc",
     "api",
 ]
@@ -154,11 +155,17 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = "UTC"
 
 USE_I18N = True
+LANGUAGE_CODE = "en-us"
+LOCALE_PATHS = [os.path.join(BASE_DIR, "locale")]
+LANGUAGES = [
+    ("en", "English"),
+    ("fr", "French"),
+    ("es", "Spanish"),
+]
 
 USE_TZ = True
 

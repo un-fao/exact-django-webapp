@@ -82,10 +82,14 @@ from .serializers import (
     NewNoteSerializer,
     NoteSerializer,
     ActivitySerializerWithModules,
+    ResetPasswordSerializer,
 )
 
 from djangoexact.settings import auth
-
+from django.utils.translation import activate, get_language
+from firebase_admin import auth as firebase_admin_auth
+from django.contrib.auth import logout
+from auditlog.context import disable_auditlog, LogEntry
 
 logger = logging.getLogger("console")
 
@@ -219,14 +223,47 @@ class UserViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         self.serializer_class = UserWriteSerializer
         return super().update(request, *args, **kwargs)
 
-    def delete(self, request, *args, **kwargs):
-        user: CustomUser = self.get_object()
+    @transaction.atomic
+    def destroy(self, request, pk=None):
+        logging.info("Deleting user")
+        user: CustomUser = CustomUser.objects.get(pk=pk)
         if user == self.request.user or self.request.user.is_superuser or self.request.user.is_staff:
-            user.delete()
-            auth.delete_user_account(user.firebase_uid)
+            LogEntry.objects.log_create(user, force_log=True, action=LogEntry.Action.DELETE)
+            with disable_auditlog():
+                ProjectInvitation.objects.filter(user=user).delete()
+                ProjectMembership.objects.filter(user=user).delete()
+                user.delete()
+            firebase_admin_auth.delete_user(user.firebase_uid)
             return Response(status=http_status.HTTP_204_NO_CONTENT)
 
         return utils.ErrorResponse("Selected user does not have permission to delete the user", status=http_status.HTTP_403_FORBIDDEN)
+
+    @action(detail=True, methods=["post"], url_path="reset-password")
+    @swagger_auto_schema(request_body=ResetPasswordSerializer, responses={400: "Bad request", 200: "Password reset successfully"})
+    @transaction.atomic
+    def reset_password(self, request, pk=None):
+        user: CustomUser = self.get_object()
+
+        serializer = ResetPasswordSerializer(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+
+        new_password = serializer.validated_data["password_new"]
+
+        user.set_password(new_password)
+        user.save()
+
+        try:
+            # NOTE: This makes the refresh token invalid but the current access token remains valid
+            firebase_admin_auth.update_user(user.firebase_uid, password=new_password)
+            firebase_admin_auth.revoke_refresh_tokens(user.firebase_uid)
+        except Exception as e:
+            return utils.ErrorResponse(str(e), status=http_status.HTTP_400_BAD_REQUEST)
+
+        return Response(status=http_status.HTTP_200_OK)
+
+    @action(detail=False, methods=["get"])
+    def whoami(self, request):
+        return Response(UserReadSerializer(request.user).data, status=http_status.HTTP_200_OK)
 
 
 class LandUseTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
@@ -1237,8 +1274,8 @@ def generic_module_viewset(model: Module):
             Updates a module.
             """
 
-            module: Module = self.get_object()
-            activity = module.parent.activity if module.module_type.is_submodule else module.activity
+            module: Module | Submodule = self.get_object()
+            activity = module.get_activity()
 
             if not utils.has_project_permission("can_change_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to update this module in the project")
@@ -1261,8 +1298,8 @@ def generic_module_viewset(model: Module):
             Partially updates a module.
             """
 
-            module: Module = self.get_object()
-            activity = module.parent.activity if module.module_type.is_submodule else module.activity
+            module: Module | Submodule = self.get_object()
+            activity = module.get_activity()
 
             if not utils.has_project_permission("can_change_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to update this module in the project")
@@ -1350,8 +1387,8 @@ def generic_module_viewset(model: Module):
             Calculates and returns total emissions for a single module.
             """
 
-            module: Module = get_object_or_404(model, pk=pk)
-            activity: Activity = module.parent.activity if module.module_type.is_submodule else module.activity
+            module: Module | Submodule = get_object_or_404(model, pk=pk)
+            activity = module.get_activity()
 
             if not utils.has_project_permission("can_view_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to view this module in the project")
@@ -1398,12 +1435,7 @@ def generic_module_viewset(model: Module):
             """
 
             module: Module | Submodule = get_object_or_404(model, pk=pk)
-
-            if module.module_type.is_submodule:
-                activity = module.parent.activity
-
-            else:
-                activity = module.activity
+            activity = module.get_activity()
 
             serializer = get_module_serializer(model, ActionTypes.UPDATE)(data={}, instance=module)
             serializer.is_valid(raise_exception=True)
@@ -1423,7 +1455,7 @@ def generic_module_viewset(model: Module):
         @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view module changes", 200: ChangeHistorySerializer})
         def history(self, request, pk=None):
             module: Module = self.get_object()
-            activity: Activity = module.parent.activity if module.module_type.is_submodule else module.activity
+            activity = module.get_activity()
 
             if not utils.has_project_permission("can_view_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to view this module in the project")
@@ -1432,6 +1464,26 @@ def generic_module_viewset(model: Module):
             changes = utils.get_changes(module.history.all())
 
             return Response(data=ChangeHistorySerializer(changes, many=True).data, status=http_status.HTTP_200_OK)
+
+        @action(detail=True, methods=["get"])
+        @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view module definitions", 200: "Definitions"})
+        def definitions(self, request, pk=None):
+            """
+            Returns the definitions for a module.
+            """
+
+            module: Module | Submodule = get_object_or_404(model, pk=pk)
+            activity = module.get_activity()
+
+            if not utils.has_project_permission("can_view_modules", self.request.user, activity.project):
+                logging.error("Selected user does not have permission to view this module in the project")
+                return utils.ErrorResponse("Selected user does not have permission to view this module in the project", status=http_status.HTTP_403_FORBIDDEN)
+
+            try:
+                definitions = utils.get_entity_definitions(module.module_type.class_name)
+                return Response(definitions)
+            except Exception as e:
+                return utils.ErrorResponse(str(e))
 
     return GenericModuleViewSet
 
@@ -1463,19 +1515,22 @@ class DefinitionViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
 
         module_type_id = request.query_params.get("module_type_id", None)
+        lang = request.GET.get("lang", "en")
+        activate(lang)
 
-        if module_type_id:
-            try:
-                module_type = ModuleType.objects.get(pk=module_type_id)
-            except ModuleType.DoesNotExist:
-                logging.error(f"Module type with id {module_type_id} not found")
-                return utils.ErrorResponse(f"Module type with id {module_type_id} not found", status=http_status.HTTP_400_BAD_REQUEST)
+        if module_type_id is None:
+            return super().list(request)
 
-            definitions = Definition.objects.filter(module_type=module_type).all()
-            serializer = get_model_serializer(Definition)(definitions, many=True)
-            return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+        try:
+            module_type = ModuleType.objects.get(pk=module_type_id)
+        except ModuleType.DoesNotExist:
+            logging.error(f"Module type with id {module_type_id} not found")
+            return utils.ErrorResponse(f"Module type with id {module_type_id} not found", status=http_status.HTTP_400_BAD_REQUEST)
 
-        return super().list(request)
+        definitions = utils.get_entity_definitions(module_type.class_name)
+
+        serializer = get_model_serializer(Definition)(definitions, many=True)
+        return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None):
         """
