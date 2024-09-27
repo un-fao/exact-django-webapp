@@ -1725,10 +1725,6 @@ class Fishery(Module):
 
     refrigerant_gwp = models.FloatField(null=True, blank=True, default=1810, verbose_name=_("refrigerant_gwp"))
 
-    fui_start = models.FloatField(null=True, blank=True, verbose_name=_("fui_start"))
-    fui_w = models.FloatField(null=True, blank=True, verbose_name=_("fui_w"))
-    fui_wo = models.FloatField(null=True, blank=True, verbose_name=_("fui_wo"))
-
     total_catch_yr_start = models.FloatField(null=True, blank=True, verbose_name=_("total_catch_yr_start"))
     total_catch_yr_w = models.FloatField(null=True, blank=True, verbose_name=_("total_catch_yr_w"))
     total_catch_yr_wo = models.FloatField(null=True, blank=True, verbose_name=_("total_catch_yr_wo"))
@@ -1766,6 +1762,10 @@ class Fishery(Module):
     inshore_ice_production_kwh_per_tonne_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("inshore_ice_production_kwh_per_tonne_t2_start"))
     inshore_ice_production_kwh_per_tonne_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("inshore_ice_production_kwh_per_tonne_t2_w"))
     inshore_ice_production_kwh_per_tonne_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("inshore_ice_production_kwh_per_tonne_t2_wo"))
+
+    fui_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("fui_t2_start"))
+    fui_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("fui_t2_w"))
+    fui_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("fui_t2_wo"))
 
     inshore_ice_production_country_t2 = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("inshore_ice_production_country_t2"))
 
