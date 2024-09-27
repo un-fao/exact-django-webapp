@@ -1581,12 +1581,12 @@ class ForestManagement(LandModule, LitterDeadwoodBiomassModule):
             "land_use_type": land_use_type,
             "forest_type": self.forest_type,
             "forest_condition_type": self.forest_condition_type,
+            "from_year": from_year,
         }
-        ref: ipcc.ForestManagementAGB = utils.get_or_raise(ipcc.ForestManagementAGB, filters, error_msg)
-
-        relevant_scenarios = self.get_relevant_scenarios()
-
-        if ref.agb_growth_min is None and any([getattr(self, f"agb_growth_rate_{direction[0]}_20_yrs_t2_{s}", None) is None for s in relevant_scenarios]):
+        try:
+            ref: ipcc.ForestManagementAGB = utils.get_or_raise(ipcc.ForestManagementAGB, filters, error_msg)
+        except ipcc.ForestManagementAGB.DoesNotExist:
+            relevant_scenarios = self.get_relevant_scenarios()
             raise ValueError(f"Reference values for AGB Growth Rate {direction[1]} 20 years are missing. Please insert t2 values for the following scenarios: {relevant_scenarios}")
 
         return ref
