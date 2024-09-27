@@ -14,6 +14,7 @@ import api.models as api_models
 import ipcc.models as ipcc_models
 
 import logging as log
+from django.utils.translation import gettext_lazy as _
 
 CN_RATIO_CROP = 10
 CN_RATIO_GRASSLAND = 15
@@ -462,3 +463,19 @@ def get_modules(activity, serialized=True) -> list:
             module_serializers_list.append(module_dict)
 
     return module_serializers_list if serialized else modules
+
+
+def get_entity_definitions(entity_type: str) -> dict:
+    """
+    Returns a dictionary where the key is the model's field name
+    and the value is the translated verbose_name for that field.
+    """
+    # Get the model class from the entity_type string (assuming the entity_type matches the model name)
+    try:
+        model_class = apps.get_model("api", entity_type)
+    except LookupError:
+        raise ValueError(f"Model '{entity_type}' not found")
+    # Extract the field names and their translated verbose names
+    field_definitions = {field.name: _(field.verbose_name) if field.verbose_name else field.name for field in model_class._meta.get_fields() if hasattr(field, "verbose_name") and not field.name.endswith("_thread")}
+
+    return field_definitions
