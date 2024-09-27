@@ -2589,16 +2589,18 @@ class NoteSerializer(serializers.ModelSerializer):
 
 
 class ResetPasswordSerializer(serializers.Serializer):
-    old_password = serializers.CharField(required=True)
-    new_password = serializers.CharField(required=True)
+    password_old = serializers.CharField(required=True)
+    password_new = serializers.CharField(required=True)
 
     def validate(self, data):
         user: CustomUser = self.context["request"].user
+        psasword_old = data.get("password_old", None)
+        password_new = data.get("password_new", None)
 
-        if not user.check_password(data["old_password"]):
+        if not user.check_password(data["password_old"]):
             raise serializers.ValidationError("Old password is incorrect")
 
-        if not data["old_password"] or not data["new_password"]:
+        if password_new is None or psasword_old is None:
             raise serializers.ValidationError("Old and new password are required")
 
         return super().validate(data)
