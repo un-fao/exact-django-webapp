@@ -93,10 +93,6 @@ class FisheryFactory(DjangoModelFactory):
 
     refrigerant_gwp = factory.fuzzy.FuzzyInteger(1810, 1810)
 
-    fui_start = factory.fuzzy.FuzzyFloat(0.0, 100)
-    fui_w = factory.fuzzy.FuzzyFloat(0.0, 100)
-    fui_wo = factory.fuzzy.FuzzyFloat(0.0, 100)
-
     total_catch_yr_start = factory.fuzzy.FuzzyFloat(0.0, 100)
     total_catch_yr_w = factory.fuzzy.FuzzyFloat(0.0, 100)
     total_catch_yr_wo = factory.fuzzy.FuzzyFloat(0.0, 100)
