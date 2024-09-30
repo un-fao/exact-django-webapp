@@ -414,9 +414,9 @@ class InputEntryDefaults(Defaults):
         super().__init__(input)
 
         self.values = SimpleNamespace(
-            co2_emissions_t2_default=0,
-            n2o_emissions_t2_default=0,
-            co2_e_emissions_t2_default=0,
+            co2_emissions_t2_default=None,
+            n2o_emissions_t2_default=None,
+            co2_e_emissions_t2_default=None,
         )
 
     def get_defaults(self, calculate=False) -> dict:
@@ -425,11 +425,15 @@ class InputEntryDefaults(Defaults):
         defaults = calcs.InputEntryCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
-        return SimpleNamespace(
-            co2_emissions_t2_default=defaults.ef.co2_value if defaults.ef else None,
-            n2o_emissions_t2_default=defaults.ef.n2o_value if defaults.ef else None,
-            co2_e_emissions_t2_default=defaults.ef.co2_eq_value if defaults.ef else None,
-        )
+        if defaults.ef:
+            if defaults.ef.co2_value:
+                self.values.co2_emissions_t2_default = defaults.ef.co2_value
+            if defaults.ef.n2o_value:
+                self.values.n2o_emissions_t2_default = defaults.ef.n2o_value
+            if defaults.ef.co2_eq_value:
+                self.values.co2_e_emissions_t2_default = defaults.ef.co2_eq_value
+
+        return self.values
 
 
 class LargeFisheryDefaults(Defaults):
