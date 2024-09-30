@@ -389,7 +389,7 @@ class WriteActivitySerializer(serializers.ModelSerializer):
         if activity_cost:
 
             project = getattr(self.instance, "project", data.get("project"))
-            project_cost = project.cost
+            project_cost = project.cost if project.cost else 0
 
             if self.instance and activity_cost > project_cost:
                 raise serializers.ValidationError("Activity cost cannot be greater than project cost")
