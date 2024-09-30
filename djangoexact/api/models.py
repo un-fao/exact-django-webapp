@@ -1569,11 +1569,10 @@ class ForestManagement(LandModule, LitterDeadwoodBiomassModule):
         return super().save(*args, **kwargs)
 
     def get_agb_growth_ref(self, land_use_type: LandUseType, from_year: int = 0) -> ipcc.ForestManagementAGB:
-        AGB_UNDER_20_NOT_FOUND = f"AGB (under 20 years) not found for ({self.forest_type.name}) {land_use_type.name} in {self.activity.project.climate.name} climate, {self.activity.project.country.region.name} region. Please insert t2 values for AGB (under 20 years) for all scenarios."
-        AGB_OVER_20_NOT_FOUND = f"AGB (over 20 years) not found for ({self.forest_type.name}) {land_use_type.name} in {self.activity.project.climate.name} climate, {self.activity.project.country.region.name} region. Please insert t2 values for AGB (over 20 years) for all scenarios."
+        AGB_UNDER_20_NOT_FOUND = f"AGB (under 20 years) not found for ({self.forest_type.name}) {land_use_type.name} in {self.activity.project.climate.name} climate, {self.activity.project.country.region.name} region. Please insert t2 values for AGB (under 20 years) for all srelevant cenarios."
+        AGB_OVER_20_NOT_FOUND = f"AGB (over 20 years) not found for ({self.forest_type.name}) {land_use_type.name} in {self.activity.project.climate.name} climate, {self.activity.project.country.region.name} region. Please insert t2 values for AGB (over 20 years) for all relevant scenarios."
 
         error_msg = AGB_UNDER_20_NOT_FOUND if from_year < 20 else AGB_OVER_20_NOT_FOUND
-        direction = ["le", "under"] if from_year < 20 else ["gt", "over"]
 
         filters = {
             "climate": self.activity.project.climate,
@@ -1583,11 +1582,10 @@ class ForestManagement(LandModule, LitterDeadwoodBiomassModule):
             "forest_condition_type": self.forest_condition_type,
             "from_year": from_year,
         }
-        try:
-            ref: ipcc.ForestManagementAGB = utils.get_or_raise(ipcc.ForestManagementAGB, filters, error_msg)
-        except ipcc.ForestManagementAGB.DoesNotExist:
-            relevant_scenarios = self.get_relevant_scenarios()
-            raise ValueError(f"Reference values for AGB Growth Rate {direction[1]} 20 years are missing. Please insert t2 values for the following scenarios: {relevant_scenarios}")
+
+        ref: ipcc.ForestManagementAGB = utils.get_or_raise(ipcc.ForestManagementAGB, filters, error_msg, method="filter").first()
+        if not ref:
+            raise ValueError(error_msg)
 
         return ref
 
