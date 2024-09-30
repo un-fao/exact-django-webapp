@@ -110,18 +110,48 @@ Cool Temperate;Oceanic Forest;Oceania;Secondary;0;57.5;3.12;n.a.;4.4
 Cool Temperate;Oceanic Forest;North and South America;Primary;0;n.a.;n.a.;n.a.;n.a.
 Cool Temperate;Oceanic Forest;North and South America;Secondary;21;354.1;9.1;76.2-131.3;10
 Cool Temperate;Oceanic Forest;North and South America;Secondary;0;213.9;6.3;3.9-120;6
-Cool Temperate;Desert;Asia, Europe, North America;Primary;0;n.a.;n.a.;n.a.;n.a.
-Cool Temperate;Desert;Asia, Europe, North America;Secondary;21;44;0.6;n.a.;n.a.
-Cool Temperate;Desert;Asia, Europe, North America;Secondary;0;25.6;0.5;n.a.;n.a.
-Cool Temperate;Steppe;Asia, Europe, North America;Primary;0;n.a.;n.a.;n.a.;n.a.
-Cool Temperate;Steppe;Asia, Europe, North America;Secondary;21;118.5;3.5;3.6-84.9;11
-Cool Temperate;Steppe;Asia, Europe, North America;Secondary;0;42.9;2.3;4.8-48.8;4
-Boreal;Coniferous Forest;Asia, Europe, North America;Primary;0;62.9;0.1-2.1;n.a.;n.a.
-Boreal;Coniferous Forest;Asia, Europe, North America;Secondary;21;n.a.;0.1-2.2;40-50;1.0
-Boreal;Coniferous Forest;Asia, Europe, North America;Secondary;0;n.a.;0.1-2.3;5.0-50;1.0
-Boreal;Tundra Woodland;Asia, Europe, North America;Primary;0;n.a.;0.4;n.a.;n.a.
-Boreal;Tundra Woodland;Asia, Europe, North America;Secondary;21;63.7;0.4;25;0.4
-Boreal;Tundra Woodland;Asia, Europe, North America;Secondary;0;104.2;0.4;5;0.4
-Boreal;Mountain System;Asia, Europe, North America;Primary;0;n.a.;n.a.;n.a.;n.a.
-Boreal;Mountain System;Asia, Europe, North America;Secondary;21;n.a.;1.1-1.5;40-50;1.0
-Boreal;Mountain System;Asia, Europe, North America;Secondary;0;1.9;1.0-1.1;5.0-50;1.0
+Cool Temperate;Desert;Asia;Primary;0;n.a.;n.a.;n.a.;n.a.
+Cool Temperate;Desert;Asia;Secondary;21;44;0.6;n.a.;n.a.
+Cool Temperate;Desert;Asia;Secondary;0;25.6;0.5;n.a.;n.a.
+Cool Temperate;Steppe;Asia;Primary;0;n.a.;n.a.;n.a.;n.a.
+Cool Temperate;Steppe;Asia;Secondary;21;118.5;3.5;3.6-84.9;11
+Cool Temperate;Steppe;Asia;Secondary;0;42.9;2.3;4.8-48.8;4
+Cool Temperate;Desert;Europe;Primary;0;n.a.;n.a.;n.a.;n.a.
+Cool Temperate;Desert;Europe;Secondary;21;44;0.6;n.a.;n.a.
+Cool Temperate;Desert;Europe;Secondary;0;25.6;0.5;n.a.;n.a.
+Cool Temperate;Steppe;Europe;Primary;0;n.a.;n.a.;n.a.;n.a.
+Cool Temperate;Steppe;Europe;Secondary;21;118.5;3.5;3.6-84.9;11
+Cool Temperate;Steppe;Europe;Secondary;0;42.9;2.3;4.8-48.8;4
+Cool Temperate;Desert;North America;Primary;0;n.a.;n.a.;n.a.;n.a.
+Cool Temperate;Desert;North America;Secondary;21;44;0.6;n.a.;n.a.
+Cool Temperate;Desert;North America;Secondary;0;25.6;0.5;n.a.;n.a.
+Cool Temperate;Steppe;North America;Primary;0;n.a.;n.a.;n.a.;n.a.
+Cool Temperate;Steppe;North America;Secondary;21;118.5;3.5;3.6-84.9;11
+Cool Temperate;Steppe;North America;Secondary;0;42.9;2.3;4.8-48.8;4
+Boreal;Coniferous Forest;Asia;Primary;0;62.9;0.1-2.1;n.a.;n.a.
+Boreal;Coniferous Forest;Asia;Secondary;21;n.a.;0.1-2.2;40-50;1.0
+Boreal;Coniferous Forest;Asia;Secondary;0;n.a.;0.1-2.3;5.0-50;1.0
+Boreal;Tundra Woodland;Asia;Primary;0;n.a.;0.4;n.a.;n.a.
+Boreal;Tundra Woodland;Asia;Secondary;21;63.7;0.4;25;0.4
+Boreal;Tundra Woodland;Asia;Secondary;0;104.2;0.4;5;0.4
+Boreal;Mountain System;Asia;Primary;0;n.a.;n.a.;n.a.;n.a.
+Boreal;Mountain System;Asia;Secondary;21;n.a.;1.1-1.5;40-50;1.0
+Boreal;Mountain System;Asia;Secondary;0;1.9;1.0-1.1;5.0-50;1.0
+Boreal;Coniferous Forest;Europe;Primary;0;62.9;0.1-2.1;n.a.;n.a.
+Boreal;Coniferous Forest;Europe;Secondary;21;n.a.;0.1-2.2;40-50;1.0
+Boreal;Coniferous Forest;Europe;Secondary;0;n.a.;0.1-2.3;5.0-50;1.0
+Boreal;Tundra Woodland;Europe;Primary;0;n.a.;0.4;n.a.;n.a.
+Boreal;Tundra Woodland;Europe;Secondary;21;63.7;0.4;25;0.4
+Boreal;Tundra Woodland;Europe;Secondary;0;104.2;0.4;5;0.4
+Boreal;Mountain System;Europe;Primary;0;n.a.;n.a.;n.a.;n.a.
+Boreal;Mountain System;Europe;Secondary;21;n.a.;1.1-1.5;40-50;1.0
+Boreal;Mountain System;Europe;Secondary;0;1.9;1.0-1.1;5.0-50;1.0
+Boreal;Coniferous Forest;North America;Primary;0;62.9;0.1-2.1;n.a.;n.a.
+Boreal;Coniferous Forest;North America;Secondary;21;n.a.;0.1-2.2;40-50;1.0
+Boreal;Coniferous Forest;North America;Secondary;0;n.a.;0.1-2.3;5.0-50;1.0
+Boreal;Tundra Woodland;North America;Primary;0;n.a.;0.4;n.a.;n.a.
+Boreal;Tundra Woodland;North America;Secondary;21;63.7;0.4;25;0.4
+Boreal;Tundra Woodland;North America;Secondary;0;104.2;0.4;5;0.4
+Boreal;Mountain System;North America;Primary;0;n.a.;n.a.;n.a.;n.a.
+Boreal;Mountain System;North America;Secondary;21;n.a.;1.1-1.5;40-50;1.0
+Boreal;Mountain System;North America;Secondary;0;1.9;1.0-1.1;5.0-50;1.0
