@@ -8,7 +8,9 @@ import api.serializers as serializers
 import api.utilities as utils
 
 
-# Create a base class that all other classes inherit from
+# TODO: I don't like the way this is implemented. It's too verbose. Review and refactor when time allows it.
+
+
 class Defaults:
     def __init__(self, input: api.Module):
         self.input = input
@@ -1105,3 +1107,98 @@ class InputDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace()
+
+
+class ForestManagementDefaults(Defaults):
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace(
+            flu_t2_start_default=0,
+            flu_t2_w_default=0,
+            flu_t2_wo_default=0,
+            fi_t2_start_default=0,
+            fi_t2_w_default=0,
+            fi_t2_wo_default=0,
+            fmg_t2_start_default=0,
+            fmg_t2_w_default=0,
+            fmg_t2_wo_default=0,
+            litter_t2_start_default=0,
+            litter_t2_w_default=0,
+            litter_t2_wo_default=0,
+            deadwood_t2_start_default=0,
+            deadwood_t2_w_default=0,
+            deadwood_t2_wo_default=0,
+            agb_growth_rate_le_20_yrs_t2_start_default=0,
+            agb_growth_rate_le_20_yrs_t2_w_default=0,
+            agb_growth_rate_le_20_yrs_t2_wo_default=0,
+            agb_growth_rate_gt_20_yrs_t2_start_default=0,
+            agb_growth_rate_gt_20_yrs_t2_w_default=0,
+            agb_growth_rate_gt_20_yrs_t2_wo_default=0,
+            bgb_growth_rate_le_20_yrs_t2_start_default=0,
+            bgb_growth_rate_le_20_yrs_t2_w_default=0,
+            bgb_growth_rate_le_20_yrs_t2_wo_default=0,
+            bgb_growth_rate_gt_20_yrs_t2_start_default=0,
+            bgb_growth_rate_gt_20_yrs_t2_w_default=0,
+            bgb_growth_rate_gt_20_yrs_t2_wo_default=0,
+            rotation_start_year_t2_start_default=0,
+            rotation_start_year_t2_w_default=0,
+            rotation_start_year_t2_wo_default=0,
+            logging_start_year_t2_start_default=0,
+            logging_start_year_t2_w_default=0,
+            logging_start_year_t2_wo_default=0,
+            logging_dry_matter_logged_t2_start_default=0,
+            logging_dry_matter_logged_t2_w_default=0,
+            logging_dry_matter_logged_t2_wo_default=0,
+            degradation_dry_matter_impacted_t2_start_default=0,
+            degradation_dry_matter_impacted_t2_w_default=0,
+            degradation_dry_matter_impacted_t2_wo_default=0,
+        )
+
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.ForestManagement
+
+        defaults = calcs.ForestManagementCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace(
+            flu_start_default=defaults.flu_start.value,
+            flu_w_default=defaults.flu_w.value,
+            flu_wo_default=defaults.flu_wo.value,
+            fi_start_default=defaults.fi_start.value,
+            fi_w_default=defaults.fi_w.value,
+            fi_wo_default=defaults.fi_wo.value,
+            fmg_start_default=defaults.fmg_start.value,
+            fmg_w_default=defaults.fmg_w.value,
+            fmg_wo_default=defaults.fmg_wo.value,
+            litter_start_default=defaults.litter_dw_start_w.litter,
+            litter_w_default=defaults.litter_dw.litter,
+            litter_wo_default=defaults.litter_dw.litter,
+            deadwood_start_default=defaults.litter_dw_start_w.dw,
+            deadwood_w_default=defaults.litter_dw.dw,
+            deadwood_wo_default=defaults.litter_dw.dw,
+            agb_growth_rate_le_20_yrs_start_default=0,
+            agb_growth_rate_le_20_yrs_w_default=defaults.agb_growth_under_20_w,
+            agb_growth_rate_le_20_yrs_wo_default=defaults.agb_growth_under_20_wo,
+            agb_growth_rate_gt_20_yrs_start_default=0,
+            agb_growth_rate_gt_20_yrs_w_default=defaults.agb_growth_over_20_w,
+            agb_growth_rate_gt_20_yrs_wo_default=defaults.agb_growth_over_20_wo,
+            bgb_growth_rate_le_20_yrs_start_default=0,
+            bgb_growth_rate_le_20_yrs_w_default=defaults.bgb_before_20_yrs.value,
+            bgb_growth_rate_le_20_yrs_wo_default=defaults.bgb_before_20_yrs.value,
+            bgb_growth_rate_gt_20_yrs_start_default=0,
+            bgb_growth_rate_gt_20_yrs_w_default=defaults.bgb_after_20_yrs.value,
+            bgb_growth_rate_gt_20_yrs_wo_default=defaults.bgb_after_20_yrs.value,
+            rotation_start_year_start_default=0,  # TODO: Ask Lorenzo
+            rotation_start_year_w_default=0,  # TODO: Ask Lorenzo
+            rotation_start_year_wo_default=0,  # TODO: Ask Lorenzo
+            logging_start_year_start_default=0,  # TODO: Ask Lorenzo
+            logging_start_year_w_default=0,  # TODO: Ask Lorenzo
+            logging_start_year_wo_default=0,  # TODO: Ask Lorenzo
+            logging_dry_matter_logged_start_default=0,  # TODO: Ask Lorenzo
+            logging_dry_matter_logged_w_default=0,  # TODO: Ask Lorenzo
+            logging_dry_matter_logged_wo_default=0,  # TODO: Ask Lorenzo
+            degradation_dry_matter_impacted_start_default=0,  # TODO: Ask Lorenzo
+            degradation_dry_matter_impacted_w_default=0,  # TODO: Ask Lorenzo
+            degradation_dry_matter_impacted_wo_default=0,  # TODO: Ask Lorenzo
+        )
