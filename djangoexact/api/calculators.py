@@ -5493,6 +5493,12 @@ class ForestManagementCalculator(LandModuleCalculator):
         self.litter_dw_start_wo = None
         self.litter_dw_max_wo = None
 
+        self.agb_under_20_w = None
+        self.agb_over_20_w = None
+
+        self.agb_under_20_wo = None
+        self.agb_over_20_wo = None
+
         self.disturbances = None
 
     def get_defaults(self, calculate=False) -> dict:
@@ -5552,11 +5558,46 @@ class ForestManagementCalculator(LandModuleCalculator):
             raise ValueError(BGB_OVER_20_NOT_FOUND)
 
         self.agb_under_20 = self.forest.get_agb_growth_ref(land_use_type=land_use_type, from_year=0)
+        self.agb_under_20_w = self.agb_under_20_wo = self.agb_under_20
+
+        # Check AGB under 20 years for with scenario
+        if self.module.is_with() and any(x is None for x in [self.agb_under_20.agb_min, self.agb_under_20.agb_max]) and self.forest.agb_t2_w is None:
+            raise ValueError("Reference values for AGB under 20 years are missing. Please fill the relevant tier 2 values.")
+
+        # Check AGB under 20 years for without scenario
+        if self.module.is_without() and any(x is None for x in [self.agb_under_20.agb_min, self.agb_under_20.agb_max]) and self.forest.agb_t2_wo is None:
+            raise ValueError("Reference values for AGB under 20 years are missing. Please fill the relevant tier 2 values.")
+
+        # Check AGB growth under 20 years for with scenario
+        if self.module.is_with() and any(x is None for x in [self.agb_under_20.agb_growth_min, self.agb_under_20.agb_growth_max]) and self.forest.agb_growth_rate_le_20_yrs_t2_w is None:
+            raise ValueError("Reference values for AGB growth under 20 years are missing. Please fill the relevant tier 2 values.")
+
+        # Check AGB growth under 20 years for without scenario
+        if self.module.is_without() and any(x is None for x in [self.agb_under_20.agb_growth_min, self.agb_under_20.agb_growth_max]) and self.forest.agb_growth_rate_le_20_yrs_t2_wo is None:
+            raise ValueError("Reference values for AGB growth under 20 years are missing. Please fill the relevant tier 2 values.")
+
         self.agb_over_20 = self.forest.get_agb_growth_ref(land_use_type=land_use_type, from_year=21 if "Secondary" in self.forest.forest_condition_type.name else 0)
+        self.agb_over_20_w = self.agb_over_20_wo = self.agb_over_20
+
+        # Check AGB over 20 years for with scenario
+        if self.module.is_with() and any(x is None for x in [self.agb_over_20.agb_min, self.agb_over_20.agb_max]) and self.forest.agb_t2_w is None:
+            raise ValueError("Reference values for AGB over 20 years are missing. Please fill the relevant tier 2 values.")
+
+        # Check AGB over 20 years for without scenario
+        if self.module.is_without() and any(x is None for x in [self.agb_over_20.agb_min, self.agb_over_20.agb_max]) and self.forest.agb_t2_wo is None:
+            raise ValueError("Reference values for AGB over 20 years are missing. Please fill the relevant tier 2 values.")
+
+        # Check AGB growth over 20 years for with scenario
+        if self.module.is_with() and any(x is None for x in [self.agb_over_20.agb_growth_min, self.agb_over_20.agb_growth_max]) and self.forest.agb_growth_rate_gt_20_yrs_t2_w is None:
+            raise ValueError("Reference values for AGB growth over 20 years are missing. Please fill the relevant tier 2 values.")
+
+        # Check AGB growth over 20 years for without scenario
+        if self.module.is_without() and any(x is None for x in [self.agb_over_20.agb_growth_min, self.agb_over_20.agb_growth_max]) and self.forest.agb_growth_rate_gt_20_yrs_t2_wo is None:
+            raise ValueError("Reference values for AGB growth over 20 years are missing. Please fill the relevant tier 2 values.")
 
         # START - Reference Values for forest remaining forest
-        self.agb_max_w = statistics.mean([self.agb_over_20.agb_min, self.agb_over_20.agb_max])
-        self.agb_growth_over_20_w = statistics.mean([self.agb_over_20.agb_growth_max, self.agb_over_20.agb_growth_min])
+        self.agb_max_w = statistics.mean([self.agb_over_20_w.agb_min, self.agb_over_20_w.agb_max]) if all([self.agb_over_20_w.agb_min, self.agb_over_20_w.agb_max]) else self.forest.agb_t2_w
+        self.agb_growth_over_20_w = statistics.mean([self.agb_over_20_w.agb_growth_max, self.agb_over_20_w.agb_growth_min]) if all([self.agb_over_20_w.agb_growth_max, self.agb_over_20_w.agb_growth_min]) else self.forest.agb_growth_rate_gt_20_yrs_t2_w
         self.agb_growth_under_20_w = 0
         self.agb_start_w = self.agb_max_w
         self.litter_dw_start_w = self.litter_dw
@@ -5565,8 +5606,8 @@ class ForestManagementCalculator(LandModuleCalculator):
         # TODO: What reference values do I choose for the start scenario?
         # TODO: Add litter start, litter end. Affo -> start=0, end=reference_values. Forest -> start=reference_values, end=refernce_values
 
-        self.agb_max_wo = statistics.mean([self.agb_over_20.agb_min, self.agb_over_20.agb_max])
-        self.agb_growth_over_20_wo = statistics.mean([self.agb_over_20.agb_growth_max, self.agb_over_20.agb_growth_min])
+        self.agb_max_wo = statistics.mean([self.agb_over_20_wo.agb_min, self.agb_over_20_wo.agb_max]) if all([self.agb_over_20_wo.agb_min, self.agb_over_20_wo.agb_max]) else self.forest.agb_t2_wo
+        self.agb_growth_over_20_wo = statistics.mean([self.agb_over_20_wo.agb_growth_max, self.agb_over_20_wo.agb_growth_min]) if all([self.agb_over_20_wo.agb_growth_max, self.agb_over_20_wo.agb_growth_min]) else self.forest.agb_growth_rate_gt_20_yrs_t2_wo
         self.agb_growth_under_20_wo = 0
         self.agb_start_wo = self.agb_max_wo
         self.litter_dw_start_wo = self.litter_dw
@@ -5574,14 +5615,14 @@ class ForestManagementCalculator(LandModuleCalculator):
         # END - Reference Values for forest remaining forest
 
         if self.is_afforestation_w:
-            self.agb_max_w = statistics.mean([self.agb_over_20.agb_min, self.agb_over_20.agb_max]) if self.activity.implementation_years > 20 else statistics.mean([self.agb_under_20.agb_min, self.agb_under_20.agb_max])
-            self.agb_growth_under_20_w = statistics.mean([self.agb_under_20.agb_growth_max, self.agb_under_20.agb_growth_min])
+            self.agb_max_w = statistics.mean([self.agb_over_20_w.agb_min, self.agb_over_20_w.agb_max]) if self.activity.implementation_years > 20 else statistics.mean([self.agb_under_20_w.agb_min, self.agb_under_20_w.agb_max]) if all([self.agb_under_20_w.agb_min, self.agb_under_20_w.agb_max]) else self.forest.agb_t2_w
+            self.agb_growth_under_20_w = statistics.mean([self.agb_under_20_w.agb_growth_max, self.agb_under_20_w.agb_growth_min]) if all([self.agb_under_20_w.agb_growth_max, self.agb_under_20_w.agb_growth_min]) else self.forest.agb_growth_rate_le_20_yrs_t2_w
             self.agb_start_w = 0
             self.litter_dw_start_w = SimpleNamespace(litter=0, dw=0)
 
         if self.is_afforestation_wo:
-            self.agb_max_wo = statistics.mean([self.agb_over_20.agb_min, self.agb_over_20.agb_max]) if self.activity.implementation_years > 20 else statistics.mean([self.agb_under_20.agb_min, self.agb_under_20.agb_max])
-            self.agb_growth_under_20_wo = statistics.mean([self.agb_under_20.agb_growth_max, self.agb_under_20.agb_growth_min])
+            self.agb_max_wo = statistics.mean([self.agb_over_20_wo.agb_min, self.agb_over_20_wo.agb_max]) if self.activity.implementation_years > 20 else statistics.mean([self.agb_under_20_wo.agb_min, self.agb_under_20_wo.agb_max]) if all([self.agb_under_20_wo.agb_min, self.agb_under_20_wo.agb_max]) else self.forest.agb_t2_wo
+            self.agb_growth_under_20_wo = statistics.mean([self.agb_under_20_wo.agb_growth_max, self.agb_under_20_wo.agb_growth_min]) if all([self.agb_under_20_wo.agb_growth_max, self.agb_under_20_wo.agb_growth_min]) else self.forest.agb_growth_rate_le_20_yrs_t2_wo
             self.agb_start_wo = 0
             self.litter_dw_start_wo = SimpleNamespace(litter=0, dw=0)
 
