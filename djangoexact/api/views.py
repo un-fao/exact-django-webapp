@@ -1509,6 +1509,12 @@ def generic_viewset(model: Model):
             translation.deactivate()
             return super().finalize_response(request, response, *args, **kwargs)
 
+        def get_queryset(self):
+            for field in model._meta.get_fields():
+                if field.name == "active":
+                    return model.objects.filter(active=True)
+            return super().get_queryset()
+
     return GenericViewSet
 
 
