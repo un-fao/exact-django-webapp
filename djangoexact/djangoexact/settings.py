@@ -46,6 +46,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 INSTALLED_APPS = [
     "unfold",  # before django.contrib.admin
     "unfold.contrib.simple_history",  # optional, if django-simple-history package is used
+    "modeltranslation",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -60,7 +61,6 @@ INSTALLED_APPS = [
     "django_filters",
     "accounts",
     "simple_history",
-    "modeltranslation",
     "ipcc",
     "api",
 ]
