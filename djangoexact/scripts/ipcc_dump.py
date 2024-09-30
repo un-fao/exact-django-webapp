@@ -4301,11 +4301,6 @@ for i, row in enumerate(df_dict):
 EnergyDefaultEmissionFactor.objects.bulk_create(l)
 
 
-"""
-
-# TODO: Run in review
-
-
 ForestManagementAGB.objects.all().delete()
 import api.utilities as utils
 
@@ -4433,6 +4428,12 @@ for i, row in df.iterrows():
                     agb_growth_min=agb_growth_min * utils.NON_MANGROVE_FACTOR if agb_growth_min else None,
                     agb_growth_max=agb_growth_max * utils.NON_MANGROVE_FACTOR if agb_growth_max else None,
                 )
+
+
+
+"""
+
+# TODO: Run in review
 
 
 # TODO: Run in develop
