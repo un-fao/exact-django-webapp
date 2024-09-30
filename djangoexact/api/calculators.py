@@ -571,23 +571,35 @@ class LandModuleCalculator(BaseCalculator):
 
         missing_scenarios = []
 
-        if not self.soc and self.project.soc_ref_t2 is not None:
-            self.soc = SimpleNamespace(value=self.project.soc_ref_t2)
-            self.soc_start = self.soc_w = self.soc_wo = self.soc
-        elif not self.soc:
-            if self.module.is_start() and self.module.soc_t2_start is None:
+        # NOTE: Hierarchical order of precedence for SOC: Project < Activity < Module
+
+        self.soc_start = self.soc_w = self.soc_wo = self.soc
+
+        if self.project.soc_ref_t2 is not None:
+            self.soc_start = self.soc_w = self.soc_wo = SimpleNamespace(value=self.project.soc_ref_t2)
+
+        if self.activity.soc_t2 is not None:
+            self.soc_start = self.soc_w = self.soc_wo = SimpleNamespace(value=self.activity.soc_t2)
+
+        if self.module.soc_t2_start is not None:
+            self.soc_start = SimpleNamespace(value=self.module.soc_t2_start)
+
+        if self.module.soc_t2_w is not None:
+            self.soc_w = SimpleNamespace(value=self.module.soc_t2_w)
+
+        if self.module.soc_t2_wo is not None:
+            self.soc_wo = SimpleNamespace(value=self.module.soc_t2_wo)
+
+        if self.soc is None and not all([self.soc_start, self.soc_w, self.soc_wo]):
+            if self.module.is_start() and not self.soc_start:
                 missing_scenarios.append("Start")
-            if self.module.is_with() and self.module.soc_t2_w is None:
+            if self.module.is_with() and not self.soc_w:
                 missing_scenarios.append("With")
-            if self.module.is_without() and self.module.soc_t2_wo is None:
+            if self.module.is_without() and not self.soc_wo:
                 missing_scenarios.append("Without")
 
             if missing_scenarios:
                 raise Exception(f"SOC for {self.project.climate.name} climate, {self.project.moisture.name} moisture, and {self.project.soil_type.name} soil type is missing. Please insert T2 values for the following scenarios: {', '.join(missing_scenarios)}")
-
-        self.soc_start = getattr(self, "soc", SimpleNamespace(value=self.module.soc_t2_start))
-        self.soc_w = getattr(self, "soc", SimpleNamespace(value=self.module.soc_t2_w))
-        self.soc_wo = getattr(self, "soc", SimpleNamespace(value=self.module.soc_t2_wo))
 
         self.som = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {self.project.moisture.name} moisture does not exist")
 
