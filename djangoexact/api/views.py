@@ -90,6 +90,8 @@ from django.utils.translation import activate, get_language
 from firebase_admin import auth as firebase_admin_auth
 from django.contrib.auth import logout
 from auditlog.context import disable_auditlog, LogEntry
+from django.utils import translation
+
 
 logger = logging.getLogger("console")
 
@@ -1437,7 +1439,7 @@ def generic_module_viewset(model: Module):
             module: Module | Submodule = get_object_or_404(model, pk=pk)
             activity = module.get_activity()
 
-            serializer = get_module_serializer(model, ActionTypes.UPDATE)(data={}, instance=module)
+            serializer = get_module_serializer(model, ActionTypes.UPDATE)(data={}, instance=module, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
 
@@ -1493,6 +1495,19 @@ def generic_viewset(model: Model):
         queryset = model.objects.all()
         serializer_class = get_model_serializer(model)
         filterset_class = filters.get_model_filter(model)
+
+        def get_serializer_context(self):
+            # Activate language in the context of the request
+            lang = self.request.query_params.get("lang")
+            if lang:
+                translation.activate(lang)
+            context = super().get_serializer_context()
+            return context
+
+        def finalize_response(self, request, response, *args, **kwargs):
+            # Deactivate the language after the response is generated
+            translation.deactivate()
+            return super().finalize_response(request, response, *args, **kwargs)
 
     return GenericViewSet
 
