@@ -41,11 +41,11 @@ msgid "Primary"
 msgstr ""
 
 #. ForestConditionType
-msgid "Secondary >20 Years"
+msgid "Secondary"
 msgstr ""
 
 #. ForestConditionType
-msgid "Secondary ≤20 Years"
+msgid "Secondary"
 msgstr ""
 
 #. SiteLocationType
@@ -464,14 +464,6 @@ msgstr ""
 msgid "High C input, with manure"
 msgstr ""
 
-#. OrganicInputType
-msgid "Other N Inputs"
-msgstr ""
-
-#. OrganicInputType
-msgid "Synthetic Fertilizer Inputs"
-msgstr ""
-
 #. ResidueManagementType
 msgid "Burned"
 msgstr ""
@@ -686,10 +678,6 @@ msgstr ""
 
 #. ManureManagementType
 msgid "Other (pls. Go Tier 2)"
-msgstr ""
-
-#. ManureManagementType
-msgid "Pit>1 Month"
 msgstr ""
 
 #. ModuleType
@@ -1005,11 +993,11 @@ msgid "Sea-spiders And Crabs"
 msgstr ""
 
 #. MacroFuelType
-msgid "Liquid or gaseous"
+msgid "Liquid or gaseous (m3)"
 msgstr ""
 
 #. MacroFuelType
-msgid "Solid"
+msgid "Solid (tdm)"
 msgstr ""
 
 #. FuelUseType
@@ -1148,14 +1136,6 @@ msgstr ""
 msgid "Animal Feed"
 msgstr ""
 
-#. MacroInputType
-msgid "Synthetic N-Fertilizers"
-msgstr ""
-
-#. MacroInputType
-msgid "N-Irrigated Rice"
-msgstr ""
-
 #. InputType
 msgid "Limestone"
 msgstr ""
@@ -1197,7 +1177,7 @@ msgid "Insecticides"
 msgstr ""
 
 #. InputType
-msgid "User Defined Animal Feed"
+msgid "User Defined Animal Feed (tier 2)"
 msgstr ""
 
 #. InputType
@@ -1250,10 +1230,6 @@ msgstr ""
 
 #. IrrigationSystemType
 msgid "Micro Sprinkler"
-msgstr ""
-
-#. IrrigationSystemType
-msgid "Other"
 msgstr ""
 
 #. IrrigationSystemType

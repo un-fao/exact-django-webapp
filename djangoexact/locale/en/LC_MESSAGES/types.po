@@ -41,12 +41,8 @@ msgid "Primary"
 msgstr "Primary"
 
 #. ForestConditionType
-msgid "Secondary >20 Years"
-msgstr "Secondary >20 Years"
-
-#. ForestConditionType
-msgid "Secondary ≤20 Years"
-msgstr "Secondary ≤20 Years"
+msgid "Secondary"
+msgstr "Secondary"
 
 #. SiteLocationType
 msgid "On-Site"
@@ -464,14 +460,6 @@ msgstr "High C input, no manure"
 msgid "High C input, with manure"
 msgstr "High C input, with manure"
 
-#. OrganicInputType
-msgid "Other N Inputs"
-msgstr "Other N Inputs"
-
-#. OrganicInputType
-msgid "Synthetic Fertilizer Inputs"
-msgstr "Synthetic Fertilizer Inputs"
-
 #. ResidueManagementType
 msgid "Burned"
 msgstr "Burned"
@@ -687,10 +675,6 @@ msgstr "Other (Pls. Go Tier 2)"
 #. ManureManagementType
 msgid "Other (pls. Go Tier 2)"
 msgstr "Other (pls. Go Tier 2)"
-
-#. ManureManagementType
-msgid "Pit>1 Month"
-msgstr "Pit>1 Month"
 
 #. ModuleType
 msgid "Project"
@@ -1005,12 +989,12 @@ msgid "Sea-spiders And Crabs"
 msgstr "Sea-spiders And Crabs"
 
 #. MacroFuelType
-msgid "Liquid or gaseous"
-msgstr "Liquid or gaseous"
+msgid "Liquid or gaseous (m3)"
+msgstr "Liquid or gaseous (m3)"
 
 #. MacroFuelType
-msgid "Solid"
-msgstr "Solid"
+msgid "Solid (tdm)"
+msgstr "Solid (tdm)"
 
 #. FuelUseType
 msgid "Stationary"
@@ -1148,14 +1132,6 @@ msgstr "Pesticides"
 msgid "Animal Feed"
 msgstr "Animal Feed"
 
-#. MacroInputType
-msgid "Synthetic N-Fertilizers"
-msgstr "Synthetic N-Fertilizers"
-
-#. MacroInputType
-msgid "N-Irrigated Rice"
-msgstr "N-Irrigated Rice"
-
 #. InputType
 msgid "Limestone"
 msgstr "Limestone"
@@ -1197,8 +1173,8 @@ msgid "Insecticides"
 msgstr "Insecticides"
 
 #. InputType
-msgid "User Defined Animal Feed"
-msgstr "User Defined Animal Feed"
+msgid "User Defined Animal Feed (tier 2)"
+msgstr "User Defined Animal Feed (tier 2)"
 
 #. InputType
 msgid "N-Fertilizers In Continuously Irrigated Rice"
@@ -1251,10 +1227,6 @@ msgstr "Trickle"
 #. IrrigationSystemType
 msgid "Micro Sprinkler"
 msgstr "Micro Sprinkler"
-
-#. IrrigationSystemType
-msgid "Other"
-msgstr "Other"
 
 #. IrrigationSystemType
 msgid "Sprinkler"
