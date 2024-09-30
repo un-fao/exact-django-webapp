@@ -1439,7 +1439,7 @@ def generic_module_viewset(model: Module):
             module: Module | Submodule = get_object_or_404(model, pk=pk)
             activity = module.get_activity()
 
-            serializer = get_module_serializer(model, ActionTypes.UPDATE)(data={}, instance=module)
+            serializer = get_module_serializer(model, ActionTypes.UPDATE)(data={}, instance=module, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
 
