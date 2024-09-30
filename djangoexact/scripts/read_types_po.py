@@ -55,19 +55,6 @@ for language in LANGUAGES:
         RoadType,
     ]
 
-    # for _type in types:
-    #     print(f"Processing type {_type}")
-    #     for obj in _type.objects.all():
-    #         obj_name = str(obj.name) if obj.name else ""
-    #         print(f"Processing object {obj_name}")
-
-    #         entry = po.find(obj_name)
-    #         print(f"Found entry {entry}")
-    #         if entry:
-    #             print(f"Found entry with {language[0]} translation {entry.msgstr}")
-    #             setattr(obj, f"name_{language[0]}", entry.msgstr)
-    #             obj.save()
-
     with transaction.atomic():
         for entry in po:
             print(f"Processing entry {entry}")
