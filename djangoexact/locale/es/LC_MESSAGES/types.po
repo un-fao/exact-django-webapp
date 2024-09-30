@@ -41,12 +41,8 @@ msgid "Primary"
 msgstr "Primario"
 
 #. ForestConditionType
-msgid "Secondary >20 Years"
-msgstr "Secundario >20 Años"
-
-#. ForestConditionType
-msgid "Secondary ≤20 Years"
-msgstr "Secundario ≤20 Años"
+msgid "Secondary"
+msgstr "Secundario"
 
 #. SiteLocationType
 msgid "On-Site"
@@ -464,14 +460,6 @@ msgstr "Aporte alto de carbono,  sin estiércol"
 msgid "High C input, with manure"
 msgstr "Aporte alto de carbono,  con estiércol"
 
-#. OrganicInputType
-msgid "Other N Inputs"
-msgstr "Otros Insumos N"
-
-#. OrganicInputType
-msgid "Synthetic Fertilizer Inputs"
-msgstr "Insumos de fertilizantes sintéticos"
-
 #. ResidueManagementType
 msgid "Burned"
 msgstr "Quemado"
@@ -687,10 +675,6 @@ msgstr "Otros (Por favor, inserte Nivel 2)"
 #. ManureManagementType
 msgid "Other (pls. Go Tier 2)"
 msgstr "Otros (Por favor, inserte Nivel 2)"
-
-#. ManureManagementType
-msgid "Pit>1 Month"
-msgstr "Pozo>1 Mes"
 
 #. ModuleType
 msgid "Project"
@@ -1005,12 +989,12 @@ msgid "Sea-spiders And Crabs"
 msgstr "Arañas marinas y cangrejos"
 
 #. MacroFuelType
-msgid "Liquid or gaseous"
-msgstr "Líquido o gaseoso"
+msgid "Liquid or gaseous (m3)"
+msgstr "Líquido o gaseoso (m3)"
 
 #. MacroFuelType
-msgid "Solid"
-msgstr "Sólido"
+msgid "Solid (tdm)"
+msgstr "Sólido (tdm)"
 
 #. FuelUseType
 msgid "Stationary"
@@ -1148,14 +1132,6 @@ msgstr "Pesticidas"
 msgid "Animal Feed"
 msgstr "Pienso"
 
-#. MacroInputType
-msgid "Synthetic N-Fertilizers"
-msgstr "Fertilizantes sintéticos de N"
-
-#. MacroInputType
-msgid "N-Irrigated Rice"
-msgstr "N en Arroz Irrigado"
-
 #. InputType
 msgid "Limestone"
 msgstr "Caliza"
@@ -1197,8 +1173,8 @@ msgid "Insecticides"
 msgstr "Insecticidas"
 
 #. InputType
-msgid "User Defined Animal Feed"
-msgstr "Pienso Definido por el usuario"
+msgid "User Defined Animal Feed (tier 2)"
+msgstr "Pienso Definido por el usuario (tier 2)"
 
 #. InputType
 msgid "N-Fertilizers In Continuously Irrigated Rice"
@@ -1251,10 +1227,6 @@ msgstr "Riego por goteo"
 #. IrrigationSystemType
 msgid "Micro Sprinkler"
 msgstr "Micro Aspersor"
-
-#. IrrigationSystemType
-msgid "Other"
-msgstr "Otro"
 
 #. IrrigationSystemType
 msgid "Sprinkler"
