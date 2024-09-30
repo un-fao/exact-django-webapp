@@ -571,7 +571,10 @@ class LandModuleCalculator(BaseCalculator):
 
         missing_scenarios = []
 
-        if not self.soc:
+        if not self.soc and self.project.soc_ref_t2 is not None:
+            self.soc = SimpleNamespace(value=self.project.soc_ref_t2)
+            self.soc_start = self.soc_w = self.soc_wo = self.soc
+        elif not self.soc:
             if self.module.is_start() and self.module.soc_t2_start is None:
                 missing_scenarios.append("Start")
             if self.module.is_with() and self.module.soc_t2_w is None:
