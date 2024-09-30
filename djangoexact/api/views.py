@@ -1550,8 +1550,7 @@ class DefinitionViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         definitions = utils.get_entity_definitions(module_type.class_name)
 
-        serializer = get_model_serializer(Definition)(definitions, many=True)
-        return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+        return Response(data=definitions, status=http_status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None):
         """
