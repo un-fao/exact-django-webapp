@@ -4214,6 +4214,98 @@ for i, row in enumerate(rows):
             value=value,
         )
 
+print("Deleting all MethaneManureManagementFactor...")
+LivestockAWMS.objects.all().delete()
+print("Deleted all MethaneManureManagementFactor.")
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "NewLivestockAWMS.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers = df.columns.values.tolist()
+df_dict = df.to_dict("records")
+
+awms_list = []
+
+for i, row in enumerate(df_dict):
+    livestock_category_type = LivestockCategoryType.objects.filter(name__iexact=sanitize(row["livestock_category_type"])).first()
+
+    livestock_production_type = LivestockProductionType.objects.filter(name__iexact=sanitize(row["livestock_production_type"])).first()
+
+    ipcc_region = IPCCRegion.objects.filter(name__iexact=sanitize(row["ipcc_region"])).first()
+
+    print(f"{livestock_category_type}, {livestock_production_type}, {ipcc_region}")
+
+    for j, header in enumerate(df_headers, start=3):
+
+        if j == len(df_headers):
+            break
+
+        manure_management_type = ManureManagementType.objects.filter(name__iexact=sanitize(df_headers[j])).first()
+
+        print(manure_management_type, row[df_headers[j]])
+
+        awms_list.append(
+            LivestockAWMS(
+                manure_management_type=manure_management_type,
+                livestock_category_type=livestock_category_type,
+                livestock_production_type=livestock_production_type,
+                ipcc_region=ipcc_region,
+                value=parse_csv_number(row[df_headers[j]]),
+            )
+        )
+
+LivestockAWMS.objects.bulk_create(awms_list)
+
+log.debug("Deleting all InputEmissionFactor models...")
+EnergyDefaultEmissionFactor.objects.all().delete()
+
+l = []
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "EnergyDefaultEmissionFactors.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers = df.columns.values.tolist()
+df_dict = df.to_dict("records")
+
+for i, row in enumerate(df_dict):
+    fuel_use_type = FuelUseType.objects.get(name__iexact=row["fuel_use_type"])
+    fuel_type = FuelType.objects.get(name__iexact=row["fuel_type"])
+    co2 = parse_csv_number(row["co2"])
+    ch4 = parse_csv_number(row["ch4"])
+    n2o = parse_csv_number(row["n2o"])
+
+    print(
+        fuel_use_type,
+        fuel_type,
+        co2,
+        ch4,
+        n2o,
+    )
+
+    l.append(
+        EnergyDefaultEmissionFactor(
+            fuel_use_type=fuel_use_type,
+            fuel_type=fuel_type,
+            co2=co2,
+            ch4=ch4,
+            n2o=n2o,
+        )
+    )
+
+EnergyDefaultEmissionFactor.objects.bulk_create(l)
+
+
+"""
+
+# TODO: Run in review
+
+
 ForestManagementAGB.objects.all().delete()
 import api.utilities as utils
 
@@ -4306,10 +4398,10 @@ for i, row in df.iterrows():
     for region in regions:
         for climate in climates:
             for type in forest_types:
-                if type.name == "Plantation" and row["agb_range_plantation"] == "n.a." and row["agb_growth_plantation"] == "n.a.":
-                    continue
-                if type.name == "Natural" and row["agb_range"] == "n.a." and row["agb_growth"] == "n.a.":
-                    continue
+                # if type.name == "Plantation" and row["agb_range_plantation"] == "n.a." and row["agb_growth_plantation"] == "n.a.":
+                #     continue
+                # if type.name == "Natural" and row["agb_range"] == "n.a." and row["agb_growth"] == "n.a.":
+                #     continue
                 if type.name == "Plantation" and forest_condition_type.name == "Primary":
                     continue
 
@@ -4342,95 +4434,5 @@ for i, row in df.iterrows():
                     agb_growth_max=agb_growth_max * utils.NON_MANGROVE_FACTOR if agb_growth_max else None,
                 )
 
-print("Deleting all MethaneManureManagementFactor...")
-LivestockAWMS.objects.all().delete()
-print("Deleted all MethaneManureManagementFactor.")
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "NewLivestockAWMS.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers = df.columns.values.tolist()
-df_dict = df.to_dict("records")
-
-awms_list = []
-
-for i, row in enumerate(df_dict):
-    livestock_category_type = LivestockCategoryType.objects.filter(name__iexact=sanitize(row["livestock_category_type"])).first()
-
-    livestock_production_type = LivestockProductionType.objects.filter(name__iexact=sanitize(row["livestock_production_type"])).first()
-
-    ipcc_region = IPCCRegion.objects.filter(name__iexact=sanitize(row["ipcc_region"])).first()
-
-    print(f"{livestock_category_type}, {livestock_production_type}, {ipcc_region}")
-
-    for j, header in enumerate(df_headers, start=3):
-
-        if j == len(df_headers):
-            break
-
-        manure_management_type = ManureManagementType.objects.filter(name__iexact=sanitize(df_headers[j])).first()
-
-        print(manure_management_type, row[df_headers[j]])
-
-        awms_list.append(
-            LivestockAWMS(
-                manure_management_type=manure_management_type,
-                livestock_category_type=livestock_category_type,
-                livestock_production_type=livestock_production_type,
-                ipcc_region=ipcc_region,
-                value=parse_csv_number(row[df_headers[j]]),
-            )
-        )
-
-LivestockAWMS.objects.bulk_create(awms_list)
-
-log.debug("Deleting all InputEmissionFactor models...")
-EnergyDefaultEmissionFactor.objects.all().delete()
-
-l = []
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "EnergyDefaultEmissionFactors.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers = df.columns.values.tolist()
-df_dict = df.to_dict("records")
-
-for i, row in enumerate(df_dict):
-    fuel_use_type = FuelUseType.objects.get(name__iexact=row["fuel_use_type"])
-    fuel_type = FuelType.objects.get(name__iexact=row["fuel_type"])
-    co2 = parse_csv_number(row["co2"])
-    ch4 = parse_csv_number(row["ch4"])
-    n2o = parse_csv_number(row["n2o"])
-
-    print(
-        fuel_use_type,
-        fuel_type,
-        co2,
-        ch4,
-        n2o,
-    )
-
-    l.append(
-        EnergyDefaultEmissionFactor(
-            fuel_use_type=fuel_use_type,
-            fuel_type=fuel_type,
-            co2=co2,
-            ch4=ch4,
-            n2o=n2o,
-        )
-    )
-
-EnergyDefaultEmissionFactor.objects.bulk_create(l)
-
-
-"""
-
-# TODO: Run in review
 
 # TODO: Run in develop
