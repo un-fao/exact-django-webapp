@@ -3365,7 +3365,7 @@ class ElectricityCalculator(BaseCalculator):
 
         try:
             elec = ipcc.ElectricityEmission.objects.get(country=module.country)
-            if "Operating Margin" in module.ef_source:
+            if module.ef_source and "Operating Margin" in module.ef_source.name:
                 log.debug(f"Operating margin: {elec.operating_margin}")
                 margin = elec.operating_margin
             else:
@@ -3385,6 +3385,7 @@ class ElectricityCalculator(BaseCalculator):
             "rate_type": change_rate.name,
             "implementation_time": self.activity.implementation_years,
             "capitalization_time": self.activity.capitalization_years,
+            "delay": self.activity.delay,
         }
         log.debug("Inputs with: %s", inputs_w)
 
@@ -3402,6 +3403,7 @@ class ElectricityCalculator(BaseCalculator):
             "rate_type": change_rate.name,
             "implementation_time": self.activity.implementation_years,
             "capitalization_time": self.activity.capitalization_years,
+            "delay": self.activity.delay,
         }
         log.debug("Inputs without: %s", inputs_wo)
 
