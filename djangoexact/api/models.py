@@ -729,6 +729,7 @@ class Activity(Historical, NoteMixin):
     soil_type_t2 = models.ForeignKey(SoilType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("soil_type_t2"))
     duration_t2 = models.IntegerField(null=True, blank=True, verbose_name=_("duration_t2"))
     start_year_t2 = models.IntegerField(null=True, blank=True, verbose_name=_("start_year_t2"))
+    soc_t2 = models.FloatField(null=True, blank=True, verbose_name=_("soc_t2"))
 
     created_at = models.DateTimeField(auto_now_add=True, null=True, verbose_name=_("created_at"))
     updated_at = models.DateTimeField(auto_now=True, null=True, verbose_name=_("updated_at"))
