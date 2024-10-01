@@ -500,7 +500,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
             owner=self.context["request"].user,
         )
 
-    def handle_luc_module(self, activity, has_organic_soil):
+    def handle_luc_module(self, activity, create_organic_soil):
         luc = LandUseChange.objects.create(
             **self.validated_data["land_use_change"],
             activity=activity,
@@ -514,7 +514,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
         )
         luc.status = StatusType.objects.get(name="READY")
 
-        if has_organic_soil:
+        if create_organic_soil:
             organic_soil = OrganicSoil.objects.create(activity=activity, area=self.validated_data.get("area"))
             organic_soil.land_use_change = luc
             organic_soil.save()
@@ -629,12 +629,13 @@ class ActivityBuilderSerializer(serializers.Serializer):
     def save(self, **kwargs):
         self.validate_total_project_cost()
 
-        has_organic_soil = "OrganicSoil" in [module.class_name for module in self.validated_data["module_types"]]
+        create_organic_soil = "OrganicSoil" in [module.class_name for module in self.validated_data["module_types"]]
         has_luc_module = self.validated_data.get("land_use_change", False)
 
         if self.instance:
             old_module_types = list(map(lambda module: module, self.instance.module_types.all()))
             new_module_types = list(map(lambda module: module, self.validated_data["module_types"]))
+            create_organic_soil = create_organic_soil and not "OrganicSoil" in [module.class_name for module in old_module_types]
 
             luc: LandUseChange = self.instance.landusechange.first()
             if luc and has_luc_module:
@@ -642,7 +643,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
             elif luc and not has_luc_module:
                 self.delete_existing_luc()
             elif not luc and has_luc_module:
-                luc = self.handle_luc_module(self.instance, has_organic_soil)
+                luc = self.handle_luc_module(self.instance, create_organic_soil)
 
             luc = self.instance.landusechange.first()
 
@@ -665,7 +666,8 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
                 ModuleClass = apps.get_model("api", module.class_name)
                 module_instance = ModuleClass.objects.filter(activity=self.instance).first()
-                if module_instance and module_instance.module_type in luc_module_types:
+                # TODO: Maybe instead of checking the module type we can check the instance class?
+                if module_instance and module_instance.module_type in luc_module_types or module.class_name == "OrganicSoil":
                     module_instance.land_use_change = luc
                     module_instance.save()
                 elif module_instance:
@@ -702,9 +704,9 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
             luc = None
             if has_luc_module:
-                luc = self.handle_luc_module(activity, has_organic_soil)
+                luc = self.handle_luc_module(activity, create_organic_soil)
 
-            self.create_modules(activity, luc, has_organic_soil, has_luc_module)
+            self.create_modules(activity, luc, create_organic_soil, has_luc_module)
             activity.save()
 
             return activity
