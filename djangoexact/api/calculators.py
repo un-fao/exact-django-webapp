@@ -2614,32 +2614,78 @@ class SmallFisheryCalculator(BaseCalculator):
     Calculator for small fishery.
     """
 
+    def __init__(self, input) -> None:
+        super().__init__(input)
+
+        self.module: SmallFishery
+
+        self.energy_ef_default: ipcc.EnergyDefaultEmissionFactor = None
+        self.energy_ef_default_co2: float = 0
+        self.energy_ef_default_ch4: float = 0
+        self.energy_ef_default_n2o: float = 0
+        self.electricity_emission: ipcc.ElectricityEmission = None
+        self.lost_refrigerant_default: float = 0
+        self.tonnes_ice_default: float = 0
+        self.kw_tonnes: float = 0
+
+        self.fui_start: ipcc.SmallFisheryFUI = None
+        self.fui_w: ipcc.SmallFisheryFUI = None
+        self.fui_wo: ipcc.SmallFisheryFUI = None
+
+        self.relevant_scenarios = self.module.get_relevant_scenarios()
+
     def get_defaults(self, calculate=False) -> dict:
-        module: SmallFishery = self.data
-        activity: Activity = module.activity
-        project: Project = activity.project
+        super().get_defaults(calculate)
 
         try:
-            ef_diesel_default_list = ipcc.EnergyDefaultEmissionFactor.objects.filter(fuel_type__fuel_use_type__name__contains="Off-Road")
+            self.energy_ef_default = ipcc.EnergyDefaultEmissionFactor.objects.filter(fuel_type__fuel_use_type__name__contains="Off-Road")
             # Average of all default emission factors for gasoil/diesel
-            self.ef_diesel_default = sum([ef.t_co2_eq for ef in ef_diesel_default_list]) / len(ef_diesel_default_list)
+            self.energy_ef_default_co2 = sum([ef.co2 for ef in self.energy_ef_default]) / len(self.energy_ef_default)
+            self.energy_ef_default_ch4 = sum([ef.ch4 for ef in self.energy_ef_default]) / len(self.energy_ef_default)
+            self.energy_ef_default_n2o = sum([ef.n2o for ef in self.energy_ef_default]) / len(self.energy_ef_default)
         except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
             raise ValueError("Default emission factors for off-road diesel do not exist")
 
         try:
             self.lost_refrigerant_default = SmallFisheryParameter.objects.get(name="lost_refrigerant_default").value
         except SmallFisheryParameter.DoesNotExist:
-            raise ValueError("Default lost refrigerant does not exist")
+            if any([v is None for v in [getattr(self.module, f"refrigerant_lost_per_tonne_t2_{s}") for s in self.relevant_scenarios]]):
+                raise ValueError(f"Default lost refrigerant does not exist. Please provide a tier 2 value for lost refrigerant for the relevant scenarios.")
 
         try:
             self.tonnes_ice_default = SmallFisheryParameter.objects.get(name="tonnes_ice_default").value
         except SmallFisheryParameter.DoesNotExist:
-            raise ValueError("Default tonnes of ice does not exist")
+            if any([v is None for v in [getattr(self.module, f"tonnes_of_ice_t2_{s}") for s in self.relevant_scenarios]]):
+                raise ValueError("Default tonnes of ice does not exist. Please provide a tier 2 value for tonnes of ice for the relevant scenarios.")
 
         try:
             self.kw_tonnes = SmallFisheryParameter.objects.get(name="kw_tonnes").value
         except SmallFisheryParameter.DoesNotExist:
-            raise ValueError("Default kw per tonne does not exist")
+            if any([v is None for v in [getattr(self.module, f"inshore_ice_production_kwh_per_tonne_t2_{s}") for s in self.relevant_scenarios]]):
+                raise ValueError("Default kw per tonne does not exist")
+
+        try:
+            self.fui_start = ipcc.SmallFisheryFUI.objects.get_value_or_average(fishery_type=self.module.fishery_type, gear_type=self.module.gear_type_start)
+        except ipcc.SmallFisheryFUI.DoesNotExist:
+            if self.module.fui_t2_start is None:
+                raise ValueError("Default FUI does not exist. Please provide a tier 2 value for FUI for the relevant scenarios.")
+
+        try:
+            self.fui_w = ipcc.SmallFisheryFUI.objects.get_value_or_average(fishery_type=self.module.fishery_type, gear_type=self.module.gear_type_w)
+        except ipcc.SmallFisheryFUI.DoesNotExist:
+            if self.module.fui_t2_w is None:
+                raise ValueError("Default FUI does not exist. Please provide a tier 2 value for FUI for the relevant scenarios.")
+
+        try:
+            self.fui_wo = ipcc.SmallFisheryFUI.objects.get_value_or_average(fishery_type=self.module.fishery_type, gear_type=self.module.gear_type_wo)
+        except ipcc.SmallFisheryFUI.DoesNotExist:
+            if self.module.fui_t2_wo is None:
+                raise ValueError("Default FUI does not exist. Please provide a tier 2 value for FUI for the relevant scenarios.")
+
+        try:
+            self.electricity_emission = ipcc.ElectricityEmission.objects.get(country=self.project.country)
+        except ipcc.ElectricityEmission.DoesNotExist:
+            raise ValueError(f"Electricity emission for {self.project.country.name} does not exist")
 
     def calculate(self) -> list[Result]:
         """
@@ -2647,92 +2693,46 @@ class SmallFisheryCalculator(BaseCalculator):
         """
         log.debug("START SmallFisheryCalculator.calculate")
 
-        module: SmallFishery = self.data
-        activity: Activity = module.activity
-        project: Project = activity.project
+        self.get_defaults()
 
-        try:
-            energy_ef_default = ipcc.EnergyDefaultEmissionFactor.objects.filter(fuel_type__fuel_use_type__name__contains="Off-Road")
-            # Average of all default emission factors for gasoil/diesel
-            energy_ef_default_co2 = sum([ef.co2 for ef in energy_ef_default]) / len(energy_ef_default)
-            energy_ef_default_ch4 = sum([ef.ch4 for ef in energy_ef_default]) / len(energy_ef_default)
-            energy_ef_default_n2o = sum([ef.n2o for ef in energy_ef_default]) / len(energy_ef_default)
-        except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
-            raise ValueError("Default emission factors for off-road diesel do not exist")
-
-        try:
-            fui_default_start = ipcc.SmallFisheryFUI.objects.get_value_or_average(fishery_type=module.fishery_type, gear_type=module.gear_type_start)
-        except ipcc.SmallFisheryFUI.DoesNotExist:
-            fui_default_start = ipcc.SmallFisheryFUI.objects.get_value_or_average(fishery_type=module.fishery_type, gear_type=module.gear_type_start)
-
-        try:
-            fui_default_w = ipcc.SmallFisheryFUI.objects.get_value_or_average(fishery_type=module.fishery_type, gear_type=module.gear_type_w)
-        except ipcc.SmallFisheryFUI.DoesNotExist:
-            fui_default_w = ipcc.SmallFisheryFUI.objects.get_value_or_average(fishery_type=module.fishery_type, gear_type=module.gear_type_w)
-
-        try:
-            fui_default_wo = ipcc.SmallFisheryFUI.objects.get_value_or_average(fishery_type=module.fishery_type, gear_type=module.gear_type_wo)
-        except ipcc.SmallFisheryFUI.DoesNotExist:
-            fui_default_wo = ipcc.SmallFisheryFUI.objects.get_value_or_average(fishery_type=module.fishery_type, gear_type=module.gear_type_wo)
-
-        try:
-            lost_refrigerant_default = SmallFisheryParameter.objects.get(name="lost_refrigerant_default").value
-        except SmallFisheryParameter.DoesNotExist:
-            raise ValueError("Default lost refrigerant does not exist")
-
-        try:
-            tonnes_ice_default = SmallFisheryParameter.objects.get(name="tonnes_ice_default").value
-        except SmallFisheryParameter.DoesNotExist:
-            raise ValueError("Default tonnes of ice does not exist")
-
-        try:
-            kw_tonnes = SmallFisheryParameter.objects.get(name="kw_tonnes").value
-        except SmallFisheryParameter.DoesNotExist:
-            raise ValueError("Default kw per tonne does not exist")
-
-        try:
-            electricity_emission = ipcc.ElectricityEmission.objects.get(country=project.country)
-        except ipcc.ElectricityEmission.DoesNotExist:
-            raise ValueError(f"Electricity emission for {project.country.name} does not exist")
-
-        if module.is_with():
+        if self.module.is_with():
             log.debug("IS WITH")
             self.inputs_w = {
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "rate_type": module.activity.change_rate.name,
-                "catch_start": module.total_catch_yr_start,
-                "catch_end": module.total_catch_yr_w,
-                "ef_diesel_default_co2": energy_ef_default_co2,
-                "ef_diesel_co2_start_tier_2": module.energy_emission_factor_co2_t2_start,
-                "ef_diesel_co2_end_tier_2": module.energy_emission_factor_co2_t2_w,
-                "ef_diesel_default_n2o": energy_ef_default_n2o,
-                "ef_diesel_n2o_start_tier_2": module.energy_emission_factor_n2o_t2_start,
-                "ef_diesel_n2o_end_tier_2": module.energy_emission_factor_n2o_t2_w,
-                "ef_diesel_default_ch4": energy_ef_default_ch4,
-                "ef_diesel_ch4_start_tier_2": module.energy_emission_factor_ch4_t2_start,
-                "ef_diesel_ch4_end_tier_2": module.energy_emission_factor_ch4_t2_w,
-                "fui_default_start": fui_default_start,
-                "fui_default_end": fui_default_w,
-                "fui_start_tier_2": module.fui_t2_start,
-                "fui_end_tier_2": module.fui_t2_w,
-                "gwp_refrigerant_default": module.refrigerant_gwp,
-                "gwp_refrigerant_start_tier_2": module.refrigerant_gwp_t2_start,
-                "gwp_refrigerant_end_tier_2": module.refrigerant_gwp_t2_w,
-                "quantity_lost_refrigerant_default": lost_refrigerant_default,
-                "quantity_lost_refrigerant_start_tier_2": module.refrigerant_lost_per_tonne_t2_start,
-                "quantity_lost_refrigerant_end_tier_2": module.refrigerant_lost_per_tonne_t2_w,
-                "percentage_refrigerant_start": module.refrigerant_pc_start,
-                "percentage_refrigerant_end": module.refrigerant_pc_w,
-                "tonnes_ice_default": tonnes_ice_default,
-                "tonnes_ice_start_tier_2": module.tonnes_of_ice_t2_start,
-                "tonnes_ice_end_tier_2": module.tonnes_of_ice_t2_w,
-                "kwh_ice_per_tonne_default": kw_tonnes,
-                "kwh_ice_per_tonne_start_tier_2": module.inshore_ice_production_kwh_per_tonne_t2_start,
-                "kwh_ice_per_tonne_end_tier_2": module.inshore_ice_production_kwh_per_tonne_t2_w,
-                "operating_margin": electricity_emission.operating_margin,
-                "percentage_ice_start": module.ice_preserved_catch_pc_start,
-                "percentage_ice_end": module.ice_preserved_catch_pc_w,
+                "rate_type": self.module.activity.change_rate.name,
+                "catch_start": self.module.total_catch_yr_start,
+                "catch_end": self.module.total_catch_yr_w,
+                "ef_diesel_default_co2": self.energy_ef_default_co2,
+                "ef_diesel_co2_start_tier_2": self.module.energy_emission_factor_co2_t2_start,
+                "ef_diesel_co2_end_tier_2": self.module.energy_emission_factor_co2_t2_w,
+                "ef_diesel_default_n2o": self.energy_ef_default_n2o,
+                "ef_diesel_n2o_start_tier_2": self.module.energy_emission_factor_n2o_t2_start,
+                "ef_diesel_n2o_end_tier_2": self.module.energy_emission_factor_n2o_t2_w,
+                "ef_diesel_default_ch4": self.energy_ef_default_ch4,
+                "ef_diesel_ch4_start_tier_2": self.module.energy_emission_factor_ch4_t2_start,
+                "ef_diesel_ch4_end_tier_2": self.module.energy_emission_factor_ch4_t2_w,
+                "fui_default_start": self.fui_start,
+                "fui_default_end": self.fui_w,
+                "fui_start_tier_2": self.module.fui_t2_start,
+                "fui_end_tier_2": self.module.fui_t2_w,
+                "gwp_refrigerant_default": self.module.refrigerant_gwp,
+                "gwp_refrigerant_start_tier_2": self.module.refrigerant_gwp_t2_start,
+                "gwp_refrigerant_end_tier_2": self.module.refrigerant_gwp_t2_w,
+                "quantity_lost_refrigerant_default": self.lost_refrigerant_default,
+                "quantity_lost_refrigerant_start_tier_2": self.module.refrigerant_lost_per_tonne_t2_start,
+                "quantity_lost_refrigerant_end_tier_2": self.module.refrigerant_lost_per_tonne_t2_w,
+                "percentage_refrigerant_start": self.module.refrigerant_pc_start,
+                "percentage_refrigerant_end": self.module.refrigerant_pc_w,
+                "tonnes_ice_default": self.tonnes_ice_default,
+                "tonnes_ice_start_tier_2": self.module.tonnes_of_ice_t2_start,
+                "tonnes_ice_end_tier_2": self.module.tonnes_of_ice_t2_w,
+                "kwh_ice_per_tonne_default": self.kw_tonnes,
+                "kwh_ice_per_tonne_start_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_start,
+                "kwh_ice_per_tonne_end_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_w,
+                "operating_margin": self.electricity_emission.operating_margin,
+                "percentage_ice_start": self.module.ice_preserved_catch_pc_start,
+                "percentage_ice_end": self.module.ice_preserved_catch_pc_w,
                 "delay": self.activity.delay,
             }
             log.debug("Inputs with: %s", self.inputs_w)
@@ -2740,44 +2740,44 @@ class SmallFisheryCalculator(BaseCalculator):
             self.math_w = MathFishery(**self.inputs_w)
             self.math_w.calculate_emissions()
 
-        if module.is_without():
+        if self.module.is_without():
             log.debug("IS WITHOUT")
             self.inputs_wo = {
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "rate_type": module.activity.change_rate.name,
-                "catch_start": module.total_catch_yr_start,
-                "catch_end": module.total_catch_yr_wo,
-                "ef_diesel_default_co2": energy_ef_default_co2,
-                "ef_diesel_co2_start_tier_2": module.energy_emission_factor_co2_t2_start,
-                "ef_diesel_co2_end_tier_2": module.energy_emission_factor_co2_t2_wo,
-                "ef_diesel_default_n2o": energy_ef_default_n2o,
-                "ef_diesel_n2o_start_tier_2": module.energy_emission_factor_n2o_t2_start,
-                "ef_diesel_n2o_end_tier_2": module.energy_emission_factor_n2o_t2_wo,
-                "ef_diesel_default_ch4": energy_ef_default_ch4,
-                "ef_diesel_ch4_start_tier_2": module.energy_emission_factor_ch4_t2_start,
-                "ef_diesel_ch4_end_tier_2": module.energy_emission_factor_ch4_t2_wo,
-                "fui_default_start": fui_default_start,
-                "fui_default_end": fui_default_wo,
-                "fui_start_tier_2": module.fui_t2_start,
-                "fui_end_tier_2": module.fui_t2_wo,
-                "gwp_refrigerant_default": module.refrigerant_gwp,
-                "gwp_refrigerant_start_tier_2": module.refrigerant_gwp_t2_start,
-                "gwp_refrigerant_end_tier_2": module.refrigerant_gwp_t2_wo,
-                "quantity_lost_refrigerant_default": lost_refrigerant_default,
-                "quantity_lost_refrigerant_start_tier_2": module.refrigerant_lost_per_tonne_t2_start,
-                "quantity_lost_refrigerant_end_tier_2": module.refrigerant_lost_per_tonne_t2_wo,
-                "percentage_refrigerant_start": module.refrigerant_pc_start,
-                "percentage_refrigerant_end": module.refrigerant_pc_wo,
-                "tonnes_ice_default": tonnes_ice_default,
-                "tonnes_ice_start_tier_2": module.tonnes_of_ice_t2_start,
-                "tonnes_ice_end_tier_2": module.tonnes_of_ice_t2_wo,
-                "kwh_ice_per_tonne_default": kw_tonnes,
-                "kwh_ice_per_tonne_start_tier_2": module.inshore_ice_production_kwh_per_tonne_t2_start,
-                "kwh_ice_per_tonne_end_tier_2": module.inshore_ice_production_kwh_per_tonne_t2_wo,
-                "operating_margin": electricity_emission.operating_margin,
-                "percentage_ice_start": module.ice_preserved_catch_pc_start,
-                "percentage_ice_end": module.ice_preserved_catch_pc_wo,
+                "rate_type": self.module.activity.change_rate.name,
+                "catch_start": self.module.total_catch_yr_start,
+                "catch_end": self.module.total_catch_yr_wo,
+                "ef_diesel_default_co2": self.energy_ef_default_co2,
+                "ef_diesel_co2_start_tier_2": self.module.energy_emission_factor_co2_t2_start,
+                "ef_diesel_co2_end_tier_2": self.module.energy_emission_factor_co2_t2_wo,
+                "ef_diesel_default_n2o": self.energy_ef_default_n2o,
+                "ef_diesel_n2o_start_tier_2": self.module.energy_emission_factor_n2o_t2_start,
+                "ef_diesel_n2o_end_tier_2": self.module.energy_emission_factor_n2o_t2_wo,
+                "ef_diesel_default_ch4": self.energy_ef_default_ch4,
+                "ef_diesel_ch4_start_tier_2": self.module.energy_emission_factor_ch4_t2_start,
+                "ef_diesel_ch4_end_tier_2": self.module.energy_emission_factor_ch4_t2_wo,
+                "fui_default_start": self.fui_start,
+                "fui_default_end": self.fui_wo,
+                "fui_start_tier_2": self.module.fui_t2_start,
+                "fui_end_tier_2": self.module.fui_t2_wo,
+                "gwp_refrigerant_default": self.module.refrigerant_gwp,
+                "gwp_refrigerant_start_tier_2": self.module.refrigerant_gwp_t2_start,
+                "gwp_refrigerant_end_tier_2": self.module.refrigerant_gwp_t2_wo,
+                "quantity_lost_refrigerant_default": self.lost_refrigerant_default,
+                "quantity_lost_refrigerant_start_tier_2": self.module.refrigerant_lost_per_tonne_t2_start,
+                "quantity_lost_refrigerant_end_tier_2": self.module.refrigerant_lost_per_tonne_t2_wo,
+                "percentage_refrigerant_start": self.module.refrigerant_pc_start,
+                "percentage_refrigerant_end": self.module.refrigerant_pc_wo,
+                "tonnes_ice_default": self.tonnes_ice_default,
+                "tonnes_ice_start_tier_2": self.module.tonnes_of_ice_t2_start,
+                "tonnes_ice_end_tier_2": self.module.tonnes_of_ice_t2_wo,
+                "kwh_ice_per_tonne_default": self.kw_tonnes,
+                "kwh_ice_per_tonne_start_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_start,
+                "kwh_ice_per_tonne_end_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_wo,
+                "operating_margin": self.electricity_emission.operating_margin,
+                "percentage_ice_start": self.module.ice_preserved_catch_pc_start,
+                "percentage_ice_end": self.module.ice_preserved_catch_pc_wo,
                 "delay": self.activity.delay,
             }
             log.debug("Inputs without: %s", self.inputs_wo)
@@ -2788,31 +2788,12 @@ class SmallFisheryCalculator(BaseCalculator):
         self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
 
+        if PLOT_GRAPHS:
+            self.results_w.plot_emissions_and_aggregate_by_activity("small_fishery_w")
+            self.results_wo.plot_emissions_and_aggregate_by_activity("small_fishery_wo")
+
         log.debug("END SmallFisheryCalculator.calculate")
         return (self.results_w, self.results_wo)
-
-    # def get_defaults(self):
-    #     self.calculate()
-
-    #     module: SmallFishery = self.data
-
-    #     defaults_start = {}
-    #     defaults_w = {}
-    #     defaults_wo = {}
-
-    #     if is_with(module):
-    #         math_w = MathFishery(*self.inputs_w)
-    #         math_w_defaults = math_w.evaluate_tier_2_defaults()
-    #         defaults_w.update(math_w_defaults.end)
-    #         defaults_w.update(math_w_defaults.other)
-
-    #     if is_without(module):
-    #         math_wo = MathFishery(*self.inputs_wo)
-    #         math_wo_defaults = math_wo.evaluate_tier_2_defaults()
-    #         defaults_wo.update(math_wo_defaults.end)
-    #         defaults_wo.update(math_wo_defaults.other)
-
-    #     return DefaultData(defaults_start, defaults_w, defaults_wo)
 
 
 class LargeFisheryCalculator(BaseCalculator):
@@ -2820,31 +2801,79 @@ class LargeFisheryCalculator(BaseCalculator):
     Calculator for large fishery.
     """
 
+    def init(self, input) -> None:
+        super().init(input)
+
+        self.module: LargeFishery
+
+        self.energy_ef_default: ipcc.EnergyDefaultEmissionFactor = None
+        self.energy_ef_default_co2: float = 0
+        self.energy_ef_default_ch4: float = 0
+        self.energy_ef_default_n2o: float = 0
+        self.fui_default_start: ipcc.LargeFisheryFUI = None
+        self.fui_default_w: ipcc.LargeFisheryFUI = None
+        self.fui_default_wo: ipcc.LargeFisheryFUI = None
+        self.lost_refrigerant_default: float = 0
+        self.tonnes_ice_default: float = 0
+        self.kw_tonnes: float = 0
+        self.electricity_country: Country = None
+        self.electricity_emission: ipcc.ElectricityEmission = None
+
+        self.relevant_scenarios = self.module.get_relevant_scenarios()
+
     def get_defaults(self, calculate=False) -> dict:
-        module: LargeFishery = self.data
-        project = module.activity.project
+        super().get_defaults(calculate)
 
         try:
-            ef_diesel_default_list = ipcc.EnergyDefaultEmissionFactor.objects.filter(fuel_type__fuel_use_type__name__contains="Off-Road")
+            self.energy_ef_default = ipcc.EnergyDefaultEmissionFactor.objects.filter(fuel_type__fuel_use_type__name__contains="Off-Road")
             # Average of all default emission factors for gasoil/diesel
-            self.ef_diesel_default = sum([ef.t_co2_eq for ef in ef_diesel_default_list]) / len(ef_diesel_default_list)
+            self.energy_ef_default_co2 = sum([ef.co2 for ef in self.energy_ef_default]) / len(self.energy_ef_default)
+            self.energy_ef_default_ch4 = sum([ef.ch4 for ef in self.energy_ef_default]) / len(self.energy_ef_default)
+            self.energy_ef_default_n2o = sum([ef.n2o for ef in self.energy_ef_default]) / len(self.energy_ef_default)
         except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
             raise ValueError("Default emission factors for off-road diesel do not exist")
 
         try:
+            self.fui_default_start = ipcc.LargeFisheryFUI.objects.get_value_or_average(fish_type=self.module.fish_type, gear_type=self.module.gear_type_start)
+        except ipcc.LargeFisheryFUI.DoesNotExist:
+            if self.module.fui_t2_start is None:
+                raise ValueError(f"Default FUI for {self.module.fish_type.name} and {self.module.gear_type_start.name} does not exist. Please provide a tier 2 value for FUI for the relevant scenarios.")
+
+        try:
+            self.fui_default_w = ipcc.LargeFisheryFUI.objects.get_value_or_average(fish_type=self.module.fish_type, gear_type=self.module.gear_type_w)
+        except ipcc.LargeFisheryFUI.DoesNotExist:
+            if self.module.fui_t2_w is None:
+                raise ValueError(f"Default FUI for {self.module.fish_type.name} and {self.module.gear_type_w.name} does not exist. Please provide a tier 2 value for FUI for the relevant scenarios.")
+
+        try:
+            self.fui_default_wo = ipcc.LargeFisheryFUI.objects.get_value_or_average(fish_type=self.module.fish_type, gear_type=self.module.gear_type_wo)
+        except ipcc.LargeFisheryFUI.DoesNotExist:
+            if self.module.fui_t2_wo is None:
+                raise ValueError(f"Default FUI for {self.module.fish_type.name} and {self.module.gear_type_wo.name} does not exist. Please provide a tier 2 value for FUI for the relevant scenarios.")
+
+        try:
             self.lost_refrigerant_default = LargeFisheryParameter.objects.get(name="lost_refrigerant_default").value
         except LargeFisheryParameter.DoesNotExist:
-            raise ValueError("Default lost refrigerant does not exist")
+            if any([v is None for v in [getattr(self.module, f"refrigerant_lost_per_tonne_t2_{s}") for s in self.relevant_scenarios]]):
+                raise ValueError("Default lost refrigerant does not exist. Please provide a tier 2 value for lost refrigerant for the relevant scenarios.")
 
         try:
             self.tonnes_ice_default = LargeFisheryParameter.objects.get(name="tonnes_ice_default").value
         except LargeFisheryParameter.DoesNotExist:
-            raise ValueError("Default tonnes of ice does not exist")
+            if any([v is None for v in [getattr(self.module, f"tonnes_of_ice_t2_{s}") for s in self.relevant_scenarios]]):
+                raise ValueError("Default tonnes of ice does not exist. Please provide a tier 2 value for tonnes of ice for the relevant scenarios.")
 
         try:
             self.kw_tonnes = LargeFisheryParameter.objects.get(name="kw_tonnes").value
         except LargeFisheryParameter.DoesNotExist:
-            raise ValueError("Default kw per tonne does not exist")
+            if any([v is None for v in [getattr(self.module, f"inshore_ice_production_kwh_per_tonne_t2_{s}") for s in self.relevant_scenarios]]):
+                raise ValueError("Default kw per tonne does not exist. Please provide a tier 2 value for kw per tonne for the relevant scenarios.")
+
+        try:
+            self.electricity_country = self.module.inshore_ice_production_country_t2 if self.module.inshore_ice_production_country_t2 else self.project.country
+            self.electricity_emission = ipcc.ElectricityEmission.objects.get(country=self.electricity_country)
+        except ipcc.ElectricityEmission.DoesNotExist:
+            raise ValueError(f"Electricity emission for {self.electricity_country.name} does not exist")
 
     def calculate(self) -> list[Result]:
         """
@@ -2852,183 +2881,109 @@ class LargeFisheryCalculator(BaseCalculator):
         """
         log.debug("START LargeFisheryCalculator.calculate")
 
-        module: LargeFishery = self.data
-        project = module.activity.project
+        self.get_defaults()
 
-        try:
-            energy_ef_default = ipcc.EnergyDefaultEmissionFactor.objects.filter(fuel_type__fuel_use_type__name__contains="Off-Road")
-            # Average of all default emission factors for gasoil/diesel
-            energy_ef_default_co2 = sum([ef.co2 for ef in energy_ef_default]) / len(energy_ef_default)
-            energy_ef_default_ch4 = sum([ef.ch4 for ef in energy_ef_default]) / len(energy_ef_default)
-            energy_ef_default_n2o = sum([ef.n2o for ef in energy_ef_default]) / len(energy_ef_default)
-        except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
-            raise ValueError("Default emission factors for off-road diesel do not exist")
-
-        try:
-            fui_default_start = ipcc.LargeFisheryFUI.objects.get_value_or_average(fish_type=module.fish_type, gear_type=module.gear_type_start)
-        except ipcc.LargeFisheryFUI.DoesNotExist:
-            raise ValueError(f"Fishery FUI for {module.fish_type.name} and {module.gear_type_start.name} does not exist")
-
-        try:
-            fui_default_w = ipcc.LargeFisheryFUI.objects.get_value_or_average(fish_type=module.fish_type, gear_type=module.gear_type_w)
-        except ipcc.LargeFisheryFUI.DoesNotExist:
-            raise ValueError(f"Fishery FUI for {module.fish_type.name} and {module.gear_type_w.name} does not exist")
-
-        try:
-            fui_default_wo = ipcc.LargeFisheryFUI.objects.get_value_or_average(fish_type=module.fish_type, gear_type=module.gear_type_wo)
-        except ipcc.LargeFisheryFUI.DoesNotExist:
-            raise ValueError(f"Fishery FUI for {module.fish_type.name} and {module.gear_type_wo.name} does not exist")
-
-        try:
-            lost_refrigerant_default = LargeFisheryParameter.objects.get(name="lost_refrigerant_default").value
-        except LargeFisheryParameter.DoesNotExist:
-            raise ValueError("Default lost refrigerant does not exist")
-
-        try:
-            tonnes_ice_default = LargeFisheryParameter.objects.get(name="tonnes_ice_default").value
-        except LargeFisheryParameter.DoesNotExist:
-            raise ValueError("Default tonnes of ice does not exist")
-
-        try:
-            kw_tonnes = LargeFisheryParameter.objects.get(name="kw_tonnes").value
-        except LargeFisheryParameter.DoesNotExist:
-            raise ValueError("Default kw per tonne does not exist")
-
-        try:
-            electricity_country = module.inshore_ice_production_country_t2 if module.inshore_ice_production_country_t2 else project.country
-            electricity_emission = ipcc.ElectricityEmission.objects.get(country=electricity_country)
-        except ipcc.ElectricityEmission.DoesNotExist:
-            raise ValueError(f"Electricity emission for {electricity_country.name} does not exist")
-
-        math_w = None
-        math_wo = None
-
-        if module.is_with():
+        if self.module.is_with():
             log.debug("IS WITH")
             self.inputs_w = {
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "rate_type": module.activity.change_rate.name,
-                "catch_start": module.total_catch_yr_start,
-                "catch_end": module.total_catch_yr_w,
-                "ef_diesel_default_co2": energy_ef_default_co2,
-                "ef_diesel_co2_start_tier_2": module.energy_emission_factor_co2_t2_start,
-                "ef_diesel_co2_end_tier_2": module.energy_emission_factor_co2_t2_w,
-                "ef_diesel_default_n2o": energy_ef_default_n2o,
-                "ef_diesel_n2o_start_tier_2": module.energy_emission_factor_n2o_t2_start,
-                "ef_diesel_n2o_end_tier_2": module.energy_emission_factor_n2o_t2_w,
-                "ef_diesel_default_ch4": energy_ef_default_ch4,
-                "ef_diesel_ch4_start_tier_2": module.energy_emission_factor_ch4_t2_start,
-                "ef_diesel_ch4_end_tier_2": module.energy_emission_factor_ch4_t2_w,
-                "fui_default_start": fui_default_start,
-                "fui_default_end": fui_default_w,
-                "fui_start_tier_2": module.fui_t2_start,
-                "fui_end_tier_2": module.fui_t2_w,
-                "gwp_refrigerant_default": module.refrigerant_gwp,
-                "gwp_refrigerant_start_tier_2": module.refrigerant_gwp_t2_start,
-                "gwp_refrigerant_end_tier_2": module.refrigerant_gwp_t2_w,
-                "quantity_lost_refrigerant_default": lost_refrigerant_default,
-                "quantity_lost_refrigerant_start_tier_2": module.refrigerant_lost_per_tonne_t2_start,
-                "quantity_lost_refrigerant_end_tier_2": module.refrigerant_lost_per_tonne_t2_w,
-                "percentage_refrigerant_start": module.refrigerant_pc_start,
-                "percentage_refrigerant_end": module.refrigerant_pc_w,
-                "tonnes_ice_default": tonnes_ice_default,
-                "tonnes_ice_start_tier_2": module.tonnes_of_ice_t2_start,
-                "tonnes_ice_end_tier_2": module.tonnes_of_ice_t2_w,
-                "kwh_ice_per_tonne_default": kw_tonnes,
-                "kwh_ice_per_tonne_start_tier_2": module.inshore_ice_production_kwh_per_tonne_t2_start,
-                "kwh_ice_per_tonne_end_tier_2": module.inshore_ice_production_kwh_per_tonne_t2_w,
-                "operating_margin": electricity_emission.operating_margin,
-                "percentage_ice_start": module.ice_preserved_catch_pc_start,
-                "percentage_ice_end": module.ice_preserved_catch_pc_w,
+                "rate_type": self.module.activity.change_rate.name,
+                "catch_start": self.module.total_catch_yr_start,
+                "catch_end": self.module.total_catch_yr_w,
+                "ef_diesel_default_co2": self.energy_ef_default_co2,
+                "ef_diesel_co2_start_tier_2": self.module.energy_emission_factor_co2_t2_start,
+                "ef_diesel_co2_end_tier_2": self.module.energy_emission_factor_co2_t2_w,
+                "ef_diesel_default_n2o": self.energy_ef_default_n2o,
+                "ef_diesel_n2o_start_tier_2": self.module.energy_emission_factor_n2o_t2_start,
+                "ef_diesel_n2o_end_tier_2": self.module.energy_emission_factor_n2o_t2_w,
+                "ef_diesel_default_ch4": self.energy_ef_default_ch4,
+                "ef_diesel_ch4_start_tier_2": self.module.energy_emission_factor_ch4_t2_start,
+                "ef_diesel_ch4_end_tier_2": self.module.energy_emission_factor_ch4_t2_w,
+                "fui_default_start": self.fui_default_start,
+                "fui_default_end": self.fui_default_w,
+                "fui_start_tier_2": self.module.fui_t2_start,
+                "fui_end_tier_2": self.module.fui_t2_w,
+                "gwp_refrigerant_default": self.module.refrigerant_gwp,
+                "gwp_refrigerant_start_tier_2": self.module.refrigerant_gwp_t2_start,
+                "gwp_refrigerant_end_tier_2": self.module.refrigerant_gwp_t2_w,
+                "quantity_lost_refrigerant_default": self.lost_refrigerant_default,
+                "quantity_lost_refrigerant_start_tier_2": self.module.refrigerant_lost_per_tonne_t2_start,
+                "quantity_lost_refrigerant_end_tier_2": self.module.refrigerant_lost_per_tonne_t2_w,
+                "percentage_refrigerant_start": self.module.refrigerant_pc_start,
+                "percentage_refrigerant_end": self.module.refrigerant_pc_w,
+                "tonnes_ice_default": self.tonnes_ice_default,
+                "tonnes_ice_start_tier_2": self.module.tonnes_of_ice_t2_start,
+                "tonnes_ice_end_tier_2": self.module.tonnes_of_ice_t2_w,
+                "kwh_ice_per_tonne_default": self.kw_tonnes,
+                "kwh_ice_per_tonne_start_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_start,
+                "kwh_ice_per_tonne_end_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_w,
+                "operating_margin": self.electricity_emission.operating_margin,
+                "percentage_ice_start": self.module.ice_preserved_catch_pc_start,
+                "percentage_ice_end": self.module.ice_preserved_catch_pc_w,
                 "delay": self.activity.delay,
             }
             log.debug("Inputs with: %s", self.inputs_w)
 
-            math_w = MathFishery(**self.inputs_w)
-            math_w.calculate_emissions()
+            self.math_w = MathFishery(**self.inputs_w)
+            self.math_w.calculate_emissions()
 
-        if module.is_without():
+        if self.module.is_without():
             log.debug("IS WITHOUT")
             self.inputs_wo = {
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "rate_type": module.activity.change_rate.name,
-                "catch_start": module.total_catch_yr_start,
-                "catch_end": module.total_catch_yr_wo,
-                "ef_diesel_default_co2": energy_ef_default_co2,
-                "ef_diesel_co2_start_tier_2": module.energy_emission_factor_co2_t2_start,
-                "ef_diesel_co2_end_tier_2": module.energy_emission_factor_co2_t2_w,
-                "ef_diesel_default_n2o": energy_ef_default_n2o,
-                "ef_diesel_n2o_start_tier_2": module.energy_emission_factor_n2o_t2_start,
-                "ef_diesel_n2o_end_tier_2": module.energy_emission_factor_n2o_t2_w,
-                "ef_diesel_default_ch4": energy_ef_default_ch4,
-                "ef_diesel_ch4_start_tier_2": module.energy_emission_factor_ch4_t2_start,
-                "ef_diesel_ch4_end_tier_2": module.energy_emission_factor_ch4_t2_w,
-                "fui_default_start": fui_default_start,
-                "fui_default_end": fui_default_wo,
-                "fui_start_tier_2": module.fui_t2_start,
-                "fui_end_tier_2": module.fui_t2_wo,
-                "gwp_refrigerant_default": module.refrigerant_gwp,
-                "gwp_refrigerant_start_tier_2": module.refrigerant_gwp_t2_start,
-                "gwp_refrigerant_end_tier_2": module.refrigerant_gwp_t2_wo,
-                "quantity_lost_refrigerant_default": lost_refrigerant_default,
-                "quantity_lost_refrigerant_start_tier_2": module.refrigerant_lost_per_tonne_t2_start,
-                "quantity_lost_refrigerant_end_tier_2": module.refrigerant_lost_per_tonne_t2_wo,
-                "percentage_refrigerant_start": module.refrigerant_pc_start,
-                "percentage_refrigerant_end": module.refrigerant_pc_wo,
-                "tonnes_ice_default": tonnes_ice_default,
-                "tonnes_ice_start_tier_2": module.tonnes_of_ice_t2_start,
-                "tonnes_ice_end_tier_2": module.tonnes_of_ice_t2_wo,
-                "kwh_ice_per_tonne_default": kw_tonnes,
-                "kwh_ice_per_tonne_start_tier_2": module.inshore_ice_production_kwh_per_tonne_t2_start,
-                "kwh_ice_per_tonne_end_tier_2": module.inshore_ice_production_kwh_per_tonne_t2_wo,
-                "operating_margin": electricity_emission.operating_margin,
-                "percentage_ice_start": module.ice_preserved_catch_pc_start,
-                "percentage_ice_end": module.ice_preserved_catch_pc_wo,
+                "rate_type": self.module.activity.change_rate.name,
+                "catch_start": self.module.total_catch_yr_start,
+                "catch_end": self.module.total_catch_yr_wo,
+                "ef_diesel_default_co2": self.energy_ef_default_co2,
+                "ef_diesel_co2_start_tier_2": self.module.energy_emission_factor_co2_t2_start,
+                "ef_diesel_co2_end_tier_2": self.module.energy_emission_factor_co2_t2_w,
+                "ef_diesel_default_n2o": self.energy_ef_default_n2o,
+                "ef_diesel_n2o_start_tier_2": self.module.energy_emission_factor_n2o_t2_start,
+                "ef_diesel_n2o_end_tier_2": self.module.energy_emission_factor_n2o_t2_w,
+                "ef_diesel_default_ch4": self.energy_ef_default_ch4,
+                "ef_diesel_ch4_start_tier_2": self.module.energy_emission_factor_ch4_t2_start,
+                "ef_diesel_ch4_end_tier_2": self.module.energy_emission_factor_ch4_t2_w,
+                "fui_default_start": self.fui_default_start,
+                "fui_default_end": self.fui_default_wo,
+                "fui_start_tier_2": self.module.fui_t2_start,
+                "fui_end_tier_2": self.module.fui_t2_wo,
+                "gwp_refrigerant_default": self.module.refrigerant_gwp,
+                "gwp_refrigerant_start_tier_2": self.module.refrigerant_gwp_t2_start,
+                "gwp_refrigerant_end_tier_2": self.module.refrigerant_gwp_t2_wo,
+                "quantity_lost_refrigerant_default": self.lost_refrigerant_default,
+                "quantity_lost_refrigerant_start_tier_2": self.module.refrigerant_lost_per_tonne_t2_start,
+                "quantity_lost_refrigerant_end_tier_2": self.module.refrigerant_lost_per_tonne_t2_wo,
+                "percentage_refrigerant_start": self.module.refrigerant_pc_start,
+                "percentage_refrigerant_end": self.module.refrigerant_pc_wo,
+                "tonnes_ice_default": self.tonnes_ice_default,
+                "tonnes_ice_start_tier_2": self.module.tonnes_of_ice_t2_start,
+                "tonnes_ice_end_tier_2": self.module.tonnes_of_ice_t2_wo,
+                "kwh_ice_per_tonne_default": self.kw_tonnes,
+                "kwh_ice_per_tonne_start_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_start,
+                "kwh_ice_per_tonne_end_tier_2": self.module.inshore_ice_production_kwh_per_tonne_t2_wo,
+                "operating_margin": self.electricity_emission.operating_margin,
+                "percentage_ice_start": self.module.ice_preserved_catch_pc_start,
+                "percentage_ice_end": self.module.ice_preserved_catch_pc_wo,
                 "delay": self.activity.delay,
             }
             log.debug("Inputs without: %s", self.inputs_wo)
 
-            math_wo = MathFishery(**self.inputs_wo)
-            math_wo.calculate_emissions()
+            self.math_wo = MathFishery(**self.inputs_wo)
+            self.math_wo.calculate_emissions()
 
-        results_w = math_w.result if math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        results_wo = math_wo.result if math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
 
-        log.debug("Results WITH")
-        results_w.breakdown(by=BreakdownTypes.ACTIVITY)
+        if PLOT_GRAPHS:
+            self.results_w.plot_emissions_and_aggregate_by_activity("large_fishery_w")
+            self.results_wo.plot_emissions_and_aggregate_by_activity("large_fishery_wo")
 
-        log.debug("Results WITHOUT")
-        results_wo.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        results_tuple = (results_w, results_wo)
+        results_tuple = (self.results_w, self.results_wo)
 
         log.debug("END LargeFisheryCalculator.calculate")
         return results_tuple
-
-    def defaults(self):
-        self.calculate()
-
-        module: LargeFishery = self.data
-
-        defaults_start = {}
-        defaults_w = {}
-        defaults_wo = {}
-
-        if module.is_with():
-            math_w = MathFishery(**self.inputs_w)
-            math_w_defaults = math_w.evaluate_tier_2_defaults()
-            defaults_w.update(math_w_defaults.end)
-            defaults_w.update(math_w_defaults.other)
-
-        if module.is_without():
-            math_wo = MathFishery(**self.inputs_wo)
-            math_wo_defaults = math_wo.evaluate_tier_2_defaults()
-            defaults_wo.update(math_wo_defaults.end)
-            defaults_wo.update(math_wo_defaults.other)
-
-        return DefaultData(defaults_start, defaults_w, defaults_wo)
 
 
 class AquacultureCalculator(BaseCalculator):
