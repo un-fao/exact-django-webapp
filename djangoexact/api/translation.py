@@ -219,3 +219,18 @@ class BuildingTypeTranslationOptions(NameOnlyTranslationOptions):
 @register(models.RoadType)
 class RoadTypeTranslationOptions(NameOnlyTranslationOptions):
     pass
+
+
+@register(models.Climate)
+class ClimateTranslationOptions(NameOnlyTranslationOptions):
+    pass
+
+
+@register(models.Moisture)
+class MoistureTranslationOptions(NameOnlyTranslationOptions):
+    pass
+
+
+@register(models.Region)
+class RegionTranslationOptions(NameOnlyTranslationOptions):
+    pass
