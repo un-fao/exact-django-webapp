@@ -2109,7 +2109,7 @@ class ForestManagementWriteSerializer(LandModuleSeralizer):
             },
             "with": {
                 "mandatory": [
-                    "land_use_type_w",
+                    "land_use_type_start",
                     "forest_type",
                 ],
                 "conditional": {
@@ -2124,7 +2124,7 @@ class ForestManagementWriteSerializer(LandModuleSeralizer):
             },
             "without": {
                 "mandatory": [
-                    "land_use_type_wo",
+                    "land_use_type_start",
                     "forest_type",
                 ],
                 "conditional": {
