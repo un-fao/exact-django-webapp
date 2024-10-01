@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: support@example.com\n"
-"POT-Creation-Date: 2024-09-24 15:47\n"
-"PO-Revision-Date: 2024-09-24 15:47\n"
+"POT-Creation-Date: 2024-10-01 12:02\n"
+"PO-Revision-Date: 2024-10-01 12:02\n"
 "Last-Translator: Your Name <your.email@example.com>\n"
 "Language-Team: English <support@example.com>\n"
 "Language: en\n"
@@ -44,10 +44,6 @@ msgstr ""
 msgid "Secondary"
 msgstr ""
 
-#. ForestConditionType
-msgid "Secondary"
-msgstr ""
-
 #. SiteLocationType
 msgid "On-Site"
 msgstr ""
@@ -70,34 +66,6 @@ msgstr ""
 
 #. StatusType
 msgid "IN PROGRESS"
-msgstr ""
-
-#. LandUseType
-msgid "Annual Cropland"
-msgstr ""
-
-#. LandUseType
-msgid "Annual Fallow"
-msgstr ""
-
-#. LandUseType
-msgid "Flooded Rice"
-msgstr ""
-
-#. LandUseType
-msgid "Grassland"
-msgstr ""
-
-#. LandUseType
-msgid "Other Land (Non-Vegetated)"
-msgstr ""
-
-#. LandUseType
-msgid "Alley Cropping"
-msgstr ""
-
-#. LandUseType
-msgid "Perennial Fallow"
 msgstr ""
 
 #. LandUseType
@@ -249,6 +217,58 @@ msgid "Peanuts"
 msgstr ""
 
 #. LandUseType
+msgid "Annual Cropland"
+msgstr ""
+
+#. LandUseType
+msgid "Annual Fallow"
+msgstr ""
+
+#. LandUseType
+msgid "Flooded Rice"
+msgstr ""
+
+#. LandUseType
+msgid "Grassland"
+msgstr ""
+
+#. LandUseType
+msgid "Other Land (Non-Vegetated)"
+msgstr ""
+
+#. LandUseType
+msgid "Alley Cropping"
+msgstr ""
+
+#. LandUseType
+msgid "Perennial Fallow"
+msgstr ""
+
+#. LandUseType
+msgid "Wheat"
+msgstr ""
+
+#. LandUseType
+msgid "Beans & Pulses"
+msgstr ""
+
+#. LandUseType
+msgid "Tubers"
+msgstr ""
+
+#. LandUseType
+msgid "Root Crops"
+msgstr ""
+
+#. LandUseType
+msgid "Shrubland"
+msgstr ""
+
+#. LandUseType
+msgid "Humid Forest"
+msgstr ""
+
+#. LandUseType
 msgid "﻿Long-Term Cultivated"
 msgstr ""
 
@@ -354,30 +374,6 @@ msgstr ""
 
 #. LandUseType
 msgid "Sugarcane"
-msgstr ""
-
-#. LandUseType
-msgid "Wheat"
-msgstr ""
-
-#. LandUseType
-msgid "Beans & Pulses"
-msgstr ""
-
-#. LandUseType
-msgid "Tubers"
-msgstr ""
-
-#. LandUseType
-msgid "Root Crops"
-msgstr ""
-
-#. LandUseType
-msgid "Shrubland"
-msgstr ""
-
-#. LandUseType
-msgid "Humid Forest"
 msgstr ""
 
 #. SettlementType
@@ -681,6 +677,34 @@ msgid "Other (pls. Go Tier 2)"
 msgstr ""
 
 #. ModuleType
+msgid "Forest Management"
+msgstr ""
+
+#. ModuleType
+msgid "Road"
+msgstr ""
+
+#. ModuleType
+msgid "Building"
+msgstr ""
+
+#. ModuleType
+msgid "Energy"
+msgstr ""
+
+#. ModuleType
+msgid "Irrigation"
+msgstr ""
+
+#. ModuleType
+msgid "Irrigation System"
+msgstr ""
+
+#. ModuleType
+msgid "Operation Phase of Irrigation"
+msgstr ""
+
+#. ModuleType
 msgid "Project"
 msgstr ""
 
@@ -722,34 +746,6 @@ msgstr ""
 
 #. ModuleType
 msgid "Aquaculture"
-msgstr ""
-
-#. ModuleType
-msgid "Forest Management"
-msgstr ""
-
-#. ModuleType
-msgid "Road"
-msgstr ""
-
-#. ModuleType
-msgid "Building"
-msgstr ""
-
-#. ModuleType
-msgid "Energy"
-msgstr ""
-
-#. ModuleType
-msgid "Irrigation"
-msgstr ""
-
-#. ModuleType
-msgid "Irrigation System"
-msgstr ""
-
-#. ModuleType
-msgid "Operation Phase of Irrigation"
 msgstr ""
 
 #. ModuleType
@@ -838,7 +834,7 @@ msgstr ""
 
 #. FisheryType
 msgid "Marine"
-msgstr ""
+msgstr "BABABA"
 
 #. FisheryType
 msgid "Inland"
@@ -846,26 +842,6 @@ msgstr ""
 
 #. FisheryType
 msgid "Unmotorized Fishing"
-msgstr ""
-
-#. LargeFisheryGearType
-msgid "Gillnets And Entangling Nets"
-msgstr ""
-
-#. LargeFisheryGearType
-msgid "Hooks And Lines"
-msgstr ""
-
-#. LargeFisheryGearType
-msgid "Midwater Trawls"
-msgstr ""
-
-#. LargeFisheryGearType
-msgid "Traps And Lift Nets"
-msgstr ""
-
-#. LargeFisheryGearType
-msgid "Surrounding Nets"
 msgstr ""
 
 #. LargeFisheryGearType
@@ -886,6 +862,26 @@ msgstr ""
 
 #. LargeFisheryGearType
 msgid "Bottom Trawls"
+msgstr ""
+
+#. LargeFisheryGearType
+msgid "Gillnets And Entangling Nets"
+msgstr ""
+
+#. LargeFisheryGearType
+msgid "Hooks And Lines"
+msgstr ""
+
+#. LargeFisheryGearType
+msgid "Midwater Trawls"
+msgstr ""
+
+#. LargeFisheryGearType
+msgid "Traps And Lift Nets"
+msgstr ""
+
+#. LargeFisheryGearType
+msgid "Surrounding Nets"
 msgstr ""
 
 #. SmallFisheryGearType
@@ -993,11 +989,11 @@ msgid "Sea-spiders And Crabs"
 msgstr ""
 
 #. MacroFuelType
-msgid "Liquid or gaseous (m3)"
+msgid "Solid (tdm)"
 msgstr ""
 
 #. MacroFuelType
-msgid "Solid (tdm)"
+msgid "Liquid or gaseous (m3)"
 msgstr ""
 
 #. FuelUseType
@@ -1177,10 +1173,6 @@ msgid "Insecticides"
 msgstr ""
 
 #. InputType
-msgid "User Defined Animal Feed (tier 2)"
-msgstr ""
-
-#. InputType
 msgid "N-Fertilizers In Continuously Irrigated Rice"
 msgstr ""
 
@@ -1190,6 +1182,10 @@ msgstr ""
 
 #. InputType
 msgid "Phosphorous"
+msgstr ""
+
+#. InputType
+msgid "User Defined Animal Feed (tier 2)"
 msgstr ""
 
 #. IrrigationSystemType
@@ -1306,4 +1302,132 @@ msgstr ""
 
 #. RoadType
 msgid "Road Rehabilitated (Pavement)"
+msgstr ""
+
+#. Climate
+msgid "Cool Temperate"
+msgstr ""
+
+#. Climate
+msgid "Warm Temperate"
+msgstr ""
+
+#. Climate
+msgid "Tropical"
+msgstr ""
+
+#. Climate
+msgid "Boreal"
+msgstr ""
+
+#. Climate
+msgid "Tropical Montane"
+msgstr ""
+
+#. Moisture
+msgid "Dry"
+msgstr ""
+
+#. Moisture
+msgid "Moist"
+msgstr ""
+
+#. Moisture
+msgid "Wet"
+msgstr ""
+
+#. Moisture
+msgid "Temperate"
+msgstr ""
+
+#. Region
+msgid "Eastern Africa"
+msgstr ""
+
+#. Region
+msgid "Central Africa"
+msgstr ""
+
+#. Region
+msgid "Northern Africa"
+msgstr ""
+
+#. Region
+msgid "Southern Africa"
+msgstr ""
+
+#. Region
+msgid "Western Africa"
+msgstr ""
+
+#. Region
+msgid "Central Asia"
+msgstr ""
+
+#. Region
+msgid "Eastern Asia"
+msgstr ""
+
+#. Region
+msgid "South-Eastern Asia"
+msgstr ""
+
+#. Region
+msgid "Southern Asia"
+msgstr ""
+
+#. Region
+msgid "Western Asia"
+msgstr ""
+
+#. Region
+msgid "Europe"
+msgstr ""
+
+#. Region
+msgid "Oceania"
+msgstr ""
+
+#. Region
+msgid "North America"
+msgstr ""
+
+#. Region
+msgid "South America"
+msgstr ""
+
+#. Region
+msgid "Central America"
+msgstr ""
+
+#. Region
+msgid "Caribbean"
+msgstr ""
+
+#. Region
+msgid "Western Europe"
+msgstr ""
+
+#. Region
+msgid "Eastern Europe"
+msgstr ""
+
+#. GlobalWarmingPotential
+msgid "IPCC Fifth Assessment Report (AR5) with Climate Change Feedback"
+msgstr ""
+
+#. GlobalWarmingPotential
+msgid "IPCC Fifth Assessment Report (AR5) without Climate Change Feedback"
+msgstr ""
+
+#. GlobalWarmingPotential
+msgid "IPCC Sixth Assessment Report (AR6)"
+msgstr ""
+
+#. GlobalWarmingPotential
+msgid "IPCC Fourth Assessment Report (AR4)"
+msgstr ""
+
+#. GlobalWarmingPotential
+msgid "IPCC Second Assessment Report (SAR)"
 msgstr ""
