@@ -1,13 +1,13 @@
-#, fuzzy
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: support@example.com\n"
-"POT-Creation-Date: 2024-09-24 15:47\n"
-"PO-Revision-Date: 2024-09-24 15:47\n"
+"POT-Creation-Date: 2024-10-01 12:02\n"
+"PO-Revision-Date: 2024-10-01 12:02\n"
 "Last-Translator: Your Name <your.email@example.com>\n"
 "Language-Team: English <support@example.com>\n"
-"Language: es\n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -67,34 +67,6 @@ msgstr "SUBMÓDULOS_VACÍOS"
 #. StatusType
 msgid "IN PROGRESS"
 msgstr "EN CURSO"
-
-#. LandUseType
-msgid "Annual Cropland"
-msgstr "Cultivos Anuales"
-
-#. LandUseType
-msgid "Annual Fallow"
-msgstr "Barbecho Anual"
-
-#. LandUseType
-msgid "Flooded Rice"
-msgstr "Arroz Inundado"
-
-#. LandUseType
-msgid "Grassland"
-msgstr "Pastizales"
-
-#. LandUseType
-msgid "Other Land (Non-Vegetated)"
-msgstr "Otras Tierras (Sin Vegetación)"
-
-#. LandUseType
-msgid "Alley Cropping"
-msgstr "Cultivos en Fajas"
-
-#. LandUseType
-msgid "Perennial Fallow"
-msgstr "Barbecho Mejorado"
 
 #. LandUseType
 msgid "Hedgerow"
@@ -245,6 +217,58 @@ msgid "Peanuts"
 msgstr "Maní/cacahuete"
 
 #. LandUseType
+msgid "Annual Cropland"
+msgstr "Cultivos Anuales"
+
+#. LandUseType
+msgid "Annual Fallow"
+msgstr "Barbecho Anual"
+
+#. LandUseType
+msgid "Flooded Rice"
+msgstr "Arroz Inundado"
+
+#. LandUseType
+msgid "Grassland"
+msgstr "Pastizales"
+
+#. LandUseType
+msgid "Other Land (Non-Vegetated)"
+msgstr "Otras Tierras (Sin Vegetación)"
+
+#. LandUseType
+msgid "Alley Cropping"
+msgstr "Cultivos en Fajas"
+
+#. LandUseType
+msgid "Perennial Fallow"
+msgstr "Barbecho Mejorado"
+
+#. LandUseType
+msgid "Wheat"
+msgstr "Trigo"
+
+#. LandUseType
+msgid "Beans & Pulses"
+msgstr "Frijoles y legumbres"
+
+#. LandUseType
+msgid "Tubers"
+msgstr "Tubérculos"
+
+#. LandUseType
+msgid "Root Crops"
+msgstr "Cultivos de Raíz alimenticia"
+
+#. LandUseType
+msgid "Shrubland"
+msgstr "Arbustos"
+
+#. LandUseType
+msgid "Humid Forest"
+msgstr "Bosque húmedo"
+
+#. LandUseType
 msgid "﻿Long-Term Cultivated"
 msgstr "Cultivado a largo plazo"
 
@@ -351,30 +375,6 @@ msgstr "Maíz"
 #. LandUseType
 msgid "Sugarcane"
 msgstr "Caña de azúcar"
-
-#. LandUseType
-msgid "Wheat"
-msgstr "Trigo"
-
-#. LandUseType
-msgid "Beans & Pulses"
-msgstr "Frijoles y legumbres"
-
-#. LandUseType
-msgid "Tubers"
-msgstr "Tubérculos"
-
-#. LandUseType
-msgid "Root Crops"
-msgstr "Cultivos de Raíz alimenticia"
-
-#. LandUseType
-msgid "Shrubland"
-msgstr "Arbustos"
-
-#. LandUseType
-msgid "Humid Forest"
-msgstr "Bosque húmedo"
 
 #. SettlementType
 msgid "Infrastructure on existing land (no paving)"
@@ -677,6 +677,34 @@ msgid "Other (pls. Go Tier 2)"
 msgstr "Otros (Por favor, inserte Nivel 2)"
 
 #. ModuleType
+msgid "Forest Management"
+msgstr "Gestión forestal"
+
+#. ModuleType
+msgid "Road"
+msgstr "Carretera"
+
+#. ModuleType
+msgid "Building"
+msgstr "Construcción"
+
+#. ModuleType
+msgid "Energy"
+msgstr "Energía"
+
+#. ModuleType
+msgid "Irrigation"
+msgstr "Riego"
+
+#. ModuleType
+msgid "Irrigation System"
+msgstr "Sistema de Riego"
+
+#. ModuleType
+msgid "Operation Phase of Irrigation"
+msgstr "Fase de Operación del Riego"
+
+#. ModuleType
 msgid "Project"
 msgstr "Proyecto"
 
@@ -719,34 +747,6 @@ msgstr "Pesca Industrial"
 #. ModuleType
 msgid "Aquaculture"
 msgstr "Acuicultura"
-
-#. ModuleType
-msgid "Forest Management"
-msgstr "Gestión forestal"
-
-#. ModuleType
-msgid "Road"
-msgstr "Carretera"
-
-#. ModuleType
-msgid "Building"
-msgstr "Construcción"
-
-#. ModuleType
-msgid "Energy"
-msgstr "Energía"
-
-#. ModuleType
-msgid "Irrigation"
-msgstr "Riego"
-
-#. ModuleType
-msgid "Irrigation System"
-msgstr "Sistema de Riego"
-
-#. ModuleType
-msgid "Operation Phase of Irrigation"
-msgstr "Fase de Operación del Riego"
 
 #. ModuleType
 msgid "Coastal Wetland"
@@ -810,7 +810,7 @@ msgstr "Estanque de agua salobre"
 
 #. WaterbodyType
 msgid "Canals & Ditches"
-msgstr "Canales y Acequias
+msgstr "Canales y Acequia"
 
 #. WaterbodyType
 msgid "Saline Pond"
@@ -845,26 +845,6 @@ msgid "Unmotorized Fishing"
 msgstr "Pesca sin motor"
 
 #. LargeFisheryGearType
-msgid "Gillnets And Entangling Nets"
-msgstr "Redes de Enmalle y Redes de Enredo"
-
-#. LargeFisheryGearType
-msgid "Hooks And Lines"
-msgstr "Sedales y Anzuelos"
-
-#. LargeFisheryGearType
-msgid "Midwater Trawls"
-msgstr "Redes de Arrastre Pelágico"
-
-#. LargeFisheryGearType
-msgid "Traps And Lift Nets"
-msgstr "Trampas y Redes Izadas"
-
-#. LargeFisheryGearType
-msgid "Surrounding Nets"
-msgstr "Redes de Cerco"
-
-#. LargeFisheryGearType
 msgid "Dredges"
 msgstr "Rastras"
 
@@ -883,6 +863,26 @@ msgstr "Sin especificar"
 #. LargeFisheryGearType
 msgid "Bottom Trawls"
 msgstr "Redes de Arrastre de Fondo"
+
+#. LargeFisheryGearType
+msgid "Gillnets And Entangling Nets"
+msgstr "Redes de Enmalle y Redes de Enredo"
+
+#. LargeFisheryGearType
+msgid "Hooks And Lines"
+msgstr "Sedales y Anzuelos"
+
+#. LargeFisheryGearType
+msgid "Midwater Trawls"
+msgstr "Redes de Arrastre Pelágico"
+
+#. LargeFisheryGearType
+msgid "Traps And Lift Nets"
+msgstr "Trampas y Redes Izadas"
+
+#. LargeFisheryGearType
+msgid "Surrounding Nets"
+msgstr "Redes de Cerco"
 
 #. SmallFisheryGearType
 msgid "Trawls"
@@ -906,7 +906,7 @@ msgstr "Almejas, Berberechos y Árcidos"
 
 #. FishType
 msgid "Cods, Hakes And Haddocks"
-msgstr "Bacalaos, Merluzas Y Eglefinos
+msgstr "Bacalaos, Merluzas Y Eglefino"
 
 #. FishType
 msgid "Flounders, Halibuts And Soles"
@@ -989,12 +989,12 @@ msgid "Sea-spiders And Crabs"
 msgstr "Arañas marinas y cangrejos"
 
 #. MacroFuelType
-msgid "Liquid or gaseous (m3)"
-msgstr "Líquido o gaseoso (m3)"
-
-#. MacroFuelType
 msgid "Solid (tdm)"
 msgstr "Sólido (tdm)"
+
+#. MacroFuelType
+msgid "Liquid or gaseous (m3)"
+msgstr "Líquido o gaseoso (m3)"
 
 #. FuelUseType
 msgid "Stationary"
@@ -1173,10 +1173,6 @@ msgid "Insecticides"
 msgstr "Insecticidas"
 
 #. InputType
-msgid "User Defined Animal Feed (tier 2)"
-msgstr "Pienso Definido por el usuario (tier 2)"
-
-#. InputType
 msgid "N-Fertilizers In Continuously Irrigated Rice"
 msgstr "Fertilizantes de N en arroz permentemente Inundado"
 
@@ -1187,6 +1183,10 @@ msgstr "Fertilizantes de N en arroz Inundado Intermitente"
 #. InputType
 msgid "Phosphorous"
 msgstr "Fosforo"
+
+#. InputType
+msgid "User Defined Animal Feed (tier 2)"
+msgstr "Pienso Definido por el usuario (tier 2)"
 
 #. IrrigationSystemType
 msgid "Surface Without IRRS"
@@ -1303,3 +1303,131 @@ msgstr "Carretera (Hormigón Armado)"
 #. RoadType
 msgid "Road Rehabilitated (Pavement)"
 msgstr "Carretera Rehabilitada (Pavimentada)"
+
+#. Climate
+msgid "Cool Temperate"
+msgstr ""
+
+#. Climate
+msgid "Warm Temperate"
+msgstr ""
+
+#. Climate
+msgid "Tropical"
+msgstr ""
+
+#. Climate
+msgid "Boreal"
+msgstr ""
+
+#. Climate
+msgid "Tropical Montane"
+msgstr ""
+
+#. Moisture
+msgid "Dry"
+msgstr ""
+
+#. Moisture
+msgid "Moist"
+msgstr ""
+
+#. Moisture
+msgid "Wet"
+msgstr ""
+
+#. Moisture
+msgid "Temperate"
+msgstr ""
+
+#. Region
+msgid "Eastern Africa"
+msgstr ""
+
+#. Region
+msgid "Central Africa"
+msgstr ""
+
+#. Region
+msgid "Northern Africa"
+msgstr ""
+
+#. Region
+msgid "Southern Africa"
+msgstr ""
+
+#. Region
+msgid "Western Africa"
+msgstr ""
+
+#. Region
+msgid "Central Asia"
+msgstr ""
+
+#. Region
+msgid "Eastern Asia"
+msgstr ""
+
+#. Region
+msgid "South-Eastern Asia"
+msgstr ""
+
+#. Region
+msgid "Southern Asia"
+msgstr ""
+
+#. Region
+msgid "Western Asia"
+msgstr ""
+
+#. Region
+msgid "Europe"
+msgstr ""
+
+#. Region
+msgid "Oceania"
+msgstr ""
+
+#. Region
+msgid "North America"
+msgstr ""
+
+#. Region
+msgid "South America"
+msgstr ""
+
+#. Region
+msgid "Central America"
+msgstr ""
+
+#. Region
+msgid "Caribbean"
+msgstr ""
+
+#. Region
+msgid "Western Europe"
+msgstr ""
+
+#. Region
+msgid "Eastern Europe"
+msgstr ""
+
+#. GlobalWarmingPotential
+msgid "IPCC Fifth Assessment Report (AR5) with Climate Change Feedback"
+msgstr ""
+
+#. GlobalWarmingPotential
+msgid "IPCC Fifth Assessment Report (AR5) without Climate Change Feedback"
+msgstr ""
+
+#. GlobalWarmingPotential
+msgid "IPCC Sixth Assessment Report (AR6)"
+msgstr ""
+
+#. GlobalWarmingPotential
+msgid "IPCC Fourth Assessment Report (AR4)"
+msgstr ""
+
+#. GlobalWarmingPotential
+msgid "IPCC Second Assessment Report (SAR)"
+msgstr ""
