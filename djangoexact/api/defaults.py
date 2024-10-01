@@ -121,6 +121,9 @@ class AnnualCroplandDefaults(Defaults):
             minor_biomass_t2_start_default=0,
             minor_biomass_t2_w_default=0,
             minor_biomass_t2_wo_default=0,
+            yield_t2_start_default=0,
+            yield_t2_w_default=0,
+            yield_t2_wo_default=0,
         )
 
     def get_defaults(self, calculate=False) -> dict:
@@ -155,6 +158,9 @@ class AnnualCroplandDefaults(Defaults):
             minor_biomass_t2_start_default=defaults.minor_biomass_start.value,
             minor_biomass_t2_w_default=defaults.minor_biomass_w.value,
             minor_biomass_t2_wo_default=defaults.minor_biomass_wo.value,
+            yield_t2_start_default=defaults.crop_yield_start.value,
+            yield_t2_w_default=defaults.crop_yield_w.value,
+            yield_t2_wo_default=defaults.crop_yield_wo.value,
         )
 
 
@@ -275,6 +281,9 @@ class FloodedRiceDefaults(Defaults):
             crop_yield_t2_start_default=0,
             crop_yield_t2_w_default=0,
             crop_yield_t2_wo_default=0,
+            cultivation_period_t2_start_default=0,
+            cultivation_period_t2_w_default=0,
+            cultivation_period_t2_wo_default=0,
         )
 
     def get_defaults(self, calculate=False) -> dict:
@@ -318,6 +327,9 @@ class FloodedRiceDefaults(Defaults):
             crop_yield_t2_start_default=defaults.yield_ref.value,
             crop_yield_t2_w_default=defaults.yield_ref.value,
             crop_yield_t2_wo_default=defaults.yield_ref.value,
+            cultivation_period_t2_start_default=defaults.efc.cultivation_period,
+            cultivation_period_t2_w_default=defaults.efc.cultivation_period,
+            cultivation_period_t2_wo_default=defaults.efc.cultivation_period,
         )
 
 
