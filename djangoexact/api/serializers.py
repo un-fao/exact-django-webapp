@@ -681,7 +681,12 @@ class ActivityBuilderSerializer(serializers.Serializer):
                     continue
 
                 ModuleClass = apps.get_model("api", module.class_name)
-                module_instance = ModuleClass.objects.create(activity=self.instance, area=self.validated_data.get("area"))
+
+                module_data = {"activity": self.instance}
+                if module in luc_module_types:
+                    module_data["area"] = self.validated_data.get("area")
+
+                module_instance = ModuleClass.objects.create(**module_data)
                 if luc and module in list(luc.get_module_types()):
                     module_instance.land_use_change = luc
                     module_instance.save()
