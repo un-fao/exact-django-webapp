@@ -2,6 +2,7 @@ import polib
 from djangoexact.settings import LANGUAGES
 import datetime
 from api.models import *
+from ipcc.models import *
 
 for language in LANGUAGES:
     po = polib.POFile(f"locale/{language[0]}/LC_MESSAGES/types.po")
@@ -61,6 +62,10 @@ for language in LANGUAGES:
         EnergySourceType,
         BuildingType,
         RoadType,
+        Climate,
+        Moisture,
+        Region,
+        GlobalWarmingPotential,
     ]
 
     for _type in types:
