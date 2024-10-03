@@ -170,14 +170,12 @@ class ForestManagementBGBAdmin(ModelAdmin):
         "region",
         "forest_type",
         "climate",
-        "threshold",
     ]
 
     search_fields = [
         "land_use_type__name",
         "region__name",
         "forest_type__name",
-        "forest_condition_type__name",
         "climate__name",
         "threshold",
     ]
