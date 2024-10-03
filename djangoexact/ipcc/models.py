@@ -178,7 +178,7 @@ class ForestManagementBGBManager(Manager):
                 region=region,
                 land_use_type=land_use_type,
             )
-            .filter(threshold__lt=threshold)
+            .filter(Q(threshold__lt=threshold) | Q(threshold__isnull=True))
             .order_by("-threshold")
             .first()
         )
