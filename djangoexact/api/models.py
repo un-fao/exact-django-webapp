@@ -729,6 +729,7 @@ class Activity(Historical, NoteMixin):
     soil_type_t2 = models.ForeignKey(SoilType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("soil_type_t2"))
     duration_t2 = models.IntegerField(null=True, blank=True, verbose_name=_("duration_t2"))
     start_year_t2 = models.IntegerField(null=True, blank=True, verbose_name=_("start_year_t2"))
+    soc_t2 = models.FloatField(null=True, blank=True, verbose_name=_("soc_t2"))
 
     created_at = models.DateTimeField(auto_now_add=True, null=True, verbose_name=_("created_at"))
     updated_at = models.DateTimeField(auto_now=True, null=True, verbose_name=_("updated_at"))
@@ -1776,7 +1777,6 @@ class SmallFishery(Fishery):
     gear_type_wo = models.ForeignKey(SmallFisheryGearType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_gear_type_wo", verbose_name=_("gear_type_wo"))
     gear_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_gear_type_thread", on_delete=models.SET_NULL)
     fishery_type = models.ForeignKey(FisheryType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fishery_type"))
-    fui_default = models.ForeignKey("ipcc.SmallFisheryFUI", on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fui_default"))
 
 
 class LargeFishery(Fishery):
@@ -1785,7 +1785,6 @@ class LargeFishery(Fishery):
     gear_type_wo = models.ForeignKey(LargeFisheryGearType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_gear_type_wo", verbose_name=_("gear_type_wo"))
     gear_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_gear_type_thread", on_delete=models.SET_NULL)
     fish_type = models.ForeignKey(FishType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fish_type"))
-    fui_default = models.ForeignKey("ipcc.LargeFisheryFUI", on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fui_default"))
 
 
 class Aquaculture(Module):
