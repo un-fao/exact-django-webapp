@@ -102,7 +102,7 @@ class PerennialCropland(LandModule):
                 if self.calculate_soc_som:
                     yearly_soil_emissions, total_soil_emissions = soil_emissions_2(self.soc_start, self.soc_end, self.hectares_total, self.hectares_start, self.hectares_end, self.hectares_before_20)
 
-                    soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in yearly_soil_emissions], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
+                    soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_soil_emissions], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
             except Exception as e:
                 traceback.print_exc()
