@@ -499,8 +499,8 @@ class BaseCalculator(ABC):
         Calculate emissions for a single module.
         """
 
-        if input.__class__ == LandUseChange or input.luc:
-            luc: LandUseChange = input if input.__class__ == LandUseChange else input.luc
+        if input.__class__ == LandUseChange:
+            luc: LandUseChange = input
             modules = luc.get_modules()
 
             if not all(modules):
