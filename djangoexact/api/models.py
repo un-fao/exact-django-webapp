@@ -776,7 +776,7 @@ class Activity(Historical, NoteMixin):
         if self.start_year_t2 is None:
             return 0
 
-        return self.project.start_year_of_activities - self.start_year_t2
+        return self.start_year_t2 - self.project.start_year_of_activities
 
     def __get_duration(self) -> int:
         if self.duration_t2 is None or self.duration_t2 == 0:
