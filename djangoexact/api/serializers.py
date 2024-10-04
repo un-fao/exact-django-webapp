@@ -590,6 +590,11 @@ class ActivityBuilderSerializer(serializers.Serializer):
     def delete_existing_luc(self):
         luc: LandUseChange = self.instance.landusechange.first()
         self.instance.module_types.remove(luc.module_type_start.id, luc.module_type_w.id, luc.module_type_wo.id, luc.module_type.id)
+        module_start, module_w, module_wo = luc.get_modules()
+        for module in [module_start, module_w, module_wo]:
+            module: LandModule
+            module.land_use_change = None
+            module.save()
         luc.delete()
         self.instance.save()
 
