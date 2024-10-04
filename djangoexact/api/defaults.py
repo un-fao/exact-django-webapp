@@ -410,7 +410,15 @@ class FuelDefaults(Defaults):
         super().__init__(input)
 
         self.values = SimpleNamespace(
-            ef_t2_default=0,
+            ef_co2_t2_start_default=0,
+            ef_co2_t2_w_default=0,
+            ef_co2_t2_wo_default=0,
+            ef_n2o_t2_start_default=0,
+            ef_n2o_t2_w_default=0,
+            ef_n2o_t2_wo_default=0,
+            ef_ch4_t2_start_default=0,
+            ef_ch4_t2_w_default=0,
+            ef_ch4_t2_wo_default=0,
         )
 
     def get_defaults(self, calculate=False) -> dict:
@@ -419,7 +427,17 @@ class FuelDefaults(Defaults):
         defaults = calcs.FuelCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
-        return self.values
+        return SimpleNamespace(
+            ef_co2_t2_start_default=defaults.ef_co2,
+            ef_co2_t2_w_default=defaults.ef_co2,
+            ef_co2_t2_wo_default=defaults.ef_co2,
+            ef_n2o_t2_start_default=defaults.ef_n2o,
+            ef_n2o_t2_w_default=defaults.ef_n2o,
+            ef_n2o_t2_wo_default=defaults.ef_n2o,
+            ef_ch4_t2_start_default=defaults.ef_ch4,
+            ef_ch4_t2_w_default=defaults.ef_ch4,
+            ef_ch4_t2_wo_default=defaults.ef_ch4,
+        )
 
 
 class InputEntryDefaults(Defaults):
