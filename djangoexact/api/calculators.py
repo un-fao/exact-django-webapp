@@ -131,7 +131,7 @@ CALCULATE_SOC_SOM_START_WO = False
 CALCULATE_SOC_SOM_W = True
 CALCULATE_SOC_SOM_WO = True
 
-PLOT_GRAPHS = True
+PLOT_GRAPHS = False
 
 
 def is_luc_remaining_same(module: LandModule) -> bool:
@@ -971,12 +971,12 @@ class OtherLandUseCalculator(BaseCalculator):
             raise Exception(f"LandUseType for {luc.module_type_start.name} does not exist")
 
         try:
-            luc_w = module_start.land_use_type_w if module_start.land_use_type_w else LandUseType.objects.get(name=luc.module_type_w.name)
+            luc_w = module_w.land_use_type_w if module_w.land_use_type_w else LandUseType.objects.get(name=luc.module_type_w.name)
         except LandUseType.DoesNotExist:
             raise Exception(f"LandUseType for {luc.module_type_w.name} does not exist")
 
         try:
-            luc_wo = module_start.land_use_type_wo if module_start.land_use_type_wo else LandUseType.objects.get(name=luc.module_type_wo.name)
+            luc_wo = module_wo.land_use_type_wo if module_wo.land_use_type_wo else LandUseType.objects.get(name=luc.module_type_wo.name)
         except LandUseType.DoesNotExist:
             raise Exception(f"LandUseType for {luc.module_type_wo.name} does not exist")
 
