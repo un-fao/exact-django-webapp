@@ -629,7 +629,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
     def save(self, **kwargs):
         self.validate_total_project_cost()
 
-        create_organic_soil = "OrganicSoil" in [module.class_name for module in self.validated_data["module_types"]]
+        create_organic_soil = "OrganicSoil" in [module.class_name for module in self.validated_data.get("module_types", [])]
         has_luc_module = self.validated_data.get("land_use_change", False)
 
         if self.instance:
