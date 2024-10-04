@@ -1071,11 +1071,11 @@ class AboveBelowGroundBiomassModule(BiomassModule):
     class Meta:
         abstract = True
 
-    def get_biomass_t2(self, scenario: utils.ScenarioTypes):
-        try:
-            return getattr(self, f"agb_t2_{scenario.value}") + getattr(self, f"bgb_t2_{scenario.value}")
-        except TypeError:
-            return None
+    # def get_biomass_t2(self, scenario: utils.ScenarioTypes):
+    #     try:
+    #         return getattr(self, f"agb_t2_{scenario.value}", 0) + getattr(self, f"bgb_t2_{scenario.value}", 0)
+    #     except TypeError:
+    #         return None
 
 
 class LitterDeadwoodBiomassModule(AboveBelowGroundBiomassModule):
@@ -1408,9 +1408,9 @@ class Grassland(LandModuleFixed, SingleBiomassModule):
     fire_periodicity_wo = models.FloatField(null=True, blank=True, default=0, verbose_name=_("fire_periodicity_wo"))
     fire_periodicity_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_fire_periodicity_thread")
 
-    fire_impact_start = models.FloatField(null=True, blank=True, verbose_name=_("fire_impact_start"))
-    fire_impact_w = models.FloatField(null=True, blank=True, verbose_name=_("fire_impact_w"))
-    fire_impact_wo = models.FloatField(null=True, blank=True, verbose_name=_("fire_impact_wo"))
+    fire_impact_start = models.FloatField(null=True, blank=True, default=0, verbose_name=_("fire_impact_start"))
+    fire_impact_w = models.FloatField(null=True, blank=True, default=0, verbose_name=_("fire_impact_w"))
+    fire_impact_wo = models.FloatField(null=True, blank=True, default=0, verbose_name=_("fire_impact_wo"))
     fire_impact_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_fire_impact_thread")
 
     yield_start = models.FloatField(null=True, blank=True, verbose_name=_("yield_start"))
