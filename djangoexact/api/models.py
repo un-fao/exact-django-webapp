@@ -1071,11 +1071,11 @@ class AboveBelowGroundBiomassModule(BiomassModule):
     class Meta:
         abstract = True
 
-    def get_biomass_t2(self, scenario: utils.ScenarioTypes):
-        try:
-            return getattr(self, f"agb_t2_{scenario.value}") + getattr(self, f"bgb_t2_{scenario.value}")
-        except TypeError:
-            return None
+    # def get_biomass_t2(self, scenario: utils.ScenarioTypes):
+    #     try:
+    #         return getattr(self, f"agb_t2_{scenario.value}", 0) + getattr(self, f"bgb_t2_{scenario.value}", 0)
+    #     except TypeError:
+    #         return None
 
 
 class LitterDeadwoodBiomassModule(AboveBelowGroundBiomassModule):
