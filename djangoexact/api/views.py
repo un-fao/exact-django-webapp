@@ -1283,7 +1283,7 @@ def generic_module_viewset(model: Module):
                 logging.error("Selected user does not have permission to update this module in the project")
                 return utils.ErrorResponse("Selected user does not have permission to update this module in the project", status=http_status.HTTP_403_FORBIDDEN)
 
-            serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data=request.data, instance=module)
+            serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data=request.data, partial=True, instance=module)
 
             if not serializer.is_valid():
                 return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
