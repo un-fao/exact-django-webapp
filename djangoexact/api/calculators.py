@@ -131,7 +131,7 @@ CALCULATE_SOC_SOM_START_WO = False
 CALCULATE_SOC_SOM_W = True
 CALCULATE_SOC_SOM_WO = True
 
-PLOT_GRAPHS = False
+PLOT_GRAPHS = True
 
 
 def is_luc_remaining_same(module: LandModule) -> bool:
@@ -1324,15 +1324,14 @@ class AnnualCropCalculator(LandModuleCalculator):
         """
         log.debug("START AnnualCropCalculator.calculate")
 
-        input: AnnualCropland = self.data
-        project: Project = input.activity.project
-        luc: LandUseChange = input.land_use_change
+        self.module: AnnualCropland
+        project: Project = self.module.activity.project
 
-        change_rate = input.activity.change_rate
+        change_rate = self.module.activity.change_rate
 
         self.get_defaults()
 
-        if input.is_start():
+        if self.module.is_start():
             log.debug("Start")
 
             self.inputs_start_w = {
@@ -1361,22 +1360,22 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "ef_nitrous_som": self.som.value,
                 "nitrous_constant": project.gwp.n2o,
                 "methane_constant": project.gwp.ch4,
-                "ef_methane_agr_residues_main": self.burning_emission_factor.ch4 if input.residue_management_type_start.name == "Burned" else None,
+                "ef_methane_agr_residues_main": self.burning_emission_factor.ch4 if self.module.residue_management_type_start.name == "Burned" else None,
                 "combustion_factor_main": self.fires_start.value,
-                "residue_main_tier_2": self.module_start.biomass_t2_start,
+                "residue_main_tier_2": self.module.residue_availability_t2_start,
                 "n_estimation_slope_main": self.n_estimation_factor_start.slope,
                 "n_estimation_intercept_main": self.n_estimation_factor_start.intercept,
                 "yield_value_main": self.crop_yield_start,
                 "ef_methane_agr_residues_minor": getattr(self.minor_burning_emission_factor, "ch4", None),
                 "combustion_factor_minor": getattr(self.minor_fires_start, "value", None),
-                "residue_minor_tier_2": input.minor_biomass_factor_t2_start,
+                "residue_minor_tier_2": self.module.minor_biomass_factor_t2_start,
                 "n_estimation_slope_minor": getattr(self.minor_n_estimation_factor_start, "slope", None),
                 "n_estimation_intercept_minor": getattr(self.minor_n_estimation_factor_start, "intercept", None),
-                "yield_value_minor": input.minor_yield_start,
-                "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if input.residue_management_type_start.name == "Burned" else None,
-                "retained_main": input.residue_management_type_start.name == "Retained",
+                "yield_value_minor": self.module.minor_yield_start,
+                "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_start.name == "Burned" else None,
+                "retained_main": self.module.residue_management_type_start.name == "Retained",
                 "ef_nitrous_agr_residues_minor": getattr(self.minor_burning_emission_factor, "n2o", None),
-                "retained_minor": getattr(input.minor_residue_management_type_start, "name", None) == "Retained",
+                "retained_minor": getattr(self.module.minor_residue_management_type_start, "name", None) == "Retained",
                 "n_content_ag_main": self.n_estimation_factor_start.n_ag_residues,
                 "ratio_bg_ag_main": self.n_estimation_factor_start.rs_t,
                 "n_content_bg_main": self.n_estimation_factor_start.n_bg_t,
@@ -1421,22 +1420,22 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "ef_nitrous_som": self.som.value,
                 "nitrous_constant": project.gwp.n2o,
                 "methane_constant": project.gwp.ch4,
-                "ef_methane_agr_residues_main": self.burning_emission_factor.ch4 if input.residue_management_type_start.name == "Burned" else None,
+                "ef_methane_agr_residues_main": self.burning_emission_factor.ch4 if self.module.residue_management_type_start.name == "Burned" else None,
                 "combustion_factor_main": self.fires_start.value,
-                "residue_main_tier_2": self.module_start.biomass_t2_start,
+                "residue_main_tier_2": self.module.residue_availability_t2_start,
                 "n_estimation_slope_main": self.n_estimation_factor_start.slope,
                 "n_estimation_intercept_main": self.n_estimation_factor_start.intercept,
                 "yield_value_main": self.crop_yield_start,
                 "ef_methane_agr_residues_minor": getattr(self.minor_burning_emission_factor, "ch4", None),
                 "combustion_factor_minor": getattr(self.minor_fires_start, "value", None),
-                "residue_minor_tier_2": input.minor_biomass_factor_t2_start,
+                "residue_minor_tier_2": self.module.minor_biomass_factor_t2_start,
                 "n_estimation_slope_minor": getattr(self.minor_n_estimation_factor_start, "slope", None),
                 "n_estimation_intercept_minor": getattr(self.minor_n_estimation_factor_start, "intercept", None),
-                "yield_value_minor": input.minor_yield_start,
-                "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if input.residue_management_type_start.name == "Burned" else None,
-                "retained_main": input.residue_management_type_start.name == "Retained",
+                "yield_value_minor": self.module.minor_yield_start,
+                "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_start.name == "Burned" else None,
+                "retained_main": self.module.residue_management_type_start.name == "Retained",
                 "ef_nitrous_agr_residues_minor": getattr(self.minor_burning_emission_factor, "n2o", None),
-                "retained_minor": getattr(input.minor_residue_management_type_start, "name", None) == "Retained",
+                "retained_minor": getattr(self.module.minor_residue_management_type_start, "name", None) == "Retained",
                 "n_content_ag_main": self.n_estimation_factor_start.n_ag_residues,
                 "ratio_bg_ag_main": self.n_estimation_factor_start.rs_t,
                 "n_content_bg_main": self.n_estimation_factor_start.n_bg_t,
@@ -1455,7 +1454,7 @@ class AnnualCropCalculator(LandModuleCalculator):
             self.math_start_wo = MathAnnualCropland(**self.inputs_start_wo)
             self.math_start_wo.calculate_emissions()
 
-        if input.is_with():
+        if self.module.is_with():
             log.debug("Is with")
 
             self.inputs_w = {
@@ -1484,22 +1483,22 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "ef_nitrous_som": self.som.value,
                 "nitrous_constant": project.gwp.n2o,
                 "methane_constant": project.gwp.ch4,
-                "ef_methane_agr_residues_main": self.burning_emission_factor.ch4 if input.residue_management_type_w.name == "Burned" else None,
+                "ef_methane_agr_residues_main": self.burning_emission_factor.ch4 if self.module.residue_management_type_w.name == "Burned" else None,
                 "combustion_factor_main": self.fires_w.value,
-                "residue_main_tier_2": input.biomass_t2_w,
+                "residue_main_tier_2": self.module.residue_availability_t2_w,
                 "n_estimation_slope_main": self.n_estimation_factor_w.slope,
                 "n_estimation_intercept_main": self.n_estimation_factor_w.intercept,
                 "yield_value_main": self.crop_yield_w,
                 "ef_methane_agr_residues_minor": getattr(self.minor_burning_emission_factor, "ch4", None),
                 "combustion_factor_minor": getattr(self.minor_fires_w, "value", None),
-                "residue_minor_tier_2": input.minor_biomass_factor_t2_w,
+                "residue_minor_tier_2": self.module.minor_biomass_factor_t2_w,
                 "n_estimation_slope_minor": getattr(self.minor_n_estimation_factor_w, "slope", None),
                 "n_estimation_intercept_minor": getattr(self.minor_n_estimation_factor_w, "intercept", None),
-                "yield_value_minor": input.minor_yield_w,
-                "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if input.residue_management_type_w.name == "Burned" else None,
-                "retained_main": input.residue_management_type_w.name == "Retained",
+                "yield_value_minor": self.module.minor_yield_w,
+                "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_w.name == "Burned" else None,
+                "retained_main": self.module.residue_management_type_w.name == "Retained",
                 "ef_nitrous_agr_residues_minor": getattr(self.minor_burning_emission_factor, "n2o", None),
-                "retained_minor": getattr(input.minor_residue_management_type_w, "name", None) == "Retained",
+                "retained_minor": getattr(self.module.minor_residue_management_type_w, "name", None) == "Retained",
                 "n_content_ag_main": self.n_estimation_factor_w.n_ag_residues,
                 "ratio_bg_ag_main": self.n_estimation_factor_w.rs_t,
                 "n_content_bg_main": self.n_estimation_factor_w.n_bg_t,
@@ -1507,7 +1506,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "ratio_bg_ag_minor": getattr(self.minor_n_estimation_factor_w, "rs_t", None),
                 "n_content_bg_minor": getattr(self.minor_n_estimation_factor_w, "n_bg_t", None),
                 "delay": self.activity.delay,
-                "calculate_biomass": input.is_luc_remaining_same(),
+                "calculate_biomass": self.module.is_luc_remaining_same(),
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_w.value,
                 "biomass_start_tier_2": self.module_w.biomass_t2_start,
@@ -1518,7 +1517,7 @@ class AnnualCropCalculator(LandModuleCalculator):
             self.math_w = MathAnnualCropland(**self.inputs_w)
             self.math_w.calculate_emissions()
 
-        if input.is_without():
+        if self.module.is_without():
             log.debug("Is without")
 
             self.inputs_wo = {
@@ -1547,22 +1546,22 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "ef_nitrous_som": self.som.value,
                 "nitrous_constant": project.gwp.n2o,
                 "methane_constant": project.gwp.ch4,
-                "ef_methane_agr_residues_main": self.burning_emission_factor.ch4 if input.residue_management_type_wo.name == "Burned" else None,
+                "ef_methane_agr_residues_main": self.burning_emission_factor.ch4 if self.module.residue_management_type_wo.name == "Burned" else None,
                 "combustion_factor_main": self.fires_wo.value,
-                "residue_main_tier_2": self.module_wo.biomass_t2_wo,
+                "residue_main_tier_2": self.module.residue_availability_t2_wo,
                 "n_estimation_slope_main": self.n_estimation_factor_wo.slope,
                 "n_estimation_intercept_main": self.n_estimation_factor_wo.intercept,
                 "yield_value_main": self.crop_yield_wo,
                 "ef_methane_agr_residues_minor": getattr(self.minor_burning_emission_factor, "ch4", None),
                 "combustion_factor_minor": getattr(self.minor_fires_wo, "value", None),
-                "residue_minor_tier_2": input.minor_biomass_factor_t2_wo,
+                "residue_minor_tier_2": self.module.minor_biomass_factor_t2_wo,
                 "n_estimation_slope_minor": getattr(self.minor_n_estimation_factor_wo, "slope", None),
                 "n_estimation_intercept_minor": getattr(self.minor_n_estimation_factor_wo, "intercept", None),
-                "yield_value_minor": input.minor_yield_wo,
-                "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if input.residue_management_type_wo.name == "Burned" else None,
-                "retained_main": input.residue_management_type_wo.name == "Retained",
+                "yield_value_minor": self.module.minor_yield_wo,
+                "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_wo.name == "Burned" else None,
+                "retained_main": self.module.residue_management_type_wo.name == "Retained",
                 "ef_nitrous_agr_residues_minor": getattr(self.minor_burning_emission_factor, "n2o", None),
-                "retained_minor": getattr(input.minor_residue_management_type_wo, "name", None) == "Retained",
+                "retained_minor": getattr(self.module.minor_residue_management_type_wo, "name", None) == "Retained",
                 "n_content_ag_main": self.n_estimation_factor_wo.n_ag_residues,
                 "ratio_bg_ag_main": self.n_estimation_factor_wo.rs_t,
                 "n_content_bg_main": self.n_estimation_factor_wo.n_bg_t,
@@ -1570,7 +1569,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "ratio_bg_ag_minor": getattr(self.minor_n_estimation_factor_wo, "rs_t", None),
                 "n_content_bg_minor": getattr(self.minor_n_estimation_factor_wo, "n_bg_t", None),
                 "delay": self.activity.delay,
-                "calculate_biomass": input.is_business_as_usual(),
+                "calculate_biomass": self.module.is_business_as_usual(),
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
@@ -1585,6 +1584,12 @@ class AnnualCropCalculator(LandModuleCalculator):
         res_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         res_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         res_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+
+        if PLOT_GRAPHS:
+            res_start_w.plot_emissions_and_aggregate_by_activity("annual_start_w")
+            res_start_wo.plot_emissions_and_aggregate_by_activity("annual_start_wo")
+            res_w.plot_emissions_and_aggregate_by_activity("annual_w")
+            res_wo.plot_emissions_and_aggregate_by_activity("annual_wo")
 
         log.debug("END AnnualCropCalculator.calculate")
 
@@ -2510,7 +2515,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "agb_ref": self.agb.value,
                 "agb_tier_2": module.get_biomass_t2(utils.ScenarioTypes.WITH),
                 "cf_ref": self.cf.value,
-                "cf_tier_2": module.combustion_factor_t2_start,
+                "cf_tier_2": module.combustion_factor_t2_w,
                 "soc_start_default": self.soc.value,
                 "soc_end_default": self.soc.value,
                 "soc_start_tier_2": module.soc_t2_start,
@@ -2561,7 +2566,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "agb_ref": self.agb.value,
                 "agb_tier_2": module.get_biomass_t2(utils.ScenarioTypes.WITHOUT),
                 "cf_ref": self.cf.value,
-                "cf_tier_2": module.combustion_factor_t2_start,
+                "cf_tier_2": module.combustion_factor_t2_wo,
                 "soc_start_default": self.soc.value,
                 "soc_end_default": self.soc.value,
                 "soc_start_tier_2": module.soc_t2_start,
