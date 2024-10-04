@@ -456,9 +456,15 @@ class LargeFisheryDefaults(Defaults):
         super().__init__(input)
 
         self.values = SimpleNamespace(
-            energy_emission_factor_t2_start_default=0,
-            energy_emission_factor_t2_w_default=0,
-            energy_emission_factor_t2_wo_default=0,
+            energy_ef_default_co2_start=0,
+            energy_ef_default_co2_w=0,
+            energy_ef_default_co2_wo=0,
+            energy_ef_default_n2o_start=0,
+            energy_ef_default_n2o_w=0,
+            energy_ef_default_n2o_wo=0,
+            energy_ef_default_ch4_start=0,
+            energy_ef_default_ch4_w=0,
+            energy_ef_default_ch4_wo=0,
             refrigerant_lost_per_tonne_t2_start_default=0,
             refrigerant_lost_per_tonne_t2_w_default=0,
             refrigerant_lost_per_tonne_t2_wo_default=0,
@@ -480,9 +486,15 @@ class LargeFisheryDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            energy_emission_factor_t2_start_default=defaults.ef_diesel_default,
-            energy_emission_factor_t2_w_default=defaults.ef_diesel_default,
-            energy_emission_factor_t2_wo_default=defaults.ef_diesel_default,
+            energy_ef_default_co2_start=defaults.energy_ef_default_co2,
+            energy_ef_default_co2_w=defaults.energy_ef_default_co2,
+            energy_ef_default_co2_wo=defaults.energy_ef_default_co2,
+            energy_ef_default_n2o_start=defaults.energy_ef_default_n2o,
+            energy_ef_default_n2o_w=defaults.energy_ef_default_n2o,
+            energy_ef_default_n2o_wo=defaults.energy_ef_default_n2o,
+            energy_ef_default_ch4_start=defaults.energy_ef_default_ch4,
+            energy_ef_default_ch4_w=defaults.energy_ef_default_ch4,
+            energy_ef_default_ch4_wo=defaults.energy_ef_default_ch4,
             refrigerant_lost_per_tonne_t2_start_default=defaults.lost_refrigerant_default,
             refrigerant_lost_per_tonne_t2_w_default=defaults.lost_refrigerant_default,
             refrigerant_lost_per_tonne_t2_wo_default=defaults.lost_refrigerant_default,
@@ -504,9 +516,15 @@ class SmallFisheryDefaults(Defaults):
         super().__init__(input)
 
         self.values = SimpleNamespace(
-            energy_emission_factor_t2_start_default=0,
-            energy_emission_factor_t2_w_default=0,
-            energy_emission_factor_t2_wo_default=0,
+            energy_ef_default_co2_start=0,
+            energy_ef_default_co2_w=0,
+            energy_ef_default_co2_wo=0,
+            energy_ef_default_n2o_start=0,
+            energy_ef_default_n2o_w=0,
+            energy_ef_default_n2o_wo=0,
+            energy_ef_default_ch4_start=0,
+            energy_ef_default_ch4_w=0,
+            energy_ef_default_ch4_wo=0,
             refrigerant_lost_per_tonne_t2_start_default=0,
             refrigerant_lost_per_tonne_t2_w_default=0,
             refrigerant_lost_per_tonne_t2_wo_default=0,
@@ -528,9 +546,15 @@ class SmallFisheryDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            energy_emission_factor_t2_start_default=defaults.ef_diesel_default,
-            energy_emission_factor_t2_w_default=defaults.ef_diesel_default,
-            energy_emission_factor_t2_wo_default=defaults.ef_diesel_default,
+            energy_ef_default_co2_start=defaults.energy_ef_default_co2,
+            energy_ef_default_co2_w=defaults.energy_ef_default_co2,
+            energy_ef_default_co2_wo=defaults.energy_ef_default_co2,
+            energy_ef_default_n2o_start=defaults.energy_ef_default_n2o,
+            energy_ef_default_n2o_w=defaults.energy_ef_default_n2o,
+            energy_ef_default_n2o_wo=defaults.energy_ef_default_n2o,
+            energy_ef_default_ch4_start=defaults.energy_ef_default_ch4,
+            energy_ef_default_ch4_w=defaults.energy_ef_default_ch4,
+            energy_ef_default_ch4_wo=defaults.energy_ef_default_ch4,
             refrigerant_lost_per_tonne_t2_start_default=defaults.lost_refrigerant_default,
             refrigerant_lost_per_tonne_t2_w_default=defaults.lost_refrigerant_default,
             refrigerant_lost_per_tonne_t2_wo_default=defaults.lost_refrigerant_default,
