@@ -158,9 +158,9 @@ class AnnualCroplandDefaults(Defaults):
             minor_biomass_t2_start_default=defaults.minor_biomass_start.value,
             minor_biomass_t2_w_default=defaults.minor_biomass_w.value,
             minor_biomass_t2_wo_default=defaults.minor_biomass_wo.value,
-            yield_t2_start_default=defaults.crop_yield_start.value,
-            yield_t2_w_default=defaults.crop_yield_w.value,
-            yield_t2_wo_default=defaults.crop_yield_wo.value,
+            yield_t2_start_default=defaults.crop_yield_start,
+            yield_t2_w_default=defaults.crop_yield_w,
+            yield_t2_wo_default=defaults.crop_yield_wo,
         )
 
 
