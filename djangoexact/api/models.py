@@ -1044,10 +1044,7 @@ class SingleBiomassModule(BiomassModule):
         abstract = True
 
     def get_biomass_t2(self, scenario: utils.ScenarioTypes):
-        try:
-            return getattr(self, f"biomass_t2_{scenario.value}")
-        except TypeError:
-            return None
+        return getattr(self, f"biomass_t2_{scenario.value}", None)
 
 
 class ResidueAvailability(models.Model):
@@ -1071,11 +1068,22 @@ class AboveBelowGroundBiomassModule(BiomassModule):
     class Meta:
         abstract = True
 
-    # def get_biomass_t2(self, scenario: utils.ScenarioTypes):
-    #     try:
-    #         return getattr(self, f"agb_t2_{scenario.value}", 0) + getattr(self, f"bgb_t2_{scenario.value}", 0)
-    #     except TypeError:
-    #         return None
+    def get_biomass_t2(self, scenario: utils.ScenarioTypes):
+
+        if getattr(self, f"agb_t2_{scenario.value}", None) is None and getattr(self, f"bgb_t2_{scenario.value}", None) is None:
+            return None
+
+        agb_t2 = getattr(self, f"agb_t2_{scenario.value}")
+        bgb_t2 = getattr(self, f"bgb_t2_{scenario.value}")
+
+        if agb_t2 is not None and bgb_t2 is not None:
+            return agb_t2 + bgb_t2
+        elif agb_t2 is not None:
+            return agb_t2
+        elif bgb_t2 is not None:
+            return bgb_t2
+        else:
+            return None
 
 
 class LitterDeadwoodBiomassModule(AboveBelowGroundBiomassModule):
@@ -1091,10 +1099,24 @@ class LitterDeadwoodBiomassModule(AboveBelowGroundBiomassModule):
         abstract = True
 
     def get_biomass_t2(self, scenario: utils.ScenarioTypes):
-        try:
-            return super().get_biomass_t2(scenario) + getattr(self, f"litter_t2_{scenario.value}") + getattr(self, f"deadwood_t2_{scenario.value}")
-        except TypeError:
+
+        if getattr(self, f"litter_t2_{scenario.value}", None) is None and getattr(self, f"deadwood_t2_{scenario.value}", None) is None:
             return None
+
+        litter_t2 = getattr(self, f"litter_t2_{scenario.value}")
+        deadwood_t2 = getattr(self, f"deadwood_t2_{scenario.value}")
+        super_t2 = super().get_biomass_t2(scenario)
+
+        if litter_t2 is not None and deadwood_t2 is not None and super_t2 is not None:
+            return litter_t2 + deadwood_t2 + super_t2
+        elif litter_t2 is not None and deadwood_t2 is not None:
+            return litter_t2 + deadwood_t2
+        elif litter_t2 is not None:
+            return litter_t2
+        elif deadwood_t2 is not None:
+            return deadwood_t2
+        else:
+            return super_t2
 
 
 ##### Land Use Changes #####
@@ -1291,6 +1313,10 @@ class PerennialCrop(models.Model):
 
 class PerennialCropland(PerennialCrop, LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule, ResidueAvailability):
     pass
+
+    # NOTE: Why having AGB and BGB AND Biomass when Biomass = AGB + BGB?
+    def get_biomass_t2(self, scenario: utils.ScenarioTypes):
+        return getattr(self, f"biomass_t2_{scenario.value}", None)
 
 
 class CroplandMinorSeason(models.Model):
@@ -2197,6 +2223,10 @@ class Settlement(LandModuleFixed, AboveBelowGroundBiomassModule, SingleBiomassMo
     settlement_type_wo = models.ForeignKey(SettlementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_settlement_type_wo", verbose_name=_("settlement_type_wo"))
     settlement_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_settlement_type_thread", on_delete=models.SET_NULL)
 
+    # NOTE: Why having AGB and BGB AND Biomass when Biomass = AGB + BGB?
+    def get_biomass_t2(self, scenario: utils.ScenarioTypes):
+        return getattr(self, f"biomass_t2_{scenario.value}", None)
+
     def save(self, *args, **kwargs):
 
         if not self.land_use_type_start:
@@ -2213,6 +2243,10 @@ class SetAside(LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule):
     is_set_aside_w = models.BooleanField(default=False, verbose_name=_("is_set_aside_w"))
     is_set_aside_wo = models.BooleanField(default=False, verbose_name=_("is_set_aside_wo"))
 
+    # NOTE: Why having AGB and BGB AND Biomass when Biomass = AGB + BGB?
+    def get_biomass_t2(self, scenario: utils.ScenarioTypes):
+        return getattr(self, f"biomass_t2_{scenario.value}", None)
+
     def save(self, *args, **kwargs):
 
         if not self.land_use_type_start:
@@ -2227,6 +2261,10 @@ class OtherLand(LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule):
     is_degraded_land_start = models.BooleanField(default=False, verbose_name=_("is_degraded_land_start"))
     is_degraded_land_w = models.BooleanField(default=False, verbose_name=_("is_degraded_land_w"))
     is_degraded_land_wo = models.BooleanField(default=False, verbose_name=_("is_degraded_land_wo"))
+
+    # NOTE: Why having AGB and BGB AND Biomass when Biomass = AGB + BGB?
+    def get_biomass_t2(self, scenario: utils.ScenarioTypes):
+        return getattr(self, f"biomass_t2_{scenario.value}", None)
 
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:
