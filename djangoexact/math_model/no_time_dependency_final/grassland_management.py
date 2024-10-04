@@ -86,70 +86,18 @@ class GrasslandManagement(BaseModule):
         self.soc_start_tier_2 = soc_start_tier_2  # tier 2 value, expects float or None
         self.soc_end_tier_2 = soc_end_tier_2  # tier 2 value, expects float or None
 
-        self.fire_impact = fire_impact
-
-        self.fmg_start_default = fmg_start_default  # defaulted to 1 in case there are None, if not float value
-        self.fmg_end_default = fmg_end_default  # defaulted to 1 in case there are None, if not float value
-        self.fmg_start_tier_2 = fmg_start_tier_2  # tier 2 value, expects float or None
-        self.fmg_end_tier_2 = fmg_end_tier_2  # tier 2 value, expects float or None
-        self.flu_start_default = flu_start_default  # defaulted to 1 in case there are None, if not float value
-        self.flu_end_default = flu_end_default  # defaulted to 1 in case there are None, if not float value
-        self.flu_start_tier_2 = flu_start_tier_2  # tier 2 value, expects float or None
-        self.flu_end_tier_2 = flu_end_tier_2  # tier 2 value, expects float or None
-        self.fi_start_default = fi_start_default  # defaulted to 1 in case there are None, if not float value
-        self.fi_end_default = fi_end_default  # defaulted to 1 in case there are None, if not float value
-        self.fi_start_tier_2 = fi_start_tier_2  # tier 2 value, expects float or None
-        self.fi_end_tier_2 = fi_end_tier_2  # tier 2 value, expects float or None
-
-        # TODO: Assigned FMG, FLU, FI values. Maybe once everything has been done change this structure
-        self.fmg_start = self.fmg_start_tier_2 if self.fmg_start_tier_2 else self.fmg_start_default
-        self.fmg_end = self.fmg_end_tier_2 if self.fmg_end_tier_2 else self.fmg_end_default
-        self.flu_start = self.flu_start_tier_2 if self.flu_start_tier_2 else self.flu_start_default
-        self.flu_end = self.flu_end_tier_2 if self.flu_end_tier_2 else self.flu_end_default
-        self.fi_start = self.fi_start_tier_2 if self.fi_start_tier_2 else self.fi_start_default
-        self.fi_end = self.fi_end_tier_2 if self.fi_end_tier_2 else self.fi_end_default
-
-        self.delay = delay  # defaulted to 0 in case there are None, if not float value
-        self.ef_nitrous_som = ef_nitrous_som  # tabulated value IPCC E75 (value for Savanna and Grassland)
-
-        # Space for the results
-        self.hectars_before_20, self.hectars_after_20 = yearly_time_dependent_20_year_breakdown(area_start, area_end, self.time_impl, self.time_cap, self.rate)
-        self.total_hectars = yearly_time_dependent_parameter_breakdown(area_start, area_end, self.time_impl, self.time_cap, self.rate, interim_values=True)
-
-        self.soc_start = self.soc_start_default * self.fmg_start * self.flu_start * self.fi_start if not self.soc_start_tier_2 else self.soc_start_tier_2
-        self.soc_end = self.soc_end_default * self.fmg_end * self.flu_end * self.fi_end if not self.soc_end_tier_2 else self.soc_end_tier_2
-
-        self.biomass_start = biomass_start_default if not biomass_start_tier_2 else biomass_start_tier_2
-        self.biomass_end = biomass_end_default if not biomass_end_tier_2 else biomass_end_tier_2
-        # DEFAULTS FOR TIER 2 VALUES INITIALIZATION
-
-        # RESULTS
-        self.emissions_residue_burning_yearly = []
-        self.emissions_residue_burning_total = 0
-
-        self.emissions_soil_yearly = []
-        self.emissions_soil_total = 0
-
-        self.emissions_som_yearly = []
-        self.emissions_som_total = 0
-
-        self.emissions_biomass_yearly = []
-        self.emissions_biomass_total = 0
-
-        self.emissions_total_yearly = []
-        self.total_emissions = 0
-
-        self.result = Result(self.time_impl, self.time_cap)
-
-        self.calculate_soc_som = calculate_soc_som
-
-        # TIER 2 DEFAULTS
-        self.soc_start_tier_2_default = self.soc_start_default * self.fmg_start * self.fi_start * self.flu_start
-        self.soc_end_tier_2_default = self.soc_end_default * self.fmg_end * self.fi_end * self.flu_end
-        self.agb_tier_2_default = self.agb_ref
-        self.combustion_factor_tier_2_default = self.cf_ref
-
-        return
+    nitrous_constant: float
+    methane_constant: float
+    fire_interval: float
+    fire_used: bool
+    fire_impact: float
+    methane_ef: float
+    nitrous_ef: float
+    agb_ref: float
+    agb_tier_2: float
+    cf_ref: float
+    cf_tier_2: Optional[float]
+    
 
     def calculate_emissions(
         self,
