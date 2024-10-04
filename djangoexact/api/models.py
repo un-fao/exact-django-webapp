@@ -1408,9 +1408,9 @@ class Grassland(LandModuleFixed, SingleBiomassModule):
     fire_periodicity_wo = models.FloatField(null=True, blank=True, default=0, verbose_name=_("fire_periodicity_wo"))
     fire_periodicity_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_fire_periodicity_thread")
 
-    fire_impact_start = models.FloatField(null=True, blank=True, verbose_name=_("fire_impact_start"))
-    fire_impact_w = models.FloatField(null=True, blank=True, verbose_name=_("fire_impact_w"))
-    fire_impact_wo = models.FloatField(null=True, blank=True, verbose_name=_("fire_impact_wo"))
+    fire_impact_start = models.FloatField(null=True, blank=True, default=0, verbose_name=_("fire_impact_start"))
+    fire_impact_w = models.FloatField(null=True, blank=True, default=0, verbose_name=_("fire_impact_w"))
+    fire_impact_wo = models.FloatField(null=True, blank=True, default=0, verbose_name=_("fire_impact_wo"))
     fire_impact_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_fire_impact_thread")
 
     yield_start = models.FloatField(null=True, blank=True, verbose_name=_("yield_start"))
