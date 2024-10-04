@@ -339,7 +339,10 @@ def yearly_time_dependent_matrix_log_rec_dis(start_value, end_value, years_imple
 
 # LIVESTOCK CH4 HEAD GENERAL FUNCTION
 # LIVESTOCK CH4 HEAD GENERAL FUNCTION
-def ch4_head_calculation_general(tam: float, vser: float, ef_prp: float, percentage_prp_default: float, percentage_prp_tier_2: float | None, ef_system_default: list, ch4_prp_tier_2: float, percentage_system_default: list, ef_single_system, ch4_system_tier_2, ch4_dividing_parameter=1):
+def ch4_head_calculation_general(tam: float, vser: float, ef_prp: float, 
+                                 percentage_prp_default: float, percentage_prp_tier_2: float | None, 
+                                 ef_system_default: list, ch4_prp_tier_2: float, percentage_system_default: list, 
+                                 ef_single_system, ch4_system_tier_2, ch4_dividing_parameter=1):
 
     try:
         # TODO: check how various tier 2 inputs of ef_system have to be handled

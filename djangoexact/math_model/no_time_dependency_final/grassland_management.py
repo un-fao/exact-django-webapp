@@ -29,7 +29,7 @@ class GrasslandManagement(LandModule):
     nitrous_constant: float
     methane_constant: float
     fire_interval: float
-    fire_used: float
+    fire_used: bool
     fire_impact: float
     methane_ef: float
     nitrous_ef: float
