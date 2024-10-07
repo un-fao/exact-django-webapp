@@ -1306,128 +1306,128 @@ msgstr "Carretera Rehabilitada (Pavimentada)"
 
 #. Climate
 msgid "Cool Temperate"
-msgstr ""
+msgstr "Templado Frío"
 
 #. Climate
 msgid "Warm Temperate"
-msgstr ""
+msgstr "Templado Cálido"
 
 #. Climate
 msgid "Tropical"
-msgstr ""
+msgstr "Tropical"
 
 #. Climate
 msgid "Boreal"
-msgstr ""
+msgstr "Boreal"
 
 #. Climate
 msgid "Tropical Montane"
-msgstr ""
+msgstr "Tropical Montano"
 
 #. Moisture
 msgid "Dry"
-msgstr ""
+msgstr "Seco"
 
 #. Moisture
 msgid "Moist"
-msgstr ""
+msgstr "Húmedo"
 
 #. Moisture
 msgid "Wet"
-msgstr ""
+msgstr "Muy húmedo"
 
 #. Moisture
 msgid "Temperate"
-msgstr ""
+msgstr "Templado"
 
 #. Region
 msgid "Eastern Africa"
-msgstr ""
+msgstr "África Oriental"
 
 #. Region
 msgid "Central Africa"
-msgstr ""
+msgstr "África Central"
 
 #. Region
 msgid "Northern Africa"
-msgstr ""
+msgstr "África Septentrional"
 
 #. Region
 msgid "Southern Africa"
-msgstr ""
+msgstr "África Meridional"
 
 #. Region
 msgid "Western Africa"
-msgstr ""
+msgstr "África Occidental"
 
 #. Region
 msgid "Central Asia"
-msgstr ""
+msgstr "Asia Central"
 
 #. Region
 msgid "Eastern Asia"
-msgstr ""
+msgstr "Asia Oriental"
 
 #. Region
 msgid "South-Eastern Asia"
-msgstr ""
+msgstr "Asia Sudoriental"
 
 #. Region
 msgid "Southern Asia"
-msgstr ""
+msgstr "Asia Meridional"
 
 #. Region
 msgid "Western Asia"
-msgstr ""
+msgstr "Asia Occidental"
 
 #. Region
 msgid "Europe"
-msgstr ""
+msgstr "Europa"
 
 #. Region
 msgid "Oceania"
-msgstr ""
+msgstr "Oceanía"
 
 #. Region
 msgid "North America"
-msgstr ""
+msgstr "América Septentrional"
 
 #. Region
 msgid "South America"
-msgstr ""
+msgstr "América del Sur"
 
 #. Region
 msgid "Central America"
-msgstr ""
+msgstr "América Central"
 
 #. Region
 msgid "Caribbean"
-msgstr ""
+msgstr "Caribe"
 
 #. Region
 msgid "Western Europe"
-msgstr ""
+msgstr "Europa Occidental
 
 #. Region
 msgid "Eastern Europe"
-msgstr ""
+msgstr "Europa Oriental"
 
 #. GlobalWarmingPotential
 msgid "IPCC Fifth Assessment Report (AR5) with Climate Change Feedback"
-msgstr ""
+msgstr "Quinto Informe de Evaluación del IPCC (AR5) con retroalimentación climática"
 
 #. GlobalWarmingPotential
 msgid "IPCC Fifth Assessment Report (AR5) without Climate Change Feedback"
-msgstr ""
+msgstr "Quinto Informe de Evaluación del IPCC (AR5) sin retroalimentación climática"
 
 #. GlobalWarmingPotential
 msgid "IPCC Sixth Assessment Report (AR6)"
-msgstr ""
+msgstr "Sexto Informe de Evaluación del IPCC (AR6)"
 
 #. GlobalWarmingPotential
 msgid "IPCC Fourth Assessment Report (AR4)"
-msgstr ""
+msgstr "Cuarto Informe de Evaluación del IPCC (AR4)"
 
 #. GlobalWarmingPotential
 msgid "IPCC Second Assessment Report (SAR)"
-msgstr ""
+msgstr "Segundo Informe de Evaluación del IPCC (SAR)"
