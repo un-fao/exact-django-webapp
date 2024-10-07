@@ -369,10 +369,10 @@ def ch4_head_calculation_general(tam: float, vser: float, ef_prp: float,
 
         return ch4_head, ch4_system, ch4_prp
 
-    except:
+    except Exception as e:
         traceback.print_exc()
         print("Error in ch4_head_calculation_general")
-        return None
+        raise e
 
 
 def soil_emissions(hectars_before_20, area_start, area_end, socref, soc_tier_2, f_lu_tier_2, f_i_tier_2, f_mg_tier_2, f_lu_ref=1, f_i_ref=1, f_mg_ref=1):
@@ -463,9 +463,10 @@ def input_single_calculation(unit_start, unit_end, ipcc_factor, tier_2_factor, u
 
         annual_emissions = yearly_time_dependent_parameter_breakdown(emissions_start, emissions_end, time_implementation, time_capitalization, rate_type)
 
-    except:
+    except Exception as e:
         traceback.print_exc()
-        return [], []
+        raise e
+        
 
     return annual_emissions, sum(annual_emissions)
 
@@ -482,9 +483,9 @@ def input_single_calculation_different_ef(unit_start, unit_end, ipcc_factor, tie
 
         annual_emissions = yearly_time_dependent_parameter_breakdown(emissions_start, emissions_end, time_implementation, time_capitalization, rate_type)
 
-    except:
+    except Exception as e:
         traceback.print_exc()
-        return None
+        raise e
 
     return annual_emissions, sum(annual_emissions)
 
@@ -527,4 +528,4 @@ class BaseModule(ABC):
 
         except Exception as e:
             traceback.print_exc()
-            return {}
+            raise e
