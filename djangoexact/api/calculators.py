@@ -2367,7 +2367,7 @@ class GrasslandCalculator(LandModuleCalculator):
         project: Project = activity.project
 
         self.ef = utils.get_or_raise(ipcc.BurningEmissionFactor, {"category__name": "Savanna and grassland"}, "Burning emission factor for savanna and grassland does not exist")
-        self.biomass = utils.get_or_raise(ipcc.GrasslandBiomass, {"climate": project.climate, "moisture": project.moisture}, f"Biomass for {project.climate.name} climate and {project.moisture.name} moisture does not exist")
+        self.biomass = utils.get_or_raise(ipcc.GrasslandBiomass, {"climate": project.climate, "moisture": project.moisture}, f"AGB for {project.climate.name} climate and {project.moisture.name} moisture does not exist")
         self.cf = utils.get_or_raise(GrasslandParameter, {"name": "default_combustion_factor"}, "Default combustion factor does not exist")
 
     def calculate(self) -> list[Result]:
@@ -2396,7 +2396,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "fire_used": module.is_fire_used_start,
                 "methane_ef": self.ef.ch4,
                 "nitrous_ef": self.ef.n2o,
-                "agb_ref": self.biomass.agb_t_dm_ha, # TODO: Check if tdm/ha or tC/ha should be sent
+                "agb_ref": self.biomass.agb_t_c_ha,
                 "agb_tier_2": module.agb_t2_start,
                 "cf_ref": self.cf.value,
                 "cf_tier_2": module.combustion_factor_t2_start,
@@ -2422,8 +2422,8 @@ class GrasslandCalculator(LandModuleCalculator):
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_w.value,
                 "calculate_biomass": False,
-                "bgb_ref": self.biomass.bgb_t_dm_ha,  # TODO: Check if tdm/ha or tC/ha should be sent
-                "bgb_tier_2": module.bgb_t2_start,
+                "biomass_start_tier_2": module.biomass_t2_start,
+                "biomass_end_tier_2": module.biomass_t2_w,
                 "fire_impact": module.fire_impact_start,
             }
 
@@ -2444,7 +2444,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "fire_used": module.is_fire_used_start,
                 "methane_ef": self.ef.ch4,
                 "nitrous_ef": self.ef.n2o,
-                "agb_ref": self.biomass.agb_t_dm_ha,  # TODO: Check if tdm/ha or tC/ha should be sent
+                "agb_ref": self.biomass.agb_t_c_ha,
                 "agb_tier_2": module.agb_t2_start,
                 "cf_ref": self.cf.value,
                 "cf_tier_2": module.combustion_factor_t2_start,
@@ -2470,8 +2470,8 @@ class GrasslandCalculator(LandModuleCalculator):
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
                 "calculate_biomass": False,
-                "bgb_ref": self.biomass.bgb_t_dm_ha,  # TODO: Check if tdm/ha or tC/ha should be sent
-                "bgb_tier_2": module.bgb_t2_start,
+                "biomass_start_tier_2": module.biomass_t2_start,
+                "biomass_end_tier_2": module.biomass_t2_wo,
                 "fire_impact": module.fire_impact_start,
             }
 
@@ -2495,7 +2495,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "fire_used": module.is_fire_used_w,
                 "methane_ef": self.ef.ch4,
                 "nitrous_ef": self.ef.n2o,
-                "agb_ref": self.biomass.agb_t_dm_ha,  # TODO: Check if tdm/ha or tC/ha should be sent
+                "agb_ref": self.biomass.agb_t_c_ha,
                 "agb_tier_2": module.agb_t2_w,
                 "cf_ref": self.cf.value,
                 "cf_tier_2": module.combustion_factor_t2_w,
@@ -2521,8 +2521,8 @@ class GrasslandCalculator(LandModuleCalculator):
                 "calculate_biomass": module.is_luc_remaining_same(),
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_w.value,
-                "bgb_ref": self.biomass.bgb_t_dm_ha,  # TODO: Check if tdm/ha or tC/ha should be sent
-                "bgb_tier_2": module.bgb_t2_w,
+                "biomass_start_tier_2": module.biomass_t2_start,
+                "biomass_end_tier_2": module.biomass_t2_w,
                 "fire_impact": module.fire_impact_w,
             }
 
@@ -2546,7 +2546,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "fire_used": module.is_fire_used_wo,
                 "methane_ef": self.ef.ch4,
                 "nitrous_ef": self.ef.n2o,
-                "agb_ref": self.biomass.agb_t_dm_ha,  # TODO: Check if tdm/ha or tC/ha should be sent
+                "agb_ref": self.biomass.agb_t_c_ha,
                 "agb_tier_2": module.agb_t2_wo,
                 "cf_ref": self.cf.value,
                 "cf_tier_2": module.combustion_factor_t2_wo,
@@ -2572,8 +2572,8 @@ class GrasslandCalculator(LandModuleCalculator):
                 "calculate_biomass": module.is_business_as_usual(),
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
-                "bgb_ref": self.biomass.bgb_t_dm_ha,  # TODO: Check if tdm/ha or tC/ha should be sent
-                "bgb_tier_2": module.bgb_t2_wo,
+                "biomass_start_tier_2": module.biomass_t2_start,
+                "biomass_end_tier_2": module.biomass_t2_wo,
                 "fire_impact": module.fire_impact_wo,
             }
 
