@@ -2004,10 +2004,6 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
         self.straw_burned_w: SimpleNamespace = SimpleNamespace(value=0)
         self.straw_burned_wo: SimpleNamespace = SimpleNamespace(value=0)
 
-        self.biomass_ef_start: SimpleNamespace | ipcc.ForestTotalBiomass = SimpleNamespace(value=0)
-        self.biomass_ef_w: SimpleNamespace | ipcc.TotalBiomassAfterDefo = SimpleNamespace(value=0)
-        self.biomass_ef_wo: SimpleNamespace | ipcc.TotalBiomassAfterDefo = SimpleNamespace(value=0)
-
         self.som: SimpleNamespace | ipcc.NitrousEmissionFactor = SimpleNamespace(value=0)
 
     def get_defaults(self, calculate=False) -> dict:
@@ -2027,7 +2023,6 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
             self.sfw_start = utils.get_or_raise(ipcc.RiceSFW, h2o_mgmt_after_start_flt, f"RiceSFW for {module.water_management_type_after_cultivation_start} does not exist")
             self.sfp_start = utils.get_or_raise(ipcc.RiceSFP, h2o_mgmt_before_start_flt, f"RiceSFP for {module.water_management_type_before_cultivation_start} does not exist")
             self.sfo_start = utils.get_or_raise(ipcc.RiceSFO, organic_amendment_start_flt, f"RiceSFO for {module.organic_amendment_type_start} does not exist")
-            self.biomass_ef_start = utils.get_or_raise(ipcc.ForestTotalBiomass, climate_flt | moisture_flt | region_flt | {"land_use_type": module.land_use_type_start}, f"ForestTotalBiomass for {self.climate.name} in {self.region.name} does not exist")
 
         if module_for_checks.is_with():
             h2o_mgmt_before_w_flt = {"water_management_type_before_cultivation": module.water_management_type_before_cultivation_w}
@@ -2036,7 +2031,6 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
             self.sfw_w = utils.get_or_raise(ipcc.RiceSFW, h2o_mgmt_after_w_flt, f"RiceSFW for {module.water_management_type_after_cultivation_w} does not exist")
             self.sfp_w = utils.get_or_raise(ipcc.RiceSFP, h2o_mgmt_before_w_flt, f"RiceSFP for {module.water_management_type_before_cultivation_w} does not exist")
             self.sfo_w = utils.get_or_raise(ipcc.RiceSFO, organic_amendment_w_flt, f"RiceSFO for {module.organic_amendment_type_w} does not exist")
-            self.biomass_ef_w = utils.get_or_raise(ipcc.TotalBiomassAfterDefo, climate_flt | moisture_flt | region_flt | {"land_use_type": module.land_use_type_w}, f"ForestTotalBiomass for {self.climate.name} in {self.region.name} does not exist")
 
         if module_for_checks.is_without():
             h2o_mgmt_before_wo_flt = {"water_management_type_before_cultivation": module.water_management_type_before_cultivation_wo}
@@ -2045,7 +2039,6 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
             self.sfw_wo = utils.get_or_raise(ipcc.RiceSFW, h2o_mgmt_after_wo_flt, f"RiceSFW for {module.water_management_type_after_cultivation_wo} does not exist")
             self.sfp_wo = utils.get_or_raise(ipcc.RiceSFP, h2o_mgmt_before_wo_flt, f"RiceSFP for {module.water_management_type_before_cultivation_wo} does not exist")
             self.sfo_wo = utils.get_or_raise(ipcc.RiceSFO, organic_amendment_wo_flt, f"RiceSFO for {module.organic_amendment_type_wo} does not exist")
-            self.biomass_ef_wo = utils.get_or_raise(ipcc.TotalBiomassAfterDefo, climate_flt | moisture_flt | region_flt | {"land_use_type": module.land_use_type_wo}, f"ForestTotalBiomass for {self.climate.name} in {self.region.name} does not exist")
 
         if module.is_ready() and calculate:
             self.calculate()
