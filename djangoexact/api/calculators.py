@@ -5748,10 +5748,6 @@ class OtherLandCalculator(LandModuleCalculator):
     def __init__(self, input) -> None:
         super().__init__(input)
 
-        self.biomass_ef_start: SimpleNamespace | ipcc.ForestTotalBiomass = SimpleNamespace(value=0)
-        self.biomass_ef_w: SimpleNamespace | ipcc.TotalBiomassAfterDefo = SimpleNamespace(value=0)
-        self.biomass_ef_wo: SimpleNamespace | ipcc.TotalBiomassAfterDefo = SimpleNamespace(value=0)
-
     def calculate(self) -> Result:
         module: OtherLand = self.data
         activity: Activity = module.activity
@@ -5956,22 +5952,17 @@ class SetAsideCalculator(LandModuleCalculator):
 
         module: SetAside = self.data
         activity: Activity = module.activity
-        project: Project = activity.project
 
         moisture_flt = {"moisture": self.moisture}
-        cm = {"climate": self.climate, "moisture": self.moisture}
 
         if module.is_start():
             self.emission_factors_start = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {self.moisture.name} moisture does not exist")
-            self.biomass_ef_start = utils.get_or_raise(ipcc.ForestTotalBiomass, cm | {"continent": project.country.region, "land_use_type": module.land_use_type_start}, f"ForestTotalBiomass for {module.land_use_type_start.name} land use type in {project.climate.name} climate and {self.moisture.name} moisture in {project.country.region.name} region does not exist")
 
         if module.is_with():
             self.emission_factors_w = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {self.moisture.name} moisture does not exist")
-            self.biomass_ef_w = utils.get_or_raise(ipcc.TotalBiomassAfterDefo, cm | {"continent": project.country.region, "land_use_type": module.land_use_type_w}, f"ForestTotalBiomass for {module.land_use_type_w.name} land use type in {project.climate.name} climate and {self.moisture.name} moisture in {project.country.region.name} region does not exist")
 
         if module.is_without():
             self.emission_factors_wo = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {self.moisture.name} moisture does not exist")
-            self.biomass_ef_wo = utils.get_or_raise(ipcc.TotalBiomassAfterDefo, cm | {"continent": project.country.region, "land_use_type": module.land_use_type_wo}, f"ForestTotalBiomass for {module.land_use_type_wo.name} land use type in {project.climate.name} climate and {self.moisture.name} moisture in {project.country.region.name} region does not exist")
 
         if module.is_ready() and calculate:
             self.calculate()
