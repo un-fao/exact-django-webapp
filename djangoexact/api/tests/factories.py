@@ -154,10 +154,6 @@ class AnnualCroplandFactory(DjangoModelFactory):
     residue_management_type_w = factory.fuzzy.FuzzyChoice(residue_management_types)
     residue_management_type_wo = factory.fuzzy.FuzzyChoice(residue_management_types)
 
-    crop_yield_start = factory.fuzzy.FuzzyInteger(0.0, 100)
-    crop_yield_w = factory.fuzzy.FuzzyInteger(0.0, 100)
-    crop_yield_wo = factory.fuzzy.FuzzyInteger(0.0, 100)
-
     area = factory.fuzzy.FuzzyInteger(150, 150)
 
 
@@ -182,10 +178,6 @@ class PerennialCroplandFactory(DjangoModelFactory):
     is_biomass_burned_start = factory.fuzzy.FuzzyChoice([True, False])
     is_biomass_burned_w = factory.fuzzy.FuzzyChoice([True, False])
     is_biomass_burned_wo = factory.fuzzy.FuzzyChoice([True, False])
-
-    crop_yield_start = factory.fuzzy.FuzzyInteger(0, 100)
-    crop_yield_w = factory.fuzzy.FuzzyInteger(0, 100)
-    crop_yield_wo = factory.fuzzy.FuzzyInteger(0, 100)
 
 
 class LivestockFactory(DjangoModelFactory):
@@ -309,10 +301,6 @@ class FloodedRiceFactory(DjangoModelFactory):
     organic_amendment_type_start = factory.fuzzy.FuzzyChoice(organic_amendment_types)
     organic_amendment_type_w = factory.fuzzy.FuzzyChoice(organic_amendment_types)
     organic_amendment_type_wo = factory.fuzzy.FuzzyChoice(organic_amendment_types)
-
-    crop_yield_start = factory.fuzzy.FuzzyInteger(1, 10)
-    crop_yield_w = factory.fuzzy.FuzzyInteger(1, 10)
-    crop_yield_wo = factory.fuzzy.FuzzyInteger(1, 10)
 
 
 class InputFactory(DjangoModelFactory):
