@@ -3375,11 +3375,11 @@ class FuelCalculator(BaseCalculator):
 
         inputs_w = {
             "emissions_factor_co2": self.ef.co2,
-            "specific_factor_co2": self.module.ef_co2_t2_w,
+            "specific_factor_co2": self.module.ef_co2_t2,
             "emissions_factor_ch4": self.ef.ch4,
-            "specific_factor_ch4": self.module.ef_ch4_t2_w,
+            "specific_factor_ch4": self.module.ef_ch4_t2,
             "emissions_factor_n2o": self.ef.n2o,
-            "specific_factor_n2o": self.module.ef_n2o_t2_w,
+            "specific_factor_n2o": self.module.ef_n2o_t2,
             "mwh_start": self.module.fuel_consumption_start,
             "mwh_end": self.module.fuel_consumption_w,
             "rate_type": change_rate.name,
@@ -3396,11 +3396,11 @@ class FuelCalculator(BaseCalculator):
 
         inputs_wo = {
             "emissions_factor_co2": self.ef.co2,
-            "specific_factor_co2": self.module.ef_co2_t2_wo,
+            "specific_factor_co2": self.module.ef_co2_t2,
             "emissions_factor_ch4": self.ef.ch4,
-            "specific_factor_ch4": self.module.ef_ch4_t2_wo,
+            "specific_factor_ch4": self.module.ef_ch4_t2,
             "emissions_factor_n2o": self.ef.n2o,
-            "specific_factor_n2o": self.module.ef_n2o_t2_wo,
+            "specific_factor_n2o": self.module.ef_n2o_t2,
             "mwh_start": self.module.fuel_consumption_start,
             "mwh_end": self.module.fuel_consumption_wo,
             "rate_type": change_rate.name,
