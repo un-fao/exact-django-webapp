@@ -302,10 +302,6 @@ class FloodedRiceFactory(DjangoModelFactory):
     organic_amendment_type_w = factory.fuzzy.FuzzyChoice(organic_amendment_types)
     organic_amendment_type_wo = factory.fuzzy.FuzzyChoice(organic_amendment_types)
 
-    crop_yield_start = factory.fuzzy.FuzzyInteger(1, 10)
-    crop_yield_w = factory.fuzzy.FuzzyInteger(1, 10)
-    crop_yield_wo = factory.fuzzy.FuzzyInteger(1, 10)
-
 
 class InputFactory(DjangoModelFactory):
     class Meta:
