@@ -555,6 +555,10 @@ class LandModuleCalculator(BaseCalculator):
         self.module_w: LandModule | SingleBiomassModule
         self.module_wo: LandModule | SingleBiomassModule
 
+        self.biomass_ef_start: ipcc.ForestTotalBiomass = ipcc.ForestTotalBiomass(value=0)
+        self.biomass_ef_w: ipcc.TotalBiomassAfterDefo = ipcc.TotalBiomassAfterDefo(value=0)
+        self.biomass_ef_wo: ipcc.TotalBiomassAfterDefo = ipcc.TotalBiomassAfterDefo(value=0)
+
         if self.luc:
             self.module_start, self.module_w, self.module_wo = self.luc.get_modules()
 
@@ -612,6 +616,10 @@ class LandModuleCalculator(BaseCalculator):
         self.fi_wo = get_fi_data(self.module_wo, self.project.climate, self.project.moisture, utils.ScenarioTypes.WITHOUT)
         self.fmg_wo = get_fmg_data(self.module_wo, self.project.climate, self.project.moisture, utils.ScenarioTypes.WITHOUT)
         self.flu_wo = get_flu_data(self.module_wo, self.project.climate, self.project.moisture, utils.ScenarioTypes.WITHOUT)
+
+        # NOTE: Added to take into account biomass growth in final land use
+        if self.luc and self.module.is_with() or self.module.is_without():
+            self.biomass_ef_start.value = 0
 
 
 class LandUseChangeCalculator(BaseCalculator):
