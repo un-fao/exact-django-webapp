@@ -2326,9 +2326,6 @@ class GrasslandCalculator(LandModuleCalculator):
         self.ef: SimpleNamespace | ipcc.BurningEmissionFactor = SimpleNamespace(value=0)
         self.agb: SimpleNamespace | ipcc.GrasslandAGB = SimpleNamespace(value=0)
         self.cf: SimpleNamespace | GrasslandParameter = SimpleNamespace(value=0)
-        self.biomass_ef_start: SimpleNamespace | ipcc.ForestTotalBiomass = SimpleNamespace(value=0)
-        self.biomass_ef_w: SimpleNamespace | ipcc.TotalBiomassAfterDefo = SimpleNamespace(value=0)
-        self.biomass_ef_wo: SimpleNamespace | ipcc.TotalBiomassAfterDefo = SimpleNamespace(value=0)
 
     def get_defaults(self, calculate=False):
         super().get_defaults(calculate)
@@ -2336,11 +2333,6 @@ class GrasslandCalculator(LandModuleCalculator):
         module: Grassland = self.data
         activity: Activity = module.activity
         project: Project = activity.project
-
-        # duration = activity.duration_t2 or self.activity.implementation_years
-        # # TODO: Is this assuming that the activity start_year must be > project start_year?
-        # delay = ((activity.start_year_t2 or 0) - project.start_year) or 0
-        # capitalization = self.activity.implementation_years - duration + self.activity.capitalization_years
 
         self.ef = utils.get_or_raise(ipcc.BurningEmissionFactor, {"category__name": "Savanna and grassland"}, "Burning emission factor for savanna and grassland does not exist")
         self.agb = utils.get_or_raise(ipcc.GrasslandAGB, {"climate": project.climate, "moisture": project.moisture}, f"AGB for {project.climate.name} climate and {project.moisture.name} moisture does not exist")
@@ -2355,11 +2347,6 @@ class GrasslandCalculator(LandModuleCalculator):
         module: Grassland = self.module
         activity: Activity = module.activity
         project: Project = activity.project
-
-        # duration = activity.duration_t2 or self.activity.implementation_years
-        # # TODO: Is this assuming that the activity start_year must be > project start_year?
-        # delay = ((activity.start_year_t2 or 0) - project.start_year) or 0
-        # capitalization = self.activity.implementation_years - duration + self.activity.capitalization_years
 
         self.get_defaults()
 
