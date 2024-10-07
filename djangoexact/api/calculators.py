@@ -3122,7 +3122,6 @@ class InputEntryCalculator(BaseCalculator):
         try:
             self.ef = ipcc.InputEmissionFactor.objects.get(input_type=module.input_type, climate=project.climate, moisture=project.moisture)
         except ipcc.InputEmissionFactor.DoesNotExist:
-            self.ef = None
             if needs_co2_ref or needs_n2o_ref or needs_co2_e_ref:
                 raise ValueError(f"Emission factor for {module.input_type.name} does not exist for {project.climate.name} and {project.moisture.name}. Please define tier 2 values.")
 
@@ -3140,17 +3139,17 @@ class InputEntryCalculator(BaseCalculator):
             "unit_start": module.value_start,
             "unit_end": module.value_w,
             "rate_type": activity.change_rate.name,
-            "ipcc_factor_co2": self.ef.co2_value if self.ef else None,
+            "ipcc_factor_co2": self.ef.co2_value,
             "tier_2_factor_co2": module.co2_emissions_t2,
             "unit_factor_co2": self.ref.co2_multiplier,
             "emissions_factor_co2": self.ref.co2_emissions_multiplier,
             "implementation_time": self.activity.implementation_years,
             "capitalization_time": self.activity.capitalization_years,
-            "ipcc_factor_n2o": self.ef.n2o_value if self.ef else None,
+            "ipcc_factor_n2o": self.ef.n2o_value,
             "tier_2_factor_n2o": module.n2o_emissions_t2,
             "unit_factor_n2o": self.ref.n2o_quantity_multiplier,
             "emissions_factor_n2o": self.ref.n2o_emissions_multiplier,
-            "ipcc_factor_eq": self.ef.co2_eq_value if self.ef else None,
+            "ipcc_factor_eq": self.ef.co2_eq_value,
             "tier_2_factor_eq": module.co2_e_emissions_t2,
             "unit_factor_eq": self.ref.production_quantity_multiplier,
             "emissions_factor_eq": self.ref.production_emissions_multiplier,
@@ -3165,17 +3164,17 @@ class InputEntryCalculator(BaseCalculator):
             "unit_start": module.value_start,
             "unit_end": module.value_wo,
             "rate_type": activity.change_rate.name,
-            "ipcc_factor_co2": self.ef.co2_value if self.ef else None,
+            "ipcc_factor_co2": self.ef.co2_value,
             "tier_2_factor_co2": module.co2_emissions_t2,
             "unit_factor_co2": self.ref.co2_multiplier,
             "emissions_factor_co2": self.ref.co2_emissions_multiplier,
             "implementation_time": self.activity.implementation_years,
             "capitalization_time": self.activity.capitalization_years,
-            "ipcc_factor_n2o": self.ef.n2o_value if self.ef else None,
+            "ipcc_factor_n2o": self.ef.n2o_value,
             "tier_2_factor_n2o": module.n2o_emissions_t2,
             "unit_factor_n2o": self.ref.n2o_quantity_multiplier,
             "emissions_factor_n2o": self.ref.n2o_emissions_multiplier,
-            "ipcc_factor_eq": self.ef.co2_eq_value if self.ef else None,
+            "ipcc_factor_eq": self.ef.co2_eq_value,
             "tier_2_factor_eq": module.co2_e_emissions_t2,
             "unit_factor_eq": self.ref.production_quantity_multiplier,
             "emissions_factor_eq": self.ref.production_emissions_multiplier,
