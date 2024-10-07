@@ -690,16 +690,23 @@ class AfforestationFLU(Model):
         return f"{self.value} for {self.climate.name} {self.moisture.name} {self.land_use_type.name}"
 
 
-class GrasslandAGB(Model):
+class GrasslandBiomass(Model):
+    """
+    Table, 6.4, page 6.27  in IPCC 2006
+    """
+
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
-    value = FloatField(default=0)
+    agb_t_dm_ha = FloatField()
+    agb_t_c_ha = FloatField()
+    bgb_t_dm_ha = FloatField()
+    bgb_t_c_ha = FloatField()
 
     class Meta:
         unique_together = ("climate", "moisture")
 
     def __str__(self):
-        return f"{self.value} for {self.climate.name} {self.moisture.name}"
+        return f"{self.climate} {self.moisture} {self.agb_t_dm_ha} {self.agb_t_c_ha} {self.bgb_t_dm_ha} {self.bgb_t_c_ha}"
 
 
 class GrasslandSOC(Model):

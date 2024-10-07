@@ -2356,7 +2356,7 @@ class GrasslandCalculator(LandModuleCalculator):
         super().__init__(input)
 
         self.ef: SimpleNamespace | ipcc.BurningEmissionFactor = SimpleNamespace(value=0)
-        self.agb: SimpleNamespace | ipcc.GrasslandAGB = SimpleNamespace(value=0)
+        self.biomass: SimpleNamespace | ipcc.GrasslandBiomass = SimpleNamespace(value=0)
         self.cf: SimpleNamespace | GrasslandParameter = SimpleNamespace(value=0)
 
     def get_defaults(self, calculate=False):
@@ -2367,7 +2367,7 @@ class GrasslandCalculator(LandModuleCalculator):
         project: Project = activity.project
 
         self.ef = utils.get_or_raise(ipcc.BurningEmissionFactor, {"category__name": "Savanna and grassland"}, "Burning emission factor for savanna and grassland does not exist")
-        self.agb = utils.get_or_raise(ipcc.GrasslandAGB, {"climate": project.climate, "moisture": project.moisture}, f"AGB for {project.climate.name} climate and {project.moisture.name} moisture does not exist")
+        self.biomass = utils.get_or_raise(ipcc.GrasslandBiomass, {"climate": project.climate, "moisture": project.moisture}, f"AGB for {project.climate.name} climate and {project.moisture.name} moisture does not exist")
         self.cf = utils.get_or_raise(GrasslandParameter, {"name": "default_combustion_factor"}, "Default combustion factor does not exist")
 
     def calculate(self) -> list[Result]:
@@ -2396,8 +2396,8 @@ class GrasslandCalculator(LandModuleCalculator):
                 "fire_used": module.is_fire_used_start,
                 "methane_ef": self.ef.ch4,
                 "nitrous_ef": self.ef.n2o,
-                "agb_ref": self.agb.value,
-                "agb_tier_2": module.biomass_t2_start,
+                "agb_ref": self.biomass.agb_t_c_ha,
+                "agb_tier_2": module.agb_t2_start,
                 "cf_ref": self.cf.value,
                 "cf_tier_2": module.combustion_factor_t2_start,
                 "soc_start_default": self.soc.value,
@@ -2444,8 +2444,8 @@ class GrasslandCalculator(LandModuleCalculator):
                 "fire_used": module.is_fire_used_start,
                 "methane_ef": self.ef.ch4,
                 "nitrous_ef": self.ef.n2o,
-                "agb_ref": self.agb.value,
-                "agb_tier_2": module.biomass_t2_start,
+                "agb_ref": self.biomass.agb_t_c_ha,
+                "agb_tier_2": module.agb_t2_start,
                 "cf_ref": self.cf.value,
                 "cf_tier_2": module.combustion_factor_t2_start,
                 "soc_start_default": self.soc.value,
@@ -2495,8 +2495,8 @@ class GrasslandCalculator(LandModuleCalculator):
                 "fire_used": module.is_fire_used_w,
                 "methane_ef": self.ef.ch4,
                 "nitrous_ef": self.ef.n2o,
-                "agb_ref": self.agb.value,
-                "agb_tier_2": module.biomass_t2_w,
+                "agb_ref": self.biomass.agb_t_c_ha,
+                "agb_tier_2": module.agb_t2_w,
                 "cf_ref": self.cf.value,
                 "cf_tier_2": module.combustion_factor_t2_w,
                 "soc_start_default": self.soc.value,
@@ -2546,8 +2546,8 @@ class GrasslandCalculator(LandModuleCalculator):
                 "fire_used": module.is_fire_used_wo,
                 "methane_ef": self.ef.ch4,
                 "nitrous_ef": self.ef.n2o,
-                "agb_ref": self.agb.value,
-                "agb_tier_2": module.biomass_t2_wo,
+                "agb_ref": self.biomass.agb_t_c_ha,
+                "agb_tier_2": module.agb_t2_wo,
                 "cf_ref": self.cf.value,
                 "cf_tier_2": module.combustion_factor_t2_wo,
                 "soc_start_default": self.soc.value,
