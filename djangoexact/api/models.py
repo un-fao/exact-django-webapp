@@ -2208,7 +2208,7 @@ class OrganicSoil(LandModuleFixed):
         return super().save(*args, **kwargs)
 
 
-class Settlement(LandModuleFixed, AboveBelowGroundBiomassModule, SingleBiomassModule):
+class Settlement(LandModuleFixed, SingleBiomassModule):
 
     settlement_type_start = models.ForeignKey(SettlementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_settlement_type_start", verbose_name=_("settlement_type_start"))
     settlement_type_w = models.ForeignKey(SettlementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_settlement_type_w", verbose_name=_("settlement_type_w"))
@@ -2229,7 +2229,7 @@ class Settlement(LandModuleFixed, AboveBelowGroundBiomassModule, SingleBiomassMo
         return super().save(*args, **kwargs)
 
 
-class SetAside(LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule):
+class SetAside(LandModule, SingleBiomassModule):
 
     is_set_aside_start = models.BooleanField(default=False, verbose_name=_("is_set_aside_start"))
     is_set_aside_w = models.BooleanField(default=False, verbose_name=_("is_set_aside_w"))
@@ -2249,7 +2249,7 @@ class SetAside(LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule):
         return super().save(*args, **kwargs)
 
 
-class OtherLand(LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule):
+class OtherLand(LandModule, SingleBiomassModule):
     is_degraded_land_start = models.BooleanField(default=False, verbose_name=_("is_degraded_land_start"))
     is_degraded_land_w = models.BooleanField(default=False, verbose_name=_("is_degraded_land_w"))
     is_degraded_land_wo = models.BooleanField(default=False, verbose_name=_("is_degraded_land_wo"))
