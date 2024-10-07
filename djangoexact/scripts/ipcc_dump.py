@@ -4424,7 +4424,7 @@ df = pd.read_csv(
     sep=";",
 )
 
-for row in df.iterrows():
+for i, row in df.iterrows():
     climate = Climate.objects.get(name__iexact=row["climate"])
     moisture = Moisture.objects.get(name__iexact=row["moisture"])
     agb_t_dm_ha = parse_csv_number(row["agb_t_dm_ha"])
