@@ -124,7 +124,7 @@ class GrasslandManagement(BaseModule):
                 return
             except:
                 traceback.print_exc()
-                return
+                raise e
 
         def calculate_soil_emissions():
             try:
@@ -146,6 +146,7 @@ class GrasslandManagement(BaseModule):
                     self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         def calculate_biomass_emissions():
             try:
@@ -158,6 +159,7 @@ class GrasslandManagement(BaseModule):
 
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         calculate_residue_burning()
         calculate_soil_emissions()

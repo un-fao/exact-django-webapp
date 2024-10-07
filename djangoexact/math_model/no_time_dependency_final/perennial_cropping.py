@@ -96,6 +96,7 @@ class PerennialCropland(LandModule):
 
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         def calculate_soil():
             try:
@@ -106,6 +107,7 @@ class PerennialCropland(LandModule):
                     self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         def calculate_biomass_emissions():
 
@@ -149,6 +151,7 @@ class PerennialCropland(LandModule):
 
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         calculate_residue()
         calculate_som()
