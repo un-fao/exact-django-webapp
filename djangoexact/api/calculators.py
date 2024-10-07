@@ -3483,8 +3483,12 @@ class SettlementCalculator(LandModuleCalculator):
 
         self.nitrous_ef = utils.get_or_raise(ipcc.NitrousEmissionFactor, {"moisture": moisture}, f"Nitrous EF not found for {moisture.name} moisture")
 
-        # TODO: Detach .biomass from SettlementEF and put it in ForestTotalBiomass
-        # TODO: Same thing for flu,fi,fmg
+        # TODO: Detach .biomass from SettlementEF and put it in ForestTotalBiomass, maybe?
+        # TODO: Same thing for flu,fi,fmg ???
+        """
+        # NOTE: Since biomass for Settlement is in another IPCC table, detached from the other biomass references for the other modules (e.g. ForestTotalBiomass),
+        I wonder if in a LUC scenario the reference values would be wrong, since the Settlement would only be able to access its own biomass reference values.
+        """
         if module.is_start():
             self.ef_start: ipcc.SettlementEF = utils.get_or_raise(ipcc.SettlementEF, {"settlement_type": module.settlement_type_start, "climate": climate, "moisture": moisture}, f"Settlement EF not found for {module.settlement_type_start.name}")
             self.flu_start = SimpleNamespace(value=self.ef_start.flu)
@@ -5917,41 +5921,19 @@ class OtherLandCalculator(LandModuleCalculator):
         module: OtherLand = self.data
         activity: Activity = module.activity
         project: Project = activity.project
-        luc: LandUseChange = module.land_use_change
 
-        climate: Climate = activity.climate_t2 or project.climate
         moisture: Moisture = activity.moisture_t2 or project.moisture
-        soil_type: SoilType = project.soil_type
 
         moisture_flt = {"moisture": moisture}
-        soil_flt = {"soil_type": soil_type}
-        cm = {"climate": climate, "moisture": moisture}
-
-        module_start = module_w = module_wo = module
-
-        if luc:
-            module_start, module_w, module_wo = luc.get_modules()
 
         if module.is_start():
-            self.flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-            self.fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.START)
-            self.fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.START)
             self.emission_factors_start = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
-            self.biomass_ef_start = utils.get_or_raise(ipcc.ForestTotalBiomass, cm | {"continent": project.country.region, "land_use_type": module.land_use_type_start}, f"ForestTotalBiomass for {module.land_use_type_start.name} land use type in {project.climate.name} climate and {moisture.name} moisture in {project.country.region.name} region does not exist")
 
         if module.is_with():
-            self.flu_w = get_flu_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
-            self.fmg_w = get_fmg_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
-            self.fi_w = get_fi_data(module_w, climate, moisture, utils.ScenarioTypes.WITH)
             self.emission_factors_w = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
-            self.biomass_ef_w = utils.get_or_raise(ipcc.TotalBiomassAfterDefo, cm | {"continent": project.country.region, "land_use_type": module.land_use_type_w}, f"ForestTotalBiomass for {module.land_use_type_w.name} land use type in {project.climate.name} climate and {moisture.name} moisture in {project.country.region.name} region does not exist")
 
         if module.is_without():
-            self.flu_wo = get_flu_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
-            self.fmg_wo = get_fmg_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
-            self.fi_wo = get_fi_data(module_wo, climate, moisture, utils.ScenarioTypes.WITHOUT)
             self.emission_factors_wo = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
-            self.biomass_ef_wo = utils.get_or_raise(ipcc.TotalBiomassAfterDefo, cm | {"continent": project.country.region, "land_use_type": module.land_use_type_wo}, f"ForestTotalBiomass for {module.land_use_type_wo.name} land use type in {project.climate.name} climate and {moisture.name} moisture in {project.country.region.name} region does not exist")
 
         if module.is_ready() and calculate:
             self.calculate()
