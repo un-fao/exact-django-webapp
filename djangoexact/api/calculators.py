@@ -1065,9 +1065,9 @@ class OtherLandUseCalculator(BaseCalculator):
             inputs_w = {
                 "end_module_has_growth": module_w.is_perennial() or module_w.is_forest(),
                 "initial_lu_biomass": biomass_initial.value,
-                "initial_lu_biomass_tier_2": module_start.get_biomass_t2(utils.ScenarioTypes.START),
+                "initial_lu_biomass_tier_2": module_start.biomass_t2_start,
                 "final_lu_biomass": biomass_final_w.value,
-                "final_lu_biomass_tier_2": module_w.get_biomass_t2(utils.ScenarioTypes.WITH),
+                "final_lu_biomass_tier_2": module_w.biomass_t2_w,
                 "c_n_ratio": c_n_ratio,
                 "moisture_emission_factor": som.value,
                 "combustion_factor": combustion_factor_w.value,
@@ -1108,9 +1108,9 @@ class OtherLandUseCalculator(BaseCalculator):
             inputs_wo = {
                 "end_module_has_growth": module_wo.is_perennial() or module_wo.is_forest(),
                 "initial_lu_biomass": biomass_initial.value,
-                "initial_lu_biomass_tier_2": module_start.get_biomass_t2(utils.ScenarioTypes.START),
+                "initial_lu_biomass_tier_2": module_start.biomass_t2_start,
                 "final_lu_biomass": biomass_final_wo.value,
-                "final_lu_biomass_tier_2": module_wo.get_biomass_t2(utils.ScenarioTypes.WITHOUT),
+                "final_lu_biomass_tier_2": module_wo.biomass_t2_wo,
                 "c_n_ratio": c_n_ratio,
                 "moisture_emission_factor": som.value,
                 "combustion_factor": combustion_factor_wo.value,
