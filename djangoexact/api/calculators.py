@@ -3439,16 +3439,11 @@ class SettlementCalculator(LandModuleCalculator):
         self.ef_w = SimpleNamespace(flu=0, fmg=0, fi=0, biomass=0)
         self.ef_wo = SimpleNamespace(flu=0, fmg=0, fi=0, biomass=0)
 
-        # self.biomass_ef_start: SimpleNamespace | ipcc.ForestTotalBiomass = SimpleNamespace(value=0)
-        # self.biomass_ef_w: SimpleNamespace | ipcc.TotalBiomassAfterDefo = SimpleNamespace(value=0)
-        # self.biomass_ef_wo: SimpleNamespace | ipcc.TotalBiomassAfterDefo = SimpleNamespace(value=0)
-
     def get_defaults(self, calculate=False) -> dict:
         log.debug("START SettlementCalculator.get_defaults")
         super().get_defaults(calculate)
 
         module: Settlement = self.data
-        activity: Activity = module.activity
         luc: LandUseChange = module.land_use_change
 
         climate: Climate = module.activity.climate_t2 or module.activity.project.climate
@@ -3463,21 +3458,18 @@ class SettlementCalculator(LandModuleCalculator):
             self.flu_start = SimpleNamespace(value=self.ef_start.flu)
             self.fi_start = SimpleNamespace(value=self.ef_start.fi)
             self.fmg_start = SimpleNamespace(value=self.ef_start.fmg)
-            # self.biomass_ef_start = utils.get_or_raise(ipcc.ForestTotalBiomass, cm | {"continent": project.country.region, "land_use_type": module.land_use_type_start}, f"Forest total biomass not found for {climate.name} climate, {moisture.name} moisture, {project.country.region.name} region and {module.land_use_type_start.name} land use type")
 
         if module.is_with():
             self.ef_w: ipcc.SettlementEF = utils.get_or_raise(ipcc.SettlementEF, {"settlement_type": module.settlement_type_w, "climate": climate, "moisture": moisture}, f"Settlement EF not found for {module.settlement_type_w.name}")
             self.flu_w = SimpleNamespace(value=self.ef_w.flu)
             self.fi_w = SimpleNamespace(value=self.ef_w.fi)
             self.fmg_w = SimpleNamespace(value=self.ef_w.fmg)
-            # self.biomass_ef_w = utils.get_or_raise(ipcc.TotalBiomassAfterDefo, cm | {"continent": project.country.region, "land_use_type": module.land_use_type_w}, f"Forest total biomass not found for {climate.name} climate, {moisture.name} moisture, {project.country.region.name} region and {module.land_use_type_w.name} land use type")
 
         if module.is_without():
             self.ef_wo: ipcc.SettlementEF = utils.get_or_raise(ipcc.SettlementEF, {"settlement_type": module.settlement_type_wo, "climate": climate, "moisture": moisture}, f"Settlement EF not found for {module.settlement_type_wo.name}")
             self.flu_wo = SimpleNamespace(value=self.ef_wo.flu)
             self.fi_wo = SimpleNamespace(value=self.ef_wo.fi)
             self.fmg_wo = SimpleNamespace(value=self.ef_wo.fmg)
-            # self.biomass_ef_wo = utils.get_or_raise(ipcc.TotalBiomassAfterDefo, cm | {"continent": project.country.region, "land_use_type": module.land_use_type_wo}, f"Forest total biomass not found for {climate.name} climate, {moisture.name} moisture, {project.country.region.name} region and {module.land_use_type_wo.name} land use type")
 
         if luc and module.is_start() and module.settlement_type_start.name.casefold() != "paved settlement":
             module_start, module_w, module_wo = luc.get_modules()
