@@ -1419,7 +1419,7 @@ class MinorSeasonFloodedRice(Rice, LandSubmodule):
 ##### Grassland and Livestock #####
 
 
-class Grassland(LandModuleFixed, AboveBelowGroundBiomassModule):
+class Grassland(LandModuleFixed, SingleBiomassModule, AboveBelowGroundBiomassModule):
     grassland_management_type_start = models.ForeignKey(GrasslandManagementType, on_delete=models.CASCADE, related_name="%(class)s_grassland_management_type_start", null=True, verbose_name=_("grassland_management_type_start"))
     grassland_management_type_w = models.ForeignKey(GrasslandManagementType, on_delete=models.CASCADE, related_name="%(class)s_grassland_management_type_w", null=True, verbose_name=_("grassland_management_type_w"))
     grassland_management_type_wo = models.ForeignKey(GrasslandManagementType, on_delete=models.CASCADE, related_name="%(class)s_grassland_management_type_wo", null=True, verbose_name=_("grassland_management_type_wo"))
