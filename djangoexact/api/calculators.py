@@ -1376,8 +1376,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_w.value,
                 "calculate_biomass": False,
-                "biomass_start_tier_2": self.module_w.get_biomass_t2(utils.ScenarioTypes.START),
-                "biomass_end_tier_2": self.module_w.get_biomass_t2(utils.ScenarioTypes.WITH),
+                "biomass_start_tier_2": self.module_w.biomass_t2_start,
+                "biomass_end_tier_2": self.module_w.biomass_t2_w,
             }
             log.debug("Inputs start w: %s", self.inputs_start_w)
 
@@ -1436,8 +1436,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
                 "calculate_biomass": False,
-                "biomass_start_tier_2": self.module_w.get_biomass_t2(utils.ScenarioTypes.START),
-                "biomass_end_tier_2": self.module_w.get_biomass_t2(utils.ScenarioTypes.WITH),
+                "biomass_start_tier_2": self.module_w.biomass_t2_start,
+                "biomass_end_tier_2": self.module_w.biomass_t2_wo,
             }
             log.debug("Inputs start wo: %s", self.inputs_start_wo)
 
@@ -1758,8 +1758,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_w.value,
                 "calculate_biomass": module.is_start() and module.is_with(),
-                "biomass_start_tier_2": self.module_start.get_biomass_t2(utils.ScenarioTypes.START),
-                "biomass_end_tier_2": self.module_w.get_biomass_t2(utils.ScenarioTypes.WITH),
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_w.biomass_t2_w,
                 "end_module_has_growth": self.end_module_has_growth_start_w,
             }
             log.debug("Inputs start w: %s", inputs_start_w)
@@ -1809,8 +1809,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
                 "calculate_biomass": module.is_start() and module.is_without(),
-                "biomass_start_tier_2": self.module_start.get_biomass_t2(utils.ScenarioTypes.START),
-                "biomass_end_tier_2": self.module_wo.get_biomass_t2(utils.ScenarioTypes.WITHOUT),
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
                 "end_module_has_growth": self.end_module_has_growth_start_wo,
             }
             log.debug("Input start wo: %s", inputs_start_wo)
@@ -1861,8 +1861,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "calculate_biomass": True,
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_w.value,
-                "biomass_start_tier_2": self.module_start.get_biomass_t2(utils.ScenarioTypes.START),
-                "biomass_end_tier_2": self.module_w.get_biomass_t2(utils.ScenarioTypes.WITH),
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_w.biomass_t2_w,
                 "end_module_has_growth": self.end_module_has_growth_w,
             }
             log.debug("Inputs w: %s", inputs_w)
@@ -1913,8 +1913,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "calculate_biomass": True,
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
-                "biomass_start_tier_2": self.module_start.get_biomass_t2(utils.ScenarioTypes.START),
-                "biomass_end_tier_2": self.module_wo.get_biomass_t2(utils.ScenarioTypes.WITHOUT),
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
                 "end_module_has_growth": self.end_module_has_growth_wo,
             }
             log.debug("Inputs wo: %s", inputs_wo)
@@ -2365,7 +2365,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "methane_ef": self.ef.ch4,
                 "nitrous_ef": self.ef.n2o,
                 "agb_ref": self.agb.value,
-                "agb_tier_2": module.get_biomass_t2(utils.ScenarioTypes.START),
+                "agb_tier_2": module.biomass_t2_start,
                 "cf_ref": self.cf.value,
                 "cf_tier_2": module.combustion_factor_t2_start,
                 "soc_start_default": self.soc.value,
@@ -2413,7 +2413,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "methane_ef": self.ef.ch4,
                 "nitrous_ef": self.ef.n2o,
                 "agb_ref": self.agb.value,
-                "agb_tier_2": module.get_biomass_t2(utils.ScenarioTypes.START),
+                "agb_tier_2": module.biomass_t2_start,
                 "cf_ref": self.cf.value,
                 "cf_tier_2": module.combustion_factor_t2_start,
                 "soc_start_default": self.soc.value,
@@ -2464,7 +2464,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "methane_ef": self.ef.ch4,
                 "nitrous_ef": self.ef.n2o,
                 "agb_ref": self.agb.value,
-                "agb_tier_2": module.get_biomass_t2(utils.ScenarioTypes.WITH),
+                "agb_tier_2": module.biomass_t2_w,
                 "cf_ref": self.cf.value,
                 "cf_tier_2": module.combustion_factor_t2_w,
                 "soc_start_default": self.soc.value,
@@ -2515,7 +2515,7 @@ class GrasslandCalculator(LandModuleCalculator):
                 "methane_ef": self.ef.ch4,
                 "nitrous_ef": self.ef.n2o,
                 "agb_ref": self.agb.value,
-                "agb_tier_2": module.get_biomass_t2(utils.ScenarioTypes.WITHOUT),
+                "agb_tier_2": module.biomass_t2_wo,
                 "cf_ref": self.cf.value,
                 "cf_tier_2": module.combustion_factor_t2_wo,
                 "soc_start_default": self.soc.value,
