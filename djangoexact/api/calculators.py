@@ -618,9 +618,12 @@ class LandModuleCalculator(BaseCalculator):
         self.fmg_wo = get_fmg_data(self.module_wo, self.project.climate, self.project.moisture, utils.ScenarioTypes.WITHOUT)
         self.flu_wo = get_flu_data(self.module_wo, self.project.climate, self.project.moisture, utils.ScenarioTypes.WITHOUT)
 
-        self.biomass_ef_start = utils.get_or_raise(ipcc.ForestTotalBiomass, climate_flt | moisture_flt | region_flt | {"land_use_type": self.module_start.land_use_type_start}, f"ForestTotalBiomass for {self.module_start.land_use_type_start.name} in {self.project.climate.name} climate, {self.project.moisture.name} moisture, and {self.project.country.region.name} region does not exist")
-        self.biomass_ef_w = utils.get_or_raise(ipcc.TotalBiomassAfterDefo, climate_flt | moisture_flt | region_flt | {"land_use_type": self.module_w.land_use_type_w}, f"TotalBiomassAfterDefo for {self.module_w.land_use_type_w.name} in {self.project.climate.name} climate, {self.project.moisture.name} moisture, and {self.project.country.region.name} region does not exist")
-        self.biomass_ef_wo = utils.get_or_raise(ipcc.TotalBiomassAfterDefo, climate_flt | moisture_flt | region_flt | {"land_use_type": self.module_wo.land_use_type_wo}, f"TotalBiomassAfterDefo for {self.module_wo.land_use_type_wo.name} in {self.project.climate.name} climate, {self.project.moisture.name} moisture, and {self.project.country.region.name} region does not exist")
+        if self.module.is_start():
+            self.biomass_ef_start = utils.get_or_raise(ipcc.ForestTotalBiomass, climate_flt | moisture_flt | region_flt | {"land_use_type": self.module_start.land_use_type_start}, f"ForestTotalBiomass for {self.module_start.land_use_type_start.name} in {self.project.climate.name} climate, {self.project.moisture.name} moisture, and {self.project.country.region.name} region does not exist")
+        if self.module.is_with():
+            self.biomass_ef_w = utils.get_or_raise(ipcc.TotalBiomassAfterDefo, climate_flt | moisture_flt | region_flt | {"land_use_type": self.module_w.land_use_type_w}, f"TotalBiomassAfterDefo for {self.module_w.land_use_type_w.name} in {self.project.climate.name} climate, {self.project.moisture.name} moisture, and {self.project.country.region.name} region does not exist")
+        if self.module.is_without():
+            self.biomass_ef_wo = utils.get_or_raise(ipcc.TotalBiomassAfterDefo, climate_flt | moisture_flt | region_flt | {"land_use_type": self.module_wo.land_use_type_wo}, f"TotalBiomassAfterDefo for {self.module_wo.land_use_type_wo.name} in {self.project.climate.name} climate, {self.project.moisture.name} moisture, and {self.project.country.region.name} region does not exist")
 
         # NOTE: Added to take into account biomass growth in final land use
         if self.luc and self.module.is_with() or self.module.is_without():
@@ -1608,9 +1611,6 @@ class PerennialCropCalculator(LandModuleCalculator):
         self.bg_default_start: ipcc.PerennialBGB | SimpleNamespace = SimpleNamespace(value=0)
         self.bg_default_w: ipcc.PerennialBGB | SimpleNamespace = SimpleNamespace(value=0)
         self.bg_default_wo: ipcc.PerennialBGB | SimpleNamespace = SimpleNamespace(value=0)
-        self.biomass_ef_start: ipcc.ForestTotalBiomass | SimpleNamespace = SimpleNamespace(value=0)
-        self.biomass_ef_w: ipcc.TotalBiomassAfterDefo | SimpleNamespace = SimpleNamespace(value=0)
-        self.biomass_ef_wo: ipcc.TotalBiomassAfterDefo | SimpleNamespace = SimpleNamespace(value=0)
 
         # Calculated by math model
         self.residue_availability_t2_start: SimpleNamespace = SimpleNamespace(value=0)
@@ -1660,21 +1660,18 @@ class PerennialCropCalculator(LandModuleCalculator):
             self.ag_default_start = utils.get_or_raise(ipcc.PerennialAGB, cmc | lut_start_flt, f"PerennialAGB for {module.land_use_type_start.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_default")
             self.agb_max_c_start = utils.get_or_raise(ipcc.PerennialMaxAGB, climate_flt | lut_start_flt, f"PerennialMaxAGB for {module.land_use_type_start.name} in {climate.name} climate does not exist", method="get_or_default")
             self.bg_default_start = utils.get_or_raise(ipcc.PerennialBGB, cmc | lut_start_flt, f"PerennialBGB for {module.land_use_type_start.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_default")
-            self.biomass_ef_start = utils.get_or_raise(ipcc.ForestTotalBiomass, cmc | lut_start_flt, f"ForestTotalBiomass for {module.land_use_type_start.name} in {climate.name} climate, {moisture.name} moisture in {region.name} region does not exist", method="get_or_default")
         if module.is_with():
             self.default_emission_factor_w = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
             self.fires_combustion_factor_w = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_w_flt, f"FiresCombustionFactor for {module.land_use_type_w.name} does not exist", method="get_or_default")
             self.ag_default_w = utils.get_or_raise(ipcc.PerennialAGB, cmc | lut_w_flt, f"PerennialAGB for {module.land_use_type_w.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_default")
             self.agb_max_c_w = utils.get_or_raise(ipcc.PerennialMaxAGB, climate_flt | lut_w_flt, f"PerennialMaxAGB for {module.land_use_type_w.name} in {climate.name} climate does not exist", method="get_or_default")
             self.bg_default_w = utils.get_or_raise(ipcc.PerennialBGB, cmc | lut_w_flt, f"PerennialBGB for {module.land_use_type_w.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_default")
-            self.biomass_ef_w = utils.get_or_raise(ipcc.TotalBiomassAfterDefo, cmc | lut_w_flt, f"ForestTotalBiomass for {module.land_use_type_w.name} in {climate.name} climate, {moisture.name} moisture in {region.name} region does not exist", method="get_or_default")
         if module.is_without():
             self.default_emission_factor_wo = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {moisture.name} moisture does not exist")
             self.fires_combustion_factor_wo = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_wo_flt, f"FiresCombustionFactor for {module.land_use_type_wo.name} does not exist")
             self.ag_default_wo = utils.get_or_raise(ipcc.PerennialAGB, cmc | lut_wo_flt, f"PerennialAGB for {module.land_use_type_wo.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_default")
             self.agb_max_c_wo = utils.get_or_raise(ipcc.PerennialMaxAGB, climate_flt | lut_wo_flt, f"PerennialMaxAGB for {module.land_use_type_wo.name} in {climate.name} climate does not exist", method="get_or_default")
             self.bg_default_wo = utils.get_or_raise(ipcc.PerennialBGB, cmc | lut_wo_flt, f"PerennialBGB for {module.land_use_type_wo.name} in {climate.name} climate and {moisture.name} moisture does not exist", method="get_or_default")
-            self.biomass_ef_wo = utils.get_or_raise(ipcc.TotalBiomassAfterDefo, cmc | lut_wo_flt, f"ForestTotalBiomass for {module.land_use_type_wo.name} in {climate.name} climate, {moisture.name} moisture in {region.name} region does not exist", method="get_or_default")
 
         # Perennial from LUC
         if self.module_start.module_type.is_luc and module.is_with() and not module.is_start():
