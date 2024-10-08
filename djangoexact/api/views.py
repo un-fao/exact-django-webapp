@@ -1499,19 +1499,6 @@ def generic_viewset(model: Model):
         serializer_class = get_model_serializer(model)
         filterset_class = filters.get_model_filter(model)
 
-        def get_serializer_context(self):
-            # Activate language in the context of the request
-            lang = self.request.query_params.get("lang")
-            if lang:
-                translation.activate(lang)
-            context = super().get_serializer_context()
-            return context
-
-        def finalize_response(self, request, response, *args, **kwargs):
-            # Deactivate the language after the response is generated
-            translation.deactivate()
-            return super().finalize_response(request, response, *args, **kwargs)
-
         def get_queryset(self):
             for field in model._meta.get_fields():
                 if field.name == "active":
