@@ -29,10 +29,6 @@ for sheet_name in wb.sheetnames:
         continue
 
     module_type = api_models.ModuleType.objects.get(class_name=class_name)
-    try:
-        pre_existing_def = api_models.Definition.objects.get(module_type=module_type)
-    except api_models.Definition.DoesNotExist:
-        pre_existing_def = api_models.Definition(module_type=module_type)
 
     # Open sheet
     sheet = wb[sheet_name]
@@ -44,6 +40,10 @@ for sheet_name in wb.sheetnames:
 
     log.debug(f"Definitions: {definitions}")
 
-    # Update the definition object with the new definitions
-    pre_existing_def.definitions = definitions
-    pre_existing_def.save()
+    # If field definitions already exist for this module type and field name, update the description
+    for field_name, description in definitions.items():
+        api_models.FieldDefinition.objects.update_or_create(
+            module_type=module_type,
+            field_name=field_name,
+            defaults={"description": description},
+        )
