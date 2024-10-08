@@ -234,3 +234,8 @@ class MoistureTranslationOptions(NameOnlyTranslationOptions):
 @register(models.Region)
 class RegionTranslationOptions(NameOnlyTranslationOptions):
     pass
+
+
+@register(models.FieldDefinition)
+class FieldDefinitionTranslationOptions(TranslationOptions):
+    fields = ("description",)
