@@ -48,15 +48,18 @@ class AnnualCropland(LandModule):
     n_content_ag_minor: float
     ratio_bg_ag_minor: float
     n_content_bg_minor: float
+    yield_main_tier_2: Optional[float]
+    yield_minor_tier_2: Optional[float]
 
     def __post_init__(self):
         super().__post_init__()
 
+        self.yield_main = self.yield_main_tier_2 or self.yield_value_main
+        self.yield_minor = self.yield_minor_tier_2 or self.yield_value_minor
+
         # NOTE: this is a default value that is calculated based on the input values, needed for the frontend
-        if self.yield_value_main:
-            self.ag_residue_main_tier_2_default = self.yield_value_main * self.n_estimation_slope_main + self.n_estimation_intercept_main
-        if self.yield_value_minor:
-            self.ag_residue_minor_tier_2_default = self.yield_value_minor * self.n_estimation_slope_minor + self.n_estimation_intercept_minor
+        self.ag_residue_main_tier_2_default = self.yield_main * self.n_estimation_slope_main + self.n_estimation_intercept_main
+        self.ag_residue_minor_tier_2_default = self.yield_minor * self.n_estimation_slope_minor + self.n_estimation_intercept_minor
         
     def calculate_emissions(self):
         def calculate_emissions_soil():
@@ -84,7 +87,7 @@ class AnnualCropland(LandModule):
         def calculate_emissions_residue_burning():
             ################## COMPUTATION OF AMOUNT OF KG OF METHANE ###################
 
-            yield_value_main = self.yield_value_main * 1000
+            yield_value_main = self.yield_main * 1000
             yield_value_minor = self.yield_value_minor * 1000 if self.yield_value_minor else None
 
             ag_residue_main = self.residue_main_tier_2 * 1000 if self.residue_main_tier_2 else yield_value_main * self.n_estimation_slope_main + self.n_estimation_intercept_main
