@@ -1048,6 +1048,22 @@ class SingleBiomassModule(BiomassModule):
     def get_biomass_t2(self, scenario: utils.ScenarioTypes):
         return getattr(self, f"biomass_t2_{scenario.value}", None)
 
+    def get_biomass_ef(self, scenario: utils.ScenarioTypes) -> ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo:
+        BiomassModel: models.Model = ipcc.ForestTotalBiomass if scenario == utils.ScenarioTypes.START else ipcc.TotalBiomassAfterDefo
+        climate = self.activity.climate_t2 if self.activity.climate_t2 is not None else self.activity.project.climate
+        moisture = self.activity.moisture_t2 if self.activity.moisture_t2 is not None else self.activity.project.moisture
+        continent = self.activity.project.country.region
+        land_use_type = getattr(self, f"land_use_type_{scenario.value}", None)
+        if land_use_type is None:
+            raise exceptions.ValidationError(f"Missing land use type for {scenario.value} scenario")
+
+        try:
+            return BiomassModel.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
+        except BiomassModel.DoesNotExist:
+            if getattr(self, f"biomass_t2_{scenario.value}", None) is None:
+                raise exceptions.ValidationError(f"Missing biomass data for {land_use_type.name}, {climate.name}, {moisture.name}, {continent.name}. Please provide tier2 value.")
+            return None
+
 
 class ResidueAvailability(models.Model):
     residue_availability_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("residue_availability_t2_start"))
@@ -1085,6 +1101,22 @@ class AboveBelowGroundBiomassModule(BiomassModule):
         elif bgb_t2 is not None:
             return bgb_t2
         else:
+            return None
+
+    def get_biomass_ef(self, scenario: utils.ScenarioTypes):
+        BiomassModel: models.Model = ipcc.ForestTotalBiomass if scenario == utils.ScenarioTypes.START else ipcc.TotalBiomassAfterDefo
+        climate = self.activity.climate_t2 if self.activity.climate_t2 is not None else self.activity.project.climate
+        moisture = self.activity.moisture_t2 if self.activity.moisture_t2 is not None else self.activity.project.moisture
+        continent = self.activity.project.country.region
+        land_use_type = getattr(self, f"land_use_type_{scenario.value}", None)
+        if land_use_type is None:
+            raise exceptions.ValidationError(f"Missing land use type for {scenario.value} scenario")
+
+        try:
+            return BiomassModel.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
+        except BiomassModel.DoesNotExist:
+            if self.get_biomass_t2(scenario) is None:
+                raise exceptions.ValidationError(f"Missing biomass data for {land_use_type.name}, {climate.name}, {moisture.name}, {continent.name}. Please provide tier2 value.")
             return None
 
 
