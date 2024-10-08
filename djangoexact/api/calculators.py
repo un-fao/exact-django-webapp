@@ -524,29 +524,23 @@ class LandModuleCalculator(BaseCalculator):
     def __init__(self, module: LandModule) -> None:
         super().__init__(module)
 
-        self.soc: ipcc.SoilOrganicCarbon | SimpleNamespace = SimpleNamespace(value=0)
-        self.som: ipcc.NitrousEmissionFactor | SimpleNamespace = SimpleNamespace(value=0)
+        self.soc: ipcc.SoilOrganicCarbon = ipcc.SoilOrganicCarbon(value=0)
+        self.som: ipcc.NitrousEmissionFactor = ipcc.NitrousEmissionFactor(value=0)
 
-        self.fi_start: SimpleNamespace | ipcc.FIData = SimpleNamespace(value=1)
-        self.fmg_start: SimpleNamespace | ipcc.FMGData = SimpleNamespace(value=1)
-        self.flu_start: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=1)
-        self.fi_w: SimpleNamespace | ipcc.FIData = SimpleNamespace(value=1)
-        self.fmg_w: SimpleNamespace | ipcc.FMGData = SimpleNamespace(value=1)
-        self.flu_w: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=1)
-        self.fi_wo: SimpleNamespace | ipcc.FIData = SimpleNamespace(value=1)
-        self.fmg_wo: SimpleNamespace | ipcc.FMGData = SimpleNamespace(value=1)
-        self.flu_wo: SimpleNamespace | ipcc.FLUData = SimpleNamespace(value=1)
+        self.fi_start: ipcc.FIData = ipcc.FIData(value=0)
+        self.fmg_start: ipcc.FMGData = ipcc.FMGData(value=0)
+        self.flu_start: ipcc.FLUData = ipcc.FLUData(value=0)
+        self.fi_w: ipcc.FIData = ipcc.FIData(value=0)
+        self.fmg_w: ipcc.FMGData = ipcc.FMGData(value=0)
+        self.flu_w: ipcc.FLUData = ipcc.FLUData(value=0)
+        self.fi_wo: ipcc.FIData = ipcc.FIData(value=0)
+        self.fmg_wo: ipcc.FMGData = ipcc.FMGData(value=0)
+        self.flu_wo: ipcc.FLUData = ipcc.FLUData(value=0)
 
         self.module: LandModule | SingleBiomassModule = module
         self.luc: LandUseChange = self.module.land_use_change
         self.activity: Activity = getattr(module, "parent", module).activity
         self.project: Project = self.activity.project
-
-        self.climate: Climate = self.activity.climate_t2 or self.project.climate
-        self.moisture: Moisture = self.activity.moisture_t2 or self.project.moisture
-        self.region: Region = self.project.country.region
-        self.change_rate: ChangeRate = self.activity.change_rate
-
         self.area = self.luc.area if self.luc else getattr(module, "parent", module).area
 
         self.module_start = self.module_w = self.module_wo = self.module
@@ -554,6 +548,13 @@ class LandModuleCalculator(BaseCalculator):
         self.module_start: LandModule | SingleBiomassModule
         self.module_w: LandModule | SingleBiomassModule
         self.module_wo: LandModule | SingleBiomassModule
+
+        self.climate: Climate = self.activity.climate_t2 or self.project.climate
+        self.moisture: Moisture = self.activity.moisture_t2 or self.project.moisture
+        self.soil_type: SoilType = self.activity.soil_type_t2 or self.project.soil_type
+        self.country: Country = self.project.country
+        self.region: Region = self.project.country.region
+        self.change_rate: ChangeRate = self.activity.change_rate
 
         self.biomass_ef_start: ipcc.ForestTotalBiomass = ipcc.ForestTotalBiomass(value=0)
         self.biomass_ef_w: ipcc.TotalBiomassAfterDefo = ipcc.TotalBiomassAfterDefo(value=0)
@@ -567,63 +568,59 @@ class LandModuleCalculator(BaseCalculator):
 
     def get_defaults(self, calculate=False) -> dict:
 
-        climate_flt = {"climate": self.project.climate}
-        moisture_flt = {"moisture": self.project.moisture}
-        soil_flt = {"soil_type": self.project.soil_type}
-        region_flt = {"continent": self.project.country.region}
+        moisture_flt = {"moisture": self.moisture}
 
-        self.soc = ipcc.SoilOrganicCarbon.objects.filter(**climate_flt, **moisture_flt, **soil_flt).first()
+        try:
+            self.soc = ipcc.SoilOrganicCarbon.objects.get(climate=self.climate, moisture=self.moisture, soil_type=self.soil_type)
+            self.soc_start = self.soc_w = self.soc_wo = self.soc
+        except ipcc.SoilOrganicCarbon.DoesNotExist:
+            missing_scenarios = []
 
-        missing_scenarios = []
+            # NOTE: Hierarchical order of precedence for SOC: Project < Activity < Module
+            if self.project.soc_ref_t2 is not None:
+                self.soc_start = self.soc_w = self.soc_wo = SimpleNamespace(value=self.project.soc_ref_t2)
 
-        # NOTE: Hierarchical order of precedence for SOC: Project < Activity < Module
+            if self.activity.soc_t2 is not None:
+                self.soc_start = self.soc_w = self.soc_wo = SimpleNamespace(value=self.activity.soc_t2)
 
-        self.soc_start = self.soc_w = self.soc_wo = self.soc
+            if self.module.soc_t2_start is not None:
+                self.soc_start = SimpleNamespace(value=self.module.soc_t2_start)
 
-        if self.project.soc_ref_t2 is not None:
-            self.soc_start = self.soc_w = self.soc_wo = SimpleNamespace(value=self.project.soc_ref_t2)
+            if self.module.soc_t2_w is not None:
+                self.soc_w = SimpleNamespace(value=self.module.soc_t2_w)
 
-        if self.activity.soc_t2 is not None:
-            self.soc_start = self.soc_w = self.soc_wo = SimpleNamespace(value=self.activity.soc_t2)
+            if self.module.soc_t2_wo is not None:
+                self.soc_wo = SimpleNamespace(value=self.module.soc_t2_wo)
 
-        if self.module.soc_t2_start is not None:
-            self.soc_start = SimpleNamespace(value=self.module.soc_t2_start)
+            if self.soc is None and not all([self.soc_start, self.soc_w, self.soc_wo]):
+                if self.module.is_start() and not self.soc_start:
+                    missing_scenarios.append("Start")
+                if self.module.is_with() and not self.soc_w:
+                    missing_scenarios.append("With")
+                if self.module.is_without() and not self.soc_wo:
+                    missing_scenarios.append("Without")
 
-        if self.module.soc_t2_w is not None:
-            self.soc_w = SimpleNamespace(value=self.module.soc_t2_w)
+                if missing_scenarios:
+                    raise Exception(f"SOC for {self.climate.name} climate, {self.moisture.name} moisture, and {self.soil_type.name} soil type is missing. Please insert T2 values for the following scenarios: {', '.join(missing_scenarios)}")
 
-        if self.module.soc_t2_wo is not None:
-            self.soc_wo = SimpleNamespace(value=self.module.soc_t2_wo)
+        self.som = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {self.climate.name} moisture does not exist")
 
-        if self.soc is None and not all([self.soc_start, self.soc_w, self.soc_wo]):
-            if self.module.is_start() and not self.soc_start:
-                missing_scenarios.append("Start")
-            if self.module.is_with() and not self.soc_w:
-                missing_scenarios.append("With")
-            if self.module.is_without() and not self.soc_wo:
-                missing_scenarios.append("Without")
-
-            if missing_scenarios:
-                raise Exception(f"SOC for {self.project.climate.name} climate, {self.project.moisture.name} moisture, and {self.project.soil_type.name} soil type is missing. Please insert T2 values for the following scenarios: {', '.join(missing_scenarios)}")
-
-        self.som = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {self.project.moisture.name} moisture does not exist")
-
-        self.fi_start = get_fi_data(self.module_start, self.project.climate, self.project.moisture, utils.ScenarioTypes.START)
-        self.fmg_start = get_fmg_data(self.module_start, self.project.climate, self.project.moisture, utils.ScenarioTypes.START)
-        self.flu_start = get_flu_data(self.module_start, self.project.climate, self.project.moisture, utils.ScenarioTypes.START)
-        self.fi_w = get_fi_data(self.module_w, self.project.climate, self.project.moisture, utils.ScenarioTypes.WITH)
-        self.fmg_w = get_fmg_data(self.module_w, self.project.climate, self.project.moisture, utils.ScenarioTypes.WITH)
-        self.flu_w = get_flu_data(self.module_w, self.project.climate, self.project.moisture, utils.ScenarioTypes.WITH)
-        self.fi_wo = get_fi_data(self.module_wo, self.project.climate, self.project.moisture, utils.ScenarioTypes.WITHOUT)
-        self.fmg_wo = get_fmg_data(self.module_wo, self.project.climate, self.project.moisture, utils.ScenarioTypes.WITHOUT)
-        self.flu_wo = get_flu_data(self.module_wo, self.project.climate, self.project.moisture, utils.ScenarioTypes.WITHOUT)
+        self.fi_start = get_fi_data(self.module_start, self.climate, self.moisture, utils.ScenarioTypes.START)
+        self.fmg_start = get_fmg_data(self.module_start, self.climate, self.moisture, utils.ScenarioTypes.START)
+        self.flu_start = get_flu_data(self.module_start, self.climate, self.moisture, utils.ScenarioTypes.START)
+        self.fi_w = get_fi_data(self.module_w, self.climate, self.moisture, utils.ScenarioTypes.WITH)
+        self.fmg_w = get_fmg_data(self.module_w, self.climate, self.moisture, utils.ScenarioTypes.WITH)
+        self.flu_w = get_flu_data(self.module_w, self.climate, self.moisture, utils.ScenarioTypes.WITH)
+        self.fi_wo = get_fi_data(self.module_wo, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
+        self.fmg_wo = get_fmg_data(self.module_wo, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
+        self.flu_wo = get_flu_data(self.module_wo, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
 
         if self.module.is_start():
-            self.biomass_ef_start = utils.get_or_raise(ipcc.ForestTotalBiomass, climate_flt | moisture_flt | region_flt | {"land_use_type": self.module_start.land_use_type_start}, f"ForestTotalBiomass for {self.module_start.land_use_type_start.name} in {self.project.climate.name} climate, {self.project.moisture.name} moisture, and {self.project.country.region.name} region does not exist")
+            self.biomass_ef_start = self.module.get_biomass_ef(utils.ScenarioTypes.START)
         if self.module.is_with():
-            self.biomass_ef_w = utils.get_or_raise(ipcc.TotalBiomassAfterDefo, climate_flt | moisture_flt | region_flt | {"land_use_type": self.module_w.land_use_type_w}, f"TotalBiomassAfterDefo for {self.module_w.land_use_type_w.name} in {self.project.climate.name} climate, {self.project.moisture.name} moisture, and {self.project.country.region.name} region does not exist")
+            self.biomass_ef_w = self.module.get_biomass_ef(utils.ScenarioTypes.WITH)
         if self.module.is_without():
-            self.biomass_ef_wo = utils.get_or_raise(ipcc.TotalBiomassAfterDefo, climate_flt | moisture_flt | region_flt | {"land_use_type": self.module_wo.land_use_type_wo}, f"TotalBiomassAfterDefo for {self.module_wo.land_use_type_wo.name} in {self.project.climate.name} climate, {self.project.moisture.name} moisture, and {self.project.country.region.name} region does not exist")
+            self.biomass_ef_wo = self.module.get_biomass_ef(utils.ScenarioTypes.WITHOUT)
 
         # NOTE: Added to take into account biomass growth in final land use
         if self.luc and self.module.is_with() or self.module.is_without():
@@ -1349,8 +1346,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
                 "rate_type": change_rate.name,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
+                "soc_start_default": self.soc_start.value,
+                "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
                 "soc_end_tier_2": self.module_w.soc_t2_w,
                 "fmg_start_default": self.fmg_start.value,
@@ -1409,8 +1406,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
                 "rate_type": change_rate.name,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
+                "soc_start_default": self.soc_start.value,
+                "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
                 "soc_end_tier_2": self.module_wo.soc_t2_wo,
                 "fmg_start_default": self.fmg_start.value,
@@ -1472,8 +1469,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
                 "rate_type": change_rate.name,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
+                "soc_start_default": self.soc_start.value,
+                "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
                 "soc_end_tier_2": self.module_w.soc_t2_w,
                 "fmg_start_default": self.fmg_start.value,
@@ -1535,8 +1532,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
                 "rate_type": change_rate.name,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
+                "soc_start_default": self.soc_start.value,
+                "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
                 "soc_end_tier_2": self.module_wo.soc_t2_wo,
                 "fmg_start_default": self.fmg_start.value,
@@ -1752,8 +1749,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "agb_maximum_c": self.agb_max_c_start.value,
                 "bgb_rate_default": self.bg_default_start.value,
                 "bgb_rate_tier_2": module.bgb_t2_start,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
+                "soc_start_default": self.soc_start.value,
+                "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": module.soc_t2_start,
                 "soc_end_tier_2": module.soc_t2_w,
                 "fmg_start_default": self.fmg_start.value,
@@ -1803,8 +1800,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "agb_maximum_c": self.agb_max_c_start.value,
                 "bgb_rate_default": self.bg_default_start.value,
                 "bgb_rate_tier_2": module.bgb_t2_start,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
+                "soc_start_default": self.soc_start.value,
+                "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
                 "soc_end_tier_2": self.module_wo.soc_t2_wo,
                 "fmg_start_default": self.fmg_start.value,
@@ -1855,8 +1852,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "agb_maximum_c": self.agb_max_c_w.value,
                 "bgb_rate_default": self.bg_default_w.value,
                 "bgb_rate_tier_2": module.bgb_t2_w,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
+                "soc_start_default": self.soc_start.value,
+                "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
                 "soc_end_tier_2": self.module_w.soc_t2_w,
                 "fmg_start_default": self.fmg_start.value,
@@ -1907,8 +1904,8 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "agb_maximum_c": self.agb_max_c_wo.value,
                 "bgb_rate_default": self.bg_default_wo.value,
                 "bgb_rate_tier_2": module.bgb_t2_wo,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
+                "soc_start_default": self.soc_start.value,
+                "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
                 "soc_end_tier_2": self.module_wo.soc_t2_wo,
                 "fmg_start_default": self.fmg_start.value,
@@ -2098,8 +2095,8 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "methane_constant": self.project.gwp.ch4,
                 "cultivation_period_ref": self.efc.cultivation_period,
                 "cultivation_period_tier_2": module.cultivation_period_t2_start,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
+                "soc_start_default": self.soc_start.value,
+                "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": getattr(module, "soc_t2_start", None),
                 "soc_end_tier_2": getattr(module, "soc_t2_w", None),
                 "fmg_start_default": self.fmg_start.value,
@@ -2156,8 +2153,8 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "methane_constant": self.project.gwp.ch4,
                 "cultivation_period_ref": self.efc.cultivation_period,
                 "cultivation_period_tier_2": module.cultivation_period_t2_start,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
+                "soc_start_default": self.soc_start.value,
+                "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": getattr(module, "soc_t2_start", None),
                 "soc_end_tier_2": getattr(module, "soc_t2_wo", None),
                 "fmg_start_default": self.fmg_start.value,
@@ -2215,8 +2212,8 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "methane_constant": self.project.gwp.ch4,
                 "cultivation_period_ref": self.efc.cultivation_period,
                 "cultivation_period_tier_2": module.cultivation_period_t2_w,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
+                "soc_start_default": self.soc_start.value,
+                "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": getattr(module, "soc_t2_start", None),
                 "soc_end_tier_2": getattr(module, "soc_t2_w", None),
                 "fmg_start_default": self.fmg_start.value,
@@ -2274,8 +2271,8 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "methane_constant": self.project.gwp.ch4,
                 "cultivation_period_ref": self.efc.cultivation_period,
                 "cultivation_period_tier_2": module.cultivation_period_t2_wo,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
+                "soc_start_default": self.soc_start.value,
+                "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": getattr(module, "soc_t2_start", None),
                 "soc_end_tier_2": getattr(module, "soc_t2_wo", None),
                 "fmg_start_default": self.fmg_start.value,
@@ -2400,8 +2397,8 @@ class GrasslandCalculator(LandModuleCalculator):
                 "agb_tier_2": module.agb_t2_start,
                 "cf_ref": self.cf.value,
                 "cf_tier_2": module.combustion_factor_t2_start,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
+                "soc_start_default": self.soc_start.value,
+                "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": module.soc_t2_start,
                 "soc_end_tier_2": module.soc_t2_w,
                 "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
@@ -2448,8 +2445,8 @@ class GrasslandCalculator(LandModuleCalculator):
                 "agb_tier_2": module.agb_t2_start,
                 "cf_ref": self.cf.value,
                 "cf_tier_2": module.combustion_factor_t2_start,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
+                "soc_start_default": self.soc_start.value,
+                "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": module.soc_t2_start,
                 "soc_end_tier_2": module.soc_t2_wo,
                 "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
@@ -2499,8 +2496,8 @@ class GrasslandCalculator(LandModuleCalculator):
                 "agb_tier_2": module.agb_t2_w,
                 "cf_ref": self.cf.value,
                 "cf_tier_2": module.combustion_factor_t2_w,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
+                "soc_start_default": self.soc_start.value,
+                "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": module.soc_t2_start,
                 "soc_end_tier_2": module.soc_t2_w,
                 "calculate_soc_som": CALCULATE_SOC_SOM_W,
@@ -2550,8 +2547,8 @@ class GrasslandCalculator(LandModuleCalculator):
                 "agb_tier_2": module.agb_t2_wo,
                 "cf_ref": self.cf.value,
                 "cf_tier_2": module.combustion_factor_t2_wo,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
+                "soc_start_default": self.soc_start.value,
+                "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": module.soc_t2_start,
                 "soc_end_tier_2": module.soc_t2_wo,
                 "calculate_soc_som": CALCULATE_SOC_SOM_WO,
@@ -2671,9 +2668,9 @@ class SmallFisheryCalculator(BaseCalculator):
                 raise ValueError("Default FUI does not exist. Please provide a tier 2 value for FUI for the relevant scenarios.")
 
         try:
-            self.electricity_emission = ipcc.ElectricityEmission.objects.get(country=self.project.country)
+            self.electricity_emission = ipcc.ElectricityEmission.objects.get(country=self.country)
         except ipcc.ElectricityEmission.DoesNotExist:
-            raise ValueError(f"Electricity emission for {self.project.country.name} does not exist")
+            raise ValueError(f"Electricity emission for {self.country.name} does not exist")
 
     def calculate(self) -> list[Result]:
         """
@@ -2858,7 +2855,7 @@ class LargeFisheryCalculator(BaseCalculator):
                 raise ValueError("Default kw per tonne does not exist. Please provide a tier 2 value for kw per tonne for the relevant scenarios.")
 
         try:
-            self.electricity_country = self.module.inshore_ice_production_country_t2 if self.module.inshore_ice_production_country_t2 else self.project.country
+            self.electricity_country = self.module.inshore_ice_production_country_t2 if self.module.inshore_ice_production_country_t2 else self.country
             self.electricity_emission = ipcc.ElectricityEmission.objects.get(country=self.electricity_country)
         except ipcc.ElectricityEmission.DoesNotExist:
             raise ValueError(f"Electricity emission for {self.electricity_country.name} does not exist")
@@ -3518,7 +3515,7 @@ class SettlementCalculator(LandModuleCalculator):
                 fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.WITHOUT)
                 fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.WITHOUT)
 
-                self.soc.value = self.soc.value * flu_start * fi_start * fmg_start  # SOCinitial
+                self.soc_start.value = self.soc_start.value * flu_start * fi_start * fmg_start  # SOCinitial
 
         log.debug("END SettlementCalculator.get_defaults")
 
@@ -3550,8 +3547,8 @@ class SettlementCalculator(LandModuleCalculator):
                 "rate_type": activity.change_rate.name,
                 "nitrous_constant": project.gwp.n2o,
                 "ef_nitrous_som": self.nitrous_ef.value,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
+                "soc_start_default": self.soc_start.value,
+                "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
                 "soc_end_tier_2": self.module_w.soc_t2_w,
                 "calculate_soc_som": False,
@@ -3586,8 +3583,8 @@ class SettlementCalculator(LandModuleCalculator):
                 "rate_type": activity.change_rate.name,
                 "nitrous_constant": project.gwp.n2o,
                 "ef_nitrous_som": self.nitrous_ef.value,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
+                "soc_start_default": self.soc_start.value,
+                "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
                 "soc_end_tier_2": self.module_wo.soc_t2_wo,
                 "calculate_soc_som": False,
@@ -3624,8 +3621,8 @@ class SettlementCalculator(LandModuleCalculator):
                 "rate_type": activity.change_rate.name,
                 "nitrous_constant": project.gwp.n2o,
                 "ef_nitrous_som": self.nitrous_ef.value,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
+                "soc_start_default": self.soc_start.value,
+                "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
                 "soc_end_tier_2": self.module_w.soc_t2_w,
                 "calculate_soc_som": True,
@@ -3662,8 +3659,8 @@ class SettlementCalculator(LandModuleCalculator):
                 "rate_type": activity.change_rate.name,
                 "nitrous_constant": project.gwp.n2o,
                 "ef_nitrous_som": self.nitrous_ef.value,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
+                "soc_start_default": self.soc_start.value,
+                "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
                 "soc_end_tier_2": self.module_wo.soc_t2_wo,
                 "calculate_soc_som": True,
@@ -5452,29 +5449,29 @@ class ForestManagementCalculator(LandModuleCalculator):
         self.has_t2_growth_wo = self.forest.agb_growth_rate_gt_20_yrs_t2_wo and self.forest.agb_growth_rate_le_20_yrs_t2_wo
 
         crluft = {
-            "climate": self.project.climate,
-            "region": self.project.country.region,
+            "climate": self.climate,
+            "region": self.region,
             "land_use_type": land_use_type,
             "forest_type": self.forest.forest_type,
         }
 
-        AGB_GROWTH_NOT_FOUND = f"AGB Growth not found for ({self.forest.forest_type.name}) {land_use_type.name} in {self.project.climate.name} climate, {self.project.country.region.name} region. Please insert t2 values for AGB Growth Rate for all scenarios."
-        BGB_UNDER_20_NOT_FOUND = f"BGB (under 20 years) not found for ({self.forest.forest_type.name}) {land_use_type.name} in {self.project.climate.name} climate, {self.project.country.region.name} region. Please insert t2 values for BGB (under 20 years) for all scenarios."
-        BGB_OVER_20_NOT_FOUND = f"BGB (over 20 years) not found for ({self.forest.forest_type.name}) {land_use_type.name} in {self.project.climate.name} climate, {self.project.country.region.name} region. Please insert t2 values for BGB (over 20 years) for all scenarios."
-        LITTER_DW_NOT_FOUND = f"Litter/Deadwood Carbon Stock reference value not found for ({self.forest.forest_type.name}) {land_use_type.name} in {self.project.climate.name} climate, {self.project.country.region.name} region."
+        AGB_GROWTH_NOT_FOUND = f"AGB Growth not found for ({self.forest.forest_type.name}) {land_use_type.name} in {self.climate.name} climate, {self.region.name} region. Please insert t2 values for AGB Growth Rate for all scenarios."
+        BGB_UNDER_20_NOT_FOUND = f"BGB (under 20 years) not found for ({self.forest.forest_type.name}) {land_use_type.name} in {self.climate.name} climate, {self.region.name} region. Please insert t2 values for BGB (under 20 years) for all scenarios."
+        BGB_OVER_20_NOT_FOUND = f"BGB (over 20 years) not found for ({self.forest.forest_type.name}) {land_use_type.name} in {self.climate.name} climate, {self.region.name} region. Please insert t2 values for BGB (over 20 years) for all scenarios."
+        LITTER_DW_NOT_FOUND = f"Litter/Deadwood Carbon Stock reference value not found for ({self.forest.forest_type.name}) {land_use_type.name} in {self.climate.name} climate, {self.region.name} region."
 
         # NOTE: For non-forest is ipcc.AfforestationCombustionFactor (used in OLUC?)
-        self.combustion_factor_w: ipcc.ForestCombustionFactor = utils.get_or_raise(ipcc.ForestCombustionFactor, {"land_use_type": self.module.land_use_type_w, "climate": self.project.climate, "forest_type": self.forest.forest_type}, f"Combustion Factor W not found for {self.module.land_use_type_w.name}, {self.project.climate.name}, {self.forest.forest_type.name}")
-        self.combustion_factor_wo: ipcc.ForestCombustionFactor = utils.get_or_raise(ipcc.ForestCombustionFactor, {"land_use_type": self.module.land_use_type_wo, "climate": self.project.climate, "forest_type": self.forest.forest_type}, f"Combustion Factor WO not found for {self.module.land_use_type_wo.name}, {self.project.climate.name}, {self.forest.forest_type.name}")
+        self.combustion_factor_w: ipcc.ForestCombustionFactor = utils.get_or_raise(ipcc.ForestCombustionFactor, {"land_use_type": self.module.land_use_type_w, "climate": self.climate, "forest_type": self.forest.forest_type}, f"Combustion Factor W not found for {self.module.land_use_type_w.name}, {self.climate.name}, {self.forest.forest_type.name}")
+        self.combustion_factor_wo: ipcc.ForestCombustionFactor = utils.get_or_raise(ipcc.ForestCombustionFactor, {"land_use_type": self.module.land_use_type_wo, "climate": self.climate, "forest_type": self.forest.forest_type}, f"Combustion Factor WO not found for {self.module.land_use_type_wo.name}, {self.climate.name}, {self.forest.forest_type.name}")
 
         if self.forest.land_use_type_start.name == "Mangrove Forest":
             try:
-                self.mangroves_data = ipcc.DataOnMangrove.objects.get(climate=self.project.climate, moisture=self.project.moisture)
+                self.mangroves_data = ipcc.DataOnMangrove.objects.get(climate=self.climate, moisture=self.climate)
             except ipcc.DataOnMangrove.DoesNotExist:
                 pass
 
         try:
-            self.litter_dw = ipcc.LitterDeadwoodCarbonStock.objects.get(climate=self.project.climate, forest_type=self.forest.forest_type, land_use_type=land_use_type)
+            self.litter_dw = ipcc.LitterDeadwoodCarbonStock.objects.get(climate=self.climate, forest_type=self.forest.forest_type, land_use_type=land_use_type)
         except ipcc.LitterDeadwoodCarbonStock.DoesNotExist:
             raise ValueError(LITTER_DW_NOT_FOUND)
 
@@ -5566,7 +5563,7 @@ class ForestManagementCalculator(LandModuleCalculator):
             self.agb_start_wo = 0
             self.litter_dw_start_wo = SimpleNamespace(litter=0, dw=0)
 
-        self.som: ipcc.NitrousEmissionFactor = utils.get_or_raise(ipcc.NitrousEmissionFactor, {"moisture": self.project.moisture}, f"SOM not found for {self.project.moisture.name} moisture.")
+        self.som: ipcc.NitrousEmissionFactor = utils.get_or_raise(ipcc.NitrousEmissionFactor, {"moisture": self.climate}, f"SOM not found for {self.climate.name} moisture.")
 
         self.disturbances: list[ForestDisturbance] = self.module.disturbances.all()
 
@@ -5616,8 +5613,8 @@ class ForestManagementCalculator(LandModuleCalculator):
                 self.litter_dw_start_w.dw,
                 self.litter_dw_max_w.dw,
                 self.forest.deadwood_t2_w,
-                self.soc.value,
-                self.soc.value,
+                self.soc_start.value,
+                self.soc_w.value,
                 self.module.soc_t2_start,
                 self.module.soc_t2_w,
                 self.fmg_start.value,
@@ -5690,8 +5687,8 @@ class ForestManagementCalculator(LandModuleCalculator):
                 self.litter_dw_start_wo.dw,
                 self.litter_dw_max_wo.dw,
                 self.forest.deadwood_t2_wo,
-                self.soc.value,
-                self.soc.value,
+                self.soc_start.value,
+                self.soc_wo.value,
                 self.module.soc_t2_start,
                 self.module.soc_t2_wo,
                 self.fmg_start.value,
@@ -5764,8 +5761,8 @@ class OtherLandCalculator(LandModuleCalculator):
                 "rate_type": activity.change_rate.name,
                 "nitrous_constant": project.gwp.n2o,
                 "ef_nitrous_som": self.som.value,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
+                "soc_start_default": self.soc_start.value,
+                "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
                 "soc_end_tier_2": self.module_w.soc_t2_w,
                 "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
@@ -5800,8 +5797,8 @@ class OtherLandCalculator(LandModuleCalculator):
                 "rate_type": activity.change_rate.name,
                 "nitrous_constant": project.gwp.n2o,
                 "ef_nitrous_som": self.som.value,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
+                "soc_start_default": self.soc_start.value,
+                "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
                 "soc_end_tier_2": self.module_wo.soc_t2_wo,
                 "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
@@ -5837,8 +5834,8 @@ class OtherLandCalculator(LandModuleCalculator):
                 "rate_type": activity.change_rate.name,
                 "nitrous_constant": project.gwp.n2o,
                 "ef_nitrous_som": self.som.value,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
+                "soc_start_default": self.soc_start.value,
+                "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
                 "soc_end_tier_2": self.module_w.soc_t2_w,
                 "calculate_soc_som": CALCULATE_SOC_SOM_W,
@@ -5874,8 +5871,8 @@ class OtherLandCalculator(LandModuleCalculator):
                 "rate_type": activity.change_rate.name,
                 "nitrous_constant": project.gwp.n2o,
                 "ef_nitrous_som": self.som.value,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
+                "soc_start_default": self.soc_start.value,
+                "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
                 "soc_end_tier_2": self.module_wo.soc_t2_wo,
                 "calculate_soc_som": CALCULATE_SOC_SOM_WO,
@@ -5983,8 +5980,8 @@ class SetAsideCalculator(LandModuleCalculator):
                 "rate_type": activity.change_rate.name,
                 "nitrous_constant": project.gwp.n2o,
                 "ef_nitrous_som": self.som.value,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
+                "soc_start_default": self.soc_start.value,
+                "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
                 "soc_end_tier_2": self.module_w.soc_t2_w,
                 "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
@@ -6019,8 +6016,8 @@ class SetAsideCalculator(LandModuleCalculator):
                 "rate_type": activity.change_rate.name,
                 "nitrous_constant": project.gwp.n2o,
                 "ef_nitrous_som": self.som.value,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
+                "soc_start_default": self.soc_start.value,
+                "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
                 "soc_end_tier_2": self.module_wo.soc_t2_wo,
                 "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
@@ -6056,8 +6053,8 @@ class SetAsideCalculator(LandModuleCalculator):
                 "rate_type": activity.change_rate.name,
                 "nitrous_constant": project.gwp.n2o,
                 "ef_nitrous_som": self.som.value,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
+                "soc_start_default": self.soc_start.value,
+                "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
                 "soc_end_tier_2": self.module_w.soc_t2_w,
                 "calculate_soc_som": CALCULATE_SOC_SOM_W,
@@ -6093,8 +6090,8 @@ class SetAsideCalculator(LandModuleCalculator):
                 "rate_type": activity.change_rate.name,
                 "nitrous_constant": project.gwp.n2o,
                 "ef_nitrous_som": self.som.value,
-                "soc_start_default": self.soc.value,
-                "soc_end_default": self.soc.value,
+                "soc_start_default": self.soc_start.value,
+                "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
                 "soc_end_tier_2": self.module_wo.soc_t2_wo,
                 "calculate_soc_som": CALCULATE_SOC_SOM_WO,
