@@ -65,6 +65,8 @@ definitions:
           # - yes | python manage.py makemigrations --merge
           - python manage.py migrate
           - python manage.py collectstatic --noinput
+          - python manage.py update_translation_fields
+          - python manage.py sync_translation_fields
 
           - pip list
           - sed -i "s|127.0.0.1|$DB_HOST|g" djangoexact/settings.py

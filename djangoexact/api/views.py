@@ -52,6 +52,7 @@ from .models import (
     InvitationStatusType,
     Definition,
     Note,
+    FieldDefinition,
 )
 from .serializers import (
     ActionTypes,
@@ -83,10 +84,12 @@ from .serializers import (
     NoteSerializer,
     ActivitySerializerWithModules,
     ResetPasswordSerializer,
+    FieldDefinitionResponseSerializer,
+    FieldDefinitionSerializer,
 )
 
 from djangoexact.settings import auth
-from django.utils.translation import activate, get_language
+from django.utils.translation import activate, get_language, deactivate
 from firebase_admin import auth as firebase_admin_auth
 from django.contrib.auth import logout
 from auditlog.context import disable_auditlog, LogEntry
@@ -1526,59 +1529,50 @@ def public_generic_viewset(model: Model):
     return PublicGenericViewSet
 
 
-class DefinitionViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
-    queryset = Definition.objects.all()
-    serializer_class = get_model_serializer(Definition)
+class FieldDefinitionViewSet(viewsets.ViewSet):
 
-    def list(self, request):
-        """
-        Get all definitions.
-        """
+    @swagger_auto_schema(
+        request_body=FieldDefinitionSerializer,
+        responses={400: "Bad request", 201: FieldDefinitionSerializer},
+    )
+    def create(self, request, *args, **kwargs):
 
+        serializer = FieldDefinitionSerializer(data=request.data)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+
+        return Response(serializer.data, status=http_status.HTTP_201_CREATED)
+
+    # Custom action for listing field definitions
+    @swagger_auto_schema(
+        manual_parameters=[openapi.Parameter("module_type_id", openapi.IN_QUERY, description="Module type id", type=openapi.TYPE_INTEGER)],
+        responses={400: "Model name not provided", 404: "Model not found", 200: FieldDefinitionResponseSerializer},
+    )
+    def list(self, request, *args, **kwargs):
         module_type_id = request.query_params.get("module_type_id", None)
-        lang = request.GET.get("lang", "en")
-        activate(lang)
 
         if module_type_id is None:
-            return super().list(request)
+            return Response({"error": "Model name not provided"}, status=400)
 
         try:
             module_type = ModuleType.objects.get(pk=module_type_id)
         except ModuleType.DoesNotExist:
-            logging.error(f"Module type with id {module_type_id} not found")
-            return utils.ErrorResponse(f"Module type with id {module_type_id} not found", status=http_status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Module not found"}, status=404)
 
-        definitions = utils.get_entity_definitions(module_type.class_name)
+        field_metadata = self.get_model_field_metadata(module_type)
 
-        return Response(data=definitions, status=http_status.HTTP_200_OK)
+        return Response(field_metadata)
 
-    def retrieve(self, request, pk=None):
-        """
-        Get a single definition.
-        """
+    def get_model_field_metadata(self, module_type):
+        field_metadata = {}
+        definitions = FieldDefinition.objects.filter(module_type=module_type).all()
 
-        return super().retrieve(request, pk)
+        for definition in definitions:
+            field_metadata[definition.field_name] = {
+                "description": definition.description,
+            }
 
-    def create(self, request):
-        """
-        Create a new definition.
-        """
-        return super().create(request)
-
-    def update(self, request, pk=None):
-        """
-        Update a definition.
-        """
-        return super().update(request, pk)
-
-    def partial_update(self, request, pk=None):
-        """
-        Partially update a definition.
-        """
-        return super().partial_update(request, pk)
-
-    def destroy(self, request, pk=None):
-        """
-        Delete a definition.
-        """
-        return super().destroy(request, pk)
+        return field_metadata

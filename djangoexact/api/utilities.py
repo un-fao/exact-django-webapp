@@ -9,6 +9,7 @@ from rest_framework import exceptions, status
 from rest_framework.response import Response
 from simple_history.models import HistoricalRecords
 from simple_history.utils import update_change_reason
+from django.utils.translation import get_language
 
 import api.models as api_models
 import ipcc.models as ipcc_models

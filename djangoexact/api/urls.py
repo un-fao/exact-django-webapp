@@ -155,7 +155,7 @@ router.register(r"peat-types", views.generic_viewset(models.PeatType), basename=
 
 
 router.register(r"users", views.UserViewSet, basename="users")
-router.register(r"definitions", views.DefinitionViewSet, basename="definitions")
+router.register(r"definitions", views.FieldDefinitionViewSet, basename="definitions")
 
 urlpatterns = [
     path("docs/", include_docs_urls(title="EX-ACT Docs")),
