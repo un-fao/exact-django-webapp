@@ -15,6 +15,8 @@ import ipcc.models as ipcc
 
 from django.utils.translation import gettext_lazy as _
 from django.apps import apps
+from django.conf import settings
+
 
 alphanumeric = validators.RegexValidator(r"^[0-9a-zA-Z]*$", "Only alphanumeric characters are allowed.")
 letters_only = validators.RegexValidator(r"^[a-zA-Z]*$", "Only letters are allowed.")
@@ -2411,3 +2413,17 @@ class OrganizationType(models.Model):
 
     def __str__(self):
         return f"({self.pk}) {self.name}"
+
+
+class FieldDefinition(models.Model):
+    module_type = models.ForeignKey(ModuleType, on_delete=models.CASCADE, related_name="field_definitions")
+    field_name = models.CharField(max_length=255, verbose_name=_("Field Name"))
+    description = models.TextField(verbose_name=_("Field Description"))
+
+    class Meta:
+        unique_together = ("module_type", "field_name")
+        verbose_name = _("Field Definition")
+        verbose_name_plural = _("Field Definitions")
+
+    def __str__(self):
+        return f"{self.module_type}.{self.field_name}"
