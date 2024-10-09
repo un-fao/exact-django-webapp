@@ -634,9 +634,9 @@ class IrrigationPhaseDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            ef_t2_start_default=defaults.ef.value,
-            ef_t2_w_default=defaults.ef.value,
-            ef_t2_wo_default=defaults.ef.value,
+            ef_t2_start_default=defaults.ef_default.value,
+            ef_t2_w_default=defaults.ef_default.value,
+            ef_t2_wo_default=defaults.ef_default.value,
         )
 
 
