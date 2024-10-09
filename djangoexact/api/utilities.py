@@ -502,9 +502,13 @@ def find_empty_scenarios(entity, field: str):
     if not isinstance(entity, api_models.Module):
         raise ValueError("Entity must be a Module instance")
 
+    entity: api_models.Module
+
+    relevant_scenarios: list[ScenarioTypes] = entity.get_relevant_scenarios()
+
     missing = []
 
-    for s in ScenarioTypes:
+    for s in relevant_scenarios:
         # Dynamically construct the field name
         field_name = f"{field}_{s.value}"
 
@@ -513,9 +517,7 @@ def find_empty_scenarios(entity, field: str):
             entity._meta.get_field(field_name)
 
             if getattr(entity, field_name) is None:
-                check_method_name = f"is_{s.verbose_name}"
-                if callable(getattr(entity, check_method_name, None)):
-                    missing.append(s.value)
+                missing.append(s)
         except FieldDoesNotExist:
             raise ValueError(f"Field '{field_name}' not found in {entity.__class__.__name__}. Have you added or refactored the field name recently?")
 
