@@ -1794,17 +1794,17 @@ class Fishery(Module):
     ice_preserved_catch_pc_wo = models.FloatField(default=0, validators=[pc_as_float], verbose_name=_("ice_preserved_catch_pc_wo"))
     ice_preserved_catch_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_ice_preserved_catch_thread", on_delete=models.SET_NULL)
 
-    energy_emission_factor_co2_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_co2_t2_start"))
-    energy_emission_factor_co2_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_co2_t2_w"))
-    energy_emission_factor_co2_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_co2_t2_wo"))
+    energy_ef_co2_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_co2_t2_start"))
+    energy_ef_co2_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_co2_t2_w"))
+    energy_ef_co2_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_co2_t2_wo"))
 
-    energy_emission_factor_ch4_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_ch4_t2_start"))
-    energy_emission_factor_ch4_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_ch4_t2_w"))
-    energy_emission_factor_ch4_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_ch4_t2_wo"))
+    energy_ef_ch4_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_ch4_t2_start"))
+    energy_ef_ch4_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_ch4_t2_w"))
+    energy_ef_ch4_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_ch4_t2_wo"))
 
-    energy_emission_factor_n2o_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_n2o_t2_start"))
-    energy_emission_factor_n2o_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_n2o_t2_w"))
-    energy_emission_factor_n2o_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_n2o_t2_wo"))
+    energy_ef_n2o_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_n2o_t2_start"))
+    energy_ef_n2o_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_n2o_t2_w"))
+    energy_ef_n2o_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_n2o_t2_wo"))
 
     refrigerant_lost_per_tonne_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("refrigerant_lost_per_tonne_t2_start"))
     refrigerant_lost_per_tonne_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("refrigerant_lost_per_tonne_t2_w"))
