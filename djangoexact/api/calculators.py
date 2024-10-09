@@ -3422,27 +3422,30 @@ class ElectricityCalculator(BaseCalculator):
     Calculator for energy.
     """
 
+    def __init__(self, input) -> None:
+        super().__init__(input)
+
+        self.module: Electricity
+
+        self.TRANSMISSION_LOSS = .1 # TODO: Add to database parameters
+        self.electricity_ef_default: ipcc.ElectricityEmission = ipcc.ElectricityEmission()
+        self.electricity_ef_selected: DefaultValue = DefaultValue()
+
     def get_defaults(self, calculate=False) -> dict:
-        module: Electricity = self.data
-        activity: Activity = module.parent.activity
-        project: Project = activity.project
+        super().get_defaults(calculate)
 
-        try:
-            elec = ipcc.ElectricityEmission.objects.get(country=module.country)
+        try:            
+            self.electricity_ef_default = ipcc.ElectricityEmission.objects.get(country=self.country)
 
-            self.ef_source = "Combined Margin" if "Combined margin" in module.ef_source.name else "Operating Margin"
-
-            if self.ef_source == "Operating Margin":
-                log.debug(f"Operating margin: {elec.operating_margin}")
-                self.ef_country = elec.operating_margin
+            if self.module.ef_source.name == "Operating Margin":
+                self.electricity_ef_selected.value = self.electricity_ef_default.operating_margin
             else:
-                log.debug(f"Combined margin: {elec.combined_margin}")
-                self.ef_country = elec.combined_margin
-
-            self.transmission_loss = 0.1  # NOTE: don't know how this should be done in the best way, hardcoded for now, but can't be retrieved from the DB (maybe create a value in the DB for this as well?)
+                self.electricity_ef_selected.value = self.electricity_ef_default.combined_margin
 
         except ipcc.ElectricityEmission.DoesNotExist:
-            raise ValueError(f"Electricity emission for {project.country.name} does not exist")
+            missing_scenarios = utils.find_empty_scenarios(self.module, "electricity_ef_t2")
+            if missing_scenarios:
+                raise ValueError(f"Electricity Emission Factor for {self.country.name} does not exist. Please provide a tier 2 value for scenarios: {', '.join(missing_scenarios)}")
 
     def calculate(self) -> list[Result]:
         """
@@ -3450,70 +3453,48 @@ class ElectricityCalculator(BaseCalculator):
         """
         log.debug("START ElectricityCalculator.calculate")
 
-        module: Electricity = self.data
-        activity: Activity = module.parent.activity
-        project: Project = activity.project
-        change_rate = activity.change_rate
+        self.get_defaults()
 
-        margin = None
-
-        try:
-            elec = ipcc.ElectricityEmission.objects.get(country=module.country)
-            if module.ef_source and "Operating Margin" in module.ef_source.name:
-                log.debug(f"Operating margin: {elec.operating_margin}")
-                margin = elec.operating_margin
-            else:
-                log.debug(f"Combined margin: {elec.combined_margin}")
-                margin = elec.combined_margin
-        except ipcc.ElectricityEmission.DoesNotExist:
-            raise ValueError(f"Electricity emission for {project.country.name} does not exist")
-
-        inputs_w = {
-            "emissions_factor": margin,
-            "specific_factor_start": module.ef_t2_start,
-            "specific_factor_end": module.ef_t2_w,
-            "mwh_start": module.mwh_start,
-            "mwh_end": module.mwh_w,
-            "percent_loss_transportation_start": module.transmission_loss_start,
-            "percent_loss_transportation_end": module.transmission_loss_w,
-            "rate_type": change_rate.name,
+        self.inputs_w = {
+            "emissions_factor": self.electricity_ef_selected.value,
+            "specific_factor_start": self.module.electricity_ef_t2_start,
+            "specific_factor_end": self.module.electricity_ef_t2_w,
+            "mwh_start": self.module.mwh_start,
+            "mwh_end": self.module.mwh_w,
+            "percent_loss_transportation_start": self.module.transmission_loss_start,
+            "percent_loss_transportation_end": self.module.transmission_loss_w,
+            "rate_type": self.change_rate.name,
             "implementation_time": self.activity.implementation_years,
             "capitalization_time": self.activity.capitalization_years,
             "delay": self.activity.delay,
         }
-        log.debug("Inputs with: %s", inputs_w)
+        log.debug("Inputs with: %s", self.inputs_w)
 
-        math_w = ElectricityConsumption(**inputs_w)
-        math_w.calculate_emissions()
+        self.math_w = ElectricityConsumption(**self.inputs_w)
+        self.math_w.calculate_emissions()
 
-        inputs_wo = {
-            "emissions_factor": margin,
-            "specific_factor_start": module.ef_t2_start,
-            "specific_factor_end": module.ef_t2_wo,
-            "mwh_start": module.mwh_start,
-            "mwh_end": module.mwh_wo,
-            "percent_loss_transportation_start": module.transmission_loss_start,
-            "percent_loss_transportation_end": module.transmission_loss_wo,
-            "rate_type": change_rate.name,
+        self.inputs_wo = {
+            "emissions_factor": self.electricity_ef_selected.value,
+            "specific_factor_start": self.module.electricity_ef_t2_start,
+            "specific_factor_end": self.module.electricity_ef_t2_wo,
+            "mwh_start": self.module.mwh_start,
+            "mwh_end": self.module.mwh_wo,
+            "percent_loss_transportation_start": self.module.transmission_loss_start,
+            "percent_loss_transportation_end": self.module.transmission_loss_wo,
+            "rate_type": self.change_rate.name,
             "implementation_time": self.activity.implementation_years,
             "capitalization_time": self.activity.capitalization_years,
             "delay": self.activity.delay,
         }
-        log.debug("Inputs without: %s", inputs_wo)
+        log.debug("Inputs without: %s", self.inputs_wo)
 
-        math_wo = ElectricityConsumption(**inputs_wo)
-        math_wo.calculate_emissions()
+        self.math_wo = ElectricityConsumption(**self.inputs_wo)
+        self.math_wo.calculate_emissions()
 
-        results_w = math_w.result if math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        results_wo = math_wo.result if math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
 
-        results_tuple = (results_w, results_wo)
-
-        log.debug("Results WITH")
-        results_w.breakdown(by=BreakdownTypes.ACTIVITY)
-
-        log.debug("Results WITHOUT")
-        results_wo.breakdown(by=BreakdownTypes.ACTIVITY)
+        results_tuple = (self.results_w, self.results_wo)
 
         log.debug("END ElectricityCalculator.calculate")
         log.debug("")

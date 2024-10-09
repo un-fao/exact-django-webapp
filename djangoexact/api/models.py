@@ -1932,9 +1932,9 @@ class Electricity(Submodule):
     mwh_renewables_wo = models.FloatField(null=True, blank=True, verbose_name=_("mwh_renewables_wo"))
     mwh_renewables_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_mwh_renewables_thread")
 
-    ef_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_start"))
-    ef_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_w"))
-    ef_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_wo"))
+    electricity_ef_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_start"))
+    electricity_ef_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_w"))
+    electricity_ef_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_wo"))
 
     transmission_loss_start = models.FloatField(default=0.1, verbose_name=_("transmission_loss_start"))
     transmission_loss_w = models.FloatField(default=0.1, verbose_name=_("transmission_loss_w"))
