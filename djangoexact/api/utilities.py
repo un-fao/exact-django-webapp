@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from simple_history.models import HistoricalRecords
 from simple_history.utils import update_change_reason
 from django.utils.translation import get_language
+from django.core.exceptions import FieldDoesNotExist
 
 import api.models as api_models
 import ipcc.models as ipcc_models
@@ -504,7 +505,18 @@ def find_empty_scenarios(entity, field: str):
     missing = []
 
     for s in ScenarioTypes:
-        if getattr(entity, f"{field}_{s.value}") is None and callable(entity, f"is_{s.verbose_name}"):
-            missing.append(s.value)
+        # Dynamically construct the field name
+        field_name = f"{field}_{s.value}"
+
+        try:
+            # Check if the field exists in the model using _meta
+            entity._meta.get_field(field_name)
+
+            if getattr(entity, field_name) is None:
+                check_method_name = f"is_{s.verbose_name}"
+                if callable(getattr(entity, check_method_name, None)):
+                    missing.append(s.value)
+        except FieldDoesNotExist:
+            raise ValueError(f"Field '{field_name}' not found in {entity.__class__.__name__}. Have you added or refactored the field name recently?")
 
     return missing
