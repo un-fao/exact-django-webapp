@@ -1,20 +1,9 @@
 from types import SimpleNamespace
-
-import ipcc.models as ipcc
-
 import api.calculators as calcs
 import api.models as api
-import api.serializers as serializers
-import api.utilities as utils
-from dataclasses import dataclass
 
 
 # TODO: I don't like the way this is implemented. It's too verbose. Review and refactor when time allows it.
-
-
-@dataclass
-class DefaultValue:
-    value: float = 0
 
 
 class Defaults:

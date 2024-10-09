@@ -17,6 +17,7 @@ import ipcc.models as ipcc_models
 
 import logging as log
 from django.utils.translation import gettext_lazy as _
+from dataclasses import dataclass
 
 CN_RATIO_CROP = 10
 CN_RATIO_GRASSLAND = 15
@@ -522,3 +523,8 @@ def find_empty_scenarios(entity, field: str):
             raise ValueError(f"Field '{field_name}' not found in {entity.__class__.__name__}. Have you added or refactored the field name recently?")
 
     return missing
+
+
+@dataclass
+class DefaultValue:
+    value: float = 0

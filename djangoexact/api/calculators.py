@@ -125,8 +125,7 @@ from .models import (
     SingleBiomassModule,
     ChangeRate,
 )
-
-from api.defaults import DefaultValue
+from api.utilities import DefaultValue
 
 CALCULATE_SOC_SOM_START_W = False
 CALCULATE_SOC_SOM_START_WO = False
@@ -2819,14 +2818,14 @@ class SmallFisheryCalculator(BaseCalculator):
                 "catch_start": self.module.total_catch_yr_start,
                 "catch_end": self.module.total_catch_yr_w,
                 "ef_diesel_default_co2": self.energy_ef_default_co2,
-                "ef_diesel_co2_start_tier_2": self.module.energy_emission_factor_co2_t2_start,
-                "ef_diesel_co2_end_tier_2": self.module.energy_emission_factor_co2_t2_w,
+                "ef_diesel_co2_start_tier_2": self.module.energy_ef_co2_t2_start,
+                "ef_diesel_co2_end_tier_2": self.module.energy_ef_co2_t2_w,
                 "ef_diesel_default_n2o": self.energy_ef_default_n2o,
-                "ef_diesel_n2o_start_tier_2": self.module.energy_emission_factor_n2o_t2_start,
-                "ef_diesel_n2o_end_tier_2": self.module.energy_emission_factor_n2o_t2_w,
+                "ef_diesel_n2o_start_tier_2": self.module.energy_ef_n2o_t2_start,
+                "ef_diesel_n2o_end_tier_2": self.module.energy_ef_n2o_t2_w,
                 "ef_diesel_default_ch4": self.energy_ef_default_ch4,
-                "ef_diesel_ch4_start_tier_2": self.module.energy_emission_factor_ch4_t2_start,
-                "ef_diesel_ch4_end_tier_2": self.module.energy_emission_factor_ch4_t2_w,
+                "ef_diesel_ch4_start_tier_2": self.module.energy_ef_ch4_t2_start,
+                "ef_diesel_ch4_end_tier_2": self.module.energy_ef_ch4_t2_w,
                 "fui_default_start": self.fui_start,
                 "fui_default_end": self.fui_w,
                 "fui_start_tier_2": self.module.fui_t2_start,
@@ -2864,14 +2863,14 @@ class SmallFisheryCalculator(BaseCalculator):
                 "catch_start": self.module.total_catch_yr_start,
                 "catch_end": self.module.total_catch_yr_wo,
                 "ef_diesel_default_co2": self.energy_ef_default_co2,
-                "ef_diesel_co2_start_tier_2": self.module.energy_emission_factor_co2_t2_start,
-                "ef_diesel_co2_end_tier_2": self.module.energy_emission_factor_co2_t2_wo,
+                "ef_diesel_co2_start_tier_2": self.module.energy_ef_co2_t2_start,
+                "ef_diesel_co2_end_tier_2": self.module.energy_ef_co2_t2_wo,
                 "ef_diesel_default_n2o": self.energy_ef_default_n2o,
-                "ef_diesel_n2o_start_tier_2": self.module.energy_emission_factor_n2o_t2_start,
-                "ef_diesel_n2o_end_tier_2": self.module.energy_emission_factor_n2o_t2_wo,
+                "ef_diesel_n2o_start_tier_2": self.module.energy_ef_n2o_t2_start,
+                "ef_diesel_n2o_end_tier_2": self.module.energy_ef_n2o_t2_wo,
                 "ef_diesel_default_ch4": self.energy_ef_default_ch4,
-                "ef_diesel_ch4_start_tier_2": self.module.energy_emission_factor_ch4_t2_start,
-                "ef_diesel_ch4_end_tier_2": self.module.energy_emission_factor_ch4_t2_wo,
+                "ef_diesel_ch4_start_tier_2": self.module.energy_ef_ch4_t2_start,
+                "ef_diesel_ch4_end_tier_2": self.module.energy_ef_ch4_t2_wo,
                 "fui_default_start": self.fui_start,
                 "fui_default_end": self.fui_wo,
                 "fui_start_tier_2": self.module.fui_t2_start,
@@ -2946,7 +2945,16 @@ class LargeFisheryCalculator(BaseCalculator):
             self.energy_ef_default_ch4 = sum([ef.ch4 for ef in self.energy_ef_default]) / len(self.energy_ef_default)
             self.energy_ef_default_n2o = sum([ef.n2o for ef in self.energy_ef_default]) / len(self.energy_ef_default)
         except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
-            raise ValueError("Default emission factors for off-road diesel do not exist")
+            missing_scenarios_co2 = utils.find_empty_scenarios(self.module, "energy_ef_co2_t2")
+            missing_scenarios_ch4 = utils.find_empty_scenarios(self.module, "energy_ef_ch4_t2")
+            missing_scenarios_n2o = utils.find_empty_scenarios(self.module, "energy_ef_n2o_t2")
+
+            if missing_scenarios_co2:
+                raise ValueError(f"Default emission factors for off-road diesel do not exist. Please provide a tier 2 value for CO2 emission factor for scenarios: {', '.join(missing_scenarios_co2)}")
+            if missing_scenarios_ch4:
+                raise ValueError(f"Default emission factors for off-road diesel do not exist. Please provide a tier 2 value for CH4 emission factor for scenarios: {', '.join(missing_scenarios_ch4)}")
+            if missing_scenarios_n2o:
+                raise ValueError(f"Default emission factors for off-road diesel do not exist. Please provide a tier 2 value for N2O emission factor for scenarios: {', '.join(missing_scenarios_n2o)}")
 
         try:
             self.fui_default_start = ipcc.LargeFisheryFUI.objects.get_value_or_average(fish_type=self.module.fish_type, gear_type=self.module.gear_type_start)
@@ -3010,14 +3018,14 @@ class LargeFisheryCalculator(BaseCalculator):
                 "catch_start": self.module.total_catch_yr_start,
                 "catch_end": self.module.total_catch_yr_w,
                 "ef_diesel_default_co2": self.energy_ef_default_co2,
-                "ef_diesel_co2_start_tier_2": self.module.energy_emission_factor_co2_t2_start,
-                "ef_diesel_co2_end_tier_2": self.module.energy_emission_factor_co2_t2_w,
+                "ef_diesel_co2_start_tier_2": self.module.energy_ef_co2_t2_start,
+                "ef_diesel_co2_end_tier_2": self.module.energy_ef_co2_t2_w,
                 "ef_diesel_default_n2o": self.energy_ef_default_n2o,
-                "ef_diesel_n2o_start_tier_2": self.module.energy_emission_factor_n2o_t2_start,
-                "ef_diesel_n2o_end_tier_2": self.module.energy_emission_factor_n2o_t2_w,
+                "ef_diesel_n2o_start_tier_2": self.module.energy_ef_n2o_t2_start,
+                "ef_diesel_n2o_end_tier_2": self.module.energy_ef_n2o_t2_w,
                 "ef_diesel_default_ch4": self.energy_ef_default_ch4,
-                "ef_diesel_ch4_start_tier_2": self.module.energy_emission_factor_ch4_t2_start,
-                "ef_diesel_ch4_end_tier_2": self.module.energy_emission_factor_ch4_t2_w,
+                "ef_diesel_ch4_start_tier_2": self.module.energy_ef_ch4_t2_start,
+                "ef_diesel_ch4_end_tier_2": self.module.energy_ef_ch4_t2_w,
                 "fui_default_start": self.fui_default_start,
                 "fui_default_end": self.fui_default_w,
                 "fui_start_tier_2": self.module.fui_t2_start,
@@ -3055,14 +3063,14 @@ class LargeFisheryCalculator(BaseCalculator):
                 "catch_start": self.module.total_catch_yr_start,
                 "catch_end": self.module.total_catch_yr_wo,
                 "ef_diesel_default_co2": self.energy_ef_default_co2,
-                "ef_diesel_co2_start_tier_2": self.module.energy_emission_factor_co2_t2_start,
-                "ef_diesel_co2_end_tier_2": self.module.energy_emission_factor_co2_t2_w,
+                "ef_diesel_co2_start_tier_2": self.module.energy_ef_co2_t2_start,
+                "ef_diesel_co2_end_tier_2": self.module.energy_ef_co2_t2_w,
                 "ef_diesel_default_n2o": self.energy_ef_default_n2o,
-                "ef_diesel_n2o_start_tier_2": self.module.energy_emission_factor_n2o_t2_start,
-                "ef_diesel_n2o_end_tier_2": self.module.energy_emission_factor_n2o_t2_w,
+                "ef_diesel_n2o_start_tier_2": self.module.energy_ef_n2o_t2_start,
+                "ef_diesel_n2o_end_tier_2": self.module.energy_ef_n2o_t2_w,
                 "ef_diesel_default_ch4": self.energy_ef_default_ch4,
-                "ef_diesel_ch4_start_tier_2": self.module.energy_emission_factor_ch4_t2_start,
-                "ef_diesel_ch4_end_tier_2": self.module.energy_emission_factor_ch4_t2_w,
+                "ef_diesel_ch4_start_tier_2": self.module.energy_ef_ch4_t2_start,
+                "ef_diesel_ch4_end_tier_2": self.module.energy_ef_ch4_t2_w,
                 "fui_default_start": self.fui_default_start,
                 "fui_default_end": self.fui_default_wo,
                 "fui_start_tier_2": self.module.fui_t2_start,
