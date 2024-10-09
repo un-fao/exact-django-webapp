@@ -493,6 +493,7 @@ class BaseCalculator(ABC):
         self.project: Project = getattr(self.data, "parent", self.data).activity.project
         self.activity: Activity = getattr(self.data, "parent", self.data).activity
         self.module: Module | Submodule = self.data
+        self.area = getattr(self.module, "parent", self.module).area
 
         self.climate: Climate = self.activity.climate_t2 or self.project.climate
         self.moisture: Moisture = self.activity.moisture_t2 or self.project.moisture
@@ -4724,103 +4725,107 @@ class CoastalWetlandCalculator(BaseCalculator):
 
     def __init__(self, input) -> None:
         super().__init__(input)
+        self.module: CoastalWetland
 
-        self.agb = SimpleNamespace(value=0)
-        self.bgb = SimpleNamespace(value=0)
-        self.litter = SimpleNamespace(value=0)
-        self.dw = SimpleNamespace(value=0)
-        self.soil_1m = SimpleNamespace(value=0)
-        self.ef_drainage = SimpleNamespace(value=0)
-        self.pc_c_lost_excavation = SimpleNamespace(value=0)
-        self.rewetting_c = SimpleNamespace(value=0)
-        self.rewetting_ch4 = SimpleNamespace(value=0)
+        self.agb = ipcc.CoastalAGB()
+        self.bgb = ipcc.CoastalBGB()
+        self.litter = ipcc.CoastalLitter()
+        self.dw = ipcc.CoastalDeadwood()
+        self.soil_1m = ipcc.DefaultSoilCarbonStock()
+        self.ef_drainage = ipcc.DrainageEmissionFactor()
+        self.pc_c_lost_excavation = CoastalWetlandParameter()
+        self.rewetting_c = ipcc.RewettingCarbonFactor()
+        self.rewetting_ch4 = ipcc.RewettingMethaneFactor()
 
         self.soil_type_name = ""
-
-        self.inputs_w = {}
-        self.inputs_wo = {}
-
-        self.math_w = None
-        self.math_wo = None
-
-        self.results_w = None
-        self.results_wo = None
 
     def get_defaults(self, calculate=False) -> dict:
         super().get_defaults(calculate)
 
-        module: CoastalWetland = self.data
-        project: Project = module.activity.project
-
         cm = {
-            "climate": project.climate,
-            "moisture": project.moisture,
+            "climate": self.climate,
+            "moisture": self.moisture,
         }
 
-        self.soil_type_name = module.soil_type_t2.name if module.soil_type_t2 else "Mineral"
-        self.salinity_type = module.avg_salinity_t2 if module.avg_salinity_t2 else SalinityType.objects.get(value=">18")
+        self.soil_type_name = self.module.soil_type_t2.name if self.module.soil_type_t2 else "Mineral"
+        self.salinity_type = self.module.avg_salinity_t2 if self.module.avg_salinity_t2 else SalinityType.objects.get(value=">18")
 
         try:
-            self.agb = ipcc.CoastalAGB.objects.get(**cm, land_use_type=module.land_use_type)
+            self.agb = ipcc.CoastalAGB.objects.get(**cm, land_use_type=self.module.land_use_type)
         except ipcc.CoastalAGB.DoesNotExist:
-            raise ValueError(f"Could not find AGB for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}. Please insert tier 2 values for the relevant scenarios.")
+            missing_scenarios = utils.find_empty_scenarios(self.module, "agb_t2")
+            if missing_scenarios:
+                raise ValueError(f"AGB for {self.module.land_use_type.name} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
 
         try:
-            self.bgb = ipcc.CoastalBGB.objects.get(**cm, land_use_type=module.land_use_type)
+            self.bgb = ipcc.CoastalBGB.objects.get(**cm, land_use_type=self.module.land_use_type)
         except ipcc.CoastalBGB.DoesNotExist:
-            raise ValueError(f"Could not find BGB for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}. Please insert tier 2 values for the relevant scenarios.")
+            missing_scenarios = utils.find_empty_scenarios(self.module, "bgb_t2")
+            if missing_scenarios:
+                raise ValueError(f"BGB for {self.module.land_use_type.name} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
 
         try:
-            self.litter = ipcc.CoastalLitter.objects.get(**cm, land_use_type=module.land_use_type)
+            self.litter = ipcc.CoastalLitter.objects.get(**cm, land_use_type=self.module.land_use_type)
         except ipcc.CoastalLitter.DoesNotExist:
-            raise ValueError(f"Could not find Litter for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}. Please insert tier 2 values for the relevant scenarios.")
+            missing_scenarios = utils.find_empty_scenarios(self.module, "litter_t2")
+            if missing_scenarios:
+                raise ValueError(f"Litter for {self.module.land_use_type.name} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
 
         try:
-            self.dw = ipcc.CoastalDeadwood.objects.get(**cm, land_use_type=module.land_use_type)
+            self.dw = ipcc.CoastalDeadwood.objects.get(**cm, land_use_type=self.module.land_use_type)
         except ipcc.CoastalDeadwood.DoesNotExist:
-            raise ValueError(f"Could not find Deadwood for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}. Please insert tier 2 values for the relevant scenarios.")
+            missing_scenarios = utils.find_empty_scenarios(self.module, "deadwood_t2")
+            if missing_scenarios:
+                raise ValueError(f"Deadwood for {self.module.land_use_type.name} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
 
         try:
-            self.soil_1m = ipcc.DefaultSoilCarbonStock.objects.get(**cm, land_use_type=module.land_use_type, soil_type__name=self.soil_type_name)
+            self.soil_1m = ipcc.DefaultSoilCarbonStock.objects.get(**cm, land_use_type=self.module.land_use_type, soil_type__name=self.soil_type_name)
         except ipcc.DefaultSoilCarbonStock.DoesNotExist:
-            raise ValueError(f"Could not find Soil 1m for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}, {self.soil_type_name}")
+            missing_scenarios = utils.find_empty_scenarios(self.module, "soc_t2")
+            if missing_scenarios:
+                raise ValueError(f"Soil 1m for {self.module.land_use_type.name} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
 
         try:
-            self.ef_drainage = ipcc.DrainageEmissionFactor.objects.get(**cm, land_use_type=module.land_use_type)
+            self.ef_drainage = ipcc.DrainageEmissionFactor.objects.get(**cm, land_use_type=self.module.land_use_type)
         except ipcc.DrainageEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find EF Drainage for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}. Please insert tier 2 values for the relevant scenarios.")
+            missing_scenarios = utils.find_empty_scenarios(self.module, "drainage_ef_t2")
+            if missing_scenarios:
+                raise ValueError(f"Drainage Emission Factor for {self.module.land_use_type.name} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
 
         try:
             self.pc_c_lost_excavation = CoastalWetlandParameter.objects.get(name="PERCENTAGE_C_LOST_EXCAVATION")
         except CoastalWetlandParameter.DoesNotExist:
-            raise ValueError(f"Could not find PC C Lost Excavation")
+            missing_scenarios = utils.find_empty_scenarios(self.module, "pc_c_lost_after_excavation_t2")
+            if missing_scenarios:
+                raise ValueError(f"Percentage C Lost After Excavation is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
 
         try:
-            self.rewetting_c = ipcc.RewettingCarbonFactor.objects.get(**cm, land_use_type=module.land_use_type, soil_type__name=self.soil_type_name)
+            self.rewetting_c = ipcc.RewettingCarbonFactor.objects.get(**cm, land_use_type=self.module.land_use_type, soil_type__name=self.soil_type_name)
         except ipcc.RewettingCarbonFactor.DoesNotExist:
-            raise ValueError(f"Could not find Rewetting C for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}. Please insert tier 2 values for the relevant scenarios.")
+            missing_scenarios = utils.find_empty_scenarios(self.module, "co2_rewetting_t2")
+            if missing_scenarios:
+                raise ValueError(f"Rewetting CO2 for {self.odule.land_use_type.name}, {self.project.climate.name}, {self.project.moisture.name}. Please insert tier 2 values for the relevant scenarios.")
 
         try:
-            self.rewetting_ch4 = ipcc.RewettingMethaneFactor.objects.get(**cm, land_use_type=module.land_use_type, salinity=self.salinity_type)
+            self.rewetting_ch4 = ipcc.RewettingMethaneFactor.objects.get(**cm, land_use_type=self.module.land_use_type, salinity=self.salinity_type)
         except ipcc.RewettingMethaneFactor.DoesNotExist:
-            raise ValueError(f"Could not find Rewetting CH4 for {module.land_use_type.name}, {project.climate.name}, {project.moisture.name}. Please insert tier 2 values for the relevant scenarios.")
+            missing_scenarios = utils.find_empty_scenarios(self.module, "ch4_rewetting_t2")
+            if missing_scenarios:
+                raise ValueError(f"Rewetting CH4 for {self.module.land_use_type.name}, {self.project.climate.name}, {self.project.moisture.name}. Please insert tier 2 values for the relevant scenarios.")
 
     def calculate(self) -> Result:
         """
         Calculates the emissions of the coastal wetland
         """
 
-        module: CoastalWetland = self.data
-        project: Project = module.activity.project
-
         self.get_defaults()
 
-        if module.is_with():
+        if self.module.is_with():
             self.inputs_w = {
-                "maximum_area_for_water_management": module.area,
-                "area_drained_start": module.area_under_drainage_start,
-                "area_drained_end": module.area_under_drainage_w,
-                "rate_type": module.activity.change_rate.name,
+                "maximum_area_for_water_management": self.area,
+                "area_drained_start": self.module.area_under_drainage_start,
+                "area_drained_end": self.module.area_under_drainage_w,
+                "rate_type": self.module.activity.change_rate.name,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
                 "agb_default": self.agb.value,
@@ -4829,36 +4834,36 @@ class CoastalWetlandCalculator(BaseCalculator):
                 "deadwood_default": self.dw.value,
                 "soil_1m_default": self.soil_1m.value,
                 "EF_drainage_default": self.ef_drainage.value,
-                "agb_tier_2": module.agb_t2_w,
-                "bgb_tier_2": module.bgb_t2_w,
-                "litter_tier_2": module.litter_t2_w,
-                "deadwood_tier_2": module.deadwood_t2_w,
-                "soil_1m_tier_2": module.soc_t2_w,
-                "EF_drainage_tier_2": module.drainage_ef_t2_w,
-                "area_excavated_start": module.drained_area_excavated_start,
-                "area_excavated_end": module.drained_area_excavated_w,
-                "area_revegated_start": module.area_w_restored_vegetation_start,
-                "area_revegated_end": module.area_w_restored_vegetation_w,
+                "agb_tier_2": self.module.agb_t2_w,
+                "bgb_tier_2": self.module.bgb_t2_w,
+                "litter_tier_2": self.module.litter_t2_w,
+                "deadwood_tier_2": self.module.deadwood_t2_w,
+                "soil_1m_tier_2": self.module.soc_t2_w,
+                "EF_drainage_tier_2": self.module.drainage_ef_t2_w,
+                "area_excavated_start": self.module.drained_area_excavated_start,
+                "area_excavated_end": self.module.drained_area_excavated_w,
+                "area_revegated_start": self.module.area_w_restored_vegetation_start,
+                "area_revegated_end": self.module.area_w_restored_vegetation_w,
                 "percentage_c_lost_excavation_default": self.pc_c_lost_excavation.value,
-                "percentage_c_lost_excavation_tier_2": module.pc_c_lost_after_excavation_t2_w,
+                "percentage_c_lost_excavation_tier_2": self.module.pc_c_lost_after_excavation_t2_w,
                 "ef_rewetting_carbon_default": self.rewetting_c.value,
                 "ef_rewetting_methane_default": self.rewetting_ch4.value,
-                "ef_rewetting_carbon_tier_2": module.co2_rewetting_t2_start,
-                "ef_rewetting_methane_tier_2": module.ch4_rewetting_t2_w,
-                "soil_type": module.avg_salinity_t2.value if module.avg_salinity_t2 else None,
-                "methane_constant": project.gwp.ch4,
+                "ef_rewetting_carbon_tier_2": self.module.co2_rewetting_t2_start,
+                "ef_rewetting_methane_tier_2": self.module.ch4_rewetting_t2_w,
+                "soil_type": self.module.avg_salinity_t2.value if self.module.avg_salinity_t2 else None,
+                "methane_constant": self.project.gwp.ch4,
                 "delay": self.activity.delay,
             }
 
             self.math_w = MathCoastalWetland(**self.inputs_w)
             self.math_w.calculate_emissions()
 
-        if module.is_without():
+        if self.module.is_without():
             self.inputs_wo = {
-                "maximum_area_for_water_management": module.area,
-                "area_drained_start": module.area_under_drainage_start,
-                "area_drained_end": module.area_under_drainage_wo,
-                "rate_type": module.activity.change_rate.name,
+                "maximum_area_for_water_management": self.area,
+                "area_drained_start": self.module.area_under_drainage_start,
+                "area_drained_end": self.module.area_under_drainage_wo,
+                "rate_type": self.module.activity.change_rate.name,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
                 "agb_default": self.agb.value,
@@ -4867,24 +4872,24 @@ class CoastalWetlandCalculator(BaseCalculator):
                 "deadwood_default": self.dw.value,
                 "soil_1m_default": self.soil_1m.value,
                 "EF_drainage_default": self.ef_drainage.value,
-                "agb_tier_2": module.agb_t2_wo,
-                "bgb_tier_2": module.bgb_t2_wo,
-                "litter_tier_2": module.litter_t2_wo,
-                "deadwood_tier_2": module.deadwood_t2_wo,
-                "soil_1m_tier_2": module.soc_t2_wo,
-                "EF_drainage_tier_2": module.drainage_ef_t2_wo,
-                "area_excavated_start": module.drained_area_excavated_start,
-                "area_excavated_end": module.drained_area_excavated_wo,
-                "area_revegated_start": module.area_w_restored_vegetation_start,
-                "area_revegated_end": module.area_w_restored_vegetation_wo,
+                "agb_tier_2": self.module.agb_t2_wo,
+                "bgb_tier_2": self.module.bgb_t2_wo,
+                "litter_tier_2": self.module.litter_t2_wo,
+                "deadwood_tier_2": self.module.deadwood_t2_wo,
+                "soil_1m_tier_2": self.module.soc_t2_wo,
+                "EF_drainage_tier_2": self.module.drainage_ef_t2_wo,
+                "area_excavated_start": self.module.drained_area_excavated_start,
+                "area_excavated_end": self.module.drained_area_excavated_wo,
+                "area_revegated_start": self.module.area_w_restored_vegetation_start,
+                "area_revegated_end": self.module.area_w_restored_vegetation_wo,
                 "percentage_c_lost_excavation_default": self.pc_c_lost_excavation.value,
-                "percentage_c_lost_excavation_tier_2": module.pc_c_lost_after_excavation_t2_wo,
+                "percentage_c_lost_excavation_tier_2": self.module.pc_c_lost_after_excavation_t2_wo,
                 "ef_rewetting_carbon_default": self.rewetting_c.value,
                 "ef_rewetting_methane_default": self.rewetting_ch4.value,
-                "ef_rewetting_carbon_tier_2": module.co2_rewetting_t2_wo,
-                "ef_rewetting_methane_tier_2": module.ch4_rewetting_t2_wo,
-                "soil_type": module.avg_salinity_t2.value if module.avg_salinity_t2 else None,
-                "methane_constant": project.gwp.ch4,
+                "ef_rewetting_carbon_tier_2": self.module.co2_rewetting_t2_wo,
+                "ef_rewetting_methane_tier_2": self.module.ch4_rewetting_t2_wo,
+                "soil_type": self.module.avg_salinity_t2.value if self.module.avg_salinity_t2 else None,
+                "methane_constant": self.project.gwp.ch4,
                 "delay": self.activity.delay,
             }
 
@@ -4897,40 +4902,6 @@ class CoastalWetlandCalculator(BaseCalculator):
         results_tuple = (self.results_w, self.results_wo)
 
         return results_tuple
-
-    def defaults(self) -> DefaultData:
-        self.calculate()
-
-        module: CoastalWetland = self.data
-
-        defaults_start = {}
-        defaults_w = {}
-        defaults_wo = {}
-
-        if module.is_luc_remaining_same():
-            math_start = MathCoastalWetland(**self.inputs_w)
-            math_start_defaults = math_start.evaluate_tier_2_defaults()
-            defaults_start.update(math_start_defaults.start)
-            defaults_start.update(math_start_defaults.other)
-        elif module.is_business_as_usual():
-            math_start_wo = MathCoastalWetland(**self.inputs_wo)
-            math_start_wo_defaults = math_start_wo.evaluate_tier_2_defaults()
-            defaults_start.update(math_start_wo_defaults.start)
-            defaults_start.update(math_start_wo_defaults.other)
-
-        if module.is_with():
-            math_w = MathCoastalWetland(**self.inputs_w)
-            math_w_defaults = math_w.evaluate_tier_2_defaults()
-            defaults_w.update(math_w_defaults.start)
-            defaults_w.update(math_w_defaults.other)
-
-        if module.is_without():
-            math_wo = MathCoastalWetland(**self.inputs_wo)
-            math_wo_defaults = math_wo.evaluate_tier_2_defaults()
-            defaults_wo.update(math_wo_defaults.start)
-            defaults_wo.update(math_wo_defaults.other)
-
-        return DefaultData(defaults_start, defaults_w, defaults_wo)
 
 
 class WaterbodyCalculator(BaseCalculator):
