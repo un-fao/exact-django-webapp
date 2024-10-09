@@ -3,12 +3,7 @@ import traceback
 
 from .generalized_modules import BaseModule
 
-from .general_functions import (
-    input_single_calculation,
-    yearly_constant_emissions_breakdown,
-    yearly_time_dependent_parameter_breakdown,
-    breakdown_according_to_values
-)
+from .general_functions import input_single_calculation, yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, breakdown_according_to_values
 from .ghg_emissions_classes import (
     ActivityTypes,
     Emission,
@@ -41,17 +36,17 @@ class Inputs(BaseModule):
     def calculate_emissions(self):
         try:
             if self.unit_factor_co2 is None or self.emissions_factor_co2 is None or self.ipcc_factor_co2 is None:
-                pass
+                yearly_co2_eq_emissions = total_co2_eq_emissions = []
             else:
                 yearly_co2_eq_emissions, total_co2_eq_emissions = input_single_calculation(self.unit_start, self.unit_end, self.ipcc_factor_co2, self.tier_2_factor_co2, self.unit_factor_co2, self.emissions_factor_co2, self.implementation_time, self.capitalization_time, self.rate_type)
 
             if self.unit_factor_n2o is None or self.emissions_factor_n2o is None or self.ipcc_factor_n2o is None:
-                pass
+                yearly_n2o_emissions = total_n2o_emissions = []
             else:
                 yearly_n2o_emissions, total_n2o_emissions = input_single_calculation(self.unit_start, self.unit_end, self.ipcc_factor_n2o, self.tier_2_factor_n2o, self.unit_factor_n2o, self.emissions_factor_n2o, self.implementation_time, self.capitalization_time, self.rate_type)
 
             if self.unit_factor_eq is None or self.emissions_factor_eq is None or self.ipcc_factor_eq is None:
-                pass
+                yearly_co2_emissions = total_co2_emissions = []
             else:
                 yearly_co2_emissions, total_co2_emissions = input_single_calculation(self.unit_start, self.unit_end, self.ipcc_factor_eq, self.tier_2_factor_eq, self.unit_factor_eq, self.emissions_factor_eq, self.implementation_time, self.capitalization_time, self.rate_type)
 
@@ -94,14 +89,7 @@ class OperationPhaseIrrigation(BaseModule):
     def calculate_emissions(
         self,
     ):
-        def ef_calculation(ef_co2_default, ef_co2_tier_2, 
-                           ef_n2o_default, ef_n2o_tier_2,
-                            ef_ch4_default, ef_ch4_tier_2,
-                           total_dynamic_head_tier_2, average_pressure_default, 
-                           average_pressure_tier_2, pumping_efficiency_default, 
-                           pumping_efficiency_tier_2, erh_electricity, 
-                           fuel_net_calorific_values, fuel_density, 
-                           depth, gwir):
+        def ef_calculation(ef_co2_default, ef_co2_tier_2, ef_n2o_default, ef_n2o_tier_2, ef_ch4_default, ef_ch4_tier_2, total_dynamic_head_tier_2, average_pressure_default, average_pressure_tier_2, pumping_efficiency_default, pumping_efficiency_tier_2, erh_electricity, fuel_net_calorific_values, fuel_density, depth, gwir):
             try:
                 pumping_efficiency = self.pumping_efficiency_tier_2 or self.pumping_efficiency_default
                 average_pressure = self.average_pressure_tier_2 or self.average_pressure_default
@@ -128,14 +116,7 @@ class OperationPhaseIrrigation(BaseModule):
                 raise e
 
         try:
-            ef_co2, ef_n2o, ef_ch4 = ef_calculation(self.ef_co2_default, self.ef_co2_tier_2,
-                                            self.ef_n2o_default, self.ef_n2o_tier_2,
-                                            self.ef_ch4_default, self.ef_ch4_tier_2,
-                                            self.total_dynamic_head_tier_2, self.average_pressure_default, 
-                                            self.average_pressure_tier_2, self.pumping_efficiency_default, 
-                                            self.pumping_efficiency_tier_2, self.erh_electricity, 
-                                            self.fuel_net_calorific_values, self.fuel_density, 
-                                            self.depth, self.gwir)
+            ef_co2, ef_n2o, ef_ch4 = ef_calculation(self.ef_co2_default, self.ef_co2_tier_2, self.ef_n2o_default, self.ef_n2o_tier_2, self.ef_ch4_default, self.ef_ch4_tier_2, self.total_dynamic_head_tier_2, self.average_pressure_default, self.average_pressure_tier_2, self.pumping_efficiency_default, self.pumping_efficiency_tier_2, self.erh_electricity, self.fuel_net_calorific_values, self.fuel_density, self.depth, self.gwir)
 
             # THESE ARE SAVED IN ORDER TO MULTIPLY BY ELECTRICITY MULTIPLIER
 
