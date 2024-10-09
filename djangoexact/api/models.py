@@ -1055,14 +1055,14 @@ class SingleBiomassModule(BiomassModule):
         continent = self.activity.project.country.region
         land_use_type = getattr(self, f"land_use_type_{scenario.value}", None)
         if land_use_type is None:
-            raise exceptions.ValidationError(f"Missing land use type for {scenario.value} scenario")
+            raise ValueError(f"Missing land use type for {scenario.value} scenario")
 
         try:
             return BiomassModel.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
         except BiomassModel.DoesNotExist:
             if getattr(self, f"biomass_t2_{scenario.value}", None) is None:
-                raise exceptions.ValidationError(f"Missing biomass data for {land_use_type.name}, {climate.name}, {moisture.name}, {continent.name}. Please provide tier2 value.")
-            return None
+                raise ValueError(f"Missing biomass data for {land_use_type.name}, {climate.name}, {moisture.name}, {continent.name}, for {scenario.verbose_name} scenario. Please provide tier2 value.")
+            return BiomassModel()
 
 
 class ResidueAvailability(models.Model):
