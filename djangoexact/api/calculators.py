@@ -126,6 +126,8 @@ from .models import (
     ChangeRate,
 )
 
+from api.defaults import DefaultValue
+
 CALCULATE_SOC_SOM_START_W = False
 CALCULATE_SOC_SOM_START_WO = False
 CALCULATE_SOC_SOM_W = True
@@ -2047,88 +2049,134 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
     def __init__(self, input) -> None:
         super().__init__(input)
 
-        self.efc: SimpleNamespace | ipcc.RiceDefaultEmissionFactor = SimpleNamespace(value=0)
-        self.yield_ref: SimpleNamespace | ipcc.RiceYield = SimpleNamespace(value=0)
-        self.sfw_start: SimpleNamespace | ipcc.RiceSFW = SimpleNamespace(value=0)
-        self.sfw_w: SimpleNamespace | ipcc.RiceSFW = SimpleNamespace(value=0)
-        self.sfw_wo: SimpleNamespace | ipcc.RiceSFW = SimpleNamespace(value=0)
-        self.sfp_start: SimpleNamespace | ipcc.RiceSFP = SimpleNamespace(value=0)
-        self.sfp_w: SimpleNamespace | ipcc.RiceSFP = SimpleNamespace(value=0)
-        self.sfp_wo: SimpleNamespace | ipcc.RiceSFP = SimpleNamespace(value=0)
-        self.sfo_start: SimpleNamespace | ipcc.RiceSFO = SimpleNamespace(value=0)
-        self.sfo_w: SimpleNamespace | ipcc.RiceSFO = SimpleNamespace(value=0)
-        self.sfo_wo: SimpleNamespace | ipcc.RiceSFO = SimpleNamespace(value=0)
-        self.efi_start: SimpleNamespace = SimpleNamespace(value=0)
-        self.efi_w: SimpleNamespace = SimpleNamespace(value=0)
-        self.efi_wo: SimpleNamespace = SimpleNamespace(value=0)
-        self.n_estimation_factor: SimpleNamespace | ipcc.CropNitrousEstimationDefaultFactor = SimpleNamespace(value=0)
-        self.burning_emission_factor: SimpleNamespace | ipcc.BurningEmissionFactor = SimpleNamespace(value=0)
-        self.rice_cf: SimpleNamespace | ipcc.FiresCombustionFactor = SimpleNamespace(value=0)
-        self.straw_burned_start: SimpleNamespace = SimpleNamespace(value=0)
-        self.straw_burned_w: SimpleNamespace = SimpleNamespace(value=0)
-        self.straw_burned_wo: SimpleNamespace = SimpleNamespace(value=0)
+        self.module: FloodedRice | MinorSeasonFloodedRice
 
-        self.som: SimpleNamespace | ipcc.NitrousEmissionFactor = SimpleNamespace(value=0)
+        self.efc_default: ipcc.RiceDefaultEmissionFactor = ipcc.RiceDefaultEmissionFactor()
+        self.yield_default: ipcc.RiceYield = ipcc.RiceYield()
+        self.sfw_start_default: ipcc.RiceSFW = ipcc.RiceSFW()
+        self.sfw_w_default: ipcc.RiceSFW = ipcc.RiceSFW()
+        self.sfw_wo_default: ipcc.RiceSFW = ipcc.RiceSFW()
+        self.sfp_start_default: ipcc.RiceSFP = ipcc.RiceSFP()
+        self.sfp_w_default: ipcc.RiceSFP = ipcc.RiceSFP()
+        self.sfp_wo_default: ipcc.RiceSFP = ipcc.RiceSFP()
+        self.sfo_start_default: ipcc.RiceSFO = ipcc.RiceSFO()
+        self.sfo_w_default: ipcc.RiceSFO = ipcc.RiceSFO()
+        self.sfo_wo_default: ipcc.RiceSFO = ipcc.RiceSFO()
+
+        self.n_estimation_factor_default: ipcc.CropNitrousEstimationDefaultFactor = ipcc.CropNitrousEstimationDefaultFactor()
+        self.burning_emission_factor_default: ipcc.BurningEmissionFactor = ipcc.BurningEmissionFactor()
+        self.rice_cf_default: ipcc.FiresCombustionFactor = ipcc.FiresCombustionFactor()
+
+        self.efi_start_default: DefaultValue = DefaultValue()
+        self.efi_w_default: DefaultValue = DefaultValue()
+        self.efi_wo_default: DefaultValue = DefaultValue()
+        self.straw_burned_start_default: DefaultValue = DefaultValue()
+        self.straw_burned_w_default: DefaultValue = DefaultValue()
+        self.straw_burned_wo_default: DefaultValue = DefaultValue()
 
     def get_defaults(self, calculate=False) -> dict:
         super().get_defaults(calculate)
 
-        module: FloodedRice | MinorSeasonFloodedRice = self.data
-        module_for_checks = getattr(module, "parent", module)
-
-        climate_flt = {"climate": self.climate}
-        moisture_flt = {"moisture": self.moisture}
-        region_flt = {"continent": self.region}
+        module_for_checks = getattr(self.module, "parent", self.module)
 
         if module_for_checks.is_start():
-            h2o_mgmt_before_start_flt = {"water_management_type_before_cultivation": module.water_management_type_before_cultivation_start}
-            h2o_mgmt_after_start_flt = {"water_management_type_after_cultivation": module.water_management_type_after_cultivation_start}
-            organic_amendment_start_flt = {"organic_amendment_type": module.organic_amendment_type_start}
-            self.sfw_start = utils.get_or_raise(ipcc.RiceSFW, h2o_mgmt_after_start_flt, f"RiceSFW for {module.water_management_type_after_cultivation_start} does not exist")
-            self.sfp_start = utils.get_or_raise(ipcc.RiceSFP, h2o_mgmt_before_start_flt, f"RiceSFP for {module.water_management_type_before_cultivation_start} does not exist")
-            self.sfo_start = utils.get_or_raise(ipcc.RiceSFO, organic_amendment_start_flt, f"RiceSFO for {module.organic_amendment_type_start} does not exist")
+            try:
+                self.sfw_start_default = ipcc.RiceSFW.objects.get(water_management_type_after_cultivation=self.module.water_management_type_after_cultivation_start)
+            except ipcc.RiceSFW.DoesNotExist:
+                if self.module.sfw_t2_start is None:
+                    raise Exception(f"RiceSFW for {self.module.water_management_type_after_cultivation_start} does not exist for start scenario. Please provide Tier 2 values.")
+
+            try:
+                self.sfp_start_default = ipcc.RiceSFP.objects.get(water_management_type_before_cultivation=self.module.water_management_type_before_cultivation_start)
+            except ipcc.RiceSFP.DoesNotExist:
+                if self.module.sfp_t2_start is None:
+                    raise Exception(f"RiceSFP for {self.module.water_management_type_before_cultivation_start} does not exist for start scenario. Please provide Tier 2 values.")
+
+            try:
+                self.sfo_start_default = ipcc.RiceSFO.objects.get(organic_amendment_type=self.module.organic_amendment_type_start)
+            except ipcc.RiceSFO.DoesNotExist:
+                if self.module.sfo_t2_start is None:
+                    raise Exception(f"RiceSFO for {self.module.organic_amendment_type_start} does not exist for start scenario. Please provide Tier 2 values.")
 
         if module_for_checks.is_with():
-            h2o_mgmt_before_w_flt = {"water_management_type_before_cultivation": module.water_management_type_before_cultivation_w}
-            h2o_mgmt_after_w_flt = {"water_management_type_after_cultivation": module.water_management_type_after_cultivation_w}
-            organic_amendment_w_flt = {"organic_amendment_type": module.organic_amendment_type_w}
-            self.sfw_w = utils.get_or_raise(ipcc.RiceSFW, h2o_mgmt_after_w_flt, f"RiceSFW for {module.water_management_type_after_cultivation_w} does not exist")
-            self.sfp_w = utils.get_or_raise(ipcc.RiceSFP, h2o_mgmt_before_w_flt, f"RiceSFP for {module.water_management_type_before_cultivation_w} does not exist")
-            self.sfo_w = utils.get_or_raise(ipcc.RiceSFO, organic_amendment_w_flt, f"RiceSFO for {module.organic_amendment_type_w} does not exist")
+            try:
+                self.sfw_w_default = ipcc.RiceSFW.objects.get(water_management_type_after_cultivation=self.module.water_management_type_after_cultivation_w)
+            except ipcc.RiceSFW.DoesNotExist:
+                if self.module.sfw_t2_w is None:
+                    raise Exception(f"RiceSFW for {self.module.water_management_type_after_cultivation_w} does not exist for with scenario. Please provide Tier 2 values.")
+
+            try:
+                self.sfp_w_default = ipcc.RiceSFP.objects.get(water_management_type_before_cultivation=self.module.water_management_type_before_cultivation_w)
+            except ipcc.RiceSFP.DoesNotExist:
+                if self.module.sfp_t2_w is None:
+                    raise Exception(f"RiceSFP for {self.module.water_management_type_before_cultivation_w} does not exist for with scenario. Please provide Tier 2 values.")
+
+            try:
+                self.sfo_w_default = ipcc.RiceSFO.objects.get(organic_amendment_type=self.module.organic_amendment_type_w)
+            except ipcc.RiceSFO.DoesNotExist:
+                if self.module.sfo_t2_w is None:
+                    raise Exception(f"RiceSFO for {self.module.organic_amendment_type_w} does not exist for with scenario. Please provide Tier 2 values.")
 
         if module_for_checks.is_without():
-            h2o_mgmt_before_wo_flt = {"water_management_type_before_cultivation": module.water_management_type_before_cultivation_wo}
-            h2o_mgmt_after_wo_flt = {"water_management_type_after_cultivation": module.water_management_type_after_cultivation_wo}
-            organic_amendment_wo_flt = {"organic_amendment_type": module.organic_amendment_type_wo}
-            self.sfw_wo = utils.get_or_raise(ipcc.RiceSFW, h2o_mgmt_after_wo_flt, f"RiceSFW for {module.water_management_type_after_cultivation_wo} does not exist")
-            self.sfp_wo = utils.get_or_raise(ipcc.RiceSFP, h2o_mgmt_before_wo_flt, f"RiceSFP for {module.water_management_type_before_cultivation_wo} does not exist")
-            self.sfo_wo = utils.get_or_raise(ipcc.RiceSFO, organic_amendment_wo_flt, f"RiceSFO for {module.organic_amendment_type_wo} does not exist")
+            try:
+                self.sfw_wo_default = ipcc.RiceSFW.objects.get(water_management_type_after_cultivation=self.module.water_management_type_after_cultivation_wo)
+            except ipcc.RiceSFW.DoesNotExist:
+                if self.module.sfw_t2_wo is None:
+                    raise Exception(f"RiceSFW for {self.module.water_management_type_after_cultivation_wo} does not exist for without scenario. Please provide Tier 2 values.")
 
-        if module.is_ready() and calculate:
+            try:
+                self.sfp_wo_default = ipcc.RiceSFP.objects.get(water_management_type_before_cultivation=self.module.water_management_type_before_cultivation_wo)
+            except ipcc.RiceSFP.DoesNotExist:
+                if self.module.sfp_t2_wo is None:
+                    raise Exception(f"RiceSFP for {self.module.water_management_type_before_cultivation_wo} does not exist for without scenario. Please provide Tier 2 values.")
+
+            try:
+                self.sfo_wo_default = ipcc.RiceSFO.objects.get(organic_amendment_type=self.module.organic_amendment_type_wo)
+            except ipcc.RiceSFO.DoesNotExist:
+                if self.module.sfo_t2_wo is None:
+                    raise Exception(f"RiceSFO for {self.module.organic_amendment_type_wo} does not exist for without scenario. Please provide Tier 2 values.")
+
+        if self.module.is_ready() and calculate:
             self.calculate()
-            self.efi_start.value = getattr(self.math_start_w, "adjusted_daily_ef_methane_tier_2_default", 0) or getattr(self.math_start_wo, "adjusted_daily_ef_methane_tier_2_default", 0)
-            self.efi_w.value = getattr(self.math_w, "adjusted_daily_ef_methane_tier_2_default", 0)
-            self.efi_wo.value = getattr(self.math_wo, "adjusted_daily_ef_methane_tier_2_default", 0)
-            self.straw_burned_start.value = getattr(self.math_start_w, "straw_tonnes_tier_2_default", 0) or getattr(self.math_start_wo, "straw_tonnes_tier_2_default", 0)
-            self.straw_burned_w.value = getattr(self.math_w, "straw_tonnes_tier_2_default", 0)
-            self.straw_burned_wo.value = getattr(self.math_wo, "straw_tonnes_tier_2_default", 0)
-            self.sfo_start.value = getattr(self.math_start_w, "SFo_tier_2_default", 0) or getattr(self.math_start_wo, "SFo_tier_2_default", 0)
-            self.sfo_w.value = getattr(self.math_w, "SFo_tier_2_default", 0)
-            self.sfo_wo.value = getattr(self.math_wo, "SFo_tier_2_default", 0)
+            self.efi_start_default.value = getattr(self.math_start_w, "adjusted_daily_ef_methane_tier_2_default", 0) or getattr(self.math_start_wo, "adjusted_daily_ef_methane_tier_2_default", 0)
+            self.efi_w_default.value = getattr(self.math_w, "adjusted_daily_ef_methane_tier_2_default", 0)
+            self.efi_wo_default.value = getattr(self.math_wo, "adjusted_daily_ef_methane_tier_2_default", 0)
+            self.straw_burned_start_default.value = getattr(self.math_start_w, "straw_tonnes_tier_2_default", 0) or getattr(self.math_start_wo, "straw_tonnes_tier_2_default", 0)
+            self.straw_burned_w_default.value = getattr(self.math_w, "straw_tonnes_tier_2_default", 0)
+            self.straw_burned_wo_default.value = getattr(self.math_wo, "straw_tonnes_tier_2_default", 0)
+            self.sfo_start_default.value = getattr(self.math_start_w, "SFo_tier_2_default", 0) or getattr(self.math_start_wo, "SFo_tier_2_default", 0)
+            self.sfo_w_default.value = getattr(self.math_w, "SFo_tier_2_default", 0)
+            self.sfo_wo_default.value = getattr(self.math_wo, "SFo_tier_2_default", 0)
 
-        self.efc = utils.get_or_raise(ipcc.RiceDefaultEmissionFactor, region_flt, f"RiceDefaultEmissionFactor for {self.region.name} does not exist")
-        self.yield_ref = utils.get_or_raise(ipcc.RiceYield, region_flt, f"RiceYield for {self.region.name} does not exist")
+        try:
+            self.efc_default = ipcc.RiceDefaultEmissionFactor.objects.get(continent=self.region)
+        except ipcc.RiceDefaultEmissionFactor.DoesNotExist:
+            missing_scenarios = utils.find_empty_scenarios(self.module, "efc_t2")
+            if missing_scenarios:
+                raise Exception(f"RiceDefaultEmissionFactor for {self.region.name} does not exist. Please provide Tier 2 values for scenarios: {', '.join(missing_scenarios)}")
+
+        try:
+            self.yield_default = ipcc.RiceYield.objects.get(continent=self.region)
+        except ipcc.RiceYield.DoesNotExist:
+            missing_scenarios = utils.find_empty_scenarios(self.module, "crop_yield_t2")
+            if missing_scenarios:
+                raise Exception(f"RiceYield for {self.region.name} does not exist. Please provide Tier 2 values for scenarios: {', '.join(missing_scenarios)}")
 
         lut_name_rice_flt = {"land_use_type__name": "Rice"}
 
-        self.n_estimation_factor = utils.get_or_raise(ipcc.CropNitrousEstimationDefaultFactor, lut_name_rice_flt, "Default nitrous estimation factor is not defined for rice")
-        self.burning_emission_factor = utils.get_or_raise(ipcc.BurningEmissionFactor, {"category__name": "Agricultural residues"}, "Burning emission factor is not defined for agricultural residues")
-        self.rice_cf = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_name_rice_flt, "Fires combustion factor is not defined for rice")
+        try:
+            self.n_estimation_factor_default = ipcc.CropNitrousEstimationDefaultFactor.objects.get(**lut_name_rice_flt)
+        except ipcc.CropNitrousEstimationDefaultFactor.DoesNotExist:
+            missing_scenarios = utils.find_empty_scenarios(self.module, "rice_straw_t2")
+            if missing_scenarios:
+                raise Exception(f"Default nitrous estimation factor is not defined for rice. Please provide Tier 2 values for scenarios: {', '.join(missing_scenarios)}")
+
+        self.burning_emission_factor_default = utils.get_or_raise(ipcc.BurningEmissionFactor, {"category__name": "Agricultural residues"}, "Burning emission factor is not defined for agricultural residues")
+        self.rice_cf_default = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_name_rice_flt, "Fires combustion factor is not defined for rice")
 
     def calculate(self, aggregate_by=BreakdownTypes.TOTAL) -> list[Result]:
-        module: FloodedRice = self.data  # TODO: Remove in favor of self.module
         # If it's a minor season, use the parent module
-        module_for_checks = getattr(module, "parent", module)
+        module_for_checks = getattr(self.module, "parent", self.module)
         is_minor_season = module_for_checks.is_minor_season()
 
         self.get_defaults()
@@ -2138,55 +2186,55 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
             self.inputs_start_w = {
                 "hectares_start": self.area,
                 "hectares_end": 0,
-                "EFc_ref": self.efc.value,
-                "EFc_tier_2": module.efc_t2_start,
-                "SFw_ref": self.sfw_start.value,
-                "SFw_tier_2": module.sfw_t2_start,
-                "SFp_ref": self.sfp_start.value,
-                "SFp_tier_2": module.sfp_t2_start,
-                "cfoa": self.sfo_start.value,
-                "SFo_tier_2": module.sfo_t2_start,
-                "adjusted_daily_ef_methane_tier_2": module.efi_t2_start,
-                "yield_ref": self.yield_ref.value,
-                "yield_tier_2": module.crop_yield_t2_start,
-                "rice_slope": self.n_estimation_factor.slope,
-                "rice_intercept": self.n_estimation_factor.intercept,
-                "straw_tonnes_tier_2": module.rice_straw_t2_start,
-                "methane_ef": self.burning_emission_factor.ch4,
-                "rice_cf": self.rice_cf.value,
-                "nitrous_ef": self.burning_emission_factor.n2o,
+                "EFc_ref": self.efc_default.value,
+                "EFc_tier_2": self.module.efc_t2_start,
+                "SFw_ref": self.sfw_start_default.value,
+                "SFw_tier_2": self.module.sfw_t2_start,
+                "SFp_ref": self.sfp_start_default.value,
+                "SFp_tier_2": self.module.sfp_t2_start,
+                "cfoa": self.sfo_start_default.value,
+                "SFo_tier_2": self.module.sfo_t2_start,
+                "adjusted_daily_ef_methane_tier_2": self.module.efi_t2_start,
+                "yield_ref": self.yield_default.value,
+                "yield_tier_2": self.module.crop_yield_t2_start,
+                "rice_slope": self.n_estimation_factor_default.slope,
+                "rice_intercept": self.n_estimation_factor_default.intercept,
+                "straw_tonnes_tier_2": self.module.rice_straw_t2_start,
+                "methane_ef": self.burning_emission_factor_default.ch4,
+                "rice_cf": self.rice_cf_default.value,
+                "nitrous_ef": self.burning_emission_factor_default.n2o,
                 "nitrous_constant": self.project.gwp.n2o,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
                 "rate_type": self.activity.change_rate.name,
                 "methane_constant": self.project.gwp.ch4,
-                "cultivation_period_ref": self.efc.cultivation_period,
-                "cultivation_period_tier_2": module.cultivation_period_t2_start,
+                "cultivation_period_ref": self.efc_default.cultivation_period,
+                "cultivation_period_tier_2": self.module.cultivation_period_t2_start,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_w.value,
-                "soc_start_tier_2": getattr(module, "soc_t2_start", None),
-                "soc_end_tier_2": getattr(module, "soc_t2_w", None),
+                "soc_start_tier_2": getattr(self.module, "soc_t2_start", None),
+                "soc_end_tier_2": getattr(self.module, "soc_t2_w", None),
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
-                "fmg_start_tier_2": module.fmg_t2_start,
-                "fmg_end_tier_2": module.fmg_t2_w,
+                "fmg_start_tier_2": self.module.fmg_t2_start,
+                "fmg_end_tier_2": self.module.fmg_t2_w,
                 "flu_start_default": self.flu_start.value,
                 "flu_end_default": self.flu_w.value,
-                "flu_start_tier_2": module.flu_t2_start,
-                "flu_end_tier_2": module.flu_t2_w,
+                "flu_start_tier_2": self.module.flu_t2_start,
+                "flu_end_tier_2": self.module.flu_t2_w,
                 "fi_start_default": self.fi_start.value,
                 "fi_end_default": self.fi_w.value,
-                "fi_start_tier_2": module.fi_t2_start,
-                "fi_end_tier_2": module.fi_t2_w,
-                "calculate_soc_som": True,  # As per original code's TODO
-                "straw_burnt": module.organic_amendment_type_start.name == "Straw Burnt",
+                "fi_start_tier_2": self.module.fi_t2_start,
+                "fi_end_tier_2": self.module.fi_t2_w,
+                "calculate_soc_som": True,
+                "straw_burnt": self.module.organic_amendment_type_start.name == "Straw Burnt",
                 "delay": self.activity.delay,
                 "ef_nitrous_som": self.som.value,
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_w.value,
                 "calculate_biomass": False,
-                "biomass_start_tier_2": module.biomass_t2_start,
-                "biomass_end_tier_2": module.biomass_t2_w,
+                "biomass_start_tier_2": self.module.biomass_t2_start,
+                "biomass_end_tier_2": self.module.biomass_t2_w,
                 "is_minor_season": is_minor_season,
             }
 
@@ -2196,55 +2244,55 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
             self.inputs_start_wo = {
                 "hectares_start": self.area,
                 "hectares_end": 0,
-                "EFc_ref": self.efc.value,
-                "EFc_tier_2": module.efc_t2_start,
-                "SFw_ref": self.sfw_start.value,
-                "SFw_tier_2": module.sfw_t2_start,
-                "SFp_ref": self.sfp_start.value,
-                "SFp_tier_2": module.sfp_t2_start,
-                "cfoa": self.sfo_start.value,
-                "SFo_tier_2": module.sfo_t2_start,
-                "adjusted_daily_ef_methane_tier_2": module.efi_t2_start,
-                "yield_ref": self.yield_ref.value,
-                "yield_tier_2": module.crop_yield_t2_start,
-                "rice_slope": self.n_estimation_factor.slope,
-                "rice_intercept": self.n_estimation_factor.intercept,
-                "straw_tonnes_tier_2": module.rice_straw_t2_start,
-                "methane_ef": self.burning_emission_factor.ch4,
-                "rice_cf": self.rice_cf.value,
-                "nitrous_ef": self.burning_emission_factor.n2o,
+                "EFc_ref": self.efc_default.value,
+                "EFc_tier_2": self.module.efc_t2_start,
+                "SFw_ref": self.sfw_start_default.value,
+                "SFw_tier_2": self.module.sfw_t2_start,
+                "SFp_ref": self.sfp_start_default.value,
+                "SFp_tier_2": self.module.sfp_t2_start,
+                "cfoa": self.sfo_start_default.value,
+                "SFo_tier_2": self.module.sfo_t2_start,
+                "adjusted_daily_ef_methane_tier_2": self.module.efi_t2_start,
+                "yield_ref": self.yield_default.value,
+                "yield_tier_2": self.module.crop_yield_t2_start,
+                "rice_slope": self.n_estimation_factor_default.slope,
+                "rice_intercept": self.n_estimation_factor_default.intercept,
+                "straw_tonnes_tier_2": self.module.rice_straw_t2_start,
+                "methane_ef": self.burning_emission_factor_default.ch4,
+                "rice_cf": self.rice_cf_default.value,
+                "nitrous_ef": self.burning_emission_factor_default.n2o,
                 "nitrous_constant": self.project.gwp.n2o,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
                 "rate_type": self.activity.change_rate.name,
                 "methane_constant": self.project.gwp.ch4,
-                "cultivation_period_ref": self.efc.cultivation_period,
-                "cultivation_period_tier_2": module.cultivation_period_t2_start,
+                "cultivation_period_ref": self.efc_default.cultivation_period,
+                "cultivation_period_tier_2": self.module.cultivation_period_t2_start,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_wo.value,
-                "soc_start_tier_2": getattr(module, "soc_t2_start", None),
-                "soc_end_tier_2": getattr(module, "soc_t2_wo", None),
+                "soc_start_tier_2": getattr(self.module, "soc_t2_start", None),
+                "soc_end_tier_2": getattr(self.module, "soc_t2_wo", None),
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
-                "fmg_start_tier_2": module.fmg_t2_start,
-                "fmg_end_tier_2": module.fmg_t2_wo,
+                "fmg_start_tier_2": self.module.fmg_t2_start,
+                "fmg_end_tier_2": self.module.fmg_t2_wo,
                 "flu_start_default": self.flu_start.value,
                 "flu_end_default": self.flu_wo.value,
-                "flu_start_tier_2": module.flu_t2_start,
-                "flu_end_tier_2": module.flu_t2_wo,
+                "flu_start_tier_2": self.module.flu_t2_start,
+                "flu_end_tier_2": self.module.flu_t2_wo,
                 "fi_start_default": self.fi_start.value,
                 "fi_end_default": self.fi_wo.value,
-                "fi_start_tier_2": module.fi_t2_start,
-                "fi_end_tier_2": module.fi_t2_wo,
+                "fi_start_tier_2": self.module.fi_t2_start,
+                "fi_end_tier_2": self.module.fi_t2_wo,
                 "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
-                "straw_burnt": module.organic_amendment_type_start.name == "Straw Burnt",
+                "straw_burnt": self.module.organic_amendment_type_start.name == "Straw Burnt",
                 "delay": self.activity.delay,
                 "ef_nitrous_som": self.som.value,
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
                 "calculate_biomass": False,
-                "biomass_start_tier_2": module.biomass_t2_start,
-                "biomass_end_tier_2": module.biomass_t2_wo,
+                "biomass_start_tier_2": self.module.biomass_t2_start,
+                "biomass_end_tier_2": self.module.biomass_t2_wo,
                 "is_minor_season": is_minor_season,
             }
 
@@ -2255,55 +2303,55 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
             self.inputs_w = {
                 "hectares_start": 0,
                 "hectares_end": self.area,
-                "EFc_ref": self.efc.value,
-                "EFc_tier_2": module.efc_t2_w,
-                "SFw_ref": self.sfw_w.value,
-                "SFw_tier_2": module.sfw_t2_w,
-                "SFp_ref": self.sfp_w.value,
-                "SFp_tier_2": module.sfp_t2_w,
-                "cfoa": self.sfo_w.value,
-                "SFo_tier_2": module.sfo_t2_w,
-                "adjusted_daily_ef_methane_tier_2": module.efi_t2_w,
-                "yield_ref": self.yield_ref.value,
-                "yield_tier_2": module.crop_yield_t2_w,
-                "rice_slope": self.n_estimation_factor.slope,
-                "rice_intercept": self.n_estimation_factor.intercept,
-                "straw_tonnes_tier_2": module.rice_straw_t2_w,
-                "methane_ef": self.burning_emission_factor.ch4,
-                "rice_cf": self.rice_cf.value,
-                "nitrous_ef": self.burning_emission_factor.n2o,
+                "EFc_ref": self.efc_default.value,
+                "EFc_tier_2": self.module.efc_t2_w,
+                "SFw_ref": self.sfw_w_default.value,
+                "SFw_tier_2": self.module.sfw_t2_w,
+                "SFp_ref": self.sfp_w_default.value,
+                "SFp_tier_2": self.module.sfp_t2_w,
+                "cfoa": self.sfo_w_default.value,
+                "SFo_tier_2": self.module.sfo_t2_w,
+                "adjusted_daily_ef_methane_tier_2": self.module.efi_t2_w,
+                "yield_ref": self.yield_default.value,
+                "yield_tier_2": self.module.crop_yield_t2_w,
+                "rice_slope": self.n_estimation_factor_default.slope,
+                "rice_intercept": self.n_estimation_factor_default.intercept,
+                "straw_tonnes_tier_2": self.module.rice_straw_t2_w,
+                "methane_ef": self.burning_emission_factor_default.ch4,
+                "rice_cf": self.rice_cf_default.value,
+                "nitrous_ef": self.burning_emission_factor_default.n2o,
                 "nitrous_constant": self.project.gwp.n2o,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
                 "rate_type": self.activity.change_rate.name,
                 "methane_constant": self.project.gwp.ch4,
-                "cultivation_period_ref": self.efc.cultivation_period,
-                "cultivation_period_tier_2": module.cultivation_period_t2_w,
+                "cultivation_period_ref": self.efc_default.cultivation_period,
+                "cultivation_period_tier_2": self.module.cultivation_period_t2_w,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_w.value,
-                "soc_start_tier_2": getattr(module, "soc_t2_start", None),
-                "soc_end_tier_2": getattr(module, "soc_t2_w", None),
+                "soc_start_tier_2": getattr(self.module, "soc_t2_start", None),
+                "soc_end_tier_2": getattr(self.module, "soc_t2_w", None),
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
-                "fmg_start_tier_2": module.fmg_t2_start,
-                "fmg_end_tier_2": module.fmg_t2_w,
+                "fmg_start_tier_2": self.module.fmg_t2_start,
+                "fmg_end_tier_2": self.module.fmg_t2_w,
                 "flu_start_default": self.flu_start.value,
                 "flu_end_default": self.flu_w.value,
-                "flu_start_tier_2": module.flu_t2_start,
-                "flu_end_tier_2": module.flu_t2_w,
+                "flu_start_tier_2": self.module.flu_t2_start,
+                "flu_end_tier_2": self.module.flu_t2_w,
                 "fi_start_default": self.fi_start.value,
                 "fi_end_default": self.fi_w.value,
-                "fi_start_tier_2": module.fi_t2_start,
-                "fi_end_tier_2": module.fi_t2_w,
+                "fi_start_tier_2": self.module.fi_t2_start,
+                "fi_end_tier_2": self.module.fi_t2_w,
                 "calculate_soc_som": CALCULATE_SOC_SOM_W,
-                "straw_burnt": module.organic_amendment_type_w.name == "Straw Burnt",
+                "straw_burnt": self.module.organic_amendment_type_w.name == "Straw Burnt",
                 "delay": self.activity.delay,
                 "ef_nitrous_som": self.som.value,
-                "calculate_biomass": module.is_start() and module.is_with(),
+                "calculate_biomass": self.module.is_start() and self.module.is_with(),
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_w.value,
-                "biomass_start_tier_2": module.biomass_t2_start,
-                "biomass_end_tier_2": module.biomass_t2_w,
+                "biomass_start_tier_2": self.module.biomass_t2_start,
+                "biomass_end_tier_2": self.module.biomass_t2_w,
                 "is_minor_season": is_minor_season,
             }
 
@@ -2314,55 +2362,55 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
             self.inputs_wo = {
                 "hectares_start": 0,
                 "hectares_end": self.area,
-                "EFc_ref": self.efc.value,
-                "EFc_tier_2": module.efc_t2_wo,
-                "SFw_ref": self.sfw_wo.value,
-                "SFw_tier_2": module.sfw_t2_wo,
-                "SFp_ref": self.sfp_wo.value,
-                "SFp_tier_2": module.sfp_t2_wo,
-                "cfoa": self.sfo_wo.value,
-                "SFo_tier_2": module.sfo_t2_wo,
-                "adjusted_daily_ef_methane_tier_2": module.efi_t2_wo,
-                "yield_ref": self.yield_ref.value,
-                "yield_tier_2": module.crop_yield_t2_wo,
-                "rice_slope": self.n_estimation_factor.slope,
-                "rice_intercept": self.n_estimation_factor.intercept,
-                "straw_tonnes_tier_2": module.rice_straw_t2_wo,
-                "methane_ef": self.burning_emission_factor.ch4,
-                "rice_cf": self.rice_cf.value,
-                "nitrous_ef": self.burning_emission_factor.n2o,
+                "EFc_ref": self.efc_default.value,
+                "EFc_tier_2": self.module.efc_t2_wo,
+                "SFw_ref": self.sfw_wo_default.value,
+                "SFw_tier_2": self.module.sfw_t2_wo,
+                "SFp_ref": self.sfp_wo_default.value,
+                "SFp_tier_2": self.module.sfp_t2_wo,
+                "cfoa": self.sfo_wo_default.value,
+                "SFo_tier_2": self.module.sfo_t2_wo,
+                "adjusted_daily_ef_methane_tier_2": self.module.efi_t2_wo,
+                "yield_ref": self.yield_default.value,
+                "yield_tier_2": self.module.crop_yield_t2_wo,
+                "rice_slope": self.n_estimation_factor_default.slope,
+                "rice_intercept": self.n_estimation_factor_default.intercept,
+                "straw_tonnes_tier_2": self.module.rice_straw_t2_wo,
+                "methane_ef": self.burning_emission_factor_default.ch4,
+                "rice_cf": self.rice_cf_default.value,
+                "nitrous_ef": self.burning_emission_factor_default.n2o,
                 "nitrous_constant": self.project.gwp.n2o,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
                 "rate_type": self.activity.change_rate.name,
                 "methane_constant": self.project.gwp.ch4,
-                "cultivation_period_ref": self.efc.cultivation_period,
-                "cultivation_period_tier_2": module.cultivation_period_t2_wo,
+                "cultivation_period_ref": self.efc_default.cultivation_period,
+                "cultivation_period_tier_2": self.module.cultivation_period_t2_wo,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_wo.value,
-                "soc_start_tier_2": getattr(module, "soc_t2_start", None),
-                "soc_end_tier_2": getattr(module, "soc_t2_wo", None),
+                "soc_start_tier_2": getattr(self.module, "soc_t2_start", None),
+                "soc_end_tier_2": getattr(self.module, "soc_t2_wo", None),
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
-                "fmg_start_tier_2": module.fmg_t2_start,
-                "fmg_end_tier_2": module.fmg_t2_wo,
+                "fmg_start_tier_2": self.module.fmg_t2_start,
+                "fmg_end_tier_2": self.module.fmg_t2_wo,
                 "flu_start_default": self.flu_start.value,
                 "flu_end_default": self.flu_wo.value,
-                "flu_start_tier_2": module.flu_t2_start,
-                "flu_end_tier_2": module.flu_t2_wo,
+                "flu_start_tier_2": self.module.flu_t2_start,
+                "flu_end_tier_2": self.module.flu_t2_wo,
                 "fi_start_default": self.fi_start.value,
                 "fi_end_default": self.fi_wo.value,
-                "fi_start_tier_2": module.fi_t2_start,
-                "fi_end_tier_2": module.fi_t2_wo,
+                "fi_start_tier_2": self.module.fi_t2_start,
+                "fi_end_tier_2": self.module.fi_t2_wo,
                 "calculate_soc_som": CALCULATE_SOC_SOM_WO,
-                "straw_burnt": module.organic_amendment_type_wo.name == "Straw Burnt",
+                "straw_burnt": self.module.organic_amendment_type_wo.name == "Straw Burnt",
                 "delay": self.activity.delay,
                 "ef_nitrous_som": self.som.value,
-                "calculate_biomass": module.is_start() and module.is_without(),
+                "calculate_biomass": self.module.is_start() and self.module.is_without(),
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
-                "biomass_start_tier_2": module.biomass_t2_start,
-                "biomass_end_tier_2": module.biomass_t2_wo,
+                "biomass_start_tier_2": self.module.biomass_t2_start,
+                "biomass_end_tier_2": self.module.biomass_t2_wo,
                 "is_minor_season": is_minor_season,
             }
 
