@@ -3131,9 +3131,18 @@ class AquacultureCalculator(BaseCalculator):
         project: Project = module.activity.project
 
         try:
+            self.ELECTRICITY_USED_DEFAULT = AquacultureParameter.objects.get(name="electricity_used_default").value
+        except AquacultureParameter.DoesNotExist:
+            missing_scenarios = utils.find_empty_scenarios(module, "electricity_used_t2")
+            if missing_scenarios:
+                raise ValueError(f"Default electricity used does not exist. Please provide a tier 2 value for electricity used for scenarios: {', '.join(missing_scenarios)}")
+
+        try:
             self.NITROUS_EF_DEFAULT = AquacultureParameter.objects.get(name="nitrous_ef_default").value
         except AquacultureParameter.DoesNotExist:
-            raise ValueError("Default nitrous emission factor does not exist")
+            missing_scenarios = utils.find_empty_scenarios(module, "n2o_from_production_t2")
+            if missing_scenarios:
+                raise ValueError(f"Default nitrous emission factor does not exist. Please provide a tier 2 value for nitrous emission factor for scenarios: {', '.join(missing_scenarios)}")
 
         try:
             # TODO: This will now be used in the inputs module for feed
@@ -3143,9 +3152,10 @@ class AquacultureCalculator(BaseCalculator):
 
         try:
             self.elec = ipcc.ElectricityEmission.objects.get(country=project.country)
-            log.debug(f"Operating margin: {self.elec.operating_margin}")
         except ipcc.ElectricityEmission.DoesNotExist:
-            raise ValueError(f"Electricity emission for {project.country.name} does not exist")
+            missing_scenarios = utils.find_empty_scenarios(module, "electricity_ef_t2")
+            if missing_scenarios:
+                raise ValueError(f"Electricity emission for {project.country.name} does not exist. Please provide a tier 2 value for electricity emission for scenarios: {', '.join(missing_scenarios)}")
 
     def calculate(self) -> list[Result]:
         """
