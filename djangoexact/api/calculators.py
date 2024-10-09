@@ -2937,20 +2937,23 @@ class LargeFisheryCalculator(BaseCalculator):
         try:
             self.lost_refrigerant_default = LargeFisheryParameter.objects.get(name="lost_refrigerant_default").value
         except LargeFisheryParameter.DoesNotExist:
-            if any([v is None for v in [getattr(self.module, f"refrigerant_lost_per_tonne_t2_{s}") for s in self.relevant_scenarios]]):
-                raise ValueError("Default lost refrigerant does not exist. Please provide a tier 2 value for lost refrigerant for the relevant scenarios.")
+            missing_scenarios = utils.find_empty_scenarios(self.module, "refrigerant_lost_per_tonne_t2")
+            if missing_scenarios:
+                raise ValueError(f"Default lost refrigerant does not exist. Please provide a tier 2 value for lost refrigerant for scenarios: {', '.join(missing_scenarios)}")
 
         try:
             self.tonnes_ice_default = LargeFisheryParameter.objects.get(name="tonnes_ice_default").value
         except LargeFisheryParameter.DoesNotExist:
-            if any([v is None for v in [getattr(self.module, f"tonnes_of_ice_t2_{s}") for s in self.relevant_scenarios]]):
-                raise ValueError("Default tonnes of ice does not exist. Please provide a tier 2 value for tonnes of ice for the relevant scenarios.")
+            missing_scenarios = utils.find_empty_scenarios(self.module, "tonnes_of_ice_t2")
+            if missing_scenarios:
+                raise ValueError(f"Default tonnes of ice does not exist. Please provide a tier 2 value for tonnes of ice for scenarios: {', '.join(missing_scenarios)}")
 
         try:
             self.kw_tonnes = LargeFisheryParameter.objects.get(name="kw_tonnes").value
         except LargeFisheryParameter.DoesNotExist:
-            if any([v is None for v in [getattr(self.module, f"inshore_ice_production_kwh_per_tonne_t2_{s}") for s in self.relevant_scenarios]]):
-                raise ValueError("Default kw per tonne does not exist. Please provide a tier 2 value for kw per tonne for the relevant scenarios.")
+            missing_scenarios = utils.find_empty_scenarios(self.module, "inshore_ice_production_kwh_per_tonne_t2")
+            if missing_scenarios:
+                raise ValueError(f"Default kw per tonne does not exist. Please provide a tier 2 value for kw per tonne for scenarios: {', '.join(missing_scenarios)}")
 
         try:
             self.electricity_country = self.module.inshore_ice_production_country_t2 if self.module.inshore_ice_production_country_t2 else self.country
