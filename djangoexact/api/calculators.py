@@ -2479,8 +2479,20 @@ class GrasslandCalculator(LandModuleCalculator):
         project: Project = activity.project
 
         self.ef = utils.get_or_raise(ipcc.BurningEmissionFactor, {"category__name": "Savanna and grassland"}, "Burning emission factor for savanna and grassland does not exist")
-        self.biomass = utils.get_or_raise(ipcc.GrasslandBiomass, {"climate": project.climate, "moisture": project.moisture}, f"AGB for {project.climate.name} climate and {project.moisture.name} moisture does not exist")
-        self.cf = utils.get_or_raise(GrasslandParameter, {"name": "default_combustion_factor"}, "Default combustion factor does not exist")
+
+        self.biomass = ipcc.GrasslandBiomass.objects.filter(climate=project.climate, moisture=project.moisture).first()
+        if self.biomass is None or self.biomass.agb_t_c_ha is None:
+            # NOTE: Right now this is the only check that's needed, as BGB is not used in the calculations
+            missing_scenarios = utils.find_empty_scenarios(module, "agb_t2")
+            if missing_scenarios:
+                raise Exception(f"AGB for {project.climate.name} climate and {project.moisture.name} moisture does not exist. Please provide Tier 2 values for scenarios: {', '.join(missing_scenarios)}")
+
+        try:
+            self.cf = GrasslandParameter.objects.get(name="default_combustion_factor")
+        except GrasslandParameter.DoesNotExist:
+            missing_scenarios = utils.find_empty_scenarios(module, "combustion_factor_t2")
+            if missing_scenarios:
+                raise Exception(f"Default combustion factor does not exist. Please provide Tier 2 values for scenarios: {', '.join(missing_scenarios)}")
 
     def calculate(self) -> list[Result]:
         """
