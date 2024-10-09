@@ -402,9 +402,9 @@ class ElectricityDefaults(Defaults):
             ef_t2_start_default=defaults.ef_country,
             ef_t2_w_default=defaults.ef_country,
             ef_t2_wo_default=defaults.ef_country,
-            transmission_loss_start_default=defaults.transmission_loss,
-            transmission_loss_w_default=defaults.transmission_loss,
-            transmission_loss_wo_default=defaults.transmission_loss,
+            transmission_loss_start_default=defaults.TRANSMISSION_LOSS,
+            transmission_loss_w_default=defaults.TRANSMISSION_LOSS,
+            transmission_loss_wo_default=defaults.TRANSMISSION_LOSS,
         )
 
 
