@@ -3595,11 +3595,10 @@ class SettlementCalculator(LandModuleCalculator):
 
         self.nitrous_ef = utils.get_or_raise(ipcc.NitrousEmissionFactor, {"moisture": moisture}, f"Nitrous EF not found for {moisture.name} moisture")
 
-        # TODO: Detach .biomass from SettlementEF and put it in ForestTotalBiomass, maybe?
-        # TODO: Same thing for flu,fi,fmg ???
         """
         # NOTE: Since biomass for Settlement is in another IPCC table, detached from the other biomass references for the other modules (e.g. ForestTotalBiomass),
         I wonder if in a LUC scenario the reference values would be wrong, since the Settlement would only be able to access its own biomass reference values.
+        08/10/2024: Lorenzo Maestripieri said that this logic is fine, since the biomass reference values are specific to the module.
         """
         if module.is_start():
             self.ef_start: ipcc.SettlementEF = utils.get_or_raise(ipcc.SettlementEF, {"settlement_type": module.settlement_type_start, "climate": climate, "moisture": moisture}, f"Settlement EF not found for {module.settlement_type_start.name}")
