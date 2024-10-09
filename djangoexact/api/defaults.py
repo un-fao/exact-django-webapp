@@ -6,9 +6,15 @@ import api.calculators as calcs
 import api.models as api
 import api.serializers as serializers
 import api.utilities as utils
+from dataclasses import dataclass
 
 
 # TODO: I don't like the way this is implemented. It's too verbose. Review and refactor when time allows it.
+
+
+@dataclass
+class DefaultValue:
+    value: float = 0
 
 
 class Defaults:
@@ -315,30 +321,30 @@ class FloodedRiceDefaults(Defaults):
             fi_t2_start_default=defaults.fi_start.value,
             fi_t2_w_default=defaults.fi_w.value,
             fi_t2_wo_default=defaults.fi_wo.value,
-            efc_t2_start_default=defaults.efc.value,
-            efc_t2_w_default=defaults.efc.value,
-            efc_t2_wo_default=defaults.efc.value,
-            sfw_t2_start_default=defaults.sfw_start.value,
-            sfw_t2_w_default=defaults.sfw_w.value,
-            sfw_t2_wo_default=defaults.sfw_wo.value,
-            sfp_t2_start_default=defaults.sfp_start.value,
-            sfp_t2_w_default=defaults.sfp_w.value,
-            sfp_t2_wo_default=defaults.sfp_wo.value,
-            efi_t2_start_default=defaults.efi_start.value,
-            efi_t2_w_default=defaults.efi_w.value,
-            efi_t2_wo_default=defaults.efi_wo.value,
-            sfo_t2_start_default=defaults.sfo_start.value,
-            sfo_t2_w_default=defaults.sfo_w.value,
-            sfo_t2_wo_default=defaults.sfo_wo.value,
-            rice_strat_t2_start_default=defaults.straw_burned_start.value,
-            rice_strat_t2_w_default=defaults.straw_burned_w.value,
-            rice_strat_t2_wo_default=defaults.straw_burned_wo.value,
-            crop_yield_t2_start_default=defaults.yield_ref.value,
-            crop_yield_t2_w_default=defaults.yield_ref.value,
-            crop_yield_t2_wo_default=defaults.yield_ref.value,
-            cultivation_period_t2_start_default=defaults.efc.cultivation_period,
-            cultivation_period_t2_w_default=defaults.efc.cultivation_period,
-            cultivation_period_t2_wo_default=defaults.efc.cultivation_period,
+            efc_t2_start_default=defaults.efc_default.value,
+            efc_t2_w_default=defaults.efc_default.value,
+            efc_t2_wo_default=defaults.efc_default.value,
+            sfw_t2_start_default=defaults.sfw_start_default.value,
+            sfw_t2_w_default=defaults.sfw_w_default.value,
+            sfw_t2_wo_default=defaults.sfw_wo_default.value,
+            sfp_t2_start_default=defaults.sfp_start_default.value,
+            sfp_t2_w_default=defaults.sfp_w_default.value,
+            sfp_t2_wo_default=defaults.sfp_wo_default.value,
+            efi_t2_start_default=defaults.efi_start_default.value,
+            efi_t2_w_default=defaults.efi_w_default.value,
+            efi_t2_wo_default=defaults.efi_wo_default.value,
+            sfo_t2_start_default=defaults.sfo_start_default.value,
+            sfo_t2_w_default=defaults.sfo_w_default.value,
+            sfo_t2_wo_default=defaults.sfo_wo_default.value,
+            rice_strat_t2_start_default=defaults.straw_burned_start_default.value,
+            rice_strat_t2_w_default=defaults.straw_burned_w_default.value,
+            rice_strat_t2_wo_default=defaults.straw_burned_wo_default.value,
+            crop_yield_t2_start_default=defaults.yield_default.value,
+            crop_yield_t2_w_default=defaults.yield_default.value,
+            crop_yield_t2_wo_default=defaults.yield_default.value,
+            cultivation_period_t2_start_default=defaults.efc_default.cultivation_period,
+            cultivation_period_t2_w_default=defaults.efc_default.cultivation_period,
+            cultivation_period_t2_wo_default=defaults.efc_default.cultivation_period,
         )
 
 
