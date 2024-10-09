@@ -4943,52 +4943,43 @@ class WaterbodyCalculator(BaseCalculator):
 
     def __init__(self, input) -> None:
         super().__init__(input)
+        self.module: Waterbody
 
-        self.methane_emission_factor = SimpleNamespace(value=0)
-        self.trophic_state_start = SimpleNamespace(value=0)
-        self.trophic_state_w = SimpleNamespace(value=0)
-        self.trophic_state_wo = SimpleNamespace(value=0)
-
-        self.inputs_start = []
-        self.inputs_w = []
-        self.inputs_wo = []
-
-        self.math_start = None
-        self.math_w = None
-        self.math_wo = None
-
-        self.results_start = None
-        self.results_w = None
-        self.results_wo = None
+        self.methane_emission_factor = ipcc.OtherConstructedWaterbodiesEmissionFactor()
+        self.trophic_state_start = ipcc.TrophicStateFactor()
+        self.trophic_state_w = ipcc.TrophicStateFactor()
+        self.trophic_state_wo = ipcc.TrophicStateFactor()
 
     def get_defaults(self, calculate=False) -> dict:
         super().get_defaults(calculate)
 
-        module: Waterbody = self.data
-        project = module.activity.project
-
         try:
-            self.methane_emission_factor = ipcc.OtherConstructedWaterbodiesEmissionFactor.objects.get(climate=project.climate, moisture=project.moisture, waterbody_type=module.waterbody_type)
+            self.methane_emission_factor = ipcc.OtherConstructedWaterbodiesEmissionFactor.objects.get(climate=self.climate, moisture=self.moisture, waterbody_type=self.module.waterbody_type)
         except ipcc.OtherConstructedWaterbodiesEmissionFactor.DoesNotExist:
-            raise ValueError(f"Could not find Methane Emission Factor for {module.waterbody_type.name}, {project.climate.name}, {project.moisture.name}")
+            missing_scenarios = utils.find_empty_scenarios(self.module, "ch4_ef_t2")
+            if missing_scenarios:
+                raise ValueError(f"Methane Emission Factor for {self.module.waterbody_type.name} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
 
-        if module.is_start():
+        if self.module.is_start():
             try:
-                self.trophic_state_start = ipcc.TrophicStateFactor.objects.get(trophic_type=module.trophic_type_start)
+                self.trophic_state_start = ipcc.TrophicStateFactor.objects.get(trophic_type=self.module.trophic_type_start)
             except ipcc.TrophicStateFactor.DoesNotExist:
-                raise ValueError(f"Could not find Trophic State Factor for {module.trophic_type_start.name}")
-
-        if module.is_with():
+                if self.module.alpha_t2_start is None:
+                    raise ValueError(f"Could not find Trophic State Factor for {self.module.trophic_type_start.name}. Please provide a tier 2 value for the starting scenario.")
+                
+        if self.module.is_with():
             try:
-                self.trophic_state_w = ipcc.TrophicStateFactor.objects.get(trophic_type=module.trophic_type_w)
+                self.trophic_state_w = ipcc.TrophicStateFactor.objects.get(trophic_type=self.module.trophic_type_w)
             except ipcc.TrophicStateFactor.DoesNotExist:
-                raise ValueError(f"Could not find Trophic State Factor for {module.trophic_type_w.name}")
-
-        if module.is_without():
+                if self.module.alpha_t2_w is None:
+                    raise ValueError(f"Could not find Trophic State Factor for {self.module.trophic_type_w.name}. Please provide a tier 2 value for the 'with' scenario.")
+                
+        if self.module.is_without():
             try:
-                self.trophic_state_wo = ipcc.TrophicStateFactor.objects.get(trophic_type=module.trophic_type_wo)
+                self.trophic_state_wo = ipcc.TrophicStateFactor.objects.get(trophic_type=self.module.trophic_type_wo)
             except ipcc.TrophicStateFactor.DoesNotExist:
-                raise ValueError(f"Could not find Trophic State Factor for {module.trophic_type_wo.name}")
+                if self.module.alpha_t2_wo is None:
+                    raise ValueError(f"Could not find Trophic State Factor for {self.module.trophic_type_wo.name}. Please provide a tier 2 value for the 'without' scenario.")
 
     def calculate(self) -> Result:
         """
