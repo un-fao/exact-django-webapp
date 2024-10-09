@@ -495,6 +495,13 @@ class BaseCalculator(ABC):
         self.activity: Activity = getattr(self.data, "parent", self.data).activity
         self.module: Module | Submodule = self.data
 
+        self.climate: Climate = self.activity.climate_t2 or self.project.climate
+        self.moisture: Moisture = self.activity.moisture_t2 or self.project.moisture
+        self.soil_type: SoilType = self.activity.soil_type_t2 or self.project.soil_type
+        self.country: Country = self.project.country
+        self.region: Region = self.project.country.region
+        self.change_rate: ChangeRate = self.activity.change_rate
+
     @abstractmethod
     def calculate(self, input: Module, aggregate_by=BreakdownTypes.TOTAL) -> Result:
         """
@@ -550,13 +557,6 @@ class LandModuleCalculator(BaseCalculator):
         self.module_start: LandModule | SingleBiomassModule
         self.module_w: LandModule | SingleBiomassModule
         self.module_wo: LandModule | SingleBiomassModule
-
-        self.climate: Climate = self.activity.climate_t2 or self.project.climate
-        self.moisture: Moisture = self.activity.moisture_t2 or self.project.moisture
-        self.soil_type: SoilType = self.activity.soil_type_t2 or self.project.soil_type
-        self.country: Country = self.project.country
-        self.region: Region = self.project.country.region
-        self.change_rate: ChangeRate = self.activity.change_rate
 
         self.biomass_ef_start: ipcc.ForestTotalBiomass = ipcc.ForestTotalBiomass(value=0)
         self.biomass_ef_w: ipcc.TotalBiomassAfterDefo = ipcc.TotalBiomassAfterDefo(value=0)
@@ -2729,20 +2729,23 @@ class SmallFisheryCalculator(BaseCalculator):
         try:
             self.lost_refrigerant_default = SmallFisheryParameter.objects.get(name="lost_refrigerant_default").value
         except SmallFisheryParameter.DoesNotExist:
-            if any([v is None for v in [getattr(self.module, f"refrigerant_lost_per_tonne_t2_{s}") for s in self.relevant_scenarios]]):
-                raise ValueError(f"Default lost refrigerant does not exist. Please provide a tier 2 value for lost refrigerant for the relevant scenarios.")
+            missing_scenarios = utils.find_empty_scenarios(self.module, "refrigerant_lost_per_tonne_t2")
+            if missing_scenarios:
+                raise ValueError(f"Default lost refrigerant does not exist. Please provide a tier 2 value for lost refrigerant for scenarios: {', '.join(missing_scenarios)}")
 
         try:
             self.tonnes_ice_default = SmallFisheryParameter.objects.get(name="tonnes_ice_default").value
         except SmallFisheryParameter.DoesNotExist:
-            if any([v is None for v in [getattr(self.module, f"tonnes_of_ice_t2_{s}") for s in self.relevant_scenarios]]):
-                raise ValueError("Default tonnes of ice does not exist. Please provide a tier 2 value for tonnes of ice for the relevant scenarios.")
+            missing_scenarios = utils.find_empty_scenarios(self.module, "tonnes_of_ice_t2")
+            if missing_scenarios:
+                raise ValueError(f"Default tonnes of ice does not exist. Please provide a tier 2 value for tonnes of ice for scenarios: {', '.join(missing_scenarios)}")
 
         try:
             self.kw_tonnes = SmallFisheryParameter.objects.get(name="kw_tonnes").value
         except SmallFisheryParameter.DoesNotExist:
-            if any([v is None for v in [getattr(self.module, f"inshore_ice_production_kwh_per_tonne_t2_{s}") for s in self.relevant_scenarios]]):
-                raise ValueError("Default kw per tonne does not exist")
+            missing_scenarios = utils.find_empty_scenarios(self.module, "inshore_ice_production_kwh_per_tonne_t2")
+            if missing_scenarios:
+                raise ValueError(f"Default kw per tonne does not exist. Please provide a tier 2 value for kw per tonne for scenarios: {', '.join(missing_scenarios)}")
 
         try:
             self.fui_start = ipcc.SmallFisheryFUI.objects.get_value_or_average(fishery_type=self.module.fishery_type, gear_type=self.module.gear_type_start)
