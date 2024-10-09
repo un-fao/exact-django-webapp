@@ -3575,92 +3575,69 @@ class SettlementCalculator(LandModuleCalculator):
 
     def __init__(self, module) -> None:
         super().__init__(module)
-        module: Settlement = module
+        self.module: Settlement
 
-        self.nitrous_ef = SimpleNamespace(value=0)
-
-        self.ef_start = SimpleNamespace(flu=0, fmg=0, fi=0, biomass=0)
-        self.ef_w = SimpleNamespace(flu=0, fmg=0, fi=0, biomass=0)
-        self.ef_wo = SimpleNamespace(flu=0, fmg=0, fi=0, biomass=0)
+        self.ef_start: ipcc.SettlementEF = ipcc.SettlementEF()
+        self.ef_w: ipcc.SettlementEF = ipcc.SettlementEF()
+        self.ef_wo: ipcc.SettlementEF = ipcc.SettlementEF()
 
     def get_defaults(self, calculate=False) -> dict:
         log.debug("START SettlementCalculator.get_defaults")
         super().get_defaults(calculate)
-
-        module: Settlement = self.data
-        luc: LandUseChange = module.land_use_change
-
-        climate: Climate = module.activity.climate_t2 or module.activity.project.climate
-        moisture: Moisture = module.activity.moisture_t2 or module.activity.project.moisture
-
-        self.nitrous_ef = utils.get_or_raise(ipcc.NitrousEmissionFactor, {"moisture": moisture}, f"Nitrous EF not found for {moisture.name} moisture")
 
         """
         # NOTE: Since biomass for Settlement is in another IPCC table, detached from the other biomass references for the other modules (e.g. ForestTotalBiomass),
         I wonder if in a LUC scenario the reference values would be wrong, since the Settlement would only be able to access its own biomass reference values.
         08/10/2024: Lorenzo Maestripieri said that this logic is fine, since the biomass reference values are specific to the module.
         """
-        if module.is_start():
-            self.ef_start: ipcc.SettlementEF = utils.get_or_raise(ipcc.SettlementEF, {"settlement_type": module.settlement_type_start, "climate": climate, "moisture": moisture}, f"Settlement EF not found for {module.settlement_type_start.name}")
-            self.flu_start = SimpleNamespace(value=self.ef_start.flu)
-            self.fi_start = SimpleNamespace(value=self.ef_start.fi)
-            self.fmg_start = SimpleNamespace(value=self.ef_start.fmg)
+        if self.module.is_start():
+            self.ef_start: ipcc.SettlementEF = utils.get_or_raise(ipcc.SettlementEF, {"settlement_type": self.module.settlement_type_start, "climate": self.climate, "moisture": self.moisture}, f"Settlement EF not found for {self.module.settlement_type_start.name}")
+            self.flu_start = DefaultValue(self.ef_start.flu)
+            self.fi_start = DefaultValue(self.ef_start.fi)
+            self.fmg_start = DefaultValue(self.ef_start.fmg)
 
-        if module.is_with():
-            self.ef_w: ipcc.SettlementEF = utils.get_or_raise(ipcc.SettlementEF, {"settlement_type": module.settlement_type_w, "climate": climate, "moisture": moisture}, f"Settlement EF not found for {module.settlement_type_w.name}")
-            self.flu_w = SimpleNamespace(value=self.ef_w.flu)
-            self.fi_w = SimpleNamespace(value=self.ef_w.fi)
-            self.fmg_w = SimpleNamespace(value=self.ef_w.fmg)
+        if self.module.is_with():
+            self.ef_w: ipcc.SettlementEF = utils.get_or_raise(ipcc.SettlementEF, {"settlement_type": self.module.settlement_type_w, "climate": self.climate, "moisture": self.moisture}, f"Settlement EF not found for {self.module.settlement_type_w.name}")
+            self.flu_w = DefaultValue(self.ef_w.flu)
+            self.fi_w = DefaultValue(self.ef_w.fi)
+            self.fmg_w = DefaultValue(self.ef_w.fmg)
 
-        if module.is_without():
-            self.ef_wo: ipcc.SettlementEF = utils.get_or_raise(ipcc.SettlementEF, {"settlement_type": module.settlement_type_wo, "climate": climate, "moisture": moisture}, f"Settlement EF not found for {module.settlement_type_wo.name}")
-            self.flu_wo = SimpleNamespace(value=self.ef_wo.flu)
-            self.fi_wo = SimpleNamespace(value=self.ef_wo.fi)
-            self.fmg_wo = SimpleNamespace(value=self.ef_wo.fmg)
+        if self.module.is_without():
+            self.ef_wo: ipcc.SettlementEF = utils.get_or_raise(ipcc.SettlementEF, {"settlement_type": self.module.settlement_type_wo, "climate": self.climate, "moisture": self.moisture}, f"Settlement EF not found for {self.module.settlement_type_wo.name}")
+            self.flu_wo = DefaultValue(self.ef_wo.flu)
+            self.fi_wo = DefaultValue(self.ef_wo.fi)
+            self.fmg_wo = DefaultValue(self.ef_wo.fmg)
 
-        if luc and module.is_start() and module.settlement_type_start.name.casefold() != "paved settlement":
-            module_start, module_w, module_wo = luc.get_modules()
-
-            is_paved_w = module.is_with() and module.settlement_type_w.name.casefold() == "paved settlement"
-            is_paved_wo = module.is_without() and module.settlement_type_wo.name.casefold() == "paved settlement"
+        # SOCinitial in case of non-paved settlement (start) to paved settlement (end)
+        if self.luc and self.module.is_start() and self.module.settlement_type_start.name.casefold() != "paved settlement":
+            is_paved_w = self.module.is_with() and self.module.settlement_type_w.name.casefold() == "paved settlement"
+            is_paved_wo = self.module.is_without() and self.module.settlement_type_wo.name.casefold() == "paved settlement"
 
             if is_paved_w or is_paved_wo:
-                flu_start = get_flu_data(module_start, climate, moisture, utils.ScenarioTypes.WITHOUT)
-                fi_start = get_fi_data(module_start, climate, moisture, utils.ScenarioTypes.WITHOUT)
-                fmg_start = get_fmg_data(module_start, climate, moisture, utils.ScenarioTypes.WITHOUT)
+                self.flu_start = get_flu_data(self.module_start, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
+                self.fi_start = get_fi_data(self.module_start, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
+                self.fmg_start = get_fmg_data(self.module_start, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
 
-                self.soc_start.value = self.soc_start.value * flu_start * fi_start * fmg_start  # SOCinitial
+                self.soc_start.value = self.soc_start.value * self.flu_start.value * self.fi_start.value * self.fmg_start.value  # SOCinitial
 
         log.debug("END SettlementCalculator.get_defaults")
 
     def calculate(self) -> Result:
         log.debug("START SettlementCalculator.calculate")
-        module: Settlement = self.data
-        activity: Activity = module.activity
-        project: Project = activity.project
-
-        res_w = MathResult(
-            self.activity.implementation_years,
-            self.activity.capitalization_years,
-        )
-        res_wo = MathResult(
-            self.activity.implementation_years,
-            self.activity.capitalization_years,
-        )
 
         self.get_defaults()
 
-        if module.is_start():
+        if self.module.is_start():
             log.debug("Start")
 
-            inputs_start_w = {
-                "hectares_start": module.area,
+            self.inputs_start_w = {
+                "hectares_start": self.area,
                 "hectares_end": 0,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "rate_type": activity.change_rate.name,
-                "nitrous_constant": project.gwp.n2o,
-                "ef_nitrous_som": self.nitrous_ef.value,
+                "rate_type": self.change_rate.name,
+                "nitrous_constant": self.project.gwp.n2o,
+                "ef_nitrous_som": self.som.value,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
@@ -3686,17 +3663,17 @@ class SettlementCalculator(LandModuleCalculator):
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
             }
 
-            self.math_start_w = MathNotCultivatedLand(**inputs_start_w)
+            self.math_start_w = MathNotCultivatedLand(**self.inputs_start_w)
             self.math_start_w.calculate_emissions()
 
-            inputs_start_wo = {
-                "hectares_start": module.area,
+            self.inputs_start_wo = {
+                "hectares_start": self.area,
                 "hectares_end": 0,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "rate_type": activity.change_rate.name,
-                "nitrous_constant": project.gwp.n2o,
-                "ef_nitrous_som": self.nitrous_ef.value,
+                "rate_type": self.change_rate.name,
+                "nitrous_constant": self.project.gwp.n2o,
+                "ef_nitrous_som": self.som.value,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
@@ -3722,19 +3699,19 @@ class SettlementCalculator(LandModuleCalculator):
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
             }
 
-            self.math_start_wo = MathNotCultivatedLand(**inputs_start_wo)
+            self.math_start_wo = MathNotCultivatedLand(**self.inputs_start_wo)
             self.math_start_wo.calculate_emissions()
 
-        if module.is_with():
+        if self.module.is_with():
 
-            inputs_w = {
+            self.inputs_w = {
                 "hectares_start": 0,
-                "hectares_end": module.area,
+                "hectares_end": self.area,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "rate_type": activity.change_rate.name,
-                "nitrous_constant": project.gwp.n2o,
-                "ef_nitrous_som": self.nitrous_ef.value,
+                "rate_type": self.change_rate.name,
+                "nitrous_constant": self.project.gwp.n2o,
+                "ef_nitrous_som": self.som.value,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
@@ -3753,26 +3730,26 @@ class SettlementCalculator(LandModuleCalculator):
                 "fi_start_tier_2": self.module_start.fi_t2_start,
                 "fi_end_tier_2": self.module_w.fi_t2_w,
                 "delay": self.activity.delay,
-                "calculate_biomass": module.is_luc_remaining_same(),
+                "calculate_biomass": self.module.is_luc_remaining_same(),
                 "biomass_start_default": self.ef_start.biomass,
                 "biomass_end_default": self.ef_w.biomass,
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
             }
 
-            self.math_w = MathNotCultivatedLand(**inputs_w)
+            self.math_w = MathNotCultivatedLand(**self.inputs_w)
             self.math_w.calculate_emissions()
 
-        if module.is_without():
+        if self.module.is_without():
 
-            inputs_wo = {
+            self.inputs_wo = {
                 "hectares_start": 0,
-                "hectares_end": module.area,
+                "hectares_end": self.area,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "rate_type": activity.change_rate.name,
-                "nitrous_constant": project.gwp.n2o,
-                "ef_nitrous_som": self.nitrous_ef.value,
+                "rate_type": self.change_rate.name,
+                "nitrous_constant": self.project.gwp.n2o,
+                "ef_nitrous_som": self.som.value,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
@@ -3791,14 +3768,14 @@ class SettlementCalculator(LandModuleCalculator):
                 "fi_start_tier_2": self.module_start.fi_t2_start,
                 "fi_end_tier_2": self.module_wo.fi_t2_wo,
                 "delay": self.activity.delay,
-                "calculate_biomass": module.is_business_as_usual(),
+                "calculate_biomass": self.module.is_business_as_usual(),
                 "biomass_start_default": self.ef_start.biomass,
                 "biomass_end_default": self.ef_wo.biomass,
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
             }
 
-            self.math_wo = MathNotCultivatedLand(**inputs_wo)
+            self.math_wo = MathNotCultivatedLand(**self.inputs_wo)
             self.math_wo.calculate_emissions()
 
         self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
@@ -3812,26 +3789,26 @@ class SettlementCalculator(LandModuleCalculator):
             self.results_w.plot_emissions_and_aggregate_by_activity("settlement_w")
             self.results_wo.plot_emissions_and_aggregate_by_activity("settlement_wo")
 
-        res_w += self.results_start_w
-        res_wo += self.results_start_wo
+        self.results_w += self.results_start_w
+        self.results_wo += self.results_start_wo
 
-        res_w += self.results_w
-        res_wo += self.results_wo
+        self.results_w += self.results_w
+        self.results_wo += self.results_wo
 
-        for building in module.buildings.all():
+        for building in self.module.buildings.all():
             r_w, r_wo = BuildingCalculator(building).calculate()
 
-            res_w += r_w
-            res_wo += r_wo
+            self.results_w += r_w
+            self.results_wo += r_wo
 
-        for road in module.roads.all():
+        for road in self.module.roads.all():
             r_w, r_wo = RoadCalculator(road).calculate()
 
-            res_w += r_w
-            res_wo += r_wo
+            self.results_w += r_w
+            self.results_wo += r_wo
 
         log.debug("END SettlementCalculator.calculate")
-        return (res_w, res_wo)
+        return (self.results_w, self.results_wo)
 
 
 class BuildingCalculator(BaseCalculator):
