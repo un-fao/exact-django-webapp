@@ -36,9 +36,17 @@ class ManureManagementTypes(Enum):
 
 
 class ScenarioTypes(Enum):
-    START = "start"
-    WITH = "w"
-    WITHOUT = "wo"
+    START = "start", "start"
+    WITH = "w", "with"
+    WITHOUT = "wo", "without"
+
+    def __new__(cls, value, verbose_name):
+        # Retain the original behavior for value
+        obj = object.__new__(cls)
+        obj._value_ = value
+        # Set additional attributes
+        obj.verbose_name = verbose_name
+        return obj
 
 
 class EmissionTypes(Enum):
@@ -487,3 +495,16 @@ def get_entity_definitions(entity_type: str) -> dict:
     field_definitions = {field.name: _(field.verbose_name) if field.verbose_name else field.name for field in model_class._meta.get_fields() if hasattr(field, "verbose_name") and not field.name.endswith("_thread")}
 
     return field_definitions
+
+
+def find_empty_scenarios(entity, field: str):
+    if not isinstance(entity, api_models.Module):
+        raise ValueError("Entity must be a Module instance")
+
+    missing = []
+
+    for s in ScenarioTypes:
+        if getattr(entity, f"{field}_{s.value}") is None and callable(entity, f"is_{s.verbose_name}"):
+            missing.append(s.value)
+
+    return missing
