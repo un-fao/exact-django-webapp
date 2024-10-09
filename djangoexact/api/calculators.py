@@ -6006,46 +6006,22 @@ class SetAsideCalculator(LandModuleCalculator):
 
     def __init__(self, input) -> None:
         super().__init__(input)
-
-        self.biomass_ef_start: SimpleNamespace | ipcc.ForestTotalBiomass = SimpleNamespace(value=0)
-        self.biomass_ef_w: SimpleNamespace | ipcc.TotalBiomassAfterDefo = SimpleNamespace(value=0)
-        self.biomass_ef_wo: SimpleNamespace | ipcc.TotalBiomassAfterDefo = SimpleNamespace(value=0)
+        self.module: SetAside
 
     def get_defaults(self, calculate=False) -> dict:
         super().get_defaults(calculate)
 
-        module: SetAside = self.data
-        activity: Activity = module.activity
-
-        moisture_flt = {"moisture": self.moisture}
-
-        if module.is_start():
-            self.emission_factors_start = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {self.moisture.name} moisture does not exist")
-
-        if module.is_with():
-            self.emission_factors_w = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {self.moisture.name} moisture does not exist")
-
-        if module.is_without():
-            self.emission_factors_wo = utils.get_or_raise(ipcc.NitrousEmissionFactor, moisture_flt, f"DefaultEmissionFactor for {self.moisture.name} moisture does not exist")
-
-        if module.is_ready() and calculate:
-            self.calculate(self)
-
     def calculate(self) -> Result:
-        module: SetAside = self.module
-        activity: Activity = module.activity
-        project: Project = activity.project
-
         self.get_defaults()
 
-        if module.is_start():
+        if self.module.is_start():
             self.inputs_start_w = {
                 "hectares_start": self.area,
                 "hectares_end": 0,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "rate_type": activity.change_rate.name,
-                "nitrous_constant": project.gwp.n2o,
+                "rate_type": self.change_rate.name,
+                "nitrous_constant": self.project.gwp.n2o,
                 "ef_nitrous_som": self.som.value,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_w.value,
@@ -6068,8 +6044,8 @@ class SetAsideCalculator(LandModuleCalculator):
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_w.value,
                 "calculate_biomass": False,
-                "biomass_start_tier_2": module.biomass_t2_start,
-                "biomass_end_tier_2": module.biomass_t2_w,
+                "biomass_start_tier_2": self.module.biomass_t2_start,
+                "biomass_end_tier_2": self.module.biomass_t2_w,
             }
 
             self.math_start_w = MathNotCultivatedLand(**self.inputs_start_w)
@@ -6080,8 +6056,8 @@ class SetAsideCalculator(LandModuleCalculator):
                 "hectares_end": 0,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "rate_type": activity.change_rate.name,
-                "nitrous_constant": project.gwp.n2o,
+                "rate_type": self.change_rate.name,
+                "nitrous_constant": self.project.gwp.n2o,
                 "ef_nitrous_som": self.som.value,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_wo.value,
@@ -6104,21 +6080,21 @@ class SetAsideCalculator(LandModuleCalculator):
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
                 "calculate_biomass": False,
-                "biomass_start_tier_2": module.biomass_t2_start,
-                "biomass_end_tier_2": module.biomass_t2_wo,
+                "biomass_start_tier_2": self.module.biomass_t2_start,
+                "biomass_end_tier_2": self.module.biomass_t2_wo,
             }
 
             self.math_start_wo = MathNotCultivatedLand(**self.inputs_start_wo)
             self.math_start_wo.calculate_emissions()
 
-        if module.is_with():
+        if self.module.is_with():
             self.inputs_w = {
                 "hectares_start": 0,
                 "hectares_end": self.area,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "rate_type": activity.change_rate.name,
-                "nitrous_constant": project.gwp.n2o,
+                "rate_type": self.change_rate.name,
+                "nitrous_constant": self.project.gwp.n2o,
                 "ef_nitrous_som": self.som.value,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_w.value,
@@ -6138,24 +6114,24 @@ class SetAsideCalculator(LandModuleCalculator):
                 "fi_start_tier_2": self.module_start.fi_t2_start,
                 "fi_end_tier_2": self.module_w.fi_t2_w,
                 "delay": self.activity.delay,
-                "calculate_biomass": module.is_luc_remaining_same(),
+                "calculate_biomass": self.module.is_luc_remaining_same(),
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_w.value,
-                "biomass_start_tier_2": module.biomass_t2_start,
-                "biomass_end_tier_2": module.biomass_t2_w,
+                "biomass_start_tier_2": self.module.biomass_t2_start,
+                "biomass_end_tier_2": self.module.biomass_t2_w,
             }
 
             self.math_w = MathNotCultivatedLand(**self.inputs_w)
             self.math_w.calculate_emissions()
 
-        if module.is_without():
+        if self.module.is_without():
             self.inputs_wo = {
                 "hectares_start": 0,
                 "hectares_end": self.area,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "rate_type": activity.change_rate.name,
-                "nitrous_constant": project.gwp.n2o,
+                "rate_type": self.change_rate.name,
+                "nitrous_constant": self.project.gwp.n2o,
                 "ef_nitrous_som": self.som.value,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_wo.value,
@@ -6175,11 +6151,11 @@ class SetAsideCalculator(LandModuleCalculator):
                 "fi_start_tier_2": self.module_start.fi_t2_start,
                 "fi_end_tier_2": self.module_wo.fi_t2_w,
                 "delay": self.activity.delay,
-                "calculate_biomass": module.is_business_as_usual(),
+                "calculate_biomass": self.module.is_business_as_usual(),
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
-                "biomass_start_tier_2": module.biomass_t2_start,
-                "biomass_end_tier_2": module.biomass_t2_wo,
+                "biomass_start_tier_2": self.module.biomass_t2_start,
+                "biomass_end_tier_2": self.module.biomass_t2_wo,
             }
 
             self.math_wo = MathNotCultivatedLand(**self.inputs_wo)
