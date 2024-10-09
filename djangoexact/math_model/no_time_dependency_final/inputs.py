@@ -1,6 +1,6 @@
 import math
 import traceback
-
+import numpy as np
 from .generalized_modules import BaseModule
 
 from .general_functions import input_single_calculation, yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, breakdown_according_to_values
@@ -36,17 +36,17 @@ class Inputs(BaseModule):
     def calculate_emissions(self):
         try:
             if self.unit_factor_co2 is None or self.emissions_factor_co2 is None or self.ipcc_factor_co2 is None:
-                yearly_co2_eq_emissions = total_co2_eq_emissions = []
+                yearly_co2_eq_emissions = total_co2_eq_emissions = np.zeros(self.implementation_time + self.capitalization_time)
             else:
                 yearly_co2_eq_emissions, total_co2_eq_emissions = input_single_calculation(self.unit_start, self.unit_end, self.ipcc_factor_co2, self.tier_2_factor_co2, self.unit_factor_co2, self.emissions_factor_co2, self.implementation_time, self.capitalization_time, self.rate_type)
 
             if self.unit_factor_n2o is None or self.emissions_factor_n2o is None or self.ipcc_factor_n2o is None:
-                yearly_n2o_emissions = total_n2o_emissions = []
+                yearly_n2o_emissions = total_n2o_emissions = np.zeros(self.implementation_time + self.capitalization_time)
             else:
                 yearly_n2o_emissions, total_n2o_emissions = input_single_calculation(self.unit_start, self.unit_end, self.ipcc_factor_n2o, self.tier_2_factor_n2o, self.unit_factor_n2o, self.emissions_factor_n2o, self.implementation_time, self.capitalization_time, self.rate_type)
 
             if self.unit_factor_eq is None or self.emissions_factor_eq is None or self.ipcc_factor_eq is None:
-                yearly_co2_emissions = total_co2_emissions = []
+                yearly_co2_emissions = total_co2_emissions = np.zeros(self.implementation_time + self.capitalization_time)
             else:
                 yearly_co2_emissions, total_co2_emissions = input_single_calculation(self.unit_start, self.unit_end, self.ipcc_factor_eq, self.tier_2_factor_eq, self.unit_factor_eq, self.emissions_factor_eq, self.implementation_time, self.capitalization_time, self.rate_type)
 
