@@ -3236,7 +3236,6 @@ class InputCalculator(BaseCalculator):
 
     def calculate(self) -> list[MathResult]:
         module: Input = self.data
-        project: Project = module.activity.project
 
         self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
@@ -3259,61 +3258,66 @@ class InputEntryCalculator(BaseCalculator):
     def __init__(self, input) -> None:
         super().__init__(input)
 
+        self.module: InputEntry
+
         self.ref = SimpleNamespace(co2_multiplier=0, co2_emissions_multiplier=0, n2o_quantity_multiplier=0, n2o_emissions_multiplier=0, production_quantity_multiplier=0, production_emissions_multiplier=0)
         self.ef = SimpleNamespace(co2_value=0, n2o_value=0, co2_eq_value=0)
 
     def get_defaults(self, calculate=False) -> dict:
 
-        module: InputEntry = self.data
-        activity: Activity = module.parent.activity
-        project: Project = activity.project
+        input_type: InputType = self.module.input_type
 
-        input_type: InputType = module.input_type
+        needs_co2_ref = input_type.has_co2_emissions and not self.module.co2_emissions_t2
+        needs_n2o_ref = input_type.has_n2o_emissions and not self.module.n2o_emissions_t2
+        needs_co2_e_ref = input_type.has_co2_e_emissions and not self.module.co2_e_emissions_t2
 
-        needs_co2_ref = input_type.has_co2_emissions and not module.co2_emissions_t2
-        needs_n2o_ref = input_type.has_n2o_emissions and not module.n2o_emissions_t2
-        needs_co2_e_ref = input_type.has_co2_e_emissions and not module.co2_e_emissions_t2
-
-        if module.status.name == "READY" and calculate:
+        if self.module.status.name == "READY" and calculate:
             self.calculate()
 
         try:
-            self.ref = ipcc.InputReference.objects.get(input_type=module.input_type)
+            self.ref = ipcc.InputReference.objects.get(input_type=self.module.input_type)
         except ipcc.InputReference.DoesNotExist:
-            raise ValueError(f"Reference for {module.input_type.name} does not exist.")
+            raise ValueError(f"Reference for {self.module.input_type.name} does not exist.")
 
-        try:
-            self.ef = ipcc.InputEmissionFactor.objects.get(input_type=module.input_type, climate=project.climate, moisture=project.moisture)
-        except ipcc.InputEmissionFactor.DoesNotExist:
-            if needs_co2_ref or needs_n2o_ref or needs_co2_e_ref:
-                raise ValueError(f"Emission factor for {module.input_type.name} does not exist for {project.climate.name} and {project.moisture.name}. Please define tier 2 values.")
+        self.ef = ipcc.InputEmissionFactor.objects.filter(input_type=self.module.input_type, climate=self.project.climate, moisture=self.project.moisture).first()
+
+        if self.ef:
+            if self.ef.co2_value is None and needs_co2_ref:
+                raise ValueError(f"Emission factor for {self.module.input_type.name} does not exist for {self.project.climate.name} and {self.project.moisture.name}. Please define tier 2 values.")
+            if self.ef.n2o_value is None and needs_n2o_ref:
+                raise ValueError(f"Emission factor for {self.module.input_type.name} does not exist for {self.project.climate.name} and {self.project.moisture.name}. Please define tier 2 values.")
+            if self.ef.co2_eq_value is None and needs_co2_e_ref:
+                raise ValueError(f"Emission factor for {self.module.input_type.name} does not exist for {self.project.climate.name} and {self.project.moisture.name}. Please define tier 2 values.")
+        else:
+            if needs_co2_ref:
+                raise ValueError(f"CO2 Emission factor for {self.module.input_type.name} does not exist for {self.project.climate.name} and {self.project.moisture.name}. Please define tier 2 values.")
+            if needs_n2o_ref:
+                raise ValueError(f"N2O Emission factor for {self.module.input_type.name} does not exist for {self.project.climate.name} and {self.project.moisture.name}. Please define tier 2 values.")
+            if needs_co2_e_ref:
+                raise ValueError(f"CO2e Emission factor for {self.module.input_type.name} does not exist for {self.project.climate.name} and {self.project.moisture.name}. Please define tier 2 values.")
 
         self.math_w = None
         self.math_wo = None
 
     def calculate(self) -> list[Result]:
-        module: InputEntry = self.data
-        activity: Activity = module.parent.activity
-        project: Project = activity.project
-
         self.get_defaults()
 
         self.inputs_w = {
-            "unit_start": module.value_start,
-            "unit_end": module.value_w,
-            "rate_type": activity.change_rate.name,
+            "unit_start": self.module.value_start,
+            "unit_end": self.module.value_w,
+            "rate_type": self.activity.change_rate.name,
             "ipcc_factor_co2": self.ef.co2_value,
-            "tier_2_factor_co2": module.co2_emissions_t2,
+            "tier_2_factor_co2": self.module.co2_emissions_t2,
             "unit_factor_co2": self.ref.co2_multiplier,
             "emissions_factor_co2": self.ref.co2_emissions_multiplier,
             "implementation_time": self.activity.implementation_years,
             "capitalization_time": self.activity.capitalization_years,
             "ipcc_factor_n2o": self.ef.n2o_value,
-            "tier_2_factor_n2o": module.n2o_emissions_t2,
+            "tier_2_factor_n2o": self.module.n2o_emissions_t2,
             "unit_factor_n2o": self.ref.n2o_quantity_multiplier,
             "emissions_factor_n2o": self.ref.n2o_emissions_multiplier,
             "ipcc_factor_eq": self.ef.co2_eq_value,
-            "tier_2_factor_eq": module.co2_e_emissions_t2,
+            "tier_2_factor_eq": self.module.co2_e_emissions_t2,
             "unit_factor_eq": self.ref.production_quantity_multiplier,
             "emissions_factor_eq": self.ref.production_emissions_multiplier,
             "delay": self.activity.delay,
@@ -3324,21 +3328,21 @@ class InputEntryCalculator(BaseCalculator):
         self.math_w.calculate_emissions()
 
         self.inputs_wo = {
-            "unit_start": module.value_start,
-            "unit_end": module.value_wo,
-            "rate_type": activity.change_rate.name,
+            "unit_start": self.module.value_start,
+            "unit_end": self.module.value_wo,
+            "rate_type": self.activity.change_rate.name,
             "ipcc_factor_co2": self.ef.co2_value,
-            "tier_2_factor_co2": module.co2_emissions_t2,
+            "tier_2_factor_co2": self.module.co2_emissions_t2,
             "unit_factor_co2": self.ref.co2_multiplier,
             "emissions_factor_co2": self.ref.co2_emissions_multiplier,
             "implementation_time": self.activity.implementation_years,
             "capitalization_time": self.activity.capitalization_years,
             "ipcc_factor_n2o": self.ef.n2o_value,
-            "tier_2_factor_n2o": module.n2o_emissions_t2,
+            "tier_2_factor_n2o": self.module.n2o_emissions_t2,
             "unit_factor_n2o": self.ref.n2o_quantity_multiplier,
             "emissions_factor_n2o": self.ref.n2o_emissions_multiplier,
             "ipcc_factor_eq": self.ef.co2_eq_value,
-            "tier_2_factor_eq": module.co2_e_emissions_t2,
+            "tier_2_factor_eq": self.module.co2_e_emissions_t2,
             "unit_factor_eq": self.ref.production_quantity_multiplier,
             "emissions_factor_eq": self.ref.production_emissions_multiplier,
             "delay": self.activity.delay,
