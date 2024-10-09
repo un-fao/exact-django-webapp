@@ -3427,14 +3427,14 @@ class ElectricityCalculator(BaseCalculator):
 
         self.module: Electricity
 
-        self.TRANSMISSION_LOSS = .1 # TODO: Add to database parameters
+        self.TRANSMISSION_LOSS = 0.1  # TODO: Add to database parameters
         self.electricity_ef_default: ipcc.ElectricityEmission = ipcc.ElectricityEmission()
         self.electricity_ef_selected: DefaultValue = DefaultValue()
 
     def get_defaults(self, calculate=False) -> dict:
         super().get_defaults(calculate)
 
-        try:            
+        try:
             self.electricity_ef_default = ipcc.ElectricityEmission.objects.get(country=self.country)
 
             if self.module.ef_source.name == "Operating Margin":
@@ -3512,15 +3512,34 @@ class FuelCalculator(BaseCalculator):
     def __init__(self, input) -> None:
         super().__init__(input)
 
-        self.ef = ipcc.EnergyDefaultEmissionFactor(fuel_type=None, co2=0, ch4=0, n2o=0)
+        self.module: Fuel
+        self.energy_ef_default: ipcc.EnergyDefaultEmissionFactor = ipcc.EnergyDefaultEmissionFactor()
+
+        self.methane_constant = self.project.gwp.ch4
+        if self.module.fuel_type.name in ["Peat", "Charcoal"]:
+            self.methane_constant = self.project.gwp.ch4_fossil
 
     def get_defaults(self, calculate=False) -> dict:
-        self.module: Fuel
+        super().get_defaults(calculate)
 
         try:
-            self.ef = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=self.module.fuel_type, fuel_use_type=self.module.fuel_type.fuel_use_type)
+            self.energy_ef_default = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=self.module.fuel_type, fuel_use_type=self.module.fuel_type.fuel_use_type)
+
+            if self.energy_ef_default:
+                if self.energy_ef_default.co2 is None and self.module.energy_ef_co2_t2 is None:
+                    raise ValueError(f"Default CO2 emission factor for {self.module.fuel_type.name} does not exist. Please provide a tier 2 value.")
+                if self.energy_ef_default.ch4 is None and self.module.energy_ef_ch4_t2 is None:
+                    raise ValueError(f"Default CH4 emission factor for {self.module.fuel_type.name} does not exist. Please provide a tier 2 value.")
+                if self.energy_ef_default.n2o is None and self.module.energy_ef_n2o_t2 is None:
+                    raise ValueError(f"Default N2O emission factor for {self.module.fuel_type.name} does not exist. Please provide a tier 2 value.")
+
         except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
-            raise ValueError(f"Default emission factor for {self.module.fuel_type.name} does not exist. Please select tier 2 value.")
+            if self.module.energy_ef_co2_t2 is None:
+                raise ValueError(f"CO2 emission factor for {self.module.fuel_type.name} does not exist. Please provide a tier 2 value.")
+            if self.module.energy_ef_ch4_t2 is None:
+                raise ValueError(f"CH4 emission factor for {self.module.fuel_type.name} does not exist. Please provide a tier 2 value.")
+            if self.module.energy_ef_n2o_t2 is None:
+                raise ValueError(f"N2O emission factor for {self.module.fuel_type.name} does not exist. Please provide a tier 2 value.")
 
     def calculate(self) -> list[Result]:
         """
@@ -3530,27 +3549,19 @@ class FuelCalculator(BaseCalculator):
 
         self.get_defaults()
 
-        change_rate = self.activity.change_rate
-        methane_constant = self.project.gwp.ch4
-
-        log.debug(f"Fuel Type: {self.module.fuel_type.name}")
-
-        if self.module.fuel_type.name in ["Peat", "Charcoal"]:
-            methane_constant = self.project.gwp.ch4_fossil
-
         inputs_w = {
-            "emissions_factor_co2": self.ef.co2,
-            "specific_factor_co2": self.module.ef_co2_t2,
-            "emissions_factor_ch4": self.ef.ch4,
-            "specific_factor_ch4": self.module.ef_ch4_t2,
-            "emissions_factor_n2o": self.ef.n2o,
-            "specific_factor_n2o": self.module.ef_n2o_t2,
+            "emissions_factor_co2": self.energy_ef_default.co2,
+            "specific_factor_co2": self.module.energy_ef_co2_t2,
+            "emissions_factor_ch4": self.energy_ef_default.ch4,
+            "specific_factor_ch4": self.module.energy_ef_ch4_t2,
+            "emissions_factor_n2o": self.energy_ef_default.n2o,
+            "specific_factor_n2o": self.module.energy_ef_n2o_t2,
             "mwh_start": self.module.fuel_consumption_start,
             "mwh_end": self.module.fuel_consumption_w,
-            "rate_type": change_rate.name,
+            "rate_type": self.change_rate.name,
             "implementation_time": self.activity.implementation_years,
             "capitalization_time": self.activity.capitalization_years,
-            "methane_constant": methane_constant,
+            "methane_constant": self.methane_constant,
             "nitrous_constant": self.project.gwp.n2o,
             "delay": self.activity.delay,
         }
@@ -3560,18 +3571,18 @@ class FuelCalculator(BaseCalculator):
         self.math_w.calculate_emissions()
 
         inputs_wo = {
-            "emissions_factor_co2": self.ef.co2,
-            "specific_factor_co2": self.module.ef_co2_t2,
-            "emissions_factor_ch4": self.ef.ch4,
-            "specific_factor_ch4": self.module.ef_ch4_t2,
-            "emissions_factor_n2o": self.ef.n2o,
-            "specific_factor_n2o": self.module.ef_n2o_t2,
+            "emissions_factor_co2": self.energy_ef_default.co2,
+            "specific_factor_co2": self.module.energy_ef_co2_t2,
+            "emissions_factor_ch4": self.energy_ef_default.ch4,
+            "specific_factor_ch4": self.module.energy_ef_ch4_t2,
+            "emissions_factor_n2o": self.energy_ef_default.n2o,
+            "specific_factor_n2o": self.module.energy_ef_n2o_t2,
             "mwh_start": self.module.fuel_consumption_start,
             "mwh_end": self.module.fuel_consumption_wo,
-            "rate_type": change_rate.name,
+            "rate_type": self.change_rate.name,
             "implementation_time": self.activity.implementation_years,
             "capitalization_time": self.activity.capitalization_years,
-            "methane_constant": methane_constant,
+            "methane_constant": self.methane_constant,
             "nitrous_constant": self.project.gwp.n2o,
             "delay": self.activity.delay,
         }
