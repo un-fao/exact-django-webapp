@@ -349,6 +349,18 @@ class LivestockDefaults(Defaults):
             prp_percentage_t2_start_default=0,
             prp_percentage_t2_w_default=0,
             prp_percentage_t2_wo_default=0,
+            prp_ch4_t2_start_default=0,
+            prp_ch4_t2_w_default=0,
+            prp_ch4_t2_wo_default=0,
+            prp_n2o_t2_start_default=0,
+            prp_n2o_t2_w_default=0,
+            prp_n2o_t2_wo_default=0,
+            emission_factor_ch4_t2_start_default=0,
+            emission_factor_ch4_t2_w_default=0,
+            emission_factor_ch4_t2_wo_default=0,
+            emission_factor_n2o_t2_start_default=0,
+            emission_factor_n2o_t2_w_default=0,
+            emission_factor_n2o_t2_wo_default=0,
         )
 
     def get_defaults(self, calculate=False) -> dict:
@@ -364,15 +376,18 @@ class LivestockDefaults(Defaults):
             prp_percentage_t2_start_default=defaults.animal_waste_prp_start.value,
             prp_percentage_t2_w_default=defaults.animal_waste_prp_w.value,
             prp_percentage_t2_wo_default=defaults.animal_waste_prp_wo.value,
-            # TODO: Wait for Lorenzo to communicate which fields to get from math model
-            # self.ch4_prp_head_start_tier_2_default = None
-            # self.ch4_prp_head_end_tier_2_default = None
-            # self.ch4_system_head_start_tier_2_default = None
-            # self.ch4_system_head_end_tier_2_default = None
-            # self.n2o_prp_direct_head_start_tier_2_default = None
-            # self.n2o_prp_direct_head_end_tier_2_default = None
-            # self.n2o_system_direct_head_start_tier_2_default = None
-            # self.n2o_system_direct_head_end_tier_2_default = None
+            prp_ch4_t2_start_default=None,
+            prp_ch4_t2_w_default=defaults.math_w.percentage_prp_end_tier_2_default,
+            prp_ch4_t2_wo_default=defaults.math_wo.percentage_prp_end_tier_2_default,
+            prp_n2o_t2_start_default=None,
+            prp_n2o_t2_w_default=defaults.math_w.n2o_prp_direct_head_end_tier_2_default,
+            prp_n2o_t2_wo_default=defaults.math_wo.n2o_prp_direct_head_end_tier_2_default,
+            emission_factor_ch4_t2_start_default=None,
+            emission_factor_ch4_t2_w_default=sum(defaults.math_w.ch4_system_head_end_tier_2_default),
+            emission_factor_ch4_t2_wo_default=sum(defaults.math_wo.ch4_system_head_end_tier_2_default),
+            emission_factor_n2o_t2_start_default=None,
+            emission_factor_n2o_t2_w_default=sum(defaults.math_w.n2o_system_direct_head_end_tier_2_default),
+            emission_factor_n2o_t2_wo_default=sum(defaults.math_wo.n2o_system_direct_head_end_tier_2_default),
         )
 
 
@@ -907,10 +922,9 @@ class OrganicSoilDefaults(Defaults):
             offsite_ch4_peat_t2_start_default=0,
             offsite_ch4_peat_t2_w_default=defaults.offsite_ef_w.ch4,
             offsite_ch4_peat_t2_wo_default=defaults.offsite_ef_wo.ch4,
-            # TODO: Ask Lorenzo about mapping of commented out fields
-            # peat_density_t2_start_default=defaults.peat_density.value, # TODO: Ask @Peter m/V
-            # peat_density_t2_w_default=defaults.peat_density.value, # TODO: Ask @Peter m/V
-            # peat_density_t2_wo_default=defaults.peat_density.value, # TODO: Ask @Peter m/V
+            peat_density_t2_start_default=0,
+            peat_density_t2_w_default=defaults.peat_extraction_math_w.peat_density_tier_2_default,
+            peat_density_t2_wo_default=defaults.peat_extraction_math_wo.peat_density_tier_2_default,
         )
 
 
@@ -991,16 +1005,9 @@ class OtherLandDefaults(Defaults):  # TODO: Rename to OtherLand
             fmg_t2_start_default=defaults.fmg_start.value,
             fmg_t2_w_default=defaults.fmg_w.value,
             fmg_t2_wo_default=defaults.fmg_wo.value,
-            # TODO: Ask Lorenzo about mapping of commented out fields
-            # agb_t2_start_default=defaults.agb_start.value,
-            # agb_t2_w_default=defaults.agb_w.value,
-            # agb_t2_wo_default=defaults.agb_wo.value,
-            # bgb_t2_start_default=defaults.bgb_start.value,
-            # bgb_t2_w_default=defaults.bgb_w.value,
-            # bgb_t2_wo_default=defaults.bgb_wo.value,
-            # biomass_t2_start_default=defaults.biomass_start.value,
-            # biomass_t2_w_default=defaults.biomass_w.value,
-            # biomass_t2_wo_default=defaults.biomass_wo.value,
+            biomass_t2_start_default=defaults.biomass_ef_start.value,
+            biomass_t2_w_default=defaults.biomass_ef_w.value,
+            biomass_t2_wo_default=defaults.biomass_ef_wo.value,
         )
 
 
@@ -1097,16 +1104,9 @@ class SetAsideDefaults(Defaults):
             fmg_t2_start_default=defaults.fmg_start.value,
             fmg_t2_w_default=defaults.fmg_w.value,
             fmg_t2_wo_default=defaults.fmg_wo.value,
-            # TODO: Ask Lorenzo about mapping of commented out fields
-            # agb_t2_start_default=defaults.agb_start.value,
-            # agb_t2_w_default=defaults.agb_w.value,
-            # agb_t2_wo_default=defaults.agb_wo.value,
-            # bgb_t2_start_default=defaults.bgb_start.value,
-            # bgb_t2_w_default=defaults.bgb_w.value,
-            # bgb_t2_wo_default=defaults.bgb_wo.value,
-            # biomass_t2_start_default=defaults.biomass_start.value,
-            # biomass_t2_w_default=defaults.biomass_w.value,
-            # biomass_t2_wo_default=defaults.biomass_wo.value,
+            biomass_t2_start_default=defaults.biomass_start.value,
+            biomass_t2_w_default=defaults.biomass_w.value,
+            biomass_t2_wo_default=defaults.biomass_wo.value,
         )
 
 
@@ -1247,16 +1247,17 @@ class ForestManagementDefaults(Defaults):
             bgb_growth_rate_gt_20_yrs_start_default=0,
             bgb_growth_rate_gt_20_yrs_w_default=defaults.bgb_after_20_yrs.value,
             bgb_growth_rate_gt_20_yrs_wo_default=defaults.bgb_after_20_yrs.value,
-            rotation_start_year_start_default=0,  # TODO: Ask Lorenzo
-            rotation_start_year_w_default=0,  # TODO: Ask Lorenzo
-            rotation_start_year_wo_default=0,  # TODO: Ask Lorenzo
-            logging_start_year_start_default=0,  # TODO: Ask Lorenzo
-            logging_start_year_w_default=0,  # TODO: Ask Lorenzo
-            logging_start_year_wo_default=0,  # TODO: Ask Lorenzo
-            logging_dry_matter_logged_start_default=0,  # TODO: Ask Lorenzo
-            logging_dry_matter_logged_w_default=0,  # TODO: Ask Lorenzo
-            logging_dry_matter_logged_wo_default=0,  # TODO: Ask Lorenzo
-            degradation_dry_matter_impacted_start_default=0,  # TODO: Ask Lorenzo
-            degradation_dry_matter_impacted_w_default=0,  # TODO: Ask Lorenzo
-            degradation_dry_matter_impacted_wo_default=0,  # TODO: Ask Lorenzo
+            rotation_start_year_start_default=defaults.activity.start_year_t2 - defaults.project.start_year_of_activities if defaults.activity.start_year_t2 else 0,
+            rotation_start_year_w_default=defaults.activity.start_year_t2 - defaults.project.start_year_of_activities if defaults.activity.start_year_t2 else 0,
+            rotation_start_year_wo_default=defaults.activity.start_year_t2 - defaults.project.start_year_of_activities if defaults.activity.start_year_t2 else 0,
+            logging_start_year_start_default=defaults.activity.start_year_t2 - defaults.project.start_year_of_activities if defaults.activity.start_year_t2 else 0,
+            logging_start_year_w_default=defaults.activity.start_year_t2 - defaults.project.start_year_of_activities if defaults.activity.start_year_t2 else 0,
+            logging_start_year_wo_default=defaults.activity.start_year_t2 - defaults.project.start_year_of_activities if defaults.activity.start_year_t2 else 0,
+            # TODO: This was removed. Will be added again, so do not remove from database model yet
+            # logging_dry_matter_logged_start_default=0,  # TODO: Ask Lorenzo
+            # logging_dry_matter_logged_w_default=0,  # TODO: Ask Lorenzo
+            # logging_dry_matter_logged_wo_default=0,  # TODO: Ask Lorenzo
+            # degradation_dry_matter_impacted_start_default=0,  # TODO: Ask Lorenzo
+            # degradation_dry_matter_impacted_w_default=0,  # TODO: Ask Lorenzo
+            # degradation_dry_matter_impacted_wo_default=0,  # TODO: Ask Lorenzo
         )
