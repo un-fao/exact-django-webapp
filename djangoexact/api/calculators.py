@@ -5568,17 +5568,13 @@ class ForestManagementCalculator(LandModuleCalculator):
         self.has_t2_growth_w = False
         self.has_t2_growth_wo = False
 
-        self.combusiton_factor_w = None
-        self.combusiton_factor_wo = None
-
-        self.mangroves_data = None
-        self.litter_dw = None
-        self.agb_growth = None
-        self.bgb_before_20_yrs = None
-        self.bgb_after_20_yrs = None
-        self.agb_under_20_yrs = None
-        self.agb_over_20_yrs = None
-        self.som = None
+        self.mangroves_data = ipcc.DataOnMangrove()
+        self.litter_dw = ipcc.LitterDeadwoodCarbonStock()
+        self.agb_growth = ipcc.ForestManagementAGBGrowth()
+        self.bgb_before_20_yrs = ipcc.ForestManagementBGB()
+        self.bgb_after_20_yrs = ipcc.ForestManagementBGB()
+        self.agb_under_20_yrs = ipcc.ForestManagementAGB()
+        self.agb_over_20_yrs = ipcc.ForestManagementAGB()
 
         self.agb_max_w = None
         self.agb_growth_over_20_w = None
@@ -5726,8 +5722,6 @@ class ForestManagementCalculator(LandModuleCalculator):
             self.agb_growth_under_20_wo = statistics.mean([self.agb_under_20_wo.agb_growth_max, self.agb_under_20_wo.agb_growth_min]) if all([self.agb_under_20_wo.agb_growth_max, self.agb_under_20_wo.agb_growth_min]) else self.forest.agb_growth_rate_le_20_yrs_t2_wo
             self.agb_start_wo = 0
             self.litter_dw_start_wo = SimpleNamespace(litter=0, dw=0)
-
-        self.som: ipcc.NitrousEmissionFactor = utils.get_or_raise(ipcc.NitrousEmissionFactor, {"moisture": self.climate}, f"SOM not found for {self.climate.name} moisture.")
 
         self.disturbances: list[ForestDisturbance] = self.module.disturbances.all()
 
