@@ -10,12 +10,14 @@ from rest_framework.response import Response
 from simple_history.models import HistoricalRecords
 from simple_history.utils import update_change_reason
 from django.utils.translation import get_language
+from django.core.exceptions import FieldDoesNotExist
 
 import api.models as api_models
 import ipcc.models as ipcc_models
 
 import logging as log
 from django.utils.translation import gettext_lazy as _
+from dataclasses import dataclass
 
 CN_RATIO_CROP = 10
 CN_RATIO_GRASSLAND = 15
@@ -36,9 +38,17 @@ class ManureManagementTypes(Enum):
 
 
 class ScenarioTypes(Enum):
-    START = "start"
-    WITH = "w"
-    WITHOUT = "wo"
+    START = "start", "start"
+    WITH = "w", "with"
+    WITHOUT = "wo", "without"
+
+    def __new__(cls, value, verbose_name):
+        # Retain the original behavior for value
+        obj = object.__new__(cls)
+        obj._value_ = value
+        # Set additional attributes
+        obj.verbose_name = verbose_name
+        return obj
 
 
 class EmissionTypes(Enum):
@@ -487,3 +497,34 @@ def get_entity_definitions(entity_type: str) -> dict:
     field_definitions = {field.name: _(field.verbose_name) if field.verbose_name else field.name for field in model_class._meta.get_fields() if hasattr(field, "verbose_name") and not field.name.endswith("_thread")}
 
     return field_definitions
+
+
+def find_empty_scenarios(entity, field: str):
+    if not isinstance(entity, api_models.Module):
+        raise ValueError("Entity must be a Module instance")
+
+    entity: api_models.Module
+
+    relevant_scenarios: list[ScenarioTypes] = entity.get_relevant_scenarios()
+
+    missing = []
+
+    for s in relevant_scenarios:
+        # Dynamically construct the field name
+        field_name = f"{field}_{s.value}"
+
+        try:
+            # Check if the field exists in the model using _meta
+            entity._meta.get_field(field_name)
+
+            if getattr(entity, field_name) is None:
+                missing.append(s)
+        except FieldDoesNotExist:
+            raise ValueError(f"Field '{field_name}' not found in {entity.__class__.__name__}. Have you added or refactored the field name recently?")
+
+    return missing
+
+
+@dataclass
+class DefaultValue:
+    value: float = 0
