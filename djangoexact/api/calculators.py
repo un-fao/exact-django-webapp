@@ -493,7 +493,7 @@ class BaseCalculator(ABC):
         self.project: Project = getattr(self.data, "parent", self.data).activity.project
         self.activity: Activity = getattr(self.data, "parent", self.data).activity
         self.module: Module | Submodule = self.data
-        self.area = getattr(self.module, "parent", self.module).area
+        self.area = getattr(self.module, "parent", getattr(self.module, "area", None))
 
         self.climate: Climate = self.activity.climate_t2 or self.project.climate
         self.moisture: Moisture = self.activity.moisture_t2 or self.project.moisture
@@ -3987,6 +3987,7 @@ class LivestockCalculator(BaseCalculator):
     """
 
     def get_defaults(self, calculate=False) -> dict:
+        super().get_defaults(calculate)
 
         module: Livestock = self.data
         activity: Activity = module.activity
@@ -4361,8 +4362,8 @@ class LivestockCalculator(BaseCalculator):
                 "ef_prp_methane_end": self.ef_ch4_prp_w.value,
                 "percentage_prp_default_start": self.animal_waste_prp_start.value,
                 "percentage_prp_default_end": self.animal_waste_prp_w.value,
-                "percentage_prp_tier_2_start": module.prp_percentage_t2_start * 100,
-                "percentage_prp_tier_2_end": module.prp_percentage_t2_w * 100,
+                "percentage_prp_tier_2_start": module.prp_percentage_t2_start * 100 if module.prp_percentage_t2_start else None,
+                "percentage_prp_tier_2_end": module.prp_percentage_t2_w * 100 if module.prp_percentage_t2_w else None,
                 "ef_system_methane_start": self.ef_ch4_system_values_start,
                 "ef_system_methane_end": self.ef_ch4_system_values_w,
                 "ch4_prp_tier_2_start": module.prp_ch4_t2_start,
@@ -4438,8 +4439,8 @@ class LivestockCalculator(BaseCalculator):
                 "ef_prp_methane_end": self.ef_ch4_prp_wo.value,
                 "percentage_prp_default_start": self.animal_waste_prp_start.value,
                 "percentage_prp_default_end": self.animal_waste_prp_wo.value,
-                "percentage_prp_tier_2_start": module.prp_percentage_t2_start * 100,
-                "percentage_prp_tier_2_end": module.prp_percentage_t2_wo * 100,
+                "percentage_prp_tier_2_start": module.prp_percentage_t2_start * 100 if module.prp_percentage_t2_start else None,
+                "percentage_prp_tier_2_end": module.prp_percentage_t2_wo * 100 if module.prp_percentage_t2_wo else None,
                 "ef_system_methane_start": self.ef_ch4_system_values_start,
                 "ef_system_methane_end": self.ef_ch4_system_values_wo,
                 "ch4_prp_tier_2_start": module.prp_ch4_t2_start,
