@@ -5046,31 +5046,31 @@ class OrganicSoilCalculator(BaseCalculator):
 
         self.module: OrganicSoil
 
-        self.ef_onsite_start = SimpleNamespace(value=0)
-        self.ef_onsite_w = SimpleNamespace(value=0)
-        self.ef_onsite_wo = SimpleNamespace(value=0)
+        self.ef_onsite_start = ipcc.OrganicSoilDrainageEmissionFactor()
+        self.ef_onsite_w = ipcc.OrganicSoilDrainageEmissionFactor()
+        self.ef_onsite_wo = ipcc.OrganicSoilDrainageEmissionFactor()
 
-        self.ef_offsite_start = SimpleNamespace(value=0)
-        self.ef_offsite_w = SimpleNamespace(value=0)
-        self.ef_offsite_wo = SimpleNamespace(value=0)
+        self.ef_offsite_start = ipcc.OrganicSoilDrainageEmissionFactor()
+        self.ef_offsite_w = ipcc.OrganicSoilDrainageEmissionFactor()
+        self.ef_offsite_wo = ipcc.OrganicSoilDrainageEmissionFactor()
 
-        self.dry_matter_w = SimpleNamespace(value=0)
-        self.dry_matter_wo = SimpleNamespace(value=0)
+        self.dry_matter_w = ipcc.OrganicSoilFuelConsumption()
+        self.dry_matter_wo = ipcc.OrganicSoilFuelConsumption()
 
-        self.fire_ref = SimpleNamespace(value=0)
+        self.fire_ref = ipcc.OrganicSoilGefEmissionFactor()
 
-        self.rewetting_start = SimpleNamespace(value=0)
-        self.rewetting_w = SimpleNamespace(value=0)
-        self.rewetting_wo = SimpleNamespace(value=0)
+        self.rewetting_start = ipcc.RewettingCarbonFactor()
+        self.rewetting_w = ipcc.RewettingCarbonFactor()
+        self.rewetting_wo = ipcc.RewettingCarbonFactor()
 
-        self.onsite_ef_w = SimpleNamespace(value=0)
-        self.onsite_ef_wo = SimpleNamespace(value=0)
+        self.onsite_ef_w = ipcc.OrganicSoilDrainageEmissionFactor()
+        self.onsite_ef_wo = ipcc.OrganicSoilDrainageEmissionFactor()
 
-        self.offsite_ef_w = SimpleNamespace(value=0)
-        self.offsite_ef_wo = SimpleNamespace(value=0)
+        self.offsite_ef_w = ipcc.OrganicSoilDrainageEmissionFactor()
+        self.offsite_ef_wo = ipcc.OrganicSoilDrainageEmissionFactor()
 
-        self.conversion_factor_w = SimpleNamespace(value=0)
-        self.conversion_factor_wo = SimpleNamespace(value=0)
+        self.conversion_factor_w = ipcc.PeatExtractionConversionFactor()
+        self.conversion_factor_wo = ipcc.PeatExtractionConversionFactor()
 
         self.organic_soil_math_w = None
         self.organic_soil_math_wo = None
