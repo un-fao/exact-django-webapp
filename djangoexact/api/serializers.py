@@ -629,6 +629,9 @@ class ActivityBuilderSerializer(serializers.Serializer):
                         else:
                             setattr(module, field.name, None)
 
+            if hasattr(module, "area"):
+                module.area = self.validated_data.get("area")
+
             module.save()
 
     @transaction.atomic
