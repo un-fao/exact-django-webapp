@@ -303,6 +303,26 @@ class FloodedRiceFactory(DjangoModelFactory):
     organic_amendment_type_wo = factory.fuzzy.FuzzyChoice(organic_amendment_types)
 
 
+class MinorSeasonFloodedRiceFactory(DjangoModelFactory):
+    class Meta:
+        model = MinorSeasonFloodedRice
+
+    area = factory.fuzzy.FuzzyInteger(150, 150)
+    status = READY
+
+    water_management_type_before_cultivation_start = factory.fuzzy.FuzzyChoice(water_mgmt_types_before_cultivation)
+    water_management_type_before_cultivation_w = factory.fuzzy.FuzzyChoice(water_mgmt_types_before_cultivation)
+    water_management_type_before_cultivation_wo = factory.fuzzy.FuzzyChoice(water_mgmt_types_before_cultivation)
+
+    water_management_type_after_cultivation_start = factory.fuzzy.FuzzyChoice(water_mgmt_types_after_cultivation)
+    water_management_type_after_cultivation_w = factory.fuzzy.FuzzyChoice(water_mgmt_types_after_cultivation)
+    water_management_type_after_cultivation_wo = factory.fuzzy.FuzzyChoice(water_mgmt_types_after_cultivation)
+
+    organic_amendment_type_start = factory.fuzzy.FuzzyChoice(organic_amendment_types)
+    organic_amendment_type_w = factory.fuzzy.FuzzyChoice(organic_amendment_types)
+    organic_amendment_type_wo = factory.fuzzy.FuzzyChoice(organic_amendment_types)
+
+
 class InputFactory(DjangoModelFactory):
     class Meta:
         model = Input
