@@ -20,6 +20,7 @@ from dataclasses import dataclass, field
 from typing import Optional
 from .generalized_modules import BaseModule
 
+
 @dataclass
 class AnnexedModule(BaseModule):
 
@@ -79,7 +80,6 @@ class AnnexedModule(BaseModule):
     ef_n2o_rewetting_final_tier_2: Optional[float]  # REWETTING EMISSIONS FINAL
     maximum_area_for_water_management: float
 
-
     def calculate_emissions(
         self,
     ):
@@ -118,9 +118,9 @@ class AnnexedModule(BaseModule):
                     self.result.yearly_emissions_by_sector_by_gas.append(co_emission_set)
                     self.result.yearly_emissions_by_sector_by_gas.append(ch4_emission_set)
 
-            except:
+            except Exception as e:
                 traceback.print_exc()
-                return
+                raise e
 
         def calculate_drainage_emissions():
             def calculate_drainage_initial():
@@ -165,9 +165,9 @@ class AnnexedModule(BaseModule):
 
                     return total_n2o, total_ch4_onsite, total_ch4_off_site, total_doc, total_co2, sum(total_n2o) + sum(total_ch4_onsite) + sum(total_ch4_off_site) + sum(total_doc) + sum(total_co2)
 
-                except:
+                except Exception as e:
                     traceback.print_exc()
-                    return
+                    raise e
 
             def calculate_drainage_final():
                 def calculate_emissions_start_end(ef, area_affected_by_action_start, area_affected_by_action_end, percentage_area_multiplier_start, percentage_area_multiplier_end, area_affected_by_module, multiplying_constant):
@@ -182,10 +182,10 @@ class AnnexedModule(BaseModule):
                             em_end = ef * (area_affected_by_action_start) * percentage_area_multiplier_end * multiplying_constant
 
                         return em_start, em_end
-                    except:
+                    except Exception as e:
                         traceback.print_exc()
                         # No return as I want it to crash if there is an error
-
+                        raise e
 
                 try:
                     # TODO: check why I need initial and final, only calculate_emissions_start_end is different???
@@ -214,9 +214,9 @@ class AnnexedModule(BaseModule):
 
                     return total_n2o, total_ch4_onsite, total_ch4_off_site, total_doc, total_co2, sum(total_n2o) + sum(total_ch4_onsite) + sum(total_ch4_off_site) + sum(total_doc) + sum(total_co2)
 
-                except:
+                except Exception as e:
                     traceback.print_exc()
-                    return
+                    raise e
 
             try:
                 n2o_initial, ch4_onsite_initial, ch4_offsite_initial, doc_initial, co2_initial, total_initial = calculate_drainage_initial()
@@ -240,9 +240,9 @@ class AnnexedModule(BaseModule):
                 self.result.yearly_emissions_by_sector_by_gas.append(ch4_offsite_emission_set)
                 self.result.yearly_emissions_by_sector_by_gas.append(n2o_emission_set)
 
-            except:
+            except Exception as e:
                 traceback.print_exc()
-                return
+                raise e
 
         def calculate_rewetting_emissions():
             def rewetting_emissions(area_rewetted, ef_doc, ef_co2, ef_ch4, ef_n2o, methane_constant, nitrous_constant, rate_coefficient, time_impl, time_cap):
@@ -259,9 +259,9 @@ class AnnexedModule(BaseModule):
                     total_n2o = yearly_time_dependent_parameter_breakdown(n2o_n_y_start, n2o_n_y_end, time_impl, time_cap, rate_coefficient, interim_values=True)
 
                     return total_co2_doc, total_ch4, total_n2o, sum(total_co2_doc) + sum(total_ch4) + sum(total_n2o)
-                except:
+                except Exception as e:
                     traceback.print_exc()
-                    return
+                    raise e
 
             # TODO: check with Lorenzo why initial and final
             try:
@@ -304,45 +304,48 @@ class AnnexedModule(BaseModule):
                 self.result.yearly_emissions_by_sector_by_gas.append(ch4_emission_set_final)
                 self.result.yearly_emissions_by_sector_by_gas.append(n2o_emission_set_final)
 
-            except:
+            except Exception as e:
                 traceback.print_exc()
-                return
+                raise e
 
         try:
             calculate_fire_emissions()
             calculate_drainage_emissions()
             calculate_rewetting_emissions()
-            
-        except:
+        except Exception as e:
             traceback.print_exc()
-            return
+            raise e
+
 
 @dataclass
 class PeatExtraction(BaseModule):
-        
-    hectares_end  : float
-    hectares_start  : float
-    percentage_ditches_start  : float
-    percentage_ditches_end  : float
-    ef_co2_onsite_ref  : float
-    ef_co2_onsite_tier_2  : Optional[float]
-    ef_ch4_onsite_ref  : float
-    ef_ch4_onsite_tier_2  : Optional[float]
-    ef_n2o_onsite_ref  : float
-    ef_n2o_onsite_tier_2  : Optional[float]
-    ef_doc_offsite_ref  : float
-    ef_doc_offsite_tier_2  : Optional[float]
-    ef_ch4_offsite_ref  : float
-    ef_ch4_offsite_tier_2 : Optional[float]
-    methane_constant  : float
-    nitrous_constant  : float
-    weight_peat : float
-    mass_tonnes_tier_2  : Optional[float]
-    conversion_factor_volume  : float
-    c_fraction_ref  : float
-    extraction_height_start  : float
-    extraction_height_end : float
 
+    hectares_end: float
+    hectares_start: float
+    percentage_ditches_start: float
+    percentage_ditches_end: float
+    ef_co2_onsite_ref: float
+    ef_co2_onsite_tier_2: Optional[float]
+    ef_ch4_onsite_ref: float
+    ef_ch4_onsite_tier_2: Optional[float]
+    ef_n2o_onsite_ref: float
+    ef_n2o_onsite_tier_2: Optional[float]
+    ef_doc_offsite_ref: float
+    ef_doc_offsite_tier_2: Optional[float]
+    ef_ch4_offsite_ref: float
+    ef_ch4_offsite_tier_2: Optional[float]
+    methane_constant: float
+    nitrous_constant: float
+    weight_peat: float
+    mass_tonnes_tier_2: Optional[float]
+    conversion_factor_volume: float
+    c_fraction_ref: float
+    extraction_height_start: float
+    extraction_height_end: float
+
+    def __post_init__(self):
+        super().__post_init__()
+        self.peat_density_tier_2_default = None
 
     def calculate_emissions(self):
         def drainage_emissions():
@@ -374,9 +377,9 @@ class PeatExtraction(BaseModule):
                 self.result.yearly_emissions_by_sector_by_gas.append(drainage_peat_ch4_emission_set)
                 self.result.yearly_emissions_by_sector_by_gas.append(drainage_peat_n2o_emission_set)
 
-            except:
+            except Exception as e:
                 traceback.print_exc()
-                return
+                raise e
 
         def off_site_emissions():
             def yearly_emissions_calculation(mass_tonnes, hectares_start, hectares_end, height_of_extraction_start, height_of_extraction_end):
@@ -395,9 +398,11 @@ class PeatExtraction(BaseModule):
                 offsite_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in offsite_emissions_yearly], ActivityTypes.OFFSITE_PEAT, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(offsite_emission_set)
 
-            except:
+                self.peat_density_tier_2_default = mass_tonnes  # mass_tonnes should be renamed to density for more clarity
+
+            except Exception as e:
                 traceback.print_exc()
-                return
+                raise e
 
         drainage_emissions()
         off_site_emissions()

@@ -117,6 +117,7 @@ class Livestock(BaseModule):
 
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         def calculate_methane_manure_management_emissions():
             try:
@@ -151,6 +152,7 @@ class Livestock(BaseModule):
 
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         def calculate_nitrous_manure_management_direct():
             try:
@@ -184,6 +186,7 @@ class Livestock(BaseModule):
 
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         def calculate_nitrous_manure_management_indirect_volatization():
             try:
@@ -217,6 +220,7 @@ class Livestock(BaseModule):
 
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         def calculate_nitrous_manure_management_indirect_leaching():
             try:
@@ -247,6 +251,7 @@ class Livestock(BaseModule):
 
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         calculate_methane_enteric_fermentation_emissions()
         calculate_methane_manure_management_emissions()

@@ -76,6 +76,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     # "accounts.middleware.FirebaseAuthenticationMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "auditlog.middleware.AuditlogMiddleware",
@@ -159,7 +160,7 @@ AUTH_PASSWORD_VALIDATORS = [
 TIME_ZONE = "UTC"
 
 USE_I18N = True
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "en"
 LOCALE_PATHS = [os.path.join(BASE_DIR, "locale")]
 LANGUAGES = [
     ("en", "English"),

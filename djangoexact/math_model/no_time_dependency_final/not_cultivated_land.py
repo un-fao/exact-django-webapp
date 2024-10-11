@@ -40,6 +40,7 @@ class NotCultivatedLand(LandModule):
 
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         def calculate_emissions_som():
             try:
@@ -50,6 +51,7 @@ class NotCultivatedLand(LandModule):
                     self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         def calculate_biomass_emissions():
             try:
@@ -62,6 +64,7 @@ class NotCultivatedLand(LandModule):
 
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         calculate_soil_emissions()
         calculate_emissions_som()

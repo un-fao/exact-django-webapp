@@ -2905,26 +2905,6 @@ for i, row in enumerate(rows):
             value=value,
         )
 
-GrasslandAGB.objects.all().delete()
-
-with open("scripts/ipcc_data/GrasslandAGB.csv", "r") as f:
-    reader = csv.reader(f)
-    data = list(reader)
-
-    for row in data:
-        climate = Climate.objects.get(name__iexact=row[0])
-        moisture = Moisture.objects.get(name__iexact=row[1])
-
-        value = parse_csv_number(row[2])
-
-        if pd.isna(value):
-            continue
-
-        print(f"{climate}, {moisture}, {value}")
-
-        GrasslandAGB.objects.create(climate=climate, moisture=moisture, value=value)
-
-
 GrasslandStockExchangeFactor.objects.all().delete()
 
 df = pd.read_csv(
@@ -4435,5 +4415,39 @@ for i, row in df.iterrows():
 
 # TODO: Run in review
 
+log.debug("Deleting all GrasslandBiomass objects...")
+ipcc.GrasslandBiomass.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "GrasslandBiomass.csv"),
+    header=0,
+    sep=";",
+)
+
+for i, row in df.iterrows():
+    climate = Climate.objects.get(name__iexact=row["climate"])
+    moisture = Moisture.objects.get(name__iexact=row["moisture"])
+    agb_t_dm_ha = parse_csv_number(row["agb_t_dm_ha"])
+    agb_t_c_ha = parse_csv_number(row["agb_t_c_ha"])
+    bgb_t_dm_ha = parse_csv_number(row["bgb_t_dm_ha"])
+    bgb_t_c_ha = parse_csv_number(row["bgb_t_c_ha"])
+
+    print(
+        climate,
+        moisture,
+        agb_t_dm_ha,
+        agb_t_c_ha,
+        bgb_t_dm_ha,
+        bgb_t_c_ha,
+    )
+
+    ipcc.GrasslandBiomass.objects.create(
+        climate=climate,
+        moisture=moisture,
+        agb_t_dm_ha=agb_t_dm_ha,
+        agb_t_c_ha=agb_t_c_ha,
+        bgb_t_dm_ha=bgb_t_dm_ha,
+        bgb_t_c_ha=bgb_t_c_ha,
+    )
 
 # TODO: Run in develop

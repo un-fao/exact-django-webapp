@@ -350,7 +350,7 @@ class ForestManagement(BaseModule):
 
             except Exception as e:
                 traceback.print_exc()
-                return
+                raise e
 
         def calculate_litter():
             try:
@@ -403,7 +403,7 @@ class ForestManagement(BaseModule):
 
             except Exception as e:
                 traceback.print_exc()
-                return
+                raise e
 
         def calculate_emissions_soil():
             try:
@@ -414,6 +414,7 @@ class ForestManagement(BaseModule):
 
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         def calculate_emissions_som():
             try:
@@ -423,6 +424,7 @@ class ForestManagement(BaseModule):
                 self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         def create_agb_matrix(years_impl, years_cap, delta_agb_yearly_below_20, delta_agb_yearly_after_20, agb_start):
 
@@ -453,7 +455,7 @@ class ForestManagement(BaseModule):
                 return agb_matrix, delta_agb_matrix
             except Exception as e:
                 traceback.print_exc()
-                return
+                raise e
 
         def create_litter_deadwood_matrix(years_impl, years_cap, delta_agb_yearly_below_20, delta_agb_yearly_after_20, agb_start, max_agb_value):
 
@@ -481,7 +483,7 @@ class ForestManagement(BaseModule):
 
             except Exception as e:
                 traceback.print_exc()
-                return
+                raise e
 
         def create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, bgb_ratio_under_threshold, bgb_ratio_over_threshold, threshold, bgb_start, time_impl):
 
@@ -501,7 +503,7 @@ class ForestManagement(BaseModule):
 
             except Exception as e:
                 traceback.print_exc()
-                return
+                raise e
 
         def check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value):
 
@@ -525,7 +527,7 @@ class ForestManagement(BaseModule):
 
             except Exception as e:
                 traceback.print_exc()
-                return
+                raise e
 
         def update_agb_matrix_rotation(agb_matrix, delta_agb_matrix, original_delta_agb_matrix, max_agb_value, rotation_impact, row, column, row_at_maximum):
 
@@ -548,7 +550,7 @@ class ForestManagement(BaseModule):
 
             except Exception as e:
                 traceback.print_exc()
-                return
+                raise e
 
         def update_agb_matrix_logging(agb_matrix, delta_agb_matrix, original_delta_agb_matrix, max_agb_value, logging_impact, column, logging_recurrence, is_degradation):
 
@@ -579,7 +581,7 @@ class ForestManagement(BaseModule):
 
             except Exception as e:
                 traceback.print_exc()
-                return
+                raise e
 
         def calculate_rotation_effect(original_agb_matrix, original_delta_agb_matrix, max_agb_value, recurrence, start_year, percentage=1):
 
@@ -640,7 +642,7 @@ class ForestManagement(BaseModule):
 
             except Exception as e:
                 traceback.print_exc()
-                return
+                raise e
 
         def calculate_logging_effect(original_agb_matrix, original_delta_agb_matrix, max_agb_value, recurrence, start_year, percentage, is_degradation=False):
 
@@ -678,7 +680,7 @@ class ForestManagement(BaseModule):
 
             except Exception as e:
                 traceback.print_exc()
-                return
+                raise e
 
         def multiply_matrix_by_matrix(matrix1, matrix2):
 
@@ -696,7 +698,7 @@ class ForestManagement(BaseModule):
 
             except Exception as e:
                 traceback.print_exc()
-                return
+                raise e
 
         def plot_annotated_matrix(matrix, title):
             """
