@@ -107,6 +107,7 @@ class Fishery(BaseModule):
 
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         def calculate_refrigerant_emissions():
             try:
@@ -127,6 +128,7 @@ class Fishery(BaseModule):
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.OTHER, emissions=[Emission(x, GasTypes.OTHER) for x in emissions_refrigerant_yearly], activity=ActivityTypes.REFRIGERANT, delay=self.delay))
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         def calculate_ice_emissions():
             try:
@@ -150,6 +152,7 @@ class Fishery(BaseModule):
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.OTHER, emissions=[Emission(x, GasTypes.OTHER) for x in emissions_ice_yearly], activity=ActivityTypes.ICE, delay=self.delay))
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         calculate_catch_emissions()
         calculate_refrigerant_emissions()
@@ -186,6 +189,7 @@ class CoastalAquaculture(BaseModule):
 
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         def calculate_co2_emissions():
             try:
@@ -203,6 +207,7 @@ class CoastalAquaculture(BaseModule):
 
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         calculate_nitrous_emissions()
         calculate_co2_emissions()

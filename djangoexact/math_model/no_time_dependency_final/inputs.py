@@ -1,14 +1,9 @@
 import math
 import traceback
-
+import numpy as np
 from .generalized_modules import BaseModule
 
-from .general_functions import (
-    input_single_calculation,
-    yearly_constant_emissions_breakdown,
-    yearly_time_dependent_parameter_breakdown,
-    breakdown_according_to_values
-)
+from .general_functions import input_single_calculation, yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, breakdown_according_to_values
 from .ghg_emissions_classes import (
     ActivityTypes,
     Emission,
@@ -40,32 +35,33 @@ class Inputs(BaseModule):
 
     def calculate_emissions(self):
         try:
-            if self.unit_factor_co2 is None or self.emissions_factor_co2 is None:
-                yearly_co2_eq_emissions, total_co2_eq_emissions = [0 for i in range(0, self.implementation_time + self.capitalization_time)], 0
+            if self.unit_factor_co2 is None or self.emissions_factor_co2 is None or self.ipcc_factor_co2 is None:
+                # THIS MEANS THE EMISSIONS CAN'T BE CALCULATED, EASIER FOR COMPREHENSION IMO
+                pass
             else:
-                yearly_co2_eq_emissions, total_co2_eq_emissions = input_single_calculation(self.unit_start, self.unit_end, self.ipcc_factor_co2, self.tier_2_factor_co2, self.unit_factor_co2, self.emissions_factor_co2, self.implementation_time, self.capitalization_time, self.rate_type)
-
-            if self.unit_factor_n2o is None or self.emissions_factor_n2o is None:
-                yearly_n2o_emissions, total_n2o_emissions = [0 for i in range(0, self.implementation_time + self.capitalization_time)], 0
+                yearly_co2_emissions, total_co2_eq_emissions = input_single_calculation(self.unit_start, self.unit_end, self.ipcc_factor_co2, self.tier_2_factor_co2, self.unit_factor_co2, self.emissions_factor_co2, self.implementation_time, self.capitalization_time, self.rate_type)
+                co2_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_co2_emissions], ActivityTypes.CO2_FIELD, delay=self.delay)
+                self.result.yearly_emissions_by_sector_by_gas.append(co2_emission_set)
+            
+            if self.unit_factor_n2o is None or self.emissions_factor_n2o is None or self.ipcc_factor_n2o is None:
+                # THIS MEANS THE EMISSIONS CAN'T BE CALCULATED, EASIER FOR COMPREHENSION IMO
+                pass
             else:
                 yearly_n2o_emissions, total_n2o_emissions = input_single_calculation(self.unit_start, self.unit_end, self.ipcc_factor_n2o, self.tier_2_factor_n2o, self.unit_factor_n2o, self.emissions_factor_n2o, self.implementation_time, self.capitalization_time, self.rate_type)
+                n2o_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in yearly_n2o_emissions], ActivityTypes.N20_FIELD, delay=self.delay)
+                self.result.yearly_emissions_by_sector_by_gas.append(n2o_emission_set)
 
-            if self.unit_factor_eq is None or self.emissions_factor_eq is None:
-                yearly_co2_emissions, total_co2_emissions = [0 for i in range(0, self.implementation_time + self.capitalization_time)], 0
+            if self.unit_factor_eq is None or self.emissions_factor_eq is None or self.ipcc_factor_eq is None:
+                # THIS MEANS THE EMISSIONS CAN'T BE CALCULATED, EASIER FOR COMPREHENSION IMO
+                pass
             else:
-                yearly_co2_emissions, total_co2_emissions = input_single_calculation(self.unit_start, self.unit_end, self.ipcc_factor_eq, self.tier_2_factor_eq, self.unit_factor_eq, self.emissions_factor_eq, self.implementation_time, self.capitalization_time, self.rate_type)
-
-            co2_eq_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_co2_eq_emissions], ActivityTypes.CO2_EQUIVALENT_VC, delay=self.delay)
-            self.result.yearly_emissions_by_sector_by_gas.append(co2_eq_emission_set)
-
-            co2_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_co2_emissions], ActivityTypes.CO2_FIELD, delay=self.delay)
-            self.result.yearly_emissions_by_sector_by_gas.append(co2_emission_set)
-
-            n2o_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in yearly_n2o_emissions], ActivityTypes.N20_FIELD, delay=self.delay)
-            self.result.yearly_emissions_by_sector_by_gas.append(n2o_emission_set)
-
+                yearly_co2_eq_emissions, total_co2_emissions = input_single_calculation(self.unit_start, self.unit_end, self.ipcc_factor_eq, self.tier_2_factor_eq, self.unit_factor_eq, self.emissions_factor_eq, self.implementation_time, self.capitalization_time, self.rate_type)
+                co2_eq_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_co2_eq_emissions], ActivityTypes.CO2_EQUIVALENT_VC, delay=self.delay)
+                self.result.yearly_emissions_by_sector_by_gas.append(co2_eq_emission_set)
+            
         except Exception as e:
             traceback.print_exc()
+            raise e
 
 
 @dataclass
@@ -93,14 +89,7 @@ class OperationPhaseIrrigation(BaseModule):
     def calculate_emissions(
         self,
     ):
-        def ef_calculation(ef_co2_default, ef_co2_tier_2, 
-                           ef_n2o_default, ef_n2o_tier_2,
-                            ef_ch4_default, ef_ch4_tier_2,
-                           total_dynamic_head_tier_2, average_pressure_default, 
-                           average_pressure_tier_2, pumping_efficiency_default, 
-                           pumping_efficiency_tier_2, erh_electricity, 
-                           fuel_net_calorific_values, fuel_density, 
-                           depth, gwir):
+        def ef_calculation(ef_co2_default, ef_co2_tier_2, ef_n2o_default, ef_n2o_tier_2, ef_ch4_default, ef_ch4_tier_2, total_dynamic_head_tier_2, average_pressure_default, average_pressure_tier_2, pumping_efficiency_default, pumping_efficiency_tier_2, erh_electricity, fuel_net_calorific_values, fuel_density, depth, gwir):
             try:
                 pumping_efficiency = self.pumping_efficiency_tier_2 or self.pumping_efficiency_default
                 average_pressure = self.average_pressure_tier_2 or self.average_pressure_default
@@ -122,19 +111,12 @@ class OperationPhaseIrrigation(BaseModule):
 
                 return C_tco2_co2, C_tco2_n2o, C_tco2_ch4
 
-            except:
+            except Exception as e:
                 traceback.print_exc()
-                return None
+                raise e
 
         try:
-            ef_co2, ef_n2o, ef_ch4 = ef_calculation(self.ef_co2_default, self.ef_co2_tier_2,
-                                            self.ef_n2o_default, self.ef_n2o_tier_2,
-                                            self.ef_ch4_default, self.ef_ch4_tier_2,
-                                            self.total_dynamic_head_tier_2, self.average_pressure_default, 
-                                            self.average_pressure_tier_2, self.pumping_efficiency_default, 
-                                            self.pumping_efficiency_tier_2, self.erh_electricity, 
-                                            self.fuel_net_calorific_values, self.fuel_density, 
-                                            self.depth, self.gwir)
+            ef_co2, ef_n2o, ef_ch4 = ef_calculation(self.ef_co2_default, self.ef_co2_tier_2, self.ef_n2o_default, self.ef_n2o_tier_2, self.ef_ch4_default, self.ef_ch4_tier_2, self.total_dynamic_head_tier_2, self.average_pressure_default, self.average_pressure_tier_2, self.pumping_efficiency_default, self.pumping_efficiency_tier_2, self.erh_electricity, self.fuel_net_calorific_values, self.fuel_density, self.depth, self.gwir)
 
             # THESE ARE SAVED IN ORDER TO MULTIPLY BY ELECTRICITY MULTIPLIER
 
@@ -157,8 +139,9 @@ class OperationPhaseIrrigation(BaseModule):
             irrigation_operational_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in yearly_emissions_ch4], ActivityTypes.IRRIGATION_OPERATIONAL, delay=self.delay)
             self.result.yearly_emissions_by_sector_by_gas.append(irrigation_operational_emission_set)
 
-        except:
+        except Exception as e:
             traceback.print_exc()
+            raise e
 
 
 @dataclass
@@ -180,8 +163,9 @@ class Roads(BaseModule):
             roads_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_total_yearly], ActivityTypes.ROADS, delay=self.delay)
             self.result.yearly_emissions_by_sector_by_gas.append(roads_emission_set)
 
-        except:
+        except Exception as e:
             traceback.print_exc()
+            raise e
 
 
 @dataclass
@@ -210,8 +194,9 @@ class ElectricityConsumption(BaseModule):
             electricity_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_total_yearly], ActivityTypes.ELECTRICITY, delay=self.delay)
             self.result.yearly_emissions_by_sector_by_gas.append(electricity_emission_set)
 
-        except:
+        except Exception as e:
             traceback.print_exc()
+            raise e
 
 
 @dataclass
@@ -257,8 +242,9 @@ class SolidAndLiquidFuelsConsumption(BaseModule):
             self.result.yearly_emissions_by_sector_by_gas.append(fuel_emission_set_ch4)
             self.result.yearly_emissions_by_sector_by_gas.append(fuel_emission_set_n2o)
 
-        except:
+        except Exception as e:
             traceback.print_exc()
+            raise e
 
 
 @dataclass
@@ -281,5 +267,6 @@ class NewIrrigation(BaseModule):
             new_irrigation_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_total_yearly], ActivityTypes.NEW_IRRIGATION, delay=self.delay)
             self.result.yearly_emissions_by_sector_by_gas.append(new_irrigation_emission_set)
 
-        except:
+        except Exception as e:
             traceback.print_exc()
+            raise e

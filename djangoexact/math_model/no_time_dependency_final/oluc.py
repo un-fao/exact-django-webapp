@@ -121,6 +121,7 @@ class OtherLandUseChanges(BaseModule):
 
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         def calculate_fire():
             delta_c_soc = (self.soc_end - self.soc_start) / 20
@@ -163,3 +164,4 @@ class OtherLandUseChanges(BaseModule):
 
         except Exception as e:
             traceback.print_exc()
+            raise e

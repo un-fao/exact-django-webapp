@@ -86,9 +86,9 @@ class FloodedRice(LandModule):
                 ch4_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in ch4_emitted_yearly], ActivityTypes.CH4_EMITTED_RICE, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(ch4_emission_set)
 
-            except:
+            except Exception as e:
                 traceback.print_exc()
-                return
+                raise e
 
         def calculate_straw_burning():
             try:
@@ -110,9 +110,9 @@ class FloodedRice(LandModule):
 
                     self.result.yearly_emissions_by_sector_by_gas.append(straw_burning_set_methane)
                     self.result.yearly_emissions_by_sector_by_gas.append(straw_burning_set_nitrous)
-            except:
+            except Exception as e:
                 traceback.print_exc()
-                return
+                raise e
 
         def calculate_soil_emissions():
             try:
@@ -122,9 +122,9 @@ class FloodedRice(LandModule):
                     soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in soil_emissions_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
 
-            except:
+            except Exception as e:
                 traceback.print_exc()
-                return
+                raise e
 
         def calculate_emissions_som():
             try:
@@ -135,6 +135,7 @@ class FloodedRice(LandModule):
                     self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         def calculate_biomass_emissions():
 
