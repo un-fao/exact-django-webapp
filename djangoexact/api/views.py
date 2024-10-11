@@ -94,6 +94,8 @@ from firebase_admin import auth as firebase_admin_auth
 from django.contrib.auth import logout
 from auditlog.context import disable_auditlog, LogEntry
 from django.utils import translation
+from django.db import connection
+import time
 
 
 logger = logging.getLogger("console")
@@ -353,9 +355,42 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         update_change_reason(project, utils.ChangeReasons.DELETE.value)
 
-        project.delete()
+        start_time = time.time()
+
+        is_deleted = self.raw_delete(project)
+        if not is_deleted:
+            return utils.ErrorResponse("Error deleting project", status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        logging.debug(f"Deletion of project {project} took {time.time() - start_time} seconds")
 
         return Response(status=http_status.HTTP_204_NO_CONTENT)
+
+    def raw_delete(self, project: Project):
+        with connection.cursor() as cursor:
+            project.members.all().delete()
+            project.invitations.all().delete()
+
+            # Delete all activities
+            activities = project.activities.all()
+            logging.debug(f"Deleting {len(activities)} activities")
+            for activity in activities:
+                logging.debug(f"Deleting activity {activity}")
+                logging.debug(f"Deleting {len(activity.modules)} modules")
+                for m in activity.modules:
+                    logging.debug(f"Deleting module {m}")
+                    if hasattr(m, "submodules"):
+                        logging.debug(f"Deleting {len(m.submodules)} submodules")
+                        for sm in m.submodules:
+                            logging.debug(f"Deleting submodule {sm}")
+                            cursor.execute(f"DELETE FROM {sm._meta.db_table} WHERE id = %s", [sm.id])
+                    cursor.execute(f"DELETE FROM {m._meta.db_table} WHERE id = %s", [m.id])
+                LandUseChange.objects.filter(activity=activity).delete()
+                cursor.execute("DELETE FROM api_activity_module_types WHERE activity_id = %s", [activity.id])
+                cursor.execute("DELETE FROM api_activity WHERE id = %s", [activity.id])
+
+            cursor.execute("DELETE FROM api_project WHERE id = %s", [project.id])
+
+        return True
 
     @swagger_auto_schema(manual_parameters=[project_id], responses={404: "Project not found"}, serializer_class=ReadProjectSerializer)
     def retrieve(self, request, pk=None):

@@ -1309,6 +1309,10 @@ class AnnualCropland(LandModule, SingleBiomassModule, ResidueAvailability):
     minor_biomass_factor_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("minor_biomass_factor_t2_w"))
     minor_biomass_factor_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("minor_biomass_factor_t2_wo"))
 
+    @property
+    def submodules(self):
+        return list(self.minor_seasons.all())
+
 
 class PerennialCrop(models.Model):
     class Meta:
@@ -1351,6 +1355,10 @@ class PerennialCropland(PerennialCrop, LandModule, SingleBiomassModule, AboveBel
     # NOTE: Why having AGB and BGB AND Biomass when Biomass = AGB + BGB?
     def get_biomass_t2(self, scenario: utils.ScenarioTypes):
         return getattr(self, f"biomass_t2_{scenario.value}", None)
+    
+    @property
+    def submodules(self):
+        return list(self.minor_seasons.all())
 
 
 class CroplandMinorSeason(models.Model):
@@ -1444,6 +1452,10 @@ class Rice(ResidueAvailability):
 
 class FloodedRice(Rice, LandModuleFixed, SingleBiomassModule):
     pass
+
+    @property
+    def submodules(self):
+        return list(self.minor_seasons.all())
 
 
 class MinorSeasonFloodedRice(Rice, LandSubmodule):
@@ -1622,6 +1634,10 @@ class ForestManagement(LandModule, LitterDeadwoodBiomassModule):
     degradation_dry_matter_impacted_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("degradation_dry_matter_impacted_t2_start"))
     degradation_dry_matter_impacted_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("degradation_dry_matter_impacted_t2_w"))
     degradation_dry_matter_impacted_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("degradation_dry_matter_impacted_t2_wo"))
+
+    @property
+    def submodules(self):
+        return list(self.disturbances.all())
 
     def save(self, *args, **kwargs):
         if self.land_use_type_start:
@@ -1890,6 +1906,10 @@ class InputType(models.Model):
 class Input(Module):
     pass
 
+    @property
+    def submodules(self):
+        return list(self.input_entries.all())
+
 
 class InputEntry(Submodule):
     parent = models.ForeignKey(Input, on_delete=models.CASCADE, related_name="input_entries")
@@ -1916,6 +1936,10 @@ class EmissionFactorSource(models.Model):
 
 class Energy(Module):
     pass
+
+    @property
+    def submodules(self):
+        return list(self.electricities.all()) + list(self.fuels.all())
 
 
 class Electricity(Submodule):
@@ -1976,6 +2000,10 @@ class EnergySourceType(models.Model):
 
 class Irrigation(Module):
     pass
+
+    @property
+    def submodules(self):
+        return list(self.irrigation_systems.all()) + list(self.irrigation_phases.all())
 
 
 class IrrigationSystem(Submodule):
@@ -2248,6 +2276,10 @@ class Settlement(LandModuleFixed, SingleBiomassModule):
     settlement_type_w = models.ForeignKey(SettlementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_settlement_type_w", verbose_name=_("settlement_type_w"))
     settlement_type_wo = models.ForeignKey(SettlementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_settlement_type_wo", verbose_name=_("settlement_type_wo"))
     settlement_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_settlement_type_thread", on_delete=models.SET_NULL)
+
+    @property
+    def submodules(self):
+        return list(self.buildings.all()) + list(self.roads.all()) + list(self.other_infrastructures.all())
 
     # NOTE: Why having AGB and BGB AND Biomass when Biomass = AGB + BGB?
     def get_biomass_t2(self, scenario: utils.ScenarioTypes):
