@@ -837,7 +837,9 @@ class Activity(Historical, NoteMixin):
 
 
 class Submodule(Historical):
-    # module_type = models.ForeignKey("api.ModuleType", on_delete=models.CASCADE, related_name="%(class)s")
+    soc_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("soc_t2_start"))
+    soc_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("soc_t2_w"))
+    soc_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("soc_t2_wo"))
     status = models.ForeignKey(StatusType, on_delete=models.CASCADE, null=True, blank=True)
     note = GenericRelation("api.Note")
 
@@ -1035,6 +1037,36 @@ class Module(Historical):
 class BiomassModule(Module):
     class Meta:
         abstract = True
+
+
+class BiomassMixin(models.Model):
+    biomass_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("biomass_t2_start"))
+    biomass_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("biomass_t2_w"))
+    biomass_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("biomass_t2_wo"))
+
+    class Meta:
+        abstract = True
+
+    def get_biomass_t2(self, scenario: utils.ScenarioTypes):
+        return getattr(self, f"biomass_t2_{scenario.value}", None)
+
+    def get_biomass_ef(self, scenario: utils.ScenarioTypes) -> ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo:
+        BiomassModel: models.Model = ipcc.ForestTotalBiomass if scenario == utils.ScenarioTypes.START else ipcc.TotalBiomassAfterDefo
+        activity: Activity = getattr(self, "parent", self).activity
+        module: LandModule = getattr(self, "parent", self)
+        climate = activity.climate_t2 if activity.climate_t2 is not None else activity.project.climate
+        moisture = activity.moisture_t2 if activity.moisture_t2 is not None else activity.project.moisture
+        continent = activity.project.country.region
+        land_use_type = getattr(module, f"land_use_type_{scenario.value}", None)
+        if land_use_type is None:
+            raise exceptions.ValidationError(f"Missing land use type for {scenario.value} scenario")
+
+        try:
+            return BiomassModel.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
+        except BiomassModel.DoesNotExist:
+            if getattr(self, f"biomass_t2_{scenario.value}", None) is None:
+                raise exceptions.ValidationError(f"Missing biomass data for {land_use_type.name}, {climate.name}, {moisture.name}, {continent.name}, for {scenario.verbose_name} scenario. Please provide tier2 value.")
+            return BiomassModel()
 
 
 class SingleBiomassModule(BiomassModule):
@@ -1355,7 +1387,7 @@ class PerennialCropland(PerennialCrop, LandModule, SingleBiomassModule, AboveBel
     # NOTE: Why having AGB and BGB AND Biomass when Biomass = AGB + BGB?
     def get_biomass_t2(self, scenario: utils.ScenarioTypes):
         return getattr(self, f"biomass_t2_{scenario.value}", None)
-    
+
     @property
     def submodules(self):
         return list(self.minor_seasons.all())
@@ -1458,7 +1490,7 @@ class FloodedRice(Rice, LandModuleFixed, SingleBiomassModule):
         return list(self.minor_seasons.all())
 
 
-class MinorSeasonFloodedRice(Rice, LandSubmodule):
+class MinorSeasonFloodedRice(Rice, LandSubmodule, BiomassMixin):
     parent = models.ForeignKey(FloodedRice, on_delete=models.CASCADE, related_name="minor_seasons", null=True, blank=True)
 
 
