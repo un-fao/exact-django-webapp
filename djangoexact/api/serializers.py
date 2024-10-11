@@ -82,6 +82,7 @@ from .models import (
     InvitationStatusType,
     ChangeRate,
     Note,
+    FieldDefinition,
 )
 
 
@@ -627,6 +628,9 @@ class ActivityBuilderSerializer(serializers.Serializer):
                             setattr(module, field.name, False)
                         else:
                             setattr(module, field.name, None)
+
+            if hasattr(module, "area"):
+                module.area = self.validated_data.get("area")
 
             module.save()
 
@@ -2616,3 +2620,18 @@ class ResetPasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError("Old and new password are required")
 
         return super().validate(data)
+
+
+class FieldDefinitionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FieldDefinition
+        fields = ("field_name", "description")
+        ref_name = "FieldDefinition"
+
+
+class FieldMetadataSerializer(serializers.Serializer):
+    description = serializers.CharField()
+
+
+class FieldDefinitionResponseSerializer(serializers.Serializer):
+    field_name = FieldMetadataSerializer(many=True)

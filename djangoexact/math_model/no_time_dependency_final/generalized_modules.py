@@ -42,7 +42,7 @@ class BaseModule:
             return Tier2Defaults(t2_start, t2_end, t2_other)
         except Exception as e:
             traceback.print_exc()
-            return {}
+            raise e
         
 
 @dataclass

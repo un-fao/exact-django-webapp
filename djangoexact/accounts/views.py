@@ -110,7 +110,11 @@ class LoginExistingUserView(APIView):
             if not user.email_verified:
                 return Response({"error": "Email not verified"}, status=status.HTTP_401_UNAUTHORIZED)
 
-            user = auth.sign_in_with_email_and_password(email, password)
+            try:
+                user = auth.sign_in_with_email_and_password(email, password)
+            except Exception as e:
+                error = json.loads(e.strerror)
+                return Response({"error": error["error"]["message"]}, status=status.HTTP_401_UNAUTHORIZED)
 
             existing_user = User.objects.get(firebase_uid=user["localId"])
 

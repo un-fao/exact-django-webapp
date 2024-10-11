@@ -15,6 +15,8 @@ import ipcc.models as ipcc
 
 from django.utils.translation import gettext_lazy as _
 from django.apps import apps
+from django.conf import settings
+
 
 alphanumeric = validators.RegexValidator(r"^[0-9a-zA-Z]*$", "Only alphanumeric characters are allowed.")
 letters_only = validators.RegexValidator(r"^[a-zA-Z]*$", "Only letters are allowed.")
@@ -835,7 +837,9 @@ class Activity(Historical, NoteMixin):
 
 
 class Submodule(Historical):
-    # module_type = models.ForeignKey("api.ModuleType", on_delete=models.CASCADE, related_name="%(class)s")
+    soc_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("soc_t2_start"))
+    soc_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("soc_t2_w"))
+    soc_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("soc_t2_wo"))
     status = models.ForeignKey(StatusType, on_delete=models.CASCADE, null=True, blank=True)
     note = GenericRelation("api.Note")
 
@@ -1035,6 +1039,36 @@ class BiomassModule(Module):
         abstract = True
 
 
+class BiomassMixin(models.Model):
+    biomass_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("biomass_t2_start"))
+    biomass_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("biomass_t2_w"))
+    biomass_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("biomass_t2_wo"))
+
+    class Meta:
+        abstract = True
+
+    def get_biomass_t2(self, scenario: utils.ScenarioTypes):
+        return getattr(self, f"biomass_t2_{scenario.value}", None)
+
+    def get_biomass_ef(self, scenario: utils.ScenarioTypes) -> ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo:
+        BiomassModel: models.Model = ipcc.ForestTotalBiomass if scenario == utils.ScenarioTypes.START else ipcc.TotalBiomassAfterDefo
+        activity: Activity = getattr(self, "parent", self).activity
+        module: LandModule = getattr(self, "parent", self)
+        climate = activity.climate_t2 if activity.climate_t2 is not None else activity.project.climate
+        moisture = activity.moisture_t2 if activity.moisture_t2 is not None else activity.project.moisture
+        continent = activity.project.country.region
+        land_use_type = getattr(module, f"land_use_type_{scenario.value}", None)
+        if land_use_type is None:
+            raise exceptions.ValidationError(f"Missing land use type for {scenario.value} scenario")
+
+        try:
+            return BiomassModel.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
+        except BiomassModel.DoesNotExist:
+            if getattr(self, f"biomass_t2_{scenario.value}", None) is None:
+                raise exceptions.ValidationError(f"Missing biomass data for {land_use_type.name}, {climate.name}, {moisture.name}, {continent.name}, for {scenario.verbose_name} scenario. Please provide tier2 value.")
+            return BiomassModel()
+
+
 class SingleBiomassModule(BiomassModule):
     biomass_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("biomass_t2_start"))
     biomass_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("biomass_t2_w"))
@@ -1045,6 +1079,22 @@ class SingleBiomassModule(BiomassModule):
 
     def get_biomass_t2(self, scenario: utils.ScenarioTypes):
         return getattr(self, f"biomass_t2_{scenario.value}", None)
+
+    def get_biomass_ef(self, scenario: utils.ScenarioTypes) -> ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo:
+        BiomassModel: models.Model = ipcc.ForestTotalBiomass if scenario == utils.ScenarioTypes.START else ipcc.TotalBiomassAfterDefo
+        climate = self.activity.climate_t2 if self.activity.climate_t2 is not None else self.activity.project.climate
+        moisture = self.activity.moisture_t2 if self.activity.moisture_t2 is not None else self.activity.project.moisture
+        continent = self.activity.project.country.region
+        land_use_type = getattr(self, f"land_use_type_{scenario.value}", None)
+        if land_use_type is None:
+            raise ValueError(f"Missing land use type for {scenario.value} scenario")
+
+        try:
+            return BiomassModel.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
+        except BiomassModel.DoesNotExist:
+            if getattr(self, f"biomass_t2_{scenario.value}", None) is None:
+                raise ValueError(f"Missing biomass data for {land_use_type.name}, {climate.name}, {moisture.name}, {continent.name}, for {scenario.verbose_name} scenario. Please provide tier2 value.")
+            return BiomassModel()
 
 
 class ResidueAvailability(models.Model):
@@ -1083,6 +1133,22 @@ class AboveBelowGroundBiomassModule(BiomassModule):
         elif bgb_t2 is not None:
             return bgb_t2
         else:
+            return None
+
+    def get_biomass_ef(self, scenario: utils.ScenarioTypes):
+        BiomassModel: models.Model = ipcc.ForestTotalBiomass if scenario == utils.ScenarioTypes.START else ipcc.TotalBiomassAfterDefo
+        climate = self.activity.climate_t2 if self.activity.climate_t2 is not None else self.activity.project.climate
+        moisture = self.activity.moisture_t2 if self.activity.moisture_t2 is not None else self.activity.project.moisture
+        continent = self.activity.project.country.region
+        land_use_type = getattr(self, f"land_use_type_{scenario.value}", None)
+        if land_use_type is None:
+            raise exceptions.ValidationError(f"Missing land use type for {scenario.value} scenario")
+
+        try:
+            return BiomassModel.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
+        except BiomassModel.DoesNotExist:
+            if self.get_biomass_t2(scenario) is None:
+                raise exceptions.ValidationError(f"Missing biomass data for {land_use_type.name}, {climate.name}, {moisture.name}, {continent.name}. Please provide tier2 value.")
             return None
 
 
@@ -1275,6 +1341,10 @@ class AnnualCropland(LandModule, SingleBiomassModule, ResidueAvailability):
     minor_biomass_factor_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("minor_biomass_factor_t2_w"))
     minor_biomass_factor_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("minor_biomass_factor_t2_wo"))
 
+    @property
+    def submodules(self):
+        return list(self.minor_seasons.all())
+
 
 class PerennialCrop(models.Model):
     class Meta:
@@ -1317,6 +1387,10 @@ class PerennialCropland(PerennialCrop, LandModule, SingleBiomassModule, AboveBel
     # NOTE: Why having AGB and BGB AND Biomass when Biomass = AGB + BGB?
     def get_biomass_t2(self, scenario: utils.ScenarioTypes):
         return getattr(self, f"biomass_t2_{scenario.value}", None)
+
+    @property
+    def submodules(self):
+        return list(self.minor_seasons.all())
 
 
 class CroplandMinorSeason(models.Model):
@@ -1411,15 +1485,19 @@ class Rice(ResidueAvailability):
 class FloodedRice(Rice, LandModuleFixed, SingleBiomassModule):
     pass
 
+    @property
+    def submodules(self):
+        return list(self.minor_seasons.all())
 
-class MinorSeasonFloodedRice(Rice, LandSubmodule):
+
+class MinorSeasonFloodedRice(Rice, LandSubmodule, BiomassMixin):
     parent = models.ForeignKey(FloodedRice, on_delete=models.CASCADE, related_name="minor_seasons", null=True, blank=True)
 
 
 ##### Grassland and Livestock #####
 
 
-class Grassland(LandModuleFixed, SingleBiomassModule):
+class Grassland(LandModuleFixed, SingleBiomassModule, AboveBelowGroundBiomassModule):
     grassland_management_type_start = models.ForeignKey(GrasslandManagementType, on_delete=models.CASCADE, related_name="%(class)s_grassland_management_type_start", null=True, verbose_name=_("grassland_management_type_start"))
     grassland_management_type_w = models.ForeignKey(GrasslandManagementType, on_delete=models.CASCADE, related_name="%(class)s_grassland_management_type_w", null=True, verbose_name=_("grassland_management_type_w"))
     grassland_management_type_wo = models.ForeignKey(GrasslandManagementType, on_delete=models.CASCADE, related_name="%(class)s_grassland_management_type_wo", null=True, verbose_name=_("grassland_management_type_wo"))
@@ -1589,6 +1667,10 @@ class ForestManagement(LandModule, LitterDeadwoodBiomassModule):
     degradation_dry_matter_impacted_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("degradation_dry_matter_impacted_t2_w"))
     degradation_dry_matter_impacted_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("degradation_dry_matter_impacted_t2_wo"))
 
+    @property
+    def submodules(self):
+        return list(self.disturbances.all())
+
     def save(self, *args, **kwargs):
         if self.land_use_type_start:
             self.land_use_type_w = self.land_use_type_start
@@ -1596,7 +1678,7 @@ class ForestManagement(LandModule, LitterDeadwoodBiomassModule):
         return super().save(*args, **kwargs)
 
     def get_agb_growth_ref(self, land_use_type: LandUseType, from_year: int = 0) -> ipcc.ForestManagementAGB:
-        AGB_UNDER_20_NOT_FOUND = f"AGB (under 20 years) not found for ({self.forest_type.name}) {land_use_type.name} in {self.activity.project.climate.name} climate, {self.activity.project.country.region.name} region. Please insert t2 values for AGB (under 20 years) for all srelevant cenarios."
+        AGB_UNDER_20_NOT_FOUND = f"AGB (under 20 years) not found for ({self.forest_type.name}) {land_use_type.name} in {self.activity.project.climate.name} climate, {self.activity.project.country.region.name} region. Please insert t2 values for AGB (under 20 years) for all relevant cenarios."
         AGB_OVER_20_NOT_FOUND = f"AGB (over 20 years) not found for ({self.forest_type.name}) {land_use_type.name} in {self.activity.project.climate.name} climate, {self.activity.project.country.region.name} region. Please insert t2 values for AGB (over 20 years) for all relevant scenarios."
 
         error_msg = AGB_UNDER_20_NOT_FOUND if from_year < 20 else AGB_OVER_20_NOT_FOUND
@@ -1760,17 +1842,17 @@ class Fishery(Module):
     ice_preserved_catch_pc_wo = models.FloatField(default=0, validators=[pc_as_float], verbose_name=_("ice_preserved_catch_pc_wo"))
     ice_preserved_catch_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_ice_preserved_catch_thread", on_delete=models.SET_NULL)
 
-    energy_emission_factor_co2_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_co2_t2_start"))
-    energy_emission_factor_co2_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_co2_t2_w"))
-    energy_emission_factor_co2_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_co2_t2_wo"))
+    energy_ef_co2_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_co2_t2_start"))
+    energy_ef_co2_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_co2_t2_w"))
+    energy_ef_co2_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_co2_t2_wo"))
 
-    energy_emission_factor_ch4_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_ch4_t2_start"))
-    energy_emission_factor_ch4_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_ch4_t2_w"))
-    energy_emission_factor_ch4_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_ch4_t2_wo"))
+    energy_ef_ch4_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_ch4_t2_start"))
+    energy_ef_ch4_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_ch4_t2_w"))
+    energy_ef_ch4_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_ch4_t2_wo"))
 
-    energy_emission_factor_n2o_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_n2o_t2_start"))
-    energy_emission_factor_n2o_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_n2o_t2_w"))
-    energy_emission_factor_n2o_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_n2o_t2_wo"))
+    energy_ef_n2o_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_n2o_t2_start"))
+    energy_ef_n2o_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_n2o_t2_w"))
+    energy_ef_n2o_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_n2o_t2_wo"))
 
     refrigerant_lost_per_tonne_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("refrigerant_lost_per_tonne_t2_start"))
     refrigerant_lost_per_tonne_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("refrigerant_lost_per_tonne_t2_w"))
@@ -1856,6 +1938,10 @@ class InputType(models.Model):
 class Input(Module):
     pass
 
+    @property
+    def submodules(self):
+        return list(self.input_entries.all())
+
 
 class InputEntry(Submodule):
     parent = models.ForeignKey(Input, on_delete=models.CASCADE, related_name="input_entries")
@@ -1883,6 +1969,10 @@ class EmissionFactorSource(models.Model):
 class Energy(Module):
     pass
 
+    @property
+    def submodules(self):
+        return list(self.electricities.all()) + list(self.fuels.all())
+
 
 class Electricity(Submodule):
     parent = models.ForeignKey(Energy, on_delete=models.CASCADE, null=True, blank=True, related_name="electricities")
@@ -1898,9 +1988,9 @@ class Electricity(Submodule):
     mwh_renewables_wo = models.FloatField(null=True, blank=True, verbose_name=_("mwh_renewables_wo"))
     mwh_renewables_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_mwh_renewables_thread")
 
-    ef_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_start"))
-    ef_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_w"))
-    ef_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_wo"))
+    electricity_ef_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_start"))
+    electricity_ef_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_w"))
+    electricity_ef_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_wo"))
 
     transmission_loss_start = models.FloatField(default=0.1, verbose_name=_("transmission_loss_start"))
     transmission_loss_w = models.FloatField(default=0.1, verbose_name=_("transmission_loss_w"))
@@ -1918,17 +2008,9 @@ class Fuel(Submodule):
     fuel_consumption_wo = models.FloatField(null=True, blank=True, verbose_name=_("fuel_consumption_wo"))
     fuel_consumption_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_fuel_consumption_thread")
 
-    ef_co2_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("ef_co2_t2_start"))
-    ef_co2_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("ef_co2_t2_w"))
-    ef_co2_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("ef_co2_t2_wo"))
-
-    ef_ch4_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("ef_ch4_t2_start"))
-    ef_ch4_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("ef_ch4_t2_w"))
-    ef_ch4_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("ef_ch4_t2_wo"))
-
-    ef_n2o_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("ef_n2o_t2_start"))
-    ef_n2o_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("ef_n2o_t2_w"))
-    ef_n2o_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("ef_n2o_t2_wo"))
+    energy_ef_co2_t2 = models.FloatField(null=True, blank=True, verbose_name=_("ef_co2_t2"))
+    energy_ef_ch4_t2 = models.FloatField(null=True, blank=True, verbose_name=_("ef_ch4_t2"))
+    energy_ef_n2o_t2 = models.FloatField(null=True, blank=True, verbose_name=_("ef_n2o_t2"))
 
     account_for_co2 = models.BooleanField(default=False, verbose_name=_("account_for_co2"))
 
@@ -1950,6 +2032,10 @@ class EnergySourceType(models.Model):
 
 class Irrigation(Module):
     pass
+
+    @property
+    def submodules(self):
+        return list(self.irrigation_systems.all()) + list(self.irrigation_phases.all())
 
 
 class IrrigationSystem(Submodule):
@@ -2216,12 +2302,16 @@ class OrganicSoil(LandModuleFixed):
         return super().save(*args, **kwargs)
 
 
-class Settlement(LandModuleFixed, AboveBelowGroundBiomassModule, SingleBiomassModule):
+class Settlement(LandModuleFixed, SingleBiomassModule):
 
     settlement_type_start = models.ForeignKey(SettlementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_settlement_type_start", verbose_name=_("settlement_type_start"))
     settlement_type_w = models.ForeignKey(SettlementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_settlement_type_w", verbose_name=_("settlement_type_w"))
     settlement_type_wo = models.ForeignKey(SettlementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_settlement_type_wo", verbose_name=_("settlement_type_wo"))
     settlement_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_settlement_type_thread", on_delete=models.SET_NULL)
+
+    @property
+    def submodules(self):
+        return list(self.buildings.all()) + list(self.roads.all()) + list(self.other_infrastructures.all())
 
     # NOTE: Why having AGB and BGB AND Biomass when Biomass = AGB + BGB?
     def get_biomass_t2(self, scenario: utils.ScenarioTypes):
@@ -2237,7 +2327,7 @@ class Settlement(LandModuleFixed, AboveBelowGroundBiomassModule, SingleBiomassMo
         return super().save(*args, **kwargs)
 
 
-class SetAside(LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule):
+class SetAside(LandModule, SingleBiomassModule):
 
     is_set_aside_start = models.BooleanField(default=False, verbose_name=_("is_set_aside_start"))
     is_set_aside_w = models.BooleanField(default=False, verbose_name=_("is_set_aside_w"))
@@ -2257,7 +2347,7 @@ class SetAside(LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule):
         return super().save(*args, **kwargs)
 
 
-class OtherLand(LandModule, SingleBiomassModule, AboveBelowGroundBiomassModule):
+class OtherLand(LandModule, SingleBiomassModule):
     is_degraded_land_start = models.BooleanField(default=False, verbose_name=_("is_degraded_land_start"))
     is_degraded_land_w = models.BooleanField(default=False, verbose_name=_("is_degraded_land_w"))
     is_degraded_land_wo = models.BooleanField(default=False, verbose_name=_("is_degraded_land_wo"))
@@ -2419,3 +2509,17 @@ class OrganizationType(models.Model):
 
     def __str__(self):
         return f"({self.pk}) {self.name}"
+
+
+class FieldDefinition(models.Model):
+    module_type = models.ForeignKey(ModuleType, on_delete=models.CASCADE, related_name="field_definitions")
+    field_name = models.CharField(max_length=255, verbose_name=_("Field Name"))
+    description = models.TextField(verbose_name=_("Field Description"))
+
+    class Meta:
+        unique_together = ("module_type", "field_name")
+        verbose_name = _("Field Definition")
+        verbose_name_plural = _("Field Definitions")
+
+    def __str__(self):
+        return f"{self.module_type}.{self.field_name}"
