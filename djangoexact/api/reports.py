@@ -46,6 +46,8 @@ class ReportFactory:
             return GrasslandReport
         elif isinstance(module, api_models.OtherLand):
             return OtherLandReport
+        elif isinstance(module, api_models.Waterbody):
+            return WaterbodyReport
         else:
             raise ValueError("Invalid module type.")
 
@@ -266,6 +268,9 @@ class BaseModuleReport:
         self.results_worksheet = self.activity_report.results_worksheet
         self.metadata_worksheet = self.activity_report.metadata_worksheet
         self.additional_indicators_worksheet = self.activity_report.additional_indicators_worksheet
+
+    def build_report(self):
+        raise NotImplementedError("build_report method not implemented.")
 
     def extract_emissions(self, data, activity_type, gas_type):
         """
@@ -674,3 +679,27 @@ class FloodedRiceReport(LandModuleReport):
 
         for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
             self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.rice_cultivation_ch4[i])
+
+
+class WaterbodyReport(BaseModuleReport):
+
+    module: api_models.Waterbody
+
+    waterbody_management_ch4: list[float] = None
+    waterbody_management_ch4_source = (math_utils.ActivityTypes.COASTAL_WATERBODIES, math_utils.GasTypes.CH4)
+
+    def __post_init__(self):
+        self.calculator = calculators.WaterbodyCalculator(self.module)
+        return super().__post_init__()
+
+    def build_report(self):
+        last_results_row = self.results_worksheet.max_row
+        last_metadata_row = self.metadata_worksheet.max_row
+        last_additional_indicators_row = self.additional_indicators_worksheet.max_row
+
+        self.waterbody_management_ch4 = self.extract_emissions(self.emissions_set, self.waterbody_management_ch4_source[0], self.waterbody_management_ch4_source[1])
+
+        self.results_worksheet.cell(row=last_results_row + 1, column=1, value="CH4 from waterbody management")
+
+        for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
+            self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.waterbody_management_ch4[i])
