@@ -438,8 +438,6 @@ class LandModuleReport(BaseModuleReport):
         self.get_result()
 
         last_results_row = self.results_worksheet.max_row + 1
-        last_metadata_row = self.metadata_worksheet.max_row + 1
-        last_additional_indicators_row = self.additional_indicators_worksheet.max_row + 1
 
         # Write module name in results sheet
         self.results_worksheet.cell(row=last_results_row, column=1, value=str(self.module_title))
@@ -458,7 +456,6 @@ class LandModuleReport(BaseModuleReport):
         self.fire_n2o_row_index = last_results_row + 4
         self.fire_ch4_row_index = last_results_row + 5
 
-        # Write emissions yearly values
         for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
             self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.biomass_co2[i])
             self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.soil_co2[i])
@@ -488,13 +485,8 @@ class PerennialCroplandReport(LandModuleReport):
         self.calculator = calculators.PerennialCroplandCalculator(self.module)
         return super().__post_init__()
 
-    def get_result(self):
-        super().get_result()
-        log.debug(f"Building report for {self.module.module_type.name}")
-
-        last_results_row = self.results_worksheet.max_row + 1
+    def populate_metadata(self):
         last_metadata_row = self.metadata_worksheet.max_row + 1
-        last_additional_indicators_row = self.additional_indicators_worksheet.max_row + 1
 
         self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Perennial Cropland")
         self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Perennial Cropland").fill = Colors.LIGHT_BLUE_FILL.value
@@ -526,6 +518,7 @@ class PerennialCroplandReport(LandModuleReport):
             self.metadata_worksheet.cell(row=last_metadata_row + 4, column=4, value=self.module.organic_input_type_wo.name)
             self.metadata_worksheet.cell(row=last_metadata_row + 5, column=4, value=self.module.crop_yield_t2_wo if self.module.crop_yield_t2_wo is not None else "Default")
 
+    def populate_additional_indicators(self):
         with_project_row = None
         for row in self.additional_indicators_worksheet.iter_rows():
             if row[0].value == "With project":
@@ -550,6 +543,39 @@ class PerennialCroplandReport(LandModuleReport):
         for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
             self.additional_indicators_worksheet.cell(without_project_row, i + 2, self.units_breakdown_wo[i])
 
+    def add_minor_seasons_results(self):
+        minor_seasons = getattr(self.module, "minor_seasons", [])
+
+        for minor_season in minor_seasons:
+            log.debug(f"Building report for minor season {minor_season.name}")
+
+            minor_calculator = calculators.PerennialCropCalculator(minor_season)
+            minor_emission_set = []
+
+            if self.module.is_with():
+                minor_emission_set += minor_calculator.results_w.yearly_emissions_by_sector_by_gas
+                if self.calculator.results_start_w is not None:
+                    minor_emission_set += self.calculator.results_start_w.yearly_emissions_by_sector_by_gas
+
+            if self.module.is_without():
+                minor_emission_set += minor_calculator.results_wo.yearly_emissions_by_sector_by_gas
+                if self.calculator.results_start_wo is not None:
+                    minor_emission_set += minor_calculator.results_start_wo.yearly_emissions_by_sector_by_gas
+
+            self.biomass_co2 = [x + y for x, y in zip(self.biomass_co2, self.extract_emissions(minor_emission_set, self.biomass_co2_source[0], self.biomass_co2_source[1]))]
+            self.soil_co2 = [x + y for x, y in zip(self.soil_co2, self.extract_emissions(minor_emission_set, self.soil_co2_source[0], self.soil_co2_source[1]))]
+            self.soil_n2o = [x + y for x, y in zip(self.soil_n2o, self.extract_emissions(minor_emission_set, self.soil_n2o_source[0], self.soil_n2o_source[1]))]
+            self.fire_n2o = [x + y for x, y in zip(self.fire_n2o, self.extract_emissions(minor_emission_set, self.fire_n2o_source[0], self.fire_n2o_source[1]))]
+            self.fire_ch4 = [x + y for x, y in zip(self.fire_ch4, self.extract_emissions(minor_emission_set, self.fire_ch4_source[0], self.fire_ch4_source[1]))]
+
+    def get_result(self):
+        super().get_result()
+        log.debug(f"Building report for {self.module.module_type.name}")
+
+        self.add_minor_seasons_results()
+        self.populate_metadata()
+        self.populate_additional_indicators()
+
         log.debug(f"Report for {self.module_title} built.")
         return self.workbook
 
@@ -564,51 +590,37 @@ class AnnualCroplandReport(LandModuleReport):
         self.calculator = calculators.AnnualCroplandCalculator(self.module)
         return super().__post_init__()
 
-    def get_result(self):
-        """
-        Additional indicators sheet: hectars indicator is self.hectares_total. Livestock indicator under self.livestock_heads_yearly_breakdown. Catch (fish) under self.tonnes_catch_yearly_breakdown
-        """
-        super().get_result()
-        log.debug(f"Building report for {self.module.module_type.name}")
+    def add_minor_seasons_results(self):
+        minor_seasons = getattr(self.module, "submodules", [])
 
-        main_season_crop_start = self.module.land_use_type_start.name
-        main_season_crop_w = self.module.land_use_type_w.name
-        main_season_crop_wo = self.module.land_use_type_wo.name
+        for minor_season in minor_seasons:
+            log.debug(f"Building report for minor season {minor_season.name}")
 
-        tillage_management_type_start = self.module.tillage_management_type_start.name
-        tillage_management_type_w = self.module.tillage_management_type_w.name
-        tillage_management_type_wo = self.module.tillage_management_type_wo.name
+            minor_calculator = calculators.AnnualCropCalculator(minor_season)
+            minor_emission_set = []
 
-        organic_input_type_start = self.module.organic_input_type_start.name
-        organic_input_type_w = self.module.organic_input_type_w.name
-        organic_input_type_wo = self.module.organic_input_type_wo.name
+            if self.module.is_with():
+                minor_emission_set += minor_calculator.results_w.yearly_emissions_by_sector_by_gas
+                if self.calculator.results_start_w is not None:
+                    minor_emission_set += self.calculator.results_start_w.yearly_emissions_by_sector_by_gas
 
-        residue_management_type_start = self.module.residue_management_type_start.name
-        residue_management_type_w = self.module.residue_management_type_w.name
-        residue_management_type_wo = self.module.residue_management_type_wo.name
+            if self.module.is_without():
+                minor_emission_set += minor_calculator.results_wo.yearly_emissions_by_sector_by_gas
+                if self.calculator.results_start_wo is not None:
+                    minor_emission_set += self.calculator.results_start_wo.yearly_emissions_by_sector_by_gas
 
-        yield_start = "Default" if self.module.crop_yield_t2_start is None else self.module.crop_yield_t2_start
-        yield_w = "Default" if self.module.crop_yield_t2_w is None else self.module.crop_yield_t2_w
-        yield_wo = "Default" if self.module.crop_yield_t2_wo is None else self.module.crop_yield_t2_wo
+            self.biomass_co2 = [x + y for x, y in zip(self.biomass_co2, self.extract_emissions(minor_emission_set, self.biomass_co2_source[0], self.biomass_co2_source[1]))]
+            self.soil_co2 = [x + y for x, y in zip(self.soil_co2, self.extract_emissions(minor_emission_set, self.soil_co2_source[0], self.soil_co2_source[1]))]
+            self.soil_n2o = [x + y for x, y in zip(self.soil_n2o, self.extract_emissions(minor_emission_set, self.soil_n2o_source[0], self.soil_n2o_source[1]))]
+            self.fire_n2o = [x + y for x, y in zip(self.fire_n2o, self.extract_emissions(minor_emission_set, self.fire_n2o_source[0], self.fire_n2o_source[1]))]
+            self.fire_ch4 = [x + y for x, y in zip(self.fire_ch4, self.extract_emissions(minor_emission_set, self.fire_ch4_source[0], self.fire_ch4_source[1]))]
 
-        minor_season_crop_start = getattr(self.module.minor_land_use_type_start, "name", "None")
-        minor_season_crop_w = getattr(self.module.minor_land_use_type_w, "name", "None")
-        minor_season_crop_wo = getattr(self.module.minor_land_use_type_wo, "name", "None")
-
-        minor_residue_management_type_start = getattr(self.module.minor_residue_management_type_start, "name", "None")
-        minor_residue_management_type_w = getattr(self.module.minor_residue_management_type_w, "name", "None")
-        minor_residue_management_type_wo = getattr(self.module.minor_residue_management_type_wo, "name", "None")
-
-        minor_yield_start = "Default" if self.module.minor_yield_start is None else self.module.minor_yield_start
-        minor_yield_w = "Default" if self.module.minor_yield_w is None else self.module.minor_yield_w
-        minor_yield_wo = "Default" if self.module.minor_yield_wo is None else self.module.minor_yield_wo
-
-        last_results_row = self.results_worksheet.max_row + 1
+    def build_metadata(self):
         last_metadata_row = self.metadata_worksheet.max_row + 1
-        last_additional_indicators_row = self.additional_indicators_worksheet.max_row + 1
 
         self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Annual Cropland")
         self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Annual Cropland").fill = Colors.LIGHT_BLUE_FILL.value
+
         self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Hectares")
         self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Main season crop")
         self.metadata_worksheet.cell(row=last_metadata_row + 3, column=1, value="Tillage management type")
@@ -621,37 +633,38 @@ class AnnualCroplandReport(LandModuleReport):
 
         if self.module.is_start():
             self.metadata_worksheet.cell(row=last_metadata_row + 1, column=2, value=self.units)
-            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=2, value=main_season_crop_start)
-            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=2, value=tillage_management_type_start)
-            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=2, value=organic_input_type_start)
-            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=2, value=residue_management_type_start)
-            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=2, value=yield_start)
-            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=2, value=minor_season_crop_start)
-            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=2, value=minor_residue_management_type_start)
-            self.metadata_worksheet.cell(row=last_metadata_row + 9, column=2, value=minor_yield_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=2, value=self.module.land_use_type_start.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=2, value=self.module.tillage_management_type_start.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=2, value=self.module.organic_input_type_start.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=2, value=self.module.residue_management_type_start.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=2, value=self.module.crop_yield_t2_start if self.module.crop_yield_t2_start is not None else "Default")
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=2, value=self.module.minor_land_use_type_start.name if self.module.minor_land_use_type_start is not None else "Default")
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=2, value=self.module.minor_residue_management_type_start.name if self.module.minor_residue_management_type_start is not None else "Default")
+            self.metadata_worksheet.cell(row=last_metadata_row + 9, column=2, value=self.module.minor_yield_start if self.module.minor_yield_start is not None else "Default")
 
         if self.module.is_with():
             self.metadata_worksheet.cell(row=last_metadata_row + 1, column=3, value=self.units)
-            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=3, value=main_season_crop_w)
-            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=3, value=tillage_management_type_w)
-            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=3, value=organic_input_type_w)
-            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=3, value=residue_management_type_w)
-            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=3, value=yield_w)
-            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=3, value=minor_season_crop_w)
-            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=3, value=minor_residue_management_type_w)
-            self.metadata_worksheet.cell(row=last_metadata_row + 9, column=3, value=minor_yield_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=3, value=self.module.land_use_type_w.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=3, value=self.module.tillage_management_type_w.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=3, value=self.module.organic_input_type_w.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=3, value=self.module.residue_management_type_w.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=3, value=self.module.crop_yield_t2_w if self.module.crop_yield_t2_w is not None else "Default")
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=3, value=self.module.minor_land_use_type_w.name if self.module.minor_land_use_type_w is not None else "Default")
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=3, value=self.module.minor_residue_management_type_w.name if self.module.minor_residue_management_type_w is not None else "Default")
+            self.metadata_worksheet.cell(row=last_metadata_row + 9, column=3, value=self.module.minor_yield_w if self.module.minor_yield_w is not None else "Default")
 
         if self.module.is_without():
             self.metadata_worksheet.cell(row=last_metadata_row + 1, column=4, value=self.units)
-            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=4, value=main_season_crop_wo)
-            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=4, value=tillage_management_type_wo)
-            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=4, value=organic_input_type_wo)
-            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=4, value=residue_management_type_wo)
-            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=4, value=yield_wo)
-            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=4, value=minor_season_crop_wo)
-            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=4, value=minor_residue_management_type_wo)
-            self.metadata_worksheet.cell(row=last_metadata_row + 9, column=4, value=minor_yield_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=4, value=self.module.land_use_type_wo.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=4, value=self.module.tillage_management_type_wo.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=4, value=self.module.organic_input_type_wo.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=4, value=self.module.residue_management_type_wo.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=4, value=self.module.crop_yield_t2_wo if self.module.crop_yield_t2_wo is not None else "Default")
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=4, value=self.module.minor_land_use_type_wo.name if self.module.minor_land_use_type_wo is not None else "Default")
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=4, value=self.module.minor_residue_management_type_wo.name if self.module.minor_residue_management_type_wo is not None else "Default")
+            self.metadata_worksheet.cell(row=last_metadata_row + 9, column=4, value=self.module.minor_yield_wo if self.module.minor_yield_wo is not None else "Default")
 
+    def build_additional_indicators(self):
         with_project_row = None
         for row in self.additional_indicators_worksheet.iter_rows():
             if row[0].value == "With project":
@@ -676,7 +689,20 @@ class AnnualCroplandReport(LandModuleReport):
         for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
             self.additional_indicators_worksheet.cell(without_project_row, i + 2, self.units_breakdown_wo[i])
 
+    def get_result(self):
+        """
+        # TODO: Additional indicators sheet: hectars indicator is self.hectares_total. Livestock indicator under self.livestock_heads_yearly_breakdown. Catch (fish) under self.tonnes_catch_yearly_breakdown
+        """
+        super().get_result()
+
+        log.debug(f"Building report for {self.module.module_type.name}")
+
+        self.add_minor_seasons_results()
+        self.build_metadata()
+        self.build_additional_indicators()
+
         log.debug(f"Report for {self.module_title} built.")
+
         return self.workbook
 
 
