@@ -1619,10 +1619,10 @@ class AnnualCropCalculator(LandModuleCalculator):
         self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
 
         if PLOT_GRAPHS:
-            res_start_w.plot_emissions_and_aggregate_by_activity("annual_start_w")
-            res_start_wo.plot_emissions_and_aggregate_by_activity("annual_start_wo")
-            res_w.plot_emissions_and_aggregate_by_activity("annual_w")
-            res_wo.plot_emissions_and_aggregate_by_activity("annual_wo")
+            self.results_start_w.plot_emissions_and_aggregate_by_activity("annual_start_w")
+            self.results_start_wo.plot_emissions_and_aggregate_by_activity("annual_start_wo")
+            self.results_w.plot_emissions_and_aggregate_by_activity("annual_w")
+            self.results_wo.plot_emissions_and_aggregate_by_activity("annual_wo")
 
         log.debug("END AnnualCropCalculator.calculate")
 
