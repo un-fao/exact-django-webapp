@@ -54,6 +54,8 @@ class ReportFactory:
             return SmallFisheryReport
         elif isinstance(module, api_models.LargeFishery):
             return LargeFisheryReport
+        elif isinstance(module, api_models.Livestock):
+            return LivestockReport
         else:
             raise ValueError("Invalid module type.")
 
@@ -810,3 +812,68 @@ class LargeFisheryReport(FisheryReport):
 
     def build_report(self):
         return super().build_report()
+
+
+class LivestockReport(BaseModuleReport):
+
+    module: api_models.Livestock
+
+    enteric_fermentation_ch4: list[float] = None
+    manure_management_other_than_prp_ch4: list[float] = None
+    manure_management_other_than_prp_direct_n2o: list[float] = None
+    manure_management_other_than_prp_leaching_indirect_n2o: list[float] = None
+    manure_management_other_than_prp_volatilization_indirect_n2o: list[float] = None
+    manure_management_prp_ch4: list[float] = None
+    manure_management_prp_direct_n2o: list[float] = None
+    manure_management_prp_leaching_indirect_n2o: list[float] = None
+    manure_management_prp_volatilization_indirect_n2o: list[float] = None
+
+    enteric_fermentation_ch4_source = (math_utils.ActivityTypes.METHANE_ENTERIC_FERMENTATION, math_utils.GasTypes.CH4)
+    manure_management_other_than_prp_ch4_source = (math_utils.ActivityTypes.METHANE_MANURE_MANAGEMENT_SYSTEM, math_utils.GasTypes.CH4)
+    manure_management_other_than_prp_direct_n2o_source = (math_utils.ActivityTypes.NITROUS_MANURE_MANAGEMENT_SYSTEM, math_utils.GasTypes.N2O)
+    manure_management_other_than_prp_leaching_indirect_n2o_source = (math_utils.ActivityTypes.NITROUS_MANURE_MANAGEMENT_INDIRECT_LEACHING_SYSTEM, math_utils.GasTypes.N2O)
+    manure_management_other_than_prp_volatilization_indirect_n2o_source = (math_utils.ActivityTypes.NITROUS_MANURE_MANAGEMENT_INDIRECT_VOLATILIZATION_SYSTEM, math_utils.GasTypes.N2O)
+    manure_management_prp_ch4_source = (math_utils.ActivityTypes.METHANE_MANURE_MANAGEMENT_PRP, math_utils.GasTypes.CH4)
+    manure_management_prp_direct_n2o_source = (math_utils.ActivityTypes.NITROUS_MANURE_MANAGEMENT_PRP, math_utils.GasTypes.N2O)
+    manure_management_prp_leaching_indirect_n2o_source = (math_utils.ActivityTypes.NITROUS_MANURE_MANAGEMENT_INDIRECT_LEACHING_PRP, math_utils.GasTypes.N2O)
+    manure_management_prp_volatilization_indirect_n2o_source = (math_utils.ActivityTypes.NITROUS_MANURE_MANAGEMENT_INDIRECT_VOLATILIZATION_PRP, math_utils.GasTypes.N2O)
+
+    def __post_init__(self):
+        self.calculator = calculators.LivestockCalculator(self.module)
+        return super().__post_init__()
+
+    def build_report(self):
+        last_results_row = self.results_worksheet.max_row
+        last_metadata_row = self.metadata_worksheet.max_row
+        last_additional_indicators_row = self.additional_indicators_worksheet.max_row
+
+        self.enteric_fermentation_ch4 = self.extract_emissions(self.emissions_set, self.enteric_fermentation_ch4_source[0], self.enteric_fermentation_ch4_source[1])
+        self.manure_management_other_than_prp_ch4 = self.extract_emissions(self.emissions_set, self.manure_management_other_than_prp_ch4_source[0], self.manure_management_other_than_prp_ch4_source[1])
+        self.manure_management_other_than_prp_direct_n2o = self.extract_emissions(self.emissions_set, self.manure_management_other_than_prp_direct_n2o_source[0], self.manure_management_other_than_prp_direct_n2o_source[1])
+        self.manure_management_other_than_prp_leaching_indirect_n2o = self.extract_emissions(self.emissions_set, self.manure_management_other_than_prp_leaching_indirect_n2o_source[0], self.manure_management_other_than_prp_leaching_indirect_n2o_source[1])
+        self.manure_management_other_than_prp_volatilization_indirect_n2o = self.extract_emissions(self.emissions_set, self.manure_management_other_than_prp_volatilization_indirect_n2o_source[0], self.manure_management_other_than_prp_volatilization_indirect_n2o_source[1])
+        self.manure_management_prp_ch4 = self.extract_emissions(self.emissions_set, self.manure_management_prp_ch4_source[0], self.manure_management_prp_ch4_source[1])
+        self.manure_management_prp_direct_n2o = self.extract_emissions(self.emissions_set, self.manure_management_prp_direct_n2o_source[0], self.manure_management_prp_direct_n2o_source[1])
+        self.manure_management_prp_leaching_indirect_n2o = self.extract_emissions(self.emissions_set, self.manure_management_prp_leaching_indirect_n2o_source[0], self.manure_management_prp_leaching_indirect_n2o_source[1])
+        self.manure_management_prp_volatilization_indirect_n2o = self.extract_emissions(self.emissions_set, self.manure_management_prp_volatilization_indirect_n2o_source[0], self.manure_management_prp_volatilization_indirect_n2o_source[1])
+
+        self.results_worksheet.cell(row=last_results_row + 1, column=1, value="CH4 from enteric fermentation")
+        self.results_worksheet.cell(row=last_results_row + 2, column=1, value="CH4 from manure management other than PRP")
+        self.results_worksheet.cell(row=last_results_row + 3, column=1, value="Direct N2O from manure management other than PRP (direct)")
+        self.results_worksheet.cell(row=last_results_row + 4, column=1, value="Indirect N2O from manure management other than PRP (leaching)")
+        self.results_worksheet.cell(row=last_results_row + 5, column=1, value="Indirect N2O from manure management other than PRP (volatilization)")
+        self.results_worksheet.cell(row=last_results_row + 6, column=1, value="CH4 from manure management PRP")
+        self.results_worksheet.cell(row=last_results_row + 7, column=1, value="Direct N2O from manure management PRP (direct)")
+        self.results_worksheet.cell(row=last_results_row + 8, column=1, value="Indirect N2O from manure management PRP (leaching)")
+        self.results_worksheet.cell(row=last_results_row + 9, column=1, value="Indirect N2O from manure management PRP (volatilization)")
+
+        for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
+            self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.enteric_fermentation_ch4[i])
+            self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.manure_management_other_than_prp_ch4[i])
+            self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.manure_management_other_than_prp_direct_n2o[i])
+            self.results_worksheet.cell(row=last_results_row + 4, column=i + 2, value=self.manure_management_other_than_prp_leaching_indirect_n2o[i])
+            self.results_worksheet.cell(row=last_results_row + 5, column=i + 2, value=self.manure_management_other_than_prp_volatilization_indirect_n2o[i])
+            self.results_worksheet.cell(row=last_results_row + 6, column=i + 2, value=self.manure_management_prp_ch4[i])
+            self.results_worksheet.cell(row=last_results_row + 7, column=i + 2, value=self.manure_management_prp_direct_n2o[i])
+            self.results_worksheet.cell(row=last_results_row + 8, column=i + 2, value=self.manure_management_prp_leaching_indirect_n2o[i])
+            self.results_worksheet.cell(row=last_results_row + 9, column=i + 2, value=self.manure_management_prp_volatilization_indirect_n2o[i])
