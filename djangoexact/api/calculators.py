@@ -624,11 +624,11 @@ class LandModuleCalculator(BaseCalculator):
         self.fmg_wo = get_fmg_data(self.module_wo, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
         self.flu_wo = get_flu_data(self.module_wo, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
 
-        if self.module.is_start():
+        if self.module.is_start() and isinstance(self.module, SingleBiomassModule):
             self.biomass_ef_start = self.module.get_biomass_ef(utils.ScenarioTypes.START)
-        if self.module.is_with():
+        if self.module.is_with() and isinstance(self.module, SingleBiomassModule):
             self.biomass_ef_w = self.module.get_biomass_ef(utils.ScenarioTypes.WITH)
-        if self.module.is_without():
+        if self.module.is_without() and isinstance(self.module, SingleBiomassModule):
             self.biomass_ef_wo = self.module.get_biomass_ef(utils.ScenarioTypes.WITHOUT)
 
         # NOTE: Added to take into account biomass growth in final land use
@@ -5672,38 +5672,38 @@ class ForestManagementCalculator(LandModuleCalculator):
         self.agb_under_20_w = self.agb_under_20_wo = self.agb_under_20
 
         # Check AGB under 20 years for with scenario
-        if self.module.is_with() and any(x is None for x in [self.agb_under_20.agb_min, self.agb_under_20.agb_max]) and self.forest.agb_t2_w is None:
+        if self.module.is_with() and self.agb_under_20 is None or any(x is None for x in [self.agb_under_20.agb_min, self.agb_under_20.agb_max]) and self.forest.agb_t2_w is None:
             raise ValueError("Reference values for AGB under 20 years are missing. Please fill the relevant tier 2 values.")
 
         # Check AGB under 20 years for without scenario
-        if self.module.is_without() and any(x is None for x in [self.agb_under_20.agb_min, self.agb_under_20.agb_max]) and self.forest.agb_t2_wo is None:
+        if self.module.is_without() and self.agb_under_20 is None or any(x is None for x in [self.agb_under_20.agb_min, self.agb_under_20.agb_max]) and self.forest.agb_t2_wo is None:
             raise ValueError("Reference values for AGB under 20 years are missing. Please fill the relevant tier 2 values.")
 
         # Check AGB growth under 20 years for with scenario
-        if self.module.is_with() and any(x is None for x in [self.agb_under_20.agb_growth_min, self.agb_under_20.agb_growth_max]) and self.forest.agb_growth_rate_le_20_yrs_t2_w is None:
+        if self.module.is_with() and self.agb_under_20 is None or any(x is None for x in [self.agb_under_20.agb_growth_min, self.agb_under_20.agb_growth_max]) and self.forest.agb_growth_rate_le_20_yrs_t2_w is None:
             raise ValueError("Reference values for AGB growth under 20 years are missing. Please fill the relevant tier 2 values.")
 
         # Check AGB growth under 20 years for without scenario
-        if self.module.is_without() and any(x is None for x in [self.agb_under_20.agb_growth_min, self.agb_under_20.agb_growth_max]) and self.forest.agb_growth_rate_le_20_yrs_t2_wo is None:
+        if self.module.is_without() and self.agb_under_20 is None or any(x is None for x in [self.agb_under_20.agb_growth_min, self.agb_under_20.agb_growth_max]) and self.forest.agb_growth_rate_le_20_yrs_t2_wo is None:
             raise ValueError("Reference values for AGB growth under 20 years are missing. Please fill the relevant tier 2 values.")
 
         self.agb_over_20 = self.forest.get_agb_growth_ref(land_use_type=land_use_type, from_year=21 if "Secondary" in self.forest.forest_condition_type.name else 0)
         self.agb_over_20_w = self.agb_over_20_wo = self.agb_over_20
 
         # Check AGB over 20 years for with scenario
-        if self.module.is_with() and any(x is None for x in [self.agb_over_20.agb_min, self.agb_over_20.agb_max]) and self.forest.agb_t2_w is None:
+        if self.module.is_with() and self.agb_over_20 is None or any(x is None for x in [self.agb_over_20.agb_min, self.agb_over_20.agb_max]) and self.forest.agb_t2_w is None:
             raise ValueError("Reference values for AGB over 20 years are missing. Please fill the relevant tier 2 values.")
 
         # Check AGB over 20 years for without scenario
-        if self.module.is_without() and any(x is None for x in [self.agb_over_20.agb_min, self.agb_over_20.agb_max]) and self.forest.agb_t2_wo is None:
+        if self.module.is_without() and self.agb_over_20 is None or any(x is None for x in [self.agb_over_20.agb_min, self.agb_over_20.agb_max]) and self.forest.agb_t2_wo is None:
             raise ValueError("Reference values for AGB over 20 years are missing. Please fill the relevant tier 2 values.")
 
         # Check AGB growth over 20 years for with scenario
-        if self.module.is_with() and any(x is None for x in [self.agb_over_20.agb_growth_min, self.agb_over_20.agb_growth_max]) and self.forest.agb_growth_rate_gt_20_yrs_t2_w is None:
+        if self.module.is_with() and self.agb_over_20 is None or any(x is None for x in [self.agb_over_20.agb_growth_min, self.agb_over_20.agb_growth_max]) and self.forest.agb_growth_rate_gt_20_yrs_t2_w is None:
             raise ValueError("Reference values for AGB growth over 20 years are missing. Please fill the relevant tier 2 values.")
 
         # Check AGB growth over 20 years for without scenario
-        if self.module.is_without() and any(x is None for x in [self.agb_over_20.agb_growth_min, self.agb_over_20.agb_growth_max]) and self.forest.agb_growth_rate_gt_20_yrs_t2_wo is None:
+        if self.module.is_without() and self.agb_over_20 is None or any(x is None for x in [self.agb_over_20.agb_growth_min, self.agb_over_20.agb_growth_max]) and self.forest.agb_growth_rate_gt_20_yrs_t2_wo is None:
             raise ValueError("Reference values for AGB growth over 20 years are missing. Please fill the relevant tier 2 values.")
 
         # START - Reference Values for forest remaining forest
