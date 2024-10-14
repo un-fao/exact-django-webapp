@@ -9,11 +9,15 @@ from rest_framework import exceptions, status
 from rest_framework.response import Response
 from simple_history.models import HistoricalRecords
 from simple_history.utils import update_change_reason
+from django.utils.translation import get_language
+from django.core.exceptions import FieldDoesNotExist
 
 import api.models as api_models
 import ipcc.models as ipcc_models
 
 import logging as log
+from django.utils.translation import gettext_lazy as _
+from dataclasses import dataclass
 
 CN_RATIO_CROP = 10
 CN_RATIO_GRASSLAND = 15
@@ -34,9 +38,17 @@ class ManureManagementTypes(Enum):
 
 
 class ScenarioTypes(Enum):
-    START = "start"
-    WITH = "w"
-    WITHOUT = "wo"
+    START = "start", "start"
+    WITH = "w", "with"
+    WITHOUT = "wo", "without"
+
+    def __new__(cls, value, verbose_name):
+        # Retain the original behavior for value
+        obj = object.__new__(cls)
+        obj._value_ = value
+        # Set additional attributes
+        obj.verbose_name = verbose_name
+        return obj
 
 
 class EmissionTypes(Enum):
@@ -190,8 +202,13 @@ def copy_activity(activity, new_project=None):
     organic_soil_copy = None
 
     for module in activity.modules:
+        module: api_models.Module
         if module.__class__.__name__ == "LandUseChange" or module.__class__.__name__ == "OrganicSoil":
             continue
+
+        # Get all attributes ending with "_thread" set them to None
+        for thread in module.threads:
+            setattr(module, thread.attname, None)
 
         module_copy = copy.deepcopy(module)
         module_copy.pk = None
@@ -253,8 +270,8 @@ def create_comment_threads(module_instance):
     for attr in dir(module_instance):
         if attr.endswith("_thread") and getattr(module_instance, attr, None) is None:
             setattr(module_instance, attr, api_models.CommentThread.objects.create())
-    module_instance.save()
-    update_change_reason(module_instance, "update")
+    if not module_instance._state.adding:
+        update_change_reason(module_instance, "update")
 
 
 def getany(objects: list[object], key: str):
@@ -387,7 +404,14 @@ def find_organic_soil_parent_module(organic_soil) -> tuple:
     """
 
     # NOTE: This is always true as long as Organic Soil is a OneToOneField of LandModule
-    parent_module: api_models.LandModule = next(attr for attr in dir(organic_soil) if attr.startswith("organic_soil_") and (attr not in ["organicsoil"] and isinstance(getattr(organic_soil, attr, None), api_models.LandModule)))
+    parent_module: api_models.LandModule = None
+
+    land_modules = api_models.ModuleType.objects.filter(is_luc=True)
+
+    for land_module in land_modules:
+        if getattr(organic_soil, land_module.class_name.lower(), None):
+            parent_module = land_module
+            break
 
     if not parent_module:
         raise ValueError(f"Could not find parent module for Organic Soil")
@@ -457,3 +481,50 @@ def get_modules(activity, serialized=True) -> list:
             module_serializers_list.append(module_dict)
 
     return module_serializers_list if serialized else modules
+
+
+def get_entity_definitions(entity_type: str) -> dict:
+    """
+    Returns a dictionary where the key is the model's field name
+    and the value is the translated verbose_name for that field.
+    """
+    # Get the model class from the entity_type string (assuming the entity_type matches the model name)
+    try:
+        model_class = apps.get_model("api", entity_type)
+    except LookupError:
+        raise ValueError(f"Model '{entity_type}' not found")
+    # Extract the field names and their translated verbose names
+    field_definitions = {field.name: _(field.verbose_name) if field.verbose_name else field.name for field in model_class._meta.get_fields() if hasattr(field, "verbose_name") and not field.name.endswith("_thread")}
+
+    return field_definitions
+
+
+def find_empty_scenarios(entity, field: str):
+    if not isinstance(entity, api_models.Module):
+        raise ValueError("Entity must be a Module instance")
+
+    entity: api_models.Module
+
+    relevant_scenarios: list[ScenarioTypes] = entity.get_relevant_scenarios()
+
+    missing = []
+
+    for s in relevant_scenarios:
+        # Dynamically construct the field name
+        field_name = f"{field}_{s.value}"
+
+        try:
+            # Check if the field exists in the model using _meta
+            entity._meta.get_field(field_name)
+
+            if getattr(entity, field_name) is None:
+                missing.append(s)
+        except FieldDoesNotExist:
+            raise ValueError(f"Field '{field_name}' not found in {entity.__class__.__name__}. Have you added or refactored the field name recently?")
+
+    return missing
+
+
+@dataclass
+class DefaultValue:
+    value: float = 0

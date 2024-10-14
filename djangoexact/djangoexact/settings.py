@@ -46,6 +46,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 INSTALLED_APPS = [
     "unfold",  # before django.contrib.admin
     "unfold.contrib.simple_history",  # optional, if django-simple-history package is used
+    "modeltranslation",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -75,6 +76,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     # "accounts.middleware.FirebaseAuthenticationMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "auditlog.middleware.AuditlogMiddleware",
@@ -154,11 +156,17 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = "UTC"
 
 USE_I18N = True
+LANGUAGE_CODE = "en"
+LOCALE_PATHS = [os.path.join(BASE_DIR, "locale")]
+LANGUAGES = [
+    ("en", "English"),
+    ("fr", "French"),
+    ("es", "Spanish"),
+]
 
 USE_TZ = True
 

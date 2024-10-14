@@ -154,7 +154,7 @@ class Deforestation(BaseModule):
                 self.emissions_biomass_loss_yearly = yearly_constant_emissions_breakdown(biomass_loss, self.time_impl, self.time_cap, self.rate_type_soil)
                 self.emissions_biomass_loss_total = biomass_loss
 
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in self.emissions_biomass_loss_yearly], activity=ActivityTypes.BIOMASS))
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in self.emissions_biomass_loss_yearly], activity=ActivityTypes.BIOMASS, delay=self.delay))
 
             except Exception as e:
                 traceback.print_exc()
@@ -171,7 +171,7 @@ class Deforestation(BaseModule):
                 self.emissions_dom_yearly = yearly_constant_emissions_breakdown(dom_loss, self.time_impl, self.time_cap, self.rate_type_soil)
                 self.emissions_dom_total = dom_loss
 
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in self.emissions_dom_yearly], activity=ActivityTypes.DOM))
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in self.emissions_dom_yearly], activity=ActivityTypes.DOM, delay=self.delay))
 
             except Exception as e:
                 traceback.print_exc()
@@ -196,8 +196,8 @@ class Deforestation(BaseModule):
                 emissions_ch4 = yearly_constant_emissions_breakdown(total_ch4_per_ha * self.area_deforested, self.time_impl, self.time_cap, self.rate_type_soil)
                 emissions_n2o = yearly_constant_emissions_breakdown(total_n2o_per_ha * self.area_deforested, self.time_impl, self.time_cap, self.rate_type_soil)
 
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in emissions_ch4], activity=ActivityTypes.RESIDUE_BURNING))
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in emissions_n2o], activity=ActivityTypes.RESIDUE_BURNING))
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in emissions_ch4], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
+                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in emissions_n2o], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
 
             except Exception as e:
                 traceback.print_exc()
