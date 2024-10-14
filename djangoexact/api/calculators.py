@@ -3334,10 +3334,10 @@ class InputEntryCalculator(BaseCalculator):
         self.math_wo = MathInputs(**self.inputs_wo)
         self.math_wo.calculate_emissions()
 
-        results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
 
-        results_tuple = (results_w, results_wo)
+        results_tuple = (self.results_w, self.results_wo)
 
         return results_tuple
 
