@@ -20,9 +20,12 @@ log.basicConfig(level=log.DEBUG)
 
 
 class Colors(Enum):
-    LIGHT_ORANGE = "fce4d6"
-    LIGHT_BLUE = "d9e1f2"
-    LIGHT_BEIGE = "ddd9c4"
+    LIGHT_ORANGE_HEX = "fce4d6"
+    LIGHT_BLUE_HEX = "d9e1f2"
+    LIGHT_BEIGE_HEX = "ddd9c4"
+    LIGHT_ORANGE_FILL = PatternFill(start_color="fce4d6", end_color="fce4d6", fill_type="solid")
+    LIGHT_BLUE_FILL = PatternFill(start_color="d9e1f2", end_color="d9e1f2", fill_type="solid")
+    LIGHT_BEIGE_FILL = PatternFill(start_color="ddd9c4", end_color="ddd9c4", fill_type="solid")
 
 
 class ReportFactory:
@@ -92,10 +95,8 @@ class BaseProjectReport:
 
         self.results_worksheet.cell(row=1, column=1, value="Activity and GHGs / Years")
 
-        light_orange = PatternFill(start_color=self.colors.LIGHT_ORANGE.value, end_color=self.colors.LIGHT_ORANGE.value, fill_type="solid")
-
         self.results_worksheet.cell(row=2, column=1, value="Total Carbon Balance")
-        self.results_worksheet.cell(row=2, column=1).fill = light_orange
+        self.results_worksheet.cell(row=2, column=1).fill = self.colors.LIGHT_ORANGE_FILL.value
 
         self.results_worksheet.cell(row=3, column=1, value="Cumulative balance in Tco2-eq")
         self.results_worksheet.cell(row=4, column=1, value="Yearly balance in Tco2-eq")
@@ -178,25 +179,22 @@ class BaseActivityReport:
         log.debug(f"Last metadata row: {last_metadata_row}")
         log.debug(f"Last additional indicators row: {last_additional_indicators_row}")
 
-        light_orange = PatternFill(start_color=Colors.LIGHT_ORANGE.value, end_color=Colors.LIGHT_ORANGE.value, fill_type="solid")
-        light_blue = PatternFill(start_color=Colors.LIGHT_BLUE.value, end_color=Colors.LIGHT_BLUE.value, fill_type="solid")
-
         self.results_worksheet.cell(row=last_results_row, column=1, value=str(self.activity_title)[:6])
-        self.results_worksheet.cell(row=last_results_row, column=1).fill = light_orange
+        self.results_worksheet.cell(row=last_results_row, column=1).fill = Colors.LIGHT_ORANGE_FILL.value
 
         self.metadata_worksheet.cell(row=last_metadata_row, column=1, value=str(self.activity_title)[:6])
-        self.metadata_worksheet.cell(row=last_metadata_row, column=1).fill = light_orange
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1).fill = Colors.LIGHT_BLUE_FILL.value
 
         self.additional_indicators_worksheet.cell(row=last_additional_indicators_row, column=1, value=str(self.activity_title)[:6])
-        self.additional_indicators_worksheet.cell(row=last_additional_indicators_row, column=1).fill = light_orange
+        self.additional_indicators_worksheet.cell(row=last_additional_indicators_row, column=1).fill = Colors.LIGHT_ORANGE_FILL.value
 
         self.additional_indicators_worksheet.cell(row=last_additional_indicators_row + 1, column=1, value="Land Uses Targeted (ha)")
-        self.additional_indicators_worksheet.cell(row=last_additional_indicators_row + 1, column=1).fill = light_blue
+        self.additional_indicators_worksheet.cell(row=last_additional_indicators_row + 1, column=1).fill = Colors.LIGHT_BLUE_FILL.value
 
         self.additional_indicators_worksheet.cell(row=last_additional_indicators_row + 2, column=1, value="With project")
-        self.additional_indicators_worksheet.cell(row=last_additional_indicators_row + 2, column=1, value="With project").fill = PatternFill(start_color=Colors.LIGHT_BEIGE.value, end_color=Colors.LIGHT_BEIGE.value, fill_type="solid")
+        self.additional_indicators_worksheet.cell(row=last_additional_indicators_row + 2, column=1, value="With project").fill = Colors.LIGHT_BEIGE_FILL.value
         self.additional_indicators_worksheet.cell(row=last_additional_indicators_row + 3, column=1, value="Without project")
-        self.additional_indicators_worksheet.cell(row=last_additional_indicators_row + 3, column=1, value="Without project").fill = PatternFill(start_color=Colors.LIGHT_BEIGE.value, end_color=Colors.LIGHT_BEIGE.value, fill_type="solid")
+        self.additional_indicators_worksheet.cell(row=last_additional_indicators_row + 3, column=1, value="Without project").fill = Colors.LIGHT_BEIGE_FILL.value
 
         log.debug(f"Activity skeleton for {self.activity.name} built.")
 
@@ -347,12 +345,9 @@ class LandModuleReport(BaseModuleReport):
         last_metadata_row = self.metadata_worksheet.max_row + 1
         last_additional_indicators_row = self.additional_indicators_worksheet.max_row + 1
 
-        light_blue = PatternFill(start_color=Colors.LIGHT_BLUE.value, end_color=Colors.LIGHT_BLUE.value, fill_type="solid")
-        light_orange = PatternFill(start_color=Colors.LIGHT_ORANGE.value, end_color=Colors.LIGHT_ORANGE.value, fill_type="solid")
-
         # Write module name in results sheet
         self.results_worksheet.cell(row=last_results_row, column=1, value=str(self.module_title))
-        self.results_worksheet.cell(row=last_results_row, column=1).fill = light_blue
+        self.results_worksheet.cell(row=last_results_row, column=1).fill = Colors.LIGHT_BLUE_FILL.value
 
         # Write emissions information
         self.results_worksheet.cell(row=last_results_row + 1, column=1, value="CO2 in biomass")
@@ -399,10 +394,8 @@ class PerennialCroplandReport(LandModuleReport):
         last_metadata_row = self.metadata_worksheet.max_row + 1
         last_additional_indicators_row = self.additional_indicators_worksheet.max_row + 1
 
-        light_blue = PatternFill(start_color=Colors.LIGHT_BLUE.value, end_color=Colors.LIGHT_BLUE.value, fill_type="solid")
-
         self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Perennial Cropland")
-        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Perennial Cropland").fill = light_blue
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Perennial Cropland").fill = Colors.LIGHT_BLUE_FILL.value
 
         self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Hectares")
         self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Main season crop")
@@ -513,7 +506,7 @@ class AnnualCroplandReport(LandModuleReport):
         last_additional_indicators_row = self.additional_indicators_worksheet.max_row + 1
 
         self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Annual Cropland")
-        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Annual Cropland").fill = PatternFill(start_color=Colors.LIGHT_BLUE.value, end_color=Colors.LIGHT_BLUE.value, fill_type="solid")
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Annual Cropland").fill = Colors.LIGHT_BLUE_FILL.value
         self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Hectares")
         self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Main season crop")
         self.metadata_worksheet.cell(row=last_metadata_row + 3, column=1, value="Tillage management type")
@@ -602,8 +595,8 @@ class SetAsideReport(LandModuleReport):
         last_metadata_row = self.metadata_worksheet.max_row + 1
         last_additional_indicators_row = self.additional_indicators_worksheet.max_row + 1
 
-        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Annual Cropland")
-        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Annual Cropland").fill = PatternFill(start_color=Colors.LIGHT_BLUE.value, end_color=Colors.LIGHT_BLUE.value, fill_type="solid")
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Set Aside")
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Set Aside").fill = Colors.LIGHT_BLUE_FILL.value
         self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Hectares")
         self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Is set aside")
 
