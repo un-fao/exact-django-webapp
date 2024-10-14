@@ -15,6 +15,7 @@ from django.conf import settings
 import openpyxl as pxl
 from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.styles import Color, PatternFill, Font, Border
+from datetime import datetime
 
 log.basicConfig(level=log.DEBUG)
 
@@ -60,6 +61,8 @@ class ReportFactory:
             return ForestManagementReport
         elif isinstance(module, api_models.Energy):
             return EnergyReport
+        elif isinstance(module, api_models.Input):
+            return InputReport
         else:
             raise ValueError("Invalid module type.")
 
@@ -96,7 +99,7 @@ class BaseProjectReport:
         self.capitalization_years = self.project.capitalization_years
         self.duration = self.implementation_years + self.capitalization_years
 
-        self.filename = os.path.join(settings.BASE_DIR, "reports", f"{str(self.project.name)[:6]}_results.xlsx")
+        self.filename = os.path.join(settings.BASE_DIR, "reports", f"{str(self.project.name)[:6]}_results_{datetime.now().strftime('%Y%m%d%H%M%S')}.xlsx")
 
         wb = xlsxwriter.Workbook(self.filename)
         wb.add_worksheet("Results")
@@ -1216,13 +1219,13 @@ class EnergyReport(BaseModuleReport):
         last_metadata_row = self.metadata_worksheet.max_row
         last_additional_indicators_row = self.additional_indicators_worksheet.max_row
 
-        self.electricity_co2_eq = self.extract_emissions(self.emissions_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1])
-        self.liquid_fuel_co2 = self.extract_emissions(self.emissions_set, self.liquid_fuel_co2_source[0], self.liquid_fuel_co2_source[1])
-        self.liquid_fuel_ch4 = self.extract_emissions(self.emissions_set, self.liquid_fuel_ch4_source[0], self.liquid_fuel_ch4_source[1])
-        self.liquid_fuel_n2o = self.extract_emissions(self.emissions_set, self.liquid_fuel_n2o_source[0], self.liquid_fuel_n2o_source[1])
-        self.solid_fuel_co2 = self.extract_emissions(self.emissions_set, self.solid_fuel_co2_source[0], self.solid_fuel_co2_source[1])
-        self.solid_fuel_ch4 = self.extract_emissions(self.emissions_set, self.solid_fuel_ch4_source[0], self.solid_fuel_ch4_source[1])
-        self.solid_fuel_n2o = self.extract_emissions(self.emissions_set, self.solid_fuel_n2o_source[0], self.solid_fuel_n2o_source[1])
+        self.electricity_co2_eq = np.zeros(self.last_year_of_accounting - self.start_year_of_activities)
+        self.liquid_fuel_co2 = np.zeros(self.last_year_of_accounting - self.start_year_of_activities)
+        self.liquid_fuel_ch4 = np.zeros(self.last_year_of_accounting - self.start_year_of_activities)
+        self.liquid_fuel_n2o = np.zeros(self.last_year_of_accounting - self.start_year_of_activities)
+        self.solid_fuel_co2 = np.zeros(self.last_year_of_accounting - self.start_year_of_activities)
+        self.solid_fuel_ch4 = np.zeros(self.last_year_of_accounting - self.start_year_of_activities)
+        self.solid_fuel_n2o = np.zeros(self.last_year_of_accounting - self.start_year_of_activities)
 
         self.add_submodules_results()
 
@@ -1242,3 +1245,80 @@ class EnergyReport(BaseModuleReport):
             self.results_worksheet.cell(row=last_results_row + 5, column=i + 2, value=self.solid_fuel_co2[i])
             self.results_worksheet.cell(row=last_results_row + 6, column=i + 2, value=self.solid_fuel_ch4[i])
             self.results_worksheet.cell(row=last_results_row + 7, column=i + 2, value=self.solid_fuel_n2o[i])
+
+
+class InputReport(BaseModuleReport):
+
+    module: api_models.Input
+
+    inputs_co2: list[float] = None
+    inputs_n2o: list[float] = None
+    inputs_co2_eq: list[float] = None
+    feed_co2_eq: list[float] = None
+
+    inputs_co2_source = (math_utils.ActivityTypes.CO2_FIELD, math_utils.GasTypes.CO2)
+    inputs_n2o_source = (math_utils.ActivityTypes.N20_FIELD, math_utils.GasTypes.N2O)
+    inputs_co2_eq_source = (math_utils.ActivityTypes.CO2_EQUIVALENT_VC, math_utils.GasTypes.CO2)
+    feed_co2_eq_source = (math_utils.ActivityTypes.CO2_EQUIVALENT_VC, math_utils.GasTypes.CO2)
+
+    def __post_init__(self):
+        self.calculator = calculators.InputCalculator(self.module)
+        return super().__post_init__()
+
+    def add_submodules_results(self):
+        submodules: list[api_models.Submodule] = self.module.submodules
+        submodules_emission_set = []
+
+        for submodule in submodules:
+            CalculatorClass = calculators.InputEntryCalculator
+            submodule: api_models.InputEntry
+
+            calculator = CalculatorClass(submodule)
+            calculator.calculate()
+
+            if self.module.is_with():
+                submodules_emission_set = calculator.results_w.yearly_emissions_by_sector_by_gas
+                if self.calculator.results_start_w is not None:
+                    submodules_emission_set = [a + b for a, b in zip(submodules_emission_set, calculator.results_start_w.yearly_emissions_by_sector_by_gas)]
+
+            if self.module.is_without():
+                submodules_emission_set = calculator.results_wo.yearly_emissions_by_sector_by_gas
+                if self.calculator.results_start_wo is not None:
+                    submodules_emission_set = [a + b for a, b in zip(submodules_emission_set, calculator.results_start_wo.yearly_emissions_by_sector_by_gas)]
+
+            self.inputs_co2 = [a + b for a, b in zip(self.inputs_co2, self.extract_emissions(submodules_emission_set, self.inputs_co2_source[0], self.inputs_co2_source[1]))]
+            self.inputs_n2o = [a + b for a, b in zip(self.inputs_n2o, self.extract_emissions(submodules_emission_set, self.inputs_n2o_source[0], self.inputs_n2o_source[1]))]
+
+            if "feed" in submodule.input_type.macro_input_type.name.casefold():
+                print("FEED")
+                self.feed_co2_eq = [a + b for a, b in zip(self.feed_co2_eq, self.extract_emissions(submodules_emission_set, self.feed_co2_eq_source[0], self.feed_co2_eq_source[1]))]
+            else:
+                print("NOT FEED")
+                self.inputs_co2_eq = [a + b for a, b in zip(self.inputs_co2_eq, self.extract_emissions(submodules_emission_set, self.inputs_co2_eq_source[0], self.inputs_co2_eq_source[1]))]
+
+    def build_report(self):
+        last_results_row = self.results_worksheet.max_row
+
+        """
+        # BUG: Calculator aggregates emissions from all submodules, but the report should only show the emissions from the main module and then add the emissions from the submodules separately
+        Setting the emissions to zero to avoid double counting might be skipping some emissions from the main module (also happening in Input, Energy, ForestManageent, AnnualCropland and PerennialCropland reports)
+        Update: this must be evaluated on a module-by-module basis. For parent modules that have no calculations attached to them, it's easier to just set the emissions to zero. For others, like ForestManagement and the Croplands, more testing is needed
+        """
+
+        self.inputs_co2 = np.zeros(self.last_year_of_accounting - self.start_year_of_activities)
+        self.inputs_n2o = np.zeros(self.last_year_of_accounting - self.start_year_of_activities)
+        self.inputs_co2_eq = np.zeros(self.last_year_of_accounting - self.start_year_of_activities)
+        self.feed_co2_eq = np.zeros(self.last_year_of_accounting - self.start_year_of_activities)
+
+        self.add_submodules_results()
+
+        self.results_worksheet.cell(row=last_results_row + 1, column=1, value="N2O from inputs (field level)")
+        self.results_worksheet.cell(row=last_results_row + 2, column=1, value="CO2 from inputs (field level)")
+        self.results_worksheet.cell(row=last_results_row + 3, column=1, value="CO2-eq from inputs (production, transportation and storage)")
+        self.results_worksheet.cell(row=last_results_row + 4, column=1, value="CO2-eq from feed")
+
+        for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
+            self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.inputs_co2[i])
+            self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.inputs_n2o[i])
+            self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.inputs_co2_eq[i])
+            self.results_worksheet.cell(row=last_results_row + 4, column=i + 2, value=self.feed_co2_eq[i])
