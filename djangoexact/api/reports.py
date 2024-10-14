@@ -790,19 +790,43 @@ class FloodedRiceReport(LandModuleReport):
         self.calculator = calculators.FloodedRiceCalculator(self.module)
         return super().__post_init__()
 
-    def build_report(self):
-        super().build_report()
+    def add_minor_seasons_results(self):
+        minor_seasons = getattr(self.module, "submodules", [])
 
-        last_results_row = self.results_worksheet.max_row
-        last_metadata_row = self.metadata_worksheet.max_row
-        last_additional_indicators_row = self.additional_indicators_worksheet.max_row
+        for minor_season in minor_seasons:
+            log.debug(f"Building report for minor season {minor_season.name}")
 
-        self.rice_cultivation_ch4 = self.extract_emissions(self.emissions_set, self.rice_cultivation_ch4_source[0], self.rice_cultivation_ch4_source[1])
+            minor_calculator = calculators.FloodedRiceCalculator(minor_season)
+            minor_emission_set = []
 
-        self.results_worksheet.cell(row=last_results_row + 1, column=1, value="CH4 from rice cultivation")
+            if self.module.is_with():
+                minor_emission_set += minor_calculator.results_w.yearly_emissions_by_sector_by_gas
+                if self.calculator.results_start_w is not None:
+                    minor_emission_set += self.calculator.results_start_w.yearly_emissions_by_sector_by_gas
+
+            if self.module.is_without():
+                minor_emission_set += minor_calculator.results_wo.yearly_emissions_by_sector_by_gas
+                if self.calculator.results_start_wo is not None:
+                    minor_emission_set += self.calculator.results_start_wo.yearly_emissions_by_sector_by_gas
+
+            self.biomass_co2 = [x + y for x, y in zip(self.biomass_co2, self.extract_emissions(minor_emission_set, self.biomass_co2_source[0], self.biomass_co2_source[1]))]
+            self.soil_co2 = [x + y for x, y in zip(self.soil_co2, self.extract_emissions(minor_emission_set, self.soil_co2_source[0], self.soil_co2_source[1]))]
+            self.soil_n2o = [x + y for x, y in zip(self.soil_n2o, self.extract_emissions(minor_emission_set, self.soil_n2o_source[0], self.soil_n2o_source[1]))]
+            self.fire_n2o = [x + y for x, y in zip(self.fire_n2o, self.extract_emissions(minor_emission_set, self.fire_n2o_source[0], self.fire_n2o_source[1]))]
+            self.fire_ch4 = [x + y for x, y in zip(self.fire_ch4, self.extract_emissions(minor_emission_set, self.fire_ch4_source[0], self.fire_ch4_source[1]))]
+            self.rice_cultivation_ch4 = [x + y for x, y in zip(self.rice_cultivation_ch4, self.extract_emissions(minor_emission_set, self.rice_cultivation_ch4_source[0], self.rice_cultivation_ch4_source[1]))]
+
+    def populate_results_sheet(self):
+        last_results_row = self.results_worksheet.max_row + 1
+
+        self.results_worksheet.cell(row=last_results_row, column=1, value="CH4 from rice cultivation")
 
         for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
-            self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.rice_cultivation_ch4[i])
+            self.results_worksheet.cell(row=last_results_row, column=i + 2, value=self.rice_cultivation_ch4[i])
+
+    def build_report(self):
+        super().build_report()
+        self.populate_results_sheet()
 
 
 @dataclass
