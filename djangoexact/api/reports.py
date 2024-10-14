@@ -48,6 +48,8 @@ class ReportFactory:
             return OtherLandReport
         elif isinstance(module, api_models.Waterbody):
             return WaterbodyReport
+        elif isinstance(module, api_models.Aquaculture):
+            return AquacultureReport
         else:
             raise ValueError("Invalid module type.")
 
@@ -705,3 +707,34 @@ class WaterbodyReport(BaseModuleReport):
 
         for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
             self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.waterbody_management_ch4[i])
+
+
+@dataclass
+class AquacultureReport(BaseModuleReport):
+
+    module: api_models.Aquaculture
+
+    fish_n2o: list[float] = None
+    electricity_co2_eq: list[float] = None
+
+    fish_n2o_source = (math_utils.ActivityTypes.N20_FIELD, math_utils.GasTypes.N2O)
+    electricity_co2_eq_source = (math_utils.ActivityTypes.ELECTRICITY, math_utils.GasTypes.CO2)
+
+    def __post_init__(self):
+        self.calculator = calculators.AquacultureCalculator(self.module)
+        return super().__post_init__()
+
+    def build_report(self):
+        last_results_row = self.results_worksheet.max_row
+        last_metadata_row = self.metadata_worksheet.max_row
+        last_additional_indicators_row = self.additional_indicators_worksheet.max_row
+
+        self.fish_n2o = self.extract_emissions(self.emissions_set, self.fish_n2o_source[0], self.fish_n2o_source[1])
+        self.electricity_co2_eq = self.extract_emissions(self.emissions_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1])
+
+        self.results_worksheet.cell(row=last_results_row + 1, column=1, value="N2O from fish")
+        self.results_worksheet.cell(row=last_results_row + 2, column=1, value="CO2-eq from electricity")
+
+        for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
+            self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.fish_n2o[i])
+            self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.electricity_co2_eq[i])
