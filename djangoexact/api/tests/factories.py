@@ -266,6 +266,7 @@ class ForestManagementFactory(DjangoModelFactory):
     land_use_type_wo = land_use_type_start
 
     forest_type = ForestType.objects.get(name="Natural")
+    forest_condition_type = ForestConditionType.objects.get(name="Primary")
 
     area = factory.fuzzy.FuzzyInteger(1, 150)
 
