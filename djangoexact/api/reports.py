@@ -816,17 +816,19 @@ class FloodedRiceReport(LandModuleReport):
             self.fire_ch4 = [x + y for x, y in zip(self.fire_ch4, self.extract_emissions(minor_emission_set, self.fire_ch4_source[0], self.fire_ch4_source[1]))]
             self.rice_cultivation_ch4 = [x + y for x, y in zip(self.rice_cultivation_ch4, self.extract_emissions(minor_emission_set, self.rice_cultivation_ch4_source[0], self.rice_cultivation_ch4_source[1]))]
 
-    def populate_results_sheet(self):
-        last_results_row = self.results_worksheet.max_row + 1
-
-        self.results_worksheet.cell(row=last_results_row, column=1, value="CH4 from rice cultivation")
-
-        for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
-            self.results_worksheet.cell(row=last_results_row, column=i + 2, value=self.rice_cultivation_ch4[i])
-
     def build_report(self):
         super().build_report()
-        self.populate_results_sheet()
+
+        last_results_row = self.results_worksheet.max_row
+        last_metadata_row = self.metadata_worksheet.max_row
+        last_additional_indicators_row = self.additional_indicators_worksheet.max_row
+
+        self.rice_cultivation_ch4 = self.extract_emissions(self.emissions_set, self.rice_cultivation_ch4_source[0], self.rice_cultivation_ch4_source[1])
+
+        self.results_worksheet.cell(row=last_results_row + 1, column=1, value="CH4 from rice cultivation")
+
+        for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
+            self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.rice_cultivation_ch4[i])
 
 
 @dataclass
