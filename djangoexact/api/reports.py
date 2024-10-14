@@ -147,6 +147,7 @@ class BaseProjectReport:
                 module_report.build_report()
 
         self.workbook.save(self.filename)
+        return self.filename
 
 
 @dataclass
