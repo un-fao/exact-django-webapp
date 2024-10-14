@@ -651,6 +651,7 @@ class CoastalWetlandReport(LandModuleReport):
         return super().__post_init__()
 
 
+@dataclass
 class FloodedRiceReport(LandModuleReport):
 
     module: api_models.FloodedRice
@@ -681,6 +682,7 @@ class FloodedRiceReport(LandModuleReport):
             self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.rice_cultivation_ch4[i])
 
 
+@dataclass
 class WaterbodyReport(BaseModuleReport):
 
     module: api_models.Waterbody
