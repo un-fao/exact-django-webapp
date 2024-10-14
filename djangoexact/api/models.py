@@ -588,6 +588,13 @@ class Project(Historical):
     def __str__(self):
         return f"({self.pk}) {self.name}"
 
+    def is_ready(self):
+        for activity in self.activities.all():
+            for module in activity.modules:
+                if not module.is_ready():
+                    return False
+        return True    
+
     def lock(self, user: CustomUser):
         self.is_locked = True
         self.locked_at = timezone.now()
