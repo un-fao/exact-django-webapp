@@ -252,7 +252,22 @@ class BaseModuleReport:
         self.duration = self.module.activity.implementation_years + self.module.activity.capitalization_years
 
     def get_result(self):
-        return NotImplementedError
+        if self.activity_report is None:
+            wb = xlsxwriter.Workbook(f"{self.module.module_type.class_name}_results.xlsx")
+            wb.add_worksheet("Results")
+            wb.add_worksheet("Metadata")
+            wb.add_worksheet("Additional Indicators")
+            wb.close()
+
+            self.workbook = pxl.load_workbook("annual_cropland_results.xlsx")
+            self.results_worksheet = self.workbook["Results"]
+            self.metadata_worksheet = self.workbook["Metadata"]
+            self.additional_indicators_worksheet = self.workbook["Additional Indicators"]
+
+        self.workbook = self.activity_report.workbook
+        self.results_worksheet = self.activity_report.results_worksheet
+        self.metadata_worksheet = self.activity_report.metadata_worksheet
+        self.additional_indicators_worksheet = self.activity_report.additional_indicators_worksheet
 
     def extract_emissions(self, data, activity_type, gas_type):
         """
@@ -315,23 +330,6 @@ class LandModuleReport(BaseModuleReport):
         self.units_breakdown_wo = [x + y for x, y in zip(break_start_wo, break_wo)]
 
     def get_result(self):
-        if self.activity_report is None:
-            wb = xlsxwriter.Workbook(f"{self.module.module_type.class_name}_results.xlsx")
-            wb.add_worksheet("Results")
-            wb.add_worksheet("Metadata")
-            wb.add_worksheet("Additional Indicators")
-            wb.close()
-
-            self.workbook = pxl.load_workbook("annual_cropland_results.xlsx")
-            self.results_worksheet = self.workbook["Results"]
-            self.metadata_worksheet = self.workbook["Metadata"]
-            self.additional_indicators_worksheet = self.workbook["Additional Indicators"]
-
-        self.workbook = self.activity_report.workbook
-        self.results_worksheet = self.activity_report.results_worksheet
-        self.metadata_worksheet = self.activity_report.metadata_worksheet
-        self.additional_indicators_worksheet = self.activity_report.additional_indicators_worksheet
-
         self.module_title = self.module.module_type.name
         self.units = self.module.area
 
