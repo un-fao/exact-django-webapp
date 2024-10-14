@@ -52,9 +52,11 @@ class AnnualCropland(LandModule):
         self.yield_minor = self.yield_minor_tier_2 or self.yield_value_minor
 
         # NOTE: this is a default value that is calculated based on the input values, needed for the frontend
-        self.ag_residue_main_tier_2_default = self.yield_main * self.n_estimation_slope_main + self.n_estimation_intercept_main
-        self.ag_residue_minor_tier_2_default = self.yield_minor * self.n_estimation_slope_minor + self.n_estimation_intercept_minor
-        
+        if self.yield_value_main is not None:
+            self.ag_residue_main_tier_2_default = self.yield_main * self.n_estimation_slope_main + self.n_estimation_intercept_main
+        if self.yield_value_minor is not None:
+            self.ag_residue_minor_tier_2_default = self.yield_minor * self.n_estimation_slope_minor + self.n_estimation_intercept_minor
+
     def calculate_emissions(self):
         def calculate_emissions_soil():
             try:
