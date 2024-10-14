@@ -33,10 +33,16 @@ class ReportFactory:
             return PerennialCroplandReport
         elif isinstance(module, api_models.AnnualCropland):
             return AnnualCroplandReport
+        elif isinstance(module, api_models.FloodedRice):
+            return FloodedRiceReport
         elif isinstance(module, api_models.LandUseChange):
             return LandUseChangeReport
-        elif isinstance(module, api_models.LandModule):
-            return LandModuleReport
+        elif isinstance(module, api_models.SetAside):
+            return SetAsideReport
+        elif isinstance(module, api_models.Grassland):
+            return GrasslandReport
+        elif isinstance(module, api_models.OtherLand):
+            return OtherLandReport
         else:
             raise ValueError("Invalid module type.")
 
@@ -225,13 +231,12 @@ class BaseModuleReport:
 
         if self.module.is_with():
             self.emissions_set += self.calculator.results_w.yearly_emissions_by_sector_by_gas
-            # TODO: This is ugly. Review this later.
-            if self.module.module_type.class_name != "LandUseChange":
+            if self.calculator.results_start_w is not None:
                 self.emissions_set += self.calculator.results_start_w.yearly_emissions_by_sector_by_gas
 
         if self.module.is_without():
             self.emissions_set += self.calculator.results_wo.yearly_emissions_by_sector_by_gas
-            if self.module.module_type.class_name != "LandUseChange":
+            if self.calculator.results_start_wo is not None:
                 self.emissions_set += self.calculator.results_start_wo.yearly_emissions_by_sector_by_gas
 
         if self.activity_report is not None:
@@ -278,6 +283,12 @@ class LandModuleReport(BaseModuleReport):
     fire_ch4: list[float] = None
     emissions_set: list[math_utils.YearlyGasActivityEmissionSet] = None
 
+    biomass_co2_source = (math_utils.ActivityTypes.BIOMASS, math_utils.GasTypes.CO2)
+    soil_co2_source = (math_utils.ActivityTypes.SOIL_CO2_CHANGE, math_utils.GasTypes.CO2)
+    soil_n2o_source = (math_utils.ActivityTypes.SOM, math_utils.GasTypes.N2O)
+    fire_n2o_source = (math_utils.ActivityTypes.RESIDUE_BURNING, math_utils.GasTypes.N2O)
+    fire_ch4_source = (math_utils.ActivityTypes.RESIDUE_BURNING, math_utils.GasTypes.CH4)
+
     units_breakdown: list[float] = None
 
     units_breakdown_w: list[float] = None
@@ -304,6 +315,18 @@ class LandModuleReport(BaseModuleReport):
         self.units_breakdown_wo = [x + y for x, y in zip(break_start_wo, break_wo)]
 
     def get_result(self):
+        if self.activity_report is None:
+            wb = xlsxwriter.Workbook(f"{self.module.module_type.class_name}_results.xlsx")
+            wb.add_worksheet("Results")
+            wb.add_worksheet("Metadata")
+            wb.add_worksheet("Additional Indicators")
+            wb.close()
+
+            self.workbook = pxl.load_workbook("annual_cropland_results.xlsx")
+            self.results_worksheet = self.workbook["Results"]
+            self.metadata_worksheet = self.workbook["Metadata"]
+            self.additional_indicators_worksheet = self.workbook["Additional Indicators"]
+
         self.workbook = self.activity_report.workbook
         self.results_worksheet = self.activity_report.results_worksheet
         self.metadata_worksheet = self.activity_report.metadata_worksheet
@@ -312,11 +335,11 @@ class LandModuleReport(BaseModuleReport):
         self.module_title = self.module.module_type.name
         self.units = self.module.area
 
-        self.biomass_co2 = self.extract_emissions(self.emissions_set, math_utils.ActivityTypes.BIOMASS, math_utils.GasTypes.CO2)
-        self.soil_co2 = self.extract_emissions(self.emissions_set, math_utils.ActivityTypes.SOIL_CO2_CHANGE, math_utils.GasTypes.CO2)
-        self.soil_n2o = self.extract_emissions(self.emissions_set, math_utils.ActivityTypes.SOM, math_utils.GasTypes.N2O)
-        self.fire_n2o = self.extract_emissions(self.emissions_set, math_utils.ActivityTypes.RESIDUE_BURNING, math_utils.GasTypes.N2O.value)
-        self.fire_ch4 = self.extract_emissions(self.emissions_set, math_utils.ActivityTypes.RESIDUE_BURNING, math_utils.GasTypes.CH4)
+        self.biomass_co2 = self.extract_emissions(self.emissions_set, self.biomass_co2_source[0], self.biomass_co2_source[1])
+        self.soil_co2 = self.extract_emissions(self.emissions_set, self.soil_co2_source[0], self.soil_co2_source[1])
+        self.soil_n2o = self.extract_emissions(self.emissions_set, self.soil_n2o_source[0], self.soil_n2o_source[1])
+        self.fire_n2o = self.extract_emissions(self.emissions_set, self.fire_n2o_source[0], self.fire_n2o_source[1])
+        self.fire_ch4 = self.extract_emissions(self.emissions_set, self.fire_ch4_source[0], self.fire_ch4_source[1])
 
     def build_report(self):
         log.debug(f"Building base report for {self.module.module_type.name}")
@@ -455,18 +478,6 @@ class AnnualCroplandReport(LandModuleReport):
         super().get_result()
         log.debug(f"Building report for {self.module.module_type.name}")
 
-        if self.activity_report is None:
-            wb = xlsxwriter.Workbook("annual_cropland_results.xlsx")
-            wb.add_worksheet("Results")
-            wb.add_worksheet("Metadata")
-            wb.add_worksheet("Additional Indicators")
-            wb.close()
-
-            self.workbook = pxl.load_workbook("annual_cropland_results.xlsx")
-            self.results_worksheet = self.workbook["Results"]
-            self.metadata_worksheet = self.workbook["Metadata"]
-            self.additional_indicators_worksheet = self.workbook["Additional Indicators"]
-
         main_season_crop_start = self.module.land_use_type_start.name
         main_season_crop_w = self.module.land_use_type_w.name
         main_season_crop_wo = self.module.land_use_type_wo.name
@@ -574,3 +585,101 @@ class AnnualCroplandReport(LandModuleReport):
 
         log.debug(f"Report for {self.module_title} built.")
         return self.workbook
+
+
+@dataclass
+class SetAsideReport(LandModuleReport):
+
+    module: api_models.SetAside
+    activity_report: BaseActivityReport = None
+
+    def __post_init__(self):
+        self.calculator = calculators.SetAsideCalculator(self.module)
+        return super().__post_init__()
+
+    def get_result(self):
+        super().get_result()
+
+        last_results_row = self.results_worksheet.max_row + 1
+        last_metadata_row = self.metadata_worksheet.max_row + 1
+        last_additional_indicators_row = self.additional_indicators_worksheet.max_row + 1
+
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Annual Cropland")
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Annual Cropland").fill = PatternFill(start_color=Colors.LIGHT_BLUE.value, end_color=Colors.LIGHT_BLUE.value, fill_type="solid")
+        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Hectares")
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Is set aside")
+
+        if self.module.is_start():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=2, value=self.units)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=2, value=self.module.is_set_aside_start)
+
+        if self.module.is_with():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=3, value=self.units)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=3, value=self.module.is_set_aside_w)
+
+        if self.module.is_without():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=4, value=self.units)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=4, value=self.module.is_set_aside_wo)
+
+
+@dataclass
+class GrasslandReport(LandModuleReport):
+
+    module: api_models.Grassland
+    activity_report: BaseActivityReport = None
+
+    def __post_init__(self):
+        self.calculator = calculators.GrasslandCalculator(self.module)
+        return super().__post_init__()
+
+
+@dataclass
+class OtherLandReport(LandModuleReport):
+
+    module: api_models.OtherLand
+    activity_report: BaseActivityReport = None
+
+    def __post_init__(self):
+        self.calculator = calculators.OtherLandCalculator(self.module)
+        return super().__post_init__()
+
+
+@dataclass
+class CoastalWetlandReport(LandModuleReport):
+
+    module: api_models.CoastalWetland
+    activity_report: BaseActivityReport = None
+
+    def __post_init__(self):
+        self.calculator = calculators.CoastalWetlandCalculator(self.module)
+        return super().__post_init__()
+
+
+class FloodedRiceReport(LandModuleReport):
+
+    module: api_models.FloodedRice
+    activity_report: BaseActivityReport = None
+
+    rice_cultivation_ch4: list[float] = None
+
+    fire_n2o_source = (math_utils.ActivityTypes.STRAW_BURNING, math_utils.GasTypes.N2O)
+    fire_ch4_source = (math_utils.ActivityTypes.STRAW_BURNING, math_utils.GasTypes.CH4)
+    rice_cultivation_ch4_source = (math_utils.ActivityTypes.CH4_EMITTED_RICE, math_utils.GasTypes.CH4)
+
+    def __post_init__(self):
+        self.calculator = calculators.FloodedRiceCalculator(self.module)
+        return super().__post_init__()
+
+    def build_report(self):
+        super().build_report()
+
+        last_results_row = self.results_worksheet.max_row
+        last_metadata_row = self.metadata_worksheet.max_row
+        last_additional_indicators_row = self.additional_indicators_worksheet.max_row
+
+        self.rice_cultivation_ch4 = self.extract_emissions(self.emissions_set, self.rice_cultivation_ch4_source[0], self.rice_cultivation_ch4_source[1])
+
+        self.results_worksheet.cell(row=last_results_row + 1, column=1, value="CH4 from rice cultivation")
+
+        for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
+            self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.rice_cultivation_ch4[i])
