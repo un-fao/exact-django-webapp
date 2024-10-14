@@ -2006,42 +2006,6 @@ with open("scripts/ipcc_data/SoilOrganicCarbon.csv", "r") as f:
             SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type, value=value)
 
 df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestCombustionFactor.csv"),
-    header=[0],
-    sep=";",
-)
-
-for i, row in df.iterrows():
-    land_use_type = LandUseType.objects.get(name__iexact=sanitize(row["land_use_type"]))
-    climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
-    forest_type = ForestType.objects.get(name__iexact=sanitize(row["forest_type"]))
-
-    co2 = parse_csv_number(row["co2"])
-    ch4 = parse_csv_number(row["ch4"])
-    n2o = parse_csv_number(row["n2o"])
-    value = parse_csv_number(row["cf"])
-
-    print(
-        land_use_type,
-        climate,
-        forest_type,
-        co2,
-        ch4,
-        n2o,
-        value,
-    )
-
-    ForestCombustionFactor.objects.get(
-        land_use_type=land_use_type,
-        climate=climate,
-        forest_type=forest_type,
-        co2=co2,
-        ch4=ch4,
-        n2o=n2o,
-        value=value,
-    )
-
-df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestManagementAGBGrowth.csv"),
     header=[0],
     sep=";",
@@ -4415,39 +4379,77 @@ for i, row in df.iterrows():
 
 # TODO: Run in review
 
-log.debug("Deleting all GrasslandBiomass objects...")
-ipcc.GrasslandBiomass.objects.all().delete()
+# log.debug("Deleting all GrasslandBiomass objects...")
+# ipcc.GrasslandBiomass.objects.all().delete()
 
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "GrasslandBiomass.csv"),
-    header=0,
-    sep=";",
-)
+# df = pd.read_csv(
+#     os.path.join(os.path.dirname(__file__), "ipcc_data", "GrasslandBiomass.csv"),
+#     header=0,
+#     sep=";",
+# )
 
-for i, row in df.iterrows():
-    climate = Climate.objects.get(name__iexact=row["climate"])
-    moisture = Moisture.objects.get(name__iexact=row["moisture"])
-    agb_t_dm_ha = parse_csv_number(row["agb_t_dm_ha"])
-    agb_t_c_ha = parse_csv_number(row["agb_t_c_ha"])
-    bgb_t_dm_ha = parse_csv_number(row["bgb_t_dm_ha"])
-    bgb_t_c_ha = parse_csv_number(row["bgb_t_c_ha"])
+# for i, row in df.iterrows():
+#     climate = Climate.objects.get(name__iexact=row["climate"])
+#     moisture = Moisture.objects.get(name__iexact=row["moisture"])
+#     agb_t_dm_ha = parse_csv_number(row["agb_t_dm_ha"])
+#     agb_t_c_ha = parse_csv_number(row["agb_t_c_ha"])
+#     bgb_t_dm_ha = parse_csv_number(row["bgb_t_dm_ha"])
+#     bgb_t_c_ha = parse_csv_number(row["bgb_t_c_ha"])
 
-    print(
-        climate,
-        moisture,
-        agb_t_dm_ha,
-        agb_t_c_ha,
-        bgb_t_dm_ha,
-        bgb_t_c_ha,
-    )
+#     print(
+#         climate,
+#         moisture,
+#         agb_t_dm_ha,
+#         agb_t_c_ha,
+#         bgb_t_dm_ha,
+#         bgb_t_c_ha,
+#     )
 
-    ipcc.GrasslandBiomass.objects.create(
-        climate=climate,
-        moisture=moisture,
-        agb_t_dm_ha=agb_t_dm_ha,
-        agb_t_c_ha=agb_t_c_ha,
-        bgb_t_dm_ha=bgb_t_dm_ha,
-        bgb_t_c_ha=bgb_t_c_ha,
-    )
+#     ipcc.GrasslandBiomass.objects.create(
+#         climate=climate,
+#         moisture=moisture,
+#         agb_t_dm_ha=agb_t_dm_ha,
+#         agb_t_c_ha=agb_t_c_ha,
+#         bgb_t_dm_ha=bgb_t_dm_ha,
+#         bgb_t_c_ha=bgb_t_c_ha,
+#     )
+
+# ForestCombustionFactor.objects.all().delete()
+
+# df = pd.read_csv(
+#     os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestCombustionFactor.csv"),
+#     header=[0],
+#     sep=";",
+# )
+
+# for i, row in df.iterrows():
+#     land_use_type = LandUseType.objects.get(name__iexact=sanitize(row["land_use_type"]))
+#     climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
+#     forest_type = ForestType.objects.get(name__iexact=sanitize(row["forest_type"]))
+
+#     co2 = parse_csv_number(row["gef_co2"])
+#     ch4 = parse_csv_number(row["gef_ch4"])
+#     n2o = parse_csv_number(row["gef_n2o"])
+#     value = parse_csv_number(row["value"])
+
+#     print(
+#         land_use_type,
+#         climate,
+#         forest_type,
+#         co2,
+#         ch4,
+#         n2o,
+#         value,
+#     )
+
+#     ForestCombustionFactor.objects.create(
+#         land_use_type=land_use_type,
+#         climate=climate,
+#         forest_type=forest_type,
+#         co2=co2,
+#         ch4=ch4,
+#         n2o=n2o,
+#         value=value,
+#     )
 
 # TODO: Run in develop
