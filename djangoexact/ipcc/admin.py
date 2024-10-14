@@ -75,6 +75,7 @@ class LivestockTAMAdmin(ModelAdmin):
 class ForestManagementAGBAdmin(ModelAdmin):
     list_display = [
         "forest_type",
+        "climate",
         "land_use_type",
         "forest_condition_type",
         "from_year",
@@ -86,6 +87,7 @@ class ForestManagementAGBAdmin(ModelAdmin):
     ]
 
     list_select_related = [
+        "climate",
         "land_use_type",
         "region",
         "forest_type",
@@ -93,6 +95,7 @@ class ForestManagementAGBAdmin(ModelAdmin):
     ]
 
     search_fields = [
+        "climate__name",
         "land_use_type__name",
         "region__name",
         "forest_type__name",
