@@ -33,6 +33,8 @@ class ReportFactory:
             return PerennialCroplandReport
         elif isinstance(module, api_models.AnnualCropland):
             return AnnualCroplandReport
+        elif isinstance(module, api_models.LandUseChange):
+            return LandUseChangeReport
         elif isinstance(module, api_models.LandModule):
             return LandModuleReport
         else:
@@ -222,10 +224,15 @@ class BaseModuleReport:
         self.emissions_set = []
 
         if self.module.is_with():
-            self.emissions_set += self.calculator.results_w.yearly_emissions_by_sector_by_gas + self.calculator.results_start_w.yearly_emissions_by_sector_by_gas
+            self.emissions_set += self.calculator.results_w.yearly_emissions_by_sector_by_gas
+            # TODO: This is ugly. Review this later.
+            if self.module.module_type.class_name != "LandUseChange":
+                self.emissions_set += self.calculator.results_start_w.yearly_emissions_by_sector_by_gas
 
         if self.module.is_without():
-            self.emissions_set += self.calculator.results_wo.yearly_emissions_by_sector_by_gas + self.calculator.results_start_wo.yearly_emissions_by_sector_by_gas
+            self.emissions_set += self.calculator.results_wo.yearly_emissions_by_sector_by_gas
+            if self.module.module_type.class_name != "LandUseChange":
+                self.emissions_set += self.calculator.results_start_wo.yearly_emissions_by_sector_by_gas
 
         if self.activity_report is not None:
             self.workbook = self.activity_report.workbook
@@ -343,6 +350,15 @@ class LandModuleReport(BaseModuleReport):
 
         log.debug(f"Base report for {self.module.module_type.name} built.")
         return self.workbook
+
+
+@dataclass
+class LandUseChangeReport(LandModuleReport):
+    module: api_models.LandUseChange
+
+    def __post_init__(self):
+        self.calculator = calculators.LandUseChangeCalculator(self.module)
+        return super().__post_init__()
 
 
 @dataclass
