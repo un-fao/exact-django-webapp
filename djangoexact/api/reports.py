@@ -50,6 +50,10 @@ class ReportFactory:
             return WaterbodyReport
         elif isinstance(module, api_models.Aquaculture):
             return AquacultureReport
+        elif isinstance(module, api_models.SmallFishery):
+            return SmallFisheryReport
+        elif isinstance(module, api_models.LargeFishery):
+            return LargeFisheryReport
         else:
             raise ValueError("Invalid module type.")
 
@@ -738,3 +742,71 @@ class AquacultureReport(BaseModuleReport):
         for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
             self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.fish_n2o[i])
             self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.electricity_co2_eq[i])
+
+
+@dataclass
+class FisheryReport(BaseModuleReport):
+
+    liquid_fuel_co2: list[float] = None
+    liquid_fuel_n2o: list[float] = None
+    liquid_fuel_ch4: list[float] = None
+    refrigeration_hfc: list[float] = None
+    electricity_co2_eq: list[float] = None
+
+    liquid_fuel_co2_source = (math_utils.ActivityTypes.CATCH, math_utils.GasTypes.CO2)
+    liquid_fuel_n2o_source = (math_utils.ActivityTypes.CATCH, math_utils.GasTypes.N2O)
+    liquid_fuel_ch4_source = (math_utils.ActivityTypes.CATCH, math_utils.GasTypes.CH4)
+    refrigeration_hfc_source = (math_utils.ActivityTypes.REFRIGERANT, math_utils.GasTypes.OTHER)
+    electricity_co2_eq_source = (math_utils.ActivityTypes.ICE, math_utils.GasTypes.OTHER)
+
+    def __post_init__(self):
+        return super().__post_init__()
+
+    def build_report(self):
+        last_results_row = self.results_worksheet.max_row
+        last_metadata_row = self.metadata_worksheet.max_row
+        last_additional_indicators_row = self.additional_indicators_worksheet.max_row
+
+        self.liquid_fuel_co2 = self.extract_emissions(self.emissions_set, self.liquid_fuel_co2_source[0], self.liquid_fuel_co2_source[1])
+        self.liquid_fuel_n2o = self.extract_emissions(self.emissions_set, self.liquid_fuel_n2o_source[0], self.liquid_fuel_n2o_source[1])
+        self.liquid_fuel_ch4 = self.extract_emissions(self.emissions_set, self.liquid_fuel_ch4_source[0], self.liquid_fuel_ch4_source[1])
+        self.refrigeration_hfc = self.extract_emissions(self.emissions_set, self.refrigeration_hfc_source[0], self.refrigeration_hfc_source[1])
+        self.electricity_co2_eq = self.extract_emissions(self.emissions_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1])
+
+        self.results_worksheet.cell(row=last_results_row + 1, column=1, value="CO2 from liquid fuels consumption")
+        self.results_worksheet.cell(row=last_results_row + 2, column=1, value="N2O from liquid fuels consumption")
+        self.results_worksheet.cell(row=last_results_row + 3, column=1, value="CH4 from liquid fuels consumption")
+        self.results_worksheet.cell(row=last_results_row + 4, column=1, value="HFC from refrigeration")
+        self.results_worksheet.cell(row=last_results_row + 5, column=1, value="CO2-eq from electricity")
+
+        for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
+            self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.liquid_fuel_co2[i])
+            self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.liquid_fuel_n2o[i])
+            self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.liquid_fuel_ch4[i])
+            self.results_worksheet.cell(row=last_results_row + 4, column=i + 2, value=self.refrigeration_hfc[i])
+
+
+@dataclass
+class SmallFisheryReport(FisheryReport):
+
+    module: api_models.SmallFishery
+
+    def __post_init__(self):
+        self.calculator = calculators.SmallFisheryCalculator(self.module)
+        return super().__post_init__()
+
+    def build_report(self):
+        return super().build_report()
+
+
+@dataclass
+class LargeFisheryReport(FisheryReport):
+
+    module: api_models.LargeFishery
+
+    def __post_init__(self):
+        self.calculator = calculators.LargeFisheryCalculator(self.module)
+        return super().__post_init__()
+
+    def build_report(self):
+        return super().build_report()
