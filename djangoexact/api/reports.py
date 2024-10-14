@@ -19,6 +19,8 @@ from datetime import datetime
 
 log.basicConfig(level=log.DEBUG)
 
+# TODO: Calculations of submodules are a mess. Total cumulative and yearly emissions don't add up at all, so something is happening there. Probably double-counting. Need to refactor the way they are calculated before making them available in the reports.
+
 
 class Colors(Enum):
     LIGHT_ORANGE_HEX = "fce4d6"
@@ -63,6 +65,8 @@ class ReportFactory:
             return EnergyReport
         elif isinstance(module, api_models.Input):
             return InputReport
+        elif isinstance(module, api_models.Irrigation):
+            return IrrigationReport
         else:
             raise ValueError("Invalid module type.")
 
@@ -337,7 +341,9 @@ class BaseModuleReport:
         self.additional_indicators_worksheet = self.activity_report.additional_indicators_worksheet
 
     def build_report(self):
-        raise NotImplementedError("build_report method not implemented.")
+        last_results_row = self.results_worksheet.max_row + 1
+        self.results_worksheet.cell(row=last_results_row, column=1, value=str(self.module.module_type.name))
+        self.results_worksheet.cell(row=last_results_row, column=1).fill = Colors.LIGHT_BLUE_FILL.value
 
     def extract_emissions(self, data, activity_type=None, gas_type=None, excluded_activity_types=[], excluded_gas_types=[]):
         """
@@ -439,14 +445,11 @@ class LandModuleReport(BaseModuleReport):
         self.fire_ch4 = self.extract_emissions(self.emissions_set, self.fire_ch4_source[0], self.fire_ch4_source[1])
 
     def build_report(self):
+        super().build_report()
         log.debug(f"Building base report for {self.module.module_type.name}")
         self.get_result()
 
-        last_results_row = self.results_worksheet.max_row + 1
-
-        # Write module name in results sheet
-        self.results_worksheet.cell(row=last_results_row, column=1, value=str(self.module_title))
-        self.results_worksheet.cell(row=last_results_row, column=1).fill = Colors.LIGHT_BLUE_FILL.value
+        last_results_row = self.results_worksheet.max_row
 
         # Write emissions information
         self.results_worksheet.cell(row=last_results_row + 1, column=1, value="CO2 in biomass")
@@ -1247,6 +1250,7 @@ class EnergyReport(BaseModuleReport):
             self.results_worksheet.cell(row=last_results_row + 7, column=i + 2, value=self.solid_fuel_n2o[i])
 
 
+@dataclass
 class InputReport(BaseModuleReport):
 
     module: api_models.Input
@@ -1322,3 +1326,70 @@ class InputReport(BaseModuleReport):
             self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.inputs_n2o[i])
             self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.inputs_co2_eq[i])
             self.results_worksheet.cell(row=last_results_row + 4, column=i + 2, value=self.feed_co2_eq[i])
+
+
+@dataclass
+class IrrigationReport(BaseModuleReport):
+
+    module: api_models.Irrigation
+
+    other_infrastructure_co2_eq: list[float] = None
+    liquid_fuel_or_electricity_co2: list[float] = None
+    liquid_fuel_or_electricity_ch4: list[float] = None
+    liquid_fuel_or_electricity_n2o: list[float] = None
+
+    other_infrastructure_co2_eq_source = (math_utils.ActivityTypes.NEW_IRRIGATION, math_utils.GasTypes.CO2)
+    liquid_fuel_or_electricity_co2_source = (math_utils.ActivityTypes.IRRIGATION_OPERATIONAL, math_utils.GasTypes.CO2)
+    liquid_fuel_or_electricity_ch4_source = (math_utils.ActivityTypes.IRRIGATION_OPERATIONAL, math_utils.GasTypes.CH4)
+    liquid_fuel_or_electricity_n2o_source = (math_utils.ActivityTypes.IRRIGATION_OPERATIONAL, math_utils.GasTypes.N2O)
+
+    def __post_init__(self):
+        self.calculator = calculators.IrrigationCalculator(self.module)
+        return super().__post_init__()
+
+    def add_submodules_results(self):
+        submodules: list[api_models.Submodule] = self.module.submodules
+
+        for submodule in submodules:
+            submodules_emission_set = []
+            CalculatorClass = calculators.IrrigationPhaseCalculator if isinstance(submodule, api_models.IrrigationPhase) else calculators.IrrigationSystemCalculator
+            submodule: api_models.IrrigationPhase | api_models.IrrigationSystem
+
+            calculator = CalculatorClass(submodule)
+            calculator.calculate()
+
+            if self.module.is_with():
+                submodules_emission_set = calculator.results_w.yearly_emissions_by_sector_by_gas
+                if self.calculator.results_start_w is not None:
+                    submodules_emission_set = [a + b for a, b in zip(submodules_emission_set, calculator.results_start_w.yearly_emissions_by_sector_by_gas)]
+
+            if self.module.is_without():
+                submodules_emission_set = calculator.results_wo.yearly_emissions_by_sector_by_gas
+                if self.calculator.results_start_wo is not None:
+                    submodules_emission_set = [a + b for a, b in zip(submodules_emission_set, calculator.results_start_wo.yearly_emissions_by_sector_by_gas)]
+
+            self.emissions_set += submodules_emission_set
+
+    def build_report(self):
+        super().build_report()
+
+        last_results_row = self.results_worksheet.max_row
+
+        self.add_submodules_results()
+        print(self.emissions_set)
+
+        self.other_infrastructure_co2_eq = self.extract_emissions(self.emissions_set, self.other_infrastructure_co2_eq_source[0], self.other_infrastructure_co2_eq_source[1])
+        self.liquid_fuel_or_electricity_co2 = self.extract_emissions(self.emissions_set, self.liquid_fuel_or_electricity_co2_source[0], self.liquid_fuel_or_electricity_co2_source[1])
+        self.liquid_fuel_or_electricity_ch4 = self.extract_emissions(self.emissions_set, self.liquid_fuel_or_electricity_ch4_source[0], self.liquid_fuel_or_electricity_ch4_source[1])
+        self.liquid_fuel_or_electricity_n2o = self.extract_emissions(self.emissions_set, self.liquid_fuel_or_electricity_n2o_source[0], self.liquid_fuel_or_electricity_n2o_source[1])
+
+        self.results_worksheet.cell(row=last_results_row + 1, column=1, value="CO2-eq from other infrastructure")
+        self.results_worksheet.cell(row=last_results_row + 2, column=1, value="CO2 from liquid fuel or electricity")
+        self.results_worksheet.cell(row=last_results_row + 3, column=1, value="CH4 from liquid fuel or electricity")
+        self.results_worksheet.cell(row=last_results_row + 4, column=1, value="N2O from liquid fuel or electricity")
+
+        for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
+            self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.other_infrastructure_co2_eq[i])
+            self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.liquid_fuel_or_electricity_co2[i])
+            self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.liquid_fuel_or_electricity_ch4[i])
+            self.results_worksheet.cell(row=last_results_row + 4, column=i + 2, value=self.liquid_fuel_or_electricity_n2o[i])
