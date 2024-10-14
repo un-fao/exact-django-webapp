@@ -75,10 +75,12 @@ class BaseProjectReport:
     metadata_worksheet: Worksheet = None
     additional_indicators_worksheet: Worksheet = None
     activities: list[api_models.Activity] = None
+    activity_reports: list["BaseActivityReport"] = None
 
     colors: Colors = Colors
 
     def __post_init__(self):
+        self.activity_reports = []
         self.activities = self.project.activities.all()
         pass
 
@@ -105,17 +107,14 @@ class BaseProjectReport:
 
         self.results_worksheet.cell(row=1, column=1, value="Activity and GHGs / Years")
 
-        self.results_worksheet.cell(row=2, column=1, value="Total Carbon Balance")
-        self.results_worksheet.cell(row=2, column=1).fill = self.colors.LIGHT_ORANGE_FILL.value
-
-        self.results_worksheet.cell(row=3, column=1, value="Cumulative balance in Tco2-eq")
-        self.results_worksheet.cell(row=4, column=1, value="Yearly balance in Tco2-eq")
-        self.results_worksheet.cell(row=5, column=1, value="CO2 in biomass")
-        self.results_worksheet.cell(row=6, column=1, value="CO2 in soils")
-        self.results_worksheet.cell(row=7, column=1, value="Other CO2")
-        self.results_worksheet.cell(row=8, column=1, value="CH4")
-        self.results_worksheet.cell(row=9, column=1, value="N20")
-        self.results_worksheet.cell(row=10, column=1, value="Other GHGs")
+        self.results_worksheet.cell(row=2, column=1, value="Cumulative balance in Tco2-eq")
+        self.results_worksheet.cell(row=3, column=1, value="Yearly balance in Tco2-eq")
+        self.results_worksheet.cell(row=4, column=1, value="CO2 in biomass")
+        self.results_worksheet.cell(row=5, column=1, value="CO2 in soils")
+        self.results_worksheet.cell(row=6, column=1, value="Other CO2")
+        self.results_worksheet.cell(row=7, column=1, value="CH4")
+        self.results_worksheet.cell(row=8, column=1, value="N20")
+        self.results_worksheet.cell(row=9, column=1, value="Other GHGs")
 
         for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
             self.results_worksheet.cell(row=1, column=i + 2, value=year)
@@ -132,19 +131,52 @@ class BaseProjectReport:
         log.debug(f"Report skeleton for {self.project.name} built.")
         return self.workbook
 
+    def finalize_report(self):
+        log.debug(f"Finalizing report for project {self.project.name}")
+
+        other_ghgs = [0] * self.duration
+        n2o = [0] * self.duration
+        ch4 = [0] * self.duration
+        other_co2 = [0] * self.duration
+        soil_co2 = [0] * self.duration
+        biomass_co2 = [0] * self.duration
+        yearly_balance_t_co2_eq = [0] * self.duration
+        cumulative_balance_t_co2_eq = [0] * self.duration
+
+        for activity in self.activity_reports:
+            log.debug(f"Finalizing report for activity {activity.activity_title}")
+            for module in activity.modules_reports:
+                log.debug(f"Finalizing report for module {module.module_title}")
+                other_ghgs = [x + y for x, y in zip(other_ghgs, module.extract_emissions(module.emissions_set, gas_type=math_utils.GasTypes.OTHER))]
+                n2o = [x + y for x, y in zip(n2o, module.extract_emissions(module.emissions_set, gas_type=math_utils.GasTypes.N2O))]
+                ch4 = [x + y for x, y in zip(ch4, module.extract_emissions(module.emissions_set, gas_type=math_utils.GasTypes.CH4))]
+                other_co2 = [x + y for x, y in zip(other_co2, module.extract_emissions(module.emissions_set, gas_type=math_utils.GasTypes.CO2, excluded_activity_types=[math_utils.ActivityTypes.BIOMASS, math_utils.ActivityTypes.SOIL_CO2_CHANGE]))]
+                soil_co2 = [x + y for x, y in zip(soil_co2, module.extract_emissions(module.emissions_set, activity_type=math_utils.ActivityTypes.SOIL_CO2_CHANGE, gas_type=math_utils.GasTypes.CO2))]
+                biomass_co2 = [x + y for x, y in zip(biomass_co2, module.extract_emissions(module.emissions_set, activity_type=math_utils.ActivityTypes.BIOMASS, gas_type=math_utils.GasTypes.CO2))]
+
+        for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
+            yearly_balance_t_co2_eq[i] = sum([biomass_co2[i], soil_co2[i], other_co2[i], ch4[i], n2o[i], other_ghgs[i]])
+            cumulative_balance_t_co2_eq[i] = sum(yearly_balance_t_co2_eq)
+
+            self.results_worksheet.cell(row=2, column=i + 2, value=cumulative_balance_t_co2_eq[i])
+            self.results_worksheet.cell(row=3, column=i + 2, value=yearly_balance_t_co2_eq[i])
+            self.results_worksheet.cell(row=4, column=i + 2, value=biomass_co2[i])
+            self.results_worksheet.cell(row=5, column=i + 2, value=soil_co2[i])
+            self.results_worksheet.cell(row=6, column=i + 2, value=other_co2[i])
+            self.results_worksheet.cell(row=7, column=i + 2, value=ch4[i])
+            self.results_worksheet.cell(row=8, column=i + 2, value=n2o[i])
+            self.results_worksheet.cell(row=9, column=i + 2, value=other_ghgs[i])
+
     def build_report(self):
         self.build_report_skeleton()
 
         for activity in self.activities:
             activity_report = BaseActivityReport(self, activity)
             activity_report.build_activity_skeleton()
+            activity_report.build_modules_reports()
+            self.activity_reports.append(activity_report)
 
-            modules = activity.modules
-            log.debug(f"Modules length: {len(modules)}")
-            for module in modules:
-                ReportClass = ReportFactory.get_report_class(module)
-                module_report = ReportClass(module, activity_report)
-                module_report.build_report()
+        self.finalize_report()
 
         self.workbook.save(self.filename)
         return self.filename
@@ -155,6 +187,7 @@ class BaseActivityReport:
 
     project_report: BaseProjectReport
     activity: api_models.Activity
+    modules_reports: list["BaseModuleReport"] = None
 
     activity_title: str = None
     start_year_of_activities: int = None
@@ -173,6 +206,7 @@ class BaseActivityReport:
         self.results_worksheet = self.project_report.results_worksheet
         self.metadata_worksheet = self.project_report.metadata_worksheet
         self.additional_indicators_worksheet = self.project_report.additional_indicators_worksheet
+        self.modules_reports = []
 
     def build_activity_skeleton(self):
         log.debug(f"Building activity skeleton for {self.activity.name}")
@@ -210,6 +244,23 @@ class BaseActivityReport:
         log.debug(f"Activity skeleton for {self.activity.name} built.")
 
         return self.workbook
+
+    def build_modules_reports(self) -> list["BaseModuleReport"]:
+        modules = self.activity.modules
+        for module in modules:
+            log.debug(f"Building report for module {module.module_type.name}")
+            ReportClass = ReportFactory.get_report_class(module)
+            module_report = ReportClass(module, self)
+            module_report.build_report()
+            self.modules_reports.append(module_report)
+
+        return self.modules_reports
+
+    def extract_modules_emissions(self, activity_type=None, gas_type=None) -> list[float]:
+        emissions = np.zeros(self.duration)
+        for module_report in self.modules_reports:
+            emissions += module_report.extract_emissions(module_report.emissions_set, activity_type, gas_type)
+        return emissions
 
 
 @dataclass
@@ -281,23 +332,46 @@ class BaseModuleReport:
     def build_report(self):
         raise NotImplementedError("build_report method not implemented.")
 
-    def extract_emissions(self, data, activity_type, gas_type):
+    def extract_emissions(self, data, activity_type=None, gas_type=None, excluded_activity_types=[], excluded_gas_types=[]):
         """
         Extracts emissions values from the provided data based on the specified activity type and gas type.
 
         Args:
             data (list): A list of data entries, where each entry is expected to have 'activity', 'gas_type', and 'emissions' attributes.
-            activity_type (str): The type of activity to filter the data entries.
-            gas_type (str): The type of gas to filter the data entries.
+            activity_type (str, optional): The type of activity to filter the data entries.
+            gas_type (str, optional): The type of gas to filter the data entries.
 
         Returns:
             list: A list of emission values if a matching entry is found.
             numpy.ndarray: An array of zeros with a length equal to the sum of implementation years and capitalization years if no matching entry is found.
         """
-        for entry in data:
-            if entry.activity == activity_type and entry.gas_type == gas_type:
-                return [e.value for e in entry.emissions]
-        return np.zeros(self.module.activity.implementation_years + self.module.activity.capitalization_years)
+        emissions = np.zeros(self.module.activity.implementation_years + self.module.activity.capitalization_years)
+
+        if (activity_type is not None and activity_type not in excluded_activity_types) and (gas_type is not None and gas_type not in excluded_gas_types):
+            for entry in data:
+                if entry.activity == activity_type and entry.gas_type == gas_type:
+                    log.debug(f"Found emissions for {activity_type} and {gas_type}")
+                    emissions = [e.value for e in entry.emissions]
+                    return emissions
+
+        elif activity_type is not None and activity_type not in excluded_activity_types:
+            for entry in data:
+                if entry.activity == activity_type:
+                    log.debug(f"Found emissions for {activity_type}")
+                    emissions = [x + y for x, y in zip(emissions, [e.value for e in entry.emissions])]
+
+        elif gas_type is not None and gas_type not in excluded_gas_types:
+            for entry in data:
+                if entry.gas_type == gas_type:
+                    log.debug(f"Found emissions for {gas_type}")
+                    emissions = [x + y for x, y in zip(emissions, [e.value for e in entry.emissions])]
+
+        else:
+            log.debug("No activity or gas type specified. Extracting all emissions.")
+            for entry in data:
+                emissions += [x + y for x, y in zip(emissions, [e.value for e in entry.emissions])]
+
+        return emissions
 
 
 @dataclass
