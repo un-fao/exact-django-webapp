@@ -58,6 +58,8 @@ class ReportFactory:
             return LivestockReport
         elif isinstance(module, api_models.ForestManagement):
             return ForestManagementReport
+        elif isinstance(module, api_models.Energy):
+            return EnergyReport
         else:
             raise ValueError("Invalid module type.")
 
@@ -1149,3 +1151,94 @@ class ForestManagementReport(LandModuleReport):
             self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.hwp_co2[i])
             self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.biomass_loss_co2[i])
             self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.biomass_gain_co2[i])
+
+
+@dataclass
+class EnergyReport(BaseModuleReport):
+    module: api_models.Energy
+
+    electricity_co2_eq: list[float] = None
+    liquid_fuel_co2: list[float] = None
+    liquid_fuel_ch4: list[float] = None
+    liquid_fuel_n2o: list[float] = None
+    solid_fuel_co2: list[float] = None
+    solid_fuel_ch4: list[float] = None
+    solid_fuel_n2o: list[float] = None
+
+    electricity_co2_eq_source = (math_utils.ActivityTypes.ELECTRICITY, math_utils.GasTypes.CO2)
+    # TODO: There's no distinction between liquid and solid fuels in the mathematical model
+    liquid_fuel_co2_source = (math_utils.ActivityTypes.FUEL, math_utils.GasTypes.CO2)
+    liquid_fuel_ch4_source = (math_utils.ActivityTypes.FUEL, math_utils.GasTypes.CH4)
+    liquid_fuel_n2o_source = (math_utils.ActivityTypes.FUEL, math_utils.GasTypes.N2O)
+    solid_fuel_co2_source = (math_utils.ActivityTypes.FUEL, math_utils.GasTypes.CO2)
+    solid_fuel_ch4_source = (math_utils.ActivityTypes.FUEL, math_utils.GasTypes.CH4)
+    solid_fuel_n2o_source = (math_utils.ActivityTypes.FUEL, math_utils.GasTypes.N2O)
+
+    def __post_init__(self):
+        self.calculator = calculators.EnergyCalculator(self.module)
+        return super().__post_init__()
+
+    def add_submodules_results(self):
+
+        submodules: list[api_models.Submodule] = self.module.submodules
+        submodules_emission_set = []
+
+        for submodule in submodules:
+            CalculatorClass = calculators.ElectricityCalculator if isinstance(submodule, api_models.Electricity) else calculators.FuelCalculator
+            submodule: api_models.Electricity | api_models.Fuel
+
+            calculator = CalculatorClass(submodule)
+            calculator.calculate()
+
+            if self.module.is_with():
+                submodules_emission_set = calculator.results_w.yearly_emissions_by_sector_by_gas
+                if self.calculator.results_start_w is not None:
+                    submodules_emission_set = [a + b for a, b in zip(submodules_emission_set, calculator.results_start_w.yearly_emissions_by_sector_by_gas)]
+
+            if self.module.is_without():
+                submodules_emission_set = calculator.results_wo.yearly_emissions_by_sector_by_gas
+                if self.calculator.results_start is not None:
+                    submodules_emission_set = [a + b for a, b in zip(submodules_emission_set, calculator.results_start_wo.yearly_emissions_by_sector_by_gas)]
+
+            self.electricity_co2_eq = [a + b for a, b in zip(self.electricity_co2_eq, self.extract_emissions(submodules_emission_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1]))]
+
+            if "solid" in submodule.fuel_type.macro_fuel_type.name.casefold():
+                self.solid_fuel_co2 = [a + b for a, b in zip(self.solid_fuel_co2, self.extract_emissions(submodules_emission_set, self.solid_fuel_co2_source[0], self.solid_fuel_co2_source[1]))]
+                self.solid_fuel_ch4 = [a + b for a, b in zip(self.solid_fuel_ch4, self.extract_emissions(submodules_emission_set, self.solid_fuel_ch4_source[0], self.solid_fuel_ch4_source[1]))]
+                self.solid_fuel_n2o = [a + b for a, b in zip(self.solid_fuel_n2o, self.extract_emissions(submodules_emission_set, self.solid_fuel_n2o_source[0], self.solid_fuel_n2o_source[1]))]
+            elif "liquid" in submodule.fuel_type.macro_fuel_type.name.casefold():
+                self.liquid_fuel_co2 = [a + b for a, b in zip(self.liquid_fuel_co2, self.extract_emissions(submodules_emission_set, self.liquid_fuel_co2_source[0], self.liquid_fuel_co2_source[1]))]
+                self.liquid_fuel_ch4 = [a + b for a, b in zip(self.liquid_fuel_ch4, self.extract_emissions(submodules_emission_set, self.liquid_fuel_ch4_source[0], self.liquid_fuel_ch4_source[1]))]
+                self.liquid_fuel_n2o = [a + b for a, b in zip(self.liquid_fuel_n2o, self.extract_emissions(submodules_emission_set, self.liquid_fuel_n2o_source[0], self.liquid_fuel_n2o_source[1]))]
+
+    def build_report(self):
+        last_results_row = self.results_worksheet.max_row
+        last_metadata_row = self.metadata_worksheet.max_row
+        last_additional_indicators_row = self.additional_indicators_worksheet.max_row
+
+        self.electricity_co2_eq = self.extract_emissions(self.emissions_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1])
+        self.liquid_fuel_co2 = self.extract_emissions(self.emissions_set, self.liquid_fuel_co2_source[0], self.liquid_fuel_co2_source[1])
+        self.liquid_fuel_ch4 = self.extract_emissions(self.emissions_set, self.liquid_fuel_ch4_source[0], self.liquid_fuel_ch4_source[1])
+        self.liquid_fuel_n2o = self.extract_emissions(self.emissions_set, self.liquid_fuel_n2o_source[0], self.liquid_fuel_n2o_source[1])
+        self.solid_fuel_co2 = self.extract_emissions(self.emissions_set, self.solid_fuel_co2_source[0], self.solid_fuel_co2_source[1])
+        self.solid_fuel_ch4 = self.extract_emissions(self.emissions_set, self.solid_fuel_ch4_source[0], self.solid_fuel_ch4_source[1])
+        self.solid_fuel_n2o = self.extract_emissions(self.emissions_set, self.solid_fuel_n2o_source[0], self.solid_fuel_n2o_source[1])
+
+        self.add_submodules_results()
+
+        self.results_worksheet.cell(row=last_results_row + 1, column=1, value="CO2-eq from electricity")
+        self.results_worksheet.cell(row=last_results_row + 2, column=1, value="CO2 from liquid fuels")
+        self.results_worksheet.cell(row=last_results_row + 3, column=1, value="CH4 from liquid fuels")
+        self.results_worksheet.cell(row=last_results_row + 4, column=1, value="N2O from liquid fuels")
+        self.results_worksheet.cell(row=last_results_row + 5, column=1, value="CO2 from solid fuels")
+        self.results_worksheet.cell(row=last_results_row + 6, column=1, value="CH4 from solid fuels")
+        self.results_worksheet.cell(row=last_results_row + 7, column=1, value="N2O from solid fuels")
+
+        for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
+            self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.electricity_co2_eq[i])
+            self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.liquid_fuel_co2[i])
+            self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.liquid_fuel_ch4[i])
+            self.results_worksheet.cell(row=last_results_row + 4, column=i + 2, value=self.liquid_fuel_n2o[i])
+            self.results_worksheet.cell(row=last_results_row + 5, column=i + 2, value=self.solid_fuel_co2[i])
+            self.results_worksheet.cell(row=last_results_row + 6, column=i + 2, value=self.solid_fuel_ch4[i])
+            self.results_worksheet.cell(row=last_results_row + 7, column=i + 2, value=self.solid_fuel_n2o[i])
