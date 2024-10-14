@@ -504,11 +504,15 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     @action(detail=True, methods=["get"])
     @swagger_auto_schema(responses={404: "Project not found", 403: "Selected user does not have permission to view project results"})
     def report(self, request, pk=None):
-        project = self.get_object()
+        project: Project = self.get_object()
 
         if not utils.has_project_permission("view_project", self.request.user, project):
             logging.error("Selected user does not have permission to view the project")
             return utils.ErrorResponse("Selected user does not have permission to view the project", status=http_status.HTTP_403_FORBIDDEN)
+
+        if not project.is_ready():
+            logging.error("Project is not ready")
+            return utils.ErrorResponse("To get a report for a project, all activities must have been completed.", status=http_status.HTTP_400_BAD_REQUEST)
 
         report = reports.BaseProjectReport(project)
         filename = report.build_report()
