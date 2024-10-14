@@ -61,14 +61,16 @@ class ReportFactory:
             return LivestockReport
         elif isinstance(module, api_models.ForestManagement):
             return ForestManagementReport
-        elif isinstance(module, api_models.Energy):
-            return EnergyReport
-        elif isinstance(module, api_models.Input):
-            return InputReport
-        elif isinstance(module, api_models.Irrigation):
-            return IrrigationReport
+        # BUG: The following modules are not yet ready to be made public. They are still in development.
+        # elif isinstance(module, api_models.Energy):
+        #     return EnergyReport
+        # elif isinstance(module, api_models.Input):
+        #     return InputReport
+        # elif isinstance(module, api_models.Irrigation):
+        #     return IrrigationReport
         else:
-            raise ValueError("Invalid module type.")
+            log.warning(f"No report class found for module {module.module_type.name}")
+            return
 
 
 @dataclass
@@ -261,6 +263,9 @@ class BaseActivityReport:
         for module in modules:
             log.debug(f"Building report for module {module.module_type.name}")
             ReportClass = ReportFactory.get_report_class(module)
+            if ReportClass is None:
+                log.warning(f"No report class found for module {module.module_type.name}")
+                continue
             module_report = ReportClass(module, self)
             module_report.build_report()
             self.modules_reports.append(module_report)
