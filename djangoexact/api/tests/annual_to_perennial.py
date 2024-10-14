@@ -18,7 +18,7 @@ class AnnualToPerennial(t.LandUseChangeTest):
         self.module_type_wo = ModuleType.objects.get(class_name="AnnualCropland")
         self.module_type_w = ModuleType.objects.get(class_name="PerennialCropland")
         self.create_land_use_change(self.module_type_start, self.module_type_wo, self.module_type_w)
-        self.add_activity_modules([self.module_type_start, self.module_type_wo, self.module_type_w])
+        self.add_activity_modules([self.module_type_start, self.module_type_wo, self.module_type_w, self.land_use_change.module_type])
 
         self.module_start: AnnualCropland = self.create_module(self.module_type_start, land_use_change=self.land_use_change)
         self.module_end: PerennialCropland = self.create_module(self.module_type_w, land_use_change=self.land_use_change)
