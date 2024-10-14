@@ -56,5 +56,5 @@ class CoastalWaterbodies(BaseModule):
             
         except Exception as e:
             traceback.print_exc()
-            pass
+            raise e
         

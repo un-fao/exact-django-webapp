@@ -39,6 +39,7 @@ router.register(r"regions", views.generic_viewset(models.Region), basename="regi
 router.register(r"countries", views.CountryViewSet, basename="countries")
 router.register(r"global-warming-potentials", views.generic_viewset(GlobalWarmingPotential), basename="global-warming-potentials")
 router.register(r"change-rates", views.generic_viewset(models.ChangeRate), basename="change-rates")
+router.register(r"organization-types", views.generic_viewset(models.OrganizationType), basename="organization-types")
 
 # Annual Cropland
 router.register(r"annual-croplands", views.generic_module_viewset(models.AnnualCropland), basename="annual-croppings")
@@ -154,7 +155,7 @@ router.register(r"peat-types", views.generic_viewset(models.PeatType), basename=
 
 
 router.register(r"users", views.UserViewSet, basename="users")
-router.register(r"definitions", views.DefinitionViewSet, basename="definitions")
+router.register(r"definitions", views.FieldDefinitionViewSet, basename="definitions")
 
 urlpatterns = [
     path("docs/", include_docs_urls(title="EX-ACT Docs")),

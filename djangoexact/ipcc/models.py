@@ -178,7 +178,7 @@ class ForestManagementBGBManager(Manager):
                 region=region,
                 land_use_type=land_use_type,
             )
-            .filter(threshold__lt=threshold)
+            .filter(Q(threshold__lt=threshold) | Q(threshold__isnull=True))
             .order_by("-threshold")
             .first()
         )
@@ -690,16 +690,23 @@ class AfforestationFLU(Model):
         return f"{self.value} for {self.climate.name} {self.moisture.name} {self.land_use_type.name}"
 
 
-class GrasslandAGB(Model):
+class GrasslandBiomass(Model):
+    """
+    Table, 6.4, page 6.27  in IPCC 2006
+    """
+
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
-    value = FloatField(default=0)
+    agb_t_dm_ha = FloatField()
+    agb_t_c_ha = FloatField()
+    bgb_t_dm_ha = FloatField()
+    bgb_t_c_ha = FloatField()
 
     class Meta:
         unique_together = ("climate", "moisture")
 
     def __str__(self):
-        return f"{self.value} for {self.climate.name} {self.moisture.name}"
+        return f"{self.climate} {self.moisture} {self.agb_t_dm_ha} {self.agb_t_c_ha} {self.bgb_t_dm_ha} {self.bgb_t_c_ha}"
 
 
 class GrasslandSOC(Model):
@@ -986,7 +993,7 @@ class LivestockAWMS(Model):
     value = FloatField()
 
     def __str__(self):
-        return f"({self.pk}) {self.livestock_production_type.name} {self.livestock_category_type.name} {self.manure_management_type.name} {self.ipcc_region.name} {self.value}"
+        return f"({self.pk}) {self.livestock_production_type} {self.livestock_category_type} {self.manure_management_type} {self.ipcc_region} {self.value}"
 
     class Meta:
         unique_together = ("livestock_production_type", "manure_management_type", "livestock_category_type", "ipcc_region")

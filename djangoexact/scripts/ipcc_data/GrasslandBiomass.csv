@@ -1,0 +1,11 @@
+climate;moisture;agb_t_dm_ha;agb_t_c_ha;bgb_t_dm_ha;bgb_t_c_ha
+Boreal;Moist;1,7;0,799;8,5;3,995
+Boreal;Dry;1,7;0,799;8,5;3,995
+Cool Temperate;Dry;1,7;0,799;6,5;3,055
+Cool Temperate;Moist;2,4;1,128;13,6;6,392
+Warm Temperate;Moist;2,7;1,269;13,5;6,345
+Warm Temperate;Dry;1,6;0,752;6,1;2,867
+Tropical;Dry;2,3;1,081;8,7;4,089
+Tropical;Moist;6,2;2,914;16,1;7,567
+Tropical;Wet;6,2;2,914;16,1;7,567
+Tropical Montane;Dry;2,3;1,081;8,7;4,089
