@@ -8,7 +8,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("id", "username", "password", "first_name", "last_name", "email", "country")
+        fields = ("id", "username", "password", "first_name", "last_name", "email", "country", "organization")
         extra_kwargs = {
             "password": {"write_only": True},
         }
@@ -21,6 +21,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             first_name=validated_data.get("first_name", None),
             last_name=validated_data.get("last_name", None),
             country=validated_data.get("country", None),
+            organization=validated_data.get("organization", None),
         )
         return user
 
@@ -43,6 +44,12 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = "__all__"
+
+
+class UserSummarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("id", "username", "first_name", "last_name", "email", "country", "organization")
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):

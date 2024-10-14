@@ -1,127 +1,157 @@
-climate;land_use_type;region;forest_condition_type;agb_range;agb_growth;agb_range_plantation;agb_growth_plantation
-Tropical;Rainforest;Africa;Primary;404.2;1.3;n.a.;n.a.
-Tropical;Rainforest;Africa;Secondary >20 years;212.9;3.5;200-300;n.a.
-Tropical;Rainforest;Africa;Secondary ≤20 Years;52,8;7,6;60-100;05-08
-Tropical;Rainforest;North and South America;Primary;307,1;1;n.a.;n.a.
-Tropical;Rainforest;North and South America;Secondary >20 Years;206,4;2,3;150-300;05-40
-Tropical;Rainforest;North and South America;Secondary ≤20 Years;75,7;5,9;150-300;
-Tropical;Rainforest;Asia;Primary;413,1;0,7;n.a.;n.a.
-Tropical;Rainforest;Asia;Secondary >20 Years;131,6;2,7;48.5-512.8;02-08
-Tropical;Rainforest;Asia;Secondary ≤20 Years;45,6;3,4;13.5-161;02-08
-Tropical;Moist Deciduous Forest;Africa;Primary;236,6;0,4;n.a.;n.a.
-Tropical;Moist Deciduous Forest;Africa;Secondary >20 Years;72,8;0,9;120-483;n.a.
-Tropical;Moist Deciduous Forest;Africa;Secondary ≤20 Years;72,8;2,9;40-195;03-15
-Tropical;Moist Deciduous Forest;North and South America;Primary;187,3;0,4;n.a.;n.a.
-Tropical;Moist Deciduous Forest;North and South America;Secondary >20 Years;131;2,7;46.9-284;04-20
-Tropical;Moist Deciduous Forest;North and South America;Secondary ≤20 Years;55,7;5,2;46.9-195;04-20
-Tropical;Moist Deciduous Forest;Asia;Primary;67,7;0,4;n.a.;n.a.
-Tropical;Moist Deciduous Forest;Asia;Secondary >20 Years;67,7;0,9;93.7-260;8
-Tropical;Moist Deciduous Forest;Asia;Secondary ≤20 Years;67,7;2,4;5.7-202;8
-Tropical;Dry Forest;Africa;Primary;69,6;n.a.;n.a.;n.a.
-Tropical;Dry Forest;Africa;Secondary >20 Years;69,6;1,6;60-193.9;06-13
-Tropical;Dry Forest;Africa;Secondary ≤20 Years;69,6;3,9;20-75.6;04-20
-Tropical;Dry Forest;North and South America;Primary;127,5;n.a.;n.a.;n.a.
-Tropical;Dry Forest;North and South America;Secondary >20 Years;118,9;1,6;50-110;04-30
-Tropical;Dry Forest;North and South America;Secondary ≤20 Years;32,2;3,9;40-62;04-30
-Tropical;Dry Forest;Asia;Primary;184.6;n.a.;n.a.;n.a.
-Tropical;Dry Forest;Asia;Secondary >20 Years;184.6;1.6;45.5-88.8;02-25
-Tropical;Dry Forest;Asia;Secondary ≤20 Years;184.6;3.9;3.56-125.5;02-25
-Tropical;Shrubland;Africa;Primary;48.4;0.9;n.a.;n.a.
-Tropical;Shrubland;Africa;Secondary >20 Years;48.4;0.9;20;2.5-14
-Tropical;Shrubland;Africa;Secondary ≤20 Years;48.4;0.2-0.7;15-20;03-07
-Tropical;Shrubland;North and South America;Primary;71.5;1.0;n.a.;n.a.
-Tropical;Shrubland;North and South America;Secondary >20 Years;71.5;1.0;30-60;05-20
-Tropical;Shrubland;North and South America;Secondary ≤20 Years;71.5;4.0;30-60;05-20
-Tropical;Shrubland;Asia;Primary;38.3;1.0-1.3;n.a.;n.a.
-Tropical;Shrubland;Asia;Secondary >20 Years;38.3;1.0-1.3;30-263.3;01-12
-Tropical;Shrubland;Asia;Secondary ≤20 Years;38.3;2.0-5.0;9.0-53.3;01-12
-Tropical;Mountain System;Africa;Primary;190.0;0.5;n.a.;n.a.
-Tropical;Mountain System;Africa;Secondary >20 Years;190.0;1.8;30-150;10
-Tropical;Mountain System;Africa;Secondary ≤20 Years;190.0;5.5;30-100;10
-Tropical;Mountain System;North and South America;Primary;195.0;0.5;n.a.;n.a.
-Tropical;Mountain System;North and South America;Secondary >20 Years;184.4;1.8;30-170;08-18
-Tropical;Mountain System;North and South America;Secondary ≤20 Years;75.9;4.4;30-170;08-18
-Tropical;Mountain System;Asia;Primary;433.5;-0.7;n.a.;n.a.
-Tropical;Mountain System;Asia;Secondary >20 Years;66.4;1.1;25-150;01-10
-Tropical;Mountain System;Asia;Secondary ≤20 Years;66.4;2.9;25-150;01-10
-Warm Temperate;Humid Forest;Africa;Primary;54.1;n.a.;n.a.;n.a.
-Warm Temperate;Humid Forest;Africa;Secondary >20 Years;54.1;1.0;n.a.;n.a.
-Warm Temperate;Humid Forest;Africa;Secondary ≤20 Years;54.1;2.5;n.a.;n.a.
-Warm Temperate;Humid Forest;North and South America;Primary;84.5;n.a.;n.a.;n.a.
-Warm Temperate;Humid Forest;North and South America;Secondary >20 Years;84.5;1.0;11.1-270;03-32
-Warm Temperate;Humid Forest;North and South America;Secondary ≤20 Years;84.5;2.5;2.45-270;03-32
-Warm Temperate;Humid Forest;Asia;Primary;323.0;n.a.;n.a.;n.a.
-Warm Temperate;Humid Forest;Asia;Secondary >20 Years;258.4;1.0;100-180;8
-Warm Temperate;Humid Forest;Asia;Secondary ≤20 Years;258.4;2.5;100-180;8
-Warm Temperate;Dry Forest;Africa;Primary;65.2;1.8;n.a.;n.a.
-Warm Temperate;Dry Forest;Africa;Secondary >20 Years;65.2;1.8;60-70;8
-Warm Temperate;Dry Forest;Africa;Secondary ≤20 Years;65.2;2.4;20-30;04-20
-Warm Temperate;Dry Forest;North and South America;Primary;115.9;1.0;n.a.;n.a.
-Warm Temperate;Dry Forest;North and South America;Secondary >20 Years;115.9;1.0;60-110;03-30
-Warm Temperate;Dry Forest;North and South America;Secondary ≤20 Years;115.9;4.0;60-110;03-30
-Warm Temperate;Dry Forest;Asia;Primary;70.9;1.5-2.0;n.a.;n.a.
-Warm Temperate;Dry Forest;Asia;Secondary >20 Years;70.9;1.5-2.0;60-163.5;02-25
-Warm Temperate;Dry Forest;Asia;Secondary ≤20 Years;70.9;6.0-7.0;54.8-69.5;02-25
-Warm Temperate;Steppe;Africa;Primary;50.5;0.9;n.a.;n.a.
-Warm Temperate;Steppe;Africa;Secondary >20 Years;50.5;0.9;15-20;2.5-14
-Warm Temperate;Steppe;Africa;Secondary ≤20 Years;50.5;1.2;15-20;0.5-15
-Warm Temperate;Steppe;North and South America;Primary;44.0;1.0;n.a.;n.a.
-Warm Temperate;Steppe;North and South America;Secondary >20 Years;44.0;1.0;30-60;05-20
-Warm Temperate;Steppe;North and South America;Secondary ≤20 Years;44.0;4.0;3.6-60;05-20
-Warm Temperate;Steppe;Asia;Primary;41.6;1.0-1.3;n.a.;n.a.
-Warm Temperate;Steppe;Asia;Secondary >20 Years;41.6;1.0-1.3;20-80;01-12
-Warm Temperate;Steppe;Asia;Secondary ≤20 Years;41.6;2.0-5.0;10-120;01-12
-Warm Temperate;Mountain System;Africa;Primary;35.1;n.a.;n.a.;n.a.
-Warm Temperate;Mountain System;Africa;Secondary >20 Years;35.1;0.5;30-150;10
-Warm Temperate;Mountain System;Africa;Secondary ≤20 Years;35.1;2.5;10-100;10
-Warm Temperate;Mountain System;North and South America;Primary;74.6;n.a.;n.a.;n.a.
-Warm Temperate;Mountain System;North and South America;Secondary >20 Years;74.6;0.5;24.9-170;02-18
-Warm Temperate;Mountain System;North and South America;Secondary ≤20 Years;74.6;2.5;3.7-170;02-18
-Warm Temperate;Mountain System;Asia;Primary;250.2;n.a.;n.a.;n.a.
-Warm Temperate;Mountain System;Asia;Secondary >20 Years;155.2;0.5;n.a.;01-12
-Warm Temperate;Mountain System;Asia;Secondary ≤20 Years;155.2;2.5;8.9-103.5;01-12
-Cool Temperate;Mountain System;Asia;Primary;n.a.;n.a.;n.a.;n.a.
-Cool Temperate;Mountain System;Asia;Secondary >20 Years;170.4;n.a.;n.a.;3.0
-Cool Temperate;Mountain System;Asia;Secondary ≤20 Years;n.a.;n.a.;16.6-34.6;3.0
-Cool Temperate;Mountain System;Europe;Primary;301.1;n.a.;n.a.;n.a.
-Cool Temperate;Mountain System;Europe;Secondary >20 Years;214.7;n.a.;n.a.;3.0
-Cool Temperate;Mountain System;Europe;Secondary ≤20 Years;27.8;n.a.;n.a.;3.0
-Cool Temperate;Mountain System;North and South America;Primary;n.a.;n.a.;n.a.;n.a.
-Cool Temperate;Mountain System;North and South America;Secondary >20 Years;185.9;4.4;29.1-89.2;9
-Cool Temperate;Mountain System;North and South America;Secondary ≤20 Years;57.9;3.1;3.0-56.0;10
-Cool Temperate;Continental Forest;Asia;Primary;n.a.;n.a.;n.a.;n.a.
-Cool Temperate;Continental Forest;Asia;Secondary >20 Years;116;n.a.;54.5-132.1;4.0
-Cool Temperate;Continental Forest;Asia;Secondary ≤20 Years;90.9;n.a.;18-66.7;4.0
-Cool Temperate;Continental Forest;Europe;Primary;332.4;n.a.;n.a.;n.a.
-Cool Temperate;Continental Forest;Europe;Secondary >20 Years;162;n.a.;n.a.;4.0
-Cool Temperate;Continental Forest;Europe;Secondary ≤20 Years;51.6;n.a.;n.a.;4.0
-Cool Temperate;Continental Forest;North and South America;Primary;n.a.;n.a.;n.a.;n.a.
-Cool Temperate;Continental Forest;North and South America;Secondary >20 Years;128.9;3.6;21.5-96.7;4
-Cool Temperate;Continental Forest;North and South America;Secondary ≤20 Years;46;3.3;5.68-8.35;5
-Cool Temperate;Oceanic Forest;Asia;Primary;289.8;n.a.;n.a.;n.a.
-Cool Temperate;Oceanic Forest;Asia;Secondary >20 Years;n.a.;n.a.;150-200;4.4
-Cool Temperate;Oceanic Forest;Asia;Secondary ≤20 Years;n.a.;n.a.;30-40;4.4
-Cool Temperate;Oceanic Forest;Europe;Primary;126.1;2.3;n.a.;n.a.
-Cool Temperate;Oceanic Forest;Europe;Secondary >20 Years;153.9;2.3;150-200;4.4
-Cool Temperate;Oceanic Forest;Europe;Secondary ≤20 Years;22.3;2.3;30-40;4.4
-Cool Temperate;Oceanic Forest;Oceania;Primary;352.7;0.37;n.a.;n.a.
-Cool Temperate;Oceanic Forest;Oceania;Secondary >20 Years;120.5;2.12;n.a.;4.4
-Cool Temperate;Oceanic Forest;Oceania;Secondary ≤20 Years;57.5;3.12;n.a.;4.4
-Cool Temperate;Oceanic Forest;North and South America;Primary;n.a.;n.a.;n.a.;n.a.
-Cool Temperate;Oceanic Forest;North and South America;Secondary >20 Years;354.1;9.1;76.2-131.3;10
-Cool Temperate;Oceanic Forest;North and South America;Secondary ≤20 Years;213.9;6.3;3.9-120;6
-Cool Temperate;Desert;Asia, Europe, North America;Primary;n.a.;n.a.;n.a.;n.a.
-Cool Temperate;Desert;Asia, Europe, North America;Secondary >20 Years;44;0.6;n.a.;n.a.
-Cool Temperate;Desert;Asia, Europe, North America;Secondary ≤20 Years;25.6;0.5;n.a.;n.a.
-Cool Temperate;Steppe;Asia, Europe, North America;Primary;n.a.;n.a.;n.a.;n.a.
-Cool Temperate;Steppe;Asia, Europe, North America;Secondary >20 Years;118.5;3.5;3.6-84.9;11
-Cool Temperate;Steppe;Asia, Europe, North America;Secondary ≤20 Years;42.9;2.3;4.8-48.8;4
-Boreal;Coniferous Forest;Asia, Europe, North America;Primary;62.9;0.1-2.1;n.a.;n.a.
-Boreal;Coniferous Forest;Asia, Europe, North America;Secondary >20 Years;n.a.;0.1-2.2;40-50;1.0
-Boreal;Coniferous Forest;Asia, Europe, North America;Secondary ≤20 Years;n.a.;0.1-2.3;5.0-50;1.0
-Boreal;Tundra Woodland;Asia, Europe, North America;Primary;n.a.;0.4;n.a.;n.a.
-Boreal;Tundra Woodland;Asia, Europe, North America;Secondary >20 Years;63.7;0.4;25;0.4
-Boreal;Tundra Woodland;Asia, Europe, North America;Secondary ≤20 Years;104.2;0.4;5;0.4
-Boreal;Mountain System;Asia, Europe, North America;Primary;n.a.;n.a.;n.a.;n.a.
-Boreal;Mountain System;Asia, Europe, North America;Secondary >20 Years;n.a.;1.1-1.5;40-50;1.0
-Boreal;Mountain System;Asia, Europe, North America;Secondary ≤20 Years;1.9;1.0-1.1;5.0-50;1.0
+climate;land_use_type;region;forest_condition_type;from_year;agb_range;agb_growth;agb_range_plantation;agb_growth_plantation
+Tropical;Rainforest;Africa;Primary;0;404.2;1.3;n.a.;n.a.
+Tropical;Rainforest;Africa;Secondary;21;212.9;3.5;200-300;n.a.
+Tropical;Rainforest;Africa;Secondary;0;52,8;7,6;60-100;05-08
+Tropical;Rainforest;North and South America;Primary;0;307,1;1;n.a.;n.a.
+Tropical;Rainforest;North and South America;Secondary;21;206,4;2,3;150-300;05-40
+Tropical;Rainforest;North and South America;Secondary;0;75,7;5,9;150-300;
+Tropical;Rainforest;Asia;Primary;0;413,1;0,7;n.a.;n.a.
+Tropical;Rainforest;Asia;Secondary;21;131,6;2,7;48.5-512.8;02-08
+Tropical;Rainforest;Asia;Secondary;0;45,6;3,4;13.5-161;02-08
+Tropical;Moist Deciduous Forest;Africa;Primary;0;236,6;0,4;n.a.;n.a.
+Tropical;Moist Deciduous Forest;Africa;Secondary;21;72,8;0,9;120-483;n.a.
+Tropical;Moist Deciduous Forest;Africa;Secondary;0;72,8;2,9;40-195;03-15
+Tropical;Moist Deciduous Forest;North and South America;Primary;0;187,3;0,4;n.a.;n.a.
+Tropical;Moist Deciduous Forest;North and South America;Secondary;21;131;2,7;46.9-284;04-20
+Tropical;Moist Deciduous Forest;North and South America;Secondary;0;55,7;5,2;46.9-195;04-20
+Tropical;Moist Deciduous Forest;Asia;Primary;0;67,7;0,4;n.a.;n.a.
+Tropical;Moist Deciduous Forest;Asia;Secondary;21;67,7;0,9;93.7-260;8
+Tropical;Moist Deciduous Forest;Asia;Secondary;0;67,7;2,4;5.7-202;8
+Tropical;Dry Forest;Africa;Primary;0;69,6;n.a.;n.a.;n.a.
+Tropical;Dry Forest;Africa;Secondary;21;69,6;1,6;60-193.9;06-13
+Tropical;Dry Forest;Africa;Secondary;0;69,6;3,9;20-75.6;04-20
+Tropical;Dry Forest;North and South America;Primary;0;127,5;n.a.;n.a.;n.a.
+Tropical;Dry Forest;North and South America;Secondary;21;118,9;1,6;50-110;04-30
+Tropical;Dry Forest;North and South America;Secondary;0;32,2;3,9;40-62;04-30
+Tropical;Dry Forest;Asia;Primary;0;184.6;n.a.;n.a.;n.a.
+Tropical;Dry Forest;Asia;Secondary;21;184.6;1.6;45.5-88.8;02-25
+Tropical;Dry Forest;Asia;Secondary;0;184.6;3.9;3.56-125.5;02-25
+Tropical;Shrubland;Africa;Primary;0;48.4;0.9;n.a.;n.a.
+Tropical;Shrubland;Africa;Secondary;21;48.4;0.9;20;2.5-14
+Tropical;Shrubland;Africa;Secondary;0;48.4;0.2-0.7;15-20;03-07
+Tropical;Shrubland;North and South America;Primary;0;71.5;1.0;n.a.;n.a.
+Tropical;Shrubland;North and South America;Secondary;21;71.5;1.0;30-60;05-20
+Tropical;Shrubland;North and South America;Secondary;0;71.5;4.0;30-60;05-20
+Tropical;Shrubland;Asia;Primary;0;38.3;1.0-1.3;n.a.;n.a.
+Tropical;Shrubland;Asia;Secondary;21;38.3;1.0-1.3;30-263.3;01-12
+Tropical;Shrubland;Asia;Secondary;0;38.3;2.0-5.0;9.0-53.3;01-12
+Tropical;Mountain System;Africa;Primary;0;190.0;0.5;n.a.;n.a.
+Tropical;Mountain System;Africa;Secondary;21;190.0;1.8;30-150;10
+Tropical;Mountain System;Africa;Secondary;0;190.0;5.5;30-100;10
+Tropical;Mountain System;North and South America;Primary;0;195.0;0.5;n.a.;n.a.
+Tropical;Mountain System;North and South America;Secondary;21;184.4;1.8;30-170;08-18
+Tropical;Mountain System;North and South America;Secondary;0;75.9;4.4;30-170;08-18
+Tropical;Mountain System;Asia;Primary;0;433.5;-0.7;n.a.;n.a.
+Tropical;Mountain System;Asia;Secondary;21;66.4;1.1;25-150;01-10
+Tropical;Mountain System;Asia;Secondary;0;66.4;2.9;25-150;01-10
+Warm Temperate;Humid Forest;Africa;Primary;0;54.1;n.a.;n.a.;n.a.
+Warm Temperate;Humid Forest;Africa;Secondary;21;54.1;1.0;n.a.;n.a.
+Warm Temperate;Humid Forest;Africa;Secondary;0;54.1;2.5;n.a.;n.a.
+Warm Temperate;Humid Forest;North and South America;Primary;0;84.5;n.a.;n.a.;n.a.
+Warm Temperate;Humid Forest;North and South America;Secondary;21;84.5;1.0;11.1-270;03-32
+Warm Temperate;Humid Forest;North and South America;Secondary;0;84.5;2.5;2.45-270;03-32
+Warm Temperate;Humid Forest;Asia;Primary;0;323.0;n.a.;n.a.;n.a.
+Warm Temperate;Humid Forest;Asia;Secondary;21;258.4;1.0;100-180;8
+Warm Temperate;Humid Forest;Asia;Secondary;0;258.4;2.5;100-180;8
+Warm Temperate;Dry Forest;Africa;Primary;0;65.2;1.8;n.a.;n.a.
+Warm Temperate;Dry Forest;Africa;Secondary;21;65.2;1.8;60-70;8
+Warm Temperate;Dry Forest;Africa;Secondary;0;65.2;2.4;20-30;04-20
+Warm Temperate;Dry Forest;North and South America;Primary;0;115.9;1.0;n.a.;n.a.
+Warm Temperate;Dry Forest;North and South America;Secondary;21;115.9;1.0;60-110;03-30
+Warm Temperate;Dry Forest;North and South America;Secondary;0;115.9;4.0;60-110;03-30
+Warm Temperate;Dry Forest;Asia;Primary;0;70.9;1.5-2.0;n.a.;n.a.
+Warm Temperate;Dry Forest;Asia;Secondary;21;70.9;1.5-2.0;60-163.5;02-25
+Warm Temperate;Dry Forest;Asia;Secondary;0;70.9;6.0-7.0;54.8-69.5;02-25
+Warm Temperate;Steppe;Africa;Primary;0;50.5;0.9;n.a.;n.a.
+Warm Temperate;Steppe;Africa;Secondary;21;50.5;0.9;15-20;2.5-14
+Warm Temperate;Steppe;Africa;Secondary;0;50.5;1.2;15-20;0.5-15
+Warm Temperate;Steppe;North and South America;Primary;0;44.0;1.0;n.a.;n.a.
+Warm Temperate;Steppe;North and South America;Secondary;21;44.0;1.0;30-60;05-20
+Warm Temperate;Steppe;North and South America;Secondary;0;44.0;4.0;3.6-60;05-20
+Warm Temperate;Steppe;Asia;Primary;0;41.6;1.0-1.3;n.a.;n.a.
+Warm Temperate;Steppe;Asia;Secondary;21;41.6;1.0-1.3;20-80;01-12
+Warm Temperate;Steppe;Asia;Secondary;0;41.6;2.0-5.0;10-120;01-12
+Warm Temperate;Mountain System;Africa;Primary;0;35.1;n.a.;n.a.;n.a.
+Warm Temperate;Mountain System;Africa;Secondary;21;35.1;0.5;30-150;10
+Warm Temperate;Mountain System;Africa;Secondary;0;35.1;2.5;10-100;10
+Warm Temperate;Mountain System;North and South America;Primary;0;74.6;n.a.;n.a.;n.a.
+Warm Temperate;Mountain System;North and South America;Secondary;21;74.6;0.5;24.9-170;02-18
+Warm Temperate;Mountain System;North and South America;Secondary;0;74.6;2.5;3.7-170;02-18
+Warm Temperate;Mountain System;Asia;Primary;0;250.2;n.a.;n.a.;n.a.
+Warm Temperate;Mountain System;Asia;Secondary;21;155.2;0.5;n.a.;01-12
+Warm Temperate;Mountain System;Asia;Secondary;0;155.2;2.5;8.9-103.5;01-12
+Cool Temperate;Mountain System;Asia;Primary;0;n.a.;n.a.;n.a.;n.a.
+Cool Temperate;Mountain System;Asia;Secondary;21;170.4;n.a.;n.a.;3.0
+Cool Temperate;Mountain System;Asia;Secondary;0;n.a.;n.a.;16.6-34.6;3.0
+Cool Temperate;Mountain System;Europe;Primary;0;301.1;n.a.;n.a.;n.a.
+Cool Temperate;Mountain System;Europe;Secondary;21;214.7;n.a.;n.a.;3.0
+Cool Temperate;Mountain System;Europe;Secondary;0;27.8;n.a.;n.a.;3.0
+Cool Temperate;Mountain System;North and South America;Primary;0;n.a.;n.a.;n.a.;n.a.
+Cool Temperate;Mountain System;North and South America;Secondary;21;185.9;4.4;29.1-89.2;9
+Cool Temperate;Mountain System;North and South America;Secondary;0;57.9;3.1;3.0-56.0;10
+Cool Temperate;Continental Forest;Asia;Primary;0;n.a.;n.a.;n.a.;n.a.
+Cool Temperate;Continental Forest;Asia;Secondary;21;116;n.a.;54.5-132.1;4.0
+Cool Temperate;Continental Forest;Asia;Secondary;0;90.9;n.a.;18-66.7;4.0
+Cool Temperate;Continental Forest;Europe;Primary;0;332.4;n.a.;n.a.;n.a.
+Cool Temperate;Continental Forest;Europe;Secondary;21;162;n.a.;n.a.;4.0
+Cool Temperate;Continental Forest;Europe;Secondary;0;51.6;n.a.;n.a.;4.0
+Cool Temperate;Continental Forest;North and South America;Primary;0;n.a.;n.a.;n.a.;n.a.
+Cool Temperate;Continental Forest;North and South America;Secondary;21;128.9;3.6;21.5-96.7;4
+Cool Temperate;Continental Forest;North and South America;Secondary;0;46;3.3;5.68-8.35;5
+Cool Temperate;Oceanic Forest;Asia;Primary;0;289.8;n.a.;n.a.;n.a.
+Cool Temperate;Oceanic Forest;Asia;Secondary;21;n.a.;n.a.;150-200;4.4
+Cool Temperate;Oceanic Forest;Asia;Secondary;0;n.a.;n.a.;30-40;4.4
+Cool Temperate;Oceanic Forest;Europe;Primary;0;126.1;2.3;n.a.;n.a.
+Cool Temperate;Oceanic Forest;Europe;Secondary;21;153.9;2.3;150-200;4.4
+Cool Temperate;Oceanic Forest;Europe;Secondary;0;22.3;2.3;30-40;4.4
+Cool Temperate;Oceanic Forest;Oceania;Primary;0;352.7;0.37;n.a.;n.a.
+Cool Temperate;Oceanic Forest;Oceania;Secondary;21;120.5;2.12;n.a.;4.4
+Cool Temperate;Oceanic Forest;Oceania;Secondary;0;57.5;3.12;n.a.;4.4
+Cool Temperate;Oceanic Forest;North and South America;Primary;0;n.a.;n.a.;n.a.;n.a.
+Cool Temperate;Oceanic Forest;North and South America;Secondary;21;354.1;9.1;76.2-131.3;10
+Cool Temperate;Oceanic Forest;North and South America;Secondary;0;213.9;6.3;3.9-120;6
+Cool Temperate;Desert;Asia;Primary;0;n.a.;n.a.;n.a.;n.a.
+Cool Temperate;Desert;Asia;Secondary;21;44;0.6;n.a.;n.a.
+Cool Temperate;Desert;Asia;Secondary;0;25.6;0.5;n.a.;n.a.
+Cool Temperate;Steppe;Asia;Primary;0;n.a.;n.a.;n.a.;n.a.
+Cool Temperate;Steppe;Asia;Secondary;21;118.5;3.5;3.6-84.9;11
+Cool Temperate;Steppe;Asia;Secondary;0;42.9;2.3;4.8-48.8;4
+Cool Temperate;Desert;Europe;Primary;0;n.a.;n.a.;n.a.;n.a.
+Cool Temperate;Desert;Europe;Secondary;21;44;0.6;n.a.;n.a.
+Cool Temperate;Desert;Europe;Secondary;0;25.6;0.5;n.a.;n.a.
+Cool Temperate;Steppe;Europe;Primary;0;n.a.;n.a.;n.a.;n.a.
+Cool Temperate;Steppe;Europe;Secondary;21;118.5;3.5;3.6-84.9;11
+Cool Temperate;Steppe;Europe;Secondary;0;42.9;2.3;4.8-48.8;4
+Cool Temperate;Desert;North America;Primary;0;n.a.;n.a.;n.a.;n.a.
+Cool Temperate;Desert;North America;Secondary;21;44;0.6;n.a.;n.a.
+Cool Temperate;Desert;North America;Secondary;0;25.6;0.5;n.a.;n.a.
+Cool Temperate;Steppe;North America;Primary;0;n.a.;n.a.;n.a.;n.a.
+Cool Temperate;Steppe;North America;Secondary;21;118.5;3.5;3.6-84.9;11
+Cool Temperate;Steppe;North America;Secondary;0;42.9;2.3;4.8-48.8;4
+Boreal;Coniferous Forest;Asia;Primary;0;62.9;0.1-2.1;n.a.;n.a.
+Boreal;Coniferous Forest;Asia;Secondary;21;n.a.;0.1-2.2;40-50;1.0
+Boreal;Coniferous Forest;Asia;Secondary;0;n.a.;0.1-2.3;5.0-50;1.0
+Boreal;Tundra Woodland;Asia;Primary;0;n.a.;0.4;n.a.;n.a.
+Boreal;Tundra Woodland;Asia;Secondary;21;63.7;0.4;25;0.4
+Boreal;Tundra Woodland;Asia;Secondary;0;104.2;0.4;5;0.4
+Boreal;Mountain System;Asia;Primary;0;n.a.;n.a.;n.a.;n.a.
+Boreal;Mountain System;Asia;Secondary;21;n.a.;1.1-1.5;40-50;1.0
+Boreal;Mountain System;Asia;Secondary;0;1.9;1.0-1.1;5.0-50;1.0
+Boreal;Coniferous Forest;Europe;Primary;0;62.9;0.1-2.1;n.a.;n.a.
+Boreal;Coniferous Forest;Europe;Secondary;21;n.a.;0.1-2.2;40-50;1.0
+Boreal;Coniferous Forest;Europe;Secondary;0;n.a.;0.1-2.3;5.0-50;1.0
+Boreal;Tundra Woodland;Europe;Primary;0;n.a.;0.4;n.a.;n.a.
+Boreal;Tundra Woodland;Europe;Secondary;21;63.7;0.4;25;0.4
+Boreal;Tundra Woodland;Europe;Secondary;0;104.2;0.4;5;0.4
+Boreal;Mountain System;Europe;Primary;0;n.a.;n.a.;n.a.;n.a.
+Boreal;Mountain System;Europe;Secondary;21;n.a.;1.1-1.5;40-50;1.0
+Boreal;Mountain System;Europe;Secondary;0;1.9;1.0-1.1;5.0-50;1.0
+Boreal;Coniferous Forest;North America;Primary;0;62.9;0.1-2.1;n.a.;n.a.
+Boreal;Coniferous Forest;North America;Secondary;21;n.a.;0.1-2.2;40-50;1.0
+Boreal;Coniferous Forest;North America;Secondary;0;n.a.;0.1-2.3;5.0-50;1.0
+Boreal;Tundra Woodland;North America;Primary;0;n.a.;0.4;n.a.;n.a.
+Boreal;Tundra Woodland;North America;Secondary;21;63.7;0.4;25;0.4
+Boreal;Tundra Woodland;North America;Secondary;0;104.2;0.4;5;0.4
+Boreal;Mountain System;North America;Primary;0;n.a.;n.a.;n.a.;n.a.
+Boreal;Mountain System;North America;Secondary;21;n.a.;1.1-1.5;40-50;1.0
+Boreal;Mountain System;North America;Secondary;0;1.9;1.0-1.1;5.0-50;1.0
