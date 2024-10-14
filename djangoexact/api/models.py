@@ -1693,8 +1693,6 @@ class ForestManagement(LandModule, LitterDeadwoodBiomassModule):
         }
 
         ref: ipcc.ForestManagementAGB = utils.get_or_raise(ipcc.ForestManagementAGB, filters, error_msg, method="filter").first()
-        if not ref:
-            raise ValueError(error_msg)
 
         return ref
 
