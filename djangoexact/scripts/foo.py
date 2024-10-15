@@ -1,9 +1,9 @@
 import api.models as models
+import ipcc.models as ipcc_models
 
 # TODO: Run in review and prod
 
 
-# Add Climate Tropical Montane to all LandUseTypes with module_type "Perennial Cropland"
 def add_climate_tropical_montane_to_perennial_cropland():
     """
     Add Climate Tropical Montane to all LandUseTypes with module_type "Perennial Cropland"
@@ -16,4 +16,13 @@ def add_climate_tropical_montane_to_perennial_cropland():
         land_use_type.save()
 
 
+def add_0_12_to_co2_value_in_input_emission_factor():
+    """
+    Add 0,12 to co2_value in InputEmissionFactor if input_type__name="Urea"
+    """
+    urea = models.InputType.objects.get(name="Urea")
+    input_emission_factor = ipcc_models.InputEmissionFactor.objects.filter(input_type=urea).update(co2_value=0.12)
+
+
 add_climate_tropical_montane_to_perennial_cropland()
+add_0_12_to_co2_value_in_input_emission_factor()
