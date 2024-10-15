@@ -62,8 +62,8 @@ class ReportFactory:
         elif isinstance(module, api_models.ForestManagement):
             return ForestManagementReport
         # BUG: The following modules are not yet ready to be made public. They are still in development.
-        # elif isinstance(module, api_models.Energy):
-        #     return EnergyReport
+        elif isinstance(module, api_models.Energy):
+            return EnergyReport
         # elif isinstance(module, api_models.Input):
         #     return InputReport
         # elif isinstance(module, api_models.Irrigation):
@@ -147,30 +147,37 @@ class BaseProjectReport:
     def finalize_report(self):
         log.debug(f"Finalizing report for project {self.project.name}")
 
-        other_ghgs = [0] * self.duration
-        n2o = [0] * self.duration
-        ch4 = [0] * self.duration
-        other_co2 = [0] * self.duration
-        soil_co2 = [0] * self.duration
-        biomass_co2 = [0] * self.duration
-        yearly_balance_t_co2_eq = [0] * self.duration
-        cumulative_balance_t_co2_eq = [0] * self.duration
+        other_ghgs = [[0] * self.duration]
+        n2o = [[0] * self.duration]
+        ch4 = [[0] * self.duration]
+        other_co2 = [[0] * self.duration]
+        soil_co2 = [[0] * self.duration]
+        biomass_co2 = [[0] * self.duration]
+        yearly_balance_t_co2_eq = [[0] * self.duration]
+        cumulative_balance_t_co2_eq = [[0] * self.duration]
 
         for activity in self.activity_reports:
             log.debug(f"Finalizing report for activity {activity.activity_title}")
             for module in activity.modules_reports:
                 log.debug(f"Finalizing report for module {module.module_title}")
-                other_ghgs = [x + y for x, y in zip(other_ghgs, module.extract_emissions(module.emissions_set, gas_type=math_utils.GasTypes.OTHER))]
-                n2o = [x + y for x, y in zip(n2o, module.extract_emissions(module.emissions_set, gas_type=math_utils.GasTypes.N2O))]
-                ch4 = [x + y for x, y in zip(ch4, module.extract_emissions(module.emissions_set, gas_type=math_utils.GasTypes.CH4))]
-                other_co2 = [x + y for x, y in zip(other_co2, module.extract_emissions(module.emissions_set, gas_type=math_utils.GasTypes.CO2, excluded_activity_types=[math_utils.ActivityTypes.BIOMASS, math_utils.ActivityTypes.SOIL_CO2_CHANGE]))]
-                soil_co2 = [x + y for x, y in zip(soil_co2, module.extract_emissions(module.emissions_set, activity_type=math_utils.ActivityTypes.SOIL_CO2_CHANGE, gas_type=math_utils.GasTypes.CO2))]
-                biomass_co2 = [x + y for x, y in zip(biomass_co2, module.extract_emissions(module.emissions_set, activity_type=math_utils.ActivityTypes.BIOMASS, gas_type=math_utils.GasTypes.CO2))]
+                other_ghgs.append(module.extract_emissions(module.emissions_set, gas_type=math_utils.GasTypes.OTHER))
+                n2o.append(module.extract_emissions(module.emissions_set, gas_type=math_utils.GasTypes.N2O))
+                ch4.append(module.extract_emissions(module.emissions_set, gas_type=math_utils.GasTypes.CH4))
+                other_co2.append(module.extract_emissions(module.emissions_set, activity_type=None, gas_type=math_utils.GasTypes.CO2, excluded_activity_types=[math_utils.ActivityTypes.BIOMASS, math_utils.ActivityTypes.SOIL_CO2_CHANGE]))
+                soil_co2.append(module.extract_emissions(module.emissions_set, activity_type=math_utils.ActivityTypes.SOIL_CO2_CHANGE, gas_type=math_utils.GasTypes.CO2))
+                biomass_co2.append(module.extract_emissions(module.emissions_set, activity_type=math_utils.ActivityTypes.BIOMASS, gas_type=math_utils.GasTypes.CO2))
+
+        other_ghgs = list(map(sum, zip(*other_ghgs)))
+        n2o = list(map(sum, zip(*n2o)))
+        ch4 = list(map(sum, zip(*ch4)))
+        other_co2 = list(map(sum, zip(*other_co2)))
+        soil_co2 = list(map(sum, zip(*soil_co2)))
+        biomass_co2 = list(map(sum, zip(*biomass_co2)))
+
+        yearly_balance_t_co2_eq = list(map(sum, zip(biomass_co2, soil_co2, other_co2, ch4, n2o, other_ghgs)))
+        cumulative_balance_t_co2_eq = np.cumsum(yearly_balance_t_co2_eq)
 
         for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
-            yearly_balance_t_co2_eq[i] = sum([biomass_co2[i], soil_co2[i], other_co2[i], ch4[i], n2o[i], other_ghgs[i]])
-            cumulative_balance_t_co2_eq[i] = sum(yearly_balance_t_co2_eq)
-
             self.results_worksheet.cell(row=2, column=i + 2, value=cumulative_balance_t_co2_eq[i])
             self.results_worksheet.cell(row=3, column=i + 2, value=yearly_balance_t_co2_eq[i])
             self.results_worksheet.cell(row=4, column=i + 2, value=biomass_co2[i])
@@ -350,7 +357,7 @@ class BaseModuleReport:
         self.results_worksheet.cell(row=last_results_row, column=1, value=str(self.module.module_type.name))
         self.results_worksheet.cell(row=last_results_row, column=1).fill = Colors.LIGHT_BLUE_FILL.value
 
-    def extract_emissions(self, data, activity_type=None, gas_type=None, excluded_activity_types=[], excluded_gas_types=[]):
+    def extract_emissions(self, data, activity_type=None, gas_type=None, excluded_activity_types=[], excluded_gas_types=[]) -> np.ndarray:
         """
         Extracts emissions values from the provided data based on the specified activity type and gas type.
 
@@ -363,33 +370,41 @@ class BaseModuleReport:
             list: A list of emission values if a matching entry is found.
             numpy.ndarray: An array of zeros with a length equal to the sum of implementation years and capitalization years if no matching entry is found.
         """
-        emissions = np.zeros(self.module.activity.implementation_years + self.module.activity.capitalization_years)
+        emissions = [[0] * self.duration]
 
-        if (activity_type is not None and activity_type not in excluded_activity_types) and (gas_type is not None and gas_type not in excluded_gas_types):
+        if activity_type is not None and gas_type is not None:
             for entry in data:
-                if entry.activity == activity_type and entry.gas_type == gas_type:
-                    log.debug(f"Found emissions for {activity_type} and {gas_type}")
-                    emissions = [e.value for e in entry.emissions]
-                    return emissions
+                if entry.activity == activity_type and entry.activity not in excluded_activity_types and entry.gas_type == gas_type and entry.gas_type not in excluded_gas_types:
+                    log.debug(f"Found emissions for {activity_type} and {gas_type} excluding {excluded_activity_types} and {excluded_gas_types}")
+                    entry_emissions = [e.value for e in entry.emissions]
+                    emissions.append(entry_emissions)
 
-        elif activity_type is not None and activity_type not in excluded_activity_types:
+        elif activity_type is not None:
             for entry in data:
-                if entry.activity == activity_type:
-                    log.debug(f"Found emissions for {activity_type}")
-                    emissions = [x + y for x, y in zip(emissions, [e.value for e in entry.emissions])]
+                if entry.activity == activity_type and entry.activity not in excluded_activity_types and entry.gas_type not in excluded_gas_types:
+                    log.debug(f"Found emissions for {entry.activity}, {entry.gas_type} excluding {excluded_gas_types}")
+                    entry_emissions = [e.value for e in entry.emissions]
+                    emissions.append(entry_emissions)
 
         elif gas_type is not None and gas_type not in excluded_gas_types:
             for entry in data:
-                if entry.gas_type == gas_type:
-                    log.debug(f"Found emissions for {gas_type}")
-                    emissions = [x + y for x, y in zip(emissions, [e.value for e in entry.emissions])]
+                if entry.gas_type == gas_type and entry.gas_type not in excluded_gas_types and entry.activity not in excluded_activity_types:
+                    log.debug(f"Found emissions for {entry.activity}, {entry.gas_type} excluding {excluded_activity_types}")
+                    entry_emissions = [e.value for e in entry.emissions]
+                    emissions.append(entry_emissions)
 
         else:
             log.debug("No activity or gas type specified. Extracting all emissions.")
             for entry in data:
-                emissions += [x + y for x, y in zip(emissions, [e.value for e in entry.emissions])]
+                entry_emissions = [e.value for e in entry.emissions]
+                emissions.append(entry_emissions)
 
-        return emissions
+        print(f"Extracted emissions before sum: {emissions}")
+        summed_emissions = list(map(sum, zip(*emissions)))
+
+        print(f"Extracted emissions: {summed_emissions}")
+
+        return summed_emissions
 
 
 @dataclass
@@ -1073,28 +1088,30 @@ class ForestManagementReport(LandModuleReport):
     litter_co2: list[float] = None
     deadwood_co2: list[float] = None
 
-    rotation_hwp_agb_co2_source = (math_utils.ActivityTypes.HWP_ROTATION_AGB, math_utils.GasTypes.CO2)
-    rotation_hwp_bgb_co2_source = (math_utils.ActivityTypes.HWP_ROTATION_BGB, math_utils.GasTypes.CO2)
-    rotation_agb_co2_source = (math_utils.ActivityTypes.ROTATION_AGB, math_utils.GasTypes.CO2)
-    rotation_agb_ch4_source = (math_utils.ActivityTypes.ROTATION_AGB, math_utils.GasTypes.CH4)
+    hwp_rotation_logging_agb_co2_source = (math_utils.ActivityTypes.HWP_ROTATION_AGB, math_utils.GasTypes.CO2)
+    hwp_rotation_logging_bgb_co2_source = (math_utils.ActivityTypes.HWP_ROTATION_BGB, math_utils.GasTypes.CO2)
     rotation_agb_n2o_source = (math_utils.ActivityTypes.ROTATION_AGB, math_utils.GasTypes.N2O)
-    rotation_bgb_co2_source = (math_utils.ActivityTypes.ROTATION_BGB, math_utils.GasTypes.CO2)
-    rotation_bgb_ch4_source = (math_utils.ActivityTypes.ROTATION_BGB, math_utils.GasTypes.CH4)
+    rotation_agb_ch4_source = (math_utils.ActivityTypes.ROTATION_AGB, math_utils.GasTypes.CH4)
     rotation_bgb_n2o_source = (math_utils.ActivityTypes.ROTATION_BGB, math_utils.GasTypes.N2O)
+    rotation_bgb_ch4_source = (math_utils.ActivityTypes.ROTATION_BGB, math_utils.GasTypes.CH4)
+    rotation_agb_co2_source = (math_utils.ActivityTypes.ROTATION_AGB, math_utils.GasTypes.CO2)
+    rotation_bgb_co2_source = (math_utils.ActivityTypes.ROTATION_BGB, math_utils.GasTypes.CO2)
     disturbance_agb_co2_source = (math_utils.ActivityTypes.DISTURBANCE_AGB, math_utils.GasTypes.CO2)
-    disturbance_agb_ch4_source = (math_utils.ActivityTypes.DISTURBANCE_AGB, math_utils.GasTypes.CH4)
-    disturbance_agb_n2o_source = (math_utils.ActivityTypes.DISTURBANCE_AGB, math_utils.GasTypes.N2O)
     disturbance_bgb_co2_source = (math_utils.ActivityTypes.DISTURBANCE_BGB, math_utils.GasTypes.CO2)
-    disturbance_bgb_ch4_source = (math_utils.ActivityTypes.DISTURBANCE_BGB, math_utils.GasTypes.CH4)
-    disturbance_bgb_n2o_source = (math_utils.ActivityTypes.DISTURBANCE_BGB, math_utils.GasTypes.N2O)
-    logging_hwp_agb_co2_source = (math_utils.ActivityTypes.HWP_LOGGING_AGB, math_utils.GasTypes.CO2)
-    logging_hwp_bgb_co2_source = (math_utils.ActivityTypes.HWP_LOGGING_BGB, math_utils.GasTypes.CO2)
-    logging_agb_co2_source = (math_utils.ActivityTypes.LOGGING_AGB, math_utils.GasTypes.CO2)
-    logging_agb_ch4_source = (math_utils.ActivityTypes.LOGGING_AGB, math_utils.GasTypes.CH4)
+    disturbance_fire_agb_n2o_source = (math_utils.ActivityTypes.DISTURBANCE_FIRE_AGB, math_utils.GasTypes.N2O)
+    disturbance_fire_agb_ch4_source = (math_utils.ActivityTypes.DISTURBANCE_FIRE_AGB, math_utils.GasTypes.CH4)
+    disturbance_fire_bgb_n2o_source = (math_utils.ActivityTypes.DISTURBANCE_FIRE_BGB, math_utils.GasTypes.N2O)
+    disturbance_fire_bgb_ch4_source = (math_utils.ActivityTypes.DISTURBANCE_FIRE_BGB, math_utils.GasTypes.CH4)
+    disturbance_fire_agb_co2_source = (math_utils.ActivityTypes.DISTURBANCE_FIRE_AGB, math_utils.GasTypes.CO2)
+    disturbance_fire_bgb_co2_source = (math_utils.ActivityTypes.DISTURBANCE_FIRE_BGB, math_utils.GasTypes.CO2)
+    hwp_logging_agb_co2_source = (math_utils.ActivityTypes.HWP_LOGGING_AGB, math_utils.GasTypes.CO2)
+    hwp_logging_bgb_co2_source = (math_utils.ActivityTypes.HWP_LOGGING_BGB, math_utils.GasTypes.CO2)
     logging_agb_n2o_source = (math_utils.ActivityTypes.LOGGING_AGB, math_utils.GasTypes.N2O)
-    logging_bgb_co2_source = (math_utils.ActivityTypes.LOGGING_BGB, math_utils.GasTypes.CO2)
-    logging_bgb_ch4_source = (math_utils.ActivityTypes.LOGGING_BGB, math_utils.GasTypes.CH4)
+    logging_agb_ch4_source = (math_utils.ActivityTypes.LOGGING_AGB, math_utils.GasTypes.CH4)
     logging_bgb_n2o_source = (math_utils.ActivityTypes.LOGGING_BGB, math_utils.GasTypes.N2O)
+    logging_bgb_ch4_source = (math_utils.ActivityTypes.LOGGING_BGB, math_utils.GasTypes.CH4)
+    logging_agb_co2_source = (math_utils.ActivityTypes.LOGGING_AGB, math_utils.GasTypes.CO2)
+    logging_bgb_co2_source = (math_utils.ActivityTypes.LOGGING_BGB, math_utils.GasTypes.CO2)
     degradation_agb_co2_source = (math_utils.ActivityTypes.DEGRADATION_AGB, math_utils.GasTypes.CO2)
     degradation_bgb_co2_source = (math_utils.ActivityTypes.DEGRADATION_BGB, math_utils.GasTypes.CO2)
     growth_agb_co2_source = (math_utils.ActivityTypes.AGB_GROWTH, math_utils.GasTypes.CO2)
@@ -1115,42 +1132,40 @@ class ForestManagementReport(LandModuleReport):
         last_metadata_row = self.metadata_worksheet.max_row
         last_additional_indicators_row = self.additional_indicators_worksheet.max_row
 
-        self.rotation_hwp_agb_co2 = self.extract_emissions(self.emissions_set, self.rotation_hwp_agb_co2_source[0], self.rotation_hwp_agb_co2_source[1])
-        self.rotation_hwp_bgb_co2 = self.extract_emissions(self.emissions_set, self.rotation_hwp_bgb_co2_source[0], self.rotation_hwp_bgb_co2_source[1])
-        self.rotation_agb_co2 = self.extract_emissions(self.emissions_set, self.rotation_agb_co2_source[0], self.rotation_agb_co2_source[1])
-        self.rotation_agb_ch4 = self.extract_emissions(self.emissions_set, self.rotation_agb_ch4_source[0], self.rotation_agb_ch4_source[1])
+        self.rotation_hwp_agb_co2 = self.extract_emissions(self.emissions_set, self.hwp_rotation_logging_agb_co2_source[0], self.hwp_rotation_logging_agb_co2_source[1])
+        self.rotation_hwp_bgb_co2 = self.extract_emissions(self.emissions_set, self.hwp_rotation_logging_bgb_co2_source[0], self.hwp_rotation_logging_bgb_co2_source[1])
         self.rotation_agb_n2o = self.extract_emissions(self.emissions_set, self.rotation_agb_n2o_source[0], self.rotation_agb_n2o_source[1])
-        self.rotation_bgb_co2 = self.extract_emissions(self.emissions_set, self.rotation_bgb_co2_source[0], self.rotation_bgb_co2_source[1])
-        self.rotation_bgb_ch4 = self.extract_emissions(self.emissions_set, self.rotation_bgb_ch4_source[0], self.rotation_bgb_ch4_source[1])
+        self.rotation_agb_ch4 = self.extract_emissions(self.emissions_set, self.rotation_agb_ch4_source[0], self.rotation_agb_ch4_source[1])
         self.rotation_bgb_n2o = self.extract_emissions(self.emissions_set, self.rotation_bgb_n2o_source[0], self.rotation_bgb_n2o_source[1])
+        self.rotation_bgb_ch4 = self.extract_emissions(self.emissions_set, self.rotation_bgb_ch4_source[0], self.rotation_bgb_ch4_source[1])
+        self.rotation_agb_co2 = self.extract_emissions(self.emissions_set, self.rotation_agb_co2_source[0], self.rotation_agb_co2_source[1])
+        self.rotation_bgb_co2 = self.extract_emissions(self.emissions_set, self.rotation_bgb_co2_source[0], self.rotation_bgb_co2_source[1])
         self.disturbance_agb_co2 = self.extract_emissions(self.emissions_set, self.disturbance_agb_co2_source[0], self.disturbance_agb_co2_source[1])
-        self.disturbance_agb_ch4 = self.extract_emissions(self.emissions_set, self.disturbance_agb_ch4_source[0], self.disturbance_agb_ch4_source[1])
-        self.disturbance_agb_n2o = self.extract_emissions(self.emissions_set, self.disturbance_agb_n2o_source[0], self.disturbance_agb_n2o_source[1])
         self.disturbance_bgb_co2 = self.extract_emissions(self.emissions_set, self.disturbance_bgb_co2_source[0], self.disturbance_bgb_co2_source[1])
-        self.disturbance_bgb_ch4 = self.extract_emissions(self.emissions_set, self.disturbance_bgb_ch4_source[0], self.disturbance_bgb_ch4_source[1])
-        self.disturbance_bgb_n2o = self.extract_emissions(self.emissions_set, self.disturbance_bgb_n2o_source[0], self.disturbance_bgb_n2o_source[1])
-        self.logging_hwp_agb_co2 = self.extract_emissions(self.emissions_set, self.logging_hwp_agb_co2_source[0], self.logging_hwp_agb_co2_source[1])
-        self.logging_hwp_bgb_co2 = self.extract_emissions(self.emissions_set, self.logging_hwp_bgb_co2_source[0], self.logging_hwp_bgb_co2_source[1])
-        self.logging_agb_co2 = self.extract_emissions(self.emissions_set, self.logging_agb_co2_source[0], self.logging_agb_co2_source[1])
-        self.logging_agb_ch4 = self.extract_emissions(self.emissions_set, self.logging_agb_ch4_source[0], self.logging_agb_ch4_source[1])
+        self.disturbance_agb_n2o = self.extract_emissions(self.emissions_set, self.disturbance_fire_agb_n2o_source[0], self.disturbance_fire_agb_n2o_source[1])
+        self.disturbance_agb_ch4 = self.extract_emissions(self.emissions_set, self.disturbance_fire_agb_ch4_source[0], self.disturbance_fire_agb_ch4_source[1])
+        self.disturbance_bgb_n2o = self.extract_emissions(self.emissions_set, self.disturbance_fire_bgb_n2o_source[0], self.disturbance_fire_bgb_n2o_source[1])
+        self.disturbance_bgb_ch4 = self.extract_emissions(self.emissions_set, self.disturbance_fire_bgb_ch4_source[0], self.disturbance_fire_bgb_ch4_source[1])
+        self.logging_hwp_agb_co2 = self.extract_emissions(self.emissions_set, self.hwp_logging_agb_co2_source[0], self.hwp_logging_agb_co2_source[1])
+        self.logging_hwp_bgb_co2 = self.extract_emissions(self.emissions_set, self.hwp_logging_bgb_co2_source[0], self.hwp_logging_bgb_co2_source[1])
         self.logging_agb_n2o = self.extract_emissions(self.emissions_set, self.logging_agb_n2o_source[0], self.logging_agb_n2o_source[1])
-        self.logging_bgb_co2 = self.extract_emissions(self.emissions_set, self.logging_bgb_co2_source[0], self.logging_bgb_co2_source[1])
-        self.logging_bgb_ch4 = self.extract_emissions(self.emissions_set, self.logging_bgb_ch4_source[0], self.logging_bgb_ch4_source[1])
+        self.logging_agb_ch4 = self.extract_emissions(self.emissions_set, self.logging_agb_ch4_source[0], self.logging_agb_ch4_source[1])
         self.logging_bgb_n2o = self.extract_emissions(self.emissions_set, self.logging_bgb_n2o_source[0], self.logging_bgb_n2o_source[1])
+        self.logging_bgb_ch4 = self.extract_emissions(self.emissions_set, self.logging_bgb_ch4_source[0], self.logging_bgb_ch4_source[1])
+        self.logging_agb_co2 = self.extract_emissions(self.emissions_set, self.logging_agb_co2_source[0], self.logging_agb_co2_source[1])
+        self.logging_bgb_co2 = self.extract_emissions(self.emissions_set, self.logging_bgb_co2_source[0], self.logging_bgb_co2_source[1])
         self.degradation_agb_co2 = self.extract_emissions(self.emissions_set, self.degradation_agb_co2_source[0], self.degradation_agb_co2_source[1])
         self.degradation_bgb_co2 = self.extract_emissions(self.emissions_set, self.degradation_bgb_co2_source[0], self.degradation_bgb_co2_source[1])
         self.growth_agb_co2 = self.extract_emissions(self.emissions_set, self.growth_agb_co2_source[0], self.growth_agb_co2_source[1])
         self.growth_bgb_co2 = self.extract_emissions(self.emissions_set, self.growth_bgb_co2_source[0], self.growth_bgb_co2_source[1])
-        self.degradation_litter_co2 = self.extract_emissions(self.emissions_set, self.degradation_litter_co2_source[0], self.degradation_litter_co2_source[1])
         self.litter_co2 = self.extract_emissions(self.emissions_set, self.litter_co2_source[0], self.litter_co2_source[1])
-        self.degradation_deadwood_co2 = self.extract_emissions(self.emissions_set, self.degradation_deadwood_co2_source[0], self.degradation_deadwood_co2_source[1])
         self.deadwood_co2 = self.extract_emissions(self.emissions_set, self.deadwood_co2_source[0], self.deadwood_co2_source[1])
 
-        self.hwp_co2 = [a + b + c + d for a, b, c, d in zip(self.rotation_hwp_agb_co2, self.rotation_hwp_bgb_co2, self.logging_hwp_agb_co2, self.logging_hwp_bgb_co2)]
-        self.fire_n2o = [a + b + c + d + e + f for a, b, c, d, e, f in zip(self.rotation_agb_n2o, self.rotation_bgb_n2o, self.disturbance_agb_n2o, self.disturbance_bgb_n2o, self.logging_agb_n2o, self.logging_bgb_n2o)]
-        self.fire_ch4 = [a + b + c + d + e + f for a, b, c, d, e, f in zip(self.rotation_agb_ch4, self.rotation_bgb_ch4, self.disturbance_agb_ch4, self.disturbance_bgb_ch4, self.logging_agb_ch4, self.logging_bgb_ch4)]
-        self.biomass_loss_co2 = [a + b + c + d + e + f + g + h + i + j for a, b, c, d, e, f, g, h, i, j in zip(self.rotation_agb_co2, self.rotation_bgb_co2, self.disturbance_agb_co2, self.disturbance_bgb_co2, self.logging_agb_co2, self.logging_bgb_co2, self.degradation_agb_co2, self.degradation_bgb_co2, self.degradation_litter_co2, self.degradation_deadwood_co2)]
-        self.biomass_gain_co2 = [a + b + c + d for a, b, c, d in zip(self.growth_agb_co2, self.growth_bgb_co2, self.litter_co2, self.deadwood_co2)]
+        self.hwp_co2 = np.sum([self.rotation_hwp_agb_co2, self.rotation_hwp_bgb_co2, self.logging_hwp_agb_co2, self.logging_hwp_bgb_co2], axis=0)
+        self.fire_n2o = np.sum([self.rotation_agb_n2o, self.rotation_bgb_n2o, self.disturbance_agb_n2o, self.disturbance_bgb_n2o, self.logging_agb_n2o, self.logging_bgb_n2o], axis=0)
+        self.fire_ch4 = np.sum([self.rotation_agb_ch4, self.rotation_bgb_ch4, self.disturbance_agb_ch4, self.disturbance_bgb_ch4, self.logging_agb_ch4, self.logging_bgb_ch4], axis=0)
+        self.biomass_loss_co2 = np.sum([self.rotation_agb_co2, self.rotation_bgb_co2, self.disturbance_agb_co2, self.disturbance_bgb_co2, self.logging_agb_co2, self.logging_bgb_co2, self.degradation_agb_co2, self.degradation_bgb_co2, self.degradation_litter_co2, self.degradation_deadwood_co2], axis=0)
+        self.biomass_gain_co2 = np.sum([self.growth_agb_co2, self.growth_bgb_co2, self.litter_co2, self.deadwood_co2], axis=0)
 
         self.results_worksheet.cell(row=last_results_row + 1, column=1, value="CO2 from HWP (rotation and logging)")
         self.results_worksheet.cell(row=last_results_row + 2, column=1, value="CO2 from biomass loss")
@@ -1177,7 +1192,6 @@ class EnergyReport(BaseModuleReport):
     solid_fuel_n2o: list[float] = None
 
     electricity_co2_eq_source = (math_utils.ActivityTypes.ELECTRICITY, math_utils.GasTypes.CO2)
-    # TODO: There's no distinction between liquid and solid fuels in the mathematical model
     liquid_fuel_co2_source = (math_utils.ActivityTypes.FUEL, math_utils.GasTypes.CO2)
     liquid_fuel_ch4_source = (math_utils.ActivityTypes.FUEL, math_utils.GasTypes.CH4)
     liquid_fuel_n2o_source = (math_utils.ActivityTypes.FUEL, math_utils.GasTypes.N2O)
@@ -1192,7 +1206,6 @@ class EnergyReport(BaseModuleReport):
     def add_submodules_results(self):
 
         submodules: list[api_models.Submodule] = self.module.submodules
-        submodules_emission_set = []
 
         for submodule in submodules:
             CalculatorClass = calculators.ElectricityCalculator if isinstance(submodule, api_models.Electricity) else calculators.FuelCalculator
@@ -1201,31 +1214,19 @@ class EnergyReport(BaseModuleReport):
             calculator = CalculatorClass(submodule)
             calculator.calculate()
 
-            if self.module.is_with():
-                submodules_emission_set = calculator.results_w.yearly_emissions_by_sector_by_gas
-                if self.calculator.results_start_w is not None:
-                    submodules_emission_set = [a + b for a, b in zip(submodules_emission_set, calculator.results_start_w.yearly_emissions_by_sector_by_gas)]
-
-            if self.module.is_without():
-                submodules_emission_set = calculator.results_wo.yearly_emissions_by_sector_by_gas
-                if self.calculator.results_start is not None:
-                    submodules_emission_set = [a + b for a, b in zip(submodules_emission_set, calculator.results_start_wo.yearly_emissions_by_sector_by_gas)]
-
-            self.electricity_co2_eq = [a + b for a, b in zip(self.electricity_co2_eq, self.extract_emissions(submodules_emission_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1]))]
+            self.electricity_co2_eq = list(map(sum, zip(self.electricity_co2_eq, self.extract_emissions(self.emissions_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1]))))
 
             if "solid" in submodule.fuel_type.macro_fuel_type.name.casefold():
-                self.solid_fuel_co2 = [a + b for a, b in zip(self.solid_fuel_co2, self.extract_emissions(submodules_emission_set, self.solid_fuel_co2_source[0], self.solid_fuel_co2_source[1]))]
-                self.solid_fuel_ch4 = [a + b for a, b in zip(self.solid_fuel_ch4, self.extract_emissions(submodules_emission_set, self.solid_fuel_ch4_source[0], self.solid_fuel_ch4_source[1]))]
-                self.solid_fuel_n2o = [a + b for a, b in zip(self.solid_fuel_n2o, self.extract_emissions(submodules_emission_set, self.solid_fuel_n2o_source[0], self.solid_fuel_n2o_source[1]))]
+                self.solid_fuel_co2 = list(map(sum, zip(self.solid_fuel_co2, self.extract_emissions(self.emissions_set, self.solid_fuel_co2_source[0], self.solid_fuel_co2_source[1]))))
+                self.solid_fuel_ch4 = list(map(sum, zip(self.solid_fuel_ch4, self.extract_emissions(self.emissions_set, self.solid_fuel_ch4_source[0], self.solid_fuel_ch4_source[1]))))
+                self.solid_fuel_n2o = list(map(sum, zip(self.solid_fuel_n2o, self.extract_emissions(self.emissions_set, self.solid_fuel_n2o_source[0], self.solid_fuel_n2o_source[1]))))
             elif "liquid" in submodule.fuel_type.macro_fuel_type.name.casefold():
-                self.liquid_fuel_co2 = [a + b for a, b in zip(self.liquid_fuel_co2, self.extract_emissions(submodules_emission_set, self.liquid_fuel_co2_source[0], self.liquid_fuel_co2_source[1]))]
-                self.liquid_fuel_ch4 = [a + b for a, b in zip(self.liquid_fuel_ch4, self.extract_emissions(submodules_emission_set, self.liquid_fuel_ch4_source[0], self.liquid_fuel_ch4_source[1]))]
-                self.liquid_fuel_n2o = [a + b for a, b in zip(self.liquid_fuel_n2o, self.extract_emissions(submodules_emission_set, self.liquid_fuel_n2o_source[0], self.liquid_fuel_n2o_source[1]))]
+                self.liquid_fuel_co2 = list(map(sum, zip(self.liquid_fuel_co2, self.extract_emissions(self.emissions_set, self.liquid_fuel_co2_source[0], self.liquid_fuel_co2_source[1]))))
+                self.liquid_fuel_ch4 = list(map(sum, zip(self.liquid_fuel_ch4, self.extract_emissions(self.emissions_set, self.liquid_fuel_ch4_source[0], self.liquid_fuel_ch4_source[1]))))
+                self.liquid_fuel_n2o = list(map(sum, zip(self.liquid_fuel_n2o, self.extract_emissions(self.emissions_set, self.liquid_fuel_n2o_source[0], self.liquid_fuel_n2o_source[1]))))
 
     def build_report(self):
         last_results_row = self.results_worksheet.max_row
-        last_metadata_row = self.metadata_worksheet.max_row
-        last_additional_indicators_row = self.additional_indicators_worksheet.max_row
 
         self.electricity_co2_eq = np.zeros(self.last_year_of_accounting - self.start_year_of_activities)
         self.liquid_fuel_co2 = np.zeros(self.last_year_of_accounting - self.start_year_of_activities)
