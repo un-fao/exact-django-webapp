@@ -559,13 +559,16 @@ class LandModuleCalculator(BaseCalculator):
         self.module_wo: LandModule | SingleBiomassModule
 
         self.biomass_ef_start: ipcc.ForestTotalBiomass = ipcc.ForestTotalBiomass(value=0)
+
+        self.biomass_ef_start_w: ipcc.TotalBiomassAfterDefo = ipcc.TotalBiomassAfterDefo(value=0)
+        self.biomass_ef_start_wo: ipcc.TotalBiomassAfterDefo = ipcc.TotalBiomassAfterDefo(value=0)
         self.biomass_ef_w: ipcc.TotalBiomassAfterDefo = ipcc.TotalBiomassAfterDefo(value=0)
         self.biomass_ef_wo: ipcc.TotalBiomassAfterDefo = ipcc.TotalBiomassAfterDefo(value=0)
 
         self.calculate_biomass_start_w = False
         self.calculate_biomass_start_wo = False
-        self.calculate_biomass_w = self.module.is_start() and self.module.is_with()
-        self.calculate_biomass_wo = self.module.is_start() and self.module.is_without()
+        self.calculate_biomass_w = not (self.module.is_start() and self.module.is_with())
+        self.calculate_biomass_wo = not (self.module.is_start() and self.module.is_without())
 
         self.soc_start = self.soc_w = self.soc_wo = ipcc.SoilOrganicCarbon()
 
@@ -624,16 +627,19 @@ class LandModuleCalculator(BaseCalculator):
         self.fmg_wo = get_fmg_data(self.module_wo, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
         self.flu_wo = get_flu_data(self.module_wo, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
 
-        if self.module.is_start() and isinstance(self.module, SingleBiomassModule):
-            self.biomass_ef_start = self.module.get_biomass_ef(utils.ScenarioTypes.START)
-        if self.module.is_with() and isinstance(self.module, SingleBiomassModule):
-            self.biomass_ef_w = self.module.get_biomass_ef(utils.ScenarioTypes.WITH)
-        if self.module.is_without() and isinstance(self.module, SingleBiomassModule):
-            self.biomass_ef_wo = self.module.get_biomass_ef(utils.ScenarioTypes.WITHOUT)
+        if isinstance(self.module, SingleBiomassModule):
+            if self.luc and self.module.is_start() and self.module.is_with():
+                self.biomass_ef_start_w = self.module_start.get_biomass_ef(utils.ScenarioTypes.START)
+            if self.luc and self.module.is_start() and self.module.is_without():
+                self.biomass_ef_start_wo = self.module_start.get_biomass_ef(utils.ScenarioTypes.START)
+            if self.luc and self.module.is_with():
+                self.biomass_ef_w = self.module_w.get_biomass_ef(utils.ScenarioTypes.WITH)
+            if self.luc and self.module.is_without():
+                self.biomass_ef_wo = self.module_wo.get_biomass_ef(utils.ScenarioTypes.WITHOUT)
 
-        # NOTE: Added to take into account biomass growth in final land use
-        if self.luc and self.module.is_with() or self.module.is_without():
-            self.biomass_ef_start.value = 0
+        # # NOTE: Added to take into account biomass growth in final land use
+        # if self.luc and self.module.is_with() or self.module.is_without():
+        #     self.biomass_ef_start.value = 0
 
 
 class LandUseChangeCalculator(BaseCalculator):
@@ -1415,7 +1421,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "ratio_bg_ag_minor": self.minor_n_estimation_factor_start.rs_t,
                 "n_content_bg_minor": self.minor_n_estimation_factor_start.n_bg_t,
                 "delay": self.activity.delay,
-                "biomass_start_default": self.biomass_ef_start.value,
+                "biomass_start_default": self.biomass_ef_start_w.value,
                 "biomass_end_default": self.biomass_ef_w.value,
                 "calculate_biomass": self.calculate_biomass_start_w,
                 "biomass_start_tier_2": self.module_w.biomass_t2_start,
@@ -1477,7 +1483,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "ratio_bg_ag_minor": self.minor_n_estimation_factor_start.rs_t,
                 "n_content_bg_minor": self.minor_n_estimation_factor_start.n_bg_t,
                 "delay": self.activity.delay,
-                "biomass_start_default": self.biomass_ef_start.value,
+                "biomass_start_default": self.biomass_ef_start_wo.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
                 "calculate_biomass": self.calculate_biomass_start_wo,
                 "biomass_start_tier_2": self.module_w.biomass_t2_start,
@@ -1543,7 +1549,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "n_content_bg_minor": self.minor_n_estimation_factor_w.n_bg_t,
                 "delay": self.activity.delay,
                 "calculate_biomass": self.calculate_biomass_w,
-                "biomass_start_default": self.biomass_ef_start.value,
+                "biomass_start_default": self.biomass_ef_start_w.value,
                 "biomass_end_default": self.biomass_ef_w.value,
                 "biomass_start_tier_2": self.module_w.biomass_t2_start,
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
@@ -1608,7 +1614,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "n_content_bg_minor": self.minor_n_estimation_factor_wo.n_bg_t,
                 "delay": self.activity.delay,
                 "calculate_biomass": self.calculate_biomass_wo,
-                "biomass_start_default": self.biomass_ef_start.value,
+                "biomass_start_default": self.biomass_ef_start_wo.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
