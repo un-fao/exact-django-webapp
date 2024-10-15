@@ -57,9 +57,9 @@ class ProjectFactory(DjangoModelFactory):
     executing_agency = factory.fuzzy.FuzzyText()
     status = factory.fuzzy.FuzzyChoice(statuses)
 
-    implementation_years = factory.fuzzy.FuzzyInteger(1, 10)
+    implementation_years = factory.fuzzy.FuzzyInteger(5, 10)
     start_year_of_activities = factory.fuzzy.FuzzyInteger(2024, 2024)
-    last_year_of_accounting = factory.fuzzy.FuzzyInteger(2024, 2050)
+    last_year_of_accounting = factory.fuzzy.FuzzyInteger(2050, 2050)
 
     climate = factory.fuzzy.FuzzyChoice(climates)
     moisture = factory.fuzzy.FuzzyChoice(moisture)
@@ -266,6 +266,7 @@ class ForestManagementFactory(DjangoModelFactory):
     land_use_type_wo = land_use_type_start
 
     forest_type = ForestType.objects.get(name="Natural")
+    forest_condition_type = ForestConditionType.objects.get(name="Primary")
 
     area = factory.fuzzy.FuzzyInteger(1, 150)
 
@@ -344,6 +345,10 @@ class InputEntryFactory(DjangoModelFactory):
     value_start = factory.fuzzy.FuzzyFloat(0, 100)
     value_w = factory.fuzzy.FuzzyFloat(0, 100)
     value_wo = factory.fuzzy.FuzzyFloat(0, 100)
+
+    co2_emissions_t2 = factory.fuzzy.FuzzyFloat(0, 1)
+    n2o_emissions_t2 = factory.fuzzy.FuzzyFloat(0, 1)
+    co2_e_emissions_t2 = factory.fuzzy.FuzzyFloat(0, 1)
 
 
 class AquacultureFactory(DjangoModelFactory):
@@ -549,6 +554,10 @@ class SettlementFactory(DjangoModelFactory):
     settlement_type_w = factory.fuzzy.FuzzyChoice(settlement_types)
     settlement_type_wo = factory.fuzzy.FuzzyChoice(settlement_types)
 
+    biomass_t2_start = factory.fuzzy.FuzzyFloat(0, 3)
+    biomass_t2_w = factory.fuzzy.FuzzyFloat(0, 3)
+    biomass_t2_wo = factory.fuzzy.FuzzyFloat(0, 3)
+
 
 building_types = [building for building in BuildingType.objects.all()]
 
@@ -563,9 +572,7 @@ class BuildingFactory(DjangoModelFactory):
     area_m2_w = factory.fuzzy.FuzzyFloat(0, 100)
     area_m2_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
-    building_types_start = factory.fuzzy.FuzzyChoice(building_types)
-    building_types_w = factory.fuzzy.FuzzyChoice(building_types)
-    building_types_wo = factory.fuzzy.FuzzyChoice(building_types)
+    building_type = factory.fuzzy.FuzzyChoice(building_types)
 
 
 class OtherLandFactory(DjangoModelFactory):
@@ -578,3 +585,20 @@ class OtherLandFactory(DjangoModelFactory):
     is_degraded_land_start = factory.fuzzy.FuzzyChoice([True, False])
     is_degraded_land_w = factory.fuzzy.FuzzyChoice([True, False])
     is_degraded_land_wo = factory.fuzzy.FuzzyChoice([True, False])
+
+
+class RoadFactory(DjangoModelFactory):
+    class Meta:
+        model = Road
+
+    status = READY
+
+    road_type = factory.fuzzy.FuzzyChoice([road for road in RoadType.objects.all()])
+
+    length_km_start = factory.fuzzy.FuzzyFloat(0, 100)
+    length_km_w = factory.fuzzy.FuzzyFloat(0, 100)
+    length_km_wo = factory.fuzzy.FuzzyFloat(0, 100)
+
+    width_m_start = factory.fuzzy.FuzzyFloat(0, 100)
+    width_m_w = factory.fuzzy.FuzzyFloat(0, 100)
+    width_m_wo = factory.fuzzy.FuzzyFloat(0, 100)

@@ -8,6 +8,7 @@ from ipcc.models import *
 from ..factories import *
 import api.tests.base_test_classes as t
 import factory.fuzzy as fuzzy
+import api.reports as reports
 
 
 class PerennialCroplandTest(t.ModuleTest):
@@ -23,6 +24,9 @@ class PerennialCroplandTest(t.ModuleTest):
 
     def test(self):
         self.calculate_results()
+
+        res = reports.BaseProjectReport(self.project)
+        res.build_report()
 
 
 PerennialCroplandTest().test()
