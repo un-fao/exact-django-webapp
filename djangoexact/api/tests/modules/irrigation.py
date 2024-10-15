@@ -19,7 +19,7 @@ class IrrigationTest(t.ModuleWithSubmodulesTest):
             ModuleType.objects.get(class_name="IrrigationPhase"),
         ]
         self.create_module()
-        self.create_submodules()
+        self.create_submodules(n=4)
 
     def test(self):
         self.calculate_results()
