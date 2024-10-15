@@ -67,6 +67,8 @@ class ReportFactory:
             return InputReport
         elif isinstance(module, api_models.Irrigation):
             return IrrigationReport
+        elif isinstance(module, api_models.Settlement):
+            return SettlementReport
         else:
             log.warning(f"No report class found for module {module.module_type.name}")
             return
@@ -1300,7 +1302,6 @@ class InputReport(BaseModuleReport):
             self.inputs_n2o = list(map(sum, zip(self.inputs_n2o, self.extract_emissions(submodule_emission_set, self.inputs_n2o_source[0], self.inputs_n2o_source[1]))))
 
             if "feed" in submodule.input_type.macro_input_type.name.casefold():
-                print("is feed")
                 self.feed_co2_eq = list(map(sum, zip(self.feed_co2_eq, self.extract_emissions(submodule_emission_set, self.feed_co2_eq_source[0], self.feed_co2_eq_source[1]))))
             else:
                 self.inputs_co2_eq = list(map(sum, zip(self.inputs_co2_eq, self.extract_emissions(submodule_emission_set, self.inputs_co2_eq_source[0], self.inputs_co2_eq_source[1]))))
@@ -1367,12 +1368,12 @@ class IrrigationReport(BaseModuleReport):
 
             if self.module.is_with():
                 submodules_emission_set = calculator.results_w.yearly_emissions_by_sector_by_gas
-                if self.calculator.results_start_w is not None:
+                if calculator.results_start_w is not None:
                     submodules_emission_set = list(map(sum, zip(submodules_emission_set, calculator.results_start_w.yearly_emissions_by_sector_by_gas)))
 
             if self.module.is_without():
                 submodules_emission_set = calculator.results_wo.yearly_emissions_by_sector_by_gas
-                if self.calculator.results_start_wo is not None:
+                if calculator.results_start_wo is not None:
                     submodules_emission_set = list(map(sum, zip(submodules_emission_set, calculator.results_start_wo.yearly_emissions_by_sector_by_gas)))
 
             self.emissions_set += submodules_emission_set
@@ -1400,3 +1401,82 @@ class IrrigationReport(BaseModuleReport):
             self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.liquid_fuel_or_electricity_co2[i])
             self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.liquid_fuel_or_electricity_ch4[i])
             self.results_worksheet.cell(row=last_results_row + 4, column=i + 2, value=self.liquid_fuel_or_electricity_n2o[i])
+
+
+# @dataclass
+class SettlementReport(BaseModuleReport):
+
+    module: api_models.Settlement
+
+    buildings_co2_eq: list[float] = None
+    roads_co2_eq: list[float] = None
+    other_infrastructure_co2_eq: list[float] = None
+
+    buildings_co2_eq_source = (math_utils.ActivityTypes.ROADS, math_utils.GasTypes.CO2)
+    roads_co2_eq_source = (math_utils.ActivityTypes.ROADS, math_utils.GasTypes.CO2)
+    infrastructure_co2_eq_source = (math_utils.ActivityTypes.ROADS, math_utils.GasTypes.CO2)
+
+    def __post_init__(self):
+        self.calculator = calculators.SettlementCalculator(self.module)
+        return super().__post_init__()
+
+    def add_submodules_results(self):
+        submodules: list[api_models.Submodule] = self.module.submodules
+        self.emissions_set = []
+
+        if self.module.is_with():
+            self.emissions_set += self.calculator.results_w.yearly_emissions_by_sector_by_gas
+            if self.calculator.results_start_w is not None:
+                self.emissions_set = list(map(sum, zip(self.emissions_set, self.calculator.results_start_w.yearly_emissions_by_sector_by_gas)))
+        if self.module.is_without():
+            self.emissions_set += self.calculator.results_wo.yearly_emissions_by_sector_by_gas
+            if self.calculator.results_start_wo is not None:
+                self.emissions_set = list(map(sum, zip(self.emissions_set, self.calculator.results_start_wo.yearly_emissions_by_sector_by_gas)))
+
+        for submodule in submodules:
+            if isinstance(submodule, api_models.OtherInfrastructure):
+                continue
+
+            submodules_emission_set = []
+            CalculatorClass = calculators.RoadCalculator if isinstance(submodule, api_models.Road) else calculators.BuildingCalculator
+            submodule: api_models.Road | api_models.Building
+
+            calculator = CalculatorClass(submodule)
+            calculator.calculate()
+
+            if self.module.is_with():
+                submodules_emission_set = calculator.results_w.yearly_emissions_by_sector_by_gas
+                if calculator.results_start_w is not None:
+                    submodules_emission_set = list(map(sum, zip(submodules_emission_set, calculator.results_start_w.yearly_emissions_by_sector_by_gas)))
+
+            if self.module.is_without():
+                submodules_emission_set = calculator.results_wo.yearly_emissions_by_sector_by_gas
+                if calculator.results_start_wo is not None:
+                    submodules_emission_set = list(map(sum, zip(submodules_emission_set, calculator.results_start_wo.yearly_emissions_by_sector_by_gas)))
+
+            if isinstance(submodule, api_models.Road):
+                self.roads_co2_eq = list(map(sum, zip(self.roads_co2_eq, self.extract_emissions(submodules_emission_set, self.roads_co2_eq_source[0], self.roads_co2_eq_source[1]))))
+            elif isinstance(submodule, api_models.Building):
+                self.buildings_co2_eq = list(map(sum, zip(self.buildings_co2_eq, self.extract_emissions(submodules_emission_set, self.buildings_co2_eq_source[0], self.buildings_co2_eq_source[1]))))
+
+            self.emissions_set += submodules_emission_set
+
+    def build_report(self):
+        super().build_report()
+
+        last_results_row = self.results_worksheet.max_row
+
+        self.buildings_co2_eq = np.zeros(self.duration)
+        self.roads_co2_eq = np.zeros(self.duration)
+        self.other_infrastructure_co2_eq = np.zeros(self.duration)
+
+        self.add_submodules_results()
+
+        self.results_worksheet.cell(row=last_results_row + 1, column=1, value="CO2-eq from buildings")
+        self.results_worksheet.cell(row=last_results_row + 2, column=1, value="CO2-eq from roads")
+        self.results_worksheet.cell(row=last_results_row + 3, column=1, value="CO2-eq from other infrastructure")
+
+        for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
+            self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.buildings_co2_eq[i])
+            self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.roads_co2_eq[i])
+            self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.other_infrastructure_co2_eq[i])
