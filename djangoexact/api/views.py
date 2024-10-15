@@ -96,6 +96,8 @@ from auditlog.context import disable_auditlog, LogEntry
 from django.utils import translation
 from django.db import connection
 import time
+import api.reports as reports
+from django.http import FileResponse
 
 
 logger = logging.getLogger("console")
@@ -498,6 +500,31 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         update_change_reason(project, utils.ChangeReasons.UPDATE.value)
 
         return super().partial_update(request, *args, **kwargs)
+
+    @action(detail=True, methods=["get"])
+    @swagger_auto_schema(responses={404: "Project not found", 403: "Selected user does not have permission to view project results"})
+    def report(self, request, pk=None):
+        project: Project = self.get_object()
+
+        if not utils.has_project_permission("view_project", self.request.user, project):
+            logging.error("Selected user does not have permission to view the project")
+            return utils.ErrorResponse("Selected user does not have permission to view the project", status=http_status.HTTP_403_FORBIDDEN)
+
+        if not project.is_ready():
+            logging.error("Project is not ready")
+            return utils.ErrorResponse("To get a report for a project, all activities must have been completed.", status=http_status.HTTP_400_BAD_REQUEST)
+
+        report = reports.BaseProjectReport(project)
+        filename = report.build_report()
+
+        try:
+            response = FileResponse(open(filename, "rb"), content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            response["Content-Disposition"] = f"attachment; filename={filename}"
+            return response
+        except FileNotFoundError:
+            return utils.ErrorResponse("Error generating report: file not found", status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception as e:
+            return utils.ErrorResponse(str(e), status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @action(detail=True, methods=["post"])
     @swagger_auto_schema(responses={404: "Project not found", 403: "Selected user does not have permission to copy the project", 201: ReadProjectSerializer}, request_body=EmptySerializer)

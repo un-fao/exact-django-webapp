@@ -1,0 +1,37 @@
+climate;forest_type;land_use_type;value;gef_co2;gef_ch4;gef_n2o
+Tropical;Natural;Rainforest;0,32;1580;6,8;0,2
+Tropical;Natural;Moist Deciduous Forest;0,36;1580;6,8;0,2
+Tropical;Natural;Dry Forest;0,36;1580;6,8;0,2
+Tropical;Natural;Shrubland;0,72;1580;6,8;0,2
+Tropical;Natural;Mangrove Forest;0,32;1580;6,8;0,2
+Tropical;Plantation;Rainforest;0,32;1580;6,8;0,2
+Tropical;Plantation;Moist Deciduous Forest;0,36;1580;6,8;0,2
+Tropical;Plantation;Dry Forest;0,36;1580;6,8;0,2
+Tropical;Plantation;Shrubland;0,72;1580;6,8;0,2
+Warm Temperate;Natural;Humid Forest;0,36;1569;4,7;0,26
+Warm Temperate;Natural;Dry Forest;0,36;1569;4,7;0,26
+Warm Temperate;Natural;Steppe;0,74;1569;4,7;0,26
+Warm Temperate;Natural;Mountain System;0,36;1569;4,7;0,26
+Warm Temperate;Plantation;Humid Forest;0,36;1569;4,7;0,26
+Warm Temperate;Plantation;Dry Forest;0,36;1569;4,7;0,26
+Warm Temperate;Plantation;Steppe;0,74;1569;4,7;0,26
+Warm Temperate;Plantation;Mountain System;0,36;1569;4,7;0,26
+Warm Temperate;Natural;Mangrove Forest;0,32;;6,8;
+Cool Temperate;Natural;Oceanic Forest;0,45;1569;4,7;0,26
+Cool Temperate;Natural;Continental Forest;0,45;1569;4,7;0,26
+Cool Temperate;Natural;Mountain System;0,45;1569;4,7;0,26
+Cool Temperate;Natural;Desert;0,45;1569;4,7;0,26
+Cool Temperate;Natural;Steppe;0,45;1569;4,7;0,26
+Cool Temperate;Plantation;Oceanic Forest;0,45;1569;4,7;0,26
+Cool Temperate;Plantation;Continental Forest;0,45;1569;4,7;0,26
+Cool Temperate;Plantation;Mountain System;0,45;1569;4,7;0,26
+Cool Temperate;Plantation;Desert;0,45;1569;4,7;0,26
+Cool Temperate;Plantation;Steppe;0,45;1569;4,7;0,26
+Boreal;Natural;Coniferous Forest;0,34;1569;4,7;0,26
+Boreal;Natural;Tundra Woodland;0,34;1569;4,7;0,26
+Boreal;Natural;Mountain System;0,34;1569;4,7;0,26
+Boreal;Plantation;Coniferous Forest;0,34;1569;4,7;0,26
+Boreal;Plantation;Tundra Woodland;0,34;1569;4,7;0,26
+Boreal;Plantation;Mountain System;0,34;1569;4,7;0,26
+Tropical;Natural;Mountain System;0,36;1580;6,8;0,2
+Tropical;Plantation;Mountain System;0,36;1580;6,8;0,2
