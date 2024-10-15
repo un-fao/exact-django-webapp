@@ -1104,9 +1104,9 @@ class SetAsideDefaults(Defaults):
             fmg_t2_start_default=defaults.fmg_start.value,
             fmg_t2_w_default=defaults.fmg_w.value,
             fmg_t2_wo_default=defaults.fmg_wo.value,
-            biomass_t2_start_default=defaults.biomass_start.value,
-            biomass_t2_w_default=defaults.biomass_w.value,
-            biomass_t2_wo_default=defaults.biomass_wo.value,
+            biomass_t2_start_default=defaults.biomass_ef_start.value,
+            biomass_t2_w_default=defaults.biomass_ef_w.value,
+            biomass_t2_wo_default=defaults.biomass_ef_wo.value,
         )
 
 
