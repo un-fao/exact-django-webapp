@@ -1,15 +1,19 @@
 import api.models as models
 
-cs = [c.name for c in models.Country.objects.all()]
+# TODO: Run in review and prod
 
-print(cs)
 
-from collections import Counter
+# Add Climate Tropical Montane to all LandUseTypes with module_type "Perennial Cropland"
+def add_climate_tropical_montane_to_perennial_cropland():
+    """
+    Add Climate Tropical Montane to all LandUseTypes with module_type "Perennial Cropland"
+    """
+    perennial_cropland = models.LandUseType.objects.filter(module_types__name="Perennial Cropland")
+    climate_tropical_montane = models.Climate.objects.get(name="Tropical Montane")
 
-# Count occurrences
-country_count = Counter(cs)
+    for land_use_type in perennial_cropland:
+        land_use_type.climates.add(climate_tropical_montane)
+        land_use_type.save()
 
-# Find duplicates
-duplicates = [country for country, count in country_count.items() if count > 1]
 
-print(duplicates)
+add_climate_tropical_montane_to_perennial_cropland()
