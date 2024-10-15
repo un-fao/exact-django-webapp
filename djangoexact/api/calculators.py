@@ -628,13 +628,13 @@ class LandModuleCalculator(BaseCalculator):
         self.flu_wo = get_flu_data(self.module_wo, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
 
         if isinstance(self.module, SingleBiomassModule):
-            if self.luc and self.module.is_start() and self.module.is_with():
+            if self.module.is_start() and self.module.is_with():
                 self.biomass_ef_start_w = self.module_start.get_biomass_ef(utils.ScenarioTypes.START)
-            if self.luc and self.module.is_start() and self.module.is_without():
+            if self.module.is_start() and self.module.is_without():
                 self.biomass_ef_start_wo = self.module_start.get_biomass_ef(utils.ScenarioTypes.START)
-            if self.luc and self.module.is_with():
+            if self.module.is_with():
                 self.biomass_ef_w = self.module_w.get_biomass_ef(utils.ScenarioTypes.WITH)
-            if self.luc and self.module.is_without():
+            if self.module.is_without():
                 self.biomass_ef_wo = self.module_wo.get_biomass_ef(utils.ScenarioTypes.WITHOUT)
 
         # # NOTE: Added to take into account biomass growth in final land use
