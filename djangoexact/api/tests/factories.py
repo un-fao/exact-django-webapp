@@ -554,6 +554,10 @@ class SettlementFactory(DjangoModelFactory):
     settlement_type_w = factory.fuzzy.FuzzyChoice(settlement_types)
     settlement_type_wo = factory.fuzzy.FuzzyChoice(settlement_types)
 
+    biomass_t2_start = factory.fuzzy.FuzzyFloat(0, 3)
+    biomass_t2_w = factory.fuzzy.FuzzyFloat(0, 3)
+    biomass_t2_wo = factory.fuzzy.FuzzyFloat(0, 3)
+
 
 building_types = [building for building in BuildingType.objects.all()]
 
@@ -568,9 +572,7 @@ class BuildingFactory(DjangoModelFactory):
     area_m2_w = factory.fuzzy.FuzzyFloat(0, 100)
     area_m2_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
-    building_types_start = factory.fuzzy.FuzzyChoice(building_types)
-    building_types_w = factory.fuzzy.FuzzyChoice(building_types)
-    building_types_wo = factory.fuzzy.FuzzyChoice(building_types)
+    building_type = factory.fuzzy.FuzzyChoice(building_types)
 
 
 class OtherLandFactory(DjangoModelFactory):
@@ -583,3 +585,20 @@ class OtherLandFactory(DjangoModelFactory):
     is_degraded_land_start = factory.fuzzy.FuzzyChoice([True, False])
     is_degraded_land_w = factory.fuzzy.FuzzyChoice([True, False])
     is_degraded_land_wo = factory.fuzzy.FuzzyChoice([True, False])
+
+
+class RoadFactory(DjangoModelFactory):
+    class Meta:
+        model = Road
+
+    status = READY
+
+    road_type = factory.fuzzy.FuzzyChoice([road for road in RoadType.objects.all()])
+
+    length_km_start = factory.fuzzy.FuzzyFloat(0, 100)
+    length_km_w = factory.fuzzy.FuzzyFloat(0, 100)
+    length_km_wo = factory.fuzzy.FuzzyFloat(0, 100)
+
+    width_m_start = factory.fuzzy.FuzzyFloat(0, 100)
+    width_m_w = factory.fuzzy.FuzzyFloat(0, 100)
+    width_m_wo = factory.fuzzy.FuzzyFloat(0, 100)
