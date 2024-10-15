@@ -38,6 +38,8 @@ class ActivityTypes(Enum):
     ROTATION_BGB = "Rotation BGB"
     DISTURBANCE_AGB = "Disturbance AGB"
     DISTURBANCE_BGB = "Disturbance BGB"
+    DISTURBANCE_FIRE_AGB = "Disturbance Fire AGB"
+    DISTURBANCE_FIRE_BGB = "Disturbance Fire BGB"
     LOGGING_AGB = "Logging AGB"
     LOGGING_BGB = "Logging BGB"
     HWP_LOGGING_AGB = "Harvested Wood Product Logging AGB"
