@@ -3135,11 +3135,11 @@ class AquacultureCalculator(BaseCalculator):
             raise ValueError("Default feed emission factor does not exist")
 
         try:
-            self.elec = ipcc.ElectricityEmission.objects.get(country=project.country)
+            self.elec = ipcc.ElectricityEmission.objects.get(country=self.country)
         except ipcc.ElectricityEmission.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(module, "electricity_ef_t2")
             if missing_scenarios:
-                raise ValueError(f"Electricity emission for {project.country.name} does not exist. Please provide a tier 2 value for electricity emission for scenarios: {', '.join(missing_scenarios)}")
+                raise ValueError(f"Electricity emission for {self.country.name} does not exist. Please provide a tier 2 value for electricity emission for scenarios: {', '.join(missing_scenarios)}")
 
     def calculate(self) -> list[Result]:
         """
