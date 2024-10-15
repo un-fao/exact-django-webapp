@@ -61,13 +61,12 @@ class ReportFactory:
             return LivestockReport
         elif isinstance(module, api_models.ForestManagement):
             return ForestManagementReport
-        # BUG: The following modules are not yet ready to be made public. They are still in development.
         elif isinstance(module, api_models.Energy):
             return EnergyReport
-        # elif isinstance(module, api_models.Input):
-        #     return InputReport
-        # elif isinstance(module, api_models.Irrigation):
-        #     return IrrigationReport
+        elif isinstance(module, api_models.Input):
+            return InputReport
+        elif isinstance(module, api_models.Irrigation):
+            return IrrigationReport
         else:
             log.warning(f"No report class found for module {module.module_type.name}")
             return
@@ -1277,34 +1276,36 @@ class InputReport(BaseModuleReport):
 
     def add_submodules_results(self):
         submodules: list[api_models.Submodule] = self.module.submodules
-        submodules_emission_set = []
+        self.emissions_set = []
 
         for submodule in submodules:
             CalculatorClass = calculators.InputEntryCalculator
             submodule: api_models.InputEntry
+            submodule_emission_set = []
 
             calculator = CalculatorClass(submodule)
             calculator.calculate()
 
             if self.module.is_with():
-                submodules_emission_set = calculator.results_w.yearly_emissions_by_sector_by_gas
+                submodule_emission_set = calculator.results_w.yearly_emissions_by_sector_by_gas
                 if self.calculator.results_start_w is not None:
-                    submodules_emission_set = [a + b for a, b in zip(submodules_emission_set, calculator.results_start_w.yearly_emissions_by_sector_by_gas)]
+                    submodule_emission_set = list(map(sum, zip(submodule_emission_set, calculator.results_start_w.yearly_emissions_by_sector_by_gas)))
 
             if self.module.is_without():
-                submodules_emission_set = calculator.results_wo.yearly_emissions_by_sector_by_gas
+                submodule_emission_set = calculator.results_wo.yearly_emissions_by_sector_by_gas
                 if self.calculator.results_start_wo is not None:
-                    submodules_emission_set = [a + b for a, b in zip(submodules_emission_set, calculator.results_start_wo.yearly_emissions_by_sector_by_gas)]
+                    submodule_emission_set = list(map(sum, zip(submodule_emission_set, calculator.results_start_wo.yearly_emissions_by_sector_by_gas)))
 
-            self.inputs_co2 = [a + b for a, b in zip(self.inputs_co2, self.extract_emissions(submodules_emission_set, self.inputs_co2_source[0], self.inputs_co2_source[1]))]
-            self.inputs_n2o = [a + b for a, b in zip(self.inputs_n2o, self.extract_emissions(submodules_emission_set, self.inputs_n2o_source[0], self.inputs_n2o_source[1]))]
+            self.inputs_co2 = list(map(sum, zip(self.inputs_co2, self.extract_emissions(submodule_emission_set, self.inputs_co2_source[0], self.inputs_co2_source[1]))))
+            self.inputs_n2o = list(map(sum, zip(self.inputs_n2o, self.extract_emissions(submodule_emission_set, self.inputs_n2o_source[0], self.inputs_n2o_source[1]))))
 
             if "feed" in submodule.input_type.macro_input_type.name.casefold():
-                print("FEED")
-                self.feed_co2_eq = [a + b for a, b in zip(self.feed_co2_eq, self.extract_emissions(submodules_emission_set, self.feed_co2_eq_source[0], self.feed_co2_eq_source[1]))]
+                print("is feed")
+                self.feed_co2_eq = list(map(sum, zip(self.feed_co2_eq, self.extract_emissions(submodule_emission_set, self.feed_co2_eq_source[0], self.feed_co2_eq_source[1]))))
             else:
-                print("NOT FEED")
-                self.inputs_co2_eq = [a + b for a, b in zip(self.inputs_co2_eq, self.extract_emissions(submodules_emission_set, self.inputs_co2_eq_source[0], self.inputs_co2_eq_source[1]))]
+                self.inputs_co2_eq = list(map(sum, zip(self.inputs_co2_eq, self.extract_emissions(submodule_emission_set, self.inputs_co2_eq_source[0], self.inputs_co2_eq_source[1]))))
+
+            self.emissions_set += submodule_emission_set
 
     def build_report(self):
         last_results_row = self.results_worksheet.max_row
@@ -1315,10 +1316,10 @@ class InputReport(BaseModuleReport):
         Update: this must be evaluated on a module-by-module basis. For parent modules that have no calculations attached to them, it's easier to just set the emissions to zero. For others, like ForestManagement and the Croplands, more testing is needed
         """
 
-        self.inputs_co2 = np.zeros(self.last_year_of_accounting - self.start_year_of_activities)
-        self.inputs_n2o = np.zeros(self.last_year_of_accounting - self.start_year_of_activities)
-        self.inputs_co2_eq = np.zeros(self.last_year_of_accounting - self.start_year_of_activities)
-        self.feed_co2_eq = np.zeros(self.last_year_of_accounting - self.start_year_of_activities)
+        self.inputs_co2 = np.zeros(self.duration)
+        self.inputs_n2o = np.zeros(self.duration)
+        self.inputs_co2_eq = np.zeros(self.duration)
+        self.feed_co2_eq = np.zeros(self.duration)
 
         self.add_submodules_results()
 
@@ -1367,12 +1368,12 @@ class IrrigationReport(BaseModuleReport):
             if self.module.is_with():
                 submodules_emission_set = calculator.results_w.yearly_emissions_by_sector_by_gas
                 if self.calculator.results_start_w is not None:
-                    submodules_emission_set = [a + b for a, b in zip(submodules_emission_set, calculator.results_start_w.yearly_emissions_by_sector_by_gas)]
+                    submodules_emission_set = list(map(sum, zip(submodules_emission_set, calculator.results_start_w.yearly_emissions_by_sector_by_gas)))
 
             if self.module.is_without():
                 submodules_emission_set = calculator.results_wo.yearly_emissions_by_sector_by_gas
                 if self.calculator.results_start_wo is not None:
-                    submodules_emission_set = [a + b for a, b in zip(submodules_emission_set, calculator.results_start_wo.yearly_emissions_by_sector_by_gas)]
+                    submodules_emission_set = list(map(sum, zip(submodules_emission_set, calculator.results_start_wo.yearly_emissions_by_sector_by_gas)))
 
             self.emissions_set += submodules_emission_set
 
