@@ -3865,10 +3865,11 @@ class BuildingCalculator(BaseCalculator):
             self.inputs_w = {
                 "ef_ipcc": self.ef.value,
                 "ef_tier_2": self.module.ef_t2_w,
-                "area": self.module.area_m2_w,
+                "units_end": self.module.area_m2_w,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
                 "rate_type": self.change_rate.name,
+                "delay": self.activity.delay,
             }
 
             self.math_w = MathRoads(**self.inputs_w)
@@ -3878,10 +3879,11 @@ class BuildingCalculator(BaseCalculator):
             self.inputs_wo = {
                 "ef_ipcc": self.ef.value,
                 "ef_tier_2": self.module.ef_t2_wo,
-                "area": self.module.area_m2_wo,
+                "units_end": self.module.area_m2_wo,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
                 "rate_type": self.change_rate.name,
+                "delay": self.activity.delay,
             }
 
             self.math_wo = MathRoads(**self.inputs_wo)
