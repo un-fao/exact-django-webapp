@@ -124,6 +124,7 @@ from .models import (
     MinorSeasonFloodedRice,
     SingleBiomassModule,
     ChangeRate,
+    AboveBelowGroundBiomassModule,
 )
 from api.utilities import DefaultValue
 
@@ -836,7 +837,7 @@ class DeforestationCalculator(BaseCalculator):
                 self.activity.capitalization_years,
                 change_rate.name,
                 total_biomass_w.value,
-                forest.get_biomass_t2(utils.ScenarioTypes.START),
+                forest.biomass_t2_start,
                 project.gwp.n2o,
                 project.gwp.ch4,
                 luc.is_fire_used_start,
@@ -890,7 +891,7 @@ class DeforestationCalculator(BaseCalculator):
                 self.activity.capitalization_years,
                 change_rate.name,
                 total_biomass_wo.value,
-                forest.get_biomass_t2(utils.ScenarioTypes.START),
+                forest.biomass_t2_start,
                 project.gwp.n2o,
                 project.gwp.ch4,
                 luc.is_fire_used_start,
@@ -973,9 +974,9 @@ class OtherLandUseCalculator(BaseCalculator):
         }
 
         module_start, module_w, module_wo = luc.get_modules()
-        module_start: LandModule | SingleBiomassModule
-        module_w: LandModule | SingleBiomassModule
-        module_wo: LandModule | SingleBiomassModule
+        module_start: SingleBiomassModule | AboveBelowGroundBiomassModule
+        module_w: SingleBiomassModule | AboveBelowGroundBiomassModule
+        module_wo: SingleBiomassModule | AboveBelowGroundBiomassModule
 
         ready = all(module.status == StatusType.objects.get(name="READY") for module in [module_start, module_w, module_wo])
         if not ready:
@@ -1482,8 +1483,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "biomass_start_default": self.biomass_ef_start_wo.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
                 "calculate_biomass": self.calculate_biomass_start_wo,
-                "biomass_start_tier_2": self.module_w.biomass_t2_start,
-                "biomass_end_tier_2": self.module_w.biomass_t2_wo,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
             }
             log.debug("Inputs start wo: %s", self.inputs_start_wo)
 
@@ -1547,7 +1548,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "calculate_biomass": self.calculate_biomass_w,
                 "biomass_start_default": self.biomass_ef_start_w.value,
                 "biomass_end_default": self.biomass_ef_w.value,
-                "biomass_start_tier_2": self.module_w.biomass_t2_start,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
             }
             log.debug("Inputs w: %s", self.inputs_w)
@@ -2216,8 +2217,8 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_w.value,
                 "calculate_biomass": self.calculate_biomass_start_w,
-                "biomass_start_tier_2": self.module.biomass_t2_start,
-                "biomass_end_tier_2": self.module.biomass_t2_w,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_w.biomass_t2_w,
                 "is_minor_season": is_minor_season,
             }
 
@@ -2274,8 +2275,8 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
                 "calculate_biomass": self.calculate_biomass_start_wo,
-                "biomass_start_tier_2": self.module.biomass_t2_start,
-                "biomass_end_tier_2": self.module.biomass_t2_wo,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
                 "is_minor_season": is_minor_season,
             }
 
@@ -2333,8 +2334,8 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "calculate_biomass": self.calculate_biomass_w,
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_w.value,
-                "biomass_start_tier_2": self.module.biomass_t2_start,
-                "biomass_end_tier_2": self.module.biomass_t2_w,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_w.biomass_t2_w,
                 "is_minor_season": is_minor_season,
             }
 
@@ -2392,8 +2393,8 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "calculate_biomass": self.calculate_biomass_wo,
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
-                "biomass_start_tier_2": self.module.biomass_t2_start,
-                "biomass_end_tier_2": self.module.biomass_t2_wo,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
                 "is_minor_season": is_minor_season,
             }
 
@@ -2529,8 +2530,8 @@ class GrasslandCalculator(LandModuleCalculator):
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_w.value,
                 "calculate_biomass": self.calculate_biomass_start_w,
-                "biomass_start_tier_2": module.biomass_t2_start,
-                "biomass_end_tier_2": module.biomass_t2_w,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_w.biomass_t2_w,
                 "fire_impact": module.fire_impact_start,
             }
 
@@ -2577,8 +2578,8 @@ class GrasslandCalculator(LandModuleCalculator):
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
                 "calculate_biomass": self.calculate_biomass_start_wo,
-                "biomass_start_tier_2": module.biomass_t2_start,
-                "biomass_end_tier_2": module.biomass_t2_wo,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
                 "fire_impact": module.fire_impact_start,
             }
 
@@ -2628,8 +2629,8 @@ class GrasslandCalculator(LandModuleCalculator):
                 "calculate_biomass": self.calculate_biomass_w,
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_w.value,
-                "biomass_start_tier_2": module.biomass_t2_start,
-                "biomass_end_tier_2": module.biomass_t2_w,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_w.biomass_t2_w,
                 "fire_impact": module.fire_impact_w,
             }
 
@@ -2679,8 +2680,8 @@ class GrasslandCalculator(LandModuleCalculator):
                 "calculate_biomass": self.calculate_biomass_wo,
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
-                "biomass_start_tier_2": module.biomass_t2_start,
-                "biomass_end_tier_2": module.biomass_t2_wo,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
                 "fire_impact": module.fire_impact_wo,
             }
 
@@ -3679,8 +3680,8 @@ class SettlementCalculator(LandModuleCalculator):
                 "biomass_start_default": self.ef_start.biomass,
                 "biomass_end_default": self.ef_w.biomass,
                 "calculate_biomass": self.calculate_biomass_start_w,
-                "biomass_start_tier_2": self.module_start.biomass_t2_start,
-                "biomass_end_tier_2": self.module_w.biomass_t2_w,
+                "biomass_start_tier_2": self.module_start.get_biomass_t2_start(utils.ScenarioTypes.START),
+                "biomass_end_tier_2": self.module_w.get_biomass_t2_w(utils.ScenarioTypes.WITH),
             }
 
             self.math_start_w = MathNotCultivatedLand(**self.inputs_start_w)
@@ -3715,7 +3716,7 @@ class SettlementCalculator(LandModuleCalculator):
                 "biomass_start_default": self.ef_start.biomass,
                 "biomass_end_default": self.ef_wo.biomass,
                 "calculate_biomass": self.calculate_biomass_start_wo,
-                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_start_tier_2": self.module_start.get_biomass_t2_start(utils.ScenarioTypes.START),
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
             }
 
@@ -3753,8 +3754,8 @@ class SettlementCalculator(LandModuleCalculator):
                 "calculate_biomass": self.calculate_biomass_w,
                 "biomass_start_default": self.ef_start.biomass,
                 "biomass_end_default": self.ef_w.biomass,
-                "biomass_start_tier_2": self.module_start.biomass_t2_start,
-                "biomass_end_tier_2": self.module_w.biomass_t2_w,
+                "biomass_start_tier_2": self.module_start.get_biomass_t2_start(utils.ScenarioTypes.START),
+                "biomass_end_tier_2": self.module_w.get_biomass_t2_w(utils.ScenarioTypes.WITH),
             }
 
             self.math_w = MathNotCultivatedLand(**self.inputs_w)
@@ -3791,7 +3792,7 @@ class SettlementCalculator(LandModuleCalculator):
                 "calculate_biomass": self.calculate_biomass_wo,
                 "biomass_start_default": self.ef_start.biomass,
                 "biomass_end_default": self.ef_wo.biomass,
-                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_start_tier_2": self.module_start.get_biomass_t2_start(utils.ScenarioTypes.START),
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
             }
 
@@ -5961,8 +5962,8 @@ class OtherLandCalculator(LandModuleCalculator):
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_w.value,
                 "calculate_biomass": self.calculate_biomass_start_w,
-                "biomass_start_tier_2": self.module.biomass_t2_start,
-                "biomass_end_tier_2": self.module.biomass_t2_w,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_w.biomass_t2_w,
             }
 
             log.debug(f"Inputs start w: {self.inputs_start_w}")
@@ -5999,8 +6000,8 @@ class OtherLandCalculator(LandModuleCalculator):
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
                 "calculate_biomass": self.calculate_biomass_start_wo,
-                "biomass_start_tier_2": self.module.biomass_t2_start,
-                "biomass_end_tier_2": self.module.biomass_t2_wo,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
             }
 
             log.debug(f"Inputs start wo: {self.inputs_start_wo}")
@@ -6038,8 +6039,8 @@ class OtherLandCalculator(LandModuleCalculator):
                 "calculate_biomass": self.calculate_biomass_w,
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_w.value,
-                "biomass_start_tier_2": self.module.biomass_t2_start,
-                "biomass_end_tier_2": self.module.biomass_t2_w,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_w.biomass_t2_w,
             }
 
             log.debug(f"Inputs w: {self.inputs_w}")
@@ -6077,8 +6078,8 @@ class OtherLandCalculator(LandModuleCalculator):
                 "calculate_biomass": self.calculate_biomass_wo,
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
-                "biomass_start_tier_2": self.module.biomass_t2_start,
-                "biomass_end_tier_2": self.module.biomass_t2_wo,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
             }
 
             log.debug(f"Inputs wo: {self.inputs_wo}")
@@ -6141,8 +6142,8 @@ class SetAsideCalculator(LandModuleCalculator):
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_w.value,
                 "calculate_biomass": self.calculate_biomass_start_w,
-                "biomass_start_tier_2": self.module.biomass_t2_start,
-                "biomass_end_tier_2": self.module.biomass_t2_w,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_w.biomass_t2_w,
             }
 
             self.math_start_w = MathNotCultivatedLand(**self.inputs_start_w)
@@ -6177,8 +6178,8 @@ class SetAsideCalculator(LandModuleCalculator):
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
                 "calculate_biomass": self.calculate_biomass_start_wo,
-                "biomass_start_tier_2": self.module.biomass_t2_start,
-                "biomass_end_tier_2": self.module.biomass_t2_wo,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
             }
 
             self.math_start_wo = MathNotCultivatedLand(**self.inputs_start_wo)
@@ -6214,8 +6215,8 @@ class SetAsideCalculator(LandModuleCalculator):
                 "calculate_biomass": self.calculate_biomass_w,
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_w.value,
-                "biomass_start_tier_2": self.module.biomass_t2_start,
-                "biomass_end_tier_2": self.module.biomass_t2_w,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_w.biomass_t2_w,
             }
 
             self.math_w = MathNotCultivatedLand(**self.inputs_w)
@@ -6251,8 +6252,8 @@ class SetAsideCalculator(LandModuleCalculator):
                 "calculate_biomass": self.calculate_biomass_wo,
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
-                "biomass_start_tier_2": self.module.biomass_t2_start,
-                "biomass_end_tier_2": self.module.biomass_t2_wo,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
             }
 
             self.math_wo = MathNotCultivatedLand(**self.inputs_wo)
