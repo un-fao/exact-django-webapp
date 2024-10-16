@@ -575,7 +575,7 @@ class PerennialCroplandReport(LandModuleReport):
     def add_minor_seasons_results(self):
         minor_seasons = getattr(self.module, "minor_seasons", [])
 
-        for minor_season in minor_seasons:
+        for minor_season in minor_seasons.all():
             log.debug(f"Building report for minor season {minor_season.name}")
 
             minor_calculator = calculators.PerennialCropCalculator(minor_season)
@@ -622,7 +622,7 @@ class AnnualCroplandReport(LandModuleReport):
     def add_minor_seasons_results(self):
         minor_seasons = getattr(self.module, "submodules", [])
 
-        for minor_season in minor_seasons:
+        for minor_season in minor_seasons.all():
             log.debug(f"Building report for minor season {minor_season.name}")
 
             minor_calculator = calculators.AnnualCropCalculator(minor_season)
@@ -822,7 +822,7 @@ class FloodedRiceReport(LandModuleReport):
     def add_minor_seasons_results(self):
         minor_seasons = getattr(self.module, "submodules", [])
 
-        for minor_season in minor_seasons:
+        for minor_season in minor_seasons.all():
             log.debug(f"Building report for minor season {minor_season.name}")
 
             minor_calculator = calculators.FloodedRiceCalculator(minor_season)
