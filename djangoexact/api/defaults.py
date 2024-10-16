@@ -1254,10 +1254,10 @@ class ForestManagementDefaults(Defaults):
             logging_start_year_w_default=defaults.activity.start_year_t2 - defaults.project.start_year_of_activities if defaults.activity.start_year_t2 else 0,
             logging_start_year_wo_default=defaults.activity.start_year_t2 - defaults.project.start_year_of_activities if defaults.activity.start_year_t2 else 0,
             # TODO: This was removed. Will be added again, so do not remove from database model yet
-            # logging_dry_matter_logged_start_default=0,  # TODO: Ask Lorenzo
-            # logging_dry_matter_logged_w_default=0,  # TODO: Ask Lorenzo
-            # logging_dry_matter_logged_wo_default=0,  # TODO: Ask Lorenzo
-            # degradation_dry_matter_impacted_start_default=0,  # TODO: Ask Lorenzo
-            # degradation_dry_matter_impacted_w_default=0,  # TODO: Ask Lorenzo
-            # degradation_dry_matter_impacted_wo_default=0,  # TODO: Ask Lorenzo
+            # logging_dry_matter_logged_start_default=0,
+            # logging_dry_matter_logged_w_default=0,
+            # logging_dry_matter_logged_wo_default=0,
+            # degradation_dry_matter_impacted_start_default=0,
+            # degradation_dry_matter_impacted_w_default=0,
+            # degradation_dry_matter_impacted_wo_default=0,
         )
