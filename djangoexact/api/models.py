@@ -593,7 +593,7 @@ class Project(Historical):
             for module in activity.modules:
                 if not module.is_ready():
                     return False
-        return True    
+        return True
 
     def lock(self, user: CustomUser):
         self.is_locked = True
@@ -1045,6 +1045,18 @@ class BiomassModule(Module):
     class Meta:
         abstract = True
 
+    @property
+    def biomass_t2_start(self):
+        raise NotImplementedError("Biomass modules must implement the biomass_t2_start property")
+
+    @property
+    def biomass_t2_w(self):
+        raise NotImplementedError("Biomass modules must implement the biomass_t2_w property")
+
+    @property
+    def biomass_t2_wo(self):
+        raise NotImplementedError("Biomass modules must implement the biomass_t2_wo property")
+
 
 class BiomassMixin(models.Model):
     biomass_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("biomass_t2_start"))
@@ -1053,6 +1065,18 @@ class BiomassMixin(models.Model):
 
     class Meta:
         abstract = True
+
+    @property
+    def biomass_t2_start(self):
+        return self.get_biomass_t2(utils.ScenarioTypes.START)
+
+    @property
+    def biomass_t2_w(self):
+        return self.get_biomass_t2(utils.ScenarioTypes.WITH)
+
+    @property
+    def biomass_t2_wo(self):
+        return self.get_biomass_t2(utils.ScenarioTypes.WITHOUT)
 
     def get_biomass_t2(self, scenario: utils.ScenarioTypes):
         return getattr(self, f"biomass_t2_{scenario.value}", None)
@@ -1125,6 +1149,18 @@ class AboveBelowGroundBiomassModule(BiomassModule):
     class Meta:
         abstract = True
 
+    @property
+    def biomass_t2_start(self):
+        return self.get_biomass_t2(utils.ScenarioTypes.START)
+
+    @property
+    def biomass_t2_w(self):
+        return self.get_biomass_t2(utils.ScenarioTypes.WITH)
+
+    @property
+    def biomass_t2_wo(self):
+        return self.get_biomass_t2(utils.ScenarioTypes.WITHOUT)
+
     def get_biomass_t2(self, scenario: utils.ScenarioTypes):
 
         if getattr(self, f"agb_t2_{scenario.value}", None) is None and getattr(self, f"bgb_t2_{scenario.value}", None) is None:
@@ -1170,6 +1206,18 @@ class LitterDeadwoodBiomassModule(AboveBelowGroundBiomassModule):
 
     class Meta:
         abstract = True
+
+    @property
+    def biomass_t2_start(self):
+        return self.get_biomass_t2(utils.ScenarioTypes.START)
+
+    @property
+    def biomass_t2_w(self):
+        return self.get_biomass_t2(utils.ScenarioTypes.WITH)
+
+    @property
+    def biomass_t2_wo(self):
+        return self.get_biomass_t2(utils.ScenarioTypes.WITHOUT)
 
     def get_biomass_t2(self, scenario: utils.ScenarioTypes):
 
