@@ -447,15 +447,15 @@ class FuelDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            ef_co2_t2_start_default=defaults.ef_co2,
-            ef_co2_t2_w_default=defaults.ef_co2,
-            ef_co2_t2_wo_default=defaults.ef_co2,
-            ef_n2o_t2_start_default=defaults.ef_n2o,
-            ef_n2o_t2_w_default=defaults.ef_n2o,
-            ef_n2o_t2_wo_default=defaults.ef_n2o,
-            ef_ch4_t2_start_default=defaults.ef_ch4,
-            ef_ch4_t2_w_default=defaults.ef_ch4,
-            ef_ch4_t2_wo_default=defaults.ef_ch4,
+            ef_co2_t2_start_default=defaults.energy_ef_default.co2,
+            ef_co2_t2_w_default=defaults.energy_ef_default.co2,
+            ef_co2_t2_wo_default=defaults.energy_ef_default.co2,
+            ef_n2o_t2_start_default=defaults.energy_ef_default.n2o,
+            ef_n2o_t2_w_default=defaults.energy_ef_default.n2o,
+            ef_n2o_t2_wo_default=defaults.energy_ef_default.n2o,
+            ef_ch4_t2_start_default=defaults.energy_ef_default.ch4,
+            ef_ch4_t2_w_default=defaults.energy_ef_default.ch4,
+            ef_ch4_t2_wo_default=defaults.energy_ef_default.ch4,
         )
 
 
