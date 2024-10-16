@@ -91,7 +91,9 @@ class CoastalWetland(BaseModule):
                     # soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_soil_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
                     # self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
 
-                    biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(emissions_biomass_total_drainage, GasTypes.CO2)], ActivityTypes.BIOMASS, delay=self.delay)
+                    emissions_biomass_yearly = breakdown_according_to_values(emissions_biomass_total_drainage, self.hectares_drained)
+
+                    biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_biomass_yearly], ActivityTypes.BIOMASS, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
 
                 except Exception as e:
