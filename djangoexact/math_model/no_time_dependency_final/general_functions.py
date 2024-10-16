@@ -162,10 +162,11 @@ def yearly_constant_emissions_breakdown(total_emissions, years_implementation, y
     return yearly_breakdown
 
 
-def yearly_time_dependent_20_year_breakdown(start_value, end_value, years_implementation, years_capitalization, function):
+def yearly_time_dependent_20_year_breakdown(start_value, end_value, years_implementation, years_capitalization, function, number_of_years=20):
+    # NOTE: this function is used to calculate the average yearly value of the breakdown for soil, but not it is also used for other cases, hence why number_of_years is added instead of only 20
     breakdown = yearly_time_dependent_parameter_breakdown(start_value, end_value, years_implementation, years_capitalization, function, interim_values=False)
 
-    after_20 = [0 for i in range(21)]
+    after_20 = [0 for i in range(number_of_years + 1)]
     after_20.extend(breakdown)
 
     before_20 = [i - j for i, j in zip(breakdown, after_20[0 : len(breakdown)])]
