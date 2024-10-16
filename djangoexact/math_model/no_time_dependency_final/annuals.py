@@ -1,14 +1,6 @@
 import traceback
 
-from .general_functions import (
-    breakdown_according_to_values,
-    soil_emissions_2,
-    som_emissions,
-    yearly_constant_emissions_breakdown,
-    yearly_time_dependent_20_year_breakdown,
-    yearly_time_dependent_parameter_breakdown,
-    biomass_emissions
-)
+from .general_functions import breakdown_according_to_values, soil_emissions_2, som_emissions, yearly_constant_emissions_breakdown, yearly_time_dependent_20_year_breakdown, yearly_time_dependent_parameter_breakdown, biomass_emissions
 from .ghg_emissions_classes import (
     ActivityTypes,
     Emission,
@@ -21,6 +13,8 @@ from .generalized_modules import LandModule
 
 from dataclasses import dataclass
 from typing import Optional
+
+
 @dataclass
 class AnnualCropland(LandModule):
 
@@ -28,13 +22,13 @@ class AnnualCropland(LandModule):
     methane_constant: float
     ef_methane_agr_residues_main: float
     combustion_factor_main: float
-    residue_main_tier_2: Optional [float]
+    residue_main_tier_2: Optional[float]
     n_estimation_slope_main: float
     n_estimation_intercept_main: float
     yield_value_main: float
     ef_methane_agr_residues_minor: float
     combustion_factor_minor: float
-    residue_minor_tier_2: Optional [float]
+    residue_minor_tier_2: Optional[float]
     n_estimation_slope_minor: float
     n_estimation_intercept_minor: float
     yield_value_minor: float
@@ -58,9 +52,11 @@ class AnnualCropland(LandModule):
         self.yield_minor = self.yield_minor_tier_2 or self.yield_value_minor
 
         # NOTE: this is a default value that is calculated based on the input values, needed for the frontend
-        self.ag_residue_main_tier_2_default = self.yield_main * self.n_estimation_slope_main + self.n_estimation_intercept_main
-        self.ag_residue_minor_tier_2_default = self.yield_minor * self.n_estimation_slope_minor + self.n_estimation_intercept_minor
-        
+        if self.yield_value_main is not None:
+            self.ag_residue_main_tier_2_default = self.yield_main * self.n_estimation_slope_main + self.n_estimation_intercept_main
+        if self.yield_value_minor is not None:
+            self.ag_residue_minor_tier_2_default = self.yield_minor * self.n_estimation_slope_minor + self.n_estimation_intercept_minor
+
     def calculate_emissions(self):
         def calculate_emissions_soil():
             try:
@@ -149,7 +145,7 @@ class AnnualCropland(LandModule):
                     emissions_biomass_yearly, emissions_biomass_total = biomass_emissions(self.biomass_start, self.biomass_end, self.hectares_start, self.hectares_end, self.rate_type, self.implementation_time, self.capitalization_time)
                     biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_biomass_yearly], ActivityTypes.BIOMASS, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
-                else: 
+                else:
                     pass
 
             except Exception as e:
@@ -159,5 +155,3 @@ class AnnualCropland(LandModule):
         calculate_emissions_som()
         calculate_emissions_residue_burning()
         calculate_biomass_emissions()
-
-

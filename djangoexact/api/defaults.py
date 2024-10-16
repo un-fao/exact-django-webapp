@@ -84,9 +84,9 @@ class GrasslandDefaults(Defaults):
             soc_t2_start_default=defaults.soc.value,
             soc_t2_w_default=defaults.soc.value,
             soc_t2_wo_default=defaults.soc.value,
-            biomass_t2_start_default=defaults.biomass.value,
-            biomass_t2_w_default=defaults.biomass.value,
-            biomass_t2_wo_default=defaults.biomass.value,
+            biomass_t2_start_default=defaults.biomass.agb_t_c_ha,
+            biomass_t2_w_default=defaults.biomass.agb_t_c_ha,
+            biomass_t2_wo_default=defaults.biomass.agb_t_c_ha,
             combustion_factor_t2_start_default=defaults.cf.value,
             combustion_factor_t2_w_default=defaults.cf.value,
             combustion_factor_t2_wo_default=defaults.cf.value,
@@ -413,10 +413,10 @@ class ElectricityDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            ef_source_default=defaults.ef_source,
-            ef_t2_start_default=defaults.ef_country,
-            ef_t2_w_default=defaults.ef_country,
-            ef_t2_wo_default=defaults.ef_country,
+            ef_source_default=defaults.electricity_ef_default.country.name,
+            ef_t2_start_default=defaults.electricity_ef_selected.value,
+            ef_t2_w_default=defaults.electricity_ef_selected.value,
+            ef_t2_wo_default=defaults.electricity_ef_selected.value,
             transmission_loss_start_default=defaults.TRANSMISSION_LOSS,
             transmission_loss_w_default=defaults.TRANSMISSION_LOSS,
             transmission_loss_wo_default=defaults.TRANSMISSION_LOSS,
@@ -447,15 +447,15 @@ class FuelDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            ef_co2_t2_start_default=defaults.ef_co2,
-            ef_co2_t2_w_default=defaults.ef_co2,
-            ef_co2_t2_wo_default=defaults.ef_co2,
-            ef_n2o_t2_start_default=defaults.ef_n2o,
-            ef_n2o_t2_w_default=defaults.ef_n2o,
-            ef_n2o_t2_wo_default=defaults.ef_n2o,
-            ef_ch4_t2_start_default=defaults.ef_ch4,
-            ef_ch4_t2_w_default=defaults.ef_ch4,
-            ef_ch4_t2_wo_default=defaults.ef_ch4,
+            ef_co2_t2_start_default=defaults.energy_ef_default.co2,
+            ef_co2_t2_w_default=defaults.energy_ef_default.co2,
+            ef_co2_t2_wo_default=defaults.energy_ef_default.co2,
+            ef_n2o_t2_start_default=defaults.energy_ef_default.n2o,
+            ef_n2o_t2_w_default=defaults.energy_ef_default.n2o,
+            ef_n2o_t2_wo_default=defaults.energy_ef_default.n2o,
+            ef_ch4_t2_start_default=defaults.energy_ef_default.ch4,
+            ef_ch4_t2_w_default=defaults.energy_ef_default.ch4,
+            ef_ch4_t2_wo_default=defaults.energy_ef_default.ch4,
         )
 
 
@@ -493,15 +493,15 @@ class LargeFisheryDefaults(Defaults):
         super().__init__(input)
 
         self.values = SimpleNamespace(
-            energy_ef_default_co2_start=0,
-            energy_ef_default_co2_w=0,
-            energy_ef_default_co2_wo=0,
-            energy_ef_default_n2o_start=0,
-            energy_ef_default_n2o_w=0,
-            energy_ef_default_n2o_wo=0,
-            energy_ef_default_ch4_start=0,
-            energy_ef_default_ch4_w=0,
-            energy_ef_default_ch4_wo=0,
+            energy_ef_co2_start_default=0,
+            energy_ef_co2_w_default=0,
+            energy_ef_co2_wo_default=0,
+            energy_ef_n2o_start_default=0,
+            energy_ef_n2o_w_default=0,
+            energy_ef_n2o_wo_default=0,
+            energy_ef_ch4_start_default=0,
+            energy_ef_ch4_w_default=0,
+            energy_ef_ch4_wo_default=0,
             refrigerant_lost_per_tonne_t2_start_default=0,
             refrigerant_lost_per_tonne_t2_w_default=0,
             refrigerant_lost_per_tonne_t2_wo_default=0,
@@ -523,15 +523,15 @@ class LargeFisheryDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            energy_ef_default_co2_start=defaults.energy_ef_default_co2,
-            energy_ef_default_co2_w=defaults.energy_ef_default_co2,
-            energy_ef_default_co2_wo=defaults.energy_ef_default_co2,
-            energy_ef_default_n2o_start=defaults.energy_ef_default_n2o,
-            energy_ef_default_n2o_w=defaults.energy_ef_default_n2o,
-            energy_ef_default_n2o_wo=defaults.energy_ef_default_n2o,
-            energy_ef_default_ch4_start=defaults.energy_ef_default_ch4,
-            energy_ef_default_ch4_w=defaults.energy_ef_default_ch4,
-            energy_ef_default_ch4_wo=defaults.energy_ef_default_ch4,
+            energy_ef_co2_start_default=defaults.energy_ef_default_co2,
+            energy_ef_co2_w_default=defaults.energy_ef_default_co2,
+            energy_ef_co2_wo_default=defaults.energy_ef_default_co2,
+            energy_ef_n2o_start_default=defaults.energy_ef_default_n2o,
+            energy_ef_n2o_w_default=defaults.energy_ef_default_n2o,
+            energy_ef_n2o_wo_default=defaults.energy_ef_default_n2o,
+            energy_ef_ch4_start_default=defaults.energy_ef_default_ch4,
+            energy_ef_ch4_w_default=defaults.energy_ef_default_ch4,
+            energy_ef_ch4_wo_default=defaults.energy_ef_default_ch4,
             refrigerant_lost_per_tonne_t2_start_default=defaults.lost_refrigerant_default,
             refrigerant_lost_per_tonne_t2_w_default=defaults.lost_refrigerant_default,
             refrigerant_lost_per_tonne_t2_wo_default=defaults.lost_refrigerant_default,
@@ -1104,9 +1104,9 @@ class SetAsideDefaults(Defaults):
             fmg_t2_start_default=defaults.fmg_start.value,
             fmg_t2_w_default=defaults.fmg_w.value,
             fmg_t2_wo_default=defaults.fmg_wo.value,
-            biomass_t2_start_default=defaults.biomass_start.value,
-            biomass_t2_w_default=defaults.biomass_w.value,
-            biomass_t2_wo_default=defaults.biomass_wo.value,
+            biomass_t2_start_default=defaults.biomass_ef_start.value,
+            biomass_t2_w_default=defaults.biomass_ef_w.value,
+            biomass_t2_wo_default=defaults.biomass_ef_wo.value,
         )
 
 
@@ -1254,10 +1254,10 @@ class ForestManagementDefaults(Defaults):
             logging_start_year_w_default=defaults.activity.start_year_t2 - defaults.project.start_year_of_activities if defaults.activity.start_year_t2 else 0,
             logging_start_year_wo_default=defaults.activity.start_year_t2 - defaults.project.start_year_of_activities if defaults.activity.start_year_t2 else 0,
             # TODO: This was removed. Will be added again, so do not remove from database model yet
-            # logging_dry_matter_logged_start_default=0,  # TODO: Ask Lorenzo
-            # logging_dry_matter_logged_w_default=0,  # TODO: Ask Lorenzo
-            # logging_dry_matter_logged_wo_default=0,  # TODO: Ask Lorenzo
-            # degradation_dry_matter_impacted_start_default=0,  # TODO: Ask Lorenzo
-            # degradation_dry_matter_impacted_w_default=0,  # TODO: Ask Lorenzo
-            # degradation_dry_matter_impacted_wo_default=0,  # TODO: Ask Lorenzo
+            # logging_dry_matter_logged_start_default=0,
+            # logging_dry_matter_logged_w_default=0,
+            # logging_dry_matter_logged_wo_default=0,
+            # degradation_dry_matter_impacted_start_default=0,
+            # degradation_dry_matter_impacted_w_default=0,
+            # degradation_dry_matter_impacted_wo_default=0,
         )

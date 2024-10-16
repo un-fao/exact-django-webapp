@@ -91,7 +91,9 @@ class CoastalWetland(BaseModule):
                     # soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_soil_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
                     # self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
 
-                    biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(emissions_biomass_total_drainage, GasTypes.CO2)], ActivityTypes.BIOMASS, delay=self.delay)
+                    emissions_biomass_yearly = breakdown_according_to_values(emissions_biomass_total_drainage, self.hectares_drained)
+
+                    biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_biomass_yearly], ActivityTypes.BIOMASS, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
 
                 except Exception as e:
@@ -106,15 +108,27 @@ class CoastalWetland(BaseModule):
                     maximum_soil_years = 1000 if EF_drainage == 0 else int(soil_1m / EF_drainage)
                     maximum_soil_emissions = soil_1m * 44 / 12
 
+                    drainage_before_n_years, drainage_after_n_years = yearly_time_dependent_20_year_breakdown(0, 
+                                                                                                              self.area_drained_end, 
+                                                                                                              self.implementation_time, 
+                                                                                                              self.capitalization_time, 
+                                                                                                              self.rate_type, 
+                                                                                                              number_of_years=maximum_soil_years)
+
                     # NOTE: This is different to what is done in the excel, however I think it is correct this way. If we were to do it like the excel
                     # we would have to recalculate the hectares according to min(maximum_soil_years, self.implementation_time + self.capitalization_time)
                     # and multiply by sum(that) instead of what we are doing now
-                    calculated = EF_drainage * 44 / 12 * sum(self.hectares_drained[:min(maximum_soil_years, self.implementation_time + self.capitalization_time)])
+
+                    # The NOTE above is kept for future reference, however the approach was changed. Now we calculate similarly to SOC emissions, as each single 
+                    # piece of land can generate emissions only for a maximum years given by the the maximum_soil_years parameter, after that the emissions are not 
+                    # generated anymore.
+
+                    calculated = EF_drainage * 44 / 12 * sum(drainage_before_n_years)
                     maximum = max(0, self.area_drained_end) * maximum_soil_emissions
 
                     total = calculated if abs(calculated) < abs(maximum) else maximum
 
-                    emissions_soil_yearly_drainage = breakdown_according_to_values(total, self.hectares_drained)
+                    emissions_soil_yearly_drainage = breakdown_according_to_values(total, drainage_before_n_years)
 
                     soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_soil_yearly_drainage], ActivityTypes.DRAINAGE, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
