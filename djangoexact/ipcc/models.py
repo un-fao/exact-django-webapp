@@ -110,7 +110,7 @@ class LitterDeadwoodCarbonStock(Model):
     dw = FloatField()
 
     def __str__(self):
-        return f"{self.land_use_type.name}, litter: {self.litter}, dw: {self.dw}"
+        return f"{self.forest_type.name} {self.land_use_type.name}, {self.climate.name} - litter: {self.litter}, dw: {self.dw}"
 
 
 class LandUseCarbonStockExchangeFactorManager(Manager):
