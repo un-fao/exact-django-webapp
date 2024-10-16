@@ -124,6 +124,7 @@ from .models import (
     MinorSeasonFloodedRice,
     SingleBiomassModule,
     ChangeRate,
+    AboveBelowGroundBiomassModule,
 )
 from api.utilities import DefaultValue
 
@@ -559,8 +560,16 @@ class LandModuleCalculator(BaseCalculator):
         self.module_wo: LandModule | SingleBiomassModule
 
         self.biomass_ef_start: ipcc.ForestTotalBiomass = ipcc.ForestTotalBiomass(value=0)
+
+        self.biomass_ef_start_w: ipcc.TotalBiomassAfterDefo = ipcc.TotalBiomassAfterDefo(value=0)
+        self.biomass_ef_start_wo: ipcc.TotalBiomassAfterDefo = ipcc.TotalBiomassAfterDefo(value=0)
         self.biomass_ef_w: ipcc.TotalBiomassAfterDefo = ipcc.TotalBiomassAfterDefo(value=0)
         self.biomass_ef_wo: ipcc.TotalBiomassAfterDefo = ipcc.TotalBiomassAfterDefo(value=0)
+
+        self.calculate_biomass_start_w = False
+        self.calculate_biomass_start_wo = False
+        self.calculate_biomass_w = not (self.module.is_start() and self.module.is_with())
+        self.calculate_biomass_wo = not (self.module.is_start() and self.module.is_without())
 
         self.soc_start = self.soc_w = self.soc_wo = ipcc.SoilOrganicCarbon()
 
@@ -619,16 +628,15 @@ class LandModuleCalculator(BaseCalculator):
         self.fmg_wo = get_fmg_data(self.module_wo, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
         self.flu_wo = get_flu_data(self.module_wo, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
 
-        if self.module.is_start():
-            self.biomass_ef_start = self.module.get_biomass_ef(utils.ScenarioTypes.START)
-        if self.module.is_with():
-            self.biomass_ef_w = self.module.get_biomass_ef(utils.ScenarioTypes.WITH)
-        if self.module.is_without():
-            self.biomass_ef_wo = self.module.get_biomass_ef(utils.ScenarioTypes.WITHOUT)
-
-        # NOTE: Added to take into account biomass growth in final land use
-        if self.luc and self.module.is_with() or self.module.is_without():
-            self.biomass_ef_start.value = 0
+        if isinstance(self.module, SingleBiomassModule):
+            if self.module.is_start() and self.module.is_with():
+                self.biomass_ef_start_w = self.module_start.get_biomass_ef(utils.ScenarioTypes.START)
+            if self.module.is_start() and self.module.is_without():
+                self.biomass_ef_start_wo = self.module_start.get_biomass_ef(utils.ScenarioTypes.START)
+            if self.module.is_with():
+                self.biomass_ef_w = self.module_w.get_biomass_ef(utils.ScenarioTypes.WITH)
+            if self.module.is_without():
+                self.biomass_ef_wo = self.module_wo.get_biomass_ef(utils.ScenarioTypes.WITHOUT)
 
 
 class LandUseChangeCalculator(BaseCalculator):
@@ -829,7 +837,7 @@ class DeforestationCalculator(BaseCalculator):
                 self.activity.capitalization_years,
                 change_rate.name,
                 total_biomass_w.value,
-                forest.get_biomass_t2(utils.ScenarioTypes.START),
+                forest.biomass_t2_start,
                 project.gwp.n2o,
                 project.gwp.ch4,
                 luc.is_fire_used_start,
@@ -883,7 +891,7 @@ class DeforestationCalculator(BaseCalculator):
                 self.activity.capitalization_years,
                 change_rate.name,
                 total_biomass_wo.value,
-                forest.get_biomass_t2(utils.ScenarioTypes.START),
+                forest.biomass_t2_start,
                 project.gwp.n2o,
                 project.gwp.ch4,
                 luc.is_fire_used_start,
@@ -966,9 +974,9 @@ class OtherLandUseCalculator(BaseCalculator):
         }
 
         module_start, module_w, module_wo = luc.get_modules()
-        module_start: LandModule | SingleBiomassModule
-        module_w: LandModule | SingleBiomassModule
-        module_wo: LandModule | SingleBiomassModule
+        module_start: SingleBiomassModule | AboveBelowGroundBiomassModule
+        module_w: SingleBiomassModule | AboveBelowGroundBiomassModule
+        module_wo: SingleBiomassModule | AboveBelowGroundBiomassModule
 
         ready = all(module.status == StatusType.objects.get(name="READY") for module in [module_start, module_w, module_wo])
         if not ready:
@@ -1175,25 +1183,6 @@ class OtherLandUseCalculator(BaseCalculator):
 
     def get_defaults(self, calculate=False) -> dict:
         return super().get_defaults(calculate)
-
-
-class AnnualCroplandCalculator(BaseCalculator):
-
-    def get_defaults(self, input: Module) -> dict:
-        return AnnualCropCalculator(input).get_defaults()
-
-    def calculate(self):
-        module: AnnualCropland = self.data
-
-        res_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        res_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-
-        r_w, r_wo = AnnualCropCalculator(module).calculate()
-
-        res_w += r_w
-        res_wo += r_wo
-
-        return (res_w, res_wo)
 
 
 class AnnualCropCalculator(LandModuleCalculator):
@@ -1410,12 +1399,14 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "n_estimation_slope_main": self.n_estimation_factor_start.slope,
                 "n_estimation_intercept_main": self.n_estimation_factor_start.intercept,
                 "yield_value_main": self.crop_yield_start.average,
+                "yield_main_tier_2": self.module.crop_yield_t2_w,
                 "ef_methane_agr_residues_minor": self.minor_burning_emission_factor.ch4,
                 "combustion_factor_minor": self.minor_fires_start.value,
                 "residue_minor_tier_2": self.module.minor_biomass_factor_t2_start,
                 "n_estimation_slope_minor": self.minor_n_estimation_factor_start.slope,
                 "n_estimation_intercept_minor": self.minor_n_estimation_factor_start.intercept,
-                "yield_value_minor": self.module.minor_yield_start,
+                "yield_value_minor": self.module.minor_yield_w,
+                "yield_minor_tier_2": self.module.crop_yield_t2_w,
                 "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_start.name == "Burned" else None,
                 "retained_main": self.module.residue_management_type_start.name == "Retained",
                 "ef_nitrous_agr_residues_minor": self.minor_burning_emission_factor.n2o,
@@ -1427,9 +1418,9 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "ratio_bg_ag_minor": self.minor_n_estimation_factor_start.rs_t,
                 "n_content_bg_minor": self.minor_n_estimation_factor_start.n_bg_t,
                 "delay": self.activity.delay,
-                "biomass_start_default": self.biomass_ef_start.value,
+                "biomass_start_default": self.biomass_ef_start_w.value,
                 "biomass_end_default": self.biomass_ef_w.value,
-                "calculate_biomass": False,
+                "calculate_biomass": self.calculate_biomass_start_w,
                 "biomass_start_tier_2": self.module_w.biomass_t2_start,
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
             }
@@ -1470,12 +1461,14 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "n_estimation_slope_main": self.n_estimation_factor_start.slope,
                 "n_estimation_intercept_main": self.n_estimation_factor_start.intercept,
                 "yield_value_main": self.crop_yield_start.average,
+                "yield_main_tier_2": self.module.crop_yield_t2_wo,
                 "ef_methane_agr_residues_minor": self.minor_burning_emission_factor.ch4,
                 "combustion_factor_minor": self.minor_fires_start.value,
                 "residue_minor_tier_2": self.module.minor_biomass_factor_t2_start,
                 "n_estimation_slope_minor": self.minor_n_estimation_factor_start.slope,
                 "n_estimation_intercept_minor": self.minor_n_estimation_factor_start.intercept,
-                "yield_value_minor": self.module.minor_yield_start,
+                "yield_value_minor": self.module.minor_yield_wo,
+                "yield_minor_tier_2": self.module.crop_yield_t2_wo,
                 "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_start.name == "Burned" else None,
                 "retained_main": self.module.residue_management_type_start.name == "Retained",
                 "ef_nitrous_agr_residues_minor": self.minor_burning_emission_factor.n2o,
@@ -1487,11 +1480,11 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "ratio_bg_ag_minor": self.minor_n_estimation_factor_start.rs_t,
                 "n_content_bg_minor": self.minor_n_estimation_factor_start.n_bg_t,
                 "delay": self.activity.delay,
-                "biomass_start_default": self.biomass_ef_start.value,
+                "biomass_start_default": self.biomass_ef_start_wo.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
-                "calculate_biomass": False,
-                "biomass_start_tier_2": self.module_w.biomass_t2_start,
-                "biomass_end_tier_2": self.module_w.biomass_t2_wo,
+                "calculate_biomass": self.calculate_biomass_start_wo,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
             }
             log.debug("Inputs start wo: %s", self.inputs_start_wo)
 
@@ -1533,12 +1526,14 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "n_estimation_slope_main": self.n_estimation_factor_w.slope,
                 "n_estimation_intercept_main": self.n_estimation_factor_w.intercept,
                 "yield_value_main": self.crop_yield_w.average,
+                "yield_main_tier_2": self.module.crop_yield_t2_w,
                 "ef_methane_agr_residues_minor": self.minor_burning_emission_factor.ch4,
                 "combustion_factor_minor": self.minor_fires_w.value,
                 "residue_minor_tier_2": self.module.minor_biomass_factor_t2_w,
                 "n_estimation_slope_minor": self.minor_n_estimation_factor_w.slope,
                 "n_estimation_intercept_minor": self.minor_n_estimation_factor_w.intercept,
                 "yield_value_minor": self.module.minor_yield_w,
+                "yield_minor_tier_2": self.module.crop_yield_t2_w,
                 "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_w.name == "Burned" else None,
                 "retained_main": self.module.residue_management_type_w.name == "Retained",
                 "ef_nitrous_agr_residues_minor": self.minor_burning_emission_factor.n2o,
@@ -1550,10 +1545,10 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "ratio_bg_ag_minor": self.minor_n_estimation_factor_w.rs_t,
                 "n_content_bg_minor": self.minor_n_estimation_factor_w.n_bg_t,
                 "delay": self.activity.delay,
-                "calculate_biomass": self.module.is_luc_remaining_same(),
-                "biomass_start_default": self.biomass_ef_start.value,
+                "calculate_biomass": self.calculate_biomass_w,
+                "biomass_start_default": self.biomass_ef_start_w.value,
                 "biomass_end_default": self.biomass_ef_w.value,
-                "biomass_start_tier_2": self.module_w.biomass_t2_start,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_w.biomass_t2_w,
             }
             log.debug("Inputs w: %s", self.inputs_w)
@@ -1596,12 +1591,14 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "n_estimation_slope_main": self.n_estimation_factor_wo.slope,
                 "n_estimation_intercept_main": self.n_estimation_factor_wo.intercept,
                 "yield_value_main": self.crop_yield_wo.average,
+                "yield_main_tier_2": self.module.crop_yield_t2_wo,
                 "ef_methane_agr_residues_minor": self.minor_burning_emission_factor.ch4,
                 "combustion_factor_minor": self.minor_fires_wo.value,
                 "residue_minor_tier_2": self.module.minor_biomass_factor_t2_wo,
                 "n_estimation_slope_minor": self.minor_n_estimation_factor_wo.slope,
                 "n_estimation_intercept_minor": self.minor_n_estimation_factor_wo.intercept,
                 "yield_value_minor": self.module.minor_yield_wo,
+                "yield_minor_tier_2": self.module.crop_yield_t2_wo,
                 "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_wo.name == "Burned" else None,
                 "retained_main": self.module.residue_management_type_wo.name == "Retained",
                 "ef_nitrous_agr_residues_minor": self.minor_burning_emission_factor.n2o,
@@ -1613,8 +1610,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "ratio_bg_ag_minor": self.minor_n_estimation_factor_wo.rs_t,
                 "n_content_bg_minor": self.minor_n_estimation_factor_wo.n_bg_t,
                 "delay": self.activity.delay,
-                "calculate_biomass": self.module.is_business_as_usual(),
-                "biomass_start_default": self.biomass_ef_start.value,
+                "calculate_biomass": self.calculate_biomass_wo,
+                "biomass_start_default": self.biomass_ef_start_wo.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
                 "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
@@ -1624,20 +1621,24 @@ class AnnualCropCalculator(LandModuleCalculator):
             self.math_wo = MathAnnualCropland(**self.inputs_wo)
             self.math_wo.calculate_emissions()
 
-        res_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        res_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        res_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        res_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
 
         if PLOT_GRAPHS:
-            res_start_w.plot_emissions_and_aggregate_by_activity("annual_start_w")
-            res_start_wo.plot_emissions_and_aggregate_by_activity("annual_start_wo")
-            res_w.plot_emissions_and_aggregate_by_activity("annual_w")
-            res_wo.plot_emissions_and_aggregate_by_activity("annual_wo")
+            self.results_start_w.plot_emissions_and_aggregate_by_activity("annual_start_w")
+            self.results_start_wo.plot_emissions_and_aggregate_by_activity("annual_start_wo")
+            self.results_w.plot_emissions_and_aggregate_by_activity("annual_w")
+            self.results_wo.plot_emissions_and_aggregate_by_activity("annual_wo")
 
         log.debug("END AnnualCropCalculator.calculate")
 
-        return (res_w + res_start_w, res_wo + res_start_wo)
+        return (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
+
+
+class AnnualCroplandCalculator(AnnualCropCalculator):
+    pass
 
 
 class PerennialCropCalculator(LandModuleCalculator):
@@ -2019,29 +2020,12 @@ class PerennialCropCalculator(LandModuleCalculator):
         return results_tuple
 
 
-class PerennialCroplandCalculator(BaseCalculator):
+class PerennialCroplandCalculator(PerennialCropCalculator):
     """
     Calculator for perennial cropping.
     """
 
-    def get_defaults(self, calculate=False) -> dict:
-        return PerennialCropCalculator(input).get_defaults(calculate=calculate)
-
-    def calculate(self):
-        log.debug("START PerennialCroplandCalculator.calculate")
-
-        module: PerennialCropland = self.data
-
-        res_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        res_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-
-        r_w, r_wo = PerennialCropCalculator(module).calculate()
-
-        res_w += r_w
-        res_wo += r_wo
-
-        log.debug("END PerennialCroplandCalculator.calculate")
-        return (res_w, res_wo)
+    pass
 
 
 class FloodedRiceSeasonCalculator(LandModuleCalculator):
@@ -2232,9 +2216,9 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "ef_nitrous_som": self.som.value,
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_w.value,
-                "calculate_biomass": False,
-                "biomass_start_tier_2": self.module.biomass_t2_start,
-                "biomass_end_tier_2": self.module.biomass_t2_w,
+                "calculate_biomass": self.calculate_biomass_start_w,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_w.biomass_t2_w,
                 "is_minor_season": is_minor_season,
             }
 
@@ -2290,9 +2274,9 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "ef_nitrous_som": self.som.value,
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
-                "calculate_biomass": False,
-                "biomass_start_tier_2": self.module.biomass_t2_start,
-                "biomass_end_tier_2": self.module.biomass_t2_wo,
+                "calculate_biomass": self.calculate_biomass_start_wo,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
                 "is_minor_season": is_minor_season,
             }
 
@@ -2347,11 +2331,11 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "straw_burnt": self.module.organic_amendment_type_w.name == "Straw Burnt",
                 "delay": self.activity.delay,
                 "ef_nitrous_som": self.som.value,
-                "calculate_biomass": self.module.is_start() and self.module.is_with(),
+                "calculate_biomass": self.calculate_biomass_w,
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_w.value,
-                "biomass_start_tier_2": self.module.biomass_t2_start,
-                "biomass_end_tier_2": self.module.biomass_t2_w,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_w.biomass_t2_w,
                 "is_minor_season": is_minor_season,
             }
 
@@ -2406,11 +2390,11 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "straw_burnt": self.module.organic_amendment_type_wo.name == "Straw Burnt",
                 "delay": self.activity.delay,
                 "ef_nitrous_som": self.som.value,
-                "calculate_biomass": self.module.is_start() and self.module.is_without(),
+                "calculate_biomass": self.calculate_biomass_wo,
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
-                "biomass_start_tier_2": self.module.biomass_t2_start,
-                "biomass_end_tier_2": self.module.biomass_t2_wo,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
                 "is_minor_season": is_minor_season,
             }
 
@@ -2545,9 +2529,9 @@ class GrasslandCalculator(LandModuleCalculator):
                 "ef_nitrous_som": self.som.value,
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_w.value,
-                "calculate_biomass": False,
-                "biomass_start_tier_2": module.biomass_t2_start,
-                "biomass_end_tier_2": module.biomass_t2_w,
+                "calculate_biomass": self.calculate_biomass_start_w,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_w.biomass_t2_w,
                 "fire_impact": module.fire_impact_start,
             }
 
@@ -2593,9 +2577,9 @@ class GrasslandCalculator(LandModuleCalculator):
                 "ef_nitrous_som": self.som.value,
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
-                "calculate_biomass": False,
-                "biomass_start_tier_2": module.biomass_t2_start,
-                "biomass_end_tier_2": module.biomass_t2_wo,
+                "calculate_biomass": self.calculate_biomass_start_wo,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
                 "fire_impact": module.fire_impact_start,
             }
 
@@ -2642,11 +2626,11 @@ class GrasslandCalculator(LandModuleCalculator):
                 "fi_end_tier_2": module.fi_t2_w,
                 "delay": self.activity.delay,
                 "ef_nitrous_som": self.som.value,
-                "calculate_biomass": module.is_luc_remaining_same(),
+                "calculate_biomass": self.calculate_biomass_w,
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_w.value,
-                "biomass_start_tier_2": module.biomass_t2_start,
-                "biomass_end_tier_2": module.biomass_t2_w,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_w.biomass_t2_w,
                 "fire_impact": module.fire_impact_w,
             }
 
@@ -2693,11 +2677,11 @@ class GrasslandCalculator(LandModuleCalculator):
                 "fi_end_tier_2": module.fi_t2_wo,
                 "delay": self.activity.delay,
                 "ef_nitrous_som": self.som.value,
-                "calculate_biomass": module.is_business_as_usual(),
+                "calculate_biomass": self.calculate_biomass_wo,
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
-                "biomass_start_tier_2": module.biomass_t2_start,
-                "biomass_end_tier_2": module.biomass_t2_wo,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
                 "fire_impact": module.fire_impact_wo,
             }
 
@@ -3152,11 +3136,11 @@ class AquacultureCalculator(BaseCalculator):
             raise ValueError("Default feed emission factor does not exist")
 
         try:
-            self.elec = ipcc.ElectricityEmission.objects.get(country=project.country)
+            self.elec = ipcc.ElectricityEmission.objects.get(country=self.country)
         except ipcc.ElectricityEmission.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(module, "electricity_ef_t2")
             if missing_scenarios:
-                raise ValueError(f"Electricity emission for {project.country.name} does not exist. Please provide a tier 2 value for electricity emission for scenarios: {', '.join(missing_scenarios)}")
+                raise ValueError(f"Electricity emission for {self.country.name} does not exist. Please provide a tier 2 value for electricity emission for scenarios: {', '.join(missing_scenarios)}")
 
     def calculate(self) -> list[Result]:
         """
@@ -3264,13 +3248,17 @@ class InputEntryCalculator(BaseCalculator):
         self.ref = SimpleNamespace(co2_multiplier=0, co2_emissions_multiplier=0, n2o_quantity_multiplier=0, n2o_emissions_multiplier=0, production_quantity_multiplier=0, production_emissions_multiplier=0)
         self.ef = SimpleNamespace(co2_value=0, n2o_value=0, co2_eq_value=0)
 
+        self.needs_co2_ref = None
+        self.needs_n2o_ref = None
+        self.needs_co2_e_ref = None
+
     def get_defaults(self, calculate=False) -> dict:
 
         input_type: InputType = self.module.input_type
 
-        needs_co2_ref = input_type.has_co2_emissions and not self.module.co2_emissions_t2
-        needs_n2o_ref = input_type.has_n2o_emissions and not self.module.n2o_emissions_t2
-        needs_co2_e_ref = input_type.has_co2_e_emissions and not self.module.co2_e_emissions_t2
+        self.needs_co2_ref = input_type.has_co2_emissions and not self.module.co2_emissions_t2
+        self.needs_n2o_ref = input_type.has_n2o_emissions and not self.module.n2o_emissions_t2
+        self.needs_co2_e_ref = input_type.has_co2_e_emissions and not self.module.co2_e_emissions_t2
 
         if self.module.status.name == "READY" and calculate:
             self.calculate()
@@ -3283,19 +3271,19 @@ class InputEntryCalculator(BaseCalculator):
         self.ef = ipcc.InputEmissionFactor.objects.filter(input_type=self.module.input_type, climate=self.project.climate, moisture=self.project.moisture).first()
 
         if self.ef:
-            if self.ef.co2_value is None and needs_co2_ref:
-                raise ValueError(f"Emission factor for {self.module.input_type.name} does not exist for {self.project.climate.name} and {self.project.moisture.name}. Please define tier 2 values.")
-            if self.ef.n2o_value is None and needs_n2o_ref:
-                raise ValueError(f"Emission factor for {self.module.input_type.name} does not exist for {self.project.climate.name} and {self.project.moisture.name}. Please define tier 2 values.")
-            if self.ef.co2_eq_value is None and needs_co2_e_ref:
-                raise ValueError(f"Emission factor for {self.module.input_type.name} does not exist for {self.project.climate.name} and {self.project.moisture.name}. Please define tier 2 values.")
+            if self.ef.co2_value is None and self.needs_co2_ref:
+                raise ValueError(f"CO2 emission factor for {self.module.input_type.name} does not exist for {self.project.climate.name} and {self.project.moisture.name}. Please define tier 2 values.")
+            if self.ef.n2o_value is None and self.needs_n2o_ref:
+                raise ValueError(f"N2O emission factor for {self.module.input_type.name} does not exist for {self.project.climate.name} and {self.project.moisture.name}. Please define tier 2 values.")
+            if self.ef.co2_eq_value is None and self.needs_co2_e_ref:
+                raise ValueError(f"CO2-eq emission factor for {self.module.input_type.name} does not exist for {self.project.climate.name} and {self.project.moisture.name}. Please define tier 2 values.")
         else:
-            if needs_co2_ref:
-                raise ValueError(f"CO2 Emission factor for {self.module.input_type.name} does not exist for {self.project.climate.name} and {self.project.moisture.name}. Please define tier 2 values.")
-            if needs_n2o_ref:
-                raise ValueError(f"N2O Emission factor for {self.module.input_type.name} does not exist for {self.project.climate.name} and {self.project.moisture.name}. Please define tier 2 values.")
-            if needs_co2_e_ref:
-                raise ValueError(f"CO2e Emission factor for {self.module.input_type.name} does not exist for {self.project.climate.name} and {self.project.moisture.name}. Please define tier 2 values.")
+            if self.needs_co2_ref:
+                raise ValueError(f"CO2 emission factor for {self.module.input_type.name} does not exist for {self.project.climate.name} and {self.project.moisture.name}. Please define tier 2 values.")
+            if self.needs_n2o_ref:
+                raise ValueError(f"N2O emission factor for {self.module.input_type.name} does not exist for {self.project.climate.name} and {self.project.moisture.name}. Please define tier 2 values.")
+            if self.needs_co2_e_ref:
+                raise ValueError(f"CO2-eq emission factor for {self.module.input_type.name} does not exist for {self.project.climate.name} and {self.project.moisture.name}. Please define tier 2 values.")
 
         self.math_w = None
         self.math_wo = None
@@ -3307,17 +3295,17 @@ class InputEntryCalculator(BaseCalculator):
             "unit_start": self.module.value_start,
             "unit_end": self.module.value_w,
             "rate_type": self.activity.change_rate.name,
-            "ipcc_factor_co2": self.ef.co2_value,
+            "ipcc_factor_co2": self.ef.co2_value if self.needs_co2_ref else 0,
             "tier_2_factor_co2": self.module.co2_emissions_t2,
             "unit_factor_co2": self.ref.co2_multiplier,
             "emissions_factor_co2": self.ref.co2_emissions_multiplier,
             "implementation_time": self.activity.implementation_years,
             "capitalization_time": self.activity.capitalization_years,
-            "ipcc_factor_n2o": self.ef.n2o_value,
+            "ipcc_factor_n2o": self.ef.n2o_value if self.needs_n2o_ref else 0,
             "tier_2_factor_n2o": self.module.n2o_emissions_t2,
             "unit_factor_n2o": self.ref.n2o_quantity_multiplier,
             "emissions_factor_n2o": self.ref.n2o_emissions_multiplier,
-            "ipcc_factor_eq": self.ef.co2_eq_value,
+            "ipcc_factor_eq": self.ef.co2_eq_value if self.needs_co2_e_ref else 0,
             "tier_2_factor_eq": self.module.co2_e_emissions_t2,
             "unit_factor_eq": self.ref.production_quantity_multiplier,
             "emissions_factor_eq": self.ref.production_emissions_multiplier,
@@ -3332,17 +3320,17 @@ class InputEntryCalculator(BaseCalculator):
             "unit_start": self.module.value_start,
             "unit_end": self.module.value_wo,
             "rate_type": self.activity.change_rate.name,
-            "ipcc_factor_co2": self.ef.co2_value,
+            "ipcc_factor_co2": self.ef.co2_value if self.needs_co2_ref else 0,
             "tier_2_factor_co2": self.module.co2_emissions_t2,
             "unit_factor_co2": self.ref.co2_multiplier,
             "emissions_factor_co2": self.ref.co2_emissions_multiplier,
             "implementation_time": self.activity.implementation_years,
             "capitalization_time": self.activity.capitalization_years,
-            "ipcc_factor_n2o": self.ef.n2o_value,
+            "ipcc_factor_n2o": self.ef.n2o_value if self.needs_n2o_ref else 0,
             "tier_2_factor_n2o": self.module.n2o_emissions_t2,
             "unit_factor_n2o": self.ref.n2o_quantity_multiplier,
             "emissions_factor_n2o": self.ref.n2o_emissions_multiplier,
-            "ipcc_factor_eq": self.ef.co2_eq_value,
+            "ipcc_factor_eq": self.ef.co2_eq_value if self.needs_co2_e_ref else 0,
             "tier_2_factor_eq": self.module.co2_e_emissions_t2,
             "unit_factor_eq": self.ref.production_quantity_multiplier,
             "emissions_factor_eq": self.ref.production_emissions_multiplier,
@@ -3353,10 +3341,10 @@ class InputEntryCalculator(BaseCalculator):
         self.math_wo = MathInputs(**self.inputs_wo)
         self.math_wo.calculate_emissions()
 
-        results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
 
-        results_tuple = (results_w, results_wo)
+        results_tuple = (self.results_w, self.results_wo)
 
         return results_tuple
 
@@ -3691,9 +3679,9 @@ class SettlementCalculator(LandModuleCalculator):
                 "delay": self.activity.delay,
                 "biomass_start_default": self.ef_start.biomass,
                 "biomass_end_default": self.ef_w.biomass,
-                "calculate_biomass": False,
-                "biomass_start_tier_2": self.module_start.biomass_t2_start,
-                "biomass_end_tier_2": self.module_w.biomass_t2_w,
+                "calculate_biomass": self.calculate_biomass_start_w,
+                "biomass_start_tier_2": self.module_start.get_biomass_t2_start(utils.ScenarioTypes.START),
+                "biomass_end_tier_2": self.module_w.get_biomass_t2_w(utils.ScenarioTypes.WITH),
             }
 
             self.math_start_w = MathNotCultivatedLand(**self.inputs_start_w)
@@ -3727,8 +3715,8 @@ class SettlementCalculator(LandModuleCalculator):
                 "delay": self.activity.delay,
                 "biomass_start_default": self.ef_start.biomass,
                 "biomass_end_default": self.ef_wo.biomass,
-                "calculate_biomass": False,
-                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "calculate_biomass": self.calculate_biomass_start_wo,
+                "biomass_start_tier_2": self.module_start.get_biomass_t2_start(utils.ScenarioTypes.START),
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
             }
 
@@ -3763,11 +3751,11 @@ class SettlementCalculator(LandModuleCalculator):
                 "fi_start_tier_2": self.module_start.fi_t2_start,
                 "fi_end_tier_2": self.module_w.fi_t2_w,
                 "delay": self.activity.delay,
-                "calculate_biomass": self.module.is_luc_remaining_same(),
+                "calculate_biomass": self.calculate_biomass_w,
                 "biomass_start_default": self.ef_start.biomass,
                 "biomass_end_default": self.ef_w.biomass,
-                "biomass_start_tier_2": self.module_start.biomass_t2_start,
-                "biomass_end_tier_2": self.module_w.biomass_t2_w,
+                "biomass_start_tier_2": self.module_start.get_biomass_t2_start(utils.ScenarioTypes.START),
+                "biomass_end_tier_2": self.module_w.get_biomass_t2_w(utils.ScenarioTypes.WITH),
             }
 
             self.math_w = MathNotCultivatedLand(**self.inputs_w)
@@ -3801,10 +3789,10 @@ class SettlementCalculator(LandModuleCalculator):
                 "fi_start_tier_2": self.module_start.fi_t2_start,
                 "fi_end_tier_2": self.module_wo.fi_t2_wo,
                 "delay": self.activity.delay,
-                "calculate_biomass": self.module.is_business_as_usual(),
+                "calculate_biomass": self.calculate_biomass_wo,
                 "biomass_start_default": self.ef_start.biomass,
                 "biomass_end_default": self.ef_wo.biomass,
-                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_start_tier_2": self.module_start.get_biomass_t2_start(utils.ScenarioTypes.START),
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
             }
 
@@ -3878,10 +3866,11 @@ class BuildingCalculator(BaseCalculator):
             self.inputs_w = {
                 "ef_ipcc": self.ef.value,
                 "ef_tier_2": self.module.ef_t2_w,
-                "area": self.module.area_m2_w,
+                "units_end": self.module.area_m2_w,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
                 "rate_type": self.change_rate.name,
+                "delay": self.activity.delay,
             }
 
             self.math_w = MathRoads(**self.inputs_w)
@@ -3891,10 +3880,11 @@ class BuildingCalculator(BaseCalculator):
             self.inputs_wo = {
                 "ef_ipcc": self.ef.value,
                 "ef_tier_2": self.module.ef_t2_wo,
-                "area": self.module.area_m2_wo,
+                "units_end": self.module.area_m2_wo,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
                 "rate_type": self.change_rate.name,
+                "delay": self.activity.delay,
             }
 
             self.math_wo = MathRoads(**self.inputs_wo)
@@ -4662,7 +4652,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
             "average_pressure_tier_2": self.module.average_pressure_t2,
             "pumping_efficiency_default": self.pumping_efficiency_default.value,
             "pumping_efficiency_tier_2": self.module.pumping_efficiency_t2_start,
-            "erh_electricity": self.erh_electricity_default,
+            "erh_electricity": self.erh_electricity_default.value,
             "fuel_net_calorific_values": self.ef_default.calorific_value,
             "fuel_density": self.ef_default.density,
             "depth": self.module.well_depth,
@@ -4691,7 +4681,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
             "average_pressure_tier_2": self.module.average_pressure_t2,
             "pumping_efficiency_default": self.pumping_efficiency_default.value,
             "pumping_efficiency_tier_2": self.module.pumping_efficiency_t2_w,
-            "erh_electricity": self.erh_electricity_default,
+            "erh_electricity": self.erh_electricity_default.value,
             "fuel_net_calorific_values": self.ef_default.calorific_value,
             "fuel_density": self.ef_default.density,
             "depth": self.module.well_depth,
@@ -4720,7 +4710,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
             "average_pressure_tier_2": self.module.average_pressure_t2,
             "pumping_efficiency_default": self.pumping_efficiency_default.value,
             "pumping_efficiency_tier_2": self.module.pumping_efficiency_t2_wo,
-            "erh_electricity": self.erh_electricity_default,
+            "erh_electricity": self.erh_electricity_default.value,
             "fuel_net_calorific_values": self.ef_default.calorific_value,
             "fuel_density": self.ef_default.density,
             "depth": self.module.well_depth,
@@ -5691,39 +5681,39 @@ class ForestManagementCalculator(LandModuleCalculator):
         self.agb_under_20_w = self.agb_under_20_wo = self.agb_under_20
 
         # Check AGB under 20 years for with scenario
-        if self.module.is_with() and any(x is None for x in [self.agb_under_20.agb_min, self.agb_under_20.agb_max]) and self.forest.agb_t2_w is None:
-            raise ValueError("Reference values for AGB under 20 years are missing. Please fill the relevant tier 2 values.")
+        if self.module.is_with() and self.agb_under_20 is None or any(x is None for x in [self.agb_under_20.agb_min, self.agb_under_20.agb_max]) and self.forest.agb_t2_w is None:
+            raise ValueError(f"Reference values for AGB under 20 years for {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name} are missing. Please fill the relevant tier 2 values.")
 
         # Check AGB under 20 years for without scenario
-        if self.module.is_without() and any(x is None for x in [self.agb_under_20.agb_min, self.agb_under_20.agb_max]) and self.forest.agb_t2_wo is None:
-            raise ValueError("Reference values for AGB under 20 years are missing. Please fill the relevant tier 2 values.")
+        if self.module.is_without() and self.agb_under_20 is None or any(x is None for x in [self.agb_under_20.agb_min, self.agb_under_20.agb_max]) and self.forest.agb_t2_wo is None:
+            raise ValueError(f"Reference values for AGB under 20 years for {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name} are missing. Please fill the relevant tier 2 values.")
 
         # Check AGB growth under 20 years for with scenario
-        if self.module.is_with() and any(x is None for x in [self.agb_under_20.agb_growth_min, self.agb_under_20.agb_growth_max]) and self.forest.agb_growth_rate_le_20_yrs_t2_w is None:
-            raise ValueError("Reference values for AGB growth under 20 years are missing. Please fill the relevant tier 2 values.")
+        if self.module.is_with() and self.agb_under_20 is None or any(x is None for x in [self.agb_under_20.agb_growth_min, self.agb_under_20.agb_growth_max]) and self.forest.agb_growth_rate_le_20_yrs_t2_w is None:
+            raise ValueError(f"Reference values for AGB growth under 20 years for {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name} are missing. Please fill the relevant tier 2 values.")
 
         # Check AGB growth under 20 years for without scenario
-        if self.module.is_without() and any(x is None for x in [self.agb_under_20.agb_growth_min, self.agb_under_20.agb_growth_max]) and self.forest.agb_growth_rate_le_20_yrs_t2_wo is None:
-            raise ValueError("Reference values for AGB growth under 20 years are missing. Please fill the relevant tier 2 values.")
+        if self.module.is_without() and self.agb_under_20 is None or any(x is None for x in [self.agb_under_20.agb_growth_min, self.agb_under_20.agb_growth_max]) and self.forest.agb_growth_rate_le_20_yrs_t2_wo is None:
+            raise ValueError(f"Reference values for AGB growth under 20 years for {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name} are missing. Please fill the relevant tier 2 values.")
 
         self.agb_over_20 = self.forest.get_agb_growth_ref(land_use_type=land_use_type, from_year=21 if "Secondary" in self.forest.forest_condition_type.name else 0)
         self.agb_over_20_w = self.agb_over_20_wo = self.agb_over_20
 
         # Check AGB over 20 years for with scenario
-        if self.module.is_with() and any(x is None for x in [self.agb_over_20.agb_min, self.agb_over_20.agb_max]) and self.forest.agb_t2_w is None:
-            raise ValueError("Reference values for AGB over 20 years are missing. Please fill the relevant tier 2 values.")
+        if self.module.is_with() and self.agb_over_20 is None or any(x is None for x in [self.agb_over_20.agb_min, self.agb_over_20.agb_max]) and self.forest.agb_t2_w is None:
+            raise ValueError(f"Reference values for AGB over 20 years for {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name} are missing. Please fill the relevant tier 2 values.")
 
         # Check AGB over 20 years for without scenario
-        if self.module.is_without() and any(x is None for x in [self.agb_over_20.agb_min, self.agb_over_20.agb_max]) and self.forest.agb_t2_wo is None:
-            raise ValueError("Reference values for AGB over 20 years are missing. Please fill the relevant tier 2 values.")
+        if self.module.is_without() and self.agb_over_20 is None or any(x is None for x in [self.agb_over_20.agb_min, self.agb_over_20.agb_max]) and self.forest.agb_t2_wo is None:
+            raise ValueError(f"Reference values for AGB over 20 years for {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name} are missing. Please fill the relevant tier 2 values.")
 
         # Check AGB growth over 20 years for with scenario
-        if self.module.is_with() and any(x is None for x in [self.agb_over_20.agb_growth_min, self.agb_over_20.agb_growth_max]) and self.forest.agb_growth_rate_gt_20_yrs_t2_w is None:
-            raise ValueError("Reference values for AGB growth over 20 years are missing. Please fill the relevant tier 2 values.")
+        if self.module.is_with() and self.agb_over_20 is None or any(x is None for x in [self.agb_over_20.agb_growth_min, self.agb_over_20.agb_growth_max]) and self.forest.agb_growth_rate_gt_20_yrs_t2_w is None:
+            raise ValueError(f"Reference values for AGB growth over 20 years for {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name} are missing. Please fill the relevant tier 2 values.")
 
         # Check AGB growth over 20 years for without scenario
-        if self.module.is_without() and any(x is None for x in [self.agb_over_20.agb_growth_min, self.agb_over_20.agb_growth_max]) and self.forest.agb_growth_rate_gt_20_yrs_t2_wo is None:
-            raise ValueError("Reference values for AGB growth over 20 years are missing. Please fill the relevant tier 2 values.")
+        if self.module.is_without() and self.agb_over_20 is None or any(x is None for x in [self.agb_over_20.agb_growth_min, self.agb_over_20.agb_growth_max]) and self.forest.agb_growth_rate_gt_20_yrs_t2_wo is None:
+            raise ValueError(f"Reference values for AGB growth over 20 years for {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name} are missing. Please fill the relevant tier 2 values.")
 
         # START - Reference Values for forest remaining forest
         self.agb_max_w = statistics.mean([self.agb_over_20_w.agb_min, self.agb_over_20_w.agb_max]) if all([self.agb_over_20_w.agb_min, self.agb_over_20_w.agb_max]) else self.forest.agb_t2_w
@@ -5971,9 +5961,9 @@ class OtherLandCalculator(LandModuleCalculator):
                 "delay": self.activity.delay,
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_w.value,
-                "calculate_biomass": False,
-                "biomass_start_tier_2": self.module.biomass_t2_start,
-                "biomass_end_tier_2": self.module.biomass_t2_w,
+                "calculate_biomass": self.calculate_biomass_start_w,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_w.biomass_t2_w,
             }
 
             log.debug(f"Inputs start w: {self.inputs_start_w}")
@@ -6009,9 +5999,9 @@ class OtherLandCalculator(LandModuleCalculator):
                 "delay": self.activity.delay,
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
-                "calculate_biomass": False,
-                "biomass_start_tier_2": self.module.biomass_t2_start,
-                "biomass_end_tier_2": self.module.biomass_t2_wo,
+                "calculate_biomass": self.calculate_biomass_start_wo,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
             }
 
             log.debug(f"Inputs start wo: {self.inputs_start_wo}")
@@ -6046,11 +6036,11 @@ class OtherLandCalculator(LandModuleCalculator):
                 "fi_start_tier_2": self.module_start.fi_t2_start,
                 "fi_end_tier_2": self.module_w.fi_t2_w,
                 "delay": self.activity.delay,
-                "calculate_biomass": self.module.is_luc_remaining_same(),
+                "calculate_biomass": self.calculate_biomass_w,
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_w.value,
-                "biomass_start_tier_2": self.module.biomass_t2_start,
-                "biomass_end_tier_2": self.module.biomass_t2_w,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_w.biomass_t2_w,
             }
 
             log.debug(f"Inputs w: {self.inputs_w}")
@@ -6085,11 +6075,11 @@ class OtherLandCalculator(LandModuleCalculator):
                 "fi_start_tier_2": self.module_start.fi_t2_start,
                 "fi_end_tier_2": self.module_wo.fi_t2_wo,
                 "delay": self.activity.delay,
-                "calculate_biomass": self.module.is_business_as_usual(),
+                "calculate_biomass": self.calculate_biomass_wo,
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
-                "biomass_start_tier_2": self.module.biomass_t2_start,
-                "biomass_end_tier_2": self.module.biomass_t2_wo,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
             }
 
             log.debug(f"Inputs wo: {self.inputs_wo}")
@@ -6151,9 +6141,9 @@ class SetAsideCalculator(LandModuleCalculator):
                 "delay": self.activity.delay,
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_w.value,
-                "calculate_biomass": False,
-                "biomass_start_tier_2": self.module.biomass_t2_start,
-                "biomass_end_tier_2": self.module.biomass_t2_w,
+                "calculate_biomass": self.calculate_biomass_start_w,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_w.biomass_t2_w,
             }
 
             self.math_start_w = MathNotCultivatedLand(**self.inputs_start_w)
@@ -6187,9 +6177,9 @@ class SetAsideCalculator(LandModuleCalculator):
                 "delay": self.activity.delay,
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
-                "calculate_biomass": False,
-                "biomass_start_tier_2": self.module.biomass_t2_start,
-                "biomass_end_tier_2": self.module.biomass_t2_wo,
+                "calculate_biomass": self.calculate_biomass_start_wo,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
             }
 
             self.math_start_wo = MathNotCultivatedLand(**self.inputs_start_wo)
@@ -6222,11 +6212,11 @@ class SetAsideCalculator(LandModuleCalculator):
                 "fi_start_tier_2": self.module_start.fi_t2_start,
                 "fi_end_tier_2": self.module_w.fi_t2_w,
                 "delay": self.activity.delay,
-                "calculate_biomass": self.module.is_luc_remaining_same(),
+                "calculate_biomass": self.calculate_biomass_w,
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_w.value,
-                "biomass_start_tier_2": self.module.biomass_t2_start,
-                "biomass_end_tier_2": self.module.biomass_t2_w,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_w.biomass_t2_w,
             }
 
             self.math_w = MathNotCultivatedLand(**self.inputs_w)
@@ -6259,11 +6249,11 @@ class SetAsideCalculator(LandModuleCalculator):
                 "fi_start_tier_2": self.module_start.fi_t2_start,
                 "fi_end_tier_2": self.module_wo.fi_t2_w,
                 "delay": self.activity.delay,
-                "calculate_biomass": self.module.is_business_as_usual(),
+                "calculate_biomass": self.calculate_biomass_wo,
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
-                "biomass_start_tier_2": self.module.biomass_t2_start,
-                "biomass_end_tier_2": self.module.biomass_t2_wo,
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
             }
 
             self.math_wo = MathNotCultivatedLand(**self.inputs_wo)

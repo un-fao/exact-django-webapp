@@ -186,9 +186,12 @@ class ModuleWithSubmodulesTest(ModuleTest):
         self.submodules = None
         self.submodule_results = None
 
-    def create_submodules(self):
+    def create_submodules(self, n=1):
         """
         Create submodules for the module.
+
+        Args:
+            n (int): The number of submodules to create for each submodule type.
 
         Returns:
             None
@@ -205,9 +208,10 @@ class ModuleWithSubmodulesTest(ModuleTest):
             except KeyError:
                 raise KeyError(f"Factory for module type {submodule_type} not found")
 
-            submodule = Factory.create(parent=self.module)
-            self.submodules.append(submodule)
-            log.info(f"Created submodule {submodule.__class__.__name__} with parameters {self.get_parameters(submodule)}")
+            for i in range(n):
+                submodule = Factory.create(parent=self.module)
+                self.submodules.append(submodule)
+                log.info(f"Created submodule {submodule.__class__.__name__} with parameters {self.get_parameters(submodule)}")
 
     def calculate_submodule_results(self):
         """

@@ -2006,42 +2006,6 @@ with open("scripts/ipcc_data/SoilOrganicCarbon.csv", "r") as f:
             SoilOrganicCarbon.objects.get(climate=climate, moisture=moisture, soil_type=soil_type, value=value)
 
 df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestCombustionFactor.csv"),
-    header=[0],
-    sep=";",
-)
-
-for i, row in df.iterrows():
-    land_use_type = LandUseType.objects.get(name__iexact=sanitize(row["land_use_type"]))
-    climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
-    forest_type = ForestType.objects.get(name__iexact=sanitize(row["forest_type"]))
-
-    co2 = parse_csv_number(row["co2"])
-    ch4 = parse_csv_number(row["ch4"])
-    n2o = parse_csv_number(row["n2o"])
-    value = parse_csv_number(row["cf"])
-
-    print(
-        land_use_type,
-        climate,
-        forest_type,
-        co2,
-        ch4,
-        n2o,
-        value,
-    )
-
-    ForestCombustionFactor.objects.get(
-        land_use_type=land_use_type,
-        climate=climate,
-        forest_type=forest_type,
-        co2=co2,
-        ch4=ch4,
-        n2o=n2o,
-        value=value,
-    )
-
-df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestManagementAGBGrowth.csv"),
     header=[0],
     sep=";",
@@ -2059,29 +2023,6 @@ for i, row in df.iterrows():
         print(climate, region, forest_type, land_use_type, gt_20_yrs, le_20_yrs)
 
         ForestManagementAGBGrowth.objects.get(climate=climate, region=region, forest_type=forest_type, land_use_type=land_use_type, value_after_20_years=gt_20_yrs, value_upto_20_years=le_20_yrs)
-    except Exception as e:
-        print(row)
-        print(e)
-
-LitterDeadwoodCarbonStock.objects.all().delete()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "LitterDeadwoodCarbonStock.csv"),
-    header=[0],
-    sep=";",
-)
-
-for i, row in df.iterrows():
-    try:
-        climate = Climate.objects.get(name__iexact=row["climate"])
-        forest_type = ForestType.objects.get(name__iexact=row["forest_type"])
-        land_use_type = LandUseType.objects.get(name__iexact=row["land_use_type"])
-        litter = parse_csv_number(row["litter"])
-        dw = parse_csv_number(row["deadwood"])
-
-        print(climate, forest_type, land_use_type, litter, dw)
-
-        LitterDeadwoodCarbonStock.objects.get(climate=climate, forest_type=forest_type, land_use_type=land_use_type, litter=litter, dw=dw)
     except Exception as e:
         print(row)
         print(e)
@@ -4413,7 +4354,7 @@ for i, row in df.iterrows():
 
 """
 
-# TODO: Run in review
+# TODO: Run in production
 
 log.debug("Deleting all GrasslandBiomass objects...")
 ipcc.GrasslandBiomass.objects.all().delete()
@@ -4449,5 +4390,70 @@ for i, row in df.iterrows():
         bgb_t_dm_ha=bgb_t_dm_ha,
         bgb_t_c_ha=bgb_t_c_ha,
     )
+
+log.debug("Deleting all ForestCombustionFactor objects...")
+ForestCombustionFactor.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestCombustionFactor.csv"),
+    header=[0],
+    sep=";",
+)
+
+for i, row in df.iterrows():
+    land_use_type = LandUseType.objects.get(name__iexact=sanitize(row["land_use_type"]))
+    climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
+    forest_type = ForestType.objects.get(name__iexact=sanitize(row["forest_type"]))
+
+    co2 = parse_csv_number(row["gef_co2"])
+    ch4 = parse_csv_number(row["gef_ch4"])
+    n2o = parse_csv_number(row["gef_n2o"])
+    value = parse_csv_number(row["value"])
+
+    print(
+        land_use_type,
+        climate,
+        forest_type,
+        co2,
+        ch4,
+        n2o,
+        value,
+    )
+
+    ForestCombustionFactor.objects.create(
+        land_use_type=land_use_type,
+        climate=climate,
+        forest_type=forest_type,
+        co2=co2,
+        ch4=ch4,
+        n2o=n2o,
+        value=value,
+    )
+
+log.debug("Deleting all LitteDeadwoodCarbonStock objects...")
+LitterDeadwoodCarbonStock.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "LitterDeadwoodCarbonStock.csv"),
+    header=[0],
+    sep=";",
+)
+
+for i, row in df.iterrows():
+    try:
+        climate = Climate.objects.get(name__iexact=row["climate"])
+        forest_type = ForestType.objects.get(name__iexact=row["forest_type"])
+        land_use_type = LandUseType.objects.get(name__iexact=row["land_use_type"])
+        litter = parse_csv_number(row["litter"])
+        dw = parse_csv_number(row["deadwood"])
+
+        print(climate, forest_type, land_use_type, litter, dw)
+
+        LitterDeadwoodCarbonStock.objects.create(climate=climate, forest_type=forest_type, land_use_type=land_use_type, litter=litter, dw=dw)
+    except Exception as e:
+        print(row)
+        print(e)
+
+# TODO: Run in review
 
 # TODO: Run in develop
