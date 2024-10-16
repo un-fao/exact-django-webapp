@@ -413,10 +413,10 @@ class ElectricityDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            ef_source_default=defaults.ef_source,
-            ef_t2_start_default=defaults.ef_country,
-            ef_t2_w_default=defaults.ef_country,
-            ef_t2_wo_default=defaults.ef_country,
+            ef_source_default=defaults.electricity_ef_default.country.name,
+            ef_t2_start_default=defaults.electricity_ef_selected.value,
+            ef_t2_w_default=defaults.electricity_ef_selected.value,
+            ef_t2_wo_default=defaults.electricity_ef_selected.value,
             transmission_loss_start_default=defaults.TRANSMISSION_LOSS,
             transmission_loss_w_default=defaults.TRANSMISSION_LOSS,
             transmission_loss_wo_default=defaults.TRANSMISSION_LOSS,
