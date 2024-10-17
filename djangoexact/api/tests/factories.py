@@ -21,14 +21,19 @@ tillage_management_types = [tillage for tillage in TillageManagementType.objects
 organic_input_types = [organic for organic in OrganicInputType.objects.filter(is_active=True).all()]
 residue_management_types = [residue for residue in ResidueManagementType.objects.all()]
 grassland_management_types = GrasslandManagementType.objects.all()
-forests = [forest for forest in LandUseType.objects.filter(module_types__class_name="ForestManagement").exclude(is_active=False)]
+
+climates = [climate for climate in Climate.objects.all()]
+
+selected_climate = factory.fuzzy.FuzzyChoice(climates).fuzz()
+forests = [forest for forest in LandUseType.objects.filter(module_types__class_name="ForestManagement", climates=selected_climate).exclude(is_active=False)]
+
 coastal_vegetations = [coastal for coastal in LandUseType.objects.filter(module_types__class_name="CoastalWetland").exclude(is_active=False)]
 
 livestock_category_types = [c for c in LivestockCategoryType.objects.filter(is_active=True).all()]
 livestock_production_types = [c for c in LivestockProductionType.objects.all()]
 fuels = [fuel for fuel in FuelType.objects.all()]
 
-climates = [climate for climate in Climate.objects.all()]
+
 moisture = [moisture for moisture in Moisture.objects.all()]
 soil_types = [soil for soil in SoilType.objects.all().exclude(active=False).exclude(name="Mineral").exclude(name="Organic")]
 countries = [country for country in Country.objects.all()]
@@ -61,7 +66,7 @@ class ProjectFactory(DjangoModelFactory):
     start_year_of_activities = factory.fuzzy.FuzzyInteger(2024, 2024)
     last_year_of_accounting = factory.fuzzy.FuzzyInteger(2050, 2050)
 
-    climate = factory.fuzzy.FuzzyChoice(climates)
+    climate = selected_climate
     moisture = factory.fuzzy.FuzzyChoice(moisture)
     country = factory.fuzzy.FuzzyChoice(countries)
     soil_type = factory.fuzzy.FuzzyChoice(soil_types)
