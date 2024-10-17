@@ -5118,9 +5118,9 @@ class OrganicSoilCalculator(BaseCalculator):
 
         self.fire_ref = ipcc.OrganicSoilGefEmissionFactor()
 
-        self.rewetting_start = ipcc.RewettingCarbonFactor()
-        self.rewetting_w = ipcc.RewettingCarbonFactor()
-        self.rewetting_wo = ipcc.RewettingCarbonFactor()
+        self.rewetting_start = ipcc.OrganicSoilRewettingEmissionFactor()
+        self.rewetting_w = ipcc.OrganicSoilRewettingEmissionFactor()
+        self.rewetting_wo = ipcc.OrganicSoilRewettingEmissionFactor()
 
         self.onsite_ef_w = ipcc.OrganicSoilDrainageEmissionFactor()
         self.onsite_ef_wo = ipcc.OrganicSoilDrainageEmissionFactor()
@@ -5246,8 +5246,8 @@ class OrganicSoilCalculator(BaseCalculator):
                 if missing_t2_gases:
                     raise ValueError(f"Could not find EF Off-Site W for {module_type_w}, {module.peat_type.name}, {project.climate.name}, {project.moisture.name}. Please provide tier 2 values.")
 
-            self.fire_used_w = module.fire_type_w is not None
-            if self.fire_used_w:
+            self.is_fire_used_w = module.fire_type_w is not None
+            if self.is_fire_used_w:
                 try:
                     self.dry_matter_w = ipcc.OrganicSoilFuelConsumption.objects.get(**cm, fire_type=module.fire_type_w)
                 except ipcc.OrganicSoilFuelConsumption.DoesNotExist:
@@ -5321,8 +5321,8 @@ class OrganicSoilCalculator(BaseCalculator):
                 if missing_t2_gases:
                     raise ValueError(f"Could not find EF Off-Site WO for {module_type_wo}, {module.peat_type.name}, {project.climate.name}, {project.moisture.name}. Please provide tier 2 values.")
 
-            self.fire_used_wo = module.fire_type_wo is not None
-            if self.fire_used_wo:
+            self.is_fire_used_wo = module.fire_type_wo is not None
+            if self.is_fire_used_wo:
                 try:
                     self.dry_matter_wo = ipcc.OrganicSoilFuelConsumption.objects.get(**cm, fire_type=module.fire_type_wo)
                 except ipcc.OrganicSoilFuelConsumption.DoesNotExist:
@@ -5373,7 +5373,7 @@ class OrganicSoilCalculator(BaseCalculator):
                 raise ValueError(f"Could not find Conversion Factor WO for {module.peat_type.name}, {project.climate.name}, {project.moisture.name}")
 
     def calculate(self) -> Result:
-        super().calculate()
+        super().calculate(self.module)
 
         input: OrganicSoil = self.data
         project: Project = input.activity.project
@@ -5394,7 +5394,7 @@ class OrganicSoilCalculator(BaseCalculator):
             "fire_boolean_end": input.fire_type_w is not None,
             "fire_periodicity_end": input.soil_fire_periodicity_w,
             "area_affected_by_action_end": self.area_affected_by_module,
-            "dry_matter_ref_fire": self.dry_matter_w.value if self.fire_used_w else None,
+            "dry_matter_ref_fire": self.dry_matter_w.value if self.is_fire_used_w else None,
             "dry_matter_tier_2_fire": input.mean_dry_matter_t2_w,
             "percentage_area_burned_end": input.soil_fire_impact_percentage_w,
             "ef_co2_ref_fire": self.fire_ref.co2,
@@ -5449,6 +5449,7 @@ class OrganicSoilCalculator(BaseCalculator):
             "ef_n2o_rewetting_final": self.rewetting_w.n2o,
             "ef_n2o_rewetting_final_tier_2": input.onsite_n2o_rewetting_t2_w,
             "maximum_area_for_water_management": self.area_affected_by_module,
+            "delay": self.activity.delay,
         }
 
         self.organic_soil_math_w = MathOrganicSoil(**self.organic_soil_inputs_w)
@@ -5480,6 +5481,7 @@ class OrganicSoilCalculator(BaseCalculator):
                 "conversion_factor_weight": self.conversion_factor_w.weight,
                 "peat_extraction_height_start": input.peat_extraction_height_start,
                 "peat_extraction_height_end": input.peat_extraction_height_w,
+                "delay": self.activity.delay,
             }
 
             self.peat_extraction_math_w = MathPeatExtraction(**self.peat_extraction_inputs_w)
@@ -5489,7 +5491,7 @@ class OrganicSoilCalculator(BaseCalculator):
             "fire_boolean_end": input.fire_type_wo is not None,
             "fire_periodicity_end": input.soil_fire_periodicity_wo,
             "area_affected_by_action_end": self.area_affected_by_module,
-            "dry_matter_ref_fire": self.dry_matter_wo.value if self.fire_used_wo else None,
+            "dry_matter_ref_fire": self.dry_matter_wo.value if self.is_fire_used_wo else None,
             "dry_matter_tier_2_fire": input.mean_dry_matter_t2_wo,
             "percentage_area_burned_end": input.soil_fire_impact_percentage_wo,
             "ef_co2_ref_fire": self.fire_ref.co2,
@@ -5544,6 +5546,7 @@ class OrganicSoilCalculator(BaseCalculator):
             "ef_n2o_rewetting_final": self.rewetting_wo.n2o,
             "ef_n2o_rewetting_final_tier_2": input.onsite_n2o_rewetting_t2_wo,
             "maximum_area_for_water_management": self.area_affected_by_module,
+            "delay": self.activity.delay,
         }
 
         self.organic_soil_math_wo = MathOrganicSoil(**self.organic_soil_inputs_wo)
@@ -5576,6 +5579,7 @@ class OrganicSoilCalculator(BaseCalculator):
                 "c_fraction_ref": 1,  # TODO: Should be conversion_factor_wo.volume,
                 "extraction_height_start": input.peat_extraction_height_start,
                 "extraction_height_end": input.peat_extraction_height_wo,
+                "delay": self.activity.delay,
             }
 
             self.peat_extraction_math_wo = MathPeatExtraction(**self.peat_extraction_inputs_wo)
