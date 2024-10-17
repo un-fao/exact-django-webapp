@@ -1,3 +1,4 @@
+import os
 import logging
 from datetime import timedelta
 from types import SimpleNamespace
@@ -570,6 +571,10 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         try:
             response = FileResponse(open(filename, "rb"), content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
             response["Content-Disposition"] = f"attachment; filename={filename}"
+            response["Content-Length"] = os.path.getsize(filename)
+
+            os.remove(filename)
+
             return response
         except FileNotFoundError:
             return utils.ErrorResponse("Error generating report: file not found", status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
