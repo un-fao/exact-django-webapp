@@ -2219,19 +2219,19 @@ class OtherInfrastructure(Submodule):
 
 
 class OrganicSoil(LandModuleFixed):
-    drainage_area_start = models.FloatField(null=True, blank=True, verbose_name=_("drainage_area_start"))
-    drainage_area_w = models.FloatField(null=True, blank=True, verbose_name=_("drainage_area_w"))
-    drainage_area_wo = models.FloatField(null=True, blank=True, verbose_name=_("drainage_area_wo"))
+    drainage_area_start = models.FloatField(default=0, verbose_name=_("drainage_area_start"))
+    drainage_area_w = models.FloatField(default=0, verbose_name=_("drainage_area_w"))
+    drainage_area_wo = models.FloatField(default=0, verbose_name=_("drainage_area_wo"))
     drainage_area_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_drainage_area_thread", on_delete=models.SET_NULL)
 
-    area_not_drained_start = models.FloatField(null=True, blank=True, verbose_name=_("area_not_drained_start"))
-    area_not_drained_w = models.FloatField(null=True, blank=True, verbose_name=_("area_not_drained_w"))
-    area_not_drained_wo = models.FloatField(null=True, blank=True, verbose_name=_("area_not_drained_wo"))
+    area_not_drained_start = models.FloatField(default=0, verbose_name=_("area_not_drained_start"))
+    area_not_drained_w = models.FloatField(default=0, verbose_name=_("area_not_drained_w"))
+    area_not_drained_wo = models.FloatField(default=0, verbose_name=_("area_not_drained_wo"))
     area_not_drained_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_area_not_drained_thread", on_delete=models.SET_NULL)
 
-    ditches_area_start = models.FloatField(null=True, blank=True, verbose_name=_("ditches_area_start"))
-    ditches_area_w = models.FloatField(null=True, blank=True, verbose_name=_("ditches_area_w"))
-    ditches_area_wo = models.FloatField(null=True, blank=True, verbose_name=_("ditches_area_wo"))
+    ditches_area_start = models.FloatField(default=0, verbose_name=_("ditches_area_start"))
+    ditches_area_w = models.FloatField(default=0, verbose_name=_("ditches_area_w"))
+    ditches_area_wo = models.FloatField(default=0, verbose_name=_("ditches_area_wo"))
     ditches_area_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_ditches_area_thread", on_delete=models.SET_NULL)
 
     fire_type_start = models.ForeignKey(FireType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_fire_type_start", verbose_name=_("fire_type_start"))
