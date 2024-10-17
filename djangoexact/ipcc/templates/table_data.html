@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load custom_filter %}
+{% block title %}{{ model_name | title }}{% endblock %}
 {% block style %}
 <style>
     .fixed-bottom-btn {
