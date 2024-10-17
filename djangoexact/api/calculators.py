@@ -628,7 +628,7 @@ class LandModuleCalculator(BaseCalculator):
         self.fmg_wo = get_fmg_data(self.module_wo, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
         self.flu_wo = get_flu_data(self.module_wo, self.climate, self.moisture, utils.ScenarioTypes.WITHOUT)
 
-        if isinstance(self.module, SingleBiomassModule):
+        if isinstance(self.module, SingleBiomassModule) and not isinstance(self.module, Settlement):  # TODO: Incorporate SettlementEF with relevant IPCC tables
             if self.module.is_start() and self.module.is_with():
                 self.biomass_ef_start_w = self.module_start.get_biomass_ef(utils.ScenarioTypes.START)
             if self.module.is_start() and self.module.is_without():
@@ -3680,8 +3680,8 @@ class SettlementCalculator(LandModuleCalculator):
                 "biomass_start_default": self.ef_start.biomass,
                 "biomass_end_default": self.ef_w.biomass,
                 "calculate_biomass": self.calculate_biomass_start_w,
-                "biomass_start_tier_2": self.module_start.get_biomass_t2_start(utils.ScenarioTypes.START),
-                "biomass_end_tier_2": self.module_w.get_biomass_t2_w(utils.ScenarioTypes.WITH),
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_w.biomass_t2_w,
             }
 
             self.math_start_w = MathNotCultivatedLand(**self.inputs_start_w)
@@ -3716,7 +3716,7 @@ class SettlementCalculator(LandModuleCalculator):
                 "biomass_start_default": self.ef_start.biomass,
                 "biomass_end_default": self.ef_wo.biomass,
                 "calculate_biomass": self.calculate_biomass_start_wo,
-                "biomass_start_tier_2": self.module_start.get_biomass_t2_start(utils.ScenarioTypes.START),
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
             }
 
@@ -3754,8 +3754,8 @@ class SettlementCalculator(LandModuleCalculator):
                 "calculate_biomass": self.calculate_biomass_w,
                 "biomass_start_default": self.ef_start.biomass,
                 "biomass_end_default": self.ef_w.biomass,
-                "biomass_start_tier_2": self.module_start.get_biomass_t2_start(utils.ScenarioTypes.START),
-                "biomass_end_tier_2": self.module_w.get_biomass_t2_w(utils.ScenarioTypes.WITH),
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
+                "biomass_end_tier_2": self.module_w.biomass_t2_w,
             }
 
             self.math_w = MathNotCultivatedLand(**self.inputs_w)
@@ -3792,7 +3792,7 @@ class SettlementCalculator(LandModuleCalculator):
                 "calculate_biomass": self.calculate_biomass_wo,
                 "biomass_start_default": self.ef_start.biomass,
                 "biomass_end_default": self.ef_wo.biomass,
-                "biomass_start_tier_2": self.module_start.get_biomass_t2_start(utils.ScenarioTypes.START),
+                "biomass_start_tier_2": self.module_start.biomass_t2_start,
                 "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
             }
 
