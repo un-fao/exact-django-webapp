@@ -2161,7 +2161,13 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
     def calculate(self, aggregate_by=BreakdownTypes.TOTAL) -> list[Result]:
         # If it's a minor season, use the parent module
         module_for_checks = getattr(self.module, "parent", self.module)
-        is_minor_season = module_for_checks.is_minor_season()
+        is_minor_season = self.module.is_minor_season()
+
+        if is_minor_season:
+            self.module_start = self.module_w = self.module_wo = self.module.parent
+            self.luc = self.module.parent.land_use_change
+            if self.luc:
+                self.module_start, self.module_w, self.module_wo = self.luc.get_modules()
 
         self.get_defaults()
 
@@ -2393,8 +2399,8 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "calculate_biomass": self.calculate_biomass_wo,
                 "biomass_start_default": self.biomass_ef_start.value,
                 "biomass_end_default": self.biomass_ef_wo.value,
-                "biomass_start_tier_2": self.module_start.biomass_t2_start,
-                "biomass_end_tier_2": self.module_wo.biomass_t2_wo,
+                "biomass_start_tier_2": self.module_start.get_biomass_t2(utils.ScenarioTypes.START),
+                "biomass_end_tier_2": self.module_wo.get_biomass_t2(utils.ScenarioTypes.WITHOUT),
                 "is_minor_season": is_minor_season,
             }
 
@@ -2427,7 +2433,7 @@ class FloodedRiceCalculator(BaseCalculator):
         self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
 
-        r_w, r_wo = FloodedRiceSeasonCalculator(module).calculate(False)
+        r_w, r_wo = FloodedRiceSeasonCalculator(module).calculate()
 
         self.results_w += r_w
         self.results_wo += r_wo
@@ -2439,8 +2445,8 @@ class FloodedRiceCalculator(BaseCalculator):
 
         return (self.results_w, self.results_wo)
 
-    def get_defaults(self, calculate=calculate) -> dict:
-        FloodedRiceSeasonCalculator(input).get_defaults(calculate=calculate)
+    def get_defaults(self, calculate=False) -> dict:
+        FloodedRiceSeasonCalculator(self.module).get_defaults(calculate=calculate)
 
 
 class GrasslandCalculator(LandModuleCalculator):
