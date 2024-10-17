@@ -622,7 +622,7 @@ class AnnualCroplandReport(LandModuleReport):
     def add_minor_seasons_results(self):
         minor_seasons = getattr(self.module, "submodules", [])
 
-        for minor_season in minor_seasons.all():
+        for minor_season in minor_seasons:
             log.debug(f"Building report for minor season {minor_season.name}")
 
             minor_calculator = calculators.AnnualCropCalculator(minor_season)
