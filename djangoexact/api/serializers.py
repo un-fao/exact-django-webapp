@@ -536,7 +536,6 @@ class ActivityBuilderSerializer(serializers.Serializer):
             luc.module_type_wo.id,
             ModuleType.objects.get(name="Land Use Change").id,
         )
-        luc.status = StatusType.objects.get(name="READY")
 
         if create_organic_soil:
             organic_soil = OrganicSoil.objects.create(activity=activity, area=self.validated_data.get("area"))
@@ -1025,35 +1024,32 @@ class LandModuleSeralizer(ScenarioModuleSerializer):
         log.debug(f"Data: {data}")
 
         activity = data["activity"] if "activity" in data else self.instance.activity
-        luc = activity.landusechange.first()
-        module_types = list(map(lambda module: module.class_name, activity.module_types.all()))
+        luc: LandUseChange = activity.landusechange.first()
+
+        if self.instance and not isinstance(self.instance, LandUseChange):
+            is_ready, errors = self.is_ready(data, self.Meta.mandatory_fields, instance=self.instance)
+
+            if not is_ready:
+                log.debug(f"Module {self.Meta.ref_name} is not ready for calculations")
+                data["status"] = StatusType.objects.get(name="EMPTY")
+            else:
+                data["status"] = StatusType.objects.get(name="READY")
+
+            super().validate(data)
+
+            for field, value in data.items():
+                setattr(self.instance, field, value)
+
+            self.instance.save()
 
         if luc:
-            module_type = ModuleType.objects.get(class_name=self.Meta.ref_name)
-            luc_module_types = [
-                luc.module_type_start.class_name,
-                luc.module_type_w.class_name,
-                luc.module_type_wo.class_name,
-            ]
-
-            # NOTE: Redundant as it's already checked in ActivityBuilderSerializer, but just in case
-            if module_type.is_luc and module_type.class_name not in luc_module_types:
-                log.error(f"Cannot add {module_type.class_name} to an activity with a Land Use Change")
-                raise serializers.ValidationError("Cannot add this module to an activity with a Land Use Change")
-
-            module_types += luc_module_types
-
-        is_ready, errors = self.is_ready(data, self.Meta.mandatory_fields, instance=self.instance)
-
-        if not is_ready:
-            log.debug(f"Module {self.Meta.ref_name} is not ready for calculations")
-            data["status"] = StatusType.objects.get(name="EMPTY")
-            return super().validate(data)
-
-        data["status"] = StatusType.objects.get(name="READY")
+            # If the module is associated with a Land Use Change, pdate the status of the Land Use Change
+            luc_serializer: LandUseChangeWriteSerializer = get_module_serializer(LandUseChange)(data={}, instance=luc, many=False, partial=True)
+            luc_serializer.is_valid(raise_exception=True)
+            luc_serializer.save()
 
         log.debug(f"END LandModuleSerializer[{self.Meta.ref_name}].validate")
-        return super().validate(data)
+        return data
 
 
 # Grassland
@@ -1274,6 +1270,18 @@ class LandUseChangeWriteSerializer(LandModuleSeralizer):
         fields = "__all__"
         ref_name = "LandUseChange"
         mandatory_fields = {}
+
+    def validate(self, data):
+
+        if self.instance:
+            self.instance: LandUseChange
+            if all([m.is_ready() for m in self.instance.get_modules()]):
+                data["status"] = StatusType.objects.get(name="READY")
+            else:
+                data["status"] = StatusType.objects.get(name="EMPTY")
+            self.instance.save()
+
+        return data
 
 
 class LandUseChangeReadSerializer(LandUseChangeWriteSerializer):
