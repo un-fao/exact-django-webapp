@@ -457,6 +457,8 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
     @transaction.atomic
     def partial_update(self, request, *args, **kwargs):
+        super().partial_update(request, *args, **kwargs)
+
         new_years = request.data.get("implementation_years", None)
         is_locking = request.data.get("is_locked")
         project: Project = self.get_object()
@@ -499,7 +501,55 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         update_change_reason(project, utils.ChangeReasons.UPDATE.value)
 
-        return super().partial_update(request, *args, **kwargs)
+        return Response(ReadProjectSerializer(project, context={"request": request}).data, status=http_status.HTTP_200_OK)
+
+    @transaction.atomic
+    def update(self, request, *args, **kwargs):
+        super().update(request, *args, **kwargs)
+
+        new_years = request.data.get("implementation_years", None)
+        is_locking = request.data.get("is_locked")
+        project: Project = self.get_object()
+        user: CustomUser = self.request.user
+
+        if not utils.has_project_permission("change_project", user, project):
+            logging.error("Selected user does not have permission to update the project")
+            return utils.ErrorResponse("Selected user does not have permission to update the project", status=http_status.HTTP_403_FORBIDDEN)
+
+        # Unlock the project if it has been locked for more than 30 minutes from the last project update
+        if project.is_locked and project.lock_updated_at and timezone.now() - project.lock_updated_at > timedelta(minutes=30):
+            project.unlock()
+
+        # If the project is not locked, or a lock is requested
+        if not project.is_locked or is_locking is True:
+            if project.is_locked and project.locked_by != user:
+                logging.warning(f"Project is already locked by: {project.locked_by.email}")
+                return Response({"message": "Project is already locked"}, status=http_status.HTTP_200_OK)
+
+            project.lock(user)
+
+        # If an unlock is requested
+        elif is_locking is False:
+            is_user_authorized = user.is_superuser or project.locked_by == user or user.memberships.filter(user=user, project=project, group__name="Admin").exists()
+
+            if not is_user_authorized:
+                logging.error("User does not have permission to unlock the project")
+                return Response({"message": "User does not have permission to unlock the project"}, status=http_status.HTTP_403_FORBIDDEN)
+
+            project.unlock()
+
+        if new_years:
+            project.implementation_years = new_years
+            for activity in project.activities.all():
+                if activity.duration_t2 > new_years:
+                    logging.warning(f"Activity {activity.name} duration_t2 is greater than project implementation years. Setting activity duration_t2 to project implementation years.")
+                    activity.duration_t2 = new_years
+                    activity.save()
+            project.save()
+
+        update_change_reason(project, utils.ChangeReasons.UPDATE.value)
+
+        return Response(ReadProjectSerializer(project, context={"request": request}).data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])
     @swagger_auto_schema(responses={404: "Project not found", 403: "Selected user does not have permission to view project results"})
