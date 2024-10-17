@@ -313,6 +313,23 @@ class WriteProjectSerializer(serializers.ModelSerializer):
         exclude = ["owner"]
         ref_name = "Project"
 
+    def sanitize_soc_ref_t2(self, data):
+        """
+        Sanitizes the 'soc_ref_t2' field in the provided data dictionary.
+
+        If the 'soc_ref_t2' field is present and its value is an empty string,
+        it sets the value of 'soc_ref_t2' to None.
+
+        Args:
+            data (dict): The data dictionary containing the 'soc_ref_t2' field.
+
+        Returns:
+            None: The function modifies the input dictionary in place.
+        """
+        soc_ref_t2 = data.get("soc_ref_t2", None)
+        if soc_ref_t2 is not None and soc_ref_t2 == "":
+            data["soc_ref_t2"] = None
+
     def validate(self, data):
         if self.instance and data.get("cost", None):
             total_activity_cost = self.instance.activities.all().values_list("cost", flat=True)
@@ -327,6 +344,12 @@ class WriteProjectSerializer(serializers.ModelSerializer):
             data["owner"] = self.context["request"].user
 
         return super().validate(data)
+
+    def is_valid(self, *, raise_exception=False):
+        # NOTE: This is a workaround made as a favor to the frontend team. The frontend sends an empty string due to a bug in the form.
+        # Ask the frontend team if this is still necessary before removing it.
+        self.sanitize_soc_ref_t2(self.initial_data)
+        return super().is_valid(raise_exception=raise_exception)
 
 
 class ProjectResultSerializer(serializers.Serializer):

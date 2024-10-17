@@ -458,8 +458,6 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
     @transaction.atomic
     def partial_update(self, request, *args, **kwargs):
-        super().partial_update(request, *args, **kwargs)
-
         new_years = request.data.get("implementation_years", None)
         is_locking = request.data.get("is_locked")
         project: Project = self.get_object()
@@ -499,6 +497,13 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                     activity.duration_t2 = new_years
                     activity.save()
             project.save()
+
+        serializer = WriteProjectSerializer(project, data=request.data, partial=True)
+        if not serializer.is_valid():
+            logging.error("Error updating project:", serializer.errors)
+            return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
 
         update_change_reason(project, utils.ChangeReasons.UPDATE.value)
 
@@ -506,8 +511,6 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
     @transaction.atomic
     def update(self, request, *args, **kwargs):
-        super().update(request, *args, **kwargs)
-
         new_years = request.data.get("implementation_years", None)
         is_locking = request.data.get("is_locked")
         project: Project = self.get_object()
@@ -547,6 +550,13 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                     activity.duration_t2 = new_years
                     activity.save()
             project.save()
+
+        serializer = WriteProjectSerializer(project, data=request.data)
+        if not serializer.is_valid():
+            logging.error("Error updating project:", serializer.errors)
+            return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
 
         update_change_reason(project, utils.ChangeReasons.UPDATE.value)
 
