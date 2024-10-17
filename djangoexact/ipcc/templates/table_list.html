@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block style %}
+<style>
+    .list-group-item a {
+        text-decoration: none;
+        color: #000;
+    }
+    .list-group-item a:hover {
+        color: #0d6efd;
+    }
+</style>
+{% endblock style %}
+{% block content %}
+<div class="m-5">
+    <div class="container">
+        <h2 class="mb-4">EX-ACT Data</h2>
+    
+        <!-- Search Bar -->
+        <form method="GET" class="d-flex mb-3">
+            <div class="input-group">
+                <input type="text" class="form-control" name="q" placeholder="Search tables..." value="{{ query }}">
+                <button class="btn btn-primary" type="submit">Search</button>
+            </div>
+        </form>
+    
+        <!-- Table List -->
+        <ul class="list-group" id="tableList">
+            {% for model in models_info %}
+                <li class="list-group-item">
+                    <a href="{% url 'table_data' model.model_name %}">{{ model.verbose_name }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}
+{% block script %}
+<script>
+    document.getElementById('tableSearch').addEventListener('keyup', function() {
+        var query = this.value.toLowerCase();
+        var items = document.querySelectorAll('#tableList .list-group-item');
+
+        items.forEach(function(item) {
+            var text = item.textContent.toLowerCase();
+            if (text.includes(query)) {
+                item.style.display = '';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock script %}
