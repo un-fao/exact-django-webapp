@@ -153,35 +153,35 @@ class IPCCRegion(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return self.name
 
 
 class GasType(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return self.name
 
 
 class GLEAMRegion(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return self.name
 
 
 class ForestType(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return self.name
 
 
 class ForestConditionType(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return self.name
 
 
 class SiteLocationType(models.Model):
@@ -226,15 +226,14 @@ class LandUseType(models.Model):
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        module_types = ", ".join([str(x.name) for x in self.module_types.all()])
-        return f"({self.pk}) {self.name} - Active: {self.is_active}" + (f" ({module_types})" if module_types else "")
+        return self.name
 
 
 class SettlementType(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return self.name
 
 
 class ChangeRate(models.Model):
@@ -260,7 +259,7 @@ class Region(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return self.name
 
 
 class Country(models.Model):
@@ -273,7 +272,7 @@ class Country(models.Model):
         verbose_name_plural = "Countries"
 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return self.name
 
 
 class Climate(models.Model):
@@ -282,7 +281,7 @@ class Climate(models.Model):
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return self.name
 
 
 class Moisture(models.Model):
@@ -290,7 +289,7 @@ class Moisture(models.Model):
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return self.name
 
 
 class SoilType(models.Model):
@@ -298,14 +297,14 @@ class SoilType(models.Model):
     active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return self.name
 
 
 class ExtractionSoilType(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return self.name
 
 
 class TillageType(models.Model):
@@ -320,7 +319,7 @@ class OrganicInputType(models.Model):
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return self.name
 
 
 class ResidueManagementType(models.Model):
@@ -355,28 +354,28 @@ class TillageManagementType(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return self.name
 
 
 class WaterManagementTypeBeforeCultivation(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return self.name
 
 
 class WaterManagementTypeAfterCultivation(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return self.name
 
 
 class GrasslandManagementType(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return self.name
 
 
 class LivestockCategoryType(models.Model):
@@ -384,21 +383,21 @@ class LivestockCategoryType(models.Model):
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return self.name
 
 
 class LivestockProductionType(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return self.name
 
 
 class ManureManagementType(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return self.name
 
 
 class ModuleType(models.Model):
@@ -427,7 +426,7 @@ class FireType(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return self.name
 
 
 class PeatType(models.Model):
@@ -455,42 +454,42 @@ class FisheryType(models.Model):
     name = models.CharField(max_length=255)
 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return self.name
 
 
 class LargeFisheryGearType(models.Model):
     name = models.CharField(max_length=255, unique=True)
 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return self.name
 
 
 class SmallFisheryGearType(models.Model):
     name = models.CharField(max_length=255, unique=True)
 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return self.name
 
 
 class FishType(models.Model):
     name = models.CharField(max_length=255)
 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return self.name
 
 
 class MacroFuelType(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"({self.pk}) {_(self.name)}"
+        return self.name
 
 
 class FuelUseType(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"({self.pk}) {self.name}"
+        return self.name
 
 
 class FuelType(models.Model):
@@ -505,7 +504,7 @@ class FuelType(models.Model):
     def __str__(self):
         macro = getattr(self.macro_fuel_type, "name", None)
         use = getattr(self.fuel_use_type, "name", None)
-        return f"({self.pk}) {macro} - {use} - {self.name}"
+        return self.name
 
 
 class SalinityType(models.Model):

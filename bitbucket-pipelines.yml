@@ -76,11 +76,11 @@ definitions:
           - gcloud app versions list --service=$SERVICE_NAME --project=$PROJECT_ID --format="value(version.id)" --sort-by="~version.createTime" | tail -n +100 | xargs -r gcloud app versions delete -q
 pipelines:
   branches:
-    develop:
-      - step: *predeploy
-      - step:
-          <<: *deploy
-          deployment: develop
+    # develop:
+    #   - step: *predeploy
+    #   - step:
+    #       <<: *deploy
+    #       deployment: develop
     review:
       - step: *predeploy
       - step:
