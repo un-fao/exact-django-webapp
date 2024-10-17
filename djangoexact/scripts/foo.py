@@ -24,5 +24,34 @@ def add_0_12_to_co2_value_in_input_emission_factor():
     input_emission_factor = ipcc_models.InputEmissionFactor.objects.filter(input_type=urea).update(co2_value=0.12)
 
 
-add_climate_tropical_montane_to_perennial_cropland()
-add_0_12_to_co2_value_in_input_emission_factor()
+def change_forest_agb_tropical_mountain_system_to_tropical_montane():
+    """
+    Change all Forest AGB Tropical Mountain System to Tropical Montane
+    """
+    tropical_montane_climate = models.Climate.objects.get(name="Tropical Montane")
+    agbs = ipcc_models.ForestManagementAGB.objects.filter(climate__name="Tropical", land_use_type__name="Mountain System").update(climate=tropical_montane_climate)
+
+
+def change_forest_bgb_tropical_mountain_system_to_tropical_montane():
+    """
+    Change all Forest AGB Tropical Mountain System to Tropical Montane
+    """
+    tropical_montane_climate = models.Climate.objects.get(name="Tropical Montane")
+    agbs = ipcc_models.ForestManagementBGB.objects.filter(climate__name="Tropical", land_use_type__name="Mountain System").update(climate=tropical_montane_climate)
+
+
+def change_forest_agb_growth_tropical_mountain_system_to_tropical_montane():
+    """
+    Change all Forest AGB Tropical Mountain System to Tropical Montane
+    """
+    tropical_montane_climate = models.Climate.objects.get(name="Tropical Montane")
+    agbs = ipcc_models.ForestManagementAGBGrowth.objects.filter(climate__name="Tropical", land_use_type__name="Mountain System").update(climate=tropical_montane_climate)
+
+
+# TODO: Run in prod
+
+# add_climate_tropical_montane_to_perennial_cropland()
+# add_0_12_to_co2_value_in_input_emission_factor()
+# change_forest_agb_tropical_mountain_system_to_tropical_montane()
+# change_forest_bgb_tropical_mountain_system_to_tropical_montane()
+# change_forest_agb_growth_tropical_mountain_system_to_tropical_montane()
