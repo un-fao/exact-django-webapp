@@ -1279,39 +1279,6 @@ for i, row in enumerate(df_dict2):
         value=value,
     )
 
-
-df2 = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "OrganicSoilGefEmissionFactor.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers2 = df2.columns.values.tolist()
-df_dict2 = df2.to_dict("records")
-
-for i, row in enumerate(df_dict2):
-    climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
-    moisture = Moisture.objects.get(name__iexact=sanitize(row["moisture"]))
-    co2 = parse_csv_number(row["co2"], nan_value=0)
-    ch4 = parse_csv_number(row["ch4"], nan_value=0)
-    co = parse_csv_number(row["co"], nan_value=0)
-
-    print(
-        climate,
-        moisture,
-        co2,
-        ch4,
-        co,
-    )
-
-    OrganicSoilGefEmissionFactor.objects.get(
-        climate=climate,
-        moisture=moisture,
-        co2=co2,
-        ch4=ch4,
-        co=co,
-    )
-
 df2 = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "RewettingEmissionFactor.csv"),
     header=0,
@@ -4454,6 +4421,42 @@ for i, row in df.iterrows():
         print(row)
         print(e)
 
+log.debug("Deleting all OrganicSoilGefEmissionFactor...")
+OrganicSoilGefEmissionFactor.objects.all().delete()
+
+df2 = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "OrganicSoilGefEmissionFactor.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers2 = df2.columns.values.tolist()
+df_dict2 = df2.to_dict("records")
+
+for i, row in enumerate(df_dict2):
+    climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
+    moisture = Moisture.objects.get(name__iexact=sanitize(row["moisture"]))
+    co2 = parse_csv_number(row["co2"], nan_value=0)
+    ch4 = parse_csv_number(row["ch4"], nan_value=0)
+    co = parse_csv_number(row["co"], nan_value=0)
+
+    print(
+        climate,
+        moisture,
+        co2,
+        ch4,
+        co,
+    )
+
+    OrganicSoilGefEmissionFactor.objects.create(
+        climate=climate,
+        moisture=moisture,
+        co2=co2,
+        ch4=ch4,
+        co=co,
+    )
+
 # TODO: Run in review
+
 
 # TODO: Run in develop
