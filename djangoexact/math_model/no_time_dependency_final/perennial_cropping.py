@@ -78,8 +78,8 @@ class PerennialCropland(LandModule):
                 yearly_nitrous_emissions = breakdown_according_to_values(total_nitrous, self.hectares_total)
                 yearly_methane_emissions = breakdown_according_to_values(total_methane, self.hectares_total)
 
-                nitrous_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_nitrous_emissions], ActivityTypes.RESIDUE_BURNING, delay=self.delay)
-                methane_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_methane_emissions], ActivityTypes.RESIDUE_BURNING, delay=self.delay)
+                nitrous_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in yearly_nitrous_emissions], ActivityTypes.RESIDUE_BURNING, delay=self.delay)
+                methane_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in yearly_methane_emissions], ActivityTypes.RESIDUE_BURNING, delay=self.delay)
                 
                 self.result.yearly_emissions_by_sector_by_gas.append(nitrous_emission_set)
                 self.result.yearly_emissions_by_sector_by_gas.append(methane_emission_set)
