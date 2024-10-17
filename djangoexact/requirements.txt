@@ -57,3 +57,4 @@ requests==2.31.0
 django-unfold==0.34.0
 django-modeltranslation==0.19.9
 XlsxWriter==3.2.0
+openpyxl==3.1.2
