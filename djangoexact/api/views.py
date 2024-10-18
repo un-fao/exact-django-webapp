@@ -1538,14 +1538,39 @@ def generic_module_viewset(model: Module):
                     return utils.ErrorResponse("Module is not ready. Cannot calculate result.")
 
             try:
-                aggregate_by = BreakdownTypes(request.query_params.get("aggregate", BreakdownTypes.TOTAL))
-                results_w, results_wo, results_tot = CalculatorFactory().calculate_result(module, aggregate_by=aggregate_by)
 
-                module_results = {
-                    "total_w": results_w,
-                    "total_wo": results_wo,
-                    "balance": results_tot,
-                }
+                aggregate_by = BreakdownTypes(request.query_params.get("aggregate", BreakdownTypes.TOTAL))
+                module_results = module.get_cached_results(by=aggregate_by)
+
+                if module_results is None:
+                    total, by_activity, by_gas, by_activity_gas = CalculatorFactory().calculate_result(module)
+
+                    results_total = {
+                        "total_w": total[0],
+                        "total_wo": total[1],
+                        "balance": total[2],
+                    }
+
+                    results_by_activity = {
+                        "total_w": list(by_activity[0]),
+                        "total_wo": list(by_activity[1]),
+                        "balance": list(by_activity[2]),
+                    }
+
+                    results_by_gas = {
+                        "total_w": list(by_gas[0]),
+                        "total_wo": list(by_gas[1]),
+                        "balance": list(by_gas[2]),
+                    }
+
+                    results_by_activity_gas = {
+                        "total_w": list(by_activity_gas[0]),
+                        "total_wo": list(by_activity_gas[1]),
+                        "balance": list(by_activity_gas[2]),
+                    }
+
+                    module_results = results_total if aggregate_by == BreakdownTypes.TOTAL else results_by_activity if aggregate_by == BreakdownTypes.ACTIVITY else results_by_gas if aggregate_by == BreakdownTypes.GAS else results_by_activity_gas
+                    module.cache_results(results_total, results_by_activity, results_by_gas, results_by_activity_gas)
 
                 serializer = DynamicResultSerializer(module_results, aggregate_by=aggregate_by)
                 serialized_data = serializer.data
