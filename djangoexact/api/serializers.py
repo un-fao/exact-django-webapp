@@ -1387,19 +1387,11 @@ class OrganicSoilReadSerializer(LandModuleSeralizer):
             self.parent_land_use_type_w = luc.module_type_w.id if luc.module_type_w else None
             self.parent_land_use_type_wo = luc.module_type_wo.id if luc.module_type_wo else None
         else:
-            parent_module: LandModule = None
-            for module_type in self.instance.activity.module_types.all():
-                module_type: ModuleType
-                if module_type.is_luc:
-                    parent_module = getattr(self.instance.activity, module_type.class_name.lower()).first()
-                    break
+            parent_module, parent_module_type = utils.find_organic_soil_parent_module(self.instance)
 
-            if parent_module is None:
-                raise ValueError("Organic Soil must be associated either with a Land Use Change or an independent Land Module")
-
-            self.parent_land_use_type_start = parent_module.module_type.id if parent_module.module_type else None
-            self.parent_land_use_type_w = parent_module.module_type.id
-            self.parent_land_use_type_wo = parent_module.module_type.id
+            self.parent_land_use_type_start = parent_module_type.id if parent_module_type else None
+            self.parent_land_use_type_w = parent_module_type.id
+            self.parent_land_use_type_wo = parent_module_type.id
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
