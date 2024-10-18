@@ -403,29 +403,17 @@ def find_organic_soil_parent_module(organic_soil) -> tuple:
         ValueError: If the parent module or module type cannot be found.
     """
 
-    # NOTE: This is always true as long as Organic Soil is a OneToOneField of LandModule
-    parent_module: api_models.LandModule = None
-
-    land_modules = api_models.ModuleType.objects.filter(is_luc=True)
-
-    for land_module in land_modules:
-        if getattr(organic_soil, land_module.class_name.lower(), None):
-            parent_module = land_module
+    parent_module = None
+    for module_type in organic_soil.activity.module_types.all():
+        module_type
+        if module_type.is_luc:
+            parent_module = getattr(organic_soil.activity, module_type.class_name.lower()).first()
             break
 
-    if not parent_module:
-        raise ValueError(f"Could not find parent module for Organic Soil")
+    if parent_module is None:
+        raise ValueError("Organic Soil must be associated either with a Land Use Change or an independent Land Module")
 
-    parent_module_name = parent_module.split("_")[-1]
-    parent_module_type: api_models.ModuleType = api_models.ModuleType.objects.filter(class_name__iexact=parent_module_name).first()
-
-    if not parent_module_type:
-        raise ValueError(f"Could not find module type for {parent_module_name}")
-
-    ParentModule = apps.get_model(app_label="api", model_name=parent_module_type.class_name)
-    parent_module = ParentModule.objects.get(organic_soil=organic_soil)
-
-    return parent_module, parent_module_type
+    return parent_module, module_type
 
 
 def get_changes(records: list[HistoricalRecords]):
