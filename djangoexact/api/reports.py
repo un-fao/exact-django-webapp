@@ -690,6 +690,9 @@ class AnnualCroplandReport(LandModuleReport):
             self.fire_ch4 = [x + y for x, y in zip(self.fire_ch4, self.extract_emissions(minor_emission_set, self.fire_ch4_source[0], self.fire_ch4_source[1]))]
 
     def build_metadata(self):
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
         last_metadata_row = self.metadata_worksheet.max_row + 1
 
         self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Annual Cropland")
@@ -738,7 +741,12 @@ class AnnualCroplandReport(LandModuleReport):
             self.metadata_worksheet.cell(row=last_metadata_row + 8, column=4, value=self.module.minor_residue_management_type_wo.name if self.module.minor_residue_management_type_wo is not None else "Default")
             self.metadata_worksheet.cell(row=last_metadata_row + 9, column=4, value=self.module.minor_yield_wo if self.module.minor_yield_wo is not None else "Default")
 
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
     def build_additional_indicators(self):
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.additional_indicators_worksheet = self.workbook["Additional Indicators"]
+
         with_project_row = None
         for row in self.additional_indicators_worksheet.iter_rows():
             if row[0].value == "With project":
@@ -762,6 +770,8 @@ class AnnualCroplandReport(LandModuleReport):
         self.additional_indicators_worksheet.cell(without_project_row, 1, "Annual Cropland (ha)")
         for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
             self.additional_indicators_worksheet.cell(without_project_row, i + 2, self.units_breakdown_wo[i])
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
     def get_result(self):
         """
@@ -793,6 +803,11 @@ class SetAsideReport(LandModuleReport):
     def get_result(self):
         super().get_result()
 
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.results_worksheet = self.workbook["Results"]
+        self.metadata_worksheet = self.workbook["Metadata"]
+        self.additional_indicators_worksheet = self.workbook["Additional Indicators"]
+
         last_results_row = self.results_worksheet.max_row + 1
         last_metadata_row = self.metadata_worksheet.max_row + 1
         last_additional_indicators_row = self.additional_indicators_worksheet.max_row + 1
@@ -813,6 +828,8 @@ class SetAsideReport(LandModuleReport):
         if self.module.is_without():
             self.metadata_worksheet.cell(row=last_metadata_row + 1, column=4, value=self.units)
             self.metadata_worksheet.cell(row=last_metadata_row + 2, column=4, value=self.module.is_set_aside_wo)
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
 
 @dataclass
@@ -893,9 +910,10 @@ class FloodedRiceReport(LandModuleReport):
     def build_report(self):
         super().build_report()
 
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.results_worksheet = self.workbook["Results"]
+
         last_results_row = self.results_worksheet.max_row
-        last_metadata_row = self.metadata_worksheet.max_row
-        last_additional_indicators_row = self.additional_indicators_worksheet.max_row
 
         self.rice_cultivation_ch4 = self.extract_emissions(self.emissions_set, self.rice_cultivation_ch4_source[0], self.rice_cultivation_ch4_source[1])
 
@@ -903,6 +921,8 @@ class FloodedRiceReport(LandModuleReport):
 
         for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
             self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.rice_cultivation_ch4[i])
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
 
 @dataclass
@@ -918,9 +938,11 @@ class WaterbodyReport(BaseModuleReport):
         return super().__post_init__()
 
     def build_report(self):
+
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.results_worksheet = self.workbook["Results"]
+
         last_results_row = self.results_worksheet.max_row
-        last_metadata_row = self.metadata_worksheet.max_row
-        last_additional_indicators_row = self.additional_indicators_worksheet.max_row
 
         self.waterbody_management_ch4 = self.extract_emissions(self.emissions_set, self.waterbody_management_ch4_source[0], self.waterbody_management_ch4_source[1])
 
@@ -928,6 +950,8 @@ class WaterbodyReport(BaseModuleReport):
 
         for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
             self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.waterbody_management_ch4[i])
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
 
 @dataclass
@@ -946,9 +970,10 @@ class AquacultureReport(BaseModuleReport):
         return super().__post_init__()
 
     def build_report(self):
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.results_worksheet = self.workbook["Results"]
+
         last_results_row = self.results_worksheet.max_row
-        last_metadata_row = self.metadata_worksheet.max_row
-        last_additional_indicators_row = self.additional_indicators_worksheet.max_row
 
         self.fish_n2o = self.extract_emissions(self.emissions_set, self.fish_n2o_source[0], self.fish_n2o_source[1])
         self.electricity_co2_eq = self.extract_emissions(self.emissions_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1])
@@ -959,6 +984,8 @@ class AquacultureReport(BaseModuleReport):
         for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
             self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.fish_n2o[i])
             self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.electricity_co2_eq[i])
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
 
 @dataclass
@@ -980,9 +1007,10 @@ class FisheryReport(BaseModuleReport):
         return super().__post_init__()
 
     def build_report(self):
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.results_worksheet = self.workbook["Results"]
+
         last_results_row = self.results_worksheet.max_row
-        last_metadata_row = self.metadata_worksheet.max_row
-        last_additional_indicators_row = self.additional_indicators_worksheet.max_row
 
         self.liquid_fuel_co2 = self.extract_emissions(self.emissions_set, self.liquid_fuel_co2_source[0], self.liquid_fuel_co2_source[1])
         self.liquid_fuel_n2o = self.extract_emissions(self.emissions_set, self.liquid_fuel_n2o_source[0], self.liquid_fuel_n2o_source[1])
@@ -1001,6 +1029,8 @@ class FisheryReport(BaseModuleReport):
             self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.liquid_fuel_n2o[i])
             self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.liquid_fuel_ch4[i])
             self.results_worksheet.cell(row=last_results_row + 4, column=i + 2, value=self.refrigeration_hfc[i])
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
 
 @dataclass
@@ -1058,9 +1088,10 @@ class LivestockReport(BaseModuleReport):
         return super().__post_init__()
 
     def build_report(self):
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.results_worksheet = self.workbook["Results"]
+
         last_results_row = self.results_worksheet.max_row
-        last_metadata_row = self.metadata_worksheet.max_row
-        last_additional_indicators_row = self.additional_indicators_worksheet.max_row
 
         self.enteric_fermentation_ch4 = self.extract_emissions(self.emissions_set, self.enteric_fermentation_ch4_source[0], self.enteric_fermentation_ch4_source[1])
         self.manure_management_other_than_prp_ch4 = self.extract_emissions(self.emissions_set, self.manure_management_other_than_prp_ch4_source[0], self.manure_management_other_than_prp_ch4_source[1])
@@ -1092,6 +1123,8 @@ class LivestockReport(BaseModuleReport):
             self.results_worksheet.cell(row=last_results_row + 7, column=i + 2, value=self.manure_management_prp_direct_n2o[i])
             self.results_worksheet.cell(row=last_results_row + 8, column=i + 2, value=self.manure_management_prp_leaching_indirect_n2o[i])
             self.results_worksheet.cell(row=last_results_row + 9, column=i + 2, value=self.manure_management_prp_volatilization_indirect_n2o[i])
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
 
 @dataclass
@@ -1174,9 +1207,10 @@ class ForestManagementReport(LandModuleReport):
     def build_report(self):
         super().build_report()
 
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.results_worksheet = self.workbook["Results"]
+
         last_results_row = self.results_worksheet.max_row
-        last_metadata_row = self.metadata_worksheet.max_row
-        last_additional_indicators_row = self.additional_indicators_worksheet.max_row
 
         self.rotation_hwp_agb_co2 = self.extract_emissions(self.emissions_set, self.hwp_rotation_logging_agb_co2_source[0], self.hwp_rotation_logging_agb_co2_source[1])
         self.rotation_hwp_bgb_co2 = self.extract_emissions(self.emissions_set, self.hwp_rotation_logging_bgb_co2_source[0], self.hwp_rotation_logging_bgb_co2_source[1])
@@ -1226,6 +1260,8 @@ class ForestManagementReport(LandModuleReport):
             self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.biomass_loss_co2[i])
             self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.biomass_gain_co2[i])
 
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
 
 @dataclass
 class EnergyReport(BaseModuleReport):
@@ -1274,6 +1310,9 @@ class EnergyReport(BaseModuleReport):
                 self.liquid_fuel_n2o = list(map(sum, zip(self.liquid_fuel_n2o, self.extract_emissions(self.emissions_set, self.liquid_fuel_n2o_source[0], self.liquid_fuel_n2o_source[1]))))
 
     def build_report(self):
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.results_worksheet = self.workbook["Results"]
+
         last_results_row = self.results_worksheet.max_row
 
         self.electricity_co2_eq = np.zeros(self.last_year_of_accounting - self.start_year_of_activities)
@@ -1302,6 +1341,8 @@ class EnergyReport(BaseModuleReport):
             self.results_worksheet.cell(row=last_results_row + 5, column=i + 2, value=self.solid_fuel_co2[i])
             self.results_worksheet.cell(row=last_results_row + 6, column=i + 2, value=self.solid_fuel_ch4[i])
             self.results_worksheet.cell(row=last_results_row + 7, column=i + 2, value=self.solid_fuel_n2o[i])
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
 
 @dataclass
@@ -1356,6 +1397,9 @@ class InputReport(BaseModuleReport):
             self.emissions_set += submodule_emission_set
 
     def build_report(self):
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.results_worksheet = self.workbook["Results"]
+
         last_results_row = self.results_worksheet.max_row
 
         """
@@ -1381,6 +1425,8 @@ class InputReport(BaseModuleReport):
             self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.inputs_n2o[i])
             self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.inputs_co2_eq[i])
             self.results_worksheet.cell(row=last_results_row + 4, column=i + 2, value=self.feed_co2_eq[i])
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
 
 @dataclass
@@ -1428,6 +1474,9 @@ class IrrigationReport(BaseModuleReport):
     def build_report(self):
         super().build_report()
 
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.results_worksheet = self.workbook["Results"]
+
         last_results_row = self.results_worksheet.max_row
 
         self.add_submodules_results()
@@ -1448,6 +1497,8 @@ class IrrigationReport(BaseModuleReport):
             self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.liquid_fuel_or_electricity_co2[i])
             self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.liquid_fuel_or_electricity_ch4[i])
             self.results_worksheet.cell(row=last_results_row + 4, column=i + 2, value=self.liquid_fuel_or_electricity_n2o[i])
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
 
 # @dataclass
@@ -1511,6 +1562,9 @@ class SettlementReport(BaseModuleReport):
     def build_report(self):
         super().build_report()
 
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.results_worksheet = self.workbook["Results"]
+
         last_results_row = self.results_worksheet.max_row
 
         self.buildings_co2_eq = np.zeros(self.duration)
@@ -1527,3 +1581,5 @@ class SettlementReport(BaseModuleReport):
             self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.buildings_co2_eq[i])
             self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.roads_co2_eq[i])
             self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.other_infrastructure_co2_eq[i])
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
