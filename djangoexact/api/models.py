@@ -861,6 +861,7 @@ class CachedResultMixin(models.Model, DirtyFieldsMixin):
         if self.last_modified is None:
             self.last_modified = timezone.now()
 
+        # BUG: Cache won't be invalidated when another module is updated, however some t2 values are shared between modules. This will result in incorrect results.
         if self.pk and self.is_dirty(check_relationship=True):
             dirty_fields = self.get_dirty_fields()
             cache_fields = ["last_cached_at", "cached_results_total", "cached_results_by_activity", "cached_results_by_gas", "cached_results_by_activity_by_gas"]
