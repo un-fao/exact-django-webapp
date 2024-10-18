@@ -122,7 +122,7 @@ class GrasslandManagement(BaseModule):
                     self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in breakdown_according_to_values(total_nitrous, self.total_hectars)], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
                     self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in breakdown_according_to_values(total_methane, self.total_hectars)], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
                 return
-            except:
+            except Exception as e:
                 traceback.print_exc()
                 raise e
 
