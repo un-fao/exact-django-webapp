@@ -16,6 +16,7 @@ import openpyxl as pxl
 from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.styles import Color, PatternFill, Font, Border
 from datetime import datetime
+from io import BytesIO
 
 log.basicConfig(level=log.DEBUG)
 
@@ -74,10 +75,44 @@ class ReportFactory:
             return
 
 
+class ExcelFileManager:
+    def __init__(self):
+        # Start with an empty in-memory Excel file
+        self.excel_file = BytesIO()
+        self._create_initial_excel()
+
+    def _create_initial_excel(self):
+
+        workbook = xlsxwriter.Workbook(self.excel_file, {"in_memory": True})
+        workbook.add_worksheet("Results")
+        workbook.add_worksheet("Metadata")
+        workbook.add_worksheet("Additional Indicators")
+
+        # Close the xlsxwriter workbook to finalize the file
+        workbook.close()
+
+        # Rewind the in-memory file
+        self.excel_file.seek(0)
+
+    def get_workbook(self):
+        # Return an openpyxl workbook from the current in-memory file
+        return pxl.load_workbook(self.excel_file)
+
+    def save_workbook(self, workbook):
+        # Save an openpyxl workbook back into the BytesIO stream
+        self.excel_file = BytesIO()
+        workbook.save(self.excel_file)
+        self.excel_file.seek(0)
+
+    def get_excel_bytes(self):
+        # Get the current Excel file as bytes (e.g., for download)
+        self.excel_file.seek(0)
+        return self.excel_file.getvalue()
+
+
 @dataclass
 class BaseProjectReport:
     project: api_models.Project
-    filename: str = None
     start_year_of_activities: int = None
     last_year_of_accounting: int = None
     implementation_years: int = None
@@ -92,10 +127,12 @@ class BaseProjectReport:
     activity_reports: list["BaseActivityReport"] = None
 
     colors: Colors = Colors
+    excel_manager: ExcelFileManager = None
 
     def __post_init__(self):
         self.activity_reports = []
         self.activities = self.project.activities.all()
+        self.excel_manager = ExcelFileManager()
         pass
 
     def build_report_skeleton(self):
@@ -106,15 +143,7 @@ class BaseProjectReport:
         self.capitalization_years = self.project.capitalization_years
         self.duration = self.implementation_years + self.capitalization_years
 
-        self.filename = os.path.join(settings.BASE_DIR, "reports", f"{str(self.project.name)[:6]}_results_{datetime.now().strftime('%Y%m%d%H%M%S')}.xlsx")
-
-        wb = xlsxwriter.Workbook(self.filename)
-        wb.add_worksheet("Results")
-        wb.add_worksheet("Metadata")
-        wb.add_worksheet("Additional Indicators")
-        wb.close()
-
-        self.workbook = pxl.load_workbook(self.filename)
+        self.workbook = self.excel_manager.get_workbook()
         self.results_worksheet = self.workbook["Results"]
         self.metadata_worksheet = self.workbook["Metadata"]
         self.additional_indicators_worksheet = self.workbook["Additional Indicators"]
@@ -141,6 +170,8 @@ class BaseProjectReport:
 
         for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
             self.additional_indicators_worksheet.cell(row=1, column=i + 2, value=year)
+
+        self.excel_manager.save_workbook(self.workbook)
 
         log.debug(f"Report skeleton for {self.project.name} built.")
         return self.workbook
@@ -178,6 +209,9 @@ class BaseProjectReport:
         yearly_balance_t_co2_eq = list(map(sum, zip(biomass_co2, soil_co2, other_co2, ch4, n2o, other_ghgs)))
         cumulative_balance_t_co2_eq = np.cumsum(yearly_balance_t_co2_eq)
 
+        self.workbook = self.excel_manager.get_workbook()
+        self.results_worksheet = self.workbook["Results"]
+
         for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
             self.results_worksheet.cell(row=2, column=i + 2, value=cumulative_balance_t_co2_eq[i])
             self.results_worksheet.cell(row=3, column=i + 2, value=yearly_balance_t_co2_eq[i])
@@ -187,6 +221,8 @@ class BaseProjectReport:
             self.results_worksheet.cell(row=7, column=i + 2, value=ch4[i])
             self.results_worksheet.cell(row=8, column=i + 2, value=n2o[i])
             self.results_worksheet.cell(row=9, column=i + 2, value=other_ghgs[i])
+
+        self.excel_manager.save_workbook(self.workbook)
 
     def build_report(self):
         self.build_report_skeleton()
@@ -198,9 +234,7 @@ class BaseProjectReport:
             self.activity_reports.append(activity_report)
 
         self.finalize_report()
-
-        self.workbook.save(self.filename)
-        return self.filename
+        return self.excel_manager.get_excel_bytes()
 
 
 @dataclass
@@ -223,10 +257,6 @@ class BaseActivityReport:
     additional_indicators_worksheet: Worksheet = None
 
     def __post_init__(self):
-        self.workbook = self.project_report.workbook
-        self.results_worksheet = self.project_report.results_worksheet
-        self.metadata_worksheet = self.project_report.metadata_worksheet
-        self.additional_indicators_worksheet = self.project_report.additional_indicators_worksheet
         self.modules_reports = []
 
     def build_activity_skeleton(self):
@@ -237,6 +267,11 @@ class BaseActivityReport:
         self.implementation_years = self.activity.implementation_years
         self.capitalization_years = self.activity.capitalization_years
         self.duration = self.implementation_years + self.capitalization_years
+
+        self.workbook = self.project_report.excel_manager.get_workbook()
+        self.results_worksheet = self.workbook["Results"]
+        self.metadata_worksheet = self.workbook["Metadata"]
+        self.additional_indicators_worksheet = self.workbook["Additional Indicators"]
 
         last_results_row = self.results_worksheet.max_row + 1
         last_metadata_row = self.metadata_worksheet.max_row + 1
@@ -261,6 +296,8 @@ class BaseActivityReport:
         self.additional_indicators_worksheet.cell(row=last_additional_indicators_row + 2, column=1, value="With project").fill = Colors.LIGHT_BEIGE_FILL.value
         self.additional_indicators_worksheet.cell(row=last_additional_indicators_row + 3, column=1, value="Without project")
         self.additional_indicators_worksheet.cell(row=last_additional_indicators_row + 3, column=1, value="Without project").fill = Colors.LIGHT_BEIGE_FILL.value
+
+        self.project_report.excel_manager.save_workbook(self.workbook)
 
         log.debug(f"Activity skeleton for {self.activity.name} built.")
 
@@ -323,12 +360,6 @@ class BaseModuleReport:
             if self.calculator.results_start_wo is not None:
                 self.emissions_set += self.calculator.results_start_wo.yearly_emissions_by_sector_by_gas
 
-        if self.activity_report is not None:
-            self.workbook = self.activity_report.workbook
-            self.results_worksheet = self.activity_report.results_worksheet
-            self.metadata_worksheet = self.activity_report.metadata_worksheet
-            self.additional_indicators_worksheet = self.activity_report.additional_indicators_worksheet
-
         self.start_year_of_activities = self.module.activity.project.start_year_of_activities
         self.last_year_of_accounting = self.module.activity.project.last_year_of_accounting
         self.implementation_years = self.module.activity.implementation_years
@@ -336,27 +367,33 @@ class BaseModuleReport:
         self.duration = self.module.activity.implementation_years + self.module.activity.capitalization_years
 
     def get_result(self):
-        if self.activity_report is None:
-            wb = xlsxwriter.Workbook(f"{self.module.module_type.class_name}_results.xlsx")
-            wb.add_worksheet("Results")
-            wb.add_worksheet("Metadata")
-            wb.add_worksheet("Additional Indicators")
-            wb.close()
+        # if self.activity_report is None:
+        #     wb = xlsxwriter.Workbook(f"{self.module.module_type.class_name}_results.xlsx")
+        #     wb.add_worksheet("Results")
+        #     wb.add_worksheet("Metadata")
+        #     wb.add_worksheet("Additional Indicators")
+        #     wb.close()
 
-            self.workbook = pxl.load_workbook("annual_cropland_results.xlsx")
-            self.results_worksheet = self.workbook["Results"]
-            self.metadata_worksheet = self.workbook["Metadata"]
-            self.additional_indicators_worksheet = self.workbook["Additional Indicators"]
+        #     self.workbook = pxl.load_workbook("annual_cropland_results.xlsx")
+        #     self.results_worksheet = self.workbook["Results"]
+        #     self.metadata_worksheet = self.workbook["Metadata"]
+        #     self.additional_indicators_worksheet = self.workbook["Additional Indicators"]
 
-        self.workbook = self.activity_report.workbook
-        self.results_worksheet = self.activity_report.results_worksheet
-        self.metadata_worksheet = self.activity_report.metadata_worksheet
-        self.additional_indicators_worksheet = self.activity_report.additional_indicators_worksheet
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.results_worksheet = self.workbook["Results"]
+        self.metadata_worksheet = self.workbook["Metadata"]
+        self.additional_indicators_worksheet = self.workbook["Additional Indicators"]
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
     def build_report(self):
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.results_worksheet = self.workbook["Results"]
+
         last_results_row = self.results_worksheet.max_row + 1
         self.results_worksheet.cell(row=last_results_row, column=1, value=str(self.module.module_type.name))
         self.results_worksheet.cell(row=last_results_row, column=1).fill = Colors.LIGHT_BLUE_FILL.value
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
     def extract_emissions(self, data, activity_type=None, gas_type=None, excluded_activity_types=[], excluded_gas_types=[]) -> np.ndarray:
         """
@@ -445,14 +482,7 @@ class LandModuleReport(BaseModuleReport):
         break_w = getattr(self.calculator.math_w, "hectares_total", np.zeros(hectares_length))
         break_wo = getattr(self.calculator.math_wo, "hectares_total", np.zeros(hectares_length))
 
-        log.debug(f"Calculating units breakdown for {self.module.module_type.name}: with")
-        log.debug(f"Units breakdown start_w: {break_start_w}")
-        log.debug(f"Units breakdown w: {break_w}")
         self.units_breakdown_w = [x + y for x, y in zip(break_start_w, break_w)]
-
-        log.debug(f"Calculating units breakdown for {self.module.module_type.name}: without")
-        log.debug(f"Units breakdown start_wo: {break_start_wo}")
-        log.debug(f"Units breakdown wo: {break_wo}")
         self.units_breakdown_wo = [x + y for x, y in zip(break_start_wo, break_wo)]
 
     def get_result(self):
@@ -469,6 +499,9 @@ class LandModuleReport(BaseModuleReport):
         super().build_report()
         log.debug(f"Building base report for {self.module.module_type.name}")
         self.get_result()
+
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.results_worksheet = self.workbook["Results"]
 
         last_results_row = self.results_worksheet.max_row
 
@@ -491,6 +524,8 @@ class LandModuleReport(BaseModuleReport):
             self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.soil_n2o[i])
             self.results_worksheet.cell(row=last_results_row + 4, column=i + 2, value=self.fire_n2o[i])
             self.results_worksheet.cell(row=last_results_row + 5, column=i + 2, value=self.fire_ch4[i])
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
         log.debug(f"Base report for {self.module.module_type.name} built.")
         return self.workbook
@@ -515,6 +550,9 @@ class PerennialCroplandReport(LandModuleReport):
         return super().__post_init__()
 
     def populate_metadata(self):
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
         last_metadata_row = self.metadata_worksheet.max_row + 1
 
         self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Perennial Cropland")
@@ -547,7 +585,12 @@ class PerennialCroplandReport(LandModuleReport):
             self.metadata_worksheet.cell(row=last_metadata_row + 4, column=4, value=self.module.organic_input_type_wo.name)
             self.metadata_worksheet.cell(row=last_metadata_row + 5, column=4, value=self.module.crop_yield_t2_wo if self.module.crop_yield_t2_wo is not None else "Default")
 
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
     def populate_additional_indicators(self):
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.additional_indicators_worksheet = self.workbook["Additional Indicators"]
+
         with_project_row = None
         for row in self.additional_indicators_worksheet.iter_rows():
             if row[0].value == "With project":
@@ -571,6 +614,8 @@ class PerennialCroplandReport(LandModuleReport):
         self.additional_indicators_worksheet.cell(without_project_row, 1, "Perennial Cropland (ha)")
         for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
             self.additional_indicators_worksheet.cell(without_project_row, i + 2, self.units_breakdown_wo[i])
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
     def add_minor_seasons_results(self):
         minor_seasons = getattr(self.module, "minor_seasons", [])
@@ -606,7 +651,7 @@ class PerennialCroplandReport(LandModuleReport):
         self.populate_additional_indicators()
 
         log.debug(f"Report for {self.module_title} built.")
-        return self.workbook
+        return self.activity_report.project_report.excel_manager.get_excel_bytes()
 
 
 @dataclass
