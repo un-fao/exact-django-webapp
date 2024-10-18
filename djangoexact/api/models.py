@@ -16,6 +16,9 @@ import ipcc.models as ipcc
 from django.utils.translation import gettext_lazy as _
 from django.apps import apps
 from django.conf import settings
+from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
+from picklefield.fields import PickledObjectField
+from dirtyfields import DirtyFieldsMixin
 
 
 alphanumeric = validators.RegexValidator(r"^[0-9a-zA-Z]*$", "Only alphanumeric characters are allowed.")
@@ -842,7 +845,65 @@ class Activity(Historical, NoteMixin):
 ##############################
 
 
-class Submodule(Historical):
+class CachedResultMixin(models.Model, DirtyFieldsMixin):
+    class Meta:
+        abstract = True
+
+    updated_at = models.DateTimeField(auto_now=True, null=True, verbose_name=_("updated_at"))
+    last_cached_at = models.DateTimeField(null=True, blank=True, verbose_name=_("last_cached_at"))
+    cached_results_total = PickledObjectField(null=True, blank=True, verbose_name=_("cached_results_total"))
+    cached_results_by_activity = PickledObjectField(null=True, blank=True, verbose_name=_("cached_results_total"))
+    cached_results_by_gas = PickledObjectField(null=True, blank=True, verbose_name=_("cached_results_total"))
+    cached_results_by_activity_by_gas = PickledObjectField(null=True, blank=True, verbose_name=_("cached_results_total"))
+    last_modified = models.DateTimeField(auto_now=False, null=True, blank=True, verbose_name=_("last_modified"))
+
+    def save(self, *args, **kwargs):
+        if self.last_modified is None:
+            self.last_modified = timezone.now()
+
+        if self.pk and self.is_dirty(check_relationship=True):
+            dirty_fields = self.get_dirty_fields()
+            cache_fields = ["last_cached_at", "cached_results_total", "cached_results_by_activity", "cached_results_by_gas", "cached_results_by_activity_by_gas"]
+
+            # Check if relevant fields were changed (exclude cache-related fields)
+            if any(field in dirty_fields for field in self._meta.get_fields() if field.name not in cache_fields):
+                self.last_modified = timezone.now()
+
+        super().save(*args, **kwargs)
+
+    def cache_results(self, balance: dict, by_activity: dict, by_gas: dict, by_activity_by_gas: dict):
+        self.last_cached_at = timezone.now()
+        self.cached_results_total = balance
+        self.cached_results_by_activity = by_activity
+        self.cached_results_by_gas = by_gas
+        self.cached_results_by_activity_by_gas = by_activity_by_gas
+        self.save()
+
+    def invalidate_cached_results(self):
+        self.last_cached_at = None
+        self.cached_results_total = None
+        self.cached_results_by_activity = None
+        self.cached_results_by_gas = None
+        self.cached_results_by_activity_by_gas = None
+        self.save()
+
+    def is_cached_results_valid(self):
+        return self.last_cached_at is not None and self.last_cached_at > self.last_modified
+
+    def get_cached_results(self, by=BreakdownTypes.TOTAL):
+        if self.is_cached_results_valid():
+            if by == BreakdownTypes.TOTAL:
+                return self.cached_results_total
+            elif by == BreakdownTypes.ACTIVITY:
+                return self.cached_results_by_activity
+            elif by == BreakdownTypes.GAS:
+                return self.cached_results_by_gas
+            elif by == BreakdownTypes.ACTIVITY_GAS:
+                return self.cached_results_by_activity_by_gas
+        return None
+
+
+class Submodule(Historical, CachedResultMixin):
     soc_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("soc_t2_start"))
     soc_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("soc_t2_w"))
     soc_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("soc_t2_wo"))
@@ -895,7 +956,7 @@ class Submodule(Historical):
         return self.parent.activity
 
 
-class Module(Historical):
+class Module(Historical, CachedResultMixin):
     class Meta:
         abstract = True
 
