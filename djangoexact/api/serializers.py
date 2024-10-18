@@ -809,6 +809,12 @@ class BaseGenericModuleSerializer(serializers.ModelSerializer):
     status = get_model_serializer(StatusType)(read_only=True)
     note = serializers.SerializerMethodField()
 
+    last_cached_at = serializers.SerializerMethodField()
+    cached_results_total = serializers.SerializerMethodField()
+    cached_results_by_activity = serializers.SerializerMethodField()
+    cached_results_by_gas = serializers.SerializerMethodField()
+    cached_results_by_activity_by_gas = serializers.SerializerMethodField()
+
     class Meta:
         extra_fields = ["module_type"]
 
@@ -817,6 +823,29 @@ class BaseGenericModuleSerializer(serializers.ModelSerializer):
         if not hasattr(self.Meta, "ref_name") or not hasattr(self.Meta, "mandatory_fields"):
             raise ValueError(f"Meta class of {self.__class__.__name__} must have a ref_name and a mandatory_fields attribute")
         log.debug(f"START BaseGenericModuleSerializer[{self.Meta.ref_name}].init")
+
+    def get_last_cached_at(self, obj):
+        return None
+
+    def get_cached_results_total(self, obj):
+        # NOTE: This is hidden for now. Could be returned as a field in the future.
+        # return DynamicResultSerializer(obj.cached_results_total, aggregate_by=BreakdownTypes.TOTAL).data if obj.cached_results_total else None
+        return None
+
+    def get_cached_results_by_activity(self, obj):
+        # NOTE: This is hidden for now. Could be returned as a field in the future.
+        # return DynamicResultSerializer(obj.cached_results_by_activity, aggregate_by=BreakdownTypes.ACTIVITY).data if obj.cached_results_by_activity else None
+        return None
+
+    def get_cached_results_by_gas(self, obj):
+        # NOTE: This is hidden for now. Could be returned as a field in the future.
+        # return DynamicResultSerializer(obj.cached_results_by_gas, aggregate_by=BreakdownTypes.GAS).data if obj.cached_results_by_gas else None
+        return None
+
+    def get_cached_results_by_activity_by_gas(self, obj):
+        # NOTE: This is hidden for now. Could be returned as a field in the future.
+        # return DynamicResultSerializer(obj.cached_results_by_activity_by_gas, aggregate_by=BreakdownTypes.ACTIVITY_GAS).data if obj.cached_results_by_activity_by_gas else None
+        return None
 
     def get_module_type(self, obj):
         return get_model_serializer(ModuleType)(ModuleType.objects.get(class_name=self.Meta.ref_name), many=False).data
