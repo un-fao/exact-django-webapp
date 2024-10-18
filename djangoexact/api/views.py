@@ -99,6 +99,7 @@ from django.db import connection
 import time
 import api.reports as reports
 from django.http import FileResponse
+from django.http import HttpResponse
 
 
 logger = logging.getLogger("console")
@@ -576,14 +577,11 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return utils.ErrorResponse("To get a report for a project, all activities must have been completed.", status=http_status.HTTP_400_BAD_REQUEST)
 
         report = reports.BaseProjectReport(project)
-        filename = report.build_report()
+        file_bytes_buffer = report.build_report()
 
         try:
-            response = FileResponse(open(filename, "rb"), content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-            response["Content-Disposition"] = f"attachment; filename={filename}"
-            response["Content-Length"] = os.path.getsize(filename)
-
-            os.remove(filename)
+            response = HttpResponse(file_bytes_buffer, content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            response["Content-Disposition"] = f'attachment; filename="{project.name}_report.xlsx"'
 
             return response
         except FileNotFoundError:
