@@ -54,6 +54,8 @@ from .models import (
     Definition,
     Note,
     FieldDefinition,
+    LandModule,
+    CachedResultMixin,
 )
 from .serializers import (
     ActionTypes,
@@ -441,7 +443,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         Calculates and returns total emissions for each module in the project.
         """
 
-        project = self.get_object()
+        project = Project.objects.prefetch_related("activities").get(pk=pk)
 
         if not utils.has_project_permission("view_project", self.request.user, project):
             logging.error("Selected user does not have permission to view the project")
@@ -1085,7 +1087,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         Calculates and returns total emissions for each module in the activity.
         """
 
-        activity = get_object_or_404(Activity, pk=pk)
+        activity = Activity.objects.prefetch_related().get(pk=pk)
 
         if not utils.has_project_permission("view_activity", self.request.user, activity.project):
             logging.error("Selected user does not have permission to view the activity")
@@ -1095,22 +1097,15 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         modules = []
         # TODO: Make a serializer for this
-        for module in activity.module_types.all():
-            try:
-                model_ref = apps.get_model(utils.API, module.class_name)
-            except LookupError:
-                logger.warning(f"Module {module.name} not found")
+        for module in activity.modules:
+
+            if not module or (module.status and module.status.name != "READY"):
                 continue
 
-            object = getattr(activity, module.class_name.lower(), None).first()
-
-            if not object or (object.status and object.status.name != "READY"):
-                continue
-
-            module_dict = get_module_serializer(model_ref)(object).data
+            module_dict = get_module_serializer(module.__class__)(module).data
 
             try:
-                viewset = generic_module_viewset(model_ref).results(self, request, pk=object.pk)
+                viewset = generic_module_viewset(module.__class__).results(self, request, pk=module.pk)
                 module_dict[labels.RESULTS] = viewset.data
 
             except Exception as e:
@@ -1404,7 +1399,7 @@ def generic_module_viewset(model: Module):
             Updates a module.
             """
 
-            module: Module | Submodule = self.get_object()
+            module: Module | Submodule | LandModule = self.get_object()
             activity = module.get_activity()
 
             if not utils.has_project_permission("can_change_modules", self.request.user, activity.project):
@@ -1418,6 +1413,9 @@ def generic_module_viewset(model: Module):
 
             module = serializer.save()
             update_change_reason(module, utils.ChangeReasons.UPDATE.value)
+
+            if hasattr(module, "land_use_change") and module.land_use_change is not None:
+                module.invalidate_luc_results()
 
             read_serializer = get_module_serializer(model)(instance=module, context={"request": request})
 
@@ -1442,6 +1440,9 @@ def generic_module_viewset(model: Module):
 
             module = serializer.save()
             update_change_reason(module, utils.ChangeReasons.UPDATE.value)
+
+            if hasattr(module, "land_use_change") and module.land_use_change is not None:
+                module.invalidate_luc_results()
 
             read_serializer = get_module_serializer(model)(instance=module, context={"request": request})
 
