@@ -433,7 +433,12 @@ class CalculatorFactory:
         try:
             calculator: BaseCalculator = self.__get_calculator(input)(input)
             result: tuple[MathResult] = calculator.calculate()
-            return Result(*result).breakdown(by=aggregate_by)
+            return (
+                Result(*result).breakdown(by=BreakdownTypes.TOTAL),
+                Result(*result).breakdown(by=BreakdownTypes.ACTIVITY),
+                Result(*result).breakdown(by=BreakdownTypes.GAS),
+                Result(*result).breakdown(by=BreakdownTypes.ACTIVITY_GAS),
+            )
 
         except Exception as e:
             raise Exception(f"Error in {input.__class__.__name__}: {e}")
