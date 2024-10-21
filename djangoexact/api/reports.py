@@ -136,6 +136,26 @@ class BaseProjectReport:
         pass
 
     def build_report_skeleton(self):
+        """
+        Builds the skeleton of a report for the project.
+
+        This method initializes the report by setting up the necessary worksheets and populating them with
+        headers and initial values. It retrieves the workbook from the excel manager, sets up the "Results",
+        "Metadata", and "Additional Indicators" worksheets, and fills in the initial data for each worksheet.
+
+        The following steps are performed:
+        1. Logs the start of the report skeleton building process.
+        2. Initializes the report's time-related attributes from the project.
+        3. Retrieves the workbook and relevant worksheets from the excel manager.
+        4. Sets up the headers and initial values in the "Results" worksheet.
+        5. Sets up the headers and initial values in the "Metadata" worksheet.
+        6. Sets up the headers and initial values in the "Additional Indicators" worksheet.
+        7. Saves the workbook using the excel manager.
+        8. Logs the completion of the report skeleton building process.
+
+        Returns:
+            Workbook: The workbook object with the initialized report skeleton.
+        """
         log.debug(f"Building report skeleton for {self.project.name}")
         self.start_year_of_activities = self.project.start_year_of_activities
         self.last_year_of_accounting = self.project.last_year_of_accounting
@@ -177,6 +197,35 @@ class BaseProjectReport:
         return self.workbook
 
     def finalize_report(self):
+        """
+        Finalizes the report for the project by aggregating emissions data from various activities and modules,
+        calculating yearly and cumulative balances of CO2 equivalents, and writing the results to an Excel workbook.
+
+        The method performs the following steps:
+        1. Initializes lists to store emissions data for different greenhouse gases (GHGs) and CO2 sources.
+        2. Iterates through activity reports and their respective module reports to extract emissions data.
+        3. Aggregates the extracted emissions data for each type of GHG and CO2 source.
+        4. Calculates the yearly and cumulative balance of CO2 equivalents.
+        5. Writes the calculated balances and emissions data to the "Results" worksheet of an Excel workbook.
+        6. Saves the updated workbook.
+
+        The emissions data includes:
+        - Other GHGs
+        - N2O (Nitrous Oxide)
+        - CH4 (Methane)
+        - Other CO2 (excluding biomass and soil CO2 changes)
+        - Soil CO2
+        - Biomass CO2
+
+        The results written to the Excel worksheet include:
+        - Cumulative balance of CO2 equivalents for each year
+        - Yearly balance of CO2 equivalents for each year
+        - Emissions data for biomass CO2, soil CO2, other CO2, CH4, N2O, and other GHGs for each year
+
+        Note: The method assumes that the `self.duration`, `self.activity_reports`, `self.project.name`,
+        `self.start_year_of_activities`, `self.last_year_of_accounting`, `self.excel_manager`, and
+        `self.workbook` attributes are properly initialized.
+        """
         log.debug(f"Finalizing report for project {self.project.name}")
 
         other_ghgs = [[0] * self.duration]
@@ -225,6 +274,20 @@ class BaseProjectReport:
         self.excel_manager.save_workbook(self.workbook)
 
     def build_report(self):
+        """
+        Builds the complete report by following these steps:
+
+        1. Initializes the report structure by calling `build_report_skeleton`.
+        2. Iterates over each activity in `self.activities`:
+            - Creates an instance of `BaseActivityReport` for the activity.
+            - Builds the skeleton for the activity report.
+            - Builds the module reports for the activity.
+            - Appends the activity report to `self.activity_reports`.
+        3. Finalizes the report by calling `finalize_report`.
+
+        Returns:
+            tuple: A tuple containing the Excel file memory pointer and its byte representation.
+        """
         self.build_report_skeleton()
 
         for activity in self.activities:
@@ -235,6 +298,15 @@ class BaseProjectReport:
 
         self.finalize_report()
         return self.excel_manager.excel_file, self.excel_manager.get_excel_bytes()
+
+    def close_file(self):
+        """
+        Closes the Excel file managed by the excel_manager.
+
+        This method ensures that the Excel file associated with the excel_manager
+        is properly closed, releasing any in-memory resources held by the file.
+        """
+        self.excel_manager.excel_file.close()
 
 
 @dataclass
@@ -260,6 +332,25 @@ class BaseActivityReport:
         self.modules_reports = []
 
     def build_activity_skeleton(self):
+        """
+        Builds the activity skeleton for the current activity and updates the Excel workbook with relevant data.
+
+        This method performs the following steps:
+        1. Logs the start of the activity skeleton building process.
+        2. Sets various attributes related to the activity, such as title, start year, last year of accounting,
+           implementation years, capitalization years, and total duration.
+        3. Retrieves the workbook and specific worksheets (Results, Metadata, Additional Indicators) from the
+           project report's Excel manager.
+        4. Determines the last row in each worksheet to append new data.
+        5. Logs the last row numbers for each worksheet.
+        6. Updates the Results, Metadata, and Additional Indicators worksheets with the activity title and
+           specific values.
+        7. Saves the updated workbook using the project report's Excel manager.
+        8. Logs the completion of the activity skeleton building process.
+
+        Returns:
+            Workbook: The updated Excel workbook.
+        """
         log.debug(f"Building activity skeleton for {self.activity.name}")
         self.activity_title = self.activity.name
         self.start_year_of_activities = self.activity.project.start_year_of_activities
@@ -304,6 +395,18 @@ class BaseActivityReport:
         return self.workbook
 
     def build_modules_reports(self) -> list["BaseModuleReport"]:
+        """
+        Builds reports for each module in the activity.
+
+        This method iterates over the modules associated with the activity,
+        retrieves the appropriate report class for each module using the
+        ReportFactory, and builds the report. If no report class is found
+        for a module, a warning is logged. The generated reports are appended
+        to the `modules_reports` list.
+
+        Returns:
+            list[BaseModuleReport]: A list of generated module reports.
+        """
         modules = self.activity.modules
         for module in modules:
             log.debug(f"Building report for module {module.module_type.name}")
@@ -318,6 +421,16 @@ class BaseActivityReport:
         return self.modules_reports
 
     def extract_modules_emissions(self, activity_type=None, gas_type=None) -> list[float]:
+        """
+        Extracts and aggregates emissions from module reports based on the specified activity type and gas type.
+
+        Args:
+            activity_type (str, optional): The type of activity to filter emissions by. Defaults to None.
+            gas_type (str, optional): The type of gas to filter emissions by. Defaults to None.
+
+        Returns:
+            list[float]: A list of aggregated emissions values for the specified duration.
+        """
         emissions = np.zeros(self.duration)
         for module_report in self.modules_reports:
             emissions += module_report.extract_emissions(module_report.emissions_set, activity_type, gas_type)
@@ -367,18 +480,6 @@ class BaseModuleReport:
         self.duration = self.module.activity.implementation_years + self.module.activity.capitalization_years
 
     def get_result(self):
-        # if self.activity_report is None:
-        #     wb = xlsxwriter.Workbook(f"{self.module.module_type.class_name}_results.xlsx")
-        #     wb.add_worksheet("Results")
-        #     wb.add_worksheet("Metadata")
-        #     wb.add_worksheet("Additional Indicators")
-        #     wb.close()
-
-        #     self.workbook = pxl.load_workbook("annual_cropland_results.xlsx")
-        #     self.results_worksheet = self.workbook["Results"]
-        #     self.metadata_worksheet = self.workbook["Metadata"]
-        #     self.additional_indicators_worksheet = self.workbook["Additional Indicators"]
-
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
         self.results_worksheet = self.workbook["Results"]
         self.metadata_worksheet = self.workbook["Metadata"]
@@ -386,6 +487,22 @@ class BaseModuleReport:
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
     def build_report(self):
+        """
+        Builds and updates the report by adding module type information to the results worksheet.
+
+        This method performs the following steps:
+        1. Retrieves the workbook from the excel manager.
+        2. Accesses the "Results" worksheet within the workbook.
+        3. Determines the next available row in the "Results" worksheet.
+        4. Inserts the module type name into the first column of the next available row.
+        5. Applies a light blue fill to the cell containing the module type name.
+        6. Saves the updated workbook using the excel manager.
+
+        Attributes:
+            workbook (Workbook): The Excel workbook object.
+            results_worksheet (Worksheet): The worksheet where results are recorded.
+            last_results_row (int): The next available row in the results worksheet.
+        """
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
         self.results_worksheet = self.workbook["Results"]
 
@@ -437,10 +554,7 @@ class BaseModuleReport:
                 entry_emissions = [e.value for e in entry.emissions]
                 emissions.append(entry_emissions)
 
-        print(f"Extracted emissions before sum: {emissions}")
         summed_emissions = list(map(sum, zip(*emissions)))
-
-        print(f"Extracted emissions: {summed_emissions}")
 
         return summed_emissions
 
@@ -473,6 +587,24 @@ class LandModuleReport(BaseModuleReport):
     units_breakdown_wo: list[float] = None
 
     def __post_init__(self):
+        """
+        Post-initialization method to set up hectares breakdown calculations.
+
+        This method is called after the object's initialization to compute the
+        breakdown of hectares with and without certain conditions. It retrieves
+        the necessary data from the calculator attributes and combines them to
+        form the units breakdown.
+
+        Attributes:
+            hectares_length (int): The total length of the hectares array,
+                calculated from the sum of implementation years and capitalization years.
+            break_start_w (numpy.ndarray): Initial hectares data with conditions.
+            break_start_wo (numpy.ndarray): Initial hectares data without conditions.
+            break_w (numpy.ndarray): Hectares data with conditions.
+            break_wo (numpy.ndarray): Hectares data without conditions.
+            units_breakdown_w (list): Combined hectares data with conditions.
+            units_breakdown_wo (list): Combined hectares data without conditions.
+        """
         super().__post_init__()
 
         hectares_length = self.module.activity.implementation_years + self.module.activity.capitalization_years
@@ -486,6 +618,22 @@ class LandModuleReport(BaseModuleReport):
         self.units_breakdown_wo = [x + y for x, y in zip(break_start_wo, break_wo)]
 
     def get_result(self):
+        """
+        Computes and assigns various emission values to the instance variables.
+
+        This method extracts emission values for biomass CO2, soil CO2, soil N2O, fire N2O, and fire CH4
+        from the emissions set using the specified sources. It also assigns the module title and units
+        based on the module's type and area.
+
+        Attributes:
+            module_title (str): The title of the module based on its type.
+            units (str): The area of the module.
+            biomass_co2 (float): The extracted biomass CO2 emissions.
+            soil_co2 (float): The extracted soil CO2 emissions.
+            soil_n2o (float): The extracted soil N2O emissions.
+            fire_n2o (float): The extracted fire N2O emissions.
+            fire_ch4 (float): The extracted fire CH4 emissions.
+        """
         self.module_title = self.module.module_type.name
         self.units = self.module.area
 
@@ -496,6 +644,24 @@ class LandModuleReport(BaseModuleReport):
         self.fire_ch4 = self.extract_emissions(self.emissions_set, self.fire_ch4_source[0], self.fire_ch4_source[1])
 
     def build_report(self):
+        """
+        Builds a detailed report by populating an Excel workbook with emissions data.
+
+        This method performs the following steps:
+        1. Calls the superclass's build_report method.
+        2. Logs the start of the report building process.
+        3. Retrieves the result data.
+        4. Obtains the workbook and the "Results" worksheet.
+        5. Determines the last row in the "Results" worksheet.
+        6. Writes emissions information labels in the worksheet.
+        7. Stores the row indices for different emissions data.
+        8. Populates the worksheet with emissions data for each year in the specified range.
+        9. Saves the updated workbook.
+        10. Logs the completion of the report building process.
+
+        Returns:
+            openpyxl.Workbook: The populated Excel workbook.
+        """
         super().build_report()
         log.debug(f"Building base report for {self.module.module_type.name}")
         self.get_result()
@@ -550,6 +716,33 @@ class PerennialCroplandReport(LandModuleReport):
         return super().__post_init__()
 
     def populate_metadata(self):
+        """
+        Populates the metadata worksheet in the Excel workbook with relevant data.
+
+        This method retrieves the workbook and the "Metadata" worksheet, then appends
+        metadata information related to perennial cropland, hectares, main season crop,
+        tillage management type, organic input type, and yield. The data is populated
+        based on the module's state (start, with, without).
+
+        The method performs the following steps:
+        1. Retrieves the workbook and the "Metadata" worksheet.
+        2. Determines the last row in the metadata worksheet.
+        3. Adds metadata headers and fills the first column with static values.
+        4. Populates the second, third, and fourth columns with dynamic values based on
+           the module's state (start, with, without).
+        5. Saves the updated workbook.
+
+        The columns are populated as follows:
+        - Column 1: Static metadata headers.
+        - Column 2: Values when the module is in the start state.
+        - Column 3: Values when the module is in the with state.
+        - Column 4: Values when the module is in the without state.
+
+        The method ensures that if certain values are not available, default values are used.
+
+        Raises:
+            AttributeError: If any required attributes are missing from the module or activity report.
+        """
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
         self.metadata_worksheet = self.workbook["Metadata"]
 
@@ -588,6 +781,28 @@ class PerennialCroplandReport(LandModuleReport):
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
     def populate_additional_indicators(self):
+        """
+        Populates the 'Additional Indicators' worksheet in the Excel workbook with data for both
+        'With project' and 'Without project' scenarios.
+
+        This method performs the following steps:
+        1. Retrieves the workbook and the 'Additional Indicators' worksheet.
+        2. Finds the row corresponding to the 'With project' label and inserts a new row below it.
+        3. Populates the new row with 'Perennial Cropland (ha)' and corresponding yearly data for the 'With project' scenario.
+        4. Finds the row corresponding to the 'Without project' label and inserts a new row below it.
+        5. Populates the new row with 'Perennial Cropland (ha)' and corresponding yearly data for the 'Without project' scenario.
+        6. Saves the updated workbook.
+
+        Attributes:
+            workbook (Workbook): The Excel workbook object.
+            additional_indicators_worksheet (Worksheet): The worksheet for additional indicators.
+            with_project_row (int): The row number for the 'With project' label.
+            without_project_row (int): The row number for the 'Without project' label.
+            start_year_of_activities (int): The starting year of activities.
+            last_year_of_accounting (int): The last year of accounting.
+            units_breakdown_w (list): The list of units breakdown for 'With project' scenario.
+            units_breakdown_wo (list): The list of units breakdown for 'Without project' scenario.
+        """
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
         self.additional_indicators_worksheet = self.workbook["Additional Indicators"]
 
@@ -618,6 +833,28 @@ class PerennialCroplandReport(LandModuleReport):
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
     def add_minor_seasons_results(self):
+        """
+        Adds the results of minor seasons to the current module.
+
+        This method iterates through all minor seasons associated with the module and calculates
+        the emissions for each minor season using the PerennialCropCalculator. The emissions are
+        then aggregated into the current module's biomass CO2, soil CO2, soil N2O, fire N2O, and
+        fire CH4 attributes.
+
+        The method handles both "with" and "without" scenarios based on the module's configuration.
+
+        Attributes:
+            minor_seasons (list): List of minor seasons associated with the module.
+            minor_calculator (PerennialCropCalculator): Calculator instance for the minor season.
+            minor_emission_set (list): List to store the emissions for the minor season.
+
+        Emissions are extracted and added to the following attributes:
+            self.biomass_co2 (list): Aggregated biomass CO2 emissions.
+            self.soil_co2 (list): Aggregated soil CO2 emissions.
+            self.soil_n2o (list): Aggregated soil N2O emissions.
+            self.fire_n2o (list): Aggregated fire N2O emissions.
+            self.fire_ch4 (list): Aggregated fire CH4 emissions.
+        """
         minor_seasons = getattr(self.module, "minor_seasons", [])
 
         for minor_season in minor_seasons.all():
@@ -643,6 +880,21 @@ class PerennialCroplandReport(LandModuleReport):
             self.fire_ch4 = [x + y for x, y in zip(self.fire_ch4, self.extract_emissions(minor_emission_set, self.fire_ch4_source[0], self.fire_ch4_source[1]))]
 
     def get_result(self):
+        """
+        Generates the result for the report by building and populating it with necessary data.
+
+        This method performs the following steps:
+        1. Calls the superclass's `get_result` method.
+        2. Logs the start of the report building process.
+        3. Adds minor seasons results to the report.
+        4. Populates the report with metadata.
+        5. Populates the report with additional indicators.
+        6. Logs the completion of the report building process.
+        7. Returns the generated report as Excel bytes.
+
+        Returns:
+            bytes: The generated report in Excel format.
+        """
         super().get_result()
         log.debug(f"Building report for {self.module.module_type.name}")
 
