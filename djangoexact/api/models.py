@@ -861,7 +861,6 @@ class CachedResultMixin(models.Model, DirtyFieldsMixin):
         if self.last_modified is None:
             self.last_modified = timezone.now()
 
-        # BUG: Cache won't be invalidated when another module is updated, however some t2 values are shared between modules. This will result in incorrect results.
         if self.pk and self.is_dirty(check_relationship=True):
             dirty_fields = self.get_dirty_fields()
             cache_fields = ["last_cached_at", "cached_results_total", "cached_results_by_activity", "cached_results_by_gas", "cached_results_by_activity_by_gas"]
@@ -902,6 +901,14 @@ class CachedResultMixin(models.Model, DirtyFieldsMixin):
             elif by == BreakdownTypes.ACTIVITY_GAS:
                 return self.cached_results_by_activity_by_gas
         return None
+
+    def invalidate_luc_results(self):
+        # NOTE: If the module is associated with a land use change, invalidate the cached results of the land use change.
+        # NOTE: This is necessary because the calculations for modules with a land use change reference other modules (mostly tier2s) that may have been updated, which would invalidate the results.
+        luc: LandUseChange = self.land_use_change
+        luc_modules = luc.get_modules()
+        for module in luc_modules:
+            module.invalidate_cached_results()
 
 
 class Submodule(Historical, CachedResultMixin):
