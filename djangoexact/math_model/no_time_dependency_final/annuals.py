@@ -53,8 +53,18 @@ class AnnualCropland(LandModule):
 
         # NOTE: this is a default value that is calculated based on the input values, needed for the frontend
         if self.yield_value_main is not None:
+            if self.n_estimation_slope_main is None:
+                raise ValueError("n_estimation_slope_main is required if yield_value_main is provided")
+            if self.n_estimation_intercept_main is None:
+                raise ValueError("n_estimation_intercept_main is required if yield_value_main is provided")
+
             self.ag_residue_main_tier_2_default = self.yield_main * self.n_estimation_slope_main + self.n_estimation_intercept_main
         if self.yield_value_minor is not None:
+            if self.n_estimation_slope_minor is None:
+                raise ValueError("n_estimation_slope_minor is required if yield_value_minor is provided")
+            if self.n_estimation_intercept_minor is None:
+                raise ValueError("n_estimation_intercept_minor is required if yield_value_minor is provided")
+
             self.ag_residue_minor_tier_2_default = self.yield_minor * self.n_estimation_slope_minor + self.n_estimation_intercept_minor
 
     def calculate_emissions(self):
