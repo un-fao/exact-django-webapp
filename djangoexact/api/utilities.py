@@ -510,7 +510,7 @@ def find_empty_scenarios(entity, field: str):
         except FieldDoesNotExist:
             raise ValueError(f"Field '{field_name}' not found in {entity.__class__.__name__}. Have you added or refactored the field name recently?")
 
-    return missing
+    return [s.verbose_name for s in missing]
 
 
 @dataclass
