@@ -1295,6 +1295,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                     self.minor_n_estimation_factor_start = ipcc.CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=minor_lut_start)
                 except ipcc.CropNitrousEstimationDefaultFactor.DoesNotExist:
                     raise Exception(f"CropNitrousEstimationDefaultFactor for {minor_lut_start.name} does not exist")
+            elif self.module.minor_yield_start is not None:
+                raise Exception(f"Yield for minor season of {self.module.module_type.name} is specified but the minor crop is missing for the start scenario")
 
         if module.is_with():
             lut_w = module.land_use_type_w
@@ -1325,6 +1327,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                     self.minor_n_estimation_factor_w = ipcc.CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=minor_lut_w)
                 except ipcc.CropNitrousEstimationDefaultFactor.DoesNotExist:
                     raise Exception(f"CropNitrousEstimationDefaultFactor for {minor_lut_w.name} does not exist")
+            elif self.module.minor_yield_w is not None:
+                raise Exception(f"Yield for minor season of {self.module.module_type.name} is specified but the minor crop is missing for the with scenario")
 
         if module.is_without():
             lut_wo = module.land_use_type_wo
@@ -1355,6 +1359,8 @@ class AnnualCropCalculator(LandModuleCalculator):
                     self.minor_n_estimation_factor_wo = ipcc.CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=minor_lut_wo)
                 except ipcc.CropNitrousEstimationDefaultFactor.DoesNotExist:
                     raise Exception(f"CropNitrousEstimationDefaultFactor for {minor_lut_wo.name} does not exist")
+            elif self.module.minor_yield_wo is not None:
+                raise Exception(f"Yield for minor season of {self.module.module_type.name} is specified but the minor crop is missing for the without scenario")
 
     def calculate(self, aggregate_by=BreakdownTypes.TOTAL) -> tuple[MathResult]:
         """
