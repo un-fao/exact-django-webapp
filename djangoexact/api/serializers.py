@@ -84,6 +84,7 @@ from .models import (
     Note,
     FieldDefinition,
 )
+from datetime import timedelta
 
 
 class EmptySerializer(serializers.Serializer):
@@ -331,11 +332,49 @@ class WriteProjectSerializer(serializers.ModelSerializer):
             data["soc_ref_t2"] = None
 
     def validate(self, data):
-        if self.instance and data.get("cost", None):
-            total_activity_cost = self.instance.activities.all().values_list("cost", flat=True)
+        if self.instance:
+            project: Project = self.instance
+            cost = data.get("cost", None)
+            new_years = data.get("implementation_years", None)
+            is_locking = data.get("is_locked", None)
+            user = self.context["request"].user
 
-            if sum(total_activity_cost) > data.get("cost"):
-                raise serializers.ValidationError("Total cost of activities cannot be greater than project cost")
+            if cost is not None:
+                total_activity_cost = project.activities.all().values_list("cost", flat=True)
+
+                if sum(total_activity_cost) > data.get("cost"):
+                    raise serializers.ValidationError("Total cost of activities cannot be greater than project cost")
+
+            if new_years is not None:
+                project.implementation_years = new_years
+                for activity in project.activities.all():
+                    if activity.duration_t2 > new_years:
+                        log.warning(f"Activity {activity.name} duration_t2 is greater than project implementation years. Setting activity duration_t2 to project implementation years.")
+                        activity.duration_t2 = new_years
+                        activity.save()
+                project.save()
+
+            has_more_than_thirty_minutes_passed = timezone.now() - project.lock_updated_at > timedelta(minutes=30)
+            if project.is_locked and project.lock_updated_at and has_more_than_thirty_minutes_passed:
+                project.unlock()
+
+            # If the project is not locked, or a lock is requested
+            if not project.is_locked or is_locking is True:
+                if project.is_locked and project.locked_by != user:
+                    log.warning(f"Project is already locked by: {project.locked_by.email}")
+                    raise serializers.ValidationError("The project is already locked")
+
+                project.lock(user)
+
+            # If an unlock is requested
+            elif is_locking is False:
+                is_user_authorized = user.is_superuser or project.locked_by == user or user.memberships.filter(user=user, project=project, group__name="Admin").exists()
+
+                if not is_user_authorized:
+                    log.error("User does not have permission to unlock the project")
+                    raise serializers.ValidationError("User does not have permission to unlock the project", code="permission_denied")
+
+                project.unlock()
 
         if not self.instance:
             if self.context["request"].user.projects.filter(name=data.get("name")).exists():
