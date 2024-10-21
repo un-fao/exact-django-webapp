@@ -169,13 +169,13 @@ page_size = openapi.Parameter(
     description="Number of items per page",
     type=openapi.TYPE_INTEGER,
 )
-
 page = openapi.Parameter(
     "page",
     openapi.IN_QUERY,
     description="Page number",
     type=openapi.TYPE_INTEGER,
 )
+name = openapi.Parameter("name", openapi.IN_QUERY, description="Name of the project", type=openapi.TYPE_STRING)
 
 
 def get_modules(activity: Activity, serialized=True) -> list:
@@ -333,18 +333,16 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
 
         request.data["user"] = self.request.user.pk
-        serializer = WriteProjectSerializer(data=request.data, context={"request": request})
+        serializer = self.serializer_class(data=request.data, context={"request": request})
 
         if not serializer.is_valid():
             logging.error("Error creating project:", serializer.errors)
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
         project = serializer.save()
-
         update_change_reason(project, utils.ChangeReasons.CREATE.value)
 
         ProjectMembership.objects.create(user=self.request.user, project=project, group=Group.objects.get(name="Admin"))
-
         read_serializer = ReadProjectSerializer(instance=project, context={"request": request})
 
         return Response(read_serializer.data, status=http_status.HTTP_201_CREATED)
@@ -361,13 +359,9 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         update_change_reason(project, utils.ChangeReasons.DELETE.value)
 
-        start_time = time.time()
-
         is_deleted = self.raw_delete(project)
         if not is_deleted:
             return utils.ErrorResponse("Error deleting project", status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        logging.debug(f"Deletion of project {project} took {time.time() - start_time} seconds")
 
         return Response(status=http_status.HTTP_204_NO_CONTENT)
 
@@ -378,16 +372,10 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
             # Delete all activities
             activities = project.activities.all()
-            logging.debug(f"Deleting {len(activities)} activities")
             for activity in activities:
-                logging.debug(f"Deleting activity {activity}")
-                logging.debug(f"Deleting {len(activity.modules)} modules")
                 for m in activity.modules:
-                    logging.debug(f"Deleting module {m}")
                     if hasattr(m, "submodules"):
-                        logging.debug(f"Deleting {len(m.submodules)} submodules")
                         for sm in m.submodules:
-                            logging.debug(f"Deleting submodule {sm}")
                             cursor.execute(f"DELETE FROM {sm._meta.db_table} WHERE id = %s", [sm.id])
                     cursor.execute(f"DELETE FROM {m._meta.db_table} WHERE id = %s", [m.id])
                 LandUseChange.objects.filter(activity=activity).delete()
@@ -411,8 +399,6 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return utils.ErrorResponse("Selected user does not have permission to view the project", status=http_status.HTTP_403_FORBIDDEN)
 
         return Response(data=ReadProjectSerializer(project, context={"request": request}).data, status=http_status.HTTP_200_OK)
-
-    name = openapi.Parameter("name", openapi.IN_QUERY, description="Name of the project", type=openapi.TYPE_STRING)
 
     @swagger_auto_schema(manual_parameters=[name], responses={404: "Project not found"}, serializer_class=ReadProjectSerializer)
     def list(self, request):
@@ -461,8 +447,6 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
     @transaction.atomic
     def partial_update(self, request, *args, **kwargs):
-        new_years = request.data.get("implementation_years", None)
-        is_locking = request.data.get("is_locked")
         project: Project = self.get_object()
         user: CustomUser = self.request.user
 
@@ -470,52 +454,18 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error("Selected user does not have permission to update the project")
             return utils.ErrorResponse("Selected user does not have permission to update the project", status=http_status.HTTP_403_FORBIDDEN)
 
-        # Unlock the project if it has been locked for more than 30 minutes from the last project update
-        if project.is_locked and project.lock_updated_at and timezone.now() - project.lock_updated_at > timedelta(minutes=30):
-            project.unlock()
-
-        # If the project is not locked, or a lock is requested
-        if not project.is_locked or is_locking is True:
-            if project.is_locked and project.locked_by != user:
-                logging.warning(f"Project is already locked by: {project.locked_by.email}")
-                return Response({"message": "Project is already locked"}, status=http_status.HTTP_200_OK)
-
-            project.lock(user)
-
-        # If an unlock is requested
-        elif is_locking is False:
-            is_user_authorized = user.is_superuser or project.locked_by == user or user.memberships.filter(user=user, project=project, group__name="Admin").exists()
-
-            if not is_user_authorized:
-                logging.error("User does not have permission to unlock the project")
-                return Response({"message": "User does not have permission to unlock the project"}, status=http_status.HTTP_403_FORBIDDEN)
-
-            project.unlock()
-
-        if new_years:
-            project.implementation_years = new_years
-            for activity in project.activities.all():
-                if activity.duration_t2 > new_years:
-                    logging.warning(f"Activity {activity.name} duration_t2 is greater than project implementation years. Setting activity duration_t2 to project implementation years.")
-                    activity.duration_t2 = new_years
-                    activity.save()
-            project.save()
-
-        serializer = WriteProjectSerializer(project, data=request.data, partial=True)
+        serializer = self.serializer_class(project, data=request.data, partial=True, context={"request": request})
         if not serializer.is_valid():
             logging.error("Error updating project:", serializer.errors)
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
         serializer.save()
-
         update_change_reason(project, utils.ChangeReasons.UPDATE.value)
 
         return Response(ReadProjectSerializer(project, context={"request": request}).data, status=http_status.HTTP_200_OK)
 
     @transaction.atomic
     def update(self, request, *args, **kwargs):
-        new_years = request.data.get("implementation_years", None)
-        is_locking = request.data.get("is_locked")
         project: Project = self.get_object()
         user: CustomUser = self.request.user
 
@@ -523,44 +473,12 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error("Selected user does not have permission to update the project")
             return utils.ErrorResponse("Selected user does not have permission to update the project", status=http_status.HTTP_403_FORBIDDEN)
 
-        # Unlock the project if it has been locked for more than 30 minutes from the last project update
-        if project.is_locked and project.lock_updated_at and timezone.now() - project.lock_updated_at > timedelta(minutes=30):
-            project.unlock()
-
-        # If the project is not locked, or a lock is requested
-        if not project.is_locked or is_locking is True:
-            if project.is_locked and project.locked_by != user:
-                logging.warning(f"Project is already locked by: {project.locked_by.email}")
-                return Response({"message": "Project is already locked"}, status=http_status.HTTP_200_OK)
-
-            project.lock(user)
-
-        # If an unlock is requested
-        elif is_locking is False:
-            is_user_authorized = user.is_superuser or project.locked_by == user or user.memberships.filter(user=user, project=project, group__name="Admin").exists()
-
-            if not is_user_authorized:
-                logging.error("User does not have permission to unlock the project")
-                return Response({"message": "User does not have permission to unlock the project"}, status=http_status.HTTP_403_FORBIDDEN)
-
-            project.unlock()
-
-        if new_years:
-            project.implementation_years = new_years
-            for activity in project.activities.all():
-                if activity.duration_t2 > new_years:
-                    logging.warning(f"Activity {activity.name} duration_t2 is greater than project implementation years. Setting activity duration_t2 to project implementation years.")
-                    activity.duration_t2 = new_years
-                    activity.save()
-            project.save()
-
-        serializer = WriteProjectSerializer(project, data=request.data)
+        serializer = self.serializer_class(project, data=request.data, context={"request": request})
         if not serializer.is_valid():
             logging.error("Error updating project:", serializer.errors)
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
         serializer.save()
-
         update_change_reason(project, utils.ChangeReasons.UPDATE.value)
 
         return Response(ReadProjectSerializer(project, context={"request": request}).data, status=http_status.HTTP_200_OK)
@@ -579,8 +497,8 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return utils.ErrorResponse("To get a report for a project, all activities must have been completed.", status=http_status.HTTP_400_BAD_REQUEST)
 
         report = reports.BaseProjectReport(project)
-        file_pointer, file_bytes_buffer = report.build_report()
-        file_pointer.close()  # Optional but good practice
+        _, file_bytes_buffer = report.build_report()
+        report.close_file()
 
         try:
             response = HttpResponse(file_bytes_buffer, content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
