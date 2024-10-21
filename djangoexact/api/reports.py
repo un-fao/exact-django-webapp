@@ -234,7 +234,7 @@ class BaseProjectReport:
             self.activity_reports.append(activity_report)
 
         self.finalize_report()
-        return self.excel_manager.get_excel_bytes()
+        return self.excel_manager.excel_file, self.excel_manager.get_excel_bytes()
 
 
 @dataclass
