@@ -1720,10 +1720,10 @@ class IrrigationReadSerializer(ScenarioModuleSerializer):
         irrigation_systems = self.instance.irrigation_systems.all()
         irrigation_phases = self.instance.irrigation_phases.all()
 
-        if any([system.status.name == "EMPTY" for system in irrigation_systems]):
+        if any([system.status.name_en == "EMPTY" for system in irrigation_systems]):
             raise serializers.ValidationError("Irrigation systems are not ready for calculations")
 
-        if any([phase.status.name == "EMPTY" for phase in irrigation_phases]):
+        if any([phase.status.name_en == "EMPTY" for phase in irrigation_phases]):
             raise serializers.ValidationError("Irrigation phases are not ready for calculations")
 
         return super().validate(data)
