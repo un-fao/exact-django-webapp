@@ -42,7 +42,7 @@ for i in range(PROJECT_SIZE):
     climate = random.choice(climates)
     moisture = random.choice(climate.moistures.all())
     soil_type = random.choice(soil_types)
-    gw_potential = GlobalWarmingPotential.objects.get(name="100 yr AR5 w/out CC feedback")
+    gw_potential = GlobalWarmingPotential.objects.get(name_en="100 yr AR5 w/out CC feedback")
 
     print(f"\n\nCountry: {country}")
     print(f"Region: {region}")
