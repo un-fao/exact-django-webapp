@@ -43,7 +43,7 @@ def_rate = ChangeRate.objects.get(name="linear")
 sm_gear_type = random.choice(sma_gear_types)
 lge_gear_type = random.choice(lge_gear_types)
 
-READY = StatusType.objects.get(name="READY")
+READY = StatusType.objects.get(name_en="READY")
 
 
 class UserFactory(DjangoModelFactory):
@@ -270,8 +270,8 @@ class ForestManagementFactory(DjangoModelFactory):
     land_use_type_w = land_use_type_start
     land_use_type_wo = land_use_type_start
 
-    forest_type = ForestType.objects.get(name="Natural")
-    forest_condition_type = ForestConditionType.objects.get(name="Primary")
+    forest_type = ForestType.objects.get(name_en="Natural")
+    forest_condition_type = ForestConditionType.objects.get(name_en="Primary")
 
     area = factory.fuzzy.FuzzyInteger(1, 150)
 

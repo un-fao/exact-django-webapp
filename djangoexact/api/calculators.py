@@ -332,7 +332,7 @@ def get_grassland_soc(luc: LandUseChange) -> ipcc.GrasslandStockExchangeFactor |
         return grassland_soc
 
     module_start: Grassland = getattr(luc.activity, luc.module_type_start.class_name.lower(), None).first()
-    if luc.module_type_start.name == "Grassland" and module_start:
+    if luc.module_type_start.name_en == "Grassland" and module_start:
 
         if module_start.status.name != "READY":
             raise Exception("Cannot retrieve Grassland SOC as the starting Grassland module is not ready to perform the calculation")
@@ -521,7 +521,7 @@ class BaseCalculator(ABC):
             if not all(modules):
                 raise Exception("At least one module is missing")
 
-            if any(module.status != StatusType.objects.get(name="READY") for module in modules):
+            if any(module.status != StatusType.objects.get(name_en="READY") for module in modules):
                 raise Exception("At least one module is not ready to perform the calculation")
 
     @abstractmethod
@@ -713,7 +713,7 @@ class DeforestationCalculator(BaseCalculator):
         # TODO: Maybe generalise this on a higher level
         if not forest:
             raise Exception("Forest module is missing")
-        if module.status != StatusType.objects.get(name="READY"):
+        if module.status != StatusType.objects.get(name_en="READY"):
             raise Exception("Forest module is not complete")
 
         cmc = {
@@ -814,14 +814,14 @@ class DeforestationCalculator(BaseCalculator):
         soc_w = soc_ref
         soc_wo = soc_ref
 
-        if luc.module_type_w.name == "Grassland":
+        if luc.module_type_w.name_en == "Grassland":
             soc_w = ipcc.GrasslandStockExchangeFactor.objects.get(grassland_management_type=module_w.grassland_management_type_start, climate=project.climate)
             flu_w = SimpleNamespace(value=soc_w.flu)
             fi_w = SimpleNamespace(value=soc_w.fi)
             fmg_w = SimpleNamespace(value=soc_w.fmg)
             soc_w = SimpleNamespace(value=soc_w.flu * soc_w.fi * soc_w.fmg)
 
-        if luc.module_type_wo.name == "Grassland":
+        if luc.module_type_wo.name_en == "Grassland":
             soc_wo = ipcc.GrasslandStockExchangeFactor.objects.get(
                 grassland_management_type=module_wo.grassland_management_type_start,
                 climate=project.climate,
@@ -983,12 +983,12 @@ class OtherLandUseCalculator(BaseCalculator):
         module_w: SingleBiomassModule | AboveBelowGroundBiomassModule
         module_wo: SingleBiomassModule | AboveBelowGroundBiomassModule
 
-        ready = all(module.status == StatusType.objects.get(name="READY") for module in [module_start, module_w, module_wo])
+        ready = all(module.status == StatusType.objects.get(name_en="READY") for module in [module_start, module_w, module_wo])
         if not ready:
             raise Exception("All modules associated with the land use change must be ready to perform the calculation")
 
         soc_start = None
-        if luc.module_type_start.name == "Grassland":
+        if luc.module_type_start.name_en == "Grassland":
             # Grassland SOCs
             soc_start = ipcc.GrasslandStockExchangeFactor.objects.get(
                 grassland_management_type=module_start.grassland_management_type_start,
@@ -1404,7 +1404,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "ef_nitrous_som": self.som.value,
                 "nitrous_constant": project.gwp.n2o,
                 "methane_constant": project.gwp.ch4,
-                "ef_methane_agr_residues_main": self.burning_emission_factor.ch4 if self.module.residue_management_type_start.name == "Burned" else None,
+                "ef_methane_agr_residues_main": self.burning_emission_factor.ch4 if self.module.residue_management_type_start.name_en == "Burned" else None,
                 "combustion_factor_main": self.fires_start.value,
                 "residue_main_tier_2": self.module.residue_availability_t2_start,
                 "n_estimation_slope_main": self.n_estimation_factor_start.slope,
@@ -1418,10 +1418,10 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "n_estimation_intercept_minor": self.minor_n_estimation_factor_start.intercept,
                 "yield_value_minor": self.module.minor_yield_w,
                 "yield_minor_tier_2": self.module.crop_yield_t2_w,
-                "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_start.name == "Burned" else None,
-                "retained_main": self.module.residue_management_type_start.name == "Retained",
+                "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_start.name_en == "Burned" else None,
+                "retained_main": self.module.residue_management_type_start.name_en == "Retained",
                 "ef_nitrous_agr_residues_minor": self.minor_burning_emission_factor.n2o,
-                "retained_minor": self.module.minor_residue_management_type_start.name == "Retained" if self.module.minor_residue_management_type_start else None,
+                "retained_minor": self.module.minor_residue_management_type_start.name_en == "Retained" if self.module.minor_residue_management_type_start else None,
                 "n_content_ag_main": self.n_estimation_factor_start.n_ag_residues,
                 "ratio_bg_ag_main": self.n_estimation_factor_start.rs_t,
                 "n_content_bg_main": self.n_estimation_factor_start.n_bg_t,
@@ -1466,7 +1466,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "ef_nitrous_som": self.som.value,
                 "nitrous_constant": project.gwp.n2o,
                 "methane_constant": project.gwp.ch4,
-                "ef_methane_agr_residues_main": self.burning_emission_factor.ch4 if self.module.residue_management_type_start.name == "Burned" else None,
+                "ef_methane_agr_residues_main": self.burning_emission_factor.ch4 if self.module.residue_management_type_start.name_en == "Burned" else None,
                 "combustion_factor_main": self.fires_start.value,
                 "residue_main_tier_2": self.module.residue_availability_t2_start,
                 "n_estimation_slope_main": self.n_estimation_factor_start.slope,
@@ -1480,10 +1480,10 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "n_estimation_intercept_minor": self.minor_n_estimation_factor_start.intercept,
                 "yield_value_minor": self.module.minor_yield_wo,
                 "yield_minor_tier_2": self.module.crop_yield_t2_wo,
-                "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_start.name == "Burned" else None,
-                "retained_main": self.module.residue_management_type_start.name == "Retained",
+                "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_start.name_en == "Burned" else None,
+                "retained_main": self.module.residue_management_type_start.name_en == "Retained",
                 "ef_nitrous_agr_residues_minor": self.minor_burning_emission_factor.n2o,
-                "retained_minor": self.module.minor_residue_management_type_start.name == "Retained" if self.module.minor_residue_management_type_start else None,
+                "retained_minor": self.module.minor_residue_management_type_start.name_en == "Retained" if self.module.minor_residue_management_type_start else None,
                 "n_content_ag_main": self.n_estimation_factor_start.n_ag_residues,
                 "ratio_bg_ag_main": self.n_estimation_factor_start.rs_t,
                 "n_content_bg_main": self.n_estimation_factor_start.n_bg_t,
@@ -1531,7 +1531,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "ef_nitrous_som": self.som.value,
                 "nitrous_constant": project.gwp.n2o,
                 "methane_constant": project.gwp.ch4,
-                "ef_methane_agr_residues_main": self.burning_emission_factor.ch4 if self.module.residue_management_type_w.name == "Burned" else None,
+                "ef_methane_agr_residues_main": self.burning_emission_factor.ch4 if self.module.residue_management_type_w.name_en == "Burned" else None,
                 "combustion_factor_main": self.fires_w.value,
                 "residue_main_tier_2": self.module.residue_availability_t2_w,
                 "n_estimation_slope_main": self.n_estimation_factor_w.slope,
@@ -1545,10 +1545,10 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "n_estimation_intercept_minor": self.minor_n_estimation_factor_w.intercept,
                 "yield_value_minor": self.module.minor_yield_w,
                 "yield_minor_tier_2": self.module.crop_yield_t2_w,
-                "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_w.name == "Burned" else None,
-                "retained_main": self.module.residue_management_type_w.name == "Retained",
+                "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_w.name_en == "Burned" else None,
+                "retained_main": self.module.residue_management_type_w.name_en == "Retained",
                 "ef_nitrous_agr_residues_minor": self.minor_burning_emission_factor.n2o,
-                "retained_minor": self.module.minor_residue_management_type_w.name == "Retained" if self.module.minor_residue_management_type_w else None,
+                "retained_minor": self.module.minor_residue_management_type_w.name_en == "Retained" if self.module.minor_residue_management_type_w else None,
                 "n_content_ag_main": self.n_estimation_factor_w.n_ag_residues,
                 "ratio_bg_ag_main": self.n_estimation_factor_w.rs_t,
                 "n_content_bg_main": self.n_estimation_factor_w.n_bg_t,
@@ -1596,7 +1596,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "ef_nitrous_som": self.som.value,
                 "nitrous_constant": project.gwp.n2o,
                 "methane_constant": project.gwp.ch4,
-                "ef_methane_agr_residues_main": self.burning_emission_factor.ch4 if self.module.residue_management_type_wo.name == "Burned" else None,
+                "ef_methane_agr_residues_main": self.burning_emission_factor.ch4 if self.module.residue_management_type_wo.name_en == "Burned" else None,
                 "combustion_factor_main": self.fires_wo.value,
                 "residue_main_tier_2": self.module.residue_availability_t2_wo,
                 "n_estimation_slope_main": self.n_estimation_factor_wo.slope,
@@ -1610,10 +1610,10 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "n_estimation_intercept_minor": self.minor_n_estimation_factor_wo.intercept,
                 "yield_value_minor": self.module.minor_yield_wo,
                 "yield_minor_tier_2": self.module.crop_yield_t2_wo,
-                "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_wo.name == "Burned" else None,
-                "retained_main": self.module.residue_management_type_wo.name == "Retained",
+                "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_wo.name_en == "Burned" else None,
+                "retained_main": self.module.residue_management_type_wo.name_en == "Retained",
                 "ef_nitrous_agr_residues_minor": self.minor_burning_emission_factor.n2o,
-                "retained_minor": self.module.minor_residue_management_type_wo.name == "Retained" if self.module.minor_residue_management_type_wo else None,
+                "retained_minor": self.module.minor_residue_management_type_wo.name_en == "Retained" if self.module.minor_residue_management_type_wo else None,
                 "n_content_ag_main": self.n_estimation_factor_wo.n_ag_residues,
                 "ratio_bg_ag_main": self.n_estimation_factor_wo.rs_t,
                 "n_content_bg_main": self.n_estimation_factor_wo.n_bg_t,
@@ -2228,7 +2228,7 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "fi_start_tier_2": self.module.fi_t2_start,
                 "fi_end_tier_2": self.module.fi_t2_w,
                 "calculate_soc_som": True,
-                "straw_burnt": self.module.organic_amendment_type_start.name == "Straw Burnt",
+                "straw_burnt": self.module.organic_amendment_type_start.name_en == "Straw Burnt",
                 "delay": self.activity.delay,
                 "ef_nitrous_som": self.som.value,
                 "biomass_start_default": self.biomass_ef_start.value,
@@ -2286,7 +2286,7 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "fi_start_tier_2": self.module.fi_t2_start,
                 "fi_end_tier_2": self.module.fi_t2_wo,
                 "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
-                "straw_burnt": self.module.organic_amendment_type_start.name == "Straw Burnt",
+                "straw_burnt": self.module.organic_amendment_type_start.name_en == "Straw Burnt",
                 "delay": self.activity.delay,
                 "ef_nitrous_som": self.som.value,
                 "biomass_start_default": self.biomass_ef_start.value,
@@ -2345,7 +2345,7 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "fi_start_tier_2": self.module.fi_t2_start,
                 "fi_end_tier_2": self.module.fi_t2_w,
                 "calculate_soc_som": CALCULATE_SOC_SOM_W,
-                "straw_burnt": self.module.organic_amendment_type_w.name == "Straw Burnt",
+                "straw_burnt": self.module.organic_amendment_type_w.name_en == "Straw Burnt",
                 "delay": self.activity.delay,
                 "ef_nitrous_som": self.som.value,
                 "calculate_biomass": self.calculate_biomass_w,
@@ -2404,7 +2404,7 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "fi_start_tier_2": self.module.fi_t2_start,
                 "fi_end_tier_2": self.module.fi_t2_wo,
                 "calculate_soc_som": CALCULATE_SOC_SOM_WO,
-                "straw_burnt": self.module.organic_amendment_type_wo.name == "Straw Burnt",
+                "straw_burnt": self.module.organic_amendment_type_wo.name_en == "Straw Burnt",
                 "delay": self.activity.delay,
                 "ef_nitrous_som": self.som.value,
                 "calculate_biomass": self.calculate_biomass_wo,
@@ -3277,7 +3277,7 @@ class InputEntryCalculator(BaseCalculator):
         self.needs_n2o_ref = input_type.has_n2o_emissions and not self.module.n2o_emissions_t2
         self.needs_co2_e_ref = input_type.has_co2_e_emissions and not self.module.co2_e_emissions_t2
 
-        if self.module.status.name == "READY" and calculate:
+        if self.module.status.name_en == "READY" and calculate:
             self.calculate()
 
         try:
@@ -4708,7 +4708,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
             "rate_type": self.activity.change_rate.name,
             "implementation_time": self.activity.implementation_years,
             "capitalization_time": self.activity.capitalization_years,
-            "transportation_loss": self.transportation_loss_default.value if self.module.fuel_type.name == "Electricity" else 0,
+            "transportation_loss": self.transportation_loss_default.value if self.module.fuel_type.name_en == "Electricity" else 0,
             "gwir": self.module.gross_irrigation_water_start,
             "delay": self.activity.delay,
         }
@@ -4737,7 +4737,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
             "rate_type": self.activity.change_rate.name,
             "implementation_time": self.activity.implementation_years,
             "capitalization_time": self.activity.capitalization_years,
-            "transportation_loss": self.transportation_loss_default.value if self.module.fuel_type.name == "Electricity" else 0,
+            "transportation_loss": self.transportation_loss_default.value if self.module.fuel_type.name_en == "Electricity" else 0,
             "gwir": self.module.gross_irrigation_water_w,
             "delay": self.activity.delay,
         }
@@ -4766,7 +4766,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
             "rate_type": self.activity.change_rate.name,
             "implementation_time": self.activity.implementation_years,
             "capitalization_time": self.activity.capitalization_years,
-            "transportation_loss": self.transportation_loss_default.value if self.module.fuel_type.name == "Electricity" else 0,
+            "transportation_loss": self.transportation_loss_default.value if self.module.fuel_type.name_en == "Electricity" else 0,
             "gwir": self.module.gross_irrigation_water_wo,
             "delay": self.activity.delay,
         }
@@ -4874,7 +4874,7 @@ class CoastalWetlandCalculator(BaseCalculator):
         except ipcc.RewettingCarbonFactor.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "co2_rewetting_t2")
             if missing_scenarios:
-                raise ValueError(f"Rewetting CO2 for {self.odule.land_use_type.name}, {self.project.climate.name}, {self.project.moisture.name}. Please insert tier 2 values for the relevant scenarios.")
+                raise ValueError(f"Rewetting CO2 for {self.module.land_use_type.name}, {self.project.climate.name}, {self.project.moisture.name}. Please insert tier 2 values for the relevant scenarios.")
 
         try:
             self.rewetting_ch4 = ipcc.RewettingMethaneFactor.objects.get(**cm, land_use_type=self.module.land_use_type, salinity=self.salinity_type)
@@ -5698,7 +5698,7 @@ class ForestManagementCalculator(LandModuleCalculator):
         self.combustion_factor_w: ipcc.ForestCombustionFactor = utils.get_or_raise(ipcc.ForestCombustionFactor, {"land_use_type": self.module.land_use_type_w, "climate": self.climate, "forest_type": self.forest.forest_type}, f"Combustion Factor W not found for {self.module.land_use_type_w.name}, {self.climate.name}, {self.forest.forest_type.name}")
         self.combustion_factor_wo: ipcc.ForestCombustionFactor = utils.get_or_raise(ipcc.ForestCombustionFactor, {"land_use_type": self.module.land_use_type_wo, "climate": self.climate, "forest_type": self.forest.forest_type}, f"Combustion Factor WO not found for {self.module.land_use_type_wo.name}, {self.climate.name}, {self.forest.forest_type.name}")
 
-        if self.forest.land_use_type_start.name == "Mangrove Forest":
+        if self.forest.land_use_type_start.name_en == "Mangrove Forest":
             try:
                 self.mangroves_data = ipcc.DataOnMangrove.objects.get(climate=self.climate, moisture=self.climate)
             except ipcc.DataOnMangrove.DoesNotExist:

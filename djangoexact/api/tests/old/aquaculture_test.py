@@ -18,12 +18,12 @@ soil_types = api_models.SoilType.objects.all().exclude(name="Aggregated").exclud
 gw_potentials = ipcc_models.GlobalWarmingPotential.objects.all()
 soc_refs = ipcc_models.SoilOrganicCarbon.objects.all()
 
-country = api_models.Country.objects.get(name="Tajikistan")
+country = api_models.Country.objects.get(name_en="Tajikistan")
 region = country.region
-climate = api_models.Climate.objects.get(name="Cool Temperate")
-moisture = api_models.Moisture.objects.get(name="Moist")
-soil_type = api_models.SoilType.objects.get(name="High Activity Clay")
-gw_potential = ipcc_models.GlobalWarmingPotential.objects.get(name="100 yr AR5 w/out CC feedback")
+climate = api_models.Climate.objects.get(name_en="Cool Temperate")
+moisture = api_models.Moisture.objects.get(name_en="Moist")
+soil_type = api_models.SoilType.objects.get(name_en="High Activity Clay")
+gw_potential = ipcc_models.GlobalWarmingPotential.objects.get(name_en="100 yr AR5 w/out CC feedback")
 
 print(f"Country: {country}")
 print(f"Region: {region}")
@@ -51,7 +51,7 @@ print(f"Capitalization Years: {p.capitalization_years}")
 print(f"Implementation Years: {p.implementation_years}")
 
 a: api_models.Activity = factories.ActivityFactory.create(project=p)
-a.module_types.set([api_models.ModuleType.objects.get(name="Aquaculture")])
+a.module_types.set([api_models.ModuleType.objects.get(name_en="Aquaculture")])
 a.save()
 
 aquacultures: list[api_models.Aquaculture] = factories.AquacultureFactory.create_batch(BATCH_SIZE, activity=a)

@@ -819,7 +819,7 @@ class Activity(Historical, NoteMixin):
         """
         statuses = [module.status for module in self.modules]
 
-        ready_count = statuses.count(StatusType.objects.get(name="READY"))
+        ready_count = statuses.count(StatusType.objects.get(name_en="READY"))
 
         if len(statuses) == 0:
             return 1
@@ -833,11 +833,11 @@ class Activity(Historical, NoteMixin):
         is_any_module_ready = any([module.is_ready() for module in self.modules])
 
         if are_modules_ready:
-            return StatusType.objects.get(name="READY")
+            return StatusType.objects.get(name_en="READY")
         elif is_any_module_ready:
-            return StatusType.objects.get(name="IN PROGRESS")
+            return StatusType.objects.get(name_en="IN PROGRESS")
         else:
-            return StatusType.objects.get(name="EMPTY")
+            return StatusType.objects.get(name_en="EMPTY")
 
 
 ##############################
@@ -946,7 +946,7 @@ class Submodule(Historical, CachedResultMixin):
         super().save(*args, **kwargs)
 
     def is_ready(self) -> bool:
-        return self.status and self.status.name == "READY"
+        return self.status and self.status.name_en == "READY"
 
     def is_start(self) -> bool:
         return self.parent.is_start()
@@ -994,7 +994,7 @@ class Module(Historical, CachedResultMixin):
         return f"({self.pk}) {self._meta.object_name} in {self.activity.name}"
 
     def is_ready(self) -> bool:
-        return self.status and self.status.name == "READY"
+        return self.status and self.status.name_en == "READY"
 
     def save(self, *args, **kwargs):
         if not self.status:
@@ -1595,7 +1595,7 @@ class Rice(ResidueAvailability):
 
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:
-            self.land_use_type_start = LandUseType.objects.get(name="Flooded Rice")
+            self.land_use_type_start = LandUseType.objects.get(name_en="Flooded Rice")
             self.land_use_type_w = self.land_use_type_start
             self.land_use_type_wo = self.land_use_type_start
 
@@ -1653,7 +1653,7 @@ class Grassland(LandModuleFixed, SingleBiomassModule, AboveBelowGroundBiomassMod
 
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:
-            self.land_use_type_start = LandUseType.objects.get(name="Grassland")
+            self.land_use_type_start = LandUseType.objects.get(name_en="Grassland")
             self.land_use_type_w = self.land_use_type_start
             self.land_use_type_wo = self.land_use_type_start
 
@@ -2416,7 +2416,7 @@ class OrganicSoil(LandModuleFixed):
 
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:
-            self.land_use_type_start = LandUseType.objects.get(name="Organic Soil")
+            self.land_use_type_start = LandUseType.objects.get(name_en="Organic Soil")
             self.land_use_type_w = self.land_use_type_start
             self.land_use_type_wo = self.land_use_type_start
 
@@ -2441,7 +2441,7 @@ class Settlement(LandModuleFixed, SingleBiomassModule):
     def save(self, *args, **kwargs):
 
         if not self.land_use_type_start:
-            self.land_use_type_start = LandUseType.objects.get(name="Settlement")
+            self.land_use_type_start = LandUseType.objects.get(name_en="Settlement")
             self.land_use_type_w = self.land_use_type_start
             self.land_use_type_wo = self.land_use_type_start
 
@@ -2461,7 +2461,7 @@ class SetAside(LandModule, SingleBiomassModule):
     def save(self, *args, **kwargs):
 
         if not self.land_use_type_start:
-            self.land_use_type_start = LandUseType.objects.get(name="Set Aside")
+            self.land_use_type_start = LandUseType.objects.get(name_en="Set Aside")
             self.land_use_type_w = self.land_use_type_start
             self.land_use_type_wo = self.land_use_type_start
 
@@ -2479,7 +2479,7 @@ class OtherLand(LandModule, SingleBiomassModule):
 
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:
-            self.land_use_type_start = LandUseType.objects.get(name="Other Land")
+            self.land_use_type_start = LandUseType.objects.get(name_en="Other Land")
             self.land_use_type_w = self.land_use_type_start
             self.land_use_type_wo = self.land_use_type_start
 
