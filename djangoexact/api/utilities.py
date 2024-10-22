@@ -363,15 +363,15 @@ def update_activity_status_and_completion(activity):
     """
     statuses = [module.status for module in find_modules(activity)]
 
-    ready_count = statuses.count(api_models.StatusType.objects.get(name="READY"))
+    ready_count = statuses.count(api_models.StatusType.objects.get(name_en="READY"))
     percentage_complete = ready_count / len(statuses)
 
     if percentage_complete == 1:
-        activity.status = api_models.StatusType.objects.get(name="READY")
+        activity.status = api_models.StatusType.objects.get(name_en="READY")
     elif percentage_complete > 0:
-        activity.status = api_models.StatusType.objects.get(name="IN PROGRESS")
+        activity.status = api_models.StatusType.objects.get(name_en="IN PROGRESS")
     else:
-        activity.status = api_models.StatusType.objects.get(name="EMPTY")
+        activity.status = api_models.StatusType.objects.get(name_en="EMPTY")
 
     activity.completion_percentage = percentage_complete
     activity.save()
