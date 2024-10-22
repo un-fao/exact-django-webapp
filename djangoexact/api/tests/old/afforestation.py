@@ -48,7 +48,7 @@ for i in range(PROJECT_SIZE):
     climate = random.choice(climates)
     moisture = random.choice(climate.moistures.all())
     soil_type = random.choice(soil_types)
-    gw_potential = GlobalWarmingPotential.objects.get(name="100 yr AR5 w/out CC feedback")
+    gw_potential = GlobalWarmingPotential.objects.get(name_en="100 yr AR5 w/out CC feedback")
 
     print(f"\n\nCountry: {country}")
     print(f"Region: {region}")
@@ -85,9 +85,9 @@ for i in range(PROJECT_SIZE):
     a: Activity = ActivityFactory.create(project=p)
 
     luc: LandUseChange = LandUseChangeFactory.create(activity=a)
-    luc.module_type_start = ModuleType.objects.get(name="Grassland")
-    luc.module_type_wo = ModuleType.objects.get(name="Grassland")
-    luc.module_type_w = ModuleType.objects.get(name="Forest Management")
+    luc.module_type_start = ModuleType.objects.get(name_en="Grassland")
+    luc.module_type_wo = ModuleType.objects.get(name_en="Grassland")
+    luc.module_type_w = ModuleType.objects.get(name_en="Forest Management")
     luc.save()
 
     forests: list[ForestManagement] = ForestManagementFactory.create_batch(BATCH_SIZE, activity=a)

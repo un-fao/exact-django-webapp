@@ -433,7 +433,7 @@ class WriteActivitySerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         if self.instance:
-            luc_module: ModuleType = ModuleType.objects.get(name="Land Use Change")
+            luc_module: ModuleType = ModuleType.objects.get(name_en="Land Use Change")
 
             module_types = data.get("module_types", [])
 
@@ -522,7 +522,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
         if data.get("activity_id", None):
             self.instance = data.get("activity_id")
 
-        luc_module = ModuleType.objects.get(name="Land Use Change")
+        luc_module = ModuleType.objects.get(name_en="Land Use Change")
         module_types = data.get("module_types", [])
         land_use_change = data.get("land_use_change", None)
         area = data.get("area", None)
@@ -573,14 +573,14 @@ class ActivityBuilderSerializer(serializers.Serializer):
             luc.module_type_start.id,
             luc.module_type_w.id,
             luc.module_type_wo.id,
-            ModuleType.objects.get(name="Land Use Change").id,
+            ModuleType.objects.get(name_en="Land Use Change").id,
         )
 
         if create_organic_soil:
             organic_soil = OrganicSoil.objects.create(activity=activity, area=self.validated_data.get("area"))
             organic_soil.land_use_change = luc
             organic_soil.save()
-            activity.module_types.add(ModuleType.objects.get(name="Organic Soil").id)
+            activity.module_types.add(ModuleType.objects.get(name_en="Organic Soil").id)
             luc.organic_soil = organic_soil
 
         luc.save()
@@ -596,7 +596,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
                 module_instance = ModuleClass.objects.create(activity=activity, land_use_change=luc, area=self.validated_data.get("area"))
                 if has_organic_soil and not has_luc_module:
                     organic_soil = OrganicSoil.objects.create(activity=activity, area=self.validated_data.get("area"))
-                    activity.module_types.add(ModuleType.objects.get(name="Organic Soil").id)
+                    activity.module_types.add(ModuleType.objects.get(name_en="Organic Soil").id)
                     module_instance.organic_soil = organic_soil
             else:
                 filters = {"activity": activity}
@@ -950,10 +950,10 @@ class BaseModuleSerializer(BaseGenericModuleSerializer):
 
         if not is_ready:
             log.debug(f"Module {self.Meta.ref_name} is not ready for calculations")
-            data["status"] = StatusType.objects.get(name="EMPTY")
+            data["status"] = StatusType.objects.get(name_en="EMPTY")
             return super().validate(data)
 
-        data["status"] = StatusType.objects.get(name="READY")
+        data["status"] = StatusType.objects.get(name_en="READY")
 
         log.debug(f"END BaseModuleSerializer[{self.Meta.ref_name}].validate")
         return super().validate(data)
@@ -981,10 +981,10 @@ class BaseSubmoduleSerializer(BaseGenericModuleSerializer):
 
         if not is_ready:
             log.debug(f"Module {self.Meta.ref_name} is not ready for calculations")
-            data["status"] = StatusType.objects.get(name="EMPTY")
+            data["status"] = StatusType.objects.get(name_en="EMPTY")
             return super().validate(data)
 
-        data["status"] = StatusType.objects.get(name="READY")
+        data["status"] = StatusType.objects.get(name_en="READY")
 
         log.debug(f"END SubmoduleBaseSerializer[{self.Meta.ref_name}].validate")
         return super().validate(data)
@@ -1099,9 +1099,9 @@ class LandModuleSeralizer(ScenarioModuleSerializer):
 
             if not is_ready:
                 log.debug(f"Module {self.Meta.ref_name} is not ready for calculations")
-                data["status"] = StatusType.objects.get(name="EMPTY")
+                data["status"] = StatusType.objects.get(name_en="EMPTY")
             else:
-                data["status"] = StatusType.objects.get(name="READY")
+                data["status"] = StatusType.objects.get(name_en="READY")
 
             super().validate(data)
 
@@ -1245,7 +1245,7 @@ class AnnualCroplandSerializer(LandModuleSeralizer):
         for minor_season in self.instance.minor_seasons.all():
             minor_season: MinorSeasonAnnualCropland
             if not minor_season.is_ready():
-                data["status"] = StatusType.objects.get(name="SUBMODULES_EMPTY")
+                data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
                 return data
 
         return super().validate(data)
@@ -1344,9 +1344,9 @@ class LandUseChangeWriteSerializer(LandModuleSeralizer):
         if self.instance:
             self.instance: LandUseChange
             if all([m.is_ready() for m in self.instance.get_modules()]):
-                data["status"] = StatusType.objects.get(name="READY")
+                data["status"] = StatusType.objects.get(name_en="READY")
             else:
-                data["status"] = StatusType.objects.get(name="EMPTY")
+                data["status"] = StatusType.objects.get(name_en="EMPTY")
             self.instance.save()
 
         return data
@@ -2292,7 +2292,7 @@ class InputSerializer(ScenarioModuleSerializer):
         for entry in entries:
             entry: InputEntry
             if not entry.is_ready():
-                data["status"] = StatusType.objects.get(name="SUBMODULES_EMPTY")
+                data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
                 return data
 
         return super().validate(data)
