@@ -20,11 +20,11 @@ u = User.objects.get(username="admin")
 
 client.force_authenticate(user=u)
 
-country = Country.objects.get(name="Lao People's Democratic Republic")
-climate = Climate.objects.get(name="Tropical")
-moisture = Moisture.objects.get(name="Moist")
-soil_type = SoilType.objects.get(name="High Activity Clay")
-gw_potential = GlobalWarmingPotential.objects.get(name="100 yr AR5 w/out CC feedback")
+country = Country.objects.get(name_en="Lao People's Democratic Republic")
+climate = Climate.objects.get(name_en="Tropical")
+moisture = Moisture.objects.get(name_en="Moist")
+soil_type = SoilType.objects.get(name_en="High Activity Clay")
+gw_potential = GlobalWarmingPotential.objects.get(name_en="100 yr AR5 w/out CC feedback")
 implementation_years = 5
 capitalization_years = 15
 
@@ -43,9 +43,9 @@ post_activity = {
     "project": project_response.data["id"],
     "module_types": [],
     "land_use_change": {
-        "module_type_start": ModuleType.objects.get(name="Grassland").id,
-        "module_type_w": ModuleType.objects.get(name="Annual Cropland").id,
-        "module_type_wo": ModuleType.objects.get(name="Grassland").id,
+        "module_type_start": ModuleType.objects.get(name_en="Grassland").id,
+        "module_type_w": ModuleType.objects.get(name_en="Annual Cropland").id,
+        "module_type_wo": ModuleType.objects.get(name_en="Grassland").id,
     },
     "area": 150,
 }
@@ -53,9 +53,9 @@ post_activity = {
 activity_response = client.post("/api/activities/build/", post_activity, format="json")
 logging.debug(activity_response.data)
 
-module_type_start = ModuleType.objects.get(name="Grassland")
-module_type_w = ModuleType.objects.get(name="Annual Cropland")
-module_type_wo = ModuleType.objects.get(name="Grassland")
+module_type_start = ModuleType.objects.get(name_en="Grassland")
+module_type_w = ModuleType.objects.get(name_en="Annual Cropland")
+module_type_wo = ModuleType.objects.get(name_en="Grassland")
 
 area = 150
 
@@ -68,13 +68,13 @@ post_luc = {
 luc = client.get(f'/api/land-use-changes/?activity_id={activity_response.data["id"]}')
 logging.debug(luc)
 
-post_grassland = {"grassland_management_type_start": GrasslandManagementType.objects.get(name="High Intensity Grazing").id, "grassland_management_type_wo": GrasslandManagementType.objects.get(name="Severely Degraded").id, "is_fire_used_start": True, "is_fire_used_wo": True, "fire_periodicity_start": 2, "fire_periodicity_wo": 2, "fire_impact_start": 0.2, "fire_impact_wo": 0.2}
+post_grassland = {"grassland_management_type_start": GrasslandManagementType.objects.get(name_en="High Intensity Grazing").id, "grassland_management_type_wo": GrasslandManagementType.objects.get(name_en="Severely Degraded").id, "is_fire_used_start": True, "is_fire_used_wo": True, "fire_periodicity_start": 2, "fire_periodicity_wo": 2, "fire_impact_start": 0.2, "fire_impact_wo": 0.2}
 
 post_annual_cropland = {
-    "land_use_type_w": LandUseType.objects.get(name="Maize").id,
-    "tillage_management_type_w": TillageManagementType.objects.get(name="Full Tillage").id,
-    "organic_input_type_w": OrganicInputType.objects.get(name="High C input, no manure").id,
-    "residue_management_type_w": ResidueManagementType.objects.get(name="Retained").id,
+    "land_use_type_w": LandUseType.objects.get(name_en="Maize").id,
+    "tillage_management_type_w": TillageManagementType.objects.get(name_en="Full Tillage").id,
+    "organic_input_type_w": OrganicInputType.objects.get(name_en="High C input, no manure").id,
+    "residue_management_type_w": ResidueManagementType.objects.get(name_en="Retained").id,
 }
 
 grassland = client.get(f'/api/grasslands/?activity_id={activity_response.data["id"]}')
