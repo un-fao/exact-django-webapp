@@ -796,7 +796,7 @@ class RecursiveField(serializers.Serializer):
 class UserSummarySerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "username"]
+        fields = ["id", "email"]
 
 
 class CommentSerializer(serializers.ModelSerializer):
