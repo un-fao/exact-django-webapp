@@ -521,7 +521,7 @@ class BaseCalculator(ABC):
             if not all(modules):
                 raise Exception("At least one module is missing")
 
-            if any(module.status != StatusType.objects.get(name="READY") for module in modules):
+            if any(module.status != StatusType.objects.get(name_en="READY") for module in modules):
                 raise Exception("At least one module is not ready to perform the calculation")
 
     @abstractmethod
@@ -713,7 +713,7 @@ class DeforestationCalculator(BaseCalculator):
         # TODO: Maybe generalise this on a higher level
         if not forest:
             raise Exception("Forest module is missing")
-        if module.status != StatusType.objects.get(name="READY"):
+        if module.status != StatusType.objects.get(name_en="READY"):
             raise Exception("Forest module is not complete")
 
         cmc = {
@@ -983,7 +983,7 @@ class OtherLandUseCalculator(BaseCalculator):
         module_w: SingleBiomassModule | AboveBelowGroundBiomassModule
         module_wo: SingleBiomassModule | AboveBelowGroundBiomassModule
 
-        ready = all(module.status == StatusType.objects.get(name="READY") for module in [module_start, module_w, module_wo])
+        ready = all(module.status == StatusType.objects.get(name_en="READY") for module in [module_start, module_w, module_wo])
         if not ready:
             raise Exception("All modules associated with the land use change must be ready to perform the calculation")
 
