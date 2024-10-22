@@ -946,7 +946,7 @@ class Submodule(Historical, CachedResultMixin):
         super().save(*args, **kwargs)
 
     def is_ready(self) -> bool:
-        return self.status and self.status.name == "READY"
+        return self.status and self.status.name_en == "READY"
 
     def is_start(self) -> bool:
         return self.parent.is_start()
