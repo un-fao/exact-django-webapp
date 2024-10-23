@@ -65,6 +65,10 @@ class CoastalWetland(BaseModule):
         self.area_start_rewetting = 0 if self.area_drained_start == 0 else max(0, -self.area_drained_end + self.area_drained_start)
         self.area_end_rewetting = 0 if self.area_drained_end == 0 else max(0, -self.area_drained_end + self.area_drained_start)
 
+        # TODO: ask Lorenzo about this variable and how it should be split across the years
+        self.hectares_excavated = yearly_time_dependent_parameter_breakdown(self.area_excavated_end - self.area_excavated_start, 0, self.implementation_time, self.capitalization_time, self.rate_type)
+
+
     
 
     def calculate_emissions(
@@ -164,12 +168,9 @@ class CoastalWetland(BaseModule):
 
                 total_biomass = biomass_co2 * (area_excavated - area_excavated_start)
                 total_soil = soil_co2 * (area_excavated - area_excavated_start)
-                # TODO: ask Lorenzo about this variable and how it should be split across the years
 
-                hectares_excavated = yearly_time_dependent_parameter_breakdown(area_excavated - area_excavated_start, 0, self.implementation_time, self.capitalization_time, self.rate_type)
-
-                emissions_yearly_biomass_extraction_excavation = breakdown_according_to_values(total_biomass, hectares_excavated)
-                emissions_yearly_soil_extraction_excavation = breakdown_according_to_values(total_soil, hectares_excavated)
+                emissions_yearly_biomass_extraction_excavation = breakdown_according_to_values(total_biomass, self.hectares_excavated)
+                emissions_yearly_soil_extraction_excavation = breakdown_according_to_values(total_soil, self.hectares_excavated)
 
                 biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_yearly_biomass_extraction_excavation], ActivityTypes.BIOMASS, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
@@ -198,9 +199,9 @@ class CoastalWetland(BaseModule):
 
                     return yearly_biomass
 
-                except:
+                except Exception as e:
                     traceback.print_exc()
-                    return []
+                    raise e
             
             try:
                 self.ef_rewetting_methane_default = 0 if not self.soil_type == "<18" else self.ef_rewetting_methane_default
