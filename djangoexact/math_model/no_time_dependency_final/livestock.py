@@ -183,6 +183,7 @@ class Livestock(BaseModule):
                 nmm_emissions_prp_yearly = yearly_time_dependent_parameter_breakdown(annual_start_prp_n2o, annual_end_prp_n2o, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 nmm_emission_set_prp = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in nmm_emissions_prp_yearly], ActivityTypes.NITROUS_MANURE_MANAGEMENT_PRP, delay=self.delay)
+                self.result.yearly_emissions_by_sector_by_gas.append(nmm_emission_set_prp)
 
             except Exception as e:
                 traceback.print_exc()
