@@ -49,6 +49,7 @@ class CoastalWetland(BaseModule):
     ef_rewetting_methane_tier_2: Optional[float]
     soil_type: float
     methane_constant: float
+    mangrove_factor: float
 
     def __post_init__(self):
         super().__post_init__()
@@ -188,7 +189,7 @@ class CoastalWetland(BaseModule):
 
             def calculate_biomass():
                 try:
-                    agb = self.agb_default * 0.451 if not self.agb_tier_2 else self.agb_tier_2
+                    agb = self.agb_default * self.mangrove_factor if not self.agb_tier_2 else self.agb_tier_2
                     bgb = self.bgb_default * agb if not self.bgb_tier_2 else self.bgb_tier_2
                     litter = self.litter_default if not self.litter_tier_2 else self.litter_tier_2
                     deadwood = self.deadwood_default if not self.deadwood_tier_2 else self.deadwood_tier_2
