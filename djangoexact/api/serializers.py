@@ -1108,10 +1108,8 @@ class LandModuleSeralizer(ScenarioModuleSerializer):
             for field, value in data.items():
                 setattr(self.instance, field, value)
 
-            self.instance.save()
-
         if luc:
-            # If the module is associated with a Land Use Change, pdate the status of the Land Use Change
+            # If the module is associated with a Land Use Change, update the status of the Land Use Change
             luc_serializer: LandUseChangeWriteSerializer = get_module_serializer(LandUseChange)(data={}, instance=luc, many=False, partial=True)
             luc_serializer.is_valid(raise_exception=True)
             luc_serializer.save()
