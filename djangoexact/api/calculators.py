@@ -1222,6 +1222,9 @@ class AnnualCropCalculator(LandModuleCalculator):
         self.minor_biomass_start: ipcc.ForestTotalBiomass = ipcc.ForestTotalBiomass()
         self.minor_biomass_w: ipcc.TotalBiomassAfterDefo = ipcc.TotalBiomassAfterDefo()
         self.minor_biomass_wo: ipcc.TotalBiomassAfterDefo = ipcc.TotalBiomassAfterDefo()
+        self.minor_yield_default_start = ipcc.CropYieldStats()
+        self.minor_yield_default_w = ipcc.CropYieldStats()
+        self.minor_yield_default_wo = ipcc.CropYieldStats()
 
         self.residue_availability_t2_start: SimpleNamespace = SimpleNamespace(value=0)
         self.residue_availability_t2_w: SimpleNamespace = SimpleNamespace(value=0)
@@ -1295,6 +1298,12 @@ class AnnualCropCalculator(LandModuleCalculator):
                     self.minor_n_estimation_factor_start = ipcc.CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=minor_lut_start)
                 except ipcc.CropNitrousEstimationDefaultFactor.DoesNotExist:
                     raise Exception(f"CropNitrousEstimationDefaultFactor for {minor_lut_start.name} does not exist")
+
+                try:
+                    self.minor_yield_default_start = ipcc.CropYieldStats.objects.get(continent=self.region, land_use_type=minor_lut_start)
+                except ipcc.CropYieldStats.DoesNotExist:
+                    raise Exception(f"CropYieldStats for {minor_lut_start.name}, {climate.name} {moisture.name} in {self.region.name} does not exist for start scenario.")
+
             elif self.module.minor_yield_start is not None:
                 raise Exception(f"Yield for minor season of {self.module.module_type.name} is specified but the minor crop is missing for the start scenario")
 
@@ -1327,6 +1336,12 @@ class AnnualCropCalculator(LandModuleCalculator):
                     self.minor_n_estimation_factor_w = ipcc.CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=minor_lut_w)
                 except ipcc.CropNitrousEstimationDefaultFactor.DoesNotExist:
                     raise Exception(f"CropNitrousEstimationDefaultFactor for {minor_lut_w.name} does not exist")
+
+                try:
+                    self.minor_yield_default_w = ipcc.CropYieldStats.objects.get(continent=self.region, land_use_type=minor_lut_w)
+                except ipcc.CropYieldStats.DoesNotExist:
+                    raise Exception(f"CropYieldStats for {minor_lut_w.name}, {climate.name} {moisture.name} in {self.region.name} does not exist for with scenario.")
+
             elif self.module.minor_yield_w is not None:
                 raise Exception(f"Yield for minor season of {self.module.module_type.name} is specified but the minor crop is missing for the with scenario")
 
@@ -1359,6 +1374,12 @@ class AnnualCropCalculator(LandModuleCalculator):
                     self.minor_n_estimation_factor_wo = ipcc.CropNitrousEstimationDefaultFactor.objects.get_or_grains(land_use_type=minor_lut_wo)
                 except ipcc.CropNitrousEstimationDefaultFactor.DoesNotExist:
                     raise Exception(f"CropNitrousEstimationDefaultFactor for {minor_lut_wo.name} does not exist")
+
+                try:
+                    self.minor_yield_default_wo = ipcc.CropYieldStats.objects.get(continent=self.region, land_use_type=minor_lut_wo)
+                except ipcc.CropYieldStats.DoesNotExist:
+                    raise Exception(f"CropYieldStats for {minor_lut_wo.name}, {climate.name} {moisture.name} in {self.region.name} does not exist for without scenario.")
+
             elif self.module.minor_yield_wo is not None:
                 raise Exception(f"Yield for minor season of {self.module.module_type.name} is specified but the minor crop is missing for the without scenario")
 
@@ -1372,6 +1393,8 @@ class AnnualCropCalculator(LandModuleCalculator):
         project: Project = self.module.activity.project
 
         change_rate = self.module.activity.change_rate
+
+        print("AOOO")
 
         self.get_defaults()
 
@@ -1416,7 +1439,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "residue_minor_tier_2": self.module.minor_biomass_factor_t2_start,
                 "n_estimation_slope_minor": self.minor_n_estimation_factor_start.slope,
                 "n_estimation_intercept_minor": self.minor_n_estimation_factor_start.intercept,
-                "yield_value_minor": self.module.minor_yield_w,
+                "yield_value_minor": self.minor_yield_default_w.average,
                 "yield_minor_tier_2": self.module.crop_yield_t2_w,
                 "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_start.name_en == "Burned" else None,
                 "retained_main": self.module.residue_management_type_start.name_en == "Retained",
@@ -1478,7 +1501,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "residue_minor_tier_2": self.module.minor_biomass_factor_t2_start,
                 "n_estimation_slope_minor": self.minor_n_estimation_factor_start.slope,
                 "n_estimation_intercept_minor": self.minor_n_estimation_factor_start.intercept,
-                "yield_value_minor": self.module.minor_yield_wo,
+                "yield_value_minor": self.minor_yield_default_wo.average,
                 "yield_minor_tier_2": self.module.crop_yield_t2_wo,
                 "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_start.name_en == "Burned" else None,
                 "retained_main": self.module.residue_management_type_start.name_en == "Retained",
@@ -1543,7 +1566,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "residue_minor_tier_2": self.module.minor_biomass_factor_t2_w,
                 "n_estimation_slope_minor": self.minor_n_estimation_factor_w.slope,
                 "n_estimation_intercept_minor": self.minor_n_estimation_factor_w.intercept,
-                "yield_value_minor": self.module.minor_yield_w,
+                "yield_value_minor": self.minor_yield_default_w.average,
                 "yield_minor_tier_2": self.module.crop_yield_t2_w,
                 "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_w.name_en == "Burned" else None,
                 "retained_main": self.module.residue_management_type_w.name_en == "Retained",
@@ -1608,7 +1631,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "residue_minor_tier_2": self.module.minor_biomass_factor_t2_wo,
                 "n_estimation_slope_minor": self.minor_n_estimation_factor_wo.slope,
                 "n_estimation_intercept_minor": self.minor_n_estimation_factor_wo.intercept,
-                "yield_value_minor": self.module.minor_yield_wo,
+                "yield_value_minor": self.minor_yield_default_wo.average,
                 "yield_minor_tier_2": self.module.crop_yield_t2_wo,
                 "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_wo.name_en == "Burned" else None,
                 "retained_main": self.module.residue_management_type_wo.name_en == "Retained",
