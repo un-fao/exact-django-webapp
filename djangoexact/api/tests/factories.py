@@ -162,6 +162,41 @@ class AnnualCroplandFactory(DjangoModelFactory):
     area = factory.fuzzy.FuzzyInteger(150, 150)
 
 
+class AnnualCroplandWithMinorSeasonFactory(DjangoModelFactory):
+    class Meta:
+        model = AnnualCropland
+
+    area = 150
+
+    status = READY
+
+    land_use_type_w = factory.fuzzy.FuzzyChoice(crop_types)
+    land_use_type_start = land_use_type_w
+    land_use_type_wo = land_use_type_w
+
+    tillage_management_type_start = factory.fuzzy.FuzzyChoice(tillage_management_types)
+    tillage_management_type_w = factory.fuzzy.FuzzyChoice(tillage_management_types)
+    tillage_management_type_wo = factory.fuzzy.FuzzyChoice(tillage_management_types)
+
+    organic_input_type_start = factory.fuzzy.FuzzyChoice(organic_input_types)
+    organic_input_type_w = organic_input_type_start
+    organic_input_type_wo = organic_input_type_start
+
+    residue_management_type_start = factory.fuzzy.FuzzyChoice(residue_management_types)
+    residue_management_type_w = factory.fuzzy.FuzzyChoice(residue_management_types)
+    residue_management_type_wo = factory.fuzzy.FuzzyChoice(residue_management_types)
+
+    area = factory.fuzzy.FuzzyInteger(150, 150)
+
+    minor_land_use_type_start = factory.fuzzy.FuzzyChoice(crop_types)
+    minor_land_use_type_w = minor_land_use_type_start
+    minor_land_use_type_wo = minor_land_use_type_start
+
+    minor_residue_management_type_start = factory.fuzzy.FuzzyChoice(residue_management_types)
+    minor_residue_management_type_w = factory.fuzzy.FuzzyChoice(residue_management_types)
+    minor_residue_management_type_wo = factory.fuzzy.FuzzyChoice(residue_management_types)
+
+
 class PerennialCroplandFactory(DjangoModelFactory):
     class Meta:
         model = PerennialCropland
