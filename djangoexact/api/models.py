@@ -862,11 +862,10 @@ class CachedResultMixin(models.Model, DirtyFieldsMixin):
             self.last_modified = timezone.now()
 
         if self.pk and self.is_dirty(check_relationship=True):
-            dirty_fields = self.get_dirty_fields()
+            dirty_fields = self.get_dirty_fields(check_relationship=True)
             cache_fields = ["last_cached_at", "cached_results_total", "cached_results_by_activity", "cached_results_by_gas", "cached_results_by_activity_by_gas"]
 
-            # Check if relevant fields were changed (exclude cache-related fields)
-            if any(field in dirty_fields for field in self._meta.get_fields() if field.name not in cache_fields):
+            if any(field in dirty_fields.keys() for field in self._meta.get_fields() if field.name not in cache_fields):
                 self.last_modified = timezone.now()
 
         super().save(*args, **kwargs)
