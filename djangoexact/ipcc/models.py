@@ -985,6 +985,9 @@ class CropYieldStatsManager(Manager):
 
 
 class CropYieldStats(Model):
+    """
+    Stats_yield_ton_per_ha:A1
+    """
 
     class Meta:
         verbose_name = "Crop Yield Stats"
