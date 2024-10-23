@@ -157,6 +157,8 @@ class ModuleTest(ActivityTest):
         self.activity.module_types.add(self.module_type)
         self.activity.save()
 
+        log.debug(f"Created {self.module.module_type.name} module with parameters {self.get_parameters(self.module)}")
+
     def calculate_results(self):
         """
         Calculate the results for the module.
