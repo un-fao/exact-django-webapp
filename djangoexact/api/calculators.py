@@ -4848,42 +4848,42 @@ class CoastalWetlandCalculator(BaseCalculator):
         except ipcc.CoastalAGB.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "agb_t2")
             if missing_scenarios:
-                raise ValueError(f"AGB for {self.module.land_use_type.name} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
+                raise ValueError(f"AGB for {self.module.land_use_type} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
 
         try:
             self.bgb = ipcc.CoastalBGB.objects.get(**cm, land_use_type=self.module.land_use_type)
         except ipcc.CoastalBGB.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "bgb_t2")
             if missing_scenarios:
-                raise ValueError(f"BGB for {self.module.land_use_type.name} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
+                raise ValueError(f"BGB for {self.module.land_use_type} {self.climate} {self.moisture} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
 
         try:
             self.litter = ipcc.CoastalLitter.objects.get(**cm, land_use_type=self.module.land_use_type)
         except ipcc.CoastalLitter.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "litter_t2")
             if missing_scenarios:
-                raise ValueError(f"Litter for {self.module.land_use_type.name} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
+                raise ValueError(f"Litter for {self.module.land_use_type} {self.climate} {self.moisture} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
 
         try:
             self.dw = ipcc.CoastalDeadwood.objects.get(**cm, land_use_type=self.module.land_use_type)
         except ipcc.CoastalDeadwood.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "deadwood_t2")
             if missing_scenarios:
-                raise ValueError(f"Deadwood for {self.module.land_use_type.name} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
+                raise ValueError(f"Deadwood for {self.module.land_use_type} {self.climate} {self.moisture} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
 
         try:
             self.soil_1m = ipcc.DefaultSoilCarbonStock.objects.get(**cm, land_use_type=self.module.land_use_type, soil_type__name=self.soil_type_name)
         except ipcc.DefaultSoilCarbonStock.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "soc_t2")
             if missing_scenarios:
-                raise ValueError(f"Soil 1m for {self.module.land_use_type.name} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
+                raise ValueError(f"Soil 1m for {self.module.land_use_type} {self.climate} {self.moisture} in {self.soil_type_name} soil is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
 
         try:
             self.ef_drainage = ipcc.DrainageEmissionFactor.objects.get(**cm, land_use_type=self.module.land_use_type)
         except ipcc.DrainageEmissionFactor.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "drainage_ef_t2")
             if missing_scenarios:
-                raise ValueError(f"Drainage Emission Factor for {self.module.land_use_type.name} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
+                raise ValueError(f"Drainage Emission Factor for {self.module.land_use_type} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
 
         try:
             self.pc_c_lost_excavation = CoastalWetlandParameter.objects.get(name="PERCENTAGE_C_LOST_EXCAVATION")
@@ -4897,14 +4897,14 @@ class CoastalWetlandCalculator(BaseCalculator):
         except ipcc.RewettingCarbonFactor.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "co2_rewetting_t2")
             if missing_scenarios:
-                raise ValueError(f"Rewetting CO2 for {self.module.land_use_type.name}, {self.project.climate.name}, {self.project.moisture.name}. Please insert tier 2 values for the relevant scenarios.")
+                raise ValueError(f"Rewetting CO2 for {self.module.land_use_type} {self.project.climate} {self.project.moisture} in {self.soil_type_name} is missing. Please insert tier 2 values for the relevant scenarios.")
 
         try:
             self.rewetting_ch4 = ipcc.RewettingMethaneFactor.objects.get(**cm, land_use_type=self.module.land_use_type, salinity=self.salinity_type)
         except ipcc.RewettingMethaneFactor.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "ch4_rewetting_t2")
             if missing_scenarios:
-                raise ValueError(f"Rewetting CH4 for {self.module.land_use_type.name}, {self.project.climate.name}, {self.project.moisture.name}. Please insert tier 2 values for the relevant scenarios.")
+                raise ValueError(f"Rewetting CH4 for {self.module.land_use_type} {self.project.climate} {self.project.moisture} with {self.salinity_type} salinity is missing. Please insert tier 2 values for the relevant scenarios.")
 
     def calculate(self) -> Result:
         """
@@ -4946,6 +4946,7 @@ class CoastalWetlandCalculator(BaseCalculator):
                 "soil_type": self.module.avg_salinity_t2.value if self.module.avg_salinity_t2 else None,
                 "methane_constant": self.project.gwp.ch4,
                 "delay": self.activity.delay,
+                "mangrove_factor": utils.MANGROVE_FACTOR if "mangrove" in self.module.land_use_type.name_en.casefold() else utils.NON_MANGROVE_FACTOR,
             }
 
             self.math_w = MathCoastalWetland(**self.inputs_w)
@@ -4984,6 +4985,7 @@ class CoastalWetlandCalculator(BaseCalculator):
                 "soil_type": self.module.avg_salinity_t2.value if self.module.avg_salinity_t2 else None,
                 "methane_constant": self.project.gwp.ch4,
                 "delay": self.activity.delay,
+                "mangrove_factor": utils.MANGROVE_FACTOR if "mangrove" in self.module.land_use_type.name_en.casefold() else utils.NON_MANGROVE_FACTOR,
             }
 
             self.math_wo = MathCoastalWetland(**self.inputs_wo)
