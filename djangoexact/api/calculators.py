@@ -1283,7 +1283,7 @@ class AnnualCropCalculator(LandModuleCalculator):
             self.n_estimation_factor_start = utils.get_or_raise(ipcc.CropNitrousEstimationDefaultFactor, lut_start_flt, f"CropNitrousEstimationDefaultFactor for {lut_start.name} does not exist", method="get_or_grains")
 
             try:
-                self.crop_yield_start = ipcc.CropYieldStats.objects.get(continent=self.region, land_use_type=lut_start)
+                self.crop_yield_start = ipcc.CropYieldStats.objects.get_or_region_average(continent=self.region, land_use_type=lut_start)
             except ipcc.CropYieldStats.DoesNotExist:
                 if module.crop_yield_t2_start is None:
                     raise Exception(f"CropYieldStats for {lut_start.name}, {climate.name} {moisture.name} in {self.region.name} does not exist for start scenario.")
@@ -1300,7 +1300,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                     raise Exception(f"CropNitrousEstimationDefaultFactor for {minor_lut_start.name} does not exist")
 
                 try:
-                    self.minor_yield_default_start = ipcc.CropYieldStats.objects.get(continent=self.region, land_use_type=minor_lut_start)
+                    self.minor_yield_default_start = ipcc.CropYieldStats.objects.get_or_region_average(continent=self.region, land_use_type=minor_lut_start)
                 except ipcc.CropYieldStats.DoesNotExist:
                     raise Exception(f"CropYieldStats for {minor_lut_start.name}, {climate.name} {moisture.name} in {self.region.name} does not exist for start scenario.")
 
@@ -1321,7 +1321,7 @@ class AnnualCropCalculator(LandModuleCalculator):
             self.n_estimation_factor_w = utils.get_or_raise(ipcc.CropNitrousEstimationDefaultFactor, lut_w_flt, f"CropNitrousEstimationDefaultFactor for {lut_w.name} does not exist", method="get_or_grains")
 
             try:
-                self.crop_yield_w = ipcc.CropYieldStats.objects.get(continent=self.region, land_use_type=lut_w)
+                self.crop_yield_w = ipcc.CropYieldStats.objects.get_or_region_average(continent=self.region, land_use_type=lut_w)
             except ipcc.CropYieldStats.DoesNotExist:
                 if module.crop_yield_t2_w is None:
                     raise Exception(f"CropYieldStats for {lut_w.name}, {climate.name} {moisture.name} in {self.region.name} does not exist for with scenario.")
@@ -1338,7 +1338,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                     raise Exception(f"CropNitrousEstimationDefaultFactor for {minor_lut_w.name} does not exist")
 
                 try:
-                    self.minor_yield_default_w = ipcc.CropYieldStats.objects.get(continent=self.region, land_use_type=minor_lut_w)
+                    self.minor_yield_default_w = ipcc.CropYieldStats.objects.get_or_region_average(continent=self.region, land_use_type=minor_lut_w)
                 except ipcc.CropYieldStats.DoesNotExist:
                     raise Exception(f"CropYieldStats for {minor_lut_w.name}, {climate.name} {moisture.name} in {self.region.name} does not exist for with scenario.")
 
@@ -1359,7 +1359,7 @@ class AnnualCropCalculator(LandModuleCalculator):
             self.n_estimation_factor_wo = utils.get_or_raise(ipcc.CropNitrousEstimationDefaultFactor, lut_wo_flt, f"CropNitrousEstimationDefaultFactor for {lut_wo.name} does not exist", method="get_or_grains")
 
             try:
-                self.crop_yield_wo = ipcc.CropYieldStats.objects.get(continent=self.region, land_use_type=lut_wo)
+                self.crop_yield_wo = ipcc.CropYieldStats.objects.get_or_region_average(continent=self.region, land_use_type=lut_wo)
             except ipcc.CropYieldStats.DoesNotExist:
                 if module.crop_yield_t2_wo is None:
                     raise Exception(f"CropYieldStats for {lut_wo.name}, {climate.name} {moisture.name} in {self.region.name} does not exist for without scenario.")
@@ -1376,7 +1376,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                     raise Exception(f"CropNitrousEstimationDefaultFactor for {minor_lut_wo.name} does not exist")
 
                 try:
-                    self.minor_yield_default_wo = ipcc.CropYieldStats.objects.get(continent=self.region, land_use_type=minor_lut_wo)
+                    self.minor_yield_default_wo = ipcc.CropYieldStats.objects.get_or_region_average(continent=self.region, land_use_type=minor_lut_wo)
                 except ipcc.CropYieldStats.DoesNotExist:
                     raise Exception(f"CropYieldStats for {minor_lut_wo.name}, {climate.name} {moisture.name} in {self.region.name} does not exist for without scenario.")
 
