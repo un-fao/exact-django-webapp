@@ -107,6 +107,10 @@ class GrasslandManagement(BaseModule):
                 if not self.fire_used or self.implementation_time + self.capitalization_time < self.fire_interval or self.fire_interval == None:
                     pass
                 else:
+
+                    if self.fire_interval <= 0:
+                        raise ValueError("Fire interval must be greater than 0 if fire is used")
+                    
                     agb = self.agb_ref if not self.agb_tier_2 else self.agb_tier_2
                     cf = self.cf_ref if not self.cf_tier_2 else self.cf_tier_2
 
