@@ -4386,70 +4386,44 @@ EnergyDefaultEmissionFactor.objects.bulk_create(l)
 #                     agb_growth_max=agb_growth_max * utils.NON_MANGROVE_FACTOR if agb_growth_max else None,
 #                 )
 
+# CoastalLitter.objects.all().delete()
+
+# df = pd.read_csv(
+#     os.path.join(os.path.dirname(__file__), "ipcc_data", "CoastalLitter.csv"),
+#     header=0,
+#     sep=",",
+# )
+
+# df_headers = df.columns.values.tolist()
+# df_dict = df.to_dict("records")
+
+# for i, row in enumerate(df_dict):
+#     climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
+#     moisture = Moisture.objects.get(name__iexact=sanitize(row["moisture"]))
+
+#     for j, header in enumerate(df_headers, start=2):
+#         if j == len(df_headers):
+#             break
+
+#         land_use_type = LandUseType.objects.get(name__iexact=sanitize(df_headers[j]))
+#         value = parse_csv_number(row[df_headers[j]])
+
+#         print(
+#             land_use_type,
+#             climate,
+#             moisture,
+#             value,
+#         )
+
+#         CoastalLitter.objects.create(
+#             land_use_type=land_use_type,
+#             climate=climate,
+#             moisture=moisture,
+#             value=value,
+#         )
+
 
 # TODO: Run in review
 
-CoastalLitter.objects.all().delete()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "CoastalLitter.csv"),
-    header=0,
-    sep=",",
-)
-
-df_headers = df.columns.values.tolist()
-df_dict = df.to_dict("records")
-
-for i, row in enumerate(df_dict):
-    climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
-    moisture = Moisture.objects.get(name__iexact=sanitize(row["moisture"]))
-
-    for j, header in enumerate(df_headers, start=2):
-        if j == len(df_headers):
-            break
-
-        land_use_type = LandUseType.objects.get(name__iexact=sanitize(df_headers[j]))
-        value = parse_csv_number(row[df_headers[j]])
-
-        print(
-            land_use_type,
-            climate,
-            moisture,
-            value,
-        )
-
-        CoastalLitter.objects.create(
-            land_use_type=land_use_type,
-            climate=climate,
-            moisture=moisture,
-            value=value,
-        )
-
-
-# with open("scripts/ipcc_data/CoastalLitter.csv", "r") as f:
-#     reader = csv.reader(f)
-#     header = next(reader, None)
-#     data = list(reader)
-
-#     for i, head in enumerate(header):
-#         head = sanitize(head).title()
-#         land_use_type = LandUseType.objects.get(name__iexact=head)
-#         for row in data:
-#             if sanitize(row[0]) == "":
-#                 continue
-
-#             climate = Climate.objects.get(name__iexact=sanitize(row[0]))
-#             moisture = Moisture.objects.get(name__iexact=sanitize(row[1]))
-
-#             value = parse_csv_number(row[i + 2])
-
-#             print(f"{land_use_type}, {climate}, {moisture}, {value}")
-
-#             CoastalLitter.objects.get(
-#                 land_use_type=land_use_type,
-#                 climate=climate,
-#                 moisture=moisture,
-#                 value=value,
-#             )
 
 # TODO: Run in develop
