@@ -332,7 +332,7 @@ def get_grassland_soc(luc: LandUseChange) -> ipcc.GrasslandStockExchangeFactor |
         return grassland_soc
 
     module_start: Grassland = getattr(luc.activity, luc.module_type_start.class_name.lower(), None).first()
-    if luc.module_type_start.name == "Grassland" and module_start:
+    if luc.module_type_start.name_en == "Grassland" and module_start:
 
         if module_start.status.name != "READY":
             raise Exception("Cannot retrieve Grassland SOC as the starting Grassland module is not ready to perform the calculation")
@@ -433,7 +433,12 @@ class CalculatorFactory:
         try:
             calculator: BaseCalculator = self.__get_calculator(input)(input)
             result: tuple[MathResult] = calculator.calculate()
-            return Result(*result).breakdown(by=aggregate_by)
+            return (
+                Result(*result).breakdown(by=BreakdownTypes.TOTAL),
+                Result(*result).breakdown(by=BreakdownTypes.ACTIVITY),
+                Result(*result).breakdown(by=BreakdownTypes.GAS),
+                Result(*result).breakdown(by=BreakdownTypes.ACTIVITY_GAS),
+            )
 
         except Exception as e:
             raise Exception(f"Error in {input.__class__.__name__}: {e}")
@@ -516,7 +521,7 @@ class BaseCalculator(ABC):
             if not all(modules):
                 raise Exception("At least one module is missing")
 
-            if any(module.status != StatusType.objects.get(name="READY") for module in modules):
+            if any(module.status != StatusType.objects.get(name_en="READY") for module in modules):
                 raise Exception("At least one module is not ready to perform the calculation")
 
     @abstractmethod
@@ -708,7 +713,7 @@ class DeforestationCalculator(BaseCalculator):
         # TODO: Maybe generalise this on a higher level
         if not forest:
             raise Exception("Forest module is missing")
-        if module.status != StatusType.objects.get(name="READY"):
+        if module.status != StatusType.objects.get(name_en="READY"):
             raise Exception("Forest module is not complete")
 
         cmc = {
@@ -809,14 +814,14 @@ class DeforestationCalculator(BaseCalculator):
         soc_w = soc_ref
         soc_wo = soc_ref
 
-        if luc.module_type_w.name == "Grassland":
+        if luc.module_type_w.name_en == "Grassland":
             soc_w = ipcc.GrasslandStockExchangeFactor.objects.get(grassland_management_type=module_w.grassland_management_type_start, climate=project.climate)
             flu_w = SimpleNamespace(value=soc_w.flu)
             fi_w = SimpleNamespace(value=soc_w.fi)
             fmg_w = SimpleNamespace(value=soc_w.fmg)
             soc_w = SimpleNamespace(value=soc_w.flu * soc_w.fi * soc_w.fmg)
 
-        if luc.module_type_wo.name == "Grassland":
+        if luc.module_type_wo.name_en == "Grassland":
             soc_wo = ipcc.GrasslandStockExchangeFactor.objects.get(
                 grassland_management_type=module_wo.grassland_management_type_start,
                 climate=project.climate,
@@ -978,12 +983,12 @@ class OtherLandUseCalculator(BaseCalculator):
         module_w: SingleBiomassModule | AboveBelowGroundBiomassModule
         module_wo: SingleBiomassModule | AboveBelowGroundBiomassModule
 
-        ready = all(module.status == StatusType.objects.get(name="READY") for module in [module_start, module_w, module_wo])
+        ready = all(module.status == StatusType.objects.get(name_en="READY") for module in [module_start, module_w, module_wo])
         if not ready:
             raise Exception("All modules associated with the land use change must be ready to perform the calculation")
 
         soc_start = None
-        if luc.module_type_start.name == "Grassland":
+        if luc.module_type_start.name_en == "Grassland":
             # Grassland SOCs
             soc_start = ipcc.GrasslandStockExchangeFactor.objects.get(
                 grassland_management_type=module_start.grassland_management_type_start,
@@ -1018,7 +1023,9 @@ class OtherLandUseCalculator(BaseCalculator):
             raise Exception(f"TotalBiomassAfterDefo for {luc_w.name} in {climate.name} climate, {moisture.name} moisture, and {continent.name} continent does not exist")
 
         try:
-            biomass_final_wo = ipcc.TotalBiomassAfterDefo.objects.get_or_default(**cmc, land_use_type=luc_wo)
+            # biomass_final_wo = ipcc.TotalBiomassAfterDefo.objects.get_or_default(**cmc, land_use_type=luc_wo)
+            # NOTE: Always zero
+            biomass_final_wo = SimpleNamespace(value=0)
         except ipcc.TotalBiomassAfterDefo.DoesNotExist:
             raise Exception(f"TotalBiomassAfterDefo for {luc_wo.name} in {climate.name} climate, {moisture.name} moisture, and {continent.name} continent does not exist")
 
@@ -1217,6 +1224,9 @@ class AnnualCropCalculator(LandModuleCalculator):
         self.minor_biomass_start: ipcc.ForestTotalBiomass = ipcc.ForestTotalBiomass()
         self.minor_biomass_w: ipcc.TotalBiomassAfterDefo = ipcc.TotalBiomassAfterDefo()
         self.minor_biomass_wo: ipcc.TotalBiomassAfterDefo = ipcc.TotalBiomassAfterDefo()
+        self.minor_yield_default_start = ipcc.CropYieldStats()
+        self.minor_yield_default_w = ipcc.CropYieldStats()
+        self.minor_yield_default_wo = ipcc.CropYieldStats()
 
         self.residue_availability_t2_start: SimpleNamespace = SimpleNamespace(value=0)
         self.residue_availability_t2_w: SimpleNamespace = SimpleNamespace(value=0)
@@ -1275,7 +1285,7 @@ class AnnualCropCalculator(LandModuleCalculator):
             self.n_estimation_factor_start = utils.get_or_raise(ipcc.CropNitrousEstimationDefaultFactor, lut_start_flt, f"CropNitrousEstimationDefaultFactor for {lut_start.name} does not exist", method="get_or_grains")
 
             try:
-                self.crop_yield_start = ipcc.CropYieldStats.objects.get(continent=self.region, land_use_type=lut_start)
+                self.crop_yield_start = ipcc.CropYieldStats.objects.get_or_region_average(continent=self.region, land_use_type=lut_start)
             except ipcc.CropYieldStats.DoesNotExist:
                 if module.crop_yield_t2_start is None:
                     raise Exception(f"CropYieldStats for {lut_start.name}, {climate.name} {moisture.name} in {self.region.name} does not exist for start scenario.")
@@ -1291,6 +1301,14 @@ class AnnualCropCalculator(LandModuleCalculator):
                 except ipcc.CropNitrousEstimationDefaultFactor.DoesNotExist:
                     raise Exception(f"CropNitrousEstimationDefaultFactor for {minor_lut_start.name} does not exist")
 
+                try:
+                    self.minor_yield_default_start = ipcc.CropYieldStats.objects.get_or_region_average(continent=self.region, land_use_type=minor_lut_start)
+                except ipcc.CropYieldStats.DoesNotExist:
+                    raise Exception(f"CropYieldStats for {minor_lut_start.name}, {climate.name} {moisture.name} in {self.region.name} does not exist for start scenario.")
+
+            elif self.module.minor_yield_start is not None:
+                raise Exception(f"Yield for minor season of {self.module.module_type.name} is specified but the minor crop is missing for the start scenario")
+
         if module.is_with():
             lut_w = module.land_use_type_w
             minor_lut_w = module.minor_land_use_type_w
@@ -1305,7 +1323,7 @@ class AnnualCropCalculator(LandModuleCalculator):
             self.n_estimation_factor_w = utils.get_or_raise(ipcc.CropNitrousEstimationDefaultFactor, lut_w_flt, f"CropNitrousEstimationDefaultFactor for {lut_w.name} does not exist", method="get_or_grains")
 
             try:
-                self.crop_yield_w = ipcc.CropYieldStats.objects.get(continent=self.region, land_use_type=lut_w)
+                self.crop_yield_w = ipcc.CropYieldStats.objects.get_or_region_average(continent=self.region, land_use_type=lut_w)
             except ipcc.CropYieldStats.DoesNotExist:
                 if module.crop_yield_t2_w is None:
                     raise Exception(f"CropYieldStats for {lut_w.name}, {climate.name} {moisture.name} in {self.region.name} does not exist for with scenario.")
@@ -1321,6 +1339,14 @@ class AnnualCropCalculator(LandModuleCalculator):
                 except ipcc.CropNitrousEstimationDefaultFactor.DoesNotExist:
                     raise Exception(f"CropNitrousEstimationDefaultFactor for {minor_lut_w.name} does not exist")
 
+                try:
+                    self.minor_yield_default_w = ipcc.CropYieldStats.objects.get_or_region_average(continent=self.region, land_use_type=minor_lut_w)
+                except ipcc.CropYieldStats.DoesNotExist:
+                    raise Exception(f"CropYieldStats for {minor_lut_w.name}, {climate.name} {moisture.name} in {self.region.name} does not exist for with scenario.")
+
+            elif self.module.minor_yield_w is not None:
+                raise Exception(f"Yield for minor season of {self.module.module_type.name} is specified but the minor crop is missing for the with scenario")
+
         if module.is_without():
             lut_wo = module.land_use_type_wo
             minor_lut_wo = module.minor_land_use_type_wo
@@ -1335,7 +1361,7 @@ class AnnualCropCalculator(LandModuleCalculator):
             self.n_estimation_factor_wo = utils.get_or_raise(ipcc.CropNitrousEstimationDefaultFactor, lut_wo_flt, f"CropNitrousEstimationDefaultFactor for {lut_wo.name} does not exist", method="get_or_grains")
 
             try:
-                self.crop_yield_wo = ipcc.CropYieldStats.objects.get(continent=self.region, land_use_type=lut_wo)
+                self.crop_yield_wo = ipcc.CropYieldStats.objects.get_or_region_average(continent=self.region, land_use_type=lut_wo)
             except ipcc.CropYieldStats.DoesNotExist:
                 if module.crop_yield_t2_wo is None:
                     raise Exception(f"CropYieldStats for {lut_wo.name}, {climate.name} {moisture.name} in {self.region.name} does not exist for without scenario.")
@@ -1351,6 +1377,14 @@ class AnnualCropCalculator(LandModuleCalculator):
                 except ipcc.CropNitrousEstimationDefaultFactor.DoesNotExist:
                     raise Exception(f"CropNitrousEstimationDefaultFactor for {minor_lut_wo.name} does not exist")
 
+                try:
+                    self.minor_yield_default_wo = ipcc.CropYieldStats.objects.get_or_region_average(continent=self.region, land_use_type=minor_lut_wo)
+                except ipcc.CropYieldStats.DoesNotExist:
+                    raise Exception(f"CropYieldStats for {minor_lut_wo.name}, {climate.name} {moisture.name} in {self.region.name} does not exist for without scenario.")
+
+            elif self.module.minor_yield_wo is not None:
+                raise Exception(f"Yield for minor season of {self.module.module_type.name} is specified but the minor crop is missing for the without scenario")
+
     def calculate(self, aggregate_by=BreakdownTypes.TOTAL) -> tuple[MathResult]:
         """
         Calculate emissions for a single AnnualCropland module.
@@ -1361,6 +1395,8 @@ class AnnualCropCalculator(LandModuleCalculator):
         project: Project = self.module.activity.project
 
         change_rate = self.module.activity.change_rate
+
+        print("AOOO")
 
         self.get_defaults()
 
@@ -1393,7 +1429,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "ef_nitrous_som": self.som.value,
                 "nitrous_constant": project.gwp.n2o,
                 "methane_constant": project.gwp.ch4,
-                "ef_methane_agr_residues_main": self.burning_emission_factor.ch4 if self.module.residue_management_type_start.name == "Burned" else None,
+                "ef_methane_agr_residues_main": self.burning_emission_factor.ch4 if self.module.residue_management_type_start.name_en == "Burned" else None,
                 "combustion_factor_main": self.fires_start.value,
                 "residue_main_tier_2": self.module.residue_availability_t2_start,
                 "n_estimation_slope_main": self.n_estimation_factor_start.slope,
@@ -1405,12 +1441,12 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "residue_minor_tier_2": self.module.minor_biomass_factor_t2_start,
                 "n_estimation_slope_minor": self.minor_n_estimation_factor_start.slope,
                 "n_estimation_intercept_minor": self.minor_n_estimation_factor_start.intercept,
-                "yield_value_minor": self.module.minor_yield_w,
+                "yield_value_minor": self.minor_yield_default_w.average,
                 "yield_minor_tier_2": self.module.crop_yield_t2_w,
-                "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_start.name == "Burned" else None,
-                "retained_main": self.module.residue_management_type_start.name == "Retained",
+                "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_start.name_en == "Burned" else None,
+                "retained_main": self.module.residue_management_type_start.name_en == "Retained",
                 "ef_nitrous_agr_residues_minor": self.minor_burning_emission_factor.n2o,
-                "retained_minor": self.module.minor_residue_management_type_start.name == "Retained" if self.module.minor_residue_management_type_start else None,
+                "retained_minor": self.module.minor_residue_management_type_start.name_en == "Retained" if self.module.minor_residue_management_type_start else None,
                 "n_content_ag_main": self.n_estimation_factor_start.n_ag_residues,
                 "ratio_bg_ag_main": self.n_estimation_factor_start.rs_t,
                 "n_content_bg_main": self.n_estimation_factor_start.n_bg_t,
@@ -1455,7 +1491,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "ef_nitrous_som": self.som.value,
                 "nitrous_constant": project.gwp.n2o,
                 "methane_constant": project.gwp.ch4,
-                "ef_methane_agr_residues_main": self.burning_emission_factor.ch4 if self.module.residue_management_type_start.name == "Burned" else None,
+                "ef_methane_agr_residues_main": self.burning_emission_factor.ch4 if self.module.residue_management_type_start.name_en == "Burned" else None,
                 "combustion_factor_main": self.fires_start.value,
                 "residue_main_tier_2": self.module.residue_availability_t2_start,
                 "n_estimation_slope_main": self.n_estimation_factor_start.slope,
@@ -1467,12 +1503,12 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "residue_minor_tier_2": self.module.minor_biomass_factor_t2_start,
                 "n_estimation_slope_minor": self.minor_n_estimation_factor_start.slope,
                 "n_estimation_intercept_minor": self.minor_n_estimation_factor_start.intercept,
-                "yield_value_minor": self.module.minor_yield_wo,
+                "yield_value_minor": self.minor_yield_default_wo.average,
                 "yield_minor_tier_2": self.module.crop_yield_t2_wo,
-                "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_start.name == "Burned" else None,
-                "retained_main": self.module.residue_management_type_start.name == "Retained",
+                "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_start.name_en == "Burned" else None,
+                "retained_main": self.module.residue_management_type_start.name_en == "Retained",
                 "ef_nitrous_agr_residues_minor": self.minor_burning_emission_factor.n2o,
-                "retained_minor": self.module.minor_residue_management_type_start.name == "Retained" if self.module.minor_residue_management_type_start else None,
+                "retained_minor": self.module.minor_residue_management_type_start.name_en == "Retained" if self.module.minor_residue_management_type_start else None,
                 "n_content_ag_main": self.n_estimation_factor_start.n_ag_residues,
                 "ratio_bg_ag_main": self.n_estimation_factor_start.rs_t,
                 "n_content_bg_main": self.n_estimation_factor_start.n_bg_t,
@@ -1520,7 +1556,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "ef_nitrous_som": self.som.value,
                 "nitrous_constant": project.gwp.n2o,
                 "methane_constant": project.gwp.ch4,
-                "ef_methane_agr_residues_main": self.burning_emission_factor.ch4 if self.module.residue_management_type_w.name == "Burned" else None,
+                "ef_methane_agr_residues_main": self.burning_emission_factor.ch4 if self.module.residue_management_type_w.name_en == "Burned" else None,
                 "combustion_factor_main": self.fires_w.value,
                 "residue_main_tier_2": self.module.residue_availability_t2_w,
                 "n_estimation_slope_main": self.n_estimation_factor_w.slope,
@@ -1532,12 +1568,12 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "residue_minor_tier_2": self.module.minor_biomass_factor_t2_w,
                 "n_estimation_slope_minor": self.minor_n_estimation_factor_w.slope,
                 "n_estimation_intercept_minor": self.minor_n_estimation_factor_w.intercept,
-                "yield_value_minor": self.module.minor_yield_w,
+                "yield_value_minor": self.minor_yield_default_w.average,
                 "yield_minor_tier_2": self.module.crop_yield_t2_w,
-                "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_w.name == "Burned" else None,
-                "retained_main": self.module.residue_management_type_w.name == "Retained",
+                "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_w.name_en == "Burned" else None,
+                "retained_main": self.module.residue_management_type_w.name_en == "Retained",
                 "ef_nitrous_agr_residues_minor": self.minor_burning_emission_factor.n2o,
-                "retained_minor": self.module.minor_residue_management_type_w.name == "Retained" if self.module.minor_residue_management_type_w else None,
+                "retained_minor": self.module.minor_residue_management_type_w.name_en == "Retained" if self.module.minor_residue_management_type_w else None,
                 "n_content_ag_main": self.n_estimation_factor_w.n_ag_residues,
                 "ratio_bg_ag_main": self.n_estimation_factor_w.rs_t,
                 "n_content_bg_main": self.n_estimation_factor_w.n_bg_t,
@@ -1585,7 +1621,7 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "ef_nitrous_som": self.som.value,
                 "nitrous_constant": project.gwp.n2o,
                 "methane_constant": project.gwp.ch4,
-                "ef_methane_agr_residues_main": self.burning_emission_factor.ch4 if self.module.residue_management_type_wo.name == "Burned" else None,
+                "ef_methane_agr_residues_main": self.burning_emission_factor.ch4 if self.module.residue_management_type_wo.name_en == "Burned" else None,
                 "combustion_factor_main": self.fires_wo.value,
                 "residue_main_tier_2": self.module.residue_availability_t2_wo,
                 "n_estimation_slope_main": self.n_estimation_factor_wo.slope,
@@ -1597,12 +1633,12 @@ class AnnualCropCalculator(LandModuleCalculator):
                 "residue_minor_tier_2": self.module.minor_biomass_factor_t2_wo,
                 "n_estimation_slope_minor": self.minor_n_estimation_factor_wo.slope,
                 "n_estimation_intercept_minor": self.minor_n_estimation_factor_wo.intercept,
-                "yield_value_minor": self.module.minor_yield_wo,
+                "yield_value_minor": self.minor_yield_default_wo.average,
                 "yield_minor_tier_2": self.module.crop_yield_t2_wo,
-                "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_wo.name == "Burned" else None,
-                "retained_main": self.module.residue_management_type_wo.name == "Retained",
+                "ef_nitrous_agr_residues_main": self.burning_emission_factor.n2o if self.module.residue_management_type_wo.name_en == "Burned" else None,
+                "retained_main": self.module.residue_management_type_wo.name_en == "Retained",
                 "ef_nitrous_agr_residues_minor": self.minor_burning_emission_factor.n2o,
-                "retained_minor": self.module.minor_residue_management_type_wo.name == "Retained" if self.module.minor_residue_management_type_wo else None,
+                "retained_minor": self.module.minor_residue_management_type_wo.name_en == "Retained" if self.module.minor_residue_management_type_wo else None,
                 "n_content_ag_main": self.n_estimation_factor_wo.n_ag_residues,
                 "ratio_bg_ag_main": self.n_estimation_factor_wo.rs_t,
                 "n_content_bg_main": self.n_estimation_factor_wo.n_bg_t,
@@ -2216,8 +2252,8 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "fi_end_default": self.fi_w.value,
                 "fi_start_tier_2": self.module.fi_t2_start,
                 "fi_end_tier_2": self.module.fi_t2_w,
-                "calculate_soc_som": True,
-                "straw_burnt": self.module.organic_amendment_type_start.name == "Straw Burnt",
+                "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
+                "straw_burnt": self.module.organic_amendment_type_start.name_en == "Straw Burnt",
                 "delay": self.activity.delay,
                 "ef_nitrous_som": self.som.value,
                 "biomass_start_default": self.biomass_ef_start.value,
@@ -2275,7 +2311,7 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "fi_start_tier_2": self.module.fi_t2_start,
                 "fi_end_tier_2": self.module.fi_t2_wo,
                 "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
-                "straw_burnt": self.module.organic_amendment_type_start.name == "Straw Burnt",
+                "straw_burnt": self.module.organic_amendment_type_start.name_en == "Straw Burnt",
                 "delay": self.activity.delay,
                 "ef_nitrous_som": self.som.value,
                 "biomass_start_default": self.biomass_ef_start.value,
@@ -2334,7 +2370,7 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "fi_start_tier_2": self.module.fi_t2_start,
                 "fi_end_tier_2": self.module.fi_t2_w,
                 "calculate_soc_som": CALCULATE_SOC_SOM_W,
-                "straw_burnt": self.module.organic_amendment_type_w.name == "Straw Burnt",
+                "straw_burnt": self.module.organic_amendment_type_w.name_en == "Straw Burnt",
                 "delay": self.activity.delay,
                 "ef_nitrous_som": self.som.value,
                 "calculate_biomass": self.calculate_biomass_w,
@@ -2393,7 +2429,7 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "fi_start_tier_2": self.module.fi_t2_start,
                 "fi_end_tier_2": self.module.fi_t2_wo,
                 "calculate_soc_som": CALCULATE_SOC_SOM_WO,
-                "straw_burnt": self.module.organic_amendment_type_wo.name == "Straw Burnt",
+                "straw_burnt": self.module.organic_amendment_type_wo.name_en == "Straw Burnt",
                 "delay": self.activity.delay,
                 "ef_nitrous_som": self.som.value,
                 "calculate_biomass": self.calculate_biomass_wo,
@@ -3055,13 +3091,13 @@ class LargeFisheryCalculator(BaseCalculator):
                 "catch_end": self.module.total_catch_yr_wo,
                 "ef_diesel_default_co2": self.energy_ef_default_co2,
                 "ef_diesel_co2_start_tier_2": self.module.energy_ef_co2_t2_start,
-                "ef_diesel_co2_end_tier_2": self.module.energy_ef_co2_t2_w,
+                "ef_diesel_co2_end_tier_2": self.module.energy_ef_co2_t2_wo,
                 "ef_diesel_default_n2o": self.energy_ef_default_n2o,
                 "ef_diesel_n2o_start_tier_2": self.module.energy_ef_n2o_t2_start,
-                "ef_diesel_n2o_end_tier_2": self.module.energy_ef_n2o_t2_w,
+                "ef_diesel_n2o_end_tier_2": self.module.energy_ef_n2o_t2_wo,
                 "ef_diesel_default_ch4": self.energy_ef_default_ch4,
                 "ef_diesel_ch4_start_tier_2": self.module.energy_ef_ch4_t2_start,
-                "ef_diesel_ch4_end_tier_2": self.module.energy_ef_ch4_t2_w,
+                "ef_diesel_ch4_end_tier_2": self.module.energy_ef_ch4_t2_wo,
                 "fui_default_start": self.fui_default_start,
                 "fui_default_end": self.fui_default_wo,
                 "fui_start_tier_2": self.module.fui_t2_start,
@@ -3198,7 +3234,7 @@ class AquacultureCalculator(BaseCalculator):
                 "electricity_used_end_tier_2": module.electricity_used_t2_wo,
                 "ef_electricity_default": self.elec.operating_margin,
                 "ef_electricity_start_tier_2": module.electricity_ef_t2_start,
-                "ef_electricity_end_tier_2": module.electricity_ef_t2_w,
+                "ef_electricity_end_tier_2": module.electricity_ef_t2_wo,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
                 "rate_type": change_rate.name,
@@ -3266,7 +3302,7 @@ class InputEntryCalculator(BaseCalculator):
         self.needs_n2o_ref = input_type.has_n2o_emissions and not self.module.n2o_emissions_t2
         self.needs_co2_e_ref = input_type.has_co2_e_emissions and not self.module.co2_e_emissions_t2
 
-        if self.module.status.name == "READY" and calculate:
+        if self.module.status.name_en == "READY" and calculate:
             self.calculate()
 
         try:
@@ -3669,7 +3705,7 @@ class SettlementCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
                 "soc_end_tier_2": self.module_w.soc_t2_w,
-                "calculate_soc_som": False,
+                "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -3705,7 +3741,7 @@ class SettlementCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
                 "soc_end_tier_2": self.module_wo.soc_t2_wo,
-                "calculate_soc_som": False,
+                "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -3743,7 +3779,7 @@ class SettlementCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
                 "soc_end_tier_2": self.module_w.soc_t2_w,
-                "calculate_soc_som": True,
+                "calculate_soc_som": CALCULATE_SOC_SOM_W,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -3781,7 +3817,7 @@ class SettlementCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
                 "soc_end_tier_2": self.module_wo.soc_t2_wo,
-                "calculate_soc_som": True,
+                "calculate_soc_som": CALCULATE_SOC_SOM_WO,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -4697,7 +4733,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
             "rate_type": self.activity.change_rate.name,
             "implementation_time": self.activity.implementation_years,
             "capitalization_time": self.activity.capitalization_years,
-            "transportation_loss": self.transportation_loss_default.value if self.module.fuel_type.name == "Electricity" else 0,
+            "transportation_loss": self.transportation_loss_default.value if self.module.fuel_type.name_en == "Electricity" else 0,
             "gwir": self.module.gross_irrigation_water_start,
             "delay": self.activity.delay,
         }
@@ -4726,7 +4762,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
             "rate_type": self.activity.change_rate.name,
             "implementation_time": self.activity.implementation_years,
             "capitalization_time": self.activity.capitalization_years,
-            "transportation_loss": self.transportation_loss_default.value if self.module.fuel_type.name == "Electricity" else 0,
+            "transportation_loss": self.transportation_loss_default.value if self.module.fuel_type.name_en == "Electricity" else 0,
             "gwir": self.module.gross_irrigation_water_w,
             "delay": self.activity.delay,
         }
@@ -4755,7 +4791,7 @@ class IrrigationPhaseCalculator(BaseCalculator):
             "rate_type": self.activity.change_rate.name,
             "implementation_time": self.activity.implementation_years,
             "capitalization_time": self.activity.capitalization_years,
-            "transportation_loss": self.transportation_loss_default.value if self.module.fuel_type.name == "Electricity" else 0,
+            "transportation_loss": self.transportation_loss_default.value if self.module.fuel_type.name_en == "Electricity" else 0,
             "gwir": self.module.gross_irrigation_water_wo,
             "delay": self.activity.delay,
         }
@@ -4796,6 +4832,9 @@ class CoastalWetlandCalculator(BaseCalculator):
         self.rewetting_c = ipcc.RewettingCarbonFactor()
         self.rewetting_ch4 = ipcc.RewettingMethaneFactor()
 
+        self.agb_default = ipcc.CoastalAGB()
+        self.bgb_default = ipcc.CoastalBGB()
+
         self.soil_type_name = ""
 
     def get_defaults(self, calculate=False) -> dict:
@@ -4806,6 +4845,11 @@ class CoastalWetlandCalculator(BaseCalculator):
             "moisture": self.moisture,
         }
 
+        if self.module.is_ready() and calculate:
+            self.calculate()
+            self.agb_default.value = getattr_or_default(self.math_w, "agb_tier_2_default") or getattr_or_default(self.math_wo, "agb_tier_2_default")
+            self.bgb_default.value = getattr_or_default(self.math_w, "bgb_tier_2_default") or getattr_or_default(self.math_wo, "bgb_tier_2_default")
+
         self.soil_type_name = self.module.soil_type_t2.name if self.module.soil_type_t2 else "Mineral"
         self.salinity_type = self.module.avg_salinity_t2 if self.module.avg_salinity_t2 else SalinityType.objects.get(value=">18")
 
@@ -4814,42 +4858,42 @@ class CoastalWetlandCalculator(BaseCalculator):
         except ipcc.CoastalAGB.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "agb_t2")
             if missing_scenarios:
-                raise ValueError(f"AGB for {self.module.land_use_type.name} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
+                raise ValueError(f"AGB for {self.module.land_use_type} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
 
         try:
             self.bgb = ipcc.CoastalBGB.objects.get(**cm, land_use_type=self.module.land_use_type)
         except ipcc.CoastalBGB.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "bgb_t2")
             if missing_scenarios:
-                raise ValueError(f"BGB for {self.module.land_use_type.name} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
+                raise ValueError(f"BGB for {self.module.land_use_type} {self.climate} {self.moisture} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
 
         try:
             self.litter = ipcc.CoastalLitter.objects.get(**cm, land_use_type=self.module.land_use_type)
         except ipcc.CoastalLitter.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "litter_t2")
             if missing_scenarios:
-                raise ValueError(f"Litter for {self.module.land_use_type.name} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
+                raise ValueError(f"Litter for {self.module.land_use_type} {self.climate} {self.moisture} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
 
         try:
             self.dw = ipcc.CoastalDeadwood.objects.get(**cm, land_use_type=self.module.land_use_type)
         except ipcc.CoastalDeadwood.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "deadwood_t2")
             if missing_scenarios:
-                raise ValueError(f"Deadwood for {self.module.land_use_type.name} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
+                raise ValueError(f"Deadwood for {self.module.land_use_type} {self.climate} {self.moisture} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
 
         try:
             self.soil_1m = ipcc.DefaultSoilCarbonStock.objects.get(**cm, land_use_type=self.module.land_use_type, soil_type__name=self.soil_type_name)
         except ipcc.DefaultSoilCarbonStock.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "soc_t2")
             if missing_scenarios:
-                raise ValueError(f"Soil 1m for {self.module.land_use_type.name} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
+                raise ValueError(f"Soil 1m for {self.module.land_use_type} {self.climate} {self.moisture} in {self.soil_type_name} soil is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
 
         try:
             self.ef_drainage = ipcc.DrainageEmissionFactor.objects.get(**cm, land_use_type=self.module.land_use_type)
         except ipcc.DrainageEmissionFactor.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "drainage_ef_t2")
             if missing_scenarios:
-                raise ValueError(f"Drainage Emission Factor for {self.module.land_use_type.name} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
+                raise ValueError(f"Drainage Emission Factor for {self.module.land_use_type} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
 
         try:
             self.pc_c_lost_excavation = CoastalWetlandParameter.objects.get(name="PERCENTAGE_C_LOST_EXCAVATION")
@@ -4863,14 +4907,14 @@ class CoastalWetlandCalculator(BaseCalculator):
         except ipcc.RewettingCarbonFactor.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "co2_rewetting_t2")
             if missing_scenarios:
-                raise ValueError(f"Rewetting CO2 for {self.odule.land_use_type.name}, {self.project.climate.name}, {self.project.moisture.name}. Please insert tier 2 values for the relevant scenarios.")
+                raise ValueError(f"Rewetting CO2 for {self.module.land_use_type} {self.project.climate} {self.project.moisture} in {self.soil_type_name} is missing. Please insert tier 2 values for the relevant scenarios.")
 
         try:
             self.rewetting_ch4 = ipcc.RewettingMethaneFactor.objects.get(**cm, land_use_type=self.module.land_use_type, salinity=self.salinity_type)
         except ipcc.RewettingMethaneFactor.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "ch4_rewetting_t2")
             if missing_scenarios:
-                raise ValueError(f"Rewetting CH4 for {self.module.land_use_type.name}, {self.project.climate.name}, {self.project.moisture.name}. Please insert tier 2 values for the relevant scenarios.")
+                raise ValueError(f"Rewetting CH4 for {self.module.land_use_type} {self.project.climate} {self.project.moisture} with {self.salinity_type} salinity is missing. Please insert tier 2 values for the relevant scenarios.")
 
     def calculate(self) -> Result:
         """
@@ -4912,6 +4956,7 @@ class CoastalWetlandCalculator(BaseCalculator):
                 "soil_type": self.module.avg_salinity_t2.value if self.module.avg_salinity_t2 else None,
                 "methane_constant": self.project.gwp.ch4,
                 "delay": self.activity.delay,
+                "mangrove_factor": utils.MANGROVE_FACTOR if "mangrove" in self.module.land_use_type.name_en.casefold() else utils.NON_MANGROVE_FACTOR,
             }
 
             self.math_w = MathCoastalWetland(**self.inputs_w)
@@ -4950,6 +4995,7 @@ class CoastalWetlandCalculator(BaseCalculator):
                 "soil_type": self.module.avg_salinity_t2.value if self.module.avg_salinity_t2 else None,
                 "methane_constant": self.project.gwp.ch4,
                 "delay": self.activity.delay,
+                "mangrove_factor": utils.MANGROVE_FACTOR if "mangrove" in self.module.land_use_type.name_en.casefold() else utils.NON_MANGROVE_FACTOR,
             }
 
             self.math_wo = MathCoastalWetland(**self.inputs_wo)
@@ -5687,7 +5733,7 @@ class ForestManagementCalculator(LandModuleCalculator):
         self.combustion_factor_w: ipcc.ForestCombustionFactor = utils.get_or_raise(ipcc.ForestCombustionFactor, {"land_use_type": self.module.land_use_type_w, "climate": self.climate, "forest_type": self.forest.forest_type}, f"Combustion Factor W not found for {self.module.land_use_type_w.name}, {self.climate.name}, {self.forest.forest_type.name}")
         self.combustion_factor_wo: ipcc.ForestCombustionFactor = utils.get_or_raise(ipcc.ForestCombustionFactor, {"land_use_type": self.module.land_use_type_wo, "climate": self.climate, "forest_type": self.forest.forest_type}, f"Combustion Factor WO not found for {self.module.land_use_type_wo.name}, {self.climate.name}, {self.forest.forest_type.name}")
 
-        if self.forest.land_use_type_start.name == "Mangrove Forest":
+        if self.forest.land_use_type_start.name_en == "Mangrove Forest":
             try:
                 self.mangroves_data = ipcc.DataOnMangrove.objects.get(climate=self.climate, moisture=self.climate)
             except ipcc.DataOnMangrove.DoesNotExist:
@@ -5931,7 +5977,7 @@ class ForestManagementCalculator(LandModuleCalculator):
                 self.combustion_factor_wo.n2o,
                 self.combustion_factor_wo.co2,
                 utils.MANGROVE_FACTOR if self.mangroves_data is not None else utils.NON_MANGROVE_FACTOR,
-                self.forest.average_yearly_degradation_percentage_w,
+                self.forest.average_yearly_degradation_percentage_wo,
                 self.som.value,
                 self.project.gwp.n2o,
                 self.project.gwp.ch4,
@@ -6287,7 +6333,7 @@ class SetAsideCalculator(LandModuleCalculator):
                 "fi_start_default": self.fi_start.value,
                 "fi_end_default": self.fi_wo.value,
                 "fi_start_tier_2": self.module_start.fi_t2_start,
-                "fi_end_tier_2": self.module_wo.fi_t2_w,
+                "fi_end_tier_2": self.module_wo.fi_t2_wo,
                 "delay": self.activity.delay,
                 "calculate_biomass": self.calculate_biomass_wo,
                 "biomass_start_default": self.biomass_ef_start.value,

@@ -16,6 +16,9 @@ import ipcc.models as ipcc
 from django.utils.translation import gettext_lazy as _
 from django.apps import apps
 from django.conf import settings
+from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
+from picklefield.fields import PickledObjectField
+from dirtyfields import DirtyFieldsMixin
 
 
 alphanumeric = validators.RegexValidator(r"^[0-9a-zA-Z]*$", "Only alphanumeric characters are allowed.")
@@ -770,6 +773,12 @@ class Activity(Historical, NoteMixin):
     class Meta:
         unique_together = ("name", "project")
 
+    def get_land_modules_area(self) -> float:
+        for module in self.modules:
+            if isinstance(module, LandModule) and module.area is not None:
+                return module.area
+        return 0
+
     def __str__(self):
         return f"({self.pk}) {self.name} in {self.project.name}"
 
@@ -816,7 +825,7 @@ class Activity(Historical, NoteMixin):
         """
         statuses = [module.status for module in self.modules]
 
-        ready_count = statuses.count(StatusType.objects.get(name="READY"))
+        ready_count = statuses.count(StatusType.objects.get(name_en="READY"))
 
         if len(statuses) == 0:
             return 1
@@ -830,11 +839,11 @@ class Activity(Historical, NoteMixin):
         is_any_module_ready = any([module.is_ready() for module in self.modules])
 
         if are_modules_ready:
-            return StatusType.objects.get(name="READY")
+            return StatusType.objects.get(name_en="READY")
         elif is_any_module_ready:
-            return StatusType.objects.get(name="IN PROGRESS")
+            return StatusType.objects.get(name_en="IN PROGRESS")
         else:
-            return StatusType.objects.get(name="EMPTY")
+            return StatusType.objects.get(name_en="EMPTY")
 
 
 ##############################
@@ -842,7 +851,72 @@ class Activity(Historical, NoteMixin):
 ##############################
 
 
-class Submodule(Historical):
+class CachedResultMixin(models.Model, DirtyFieldsMixin):
+    class Meta:
+        abstract = True
+
+    updated_at = models.DateTimeField(auto_now=True, null=True, verbose_name=_("updated_at"))
+    last_cached_at = models.DateTimeField(null=True, blank=True, verbose_name=_("last_cached_at"))
+    cached_results_total = PickledObjectField(null=True, blank=True, verbose_name=_("cached_results_total"))
+    cached_results_by_activity = PickledObjectField(null=True, blank=True, verbose_name=_("cached_results_total"))
+    cached_results_by_gas = PickledObjectField(null=True, blank=True, verbose_name=_("cached_results_total"))
+    cached_results_by_activity_by_gas = PickledObjectField(null=True, blank=True, verbose_name=_("cached_results_total"))
+    last_modified = models.DateTimeField(auto_now=False, null=True, blank=True, verbose_name=_("last_modified"))
+
+    def save(self, *args, **kwargs):
+        if self.last_modified is None:
+            self.last_modified = timezone.now()
+
+        if self.pk and self.is_dirty(check_relationship=True):
+            dirty_fields = self.get_dirty_fields(check_relationship=True)
+            cache_fields = ["last_cached_at", "cached_results_total", "cached_results_by_activity", "cached_results_by_gas", "cached_results_by_activity_by_gas"]
+
+            if any(field in dirty_fields.keys() for field in self._meta.get_fields() if field.name not in cache_fields):
+                self.last_modified = timezone.now()
+
+        super().save(*args, **kwargs)
+
+    def cache_results(self, balance: dict, by_activity: dict, by_gas: dict, by_activity_by_gas: dict):
+        self.last_cached_at = timezone.now()
+        self.cached_results_total = balance
+        self.cached_results_by_activity = by_activity
+        self.cached_results_by_gas = by_gas
+        self.cached_results_by_activity_by_gas = by_activity_by_gas
+        self.save()
+
+    def invalidate_cached_results(self):
+        self.last_cached_at = None
+        self.cached_results_total = None
+        self.cached_results_by_activity = None
+        self.cached_results_by_gas = None
+        self.cached_results_by_activity_by_gas = None
+        self.save()
+
+    def is_cached_results_valid(self):
+        return self.last_cached_at is not None and self.last_cached_at > self.last_modified
+
+    def get_cached_results(self, by=BreakdownTypes.TOTAL):
+        if self.is_cached_results_valid():
+            if by == BreakdownTypes.TOTAL:
+                return self.cached_results_total
+            elif by == BreakdownTypes.ACTIVITY:
+                return self.cached_results_by_activity
+            elif by == BreakdownTypes.GAS:
+                return self.cached_results_by_gas
+            elif by == BreakdownTypes.ACTIVITY_GAS:
+                return self.cached_results_by_activity_by_gas
+        return None
+
+    def invalidate_luc_results(self):
+        # NOTE: If the module is associated with a land use change, invalidate the cached results of the land use change.
+        # NOTE: This is necessary because the calculations for modules with a land use change reference other modules (mostly tier2s) that may have been updated, which would invalidate the results.
+        luc: LandUseChange = self.land_use_change
+        luc_modules = luc.get_modules()
+        for module in luc_modules:
+            module.invalidate_cached_results()
+
+
+class Submodule(Historical, CachedResultMixin):
     soc_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("soc_t2_start"))
     soc_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("soc_t2_w"))
     soc_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("soc_t2_wo"))
@@ -877,7 +951,7 @@ class Submodule(Historical):
         super().save(*args, **kwargs)
 
     def is_ready(self) -> bool:
-        return self.status and self.status.name == "READY"
+        return self.status and self.status.name_en == "READY"
 
     def is_start(self) -> bool:
         return self.parent.is_start()
@@ -895,7 +969,7 @@ class Submodule(Historical):
         return self.parent.activity
 
 
-class Module(Historical):
+class Module(Historical, CachedResultMixin):
     class Meta:
         abstract = True
 
@@ -925,7 +999,7 @@ class Module(Historical):
         return f"({self.pk}) {self._meta.object_name} in {self.activity.name}"
 
     def is_ready(self) -> bool:
-        return self.status and self.status.name == "READY"
+        return self.status and self.status.name_en == "READY"
 
     def save(self, *args, **kwargs):
         if not self.status:
@@ -1526,7 +1600,7 @@ class Rice(ResidueAvailability):
 
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:
-            self.land_use_type_start = LandUseType.objects.get(name="Flooded Rice")
+            self.land_use_type_start = LandUseType.objects.get(name_en="Flooded Rice")
             self.land_use_type_w = self.land_use_type_start
             self.land_use_type_wo = self.land_use_type_start
 
@@ -1584,7 +1658,7 @@ class Grassland(LandModuleFixed, SingleBiomassModule, AboveBelowGroundBiomassMod
 
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:
-            self.land_use_type_start = LandUseType.objects.get(name="Grassland")
+            self.land_use_type_start = LandUseType.objects.get(name_en="Grassland")
             self.land_use_type_w = self.land_use_type_start
             self.land_use_type_wo = self.land_use_type_start
 
@@ -1737,8 +1811,10 @@ class ForestManagement(LandModule, LitterDeadwoodBiomassModule):
 
         error_msg = AGB_UNDER_20_NOT_FOUND if from_year < 20 else AGB_OVER_20_NOT_FOUND
 
+        climate = self.activity.climate_t2 if self.activity.climate_t2 else self.activity.project.climate
+
         filters = {
-            "climate": self.activity.project.climate,
+            "climate": climate,
             "region": self.activity.project.country.region,
             "land_use_type": land_use_type,
             "forest_type": self.forest_type,
@@ -2347,7 +2423,7 @@ class OrganicSoil(LandModuleFixed):
 
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:
-            self.land_use_type_start = LandUseType.objects.get(name="Organic Soil")
+            self.land_use_type_start = LandUseType.objects.get(name_en="Organic Soil")
             self.land_use_type_w = self.land_use_type_start
             self.land_use_type_wo = self.land_use_type_start
 
@@ -2372,7 +2448,7 @@ class Settlement(LandModuleFixed, SingleBiomassModule):
     def save(self, *args, **kwargs):
 
         if not self.land_use_type_start:
-            self.land_use_type_start = LandUseType.objects.get(name="Settlement")
+            self.land_use_type_start = LandUseType.objects.get(name_en="Settlement")
             self.land_use_type_w = self.land_use_type_start
             self.land_use_type_wo = self.land_use_type_start
 
@@ -2392,7 +2468,7 @@ class SetAside(LandModule, SingleBiomassModule):
     def save(self, *args, **kwargs):
 
         if not self.land_use_type_start:
-            self.land_use_type_start = LandUseType.objects.get(name="Set Aside")
+            self.land_use_type_start = LandUseType.objects.get(name_en="Set Aside")
             self.land_use_type_w = self.land_use_type_start
             self.land_use_type_wo = self.land_use_type_start
 
@@ -2410,7 +2486,7 @@ class OtherLand(LandModule, SingleBiomassModule):
 
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:
-            self.land_use_type_start = LandUseType.objects.get(name="Other Land")
+            self.land_use_type_start = LandUseType.objects.get(name_en="Other Land")
             self.land_use_type_w = self.land_use_type_start
             self.land_use_type_wo = self.land_use_type_start
 

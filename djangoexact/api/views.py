@@ -54,6 +54,8 @@ from .models import (
     Definition,
     Note,
     FieldDefinition,
+    LandModule,
+    CachedResultMixin,
 )
 from .serializers import (
     ActionTypes,
@@ -167,13 +169,13 @@ page_size = openapi.Parameter(
     description="Number of items per page",
     type=openapi.TYPE_INTEGER,
 )
-
 page = openapi.Parameter(
     "page",
     openapi.IN_QUERY,
     description="Page number",
     type=openapi.TYPE_INTEGER,
 )
+name = openapi.Parameter("name", openapi.IN_QUERY, description="Name of the project", type=openapi.TYPE_STRING)
 
 
 def get_modules(activity: Activity, serialized=True) -> list:
@@ -331,18 +333,16 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
 
         request.data["user"] = self.request.user.pk
-        serializer = WriteProjectSerializer(data=request.data, context={"request": request})
+        serializer = self.serializer_class(data=request.data, context={"request": request})
 
         if not serializer.is_valid():
             logging.error("Error creating project:", serializer.errors)
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
         project = serializer.save()
-
         update_change_reason(project, utils.ChangeReasons.CREATE.value)
 
         ProjectMembership.objects.create(user=self.request.user, project=project, group=Group.objects.get(name="Admin"))
-
         read_serializer = ReadProjectSerializer(instance=project, context={"request": request})
 
         return Response(read_serializer.data, status=http_status.HTTP_201_CREATED)
@@ -359,13 +359,9 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         update_change_reason(project, utils.ChangeReasons.DELETE.value)
 
-        start_time = time.time()
-
         is_deleted = self.raw_delete(project)
         if not is_deleted:
             return utils.ErrorResponse("Error deleting project", status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        logging.debug(f"Deletion of project {project} took {time.time() - start_time} seconds")
 
         return Response(status=http_status.HTTP_204_NO_CONTENT)
 
@@ -376,16 +372,10 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
             # Delete all activities
             activities = project.activities.all()
-            logging.debug(f"Deleting {len(activities)} activities")
             for activity in activities:
-                logging.debug(f"Deleting activity {activity}")
-                logging.debug(f"Deleting {len(activity.modules)} modules")
                 for m in activity.modules:
-                    logging.debug(f"Deleting module {m}")
                     if hasattr(m, "submodules"):
-                        logging.debug(f"Deleting {len(m.submodules)} submodules")
                         for sm in m.submodules:
-                            logging.debug(f"Deleting submodule {sm}")
                             cursor.execute(f"DELETE FROM {sm._meta.db_table} WHERE id = %s", [sm.id])
                     cursor.execute(f"DELETE FROM {m._meta.db_table} WHERE id = %s", [m.id])
                 LandUseChange.objects.filter(activity=activity).delete()
@@ -409,8 +399,6 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return utils.ErrorResponse("Selected user does not have permission to view the project", status=http_status.HTTP_403_FORBIDDEN)
 
         return Response(data=ReadProjectSerializer(project, context={"request": request}).data, status=http_status.HTTP_200_OK)
-
-    name = openapi.Parameter("name", openapi.IN_QUERY, description="Name of the project", type=openapi.TYPE_STRING)
 
     @swagger_auto_schema(manual_parameters=[name], responses={404: "Project not found"}, serializer_class=ReadProjectSerializer)
     def list(self, request):
@@ -441,7 +429,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         Calculates and returns total emissions for each module in the project.
         """
 
-        project = self.get_object()
+        project = Project.objects.prefetch_related("activities").get(pk=pk)
 
         if not utils.has_project_permission("view_project", self.request.user, project):
             logging.error("Selected user does not have permission to view the project")
@@ -459,8 +447,6 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
     @transaction.atomic
     def partial_update(self, request, *args, **kwargs):
-        new_years = request.data.get("implementation_years", None)
-        is_locking = request.data.get("is_locked")
         project: Project = self.get_object()
         user: CustomUser = self.request.user
 
@@ -468,52 +454,18 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error("Selected user does not have permission to update the project")
             return utils.ErrorResponse("Selected user does not have permission to update the project", status=http_status.HTTP_403_FORBIDDEN)
 
-        # Unlock the project if it has been locked for more than 30 minutes from the last project update
-        if project.is_locked and project.lock_updated_at and timezone.now() - project.lock_updated_at > timedelta(minutes=30):
-            project.unlock()
-
-        # If the project is not locked, or a lock is requested
-        if not project.is_locked or is_locking is True:
-            if project.is_locked and project.locked_by != user:
-                logging.warning(f"Project is already locked by: {project.locked_by.email}")
-                return Response({"message": "Project is already locked"}, status=http_status.HTTP_200_OK)
-
-            project.lock(user)
-
-        # If an unlock is requested
-        elif is_locking is False:
-            is_user_authorized = user.is_superuser or project.locked_by == user or user.memberships.filter(user=user, project=project, group__name="Admin").exists()
-
-            if not is_user_authorized:
-                logging.error("User does not have permission to unlock the project")
-                return Response({"message": "User does not have permission to unlock the project"}, status=http_status.HTTP_403_FORBIDDEN)
-
-            project.unlock()
-
-        if new_years:
-            project.implementation_years = new_years
-            for activity in project.activities.all():
-                if activity.duration_t2 > new_years:
-                    logging.warning(f"Activity {activity.name} duration_t2 is greater than project implementation years. Setting activity duration_t2 to project implementation years.")
-                    activity.duration_t2 = new_years
-                    activity.save()
-            project.save()
-
-        serializer = WriteProjectSerializer(project, data=request.data, partial=True)
+        serializer = self.serializer_class(project, data=request.data, partial=True, context={"request": request})
         if not serializer.is_valid():
             logging.error("Error updating project:", serializer.errors)
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
         serializer.save()
-
         update_change_reason(project, utils.ChangeReasons.UPDATE.value)
 
         return Response(ReadProjectSerializer(project, context={"request": request}).data, status=http_status.HTTP_200_OK)
 
     @transaction.atomic
     def update(self, request, *args, **kwargs):
-        new_years = request.data.get("implementation_years", None)
-        is_locking = request.data.get("is_locked")
         project: Project = self.get_object()
         user: CustomUser = self.request.user
 
@@ -521,44 +473,12 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error("Selected user does not have permission to update the project")
             return utils.ErrorResponse("Selected user does not have permission to update the project", status=http_status.HTTP_403_FORBIDDEN)
 
-        # Unlock the project if it has been locked for more than 30 minutes from the last project update
-        if project.is_locked and project.lock_updated_at and timezone.now() - project.lock_updated_at > timedelta(minutes=30):
-            project.unlock()
-
-        # If the project is not locked, or a lock is requested
-        if not project.is_locked or is_locking is True:
-            if project.is_locked and project.locked_by != user:
-                logging.warning(f"Project is already locked by: {project.locked_by.email}")
-                return Response({"message": "Project is already locked"}, status=http_status.HTTP_200_OK)
-
-            project.lock(user)
-
-        # If an unlock is requested
-        elif is_locking is False:
-            is_user_authorized = user.is_superuser or project.locked_by == user or user.memberships.filter(user=user, project=project, group__name="Admin").exists()
-
-            if not is_user_authorized:
-                logging.error("User does not have permission to unlock the project")
-                return Response({"message": "User does not have permission to unlock the project"}, status=http_status.HTTP_403_FORBIDDEN)
-
-            project.unlock()
-
-        if new_years:
-            project.implementation_years = new_years
-            for activity in project.activities.all():
-                if activity.duration_t2 > new_years:
-                    logging.warning(f"Activity {activity.name} duration_t2 is greater than project implementation years. Setting activity duration_t2 to project implementation years.")
-                    activity.duration_t2 = new_years
-                    activity.save()
-            project.save()
-
-        serializer = WriteProjectSerializer(project, data=request.data)
+        serializer = self.serializer_class(project, data=request.data, context={"request": request})
         if not serializer.is_valid():
             logging.error("Error updating project:", serializer.errors)
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
         serializer.save()
-
         update_change_reason(project, utils.ChangeReasons.UPDATE.value)
 
         return Response(ReadProjectSerializer(project, context={"request": request}).data, status=http_status.HTTP_200_OK)
@@ -577,7 +497,8 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return utils.ErrorResponse("To get a report for a project, all activities must have been completed.", status=http_status.HTTP_400_BAD_REQUEST)
 
         report = reports.BaseProjectReport(project)
-        file_bytes_buffer = report.build_report()
+        _, file_bytes_buffer = report.build_report()
+        report.close_file()
 
         try:
             response = HttpResponse(file_bytes_buffer, content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
@@ -756,7 +677,9 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     def destroy(self, request, *args, **kwargs):
         membership = self.get_object()
 
-        if not utils.has_project_permission("delete_projectmembership", self.request.user, membership.project):
+        if membership.user == self.request.user and membership.project.owner != self.request.user:
+            membership.delete()
+        elif not utils.has_project_permission("delete_projectmembership", self.request.user, membership.project):
             logging.error("Selected user does not have permission to delete project memberships")
             return utils.ErrorResponse("Selected user does not have permission to delete project memberships", status=http_status.HTTP_403_FORBIDDEN)
 
@@ -1085,7 +1008,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         Calculates and returns total emissions for each module in the activity.
         """
 
-        activity = get_object_or_404(Activity, pk=pk)
+        activity = Activity.objects.prefetch_related().get(pk=pk)
 
         if not utils.has_project_permission("view_activity", self.request.user, activity.project):
             logging.error("Selected user does not have permission to view the activity")
@@ -1095,22 +1018,15 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         modules = []
         # TODO: Make a serializer for this
-        for module in activity.module_types.all():
-            try:
-                model_ref = apps.get_model(utils.API, module.class_name)
-            except LookupError:
-                logger.warning(f"Module {module.name} not found")
+        for module in activity.modules:
+
+            if not module or (module.status and module.status.name != "READY"):
                 continue
 
-            object = getattr(activity, module.class_name.lower(), None).first()
-
-            if not object or (object.status and object.status.name != "READY"):
-                continue
-
-            module_dict = get_module_serializer(model_ref)(object).data
+            module_dict = get_module_serializer(module.__class__)(module).data
 
             try:
-                viewset = generic_module_viewset(model_ref).results(self, request, pk=object.pk)
+                viewset = generic_module_viewset(module.__class__).results(self, request, pk=module.pk)
                 module_dict[labels.RESULTS] = viewset.data
 
             except Exception as e:
@@ -1404,7 +1320,7 @@ def generic_module_viewset(model: Module):
             Updates a module.
             """
 
-            module: Module | Submodule = self.get_object()
+            module: Module | Submodule | LandModule = self.get_object()
             activity = module.get_activity()
 
             if not utils.has_project_permission("can_change_modules", self.request.user, activity.project):
@@ -1418,6 +1334,9 @@ def generic_module_viewset(model: Module):
 
             module = serializer.save()
             update_change_reason(module, utils.ChangeReasons.UPDATE.value)
+
+            if hasattr(module, "land_use_change") and module.land_use_change is not None:
+                module.invalidate_luc_results()
 
             read_serializer = get_module_serializer(model)(instance=module, context={"request": request})
 
@@ -1442,6 +1361,9 @@ def generic_module_viewset(model: Module):
 
             module = serializer.save()
             update_change_reason(module, utils.ChangeReasons.UPDATE.value)
+
+            if hasattr(module, "land_use_change") and module.land_use_change is not None:
+                module.invalidate_luc_results()
 
             read_serializer = get_module_serializer(model)(instance=module, context={"request": request})
 
@@ -1538,14 +1460,39 @@ def generic_module_viewset(model: Module):
                     return utils.ErrorResponse("Module is not ready. Cannot calculate result.")
 
             try:
-                aggregate_by = BreakdownTypes(request.query_params.get("aggregate", BreakdownTypes.TOTAL))
-                results_w, results_wo, results_tot = CalculatorFactory().calculate_result(module, aggregate_by=aggregate_by)
 
-                module_results = {
-                    "total_w": results_w,
-                    "total_wo": results_wo,
-                    "balance": results_tot,
-                }
+                aggregate_by = BreakdownTypes(request.query_params.get("aggregate", BreakdownTypes.TOTAL))
+                module_results = module.get_cached_results(by=aggregate_by)
+
+                if module_results is None:
+                    total, by_activity, by_gas, by_activity_gas = CalculatorFactory().calculate_result(module)
+
+                    results_total = {
+                        "total_w": total[0],
+                        "total_wo": total[1],
+                        "balance": total[2],
+                    }
+
+                    results_by_activity = {
+                        "total_w": list(by_activity[0]),
+                        "total_wo": list(by_activity[1]),
+                        "balance": list(by_activity[2]),
+                    }
+
+                    results_by_gas = {
+                        "total_w": list(by_gas[0]),
+                        "total_wo": list(by_gas[1]),
+                        "balance": list(by_gas[2]),
+                    }
+
+                    results_by_activity_gas = {
+                        "total_w": list(by_activity_gas[0]),
+                        "total_wo": list(by_activity_gas[1]),
+                        "balance": list(by_activity_gas[2]),
+                    }
+
+                    module_results = results_total if aggregate_by == BreakdownTypes.TOTAL else results_by_activity if aggregate_by == BreakdownTypes.ACTIVITY else results_by_gas if aggregate_by == BreakdownTypes.GAS else results_by_activity_gas
+                    module.cache_results(results_total, results_by_activity, results_by_gas, results_by_activity_gas)
 
                 serializer = DynamicResultSerializer(module_results, aggregate_by=aggregate_by)
                 serialized_data = serializer.data

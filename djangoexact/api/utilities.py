@@ -363,15 +363,15 @@ def update_activity_status_and_completion(activity):
     """
     statuses = [module.status for module in find_modules(activity)]
 
-    ready_count = statuses.count(api_models.StatusType.objects.get(name="READY"))
+    ready_count = statuses.count(api_models.StatusType.objects.get(name_en="READY"))
     percentage_complete = ready_count / len(statuses)
 
     if percentage_complete == 1:
-        activity.status = api_models.StatusType.objects.get(name="READY")
+        activity.status = api_models.StatusType.objects.get(name_en="READY")
     elif percentage_complete > 0:
-        activity.status = api_models.StatusType.objects.get(name="IN PROGRESS")
+        activity.status = api_models.StatusType.objects.get(name_en="IN PROGRESS")
     else:
-        activity.status = api_models.StatusType.objects.get(name="EMPTY")
+        activity.status = api_models.StatusType.objects.get(name_en="EMPTY")
 
     activity.completion_percentage = percentage_complete
     activity.save()
@@ -510,7 +510,7 @@ def find_empty_scenarios(entity, field: str):
         except FieldDoesNotExist:
             raise ValueError(f"Field '{field_name}' not found in {entity.__class__.__name__}. Have you added or refactored the field name recently?")
 
-    return missing
+    return [s.verbose_name for s in missing]
 
 
 @dataclass

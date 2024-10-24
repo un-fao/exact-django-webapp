@@ -923,16 +923,16 @@ class LargeFisheryFUIManager(Manager):
             model = LargeFisheryFUI.objects.get(fish_type=fish_type, gear_type=gear_type)
             return model.value
         except LargeFisheryFUI.DoesNotExist:
-            if fish_type.name == "Not Specified" and gear_type.name == "Not Specified":
+            if fish_type.name_en == "Not Specified" and gear_type.name_en == "Not Specified":
                 _all = LargeFisheryFUI.objects.exclude(fish_type__name="Not Specified")
                 _all = _all.exclude(gear_type__name="Not Specified").values_list("value", flat=True)
                 return sum(_all) / len(_all)
 
-            if fish_type.name == "Not Specified":
+            if fish_type.name_en == "Not Specified":
                 fuis = LargeFisheryFUI.objects.filter(gear_type=gear_type).values_list("value", flat=True)
                 return sum(fuis) / len(fuis)
 
-            if gear_type.name == "Not Specified":
+            if gear_type.name_en == "Not Specified":
                 fuis = LargeFisheryFUI.objects.filter(fish_type=fish_type).values_list("value", flat=True)
                 return sum(fuis) / len(fuis)
 
@@ -985,6 +985,9 @@ class CropYieldStatsManager(Manager):
 
 
 class CropYieldStats(Model):
+    """
+    Stats_yield_ton_per_ha:A1
+    """
 
     class Meta:
         verbose_name = "Crop Yield Stats"
