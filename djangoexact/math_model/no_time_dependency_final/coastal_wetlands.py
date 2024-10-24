@@ -69,7 +69,8 @@ class CoastalWetland(BaseModule):
         # TODO: ask Lorenzo about this variable and how it should be split across the years
         self.hectares_excavated = yearly_time_dependent_parameter_breakdown(self.area_excavated_end - self.area_excavated_start, 0, self.implementation_time, self.capitalization_time, self.rate_type)
 
-
+        # TIER 2 VALUES
+        self.agb_tier_2_default = None
     
 
     def calculate_emissions(
@@ -190,6 +191,10 @@ class CoastalWetland(BaseModule):
             def calculate_biomass():
                 try:
                     agb = self.agb_default * self.mangrove_factor if not self.agb_tier_2 else self.agb_tier_2
+
+                    # ASSIGN TIER 2 VALUE DEFAULT FOR FRONT END, AS IT'S IN TONNES OF CARBON
+                    self.agb_tier_2_default = agb
+
                     bgb = self.bgb_default * agb if not self.bgb_tier_2 else self.bgb_tier_2
                     litter = self.litter_default if not self.litter_tier_2 else self.litter_tier_2
                     deadwood = self.deadwood_default if not self.deadwood_tier_2 else self.deadwood_tier_2

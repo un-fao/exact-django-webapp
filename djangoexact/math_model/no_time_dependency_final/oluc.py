@@ -101,11 +101,9 @@ class OtherLandUseChanges(BaseModule):
 
                 delta_c_biomass = (final_biomass - initial_biomass) * (-44 / 12)
 
-                # TODO: add logic for comprehension of amount of hectars addressed in one year (not self.total_hectars) and use that for the breakdown and total
                 total = delta_c_biomass * self.area
 
-                total_biomass_emissions = total
-                # TODO: change so only in implementation years but proportionate to the hectars addressed in that year
+                # TODO:  change so proportionate to the number of hectares of difference with the previous year
                 yearly_biomass_emissions = yearly_constant_emissions_breakdown(total, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(
@@ -124,7 +122,7 @@ class OtherLandUseChanges(BaseModule):
                 raise e
 
         def calculate_fire():
-            delta_c_soc = (self.soc_end - self.soc_start) / 20
+
 
             initial_biomass_without_removal = self.initial_lu_biomass if not self.initial_lu_biomass_tier_2 else self.initial_lu_biomass_tier_2
 
@@ -148,7 +146,7 @@ class OtherLandUseChanges(BaseModule):
             methane_em_per_hectar = methane_emissions / 1000
             nitrous_em_per_hectar = nitrous_emissions / 1000
 
-            # TODO: same as biomass above, breakdown according to hectares addressed in that year
+            # TODO:  change so proportionate to the number of hectares of difference with the previous year
             methane_fire_emissions = methane_em_per_hectar * self.area
             nitrous_fire_emissions = nitrous_em_per_hectar * self.area
 
