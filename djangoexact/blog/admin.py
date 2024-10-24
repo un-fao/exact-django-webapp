@@ -23,6 +23,14 @@ class PostAdminForm(forms.ModelForm):
 class PostAdmin(ModelAdmin):
     form = PostAdminForm
 
+    list_display = ["title", "author", "date_created"]
+    search_fields = ["title", "author__first_name", "author__last_name"]
+    readonly_fields = ["slug", "author"]
+    fieldsets = [
+        (None, {"fields": ["title", "excerpt", "content"]}),
+        ("Meta", {"fields": ["slug", "author"]}),
+    ]
+
     def save_model(self, request, obj, form, change):
         obj.author = request.user
         obj.slug = slugify(obj.title)
