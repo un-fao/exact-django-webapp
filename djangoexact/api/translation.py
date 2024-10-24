@@ -239,3 +239,13 @@ class RegionTranslationOptions(NameOnlyTranslationOptions):
 @register(models.FieldDefinition)
 class FieldDefinitionTranslationOptions(TranslationOptions):
     fields = ("description",)
+
+
+@register(models.WaterManagementTypeBeforeCultivation)
+class WaterManagementTypeBeforeCultivationTranslationOptions(NameOnlyTranslationOptions):
+    pass
+
+
+@register(models.WaterManagementTypeAfterCultivation)
+class WaterManagementTypeAfterCultivationTranslationOptions(NameOnlyTranslationOptions):
+    pass
