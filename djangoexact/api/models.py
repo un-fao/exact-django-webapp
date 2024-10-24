@@ -773,6 +773,12 @@ class Activity(Historical, NoteMixin):
     class Meta:
         unique_together = ("name", "project")
 
+    def get_land_modules_area(self) -> float:
+        for module in self.modules:
+            if isinstance(module, LandModule) and module.area is not None:
+                return module.area
+        return 0
+
     def __str__(self):
         return f"({self.pk}) {self.name} in {self.project.name}"
 
@@ -1805,8 +1811,10 @@ class ForestManagement(LandModule, LitterDeadwoodBiomassModule):
 
         error_msg = AGB_UNDER_20_NOT_FOUND if from_year < 20 else AGB_OVER_20_NOT_FOUND
 
+        climate = self.activity.climate_t2 if self.activity.climate_t2 else self.activity.project.climate
+
         filters = {
-            "climate": self.activity.project.climate,
+            "climate": climate,
             "region": self.activity.project.country.region,
             "land_use_type": land_use_type,
             "forest_type": self.forest_type,

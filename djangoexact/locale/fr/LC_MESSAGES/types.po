@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: support@example.com\n"
-"POT-Creation-Date: 2024-10-01 12:02\n"
-"PO-Revision-Date: 2024-10-01 12:02\n"
+"POT-Creation-Date: 2024-10-24 12:29\n"
+"PO-Revision-Date: 2024-10-24 12:29\n"
 "Last-Translator: Your Name <your.email@example.com>\n"
 "Language-Team: English <support@example.com>\n"
 "Language: en\n"
@@ -69,59 +69,7 @@ msgid "IN PROGRESS"
 msgstr ""
 
 #. LandUseType
-msgid "Hedgerow"
-msgstr ""
-
-#. LandUseType
-msgid "Multistrata"
-msgstr ""
-
-#. LandUseType
-msgid "Parkland"
-msgstr ""
-
-#. LandUseType
-msgid "Shaded Perennial"
-msgstr ""
-
-#. LandUseType
-msgid "Silvoarable"
-msgstr ""
-
-#. LandUseType
-msgid "Silvopasture"
-msgstr ""
-
-#. LandUseType
 msgid "Barley"
-msgstr ""
-
-#. LandUseType
-msgid "Olive"
-msgstr ""
-
-#. LandUseType
-msgid "Orchard"
-msgstr ""
-
-#. LandUseType
-msgid "Short Rotation Coppice"
-msgstr ""
-
-#. LandUseType
-msgid "Tea"
-msgstr ""
-
-#. LandUseType
-msgid "Vine"
-msgstr ""
-
-#. LandUseType
-msgid "Oil Palm"
-msgstr ""
-
-#. LandUseType
-msgid "Rubber"
 msgstr ""
 
 #. LandUseType
@@ -177,10 +125,6 @@ msgid "Spring Wheat"
 msgstr ""
 
 #. LandUseType
-msgid "Alfalfa"
-msgstr ""
-
-#. LandUseType
 msgid "Non-Legume Hay"
 msgstr ""
 
@@ -209,11 +153,75 @@ msgid "Default"
 msgstr ""
 
 #. LandUseType
-msgid "Agroforestry - Default"
+msgid "Peanuts"
 msgstr ""
 
 #. LandUseType
-msgid "Peanuts"
+msgid "Alley Cropping"
+msgstr ""
+
+#. LandUseType
+msgid "Perennial Fallow"
+msgstr ""
+
+#. LandUseType
+msgid "Hedgerow"
+msgstr ""
+
+#. LandUseType
+msgid "Multistrata"
+msgstr ""
+
+#. LandUseType
+msgid "Parkland"
+msgstr ""
+
+#. LandUseType
+msgid "Shaded Perennial"
+msgstr ""
+
+#. LandUseType
+msgid "Silvoarable"
+msgstr ""
+
+#. LandUseType
+msgid "Silvopasture"
+msgstr ""
+
+#. LandUseType
+msgid "Olive"
+msgstr ""
+
+#. LandUseType
+msgid "Orchard"
+msgstr ""
+
+#. LandUseType
+msgid "Short Rotation Coppice"
+msgstr ""
+
+#. LandUseType
+msgid "Tea"
+msgstr ""
+
+#. LandUseType
+msgid "Vine"
+msgstr ""
+
+#. LandUseType
+msgid "Oil Palm"
+msgstr ""
+
+#. LandUseType
+msgid "Rubber"
+msgstr ""
+
+#. LandUseType
+msgid "Alfalfa"
+msgstr ""
+
+#. LandUseType
+msgid "Agroforestry - Default"
 msgstr ""
 
 #. LandUseType
@@ -234,14 +242,6 @@ msgstr ""
 
 #. LandUseType
 msgid "Other Land (Non-Vegetated)"
-msgstr ""
-
-#. LandUseType
-msgid "Alley Cropping"
-msgstr ""
-
-#. LandUseType
-msgid "Perennial Fallow"
 msgstr ""
 
 #. LandUseType
@@ -1188,6 +1188,10 @@ msgstr ""
 msgid "User Defined Animal Feed (tier 2)"
 msgstr ""
 
+#. InputType
+msgid "User Defined Input (tier 2)"
+msgstr ""
+
 #. IrrigationSystemType
 msgid "Surface Without IRRS"
 msgstr ""
@@ -1430,4 +1434,28 @@ msgstr ""
 
 #. GlobalWarmingPotential
 msgid "IPCC Second Assessment Report (SAR)"
+msgstr ""
+
+#. WaterManagementTypeBeforeCultivation
+msgid "Non Flooded Pre-Season <180 D"
+msgstr ""
+
+#. WaterManagementTypeBeforeCultivation
+msgid "Non Flooded Pre-Season >180 D"
+msgstr ""
+
+#. WaterManagementTypeBeforeCultivation
+msgid "Flooded Pre-Season > 30 D"
+msgstr ""
+
+#. WaterManagementTypeAfterCultivation
+msgid "Rainfed, Wet Season (Regular Rainfed)"
+msgstr ""
+
+#. WaterManagementTypeAfterCultivation
+msgid "Rainfed, Dry Season (Drought Prone)"
+msgstr ""
+
+#. WaterManagementTypeAfterCultivation
+msgid "Rainfed, Deep Water"
 msgstr ""
