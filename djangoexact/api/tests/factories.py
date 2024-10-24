@@ -566,6 +566,8 @@ class IrrigationPhaseFactory(DjangoModelFactory):
     class Meta:
         model = IrrigationPhase
 
+    status = READY
+
     irrigation_system_type = factory.fuzzy.FuzzyChoice(IrrigationSystemType.objects.filter(module_types__class_name="IrrigationPhase").all())
     fuel_type = factory.fuzzy.FuzzyChoice(fuel_types)
     well_depth = factory.fuzzy.FuzzyFloat(0, 100)

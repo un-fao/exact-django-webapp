@@ -536,7 +536,7 @@ class Historical(models.Model):
         abstract = True
 
 
-class Project(Historical):
+class Project(Historical, DirtyFieldsMixin):
     class Meta:
         verbose_name_plural = "Projects"
         unique_together = ("name", "owner")
@@ -585,6 +585,14 @@ class Project(Historical):
             old = Project.objects.get(pk=self.pk)
             if old.owner != self.owner:
                 raise exceptions.ValidationError("User cannot be changed")
+
+            if self.is_dirty(check_relationship=True):
+                for activity in self.activities.all():
+                    activity: Activity
+                    for module in activity.modules:
+                        module: Module
+                        module.invalidate_cached_results()
+
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -726,7 +734,7 @@ class NoteMixin(models.Model):
         abstract = True
 
 
-class Activity(Historical, NoteMixin):
+class Activity(Historical, NoteMixin, DirtyFieldsMixin):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="activities", verbose_name=_("project"))
     name = models.CharField(max_length=255, verbose_name=_("name"))
     description = models.TextField(null=True, blank=True, verbose_name=_("description"))
@@ -759,7 +767,7 @@ class Activity(Historical, NoteMixin):
         return self.__get_delay()
 
     @property
-    def modules(self) -> list:
+    def modules(self) -> list["Module"]:
         return self.__get_all_modules()
 
     @property
@@ -787,6 +795,10 @@ class Activity(Historical, NoteMixin):
             self.state = StatusType.objects.get_or_create(name="EMPTY")[0]
             if not self.change_rate:
                 self.change_rate = ChangeRate.objects.get_or_create(name="linear")[0]
+        if self.pk:
+            if self.is_dirty(check_relationship=True):
+                for module in self.modules:
+                    module.invalidate_cached_results()
         super().save(*args, **kwargs)
 
     def __get_delay(self) -> int:
@@ -871,8 +883,11 @@ class CachedResultMixin(models.Model, DirtyFieldsMixin):
             dirty_fields = self.get_dirty_fields(check_relationship=True)
             cache_fields = ["last_cached_at", "cached_results_total", "cached_results_by_activity", "cached_results_by_gas", "cached_results_by_activity_by_gas"]
 
-            if any(field in dirty_fields.keys() for field in self._meta.get_fields() if field.name not in cache_fields):
+            if any(field.name in dirty_fields.keys() for field in self._meta.get_fields() if field.name not in cache_fields):
                 self.last_modified = timezone.now()
+                if isinstance(self, Submodule):
+                    parent: Module = self.parent
+                    parent.invalidate_cached_results()
 
         super().save(*args, **kwargs)
 
@@ -967,6 +982,34 @@ class Submodule(Historical, CachedResultMixin):
 
     def get_activity(self) -> Activity:
         return self.parent.activity
+
+    def get_relevant_scenarios(self):
+        """
+        Returns the relevant scenarios for a given field.
+
+        Args:
+            field (str): The field to check.
+
+        Returns:
+            list: The relevant scenarios for the given field.
+        """
+        log.debug("Get relevant scenarios for field")
+        module_start = module_w = module_wo = self
+
+        scenarios = []
+
+        if self.__class__.__name__ == module_start.__class__.__name__:
+            scenarios.append(utils.ScenarioTypes.START)
+        if self.__class__.__name__ == module_w.__class__.__name__:
+            scenarios.append(utils.ScenarioTypes.WITH)
+        if self.__class__.__name__ == module_wo.__class__.__name__:
+            scenarios.append(utils.ScenarioTypes.WITHOUT)
+
+        return scenarios
+
+    def get_cached_results(self, by=BreakdownTypes.TOTAL):
+        # TODO: Implement caching for submodules
+        return None
 
 
 class Module(Historical, CachedResultMixin):
@@ -1470,7 +1513,7 @@ class AnnualCropland(LandModule, SingleBiomassModule, ResidueAvailability):
     minor_biomass_factor_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("minor_biomass_factor_t2_wo"))
 
     @property
-    def submodules(self):
+    def submodules(self) -> list["Submodule"]:
         return list(self.minor_seasons.all())
 
 
@@ -1517,7 +1560,7 @@ class PerennialCropland(PerennialCrop, LandModule, SingleBiomassModule, AboveBel
         return getattr(self, f"biomass_t2_{scenario.value}", None)
 
     @property
-    def submodules(self):
+    def submodules(self) -> list["Submodule"]:
         return list(self.minor_seasons.all())
 
 
@@ -1614,7 +1657,7 @@ class FloodedRice(Rice, LandModuleFixed, SingleBiomassModule):
     pass
 
     @property
-    def submodules(self):
+    def submodules(self) -> list["Submodule"]:
         return list(self.minor_seasons.all())
 
 
@@ -1796,7 +1839,7 @@ class ForestManagement(LandModule, LitterDeadwoodBiomassModule):
     degradation_dry_matter_impacted_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("degradation_dry_matter_impacted_t2_wo"))
 
     @property
-    def submodules(self):
+    def submodules(self) -> list["Submodule"]:
         return list(self.disturbances.all())
 
     def save(self, *args, **kwargs):
@@ -2067,7 +2110,7 @@ class Input(Module):
     pass
 
     @property
-    def submodules(self):
+    def submodules(self) -> list["Submodule"]:
         return list(self.input_entries.all())
 
 
@@ -2098,7 +2141,7 @@ class Energy(Module):
     pass
 
     @property
-    def submodules(self):
+    def submodules(self) -> list["Submodule"]:
         return list(self.electricities.all()) + list(self.fuels.all())
 
 
@@ -2162,7 +2205,7 @@ class Irrigation(Module):
     pass
 
     @property
-    def submodules(self):
+    def submodules(self) -> list["Submodule"]:
         return list(self.irrigation_systems.all()) + list(self.irrigation_phases.all())
 
 
@@ -2438,7 +2481,7 @@ class Settlement(LandModuleFixed, SingleBiomassModule):
     settlement_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_settlement_type_thread", on_delete=models.SET_NULL)
 
     @property
-    def submodules(self):
+    def submodules(self) -> list["Submodule"]:
         return list(self.buildings.all()) + list(self.roads.all()) + list(self.other_infrastructures.all())
 
     # NOTE: Why having AGB and BGB AND Biomass when Biomass = AGB + BGB?
