@@ -71,6 +71,7 @@ class CoastalWetland(BaseModule):
 
         # TIER 2 VALUES
         self.agb_tier_2_default = None
+        self.bgb_tier_2_default = None
     
 
     def calculate_emissions(
@@ -191,13 +192,13 @@ class CoastalWetland(BaseModule):
             def calculate_biomass():
                 try:
                     agb = self.agb_default * self.mangrove_factor if not self.agb_tier_2 else self.agb_tier_2
-
-                    # ASSIGN TIER 2 VALUE DEFAULT FOR FRONT END, AS IT'S IN TONNES OF CARBON
-                    self.agb_tier_2_default = agb
-
                     bgb = self.bgb_default * agb if not self.bgb_tier_2 else self.bgb_tier_2
                     litter = self.litter_default if not self.litter_tier_2 else self.litter_tier_2
                     deadwood = self.deadwood_default if not self.deadwood_tier_2 else self.deadwood_tier_2
+
+                    # ASSIGN TIER 2 VALUE DEFAULT FOR FRONT END, AS IT'S IN TONNES OF CARBON
+                    self.agb_tier_2_default = self.agb_default * self.mangrove_factor
+                    self.bgb_tier_2_default = self.bgb_default * agb * self.mangrove_factor if not self.agb_tier_2 else self.bgb_default * self.agb_tier_2
 
                     biomass_emissions_total = -44/12 * (agb + bgb + litter + deadwood) / (20) * sum(self.hectares_revegetated_before_20)
 
