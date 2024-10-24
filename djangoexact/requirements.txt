@@ -59,3 +59,4 @@ django-modeltranslation==0.19.9
 XlsxWriter==3.2.0
 openpyxl==3.1.2
 django-ckeditor==6.7.1
+django-picklefield==3.2
