@@ -1023,7 +1023,9 @@ class OtherLandUseCalculator(BaseCalculator):
             raise Exception(f"TotalBiomassAfterDefo for {luc_w.name} in {climate.name} climate, {moisture.name} moisture, and {continent.name} continent does not exist")
 
         try:
-            biomass_final_wo = ipcc.TotalBiomassAfterDefo.objects.get_or_default(**cmc, land_use_type=luc_wo)
+            # biomass_final_wo = ipcc.TotalBiomassAfterDefo.objects.get_or_default(**cmc, land_use_type=luc_wo)
+            # NOTE: Always zero
+            biomass_final_wo = SimpleNamespace(value=0)
         except ipcc.TotalBiomassAfterDefo.DoesNotExist:
             raise Exception(f"TotalBiomassAfterDefo for {luc_wo.name} in {climate.name} climate, {moisture.name} moisture, and {continent.name} continent does not exist")
 
@@ -2250,7 +2252,7 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
                 "fi_end_default": self.fi_w.value,
                 "fi_start_tier_2": self.module.fi_t2_start,
                 "fi_end_tier_2": self.module.fi_t2_w,
-                "calculate_soc_som": True,
+                "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
                 "straw_burnt": self.module.organic_amendment_type_start.name_en == "Straw Burnt",
                 "delay": self.activity.delay,
                 "ef_nitrous_som": self.som.value,
@@ -3703,7 +3705,7 @@ class SettlementCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
                 "soc_end_tier_2": self.module_w.soc_t2_w,
-                "calculate_soc_som": False,
+                "calculate_soc_som": CALCULATE_SOC_SOM_START_W,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -3739,7 +3741,7 @@ class SettlementCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
                 "soc_end_tier_2": self.module_wo.soc_t2_wo,
-                "calculate_soc_som": False,
+                "calculate_soc_som": CALCULATE_SOC_SOM_START_WO,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -3777,7 +3779,7 @@ class SettlementCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_w.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
                 "soc_end_tier_2": self.module_w.soc_t2_w,
-                "calculate_soc_som": True,
+                "calculate_soc_som": CALCULATE_SOC_SOM_W,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -3815,7 +3817,7 @@ class SettlementCalculator(LandModuleCalculator):
                 "soc_end_default": self.soc_wo.value,
                 "soc_start_tier_2": self.module_start.soc_t2_start,
                 "soc_end_tier_2": self.module_wo.soc_t2_wo,
-                "calculate_soc_som": True,
+                "calculate_soc_som": CALCULATE_SOC_SOM_WO,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -4830,6 +4832,9 @@ class CoastalWetlandCalculator(BaseCalculator):
         self.rewetting_c = ipcc.RewettingCarbonFactor()
         self.rewetting_ch4 = ipcc.RewettingMethaneFactor()
 
+        self.agb_default = ipcc.CoastalAGB()
+        self.bgb_default = ipcc.CoastalBGB()
+
         self.soil_type_name = ""
 
     def get_defaults(self, calculate=False) -> dict:
@@ -4839,6 +4844,11 @@ class CoastalWetlandCalculator(BaseCalculator):
             "climate": self.climate,
             "moisture": self.moisture,
         }
+
+        if self.module.is_ready() and calculate:
+            self.calculate()
+            self.agb_default.value = getattr_or_default(self.math_w, "agb_tier_2_default") or getattr_or_default(self.math_wo, "agb_tier_2_default")
+            self.bgb_default.value = getattr_or_default(self.math_w, "bgb_tier_2_default") or getattr_or_default(self.math_wo, "bgb_tier_2_default")
 
         self.soil_type_name = self.module.soil_type_t2.name if self.module.soil_type_t2 else "Mineral"
         self.salinity_type = self.module.avg_salinity_t2 if self.module.avg_salinity_t2 else SalinityType.objects.get(value=">18")
