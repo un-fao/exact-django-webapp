@@ -1565,10 +1565,7 @@ class BuildingSerializer(ScenarioSubmoduleSerializer):
         ref_name = "Building"
         mandatory_fields = {
             "start": {
-                "mandatory": [
-                    "building_type",
-                    "area_m2_start",
-                ],
+                "mandatory": [],
             },
             "with": {
                 "mandatory": [
@@ -1607,11 +1604,7 @@ class RoadSerializer(ScenarioSubmoduleSerializer):
         ref_name = "Road"
         mandatory_fields = {
             "start": {
-                "mandatory": [
-                    "road_type",
-                    "length_km_start",
-                    "width_m_start",
-                ],
+                "mandatory": [],
             },
             "with": {
                 "mandatory": [
@@ -1651,7 +1644,7 @@ class OtherInfrastructureSerializer(ScenarioSubmoduleSerializer):
         ref_name = "OtherInfrastructure"
         mandatory_fields = {
             "start": {
-                "mandatory": ["area_m2_start"],
+                "mandatory": [],
             },
             "with": {
                 "mandatory": ["area_m2_w"],
