@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: support@example.com\n"
-"POT-Creation-Date: 2024-10-01 12:02\n"
-"PO-Revision-Date: 2024-10-01 12:02\n"
+"POT-Creation-Date: 2024-10-24 12:29\n"
+"PO-Revision-Date: 2024-10-24 12:29\n"
 "Last-Translator: Your Name <your.email@example.com>\n"
 "Language-Team: English <support@example.com>\n"
 "Language: en\n"
@@ -69,60 +69,8 @@ msgid "IN PROGRESS"
 msgstr "EN CURSO"
 
 #. LandUseType
-msgid "Hedgerow"
-msgstr "Cultivos en setos , Cercas vivas"
-
-#. LandUseType
-msgid "Multistrata"
-msgstr "Sistemas de cultivos a diversos niveles"
-
-#. LandUseType
-msgid "Parkland"
-msgstr "Parques Agroforestales"
-
-#. LandUseType
-msgid "Shaded Perennial"
-msgstr "Cultivos perennes bajo sombra"
-
-#. LandUseType
-msgid "Silvoarable"
-msgstr "Silvoarable"
-
-#. LandUseType
-msgid "Silvopasture"
-msgstr "Silvopastoril"
-
-#. LandUseType
 msgid "Barley"
 msgstr "Cebada"
-
-#. LandUseType
-msgid "Olive"
-msgstr "Olivo"
-
-#. LandUseType
-msgid "Orchard"
-msgstr "Huerta"
-
-#. LandUseType
-msgid "Short Rotation Coppice"
-msgstr "Monte bajo de ciclo corto"
-
-#. LandUseType
-msgid "Tea"
-msgstr "Té"
-
-#. LandUseType
-msgid "Vine"
-msgstr "Vid"
-
-#. LandUseType
-msgid "Oil Palm"
-msgstr "Palma Aceitera"
-
-#. LandUseType
-msgid "Rubber"
-msgstr "Caucho"
 
 #. LandUseType
 msgid "Oats"
@@ -177,10 +125,6 @@ msgid "Spring Wheat"
 msgstr "Trigo de primavera"
 
 #. LandUseType
-msgid "Alfalfa"
-msgstr "Alfalfa"
-
-#. LandUseType
 msgid "Non-Legume Hay"
 msgstr "Heno no leguminoso"
 
@@ -209,12 +153,76 @@ msgid "Default"
 msgstr "Por defecto"
 
 #. LandUseType
-msgid "Agroforestry - Default"
-msgstr "Agroforestería - Por defecto"
-
-#. LandUseType
 msgid "Peanuts"
 msgstr "Maní/cacahuete"
+
+#. LandUseType
+msgid "Alley Cropping"
+msgstr "Cultivos en Fajas"
+
+#. LandUseType
+msgid "Perennial Fallow"
+msgstr "Barbecho Mejorado"
+
+#. LandUseType
+msgid "Hedgerow"
+msgstr "Cultivos en setos , Cercas vivas"
+
+#. LandUseType
+msgid "Multistrata"
+msgstr "Sistemas de cultivos a diversos niveles"
+
+#. LandUseType
+msgid "Parkland"
+msgstr "Parques Agroforestales"
+
+#. LandUseType
+msgid "Shaded Perennial"
+msgstr "Cultivos perennes bajo sombra"
+
+#. LandUseType
+msgid "Silvoarable"
+msgstr "Silvoarable"
+
+#. LandUseType
+msgid "Silvopasture"
+msgstr "Silvopastoril"
+
+#. LandUseType
+msgid "Olive"
+msgstr "Olivo"
+
+#. LandUseType
+msgid "Orchard"
+msgstr "Huerta"
+
+#. LandUseType
+msgid "Short Rotation Coppice"
+msgstr "Monte bajo de ciclo corto"
+
+#. LandUseType
+msgid "Tea"
+msgstr "Té"
+
+#. LandUseType
+msgid "Vine"
+msgstr "Vid"
+
+#. LandUseType
+msgid "Oil Palm"
+msgstr "Palma Aceitera"
+
+#. LandUseType
+msgid "Rubber"
+msgstr "Caucho"
+
+#. LandUseType
+msgid "Alfalfa"
+msgstr "Alfalfa"
+
+#. LandUseType
+msgid "Agroforestry - Default"
+msgstr "Agroforestería - Por defecto"
 
 #. LandUseType
 msgid "Annual Cropland"
@@ -235,14 +243,6 @@ msgstr "Pastizales"
 #. LandUseType
 msgid "Other Land (Non-Vegetated)"
 msgstr "Otras Tierras (Sin Vegetación)"
-
-#. LandUseType
-msgid "Alley Cropping"
-msgstr "Cultivos en Fajas"
-
-#. LandUseType
-msgid "Perennial Fallow"
-msgstr "Barbecho Mejorado"
 
 #. LandUseType
 msgid "Wheat"
@@ -1188,6 +1188,10 @@ msgstr "Fosforo"
 msgid "User Defined Animal Feed (tier 2)"
 msgstr "Pienso Definido por el usuario (tier 2)"
 
+#. InputType
+msgid "User Defined Input (tier 2)"
+msgstr ""
+
 #. IrrigationSystemType
 msgid "Surface Without IRRS"
 msgstr "De superficie sin sistema de retorno de a escorrentía"
@@ -1406,7 +1410,7 @@ msgstr "Caribe"
 
 #. Region
 msgid "Western Europe"
-msgstr "Europa Occidental
+msgstr "Europa Occidenta"
 
 #. Region
 msgid "Eastern Europe"
@@ -1414,11 +1418,13 @@ msgstr "Europa Oriental"
 
 #. GlobalWarmingPotential
 msgid "IPCC Fifth Assessment Report (AR5) with Climate Change Feedback"
-msgstr "Quinto Informe de Evaluación del IPCC (AR5) con retroalimentación climática"
+msgstr ""
+"Quinto Informe de Evaluación del IPCC (AR5) con retroalimentación climática"
 
 #. GlobalWarmingPotential
 msgid "IPCC Fifth Assessment Report (AR5) without Climate Change Feedback"
-msgstr "Quinto Informe de Evaluación del IPCC (AR5) sin retroalimentación climática"
+msgstr ""
+"Quinto Informe de Evaluación del IPCC (AR5) sin retroalimentación climática"
 
 #. GlobalWarmingPotential
 msgid "IPCC Sixth Assessment Report (AR6)"
@@ -1431,3 +1437,27 @@ msgstr "Cuarto Informe de Evaluación del IPCC (AR4)"
 #. GlobalWarmingPotential
 msgid "IPCC Second Assessment Report (SAR)"
 msgstr "Segundo Informe de Evaluación del IPCC (SAR)"
+
+#. WaterManagementTypeBeforeCultivation
+msgid "Non Flooded Pre-Season <180 D"
+msgstr ""
+
+#. WaterManagementTypeBeforeCultivation
+msgid "Non Flooded Pre-Season >180 D"
+msgstr ""
+
+#. WaterManagementTypeBeforeCultivation
+msgid "Flooded Pre-Season > 30 D"
+msgstr ""
+
+#. WaterManagementTypeAfterCultivation
+msgid "Rainfed, Wet Season (Regular Rainfed)"
+msgstr ""
+
+#. WaterManagementTypeAfterCultivation
+msgid "Rainfed, Dry Season (Drought Prone)"
+msgstr ""
+
+#. WaterManagementTypeAfterCultivation
+msgid "Rainfed, Deep Water"
+msgstr ""

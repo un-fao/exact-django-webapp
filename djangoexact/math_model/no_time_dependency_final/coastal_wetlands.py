@@ -49,6 +49,7 @@ class CoastalWetland(BaseModule):
     ef_rewetting_methane_tier_2: Optional[float]
     soil_type: float
     methane_constant: float
+    mangrove_factor: float
 
     def __post_init__(self):
         super().__post_init__()
@@ -65,6 +66,12 @@ class CoastalWetland(BaseModule):
         self.area_start_rewetting = 0 if self.area_drained_start == 0 else max(0, -self.area_drained_end + self.area_drained_start)
         self.area_end_rewetting = 0 if self.area_drained_end == 0 else max(0, -self.area_drained_end + self.area_drained_start)
 
+        # TODO: ask Lorenzo about this variable and how it should be split across the years
+        self.hectares_excavated = yearly_time_dependent_parameter_breakdown(self.area_excavated_end - self.area_excavated_start, 0, self.implementation_time, self.capitalization_time, self.rate_type)
+
+        # TIER 2 VALUES
+        self.agb_tier_2_default = None
+        self.bgb_tier_2_default = None
     
 
     def calculate_emissions(
@@ -164,12 +171,9 @@ class CoastalWetland(BaseModule):
 
                 total_biomass = biomass_co2 * (area_excavated - area_excavated_start)
                 total_soil = soil_co2 * (area_excavated - area_excavated_start)
-                # TODO: ask Lorenzo about this variable and how it should be split across the years
 
-                hectares_excavated = yearly_time_dependent_parameter_breakdown(area_excavated - area_excavated_start, 0, self.implementation_time, self.capitalization_time, self.rate_type)
-
-                emissions_yearly_biomass_extraction_excavation = breakdown_according_to_values(total_biomass, hectares_excavated)
-                emissions_yearly_soil_extraction_excavation = breakdown_according_to_values(total_soil, hectares_excavated)
+                emissions_yearly_biomass_extraction_excavation = breakdown_according_to_values(total_biomass, self.hectares_excavated)
+                emissions_yearly_soil_extraction_excavation = breakdown_according_to_values(total_soil, self.hectares_excavated)
 
                 biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_yearly_biomass_extraction_excavation], ActivityTypes.BIOMASS, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
@@ -187,10 +191,14 @@ class CoastalWetland(BaseModule):
 
             def calculate_biomass():
                 try:
-                    agb = self.agb_default * 0.451 if not self.agb_tier_2 else self.agb_tier_2
+                    agb = self.agb_default * self.mangrove_factor if not self.agb_tier_2 else self.agb_tier_2
                     bgb = self.bgb_default * agb if not self.bgb_tier_2 else self.bgb_tier_2
                     litter = self.litter_default if not self.litter_tier_2 else self.litter_tier_2
                     deadwood = self.deadwood_default if not self.deadwood_tier_2 else self.deadwood_tier_2
+
+                    # ASSIGN TIER 2 VALUE DEFAULT FOR FRONT END, AS IT'S IN TONNES OF CARBON
+                    self.agb_tier_2_default = self.agb_default * self.mangrove_factor
+                    self.bgb_tier_2_default = self.bgb_default * agb * self.mangrove_factor if not self.agb_tier_2 else self.bgb_default * self.agb_tier_2
 
                     biomass_emissions_total = -44/12 * (agb + bgb + litter + deadwood) / (20) * sum(self.hectares_revegetated_before_20)
 
@@ -198,9 +206,9 @@ class CoastalWetland(BaseModule):
 
                     return yearly_biomass
 
-                except:
+                except Exception as e:
                     traceback.print_exc()
-                    return []
+                    raise e
             
             try:
                 self.ef_rewetting_methane_default = 0 if not self.soil_type == "<18" else self.ef_rewetting_methane_default
