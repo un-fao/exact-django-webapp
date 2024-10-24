@@ -5,7 +5,7 @@ from api.models import *
 from ipcc.models import *
 
 for language in LANGUAGES:
-    po = polib.POFile(f"locale/{language[0]}/LC_MESSAGES/types.po")
+    po = polib.pofile(f"locale/{language[0]}/LC_MESSAGES/types.po")
     po.metadata = {
         "Project-Id-Version": "1.0",
         "Report-Msgid-Bugs-To": "support@example.com",
@@ -77,12 +77,12 @@ for language in LANGUAGES:
             obj_name = str(obj.name) if obj.name else ""
             obj_translated_name = getattr(obj, f"name_{language[0]}", obj_name) or ""
 
-            print(f"Adding object {obj_name} of type {_type.__name__} to the po file")
-
             # Check if the object is already in the po file
             if po.find(obj_name):
                 print(f"Object {obj_name} of type {_type.__name__} already exists in the po file")
                 continue
+
+            print(f"Adding object {obj_name} of type {_type.__name__} to the po file")
 
             entry = polib.POEntry(
                 msgid=obj_name,
