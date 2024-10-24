@@ -18,8 +18,10 @@ class PostSerializer(serializers.ModelSerializer):
         model = models.Post
         fields = "__all__"
 
-    # On save, add slug and author
     def create(self, validated_data):
+        if models.Post.objects.filter(title=validated_data["title"]).exists():
+            raise serializers.ValidationError("Post with this title already exists")
+
         slug = slugify(validated_data["title"])
         user = self.context["request"].user
         post = models.Post.objects.create(author=user, slug=slug, **validated_data)
