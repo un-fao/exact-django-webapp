@@ -773,6 +773,12 @@ class Activity(Historical, NoteMixin):
     class Meta:
         unique_together = ("name", "project")
 
+    def get_land_modules_area(self) -> float:
+        for module in self.modules:
+            if isinstance(module, LandModule) and module.area is not None:
+                return module.area
+        return 0
+
     def __str__(self):
         return f"({self.pk}) {self.name} in {self.project.name}"
 

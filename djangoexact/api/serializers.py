@@ -282,6 +282,9 @@ class ReadProjectSerializer(serializers.ModelSerializer):
     status = get_model_serializer(ProjectStatus)(many=False, required=False, read_only=True)
     owner = UserReadSerializer(many=False, read_only=True)
     role = serializers.SerializerMethodField()
+    total_hectares = serializers.SerializerMethodField()
+    total_catch = serializers.SerializerMethodField()
+    total_livestock = serializers.SerializerMethodField()
 
     capitalization_years = serializers.FloatField(read_only=True)
 
@@ -295,6 +298,32 @@ class ReadProjectSerializer(serializers.ModelSerializer):
         user_project_group = ProjectMembership.objects.filter(user=user, project=obj).all()
 
         return [group.group.name for group in user_project_group] if user_project_group else []
+
+    def get_total_hectares(self, obj):
+        return sum([activity.get_land_modules_area() for activity in obj.activities.all()])
+
+    def get_total_catch(self, obj):
+        small_fisheries = SmallFishery.objects.filter(activity__project=obj).all()
+        large_fisheries = LargeFishery.objects.filter(activity__project=obj).all()
+
+        scenario_based_catch = {
+            "start": sum([fishery.total_catch_yr_start for fishery in small_fisheries]) + sum([fishery.total_catch_yr_start for fishery in large_fisheries]),
+            "w": sum([fishery.total_catch_yr_w for fishery in small_fisheries]) + sum([fishery.total_catch_yr_w for fishery in large_fisheries]),
+            "wo": sum([fishery.total_catch_yr_wo for fishery in small_fisheries]) + sum([fishery.total_catch_yr_wo for fishery in large_fisheries]),
+        }
+
+        return scenario_based_catch
+
+    def get_total_livestock(self, obj):
+        livestock = Livestock.objects.filter(activity__project=obj).all()
+
+        scenario_based_livestock = {
+            "start": sum([getattr(animal, "heads_number_start", 0) for animal in livestock]),
+            "w": sum([getattr(animal, "heads_number_w", 0) for animal in livestock]),
+            "wo": sum([getattr(animal, "heads_number_wo", 0) for animal in livestock]),
+        }
+
+        return scenario_based_livestock
 
     class Meta:
         model = Project
