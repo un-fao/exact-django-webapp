@@ -1448,7 +1448,6 @@ def generic_module_viewset(model: Module):
 
             serializer = get_module_serializer(model, ActionTypes.RETRIEVE)(data={"activity": activity.pk}, partial=True, instance=module)
             serializer.is_valid(raise_exception=True)
-            module = serializer.save()
 
             if module.module_type.class_name == LandUseChange.__name__:
                 module: LandUseChange
