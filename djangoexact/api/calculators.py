@@ -4832,6 +4832,9 @@ class CoastalWetlandCalculator(BaseCalculator):
         self.rewetting_c = ipcc.RewettingCarbonFactor()
         self.rewetting_ch4 = ipcc.RewettingMethaneFactor()
 
+        self.agb_default = ipcc.CoastalAGB()
+        self.bgb_default = ipcc.CoastalBGB()
+
         self.soil_type_name = ""
 
     def get_defaults(self, calculate=False) -> dict:
@@ -4841,6 +4844,11 @@ class CoastalWetlandCalculator(BaseCalculator):
             "climate": self.climate,
             "moisture": self.moisture,
         }
+
+        if self.module.is_ready() and calculate:
+            self.calculate()
+            self.agb_default.value = getattr_or_default(self.math_w, "agb_tier_2_default") or getattr_or_default(self.math_wo, "agb_tier_2_default")
+            self.bgb_default.value = getattr_or_default(self.math_w, "bgb_tier_2_default") or getattr_or_default(self.math_wo, "bgb_tier_2_default")
 
         self.soil_type_name = self.module.soil_type_t2.name if self.module.soil_type_t2 else "Mineral"
         self.salinity_type = self.module.avg_salinity_t2 if self.module.avg_salinity_t2 else SalinityType.objects.get(value=">18")
