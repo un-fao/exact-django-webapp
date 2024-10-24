@@ -4688,8 +4688,25 @@ class IrrigationPhaseCalculator(BaseCalculator):
 
         try:
             self.ef_default = ipcc.IrrigationPhaseData.objects.get(fuel_type=self.module.fuel_type)
+
+            if self.ef_default:
+                if self.ef_default.co2_emissions is None:
+                    missing_scenarios = utils.find_empty_scenarios(self.module, "ef_co2_t2")
+                    if missing_scenarios:
+                        raise ValueError(f"CO2 Emission Factor for {self.module.fuel_type.name} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
+                if self.ef_default.ch4_emissions is None:
+                    missing_scenarios = utils.find_empty_scenarios(self.module, "ef_ch4_t2")
+                    if missing_scenarios:
+                        raise ValueError(f"CH4 Emission Factor for {self.module.fuel_type.name} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
+                if self.ef_default.n2o_emissions is None:
+                    missing_scenarios = utils.find_empty_scenarios(self.module, "ef_n2o_t2")
+                    if missing_scenarios:
+                        raise ValueError(f"N2O Emission Factor for {self.module.fuel_type.name} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
         except ipcc.IrrigationPhaseData.DoesNotExist:
-            missing_scenarios = utils.find_empty_scenarios(self.module, "ef_t2")
+            missing_co2_scenarios = utils.find_empty_scenarios(self.module, "ef_co2_t2")
+            missing_ch4_scenarios = utils.find_empty_scenarios(self.module, "ef_ch4_t2")
+            missing_n2o_scenarios = utils.find_empty_scenarios(self.module, "ef_n2o_t2")
+            missing_scenarios = set(missing_co2_scenarios + missing_ch4_scenarios + missing_n2o_scenarios)
             if missing_scenarios:
                 raise ValueError(f"Emission Factor for {self.module.fuel_type.name} is missing in the following scenarios: {', '.join(missing_scenarios)}")
 
