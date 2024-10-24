@@ -18,6 +18,3 @@ def post_detail(request, slug):
 class PostViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = models.Post.objects.all()
     serializer_class = serializers.PostSerializer
-
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
