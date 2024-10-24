@@ -1811,8 +1811,10 @@ class ForestManagement(LandModule, LitterDeadwoodBiomassModule):
 
         error_msg = AGB_UNDER_20_NOT_FOUND if from_year < 20 else AGB_OVER_20_NOT_FOUND
 
+        climate = self.activity.climate_t2 if self.activity.climate_t2 else self.activity.project.climate
+
         filters = {
-            "climate": self.activity.project.climate,
+            "climate": climate,
             "region": self.activity.project.country.region,
             "land_use_type": land_use_type,
             "forest_type": self.forest_type,
