@@ -488,7 +488,7 @@ def get_entity_definitions(entity_type: str) -> dict:
 
 
 def find_empty_scenarios(entity, field: str):
-    if not isinstance(entity, api_models.Module):
+    if not isinstance(entity, api_models.Module) and not isinstance(entity, api_models.Submodule):
         raise ValueError("Entity must be a Module instance")
 
     entity: api_models.Module
