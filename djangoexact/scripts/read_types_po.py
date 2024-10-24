@@ -4,6 +4,7 @@ import datetime
 from api.models import *
 from django.apps import apps
 from django.db import transaction
+from ipcc.models import *
 
 for language in LANGUAGES:
     print(f"Processing language {language[0]}")
@@ -50,9 +51,15 @@ for language in LANGUAGES:
         MacroInputType,
         InputType,
         IrrigationSystemType,
-        EnergySourceType,  # TODO: Remove from database
+        EnergySourceType,
         BuildingType,
         RoadType,
+        Climate,
+        Moisture,
+        Region,
+        GlobalWarmingPotential,
+        WaterManagementTypeBeforeCultivation,
+        WaterManagementTypeAfterCultivation,
     ]
 
     with transaction.atomic():
