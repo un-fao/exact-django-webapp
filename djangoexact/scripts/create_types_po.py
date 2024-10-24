@@ -66,6 +66,8 @@ for language in LANGUAGES:
         Moisture,
         Region,
         GlobalWarmingPotential,
+        WaterManagementTypeBeforeCultivation,
+        WaterManagementTypeAfterCultivation,
     ]
 
     for _type in types:
@@ -74,6 +76,8 @@ for language in LANGUAGES:
             # Handle None values in both msgid and msgstr
             obj_name = str(obj.name) if obj.name else ""
             obj_translated_name = getattr(obj, f"name_{language[0]}", obj_name) or ""
+
+            print(f"Adding object {obj_name} of type {_type.__name__} to the po file")
 
             # Check if the object is already in the po file
             if po.find(obj_name):
