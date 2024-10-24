@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: support@example.com\n"
-"POT-Creation-Date: 2024-10-01 12:02\n"
-"PO-Revision-Date: 2024-10-01 12:02\n"
+"POT-Creation-Date: 2024-10-24 12:29\n"
+"PO-Revision-Date: 2024-10-24 12:29\n"
 "Last-Translator: Your Name <your.email@example.com>\n"
 "Language-Team: English <support@example.com>\n"
 "Language: en\n"
@@ -69,60 +69,8 @@ msgid "IN PROGRESS"
 msgstr "IN PROGRESS"
 
 #. LandUseType
-msgid "Hedgerow"
-msgstr "Hedgerow"
-
-#. LandUseType
-msgid "Multistrata"
-msgstr "Multistrata"
-
-#. LandUseType
-msgid "Parkland"
-msgstr "Parkland"
-
-#. LandUseType
-msgid "Shaded Perennial"
-msgstr "Shaded Perennial"
-
-#. LandUseType
-msgid "Silvoarable"
-msgstr "Silvoarable"
-
-#. LandUseType
-msgid "Silvopasture"
-msgstr "Silvopasture"
-
-#. LandUseType
 msgid "Barley"
 msgstr "Barley"
-
-#. LandUseType
-msgid "Olive"
-msgstr "Olive"
-
-#. LandUseType
-msgid "Orchard"
-msgstr "Orchard"
-
-#. LandUseType
-msgid "Short Rotation Coppice"
-msgstr "Short Rotation Coppice"
-
-#. LandUseType
-msgid "Tea"
-msgstr "Tea"
-
-#. LandUseType
-msgid "Vine"
-msgstr "Vine"
-
-#. LandUseType
-msgid "Oil Palm"
-msgstr "Oil Palm"
-
-#. LandUseType
-msgid "Rubber"
-msgstr "Rubber"
 
 #. LandUseType
 msgid "Oats"
@@ -177,10 +125,6 @@ msgid "Spring Wheat"
 msgstr "Spring Wheat"
 
 #. LandUseType
-msgid "Alfalfa"
-msgstr "Alfalfa"
-
-#. LandUseType
 msgid "Non-Legume Hay"
 msgstr "Non-Legume Hay"
 
@@ -209,12 +153,76 @@ msgid "Default"
 msgstr "Default"
 
 #. LandUseType
-msgid "Agroforestry - Default"
-msgstr "Agroforestry - Default"
-
-#. LandUseType
 msgid "Peanuts"
 msgstr "Peanuts"
+
+#. LandUseType
+msgid "Alley Cropping"
+msgstr "Alley Cropping"
+
+#. LandUseType
+msgid "Perennial Fallow"
+msgstr "Perennial Fallow"
+
+#. LandUseType
+msgid "Hedgerow"
+msgstr "Hedgerow"
+
+#. LandUseType
+msgid "Multistrata"
+msgstr "Multistrata"
+
+#. LandUseType
+msgid "Parkland"
+msgstr "Parkland"
+
+#. LandUseType
+msgid "Shaded Perennial"
+msgstr "Shaded Perennial"
+
+#. LandUseType
+msgid "Silvoarable"
+msgstr "Silvoarable"
+
+#. LandUseType
+msgid "Silvopasture"
+msgstr "Silvopasture"
+
+#. LandUseType
+msgid "Olive"
+msgstr "Olive"
+
+#. LandUseType
+msgid "Orchard"
+msgstr "Orchard"
+
+#. LandUseType
+msgid "Short Rotation Coppice"
+msgstr "Short Rotation Coppice"
+
+#. LandUseType
+msgid "Tea"
+msgstr "Tea"
+
+#. LandUseType
+msgid "Vine"
+msgstr "Vine"
+
+#. LandUseType
+msgid "Oil Palm"
+msgstr "Oil Palm"
+
+#. LandUseType
+msgid "Rubber"
+msgstr "Rubber"
+
+#. LandUseType
+msgid "Alfalfa"
+msgstr "Alfalfa"
+
+#. LandUseType
+msgid "Agroforestry - Default"
+msgstr "Agroforestry - Default"
 
 #. LandUseType
 msgid "Annual Cropland"
@@ -235,14 +243,6 @@ msgstr "Grassland"
 #. LandUseType
 msgid "Other Land (Non-Vegetated)"
 msgstr "Other Land (Non-Vegetated)"
-
-#. LandUseType
-msgid "Alley Cropping"
-msgstr "Alley Cropping"
-
-#. LandUseType
-msgid "Perennial Fallow"
-msgstr "Perennial Fallow"
 
 #. LandUseType
 msgid "Wheat"
@@ -1188,6 +1188,10 @@ msgstr "Phosphorous"
 msgid "User Defined Animal Feed (tier 2)"
 msgstr "User Defined Animal Feed (tier 2)"
 
+#. InputType
+msgid "User Defined Input (tier 2)"
+msgstr "User Defined Input (tier 2)"
+
 #. IrrigationSystemType
 msgid "Surface Without IRRS"
 msgstr "Surface Without IRRS"
@@ -1431,3 +1435,27 @@ msgstr "IPCC Fourth Assessment Report (AR4)"
 #. GlobalWarmingPotential
 msgid "IPCC Second Assessment Report (SAR)"
 msgstr "IPCC Second Assessment Report (SAR)"
+
+#. WaterManagementTypeBeforeCultivation
+msgid "Non Flooded Pre-Season <180 D"
+msgstr "Non Flooded Pre-Season <180 D"
+
+#. WaterManagementTypeBeforeCultivation
+msgid "Non Flooded Pre-Season >180 D"
+msgstr "Non Flooded Pre-Season >180 D"
+
+#. WaterManagementTypeBeforeCultivation
+msgid "Flooded Pre-Season > 30 D"
+msgstr "Flooded Pre-Season > 30 D"
+
+#. WaterManagementTypeAfterCultivation
+msgid "Rainfed, Wet Season (Regular Rainfed)"
+msgstr "Rainfed, Wet Season (Regular Rainfed)"
+
+#. WaterManagementTypeAfterCultivation
+msgid "Rainfed, Dry Season (Drought Prone)"
+msgstr "Rainfed, Dry Season (Drought Prone)"
+
+#. WaterManagementTypeAfterCultivation
+msgid "Rainfed, Deep Water"
+msgstr "Rainfed, Deep Water"

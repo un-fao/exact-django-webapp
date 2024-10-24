@@ -156,9 +156,9 @@ class AnnualCroplandDefaults(Defaults):
             minor_biomass_t2_start_default=defaults.minor_biomass_start.value,
             minor_biomass_t2_w_default=defaults.minor_biomass_w.value,
             minor_biomass_t2_wo_default=defaults.minor_biomass_wo.value,
-            yield_t2_start_default=defaults.crop_yield_start.value,
-            yield_t2_w_default=defaults.crop_yield_w.value,
-            yield_t2_wo_default=defaults.crop_yield_wo.value,
+            yield_t2_start_default=defaults.crop_yield_start.average,
+            yield_t2_w_default=defaults.crop_yield_w.average,
+            yield_t2_wo_default=defaults.crop_yield_wo.average,
         )
 
 
@@ -744,12 +744,12 @@ class CoastalWetlandDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            agb_t2_start_default=defaults.agb.value,
-            agb_t2_w_default=defaults.agb.value,
-            agb_t2_wo_default=defaults.agb.value,
-            bgb_t2_start_default=defaults.bgb.value,
-            bgb_t2_w_default=defaults.bgb.value,
-            bgb_t2_wo_default=defaults.bgb.value,
+            agb_t2_start_default=defaults.agb_default.value,
+            agb_t2_w_default=defaults.agb_default.value,
+            agb_t2_wo_default=defaults.agb_default.value,
+            bgb_t2_start_default=defaults.bgb_default.value,
+            bgb_t2_w_default=defaults.bgb_default.value,
+            bgb_t2_wo_default=defaults.bgb_default.value,
             soc_t2_start_default=defaults.soil_1m.value,
             soc_t2_w_default=defaults.soil_1m.value,
             soc_t2_wo_default=defaults.soil_1m.value,
