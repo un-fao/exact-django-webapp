@@ -307,9 +307,9 @@ class ReadProjectSerializer(serializers.ModelSerializer):
         large_fisheries = LargeFishery.objects.filter(activity__project=obj).all()
 
         scenario_based_catch = {
-            "start": sum([fishery.total_catch_yr_start for fishery in small_fisheries]) + sum([fishery.total_catch_yr_start for fishery in large_fisheries]),
-            "w": sum([fishery.total_catch_yr_w for fishery in small_fisheries]) + sum([fishery.total_catch_yr_w for fishery in large_fisheries]),
-            "wo": sum([fishery.total_catch_yr_wo for fishery in small_fisheries]) + sum([fishery.total_catch_yr_wo for fishery in large_fisheries]),
+            "start": sum([fishery.total_catch_yr_start if fishery.total_catch_yr_start is not None else 0 for fishery in small_fisheries]) + sum([fishery.total_catch_yr_start for fishery in large_fisheries]),
+            "w": sum([fishery.total_catch_yr_w if fishery.total_catch_yr_w is not None else 0 for fishery in small_fisheries]) + sum([fishery.total_catch_yr_w for fishery in large_fisheries]),
+            "wo": sum([fishery.total_catch_yr_wo if fishery.total_catch_yr_wo is not None else 0 for fishery in small_fisheries]) + sum([fishery.total_catch_yr_wo for fishery in large_fisheries]),
         }
 
         return scenario_based_catch
@@ -318,9 +318,9 @@ class ReadProjectSerializer(serializers.ModelSerializer):
         livestock = Livestock.objects.filter(activity__project=obj).all()
 
         scenario_based_livestock = {
-            "start": sum([getattr(animal, "heads_number_start", 0) for animal in livestock]),
-            "w": sum([getattr(animal, "heads_number_w", 0) for animal in livestock]),
-            "wo": sum([getattr(animal, "heads_number_wo", 0) for animal in livestock]),
+            "start": sum([animal.heads_number_start if animal.heads_number_start is not None else 0 for animal in livestock]),
+            "w": sum([animal.heads_number_w if animal.heads_number_w is not None else 0 for animal in livestock]),
+            "wo": sum([animal.heads_number_wo if animal.heads_number_wo is not None else 0 for animal in livestock]),
         }
 
         return scenario_based_livestock
