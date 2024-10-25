@@ -138,7 +138,6 @@ class OtherLandUseChanges(BaseModule):
         
         def calculate_biomass():
             try:
-                # TODO: talk to Claudio, there is a problem here where there is a value for biomass change in emissions, even though initial and final should be the same
                 initial_biomass_without_removal = self.initial_lu_biomass if not self.initial_lu_biomass_tier_2 else self.initial_lu_biomass_tier_2
                 final_biomass = self.final_lu_biomass if not self.final_lu_biomass_tier_2 else self.final_lu_biomass_tier_2
 
@@ -157,7 +156,6 @@ class OtherLandUseChanges(BaseModule):
 
                 total = delta_c_biomass * self.area
 
-                # TODO:  change so proportionate to the number of hectares of difference with the previous year
                 yearly_biomass_emissions = breakdown_according_to_values(total, self.hectare_variation_yearly)
                 self.result.yearly_emissions_by_sector_by_gas.append(
                     YearlyGasActivityEmissionSet(
