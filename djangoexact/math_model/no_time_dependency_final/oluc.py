@@ -8,6 +8,8 @@ from .general_functions import (
     yearly_time_dependent_20_year_breakdown,
     yearly_time_dependent_parameter_breakdown,
     som_emissions,
+    yearly_time_dependent_increase_full_year,
+    breakdown_according_to_values
 )
 from .ghg_emissions_classes import (
     ActivityTypes,
@@ -77,6 +79,9 @@ class OtherLandUseChanges(BaseModule):
 
         self.soc_start = soc_ref_start * fmg_start * fi_start * flu_start
         self.soc_end = soc_ref_end * fmg_end * fi_end * flu_end
+
+        # NOTE: Difference in number of hectares of which we change land use each year, compared to previous year
+        self.hectare_variation_yearly = yearly_time_dependent_increase_full_year(0, self.area, self.implementation_time, self.capitalization_time, self.rate_type)
         
 
     def calculate_emissions(self):
@@ -104,14 +109,12 @@ class OtherLandUseChanges(BaseModule):
                 total = delta_c_biomass * self.area
 
                 # TODO:  change so proportionate to the number of hectares of difference with the previous year
-                yearly_biomass_emissions = yearly_constant_emissions_breakdown(total, self.implementation_time, self.capitalization_time, self.rate_type)
-
+                yearly_biomass_emissions = breakdown_according_to_values(total, self.hectare_variation_yearly)
                 self.result.yearly_emissions_by_sector_by_gas.append(
                     YearlyGasActivityEmissionSet(
                         year=0,
                         gas_type=GasTypes.CO2,
                         emissions=[Emission(e, GasTypes.CO2) for e in yearly_biomass_emissions],
-                        # TODO: ask Lorenzo if Biomass Loss or Gain
                         activity=ActivityTypes.BIOMASS,
                         delay=self.delay,
                     )
@@ -146,12 +149,11 @@ class OtherLandUseChanges(BaseModule):
             methane_em_per_hectar = methane_emissions / 1000
             nitrous_em_per_hectar = nitrous_emissions / 1000
 
-            # TODO:  change so proportionate to the number of hectares of difference with the previous year
             methane_fire_emissions = methane_em_per_hectar * self.area
             nitrous_fire_emissions = nitrous_em_per_hectar * self.area
 
-            yearly_methane_fire_emissions = yearly_constant_emissions_breakdown(methane_fire_emissions, self.implementation_time, self.capitalization_time, self.rate_type)
-            yearly_nitrous_fire_emissions = yearly_constant_emissions_breakdown(nitrous_fire_emissions, self.implementation_time, self.capitalization_time, self.rate_type)
+            yearly_methane_fire_emissions = breakdown_according_to_values(methane_fire_emissions, self.hectare_variation_yearly)
+            yearly_nitrous_fire_emissions = breakdown_according_to_values(nitrous_fire_emissions, self.hectare_variation_yearly)
 
             self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in yearly_methane_fire_emissions], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
             self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in yearly_nitrous_fire_emissions], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
