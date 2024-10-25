@@ -104,7 +104,6 @@ class FloodedRice(LandModule):
                     total_methane = straw_methane_co2 * sum(self.hectares_total)
                     total_nitrous = straw_nitrous_co2 * sum(self.hectares_total)
 
-                    # TODO: check if this should be breakdown according to hectares_total or hectares_under_20
                     straw_burning_set_methane = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in breakdown_according_to_values(total_methane, self.hectares_total)], ActivityTypes.STRAW_BURNING, delay=self.delay)
                     straw_burning_set_nitrous = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in breakdown_according_to_values(total_nitrous, self.hectares_total)], ActivityTypes.STRAW_BURNING, delay=self.delay)
 
