@@ -55,7 +55,6 @@ class CoastalWetland(BaseModule):
         super().__post_init__()
 
         # HECTARES DRAINED
-        # TODO: ask Lorenzo why this is done
         # NOTE: set to 0 and self.area_drained_end - self.area_excavated_end as if not we have double counting. No need for checks as area_drained_end is always greater than area_excavated_end
         self.hectares_drained_before_20, self.hectares_drained_after_20 = yearly_time_dependent_20_year_breakdown(0, self.area_drained_end - self.area_excavated_end, self.implementation_time, self.capitalization_time, self.rate_type)
         self.hectares_drained = yearly_time_dependent_parameter_breakdown(0, self.area_drained_end, self.implementation_time, self.capitalization_time, self.rate_type)

@@ -189,7 +189,6 @@ class AnnexedModule(BaseModule):
 
                 try:
                     # TODO: check why I need initial and final, only calculate_emissions_start_end is different???
-                    # TODO: assign ef values in constructor
                     ef_n2o = self.ef_n2o_ref_drainage_final if not self.ef_n2o_tier_2_drainage_final else self.ef_n2o_tier_2_drainage_final
                     ef_ch4_on_site = self.ef_ch4_onsite_ref_drainage_final if not self.ef_ch4_onsite_tier_2_drainage_final else self.ef_ch4_onsite_tier_2_drainage_final
                     ef_ch4_off_site = self.ef_ch4_offsite_ref_drainage_final if not self.ef_ch4_offsite_tier_2_drainage_final else self.ef_ch4_offsite_tier_2_drainage_final
@@ -263,7 +262,6 @@ class AnnexedModule(BaseModule):
                     traceback.print_exc()
                     raise e
 
-            # TODO: check with Lorenzo why initial and final
             try:
                 area_not_drained_start = self.maximum_area_for_water_management - self.area_drained_start
                 area_not_drained_end = self.maximum_area_for_water_management - self.area_drained_end
