@@ -240,7 +240,6 @@ def yearly_time_dependent_increase_full_year(start_value, end_value, years_imple
 import matplotlib.pyplot as plt
 
 
-# TODO: these functions basically only work with 'D' as a rate. has to be generalized
 def yearly_time_dependent_matrix(start_value, end_value, years_implementation, years_capitalization, function, interim_values=True):
 
     if function == "linear":
@@ -363,7 +362,6 @@ def ch4_head_calculation_general(tam: float, vser: float, ef_prp: float,
         percentage_prp = percentage_prp_default if percentage_prp_tier_2 is None else percentage_prp_tier_2
 
         # TODO: add tier 2 value for ef_prp
-
         ch4_prp = ef_prp * (tam / 1000) * vser / ch4_dividing_parameter * 365 * percentage_prp / 100 if not ch4_prp_tier_2 else ch4_prp_tier_2 * percentage_prp / 100
 
         ch4_head = sum(ch4_system) + ch4_prp
@@ -377,7 +375,6 @@ def ch4_head_calculation_general(tam: float, vser: float, ef_prp: float,
 
 
 def soil_emissions(hectars_before_20, area_start, area_end, socref, soc_tier_2, f_lu_tier_2, f_i_tier_2, f_mg_tier_2, f_lu_ref=1, f_i_ref=1, f_mg_ref=1):
-    # TODO: GENERALIZE SO IT CAN BE USED FOR ALL DIFFERENT KINDS OF CALCULATIONS, MEANING THAT SOCREF, FLU ecc ARE ASSIGNED IN THE MODULE SPECIFIC FUNCTION
     # f_mg and f_i are defaulted to 1 in case they are not inserted
     soc = socref if not soc_tier_2 else soc_tier_2
     f_lu = f_lu_ref if not f_lu_tier_2 else f_lu_tier_2
@@ -424,7 +421,6 @@ def som_emissions(soc_final, soc_initial, emission_factor_nitrous, nitrous_const
 
     total = -sum(hectares_before_20) * som_n2o
 
-    # TODO: ask if this should be broken down proportionally, in that case we have to take an approach similar to the one used in the soil calculation
     emissions_som_yearly = breakdown_according_to_values(total, hectares_before_20)
     emissions_som_total = total
 
