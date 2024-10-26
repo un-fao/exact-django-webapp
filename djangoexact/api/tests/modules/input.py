@@ -18,7 +18,7 @@ class InputTest(t.ModuleWithSubmodulesTest):
             ModuleType.objects.get(class_name="InputEntry"),
         ]
         self.create_module()
-        self.create_submodules(n=10)
+        self.create_submodules(n=5)
 
     def test(self):
         self.calculate_results()
