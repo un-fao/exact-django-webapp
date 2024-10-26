@@ -306,14 +306,14 @@ class ReadProjectSerializer(serializers.ModelSerializer):
         small_fisheries = SmallFishery.objects.filter(activity__project=obj).all()
         large_fisheries = LargeFishery.objects.filter(activity__project=obj).all()
 
-        all_catch_start = list(filter(lambda fishery: fishery.total_catch_yr_start is not None, small_fisheries)) + list(filter(lambda fishery: fishery.total_catch_yr_start is not None, large_fisheries))
-        all_catch_w = list(filter(lambda fishery: fishery.total_catch_yr_w is not None, small_fisheries)) + list(filter(lambda fishery: fishery.total_catch_yr_w is not None, large_fisheries))
-        all_catch_wo = list(filter(lambda fishery: fishery.total_catch_yr_wo is not None, small_fisheries)) + list(filter(lambda fishery: fishery.total_catch_yr_wo is not None, large_fisheries))
+        all_catch_start = sum([f.total_catch_yr_start for f in list(filter(lambda fishery: fishery.total_catch_yr_start is not None, small_fisheries))]) + sum([f.total_catch_yr_start for f in list(filter(lambda fishery: fishery.total_catch_yr_start is not None, large_fisheries))])
+        all_catch_w = sum([f.total_catch_yr_w for f in list(filter(lambda fishery: fishery.total_catch_yr_w is not None, small_fisheries))]) + sum([f.total_catch_yr_w for f in list(filter(lambda fishery: fishery.total_catch_yr_w is not None, large_fisheries))])
+        all_catch_wo = sum([f.total_catch_yr_wo for f in list(filter(lambda fishery: fishery.total_catch_yr_wo is not None, small_fisheries))]) + sum([f.total_catch_yr_wo for f in list(filter(lambda fishery: fishery.total_catch_yr_wo is not None, large_fisheries))])
 
         scenario_based_catch = {
-            "start": sum(all_catch_start),
-            "w": sum(all_catch_w),
-            "wo": sum(all_catch_wo),
+            "start": all_catch_start,
+            "w": all_catch_w,
+            "wo": all_catch_wo,
         }
 
         return scenario_based_catch
@@ -321,14 +321,14 @@ class ReadProjectSerializer(serializers.ModelSerializer):
     def get_total_livestock(self, obj):
         livestock = Livestock.objects.filter(activity__project=obj).all()
 
-        all_livestock_start = list(filter(lambda animal: animal.heads_number_start is not None, livestock))
-        all_livestock_w = list(filter(lambda animal: animal.heads_number_w is not None, livestock))
-        all_livestock_wo = list(filter(lambda animal: animal.heads_number_wo is not None, livestock))
+        all_livestock_start = sum([animal.heads_number_start for animal in list(filter(lambda animal: animal.heads_number_start is not None, livestock))])
+        all_livestock_w = sum([animal.heads_number_w for animal in list(filter(lambda animal: animal.heads_number_w is not None, livestock))])
+        all_livestock_wo = sum([animal.heads_number_wo for animal in list(filter(lambda animal: animal.heads_number_wo is not None, livestock))])
 
         scenario_based_livestock = {
-            "start": sum(all_livestock_start),
-            "w": sum(all_livestock_w),
-            "wo": sum(all_livestock_wo),
+            "start": all_livestock_start,
+            "w": all_livestock_w,
+            "wo": all_livestock_wo,
         }
 
         return scenario_based_livestock
