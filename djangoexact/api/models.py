@@ -885,9 +885,10 @@ class CachedResultMixin(models.Model, DirtyFieldsMixin):
 
             if any(field.name in dirty_fields.keys() for field in self._meta.get_fields() if field.name not in cache_fields):
                 self.last_modified = timezone.now()
-                if isinstance(self, Submodule):
-                    parent: Module = self.parent
-                    parent.invalidate_cached_results()
+
+        if isinstance(self, Submodule):
+            parent: Module = self.parent
+            parent.invalidate_cached_results()
 
         super().save(*args, **kwargs)
 
@@ -905,6 +906,9 @@ class CachedResultMixin(models.Model, DirtyFieldsMixin):
         self.cached_results_by_activity = None
         self.cached_results_by_gas = None
         self.cached_results_by_activity_by_gas = None
+        if isinstance(self, Submodule):
+            parent: Module = self.parent
+            parent.invalidate_cached_results()
         self.save()
 
     def is_cached_results_valid(self):
@@ -929,6 +933,12 @@ class CachedResultMixin(models.Model, DirtyFieldsMixin):
         luc_modules = luc.get_modules()
         for module in luc_modules:
             module.invalidate_cached_results()
+
+    def delete(self, *args, **kwargs):
+        if isinstance(self, Submodule):
+            parent: Module = self.parent
+            parent.invalidate_cached_results()
+        super().delete(*args, **kwargs)
 
 
 class Submodule(Historical, CachedResultMixin):
