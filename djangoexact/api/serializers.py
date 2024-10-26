@@ -879,6 +879,25 @@ class LandUseTypeSerializer(serializers.ModelSerializer):
         ref_name = "LandUseType"
 
 
+class ModuleResultSerializer(serializers.Serializer):
+    results_total = serializers.SerializerMethodField()
+    results_by_activity = serializers.SerializerMethodField()
+    results_by_gas = serializers.SerializerMethodField()
+    results_by_activity_by_gas = serializers.SerializerMethodField()
+
+    def get_results_total(self, obj):
+        return DynamicResultSerializer(obj.cached_results_total, aggregate_by=BreakdownTypes.TOTAL).data if obj.cached_results_total else None
+
+    def get_results_by_activity(self, obj):
+        return DynamicResultSerializer(obj.cached_results_by_activity, aggregate_by=BreakdownTypes.ACTIVITY).data if obj.cached_results_by_activity else None
+
+    def get_results_by_gas(self, obj):
+        return DynamicResultSerializer(obj.cached_results_by_gas, aggregate_by=BreakdownTypes.GAS).data if obj.cached_results_by_gas else None
+
+    def get_results_by_activity_by_gas(self, obj):
+        return DynamicResultSerializer(obj.cached_results_by_activity_by_gas, aggregate_by=BreakdownTypes.ACTIVITY_GAS).data if obj.cached_results_by_activity_by_gas else None
+
+
 class BaseGenericModuleSerializer(serializers.ModelSerializer):
     activity = ActivitySerializer(many=False, read_only=True)
     module_type = serializers.SerializerMethodField()

@@ -59,6 +59,7 @@ from .models import (
 )
 from .serializers import (
     ActionTypes,
+    ModuleResultSerializer,
     ActivityBuilderSerializer,
     ActivitySerializer,
     CommentSerializer,
@@ -102,6 +103,11 @@ import time
 import api.reports as reports
 from django.http import FileResponse
 from django.http import HttpResponse
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from django.test import RequestFactory
+import asyncio
+from asgiref.sync import sync_to_async
 
 
 logger = logging.getLogger("console")
@@ -442,8 +448,26 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         response = serialized_project
         response["activities"] = []
 
-        for activity in project.activities.all():
-            response["activities"].append(ActivityViewSet.results(self, request, activity.pk).data)
+        # Function to process an activity
+        def process_activity(activity_pk):
+            return ActivityViewSet.results(self, request, pk=activity_pk).data
+
+        activity_pks = [activity.pk for activity in project.activities.all()]
+
+        # Use ThreadPoolExecutor to run tasks in parallel
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            # Submit all tasks to the executor
+            future_to_pk = {executor.submit(process_activity, pk): pk for pk in activity_pks}
+
+            for future in as_completed(future_to_pk):
+                pk = future_to_pk[future]
+                try:
+                    data = future.result()
+                except Exception as exc:
+                    logging.error(f"Activity {pk} generated an exception: {exc}")
+                    # You can choose to handle exceptions differently if needed
+                else:
+                    response["activities"].append(data)
 
         return Response(data=response, status=http_status.HTTP_200_OK)
 
@@ -1466,6 +1490,7 @@ def generic_module_viewset(model: Module):
                 module_results = module.get_cached_results(by=aggregate_by)
 
                 if module_results is None:
+                    logger.debug(f"Cache is invalid. Calculating results for module {module.id}")
                     total, by_activity, by_gas, by_activity_gas = CalculatorFactory().calculate_result(module)
 
                     results_total = {
@@ -1495,7 +1520,9 @@ def generic_module_viewset(model: Module):
                     module_results = results_total if aggregate_by == BreakdownTypes.TOTAL else results_by_activity if aggregate_by == BreakdownTypes.ACTIVITY else results_by_gas if aggregate_by == BreakdownTypes.GAS else results_by_activity_gas
                     module.cache_results(results_total, results_by_activity, results_by_gas, results_by_activity_gas)
 
-                serializer = DynamicResultSerializer(module_results, aggregate_by=aggregate_by)
+                # serializer = DynamicResultSerializer(module_results, aggregate_by=aggregate_by)
+                # serialized_data = serializer.data
+                serializer = ModuleResultSerializer(module)
                 serialized_data = serializer.data
 
                 return Response(serialized_data)
