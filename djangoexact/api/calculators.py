@@ -736,7 +736,7 @@ class DeforestationCalculator(BaseCalculator):
             try:
                 total_biomass_w = ipcc.TotalBiomassAfterDefo.objects.get_or_default(**cmc, land_use_type=module_w.land_use_type_w)
             except ipcc.TotalBiomassAfterDefo.DoesNotExist:
-                raise Exception(f"TotalBiomassAfterDefo for {module.land_use_type_w.name} in {climate.name} climate, {moisture.name} moisture, and {region.name} region does not exist")
+                raise Exception(f"TotalBiomassAfterDefo for {module.land_use_type_w} in {climate} climate, {moisture} moisture, and {region} region does not exist")
 
         if module_wo.module_type.class_name == "ForestManagement":
             total_biomass_wo = SimpleNamespace(value=0)
@@ -744,7 +744,7 @@ class DeforestationCalculator(BaseCalculator):
             try:
                 total_biomass_wo = ipcc.TotalBiomassAfterDefo.objects.get_or_default(**cmc, land_use_type=module_wo.land_use_type_wo)
             except ipcc.TotalBiomassAfterDefo.DoesNotExist:
-                raise Exception(f"TotalBiomassAfterDefo for {module.land_use_type_wo.name} in {climate.name} climate, {moisture.name} moisture, and {region.name} region does not exist")
+                raise Exception(f"TotalBiomassAfterDefo for {module.land_use_type_wo} in {climate} climate, {moisture} moisture, and {region} region does not exist")
 
         # NOTE: Maybe merge the mangroves and deforestation IPCC tables into one table?
         # TODO: Review with new forest management data
@@ -752,11 +752,21 @@ class DeforestationCalculator(BaseCalculator):
             try:
                 agb_start = ipcc.ForestManagementAGB.objects.get(climate=climate, region=region, forest_type=forest.forest_type, land_use_type=forest.land_use_type_start, forest_condition_type=forest.forest_condition_type)
             except ipcc.ForestManagementAGB.DoesNotExist:
-                raise Exception(f"ForestManagementAGB for {forest.forest_type.name} {forest.forest_condition_type.name} {forest.land_use_type_start.name} in {climate.name} climate, {region.name} region, forest type does not exist")
-            mean = statistics.mean([agb_start.agb_min, agb_start.agb_max])
+                if forest.agb_t2_start is None:
+                    raise Exception(f"AGB for {forest.land_use_type_start} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
+
+            if agb_start.agb_min is None or agb_start.agb_max is None:
+                if forest.agb_t2_start is None:
+                    raise Exception(f"AGB for {forest.land_use_type_start} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
+
+                mean = forest.agb_t2_start
+            else:
+                mean = statistics.mean([agb_start.agb_min, agb_start.agb_max])
+
             bgb_start = ipcc.ForestManagementBGB.objects.get_first_above_threshold(region=region, land_use_type=module.land_use_type_start, threshold=mean, climate=climate, forest_type=forest.forest_type)
             if not bgb_start:
                 raise Exception(f"ForestManagementBGB for {module.land_use_type_start.name} in {climate.name} climate, {region.name} region, and {forest.forest_type.name} forest type does not exist")
+
             if module_w.module_type.class_name == "ForestManagement":
                 litter_dw_w = SimpleNamespace(litter=0, dw=0)
                 agb_w = SimpleNamespace(value=0)
@@ -765,14 +775,25 @@ class DeforestationCalculator(BaseCalculator):
                 try:
                     litter_dw_w = ipcc.LitterDeadwoodCarbonStock.objects.get(land_use_type=module.land_use_type_w, climate=climate, forest_type=forest.forest_type)
                 except ipcc.LitterDeadwoodCarbonStock.DoesNotExist:
-                    raise Exception(f"LitterDeadwoodCarbonStock for {module.land_use_type_w.name} in {climate.name} climate, {forest.forest_type.name} forest type does not exist")
+                    raise Exception(f"LitterDeadwoodCarbonStock for {module.land_use_type_w} in {climate} climate, {forest.forest_type} forest type does not exist")
                 try:
                     agb_w = ipcc.ForestManagementAGB.objects.get(climate=climate, region=region, forest_type=forest.forest_type, land_use_type=forest.land_use_type_w, forest_condition_type=forest.forest_condition_type)
                 except ipcc.ForestManagementAGB.DoesNotExist:
-                    raise Exception(f"ForestManagementAGB for {forest.land_use_type_w.name} in {climate.name} climate, {region.name} region, {forest.forest_type.name} forest type, and Secondary >20 Years forest condition type does not exist")
-                bgb_w = ipcc.ForestManagementBGB.objects.get_first_above_threshold(region=region, land_use_type=module.land_use_type_start, threshold=statistics.mean([agb_w.agb_min, agb_w.agb_max]), climate=climate, forest_type=forest.forest_type)
+                    if forest.agb_t2_w is None:
+                        raise Exception(f"AGB for {forest.land_use_type_w} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
+                
+                if agb_w.agb_min is None or agb_w.agb_max is None:
+                    if forest.agb_t2_w is None:
+                        raise Exception(f"AGB for {forest.land_use_type_w} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
+                    
+                    mean = forest.agb_t2_w
+                else:
+                    mean = statistics.mean([agb_w.agb_min, agb_w.agb_max])
+
+                bgb_w = ipcc.ForestManagementBGB.objects.get_first_above_threshold(region=region, land_use_type=module.land_use_type_start, threshold=mean, climate=climate, forest_type=forest.forest_type)
                 if not bgb_w:
-                    raise Exception(f"ForestManagementBGB for {module.land_use_type_w.name} in {climate.name} climate, {region.name} region, and {forest.forest_type.name} forest type does not exist")
+                    raise Exception(f"ForestManagementBGB for {module.land_use_type_w} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
+
             if module_wo.module_type.class_name == "ForestManagement":
                 litter_dw_wo = SimpleNamespace(litter=0, dw=0)
                 agb_wo = SimpleNamespace(value=0)
@@ -785,10 +806,20 @@ class DeforestationCalculator(BaseCalculator):
                 try:
                     agb_wo = ipcc.ForestManagementAGB.objects.get(climate=climate, region=region, forest_type=forest.forest_type, land_use_type=forest.land_use_type_wo, forest_condition_type=forest.forest_condition_type)
                 except ipcc.ForestManagementAGB.DoesNotExist:
-                    raise Exception(f"ForestManagementAGB for {forest.land_use_type_wo.name} in {climate.name} climate, {region.name} region, {forest.forest_type.name} forest type, and Secondary >20 Years forest condition type does not exist")
-                bgb_wo = ipcc.ForestManagementBGB.objects.get_first_above_threshold(region=region, land_use_type=module.land_use_type_w, threshold=statistics.mean([agb_wo.agb_min, agb_wo.agb_max]), climate=climate, forest_type=forest.forest_type)
+                    if forest.agb_t2_wo is None:
+                        raise Exception(f"AGB for {forest.land_use_type_wo} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
+
+                if agb_wo.agb_min is None or agb_wo.agb_max is None:
+                    if forest.agb_t2_wo is None:
+                        raise Exception(f"AGB for {forest.land_use_type_wo} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
+                    
+                    mean = forest.agb_t2_wo
+                else:
+                    mean = statistics.mean([agb_wo.agb_min, agb_wo.agb_max])
+
+                bgb_wo = ipcc.ForestManagementBGB.objects.get_first_above_threshold(region=region, land_use_type=module.land_use_type_w, threshold=mean, climate=climate, forest_type=forest.forest_type)
                 if not bgb_wo:
-                    raise Exception(f"ForestManagementBGB for {module.land_use_type_wo.name} in {climate.name} climate, {region.name} region, and {forest.forest_type.name} forest type does not exist")
+                    raise Exception(f"ForestManagementBGB for {module.land_use_type_wo} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
         else:
             mangroves_data = ipcc.DataOnMangrove.objects.get(continent=region)
 
