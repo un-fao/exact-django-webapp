@@ -357,7 +357,9 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error("Selected user does not have permission to delete the project")
             return utils.ErrorResponse("Selected user does not have permission to delete the project", status=http_status.HTTP_403_FORBIDDEN)
 
-        update_change_reason(project, utils.ChangeReasons.DELETE.value)
+        # NOTE: This is a workaround for a bug in the simple_history library caused by an unhandled AttributeError when deleting a project with no previous history
+        if project.history.count() > 0:
+            update_change_reason(project, utils.ChangeReasons.DELETE.value)
 
         is_deleted = self.raw_delete(project)
         if not is_deleted:
