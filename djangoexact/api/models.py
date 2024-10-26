@@ -2179,6 +2179,13 @@ class Electricity(Submodule):
 
     ef_source = models.ForeignKey(EmissionFactorSource, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("ef_source"))
 
+    def save(self, *args, **kwargs):
+
+        if self.pk is None:
+            self.ef_source = EmissionFactorSource.objects.get_or_create(name="Operating Margin")[0]
+
+        return super().save(*args, **kwargs)
+
 
 class Fuel(Submodule):
     parent = models.ForeignKey(Energy, on_delete=models.CASCADE, null=True, blank=True, related_name="fuels")
