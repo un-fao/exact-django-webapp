@@ -815,7 +815,7 @@ class DeforestationCalculator(BaseCalculator):
         soc_wo = soc_ref
 
         if luc.module_type_w.name_en == "Grassland":
-            soc_w = ipcc.GrasslandStockExchangeFactor.objects.get(grassland_management_type=module_w.grassland_management_type_start, climate=project.climate)
+            soc_w = ipcc.GrasslandStockExchangeFactor.objects.get(grassland_management_type=module_w.grassland_management_type_w, climate=project.climate)
             flu_w = SimpleNamespace(value=soc_w.flu)
             fi_w = SimpleNamespace(value=soc_w.fi)
             fmg_w = SimpleNamespace(value=soc_w.fmg)
@@ -823,7 +823,7 @@ class DeforestationCalculator(BaseCalculator):
 
         if luc.module_type_wo.name_en == "Grassland":
             soc_wo = ipcc.GrasslandStockExchangeFactor.objects.get(
-                grassland_management_type=module_wo.grassland_management_type_start,
+                grassland_management_type=module_wo.grassland_management_type_wo,
                 climate=project.climate,
             )
             flu_wo = SimpleNamespace(value=soc_wo.flu)
