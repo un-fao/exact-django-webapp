@@ -961,8 +961,6 @@ class Submodule(Historical, CachedResultMixin):
             self.status = StatusType.objects.get_or_create(name="EMPTY")[0]
 
         if not self.pk:
-            parent: Module = self.parent
-            parent.invalidate_cached_results()
             utils.create_comment_threads(self)
 
         super().save(*args, **kwargs)
