@@ -2,7 +2,7 @@ runtime: python311
 service: $SERVICE_NAME
 instance_class: F2
 
-entrypoint: gunicorn -b :$PORT -w 4 main:app
+entrypoint: gunicorn -b :$PORT -w 4 main:app --timeout 120
 
 handlers:
 # This configures Google App Engine to serve the files in the app's static
