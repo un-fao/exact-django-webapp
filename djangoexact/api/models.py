@@ -33,6 +33,7 @@ RICE_CULTIVATION_DAYS = 113
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.core.validators import RegexValidator
+import threading
 
 alphanumeric = RegexValidator(r"^[0-9a-zA-Z]*$", "Only alphanumeric characters are allowed.")
 
@@ -587,11 +588,20 @@ class Project(Historical, DirtyFieldsMixin):
                 raise exceptions.ValidationError("User cannot be changed")
 
             if self.is_dirty(check_relationship=True):
-                for activity in self.activities.all():
-                    activity: Activity
-                    for module in activity.modules:
-                        module: Module
-                        module.invalidate_cached_results()
+                dirty_fields = self.get_dirty_fields(check_relationship=True)
+                exclude_fields = ["is_locked", "locked_at", "lock_updated_at", "locked_by", "updated_at"]
+
+                threads: list[threading.Thread] = []
+
+                if any(field.name in dirty_fields.keys() for field in self._meta.get_fields() if field.name not in exclude_fields):
+                    for activity in self.activities.all():
+                        activity: Activity
+                        for module in activity.modules:
+                            module: Module
+                            threads.append(threading.Thread(target=module.invalidate_cached_results))
+
+                for thread in threads:
+                    thread.start()
 
         super().save(*args, **kwargs)
 
@@ -797,8 +807,12 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
                 self.change_rate = ChangeRate.objects.get_or_create(name="linear")[0]
         if self.pk:
             if self.is_dirty(check_relationship=True):
-                for module in self.modules:
-                    module.invalidate_cached_results()
+                dirty_fields = self.get_dirty_fields(check_relationship=True)
+                exclude_fields = ["cost", "description", "name", "owner", "updated_at"]
+
+                if any(field.name in dirty_fields.keys() for field in self._meta.get_fields() if field.name not in exclude_fields):
+                    for module in self.modules:
+                        module.invalidate_cached_results()
         super().save(*args, **kwargs)
 
     def __get_delay(self) -> int:
