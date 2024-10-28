@@ -59,6 +59,7 @@ from .models import (
 )
 from .serializers import (
     ActionTypes,
+    ModuleResultSerializer,
     ActivityBuilderSerializer,
     ActivitySerializer,
     CommentSerializer,
@@ -102,7 +103,11 @@ import time
 import api.reports as reports
 from django.http import FileResponse
 from django.http import HttpResponse
-
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from django.test import RequestFactory
+import asyncio
+from asgiref.sync import sync_to_async
 
 logger = logging.getLogger("console")
 
@@ -201,7 +206,7 @@ class BaseWiewSet(viewsets.GenericViewSet):
         # If list operation, filter out inactive objects, unless ?filter_inactive=true
         if self.action == "list" and not self.request.query_params.get("filter_inactive"):
             try:
-                is_active_field = self.queryset.model._meta.get_field("is_active")
+                # is_active_field = self.queryset.model._meta.get_field("is_active")
                 return self.queryset.filter(is_active=True)
             except FieldDoesNotExist:
                 return super().get_queryset()
@@ -442,8 +447,26 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         response = serialized_project
         response["activities"] = []
 
-        for activity in project.activities.all():
-            response["activities"].append(ActivityViewSet.results(self, request, activity.pk).data)
+        # Function to process an activity
+        def process_activity(activity_pk):
+            return ActivityViewSet.results(self, request, pk=activity_pk).data
+
+        activity_pks = [activity.pk for activity in project.activities.all()]
+
+        # Use ThreadPoolExecutor to run tasks in parallel
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            # Submit all tasks to the executor
+            future_to_pk = {executor.submit(process_activity, pk): pk for pk in activity_pks}
+
+            for future in as_completed(future_to_pk):
+                pk = future_to_pk[future]
+                try:
+                    data = future.result()
+                except Exception as exc:
+                    logging.error(f"Activity {pk} generated an exception: {exc}")
+                    # You can choose to handle exceptions differently if needed
+                else:
+                    response["activities"].append(data)
 
         return Response(data=response, status=http_status.HTTP_200_OK)
 
@@ -990,19 +1013,21 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error("Selected user does not have permission to view activities in the project")
             return utils.ErrorResponse("Selected user does not have permission to view activities in the project", status=http_status.HTTP_403_FORBIDDEN)
 
-        list = Activity.objects.filter(project__id=project_id)
+        def process_activity(activity):
+            activity_dict = ActivitySerializer(activity).data
+            activity_dict["modules"] = get_modules(activity)
+            return activity_dict
+
+        _list = Activity.objects.filter(project__id=project_id)
 
         paginator = DefaultPagination()
-        page = paginator.paginate_queryset(list, request)
+        page = paginator.paginate_queryset(_list, request)
         if page is not None:
-            response = []
-            for activity in page:
-                activity_dict = ActivitySerializer(activity).data
-                activity_dict["modules"] = get_modules(activity)
-                response.append(activity_dict)
+            with ThreadPoolExecutor() as executor:
+                response = list(executor.map(process_activity, page))
             return paginator.get_paginated_response(response)
 
-        return Response(data=self.serializer_class(list, many=True).data, status=http_status.HTTP_200_OK)
+        return Response(data=self.serializer_class(_list, many=True).data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])
     def results(self, request, pk=None):
@@ -1466,6 +1491,7 @@ def generic_module_viewset(model: Module):
                 module_results = module.get_cached_results(by=aggregate_by)
 
                 if module_results is None:
+                    logger.debug(f"Cache is invalid. Calculating results for module {module.id}")
                     total, by_activity, by_gas, by_activity_gas = CalculatorFactory().calculate_result(module)
 
                     results_total = {
