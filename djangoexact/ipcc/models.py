@@ -286,7 +286,7 @@ class ForestTotalBiomassManager(Manager):
                 climate=climate,
                 moisture=moisture,
                 continent=continent,
-                land_use_type__name__icontains="Default",
+                land_use_type__name__icontains="Agroforestry - Default",
             )
 
 
