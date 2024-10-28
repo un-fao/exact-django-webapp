@@ -749,19 +749,18 @@ class DeforestationCalculator(BaseCalculator):
         # NOTE: Maybe merge the mangroves and deforestation IPCC tables into one table?
         # TODO: Review with new forest management data
         if forest.land_use_type_start.name != utils.MANGROVES:
-            try:
-                agb_start = forest.get_agb_growth_ref(land_use_type=forest.land_use_type_start, from_year=21)
-            except ipcc.ForestManagementAGB.DoesNotExist:
-                if forest.agb_t2_start is None:
-                    raise Exception(f"AGB for {forest.land_use_type_start} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
+            agb_start = forest.get_agb_growth_ref(land_use_type=forest.land_use_type_start, from_year=21)
+            if agb_start is None:
+                agb_start = ipcc.ForestManagementAGB()
 
             if agb_start.agb_min is None or agb_start.agb_max is None:
                 if forest.agb_t2_start is None:
-                    raise Exception(f"AGB for {forest.land_use_type_start} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
+                    raise Exception(f"AGB for {forest.land_use_type_start} in {climate} climate, {region} region, and {forest.forest_type} does not exist")
 
-                mean = forest.agb_t2_start
-            else:
-                mean = statistics.mean([agb_start.agb_min, agb_start.agb_max])
+                agb_start.agb_min = forest.agb_t2_start
+                agb_start.agb_max = forest.agb_t2_start
+
+            mean = statistics.mean([agb_start.agb_min, agb_start.agb_max])
 
             bgb_start = ipcc.ForestManagementBGB.objects.get_first_above_threshold(region=region, land_use_type=module.land_use_type_start, threshold=mean, climate=climate, forest_type=forest.forest_type)
             if not bgb_start:
@@ -776,19 +775,19 @@ class DeforestationCalculator(BaseCalculator):
                     litter_dw_w = ipcc.LitterDeadwoodCarbonStock.objects.get(land_use_type=module.land_use_type_w, climate=climate, forest_type=forest.forest_type)
                 except ipcc.LitterDeadwoodCarbonStock.DoesNotExist:
                     raise Exception(f"LitterDeadwoodCarbonStock for {module.land_use_type_w} in {climate} climate, {forest.forest_type} forest type does not exist")
-                try:
-                    agb_w = forest.get_agb_growth_ref(land_use_type=forest.land_use_type_w, from_year=21)
-                except ipcc.ForestManagementAGB.DoesNotExist:
-                    if forest.agb_t2_w is None:
-                        raise Exception(f"AGB for {forest.land_use_type_w} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
+
+                agb_w = forest.get_agb_growth_ref(land_use_type=forest.land_use_type_w, from_year=21)
+                if agb_w is None:
+                    agb_w = ipcc.ForestManagementAGB()
 
                 if agb_w.agb_min is None or agb_w.agb_max is None:
                     if forest.agb_t2_w is None:
-                        raise Exception(f"AGB for {forest.land_use_type_w} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
+                        raise Exception(f"AGB for {forest.land_use_type_w} in {climate} climate, {region} region, and {forest.forest_type} does not exist")
 
-                    mean = forest.agb_t2_w
-                else:
-                    mean = statistics.mean([agb_w.agb_min, agb_w.agb_max])
+                    agb_w.agb_min = forest.agb_t2_w
+                    agb_w.agb_max = forest.agb_t2_w
+
+                mean = statistics.mean([agb_w.agb_min, agb_w.agb_max])
 
                 bgb_w = ipcc.ForestManagementBGB.objects.get_first_above_threshold(region=region, land_use_type=module.land_use_type_start, threshold=mean, climate=climate, forest_type=forest.forest_type)
                 if not bgb_w:
@@ -803,19 +802,19 @@ class DeforestationCalculator(BaseCalculator):
                     litter_dw_wo = ipcc.LitterDeadwoodCarbonStock.objects.get(land_use_type=module.land_use_type_wo, climate=climate, forest_type=forest.forest_type)
                 except ipcc.LitterDeadwoodCarbonStock.DoesNotExist:
                     raise Exception(f"LitterDeadwoodCarbonStock for {module.land_use_type_wo.name} in {climate.name} climate, {forest.forest_type.name} forest type does not exist")
-                try:
-                    agb_wo = forest.get_agb_growth_ref(land_use_type=forest.land_use_type_wo, from_year=21)
-                except ipcc.ForestManagementAGB.DoesNotExist:
-                    if forest.agb_t2_wo is None:
-                        raise Exception(f"AGB for {forest.land_use_type_wo} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
+
+                agb_wo = forest.get_agb_growth_ref(land_use_type=forest.land_use_type_wo, from_year=21)
+                if agb_wo is None:
+                    agb_wo = ipcc.ForestManagementAGB()
 
                 if agb_wo.agb_min is None or agb_wo.agb_max is None:
                     if forest.agb_t2_wo is None:
-                        raise Exception(f"AGB for {forest.land_use_type_wo} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
+                        raise Exception(f"AGB for {forest.land_use_type_wo} in {climate} climate, {region} region, and {forest.forest_type} does not exist")
 
-                    mean = forest.agb_t2_wo
-                else:
-                    mean = statistics.mean([agb_wo.agb_min, agb_wo.agb_max])
+                    agb_wo.agb_min = forest.agb_t2_wo
+                    agb_wo.agb_max = forest.agb_t2_wo
+
+                mean = statistics.mean([agb_wo.agb_min, agb_wo.agb_max])
 
                 bgb_wo = ipcc.ForestManagementBGB.objects.get_first_above_threshold(region=region, land_use_type=module.land_use_type_w, threshold=mean, climate=climate, forest_type=forest.forest_type)
                 if not bgb_wo:
