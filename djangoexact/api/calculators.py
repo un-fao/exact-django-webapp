@@ -750,7 +750,7 @@ class DeforestationCalculator(BaseCalculator):
         # TODO: Review with new forest management data
         if forest.land_use_type_start.name != utils.MANGROVES:
             try:
-                agb_start = ipcc.ForestManagementAGB.objects.get(climate=climate, region=region, forest_type=forest.forest_type, land_use_type=forest.land_use_type_start, forest_condition_type=forest.forest_condition_type)
+                agb_start = forest.get_agb_growth_ref(land_use_type=forest.land_use_type_start, from_year=21)
             except ipcc.ForestManagementAGB.DoesNotExist:
                 if forest.agb_t2_start is None:
                     raise Exception(f"AGB for {forest.land_use_type_start} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
@@ -777,15 +777,15 @@ class DeforestationCalculator(BaseCalculator):
                 except ipcc.LitterDeadwoodCarbonStock.DoesNotExist:
                     raise Exception(f"LitterDeadwoodCarbonStock for {module.land_use_type_w} in {climate} climate, {forest.forest_type} forest type does not exist")
                 try:
-                    agb_w = ipcc.ForestManagementAGB.objects.get(climate=climate, region=region, forest_type=forest.forest_type, land_use_type=forest.land_use_type_w, forest_condition_type=forest.forest_condition_type)
+                    agb_w = forest.get_agb_growth_ref(land_use_type=forest.land_use_type_w, from_year=21)
                 except ipcc.ForestManagementAGB.DoesNotExist:
                     if forest.agb_t2_w is None:
                         raise Exception(f"AGB for {forest.land_use_type_w} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
-                
+
                 if agb_w.agb_min is None or agb_w.agb_max is None:
                     if forest.agb_t2_w is None:
                         raise Exception(f"AGB for {forest.land_use_type_w} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
-                    
+
                     mean = forest.agb_t2_w
                 else:
                     mean = statistics.mean([agb_w.agb_min, agb_w.agb_max])
@@ -804,7 +804,7 @@ class DeforestationCalculator(BaseCalculator):
                 except ipcc.LitterDeadwoodCarbonStock.DoesNotExist:
                     raise Exception(f"LitterDeadwoodCarbonStock for {module.land_use_type_wo.name} in {climate.name} climate, {forest.forest_type.name} forest type does not exist")
                 try:
-                    agb_wo = ipcc.ForestManagementAGB.objects.get(climate=climate, region=region, forest_type=forest.forest_type, land_use_type=forest.land_use_type_wo, forest_condition_type=forest.forest_condition_type)
+                    agb_wo = forest.get_agb_growth_ref(land_use_type=forest.land_use_type_wo, from_year=21)
                 except ipcc.ForestManagementAGB.DoesNotExist:
                     if forest.agb_t2_wo is None:
                         raise Exception(f"AGB for {forest.land_use_type_wo} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
@@ -812,7 +812,7 @@ class DeforestationCalculator(BaseCalculator):
                 if agb_wo.agb_min is None or agb_wo.agb_max is None:
                     if forest.agb_t2_wo is None:
                         raise Exception(f"AGB for {forest.land_use_type_wo} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
-                    
+
                     mean = forest.agb_t2_wo
                 else:
                     mean = statistics.mean([agb_wo.agb_min, agb_wo.agb_max])
@@ -2505,7 +2505,13 @@ class FloodedRiceCalculator(BaseCalculator):
         self.results_w += r_w
         self.results_wo += r_wo
 
-        for season in module.minor_seasons.all():
+        minor_seasons: list[MinorSeasonFloodedRice] = module.minor_seasons.all()
+
+        if any([not season.is_ready() for season in minor_seasons]):
+            raise Exception("At least one minor season is not ready")
+
+        for season in minor_seasons:
+            season: MinorSeasonFloodedRice
             r_w, r_wo = FloodedRiceSeasonCalculator(season).calculate()
             self.results_w += r_w
             self.results_wo += r_wo
