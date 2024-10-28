@@ -1520,9 +1520,7 @@ def generic_module_viewset(model: Module):
                     module_results = results_total if aggregate_by == BreakdownTypes.TOTAL else results_by_activity if aggregate_by == BreakdownTypes.ACTIVITY else results_by_gas if aggregate_by == BreakdownTypes.GAS else results_by_activity_gas
                     module.cache_results(results_total, results_by_activity, results_by_gas, results_by_activity_gas)
 
-                # serializer = DynamicResultSerializer(module_results, aggregate_by=aggregate_by)
-                # serialized_data = serializer.data
-                serializer = ModuleResultSerializer(module)
+                serializer = DynamicResultSerializer(module_results, aggregate_by=aggregate_by)
                 serialized_data = serializer.data
                 # serializer = ModuleResultSerializer(module)
                 # serialized_data = serializer.data
