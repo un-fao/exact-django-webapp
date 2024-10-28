@@ -109,7 +109,6 @@ from django.test import RequestFactory
 import asyncio
 from asgiref.sync import sync_to_async
 
-
 logger = logging.getLogger("console")
 
 activity_id = openapi.Parameter(
@@ -1014,19 +1013,21 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error("Selected user does not have permission to view activities in the project")
             return utils.ErrorResponse("Selected user does not have permission to view activities in the project", status=http_status.HTTP_403_FORBIDDEN)
 
-        list = Activity.objects.filter(project__id=project_id)
+        def process_activity(activity):
+            activity_dict = ActivitySerializer(activity).data
+            activity_dict["modules"] = get_modules(activity)
+            return activity_dict
+
+        _list = Activity.objects.filter(project__id=project_id)
 
         paginator = DefaultPagination()
-        page = paginator.paginate_queryset(list, request)
+        page = paginator.paginate_queryset(_list, request)
         if page is not None:
-            response = []
-            for activity in page:
-                activity_dict = ActivitySerializer(activity).data
-                activity_dict["modules"] = get_modules(activity)
-                response.append(activity_dict)
+            with ThreadPoolExecutor() as executor:
+                response = list(executor.map(process_activity, page))
             return paginator.get_paginated_response(response)
 
-        return Response(data=self.serializer_class(list, many=True).data, status=http_status.HTTP_200_OK)
+        return Response(data=self.serializer_class(_list, many=True).data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])
     def results(self, request, pk=None):
