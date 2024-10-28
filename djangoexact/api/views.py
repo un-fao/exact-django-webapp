@@ -1497,6 +1497,8 @@ def generic_module_viewset(model: Module):
 
                 serializer = DynamicResultSerializer(module_results, aggregate_by=aggregate_by)
                 serialized_data = serializer.data
+                # serializer = ModuleResultSerializer(module)
+                # serialized_data = serializer.data
 
                 return Response(serialized_data)
 
