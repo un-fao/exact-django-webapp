@@ -382,11 +382,11 @@ def update_activity_status_and_completion(activity):
 # NOTE: This could be done with signals, but I saw there are no signals as of now
 # so I kept this approach for consistency. Can be changed later if needed.
 def get_activity_default_status():
-    return api_models.StatusType.objects.get_or_create(name="EMPTY")[0]
+    return api_models.StatusType.objects.get_or_create(name_en="EMPTY")[0]
 
 
 def get_default_peat_type():
-    return api_models.PeatType.objects.get_or_create(name="Nutrient Poor")[0]
+    return api_models.PeatType.objects.get_or_create(name_en="Nutrient Poor")[0]
 
 
 def find_organic_soil_parent_module(organic_soil) -> tuple:
