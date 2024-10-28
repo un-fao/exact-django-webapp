@@ -1524,6 +1524,8 @@ def generic_module_viewset(model: Module):
                 # serialized_data = serializer.data
                 serializer = ModuleResultSerializer(module)
                 serialized_data = serializer.data
+                # serializer = ModuleResultSerializer(module)
+                # serialized_data = serializer.data
 
                 return Response(serialized_data)
 
