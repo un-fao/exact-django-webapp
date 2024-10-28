@@ -781,11 +781,11 @@ class DeforestationCalculator(BaseCalculator):
                 except ipcc.ForestManagementAGB.DoesNotExist:
                     if forest.agb_t2_w is None:
                         raise Exception(f"AGB for {forest.land_use_type_w} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
-                
+
                 if agb_w.agb_min is None or agb_w.agb_max is None:
                     if forest.agb_t2_w is None:
                         raise Exception(f"AGB for {forest.land_use_type_w} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
-                    
+
                     mean = forest.agb_t2_w
                 else:
                     mean = statistics.mean([agb_w.agb_min, agb_w.agb_max])
@@ -812,7 +812,7 @@ class DeforestationCalculator(BaseCalculator):
                 if agb_wo.agb_min is None or agb_wo.agb_max is None:
                     if forest.agb_t2_wo is None:
                         raise Exception(f"AGB for {forest.land_use_type_wo} in {climate} climate, {region} region, and {forest.forest_type} forest type does not exist")
-                    
+
                     mean = forest.agb_t2_wo
                 else:
                     mean = statistics.mean([agb_wo.agb_min, agb_wo.agb_max])
@@ -2505,7 +2505,13 @@ class FloodedRiceCalculator(BaseCalculator):
         self.results_w += r_w
         self.results_wo += r_wo
 
-        for season in module.minor_seasons.all():
+        minor_seasons: list[MinorSeasonFloodedRice] = module.minor_seasons.all()
+
+        if any([not season.is_ready() for season in minor_seasons]):
+            raise Exception("At least one minor season is not ready")
+
+        for season in minor_seasons:
+            season: MinorSeasonFloodedRice
             r_w, r_wo = FloodedRiceSeasonCalculator(season).calculate()
             self.results_w += r_w
             self.results_wo += r_wo
