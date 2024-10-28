@@ -1875,7 +1875,7 @@ class ForestManagement(LandModule, LitterDeadwoodBiomassModule):
             "from_year": from_year,
         }
 
-        ref: ipcc.ForestManagementAGB = utils.get_or_raise(ipcc.ForestManagementAGB, filters, error_msg, method="filter").first()
+        ref: ipcc.ForestManagementAGB = ipcc.ForestManagementAGB.objects.filter(**filters).first()
 
         return ref
 
