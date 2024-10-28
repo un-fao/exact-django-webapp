@@ -206,7 +206,7 @@ class BaseWiewSet(viewsets.GenericViewSet):
         # If list operation, filter out inactive objects, unless ?filter_inactive=true
         if self.action == "list" and not self.request.query_params.get("filter_inactive"):
             try:
-                # is_active_field = self.queryset.model._meta.get_field("is_active")
+                is_active_field = self.queryset.model._meta.get_field("is_active")
                 return self.queryset.filter(is_active=True)
             except FieldDoesNotExist:
                 return super().get_queryset()
