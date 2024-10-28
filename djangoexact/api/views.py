@@ -109,7 +109,6 @@ from django.test import RequestFactory
 import asyncio
 from asgiref.sync import sync_to_async
 
-
 logger = logging.getLogger("console")
 
 activity_id = openapi.Parameter(
@@ -207,7 +206,7 @@ class BaseWiewSet(viewsets.GenericViewSet):
         # If list operation, filter out inactive objects, unless ?filter_inactive=true
         if self.action == "list" and not self.request.query_params.get("filter_inactive"):
             try:
-                is_active_field = self.queryset.model._meta.get_field("is_active")
+                # is_active_field = self.queryset.model._meta.get_field("is_active")
                 return self.queryset.filter(is_active=True)
             except FieldDoesNotExist:
                 return super().get_queryset()
@@ -1014,19 +1013,21 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error("Selected user does not have permission to view activities in the project")
             return utils.ErrorResponse("Selected user does not have permission to view activities in the project", status=http_status.HTTP_403_FORBIDDEN)
 
-        list = Activity.objects.filter(project__id=project_id)
+        def process_activity(activity):
+            activity_dict = ActivitySerializer(activity).data
+            activity_dict["modules"] = get_modules(activity)
+            return activity_dict
+
+        _list = Activity.objects.filter(project__id=project_id)
 
         paginator = DefaultPagination()
-        page = paginator.paginate_queryset(list, request)
+        page = paginator.paginate_queryset(_list, request)
         if page is not None:
-            response = []
-            for activity in page:
-                activity_dict = ActivitySerializer(activity).data
-                activity_dict["modules"] = get_modules(activity)
-                response.append(activity_dict)
+            with ThreadPoolExecutor() as executor:
+                response = list(executor.map(process_activity, page))
             return paginator.get_paginated_response(response)
 
-        return Response(data=self.serializer_class(list, many=True).data, status=http_status.HTTP_200_OK)
+        return Response(data=self.serializer_class(_list, many=True).data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])
     def results(self, request, pk=None):
@@ -1520,9 +1521,7 @@ def generic_module_viewset(model: Module):
                     module_results = results_total if aggregate_by == BreakdownTypes.TOTAL else results_by_activity if aggregate_by == BreakdownTypes.ACTIVITY else results_by_gas if aggregate_by == BreakdownTypes.GAS else results_by_activity_gas
                     module.cache_results(results_total, results_by_activity, results_by_gas, results_by_activity_gas)
 
-                # serializer = DynamicResultSerializer(module_results, aggregate_by=aggregate_by)
-                # serialized_data = serializer.data
-                serializer = ModuleResultSerializer(module)
+                serializer = DynamicResultSerializer(module_results, aggregate_by=aggregate_by)
                 serialized_data = serializer.data
                 # serializer = ModuleResultSerializer(module)
                 # serialized_data = serializer.data
