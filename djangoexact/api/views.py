@@ -751,7 +751,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return Response({"message": f"Invitation for {user.email} already sent for group {invitation.group.name}"}, status=http_status.HTTP_200_OK)
 
         invitation = ProjectInvitation(project=project, user=user, group=group)
-        invitation.status = InvitationStatusType.objects.get(name=utils.InvitationStatus.PENDING.value)
+        invitation.status = InvitationStatusType.objects.get(name_en=utils.InvitationStatus.PENDING.value)
         invitation.save()
 
         invitation_link = reverse("project-invitations-accept", args=[invitation.token])
@@ -877,7 +877,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         # if invitation.token_expiry < timezone.now():
         #     return utils.ErrorResponse("Invitation link has expired", status=http_status.HTTP_400_BAD_REQUEST)
 
-        invitation.status = InvitationStatusType.objects.get(name=utils.InvitationStatus.ACCEPTED.value)
+        invitation.status = InvitationStatusType.objects.get(name_en=utils.InvitationStatus.ACCEPTED.value)
 
         ProjectMembership.objects.create(user=invitation.user, project=invitation.project, group=invitation.group)
 
@@ -935,7 +935,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
     @transaction.atomic
     def create(self, request, *args, **kwargs):
-        _status = StatusType.objects.get_or_create(name="EMPTY")[0]
+        _status = StatusType.objects.get_or_create(name_en="EMPTY")[0]
         request.data["status"] = _status.pk
         serializer = WriteActivitySerializer(data=request.data)
 
