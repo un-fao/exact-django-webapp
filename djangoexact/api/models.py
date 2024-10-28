@@ -802,7 +802,7 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            self.state = StatusType.objects.get_or_create(name="EMPTY")[0]
+            self.state = StatusType.objects.get_or_create(name_en="EMPTY")[0]
             if not self.change_rate:
                 self.change_rate = ChangeRate.objects.get_or_create(name="linear")[0]
         if self.pk:
@@ -982,7 +982,7 @@ class Submodule(Historical, CachedResultMixin):
             raise exceptions.ValidationError("Submodule must have a parent field specified in the model")
 
         if not self.status:
-            self.status = StatusType.objects.get_or_create(name="EMPTY")[0]
+            self.status = StatusType.objects.get_or_create(name_en="EMPTY")[0]
 
         if not self.pk:
             utils.create_comment_threads(self)
@@ -1070,7 +1070,7 @@ class Module(Historical, CachedResultMixin):
 
     def save(self, *args, **kwargs):
         if not self.status:
-            self.status = StatusType.objects.get_or_create(name="EMPTY")[0]
+            self.status = StatusType.objects.get(name_en="EMPTY")
 
         if not self.pk:
             utils.create_comment_threads(self)
