@@ -240,6 +240,10 @@ class PerennialCroplandDefaults(Defaults):
         )
 
 
+class MinorSeasonPerennialCroplandDefaults(PerennialCroplandDefaults):
+    pass
+
+
 class FloodedRiceDefaults(Defaults):
 
     def __init__(self, input: calcs.Module):
