@@ -672,11 +672,12 @@ class Project(Historical, DirtyFieldsMixin):
 class ProjectTag(models.Model):
     class Meta:
         verbose_name_plural = "Project Tags"
-        unique_together = ("name", "project")
+        unique_together = ("name", "slug", "user", "project")
 
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="tags")
-    name = models.CharField(max_length=255, unique=True)
-    slug = models.SlugField(max_length=255, unique=True)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="tags")
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255)
 
     def __str__(self):
         return self.name
