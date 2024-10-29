@@ -5,6 +5,9 @@ from ipcc.models import GlobalWarmingPotential
 from rest_framework import permissions, routers
 from rest_framework.documentation import include_docs_urls
 
+from rest_framework_nested import routers as nested_routers
+
+
 import api.models as models
 
 from . import views
@@ -24,6 +27,10 @@ schema_view = get_schema_view(
 router = routers.DefaultRouter()
 
 router.register(r"projects", views.ProjectViewSet)
+
+project_router = nested_routers.NestedSimpleRouter(router, r"projects", lookup="project")
+project_router.register(r"tags", views.ProjectTagViewSet, basename="project-tags")
+
 router.register(r"project-invitations", views.ProjectInvitationViewSet, basename="project-invitations")
 router.register(r"project-memberships", views.ProjectMembershipViewSet)
 router.register(r"groups", views.GroupViewSet)
@@ -164,3 +171,4 @@ urlpatterns = [
     re_path(r"^redoc/$", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
 ]
 urlpatterns += router.urls
+urlpatterns += project_router.urls
