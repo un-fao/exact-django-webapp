@@ -541,6 +541,7 @@ class Project(Historical, DirtyFieldsMixin):
     class Meta:
         verbose_name_plural = "Projects"
         unique_together = ("name", "owner")
+        ordering = ["-id"]  # Orders by created_at descending
 
     owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="projects", verbose_name=_("owner"))
     date = models.DateTimeField(null=True, blank=True, verbose_name=_("date"))
@@ -790,6 +791,7 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
 
     class Meta:
         unique_together = ("name", "project")
+        ordering = ["-created_at"]  # Orders by created_at descending
 
     def get_land_modules_area(self) -> float:
         for module in self.modules:
@@ -860,6 +862,7 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
 
         return percentage_complete
 
+    # TODO: Maybe persist on database and add a signal to update the status of the activity on module save
     def __get_status(self):
         are_modules_ready = all([module.is_ready() for module in self.modules])
         is_any_module_ready = any([module.is_ready() for module in self.modules])
@@ -1436,7 +1439,6 @@ class LandModule(Module):
 
 class LandSubmodule(Submodule):
     land_use_change = models.OneToOneField("api.LandUseChange", on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s")
-
     area = models.FloatField(null=True, blank=True)
 
     land_use_type_start = models.ForeignKey(LandUseType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_start")
