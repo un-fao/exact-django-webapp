@@ -541,6 +541,7 @@ class Project(Historical, DirtyFieldsMixin):
     class Meta:
         verbose_name_plural = "Projects"
         unique_together = ("name", "owner")
+        ordering = ["-id"]  # Orders by created_at descending
 
     owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="projects", verbose_name=_("owner"))
     date = models.DateTimeField(null=True, blank=True, verbose_name=_("date"))
@@ -790,6 +791,7 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
 
     class Meta:
         unique_together = ("name", "project")
+        ordering = ["-created_at"]  # Orders by created_at descending
 
     def get_land_modules_area(self) -> float:
         for module in self.modules:
