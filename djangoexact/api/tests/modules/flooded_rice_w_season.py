@@ -15,7 +15,7 @@ class FloodedRiceTest(t.ModuleTest):
         self.module_type = ModuleType.objects.get(class_name="FloodedRice")
         self.create_module()
 
-        self.minor_season = MinorSeasonFloodedRiceFactory.build(parent=self.module)
+        self.minor_season = MinorSeasonFloodedRiceFactory.create(parent=self.module)
 
     def test(self):
         self.calculate_results()
