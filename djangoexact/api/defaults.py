@@ -81,15 +81,18 @@ class GrasslandDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            soc_t2_start_default=defaults.soc.value,
-            soc_t2_w_default=defaults.soc.value,
-            soc_t2_wo_default=defaults.soc.value,
+            soc_t2_start_default=defaults.soc_start.value,
+            soc_t2_w_default=defaults.soc_w.value,
+            soc_t2_wo_default=defaults.soc_wo.value,
             biomass_t2_start_default=defaults.biomass.agb_t_c_ha,
             biomass_t2_w_default=defaults.biomass.agb_t_c_ha,
             biomass_t2_wo_default=defaults.biomass.agb_t_c_ha,
             combustion_factor_t2_start_default=defaults.cf.value,
             combustion_factor_t2_w_default=defaults.cf.value,
             combustion_factor_t2_wo_default=defaults.cf.value,
+            agb_t2_start_default=defaults.biomass.agb_t_c_ha,
+            agb_t2_w_default=defaults.biomass.agb_t_c_ha,
+            agb_t2_wo_default=defaults.biomass.agb_t_c_ha,
         )
 
 
