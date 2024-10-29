@@ -25,8 +25,14 @@ from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from simple_history.utils import update_change_reason
 from rest_framework.pagination import PageNumberPagination
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import generics
+import django_filters
+from rest_framework import filters
+from rest_framework.exceptions import PermissionDenied
 
-import api.filters as filters
+
+import api.filters as api_filters
 import api.labels as labels
 import api.utilities as utils
 from api.defaults import DefaultsFactory
@@ -56,6 +62,7 @@ from .models import (
     FieldDefinition,
     LandModule,
     CachedResultMixin,
+    ProjectTag,
 )
 from .serializers import (
     ActionTypes,
@@ -94,6 +101,7 @@ from .serializers import (
     ActivityResultSerializer,
     ProjectSummarySerializer,
     ActivitySummarySerializer,
+    ProjectTagSerializer,
 )
 
 from djangoexact.settings import auth
@@ -112,6 +120,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from django.test import RequestFactory
 import asyncio
 from asgiref.sync import sync_to_async
+from django.utils.text import slugify
+
 
 logger = logging.getLogger("console")
 
@@ -1640,7 +1650,7 @@ def generic_viewset(model: Model):
     class GenericViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         queryset = model.objects.all()
         serializer_class = get_model_serializer(model)
-        filterset_class = filters.get_model_filter(model)
+        filterset_class = api_filters.get_model_filter(model)
 
         def get_queryset(self):
             for field in model._meta.get_fields():
@@ -1706,3 +1716,84 @@ class FieldDefinitionViewSet(viewsets.ViewSet):
             }
 
         return field_metadata
+
+
+class ProjectTagViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    queryset = ProjectTag.objects.all()
+    serializer_class = ProjectTagSerializer
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["name"]
+    ordering_fields = ["name"]
+    ordering = ["name"]
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        project_id = self.kwargs.get("project_pk")
+        context["project"] = get_object_or_404(Project, pk=project_id)
+        return context
+
+    def get_queryset(self):
+        project_id = self.kwargs.get("project_pk")  # 'project_pk' comes from the nested router
+        search = self.request.query_params.get("search", None)
+
+        project = get_object_or_404(Project, pk=project_id)
+
+        if not utils.has_project_permission("view_project", self.request.user, project):
+            logging.error("Selected user does not have permission to view the project")
+            return utils.ErrorResponse("Selected user does not have permission to view the project", status=http_status.HTTP_403_FORBIDDEN)
+
+        filters = {"project": project}
+
+        if search:
+            filters["name__icontains"] = search
+
+        return ProjectTag.objects.filter(**filters)
+
+    def perform_create(self, serializer):
+        project_id = self.kwargs.get("project_pk")
+        project = get_object_or_404(Project, pk=project_id)
+
+        if not utils.has_project_permission("add_tag", self.request.user, serializer.validated_data["project"]):
+            logging.error("Selected user does not have permission to add tags to the project")
+            raise PermissionDenied("Selected user does not have permission to add tags to the project", status=http_status.HTTP_403_FORBIDDEN)
+
+        serializer.save(project=project)
+
+    # def create(self, request, *args, **kwargs):
+    #     serializer = TagSerializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+
+    #     if not utils.has_project_permission("add_tag", self.request.user, serializer.validated_data["project"]):
+    #         logging.error("Selected user does not have permission to add tags to the project")
+    #         return utils.ErrorResponse("Selected user does not have permission to add tags to the project", status=http_status.HTTP_403_FORBIDDEN)
+
+    #     if Tag.objects.filter(slug=slugify(serializer.validated_data["name"]), project=serializer.validated_data["project"]).exists():
+    #         return utils.ErrorResponse("Tag with the same name already exists in the project", status=http_status.HTTP_400_BAD_REQUEST)
+
+    #     serializer.save()
+
+    #     return Response(serializer.data, status=http_status.HTTP_201_CREATED)
+
+    # def list(self, request, *args, **kwargs):
+
+    #     project_id = self.request.query_params.get("project_id", None)
+    #     search = self.request.query_params.get("search", None)
+
+    #     if not project_id:
+    #         logging.error("Project id not provided")
+    #         return utils.ErrorResponse("Project id not provided", status=http_status.HTTP_400_BAD_REQUEST)
+
+    #     project = get_object_or_404(Project, pk=project_id)
+
+    #     if not utils.has_project_permission("view_tag", self.request.user, project):
+    #         logging.error("Selected user does not have permission to view tags in the project")
+    #         return utils.ErrorResponse("Selected user does not have permission to view tags in the project", status=http_status.HTTP_403_FORBIDDEN)
+
+    #     if search:
+    #         tags = Tag.objects.filter(project=project, name__icontains=search).all()
+    #     else:
+    #         tags = Tag.objects.filter(project=project).all()
+
+    #     serializer = TagSerializer(tags, many=True)
+
+    #     return Response(serializer.data, status=http_status.HTTP_200_OK)

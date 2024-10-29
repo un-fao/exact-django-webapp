@@ -18,6 +18,7 @@ from abc import ABC, abstractmethod
 import api.calculators as calcs
 import api.utilities as utils
 from api.models import CustomUser as User
+from django.utils.text import slugify
 
 from . import labels
 from .models import (
@@ -83,6 +84,7 @@ from .models import (
     ChangeRate,
     Note,
     FieldDefinition,
+    ProjectTag,
 )
 from datetime import timedelta
 
@@ -273,13 +275,28 @@ class CountrySerializer(serializers.ModelSerializer):
         ref_name = "Country"
 
 
+class ProjectTagSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ProjectTag
+        fields = ["id", "name"]
+        read_only_fields = ["slug"]
+
+    def validate_name(self, value):
+        project = self.context["project"]
+        if ProjectTag.objects.filter(project=project, slug=slugify(value)).exists():
+            raise serializers.ValidationError("Tag with this name already exists for this project.")
+        return value
+
+
 class ProjectSummarySerializer(serializers.ModelSerializer):
     role = serializers.SerializerMethodField(read_only=True)
     country = serializers.StringRelatedField(many=False, read_only=True, source="country.name")
+    tags = ProjectTagSerializer(many=True, read_only=True)
 
     class Meta:
         model = Project
-        fields = ["id", "name", "country", "updated_at", "role"]
+        fields = ["id", "name", "country", "updated_at", "role", "tags"]
 
     def get_role(self, obj):
         ctx = self.context.get("request", None)
@@ -415,7 +432,7 @@ class WriteProjectSerializer(serializers.ModelSerializer):
                         activity.save()
                 project.save()
 
-            has_more_than_thirty_minutes_passed = timezone.now() - project.lock_updated_at > timedelta(minutes=30)
+            has_more_than_thirty_minutes_passed = project.lock_updated_at is not None and timezone.now() - project.lock_updated_at > timedelta(minutes=30)
             if project.is_locked and project.lock_updated_at and has_more_than_thirty_minutes_passed:
                 project.unlock()
 
