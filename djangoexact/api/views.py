@@ -25,8 +25,14 @@ from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from simple_history.utils import update_change_reason
 from rest_framework.pagination import PageNumberPagination
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import generics
+import django_filters
+from rest_framework import filters
+from rest_framework.exceptions import PermissionDenied
 
-import api.filters as filters
+
+import api.filters as api_filters
 import api.labels as labels
 import api.utilities as utils
 from api.defaults import DefaultsFactory
@@ -56,6 +62,7 @@ from .models import (
     FieldDefinition,
     LandModule,
     CachedResultMixin,
+    ProjectTag,
 )
 from .serializers import (
     ActionTypes,
@@ -94,6 +101,7 @@ from .serializers import (
     ActivityResultSerializer,
     ProjectSummarySerializer,
     ActivitySummarySerializer,
+    ProjectTagSerializer,
 )
 
 from djangoexact.settings import auth
@@ -112,6 +120,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from django.test import RequestFactory
 import asyncio
 from asgiref.sync import sync_to_async
+from django.utils.text import slugify
+
 
 logger = logging.getLogger("console")
 
@@ -1623,7 +1633,7 @@ def generic_viewset(model: Model):
     class GenericViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         queryset = model.objects.all()
         serializer_class = get_model_serializer(model)
-        filterset_class = filters.get_model_filter(model)
+        filterset_class = api_filters.get_model_filter(model)
 
         def get_queryset(self):
             for field in model._meta.get_fields():
@@ -1689,3 +1699,57 @@ class FieldDefinitionViewSet(viewsets.ViewSet):
             }
 
         return field_metadata
+
+
+class ProjectTagViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+    queryset = ProjectTag.objects.all()
+    serializer_class = ProjectTagSerializer
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["name"]
+    ordering_fields = ["name"]
+    ordering = ["name"]
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        project_id = self.kwargs.get("project_pk")
+        context["project"] = get_object_or_404(Project, pk=project_id)
+        context["user"] = self.request.user
+        return context
+
+    @transaction.atomic
+    def create(self, request, *args, **kwargs):
+        project_id = self.kwargs.get("project_pk")
+        project = get_object_or_404(Project, pk=project_id)
+
+        if not utils.has_project_permission("view_project", self.request.user, project):
+            logging.error("Selected user does not have permission to view the project")
+            return utils.ErrorResponse("Selected user does not have permission to view the project", status=http_status.HTTP_403_FORBIDDEN)
+
+        serializer = ProjectTagSerializer(data=request.data, context={"project": project, "user": self.request.user})
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
+
+        serializer.save(project=project, user=self.request.user)
+
+        return Response(serializer.data, status=http_status.HTTP_201_CREATED)
+
+    def list(self, request, *args, **kwargs):
+        project_id = self.kwargs.get("project_pk")
+        search = self.request.query_params.get("search", None)
+
+        project = get_object_or_404(Project, pk=project_id)
+
+        if not utils.has_project_permission("view_project", self.request.user, project):
+            logging.error("Selected user does not have permission to view the project")
+            return utils.ErrorResponse("Selected user does not have permission to view the project", status=http_status.HTTP_403_FORBIDDEN)
+
+        filters = {"project": project, "user": self.request.user}
+
+        if search:
+            filters["name__icontains"] = search
+
+        queryset = ProjectTag.objects.filter(**filters)
+        serializer = ProjectTagSerializer(queryset, many=True)
+
+        return Response(serializer.data, status=http_status.HTTP_200_OK)
