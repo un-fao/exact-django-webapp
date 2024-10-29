@@ -337,6 +337,15 @@ class FloodedRiceDefaults(Defaults):
         )
 
 
+class MinorSeasonFloodedRiceDefaults(FloodedRiceDefaults):
+
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+    def get_defaults(self, calculate=False) -> dict:
+        return super().get_defaults(calculate)
+
+
 class LivestockDefaults(Defaults):
 
     def __init__(self, input: calcs.Module):
