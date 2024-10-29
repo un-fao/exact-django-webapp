@@ -275,10 +275,11 @@ class CountrySerializer(serializers.ModelSerializer):
 
 class ProjectSummarySerializer(serializers.ModelSerializer):
     role = serializers.SerializerMethodField(read_only=True)
+    country = serializers.StringRelatedField(many=False, read_only=True, source="country.name")
 
     class Meta:
         model = Project
-        fields = ["id", "name", "country", "created_at", "owner", "role"]
+        fields = ["id", "name", "country", "updated_at", "role"]
 
     def get_role(self, obj):
         ctx = self.context.get("request", None)
@@ -452,18 +453,9 @@ class WriteProjectSerializer(serializers.ModelSerializer):
 
 
 class ActivitySummarySerializer(serializers.ModelSerializer):
-    module_types = serializers.SerializerMethodField(read_only=True)
-    status = serializers.SerializerMethodField(read_only=True)
-
-    def get_module_types(self, obj: Activity):
-        return [{"id": module.pk, "name": module.name} for module in obj.module_types.all()]
-
-    def get_status(self, obj: Activity):
-        return {"id": obj.status.id, "name": obj.status.name}
-
     class Meta:
         model = Activity
-        fields = ["id", "name", "module_types", "status", "completion_percentage"]
+        fields = ["id", "name", "module_types", "completion_percentage"]
         ref_name = "Activity"
 
 
@@ -936,7 +928,7 @@ class ModuleResultSerializer(serializers.Serializer):
 
 
 class BaseGenericModuleSerializer(serializers.ModelSerializer):
-    activity = ActivitySerializer(many=False, read_only=True)
+    # activity = ActivitySerializer(many=False, read_only=True)
     module_type = serializers.SerializerMethodField()
     status = get_model_serializer(StatusType)(read_only=True)
     note = serializers.SerializerMethodField()
@@ -1170,7 +1162,7 @@ class ScenarioSubmoduleSerializer(BaseSubmoduleSerializer, ScenarioBaseSerialize
 
 
 class LandModuleSeralizer(ScenarioModuleSerializer):
-    activity = ActivitySerializer(many=False, read_only=True)
+    # activity = ActivitySerializer(many=False, read_only=True)
     land_use_change = get_model_serializer(LandUseChange)(many=False, read_only=True, required=False)
     status = get_model_serializer(StatusType)(many=False, read_only=True)
 
