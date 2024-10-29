@@ -862,6 +862,7 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
 
         return percentage_complete
 
+    # TODO: Maybe persist on database and add a signal to update the status of the activity on module save
     def __get_status(self):
         are_modules_ready = all([module.is_ready() for module in self.modules])
         is_any_module_ready = any([module.is_ready() for module in self.modules])
@@ -1438,7 +1439,6 @@ class LandModule(Module):
 
 class LandSubmodule(Submodule):
     land_use_change = models.OneToOneField("api.LandUseChange", on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s")
-
     area = models.FloatField(null=True, blank=True)
 
     land_use_type_start = models.ForeignKey(LandUseType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_land_use_type_start")
