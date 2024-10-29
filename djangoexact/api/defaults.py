@@ -135,9 +135,9 @@ class AnnualCroplandDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            soc_t2_start_default=defaults.soc.value,
-            soc_t2_w_default=defaults.soc.value,
-            soc_t2_wo_default=defaults.soc.value,
+            soc_t2_start_default=defaults.soc_start.value,
+            soc_t2_w_default=defaults.soc_w.value,
+            soc_t2_wo_default=defaults.soc_wo.value,
             fi_t2_start_default=defaults.fi_start.value,
             fi_t2_w_default=defaults.fi_w.value,
             fi_t2_wo_default=defaults.fi_wo.value,
@@ -1185,6 +1185,9 @@ class ForestManagementDefaults(Defaults):
         super().__init__(input)
 
         self.values = SimpleNamespace(
+            soc_t2_start_default=0,
+            soc_t2_w_default=0,
+            soc_t2_wo_default=0,
             flu_t2_start_default=0,
             flu_t2_w_default=0,
             flu_t2_wo_default=0,
@@ -1200,12 +1203,18 @@ class ForestManagementDefaults(Defaults):
             deadwood_t2_start_default=0,
             deadwood_t2_w_default=0,
             deadwood_t2_wo_default=0,
+            agb_t2_start_default=0,
+            agb_t2_w_default=0,
+            agb_t2_wo_default=0,
             agb_growth_rate_le_20_yrs_t2_start_default=0,
             agb_growth_rate_le_20_yrs_t2_w_default=0,
             agb_growth_rate_le_20_yrs_t2_wo_default=0,
             agb_growth_rate_gt_20_yrs_t2_start_default=0,
             agb_growth_rate_gt_20_yrs_t2_w_default=0,
             agb_growth_rate_gt_20_yrs_t2_wo_default=0,
+            bgb_t2_start_default=0,
+            bgb_t2_w_default=0,
+            bgb_t2_wo_default=0,
             bgb_growth_rate_le_20_yrs_t2_start_default=0,
             bgb_growth_rate_le_20_yrs_t2_w_default=0,
             bgb_growth_rate_le_20_yrs_t2_wo_default=0,
@@ -1233,6 +1242,9 @@ class ForestManagementDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
+            soc_t2_start_default=defaults.soc_start.value,
+            soc_t2_w_default=defaults.soc_w.value,
+            soc_t2_wo_default=defaults.soc_wo.value,
             flu_t2_start_default=defaults.flu_start.value,
             flu_t2_w_default=defaults.flu_w.value,
             flu_t2_wo_default=defaults.flu_wo.value,
