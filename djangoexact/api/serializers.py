@@ -280,12 +280,16 @@ class ProjectTagSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectTag
         fields = ["id", "name"]
-        read_only_fields = ["slug"]
 
     def validate_name(self, value):
         project = self.context["project"]
-        if ProjectTag.objects.filter(project=project, slug=slugify(value)).exists():
+        user = self.context["user"]
+        if not ProjectMembership.objects.filter(project=project, user=user).exists():
+            raise serializers.ValidationError("User does not have permission to add tags to this project.")
+
+        if ProjectTag.objects.filter(project=project, user=user, slug=slugify(value)).exists():
             raise serializers.ValidationError("Tag with this name already exists for this project.")
+
         return value
 
 

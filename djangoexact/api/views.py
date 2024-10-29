@@ -1713,10 +1713,29 @@ class ProjectTagViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         context = super().get_serializer_context()
         project_id = self.kwargs.get("project_pk")
         context["project"] = get_object_or_404(Project, pk=project_id)
+        context["user"] = self.request.user
         return context
 
-    def get_queryset(self):
-        project_id = self.kwargs.get("project_pk")  # 'project_pk' comes from the nested router
+    @transaction.atomic
+    def create(self, request, *args, **kwargs):
+        project_id = self.kwargs.get("project_pk")
+        project = get_object_or_404(Project, pk=project_id)
+
+        if not utils.has_project_permission("view_project", self.request.user, project):
+            logging.error("Selected user does not have permission to view the project")
+            return utils.ErrorResponse("Selected user does not have permission to view the project", status=http_status.HTTP_403_FORBIDDEN)
+
+        serializer = ProjectTagSerializer(data=request.data, context={"project": project, "user": self.request.user})
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
+
+        serializer.save(project=project, user=self.request.user)
+
+        return Response(serializer.data, status=http_status.HTTP_201_CREATED)
+
+    def list(self, request, *args, **kwargs):
+        project_id = self.kwargs.get("project_pk")
         search = self.request.query_params.get("search", None)
 
         project = get_object_or_404(Project, pk=project_id)
@@ -1725,19 +1744,12 @@ class ProjectTagViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error("Selected user does not have permission to view the project")
             return utils.ErrorResponse("Selected user does not have permission to view the project", status=http_status.HTTP_403_FORBIDDEN)
 
-        filters = {"project": project}
+        filters = {"project": project, "user": self.request.user}
 
         if search:
             filters["name__icontains"] = search
 
-        return ProjectTag.objects.filter(**filters)
+        queryset = ProjectTag.objects.filter(**filters)
+        serializer = ProjectTagSerializer(queryset, many=True)
 
-    def perform_create(self, serializer):
-        project_id = self.kwargs.get("project_pk")
-        project = get_object_or_404(Project, pk=project_id)
-
-        if not utils.has_project_permission("add_tag", self.request.user, project):
-            logging.error("Selected user does not have permission to add tags to the project")
-            raise PermissionDenied("Selected user does not have permission to add tags to the project", status=http_status.HTTP_403_FORBIDDEN)
-
-        serializer.save(project=project)
+        return Response(serializer.data, status=http_status.HTTP_200_OK)
