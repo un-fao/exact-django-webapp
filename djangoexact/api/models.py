@@ -19,6 +19,7 @@ from django.conf import settings
 from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
 from picklefield.fields import PickledObjectField
 from dirtyfields import DirtyFieldsMixin
+from django.utils.text import slugify
 
 
 alphanumeric = validators.RegexValidator(r"^[0-9a-zA-Z]*$", "Only alphanumeric characters are allowed.")
@@ -666,6 +667,24 @@ class Project(Historical, DirtyFieldsMixin):
             self.gw_potential.ch4_fossil = self.gwp_ch4_fossil_t2
 
         return self.gw_potential
+
+
+class ProjectTag(models.Model):
+    class Meta:
+        verbose_name_plural = "Project Tags"
+        unique_together = ("name", "slug", "user", "project")
+
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="tags")
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="tags")
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        return super().save(*args, **kwargs)
 
 
 class ProjectInvitation(Historical):
