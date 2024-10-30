@@ -127,6 +127,10 @@ if os.getenv("GAE_APPLICATION", None):
             "TEST": {
                 "NAME": "$DB_NAME",
             },
+            "OPTIONS": {
+                "connect_timeout": 30,  # Optional: set timeout
+            },
+            "CONN_MAX_AGE": 600,  # Enables persistent connections
         }
     }
 else:
@@ -138,6 +142,10 @@ else:
             "PASSWORD": os.getenv("DB_PASSWORD", default="$DB_PASSWORD"),
             "NAME": os.getenv("DB_NAME", default="$DB_NAME"),
             "PORT": os.getenv("DB_PORT", default="$DB_PORT"),
+            "OPTIONS": {
+                "connect_timeout": 30,  # Optional: set timeout
+            },
+            "CONN_MAX_AGE": 600,  # Enables persistent connections
         }
     }
 
