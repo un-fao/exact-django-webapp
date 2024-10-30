@@ -1183,7 +1183,7 @@ class CommentThreadViewSet(viewsets.ModelViewSet):
         """
 
         thread = get_object_or_404(CommentThread, pk=pk)
-        comments = thread.comments.all()
+        comments = thread.comments.filter(parent=None).all()
 
         return Response(data=CommentSerializer(comments, many=True).data, status=http_status.HTTP_200_OK)
 
@@ -1263,15 +1263,6 @@ class CommentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    def get_queryset(self):
-        queryset = Comment.objects.all()
-        parent = self.request.query_params.get("parent", None)
-        if parent is not None:
-            queryset = queryset.filter(parent=parent)
-        else:
-            queryset = queryset.filter(parent__isnull=True)
-        return queryset
-
     @action(detail=True, methods=["get"])
     def replies(self, request, thread_id=None, pk=None):
         """
@@ -1282,6 +1273,21 @@ class CommentViewSet(viewsets.ModelViewSet):
         replies = comment.replies.all()
 
         return Response(data=CommentSerializer(replies, many=True).data, status=http_status.HTTP_200_OK)
+
+    def list(self, request):
+        """
+        Get all comments.
+        """
+        thread_id = self.request.query_params.get("thread", None)
+
+        if thread_id is None:
+            return utils.ErrorResponse("Thread id not provided", status=http_status.HTTP_400_BAD_REQUEST)
+
+        comments = Comment.objects.filter(thread__id=thread_id, parent=None).all()
+        serializer = CommentSerializer(comments, many=True)
+        return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+
+        return super().list(request)
 
 
 class ModuleTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
