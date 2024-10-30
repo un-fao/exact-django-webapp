@@ -461,7 +461,11 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         Calculates and returns total emissions for each module in the project.
         """
 
-        project = Project.objects.prefetch_related("activities").get(pk=pk)
+        try:
+            project = Project.objects.prefetch_related("activities").get(pk=pk)
+        except Project.DoesNotExist:
+            logging.error("Project not found")
+            return utils.ErrorResponse("Project not found", status=http_status.HTTP_404_NOT_FOUND)
 
         if not utils.has_project_permission("view_project", self.request.user, project):
             logging.error("Selected user does not have permission to view the project")
