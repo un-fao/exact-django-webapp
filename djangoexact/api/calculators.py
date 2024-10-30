@@ -755,7 +755,7 @@ class DeforestationCalculator(BaseCalculator):
 
             if agb_start.agb_min is None or agb_start.agb_max is None:
                 if forest.agb_t2_start is None:
-                    raise Exception(f"AGB for {forest.land_use_type_start} in {climate} climate, {region} region, and {forest.forest_type} does not exist")
+                    raise Exception(f"AGB for {forest.land_use_type_start} in {climate} climate, {region} region, and {forest.forest_type} does not exist. Please insert T2 values for the start module")
 
                 agb_start.agb_min = forest.agb_t2_start
                 agb_start.agb_max = forest.agb_t2_start
