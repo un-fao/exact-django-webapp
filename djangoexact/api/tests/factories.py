@@ -301,6 +301,8 @@ class ForestManagementFactory(DjangoModelFactory):
 
     # On init, choose land_use_type based on activity.project.climate
 
+    status = READY
+
     land_use_type_start = factory.fuzzy.FuzzyChoice(forests)
     land_use_type_w = land_use_type_start
     land_use_type_wo = land_use_type_start

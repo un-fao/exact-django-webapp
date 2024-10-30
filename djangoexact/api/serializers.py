@@ -2400,22 +2400,26 @@ class ForestManagementWriteSerializer(LandModuleSeralizer):
         instance: ForestManagement = self.instance
 
         data = self.merge_instance_data(data, instance=instance)
+        disturbances = self.instance.disturbances.all().count() if self.instance else 0
+        scenarios = [utils.ScenarioTypes.START.value, utils.ScenarioTypes.WITH.value, utils.ScenarioTypes.WITHOUT.value]
 
-        # Logging mandatory fields
-        loggings = get_filled_scenarios(data, ["logging_recurrence_yrs"])
-        rotations = get_filled_scenarios(data, ["rotation_length_yrs"])
-        disturbances = self.instance.disturbances.all().count() if self.instance else None
+        def has_data_for(scenario, *keys):
+            return any(data.get(f"{key}_{scenario}") for key in keys)
 
-        if rotations and (loggings or disturbances):
-            errors += ["Forest rotation cannot be used with logging or other disturbances at the same time"]
+        for scenario in scenarios:
+            verbose_scenario_name = utils.ScenarioTypes(scenario).verbose_name
 
-        if loggings and disturbances:
-            errors += ["Cannot have logging and other disturbances at the same time"]
+            if has_data_for(scenario, "rotation_length_yrs") and (has_data_for(scenario, "logging_recurrence_yrs", "average_yearly_degradation_percentage") or disturbances):
+                errors.append(f"If a forest has rotation it cannot have logging, degradation, or disturbances in the {verbose_scenario_name} scenario")
 
-        if not loggings and not rotations:
-            degradations = get_filled_scenarios(data, ["average_yearly_degradation_percentage"])
-            if not degradations:
-                errors += ["With no logging, rotation or disturbances, average yearly degradation percentage is required"]
+            if has_data_for(scenario, "logging_recurrence_yrs") and has_data_for(scenario, "rotation_length_yrs", "average_yearly_degradation_percentage"):
+                errors.append(f"If a forest has logging it cannot have rotation or degradation in the {verbose_scenario_name} scenario")
+
+            if disturbances and has_data_for(scenario, "rotation_length_yrs", "degredation_dry_matter_impacted_t2"):
+                errors.append(f"If a forest has disturbances it cannot have rotation or degradation in the {verbose_scenario_name} scenario")
+
+            if has_data_for(scenario, "average_yearly_degradation_percentage") and (has_data_for(scenario, "rotation_length_yrs", "logging_recurrence_yrs") or disturbances):
+                errors.append(f"If a forest has degradation it cannot have rotation, logging, or disturbances in the {verbose_scenario_name} scenario")
 
         if instance and instance.disturbances.count() > 0:
             pc_biomass_destruction_start = data.get("logging_percentage_agb_logged_start", 0)
