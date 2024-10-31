@@ -703,9 +703,9 @@ class SettlementDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            soc_t2_start_default=defaults.soc.value,
-            soc_t2_w_default=defaults.soc.value,
-            soc_t2_wo_default=defaults.soc.value,
+            soc_t2_start_default=defaults.soc_start.value,
+            soc_t2_w_default=defaults.soc_w.value,
+            soc_t2_wo_default=defaults.soc_wo.value,
             flu_t2_start_default=defaults.flu_start.value,
             flu_t2_w_default=defaults.flu_w.value,
             flu_t2_wo_default=defaults.flu_wo.value,
