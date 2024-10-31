@@ -210,9 +210,9 @@ class PerennialCroplandDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            soc_t2_start_default=defaults.soc.value,
-            soc_t2_w_default=defaults.soc.value,
-            soc_t2_wo_default=defaults.soc.value,
+            soc_t2_start_default=defaults.soc_start.value,
+            soc_t2_w_default=defaults.soc_w.value,
+            soc_t2_wo_default=defaults.soc_wo.value,
             agb_t2_start_default=defaults.agb_start_default.value,
             agb_t2_w_default=defaults.agb_w_default.value,
             agb_t2_wo_default=defaults.ag_default_wo.value,
