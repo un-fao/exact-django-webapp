@@ -273,6 +273,30 @@ class CountrySerializer(serializers.ModelSerializer):
         ref_name = "Country"
 
 
+class ProjectSummarySerializer(serializers.ModelSerializer):
+    role = serializers.SerializerMethodField(read_only=True)
+    country = serializers.StringRelatedField(many=False, read_only=True, source="country.name")
+
+    class Meta:
+        model = Project
+        fields = ["id", "name", "country", "updated_at", "role"]
+
+    def get_role(self, obj):
+        ctx = self.context.get("request", None)
+
+        if not ctx:
+            return []
+
+        user = ctx.user
+        user_project_group = ProjectMembership.objects.filter(user=user, project=obj).all()
+
+        return [group.group.name for group in user_project_group] if user_project_group else []
+
+
+class ProjectResultSerializer(serializers.Serializer):
+    pass
+
+
 class ReadProjectSerializer(serializers.ModelSerializer):
     climate = get_model_serializer(Climate)(many=False, read_only=True)
     country = CountrySerializer(many=False, read_only=True)
@@ -428,10 +452,15 @@ class WriteProjectSerializer(serializers.ModelSerializer):
         return super().is_valid(raise_exception=raise_exception)
 
 
-class ProjectResultSerializer(serializers.Serializer):
-    # TODO: This can probably be removed and the fields moved to ProjectSerializer as read_only
-    activities = serializers.SerializerMethodField()
-    results = ResultSerializer(many=False)
+class ActivitySummarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Activity
+        fields = ["id", "name", "module_types", "completion_percentage"]
+        ref_name = "Activity"
+
+
+class ActivityResultSerializer(serializers.Serializer):
+    pass
 
 
 class ActivitySerializer(serializers.ModelSerializer):
@@ -899,7 +928,7 @@ class ModuleResultSerializer(serializers.Serializer):
 
 
 class BaseGenericModuleSerializer(serializers.ModelSerializer):
-    activity = ActivitySerializer(many=False, read_only=True)
+    # activity = ActivitySerializer(many=False, read_only=True)
     module_type = serializers.SerializerMethodField()
     status = get_model_serializer(StatusType)(read_only=True)
     note = serializers.SerializerMethodField()
@@ -1133,7 +1162,7 @@ class ScenarioSubmoduleSerializer(BaseSubmoduleSerializer, ScenarioBaseSerialize
 
 
 class LandModuleSeralizer(ScenarioModuleSerializer):
-    activity = ActivitySerializer(many=False, read_only=True)
+    # activity = ActivitySerializer(many=False, read_only=True)
     land_use_change = get_model_serializer(LandUseChange)(many=False, read_only=True, required=False)
     status = get_model_serializer(StatusType)(many=False, read_only=True)
 
@@ -1217,8 +1246,12 @@ class GrasslandWriteSerializer(LandModuleSeralizer):
         }
 
 
-class GrasslandReadSerializer(GrasslandWriteSerializer):
-    pass
+class GrasslandReadSerializer(BaseGenericModuleSerializer):
+    class Meta:
+        model = Grassland
+        fields = "__all__"
+        ref_name = "Grassland"
+        mandatory_fields = GrasslandWriteSerializer.Meta.mandatory_fields
 
 
 # Annual Cropping
@@ -1258,8 +1291,11 @@ class MinorSeasonAnnualCroplandWriteSerializer(ScenarioSubmoduleSerializer):
         }
 
 
-class MinorSeasonAnnualCroplandReadSerializer(MinorSeasonAnnualCroplandWriteSerializer):
-    pass
+class MinorSeasonAnnualCroplandReadSerializer(BaseGenericModuleSerializer):
+    class Meta:
+        model = MinorSeasonAnnualCropland
+        fields = "__all__"
+        ref_name = "MinorSeasonAnnualCropland"
 
 
 class AnnualCroplandSerializer(LandModuleSeralizer):
@@ -1309,8 +1345,12 @@ class AnnualCroplandWriteSerializer(AnnualCroplandSerializer):
     pass
 
 
-class AnnualCroplandReadSerializer(AnnualCroplandSerializer):
-    pass
+class AnnualCroplandReadSerializer(BaseGenericModuleSerializer):
+    class Meta:
+        model = AnnualCropland
+        fields = "__all__"
+        ref_name = "AnnualCropland"
+        mandatory_fields = AnnualCroplandSerializer.Meta.mandatory_fields
 
 
 # Perennial Cropping
@@ -1344,8 +1384,12 @@ class MinorSeasonPerennialCroplandWriteSerializer(ScenarioSubmoduleSerializer):
         }
 
 
-class MinorSeasonPerennialCroplandReadSerializer(MinorSeasonPerennialCroplandWriteSerializer):
-    pass
+class MinorSeasonPerennialCroplandReadSerializer(BaseGenericModuleSerializer):
+    class Meta:
+        model = MinorSeasonPerennialCropland
+        fields = "__all__"
+        ref_name = "MinorSeasonPerennialCropland"
+        mandatory_fields = MinorSeasonPerennialCroplandWriteSerializer.Meta.mandatory_fields
 
 
 class PerennialCroplandWriteSerializer(LandModuleSeralizer):
@@ -1378,9 +1422,14 @@ class PerennialCroplandWriteSerializer(LandModuleSeralizer):
         }
 
 
-class PerennialCroplandReadSerializer(PerennialCroplandWriteSerializer):
+class PerennialCroplandReadSerializer(BaseGenericModuleSerializer):
     minor_seasons = MinorSeasonPerennialCroplandReadSerializer(many=True, read_only=True)
-    pass
+
+    class Meta:
+        model = PerennialCropland
+        fields = "__all__"
+        ref_name = "PerennialCropland"
+        mandatory_fields = PerennialCroplandWriteSerializer.Meta.mandatory_fields
 
 
 # Land Use Change
@@ -1556,8 +1605,12 @@ class MinorSeasonFloodedRiceWriteSerializer(ScenarioSubmoduleSerializer):
         }
 
 
-class MinorSeasonFloodedRiceReadSerializer(MinorSeasonFloodedRiceWriteSerializer):
-    pass
+class MinorSeasonFloodedRiceReadSerializer(BaseGenericModuleSerializer):
+    class Meta:
+        model = MinorSeasonFloodedRice
+        fields = "__all__"
+        ref_name = "MinorSeasonFloodedRice"
+        mandatory_fields = MinorSeasonFloodedRiceWriteSerializer.Meta.mandatory_fields
 
 
 class FloodedRiceWriteSerializer(LandModuleSeralizer):
@@ -1608,9 +1661,14 @@ class FloodedRiceWriteSerializer(LandModuleSeralizer):
         return super().validate(data)
 
 
-class FloodedRiceReadSerializer(FloodedRiceWriteSerializer):
+class FloodedRiceReadSerializer(BaseGenericModuleSerializer):
     minor_seasons = MinorSeasonFloodedRiceReadSerializer(many=True, read_only=True)
-    pass
+
+    class Meta:
+        model = FloodedRice
+        fields = "__all__"
+        ref_name = "FloodedRice"
+        mandatory_fields = FloodedRiceWriteSerializer.Meta.mandatory_fields
 
 
 # Building
@@ -1646,8 +1704,12 @@ class BuildingWriteSerializer(BuildingSerializer):
     pass
 
 
-class BuildingReadSerializer(BuildingSerializer):
-    pass
+class BuildingReadSerializer(BaseGenericModuleSerializer):
+    class Meta:
+        model = Building
+        fields = "__all__"
+        ref_name = "Building"
+        mandatory_fields = {}
 
 
 # Road
@@ -1686,8 +1748,13 @@ class RoadWriteSerializer(RoadSerializer):
     pass
 
 
-class RoadReadSerializer(RoadSerializer):
-    pass
+class RoadReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = Road
+        fields = "__all__"
+        ref_name = "Road"
+        mandatory_fields = {}
 
 
 # Other
@@ -1715,8 +1782,13 @@ class OtherInfrastructureWriteSerializer(OtherInfrastructureSerializer):
     pass
 
 
-class OtherInfrastructureReadSerializer(OtherInfrastructureSerializer):
-    pass
+class OtherInfrastructureReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = OtherInfrastructure
+        fields = "__all__"
+        ref_name = "OtherInfrastructure"
+        mandatory_fields = {}
 
 
 class IrrigationWriteSerializer(ScenarioModuleSerializer):
@@ -1727,7 +1799,7 @@ class IrrigationWriteSerializer(ScenarioModuleSerializer):
         mandatory_fields = {}
 
 
-class IrrigationReadSerializer(ScenarioModuleSerializer):
+class IrrigationReadSerializer(BaseGenericModuleSerializer):
     class Meta:
         model = Irrigation
         fields = "__all__"
@@ -1788,8 +1860,13 @@ class IrrigationSystemWriteSerializer(ScenarioSubmoduleSerializer):
         return data
 
 
-class IrrigationSystemReadSerializer(IrrigationSystemWriteSerializer):
-    pass
+class IrrigationSystemReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = IrrigationSystem
+        fields = "__all__"
+        ref_name = "IrrigationSystem"
+        mandatory_fields = {}
 
 
 # IrrigationPhase
@@ -1838,8 +1915,13 @@ class IrrigationPhaseWriteSerializer(ScenarioSubmoduleSerializer):
         return data
 
 
-class IrrigationPhaseReadSerializer(IrrigationPhaseWriteSerializer):
-    pass
+class IrrigationPhaseReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = IrrigationPhase
+        fields = "__all__"
+        ref_name = "IrrigationPhase"
+        mandatory_fields = {}
 
 
 class EnergySerializer(ScenarioModuleSerializer):
@@ -1877,8 +1959,13 @@ class EnergyWriteSerializer(EnergySerializer):
     pass
 
 
-class EnergyReadSerializer(EnergySerializer):
-    pass
+class EnergyReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = Energy
+        fields = "__all__"
+        ref_name = "Energy"
+        mandatory_fields = {}
 
 
 # Fuel
@@ -1926,8 +2013,13 @@ class FuelWriteSerializer(FuelSerializer):
     pass
 
 
-class FuelReadSerializer(FuelSerializer):
-    pass
+class FuelReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = Fuel
+        fields = "__all__"
+        ref_name = "Fuel"
+        mandatory_fields = {}
 
 
 class ElectricityWriteSerializer(NoScenarioSubmoduleSerializer):
@@ -1968,8 +2060,13 @@ class ElectricityWriteSerializer(NoScenarioSubmoduleSerializer):
         return data
 
 
-class ElectricityReadSerializer(ElectricityWriteSerializer):
-    pass
+class ElectricityReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = Electricity
+        fields = "__all__"
+        ref_name = "Electricity"
+        mandatory_fields = {}
 
 
 # Livestock
@@ -2014,8 +2111,13 @@ class LivestockWriteSerializer(LandModuleSeralizer):
         }
 
 
-class LivestockReadSerializer(LivestockWriteSerializer):
-    pass
+class LivestockReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = Livestock
+        fields = "__all__"
+        ref_name = "Livestock"
+        mandatory_fields = LivestockWriteSerializer.Meta.mandatory_fields
 
 
 # Aquaculture
@@ -2048,8 +2150,13 @@ class AquacultureWriteSerializer(LandModuleSeralizer):
         return super().validate(data)
 
 
-class AquacultureReadSerializer(AquacultureWriteSerializer):
-    pass
+class AquacultureReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = Aquaculture
+        fields = "__all__"
+        ref_name = "Aquaculture"
+        mandatory_fields = AquacultureWriteSerializer.Meta.mandatory_fields
 
 
 # SmllFishery
@@ -2094,8 +2201,13 @@ class SmallFisheryWriteSerializer(LandModuleSeralizer):
         }
 
 
-class SmallFisheryReadSerializer(SmallFisheryWriteSerializer):
-    pass
+class SmallFisheryReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = SmallFishery
+        fields = "__all__"
+        ref_name = "SmallFishery"
+        mandatory_fields = SmallFisheryWriteSerializer.Meta.mandatory_fields
 
 
 # LargeFishery
@@ -2140,8 +2252,13 @@ class LargeFisheryWriteSerializer(LandModuleSeralizer):
         }
 
 
-class LargeFisheryReadSerializer(LargeFisheryWriteSerializer):
-    pass
+class LargeFisheryReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = LargeFishery
+        fields = "__all__"
+        ref_name = "LargeFishery"
+        mandatory_fields = LargeFisheryWriteSerializer.Meta.mandatory_fields
 
 
 # Waterbody
@@ -2181,8 +2298,13 @@ class WaterbodyWriteSerializer(WaterbodySerializer):
     pass
 
 
-class WaterbodyReadSerializer(WaterbodySerializer):
-    pass
+class WaterbodyReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = Waterbody
+        fields = "__all__"
+        ref_name = "Waterbody"
+        mandatory_fields = WaterbodyWriteSerializer.Meta.mandatory_fields
 
 
 class ProjectNameIdSerializer(serializers.ModelSerializer):
@@ -2278,22 +2400,26 @@ class ForestManagementWriteSerializer(LandModuleSeralizer):
         instance: ForestManagement = self.instance
 
         data = self.merge_instance_data(data, instance=instance)
+        disturbances = self.instance.disturbances.all().count() if self.instance else 0
+        scenarios = [utils.ScenarioTypes.START.value, utils.ScenarioTypes.WITH.value, utils.ScenarioTypes.WITHOUT.value]
 
-        # Logging mandatory fields
-        loggings = get_filled_scenarios(data, ["logging_recurrence_yrs"])
-        rotations = get_filled_scenarios(data, ["rotation_length_yrs"])
-        disturbances = self.instance.disturbances.all().count() if self.instance else None
+        def has_data_for(scenario, *keys):
+            return any(data.get(f"{key}_{scenario}") for key in keys)
 
-        if rotations and (loggings or disturbances):
-            errors += ["Forest rotation cannot be used with logging or other disturbances at the same time"]
+        for scenario in scenarios:
+            verbose_scenario_name = utils.ScenarioTypes(scenario).verbose_name
 
-        if loggings and disturbances:
-            errors += ["Cannot have logging and other disturbances at the same time"]
+            if has_data_for(scenario, "rotation_length_yrs") and (has_data_for(scenario, "logging_recurrence_yrs", "average_yearly_degradation_percentage") or disturbances):
+                errors.append(f"If a forest has rotation it cannot have logging, degradation, or disturbances in the {verbose_scenario_name} scenario")
 
-        if not loggings and not rotations:
-            degradations = get_filled_scenarios(data, ["average_yearly_degradation_percentage"])
-            if not degradations:
-                errors += ["With no logging, rotation or disturbances, average yearly degradation percentage is required"]
+            if has_data_for(scenario, "logging_recurrence_yrs") and has_data_for(scenario, "rotation_length_yrs", "average_yearly_degradation_percentage"):
+                errors.append(f"If a forest has logging it cannot have rotation or degradation in the {verbose_scenario_name} scenario")
+
+            if disturbances and has_data_for(scenario, "rotation_length_yrs", "degredation_dry_matter_impacted_t2"):
+                errors.append(f"If a forest has disturbances it cannot have rotation or degradation in the {verbose_scenario_name} scenario")
+
+            if has_data_for(scenario, "average_yearly_degradation_percentage") and (has_data_for(scenario, "rotation_length_yrs", "logging_recurrence_yrs") or disturbances):
+                errors.append(f"If a forest has degradation it cannot have rotation, logging, or disturbances in the {verbose_scenario_name} scenario")
 
         if instance and instance.disturbances.count() > 0:
             pc_biomass_destruction_start = data.get("logging_percentage_agb_logged_start", 0)
@@ -2323,8 +2449,13 @@ class ForestManagementWriteSerializer(LandModuleSeralizer):
         return super().validate(data)
 
 
-class ForestManagementReadSerializer(ForestManagementWriteSerializer):
-    pass
+class ForestManagementReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = ForestManagement
+        fields = "__all__"
+        ref_name = "ForestManagement"
+        mandatory_fields = ForestManagementWriteSerializer.Meta.mandatory_fields
 
 
 class InputSerializer(ScenarioModuleSerializer):
@@ -2349,8 +2480,13 @@ class InputWriteSerializer(InputSerializer):
     pass
 
 
-class InputReadSerializer(InputSerializer):
-    pass
+class InputReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = Input
+        fields = "__all__"
+        ref_name = "Input"
+        mandatory_fields = {}
 
 
 class InputEntrySerializer(ScenarioSubmoduleSerializer):
@@ -2401,8 +2537,13 @@ class InputEntryWriteSerializer(InputEntrySerializer):
     pass
 
 
-class InputEntryReadSerializer(InputEntrySerializer):
-    pass
+class InputEntryReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = InputEntry
+        fields = "__all__"
+        ref_name = "InputEntry"
+        mandatory_fields = {}
 
 
 class DynamicResultSerializer(serializers.Serializer):
@@ -2474,8 +2615,13 @@ class SetAsideWriteSerializer(LandModuleSeralizer):
         mandatory_fields = {}
 
 
-class SetAsideReadSerializer(SetAsideWriteSerializer):
-    pass
+class SetAsideReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = SetAside
+        fields = "__all__"
+        ref_name = "SetAside"
+        mandatory_fields = {}
 
 
 class OtherLandWriteSerializer(LandModuleSeralizer):
@@ -2486,8 +2632,13 @@ class OtherLandWriteSerializer(LandModuleSeralizer):
         mandatory_fields = {}
 
 
-class OtherLandReadSerializer(OtherLandWriteSerializer):
-    pass
+class OtherLandReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = OtherLand
+        fields = "__all__"
+        ref_name = "OtherLand"
+        mandatory_fields = {}
 
 
 class SettlementSerializer(LandModuleSeralizer):
@@ -2552,8 +2703,13 @@ class SettlementWriteSerializer(SettlementSerializer):
     pass
 
 
-class SettlementReadSerializer(SettlementSerializer):
-    pass
+class SettlementReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = Settlement
+        fields = "__all__"
+        ref_name = "Settlement"
+        mandatory_fields = {}
 
 
 class ConfigParamSerializer(serializers.ModelSerializer):
@@ -2605,8 +2761,13 @@ class CoastalWetlandWriteSerializer(CoastalWetlandSerializer):
     pass
 
 
-class CoastalWetlandReadSerializer(CoastalWetlandSerializer):
-    pass
+class CoastalWetlandReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = CoastalWetland
+        fields = "__all__"
+        ref_name = "CoastalWetland"
+        mandatory_fields = {}
 
 
 class ForestDisturbanceWriteSerializer(ScenarioSubmoduleSerializer):
@@ -2651,8 +2812,13 @@ class ForestDisturbanceWriteSerializer(ScenarioSubmoduleSerializer):
         return super().validate(data)
 
 
-class ForestDisturbanceReadSerializer(ForestDisturbanceWriteSerializer):
-    pass
+class ForestDisturbanceReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = ForestDisturbance
+        fields = "__all__"
+        ref_name = "ForestDisturbance"
+        mandatory_fields = ForestDisturbanceWriteSerializer.Meta.mandatory_fields
 
 
 class ChangeSerializer(serializers.Serializer):
