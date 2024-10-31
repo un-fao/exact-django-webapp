@@ -14,10 +14,7 @@ from api import utilities as utils
 import ipcc.models as ipcc
 
 from django.utils.translation import gettext_lazy as _
-from django.apps import apps
-from django.conf import settings
 from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
-from picklefield.fields import PickledObjectField
 from dirtyfields import DirtyFieldsMixin
 from django.utils.text import slugify
 
@@ -905,10 +902,10 @@ class CachedResultMixin(models.Model, DirtyFieldsMixin):
 
     updated_at = models.DateTimeField(auto_now=True, null=True, verbose_name=_("updated_at"))
     last_cached_at = models.DateTimeField(null=True, blank=True, verbose_name=_("last_cached_at"))
-    cached_results_total = PickledObjectField(null=True, blank=True, verbose_name=_("cached_results_total"))
-    cached_results_by_activity = PickledObjectField(null=True, blank=True, verbose_name=_("cached_results_total"))
-    cached_results_by_gas = PickledObjectField(null=True, blank=True, verbose_name=_("cached_results_total"))
-    cached_results_by_activity_by_gas = PickledObjectField(null=True, blank=True, verbose_name=_("cached_results_total"))
+    cached_results_total = models.JSONField(null=True, blank=True, verbose_name=_("cached_results_total"))
+    cached_results_by_activity = models.JSONField(null=True, blank=True, verbose_name=_("cached_results_total"))
+    cached_results_by_gas = models.JSONField(null=True, blank=True, verbose_name=_("cached_results_total"))
+    cached_results_by_activity_by_gas = models.JSONField(null=True, blank=True, verbose_name=_("cached_results_total"))
     last_modified = models.DateTimeField(auto_now=False, null=True, blank=True, verbose_name=_("last_modified"))
 
     def save(self, *args, **kwargs):
