@@ -550,9 +550,12 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error("Project is not ready")
             return utils.ErrorResponse("To get a report for a project, all activities must have been completed.", status=http_status.HTTP_400_BAD_REQUEST)
 
-        report = reports.BaseProjectReport(project)
-        _, file_bytes_buffer = report.build_report()
-        report.close_file()
+        try:
+            report = reports.BaseProjectReport(project)
+            _, file_bytes_buffer = report.build_report()
+            report.close_file()
+        except Exception as e:
+            return utils.ErrorResponse(str(e), status=http_status.HTTP_422_UNPROCESSABLE_ENTITY)
 
         try:
             response = HttpResponse(file_bytes_buffer, content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")

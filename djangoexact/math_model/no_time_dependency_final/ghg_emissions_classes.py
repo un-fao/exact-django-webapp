@@ -108,6 +108,12 @@ class YearlyGasEmissionSet:
 
         self.emissions.extend(emissions)
 
+    def __sub__(self, other):
+        return YearlyGasEmissionSet(self.year, self.gas_type, [x - y for x, y in zip(self.emissions, other.emissions)], self.delay)
+
+    def __add__(self, other):
+        return YearlyGasEmissionSet(self.year, self.gas_type, [x + y for x, y in zip(self.emissions, other.emissions)], self.delay)
+
 
 class YearlyGasActivityEmissionSet(YearlyGasEmissionSet):
 
@@ -118,6 +124,12 @@ class YearlyGasActivityEmissionSet(YearlyGasEmissionSet):
 
     def to_dict(self):
         return {"year": self.year, "gas_type": {"name": self.gas_type.name if self.gas_type else None}, "emissions": [emission.to_dict() for emission in self.emissions], "activity": self.activity}
+
+    def __sub__(self, other):
+        return YearlyGasActivityEmissionSet(self.year, self.gas_type, [x - y for x, y in zip(self.emissions, other.emissions)], self.activity, self.delay)
+
+    def __add__(self, other):
+        return YearlyGasActivityEmissionSet(self.year, self.gas_type, [x + y for x, y in zip(self.emissions, other.emissions)], self.activity, self.delay)
 
 
 class YearlyActivityEmissionSet:
