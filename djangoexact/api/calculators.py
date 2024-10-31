@@ -3722,18 +3722,21 @@ class SettlementCalculator(LandModuleCalculator):
             self.flu_start = DefaultValue(self.ef_start.flu)
             self.fi_start = DefaultValue(self.ef_start.fi)
             self.fmg_start = DefaultValue(self.ef_start.fmg)
+            self.biomass_ef_start.value = self.ef_start.biomass
 
         if self.module.is_with():
             self.ef_w: ipcc.SettlementEF = utils.get_or_raise(ipcc.SettlementEF, {"settlement_type": self.module.settlement_type_w, "climate": self.climate, "moisture": self.moisture}, f"Settlement EF not found for {self.module.settlement_type_w.name}")
             self.flu_w = DefaultValue(self.ef_w.flu)
             self.fi_w = DefaultValue(self.ef_w.fi)
             self.fmg_w = DefaultValue(self.ef_w.fmg)
+            self.biomass_ef_w.value = self.ef_w.biomass
 
         if self.module.is_without():
             self.ef_wo: ipcc.SettlementEF = utils.get_or_raise(ipcc.SettlementEF, {"settlement_type": self.module.settlement_type_wo, "climate": self.climate, "moisture": self.moisture}, f"Settlement EF not found for {self.module.settlement_type_wo.name}")
             self.flu_wo = DefaultValue(self.ef_wo.flu)
             self.fi_wo = DefaultValue(self.ef_wo.fi)
             self.fmg_wo = DefaultValue(self.ef_wo.fmg)
+            self.biomass_ef_wo.value = self.ef_wo.biomass
 
         # SOCinitial in case of non-paved settlement (start) to paved settlement (end)
         if self.luc and self.module.is_start() and self.module.settlement_type_start.name.casefold() != "paved settlement":
