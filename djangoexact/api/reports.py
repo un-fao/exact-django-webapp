@@ -17,10 +17,15 @@ from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.styles import Color, PatternFill, Font, Border
 from datetime import datetime
 from io import BytesIO
+from rest_framework.test import APIRequestFactory
 
 log.basicConfig(level=log.DEBUG)
 
 # TODO: Calculations of submodules are a mess. Total cumulative and yearly emissions don't add up at all, so something is happening there. Probably double-counting. Need to refactor the way they are calculated before making them available in the reports.
+
+
+class NotReadyError(Exception):
+    pass
 
 
 class Colors(Enum):
@@ -459,19 +464,16 @@ class BaseModuleReport:
     additional_indicators_worksheet: Worksheet = None
 
     def __post_init__(self):
-        self.result = self.calculator.calculate()
 
-        self.emissions_set = []
+        try:
+            self.result = self.calculator.calculate()
+        except Exception as e:
+            log.error(f"Cannot calculate report for module {self.module.module_type.name} in activity {self.module.activity.name}: {e}")
+            raise NotReadyError(f"Cannot calculate report for module {self.module.module_type.name} in activity {self.module.activity.name}: {e}")
 
-        if self.module.is_with():
-            self.emissions_set += self.calculator.results_w.yearly_emissions_by_sector_by_gas
-            if self.calculator.results_start_w is not None:
-                self.emissions_set += self.calculator.results_start_w.yearly_emissions_by_sector_by_gas
+        from api.calculators import Result
 
-        if self.module.is_without():
-            self.emissions_set += self.calculator.results_wo.yearly_emissions_by_sector_by_gas
-            if self.calculator.results_start_wo is not None:
-                self.emissions_set += self.calculator.results_start_wo.yearly_emissions_by_sector_by_gas
+        self.emissions_set = Result(*self.result).balance.yearly_emissions_by_sector_by_gas
 
         self.start_year_of_activities = self.module.activity.project.start_year_of_activities
         self.last_year_of_accounting = self.module.activity.project.last_year_of_accounting
@@ -1548,18 +1550,24 @@ class EnergyReport(BaseModuleReport):
             submodule: api_models.Electricity | api_models.Fuel
 
             calculator = CalculatorClass(submodule)
-            calculator.calculate()
+            from api.calculators import Result
 
-            self.electricity_co2_eq = list(map(sum, zip(self.electricity_co2_eq, self.extract_emissions(self.emissions_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1]))))
+            try:
+                submodule_emission_set = Result(*calculator.calculate()).balance.yearly_emissions_by_sector_by_gas
+            except Exception as e:
+                log.error(f"Cannot calculate emissions for submodule {submodule.module_type.name} in activity {submodule.parent.activity.name}: {e}")
+                raise NotReadyError(f"Cannot calculate emissions for submodule {submodule.module_type.name} in activity {submodule.parent.activity.name}: {e}")
+
+            self.electricity_co2_eq = list(map(sum, zip(self.electricity_co2_eq, self.extract_emissions(submodule_emission_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1]))))
 
             if "solid" in submodule.fuel_type.macro_fuel_type.name.casefold():
-                self.solid_fuel_co2 = list(map(sum, zip(self.solid_fuel_co2, self.extract_emissions(self.emissions_set, self.solid_fuel_co2_source[0], self.solid_fuel_co2_source[1]))))
-                self.solid_fuel_ch4 = list(map(sum, zip(self.solid_fuel_ch4, self.extract_emissions(self.emissions_set, self.solid_fuel_ch4_source[0], self.solid_fuel_ch4_source[1]))))
-                self.solid_fuel_n2o = list(map(sum, zip(self.solid_fuel_n2o, self.extract_emissions(self.emissions_set, self.solid_fuel_n2o_source[0], self.solid_fuel_n2o_source[1]))))
+                self.solid_fuel_co2 = list(map(sum, zip(self.solid_fuel_co2, self.extract_emissions(submodule_emission_set, self.solid_fuel_co2_source[0], self.solid_fuel_co2_source[1]))))
+                self.solid_fuel_ch4 = list(map(sum, zip(self.solid_fuel_ch4, self.extract_emissions(submodule_emission_set, self.solid_fuel_ch4_source[0], self.solid_fuel_ch4_source[1]))))
+                self.solid_fuel_n2o = list(map(sum, zip(self.solid_fuel_n2o, self.extract_emissions(submodule_emission_set, self.solid_fuel_n2o_source[0], self.solid_fuel_n2o_source[1]))))
             elif "liquid" in submodule.fuel_type.macro_fuel_type.name.casefold():
-                self.liquid_fuel_co2 = list(map(sum, zip(self.liquid_fuel_co2, self.extract_emissions(self.emissions_set, self.liquid_fuel_co2_source[0], self.liquid_fuel_co2_source[1]))))
-                self.liquid_fuel_ch4 = list(map(sum, zip(self.liquid_fuel_ch4, self.extract_emissions(self.emissions_set, self.liquid_fuel_ch4_source[0], self.liquid_fuel_ch4_source[1]))))
-                self.liquid_fuel_n2o = list(map(sum, zip(self.liquid_fuel_n2o, self.extract_emissions(self.emissions_set, self.liquid_fuel_n2o_source[0], self.liquid_fuel_n2o_source[1]))))
+                self.liquid_fuel_co2 = list(map(sum, zip(self.liquid_fuel_co2, self.extract_emissions(submodule_emission_set, self.liquid_fuel_co2_source[0], self.liquid_fuel_co2_source[1]))))
+                self.liquid_fuel_ch4 = list(map(sum, zip(self.liquid_fuel_ch4, self.extract_emissions(submodule_emission_set, self.liquid_fuel_ch4_source[0], self.liquid_fuel_ch4_source[1]))))
+                self.liquid_fuel_n2o = list(map(sum, zip(self.liquid_fuel_n2o, self.extract_emissions(submodule_emission_set, self.liquid_fuel_n2o_source[0], self.liquid_fuel_n2o_source[1]))))
 
     def build_report(self):
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
@@ -1618,7 +1626,6 @@ class InputReport(BaseModuleReport):
 
     def add_submodules_results(self):
         submodules: list[api_models.Submodule] = self.module.submodules
-        self.emissions_set = []
 
         for submodule in submodules:
             CalculatorClass = calculators.InputEntryCalculator
@@ -1626,17 +1633,13 @@ class InputReport(BaseModuleReport):
             submodule_emission_set = []
 
             calculator = CalculatorClass(submodule)
-            calculator.calculate()
+            from api.calculators import Result
 
-            if self.module.is_with():
-                submodule_emission_set = calculator.results_w.yearly_emissions_by_sector_by_gas
-                if self.calculator.results_start_w is not None:
-                    submodule_emission_set = list(map(sum, zip(submodule_emission_set, calculator.results_start_w.yearly_emissions_by_sector_by_gas)))
-
-            if self.module.is_without():
-                submodule_emission_set = calculator.results_wo.yearly_emissions_by_sector_by_gas
-                if self.calculator.results_start_wo is not None:
-                    submodule_emission_set = list(map(sum, zip(submodule_emission_set, calculator.results_start_wo.yearly_emissions_by_sector_by_gas)))
+            try:
+                submodule_emission_set = Result(*calculator.calculate()).balance.yearly_emissions_by_sector_by_gas
+            except Exception as e:
+                log.error(f"Cannot calculate emissions for submodule {submodule.module_type.name} in activity {submodule.parent.activity.name}: {e}")
+                raise NotReadyError(f"Cannot calculate emissions for submodule {submodule.module_type.name} in activity {submodule.parent.activity.name}: {e}")
 
             self.inputs_co2 = list(map(sum, zip(self.inputs_co2, self.extract_emissions(submodule_emission_set, self.inputs_co2_source[0], self.inputs_co2_source[1]))))
             self.inputs_n2o = list(map(sum, zip(self.inputs_n2o, self.extract_emissions(submodule_emission_set, self.inputs_n2o_source[0], self.inputs_n2o_source[1]))))
@@ -1645,8 +1648,6 @@ class InputReport(BaseModuleReport):
                 self.feed_co2_eq = list(map(sum, zip(self.feed_co2_eq, self.extract_emissions(submodule_emission_set, self.feed_co2_eq_source[0], self.feed_co2_eq_source[1]))))
             else:
                 self.inputs_co2_eq = list(map(sum, zip(self.inputs_co2_eq, self.extract_emissions(submodule_emission_set, self.inputs_co2_eq_source[0], self.inputs_co2_eq_source[1]))))
-
-            self.emissions_set += submodule_emission_set
 
     def build_report(self):
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
@@ -1709,19 +1710,18 @@ class IrrigationReport(BaseModuleReport):
             submodule: api_models.IrrigationPhase | api_models.IrrigationSystem
 
             calculator = CalculatorClass(submodule)
-            calculator.calculate()
+            from api.calculators import Result
 
-            if self.module.is_with():
-                submodules_emission_set = calculator.results_w.yearly_emissions_by_sector_by_gas
-                if calculator.results_start_w is not None:
-                    submodules_emission_set = list(map(sum, zip(submodules_emission_set, calculator.results_start_w.yearly_emissions_by_sector_by_gas)))
+            try:
+                submodules_emission_set = Result(*calculator.calculate()).balance.yearly_emissions_by_sector_by_gas
+            except Exception as e:
+                log.error(f"Cannot calculate emissions for submodule {submodule.module_type.name} in activity {submodule.parent.activity.name}: {e}")
+                raise NotReadyError(f"Cannot calculate emissions for submodule {submodule.module_type.name} in activity {submodule.parent.activity.name}: {e}")
 
-            if self.module.is_without():
-                submodules_emission_set = calculator.results_wo.yearly_emissions_by_sector_by_gas
-                if calculator.results_start_wo is not None:
-                    submodules_emission_set = list(map(sum, zip(submodules_emission_set, calculator.results_start_wo.yearly_emissions_by_sector_by_gas)))
-
-            self.emissions_set += submodules_emission_set
+            self.other_infrastructure_co2_eq = self.extract_emissions(submodules_emission_set, self.other_infrastructure_co2_eq_source[0], self.other_infrastructure_co2_eq_source[1])
+            self.liquid_fuel_or_electricity_co2 = self.extract_emissions(submodules_emission_set, self.liquid_fuel_or_electricity_co2_source[0], self.liquid_fuel_or_electricity_co2_source[1])
+            self.liquid_fuel_or_electricity_ch4 = self.extract_emissions(submodules_emission_set, self.liquid_fuel_or_electricity_ch4_source[0], self.liquid_fuel_or_electricity_ch4_source[1])
+            self.liquid_fuel_or_electricity_n2o = self.extract_emissions(submodules_emission_set, self.liquid_fuel_or_electricity_n2o_source[0], self.liquid_fuel_or_electricity_n2o_source[1])
 
     def build_report(self):
         super().build_report()
@@ -1732,12 +1732,6 @@ class IrrigationReport(BaseModuleReport):
         last_results_row = self.results_worksheet.max_row
 
         self.add_submodules_results()
-        print(self.emissions_set)
-
-        self.other_infrastructure_co2_eq = self.extract_emissions(self.emissions_set, self.other_infrastructure_co2_eq_source[0], self.other_infrastructure_co2_eq_source[1])
-        self.liquid_fuel_or_electricity_co2 = self.extract_emissions(self.emissions_set, self.liquid_fuel_or_electricity_co2_source[0], self.liquid_fuel_or_electricity_co2_source[1])
-        self.liquid_fuel_or_electricity_ch4 = self.extract_emissions(self.emissions_set, self.liquid_fuel_or_electricity_ch4_source[0], self.liquid_fuel_or_electricity_ch4_source[1])
-        self.liquid_fuel_or_electricity_n2o = self.extract_emissions(self.emissions_set, self.liquid_fuel_or_electricity_n2o_source[0], self.liquid_fuel_or_electricity_n2o_source[1])
 
         self.results_worksheet.cell(row=last_results_row + 1, column=1, value="CO2-eq from other infrastructure")
         self.results_worksheet.cell(row=last_results_row + 2, column=1, value="CO2 from liquid fuel or electricity")
@@ -1754,7 +1748,7 @@ class IrrigationReport(BaseModuleReport):
 
 
 # @dataclass
-class SettlementReport(BaseModuleReport):
+class SettlementReport(LandModuleReport):
 
     module: api_models.Settlement
 
@@ -1768,48 +1762,33 @@ class SettlementReport(BaseModuleReport):
 
     def __post_init__(self):
         self.calculator = calculators.SettlementCalculator(self.module)
+        self.module_endpoint = "settlements"
         return super().__post_init__()
 
     def add_submodules_results(self):
         submodules: list[api_models.Submodule] = self.module.submodules
-        self.emissions_set = []
-
-        if self.module.is_with():
-            self.emissions_set += self.calculator.results_w.yearly_emissions_by_sector_by_gas
-            if self.calculator.results_start_w is not None:
-                self.emissions_set = list(map(sum, zip(self.emissions_set, self.calculator.results_start_w.yearly_emissions_by_sector_by_gas)))
-        if self.module.is_without():
-            self.emissions_set += self.calculator.results_wo.yearly_emissions_by_sector_by_gas
-            if self.calculator.results_start_wo is not None:
-                self.emissions_set = list(map(sum, zip(self.emissions_set, self.calculator.results_start_wo.yearly_emissions_by_sector_by_gas)))
 
         for submodule in submodules:
             if isinstance(submodule, api_models.OtherInfrastructure):
                 continue
 
-            submodules_emission_set = []
+            submodules_emission_set = submodule.cached_results_by_activity_by_gas["balance"] if submodule.cached_results_by_activity_by_gas is not None else []
             CalculatorClass = calculators.RoadCalculator if isinstance(submodule, api_models.Road) else calculators.BuildingCalculator
             submodule: api_models.Road | api_models.Building
 
             calculator = CalculatorClass(submodule)
-            calculator.calculate()
+            from api.calculators import Result
 
-            if self.module.is_with():
-                submodules_emission_set = calculator.results_w.yearly_emissions_by_sector_by_gas
-                if calculator.results_start_w is not None:
-                    submodules_emission_set = list(map(sum, zip(submodules_emission_set, calculator.results_start_w.yearly_emissions_by_sector_by_gas)))
-
-            if self.module.is_without():
-                submodules_emission_set = calculator.results_wo.yearly_emissions_by_sector_by_gas
-                if calculator.results_start_wo is not None:
-                    submodules_emission_set = list(map(sum, zip(submodules_emission_set, calculator.results_start_wo.yearly_emissions_by_sector_by_gas)))
+            try:
+                submodules_emission_set = Result(*calculator.calculate()).balance.yearly_emissions_by_sector_by_gas
+            except Exception as e:
+                log.error(f"Cannot calculate emissions for submodule {submodule.module_type.name} in activity {submodule.parent.activity.name}: {e}")
+                raise NotReadyError(f"Cannot calculate emissions for submodule {submodule.module_type.name} in activity {submodule.parent.activity.name}: {e}")
 
             if isinstance(submodule, api_models.Road):
                 self.roads_co2_eq = list(map(sum, zip(self.roads_co2_eq, self.extract_emissions(submodules_emission_set, self.roads_co2_eq_source[0], self.roads_co2_eq_source[1]))))
             elif isinstance(submodule, api_models.Building):
                 self.buildings_co2_eq = list(map(sum, zip(self.buildings_co2_eq, self.extract_emissions(submodules_emission_set, self.buildings_co2_eq_source[0], self.buildings_co2_eq_source[1]))))
-
-            self.emissions_set += submodules_emission_set
 
     def build_report(self):
         super().build_report()
