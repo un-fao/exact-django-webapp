@@ -755,7 +755,7 @@ class DeforestationCalculator(BaseCalculator):
 
             if agb_start.agb_min is None or agb_start.agb_max is None:
                 if forest.agb_t2_start is None:
-                    raise Exception(f"AGB for {forest.land_use_type_start} in {climate} climate, {region} region, and {forest.forest_type} does not exist")
+                    raise Exception(f"AGB for {forest.land_use_type_start} in {climate} climate, {region} region, and {forest.forest_type} does not exist. Please insert T2 values for the start module")
 
                 agb_start.agb_min = forest.agb_t2_start
                 agb_start.agb_max = forest.agb_t2_start
@@ -1738,8 +1738,36 @@ class PerennialCropCalculator(LandModuleCalculator):
         self.end_module_has_growth_w = False
         self.end_module_has_growth_wo = False
 
+        self.parent: PerennialCropland = getattr(self.module, "parent", self.module)
+
+        self.soc_t2_start = getattr(self.module, "soc_t2_start", None) or self.parent.soc_t2_start
+        self.soc_t2_w = getattr(self.module, "soc_t2_w", None) or self.parent.soc_t2_w
+        self.soc_t2_wo = getattr(self.module, "soc_t2_wo", None) or self.parent.soc_t2_wo
+
+        self.agb_t2_start = getattr(self.module, "agb_t2_start", None) or self.parent.agb_t2_start
+        self.agb_t2_w = getattr(self.module, "agb_t2_w", None) or self.parent.agb_t2_w
+        self.agb_t2_wo = getattr(self.module, "agb_t2_wo", None) or self.parent.agb_t2_wo
+
+        self.agb_max_t2_start = getattr(self.module, "agb_max_t2_start", None) or self.parent.agb_max_t2_start
+        self.agb_max_t2_w = getattr(self.module, "agb_max_t2_w", None) or self.parent.agb_max_t2_w
+        self.agb_max_t2_wo = getattr(self.module, "agb_max_t2_wo", None) or self.parent.agb_max_t2_wo
+
+        self.bgb_t2_start = getattr(self.module, "bgb_t2_start", None) or self.parent.bgb_t2_start
+        self.bgb_t2_w = getattr(self.module, "bgb_t2_w", None) or self.parent.bgb_t2_w
+        self.bgb_t2_wo = getattr(self.module, "bgb_t2_wo", None) or self.parent.bgb_t2_wo
+
+        self.fire_periodicity_t2_start = getattr(self.module, "fire_periodicity_t2_start", None) or self.parent.fire_periodicity_t2_start
+        self.fire_periodicity_t2_w = getattr(self.module, "fire_periodicity_t2_w", None) or self.parent.fire_periodicity_t2_w
+        self.fire_periodicity_t2_wo = getattr(self.module, "fire_periodicity_t2_wo", None) or self.parent.fire_periodicity_t2_wo
+
+        self.residue_availability_t2_start = getattr(self.module, "residue_availability_t2_start", None) or self.parent.residue_availability_t2_start
+        self.residue_availability_t2_w = getattr(self.module, "residue_availability_t2_w", None) or self.parent.residue_availability_t2_w
+        self.residue_availability_t2_wo = getattr(self.module, "residue_availability_t2_wo", None) or self.parent.residue_availability_t2_wo
+
     def get_defaults(self, calculate=False) -> dict:
         super().get_defaults(calculate)
+
+        # TODO: This can also be called by Minor Seasons. Minor seasons lack some tier2s, that need to be fetched from the parent.
 
         savanna_flt = {"category__name": "Savanna and grassland"}
 
@@ -1769,19 +1797,19 @@ class PerennialCropCalculator(LandModuleCalculator):
             try:
                 self.agb_start_default = ipcc.PerennialAGB.objects.get(climate=self.climate, moisture=self.moisture, continent=self.region, land_use_type=self.module.land_use_type_start)
             except ipcc.PerennialAGB.DoesNotExist:
-                if self.module.agb_t2_start is None:
+                if self.agb_t2_start is None:
                     raise Exception(f"PerennialAGB for {self.module.land_use_type_start.name} in {self.climate.name} climate does not exist for start scenario. Please provide Tier 2 values.")
 
             try:
                 self.agb_max_start_default = ipcc.PerennialMaxAGB.objects.get(climate=self.climate, land_use_type=self.module.land_use_type_start)
             except ipcc.PerennialMaxAGB.DoesNotExist:
-                if self.module.agb_max_t2_start is None:
+                if self.agb_max_t2_start is None:
                     raise Exception(f"PerennialMaxAGB for {self.module.land_use_type_start.name} in {self.climate.name} climate does not exist for start scenario. Please provide Tier 2 values.")
 
             try:
                 self.bgb_start_default = ipcc.PerennialBGB.objects.get(climate=self.climate, moisture=self.moisture, continent=self.region, land_use_type=self.module.land_use_type_start)
             except ipcc.PerennialBGB.DoesNotExist:
-                if self.module.bgb_t2_start is None:
+                if self.bgb_t2_start is None:
                     raise Exception(f"PerennialBGB for {self.module.land_use_type_start.name} in {self.climate.name} climate does not exist for start scenario. Please provide Tier 2 values.")
 
         if self.module.is_with():
@@ -1790,19 +1818,19 @@ class PerennialCropCalculator(LandModuleCalculator):
             try:
                 self.agb_w_default = ipcc.PerennialAGB.objects.get(climate=self.climate, moisture=self.moisture, continent=self.region, land_use_type=self.module.land_use_type_w)
             except ipcc.PerennialAGB.DoesNotExist:
-                if self.module.agb_t2_w is None:
+                if self.agb_t2_w is None:
                     raise Exception(f"PerennialAGB for {self.module.land_use_type_w.name} in {self.climate.name} climate does not exist for with scenario. Please provide Tier 2 values.")
 
             try:
                 self.agb_max_w_default = ipcc.PerennialMaxAGB.objects.get(climate=self.climate, land_use_type=self.module.land_use_type_w)
             except ipcc.PerennialMaxAGB.DoesNotExist:
-                if self.module.agb_max_t2_w is None:
+                if self.agb_max_t2_w is None:
                     raise Exception(f"PerennialMaxAGB for {self.module.land_use_type_w.name} in {self.climate.name} climate does not exist for with scenario. Please provide Tier 2 values.")
 
             try:
                 self.bgb_w_default = ipcc.PerennialBGB.objects.get(climate=self.climate, moisture=self.moisture, continent=self.region, land_use_type=self.module.land_use_type_w)
             except ipcc.PerennialBGB.DoesNotExist:
-                if self.module.bgb_t2_w is None:
+                if self.bgb_t2_w is None:
                     raise Exception(f"PerennialBGB for {self.module.land_use_type_w.name} in {self.climate.name} climate does not exist for with scenario. Please provide Tier 2 values.")
 
         if self.module.is_without():
@@ -1811,19 +1839,19 @@ class PerennialCropCalculator(LandModuleCalculator):
             try:
                 self.ag_default_wo = ipcc.PerennialAGB.objects.get(climate=self.climate, moisture=self.moisture, continent=self.region, land_use_type=self.module.land_use_type_wo)
             except ipcc.PerennialAGB.DoesNotExist:
-                if self.module.agb_t2_wo is None:
+                if self.agb_t2_wo is None:
                     raise Exception(f"PerennialAGB for {self.module.land_use_type_wo.name} in {self.climate.name} climate does not exist for without scenario. Please provide Tier 2 values.")
 
             try:
                 self.agb_max_wo_default = ipcc.PerennialMaxAGB.objects.get(climate=self.climate, land_use_type=self.module.land_use_type_wo)
             except ipcc.PerennialMaxAGB.DoesNotExist:
-                if self.module.agb_max_t2_wo is None:
+                if self.agb_max_t2_wo is None:
                     raise Exception(f"PerennialMaxAGB for {self.module.land_use_type_wo.name} in {self.climate.name} climate does not exist for without scenario. Please provide Tier 2 values.")
 
             try:
                 self.bg_default_wo = ipcc.PerennialBGB.objects.get(climate=self.climate, moisture=self.moisture, continent=self.region, land_use_type=self.module.land_use_type_wo)
             except ipcc.PerennialBGB.DoesNotExist:
-                if self.module.bgb_t2_wo is None:
+                if self.bgb_t2_wo is None:
                     raise Exception(f"PerennialBGB for {self.module.land_use_type_wo.name} in {self.climate.name} climate does not exist for without scenario. Please provide Tier 2 values.")
 
         # Perennial from LUC
@@ -1878,17 +1906,17 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "emission_factor_burning_methane": self.burning_emission_factor.ch4,
                 "combustion_factor": self.fires_combustion_factor_start.value,
                 "fire_periodicity_default": self.default_fire_periodicity.value,
-                "fire_periodicity_tier_2": self.module.fire_periodicity_t2_start,
-                "t_biomass_tier_2": self.module.residue_availability_t2_start,
+                "fire_periodicity_tier_2": self.fire_periodicity_t2_start,
+                "t_biomass_tier_2": self.residue_availability_t2_start,
                 "agb_rate_default": self.agb_start_default.value,
-                "agb_rate_tier_2": self.module.agb_t2_start,
+                "agb_rate_tier_2": self.agb_t2_start,
                 "agb_maximum_c": self.agb_max_start_default.value,
                 "bgb_rate_default": self.bgb_start_default.value,
-                "bgb_rate_tier_2": self.module.bgb_t2_start,
+                "bgb_rate_tier_2": self.bgb_t2_start,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_w.value,
-                "soc_start_tier_2": self.module.soc_t2_start,
-                "soc_end_tier_2": self.module.soc_t2_w,
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_w,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -1929,17 +1957,17 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "emission_factor_burning_methane": self.burning_emission_factor.ch4,
                 "combustion_factor": self.fires_combustion_factor_start.value,
                 "fire_periodicity_default": self.default_fire_periodicity.value,
-                "fire_periodicity_tier_2": self.module.fire_periodicity_t2_start,
-                "t_biomass_tier_2": self.module.residue_availability_t2_start,
+                "fire_periodicity_tier_2": self.fire_periodicity_t2_start,
+                "t_biomass_tier_2": self.residue_availability_t2_start,
                 "agb_rate_default": self.agb_start_default.value,
-                "agb_rate_tier_2": self.module.agb_t2_start,
+                "agb_rate_tier_2": self.agb_t2_start,
                 "agb_maximum_c": self.agb_max_start_default.value,
                 "bgb_rate_default": self.bgb_start_default.value,
-                "bgb_rate_tier_2": self.module.bgb_t2_start,
+                "bgb_rate_tier_2": self.bgb_t2_start,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_wo.value,
-                "soc_start_tier_2": self.module_start.soc_t2_start,
-                "soc_end_tier_2": self.module_wo.soc_t2_wo,
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_wo,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -1981,17 +2009,17 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "emission_factor_burning_methane": self.burning_emission_factor.ch4,
                 "combustion_factor": self.fires_combustion_factor_w.value,
                 "fire_periodicity_default": self.default_fire_periodicity.value,
-                "fire_periodicity_tier_2": self.module.fire_periodicity_t2_w,
-                "t_biomass_tier_2": self.module.residue_availability_t2_w,
+                "fire_periodicity_tier_2": self.fire_periodicity_t2_w,
+                "t_biomass_tier_2": self.residue_availability_t2_w,
                 "agb_rate_default": self.agb_w_default.value,
-                "agb_rate_tier_2": self.module.agb_t2_w,
+                "agb_rate_tier_2": self.agb_t2_w,
                 "agb_maximum_c": self.agb_max_w_default.value,
                 "bgb_rate_default": self.bgb_w_default.value,
-                "bgb_rate_tier_2": self.module.bgb_t2_w,
+                "bgb_rate_tier_2": self.bgb_t2_w,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_w.value,
-                "soc_start_tier_2": self.module_start.soc_t2_start,
-                "soc_end_tier_2": self.module_w.soc_t2_w,
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_w,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_w.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,
@@ -2033,17 +2061,17 @@ class PerennialCropCalculator(LandModuleCalculator):
                 "emission_factor_burning_methane": self.burning_emission_factor.ch4,
                 "combustion_factor": self.fires_combustion_factor_wo.value,
                 "fire_periodicity_default": self.default_fire_periodicity.value,
-                "fire_periodicity_tier_2": self.module.fire_periodicity_t2_wo,
-                "t_biomass_tier_2": self.module.residue_availability_t2_wo,
+                "fire_periodicity_tier_2": self.fire_periodicity_t2_wo,
+                "t_biomass_tier_2": self.residue_availability_t2_wo,
                 "agb_rate_default": self.ag_default_wo.value,
-                "agb_rate_tier_2": self.module.agb_t2_wo,
+                "agb_rate_tier_2": self.agb_t2_wo,
                 "agb_maximum_c": self.agb_max_wo_default.value,
                 "bgb_rate_default": self.bg_default_wo.value,
-                "bgb_rate_tier_2": self.module.bgb_t2_wo,
+                "bgb_rate_tier_2": self.bgb_t2_wo,
                 "soc_start_default": self.soc_start.value,
                 "soc_end_default": self.soc_wo.value,
-                "soc_start_tier_2": self.module_start.soc_t2_start,
-                "soc_end_tier_2": self.module_wo.soc_t2_wo,
+                "soc_start_tier_2": self.soc_t2_start,
+                "soc_end_tier_2": self.soc_t2_wo,
                 "fmg_start_default": self.fmg_start.value,
                 "fmg_end_default": self.fmg_wo.value,
                 "fmg_start_tier_2": self.module_start.fmg_t2_start,

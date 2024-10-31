@@ -301,6 +301,8 @@ class ForestManagementFactory(DjangoModelFactory):
 
     # On init, choose land_use_type based on activity.project.climate
 
+    status = READY
+
     land_use_type_start = factory.fuzzy.FuzzyChoice(forests)
     land_use_type_w = land_use_type_start
     land_use_type_wo = land_use_type_start
@@ -552,14 +554,14 @@ class IrrigationSystemFactory(DjangoModelFactory):
 
     status = READY
 
-    irrigation_system_type = factory.fuzzy.FuzzyChoice(IrrigationSystemType.objects.filter(module_types__class_name="IrrigationSystem").all())
+    irrigation_system_type = factory.fuzzy.FuzzyChoice(IrrigationSystemType.objects.all())
 
     ha_start = factory.fuzzy.FuzzyFloat(0, 100)
     ha_w = factory.fuzzy.FuzzyFloat(0, 100)
     ha_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
 
-fuel_types = [fuel for fuel in FuelType.objects.filter(module_types__class_name="IrrigationPhase").all()]
+fuel_types = [fuel for fuel in FuelType.objects.all()]
 
 
 class IrrigationPhaseFactory(DjangoModelFactory):
@@ -568,7 +570,7 @@ class IrrigationPhaseFactory(DjangoModelFactory):
 
     status = READY
 
-    irrigation_system_type = factory.fuzzy.FuzzyChoice(IrrigationSystemType.objects.filter(module_types__class_name="IrrigationPhase").all())
+    irrigation_system_type = factory.fuzzy.FuzzyChoice(IrrigationSystemType.objects.all())
     fuel_type = factory.fuzzy.FuzzyChoice(fuel_types)
     well_depth = factory.fuzzy.FuzzyFloat(0, 100)
 

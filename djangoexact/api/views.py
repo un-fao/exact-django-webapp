@@ -90,6 +90,10 @@ from .serializers import (
     ResetPasswordSerializer,
     FieldDefinitionResponseSerializer,
     FieldDefinitionSerializer,
+    ProjectResultSerializer,
+    ActivityResultSerializer,
+    ProjectSummarySerializer,
+    ActivitySummarySerializer,
 )
 
 from djangoexact.settings import auth
@@ -414,20 +418,31 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
 
         search_query = request.query_params.get("name", None)
+        is_summary = request.query_params.get("summary", False)
 
         filters = {}
         if search_query:
             filters["project__name__icontains"] = search_query
 
         shared_projects = request.user.memberships.filter(**filters).all()
-        list = [share.project for share in shared_projects if utils.has_project_permission("view_project", self.request.user, share.project)]
+        projects_list = [share.project for share in shared_projects if utils.has_project_permission("view_project", self.request.user, share.project)]
+        ordered_projects = sorted(projects_list, key=lambda x: x.created_at, reverse=True)
+
+        SerializerClass = ReadProjectSerializer
+        if is_summary:
+            SerializerClass = ProjectSummarySerializer
+
+        def serialize_project(project):
+            return SerializerClass(project, context={"request": request}).data
 
         paginator = DefaultPagination()
-        page = paginator.paginate_queryset(list, request)
+        page = paginator.paginate_queryset(ordered_projects, request)
         if page is not None:
-            return paginator.get_paginated_response(ReadProjectSerializer(page, many=True, context={"request": request}).data)
+            with ThreadPoolExecutor(max_workers=10) as executor:
+                response = list(executor.map(serialize_project, page))
+            return paginator.get_paginated_response(response)
 
-        return Response(data=ReadProjectSerializer(list, many=True, context={"request": request}).data, status=http_status.HTTP_200_OK)
+        return Response(data=SerializerClass(ordered_projects, many=True, context={"request": request}).data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])
     @swagger_auto_schema(manual_parameters=[project_id], responses={404: "Project not found"})
@@ -436,13 +451,17 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         Calculates and returns total emissions for each module in the project.
         """
 
-        project = Project.objects.prefetch_related("activities").get(pk=pk)
+        try:
+            project = Project.objects.prefetch_related("activities").get(pk=pk)
+        except Project.DoesNotExist:
+            logging.error("Project not found")
+            return utils.ErrorResponse("Project not found", status=http_status.HTTP_404_NOT_FOUND)
 
         if not utils.has_project_permission("view_project", self.request.user, project):
             logging.error("Selected user does not have permission to view the project")
             return utils.ErrorResponse("Selected user does not have permission to view the project", status=http_status.HTTP_403_FORBIDDEN)
 
-        serialized_project = ReadProjectSerializer(project, context={"request": request}).data
+        serialized_project = ProjectResultSerializer(project, context={"request": request}).data
 
         response = serialized_project
         response["activities"] = []
@@ -521,9 +540,12 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error("Project is not ready")
             return utils.ErrorResponse("To get a report for a project, all activities must have been completed.", status=http_status.HTTP_400_BAD_REQUEST)
 
-        report = reports.BaseProjectReport(project)
-        _, file_bytes_buffer = report.build_report()
-        report.close_file()
+        try:
+            report = reports.BaseProjectReport(project)
+            _, file_bytes_buffer = report.build_report()
+            report.close_file()
+        except Exception as e:
+            return utils.ErrorResponse(str(e), status=http_status.HTTP_422_UNPROCESSABLE_ENTITY)
 
         try:
             response = HttpResponse(file_bytes_buffer, content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
@@ -1008,26 +1030,36 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         logger.info("ActivityViewSet.list")
         project_id = utils.get_query_param_or_validation_error(self.request, "project_id")
         project = get_object_or_404(Project, pk=project_id)
+        is_summary = request.query_params.get("summary", False)
+        SerializerClass = ActivitySerializerWithModules
+        if is_summary:
+            SerializerClass = ActivitySummarySerializer
 
         if not utils.has_project_permission("view_activity", self.request.user, project):
             logging.error("Selected user does not have permission to view activities in the project")
             return utils.ErrorResponse("Selected user does not have permission to view activities in the project", status=http_status.HTTP_403_FORBIDDEN)
 
         def process_activity(activity):
-            activity_dict = ActivitySerializer(activity).data
-            activity_dict["modules"] = get_modules(activity)
+            activity_dict = SerializerClass(activity).data
             return activity_dict
 
-        _list = Activity.objects.filter(project__id=project_id)
+        activities_list = Activity.objects.filter(project__id=project_id)
+
+        # Start measuring time
+        start = time.time()
 
         paginator = DefaultPagination()
-        page = paginator.paginate_queryset(_list, request)
+        page = paginator.paginate_queryset(activities_list, request)
         if page is not None:
             with ThreadPoolExecutor() as executor:
                 response = list(executor.map(process_activity, page))
+                logger.debug(f"Time taken to process activities: {time.time() - start}")
             return paginator.get_paginated_response(response)
 
-        return Response(data=self.serializer_class(_list, many=True).data, status=http_status.HTTP_200_OK)
+        # End measuring time
+        logger.debug(f"Time taken to process activities: {time.time() - start}")
+
+        return Response(data=SerializerClass(activities_list, many=True).data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])
     def results(self, request, pk=None):
@@ -1041,7 +1073,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error("Selected user does not have permission to view the activity")
             return utils.ErrorResponse("Selected user does not have permission to view the activity", status=http_status.HTTP_403_FORBIDDEN)
 
-        response = {**ActivitySerializer(activity).data}
+        response = {**ActivityResultSerializer(activity).data}
 
         modules = []
         # TODO: Make a serializer for this
@@ -1154,7 +1186,7 @@ class CommentThreadViewSet(viewsets.ModelViewSet):
         """
 
         thread = get_object_or_404(CommentThread, pk=pk)
-        comments = thread.comments.all()
+        comments = thread.comments.filter(parent=None).all()
 
         return Response(data=CommentSerializer(comments, many=True).data, status=http_status.HTTP_200_OK)
 
@@ -1234,15 +1266,6 @@ class CommentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    def get_queryset(self):
-        queryset = Comment.objects.all()
-        parent = self.request.query_params.get("parent", None)
-        if parent is not None:
-            queryset = queryset.filter(parent=parent)
-        else:
-            queryset = queryset.filter(parent__isnull=True)
-        return queryset
-
     @action(detail=True, methods=["get"])
     def replies(self, request, thread_id=None, pk=None):
         """
@@ -1253,6 +1276,21 @@ class CommentViewSet(viewsets.ModelViewSet):
         replies = comment.replies.all()
 
         return Response(data=CommentSerializer(replies, many=True).data, status=http_status.HTTP_200_OK)
+
+    def list(self, request):
+        """
+        Get all comments.
+        """
+        thread_id = self.request.query_params.get("thread", None)
+
+        if thread_id is None:
+            return utils.ErrorResponse("Thread id not provided", status=http_status.HTTP_400_BAD_REQUEST)
+
+        comments = Comment.objects.filter(thread__id=thread_id, parent=None).all()
+        serializer = CommentSerializer(comments, many=True)
+        return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+
+        return super().list(request)
 
 
 class ModuleTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
