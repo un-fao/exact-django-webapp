@@ -4248,6 +4248,47 @@ for i, row in enumerate(df_dict2):
         co=co,
     )
 
+CoastalLitter.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "CoastalLitter.csv"),
+    header=0,
+    sep=",",
+)
+
+df_headers = df.columns.values.tolist()
+df_dict = df.to_dict("records")
+
+for i, row in enumerate(df_dict):
+    climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
+    moisture = Moisture.objects.get(name__iexact=sanitize(row["moisture"]))
+
+    for j, header in enumerate(df_headers, start=2):
+        if j == len(df_headers):
+            break
+
+        land_use_type = LandUseType.objects.get(name__iexact=sanitize(df_headers[j]))
+        value = parse_csv_number(row[df_headers[j]])
+
+        print(
+            land_use_type,
+            climate,
+            moisture,
+            value,
+        )
+
+        CoastalLitter.objects.create(
+            land_use_type=land_use_type,
+            climate=climate,
+            moisture=moisture,
+            value=value,
+        )
+
+"""
+
+# TODO: Run in production
+
+
 ForestManagementAGB.objects.all().delete()
 import api.utilities as utils
 
@@ -4260,19 +4301,12 @@ df = pd.read_csv(
 for i, row in df.iterrows():
     print(row)
 
-    TODO: Clarify with Lorenzo what sub-tropical is in terms of climate. Skip for now.
-    if row["climate"] == "Sub-tropical":
-        continue
-
-    if row["climate"] == "Tropical":
-        climates = [climate for climate in Climate.objects.filter(name__in=["Tropical"]).all()]
-    elif row["climate"] == "Temperate":
-        climates = [climate for climate in Climate.objects.filter(name__in=["Temperate"]).all()]
-    else:
-        climates = [Climate.objects.get(name__iexact=row["climate"])]
+    climates = [Climate.objects.get(name__iexact=row["climate"])]
 
     print(row["land_use_type"])
     land_use_type = LandUseType.objects.get(name__iexact=row["land_use_type"])
+
+    from_year = row["from_year"]
 
     print(f"Region: {row['region']}")
 
@@ -4298,7 +4332,7 @@ for i, row in df.iterrows():
 
     forest_condition_type = ForestConditionType.objects.get(name__iexact=row["forest_condition_type"])
 
-    forest_types = ForestType.objects.filter(name__in=["Natural", "Plantaion"]).all()
+    forest_types = ForestType.objects.filter(name__in=["Natural", "Plantation"]).all()
 
     agb_range_min = None
     agb_range_max = None
@@ -4340,12 +4374,13 @@ for i, row in df.iterrows():
     print("Climates: ", climates)
     print("Regions: ", regions)
     print("Forest Types: ", forest_types)
+    print(f"From Year: {from_year}")
 
     for region in regions:
         for climate in climates:
             for type in forest_types:
                 if type.name == "Plantation" and forest_condition_type.name == "Primary":
-                    Primary forest plantations are not possible
+                    # Primary forest plantations are not possible
                     continue
 
                 if type.name == "Plantation":
@@ -4375,7 +4410,7 @@ for i, row in df.iterrows():
                     region=region,
                     climate=climate,
                     forest_condition_type=forest_condition_type,
-                    from_year=row["from_year"],
+                    from_year=from_year,
                     forest_type=type,
                     agb_min=agb_range_min * utils.NON_MANGROVE_FACTOR if agb_range_min else None,
                     agb_max=agb_range_max * utils.NON_MANGROVE_FACTOR if agb_range_max else None,
@@ -4383,46 +4418,23 @@ for i, row in df.iterrows():
                     agb_growth_max=agb_growth_max * utils.NON_MANGROVE_FACTOR if agb_growth_max else None,
                 )
 
-CoastalLitter.objects.all().delete()
+# df = pd.read_csv(
+#     os.path.join(os.path.dirname(__file__), "ipcc_data", "IrrigationSystemType_ModuleType.csv"),
+#     header=0,
+#     sep=",",
+# )
 
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "CoastalLitter.csv"),
-    header=0,
-    sep=",",
-)
+# df_headers = df.columns.values.tolist()
+# df_dict = df.to_dict("records")
 
-df_headers = df.columns.values.tolist()
-df_dict = df.to_dict("records")
+# for i, row in df.iterrows():
+#     irrigation_system_type = IrrigationSystemType.objects.get(name__iexact=row["irrigation_system_type"])
+#     module_type = ModuleType.objects.get(class_name__iexact=row["module_type"])
 
-for i, row in enumerate(df_dict):
-    climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
-    moisture = Moisture.objects.get(name__iexact=sanitize(row["moisture"]))
+#     print(irrigation_system_type, module_type)
 
-    for j, header in enumerate(df_headers, start=2):
-        if j == len(df_headers):
-            break
-
-        land_use_type = LandUseType.objects.get(name__iexact=sanitize(df_headers[j]))
-        value = parse_csv_number(row[df_headers[j]])
-
-        print(
-            land_use_type,
-            climate,
-            moisture,
-            value,
-        )
-
-        CoastalLitter.objects.create(
-            land_use_type=land_use_type,
-            climate=climate,
-            moisture=moisture,
-            value=value,
-        )
-
-"""
-
-# TODO: Run in production
-
+#     irrigation_system_type.module_types.add(module_type)
+#     irrigation_system_type.save()
 
 # TODO: Run in review
 
