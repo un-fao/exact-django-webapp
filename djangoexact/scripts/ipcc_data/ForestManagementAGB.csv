@@ -155,3 +155,55 @@ Boreal;Tundra Woodland;North America;Secondary;0;104.2;0.4;5;0.4
 Boreal;Mountain System;North America;Primary;0;n.a.;n.a.;n.a.;n.a.
 Boreal;Mountain System;North America;Secondary;21;n.a.;1.1-1.5;40-50;1.0
 Boreal;Mountain System;North America;Secondary;0;1.9;1.0-1.1;5.0-50;1.0
+Tropical;Rainforest;Africa;Primary;21;404.2;1.3;n.a.;n.a.
+Tropical;Rainforest;North and South America;Primary;21;307,1;1;n.a.;n.a.
+Tropical;Rainforest;Asia;Primary;21;413,1;0,7;n.a.;n.a.
+Tropical;Moist Deciduous Forest;Africa;Primary;21;236,6;0,4;n.a.;n.a.
+Tropical;Moist Deciduous Forest;North and South America;Primary;21;187,3;0,4;n.a.;n.a.
+Tropical;Moist Deciduous Forest;Asia;Primary;21;67,7;0,4;n.a.;n.a.
+Tropical;Dry Forest;Africa;Primary;21;69,6;n.a.;n.a.;n.a.
+Tropical;Dry Forest;North and South America;Primary;21;127,5;n.a.;n.a.;n.a.
+Tropical;Dry Forest;Asia;Primary;21;184.6;n.a.;n.a.;n.a.
+Tropical;Shrubland;Africa;Primary;21;48.4;0.9;n.a.;n.a.
+Tropical;Shrubland;North and South America;Primary;21;71.5;1.0;n.a.;n.a.
+Tropical;Shrubland;Asia;Primary;21;38.3;1.0-1.3;n.a.;n.a.
+Tropical Montane;Mountain System;Africa;Primary;21;190.0;0.5;n.a.;n.a.
+Tropical Montane;Mountain System;North and South America;Primary;21;195.0;0.5;n.a.;n.a.
+Tropical Montane;Mountain System;Asia;Primary;21;433.5;-0.7;n.a.;n.a.
+Warm Temperate;Humid Forest;Africa;Primary;21;54.1;n.a.;n.a.;n.a.
+Warm Temperate;Humid Forest;North and South America;Primary;21;84.5;n.a.;n.a.;n.a.
+Warm Temperate;Humid Forest;Asia;Primary;21;323.0;n.a.;n.a.;n.a.
+Warm Temperate;Dry Forest;Africa;Primary;21;65.2;1.8;n.a.;n.a.
+Warm Temperate;Dry Forest;North and South America;Primary;21;115.9;1.0;n.a.;n.a.
+Warm Temperate;Dry Forest;Asia;Primary;21;70.9;1.5-2.0;n.a.;n.a.
+Warm Temperate;Steppe;Africa;Primary;21;50.5;0.9;n.a.;n.a.
+Warm Temperate;Steppe;North and South America;Primary;21;44.0;1.0;n.a.;n.a.
+Warm Temperate;Steppe;Asia;Primary;21;41.6;1.0-1.3;n.a.;n.a.
+Warm Temperate;Mountain System;Africa;Primary;21;35.1;n.a.;n.a.;n.a.
+Warm Temperate;Mountain System;North and South America;Primary;21;74.6;n.a.;n.a.;n.a.
+Warm Temperate;Mountain System;Asia;Primary;21;250.2;n.a.;n.a.;n.a.
+Cool Temperate;Mountain System;Asia;Primary;21;n.a.;n.a.;n.a.;n.a.
+Cool Temperate;Mountain System;Europe;Primary;21;301.1;n.a.;n.a.;n.a.
+Cool Temperate;Mountain System;North and South America;Primary;21;n.a.;n.a.;n.a.;n.a.
+Cool Temperate;Continental Forest;Asia;Primary;21;n.a.;n.a.;n.a.;n.a.
+Cool Temperate;Continental Forest;Europe;Primary;21;332.4;n.a.;n.a.;n.a.
+Cool Temperate;Continental Forest;North and South America;Primary;21;n.a.;n.a.;n.a.;n.a.
+Cool Temperate;Oceanic Forest;Asia;Primary;21;289.8;n.a.;n.a.;n.a.
+Cool Temperate;Oceanic Forest;Europe;Primary;21;126.1;2.3;n.a.;n.a.
+Cool Temperate;Oceanic Forest;Oceania;Primary;21;352.7;0.37;n.a.;n.a.
+Cool Temperate;Oceanic Forest;North and South America;Primary;21;n.a.;n.a.;n.a.;n.a.
+Cool Temperate;Desert;Asia;Primary;21;n.a.;n.a.;n.a.;n.a.
+Cool Temperate;Steppe;Asia;Primary;21;n.a.;n.a.;n.a.;n.a.
+Cool Temperate;Desert;Europe;Primary;21;n.a.;n.a.;n.a.;n.a.
+Cool Temperate;Steppe;Europe;Primary;21;n.a.;n.a.;n.a.;n.a.
+Cool Temperate;Desert;North America;Primary;21;n.a.;n.a.;n.a.;n.a.
+Cool Temperate;Steppe;North America;Primary;21;n.a.;n.a.;n.a.;n.a.
+Boreal;Coniferous Forest;Asia;Primary;21;62.9;0.1-2.1;n.a.;n.a.
+Boreal;Tundra Woodland;Asia;Primary;21;n.a.;0.4;n.a.;n.a.
+Boreal;Mountain System;Asia;Primary;21;n.a.;n.a.;n.a.;n.a.
+Boreal;Coniferous Forest;Europe;Primary;21;62.9;0.1-2.1;n.a.;n.a.
+Boreal;Tundra Woodland;Europe;Primary;21;n.a.;0.4;n.a.;n.a.
+Boreal;Mountain System;Europe;Primary;21;n.a.;n.a.;n.a.;n.a.
+Boreal;Coniferous Forest;North America;Primary;21;62.9;0.1-2.1;n.a.;n.a.
+Boreal;Tundra Woodland;North America;Primary;21;n.a.;0.4;n.a.;n.a.
+Boreal;Mountain System;North America;Primary;21;n.a.;n.a.;n.a.;n.a.
