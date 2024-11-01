@@ -460,6 +460,8 @@ class ActivitySummarySerializer(serializers.ModelSerializer):
 
 
 class ActivityResultSerializer(serializers.Serializer):
+    name = serializers.CharField(read_only=True)
+    cost = serializers.FloatField(read_only=True)
     pass
 
 
