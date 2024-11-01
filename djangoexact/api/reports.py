@@ -1704,6 +1704,11 @@ class IrrigationReport(BaseModuleReport):
     def add_submodules_results(self):
         submodules: list[api_models.Submodule] = self.module.submodules
 
+        self.other_infrastructure_co2_eq = np.zeros(self.duration)
+        self.liquid_fuel_or_electricity_co2 = np.zeros(self.duration)
+        self.liquid_fuel_or_electricity_ch4 = np.zeros(self.duration)
+        self.liquid_fuel_or_electricity_n2o = np.zeros(self.duration)
+
         for submodule in submodules:
             submodules_emission_set = []
             CalculatorClass = calculators.IrrigationPhaseCalculator if isinstance(submodule, api_models.IrrigationPhase) else calculators.IrrigationSystemCalculator
