@@ -16,6 +16,7 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
+from api.views import warmup
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -23,4 +24,5 @@ urlpatterns = [
     path("api/ipcc/", include("ipcc.urls")),
     path("api/accounts/", include("accounts.urls")),
     path("api/blog/", include("blog.urls")),
+    path("_ah/warmup", warmup),
 ]
