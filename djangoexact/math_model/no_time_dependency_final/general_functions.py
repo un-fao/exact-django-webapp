@@ -548,6 +548,7 @@ def create_agb_bgb_matrix(years_impl, years_cap, delta_agb_yearly_below_20, delt
         traceback.print_exc()
         raise e
     
+    
 def create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, bgb_ratio_under_threshold, bgb_ratio_over_threshold, threshold, bgb_start, time_impl):
 
     try:
