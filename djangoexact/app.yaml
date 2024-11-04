@@ -25,3 +25,9 @@ env_variables:
   DB_NAME: "$DB_NAME"
   DB_PORT: "$DB_PORT"
   SECRET_KEY: "$SECRET_KEY"
+
+automatic_scaling:
+  min_idle_instances: 1
+
+inbound_services:
+- warmup
