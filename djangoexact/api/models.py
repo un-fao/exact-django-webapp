@@ -1891,11 +1891,6 @@ class ForestManagement(LandModule, LitterDeadwoodBiomassModule):
         return super().save(*args, **kwargs)
 
     def get_agb_growth_ref(self, land_use_type: LandUseType, from_year: int = 0) -> ipcc.ForestManagementAGB:
-        AGB_UNDER_20_NOT_FOUND = f"AGB (under 20 years) not found for ({self.forest_type.name}) {land_use_type.name} in {self.activity.project.climate.name} climate, {self.activity.project.country.region.name} region. Please insert t2 values for AGB (under 20 years) for all relevant cenarios."
-        AGB_OVER_20_NOT_FOUND = f"AGB (over 20 years) not found for ({self.forest_type.name}) {land_use_type.name} in {self.activity.project.climate.name} climate, {self.activity.project.country.region.name} region. Please insert t2 values for AGB (over 20 years) for all relevant scenarios."
-
-        error_msg = AGB_UNDER_20_NOT_FOUND if from_year < 20 else AGB_OVER_20_NOT_FOUND
-
         climate = self.activity.climate_t2 if self.activity.climate_t2 else self.activity.project.climate
 
         filters = {
