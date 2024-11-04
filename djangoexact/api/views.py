@@ -214,6 +214,10 @@ class DefaultPagination(PageNumberPagination):
     max_page_size = 100
 
 
+def warmup(request):
+    return HttpResponse("Warmup successful.")
+
+
 class BaseWiewSet(viewsets.GenericViewSet):
     def get_queryset(self):
 
