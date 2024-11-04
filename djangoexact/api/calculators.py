@@ -4028,7 +4028,7 @@ class RoadCalculator(BaseCalculator):
         except ipcc.RoadEmissionFactor.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "ef_t2")
             if missing_scenarios:
-                raise ValueError(f"Road Emission Factor for {self.module.road_type.name} does not exist. Please provide a tier 2 value for scenarios: {', '.join(missing_scenarios)}")
+                raise ValueError(f"Road Emission Factor for {self.module.road_type} does not exist. Please provide a tier 2 value for scenarios: {', '.join(missing_scenarios)}")
 
     def calculate(self) -> list[Result]:
         """
