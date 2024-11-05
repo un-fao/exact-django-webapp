@@ -34,8 +34,33 @@ import traceback
 # NOTE: ForestManagement class extends LandModule even though it does not have a biomass_start and end. 
 # As these variables have beene set to Optional for Perennial it should work fine.
 @dataclass
-class ForestManagement(LandModule):
+class ForestManagement(BaseModule):
     """Forest management module"""
+    
+    ########### GENERAL LAND MODULE VARIABLES ############ # NOTE: Can't directly extend LandModule as it has biomass values (consider changing this)
+    hectares_start: float
+    hectares_end: float
+
+    soc_start_default: float
+    soc_end_default: float
+    soc_start_tier_2: Optional[float]
+    soc_end_tier_2: Optional[float]
+    fmg_start_default: float
+    fmg_end_default: float
+    fmg_start_tier_2: Optional[float]
+    fmg_end_tier_2: Optional[float]
+    flu_start_default: float
+    flu_end_default: float
+    flu_start_tier_2: Optional[float]
+    flu_end_tier_2: Optional[float]
+    fi_start_default: float
+    fi_end_default: float
+    fi_start_tier_2: Optional[float]
+    fi_end_tier_2: Optional[float]
+    
+    ef_nitrous_som: float
+    
+    
     ########### AGB and BGB RELATED VARIABLES ############
     agb_yearly_growth_over_20_default : float
     agb_yearly_growth_over_20_tier_2 : float
@@ -48,9 +73,8 @@ class ForestManagement(LandModule):
     bgb_yearly_growth_over_20_tier_2 : float
     agb_start_default : float
     agb_start_tier_2 : float
-    bgb_start_default : float
-    bgb_start_tier_2 : float
     max_agb_value : float
+    max_bgb_value: Optional[float] # NOTE: AS OF NOW IT'S NOT USED YET, PREDISPONED FOR FUTURE IMPLEMENTATION
 
     ########### ROTATION RELATED VARIABLES ############
     rotation_recurrence: int
@@ -122,8 +146,19 @@ class ForestManagement(LandModule):
         # equivalent to capitalization + implementation + 1
         self.capitalization_time = self.capitalization_time if not self.rate_type == 'immediate' else self.capitalization_time + self.implementation_time + 1
         self.implementation_time = self.implementation_time if not self.rate_type == 'immediate' else 1
+        
+        ########### GENERALE LAND MODULE ASSIGNMENTS ############
+        fmg_start = self.fmg_start_tier_2 or self.fmg_start_default
+        fmg_end = self.fmg_end_tier_2 or self.fmg_end_default
+        flu_start = self.flu_start_tier_2 or self.flu_start_default
+        flu_end = self.flu_end_tier_2 or self.flu_end_default
+        fi_start = self.fi_start_tier_2 or self.fi_start_default
+        fi_end = self.fi_end_tier_2 or self.fi_end_default
+        soc_ref_start = self.soc_start_tier_2 or self.soc_start_default
+        soc_ref_end = self.soc_end_tier_2 or self.soc_end_default
 
-
+        self.soc_start = soc_ref_start * fmg_start * fi_start * flu_start
+        self.soc_end = soc_ref_end * fmg_end * fi_end * flu_end
 
         ########### AGB AND BGB MATRIX CREATION ############
         # NOTE: We have to understand if we're in Afforestation or Forest Remaining Forest (Deforesation Occurs in the Defo module)

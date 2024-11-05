@@ -5929,7 +5929,7 @@ class ForestManagementCalculator(LandModuleCalculator):
 
             log.debug(f"Forest inputs with: {self.inputs_w}")
 
-            self.math_w = MathForestManagement(*self.inputs_w)
+            self.math_w = MathForestManagement(**self.inputs_w)
             self.math_w.calculate_emissions()
 
         if self.module.is_without():
@@ -6003,7 +6003,7 @@ class ForestManagementCalculator(LandModuleCalculator):
 
             log.debug(f"Forest inputs without: {self.inputs_wo}")
 
-            self.math_wo = MathForestManagement(*self.inputs_wo)
+            self.math_wo = MathForestManagement(**self.inputs_wo)
             self.math_wo.calculate_emissions()
 
         self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
