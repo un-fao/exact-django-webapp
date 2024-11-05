@@ -2,7 +2,6 @@ import re
 import traceback
 
 from .general_functions import (
-    BaseModule,
     breakdown_according_to_values,
     soil_emissions,
     soil_emissions_2,
@@ -20,7 +19,7 @@ from .ghg_emissions_classes import (
 )
 
 
-class Deforestation(BaseModule):
+class Deforestation():
     def __init__(self, ha_start, ha_end, time_impl, time_cap, rate_type_soil, biomass_final_1_year_t_per_ha, biomass_final_1_year_t_per_ha_tier_2, nitrous_constant, methane_constant, fire_bool, n2o_vegetation, ch4_vegetation, cf_vegetation, moisture_emission_factor, litter, litter_tier_2, dw, dw_tier_2, hwp_before_t_dm_per_ha, mangrove_factor, bgb_t_c_per_ha_tier_2, agb_t_c_per_ha_tier_2, agb_t_c_per_ha_default, bgb_t_c_per_ha_default_input_parameter, c_n_ratio, soc_after_defo_tier_2, soc_reference_default, soc_reference_tier_2, fmg_start_tier_2, fmg_end_tier_2, fi_start_tier_2, fi_end_tier_2, flu_start_tier_2, flu_end_tier_2, soc_start_tier_2, soc_end_tier_2, fmg_start_default, fmg_end_default, fi_start_default, fi_end_default, flu_start_default, flu_end_default, soc_start_default, soc_end_default, calculate_soc_som, delay, end_module_has_growth):
         self.ha_start = ha_start
         self.ha_end = ha_end
