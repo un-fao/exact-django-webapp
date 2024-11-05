@@ -703,9 +703,17 @@ class LandModuleReport(BaseModuleReport):
 class LandUseChangeReport(LandModuleReport):
     module: api_models.LandUseChange
 
+    dom_co2_source = (math_utils.ActivityTypes.DOM, math_utils.GasTypes.CO2)
+
     def __post_init__(self):
         self.calculator = calculators.LandUseChangeCalculator(self.module)
         return super().__post_init__()
+
+    def get_result(self):
+        super().get_result()
+
+        dom_co2 = self.extract_emissions(self.emissions_set, self.dom_co2_source[0], self.dom_co2_source[1])
+        self.soil_co2 = list(map(sum, zip(self.soil_co2, dom_co2)))
 
 
 @dataclass
