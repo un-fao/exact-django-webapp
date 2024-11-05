@@ -2029,6 +2029,10 @@ class FuelSerializer(ScenarioSubmoduleSerializer):
         if parent.fuels.count() + 1 > max_elements:
             raise serializers.ValidationError(f"Only {max_elements} fuel modules are allowed")
 
+        parent_serializer = EnergySerializer(data={}, instance=parent, partial=True)
+        if parent_serializer.is_valid():
+            parent_serializer.save()
+
         return data
 
 
@@ -2079,6 +2083,10 @@ class ElectricityWriteSerializer(NoScenarioSubmoduleSerializer):
 
         if not self.instance and parent.electricities.count() + 1 > max_elements:
             raise serializers.ValidationError(f"Only {max_elements} electricity modules are allowed")
+
+        parent_serializer = EnergySerializer(data={}, instance=parent, partial=True)
+        if parent_serializer.is_valid():
+            parent_serializer.save()
 
         return data
 
