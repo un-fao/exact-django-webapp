@@ -2804,6 +2804,13 @@ class Processing(Submodule):
     water_use_per_year_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_water_use_per_year_thread")
 
 
+class PackagingType(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Packaging(Submodule):
     parent = models.ForeignKey(ValueChain, null=True, blank=True, related_name="packagings", on_delete=models.CASCADE)
 
