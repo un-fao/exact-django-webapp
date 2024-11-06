@@ -2803,6 +2803,8 @@ class Processing(Submodule):
     water_use_per_year_wo = models.FloatField(null=True, blank=True)
     water_use_per_year_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_water_use_per_year_thread")
 
+    country_of_origin = models.ForeignKey(Country, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_country_of_origin")
+
 
 class PackagingType(models.Model):
     name = models.CharField(max_length=255, unique=True)
