@@ -6493,7 +6493,31 @@ class ProcessingCalculator(BaseCalculator):
 
         self.module: Processing
 
+        self.energy_ef_start = ipcc.EnergyDefaultEmissionFactor()
+        self.energy_ef_w = ipcc.EnergyDefaultEmissionFactor()
+        self.energy_ef_wo = ipcc.EnergyDefaultEmissionFactor()
+
+        self.electricity_ef = ipcc.ElectricityEmission()
+
     def get_defaults(self, calculate=False) -> dict:
+
+        try:
+            self.electricity_ef = ipcc.ElectricityEmission.objects.get(country=self.module.country_of_origin)
+        except ipcc.ElectricityEmission.DoesNotExist:
+            log.error(f"Electricity emission factor for {self.module.country_of_origin} not found.")
+
+        if self.module.is_with():
+            try:
+                self.energy_ef_w = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=self.module.fuel_type_w)
+            except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
+                log.error(f"Energy emission factor for {self.module.fuel_type_w} not found. Plase select tier2 value for with scenario.")
+
+        if self.module.is_without():
+            try:
+                self.energy_ef_wo = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=self.module.fuel_type_wo)
+            except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
+                log.error(f"Energy emission factor for {self.module.fuel_type_wo} not found. Plase select tier2 value for without scenario.")
+
         return super().get_defaults(calculate)
 
     def calculate(self) -> Result:
@@ -6516,7 +6540,22 @@ class PackagingCalculator(BaseCalculator):
 
         self.module: Packaging
 
+        self.packaging_ef = ipcc.ValueChainPackagingEmissionFactor()
+
     def get_defaults(self, calculate=False) -> dict:
+
+        if self.module.is_with():
+            try:
+                self.packaging_ef = ipcc.ValueChainPackagingEmissionFactor.objects.get(fuel_type=self.module.packaging_material_type_w)
+            except ipcc.ValueChainPackagingEmissionFactor.DoesNotExist:
+                log.error(f"Packaging emission factor for {self.module.packaging_material_type_w} not found. Plase select tier2 value for with scenario.")
+
+        if self.module.is_without():
+            try:
+                self.packaging_ef = ipcc.ValueChainPackagingEmissionFactor.objects.get(fuel_type=self.module.packaging_material_type_wo)
+            except ipcc.ValueChainPackagingEmissionFactor.DoesNotExist:
+                log.error(f"Packaging emission factor for {self.module.packaging_material_type_wo} not found. Plase select tier2 value for without scenario.")
+
         return super().get_defaults(calculate)
 
     def calculate(self) -> Result:
