@@ -2926,7 +2926,99 @@ class ProjectInvitationWriteSerializer(serializers.Serializer):
     project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(), required=True)
 
 
-class StorageSerializer(SubmoduleBaseSerializer):
+class NewNoteSerializer(serializers.ModelSerializer):
+    content = serializers.CharField(required=True)
+    module_type_id = serializers.IntegerField(required=True)
+    module_id = serializers.IntegerField(required=True)
+
+    class Meta:
+        model = Note
+        fields = ["content", "module_type_id", "module_id"]
+        ref_name = "Note"
+
+    def validate(self, data):
+
+        try:
+            module_type = ModuleType.objects.get(pk=data["module_type_id"])
+        except ModuleType.DoesNotExist:
+            raise serializers.ValidationError("Module type does not exist")
+
+        ModuleClass = utils.get_model(module_type.class_name, suffix=None)
+        try:
+            module: Module | Submodule = ModuleClass.objects.get(pk=data["module_id"])
+        except ModuleClass.DoesNotExist:
+            raise serializers.ValidationError("Module does not exist")
+
+        if module.note.exists():
+            raise serializers.ValidationError(f"Note already exists for this module. Use PUT with id {module.note.pk} to update")
+
+        return super().validate(data)
+
+    def save(self, **kwargs):
+        module_type = ModuleType.objects.get(pk=self.validated_data["module_type_id"])
+        ModuleClass = utils.get_model(module_type.class_name, suffix=None)
+        module: Module | Submodule = ModuleClass.objects.get(pk=self.validated_data["module_id"])
+
+        note = Note.objects.create(
+            author=self.context["request"].user,
+            content=self.validated_data["content"],
+            content_object=module,
+        )
+
+        return note
+
+
+class NoteSerializer(serializers.ModelSerializer):
+    module_type = serializers.SerializerMethodField(read_only=True)
+    module_id = serializers.SerializerMethodField(read_only=True)
+
+    def get_module_type(self, obj):
+        module_type = ModuleType.objects.get(class_name=obj.content_object.__class__.__name__)
+        return get_model_serializer(ModuleType)(module_type, many=False).data
+
+    def get_module_id(self, obj):
+        return obj.content_object.id
+
+    class Meta:
+        model = Note
+        fields = ["id", "content", "module_type", "module_id"]
+        ref_name = "Note"
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    password_old = serializers.CharField(required=True)
+    password_new = serializers.CharField(required=True)
+
+    def validate(self, data):
+        user: CustomUser = self.context["request"].user
+        psasword_old = data.get("password_old", None)
+        password_new = data.get("password_new", None)
+
+        if not user.check_password(data["password_old"]):
+            raise serializers.ValidationError("Old password is incorrect")
+
+        if password_new is None or psasword_old is None:
+            raise serializers.ValidationError("Old and new password are required")
+
+        return super().validate(data)
+
+
+class FieldDefinitionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FieldDefinition
+        fields = ("field_name", "description")
+        ref_name = "FieldDefinition"
+
+
+class FieldMetadataSerializer(serializers.Serializer):
+    description = serializers.CharField()
+
+
+class FieldDefinitionResponseSerializer(serializers.Serializer):
+    field_name = FieldMetadataSerializer(many=True)
+
+
+class StorageSerializer(ScenarioSubmoduleSerializer):
     class Meta:
         model = Storage
         fields = "__all__"
@@ -2957,7 +3049,7 @@ class StorageSerializer(SubmoduleBaseSerializer):
         }
 
 
-class ProcessingSerializer(SubmoduleBaseSerializer):
+class ProcessingSerializer(ScenarioSubmoduleSerializer):
     class Meta:
         model = Processing
         fields = "__all__"
@@ -2985,7 +3077,7 @@ class ProcessingSerializer(SubmoduleBaseSerializer):
         }
 
 
-class PackagingSerializer(SubmoduleBaseSerializer):
+class PackagingSerializer(ScenarioSubmoduleSerializer):
     class Meta:
         model = Packaging
         fields = "__all__"
@@ -3014,7 +3106,7 @@ class PackagingSerializer(SubmoduleBaseSerializer):
         }
 
 
-class TransportSerializer(SubmoduleBaseSerializer):
+class TransportSerializer(ScenarioSubmoduleSerializer):
     class Meta:
         model = Transport
         fields = "__all__"
