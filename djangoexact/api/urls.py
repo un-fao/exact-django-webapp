@@ -5,6 +5,9 @@ from ipcc.models import GlobalWarmingPotential
 from rest_framework import permissions, routers
 from rest_framework.documentation import include_docs_urls
 
+from rest_framework_nested import routers as nested_routers
+
+
 import api.models as models
 
 from . import views
@@ -19,34 +22,40 @@ schema_view = get_schema_view(
         # license=openapi.License(name="BSD License"),
     ),
     public=True,
-    permission_classes=[permissions.IsAuthenticated],
 )
 
 router = routers.DefaultRouter()
 
 router.register(r"projects", views.ProjectViewSet)
-router.register(r"project-invitations", views.ProjectInvitationViewSet)
+
+project_router = nested_routers.NestedSimpleRouter(router, r"projects", lookup="project")
+project_router.register(r"tags", views.ProjectTagViewSet, basename="project-tags")
+
+router.register(r"project-invitations", views.ProjectInvitationViewSet, basename="project-invitations")
+router.register(r"project-memberships", views.ProjectMembershipViewSet)
 router.register(r"groups", views.GroupViewSet)
 router.register(r"activities", views.ActivityViewSet, basename="activities")
 router.register(r"threads", views.CommentThreadViewSet, basename="threads")
 router.register(r"comments", views.CommentViewSet, basename="comments")
 router.register(r"land-use-types", views.LandUseTypeViewSet, basename="land-use-types")
 router.register(r"module-types", views.ModuleTypeViewSet, basename="modules")
+router.register(r"notes", views.NoteViewSet, basename="notes")
 
 router.register(r"statuses", views.generic_viewset(models.ProjectStatus), basename="statuses")
 router.register(r"regions", views.generic_viewset(models.Region), basename="regions")
 router.register(r"countries", views.CountryViewSet, basename="countries")
 router.register(r"global-warming-potentials", views.generic_viewset(GlobalWarmingPotential), basename="global-warming-potentials")
 router.register(r"change-rates", views.generic_viewset(models.ChangeRate), basename="change-rates")
+router.register(r"organization-types", views.generic_viewset(models.OrganizationType), basename="organization-types")
 
 # Annual Cropland
-router.register(r"annual-croppings", views.generic_module_viewset(models.AnnualCropping), basename="annual-croppings")
-router.register(r"annual-croppings-minor-seasons", views.generic_module_viewset(models.MinorSeasonAnnualCropping), basename="annualcroppingminorseasons")
+router.register(r"annual-croplands", views.generic_module_viewset(models.AnnualCropland), basename="annual-croppings")
+router.register(r"annual-croplands-minor-seasons", views.generic_module_viewset(models.MinorSeasonAnnualCropland), basename="annual-cropland-minor-seasons")
 router.register(r"tillage-management-types", views.generic_viewset(models.TillageManagementType), basename="tillage-management-types")
 
 # Perennial Cropland
-router.register(r"perennial-croppings", views.generic_module_viewset(models.PerennialCropping), basename="perennialcroppings")
-router.register(r"perennial-croppings-minor-seasons", views.generic_module_viewset(models.MinorSeasonPerennialCropping), basename="perennialcroppingminorseasons")
+router.register(r"perennial-croplands", views.generic_module_viewset(models.PerennialCropland), basename="perennial-croplands")
+router.register(r"perennial-croplands-minor-seasons", views.generic_module_viewset(models.MinorSeasonPerennialCropland), basename="perennial-cropland-minor-seasons")
 
 # Grassland
 router.register(r"grasslands", views.generic_module_viewset(models.Grassland), basename="grasslands")
@@ -79,8 +88,8 @@ router.register(r"irrigation-system-types", views.generic_viewset(models.Irrigat
 # Set Aside
 router.register(r"set-asides", views.generic_module_viewset(models.SetAside), basename="set-asides")
 
-# Degraded Land
-router.register(r"degraded-lands", views.generic_module_viewset(models.DegradedLand), basename="degraded-lands")
+# Other Land
+router.register(r"other-lands", views.generic_module_viewset(models.OtherLand), basename="other-lands")
 
 # Coastal Wetland
 router.register(r"coastal-wetlands", views.generic_module_viewset(models.CoastalWetland), basename="coastal-wetlands")
@@ -153,7 +162,7 @@ router.register(r"peat-types", views.generic_viewset(models.PeatType), basename=
 
 
 router.register(r"users", views.UserViewSet, basename="users")
-router.register(r"definitions", views.DefinitionViewSet, basename="definitions")
+router.register(r"definitions", views.FieldDefinitionViewSet, basename="definitions")
 
 urlpatterns = [
     path("docs/", include_docs_urls(title="EX-ACT Docs")),
@@ -162,3 +171,4 @@ urlpatterns = [
     re_path(r"^redoc/$", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
 ]
 urlpatterns += router.urls
+urlpatterns += project_router.urls
