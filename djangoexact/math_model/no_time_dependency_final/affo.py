@@ -110,6 +110,7 @@ class Afforestation:
             
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         def calculate_dom_emissions():
 
@@ -125,6 +126,7 @@ class Afforestation:
             
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         def calculate_biomass_loss():
 
@@ -137,6 +139,7 @@ class Afforestation:
 
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         def calculate_soil_emissions():
 
@@ -144,6 +147,7 @@ class Afforestation:
                 self.yearly_soil_emissions, self.total_soil_emissions = soil_emissions(self.hectars_before_20, 0, self.hectars_end, self.soc_default, self.soc_tier_2, None, None, None, self.flu)
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         def calculate_fire_emissions():
 
@@ -162,6 +166,7 @@ class Afforestation:
             
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         calculate_biomass_gain()
         calculate_dom_emissions()
@@ -177,6 +182,7 @@ class Afforestation:
 
         except Exception as e:
             traceback.print_exc()
+            raise e
 
     def evaluate_tier_2():
         pass

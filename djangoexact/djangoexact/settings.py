@@ -14,7 +14,11 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from datetime import timedelta
 from pathlib import Path
+import json
+import base64
 
+import firebase_admin
+import pyrebase
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -32,7 +36,7 @@ SECRET_KEY = os.getenv("SECRET_KEY") if not os.getenv("GAE_APPLICATION", None) e
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["$ALLOWED_HOST", "localhost", "127.0.0.1", "0.0.0.0", "localhost:3000"]
+ALLOWED_HOSTS = ["$ALLOWED_HOST", "localhost", "127.0.0.1", "0.0.0.0", "localhost:3000", "20241104t080651.fao-exact-review.ew.r.appspot.com"]
 
 CORS_ORIGIN_ALLOW_ALL = True
 
@@ -40,6 +44,14 @@ CORS_ORIGIN_ALLOW_ALL = True
 # Application definition
 
 INSTALLED_APPS = [
+    "unfold",  # before django.contrib.admin
+    "unfold.contrib.filters",  # optional, if special filters are needed
+    "unfold.contrib.forms",  # optional, if special form elements are needed
+    "unfold.contrib.inlines",  # optional, if special inlines are needed
+    "unfold.contrib.import_export",  # optional, if django-import-export package is used
+    "unfold.contrib.guardian",  # optional, if django-guardian package is used
+    "unfold.contrib.simple_history",  # optional, if django-simple-history package is used
+    "modeltranslation",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -51,12 +63,13 @@ INSTALLED_APPS = [
     "django_archive",
     "auditlog",
     "rest_framework",
-    "rest_framework_simplejwt",
     "django_filters",
     "accounts",
     "simple_history",
     "ipcc",
     "api",
+    "blog",
+    "ckeditor",
 ]
 
 if DEBUG:
@@ -68,7 +81,9 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
+    # "accounts.middleware.FirebaseAuthenticationMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "auditlog.middleware.AuditlogMiddleware",
@@ -109,6 +124,13 @@ if os.getenv("GAE_APPLICATION", None):
             "USER": "$DB_USERNAME",
             "PASSWORD": "$DB_PASSWORD",
             "NAME": "$DB_NAME",
+            "TEST": {
+                "NAME": "$DB_NAME",
+            },
+            "OPTIONS": {
+                "connect_timeout": 30,  # Optional: set timeout
+            },
+            "CONN_MAX_AGE": 0,  # Enables persistent connections
         }
     }
 else:
@@ -120,6 +142,10 @@ else:
             "PASSWORD": os.getenv("DB_PASSWORD", default="$DB_PASSWORD"),
             "NAME": os.getenv("DB_NAME", default="$DB_NAME"),
             "PORT": os.getenv("DB_PORT", default="$DB_PORT"),
+            "OPTIONS": {
+                "connect_timeout": 30,  # Optional: set timeout
+            },
+            "CONN_MAX_AGE": 0,  # Enables persistent connections
         }
     }
 
@@ -145,19 +171,29 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = "UTC"
 
 USE_I18N = True
+LANGUAGE_CODE = "en"
+LOCALE_PATHS = [os.path.join(BASE_DIR, "locale")]
+LANGUAGES = [
+    ("en", "English"),
+    ("fr", "French"),
+    ("es", "Spanish"),
+]
 
 USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
-STATIC_ROOT = "static"
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 STATIC_URL = "/static/"
+
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, "static"),
+# ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -167,9 +203,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.BasicAuthentication",
+        # "rest_framework.authentication.BasicAuthentication",
         # "rest_framework.authentication.SessionAuthentication",
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        # "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "accounts.firebase.FirebaseAuthentication",
     ],
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
 }
@@ -179,7 +216,7 @@ AUDITLOG_INCLUDE_ALL_MODELS = True
 AUDITLOG_EXCLUDE_TRACKING_FIELDS = ("created", "modified")
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=30),
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),
     "TOKEN_OBTAIN_SERIALIZER": "accounts.serializers.MyTokenObtainPairSerializer",
 }
 
@@ -216,3 +253,40 @@ ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
+
+# Email settings
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = os.getenv("EMAIL_HOST", "$EMAIL_HOST")
+EMAIL_PORT = os.getenv("EMAIL_PORT", "$EMAIL_PORT")
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv("SMTP_USER_EMAIL", "$SMTP_USER_EMAIL")
+EMAIL_HOST_PASSWORD = os.getenv("SMTP_USER_PASSWORD", "$SMTP_USER_PASSWORD")
+
+# Firebase settings
+try:
+    FIREBASE_CONFIG = {
+        "apiKey": os.getenv("FIREBASE_API_KEY", "$FIREBASE_API_KEY"),
+        "authDomain": os.getenv("FIREBASE_AUTH_DOMAIN", "$FIREBASE_AUTH_DOMAIN"),
+        "projectId": os.getenv("FIREBASE_PROJECT_ID", "$FIREBASE_PROJECT_ID"),
+        "storageBucket": os.getenv("FIREBASE_STORAGE_BUCKET", "$FIREBASE_STORAGE_BUCKET"),
+        "messagingSenderId": os.getenv("FIREBASE_MESSAGING_SENDER_ID", "$FIREBASE_MESSAGING_SENDER_ID"),
+        "appId": os.getenv("FIREBASE_APP_ID", "$FIREBASE_APP_ID"),
+        "measurementId": os.getenv("FIREBASE_MEASUREMENT_ID", "$FIREBASE_MEASUREMENT_ID"),
+        "databaseURL": "",
+        "serviceAccount": json.loads(base64.b64decode(os.getenv("FIREBASE_SERVICE_ACCOUNT", "$FIREBASE_SERVICE_ACCOUNT")).decode()),
+    }
+
+    firebase = pyrebase.initialize_app(FIREBASE_CONFIG)
+    auth = firebase.auth()
+    firebase_admin.initialize_app(firebase_admin.credentials.Certificate(FIREBASE_CONFIG["serviceAccount"]))
+except Exception as e:
+    raise Exception(f"Firebase config not found: {e}") from e
+
+UNFOLD = {
+    "SIDEBAR": {
+        "show_search": True,  # Search in applications and models names
+        "show_all_applications": True,  # Dropdown with all applications and models
+    },
+}
+
+CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"

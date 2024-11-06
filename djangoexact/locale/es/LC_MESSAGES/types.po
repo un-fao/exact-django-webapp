@@ -1,0 +1,1463 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: support@example.com\n"
+"POT-Creation-Date: 2024-10-24 12:29\n"
+"PO-Revision-Date: 2024-10-24 12:29\n"
+"Last-Translator: Your Name <your.email@example.com>\n"
+"Language-Team: English <support@example.com>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. InvitationStatusType
+msgid "pending"
+msgstr "pendiente"
+
+#. InvitationStatusType
+msgid "accepted"
+msgstr "aceptada"
+
+#. InvitationStatusType
+msgid "rejected"
+msgstr "rechazada"
+
+#. InvitationStatusType
+msgid "canceled"
+msgstr "cancelada"
+
+#. ForestType
+msgid "Natural"
+msgstr "Natural"
+
+#. ForestType
+msgid "Plantation"
+msgstr "Plantación"
+
+#. ForestConditionType
+msgid "Primary"
+msgstr "Primario"
+
+#. ForestConditionType
+msgid "Secondary"
+msgstr "Secundario"
+
+#. SiteLocationType
+msgid "On-Site"
+msgstr "In Situ"
+
+#. SiteLocationType
+msgid "Off-Site"
+msgstr "Fuera del Sitio"
+
+#. StatusType
+msgid "EMPTY"
+msgstr "VACÍO"
+
+#. StatusType
+msgid "READY"
+msgstr "LISTO"
+
+#. StatusType
+msgid "SUBMODULES_EMPTY"
+msgstr "SUBMÓDULOS_VACÍOS"
+
+#. StatusType
+msgid "IN PROGRESS"
+msgstr "EN CURSO"
+
+#. LandUseType
+msgid "Barley"
+msgstr "Cebada"
+
+#. LandUseType
+msgid "Oats"
+msgstr "Avena"
+
+#. LandUseType
+msgid "Millet"
+msgstr "Mijo"
+
+#. LandUseType
+msgid "Rice"
+msgstr "Arroz"
+
+#. LandUseType
+msgid "Sorghum"
+msgstr "Sorgo"
+
+#. LandUseType
+msgid "Rye"
+msgstr "Centeno"
+
+#. LandUseType
+msgid "Generic Value"
+msgstr "Valor genérico"
+
+#. LandUseType
+msgid "Soybeans"
+msgstr "Soja"
+
+#. LandUseType
+msgid "Dry Bean"
+msgstr "Frijoles"
+
+#. LandUseType
+msgid "Potatoes"
+msgstr "Patatas"
+
+#. LandUseType
+msgid "N-Fixing Forages"
+msgstr "Forrajes fijadores de N"
+
+#. LandUseType
+msgid "Non-N-Fixing Forages"
+msgstr "Forrajes no fijadores de N"
+
+#. LandUseType
+msgid "Winter Wheat"
+msgstr "Trigo de Invierno"
+
+#. LandUseType
+msgid "Spring Wheat"
+msgstr "Trigo de primavera"
+
+#. LandUseType
+msgid "Non-Legume Hay"
+msgstr "Heno no leguminoso"
+
+#. LandUseType
+msgid "Perennial Grasses"
+msgstr "Hierbas perennes"
+
+#. LandUseType
+msgid "Grass-Clover Mixtures"
+msgstr "Mezcla de Trébol-Pasto"
+
+#. LandUseType
+msgid "Long-Term Cultivated"
+msgstr "Cultivado a largo plazo"
+
+#. LandUseType
+msgid "Perennial/Tree Crop"
+msgstr "Cultivo perenne/arbóreo"
+
+#. LandUseType
+msgid "Set Aside (< 20 Yrs)"
+msgstr "De reserva (< 20 Yrs)"
+
+#. LandUseType
+msgid "Default"
+msgstr "Por defecto"
+
+#. LandUseType
+msgid "Peanuts"
+msgstr "Maní/cacahuete"
+
+#. LandUseType
+msgid "Alley Cropping"
+msgstr "Cultivos en Fajas"
+
+#. LandUseType
+msgid "Perennial Fallow"
+msgstr "Barbecho Mejorado"
+
+#. LandUseType
+msgid "Hedgerow"
+msgstr "Cultivos en setos , Cercas vivas"
+
+#. LandUseType
+msgid "Multistrata"
+msgstr "Sistemas de cultivos a diversos niveles"
+
+#. LandUseType
+msgid "Parkland"
+msgstr "Parques Agroforestales"
+
+#. LandUseType
+msgid "Shaded Perennial"
+msgstr "Cultivos perennes bajo sombra"
+
+#. LandUseType
+msgid "Silvoarable"
+msgstr "Silvoarable"
+
+#. LandUseType
+msgid "Silvopasture"
+msgstr "Silvopastoril"
+
+#. LandUseType
+msgid "Olive"
+msgstr "Olivo"
+
+#. LandUseType
+msgid "Orchard"
+msgstr "Huerta"
+
+#. LandUseType
+msgid "Short Rotation Coppice"
+msgstr "Monte bajo de ciclo corto"
+
+#. LandUseType
+msgid "Tea"
+msgstr "Té"
+
+#. LandUseType
+msgid "Vine"
+msgstr "Vid"
+
+#. LandUseType
+msgid "Oil Palm"
+msgstr "Palma Aceitera"
+
+#. LandUseType
+msgid "Rubber"
+msgstr "Caucho"
+
+#. LandUseType
+msgid "Alfalfa"
+msgstr "Alfalfa"
+
+#. LandUseType
+msgid "Agroforestry - Default"
+msgstr "Agroforestería - Por defecto"
+
+#. LandUseType
+msgid "Annual Cropland"
+msgstr "Cultivos Anuales"
+
+#. LandUseType
+msgid "Annual Fallow"
+msgstr "Barbecho Anual"
+
+#. LandUseType
+msgid "Flooded Rice"
+msgstr "Arroz Inundado"
+
+#. LandUseType
+msgid "Grassland"
+msgstr "Pastizales"
+
+#. LandUseType
+msgid "Other Land (Non-Vegetated)"
+msgstr "Otras Tierras (Sin Vegetación)"
+
+#. LandUseType
+msgid "Wheat"
+msgstr "Trigo"
+
+#. LandUseType
+msgid "Beans & Pulses"
+msgstr "Frijoles y legumbres"
+
+#. LandUseType
+msgid "Tubers"
+msgstr "Tubérculos"
+
+#. LandUseType
+msgid "Root Crops"
+msgstr "Cultivos de Raíz alimenticia"
+
+#. LandUseType
+msgid "Shrubland"
+msgstr "Arbustos"
+
+#. LandUseType
+msgid "Humid Forest"
+msgstr "Bosque húmedo"
+
+#. LandUseType
+msgid "﻿Long-Term Cultivated"
+msgstr "Cultivado a largo plazo"
+
+#. LandUseType
+msgid "Mangrove Forest"
+msgstr "Manglar"
+
+#. LandUseType
+msgid "Mangrove"
+msgstr "Mangle"
+
+#. LandUseType
+msgid "Tidal Marsh"
+msgstr "Marisma"
+
+#. LandUseType
+msgid "Seagrass"
+msgstr "Pradera Marina"
+
+#. LandUseType
+msgid "Tidal Marsh Mediterranean"
+msgstr "Marisma mediterránea"
+
+#. LandUseType
+msgid "Set Aside"
+msgstr "De reserva"
+
+#. LandUseType
+msgid "Perennial Cropland"
+msgstr "Cultivos perennes"
+
+#. LandUseType
+msgid "Vegetables"
+msgstr "Verduras"
+
+#. LandUseType
+msgid "Oilseeds"
+msgstr "Semillas oleaginosas"
+
+#. LandUseType
+msgid "Groundnuts"
+msgstr "Maní/cacahuete"
+
+#. LandUseType
+msgid "Organic Soil"
+msgstr "Suelo Orgánico"
+
+#. LandUseType
+msgid "Rainforest"
+msgstr "Bosque lluvioso"
+
+#. LandUseType
+msgid "Moist Deciduous Forest"
+msgstr "Bosque húmedo de hojas caducas"
+
+#. LandUseType
+msgid "Dry Forest"
+msgstr "Bosque Seco"
+
+#. LandUseType
+msgid "Settlement"
+msgstr "Asentamiento"
+
+#. LandUseType
+msgid "Oceanic Forest"
+msgstr "Bosque oceánico"
+
+#. LandUseType
+msgid "Continental Forest"
+msgstr "Bosque continental"
+
+#. LandUseType
+msgid "Desert"
+msgstr "Desierto"
+
+#. LandUseType
+msgid "Steppe"
+msgstr "Estepa"
+
+#. LandUseType
+msgid "Coniferous Forest"
+msgstr "Bosque coníferas"
+
+#. LandUseType
+msgid "Tundra Woodland"
+msgstr "Bosque de tundra"
+
+#. LandUseType
+msgid "Mountain System"
+msgstr "Sistemas montañosos"
+
+#. LandUseType
+msgid "Other Land"
+msgstr "Otras tierras"
+
+#. LandUseType
+msgid "Grains"
+msgstr "Granos"
+
+#. LandUseType
+msgid "Maize"
+msgstr "Maíz"
+
+#. LandUseType
+msgid "Sugarcane"
+msgstr "Caña de azúcar"
+
+#. SettlementType
+msgid "Infrastructure on existing land (no paving)"
+msgstr "Infraestructura en terreno existente (sin pavimentación)"
+
+#. SettlementType
+msgid "Paved settlement"
+msgstr "Asentamiento pavimentado"
+
+#. SettlementType
+msgid "Turfgrass"
+msgstr "Césped"
+
+#. SettlementType
+msgid "Wooded area"
+msgstr "Zona boscosa"
+
+#. SettlementType
+msgid "Cultivated soil"
+msgstr "Suelo cultivado"
+
+#. SoilType
+msgid "High Activity Clay"
+msgstr "Arcillas de Alta Intensidad"
+
+#. SoilType
+msgid "Low Activity Clay"
+msgstr "Arcillas de Baja Intensidad"
+
+#. SoilType
+msgid "Sandy"
+msgstr "Arenoso"
+
+#. SoilType
+msgid "Spodic"
+msgstr "Espódicos"
+
+#. SoilType
+msgid "Volcanic"
+msgstr "Volcánicos"
+
+#. SoilType
+msgid "Wetland"
+msgstr "Humedales"
+
+#. SoilType
+msgid "Organic"
+msgstr "Orgánico"
+
+#. SoilType
+msgid "Mineral"
+msgstr "Mineral"
+
+#. SoilType
+msgid "Aggregated"
+msgstr "Agregado"
+
+#. TillageType
+msgid "Full Tillage"
+msgstr "Laboreo Total"
+
+#. TillageType
+msgid "Reduced Tillage"
+msgstr "Laboreo Reducido"
+
+#. TillageType
+msgid "No Tillage"
+msgstr "Sin Laboreo"
+
+#. OrganicInputType
+msgid "Low C input"
+msgstr "Aporte bajo de carbono"
+
+#. OrganicInputType
+msgid "Medium C input"
+msgstr "Aporte medio de carbono"
+
+#. OrganicInputType
+msgid "High C input, no manure"
+msgstr "Aporte alto de carbono,  sin estiércol"
+
+#. OrganicInputType
+msgid "High C input, with manure"
+msgstr "Aporte alto de carbono,  con estiércol"
+
+#. ResidueManagementType
+msgid "Burned"
+msgstr "Quemado"
+
+#. ResidueManagementType
+msgid "Retained"
+msgstr "Retenido"
+
+#. ResidueManagementType
+msgid "Exported"
+msgstr "Exportado"
+
+#. WaterRegimeType
+msgid "Irrigated, Continuously Flooded"
+msgstr "Irrigadas, Inundadas permanentemente"
+
+#. WaterRegimeType
+msgid "Irrigated, Single Drainage Period"
+msgstr "Irrigadas, Inundados intermitentemente – aireación simple"
+
+#. WaterRegimeType
+msgid "Irrigated, Multiple Drainage Periods"
+msgstr "Irrigadas, Inundados intermitentemente – aireación múltiple"
+
+#. OrganicAmendmentType
+msgid "Straw Burnt"
+msgstr "Paja quemada"
+
+#. OrganicAmendmentType
+msgid "Straw Exported"
+msgstr "Paja exportada"
+
+#. OrganicAmendmentType
+msgid "Compost"
+msgstr "Compost"
+
+#. OrganicAmendmentType
+msgid "Farm Yard Manure"
+msgstr "Estiércol de corral"
+
+#. OrganicAmendmentType
+msgid "Green Manure"
+msgstr "Estiércol verde"
+
+#. OrganicAmendmentType
+msgid "Straw Incorporated Long (>30 Days) Before Cultivation"
+msgstr "Paja Incorporada Mucho (>30 días) Antes del cultivo"
+
+#. OrganicAmendmentType
+msgid "Straw Incorporated Shortly (<30 Days) Before Cultivation"
+msgstr "Paja Incorporada Poco (<30 días) Antes del cultivo"
+
+#. GrasslandManagementType
+msgid "Non-Degraded"
+msgstr "No degradado"
+
+#. GrasslandManagementType
+msgid "High Intensity Grazing"
+msgstr "Pastoreo intensivo"
+
+#. GrasslandManagementType
+msgid "Severely Degraded"
+msgstr "Severamente degradados"
+
+#. GrasslandManagementType
+msgid "Improved With Medium Inputs"
+msgstr "Pastizal mejorado con insumos medios"
+
+#. GrasslandManagementType
+msgid "Improved Grassland"
+msgstr "Pastizal mejorado"
+
+#. GrasslandManagementType
+msgid "Improved With High Inputs"
+msgstr "Pastizal mejorado con insumos altos"
+
+#. LivestockCategoryType
+msgid "Dairy Cattle"
+msgstr "Vacas lecheras"
+
+#. LivestockCategoryType
+msgid "Other Cattle"
+msgstr "Vacuno otro"
+
+#. LivestockCategoryType
+msgid "Camels"
+msgstr "Camellos"
+
+#. LivestockCategoryType
+msgid "Horses"
+msgstr "Caballos"
+
+#. LivestockCategoryType
+msgid "Mules And Asses"
+msgstr "Mulas y asnos"
+
+#. LivestockCategoryType
+msgid "Other Buffalo"
+msgstr "Búfalo otro"
+
+#. LivestockCategoryType
+msgid "Dairy Buffalo"
+msgstr "Búfala lechera"
+
+#. LivestockCategoryType
+msgid "Dairy Sheep"
+msgstr "Oveja lechera"
+
+#. LivestockCategoryType
+msgid "Other Sheep"
+msgstr "Ovino otro"
+
+#. LivestockCategoryType
+msgid "Growing Swine"
+msgstr "Porcino en crecimiento"
+
+#. LivestockCategoryType
+msgid "Breeding Swine"
+msgstr "Porcino reproductivo"
+
+#. LivestockCategoryType
+msgid "Goats"
+msgstr "Cabras"
+
+#. LivestockCategoryType
+msgid "Deer"
+msgstr "Ciervo"
+
+#. LivestockCategoryType
+msgid "Ostrich"
+msgstr "Avestruz"
+
+#. LivestockCategoryType
+msgid "Chicken Layer"
+msgstr "Gallinas ponedoras"
+
+#. LivestockCategoryType
+msgid "Chicken Broiler"
+msgstr "Pollos parrilleros"
+
+#. LivestockCategoryType
+msgid "Llamas And Alpacas"
+msgstr "Llamas y Alpacas"
+
+#. LivestockProductionType
+msgid "High-Productivity"
+msgstr "Alta Productividad"
+
+#. LivestockProductionType
+msgid "Low-Productivity"
+msgstr "Baja Productividad"
+
+#. ManureManagementType
+msgid "Pasture/Range/Paddock"
+msgstr "Pastura/Prado/Pradera"
+
+#. ManureManagementType
+msgid "Daily Spread"
+msgstr "Distribución diaria"
+
+#. ManureManagementType
+msgid "Digester"
+msgstr "Digestor"
+
+#. ManureManagementType
+msgid "Burned For Fuel"
+msgstr "Quemado para combustible"
+
+#. ManureManagementType
+msgid "Pit<1Month"
+msgstr "Pozo<1Mes"
+
+#. ManureManagementType
+msgid "Pit>1Month"
+msgstr "Pozo>1Mes"
+
+#. ManureManagementType
+msgid "Poultry Manure"
+msgstr "Estiercol de aves de corral"
+
+#. ManureManagementType
+msgid "Deep Bedding"
+msgstr "Camas profundas"
+
+#. ManureManagementType
+msgid "Composting"
+msgstr "Compostaje"
+
+#. ManureManagementType
+msgid "Aerobic Treatment"
+msgstr "Tratamiento Aeróbico"
+
+#. ManureManagementType
+msgid "Lagoon"
+msgstr "Laguna"
+
+#. ManureManagementType
+msgid "Liquid/Slurry"
+msgstr "Líquido/fango"
+
+#. ManureManagementType
+msgid "Solid Storage"
+msgstr "Almacenaje de sólidos"
+
+#. ManureManagementType
+msgid "Dry Lot"
+msgstr "Corral de engorde"
+
+#. ManureManagementType
+msgid "Other (Pls. Go Tier 2)"
+msgstr "Otros (Por favor, inserte Nivel 2)"
+
+#. ManureManagementType
+msgid "Other (pls. Go Tier 2)"
+msgstr "Otros (Por favor, inserte Nivel 2)"
+
+#. ModuleType
+msgid "Forest Management"
+msgstr "Gestión forestal"
+
+#. ModuleType
+msgid "Road"
+msgstr "Carretera"
+
+#. ModuleType
+msgid "Building"
+msgstr "Construcción"
+
+#. ModuleType
+msgid "Energy"
+msgstr "Energía"
+
+#. ModuleType
+msgid "Irrigation"
+msgstr "Riego"
+
+#. ModuleType
+msgid "Irrigation System"
+msgstr "Sistema de Riego"
+
+#. ModuleType
+msgid "Operation Phase of Irrigation"
+msgstr "Fase de Operación del Riego"
+
+#. ModuleType
+msgid "Project"
+msgstr "Proyecto"
+
+#. ModuleType
+msgid "Activity"
+msgstr "Actividad"
+
+#. ModuleType
+msgid "OtherLandUse"
+msgstr "Otros Usos de la Tierra"
+
+#. ModuleType
+msgid "Flooded Rice Minor Season"
+msgstr "Estación secundaria de Arroz inundado"
+
+#. ModuleType
+msgid "Perennial Cropland Minor Season"
+msgstr "Estación secundaria de Cultivo perenne"
+
+#. ModuleType
+msgid "Annual Cropland Minor Season"
+msgstr "Estación secundaria de cultivos anuales"
+
+#. ModuleType
+msgid "Livestock"
+msgstr "Ganado"
+
+#. ModuleType
+msgid "Waterbody"
+msgstr "Masa de Agua"
+
+#. ModuleType
+msgid "Small Fishery"
+msgstr "Pesca Artesanal"
+
+#. ModuleType
+msgid "Large Fishery"
+msgstr "Pesca Industrial"
+
+#. ModuleType
+msgid "Aquaculture"
+msgstr "Acuicultura"
+
+#. ModuleType
+msgid "Coastal Wetland"
+msgstr "Humedales costeros"
+
+#. ModuleType
+msgid "Land Use Change"
+msgstr "Cambio de uso de la tierra"
+
+#. ModuleType
+msgid "Other Infrastructure"
+msgstr "Otra Infraestructura"
+
+#. ModuleType
+msgid "Electricity"
+msgstr "Electricidad"
+
+#. ModuleType
+msgid "Fuel"
+msgstr "Combustible"
+
+#. ModuleType
+msgid "Input"
+msgstr "Insumo"
+
+#. ModuleType
+msgid "Input Entry"
+msgstr "Entrada de Insumos"
+
+#. ModuleType
+msgid "Forest Disturbance"
+msgstr "Perturbaciones en bosques"
+
+#. FireType
+msgid "Wildfire Undrained Peat"
+msgstr "Incendio forestal en Turba sin drenar"
+
+#. FireType
+msgid "Wildfire Drained Peat"
+msgstr "Incendio forestal en Turba Drenada"
+
+#. FireType
+msgid "Prescribed Fire (E.G. Land Mgnt)"
+msgstr "Quema controlada (p. ej. Gestión de tierras)"
+
+#. PeatType
+msgid "Nutrient Rich"
+msgstr "Rica en Nutrientes"
+
+#. PeatType
+msgid "Nutrient Poor"
+msgstr "Pobre en Nutrientes"
+
+#. WaterbodyType
+msgid "Freshwater Pond"
+msgstr "Estanque de agua dulce"
+
+#. WaterbodyType
+msgid "Brackishwater Pond"
+msgstr "Estanque de agua salobre"
+
+#. WaterbodyType
+msgid "Canals & Ditches"
+msgstr "Canales y Acequia"
+
+#. WaterbodyType
+msgid "Saline Pond"
+msgstr "Estanque Salino"
+
+#. TrophicType
+msgid "Oligotrophic"
+msgstr "Oligotrófico"
+
+#. TrophicType
+msgid "Eutrophic"
+msgstr "Eutrófico"
+
+#. TrophicType
+msgid "Mesotrophic"
+msgstr "Mesotrófico"
+
+#. TrophicType
+msgid "Hypereutrophic"
+msgstr "Hipereutrófico"
+
+#. FisheryType
+msgid "Marine"
+msgstr "Marina"
+
+#. FisheryType
+msgid "Inland"
+msgstr "Continental"
+
+#. FisheryType
+msgid "Unmotorized Fishing"
+msgstr "Pesca sin motor"
+
+#. LargeFisheryGearType
+msgid "Dredges"
+msgstr "Rastras"
+
+#. LargeFisheryGearType
+msgid "Other Or Mixed"
+msgstr "Otros o Mezclados"
+
+#. LargeFisheryGearType
+msgid "Mobile Seine"
+msgstr "Redes de tiro mobil"
+
+#. LargeFisheryGearType
+msgid "Not Specified"
+msgstr "Sin especificar"
+
+#. LargeFisheryGearType
+msgid "Bottom Trawls"
+msgstr "Redes de Arrastre de Fondo"
+
+#. LargeFisheryGearType
+msgid "Gillnets And Entangling Nets"
+msgstr "Redes de Enmalle y Redes de Enredo"
+
+#. LargeFisheryGearType
+msgid "Hooks And Lines"
+msgstr "Sedales y Anzuelos"
+
+#. LargeFisheryGearType
+msgid "Midwater Trawls"
+msgstr "Redes de Arrastre Pelágico"
+
+#. LargeFisheryGearType
+msgid "Traps And Lift Nets"
+msgstr "Trampas y Redes Izadas"
+
+#. LargeFisheryGearType
+msgid "Surrounding Nets"
+msgstr "Redes de Cerco"
+
+#. SmallFisheryGearType
+msgid "Trawls"
+msgstr "Redes de Arrastre"
+
+#. SmallFisheryGearType
+msgid "Multiple"
+msgstr "Múltiple"
+
+#. SmallFisheryGearType
+msgid "Pots And Traps"
+msgstr "Nasas y Trampas"
+
+#. FishType
+msgid "Abalones, Winkles And Conchs"
+msgstr "Abulones, Caracolas y Conchas"
+
+#. FishType
+msgid "Clams, Cockles And Arkshells"
+msgstr "Almejas, Berberechos y Árcidos"
+
+#. FishType
+msgid "Cods, Hakes And Haddocks"
+msgstr "Bacalaos, Merluzas Y Eglefino"
+
+#. FishType
+msgid "Flounders, Halibuts And Soles"
+msgstr "Lenguados y Halibut"
+
+#. FishType
+msgid "Herrings, Sardines And Anchovies"
+msgstr "Arenques, Sardinas y Anchoas"
+
+#. FishType
+msgid "Jacks, Mullets And Sauries"
+msgstr "Jurel, Salmonetes y Papardas"
+
+#. FishType
+msgid "Krill And Plankton"
+msgstr "Kril y Plancton"
+
+#. FishType
+msgid "Mackerels, Snoeks And Cutlassfish"
+msgstr "Caballa, Barracuda  y Papardas"
+
+#. FishType
+msgid "Miscellaneous Marine Crustaceans"
+msgstr "Varios crustáceos marinos"
+
+#. FishType
+msgid "Miscellaneous Marine Fishes"
+msgstr "Peces marinos varios"
+
+#. FishType
+msgid "Miscellaneous Marine Molluscs"
+msgstr "Varios moluscos marinos"
+
+#. FishType
+msgid "Mussels"
+msgstr "Mejillones"
+
+#. FishType
+msgid "Redfish, Basses And Congers"
+msgstr "Gallineta, Lubinas y Congrios"
+
+#. FishType
+msgid "Salmons, Trots And Smelts"
+msgstr "Salmones, Truchas y Capellanes "
+
+#. FishType
+msgid "Scallops And Pectens"
+msgstr "Vieiras y Pecten"
+
+#. FishType
+msgid "Shads"
+msgstr "Sábalos"
+
+#. FishType
+msgid "Sharks And Rays"
+msgstr "Tiburones y Rayas"
+
+#. FishType
+msgid "Shrimps And Prawns"
+msgstr "Gambas y Camarones"
+
+#. FishType
+msgid "Squat Lobsters"
+msgstr "Langosta rechoncha"
+
+#. FishType
+msgid "Squids, Cuttlefish And Octopuses"
+msgstr "Calamares, Sepias Y Pulpos"
+
+#. FishType
+msgid "Tunas, Bonitos And Billfishes"
+msgstr "Atunes, Bonitos Y Picudos"
+
+#. FishType
+msgid "Lobsters And Spiny-rock Lobsters"
+msgstr "Langostas"
+
+#. FishType
+msgid "Sea-spiders And Crabs"
+msgstr "Arañas marinas y cangrejos"
+
+#. MacroFuelType
+msgid "Solid (tdm)"
+msgstr "Sólido (tdm)"
+
+#. MacroFuelType
+msgid "Liquid or gaseous (m3)"
+msgstr "Líquido o gaseoso (m3)"
+
+#. FuelUseType
+msgid "Stationary"
+msgstr "Estacionario"
+
+#. FuelUseType
+msgid "Mobile"
+msgstr "Móvil"
+
+#. FuelUseType
+msgid "Off-Road"
+msgstr "Fuera de la carretera"
+
+#. FuelType
+msgid "Ethanol (Cars)"
+msgstr "Etanol (Coches)"
+
+#. FuelType
+msgid "Ethanol (Trucks)"
+msgstr "Etanol (Camiones)"
+
+#. FuelType
+msgid "Diesel"
+msgstr "Diesel"
+
+#. FuelType
+msgid "Gasoline (2-Stroke)"
+msgstr "Gasolina (2-tiempos)"
+
+#. FuelType
+msgid "Gasoline (4-Stroke)"
+msgstr "Gasolina (4-tiempos)"
+
+#. FuelType
+msgid "Wood"
+msgstr "Leña"
+
+#. FuelType
+msgid "Peat"
+msgstr "Turba"
+
+#. FuelType
+msgid "Charcoal"
+msgstr "Carbón Vegetal"
+
+#. FuelType
+msgid "Motor Gasoline"
+msgstr "Motor de Gasolina"
+
+#. FuelType
+msgid "Gasoil /Diesel Oil"
+msgstr "Gasóleo"
+
+#. FuelType
+msgid "Waste Oil / Lubrificants"
+msgstr "Aceite Usado/ Lubricante"
+
+#. FuelType
+msgid "Lpg"
+msgstr "GLP"
+
+#. FuelType
+msgid "Natural Gas"
+msgstr "Gas Natural"
+
+#. FuelType
+msgid "Solar"
+msgstr "Solar"
+
+#. CropType
+msgid "Cereals"
+msgstr "Cereales"
+
+#. CropType
+msgid "Pulses"
+msgstr "Legumbres"
+
+#. CropType
+msgid "Roots And Tubers"
+msgstr "Raizes y Tubérculos"
+
+#. CropType
+msgid "Beans"
+msgstr "Frijoles"
+
+#. CropType
+msgid "Agroforestry - default"
+msgstr "Agroforestería - Por Defecto"
+
+#. CropType
+msgid "Alley cropping"
+msgstr "Cultivos en fajas"
+
+#. CropType
+msgid "Oil palm"
+msgstr "Palma Aceitera"
+
+#. CropType
+msgid "Perennial fallow"
+msgstr "Barbecho mejorado"
+
+#. CropType
+msgid "Shaded perennial"
+msgstr "Cultivos perennes bajo sombra"
+
+#. DisturbanceType
+msgid "Fire"
+msgstr "Fuego"
+
+#. DisturbanceType
+msgid "Insects"
+msgstr "Insectos"
+
+#. MacroInputType
+msgid "Lime Application"
+msgstr "Aplicación de cal"
+
+#. MacroInputType
+msgid "Synthetic Fertilizers"
+msgstr "Fertilizantes sintéticos"
+
+#. MacroInputType
+msgid "N-Fertilizers On Irrigated Rice"
+msgstr "Fertilizantes de N en Arroz de Regadío"
+
+#. MacroInputType
+msgid "Organic N-Fertilizers"
+msgstr "Fertilizantes de N orgánicos"
+
+#. MacroInputType
+msgid "Pesticides"
+msgstr "Pesticidas"
+
+#. MacroInputType
+msgid "Animal Feed"
+msgstr "Pienso"
+
+#. InputType
+msgid "Limestone"
+msgstr "Caliza"
+
+#. InputType
+msgid "Dolomite"
+msgstr "Dolomita"
+
+#. InputType
+msgid "Urea"
+msgstr "Urea"
+
+#. InputType
+msgid "Synthetic N-Fertilizers Other Than Urea"
+msgstr "Fertilizantes de N Sintéticos Distintos de la Urea"
+
+#. InputType
+msgid "Sewage"
+msgstr "Aguas Residuales"
+
+#. InputType
+msgid "Rendering Waste, Brewery Waste, Guano"
+msgstr "Desechos, Residuos de la fabricación de cerveza, Guano"
+
+#. InputType
+msgid "Potassium"
+msgstr "Potasio"
+
+#. InputType
+msgid "Fungicides"
+msgstr "Fungicidas"
+
+#. InputType
+msgid "Herbicides"
+msgstr "Herbicidas"
+
+#. InputType
+msgid "Insecticides"
+msgstr "Insecticidas"
+
+#. InputType
+msgid "N-Fertilizers In Continuously Irrigated Rice"
+msgstr "Fertilizantes de N en arroz permentemente Inundado"
+
+#. InputType
+msgid "N-Fertilizers In Wet And Dry Irrigated Rice"
+msgstr "Fertilizantes de N en arroz Inundado Intermitente"
+
+#. InputType
+msgid "Phosphorous"
+msgstr "Fosforo"
+
+#. InputType
+msgid "User Defined Animal Feed (tier 2)"
+msgstr "Pienso Definido por el usuario (tier 2)"
+
+#. InputType
+msgid "User Defined Input (tier 2)"
+msgstr ""
+
+#. IrrigationSystemType
+msgid "Surface Without IRRS"
+msgstr "De superficie sin sistema de retorno de a escorrentía"
+
+#. IrrigationSystemType
+msgid "Surface With IRRS"
+msgstr "De superficie con sistema de retorno de a escorrentía"
+
+#. IrrigationSystemType
+msgid "Solid Set Sprinkler"
+msgstr "Conjunto de aspersores solidos"
+
+#. IrrigationSystemType
+msgid "Permanent Sprinkler"
+msgstr "Aspersor permanente"
+
+#. IrrigationSystemType
+msgid "Hand Moved Sprinkler"
+msgstr "Aspersor movido a mano"
+
+#. IrrigationSystemType
+msgid "Solid Roll Sprinkler"
+msgstr "Aspersor de rodillo macizo"
+
+#. IrrigationSystemType
+msgid "Center-Pivot Sprinkler"
+msgstr "Aspersor de pivote central"
+
+#. IrrigationSystemType
+msgid "Traveler Sprinkler"
+msgstr "Aspersor viajero"
+
+#. IrrigationSystemType
+msgid "Trickle"
+msgstr "Riego por goteo"
+
+#. IrrigationSystemType
+msgid "Micro Sprinkler"
+msgstr "Micro Aspersor"
+
+#. IrrigationSystemType
+msgid "Sprinkler"
+msgstr "Aspersor"
+
+#. BuildingType
+msgid "Housing (Concrete)"
+msgstr "Viviendas (Cemento)"
+
+#. BuildingType
+msgid "Agricultural Buildings (Concrete)"
+msgstr "Construcciones Agrícolas (Cemento)"
+
+#. BuildingType
+msgid "Agricultural Buildings (Metal)"
+msgstr "Construcciones Agrícolas (Metal)"
+
+#. BuildingType
+msgid "Industrial Buildings (Concrete)"
+msgstr "Construcciones Industriales (Cemento)"
+
+#. BuildingType
+msgid "Industrial Buildings (Metal)"
+msgstr "Construcciones Industriales (Metal)"
+
+#. BuildingType
+msgid "Garage (Concrete)"
+msgstr "Garaje (Cemento)"
+
+#. BuildingType
+msgid "Garage (Metal)"
+msgstr "Garaje (Metal)"
+
+#. BuildingType
+msgid "Offices (Concrete)"
+msgstr "Oficinas (Cemento)"
+
+#. BuildingType
+msgid "Offices (Metal)"
+msgstr "Oficinas (Metal)"
+
+#. BuildingType
+msgid "Food Sales (Retail Or Wholesale)"
+msgstr "Venta de alimentos (al por menor o al por mayor)"
+
+#. BuildingType
+msgid "Food Service (Restaurants)"
+msgstr "Servicio de Comida (Restaurantes)"
+
+#. BuildingType
+msgid "Warehouse And Storage"
+msgstr "Almacén y Almacenamiento"
+
+#. BuildingType
+msgid "Education"
+msgstr "Educación"
+
+#. BuildingType
+msgid "Health Care (Metal)"
+msgstr "Atención Sanitaria (Metal)"
+
+#. RoadType
+msgid "Road (Bitumen)"
+msgstr "Carretera (Bitumen)"
+
+#. RoadType
+msgid "Road (Asphalt)"
+msgstr "Carretera (Asfalto)"
+
+#. RoadType
+msgid "Road (Reinforced Concrete)"
+msgstr "Carretera (Hormigón Armado)"
+
+#. RoadType
+msgid "Road Rehabilitated (Pavement)"
+msgstr "Carretera Rehabilitada (Pavimentada)"
+
+#. Climate
+msgid "Cool Temperate"
+msgstr "Templado Frío"
+
+#. Climate
+msgid "Warm Temperate"
+msgstr "Templado Cálido"
+
+#. Climate
+msgid "Tropical"
+msgstr "Tropical"
+
+#. Climate
+msgid "Boreal"
+msgstr "Boreal"
+
+#. Climate
+msgid "Tropical Montane"
+msgstr "Tropical Montano"
+
+#. Moisture
+msgid "Dry"
+msgstr "Seco"
+
+#. Moisture
+msgid "Moist"
+msgstr "Húmedo"
+
+#. Moisture
+msgid "Wet"
+msgstr "Muy húmedo"
+
+#. Moisture
+msgid "Temperate"
+msgstr "Templado"
+
+#. Region
+msgid "Eastern Africa"
+msgstr "África Oriental"
+
+#. Region
+msgid "Central Africa"
+msgstr "África Central"
+
+#. Region
+msgid "Northern Africa"
+msgstr "África Septentrional"
+
+#. Region
+msgid "Southern Africa"
+msgstr "África Meridional"
+
+#. Region
+msgid "Western Africa"
+msgstr "África Occidental"
+
+#. Region
+msgid "Central Asia"
+msgstr "Asia Central"
+
+#. Region
+msgid "Eastern Asia"
+msgstr "Asia Oriental"
+
+#. Region
+msgid "South-Eastern Asia"
+msgstr "Asia Sudoriental"
+
+#. Region
+msgid "Southern Asia"
+msgstr "Asia Meridional"
+
+#. Region
+msgid "Western Asia"
+msgstr "Asia Occidental"
+
+#. Region
+msgid "Europe"
+msgstr "Europa"
+
+#. Region
+msgid "Oceania"
+msgstr "Oceanía"
+
+#. Region
+msgid "North America"
+msgstr "América Septentrional"
+
+#. Region
+msgid "South America"
+msgstr "América del Sur"
+
+#. Region
+msgid "Central America"
+msgstr "América Central"
+
+#. Region
+msgid "Caribbean"
+msgstr "Caribe"
+
+#. Region
+msgid "Western Europe"
+msgstr "Europa Occidenta"
+
+#. Region
+msgid "Eastern Europe"
+msgstr "Europa Oriental"
+
+#. GlobalWarmingPotential
+msgid "IPCC Fifth Assessment Report (AR5) with Climate Change Feedback"
+msgstr ""
+"Quinto Informe de Evaluación del IPCC (AR5) con retroalimentación climática"
+
+#. GlobalWarmingPotential
+msgid "IPCC Fifth Assessment Report (AR5) without Climate Change Feedback"
+msgstr ""
+"Quinto Informe de Evaluación del IPCC (AR5) sin retroalimentación climática"
+
+#. GlobalWarmingPotential
+msgid "IPCC Sixth Assessment Report (AR6)"
+msgstr "Sexto Informe de Evaluación del IPCC (AR6)"
+
+#. GlobalWarmingPotential
+msgid "IPCC Fourth Assessment Report (AR4)"
+msgstr "Cuarto Informe de Evaluación del IPCC (AR4)"
+
+#. GlobalWarmingPotential
+msgid "IPCC Second Assessment Report (SAR)"
+msgstr "Segundo Informe de Evaluación del IPCC (SAR)"
+
+#. WaterManagementTypeBeforeCultivation
+msgid "Non Flooded Pre-Season <180 D"
+msgstr ""
+
+#. WaterManagementTypeBeforeCultivation
+msgid "Non Flooded Pre-Season >180 D"
+msgstr ""
+
+#. WaterManagementTypeBeforeCultivation
+msgid "Flooded Pre-Season > 30 D"
+msgstr ""
+
+#. WaterManagementTypeAfterCultivation
+msgid "Rainfed, Wet Season (Regular Rainfed)"
+msgstr ""
+
+#. WaterManagementTypeAfterCultivation
+msgid "Rainfed, Dry Season (Drought Prone)"
+msgstr ""
+
+#. WaterManagementTypeAfterCultivation
+msgid "Rainfed, Deep Water"
+msgstr ""

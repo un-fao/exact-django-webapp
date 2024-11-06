@@ -1,4 +1,4 @@
-Mangrove,Tidal marsh,Seagrass
+climate,moisture,Mangrove,Tidal marsh,Seagrass
 Boreal,Dry,0,0,0
 Boreal,Moist,0,0,0
 Cool Temperate,Dry,0,0,0
@@ -8,4 +8,4 @@ Warm Temperate,Moist,0.7,0,0
 Tropical,Dry,0.7,0,0
 Tropical,Moist,0.7,0,0
 Tropical,Wet,0.7,0,0
-Tropical,Montane,0,0,0
+Tropical Montane,Dry,0,0,0
