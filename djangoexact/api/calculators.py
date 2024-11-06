@@ -125,6 +125,11 @@ from .models import (
     SingleBiomassModule,
     ChangeRate,
     AboveBelowGroundBiomassModule,
+    ValueChain,
+    Transport,
+    Packaging,
+    Storage,
+    Processing,
 )
 from api.utilities import DefaultValue
 
@@ -6461,3 +6466,132 @@ class SetAsideCalculator(LandModuleCalculator):
         results_tuple = (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
 
         return results_tuple
+
+
+class StorageCalculator(BaseCalculator):
+    def __init__(self, input) -> None:
+        super().__init__(input)
+
+        self.module: Storage
+
+    def calculate(self, input: Module, aggregate_by=BreakdownTypes.TOTAL) -> Result:
+        super().calculate(input, aggregate_by)
+
+        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+
+        results_tuple = (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
+
+        return results_tuple
+
+
+class ProcessingCalculator(BaseCalculator):
+
+    def __init__(self, input) -> None:
+        super().__init__(input)
+
+        self.module: Processing
+
+    def calculate(self, input: Module, aggregate_by=BreakdownTypes.TOTAL) -> Result:
+        super().calculate(input, aggregate_by)
+
+        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+
+        results_tuple = (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
+
+        return results_tuple
+
+
+class PackagingCalculator(BaseCalculator):
+
+    def __init__(self, input) -> None:
+        super().__init__(input)
+
+        self.module: Packaging
+
+    def calculate(self, input: Module, aggregate_by=BreakdownTypes.TOTAL) -> Result:
+        super().calculate(input, aggregate_by)
+
+        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+
+        results_tuple = (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
+
+        return results_tuple
+
+
+class TransportCalculator(BaseCalculator):
+
+    def __init__(self, input) -> None:
+        super().__init__(input)
+
+        self.module: Transport
+
+    def calculate(self, input: Module, aggregate_by=BreakdownTypes.TOTAL) -> Result:
+        super().calculate(input, aggregate_by)
+
+        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+
+        results_tuple = (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
+
+        return results_tuple
+
+
+class ValueChainCalculator(BaseCalculator):
+
+    def __init__(self, input) -> None:
+        super().__init__(input)
+
+        self.module: ValueChain
+
+    def calculate(self, input: Module, aggregate_by=BreakdownTypes.TOTAL) -> Result:
+        super().calculate(input, aggregate_by)
+
+        self.results_w = MathResult(
+            self.activity.implementation_years,
+            self.activity.capitalization_years,
+        )
+        self.results_wo = MathResult(
+            self.activity.implementation_years,
+            self.activity.capitalization_years,
+        )
+
+        for storage in self.module.storages.all():
+            calculator = StorageCalculator(storage)
+            r_w, r_wo = calculator.calculate()
+
+            self.results_w += r_w
+            self.results_wo += r_wo
+
+        for processing in self.module.processings.all():
+            calculator = ProcessingCalculator(processing)
+            r_w, r_wo = calculator.calculate()
+
+            self.results_w += r_w
+            self.results_wo += r_wo
+
+        for packaging in self.module.packagings.all():
+            calculator = PackagingCalculator(packaging)
+            r_w, r_wo = calculator.calculate()
+
+            self.results_w += r_w
+            self.results_wo += r_wo
+
+        for transport in self.module.transports.all():
+            calculator = TransportCalculator(transport)
+            r_w, r_wo = calculator.calculate()
+
+            self.results_w += r_w
+            self.results_wo += r_wo
+
+        return (self.results_w, self.results_wo)
