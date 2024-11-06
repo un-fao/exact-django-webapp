@@ -3175,12 +3175,12 @@ class ValueChainSerializer(ScenarioModuleSerializer):
         if not self.instance:
             return data
 
-        storages = StorageSerializer(self.instance.storages.all(), many=True)
-        processings = ProcessingSerializer(self.instance.processings.all(), many=True)
-        packagings = PackagingSerializer(self.instance.packagings.all(), many=True)
-        transports = TransportSerializer(self.instance.transports.all(), many=True)
+        storages = self.instance.storages.all()
+        processings = self.instance.processings.all()
+        packagings = self.instance.packagings.all()
+        transports = self.instance.transports.all()
 
-        all_submodules = storages.data + processings.data + packagings.data + transports.data
+        all_submodules = list(storages) + list(processings) + list(packagings) + list(transports)
 
         if any([not submodule.is_ready() for submodule in all_submodules]):
             data["status"] = StatusType.objects.get(name="SUBMODULES_EMPTY")
