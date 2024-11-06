@@ -4462,6 +4462,9 @@ for i, row in df.iterrows():
 
     PackagingType.objects.create(name=name)
 
+log.debug("Deleting all ValueChainPackagingEmissionFactor objects...")
+ValueChainPackagingEmissionFactor.objects.all().delete()
+
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainPackagingEmissionFactor.csv"),
     header=0,
