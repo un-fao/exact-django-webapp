@@ -1689,3 +1689,23 @@ class InputsNitrousEmissionFactor(Model):
 
     def __str__(self):
         return f"({self.pk}) {self.moisture.name} {self.value}"
+
+
+class ValueChainPackagingEmissionFactor(Model):
+    """
+    Type of packaging	Emission factors (t〖CO〗_2-e/tonne of packaging)
+    Wood	            0.4
+    Paper	            2.1
+    Aluminium	        8.5
+    Plastic (mixed)	    3.6
+    """
+
+    class Meta:
+        verbose_name = "Value Chain Packaging Emission Factor"
+        verbose_name_plural = "Value Chain Packaging Emission Factors"
+
+    packaging_type = ForeignKey("api.PackagingType", on_delete=CASCADE)
+    value = FloatField(default=0)
+
+    def __str__(self):
+        return f"({self.pk}) {self.packaging_type.name} {self.value}"
