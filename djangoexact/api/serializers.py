@@ -2986,7 +2986,7 @@ class FieldDefinitionResponseSerializer(serializers.Serializer):
     field_name = FieldMetadataSerializer(many=True)
 
 
-class StorageSerializer(SubmoduleBaseSerializer):
+class StorageSerializer(ScenarioSubmoduleSerializer):
     class Meta:
         model = Storage
         fields = "__all__"
@@ -3017,7 +3017,7 @@ class StorageSerializer(SubmoduleBaseSerializer):
         }
 
 
-class ProcessingSerializer(SubmoduleBaseSerializer):
+class ProcessingSerializer(ScenarioSubmoduleSerializer):
     class Meta:
         model = Processing
         fields = "__all__"
@@ -3045,7 +3045,7 @@ class ProcessingSerializer(SubmoduleBaseSerializer):
         }
 
 
-class PackagingSerializer(SubmoduleBaseSerializer):
+class PackagingSerializer(ScenarioSubmoduleSerializer):
     class Meta:
         model = Packaging
         fields = "__all__"
@@ -3074,7 +3074,7 @@ class PackagingSerializer(SubmoduleBaseSerializer):
         }
 
 
-class TransportSerializer(SubmoduleBaseSerializer):
+class TransportSerializer(ScenarioSubmoduleSerializer):
     class Meta:
         model = Transport
         fields = "__all__"
