@@ -705,10 +705,11 @@ class ActivityBuilderSerializer(serializers.Serializer):
                 module_instance = ModuleClass.objects.create(**filters)
 
             module_instance.save()
+
             try:
                 update_change_reason(module_instance, "update")
-            except Exception as e:
-                log.error(f"Error updating change reason: {e}")
+            except AttributeError:
+                pass
 
     def unique_activity_name(self):
         base_name = self.validated_data["name"]
@@ -3049,6 +3050,19 @@ class StorageSerializer(ScenarioSubmoduleSerializer):
         }
 
 
+class StorageWriteSerializer(StorageSerializer):
+    pass
+
+
+class StorageReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = Storage
+        fields = "__all__"
+        ref_name = "Storage"
+        mandatory_fields = {}
+
+
 class ProcessingSerializer(ScenarioSubmoduleSerializer):
     class Meta:
         model = Processing
@@ -3075,6 +3089,19 @@ class ProcessingSerializer(ScenarioSubmoduleSerializer):
                 },
             },
         }
+
+
+class ProcessingWriteSerializer(ProcessingSerializer):
+    pass
+
+
+class ProcessingReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = Processing
+        fields = "__all__"
+        ref_name = "Processing"
+        mandatory_fields = {}
 
 
 class PackagingSerializer(ScenarioSubmoduleSerializer):
@@ -3106,6 +3133,19 @@ class PackagingSerializer(ScenarioSubmoduleSerializer):
         }
 
 
+class PackagingWriteSerializer(PackagingSerializer):
+    pass
+
+
+class PackagingReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = Packaging
+        fields = "__all__"
+        ref_name = "Packaging"
+        mandatory_fields = {}
+
+
 class TransportSerializer(ScenarioSubmoduleSerializer):
     class Meta:
         model = Transport
@@ -3127,25 +3167,36 @@ class TransportSerializer(ScenarioSubmoduleSerializer):
         }
 
 
-class ValueChainSerializer(BaseModuleSerializer):
+class TransportWriteSerializer(TransportSerializer):
+    pass
 
-    value_chain_commodity = serializers.SerializerMethodField()
-    initial_product = serializers.SerializerMethodField()
-    final_product = serializers.SerializerMethodField()
+    def validate(self, data):
+        super().validate(data)
+
+        parent: ValueChain = utils.getany([self.instance, dict(data)], "parent")
+        parent_serializer = ValueChainSerializer(data={}, instance=parent, partial=True)
+        if parent_serializer.is_valid():
+            parent_serializer.save()
+
+        return data
+
+
+class TransportReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = Transport
+        fields = "__all__"
+        ref_name = "Transport"
+        mandatory_fields = {}
+
+
+class ValueChainSerializer(ScenarioModuleSerializer):
 
     class Meta:
         model = ValueChain
         fields = "__all__"
         ref_name = "ValueChain"
-
-    def get_value_chain_commodity(self, obj):
-        pass
-
-    def get_initial_product(self, obj):
-        pass
-
-    def get_final_product(self, obj):
-        pass
+        mandatory_fields = {}
 
     def validate(self, data):
         super().validate(data)
@@ -3154,11 +3205,26 @@ class ValueChainSerializer(BaseModuleSerializer):
             return data
 
         storages = StorageSerializer(self.instance.storages.all(), many=True)
-        processings = ProcessingSerializer(self.instance.processings.all(), mnany=True)
-        packagings = PackagingSerializer(self.instance.packagings.all(), mnany=True)
-        transports = TransportSerializer(self.instance.transports.all(), mnany=True)
+        processings = ProcessingSerializer(self.instance.processings.all(), many=True)
+        packagings = PackagingSerializer(self.instance.packagings.all(), many=True)
+        transports = TransportSerializer(self.instance.transports.all(), many=True)
 
-        if any(lambda x: not x.is_valid(), [storages, processings, packagings, transports]):
+        all_submodules = storages.data + processings.data + packagings.data + transports.data
+
+        if any([not submodule.is_ready() for submodule in all_submodules]):
             data["status"] = StatusType.objects.get(name="SUBMODULES_EMPTY")
 
         return data
+
+
+class ValueChainWriteSerializer(ValueChainSerializer):
+    pass
+
+
+class ValueChainReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = ValueChain
+        fields = "__all__"
+        ref_name = "ValueChain"
+        mandatory_fields = {}

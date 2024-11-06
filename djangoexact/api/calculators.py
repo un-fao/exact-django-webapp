@@ -6470,8 +6470,11 @@ class StorageCalculator(BaseCalculator):
 
         self.module: Storage
 
-    def calculate(self, input: Module, aggregate_by=BreakdownTypes.TOTAL) -> Result:
-        super().calculate(input, aggregate_by)
+    def get_defaults(self, calculate=False) -> dict:
+        return super().get_defaults
+
+    def calculate(self) -> Result:
+        self.get_defaults()
 
         self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
@@ -6490,8 +6493,11 @@ class ProcessingCalculator(BaseCalculator):
 
         self.module: Processing
 
-    def calculate(self, input: Module, aggregate_by=BreakdownTypes.TOTAL) -> Result:
-        super().calculate(input, aggregate_by)
+    def get_defaults(self, calculate=False) -> dict:
+        return super().get_defaults(calculate)
+
+    def calculate(self) -> Result:
+        self.get_defaults()
 
         self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
@@ -6510,8 +6516,11 @@ class PackagingCalculator(BaseCalculator):
 
         self.module: Packaging
 
-    def calculate(self, input: Module, aggregate_by=BreakdownTypes.TOTAL) -> Result:
-        super().calculate(input, aggregate_by)
+    def get_defaults(self, calculate=False) -> dict:
+        return super().get_defaults(calculate)
+
+    def calculate(self) -> Result:
+        self.get_defaults()
 
         self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
@@ -6530,8 +6539,11 @@ class TransportCalculator(BaseCalculator):
 
         self.module: Transport
 
-    def calculate(self, input: Module, aggregate_by=BreakdownTypes.TOTAL) -> Result:
-        super().calculate(input, aggregate_by)
+    def get_defaults(self, calculate=False) -> dict:
+        return super().get_defaults(calculate)
+
+    def calculate(self) -> Result:
+        self.get_defaults()
 
         self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
@@ -6550,8 +6562,11 @@ class ValueChainCalculator(BaseCalculator):
 
         self.module: ValueChain
 
-    def calculate(self, input: Module, aggregate_by=BreakdownTypes.TOTAL) -> Result:
-        super().calculate(input, aggregate_by)
+    def get_defaults(self, calculate=False) -> dict:
+        return super().get_defaults(calculate)
+
+    def calculate(self) -> Result:
+        self.get_defaults()
 
         self.results_w = MathResult(
             self.activity.implementation_years,
