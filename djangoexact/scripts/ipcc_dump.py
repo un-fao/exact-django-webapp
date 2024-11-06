@@ -4445,8 +4445,45 @@ for i, row in enumerate(df_dict):
 
 # TODO: Run in develop
 
+# df = pd.read_csv(
+#     os.path.join(os.path.dirname(__file__), "ipcc_data", "PackagingTypes.csv"),
+#     header=0,
+#     sep=",",
+# )
+
+# for i, row in df.iterrows():
+#     name = row["name"]
+
+#     if PackagingType.objects.filter(name__iexact=name).exists():
+#         print(f"PackagingType {name} already exists. Skipping...")
+#         continue
+
+#     print(name)
+
+#     PackagingType.objects.create(name=name)
+
+# log.debug("Deleting all ValueChainPackagingEmissionFactor objects...")
+# ValueChainPackagingEmissionFactor.objects.all().delete()
+
+# df = pd.read_csv(
+#     os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainPackagingEmissionFactor.csv"),
+#     header=0,
+#     sep=",",
+# )
+
+# for i, row in df.iterrows():
+#     packaging_type = PackagingType.objects.get(name__iexact=row["packaging_type"])
+#     value = parse_csv_number(row["value"])
+
+#     print(
+#         packaging_type,
+#         value,
+#     )
+
+#     ValueChainPackagingEmissionFactor.objects.create(packaging_type=packaging_type, value=value)
+
 df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "PackagingTypes.csv"),
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "RefrigerantType.csv"),
     header=0,
     sep=",",
 )
@@ -4454,30 +4491,50 @@ df = pd.read_csv(
 for i, row in df.iterrows():
     name = row["name"]
 
-    if PackagingType.objects.filter(name__iexact=name).exists():
-        print(f"PackagingType {name} already exists. Skipping...")
+    if RefrigerantType.objects.filter(name__iexact=name).exists():
+        print(f"RefrigerantType {name} already exists. Skipping...")
         continue
 
     print(name)
 
-    PackagingType.objects.create(name=name)
+    RefrigerantType.objects.create(name=name)
 
-log.debug("Deleting all ValueChainPackagingEmissionFactor objects...")
-ValueChainPackagingEmissionFactor.objects.all().delete()
+log.debug("Deleting all ValueChainRefrigerantEmissionFactor objects...")
+ValueChainRefrigerantEmissionFactor.objects.all().delete()
 
 df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainPackagingEmissionFactor.csv"),
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainRefrigerantEmissionFactors.csv"),
     header=0,
     sep=",",
 )
 
 for i, row in df.iterrows():
-    packaging_type = PackagingType.objects.get(name__iexact=row["packaging_type"])
-    value = parse_csv_number(row["value"])
+    refrigerant_type = RefrigerantType.objects.get(name__iexact=row["refrigerant_type"])
+    sar = GlobalWarmingPotential.objects.get(name__icontains="SAR")
+    ar4 = GlobalWarmingPotential.objects.get(name__icontains="AR4")
+    ar5 = GlobalWarmingPotential.objects.get(name__icontains="AR5) with C")
+    ar5_wo = GlobalWarmingPotential.objects.get(name__icontains="AR5) without C")
+    ar6 = GlobalWarmingPotential.objects.get(name__icontains="AR6")
+
+    sar_value = parse_csv_number(row["sar"])
+    ar4_value = parse_csv_number(row["ar4"])
+    ar5_value = parse_csv_number(row["ar5"])
+    ar6_value = parse_csv_number(row["ar6"])
 
     print(
-        packaging_type,
-        value,
+        refrigerant_type,
+        sar_value,
+        ar4_value,
+        ar5_value,
+        ar6_value,
     )
 
-    ValueChainPackagingEmissionFactor.objects.create(packaging_type=packaging_type, value=value)
+    if sar_value:
+        ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=sar, value=sar_value)
+    if ar4_value:
+        ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=ar4, value=ar4_value)
+    if ar5_value:
+        ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=ar5, value=ar5_value)
+        ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=ar5_wo, value=ar5_value)
+    if ar6_value:
+        ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=ar6, value=ar6_value)
