@@ -703,9 +703,17 @@ class LandModuleReport(BaseModuleReport):
 class LandUseChangeReport(LandModuleReport):
     module: api_models.LandUseChange
 
+    dom_co2_source = (math_utils.ActivityTypes.DOM, math_utils.GasTypes.CO2)
+
     def __post_init__(self):
         self.calculator = calculators.LandUseChangeCalculator(self.module)
         return super().__post_init__()
+
+    def get_result(self):
+        super().get_result()
+
+        dom_co2 = self.extract_emissions(self.emissions_set, self.dom_co2_source[0], self.dom_co2_source[1])
+        self.soil_co2 = list(map(sum, zip(self.soil_co2, dom_co2)))
 
 
 @dataclass
@@ -1560,14 +1568,15 @@ class EnergyReport(BaseModuleReport):
 
             self.electricity_co2_eq = list(map(sum, zip(self.electricity_co2_eq, self.extract_emissions(submodule_emission_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1]))))
 
-            if "solid" in submodule.fuel_type.macro_fuel_type.name.casefold():
-                self.solid_fuel_co2 = list(map(sum, zip(self.solid_fuel_co2, self.extract_emissions(submodule_emission_set, self.solid_fuel_co2_source[0], self.solid_fuel_co2_source[1]))))
-                self.solid_fuel_ch4 = list(map(sum, zip(self.solid_fuel_ch4, self.extract_emissions(submodule_emission_set, self.solid_fuel_ch4_source[0], self.solid_fuel_ch4_source[1]))))
-                self.solid_fuel_n2o = list(map(sum, zip(self.solid_fuel_n2o, self.extract_emissions(submodule_emission_set, self.solid_fuel_n2o_source[0], self.solid_fuel_n2o_source[1]))))
-            elif "liquid" in submodule.fuel_type.macro_fuel_type.name.casefold():
-                self.liquid_fuel_co2 = list(map(sum, zip(self.liquid_fuel_co2, self.extract_emissions(submodule_emission_set, self.liquid_fuel_co2_source[0], self.liquid_fuel_co2_source[1]))))
-                self.liquid_fuel_ch4 = list(map(sum, zip(self.liquid_fuel_ch4, self.extract_emissions(submodule_emission_set, self.liquid_fuel_ch4_source[0], self.liquid_fuel_ch4_source[1]))))
-                self.liquid_fuel_n2o = list(map(sum, zip(self.liquid_fuel_n2o, self.extract_emissions(submodule_emission_set, self.liquid_fuel_n2o_source[0], self.liquid_fuel_n2o_source[1]))))
+            if isinstance(submodule, api_models.Fuel):
+                if "solid" in submodule.fuel_type.macro_fuel_type.name.casefold():
+                    self.solid_fuel_co2 = list(map(sum, zip(self.solid_fuel_co2, self.extract_emissions(submodule_emission_set, self.solid_fuel_co2_source[0], self.solid_fuel_co2_source[1]))))
+                    self.solid_fuel_ch4 = list(map(sum, zip(self.solid_fuel_ch4, self.extract_emissions(submodule_emission_set, self.solid_fuel_ch4_source[0], self.solid_fuel_ch4_source[1]))))
+                    self.solid_fuel_n2o = list(map(sum, zip(self.solid_fuel_n2o, self.extract_emissions(submodule_emission_set, self.solid_fuel_n2o_source[0], self.solid_fuel_n2o_source[1]))))
+                elif "liquid" in submodule.fuel_type.macro_fuel_type.name.casefold():
+                    self.liquid_fuel_co2 = list(map(sum, zip(self.liquid_fuel_co2, self.extract_emissions(submodule_emission_set, self.liquid_fuel_co2_source[0], self.liquid_fuel_co2_source[1]))))
+                    self.liquid_fuel_ch4 = list(map(sum, zip(self.liquid_fuel_ch4, self.extract_emissions(submodule_emission_set, self.liquid_fuel_ch4_source[0], self.liquid_fuel_ch4_source[1]))))
+                    self.liquid_fuel_n2o = list(map(sum, zip(self.liquid_fuel_n2o, self.extract_emissions(submodule_emission_set, self.liquid_fuel_n2o_source[0], self.liquid_fuel_n2o_source[1]))))
 
     def build_report(self):
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
@@ -1703,6 +1712,11 @@ class IrrigationReport(BaseModuleReport):
 
     def add_submodules_results(self):
         submodules: list[api_models.Submodule] = self.module.submodules
+
+        self.other_infrastructure_co2_eq = np.zeros(self.duration)
+        self.liquid_fuel_or_electricity_co2 = np.zeros(self.duration)
+        self.liquid_fuel_or_electricity_ch4 = np.zeros(self.duration)
+        self.liquid_fuel_or_electricity_n2o = np.zeros(self.duration)
 
         for submodule in submodules:
             submodules_emission_set = []
