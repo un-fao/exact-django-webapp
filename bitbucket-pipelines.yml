@@ -27,13 +27,16 @@ definitions:
           - cd djangoexact
 
           - sed -i "s|\$SERVICE_NAME|$SERVICE_NAME|g" app.yaml
-          - sed -i "s|\$PROJECT_ID|$PROJECT_ID|g" app.yaml
+          - sed -i "s|\$PROJECT_ID|${PROJECT_ID}|g" app.yaml
           - sed -i "s|\$DB_ENGINE|$DB_ENGINE|g" app.yaml
           - sed -i "s|\$DB_HOST|$DB_HOST|g" app.yaml
           - sed -i "s|\$DB_USERNAME|$DB_USERNAME|g" app.yaml
           - sed -i "s|\$DB_PASSWORD|$DB_PASSWORD|g" app.yaml
           - sed -i "s|\$DB_NAME|$DB_NAME|g" app.yaml
           - sed -i "s|\$DB_PORT|$DB_PORT|g" app.yaml
+          # - sed -i "s|\$FIREBASE_API_KEY|$FIREBASE_API_KEY|g" app.yaml
+          # - sed -i "s|\$FIREBASE_SERVICE_ACCOUNT|$FIREBASE_SERVICE_ACCOUNT|g" app.yaml
+          - echo "$(cat app.yaml)"
 
           - sed -i "s|\$DB_ENGINE|$DB_ENGINE|g" djangoexact/settings.py
           - sed -i "s|\$DB_INSTANCE_CONNECTION|$DB_INSTANCE_CONNECTION|g" djangoexact/settings.py
@@ -44,11 +47,26 @@ definitions:
           - sed -i "s|\$DB_PORT|$DB_PORT|g" djangoexact/settings.py
           - sed -i "s|\$ALLOWED_HOST|$ALLOWED_HOST|g" djangoexact/settings.py
           - sed -i "s|\$SECRET_KEY|$SECRET_KEY|g" djangoexact/settings.py
+          - sed -i "s|\\\$EMAIL_HOST|$EMAIL_HOST|g" djangoexact/settings.py
+          - sed -i "s|\\\$EMAIL_PORT|$EMAIL_PORT|g" djangoexact/settings.py
+          - sed -i "s|\\\$SMTP_USER_EMAIL|$SMTP_USER_EMAIL|g" djangoexact/settings.py
+          - sed -i "s|\\\$SMTP_USER_PASSWORD|$SMTP_USER_PASSWORD|g" djangoexact/settings.py
+          - sed -i "s|\$FIREBASE_API_KEY|$FIREBASE_API_KEY|g" djangoexact/settings.py
+          - sed -i "s|\$FIREBASE_AUTH_DOMAIN|$FIREBASE_AUTH_DOMAIN|g" djangoexact/settings.py
+          - sed -i "s|\$FIREBASE_PROJECT_ID|$FIREBASE_PROJECT_ID|g" djangoexact/settings.py
+          - sed -i "s|\$FIREBASE_STORAGE_BUCKET|$FIREBASE_STORAGE_BUCKET|g" djangoexact/settings.py
+          - sed -i "s|\$FIREBASE_MESSAGING_SENDER_ID|$FIREBASE_MESSAGING_SENDER_ID|g" djangoexact/settings.py
+          - sed -i "s|\$FIREBASE_APP_ID|$FIREBASE_APP_ID|g" djangoexact/settings.py
+          - sed -i "s|\$FIREBASE_MEASUREMENT_ID|$FIREBASE_MEASUREMENT_ID|g" djangoexact/settings.py
+          - sed -i "s|\$FIREBASE_SERVICE_ACCOUNT|$FIREBASE_SERVICE_ACCOUNT|g" djangoexact/settings.py
+          - echo "$(cat djangoexact/settings.py)"
 
           - pip install -r requirements.txt
           # - yes | python manage.py makemigrations --merge
           - python manage.py migrate
           - python manage.py collectstatic --noinput
+          - python manage.py update_translation_fields
+          - python manage.py sync_translation_fields
 
           - pip list
           - sed -i "s|127.0.0.1|$DB_HOST|g" djangoexact/settings.py
@@ -58,11 +76,11 @@ definitions:
           - gcloud app versions list --service=$SERVICE_NAME --project=$PROJECT_ID --format="value(version.id)" --sort-by="~version.createTime" | tail -n +100 | xargs -r gcloud app versions delete -q
 pipelines:
   branches:
-    develop:
-      - step: *predeploy
-      - step:
-          <<: *deploy
-          deployment: develop
+    # develop:
+    #   - step: *predeploy
+    #   - step:
+    #       <<: *deploy
+    #       deployment: develop
     review:
       - step: *predeploy
       - step:
