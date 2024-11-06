@@ -1709,3 +1709,18 @@ class ValueChainPackagingEmissionFactor(Model):
 
     def __str__(self):
         return f"({self.pk}) {self.packaging_type.name} {self.value}"
+
+
+class ValueChainRefrigerantEmissionFactor(Model):
+    """"""
+
+    class Meta:
+        verbose_name = "Value Chain Refrigerant Emission Factor"
+        verbose_name_plural = "Value Chain Refrigerant Emission Factors"
+
+    refrigerant_type = ForeignKey("api.RefrigerantType", on_delete=CASCADE)
+    gwp = ForeignKey(GlobalWarmingPotential, on_delete=CASCADE)
+    value = FloatField(default=0)
+
+    def __str__(self):
+        return f"({self.pk}) {self.refrigerant_type.name} {self.value}"
