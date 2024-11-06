@@ -936,8 +936,8 @@ class OrganicSoilDefaults(Defaults):
             offsite_ch4_peat_t2_w_default=defaults.offsite_ef_w.ch4,
             offsite_ch4_peat_t2_wo_default=defaults.offsite_ef_wo.ch4,
             peat_density_t2_start_default=0,
-            peat_density_t2_w_default=defaults.peat_extraction_math_w.peat_density_tier_2_default,
-            peat_density_t2_wo_default=defaults.peat_extraction_math_wo.peat_density_tier_2_default,
+            peat_density_t2_w_default=defaults.peat_extraction_math_w.peat_density_tier_2_default if defaults.peat_extraction_math_w else 0,
+            peat_density_t2_wo_default=defaults.peat_extraction_math_wo.peat_density_tier_2_default if defaults.peat_extraction_math_wo else 0,
         )
 
 
