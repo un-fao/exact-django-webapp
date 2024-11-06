@@ -169,6 +169,7 @@ router.register(r"storages", views.generic_module_viewset(models.Storage), basen
 router.register(r"processings", views.generic_module_viewset(models.Processing), basename="processing")
 router.register(r"packagings", views.generic_module_viewset(models.Packaging), basename="packagings")
 router.register(r"transports", views.generic_module_viewset(models.Transport), basename="transports")
+router.register(r"fuel-use-types", views.generic_viewset(models.FuelUseType), basename="fuel-use-types")
 
 urlpatterns = [
     path("docs/", include_docs_urls(title="EX-ACT Docs")),
