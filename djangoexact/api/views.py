@@ -1477,7 +1477,11 @@ def generic_module_viewset(model: Module):
 
             read_serializer = get_module_serializer(model)(instance=module_serializer.instance)
 
-            update_change_reason(module_serializer.instance, utils.ChangeReasons.CREATE.value)
+            try:
+                update_change_reason(module_serializer.instance, utils.ChangeReasons.CREATE.value)
+            except AttributeError:
+                logger.warning("Module does not have a change reason attribute")
+                pass
 
             logging.debug(f"END GenericModuleViewSet[{model.__name__}].create")
 
