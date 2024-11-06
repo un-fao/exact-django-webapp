@@ -164,6 +164,12 @@ router.register(r"peat-types", views.generic_viewset(models.PeatType), basename=
 router.register(r"users", views.UserViewSet, basename="users")
 router.register(r"definitions", views.FieldDefinitionViewSet, basename="definitions")
 
+router.register(r"value-chains", views.generic_module_viewset(models.ValueChain), basename="value-chains")
+router.register(r"storages", views.generic_module_viewset(models.Storage), basename="storages")
+router.register(r"processings", views.generic_module_viewset(models.Processing), basename="processing")
+router.register(r"packagings", views.generic_module_viewset(models.Packaging), basename="packagings")
+router.register(r"transports", views.generic_module_viewset(models.Transport), basename="transports")
+
 urlpatterns = [
     path("docs/", include_docs_urls(title="EX-ACT Docs")),
     re_path(r"^swagger(?P<format>\.json|\.yaml)$", schema_view.without_ui(cache_timeout=0), name="schema-json"),
