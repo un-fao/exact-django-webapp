@@ -283,7 +283,7 @@ class BaseProjectReport:
             self.results_worksheet.cell(row=8, column=i + 2, value=n2o[i])
             self.results_worksheet.cell(row=9, column=i + 2, value=other_ghgs[i])
             self.results_worksheet.cell(row=10, column=i + 2, value=self.cumulative_hectares_yearly[i])
-            self.results_worksheet.cell(row=10, column=i + 2, value=self.cumulative_hectares_yearly[i]).fill = Colors.LIGHT_ORANGE_FILL.value
+            self.results_worksheet.cell(row=10, column=i + 2, value=self.cumulative_hectares_yearly[i]).fill = Colors.LIGHT_BEIGE_FILL.value
 
         self.excel_manager.save_workbook(self.workbook)
 
@@ -311,8 +311,6 @@ class BaseProjectReport:
             activity_report.build_yearly_balance()
             self.cumulative_hectares_yearly = list(map(sum, zip(self.cumulative_hectares_yearly, activity_report.total_hectares_yearly)))
             self.activity_reports.append(activity_report)
-
-        self.cumulative_hectares_yearly = np.cumsum(self.cumulative_hectares_yearly)
 
         self.finalize_report()
         return self.excel_manager.excel_file, self.excel_manager.get_excel_bytes()
@@ -448,7 +446,7 @@ class BaseActivityReport:
 
         for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
             self.results_worksheet.cell(row=activity_title_row, column=i + 2, value=self.total_emissions[i])
-            self.results_worksheet.cell(row=activity_title_row, column=i + 2, value=self.total_emissions[i]).fill = Colors.LIGHT_ORANGE_FILL.value
+            self.results_worksheet.cell(row=activity_title_row, column=i + 2, value=self.total_emissions[i]).fill = Colors.LIGHT_BEIGE_FILL.value
 
         self.project_report.excel_manager.save_workbook(self.workbook)
 
