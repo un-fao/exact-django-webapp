@@ -653,9 +653,15 @@ class IrrigationPhaseDefaults(Defaults):
         super().__init__(input)
 
         self.values = SimpleNamespace(
-            ef_t2_start_default=0,
-            ef_t2_w_default=0,
-            ef_t2_wo_default=0,
+            ef_co2_t2_start_default=0,
+            ef_co2_t2_w_default=0,
+            ef_co2_t2_wo_default=0,
+            ef_n2o_t2_start_default=0,
+            ef_n2o_t2_w_default=0,
+            ef_n2o_t2_wo_default=0,
+            ef_ch4_t2_start_default=0,
+            ef_ch4_t2_w_default=0,
+            ef_ch4_t2_wo_default=0,
         )
 
     def get_defaults(self, calculate=False) -> dict:
@@ -665,9 +671,15 @@ class IrrigationPhaseDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            ef_t2_start_default=defaults.ef_default.value,
-            ef_t2_w_default=defaults.ef_default.value,
-            ef_t2_wo_default=defaults.ef_default.value,
+            ef_co2_t2_start_default=defaults.ef_default.co2_emissions,
+            ef_co2_t2_w_default=defaults.ef_default.co2_emissions,
+            ef_co2_t2_wo_default=defaults.ef_default.co2_emissions,
+            ef_n2o_t2_start_default=defaults.ef_default.n2o_emissions,
+            ef_n2o_t2_w_default=defaults.ef_default.n2o_emissions,
+            ef_n2o_t2_wo_default=defaults.ef_default.n2o_emissions,
+            ef_ch4_t2_start_default=defaults.ef_default.ch4_emissions,
+            ef_ch4_t2_w_default=defaults.ef_default.ch4_emissions,
+            ef_ch4_t2_wo_default=defaults.ef_default.ch4_emissions,
         )
 
 
