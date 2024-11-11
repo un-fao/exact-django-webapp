@@ -6540,19 +6540,27 @@ class PackagingCalculator(BaseCalculator):
 
         self.module: Packaging
 
-        self.packaging_ef = ipcc.ValueChainPackagingEmissionFactor()
+        self.packaging_ef_start = ipcc.ValueChainPackagingEmissionFactor()
+        self.packaging_ef_w = ipcc.ValueChainPackagingEmissionFactor()
+        self.packaging_ef_wo = ipcc.ValueChainPackagingEmissionFactor()
 
     def get_defaults(self, calculate=False) -> dict:
 
+        if self.module.is_start():
+            try:
+                self.packaging_ef_start = ipcc.ValueChainPackagingEmissionFactor.objects.get(fuel_type=self.module.packaging_material_type_start)
+            except ipcc.ValueChainPackagingEmissionFactor.DoesNotExist:
+                log.error(f"Packaging emission factor for {self.module.packaging_material_type_start} not found. Plase select tier2 value for start scenario.")
+
         if self.module.is_with():
             try:
-                self.packaging_ef = ipcc.ValueChainPackagingEmissionFactor.objects.get(fuel_type=self.module.packaging_material_type_w)
+                self.packaging_ef_w = ipcc.ValueChainPackagingEmissionFactor.objects.get(fuel_type=self.module.packaging_material_type_w)
             except ipcc.ValueChainPackagingEmissionFactor.DoesNotExist:
                 log.error(f"Packaging emission factor for {self.module.packaging_material_type_w} not found. Plase select tier2 value for with scenario.")
 
         if self.module.is_without():
             try:
-                self.packaging_ef = ipcc.ValueChainPackagingEmissionFactor.objects.get(fuel_type=self.module.packaging_material_type_wo)
+                self.packaging_ef_wo = ipcc.ValueChainPackagingEmissionFactor.objects.get(fuel_type=self.module.packaging_material_type_wo)
             except ipcc.ValueChainPackagingEmissionFactor.DoesNotExist:
                 log.error(f"Packaging emission factor for {self.module.packaging_material_type_wo} not found. Plase select tier2 value for without scenario.")
 
@@ -6560,6 +6568,30 @@ class PackagingCalculator(BaseCalculator):
 
     def calculate(self) -> Result:
         self.get_defaults()
+
+        if self.module.is_with():
+            self.inputs_w = {
+                "implementation_time": self.activity.implementation_years,
+                "capitalization_time": self.activity.capitalization_years,
+                "rate_type": self.activity.change_rate.name,
+                "delay": self.activity.delay,
+                "emission_factor_start_default": self.packaging_ef_start.value,
+                "emission_factor_end_default": self.packaging_ef_w.value,
+                "input_quantity_start": self.module.kf_of_packaging_material_start,
+                "input_quantity_end": self.module.kf_of_packaging_material_w,
+            }
+
+        if self.module.is_without():
+            self.inputs_wo = {
+                "implementation_time": self.activity.implementation_years,
+                "capitalization_time": self.activity.capitalization_years,
+                "rate_type": self.activity.change_rate.name,
+                "delay": self.activity.delay,
+                "emission_factor_start_default": self.packaging_ef_start.value,
+                "emission_factor_end_default": self.packaging_ef_wo.value,
+                "input_quantity_start": self.module.kf_of_packaging_material_start,
+                "input_quantity_end": self.module.kf_of_packaging_material_wo,
+            }
 
         self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
