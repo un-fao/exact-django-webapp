@@ -1304,3 +1304,36 @@ class ForestManagementDefaults(Defaults):
             # degradation_dry_matter_impacted_w_default=0,
             # degradation_dry_matter_impacted_wo_default=0,
         )
+
+
+class ForestDisturbanceDefaults(Defaults):
+
+    start_year_t2_start_default = 0
+    start_year_t2_w_default = 0
+    start_year_t2_wo_default = 0
+
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.start_year_t2_start_default = 0
+        self.start_year_t2_w_default = 0
+        self.start_year_t2_wo_default = 0
+
+        self.values = SimpleNamespace(
+            start_year_t2_start_default=0,
+            start_year_t2_w_default=0,
+            start_year_t2_wo_default=0,
+        )
+
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.ForestDisturbance
+
+        self.start_year_t2_start_default = self.input.start_year_t2_start
+        self.start_year_t2_w_default = self.input.start_year_t2_w
+        self.start_year_t2_wo_default = self.input.start_year_t2_wo
+
+        return SimpleNamespace(
+            start_year_t2_start_default=self.start_year_t2_start_default,
+            start_year_t2_w_default=self.start_year_t2_w_default,
+            start_year_t2_wo_default=self.start_year_t2_wo_default,
+        )
