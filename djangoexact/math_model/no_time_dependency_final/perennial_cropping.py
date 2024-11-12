@@ -134,6 +134,9 @@ class PerennialCropland(LandModule):
                         biomass_accumulation_rate = agb_rate + bgb_rate
 
                         max_years_growth = max_agb / agb_rate
+                        
+                        # BREAKDOWN THE HECTARES FOR MAX YEARS GROWTH
+                        hectares_before_n, hectares_after_n = yearly_time_dependent_20_year_breakdown(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type, number_of_years=int(max_years_growth))
 
                         calculated = self.biomass_start + biomass_accumulation_rate * sum(self.hectares_total) 
                         tabular = (max_agb + bgb_rate * max_years_growth) * self.hectares_end
@@ -142,7 +145,7 @@ class PerennialCropland(LandModule):
 
 
                         # NOTE: maybe this should be broken down over max_years_growth or over all years of project depending on whether calculated or tabular is used
-                        yearly_bio_emissions = breakdown_according_to_values_for_x_years(total, self.hectares_total, len(self.hectares_total))
+                        yearly_bio_emissions = breakdown_according_to_values(total, hectares_before_n)
 
                         biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_bio_emissions], ActivityTypes.BIOMASS, delay=self.delay)
                         self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
