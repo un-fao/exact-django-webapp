@@ -334,7 +334,7 @@ def get_grassland_soc(luc: LandUseChange) -> ipcc.GrasslandStockExchangeFactor |
     module_start: Grassland = getattr(luc.activity, luc.module_type_start.class_name.lower(), None).first()
     if luc.module_type_start.name_en == "Grassland" and module_start:
 
-        if module_start.status.name != "READY":
+        if module_start.status.name_en != "READY":
             raise Exception("Cannot retrieve Grassland SOC as the starting Grassland module is not ready to perform the calculation")
 
         try:
