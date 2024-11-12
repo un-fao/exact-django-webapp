@@ -871,27 +871,27 @@ class DeforestationCalculator(BaseCalculator):
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
                 "rate_type": change_rate.name,
-                "biomass_final_1_year_t_per_ha": total_biomass_w.value,
-                "biomass_final_1_year_t_per_ha_tier_2": forest.biomass_t2_start,
+                "biomass_final_1_year_t_per_ha_default": total_biomass_w.value,
+                "biomass_final_1_year_t_per_ha_tier_2": forest.biomass_t2_w,
                 "nitrous_constant": project.gwp.n2o,
                 "methane_constant": project.gwp.ch4,
-                "fire_bool": luc.is_fire_used_start,
+                "fire_bool": luc.is_fire_used_w,
                 "n2o_vegetation": combustion_factor_w.n2o,
                 "ch4_vegetation": combustion_factor_w.ch4,
                 "cf_vegetation": combustion_factor_w.value,
                 "moisture_emission_factor": som.value,
                 "litter": litter_dw_w.litter if mangroves_data is None else mangroves_data.litter,
-                "litter_tier_2": forest.litter_t2_start,
+                "litter_tier_2": forest.litter_t2_w,
                 "dw": litter_dw_w.dw if mangroves_data is None else mangroves_data.dw,
-                "dw_tier_2": forest.deadwood_t2_start,
+                "dw_tier_2": forest.deadwood_t2_w,
                 "hwp_before_t_dm_per_ha": dry_matter_w,
                 "mangrove_factor": utils.MANGROVE_FACTOR if mangroves_data is not None else utils.NON_MANGROVE_FACTOR,
-                "bgb_t_c_per_ha_tier_2": forest.bgb_t2_start,
-                "agb_t_c_per_ha_tier_2": forest.agb_t2_start,
+                "bgb_t_c_per_ha_tier_2": forest.bgb_t2_w,
+                "agb_t_c_per_ha_tier_2": forest.agb_t2_w,
                 "agb_t_c_per_ha_default": statistics.mean([agb_w.agb_min, agb_w.agb_max]),
                 "bgb_t_c_per_ha_default_input_parameter": bgb_w.value,
                 "c_n_ratio": utils.CN_RATIO_GRASSLAND,
-                "soc_after_defo_tier_2": module_w.soc_t2_start,
+                "soc_after_defo_tier_2": module_w.soc_t2_w,
                 "soc_reference_default": soc_ref.value,
                 "soc_reference_tier_2": project.soc_ref_t2,
                 "fmg_start_tier_2": module.fmg_t2_start,
@@ -915,7 +915,7 @@ class DeforestationCalculator(BaseCalculator):
                 "end_module_has_growth": module_w.is_perennial() or module_w.is_forest(),
             }
 
-            math_w = MathDeforestation(*self.inputs_w)
+            math_w = MathDeforestation(**self.inputs_w)
             math_w.calculate_emissions()
 
         if not module.is_business_as_usual():
@@ -925,27 +925,27 @@ class DeforestationCalculator(BaseCalculator):
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
                 "rate_type": change_rate.name,
-                "biomass_final_1_year_t_per_ha": total_biomass_wo.value,
-                "biomass_final_1_year_t_per_ha_tier_2": forest.biomass_t2_start,
+                "biomass_final_1_year_t_per_ha_default": total_biomass_wo.value,
+                "biomass_final_1_year_t_per_ha_tier_2": forest.biomass_t2_wo,
                 "nitrous_constant": project.gwp.n2o,
                 "methane_constant": project.gwp.ch4,
-                "fire_bool": luc.is_fire_used_start,
+                "fire_bool": luc.is_fire_used_wo,
                 "n2o_vegetation": combustion_factor_wo.n2o,
                 "ch4_vegetation": combustion_factor_wo.ch4,
                 "cf_vegetation": combustion_factor_wo.value,
                 "moisture_emission_factor": som.value,
                 "litter": litter_dw_wo.litter if mangroves_data is None else mangroves_data.litter,
-                "litter_tier_2": forest.litter_t2_start,
+                "litter_tier_2": forest.litter_t2_wo,
                 "dw": litter_dw_wo.dw if mangroves_data is None else mangroves_data.dw,
-                "dw_tier_2": forest.deadwood_t2_start,
+                "dw_tier_2": forest.deadwood_t2_wo,
                 "hwp_before_t_dm_per_ha": dry_matter_wo,
                 "mangrove_factor": utils.MANGROVE_FACTOR if mangroves_data is not None else utils.NON_MANGROVE_FACTOR,
-                "bgb_t_c_per_ha_tier_2": forest.bgb_t2_start,
-                "agb_t_c_per_ha_tier_2": forest.agb_t2_start,
+                "bgb_t_c_per_ha_tier_2": forest.bgb_t2_wo,
+                "agb_t_c_per_ha_tier_2": forest.agb_t2_wo,
                 "agb_t_c_per_ha_default": statistics.mean([agb_wo.agb_min, agb_wo.agb_max]),
                 "bgb_t_c_per_ha_default_input_parameter": bgb_wo.value,
                 "c_n_ratio": utils.CN_RATIO_GRASSLAND,
-                "soc_after_defo_tier_2": module_wo.soc_t2_start,
+                "soc_after_defo_tier_2": module_wo.soc_t2_wo,
                 "soc_reference_default": soc_ref.value,
                 "soc_reference_tier_2": project.soc_ref_t2,
                 "fmg_start_tier_2": module.fmg_t2_start,
@@ -969,7 +969,7 @@ class DeforestationCalculator(BaseCalculator):
                 "end_module_has_growth": module_wo.is_perennial() or module_wo.is_forest(),
             }
 
-            math_wo = MathDeforestation(*self.inputs_wo)
+            math_wo = MathDeforestation(**self.inputs_wo)
             math_wo.calculate_emissions()
 
         res_w = math_w.result if math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
@@ -5743,9 +5743,6 @@ class OrganicSoilCalculator(BaseCalculator):
 
 
 class ForestManagementCalculator(LandModuleCalculator):
-    """
-    # TODO: Review
-    """
 
     def __init__(self, module: LandModule) -> None:
         super().__init__(module)
