@@ -1939,6 +1939,28 @@ class ForestDisturbance(Submodule):
     dry_matter_impacted_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("dry_matter_impacted_t2_w"))
     dry_matter_impacted_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("dry_matter_impacted_t2_wo"))
 
+    def delete(self, *args, **kwargs):
+        deleted = super().delete(*args, **kwargs)
+
+        from api.serializers import ForestManagementWriteSerializer
+
+        parent_serializer = ForestManagementWriteSerializer(self.parent, data={}, partial=True)
+        parent_serializer.is_valid()
+        parent_serializer.save()
+
+        return deleted
+
+    def save(self, *args, **kwargs):
+        saved = super().save(*args, **kwargs)
+
+        from api.serializers import ForestManagementWriteSerializer
+
+        parent_serializer = ForestManagementWriteSerializer(self.parent, data={}, partial=True)
+        parent_serializer.is_valid()
+        parent_serializer.save()
+
+        return saved
+
 
 class Waterbody(Module):
     waterbody_type = models.ForeignKey(WaterbodyType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("waterbody_type"))
