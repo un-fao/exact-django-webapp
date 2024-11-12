@@ -966,6 +966,7 @@ class CachedResultMixin(models.Model, DirtyFieldsMixin):
         luc_modules = luc.get_modules()
         for module in luc_modules:
             module.invalidate_cached_results()
+        luc.invalidate_cached_results()
 
     def delete(self, *args, **kwargs):
         if isinstance(self, Submodule):
