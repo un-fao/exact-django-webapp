@@ -1093,7 +1093,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         # TODO: Make a serializer for this
         for module in activity.modules:
 
-            if not module or (module.status and module.status.name != "READY"):
+            if not module or (module.status and module.status.name_en != "READY"):
                 continue
 
             module_dict = get_module_serializer(module.__class__)(module).data
