@@ -1,5 +1,4 @@
 from abc import ABC
-from .general_functions import Tier2Defaults
 import re
 import traceback
 from .ghg_emissions_classes import (
@@ -39,7 +38,7 @@ class BaseModule:
             t2_end = {re.sub("_end_tier_2_default", "", k): v for k, v in self.__dict__.items() if "end_tier_2_default" in k}
             t2_other = {re.sub("_tier_2_default", "", k): v for k, v in self.__dict__.items() if "_tier_2_default" in k and "start" not in k and "end" not in k}
 
-            return Tier2Defaults(t2_start, t2_end, t2_other)
+            return (t2_start, t2_end, t2_other)
         except Exception as e:
             traceback.print_exc()
             raise e
