@@ -23,60 +23,60 @@ from .generalized_modules import BaseModule
 from dataclasses import dataclass, field
 from typing import Optional
 
+
 @dataclass
 class Defo(BaseModule):
-    
-    ha_start : float
-    ha_end : float
-    biomass_final_1_year_t_per_ha_default : float
-    biomass_final_1_year_t_per_ha_tier_2 : Optional[float]
-    nitrous_constant : float 
-    methane_constant : float
-    fire_bool : bool
-    n2o_vegetation : float
-    ch4_vegetation : float
-    cf_vegetation : float
-    moisture_emission_factor : float
-    litter : float
-    litter_tier_2 : Optional[float]
-    dw : float
-    dw_tier_2 : Optional[float]
-    hwp_before_t_dm_per_ha : float
-    mangrove_factor : float
-    bgb_t_c_per_ha_tier_2 : Optional[float]
-    agb_t_c_per_ha_tier_2 : Optional[float]
-    agb_t_c_per_ha_default : float
-    bgb_t_c_per_ha_default_input_parameter : float
-    c_n_ratio : float
-    soc_after_defo_tier_2 : Optional[float]
-    soc_reference_default : float
-    soc_reference_tier_2 : Optional[float]
-    fmg_start_tier_2 : Optional[float]
-    fmg_end_tier_2 : Optional[float]
-    fi_start_tier_2 : Optional[float]
-    fi_end_tier_2 : Optional[float]
-    flu_start_tier_2 : Optional[float]
-    flu_end_tier_2 : Optional[float]
-    soc_start_tier_2 : Optional[float]
-    soc_end_tier_2 : Optional[float]
-    fmg_start_default : float
-    fmg_end_default : float
-    fi_start_default : float
-    fi_end_default : float
-    flu_start_default : float
-    flu_end_default : float
-    soc_start_default : float
-    soc_end_default : float
-    calculate_soc_som : bool
+
+    ha_start: float
+    ha_end: float
+    biomass_final_1_year_t_per_ha_default: float
+    biomass_final_1_year_t_per_ha_tier_2: Optional[float]
+    nitrous_constant: float
+    methane_constant: float
+    fire_bool: bool
+    n2o_vegetation: float
+    ch4_vegetation: float
+    cf_vegetation: float
+    moisture_emission_factor: float
+    litter: float
+    litter_tier_2: Optional[float]
+    dw: float
+    dw_tier_2: Optional[float]
+    hwp_before_t_dm_per_ha: float
+    mangrove_factor: float
+    bgb_t_c_per_ha_tier_2: Optional[float]
+    agb_t_c_per_ha_tier_2: Optional[float]
+    agb_t_c_per_ha_default: float
+    bgb_t_c_per_ha_default_input_parameter: float
+    c_n_ratio: float
+    soc_after_defo_tier_2: Optional[float]
+    soc_reference_default: float
+    soc_reference_tier_2: Optional[float]
+    fmg_start_tier_2: Optional[float]
+    fmg_end_tier_2: Optional[float]
+    fi_start_tier_2: Optional[float]
+    fi_end_tier_2: Optional[float]
+    flu_start_tier_2: Optional[float]
+    flu_end_tier_2: Optional[float]
+    soc_start_tier_2: Optional[float]
+    soc_end_tier_2: Optional[float]
+    fmg_start_default: float
+    fmg_end_default: float
+    fi_start_default: float
+    fi_end_default: float
+    flu_start_default: float
+    flu_end_default: float
+    soc_start_default: float
+    soc_end_default: float
+    calculate_soc_som: bool
 
     # NOTE: This is a check that implies that the final module has growth. Meaning it is either Perennial or Forest
-    # in this case the growth is calculated in the final module, hence the final_biomass has to be set to 0 
-    end_module_has_growth : bool 
-    
+    # in this case the growth is calculated in the final module, hence the final_biomass has to be set to 0
+    end_module_has_growth: bool
+
     def __post_init__(self):
         super().__post_init__()
-        
-        
+
         self.area_deforested = abs(self.ha_end - self.ha_start)
         # TODO: Assigned FMG, FLU, FI values. Maybe once everything has been done change this structure
         self.fmg_start = self.fmg_start_tier_2 if self.fmg_start_tier_2 else self.fmg_start_default
@@ -88,13 +88,13 @@ class Defo(BaseModule):
 
         self.soc_start = self.soc_start_default * self.fmg_start * self.flu_start * self.fi_start if not self.soc_start_tier_2 else self.soc_start_tier_2 * self.fmg_start * self.flu_start * self.fi_start
         self.soc_end = self.soc_end_default * self.fmg_end * self.flu_end * self.fi_end if not self.soc_end_tier_2 else self.soc_end_tier_2 * self.fmg_end * self.flu_end * self.fi_end
-        
-        # AUXILIARY VARIABLES FOR SOIL CALCULATION  
+
+        # AUXILIARY VARIABLES FOR SOIL CALCULATION
         self.hectares_before_20, self.hectares_after_20 = yearly_time_dependent_20_year_breakdown(0, self.area_deforested, self.implementation_time, self.capitalization_time, self.rate_type)
         self.total_hectares = yearly_time_dependent_parameter_breakdown(self.area_deforested, 0, self.implementation_time, self.capitalization_time, self.rate_type)
-        
+
     def calculate_emissions(self):
-        
+
         def calculate_biomass():
             try:
                 # NOTE: try to make the variable names similar to OLUC
@@ -163,6 +163,6 @@ class Defo(BaseModule):
             except Exception as e:
                 traceback.print_exc()
 
-            calculate_biomass()
-            calculate_dom_emissions()
-            calculate_fire_emissions()
+        calculate_biomass()
+        calculate_dom_emissions()
+        calculate_fire_emissions()
