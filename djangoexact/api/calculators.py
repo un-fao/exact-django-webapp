@@ -5518,7 +5518,7 @@ class OrganicSoilCalculator(BaseCalculator):
         self.peat_extraction_math_wo = None
 
         self.organic_soil_inputs_w = {
-            "fire_boolean_end": input.fire_type_w is not None,
+            "fire_boolean_end": self.is_fire_used_w,
             "fire_periodicity_end": input.soil_fire_periodicity_w,
             "area_affected_by_action_end": self.area_affected_by_module,
             "dry_matter_ref_fire": self.dry_matter_w.value if self.is_fire_used_w else None,
@@ -5584,38 +5584,39 @@ class OrganicSoilCalculator(BaseCalculator):
 
         if input.peat_area_start:
             self.peat_extraction_inputs_w = {
-                "peat_area_start": input.peat_area_start,
-                "peat_area_end": input.peat_area_w,
+                "hectares_start": input.peat_area_start,
+                "hectares_end": input.peat_area_w,
                 "percentage_ditches_start": input.peat_ditches_area_start,
                 "percentage_ditches_end": input.peat_ditches_area_w,
                 "rate_type": input.activity.change_rate.name,
-                "ef_co2_tier_2_start": self.onsite_ef_w.co2,
-                "ef_co2_tier_2_end": input.onsite_co2_peat_t2_w,
-                "ef_ch4_onsite_tier_2_start": self.onsite_ef_w.ch4,
-                "ef_ch4_onsite_tier_2_end": None,
-                "ef_n2o_tier_2_start": self.onsite_ef_w.n2o,
-                "ef_n2o_tier_2_end": input.onsite_n2o_peat_t2_w,
-                "ef_doc_tier_2_start": self.offsite_ef_w.doc,
-                "ef_doc_tier_2_end": input.offsite_doc_peat_t2_w,
-                "ef_ch4_offsite_tier_2_start": self.offsite_ef_w.ch4,
-                "ef_ch4_offsite_tier_2_end": input.offsite_ch4_peat_t2_w,
+                "ef_co2_onsite_ref": self.onsite_ef_w.co2,
+                "ef_co2_onsite_tier_2": input.onsite_co2_peat_t2_w,
+                "ef_ch4_onsite_ref": self.onsite_ef_w.ch4,
+                "ef_ch4_onsite_tier_2": None,  # NOTE: Set to None, why?
+                "ef_n2o_onsite_ref": self.onsite_ef_w.n2o,
+                "ef_n2o_onsite_tier_2": input.onsite_n2o_peat_t2_w,
+                "ef_doc_offsite_ref": self.offsite_ef_w.doc,
+                "ef_doc_offsite_tier_2": input.offsite_doc_peat_t2_w,
+                "ef_ch4_offsite_ref": self.offsite_ef_w.ch4,
+                "ef_ch4_offsite_tier_2": input.offsite_ch4_peat_t2_w,
                 "methane_constant": project.gwp.ch4,
                 "nitrous_constant": project.gwp.n2o,
+                "weight_peat": self.conversion_factor_wo.weight,
+                "mass_tonnes_tier_2": input.peat_density_t2_w,
+                "conversion_factor_volume": self.conversion_factor_wo.volume,
+                "c_fraction_ref": 1,  # TODO: Should be conversion_factor_w.volume,
+                "extraction_height_start": input.peat_extraction_height_start,
+                "extraction_height_end": input.peat_extraction_height_w,
+                "delay": self.activity.delay,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "conversion_factor_volume": self.conversion_factor_w.volume,
-                "peat_density_tier_2_start": input.peat_density_t2_w,
-                "conversion_factor_weight": self.conversion_factor_w.weight,
-                "peat_extraction_height_start": input.peat_extraction_height_start,
-                "peat_extraction_height_end": input.peat_extraction_height_w,
-                "delay": self.activity.delay,
             }
 
             self.peat_extraction_math_w = MathPeatExtraction(**self.peat_extraction_inputs_w)
             self.peat_extraction_math_w.calculate_emissions()
 
         self.organic_soil_inputs_wo = {
-            "fire_boolean_end": input.fire_type_wo is not None,
+            "fire_boolean_end": self.is_fire_used_wo,
             "fire_periodicity_end": input.soil_fire_periodicity_wo,
             "area_affected_by_action_end": self.area_affected_by_module,
             "dry_matter_ref_fire": self.dry_matter_wo.value if self.is_fire_used_wo else None,
@@ -5698,8 +5699,6 @@ class OrganicSoilCalculator(BaseCalculator):
                 "ef_ch4_offsite_tier_2": input.offsite_ch4_peat_t2_wo,
                 "methane_constant": project.gwp.ch4,
                 "nitrous_constant": project.gwp.n2o,
-                "implementation_time": self.activity.implementation_years,
-                "capitalization_time": self.activity.capitalization_years,
                 "weight_peat": self.conversion_factor_wo.weight,
                 "mass_tonnes_tier_2": input.peat_density_t2_wo,
                 "conversion_factor_volume": self.conversion_factor_wo.volume,
@@ -5707,6 +5706,8 @@ class OrganicSoilCalculator(BaseCalculator):
                 "extraction_height_start": input.peat_extraction_height_start,
                 "extraction_height_end": input.peat_extraction_height_wo,
                 "delay": self.activity.delay,
+                "implementation_time": self.activity.implementation_years,
+                "capitalization_time": self.activity.capitalization_years,
             }
 
             self.peat_extraction_math_wo = MathPeatExtraction(**self.peat_extraction_inputs_wo)
