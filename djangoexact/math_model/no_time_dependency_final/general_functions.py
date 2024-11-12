@@ -559,7 +559,7 @@ def create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, bgb_ratio_under_thr
             for j in range(i, agb_matrix.shape[1]):
                 value_to_assign = bgb_start + delta_bgb_matrix[i][j] + np.sum(delta_bgb_matrix[i, i:j])
                 if value_to_assign > threshold:
-                    delta_bgb_matrix[i][j] = delta_bgb_matrix[i][j] * bgb_ratio_over_threshold
+                    delta_bgb_matrix[i][j] = delta_bgb_matrix[i][j]/bgb_ratio_under_threshold * bgb_ratio_over_threshold
                     value_to_assign = bgb_start + delta_bgb_matrix[i][j] + np.sum(delta_bgb_matrix[i, i:j])
                 bgb_matrix[i][j] = value_to_assign
 

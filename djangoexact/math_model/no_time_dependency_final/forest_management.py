@@ -296,7 +296,7 @@ class ForestManagement(BaseModule):
             try:
                 # NOTE: We start with a check to see if the agb_matrix has negative values, if it does, it means that the parameters for logging and disturbance are such that the agb_matrix has negative values
                 if np.any(np.sum(self.agb_matrix < 0), axis=0):
-                        raise ValueError(f"Negative values in agb_matrix, check the parameters for logging and disturbance % over 100")
+                    raise ValueError(f"Negative values in agb_matrix, check the parameters for logging and disturbance % over 100")
 
                 agb_times_hectares = multiply_matrix_by_matrix(self.delta_agb_matrix, self.hectares_matrix)
                 yearly_agb_emissions = [x * -44 / 12 for x in agb_times_hectares]
