@@ -4246,6 +4246,7 @@ for i, row in enumerate(df_dict):
         ForestManagementAGB.objects.all().delete()
 import api.utilities as utils
 
+
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestManagementAGB.csv"),
     header=0,
@@ -4429,8 +4430,7 @@ for i, row in enumerate(df_dict):
         )
     )
 
-# EnergyDefaultEmissionFactor.objects.bulk_create(l)
-
+EnergyDefaultEmissionFactor.objects.bulk_create(l)
 
 """
 
