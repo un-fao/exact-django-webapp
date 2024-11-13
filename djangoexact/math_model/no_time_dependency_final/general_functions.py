@@ -339,30 +339,30 @@ def yearly_time_dependent_matrix_log_rec_dis(start_value, end_value, years_imple
 
 # LIVESTOCK CH4 HEAD GENERAL FUNCTION
 # LIVESTOCK CH4 HEAD GENERAL FUNCTION
-def ch4_head_calculation_general(tam: float, vser: float, ef_prp: float, 
+def gas_head_calculation(tam: float, vser_ner: float, ef_prp: float, 
                                  percentage_prp_default: float, percentage_prp_tier_2: float | None, 
-                                 ef_system_default: list, ch4_prp_tier_2: float, percentage_system_default: list, 
-                                 ef_single_system, ch4_system_tier_2, ch4_dividing_parameter=1):
+                                 ef_system_default: list, gas_prp_tier_2: float, percentage_system_default: list, 
+                                 ef_single_system, gas_system_tier_2, gas_dividing_parameter=1):
 
     try:
         # TODO: check how various tier 2 inputs of ef_system have to be handled
-        if ch4_system_tier_2 is None:
+        if gas_system_tier_2 is None:
             ef_system = ef_system_default if ef_single_system is None else [ef_single_system]
 
             if percentage_prp_tier_2 is None:
-                ch4_system = [i * (tam / 1000) * (vser) / ch4_dividing_parameter * 365 * j / 100 for (i, j) in zip(ef_system, percentage_system_default)]
+                ch4_system = [i * (tam / 1000) * (vser_ner) / gas_dividing_parameter * 365 * j / 100 for (i, j) in zip(ef_system, percentage_system_default)]
             else:
                 # this recalculates percentages in the system as a function of percentage prp tier 2
-                ch4_system = [i * (tam / 1000) * vser / ch4_dividing_parameter * 365 * j / 100 * ((1 - percentage_prp_tier_2 / 100) / (1 - percentage_prp_default / 100)) for (i, j) in zip(ef_system, percentage_system_default)]
+                ch4_system = [i * (tam / 1000) * vser_ner / gas_dividing_parameter * 365 * j / 100 * ((1 - percentage_prp_tier_2 / 100) / (1 - percentage_prp_default / 100)) for (i, j) in zip(ef_system, percentage_system_default)]
 
         else:
             # TODO: check if this has to be recalculated as a function of percentage prp tier 2
-            ch4_system = [ch4_system_tier_2]
+            ch4_system = [gas_system_tier_2]
 
         percentage_prp = percentage_prp_default if percentage_prp_tier_2 is None else percentage_prp_tier_2
 
         # TODO: add tier 2 value for ef_prp
-        ch4_prp = ef_prp * (tam / 1000) * vser / ch4_dividing_parameter * 365 * percentage_prp / 100 if not ch4_prp_tier_2 else ch4_prp_tier_2 * percentage_prp / 100
+        ch4_prp = ef_prp * (tam / 1000) * vser_ner / gas_dividing_parameter * 365 * percentage_prp / 100 if not gas_prp_tier_2 else gas_prp_tier_2 * percentage_prp / 100
 
         ch4_head = sum(ch4_system) + ch4_prp
 
@@ -769,29 +769,28 @@ def multiply_matrix_by_matrix(matrix1, matrix2):
         traceback.print_exc()
         raise e
 
-def create_litter_deadwood_matrix(years_impl, years_cap, delta_agb_yearly_below_20, delta_agb_yearly_after_20, agb_start, max_agb_value):
+def create_litter_deadwood_matrix(years_impl, years_cap, delta_yearly, value_start, max_value):
 
     try:
         years_total = years_impl + years_cap
-        delta_agb_matrix = np.full((years_impl, years_total), 0.0)
-        agb_matrix = np.full((years_impl, years_total), 0.0)
+        delta_matrix = np.full((years_impl, years_total), 0.0)
+        cumulative_matrix = np.full((years_impl, years_total), 0.0)
 
-        # NOTE: IN THE CASE OF DEFORESTATION THERE IS NO GROWTH
-        # if hectares_start == hectares_end or hectares_start < hectares_end:
+        # NOTE: The same value is added, but I keep this way so that if in the future we want a different delta at different intervals (Like for AGB) we can do it
         for i in range(years_impl):
-            # CREATING DELTA AGB MATRIX
+            # CREATING LITTER/DEADWOOD MATRIX
             end_index_below_20 = min(i + 20, years_total)
-            delta_agb_matrix[i, i:end_index_below_20] = delta_agb_yearly_below_20
+            delta_matrix[i, i:end_index_below_20] = delta_yearly # This would be before 20 years
             if end_index_below_20 < years_total:
-                delta_agb_matrix[i, end_index_below_20:] = delta_agb_yearly_after_20
+                delta_matrix[i, end_index_below_20:] = delta_yearly # This would be after 20 years
 
         for i in range(years_impl):
             for j in range(i, years_total):
-                agb_matrix[i, j] = agb_start + delta_agb_matrix[i][j] + np.sum(delta_agb_matrix[i, i:j])
+                cumulative_matrix[i, j] = value_start + delta_matrix[i][j] + np.sum(delta_matrix[i, i:j])
+                
+        check_agb_matrices(cumulative_matrix, delta_matrix, max_value)
 
-        # agb_matrix, delta_agb_matrix = check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value)
-
-        return agb_matrix, delta_agb_matrix
+        return cumulative_matrix, delta_matrix
 
     except Exception as e:
         traceback.print_exc()
