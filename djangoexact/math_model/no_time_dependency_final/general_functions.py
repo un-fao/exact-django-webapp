@@ -570,6 +570,10 @@ def create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, bgb_ratio_under_thr
         raise e
     
 def check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value):
+    
+    # check for any negative values in the agb_matrix
+    if np.any(agb_matrix < 0):
+        raise Exception("Negative values in agb_matrix, percentage disturbance + percentage logging is > 100%")
 
     try:
         for i in range(agb_matrix.shape[0]):
@@ -739,7 +743,7 @@ def calculate_logging_effect(original_agb_matrix, original_delta_agb_matrix, max
             agb_matrix, delta_agb_matrix = update_agb_matrix_logging(agb_matrix, delta_agb_matrix, original_delta_agb_matrix, max_agb_value, logging_impact, i * recurrence, recurrence, is_degradation)
             agb_matrix, delta_agb_matrix = check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value)
 
-            # BUG: @Peter: result dictionary is always empty
+            # NOTE: as of now result is always empty, add necessary logic or remove it, as it's not used anywhere   
 
         return result, logging_impact, delta_agb_matrix
 
