@@ -364,9 +364,9 @@ def gas_head_calculation(tam: float, vser_or_ner: float, ef_prp: float,
         # TODO: add tier 2 value for ef_prp
         gas_prp = ef_prp * (tam / 1000) * vser_or_ner / gas_dividing_parameter * 365 * percentage_prp / 100 if not gas_prp_tier_2 else gas_prp_tier_2 * percentage_prp / 100
 
-        ch4_head = sum(gas_system) + gas_prp
+        gas_head = sum(gas_system) + gas_prp
 
-        return ch4_head, gas_system, gas_prp
+        return gas_head, gas_system, gas_prp
 
     except Exception as e:
         traceback.print_exc()
