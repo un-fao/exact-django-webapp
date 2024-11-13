@@ -318,7 +318,7 @@ class ForestManagement(BaseModule):
         def calculate_litter():
             try:
 
-                litter_matrix, delta_litter_matrix = create_litter_deadwood_matrix(self.implementation_time, self.capitalization_time, self.litter_20_years / 20, self.litter_20_years / 20, self.litter_start, self.litter_max)
+                litter_matrix, delta_litter_matrix = create_litter_deadwood_matrix(self.implementation_time, self.capitalization_time, self.litter_20_years / 20, self.litter_start, self.litter_max)
 
                 if self.degradation_percentage:
                     # NOTE: This means we have degradation, which has an impact on litter and deadwood as well
@@ -345,7 +345,7 @@ class ForestManagement(BaseModule):
         
         def calculate_deadwood():
             try:
-                deadwood_matrix, delta_deadwood_matrix = create_litter_deadwood_matrix(self.implementation_time, self.capitalization_time, self.deadwood_20_years / 20, self.deadwood_20_years / 20, self.deadwood_start, self.deadwood_max)
+                deadwood_matrix, delta_deadwood_matrix = create_litter_deadwood_matrix(self.implementation_time, self.capitalization_time, self.deadwood_20_years / 20, self.deadwood_start, self.deadwood_max)
 
                 if self.degradation_percentage:
                     # NOTE: This means we have degradation, which has an impact on litter and deadwood as well
