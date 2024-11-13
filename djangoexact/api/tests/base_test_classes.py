@@ -11,12 +11,13 @@ from factory import fuzzy
 from .factories import *
 import api.tests.base_test_classes as t
 import uuid
+from django.contrib.auth.models import Group
 
 
 class ProjectTest:
     def __init__(self):
         log.basicConfig(level=log.INFO)
-        self.user = User.objects.get(email="admin@admin.com")
+        self.user = User.objects.get(email="claudio.lavacca@fao.org")
         self.climates = Climate.objects.all()
         self.countries = Country.objects.all()
         self.soil_types = SoilType.objects.all().exclude(active=False).exclude(name="Mineral").exclude(name="Organic")
@@ -55,6 +56,7 @@ class ProjectTest:
             None.
         """
         self.project: Project = ProjectFactory.create(owner=self.user, name=uuid.uuid4(), climate=self.climate, moisture=self.moisture)
+        ProjectMembership.objects.create(project=self.project, user=self.user, group=Group.objects.get(name="Admin"))
         log.info(f"Created project with parameters {self.get_parameters(self.project)}")
 
     @abstractmethod
