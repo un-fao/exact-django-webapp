@@ -339,7 +339,7 @@ def yearly_time_dependent_matrix_log_rec_dis(start_value, end_value, years_imple
 
 # LIVESTOCK CH4 HEAD GENERAL FUNCTION
 # LIVESTOCK CH4 HEAD GENERAL FUNCTION
-def gas_head_calculation(tam: float, vser_ner: float, ef_prp: float, 
+def gas_head_calculation(tam: float, vser_or_ner: float, ef_prp: float, 
                                  percentage_prp_default: float, percentage_prp_tier_2: float | None, 
                                  ef_system_default: list, gas_prp_tier_2: float, percentage_system_default: list, 
                                  ef_single_system, gas_system_tier_2, gas_dividing_parameter=1):
@@ -350,10 +350,10 @@ def gas_head_calculation(tam: float, vser_ner: float, ef_prp: float,
             ef_system = ef_system_default if ef_single_system is None else [ef_single_system]
 
             if percentage_prp_tier_2 is None:
-                gas_system = [i * (tam / 1000) * (vser_ner) / gas_dividing_parameter * 365 * j / 100 for (i, j) in zip(ef_system, percentage_system_default)]
+                gas_system = [i * (tam / 1000) * (vser_or_ner) / gas_dividing_parameter * 365 * j / 100 for (i, j) in zip(ef_system, percentage_system_default)]
             else:
                 # this recalculates percentages in the system as a function of percentage prp tier 2
-                gas_system = [i * (tam / 1000) * vser_ner / gas_dividing_parameter * 365 * j / 100 * ((1 - percentage_prp_tier_2 / 100) / (1 - percentage_prp_default / 100)) for (i, j) in zip(ef_system, percentage_system_default)]
+                gas_system = [i * (tam / 1000) * vser_or_ner / gas_dividing_parameter * 365 * j / 100 * ((1 - percentage_prp_tier_2 / 100) / (1 - percentage_prp_default / 100)) for (i, j) in zip(ef_system, percentage_system_default)]
 
         else:
             # TODO: check if this has to be recalculated as a function of percentage prp tier 2
@@ -362,7 +362,7 @@ def gas_head_calculation(tam: float, vser_ner: float, ef_prp: float,
         percentage_prp = percentage_prp_default if percentage_prp_tier_2 is None else percentage_prp_tier_2
 
         # TODO: add tier 2 value for ef_prp
-        gas_prp = ef_prp * (tam / 1000) * vser_ner / gas_dividing_parameter * 365 * percentage_prp / 100 if not gas_prp_tier_2 else gas_prp_tier_2 * percentage_prp / 100
+        gas_prp = ef_prp * (tam / 1000) * vser_or_ner / gas_dividing_parameter * 365 * percentage_prp / 100 if not gas_prp_tier_2 else gas_prp_tier_2 * percentage_prp / 100
 
         ch4_head = sum(gas_system) + gas_prp
 
