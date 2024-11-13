@@ -7,14 +7,14 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('ipcc', '0046_valuechainrefrigerantemissionfactor'),
+        ("ipcc", "0046_valuechainrefrigerantemissionfactor"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='valuechainrefrigerantemissionfactor',
-            name='gwp',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='ipcc.globalwarmingpotential'),
+            model_name="valuechainrefrigerantemissionfactor",
+            name="gwp",
+            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to="ipcc.globalwarmingpotential"),
             preserve_default=False,
         ),
     ]
