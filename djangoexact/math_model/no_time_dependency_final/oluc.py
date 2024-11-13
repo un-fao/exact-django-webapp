@@ -2,7 +2,7 @@ import re
 import traceback
 
 from .general_functions import (
-    ch4_head_calculation_general,
+    gas_head_calculation,
     soil_emissions_2,
     yearly_constant_emissions_breakdown,
     yearly_time_dependent_20_year_breakdown,
