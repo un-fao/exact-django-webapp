@@ -4243,14 +4243,8 @@ for i, row in enumerate(df_dict):
             value=value,
         )
 
-"""
-
-# TODO: Run in production
-
-
-# ForestManagementAGB.objects.all().delete()
+        ForestManagementAGB.objects.all().delete()
 import api.utilities as utils
-from django.db.utils import IntegrityError
 
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestManagementAGB.csv"),
@@ -4310,7 +4304,7 @@ for i, row in df.iterrows():
         agb_range_min = parse_csv_number(row["agb_range"])
         agb_range_max = parse_csv_number(row["agb_range"])
 
-    if not row["agb_growth"] and row["agb_growth"].startswith("-") and not isinstance(row["agb_growth"], float) and len(row["agb_growth"].split("-")) == 2:
+    if not row["agb_growth"].startswith("-") and not isinstance(row["agb_growth"], float) and len(row["agb_growth"].split("-")) == 2:
         agb_growth_min = parse_csv_number(row["agb_growth"].split("-")[0])
         agb_growth_max = parse_csv_number(row["agb_growth"].split("-")[1])
     elif row["agb_growth"] != "n.a." or row["agb_growth"] != "":
@@ -4365,21 +4359,18 @@ for i, row in df.iterrows():
                     agb_growth_max_plantation,
                 )
 
-                try:
-                    ForestManagementAGB.objects.create(
-                        land_use_type=land_use_type,
-                        region=region,
-                        climate=climate,
-                        forest_condition_type=forest_condition_type,
-                        from_year=from_year,
-                        forest_type=type,
-                        agb_min=agb_range_min * utils.NON_MANGROVE_FACTOR if agb_range_min else None,
-                        agb_max=agb_range_max * utils.NON_MANGROVE_FACTOR if agb_range_max else None,
-                        agb_growth_min=agb_growth_min * utils.NON_MANGROVE_FACTOR if agb_growth_min else None,
-                        agb_growth_max=agb_growth_max * utils.NON_MANGROVE_FACTOR if agb_growth_max else None,
-                    )
-                except IntegrityError as e:
-                    log.warning(e)
+                ForestManagementAGB.objects.create(
+                    land_use_type=land_use_type,
+                    region=region,
+                    climate=climate,
+                    forest_condition_type=forest_condition_type,
+                    from_year=from_year,
+                    forest_type=type,
+                    agb_min=agb_range_min * utils.NON_MANGROVE_FACTOR if agb_range_min else None,
+                    agb_max=agb_range_max * utils.NON_MANGROVE_FACTOR if agb_range_max else None,
+                    agb_growth_min=agb_growth_min * utils.NON_MANGROVE_FACTOR if agb_growth_min else None,
+                    agb_growth_max=agb_growth_max * utils.NON_MANGROVE_FACTOR if agb_growth_max else None,
+                )
 
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "IrrigationSystemType_ModuleType.csv"),
@@ -4439,6 +4430,12 @@ for i, row in enumerate(df_dict):
     )
 
 # EnergyDefaultEmissionFactor.objects.bulk_create(l)
+
+
+"""
+
+# TODO: Run in production
+
 
 # TODO: Run in review
 
