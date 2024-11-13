@@ -668,7 +668,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
                     module_instance.organic_soil = organic_soil
             else:
                 filters = {"activity": activity}
-                if module_type.name in ["Coastal Wetland", "Waterbody"]:
+                if module_type.class_name in [CoastalWetland.__name__, Waterbody.__name__]:
                     filters["area"] = self.validated_data.get("area")
                 module_instance = ModuleClass.objects.create(**filters)
 
