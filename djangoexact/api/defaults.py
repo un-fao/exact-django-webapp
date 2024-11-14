@@ -84,9 +84,9 @@ class GrasslandDefaults(Defaults):
             soc_t2_start_default=defaults.soc_start.value,
             soc_t2_w_default=defaults.soc_w.value,
             soc_t2_wo_default=defaults.soc_wo.value,
-            biomass_t2_start_default=defaults.biomass.agb_t_c_ha,
-            biomass_t2_w_default=defaults.biomass.agb_t_c_ha,
-            biomass_t2_wo_default=defaults.biomass.agb_t_c_ha,
+            biomass_t2_start_default=defaults.biomass_ef_start.value,
+            biomass_t2_w_default=defaults.biomass_ef_w.value,
+            biomass_t2_wo_default=defaults.biomass_ef_wo.value,
             combustion_factor_t2_start_default=defaults.cf.value,
             combustion_factor_t2_w_default=defaults.cf.value,
             combustion_factor_t2_wo_default=defaults.cf.value,
@@ -653,9 +653,15 @@ class IrrigationPhaseDefaults(Defaults):
         super().__init__(input)
 
         self.values = SimpleNamespace(
-            ef_t2_start_default=0,
-            ef_t2_w_default=0,
-            ef_t2_wo_default=0,
+            ef_co2_t2_start_default=0,
+            ef_co2_t2_w_default=0,
+            ef_co2_t2_wo_default=0,
+            ef_n2o_t2_start_default=0,
+            ef_n2o_t2_w_default=0,
+            ef_n2o_t2_wo_default=0,
+            ef_ch4_t2_start_default=0,
+            ef_ch4_t2_w_default=0,
+            ef_ch4_t2_wo_default=0,
         )
 
     def get_defaults(self, calculate=False) -> dict:
@@ -665,9 +671,15 @@ class IrrigationPhaseDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            ef_t2_start_default=defaults.ef_default.value,
-            ef_t2_w_default=defaults.ef_default.value,
-            ef_t2_wo_default=defaults.ef_default.value,
+            ef_co2_t2_start_default=defaults.ef_default.co2_emissions,
+            ef_co2_t2_w_default=defaults.ef_default.co2_emissions,
+            ef_co2_t2_wo_default=defaults.ef_default.co2_emissions,
+            ef_n2o_t2_start_default=defaults.ef_default.n2o_emissions,
+            ef_n2o_t2_w_default=defaults.ef_default.n2o_emissions,
+            ef_n2o_t2_wo_default=defaults.ef_default.n2o_emissions,
+            ef_ch4_t2_start_default=defaults.ef_default.ch4_emissions,
+            ef_ch4_t2_w_default=defaults.ef_default.ch4_emissions,
+            ef_ch4_t2_wo_default=defaults.ef_default.ch4_emissions,
         )
 
 
@@ -1260,9 +1272,12 @@ class ForestManagementDefaults(Defaults):
             deadwood_t2_start_default=defaults.litter_dw_start_w.dw,
             deadwood_t2_w_default=defaults.litter_dw.dw,
             deadwood_t2_wo_default=defaults.litter_dw.dw,
-            agb_t2_start_default=defaults.agb_start_w or defaults.agb_start_wo,
+            agb_t2_start_default=defaults.agb_start_w if self.input.is_with() else defaults.agb_start_w if self.input.is_with() else 0,
             agb_t2_w_default=defaults.agb_max_w,
             agb_t2_wo_default=defaults.agb_max_wo,
+            bgb_t2_start_default=defaults.bgb_after_20_yrs.value if defaults.bgb_after_20_yrs else 0,
+            bgb_t2_w_default=defaults.bgb_after_20_yrs.value if defaults.bgb_after_20_yrs else 0,
+            bgb_t2_wo_default=defaults.bgb_after_20_yrs.value if defaults.bgb_after_20_yrs else 0,
             agb_growth_rate_le_20_yrs_t2_start_default=0,
             agb_growth_rate_le_20_yrs_t2_w_default=defaults.agb_growth_under_20_w,
             agb_growth_rate_le_20_yrs_t2_wo_default=defaults.agb_growth_under_20_wo,
@@ -1288,6 +1303,39 @@ class ForestManagementDefaults(Defaults):
             # degradation_dry_matter_impacted_start_default=0,
             # degradation_dry_matter_impacted_w_default=0,
             # degradation_dry_matter_impacted_wo_default=0,
+        )
+
+
+class ForestDisturbanceDefaults(Defaults):
+
+    start_year_t2_start_default = 0
+    start_year_t2_w_default = 0
+    start_year_t2_wo_default = 0
+
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.start_year_t2_start_default = 0
+        self.start_year_t2_w_default = 0
+        self.start_year_t2_wo_default = 0
+
+        self.values = SimpleNamespace(
+            start_year_t2_start_default=0,
+            start_year_t2_w_default=0,
+            start_year_t2_wo_default=0,
+        )
+
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.ForestDisturbance
+
+        self.start_year_t2_start_default = self.input.start_year_t2_start
+        self.start_year_t2_w_default = self.input.start_year_t2_w
+        self.start_year_t2_wo_default = self.input.start_year_t2_wo
+
+        return SimpleNamespace(
+            start_year_t2_start_default=self.start_year_t2_start_default,
+            start_year_t2_w_default=self.start_year_t2_w_default,
+            start_year_t2_wo_default=self.start_year_t2_wo_default,
         )
 
 
