@@ -33,10 +33,6 @@ class ValueChain(BaseModule):
     # Input quantities    
     input_quantity_start: float
     input_quantity_end: float
-    
-    # Transmission loss
-    transmission_loss_start: float
-    transmission_loss_end: float
 
     activity_type: ActivityTypes
 
