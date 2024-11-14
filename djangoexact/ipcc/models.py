@@ -1704,11 +1704,11 @@ class ValueChainPackagingEmissionFactor(Model):
         verbose_name = "Value Chain Packaging Emission Factor"
         verbose_name_plural = "Value Chain Packaging Emission Factors"
 
-    packaging_type = ForeignKey("api.PackagingMaterialType", on_delete=CASCADE)
+    packaging_material_type = ForeignKey("api.PackagingMaterialType", on_delete=CASCADE)
     value = FloatField(default=0)
 
     def __str__(self):
-        return f"({self.pk}) {self.packaging_type.name} {self.value}"
+        return f"({self.pk}) {self.packaging_material_type.name} {self.value}"
 
 
 class ValueChainRefrigerantEmissionFactor(Model):
