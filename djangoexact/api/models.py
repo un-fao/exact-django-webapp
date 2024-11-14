@@ -2777,7 +2777,7 @@ class ValueChainSubmodule(Submodule):
     emission_factor_t2_w = models.FloatField(null=True, blank=True)
     emission_factor_t2_wo = models.FloatField(null=True, blank=True)
 
-    country_of_origin_t2 = models.ForeignKey(Country, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_country_of_origin_t2")
+    country_t2 = models.ForeignKey(Country, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_country_of_origin_t2")
     ef_source = models.ForeignKey(EmissionFactorSource, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("ef_source"))
 
     def save(self, *args, **kwargs):
