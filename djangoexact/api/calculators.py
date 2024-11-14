@@ -132,6 +132,9 @@ from .models import (
     Processing,
 )
 from api.utilities import DefaultValue
+from math_model.no_time_dependency_final.value_chains import ValueChain as MathValueChain
+from math_model.no_time_dependency_final.ghg_emissions_classes import ActivityTypes as MathActivityTypes
+
 
 CALCULATE_SOC_SOM_START_W = False
 CALCULATE_SOC_SOM_START_WO = False
@@ -3532,8 +3535,10 @@ class ElectricityCalculator(BaseCalculator):
     def get_defaults(self, calculate=False) -> dict:
         super().get_defaults(calculate)
 
+        country = self.module.country if self.module.country else self.country
+
         try:
-            self.electricity_ef_default = ipcc.ElectricityEmission.objects.get(country=self.country)
+            self.electricity_ef_default = ipcc.ElectricityEmission.objects.get(country=country)
 
             if self.module.ef_source.name == "Operating Margin":
                 self.electricity_ef_selected.value = self.electricity_ef_default.operating_margin
@@ -6470,11 +6475,79 @@ class StorageCalculator(BaseCalculator):
 
         self.module: Storage
 
+        self.refrigerant_ef_start = ipcc.ValueChainRefrigerantEmissionFactor()
+        self.refrigerant_ef_w = ipcc.ValueChainRefrigerantEmissionFactor()
+        self.refrigerant_ef_wo = ipcc.ValueChainRefrigerantEmissionFactor()
+
     def get_defaults(self, calculate=False) -> dict:
+
+        if self.module.is_start():
+            try:
+                self.refrigerant_ef_start = ipcc.ValueChainRefrigerantEmissionFactor.objects.get(refrigerant_type=self.module.refrigerant_type_start, gwp=self.project.gwp)
+            except ipcc.ValueChainRefrigerantEmissionFactor.DoesNotExist:
+                if self.module.emission_factor_t2_start is None:
+                    log.error(f"Refrigerant emission factor for {self.module.refrigerant_type_start} not found. Plase select tier2 value for start scenario.")
+                    raise ValueError(f"Refrigerant emission factor for {self.module.refrigerant_type_start} not found. Plase select tier2 value for start scenario.")
+                self.refrigerant_ef_start.value = self.module.emission_factor_t2_start
+
+        if self.module.is_with():
+            try:
+                self.refrigerant_ef_w = ipcc.ValueChainRefrigerantEmissionFactor.objects.get(refrigerant_type=self.module.refrigerant_type_w, gwp=self.project.gwp)
+            except ipcc.ValueChainRefrigerantEmissionFactor.DoesNotExist:
+                if self.module.emission_factor_t2_w is None:
+                    log.error(f"Refrigerant emission factor for {self.module.refrigerant_type_w} not found. Plase select tier2 value for with scenario.")
+                    raise ValueError(f"Refrigerant emission factor for {self.module.refrigerant_type_w} not found. Plase select tier2 value for with scenario.")
+                self.refrigerant_ef_w.value = self.module.emission_factor_t2_w
+
+        if self.module.is_without():
+            try:
+                self.refrigerant_ef_wo = ipcc.ValueChainRefrigerantEmissionFactor.objects.get(refrigerant_type=self.module.refrigerant_type_wo, gwp=self.project.gwp)
+            except ipcc.ValueChainRefrigerantEmissionFactor.DoesNotExist:
+                if self.module.emission_factor_t2_wo is None:
+                    log.error(f"Refrigerant emission factor for {self.module.refrigerant_type_wo} not found. Plase select tier2 value for without scenario.")
+                    raise ValueError(f"Refrigerant emission factor for {self.module.refrigerant_type_wo} not found. Plase select tier2 value for without scenario.")
+                self.refrigerant_ef_wo.value = self.module.emission_factor_t2_wo
+
         return super().get_defaults
 
     def calculate(self) -> Result:
         self.get_defaults()
+
+        shared_inputs = {
+            "activity_type": MathActivityTypes.STORAGE,
+            "implementation_time": self.activity.implementation_years,
+            "capitalization_time": self.activity.capitalization_years,
+            "rate_type": self.activity.change_rate.name,
+            "delay": self.activity.delay,
+        }
+
+        if self.module.is_with():
+            self.inputs_w = {
+                **shared_inputs,
+                "emission_factor_start_default": self.refrigerant_ef_start.value,
+                "emission_factor_end_default": self.refrigerant_ef_w.value,
+                "emission_factor_start_tier_2": self.module.emission_factor_t2_start,
+                "emission_factor_end_tier_2": self.module.emission_factor_t2_w,
+                "input_quantity_start": self.module.total_refrigerant_leakage_start,
+                "input_quantity_end": self.module.total_refrigerant_leakage_w,
+            }
+
+            self.math_w = MathValueChain(**self.inputs_w)
+            self.math_w.calculate_emissions()
+
+        if self.module.is_without():
+            self.inputs_wo = {
+                **shared_inputs,
+                "emission_factor_start_default": self.refrigerant_ef_start.value,
+                "emission_factor_end_default": self.refrigerant_ef_wo.value,
+                "emission_factor_start_tier_2": self.module.emission_factor_t2_start,
+                "emission_factor_end_tier_2": self.module.emission_factor_t2_wo,
+                "input_quantity_start": self.module.total_refrigerant_leakage_start,
+                "input_quantity_end": self.module.total_refrigerant_leakage_wo,
+            }
+
+            self.math_wo = MathValueChain(**self.inputs_wo)
+            self.math_wo.calculate_emissions()
 
         self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
@@ -6488,6 +6561,8 @@ class StorageCalculator(BaseCalculator):
 
 class ProcessingCalculator(BaseCalculator):
 
+    # TODO: This is basically only the Energy module. The model needs to extend energy if we want to maintain consistency.
+
     def __init__(self, input) -> None:
         super().__init__(input)
 
@@ -6500,24 +6575,6 @@ class ProcessingCalculator(BaseCalculator):
         self.electricity_ef = ipcc.ElectricityEmission()
 
     def get_defaults(self, calculate=False) -> dict:
-
-        try:
-            self.electricity_ef = ipcc.ElectricityEmission.objects.get(country=self.module.country_of_origin)
-        except ipcc.ElectricityEmission.DoesNotExist:
-            log.error(f"Electricity emission factor for {self.module.country_of_origin} not found.")
-
-        if self.module.is_with():
-            try:
-                self.energy_ef_w = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=self.module.fuel_type_w)
-            except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
-                log.error(f"Energy emission factor for {self.module.fuel_type_w} not found. Plase select tier2 value for with scenario.")
-
-        if self.module.is_without():
-            try:
-                self.energy_ef_wo = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=self.module.fuel_type_wo)
-            except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
-                log.error(f"Energy emission factor for {self.module.fuel_type_wo} not found. Plase select tier2 value for without scenario.")
-
         return super().get_defaults(calculate)
 
     def calculate(self) -> Result:
@@ -6544,54 +6601,78 @@ class PackagingCalculator(BaseCalculator):
         self.packaging_ef_w = ipcc.ValueChainPackagingEmissionFactor()
         self.packaging_ef_wo = ipcc.ValueChainPackagingEmissionFactor()
 
+        self.electricity_ef_default = ipcc.ElectricityEmission()
+        self.electricity_ef_selected: DefaultValue = DefaultValue()
+
     def get_defaults(self, calculate=False) -> dict:
 
         if self.module.is_start():
             try:
                 self.packaging_ef_start = ipcc.ValueChainPackagingEmissionFactor.objects.get(packaging_material_type=self.module.packaging_material_type_start)
             except ipcc.ValueChainPackagingEmissionFactor.DoesNotExist:
-                log.error(f"Packaging emission factor for {self.module.packaging_material_type_start} not found. Plase select tier2 value for start scenario.")
+                if self.module.emission_factor_t2_start is None:
+                    log.error(f"Packaging emission factor for {self.module.packaging_material_type_start} not found. Plase select tier2 value for start scenario.")
+                    raise ValueError(f"Packaging emission factor for {self.module.packaging_material_type_start} not found. Plase select tier2 value for start scenario.")
+                self.packaging_ef_start.value = self.module.emission_factor_t2_start
 
         if self.module.is_with():
             try:
                 self.packaging_ef_w = ipcc.ValueChainPackagingEmissionFactor.objects.get(packaging_material_type=self.module.packaging_material_type_w)
             except ipcc.ValueChainPackagingEmissionFactor.DoesNotExist:
-                log.error(f"Packaging emission factor for {self.module.packaging_material_type_w} not found. Plase select tier2 value for with scenario.")
+                if self.module.emission_factor_t2_w is None:
+                    log.error(f"Packaging emission factor for {self.module.packaging_material_type_w} not found. Plase select tier2 value for with scenario.")
+                    raise ValueError(f"Packaging emission factor for {self.module.packaging_material_type_w} not found. Plase select tier2 value for with scenario.")
+                self.packaging_ef_w.value = self.module.emission_factor_t2_w
 
         if self.module.is_without():
             try:
                 self.packaging_ef_wo = ipcc.ValueChainPackagingEmissionFactor.objects.get(packaging_material_type=self.module.packaging_material_type_wo)
             except ipcc.ValueChainPackagingEmissionFactor.DoesNotExist:
-                log.error(f"Packaging emission factor for {self.module.packaging_material_type_wo} not found. Plase select tier2 value for without scenario.")
+                if self.module.emission_factor_t2_wo is None:
+                    log.error(f"Packaging emission factor for {self.module.packaging_material_type_wo} not found. Plase select tier2 value for without scenario.")
+                    raise ValueError(f"Packaging emission factor for {self.module.packaging_material_type_wo} not found. Plase select tier2 value for without scenario.")
+                self.packaging_ef_wo.value = self.module.emission_factor_t2_wo
 
         return super().get_defaults(calculate)
 
     def calculate(self) -> Result:
         self.get_defaults()
 
+        shared_inputs = {
+            "activity_type": MathActivityTypes.PACKAGING,
+            "implementation_time": self.activity.implementation_years,
+            "capitalization_time": self.activity.capitalization_years,
+            "rate_type": self.activity.change_rate.name,
+            "delay": self.activity.delay,
+        }
+
         if self.module.is_with():
             self.inputs_w = {
-                "implementation_time": self.activity.implementation_years,
-                "capitalization_time": self.activity.capitalization_years,
-                "rate_type": self.activity.change_rate.name,
-                "delay": self.activity.delay,
+                **shared_inputs,
                 "emission_factor_start_default": self.packaging_ef_start.value,
                 "emission_factor_end_default": self.packaging_ef_w.value,
+                "emission_factor_start_tier_2": self.module.emission_factor_t2_start,
+                "emission_factor_end_tier_2": self.module.emission_factor_t2_w,
                 "input_quantity_start": self.module.kg_of_packaging_material_start,
                 "input_quantity_end": self.module.kg_of_packaging_material_w,
             }
 
+            self.math_w = MathValueChain(**self.inputs_w)
+            self.math_w.calculate_emissions()
+
         if self.module.is_without():
             self.inputs_wo = {
-                "implementation_time": self.activity.implementation_years,
-                "capitalization_time": self.activity.capitalization_years,
-                "rate_type": self.activity.change_rate.name,
-                "delay": self.activity.delay,
+                **shared_inputs,
                 "emission_factor_start_default": self.packaging_ef_start.value,
                 "emission_factor_end_default": self.packaging_ef_wo.value,
+                "emission_factor_start_tier_2": self.module.emission_factor_t2_start,
+                "emission_factor_end_tier_2": self.module.emission_factor_t2_wo,
                 "input_quantity_start": self.module.kg_of_packaging_material_start,
                 "input_quantity_end": self.module.kg_of_packaging_material_wo,
             }
+
+            self.math_wo = MathValueChain(**self.inputs_wo)
+            self.math_wo.calculate_emissions()
 
         self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
@@ -6604,6 +6685,8 @@ class PackagingCalculator(BaseCalculator):
 
 
 class TransportCalculator(BaseCalculator):
+
+    # TODO: This is basically only the Energy module. The model needs to extend energy if we want to maintain consistency.
 
     def __init__(self, input) -> None:
         super().__init__(input)
