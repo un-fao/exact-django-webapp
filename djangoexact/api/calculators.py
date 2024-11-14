@@ -403,7 +403,7 @@ class DefaultData:
 
 
 class CalculatorFactory:
-    def __get_calculator(self, input):
+    def get_calculator(self, input):
         """
         Finds the calculator class for a given module.
 
@@ -436,7 +436,7 @@ class CalculatorFactory:
             Exception: If an error occurs during the calculation.
         """
         try:
-            calculator: BaseCalculator = self.__get_calculator(input)(input)
+            calculator: BaseCalculator = self.get_calculator(input)(input)
             result: tuple[MathResult] = calculator.calculate()
             return (
                 Result(*result).breakdown(by=BreakdownTypes.TOTAL),
@@ -462,7 +462,7 @@ class CalculatorFactory:
             Exception: If an error occurs while retrieving the default values.
         """
         try:
-            calculator: BaseCalculator = self.__get_calculator(input)(input)
+            calculator: BaseCalculator = self.get_calculator(input)(input)
             return calculator.defaults()
 
         except Exception as e:
@@ -6548,19 +6548,19 @@ class PackagingCalculator(BaseCalculator):
 
         if self.module.is_start():
             try:
-                self.packaging_ef_start = ipcc.ValueChainPackagingEmissionFactor.objects.get(fuel_type=self.module.packaging_material_type_start)
+                self.packaging_ef_start = ipcc.ValueChainPackagingEmissionFactor.objects.get(packaging_material_type=self.module.packaging_material_type_start)
             except ipcc.ValueChainPackagingEmissionFactor.DoesNotExist:
                 log.error(f"Packaging emission factor for {self.module.packaging_material_type_start} not found. Plase select tier2 value for start scenario.")
 
         if self.module.is_with():
             try:
-                self.packaging_ef_w = ipcc.ValueChainPackagingEmissionFactor.objects.get(fuel_type=self.module.packaging_material_type_w)
+                self.packaging_ef_w = ipcc.ValueChainPackagingEmissionFactor.objects.get(packaging_material_type=self.module.packaging_material_type_w)
             except ipcc.ValueChainPackagingEmissionFactor.DoesNotExist:
                 log.error(f"Packaging emission factor for {self.module.packaging_material_type_w} not found. Plase select tier2 value for with scenario.")
 
         if self.module.is_without():
             try:
-                self.packaging_ef_wo = ipcc.ValueChainPackagingEmissionFactor.objects.get(fuel_type=self.module.packaging_material_type_wo)
+                self.packaging_ef_wo = ipcc.ValueChainPackagingEmissionFactor.objects.get(packaging_material_type=self.module.packaging_material_type_wo)
             except ipcc.ValueChainPackagingEmissionFactor.DoesNotExist:
                 log.error(f"Packaging emission factor for {self.module.packaging_material_type_wo} not found. Plase select tier2 value for without scenario.")
 
@@ -6577,8 +6577,8 @@ class PackagingCalculator(BaseCalculator):
                 "delay": self.activity.delay,
                 "emission_factor_start_default": self.packaging_ef_start.value,
                 "emission_factor_end_default": self.packaging_ef_w.value,
-                "input_quantity_start": self.module.kf_of_packaging_material_start,
-                "input_quantity_end": self.module.kf_of_packaging_material_w,
+                "input_quantity_start": self.module.kg_of_packaging_material_start,
+                "input_quantity_end": self.module.kg_of_packaging_material_w,
             }
 
         if self.module.is_without():
@@ -6589,8 +6589,8 @@ class PackagingCalculator(BaseCalculator):
                 "delay": self.activity.delay,
                 "emission_factor_start_default": self.packaging_ef_start.value,
                 "emission_factor_end_default": self.packaging_ef_wo.value,
-                "input_quantity_start": self.module.kf_of_packaging_material_start,
-                "input_quantity_end": self.module.kf_of_packaging_material_wo,
+                "input_quantity_start": self.module.kg_of_packaging_material_start,
+                "input_quantity_end": self.module.kg_of_packaging_material_wo,
             }
 
         self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
@@ -6628,10 +6628,17 @@ class TransportCalculator(BaseCalculator):
 
 class ValueChainCalculator(BaseCalculator):
 
-    def __init__(self, input) -> None:
+    # TODO: Generalize this logic for all calculators with submodules
+
+    def __init__(self, input, *args, **kwargs) -> None:
         super().__init__(input)
 
         self.module: ValueChain
+        self.filtered_submodules: list[Storage | Transport | Packaging | Processing] = self.module.submodules
+
+        if "module_types" in kwargs:
+            module_types = [module_type.class_name for module_type in ModuleType.objects.filter(id__in=kwargs["module_types"])]
+            self.filtered_submodules = list(filter(lambda x: x.__name__ in module_types, self.module.submodules))
 
     def get_defaults(self, calculate=False) -> dict:
         return super().get_defaults(calculate)
@@ -6648,8 +6655,8 @@ class ValueChainCalculator(BaseCalculator):
             self.activity.capitalization_years,
         )
 
-        for submodule in self.module.submodules:
-            calculator: BaseCalculator = CalculatorFactory().__get_calculator(submodule)
+        for submodule in self.filtered_submodules:
+            calculator: BaseCalculator = CalculatorFactory().get_calculator(submodule)(submodule)
             r_w, r_wo = calculator.calculate()
 
             self.results_w += r_w
