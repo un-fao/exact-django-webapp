@@ -4450,45 +4450,45 @@ EnergyDefaultEmissionFactor.objects.bulk_create(l)
 
 # TODO: Run in develop
 
-# df = pd.read_csv(
-#     os.path.join(os.path.dirname(__file__), "ipcc_data", "PackagingTypes.csv"),
-#     header=0,
-#     sep=",",
-# )
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainPackagingMaterialTypes.csv"),
+    header=0,
+    sep=",",
+)
 
-# for i, row in df.iterrows():
-#     name = row["name"]
+for i, row in df.iterrows():
+    name = row["name"]
 
-#     if PackagingType.objects.filter(name__iexact=name).exists():
-#         print(f"PackagingType {name} already exists. Skipping...")
-#         continue
+    if PackagingMaterialType.objects.filter(name__iexact=name).exists():
+        print(f"PackagingType {name} already exists. Skipping...")
+        continue
 
-#     print(name)
+    print(name)
 
-#     PackagingType.objects.create(name=name)
+    PackagingMaterialType.objects.create(name=name)
 
-# log.debug("Deleting all ValueChainPackagingEmissionFactor objects...")
-# ValueChainPackagingEmissionFactor.objects.all().delete()
-
-# df = pd.read_csv(
-#     os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainPackagingEmissionFactor.csv"),
-#     header=0,
-#     sep=",",
-# )
-
-# for i, row in df.iterrows():
-#     packaging_type = PackagingType.objects.get(name__iexact=row["packaging_type"])
-#     value = parse_csv_number(row["value"])
-
-#     print(
-#         packaging_type,
-#         value,
-#     )
-
-#     ValueChainPackagingEmissionFactor.objects.create(packaging_type=packaging_type, value=value)
+log.debug("Deleting all ValueChainPackagingEmissionFactor objects...")
+ValueChainPackagingEmissionFactor.objects.all().delete()
 
 df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "RefrigerantType.csv"),
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainPackagingEmissionFactors.csv"),
+    header=0,
+    sep=",",
+)
+
+for i, row in df.iterrows():
+    packaging_type = PackagingMaterialType.objects.get(name__iexact=row["packaging_type"])
+    value = parse_csv_number(row["value"])
+
+    print(
+        packaging_type,
+        value,
+    )
+
+    ValueChainPackagingEmissionFactor.objects.create(packaging_type=packaging_type, value=value)
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainRefrigerantTypes.csv"),
     header=0,
     sep=",",
 )
