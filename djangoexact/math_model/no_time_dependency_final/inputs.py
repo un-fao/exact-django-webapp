@@ -3,7 +3,7 @@ import traceback
 import numpy as np
 from .generalized_modules import BaseModule
 
-from .general_functions import input_single_calculation, breakdown_equally_across_years, compute_yearly_or_half_year_cumulative, breakdown_proportionally_to_values
+from .general_functions import input_single_calculation, compute_yearly_or_half_year_cumulative, breakdown_proportionally_to_values
 from .ghg_emissions_classes import (
     ActivityTypes,
     Emission,
