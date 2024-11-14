@@ -2,12 +2,11 @@ import re
 import traceback
 
 from .general_functions import (
-    breakdown_according_to_values,
+    breakdown_proportionally_to_values,
     soil_emissions,
-    soil_emissions_2,
-    yearly_constant_emissions_breakdown,
-    yearly_time_dependent_20_year_breakdown,
-    yearly_time_dependent_parameter_breakdown,
+    breakdown_equally_across_years,
+    compute_half_year_cumulative_n_year_maturity,
+    compute_yearly_or_half_year_cumulative,
     som_emissions,
 )
 from .ghg_emissions_classes import (
@@ -90,8 +89,8 @@ class Defo(BaseModule):
         self.soc_end = self.soc_end_default * self.fmg_end * self.flu_end * self.fi_end if not self.soc_end_tier_2 else self.soc_end_tier_2 * self.fmg_end * self.flu_end * self.fi_end
 
         # AUXILIARY VARIABLES FOR SOIL CALCULATION
-        self.hectares_before_20, self.hectares_after_20 = yearly_time_dependent_20_year_breakdown(0, self.area_deforested, self.implementation_time, self.capitalization_time, self.rate_type)
-        self.total_hectares = yearly_time_dependent_parameter_breakdown(self.area_deforested, 0, self.implementation_time, self.capitalization_time, self.rate_type)
+        self.hectares_before_20, self.hectares_after_20 = compute_half_year_cumulative_n_year_maturity(0, self.area_deforested, self.implementation_time, self.capitalization_time, self.rate_type)
+        self.total_hectares = compute_yearly_or_half_year_cumulative(self.area_deforested, 0, self.implementation_time, self.capitalization_time, self.rate_type)
 
     def calculate_emissions(self):
 
@@ -121,7 +120,7 @@ class Defo(BaseModule):
 
                 biomass_loss = biomass_forest_agb_bgb_t_co2 * self.area_deforested
 
-                emissions_biomass_loss_yearly = yearly_constant_emissions_breakdown(biomass_loss, self.implementation_time, self.capitalization_time, self.rate_type)
+                emissions_biomass_loss_yearly = breakdown_equally_across_years(biomass_loss, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in emissions_biomass_loss_yearly], activity=ActivityTypes.BIOMASS, delay=self.delay))
 
@@ -137,7 +136,7 @@ class Defo(BaseModule):
                 biomass_forest_dom_t_co2_per_ha = biomass_forest_dom_t_c_per_ha * (44 / 12)
 
                 dom_loss = biomass_forest_dom_t_co2_per_ha * self.area_deforested
-                emissions_dom_yearly = yearly_constant_emissions_breakdown(dom_loss, self.implementation_time, self.capitalization_time, self.rate_type)
+                emissions_dom_yearly = breakdown_equally_across_years(dom_loss, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in emissions_dom_yearly], activity=ActivityTypes.DOM, delay=self.delay))
 
@@ -154,8 +153,8 @@ class Defo(BaseModule):
                 total_ch4_per_ha = fire_kg_ch4 * self.methane_constant / 1000
                 total_n2o_per_ha = fire_kg_n2o * self.nitrous_constant / 1000
 
-                emissions_ch4 = yearly_constant_emissions_breakdown(total_ch4_per_ha * self.area_deforested, self.implementation_time, self.capitalization_time, self.rate_type)
-                emissions_n2o = yearly_constant_emissions_breakdown(total_n2o_per_ha * self.area_deforested, self.implementation_time, self.capitalization_time, self.rate_type)
+                emissions_ch4 = breakdown_equally_across_years(total_ch4_per_ha * self.area_deforested, self.implementation_time, self.capitalization_time, self.rate_type)
+                emissions_n2o = breakdown_equally_across_years(total_n2o_per_ha * self.area_deforested, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in emissions_ch4], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in emissions_n2o], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
