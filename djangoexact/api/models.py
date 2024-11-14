@@ -2764,7 +2764,31 @@ class ValueChain(Module):
         return list(self.storages.all()) + list(self.processings.all()) + list(self.packagings.all()) + list(self.transports.all())
 
 
-class Storage(Submodule):
+class ValueChainSubmodule(Submodule):
+
+    class Meta:
+        abstract = True
+
+    energy_ef_t2_start = models.FloatField(null=True, blank=True)
+    energy_ef_t2_w = models.FloatField(null=True, blank=True)
+    energy_ef_t2_wo = models.FloatField(null=True, blank=True)
+
+    emission_factor_t2_start = models.FloatField(null=True, blank=True)
+    emission_factor_t2_w = models.FloatField(null=True, blank=True)
+    emission_factor_t2_wo = models.FloatField(null=True, blank=True)
+
+    country_of_origin_t2 = models.ForeignKey(Country, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_country_of_origin_t2")
+    ef_source = models.ForeignKey(EmissionFactorSource, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("ef_source"))
+
+    def save(self, *args, **kwargs):
+
+        if self.pk is None:
+            self.ef_source = EmissionFactorSource.objects.get_or_create(name="Operating Margin")[0]
+
+        return super().save(*args, **kwargs)
+
+
+class Storage(ValueChainSubmodule):
     parent = models.ForeignKey(ValueChain, null=True, blank=True, related_name="storages", on_delete=models.CASCADE)
 
     electricity_use_per_year_start = models.FloatField(null=True, blank=True)
@@ -2785,7 +2809,7 @@ class Storage(Submodule):
     total_refrigerant_leakage_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_total_refrigerant_leakage_thread")
 
 
-class Processing(Submodule):
+class Processing(ValueChainSubmodule):
     parent = models.ForeignKey(ValueChain, null=True, blank=True, related_name="processings", on_delete=models.CASCADE)
 
     fuel_type_start = models.ForeignKey(FuelType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_fuel_type_start", limit_choices_to=({"fuel_use_type__name": "Stationary"}))
@@ -2805,10 +2829,8 @@ class Processing(Submodule):
     water_use_per_year_wo = models.FloatField(null=True, blank=True)
     water_use_per_year_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_water_use_per_year_thread")
 
-    country_of_origin = models.ForeignKey(Country, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_country_of_origin")
 
-
-class Packaging(Submodule):
+class Packaging(ValueChainSubmodule):
     parent = models.ForeignKey(ValueChain, null=True, blank=True, related_name="packagings", on_delete=models.CASCADE)
 
     packaging_material_type_start = models.ForeignKey(PackagingMaterialType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_packaging_material_type_start")
@@ -2832,8 +2854,10 @@ class Packaging(Submodule):
     emission_factor_t2_w = models.FloatField(null=True, blank=True)
     emission_factor_t2_wo = models.FloatField(null=True, blank=True)
 
+    ef_source = models.ForeignKey(EmissionFactorSource, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("ef_source"))
 
-class Transport(Submodule):
+
+class Transport(ValueChainSubmodule):
     parent = models.ForeignKey(ValueChain, null=True, blank=True, related_name="transports", on_delete=models.CASCADE)
 
     fuel_type_start = models.ForeignKey(FuelType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_fuel_type_start")
