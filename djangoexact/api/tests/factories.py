@@ -646,3 +646,33 @@ class RoadFactory(DjangoModelFactory):
     width_m_start = factory.fuzzy.FuzzyFloat(0, 100)
     width_m_w = factory.fuzzy.FuzzyFloat(0, 100)
     width_m_wo = factory.fuzzy.FuzzyFloat(0, 100)
+
+
+class ValueChainFactory(DjangoModelFactory):
+
+    class Meta:
+        model = ValueChain
+
+    status = READY
+
+
+class ValueChainPackagingFactory(DjangoModelFactory):
+
+    class Meta:
+        model = Packaging
+
+    status = READY
+
+    packaging_material_type_start = factory.fuzzy.FuzzyChoice([packaging for packaging in PackagingMaterialType.objects.all()])
+    packaging_material_type_w = factory.fuzzy.FuzzyChoice([packaging for packaging in PackagingMaterialType.objects.all()])
+    packaging_material_type_wo = factory.fuzzy.FuzzyChoice([packaging for packaging in PackagingMaterialType.objects.all()])
+
+    kg_of_packaging_material_start = factory.fuzzy.FuzzyFloat(0, 100)
+    kg_of_packaging_material_w = factory.fuzzy.FuzzyFloat(0, 100)
+    kg_of_packaging_material_wo = factory.fuzzy.FuzzyFloat(0, 100)
+
+    is_electric = factory.fuzzy.FuzzyChoice([True, False])
+
+    kwh_energy_per_year_start = factory.fuzzy.FuzzyFloat(0, 100)
+    kwh_energy_per_year_w = factory.fuzzy.FuzzyFloat(0, 100)
+    kwh_energy_per_year_wo = factory.fuzzy.FuzzyFloat(0, 100)
