@@ -477,6 +477,10 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         serialized_project = ProjectResultSerializer(project, context={"request": request}).data
 
+        selected_activities = request.query_params.get("activities", "").split(",")
+        if selected_activities == [""]:
+            selected_activities = project.activities.values_list("id", flat=True)
+
         response = serialized_project
         response["activities"] = []
 
@@ -484,7 +488,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         def process_activity(activity_pk):
             return ActivityViewSet.results(self, request, pk=activity_pk).data
 
-        activity_pks = [activity.pk for activity in project.activities.all()]
+        activity_pks = project.activities.filter(pk__in=selected_activities).values_list("id", flat=True)
 
         # Use ThreadPoolExecutor to run tasks in parallel
         with ThreadPoolExecutor(max_workers=10) as executor:
@@ -1093,7 +1097,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         # TODO: Make a serializer for this
         for module in activity.modules:
 
-            if not module or (module.status and module.status.name != "READY"):
+            if not module or (module.status and module.status.name_en != "READY"):
                 continue
 
             module_dict = get_module_serializer(module.__class__)(module).data
