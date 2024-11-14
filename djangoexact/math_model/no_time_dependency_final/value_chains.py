@@ -29,8 +29,8 @@ class ValueChain(BaseModule):
     emission_factor_end_default: float
     emission_factor_start_tier_2: Optional[float]
     emission_factor_end_tier_2: Optional[float]
-    
-    # Input quantities    
+
+    # Input quantities
     input_quantity_start: float
     input_quantity_end: float
 
@@ -46,7 +46,7 @@ class ValueChain(BaseModule):
 
         emissions_start = self.input_quantity_start * self.emission_factor_start
         emissions_end = self.input_quantity_end * self.emission_factor_end
-        
+
         emissions_yearly = yearly_time_dependent_parameter_breakdown(emissions_start, emissions_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
         emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_yearly], self.activity_type, delay=self.delay)
