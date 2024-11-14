@@ -155,6 +155,7 @@ router.register(r"emission-factor-sources", views.generic_viewset(models.Emissio
 # Fuel
 router.register(r"macro-fuel-types", views.generic_viewset(models.MacroFuelType), basename="macro-fuel-types")
 router.register(r"fuel-types", views.generic_viewset(models.FuelType), basename="fuel-types")
+router.register(r"fuel-use-types", views.generic_viewset(models.FuelUseType), basename="fuel-use-types")
 
 # Organic Soil
 router.register(r"fire-types", views.generic_viewset(models.FireType), basename="fire-types")
@@ -164,12 +165,12 @@ router.register(r"peat-types", views.generic_viewset(models.PeatType), basename=
 router.register(r"users", views.UserViewSet, basename="users")
 router.register(r"definitions", views.FieldDefinitionViewSet, basename="definitions")
 
+# Value Chains
 router.register(r"value-chains", views.generic_module_viewset(models.ValueChain), basename="value-chains")
 router.register(r"storages", views.generic_module_viewset(models.Storage), basename="storages")
 router.register(r"processings", views.generic_module_viewset(models.Processing), basename="processing")
 router.register(r"packagings", views.generic_module_viewset(models.Packaging), basename="packagings")
 router.register(r"transports", views.generic_module_viewset(models.Transport), basename="transports")
-router.register(r"fuel-use-types", views.generic_viewset(models.FuelUseType), basename="fuel-use-types")
 
 urlpatterns = [
     path("docs/", include_docs_urls(title="EX-ACT Docs")),
