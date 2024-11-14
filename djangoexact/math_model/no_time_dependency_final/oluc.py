@@ -81,7 +81,7 @@ class OtherLandUseChanges(BaseModule):
         self.soc_end = soc_ref_end * fmg_end * fi_end * flu_end
 
         # NOTE: Difference in number of hectares of which we change land use each year, compared to previous year
-        self.hectare_variation_yearly = compute_yearly_delta(0, self.area, self.implementation_time, self.capitalization_time, self.rate_type)
+        self.hectare_variation_yearly = compute_yearly_delta(self.area, 0, self.implementation_time, self.capitalization_time, self.rate_type)
         
 
     def calculate_emissions(self):
