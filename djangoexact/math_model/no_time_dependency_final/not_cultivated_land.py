@@ -6,7 +6,6 @@ from dataclasses import dataclass
 from .general_functions import (
     breakdown_proportionally_to_values,
     soil_emissions,
-    breakdown_equally_across_years,
     som_emissions,
     compute_half_year_cumulative_n_year_maturity,
     compute_yearly_or_half_year_cumulative,
