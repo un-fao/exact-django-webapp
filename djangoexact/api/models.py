@@ -2782,7 +2782,7 @@ class ValueChain(Module):
 
     @property
     def submodules(self) -> list["Submodule"]:
-        return list(self.production.all()) + list(self.storage.all()) + list(self.processings.all()) + list(self.packagings.all()) + list(self.transports.all())
+        return list(self.storages.all()) + list(self.processings.all()) + list(self.packagings.all()) + list(self.transports.all())
 
 
 class Storage(Submodule):
@@ -2837,10 +2837,10 @@ class Packaging(Submodule):
     packaging_material_type_wo = models.ForeignKey(PackagingMaterialType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_packaging_material_type_wo")
     packaging_material_type_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_packaging_material_type_thread")
 
-    kf_of_packaging_material_start = models.FloatField(null=True, blank=True)
-    kf_of_packaging_material_w = models.FloatField(null=True, blank=True)
-    kf_of_packaging_material_wo = models.FloatField(null=True, blank=True)
-    kf_of_packaging_material_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_kf_of_packaging_material_thread")
+    kg_of_packaging_material_start = models.FloatField(null=True, blank=True)
+    kg_of_packaging_material_w = models.FloatField(null=True, blank=True)
+    kg_of_packaging_material_wo = models.FloatField(null=True, blank=True)
+    kg_of_packaging_material_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_kf_of_packaging_material_thread")
 
     is_electric = models.BooleanField(default=False)
 
