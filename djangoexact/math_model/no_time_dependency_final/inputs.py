@@ -3,7 +3,7 @@ import traceback
 import numpy as np
 from .generalized_modules import BaseModule
 
-from .general_functions import input_single_calculation, yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, breakdown_according_to_values
+from .general_functions import input_single_calculation, breakdown_equally_across_years, compute_yearly_or_half_year_cumulative, breakdown_proportionally_to_values
 from .ghg_emissions_classes import (
     ActivityTypes,
     Emission,
@@ -157,8 +157,8 @@ class Roads(BaseModule):
             ef = self.ef_tier_2 or self.ef_ipcc
 
             self.total_emissions = self.units_end * ef / 1000  # to convert the ef from kg to g
-            yearly_units = yearly_time_dependent_parameter_breakdown(0, self.units_end, self.implementation_time, self.capitalization_time, self.rate_type)
-            self.emissions_total_yearly = breakdown_according_to_values(self.total_emissions, yearly_units)
+            yearly_units = compute_yearly_or_half_year_cumulative(0, self.units_end, self.implementation_time, self.capitalization_time, self.rate_type)
+            self.emissions_total_yearly = breakdown_proportionally_to_values(self.total_emissions, yearly_units)
 
             roads_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_total_yearly], ActivityTypes.ROADS, delay=self.delay)
             self.result.yearly_emissions_by_sector_by_gas.append(roads_emission_set)
@@ -189,7 +189,7 @@ class ElectricityConsumption(BaseModule):
             annual_start = (factor_start * self.mwh_start) * (1 + self.percent_loss_transportation_start)
             annual_end = (factor_end * self.mwh_end) * (1 + self.percent_loss_transportation_end)
 
-            emissions_total_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
+            emissions_total_yearly = compute_yearly_or_half_year_cumulative(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
             electricity_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_total_yearly], ActivityTypes.ELECTRICITY, delay=self.delay)
             self.result.yearly_emissions_by_sector_by_gas.append(electricity_emission_set)
@@ -230,9 +230,9 @@ class SolidAndLiquidFuelsConsumption(BaseModule):
             annual_start_n2o = factor_n2o * self.mwh_start * self.nitrous_constant
             annual_end_n2o = factor_n2o * self.mwh_end * self.nitrous_constant
 
-            emissions_co2_yearly = yearly_time_dependent_parameter_breakdown(annual_start_co2, annual_end_co2, self.implementation_time, self.capitalization_time, self.rate_type)
-            emissions_ch4_yearly = yearly_time_dependent_parameter_breakdown(annual_start_ch4, annual_end_ch4, self.implementation_time, self.capitalization_time, self.rate_type)
-            emissions_n2o_yearly = yearly_time_dependent_parameter_breakdown(annual_start_n2o, annual_end_n2o, self.implementation_time, self.capitalization_time, self.rate_type)
+            emissions_co2_yearly = compute_yearly_or_half_year_cumulative(annual_start_co2, annual_end_co2, self.implementation_time, self.capitalization_time, self.rate_type)
+            emissions_ch4_yearly = compute_yearly_or_half_year_cumulative(annual_start_ch4, annual_end_ch4, self.implementation_time, self.capitalization_time, self.rate_type)
+            emissions_n2o_yearly = compute_yearly_or_half_year_cumulative(annual_start_n2o, annual_end_n2o, self.implementation_time, self.capitalization_time, self.rate_type)
 
             fuel_emission_set_co2 = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_co2_yearly], ActivityTypes.FUEL, delay=self.delay)
             fuel_emission_set_ch4 = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in emissions_ch4_yearly], ActivityTypes.FUEL, delay=self.delay)
@@ -261,8 +261,8 @@ class NewIrrigation(BaseModule):
             ef = self.ef_tier_2 or self.ef_ref
 
             self.total_emissions = ef * (self.units_end - self.units_start) / 1000  # to convert the ef from kg to g
-            yearly_units = yearly_time_dependent_parameter_breakdown(self.units_start, self.units_end, self.implementation_time, self.capitalization_time, self.rate_type)
-            emissions_total_yearly = breakdown_according_to_values(self.total_emissions, yearly_units)
+            yearly_units = compute_yearly_or_half_year_cumulative(self.units_start, self.units_end, self.implementation_time, self.capitalization_time, self.rate_type)
+            emissions_total_yearly = breakdown_proportionally_to_values(self.total_emissions, yearly_units)
 
             new_irrigation_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_total_yearly], ActivityTypes.NEW_IRRIGATION, delay=self.delay)
             self.result.yearly_emissions_by_sector_by_gas.append(new_irrigation_emission_set)

@@ -2,11 +2,11 @@ import math
 import traceback
 
 from .general_functions import (
-    breakdown_according_to_values,
-    soil_emissions_2,
-    yearly_constant_emissions_breakdown,
-    yearly_time_dependent_20_year_breakdown,
-    yearly_time_dependent_parameter_breakdown,
+    breakdown_proportionally_to_values,
+    soil_emissions,
+    breakdown_equally_across_years,
+    compute_half_year_cumulative_n_year_maturity,
+    compute_yearly_or_half_year_cumulative,
     som_emissions,
     biomass_emissions
 )
@@ -81,7 +81,7 @@ class FloodedRice(LandModule):
                 kg_methane_cultivation_period = adjusted_daily_ef_methane_ref * cultivation_period
 
                 ch4_emitted_total = kg_methane_cultivation_period * sum(self.hectares_total) * self.methane_constant / 1000
-                ch4_emitted_yearly = breakdown_according_to_values(ch4_emitted_total, self.hectares_total)
+                ch4_emitted_yearly = breakdown_proportionally_to_values(ch4_emitted_total, self.hectares_total)
 
                 ch4_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in ch4_emitted_yearly], ActivityTypes.CH4_EMITTED_RICE, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(ch4_emission_set)
@@ -104,8 +104,8 @@ class FloodedRice(LandModule):
                     total_methane = straw_methane_co2 * sum(self.hectares_total)
                     total_nitrous = straw_nitrous_co2 * sum(self.hectares_total)
 
-                    straw_burning_set_methane = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in breakdown_according_to_values(total_methane, self.hectares_total)], ActivityTypes.STRAW_BURNING, delay=self.delay)
-                    straw_burning_set_nitrous = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in breakdown_according_to_values(total_nitrous, self.hectares_total)], ActivityTypes.STRAW_BURNING, delay=self.delay)
+                    straw_burning_set_methane = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in breakdown_proportionally_to_values(total_methane, self.hectares_total)], ActivityTypes.STRAW_BURNING, delay=self.delay)
+                    straw_burning_set_nitrous = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in breakdown_proportionally_to_values(total_nitrous, self.hectares_total)], ActivityTypes.STRAW_BURNING, delay=self.delay)
 
                     self.result.yearly_emissions_by_sector_by_gas.append(straw_burning_set_methane)
                     self.result.yearly_emissions_by_sector_by_gas.append(straw_burning_set_nitrous)
@@ -116,7 +116,7 @@ class FloodedRice(LandModule):
         def calculate_soil_emissions():
             try:
                 if self.calculate_soc_som and not self.is_minor_season:
-                    soil_emissions_yearly, soil_emissions_total = soil_emissions_2(self.soc_start, self.soc_end, self.hectares_total, self.hectares_start, self.hectares_end, self.hectares_before_20)
+                    soil_emissions_yearly, soil_emissions_total = soil_emissions(self.soc_start, self.soc_end, self.hectares_total, self.hectares_start, self.hectares_end, self.hectares_before_20)
 
                     soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in soil_emissions_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)

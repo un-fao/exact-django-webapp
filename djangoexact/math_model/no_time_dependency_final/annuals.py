@@ -1,6 +1,6 @@
 import traceback
 
-from .general_functions import breakdown_according_to_values, soil_emissions_2, som_emissions, yearly_constant_emissions_breakdown, yearly_time_dependent_20_year_breakdown, yearly_time_dependent_parameter_breakdown, biomass_emissions
+from .general_functions import breakdown_proportionally_to_values, soil_emissions, som_emissions, breakdown_equally_across_years, compute_half_year_cumulative_n_year_maturity, compute_yearly_or_half_year_cumulative, biomass_emissions
 from .ghg_emissions_classes import (
     ActivityTypes,
     Emission,
@@ -71,7 +71,7 @@ class AnnualCropland(LandModule):
         def calculate_emissions_soil():
             try:
                 if self.calculate_soc_som:
-                    emissions_soil_yearly, emissions_soil_total = soil_emissions_2(self.soc_start, self.soc_end, self.hectares_total, self.hectares_start, self.hectares_end, self.hectares_before_20)
+                    emissions_soil_yearly, emissions_soil_total = soil_emissions(self.soc_start, self.soc_end, self.hectares_total, self.hectares_start, self.hectares_end, self.hectares_before_20)
 
                     soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_soil_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
@@ -143,8 +143,8 @@ class AnnualCropland(LandModule):
             total_nitrous = (sum(self.hectares_total)) * kg_nitrous * self.nitrous_constant / 1000
             total_methane = (sum(self.hectares_total)) * kg_methane * self.methane_constant / 1000
 
-            residue_burning_nitrous_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in breakdown_according_to_values(total_nitrous, self.hectares_total)], ActivityTypes.RESIDUE_BURNING, delay=self.delay)
-            residue_burning_methane_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in breakdown_according_to_values(total_methane, self.hectares_total)], ActivityTypes.RESIDUE_BURNING, delay=self.delay)
+            residue_burning_nitrous_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in breakdown_proportionally_to_values(total_nitrous, self.hectares_total)], ActivityTypes.RESIDUE_BURNING, delay=self.delay)
+            residue_burning_methane_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in breakdown_proportionally_to_values(total_methane, self.hectares_total)], ActivityTypes.RESIDUE_BURNING, delay=self.delay)
 
             self.result.yearly_emissions_by_sector_by_gas.append(residue_burning_nitrous_emission_set)
             self.result.yearly_emissions_by_sector_by_gas.append(residue_burning_methane_emission_set)
