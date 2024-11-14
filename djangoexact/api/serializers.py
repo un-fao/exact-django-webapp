@@ -3014,6 +3014,17 @@ class StorageSerializer(ScenarioSubmoduleSerializer):
         fields = "__all__"
         ref_name = "Storage"
         mandatory_fields = {
+            "start": {
+                "mandatory": [
+                    "electricity_use_per_year_start",
+                ],
+                "conditional": {
+                    "is_refrigerant_used": [
+                        "regrigerant_type_start",
+                        "total_refrigerant_leakage_start",
+                    ]
+                },
+            },
             "with": {
                 "mandatory": [
                     "electricity_use_per_year_w",
@@ -3058,6 +3069,17 @@ class ProcessingSerializer(ScenarioSubmoduleSerializer):
         fields = "__all__"
         ref_name = "Processing"
         mandatory_fields = {
+            "start": {
+                "mandatory": [
+                    "energy_type_start",
+                    "energy_use_per_year_start",
+                ],
+                "conditional": {
+                    "is_water_used": [
+                        "water_use_per_year_start",
+                    ]
+                },
+            },
             "with": {
                 "mandatory": [
                     "energy_type_w",
@@ -3099,6 +3121,15 @@ class PackagingSerializer(ScenarioSubmoduleSerializer):
         fields = "__all__"
         ref_name = "Packaging"
         mandatory_fields = {
+            "start": {
+                "mandatory": [
+                    "packaging_material_start",
+                    "kg_of_packaging_material_start",
+                ],
+                "conditional": {
+                    "is_electric": ["kwh_energy_per_year_start"],
+                },
+            },
             "with": {
                 "mandatory": [
                     "packaging_material_w",
@@ -3141,6 +3172,12 @@ class TransportSerializer(ScenarioSubmoduleSerializer):
         fields = "__all__"
         ref_name = "Transport"
         mandatory_fields = {
+            "start": {
+                "mandatory": [
+                    "fuel_type_start",
+                    "fuel_used_per_year_start",
+                ]
+            },
             "with": {
                 "mandatory": [
                     "fuel_type_w",
