@@ -6648,29 +6648,8 @@ class ValueChainCalculator(BaseCalculator):
             self.activity.capitalization_years,
         )
 
-        for storage in self.module.storages.all():
-            calculator = StorageCalculator(storage)
-            r_w, r_wo = calculator.calculate()
-
-            self.results_w += r_w
-            self.results_wo += r_wo
-
-        for processing in self.module.processings.all():
-            calculator = ProcessingCalculator(processing)
-            r_w, r_wo = calculator.calculate()
-
-            self.results_w += r_w
-            self.results_wo += r_wo
-
-        for packaging in self.module.packagings.all():
-            calculator = PackagingCalculator(packaging)
-            r_w, r_wo = calculator.calculate()
-
-            self.results_w += r_w
-            self.results_wo += r_wo
-
-        for transport in self.module.transports.all():
-            calculator = TransportCalculator(transport)
+        for submodule in self.module.submodules:
+            calculator: BaseCalculator = CalculatorFactory().__get_calculator(submodule)
             r_w, r_wo = calculator.calculate()
 
             self.results_w += r_w
