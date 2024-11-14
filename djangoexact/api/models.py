@@ -2808,13 +2808,6 @@ class Processing(Submodule):
     country_of_origin = models.ForeignKey(Country, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_country_of_origin")
 
 
-class PackagingType(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-
-    def __str__(self):
-        return self.name
-
-
 class Packaging(Submodule):
     parent = models.ForeignKey(ValueChain, null=True, blank=True, related_name="packagings", on_delete=models.CASCADE)
 
