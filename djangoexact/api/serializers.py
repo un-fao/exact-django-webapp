@@ -694,7 +694,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
                     module_instance.organic_soil = organic_soil
             else:
                 filters = {"activity": activity}
-                if module_type.name in ["Coastal Wetland", "Waterbody"]:
+                if module_type.class_name in [CoastalWetland.__name__, Waterbody.__name__]:
                     filters["area"] = self.validated_data.get("area")
                 module_instance = ModuleClass.objects.create(**filters)
 
@@ -2486,6 +2486,10 @@ class ForestManagementWriteSerializer(LandModuleSeralizer):
         if errors:
             raise serializers.ValidationError(errors)
 
+        if any([not d.is_ready() for d in instance.disturbances.all()]):
+            data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
+            return data
+
         return super().validate(data)
 
 
@@ -2849,7 +2853,21 @@ class ForestDisturbanceWriteSerializer(ScenarioSubmoduleSerializer):
         }
 
     def validate(self, data):
-        return super().validate(data)
+        super().validate(data)
+
+        parent = utils.getany([self.instance, dict(data)], "parent")
+        if parent.disturbances.count() + 1 > 3:
+            raise serializers.ValidationError("Only 3 disturbances are allowed")
+
+        if not self.instance or not self.instance.is_ready():
+            parent.status = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
+            parent.save()
+        else:
+            parent_serializer = ForestManagementReadSerializer(data={}, instance=parent, partial=True)
+            if parent_serializer.is_valid():
+                parent_serializer.save()
+
+        return data
 
 
 class ForestDisturbanceReadSerializer(BaseGenericModuleSerializer):
