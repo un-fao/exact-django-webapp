@@ -145,6 +145,9 @@ def compute_half_year_delta(start_value, end_value, years_implementation, years_
 def compute_yearly_delta(start_value, end_value, years_implementation, years_capitalization, function):
     values_at_year = compute_yearly_or_half_year_cumulative(start_value, end_value, years_implementation, years_capitalization, function, interim_values=False)
     delta_yearly = [values_at_year[i] - values_at_year[i - 1] for i in range(1, len(values_at_year))]
+    
+    # Delta can not be negative
+    delta_yearly = [abs(i) for i in delta_yearly]
 
     return delta_yearly
 
