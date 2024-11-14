@@ -138,6 +138,8 @@ def compute_half_year_delta(start_value, end_value, years_implementation, years_
 
     # subtract result_interim with each equivalent value in result_not_interim
     result = [i - j for i, j in zip(result_interim, result_not_interim)]
+    
+    result = [abs(i) for i in result]
 
     return result
 
