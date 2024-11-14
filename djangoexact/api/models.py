@@ -2849,6 +2849,10 @@ class Packaging(Submodule):
     kwh_energy_per_year_wo = models.FloatField(null=True, blank=True)
     kwh_energy_per_year_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_kwh_energy_per_year_thread")
 
+    emission_factor_t2_start = models.FloatField(null=True, blank=True)
+    emission_factor_t2_w = models.FloatField(null=True, blank=True)
+    emission_factor_t2_wo = models.FloatField(null=True, blank=True)
+
 
 class Transport(Submodule):
     parent = models.ForeignKey(ValueChain, null=True, blank=True, related_name="transports", on_delete=models.CASCADE)
