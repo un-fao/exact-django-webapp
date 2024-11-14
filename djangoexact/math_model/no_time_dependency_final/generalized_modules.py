@@ -10,11 +10,11 @@ from .ghg_emissions_classes import (
 )
 
 from .general_functions import (
-    breakdown_according_to_values,
-    soil_emissions_2,
-    yearly_constant_emissions_breakdown,
-    yearly_time_dependent_20_year_breakdown,
-    yearly_time_dependent_parameter_breakdown,
+    breakdown_proportionally_to_values,
+    soil_emissions,
+    breakdown_equally_across_years,
+    compute_half_year_cumulative_n_year_maturity,
+    compute_yearly_or_half_year_cumulative,
     som_emissions,
     biomass_emissions
 )
@@ -96,7 +96,7 @@ class LandModule(BaseModule):
         self.biomass_start = self.biomass_start_tier_2 or self.biomass_start_default
         self.biomass_end = self.biomass_end_tier_2 or self.biomass_end_default
 
-        self.hectares_before_20, self.hectares_after_20 = yearly_time_dependent_20_year_breakdown(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
-        self.hectares_total = yearly_time_dependent_parameter_breakdown(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
+        self.hectares_before_20, self.hectares_after_20 = compute_half_year_cumulative_n_year_maturity(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
+        self.hectares_total = compute_yearly_or_half_year_cumulative(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
     # TODO: Consider moving som_calculation, soil_calculation and biomass_calculation to here
