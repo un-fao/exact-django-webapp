@@ -1,5 +1,5 @@
 import traceback
-from .general_functions import breakdown_equally_across_years, compute_yearly_or_half_year_cumulative, compute_half_year_cumulative_n_year_maturity, breakdown_proportionally_to_values
+from .general_functions import compute_yearly_or_half_year_cumulative, compute_half_year_cumulative_n_year_maturity, breakdown_proportionally_to_values
 from .ghg_emissions_classes import YearlyGasActivityEmissionSet, Emission, GasTypes, ActivityTypes, Result
 
 from .generalized_modules import BaseModule

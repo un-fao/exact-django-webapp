@@ -74,38 +74,6 @@ def compute_yearly_or_half_year_cumulative(start_value, end_value, years_impleme
         raise Exception(f'Function "{function}" not recognized')
 
 
-def breakdown_equally_across_years(total_emissions, years_implementation, years_capitalization, rate_type):
-
-    if rate_type == "linear":
-        yearly_breakdown = [total_emissions / years_implementation for _ in range(years_implementation)]
-        yearly_breakdown.extend([0 for _ in range(years_capitalization)])
-
-    elif rate_type == "exponential":
-        # NOTE: this is changed to -k (as k=-0.519349) as I believe we should have a larger part towards to end than the beginning
-        k = -0.519349  # growth rate determined from the previous calculation
-        # Calculate the total area under the exponential curve from 0 to years_implementation
-        total_area = (math.exp(k * years_implementation) - 1) / k
-
-        yearly_breakdown = []
-        for year in range(1, years_implementation + 1):
-            # Calculate the area for each year interval
-            area_start = (math.exp(k * (year - 1)) - 1) / k
-            area_end = (math.exp(k * year) - 1) / k
-            yearly_emissions = total_emissions * (area_end - area_start) / total_area
-            yearly_breakdown.append(yearly_emissions)
-
-        yearly_breakdown.extend([0 for _ in range(years_capitalization)])
-
-    elif rate_type == "immediate":
-        yearly_breakdown = [total_emissions] + [0 for _ in range(years_implementation - 1)]
-        yearly_breakdown.extend([0 for _ in range(years_capitalization)])
-
-    else:
-        raise Exception(f'Function "{rate_type}" not recognized')
-
-    return yearly_breakdown
-
-
 def compute_half_year_cumulative_n_year_maturity(start_value, end_value, years_implementation, years_capitalization, function, number_of_years=20):
     # NOTE: this function is used to calculate the average yearly value of the breakdown for soil, but not it is also used for other cases, hence why number_of_years is added instead of only 20
     breakdown = compute_yearly_or_half_year_cumulative(start_value, end_value, years_implementation, years_capitalization, function, interim_values=False)

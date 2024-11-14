@@ -1,6 +1,6 @@
 import traceback
 
-from .general_functions import breakdown_proportionally_to_values, soil_emissions, som_emissions, breakdown_equally_across_years, compute_half_year_cumulative_n_year_maturity, compute_yearly_or_half_year_cumulative, biomass_emissions
+from .general_functions import breakdown_proportionally_to_values, soil_emissions, som_emissions, compute_half_year_cumulative_n_year_maturity, compute_yearly_or_half_year_cumulative, biomass_emissions
 from .ghg_emissions_classes import (
     ActivityTypes,
     Emission,

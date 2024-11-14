@@ -4,7 +4,6 @@ import traceback
 from .general_functions import (
     gas_head_calculation,
     soil_emissions,
-    breakdown_equally_across_years,
     compute_half_year_cumulative_n_year_maturity,
     compute_yearly_or_half_year_cumulative,
     som_emissions,
