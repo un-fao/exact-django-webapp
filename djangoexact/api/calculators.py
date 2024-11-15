@@ -734,7 +734,7 @@ class DeforestationCalculator(BaseCalculator):
             total_biomass_w = SimpleNamespace(value=0)
         else:
             try:
-                total_biomass_w = ipcc.TotalBiomassAfterDefo.objects.get_or_default(**cmc, land_use_type=module_w.land_use_type_w)
+                total_biomass_w = SimpleNamespace(value=0)  # 15/11/2024: Set to zero to align with OLUC logic
             except ipcc.TotalBiomassAfterDefo.DoesNotExist:
                 raise Exception(f"TotalBiomassAfterDefo for {module.land_use_type_w} in {climate} climate, {moisture} moisture, and {region} region does not exist")
 
@@ -742,7 +742,7 @@ class DeforestationCalculator(BaseCalculator):
             total_biomass_wo = SimpleNamespace(value=0)
         else:
             try:
-                total_biomass_wo = ipcc.TotalBiomassAfterDefo.objects.get_or_default(**cmc, land_use_type=module_wo.land_use_type_wo)
+                total_biomass_wo = SimpleNamespace(value=0)  # 15/11/2024: Set to zero to align with OLUC logic
             except ipcc.TotalBiomassAfterDefo.DoesNotExist:
                 raise Exception(f"TotalBiomassAfterDefo for {module.land_use_type_wo} in {climate} climate, {moisture} moisture, and {region} region does not exist")
 
@@ -872,7 +872,7 @@ class DeforestationCalculator(BaseCalculator):
                 "capitalization_time": self.activity.capitalization_years,
                 "rate_type": change_rate.name,
                 "biomass_final_1_year_t_per_ha_default": total_biomass_w.value,
-                "biomass_final_1_year_t_per_ha_tier_2": forest.biomass_t2_w,
+                "biomass_final_1_year_t_per_ha_tier_2": None,  # 15/11/2024: said by Lorenzo to always be None because final biomass in defo/OLUC (=0) cannot be overridden
                 "nitrous_constant": project.gwp.n2o,
                 "methane_constant": project.gwp.ch4,
                 "fire_bool": luc.is_fire_used_w,
@@ -886,8 +886,8 @@ class DeforestationCalculator(BaseCalculator):
                 "dw_tier_2": forest.deadwood_t2_w,
                 "hwp_before_t_dm_per_ha": dry_matter_w,
                 "mangrove_factor": utils.MANGROVE_FACTOR if mangroves_data is not None else utils.NON_MANGROVE_FACTOR,
-                "bgb_t_c_per_ha_tier_2": forest.bgb_t2_w,
-                "agb_t_c_per_ha_tier_2": forest.agb_t2_w,
+                "bgb_t_c_per_ha_tier_2": forest.bgb_t2_start,  # 15/11/2024: said by Lorenzo to be taken from the start module
+                "agb_t_c_per_ha_tier_2": forest.agb_t2_start,  # 15/11/2024: said by Lorenzo to be taken from the start module
                 "agb_t_c_per_ha_default": statistics.mean([agb_w.agb_min, agb_w.agb_max]),
                 "bgb_t_c_per_ha_default_input_parameter": bgb_w.value,
                 "c_n_ratio": utils.CN_RATIO_GRASSLAND,
@@ -926,7 +926,7 @@ class DeforestationCalculator(BaseCalculator):
                 "capitalization_time": self.activity.capitalization_years,
                 "rate_type": change_rate.name,
                 "biomass_final_1_year_t_per_ha_default": total_biomass_wo.value,
-                "biomass_final_1_year_t_per_ha_tier_2": forest.biomass_t2_wo,
+                "biomass_final_1_year_t_per_ha_tier_2": None,  # 15/11/2024: said by Lorenzo to always be None because final biomass in defo/OLUC (=0) cannot be overridden
                 "nitrous_constant": project.gwp.n2o,
                 "methane_constant": project.gwp.ch4,
                 "fire_bool": luc.is_fire_used_wo,
@@ -940,8 +940,8 @@ class DeforestationCalculator(BaseCalculator):
                 "dw_tier_2": forest.deadwood_t2_wo,
                 "hwp_before_t_dm_per_ha": dry_matter_wo,
                 "mangrove_factor": utils.MANGROVE_FACTOR if mangroves_data is not None else utils.NON_MANGROVE_FACTOR,
-                "bgb_t_c_per_ha_tier_2": forest.bgb_t2_wo,
-                "agb_t_c_per_ha_tier_2": forest.agb_t2_wo,
+                "bgb_t_c_per_ha_tier_2": forest.bgb_t2_start,  # 15/11/2024: said by Lorenzo to be taken from the start module
+                "agb_t_c_per_ha_tier_2": forest.agb_t2_start,  # 15/11/2024: said by Lorenzo to be taken from the start module
                 "agb_t_c_per_ha_default": statistics.mean([agb_wo.agb_min, agb_wo.agb_max]),
                 "bgb_t_c_per_ha_default_input_parameter": bgb_wo.value,
                 "c_n_ratio": utils.CN_RATIO_GRASSLAND,
@@ -1046,15 +1046,13 @@ class OtherLandUseCalculator(BaseCalculator):
             raise Exception(f"ForestTotalBiomass for {luc_start.name} in {climate.name} climate, {moisture.name} moisture, and {continent.name} continent does not exist")
 
         try:
-            # biomass_final_w = ipcc.TotalBiomassAfterDefo.objects.get_or_default(**cmc, land_use_type=luc_w)
-            # NOTE: Always zero
+            # 15/11/2024: Always zero
             biomass_final_w = SimpleNamespace(value=0)
         except ipcc.TotalBiomassAfterDefo.DoesNotExist:
             raise Exception(f"TotalBiomassAfterDefo for {luc_w.name} in {climate.name} climate, {moisture.name} moisture, and {continent.name} continent does not exist")
 
         try:
-            # biomass_final_wo = ipcc.TotalBiomassAfterDefo.objects.get_or_default(**cmc, land_use_type=luc_wo)
-            # NOTE: Always zero
+            # 15/11/2024: Always zero
             biomass_final_wo = SimpleNamespace(value=0)
         except ipcc.TotalBiomassAfterDefo.DoesNotExist:
             raise Exception(f"TotalBiomassAfterDefo for {luc_wo.name} in {climate.name} climate, {moisture.name} moisture, and {continent.name} continent does not exist")
@@ -1129,7 +1127,7 @@ class OtherLandUseCalculator(BaseCalculator):
                 "initial_lu_biomass": biomass_initial.value,
                 "initial_lu_biomass_tier_2": module_start.biomass_t2_start,
                 "final_lu_biomass": biomass_final_w.value,
-                "final_lu_biomass_tier_2": module_w.biomass_t2_w,
+                "final_lu_biomass_tier_2": None,  # 15/11/2024: said by Lorenzo to always be None because final biomass in defo/OLUC (=0) cannot be overridden
                 "c_n_ratio": c_n_ratio,
                 "moisture_emission_factor": som.value,
                 "combustion_factor": combustion_factor_w.value,
@@ -1172,7 +1170,7 @@ class OtherLandUseCalculator(BaseCalculator):
                 "initial_lu_biomass": biomass_initial.value,
                 "initial_lu_biomass_tier_2": module_start.biomass_t2_start,
                 "final_lu_biomass": biomass_final_wo.value,
-                "final_lu_biomass_tier_2": module_wo.biomass_t2_wo,
+                "final_lu_biomass_tier_2": None,  # 15/11/2024: said by Lorenzo to always be None because final biomass in defo/OLUC (=0) cannot be overridden
                 "c_n_ratio": c_n_ratio,
                 "moisture_emission_factor": som.value,
                 "combustion_factor": combustion_factor_wo.value,
