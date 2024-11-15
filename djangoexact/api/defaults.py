@@ -1253,6 +1253,43 @@ class ForestManagementDefaults(Defaults):
         defaults = calcs.ForestManagementCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
+        agb_start = 0
+        bgb_start = 0
+        bgb_w = 0
+        bgb_wo = 0
+        bgb_growth_before_20_yrs_w = 0
+        bgb_growth_before_20_yrs_wo = 0
+        bgb_growth_after_20_yrs_w = 0
+        bgb_growth_after_20_yrs_wo = 0
+
+        if defaults.agb_start_w:
+            agb_start = defaults.agb_start_w
+        elif defaults.agb_start_wo:
+            agb_start = defaults.agb_start_wo
+
+        if defaults.bgb_after_20_yrs and defaults.agb_start_w:
+            bgb_start = defaults.agb_start_w * defaults.bgb_after_20_yrs.value
+        elif defaults.bgb_after_20_yrs and defaults.agb_start_wo:
+            bgb_start = defaults.agb_start_wo * defaults.bgb_after_20_yrs.value
+
+        if defaults.bgb_after_20_yrs and defaults.agb_max_w:
+            bgb_w = defaults.agb_max_w * defaults.bgb_after_20_yrs.value
+
+        if defaults.bgb_after_20_yrs and defaults.agb_max_wo:
+            bgb_wo = defaults.agb_max_wo * defaults.bgb_after_20_yrs.value
+
+        if defaults.bgb_before_20_yrs and defaults.agb_growth_under_20_w:
+            bgb_growth_before_20_yrs_w = defaults.agb_growth_under_20_w * defaults.bgb_before_20_yrs.value
+
+        if defaults.bgb_before_20_yrs and defaults.agb_growth_under_20_wo:
+            bgb_growth_before_20_yrs_wo = defaults.agb_growth_under_20_wo * defaults.bgb_before_20_yrs.value
+
+        if defaults.bgb_after_20_yrs and defaults.agb_growth_over_20_w:
+            bgb_growth_after_20_yrs_w = defaults.agb_growth_over_20_w * defaults.bgb_after_20_yrs.value
+
+        if defaults.bgb_after_20_yrs and defaults.agb_growth_over_20_wo:
+            bgb_growth_after_20_yrs_wo = defaults.agb_growth_over_20_wo * defaults.bgb_after_20_yrs.value
+
         return SimpleNamespace(
             soc_t2_start_default=defaults.soc_start.value,
             soc_t2_w_default=defaults.soc_w.value,
@@ -1272,12 +1309,12 @@ class ForestManagementDefaults(Defaults):
             deadwood_t2_start_default=defaults.litter_dw_start_w.dw,
             deadwood_t2_w_default=defaults.litter_dw.dw,
             deadwood_t2_wo_default=defaults.litter_dw.dw,
-            agb_t2_start_default=defaults.agb_start_w if self.input.is_with() else defaults.agb_start_w if self.input.is_with() else 0,
+            agb_t2_start_default=agb_start,
             agb_t2_w_default=defaults.agb_max_w,
             agb_t2_wo_default=defaults.agb_max_wo,
-            bgb_t2_start_default=defaults.bgb_after_20_yrs.value if defaults.bgb_after_20_yrs else 0,
-            bgb_t2_w_default=defaults.bgb_after_20_yrs.value if defaults.bgb_after_20_yrs else 0,
-            bgb_t2_wo_default=defaults.bgb_after_20_yrs.value if defaults.bgb_after_20_yrs else 0,
+            bgb_t2_start_default=bgb_start,
+            bgb_t2_w_default=bgb_w,
+            bgb_t2_wo_default=bgb_wo,
             agb_growth_rate_le_20_yrs_t2_start_default=0,
             agb_growth_rate_le_20_yrs_t2_w_default=defaults.agb_growth_under_20_w,
             agb_growth_rate_le_20_yrs_t2_wo_default=defaults.agb_growth_under_20_wo,
@@ -1285,11 +1322,11 @@ class ForestManagementDefaults(Defaults):
             agb_growth_rate_gt_20_yrs_t2_w_default=defaults.agb_growth_over_20_w,
             agb_growth_rate_gt_20_yrs_t2_wo_default=defaults.agb_growth_over_20_wo,
             bgb_growth_rate_le_20_yrs_t2_start_default=0,
-            bgb_growth_rate_le_20_yrs_t2_w_default=defaults.bgb_before_20_yrs.value,
-            bgb_growth_rate_le_20_yrs_t2_wo_default=defaults.bgb_before_20_yrs.value,
+            bgb_growth_rate_le_20_yrs_t2_w_default=bgb_growth_before_20_yrs_w,
+            bgb_growth_rate_le_20_yrs_t2_wo_default=bgb_growth_before_20_yrs_wo,
             bgb_growth_rate_gt_20_yrs_t2_start_default=0,
-            bgb_growth_rate_gt_20_yrs_t2_w_default=defaults.bgb_after_20_yrs.value,
-            bgb_growth_rate_gt_20_yrs_t2_wo_default=defaults.bgb_after_20_yrs.value,
+            bgb_growth_rate_gt_20_yrs_t2_w_default=bgb_growth_after_20_yrs_w,
+            bgb_growth_rate_gt_20_yrs_t2_wo_default=bgb_growth_after_20_yrs_wo,
             rotation_start_year_t2_start_default=defaults.activity.start_year_t2 - defaults.project.start_year_of_activities if defaults.activity.start_year_t2 else 0,
             rotation_start_year_t2_w_default=defaults.activity.start_year_t2 - defaults.project.start_year_of_activities if defaults.activity.start_year_t2 else 0,
             rotation_start_year_t2_wo_default=defaults.activity.start_year_t2 - defaults.project.start_year_of_activities if defaults.activity.start_year_t2 else 0,
