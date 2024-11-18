@@ -595,11 +595,11 @@ class ActivityBuilderSerializer(serializers.Serializer):
     project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(), required=True)
     name = serializers.CharField(max_length=255, required=True)
     cost = serializers.FloatField(required=False)
-    climate = serializers.PrimaryKeyRelatedField(queryset=Climate.objects.all(), required=True)
-    moisture = serializers.PrimaryKeyRelatedField(queryset=Moisture.objects.all(), required=True)
-    soil_type = serializers.PrimaryKeyRelatedField(queryset=SoilType.objects.all(), required=True)
-    duration = serializers.IntegerField(required=True)
-    start_year = serializers.IntegerField(required=False)
+    climate_t2 = serializers.PrimaryKeyRelatedField(queryset=Climate.objects.all(), required=False)
+    moisture_t2 = serializers.PrimaryKeyRelatedField(queryset=Moisture.objects.all(), required=False)
+    soil_type_t2 = serializers.PrimaryKeyRelatedField(queryset=SoilType.objects.all(), required=False)
+    duration_t2 = serializers.IntegerField(required=False)
+    start_year_t2 = serializers.IntegerField(required=False)
     land_use_change = LandUseChangeBuilderSerializer(many=False, required=False, allow_null=True)
     module_types = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
     area = serializers.FloatField(required=False, min_value=0)
@@ -644,11 +644,11 @@ class ActivityBuilderSerializer(serializers.Serializer):
             project=self.validated_data["project"],
             cost=self.validated_data["cost"],
             change_rate=self.validated_data.get("change_rate", default_change_rate),
-            climate_t2=self.validated_data.get("climate"),
-            moisture_t2=self.validated_data.get("moisture"),
-            duration_t2=self.validated_data.get("duration"),
-            soil_type_t2=self.validated_data.get("soil_type"),
-            start_year_t2=self.validated_data.get("start_year"),
+            climate_t2=self.validated_data.get("climate_t2"),
+            moisture_t2=self.validated_data.get("moisture_t2"),
+            duration_t2=self.validated_data.get("duration_t2"),
+            soil_type_t2=self.validated_data.get("soil_type_t2"),
+            start_year_t2=self.validated_data.get("start_year_t2"),
             owner=self.context["request"].user,
         )
 
@@ -694,7 +694,10 @@ class ActivityBuilderSerializer(serializers.Serializer):
                 module_instance = ModuleClass.objects.create(**filters)
 
             module_instance.save()
-            update_change_reason(module_instance, "update")
+            try:
+                update_change_reason(module_instance, "update")
+            except Exception as e:
+                log.error(f"Error updating change reason: {e}")
 
     def unique_activity_name(self):
         base_name = self.validated_data["name"]
