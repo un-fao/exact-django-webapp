@@ -1,3 +1,4 @@
+import re
 import copy
 import json
 import logging as log
@@ -6471,7 +6472,27 @@ class SetAsideCalculator(LandModuleCalculator):
         return results_tuple
 
 
-class StorageCalculator(BaseCalculator):
+class BaseValueChainCalculator(BaseCalculator):
+    def __init__(self, input) -> None:
+        super().__init__(input)
+
+        self.electricity_math_start_w = None
+        self.electricity_math_start_wo = None
+        self.electricity_math_w = None
+        self.electricity_math_wo = None
+
+        self.electricity_inputs_start_w = None
+        self.electricity_inputs_start_wo = None
+        self.electricity_inputs_w = None
+        self.electricity_inputs_wo = None
+
+        self.electricity_results_start_w = None
+        self.electricity_results_start_wo = None
+        self.electricity_results_w = None
+        self.electricity_results_wo = None
+
+
+class StorageCalculator(BaseValueChainCalculator):
     def __init__(self, input) -> None:
         super().__init__(input)
 
@@ -6481,7 +6502,15 @@ class StorageCalculator(BaseCalculator):
         self.refrigerant_ef_w = ipcc.ValueChainRefrigerantEmissionFactor()
         self.refrigerant_ef_wo = ipcc.ValueChainRefrigerantEmissionFactor()
 
+        self.electricity_ef_default = ipcc.ElectricityEmission()
+        self.electricity_ef_selected: DefaultValue = DefaultValue()
+
     def get_defaults(self, calculate=False) -> dict:
+
+        country = getattr(self.module, "country", self.country)
+
+        self.electricity_ef_default = ipcc.ElectricityEmission.objects.get(country=country)
+        self.electricity_ef_selected.value = self.electricity_ef_default.operating_margin
 
         if self.module.is_start():
             try:
@@ -6516,7 +6545,6 @@ class StorageCalculator(BaseCalculator):
         self.get_defaults()
 
         shared_inputs = {
-            "activity_type": MathActivityTypes.STORAGE,
             "implementation_time": self.activity.implementation_years,
             "capitalization_time": self.activity.capitalization_years,
             "rate_type": self.activity.change_rate.name,
@@ -6526,6 +6554,7 @@ class StorageCalculator(BaseCalculator):
         if self.module.is_with():
             self.inputs_w = {
                 **shared_inputs,
+                "activity_type": MathActivityTypes.STORAGE,
                 "emission_factor_start_default": self.refrigerant_ef_start.value,
                 "emission_factor_end_default": self.refrigerant_ef_w.value,
                 "emission_factor_start_tier_2": self.module.emission_factor_t2_start,
@@ -6537,9 +6566,24 @@ class StorageCalculator(BaseCalculator):
             self.math_w = MathValueChain(**self.inputs_w)
             self.math_w.calculate_emissions()
 
+            self.electricity_inputs_w = {
+                **shared_inputs,
+                "emissions_factor": self.electricity_ef_selected.value,
+                "specific_factor_start": self.module.emission_factor_t2_start,
+                "specific_factor_end": self.module.emission_factor_t2_w,
+                "mwh_start": self.module.kwh_energy_per_year_start,
+                "mwh_end": self.module.kwh_energy_per_year_w,
+                "percent_loss_transportation_start": 0,
+                "percent_loss_transportation_end": 0,
+            }
+
+            self.electricity_math_w = ElectricityConsumption(**self.electricity_inputs_w)
+            self.electricity_math_w.calculate_emissions()
+
         if self.module.is_without():
             self.inputs_wo = {
                 **shared_inputs,
+                "activity_type": MathActivityTypes.STORAGE,
                 "emission_factor_start_default": self.refrigerant_ef_start.value,
                 "emission_factor_end_default": self.refrigerant_ef_wo.value,
                 "emission_factor_start_tier_2": self.module.emission_factor_t2_start,
@@ -6551,17 +6595,36 @@ class StorageCalculator(BaseCalculator):
             self.math_wo = MathValueChain(**self.inputs_wo)
             self.math_wo.calculate_emissions()
 
+            self.electricity_inputs_wo = {
+                **shared_inputs,
+                "emissions_factor": self.electricity_ef_selected.value,
+                "specific_factor_start": self.module.emission_factor_t2_start,
+                "specific_factor_end": self.module.emission_factor_t2_wo,
+                "mwh_start": self.module.kwh_energy_per_year_start,
+                "mwh_end": self.module.kwh_energy_per_year_wo,
+                "percent_loss_transportation_start": 0,
+                "percent_loss_transportation_end": 0,
+            }
+
+            self.electricity_math_wo = ElectricityConsumption(**self.electricity_inputs_wo)
+            self.electricity_math_wo.calculate_emissions()
+
         self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+
+        self.results_start_w += self.electricity_math_start_w.result if self.electricity_math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_start_wo += self.electricity_math_start_wo.result if self.electricity_math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w += self.electricity_math_w.result if self.electricity_math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_wo += self.electricity_math_wo.result if self.electricity_math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
 
         results_tuple = (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
 
         return results_tuple
 
 
-class ProcessingCalculator(BaseCalculator):
+class ProcessingCalculator(BaseValueChainCalculator):
 
     # TODO: This is basically only the Energy module. The model needs to extend energy if we want to maintain consistency.
 
@@ -6574,13 +6637,146 @@ class ProcessingCalculator(BaseCalculator):
         self.energy_ef_w = ipcc.EnergyDefaultEmissionFactor()
         self.energy_ef_wo = ipcc.EnergyDefaultEmissionFactor()
 
-        self.electricity_ef = ipcc.ElectricityEmission()
+        self.electricity_ef_default = ipcc.ElectricityEmission()
+        self.electricity_ef_selected: DefaultValue = DefaultValue()
+
+        self.methane_constant_start = self.project.gwp.ch4
+        self.methane_constant_w = self.project.gwp.ch4
+        self.methane_constant_wo = self.project.gwp.ch4
+
+        if self.module.fuel_type_start.name in ["Peat", "Charcoal"]:
+            self.methane_constant_start = self.project.gwp.ch4_fossil
+
+        if self.module.fuel_type_w.name in ["Peat", "Charcoal"]:
+            self.methane_constant_w = self.project.gwp.ch4_fossil
+
+        if self.module.fuel_type_wo.name in ["Peat", "Charcoal"]:
+            self.methane_constant_wo = self.project.gwp.ch4_fossil
 
     def get_defaults(self, calculate=False) -> dict:
+
+        country = getattr(self.module, "country", self.country)
+        self.electricity_ef_default = ipcc.ElectricityEmission.objects.get(country=country)
+        self.electricity_ef_selected.value = self.electricity_ef_default.operating_margin
+
+        if self.module.is_start() and not self.module.fuel_type_start.name.lower() == "electricity":
+            try:
+                self.energy_ef_start = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=self.module.fuel_type_start, fuel_use_type=self.module.fuel_type_start.fuel_use_type)
+            except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
+                if self.module.emission_factor_t2_start is None:
+                    log.error(f"Energy emission factor for {self.module.fuel_type_start} not found. Plase select tier2 value for start scenario.")
+                    raise ValueError(f"Energy emission factor for {self.module.fuel_type_start} not found. Plase select tier2 value for start scenario.")
+                self.energy_ef_start.value = self.module.emission_factor_t2_start
+
+        if self.module.is_with() and not self.module.fuel_type_w.name.lower() == "electricity":
+            try:
+                self.energy_ef_w = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=self.module.fuel_type_w, fuel_use_type=self.module.fuel_type_w.fuel_use_type)
+            except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
+                if self.module.emission_factor_t2_w is None:
+                    log.error(f"Energy emission factor for {self.module.fuel_type_w} not found. Plase select tier2 value for with scenario.")
+                    raise ValueError(f"Energy emission factor for {self.module.fuel_type_w} not found. Plase select tier2 value for with scenario.")
+                self.energy_ef_w.value = self.module.emission_factor_t2_w
+
+        if self.module.is_without() and not self.module.fuel_type_wo.name.lower() == "electricity":
+            try:
+                self.energy_ef_wo = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=self.module.fuel_type_wo, fuel_use_type=self.module.fuel_type_wo.fuel_use_type)
+            except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
+                if self.module.emission_factor_t2_wo is None:
+                    log.error(f"Energy emission factor for {self.module.fuel_type_wo} not found. Plase select tier2 value for without scenario.")
+                    raise ValueError(f"Energy emission factor for {self.module.fuel_type_wo} not found. Plase select tier2 value for without scenario.")
+                self.energy_ef_wo.value = self.module.emission_factor_t2_wo
+
         return super().get_defaults(calculate)
 
     def calculate(self) -> Result:
         self.get_defaults()
+
+        shared_inputs = {
+            "rate_type": self.change_rate.name,
+            "delay": self.activity.delay,
+            "implementation_time": self.activity.implementation_years,
+            "capitalization_time": self.activity.capitalization_years,
+        }
+
+        if self.module.is_with():
+
+            if self.module.fuel_type_w.name.lower() == "electricity":
+
+                self.inputs_w = {
+                    **shared_inputs,
+                    "emissions_factor": self.electricity_ef_selected.value,
+                    "specific_factor_start": self.module.emission_factor_t2_start,
+                    "specific_factor_end": self.module.emission_factor_t2_w,
+                    "mwh_start": self.module.kwh_energy_per_year_start,
+                    "mwh_end": self.module.kwh_energy_per_year_w,
+                    "percent_loss_transportation_start": 0,
+                    "percent_loss_transportation_end": 0,
+                }
+
+                log.debug(f"Inputs w: {self.inputs_w}")
+
+                self.math_w = ElectricityConsumption(**self.inputs_w)
+                self.math_w.calculate_emissions()
+
+            else:
+
+                self.inputs_w = {
+                    **shared_inputs,
+                    "emissions_factor_co2": self.energy_ef_w.co2,
+                    "specific_factor_co2": self.module.energy_ef_co2_t2,
+                    "emissions_factor_ch4": self.energy_ef_w.ch4,
+                    "specific_factor_ch4": self.module.energy_ef_ch4_t2,
+                    "emissions_factor_n2o": self.energy_ef_w.n2o,
+                    "specific_factor_n2o": self.module.energy_ef_n2o_t2,
+                    "mwh_start": self.module.kwh_energy_per_year_start,
+                    "mwh_end": self.module.kwh_energy_per_year_w,
+                    "methane_constant": self.methane_constant_w,
+                    "nitrous_constant": self.project.gwp.n2o,
+                }
+
+                log.debug(f"Inputs w: {self.inputs_w}")
+
+                self.math_w = SolidAndLiquidFuelsConsumption(**self.inputs_w)
+                self.math_w.calculate_emissions()
+
+        if self.module.is_without():
+            if self.module.fuel_type_wo.name.lower() == "electricity":
+
+                self.inputs_wo = {
+                    **shared_inputs,
+                    "emissions_factor": self.electricity_ef_selected.value,
+                    "specific_factor_start": self.module.emission_factor_t2_start,
+                    "specific_factor_end": self.module.emission_factor_t2_wo,
+                    "mwh_start": self.module.kwh_energy_per_year_start,
+                    "mwh_end": self.module.kwh_energy_per_year_wo,
+                    "percent_loss_transportation_start": 0,
+                    "percent_loss_transportation_end": 0,
+                }
+
+                log.debug(f"Inputs wo: {self.inputs_wo}")
+
+                self.math_wo = ElectricityConsumption(**self.inputs_wo)
+                self.math_wo.calculate_emissions()
+
+            else:
+                self.inputs_wo = {
+                    **shared_inputs,
+                    "emissions_factor_co2": self.energy_ef_wo.co2,
+                    "specific_factor_co2": self.module.energy_ef_co2_t2,
+                    "emissions_factor_ch4": self.energy_ef_wo.ch4,
+                    "specific_factor_ch4": self.module.energy_ef_ch4_t2,
+                    "emissions_factor_n2o": self.energy_ef_wo.n2o,
+                    "specific_factor_n2o": self.module.energy_ef_n2o_t2,
+                    "mwh_start": self.module.kwh_energy_per_year_start,
+                    "mwh_end": self.module.kwh_energy_per_year_wo,
+                    "methane_constant": self.methane_constant_w,
+                    "nitrous_constant": self.project.gwp.n2o,
+                }
+
+                log.debug(f"Inputs wo: {self.inputs_wo}")
+
+                self.math_wo = SolidAndLiquidFuelsConsumption(**self.inputs_wo)
+                self.math_wo.calculate_emissions()
 
         self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
@@ -6592,7 +6788,7 @@ class ProcessingCalculator(BaseCalculator):
         return results_tuple
 
 
-class PackagingCalculator(BaseCalculator):
+class PackagingCalculator(BaseValueChainCalculator):
 
     def __init__(self, input) -> None:
         super().__init__(input)
@@ -6607,6 +6803,10 @@ class PackagingCalculator(BaseCalculator):
         self.electricity_ef_selected: DefaultValue = DefaultValue()
 
     def get_defaults(self, calculate=False) -> dict:
+
+        country = getattr(self.module, "country", self.country)
+        self.electricity_ef_default = ipcc.ElectricityEmission.objects.get(country=country)
+        self.electricity_ef_selected.value = self.electricity_ef_default.operating_margin
 
         if self.module.is_start():
             try:
@@ -6641,7 +6841,6 @@ class PackagingCalculator(BaseCalculator):
         self.get_defaults()
 
         shared_inputs = {
-            "activity_type": MathActivityTypes.PACKAGING,
             "implementation_time": self.activity.implementation_years,
             "capitalization_time": self.activity.capitalization_years,
             "rate_type": self.activity.change_rate.name,
@@ -6651,6 +6850,7 @@ class PackagingCalculator(BaseCalculator):
         if self.module.is_with():
             self.inputs_w = {
                 **shared_inputs,
+                "activity_type": MathActivityTypes.PACKAGING,
                 "emission_factor_start_default": self.packaging_ef_start.value,
                 "emission_factor_end_default": self.packaging_ef_w.value,
                 "emission_factor_start_tier_2": self.module.emission_factor_t2_start,
@@ -6662,9 +6862,25 @@ class PackagingCalculator(BaseCalculator):
             self.math_w = MathValueChain(**self.inputs_w)
             self.math_w.calculate_emissions()
 
+            if self.module.is_electric:
+                self.electricity_inputs_w = {
+                    **shared_inputs,
+                    "emissions_factor": self.electricity_ef_selected.value,
+                    "specific_factor_start": self.module.emission_factor_t2_start,
+                    "specific_factor_end": self.module.emission_factor_t2_w,
+                    "mwh_start": self.module.kwh_energy_per_year_start,
+                    "mwh_end": self.module.kwh_energy_per_year_w,
+                    "percent_loss_transportation_start": 0,
+                    "percent_loss_transportation_end": 0,
+                }
+
+                self.electricity_math_w = ElectricityConsumption(**self.electricity_inputs_w)
+                self.electricity_math_w.calculate_emissions()
+
         if self.module.is_without():
             self.inputs_wo = {
                 **shared_inputs,
+                "activity_type": MathActivityTypes.PACKAGING,
                 "emission_factor_start_default": self.packaging_ef_start.value,
                 "emission_factor_end_default": self.packaging_ef_wo.value,
                 "emission_factor_start_tier_2": self.module.emission_factor_t2_start,
@@ -6676,10 +6892,30 @@ class PackagingCalculator(BaseCalculator):
             self.math_wo = MathValueChain(**self.inputs_wo)
             self.math_wo.calculate_emissions()
 
+            if self.module.is_electric:
+                self.electricity_inputs_wo = {
+                    **shared_inputs,
+                    "emissions_factor": self.electricity_ef_selected.value,
+                    "specific_factor_start": self.module.emission_factor_t2_start,
+                    "specific_factor_end": self.module.emission_factor_t2_wo,
+                    "mwh_start": self.module.kwh_energy_per_year_start,
+                    "mwh_end": self.module.kwh_energy_per_year_wo,
+                    "percent_loss_transportation_start": 0,
+                    "percent_loss_transportation_end": 0,
+                }
+
+                self.electricity_math_wo = ElectricityConsumption(**self.electricity_inputs_wo)
+                self.electricity_math_wo.calculate_emissions()
+
         self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+
+        self.results_start_w += self.electricity_math_start_w.result if self.electricity_math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_start_wo += self.electricity_math_start_wo.result if self.electricity_math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w += self.electricity_math_w.result if self.electricity_math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_wo += self.electricity_math_wo.result if self.electricity_math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
 
         results_tuple = (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
 
@@ -6695,11 +6931,149 @@ class TransportCalculator(BaseCalculator):
 
         self.module: Transport
 
+        self.energy_ef_start = ipcc.EnergyDefaultEmissionFactor()
+        self.energy_ef_w = ipcc.EnergyDefaultEmissionFactor()
+        self.energy_ef_wo = ipcc.EnergyDefaultEmissionFactor()
+
+        self.electricity_ef_default = ipcc.ElectricityEmission()
+        self.electricity_ef_selected: DefaultValue = DefaultValue()
+
+        self.methane_constant_start = self.project.gwp.ch4
+        self.methane_constant_w = self.project.gwp.ch4
+        self.methane_constant_wo = self.project.gwp.ch4
+
+        if self.module.fuel_type_start.name in ["Peat", "Charcoal"]:
+            self.methane_constant_start = self.project.gwp.ch4_fossil
+
+        if self.module.fuel_type_w.name in ["Peat", "Charcoal"]:
+            self.methane_constant_w = self.project.gwp.ch4_fossil
+
+        if self.module.fuel_type_wo.name in ["Peat", "Charcoal"]:
+            self.methane_constant_wo = self.project.gwp.ch4_fossil
+
     def get_defaults(self, calculate=False) -> dict:
-        return super().get_defaults(calculate)
+        super().get_defaults(calculate)
+
+        country = getattr(self.module, "country", self.country)
+        self.electricity_ef_default = ipcc.ElectricityEmission.objects.get(country=country)
+        self.electricity_ef_selected.value = self.electricity_ef_default.operating_margin
+
+        if self.module.is_start() and not self.module.fuel_type_start.name.lower() == "electricity":
+            try:
+                self.energy_ef_start = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=self.module.fuel_type_start, fuel_use_type=self.module.fuel_type_start.fuel_use_type)
+            except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
+                if self.module.emission_factor_t2_start is None:
+                    log.error(f"Energy emission factor for {self.module.fuel_type_start} not found. Plase select tier2 value for start scenario.")
+                    raise ValueError(f"Energy emission factor for {self.module.fuel_type_start} not found. Plase select tier2 value for start scenario.")
+                self.energy_ef_start.value = self.module.emission_factor_t2_start
+
+        if self.module.is_with() and not self.module.fuel_type_w.name.lower() == "electricity":
+            try:
+                self.energy_ef_w = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=self.module.fuel_type_w, fuel_use_type=self.module.fuel_type_w.fuel_use_type)
+            except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
+                if self.module.emission_factor_t2_w is None:
+                    log.error(f"Energy emission factor for {self.module.fuel_type_w} not found. Plase select tier2 value for with scenario.")
+                    raise ValueError(f"Energy emission factor for {self.module.fuel_type_w} not found. Plase select tier2 value for with scenario.")
+                self.energy_ef_w.value = self.module.emission_factor_t2_w
+
+        if self.module.is_without() and not self.module.fuel_type_wo.name.lower() == "electricity":
+            try:
+                self.energy_ef_wo = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=self.module.fuel_type_wo, fuel_use_type=self.module.fuel_type_wo.fuel_use_type)
+            except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
+                if self.module.emission_factor_t2_wo is None:
+                    log.error(f"Energy emission factor for {self.module.fuel_type_wo} not found. Plase select tier2 value for without scenario.")
+                    raise ValueError(f"Energy emission factor for {self.module.fuel_type_wo} not found. Plase select tier2 value for without scenario.")
+                self.energy_ef_wo.value = self.module.emission_factor_t2_wo
 
     def calculate(self) -> Result:
         self.get_defaults()
+
+        shared_inputs = {
+            "rate_type": self.change_rate.name,
+            "delay": self.activity.delay,
+            "implementation_time": self.activity.implementation_years,
+            "capitalization_time": self.activity.capitalization_years,
+        }
+
+        if self.module.is_with():
+
+            if self.module.fuel_type_w.name.lower() == "electricity":
+
+                self.inputs_w = {
+                    **shared_inputs,
+                    "emissions_factor": self.electricity_ef_selected.value,
+                    "specific_factor_start": self.module.emission_factor_t2_start,
+                    "specific_factor_end": self.module.emission_factor_t2_w,
+                    "mwh_start": self.module.fuel_used_per_year_start,
+                    "mwh_end": self.module.fuel_used_per_year_w,
+                    "percent_loss_transportation_start": 0,
+                    "percent_loss_transportation_end": 0,
+                }
+
+                log.debug(f"Inputs w: {self.inputs_w}")
+
+                self.math_w = ElectricityConsumption(**self.inputs_w)
+                self.math_w.calculate_emissions()
+
+            else:
+
+                self.inputs_w = {
+                    **shared_inputs,
+                    "emissions_factor_co2": self.energy_ef_w.co2,
+                    "specific_factor_co2": self.module.energy_ef_co2_t2,
+                    "emissions_factor_ch4": self.energy_ef_w.ch4,
+                    "specific_factor_ch4": self.module.energy_ef_ch4_t2,
+                    "emissions_factor_n2o": self.energy_ef_w.n2o,
+                    "specific_factor_n2o": self.module.energy_ef_n2o_t2,
+                    "mwh_start": self.module.fuel_used_per_year_start,
+                    "mwh_end": self.module.fuel_used_per_year_w,
+                    "methane_constant": self.methane_constant_w,
+                    "nitrous_constant": self.project.gwp.n2o,
+                }
+
+                log.debug(f"Inputs w: {self.inputs_w}")
+
+                self.math_w = SolidAndLiquidFuelsConsumption(**self.inputs_w)
+                self.math_w.calculate_emissions()
+
+        if self.module.is_without():
+            if self.module.fuel_type_wo.name.lower() == "electricity":
+
+                self.inputs_wo = {
+                    **shared_inputs,
+                    "emissions_factor": self.electricity_ef_selected.value,
+                    "specific_factor_start": self.module.emission_factor_t2_start,
+                    "specific_factor_end": self.module.emission_factor_t2_wo,
+                    "mwh_start": self.module.fuel_used_per_year_start,
+                    "mwh_end": self.module.fuel_used_per_year_wo,
+                    "percent_loss_transportation_start": 0,
+                    "percent_loss_transportation_end": 0,
+                }
+
+                log.debug(f"Inputs wo: {self.inputs_wo}")
+
+                self.math_wo = ElectricityConsumption(**self.inputs_wo)
+                self.math_wo.calculate_emissions()
+
+            else:
+                self.inputs_wo = {
+                    **shared_inputs,
+                    "emissions_factor_co2": self.energy_ef_wo.co2,
+                    "specific_factor_co2": self.module.energy_ef_co2_t2,
+                    "emissions_factor_ch4": self.energy_ef_wo.ch4,
+                    "specific_factor_ch4": self.module.energy_ef_ch4_t2,
+                    "emissions_factor_n2o": self.energy_ef_wo.n2o,
+                    "specific_factor_n2o": self.module.energy_ef_n2o_t2,
+                    "mwh_start": self.module.fuel_used_per_year_start,
+                    "mwh_end": self.module.fuel_used_per_year_wo,
+                    "methane_constant": self.methane_constant_w,
+                    "nitrous_constant": self.project.gwp.n2o,
+                }
+
+                log.debug(f"Inputs wo: {self.inputs_wo}")
+
+                self.math_wo = SolidAndLiquidFuelsConsumption(**self.inputs_wo)
+                self.math_wo.calculate_emissions()
 
         self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
