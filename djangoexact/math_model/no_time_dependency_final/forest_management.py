@@ -302,6 +302,9 @@ class ForestManagement(BaseModule):
                 if np.any(np.sum(self.agb_matrix < 0), axis=0):
                     raise ValueError(f"Negative values in agb_matrix, check the parameters for logging and disturbance % over 100")
 
+                check_agb_matrices(self.agb_matrix, self.delta_agb_matrix, self.max_agb_value)
+                check_agb_matrices(self.bgb_matrix, self.delta_bgb_matrix, self.max_bgb_value)
+                
                 agb_times_hectares = multiply_matrix_by_matrix(self.delta_agb_matrix, self.hectares_matrix)
                 yearly_agb_emissions = [x * -44 / 12 for x in agb_times_hectares]
 
