@@ -77,6 +77,10 @@ class ActivityTypes(Enum):
     DEGRADATION_BGB = "Degradation BGB"
     DEGRADATION_LITTER = "Degradation Litter"
     DEGRADATION_DEADWOOD = "Degradation Deadwood"
+    PACKAGING = "Packaging"
+    TRANSPORT = "Transport"
+    STORAGE = "Storage"
+    PROCESSING = "Processing"
 
 
 class Emission:
