@@ -44,6 +44,8 @@ class ProjectLockTestCase(APITestCase):
         self.climate = models.Climate.objects.order_by("?").first()
         self.moisture = self.climate.moistures.order_by("?").first()
         self.soil_type = models.SoilType.objects.order_by("?").first()
+        self.module_type = models.ModuleType.objects.get(class_name="PerennialCropland")
+        self.change_rate = models.ChangeRate.objects.get(name="linear")
         self.project_data = {
             "name": FuzzyText().fuzz(),
             "start_year_of_activities": 2024,
@@ -114,15 +116,13 @@ class ProjectLockTestCase(APITestCase):
         and the response is returned.
         """
         log.info("Creating activity")
-        module_type = models.ModuleType.objects.get(class_name="PerennialCropland")
-        change_rate = models.ChangeRate.objects.get(name="linear")
 
         activity_builder_data = {
             "name": FuzzyText().fuzz(),
             "project": project.id,
-            "module_types": [module_type.id],
+            "module_types": [self.module_type.id],
             "area": 100,
-            "change_rate": change_rate.id,
+            "change_rate": self.change_rate.id,
             "cost": 0,
         }
 
