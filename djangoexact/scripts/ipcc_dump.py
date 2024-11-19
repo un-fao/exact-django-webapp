@@ -4485,7 +4485,7 @@ for i, row in df.iterrows():
         value,
     )
 
-    ValueChainPackagingEmissionFactor.objects.create(packaging_type=packaging_type, value=value)
+    ValueChainPackagingEmissionFactor.objects.create(packaging_material_type=packaging_type, value=value)
 
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainRefrigerantTypes.csv"),
