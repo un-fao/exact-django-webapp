@@ -7,14 +7,14 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0181_packagingtype_valuechain_transport_storage_and_more'),
-        ('ipcc', '0048_alter_valuechainpackagingemissionfactor_packaging_type'),
+        ("api", "0181_packagingtype_valuechain_transport_storage_and_more"),
+        ("ipcc", "0048_alter_valuechainpackagingemissionfactor_packaging_type"),
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name='valuechainpackagingemissionfactor',
-            name='packaging_type',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.packagingtype'),
-        ),
+        # migrations.AlterField(
+        #     model_name='valuechainpackagingemissionfactor',
+        #     name='packaging_type',
+        #     field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.packagingtype'),
+        # ),
     ]
