@@ -1362,3 +1362,78 @@ class ForestDisturbanceDefaults(Defaults):
             start_year_t2_w_default=self.start_year_t2_w_default,
             start_year_t2_wo_default=self.start_year_t2_wo_default,
         )
+
+
+class ValueChainDefaults(Defaults):
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace()
+
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.ValueChain
+
+        defaults = calcs.ValueChainCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace()
+
+
+class StorageDefaults(Defaults):
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace()
+
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.Storage
+
+        defaults = calcs.StorageCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace()
+
+
+class TransportDefaults(Defaults):
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace()
+
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.Transport
+
+        defaults = calcs.TransportCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace()
+
+
+class ProcessingDefaults(Defaults):
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace()
+
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.Processing
+
+        defaults = calcs.ProcessingCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace()
+
+
+class PackagingDefaults(Defaults):
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace()
+
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.Packaging
+
+        defaults = calcs.PackagingCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace()
