@@ -651,7 +651,16 @@ def update_agb_matrix_logging(agb_matrix, delta_agb_matrix, original_delta_agb_m
         traceback.print_exc()
         raise e
     
+def remove_values_not_on_diagonal(matrix):
+    # NOTE: all values not in diagonal have to be set to 0
+    for i in range(matrix.shape[0]):
+        for j in range(matrix.shape[1]):
+            if i != j:
+                matrix[i][j] = 0
+                
+    return matrix
     
+      
 def calculate_rotation_effect(original_agb_matrix, original_delta_agb_matrix, max_agb_value, recurrence, start_year, percentage=1):
 
     try:

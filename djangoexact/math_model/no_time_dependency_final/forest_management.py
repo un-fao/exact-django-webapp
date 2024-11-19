@@ -14,8 +14,7 @@ from .general_functions import (
     check_agb_matrices,
     soil_emissions_2,
     som_emissions,
-    
-    
+    remove_values_not_on_diagonal
 )
 
 from .ghg_emissions_classes import (
@@ -170,7 +169,24 @@ class ForestManagement(BaseModule):
                 bgb_matrix, delta_bgb_matrix = create_agb_bgb_matrix(self.implementation_time, self.capitalization_time, self.bgb_yearly_growth_under_20_tier_2, self.bgb_yearly_growth_over_20_tier_2, self.bgb_start, self.rotation_recurrence)
             else:
                 bgb_matrix, delta_bgb_matrix = create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, self.bgb_ratio_under_threshold, self.bgb_ratio_over_threshold, self.bgb_ratio_threshold, self.bgb_start, self.implementation_time)
-                
+        
+        elif self.hectares_end == 0:
+            # NOTE: THIS MEANS WE ARE IN THE CASE IN WHICH WE HAVE FOREST IN THE START STATE BUT ARE GOING TO DEFOREST IT
+            # IN THIS CASE ONCE HECTARES HAVE BEEN CHANGED, THEY SHOULD NOT BE PRESENT IN THE YEAR AFTER, TO ALL EXTENTS THIS MEANS WE ONLY
+            # HAVE VALUES ON THE DIAGONAL OF THE MATRIX AND 0 ELSEWHERE
+            agb_matrix, delta_agb_matrix = create_agb_bgb_matrix(self.implementation_time, self.capitalization_time, self.agb_yearly_growth_over_20, self.agb_yearly_growth_over_20, self.agb_start, self.rotation_recurrence)
+            if self.bgb_yearly_growth_over_20_tier_2 and self.bgb_yearly_growth_under_20_tier_2:
+                bgb_matrix, delta_bgb_matrix = create_agb_bgb_matrix(self.implementation_time, self.capitalization_time, self.bgb_yearly_growth_over_20_tier_2, self.bgb_yearly_growth_over_20_tier_2, self.bgb_start, self.rotation_recurrence)
+            else:
+                bgb_matrix, delta_bgb_matrix = create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, self.bgb_ratio_under_threshold, self.bgb_ratio_over_threshold, self.bgb_ratio_threshold, self.bgb_start, self.implementation_time)
+            
+            # NOTE: NOW THAT WE HAVE THE MATRICES, WE NEED TO SET THE VALUES TO 0 FOR THE YEARS AFTER THE DEFORESTATION
+            # we will only keep values on the diagonal and nothing else
+            agb_matrix = remove_values_not_on_diagonal(agb_matrix)
+            bgb_matrix = remove_values_not_on_diagonal(bgb_matrix)
+            delta_agb_matrix = remove_values_not_on_diagonal(delta_agb_matrix)
+            delta_bgb_matrix = remove_values_not_on_diagonal(delta_bgb_matrix)
+            
         else:
             # NOTE: THIS MEANS WE ARE IN FOREST REMAINING FOREST
             # THE ONLY DIFFERENCE BETWEEN THE TWO CASES IS THAT WE DON'T UTILIZE YEARLY GROWTH UNDER 20, BUT ALWAYS OVER 20 AS THE FOREST WAS ALREADY EXISTING. SAME FOR BGB
