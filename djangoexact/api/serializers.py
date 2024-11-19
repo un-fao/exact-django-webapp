@@ -525,6 +525,12 @@ class WriteActivitySerializer(serializers.ModelSerializer):
         ref_name = "Activity"
 
     def validate(self, data):
+
+        project = self.instance.project if self.instance else data.get("project")
+
+        if project.is_locked and not project.locked_by == self.context["request"].user:
+            raise serializers.ValidationError("Project is locked by another user")
+
         if self.instance:
             luc_module: ModuleType = ModuleType.objects.get(name_en="Land Use Change")
 
