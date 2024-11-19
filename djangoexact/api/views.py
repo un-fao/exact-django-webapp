@@ -1445,7 +1445,11 @@ def generic_module_viewset(model: Module):
                 return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
             module = serializer.save()
-            update_change_reason(module, utils.ChangeReasons.UPDATE.value)
+            try:
+                update_change_reason(module, utils.ChangeReasons.UPDATE.value)
+            except Exception as e:
+                logger.error(f"Error updating change reason for module {module.id}", e)
+                pass
 
             if hasattr(module, "land_use_change") and module.land_use_change is not None:
                 module.invalidate_luc_results()
