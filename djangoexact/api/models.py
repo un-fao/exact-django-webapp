@@ -2769,6 +2769,8 @@ class ValueChainSubmodule(Submodule):
     class Meta:
         abstract = True
 
+    name = models.CharField(max_length=255, unique=True, null=True, blank=True)
+
     energy_ef_co2_t2 = models.FloatField(null=True, blank=True)
     energy_ef_ch4_t2 = models.FloatField(null=True, blank=True)
     energy_ef_n2o_t2 = models.FloatField(null=True, blank=True)
