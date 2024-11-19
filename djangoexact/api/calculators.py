@@ -6550,19 +6550,19 @@ class StorageCalculator(BaseValueChainCalculator):
         }
 
         if self.module.is_with():
-            self.inputs_w = {
-                **shared_inputs,
-                "activity_type": MathActivityTypes.STORAGE,
-                "emission_factor_start_default": self.refrigerant_ef_start.value,
-                "emission_factor_end_default": self.refrigerant_ef_w.value,
-                "emission_factor_start_tier_2": self.module.emission_factor_t2_start,
-                "emission_factor_end_tier_2": self.module.emission_factor_t2_w,
-                "input_quantity_start": self.module.total_refrigerant_leakage_start,
-                "input_quantity_end": self.module.total_refrigerant_leakage_w,
-            }
+            # self.inputs_w = {
+            #     **shared_inputs,
+            #     "activity_type": MathActivityTypes.STORAGE,
+            #     "emission_factor_start_default": self.refrigerant_ef_start.value,
+            #     "emission_factor_end_default": self.refrigerant_ef_w.value,
+            #     "emission_factor_start_tier_2": self.module.emission_factor_t2_start,
+            #     "emission_factor_end_tier_2": self.module.emission_factor_t2_w,
+            #     "input_quantity_start": self.module.total_refrigerant_leakage_start,
+            #     "input_quantity_end": self.module.total_refrigerant_leakage_w,
+            # }
 
-            self.math_w = MathValueChain(**self.inputs_w)
-            self.math_w.calculate_emissions()
+            # self.math_w = MathValueChain(**self.inputs_w)
+            # self.math_w.calculate_emissions()
 
             self.electricity_inputs_w = {
                 **shared_inputs,
@@ -6579,19 +6579,19 @@ class StorageCalculator(BaseValueChainCalculator):
             self.electricity_math_w.calculate_emissions()
 
         if self.module.is_without():
-            self.inputs_wo = {
-                **shared_inputs,
-                "activity_type": MathActivityTypes.STORAGE,
-                "emission_factor_start_default": self.refrigerant_ef_start.value,
-                "emission_factor_end_default": self.refrigerant_ef_wo.value,
-                "emission_factor_start_tier_2": self.module.emission_factor_t2_start,
-                "emission_factor_end_tier_2": self.module.emission_factor_t2_wo,
-                "input_quantity_start": self.module.total_refrigerant_leakage_start,
-                "input_quantity_end": self.module.total_refrigerant_leakage_wo,
-            }
+            # self.inputs_wo = {
+            #     **shared_inputs,
+            #     "activity_type": MathActivityTypes.STORAGE,
+            #     "emission_factor_start_default": self.refrigerant_ef_start.value,
+            #     "emission_factor_end_default": self.refrigerant_ef_wo.value,
+            #     "emission_factor_start_tier_2": self.module.emission_factor_t2_start,
+            #     "emission_factor_end_tier_2": self.module.emission_factor_t2_wo,
+            #     "input_quantity_start": self.module.total_refrigerant_leakage_start,
+            #     "input_quantity_end": self.module.total_refrigerant_leakage_wo,
+            # }
 
-            self.math_wo = MathValueChain(**self.inputs_wo)
-            self.math_wo.calculate_emissions()
+            # self.math_wo = MathValueChain(**self.inputs_wo)
+            # self.math_wo.calculate_emissions()
 
             self.electricity_inputs_wo = {
                 **shared_inputs,
