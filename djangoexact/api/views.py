@@ -1448,7 +1448,7 @@ def generic_module_viewset(model: Module):
             try:
                 update_change_reason(module, utils.ChangeReasons.UPDATE.value)
             except Exception as e:
-                logger.error(f"Error updating change reason for module {module.id}", e)
+                logger.error(f"Error updating change reason for module {module.id}")
                 pass
 
             if hasattr(module, "land_use_change") and module.land_use_change is not None:
