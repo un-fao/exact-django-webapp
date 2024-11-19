@@ -3039,7 +3039,7 @@ class StorageSerializer(ValueChainSubmoduleMixin):
         mandatory_fields = {
             "start": {
                 "mandatory": [
-                    "electricity_use_per_year_start",
+                    "kwh_energy_per_year_start",
                 ],
                 "conditional": {
                     "is_refrigerant_used": [
@@ -3050,7 +3050,7 @@ class StorageSerializer(ValueChainSubmoduleMixin):
             },
             "with": {
                 "mandatory": [
-                    "electricity_use_per_year_w",
+                    "kwh_energy_per_year_w",
                 ],
                 "conditional": {
                     "is_refrigerant_used": [
@@ -3061,7 +3061,7 @@ class StorageSerializer(ValueChainSubmoduleMixin):
             },
             "without": {
                 "mandatory": [
-                    "electricity_use_per_year_wo",
+                    "kwh_energy_per_year_wo",
                 ],
                 "conditional": {
                     "is_refrigerant_used": [
@@ -3149,7 +3149,7 @@ class PackagingSerializer(ValueChainSubmoduleMixin):
         mandatory_fields = {
             "start": {
                 "mandatory": [
-                    "packaging_material_start",
+                    "packaging_material_type_start",
                     "kg_of_packaging_material_start",
                 ],
                 "conditional": {
@@ -3158,7 +3158,7 @@ class PackagingSerializer(ValueChainSubmoduleMixin):
             },
             "with": {
                 "mandatory": [
-                    "packaging_material_w",
+                    "packaging_material_type_w",
                     "kg_of_packaging_material_w",
                 ],
                 "conditional": {
@@ -3167,7 +3167,7 @@ class PackagingSerializer(ValueChainSubmoduleMixin):
             },
             "without": {
                 "mandatory": [
-                    "packaging_material_wo",
+                    "packaging_material_type_wo",
                     "kg_of_packaging_material_wo",
                 ],
                 "conditional": {
