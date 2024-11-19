@@ -362,8 +362,10 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error("Error creating project:", serializer.errors)
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
-        project = serializer.save()
+        project: Project = serializer.save()
         update_change_reason(project, utils.ChangeReasons.CREATE.value)
+
+        project.lock(self.request.user)
 
         ProjectMembership.objects.create(user=self.request.user, project=project, group=Group.objects.get(name="Admin"))
         read_serializer = ReadProjectSerializer(instance=project, context={"request": request})
