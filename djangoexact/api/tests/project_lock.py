@@ -12,6 +12,28 @@ from factory.fuzzy import FuzzyText, FuzzyInteger, FuzzyChoice
 class ProjectLockTestCase(APITestCase):
 
     def setUp(self):
+        """
+        Set up the test environment for the project lock tests.
+
+        This method initializes the following attributes:
+        - self.user: A CustomUser instance with the email "claudio.lavacca@fao.org".
+        - self.user2: A CustomUser instance with the email "test@user.org".
+        - self.group: A Group instance with the name "Second Reviewer".
+        - self.country: A randomly selected Country instance.
+        - self.climate: A randomly selected Climate instance.
+        - self.moisture: A randomly selected Moisture instance associated with the selected Climate.
+        - self.soil_type: A randomly selected SoilType instance.
+        - self.project_data: A dictionary containing project data with the following keys:
+            - "name": A randomly generated string.
+            - "start_year_of_activities": The year 2024.
+            - "implementation_years": The number 10.
+            - "last_year_of_accounting": The year 2040.
+            - "country": The ID of the selected Country instance.
+            - "climate": The ID of the selected Climate instance.
+            - "moisture": The ID of the selected Moisture instance.
+            - "soil_type": The ID of the selected SoilType instance.
+            - "gw_potential": The ID of a randomly selected GlobalWarmingPotential instance.
+        """
         self.user = models.CustomUser.objects.get(email="claudio.lavacca@fao.org")
         self.user2 = models.CustomUser.objects.get(email="test@user.org")
         self.group = models.Group.objects.get(name="Second Reviewer")
@@ -32,10 +54,18 @@ class ProjectLockTestCase(APITestCase):
         }
 
     def test_create_project(self):
+        """
+        Test the creation of a project using the ProjectViewSet.
+
+        This test uses the APIRequestFactory to create a POST request to the
+        'project-list' endpoint with the provided project data in JSON format.
+        The request is authenticated with a test user, and the response is
+        checked to ensure that the project is created successfully with a
+        status code of 201 (Created).
+        """
         factory = APIRequestFactory(enforce_csrf_checks=False)
         view = ProjectViewSet.as_view({"post": "create"})
 
-        # force authentication
         request = factory.post(
             reverse("project-list"),
             self.project_data,
@@ -46,6 +76,20 @@ class ProjectLockTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_modify_project_as_not_lock_holder(self):
+        """
+        Test that a user who is not the lock holder of a project cannot modify the project.
+
+        This test performs the following steps:
+        1. Creates a project using the `ProjectViewSet` and verifies that the project is created successfully.
+        2. Retrieves the created project from the database.
+        3. Creates a project membership for a second user (`self.user2`) who is not the lock holder.
+        4. Attempts to modify the project using the second user and verifies that the modification is not allowed,
+           expecting a `HTTP_400_BAD_REQUEST` status code.
+
+        Assertions:
+        - The project creation response status code is `HTTP_201_CREATED`.
+        - The project modification response status code is `HTTP_400_BAD_REQUEST`.
+        """
         factory = APIRequestFactory(enforce_csrf_checks=False)
         create_view = ProjectViewSet.as_view({"post": "create"})
 
@@ -69,6 +113,19 @@ class ProjectLockTestCase(APITestCase):
         self.assertEqual(modify_response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_modify_project_as_lock_holder(self):
+        """
+        Test that a project lock holder can modify the project.
+
+        This test performs the following steps:
+        1. Creates a project using the ProjectViewSet's create action.
+        2. Authenticates the request with a user.
+        3. Verifies that the project is created successfully with a 201 status code.
+        4. Retrieves the created project from the database.
+        5. Modifies the project's name using the ProjectViewSet's partial_update action.
+        6. Authenticates the modification request with the same user.
+        7. Verifies that the project is modified successfully with a 200 status code.
+        8. Confirms that the project's name has been updated to "New Name".
+        """
         factory = APIRequestFactory(enforce_csrf_checks=False)
         create_view = ProjectViewSet.as_view({"post": "create"})
 
