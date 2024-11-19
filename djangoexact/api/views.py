@@ -1485,7 +1485,7 @@ def generic_module_viewset(model: Module):
 
             module_serializer.save()
 
-            read_serializer = get_module_serializer(model)(instance=module_serializer.instance)
+            read_serializer = get_module_serializer(model, action=ActionTypes.RETRIEVE)(instance=module_serializer.instance)
 
             try:
                 update_change_reason(module_serializer.instance, utils.ChangeReasons.CREATE.value)
@@ -1526,12 +1526,12 @@ def generic_module_viewset(model: Module):
 
             return Response(data)
 
-        @action(detail=True, methods=["get"])
+        @action(detail=True, methods=["get"], url_path="results")
         def results(self, request, pk=None):
             """
             Calculates and returns total emissions for a single module.
             """
-
+            logger.debug(f"START GenericModuleViewSet.results for module {model} {pk}")
             module: Module | Submodule = get_object_or_404(model, pk=pk)
             activity = module.get_activity()
 
