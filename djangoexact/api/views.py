@@ -967,7 +967,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error("Selected user does not have permission to update activities in the project")
             return utils.ErrorResponse("Selected user does not have permission to update activities in the project", status=http_status.HTTP_403_FORBIDDEN)
 
-        serializer = WriteActivitySerializer(data=request.data, instance=activity)
+        serializer = WriteActivitySerializer(data=request.data, instance=activity, context={"request": request})
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
@@ -986,7 +986,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error("Selected user does not have permission to update activities in the project")
             return utils.ErrorResponse("Selected user does not have permission to update activities in the project", status=http_status.HTTP_403_FORBIDDEN)
 
-        serializer = WriteActivitySerializer(data=request.data, partial=True, instance=activity)
+        serializer = WriteActivitySerializer(data=request.data, partial=True, instance=activity, context={"request": request})
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
@@ -1139,7 +1139,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         return Response(data=modules, status=http_status.HTTP_200_OK)
 
-    @action(detail=False, methods=["post"])
+    @action(detail=False, methods=["post"], url_path="build")
     @swagger_auto_schema(
         request_body=ActivityBuilderSerializer,
         responses={400: "Bad request", 200: ActivitySerializer},
@@ -1412,7 +1412,7 @@ def generic_module_viewset(model: Module):
                 logging.error("Selected user does not have permission to update this module in the project")
                 return utils.ErrorResponse("Selected user does not have permission to update this module in the project", status=http_status.HTTP_403_FORBIDDEN)
 
-            serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data=request.data, partial=True, instance=module)
+            serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data=request.data, partial=True, instance=module, context={"request": request})
 
             if not serializer.is_valid():
                 return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
@@ -1439,7 +1439,7 @@ def generic_module_viewset(model: Module):
                 logging.error("Selected user does not have permission to update this module in the project")
                 return utils.ErrorResponse("Selected user does not have permission to update this module in the project", status=http_status.HTTP_403_FORBIDDEN)
 
-            serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data=request.data, partial=True, instance=module)
+            serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data=request.data, partial=True, instance=module, context={"request": request})
 
             if not serializer.is_valid():
                 return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
@@ -1463,7 +1463,7 @@ def generic_module_viewset(model: Module):
             logging.debug(f"START GenericModuleViewSet[{model.__name__}].create")
             logging.debug(f"request.data: {request.data}")
 
-            module_serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data=request.data, many=request.data.__class__ == list)
+            module_serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data=request.data, many=request.data.__class__ == list, context={"request": request})
             module_type = ModuleType.objects.get(class_name=model.__name__)
 
             if not module_serializer.is_valid():
