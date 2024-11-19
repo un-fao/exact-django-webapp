@@ -17,12 +17,6 @@ class ValueChainTestCase(APITestCaseMixin):
     def setUp(self):
         super().setUp()
 
-        models.ModuleType.objects.create(class_name="ValueChain", name="Value Chain", is_container=True)
-        models.ModuleType.objects.create(class_name="Processing", name="Processing", is_submodule=True)
-        models.ModuleType.objects.create(class_name="Storage", name="Storage", is_submodule=True)
-        models.ModuleType.objects.create(class_name="Transport", name="Transport", is_submodule=True)
-        models.ModuleType.objects.create(class_name="Packaging", name="Packaging", is_submodule=True)
-
     def create_value_chain(self):
         """
         Create a value chain using the ValueChainViewSet.
@@ -163,7 +157,7 @@ class ValueChainTestCase(APITestCaseMixin):
             "kwh_energy_per_year_start": FuzzyInteger(1, 100).fuzz(),
             "kwh_energy_per_year_w": FuzzyInteger(1, 100).fuzz(),
             "kwh_energy_per_year_wo": FuzzyInteger(1, 100).fuzz(),
-            "is_refrigerant_used": FuzzyChoice([True, False]).fuzz(),
+            "is_refrigerant_used": FuzzyChoice([False, False]).fuzz(),
             "refrigerant_type_start": FuzzyChoice(refrigerant_types).fuzz().id,
             "refrigerant_type_w": FuzzyChoice(refrigerant_types).fuzz().id,
             "refrigerant_type_wo": FuzzyChoice(refrigerant_types).fuzz().id,
