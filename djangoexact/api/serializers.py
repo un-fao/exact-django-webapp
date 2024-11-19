@@ -3019,7 +3019,19 @@ class FieldDefinitionResponseSerializer(serializers.Serializer):
     field_name = FieldMetadataSerializer(many=True)
 
 
-class StorageSerializer(ScenarioSubmoduleSerializer):
+class ValueChainSubmoduleMixin(ScenarioSubmoduleSerializer):
+    def save(self, **kwargs):
+        super().save(**kwargs)
+
+        parent: ValueChain = utils.getany([self.instance, dict(kwargs)], "parent")
+        parent_serializer = ValueChainSerializer(data={}, instance=parent, partial=True, context=self.context)
+        parent_serializer.is_valid()
+        parent_serializer.save()
+
+        return self.instance
+
+
+class StorageSerializer(ValueChainSubmoduleMixin):
     class Meta:
         model = Storage
         fields = "__all__"
@@ -3074,7 +3086,7 @@ class StorageReadSerializer(BaseGenericModuleSerializer):
         mandatory_fields = {}
 
 
-class ProcessingSerializer(ScenarioSubmoduleSerializer):
+class ProcessingSerializer(ValueChainSubmoduleMixin):
     class Meta:
         model = Processing
         fields = "__all__"
@@ -3082,8 +3094,8 @@ class ProcessingSerializer(ScenarioSubmoduleSerializer):
         mandatory_fields = {
             "start": {
                 "mandatory": [
-                    "energy_type_start",
-                    "energy_use_per_year_start",
+                    "fuel_type_start",
+                    "kwh_energy_per_year_start",
                 ],
                 "conditional": {
                     "is_water_used": [
@@ -3093,8 +3105,8 @@ class ProcessingSerializer(ScenarioSubmoduleSerializer):
             },
             "with": {
                 "mandatory": [
-                    "energy_type_w",
-                    "energy_use_per_year_w",
+                    "fuel_type_w",
+                    "kwh_energy_per_year_w",
                 ],
                 "conditional": {
                     "is_water_used": [
@@ -3103,7 +3115,10 @@ class ProcessingSerializer(ScenarioSubmoduleSerializer):
                 },
             },
             "without": {
-                "mandatory": ["energy_type_wo", "energy_use_per_year_wo"],
+                "mandatory": [
+                    "fuel_type_wo",
+                    "kwh_energy_per_year_wo",
+                ],
                 "conditional": {
                     "is_water_used": [
                         "water_use_per_year_wo",
@@ -3126,7 +3141,7 @@ class ProcessingReadSerializer(BaseGenericModuleSerializer):
         mandatory_fields = {}
 
 
-class PackagingSerializer(ScenarioSubmoduleSerializer):
+class PackagingSerializer(ValueChainSubmoduleMixin):
     class Meta:
         model = Packaging
         fields = "__all__"
@@ -3177,7 +3192,7 @@ class PackagingReadSerializer(BaseGenericModuleSerializer):
         mandatory_fields = {}
 
 
-class TransportSerializer(ScenarioSubmoduleSerializer):
+class TransportSerializer(ValueChainSubmoduleMixin):
     class Meta:
         model = Transport
         fields = "__all__"
@@ -3211,7 +3226,7 @@ class TransportWriteSerializer(TransportSerializer):
         super().validate(data)
 
         parent: ValueChain = utils.getany([self.instance, dict(data)], "parent")
-        parent_serializer = ValueChainSerializer(data={}, instance=parent, partial=True)
+        parent_serializer = ValueChainSerializer(data={}, instance=parent, partial=True, context=self.context)
         if parent_serializer.is_valid():
             parent_serializer.save()
 
