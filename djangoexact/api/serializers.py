@@ -320,7 +320,7 @@ class ProjectSummarySerializer(serializers.ModelSerializer):
 
 
 class ProjectResultSerializer(serializers.Serializer):
-    pass
+    activities = serializers.ListField(child=ResultSerializer())
 
 
 class ReadProjectSerializer(serializers.ModelSerializer):
@@ -1343,6 +1343,7 @@ class MinorSeasonAnnualCroplandReadSerializer(BaseGenericModuleSerializer):
         model = MinorSeasonAnnualCropland
         fields = "__all__"
         ref_name = "MinorSeasonAnnualCropland"
+        mandatory_fields = MinorSeasonAnnualCroplandWriteSerializer.Meta.mandatory_fields
 
 
 class AnnualCroplandSerializer(LandModuleSeralizer):
