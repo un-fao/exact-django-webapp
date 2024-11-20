@@ -1475,7 +1475,7 @@ def generic_module_viewset(model: Module):
             logging.debug(f"START GenericModuleViewSet[{model.__name__}].create")
             logging.debug(f"request.data: {request.data}")
 
-            module_serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data=request.data, many=request.data.__class__ == list, context={"request": request})
+            module_serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data=request.data, context={"request": request}, many=request.data.__class__ == list)
             module_type = ModuleType.objects.get(class_name=model.__name__)
 
             if not module_serializer.is_valid():
@@ -1493,7 +1493,7 @@ def generic_module_viewset(model: Module):
 
             module_serializer.save()
 
-            read_serializer = get_module_serializer(model, action=ActionTypes.RETRIEVE)(instance=module_serializer.instance)
+            read_serializer = get_module_serializer(model, action=ActionTypes.RETRIEVE)(instance=module_serializer.instance, context={"request": request})
 
             try:
                 update_change_reason(module_serializer.instance, utils.ChangeReasons.CREATE.value)
