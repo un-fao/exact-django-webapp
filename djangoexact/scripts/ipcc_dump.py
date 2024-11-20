@@ -3566,32 +3566,6 @@ for i, row in enumerate(rows):
             biomass=parse_csv_number(row["biomass"]),
         )
 
-ElectricityEmission.objects.all().delete()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "ElectricityEmissions.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers = df.columns.values.tolist()
-rows = df.to_dict("records")
-
-for row in rows:
-    country = row["country"]
-    operating_margin = parse_csv_number(row["operating_margin"])
-    combined_margin = parse_csv_number(row["combined_margin"])
-
-    print(country, operating_margin, combined_margin)
-    country = Country.objects.get(name__iexact=country)
-
-    ElectricityEmission.objects.create(
-        country=country,
-        operating_margin=operating_margin,
-        combined_margin=combined_margin,
-    )
-
-
 log.debug("Updating all GlobalWarmingPotential objects...")
 # NOTE: This will delete all projects in review. Change to iexact update
 
@@ -4439,9 +4413,6 @@ EnergyDefaultEmissionFactor.objects.bulk_create(l)
 
 # TODO: Run in review
 
-
-# TODO: Run in develop
-
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainPackagingMaterialTypes.csv"),
     header=0,
@@ -4535,3 +4506,35 @@ for i, row in df.iterrows():
         ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=ar5_wo, value=ar5_value)
     if ar6_value:
         ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=ar6, value=ar6_value)
+
+log.debug("Deleting all ElectricityEmissions objects...")
+ElectricityEmission.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "ElectricityEmissions.csv"),
+    header=0,
+    sep=";",
+)
+
+df_headers = df.columns.values.tolist()
+rows = df.to_dict("records")
+
+for row in rows:
+    country = row["country"]
+    operating_margin = parse_csv_number(row["operating_margin"])
+    combined_margin = parse_csv_number(row["combined_margin"])
+
+    print(country, operating_margin, combined_margin)
+    try:
+        country = Country.objects.get(name__iexact=country)
+    except Country.DoesNotExist:
+        country = Country.objects.create(name=country, region=Region.objects.get(name=row["region"]))
+
+    ElectricityEmission.objects.create(
+        country=country,
+        operating_margin=operating_margin,
+        combined_margin=combined_margin,
+    )
+
+
+# TODO: Run in develop
