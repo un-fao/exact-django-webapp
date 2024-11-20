@@ -2,6 +2,7 @@ import api.models as models
 import ipcc.models as ipcc_models
 from django.apps import apps
 import logging as log
+from django.db.models import Q
 
 # TODO: Run in review and prod
 
@@ -54,15 +55,20 @@ def cycle_all_modules_and_invalidate_cached_results():
     """
     Cycle all modules and invalidate cached results
     """
+    models.ForestDisturbance.objects.all().delete()
     for module_type in models.ModuleType.objects.all():
         log.debug(f"Invalidating cached results for {module_type}")
         try:
             ModuleClass: models.Module = apps.get_model("api", module_type.class_name)
-            for module in ModuleClass.objects.all():
-                if hasattr(module, "invalidate_cached_results"):
-                    module.invalidate_cached_results()
-                else:
-                    log.error(f"Could not find invalidate_cached_results for {module}")
+            if hasattr(ModuleClass, "last_cached_at"):
+                ModuleClass.history.all().update(updated_at=None, last_cached_at=None, cached_results_total=None, cached_results_by_activity=None, cached_results_by_gas=None, cached_results_by_activity_by_gas=None, last_modified=None)
+                for module in ModuleClass.objects.filter(Q(last_cached_at__isnull=False) | Q(cached_results_total__isnull=False)):
+                    if hasattr(module, "invalidate_cached_results"):
+                        module.invalidate_cached_results()
+                    else:
+                        log.error(f"Could not find invalidate_cached_results for {module}")
+            else:
+                log.error(f"Could not find last_cached_at for {module_type}")
         except LookupError:
             log.error(f"Could not find module class for {module_type}")
 
@@ -74,4 +80,4 @@ def cycle_all_modules_and_invalidate_cached_results():
 # change_forest_agb_tropical_mountain_system_to_tropical_montane()
 # change_forest_bgb_tropical_mountain_system_to_tropical_montane()
 # change_forest_agb_growth_tropical_mountain_system_to_tropical_montane()
-cycle_all_modules_and_invalidate_cached_results()
+# cycle_all_modules_and_invalidate_cached_results()
