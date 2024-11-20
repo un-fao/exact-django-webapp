@@ -316,7 +316,7 @@ class ProjectSummarySerializer(serializers.ModelSerializer):
 
 
 class ProjectResultSerializer(serializers.Serializer):
-    pass
+    activities = serializers.ListField(child=ResultSerializer())
 
 
 class ReadProjectSerializer(serializers.ModelSerializer):
