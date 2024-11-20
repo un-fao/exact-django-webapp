@@ -3566,32 +3566,6 @@ for i, row in enumerate(rows):
             biomass=parse_csv_number(row["biomass"]),
         )
 
-ElectricityEmission.objects.all().delete()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "ElectricityEmissions.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers = df.columns.values.tolist()
-rows = df.to_dict("records")
-
-for row in rows:
-    country = row["country"]
-    operating_margin = parse_csv_number(row["operating_margin"])
-    combined_margin = parse_csv_number(row["combined_margin"])
-
-    print(country, operating_margin, combined_margin)
-    country = Country.objects.get(name__iexact=country)
-
-    ElectricityEmission.objects.create(
-        country=country,
-        operating_margin=operating_margin,
-        combined_margin=combined_margin,
-    )
-
-
 log.debug("Updating all GlobalWarmingPotential objects...")
 # NOTE: This will delete all projects in review. Change to iexact update
 
@@ -4243,13 +4217,9 @@ for i, row in enumerate(df_dict):
             value=value,
         )
 
-"""
+        ForestManagementAGB.objects.all().delete()
+import api.utilities as utils
 
-# TODO: Run in production
-
-
-# ForestManagementAGB.objects.all().delete()
-# import api.utilities as utils
 
 # df = pd.read_csv(
 #     os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestManagementAGB.csv"),
@@ -4309,12 +4279,12 @@ for i, row in enumerate(df_dict):
 #         agb_range_min = parse_csv_number(row["agb_range"])
 #         agb_range_max = parse_csv_number(row["agb_range"])
 
-#     if not row["agb_growth"].startswith("-") and not isinstance(row["agb_growth"], float) and len(row["agb_growth"].split("-")) == 2:
-#         agb_growth_min = parse_csv_number(row["agb_growth"].split("-")[0])
-#         agb_growth_max = parse_csv_number(row["agb_growth"].split("-")[1])
-#     elif row["agb_growth"] != "n.a." or row["agb_growth"] != "":
-#         agb_growth_min = parse_csv_number(row["agb_growth"])
-#         agb_growth_max = parse_csv_number(row["agb_growth"])
+    if not row["agb_growth"].startswith("-") and not isinstance(row["agb_growth"], float) and len(row["agb_growth"].split("-")) == 2:
+        agb_growth_min = parse_csv_number(row["agb_growth"].split("-")[0])
+        agb_growth_max = parse_csv_number(row["agb_growth"].split("-")[1])
+    elif row["agb_growth"] != "n.a." or row["agb_growth"] != "":
+        agb_growth_min = parse_csv_number(row["agb_growth"])
+        agb_growth_max = parse_csv_number(row["agb_growth"])
 
 #     if not isinstance(row["agb_range_plantation"], float) and len(row["agb_range_plantation"].split("-")) == 2:
 #         agb_range_min_plantation = parse_csv_number(row["agb_range_plantation"].split("-")[0])
@@ -4364,18 +4334,18 @@ for i, row in enumerate(df_dict):
 #                     agb_growth_max_plantation,
 #                 )
 
-#                 ForestManagementAGB.objects.create(
-#                     land_use_type=land_use_type,
-#                     region=region,
-#                     climate=climate,
-#                     forest_condition_type=forest_condition_type,
-#                     from_year=from_year,
-#                     forest_type=type,
-#                     agb_min=agb_range_min * utils.NON_MANGROVE_FACTOR if agb_range_min else None,
-#                     agb_max=agb_range_max * utils.NON_MANGROVE_FACTOR if agb_range_max else None,
-#                     agb_growth_min=agb_growth_min * utils.NON_MANGROVE_FACTOR if agb_growth_min else None,
-#                     agb_growth_max=agb_growth_max * utils.NON_MANGROVE_FACTOR if agb_growth_max else None,
-#                 )
+                ForestManagementAGB.objects.create(
+                    land_use_type=land_use_type,
+                    region=region,
+                    climate=climate,
+                    forest_condition_type=forest_condition_type,
+                    from_year=from_year,
+                    forest_type=type,
+                    agb_min=agb_range_min * utils.NON_MANGROVE_FACTOR if agb_range_min else None,
+                    agb_max=agb_range_max * utils.NON_MANGROVE_FACTOR if agb_range_max else None,
+                    agb_growth_min=agb_growth_min * utils.NON_MANGROVE_FACTOR if agb_growth_min else None,
+                    agb_growth_max=agb_growth_max * utils.NON_MANGROVE_FACTOR if agb_growth_max else None,
+                )
 
 # df = pd.read_csv(
 #     os.path.join(os.path.dirname(__file__), "ipcc_data", "IrrigationSystemType_ModuleType.csv"),
@@ -4395,48 +4365,176 @@ for i, row in enumerate(df_dict):
 #     irrigation_system_type.module_types.add(module_type)
 #     irrigation_system_type.save()
 
-log.debug("Deleting all InputEmissionFactor models...")
-EnergyDefaultEmissionFactor.objects.all().delete()
+# log.debug("Deleting all InputEmissionFactor models...")
+# EnergyDefaultEmissionFactor.objects.all().delete()
 
-l = []
+# l = []
+
+# df = pd.read_csv(
+#     os.path.join(os.path.dirname(__file__), "ipcc_data", "EnergyDefaultEmissionFactors.csv"),
+#     header=0,
+#     sep=";",
+# )
+
+# df_headers = df.columns.values.tolist()
+# df_dict = df.to_dict("records")
+
+# for i, row in enumerate(df_dict):
+#     fuel_use_type = FuelUseType.objects.get(name__iexact=row["fuel_use_type"])
+#     fuel_type = FuelType.objects.get(name__iexact=row["fuel_type"])
+#     co2 = parse_csv_number(row["co2"])
+#     ch4 = parse_csv_number(row["ch4"])
+#     n2o = parse_csv_number(row["n2o"])
+
+#     print(
+#         fuel_use_type,
+#         fuel_type,
+#         co2,
+#         ch4,
+#         n2o,
+#     )
+
+#     l.append(
+#         EnergyDefaultEmissionFactor(
+#             fuel_use_type=fuel_use_type,
+#             fuel_type=fuel_type,
+#             co2=co2,
+#             ch4=ch4,
+#             n2o=n2o,
+#         )
+#     )
+
+EnergyDefaultEmissionFactor.objects.bulk_create(l)
+
+"""
+
+# TODO: Run in production
+
+
+# TODO: Run in review
 
 df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "EnergyDefaultEmissionFactors.csv"),
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainPackagingMaterialTypes.csv"),
+    header=0,
+    sep=",",
+)
+
+for i, row in df.iterrows():
+    name = row["name"]
+
+    if PackagingMaterialType.objects.filter(name__iexact=name).exists():
+        print(f"PackagingType {name} already exists. Skipping...")
+        continue
+
+    print(name)
+
+    PackagingMaterialType.objects.create(name=name)
+
+log.debug("Deleting all ValueChainPackagingEmissionFactor objects...")
+ValueChainPackagingEmissionFactor.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainPackagingEmissionFactors.csv"),
+    header=0,
+    sep=",",
+)
+
+for i, row in df.iterrows():
+    packaging_type = PackagingMaterialType.objects.get(name__iexact=row["packaging_type"])
+    value = parse_csv_number(row["value"])
+
+    print(
+        packaging_type,
+        value,
+    )
+
+    ValueChainPackagingEmissionFactor.objects.create(packaging_material_type=packaging_type, value=value)
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainRefrigerantTypes.csv"),
+    header=0,
+    sep=",",
+)
+
+for i, row in df.iterrows():
+    name = row["name"]
+
+    if RefrigerantType.objects.filter(name__iexact=name).exists():
+        print(f"RefrigerantType {name} already exists. Skipping...")
+        continue
+
+    print(name)
+
+    RefrigerantType.objects.create(name=name)
+
+log.debug("Deleting all ValueChainRefrigerantEmissionFactor objects...")
+ValueChainRefrigerantEmissionFactor.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainRefrigerantEmissionFactors.csv"),
+    header=0,
+    sep=",",
+)
+
+for i, row in df.iterrows():
+    refrigerant_type = RefrigerantType.objects.get(name__iexact=row["refrigerant_type"])
+    sar = GlobalWarmingPotential.objects.get(name__icontains="SAR")
+    ar4 = GlobalWarmingPotential.objects.get(name__icontains="AR4")
+    ar5 = GlobalWarmingPotential.objects.get(name__icontains="AR5) with C")
+    ar5_wo = GlobalWarmingPotential.objects.get(name__icontains="AR5) without C")
+    ar6 = GlobalWarmingPotential.objects.get(name__icontains="AR6")
+
+    sar_value = parse_csv_number(row["sar"])
+    ar4_value = parse_csv_number(row["ar4"])
+    ar5_value = parse_csv_number(row["ar5"])
+    ar6_value = parse_csv_number(row["ar6"])
+
+    print(
+        refrigerant_type,
+        sar_value,
+        ar4_value,
+        ar5_value,
+        ar6_value,
+    )
+
+    if sar_value:
+        ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=sar, value=sar_value)
+    if ar4_value:
+        ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=ar4, value=ar4_value)
+    if ar5_value:
+        ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=ar5, value=ar5_value)
+        ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=ar5_wo, value=ar5_value)
+    if ar6_value:
+        ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=ar6, value=ar6_value)
+
+log.debug("Deleting all ElectricityEmissions objects...")
+ElectricityEmission.objects.all().delete()
+
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "ElectricityEmissions.csv"),
     header=0,
     sep=";",
 )
 
 df_headers = df.columns.values.tolist()
-df_dict = df.to_dict("records")
+rows = df.to_dict("records")
 
-for i, row in enumerate(df_dict):
-    fuel_use_type = FuelUseType.objects.get(name__iexact=row["fuel_use_type"])
-    fuel_type = FuelType.objects.get(name__iexact=row["fuel_type"])
-    co2 = parse_csv_number(row["co2"])
-    ch4 = parse_csv_number(row["ch4"])
-    n2o = parse_csv_number(row["n2o"])
+for row in rows:
+    country = row["country"]
+    operating_margin = parse_csv_number(row["operating_margin"])
+    combined_margin = parse_csv_number(row["combined_margin"])
 
-    print(
-        fuel_use_type,
-        fuel_type,
-        co2,
-        ch4,
-        n2o,
+    print(country, operating_margin, combined_margin)
+    try:
+        country = Country.objects.get(name__iexact=country)
+    except Country.DoesNotExist:
+        country = Country.objects.create(name=country, region=Region.objects.get(name=row["region"]))
+
+    ElectricityEmission.objects.create(
+        country=country,
+        operating_margin=operating_margin,
+        combined_margin=combined_margin,
     )
-
-    l.append(
-        EnergyDefaultEmissionFactor(
-            fuel_use_type=fuel_use_type,
-            fuel_type=fuel_type,
-            co2=co2,
-            ch4=ch4,
-            n2o=n2o,
-        )
-    )
-
-EnergyDefaultEmissionFactor.objects.bulk_create(l)
-
-# TODO: Run in review
 
 
 # TODO: Run in develop

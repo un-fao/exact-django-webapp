@@ -18,6 +18,7 @@ from abc import ABC, abstractmethod
 import api.calculators as calcs
 import api.utilities as utils
 from api.models import CustomUser as User
+from django.utils.text import slugify
 
 from . import labels
 from .models import (
@@ -83,6 +84,12 @@ from .models import (
     ChangeRate,
     Note,
     FieldDefinition,
+    ProjectTag,
+    ValueChain,
+    Storage,
+    Processing,
+    Packaging,
+    Transport,
 )
 from datetime import timedelta
 
@@ -273,13 +280,32 @@ class CountrySerializer(serializers.ModelSerializer):
         ref_name = "Country"
 
 
+class ProjectTagSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ProjectTag
+        fields = ["id", "name"]
+
+    def validate_name(self, value):
+        project = self.context["project"]
+        user = self.context["user"]
+        if not ProjectMembership.objects.filter(project=project, user=user).exists():
+            raise serializers.ValidationError("User does not have permission to add tags to this project.")
+
+        if ProjectTag.objects.filter(project=project, user=user, slug=slugify(value)).exists():
+            raise serializers.ValidationError("Tag with this name already exists for this project.")
+
+        return value
+
+
 class ProjectSummarySerializer(serializers.ModelSerializer):
     role = serializers.SerializerMethodField(read_only=True)
     country = serializers.StringRelatedField(many=False, read_only=True, source="country.name")
+    tags = ProjectTagSerializer(many=True, read_only=True)
 
     class Meta:
         model = Project
-        fields = ["id", "name", "country", "updated_at", "role"]
+        fields = ["id", "name", "country", "updated_at", "role", "tags"]
 
     def get_role(self, obj):
         ctx = self.context.get("request", None)
@@ -415,9 +441,13 @@ class WriteProjectSerializer(serializers.ModelSerializer):
                         activity.save()
                 project.save()
 
-            has_more_than_thirty_minutes_passed = timezone.now() - project.lock_updated_at > timedelta(minutes=30)
+            has_more_than_thirty_minutes_passed = project.lock_updated_at is not None and timezone.now() - project.lock_updated_at > timedelta(minutes=30)
             if project.is_locked and project.lock_updated_at and has_more_than_thirty_minutes_passed:
                 project.unlock()
+
+            if project.is_locked and project.locked_by != user:
+                log.warning(f"Project is already locked by: {project.locked_by.email}")
+                raise serializers.ValidationError("The project is already locked")
 
             # If the project is not locked, or a lock is requested
             if not project.is_locked or is_locking is True:
@@ -500,6 +530,12 @@ class WriteActivitySerializer(serializers.ModelSerializer):
         ref_name = "Activity"
 
     def validate(self, data):
+
+        project = self.instance.project if self.instance else data.get("project")
+
+        if project.is_locked and not project.locked_by == self.context["request"].user:
+            raise serializers.ValidationError("Project is locked by another user")
+
         if self.instance:
             luc_module: ModuleType = ModuleType.objects.get(name_en="Land Use Change")
 
@@ -574,11 +610,11 @@ class ActivityBuilderSerializer(serializers.Serializer):
     project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(), required=True)
     name = serializers.CharField(max_length=255, required=True)
     cost = serializers.FloatField(required=False)
-    climate = serializers.PrimaryKeyRelatedField(queryset=Climate.objects.all(), required=True)
-    moisture = serializers.PrimaryKeyRelatedField(queryset=Moisture.objects.all(), required=True)
-    soil_type = serializers.PrimaryKeyRelatedField(queryset=SoilType.objects.all(), required=True)
-    duration = serializers.IntegerField(required=True)
-    start_year = serializers.IntegerField(required=False)
+    climate_t2 = serializers.PrimaryKeyRelatedField(queryset=Climate.objects.all(), required=False)
+    moisture_t2 = serializers.PrimaryKeyRelatedField(queryset=Moisture.objects.all(), required=False)
+    soil_type_t2 = serializers.PrimaryKeyRelatedField(queryset=SoilType.objects.all(), required=False)
+    duration_t2 = serializers.IntegerField(required=False)
+    start_year_t2 = serializers.IntegerField(required=False)
     land_use_change = LandUseChangeBuilderSerializer(many=False, required=False, allow_null=True)
     module_types = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
     area = serializers.FloatField(required=False, min_value=0)
@@ -623,11 +659,11 @@ class ActivityBuilderSerializer(serializers.Serializer):
             project=self.validated_data["project"],
             cost=self.validated_data["cost"],
             change_rate=self.validated_data.get("change_rate", default_change_rate),
-            climate_t2=self.validated_data.get("climate"),
-            moisture_t2=self.validated_data.get("moisture"),
-            duration_t2=self.validated_data.get("duration"),
-            soil_type_t2=self.validated_data.get("soil_type"),
-            start_year_t2=self.validated_data.get("start_year"),
+            climate_t2=self.validated_data.get("climate_t2"),
+            moisture_t2=self.validated_data.get("moisture_t2"),
+            duration_t2=self.validated_data.get("duration_t2"),
+            soil_type_t2=self.validated_data.get("soil_type_t2"),
+            start_year_t2=self.validated_data.get("start_year_t2"),
             owner=self.context["request"].user,
         )
 
@@ -673,7 +709,11 @@ class ActivityBuilderSerializer(serializers.Serializer):
                 module_instance = ModuleClass.objects.create(**filters)
 
             module_instance.save()
-            update_change_reason(module_instance, "update")
+
+            try:
+                update_change_reason(module_instance, "update")
+            except AttributeError:
+                pass
 
     def unique_activity_name(self):
         base_name = self.validated_data["name"]
@@ -1022,8 +1062,13 @@ class BaseModuleSerializer(BaseGenericModuleSerializer):
         log.debug(f"START BaseModuleSerializer[{self.Meta.ref_name}].validate")
 
         activity = data["parent"].activity if data.get("parent") else data.get("activity", self.instance.activity)
+        project: Project = activity.project
 
         module_types = list(map(lambda module: module.class_name, activity.module_types.all()))
+
+        if project.is_locked and not project.locked_by == self.context["request"].user:
+            log.error("Project is locked by another user")
+            raise serializers.ValidationError("Project is locked by another user")
 
         if getattr(activity, self.Meta.ref_name.lower(), None).exists() and not self.instance:
             log.error(f"Activity already has a {self.Meta.ref_name}")
@@ -2976,3 +3021,266 @@ class FieldMetadataSerializer(serializers.Serializer):
 
 class FieldDefinitionResponseSerializer(serializers.Serializer):
     field_name = FieldMetadataSerializer(many=True)
+
+
+class ValueChainSubmoduleMixin(ScenarioSubmoduleSerializer):
+    def save(self, **kwargs):
+        super().save(**kwargs)
+
+        parent: ValueChain = utils.getany([self.instance, dict(kwargs)], "parent")
+        parent_serializer = ValueChainSerializer(data={}, instance=parent, partial=True, context=self.context)
+        parent_serializer.is_valid()
+        parent_serializer.save()
+
+        return self.instance
+
+
+class StorageSerializer(ValueChainSubmoduleMixin):
+    class Meta:
+        model = Storage
+        fields = "__all__"
+        ref_name = "Storage"
+        mandatory_fields = {
+            "start": {
+                "mandatory": [
+                    "kwh_energy_per_year_start",
+                ],
+                "conditional": {
+                    "is_refrigerant_used": [
+                        "regrigerant_type_start",
+                        "total_refrigerant_leakage_start",
+                    ]
+                },
+            },
+            "with": {
+                "mandatory": [
+                    "kwh_energy_per_year_w",
+                ],
+                "conditional": {
+                    "is_refrigerant_used": [
+                        "regrigerant_type_w",
+                        "total_refrigerant_leakage_w",
+                    ]
+                },
+            },
+            "without": {
+                "mandatory": [
+                    "kwh_energy_per_year_wo",
+                ],
+                "conditional": {
+                    "is_refrigerant_used": [
+                        "regrigerant_type_wo",
+                        "total_refrigerant_leakage_wo",
+                    ]
+                },
+            },
+        }
+
+
+class StorageWriteSerializer(StorageSerializer):
+    pass
+
+
+class StorageReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = Storage
+        fields = "__all__"
+        ref_name = "Storage"
+        mandatory_fields = {}
+
+
+class ProcessingSerializer(ValueChainSubmoduleMixin):
+    class Meta:
+        model = Processing
+        fields = "__all__"
+        ref_name = "Processing"
+        mandatory_fields = {
+            "start": {
+                "mandatory": [
+                    "fuel_type_start",
+                    "kwh_energy_per_year_start",
+                ],
+                "conditional": {
+                    "is_water_used": [
+                        "water_use_per_year_start",
+                    ]
+                },
+            },
+            "with": {
+                "mandatory": [
+                    "fuel_type_w",
+                    "kwh_energy_per_year_w",
+                ],
+                "conditional": {
+                    "is_water_used": [
+                        "water_use_per_year_w",
+                    ]
+                },
+            },
+            "without": {
+                "mandatory": [
+                    "fuel_type_wo",
+                    "kwh_energy_per_year_wo",
+                ],
+                "conditional": {
+                    "is_water_used": [
+                        "water_use_per_year_wo",
+                    ]
+                },
+            },
+        }
+
+
+class ProcessingWriteSerializer(ProcessingSerializer):
+    pass
+
+
+class ProcessingReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = Processing
+        fields = "__all__"
+        ref_name = "Processing"
+        mandatory_fields = {}
+
+
+class PackagingSerializer(ValueChainSubmoduleMixin):
+    class Meta:
+        model = Packaging
+        fields = "__all__"
+        ref_name = "Packaging"
+        mandatory_fields = {
+            "start": {
+                "mandatory": [
+                    "packaging_material_type_start",
+                    "kg_of_packaging_material_start",
+                ],
+                "conditional": {
+                    "is_electric": ["kwh_energy_per_year_start"],
+                },
+            },
+            "with": {
+                "mandatory": [
+                    "packaging_material_type_w",
+                    "kg_of_packaging_material_w",
+                ],
+                "conditional": {
+                    "is_electric": ["kwh_energy_per_year_w"],
+                },
+            },
+            "without": {
+                "mandatory": [
+                    "packaging_material_type_wo",
+                    "kg_of_packaging_material_wo",
+                ],
+                "conditional": {
+                    "is_electric": [
+                        "kwh_energy_per_year_wo",
+                    ]
+                },
+            },
+        }
+
+
+class PackagingWriteSerializer(PackagingSerializer):
+    pass
+
+
+class PackagingReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = Packaging
+        fields = "__all__"
+        ref_name = "Packaging"
+        mandatory_fields = {}
+
+
+class TransportSerializer(ValueChainSubmoduleMixin):
+    class Meta:
+        model = Transport
+        fields = "__all__"
+        ref_name = "Transport"
+        mandatory_fields = {
+            "start": {
+                "mandatory": [
+                    "fuel_type_start",
+                    "fuel_used_per_year_start",
+                ]
+            },
+            "with": {
+                "mandatory": [
+                    "fuel_type_w",
+                    "fuel_used_per_year_w",
+                ]
+            },
+            "without": {
+                "mandatory": [
+                    "fuel_type_wo",
+                    "fuel_used_per_year_wo",
+                ]
+            },
+        }
+
+
+class TransportWriteSerializer(TransportSerializer):
+    pass
+
+    def validate(self, data):
+        super().validate(data)
+
+        parent: ValueChain = utils.getany([self.instance, dict(data)], "parent")
+        parent_serializer = ValueChainSerializer(data={}, instance=parent, partial=True, context=self.context)
+        if parent_serializer.is_valid():
+            parent_serializer.save()
+
+        return data
+
+
+class TransportReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = Transport
+        fields = "__all__"
+        ref_name = "Transport"
+        mandatory_fields = {}
+
+
+class ValueChainSerializer(ScenarioModuleSerializer):
+
+    class Meta:
+        model = ValueChain
+        fields = "__all__"
+        ref_name = "ValueChain"
+        mandatory_fields = {}
+
+    def validate(self, data):
+        super().validate(data)
+
+        if not self.instance:
+            return data
+
+        storages = self.instance.storages.all()
+        processings = self.instance.processings.all()
+        packagings = self.instance.packagings.all()
+        transports = self.instance.transports.all()
+
+        all_submodules = list(storages) + list(processings) + list(packagings) + list(transports)
+
+        if any([not submodule.is_ready() for submodule in all_submodules]):
+            data["status"] = StatusType.objects.get(name="SUBMODULES_EMPTY")
+
+        return data
+
+
+class ValueChainWriteSerializer(ValueChainSerializer):
+    pass
+
+
+class ValueChainReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = ValueChain
+        fields = "__all__"
+        ref_name = "ValueChain"
+        mandatory_fields = {}

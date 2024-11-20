@@ -62,3 +62,4 @@ django-ckeditor==6.7.1
 django-picklefield==3.2
 django-dirtyfields==1.9.3
 python-slugify==8.0.4
+drf-nested-routers==0.94.1
