@@ -460,8 +460,16 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         return Response(data=SerializerClass(ordered_projects, many=True, context={"request": request}).data, status=http_status.HTTP_200_OK)
 
+    activities = openapi.Parameter(
+        "activities",
+        openapi.IN_QUERY,
+        description="List of activity ids to include in the results",
+        type=openapi.TYPE_ARRAY,
+        items={"type": openapi.TYPE_INTEGER},
+    )
+
     @action(detail=True, methods=["get"])
-    @swagger_auto_schema(manual_parameters=[project_id], responses={404: "Project not found"})
+    @swagger_auto_schema(manual_parameters=[activities], responses={404: "Project not found", 403: "Selected user does not have permission to view project results", 200: ProjectResultSerializer})
     def results(self, request, pk=None):
         """
         Calculates and returns total emissions for each module in the project.
