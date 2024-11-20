@@ -1,5 +1,7 @@
 import api.models as models
 import ipcc.models as ipcc_models
+from django.apps import apps
+import logging as log
 
 # TODO: Run in review and prod
 
@@ -48,6 +50,23 @@ def change_forest_agb_growth_tropical_mountain_system_to_tropical_montane():
     agbs = ipcc_models.ForestManagementAGBGrowth.objects.filter(climate__name="Tropical", land_use_type__name="Mountain System").update(climate=tropical_montane_climate)
 
 
+def cycle_all_modules_and_invalidate_cached_results():
+    """
+    Cycle all modules and invalidate cached results
+    """
+    for module_type in models.ModuleType.objects.all():
+        log.debug(f"Invalidating cached results for {module_type}")
+        try:
+            ModuleClass: models.Module = apps.get_model("api", module_type.class_name)
+            for module in ModuleClass.objects.all():
+                if hasattr(module, "invalidate_cached_results"):
+                    module.invalidate_cached_results()
+                else:
+                    log.error(f"Could not find invalidate_cached_results for {module}")
+        except LookupError:
+            log.error(f"Could not find module class for {module_type}")
+
+
 # TODO: Run in prod
 
 # add_climate_tropical_montane_to_perennial_cropland()
@@ -55,3 +74,4 @@ def change_forest_agb_growth_tropical_mountain_system_to_tropical_montane():
 # change_forest_agb_tropical_mountain_system_to_tropical_montane()
 # change_forest_bgb_tropical_mountain_system_to_tropical_montane()
 # change_forest_agb_growth_tropical_mountain_system_to_tropical_montane()
+cycle_all_modules_and_invalidate_cached_results()
