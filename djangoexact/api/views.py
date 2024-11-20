@@ -1475,7 +1475,7 @@ def generic_module_viewset(model: Module):
             logging.debug(f"START GenericModuleViewSet[{model.__name__}].create")
             logging.debug(f"request.data: {request.data}")
 
-            module_serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data=request.data, context={"request": request}, many=request.data.__class__ == list)
+            module_serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data=request.data, many=request.data.__class__ == list, context={"request": request})
             module_type = ModuleType.objects.get(class_name=model.__name__)
 
             if not module_serializer.is_valid():
@@ -1529,7 +1529,7 @@ def generic_module_viewset(model: Module):
             data = []
 
             for i, module in enumerate(modules):
-                serializer = get_module_serializer(model)(instance=module)
+                serializer = get_module_serializer(model)(instance=module, context={"request": request})
                 data.append({**serializer.data})
 
             return Response(data)
@@ -1547,7 +1547,7 @@ def generic_module_viewset(model: Module):
                 logging.error("Selected user does not have permission to view this module in the project")
                 return utils.ErrorResponse("Selected user does not have permission to view this module in the project", status=http_status.HTTP_403_FORBIDDEN)
 
-            serializer = get_module_serializer(model, ActionTypes.RETRIEVE)(data={"activity": activity.pk}, partial=True, instance=module)
+            serializer = get_module_serializer(model, ActionTypes.RETRIEVE)(data={"activity": activity.pk}, partial=True, instance=module, context={"request": request})
             serializer.is_valid(raise_exception=True)
 
             if module.module_type.class_name == LandUseChange.__name__:
@@ -1621,7 +1621,7 @@ def generic_module_viewset(model: Module):
             module: Module | Submodule = get_object_or_404(model, pk=pk)
             activity = module.get_activity()
 
-            serializer = get_module_serializer(model, ActionTypes.UPDATE)(data={}, instance=module, partial=True)
+            serializer = get_module_serializer(model, ActionTypes.UPDATE)(data={}, instance=module, partial=True, context={"request": request})
             serializer.is_valid(raise_exception=True)
             serializer.save()
 
