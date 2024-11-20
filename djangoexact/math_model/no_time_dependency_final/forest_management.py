@@ -302,6 +302,9 @@ class ForestManagement(BaseModule):
                 if np.any(np.sum(self.agb_matrix < 0), axis=0):
                     raise ValueError(f"Negative values in agb_matrix, check the parameters for logging and disturbance % over 100")
 
+                check_agb_matrices(self.agb_matrix, self.delta_agb_matrix, self.max_agb_value)
+                check_agb_matrices(self.bgb_matrix, self.delta_bgb_matrix, self.max_bgb_value)
+                
                 agb_times_hectares = multiply_matrix_by_matrix(self.delta_agb_matrix, self.hectares_matrix)
                 yearly_agb_emissions = [x * -44 / 12 for x in agb_times_hectares]
 
@@ -318,7 +321,7 @@ class ForestManagement(BaseModule):
         def calculate_litter():
             try:
 
-                litter_matrix, delta_litter_matrix = create_litter_deadwood_matrix(self.implementation_time, self.capitalization_time, self.litter_20_years / 20, self.litter_20_years / 20, self.litter_start, self.litter_max)
+                litter_matrix, delta_litter_matrix = create_litter_deadwood_matrix(self.implementation_time, self.capitalization_time, self.litter_20_years / 20, self.litter_start, self.litter_max)
 
                 if self.degradation_percentage:
                     # NOTE: This means we have degradation, which has an impact on litter and deadwood as well
@@ -345,7 +348,7 @@ class ForestManagement(BaseModule):
         
         def calculate_deadwood():
             try:
-                deadwood_matrix, delta_deadwood_matrix = create_litter_deadwood_matrix(self.implementation_time, self.capitalization_time, self.deadwood_20_years / 20, self.deadwood_20_years / 20, self.deadwood_start, self.deadwood_max)
+                deadwood_matrix, delta_deadwood_matrix = create_litter_deadwood_matrix(self.implementation_time, self.capitalization_time, self.deadwood_20_years / 20, self.deadwood_start, self.deadwood_max)
 
                 if self.degradation_percentage:
                     # NOTE: This means we have degradation, which has an impact on litter and deadwood as well

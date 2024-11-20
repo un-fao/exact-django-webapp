@@ -210,9 +210,9 @@ class PerennialCroplandDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            soc_t2_start_default=defaults.soc.value,
-            soc_t2_w_default=defaults.soc.value,
-            soc_t2_wo_default=defaults.soc.value,
+            soc_t2_start_default=defaults.soc_start.value,
+            soc_t2_w_default=defaults.soc_w.value,
+            soc_t2_wo_default=defaults.soc_wo.value,
             agb_t2_start_default=defaults.agb_start_default.value,
             agb_t2_w_default=defaults.agb_w_default.value,
             agb_t2_wo_default=defaults.ag_default_wo.value,
@@ -392,10 +392,10 @@ class LivestockDefaults(Defaults):
             prp_percentage_t2_start_default=defaults.animal_waste_prp_start.value,
             prp_percentage_t2_w_default=defaults.animal_waste_prp_w.value,
             prp_percentage_t2_wo_default=defaults.animal_waste_prp_wo.value,
-            prp_ch4_t2_start_default=0,
+            prp_ch4_t2_start_default=defaults.math_w.percentage_prp_start_tier_2_default or defaults.math_wo.percentage_prp_start_tier_2_default,
             prp_ch4_t2_w_default=defaults.math_w.percentage_prp_end_tier_2_default,
             prp_ch4_t2_wo_default=defaults.math_wo.percentage_prp_end_tier_2_default,
-            prp_n2o_t2_start_default=0,
+            prp_n2o_t2_start_default=defaults.math_w.n2o_prp_direct_head_start_tier_2_default or defaults.math_wo.n2o_prp_direct_head_start_tier_2_default,
             prp_n2o_t2_w_default=defaults.math_w.n2o_prp_direct_head_end_tier_2_default,
             prp_n2o_t2_wo_default=defaults.math_wo.n2o_prp_direct_head_end_tier_2_default,
             emission_factor_ch4_t2_start_default=0,
@@ -703,9 +703,9 @@ class SettlementDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            soc_t2_start_default=defaults.soc.value,
-            soc_t2_w_default=defaults.soc.value,
-            soc_t2_wo_default=defaults.soc.value,
+            soc_t2_start_default=defaults.soc_start.value,
+            soc_t2_w_default=defaults.soc_w.value,
+            soc_t2_wo_default=defaults.soc_wo.value,
             flu_t2_start_default=defaults.flu_start.value,
             flu_t2_w_default=defaults.flu_w.value,
             flu_t2_wo_default=defaults.flu_wo.value,
@@ -1362,3 +1362,78 @@ class ForestDisturbanceDefaults(Defaults):
             start_year_t2_w_default=self.start_year_t2_w_default,
             start_year_t2_wo_default=self.start_year_t2_wo_default,
         )
+
+
+class ValueChainDefaults(Defaults):
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace()
+
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.ValueChain
+
+        defaults = calcs.ValueChainCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace()
+
+
+class StorageDefaults(Defaults):
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace()
+
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.Storage
+
+        defaults = calcs.StorageCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace()
+
+
+class TransportDefaults(Defaults):
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace()
+
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.Transport
+
+        defaults = calcs.TransportCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace()
+
+
+class ProcessingDefaults(Defaults):
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace()
+
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.Processing
+
+        defaults = calcs.ProcessingCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace()
+
+
+class PackagingDefaults(Defaults):
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace()
+
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.Packaging
+
+        defaults = calcs.PackagingCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace()

@@ -646,3 +646,99 @@ class RoadFactory(DjangoModelFactory):
     width_m_start = factory.fuzzy.FuzzyFloat(0, 100)
     width_m_w = factory.fuzzy.FuzzyFloat(0, 100)
     width_m_wo = factory.fuzzy.FuzzyFloat(0, 100)
+
+
+class ValueChainFactory(DjangoModelFactory):
+
+    class Meta:
+        model = ValueChain
+
+    status = READY
+
+
+class ValueChainPackagingFactory(DjangoModelFactory):
+
+    class Meta:
+        model = Packaging
+
+    status = READY
+
+    packaging_material_type_start = factory.fuzzy.FuzzyChoice([packaging for packaging in PackagingMaterialType.objects.all()])
+    packaging_material_type_w = factory.fuzzy.FuzzyChoice([packaging for packaging in PackagingMaterialType.objects.all()])
+    packaging_material_type_wo = factory.fuzzy.FuzzyChoice([packaging for packaging in PackagingMaterialType.objects.all()])
+
+    kg_of_packaging_material_start = factory.fuzzy.FuzzyFloat(0, 100)
+    kg_of_packaging_material_w = factory.fuzzy.FuzzyFloat(0, 100)
+    kg_of_packaging_material_wo = factory.fuzzy.FuzzyFloat(0, 100)
+
+    is_electric = factory.fuzzy.FuzzyChoice([True, False])
+
+    kwh_energy_per_year_start = factory.fuzzy.FuzzyFloat(0, 100)
+    kwh_energy_per_year_w = factory.fuzzy.FuzzyFloat(0, 100)
+    kwh_energy_per_year_wo = factory.fuzzy.FuzzyFloat(0, 100)
+
+
+class ValueChainStorageFactory(DjangoModelFactory):
+
+    class Meta:
+        model = Storage
+
+    status = READY
+
+    kwh_energy_per_year_start = factory.fuzzy.FuzzyFloat(0, 100)
+    kwh_energy_per_year_w = factory.fuzzy.FuzzyFloat(0, 100)
+    kwh_energy_per_year_wo = factory.fuzzy.FuzzyFloat(0, 100)
+
+    is_refrigerant_used = factory.fuzzy.FuzzyChoice([True, False])
+
+    refrigerant_type_start = factory.fuzzy.FuzzyChoice([refrigerant for refrigerant in RefrigerantType.objects.all()])
+    refrigerant_type_w = factory.fuzzy.FuzzyChoice([refrigerant for refrigerant in RefrigerantType.objects.all()])
+    refrigerant_type_wo = factory.fuzzy.FuzzyChoice([refrigerant for refrigerant in RefrigerantType.objects.all()])
+
+    total_refrigerant_leakage_start = factory.fuzzy.FuzzyFloat(0, 100)
+    total_refrigerant_leakage_w = factory.fuzzy.FuzzyFloat(0, 100)
+    total_refrigerant_leakage_wo = factory.fuzzy.FuzzyFloat(0, 100)
+
+    emission_factor_t2_start = factory.fuzzy.FuzzyFloat(0, 100)
+    emission_factor_t2_w = factory.fuzzy.FuzzyFloat(0, 100)
+    emission_factor_t2_wo = factory.fuzzy.FuzzyFloat(0, 100)
+
+
+fuel_types_stationary = [fuel for fuel in FuelType.objects.filter(fuel_use_type__name__icontains="stationary").all()]
+
+
+class ValueChainProcessingFactory(DjangoModelFactory):
+    class Meta:
+        model = Processing
+
+    status = READY
+
+    fuel_type_start = factory.fuzzy.FuzzyChoice(fuel_types)
+    fuel_type_w = factory.fuzzy.FuzzyChoice(fuel_types)
+    fuel_type_wo = factory.fuzzy.FuzzyChoice(fuel_types)
+
+    kwh_energy_per_year_start = factory.fuzzy.FuzzyFloat(0, 100)
+    kwh_energy_per_year_w = factory.fuzzy.FuzzyFloat(0, 100)
+    kwh_energy_per_year_wo = factory.fuzzy.FuzzyFloat(0, 100)
+
+    is_water_used = factory.fuzzy.FuzzyChoice([True, False])
+
+    water_use_per_year_start = factory.fuzzy.FuzzyFloat(0, 100)
+    water_use_per_year_w = factory.fuzzy.FuzzyFloat(0, 100)
+    water_use_per_year_wo = factory.fuzzy.FuzzyFloat(0, 100)
+
+
+class ValueChainTransportFactory(DjangoModelFactory):
+
+    class Meta:
+        model = Transport
+
+    status = READY
+
+    fuel_type_start = factory.fuzzy.FuzzyChoice(fuel_types)
+    fuel_type_w = factory.fuzzy.FuzzyChoice(fuel_types)
+    fuel_type_wo = factory.fuzzy.FuzzyChoice(fuel_types)
+
+    fuel_used_per_year_start = factory.fuzzy.FuzzyFloat(0, 100)
+    fuel_used_per_year_w = factory.fuzzy.FuzzyFloat(0, 100)
+    fuel_used_per_year_wo = factory.fuzzy.FuzzyFloat(0, 100)
