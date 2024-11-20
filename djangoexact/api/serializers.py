@@ -1242,7 +1242,7 @@ class LandModuleSeralizer(ScenarioModuleSerializer):
 
         if luc:
             # If the module is associated with a Land Use Change, update the status of the Land Use Change
-            luc_serializer: LandUseChangeWriteSerializer = get_module_serializer(LandUseChange)(data={}, instance=luc, many=False, partial=True)
+            luc_serializer: LandUseChangeWriteSerializer = get_module_serializer(LandUseChange)(data={}, instance=luc, many=False, partial=True, context=self.context)
             luc_serializer.is_valid(raise_exception=True)
             luc_serializer.save()
 
@@ -2732,7 +2732,7 @@ class SettlementSerializer(LandModuleSeralizer):
             raise serializers.ValidationError("At least one building is not ready for calculations")
 
         for building in buildings:
-            building_serializer = BuildingReadSerializer(data={}, partial=True, instance=building)
+            building_serializer = BuildingReadSerializer(data={}, partial=True, instance=building, context=self.context)
             if not building_serializer.is_valid():
                 raise serializers.ValidationError(building_serializer.errors)
 
@@ -2742,7 +2742,7 @@ class SettlementSerializer(LandModuleSeralizer):
             raise serializers.ValidationError("At least one road is not ready for calculations")
 
         for road in roads:
-            road_serializer = RoadReadSerializer(data={}, partial=True, instance=road)
+            road_serializer = RoadReadSerializer(data={}, partial=True, instance=road, context=self.context)
             if not road_serializer.is_valid():
                 raise serializers.ValidationError(road_serializer.errors)
 
@@ -2752,7 +2752,7 @@ class SettlementSerializer(LandModuleSeralizer):
             raise serializers.ValidationError("At least one other infrastructure is not ready for calculations")
 
         for other_infrastructure in other_infrastructures:
-            other_infrastructure_serializer = OtherInfrastructureReadSerializer(data={}, partial=True, instance=other_infrastructure)
+            other_infrastructure_serializer = OtherInfrastructureReadSerializer(data={}, partial=True, instance=other_infrastructure, context=self.context)
             if not other_infrastructure_serializer.is_valid():
                 raise serializers.ValidationError(other_infrastructure_serializer.errors)
 
@@ -2879,7 +2879,7 @@ class ForestDisturbanceWriteSerializer(ScenarioSubmoduleSerializer):
             parent.status = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
             parent.save()
         else:
-            parent_serializer = ForestManagementReadSerializer(data={}, instance=parent, partial=True)
+            parent_serializer = ForestManagementReadSerializer(data={}, instance=parent, partial=True, context=self.context)
             if parent_serializer.is_valid():
                 parent_serializer.save()
 
