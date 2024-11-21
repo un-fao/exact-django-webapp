@@ -435,7 +435,7 @@ class WriteProjectSerializer(serializers.ModelSerializer):
             if new_years is not None:
                 project.implementation_years = new_years
                 for activity in project.activities.all():
-                    if activity.duration_t2 > new_years:
+                    if activity.duration_t2 and activity.duration_t2 > new_years:
                         log.warning(f"Activity {activity.name} duration_t2 is greater than project implementation years. Setting activity duration_t2 to project implementation years.")
                         activity.duration_t2 = new_years
                         activity.save()
