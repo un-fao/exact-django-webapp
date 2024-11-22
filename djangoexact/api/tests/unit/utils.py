@@ -43,7 +43,7 @@ class APITestCaseMixin(APITestCase):
         self.country = models.Country.objects.order_by("?").first()
         self.climate = models.Climate.objects.order_by("?").first()
         self.moisture = self.climate.moistures.order_by("?").first()
-        self.soil_type = models.SoilType.objects.order_by("?").first()
+        self.soil_type = models.SoilType.objects.filter(active=True).order_by("?").first()
         self.module_type = models.ModuleType.objects.filter(is_luc=True).order_by("?").first()
         self.change_rate = models.ChangeRate.objects.get(name="linear")
         self.project_data = {
@@ -56,6 +56,7 @@ class APITestCaseMixin(APITestCase):
             "moisture": self.moisture.id,
             "soil_type": self.soil_type.id,
             "gw_potential": ipcc_models.GlobalWarmingPotential.objects.order_by("?").first().id,
+            "soc_ref_t2": FuzzyInteger(0, 100).fuzz(),
         }
 
     def create_project(self):
@@ -120,7 +121,7 @@ class APITestCaseMixin(APITestCase):
         activity_builder_data = {
             "name": FuzzyText().fuzz(),
             "project": project.id,
-            "module_types": [self.module_type.id] if module_types is None else module_types,
+            "module_types": [self.module_type.id] if module_types is None else [module_type.id for module_type in module_types],
             "area": 100,
             "change_rate": self.change_rate.id,
             "cost": 0,
