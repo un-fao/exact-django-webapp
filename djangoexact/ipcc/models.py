@@ -1004,24 +1004,10 @@ class CropYieldStats(Model):
 
     objects = CropYieldStatsManager()
 
-    def save(self, *args, **kwargs):
-        self.average = (
-            sum(
-                [
-                    x
-                    for x in [
-                        self.year_2016,
-                        self.year_2017,
-                        self.year_2018,
-                        self.year_2019,
-                        self.year_2020,
-                    ]
-                ]
-            )
-            / 5
-            / 10000
-        )
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     not_none_years = [x for x in [self.year_2016, self.year_2017, self.year_2018, self.year_2019, self.year_2020] if x]
+    #     self.average = sum(not_none_years) / len(not_none_years) / 10000
+    #     super().save(*args, **kwargs)
 
     def __str__(self):
         return f"({self.pk}) - {self.land_use_type.name} - {self.continent} - {self.average}"
