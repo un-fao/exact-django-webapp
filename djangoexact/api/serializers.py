@@ -172,7 +172,6 @@ def get_model_serializer(model_arg):
             ref_name = model_arg.__name__
 
         def __init__(self, *args, **kwargs):
-            log.debug(f"START GenericSerializer[{model_arg.__name__}].init")
             super().__init__(*args, **kwargs)
 
     try:
