@@ -1288,7 +1288,7 @@ class SingleBiomassModule(BiomassModule):
             return BiomassModel.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
         except BiomassModel.DoesNotExist:
             if getattr(self, f"biomass_t2_{scenario.value}", None) is None:
-                raise ValueError(f"Missing biomass data for {land_use_type.name}, {climate.name}, {moisture.name}, {continent.name}, for {scenario.verbose_name} scenario. Please provide tier2 value.")
+                raise ValueError(f"Missing biomass data for {land_use_type}, {climate}, {moisture}, {continent}, for {scenario.verbose_name} scenario. Please provide tier2 value.")
             return BiomassModel()
 
 
