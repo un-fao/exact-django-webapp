@@ -271,7 +271,10 @@ def create_comment_threads(module_instance):
         if attr.endswith("_thread") and getattr(module_instance, attr, None) is None:
             setattr(module_instance, attr, api_models.CommentThread.objects.create())
     if not module_instance._state.adding:
-        update_change_reason(module_instance, "update")
+        try:
+            update_change_reason(module_instance, "update")
+        except Exception as e:
+            log.warning(f"Error updating change reason: {e}")
 
 
 def getany(objects: list[object], key: str):

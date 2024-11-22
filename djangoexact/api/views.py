@@ -1610,7 +1610,7 @@ def generic_module_viewset(model: Module):
                 logging.error("Error calculating result in GenericModuleViewSet.results", e)
                 return utils.ErrorResponse(str(e))
 
-        @action(detail=True, methods=["get"])
+        @action(detail=True, methods=["get"], url_path="defaults")
         def defaults(self, request, pk=None):
             """
             Returns the default values for a module.
