@@ -10,34 +10,17 @@ from factory.fuzzy import FuzzyText, FuzzyInteger, FuzzyChoice
 import logging as log
 from api.tests.unit.utils import APITestCaseMixin
 from api import serializers
+import copy
+from . import base_module
 
 
-class PerennialCroplandTestCase(APITestCaseMixin):
-
+class PerennialCroplandTestCase(base_module.BaseModuleTestCase):
     def setUp(self):
+        self.ModuleClass = models.PerennialCropland
         super().setUp()
 
-        project_response = self.create_project()
-        self.assertEqual(project_response.status_code, status.HTTP_201_CREATED)
-
-        self.project = models.Project.objects.get(id=project_response.data["id"])
-        self.perennial_cropland_module_type = models.ModuleType.objects.get(class_name="PerennialCropland")
-
-        activity_response = self.create_activity(self.project, self.user, [self.perennial_cropland_module_type])
-        self.assertEqual(activity_response.status_code, status.HTTP_200_OK)
-
-        self.activity = models.Activity.objects.get(id=activity_response.data["id"])
-        self.module: models.Module = self.activity.perennialcropland.first()
-
-        self.validated_data = self.get_valid_module_data()
-        self.edit_module(self.module, self.user, self.validated_data)
-        self.module.refresh_from_db()
-
-        self.module_viewset = generic_module_viewset(models.PerennialCropland)
-
-    def get_valid_module_data(self):
-        trees = models.LandUseType.objects.filter(module_types__class_name="PerennialCropland", climates__id=self.project.climate.id, moistures__id=self.project.moisture.id, is_active=True)
-        data = {
+        trees = models.LandUseType.objects.filter(module_types__class_name="PerennialCropland", climates=self.project.climate, moistures=self.project.moisture, is_active=True)
+        self.validated_data = {
             "land_use_type_start": trees.order_by("?").first().id,
             "land_use_type_w": trees.order_by("?").first().id,
             "land_use_type_wo": trees.order_by("?").first().id,
@@ -51,12 +34,14 @@ class PerennialCroplandTestCase(APITestCaseMixin):
             "is_biomass_burned_w": FuzzyChoice([True, False]).fuzz(),
             "is_biomass_burned_wo": FuzzyChoice([True, False]).fuzz(),
         }
-        return data
+
+        self.edit_module(self.module, self.user, self.validated_data)
+        self.module.refresh_from_db()
 
     def test_modify_perennial_cropland(self):
 
-        validated_data = self.get_valid_module_data()
-        print(validated_data)
+        validated_data = copy.deepcopy(self.validated_data)
+        validated_data["land_use_type_start"] = models.LandUseType.objects.order_by("?").first().id
         response = self.edit_module(self.module, self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -64,7 +49,7 @@ class PerennialCroplandTestCase(APITestCaseMixin):
 
     def test_patch_perennial_cropland_to_not_ready(self):
 
-        validated_data = self.get_valid_module_data()
+        validated_data = copy.deepcopy(self.validated_data)
         validated_data["land_use_type_start"] = None
         response = self.edit_module(self.module, self.user, validated_data)
 
@@ -90,7 +75,7 @@ class PerennialCroplandTestCase(APITestCaseMixin):
 
         force_authenticate(request, user=self.user)
         response = view(request, pk=self.module.pk)
+        print(response.data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        print(response.data)
         self.assertTrue(type(response.data) == dict)
