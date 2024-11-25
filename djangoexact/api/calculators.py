@@ -3228,12 +3228,13 @@ class AquacultureCalculator(BaseCalculator):
         module: Aquaculture = self.data
         project: Project = module.activity.project
 
-        try:
-            self.ELECTRICITY_USED_DEFAULT = AquacultureParameter.objects.get(name="electricity_used_default").value
-        except AquacultureParameter.DoesNotExist:
-            missing_scenarios = utils.find_empty_scenarios(module, "electricity_used_t2")
-            if missing_scenarios:
-                raise ValueError(f"Default electricity used does not exist. Please provide a tier 2 value for electricity used for scenarios: {', '.join(missing_scenarios)}")
+        # TODO: What EF should we use in Aquaculture electricity?
+        # try:
+        #     self.ELECTRICITY_USED_DEFAULT = AquacultureParameter.objects.get(name="electricity_used_default").value
+        # except AquacultureParameter.DoesNotExist:
+        #     missing_scenarios = utils.find_empty_scenarios(module, "electricity_used_t2")
+        #     if missing_scenarios:
+        #         raise ValueError(f"Default electricity used does not exist. Please provide a tier 2 value for electricity used for scenarios: {', '.join(missing_scenarios)}")
 
         try:
             self.NITROUS_EF_DEFAULT = AquacultureParameter.objects.get(name="nitrous_ef_default").value
