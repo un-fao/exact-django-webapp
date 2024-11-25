@@ -34,7 +34,7 @@ class ValueChainTestCase(APITestCaseMixin):
 
         project = models.Project.objects.get(id=project_response.data["id"])
 
-        activity = self.create_activity(project, self.user, module_types=[models.ModuleType.objects.get(class_name="ValueChain").pk])
+        activity = self.create_activity(project, self.user, module_types=[models.ModuleType.objects.get(class_name="ValueChain")])
         self.assertEqual(activity.status_code, status.HTTP_200_OK)
 
         value_chain = models.ValueChain.objects.get(activity=activity.data["id"])
