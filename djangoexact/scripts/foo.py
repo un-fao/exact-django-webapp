@@ -1,8 +1,11 @@
+import firebase_admin.auth
 import api.models as models
 import ipcc.models as ipcc_models
 from django.apps import apps
 import logging as log
 from django.db.models import Q
+from djangoexact.settings import auth
+import firebase_admin
 
 # TODO: Run in review and prod
 
@@ -73,6 +76,24 @@ def cycle_all_modules_and_invalidate_cached_results():
             log.error(f"Could not find module class for {module_type}")
 
 
+def create_test_user_for_peter():
+    """
+    Create a test user for Peter
+    """
+
+    user = models.CustomUser.objects.get(email="testuser@test.com")
+
+
+def activate_test_user_for_peter_on_firebase():
+    """
+    Activate test user for Peter on Firebase
+    """
+
+    # Find firebase user with email and activate
+    user = auth.sign_in_with_email_and_password("testuser@test.com", "testuser")
+    firebase_admin.auth.update_user(user["localId"], email_verified=True)
+
+
 # TODO: Run in prod
 
 # add_climate_tropical_montane_to_perennial_cropland()
@@ -81,3 +102,5 @@ def cycle_all_modules_and_invalidate_cached_results():
 # change_forest_bgb_tropical_mountain_system_to_tropical_montane()
 # change_forest_agb_growth_tropical_mountain_system_to_tropical_montane()
 # cycle_all_modules_and_invalidate_cached_results()
+# create_test_user_for_peter()
+# activate_test_user_for_peter_on_firebase()
