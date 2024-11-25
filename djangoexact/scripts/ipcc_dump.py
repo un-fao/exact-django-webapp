@@ -4507,7 +4507,7 @@ EnergyDefaultEmissionFactor.objects.bulk_create(l)
 
 # TODO: Run in develop
 
-CropYieldStats.objects.all().delete()
+CropYieldStat.objects.all().delete()
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "CropYieldStats.csv"),
     header=[0],
@@ -4530,7 +4530,7 @@ for i, row in df.iterrows():
 
     print(f"{land_use_type}, {continent}, {yr_2016}, {yr_2017}, {yr_2018}, {yr_2019}, {yr_2020}, {average}")
 
-    stat = CropYieldStats.objects.create(
+    stat = CropYieldStat.objects.create(
         land_use_type=land_use_type,
         continent=continent,
         year_2016=yr_2016,
