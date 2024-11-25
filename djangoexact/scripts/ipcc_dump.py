@@ -1774,38 +1774,6 @@ for i, row in df.iterrows():
         name__iexact=name,
         value=value,
     )
-CropYieldStats.objects.all().delete()
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "CropYieldStats.csv"),
-    header=[0],
-    sep=";",
-)
-
-for i, row in df.iterrows():
-    land_use_type = LandUseType.objects.get(name__iexact=sanitize(row["land_use_type"]))
-    continent = Region.objects.get(name__iexact=sanitize(row["continent"]))
-    yr_2016 = parse_csv_number(row["2016"])
-    yr_2017 = parse_csv_number(row["2017"])
-    yr_2018 = parse_csv_number(row["2018"])
-    yr_2019 = parse_csv_number(row["2019"])
-    yr_2020 = parse_csv_number(row["2020"])
-
-    average = (yr_2016 + yr_2017 + yr_2018 + yr_2019 + yr_2020) / 5 / 10000
-
-    print(
-        f"{land_use_type}, {continent}, {yr_2016}, {yr_2017}, {yr_2018}, {yr_2019}, {yr_2020}, {average}"
-    )
-
-    stat = CropYieldStats.objects.get(
-        land_use_type=land_use_type,
-        continent=continent,
-        year_2016=yr_2016,
-        year_2017=yr_2017,
-        year_2018=yr_2018,
-        year_2019=yr_2019,
-        year_2020=yr_2020,
-        average=average,
-    )
 
 df = pd.read_csv(
     os.path.join(os.path.dirname(__file__), "ipcc_data", "LivestockVSER.csv"),
@@ -4413,128 +4381,162 @@ EnergyDefaultEmissionFactor.objects.bulk_create(l)
 
 # TODO: Run in review
 
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainPackagingMaterialTypes.csv"),
-    header=0,
-    sep=",",
-)
+# df = pd.read_csv(
+#     os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainPackagingMaterialTypes.csv"),
+#     header=0,
+#     sep=",",
+# )
 
-for i, row in df.iterrows():
-    name = row["name"]
+# for i, row in df.iterrows():
+#     name = row["name"]
 
-    if PackagingMaterialType.objects.filter(name__iexact=name).exists():
-        print(f"PackagingType {name} already exists. Skipping...")
-        continue
+#     if PackagingMaterialType.objects.filter(name__iexact=name).exists():
+#         print(f"PackagingType {name} already exists. Skipping...")
+#         continue
 
-    print(name)
+#     print(name)
 
-    PackagingMaterialType.objects.create(name=name)
+#     PackagingMaterialType.objects.create(name=name)
 
-log.debug("Deleting all ValueChainPackagingEmissionFactor objects...")
-ValueChainPackagingEmissionFactor.objects.all().delete()
+# log.debug("Deleting all ValueChainPackagingEmissionFactor objects...")
+# ValueChainPackagingEmissionFactor.objects.all().delete()
 
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainPackagingEmissionFactors.csv"),
-    header=0,
-    sep=",",
-)
+# df = pd.read_csv(
+#     os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainPackagingEmissionFactors.csv"),
+#     header=0,
+#     sep=",",
+# )
 
-for i, row in df.iterrows():
-    packaging_type = PackagingMaterialType.objects.get(name__iexact=row["packaging_type"])
-    value = parse_csv_number(row["value"])
+# for i, row in df.iterrows():
+#     packaging_type = PackagingMaterialType.objects.get(name__iexact=row["packaging_type"])
+#     value = parse_csv_number(row["value"])
 
-    print(
-        packaging_type,
-        value,
-    )
+#     print(
+#         packaging_type,
+#         value,
+#     )
 
-    ValueChainPackagingEmissionFactor.objects.create(packaging_material_type=packaging_type, value=value)
+#     ValueChainPackagingEmissionFactor.objects.create(packaging_material_type=packaging_type, value=value)
 
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainRefrigerantTypes.csv"),
-    header=0,
-    sep=",",
-)
+# df = pd.read_csv(
+#     os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainRefrigerantTypes.csv"),
+#     header=0,
+#     sep=",",
+# )
 
-for i, row in df.iterrows():
-    name = row["name"]
+# for i, row in df.iterrows():
+#     name = row["name"]
 
-    if RefrigerantType.objects.filter(name__iexact=name).exists():
-        print(f"RefrigerantType {name} already exists. Skipping...")
-        continue
+#     if RefrigerantType.objects.filter(name__iexact=name).exists():
+#         print(f"RefrigerantType {name} already exists. Skipping...")
+#         continue
 
-    print(name)
+#     print(name)
 
-    RefrigerantType.objects.create(name=name)
+#     RefrigerantType.objects.create(name=name)
 
-log.debug("Deleting all ValueChainRefrigerantEmissionFactor objects...")
-ValueChainRefrigerantEmissionFactor.objects.all().delete()
+# log.debug("Deleting all ValueChainRefrigerantEmissionFactor objects...")
+# ValueChainRefrigerantEmissionFactor.objects.all().delete()
 
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainRefrigerantEmissionFactors.csv"),
-    header=0,
-    sep=",",
-)
+# df = pd.read_csv(
+#     os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainRefrigerantEmissionFactors.csv"),
+#     header=0,
+#     sep=",",
+# )
 
-for i, row in df.iterrows():
-    refrigerant_type = RefrigerantType.objects.get(name__iexact=row["refrigerant_type"])
-    sar = GlobalWarmingPotential.objects.get(name__icontains="SAR")
-    ar4 = GlobalWarmingPotential.objects.get(name__icontains="AR4")
-    ar5 = GlobalWarmingPotential.objects.get(name__icontains="AR5) with C")
-    ar5_wo = GlobalWarmingPotential.objects.get(name__icontains="AR5) without C")
-    ar6 = GlobalWarmingPotential.objects.get(name__icontains="AR6")
+# for i, row in df.iterrows():
+#     refrigerant_type = RefrigerantType.objects.get(name__iexact=row["refrigerant_type"])
+#     sar = GlobalWarmingPotential.objects.get(name__icontains="SAR")
+#     ar4 = GlobalWarmingPotential.objects.get(name__icontains="AR4")
+#     ar5 = GlobalWarmingPotential.objects.get(name__icontains="AR5) with C")
+#     ar5_wo = GlobalWarmingPotential.objects.get(name__icontains="AR5) without C")
+#     ar6 = GlobalWarmingPotential.objects.get(name__icontains="AR6")
 
-    sar_value = parse_csv_number(row["sar"])
-    ar4_value = parse_csv_number(row["ar4"])
-    ar5_value = parse_csv_number(row["ar5"])
-    ar6_value = parse_csv_number(row["ar6"])
+#     sar_value = parse_csv_number(row["sar"])
+#     ar4_value = parse_csv_number(row["ar4"])
+#     ar5_value = parse_csv_number(row["ar5"])
+#     ar6_value = parse_csv_number(row["ar6"])
 
-    print(
-        refrigerant_type,
-        sar_value,
-        ar4_value,
-        ar5_value,
-        ar6_value,
-    )
+#     print(
+#         refrigerant_type,
+#         sar_value,
+#         ar4_value,
+#         ar5_value,
+#         ar6_value,
+#     )
 
-    if sar_value:
-        ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=sar, value=sar_value)
-    if ar4_value:
-        ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=ar4, value=ar4_value)
-    if ar5_value:
-        ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=ar5, value=ar5_value)
-        ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=ar5_wo, value=ar5_value)
-    if ar6_value:
-        ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=ar6, value=ar6_value)
+#     if sar_value:
+#         ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=sar, value=sar_value)
+#     if ar4_value:
+#         ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=ar4, value=ar4_value)
+#     if ar5_value:
+#         ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=ar5, value=ar5_value)
+#         ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=ar5_wo, value=ar5_value)
+#     if ar6_value:
+#         ValueChainRefrigerantEmissionFactor.objects.create(refrigerant_type=refrigerant_type, gwp=ar6, value=ar6_value)
 
-log.debug("Deleting all ElectricityEmissions objects...")
-ElectricityEmission.objects.all().delete()
+# log.debug("Deleting all ElectricityEmissions objects...")
+# ElectricityEmission.objects.all().delete()
 
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "ElectricityEmissions.csv"),
-    header=0,
-    sep=";",
-)
+# df = pd.read_csv(
+#     os.path.join(os.path.dirname(__file__), "ipcc_data", "ElectricityEmissions.csv"),
+#     header=0,
+#     sep=";",
+# )
 
-df_headers = df.columns.values.tolist()
-rows = df.to_dict("records")
+# df_headers = df.columns.values.tolist()
+# rows = df.to_dict("records")
 
-for row in rows:
-    country = row["country"]
-    operating_margin = parse_csv_number(row["operating_margin"])
-    combined_margin = parse_csv_number(row["combined_margin"])
+# for row in rows:
+#     country = row["country"]
+#     operating_margin = parse_csv_number(row["operating_margin"])
+#     combined_margin = parse_csv_number(row["combined_margin"])
 
-    print(country, operating_margin, combined_margin)
-    try:
-        country = Country.objects.get(name__iexact=country)
-    except Country.DoesNotExist:
-        country = Country.objects.create(name=country, region=Region.objects.get(name=row["region"]))
+#     print(country, operating_margin, combined_margin)
+#     try:
+#         country = Country.objects.get(name__iexact=country)
+#     except Country.DoesNotExist:
+#         country = Country.objects.create(name=country, region=Region.objects.get(name=row["region"]))
 
-    ElectricityEmission.objects.create(
-        country=country,
-        operating_margin=operating_margin,
-        combined_margin=combined_margin,
-    )
+#     ElectricityEmission.objects.create(
+#         country=country,
+#         operating_margin=operating_margin,
+#         combined_margin=combined_margin,
+#     )
 
 
 # TODO: Run in develop
+
+CropYieldStat.objects.all().delete()
+df = pd.read_csv(
+    os.path.join(os.path.dirname(__file__), "ipcc_data", "CropYieldStats.csv"),
+    header=[0],
+    sep=";",
+)
+
+for i, row in df.iterrows():
+    print(row)
+    land_use_type = LandUseType.objects.get(name__iexact=row["land_use_type"])
+    continent = Region.objects.get(name__iexact=sanitize(row["continent"]))
+    yr_2016 = parse_csv_number(row["2016"])
+    yr_2017 = parse_csv_number(row["2017"])
+    yr_2018 = parse_csv_number(row["2018"])
+    yr_2019 = parse_csv_number(row["2019"])
+    yr_2020 = parse_csv_number(row["2020"])
+
+    actual_years = [yr for yr in [yr_2016, yr_2017, yr_2018, yr_2019, yr_2020] if yr is not None]
+    print(actual_years)
+    average = sum(actual_years) / len(actual_years) / 10000
+
+    print(f"{land_use_type}, {continent}, {yr_2016}, {yr_2017}, {yr_2018}, {yr_2019}, {yr_2020}, {average}")
+
+    stat = CropYieldStat.objects.create(
+        land_use_type=land_use_type,
+        continent=continent,
+        year_2016=yr_2016,
+        year_2017=yr_2017,
+        year_2018=yr_2018,
+        year_2019=yr_2019,
+        year_2020=yr_2020,
+        average=average,
+    )
