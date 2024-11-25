@@ -188,10 +188,10 @@ class Result:
 
     def breakdown_by_activity(self):
 
-        aggregated_emissions = {activity.value: YearlyActivityEmissionSet(0, [Emission(gas_type=None) for i in range(self.time_tot)], activity.value) for activity in [i.activity for i in self.yearly_emissions_by_sector_by_gas]}
+        aggregated_emissions = {activity: YearlyActivityEmissionSet(0, [Emission(gas_type=None) for i in range(self.time_tot)], activity) for activity in [i.activity for i in self.yearly_emissions_by_sector_by_gas]}
 
         for yearly_emission in self.yearly_emissions_by_sector_by_gas:
-            aggregated_emissions[yearly_emission.activity.value].emissions = [x + y for x, y in zip(aggregated_emissions[yearly_emission.activity.value].emissions, yearly_emission.emissions)]
+            aggregated_emissions[yearly_emission.activity].emissions = [x + y for x, y in zip(aggregated_emissions[yearly_emission.activity].emissions, yearly_emission.emissions)]
 
         return aggregated_emissions.values()
 
