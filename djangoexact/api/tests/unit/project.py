@@ -11,7 +11,7 @@ import logging as log
 from api.tests.unit.utils import APITestCaseMixin
 
 
-class ProjectLockTestCase(APITestCaseMixin):
+class ProjectTestCase(APITestCaseMixin):
     def test_create_project(self):
         """
         Test the creation of a project using the ProjectViewSet.
@@ -24,6 +24,7 @@ class ProjectLockTestCase(APITestCaseMixin):
         """
         response = self.create_project()
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue("project_membership" in response.data and type(response.data["project_membership"]) == int)
 
     def test_modify_project_as_not_lock_holder(self):
         """
