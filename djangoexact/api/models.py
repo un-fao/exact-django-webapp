@@ -909,6 +909,8 @@ class CachedResultMixin(models.Model, DirtyFieldsMixin):
     last_modified = models.DateTimeField(auto_now=False, null=True, blank=True, verbose_name=_("last_modified"))
 
     def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
         if self.last_modified is None:
             self.last_modified = timezone.now()
 
@@ -923,7 +925,7 @@ class CachedResultMixin(models.Model, DirtyFieldsMixin):
             parent: Module = self.parent
             parent.invalidate_cached_results()
 
-        super().save(*args, **kwargs)
+        return self
 
     def cache_results(self, balance: dict, by_activity: dict, by_gas: dict, by_activity_by_gas: dict):
         self.last_cached_at = timezone.now()
@@ -998,6 +1000,8 @@ class Submodule(Historical, CachedResultMixin):
         return self.__get_threads()
 
     def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
         if not self.parent:
             raise exceptions.ValidationError("Submodule must have a parent field specified in the model")
 
@@ -1007,7 +1011,7 @@ class Submodule(Historical, CachedResultMixin):
         if not self.pk:
             utils.create_comment_threads(self)
 
-        super().save(*args, **kwargs)
+        return self
 
     def is_ready(self) -> bool:
         return self.status and self.status.name_en == "READY"
@@ -1089,13 +1093,15 @@ class Module(Historical, CachedResultMixin):
         return self.status and self.status.name_en == "READY"
 
     def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
         if not self.status:
             self.status = StatusType.objects.get(name_en="EMPTY")
 
         if not self.pk:
             utils.create_comment_threads(self)
 
-        super().save(*args, **kwargs)
+        return self
 
     def is_luc_remaining_same(self) -> bool:
         """
