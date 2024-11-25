@@ -974,17 +974,17 @@ class SmallFisheryFUI(Model):
         return f"{self.fishery_type} - {self.gear_type} FUI: {self.value}"
 
 
-class CropYieldStatsManager(Manager):
+class CropYieldStatManager(Manager):
     def get_or_region_average(self, land_use_type, continent):
         try:
-            return CropYieldStats.objects.get(land_use_type=land_use_type, continent=continent)
-        except CropYieldStats.DoesNotExist:
-            _all = CropYieldStats.objects.filter(Q(average__gt=0), continent=continent).values_list("average", flat=True)
+            return CropYieldStat.objects.get(land_use_type=land_use_type, continent=continent)
+        except CropYieldStat.DoesNotExist:
+            _all = CropYieldStat.objects.filter(Q(average__gt=0), continent=continent).values_list("average", flat=True)
             _average = sum(_all) / _all.count()
             return SimpleNamespace(average=_average)
 
 
-class CropYieldStats(Model):
+class CropYieldStat(Model):
     """
     Stats_yield_ton_per_ha:A1
     """
@@ -1002,26 +1002,12 @@ class CropYieldStats(Model):
     year_2020 = FloatField(null=True, blank=True)
     average = FloatField()
 
-    objects = CropYieldStatsManager()
+    objects = CropYieldStatManager()
 
-    def save(self, *args, **kwargs):
-        self.average = (
-            sum(
-                [
-                    x
-                    for x in [
-                        self.year_2016,
-                        self.year_2017,
-                        self.year_2018,
-                        self.year_2019,
-                        self.year_2020,
-                    ]
-                ]
-            )
-            / 5
-            / 10000
-        )
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     not_none_years = [x for x in [self.year_2016, self.year_2017, self.year_2018, self.year_2019, self.year_2020] if x]
+    #     self.average = sum(not_none_years) / len(not_none_years) / 10000
+    #     super().save(*args, **kwargs)
 
     def __str__(self):
         return f"({self.pk}) - {self.land_use_type.name} - {self.continent} - {self.average}"

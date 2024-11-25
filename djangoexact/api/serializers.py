@@ -172,7 +172,6 @@ def get_model_serializer(model_arg):
             ref_name = model_arg.__name__
 
         def __init__(self, *args, **kwargs):
-            log.debug(f"START GenericSerializer[{model_arg.__name__}].init")
             super().__init__(*args, **kwargs)
 
     try:
@@ -320,7 +319,8 @@ class ProjectSummarySerializer(serializers.ModelSerializer):
 
 
 class ProjectResultSerializer(serializers.Serializer):
-    activities = serializers.ListField(child=ResultSerializer())
+    # activities = serializers.ListField(child=ResultSerializer())
+    pass
 
 
 class ReadProjectSerializer(serializers.ModelSerializer):
@@ -710,10 +710,8 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
             module_instance.save()
 
-            try:
-                update_change_reason(module_instance, "update")
-            except AttributeError:
-                pass
+            if module_instance.history.exists():
+                utils.update_change_reason(module_instance, "update")
 
     def unique_activity_name(self):
         base_name = self.validated_data["name"]
@@ -2406,6 +2404,7 @@ class ForestManagementWriteSerializer(LandModuleSeralizer):
             "start": {
                 "mandatory": [
                     "land_use_type_start",
+                    "forest_condition_type",
                     "forest_type",
                 ],
                 "conditional": {
@@ -2421,6 +2420,7 @@ class ForestManagementWriteSerializer(LandModuleSeralizer):
             "with": {
                 "mandatory": [
                     "land_use_type_start",
+                    "forest_condition_type",
                     "forest_type",
                 ],
                 "conditional": {
@@ -2436,6 +2436,7 @@ class ForestManagementWriteSerializer(LandModuleSeralizer):
             "without": {
                 "mandatory": [
                     "land_use_type_start",
+                    "forest_condition_type",
                     "forest_type",
                 ],
                 "conditional": {
