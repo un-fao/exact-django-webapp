@@ -38,7 +38,7 @@ class PerennialCroplandTestCase(base_module.BaseModuleTestCase):
         self.edit_module(self.module, self.user, self.validated_data)
         self.module.refresh_from_db()
 
-    def test_modify_perennial_cropland(self):
+    def test_modify(self):
 
         validated_data = copy.deepcopy(self.validated_data)
         validated_data["land_use_type_start"] = models.LandUseType.objects.order_by("?").first().id
@@ -47,7 +47,7 @@ class PerennialCroplandTestCase(base_module.BaseModuleTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["status"]["name"], "READY")
 
-    def test_patch_perennial_cropland_to_not_ready(self):
+    def test_patch_to_not_ready(self):
 
         validated_data = copy.deepcopy(self.validated_data)
         validated_data["land_use_type_start"] = None
@@ -56,7 +56,7 @@ class PerennialCroplandTestCase(base_module.BaseModuleTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["status"]["name"], "EMPTY")
 
-    def test_calculate_perennial_cropland_results(self):
+    def test_calculate_results(self):
 
         view = self.module_viewset.as_view({"get": "results"})
         request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
@@ -68,7 +68,7 @@ class PerennialCroplandTestCase(base_module.BaseModuleTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue("balance" in response.data)
 
-    def test_get_perennial_cropland_defaults(self):
+    def test_get_defaults(self):
 
         view = self.module_viewset.as_view({"get": "defaults"})
         request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-defaults", args=[self.module.pk]), format="json")
