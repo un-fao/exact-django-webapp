@@ -319,7 +319,8 @@ class ProjectSummarySerializer(serializers.ModelSerializer):
 
 
 class ProjectResultSerializer(serializers.Serializer):
-    activities = serializers.ListField(child=ResultSerializer())
+    # activities = serializers.ListField(child=ResultSerializer())
+    pass
 
 
 class ReadProjectSerializer(serializers.ModelSerializer):
@@ -709,10 +710,8 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
             module_instance.save()
 
-            try:
-                update_change_reason(module_instance, "update")
-            except AttributeError:
-                pass
+            if module_instance.history.exists():
+                utils.update_change_reason(module_instance, "update")
 
     def unique_activity_name(self):
         base_name = self.validated_data["name"]
