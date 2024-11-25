@@ -37,3 +37,5 @@ class BaseModuleTestCase(APITestCaseMixin):
         self.module: models.Module = apps.get_model("api", self.module_type.class_name).objects.get(activity=self.activity)
 
         self.module_viewset = generic_module_viewset(self.ModuleClass)
+
+        self.land_use_types = models.LandUseType.objects.all()
