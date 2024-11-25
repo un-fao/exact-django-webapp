@@ -19,11 +19,11 @@ class AnnualCroplandTestCase(base_module.BaseModuleTestCase):
         self.ModuleClass = models.AnnualCropland
         super().setUp()
 
-        self.trees = models.LandUseType.objects.filter(module_types__class_name="AnnualCropland", climates=self.project.climate, moistures=self.project.moisture, is_active=True)
+        self.land_use_types = self.land_use_types.filter(module_types__class_name=self.ModuleClass.__name__, climates=self.project.climate, moistures=self.project.moisture, is_active=True)
         self.validated_data = {
-            "land_use_type_start": self.trees.order_by("?").first().id,
-            "land_use_type_w": self.trees.order_by("?").first().id,
-            "land_use_type_wo": self.trees.order_by("?").first().id,
+            "land_use_type_start": self.land_use_types.order_by("?").first().id,
+            "land_use_type_w": self.land_use_types.order_by("?").first().id,
+            "land_use_type_wo": self.land_use_types.order_by("?").first().id,
             "tillage_management_type_start": models.TillageManagementType.objects.order_by("?").first().id,
             "tillage_management_type_w": models.TillageManagementType.objects.order_by("?").first().id,
             "tillage_management_type_wo": models.TillageManagementType.objects.order_by("?").first().id,
@@ -61,9 +61,9 @@ class AnnualCroplandTestCase(base_module.BaseModuleTestCase):
         validated_data = copy.deepcopy(self.validated_data)
         validated_data.update(
             {
-                "minor_land_use_type_start": self.trees.order_by("?").first().id,
-                "minor_land_use_type_w": self.trees.order_by("?").first().id,
-                "minor_land_use_type_wo": self.trees.order_by("?").first().id,
+                "minor_land_use_type_start": self.land_use_types.order_by("?").first().id,
+                "minor_land_use_type_w": self.land_use_types.order_by("?").first().id,
+                "minor_land_use_type_wo": self.land_use_types.order_by("?").first().id,
                 "minor_residue_management_type_start": models.ResidueManagementType.objects.order_by("?").first().id,
                 "minor_residue_management_type_w": models.ResidueManagementType.objects.order_by("?").first().id,
                 "minor_residue_management_type_wo": models.ResidueManagementType.objects.order_by("?").first().id,
@@ -75,7 +75,7 @@ class AnnualCroplandTestCase(base_module.BaseModuleTestCase):
         self.assertEqual(response.data["status"]["name"], "READY")
 
         view = self.module_viewset.as_view({"get": "results"})
-        request = self.request_factory.get(reverse("annualcropland-results", args=[self.module.pk]), format="json")
+        request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
 
         force_authenticate(request, user=self.user)
         response = view(request, pk=self.module.pk)
@@ -87,7 +87,7 @@ class AnnualCroplandTestCase(base_module.BaseModuleTestCase):
     def test_calculate_annual_cropland_results(self):
 
         view = self.module_viewset.as_view({"get": "results"})
-        request = self.request_factory.get(reverse("annualcropland-results", args=[self.module.pk]), format="json")
+        request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
 
         force_authenticate(request, user=self.user)
         response = view(request, pk=self.module.pk)
@@ -99,7 +99,7 @@ class AnnualCroplandTestCase(base_module.BaseModuleTestCase):
     def test_get_annual_cropland_defaults(self):
 
         view = self.module_viewset.as_view({"get": "defaults"})
-        request = self.request_factory.get(reverse("annualcropland-defaults", args=[self.module.pk]), format="json")
+        request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-defaults", args=[self.module.pk]), format="json")
 
         force_authenticate(request, user=self.user)
         response = view(request, pk=self.module.pk)
