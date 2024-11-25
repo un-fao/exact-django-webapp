@@ -14,49 +14,47 @@ import copy
 from . import base_module
 
 
-class PerennialCroplandTestCase(base_module.BaseModuleTestCase):
+class FloodedRiceTestCase(base_module.BaseModuleTestCase):
     def setUp(self):
-        self.ModuleClass = models.PerennialCropland
+        self.ModuleClass = models.FloodedRice
         super().setUp()
 
-        trees = models.LandUseType.objects.filter(module_types__class_name="PerennialCropland", climates=self.project.climate, moistures=self.project.moisture, is_active=True)
+        self.land_use_types = self.land_use_types.filter(module_types__class_name=self.ModuleClass.__name__, climates=self.project.climate, moistures=self.project.moisture, is_active=True)
+
         self.validated_data = {
-            "land_use_type_start": trees.order_by("?").first().id,
-            "land_use_type_w": trees.order_by("?").first().id,
-            "land_use_type_wo": trees.order_by("?").first().id,
-            "tillage_management_type_start": models.TillageManagementType.objects.order_by("?").first().id,
-            "tillage_management_type_w": models.TillageManagementType.objects.order_by("?").first().id,
-            "tillage_management_type_wo": models.TillageManagementType.objects.order_by("?").first().id,
-            "organic_input_type_start": models.OrganicInputType.objects.order_by("?").first().id,
-            "organic_input_type_w": models.OrganicInputType.objects.order_by("?").first().id,
-            "organic_input_type_wo": models.OrganicInputType.objects.order_by("?").first().id,
-            "is_biomass_burned_start": FuzzyChoice([True, False]).fuzz(),
-            "is_biomass_burned_w": FuzzyChoice([True, False]).fuzz(),
-            "is_biomass_burned_wo": FuzzyChoice([True, False]).fuzz(),
+            "water_management_type_before_cultivation_start": models.WaterManagementTypeBeforeCultivation.objects.order_by("?").first().id,
+            "water_management_type_before_cultivation_w": models.WaterManagementTypeBeforeCultivation.objects.order_by("?").first().id,
+            "water_management_type_before_cultivation_wo": models.WaterManagementTypeBeforeCultivation.objects.order_by("?").first().id,
+            "water_management_type_after_cultivation_start": models.WaterManagementTypeAfterCultivation.objects.order_by("?").first().id,
+            "water_management_type_after_cultivation_w": models.WaterManagementTypeAfterCultivation.objects.order_by("?").first().id,
+            "water_management_type_after_cultivation_wo": models.WaterManagementTypeAfterCultivation.objects.order_by("?").first().id,
+            "organic_amendment_type_start": models.OrganicAmendmentType.objects.order_by("?").first().id,
+            "organic_amendment_type_w": models.OrganicAmendmentType.objects.order_by("?").first().id,
+            "organic_amendment_type_wo": models.OrganicAmendmentType.objects.order_by("?").first().id,
         }
 
         self.edit_module(self.module, self.user, self.validated_data)
         self.module.refresh_from_db()
 
-    def test_modify_perennial_cropland(self):
+    def test_modify_annual_cropland(self):
 
         validated_data = copy.deepcopy(self.validated_data)
-        validated_data["land_use_type_start"] = models.LandUseType.objects.order_by("?").first().id
+        validated_data["water_management_type_before_cultivation_start"] = models.WaterManagementTypeBeforeCultivation.objects.order_by("?").first().id
         response = self.edit_module(self.module, self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["status"]["name"], "READY")
 
-    def test_patch_perennial_cropland_to_not_ready(self):
+    def test_patch_annual_cropland_to_not_ready(self):
 
         validated_data = copy.deepcopy(self.validated_data)
-        validated_data["land_use_type_start"] = None
+        validated_data["water_management_type_before_cultivation_start"] = None
         response = self.edit_module(self.module, self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["status"]["name"], "EMPTY")
 
-    def test_calculate_perennial_cropland_results(self):
+    def test_calculate_annual_cropland_results(self):
 
         view = self.module_viewset.as_view({"get": "results"})
         request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
@@ -68,7 +66,7 @@ class PerennialCroplandTestCase(base_module.BaseModuleTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue("balance" in response.data)
 
-    def test_get_perennial_cropland_defaults(self):
+    def test_get_annual_cropland_defaults(self):
 
         view = self.module_viewset.as_view({"get": "defaults"})
         request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-defaults", args=[self.module.pk]), format="json")
