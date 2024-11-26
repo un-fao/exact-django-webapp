@@ -1364,21 +1364,6 @@ class ForestDisturbanceDefaults(Defaults):
         )
 
 
-class ValueChainDefaults(Defaults):
-    def __init__(self, input: calcs.Module):
-        super().__init__(input)
-
-        self.values = SimpleNamespace()
-
-    def get_defaults(self, calculate=False) -> dict:
-        self.input: api.ValueChain
-
-        defaults = calcs.ValueChainCalculator(self.input)
-        defaults.get_defaults(calculate=calculate)
-
-        return SimpleNamespace()
-
-
 class StorageDefaults(Defaults):
     def __init__(self, input: calcs.Module):
         super().__init__(input)
