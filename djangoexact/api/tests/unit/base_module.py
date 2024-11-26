@@ -38,4 +38,4 @@ class BaseModuleTestCase(APITestCaseMixin):
 
         self.module_viewset = generic_module_viewset(self.ModuleClass)
 
-        self.land_use_types = models.LandUseType.objects.all()
+        self.land_use_types = models.LandUseType.objects.filter(module_types__class_name=self.ModuleClass.__name__, climates=self.project.climate, moistures=self.project.moisture, is_active=True)

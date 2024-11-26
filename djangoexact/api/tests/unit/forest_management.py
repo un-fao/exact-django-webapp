@@ -25,6 +25,19 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
             "land_use_type_start": self.land_use_types.order_by("?").first().id,
             "forest_type": models.ForestType.objects.order_by("?").first().id,
             "forest_condition_type": models.ForestConditionType.objects.order_by("?").first().id,
+            # NOTE: Added to avoid validation errors due to missing IPCC data for some forest types
+            "agb_growth_rate_le_20_yrs_t2_start": FuzzyFloat(0, 1).fuzz(),
+            "agb_growth_rate_le_20_yrs_t2_w": FuzzyFloat(0, 1).fuzz(),
+            "agb_growth_rate_le_20_yrs_t2_wo": FuzzyFloat(0, 1).fuzz(),
+            "agb_growth_rate_gt_20_yrs_t2_start": FuzzyFloat(0, 1).fuzz(),
+            "agb_growth_rate_gt_20_yrs_t2_w": FuzzyFloat(0, 1).fuzz(),
+            "agb_growth_rate_gt_20_yrs_t2_wo": FuzzyFloat(0, 1).fuzz(),
+            "bgb_growth_rate_le_20_yrs_t2_start": FuzzyFloat(0, 1).fuzz(),
+            "bgb_growth_rate_le_20_yrs_t2_w": FuzzyFloat(0, 1).fuzz(),
+            "bgb_growth_rate_le_20_yrs_t2_wo": FuzzyFloat(0, 1).fuzz(),
+            "bgb_growth_rate_gt_20_yrs_t2_start": FuzzyFloat(0, 1).fuzz(),
+            "bgb_growth_rate_gt_20_yrs_t2_w": FuzzyFloat(0, 1).fuzz(),
+            "bgb_growth_rate_gt_20_yrs_t2_wo": FuzzyFloat(0, 1).fuzz(),
         }
 
         self.edit_module(self.module, self.user, self.validated_data)
@@ -38,6 +51,43 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["status"]["name"], "READY")
+
+    def test_modify_and_check_cache_invalidation(self):
+        self.test_modify()
+
+        # Check that the cache is invalidated
+        view = self.module_viewset.as_view({"get": "results"})
+        request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
+
+        force_authenticate(request, user=self.user)
+        response = view(request, pk=self.module.pk)
+        print(response.data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue("balance" in response.data)
+
+        old_balance = response.data["balance"]
+
+        validated_data = copy.deepcopy(self.validated_data)
+        validated_data["average_yearly_degradation_percentage_w"] = 0.2
+        response = self.edit_module(self.module, self.user, validated_data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["status"]["name"], "READY")
+
+        # Check that the cache is invalidated
+        view = self.module_viewset.as_view({"get": "results"})
+        request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
+
+        force_authenticate(request, user=self.user)
+        response = view(request, pk=self.module.pk)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue("balance" in response.data)
+
+        new_balance = response.data["balance"]
+
+        self.assertNotEqual(old_balance, new_balance)
 
     def test_patch_to_not_ready(self):
 

@@ -45,6 +45,43 @@ class FloodedRiceTestCase(base_module.BaseModuleTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["status"]["name"], "READY")
 
+    def test_modify_and_check_cache_invalidation(self):
+        self.test_modify()
+
+        # Check that the cache is invalidated
+        view = self.module_viewset.as_view({"get": "results"})
+        request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
+
+        force_authenticate(request, user=self.user)
+        response = view(request, pk=self.module.pk)
+        print(response.data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue("balance" in response.data)
+
+        old_balance = response.data["balance"]
+
+        validated_data = copy.deepcopy(self.validated_data)
+        validated_data["water_management_type_before_cultivation_w"] = models.WaterManagementTypeBeforeCultivation.objects.order_by("?").first().id
+        response = self.edit_module(self.module, self.user, validated_data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["status"]["name"], "READY")
+
+        # Check that the cache is invalidated
+        view = self.module_viewset.as_view({"get": "results"})
+        request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
+
+        force_authenticate(request, user=self.user)
+        response = view(request, pk=self.module.pk)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue("balance" in response.data)
+
+        new_balance = response.data["balance"]
+
+        self.assertNotEqual(old_balance, new_balance)
+
     def test_patch__to_not_ready(self):
 
         validated_data = copy.deepcopy(self.validated_data)
