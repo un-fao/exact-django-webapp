@@ -81,7 +81,10 @@ from .models import (
     Waterbody,
     LandModule,
     InvitationStatusType,
-    ValueChain,
+    ChangeRate,
+    Note,
+    FieldDefinition,
+    ProjectTag,
     Storage,
     Processing,
     Packaging,
@@ -3021,19 +3024,7 @@ class FieldDefinitionResponseSerializer(serializers.Serializer):
     field_name = FieldMetadataSerializer(many=True)
 
 
-class ValueChainSubmoduleMixin(ScenarioSubmoduleSerializer):
-    def save(self, **kwargs):
-        super().save(**kwargs)
-
-        parent: ValueChain = utils.getany([self.instance, dict(kwargs)], "parent")
-        parent_serializer = ValueChainSerializer(data={}, instance=parent, partial=True, context=self.context)
-        parent_serializer.is_valid()
-        parent_serializer.save()
-
-        return self.instance
-
-
-class StorageSerializer(ValueChainSubmoduleMixin):
+class StorageSerializer(ScenarioModuleSerializer):
     class Meta:
         model = Storage
         fields = "__all__"
@@ -3045,7 +3036,7 @@ class StorageSerializer(ValueChainSubmoduleMixin):
                 ],
                 "conditional": {
                     "is_refrigerant_used": [
-                        "regrigerant_type_start",
+                        "refrigerant_type_start",
                         "total_refrigerant_leakage_start",
                     ]
                 },
@@ -3056,7 +3047,7 @@ class StorageSerializer(ValueChainSubmoduleMixin):
                 ],
                 "conditional": {
                     "is_refrigerant_used": [
-                        "regrigerant_type_w",
+                        "refrigerant_type_w",
                         "total_refrigerant_leakage_w",
                     ]
                 },
@@ -3067,7 +3058,7 @@ class StorageSerializer(ValueChainSubmoduleMixin):
                 ],
                 "conditional": {
                     "is_refrigerant_used": [
-                        "regrigerant_type_wo",
+                        "refrigerant_type_wo",
                         "total_refrigerant_leakage_wo",
                     ]
                 },
@@ -3088,7 +3079,7 @@ class StorageReadSerializer(BaseGenericModuleSerializer):
         mandatory_fields = {}
 
 
-class ProcessingSerializer(ValueChainSubmoduleMixin):
+class ProcessingSerializer(ScenarioModuleSerializer):
     class Meta:
         model = Processing
         fields = "__all__"
@@ -3143,7 +3134,7 @@ class ProcessingReadSerializer(BaseGenericModuleSerializer):
         mandatory_fields = {}
 
 
-class PackagingSerializer(ValueChainSubmoduleMixin):
+class PackagingSerializer(ScenarioModuleSerializer):
     class Meta:
         model = Packaging
         fields = "__all__"
@@ -3194,7 +3185,7 @@ class PackagingReadSerializer(BaseGenericModuleSerializer):
         mandatory_fields = {}
 
 
-class TransportSerializer(ValueChainSubmoduleMixin):
+class TransportSerializer(ScenarioModuleSerializer):
     class Meta:
         model = Transport
         fields = "__all__"
@@ -3224,16 +3215,6 @@ class TransportSerializer(ValueChainSubmoduleMixin):
 class TransportWriteSerializer(TransportSerializer):
     pass
 
-    def validate(self, data):
-        super().validate(data)
-
-        parent: ValueChain = utils.getany([self.instance, dict(data)], "parent")
-        parent_serializer = ValueChainSerializer(data={}, instance=parent, partial=True, context=self.context)
-        if parent_serializer.is_valid():
-            parent_serializer.save()
-
-        return data
-
 
 class TransportReadSerializer(BaseGenericModuleSerializer):
 
@@ -3241,44 +3222,4 @@ class TransportReadSerializer(BaseGenericModuleSerializer):
         model = Transport
         fields = "__all__"
         ref_name = "Transport"
-        mandatory_fields = {}
-
-
-class ValueChainSerializer(ScenarioModuleSerializer):
-
-    class Meta:
-        model = ValueChain
-        fields = "__all__"
-        ref_name = "ValueChain"
-        mandatory_fields = {}
-
-    def validate(self, data):
-        super().validate(data)
-
-        if not self.instance:
-            return data
-
-        storages = self.instance.storages.all()
-        processings = self.instance.processings.all()
-        packagings = self.instance.packagings.all()
-        transports = self.instance.transports.all()
-
-        all_submodules = list(storages) + list(processings) + list(packagings) + list(transports)
-
-        if any([not submodule.is_ready() for submodule in all_submodules]):
-            data["status"] = StatusType.objects.get(name="SUBMODULES_EMPTY")
-
-        return data
-
-
-class ValueChainWriteSerializer(ValueChainSerializer):
-    pass
-
-
-class ValueChainReadSerializer(BaseGenericModuleSerializer):
-
-    class Meta:
-        model = ValueChain
-        fields = "__all__"
-        ref_name = "ValueChain"
         mandatory_fields = {}

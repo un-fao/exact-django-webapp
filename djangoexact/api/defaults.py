@@ -1331,19 +1331,37 @@ class ForestManagementDefaults(Defaults):
         )
 
 
-class ValueChainDefaults(Defaults):
+class ForestDisturbanceDefaults(Defaults):
+
+    start_year_t2_start_default = 0
+    start_year_t2_w_default = 0
+    start_year_t2_wo_default = 0
+
     def __init__(self, input: calcs.Module):
         super().__init__(input)
 
-        self.values = SimpleNamespace()
+        self.start_year_t2_start_default = 0
+        self.start_year_t2_w_default = 0
+        self.start_year_t2_wo_default = 0
+
+        self.values = SimpleNamespace(
+            start_year_t2_start_default=0,
+            start_year_t2_w_default=0,
+            start_year_t2_wo_default=0,
+        )
 
     def get_defaults(self, calculate=False) -> dict:
-        self.input: api.ValueChain
+        self.input: api.ForestDisturbance
 
-        defaults = calcs.ValueChainCalculator(self.input)
-        defaults.get_defaults(calculate=calculate)
+        self.start_year_t2_start_default = self.input.start_year_t2_start
+        self.start_year_t2_w_default = self.input.start_year_t2_w
+        self.start_year_t2_wo_default = self.input.start_year_t2_wo
 
-        return SimpleNamespace()
+        return SimpleNamespace(
+            start_year_t2_start_default=self.start_year_t2_start_default,
+            start_year_t2_w_default=self.start_year_t2_w_default,
+            start_year_t2_wo_default=self.start_year_t2_wo_default,
+        )
 
 
 class StorageDefaults(Defaults):

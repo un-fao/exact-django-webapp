@@ -648,14 +648,6 @@ class RoadFactory(DjangoModelFactory):
     width_m_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
 
-class ValueChainFactory(DjangoModelFactory):
-
-    class Meta:
-        model = ValueChain
-
-    status = READY
-
-
 class ValueChainPackagingFactory(DjangoModelFactory):
 
     class Meta:

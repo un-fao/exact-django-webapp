@@ -166,7 +166,6 @@ router.register(r"users", views.UserViewSet, basename="users")
 router.register(r"definitions", views.FieldDefinitionViewSet, basename="definitions")
 
 # Value Chains
-router.register(r"value-chains", views.generic_module_viewset(models.ValueChain), basename="valuechain")
 router.register(r"storages", views.generic_module_viewset(models.Storage), basename="storage")
 router.register(r"processings", views.generic_module_viewset(models.Processing), basename="processing")
 router.register(r"packagings", views.generic_module_viewset(models.Packaging), basename="packaging")
