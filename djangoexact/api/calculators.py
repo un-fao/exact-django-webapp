@@ -126,7 +126,6 @@ from .models import (
     SingleBiomassModule,
     ChangeRate,
     AboveBelowGroundBiomassModule,
-    ValueChain,
     Transport,
     Packaging,
     Storage,
@@ -6512,31 +6511,40 @@ class StorageCalculator(BaseValueChainCalculator):
         self.electricity_ef_selected.value = self.electricity_ef_default.operating_margin
 
         if self.module.is_start():
-            try:
-                self.refrigerant_ef_start = ipcc.ValueChainRefrigerantEmissionFactor.objects.get(refrigerant_type=self.module.refrigerant_type_start, gwp=self.project.gwp)
-            except ipcc.ValueChainRefrigerantEmissionFactor.DoesNotExist:
-                if self.module.emission_factor_t2_start is None:
-                    log.error(f"Refrigerant emission factor for {self.module.refrigerant_type_start} not found. Plase select tier2 value for start scenario.")
-                    raise ValueError(f"Refrigerant emission factor for {self.module.refrigerant_type_start} not found. Plase select tier2 value for start scenario.")
-                self.refrigerant_ef_start.value = self.module.emission_factor_t2_start
+            if self.module.is_refrigerant_used:
+                try:
+                    self.refrigerant_ef_start = ipcc.ValueChainRefrigerantEmissionFactor.objects.get(refrigerant_type=self.module.refrigerant_type_start, gwp=self.project.gwp)
+                except ipcc.ValueChainRefrigerantEmissionFactor.DoesNotExist:
+                    if self.module.emission_factor_t2_start is None:
+                        log.error(f"Refrigerant emission factor for {self.module.refrigerant_type_start} not found. Plase select tier2 value for start scenario.")
+                        raise ValueError(f"Refrigerant emission factor for {self.module.refrigerant_type_start} not found. Plase select tier2 value for start scenario.")
+                    self.refrigerant_ef_start.value = self.module.emission_factor_t2_start
+            else:
+                self.refrigerant_ef_start.value = 0
 
         if self.module.is_with():
-            try:
-                self.refrigerant_ef_w = ipcc.ValueChainRefrigerantEmissionFactor.objects.get(refrigerant_type=self.module.refrigerant_type_w, gwp=self.project.gwp)
-            except ipcc.ValueChainRefrigerantEmissionFactor.DoesNotExist:
-                if self.module.emission_factor_t2_w is None:
-                    log.error(f"Refrigerant emission factor for {self.module.refrigerant_type_w} not found. Plase select tier2 value for with scenario.")
-                    raise ValueError(f"Refrigerant emission factor for {self.module.refrigerant_type_w} not found. Plase select tier2 value for with scenario.")
-                self.refrigerant_ef_w.value = self.module.emission_factor_t2_w
+            if self.module.is_refrigerant_used:
+                try:
+                    self.refrigerant_ef_w = ipcc.ValueChainRefrigerantEmissionFactor.objects.get(refrigerant_type=self.module.refrigerant_type_w, gwp=self.project.gwp)
+                except ipcc.ValueChainRefrigerantEmissionFactor.DoesNotExist:
+                    if self.module.emission_factor_t2_w is None:
+                        log.error(f"Refrigerant emission factor for {self.module.refrigerant_type_w} not found. Plase select tier2 value for with scenario.")
+                        raise ValueError(f"Refrigerant emission factor for {self.module.refrigerant_type_w} not found. Plase select tier2 value for with scenario.")
+                    self.refrigerant_ef_w.value = self.module.emission_factor_t2_w
+            else:
+                self.refrigerant_ef_w.value = 0
 
         if self.module.is_without():
-            try:
-                self.refrigerant_ef_wo = ipcc.ValueChainRefrigerantEmissionFactor.objects.get(refrigerant_type=self.module.refrigerant_type_wo, gwp=self.project.gwp)
-            except ipcc.ValueChainRefrigerantEmissionFactor.DoesNotExist:
-                if self.module.emission_factor_t2_wo is None:
-                    log.error(f"Refrigerant emission factor for {self.module.refrigerant_type_wo} not found. Plase select tier2 value for without scenario.")
-                    raise ValueError(f"Refrigerant emission factor for {self.module.refrigerant_type_wo} not found. Plase select tier2 value for without scenario.")
-                self.refrigerant_ef_wo.value = self.module.emission_factor_t2_wo
+            if self.module.is_refrigerant_used:
+                try:
+                    self.refrigerant_ef_wo = ipcc.ValueChainRefrigerantEmissionFactor.objects.get(refrigerant_type=self.module.refrigerant_type_wo, gwp=self.project.gwp)
+                except ipcc.ValueChainRefrigerantEmissionFactor.DoesNotExist:
+                    if self.module.emission_factor_t2_wo is None:
+                        log.error(f"Refrigerant emission factor for {self.module.refrigerant_type_wo} not found. Plase select tier2 value for without scenario.")
+                        raise ValueError(f"Refrigerant emission factor for {self.module.refrigerant_type_wo} not found. Plase select tier2 value for without scenario.")
+                    self.refrigerant_ef_wo.value = self.module.emission_factor_t2_wo
+            else:
+                self.refrigerant_ef_wo.value = 0
 
         return super().get_defaults
 
@@ -6551,19 +6559,20 @@ class StorageCalculator(BaseValueChainCalculator):
         }
 
         if self.module.is_with():
-            # self.inputs_w = {
-            #     **shared_inputs,
-            #     "activity_type": MathActivityTypes.STORAGE,
-            #     "emission_factor_start_default": self.refrigerant_ef_start.value,
-            #     "emission_factor_end_default": self.refrigerant_ef_w.value,
-            #     "emission_factor_start_tier_2": self.module.emission_factor_t2_start,
-            #     "emission_factor_end_tier_2": self.module.emission_factor_t2_w,
-            #     "input_quantity_start": self.module.total_refrigerant_leakage_start,
-            #     "input_quantity_end": self.module.total_refrigerant_leakage_w,
-            # }
+            if self.module.is_refrigerant_used:
+                self.inputs_w = {
+                    **shared_inputs,
+                    "activity_type": MathActivityTypes.STORAGE,
+                    "emission_factor_start_default": self.refrigerant_ef_start.value,
+                    "emission_factor_end_default": self.refrigerant_ef_w.value,
+                    "emission_factor_start_tier_2": self.module.emission_factor_t2_start,
+                    "emission_factor_end_tier_2": self.module.emission_factor_t2_w,
+                    "input_quantity_start": self.module.total_refrigerant_leakage_start,
+                    "input_quantity_end": self.module.total_refrigerant_leakage_w,
+                }
 
-            # self.math_w = MathValueChain(**self.inputs_w)
-            # self.math_w.calculate_emissions()
+                self.math_w = MathValueChain(**self.inputs_w)
+                self.math_w.calculate_emissions()
 
             self.electricity_inputs_w = {
                 **shared_inputs,
@@ -6580,19 +6589,20 @@ class StorageCalculator(BaseValueChainCalculator):
             self.electricity_math_w.calculate_emissions()
 
         if self.module.is_without():
-            # self.inputs_wo = {
-            #     **shared_inputs,
-            #     "activity_type": MathActivityTypes.STORAGE,
-            #     "emission_factor_start_default": self.refrigerant_ef_start.value,
-            #     "emission_factor_end_default": self.refrigerant_ef_wo.value,
-            #     "emission_factor_start_tier_2": self.module.emission_factor_t2_start,
-            #     "emission_factor_end_tier_2": self.module.emission_factor_t2_wo,
-            #     "input_quantity_start": self.module.total_refrigerant_leakage_start,
-            #     "input_quantity_end": self.module.total_refrigerant_leakage_wo,
-            # }
+            if self.module.is_refrigerant_used:
+                self.inputs_wo = {
+                    **shared_inputs,
+                    "activity_type": MathActivityTypes.STORAGE,
+                    "emission_factor_start_default": self.refrigerant_ef_start.value,
+                    "emission_factor_end_default": self.refrigerant_ef_wo.value,
+                    "emission_factor_start_tier_2": self.module.emission_factor_t2_start,
+                    "emission_factor_end_tier_2": self.module.emission_factor_t2_wo,
+                    "input_quantity_start": self.module.total_refrigerant_leakage_start,
+                    "input_quantity_end": self.module.total_refrigerant_leakage_wo,
+                }
 
-            # self.math_wo = MathValueChain(**self.inputs_wo)
-            # self.math_wo.calculate_emissions()
+                self.math_wo = MathValueChain(**self.inputs_wo)
+                self.math_wo.calculate_emissions()
 
             self.electricity_inputs_wo = {
                 **shared_inputs,
@@ -7082,42 +7092,3 @@ class TransportCalculator(BaseCalculator):
         results_tuple = (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
 
         return results_tuple
-
-
-class ValueChainCalculator(BaseCalculator):
-
-    # TODO: Generalize this logic for all calculators with submodules
-
-    def __init__(self, input, *args, **kwargs) -> None:
-        super().__init__(input)
-
-        self.module: ValueChain
-        self.filtered_submodules: list[Storage | Transport | Packaging | Processing] = self.module.submodules
-
-        if "module_types" in kwargs:
-            module_types = [module_type.class_name for module_type in ModuleType.objects.filter(id__in=kwargs["module_types"])]
-            self.filtered_submodules = list(filter(lambda x: x.__name__ in module_types, self.module.submodules))
-
-    def get_defaults(self, calculate=False) -> dict:
-        return super().get_defaults(calculate)
-
-    def calculate(self) -> Result:
-        self.get_defaults()
-
-        self.results_w = MathResult(
-            self.activity.implementation_years,
-            self.activity.capitalization_years,
-        )
-        self.results_wo = MathResult(
-            self.activity.implementation_years,
-            self.activity.capitalization_years,
-        )
-
-        for submodule in self.filtered_submodules:
-            calculator: BaseCalculator = CalculatorFactory().get_calculator(submodule)(submodule)
-            r_w, r_wo = calculator.calculate()
-
-            self.results_w += r_w
-            self.results_wo += r_wo
-
-        return (self.results_w, self.results_wo)
