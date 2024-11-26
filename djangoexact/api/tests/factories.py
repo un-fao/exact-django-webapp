@@ -648,7 +648,7 @@ class RoadFactory(DjangoModelFactory):
     width_m_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
 
-class ValueChainPackagingFactory(DjangoModelFactory):
+class PackagingFactory(DjangoModelFactory):
 
     class Meta:
         model = Packaging
@@ -670,7 +670,7 @@ class ValueChainPackagingFactory(DjangoModelFactory):
     kwh_energy_per_year_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
 
-class ValueChainStorageFactory(DjangoModelFactory):
+class StorageFactory(DjangoModelFactory):
 
     class Meta:
         model = Storage
@@ -699,7 +699,7 @@ class ValueChainStorageFactory(DjangoModelFactory):
 fuel_types_stationary = [fuel for fuel in FuelType.objects.filter(fuel_use_type__name__icontains="stationary").all()]
 
 
-class ValueChainProcessingFactory(DjangoModelFactory):
+class ProcessingFactory(DjangoModelFactory):
     class Meta:
         model = Processing
 
@@ -720,7 +720,7 @@ class ValueChainProcessingFactory(DjangoModelFactory):
     water_use_per_year_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
 
-class ValueChainTransportFactory(DjangoModelFactory):
+class TransportFactory(DjangoModelFactory):
 
     class Meta:
         model = Transport
