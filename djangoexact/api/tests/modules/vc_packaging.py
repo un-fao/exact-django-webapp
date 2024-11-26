@@ -13,18 +13,11 @@ import api.tests.base_test_classes as t
 class ValueChainPackagingTest(t.ModuleTest):
     def __init__(self):
         super().__init__()
-        self.module_type = ModuleType.objects.get(class_name="ValueChain")
+        self.module_type = ModuleType.objects.get(class_name="Packaging")
         self.create_module()
-
-        self.packaging = ValueChainPackagingFactory.create(parent=self.module)
 
     def test(self):
         self.calculate_results()
-
-        msc = PackagingCalculator(self.packaging)
-        res = msc.calculate()
-
-        print(f"Packaging results: {Result(*res).breakdown()}")
 
         # res = reports.BaseProjectReport(self.project)
         # res.build_report()
