@@ -7,7 +7,10 @@ from .grassland import *
 from .large_fishery import *
 from .livestock import *
 from .perennial_cropland import *
-from .project_lock import *
+from .project import *
 from .small_fishery import *
-from .value_chains import *
 from .waterbody import *
+from .transport import *
+from .processing import *
+from .packaging import *
+from .storage import *
