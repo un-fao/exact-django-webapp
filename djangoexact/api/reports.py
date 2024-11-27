@@ -85,6 +85,7 @@ class ExcelFileManager:
         # Start with an empty in-memory Excel file
         self.excel_file = BytesIO()
         self._create_initial_excel()
+        self.SAVE_TO_FILE = True
 
     def _create_initial_excel(self):
 
@@ -110,6 +111,10 @@ class ExcelFileManager:
         self.excel_file = BytesIO()
         workbook.save(self.excel_file)
         self.excel_file.seek(0)
+
+        if self.SAVE_TO_FILE:
+            with open(f"reports/{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.xlsx", "wb") as f:
+                f.write(self.excel_file.getvalue())
 
     def get_excel_bytes(self):
         # Get the current Excel file as bytes (e.g., for download)
@@ -868,7 +873,7 @@ class PerennialCroplandReport(LandModuleReport):
         self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Perennial Cropland").fill = Colors.LIGHT_BLUE_FILL.value
 
         self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Hectares")
-        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Main season crop")
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Agroforestry system")
         self.metadata_worksheet.cell(row=last_metadata_row + 3, column=1, value="Tillage management type")
         self.metadata_worksheet.cell(row=last_metadata_row + 4, column=1, value="Organic input type")
         self.metadata_worksheet.cell(row=last_metadata_row + 5, column=1, value="Yield")
@@ -1364,6 +1369,58 @@ class AquacultureReport(BaseModuleReport):
             self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.electricity_co2_eq[i])
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+    def populate_metadata(self):
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
+        last_metadata_row = self.metadata_worksheet.max_row + 1
+
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Aquaculture")
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Aquaculture").fill = Colors.LIGHT_BLUE_FILL.value
+        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Production (tons fish/year)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="electricity used for fish production (KWh/ t of production)")
+
+        if self.module.is_start():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=2, value=self.module.annual_production_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=2, value=self.module.electricity_used_t2_start)
+
+        if self.module.is_with():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=3, value=self.module.annual_production_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=3, value=self.module.electricity_used_t2_w)
+
+        if self.module.is_without():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=4, value=self.module.annual_production_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=4, value=self.module.electricity_used_t2_wo)
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+    def get_result(self):
+        """
+        Generates the result for the report by building and populating it with necessary data.
+
+        This method performs the following steps:
+        1. Calls the superclass's `get_result` method.
+        2. Logs the start of the report building process.
+        3. Adds minor seasons results to the report.
+        4. Populates the report with metadata.
+        5. Populates the report with additional indicators.
+        6. Logs the completion of the report building process.
+        7. Returns the generated report as Excel bytes.
+
+        Returns:
+            bytes: The generated report in Excel format.
+        """
+        super().get_result()
+        log.debug(f"Building report for {self.module.module_type.name}")
+
+        self.populate_metadata()
+
+        log.debug(f"Report for {self.module_title} built.")
+        return self.activity_report.project_report.excel_manager.get_excel_bytes()
+
+    def build_report(self):
+        self.get_result()
 
 
 @dataclass
