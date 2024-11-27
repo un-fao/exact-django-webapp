@@ -3,6 +3,7 @@ import django_filters as filters
 
 def get_model_filter(model_arg):
     class GenericModelFilter(filters.FilterSet):
+
         class Meta:
             model = model_arg
             fields = "__all__"
