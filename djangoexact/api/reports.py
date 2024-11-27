@@ -92,7 +92,7 @@ class ExcelFileManager:
         workbook.add_worksheet("Results")
         metadata_worksheet = workbook.add_worksheet("Metadata")
         additional_indicators_worksheet = workbook.add_worksheet("Additional Indicators")
-        metadata_worksheet.hide()
+        # metadata_worksheet.hide()
         additional_indicators_worksheet.hide()
 
         # Close the xlsxwriter workbook to finalize the file
@@ -194,9 +194,47 @@ class BaseProjectReport:
         for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
             self.results_worksheet.cell(row=1, column=i + 2, value=year)
 
-        self.metadata_worksheet.cell(row=1, column=2, value="START")
-        self.metadata_worksheet.cell(row=1, column=3, value="WITH")
-        self.metadata_worksheet.cell(row=1, column=4, value="WITHOUT")
+        # Metadata worksheet setup
+
+        self.metadata_worksheet.cell(row=1, column=1, value="Report download date")
+        self.metadata_worksheet.cell(row=1, column=5, value="Tier 2")
+        self.metadata_worksheet.cell(row=2, column=1, value="Project name")
+        self.metadata_worksheet.cell(row=3, column=1, value="Status")
+        self.metadata_worksheet.cell(row=4, column=1, value="Country")
+        self.metadata_worksheet.cell(row=5, column=1, value="Climate")
+        self.metadata_worksheet.cell(row=6, column=1, value="Moisture")
+        self.metadata_worksheet.cell(row=7, column=1, value="Soil type")
+        self.metadata_worksheet.cell(row=8, column=1, value="Implementation phase (years)")
+        self.metadata_worksheet.cell(row=9, column=1, value="Capitalization phase (years)")
+        self.metadata_worksheet.cell(row=10, column=1, value="Total duration of accounting (years)")
+        self.metadata_worksheet.cell(row=11, column=1, value="Global warming potential")
+        self.metadata_worksheet.cell(row=12, column=1, value="CO2")
+        self.metadata_worksheet.cell(row=13, column=1, value="CH4")
+        self.metadata_worksheet.cell(row=14, column=1, value="N2O")
+        self.metadata_worksheet.cell(row=15, column=1, value="Fossil CH4")
+
+        self.metadata_worksheet.cell(row=1, column=2, value=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        self.metadata_worksheet.cell(row=2, column=2, value=str(self.project.name))
+        self.metadata_worksheet.cell(row=3, column=2, value=self.project.status.name)
+        self.metadata_worksheet.cell(row=4, column=2, value=self.project.country.name)
+        self.metadata_worksheet.cell(row=5, column=2, value=self.project.climate.name)
+        self.metadata_worksheet.cell(row=6, column=2, value=self.project.moisture.name)
+        self.metadata_worksheet.cell(row=7, column=2, value=self.project.soil_type.name)
+        self.metadata_worksheet.cell(row=8, column=2, value=self.implementation_years)
+        self.metadata_worksheet.cell(row=9, column=2, value=self.capitalization_years)
+        self.metadata_worksheet.cell(row=10, column=2, value=self.duration)
+        self.metadata_worksheet.cell(row=11, column=2, value=self.project.gwp.name)
+        self.metadata_worksheet.cell(row=12, column=2, value=self.project.gwp.co2)
+        self.metadata_worksheet.cell(row=13, column=2, value=self.project.gwp.ch4)
+        self.metadata_worksheet.cell(row=14, column=2, value=self.project.gwp.n2o)
+        self.metadata_worksheet.cell(row=15, column=2, value=self.project.gwp.ch4_fossil)
+
+        self.metadata_worksheet.cell(row=16, column=1, value="")
+        self.metadata_worksheet.cell(row=17, column=1, value="")
+
+        self.metadata_worksheet.cell(row=18, column=2, value="START")
+        self.metadata_worksheet.cell(row=18, column=3, value="WITH")
+        self.metadata_worksheet.cell(row=18, column=4, value="WITHOUT")
 
         self.additional_indicators_worksheet.cell(row=1, column=1, value="Activity and GHGs / Years")
 
