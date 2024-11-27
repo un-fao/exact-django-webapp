@@ -4,6 +4,7 @@ import xlsxwriter.format
 import xlsxwriter.worksheet
 import api.models as api_models
 import api.calculators as calculators
+import api.defaults as defaults
 from typing import Optional
 import math_model.no_time_dependency_final.ghg_emissions_classes as math_utils
 import numpy as np
@@ -32,9 +33,11 @@ class Colors(Enum):
     LIGHT_ORANGE_HEX = "fce4d6"
     LIGHT_BLUE_HEX = "d9e1f2"
     LIGHT_BEIGE_HEX = "ddd9c4"
+    LIGHT_RED_HEX = "ffcccc"
     LIGHT_ORANGE_FILL = PatternFill(start_color="fce4d6", end_color="fce4d6", fill_type="solid")
     LIGHT_BLUE_FILL = PatternFill(start_color="d9e1f2", end_color="d9e1f2", fill_type="solid")
     LIGHT_BEIGE_FILL = PatternFill(start_color="ddd9c4", end_color="ddd9c4", fill_type="solid")
+    LIGHT_RED_FILL = PatternFill(start_color="ffcccc", end_color="ffcccc", fill_type="solid")
 
 
 class ReportFactory:
@@ -1658,8 +1661,145 @@ class ForestManagementReport(LandModuleReport):
     deadwood_co2_source = (math_utils.ActivityTypes.DEADWOOD, math_utils.GasTypes.CO2)
 
     def __post_init__(self):
-        self.calculator = calculators.ForestManagementCalculator(self.module)
+        self.calculator: calculators.ForestManagementCalculator = calculators.ForestManagementCalculator(self.module)
         return super().__post_init__()
+
+    def populate_metadata(self):
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
+        last_metadata_row = self.metadata_worksheet.max_row + 1
+
+        default = defaults.ForestManagementDefaults(input=self.module).get_defaults()
+
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Forest Management")
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1).fill = Colors.LIGHT_BLUE_FILL.value
+        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Hectares")
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Type of forest")
+        self.metadata_worksheet.cell(row=last_metadata_row + 3, column=1, value="Forest category")
+        self.metadata_worksheet.cell(row=last_metadata_row + 4, column=1, value="Length of rotation (years)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 5, column=1, value="% of harvest used for energy")
+        self.metadata_worksheet.cell(row=last_metadata_row + 6, column=1, value="start year of rotations (no of years)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 7, column=1, value="Harvesting recurrence (years)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 8, column=1, value="timber harvested (% AGB logged)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 9, column=1, value="Biomass used for Energy (%)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 10, column=1, value="start year of harvesting (no of years)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 11, column=1, value="AGB (tC/ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 11, column=1).fill = Colors.LIGHT_RED_FILL.value
+        self.metadata_worksheet.cell(row=last_metadata_row + 12, column=1, value="BGB (tC/ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 12, column=1).fill = Colors.LIGHT_RED_FILL.value
+        self.metadata_worksheet.cell(row=last_metadata_row + 13, column=1, value="AGB growth rate <=20 years (tC/ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 13, column=1).fill = Colors.LIGHT_RED_FILL.value
+        self.metadata_worksheet.cell(row=last_metadata_row + 14, column=1, value="BGB growth rate <=20 years (tC/ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 14, column=1).fill = Colors.LIGHT_RED_FILL.value
+        self.metadata_worksheet.cell(row=last_metadata_row + 15, column=1, value="Litter (tC/ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 15, column=1).fill = Colors.LIGHT_RED_FILL.value
+        self.metadata_worksheet.cell(row=last_metadata_row + 16, column=1, value="Deadwood (tC/ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 16, column=1).fill = Colors.LIGHT_RED_FILL.value
+
+        if self.module.is_start():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=2, value=self.module.area)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=2, value=self.module.forest_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=2, value=self.module.forest_condition_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=2, value=self.module.rotation_length_yrs_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=2, value=self.module.rotation_percentage_biomass_for_energy_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=2, value=self.module.rotation_start_year_t2_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=2, value=self.module.logging_recurrence_yrs_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=2, value=self.module.logging_percentage_agb_logged_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 9, column=2, value=self.module.logging_percentage_biomass_for_energy_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 10, column=2, value=self.module.logging_start_year_t2_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 11, column=2, value=default.agb_t2_start_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 11, column=2).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 12, column=2, value=default.bgb_t2_start_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 12, column=2).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 13, column=2, value=default.agb_growth_rate_le_20_yrs_t2_start_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 13, column=2).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 14, column=2, value=default.bgb_growth_rate_le_20_yrs_t2_start_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 14, column=2).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 15, column=2, value=default.litter_t2_start_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 15, column=2).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 16, column=2, value=default.deadwood_t2_start_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 16, column=2).fill = Colors.LIGHT_RED_FILL.value
+
+        if self.module.is_with():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=3, value=self.module.area)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=3, value=self.module.forest_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=3, value=self.module.forest_condition_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=3, value=self.module.rotation_length_yrs_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=3, value=self.module.rotation_percentage_biomass_for_energy_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=3, value=self.module.rotation_start_year_t2_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=3, value=self.module.logging_recurrence_yrs_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=3, value=self.module.logging_percentage_agb_logged_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 9, column=3, value=self.module.logging_percentage_biomass_for_energy_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 10, column=3, value=self.module.logging_start_year_t2_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 11, column=3, value=default.agb_t2_w_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 11, column=3).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 12, column=3, value=default.bgb_t2_w_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 12, column=3).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 13, column=3, value=default.agb_growth_rate_le_20_yrs_t2_w_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 13, column=3).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 14, column=3, value=default.bgb_growth_rate_le_20_yrs_t2_w_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 14, column=3).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 15, column=3, value=default.litter_t2_w_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 15, column=3).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 16, column=3, value=default.deadwood_t2_w_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 16, column=3).fill = Colors.LIGHT_RED_FILL.value
+
+        if self.module.is_without():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=4, value=self.module.area)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=4, value=self.module.forest_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=4, value=self.module.forest_condition_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=4, value=self.module.rotation_length_yrs_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=4, value=self.module.rotation_percentage_biomass_for_energy_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=4, value=self.module.rotation_start_year_t2_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=4, value=self.module.logging_recurrence_yrs_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=4, value=self.module.logging_percentage_agb_logged_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 9, column=4, value=self.module.logging_percentage_biomass_for_energy_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 10, column=4, value=self.module.logging_start_year_t2_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 11, column=4, value=default.agb_t2_wo_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 11, column=4).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 12, column=4, value=default.bgb_t2_wo_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 12, column=4).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 13, column=4, value=default.agb_growth_rate_le_20_yrs_t2_wo_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 13, column=4).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 14, column=4, value=default.bgb_growth_rate_le_20_yrs_t2_wo_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 14, column=4).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 15, column=4, value=default.litter_t2_wo_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 15, column=4).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 16, column=4, value=default.deadwood_t2_wo_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 16, column=4).fill = Colors.LIGHT_RED_FILL.value
+
+        for i, disturbance in enumerate(self.module.disturbances.all()):
+            disturbance: api_models.ForestDisturbance
+            self.metadata_worksheet.cell(row=last_metadata_row + 17 + i, column=1, value=f"Disturbance {i + 1}: type")
+            self.metadata_worksheet.cell(row=last_metadata_row + 18 + i, column=1, value="distrubance recurrence (years)")
+            self.metadata_worksheet.cell(row=last_metadata_row + 19 + i, column=1, value="biomass destruction (%)")
+
+            if self.module.is_start():
+                self.metadata_worksheet.cell(row=last_metadata_row + 18 + i, column=2, value=disturbance.disturbance_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 19 + i, column=2, value=disturbance.recurrence_yrs_start)
+                self.metadata_worksheet.cell(row=last_metadata_row + 20 + i, column=2, value=disturbance.percentage_biomass_destruction_start)
+
+            if self.module.is_with():
+                self.metadata_worksheet.cell(row=last_metadata_row + 18 + i, column=3, value=disturbance.disturbance_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 19 + i, column=3, value=disturbance.recurrence_yrs_w)
+                self.metadata_worksheet.cell(row=last_metadata_row + 20 + i, column=3, value=disturbance.percentage_biomass_destruction_w)
+
+            if self.module.is_without():
+                self.metadata_worksheet.cell(row=last_metadata_row + 18 + i, column=4, value=disturbance.disturbance_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 19 + i, column=4, value=disturbance.recurrence_yrs_wo)
+                self.metadata_worksheet.cell(row=last_metadata_row + 20 + i, column=4, value=disturbance.percentage_biomass_destruction_wo)
+
+        self.metadata_worksheet.cell(row=last_metadata_row + 17 + len(self.module.disturbances.all()), column=1, value="average yearly degradation (%)")
+
+        if self.module.is_start():
+            self.metadata_worksheet.cell(row=last_metadata_row + 17 + len(self.module.disturbances.all()), column=2, value=self.module.average_yearly_degradation_percentage_start)
+
+        if self.module.is_with():
+            self.metadata_worksheet.cell(row=last_metadata_row + 17 + len(self.module.disturbances.all()), column=3, value=self.module.average_yearly_degradation_percentage_w)
+
+        if self.module.is_without():
+            self.metadata_worksheet.cell(row=last_metadata_row + 17 + len(self.module.disturbances.all()), column=4, value=self.module.average_yearly_degradation_percentage_wo)
 
     def build_report(self):
         super().build_report()
@@ -1755,6 +1895,8 @@ class ForestManagementReport(LandModuleReport):
             self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.hwp_co2[i])
             self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.biomass_loss_co2[i])
             self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.biomass_gain_co2[i])
+
+        self.populate_metadata()
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
