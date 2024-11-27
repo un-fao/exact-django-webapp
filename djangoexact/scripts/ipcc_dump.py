@@ -4507,36 +4507,58 @@ EnergyDefaultEmissionFactor.objects.bulk_create(l)
 
 # TODO: Run in develop
 
-CropYieldStat.objects.all().delete()
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "CropYieldStats.csv"),
-    header=[0],
-    sep=";",
-)
+# CropYieldStat.objects.all().delete()
+# df = pd.read_csv(
+#     os.path.join(os.path.dirname(__file__), "ipcc_data", "CropYieldStats.csv"),
+#     header=[0],
+#     sep=";",
+# )
 
-for i, row in df.iterrows():
-    print(row)
-    land_use_type = LandUseType.objects.get(name__iexact=row["land_use_type"])
-    continent = Region.objects.get(name__iexact=sanitize(row["continent"]))
-    yr_2016 = parse_csv_number(row["2016"])
-    yr_2017 = parse_csv_number(row["2017"])
-    yr_2018 = parse_csv_number(row["2018"])
-    yr_2019 = parse_csv_number(row["2019"])
-    yr_2020 = parse_csv_number(row["2020"])
+# for i, row in df.iterrows():
+#     print(row)
+#     land_use_type = LandUseType.objects.get(name__iexact=row["land_use_type"])
+#     continent = Region.objects.get(name__iexact=sanitize(row["continent"]))
+#     yr_2016 = parse_csv_number(row["2016"])
+#     yr_2017 = parse_csv_number(row["2017"])
+#     yr_2018 = parse_csv_number(row["2018"])
+#     yr_2019 = parse_csv_number(row["2019"])
+#     yr_2020 = parse_csv_number(row["2020"])
 
-    actual_years = [yr for yr in [yr_2016, yr_2017, yr_2018, yr_2019, yr_2020] if yr is not None]
-    print(actual_years)
-    average = sum(actual_years) / len(actual_years) / 10000
+#     actual_years = [yr for yr in [yr_2016, yr_2017, yr_2018, yr_2019, yr_2020] if yr is not None]
+#     print(actual_years)
+#     average = sum(actual_years) / len(actual_years) / 10000
 
-    print(f"{land_use_type}, {continent}, {yr_2016}, {yr_2017}, {yr_2018}, {yr_2019}, {yr_2020}, {average}")
+#     print(f"{land_use_type}, {continent}, {yr_2016}, {yr_2017}, {yr_2018}, {yr_2019}, {yr_2020}, {average}")
 
-    stat = CropYieldStat.objects.create(
-        land_use_type=land_use_type,
-        continent=continent,
-        year_2016=yr_2016,
-        year_2017=yr_2017,
-        year_2018=yr_2018,
-        year_2019=yr_2019,
-        year_2020=yr_2020,
-        average=average,
+#     stat = CropYieldStat.objects.create(
+#         land_use_type=land_use_type,
+#         continent=continent,
+#         year_2016=yr_2016,
+#         year_2017=yr_2017,
+#         year_2018=yr_2018,
+#         year_2019=yr_2019,
+#         year_2020=yr_2020,
+#         average=average,
+#     )
+
+
+def import_fuel_type_fuel_use_type_mapping():
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "FuelType_FuelUseType.csv"),
+        header=0,
+        sep=",",
     )
+
+    for i, row in df.iterrows():
+        fuel_type = row["fuel_type"]
+        fuel_use_type = FuelUseType.objects.get(name__iexact=row["fuel_use_type"])
+
+        if FuelType.objects.filter(name=fuel_type, fuel_use_type=fuel_use_type).exists():
+            print(f"FuelTypeFuelUseType {fuel_type} {fuel_use_type} already exists. Skipping...")
+            continue
+
+        print(fuel_type, fuel_use_type)
+        FuelType.objects.create(name=fuel_type, fuel_use_type=fuel_use_type)
+
+
+import_fuel_type_fuel_use_type_mapping()
