@@ -1255,8 +1255,11 @@ class FloodedRiceReport(LandModuleReport):
     fire_ch4_source = (math_utils.ActivityTypes.STRAW_BURNING, math_utils.GasTypes.CH4)
     rice_cultivation_ch4_source = (math_utils.ActivityTypes.CH4_EMITTED_RICE, math_utils.GasTypes.CH4)
 
+    minor_season_calculators: list[calculators.FloodedRiceSeasonCalculator] = None
+
     def __post_init__(self):
-        self.calculator = calculators.FloodedRiceCalculator(self.module)
+        self.calculator: calculators.FloodedRiceSeasonCalculator = calculators.FloodedRiceSeasonCalculator(self.module)
+        self.minor_season_calculators = []
         return super().__post_init__()
 
     def add_minor_seasons_results(self):
@@ -1265,7 +1268,8 @@ class FloodedRiceReport(LandModuleReport):
         for minor_season in minor_seasons.all():
             log.debug(f"Building report for minor season {minor_season.name}")
 
-            minor_calculator = calculators.FloodedRiceCalculator(minor_season)
+            minor_calculator = calculators.FloodedRiceSeasonCalculator(minor_season)
+            self.minor_season_calculators.append(minor_calculator)
             minor_emission_set = []
 
             if self.module.is_with():
@@ -1289,6 +1293,88 @@ class FloodedRiceReport(LandModuleReport):
 
             self.total_emissions = list(map(sum, zip(self.biomass_co2, self.soil_co2, self.soil_n2o, self.fire_n2o, self.fire_ch4, self.rice_cultivation_ch4)))
 
+    def populate_metadata(self):
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
+        last_metadata_row = self.metadata_worksheet.max_row + 1
+
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Flooded Rice")
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Flooded Rice").fill = Colors.LIGHT_BLUE_FILL.value
+
+        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Number of seasons")
+
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Season 1 - Hectares")
+        self.metadata_worksheet.cell(row=last_metadata_row + 3, column=1, value="Season 1 - Cultivation period")
+        self.metadata_worksheet.cell(row=last_metadata_row + 4, column=1, value="Season 1 - Water before cultivation")
+        self.metadata_worksheet.cell(row=last_metadata_row + 5, column=1, value="Season 1 - Water during cultivation")
+        self.metadata_worksheet.cell(row=last_metadata_row + 6, column=1, value="Season 1 - Organic amendment")
+        self.metadata_worksheet.cell(row=last_metadata_row + 7, column=1, value="Season 1 - Yield")
+
+        seasons: list[api_models.MinorSeasonFloodedRice] = getattr(self.module, "submodules", [])
+
+        for i, season in enumerate(seasons):
+            self.metadata_worksheet.cell(row=last_metadata_row + 8 + i, column=1, value=f"Season {i + 2} - Hectares")
+            self.metadata_worksheet.cell(row=last_metadata_row + 9 + i, column=1, value=f"Season {i + 2} - Cultivation period")
+            self.metadata_worksheet.cell(row=last_metadata_row + 10 + i, column=1, value=f"Season {i + 2} - Water before cultivation")
+            self.metadata_worksheet.cell(row=last_metadata_row + 11 + i, column=1, value=f"Season {i + 2} - Water during cultivation")
+            self.metadata_worksheet.cell(row=last_metadata_row + 12 + i, column=1, value=f"Season {i + 2} - Organic amendment")
+            self.metadata_worksheet.cell(row=last_metadata_row + 13 + i, column=1, value=f"Season {i + 2} - Yield")
+
+        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=2, value=len(seasons) + 1)
+
+        if self.module.is_start():
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=2, value=self.module.area)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=2, value=self.calculator.efc_default.cultivation_period)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=2, value=self.module.water_management_type_before_cultivation_start.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=2, value=self.module.water_management_type_after_cultivation_start.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=2, value=self.module.organic_amendment_type_start.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=2, value=self.calculator.yield_default.value)
+
+        if self.module.is_with():
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=3, value=self.module.area)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=3, value=self.calculator.efc_default.cultivation_period)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=3, value=self.module.water_management_type_before_cultivation_w.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=3, value=self.module.water_management_type_after_cultivation_w.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=3, value=self.module.organic_amendment_type_w.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=3, value=self.calculator.yield_default.value)
+
+        if self.module.is_without():
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=4, value=self.module.area)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=4, value=self.calculator.efc_default.cultivation_period)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=4, value=self.module.water_management_type_before_cultivation_wo.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=4, value=self.module.water_management_type_after_cultivation_wo.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=4, value=self.module.organic_amendment_type_wo.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=4, value=self.calculator.yield_default.value)
+
+        for i, season in enumerate(seasons):
+            season_calculator = calculators.FloodedRiceSeasonCalculator(season)
+            season_calculator.calculate()
+
+            if self.module.is_start():
+                self.metadata_worksheet.cell(row=last_metadata_row + 8 + i, column=2, value=season.area)
+                self.metadata_worksheet.cell(row=last_metadata_row + 9 + i, column=2, value=season_calculator.efc_default.cultivation_period)
+                self.metadata_worksheet.cell(row=last_metadata_row + 10 + i, column=2, value=season.water_management_type_before_cultivation_start.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 11 + i, column=2, value=season.water_management_type_after_cultivation_start.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 12 + i, column=2, value=season.organic_amendment_type_start.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 13 + i, column=2, value=season_calculator.yield_default.value)
+
+            if self.module.is_with():
+                self.metadata_worksheet.cell(row=last_metadata_row + 8 + i, column=3, value=season.area)
+                self.metadata_worksheet.cell(row=last_metadata_row + 9 + i, column=3, value=season_calculator.efc_default.cultivation_period)
+                self.metadata_worksheet.cell(row=last_metadata_row + 10 + i, column=3, value=season.water_management_type_before_cultivation_w.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 11 + i, column=3, value=season.water_management_type_after_cultivation_w.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 12 + i, column=3, value=season.organic_amendment_type_w.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 13 + i, column=3, value=season_calculator.yield_default.value)
+
+            if self.module.is_without():
+                self.metadata_worksheet.cell(row=last_metadata_row + 8 + i, column=4, value=season.area)
+                self.metadata_worksheet.cell(row=last_metadata_row + 9 + i, column=4, value=season_calculator.efc_default.cultivation_period)
+                self.metadata_worksheet.cell(row=last_metadata_row + 10 + i, column=4, value=season.water_management_type_before_cultivation_wo.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 11 + i, column=4, value=season.water_management_type_after_cultivation_wo.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 12 + i, column=4, value=season.organic_amendment_type_wo.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 13 + i, column=4, value=season_calculator.yield_default.value)
+
     def build_report(self):
         super().build_report()
 
@@ -1303,6 +1389,8 @@ class FloodedRiceReport(LandModuleReport):
 
         for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
             self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.rice_cultivation_ch4[i])
+
+        self.populate_metadata()
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
