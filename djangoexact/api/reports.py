@@ -1220,6 +1220,55 @@ class GrasslandReport(LandModuleReport):
         self.calculator = calculators.GrasslandCalculator(self.module)
         return super().__post_init__()
 
+    def populate_metadata(self):
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
+        last_metadata_row = self.metadata_worksheet.max_row + 1
+
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Grassland")
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Grassland").fill = Colors.LIGHT_BLUE_FILL.value
+
+        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Hectares")
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Grassland management")
+        self.metadata_worksheet.cell(row=last_metadata_row + 3, column=1, value="Yield")
+        self.metadata_worksheet.cell(row=last_metadata_row + 4, column=1, value="Fire occurrence (yes/no)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 5, column=1, value="Fire periodicity (years)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 6, column=1, value="Fire impact (%)")
+
+        if self.module.is_start():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=2, value=self.units)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=2, value=self.module.grassland_management_type_start.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=2, value=self.module.yield_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=2, value="Yes" if self.module.is_fire_used_start else "No")
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=2, value=self.module.fire_periodicity_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=2, value=self.module.fire_impact_start)
+
+        if self.module.is_with():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=3, value=self.units)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=3, value=self.module.grassland_management_type_w.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=3, value=self.module.yield_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=3, value="Yes" if self.module.is_fire_used_w else "No")
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=3, value=self.module.fire_periodicity_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=3, value=self.module.fire_impact_w)
+
+        if self.module.is_without():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=4, value=self.units)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=4, value=self.module.grassland_management_type_wo.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=4, value=self.module.yield_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=4, value="Yes" if self.module.is_fire_used_wo else "No")
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=4, value=self.module.fire_periodicity_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=4, value=self.module.fire_impact_wo)
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+    def build_report(self):
+        super().build_report()
+        log.debug(f"Building base report for {self.module.module_type.name}")
+        self.populate_metadata()
+        log.debug(f"Base report for {self.module.module_type.name} built.")
+        return self.workbook
+
 
 @dataclass
 class OtherLandReport(LandModuleReport):
