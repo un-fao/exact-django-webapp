@@ -1456,6 +1456,32 @@ class WaterbodyReport(BaseModuleReport):
         self.calculator = calculators.WaterbodyCalculator(self.module)
         return super().__post_init__()
 
+    def populate_metadata(self):
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
+        last_metadata_row = self.metadata_worksheet.max_row + 1
+
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Waterbody")
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Waterbody").fill = Colors.LIGHT_BLUE_FILL.value
+
+        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Waterbody type")
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Trophic class")
+
+        if self.module.is_start():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=2, value=self.module.waterbody_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=2, value=self.module.trophic_type_start.name)
+
+        if self.module.is_with():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=3, value=self.module.waterbody_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=3, value=self.module.trophic_type_w.name)
+
+        if self.module.is_without():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=4, value=self.module.waterbody_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=4, value=self.module.trophic_type_wo.name)
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
     def build_report(self):
 
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
@@ -1471,6 +1497,8 @@ class WaterbodyReport(BaseModuleReport):
 
         for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
             self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.waterbody_management_ch4[i])
+
+        self.populate_metadata()
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
