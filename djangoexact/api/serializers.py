@@ -2806,13 +2806,22 @@ class CoastalWetlandSerializer(NoScenarioModuleSerializer):
         ref_name = "CoastalWetland"
         mandatory_fields = {
             "start": {
-                "mandatory": ["land_use_type", "area"],
+                "mandatory": [
+                    "land_use_type",
+                    "area",
+                ],
             },
             "with": {
-                "mandatory": ["land_use_type", "area"],
+                "mandatory": [
+                    "land_use_type",
+                    "area",
+                ],
             },
             "without": {
-                "mandatory": ["land_use_type", "area"],
+                "mandatory": [
+                    "land_use_type",
+                    "area",
+                ],
             },
         }
 
