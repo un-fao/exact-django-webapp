@@ -1664,6 +1664,48 @@ class LivestockReport(BaseModuleReport):
         self.calculator = calculators.LivestockCalculator(self.module)
         return super().__post_init__()
 
+    def populate_metadata(self):
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
+        last_metadata_row = self.metadata_worksheet.max_row + 1
+
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Livestock")
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Livestock").fill = Colors.LIGHT_BLUE_FILL.value
+
+        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Livestock category")
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Number of heads")
+        self.metadata_worksheet.cell(row=last_metadata_row + 3, column=1, value="Livestock productivity")
+        self.metadata_worksheet.cell(row=last_metadata_row + 4, column=1, value="Production (unit of product)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 5, column=1, value="Manure management")
+        self.metadata_worksheet.cell(row=last_metadata_row + 6, column=1, value="Heads on pasture (%)")
+
+        if self.module.is_start():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=2, value=self.module.livestock_category_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=2, value=self.module.heads_number_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=2, value=self.module.livestock_production_type_start.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=2, value=self.module.production_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=2, value="WIP")  # TODO: Ask Lorenzo what this value should be
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=2, value="WIP")  # TODO: Ask Lorenzo what this value should be
+
+        if self.module.is_with():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=3, value=self.module.livestock_category_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=3, value=self.module.heads_number_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=3, value=self.module.livestock_production_type_w.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=3, value=self.module.production_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=3, value="WIP")  # TODO: Ask Lorenzo what this value should be
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=3, value="WIP")  # TODO: Ask Lorenzo what this value should be
+
+        if self.module.is_without():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=4, value=self.module.livestock_category_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=4, value=self.module.heads_number_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=4, value=self.module.livestock_production_type_wo.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=4, value=self.module.production_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=4, value="WIP")  # TODO: Ask Lorenzo what this value should be
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=4, value="WIP")  # TODO: Ask Lorenzo what this value should be
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
     def build_report(self):
         super().build_report()
 
@@ -1720,6 +1762,8 @@ class LivestockReport(BaseModuleReport):
             self.results_worksheet.cell(row=last_results_row + 7, column=i + 2, value=self.manure_management_prp_direct_n2o[i])
             self.results_worksheet.cell(row=last_results_row + 8, column=i + 2, value=self.manure_management_prp_leaching_indirect_n2o[i])
             self.results_worksheet.cell(row=last_results_row + 9, column=i + 2, value=self.manure_management_prp_volatilization_indirect_n2o[i])
+
+        self.populate_metadata()
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
