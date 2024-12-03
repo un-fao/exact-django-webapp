@@ -1644,11 +1644,65 @@ class SmallFisheryReport(FisheryReport):
     module: api_models.SmallFishery
 
     def __post_init__(self):
-        self.calculator = calculators.SmallFisheryCalculator(self.module)
+        self.calculator: calculators.SmallFisheryCalculator = calculators.SmallFisheryCalculator(self.module)
         return super().__post_init__()
 
+    def populate_metadata(self):
+        quantity_of_ice = self.calculator.tonnes_ice_default
+        kw_tonnes = self.calculator.kw_tonnes
+
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
+        last_metadata_row = self.metadata_worksheet.max_row + 1
+
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Small Fishery")
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Small Fishery").fill = Colors.LIGHT_BLUE_FILL.value
+
+        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Type of fisheries")
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Gear category")
+        self.metadata_worksheet.cell(row=last_metadata_row + 3, column=1, value="Total catch (t/year)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 4, column=1, value="% of refrigerant systems")
+        self.metadata_worksheet.cell(row=last_metadata_row + 5, column=1, value="% of total catch preserved with ice")
+        self.metadata_worksheet.cell(row=last_metadata_row + 6, column=1, value="Fuel use intensity (l/t)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 7, column=1, value="Quantity of ice (t ice/t of catch)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 8, column=1, value="Electricity used for ice production (KWh/ t of ice)")
+
+        if self.module.is_start():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=2, value=self.module.fishery_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=2, value=self.module.gear_type_start.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=2, value=self.module.total_catch_yr_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=2, value=self.module.refrigerant_pc_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=2, value=self.module.ice_preserved_catch_pc_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=2, value=self.calculator.fui_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=2, value=quantity_of_ice)
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=2, value=kw_tonnes)
+
+        if self.module.is_with():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=3, value=self.module.fishery_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=3, value=self.module.gear_type_w.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=3, value=self.module.total_catch_yr_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=3, value=self.module.refrigerant_pc_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=3, value=self.module.ice_preserved_catch_pc_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=3, value=self.calculator.fui_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=3, value=quantity_of_ice)
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=3, value=kw_tonnes)
+
+        if self.module.is_without():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=4, value=self.module.fishery_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=4, value=self.module.gear_type_wo.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=4, value=self.module.total_catch_yr_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=4, value=self.module.refrigerant_pc_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=4, value=self.module.ice_preserved_catch_pc_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=4, value=self.calculator.fui_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=4, value=quantity_of_ice)
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=4, value=kw_tonnes)
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
     def build_report(self):
-        return super().build_report()
+        super().build_report()
+        self.populate_metadata()
 
 
 @dataclass
@@ -1657,11 +1711,65 @@ class LargeFisheryReport(FisheryReport):
     module: api_models.LargeFishery
 
     def __post_init__(self):
-        self.calculator = calculators.LargeFisheryCalculator(self.module)
+        self.calculator: calculators.LargeFisheryCalculator = calculators.LargeFisheryCalculator(self.module)
         return super().__post_init__()
 
+    def populate_metadata(self):
+        quantity_of_ice = self.calculator.tonnes_ice_default
+        kw_tonnes = self.calculator.kw_tonnes
+
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
+        last_metadata_row = self.metadata_worksheet.max_row + 1
+
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Small Fishery")
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Small Fishery").fill = Colors.LIGHT_BLUE_FILL.value
+
+        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Type of fisheries")
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Gear category")
+        self.metadata_worksheet.cell(row=last_metadata_row + 3, column=1, value="Total catch (t/year)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 4, column=1, value="% of refrigerant systems")
+        self.metadata_worksheet.cell(row=last_metadata_row + 5, column=1, value="% of total catch preserved with ice")
+        self.metadata_worksheet.cell(row=last_metadata_row + 6, column=1, value="Fuel use intensity (l/t)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 7, column=1, value="Quantity of ice (t ice/t of catch)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 8, column=1, value="Electricity used for ice production (KWh/ t of ice)")
+
+        if self.module.is_start():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=2, value=self.module.fish_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=2, value=self.module.gear_type_start.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=2, value=self.module.total_catch_yr_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=2, value=self.module.refrigerant_pc_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=2, value=self.module.ice_preserved_catch_pc_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=2, value=self.calculator.fui_default_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=2, value=quantity_of_ice)
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=2, value=kw_tonnes)
+
+        if self.module.is_with():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=3, value=self.module.fish_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=3, value=self.module.gear_type_w.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=3, value=self.module.total_catch_yr_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=3, value=self.module.refrigerant_pc_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=3, value=self.module.ice_preserved_catch_pc_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=3, value=self.calculator.fui_default_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=3, value=quantity_of_ice)
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=3, value=kw_tonnes)
+
+        if self.module.is_without():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=4, value=self.module.fish_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=4, value=self.module.gear_type_wo.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=4, value=self.module.total_catch_yr_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=4, value=self.module.refrigerant_pc_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=4, value=self.module.ice_preserved_catch_pc_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=4, value=self.calculator.fui_default_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=4, value=quantity_of_ice)
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=4, value=kw_tonnes)
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
     def build_report(self):
-        return super().build_report()
+        super().build_report()
+        self.populate_metadata()
 
 
 class LivestockReport(BaseModuleReport):
