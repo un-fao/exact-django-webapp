@@ -78,6 +78,8 @@ class ReportFactory:
             return IrrigationReport
         elif isinstance(module, api_models.Settlement):
             return SettlementReport
+        elif isinstance(module, api_models.CoastalWetland):
+            return CoastalWetlandReport
         else:
             log.warning(f"No report class found for module {module.module_type.name}")
             return
@@ -1288,8 +1290,87 @@ class CoastalWetlandReport(LandModuleReport):
     activity_report: BaseActivityReport = None
 
     def __post_init__(self):
-        self.calculator = calculators.CoastalWetlandCalculator(self.module)
+        self.calculator: calculators.CoastalWetlandCalculator = calculators.CoastalWetlandCalculator(self.module)
         return super().__post_init__()
+
+    def populate_metadata(self):
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
+        last_metadata_row = self.metadata_worksheet.max_row + 1
+
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Coastal Wetland")
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Coastal Wetland").fill = Colors.LIGHT_BLUE_FILL.value
+
+        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Hectares")
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Type of vegetation")
+        self.metadata_worksheet.cell(row=last_metadata_row + 3, column=1, value="Area under drainage")
+        self.metadata_worksheet.cell(row=last_metadata_row + 4, column=1, value="Drained area excavated")
+        self.metadata_worksheet.cell(row=last_metadata_row + 5, column=1, value="Are not drained or rewetted")
+        self.metadata_worksheet.cell(row=last_metadata_row + 6, column=1, value="Area with restored vegetation (ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 7, column=1, value="Type of soil")
+        self.metadata_worksheet.cell(row=last_metadata_row + 8, column=1, value="Soil carbon (tC/ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 9, column=1, value="% C lost after excavation (%)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 10, column=1, value="AGB (tC/ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 11, column=1, value="BGB (tC/ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 12, column=1, value="Litter (tC/ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 13, column=1, value="Deadwood (tC/ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 14, column=1, value="Average salinity")
+
+        if self.module.is_start():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=2, value=self.units)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=2, value=self.module.land_use_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=2, value=self.module.area_under_drainage_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=2, value=self.module.drained_area_excavated_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=2, value=self.module.area_not_drained_or_rewetted_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=2, value=self.module.area_w_restored_vegetation_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=2, value=self.module.soil_type_t2.name if self.module.soil_type_t2 is not None else "Default")
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=2, value=self.module.soc_t2_start if self.module.soc_t2_start is not None else "Default")
+            self.metadata_worksheet.cell(row=last_metadata_row + 9, column=2, value=self.module.pc_c_lost_after_excavation_t2_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 10, column=2, value=self.calculator.agb.value)
+            self.metadata_worksheet.cell(row=last_metadata_row + 11, column=2, value=self.calculator.bgb.value)
+            self.metadata_worksheet.cell(row=last_metadata_row + 12, column=2, value=self.calculator.litter.value)
+            self.metadata_worksheet.cell(row=last_metadata_row + 13, column=2, value=self.calculator.dw.value)
+            self.metadata_worksheet.cell(row=last_metadata_row + 14, column=2, value=self.calculator.salinity_type.value)
+
+        if self.module.is_with():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=3, value=self.units)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=3, value=self.module.land_use_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=3, value=self.module.area_under_drainage_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=3, value=self.module.drained_area_excavated_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=3, value=self.module.area_not_drained_or_rewetted_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=3, value=self.module.area_w_restored_vegetation_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=3, value=self.module.soil_type_t2.name if self.module.soil_type_t2 is not None else "Default")
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=3, value=self.module.soc_t2_w if self.module.soc_t2_w is not None else "Default")
+            self.metadata_worksheet.cell(row=last_metadata_row + 9, column=3, value=self.module.pc_c_lost_after_excavation_t2_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 10, column=3, value=self.calculator.agb.value)
+            self.metadata_worksheet.cell(row=last_metadata_row + 11, column=3, value=self.calculator.bgb.value)
+            self.metadata_worksheet.cell(row=last_metadata_row + 12, column=3, value=self.calculator.litter.value)
+            self.metadata_worksheet.cell(row=last_metadata_row + 13, column=3, value=self.calculator.dw.value)
+            self.metadata_worksheet.cell(row=last_metadata_row + 14, column=3, value=self.calculator.salinity_type.value)
+
+        if self.module.is_without():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=4, value=self.units)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=4, value=self.module.land_use_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=4, value=self.module.area_under_drainage_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=4, value=self.module.drained_area_excavated_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=4, value=self.module.area_not_drained_or_rewetted_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=4, value=self.module.area_w_restored_vegetation_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=4, value=self.module.soil_type_t2.name if self.module.soil_type_t2 is not None else "Default")
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=4, value=self.module.soc_t2_wo if self.module.soc_t2_wo is not None else "Default")
+            self.metadata_worksheet.cell(row=last_metadata_row + 9, column=4, value=self.module.pc_c_lost_after_excavation_t2_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 10, column=4, value=self.calculator.agb.value)
+            self.metadata_worksheet.cell(row=last_metadata_row + 11, column=4, value=self.calculator.bgb.value)
+            self.metadata_worksheet.cell(row=last_metadata_row + 12, column=4, value=self.calculator.litter.value)
+            self.metadata_worksheet.cell(row=last_metadata_row + 13, column=4, value=self.calculator.dw.value)
+            self.metadata_worksheet.cell(row=last_metadata_row + 14, column=4, value=self.calculator.salinity_type.value)
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+    def build_report(self):
+        super().build_report()
+        self.populate_metadata()
+        return self.workbook
 
 
 @dataclass
