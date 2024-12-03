@@ -281,6 +281,8 @@ class LandUseChangeTest(ActivityTest):
             module_type_wo=module_type_wo,
             module_type_w=module_type_w,
         )
+        self.activity.module_types.add(ModuleType.objects.get(class_name="LandUseChange"))
+        self.activity.save()
         log.info(f"Created LUC with parameters {self.get_parameters(self.land_use_change)}")
 
     def calculate_results(self):
