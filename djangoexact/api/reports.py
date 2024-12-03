@@ -823,6 +823,63 @@ class LandUseChangeReport(LandModuleReport):
         self.calculator = calculators.LandUseChangeCalculator(self.module)
         return super().__post_init__()
 
+    def populate_metadata(self):
+        """
+        Populates the metadata worksheet in the Excel workbook with relevant data.
+
+        This method retrieves the workbook and the "Metadata" worksheet, then appends
+        metadata information related to land use change, hectares, main season crop,
+        tillage management type, organic input type, and yield. The data is populated
+        based on the module's state (start, with, without).
+
+        The method performs the following steps:
+        1. Retrieves the workbook and the "Metadata" worksheet.
+        2. Determines the last row in the metadata worksheet.
+        3. Adds metadata headers and fills the first column with static values.
+        4. Populates the second, third, and fourth columns with dynamic values based on
+           the module's state (start, with, without).
+        5. Saves the updated workbook.
+
+        The columns are populated as follows:
+        - Column 1: Static metadata headers.
+        - Column 2: Values when the module is in the start state.
+        - Column 3: Values when the module is in the with state.
+        - Column 4: Values when the module is in the without state.
+
+        The method ensures that if certain values are not available, default values are used.
+
+        Raises:
+            AttributeError: If any required attributes are missing from the module or activity report.
+        """
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
+        last_metadata_row = self.metadata_worksheet.max_row + 1
+
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Land Use Change")
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1).fill = Colors.LIGHT_BLUE_FILL.value
+
+        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Type of land use change")
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Fire used during conversion")
+        self.metadata_worksheet.cell(row=last_metadata_row + 3, column=1, value="Dry matter removed during conversion")
+
+        if self.module.is_start():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=2, value=self.module.module_type_start.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=2, value="Yes" if self.module.is_fire_used_start else "No")
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=2, value=self.module.dry_matter_start)
+
+        if self.module.is_with():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=3, value=self.module.module_type_w.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=3, value="Yes" if self.module.is_fire_used_w else "No")
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=3, value=self.module.dry_matter_w)
+
+        if self.module.is_without():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=4, value=self.module.module_type_wo.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=4, value="Yes" if self.module.is_fire_used_wo else "No")
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=4, value=self.module.dry_matter_wo)
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
     def get_result(self):
         super().get_result()
 
@@ -830,6 +887,11 @@ class LandUseChangeReport(LandModuleReport):
         self.soil_co2 = list(map(sum, zip(self.soil_co2, dom_co2)))
 
         self.total_emissions = list(map(sum, zip(self.total_emissions, dom_co2)))
+
+    def build_report(self):
+        super().build_report()
+        self.populate_metadata()
+        return self.workbook
 
 
 @dataclass
