@@ -130,7 +130,7 @@ if os.getenv("GAE_APPLICATION", None):
             "OPTIONS": {
                 "connect_timeout": 30,  # Optional: set timeout
             },
-            "CONN_MAX_AGE": 0,  # Enables persistent connections
+            "CONN_MAX_AGE": 10,
         }
     }
 else:
@@ -145,7 +145,6 @@ else:
             "OPTIONS": {
                 "connect_timeout": 30,  # Optional: set timeout
             },
-            "CONN_MAX_AGE": 0,  # Enables persistent connections
         }
     }
 
