@@ -14,11 +14,9 @@ from api import utilities as utils
 import ipcc.models as ipcc
 
 from django.utils.translation import gettext_lazy as _
-from django.apps import apps
-from django.conf import settings
 from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
-from picklefield.fields import PickledObjectField
 from dirtyfields import DirtyFieldsMixin
+from django.utils.text import slugify
 
 
 alphanumeric = validators.RegexValidator(r"^[0-9a-zA-Z]*$", "Only alphanumeric characters are allowed.")
@@ -668,6 +666,24 @@ class Project(Historical, DirtyFieldsMixin):
         return self.gw_potential
 
 
+class ProjectTag(models.Model):
+    class Meta:
+        verbose_name_plural = "Project Tags"
+        unique_together = ("name", "slug", "user", "project")
+
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="tags")
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="tags")
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        return super().save(*args, **kwargs)
+
+
 class ProjectInvitation(Historical):
     STATUS_CHOICES = (("sent", "Sent"), ("accepted", "Accepted"), ("declined", "Declined"))
 
@@ -886,10 +902,10 @@ class CachedResultMixin(models.Model, DirtyFieldsMixin):
 
     updated_at = models.DateTimeField(auto_now=True, null=True, verbose_name=_("updated_at"))
     last_cached_at = models.DateTimeField(null=True, blank=True, verbose_name=_("last_cached_at"))
-    cached_results_total = PickledObjectField(null=True, blank=True, verbose_name=_("cached_results_total"))
-    cached_results_by_activity = PickledObjectField(null=True, blank=True, verbose_name=_("cached_results_total"))
-    cached_results_by_gas = PickledObjectField(null=True, blank=True, verbose_name=_("cached_results_total"))
-    cached_results_by_activity_by_gas = PickledObjectField(null=True, blank=True, verbose_name=_("cached_results_total"))
+    cached_results_total = models.JSONField(null=True, blank=True, verbose_name=_("cached_results_total"))
+    cached_results_by_activity = models.JSONField(null=True, blank=True, verbose_name=_("cached_results_total"))
+    cached_results_by_gas = models.JSONField(null=True, blank=True, verbose_name=_("cached_results_total"))
+    cached_results_by_activity_by_gas = models.JSONField(null=True, blank=True, verbose_name=_("cached_results_total"))
     last_modified = models.DateTimeField(auto_now=False, null=True, blank=True, verbose_name=_("last_modified"))
 
     def save(self, *args, **kwargs):
@@ -898,7 +914,7 @@ class CachedResultMixin(models.Model, DirtyFieldsMixin):
 
         if self.pk and self.is_dirty(check_relationship=True):
             dirty_fields = self.get_dirty_fields(check_relationship=True)
-            cache_fields = ["last_cached_at", "cached_results_total", "cached_results_by_activity", "cached_results_by_gas", "cached_results_by_activity_by_gas"]
+            cache_fields = ["last_cached_at", "cached_results_total", "cached_results_by_activity", "cached_results_by_gas", "cached_results_by_activity_by_gas", "last_modified"]
 
             if any(field.name in dirty_fields.keys() for field in self._meta.get_fields() if field.name not in cache_fields):
                 self.last_modified = timezone.now()
@@ -1264,11 +1280,15 @@ class SingleBiomassModule(BiomassModule):
         if land_use_type is None:
             raise ValueError(f"Missing land use type for {scenario.value} scenario")
 
+        # BUG: This is a temporary fix because the land use type "Default" is not being used in the database for biomass data. Unify this.
+        if land_use_type.name_en == "Default":
+            land_use_type = LandUseType.objects.get(name_en="Agroforestry - Default")
+
         try:
             return BiomassModel.objects.get(climate=climate, moisture=moisture, continent=continent, land_use_type=land_use_type)
         except BiomassModel.DoesNotExist:
             if getattr(self, f"biomass_t2_{scenario.value}", None) is None:
-                raise ValueError(f"Missing biomass data for {land_use_type.name}, {climate.name}, {moisture.name}, {continent.name}, for {scenario.verbose_name} scenario. Please provide tier2 value.")
+                raise ValueError(f"Missing biomass data for {land_use_type}, {climate}, {moisture}, {continent}, for {scenario.verbose_name} scenario. Please provide tier2 value.")
             return BiomassModel()
 
 
@@ -1876,11 +1896,6 @@ class ForestManagement(LandModule, LitterDeadwoodBiomassModule):
         return super().save(*args, **kwargs)
 
     def get_agb_growth_ref(self, land_use_type: LandUseType, from_year: int = 0) -> ipcc.ForestManagementAGB:
-        AGB_UNDER_20_NOT_FOUND = f"AGB (under 20 years) not found for ({self.forest_type.name}) {land_use_type.name} in {self.activity.project.climate.name} climate, {self.activity.project.country.region.name} region. Please insert t2 values for AGB (under 20 years) for all relevant cenarios."
-        AGB_OVER_20_NOT_FOUND = f"AGB (over 20 years) not found for ({self.forest_type.name}) {land_use_type.name} in {self.activity.project.climate.name} climate, {self.activity.project.country.region.name} region. Please insert t2 values for AGB (over 20 years) for all relevant scenarios."
-
-        error_msg = AGB_UNDER_20_NOT_FOUND if from_year < 20 else AGB_OVER_20_NOT_FOUND
-
         climate = self.activity.climate_t2 if self.activity.climate_t2 else self.activity.project.climate
 
         filters = {
@@ -2339,7 +2354,7 @@ class RoadType(models.Model):
     name = models.CharField(max_length=255, unique=True)
 
     def __str__(self):
-        return f"({self.id}) {self.name}"
+        return self.name
 
 
 class Building(Submodule):
@@ -2750,3 +2765,112 @@ class FieldDefinition(models.Model):
 
     def __str__(self):
         return f"{self.module_type}.{self.field_name}"
+
+
+class RefrigerantType(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return f"({self.pk}) {self.name}"
+
+
+class PackagingMaterialType(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return f"({self.pk}) {self.name}"
+
+
+class ValueChainModule(Module):
+
+    class Meta:
+        abstract = True
+
+    name = models.CharField(max_length=255, unique=True, null=True, blank=True)
+
+    energy_ef_co2_t2 = models.FloatField(null=True, blank=True)
+    energy_ef_ch4_t2 = models.FloatField(null=True, blank=True)
+    energy_ef_n2o_t2 = models.FloatField(null=True, blank=True)
+
+    emission_factor_t2_start = models.FloatField(null=True, blank=True)
+    emission_factor_t2_w = models.FloatField(null=True, blank=True)
+    emission_factor_t2_wo = models.FloatField(null=True, blank=True)
+
+    country_t2 = models.ForeignKey(Country, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_country_of_origin_t2")
+    ef_source = models.ForeignKey(EmissionFactorSource, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("ef_source"))
+
+    def save(self, *args, **kwargs):
+
+        if self.pk is None:
+            self.ef_source = EmissionFactorSource.objects.get_or_create(name="Operating Margin")[0]
+
+        return super().save(*args, **kwargs)
+
+
+class Storage(ValueChainModule):
+    kwh_energy_per_year_start = models.FloatField(null=True, blank=True)
+    kwh_energy_per_year_w = models.FloatField(null=True, blank=True)
+    kwh_energy_per_year_wo = models.FloatField(null=True, blank=True)
+    kwh_energy_per_year_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL)
+
+    is_refrigerant_used = models.BooleanField(default=False)
+
+    refrigerant_type_start = models.ForeignKey(RefrigerantType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_refrigerant_type_start")
+    refrigerant_type_w = models.ForeignKey(RefrigerantType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_refrigerant_type_w")
+    refrigerant_type_wo = models.ForeignKey(RefrigerantType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_refrigerant_type_wo")
+    refrigerant_type_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_refrigerant_type_thread")
+
+    total_refrigerant_leakage_start = models.FloatField(null=True, blank=True)
+    total_refrigerant_leakage_w = models.FloatField(null=True, blank=True)
+    total_refrigerant_leakage_wo = models.FloatField(null=True, blank=True)
+    total_refrigerant_leakage_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_total_refrigerant_leakage_thread")
+
+
+class Processing(ValueChainModule):
+    fuel_type_start = models.ForeignKey(FuelType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_fuel_type_start", limit_choices_to=({"fuel_use_type__name": "Stationary"}))
+    fuel_type_w = models.ForeignKey(FuelType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_fuel_type_w", limit_choices_to=({"fuel_use_type__name": "Stationary"}))
+    fuel_type_wo = models.ForeignKey(FuelType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_fuel_type_wo", limit_choices_to=({"fuel_use_type__name": "Stationary"}))
+    fuel_type_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_fuel_type_thread")
+
+    kwh_energy_per_year_start = models.FloatField(null=True, blank=True)
+    kwh_energy_per_year_w = models.FloatField(null=True, blank=True)
+    kwh_energy_per_year_wo = models.FloatField(null=True, blank=True)
+    kwh_energy_per_year_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_energy_use_per_year_thread")
+
+    is_water_used = models.BooleanField(default=False)
+
+    water_use_per_year_start = models.FloatField(null=True, blank=True)
+    water_use_per_year_w = models.FloatField(null=True, blank=True)
+    water_use_per_year_wo = models.FloatField(null=True, blank=True)
+    water_use_per_year_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_water_use_per_year_thread")
+
+
+class Packaging(ValueChainModule):
+    packaging_material_type_start = models.ForeignKey(PackagingMaterialType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_packaging_material_type_start")
+    packaging_material_type_w = models.ForeignKey(PackagingMaterialType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_packaging_material_type_w")
+    packaging_material_type_wo = models.ForeignKey(PackagingMaterialType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_packaging_material_type_wo")
+    packaging_material_type_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_packaging_material_type_thread")
+
+    kg_of_packaging_material_start = models.FloatField(null=True, blank=True)
+    kg_of_packaging_material_w = models.FloatField(null=True, blank=True)
+    kg_of_packaging_material_wo = models.FloatField(null=True, blank=True)
+    kg_of_packaging_material_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_kf_of_packaging_material_thread")
+
+    is_electric = models.BooleanField(default=False)
+
+    kwh_energy_per_year_start = models.FloatField(null=True, blank=True)
+    kwh_energy_per_year_w = models.FloatField(null=True, blank=True)
+    kwh_energy_per_year_wo = models.FloatField(null=True, blank=True)
+    kwh_energy_per_year_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_kwh_energy_per_year_thread")
+
+
+class Transport(ValueChainModule):
+    fuel_type_start = models.ForeignKey(FuelType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_fuel_type_start")
+    fuel_type_w = models.ForeignKey(FuelType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_fuel_type_w")
+    fuel_type_wo = models.ForeignKey(FuelType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_fuel_type_wo")
+    fuel_type_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_fuel_type_thread")
+
+    fuel_used_per_year_start = models.FloatField(null=True, blank=True)
+    fuel_used_per_year_w = models.FloatField(null=True, blank=True)
+    fuel_used_per_year_wo = models.FloatField(null=True, blank=True)
+    fuel_used_per_year_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_fuel_used_per_year_thread")

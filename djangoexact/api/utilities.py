@@ -8,7 +8,6 @@ from django.db import models
 from rest_framework import exceptions, status
 from rest_framework.response import Response
 from simple_history.models import HistoricalRecords
-from simple_history.utils import update_change_reason
 from django.utils.translation import get_language
 from django.core.exceptions import FieldDoesNotExist
 
@@ -271,7 +270,8 @@ def create_comment_threads(module_instance):
         if attr.endswith("_thread") and getattr(module_instance, attr, None) is None:
             setattr(module_instance, attr, api_models.CommentThread.objects.create())
     if not module_instance._state.adding:
-        update_change_reason(module_instance, "update")
+        if module_instance.history.exists():
+            update_change_reason(module_instance, "update")
 
 
 def getany(objects: list[object], key: str):
@@ -516,3 +516,26 @@ def find_empty_scenarios(entity, field: str):
 @dataclass
 class DefaultValue:
     value: float = 0
+
+
+def update_change_reason(instance, reason):
+    from simple_history.utils import get_history_manager_for_model
+
+    attrs = {}
+    model = type(instance)
+    manager = instance if instance.pk is not None else model
+    history = get_history_manager_for_model(manager)
+    history_fields = [field.attname for field in history.model._meta.fields]
+    for field in instance._meta.fields:
+        if field.attname not in history_fields:
+            continue
+        value = getattr(instance, field.attname)
+        if field.primary_key is True:
+            if value is not None:
+                attrs[field.attname] = value
+        else:
+            attrs[field.attname] = value
+
+    record = history.filter(id=instance.pk).order_by("-history_date").first()
+    record.history_change_reason = reason
+    record.save()

@@ -210,9 +210,9 @@ class PerennialCroplandDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            soc_t2_start_default=defaults.soc.value,
-            soc_t2_w_default=defaults.soc.value,
-            soc_t2_wo_default=defaults.soc.value,
+            soc_t2_start_default=defaults.soc_start.value,
+            soc_t2_w_default=defaults.soc_w.value,
+            soc_t2_wo_default=defaults.soc_wo.value,
             agb_t2_start_default=defaults.agb_start_default.value,
             agb_t2_w_default=defaults.agb_w_default.value,
             agb_t2_wo_default=defaults.ag_default_wo.value,
@@ -392,10 +392,10 @@ class LivestockDefaults(Defaults):
             prp_percentage_t2_start_default=defaults.animal_waste_prp_start.value,
             prp_percentage_t2_w_default=defaults.animal_waste_prp_w.value,
             prp_percentage_t2_wo_default=defaults.animal_waste_prp_wo.value,
-            prp_ch4_t2_start_default=0,
+            prp_ch4_t2_start_default=defaults.math_w.percentage_prp_start_tier_2_default or defaults.math_wo.percentage_prp_start_tier_2_default,
             prp_ch4_t2_w_default=defaults.math_w.percentage_prp_end_tier_2_default,
             prp_ch4_t2_wo_default=defaults.math_wo.percentage_prp_end_tier_2_default,
-            prp_n2o_t2_start_default=0,
+            prp_n2o_t2_start_default=defaults.math_w.n2o_prp_direct_head_start_tier_2_default or defaults.math_wo.n2o_prp_direct_head_start_tier_2_default,
             prp_n2o_t2_w_default=defaults.math_w.n2o_prp_direct_head_end_tier_2_default,
             prp_n2o_t2_wo_default=defaults.math_wo.n2o_prp_direct_head_end_tier_2_default,
             emission_factor_ch4_t2_start_default=0,
@@ -445,15 +445,9 @@ class FuelDefaults(Defaults):
         super().__init__(input)
 
         self.values = SimpleNamespace(
-            ef_co2_t2_start_default=0,
-            ef_co2_t2_w_default=0,
-            ef_co2_t2_wo_default=0,
-            ef_n2o_t2_start_default=0,
-            ef_n2o_t2_w_default=0,
-            ef_n2o_t2_wo_default=0,
-            ef_ch4_t2_start_default=0,
-            ef_ch4_t2_w_default=0,
-            ef_ch4_t2_wo_default=0,
+            ef_co2_t2_default=0,
+            ef_n2o_t2_default=0,
+            ef_ch4_t2_default=0,
         )
 
     def get_defaults(self, calculate=False) -> dict:
@@ -463,15 +457,9 @@ class FuelDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            ef_co2_t2_start_default=defaults.energy_ef_default.co2,
-            ef_co2_t2_w_default=defaults.energy_ef_default.co2,
-            ef_co2_t2_wo_default=defaults.energy_ef_default.co2,
-            ef_n2o_t2_start_default=defaults.energy_ef_default.n2o,
-            ef_n2o_t2_w_default=defaults.energy_ef_default.n2o,
-            ef_n2o_t2_wo_default=defaults.energy_ef_default.n2o,
-            ef_ch4_t2_start_default=defaults.energy_ef_default.ch4,
-            ef_ch4_t2_w_default=defaults.energy_ef_default.ch4,
-            ef_ch4_t2_wo_default=defaults.energy_ef_default.ch4,
+            ef_co2_t2_default=defaults.energy_ef_default.co2,
+            ef_n2o_t2_default=defaults.energy_ef_default.n2o,
+            ef_ch4_t2_default=defaults.energy_ef_default.ch4,
         )
 
 
@@ -715,9 +703,9 @@ class SettlementDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            soc_t2_start_default=defaults.soc.value,
-            soc_t2_w_default=defaults.soc.value,
-            soc_t2_wo_default=defaults.soc.value,
+            soc_t2_start_default=defaults.soc_start.value,
+            soc_t2_w_default=defaults.soc_w.value,
+            soc_t2_wo_default=defaults.soc_wo.value,
             flu_t2_start_default=defaults.flu_start.value,
             flu_t2_w_default=defaults.flu_w.value,
             flu_t2_wo_default=defaults.flu_wo.value,
@@ -1253,6 +1241,43 @@ class ForestManagementDefaults(Defaults):
         defaults = calcs.ForestManagementCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
+        agb_start = 0
+        bgb_start = 0
+        bgb_w = 0
+        bgb_wo = 0
+        bgb_growth_before_20_yrs_w = 0
+        bgb_growth_before_20_yrs_wo = 0
+        bgb_growth_after_20_yrs_w = 0
+        bgb_growth_after_20_yrs_wo = 0
+
+        if defaults.agb_start_w:
+            agb_start = defaults.agb_start_w
+        elif defaults.agb_start_wo:
+            agb_start = defaults.agb_start_wo
+
+        if defaults.bgb_after_20_yrs and defaults.agb_start_w:
+            bgb_start = defaults.agb_start_w * defaults.bgb_after_20_yrs.value
+        elif defaults.bgb_after_20_yrs and defaults.agb_start_wo:
+            bgb_start = defaults.agb_start_wo * defaults.bgb_after_20_yrs.value
+
+        if defaults.bgb_after_20_yrs and defaults.agb_max_w:
+            bgb_w = defaults.agb_max_w * defaults.bgb_after_20_yrs.value
+
+        if defaults.bgb_after_20_yrs and defaults.agb_max_wo:
+            bgb_wo = defaults.agb_max_wo * defaults.bgb_after_20_yrs.value
+
+        if defaults.bgb_before_20_yrs and defaults.agb_growth_under_20_w:
+            bgb_growth_before_20_yrs_w = defaults.agb_growth_under_20_w * defaults.bgb_before_20_yrs.value
+
+        if defaults.bgb_before_20_yrs and defaults.agb_growth_under_20_wo:
+            bgb_growth_before_20_yrs_wo = defaults.agb_growth_under_20_wo * defaults.bgb_before_20_yrs.value
+
+        if defaults.bgb_after_20_yrs and defaults.agb_growth_over_20_w:
+            bgb_growth_after_20_yrs_w = defaults.agb_growth_over_20_w * defaults.bgb_after_20_yrs.value
+
+        if defaults.bgb_after_20_yrs and defaults.agb_growth_over_20_wo:
+            bgb_growth_after_20_yrs_wo = defaults.agb_growth_over_20_wo * defaults.bgb_after_20_yrs.value
+
         return SimpleNamespace(
             soc_t2_start_default=defaults.soc_start.value,
             soc_t2_w_default=defaults.soc_w.value,
@@ -1272,12 +1297,12 @@ class ForestManagementDefaults(Defaults):
             deadwood_t2_start_default=defaults.litter_dw_start_w.dw,
             deadwood_t2_w_default=defaults.litter_dw.dw,
             deadwood_t2_wo_default=defaults.litter_dw.dw,
-            agb_t2_start_default=defaults.agb_start_w if self.input.is_with() else defaults.agb_start_w if self.input.is_with() else 0,
+            agb_t2_start_default=agb_start,
             agb_t2_w_default=defaults.agb_max_w,
             agb_t2_wo_default=defaults.agb_max_wo,
-            bgb_t2_start_default=defaults.bgb_after_20_yrs.value if defaults.bgb_after_20_yrs else 0,
-            bgb_t2_w_default=defaults.bgb_after_20_yrs.value if defaults.bgb_after_20_yrs else 0,
-            bgb_t2_wo_default=defaults.bgb_after_20_yrs.value if defaults.bgb_after_20_yrs else 0,
+            bgb_t2_start_default=bgb_start,
+            bgb_t2_w_default=bgb_w,
+            bgb_t2_wo_default=bgb_wo,
             agb_growth_rate_le_20_yrs_t2_start_default=0,
             agb_growth_rate_le_20_yrs_t2_w_default=defaults.agb_growth_under_20_w,
             agb_growth_rate_le_20_yrs_t2_wo_default=defaults.agb_growth_under_20_wo,
@@ -1285,11 +1310,11 @@ class ForestManagementDefaults(Defaults):
             agb_growth_rate_gt_20_yrs_t2_w_default=defaults.agb_growth_over_20_w,
             agb_growth_rate_gt_20_yrs_t2_wo_default=defaults.agb_growth_over_20_wo,
             bgb_growth_rate_le_20_yrs_t2_start_default=0,
-            bgb_growth_rate_le_20_yrs_t2_w_default=defaults.bgb_before_20_yrs.value,
-            bgb_growth_rate_le_20_yrs_t2_wo_default=defaults.bgb_before_20_yrs.value,
+            bgb_growth_rate_le_20_yrs_t2_w_default=bgb_growth_before_20_yrs_w,
+            bgb_growth_rate_le_20_yrs_t2_wo_default=bgb_growth_before_20_yrs_wo,
             bgb_growth_rate_gt_20_yrs_t2_start_default=0,
-            bgb_growth_rate_gt_20_yrs_t2_w_default=defaults.bgb_after_20_yrs.value,
-            bgb_growth_rate_gt_20_yrs_t2_wo_default=defaults.bgb_after_20_yrs.value,
+            bgb_growth_rate_gt_20_yrs_t2_w_default=bgb_growth_after_20_yrs_w,
+            bgb_growth_rate_gt_20_yrs_t2_wo_default=bgb_growth_after_20_yrs_wo,
             rotation_start_year_t2_start_default=defaults.activity.start_year_t2 - defaults.project.start_year_of_activities if defaults.activity.start_year_t2 else 0,
             rotation_start_year_t2_w_default=defaults.activity.start_year_t2 - defaults.project.start_year_of_activities if defaults.activity.start_year_t2 else 0,
             rotation_start_year_t2_wo_default=defaults.activity.start_year_t2 - defaults.project.start_year_of_activities if defaults.activity.start_year_t2 else 0,
@@ -1337,3 +1362,63 @@ class ForestDisturbanceDefaults(Defaults):
             start_year_t2_w_default=self.start_year_t2_w_default,
             start_year_t2_wo_default=self.start_year_t2_wo_default,
         )
+
+
+class StorageDefaults(Defaults):
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace()
+
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.Storage
+
+        defaults = calcs.StorageCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace()
+
+
+class TransportDefaults(Defaults):
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace()
+
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.Transport
+
+        defaults = calcs.TransportCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace()
+
+
+class ProcessingDefaults(Defaults):
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace()
+
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.Processing
+
+        defaults = calcs.ProcessingCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace()
+
+
+class PackagingDefaults(Defaults):
+    def __init__(self, input: calcs.Module):
+        super().__init__(input)
+
+        self.values = SimpleNamespace()
+
+    def get_defaults(self, calculate=False) -> dict:
+        self.input: api.Packaging
+
+        defaults = calcs.PackagingCalculator(self.input)
+        defaults.get_defaults(calculate=calculate)
+
+        return SimpleNamespace()
