@@ -39,3 +39,16 @@ class BaseModuleTestCase(APITestCaseMixin):
         self.module_viewset = generic_module_viewset(self.ModuleClass)
 
         self.land_use_types = models.LandUseType.objects.filter(module_types__class_name=self.ModuleClass.__name__, climates=self.project.climate, moistures=self.project.moisture, is_active=True)
+
+
+class BaseModuleWithSubmoduleTestCase(BaseModuleTestCase):
+    def setUp(self):
+        super().setUp()
+        self.submodules = []
+
+        for submodule in self.submodule_classes:
+            submodule: models.Module
+            submodule_response = self.create_submodule(submodule, self.user, {"parent": self.module.pk})
+            self.assertEqual(submodule_response.status_code, status.HTTP_201_CREATED)
+
+            self.submodules.append(submodule.objects.get(id=submodule_response.data["id"]))

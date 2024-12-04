@@ -167,9 +167,13 @@ router.register(r"definitions", views.FieldDefinitionViewSet, basename="definiti
 
 # Value Chains
 router.register(r"storages", views.generic_module_viewset(models.Storage), basename="storage")
+router.register(r"storage-entries", views.generic_module_viewset(models.StorageEntry), basename="storageentry")
 router.register(r"processings", views.generic_module_viewset(models.Processing), basename="processing")
+router.register(r"processing-entries", views.generic_module_viewset(models.ProcessingEntry), basename="processingentry")
 router.register(r"packagings", views.generic_module_viewset(models.Packaging), basename="packaging")
+router.register(r"packaging-entries", views.generic_module_viewset(models.PackagingEntry), basename="packagingentry")
 router.register(r"transports", views.generic_module_viewset(models.Transport), basename="transport")
+router.register(r"transport-entries", views.generic_module_viewset(models.TransportEntry), basename="transportentry")
 
 urlpatterns = [
     path("docs/", include_docs_urls(title="EX-ACT Docs")),
