@@ -6691,13 +6691,13 @@ class ProcessingEntryCalculator(BaseValueChainCalculator):
         self.get_defaults()
 
         if self.module.is_with():
-            self.module.fuel_type = self.module.fuel_type_w
+            self.module.fuel_type = self.module.fuel_type_w  # Temporarily assign fuel type to comply with the Fuel calculator requirements
             calc = ElectricityCalculator(self.module) if self.module.fuel_type_w.name.casefold() == "electricity" else FuelCalculator(self.module)
             calc.calculate()
             self.math_w = calc.math_w
 
         if self.module.is_without():
-            self.module.fuel_type = self.module.fuel_type_wo
+            self.module.fuel_type = self.module.fuel_type_wo  # Temporarily assign fuel type to comply with the Fuel calculator requirements
             calc = ElectricityCalculator(self.module) if self.module.fuel_type_wo.name.casefold() == "electricity" else FuelCalculator(self.module)
             calc.calculate()
             self.math_wo = calc.math_wo
@@ -6888,13 +6888,13 @@ class TransportEntryCalculator(BaseCalculator):
         self.get_defaults()
 
         if self.module.is_with():
-            self.module.fuel_type = self.module.fuel_type_w
+            self.module.fuel_type = self.module.fuel_type_w  # Temporarily assign fuel type to comply with the Fuel calculator requirements
             calc = ElectricityCalculator(self.module) if self.module.fuel_type_w.name.casefold() == "electricity" else FuelCalculator(self.module)
             calc.calculate()
             self.math_w = calc.math_w
 
         if self.module.is_without():
-            self.module.fuel_type = self.module.fuel_type_wo
+            self.module.fuel_type = self.module.fuel_type_wo  # Temporarily assign fuel type to comply with the Fuel calculator requirements
             calc = ElectricityCalculator(self.module) if self.module.fuel_type_wo.name.casefold() == "electricity" else FuelCalculator(self.module)
             calc.calculate()
             self.math_wo = calc.math_wo
