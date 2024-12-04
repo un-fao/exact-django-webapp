@@ -2779,7 +2779,17 @@ class PackagingMaterialType(models.Model):
         return f"({self.pk}) {self.name}"
 
 
-class ValueChainModule(Module):
+class ValueChainParentModule(Module):
+
+    class Meta:
+        abstract = True
+
+    @property
+    def submodules(self) -> list["ValueChainSubmodule"]:
+        return list(self.entries.all())
+
+
+class ValueChainSubmodule(Submodule):
 
     class Meta:
         abstract = True
@@ -2805,7 +2815,13 @@ class ValueChainModule(Module):
         return super().save(*args, **kwargs)
 
 
-class Storage(ValueChainModule):
+class Storage(ValueChainParentModule):
+    pass
+
+
+class StorageEntry(ValueChainSubmodule):
+    parent = models.ForeignKey(Storage, on_delete=models.CASCADE, null=True, blank=True, related_name="entries")
+
     kwh_energy_per_year_start = models.FloatField(null=True, blank=True)
     kwh_energy_per_year_w = models.FloatField(null=True, blank=True)
     kwh_energy_per_year_wo = models.FloatField(null=True, blank=True)
@@ -2824,7 +2840,13 @@ class Storage(ValueChainModule):
     total_refrigerant_leakage_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_total_refrigerant_leakage_thread")
 
 
-class Processing(ValueChainModule):
+class Processing(ValueChainParentModule):
+    pass
+
+
+class ProcessingEntry(ValueChainSubmodule):
+    parent = models.ForeignKey(Processing, on_delete=models.CASCADE, null=True, blank=True, related_name="entries")
+
     fuel_type_start = models.ForeignKey(FuelType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_fuel_type_start", limit_choices_to=({"fuel_use_type__name": "Stationary"}))
     fuel_type_w = models.ForeignKey(FuelType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_fuel_type_w", limit_choices_to=({"fuel_use_type__name": "Stationary"}))
     fuel_type_wo = models.ForeignKey(FuelType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_fuel_type_wo", limit_choices_to=({"fuel_use_type__name": "Stationary"}))
@@ -2843,7 +2865,13 @@ class Processing(ValueChainModule):
     water_use_per_year_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_water_use_per_year_thread")
 
 
-class Packaging(ValueChainModule):
+class Packaging(ValueChainParentModule):
+    pass
+
+
+class PackagingEntry(ValueChainSubmodule):
+    parent = models.ForeignKey(Packaging, on_delete=models.CASCADE, null=True, blank=True, related_name="entries")
+
     packaging_material_type_start = models.ForeignKey(PackagingMaterialType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_packaging_material_type_start")
     packaging_material_type_w = models.ForeignKey(PackagingMaterialType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_packaging_material_type_w")
     packaging_material_type_wo = models.ForeignKey(PackagingMaterialType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_packaging_material_type_wo")
@@ -2862,7 +2890,13 @@ class Packaging(ValueChainModule):
     kwh_energy_per_year_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_kwh_energy_per_year_thread")
 
 
-class Transport(ValueChainModule):
+class Transport(ValueChainParentModule):
+    pass
+
+
+class TransportEntry(ValueChainSubmodule):
+    parent = models.ForeignKey(Transport, on_delete=models.CASCADE, null=True, blank=True, related_name="entries")
+
     fuel_type_start = models.ForeignKey(FuelType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_fuel_type_start")
     fuel_type_w = models.ForeignKey(FuelType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_fuel_type_w")
     fuel_type_wo = models.ForeignKey(FuelType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_fuel_type_wo")
