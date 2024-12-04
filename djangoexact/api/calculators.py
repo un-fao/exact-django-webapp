@@ -130,6 +130,10 @@ from .models import (
     Packaging,
     Storage,
     Processing,
+    TransportEntry,
+    PackagingEntry,
+    StorageEntry,
+    ProcessingEntry,
 )
 from api.utilities import DefaultValue
 from math_model.no_time_dependency_final.value_chains import ValueChain as MathValueChain
@@ -3563,8 +3567,8 @@ class ElectricityCalculator(BaseCalculator):
             "emissions_factor": self.electricity_ef_selected.value,
             "specific_factor_start": self.module.electricity_ef_t2_start,
             "specific_factor_end": self.module.electricity_ef_t2_w,
-            "mwh_start": self.module.mwh_start,
-            "mwh_end": self.module.mwh_w,
+            "mwh_start": self.module.quantity_consumed_per_year_start,
+            "mwh_end": self.module.quantity_consumed_per_year_w,
             "percent_loss_transportation_start": self.module.transmission_loss_start,
             "percent_loss_transportation_end": self.module.transmission_loss_w,
             "rate_type": self.change_rate.name,
@@ -3581,8 +3585,8 @@ class ElectricityCalculator(BaseCalculator):
             "emissions_factor": self.electricity_ef_selected.value,
             "specific_factor_start": self.module.electricity_ef_t2_start,
             "specific_factor_end": self.module.electricity_ef_t2_wo,
-            "mwh_start": self.module.mwh_start,
-            "mwh_end": self.module.mwh_wo,
+            "mwh_start": self.module.quantity_consumed_per_year_start,
+            "mwh_end": self.module.quantity_consumed_per_year_wo,
             "percent_loss_transportation_start": self.module.transmission_loss_start,
             "percent_loss_transportation_end": self.module.transmission_loss_wo,
             "rate_type": self.change_rate.name,
@@ -3660,8 +3664,8 @@ class FuelCalculator(BaseCalculator):
             "specific_factor_ch4": self.module.energy_ef_ch4_t2,
             "emissions_factor_n2o": self.energy_ef_default.n2o,
             "specific_factor_n2o": self.module.energy_ef_n2o_t2,
-            "mwh_start": self.module.fuel_consumption_start,
-            "mwh_end": self.module.fuel_consumption_w,
+            "mwh_start": self.module.quantity_consumed_per_year_start,
+            "mwh_end": self.module.quantity_consumed_per_year_w,
             "rate_type": self.change_rate.name,
             "implementation_time": self.activity.implementation_years,
             "capitalization_time": self.activity.capitalization_years,
@@ -3681,8 +3685,8 @@ class FuelCalculator(BaseCalculator):
             "specific_factor_ch4": self.module.energy_ef_ch4_t2,
             "emissions_factor_n2o": self.energy_ef_default.n2o,
             "specific_factor_n2o": self.module.energy_ef_n2o_t2,
-            "mwh_start": self.module.fuel_consumption_start,
-            "mwh_end": self.module.fuel_consumption_wo,
+            "mwh_start": self.module.quantity_consumed_per_year_start,
+            "mwh_end": self.module.quantity_consumed_per_year_wo,
             "rate_type": self.change_rate.name,
             "implementation_time": self.activity.implementation_years,
             "capitalization_time": self.activity.capitalization_years,
@@ -6490,11 +6494,33 @@ class BaseValueChainCalculator(BaseCalculator):
         self.electricity_results_wo = None
 
 
-class StorageCalculator(BaseValueChainCalculator):
+class StorageCalculator(BaseCalculator):
+
+    def __init__(self, input) -> None:
+        super().__init__(input)
+        self.module: Storage
+
+    def get_defaults(self, calculate=False) -> dict:
+        return super().get_defaults(calculate)
+
+    def calculate(self) -> list[MathResult]:
+        self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+
+        for entry in self.module.submodules:
+            r_w, r_wo = StorageEntryCalculator(entry).calculate()
+
+            self.results_w += r_w
+            self.results_wo += r_wo
+
+        return (self.results_w, self.results_wo)
+
+
+class StorageEntryCalculator(BaseValueChainCalculator):
     def __init__(self, input) -> None:
         super().__init__(input)
 
-        self.module: Storage
+        self.module: StorageEntry
 
         self.refrigerant_ef_start = ipcc.ValueChainRefrigerantEmissionFactor()
         self.refrigerant_ef_w = ipcc.ValueChainRefrigerantEmissionFactor()
@@ -6579,8 +6605,8 @@ class StorageCalculator(BaseValueChainCalculator):
                 "emissions_factor": self.electricity_ef_selected.value,
                 "specific_factor_start": self.module.emission_factor_t2_start,
                 "specific_factor_end": self.module.emission_factor_t2_w,
-                "mwh_start": self.module.kwh_energy_per_year_start,
-                "mwh_end": self.module.kwh_energy_per_year_w,
+                "mwh_start": self.module.quantity_consumed_per_year_start,
+                "mwh_end": self.module.quantity_consumed_per_year_w,
                 "percent_loss_transportation_start": 0,
                 "percent_loss_transportation_end": 0,
             }
@@ -6609,8 +6635,8 @@ class StorageCalculator(BaseValueChainCalculator):
                 "emissions_factor": self.electricity_ef_selected.value,
                 "specific_factor_start": self.module.emission_factor_t2_start,
                 "specific_factor_end": self.module.emission_factor_t2_wo,
-                "mwh_start": self.module.kwh_energy_per_year_start,
-                "mwh_end": self.module.kwh_energy_per_year_wo,
+                "mwh_start": self.module.quantity_consumed_per_year_start,
+                "mwh_end": self.module.quantity_consumed_per_year_wo,
                 "percent_loss_transportation_start": 0,
                 "percent_loss_transportation_end": 0,
             }
@@ -6633,14 +6659,36 @@ class StorageCalculator(BaseValueChainCalculator):
         return results_tuple
 
 
-class ProcessingCalculator(BaseValueChainCalculator):
+class ProcessingCalculator(BaseCalculator):
+
+    def __init__(self, input) -> None:
+        super().__init__(input)
+        self.module: Processing
+
+    def get_defaults(self, calculate=False) -> dict:
+        return super().get_defaults(calculate)
+
+    def calculate(self) -> list[MathResult]:
+        self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+
+        for entry in self.module.submodules:
+            r_w, r_wo = ProcessingEntryCalculator(entry).calculate()
+
+            self.results_w += r_w
+            self.results_wo += r_wo
+
+        return (self.results_w, self.results_wo)
+
+
+class ProcessingEntryCalculator(BaseValueChainCalculator):
 
     # TODO: This is basically only the Energy module. The model needs to extend energy if we want to maintain consistency.
 
     def __init__(self, input) -> None:
         super().__init__(input)
 
-        self.module: Processing
+        self.module: ProcessingEntry
 
         self.energy_ef_start = ipcc.EnergyDefaultEmissionFactor()
         self.energy_ef_w = ipcc.EnergyDefaultEmissionFactor()
@@ -6672,7 +6720,7 @@ class ProcessingCalculator(BaseValueChainCalculator):
             try:
                 self.energy_ef_start = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=self.module.fuel_type_start, fuel_use_type=self.module.fuel_type_start.fuel_use_type)
             except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
-                if self.module.emission_factor_t2_start is None:
+                if any([ef is None for ef in [self.module.energy_ef_co2_t2, self.module.energy_ef_ch4_t2, self.module.energy_ef_n2o_t2]]):
                     log.error(f"Energy emission factor for {self.module.fuel_type_start} not found. Plase select tier2 value for start scenario.")
                     raise ValueError(f"Energy emission factor for {self.module.fuel_type_start} not found. Plase select tier2 value for start scenario.")
                 self.energy_ef_start.value = self.module.emission_factor_t2_start
@@ -6681,7 +6729,7 @@ class ProcessingCalculator(BaseValueChainCalculator):
             try:
                 self.energy_ef_w = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=self.module.fuel_type_w, fuel_use_type=self.module.fuel_type_w.fuel_use_type)
             except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
-                if self.module.emission_factor_t2_w is None:
+                if any([ef is None for ef in [self.module.energy_ef_co2_t2, self.module.energy_ef_ch4_t2, self.module.energy_ef_n2o_t2]]):
                     log.error(f"Energy emission factor for {self.module.fuel_type_w} not found. Plase select tier2 value for with scenario.")
                     raise ValueError(f"Energy emission factor for {self.module.fuel_type_w} not found. Plase select tier2 value for with scenario.")
                 self.energy_ef_w.value = self.module.emission_factor_t2_w
@@ -6690,7 +6738,7 @@ class ProcessingCalculator(BaseValueChainCalculator):
             try:
                 self.energy_ef_wo = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=self.module.fuel_type_wo, fuel_use_type=self.module.fuel_type_wo.fuel_use_type)
             except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
-                if self.module.emission_factor_t2_wo is None:
+                if any([ef is None for ef in [self.module.energy_ef_co2_t2, self.module.energy_ef_ch4_t2, self.module.energy_ef_n2o_t2]]):
                     log.error(f"Energy emission factor for {self.module.fuel_type_wo} not found. Plase select tier2 value for without scenario.")
                     raise ValueError(f"Energy emission factor for {self.module.fuel_type_wo} not found. Plase select tier2 value for without scenario.")
                 self.energy_ef_wo.value = self.module.emission_factor_t2_wo
@@ -6716,8 +6764,8 @@ class ProcessingCalculator(BaseValueChainCalculator):
                     "emissions_factor": self.electricity_ef_selected.value,
                     "specific_factor_start": self.module.emission_factor_t2_start,
                     "specific_factor_end": self.module.emission_factor_t2_w,
-                    "mwh_start": self.module.kwh_energy_per_year_start,
-                    "mwh_end": self.module.kwh_energy_per_year_w,
+                    "mwh_start": self.module.quantity_consumed_per_year_start,
+                    "mwh_end": self.module.quantity_consumed_per_year_w,
                     "percent_loss_transportation_start": 0,
                     "percent_loss_transportation_end": 0,
                 }
@@ -6737,8 +6785,8 @@ class ProcessingCalculator(BaseValueChainCalculator):
                     "specific_factor_ch4": self.module.energy_ef_ch4_t2,
                     "emissions_factor_n2o": self.energy_ef_w.n2o,
                     "specific_factor_n2o": self.module.energy_ef_n2o_t2,
-                    "mwh_start": self.module.kwh_energy_per_year_start,
-                    "mwh_end": self.module.kwh_energy_per_year_w,
+                    "mwh_start": self.module.quantity_consumed_per_year_start,
+                    "mwh_end": self.module.quantity_consumed_per_year_w,
                     "methane_constant": self.methane_constant_w,
                     "nitrous_constant": self.project.gwp.n2o,
                 }
@@ -6756,8 +6804,8 @@ class ProcessingCalculator(BaseValueChainCalculator):
                     "emissions_factor": self.electricity_ef_selected.value,
                     "specific_factor_start": self.module.emission_factor_t2_start,
                     "specific_factor_end": self.module.emission_factor_t2_wo,
-                    "mwh_start": self.module.kwh_energy_per_year_start,
-                    "mwh_end": self.module.kwh_energy_per_year_wo,
+                    "mwh_start": self.module.quantity_consumed_per_year_start,
+                    "mwh_end": self.module.quantity_consumed_per_year_wo,
                     "percent_loss_transportation_start": 0,
                     "percent_loss_transportation_end": 0,
                 }
@@ -6776,8 +6824,8 @@ class ProcessingCalculator(BaseValueChainCalculator):
                     "specific_factor_ch4": self.module.energy_ef_ch4_t2,
                     "emissions_factor_n2o": self.energy_ef_wo.n2o,
                     "specific_factor_n2o": self.module.energy_ef_n2o_t2,
-                    "mwh_start": self.module.kwh_energy_per_year_start,
-                    "mwh_end": self.module.kwh_energy_per_year_wo,
+                    "mwh_start": self.module.quantity_consumed_per_year_start,
+                    "mwh_end": self.module.quantity_consumed_per_year_wo,
                     "methane_constant": self.methane_constant_w,
                     "nitrous_constant": self.project.gwp.n2o,
                 }
@@ -6797,12 +6845,34 @@ class ProcessingCalculator(BaseValueChainCalculator):
         return results_tuple
 
 
-class PackagingCalculator(BaseValueChainCalculator):
+class PackagingCalculator(BaseCalculator):
+
+    def __init__(self, input) -> None:
+        super().__init__(input)
+        self.module: Packaging
+
+    def get_defaults(self, calculate=False) -> dict:
+        return super().get_defaults(calculate)
+
+    def calculate(self) -> list[MathResult]:
+        self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+
+        for entry in self.module.submodules:
+            r_w, r_wo = PackagingEntryCalculator(entry).calculate()
+
+            self.results_w += r_w
+            self.results_wo += r_wo
+
+        return (self.results_w, self.results_wo)
+
+
+class PackagingEntryCalculator(BaseValueChainCalculator):
 
     def __init__(self, input) -> None:
         super().__init__(input)
 
-        self.module: Packaging
+        self.module: PackagingEntry
 
         self.packaging_ef_start = ipcc.ValueChainPackagingEmissionFactor()
         self.packaging_ef_w = ipcc.ValueChainPackagingEmissionFactor()
@@ -6877,8 +6947,8 @@ class PackagingCalculator(BaseValueChainCalculator):
                     "emissions_factor": self.electricity_ef_selected.value,
                     "specific_factor_start": self.module.emission_factor_t2_start,
                     "specific_factor_end": self.module.emission_factor_t2_w,
-                    "mwh_start": self.module.kwh_energy_per_year_start,
-                    "mwh_end": self.module.kwh_energy_per_year_w,
+                    "mwh_start": self.module.quantity_consumed_per_year_start,
+                    "mwh_end": self.module.quantity_consumed_per_year_w,
                     "percent_loss_transportation_start": 0,
                     "percent_loss_transportation_end": 0,
                 }
@@ -6907,8 +6977,8 @@ class PackagingCalculator(BaseValueChainCalculator):
                     "emissions_factor": self.electricity_ef_selected.value,
                     "specific_factor_start": self.module.emission_factor_t2_start,
                     "specific_factor_end": self.module.emission_factor_t2_wo,
-                    "mwh_start": self.module.kwh_energy_per_year_start,
-                    "mwh_end": self.module.kwh_energy_per_year_wo,
+                    "mwh_start": self.module.quantity_consumed_per_year_start,
+                    "mwh_end": self.module.quantity_consumed_per_year_wo,
                     "percent_loss_transportation_start": 0,
                     "percent_loss_transportation_end": 0,
                 }
@@ -6933,12 +7003,34 @@ class PackagingCalculator(BaseValueChainCalculator):
 
 class TransportCalculator(BaseCalculator):
 
+    def __init__(self, input) -> None:
+        super().__init__(input)
+        self.module: Transport
+
+    def get_defaults(self, calculate=False) -> dict:
+        return super().get_defaults(calculate)
+
+    def calculate(self) -> list[MathResult]:
+        self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+
+        for entry in self.module.submodules:
+            r_w, r_wo = TransportEntryCalculator(entry).calculate()
+
+            self.results_w += r_w
+            self.results_wo += r_wo
+
+        return (self.results_w, self.results_wo)
+
+
+class TransportEntryCalculator(BaseCalculator):
+
     # TODO: This is basically only the Energy module. The model needs to extend energy if we want to maintain consistency.
 
     def __init__(self, input) -> None:
         super().__init__(input)
 
-        self.module: Transport
+        self.module: TransportEntry
 
         self.energy_ef_start = ipcc.EnergyDefaultEmissionFactor()
         self.energy_ef_w = ipcc.EnergyDefaultEmissionFactor()
@@ -6971,7 +7063,7 @@ class TransportCalculator(BaseCalculator):
             try:
                 self.energy_ef_start = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=self.module.fuel_type_start, fuel_use_type=self.module.fuel_type_start.fuel_use_type)
             except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
-                if self.module.emission_factor_t2_start is None:
+                if any([ef is None for ef in [self.module.energy_ef_co2_t2, self.module.energy_ef_ch4_t2, self.module.energy_ef_n2o_t2]]):
                     log.error(f"Energy emission factor for {self.module.fuel_type_start} not found. Plase select tier2 value for start scenario.")
                     raise ValueError(f"Energy emission factor for {self.module.fuel_type_start} not found. Plase select tier2 value for start scenario.")
                 self.energy_ef_start.value = self.module.emission_factor_t2_start
@@ -6980,7 +7072,7 @@ class TransportCalculator(BaseCalculator):
             try:
                 self.energy_ef_w = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=self.module.fuel_type_w, fuel_use_type=self.module.fuel_type_w.fuel_use_type)
             except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
-                if self.module.emission_factor_t2_w is None:
+                if any([ef is None for ef in [self.module.energy_ef_co2_t2, self.module.energy_ef_ch4_t2, self.module.energy_ef_n2o_t2]]):
                     log.error(f"Energy emission factor for {self.module.fuel_type_w} not found. Plase select tier2 value for with scenario.")
                     raise ValueError(f"Energy emission factor for {self.module.fuel_type_w} not found. Plase select tier2 value for with scenario.")
                 self.energy_ef_w.value = self.module.emission_factor_t2_w
@@ -6989,7 +7081,7 @@ class TransportCalculator(BaseCalculator):
             try:
                 self.energy_ef_wo = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=self.module.fuel_type_wo, fuel_use_type=self.module.fuel_type_wo.fuel_use_type)
             except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
-                if self.module.emission_factor_t2_wo is None:
+                if any([ef is None for ef in [self.module.energy_ef_co2_t2, self.module.energy_ef_ch4_t2, self.module.energy_ef_n2o_t2]]):
                     log.error(f"Energy emission factor for {self.module.fuel_type_wo} not found. Plase select tier2 value for without scenario.")
                     raise ValueError(f"Energy emission factor for {self.module.fuel_type_wo} not found. Plase select tier2 value for without scenario.")
                 self.energy_ef_wo.value = self.module.emission_factor_t2_wo
@@ -7013,10 +7105,10 @@ class TransportCalculator(BaseCalculator):
                     "emissions_factor": self.electricity_ef_selected.value,
                     "specific_factor_start": self.module.emission_factor_t2_start,
                     "specific_factor_end": self.module.emission_factor_t2_w,
-                    "mwh_start": self.module.fuel_used_per_year_start,
-                    "mwh_end": self.module.fuel_used_per_year_w,
-                    "percent_loss_transportation_start": 0,
-                    "percent_loss_transportation_end": 0,
+                    "mwh_start": self.module.quantity_consumed_per_year_start,
+                    "mwh_end": self.module.quantity_consumed_per_year_w,
+                    "percent_loss_transportation_start": self.module.transmission_loss_t2_start,
+                    "percent_loss_transportation_end": self.module.transmission_loss_t2_w,
                 }
 
                 log.debug(f"Inputs w: {self.inputs_w}")
@@ -7034,8 +7126,8 @@ class TransportCalculator(BaseCalculator):
                     "specific_factor_ch4": self.module.energy_ef_ch4_t2,
                     "emissions_factor_n2o": self.energy_ef_w.n2o,
                     "specific_factor_n2o": self.module.energy_ef_n2o_t2,
-                    "mwh_start": self.module.fuel_used_per_year_start,
-                    "mwh_end": self.module.fuel_used_per_year_w,
+                    "mwh_start": self.module.quantity_consumed_per_year_start,
+                    "mwh_end": self.module.quantity_consumed_per_year_w,
                     "methane_constant": self.methane_constant_w,
                     "nitrous_constant": self.project.gwp.n2o,
                 }
@@ -7053,10 +7145,10 @@ class TransportCalculator(BaseCalculator):
                     "emissions_factor": self.electricity_ef_selected.value,
                     "specific_factor_start": self.module.emission_factor_t2_start,
                     "specific_factor_end": self.module.emission_factor_t2_wo,
-                    "mwh_start": self.module.fuel_used_per_year_start,
-                    "mwh_end": self.module.fuel_used_per_year_wo,
-                    "percent_loss_transportation_start": 0,
-                    "percent_loss_transportation_end": 0,
+                    "mwh_start": self.module.quantity_consumed_per_year_start,
+                    "mwh_end": self.module.quantity_consumed_per_year_wo,
+                    "percent_loss_transportation_start": self.module.transmission_loss_t2_start,
+                    "percent_loss_transportation_end": self.module.transmission_loss_t2_wo,
                 }
 
                 log.debug(f"Inputs wo: {self.inputs_wo}")
@@ -7073,8 +7165,8 @@ class TransportCalculator(BaseCalculator):
                     "specific_factor_ch4": self.module.energy_ef_ch4_t2,
                     "emissions_factor_n2o": self.energy_ef_wo.n2o,
                     "specific_factor_n2o": self.module.energy_ef_n2o_t2,
-                    "mwh_start": self.module.fuel_used_per_year_start,
-                    "mwh_end": self.module.fuel_used_per_year_wo,
+                    "mwh_start": self.module.quantity_consumed_per_year_start,
+                    "mwh_end": self.module.quantity_consumed_per_year_wo,
                     "methane_constant": self.methane_constant_w,
                     "nitrous_constant": self.project.gwp.n2o,
                 }

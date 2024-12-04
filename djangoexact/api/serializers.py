@@ -89,6 +89,10 @@ from .models import (
     Processing,
     Packaging,
     Transport,
+    StorageEntry,
+    ProcessingEntry,
+    PackagingEntry,
+    TransportEntry,
 )
 from datetime import timedelta
 
@@ -1174,7 +1178,7 @@ class ScenarioBaseSerializer(BaseGenericModuleSerializer):
                 mandatory_fields = config.get("mandatory", [])
                 missing_mandatory_fields = [field for field in mandatory_fields if combined_data.get(field) is None]
                 if missing_mandatory_fields:
-                    errors[scenario] = f"Missing mandatory fields: {', '.join(missing_mandatory_fields)}"
+                    errors[scenario] = [f"Missing mandatory fields: {', '.join(missing_mandatory_fields)}"]
 
                 # Validate conditional fields
                 conditional_fields = config.get("conditional", {})
@@ -3033,46 +3037,27 @@ class FieldDefinitionResponseSerializer(serializers.Serializer):
     field_name = FieldMetadataSerializer(many=True)
 
 
-class StorageSerializer(ScenarioModuleSerializer):
+class ValueChainParentModuleSerializer(ScenarioModuleSerializer):
+    def validate(self, data):
+        super().validate(data)
+
+        if not self.instance:
+            return data
+
+        entries = self.instance.entries.all()
+
+        if any([not submodule.is_ready() for submodule in entries]):
+            data["status"] = StatusType.objects.get(name="SUBMODULES_EMPTY")
+
+        return data
+
+
+class StorageSerializer(ValueChainParentModuleSerializer):
     class Meta:
         model = Storage
         fields = "__all__"
         ref_name = "Storage"
-        mandatory_fields = {
-            "start": {
-                "mandatory": [
-                    "kwh_energy_per_year_start",
-                ],
-                "conditional": {
-                    "is_refrigerant_used": [
-                        "refrigerant_type_start",
-                        "total_refrigerant_leakage_start",
-                    ]
-                },
-            },
-            "with": {
-                "mandatory": [
-                    "kwh_energy_per_year_w",
-                ],
-                "conditional": {
-                    "is_refrigerant_used": [
-                        "refrigerant_type_w",
-                        "total_refrigerant_leakage_w",
-                    ]
-                },
-            },
-            "without": {
-                "mandatory": [
-                    "kwh_energy_per_year_wo",
-                ],
-                "conditional": {
-                    "is_refrigerant_used": [
-                        "refrigerant_type_wo",
-                        "total_refrigerant_leakage_wo",
-                    ]
-                },
-            },
-        }
+        mandatory_fields = {}
 
 
 class StorageWriteSerializer(StorageSerializer):
@@ -3088,46 +3073,76 @@ class StorageReadSerializer(BaseGenericModuleSerializer):
         mandatory_fields = {}
 
 
-class ProcessingSerializer(ScenarioModuleSerializer):
+class StorageEntrySerializer(ScenarioSubmoduleSerializer):
     class Meta:
-        model = Processing
+        model = StorageEntry
         fields = "__all__"
-        ref_name = "Processing"
+        ref_name = "StorageEntry"
         mandatory_fields = {
             "start": {
                 "mandatory": [
-                    "fuel_type_start",
-                    "kwh_energy_per_year_start",
+                    "quantity_consumed_per_year_start",
                 ],
                 "conditional": {
-                    "is_water_used": [
-                        "water_use_per_year_start",
+                    "is_refrigerant_used": [
+                        "refrigerant_type_start",
+                        "total_refrigerant_leakage_start",
                     ]
                 },
             },
             "with": {
                 "mandatory": [
-                    "fuel_type_w",
-                    "kwh_energy_per_year_w",
+                    "quantity_consumed_per_year_w",
                 ],
                 "conditional": {
-                    "is_water_used": [
-                        "water_use_per_year_w",
+                    "is_refrigerant_used": [
+                        "refrigerant_type_w",
+                        "total_refrigerant_leakage_w",
                     ]
                 },
             },
             "without": {
                 "mandatory": [
-                    "fuel_type_wo",
-                    "kwh_energy_per_year_wo",
+                    "quantity_consumed_per_year_wo",
                 ],
                 "conditional": {
-                    "is_water_used": [
-                        "water_use_per_year_wo",
+                    "is_refrigerant_used": [
+                        "refrigerant_type_wo",
+                        "total_refrigerant_leakage_wo",
                     ]
                 },
             },
         }
+
+
+class StorageEntryWriteSerializer(StorageEntrySerializer):
+
+    def save(self, **kwargs):
+        super().save(**kwargs)
+
+        parent: Storage = utils.getany([self.instance, dict(kwargs)], "parent")
+        parent_serializer = StorageWriteSerializer(data={}, instance=parent, partial=True, context=self.context)
+        if parent_serializer.is_valid():
+            parent_serializer.save()
+
+        return self.instance
+
+
+class StorageEntryReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = StorageEntry
+        fields = "__all__"
+        ref_name = "StorageEntry"
+        mandatory_fields = {}
+
+
+class ProcessingSerializer(ValueChainParentModuleSerializer):
+    class Meta:
+        model = Processing
+        fields = "__all__"
+        ref_name = "Processing"
+        mandatory_fields = {}
 
 
 class ProcessingWriteSerializer(ProcessingSerializer):
@@ -3143,42 +3158,76 @@ class ProcessingReadSerializer(BaseGenericModuleSerializer):
         mandatory_fields = {}
 
 
-class PackagingSerializer(ScenarioModuleSerializer):
+class ProcessingEntrySerializer(ScenarioSubmoduleSerializer):
     class Meta:
-        model = Packaging
+        model = ProcessingEntry
         fields = "__all__"
-        ref_name = "Packaging"
+        ref_name = "ProcessingEntry"
         mandatory_fields = {
             "start": {
                 "mandatory": [
-                    "packaging_material_type_start",
-                    "kg_of_packaging_material_start",
+                    "fuel_type_start",
+                    "quantity_consumed_per_year_start",
                 ],
                 "conditional": {
-                    "is_electric": ["kwh_energy_per_year_start"],
+                    "is_water_used": [
+                        "water_use_per_year_start",
+                    ]
                 },
             },
             "with": {
                 "mandatory": [
-                    "packaging_material_type_w",
-                    "kg_of_packaging_material_w",
+                    "fuel_type_w",
+                    "quantity_consumed_per_year_w",
                 ],
                 "conditional": {
-                    "is_electric": ["kwh_energy_per_year_w"],
+                    "is_water_used": [
+                        "water_use_per_year_w",
+                    ]
                 },
             },
             "without": {
                 "mandatory": [
-                    "packaging_material_type_wo",
-                    "kg_of_packaging_material_wo",
+                    "fuel_type_wo",
+                    "quantity_consumed_per_year_wo",
                 ],
                 "conditional": {
-                    "is_electric": [
-                        "kwh_energy_per_year_wo",
+                    "is_water_used": [
+                        "water_use_per_year_wo",
                     ]
                 },
             },
         }
+
+
+class ProcessingEntryWriteSerializer(ProcessingEntrySerializer):
+
+    def save(self, **kwargs):
+        super().save(**kwargs)
+
+        parent: Processing = utils.getany([self.instance, dict(kwargs)], "parent")
+        parent_serializer = ProcessingWriteSerializer(data={}, instance=parent, partial=True, context=self.context)
+        if parent_serializer.is_valid():
+            parent_serializer.save()
+
+        return self.instance
+
+
+class ProcessingEntryReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = ProcessingEntry
+        fields = "__all__"
+        ref_name = "ProcessingEntry"
+        mandatory_fields = {}
+
+
+class PackagingSerializer(ValueChainParentModuleSerializer):
+    class Meta:
+        model = Packaging
+        fields = "__all__"
+        ref_name = "Packaging"
+        mandatory_fields = {}
 
 
 class PackagingWriteSerializer(PackagingSerializer):
@@ -3194,31 +3243,76 @@ class PackagingReadSerializer(BaseGenericModuleSerializer):
         mandatory_fields = {}
 
 
-class TransportSerializer(ScenarioModuleSerializer):
+class PackagingEntrySerializer(ScenarioSubmoduleSerializer):
+    class Meta:
+        model = PackagingEntry
+        fields = "__all__"
+        ref_name = "PackagingEntry"
+        mandatory_fields = {
+            "start": {
+                "mandatory": [
+                    "packaging_material_type_start",
+                    "kg_of_packaging_material_start",
+                ],
+                "conditional": {
+                    "is_electric": [
+                        "quantity_consumed_per_year_start",
+                    ],
+                },
+            },
+            "with": {
+                "mandatory": [
+                    "packaging_material_type_w",
+                    "kg_of_packaging_material_w",
+                ],
+                "conditional": {
+                    "is_electric": [
+                        "quantity_consumed_per_year_w",
+                    ],
+                },
+            },
+            "without": {
+                "mandatory": [
+                    "packaging_material_type_wo",
+                    "kg_of_packaging_material_wo",
+                ],
+                "conditional": {
+                    "is_electric": [
+                        "quantity_consumed_per_year_wo",
+                    ]
+                },
+            },
+        }
+
+
+class PackagingEntryWriteSerializer(PackagingEntrySerializer):
+
+    def save(self, **kwargs):
+        super().save(**kwargs)
+
+        parent: Packaging = utils.getany([self.instance, dict(kwargs)], "parent")
+        parent_serializer = PackagingWriteSerializer(data={}, instance=parent, partial=True, context=self.context)
+        if parent_serializer.is_valid():
+            parent_serializer.save()
+
+        return self.instance
+
+
+class PackagingEntryReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = PackagingEntry
+        fields = "__all__"
+        ref_name = "PackagingEntry"
+        mandatory_fields = {}
+
+
+class TransportSerializer(ValueChainParentModuleSerializer):
     class Meta:
         model = Transport
         fields = "__all__"
         ref_name = "Transport"
-        mandatory_fields = {
-            "start": {
-                "mandatory": [
-                    "fuel_type_start",
-                    "fuel_used_per_year_start",
-                ]
-            },
-            "with": {
-                "mandatory": [
-                    "fuel_type_w",
-                    "fuel_used_per_year_w",
-                ]
-            },
-            "without": {
-                "mandatory": [
-                    "fuel_type_wo",
-                    "fuel_used_per_year_wo",
-                ]
-            },
-        }
+        mandatory_fields = {}
 
 
 class TransportWriteSerializer(TransportSerializer):
@@ -3231,4 +3325,53 @@ class TransportReadSerializer(BaseGenericModuleSerializer):
         model = Transport
         fields = "__all__"
         ref_name = "Transport"
+        mandatory_fields = {}
+
+
+class TransportEntrySerializer(ScenarioSubmoduleSerializer):
+    class Meta:
+        model = TransportEntry
+        fields = "__all__"
+        ref_name = "TransportEntry"
+        mandatory_fields = {
+            "start": {
+                "mandatory": [
+                    "fuel_type_start",
+                    "quantity_consumed_per_year_start",
+                ]
+            },
+            "with": {
+                "mandatory": [
+                    "fuel_type_w",
+                    "quantity_consumed_per_year_w",
+                ]
+            },
+            "without": {
+                "mandatory": [
+                    "fuel_type_wo",
+                    "quantity_consumed_per_year_wo",
+                ]
+            },
+        }
+
+
+class TransportEntryWriteSerializer(TransportEntrySerializer):
+
+    def save(self, **kwargs):
+        super().save(**kwargs)
+
+        parent: Transport = utils.getany([self.instance, dict(kwargs)], "parent")
+        parent_serializer = TransportWriteSerializer(data={}, instance=parent, partial=True, context=self.context)
+        if parent_serializer.is_valid():
+            parent_serializer.save()
+
+        return self.instance
+
+
+class TransportEntryReadSerializer(BaseGenericModuleSerializer):
+
+    class Meta:
+        model = TransportEntry
+        fields = "__all__"
+        ref_name = "TransportEntry"
         mandatory_fields = {}
