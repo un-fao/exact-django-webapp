@@ -2211,10 +2211,10 @@ class Electricity(Submodule):
     parent = models.ForeignKey(Energy, on_delete=models.CASCADE, null=True, blank=True, related_name="electricities")
     country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("country"))
 
-    mwh_start = models.FloatField(null=True, blank=True, verbose_name=_("mwh_start"))
-    mwh_w = models.FloatField(null=True, blank=True, verbose_name=_("mwh_w"))
-    mwh_wo = models.FloatField(null=True, blank=True, verbose_name=_("mwh_wo"))
-    mwh_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_mwh_thread")
+    quantity_consumed_per_year_start = models.FloatField(null=True, blank=True, verbose_name=_("quantity_consumed_per_year_start"))
+    quantity_consumed_per_year_w = models.FloatField(null=True, blank=True, verbose_name=_("quantity_consumed_per_year_w"))
+    quantity_consumed_per_year_wo = models.FloatField(null=True, blank=True, verbose_name=_("quantity_consumed_per_year_wo"))
+    quantity_consumed_per_year_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_quantity_consumed_per_year_thread")
 
     mwh_renewables_start = models.FloatField(null=True, blank=True, verbose_name=_("mwh_renewables_start"))
     mwh_renewables_w = models.FloatField(null=True, blank=True, verbose_name=_("mwh_renewables_w"))
@@ -2243,10 +2243,10 @@ class Fuel(Submodule):
     parent = models.ForeignKey(Energy, on_delete=models.CASCADE, null=True, blank=True, related_name="fuels")
     fuel_type = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fuel_type"))
 
-    fuel_consumption_start = models.FloatField(null=True, blank=True, verbose_name=_("fuel_consumption_start"))
-    fuel_consumption_w = models.FloatField(null=True, blank=True, verbose_name=_("fuel_consumption_w"))
-    fuel_consumption_wo = models.FloatField(null=True, blank=True, verbose_name=_("fuel_consumption_wo"))
-    fuel_consumption_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_fuel_consumption_thread")
+    quantity_consumed_per_year_start = models.FloatField(null=True, blank=True, verbose_name=_("quantity_consumed_per_year_start"))
+    quantity_consumed_per_year_w = models.FloatField(null=True, blank=True, verbose_name=_("quantity_consumed_per_year_w"))
+    quantity_consumed_per_year_wo = models.FloatField(null=True, blank=True, verbose_name=_("quantity_consumed_per_year_wo"))
+    quantity_consumed_per_year_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_quantity_consumed_per_year_thread")
 
     energy_ef_co2_t2 = models.FloatField(null=True, blank=True, verbose_name=_("ef_co2_t2"))
     energy_ef_ch4_t2 = models.FloatField(null=True, blank=True, verbose_name=_("ef_ch4_t2"))
@@ -2796,16 +2796,46 @@ class ValueChainSubmodule(Submodule):
 
     name = models.CharField(max_length=255, unique=True, null=True, blank=True)
 
+    # Energy - Common Inputs
+
+    fuel_type_start = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fuel_type_start"), related_name="%(class)s_fuel_type_start")
+    fuel_type_w = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fuel_type_w"), related_name="%(class)s_fuel_type_w")
+    fuel_type_wo = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fuel_type_wo"), related_name="%(class)s_fuel_type_wo")
+
+    quantity_consumed_per_year_start = models.FloatField(null=True, blank=True, verbose_name=_("quantity_consumed_per_year_start"))
+    quantity_consumed_per_year_w = models.FloatField(null=True, blank=True, verbose_name=_("quantity_consumed_per_year_w"))
+    quantity_consumed_per_year_wo = models.FloatField(null=True, blank=True, verbose_name=_("quantity_consumed_per_year_wo"))
+    quantity_consumed_per_year_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_quantity_consumed_per_year_thread")
+
+    # Electricity-specific Inputs
+
+    mwh_renewables_start = models.FloatField(null=True, blank=True, verbose_name=_("mwh_renewables_start"))
+    mwh_renewables_w = models.FloatField(null=True, blank=True, verbose_name=_("mwh_renewables_w"))
+    mwh_renewables_wo = models.FloatField(null=True, blank=True, verbose_name=_("mwh_renewables_wo"))
+    mwh_renewables_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_mwh_renewables_thread")
+
+    electricity_ef_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_start"))
+    electricity_ef_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_w"))
+    electricity_ef_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_wo"))
+
+    transmission_loss_t2_start = models.FloatField(default=0.1, verbose_name=_("transmission_loss_t2_start"))
+    transmission_loss_t2_w = models.FloatField(default=0.1, verbose_name=_("transmission_loss_t2_w"))
+    transmission_loss_t2_wo = models.FloatField(default=0.1, verbose_name=_("transmission_loss_t2_wo"))
+
+    country_t2 = models.ForeignKey(Country, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_country_of_origin_t2")
+    ef_source = models.ForeignKey(EmissionFactorSource, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("ef_source"))
+
+    # Fuel-specific Inputs
+
     energy_ef_co2_t2 = models.FloatField(null=True, blank=True)
     energy_ef_ch4_t2 = models.FloatField(null=True, blank=True)
     energy_ef_n2o_t2 = models.FloatField(null=True, blank=True)
 
+    # Value Chain-specific Inputs
+
     emission_factor_t2_start = models.FloatField(null=True, blank=True)
     emission_factor_t2_w = models.FloatField(null=True, blank=True)
     emission_factor_t2_wo = models.FloatField(null=True, blank=True)
-
-    country_t2 = models.ForeignKey(Country, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_country_of_origin_t2")
-    ef_source = models.ForeignKey(EmissionFactorSource, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("ef_source"))
 
     def save(self, *args, **kwargs):
 
@@ -2821,11 +2851,6 @@ class Storage(ValueChainParentModule):
 
 class StorageEntry(ValueChainSubmodule):
     parent = models.ForeignKey(Storage, on_delete=models.CASCADE, null=True, blank=True, related_name="entries")
-
-    kwh_energy_per_year_start = models.FloatField(null=True, blank=True)
-    kwh_energy_per_year_w = models.FloatField(null=True, blank=True)
-    kwh_energy_per_year_wo = models.FloatField(null=True, blank=True)
-    kwh_energy_per_year_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL)
 
     is_refrigerant_used = models.BooleanField(default=False)
 
@@ -2846,16 +2871,6 @@ class Processing(ValueChainParentModule):
 
 class ProcessingEntry(ValueChainSubmodule):
     parent = models.ForeignKey(Processing, on_delete=models.CASCADE, null=True, blank=True, related_name="entries")
-
-    fuel_type_start = models.ForeignKey(FuelType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_fuel_type_start", limit_choices_to=({"fuel_use_type__name": "Stationary"}))
-    fuel_type_w = models.ForeignKey(FuelType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_fuel_type_w", limit_choices_to=({"fuel_use_type__name": "Stationary"}))
-    fuel_type_wo = models.ForeignKey(FuelType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_fuel_type_wo", limit_choices_to=({"fuel_use_type__name": "Stationary"}))
-    fuel_type_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_fuel_type_thread")
-
-    kwh_energy_per_year_start = models.FloatField(null=True, blank=True)
-    kwh_energy_per_year_w = models.FloatField(null=True, blank=True)
-    kwh_energy_per_year_wo = models.FloatField(null=True, blank=True)
-    kwh_energy_per_year_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_energy_use_per_year_thread")
 
     is_water_used = models.BooleanField(default=False)
 
@@ -2884,11 +2899,6 @@ class PackagingEntry(ValueChainSubmodule):
 
     is_electric = models.BooleanField(default=False)
 
-    kwh_energy_per_year_start = models.FloatField(null=True, blank=True)
-    kwh_energy_per_year_w = models.FloatField(null=True, blank=True)
-    kwh_energy_per_year_wo = models.FloatField(null=True, blank=True)
-    kwh_energy_per_year_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_kwh_energy_per_year_thread")
-
 
 class Transport(ValueChainParentModule):
     pass
@@ -2896,13 +2906,3 @@ class Transport(ValueChainParentModule):
 
 class TransportEntry(ValueChainSubmodule):
     parent = models.ForeignKey(Transport, on_delete=models.CASCADE, null=True, blank=True, related_name="entries")
-
-    fuel_type_start = models.ForeignKey(FuelType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_fuel_type_start")
-    fuel_type_w = models.ForeignKey(FuelType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_fuel_type_w")
-    fuel_type_wo = models.ForeignKey(FuelType, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_fuel_type_wo")
-    fuel_type_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_fuel_type_thread")
-
-    fuel_used_per_year_start = models.FloatField(null=True, blank=True)
-    fuel_used_per_year_w = models.FloatField(null=True, blank=True)
-    fuel_used_per_year_wo = models.FloatField(null=True, blank=True)
-    fuel_used_per_year_thread = models.ForeignKey(CommentThread, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_fuel_used_per_year_thread")

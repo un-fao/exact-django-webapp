@@ -573,9 +573,9 @@ if TEST_ENERGY:
             log.debug("\n")
 
             log.debug(f"Country: {electricity_entry.country}")
-            log.debug(f"MWH start: {electricity_entry.mwh_start:,f}")
-            log.debug(f"MWH wo: {electricity_entry.mwh_wo:,f}")
-            log.debug(f"MWH w: {electricity_entry.mwh_w:,f}")
+            log.debug(f"MWH start: {electricity_entry.quantity_consumed_per_year_start:,f}")
+            log.debug(f"MWH wo: {electricity_entry.quantity_consumed_per_year_wo:,f}")
+            log.debug(f"MWH w: {electricity_entry.quantity_consumed_per_year_w:,f}")
             log.debug(f"MWH Renewables start: {electricity_entry.mwh_renewables_start:,f}")
             log.debug(f"MWH Renewables wo: {electricity_entry.mwh_renewables_wo:,f}")
             log.debug(f"MWH Renewables w: {electricity_entry.mwh_renewables_w:,f}")
@@ -591,9 +591,9 @@ if TEST_ENERGY:
             log.debug("\n")
 
             log.debug(f"Fuel Type: {fuel_entry.fuel_type}")
-            log.debug(f"Fuel consumption start: {fuel_entry.fuel_consumption_start:,f}")
-            log.debug(f"Fuel consumption wo: {fuel_entry.fuel_consumption_wo:,f}")
-            log.debug(f"Fuel consumption w: {fuel_entry.fuel_consumption_w:,f}")
+            log.debug(f"Fuel consumption start: {fuel_entry.quantity_consumed_per_year_start:,f}")
+            log.debug(f"Fuel consumption wo: {fuel_entry.quantity_consumed_per_year_wo:,f}")
+            log.debug(f"Fuel consumption w: {fuel_entry.quantity_consumed_per_year_w:,f}")
 
             log.debug("\n")
 
