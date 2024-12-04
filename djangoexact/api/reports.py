@@ -2419,7 +2419,71 @@ class EnergyReport(BaseModuleReport):
         self.total_emissions = list(map(sum, zip(self.total_emissions, self.liquid_fuel_co2, self.liquid_fuel_ch4, self.liquid_fuel_n2o)))
         self.total_emissions = list(map(sum, zip(self.total_emissions, self.solid_fuel_co2, self.solid_fuel_ch4, self.solid_fuel_n2o)))
 
-    def build_report(self):
+    def populate_metadata(self):
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
+        last_metadata_row = self.metadata_worksheet.max_row
+
+        log.debug(f"Found {len(self.module.electricities.all())} electricity submodules and {len(self.module.fuels.all())} fuel submodules")
+
+        for i, electricity in enumerate(api_models.Electricity.objects.filter(parent=self.module).all()):
+            electricity: api_models.Electricity
+
+            self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=1, value="Electricity - power country of origin")
+            self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=1, value="Electricity grid (MWh/year)")
+            self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=1, value="Electricity renewable (MWh/year)")
+            self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=1, value="Scope of emission factor")
+
+            if self.module.is_start():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=2, value=electricity.country.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=2, value=electricity.mwh_start)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=2, value=electricity.mwh_renewables_start)
+                self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=2, value=electricity.ef_source.name)
+
+            if self.module.is_with():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=3, value=electricity.country.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=3, value=electricity.mwh_w)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=3, value=electricity.mwh_renewables_w)
+                self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=3, value=electricity.ef_source.name)
+
+            if self.module.is_without():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=4, value=electricity.country.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=4, value=electricity.mwh_wo)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=4, value=electricity.mwh_renewables_wo)
+                self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=4, value=electricity.ef_source.name)
+
+        last_metadata_row += len(api_models.Electricity.objects.filter(parent=self.module).all()) + 3
+
+        for i, fuel in enumerate(api_models.Fuel.objects.filter(parent=self.module).all()):
+            fuel: api_models.Fuel
+
+            self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=1, value="Fuel - estate")
+            self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=1, value="Fuel - type")
+            self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=1, value="Fuel consumption (m3 or tdm)")
+            self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=1, value="Accounting for CO2 emissions (yes/no)")
+
+            if self.module.is_start():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=2, value="WIP")  # TODO: What is this?
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=2, value=fuel.fuel_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=2, value=fuel.fuel_consumption_start)
+                self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=2, value="WIP")  # TODO: What is this?
+
+            if self.module.is_with():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=3, value="WIP")
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=3, value=fuel.fuel_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=3, value=fuel.fuel_consumption_w)
+                self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=3, value="WIP")
+
+            if self.module.is_without():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=4, value="WIP")
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=4, value=fuel.fuel_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=4, value=fuel.fuel_consumption_wo)
+                self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=4, value="WIP")
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+    def populate_results(self):
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
         self.results_worksheet = self.workbook["Results"]
 
@@ -2453,6 +2517,14 @@ class EnergyReport(BaseModuleReport):
             self.results_worksheet.cell(row=last_results_row + 7, column=i + 2, value=self.solid_fuel_n2o[i])
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+    def build_report(self):
+        super().build_report()
+
+        self.populate_results()
+        self.populate_metadata()
+
+        return self.workbook
 
 
 @dataclass
