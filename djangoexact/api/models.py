@@ -2209,7 +2209,7 @@ class Energy(Module):
 
 class Electricity(Submodule):
     parent = models.ForeignKey(Energy, on_delete=models.CASCADE, null=True, blank=True, related_name="electricities")
-    country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("country"))
+    country_t2 = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("country_t2"))
 
     quantity_consumed_per_year_start = models.FloatField(null=True, blank=True, verbose_name=_("quantity_consumed_per_year_start"))
     quantity_consumed_per_year_w = models.FloatField(null=True, blank=True, verbose_name=_("quantity_consumed_per_year_w"))
@@ -2225,9 +2225,9 @@ class Electricity(Submodule):
     electricity_ef_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_w"))
     electricity_ef_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_wo"))
 
-    transmission_loss_start = models.FloatField(default=0.1, verbose_name=_("transmission_loss_start"))
-    transmission_loss_w = models.FloatField(default=0.1, verbose_name=_("transmission_loss_w"))
-    transmission_loss_wo = models.FloatField(default=0.1, verbose_name=_("transmission_loss_wo"))
+    transmission_loss_t2_start = models.FloatField(default=0.1, verbose_name=_("transmission_loss_t2_start"))
+    transmission_loss_t2_w = models.FloatField(default=0.1, verbose_name=_("transmission_loss_t2_w"))
+    transmission_loss_t2_wo = models.FloatField(default=0.1, verbose_name=_("transmission_loss_t2_wo"))
 
     ef_source = models.ForeignKey(EmissionFactorSource, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("ef_source"))
 

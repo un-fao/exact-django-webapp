@@ -572,7 +572,7 @@ if TEST_ENERGY:
 
             log.debug("\n")
 
-            log.debug(f"Country: {electricity_entry.country}")
+            log.debug(f"Country: {electricity_entry.country_t2}")
             log.debug(f"MWH start: {electricity_entry.quantity_consumed_per_year_start:,f}")
             log.debug(f"MWH wo: {electricity_entry.quantity_consumed_per_year_wo:,f}")
             log.debug(f"MWH w: {electricity_entry.quantity_consumed_per_year_w:,f}")
