@@ -17,7 +17,7 @@ from . import base_module
 class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
     def setUp(self):
         self.ModuleClass = models.Energy
-        self.submodule_classes = [models.Electricity]
+        self.submodule_classes = [models.Electricity, models.Fuel]
         super().setUp()
 
         self.land_use_types = self.land_use_types.filter(module_types__class_name=self.ModuleClass.__name__, climates=self.project.climate, moistures=self.project.moisture, is_active=True)
@@ -29,8 +29,13 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         }
 
         self.edit_module(self.submodules[0], self.user, self.validated_data)
-        self.submodules[0].refresh_from_db()
 
+        fuel_data = copy.deepcopy(self.validated_data)
+        fuel_data["fuel_type"] = models.FuelType.objects.order_by("?").first().pk
+        self.edit_module(self.submodules[1], self.user, fuel_data)
+
+        self.submodules[0].refresh_from_db()
+        self.submodules[1].refresh_from_db()
         self.module.refresh_from_db()
 
     def test_results_influenced_by_tier_2_values(self):
