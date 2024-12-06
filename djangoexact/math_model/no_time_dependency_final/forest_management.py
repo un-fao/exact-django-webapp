@@ -122,6 +122,12 @@ class ForestManagement(BaseModule):
 
     def __post_init__(self):
         super().__post_init__()
+        
+        # TODO: This is like this because to all calculation extents, if the rate is immediate, the implementation time of the project is basically 1 year
+        # hence all the time dependent calculations for rotation ecc are to be considered on 1 year and not multiple years. The capitalization then becomes 
+        # equivalent to capitalization + implementation - 1
+        self.capitalization_time = self.capitalization_time if not self.rate_type == 'immediate' else self.capitalization_time + self.implementation_time - 1
+        self.implementation_time = self.implementation_time if not self.rate_type == 'immediate' else 1
 
         ########### MATRIX ASSIGNMENT ############
         # Hectares at each year of the project
@@ -141,11 +147,6 @@ class ForestManagement(BaseModule):
         self.litter_20_years = self.litter_20_years_default if not self.litter_20_years_tier_2 else self.litter_20_years_tier_2
         self.deadwood_20_years = self.deadwood_20_years_default if not self.deadwood_20_years_tier_2 else self.deadwood_20_years_tier_2
 
-        # TODO: This is like this because to all calculation extents, if the rate is immediate, the implementation time of the project is basically 1 year
-        # hence all the time dependent calculations for rotation ecc are to be considered on 1 year and not multiple years. The capitalization then becomes 
-        # equivalent to capitalization + implementation + 1
-        self.capitalization_time = self.capitalization_time if not self.rate_type == 'immediate' else self.capitalization_time + self.implementation_time + 1
-        self.implementation_time = self.implementation_time if not self.rate_type == 'immediate' else 1
         
         ########### GENERALE LAND MODULE ASSIGNMENTS ############
         fmg_start = self.fmg_start_tier_2 or self.fmg_start_default
