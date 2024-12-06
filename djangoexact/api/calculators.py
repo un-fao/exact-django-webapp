@@ -3496,8 +3496,8 @@ class EnergyCalculator(BaseCalculator):
     Calculator for Energy module
     """
 
-    def get_defaults(self, input: Module) -> dict:
-        return super().get_defaults(input)
+    def get_defaults(self, calculate=False) -> dict:
+        return super().get_defaults(calculate)
 
     def calculate(self) -> list[Result]:
         """

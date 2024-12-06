@@ -2029,19 +2029,19 @@ class FuelSerializer(ScenarioSubmoduleSerializer):
             "start": {
                 "mandatory": [
                     "fuel_type",
-                    "fuel_consumption_start",
+                    "quantity_consumed_per_year_start",
                 ],
             },
             "with": {
                 "mandatory": [
                     "fuel_type",
-                    "fuel_consumption_w",
+                    "quantity_consumed_per_year_w",
                 ],
             },
             "without": {
                 "mandatory": [
                     "fuel_type",
-                    "fuel_consumption_wo",
+                    "quantity_consumed_per_year_wo",
                 ],
             },
         }
@@ -2083,20 +2083,20 @@ class ElectricityWriteSerializer(NoScenarioSubmoduleSerializer):
         mandatory_fields = {
             "start": {
                 "mandatory": [
-                    "mwh_start",
-                    "transmission_loss_start",
+                    "quantity_consumed_per_year_start",
+                    "transmission_loss_t2_start",
                 ],
             },
             "with": {
                 "mandatory": [
-                    "mwh_w",
-                    "transmission_loss_w",
+                    "quantity_consumed_per_year_w",
+                    "transmission_loss_t2_w",
                 ],
             },
             "without": {
                 "mandatory": [
-                    "mwh_wo",
-                    "transmission_loss_wo",
+                    "quantity_consumed_per_year_wo",
+                    "transmission_loss_t2_wo",
                 ],
             },
         }
