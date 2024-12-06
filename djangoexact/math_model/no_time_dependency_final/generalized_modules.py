@@ -1,24 +1,13 @@
 from abc import ABC
 import re
 import traceback
-from .ghg_emissions_classes import (
+from ghg_emissions_classes import (
     ActivityTypes,
     Emission,
     GasTypes,
     Result,
     YearlyGasActivityEmissionSet,
 )
-
-from .general_functions import (
-    breakdown_according_to_values,
-    soil_emissions_2,
-    yearly_constant_emissions_breakdown,
-    yearly_time_dependent_20_year_breakdown,
-    yearly_time_dependent_parameter_breakdown,
-    som_emissions,
-    biomass_emissions
-)
-
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -95,6 +84,9 @@ class LandModule(BaseModule):
 
         self.biomass_start = self.biomass_start_tier_2 or self.biomass_start_default
         self.biomass_end = self.biomass_end_tier_2 or self.biomass_end_default
+        
+        from general_functions import (yearly_time_dependent_20_year_breakdown, yearly_time_dependent_parameter_breakdown)
+
 
         self.hectares_before_20, self.hectares_after_20 = yearly_time_dependent_20_year_breakdown(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
         self.hectares_total = yearly_time_dependent_parameter_breakdown(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
