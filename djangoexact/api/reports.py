@@ -2766,9 +2766,80 @@ class SettlementReport(LandModuleReport):
         self.total_emissions = list(map(sum, zip(self.total_emissions, self.roads_co2_eq)))
         self.total_emissions = list(map(sum, zip(self.total_emissions, self.buildings_co2_eq)))
 
-    def build_report(self):
-        super().build_report()
+    def populate_metadata(self):
 
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
+        last_metadata_row = self.metadata_worksheet.max_row
+
+        for i, building in enumerate(self.module.buildings.all()):
+            building: api_models.Building
+
+            if i != 0:
+                last_metadata_row += 1
+
+            self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=1, value="Type of building")
+            self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=1, value="Area of building (m2)")
+
+            if self.module.is_start():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=2, value=building.building_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=2, value=building.area_m2_start)
+
+            if self.module.is_with():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=3, value=building.building_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=3, value=building.area_m2_w)
+
+            if self.module.is_without():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=4, value=building.building_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=4, value=building.area_m2_wo)
+
+        last_metadata_row += len(self.module.buildings.all()) + 1
+
+        for i, road in enumerate(self.module.roads.all()):
+            road: api_models.Road
+
+            if i != 0:
+                last_metadata_row += 2
+
+            self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=1, value="Type of road")
+            self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=1, value="Length of road (km)")
+            self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=1, value="Width of road (m)")
+
+            if self.module.is_start():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=2, value=road.road_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=2, value=road.length_km_start)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=2, value=road.width_m_start)
+
+            if self.module.is_with():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=3, value=road.road_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=3, value=road.length_km_w)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=3, value=road.width_m_w)
+
+            if self.module.is_without():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=4, value=road.road_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=4, value=road.length_km_wo)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=4, value=road.width_m_wo)
+
+        last_metadata_row += len(self.module.roads.all()) + 2
+
+        for i, infra in enumerate(self.module.other_infrastructures.all()):
+            infra: api_models.OtherInfrastructure
+
+            self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=1, value=f"Area of infrastructure {i+1} (m2)")
+
+            if self.module.is_start():
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=2, value=infra.area_m2_start)
+
+            if self.module.is_with():
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=3, value=infra.area_m2_w)
+
+            if self.module.is_without():
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=4, value=infra.area_m2_wo)
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+    def populate_results(self):
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
         self.results_worksheet = self.workbook["Results"]
 
@@ -2790,6 +2861,11 @@ class SettlementReport(LandModuleReport):
             self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.other_infrastructure_co2_eq[i])
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+    def build_report(self):
+        super().build_report()
+        self.populate_results()
+        self.populate_metadata()
 
 
 @dataclass
