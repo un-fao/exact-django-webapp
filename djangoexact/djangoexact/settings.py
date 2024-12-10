@@ -36,7 +36,7 @@ SECRET_KEY = os.getenv("SECRET_KEY", "$SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["$ALLOWED_HOST", "localhost", "127.0.0.1", "0.0.0.0", "localhost:3000"]
+ALLOWED_HOSTS = ["$ALLOWED_HOST", "localhost", "127.0.0.1", "0.0.0.0", "localhost:3000", "20241104t080651.fao-exact-review.ew.r.appspot.com"]
 
 CORS_ORIGIN_ALLOW_ALL = True
 
@@ -45,7 +45,13 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 INSTALLED_APPS = [
     "unfold",  # before django.contrib.admin
+    "unfold.contrib.filters",  # optional, if special filters are needed
+    "unfold.contrib.forms",  # optional, if special form elements are needed
+    "unfold.contrib.inlines",  # optional, if special inlines are needed
+    "unfold.contrib.import_export",  # optional, if django-import-export package is used
+    "unfold.contrib.guardian",  # optional, if django-guardian package is used
     "unfold.contrib.simple_history",  # optional, if django-simple-history package is used
+    "modeltranslation",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -62,6 +68,8 @@ INSTALLED_APPS = [
     "simple_history",
     "ipcc",
     "api",
+    "blog",
+    "ckeditor",
 ]
 
 if DEBUG:
@@ -75,6 +83,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     # "accounts.middleware.FirebaseAuthenticationMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "auditlog.middleware.AuditlogMiddleware",
@@ -118,6 +127,10 @@ if os.getenv("GAE_APPLICATION", None):
             "TEST": {
                 "NAME": "$DB_NAME",
             },
+            "OPTIONS": {
+                "connect_timeout": 30,  # Optional: set timeout
+            },
+            "CONN_MAX_AGE": 10,
         }
     }
 else:
@@ -129,6 +142,9 @@ else:
             "PASSWORD": os.getenv("DB_PASSWORD", default="$DB_PASSWORD"),
             "NAME": os.getenv("DB_NAME", default="$DB_NAME"),
             "PORT": os.getenv("DB_PORT", default="$DB_PORT"),
+            "OPTIONS": {
+                "connect_timeout": 30,  # Optional: set timeout
+            },
         }
     }
 
@@ -154,19 +170,29 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = "UTC"
 
 USE_I18N = True
+LANGUAGE_CODE = "en"
+LOCALE_PATHS = [os.path.join(BASE_DIR, "locale")]
+LANGUAGES = [
+    ("en", "English"),
+    ("fr", "French"),
+    ("es", "Spanish"),
+]
 
 USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
-STATIC_ROOT = "static"
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 STATIC_URL = "/static/"
+
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, "static"),
+# ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -261,3 +287,5 @@ UNFOLD = {
         "show_all_applications": True,  # Dropdown with all applications and models
     },
 }
+
+CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"

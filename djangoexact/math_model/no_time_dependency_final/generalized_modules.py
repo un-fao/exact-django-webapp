@@ -1,5 +1,4 @@
 from abc import ABC
-from .general_functions import Tier2Defaults
 import re
 import traceback
 from .ghg_emissions_classes import (
@@ -39,10 +38,10 @@ class BaseModule:
             t2_end = {re.sub("_end_tier_2_default", "", k): v for k, v in self.__dict__.items() if "end_tier_2_default" in k}
             t2_other = {re.sub("_tier_2_default", "", k): v for k, v in self.__dict__.items() if "_tier_2_default" in k and "start" not in k and "end" not in k}
 
-            return Tier2Defaults(t2_start, t2_end, t2_other)
+            return (t2_start, t2_end, t2_other)
         except Exception as e:
             traceback.print_exc()
-            return {}
+            raise e
         
 
 @dataclass
@@ -68,9 +67,11 @@ class LandModule(BaseModule):
     fi_end_tier_2: Optional[float]
 
     calculate_soc_som: bool
+    calculate_biomass: bool
     ef_nitrous_som: float
 
-    # NOTE: biomass_start and biomass_end are set to Optional[float] only because in Perennial Biomass Emissions it is necessary for the calculations (if self.biomass_start and self.biomass_end:)
+    # NOTE: biomass_start and biomass_end are set to Optional[float] only because in 
+    # Perennial Biomass Emissions it is necessary for the calculations (if self.biomass_start and self.biomass_end:)
     # maybe we can send a parameter to the perennial or perennial.calculate_emissions() to avoid this
     biomass_start_default: Optional[float]
     biomass_end_default: Optional[float]

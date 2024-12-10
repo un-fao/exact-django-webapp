@@ -22,6 +22,7 @@ from .serializers import (
     LoginSerializer,
     RegisterSerializer,
     UserSerializer,
+    UserSummarySerializer,
     PasswordResetSerializer,
 )
 
@@ -41,7 +42,7 @@ class RegisterView(generics.GenericAPIView):
 
         return Response(
             {
-                "user": UserSerializer(user, context=self.get_serializer_context()).data,
+                "user": UserSummarySerializer(user, context=self.get_serializer_context()).data,
                 "message": "User Created Successfully.  Now perform Login to get your token",
             }
         )
@@ -78,7 +79,7 @@ class CreateNewUserView(APIView):
 
             utils.send_email_verification_link(email, db_user.first_name.capitalize() + " " + db_user.last_name.capitalize())
 
-            return Response({"uid": db_user.firebase_uid}, status=status.HTTP_201_CREATED)
+            return Response(UserSummarySerializer(db_user).data, status=status.HTTP_201_CREATED)
 
         except Exception as e:
             try:
@@ -109,7 +110,11 @@ class LoginExistingUserView(APIView):
             if not user.email_verified:
                 return Response({"error": "Email not verified"}, status=status.HTTP_401_UNAUTHORIZED)
 
-            user = auth.sign_in_with_email_and_password(email, password)
+            try:
+                user = auth.sign_in_with_email_and_password(email, password)
+            except Exception as e:
+                error = json.loads(e.strerror)
+                return Response({"error": error["error"]["message"]}, status=status.HTTP_401_UNAUTHORIZED)
 
             existing_user = User.objects.get(firebase_uid=user["localId"])
 
@@ -126,7 +131,7 @@ class LoginExistingUserView(APIView):
                 "refresh_token": user["refreshToken"],
                 "expires_in": user["expiresIn"],
                 "kind": user["kind"],
-                "user": UserSerializer(existing_user).data,
+                "user": UserSummarySerializer(existing_user).data,
             }
 
             return Response(extra_data, status=status.HTTP_200_OK)

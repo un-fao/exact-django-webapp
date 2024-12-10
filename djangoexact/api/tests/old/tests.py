@@ -320,9 +320,9 @@ if TEST_ANNUAL_CROPPING:
         print(f"Residue Management Type WO: {annual_cropping.residue_management_type_wo}")
         print(f"Residue Management Type W: {annual_cropping.residue_management_type_w}")
 
-        print(f"Crop Yield START: {annual_cropping.crop_yield_start}")
-        print(f"Crop Yield WO: {annual_cropping.crop_yield_wo}")
-        print(f"Crop Yield W: {annual_cropping.crop_yield_w}")
+        print(f"Crop Yield START: {annual_cropping.crop_yield_t2_start}")
+        print(f"Crop Yield WO: {annual_cropping.crop_yield_t2_wo}")
+        print(f"Crop Yield W: {annual_cropping.crop_yield_t2_w}")
 
         try:
             results: Result = CalculatorFactory().calculate_result(annual_cropping)
@@ -433,9 +433,9 @@ if TEST_PERENNIAL_CROPPING:
 
         print("\n")
 
-        print(f"Crop Yield START: {perennial.crop_yield_start}")
-        print(f"Crop Yield WO: {perennial.crop_yield_wo}")
-        print(f"Crop Yield W: {perennial.crop_yield_w}")
+        print(f"Crop Yield START: {perennial.crop_yield_t2_start}")
+        print(f"Crop Yield WO: {perennial.crop_yield_t2_wo}")
+        print(f"Crop Yield W: {perennial.crop_yield_t2_w}")
 
         print("\n\n")
 
@@ -572,10 +572,10 @@ if TEST_ENERGY:
 
             log.debug("\n")
 
-            log.debug(f"Country: {electricity_entry.country}")
-            log.debug(f"MWH start: {electricity_entry.mwh_start:,f}")
-            log.debug(f"MWH wo: {electricity_entry.mwh_wo:,f}")
-            log.debug(f"MWH w: {electricity_entry.mwh_w:,f}")
+            log.debug(f"Country: {electricity_entry.country_t2}")
+            log.debug(f"MWH start: {electricity_entry.quantity_consumed_per_year_start:,f}")
+            log.debug(f"MWH wo: {electricity_entry.quantity_consumed_per_year_wo:,f}")
+            log.debug(f"MWH w: {electricity_entry.quantity_consumed_per_year_w:,f}")
             log.debug(f"MWH Renewables start: {electricity_entry.mwh_renewables_start:,f}")
             log.debug(f"MWH Renewables wo: {electricity_entry.mwh_renewables_wo:,f}")
             log.debug(f"MWH Renewables w: {electricity_entry.mwh_renewables_w:,f}")
@@ -591,9 +591,9 @@ if TEST_ENERGY:
             log.debug("\n")
 
             log.debug(f"Fuel Type: {fuel_entry.fuel_type}")
-            log.debug(f"Fuel consumption start: {fuel_entry.fuel_consumption_start:,f}")
-            log.debug(f"Fuel consumption wo: {fuel_entry.fuel_consumption_wo:,f}")
-            log.debug(f"Fuel consumption w: {fuel_entry.fuel_consumption_w:,f}")
+            log.debug(f"Fuel consumption start: {fuel_entry.quantity_consumed_per_year_start:,f}")
+            log.debug(f"Fuel consumption wo: {fuel_entry.quantity_consumed_per_year_wo:,f}")
+            log.debug(f"Fuel consumption w: {fuel_entry.quantity_consumed_per_year_w:,f}")
 
             log.debug("\n")
 

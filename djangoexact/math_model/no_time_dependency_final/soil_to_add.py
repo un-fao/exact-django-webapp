@@ -35,4 +35,4 @@ class SoilToAdd(LandModule):
             print("Error in SoilToAdd.calculate_emissions")
             print(e)
             print(traceback.format_exc())
-            return 0
+            raise e

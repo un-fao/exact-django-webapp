@@ -32,7 +32,6 @@ class CoastalWaterbodies(BaseModule):
 
         try:
 
-            # TODO: see if on FIGMA there are more start-end values, in that case they can just be added and calculation can be done on two rows
             trophic_state_start = self.trophic_state_default if not self.chlo_A_start else 0.26 * self.chlo_A_start
             trophic_state_start = self.trophic_state_default if not self.trophic_state_tier_2_start else self.trophic_state_tier_2_start
 
@@ -56,5 +55,5 @@ class CoastalWaterbodies(BaseModule):
             
         except Exception as e:
             traceback.print_exc()
-            pass
+            raise e
         

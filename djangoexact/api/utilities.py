@@ -8,12 +8,15 @@ from django.db import models
 from rest_framework import exceptions, status
 from rest_framework.response import Response
 from simple_history.models import HistoricalRecords
-from simple_history.utils import update_change_reason
+from django.utils.translation import get_language
+from django.core.exceptions import FieldDoesNotExist
 
 import api.models as api_models
 import ipcc.models as ipcc_models
 
 import logging as log
+from django.utils.translation import gettext_lazy as _
+from dataclasses import dataclass
 
 CN_RATIO_CROP = 10
 CN_RATIO_GRASSLAND = 15
@@ -34,9 +37,17 @@ class ManureManagementTypes(Enum):
 
 
 class ScenarioTypes(Enum):
-    START = "start"
-    WITH = "w"
-    WITHOUT = "wo"
+    START = "start", "start"
+    WITH = "w", "with"
+    WITHOUT = "wo", "without"
+
+    def __new__(cls, value, verbose_name):
+        # Retain the original behavior for value
+        obj = object.__new__(cls)
+        obj._value_ = value
+        # Set additional attributes
+        obj.verbose_name = verbose_name
+        return obj
 
 
 class EmissionTypes(Enum):
@@ -118,20 +129,6 @@ class ErrorResponse(Response):
         super().__init__(error(data), status=status)
 
 
-def is_start_with_changed(_class: object, luc):
-    return luc.module_type_start.class_name == _class.__name__ and luc.module_type_start != luc.module_type_wo
-
-
-def get_thread_attributes(module: models.Model):
-    return [attr for attr in module._meta.get_fields() if attr.name.endswith("_thread")]
-
-
-def get_module_status(self, activity, module_type):
-    module_attr = getattr(activity, module_type.class_name.lower(), None)
-    module = module_attr.first() if module_attr else None
-    return module.status if module else None
-
-
 def has_project_permission(permission, user, project):
     """
     Check if a user has a specific permission for a project.
@@ -203,9 +200,14 @@ def copy_activity(activity, new_project=None):
     luc_copy = None
     organic_soil_copy = None
 
-    for module in find_modules(activity):
+    for module in activity.modules:
+        module: api_models.Module
         if module.__class__.__name__ == "LandUseChange" or module.__class__.__name__ == "OrganicSoil":
             continue
+
+        # Get all attributes ending with "_thread" set them to None
+        for thread in module.threads:
+            setattr(module, thread.attname, None)
 
         module_copy = copy.deepcopy(module)
         module_copy.pk = None
@@ -267,8 +269,9 @@ def create_comment_threads(module_instance):
     for attr in dir(module_instance):
         if attr.endswith("_thread") and getattr(module_instance, attr, None) is None:
             setattr(module_instance, attr, api_models.CommentThread.objects.create())
-    module_instance.save()
-    update_change_reason(module_instance, "update")
+    if not module_instance._state.adding:
+        if module_instance.history.exists():
+            update_change_reason(module_instance, "update")
 
 
 def getany(objects: list[object], key: str):
@@ -360,15 +363,15 @@ def update_activity_status_and_completion(activity):
     """
     statuses = [module.status for module in find_modules(activity)]
 
-    ready_count = statuses.count(api_models.StatusType.objects.get(name="READY"))
+    ready_count = statuses.count(api_models.StatusType.objects.get(name_en="READY"))
     percentage_complete = ready_count / len(statuses)
 
     if percentage_complete == 1:
-        activity.status = api_models.StatusType.objects.get(name="READY")
+        activity.status = api_models.StatusType.objects.get(name_en="READY")
     elif percentage_complete > 0:
-        activity.status = api_models.StatusType.objects.get(name="IN PROGRESS")
+        activity.status = api_models.StatusType.objects.get(name_en="IN PROGRESS")
     else:
-        activity.status = api_models.StatusType.objects.get(name="EMPTY")
+        activity.status = api_models.StatusType.objects.get(name_en="EMPTY")
 
     activity.completion_percentage = percentage_complete
     activity.save()
@@ -379,11 +382,11 @@ def update_activity_status_and_completion(activity):
 # NOTE: This could be done with signals, but I saw there are no signals as of now
 # so I kept this approach for consistency. Can be changed later if needed.
 def get_activity_default_status():
-    return api_models.StatusType.objects.get_or_create(name="EMPTY")[0]
+    return api_models.StatusType.objects.get_or_create(name_en="EMPTY")[0]
 
 
 def get_default_peat_type():
-    return api_models.PeatType.objects.get_or_create(name="Nutrient Poor")[0]
+    return api_models.PeatType.objects.get_or_create(name_en="Nutrient Poor")[0]
 
 
 def find_organic_soil_parent_module(organic_soil) -> tuple:
@@ -400,22 +403,17 @@ def find_organic_soil_parent_module(organic_soil) -> tuple:
         ValueError: If the parent module or module type cannot be found.
     """
 
-    # NOTE: This is always true as long as Organic Soil is a OneToOneField of LandModule
-    parent_module: api_models.LandModule = next(attr for attr in dir(organic_soil) if attr.startswith("organic_soil_") and (attr not in ["organicsoil"] and isinstance(getattr(organic_soil, attr, None), api_models.LandModule)))
+    parent_module = None
+    for module_type in organic_soil.activity.module_types.all():
+        module_type
+        if module_type.is_luc:
+            parent_module = getattr(organic_soil.activity, module_type.class_name.lower()).first()
+            break
 
-    if not parent_module:
-        raise ValueError(f"Could not find parent module for Organic Soil")
+    if parent_module is None:
+        raise ValueError("Organic Soil must be associated either with a Land Use Change or an independent Land Module")
 
-    parent_module_name = parent_module.split("_")[-1]
-    parent_module_type: api_models.ModuleType = api_models.ModuleType.objects.filter(class_name__iexact=parent_module_name).first()
-
-    if not parent_module_type:
-        raise ValueError(f"Could not find module type for {parent_module_name}")
-
-    ParentModule = apps.get_model(app_label="api", model_name=parent_module_type.class_name)
-    parent_module = ParentModule.objects.get(organic_soil=organic_soil)
-
-    return parent_module, parent_module_type
+    return parent_module, module_type
 
 
 def get_changes(records: list[HistoricalRecords]):
@@ -471,3 +469,73 @@ def get_modules(activity, serialized=True) -> list:
             module_serializers_list.append(module_dict)
 
     return module_serializers_list if serialized else modules
+
+
+def get_entity_definitions(entity_type: str) -> dict:
+    """
+    Returns a dictionary where the key is the model's field name
+    and the value is the translated verbose_name for that field.
+    """
+    # Get the model class from the entity_type string (assuming the entity_type matches the model name)
+    try:
+        model_class = apps.get_model("api", entity_type)
+    except LookupError:
+        raise ValueError(f"Model '{entity_type}' not found")
+    # Extract the field names and their translated verbose names
+    field_definitions = {field.name: _(field.verbose_name) if field.verbose_name else field.name for field in model_class._meta.get_fields() if hasattr(field, "verbose_name") and not field.name.endswith("_thread")}
+
+    return field_definitions
+
+
+def find_empty_scenarios(entity, field: str):
+    if not isinstance(entity, api_models.Module) and not isinstance(entity, api_models.Submodule):
+        raise ValueError("Entity must be a Module instance")
+
+    entity: api_models.Module
+
+    relevant_scenarios: list[ScenarioTypes] = entity.get_relevant_scenarios()
+
+    missing = []
+
+    for s in relevant_scenarios:
+        # Dynamically construct the field name
+        field_name = f"{field}_{s.value}"
+
+        try:
+            # Check if the field exists in the model using _meta
+            entity._meta.get_field(field_name)
+
+            if getattr(entity, field_name) is None:
+                missing.append(s)
+        except FieldDoesNotExist:
+            raise ValueError(f"Field '{field_name}' not found in {entity.__class__.__name__}. Have you added or refactored the field name recently?")
+
+    return [s.verbose_name for s in missing]
+
+
+@dataclass
+class DefaultValue:
+    value: float = 0
+
+
+def update_change_reason(instance, reason):
+    from simple_history.utils import get_history_manager_for_model
+
+    attrs = {}
+    model = type(instance)
+    manager = instance if instance.pk is not None else model
+    history = get_history_manager_for_model(manager)
+    history_fields = [field.attname for field in history.model._meta.fields]
+    for field in instance._meta.fields:
+        if field.attname not in history_fields:
+            continue
+        value = getattr(instance, field.attname)
+        if field.primary_key is True:
+            if value is not None:
+                attrs[field.attname] = value
+        else:
+            attrs[field.attname] = value
+
+    record = history.filter(id=instance.pk).order_by("-history_date").first()
+    record.history_change_reason = reason
+    record.save()

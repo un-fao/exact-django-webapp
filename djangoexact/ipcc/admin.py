@@ -3,7 +3,7 @@ from unfold.admin import ModelAdmin
 
 from .models import *
 
-for model in [model for model in dir() if not model.startswith("_") and not model.startswith("ForestManagementAGB") and not model.startswith("PerennialAGB") and not model.startswith("PerennialBGB") and not model.startswith("AfforestationFLU") and not model.startswith("LivestockTAM") and not model.startswith("LivestockVSER") and not model.startswith("LivestockManureEF") and not model.startswith("FLUData") and not model.startswith("LivestockAWMS") and not model.startswith("ForestManagementBGB")]:
+for model in [model for model in dir() if not model.startswith("_") and not model.startswith("ForestManagementAGB") and not model.startswith("PerennialAGB") and not model.startswith("PerennialBGB") and not model.startswith("AfforestationFLU") and not model.startswith("LivestockTAM") and not model.startswith("LivestockVSER") and not model.startswith("LivestockManureEF") and not model.startswith("FLUData") and not model.startswith("LivestockAWMS") and not model.startswith("ForestManagementBGB") and not model.startswith("ForestTotalBiomass")]:
     try:
         admin.site.register(eval(model), ModelAdmin)
     except:
@@ -75,6 +75,7 @@ class LivestockTAMAdmin(ModelAdmin):
 class ForestManagementAGBAdmin(ModelAdmin):
     list_display = [
         "forest_type",
+        "climate",
         "land_use_type",
         "forest_condition_type",
         "from_year",
@@ -86,6 +87,7 @@ class ForestManagementAGBAdmin(ModelAdmin):
     ]
 
     list_select_related = [
+        "climate",
         "land_use_type",
         "region",
         "forest_type",
@@ -93,6 +95,7 @@ class ForestManagementAGBAdmin(ModelAdmin):
     ]
 
     search_fields = [
+        "climate__name",
         "land_use_type__name",
         "region__name",
         "forest_type__name",
@@ -170,22 +173,42 @@ class ForestManagementBGBAdmin(ModelAdmin):
         "region",
         "forest_type",
         "climate",
-        "threshold",
     ]
 
     search_fields = [
         "land_use_type__name",
         "region__name",
         "forest_type__name",
-        "forest_condition_type__name",
         "climate__name",
         "threshold",
     ]
 
 
+class ForestTotalBiomassAdmin(ModelAdmin):
+    list_display = [
+        "climate",
+        "moisture",
+        "continent",
+        "land_use_type",
+        "value",
+    ]
+
+    list_select_related = [
+        "land_use_type",
+        "continent",
+        "climate",
+        "moisture",
+    ]
+
+    search_fields = [
+        "land_use_type__name",
+        "continent__name",
+        "climate__name",
+        "moisture__name",
+    ]
+
+
 admin.site.register(FLUData, FLUDataAdmin)
-
-
 admin.site.register(PerennialAGB, AGBAdmin)
 admin.site.register(PerennialBGB, BGBAdmin)
 admin.site.register(AfforestationFLU, AfforestationFLUAdmin)
@@ -195,3 +218,4 @@ admin.site.register(LivestockManureEF, LivestockManureEFAdmin)
 admin.site.register(ForestManagementAGB, ForestManagementAGBAdmin)
 admin.site.register(LivestockAWMS, LivestockAWMSAdmin)
 admin.site.register(ForestManagementBGB, ForestManagementBGBAdmin)
+admin.site.register(ForestTotalBiomass, ForestTotalBiomassAdmin)
