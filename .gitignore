@@ -85,3 +85,11 @@ djangoexact/djangoexact/fao-exact-review-firebaseauth-private-key20240715164125.
 csv
 djangoexact/ipcc_dump_csv.zip
 djangoexact/scripts/Ex_Act_Definitions_LM_0108.xlsx
+djangoexact/annual_cropland_results.xlsx
+
+graphs/
+reports/
+static/
+djangoexact/scripts/ipcc_data/ForestManagementAGBRevised.csv
+djangoexact/docs/EX-ACT VC migration.docx
+docs/docs/

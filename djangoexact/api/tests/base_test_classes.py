@@ -11,12 +11,13 @@ from factory import fuzzy
 from .factories import *
 import api.tests.base_test_classes as t
 import uuid
+from django.contrib.auth.models import Group
 
 
 class ProjectTest:
     def __init__(self):
         log.basicConfig(level=log.INFO)
-        self.user = User.objects.get(email="admin@admin.com")
+        self.user = User.objects.get(email="claudio.lavacca@fao.org")
         self.climates = Climate.objects.all()
         self.countries = Country.objects.all()
         self.soil_types = SoilType.objects.all().exclude(active=False).exclude(name="Mineral").exclude(name="Organic")
@@ -55,6 +56,7 @@ class ProjectTest:
             None.
         """
         self.project: Project = ProjectFactory.create(owner=self.user, name=uuid.uuid4(), climate=self.climate, moisture=self.moisture)
+        ProjectMembership.objects.create(project=self.project, user=self.user, group=Group.objects.get(name="Admin"))
         log.info(f"Created project with parameters {self.get_parameters(self.project)}")
 
     @abstractmethod
@@ -157,6 +159,8 @@ class ModuleTest(ActivityTest):
         self.activity.module_types.add(self.module_type)
         self.activity.save()
 
+        log.debug(f"Created {self.module.module_type.name} module with parameters {self.get_parameters(self.module)}")
+
     def calculate_results(self):
         """
         Calculate the results for the module.
@@ -186,9 +190,12 @@ class ModuleWithSubmodulesTest(ModuleTest):
         self.submodules = None
         self.submodule_results = None
 
-    def create_submodules(self):
+    def create_submodules(self, n=1):
         """
         Create submodules for the module.
+
+        Args:
+            n (int): The number of submodules to create for each submodule type.
 
         Returns:
             None
@@ -205,9 +212,10 @@ class ModuleWithSubmodulesTest(ModuleTest):
             except KeyError:
                 raise KeyError(f"Factory for module type {submodule_type} not found")
 
-            submodule = Factory.create(parent=self.module)
-            self.submodules.append(submodule)
-            log.info(f"Created submodule {submodule.__class__.__name__} with parameters {self.get_parameters(submodule)}")
+            for i in range(n):
+                submodule = Factory.create(parent=self.module)
+                self.submodules.append(submodule)
+                log.info(f"Created submodule {submodule.__class__.__name__} with parameters {self.get_parameters(submodule)}")
 
     def calculate_submodule_results(self):
         """

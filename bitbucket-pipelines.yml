@@ -65,6 +65,8 @@ definitions:
           # - yes | python manage.py makemigrations --merge
           - python manage.py migrate
           - python manage.py collectstatic --noinput
+          - python manage.py update_translation_fields
+          - python manage.py sync_translation_fields
 
           - pip list
           - sed -i "s|127.0.0.1|$DB_HOST|g" djangoexact/settings.py
@@ -74,11 +76,11 @@ definitions:
           - gcloud app versions list --service=$SERVICE_NAME --project=$PROJECT_ID --format="value(version.id)" --sort-by="~version.createTime" | tail -n +100 | xargs -r gcloud app versions delete -q
 pipelines:
   branches:
-    develop:
-      - step: *predeploy
-      - step:
-          <<: *deploy
-          deployment: develop
+    # develop:
+    #   - step: *predeploy
+    #   - step:
+    #       <<: *deploy
+    #       deployment: develop
     review:
       - step: *predeploy
       - step:

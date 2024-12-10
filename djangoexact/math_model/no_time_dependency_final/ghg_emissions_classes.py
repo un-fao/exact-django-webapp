@@ -38,6 +38,8 @@ class ActivityTypes(Enum):
     ROTATION_BGB = "Rotation BGB"
     DISTURBANCE_AGB = "Disturbance AGB"
     DISTURBANCE_BGB = "Disturbance BGB"
+    DISTURBANCE_FIRE_AGB = "Disturbance Fire AGB"
+    DISTURBANCE_FIRE_BGB = "Disturbance Fire BGB"
     LOGGING_AGB = "Logging AGB"
     LOGGING_BGB = "Logging BGB"
     HWP_LOGGING_AGB = "Harvested Wood Product Logging AGB"
@@ -56,10 +58,14 @@ class ActivityTypes(Enum):
     SOLID_CONSUMPTION = "Solid Consumption"
     NEW_IRRIGATION = "New Irrigation"
     METHANE_ENTERIC_FERMENTATION = "Methane Enteric Fermentation"
-    METHANE_MANURE_MANAGEMENT = "Methane Manure Management"
-    NITROUS_MANURE_MANAGEMENT = "Nitrous Oxide Manure Management"
-    NITROUS_MANURE_MANAGEMENT_INDIRECT_VOLATILIZATION = "Nitrous Oxide Manure Management Indirect Volatilization"
-    NITROUS_MANURE_MANAGEMENT_INDIRECT_LEACHING = "Nitrous Oxide Manure Management Indirect Leaching"
+    METHANE_MANURE_MANAGEMENT_SYSTEM = "Methane Manure Management System"
+    METHANE_MANURE_MANAGEMENT_PRP = "Methane Manure Management PRP"
+    NITROUS_MANURE_MANAGEMENT_SYSTEM = "Nitrous Oxide Manure Management System"
+    NITROUS_MANURE_MANAGEMENT_PRP = "Nitrous Oxide Manure Management PRP"
+    NITROUS_MANURE_MANAGEMENT_INDIRECT_VOLATILIZATION_SYSTEM = "Nitrous Oxide Manure Management Indirect Volatilization System"
+    NITROUS_MANURE_MANAGEMENT_INDIRECT_VOLATILIZATION_PRP = "Nitrous Oxide Manure Management Indirect Volatilization PRP"
+    NITROUS_MANURE_MANAGEMENT_INDIRECT_LEACHING_SYSTEM = "Nitrous Oxide Manure Management Indirect Leaching System"
+    NITROUS_MANURE_MANAGEMENT_INDIRECT_LEACHING_PRP = "Nitrous Oxide Manure Management Indirect Leaching PRP"
     REWETTING_REVEGETATION = "Rewetting Revegetation"
     FIRE_ON_SOIL = "Fire on Soil"
     DRAINAGE = "Drainage"
@@ -71,6 +77,10 @@ class ActivityTypes(Enum):
     DEGRADATION_BGB = "Degradation BGB"
     DEGRADATION_LITTER = "Degradation Litter"
     DEGRADATION_DEADWOOD = "Degradation Deadwood"
+    PACKAGING = "Packaging"
+    TRANSPORT = "Transport"
+    STORAGE = "Storage"
+    PROCESSING = "Processing"
 
 
 class Emission:
@@ -102,6 +112,12 @@ class YearlyGasEmissionSet:
 
         self.emissions.extend(emissions)
 
+    def __sub__(self, other):
+        return YearlyGasEmissionSet(self.year, self.gas_type, [x - y for x, y in zip(self.emissions, other.emissions)], self.delay)
+
+    def __add__(self, other):
+        return YearlyGasEmissionSet(self.year, self.gas_type, [x + y for x, y in zip(self.emissions, other.emissions)], self.delay)
+
 
 class YearlyGasActivityEmissionSet(YearlyGasEmissionSet):
 
@@ -112,6 +128,12 @@ class YearlyGasActivityEmissionSet(YearlyGasEmissionSet):
 
     def to_dict(self):
         return {"year": self.year, "gas_type": {"name": self.gas_type.name if self.gas_type else None}, "emissions": [emission.to_dict() for emission in self.emissions], "activity": self.activity}
+
+    def __sub__(self, other):
+        return YearlyGasActivityEmissionSet(self.year, self.gas_type, [x - y for x, y in zip(self.emissions, other.emissions)], self.activity, self.delay)
+
+    def __add__(self, other):
+        return YearlyGasActivityEmissionSet(self.year, self.gas_type, [x + y for x, y in zip(self.emissions, other.emissions)], self.activity, self.delay)
 
 
 class YearlyActivityEmissionSet:
@@ -166,10 +188,10 @@ class Result:
 
     def breakdown_by_activity(self):
 
-        aggregated_emissions = {activity.value: YearlyActivityEmissionSet(0, [Emission(gas_type=None) for i in range(self.time_tot)], activity.value) for activity in [i.activity for i in self.yearly_emissions_by_sector_by_gas]}
+        aggregated_emissions = {activity: YearlyActivityEmissionSet(0, [Emission(gas_type=None) for i in range(self.time_tot)], activity) for activity in [i.activity for i in self.yearly_emissions_by_sector_by_gas]}
 
         for yearly_emission in self.yearly_emissions_by_sector_by_gas:
-            aggregated_emissions[yearly_emission.activity.value].emissions = [x + y for x, y in zip(aggregated_emissions[yearly_emission.activity.value].emissions, yearly_emission.emissions)]
+            aggregated_emissions[yearly_emission.activity].emissions = [x + y for x, y in zip(aggregated_emissions[yearly_emission.activity].emissions, yearly_emission.emissions)]
 
         return aggregated_emissions.values()
 
