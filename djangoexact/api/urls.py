@@ -175,6 +175,9 @@ router.register(r"packaging-entries", views.generic_module_viewset(models.Packag
 router.register(r"transports", views.generic_module_viewset(models.Transport), basename="transport")
 router.register(r"transport-entries", views.generic_module_viewset(models.TransportEntry), basename="transportentry")
 
+router.register(r"packaging-material-types", views.generic_viewset(models.PackagingMaterialType), basename="packagingmaterialtypes")
+router.register(r"refrigerant-types", views.generic_viewset(models.RefrigerantType), basename="refrigeranttypes")
+
 urlpatterns = [
     path("docs/", include_docs_urls(title="EX-ACT Docs")),
     re_path(r"^swagger(?P<format>\.json|\.yaml)$", schema_view.without_ui(cache_timeout=0), name="schema-json"),
