@@ -80,6 +80,8 @@ class ReportFactory:
             return SettlementReport
         elif isinstance(module, api_models.CoastalWetland):
             return CoastalWetlandReport
+        elif isinstance(module, api_models.OrganicSoil):
+            return OrganicSoilReport
         else:
             log.warning(f"No report class found for module {module.module_type.name}")
             return
@@ -2788,3 +2790,100 @@ class SettlementReport(LandModuleReport):
             self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.other_infrastructure_co2_eq[i])
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+
+@dataclass
+class OrganicSoilReport(BaseModuleReport):
+
+    module: api_models.OrganicSoil
+
+    def __post_init__(self):
+        self.calculator = calculators.OrganicSoilCalculator(self.module)
+        return super().__post_init__()
+
+    def populate_metadata(self):
+
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
+        last_metadata_row = self.metadata_worksheet.max_row + 1
+
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value=str(self.module.module_type.name))
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1).fill = Colors.LIGHT_BLUE_FILL.value
+
+        last_metadata_row = self.metadata_worksheet.max_row
+
+        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Hectares")
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Type of land use")
+        self.metadata_worksheet.cell(row=last_metadata_row + 3, column=1, value="Are under drainage (ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 4, column=1, value="% area of ditches (ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 5, column=1, value="Fire on soil")
+        self.metadata_worksheet.cell(row=last_metadata_row + 6, column=1, value="Soil fire periodicity")
+        self.metadata_worksheet.cell(row=last_metadata_row + 7, column=1, value="% soil fire impact")
+        self.metadata_worksheet.cell(row=last_metadata_row + 8, column=1, value="Area of peat extraction (ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 9, column=1, value="Height of extraction (cm)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 10, column=1, value="Peat used for energy (yes/no)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 11, column=1, value="Type of peat")
+        self.metadata_worksheet.cell(row=last_metadata_row + 12, column=1, value="Peat density (t/m3)")
+
+        luc: api_models.LandUseChange = self.module.land_use_change
+
+        if self.module.is_start():
+
+            math = self.calculator.math_start_w or self.calculator.math_start_wo
+            peat_density = math.peat_density_tier_2_default
+
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=2, value=luc.module_type_start.area)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=2, value=luc.module_type_start.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=2, value=self.module.drainage_area_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=2, value=self.module.ditches_area_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=2, value=self.module.fire_type_start.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=2, value=self.module.soil_fire_periodicity_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=2, value=self.module.soil_fire_impact_percentage_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=2, value=self.module.peat_area_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 9, column=2, value=self.module.peat_extraction_height_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 10, column=2, value="Yes" if self.module.is_peat_for_energy_start else "No")
+            self.metadata_worksheet.cell(row=last_metadata_row + 11, column=2, value=self.module.peat_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 12, column=2, value=peat_density)
+
+        if self.module.is_with():
+
+            math = self.calculator.math_start_w
+            peat_density = math.peat_density_tier_2_default
+
+            self.metadata_worksheet.cell(row=last_metadata_row + 13, column=3, value=luc.module_type_start.area)
+            self.metadata_worksheet.cell(row=last_metadata_row + 14, column=3, value=luc.module_type_w.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 15, column=3, value=self.module.drainage_area_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 16, column=3, value=self.module.ditches_area_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 17, column=3, value=self.module.fire_type_w.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 18, column=3, value=self.module.soil_fire_periodicity_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 19, column=3, value=self.module.soil_fire_impact_percentage_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 20, column=3, value=self.module.peat_area_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 21, column=3, value=self.module.peat_extraction_height_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 22, column=3, value="Yes" if self.module.is_peat_for_energy_w else "No")
+            self.metadata_worksheet.cell(row=last_metadata_row + 23, column=3, value=self.module.peat_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 24, column=3, value=peat_density)
+
+        if self.module.is_without():
+
+            math = self.calculator.math_start_wo
+            peat_density = math.peat_density_tier_2_default
+
+            self.metadata_worksheet.cell(row=last_metadata_row + 25, column=4, value=luc.module_type_start.area)
+            self.metadata_worksheet.cell(row=last_metadata_row + 26, column=4, value=luc.module_type_wo.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 27, column=4, value=self.module.drainage_area_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 28, column=4, value=self.module.ditches_area_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 29, column=4, value=self.module.fire_type_wo.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 30, column=4, value=self.module.soil_fire_periodicity_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 31, column=4, value=self.module.soil_fire_impact_percentage_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 32, column=4, value=self.module.peat_area_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 33, column=4, value=self.module.peat_extraction_height_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 34, column=4, value="Yes" if self.module.is_peat_for_energy_wo else "No")
+            self.metadata_worksheet.cell(row=last_metadata_row + 35, column=4, value=self.module.peat_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 36, column=4, value=peat_density)
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+    def build_report(self):
+        super().build_report()
+        self.populate_metadata()
