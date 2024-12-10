@@ -560,6 +560,10 @@ class IrrigationSystemFactory(DjangoModelFactory):
     ha_w = factory.fuzzy.FuzzyFloat(0, 100)
     ha_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
+    ef_t2_start = factory.fuzzy.FuzzyFloat(0, 5)
+    ef_t2_w = factory.fuzzy.FuzzyFloat(0, 5)
+    ef_t2_wo = factory.fuzzy.FuzzyFloat(0, 5)
+
 
 fuel_types = [fuel for fuel in FuelType.objects.all()]
 
@@ -581,6 +585,24 @@ class IrrigationPhaseFactory(DjangoModelFactory):
     gross_irrigation_water_start = factory.fuzzy.FuzzyFloat(0, 100)
     gross_irrigation_water_w = factory.fuzzy.FuzzyFloat(0, 100)
     gross_irrigation_water_wo = factory.fuzzy.FuzzyFloat(0, 100)
+
+    ef_co2_t2_start = factory.fuzzy.FuzzyFloat(0, 5)
+    ef_co2_t2_w = factory.fuzzy.FuzzyFloat(0, 5)
+    ef_co2_t2_wo = factory.fuzzy.FuzzyFloat(0, 5)
+    ef_ch4_t2_start = factory.fuzzy.FuzzyFloat(0, 5)
+    ef_ch4_t2_w = factory.fuzzy.FuzzyFloat(0, 5)
+    ef_ch4_t2_wo = factory.fuzzy.FuzzyFloat(0, 5)
+    ef_n2o_t2_start = factory.fuzzy.FuzzyFloat(0, 5)
+    ef_n2o_t2_w = factory.fuzzy.FuzzyFloat(0, 5)
+    ef_n2o_t2_wo = factory.fuzzy.FuzzyFloat(0, 5)
+    transmission_loss_t2_start = factory.fuzzy.FuzzyFloat(0, 5)
+    transmission_loss_t2_w = factory.fuzzy.FuzzyFloat(0, 5)
+    transmission_loss_t2_wo = factory.fuzzy.FuzzyFloat(0, 5)
+    average_pressure_t2 = factory.fuzzy.FuzzyFloat(0, 5)
+    total_dynamic_head_t2 = factory.fuzzy.FuzzyFloat(0, 5)
+    pumping_efficiency_t2_start = factory.fuzzy.FuzzyFloat(0, 5)
+    pumping_efficiency_t2_w = factory.fuzzy.FuzzyFloat(0, 5)
+    pumping_efficiency_t2_wo = factory.fuzzy.FuzzyFloat(0, 5)
 
 
 settlement_types = [settlement for settlement in SettlementType.objects.all()]
