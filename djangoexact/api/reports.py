@@ -2696,8 +2696,74 @@ class IrrigationReport(BaseModuleReport):
 
         self.total_emissions = list(map(sum, zip(self.total_emissions, self.other_infrastructure_co2_eq, self.liquid_fuel_or_electricity_co2, self.liquid_fuel_or_electricity_ch4, self.liquid_fuel_or_electricity_n2o)))
 
-    def build_report(self):
-        super().build_report()
+    def populate_metadata(self):
+
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
+        last_metadata_row = self.metadata_worksheet.max_row
+
+        for i, system in enumerate(self.module.irrigation_systems.all()):
+
+            system: api_models.IrrigationSystem
+
+            if i != 0:
+                last_metadata_row += 1
+
+            self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=1, value="New irrigation system type")
+            self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=1, value="Hectares")
+
+            if self.module.is_start():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=2, value=system.irrigation_system_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=2, value=system.ha_start)
+
+            if self.module.is_with():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=3, value=system.irrigation_system_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=3, value=system.ha_w)
+
+            if self.module.is_without():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=4, value=system.irrigation_system_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=4, value=system.ha_wo)
+
+        last_metadata_row += len(self.module.irrigation_systems.all()) + 1
+
+        for i, phase in enumerate(self.module.irrigation_phases.all()):
+
+            phase: api_models.IrrigationPhase
+
+            if i != 0:
+                last_metadata_row += 4
+
+            self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=1, value="Operating irrigation system type")
+            self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=1, value="Hectares")
+            self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=1, value="Source of energy")
+            self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=1, value="Depth of well (m)")
+            self.metadata_worksheet.cell(row=last_metadata_row + 5 + i, column=1, value="Gross irrigation water requirement (mm/year)")
+
+            if self.module.is_start():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=2, value=phase.irrigation_system_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=2, value=phase.ha_start)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=2, value=phase.fuel_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=2, value=phase.well_depth)
+                self.metadata_worksheet.cell(row=last_metadata_row + 5 + i, column=2, value=phase.gross_irrigation_water_start)
+
+            if self.module.is_with():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=3, value=phase.irrigation_system_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=3, value=phase.ha_w)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=3, value=phase.fuel_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=3, value=phase.well_depth)
+                self.metadata_worksheet.cell(row=last_metadata_row + 5 + i, column=3, value=phase.gross_irrigation_water_w)
+
+            if self.module.is_without():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=4, value=phase.irrigation_system_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=4, value=phase.ha_wo)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=4, value=phase.fuel_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=4, value=phase.well_depth)
+                self.metadata_worksheet.cell(row=last_metadata_row + 5 + i, column=4, value=phase.gross_irrigation_water_wo)
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+    def populate_results(self):
 
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
         self.results_worksheet = self.workbook["Results"]
@@ -2718,6 +2784,11 @@ class IrrigationReport(BaseModuleReport):
             self.results_worksheet.cell(row=last_results_row + 4, column=i + 2, value=self.liquid_fuel_or_electricity_n2o[i])
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+    def build_report(self):
+        super().build_report()
+        self.populate_results()
+        self.populate_metadata()
 
 
 # @dataclass
