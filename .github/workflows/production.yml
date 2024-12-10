@@ -1,10 +1,13 @@
 name: Django Exact
 
 on:
-  push:
-    branches: []
   pull_request:
     branches: [ main ]
+  
+permissions:
+  id-token: write
+  actions: read
+  contents: read  
 
 jobs:
   setup:
@@ -40,7 +43,9 @@ jobs:
     - id: 'Auth'
       uses: 'google-github-actions/auth@v2'
       with:
-        credentials_json: ${{ secrets.PROJECT_KEYFILE }}
+        token_format: access_token
+        workload_identity_provider: ${{ vars.WORKLOAD_ID_PROVIDER }}    
+        service_account: ${{ vars.SERVICE_ACCOUNT }}
     
     - name: Verify gcloud authentication
       run: gcloud run services list --filter=status:ACTIVE --format="value(account)"  
