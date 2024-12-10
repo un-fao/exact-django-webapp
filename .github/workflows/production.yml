@@ -1,0 +1,101 @@
+name: Django Exact
+
+on:
+  push:
+    branches: []
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    environment:
+      name: review
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        # This is the version of the action for setting up Python, not the Python version.
+        uses: actions/setup-python@v5
+        with:
+          # Semantic version range syntax or exact version of a Python version
+          python-version: '3.11'
+          # Optional - x64 or x86 architecture, defaults to x64
+          architecture: 'x64'
+      # You can test your matrix by printing the current Python version
+      - name: Display Python version
+        run: python -c "import sys; print(sys.version)"
+  
+  deploy:
+    needs: setup
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: 'write'
+      contents: 'read'
+      actions: 'read'
+    environment:
+      name: review
+    steps:
+    - name: 'Checkout Code'
+      uses: actions/checkout@v4  
+    - id: 'Auth'
+      uses: 'google-github-actions/auth@v2'
+      with:
+        credentials_json: ${{ secrets.PROJECT_KEYFILE }}
+    
+    - name: Verify gcloud authentication
+      run: gcloud run services list --filter=status:ACTIVE --format="value(account)"  
+      
+    - name: 'Cloud SQL Proxy'
+      uses: ahmadnassri/action-google-cloud-sql-proxy@v1.4.0
+      with:
+        key: ${{ secrets.PROJECT_KEYFILE }}
+        connection: ${{ vars.DB_INSTANCE_CONNECTION }}
+        port: ${{ vars.DB_PORT }}  
+
+    - run: |
+
+        sed -i 's|\$SERVICE_NAME|${{ vars.SERVICE_NAME }}|g' djangoexact/app.yaml
+        sed -i 's|\$PROJECT_ID|${{ vars.PROJECT_ID }}|g' djangoexact/app.yaml
+        sed -i 's|\$DB_ENGINE|${{ vars.DB_ENGINE }}|g' djangoexact/app.yaml
+        sed -i 's|\$DB_HOST|${{ vars.DB_HOST }}|g' djangoexact/app.yaml
+        sed -i 's|\$DB_USERNAME|${{ vars.DB_USERNAME }}|g' djangoexact/app.yaml
+        sed -i 's|\$DB_PASSWORD|${{ secrets.DB_PASSWORD }}|g' djangoexact/app.yaml
+        sed -i 's|\$DB_NAME|${{ vars.DB_NAME }}|g' djangoexact/app.yaml
+        sed -i 's|\$DB_PORT|${{ vars.DB_PORT }}|g' djangoexact/app.yaml
+
+        echo "$(cat djangoexact/app.yaml)"
+
+        sed -i 's|\$DB_ENGINE|${{ vars.DB_ENGINE }}|g' djangoexact/djangoexact/settings.py
+        sed -i 's|\$DB_INSTANCE_CONNECTION|${{ vars.DB_INSTANCE_CONNECTION }}|g' djangoexact/djangoexact/settings.py
+        sed -i 's|\$DB_HOST|${{ vars.DB_HOST }}|g' djangoexact/djangoexact/settings.py
+        sed -i 's|\$DB_USERNAME|${{ vars.DB_USERNAME  }}|g' djangoexact/djangoexact/settings.py
+        sed -i 's|\$DB_PASSWORD|${{ secrets.DB_PASSWORD }}|g' djangoexact/djangoexact/settings.py
+        sed -i 's|\$DB_NAME|${{ vars.DB_NAME }}|g' djangoexact/djangoexact/settings.py
+        sed -i 's|\$DB_PORT|${{ vars.DB_PORT }}|g' djangoexact/djangoexact/settings.py
+        sed -i 's|\$ALLOWED_HOST|${{ vars.ALLOWED_HOST }}|g' djangoexact/djangoexact/settings.py
+        sed -i 's|\$SECRET_KEY|${{ secrets.GAE_APPLICATION }}|g' djangoexact/djangoexact/settings.py
+        sed -i 's|\\\$EMAIL_HOST|${{ vars.EMAIL_HOST }}|g' djangoexact/djangoexact/settings.py
+        sed -i 's|\\\$EMAIL_PORT|${{ vars.EMAIL_PORT }}|g' djangoexact/djangoexact/settings.py
+        sed -i 's|\\\$SMTP_USER_EMAIL|${{ vars.SMTP_USER_EMAIL }}|g' djangoexact/djangoexact/settings.py
+        sed -i 's|\\\$SMTP_USER_PASSWORD|${{ secrets.SMTP_USER_PASSWORD }}|g' djangoexact/djangoexact/settings.py
+        sed -i 's|\$FIREBASE_API_KEY|${{ vars.FIREBASE_API_KEY }}|g' djangoexact/djangoexact/settings.py
+        sed -i 's|\$FIREBASE_AUTH_DOMAIN|${{ vars.FIREBASE_AUTH_DOMAIN }}|g' djangoexact/djangoexact/settings.py
+        sed -i 's|\$FIREBASE_PROJECT_ID|${{ vars.FIREBASE_PROJECT_ID }}|g' djangoexact/djangoexact/settings.py
+        sed -i 's|\$FIREBASE_STORAGE_BUCKET|${{ vars.FIREBASE_STORAGE_BUCKET }}|g' djangoexact/djangoexact/settings.py
+        sed -i 's|\$FIREBASE_MESSAGING_SENDER_ID|${{ vars.FIREBASE_MESSAGING_SENDER_ID }}|g' djangoexact/djangoexact/settings.py
+        sed -i 's|\$FIREBASE_APP_ID|${{ vars.FIREBASE_APP_ID }}|g' djangoexact/djangoexact/settings.py
+        sed -i 's|\$FIREBASE_MEASUREMENT_ID|${{ vars.FIREBASE_MEASUREMENT_ID }}|g' djangoexact/djangoexact/settings.py
+        sed -i 's|\$FIREBASE_SERVICE_ACCOUNT|${{ vars.FIREBASE_SERVICE_ACCOUNT }}|g' djangoexact/djangoexact/settings.py
+
+        echo "$(cat djangoexact/djangoexact/settings.py)"
+
+        pip install -r djangoexact/requirements.txt
+        
+        python djangoexact/manage.py migrate
+        python djangoexact/manage.py collectstatic --noinput
+
+        pip list
+        sed -i "s|127.0.0.1|${{ vars.DB_HOST }}|g" djangoexact/djangoexact/settings.py
+        
+        gcloud app deploy djangoexact/app.yaml --project ${{ vars.PROJECT_ID }} --verbosity=debug
+        gcloud app versions list --service=${{ vars.SERVICE_NAME }} --project=${{ vars.PROJECT_ID }} --format="value(version.id)" --sort-by="~version.createTime" | tail -n +100 | xargs -r gcloud app versions delete -q
