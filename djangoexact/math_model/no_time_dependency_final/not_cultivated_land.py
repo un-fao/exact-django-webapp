@@ -40,6 +40,7 @@ class NotCultivatedLand(LandModule):
 
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         def calculate_emissions_som():
             try:
@@ -50,15 +51,20 @@ class NotCultivatedLand(LandModule):
                     self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         def calculate_biomass_emissions():
             try:
-                emissions_biomass_yearly, emissions_biomass_total = biomass_emissions(self.biomass_start, self.biomass_end, self.hectares_start, self.hectares_end, self.rate_type, self.implementation_time, self.capitalization_time)
-                biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_biomass_yearly], ActivityTypes.BIOMASS, delay=self.delay)
-                self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
+                if self.calculate_biomass:
+                    emissions_biomass_yearly, emissions_biomass_total = biomass_emissions(self.biomass_start, self.biomass_end, self.hectares_start, self.hectares_end, self.rate_type, self.implementation_time, self.capitalization_time)
+                    biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_biomass_yearly], ActivityTypes.BIOMASS, delay=self.delay)
+                    self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
+                else:
+                    pass
 
             except Exception as e:
                 traceback.print_exc()
+                raise e
 
         calculate_soil_emissions()
         calculate_emissions_som()

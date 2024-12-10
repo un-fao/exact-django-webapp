@@ -1,14 +1,6 @@
 import traceback
 
-from .general_functions import (
-    breakdown_according_to_values,
-    soil_emissions_2,
-    som_emissions,
-    yearly_constant_emissions_breakdown,
-    yearly_time_dependent_20_year_breakdown,
-    yearly_time_dependent_parameter_breakdown,
-    biomass_emissions
-)
+from .general_functions import breakdown_according_to_values, soil_emissions_2, som_emissions, yearly_constant_emissions_breakdown, yearly_time_dependent_20_year_breakdown, yearly_time_dependent_parameter_breakdown, biomass_emissions
 from .ghg_emissions_classes import (
     ActivityTypes,
     Emission,
@@ -21,6 +13,8 @@ from .generalized_modules import LandModule
 
 from dataclasses import dataclass
 from typing import Optional
+
+
 @dataclass
 class AnnualCropland(LandModule):
 
@@ -28,13 +22,13 @@ class AnnualCropland(LandModule):
     methane_constant: float
     ef_methane_agr_residues_main: float
     combustion_factor_main: float
-    residue_main_tier_2: Optional [float]
+    residue_main_tier_2: Optional[float]
     n_estimation_slope_main: float
     n_estimation_intercept_main: float
     yield_value_main: float
     ef_methane_agr_residues_minor: float
     combustion_factor_minor: float
-    residue_minor_tier_2: Optional [float]
+    residue_minor_tier_2: Optional[float]
     n_estimation_slope_minor: float
     n_estimation_intercept_minor: float
     yield_value_minor: float
@@ -48,16 +42,31 @@ class AnnualCropland(LandModule):
     n_content_ag_minor: float
     ratio_bg_ag_minor: float
     n_content_bg_minor: float
+    yield_main_tier_2: Optional[float]
+    yield_minor_tier_2: Optional[float]
 
     def __post_init__(self):
         super().__post_init__()
 
+        self.yield_main = self.yield_main_tier_2 or self.yield_value_main
+        self.yield_minor = self.yield_minor_tier_2 or self.yield_value_minor
+
         # NOTE: this is a default value that is calculated based on the input values, needed for the frontend
-        if self.yield_value_main:
-            self.ag_residue_main_tier_2_default = self.yield_value_main * self.n_estimation_slope_main + self.n_estimation_intercept_main
-        if self.yield_value_minor:
-            self.ag_residue_minor_tier_2_default = self.yield_value_minor * self.n_estimation_slope_minor + self.n_estimation_intercept_minor
-        
+        if self.yield_value_main is not None:
+            if self.n_estimation_slope_main is None:
+                raise ValueError("n_estimation_slope_main is required if yield_value_main is provided")
+            if self.n_estimation_intercept_main is None:
+                raise ValueError("n_estimation_intercept_main is required if yield_value_main is provided")
+
+            self.ag_residue_main_tier_2_default = self.yield_main * self.n_estimation_slope_main + self.n_estimation_intercept_main
+        if self.yield_value_minor is not None:
+            if self.n_estimation_slope_minor is None:
+                raise ValueError("n_estimation_slope_minor is required if yield_value_minor is provided")
+            if self.n_estimation_intercept_minor is None:
+                raise ValueError("n_estimation_intercept_minor is required if yield_value_minor is provided")
+
+            self.ag_residue_minor_tier_2_default = self.yield_minor * self.n_estimation_slope_minor + self.n_estimation_intercept_minor
+
     def calculate_emissions(self):
         def calculate_emissions_soil():
             try:
@@ -84,7 +93,7 @@ class AnnualCropland(LandModule):
         def calculate_emissions_residue_burning():
             ################## COMPUTATION OF AMOUNT OF KG OF METHANE ###################
 
-            yield_value_main = self.yield_value_main * 1000
+            yield_value_main = self.yield_main * 1000
             yield_value_minor = self.yield_value_minor * 1000 if self.yield_value_minor else None
 
             ag_residue_main = self.residue_main_tier_2 * 1000 if self.residue_main_tier_2 else yield_value_main * self.n_estimation_slope_main + self.n_estimation_intercept_main
@@ -142,9 +151,12 @@ class AnnualCropland(LandModule):
 
         def calculate_biomass_emissions():
             try:
-                emissions_biomass_yearly, emissions_biomass_total = biomass_emissions(self.biomass_start, self.biomass_end, self.hectares_start, self.hectares_end, self.rate_type, self.implementation_time, self.capitalization_time)
-                biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_biomass_yearly], ActivityTypes.BIOMASS, delay=self.delay)
-                self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
+                if self.calculate_biomass:
+                    emissions_biomass_yearly, emissions_biomass_total = biomass_emissions(self.biomass_start, self.biomass_end, self.hectares_start, self.hectares_end, self.rate_type, self.implementation_time, self.capitalization_time)
+                    biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_biomass_yearly], ActivityTypes.BIOMASS, delay=self.delay)
+                    self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
+                else:
+                    pass
 
             except Exception as e:
                 traceback.print_exc()
@@ -153,5 +165,3 @@ class AnnualCropland(LandModule):
         calculate_emissions_som()
         calculate_emissions_residue_burning()
         calculate_biomass_emissions()
-
-

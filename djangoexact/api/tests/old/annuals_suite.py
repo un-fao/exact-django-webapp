@@ -42,7 +42,7 @@ for i in range(PROJECT_SIZE):
     climate = random.choice(climates)
     moisture = random.choice(climate.moistures.all())
     soil_type = random.choice(soil_types)
-    gw_potential = GlobalWarmingPotential.objects.get(name="100 yr AR5 w/out CC feedback")
+    gw_potential = GlobalWarmingPotential.objects.get(name_en="100 yr AR5 w/out CC feedback")
 
     print(f"\n\nCountry: {country}")
     print(f"Region: {region}")
@@ -110,19 +110,19 @@ for i in range(PROJECT_SIZE):
         sheet["G25"].value = annual.tillage_management_type_start.name
         sheet["I25"].value = annual.organic_input_type_start.name
         sheet["K25"].value = annual.residue_management_type_start.name
-        sheet["M25"].value = annual.crop_yield_start
+        sheet["M25"].value = annual.crop_yield_t2_start
 
         sheet["E26"].value = annual.land_use_type_wo.name
         sheet["G26"].value = annual.tillage_management_type_wo.name
         sheet["I26"].value = annual.organic_input_type_wo.name
         sheet["K26"].value = annual.residue_management_type_wo.name
-        sheet["M26"].value = annual.crop_yield_wo
+        sheet["M26"].value = annual.crop_yield_t2_wo
 
         sheet["E27"].value = annual.land_use_type_w.name
         sheet["G27"].value = annual.tillage_management_type_w.name
         sheet["I27"].value = annual.organic_input_type_w.name
         sheet["K27"].value = annual.residue_management_type_w.name
-        sheet["M27"].value = annual.crop_yield_w
+        sheet["M27"].value = annual.crop_yield_t2_w
 
         has_tillage_changed_wo = sheet["G26"].value != sheet["G25"].value
         has_organic_changed_wo = sheet["I26"].value != sheet["I25"].value
