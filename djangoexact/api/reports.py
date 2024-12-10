@@ -4,6 +4,7 @@ import xlsxwriter.format
 import xlsxwriter.worksheet
 import api.models as api_models
 import api.calculators as calculators
+import api.defaults as defaults
 from typing import Optional
 import math_model.no_time_dependency_final.ghg_emissions_classes as math_utils
 import numpy as np
@@ -32,9 +33,11 @@ class Colors(Enum):
     LIGHT_ORANGE_HEX = "fce4d6"
     LIGHT_BLUE_HEX = "d9e1f2"
     LIGHT_BEIGE_HEX = "ddd9c4"
+    LIGHT_RED_HEX = "ffcccc"
     LIGHT_ORANGE_FILL = PatternFill(start_color="fce4d6", end_color="fce4d6", fill_type="solid")
     LIGHT_BLUE_FILL = PatternFill(start_color="d9e1f2", end_color="d9e1f2", fill_type="solid")
     LIGHT_BEIGE_FILL = PatternFill(start_color="ddd9c4", end_color="ddd9c4", fill_type="solid")
+    LIGHT_RED_FILL = PatternFill(start_color="ffcccc", end_color="ffcccc", fill_type="solid")
 
 
 class ReportFactory:
@@ -75,6 +78,10 @@ class ReportFactory:
             return IrrigationReport
         elif isinstance(module, api_models.Settlement):
             return SettlementReport
+        elif isinstance(module, api_models.CoastalWetland):
+            return CoastalWetlandReport
+        elif isinstance(module, api_models.OrganicSoil):
+            return OrganicSoilReport
         else:
             log.warning(f"No report class found for module {module.module_type.name}")
             return
@@ -85,6 +92,7 @@ class ExcelFileManager:
         # Start with an empty in-memory Excel file
         self.excel_file = BytesIO()
         self._create_initial_excel()
+        self.SAVE_TO_FILE = True
 
     def _create_initial_excel(self):
 
@@ -92,7 +100,7 @@ class ExcelFileManager:
         workbook.add_worksheet("Results")
         metadata_worksheet = workbook.add_worksheet("Metadata")
         additional_indicators_worksheet = workbook.add_worksheet("Additional Indicators")
-        metadata_worksheet.hide()
+        # metadata_worksheet.hide()
         additional_indicators_worksheet.hide()
 
         # Close the xlsxwriter workbook to finalize the file
@@ -110,6 +118,10 @@ class ExcelFileManager:
         self.excel_file = BytesIO()
         workbook.save(self.excel_file)
         self.excel_file.seek(0)
+
+        if self.SAVE_TO_FILE:
+            with open(f"reports/{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.xlsx", "wb") as f:
+                f.write(self.excel_file.getvalue())
 
     def get_excel_bytes(self):
         # Get the current Excel file as bytes (e.g., for download)
@@ -194,9 +206,47 @@ class BaseProjectReport:
         for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
             self.results_worksheet.cell(row=1, column=i + 2, value=year)
 
-        self.metadata_worksheet.cell(row=1, column=2, value="START")
-        self.metadata_worksheet.cell(row=1, column=3, value="WITH")
-        self.metadata_worksheet.cell(row=1, column=4, value="WITHOUT")
+        # Metadata worksheet setup
+
+        self.metadata_worksheet.cell(row=1, column=1, value="Report download date")
+        self.metadata_worksheet.cell(row=1, column=5, value="Tier 2")
+        self.metadata_worksheet.cell(row=2, column=1, value="Project name")
+        self.metadata_worksheet.cell(row=3, column=1, value="Status")
+        self.metadata_worksheet.cell(row=4, column=1, value="Country")
+        self.metadata_worksheet.cell(row=5, column=1, value="Climate")
+        self.metadata_worksheet.cell(row=6, column=1, value="Moisture")
+        self.metadata_worksheet.cell(row=7, column=1, value="Soil type")
+        self.metadata_worksheet.cell(row=8, column=1, value="Implementation phase (years)")
+        self.metadata_worksheet.cell(row=9, column=1, value="Capitalization phase (years)")
+        self.metadata_worksheet.cell(row=10, column=1, value="Total duration of accounting (years)")
+        self.metadata_worksheet.cell(row=11, column=1, value="Global warming potential")
+        self.metadata_worksheet.cell(row=12, column=1, value="CO2")
+        self.metadata_worksheet.cell(row=13, column=1, value="CH4")
+        self.metadata_worksheet.cell(row=14, column=1, value="N2O")
+        self.metadata_worksheet.cell(row=15, column=1, value="Fossil CH4")
+
+        self.metadata_worksheet.cell(row=1, column=2, value=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        self.metadata_worksheet.cell(row=2, column=2, value=str(self.project.name))
+        self.metadata_worksheet.cell(row=3, column=2, value=self.project.status.name)
+        self.metadata_worksheet.cell(row=4, column=2, value=self.project.country.name)
+        self.metadata_worksheet.cell(row=5, column=2, value=self.project.climate.name)
+        self.metadata_worksheet.cell(row=6, column=2, value=self.project.moisture.name)
+        self.metadata_worksheet.cell(row=7, column=2, value=self.project.soil_type.name)
+        self.metadata_worksheet.cell(row=8, column=2, value=self.implementation_years)
+        self.metadata_worksheet.cell(row=9, column=2, value=self.capitalization_years)
+        self.metadata_worksheet.cell(row=10, column=2, value=self.duration)
+        self.metadata_worksheet.cell(row=11, column=2, value=self.project.gwp.name)
+        self.metadata_worksheet.cell(row=12, column=2, value=self.project.gwp.co2)
+        self.metadata_worksheet.cell(row=13, column=2, value=self.project.gwp.ch4)
+        self.metadata_worksheet.cell(row=14, column=2, value=self.project.gwp.n2o)
+        self.metadata_worksheet.cell(row=15, column=2, value=self.project.gwp.ch4_fossil)
+
+        self.metadata_worksheet.cell(row=16, column=1, value="")
+        self.metadata_worksheet.cell(row=17, column=1, value="")
+
+        self.metadata_worksheet.cell(row=18, column=2, value="START")
+        self.metadata_worksheet.cell(row=18, column=3, value="WITH")
+        self.metadata_worksheet.cell(row=18, column=4, value="WITHOUT")
 
         self.additional_indicators_worksheet.cell(row=1, column=1, value="Activity and GHGs / Years")
 
@@ -775,6 +825,63 @@ class LandUseChangeReport(LandModuleReport):
         self.calculator = calculators.LandUseChangeCalculator(self.module)
         return super().__post_init__()
 
+    def populate_metadata(self):
+        """
+        Populates the metadata worksheet in the Excel workbook with relevant data.
+
+        This method retrieves the workbook and the "Metadata" worksheet, then appends
+        metadata information related to land use change, hectares, main season crop,
+        tillage management type, organic input type, and yield. The data is populated
+        based on the module's state (start, with, without).
+
+        The method performs the following steps:
+        1. Retrieves the workbook and the "Metadata" worksheet.
+        2. Determines the last row in the metadata worksheet.
+        3. Adds metadata headers and fills the first column with static values.
+        4. Populates the second, third, and fourth columns with dynamic values based on
+           the module's state (start, with, without).
+        5. Saves the updated workbook.
+
+        The columns are populated as follows:
+        - Column 1: Static metadata headers.
+        - Column 2: Values when the module is in the start state.
+        - Column 3: Values when the module is in the with state.
+        - Column 4: Values when the module is in the without state.
+
+        The method ensures that if certain values are not available, default values are used.
+
+        Raises:
+            AttributeError: If any required attributes are missing from the module or activity report.
+        """
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
+        last_metadata_row = self.metadata_worksheet.max_row + 1
+
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Land Use Change")
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1).fill = Colors.LIGHT_BLUE_FILL.value
+
+        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Type of land use change")
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Fire used during conversion")
+        self.metadata_worksheet.cell(row=last_metadata_row + 3, column=1, value="Dry matter removed during conversion")
+
+        if self.module.is_start():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=2, value=self.module.module_type_start.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=2, value="Yes" if self.module.is_fire_used_start else "No")
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=2, value=self.module.dry_matter_start)
+
+        if self.module.is_with():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=3, value=self.module.module_type_w.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=3, value="Yes" if self.module.is_fire_used_w else "No")
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=3, value=self.module.dry_matter_w)
+
+        if self.module.is_without():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=4, value=self.module.module_type_wo.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=4, value="Yes" if self.module.is_fire_used_wo else "No")
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=4, value=self.module.dry_matter_wo)
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
     def get_result(self):
         super().get_result()
 
@@ -782,6 +889,11 @@ class LandUseChangeReport(LandModuleReport):
         self.soil_co2 = list(map(sum, zip(self.soil_co2, dom_co2)))
 
         self.total_emissions = list(map(sum, zip(self.total_emissions, dom_co2)))
+
+    def build_report(self):
+        super().build_report()
+        self.populate_metadata()
+        return self.workbook
 
 
 @dataclass
@@ -830,7 +942,7 @@ class PerennialCroplandReport(LandModuleReport):
         self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Perennial Cropland").fill = Colors.LIGHT_BLUE_FILL.value
 
         self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Hectares")
-        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Main season crop")
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Agroforestry system")
         self.metadata_worksheet.cell(row=last_metadata_row + 3, column=1, value="Tillage management type")
         self.metadata_worksheet.cell(row=last_metadata_row + 4, column=1, value="Organic input type")
         self.metadata_worksheet.cell(row=last_metadata_row + 5, column=1, value="Yield")
@@ -1174,6 +1286,55 @@ class GrasslandReport(LandModuleReport):
         self.calculator = calculators.GrasslandCalculator(self.module)
         return super().__post_init__()
 
+    def populate_metadata(self):
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
+        last_metadata_row = self.metadata_worksheet.max_row + 1
+
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Grassland")
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Grassland").fill = Colors.LIGHT_BLUE_FILL.value
+
+        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Hectares")
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Grassland management")
+        self.metadata_worksheet.cell(row=last_metadata_row + 3, column=1, value="Yield")
+        self.metadata_worksheet.cell(row=last_metadata_row + 4, column=1, value="Fire occurrence (yes/no)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 5, column=1, value="Fire periodicity (years)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 6, column=1, value="Fire impact (%)")
+
+        if self.module.is_start():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=2, value=self.units)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=2, value=self.module.grassland_management_type_start.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=2, value=self.module.yield_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=2, value="Yes" if self.module.is_fire_used_start else "No")
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=2, value=self.module.fire_periodicity_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=2, value=self.module.fire_impact_start)
+
+        if self.module.is_with():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=3, value=self.units)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=3, value=self.module.grassland_management_type_w.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=3, value=self.module.yield_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=3, value="Yes" if self.module.is_fire_used_w else "No")
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=3, value=self.module.fire_periodicity_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=3, value=self.module.fire_impact_w)
+
+        if self.module.is_without():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=4, value=self.units)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=4, value=self.module.grassland_management_type_wo.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=4, value=self.module.yield_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=4, value="Yes" if self.module.is_fire_used_wo else "No")
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=4, value=self.module.fire_periodicity_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=4, value=self.module.fire_impact_wo)
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+    def build_report(self):
+        super().build_report()
+        log.debug(f"Building base report for {self.module.module_type.name}")
+        self.populate_metadata()
+        log.debug(f"Base report for {self.module.module_type.name} built.")
+        return self.workbook
+
 
 @dataclass
 class OtherLandReport(LandModuleReport):
@@ -1193,8 +1354,87 @@ class CoastalWetlandReport(LandModuleReport):
     activity_report: BaseActivityReport = None
 
     def __post_init__(self):
-        self.calculator = calculators.CoastalWetlandCalculator(self.module)
+        self.calculator: calculators.CoastalWetlandCalculator = calculators.CoastalWetlandCalculator(self.module)
         return super().__post_init__()
+
+    def populate_metadata(self):
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
+        last_metadata_row = self.metadata_worksheet.max_row + 1
+
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Coastal Wetland")
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Coastal Wetland").fill = Colors.LIGHT_BLUE_FILL.value
+
+        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Hectares")
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Type of vegetation")
+        self.metadata_worksheet.cell(row=last_metadata_row + 3, column=1, value="Area under drainage")
+        self.metadata_worksheet.cell(row=last_metadata_row + 4, column=1, value="Drained area excavated")
+        self.metadata_worksheet.cell(row=last_metadata_row + 5, column=1, value="Are not drained or rewetted")
+        self.metadata_worksheet.cell(row=last_metadata_row + 6, column=1, value="Area with restored vegetation (ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 7, column=1, value="Type of soil")
+        self.metadata_worksheet.cell(row=last_metadata_row + 8, column=1, value="Soil carbon (tC/ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 9, column=1, value="% C lost after excavation (%)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 10, column=1, value="AGB (tC/ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 11, column=1, value="BGB (tC/ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 12, column=1, value="Litter (tC/ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 13, column=1, value="Deadwood (tC/ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 14, column=1, value="Average salinity")
+
+        if self.module.is_start():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=2, value=self.units)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=2, value=self.module.land_use_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=2, value=self.module.area_under_drainage_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=2, value=self.module.drained_area_excavated_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=2, value=self.module.area_not_drained_or_rewetted_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=2, value=self.module.area_w_restored_vegetation_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=2, value=self.module.soil_type_t2.name if self.module.soil_type_t2 is not None else "Default")
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=2, value=self.module.soc_t2_start if self.module.soc_t2_start is not None else "Default")
+            self.metadata_worksheet.cell(row=last_metadata_row + 9, column=2, value=self.module.pc_c_lost_after_excavation_t2_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 10, column=2, value=self.calculator.agb.value)
+            self.metadata_worksheet.cell(row=last_metadata_row + 11, column=2, value=self.calculator.bgb.value)
+            self.metadata_worksheet.cell(row=last_metadata_row + 12, column=2, value=self.calculator.litter.value)
+            self.metadata_worksheet.cell(row=last_metadata_row + 13, column=2, value=self.calculator.dw.value)
+            self.metadata_worksheet.cell(row=last_metadata_row + 14, column=2, value=self.calculator.salinity_type.value)
+
+        if self.module.is_with():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=3, value=self.units)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=3, value=self.module.land_use_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=3, value=self.module.area_under_drainage_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=3, value=self.module.drained_area_excavated_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=3, value=self.module.area_not_drained_or_rewetted_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=3, value=self.module.area_w_restored_vegetation_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=3, value=self.module.soil_type_t2.name if self.module.soil_type_t2 is not None else "Default")
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=3, value=self.module.soc_t2_w if self.module.soc_t2_w is not None else "Default")
+            self.metadata_worksheet.cell(row=last_metadata_row + 9, column=3, value=self.module.pc_c_lost_after_excavation_t2_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 10, column=3, value=self.calculator.agb.value)
+            self.metadata_worksheet.cell(row=last_metadata_row + 11, column=3, value=self.calculator.bgb.value)
+            self.metadata_worksheet.cell(row=last_metadata_row + 12, column=3, value=self.calculator.litter.value)
+            self.metadata_worksheet.cell(row=last_metadata_row + 13, column=3, value=self.calculator.dw.value)
+            self.metadata_worksheet.cell(row=last_metadata_row + 14, column=3, value=self.calculator.salinity_type.value)
+
+        if self.module.is_without():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=4, value=self.units)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=4, value=self.module.land_use_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=4, value=self.module.area_under_drainage_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=4, value=self.module.drained_area_excavated_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=4, value=self.module.area_not_drained_or_rewetted_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=4, value=self.module.area_w_restored_vegetation_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=4, value=self.module.soil_type_t2.name if self.module.soil_type_t2 is not None else "Default")
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=4, value=self.module.soc_t2_wo if self.module.soc_t2_wo is not None else "Default")
+            self.metadata_worksheet.cell(row=last_metadata_row + 9, column=4, value=self.module.pc_c_lost_after_excavation_t2_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 10, column=4, value=self.calculator.agb.value)
+            self.metadata_worksheet.cell(row=last_metadata_row + 11, column=4, value=self.calculator.bgb.value)
+            self.metadata_worksheet.cell(row=last_metadata_row + 12, column=4, value=self.calculator.litter.value)
+            self.metadata_worksheet.cell(row=last_metadata_row + 13, column=4, value=self.calculator.dw.value)
+            self.metadata_worksheet.cell(row=last_metadata_row + 14, column=4, value=self.calculator.salinity_type.value)
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+    def build_report(self):
+        super().build_report()
+        self.populate_metadata()
+        return self.workbook
 
 
 @dataclass
@@ -1209,8 +1449,11 @@ class FloodedRiceReport(LandModuleReport):
     fire_ch4_source = (math_utils.ActivityTypes.STRAW_BURNING, math_utils.GasTypes.CH4)
     rice_cultivation_ch4_source = (math_utils.ActivityTypes.CH4_EMITTED_RICE, math_utils.GasTypes.CH4)
 
+    minor_season_calculators: list[calculators.FloodedRiceSeasonCalculator] = None
+
     def __post_init__(self):
-        self.calculator = calculators.FloodedRiceCalculator(self.module)
+        self.calculator: calculators.FloodedRiceSeasonCalculator = calculators.FloodedRiceSeasonCalculator(self.module)
+        self.minor_season_calculators = []
         return super().__post_init__()
 
     def add_minor_seasons_results(self):
@@ -1219,7 +1462,8 @@ class FloodedRiceReport(LandModuleReport):
         for minor_season in minor_seasons.all():
             log.debug(f"Building report for minor season {minor_season.name}")
 
-            minor_calculator = calculators.FloodedRiceCalculator(minor_season)
+            minor_calculator = calculators.FloodedRiceSeasonCalculator(minor_season)
+            self.minor_season_calculators.append(minor_calculator)
             minor_emission_set = []
 
             if self.module.is_with():
@@ -1243,6 +1487,88 @@ class FloodedRiceReport(LandModuleReport):
 
             self.total_emissions = list(map(sum, zip(self.biomass_co2, self.soil_co2, self.soil_n2o, self.fire_n2o, self.fire_ch4, self.rice_cultivation_ch4)))
 
+    def populate_metadata(self):
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
+        last_metadata_row = self.metadata_worksheet.max_row + 1
+
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Flooded Rice")
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Flooded Rice").fill = Colors.LIGHT_BLUE_FILL.value
+
+        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Number of seasons")
+
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Season 1 - Hectares")
+        self.metadata_worksheet.cell(row=last_metadata_row + 3, column=1, value="Season 1 - Cultivation period")
+        self.metadata_worksheet.cell(row=last_metadata_row + 4, column=1, value="Season 1 - Water before cultivation")
+        self.metadata_worksheet.cell(row=last_metadata_row + 5, column=1, value="Season 1 - Water during cultivation")
+        self.metadata_worksheet.cell(row=last_metadata_row + 6, column=1, value="Season 1 - Organic amendment")
+        self.metadata_worksheet.cell(row=last_metadata_row + 7, column=1, value="Season 1 - Yield")
+
+        seasons: list[api_models.MinorSeasonFloodedRice] = getattr(self.module, "submodules", [])
+
+        for i, season in enumerate(seasons):
+            self.metadata_worksheet.cell(row=last_metadata_row + 8 + i, column=1, value=f"Season {i + 2} - Hectares")
+            self.metadata_worksheet.cell(row=last_metadata_row + 9 + i, column=1, value=f"Season {i + 2} - Cultivation period")
+            self.metadata_worksheet.cell(row=last_metadata_row + 10 + i, column=1, value=f"Season {i + 2} - Water before cultivation")
+            self.metadata_worksheet.cell(row=last_metadata_row + 11 + i, column=1, value=f"Season {i + 2} - Water during cultivation")
+            self.metadata_worksheet.cell(row=last_metadata_row + 12 + i, column=1, value=f"Season {i + 2} - Organic amendment")
+            self.metadata_worksheet.cell(row=last_metadata_row + 13 + i, column=1, value=f"Season {i + 2} - Yield")
+
+        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=2, value=len(seasons) + 1)
+
+        if self.module.is_start():
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=2, value=self.module.area)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=2, value=self.calculator.efc_default.cultivation_period)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=2, value=self.module.water_management_type_before_cultivation_start.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=2, value=self.module.water_management_type_after_cultivation_start.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=2, value=self.module.organic_amendment_type_start.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=2, value=self.calculator.yield_default.value)
+
+        if self.module.is_with():
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=3, value=self.module.area)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=3, value=self.calculator.efc_default.cultivation_period)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=3, value=self.module.water_management_type_before_cultivation_w.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=3, value=self.module.water_management_type_after_cultivation_w.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=3, value=self.module.organic_amendment_type_w.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=3, value=self.calculator.yield_default.value)
+
+        if self.module.is_without():
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=4, value=self.module.area)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=4, value=self.calculator.efc_default.cultivation_period)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=4, value=self.module.water_management_type_before_cultivation_wo.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=4, value=self.module.water_management_type_after_cultivation_wo.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=4, value=self.module.organic_amendment_type_wo.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=4, value=self.calculator.yield_default.value)
+
+        for i, season in enumerate(seasons):
+            season_calculator = calculators.FloodedRiceSeasonCalculator(season)
+            season_calculator.calculate()
+
+            if self.module.is_start():
+                self.metadata_worksheet.cell(row=last_metadata_row + 8 + i, column=2, value=season.area)
+                self.metadata_worksheet.cell(row=last_metadata_row + 9 + i, column=2, value=season_calculator.efc_default.cultivation_period)
+                self.metadata_worksheet.cell(row=last_metadata_row + 10 + i, column=2, value=season.water_management_type_before_cultivation_start.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 11 + i, column=2, value=season.water_management_type_after_cultivation_start.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 12 + i, column=2, value=season.organic_amendment_type_start.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 13 + i, column=2, value=season_calculator.yield_default.value)
+
+            if self.module.is_with():
+                self.metadata_worksheet.cell(row=last_metadata_row + 8 + i, column=3, value=season.area)
+                self.metadata_worksheet.cell(row=last_metadata_row + 9 + i, column=3, value=season_calculator.efc_default.cultivation_period)
+                self.metadata_worksheet.cell(row=last_metadata_row + 10 + i, column=3, value=season.water_management_type_before_cultivation_w.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 11 + i, column=3, value=season.water_management_type_after_cultivation_w.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 12 + i, column=3, value=season.organic_amendment_type_w.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 13 + i, column=3, value=season_calculator.yield_default.value)
+
+            if self.module.is_without():
+                self.metadata_worksheet.cell(row=last_metadata_row + 8 + i, column=4, value=season.area)
+                self.metadata_worksheet.cell(row=last_metadata_row + 9 + i, column=4, value=season_calculator.efc_default.cultivation_period)
+                self.metadata_worksheet.cell(row=last_metadata_row + 10 + i, column=4, value=season.water_management_type_before_cultivation_wo.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 11 + i, column=4, value=season.water_management_type_after_cultivation_wo.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 12 + i, column=4, value=season.organic_amendment_type_wo.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 13 + i, column=4, value=season_calculator.yield_default.value)
+
     def build_report(self):
         super().build_report()
 
@@ -1257,6 +1583,8 @@ class FloodedRiceReport(LandModuleReport):
 
         for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
             self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.rice_cultivation_ch4[i])
+
+        self.populate_metadata()
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
@@ -1273,6 +1601,32 @@ class WaterbodyReport(BaseModuleReport):
         self.calculator = calculators.WaterbodyCalculator(self.module)
         return super().__post_init__()
 
+    def populate_metadata(self):
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
+        last_metadata_row = self.metadata_worksheet.max_row + 1
+
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Waterbody")
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Waterbody").fill = Colors.LIGHT_BLUE_FILL.value
+
+        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Waterbody type")
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Trophic class")
+
+        if self.module.is_start():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=2, value=self.module.waterbody_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=2, value=self.module.trophic_type_start.name)
+
+        if self.module.is_with():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=3, value=self.module.waterbody_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=3, value=self.module.trophic_type_w.name)
+
+        if self.module.is_without():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=4, value=self.module.waterbody_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=4, value=self.module.trophic_type_wo.name)
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
     def build_report(self):
 
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
@@ -1288,6 +1642,8 @@ class WaterbodyReport(BaseModuleReport):
 
         for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
             self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.waterbody_management_ch4[i])
+
+        self.populate_metadata()
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
@@ -1326,6 +1682,58 @@ class AquacultureReport(BaseModuleReport):
             self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.electricity_co2_eq[i])
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+    def populate_metadata(self):
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
+        last_metadata_row = self.metadata_worksheet.max_row + 1
+
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Aquaculture")
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Aquaculture").fill = Colors.LIGHT_BLUE_FILL.value
+        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Production (tons fish/year)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="electricity used for fish production (KWh/ t of production)")
+
+        if self.module.is_start():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=2, value=self.module.annual_production_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=2, value=self.module.electricity_used_t2_start)
+
+        if self.module.is_with():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=3, value=self.module.annual_production_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=3, value=self.module.electricity_used_t2_w)
+
+        if self.module.is_without():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=4, value=self.module.annual_production_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=4, value=self.module.electricity_used_t2_wo)
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+    def get_result(self):
+        """
+        Generates the result for the report by building and populating it with necessary data.
+
+        This method performs the following steps:
+        1. Calls the superclass's `get_result` method.
+        2. Logs the start of the report building process.
+        3. Adds minor seasons results to the report.
+        4. Populates the report with metadata.
+        5. Populates the report with additional indicators.
+        6. Logs the completion of the report building process.
+        7. Returns the generated report as Excel bytes.
+
+        Returns:
+            bytes: The generated report in Excel format.
+        """
+        super().get_result()
+        log.debug(f"Building report for {self.module.module_type.name}")
+
+        self.populate_metadata()
+
+        log.debug(f"Report for {self.module_title} built.")
+        return self.activity_report.project_report.excel_manager.get_excel_bytes()
+
+    def build_report(self):
+        self.get_result()
 
 
 @dataclass
@@ -1381,11 +1789,65 @@ class SmallFisheryReport(FisheryReport):
     module: api_models.SmallFishery
 
     def __post_init__(self):
-        self.calculator = calculators.SmallFisheryCalculator(self.module)
+        self.calculator: calculators.SmallFisheryCalculator = calculators.SmallFisheryCalculator(self.module)
         return super().__post_init__()
 
+    def populate_metadata(self):
+        quantity_of_ice = self.calculator.tonnes_ice_default
+        kw_tonnes = self.calculator.kw_tonnes
+
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
+        last_metadata_row = self.metadata_worksheet.max_row + 1
+
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Small Fishery")
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Small Fishery").fill = Colors.LIGHT_BLUE_FILL.value
+
+        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Type of fisheries")
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Gear category")
+        self.metadata_worksheet.cell(row=last_metadata_row + 3, column=1, value="Total catch (t/year)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 4, column=1, value="% of refrigerant systems")
+        self.metadata_worksheet.cell(row=last_metadata_row + 5, column=1, value="% of total catch preserved with ice")
+        self.metadata_worksheet.cell(row=last_metadata_row + 6, column=1, value="Fuel use intensity (l/t)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 7, column=1, value="Quantity of ice (t ice/t of catch)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 8, column=1, value="Electricity used for ice production (KWh/ t of ice)")
+
+        if self.module.is_start():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=2, value=self.module.fishery_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=2, value=self.module.gear_type_start.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=2, value=self.module.total_catch_yr_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=2, value=self.module.refrigerant_pc_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=2, value=self.module.ice_preserved_catch_pc_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=2, value=self.calculator.fui_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=2, value=quantity_of_ice)
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=2, value=kw_tonnes)
+
+        if self.module.is_with():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=3, value=self.module.fishery_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=3, value=self.module.gear_type_w.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=3, value=self.module.total_catch_yr_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=3, value=self.module.refrigerant_pc_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=3, value=self.module.ice_preserved_catch_pc_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=3, value=self.calculator.fui_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=3, value=quantity_of_ice)
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=3, value=kw_tonnes)
+
+        if self.module.is_without():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=4, value=self.module.fishery_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=4, value=self.module.gear_type_wo.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=4, value=self.module.total_catch_yr_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=4, value=self.module.refrigerant_pc_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=4, value=self.module.ice_preserved_catch_pc_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=4, value=self.calculator.fui_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=4, value=quantity_of_ice)
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=4, value=kw_tonnes)
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
     def build_report(self):
-        return super().build_report()
+        super().build_report()
+        self.populate_metadata()
 
 
 @dataclass
@@ -1394,11 +1856,65 @@ class LargeFisheryReport(FisheryReport):
     module: api_models.LargeFishery
 
     def __post_init__(self):
-        self.calculator = calculators.LargeFisheryCalculator(self.module)
+        self.calculator: calculators.LargeFisheryCalculator = calculators.LargeFisheryCalculator(self.module)
         return super().__post_init__()
 
+    def populate_metadata(self):
+        quantity_of_ice = self.calculator.tonnes_ice_default
+        kw_tonnes = self.calculator.kw_tonnes
+
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
+        last_metadata_row = self.metadata_worksheet.max_row + 1
+
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Small Fishery")
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Small Fishery").fill = Colors.LIGHT_BLUE_FILL.value
+
+        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Type of fisheries")
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Gear category")
+        self.metadata_worksheet.cell(row=last_metadata_row + 3, column=1, value="Total catch (t/year)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 4, column=1, value="% of refrigerant systems")
+        self.metadata_worksheet.cell(row=last_metadata_row + 5, column=1, value="% of total catch preserved with ice")
+        self.metadata_worksheet.cell(row=last_metadata_row + 6, column=1, value="Fuel use intensity (l/t)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 7, column=1, value="Quantity of ice (t ice/t of catch)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 8, column=1, value="Electricity used for ice production (KWh/ t of ice)")
+
+        if self.module.is_start():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=2, value=self.module.fish_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=2, value=self.module.gear_type_start.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=2, value=self.module.total_catch_yr_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=2, value=self.module.refrigerant_pc_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=2, value=self.module.ice_preserved_catch_pc_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=2, value=self.calculator.fui_default_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=2, value=quantity_of_ice)
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=2, value=kw_tonnes)
+
+        if self.module.is_with():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=3, value=self.module.fish_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=3, value=self.module.gear_type_w.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=3, value=self.module.total_catch_yr_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=3, value=self.module.refrigerant_pc_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=3, value=self.module.ice_preserved_catch_pc_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=3, value=self.calculator.fui_default_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=3, value=quantity_of_ice)
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=3, value=kw_tonnes)
+
+        if self.module.is_without():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=4, value=self.module.fish_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=4, value=self.module.gear_type_wo.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=4, value=self.module.total_catch_yr_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=4, value=self.module.refrigerant_pc_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=4, value=self.module.ice_preserved_catch_pc_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=4, value=self.calculator.fui_default_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=4, value=quantity_of_ice)
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=4, value=kw_tonnes)
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
     def build_report(self):
-        return super().build_report()
+        super().build_report()
+        self.populate_metadata()
 
 
 class LivestockReport(BaseModuleReport):
@@ -1428,6 +1944,48 @@ class LivestockReport(BaseModuleReport):
     def __post_init__(self):
         self.calculator = calculators.LivestockCalculator(self.module)
         return super().__post_init__()
+
+    def populate_metadata(self):
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
+        last_metadata_row = self.metadata_worksheet.max_row + 1
+
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Livestock")
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Livestock").fill = Colors.LIGHT_BLUE_FILL.value
+
+        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Livestock category")
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Number of heads")
+        self.metadata_worksheet.cell(row=last_metadata_row + 3, column=1, value="Livestock productivity")
+        self.metadata_worksheet.cell(row=last_metadata_row + 4, column=1, value="Production (unit of product)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 5, column=1, value="Manure management")
+        self.metadata_worksheet.cell(row=last_metadata_row + 6, column=1, value="Heads on pasture (%)")
+
+        if self.module.is_start():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=2, value=self.module.livestock_category_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=2, value=self.module.heads_number_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=2, value=self.module.livestock_production_type_start.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=2, value=self.module.production_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=2, value="WIP")  # TODO: Ask Lorenzo what this value should be
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=2, value="WIP")  # TODO: Ask Lorenzo what this value should be
+
+        if self.module.is_with():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=3, value=self.module.livestock_category_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=3, value=self.module.heads_number_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=3, value=self.module.livestock_production_type_w.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=3, value=self.module.production_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=3, value="WIP")  # TODO: Ask Lorenzo what this value should be
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=3, value="WIP")  # TODO: Ask Lorenzo what this value should be
+
+        if self.module.is_without():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=4, value=self.module.livestock_category_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=4, value=self.module.heads_number_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=4, value=self.module.livestock_production_type_wo.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=4, value=self.module.production_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=4, value="WIP")  # TODO: Ask Lorenzo what this value should be
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=4, value="WIP")  # TODO: Ask Lorenzo what this value should be
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
     def build_report(self):
         super().build_report()
@@ -1485,6 +2043,8 @@ class LivestockReport(BaseModuleReport):
             self.results_worksheet.cell(row=last_results_row + 7, column=i + 2, value=self.manure_management_prp_direct_n2o[i])
             self.results_worksheet.cell(row=last_results_row + 8, column=i + 2, value=self.manure_management_prp_leaching_indirect_n2o[i])
             self.results_worksheet.cell(row=last_results_row + 9, column=i + 2, value=self.manure_management_prp_volatilization_indirect_n2o[i])
+
+        self.populate_metadata()
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
@@ -1563,8 +2123,145 @@ class ForestManagementReport(LandModuleReport):
     deadwood_co2_source = (math_utils.ActivityTypes.DEADWOOD, math_utils.GasTypes.CO2)
 
     def __post_init__(self):
-        self.calculator = calculators.ForestManagementCalculator(self.module)
+        self.calculator: calculators.ForestManagementCalculator = calculators.ForestManagementCalculator(self.module)
         return super().__post_init__()
+
+    def populate_metadata(self):
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
+        last_metadata_row = self.metadata_worksheet.max_row + 1
+
+        default = defaults.ForestManagementDefaults(input=self.module).get_defaults()
+
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value="Forest Management")
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1).fill = Colors.LIGHT_BLUE_FILL.value
+        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Hectares")
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Type of forest")
+        self.metadata_worksheet.cell(row=last_metadata_row + 3, column=1, value="Forest category")
+        self.metadata_worksheet.cell(row=last_metadata_row + 4, column=1, value="Length of rotation (years)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 5, column=1, value="% of harvest used for energy")
+        self.metadata_worksheet.cell(row=last_metadata_row + 6, column=1, value="start year of rotations (no of years)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 7, column=1, value="Harvesting recurrence (years)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 8, column=1, value="timber harvested (% AGB logged)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 9, column=1, value="Biomass used for Energy (%)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 10, column=1, value="start year of harvesting (no of years)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 11, column=1, value="AGB (tC/ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 11, column=1).fill = Colors.LIGHT_RED_FILL.value
+        self.metadata_worksheet.cell(row=last_metadata_row + 12, column=1, value="BGB (tC/ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 12, column=1).fill = Colors.LIGHT_RED_FILL.value
+        self.metadata_worksheet.cell(row=last_metadata_row + 13, column=1, value="AGB growth rate <=20 years (tC/ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 13, column=1).fill = Colors.LIGHT_RED_FILL.value
+        self.metadata_worksheet.cell(row=last_metadata_row + 14, column=1, value="BGB growth rate <=20 years (tC/ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 14, column=1).fill = Colors.LIGHT_RED_FILL.value
+        self.metadata_worksheet.cell(row=last_metadata_row + 15, column=1, value="Litter (tC/ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 15, column=1).fill = Colors.LIGHT_RED_FILL.value
+        self.metadata_worksheet.cell(row=last_metadata_row + 16, column=1, value="Deadwood (tC/ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 16, column=1).fill = Colors.LIGHT_RED_FILL.value
+
+        if self.module.is_start():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=2, value=self.module.area)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=2, value=self.module.forest_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=2, value=self.module.forest_condition_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=2, value=self.module.rotation_length_yrs_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=2, value=self.module.rotation_percentage_biomass_for_energy_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=2, value=self.module.rotation_start_year_t2_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=2, value=self.module.logging_recurrence_yrs_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=2, value=self.module.logging_percentage_agb_logged_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 9, column=2, value=self.module.logging_percentage_biomass_for_energy_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 10, column=2, value=self.module.logging_start_year_t2_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 11, column=2, value=default.agb_t2_start_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 11, column=2).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 12, column=2, value=default.bgb_t2_start_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 12, column=2).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 13, column=2, value=default.agb_growth_rate_le_20_yrs_t2_start_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 13, column=2).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 14, column=2, value=default.bgb_growth_rate_le_20_yrs_t2_start_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 14, column=2).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 15, column=2, value=default.litter_t2_start_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 15, column=2).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 16, column=2, value=default.deadwood_t2_start_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 16, column=2).fill = Colors.LIGHT_RED_FILL.value
+
+        if self.module.is_with():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=3, value=self.module.area)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=3, value=self.module.forest_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=3, value=self.module.forest_condition_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=3, value=self.module.rotation_length_yrs_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=3, value=self.module.rotation_percentage_biomass_for_energy_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=3, value=self.module.rotation_start_year_t2_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=3, value=self.module.logging_recurrence_yrs_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=3, value=self.module.logging_percentage_agb_logged_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 9, column=3, value=self.module.logging_percentage_biomass_for_energy_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 10, column=3, value=self.module.logging_start_year_t2_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 11, column=3, value=default.agb_t2_w_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 11, column=3).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 12, column=3, value=default.bgb_t2_w_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 12, column=3).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 13, column=3, value=default.agb_growth_rate_le_20_yrs_t2_w_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 13, column=3).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 14, column=3, value=default.bgb_growth_rate_le_20_yrs_t2_w_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 14, column=3).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 15, column=3, value=default.litter_t2_w_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 15, column=3).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 16, column=3, value=default.deadwood_t2_w_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 16, column=3).fill = Colors.LIGHT_RED_FILL.value
+
+        if self.module.is_without():
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=4, value=self.module.area)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=4, value=self.module.forest_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=4, value=self.module.forest_condition_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=4, value=self.module.rotation_length_yrs_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=4, value=self.module.rotation_percentage_biomass_for_energy_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=4, value=self.module.rotation_start_year_t2_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=4, value=self.module.logging_recurrence_yrs_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=4, value=self.module.logging_percentage_agb_logged_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 9, column=4, value=self.module.logging_percentage_biomass_for_energy_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 10, column=4, value=self.module.logging_start_year_t2_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 11, column=4, value=default.agb_t2_wo_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 11, column=4).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 12, column=4, value=default.bgb_t2_wo_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 12, column=4).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 13, column=4, value=default.agb_growth_rate_le_20_yrs_t2_wo_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 13, column=4).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 14, column=4, value=default.bgb_growth_rate_le_20_yrs_t2_wo_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 14, column=4).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 15, column=4, value=default.litter_t2_wo_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 15, column=4).fill = Colors.LIGHT_RED_FILL.value
+            self.metadata_worksheet.cell(row=last_metadata_row + 16, column=4, value=default.deadwood_t2_wo_default)
+            self.metadata_worksheet.cell(row=last_metadata_row + 16, column=4).fill = Colors.LIGHT_RED_FILL.value
+
+        for i, disturbance in enumerate(self.module.disturbances.all()):
+            disturbance: api_models.ForestDisturbance
+            self.metadata_worksheet.cell(row=last_metadata_row + 17 + i, column=1, value=f"Disturbance {i + 1}: type")
+            self.metadata_worksheet.cell(row=last_metadata_row + 18 + i, column=1, value="distrubance recurrence (years)")
+            self.metadata_worksheet.cell(row=last_metadata_row + 19 + i, column=1, value="biomass destruction (%)")
+
+            if self.module.is_start():
+                self.metadata_worksheet.cell(row=last_metadata_row + 18 + i, column=2, value=disturbance.disturbance_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 19 + i, column=2, value=disturbance.recurrence_yrs_start)
+                self.metadata_worksheet.cell(row=last_metadata_row + 20 + i, column=2, value=disturbance.percentage_biomass_destruction_start)
+
+            if self.module.is_with():
+                self.metadata_worksheet.cell(row=last_metadata_row + 18 + i, column=3, value=disturbance.disturbance_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 19 + i, column=3, value=disturbance.recurrence_yrs_w)
+                self.metadata_worksheet.cell(row=last_metadata_row + 20 + i, column=3, value=disturbance.percentage_biomass_destruction_w)
+
+            if self.module.is_without():
+                self.metadata_worksheet.cell(row=last_metadata_row + 18 + i, column=4, value=disturbance.disturbance_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 19 + i, column=4, value=disturbance.recurrence_yrs_wo)
+                self.metadata_worksheet.cell(row=last_metadata_row + 20 + i, column=4, value=disturbance.percentage_biomass_destruction_wo)
+
+        self.metadata_worksheet.cell(row=last_metadata_row + 17 + len(self.module.disturbances.all()), column=1, value="average yearly degradation (%)")
+
+        if self.module.is_start():
+            self.metadata_worksheet.cell(row=last_metadata_row + 17 + len(self.module.disturbances.all()), column=2, value=self.module.average_yearly_degradation_percentage_start)
+
+        if self.module.is_with():
+            self.metadata_worksheet.cell(row=last_metadata_row + 17 + len(self.module.disturbances.all()), column=3, value=self.module.average_yearly_degradation_percentage_w)
+
+        if self.module.is_without():
+            self.metadata_worksheet.cell(row=last_metadata_row + 17 + len(self.module.disturbances.all()), column=4, value=self.module.average_yearly_degradation_percentage_wo)
 
     def build_report(self):
         super().build_report()
@@ -1661,6 +2358,8 @@ class ForestManagementReport(LandModuleReport):
             self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.biomass_loss_co2[i])
             self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.biomass_gain_co2[i])
 
+        self.populate_metadata()
+
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
 
@@ -1722,7 +2421,71 @@ class EnergyReport(BaseModuleReport):
         self.total_emissions = list(map(sum, zip(self.total_emissions, self.liquid_fuel_co2, self.liquid_fuel_ch4, self.liquid_fuel_n2o)))
         self.total_emissions = list(map(sum, zip(self.total_emissions, self.solid_fuel_co2, self.solid_fuel_ch4, self.solid_fuel_n2o)))
 
-    def build_report(self):
+    def populate_metadata(self):
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
+        last_metadata_row = self.metadata_worksheet.max_row
+
+        log.debug(f"Found {len(self.module.electricities.all())} electricity submodules and {len(self.module.fuels.all())} fuel submodules")
+
+        for i, electricity in enumerate(api_models.Electricity.objects.filter(parent=self.module).all()):
+            electricity: api_models.Electricity
+
+            self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=1, value="Electricity - power country of origin")
+            self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=1, value="Electricity grid (MWh/year)")
+            self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=1, value="Electricity renewable (MWh/year)")
+            self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=1, value="Scope of emission factor")
+
+            if self.module.is_start():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=2, value=electricity.country.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=2, value=electricity.mwh_start)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=2, value=electricity.mwh_renewables_start)
+                self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=2, value=electricity.ef_source.name)
+
+            if self.module.is_with():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=3, value=electricity.country.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=3, value=electricity.mwh_w)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=3, value=electricity.mwh_renewables_w)
+                self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=3, value=electricity.ef_source.name)
+
+            if self.module.is_without():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=4, value=electricity.country.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=4, value=electricity.mwh_wo)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=4, value=electricity.mwh_renewables_wo)
+                self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=4, value=electricity.ef_source.name)
+
+        last_metadata_row += len(api_models.Electricity.objects.filter(parent=self.module).all()) + 3
+
+        for i, fuel in enumerate(api_models.Fuel.objects.filter(parent=self.module).all()):
+            fuel: api_models.Fuel
+
+            self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=1, value="Fuel - estate")
+            self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=1, value="Fuel - type")
+            self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=1, value="Fuel consumption (m3 or tdm)")
+            self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=1, value="Accounting for CO2 emissions (yes/no)")
+
+            if self.module.is_start():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=2, value="WIP")  # TODO: What is this?
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=2, value=fuel.fuel_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=2, value=fuel.fuel_consumption_start)
+                self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=2, value="WIP")  # TODO: What is this?
+
+            if self.module.is_with():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=3, value="WIP")
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=3, value=fuel.fuel_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=3, value=fuel.fuel_consumption_w)
+                self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=3, value="WIP")
+
+            if self.module.is_without():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=4, value="WIP")
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=4, value=fuel.fuel_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=4, value=fuel.fuel_consumption_wo)
+                self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=4, value="WIP")
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+    def populate_results(self):
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
         self.results_worksheet = self.workbook["Results"]
 
@@ -1756,6 +2519,14 @@ class EnergyReport(BaseModuleReport):
             self.results_worksheet.cell(row=last_results_row + 7, column=i + 2, value=self.solid_fuel_n2o[i])
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+    def build_report(self):
+        super().build_report()
+
+        self.populate_results()
+        self.populate_metadata()
+
+        return self.workbook
 
 
 @dataclass
@@ -1806,9 +2577,40 @@ class InputReport(BaseModuleReport):
         self.total_emissions = list(map(sum, zip(self.total_emissions, self.feed_co2_eq)))
         self.total_emissions = list(map(sum, zip(self.total_emissions, self.inputs_co2_eq)))
 
-    def build_report(self):
-        super().build_report()
+    def populate_metadata(self):
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
 
+        last_metadata_row = self.metadata_worksheet.max_row
+
+        for i, entry in enumerate(self.module.submodules):
+
+            if i != 0:
+                last_metadata_row += 2
+
+            entry: api_models.InputEntry
+            self.metadata_worksheet.cell(row=last_metadata_row + i + 1, column=1, value="Macro input type")
+            self.metadata_worksheet.cell(row=last_metadata_row + i + 2, column=1, value="Input type")
+            self.metadata_worksheet.cell(row=last_metadata_row + i + 3, column=1, value="Quantity (t/year)")
+
+            if self.module.is_start():
+                self.metadata_worksheet.cell(row=last_metadata_row + i + 1, column=2, value=entry.input_type.macro_input_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + i + 2, column=2, value=entry.input_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + i + 3, column=2, value=entry.value_start)
+
+            if self.module.is_with():
+                self.metadata_worksheet.cell(row=last_metadata_row + i + 1, column=3, value=entry.input_type.macro_input_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + i + 2, column=3, value=entry.input_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + i + 3, column=3, value=entry.value_w)
+
+            if self.module.is_without():
+                self.metadata_worksheet.cell(row=last_metadata_row + i + 1, column=4, value=entry.input_type.macro_input_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + i + 2, column=4, value=entry.input_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + i + 3, column=4, value=entry.value_wo)
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+    def populate_results(self):
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
         self.results_worksheet = self.workbook["Results"]
 
@@ -1839,6 +2641,11 @@ class InputReport(BaseModuleReport):
             self.results_worksheet.cell(row=last_results_row + 4, column=i + 2, value=self.feed_co2_eq[i])
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+    def build_report(self):
+        super().build_report()
+        self.populate_results()
+        self.populate_metadata()
 
 
 @dataclass
@@ -1889,8 +2696,74 @@ class IrrigationReport(BaseModuleReport):
 
         self.total_emissions = list(map(sum, zip(self.total_emissions, self.other_infrastructure_co2_eq, self.liquid_fuel_or_electricity_co2, self.liquid_fuel_or_electricity_ch4, self.liquid_fuel_or_electricity_n2o)))
 
-    def build_report(self):
-        super().build_report()
+    def populate_metadata(self):
+
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
+        last_metadata_row = self.metadata_worksheet.max_row
+
+        for i, system in enumerate(self.module.irrigation_systems.all()):
+
+            system: api_models.IrrigationSystem
+
+            if i != 0:
+                last_metadata_row += 1
+
+            self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=1, value="New irrigation system type")
+            self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=1, value="Hectares")
+
+            if self.module.is_start():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=2, value=system.irrigation_system_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=2, value=system.ha_start)
+
+            if self.module.is_with():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=3, value=system.irrigation_system_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=3, value=system.ha_w)
+
+            if self.module.is_without():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=4, value=system.irrigation_system_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=4, value=system.ha_wo)
+
+        last_metadata_row += len(self.module.irrigation_systems.all()) + 1
+
+        for i, phase in enumerate(self.module.irrigation_phases.all()):
+
+            phase: api_models.IrrigationPhase
+
+            if i != 0:
+                last_metadata_row += 4
+
+            self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=1, value="Operating irrigation system type")
+            self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=1, value="Hectares")
+            self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=1, value="Source of energy")
+            self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=1, value="Depth of well (m)")
+            self.metadata_worksheet.cell(row=last_metadata_row + 5 + i, column=1, value="Gross irrigation water requirement (mm/year)")
+
+            if self.module.is_start():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=2, value=phase.irrigation_system_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=2, value=phase.ha_start)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=2, value=phase.fuel_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=2, value=phase.well_depth)
+                self.metadata_worksheet.cell(row=last_metadata_row + 5 + i, column=2, value=phase.gross_irrigation_water_start)
+
+            if self.module.is_with():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=3, value=phase.irrigation_system_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=3, value=phase.ha_w)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=3, value=phase.fuel_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=3, value=phase.well_depth)
+                self.metadata_worksheet.cell(row=last_metadata_row + 5 + i, column=3, value=phase.gross_irrigation_water_w)
+
+            if self.module.is_without():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=4, value=phase.irrigation_system_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=4, value=phase.ha_wo)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=4, value=phase.fuel_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=4, value=phase.well_depth)
+                self.metadata_worksheet.cell(row=last_metadata_row + 5 + i, column=4, value=phase.gross_irrigation_water_wo)
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+    def populate_results(self):
 
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
         self.results_worksheet = self.workbook["Results"]
@@ -1911,6 +2784,11 @@ class IrrigationReport(BaseModuleReport):
             self.results_worksheet.cell(row=last_results_row + 4, column=i + 2, value=self.liquid_fuel_or_electricity_n2o[i])
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+    def build_report(self):
+        super().build_report()
+        self.populate_results()
+        self.populate_metadata()
 
 
 # @dataclass
@@ -1959,9 +2837,80 @@ class SettlementReport(LandModuleReport):
         self.total_emissions = list(map(sum, zip(self.total_emissions, self.roads_co2_eq)))
         self.total_emissions = list(map(sum, zip(self.total_emissions, self.buildings_co2_eq)))
 
-    def build_report(self):
-        super().build_report()
+    def populate_metadata(self):
 
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
+        last_metadata_row = self.metadata_worksheet.max_row
+
+        for i, building in enumerate(self.module.buildings.all()):
+            building: api_models.Building
+
+            if i != 0:
+                last_metadata_row += 1
+
+            self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=1, value="Type of building")
+            self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=1, value="Area of building (m2)")
+
+            if self.module.is_start():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=2, value=building.building_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=2, value=building.area_m2_start)
+
+            if self.module.is_with():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=3, value=building.building_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=3, value=building.area_m2_w)
+
+            if self.module.is_without():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=4, value=building.building_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=4, value=building.area_m2_wo)
+
+        last_metadata_row += len(self.module.buildings.all()) + 1
+
+        for i, road in enumerate(self.module.roads.all()):
+            road: api_models.Road
+
+            if i != 0:
+                last_metadata_row += 2
+
+            self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=1, value="Type of road")
+            self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=1, value="Length of road (km)")
+            self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=1, value="Width of road (m)")
+
+            if self.module.is_start():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=2, value=road.road_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=2, value=road.length_km_start)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=2, value=road.width_m_start)
+
+            if self.module.is_with():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=3, value=road.road_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=3, value=road.length_km_w)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=3, value=road.width_m_w)
+
+            if self.module.is_without():
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=4, value=road.road_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=4, value=road.length_km_wo)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=4, value=road.width_m_wo)
+
+        last_metadata_row += len(self.module.roads.all()) + 2
+
+        for i, infra in enumerate(self.module.other_infrastructures.all()):
+            infra: api_models.OtherInfrastructure
+
+            self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=1, value=f"Area of infrastructure {i+1} (m2)")
+
+            if self.module.is_start():
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=2, value=infra.area_m2_start)
+
+            if self.module.is_with():
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=3, value=infra.area_m2_w)
+
+            if self.module.is_without():
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=4, value=infra.area_m2_wo)
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+    def populate_results(self):
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
         self.results_worksheet = self.workbook["Results"]
 
@@ -1983,3 +2932,105 @@ class SettlementReport(LandModuleReport):
             self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.other_infrastructure_co2_eq[i])
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+    def build_report(self):
+        super().build_report()
+        self.populate_results()
+        self.populate_metadata()
+
+
+@dataclass
+class OrganicSoilReport(BaseModuleReport):
+
+    module: api_models.OrganicSoil
+
+    def __post_init__(self):
+        self.calculator = calculators.OrganicSoilCalculator(self.module)
+        return super().__post_init__()
+
+    def populate_metadata(self):
+
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
+
+        last_metadata_row = self.metadata_worksheet.max_row + 1
+
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value=str(self.module.module_type.name))
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1).fill = Colors.LIGHT_BLUE_FILL.value
+
+        last_metadata_row = self.metadata_worksheet.max_row
+
+        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=1, value="Hectares")
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=1, value="Type of land use")
+        self.metadata_worksheet.cell(row=last_metadata_row + 3, column=1, value="Are under drainage (ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 4, column=1, value="% area of ditches (ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 5, column=1, value="Fire on soil")
+        self.metadata_worksheet.cell(row=last_metadata_row + 6, column=1, value="Soil fire periodicity")
+        self.metadata_worksheet.cell(row=last_metadata_row + 7, column=1, value="% soil fire impact")
+        self.metadata_worksheet.cell(row=last_metadata_row + 8, column=1, value="Area of peat extraction (ha)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 9, column=1, value="Height of extraction (cm)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 10, column=1, value="Peat used for energy (yes/no)")
+        self.metadata_worksheet.cell(row=last_metadata_row + 11, column=1, value="Type of peat")
+        self.metadata_worksheet.cell(row=last_metadata_row + 12, column=1, value="Peat density (t/m3)")
+
+        luc: api_models.LandUseChange = self.module.land_use_change
+
+        if self.module.is_start():
+
+            math = self.calculator.math_start_w or self.calculator.math_start_wo
+            peat_density = math.peat_density_tier_2_default
+
+            self.metadata_worksheet.cell(row=last_metadata_row + 1, column=2, value=luc.module_type_start.area)
+            self.metadata_worksheet.cell(row=last_metadata_row + 2, column=2, value=luc.module_type_start.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=2, value=self.module.drainage_area_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 4, column=2, value=self.module.ditches_area_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=2, value=self.module.fire_type_start.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=2, value=self.module.soil_fire_periodicity_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 7, column=2, value=self.module.soil_fire_impact_percentage_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=2, value=self.module.peat_area_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 9, column=2, value=self.module.peat_extraction_height_start)
+            self.metadata_worksheet.cell(row=last_metadata_row + 10, column=2, value="Yes" if self.module.is_peat_for_energy_start else "No")
+            self.metadata_worksheet.cell(row=last_metadata_row + 11, column=2, value=self.module.peat_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 12, column=2, value=peat_density)
+
+        if self.module.is_with():
+
+            math = self.calculator.math_start_w
+            peat_density = math.peat_density_tier_2_default
+
+            self.metadata_worksheet.cell(row=last_metadata_row + 13, column=3, value=luc.module_type_start.area)
+            self.metadata_worksheet.cell(row=last_metadata_row + 14, column=3, value=luc.module_type_w.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 15, column=3, value=self.module.drainage_area_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 16, column=3, value=self.module.ditches_area_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 17, column=3, value=self.module.fire_type_w.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 18, column=3, value=self.module.soil_fire_periodicity_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 19, column=3, value=self.module.soil_fire_impact_percentage_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 20, column=3, value=self.module.peat_area_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 21, column=3, value=self.module.peat_extraction_height_w)
+            self.metadata_worksheet.cell(row=last_metadata_row + 22, column=3, value="Yes" if self.module.is_peat_for_energy_w else "No")
+            self.metadata_worksheet.cell(row=last_metadata_row + 23, column=3, value=self.module.peat_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 24, column=3, value=peat_density)
+
+        if self.module.is_without():
+
+            math = self.calculator.math_start_wo
+            peat_density = math.peat_density_tier_2_default
+
+            self.metadata_worksheet.cell(row=last_metadata_row + 25, column=4, value=luc.module_type_start.area)
+            self.metadata_worksheet.cell(row=last_metadata_row + 26, column=4, value=luc.module_type_wo.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 27, column=4, value=self.module.drainage_area_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 28, column=4, value=self.module.ditches_area_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 29, column=4, value=self.module.fire_type_wo.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 30, column=4, value=self.module.soil_fire_periodicity_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 31, column=4, value=self.module.soil_fire_impact_percentage_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 32, column=4, value=self.module.peat_area_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 33, column=4, value=self.module.peat_extraction_height_wo)
+            self.metadata_worksheet.cell(row=last_metadata_row + 34, column=4, value="Yes" if self.module.is_peat_for_energy_wo else "No")
+            self.metadata_worksheet.cell(row=last_metadata_row + 35, column=4, value=self.module.peat_type.name)
+            self.metadata_worksheet.cell(row=last_metadata_row + 36, column=4, value=peat_density)
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+    def build_report(self):
+        super().build_report()
+        self.populate_metadata()
