@@ -2575,9 +2575,40 @@ class InputReport(BaseModuleReport):
         self.total_emissions = list(map(sum, zip(self.total_emissions, self.feed_co2_eq)))
         self.total_emissions = list(map(sum, zip(self.total_emissions, self.inputs_co2_eq)))
 
-    def build_report(self):
-        super().build_report()
+    def populate_metadata(self):
+        self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
+        self.metadata_worksheet = self.workbook["Metadata"]
 
+        last_metadata_row = self.metadata_worksheet.max_row
+
+        for i, entry in enumerate(self.module.submodules):
+
+            if i != 0:
+                last_metadata_row += 2
+
+            entry: api_models.InputEntry
+            self.metadata_worksheet.cell(row=last_metadata_row + i + 1, column=1, value="Macro input type")
+            self.metadata_worksheet.cell(row=last_metadata_row + i + 2, column=1, value="Input type")
+            self.metadata_worksheet.cell(row=last_metadata_row + i + 3, column=1, value="Quantity (t/year)")
+
+            if self.module.is_start():
+                self.metadata_worksheet.cell(row=last_metadata_row + i + 1, column=2, value=entry.input_type.macro_input_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + i + 2, column=2, value=entry.input_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + i + 3, column=2, value=entry.value_start)
+
+            if self.module.is_with():
+                self.metadata_worksheet.cell(row=last_metadata_row + i + 1, column=3, value=entry.input_type.macro_input_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + i + 2, column=3, value=entry.input_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + i + 3, column=3, value=entry.value_w)
+
+            if self.module.is_without():
+                self.metadata_worksheet.cell(row=last_metadata_row + i + 1, column=4, value=entry.input_type.macro_input_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + i + 2, column=4, value=entry.input_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + i + 3, column=4, value=entry.value_wo)
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+    def populate_results(self):
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
         self.results_worksheet = self.workbook["Results"]
 
@@ -2608,6 +2639,11 @@ class InputReport(BaseModuleReport):
             self.results_worksheet.cell(row=last_results_row + 4, column=i + 2, value=self.feed_co2_eq[i])
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+    def build_report(self):
+        super().build_report()
+        self.populate_results()
+        self.populate_metadata()
 
 
 @dataclass
