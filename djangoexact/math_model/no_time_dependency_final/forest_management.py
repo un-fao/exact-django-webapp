@@ -197,12 +197,6 @@ class ForestManagement(BaseModule):
                 
                 plot_matrix_with_values(agb_matrix, title="agb matrix developed from previous module")
                 plot_matrix_with_values(bgb_matrix, title="BGB Matrix developed from previous module")
-                
-                agb_matrix, delta_agb_matrix = check_agb_matrices(agb_matrix, delta_agb_matrix, self.max_agb_value)
-                bgb_matrix, delta_bgb_matrix = check_agb_matrices(bgb_matrix, delta_bgb_matrix, self.max_bgb_value)
-                
-                plot_matrix_with_values(agb_matrix, title="AGB Matrix developed from previous module after check")
-                plot_matrix_with_values(bgb_matrix, title="BGB Matrix developed from previous module after check")
 
         self.agb_matrix = agb_matrix
         self.bgb_matrix = bgb_matrix
@@ -330,6 +324,8 @@ class ForestManagement(BaseModule):
 
                 check_agb_matrices(self.agb_matrix, self.delta_agb_matrix, self.max_agb_value)
                 check_agb_matrices(self.bgb_matrix, self.delta_bgb_matrix, self.max_bgb_value)
+                
+                plot_matrix_with_values(self.agb_matrix, title="AGB Matrix after")
                 
                 agb_times_hectares = multiply_matrix_by_matrix(self.delta_agb_matrix, self.hectares_matrix)
                 yearly_agb_emissions = [x * -44 / 12 for x in agb_times_hectares]

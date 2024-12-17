@@ -705,21 +705,26 @@ def update_agb_matrix_logging(agb_matrix, delta_agb_matrix, original_delta_agb_m
         for row in range(0, agb_matrix.shape[0]):
             agb_matrix[row, column:] = agb_matrix[row, column:] + logging_impact[row, column]
             # now set all values after the column to agb_matrix[row, column]
-            agb_matrix[row, column:] = agb_matrix[row, column]
-
-            for j in range(column + 1, agb_matrix.shape[1]):
-                if agb_matrix[row][j] < max_agb_value:
-                    if is_degradation:
-                        delta_agb_matrix[row][j] = original_delta_agb_matrix[row][j]
-                    else:
-                        delta_agb_matrix[row][j:] = original_delta_agb_matrix[row][j:]
-                    # This means that there is a change in the agb_matrix so that we have to keep growing in delta_agb_matrix. Add for each value of
-                    for m in range(j, min(agb_matrix.shape[1], j + logging_recurrence + 1)):
-                        if m == agb_matrix.shape[1]:
-                            agb_matrix[row][m] = agb_matrix[row][m] + np.sum(delta_agb_matrix[row][j:m])
+            
+            # THIS MEANS THAT WE HAVE GOTTEN TO HECTARES WHICH ARE NOT YET TRANSFORMED, STOP THE ANALYSIS
+            if agb_matrix[row, column] == 0:
+                pass
+            else:
+                agb_matrix[row, column:] = agb_matrix[row, column]
+                
+                for j in range(column + 1, agb_matrix.shape[1]):
+                    if agb_matrix[row][j] < max_agb_value:
+                        if is_degradation:
+                            delta_agb_matrix[row][j] = original_delta_agb_matrix[row][j]
                         else:
-                            agb_matrix[row][m] = agb_matrix[row][m] + np.sum(delta_agb_matrix[row][j : m + 1])
-                    break
+                            delta_agb_matrix[row][j:] = original_delta_agb_matrix[row][j:]
+                        # This means that there is a change in the agb_matrix so that we have to keep growing in delta_agb_matrix. Add for each value of
+                        for m in range(j, min(agb_matrix.shape[1], j + logging_recurrence + 1)):
+                            if m == agb_matrix.shape[1]:
+                                agb_matrix[row][m] = agb_matrix[row][m] + np.sum(delta_agb_matrix[row][j:m])
+                            else:
+                                agb_matrix[row][m] = agb_matrix[row][m] + np.sum(delta_agb_matrix[row][j : m + 1])
+                        break
 
         check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value)
 
