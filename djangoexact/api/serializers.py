@@ -93,6 +93,7 @@ from .models import (
     ProcessingEntry,
     PackagingEntry,
     TransportEntry,
+    ProjectFileAttachment,
 )
 from datetime import timedelta
 
@@ -3375,3 +3376,66 @@ class TransportEntryReadSerializer(BaseGenericModuleSerializer):
         fields = "__all__"
         ref_name = "TransportEntry"
         mandatory_fields = {}
+
+class ProjectFileUploadSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(read_only=True)
+    bucket_public_url = serializers.URLField(read_only=True)
+    file = serializers.FileField(required=True, write_only=True)
+    class Meta:
+        model = ProjectFileAttachment
+        fields = "__all__"
+        ref_name = "ProjectFileAttachment"
+
+    def validate(self, attrs):
+
+        file = attrs["file"]
+
+        if file.size > 25 * 1024 * 1024:
+            raise serializers.ValidationError("File size must be less than 25MB")
+        
+        if ProjectFileAttachment.objects.filter(project=attrs["project"], name=file.name).exists():
+            raise serializers.ValidationError("A file with the same name already exists in the project")
+
+        return super().validate(attrs)
+
+    def save(self, **kwargs):
+        project = self.validated_data["project"]
+        file = self.validated_data["file"]
+        
+        from google.cloud import storage
+
+        try:
+            client = storage.Client()
+            bucket = client.get_bucket("fao-exact-review-uploads") # TODO: Move to settings and make dynamic based on environment (dev, review, prod)
+            project_folder = f"projects/{project.id}/"
+            blob = bucket.blob(f"{project_folder}{file.name}")
+
+            file_size = file.size
+
+            total_size = sum([blob.size for blob in bucket.list_blobs(prefix=project_folder)])
+            if total_size + file_size > 25 * 1024 * 1024:
+                raise serializers.ValidationError("Maximum total project files size reached. Total size of all files in the project must be less than 25MB.")
+
+            blob.upload_from_file(file, content_type=file.content_type)
+            public_url = blob.public_url
+
+            attachment = ProjectFileAttachment.objects.create(
+                name=file.name,
+                project=project,
+                bucket_public_url=public_url
+            )
+        except Exception as e:
+            blob.delete()
+            raise serializers.ValidationError(str(e))
+
+        return attachment
+    
+class ProjectFileReadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectFileAttachment
+        fields = "__all__"
+        ref_name = "ProjectFileAttachment"
+
+class ProjectFileDownloadSerializer(serializers.Serializer):
+    file_name = serializers.CharField()
+    content_type = serializers.CharField()
