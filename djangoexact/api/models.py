@@ -663,6 +663,13 @@ class Project(Historical, DirtyFieldsMixin):
 
         return self.gw_potential
 
+class ProjectFileAttachment(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="attachments")
+    name = models.CharField(max_length=255)
+    bucket_public_url = models.URLField()
+
+    def __str__(self):
+        return f"({self.pk}) {self.project.name} - {self.name}"
 
 class ProjectTag(models.Model):
     class Meta:
