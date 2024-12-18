@@ -828,7 +828,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         invitation.status = InvitationStatusType.objects.get(name_en=utils.InvitationStatus.PENDING.value)
         invitation.save()
 
-        invitation_link = reverse("project-invitations-accept", args=[invitation.token])
+        invitation_link = reverse("projectinvitations-accept", args=[invitation.token])
         send_mail(
             f"You have been invited to join the project {project.name}",
             f"Click the link to accept the invitation: {request.build_absolute_uri(invitation_link)}",
