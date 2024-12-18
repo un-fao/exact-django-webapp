@@ -2178,11 +2178,11 @@ class Input(Module):
 
 class InputEntry(Submodule):
     parent = models.ForeignKey(Input, on_delete=models.CASCADE, related_name="input_entries")
-    input_type = models.ForeignKey(InputType, on_delete=models.CASCADE, verbose_name=_("input_type"))
+    input_type = models.ForeignKey(InputType, null=True, blank=True, on_delete=models.CASCADE, verbose_name=_("input_type"))
 
-    value_start = models.FloatField(verbose_name=_("value_start"))
-    value_w = models.FloatField(verbose_name=_("value_w"))
-    value_wo = models.FloatField(verbose_name=_("value_wo"))
+    value_start = models.FloatField(null=True, blank=True, verbose_name=_("value_start"))
+    value_w = models.FloatField(null=True, blank=True, verbose_name=_("value_w"))
+    value_wo = models.FloatField(null=True, blank=True, verbose_name=_("value_wo"))
     value_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_value_thread")
 
     co2_emissions_t2 = models.FloatField(null=True, blank=True, verbose_name=_("co2_emissions_t2"))
