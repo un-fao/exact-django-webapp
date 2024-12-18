@@ -2691,6 +2691,8 @@ class Parameter(models.Model):
     def __str__(self):
         return f"({self.pk}) {self.name} = {self.value} {self.unit if self.unit else ''}"
 
+class ApplicationParameter(Parameter):
+    pass
 
 class LivestockParameter(Parameter):
     pass
