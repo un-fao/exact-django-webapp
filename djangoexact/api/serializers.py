@@ -94,6 +94,7 @@ from .models import (
     PackagingEntry,
     TransportEntry,
     ProjectFileAttachment,
+    ApplicationParameter,
 )
 from datetime import timedelta
 
@@ -3390,8 +3391,10 @@ class ProjectFileUploadSerializer(serializers.ModelSerializer):
 
         file = attrs["file"]
 
-        if file.size > 25 * 1024 * 1024:
-            raise serializers.ValidationError("File size must be less than 25MB")
+        max_size_in_mb = int(ApplicationParameter.objects.get(name__iexact="project_uploads_max_file_size_mb").value)
+
+        if file.size > max_size_in_mb * 1024 * 1024:
+            raise serializers.ValidationError(f"File size must be less than {max_size_in_mb}MB")
         
         if ProjectFileAttachment.objects.filter(project=attrs["project"], name=file.name).exists():
             raise serializers.ValidationError("A file with the same name already exists in the project")
