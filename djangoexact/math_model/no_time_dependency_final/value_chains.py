@@ -2,11 +2,7 @@ import math
 import traceback
 
 from .general_functions import (
-    breakdown_according_to_values,
-    soil_emissions,
-    yearly_constant_emissions_breakdown,
-    yearly_time_dependent_20_year_breakdown,
-    yearly_time_dependent_parameter_breakdown,
+    compute_yearly_or_half_year_cumulative
 )
 from .ghg_emissions_classes import (
     ActivityTypes,
@@ -47,7 +43,7 @@ class ValueChain(BaseModule):
         emissions_start = self.input_quantity_start * self.emission_factor_start
         emissions_end = self.input_quantity_end * self.emission_factor_end
 
-        emissions_yearly = yearly_time_dependent_parameter_breakdown(emissions_start, emissions_end, self.implementation_time, self.capitalization_time, self.rate_type)
+        emissions_yearly = compute_yearly_or_half_year_cumulative(emissions_start, emissions_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
         emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_yearly], self.activity_type, delay=self.delay)
         self.result.yearly_emissions_by_sector_by_gas.append(emission_set)
