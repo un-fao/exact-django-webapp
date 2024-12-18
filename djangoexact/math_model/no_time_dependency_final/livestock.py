@@ -3,7 +3,7 @@ import traceback
 
 from .general_functions import (
     gas_head_calculation,
-    yearly_time_dependent_parameter_breakdown,
+    compute_yearly_or_half_year_cumulative,
 )
 from .ghg_emissions_classes import (
     ActivityTypes,
@@ -98,7 +98,7 @@ class Livestock(BaseModule):
         self.n2o_system_direct_head_end_tier_2_default = None
         self.n2o_prp_direct_head_end_tier_2_default = None
 
-        self.livestock_heads_yearly_breakdown = yearly_time_dependent_parameter_breakdown(self.head_number_start, self.head_number_end, self.implementation_time, self.capitalization_time, self.rate_type)
+        self.livestock_heads_yearly_breakdown = compute_yearly_or_half_year_cumulative(self.head_number_start, self.head_number_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
 
     def calculate_emissions(self):
@@ -110,7 +110,7 @@ class Livestock(BaseModule):
                 emissions_start = specific_factor_start / 1000 * self.methane_constant * self.head_number_start
                 emissions_end = specific_factor_end / 1000 * self.methane_constant * self.head_number_end
 
-                mef_emissions_yearly = yearly_time_dependent_parameter_breakdown(emissions_start, emissions_end, self.implementation_time, self.capitalization_time, self.rate_type)
+                mef_emissions_yearly = compute_yearly_or_half_year_cumulative(emissions_start, emissions_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 mef_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in mef_emissions_yearly], ActivityTypes.METHANE_ENTERIC_FERMENTATION, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(mef_emission_set)
@@ -137,12 +137,12 @@ class Livestock(BaseModule):
                 annual_start_system = sum(ch4_system_head_start) * self.head_number_start / 1000 * self.methane_constant
                 annual_end_system = sum(ch4_system_head_end) * self.head_number_end / 1000 * self.methane_constant
 
-                mmm_emissions_system_yearly = yearly_time_dependent_parameter_breakdown(annual_start_system, annual_end_system, self.implementation_time, self.capitalization_time, self.rate_type)
+                mmm_emissions_system_yearly = compute_yearly_or_half_year_cumulative(annual_start_system, annual_end_system, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 annual_start_prp = percentage_prp_start * self.head_number_start / 1000 * self.methane_constant
                 annual_end_prp = percentage_prp_end * self.head_number_end / 1000 * self.methane_constant
 
-                mmm_emissions_prp_yearly = yearly_time_dependent_parameter_breakdown(annual_start_prp, annual_end_prp, self.implementation_time, self.capitalization_time, self.rate_type)
+                mmm_emissions_prp_yearly = compute_yearly_or_half_year_cumulative(annual_start_prp, annual_end_prp, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 mmm_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in mmm_emissions_system_yearly], ActivityTypes.METHANE_MANURE_MANAGEMENT_SYSTEM, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(mmm_emission_set)
@@ -172,7 +172,7 @@ class Livestock(BaseModule):
                 annual_start_system_n2o = sum(n2o_system_direct_head_start) * self.head_number_start / 1000 * 44 / 28 * self.nitrous_constant
                 annual_end_system_n2o = sum(n2o_system_direct_head_end) * self.head_number_end / 1000 * 44 / 28 * self.nitrous_constant
 
-                nmm_direct_emissions_yearly = yearly_time_dependent_parameter_breakdown(annual_start_system_n2o, annual_end_system_n2o, self.implementation_time, self.capitalization_time, self.rate_type)
+                nmm_direct_emissions_yearly = compute_yearly_or_half_year_cumulative(annual_start_system_n2o, annual_end_system_n2o, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 nmm_emission_set_system = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in nmm_direct_emissions_yearly], ActivityTypes.NITROUS_MANURE_MANAGEMENT_SYSTEM, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(nmm_emission_set_system)
@@ -180,7 +180,7 @@ class Livestock(BaseModule):
                 annual_start_prp_n2o = n2o_prp_direct_head_start * self.head_number_start / 1000 * 44 / 28 * self.nitrous_constant
                 annual_end_prp_n2o = n2o_prp_direct_head_end * self.head_number_end / 1000 * 44 / 28 * self.nitrous_constant
 
-                nmm_emissions_prp_yearly = yearly_time_dependent_parameter_breakdown(annual_start_prp_n2o, annual_end_prp_n2o, self.implementation_time, self.capitalization_time, self.rate_type)
+                nmm_emissions_prp_yearly = compute_yearly_or_half_year_cumulative(annual_start_prp_n2o, annual_end_prp_n2o, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 nmm_emission_set_prp = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in nmm_emissions_prp_yearly], ActivityTypes.NITROUS_MANURE_MANAGEMENT_PRP, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(nmm_emission_set_prp)
@@ -203,7 +203,7 @@ class Livestock(BaseModule):
 
 
                 # NOTE MAYBE A GENERALIZED FUNCTION CAN BE DONE FOR THIS NOW?
-                nmm_indirect_volatization_emissions_yearly_system = yearly_time_dependent_parameter_breakdown(annual_start_system, annual_end_system, self.implementation_time, self.capitalization_time, self.rate_type)
+                nmm_indirect_volatization_emissions_yearly_system = compute_yearly_or_half_year_cumulative(annual_start_system, annual_end_system, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 nmm_indirect_volatization_emission_set_system = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in nmm_indirect_volatization_emissions_yearly_system], ActivityTypes.NITROUS_MANURE_MANAGEMENT_INDIRECT_VOLATILIZATION_SYSTEM, delay=self.delay)
 
@@ -212,7 +212,7 @@ class Livestock(BaseModule):
                 annual_start_prp = n2o_head_prp_start * self.head_number_start / 1000 * 44 / 28 * self.nitrous_constant * self.volatilization_multiplier
                 annual_end_prp = n2o_head_prp_end * self.head_number_end / 1000 * 44 / 28 * self.nitrous_constant * self.volatilization_multiplier
 
-                nmm_indirect_volatization_emissions_yearly_prp = yearly_time_dependent_parameter_breakdown(annual_start_prp, annual_end_prp, self.implementation_time, self.capitalization_time, self.rate_type)
+                nmm_indirect_volatization_emissions_yearly_prp = compute_yearly_or_half_year_cumulative(annual_start_prp, annual_end_prp, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 nmm_indirect_volatization_emission_set_prp = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in nmm_indirect_volatization_emissions_yearly_prp], ActivityTypes.NITROUS_MANURE_MANAGEMENT_INDIRECT_VOLATILIZATION_PRP, delay=self.delay)
 
@@ -235,7 +235,7 @@ class Livestock(BaseModule):
                 annual_start_system = sum(n2o_system_start) * self.head_number_start / 1000 * 44 / 28 * self.nitrous_constant * self.leaching_multiplier
                 annual_end_system = sum(n2o_system_end) * self.head_number_end / 1000 * 44 / 28 * self.nitrous_constant * self.leaching_multiplier
 
-                nmm_indirect_leaching_emissions_yearly_system = yearly_time_dependent_parameter_breakdown(annual_start_system, annual_end_system, self.implementation_time, self.capitalization_time, self.rate_type)
+                nmm_indirect_leaching_emissions_yearly_system = compute_yearly_or_half_year_cumulative(annual_start_system, annual_end_system, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 nmm_indirect_leaching_emission_set_system = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in nmm_indirect_leaching_emissions_yearly_system], ActivityTypes.NITROUS_MANURE_MANAGEMENT_INDIRECT_LEACHING_SYSTEM, delay=self.delay)
 
@@ -244,7 +244,7 @@ class Livestock(BaseModule):
                 annual_start_prp = n2o_prp_start * self.head_number_start / 1000 * 44 / 28 * self.nitrous_constant * self.leaching_multiplier
                 annual_end_prp = n2o_prp_end * self.head_number_end / 1000 * 44 / 28 * self.nitrous_constant * self.leaching_multiplier
 
-                nmm_indirect_leaching_emissions_yearly_prp = yearly_time_dependent_parameter_breakdown(annual_start_prp, annual_end_prp, self.implementation_time, self.capitalization_time, self.rate_type)
+                nmm_indirect_leaching_emissions_yearly_prp = compute_yearly_or_half_year_cumulative(annual_start_prp, annual_end_prp, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 nmm_indirect_leaching_emission_set_prp = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in nmm_indirect_leaching_emissions_yearly_prp], ActivityTypes.NITROUS_MANURE_MANAGEMENT_INDIRECT_LEACHING_PRP, delay=self.delay)
 
