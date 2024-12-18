@@ -123,6 +123,11 @@ def add_c_fraction_ref_parameter():
     """
     models.ApplicationParameter.objects.create(name="c_fraction_ref", value=1)
 
+def add_project_uploads_max_file_size_parameter():
+    """
+    Add project_uploads_max_file_size parameter
+    """
+    models.ApplicationParameter.objects.create(name="project_uploads_max_file_size_mb", value=50)
 
 # TODO: Run in prod
 
@@ -134,6 +139,7 @@ def add_c_fraction_ref_parameter():
 models.ApplicationParameter.objects.all().delete()
 migrate_all_parameters()
 add_c_fraction_ref_parameter()
+add_project_uploads_max_file_size_parameter()
 
 # cycle_all_modules_and_invalidate_cached_results()
 # create_test_user_for_peter()
