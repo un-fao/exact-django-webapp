@@ -131,9 +131,10 @@ def add_c_fraction_ref_parameter():
 # change_forest_agb_tropical_mountain_system_to_tropical_montane()
 # change_forest_bgb_tropical_mountain_system_to_tropical_montane()
 # change_forest_agb_growth_tropical_mountain_system_to_tropical_montane()
-# cycle_all_modules_and_invalidate_cached_results()
-# create_test_user_for_peter()
-# activate_test_user_for_peter_on_firebase()
 models.ApplicationParameter.objects.all().delete()
 migrate_all_parameters()
 add_c_fraction_ref_parameter()
+
+# cycle_all_modules_and_invalidate_cached_results()
+# create_test_user_for_peter()
+# activate_test_user_for_peter_on_firebase()
