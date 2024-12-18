@@ -1,9 +1,9 @@
 from .generalized_modules import BaseModule, LandModule
 from .general_functions import (
-    yearly_time_dependent_parameter_breakdown,
-    yearly_time_dependent_matrix,
-    yearly_time_dependent_20_year_breakdown,
-    yearly_time_dependent_matrix_log_rec_dis,
+    compute_yearly_or_half_year_cumulative,
+    compute_yearly_cumulative_matrix,
+    compute_half_year_cumulative_n_year_maturity,
+    compute_matrix_for_log_rec_dis,
     create_agb_bgb_matrix,
     create_bgb_matrix_from_agb,
     breakdown_agb_bgb_emissions,
@@ -12,7 +12,7 @@ from .general_functions import (
     calculate_logging_effect,
     create_litter_deadwood_matrix,
     check_agb_matrices,
-    soil_emissions_2,
+    soil_emissions,
     som_emissions,
     
     
@@ -131,12 +131,12 @@ class ForestManagement(BaseModule):
 
         ########### MATRIX ASSIGNMENT ############
         # Hectares at each year of the project
-        self.hectares_total = yearly_time_dependent_parameter_breakdown(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
+        self.hectares_total = compute_yearly_or_half_year_cumulative(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
         # Hectares which have reached and have not 20 years of maturity, necessary for soil emissions
-        self.hectares_before_20, self.hectares_after_20 = yearly_time_dependent_20_year_breakdown(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
+        self.hectares_before_20, self.hectares_after_20 = compute_half_year_cumulative_n_year_maturity(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
         
-        self.hectares_matrix = yearly_time_dependent_matrix(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
-        self.hectares_for_rot_log_dis = yearly_time_dependent_matrix_log_rec_dis(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
+        self.hectares_matrix = compute_yearly_cumulative_matrix(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
+        self.hectares_for_rot_log_dis = compute_matrix_for_log_rec_dis(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
         ########### GENERAL VARIABLE ASSIGNMENTS ############
         self.agb_yearly_growth_over_20 = self.agb_yearly_growth_over_20_default if not self.agb_yearly_growth_over_20_tier_2 else self.agb_yearly_growth_over_20_tier_2
@@ -373,7 +373,7 @@ class ForestManagement(BaseModule):
 
         def calculate_emissions_soil():
             try:
-                emissions_soil_yearly, emissions_soil_total = soil_emissions_2(self.soc_start, self.soc_end, self.hectares_total, self.hectares_start, self.hectares_end, self.hectares_before_20)
+                emissions_soil_yearly, emissions_soil_total = soil_emissions(self.soc_start, self.soc_end, self.hectares_total, self.hectares_start, self.hectares_end, self.hectares_before_20)
 
                 soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_soil_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
