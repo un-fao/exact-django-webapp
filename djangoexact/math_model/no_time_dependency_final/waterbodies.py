@@ -1,5 +1,5 @@
 import traceback
-from .general_functions import yearly_constant_emissions_breakdown, yearly_time_dependent_parameter_breakdown, yearly_time_dependent_20_year_breakdown, breakdown_according_to_values, soil_emissions
+from .general_functions import compute_yearly_or_half_year_cumulative, compute_half_year_cumulative_n_year_maturity, breakdown_proportionally_to_values
 from .ghg_emissions_classes import YearlyGasActivityEmissionSet, Emission, GasTypes, ActivityTypes, Result
 
 from .generalized_modules import BaseModule
@@ -25,7 +25,7 @@ class CoastalWaterbodies(BaseModule):
     def __post_init__(self):
         super().__post_init__()
 
-        self.hectares = yearly_time_dependent_parameter_breakdown(self.area_start, self.area_end, self.implementation_time, self.capitalization_time, self.rate_type)
+        self.hectares = compute_yearly_or_half_year_cumulative(self.area_start, self.area_end, self.implementation_time, self.capitalization_time, self.rate_type)
     
 
     def calculate_emissions(self, ):
@@ -44,7 +44,7 @@ class CoastalWaterbodies(BaseModule):
             yearly_emissions_start = self.area_start * trophic_state_start * methane_emission_factor_start / 1000 * self.methane_constant
             yearly_emissions_end = self.area_end * trophic_state_end * methane_emission_factor_end / 1000 * self.methane_constant
 
-            self.emissions_yearly = yearly_time_dependent_parameter_breakdown(yearly_emissions_start, yearly_emissions_end, self.implementation_time, self.capitalization_time, self.rate_type)
+            self.emissions_yearly = compute_yearly_or_half_year_cumulative(yearly_emissions_start, yearly_emissions_end, self.implementation_time, self.capitalization_time, self.rate_type)
             self.total_emissions = sum(self.emissions_yearly)
 
             # offsite_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.offsite_emissions_yearly], ActivityTypes.OFFSITE_PEAT, delay=self.delay)
