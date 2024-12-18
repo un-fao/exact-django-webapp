@@ -4359,8 +4359,9 @@ def delete_and_import_input_emission_factors():
     df_dict = df.to_dict("records")
 
     for i, row in enumerate(df_dict):
+        print(row)
         fuel_use_type = FuelUseType.objects.get(name__iexact=row["fuel_use_type"])
-        fuel_type = FuelType.objects.get(name__iexact=row["fuel_type"])
+        fuel_type = FuelType.objects.get(name__iexact=row["fuel_type"], fuel_use_type=fuel_use_type)
         co2 = parse_csv_number(row["co2"])
         ch4 = parse_csv_number(row["ch4"])
         n2o = parse_csv_number(row["n2o"])
@@ -4584,5 +4585,7 @@ def import_fuel_type_fuel_use_type_mapping():
 # delete_and_import_eletricity_emissions()
 # delete_and_import_crop_yield_stats()
 # import_fuel_type_fuel_use_type_mapping()
+
+delete_and_import_input_emission_factors()
 
 # TODO: Run in develop

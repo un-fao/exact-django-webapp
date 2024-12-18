@@ -3634,19 +3634,19 @@ class FuelCalculator(BaseCalculator):
 
             if self.energy_ef_default:
                 if self.energy_ef_default.co2 is None and self.module.energy_ef_co2_t2 is None:
-                    raise ValueError(f"Default CO2 emission factor for {self.module.fuel_type.name} does not exist. Please provide a tier 2 value.")
+                    raise ValueError(f"Default CO2 emission factor for {self.module.fuel_type.name} {self.module.fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value.")
                 if self.energy_ef_default.ch4 is None and self.module.energy_ef_ch4_t2 is None:
-                    raise ValueError(f"Default CH4 emission factor for {self.module.fuel_type.name} does not exist. Please provide a tier 2 value.")
+                    raise ValueError(f"Default CH4 emission factor for {self.module.fuel_type.name} {self.module.fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value.")
                 if self.energy_ef_default.n2o is None and self.module.energy_ef_n2o_t2 is None:
-                    raise ValueError(f"Default N2O emission factor for {self.module.fuel_type.name} does not exist. Please provide a tier 2 value.")
+                    raise ValueError(f"Default N2O emission factor for {self.module.fuel_type.name} {self.module.fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value.")
 
         except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
             if self.module.energy_ef_co2_t2 is None:
-                raise ValueError(f"CO2 emission factor for {self.module.fuel_type.name} does not exist. Please provide a tier 2 value.")
+                raise ValueError(f"CO2 emission factor for {self.module.fuel_type.name} {self.module.fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value.")
             if self.module.energy_ef_ch4_t2 is None:
-                raise ValueError(f"CH4 emission factor for {self.module.fuel_type.name} does not exist. Please provide a tier 2 value.")
+                raise ValueError(f"CH4 emission factor for {self.module.fuel_type.name} {self.module.fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value.")
             if self.module.energy_ef_n2o_t2 is None:
-                raise ValueError(f"N2O emission factor for {self.module.fuel_type.name} does not exist. Please provide a tier 2 value.")
+                raise ValueError(f"N2O emission factor for {self.module.fuel_type.name} {self.module.fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value.")
 
     def calculate(self) -> list[Result]:
         """
