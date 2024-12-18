@@ -929,6 +929,10 @@ class CachedResultMixin(models.Model, DirtyFieldsMixin):
         self.cached_results_by_activity = by_activity
         self.cached_results_by_gas = by_gas
         self.cached_results_by_activity_by_gas = by_activity_by_gas
+
+        if hasattr(self, "skip_history_when_saving"):
+            self.skip_history_when_saving = True
+
         self.save()
 
     def invalidate_cached_results(self):
