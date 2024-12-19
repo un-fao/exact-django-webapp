@@ -4573,6 +4573,21 @@ def import_fuel_type_fuel_use_type_mapping():
         log.debug(fuel_type, fuel_use_type)
         FuelType.objects.create(name=fuel_type, fuel_use_type=fuel_use_type)
 
+def assign_fuel_type_units():
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "FuelType_Unit.csv"),
+        header=0,
+        sep=",",
+    )
+
+    for i, row in df.iterrows():
+        fuel_type = FuelType.objects.filter(name__iexact=row["fuel_type"]).all()
+        unit = Unit.objects.get(name__iexact=row["unit"])
+
+        for ft in fuel_type:
+            ft.unit = unit
+            ft.save()
+
 
 # TODO: Run in production
 
@@ -4587,5 +4602,7 @@ def import_fuel_type_fuel_use_type_mapping():
 # import_fuel_type_fuel_use_type_mapping()
 
 delete_and_import_input_emission_factors()
+assign_fuel_type_units()
 
 # TODO: Run in develop
+
