@@ -129,6 +129,13 @@ def add_project_uploads_max_file_size_parameter():
     """
     models.ApplicationParameter.objects.create(name="project_uploads_max_file_size_mb", value=50)
 
+def print_all_fuel_types():
+    """
+    Print all fuel types
+    """
+    for fuel_type in models.FuelType.objects.all():
+        print(fuel_type.name)
+
 # TODO: Run in prod
 
 # add_climate_tropical_montane_to_perennial_cropland()
@@ -136,11 +143,13 @@ def add_project_uploads_max_file_size_parameter():
 # change_forest_agb_tropical_mountain_system_to_tropical_montane()
 # change_forest_bgb_tropical_mountain_system_to_tropical_montane()
 # change_forest_agb_growth_tropical_mountain_system_to_tropical_montane()
-models.ApplicationParameter.objects.all().delete()
-migrate_all_parameters()
-add_c_fraction_ref_parameter()
-add_project_uploads_max_file_size_parameter()
+
+# models.ApplicationParameter.objects.all().delete()
+# migrate_all_parameters()
+# add_c_fraction_ref_parameter()
+# add_project_uploads_max_file_size_parameter()
 
 # cycle_all_modules_and_invalidate_cached_results()
 # create_test_user_for_peter()
 # activate_test_user_for_peter_on_firebase()
+
