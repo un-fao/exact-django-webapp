@@ -2798,6 +2798,10 @@ class MacroFuelTypeSerializer(serializers.ModelSerializer):
 
 class FuelTypeSerializer(serializers.ModelSerializer):
     macro_fuel_type = MacroFuelTypeSerializer(many=False, read_only=True)
+    unit = serializers.SerializerMethodField()
+
+    def get_unit(self, obj):
+        return obj.unit.name if obj.unit else None
 
     class Meta:
         model = FuelType
