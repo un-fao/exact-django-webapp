@@ -493,12 +493,18 @@ class FuelUseType(models.Model):
     def __str__(self):
         return self.name
 
+class Unit(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
 
 class FuelType(models.Model):
     name = models.CharField(max_length=100)
     fuel_use_type = models.ForeignKey(FuelUseType, on_delete=models.CASCADE, related_name="fuel_types")
     macro_fuel_type = models.ForeignKey(MacroFuelType, on_delete=models.CASCADE, null=True, blank=True)
     module_types = models.ManyToManyField(ModuleType, related_name="fuel_types")
+    unit = models.ForeignKey(Unit, on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         unique_together = ("name", "fuel_use_type", "macro_fuel_type")
