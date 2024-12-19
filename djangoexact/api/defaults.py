@@ -1364,61 +1364,166 @@ class ForestDisturbanceDefaults(Defaults):
         )
 
 
-class StorageDefaults(Defaults):
+class StorageEntryDefaults(Defaults):
     def __init__(self, input: calcs.Module):
         super().__init__(input)
 
-        self.values = SimpleNamespace()
+        self.refrigerant_ef_start_default = 0
+        self.refrigerant_ef_w_default = 0
+        self.refrigerant_ef_wo_default = 0
+
+        self.electricity_ef_default = 0
 
     def get_defaults(self, calculate=False) -> dict:
         self.input: api.Storage
 
-        defaults = calcs.StorageCalculator(self.input)
+        defaults = calcs.StorageEntryCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
-        return SimpleNamespace()
+        self.refrigerant_ef_start = defaults.refrigerant_ef_start.value
+        self.refrigerant_ef_w = defaults.refrigerant_ef_w.value
+        self.refrigerant_ef_wo = defaults.refrigerant_ef_wo.value
+        self.electricity_ef_default = defaults.electricity_ef_selected.value
+
+        return SimpleNamespace(
+            refrigerant_ef_start_default=self.refrigerant_ef_start,
+            refrigerant_ef_w_default=self.refrigerant_ef_w,
+            refrigerant_ef_wo_default=self.refrigerant_ef_wo,
+            electricity_ef_default=self.electricity_ef_default,
+        )
 
 
-class TransportDefaults(Defaults):
+class TransportEntryDefaults(Defaults):
     def __init__(self, input: calcs.Module):
         super().__init__(input)
 
-        self.values = SimpleNamespace()
+        self.energy_ef_co2_start_default = 0
+        self.energy_ef_ch4_start_default = 0
+        self.energy_ef_n2o_start_default = 0
+        self.energy_ef_co2_w_default = 0
+        self.energy_ef_ch4_w_default = 0
+        self.energy_ef_n2o_w_default = 0
+        self.energy_ef_co2_wo_default = 0
+        self.energy_ef_ch4_wo_default = 0
+        self.energy_ef_n2o_wo_default = 0
+
+        self.electricity_ef_w_default = 0
+        self.electricity_ef_wo_default = 0
 
     def get_defaults(self, calculate=False) -> dict:
         self.input: api.Transport
 
-        defaults = calcs.TransportCalculator(self.input)
+        defaults = calcs.TransportEntryCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
-        return SimpleNamespace()
+        if isinstance(defaults.energy_calculator_w, calcs.ElectricityCalculator):
+            self.electricity_ef_w_default = defaults.energy_calculator_w.electricity_ef_selected.value
+        elif isinstance(defaults.energy_calculator_w, calcs.FuelCalculator):
+            self.energy_ef_co2_w_default = defaults.energy_calculator_w.energy_ef_default.co2
+            self.energy_ef_ch4_w_default = defaults.energy_calculator_w.energy_ef_default.ch4
+            self.energy_ef_n2o_w_default = defaults.energy_calculator_w.energy_ef_default.n2o
 
+        if isinstance(defaults.energy_calculator_wo, calcs.ElectricityCalculator):
+            self.electricity_ef_wo_default = defaults.energy_calculator_wo.electricity_ef_selected.value
+        elif isinstance(defaults.energy_calculator_wo, calcs.FuelCalculator):
+            self.energy_ef_co2_wo_default = defaults.energy_calculator_wo.energy_ef_default.co2
+            self.energy_ef_ch4_wo_default = defaults.energy_calculator_wo.energy_ef_default.ch4
+            self.energy_ef_n2o_wo_default = defaults.energy_calculator_wo.energy_ef_default.n2o
 
-class ProcessingDefaults(Defaults):
+        return SimpleNamespace(
+            energy_ef_co2_start_default=0,
+            energy_ef_ch4_start_default=0,
+            energy_ef_n2o_start_default=0,
+            energy_ef_co2_w_default=self.energy_ef_co2_w_default,
+            energy_ef_ch4_w_default=self.energy_ef_ch4_w_default,
+            energy_ef_n2o_w_default=self.energy_ef_n2o_w_default,
+            energy_ef_co2_wo_default=self.energy_ef_co2_wo_default,
+            energy_ef_ch4_wo_default=self.energy_ef_ch4_wo_default,
+            energy_ef_n2o_wo_default=self.energy_ef_n2o_wo_default,
+            electricity_ef_w_default=self.electricity_ef_w_default,
+            electricity_ef_wo_default=self.electricity_ef_wo_default,
+        )
+
+class ProcessingEntryDefaults(Defaults):
     def __init__(self, input: calcs.Module):
         super().__init__(input)
 
-        self.values = SimpleNamespace()
+        self.energy_ef_co2_start_default = 0
+        self.energy_ef_ch4_start_default = 0
+        self.energy_ef_n2o_start_default = 0
+        self.energy_ef_co2_w_default = 0
+        self.energy_ef_ch4_w_default = 0
+        self.energy_ef_n2o_w_default = 0
+        self.energy_ef_co2_wo_default = 0
+        self.energy_ef_ch4_wo_default = 0
+        self.energy_ef_n2o_wo_default = 0
+
+        self.electricity_ef_w_default = 0
+        self.electricity_ef_wo_default = 0
 
     def get_defaults(self, calculate=False) -> dict:
         self.input: api.Processing
 
-        defaults = calcs.ProcessingCalculator(self.input)
+        defaults = calcs.ProcessingEntryCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
-        return SimpleNamespace()
+        if isinstance(defaults.energy_calculator_w, calcs.ElectricityCalculator):
+            self.electricity_ef_w_default = defaults.energy_calculator_w.electricity_ef_selected.value
+        elif isinstance(defaults.energy_calculator_w, calcs.FuelCalculator):
+            self.energy_ef_co2_w_default = defaults.energy_calculator_w.energy_ef_default.co2
+            self.energy_ef_ch4_w_default = defaults.energy_calculator_w.energy_ef_default.ch4
+            self.energy_ef_n2o_w_default = defaults.energy_calculator_w.energy_ef_default.n2o
+
+        if isinstance(defaults.energy_calculator_wo, calcs.ElectricityCalculator):
+            self.electricity_ef_wo_default = defaults.energy_calculator_wo.electricity_ef_selected.value
+        elif isinstance(defaults.energy_calculator_wo, calcs.FuelCalculator):
+            self.energy_ef_co2_wo_default = defaults.energy_calculator_wo.energy_ef_default.co2
+            self.energy_ef_ch4_wo_default = defaults.energy_calculator_wo.energy_ef_default.ch4
+            self.energy_ef_n2o_wo_default = defaults.energy_calculator_wo.energy_ef_default.n2o
+
+        return SimpleNamespace(
+            energy_ef_co2_start_default=0,
+            energy_ef_ch4_start_default=0,
+            energy_ef_n2o_start_default=0,
+            energy_ef_co2_w_default=self.energy_ef_co2_w_default,
+            energy_ef_ch4_w_default=self.energy_ef_ch4_w_default,
+            energy_ef_n2o_w_default=self.energy_ef_n2o_w_default,
+            energy_ef_co2_wo_default=self.energy_ef_co2_wo_default,
+            energy_ef_ch4_wo_default=self.energy_ef_ch4_wo_default,
+            energy_ef_n2o_wo_default=self.energy_ef_n2o_wo_default,
+            electricity_ef_w_default=self.electricity_ef_w_default,
+            electricity_ef_wo_default=self.electricity_ef_wo_default,
+        )
 
 
-class PackagingDefaults(Defaults):
+class PackagingEntryDefaults(Defaults):
     def __init__(self, input: calcs.Module):
         super().__init__(input)
 
-        self.values = SimpleNamespace()
+        self.packaging_ef_start_default = 0
+        self.packaging_ef_w_default = 0
+        self.packaging_ef_wo_default = 0
+
+        self.electricity_ef_w_default = 0
+        self.electricity_ef_wo_default = 0
 
     def get_defaults(self, calculate=False) -> dict:
         self.input: api.Packaging
 
-        defaults = calcs.PackagingCalculator(self.input)
+        defaults = calcs.PackagingEntryCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
-        return SimpleNamespace()
+        self.packaging_ef_start_default = defaults.packaging_ef_start.value
+        self.packaging_ef_w_default = defaults.packaging_ef_w.value
+        self.packaging_ef_wo_default = defaults.packaging_ef_wo.value
+
+        self.electricity_ef_w_default = defaults.energy_calculator_w.electricity_ef_selected.value
+        self.electricity_ef_wo_default = defaults.energy_calculator_wo.electricity_ef_selected.value
+
+        return SimpleNamespace(
+            packaging_ef_start_default=self.packaging_ef_start_default,
+            packaging_ef_w_default=self.packaging_ef_w_default,
+            packaging_ef_wo_default=self.packaging_ef_wo_default,
+            electricity_ef_w_default=self.electricity_ef_w_default,
+            electricity_ef_wo_default=self.electricity_ef_wo_default,
+        )
