@@ -4,6 +4,7 @@ from api.calculators import *
 from api.models import *
 from api.serializers import *
 from ipcc.models import *
+import api.reports as reports
 
 from .factories import *
 import api.tests.base_test_classes as t
@@ -23,6 +24,9 @@ class AnnualToSetAside(t.LandUseChangeTest):
 
     def test(self):
         self.calculate_results()
+
+        rep = reports.BaseProjectReport(self.project)
+        rep.build_report()
 
 
 AnnualToSetAside().test()

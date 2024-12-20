@@ -493,12 +493,18 @@ class FuelUseType(models.Model):
     def __str__(self):
         return self.name
 
+class Unit(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
 
 class FuelType(models.Model):
     name = models.CharField(max_length=100)
     fuel_use_type = models.ForeignKey(FuelUseType, on_delete=models.CASCADE, related_name="fuel_types")
     macro_fuel_type = models.ForeignKey(MacroFuelType, on_delete=models.CASCADE, null=True, blank=True)
     module_types = models.ManyToManyField(ModuleType, related_name="fuel_types")
+    unit = models.ForeignKey(Unit, on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         unique_together = ("name", "fuel_use_type", "macro_fuel_type")
@@ -663,6 +669,13 @@ class Project(Historical, DirtyFieldsMixin):
 
         return self.gw_potential
 
+class ProjectFileAttachment(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="attachments")
+    name = models.CharField(max_length=255)
+    bucket_public_url = models.URLField()
+
+    def __str__(self):
+        return f"({self.pk}) {self.project.name} - {self.name}"
 
 class ProjectTag(models.Model):
     class Meta:
@@ -929,6 +942,10 @@ class CachedResultMixin(models.Model, DirtyFieldsMixin):
         self.cached_results_by_activity = by_activity
         self.cached_results_by_gas = by_gas
         self.cached_results_by_activity_by_gas = by_activity_by_gas
+
+        if hasattr(self, "skip_history_when_saving"):
+            self.skip_history_when_saving = True
+
         self.save()
 
     def invalidate_cached_results(self):
@@ -2178,11 +2195,11 @@ class Input(Module):
 
 class InputEntry(Submodule):
     parent = models.ForeignKey(Input, on_delete=models.CASCADE, related_name="input_entries")
-    input_type = models.ForeignKey(InputType, on_delete=models.CASCADE, verbose_name=_("input_type"))
+    input_type = models.ForeignKey(InputType, null=True, blank=True, on_delete=models.CASCADE, verbose_name=_("input_type"))
 
-    value_start = models.FloatField(verbose_name=_("value_start"))
-    value_w = models.FloatField(verbose_name=_("value_w"))
-    value_wo = models.FloatField(verbose_name=_("value_wo"))
+    value_start = models.FloatField(null=True, blank=True, verbose_name=_("value_start"))
+    value_w = models.FloatField(null=True, blank=True, verbose_name=_("value_w"))
+    value_wo = models.FloatField(null=True, blank=True, verbose_name=_("value_wo"))
     value_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_value_thread")
 
     co2_emissions_t2 = models.FloatField(null=True, blank=True, verbose_name=_("co2_emissions_t2"))
@@ -2687,6 +2704,8 @@ class Parameter(models.Model):
     def __str__(self):
         return f"({self.pk}) {self.name} = {self.value} {self.unit if self.unit else ''}"
 
+class ApplicationParameter(Parameter):
+    pass
 
 class LivestockParameter(Parameter):
     pass

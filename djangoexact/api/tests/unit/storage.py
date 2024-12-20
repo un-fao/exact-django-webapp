@@ -80,8 +80,15 @@ class StorageTestCase(base_module.BaseModuleWithSubmoduleTestCase):
 
     def test_get_defaults(self):
 
-        view = self.module_viewset.as_view({"get": "defaults"})
-        request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-defaults", args=[self.module.pk]), format="json")
+        subresponse = self.create_submodule(models.StorageEntry, self.user, {"parent": self.module.pk})
+        self.assertEqual(subresponse.status_code, status.HTTP_201_CREATED)
+
+        submodule = models.StorageEntry.objects.get(pk=subresponse.data["id"])
+        self.edit_module(submodule, self.user, self.validated_data)
+
+        view = generic_module_viewset(models.StorageEntry).as_view({"get": "defaults"})
+        print(subresponse.data["id"])
+        request = self.request_factory.get(reverse(f"storageentry-defaults", args=[subresponse.data["id"]]), format="json")
 
         force_authenticate(request, user=self.user)
         response = view(request, pk=self.module.pk)
