@@ -4591,8 +4591,6 @@ def assign_fuel_type_units():
 
 # TODO: Run in production
 
-# TODO: Run in review
-
 # delete_and_import_value_chain_packaging_material_types()
 # delete_and_import_value_chain_packaging_emission_factors()
 # delete_and_import_value_chain_refrigerant_types()
@@ -4600,9 +4598,10 @@ def assign_fuel_type_units():
 # delete_and_import_eletricity_emissions()
 # delete_and_import_crop_yield_stats()
 # import_fuel_type_fuel_use_type_mapping()
+# delete_and_import_input_emission_factors()
+# assign_fuel_type_units()
 
-delete_and_import_input_emission_factors()
-assign_fuel_type_units()
+# TODO: Run in review
 
 # TODO: Run in develop
 
