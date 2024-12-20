@@ -1,7 +1,7 @@
 from abc import ABC
 import re
 import traceback
-from .ghg_emissions_classes import (
+from ghg_emissions_classes import (
     ActivityTypes,
     Emission,
     GasTypes,

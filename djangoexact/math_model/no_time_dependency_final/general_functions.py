@@ -5,7 +5,7 @@ import traceback
 from dataclasses import dataclass
 import copy
 import numpy as np
-
+from typing import Optional
 
 def average_yearly_value(yearly_breakdown: list):
     average_yearly_value = [(yearly_breakdown[i] + yearly_breakdown[i + 1]) / 2 for i in range(len(yearly_breakdown) - 1)]
@@ -24,15 +24,18 @@ def compute_yearly_or_half_year_cumulative(start_value, end_value, years_impleme
     if function == "exponential":
         # NOTE: the function is y = b + a * e^(kx) where k = -0.519349 this was calculated as the integral between 0 and 1 of a*e^(bx) = 0.78
         # where 0.78 was selected from the exact team, as it shows natural decay
-        k = -0.519349
-        a = end_value / (math.exp(k * years_implementation) - 1)
-        b = start_value - a
 
         if start_value < end_value:
+            k = -0.519349
+            a = end_value / (math.exp(k * years_implementation) - 1)
+            b = start_value - a
             yearly_breakdown = [b + a * math.exp(k * i) for i in range(years_implementation + 1)]
         else:
+            # NOTE: We switch end and start values as we want the same decay as above but in the opposite direction
+            k = -0.519349
+            a = start_value / (math.exp(k * years_implementation) - 1)
+            b = end_value - a
             yearly_breakdown = [b + a * math.exp(k * i) for i in range(years_implementation + 1)]
-            yearly_breakdown.reverse()
 
         yearly_breakdown.extend([yearly_breakdown[-1] for i in range(years_capitalization)])
 
@@ -135,19 +138,26 @@ def compute_yearly_cumulative_matrix(start_value, end_value, years_implementatio
 
         matrix = np.full((years_implementation, years_total), 0.0)
         n = len(half_year)
-
-        for i in range(matrix.shape[0]):
-            matrix[i][i] = half_year[0]
-            for j in range(i + 1, n):
-                matrix[i][j] = full_year[0]
+        
+        if start_value < end_value:
+            for i in range(matrix.shape[0]):
+                matrix[i][i] = half_year[i]
+                for j in range(i + 1, n):
+                    matrix[i][j] = full_year[i]
+        
+        else:
+            for i in range(matrix.shape[0]):
+                for j in range(0, i):
+                    matrix[i][j] = full_year[i]
 
         # NOTE: now it does what is needed, but it is not very readable. Has to be fixed further on
 
-        return matrix
+        return np.abs(matrix)
 
     elif function == "immediate":
         years_total = years_implementation + years_capitalization
-
+        # NOTE: this is the case where we have an immediate change in the value of the hectares
+        # fill the matrix with the end value
         matrix = np.full((years_implementation, years_total), end_value)
 
         return matrix
@@ -158,18 +168,25 @@ def compute_yearly_cumulative_matrix(start_value, end_value, years_implementatio
 
         half_year = compute_half_year_delta(start_value, end_value, years_implementation, years_capitalization, function)
         full_year = compute_yearly_delta(start_value, end_value, years_implementation, years_capitalization, function)
+        
+        ao = sum (half_year)
+        bo = sum (full_year)
 
         matrix = np.full((years_implementation, years_total), 0.0)
         n = len(half_year)
-
-        for i in range(matrix.shape[0]):
-            matrix[i][i] = half_year[0]
-            for j in range(i + 1, n):
-                matrix[i][j] = full_year[0]
-
-        # NOTE: now it does what is needed, but it is not very readable. Has to be fixed further on
-
-        return matrix
+        
+        if start_value < end_value:
+            for i in range(matrix.shape[0]):
+                matrix[i][i] = half_year[i]
+                for j in range(i + 1, n):
+                    matrix[i][j] = full_year[i]
+        
+        else:
+            for i in range(matrix.shape[0]):
+                for j in range(0, i):
+                    matrix[i][j] = full_year[i]
+            
+        return np.abs(matrix)
 
     else:
         raise Exception(f'Function "{function}" not recognized')
@@ -187,11 +204,17 @@ def compute_matrix_for_log_rec_dis(start_value, end_value, years_implementation,
         matrix = np.full((years_implementation, years_total), 0.0)
         n = len(full_year)
 
-        for i in range(matrix.shape[0]):
-            for j in range(i, n):
-                matrix[i][j] = full_year[1]
+        if start_value < end_value:
+            for i in range(matrix.shape[0]):
+                for j in range(i, n):
+                    matrix[i][j] = full_year[i]
+                    
+        else:
+            for i in range(matrix.shape[0]):
+                for j in range(0, i):
+                    matrix[i][j] = full_year[i]
 
-        return matrix
+        return np.abs(matrix)
 
     elif function == "immediate":
         years_total = years_implementation + years_capitalization
@@ -212,11 +235,17 @@ def compute_matrix_for_log_rec_dis(start_value, end_value, years_implementation,
         matrix = np.full((years_implementation, years_total), 0.0)
         n = len(full_year)
 
-        for i in range(matrix.shape[0]):
-            for j in range(i, n):
-                matrix[i][j] = full_year[1]
-
-        return matrix
+        if start_value < end_value:
+            for i in range(matrix.shape[0]):
+                for j in range(i, n):
+                    matrix[i][j] = full_year[i]
+                    
+        else:
+            for i in range(matrix.shape[0]):
+                for j in range(0, i):
+                    matrix[i][j] = full_year[i]
+                    
+        return np.abs(matrix)
 
     else:
         raise Exception(f'Function "{function}" not recognized')
@@ -378,52 +407,109 @@ def breakdown_agb_bgb_emissions(rotation_times_hectares_agb, rotation_times_hect
 
     return harvested_wood_product_agb, harvested_wood_product_bgb, nitrous_fire_component_agb, methane_fire_component_agb, nitrous_fire_component_bgb, methane_fire_component_bgb, co2_fire_component_agb, co2_fire_component_bgb
 
-def create_agb_bgb_matrix(years_impl, years_cap, delta_agb_yearly_below_20, delta_agb_yearly_after_20, agb_start, rotation_recurrence):
-
+def create_agb_bgb_matrix(years_impl, years_cap, delta_agb_yearly_below_20, delta_agb_yearly_after_20, agb_start, rotation_recurrence, affo_boolean, is_same_forest_type = None, forest_start = None):
+    
     try:
 
         if rotation_recurrence and rotation_recurrence < 20:
             # NOTE: This is due to the fact that it does not have time to grow past 20 years. EVER. As it's relative to the patch of land. Biomass under any
             # hectar never grows to be 20 years old. Always killed before hand
             delta_agb_yearly_after_20 = delta_agb_yearly_below_20
+        
+        # NOTE: This means we are in the case of afforestation. In this case the hectares start growing from year i (across the diagonal)
+        if affo_boolean and not is_same_forest_type:
+            years_total = years_impl + years_cap
+            delta_agb_matrix = np.full((years_impl, years_total), 0.0)
+            agb_matrix = np.full((years_impl, years_total), 0.0)
 
-        years_total = years_impl + years_cap
-        delta_agb_matrix = np.full((years_impl, years_total), 0.0)
-        agb_matrix = np.full((years_impl, years_total), 0.0)
+            # NOTE: IN THE CASE OF DEFORESTATION THERE IS NO GROWTH
+            # if hectares_start == hectares_end or hectares_start < hectares_end:
+            for i in range(years_impl):
+                # CREATING DELTA AGB MATRIX
+                end_index_below_20 = min(i + 20, years_total)
+                delta_agb_matrix[i, i:end_index_below_20] = delta_agb_yearly_below_20
+                if end_index_below_20 < years_total:
+                    delta_agb_matrix[i, end_index_below_20:] = delta_agb_yearly_after_20
 
-        # NOTE: IN THE CASE OF DEFORESTATION THERE IS NO GROWTH
-        # if hectares_start == hectares_end or hectares_start < hectares_end:
-        for i in range(years_impl):
-            # CREATING DELTA AGB MATRIX
-            end_index_below_20 = min(i + 20, years_total)
-            delta_agb_matrix[i, i:end_index_below_20] = delta_agb_yearly_below_20
-            if end_index_below_20 < years_total:
-                delta_agb_matrix[i, end_index_below_20:] = delta_agb_yearly_after_20
+            for i in range(years_impl):
+                for j in range(i, years_total):
+                    agb_matrix[i, j] = agb_start + delta_agb_matrix[i][j] + np.sum(delta_agb_matrix[i, i:j])
 
-        for i in range(years_impl):
-            for j in range(i, years_total):
-                agb_matrix[i, j] = agb_start + delta_agb_matrix[i][j] + np.sum(delta_agb_matrix[i, i:j])
+            return agb_matrix, delta_agb_matrix
+        
+        elif affo_boolean and is_same_forest_type and forest_start:
+            # NOTE: This means we are in the case where the practices on the forest have changed, but the forest type is the same
+            # We retrieve the agb matrix from the previous forest as a starting point, we set the values from the diagonal onwards, as that's where they start with the new practices
+            start_agb_matrix = forest_start.agb_matrix
+            delta_agb_matrix = np.full((years_impl, years_impl + years_cap), 0.0)
+            agb_matrix = np.full((years_impl, years_impl + years_cap), 0.0)
+            # NOTE: We set the values from the diagonal onwards, as that's where they start with the new practices
+            years_total = years_impl + years_cap
+            for i in range(years_impl):
+                for j in range(i + 1, years_total):
+                    start_agb_matrix[i, j] = 0 
+                    
+            # now we create the delta agb matrix
+            for i in range(years_impl):
+                # CREATING DELTA AGB MATRIX
+                end_index_below_20 = min(i + 20, years_total)
+                delta_agb_matrix[i, i:end_index_below_20] = delta_agb_yearly_below_20
+                if end_index_below_20 < years_total:
+                    delta_agb_matrix[i, end_index_below_20:] = delta_agb_yearly_after_20
+                    
+            # Now we create the new agb matrix
+            for i in range(years_impl):
+                for j in range(i, years_total):
+                    agb_matrix[i, j] =  start_agb_matrix[i, i] + delta_agb_matrix[i][j] + np.sum(delta_agb_matrix[i, i:j])
+            
+            return agb_matrix, delta_agb_matrix
+        # NOTE: This means we are in the case of deforestation. In this case the hectares start growing from year 0 
+        else:
+            years_total = years_impl + years_cap
+            delta_agb_matrix = np.full((years_impl, years_total), 0.0)
+            agb_matrix = np.full((years_impl, years_total), 0.0)
 
-        return agb_matrix, delta_agb_matrix
+            # NOTE: IN THE CASE OF DEFORESTATION THERE IS NO GROWTH
+            # if hectares_start == hectares_end or hectares_start < hectares_end:
+            for i in range(years_impl):
+                # CREATING DELTA AGB MATRIX
+                end_index_below_20 = min(i + 20, years_total)
+                delta_agb_matrix[i, 0:end_index_below_20] = delta_agb_yearly_below_20
+                if end_index_below_20 < years_total:
+                    delta_agb_matrix[i, end_index_below_20:] = delta_agb_yearly_after_20
+
+            for i in range(years_impl):
+                for j in range(0, years_total):
+                    agb_matrix[i, j] = agb_start + delta_agb_matrix[i][j] + np.sum(delta_agb_matrix[i, 0:j])
+
+            return agb_matrix, delta_agb_matrix
+           
     except Exception as e:
         traceback.print_exc()
         raise e
     
-    
-def create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, bgb_ratio_under_threshold, bgb_ratio_over_threshold, threshold, bgb_start, time_impl):
+def create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, bgb_ratio_under_threshold, bgb_ratio_over_threshold, threshold, bgb_start, time_impl, affo_boolean = None, is_same_forest_type = None, forest_start = None):
 
     try:
         delta_bgb_matrix = delta_agb_matrix * bgb_ratio_under_threshold
         bgb_matrix = np.full((agb_matrix.shape[0], agb_matrix.shape[1]), 0.0)
 
         for i in range(time_impl):
-            for j in range(i, agb_matrix.shape[1]):
-                value_to_assign = bgb_start + delta_bgb_matrix[i][j] + np.sum(delta_bgb_matrix[i, i:j])
-                if value_to_assign > threshold:
-                    delta_bgb_matrix[i][j] = delta_bgb_matrix[i][j]/bgb_ratio_under_threshold * bgb_ratio_over_threshold
-                    value_to_assign = bgb_start + delta_bgb_matrix[i][j] + np.sum(delta_bgb_matrix[i, i:j])
+            for j in range(0, agb_matrix.shape[1]):
+                if affo_boolean and is_same_forest_type and forest_start:
+                    value_to_assign = agb_matrix[i][j] * bgb_ratio_under_threshold
+                    if value_to_assign > threshold * bgb_ratio_under_threshold:
+                        value_to_assign = delta_agb_matrix[i][j] * bgb_ratio_over_threshold + agb_matrix[i][j - 1] * bgb_ratio_under_threshold
+                        
+                else:
+                    value_to_assign = bgb_start + delta_bgb_matrix[i][j] + np.sum(delta_bgb_matrix[i, 0:j])
+                    if value_to_assign > threshold * bgb_ratio_under_threshold:
+                        delta_bgb_matrix[i][j] = delta_bgb_matrix[i][j] * bgb_ratio_over_threshold  
+                        value_to_assign = bgb_start + delta_bgb_matrix[i][j] + np.sum(delta_bgb_matrix[i, i:j])
+                
+                
                 bgb_matrix[i][j] = value_to_assign
-
+                  
         return bgb_matrix, delta_bgb_matrix
 
     except Exception as e:
@@ -438,7 +524,7 @@ def check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value):
 
     try:
         for i in range(agb_matrix.shape[0]):
-            for j in range(i, agb_matrix.shape[1]):
+            for j in range(0, agb_matrix.shape[1]):
                 if agb_matrix[i][j] > max_agb_value:
                     # Update agb_matrix
                     agb_matrix[i][j:] = max_agb_value
@@ -485,24 +571,29 @@ def update_agb_matrix_logging(agb_matrix, delta_agb_matrix, original_delta_agb_m
 
     try:
         # take the value for each row on the column, that is much we are cutting down, subtract it from the agb_matrix across the row
-        for row in range(0, min(agb_matrix.shape[0], column + 1)):
+        for row in range(0, agb_matrix.shape[0]):
             agb_matrix[row, column:] = agb_matrix[row, column:] + logging_impact[row, column]
             # now set all values after the column to agb_matrix[row, column]
-            agb_matrix[row, column:] = agb_matrix[row, column]
-
-            for j in range(column, agb_matrix.shape[1]):
-                if agb_matrix[row][j] < max_agb_value:
-                    if is_degradation:
-                        delta_agb_matrix[row][j] = original_delta_agb_matrix[row][j]
-                    else:
-                        delta_agb_matrix[row][j:] = original_delta_agb_matrix[row][j:]
-                    # This means that there is a change in the agb_matrix so that we have to keep growing in delta_agb_matrix. Add for each value of
-                    for m in range(j, min(agb_matrix.shape[1], j + logging_recurrence + 1)):
-                        if m == agb_matrix.shape[1]:
-                            agb_matrix[row][m] = agb_matrix[row][m] + np.sum(delta_agb_matrix[row][j:m])
+            
+            # THIS MEANS THAT WE HAVE GOTTEN TO HECTARES WHICH ARE NOT YET TRANSFORMED, STOP THE ANALYSIS
+            if agb_matrix[row, column] == 0:
+                pass
+            else:
+                agb_matrix[row, column:] = agb_matrix[row, column]
+                
+                for j in range(column + 1, agb_matrix.shape[1]):
+                    if agb_matrix[row][j] < max_agb_value:
+                        if is_degradation:
+                            delta_agb_matrix[row][j] = original_delta_agb_matrix[row][j]
                         else:
-                            agb_matrix[row][m] = agb_matrix[row][m] + np.sum(delta_agb_matrix[row][j : m + 1])
-                    break
+                            delta_agb_matrix[row][j:] = original_delta_agb_matrix[row][j:]
+                        # This means that there is a change in the agb_matrix so that we have to keep growing in delta_agb_matrix. Add for each value of
+                        for m in range(j, min(agb_matrix.shape[1], j + logging_recurrence + 1)):
+                            if m == agb_matrix.shape[1]:
+                                agb_matrix[row][m] = agb_matrix[row][m] + np.sum(delta_agb_matrix[row][j:m])
+                            else:
+                                agb_matrix[row][m] = agb_matrix[row][m] + np.sum(delta_agb_matrix[row][j : m + 1])
+                        break
 
         check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value)
 
@@ -512,6 +603,22 @@ def update_agb_matrix_logging(agb_matrix, delta_agb_matrix, original_delta_agb_m
         traceback.print_exc()
         raise e
     
+def remove_values_not_on_diagonal(matrix):
+    # NOTE: all values not in diagonal have to be set to 0
+    for i in range(matrix.shape[0]):
+        for j in range(matrix.shape[1]):
+            if i != j:
+                matrix[i][j] = 0
+                
+    return matrix
+    
+def forest_start_logging_matrix(matrix):
+    
+    # iterate over the diagonal of the matrix, multiply by the difference between the column you are in and the final column in the diagonal
+    for i in range(matrix.shape[0]):
+        matrix[i][i] = matrix[i][i] * (matrix.shape[0] - i)
+        
+    return matrix   
     
 def calculate_rotation_effect(original_agb_matrix, original_delta_agb_matrix, max_agb_value, recurrence, start_year, percentage=1):
 
@@ -529,13 +636,12 @@ def calculate_rotation_effect(original_agb_matrix, original_delta_agb_matrix, ma
 
         # THIS MEANS WE START WITH A FULL FOREST, WHERE VALUE = MAX_AGB_VALUE
         for row_index in range(maximum_row):
-            if agb_matrix[row_index][row_index] >= max_agb_value:
-                # subtract this to all value in the row, right of the diagonal
-                agb_matrix[row_index][row_index:] -= max_agb_value
-                rotation_matrix[row_index][row_index] = -max_agb_value
-                results[row_index] = -max_agb_value * percentage
-                rotation_impact[row_index, row_index] = -max_agb_value
-
+            # subtract this to all value in the row, right of the diagonal
+            agb_matrix[row_index][row_index:] -= original_agb_matrix[row_index][row_index]
+            rotation_matrix[row_index][row_index] = -original_agb_matrix[row_index][row_index]
+            results[row_index] = -original_agb_matrix[row_index][row_index] * percentage
+            rotation_impact[row_index, row_index] = -original_agb_matrix[row_index, row_index]
+            
         agb_matrix, delta_agb_matrix = check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value)
 
         row_start = 0
@@ -568,7 +674,7 @@ def calculate_rotation_effect(original_agb_matrix, original_delta_agb_matrix, ma
         results = dict(sorted(results.items()))
 
         # add to each year
-        return results, rotation_matrix, delta_agb_matrix
+        return results, rotation_matrix, delta_agb_matrix, agb_matrix
 
     except Exception as e:
         traceback.print_exc()
@@ -592,12 +698,10 @@ def calculate_logging_effect(original_agb_matrix, original_delta_agb_matrix, max
 
             # i represents the column of our matrix. When there is logging we are cutting down a percentage of the forest present in year i
             # We are cutting down a percentage of the forest present in year i
-            # NOTE: applied change here to include year of start (no idea if correct)
 
             if i <= agb_matrix.shape[1]:
                 logging_impact[:, i * recurrence + start_year] = -agb_matrix[:, i * recurrence + start_year] * percentage
             else:
-                ao = i * recurrence - 1 + start_year
                 logging_impact[:, i * recurrence + start_year] = -agb_matrix[:, i * recurrence - 1 + start_year] * percentage
 
             # Update the agb_matrix
@@ -606,7 +710,7 @@ def calculate_logging_effect(original_agb_matrix, original_delta_agb_matrix, max
 
             # NOTE: as of now result is always empty, add necessary logic or remove it, as it's not used anywhere   
 
-        return result, logging_impact, delta_agb_matrix
+        return result, logging_impact, delta_agb_matrix, agb_matrix
 
     except Exception as e:
         traceback.print_exc()
@@ -656,3 +760,52 @@ def create_litter_deadwood_matrix(years_impl, years_cap, delta_yearly, value_sta
     except Exception as e:
         traceback.print_exc()
         raise e
+    
+def plot_matrix_with_values(matrix, cmap='viridis', title="Matrix Plot"):
+    """
+    Plots a 2D matrix with values written in each cell and color-coded.
+    
+    Args:
+        matrix (2D list or np.ndarray): The matrix to plot.
+        cmap (str): Colormap for the matrix values (default is 'viridis').
+        title (str): Title of the plot (default is "Matrix Plot").
+    """
+    matrix = np.array(matrix)  # Ensure the input is a numpy array
+    
+    # Set the figure size to ensure cells are square
+    fig, ax = plt.subplots(figsize=(len(matrix[0]) * 0.5, len(matrix) * 0.5))  # Adjust dimensions for square cells
+    
+    # Plot the matrix as an image
+    cax = ax.imshow(matrix, cmap=cmap, interpolation='nearest', aspect='equal')  # `aspect='equal'` ensures square cells
+    
+    # Add colorbar
+    plt.colorbar(cax, ax=ax, orientation='vertical')
+    
+    # Write the values in each cell
+    for i in range(matrix.shape[0]):
+        for j in range(matrix.shape[1]):
+            value = matrix[i, j]
+            ax.text(j, i, f"{value:.1f}" if isinstance(value, float) else str(value), 
+                    ha='center', va='center', fontsize=9,  # Adjusted font size
+                    color='black' if cax.norm(value) > 0.5 else 'white')
+    
+    # Set up axis labels and title
+    ax.set_title(title, fontsize=14)
+    ax.set_xlabel("Columns")
+    ax.set_ylabel("Rows")
+    
+    # Ensure gridlines match up with cells
+    ax.set_xticks(np.arange(-0.5, matrix.shape[1], 1), minor=True)
+    ax.set_yticks(np.arange(-0.5, matrix.shape[0], 1), minor=True)
+    ax.grid(which="minor", color="gray", linestyle='-', linewidth=0.5)
+    ax.tick_params(which="minor", size=0)
+    
+    # Ensure tight layout for consistent plotting
+    plt.tight_layout()
+    
+    # Create folder for saving matrix images
+    os.makedirs("matrices", exist_ok=True)
+    
+    # Save the plot
+    plt.savefig(f"matrices/{title}.png")
+    
