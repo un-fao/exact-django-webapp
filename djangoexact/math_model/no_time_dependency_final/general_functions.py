@@ -6,6 +6,7 @@ from dataclasses import dataclass
 import copy
 import numpy as np
 from typing import Optional
+import os
 
 def average_yearly_value(yearly_breakdown: list):
     average_yearly_value = [(yearly_breakdown[i] + yearly_breakdown[i + 1]) / 2 for i in range(len(yearly_breakdown) - 1)]
