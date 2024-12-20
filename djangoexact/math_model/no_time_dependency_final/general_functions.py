@@ -627,7 +627,7 @@ def create_agb_bgb_matrix(years_impl, years_cap, delta_agb_yearly_below_20, delt
         traceback.print_exc()
         raise e
     
-def create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, bgb_ratio_under_threshold, bgb_ratio_over_threshold, threshold, bgb_start, time_impl):
+def create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, bgb_ratio_under_threshold, bgb_ratio_over_threshold, threshold, bgb_start, time_impl, affo_boolean = None, is_same_forest_type = None, forest_start = None):
 
     try:
         delta_bgb_matrix = delta_agb_matrix * bgb_ratio_under_threshold
@@ -635,12 +635,20 @@ def create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, bgb_ratio_under_thr
 
         for i in range(time_impl):
             for j in range(0, agb_matrix.shape[1]):
-                value_to_assign = bgb_start + delta_bgb_matrix[i][j] + np.sum(delta_bgb_matrix[i, 0:j])
-                if value_to_assign > threshold:
-                    delta_bgb_matrix[i][j] = delta_bgb_matrix[i][j]/bgb_ratio_under_threshold * bgb_ratio_over_threshold
-                    value_to_assign = bgb_start + delta_bgb_matrix[i][j] + np.sum(delta_bgb_matrix[i, i:j])
+                if affo_boolean and is_same_forest_type and forest_start:
+                    value_to_assign = agb_matrix[i][j] * bgb_ratio_under_threshold
+                    if value_to_assign > threshold * bgb_ratio_under_threshold:
+                        value_to_assign = delta_agb_matrix[i][j] * bgb_ratio_over_threshold + agb_matrix[i][j - 1] * bgb_ratio_under_threshold
+                        
+                else:
+                    value_to_assign = bgb_start + delta_bgb_matrix[i][j] + np.sum(delta_bgb_matrix[i, 0:j])
+                    if value_to_assign > threshold * bgb_ratio_under_threshold:
+                        delta_bgb_matrix[i][j] = delta_bgb_matrix[i][j] * bgb_ratio_over_threshold  
+                        value_to_assign = bgb_start + delta_bgb_matrix[i][j] + np.sum(delta_bgb_matrix[i, i:j])
+                
+                
                 bgb_matrix[i][j] = value_to_assign
-
+                  
         return bgb_matrix, delta_bgb_matrix
 
     except Exception as e:
@@ -767,13 +775,12 @@ def calculate_rotation_effect(original_agb_matrix, original_delta_agb_matrix, ma
 
         # THIS MEANS WE START WITH A FULL FOREST, WHERE VALUE = MAX_AGB_VALUE
         for row_index in range(maximum_row):
-            if agb_matrix[row_index][row_index] >= max_agb_value:
-                # subtract this to all value in the row, right of the diagonal
-                agb_matrix[row_index][row_index:] -= max_agb_value
-                rotation_matrix[row_index][row_index] = -max_agb_value
-                results[row_index] = -max_agb_value * percentage
-                rotation_impact[row_index, row_index] = -max_agb_value
-
+            # subtract this to all value in the row, right of the diagonal
+            agb_matrix[row_index][row_index:] -= original_agb_matrix[row_index][row_index]
+            rotation_matrix[row_index][row_index] = -original_agb_matrix[row_index][row_index]
+            results[row_index] = -original_agb_matrix[row_index][row_index] * percentage
+            rotation_impact[row_index, row_index] = -original_agb_matrix[row_index, row_index]
+            
         agb_matrix, delta_agb_matrix = check_agb_matrices(agb_matrix, delta_agb_matrix, max_agb_value)
 
         row_start = 0
