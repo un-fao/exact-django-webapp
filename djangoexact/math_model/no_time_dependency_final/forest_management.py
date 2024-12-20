@@ -169,6 +169,7 @@ class ForestManagement(BaseModule):
         ########### AGB AND BGB MATRIX CREATION ############
         # NOTE: We have to understand if we're in Afforestation or Forest Remaining Forest (Deforesation Occurs in the Defo module)
         affo_bool = self.hectares_end > self.hectares_start
+        self.affo_bool = affo_bool
         
         if self.agb_start == 0:
             # This is the case of afforestation, as we don't have any AGB or BGB at the start
@@ -186,11 +187,11 @@ class ForestManagement(BaseModule):
                 if self.bgb_yearly_growth_over_20_tier_2 and self.bgb_yearly_growth_under_20_tier_2:
                     bgb_matrix, delta_bgb_matrix = create_agb_bgb_matrix(self.implementation_time, self.capitalization_time, self.bgb_yearly_growth_over_20_tier_2, self.bgb_yearly_growth_over_20_tier_2, self.bgb_start, self.rotation_recurrence, affo_bool)
                 else:
-                    bgb_matrix, delta_bgb_matrix = create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, self.bgb_ratio_under_threshold, self.bgb_ratio_over_threshold, self.bgb_ratio_threshold, self.bgb_start, self.implementation_time)
+                    bgb_matrix, delta_bgb_matrix = create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, self.bgb_ratio_under_threshold, self.bgb_ratio_over_threshold, self.bgb_ratio_threshold, self.bgb_start, self.implementation_time, affo_bool, self.is_same_forest_type)
             else:
                 # NOTE: This means we have the same forest type, hence we don't have to create a new agb and bgb matrix, but we can use the one from the previous forest module
                 agb_matrix, delta_agb_matrix = create_agb_bgb_matrix(self.implementation_time, self.capitalization_time, self.agb_yearly_growth_over_20, self.agb_yearly_growth_over_20, self.agb_start, self.rotation_recurrence, affo_bool, self.is_same_forest_type, self.forest_start )
-                bgb_matrix, delta_bgb_matrix = create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, self.bgb_ratio_under_threshold, self.bgb_ratio_over_threshold, self.bgb_ratio_threshold, self.bgb_start, self.implementation_time)
+                bgb_matrix, delta_bgb_matrix = create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, self.bgb_ratio_under_threshold, self.bgb_ratio_over_threshold, self.bgb_ratio_threshold, self.bgb_start, self.implementation_time, affo_bool, self.is_same_forest_type, self.forest_start)
                 
                 plot_matrix_with_values(self.forest_start.agb_matrix, title="agb matrix from previous module")
                 plot_matrix_with_values(self.forest_start.bgb_matrix, title="BGB Matrix from previous module")
@@ -214,25 +215,35 @@ class ForestManagement(BaseModule):
         def calculate_rotation():
             
             try:
-                result_rotation_agb, rotation_matrix_agb, delta_agb_matrix, agb_matrix = calculate_rotation_effect(self.agb_matrix, self.delta_agb_matrix, self.max_agb_value, self.rotation_recurrence, self.rotation_start_year)
-                result_rotation_bgb, rotation_matrix_bgb, delta_bgb_matrix, bgb_matrix = calculate_rotation_effect(self.bgb_matrix, self.delta_bgb_matrix, self.max_bgb_value, self.rotation_recurrence, self.rotation_start_year)
                 
-                rotation_times_hectares_agb = multiply_matrix_by_matrix(rotation_matrix_agb, self.hectares_for_rot_log_dis)
-                rotation_times_hectares_bgb = multiply_matrix_by_matrix(rotation_matrix_bgb, self.hectares_for_rot_log_dis)
+                # NOTE: No emissions for Rotation are generated in the START scenario, new practices are applied. Even though the matrix is not null, 
+                # the hectares are null, hence no emissions are generated. The check on affo_bool means it's not the start scenario, no rotation in start
+                if self.affo_bool:
+                    result_rotation_agb, rotation_matrix_agb, delta_agb_matrix, agb_matrix = calculate_rotation_effect(self.agb_matrix, self.delta_agb_matrix, self.max_agb_value, self.rotation_recurrence, self.rotation_start_year)
+                    result_rotation_bgb, rotation_matrix_bgb, delta_bgb_matrix, bgb_matrix = calculate_rotation_effect(self.bgb_matrix, self.delta_bgb_matrix, self.max_bgb_value, self.rotation_recurrence, self.rotation_start_year)
+                    
+                    plot_matrix_with_values(self.agb_matrix, title="AGB Matrix in rotation")
+                    plot_matrix_with_values(self.bgb_matrix, title="BGB Matrix in rotation")
+                    
+                    plot_matrix_with_values(rotation_matrix_agb, title="Rotation Matrix AGB")
+                    plot_matrix_with_values(rotation_matrix_bgb, title="Rotation Matrix BGB")
+                    
+                    rotation_times_hectares_agb = multiply_matrix_by_matrix(rotation_matrix_agb, self.hectares_for_rot_log_dis)
+                    rotation_times_hectares_bgb = multiply_matrix_by_matrix(rotation_matrix_bgb, self.hectares_for_rot_log_dis)
 
-                (hwp_rotation_agb, hwp_rotation_bgb, nitrous_fire_component_agb, methane_fire_component_agb, nitrous_fire_component_bgb, methane_fire_component_bgb, co2_fire_component_agb, co2_fire_component_bgb) = breakdown_agb_bgb_emissions(rotation_times_hectares_agb, rotation_times_hectares_bgb, self.rotation_percentage_energy, self.forest_cf, self.forest_gef_ch4, self.forest_gef_n2o, self.forest_gef_co2, self.mangrove_factor, self.ef_nitrous, self.ef_methane)
+                    (hwp_rotation_agb, hwp_rotation_bgb, nitrous_fire_component_agb, methane_fire_component_agb, nitrous_fire_component_bgb, methane_fire_component_bgb, co2_fire_component_agb, co2_fire_component_bgb) = breakdown_agb_bgb_emissions(rotation_times_hectares_agb, rotation_times_hectares_bgb, self.rotation_percentage_energy, self.forest_cf, self.forest_gef_ch4, self.forest_gef_n2o, self.forest_gef_co2, self.mangrove_factor, self.ef_nitrous, self.ef_methane)
 
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in hwp_rotation_agb], activity=ActivityTypes.HWP_ROTATION_AGB, delay=self.delay))
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in hwp_rotation_bgb], activity=ActivityTypes.HWP_ROTATION_BGB, delay=self.delay))
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in nitrous_fire_component_agb], activity=ActivityTypes.ROTATION_AGB, delay=self.delay))
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in methane_fire_component_agb], activity=ActivityTypes.ROTATION_AGB, delay=self.delay))
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in nitrous_fire_component_bgb], activity=ActivityTypes.ROTATION_BGB, delay=self.delay))
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in methane_fire_component_bgb], activity=ActivityTypes.ROTATION_BGB, delay=self.delay))
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in co2_fire_component_agb], activity=ActivityTypes.ROTATION_AGB, delay=self.delay))
-                self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in co2_fire_component_bgb], activity=ActivityTypes.ROTATION_BGB, delay=self.delay))
-                
-                # NOTE: This is necessary as we need to update the delta matrices with the new values because they are used further on for bgb and agb calculations
-                self.update_delta_agb_and_bgb_matrix(delta_agb_matrix, delta_bgb_matrix, agb_matrix, bgb_matrix)
+                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in hwp_rotation_agb], activity=ActivityTypes.HWP_ROTATION_AGB, delay=self.delay))
+                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in hwp_rotation_bgb], activity=ActivityTypes.HWP_ROTATION_BGB, delay=self.delay))
+                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in nitrous_fire_component_agb], activity=ActivityTypes.ROTATION_AGB, delay=self.delay))
+                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in methane_fire_component_agb], activity=ActivityTypes.ROTATION_AGB, delay=self.delay))
+                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in nitrous_fire_component_bgb], activity=ActivityTypes.ROTATION_BGB, delay=self.delay))
+                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in methane_fire_component_bgb], activity=ActivityTypes.ROTATION_BGB, delay=self.delay))
+                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in co2_fire_component_agb], activity=ActivityTypes.ROTATION_AGB, delay=self.delay))
+                    self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in co2_fire_component_bgb], activity=ActivityTypes.ROTATION_BGB, delay=self.delay))
+                    
+                    # NOTE: This is necessary as we need to update the delta matrices with the new values because they are used further on for bgb and agb calculations
+                    self.update_delta_agb_and_bgb_matrix(delta_agb_matrix, delta_bgb_matrix, agb_matrix, bgb_matrix)
     
             
             except Exception as e:
@@ -457,7 +468,7 @@ inputs_start = {'capitalization_time': 15,
           'disturbance_recurrence': [], 
           'disturbance_percentage': [], 
           'disturbance_year_of_start': [],
-          'logging_recurrence': 2, 
+          'logging_recurrence': None, 
           'logging_percentage': 0.2, 
           'logging_percentage_energy': 0.5,
           'logging_year_of_start': 0, 
@@ -502,13 +513,15 @@ inputs_start = {'capitalization_time': 15,
 
 ao = ForestManagement(**inputs_start)
 ao.calculate_emissions()
+ao.result.plot_emissions_and_aggregate_by_activity('start')
+plot_matrix_with_values(ao.agb_matrix, title="AGB Matrix ao")
 
 inputs_w = {'capitalization_time': 15, 
           'implementation_time': 10, 
           'rate_type': 'linear', 
           'hectares_start': 0, 
           'hectares_end': 1000, 
-          'rotation_recurrence': None, 
+          'rotation_recurrence': 5, 
           'rotation_start_year': 0, 
           'rotation_percentage_energy': 0.2, 
           'bgb_ratio_threshold': 125.0, 
@@ -527,7 +540,7 @@ inputs_w = {'capitalization_time': 15,
           'disturbance_recurrence': [], 
           'disturbance_percentage': [], 
           'disturbance_year_of_start': [],
-          'logging_recurrence': 5, 
+          'logging_recurrence': None, 
           'logging_percentage': 0.02, 
           'logging_percentage_energy': 0.5,
           'logging_year_of_start': 0, 
@@ -572,6 +585,8 @@ inputs_w = {'capitalization_time': 15,
 
 ao2 = ForestManagement(**inputs_w)
 ao2.calculate_emissions()
+
+ao2.result.plot_emissions_and_aggregate_by_activity('with')
 
  
  
