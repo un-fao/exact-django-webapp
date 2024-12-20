@@ -1440,24 +1440,24 @@ msgstr "Segundo Informe de Evaluación del IPCC (SAR)"
 
 #. WaterManagementTypeBeforeCultivation
 msgid "Non Flooded Pre-Season <180 D"
-msgstr ""
-
+msgstr "Pretemporada no inundada <180 días"
+ 
 #. WaterManagementTypeBeforeCultivation
 msgid "Non Flooded Pre-Season >180 D"
-msgstr ""
-
+msgstr "Pretemporada no inundada >180 días"
+ 
 #. WaterManagementTypeBeforeCultivation
 msgid "Flooded Pre-Season > 30 D"
-msgstr ""
-
+msgstr "Pretemporada inundada > 30 días"
+ 
 #. WaterManagementTypeAfterCultivation
 msgid "Rainfed, Wet Season (Regular Rainfed)"
-msgstr ""
-
+msgstr "Alimentadas a lluvia, Alimentación regular por lluvia"
+ 
 #. WaterManagementTypeAfterCultivation
 msgid "Rainfed, Dry Season (Drought Prone)"
-msgstr ""
-
+msgstr "Alimentadas a lluvia, Con tendencia a la sequía"
+ 
 #. WaterManagementTypeAfterCultivation
 msgid "Rainfed, Deep Water"
-msgstr ""
+msgstr "Alimentadas a lluvia, Aguas profundas "
