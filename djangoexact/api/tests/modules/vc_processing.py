@@ -10,14 +10,19 @@ from ..factories import *
 import api.tests.base_test_classes as t
 
 
-class ValueChainProcessingTest(t.ModuleTest):
+class ValueChainProcessingTest(t.ModuleWithSubmodulesTest):
     def __init__(self):
         super().__init__()
         self.module_type = ModuleType.objects.get(class_name="Processing")
+        self.submodule_types = [
+            ModuleType.objects.get(class_name="ProcessingEntry"),
+        ]
         self.create_module()
+        self.create_submodules()
 
     def test(self):
         self.calculate_results()
+        self.calculate_submodule_results()
 
         # res = reports.BaseProjectReport(self.project)
         # res.build_report()

@@ -71,15 +71,12 @@ from . import utilities as utils
 from .models import (
     Activity,
     Submodule,
-    AnnualCroplandParameter,
     AnnualCropland,
     Aquaculture,
-    AquacultureParameter,
     BiomassModule,
     Building,
     Climate,
     CoastalWetland,
-    CoastalWetlandParameter,
     Country,
     OtherLand,
     Electricity,
@@ -89,13 +86,11 @@ from .models import (
     ForestManagement,
     Fuel,
     Grassland,
-    GrasslandParameter,
     Input,
     InputEntry,
     InputType,
     SalinityType,
     Irrigation,
-    IrrigationParameter,
     IrrigationPhase,
     IrrigationSystem,
     LandModule,
@@ -103,9 +98,7 @@ from .models import (
     LandUseChange,
     LandUseType,
     LargeFishery,
-    LargeFisheryParameter,
     Livestock,
-    LivestockParameter,
     Module,
     Moisture,
     OrganicInputType,
@@ -117,7 +110,6 @@ from .models import (
     Settlement,
     SetAside,
     SmallFishery,
-    SmallFisheryParameter,
     SoilType,
     StatusType,
     Waterbody,
@@ -134,6 +126,7 @@ from .models import (
     PackagingEntry,
     StorageEntry,
     ProcessingEntry,
+    ApplicationParameter,
 )
 from api.utilities import DefaultValue
 from math_model.no_time_dependency_final.value_chains import ValueChain as MathValueChain
@@ -1799,7 +1792,7 @@ class PerennialCropCalculator(LandModuleCalculator):
             self.residue_availability_t2_wo = SimpleNamespace(value=getattr(self.math_w, "biomass_availability_tier_2_default", 0) or getattr(self.math_wo, "biomass_availability_tier_2_default", 0))
 
         self.burning_emission_factor = utils.get_or_raise(ipcc.BurningEmissionFactor, savanna_flt, "BurningEmissionFactor for Savanna and grassland does not exist")
-        self.default_fire_periodicity = AnnualCroplandParameter.objects.get(name="default_fire_periodicity")
+        self.default_fire_periodicity = ApplicationParameter.objects.get(name="default_fire_periodicity")
 
         if self.module.is_start():
             self.fires_combustion_factor_start = utils.get_or_raise(ipcc.FiresCombustionFactor, lut_start_flt, f"FiresCombustionFactor for {self.module.land_use_type_start.name} does not exist", method="get_or_default")
@@ -2569,7 +2562,7 @@ class GrasslandCalculator(LandModuleCalculator):
 
         self.ef: SimpleNamespace | ipcc.BurningEmissionFactor = SimpleNamespace(value=0)
         self.biomass: SimpleNamespace | ipcc.GrasslandBiomass = SimpleNamespace(value=0)
-        self.cf: SimpleNamespace | GrasslandParameter = SimpleNamespace(value=0)
+        self.cf: SimpleNamespace | ApplicationParameter = SimpleNamespace(value=0)
 
     def get_defaults(self, calculate=False):
         super().get_defaults(calculate)
@@ -2588,8 +2581,8 @@ class GrasslandCalculator(LandModuleCalculator):
                 raise Exception(f"AGB for {project.climate.name} climate and {project.moisture.name} moisture does not exist. Please provide Tier 2 values for scenarios: {', '.join(missing_scenarios)}")
 
         try:
-            self.cf = GrasslandParameter.objects.get(name="default_combustion_factor")
-        except GrasslandParameter.DoesNotExist:
+            self.cf = ApplicationParameter.objects.get(name="default_combustion_factor")
+        except ApplicationParameter.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(module, "combustion_factor_t2")
             if missing_scenarios:
                 raise Exception(f"Default combustion factor does not exist. Please provide Tier 2 values for scenarios: {', '.join(missing_scenarios)}")
@@ -2862,22 +2855,22 @@ class SmallFisheryCalculator(BaseCalculator):
             raise ValueError("Default emission factors for off-road diesel do not exist")
 
         try:
-            self.lost_refrigerant_default = SmallFisheryParameter.objects.get(name="lost_refrigerant_default").value
-        except SmallFisheryParameter.DoesNotExist:
+            self.lost_refrigerant_default = ApplicationParameter.objects.get(name="small_fishery_lost_refrigerant_default").value
+        except ApplicationParameter.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "refrigerant_lost_per_tonne_t2")
             if missing_scenarios:
                 raise ValueError(f"Default lost refrigerant does not exist. Please provide a tier 2 value for lost refrigerant for scenarios: {', '.join(missing_scenarios)}")
 
         try:
-            self.tonnes_ice_default = SmallFisheryParameter.objects.get(name="tonnes_ice_default").value
-        except SmallFisheryParameter.DoesNotExist:
+            self.tonnes_ice_default = ApplicationParameter.objects.get(name="small_fishery_tonnes_ice_default").value
+        except ApplicationParameter.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "tonnes_of_ice_t2")
             if missing_scenarios:
                 raise ValueError(f"Default tonnes of ice does not exist. Please provide a tier 2 value for tonnes of ice for scenarios: {', '.join(missing_scenarios)}")
 
         try:
-            self.kw_tonnes = SmallFisheryParameter.objects.get(name="kw_tonnes").value
-        except SmallFisheryParameter.DoesNotExist:
+            self.kw_tonnes = ApplicationParameter.objects.get(name="small_fishery_kw_tonnes").value
+        except ApplicationParameter.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "inshore_ice_production_kwh_per_tonne_t2")
             if missing_scenarios:
                 raise ValueError(f"Default kw per tonne does not exist. Please provide a tier 2 value for kw per tonne for scenarios: {', '.join(missing_scenarios)}")
@@ -3082,22 +3075,22 @@ class LargeFisheryCalculator(BaseCalculator):
                 raise ValueError(f"Default FUI for {self.module.fish_type.name} and {self.module.gear_type_wo.name} does not exist. Please provide a tier 2 value for FUI for the relevant scenarios.")
 
         try:
-            self.lost_refrigerant_default = LargeFisheryParameter.objects.get(name="lost_refrigerant_default").value
-        except LargeFisheryParameter.DoesNotExist:
+            self.lost_refrigerant_default = ApplicationParameter.objects.get(name="large_fishery_lost_refrigerant_default").value
+        except ApplicationParameter.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "refrigerant_lost_per_tonne_t2")
             if missing_scenarios:
                 raise ValueError(f"Default lost refrigerant does not exist. Please provide a tier 2 value for lost refrigerant for scenarios: {', '.join(missing_scenarios)}")
 
         try:
-            self.tonnes_ice_default = LargeFisheryParameter.objects.get(name="tonnes_ice_default").value
-        except LargeFisheryParameter.DoesNotExist:
+            self.tonnes_ice_default = ApplicationParameter.objects.get(name="large_fishery_tonnes_ice_default").value
+        except ApplicationParameter.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "tonnes_of_ice_t2")
             if missing_scenarios:
                 raise ValueError(f"Default tonnes of ice does not exist. Please provide a tier 2 value for tonnes of ice for scenarios: {', '.join(missing_scenarios)}")
 
         try:
-            self.kw_tonnes = LargeFisheryParameter.objects.get(name="kw_tonnes").value
-        except LargeFisheryParameter.DoesNotExist:
+            self.kw_tonnes = ApplicationParameter.objects.get(name="large_fishery_kw_tonnes").value
+        except ApplicationParameter.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "inshore_ice_production_kwh_per_tonne_t2")
             if missing_scenarios:
                 raise ValueError(f"Default kw per tonne does not exist. Please provide a tier 2 value for kw per tonne for scenarios: {', '.join(missing_scenarios)}")
@@ -3239,23 +3232,23 @@ class AquacultureCalculator(BaseCalculator):
 
         # TODO: What EF should we use in Aquaculture electricity?
         # try:
-        #     self.ELECTRICITY_USED_DEFAULT = AquacultureParameter.objects.get(name="electricity_used_default").value
-        # except AquacultureParameter.DoesNotExist:
+        #     self.ELECTRICITY_USED_DEFAULT = ApplicationParameter.objects.get(name="electricity_used_default").value
+        # except ApplicationParameter.DoesNotExist:
         #     missing_scenarios = utils.find_empty_scenarios(module, "electricity_used_t2")
         #     if missing_scenarios:
         #         raise ValueError(f"Default electricity used does not exist. Please provide a tier 2 value for electricity used for scenarios: {', '.join(missing_scenarios)}")
 
         try:
-            self.NITROUS_EF_DEFAULT = AquacultureParameter.objects.get(name="nitrous_ef_default").value
-        except AquacultureParameter.DoesNotExist:
+            self.NITROUS_EF_DEFAULT = ApplicationParameter.objects.get(name="nitrous_ef_default").value
+        except ApplicationParameter.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(module, "n2o_from_production_t2")
             if missing_scenarios:
                 raise ValueError(f"Default nitrous emission factor does not exist. Please provide a tier 2 value for nitrous emission factor for scenarios: {', '.join(missing_scenarios)}")
 
         try:
             # TODO: This will now be used in the inputs module for feed
-            self.FEED_EF_DEFAULT = AquacultureParameter.objects.get(name="feed_ef_default").value
-        except AquacultureParameter.DoesNotExist:
+            self.FEED_EF_DEFAULT = ApplicationParameter.objects.get(name="feed_ef_default").value
+        except ApplicationParameter.DoesNotExist:
             raise ValueError("Default feed emission factor does not exist")
 
         try:
@@ -3641,19 +3634,19 @@ class FuelCalculator(BaseCalculator):
 
             if self.energy_ef_default:
                 if self.energy_ef_default.co2 is None and self.module.energy_ef_co2_t2 is None:
-                    raise ValueError(f"Default CO2 emission factor for {self.module.fuel_type.name} does not exist. Please provide a tier 2 value.")
+                    raise ValueError(f"Default CO2 emission factor for {self.module.fuel_type.name} {self.module.fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value.")
                 if self.energy_ef_default.ch4 is None and self.module.energy_ef_ch4_t2 is None:
-                    raise ValueError(f"Default CH4 emission factor for {self.module.fuel_type.name} does not exist. Please provide a tier 2 value.")
+                    raise ValueError(f"Default CH4 emission factor for {self.module.fuel_type.name} {self.module.fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value.")
                 if self.energy_ef_default.n2o is None and self.module.energy_ef_n2o_t2 is None:
-                    raise ValueError(f"Default N2O emission factor for {self.module.fuel_type.name} does not exist. Please provide a tier 2 value.")
+                    raise ValueError(f"Default N2O emission factor for {self.module.fuel_type.name} {self.module.fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value.")
 
         except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
             if self.module.energy_ef_co2_t2 is None:
-                raise ValueError(f"CO2 emission factor for {self.module.fuel_type.name} does not exist. Please provide a tier 2 value.")
+                raise ValueError(f"CO2 emission factor for {self.module.fuel_type.name} {self.module.fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value.")
             if self.module.energy_ef_ch4_t2 is None:
-                raise ValueError(f"CH4 emission factor for {self.module.fuel_type.name} does not exist. Please provide a tier 2 value.")
+                raise ValueError(f"CH4 emission factor for {self.module.fuel_type.name} {self.module.fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value.")
             if self.module.energy_ef_n2o_t2 is None:
-                raise ValueError(f"N2O emission factor for {self.module.fuel_type.name} does not exist. Please provide a tier 2 value.")
+                raise ValueError(f"N2O emission factor for {self.module.fuel_type.name} {self.module.fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value.")
 
     def calculate(self) -> list[Result]:
         """
@@ -4115,7 +4108,7 @@ class LivestockCalculator(BaseCalculator):
         climate: Climate = activity.climate_t2 or project.climate
         moisture: Moisture = activity.moisture_t2 or project.moisture
 
-        self.LEACHING_MULTI = LivestockParameter.objects.get(name="LEACHING_MULTIPLIER").value
+        self.LEACHING_MULTI = ApplicationParameter.objects.get(name="leaching_multiplier").value
         self.volatilization_multi = ipcc.ManureManagementVolatilizationMultiplier.objects.get(moisture=moisture)
 
         if module.is_start():
@@ -4765,9 +4758,9 @@ class IrrigationPhaseCalculator(BaseCalculator):
         self.ef_default: ipcc.IrrigationPhaseData = ipcc.IrrigationPhaseData()
         self.energy_ef_default = ipcc.EnergyDefaultEmissionFactor()
         self.pressure_default = ipcc.IrrigationPressureRequirement()
-        self.erh_electricity_default = IrrigationParameter()
-        self.transportation_loss_default = IrrigationParameter()
-        self.pumping_efficiency_default = IrrigationParameter()
+        self.erh_electricity_default = ApplicationParameter()
+        self.transportation_loss_default = ApplicationParameter()
+        self.pumping_efficiency_default = ApplicationParameter()
 
     def get_defaults(self, calculate=False) -> dict:
         super().get_defaults(calculate)
@@ -4803,14 +4796,14 @@ class IrrigationPhaseCalculator(BaseCalculator):
                 raise ValueError(f"Pressure Requirement for {self.module.irrigation_system_type.name} is missing. Please provide a tier 2 value.")
 
         try:
-            self.pumping_efficiency_default = IrrigationParameter.objects.get(name="PUMPING_EFFICIENCY")
-        except IrrigationParameter.DoesNotExist:
+            self.pumping_efficiency_default = ApplicationParameter.objects.get(name="pumping_efficiency")
+        except ApplicationParameter.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "pumping_efficiency_t2")
             if missing_scenarios:
                 raise ValueError(f"Pumping Efficiency is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
 
-        self.erh_electricity_default: IrrigationParameter = utils.get_or_raise(IrrigationParameter, {"name": "ERH_ELECTRICITY"}, f"Could not find ERH_ELECTRICITY")
-        self.transportation_loss_default: IrrigationParameter = utils.get_or_raise(IrrigationParameter, {"name": "TRANSPORTATION_LOSS"}, f"Could not find TRANSPORTATION_LOSS")
+        self.erh_electricity_default: ApplicationParameter = utils.get_or_raise(ApplicationParameter, {"name__iexact": "erh_electricity"}, f"Could not find erh_electricity")
+        self.transportation_loss_default: ApplicationParameter = utils.get_or_raise(ApplicationParameter, {"name__iexact": "transportation_loss"}, f"Could not find transportation_loss")
 
     def calculate(self) -> list[Result]:
         self.get_defaults()
@@ -4931,7 +4924,7 @@ class CoastalWetlandCalculator(BaseCalculator):
         self.dw = ipcc.CoastalDeadwood()
         self.soil_1m = ipcc.DefaultSoilCarbonStock()
         self.ef_drainage = ipcc.DrainageEmissionFactor()
-        self.pc_c_lost_excavation = CoastalWetlandParameter()
+        self.pc_c_lost_excavation = ApplicationParameter()
         self.rewetting_c = ipcc.RewettingCarbonFactor()
         self.rewetting_ch4 = ipcc.RewettingMethaneFactor()
 
@@ -4999,8 +4992,8 @@ class CoastalWetlandCalculator(BaseCalculator):
                 raise ValueError(f"Drainage Emission Factor for {self.module.land_use_type} is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
 
         try:
-            self.pc_c_lost_excavation = CoastalWetlandParameter.objects.get(name="PERCENTAGE_C_LOST_EXCAVATION")
-        except CoastalWetlandParameter.DoesNotExist:
+            self.pc_c_lost_excavation = ApplicationParameter.objects.get(name="percentage_c_lost_excavation")
+        except ApplicationParameter.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "pc_c_lost_after_excavation_t2")
             if missing_scenarios:
                 raise ValueError(f"Percentage C Lost After Excavation is missing. Please provide a tier 2 value for the following scenarios: {', '.join(missing_scenarios)}")
@@ -6690,6 +6683,9 @@ class ProcessingEntryCalculator(BaseValueChainCalculator):
         if self.module.fuel_type_wo.name in ["Peat", "Charcoal"]:
             self.methane_constant_wo = self.project.gwp.ch4_fossil
 
+        self.energy_calculator_w: ElectricityCalculator | FuelCalculator = None
+        self.energy_calculator_wo: ElectricityCalculator | FuelCalculator = None
+
     def get_defaults(self, calculate=False) -> dict:
         return super().get_defaults(calculate)
 
@@ -6698,15 +6694,15 @@ class ProcessingEntryCalculator(BaseValueChainCalculator):
 
         if self.module.is_with():
             self.module.fuel_type = self.module.fuel_type_w  # Temporarily assign fuel type to comply with the Fuel calculator requirements
-            calc = ElectricityCalculator(self.module) if self.module.fuel_type_w.name.casefold() == "electricity" else FuelCalculator(self.module)
-            calc.calculate()
-            self.math_w = calc.math_w
+            self.energy_calculator_w = ElectricityCalculator(self.module) if self.module.fuel_type_w.name.casefold() == "electricity" else FuelCalculator(self.module)
+            self.energy_calculator_w.calculate()
+            self.math_w = self.energy_calculator_w.math_w
 
         if self.module.is_without():
             self.module.fuel_type = self.module.fuel_type_wo  # Temporarily assign fuel type to comply with the Fuel calculator requirements
-            calc = ElectricityCalculator(self.module) if self.module.fuel_type_wo.name.casefold() == "electricity" else FuelCalculator(self.module)
-            calc.calculate()
-            self.math_wo = calc.math_wo
+            self.energy_calculator_wo = ElectricityCalculator(self.module) if self.module.fuel_type_wo.name.casefold() == "electricity" else FuelCalculator(self.module)
+            self.energy_calculator_wo.calculate()
+            self.math_wo = self.energy_calculator_wo.math_wo
 
         self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
@@ -6751,8 +6747,8 @@ class PackagingEntryCalculator(BaseValueChainCalculator):
         self.packaging_ef_w = ipcc.ValueChainPackagingEmissionFactor()
         self.packaging_ef_wo = ipcc.ValueChainPackagingEmissionFactor()
 
-        self.electricity_ef_default = ipcc.ElectricityEmission()
-        self.electricity_ef_selected: DefaultValue = DefaultValue()
+        self.energy_calculator_w: ElectricityCalculator = ElectricityCalculator(self.module)
+        self.energy_calculator_wo: ElectricityCalculator = ElectricityCalculator(self.module)
 
     def get_defaults(self, calculate=False) -> dict:
         if self.module.is_start():
@@ -6810,9 +6806,8 @@ class PackagingEntryCalculator(BaseValueChainCalculator):
             self.math_w.calculate_emissions()
 
             if self.module.is_electric:
-                calc = ElectricityCalculator(self.module)
-                calc.calculate()
-                self.electricity_math_w = calc.math_w
+                self.energy_calculator_w.calculate()
+                self.electricity_math_w = self.energy_calculator_w.math_w
 
         if self.module.is_without():
             self.inputs_wo = {
@@ -6830,9 +6825,8 @@ class PackagingEntryCalculator(BaseValueChainCalculator):
             self.math_wo.calculate_emissions()
 
             if self.module.is_electric:
-                calc = ElectricityCalculator(self.module)
-                calc.calculate()
-                self.electricity_math_wo = calc.math_wo
+                self.energy_calculator_wo.calculate()
+                self.electricity_math_wo = self.energy_calculator_wo.math_wo
 
         self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
@@ -6880,12 +6874,8 @@ class TransportEntryCalculator(BaseCalculator):
 
         self.module: TransportEntry
 
-        self.energy_ef_start = ipcc.EnergyDefaultEmissionFactor()
-        self.energy_ef_w = ipcc.EnergyDefaultEmissionFactor()
-        self.energy_ef_wo = ipcc.EnergyDefaultEmissionFactor()
-
-        self.electricity_ef_default = ipcc.ElectricityEmission()
-        self.electricity_ef_selected: DefaultValue = DefaultValue()
+        self.energy_calculator_w: ElectricityCalculator | FuelCalculator = None
+        self.energy_calculator_wo: ElectricityCalculator | FuelCalculator = None
 
     def get_defaults(self, calculate=False) -> dict:
         super().get_defaults(calculate)
@@ -6895,15 +6885,15 @@ class TransportEntryCalculator(BaseCalculator):
 
         if self.module.is_with():
             self.module.fuel_type = self.module.fuel_type_w  # Temporarily assign fuel type to comply with the Fuel calculator requirements
-            calc = ElectricityCalculator(self.module) if self.module.fuel_type_w.name.casefold() == "electricity" else FuelCalculator(self.module)
-            calc.calculate()
-            self.math_w = calc.math_w
+            self.energy_calculator_w = ElectricityCalculator(self.module) if self.module.fuel_type_w.name.casefold() == "electricity" else FuelCalculator(self.module)
+            self.energy_calculator_w.calculate()
+            self.math_w = self.energy_calculator_w.math_w
 
         if self.module.is_without():
             self.module.fuel_type = self.module.fuel_type_wo  # Temporarily assign fuel type to comply with the Fuel calculator requirements
-            calc = ElectricityCalculator(self.module) if self.module.fuel_type_wo.name.casefold() == "electricity" else FuelCalculator(self.module)
-            calc.calculate()
-            self.math_wo = calc.math_wo
+            self.energy_calculator_wo = ElectricityCalculator(self.module) if self.module.fuel_type_wo.name.casefold() == "electricity" else FuelCalculator(self.module)
+            self.energy_calculator_wo.calculate()
+            self.math_wo = self.energy_calculator_wo.math_wo
 
         self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)

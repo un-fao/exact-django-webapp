@@ -27,6 +27,7 @@ schema_view = get_schema_view(
 router = routers.DefaultRouter()
 
 router.register(r"projects", views.ProjectViewSet, basename="project")
+router.register(r"project-attachments", views.ProjectFileAttachmentViewSet, basename="projectattachments")
 
 project_router = nested_routers.NestedSimpleRouter(router, r"projects", lookup="project")
 project_router.register(r"tags", views.ProjectTagViewSet, basename="projecttags")
