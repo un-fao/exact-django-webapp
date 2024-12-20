@@ -669,11 +669,17 @@ class RoadFactory(DjangoModelFactory):
     width_m_w = factory.fuzzy.FuzzyFloat(0, 100)
     width_m_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
-
 class PackagingFactory(DjangoModelFactory):
-
+    
     class Meta:
         model = Packaging
+
+    status = READY
+
+class PackagingEntryFactory(DjangoModelFactory):
+
+    class Meta:
+        model = PackagingEntry
 
     status = READY
 
@@ -687,21 +693,27 @@ class PackagingFactory(DjangoModelFactory):
 
     is_electric = factory.fuzzy.FuzzyChoice([True, False])
 
-    kwh_energy_per_year_start = factory.fuzzy.FuzzyFloat(0, 100)
-    kwh_energy_per_year_w = factory.fuzzy.FuzzyFloat(0, 100)
-    kwh_energy_per_year_wo = factory.fuzzy.FuzzyFloat(0, 100)
-
+    quantity_consumed_per_year_start = factory.fuzzy.FuzzyFloat(0, 100)
+    quantity_consumed_per_year_w = factory.fuzzy.FuzzyFloat(0, 100)
+    quantity_consumed_per_year_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
 class StorageFactory(DjangoModelFactory):
-
+    
     class Meta:
         model = Storage
 
     status = READY
 
-    kwh_energy_per_year_start = factory.fuzzy.FuzzyFloat(0, 100)
-    kwh_energy_per_year_w = factory.fuzzy.FuzzyFloat(0, 100)
-    kwh_energy_per_year_wo = factory.fuzzy.FuzzyFloat(0, 100)
+class StorageEntryFactory(DjangoModelFactory):
+
+    class Meta:
+        model = StorageEntry
+
+    status = READY
+
+    quantity_consumed_per_year_start = factory.fuzzy.FuzzyFloat(0, 100)
+    quantity_consumed_per_year_w = factory.fuzzy.FuzzyFloat(0, 100)
+    quantity_consumed_per_year_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
     is_refrigerant_used = factory.fuzzy.FuzzyChoice([True, False])
 
@@ -720,10 +732,16 @@ class StorageFactory(DjangoModelFactory):
 
 fuel_types_stationary = [fuel for fuel in FuelType.objects.filter(fuel_use_type__name__icontains="stationary").all()]
 
-
 class ProcessingFactory(DjangoModelFactory):
+
     class Meta:
         model = Processing
+
+    status = READY
+
+class ProcessingEntryFactory(DjangoModelFactory):
+    class Meta:
+        model = ProcessingEntry
 
     status = READY
 
@@ -731,9 +749,9 @@ class ProcessingFactory(DjangoModelFactory):
     fuel_type_w = factory.fuzzy.FuzzyChoice(fuel_types)
     fuel_type_wo = factory.fuzzy.FuzzyChoice(fuel_types)
 
-    kwh_energy_per_year_start = factory.fuzzy.FuzzyFloat(0, 100)
-    kwh_energy_per_year_w = factory.fuzzy.FuzzyFloat(0, 100)
-    kwh_energy_per_year_wo = factory.fuzzy.FuzzyFloat(0, 100)
+    quantity_consumed_per_year_start = factory.fuzzy.FuzzyFloat(0, 100)
+    quantity_consumed_per_year_w = factory.fuzzy.FuzzyFloat(0, 100)
+    quantity_consumed_per_year_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
     is_water_used = factory.fuzzy.FuzzyChoice([True, False])
 
@@ -741,11 +759,17 @@ class ProcessingFactory(DjangoModelFactory):
     water_use_per_year_w = factory.fuzzy.FuzzyFloat(0, 100)
     water_use_per_year_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
-
 class TransportFactory(DjangoModelFactory):
-
+    
     class Meta:
         model = Transport
+
+    status = READY
+
+class TransportEntryFactory(DjangoModelFactory):
+
+    class Meta:
+        model = TransportEntry
 
     status = READY
 
@@ -753,6 +777,6 @@ class TransportFactory(DjangoModelFactory):
     fuel_type_w = factory.fuzzy.FuzzyChoice(fuel_types)
     fuel_type_wo = factory.fuzzy.FuzzyChoice(fuel_types)
 
-    fuel_used_per_year_start = factory.fuzzy.FuzzyFloat(0, 100)
-    fuel_used_per_year_w = factory.fuzzy.FuzzyFloat(0, 100)
-    fuel_used_per_year_wo = factory.fuzzy.FuzzyFloat(0, 100)
+    quantity_consumed_per_year_start = factory.fuzzy.FuzzyFloat(0, 100)
+    quantity_consumed_per_year_w = factory.fuzzy.FuzzyFloat(0, 100)
+    quantity_consumed_per_year_wo = factory.fuzzy.FuzzyFloat(0, 100)

@@ -6747,8 +6747,8 @@ class PackagingEntryCalculator(BaseValueChainCalculator):
         self.packaging_ef_w = ipcc.ValueChainPackagingEmissionFactor()
         self.packaging_ef_wo = ipcc.ValueChainPackagingEmissionFactor()
 
-        self.energy_calculator_w: ElectricityCalculator = None
-        self.energy_calculator_wo: ElectricityCalculator = None
+        self.energy_calculator_w: ElectricityCalculator = ElectricityCalculator(self.module)
+        self.energy_calculator_wo: ElectricityCalculator = ElectricityCalculator(self.module)
 
     def get_defaults(self, calculate=False) -> dict:
         if self.module.is_start():
@@ -6806,7 +6806,6 @@ class PackagingEntryCalculator(BaseValueChainCalculator):
             self.math_w.calculate_emissions()
 
             if self.module.is_electric:
-                self.energy_calculator_w = ElectricityCalculator(self.module)
                 self.energy_calculator_w.calculate()
                 self.electricity_math_w = self.energy_calculator_w.math_w
 
@@ -6826,7 +6825,6 @@ class PackagingEntryCalculator(BaseValueChainCalculator):
             self.math_wo.calculate_emissions()
 
             if self.module.is_electric:
-                self.energy_calculator_wo = ElectricityCalculator(self.module)
                 self.energy_calculator_wo.calculate()
                 self.electricity_math_wo = self.energy_calculator_wo.math_wo
 
