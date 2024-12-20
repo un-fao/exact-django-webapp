@@ -5993,8 +5993,8 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "capitalization_time": self.activity.capitalization_years,
                 "implementation_time": self.activity.implementation_years,
                 "rate_type": self.module.activity.change_rate.name,
-                "hectares_start": 0,
-                "hectares_end": self.area,
+                "hectares_start": self.area,
+                "hectares_end": 0,
                 "rotation_recurrence": self.forest.rotation_length_yrs_start,
                 "rotation_start_year": self.forest.rotation_start_year_t2_start,
                 "rotation_percentage_energy": self.forest.rotation_percentage_biomass_for_energy_start,
@@ -6054,6 +6054,8 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "nitrous_constant": self.project.gwp.n2o,
                 "methane_constant": self.project.gwp.ch4,
                 "delay": self.activity.delay,
+                'is_same_forest_type': False,
+                'forest_start': None,
             }
 
             log.debug(f"Forest inputs start: {self.inputs_start}")
@@ -6131,6 +6133,8 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "nitrous_constant": self.project.gwp.n2o,
                 "methane_constant": self.project.gwp.ch4,
                 "delay": self.activity.delay,
+                'is_same_forest_type': self.forest.forest_type == self.forest.forest_type, # TODO: Becomes forest_type_start == forest_type_w
+                'forest_start': self.math_start, # TODO: Becomes math_start_w
             }
 
             log.debug(f"Forest inputs with: {self.inputs_w}")
@@ -6205,6 +6209,8 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "nitrous_constant": self.project.gwp.n2o,
                 "methane_constant": self.project.gwp.ch4,
                 "delay": self.activity.delay,
+                'is_same_forest_type': self.forest.forest_type == self.forest.forest_type, # TODO: Becomes forest_type_start == forest_type_wo
+                'forest_start': self.math_start, # TODO: Becomes math_start_w
             }
 
             log.debug(f"Forest inputs without: {self.inputs_wo}")
@@ -6216,6 +6222,7 @@ class ForestManagementCalculator(LandModuleCalculator):
         self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
 
         if PLOT_GRAPHS:
+            self.results_start.plot_emissions_and_aggregate_by_activity("forest_start")
             self.results_w.plot_emissions_and_aggregate_by_activity("forest_w")
             self.results_wo.plot_emissions_and_aggregate_by_activity("forest_wo")
 
