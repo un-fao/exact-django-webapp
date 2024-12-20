@@ -16,6 +16,7 @@ class EnergyTest(t.ModuleWithSubmodulesTest):
         self.module_type = ModuleType.objects.get(class_name="Energy")
         self.submodule_types = [
             ModuleType.objects.get(class_name="Fuel"),
+            ModuleType.objects.get(class_name="Electricity"),
         ]
         self.create_module()
         self.create_submodules()

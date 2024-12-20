@@ -93,6 +93,48 @@ def activate_test_user_for_peter_on_firebase():
     user = auth.sign_in_with_email_and_password("testuser@test.com", "testuser")
     firebase_admin.auth.update_user(user["localId"], email_verified=True)
 
+def migrate_all_parameters():
+    from camel_converter import to_snake
+    params = [
+        models.LivestockParameter,
+        models.IrrigationParameter,
+        models.SmallFisheryParameter,
+        models.LargeFisheryParameter,
+        models.AquacultureParameter,
+        models.GrasslandParameter,
+        models.AnnualCroplandParameter,
+        models.CoastalWetlandParameter,
+    ]
+
+    for param in params:
+        print(f"Migrating {param}")
+        objs: list[models.Parameter] = param.objects.all()
+        for obj in objs:
+            print(f"Creating {obj.name} {obj.value}")
+            models.ApplicationParameter.objects.create(
+                name=obj.name.casefold() if param not in [models.SmallFisheryParameter, models.LargeFisheryParameter] else f"{to_snake(param.__name__.replace('Parameter', ''))}_{to_snake(obj.name)}",
+                value=obj.value,
+                unit=obj.unit,
+            )
+
+def add_c_fraction_ref_parameter():
+    """
+    Add c_fraction_ref parameter to all LandUseTypes
+    """
+    models.ApplicationParameter.objects.create(name="c_fraction_ref", value=1)
+
+def add_project_uploads_max_file_size_parameter():
+    """
+    Add project_uploads_max_file_size parameter
+    """
+    models.ApplicationParameter.objects.create(name="project_uploads_max_file_size_mb", value=50)
+
+def print_all_fuel_types():
+    """
+    Print all fuel types
+    """
+    for fuel_type in models.FuelType.objects.all():
+        print(fuel_type.name)
 
 # TODO: Run in prod
 
@@ -101,6 +143,13 @@ def activate_test_user_for_peter_on_firebase():
 # change_forest_agb_tropical_mountain_system_to_tropical_montane()
 # change_forest_bgb_tropical_mountain_system_to_tropical_montane()
 # change_forest_agb_growth_tropical_mountain_system_to_tropical_montane()
+
+# models.ApplicationParameter.objects.all().delete()
+# migrate_all_parameters()
+# add_c_fraction_ref_parameter()
+# add_project_uploads_max_file_size_parameter()
+
 # cycle_all_modules_and_invalidate_cached_results()
 # create_test_user_for_peter()
 # activate_test_user_for_peter_on_firebase()
+
