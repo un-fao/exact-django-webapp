@@ -408,7 +408,7 @@ def breakdown_agb_bgb_emissions(rotation_times_hectares_agb, rotation_times_hect
 
     return harvested_wood_product_agb, harvested_wood_product_bgb, nitrous_fire_component_agb, methane_fire_component_agb, nitrous_fire_component_bgb, methane_fire_component_bgb, co2_fire_component_agb, co2_fire_component_bgb
 
-def create_agb_bgb_matrix(years_impl, years_cap, delta_agb_yearly_below_20, delta_agb_yearly_after_20, agb_start, rotation_recurrence, affo_boolean, is_same_forest_type = None, forest_start = None):
+def create_agb_bgb_matrix(years_impl, years_cap, delta_agb_yearly_below_20, delta_agb_yearly_after_20, agb_start, rotation_recurrence, affo_boolean, is_same_forest_type = None, forest_start = None, is_agb = True):
     
     try:
 
@@ -464,7 +464,7 @@ def create_agb_bgb_matrix(years_impl, years_cap, delta_agb_yearly_below_20, delt
                     agb_matrix[i, j] =  start_agb_matrix[i, i] + delta_agb_matrix[i][j] + np.sum(delta_agb_matrix[i, i:j])
             
             return agb_matrix, delta_agb_matrix
-        # NOTE: This means we are in the case of deforestation. In this case the hectares start growing from year 0 
+        # NOTE: This means we are in the start scenario. In this case the hectares start growing from year 0 
         else:
             years_total = years_impl + years_cap
             delta_agb_matrix = np.full((years_impl, years_total), 0.0)
