@@ -90,11 +90,11 @@ def compute_half_year_cumulative_n_year_maturity(start_value, end_value, years_i
     return average_before_20, average_after_20
 
 
-def breakdown_proportionally_to_values(maximum, list_of_proportions):
+def breakdown_proportionally_to_values(total, list_of_proportions):
     if sum(list_of_proportions) == 0:
         return [0 for i in list_of_proportions]
     else:
-        result = [maximum * i / sum(list_of_proportions) for i in list_of_proportions]
+        result = [total * i / sum(list_of_proportions) for i in list_of_proportions]
         return result
 
 
