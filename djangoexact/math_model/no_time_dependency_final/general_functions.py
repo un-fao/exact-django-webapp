@@ -40,9 +40,7 @@ def compute_yearly_or_half_year_cumulative(start_value, end_value, years_impleme
         if interim_values:
             return average_yearly_value(yearly_breakdown)
         else:
-            yearly_breakdown
-
-        return yearly_breakdown
+            return yearly_breakdown
 
     elif function == "linear":
         # calculate the parameters for the function a + bx
