@@ -191,13 +191,10 @@ class ForestManagement(BaseModule):
             else:
                 # NOTE: This means we have the same forest type, hence we don't have to create a new agb and bgb matrix, but we can use the one from the previous forest module
                 agb_matrix, delta_agb_matrix = create_agb_bgb_matrix(self.implementation_time, self.capitalization_time, self.agb_yearly_growth_over_20, self.agb_yearly_growth_over_20, self.agb_start, self.rotation_recurrence, affo_bool, self.is_same_forest_type, self.forest_start )
-                bgb_matrix, delta_bgb_matrix = create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, self.bgb_ratio_under_threshold, self.bgb_ratio_over_threshold, self.bgb_ratio_threshold, self.bgb_start, self.implementation_time, affo_bool, self.is_same_forest_type, self.forest_start)
-                
-                plot_matrix_with_values(self.forest_start.agb_matrix, title="agb matrix from previous module")
-                plot_matrix_with_values(self.forest_start.bgb_matrix, title="BGB Matrix from previous module")
-                
-                plot_matrix_with_values(agb_matrix, title="agb matrix developed from previous module")
-                plot_matrix_with_values(bgb_matrix, title="BGB Matrix developed from previous module")
+                if self.bgb_yearly_growth_over_20_tier_2 and self.bgb_yearly_growth_under_20_tier_2:
+                    bgb_matrix, delta_bgb_matrix = create_agb_bgb_matrix(self.implementation_time, self.capitalization_time, self.bgb_yearly_growth_over_20_tier_2, self.bgb_yearly_growth_over_20_tier_2, self.bgb_start, self.rotation_recurrence, affo_bool, self.is_same_forest_type, self.forest_start, is_agb = False)
+                else:
+                    bgb_matrix, delta_bgb_matrix = create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, self.bgb_ratio_under_threshold, self.bgb_ratio_over_threshold, self.bgb_ratio_threshold, self.bgb_start, self.implementation_time, affo_bool, self.is_same_forest_type, self.forest_start)
 
         self.agb_matrix = agb_matrix
         self.bgb_matrix = bgb_matrix
@@ -221,12 +218,6 @@ class ForestManagement(BaseModule):
                 if self.affo_bool:
                     result_rotation_agb, rotation_matrix_agb, delta_agb_matrix, agb_matrix = calculate_rotation_effect(self.agb_matrix, self.delta_agb_matrix, self.max_agb_value, self.rotation_recurrence, self.rotation_start_year)
                     result_rotation_bgb, rotation_matrix_bgb, delta_bgb_matrix, bgb_matrix = calculate_rotation_effect(self.bgb_matrix, self.delta_bgb_matrix, self.max_bgb_value, self.rotation_recurrence, self.rotation_start_year)
-                    
-                    plot_matrix_with_values(self.agb_matrix, title="AGB Matrix in rotation")
-                    plot_matrix_with_values(self.bgb_matrix, title="BGB Matrix in rotation")
-                    
-                    plot_matrix_with_values(rotation_matrix_agb, title="Rotation Matrix AGB")
-                    plot_matrix_with_values(rotation_matrix_bgb, title="Rotation Matrix BGB")
                     
                     rotation_times_hectares_agb = multiply_matrix_by_matrix(rotation_matrix_agb, self.hectares_for_rot_log_dis)
                     rotation_times_hectares_bgb = multiply_matrix_by_matrix(rotation_matrix_bgb, self.hectares_for_rot_log_dis)
@@ -335,9 +326,7 @@ class ForestManagement(BaseModule):
 
                 check_agb_matrices(self.agb_matrix, self.delta_agb_matrix, self.max_agb_value)
                 check_agb_matrices(self.bgb_matrix, self.delta_bgb_matrix, self.max_bgb_value)
-                
-                plot_matrix_with_values(self.agb_matrix, title="AGB Matrix after")
-                
+                                
                 agb_times_hectares = multiply_matrix_by_matrix(self.delta_agb_matrix, self.hectares_matrix)
                 yearly_agb_emissions = [x * -44 / 12 for x in agb_times_hectares]
 
