@@ -53,9 +53,9 @@ class PerennialCropland(LandModule):
     ):
         def calculate_residue():
             try:
-                fire_periodicity = self.fire_periodicity_default if not self.fire_periodicity_tier_2 else self.fire_periodicity_tier_2
-                ag_tc = self.agb_rate_default if not self.agb_rate_tier_2 else self.agb_rate_tier_2
-                t_biomass = ag_tc * 0.5 / 0.47 if not self.t_biomass_tier_2 else self.t_biomass_tier_2  # Default
+                fire_periodicity = self.fire_periodicity_default if self.fire_periodicity_tier_2 is None else self.fire_periodicity_tier_2
+                ag_tc = self.agb_rate_default if self.agb_rate_tier_2 is None else self.agb_rate_tier_2
+                t_biomass = ag_tc * 0.5 / 0.47 if self.t_biomass_tier_2 is None else self.t_biomass_tier_2  # Default
                 self.residue_availability_tier_2_default = t_biomass
 
                 ################## COMPUTATION OF AMOUNT OF KG OF METHANE ###################
@@ -122,8 +122,8 @@ class PerennialCropland(LandModule):
 
                     else:
                         # NOTE: In this case we are in the situation where biomass_final has to be calculated and is not tabulated
-                        agb_rate = self.agb_rate_default * 44 / 12 if not self.agb_rate_tier_2 else self.agb_rate_tier_2 * 44 / 12
-                        bgb_rate = self.bgb_rate_default * 44 / 12 if not self.bgb_rate_tier_2 else self.bgb_rate_tier_2 * 44 / 12
+                        agb_rate = self.agb_rate_default * 44 / 12 if self.agb_rate_tier_2 is None else self.agb_rate_tier_2 * 44 / 12
+                        bgb_rate = self.bgb_rate_default * 44 / 12 if self.bgb_rate_tier_2 is None else self.bgb_rate_tier_2 * 44 / 12
 
                         if self.agb_rate_tier_2:    
                             max_agb = 0 if self.agb_rate_default < self.agb_rate_tier_2 else self.agb_maximum_c * 44 / 12

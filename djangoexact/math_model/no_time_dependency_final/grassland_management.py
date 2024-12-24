@@ -50,8 +50,8 @@ class GrasslandManagement(LandModule):
                     if self.fire_interval <= 0:
                         raise ValueError("Fire interval must be greater than 0 if fire is used")
                     
-                    agb = self.agb_ref if not self.agb_tier_2 else self.agb_tier_2
-                    cf = self.cf_ref if not self.cf_tier_2 else self.cf_tier_2
+                    agb = self.agb_ref if self.agb_tier_2 is None else self.agb_tier_2
+                    cf = self.cf_ref if self.cf_tier_2 is None else self.cf_tier_2
 
                     annual_nitrous = ((agb * self.fire_impact * cf * self.nitrous_ef * self.nitrous_constant / 1000) / self.fire_interval) 
                     annual_methane = ((agb * self.fire_impact * cf * self.methane_ef * self.methane_constant / 1000) / self.fire_interval)
