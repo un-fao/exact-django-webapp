@@ -124,7 +124,7 @@ class OtherLandUseChanges(BaseModule):
         def calculate_fire():
 
 
-            initial_biomass_without_removal = self.initial_lu_biomass if not self.initial_lu_biomass_tier_2 else self.initial_lu_biomass_tier_2
+            initial_biomass_without_removal = self.initial_lu_biomass if self.initial_lu_biomass_tier_2 is None else self.initial_lu_biomass_tier_2
 
             conversion_factor_dry_matter = 0.47
 
