@@ -578,6 +578,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             _, file_bytes_buffer = report.build_report()
             report.close_file()
         except Exception as e:
+            logger.error(f"Error generating report: {e}")
             return utils.ErrorResponse(str(e), status=http_status.HTTP_422_UNPROCESSABLE_ENTITY)
 
         try:
