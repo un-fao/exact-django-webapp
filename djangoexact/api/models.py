@@ -752,7 +752,7 @@ class Note(Historical):
         return self.content_object
 
     @property
-    def project(self):
+    def project(self) -> Project:
         match self.content_object.__class__.__name__:
             case "Project":
                 return self.content_object
