@@ -495,7 +495,18 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     )
 
     @action(detail=True, methods=["get"])
-    @swagger_auto_schema(manual_parameters=[activities], responses={404: "Project not found", 403: "Selected user does not have permission to view project results", 200: ProjectResultSerializer})
+    @swagger_auto_schema(
+        manual_parameters=[
+            activities,
+            openapi.Parameter(
+                "cached",
+                openapi.IN_QUERY,
+                description="Return cached results",
+                type=openapi.TYPE_BOOLEAN,
+            ),
+        ], 
+        responses={404: "Project not found", 403: "Selected user does not have permission to view project results", 200: ProjectResultSerializer},
+    )
     def results(self, request, pk=None):
         """
         Calculates and returns total emissions for each module in the project.
@@ -1163,6 +1174,17 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(data=SerializerClass(activities_list, many=True).data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "cached",
+                openapi.IN_QUERY,
+                description="Return cached results",
+                type=openapi.TYPE_BOOLEAN,
+            )
+        ],
+        responses={400: "Bad request", 403: "Selected user does not have permission to view activity results", 200: ActivityResultSerializer},
+    )
     def results(self, request, pk=None):
         """
         Calculates and returns total emissions for each module in the activity.
@@ -1626,6 +1648,13 @@ def generic_module_viewset(model: Module):
             return Response(data)
 
         @action(detail=True, methods=["get"], url_path="results")
+        @swagger_auto_schema(
+            manual_parameters=[
+                openapi.Parameter("aggregate", openapi.IN_QUERY, description="Aggregate results by", type=openapi.TYPE_STRING, enum=[BreakdownTypes.TOTAL, BreakdownTypes.ACTIVITY, BreakdownTypes.GAS, BreakdownTypes.ACTIVITY_GAS]),
+                openapi.Parameter("cached", openapi.IN_QUERY, description="Use cached results", type=openapi.TYPE_BOOLEAN),
+            ],
+            responses={400: "Bad request", 403: "Selected user does not have permission to view module results", 200: DynamicResultSerializer},
+        )
         def results(self, request, pk=None):
             """
             Calculates and returns total emissions for a single module.
@@ -1654,8 +1683,9 @@ def generic_module_viewset(model: Module):
 
                 aggregate_by = BreakdownTypes(request.query_params.get("aggregate", BreakdownTypes.TOTAL))
                 module_results = module.get_cached_results(by=aggregate_by)
+                use_cached_results = request.query_params.get("cached", "true") == "true"
 
-                if module_results is None:
+                if module_results is None or not use_cached_results:
                     logger.debug(f"Cache is invalid. Calculating results for module {module.id}")
                     total, by_activity, by_gas, by_activity_gas = CalculatorFactory().calculate_result(module)
 
