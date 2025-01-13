@@ -580,6 +580,8 @@ class Project(Historical, DirtyFieldsMixin):
     created_at = models.DateTimeField(auto_now_add=True, null=True, verbose_name=_("created_at"))
     updated_at = models.DateTimeField(auto_now=True, null=True, verbose_name=_("updated_at"))
 
+    is_archived = models.BooleanField(default=False, verbose_name=_("is_archived"))
+
     @property
     def capitalization_years(self) -> int:
         return self.__get_capitalization_years()
