@@ -87,9 +87,9 @@ class OtherLandUseChanges(BaseModule):
         
         def calculate_biomass():
             try:
-                initial_biomass_without_removal = self.initial_lu_biomass if not self.initial_lu_biomass_tier_2 else self.initial_lu_biomass_tier_2
-                initial_biomass_without_removal = self.initial_lu_biomass if not self.initial_lu_biomass_tier_2 else self.initial_lu_biomass_tier_2
-                final_biomass = self.final_lu_biomass if not self.final_lu_biomass_tier_2 else self.final_lu_biomass_tier_2
+                initial_biomass_without_removal = self.initial_lu_biomass if self.initial_lu_biomass_tier_2 is None else self.initial_lu_biomass_tier_2
+                initial_biomass_without_removal = self.initial_lu_biomass if self.initial_lu_biomass_tier_2 is None else self.initial_lu_biomass_tier_2
+                final_biomass = self.final_lu_biomass if self.final_lu_biomass_tier_2 is None else self.final_lu_biomass_tier_2
 
                 # NOTE: here we can see the impact of end_module_has_growth, if it is true, the final_biomass is set to 0, it is Perennial or Forest
                 if self.end_module_has_growth:
@@ -124,7 +124,7 @@ class OtherLandUseChanges(BaseModule):
         def calculate_fire():
 
 
-            initial_biomass_without_removal = self.initial_lu_biomass if not self.initial_lu_biomass_tier_2 else self.initial_lu_biomass_tier_2
+            initial_biomass_without_removal = self.initial_lu_biomass if self.initial_lu_biomass_tier_2 is None else self.initial_lu_biomass_tier_2
 
             conversion_factor_dry_matter = 0.47
 

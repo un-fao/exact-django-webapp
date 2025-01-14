@@ -32,14 +32,14 @@ class CoastalWaterbodies(BaseModule):
 
         try:
 
-            trophic_state_start = self.trophic_state_default if not self.chlo_A_start else 0.26 * self.chlo_A_start
-            trophic_state_start = self.trophic_state_default if not self.trophic_state_tier_2_start else self.trophic_state_tier_2_start
+            trophic_state_start = self.trophic_state_default if self.chlo_A_start is None else 0.26 * self.chlo_A_start
+            trophic_state_start = self.trophic_state_default if self.trophic_state_tier_2_start is None else self.trophic_state_tier_2_start
 
-            trophic_state_end = self.trophic_state_default if not self.chlo_A_end else 0.26 * self.chlo_A_end
-            trophic_state_end = self.trophic_state_default if not self.trophic_state_tier_2_end else self.trophic_state_tier_2_end
+            trophic_state_end = self.trophic_state_default if self.chlo_A_end is None else 0.26 * self.chlo_A_end
+            trophic_state_end = self.trophic_state_default if self.trophic_state_tier_2_end is None else self.trophic_state_tier_2_end
 
-            methane_emission_factor_end = self.methane_emission_factor_default if not self.methane_emission_factor_end_tier_2 else self.methane_emission_factor_end_tier_2
-            methane_emission_factor_start = self.methane_emission_factor_default if not self.methane_emission_factor_start_tier_2 else self.methane_emission_factor_start_tier_2
+            methane_emission_factor_end = self.methane_emission_factor_default if self.methane_emission_factor_end_tier_2 is None else self.methane_emission_factor_end_tier_2
+            methane_emission_factor_start = self.methane_emission_factor_default if self.methane_emission_factor_start_tier_2 is None else self.methane_emission_factor_start_tier_2
 
             yearly_emissions_start = self.area_start * trophic_state_start * methane_emission_factor_start / 1000 * self.methane_constant
             yearly_emissions_end = self.area_end * trophic_state_end * methane_emission_factor_end / 1000 * self.methane_constant
