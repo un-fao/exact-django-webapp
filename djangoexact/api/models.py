@@ -1967,17 +1967,6 @@ class ForestDisturbance(Submodule):
 
         return deleted
 
-    def save(self, *args, **kwargs):
-        saved = super().save(*args, **kwargs)
-
-        from api.serializers import ForestManagementWriteSerializer
-
-        parent_serializer = ForestManagementWriteSerializer(self.parent, data={}, partial=True)
-        parent_serializer.is_valid()
-        parent_serializer.save()
-
-        return saved
-
 
 class Waterbody(Module):
     waterbody_type = models.ForeignKey(WaterbodyType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("waterbody_type"))
