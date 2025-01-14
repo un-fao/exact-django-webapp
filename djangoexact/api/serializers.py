@@ -2595,6 +2595,11 @@ class InputEntrySerializer(ScenarioSubmoduleSerializer):
 
         if parent.input_entries.count() + 1 > max_entries:
             raise serializers.ValidationError(f"Only {max_entries} input entries are allowed")
+        
+        # Validate parent
+        parent_serializer = InputSerializer(data={}, instance=parent, partial=True, context=self.context)
+        parent_serializer.is_valid()
+        parent_serializer.save()
 
         return data
 
