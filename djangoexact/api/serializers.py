@@ -1243,6 +1243,14 @@ class LandModuleSeralizer(ScenarioModuleSerializer):
             for field, value in data.items():
                 setattr(self.instance, field, value)
 
+            # Validate the parent Land Use Change on related LandModule change
+            parent_luc = getattr(self.instance, "land_use_change", None)
+
+            if parent_luc:
+                luc_serializer = get_module_serializer(LandUseChange)(data={}, instance=parent_luc, many=False, partial=True, context=self.context)
+                luc_serializer.is_valid()
+                luc_serializer.save()
+
         if luc:
             # If the module is associated with a Land Use Change, update the status of the Land Use Change
             luc_serializer: LandUseChangeWriteSerializer = get_module_serializer(LandUseChange)(data={}, instance=luc, many=False, partial=True, context=self.context)
