@@ -1858,17 +1858,22 @@ class IrrigationReadSerializer(BaseGenericModuleSerializer):
         mandatory_fields = {}
 
     def validate(self, data):
+        super().validate(data)
 
-        irrigation_systems = self.instance.irrigation_systems.all()
-        irrigation_phases = self.instance.irrigation_phases.all()
+        irrigation_systems: list[IrrigationSystem] = self.instance.irrigation_systems.all()
+        irrigation_phases: list[IrrigationPhase] = self.instance.irrigation_phases.all()
 
-        if any([system.status.name_en == "EMPTY" for system in irrigation_systems]):
-            raise serializers.ValidationError("Irrigation systems are not ready for calculations")
+        for irrigation_system in irrigation_systems:
+            if not irrigation_system.is_ready():
+                self.instance.status = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
+                break
 
-        if any([phase.status.name_en == "EMPTY" for phase in irrigation_phases]):
-            raise serializers.ValidationError("Irrigation phases are not ready for calculations")
+        for irrigation_phase in irrigation_phases:
+            if not irrigation_phase.is_ready():
+                self.instance.status = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
+                break
 
-        return super().validate(data)
+        return data
 
 
 # IrrigationSystem
@@ -1907,6 +1912,11 @@ class IrrigationSystemWriteSerializer(ScenarioSubmoduleSerializer):
 
         if self.instance and self.instance.parent.irrigation_systems.all().count() + 1 > max_entries:
             raise serializers.ValidationError(f"Only {max_entries} irrigation systems are allowed")
+        
+        parent = utils.getany([self.instance, dict(data)], "parent")
+        parent_serializer = IrrigationWriteSerializer(data={}, instance=parent, partial=True, context=self.context)
+        parent_serializer.is_valid()
+        parent_serializer.save()
 
         return data
 
@@ -1962,6 +1972,11 @@ class IrrigationPhaseWriteSerializer(ScenarioSubmoduleSerializer):
 
         if self.instance and self.instance.parent.irrigation_phases.all().count() + 1 > max_entries:
             raise serializers.ValidationError(f"Only {max_entries} irrigation phases are allowed")
+        
+        parent = utils.getany([self.instance, dict(data)], "parent")
+        parent_serializer = IrrigationWriteSerializer(data={}, instance=parent, partial=True, context=self.context)
+        parent_serializer.is_valid()
+        parent_serializer.save()
 
         return data
 
