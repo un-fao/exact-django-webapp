@@ -143,7 +143,6 @@ def print_all_fuel_types():
 # change_forest_agb_tropical_mountain_system_to_tropical_montane()
 # change_forest_bgb_tropical_mountain_system_to_tropical_montane()
 # change_forest_agb_growth_tropical_mountain_system_to_tropical_montane()
-
 # models.ApplicationParameter.objects.all().delete()
 # migrate_all_parameters()
 # add_c_fraction_ref_parameter()
