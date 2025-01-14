@@ -1787,9 +1787,9 @@ class PerennialCropCalculator(LandModuleCalculator):
         if self.module.is_ready() and calculate:
             self.calculate()
 
-            self.residue_availability_t2_start = SimpleNamespace(value=getattr(self.math_start_w, "biomass_availability_tier_2_default", 0) or getattr(self.math_start_wo, "biomass_availability_tier_2_default", 0))
-            self.residue_availability_t2_w = SimpleNamespace(value=getattr(self.math_w, "biomass_availability_tier_2_default", 0) or getattr(self.math_wo, "biomass_availability_tier_2_default", 0))
-            self.residue_availability_t2_wo = SimpleNamespace(value=getattr(self.math_w, "biomass_availability_tier_2_default", 0) or getattr(self.math_wo, "biomass_availability_tier_2_default", 0))
+            self.residue_availability_t2_start = SimpleNamespace(value=getattr(self.math_start_w, "residue_availability_tier_2_default", 0) or getattr(self.math_start_wo, "biomass_availability_tier_2_default", 0))
+            self.residue_availability_t2_w = SimpleNamespace(value=getattr(self.math_w, "residue_availability_tier_2_default", 0) or getattr(self.math_wo, "biomass_availability_tier_2_default", 0))
+            self.residue_availability_t2_wo = SimpleNamespace(value=getattr(self.math_w, "residue_availability_tier_2_default", 0) or getattr(self.math_wo, "biomass_availability_tier_2_default", 0))
 
         self.burning_emission_factor = utils.get_or_raise(ipcc.BurningEmissionFactor, savanna_flt, "BurningEmissionFactor for Savanna and grassland does not exist")
         self.default_fire_periodicity = ApplicationParameter.objects.get(name="default_fire_periodicity")
