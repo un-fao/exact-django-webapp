@@ -450,13 +450,13 @@ class WriteProjectSerializer(serializers.ModelSerializer):
             if project.is_locked and project.lock_updated_at and has_more_than_thirty_minutes_passed:
                 project.unlock()
 
-            if project.is_locked and project.locked_by != user:
+            if project.is_locked and project.locked_by != user and not user.is_staff:
                 log.warning(f"Project is already locked by: {project.locked_by.email}")
                 raise serializers.ValidationError("The project is already locked")
 
             # If the project is not locked, or a lock is requested
             if not project.is_locked or is_locking is True:
-                if project.is_locked and project.locked_by != user:
+                if project.is_locked and project.locked_by != user and not user.is_staff:
                     log.warning(f"Project is already locked by: {project.locked_by.email}")
                     raise serializers.ValidationError("The project is already locked")
 
@@ -538,7 +538,7 @@ class WriteActivitySerializer(serializers.ModelSerializer):
 
         project = self.instance.project if self.instance else data.get("project")
 
-        if project.is_locked and not project.locked_by == self.context["request"].user:
+        if project.is_locked and not project.locked_by == self.context["request"].user and not self.context["request"].user.is_staff:
             raise serializers.ValidationError("Project is locked by another user")
 
         if self.instance:
@@ -1069,7 +1069,7 @@ class BaseModuleSerializer(BaseGenericModuleSerializer):
 
         module_types = list(map(lambda module: module.class_name, activity.module_types.all()))
 
-        if project.is_locked and not project.locked_by == self.context["request"].user:
+        if project.is_locked and not project.locked_by == self.context["request"].user and not self.context["request"].user.is_staff:
             log.error("Project is locked by another user")
             raise serializers.ValidationError("Project is locked by another user")
 
