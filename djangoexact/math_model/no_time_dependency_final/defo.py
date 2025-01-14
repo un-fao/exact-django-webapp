@@ -78,15 +78,15 @@ class Defo(BaseModule):
 
         self.area_deforested = abs(self.ha_end - self.ha_start)
         # TODO: Assigned FMG, FLU, FI values. Maybe once everything has been done change this structure
-        self.fmg_start = self.fmg_start_tier_2 if self.fmg_start_tier_2 else self.fmg_start_default
-        self.fmg_end = self.fmg_end_tier_2 if self.fmg_end_tier_2 else self.fmg_end_default
-        self.flu_start = self.flu_start_tier_2 if self.flu_start_tier_2 else self.flu_start_default
-        self.flu_end = self.flu_end_tier_2 if self.flu_end_tier_2 else self.flu_end_default
-        self.fi_start = self.fi_start_tier_2 if self.fi_start_tier_2 else self.fi_start_default
-        self.fi_end = self.fi_end_tier_2 if self.fi_end_tier_2 else self.fi_end_default
+        self.fmg_start = self.fmg_start_tier_2 if self.fmg_start_tier_2 is not None else self.fmg_start_default
+        self.fmg_end = self.fmg_end_tier_2 if self.fmg_end_tier_2 is not None else self.fmg_end_default
+        self.flu_start = self.flu_start_tier_2 if self.flu_start_tier_2 is not None else self.flu_start_default
+        self.flu_end = self.flu_end_tier_2 if self.flu_end_tier_2 is not None else self.flu_end_default
+        self.fi_start = self.fi_start_tier_2 if self.fi_start_tier_2 is not None else self.fi_start_default
+        self.fi_end = self.fi_end_tier_2 if self.fi_end_tier_2 is not None else self.fi_end_default
 
-        self.soc_start = self.soc_start_default * self.fmg_start * self.flu_start * self.fi_start if not self.soc_start_tier_2 else self.soc_start_tier_2 * self.fmg_start * self.flu_start * self.fi_start
-        self.soc_end = self.soc_end_default * self.fmg_end * self.flu_end * self.fi_end if not self.soc_end_tier_2 else self.soc_end_tier_2 * self.fmg_end * self.flu_end * self.fi_end
+        self.soc_start = self.soc_start_default * self.fmg_start * self.flu_start * self.fi_start if self.soc_start_tier_2 is None else self.soc_start_tier_2 * self.fmg_start * self.flu_start * self.fi_start
+        self.soc_end = self.soc_end_default * self.fmg_end * self.flu_end * self.fi_end if self.soc_end_tier_2 is None else self.soc_end_tier_2 * self.fmg_end * self.flu_end * self.fi_end
 
         # AUXILIARY VARIABLES FOR SOIL CALCULATION
         self.hectares_before_20, self.hectares_after_20 = compute_half_year_cumulative_n_year_maturity(0, self.area_deforested, self.implementation_time, self.capitalization_time, self.rate_type)
@@ -101,8 +101,8 @@ class Defo(BaseModule):
                 # NOTE: try to make the variable names similar to OLUC
                 bgb_t_c_per_ha_default = self.bgb_t_c_per_ha_default_input_parameter * self.agb_t_c_per_ha_default
 
-                agb_t_c = self.agb_t_c_per_ha_default if not self.agb_t_c_per_ha_tier_2 else self.agb_t_c_per_ha_tier_2
-                bgb_t_c = bgb_t_c_per_ha_default if not self.bgb_t_c_per_ha_tier_2 else self.bgb_t_c_per_ha_tier_2
+                agb_t_c = self.agb_t_c_per_ha_default if self.agb_t_c_per_ha_tier_2 is None else self.agb_t_c_per_ha_tier_2
+                bgb_t_c = bgb_t_c_per_ha_default if self.bgb_t_c_per_ha_tier_2 is None else self.bgb_t_c_per_ha_tier_2
 
                 hwp_before_t_c = self.agb_t_c_per_ha_default if self.hwp_before_t_dm_per_ha * self.mangrove_factor > self.agb_t_c_per_ha_default else self.hwp_before_t_dm_per_ha * self.mangrove_factor
 
@@ -131,8 +131,8 @@ class Defo(BaseModule):
 
         def calculate_dom_emissions():
             try:
-                litter = self.litter if not self.litter_tier_2 else self.litter_tier_2
-                dw = self.dw if not self.dw_tier_2 else self.dw_tier_2
+                litter = self.litter if self.litter_tier_2 is None else self.litter_tier_2
+                dw = self.dw if self.dw_tier_2 is None else self.dw_tier_2
 
                 biomass_forest_dom_t_c_per_ha = litter + dw
                 biomass_forest_dom_t_co2_per_ha = biomass_forest_dom_t_c_per_ha * (44 / 12)

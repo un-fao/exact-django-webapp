@@ -139,24 +139,24 @@ class ForestManagement(BaseModule):
         self.hectares_for_rot_log_dis = compute_matrix_for_log_rec_dis(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
         ########### GENERAL VARIABLE ASSIGNMENTS ############
-        self.agb_yearly_growth_over_20 = self.agb_yearly_growth_over_20_default if not self.agb_yearly_growth_over_20_tier_2 else self.agb_yearly_growth_over_20_tier_2
-        self.agb_yearly_growth_under_20 = self.agb_yearly_growth_under_20_default if not self.agb_yearly_growth_under_20_tier_2 else self.agb_yearly_growth_under_20_tier_2
-        self.agb_start = self.agb_start_default if not self.agb_start_tier_2 else self.agb_start_tier_2
+        self.agb_yearly_growth_over_20 = self.agb_yearly_growth_over_20_default if self.agb_yearly_growth_over_20_tier_2 is None else self.agb_yearly_growth_over_20_tier_2
+        self.agb_yearly_growth_under_20 = self.agb_yearly_growth_under_20_default if self.agb_yearly_growth_under_20_tier_2 is None else self.agb_yearly_growth_under_20_tier_2
+        self.agb_start = self.agb_start_default if self.agb_start_tier_2 is None else self.agb_start_tier_2
         self.bgb_start = self.agb_start * self.bgb_ratio_under_threshold if self.agb_start < self.bgb_ratio_threshold else self.agb_start * self.bgb_ratio_over_threshold
         self.max_bgb_value = self.max_agb_value * self.bgb_ratio_under_threshold if self.max_agb_value < self.bgb_ratio_threshold else self.max_agb_value * self.bgb_ratio_over_threshold
-        self.litter_20_years = self.litter_20_years_default if not self.litter_20_years_tier_2 else self.litter_20_years_tier_2
-        self.deadwood_20_years = self.deadwood_20_years_default if not self.deadwood_20_years_tier_2 else self.deadwood_20_years_tier_2
+        self.litter_20_years = self.litter_20_years_default if self.litter_20_years_tier_2 is None else self.litter_20_years_tier_2
+        self.deadwood_20_years = self.deadwood_20_years_default if self.deadwood_20_years_tier_2 is None else self.deadwood_20_years_tier_2
 
         
         ########### GENERALE LAND MODULE ASSIGNMENTS ############
-        fmg_start = self.fmg_start_tier_2 or self.fmg_start_default
-        fmg_end = self.fmg_end_tier_2 or self.fmg_end_default
-        flu_start = self.flu_start_tier_2 or self.flu_start_default
-        flu_end = self.flu_end_tier_2 or self.flu_end_default
-        fi_start = self.fi_start_tier_2 or self.fi_start_default
-        fi_end = self.fi_end_tier_2 or self.fi_end_default
-        soc_ref_start = self.soc_start_tier_2 or self.soc_start_default
-        soc_ref_end = self.soc_end_tier_2 or self.soc_end_default
+        fmg_start = self.fmg_start_tier_2 if self.fmg_start_tier_2 is not None else self.fmg_start_default
+        fmg_end = self.fmg_end_tier_2 if self.fmg_end_tier_2 is not None else self.fmg_end_default
+        flu_start = self.flu_start_tier_2 if self.flu_start_tier_2 is not None else self.flu_start_default
+        flu_end = self.flu_end_tier_2 if self.flu_end_tier_2 is not None else self.flu_end_default
+        fi_start = self.fi_start_tier_2 if self.fi_start_tier_2 is not None else self.fi_start_default
+        fi_end = self.fi_end_tier_2 if self.fi_end_tier_2 is not None else self.fi_end_default
+        soc_ref_start = self.soc_start_tier_2 if self.soc_start_tier_2 is not None else self.soc_start_default
+        soc_ref_end = self.soc_end_tier_2 if self.soc_end_tier_2 is not None else self.soc_end_default
 
         self.soc_start = soc_ref_start * fmg_start * fi_start * flu_start
         self.soc_end = soc_ref_end * fmg_end * fi_end * flu_end
