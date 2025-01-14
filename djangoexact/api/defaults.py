@@ -305,6 +305,8 @@ class FloodedRiceDefaults(Defaults):
         defaults = calcs.FloodedRiceSeasonCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
+        biomass_ef_start = defaults.biomass_ef_start_w or defaults.biomass_ef_start_wo
+
         return SimpleNamespace(
             soc_t2_start_default=defaults.soc.value,
             soc_t2_w_default=defaults.soc.value,
@@ -313,7 +315,7 @@ class FloodedRiceDefaults(Defaults):
             flu_t2_w_default=defaults.flu_w.value,
             flu_t2_wo_default=defaults.flu_wo.value,
             # TODO: Biomass will be yield+rice_straw (to be included in the model)
-            biomass_t2_start_default=defaults.biomass_ef_start.value,
+            biomass_t2_start_default=biomass_ef_start.value,
             biomass_t2_w_default=defaults.biomass_ef_w.value,
             biomass_t2_wo_default=defaults.biomass_ef_wo.value,
             fmg_t2_start_default=defaults.fmg_start.value,
