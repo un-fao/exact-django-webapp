@@ -2260,7 +2260,9 @@ class Electricity(Submodule):
 
 class Fuel(Submodule):
     parent = models.ForeignKey(Energy, on_delete=models.CASCADE, null=True, blank=True, related_name="fuels")
-    fuel_type = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fuel_type"))
+    fuel_type_start = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fuel_type_start"), related_name="%(class)s_fuel_type_start")
+    fuel_type_w = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fuel_type_w"), related_name="%(class)s_fuel_type_w")
+    fuel_type_wo = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fuel_type_wo"), related_name="%(class)s_fuel_type_wo")
 
     quantity_consumed_per_year_start = models.FloatField(null=True, blank=True, verbose_name=_("quantity_consumed_per_year_start"))
     quantity_consumed_per_year_w = models.FloatField(null=True, blank=True, verbose_name=_("quantity_consumed_per_year_w"))
@@ -2317,7 +2319,9 @@ class IrrigationSystem(Submodule):
 class IrrigationPhase(Submodule):
     parent = models.ForeignKey(Irrigation, on_delete=models.CASCADE, null=True, blank=True, related_name="irrigation_phases")
     irrigation_system_type = models.ForeignKey(IrrigationSystemType, on_delete=models.CASCADE, null=True, blank=True, related_name="irrigation_phases", verbose_name=_("irrigation_system_type"))
-    fuel_type = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fuel_type"))
+    fuel_type_start = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fuel_type_start"), related_name="%(class)s_fuel_type_start")
+    fuel_type_w = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fuel_type_w"), related_name="%(class)s_fuel_type_w")
+    fuel_type_wo = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fuel_type_wo"), related_name="%(class)s_fuel_type_wo")
     well_depth = models.FloatField(null=True, blank=True, verbose_name=_("well_depth"))
 
     ha_start = models.FloatField(null=True, blank=True, verbose_name=_("ha_start"))
