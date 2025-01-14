@@ -425,10 +425,10 @@ class LivestockDefaults(Defaults):
             prp_n2o_t2_start_default=defaults.math_w.n2o_prp_direct_head_start_tier_2_default or defaults.math_wo.n2o_prp_direct_head_start_tier_2_default,
             prp_n2o_t2_w_default=defaults.math_w.n2o_prp_direct_head_end_tier_2_default,
             prp_n2o_t2_wo_default=defaults.math_wo.n2o_prp_direct_head_end_tier_2_default,
-            emission_factor_ch4_t2_start_default=0,
+            emission_factor_ch4_t2_start_default=sum(defaults.math_w.ch4_system_head_start_tier_2_default) or sum(defaults.math_wo.ch4_system_head_start_tier_2_default),
             emission_factor_ch4_t2_w_default=sum(defaults.math_w.ch4_system_head_end_tier_2_default),
             emission_factor_ch4_t2_wo_default=sum(defaults.math_wo.ch4_system_head_end_tier_2_default),
-            emission_factor_n2o_t2_start_default=0,
+            emission_factor_n2o_t2_start_default=sum(defaults.math_w.n2o_system_direct_head_start_tier_2_default) or sum(defaults.math_wo.n2o_system_direct_head_start_tier_2_default),
             emission_factor_n2o_t2_w_default=sum(defaults.math_w.n2o_system_direct_head_end_tier_2_default),
             emission_factor_n2o_t2_wo_default=sum(defaults.math_wo.n2o_system_direct_head_end_tier_2_default),
         )
