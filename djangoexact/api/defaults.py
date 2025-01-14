@@ -1111,6 +1111,8 @@ class SetAsideDefaults(Defaults):
         defaults = calcs.SetAsideCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
+        biomass_ef_start = defaults.biomass_ef_w or defaults.biomass_ef_wo
+
         return SimpleNamespace(
             soc_t2_start_default=defaults.soc.value,
             soc_t2_w_default=defaults.soc.value,
@@ -1124,7 +1126,7 @@ class SetAsideDefaults(Defaults):
             fmg_t2_start_default=defaults.fmg_start.value,
             fmg_t2_w_default=defaults.fmg_w.value,
             fmg_t2_wo_default=defaults.fmg_wo.value,
-            biomass_t2_start_default=defaults.biomass_ef_start.value,
+            biomass_t2_start_default=biomass_ef_start.value,
             biomass_t2_w_default=defaults.biomass_ef_w.value,
             biomass_t2_wo_default=defaults.biomass_ef_wo.value,
         )
