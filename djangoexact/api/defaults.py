@@ -974,12 +974,12 @@ class AquacultureDefaults(Defaults):
         super().__init__(input)
 
         self.values = SimpleNamespace(
-            electricity_used_t2_start_default=0,
-            electricity_used_t2_w_default=0,
-            electricity_used_t2_wo_default=0,
             electricity_ef_t2_start_default=0,
             electricity_ef_t2_w_default=0,
             electricity_ef_t2_wo_default=0,
+            n2o_from_production_t2_start_default=0,
+            n2o_from_production_t2_w_default=0,
+            n2o_from_production_t2_wo_default=0,
         )
 
     def get_defaults(self, calculate=False) -> dict:
@@ -989,12 +989,13 @@ class AquacultureDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            electricity_used_t2_start_default=defaults.elec.operating_margin,
-            electricity_used_t2_w_default=defaults.elec.operating_margin,
-            electricity_used_t2_wo_default=defaults.elec.operating_margin,
-            electricity_ef_t2_start_default=defaults.NITROUS_EF_DEFAULT,
-            electricity_ef_t2_w_default=defaults.NITROUS_EF_DEFAULT,
-            electricity_ef_t2_wo_default=defaults.NITROUS_EF_DEFAULT,
+            # TODO: 14/01/2025 meeting with Lorenzo: electricity must be aligned with energy logic
+            electricity_ef_t2_start_default=defaults.elec.operating_margin,
+            electricity_ef_t2_w_default=defaults.elec.operating_margin,
+            electricity_ef_t2_wo_default=defaults.elec.operating_margin,
+            n2o_from_production_t2_start_default=defaults.NITROUS_EF_DEFAULT,
+            n2o_from_production_t2_w_default=defaults.NITROUS_EF_DEFAULT,
+            n2o_from_production_t2_wo_default=defaults.NITROUS_EF_DEFAULT,
         )
 
 
