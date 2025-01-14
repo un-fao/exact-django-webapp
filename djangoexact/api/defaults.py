@@ -69,6 +69,15 @@ class GrasslandDefaults(Defaults):
             combustion_factor_t2_start_default=0,
             combustion_factor_t2_w_default=0,
             combustion_factor_t2_wo_default=0,
+            flu_t2_start_default=0,
+            flu_t2_w_default=0,
+            flu_t2_wo_default=0,
+            fi_t2_start_default=0,
+            fi_t2_w_default=0,
+            fi_t2_wo_default=0,
+            fmg_t2_start_default=0,
+            fmg_t2_w_default=0,
+            fmg_t2_wo_default=0,
         )
 
     def get_defaults(self, calculate=False) -> dict:
@@ -80,11 +89,13 @@ class GrasslandDefaults(Defaults):
         defaults = calcs.GrasslandCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
+        biomass_ef_start = defaults.biomass_ef_start_w or defaults.biomass_ef_start_wo
+
         return SimpleNamespace(
             soc_t2_start_default=defaults.soc_start.value,
             soc_t2_w_default=defaults.soc_w.value,
             soc_t2_wo_default=defaults.soc_wo.value,
-            biomass_t2_start_default=defaults.biomass_ef_start.value,
+            biomass_t2_start_default=biomass_ef_start.value,
             biomass_t2_w_default=defaults.biomass_ef_w.value,
             biomass_t2_wo_default=defaults.biomass_ef_wo.value,
             combustion_factor_t2_start_default=defaults.cf.value,
@@ -93,6 +104,15 @@ class GrasslandDefaults(Defaults):
             agb_t2_start_default=defaults.biomass.agb_t_c_ha,
             agb_t2_w_default=defaults.biomass.agb_t_c_ha,
             agb_t2_wo_default=defaults.biomass.agb_t_c_ha,
+            flu_t2_start_default=defaults.flu_start.value,
+            flu_t2_w_default=defaults.flu_w.value,
+            flu_t2_wo_default=defaults.flu_wo.value,
+            fi_t2_start_default=defaults.fi_start.value,
+            fi_t2_w_default=defaults.fi_w.value,
+            fi_t2_wo_default=defaults.fi_wo.value,
+            fmg_t2_start_default=defaults.fmg_start.value,
+            fmg_t2_w_default=defaults.fmg_w.value,
+            fmg_t2_wo_default=defaults.fmg_wo.value,
         )
 
 
