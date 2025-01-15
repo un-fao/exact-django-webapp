@@ -1949,6 +1949,7 @@ class IrrigationPhaseWriteSerializer(ScenarioSubmoduleSerializer):
         mandatory_fields = {
             "start": {
                 "mandatory": [
+                    "gross_irrigation_water_start",
                     "irrigation_system_type",
                     "fuel_type_start",
                     "well_depth",
@@ -1957,6 +1958,7 @@ class IrrigationPhaseWriteSerializer(ScenarioSubmoduleSerializer):
             },
             "with": {
                 "mandatory": [
+                    "gross_irrigation_water_w",
                     "irrigation_system_type",
                     "fuel_type_w",
                     "well_depth",
@@ -1965,6 +1967,7 @@ class IrrigationPhaseWriteSerializer(ScenarioSubmoduleSerializer):
             },
             "without": {
                 "mandatory": [
+                    "gross_irrigation_water_wo",
                     "irrigation_system_type",
                     "fuel_type_wo",
                     "well_depth",
