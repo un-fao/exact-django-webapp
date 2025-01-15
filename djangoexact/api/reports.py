@@ -92,7 +92,7 @@ class ExcelFileManager:
         # Start with an empty in-memory Excel file
         self.excel_file = BytesIO()
         self._create_initial_excel()
-        self.SAVE_TO_FILE = True
+        self.SAVE_TO_FILE = False
 
     def _create_initial_excel(self):
 
@@ -227,7 +227,7 @@ class BaseProjectReport:
 
         self.metadata_worksheet.cell(row=1, column=2, value=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         self.metadata_worksheet.cell(row=2, column=2, value=str(self.project.name))
-        self.metadata_worksheet.cell(row=3, column=2, value=self.project.status.name)
+        self.metadata_worksheet.cell(row=3, column=2, value=self.project.status.name if self.project.status else "N/A")
         self.metadata_worksheet.cell(row=4, column=2, value=self.project.country.name)
         self.metadata_worksheet.cell(row=5, column=2, value=self.project.climate.name)
         self.metadata_worksheet.cell(row=6, column=2, value=self.project.moisture.name)
