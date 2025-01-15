@@ -18,7 +18,7 @@ from django.utils import timezone
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
-from rest_framework import permissions, viewsets
+from rest_framework import permissions, viewsets, views
 from rest_framework import status as http_status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -63,7 +63,8 @@ from .models import (
     LandModule,
     CachedResultMixin,
     ProjectTag,
-    ProjectFileAttachment
+    ProjectFileAttachment,
+    APIStatus,
 )
 from .serializers import (
     ActionTypes,
@@ -105,6 +106,7 @@ from .serializers import (
     ProjectTagSerializer,
     ProjectFileUploadSerializer,
     ProjectFileReadSerializer,
+    APIStatusSerializer,
 )
 
 from djangoexact.settings import auth
@@ -124,6 +126,7 @@ from django.test import RequestFactory
 import asyncio
 from asgiref.sync import sync_to_async
 from django.utils.text import slugify
+from django.core.cache import cache
 
 
 logger = logging.getLogger("console")
@@ -2056,3 +2059,23 @@ class ProjectFileAttachmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         attachment.delete()
 
         return Response(status=http_status.HTTP_204_NO_CONTENT)
+
+class APIStatusView(views.APIView):
+    def get(self, request):
+        try:
+            api_status = APIStatus.objects.first()
+            if api_status and api_status.is_under_maintenance:
+                serializer = APIStatusSerializer(api_status)
+                return Response({
+                    "status": "maintenance",
+                    "http_status": 503,
+                    **serializer.data
+                }, status=http_status.HTTP_503_SERVICE_UNAVAILABLE)
+        except APIStatus.DoesNotExist:
+            pass
+
+        return Response({
+            "status": "operational",
+            "http_status": 200,
+            "message": "API is fully operational."
+        }, status=http_status.HTTP_200_OK)

@@ -95,6 +95,7 @@ from .models import (
     TransportEntry,
     ProjectFileAttachment,
     ApplicationParameter,
+    APIStatus,
 )
 from datetime import timedelta
 
@@ -3477,3 +3478,9 @@ class ProjectFileReadSerializer(serializers.ModelSerializer):
 class ProjectFileDownloadSerializer(serializers.Serializer):
     file_name = serializers.CharField()
     content_type = serializers.CharField()
+
+class APIStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = APIStatus
+        fields = ['is_under_maintenance', 'maintenance_end_time', 'maintenance_message']
+        ref_name = "APIStatus"
