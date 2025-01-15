@@ -77,10 +77,10 @@ class CoastalWetland(BaseModule):
         def calculate_drainage():
             def calculate_biomass():
                 try:
-                    agb = self.agb_default * 0.451 if not self.agb_tier_2 else self.agb_tier_2
-                    bgb = self.bgb_default * agb if not self.bgb_tier_2 else self.bgb_tier_2
-                    litter = self.litter_default if not self.litter_tier_2 else self.litter_tier_2
-                    deadwood = self.deadwood_default if not self.deadwood_tier_2 else self.deadwood_tier_2
+                    agb = self.agb_default * 0.451 if self.agb_tier_2 is None else self.agb_tier_2
+                    bgb = self.bgb_default * agb if self.bgb_tier_2 is None else self.bgb_tier_2
+                    litter = self.litter_default if self.litter_tier_2 is None else self.litter_tier_2
+                    deadwood = self.deadwood_default if self.deadwood_tier_2 is None else self.deadwood_tier_2
 
                     # TODO: ask Lorenzo about this variable, should it be 0? Should it be calculated?
                     stock_c_biomass_start = 0
@@ -106,8 +106,8 @@ class CoastalWetland(BaseModule):
 
             def calculate_soil():
                 try:
-                    soil_1m = self.soil_1m_default if not self.soil_1m_tier_2 else self.soil_1m_tier_2
-                    EF_drainage = self.EF_drainage_default if not self.EF_drainage_tier_2 else self.EF_drainage_tier_2
+                    soil_1m = self.soil_1m_default if self.soil_1m_tier_2 is None else self.soil_1m_tier_2
+                    EF_drainage = self.EF_drainage_default if self.EF_drainage_tier_2 is None else self.EF_drainage_tier_2
 
                     maximum_soil_years = 1000 if EF_drainage == 0 else int(soil_1m / EF_drainage)
                     maximum_soil_emissions = soil_1m * 44 / 12
@@ -151,12 +151,12 @@ class CoastalWetland(BaseModule):
 
                 area_excavated = self.area_excavated_end
 
-                agb = self.agb_default * 0.451 if not self.agb_tier_2 else self.agb_tier_2
-                bgb = self.bgb_default * agb if not self.bgb_tier_2 else self.bgb_tier_2
-                litter = self.litter_default if not self.litter_tier_2 else self.litter_tier_2
-                deadwood = self.deadwood_default if not self.deadwood_tier_2 else self.deadwood_tier_2
-                soil_1m = self.soil_1m_default if not self.soil_1m_tier_2 else self.soil_1m_tier_2
-                percentage_c_lost_excavation = self.percentage_c_lost_excavation_default if not self.percentage_c_lost_excavation_tier_2 else self.percentage_c_lost_excavation_tier_2
+                agb = self.agb_default * 0.451 if self.agb_tier_2 is None else self.agb_tier_2
+                bgb = self.bgb_default * agb if self.bgb_tier_2 is None else self.bgb_tier_2
+                litter = self.litter_default if self.litter_tier_2 is None else self.litter_tier_2
+                deadwood = self.deadwood_default if self.deadwood_tier_2 is None else self.deadwood_tier_2
+                soil_1m = self.soil_1m_default if self.soil_1m_tier_2 is None else self.soil_1m_tier_2
+                percentage_c_lost_excavation = self.percentage_c_lost_excavation_default if self.percentage_c_lost_excavation_tier_2 is None else self.percentage_c_lost_excavation_tier_2
 
                 biomass_c = agb + bgb + litter + deadwood
                 soil_c = soil_1m * percentage_c_lost_excavation
@@ -188,14 +188,14 @@ class CoastalWetland(BaseModule):
 
             def calculate_biomass():
                 try:
-                    agb = self.agb_default * self.mangrove_factor if not self.agb_tier_2 else self.agb_tier_2
-                    bgb = self.bgb_default * agb if not self.bgb_tier_2 else self.bgb_tier_2
-                    litter = self.litter_default if not self.litter_tier_2 else self.litter_tier_2
-                    deadwood = self.deadwood_default if not self.deadwood_tier_2 else self.deadwood_tier_2
+                    agb = self.agb_default * self.mangrove_factor if self.agb_tier_2 is None else self.agb_tier_2
+                    bgb = self.bgb_default * agb if self.bgb_tier_2 is None else self.bgb_tier_2
+                    litter = self.litter_default if self.litter_tier_2 is None else self.litter_tier_2
+                    deadwood = self.deadwood_default if self.deadwood_tier_2 is None else self.deadwood_tier_2
 
                     # ASSIGN TIER 2 VALUE DEFAULT FOR FRONT END, AS IT'S IN TONNES OF CARBON
                     self.agb_tier_2_default = self.agb_default * self.mangrove_factor
-                    self.bgb_tier_2_default = self.bgb_default * agb * self.mangrove_factor if not self.agb_tier_2 else self.bgb_default * self.agb_tier_2
+                    self.bgb_tier_2_default = self.bgb_default * agb * self.mangrove_factor if self.agb_tier_2 is None else self.bgb_default * self.agb_tier_2
 
                     biomass_emissions_total = -44/12 * (agb + bgb + litter + deadwood) / (20) * sum(self.hectares_revegetated_before_20)
 
@@ -209,8 +209,8 @@ class CoastalWetland(BaseModule):
             
             try:
                 self.ef_rewetting_methane_default = 0 if not self.soil_type == "<18" else self.ef_rewetting_methane_default
-                ef_rewetting_carbon = self.ef_rewetting_carbon_default if not self.ef_rewetting_carbon_tier_2 else self.ef_rewetting_carbon_tier_2
-                ef_rewetting_methane = self.ef_rewetting_methane_default if not self.ef_rewetting_methane_tier_2 else self.ef_rewetting_methane_tier_2
+                ef_rewetting_carbon = self.ef_rewetting_carbon_default if self.ef_rewetting_carbon_tier_2 is None else self.ef_rewetting_carbon_tier_2
+                ef_rewetting_methane = self.ef_rewetting_methane_default if self.ef_rewetting_methane_tier_2 is None else self.ef_rewetting_methane_tier_2
 
                 emissions_yearly_rewetting_carbon = compute_yearly_or_half_year_cumulative(0, 44 / 12 * self.area_end_rewetting * ef_rewetting_carbon, self.implementation_time, self.capitalization_time, self.rate_type)
                 emissions_yearly_rewetting_methane = compute_yearly_or_half_year_cumulative(0, self.methane_constant * self.area_end_rewetting * ef_rewetting_methane / 1000, self.implementation_time, self.capitalization_time, self.rate_type)

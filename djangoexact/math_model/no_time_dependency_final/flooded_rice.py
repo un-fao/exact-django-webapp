@@ -66,16 +66,16 @@ class FloodedRice(LandModule):
     ):
         def calculate_ch4_emitted():
             try:
-                yield_value = self.yield_ref if not self.yield_tier_2 else self.yield_tier_2
-                straw_tonnes_ref = yield_value * self.rice_slope + self.rice_intercept if not self.straw_tonnes_tier_2 else self.straw_tonnes_tier_2
-                SFo = (1 + straw_tonnes_ref * self.cfoa) ** 0.59 if not self.SFo_tier_2 else self.SFo_tier_2
+                yield_value = self.yield_ref if self.yield_tier_2 is None else self.yield_tier_2
+                straw_tonnes_ref = yield_value * self.rice_slope + self.rice_intercept if self.straw_tonnes_tier_2 is None else self.straw_tonnes_tier_2
+                SFo = (1 + straw_tonnes_ref * self.cfoa) ** 0.59 if self.SFo_tier_2 is None else self.SFo_tier_2
 
                 if self.hectares_start == 0 and self.hectares_end == 0:
                     adjusted_daily_ef_methane_ref = 0
                 else:
-                    adjusted_daily_ef_methane_ref = self.EFc * self.SFw * self.SFp * SFo if not self.adjusted_daily_ef_methane_tier_2 else self.adjusted_daily_ef_methane_tier_2
+                    adjusted_daily_ef_methane_ref = self.EFc * self.SFw * self.SFp * SFo if self.adjusted_daily_ef_methane_tier_2 is None else self.adjusted_daily_ef_methane_tier_2
 
-                cultivation_period = self.cultivation_period_ref if not self.cultivation_period_tier_2 else self.cultivation_period_tier_2
+                cultivation_period = self.cultivation_period_ref if self.cultivation_period_tier_2 is None else self.cultivation_period_tier_2
 
                 kg_methane_cultivation_period = adjusted_daily_ef_methane_ref * cultivation_period
 
@@ -95,8 +95,8 @@ class FloodedRice(LandModule):
                     pass
 
                 else:
-                    yield_value = self.yield_ref if not self.yield_tier_2 else self.yield_tier_2
-                    straw_tonnes_ref = yield_value * self.rice_slope + self.rice_intercept if not self.straw_tonnes_tier_2 else self.straw_tonnes_tier_2
+                    yield_value = self.yield_ref if self.yield_tier_2 is None else self.yield_tier_2
+                    straw_tonnes_ref = yield_value * self.rice_slope + self.rice_intercept if self.straw_tonnes_tier_2 is None else self.straw_tonnes_tier_2
                     straw_methane_co2 = straw_tonnes_ref * self.rice_cf * self.methane_ef * self.methane_constant / 1000
                     straw_nitrous_co2 = straw_tonnes_ref * self.rice_cf * self.nitrous_ef * self.nitrous_constant / 1000
 

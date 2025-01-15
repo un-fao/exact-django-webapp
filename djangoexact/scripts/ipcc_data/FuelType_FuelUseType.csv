@@ -1,11 +1,11 @@
 fuel_type,fuel_use_type
 Motor Gasoline,Stationary
-Gasoil /Diesel Oil,Stationary
-Waste Oil / Lubricants,Stationary
+Gasoil/Diesel Oil,Stationary
+Waste Oil/Lubricants,Stationary
 LPG,Stationary
 Natural Gas,Stationary
 Motor Gasoline,Mobile
-Gasoil /Diesel Oil,Mobile
+Gasoil/Diesel Oil,Mobile
 Waste Oil/Lubricants,Mobile
 LPG,Mobile
 Natural Gas,Mobile

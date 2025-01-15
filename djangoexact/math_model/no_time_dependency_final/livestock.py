@@ -104,8 +104,8 @@ class Livestock(BaseModule):
     def calculate_emissions(self):
         def calculate_methane_enteric_fermentation_emissions():
             try:
-                specific_factor_start = self.specific_factor_default_start if not self.specific_factor_start_tier_2 else self.specific_factor_start_tier_2
-                specific_factor_end = self.specific_factor_default_end if not self.specific_factor_end_tier_2 else self.specific_factor_end_tier_2
+                specific_factor_start = self.specific_factor_default_start if self.specific_factor_start_tier_2 is None else self.specific_factor_start_tier_2
+                specific_factor_end = self.specific_factor_default_end if self.specific_factor_end_tier_2 is None else self.specific_factor_end_tier_2
 
                 emissions_start = specific_factor_start / 1000 * self.methane_constant * self.head_number_start
                 emissions_end = specific_factor_end / 1000 * self.methane_constant * self.head_number_end
