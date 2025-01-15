@@ -73,7 +73,7 @@ class IrrigationTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         prev_balance = response.data["balance"]
 
         validated_data = copy.deepcopy(self.validated_data)
-        validated_data["irrigation_system_type"] = models.IrrigationSystemType.objects.order_by("?").first().pk
+        validated_data["ef_t2_start"] = FuzzyFloat(0, 1000).fuzz()
 
         response = self.edit_module(self.submodules[0], self.user, validated_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
