@@ -31,6 +31,8 @@ API = "api"
 TROPHIC_STATE = 0.7
 INCLUDE_RELATED = "include_related"
 
+FOSSIL_METHANE_FUELS = ["peat", "charcoal"]
+
 
 class ManureManagementTypes(Enum):
     PRP = "Pasture/Range/Paddock"
