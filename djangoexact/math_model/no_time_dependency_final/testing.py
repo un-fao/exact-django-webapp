@@ -1,11 +1,4 @@
-tier2 = 0
-default = None
+from general_functions import compute_yearly_cumulative_matrix, plot_matrix_with_values
 
-
-ciao = tier2 or default
-ciao2 = tier2 if tier2 else default
-ciao3 = tier2 if tier2 is not None else default
-
-print(ciao)
-print(ciao2)
-print(ciao3)
+ao = compute_yearly_cumulative_matrix(10000, 0, 10, 5, 'exponential')
+plot_matrix_with_values(ao,)
