@@ -81,14 +81,14 @@ pipelines:
     #   - step:
     #       <<: *deploy
     #       deployment: develop
-    review:
-      - step: *predeploy
-      - step:
-          <<: *deploy
-          deployment: review
-    master:
-      - step: *predeploy
-      - step:
-          <<: *deploy
-          deployment: production
-          trigger: manual
+    # review:
+    #   - step: *predeploy
+    #   - step:
+    #       <<: *deploy
+    #       deployment: review
+    # master:
+    #   - step: *predeploy
+    #   - step:
+    #       <<: *deploy
+    #       deployment: production
+    #       trigger: manual
