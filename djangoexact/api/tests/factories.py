@@ -450,7 +450,9 @@ class FuelFactory(DjangoModelFactory):
 
     status = READY
 
-    fuel_type = factory.fuzzy.FuzzyChoice(fuels)
+    fuel_type_start = factory.fuzzy.FuzzyChoice(fuels)
+    fuel_type_w = factory.fuzzy.FuzzyChoice(fuels)
+    fuel_type_wo = factory.fuzzy.FuzzyChoice(fuels)
 
     fuel_consumption_start = factory.fuzzy.FuzzyFloat(0, 100)
     fuel_consumption_w = factory.fuzzy.FuzzyFloat(0, 100)

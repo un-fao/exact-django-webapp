@@ -2053,19 +2053,19 @@ class FuelSerializer(ScenarioSubmoduleSerializer):
         mandatory_fields = {
             "start": {
                 "mandatory": [
-                    "fuel_type",
+                    "fuel_type_start",
                     "quantity_consumed_per_year_start",
                 ],
             },
             "with": {
                 "mandatory": [
-                    "fuel_type",
+                    "fuel_type_w",
                     "quantity_consumed_per_year_w",
                 ],
             },
             "without": {
                 "mandatory": [
-                    "fuel_type",
+                    "fuel_type_wo",
                     "quantity_consumed_per_year_wo",
                 ],
             },

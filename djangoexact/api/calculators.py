@@ -3623,31 +3623,54 @@ class FuelCalculator(BaseCalculator):
         self.module: Fuel
         self.energy_ef_default: ipcc.EnergyDefaultEmissionFactor = ipcc.EnergyDefaultEmissionFactor()
 
-        self.methane_constant = self.project.gwp.ch4
-        if self.module.fuel_type.name in ["Peat", "Charcoal"]:
-            self.methane_constant = self.project.gwp.ch4_fossil
+        self.methane_constant_start = 0
+        self.methane_constant_with = 0
+        self.methane_constant_without = 0
+
+        for scenario in utils.ScenarioTypes:
+            fuel_type: FuelType = getattr(self.module, f"fuel_type_{scenario.value}", None)
+            if fuel_type and fuel_type.name.casefold() in utils.FOSSIL_METHANE_FUELS:
+                setattr(self, f"methane_constant_{scenario.value}", self.project.gwp.ch4_fossil)
+            else:
+                setattr(self, f"methane_constant_{scenario.value}", self.project.gwp.ch4)
+
+    def get_energy_ef_default(self, scenario: utils.ScenarioTypes):
+        try:
+            fuel_type: FuelType = getattr(self.module, f"fuel_type_{scenario.value}")
+            energy_ef_default = ipcc.EnergyDefaultEmissionFactor.objects.get(
+                fuel_type=fuel_type,
+                fuel_use_type=fuel_type.fuel_use_type,
+            )
+
+            if energy_ef_default:
+                if energy_ef_default.co2 is None and getattr(self.module, f"energy_ef_co2_t2_{scenario.value}") is None:
+                    raise ValueError(f"Default CO2 emission factor for {fuel_type.name} {fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value for scenario: {scenario.name.lower()}")
+                if energy_ef_default.ch4 is None and getattr(self.module, f"energy_ef_ch4_t2_{scenario.value}") is None:
+                    raise ValueError(f"Default CH4 emission factor for {fuel_type.name} {fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value for scenario: {scenario.name.lower()}")
+                if energy_ef_default.n2o is None and getattr(self.module, f"energy_ef_n2o_t2_{scenario.value}") is None:
+                    raise ValueError(f"Default N2O emission factor for {fuel_type.name} {fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value for scenario: {scenario.name.lower()}")
+
+        except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
+            if getattr(self.module, f"energy_ef_co2_t2_{scenario.value}") is None:
+                raise ValueError(f"CO2 emission factor for {fuel_type.name} {fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value for scenario: {scenario.name.lower()}")
+            if getattr(self.module, f"energy_ef_ch4_t2_{scenario.value}") is None:
+                raise ValueError(f"CH4 emission factor for {fuel_type.name} {fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value for scenario: {scenario.name.lower()}")
+            if getattr(self.module, f"energy_ef_n2o_t2_{scenario.value}") is None:
+                raise ValueError(f"N2O emission factor for {fuel_type.name} {fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value for scenario: {scenario.name.lower()}")
+
+        self.energy_ef_default = energy_ef_default
 
     def get_defaults(self, calculate=False) -> dict:
         super().get_defaults(calculate)
 
-        try:
-            self.energy_ef_default = ipcc.EnergyDefaultEmissionFactor.objects.get(fuel_type=self.module.fuel_type, fuel_use_type=self.module.fuel_type.fuel_use_type)
+        if self.module.is_start():
+            self.get_energy_ef_default(utils.ScenarioTypes.START)
 
-            if self.energy_ef_default:
-                if self.energy_ef_default.co2 is None and self.module.energy_ef_co2_t2 is None:
-                    raise ValueError(f"Default CO2 emission factor for {self.module.fuel_type.name} {self.module.fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value.")
-                if self.energy_ef_default.ch4 is None and self.module.energy_ef_ch4_t2 is None:
-                    raise ValueError(f"Default CH4 emission factor for {self.module.fuel_type.name} {self.module.fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value.")
-                if self.energy_ef_default.n2o is None and self.module.energy_ef_n2o_t2 is None:
-                    raise ValueError(f"Default N2O emission factor for {self.module.fuel_type.name} {self.module.fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value.")
+        if self.module.is_with():
+            self.get_energy_ef_default(utils.ScenarioTypes.WITH)
 
-        except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
-            if self.module.energy_ef_co2_t2 is None:
-                raise ValueError(f"CO2 emission factor for {self.module.fuel_type.name} {self.module.fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value.")
-            if self.module.energy_ef_ch4_t2 is None:
-                raise ValueError(f"CH4 emission factor for {self.module.fuel_type.name} {self.module.fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value.")
-            if self.module.energy_ef_n2o_t2 is None:
-                raise ValueError(f"N2O emission factor for {self.module.fuel_type.name} {self.module.fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value.")
+        if self.module.is_without():
+            self.get_energy_ef_default(utils.ScenarioTypes.WITHOUT)
 
     def calculate(self) -> list[Result]:
         """
@@ -3659,17 +3682,17 @@ class FuelCalculator(BaseCalculator):
 
         inputs_w = {
             "emissions_factor_co2": self.energy_ef_default.co2,
-            "specific_factor_co2": self.module.energy_ef_co2_t2,
+            "specific_factor_co2": self.module.energy_ef_co2_t2_start,
             "emissions_factor_ch4": self.energy_ef_default.ch4,
-            "specific_factor_ch4": self.module.energy_ef_ch4_t2,
+            "specific_factor_ch4": self.module.energy_ef_ch4_t2_start,
             "emissions_factor_n2o": self.energy_ef_default.n2o,
-            "specific_factor_n2o": self.module.energy_ef_n2o_t2,
+            "specific_factor_n2o": self.module.energy_ef_n2o_t2_start,
             "mwh_start": self.module.quantity_consumed_per_year_start,
             "mwh_end": self.module.quantity_consumed_per_year_w,
             "rate_type": self.change_rate.name,
             "implementation_time": self.activity.implementation_years,
             "capitalization_time": self.activity.capitalization_years,
-            "methane_constant": self.methane_constant,
+            "methane_constant": self.methane_constant_w,
             "nitrous_constant": self.project.gwp.n2o,
             "delay": self.activity.delay,
         }
@@ -3680,17 +3703,17 @@ class FuelCalculator(BaseCalculator):
 
         inputs_wo = {
             "emissions_factor_co2": self.energy_ef_default.co2,
-            "specific_factor_co2": self.module.energy_ef_co2_t2,
+            "specific_factor_co2": self.module.energy_ef_co2_t2_start,
             "emissions_factor_ch4": self.energy_ef_default.ch4,
-            "specific_factor_ch4": self.module.energy_ef_ch4_t2,
+            "specific_factor_ch4": self.module.energy_ef_ch4_t2_start,
             "emissions_factor_n2o": self.energy_ef_default.n2o,
-            "specific_factor_n2o": self.module.energy_ef_n2o_t2,
+            "specific_factor_n2o": self.module.energy_ef_n2o_t2_start,
             "mwh_start": self.module.quantity_consumed_per_year_start,
             "mwh_end": self.module.quantity_consumed_per_year_wo,
             "rate_type": self.change_rate.name,
             "implementation_time": self.activity.implementation_years,
             "capitalization_time": self.activity.capitalization_years,
-            "methane_constant": self.methane_constant,
+            "methane_constant": self.methane_constant_wo,
             "nitrous_constant": self.project.gwp.n2o,
             "delay": self.activity.delay,
         }
