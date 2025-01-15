@@ -650,6 +650,16 @@ class BuildingFactory(DjangoModelFactory):
 
     building_type = factory.fuzzy.FuzzyChoice(building_types)
 
+class OtherInfrastructureFactory(DjangoModelFactory):
+    class Meta:
+        model = OtherInfrastructure
+
+    status = READY
+
+    area_m2_start = factory.fuzzy.FuzzyFloat(0, 100)
+    area_m2_w = factory.fuzzy.FuzzyFloat(0, 100)
+    area_m2_wo = factory.fuzzy.FuzzyFloat(0, 100)
+
 
 class OtherLandFactory(DjangoModelFactory):
     class Meta:
