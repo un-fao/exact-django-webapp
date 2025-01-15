@@ -14,27 +14,29 @@ import copy
 from . import base_module
 
 
-class StorageTestCase(base_module.BaseModuleTestCase):
+class StorageTestCase(base_module.BaseModuleWithSubmoduleTestCase):
     def setUp(self):
         self.ModuleClass = models.Storage
+        self.submodule_classes = [models.StorageEntry]
         super().setUp()
 
         self.land_use_types = self.land_use_types.filter(module_types__class_name=self.ModuleClass.__name__, climates=self.project.climate, moistures=self.project.moisture, is_active=True)
 
         self.validated_data = {
-            "kwh_energy_per_year_start": FuzzyFloat(0, 1000).fuzz(),
-            "kwh_energy_per_year_w": FuzzyFloat(0, 1000).fuzz(),
-            "kwh_energy_per_year_wo": FuzzyFloat(0, 1000).fuzz(),
+            "quantity_consumed_per_year_start": FuzzyFloat(0, 1000).fuzz(),
+            "quantity_consumed_per_year_w": FuzzyFloat(0, 1000).fuzz(),
+            "quantity_consumed_per_year_wo": FuzzyFloat(0, 1000).fuzz(),
+            "is_refrigerant_used": False,
         }
 
-        self.edit_module(self.module, self.user, self.validated_data)
+        self.edit_module(self.submodules[0], self.user, self.validated_data)
         self.module.refresh_from_db()
 
     def test_modify(self):
 
         validated_data = copy.deepcopy(self.validated_data)
-        validated_data["kwh_energy_per_year_start"] = FuzzyFloat(0, 1000).fuzz()
-        response = self.edit_module(self.module, self.user, validated_data)
+        validated_data["quantity_consumed_per_year_start"] = FuzzyFloat(0, 1000).fuzz()
+        response = self.edit_module(self.submodules[0], self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["status"]["name"], "READY")
@@ -42,8 +44,8 @@ class StorageTestCase(base_module.BaseModuleTestCase):
     def test_patch_to_not_ready(self):
 
         validated_data = copy.deepcopy(self.validated_data)
-        validated_data["kwh_energy_per_year_start"] = None
-        response = self.edit_module(self.module, self.user, validated_data)
+        validated_data["quantity_consumed_per_year_start"] = None
+        response = self.edit_module(self.submodules[0], self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["status"]["name"], "EMPTY")
@@ -58,7 +60,7 @@ class StorageTestCase(base_module.BaseModuleTestCase):
         validated_data["total_refrigerant_leakage_start"] = FuzzyFloat(0, 1000).fuzz()
         validated_data["total_refrigerant_leakage_w"] = FuzzyFloat(0, 1000).fuzz()
         validated_data["total_refrigerant_leakage_wo"] = FuzzyFloat(0, 1000).fuzz()
-        response = self.edit_module(self.module, self.user, validated_data)
+        response = self.edit_module(self.submodules[0], self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["status"]["name"], "READY")
@@ -66,7 +68,6 @@ class StorageTestCase(base_module.BaseModuleTestCase):
         self.test_calculate_results()
 
     def test_calculate_results(self):
-
         view = self.module_viewset.as_view({"get": "results"})
         request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
 
@@ -79,8 +80,15 @@ class StorageTestCase(base_module.BaseModuleTestCase):
 
     def test_get_defaults(self):
 
-        view = self.module_viewset.as_view({"get": "defaults"})
-        request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-defaults", args=[self.module.pk]), format="json")
+        subresponse = self.create_submodule(models.StorageEntry, self.user, {"parent": self.module.pk})
+        self.assertEqual(subresponse.status_code, status.HTTP_201_CREATED)
+
+        submodule = models.StorageEntry.objects.get(pk=subresponse.data["id"])
+        self.edit_module(submodule, self.user, self.validated_data)
+
+        view = generic_module_viewset(models.StorageEntry).as_view({"get": "defaults"})
+        print(subresponse.data["id"])
+        request = self.request_factory.get(reverse(f"storageentry-defaults", args=[subresponse.data["id"]]), format="json")
 
         force_authenticate(request, user=self.user)
         response = view(request, pk=self.module.pk)

@@ -1,9 +1,9 @@
 from .generalized_modules import BaseModule, LandModule
 from .general_functions import (
-    yearly_time_dependent_parameter_breakdown,
-    yearly_time_dependent_matrix,
-    yearly_time_dependent_20_year_breakdown,
-    yearly_time_dependent_matrix_log_rec_dis,
+    compute_yearly_or_half_year_cumulative,
+    compute_yearly_cumulative_matrix,
+    compute_half_year_cumulative_n_year_maturity,
+    compute_matrix_for_log_rec_dis,
     create_agb_bgb_matrix,
     create_bgb_matrix_from_agb,
     breakdown_agb_bgb_emissions,
@@ -12,7 +12,7 @@ from .general_functions import (
     calculate_logging_effect,
     create_litter_deadwood_matrix,
     check_agb_matrices,
-    soil_emissions_2,
+    soil_emissions,
     som_emissions,
     
     
@@ -122,40 +122,41 @@ class ForestManagement(BaseModule):
 
     def __post_init__(self):
         super().__post_init__()
+        
+        # TODO: This is like this because to all calculation extents, if the rate is immediate, the implementation time of the project is basically 1 year
+        # hence all the time dependent calculations for rotation ecc are to be considered on 1 year and not multiple years. The capitalization then becomes 
+        # equivalent to capitalization + implementation - 1
+        self.capitalization_time = self.capitalization_time if not self.rate_type == 'immediate' else self.capitalization_time + self.implementation_time - 1
+        self.implementation_time = self.implementation_time if not self.rate_type == 'immediate' else 1
 
         ########### MATRIX ASSIGNMENT ############
         # Hectares at each year of the project
-        self.hectares_total = yearly_time_dependent_parameter_breakdown(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
+        self.hectares_total = compute_yearly_or_half_year_cumulative(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
         # Hectares which have reached and have not 20 years of maturity, necessary for soil emissions
-        self.hectares_before_20, self.hectares_after_20 = yearly_time_dependent_20_year_breakdown(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
+        self.hectares_before_20, self.hectares_after_20 = compute_half_year_cumulative_n_year_maturity(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
         
-        self.hectares_matrix = yearly_time_dependent_matrix(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
-        self.hectares_for_rot_log_dis = yearly_time_dependent_matrix_log_rec_dis(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
+        self.hectares_matrix = compute_yearly_cumulative_matrix(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
+        self.hectares_for_rot_log_dis = compute_matrix_for_log_rec_dis(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
         ########### GENERAL VARIABLE ASSIGNMENTS ############
-        self.agb_yearly_growth_over_20 = self.agb_yearly_growth_over_20_default if not self.agb_yearly_growth_over_20_tier_2 else self.agb_yearly_growth_over_20_tier_2
-        self.agb_yearly_growth_under_20 = self.agb_yearly_growth_under_20_default if not self.agb_yearly_growth_under_20_tier_2 else self.agb_yearly_growth_under_20_tier_2
-        self.agb_start = self.agb_start_default if not self.agb_start_tier_2 else self.agb_start_tier_2
+        self.agb_yearly_growth_over_20 = self.agb_yearly_growth_over_20_default if self.agb_yearly_growth_over_20_tier_2 is None else self.agb_yearly_growth_over_20_tier_2
+        self.agb_yearly_growth_under_20 = self.agb_yearly_growth_under_20_default if self.agb_yearly_growth_under_20_tier_2 is None else self.agb_yearly_growth_under_20_tier_2
+        self.agb_start = self.agb_start_default if self.agb_start_tier_2 is None else self.agb_start_tier_2
         self.bgb_start = self.agb_start * self.bgb_ratio_under_threshold if self.agb_start < self.bgb_ratio_threshold else self.agb_start * self.bgb_ratio_over_threshold
         self.max_bgb_value = self.max_agb_value * self.bgb_ratio_under_threshold if self.max_agb_value < self.bgb_ratio_threshold else self.max_agb_value * self.bgb_ratio_over_threshold
-        self.litter_20_years = self.litter_20_years_default if not self.litter_20_years_tier_2 else self.litter_20_years_tier_2
-        self.deadwood_20_years = self.deadwood_20_years_default if not self.deadwood_20_years_tier_2 else self.deadwood_20_years_tier_2
+        self.litter_20_years = self.litter_20_years_default if self.litter_20_years_tier_2 is None else self.litter_20_years_tier_2
+        self.deadwood_20_years = self.deadwood_20_years_default if self.deadwood_20_years_tier_2 is None else self.deadwood_20_years_tier_2
 
-        # TODO: This is like this because to all calculation extents, if the rate is immediate, the implementation time of the project is basically 1 year
-        # hence all the time dependent calculations for rotation ecc are to be considered on 1 year and not multiple years. The capitalization then becomes 
-        # equivalent to capitalization + implementation + 1
-        self.capitalization_time = self.capitalization_time if not self.rate_type == 'immediate' else self.capitalization_time + self.implementation_time + 1
-        self.implementation_time = self.implementation_time if not self.rate_type == 'immediate' else 1
         
         ########### GENERALE LAND MODULE ASSIGNMENTS ############
-        fmg_start = self.fmg_start_tier_2 or self.fmg_start_default
-        fmg_end = self.fmg_end_tier_2 or self.fmg_end_default
-        flu_start = self.flu_start_tier_2 or self.flu_start_default
-        flu_end = self.flu_end_tier_2 or self.flu_end_default
-        fi_start = self.fi_start_tier_2 or self.fi_start_default
-        fi_end = self.fi_end_tier_2 or self.fi_end_default
-        soc_ref_start = self.soc_start_tier_2 or self.soc_start_default
-        soc_ref_end = self.soc_end_tier_2 or self.soc_end_default
+        fmg_start = self.fmg_start_tier_2 if self.fmg_start_tier_2 is not None else self.fmg_start_default
+        fmg_end = self.fmg_end_tier_2 if self.fmg_end_tier_2 is not None else self.fmg_end_default
+        flu_start = self.flu_start_tier_2 if self.flu_start_tier_2 is not None else self.flu_start_default
+        flu_end = self.flu_end_tier_2 if self.flu_end_tier_2 is not None else self.flu_end_default
+        fi_start = self.fi_start_tier_2 if self.fi_start_tier_2 is not None else self.fi_start_default
+        fi_end = self.fi_end_tier_2 if self.fi_end_tier_2 is not None else self.fi_end_default
+        soc_ref_start = self.soc_start_tier_2 if self.soc_start_tier_2 is not None else self.soc_start_default
+        soc_ref_end = self.soc_end_tier_2 if self.soc_end_tier_2 is not None else self.soc_end_default
 
         self.soc_start = soc_ref_start * fmg_start * fi_start * flu_start
         self.soc_end = soc_ref_end * fmg_end * fi_end * flu_end
@@ -372,7 +373,7 @@ class ForestManagement(BaseModule):
 
         def calculate_emissions_soil():
             try:
-                emissions_soil_yearly, emissions_soil_total = soil_emissions_2(self.soc_start, self.soc_end, self.hectares_total, self.hectares_start, self.hectares_end, self.hectares_before_20)
+                emissions_soil_yearly, emissions_soil_total = soil_emissions(self.soc_start, self.soc_end, self.hectares_total, self.hectares_start, self.hectares_end, self.hectares_before_20)
 
                 soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_soil_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)

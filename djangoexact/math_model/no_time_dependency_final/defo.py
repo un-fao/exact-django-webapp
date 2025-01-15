@@ -2,13 +2,12 @@ import re
 import traceback
 
 from .general_functions import (
-    breakdown_according_to_values,
+    breakdown_proportionally_to_values,
     soil_emissions,
-    soil_emissions_2,
-    yearly_constant_emissions_breakdown,
-    yearly_time_dependent_20_year_breakdown,
-    yearly_time_dependent_parameter_breakdown,
+    compute_half_year_cumulative_n_year_maturity,
+    compute_yearly_or_half_year_cumulative,
     som_emissions,
+    compute_yearly_delta
 )
 from .ghg_emissions_classes import (
     ActivityTypes,
@@ -79,20 +78,22 @@ class Defo(BaseModule):
 
         self.area_deforested = abs(self.ha_end - self.ha_start)
         # TODO: Assigned FMG, FLU, FI values. Maybe once everything has been done change this structure
-        self.fmg_start = self.fmg_start_tier_2 if self.fmg_start_tier_2 else self.fmg_start_default
-        self.fmg_end = self.fmg_end_tier_2 if self.fmg_end_tier_2 else self.fmg_end_default
-        self.flu_start = self.flu_start_tier_2 if self.flu_start_tier_2 else self.flu_start_default
-        self.flu_end = self.flu_end_tier_2 if self.flu_end_tier_2 else self.flu_end_default
-        self.fi_start = self.fi_start_tier_2 if self.fi_start_tier_2 else self.fi_start_default
-        self.fi_end = self.fi_end_tier_2 if self.fi_end_tier_2 else self.fi_end_default
+        self.fmg_start = self.fmg_start_tier_2 if self.fmg_start_tier_2 is not None else self.fmg_start_default
+        self.fmg_end = self.fmg_end_tier_2 if self.fmg_end_tier_2 is not None else self.fmg_end_default
+        self.flu_start = self.flu_start_tier_2 if self.flu_start_tier_2 is not None else self.flu_start_default
+        self.flu_end = self.flu_end_tier_2 if self.flu_end_tier_2 is not None else self.flu_end_default
+        self.fi_start = self.fi_start_tier_2 if self.fi_start_tier_2 is not None else self.fi_start_default
+        self.fi_end = self.fi_end_tier_2 if self.fi_end_tier_2 is not None else self.fi_end_default
 
-        self.soc_start = self.soc_start_default * self.fmg_start * self.flu_start * self.fi_start if not self.soc_start_tier_2 else self.soc_start_tier_2 * self.fmg_start * self.flu_start * self.fi_start
-        self.soc_end = self.soc_end_default * self.fmg_end * self.flu_end * self.fi_end if not self.soc_end_tier_2 else self.soc_end_tier_2 * self.fmg_end * self.flu_end * self.fi_end
+        self.soc_start = self.soc_start_default * self.fmg_start * self.flu_start * self.fi_start if self.soc_start_tier_2 is None else self.soc_start_tier_2 * self.fmg_start * self.flu_start * self.fi_start
+        self.soc_end = self.soc_end_default * self.fmg_end * self.flu_end * self.fi_end if self.soc_end_tier_2 is None else self.soc_end_tier_2 * self.fmg_end * self.flu_end * self.fi_end
 
         # AUXILIARY VARIABLES FOR SOIL CALCULATION
-        self.hectares_before_20, self.hectares_after_20 = yearly_time_dependent_20_year_breakdown(0, self.area_deforested, self.implementation_time, self.capitalization_time, self.rate_type)
-        self.total_hectares = yearly_time_dependent_parameter_breakdown(self.area_deforested, 0, self.implementation_time, self.capitalization_time, self.rate_type)
-
+        self.hectares_before_20, self.hectares_after_20 = compute_half_year_cumulative_n_year_maturity(0, self.area_deforested, self.implementation_time, self.capitalization_time, self.rate_type)
+        self.total_hectares = compute_yearly_or_half_year_cumulative(self.area_deforested, 0, self.implementation_time, self.capitalization_time, self.rate_type)
+        self.delta_hectares = compute_yearly_delta(self.area_deforested, 0, self.implementation_time, self.capitalization_time, self.rate_type)
+        
+        
     def calculate_emissions(self):
 
         def calculate_biomass():
@@ -100,8 +101,8 @@ class Defo(BaseModule):
                 # NOTE: try to make the variable names similar to OLUC
                 bgb_t_c_per_ha_default = self.bgb_t_c_per_ha_default_input_parameter * self.agb_t_c_per_ha_default
 
-                agb_t_c = self.agb_t_c_per_ha_default if not self.agb_t_c_per_ha_tier_2 else self.agb_t_c_per_ha_tier_2
-                bgb_t_c = bgb_t_c_per_ha_default if not self.bgb_t_c_per_ha_tier_2 else self.bgb_t_c_per_ha_tier_2
+                agb_t_c = self.agb_t_c_per_ha_default if self.agb_t_c_per_ha_tier_2 is None else self.agb_t_c_per_ha_tier_2
+                bgb_t_c = bgb_t_c_per_ha_default if self.bgb_t_c_per_ha_tier_2 is None else self.bgb_t_c_per_ha_tier_2
 
                 hwp_before_t_c = self.agb_t_c_per_ha_default if self.hwp_before_t_dm_per_ha * self.mangrove_factor > self.agb_t_c_per_ha_default else self.hwp_before_t_dm_per_ha * self.mangrove_factor
 
@@ -121,7 +122,7 @@ class Defo(BaseModule):
 
                 biomass_loss = biomass_forest_agb_bgb_t_co2 * self.area_deforested
 
-                emissions_biomass_loss_yearly = yearly_constant_emissions_breakdown(biomass_loss, self.implementation_time, self.capitalization_time, self.rate_type)
+                emissions_biomass_loss_yearly = breakdown_proportionally_to_values(biomass_loss, self.delta_hectares)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in emissions_biomass_loss_yearly], activity=ActivityTypes.BIOMASS, delay=self.delay))
 
@@ -130,14 +131,15 @@ class Defo(BaseModule):
 
         def calculate_dom_emissions():
             try:
-                litter = self.litter if not self.litter_tier_2 else self.litter_tier_2
-                dw = self.dw if not self.dw_tier_2 else self.dw_tier_2
+                litter = self.litter if self.litter_tier_2 is None else self.litter_tier_2
+                dw = self.dw if self.dw_tier_2 is None else self.dw_tier_2
 
                 biomass_forest_dom_t_c_per_ha = litter + dw
                 biomass_forest_dom_t_co2_per_ha = biomass_forest_dom_t_c_per_ha * (44 / 12)
 
                 dom_loss = biomass_forest_dom_t_co2_per_ha * self.area_deforested
-                emissions_dom_yearly = yearly_constant_emissions_breakdown(dom_loss, self.implementation_time, self.capitalization_time, self.rate_type)
+                
+                emissions_dom_yearly = breakdown_proportionally_to_values(dom_loss, self.delta_hectares)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in emissions_dom_yearly], activity=ActivityTypes.DOM, delay=self.delay))
 
@@ -153,9 +155,12 @@ class Defo(BaseModule):
 
                 total_ch4_per_ha = fire_kg_ch4 * self.methane_constant / 1000
                 total_n2o_per_ha = fire_kg_n2o * self.nitrous_constant / 1000
+                
+                total_ch4 = total_ch4_per_ha * self.area_deforested
+                total_n2o = total_n2o_per_ha * self.area_deforested
 
-                emissions_ch4 = yearly_constant_emissions_breakdown(total_ch4_per_ha * self.area_deforested, self.implementation_time, self.capitalization_time, self.rate_type)
-                emissions_n2o = yearly_constant_emissions_breakdown(total_n2o_per_ha * self.area_deforested, self.implementation_time, self.capitalization_time, self.rate_type)
+                emissions_ch4 = breakdown_proportionally_to_values(total_ch4, self.delta_hectares)
+                emissions_n2o = breakdown_proportionally_to_values(total_n2o, self.delta_hectares)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in emissions_ch4], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in emissions_n2o], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
