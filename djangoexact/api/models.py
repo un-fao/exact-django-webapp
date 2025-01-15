@@ -2896,3 +2896,13 @@ class Transport(ValueChainParentModule):
 
 class TransportEntry(ValueChainSubmodule):
     parent = models.ForeignKey(Transport, on_delete=models.CASCADE, null=True, blank=True, related_name="entries")
+
+from django.db import models
+
+class APIStatus(models.Model):
+    is_under_maintenance = models.BooleanField(default=False)
+    maintenance_end_time = models.DateTimeField(null=True, blank=True)
+    maintenance_message = models.TextField(default="The API is under maintenance. Please check back later.")
+
+    def __str__(self):
+        return "API Status"
