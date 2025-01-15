@@ -128,6 +128,7 @@ from .models import (
     ProcessingEntry,
     ApplicationParameter,
     FuelType,
+    OtherInfrastructure,
 )
 from api.utilities import DefaultValue
 from math_model.no_time_dependency_final.value_chains import ValueChain as MathValueChain
@@ -3979,7 +3980,7 @@ class SettlementCalculator(LandModuleCalculator):
 
 class BuildingCalculator(BaseCalculator):
     """
-    Calculator for buildings and roads.
+    Calculator for buildings.
     """
 
     def __init__(self, input) -> None:
@@ -4045,7 +4046,7 @@ class BuildingCalculator(BaseCalculator):
 
 class RoadCalculator(BaseCalculator):
     """
-    Calculator for buildings and roads.
+    Calculator for roads.
     """
 
     def __init__(self, input) -> None:
@@ -4111,6 +4112,65 @@ class RoadCalculator(BaseCalculator):
 
         return results_tuple
 
+class OtherInfrastructureCalculator(BaseCalculator):
+    """
+    Calculator for other infrastructure.
+    """
+
+    def __init__(self, input) -> None:
+        super().__init__(input)
+        self.module: OtherInfrastructure
+
+        self.ef: ipcc.BuildingEmissionFactor = ipcc.BuildingEmissionFactor()
+
+    def get_defaults(self, calculate=False) -> dict:
+        super().get_defaults(calculate)
+        
+        missing_scenarios = utils.find_empty_scenarios(self.module, "ef_t2")
+        if missing_scenarios:
+            raise ValueError(f"Infrastructure Emission Factor is missing. Please provide a tier 2 value for scenarios: {', '.join(missing_scenarios)}")
+
+    def calculate(self) -> list[Result]:
+        """
+        Calculate emissions for a single Building module.
+        """
+
+        self.get_defaults()
+
+        if self.module.is_with():
+            self.inputs_w = {
+                "ef_ipcc": self.ef.value,
+                "ef_tier_2": self.module.ef_t2_w,
+                "units_end": self.module.area_m2_w,
+                "implementation_time": self.activity.implementation_years,
+                "capitalization_time": self.activity.capitalization_years,
+                "rate_type": self.change_rate.name,
+                "delay": self.activity.delay,
+            }
+
+            self.math_w = MathRoads(**self.inputs_w)
+            self.math_w.calculate_emissions()
+
+        if self.module.is_without():
+            self.inputs_wo = {
+                "ef_ipcc": self.ef.value,
+                "ef_tier_2": self.module.ef_t2_wo,
+                "units_end": self.module.area_m2_wo,
+                "implementation_time": self.activity.implementation_years,
+                "capitalization_time": self.activity.capitalization_years,
+                "rate_type": self.change_rate.name,
+                "delay": self.activity.delay,
+            }
+
+            self.math_wo = MathRoads(**self.inputs_wo)
+            self.math_wo.calculate_emissions()
+
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+
+        results_tuple = (self.results_w, self.results_wo)
+
+        return results_tuple
 
 class LivestockCalculator(BaseCalculator):
     """
