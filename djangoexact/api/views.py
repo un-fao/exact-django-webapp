@@ -18,7 +18,7 @@ from django.utils import timezone
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
-from rest_framework import permissions, viewsets, views
+from rest_framework import permissions, viewsets
 from rest_framework import status as http_status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -63,8 +63,7 @@ from .models import (
     LandModule,
     CachedResultMixin,
     ProjectTag,
-    ProjectFileAttachment,
-    APIStatus,
+    ProjectFileAttachment
 )
 from .serializers import (
     ActionTypes,
@@ -106,7 +105,6 @@ from .serializers import (
     ProjectTagSerializer,
     ProjectFileUploadSerializer,
     ProjectFileReadSerializer,
-    APIStatusSerializer,
 )
 
 from djangoexact.settings import auth
@@ -126,7 +124,6 @@ from django.test import RequestFactory
 import asyncio
 from asgiref.sync import sync_to_async
 from django.utils.text import slugify
-from django.core.cache import cache
 
 
 logger = logging.getLogger("console")
@@ -451,12 +448,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 type=openapi.TYPE_BOOLEAN,
             ),
         ], 
-        responses={
-            404: "Project not found", 
-            403: "Selected user does not have permission to view projects", 
-            200: ReadProjectSerializer,
-            201: ProjectSummarySerializer,
-        },
+        responses={404: "Project not found", 403: "Selected user does not have permission to view projects", 200: ReadProjectSerializer | ProjectSummarySerializer},
         serializer_class=ReadProjectSerializer,
     )
     def list(self, request):
@@ -609,18 +601,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(ReadProjectSerializer(project, context={"request": request}).data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])
-    @swagger_auto_schema(
-        manual_parameters=[
-            openapi.Parameter(
-                "activities",
-                openapi.IN_QUERY,
-                description="List of activity IDs to include in the report",
-                type=openapi.TYPE_ARRAY,
-                items={"type": openapi.TYPE_INTEGER},
-            )
-        ],
-        responses={404: "Project not found", 403: "Selected user does not have permission to view project results"},
-    )
+    @swagger_auto_schema(responses={404: "Project not found", 403: "Selected user does not have permission to view project results"})
     def report(self, request, pk=None):
         project: Project = self.get_object()
 
@@ -631,15 +612,9 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not project.is_ready():
             logging.error("Project is not ready")
             return utils.ErrorResponse("To get a report for a project, all activities must have been completed.", status=http_status.HTTP_400_BAD_REQUEST)
-        
-        selected_activities = request.query_params.get("activities", "").split(",")
-        if selected_activities == [""]:
-            selected_activities = None
-        else:
-            selected_activities = project.activities.filter(pk__in=selected_activities)
 
         try:
-            report = reports.BaseProjectReport(project, activities=selected_activities)
+            report = reports.BaseProjectReport(project)
             _, file_bytes_buffer = report.build_report()
             report.close_file()
         except Exception as e:
@@ -1675,7 +1650,7 @@ def generic_module_viewset(model: Module):
         @action(detail=True, methods=["get"], url_path="results")
         @swagger_auto_schema(
             manual_parameters=[
-                openapi.Parameter("aggregate", openapi.IN_QUERY, description="Aggregate results by", type=openapi.TYPE_STRING, enum=[BreakdownTypes.TOTAL.value, BreakdownTypes.ACTIVITY.value, BreakdownTypes.GAS.value, BreakdownTypes.ACTIVITY_GAS.value]),
+                openapi.Parameter("aggregate", openapi.IN_QUERY, description="Aggregate results by", type=openapi.TYPE_STRING, enum=[BreakdownTypes.TOTAL, BreakdownTypes.ACTIVITY, BreakdownTypes.GAS, BreakdownTypes.ACTIVITY_GAS]),
                 openapi.Parameter("cached", openapi.IN_QUERY, description="Use cached results", type=openapi.TYPE_BOOLEAN),
             ],
             responses={400: "Bad request", 403: "Selected user does not have permission to view module results", 200: DynamicResultSerializer},
@@ -1702,7 +1677,6 @@ def generic_module_viewset(model: Module):
                     return utils.ErrorResponse("Not all modules are ready. Land Use Change module cannot be calculated.")
             else:
                 if not module.is_ready():
-                    logger.error(f"Module {module.module_type} is not ready. Cannot calculate result.")
                     return utils.ErrorResponse("Module is not ready. Cannot calculate result.")
 
             try:
@@ -1902,8 +1876,6 @@ class ProjectTagViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     ordering = ["name"]
 
     def get_serializer_context(self):
-        if getattr(self, 'swagger_fake_view', False):
-            return {}
         context = super().get_serializer_context()
         project_id = self.kwargs.get("project_pk")
         context["project"] = get_object_or_404(Project, pk=project_id)
@@ -1957,8 +1929,6 @@ class ProjectFileAttachmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     ordering = ["name"]
 
     def get_serializer_context(self):
-        if getattr(self, 'swagger_fake_view', False):
-            return {}
         context = super().get_serializer_context()
         project_id = self.kwargs.get("project_pk")
         context["project"] = get_object_or_404(Project, pk=project_id)
@@ -1967,7 +1937,6 @@ class ProjectFileAttachmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
     @transaction.atomic
     def create(self, request):
-        
         project_id = request.data.get("project", None)
 
         if project_id is None:
@@ -2059,23 +2028,3 @@ class ProjectFileAttachmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         attachment.delete()
 
         return Response(status=http_status.HTTP_204_NO_CONTENT)
-
-class APIStatusView(views.APIView):
-    def get(self, request):
-        try:
-            api_status = APIStatus.objects.first()
-            if api_status and api_status.is_under_maintenance:
-                serializer = APIStatusSerializer(api_status)
-                return Response({
-                    "status": "maintenance",
-                    "http_status": 503,
-                    **serializer.data
-                }, status=http_status.HTTP_503_SERVICE_UNAVAILABLE)
-        except APIStatus.DoesNotExist:
-            pass
-
-        return Response({
-            "status": "operational",
-            "http_status": 200,
-            "message": "API is fully operational."
-        }, status=http_status.HTTP_200_OK)
