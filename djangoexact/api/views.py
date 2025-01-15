@@ -612,9 +612,15 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not project.is_ready():
             logging.error("Project is not ready")
             return utils.ErrorResponse("To get a report for a project, all activities must have been completed.", status=http_status.HTTP_400_BAD_REQUEST)
+        
+        selected_activities = request.query_params.get("activities", "").split(",")
+        if selected_activities == [""]:
+            selected_activities = None
+        else:
+            selected_activities = project.activities.filter(pk__in=selected_activities)
 
         try:
-            report = reports.BaseProjectReport(project)
+            report = reports.BaseProjectReport(project, activities=selected_activities)
             _, file_bytes_buffer = report.build_report()
             report.close_file()
         except Exception as e:
