@@ -2061,21 +2061,18 @@ class ProjectFileAttachmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(status=http_status.HTTP_204_NO_CONTENT)
 
 class APIStatusView(views.APIView):
+    permission_classes = [permissions.AllowAny]
+
+    @swagger_auto_schema(responses={503: APIStatusSerializer, 200: APIStatusSerializer})
     def get(self, request):
+        status = http_status.HTTP_200_OK
+
         try:
             api_status = APIStatus.objects.first()
+            serializer = APIStatusSerializer(api_status)
             if api_status and api_status.is_under_maintenance:
-                serializer = APIStatusSerializer(api_status)
-                return Response({
-                    "status": "maintenance",
-                    "http_status": 503,
-                    **serializer.data
-                }, status=http_status.HTTP_503_SERVICE_UNAVAILABLE)
+                status = http_status.HTTP_503_SERVICE_UNAVAILABLE
         except APIStatus.DoesNotExist:
             pass
 
-        return Response({
-            "status": "operational",
-            "http_status": 200,
-            "message": "API is fully operational."
-        }, status=http_status.HTTP_200_OK)
+        return Response(serializer.data, status=status)
