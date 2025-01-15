@@ -2063,9 +2063,19 @@ class ProjectFileAttachmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 class APIHealthView(views.APIView):
     permission_classes = [permissions.AllowAny]
 
+    CACHE_KEY = "api_health_status"
+    CACHE_TIMEOUT_SECONDS = 60
+
     @swagger_auto_schema(responses={503: APIStatusSerializer, 200: APIStatusSerializer})
     def get(self, request):
         status = http_status.HTTP_200_OK
+        cached_status: dict = cache.get(self.CACHE_KEY)
+
+        if cached_status:
+            if cached_status["is_under_maintenance"]:
+                status = http_status.HTTP_503_SERVICE_UNAVAILABLE
+            return Response(cached_status, status=status)
+        
 
         try:
             api_status = APIHealth.objects.first()
@@ -2075,4 +2085,5 @@ class APIHealthView(views.APIView):
         except APIHealth.DoesNotExist:
             pass
 
+        cache.set(self.CACHE_KEY, serializer.data, self.CACHE_TIMEOUT_SECONDS)
         return Response(serializer.data, status=status)
