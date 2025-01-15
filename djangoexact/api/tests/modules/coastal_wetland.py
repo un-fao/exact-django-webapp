@@ -4,6 +4,7 @@ from api.calculators import *
 from api.models import *
 from api.serializers import *
 from ipcc.models import *
+import api.reports as reports
 
 from ..factories import *
 import api.tests.base_test_classes as t
@@ -18,6 +19,9 @@ class CoastalWetlandTest(t.ModuleTest):
 
     def test(self):
         self.calculate_results()
+
+        res = reports.BaseProjectReport(self.project)
+        res.build_report()
 
 
 CoastalWetlandTest().test()

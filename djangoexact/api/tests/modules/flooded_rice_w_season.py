@@ -4,6 +4,7 @@ from api.calculators import *
 from api.models import *
 from api.serializers import *
 from ipcc.models import *
+import api.reports as reports
 
 from ..factories import *
 import api.tests.base_test_classes as t
@@ -22,6 +23,9 @@ class FloodedRiceTest(t.ModuleTest):
 
         msc = FloodedRiceSeasonCalculator(self.minor_season)
         res = msc.calculate()
+
+        rep = reports.BaseProjectReport(self.project)
+        rep.build_report()
 
         print(f"Minor season results: {Result(*res).breakdown()}")
 

@@ -14,9 +14,10 @@ import copy
 from . import base_module
 
 
-class ProcessingTestCase(base_module.BaseModuleTestCase):
+class ProcessingTestCase(base_module.BaseModuleWithSubmoduleTestCase):
     def setUp(self):
         self.ModuleClass = models.Processing
+        self.submodule_classes = [models.ProcessingEntry]
         super().setUp()
 
         self.land_use_types = self.land_use_types.filter(module_types__class_name=self.ModuleClass.__name__, climates=self.project.climate, moistures=self.project.moisture, is_active=True)
@@ -25,19 +26,22 @@ class ProcessingTestCase(base_module.BaseModuleTestCase):
             "fuel_type_start": models.FuelType.objects.filter(fuel_use_type__name="Stationary").order_by("?").first().id,
             "fuel_type_w": models.FuelType.objects.filter(fuel_use_type__name="Stationary").order_by("?").first().id,
             "fuel_type_wo": models.FuelType.objects.filter(fuel_use_type__name="Stationary").order_by("?").first().id,
-            "kwh_energy_per_year_start": FuzzyFloat(0, 1000).fuzz(),
-            "kwh_energy_per_year_w": FuzzyFloat(0, 1000).fuzz(),
-            "kwh_energy_per_year_wo": FuzzyFloat(0, 1000).fuzz(),
+            "energy_ef_co2_t2": FuzzyFloat(0, 1000).fuzz(),
+            "energy_ef_ch4_t2": FuzzyFloat(0, 1000).fuzz(),
+            "energy_ef_n2o_t2": FuzzyFloat(0, 1000).fuzz(),
+            "quantity_consumed_per_year_start": FuzzyFloat(0, 1000).fuzz(),
+            "quantity_consumed_per_year_w": FuzzyFloat(0, 1000).fuzz(),
+            "quantity_consumed_per_year_wo": FuzzyFloat(0, 1000).fuzz(),
         }
 
-        self.edit_module(self.module, self.user, self.validated_data)
+        self.edit_module(self.submodules[0], self.user, self.validated_data)
         self.module.refresh_from_db()
 
     def test_modify(self):
 
         validated_data = copy.deepcopy(self.validated_data)
         validated_data["fuel_type_start"] = models.FuelType.objects.filter(fuel_use_type__name="Stationary").order_by("?").first().id
-        response = self.edit_module(self.module, self.user, validated_data)
+        response = self.edit_module(self.submodules[0], self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["status"]["name"], "READY")
@@ -46,7 +50,7 @@ class ProcessingTestCase(base_module.BaseModuleTestCase):
 
         validated_data = copy.deepcopy(self.validated_data)
         validated_data["fuel_type_start"] = None
-        response = self.edit_module(self.module, self.user, validated_data)
+        response = self.edit_module(self.submodules[0], self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["status"]["name"], "EMPTY")

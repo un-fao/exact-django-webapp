@@ -1,14 +1,13 @@
 import traceback
 
 from .general_functions import (
-    breakdown_according_to_values,
-    soil_emissions_2,
+    breakdown_proportionally_to_values,
+    soil_emissions,
     som_emissions,
-    yearly_constant_emissions_breakdown,
-    yearly_time_dependent_20_year_breakdown,
-    yearly_time_dependent_parameter_breakdown,
-    biomass_emissions,
-    breakdown_according_to_values_for_x_years
+    compute_half_year_cumulative_n_year_maturity,
+    compute_yearly_or_half_year_cumulative,
+    biomass_emissions
+    
 )
 from .ghg_emissions_classes import (
     ActivityTypes,
@@ -54,9 +53,9 @@ class PerennialCropland(LandModule):
     ):
         def calculate_residue():
             try:
-                fire_periodicity = self.fire_periodicity_default if not self.fire_periodicity_tier_2 else self.fire_periodicity_tier_2
-                ag_tc = self.agb_rate_default if not self.agb_rate_tier_2 else self.agb_rate_tier_2
-                t_biomass = ag_tc * 0.5 / 0.47 if not self.t_biomass_tier_2 else self.t_biomass_tier_2  # Default
+                fire_periodicity = self.fire_periodicity_default if self.fire_periodicity_tier_2 is None else self.fire_periodicity_tier_2
+                ag_tc = self.agb_rate_default if self.agb_rate_tier_2 is None else self.agb_rate_tier_2
+                t_biomass = ag_tc * 0.5 / 0.47 if self.t_biomass_tier_2 is None else self.t_biomass_tier_2  # Default
                 self.residue_availability_tier_2_default = t_biomass
 
                 ################## COMPUTATION OF AMOUNT OF KG OF METHANE ###################
@@ -72,11 +71,11 @@ class PerennialCropland(LandModule):
                 nitrous_component = kg_nitrous * self.nitrous_constant / 1000
                 methane_component = kg_methane * self.methane_constant / 1000
 
-                total_nitrous = sum(self.hectares_total) * nitrous_component
+                total_nitrous = sum(self.hectares_total) * nitrous_component 
                 total_methane = sum(self.hectares_total) * methane_component
 
-                yearly_nitrous_emissions = breakdown_according_to_values(total_nitrous, self.hectares_total)
-                yearly_methane_emissions = breakdown_according_to_values(total_methane, self.hectares_total)
+                yearly_nitrous_emissions = breakdown_proportionally_to_values(total_nitrous, self.hectares_total)
+                yearly_methane_emissions = breakdown_proportionally_to_values(total_methane, self.hectares_total)
 
                 nitrous_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in yearly_nitrous_emissions], ActivityTypes.RESIDUE_BURNING, delay=self.delay)
                 methane_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in yearly_methane_emissions], ActivityTypes.RESIDUE_BURNING, delay=self.delay)
@@ -101,7 +100,7 @@ class PerennialCropland(LandModule):
         def calculate_soil():
             try:
                 if self.calculate_soc_som:
-                    yearly_soil_emissions, total_soil_emissions = soil_emissions_2(self.soc_start, self.soc_end, self.hectares_total, self.hectares_start, self.hectares_end, self.hectares_before_20)
+                    yearly_soil_emissions, total_soil_emissions = soil_emissions(self.soc_start, self.soc_end, self.hectares_total, self.hectares_start, self.hectares_end, self.hectares_before_20)
 
                     soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_soil_emissions], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
@@ -123,8 +122,8 @@ class PerennialCropland(LandModule):
 
                     else:
                         # NOTE: In this case we are in the situation where biomass_final has to be calculated and is not tabulated
-                        agb_rate = self.agb_rate_default * 44 / 12 if not self.agb_rate_tier_2 else self.agb_rate_tier_2 * 44 / 12
-                        bgb_rate = self.bgb_rate_default * 44 / 12 if not self.bgb_rate_tier_2 else self.bgb_rate_tier_2 * 44 / 12
+                        agb_rate = self.agb_rate_default * 44 / 12 if self.agb_rate_tier_2 is None else self.agb_rate_tier_2 * 44 / 12
+                        bgb_rate = self.bgb_rate_default * 44 / 12 if self.bgb_rate_tier_2 is None else self.bgb_rate_tier_2 * 44 / 12
 
                         if self.agb_rate_tier_2:    
                             max_agb = 0 if self.agb_rate_default < self.agb_rate_tier_2 else self.agb_maximum_c * 44 / 12
@@ -136,7 +135,7 @@ class PerennialCropland(LandModule):
                         max_years_growth = max_agb / agb_rate
                         
                         # BREAKDOWN THE HECTARES FOR MAX YEARS GROWTH
-                        hectares_before_n, hectares_after_n = yearly_time_dependent_20_year_breakdown(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type, number_of_years=int(max_years_growth))
+                        hectares_before_n, hectares_after_n = compute_half_year_cumulative_n_year_maturity(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type, number_of_years=int(max_years_growth))
 
                         calculated = self.biomass_start + biomass_accumulation_rate * sum(self.hectares_total) 
                         tabular = (max_agb + bgb_rate * max_years_growth) * self.hectares_end
@@ -145,7 +144,7 @@ class PerennialCropland(LandModule):
 
 
                         # NOTE: maybe this should be broken down over max_years_growth or over all years of project depending on whether calculated or tabular is used
-                        yearly_bio_emissions = breakdown_according_to_values(total, hectares_before_n)
+                        yearly_bio_emissions = breakdown_proportionally_to_values(total, hectares_before_n)
 
                         biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_bio_emissions], ActivityTypes.BIOMASS, delay=self.delay)
                         self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
