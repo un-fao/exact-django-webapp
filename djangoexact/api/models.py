@@ -2899,10 +2899,10 @@ class TransportEntry(ValueChainSubmodule):
 
 from django.db import models
 
-class APIStatus(models.Model):
+class APIHealth(models.Model):
     is_under_maintenance = models.BooleanField(default=False)
     maintenance_end_time = models.DateTimeField(null=True, blank=True)
     maintenance_message = models.TextField(default="The tool is under maintenance. Please check back later.")
 
     def __str__(self):
-        return "API Status"
+        return "API Health"

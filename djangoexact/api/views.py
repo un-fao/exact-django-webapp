@@ -64,7 +64,7 @@ from .models import (
     CachedResultMixin,
     ProjectTag,
     ProjectFileAttachment,
-    APIStatus,
+    APIHealth,
 )
 from .serializers import (
     ActionTypes,
@@ -2060,7 +2060,7 @@ class ProjectFileAttachmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         return Response(status=http_status.HTTP_204_NO_CONTENT)
 
-class APIStatusView(views.APIView):
+class APIHealthView(views.APIView):
     permission_classes = [permissions.AllowAny]
 
     @swagger_auto_schema(responses={503: APIStatusSerializer, 200: APIStatusSerializer})
@@ -2068,11 +2068,11 @@ class APIStatusView(views.APIView):
         status = http_status.HTTP_200_OK
 
         try:
-            api_status = APIStatus.objects.first()
+            api_status = APIHealth.objects.first()
             serializer = APIStatusSerializer(api_status)
             if api_status and api_status.is_under_maintenance:
                 status = http_status.HTTP_503_SERVICE_UNAVAILABLE
-        except APIStatus.DoesNotExist:
+        except APIHealth.DoesNotExist:
             pass
 
         return Response(serializer.data, status=status)
