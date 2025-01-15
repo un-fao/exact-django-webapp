@@ -1677,6 +1677,7 @@ def generic_module_viewset(model: Module):
                     return utils.ErrorResponse("Not all modules are ready. Land Use Change module cannot be calculated.")
             else:
                 if not module.is_ready():
+                    logger.error(f"Module {module.module_type} is not ready. Cannot calculate result.")
                     return utils.ErrorResponse("Module is not ready. Cannot calculate result.")
 
             try:
