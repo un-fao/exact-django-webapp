@@ -2269,9 +2269,17 @@ class Fuel(Submodule):
     quantity_consumed_per_year_wo = models.FloatField(null=True, blank=True, verbose_name=_("quantity_consumed_per_year_wo"))
     quantity_consumed_per_year_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_quantity_consumed_per_year_thread")
 
-    energy_ef_co2_t2 = models.FloatField(null=True, blank=True, verbose_name=_("ef_co2_t2"))
-    energy_ef_ch4_t2 = models.FloatField(null=True, blank=True, verbose_name=_("ef_ch4_t2"))
-    energy_ef_n2o_t2 = models.FloatField(null=True, blank=True, verbose_name=_("ef_n2o_t2"))
+    energy_ef_co2_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("ef_co2_t2"))
+    energy_ef_ch4_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("ef_ch4_t2"))
+    energy_ef_n2o_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("ef_n2o_t2"))
+
+    energy_ef_co2_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("ef_co2_t2_w"))
+    energy_ef_ch4_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("ef_ch4_t2_w"))
+    energy_ef_n2o_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("ef_n2o_t2_w"))
+
+    energy_ef_co2_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("ef_co2_t2_wo"))
+    energy_ef_ch4_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("ef_ch4_t2_wo"))
+    energy_ef_n2o_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("ef_n2o_t2_wo"))
 
     account_for_co2 = models.BooleanField(default=False, verbose_name=_("account_for_co2"))
 
