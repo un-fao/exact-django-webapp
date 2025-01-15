@@ -181,7 +181,6 @@ router.register(r"refrigerant-types", views.generic_viewset(models.RefrigerantTy
 
 urlpatterns = [
     path("docs/", include_docs_urls(title="EX-ACT Docs")),
-    path('status/', views.APIStatusView.as_view(), name='api-status'),
     re_path(r"^swagger(?P<format>\.json|\.yaml)$", schema_view.without_ui(cache_timeout=0), name="schema-json"),
     re_path(r"^swagger/$", schema_view.with_ui("swagger", cache_timeout=0), name="schema-swagger-ui"),
     re_path(r"^redoc/$", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
