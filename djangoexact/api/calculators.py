@@ -5889,6 +5889,13 @@ class ForestManagementCalculator(LandModuleCalculator):
         self.agb_under_20_yrs = ipcc.ForestManagementAGB()
         self.agb_over_20_yrs = ipcc.ForestManagementAGB()
 
+        self.agb_max_start = None
+        self.agb_growth_over_20_start = None
+        self.agb_growth_under_20_start = None
+        self.agb_start_start = None
+        self.litter_dw_start_start = None
+        self.litter_dw_max_start = None
+
         self.agb_max_w = None
         self.agb_growth_over_20_w = None
         self.agb_growth_under_20_w = None
@@ -5902,6 +5909,9 @@ class ForestManagementCalculator(LandModuleCalculator):
         self.agb_start_wo = None
         self.litter_dw_start_wo = None
         self.litter_dw_max_wo = None
+
+        self.agb_under_20_start = None
+        self.agb_over_20_start = None
 
         self.agb_under_20_w = None
         self.agb_over_20_w = None
@@ -5934,9 +5944,11 @@ class ForestManagementCalculator(LandModuleCalculator):
         LITTER_DW_NOT_FOUND = f"Litter/Deadwood Carbon Stock reference value not found for ({self.forest.forest_type.name}) {land_use_type.name} in {self.climate.name} climate, {self.region.name} region."
 
         # NOTE: For non-forest is ipcc.AfforestationCombustionFactor (used in OLUC?)
+        self.combustion_factor_start: ipcc.ForestCombustionFactor = utils.get_or_raise(ipcc.ForestCombustionFactor, {"land_use_type": self.module.land_use_type_start, "climate": self.climate, "forest_type": self.forest.forest_type}, f"Combustion Factor Start not found for {self.module.land_use_type_start.name}, {self.climate.name}, {self.forest.forest_type.name}")
         self.combustion_factor_w: ipcc.ForestCombustionFactor = utils.get_or_raise(ipcc.ForestCombustionFactor, {"land_use_type": self.module.land_use_type_w, "climate": self.climate, "forest_type": self.forest.forest_type}, f"Combustion Factor W not found for {self.module.land_use_type_w.name}, {self.climate.name}, {self.forest.forest_type.name}")
         self.combustion_factor_wo: ipcc.ForestCombustionFactor = utils.get_or_raise(ipcc.ForestCombustionFactor, {"land_use_type": self.module.land_use_type_wo, "climate": self.climate, "forest_type": self.forest.forest_type}, f"Combustion Factor WO not found for {self.module.land_use_type_wo.name}, {self.climate.name}, {self.forest.forest_type.name}")
 
+        # TODO: Not used. Turn into has_mangrove flag
         if self.forest.land_use_type_start.name_en == "Mangrove Forest":
             try:
                 self.mangroves_data = ipcc.DataOnMangrove.objects.get(climate=self.climate, moisture=self.climate)
@@ -5972,7 +5984,12 @@ class ForestManagementCalculator(LandModuleCalculator):
         if self.agb_under_20 is None:
             self.agb_under_20 = ipcc.ForestManagementAGB()
 
-        self.agb_under_20_w = self.agb_under_20_wo = self.agb_under_20
+        self.agb_under_20_start = self.agb_under_20_w = self.agb_under_20_wo = self.agb_under_20
+
+        if self.module.is_start() and (self.agb_under_20 is None or any(x is None for x in [self.agb_under_20.agb_min, self.agb_under_20.agb_max])):
+            if self.forest.agb_t2_start is None:
+                raise ValueError(f"Reference values for AGB under 20 years for {self.climate.name} {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name}, in {self.region.name} are missing. Please fill the relevant tier 2 values.")
+            self.agb_under_20_start.agb_min = self.agb_under_20_start.agb_max = self.forest.agb_t2_start
 
         # Check AGB under 20 years for with scenario
         if self.module.is_with() and (self.agb_under_20 is None or any(x is None for x in [self.agb_under_20.agb_min, self.agb_under_20.agb_max])):
@@ -5985,6 +6002,11 @@ class ForestManagementCalculator(LandModuleCalculator):
             if self.forest.agb_t2_wo is None:
                 raise ValueError(f"Reference values for AGB under 20 years for {self.climate.name} {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name}, in {self.region.name} are missing. Please fill the relevant tier 2 values.")
             self.agb_under_20_wo.agb_min = self.agb_under_20_wo.agb_max = self.forest.agb_t2_wo
+
+        if self.module.is_start() and (self.agb_under_20 is None or any(x is None for x in [self.agb_under_20.agb_growth_min, self.agb_under_20.agb_growth_max])):
+            if self.forest.agb_growth_rate_le_20_yrs_t2_start is None:
+                raise ValueError(f"Reference values for AGB growth under 20 years for {self.climate.name} {self.forest.forest_condition_type.name} {self.forest.forest_type.name} {land_use_type.name}, in {self.region.name} are missing. Please fill the relevant tier 2 values.")
+            self.agb_under_20_start.agb_growth_min = self.agb_under_20_start.agb_growth_max = self.forest.agb_growth_rate_le_20_yrs_t2_start
 
         # Check AGB growth under 20 years for with scenario
         if self.module.is_with() and (self.agb_under_20 is None or any(x is None for x in [self.agb_under_20.agb_growth_min, self.agb_under_20.agb_growth_max])):
@@ -6003,7 +6025,7 @@ class ForestManagementCalculator(LandModuleCalculator):
         if self.agb_over_20 is None:
             self.agb_over_20 = ipcc.ForestManagementAGB()
 
-        self.agb_over_20_w = self.agb_over_20_wo = self.agb_over_20
+        self.agb_over_20_start = self.agb_over_20_w = self.agb_over_20_wo = self.agb_over_20
 
         # Check AGB over 20 years for with scenario
         if self.module.is_with() and (any(x is None for x in [self.agb_over_20.agb_min, self.agb_over_20.agb_max])):
@@ -6030,6 +6052,14 @@ class ForestManagementCalculator(LandModuleCalculator):
             self.agb_over_20_wo.agb_growth_min = self.agb_over_20_wo.agb_growth_max = self.forest.agb_growth_rate_gt_20_yrs_t2_wo
 
         # START - Reference Values for forest remaining forest
+
+        self.agb_max_start = statistics.mean([self.agb_over_20_start.agb_min, self.agb_over_20_start.agb_max]) if all([self.agb_over_20_start.agb_min, self.agb_over_20_start.agb_max]) else self.forest.agb_t2_start
+        self.agb_growth_over_20_start = statistics.mean([self.agb_over_20_start.agb_growth_max, self.agb_over_20_start.agb_growth_min]) if all([self.agb_over_20_start.agb_growth_max, self.agb_over_20_start.agb_growth_min]) else self.forest.agb_growth_rate_gt_20_yrs_t2_start
+        self.agb_growth_under_20_start = 0
+        self.agb_start_start = self.agb_max_start
+        self.litter_dw_start_start = self.litter_dw
+        self.litter_dw_max_start = self.litter_dw
+
         self.agb_max_w = statistics.mean([self.agb_over_20_w.agb_min, self.agb_over_20_w.agb_max]) if all([self.agb_over_20_w.agb_min, self.agb_over_20_w.agb_max]) else self.forest.agb_t2_w
         self.agb_growth_over_20_w = statistics.mean([self.agb_over_20_w.agb_growth_max, self.agb_over_20_w.agb_growth_min]) if all([self.agb_over_20_w.agb_growth_max, self.agb_over_20_w.agb_growth_min]) else self.forest.agb_growth_rate_gt_20_yrs_t2_w
         self.agb_growth_under_20_w = 0
@@ -6068,6 +6098,84 @@ class ForestManagementCalculator(LandModuleCalculator):
         super().calculate(self)
 
         self.get_defaults()
+
+        if self.module.is_start():
+            self.inputs_start = {
+                "capitalization_time": self.activity.capitalization_years,
+                "implementation_time": self.activity.implementation_years,
+                "rate_type": self.module.activity.change_rate.name,
+                "hectares_start": self.area,
+                "hectares_end": 0,
+                "rotation_recurrence": self.forest.rotation_length_yrs_start,
+                "rotation_start_year": self.forest.rotation_start_year_t2_start,
+                "rotation_percentage_energy": self.forest.rotation_percentage_biomass_for_energy_start,
+                "bgb_ratio_threshold": self.bgb_before_20_yrs.threshold,
+                "bgb_ratio_under_threshold": self.bgb_before_20_yrs.value,
+                "bgb_ratio_over_threshold": self.bgb_after_20_yrs.value,
+                "bgb_yearly_growth_under_20_tier_2": self.forest.bgb_growth_rate_le_20_yrs_t2_start,
+                "bgb_yearly_growth_over_20_tier_2": self.forest.bgb_growth_rate_gt_20_yrs_t2_start,
+                "agb_start_default": self.agb_start_start,
+                "agb_start_tier_2": self.forest.agb_t2_start,
+                "agb_yearly_growth_under_20_default": self.agb_growth_under_20_start,
+                "agb_yearly_growth_under_20_tier_2": self.forest.agb_growth_rate_le_20_yrs_t2_start,
+                "agb_yearly_growth_over_20_default": self.agb_growth_over_20_start,
+                "agb_yearly_growth_over_20_tier_2": self.forest.agb_growth_rate_gt_20_yrs_t2_start,
+                "max_agb_value": self.agb_max_start,
+                "max_bgb_value": None,  # Unused in math model
+                "disturbance_recurrence": list(self.disturbances.values_list("recurrence_yrs_start", flat=True)),
+                "disturbance_percentage": list(self.disturbances.values_list("percentage_biomass_destruction_start", flat=True)),
+                "disturbance_year_of_start": list(self.disturbances.values_list("start_year_t2_start", flat=True)),
+                "logging_recurrence": self.forest.logging_recurrence_yrs_start,
+                "logging_percentage": self.forest.logging_percentage_agb_logged_start,
+                "logging_percentage_energy": self.forest.logging_percentage_biomass_for_energy_start,
+                "logging_year_of_start": self.forest.logging_start_year_t2_start,
+                "litter_20_years_default": self.litter_dw.litter,
+                "litter_start": self.litter_dw_start_start.litter,
+                "litter_max": self.litter_dw_max_start.litter,
+                "litter_20_years_tier_2": self.forest.litter_t2_start,
+                "deadwood_20_years_default": self.litter_dw.dw,
+                "deadwood_start": self.litter_dw_start_start.dw,
+                "deadwood_max": self.litter_dw_max_start.dw,
+                "deadwood_20_years_tier_2": self.forest.deadwood_t2_start,
+                "soc_start_default": self.soc_start.value,
+                "soc_end_default": self.soc_start.value,
+                "soc_start_tier_2": self.module.soc_t2_start,
+                "soc_end_tier_2": self.module.soc_t2_start,
+                "fmg_start_default": self.fmg_start.value,
+                "fmg_end_default": self.fmg_start.value,
+                "fmg_start_tier_2": self.forest.fmg_t2_start,
+                "fmg_end_tier_2": self.forest.fmg_t2_start,
+                "flu_start_default": self.flu_start.value,
+                "flu_end_default": self.flu_start.value,
+                "flu_start_tier_2": self.forest.flu_t2_start,
+                "flu_end_tier_2": self.forest.flu_t2_start,
+                "fi_start_default": self.fi_start.value,
+                "fi_end_default": self.fi_start.value,
+                "fi_start_tier_2": self.forest.fi_t2_start,
+                "fi_end_tier_2": self.forest.fi_t2_start,
+                "ef_methane": self.project.gwp.ch4,
+                "ef_nitrous": self.project.gwp.n2o,
+                "forest_cf": self.combustion_factor_start.value,
+                "forest_gef_ch4": self.combustion_factor_start.ch4,
+                "forest_gef_n2o": self.combustion_factor_start.n2o,
+                "forest_gef_co2": self.combustion_factor_start.co2,
+                "mangrove_factor": utils.MANGROVE_FACTOR if self.mangroves_data is not None else utils.NON_MANGROVE_FACTOR,
+                "degradation_percentage": self.forest.average_yearly_degradation_percentage_start,
+                "ef_nitrous_som": self.som.value,
+                "nitrous_constant": self.project.gwp.n2o,
+                "methane_constant": self.project.gwp.ch4,
+                "delay": self.activity.delay,
+                'is_same_forest_type': False,
+                'forest_start': None,
+            }
+
+            log.debug(f"Forest inputs start: {self.inputs_start}")
+
+            self.math_start = MathForestManagement(**self.inputs_start)
+            self.math_start.calculate_emissions()
+
+        self.results_start = self.math_start.result if self.math_start else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+
 
         if self.module.is_with():
 
@@ -6136,6 +6244,8 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "nitrous_constant": self.project.gwp.n2o,
                 "methane_constant": self.project.gwp.ch4,
                 "delay": self.activity.delay,
+                'is_same_forest_type': self.forest.forest_type == self.forest.forest_type, # TODO: Becomes forest_type_start == forest_type_w
+                'forest_start': self.math_start, # TODO: Becomes math_start_w
             }
 
             log.debug(f"Forest inputs with: {self.inputs_w}")
@@ -6210,6 +6320,8 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "nitrous_constant": self.project.gwp.n2o,
                 "methane_constant": self.project.gwp.ch4,
                 "delay": self.activity.delay,
+                'is_same_forest_type': self.forest.forest_type == self.forest.forest_type, # TODO: Becomes forest_type_start == forest_type_wo
+                'forest_start': self.math_start, # TODO: Becomes math_start_w
             }
 
             log.debug(f"Forest inputs without: {self.inputs_wo}")
@@ -6221,6 +6333,7 @@ class ForestManagementCalculator(LandModuleCalculator):
         self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
 
         if PLOT_GRAPHS:
+            self.results_start.plot_emissions_and_aggregate_by_activity("forest_start")
             self.results_w.plot_emissions_and_aggregate_by_activity("forest_w")
             self.results_wo.plot_emissions_and_aggregate_by_activity("forest_wo")
 
