@@ -163,16 +163,17 @@ class APITestCaseMixin(APITestCase):
         with the provided module data in JSON format. The request is authenticated with the provided user,
         and the response is returned.
         """
-        log.info("Editing module")
+        log.debug(f"Editing module: {module.__class__.__name__}")
+        log.debug(f"Data: {data}")
         view = generic_module_viewset(module.__class__).as_view({"patch": "partial_update"})
         # Get viewset url name
         request = self.request_factory.patch(
-            reverse(f"{module.__class__.__name__.lower()}-detail", args=[module.id]),
+            reverse(f"{module.__class__.__name__.lower()}-detail", args=[module.pk]),
             data,
             format="json",
         )
         force_authenticate(request, user=user)
-        return view(request, pk=module.id)
+        return view(request, pk=module.pk)
 
     def create_submodule(self, SubmoduleClass, user, data):
         """

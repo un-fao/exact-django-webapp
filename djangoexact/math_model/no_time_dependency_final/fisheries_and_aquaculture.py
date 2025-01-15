@@ -1,7 +1,7 @@
 import re
 import traceback
 
-from .general_functions import yearly_time_dependent_parameter_breakdown
+from .general_functions import compute_yearly_or_half_year_cumulative
 from .generalized_modules import BaseModule
 from .ghg_emissions_classes import (
     ActivityTypes,
@@ -52,7 +52,7 @@ class Fishery(BaseModule):
     def __post_init__(self):
         super().__post_init__()
 
-        self.tonnes_catch_yearly_breakdown = yearly_time_dependent_parameter_breakdown(self.catch_start, self.catch_end, self.implementation_time, self.capitalization_time, self.rate_type)
+        self.tonnes_catch_yearly_breakdown = compute_yearly_or_half_year_cumulative(self.catch_start, self.catch_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
     def calculate_emissions(self):
         def calculate_catch_emissions():
@@ -77,7 +77,7 @@ class Fishery(BaseModule):
                 annual_co2_start = self.catch_start * ef_co2_start
                 annual_co2_end = self.catch_end * ef_co2_end
 
-                emissions_co2_catch_yearly = yearly_time_dependent_parameter_breakdown(annual_co2_start, annual_co2_end, self.implementation_time, self.capitalization_time, self.rate_type)
+                emissions_co2_catch_yearly = compute_yearly_or_half_year_cumulative(annual_co2_start, annual_co2_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(x, GasTypes.CO2) for x in emissions_co2_catch_yearly], activity=ActivityTypes.CATCH, delay=self.delay))
 
@@ -89,7 +89,7 @@ class Fishery(BaseModule):
                 annual_n2o_start = self.catch_start * ef_n2o_start
                 annual_n2o_end = self.catch_end * ef_n2o_end
 
-                emissions_n2o_catch_yearly = yearly_time_dependent_parameter_breakdown(annual_n2o_start, annual_n2o_end, self.implementation_time, self.capitalization_time, self.rate_type)
+                emissions_n2o_catch_yearly = compute_yearly_or_half_year_cumulative(annual_n2o_start, annual_n2o_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(x, GasTypes.N2O) for x in emissions_n2o_catch_yearly], activity=ActivityTypes.CATCH, delay=self.delay))
 
@@ -101,7 +101,7 @@ class Fishery(BaseModule):
                 annual_ch4_start = self.catch_start * ef_ch4_start
                 annual_ch4_end = self.catch_end * ef_ch4_end
 
-                emissions_ch4_catch_yearly = yearly_time_dependent_parameter_breakdown(annual_ch4_start, annual_ch4_end, self.implementation_time, self.capitalization_time, self.rate_type)
+                emissions_ch4_catch_yearly = compute_yearly_or_half_year_cumulative(annual_ch4_start, annual_ch4_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(x, GasTypes.CH4) for x in emissions_ch4_catch_yearly], activity=ActivityTypes.CATCH, delay=self.delay))
 
@@ -123,7 +123,7 @@ class Fishery(BaseModule):
                 annual_start = gwp_refrigerant_start * quantity_lost_refrigerant_start * catch_with_refrigerant_start / 1000
                 annual_end = gwp_refrigerant_end * quantity_lost_refrigerant_end * catch_with_refrigerant_end / 1000
 
-                emissions_refrigerant_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
+                emissions_refrigerant_yearly = compute_yearly_or_half_year_cumulative(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.OTHER, emissions=[Emission(x, GasTypes.OTHER) for x in emissions_refrigerant_yearly], activity=ActivityTypes.REFRIGERANT, delay=self.delay))
             except Exception as e:
@@ -147,7 +147,7 @@ class Fishery(BaseModule):
                 annual_start = ice_ef_start * catch_with_refrigerant_start
                 annual_end = ice_ef_end * catch_with_refrigerant_end
 
-                emissions_ice_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
+                emissions_ice_yearly = compute_yearly_or_half_year_cumulative(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.OTHER, emissions=[Emission(x, GasTypes.OTHER) for x in emissions_ice_yearly], activity=ActivityTypes.ICE, delay=self.delay))
             except Exception as e:
@@ -183,7 +183,7 @@ class CoastalAquaculture(BaseModule):
                 annual_start = nitrous_ef_start * self.production_start * self.nitrous_constant * 44 / 28
                 annual_end = nitrous_ef_end * self.production_end * self.nitrous_constant * 44 / 28
 
-                emissions_nitrous_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
+                emissions_nitrous_yearly = compute_yearly_or_half_year_cumulative(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(x, GasTypes.N2O) for x in emissions_nitrous_yearly], activity=ActivityTypes.N20_FIELD, delay=self.delay))
 
@@ -201,7 +201,7 @@ class CoastalAquaculture(BaseModule):
                 annual_start = electricity_used_start * self.production_start * ef_electricity_start
                 annual_end = electricity_used_end * self.production_end * ef_electricity_end
 
-                emissions_co2_yearly = yearly_time_dependent_parameter_breakdown(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
+                emissions_co2_yearly = compute_yearly_or_half_year_cumulative(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(x, GasTypes.CO2) for x in emissions_co2_yearly], activity=ActivityTypes.ELECTRICITY, delay=self.delay))
 
