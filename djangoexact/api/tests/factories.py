@@ -575,7 +575,11 @@ class IrrigationPhaseFactory(DjangoModelFactory):
     status = READY
 
     irrigation_system_type = factory.fuzzy.FuzzyChoice(IrrigationSystemType.objects.filter(module_types__class_name="IrrigationPhase").all())
-    fuel_type = factory.fuzzy.FuzzyChoice(fuel_types)
+
+    fuel_type_start = factory.fuzzy.FuzzyChoice(fuel_types)
+    fuel_type_w = factory.fuzzy.FuzzyChoice(fuel_types)
+    fuel_type_wo = factory.fuzzy.FuzzyChoice(fuel_types)
+
     well_depth = factory.fuzzy.FuzzyFloat(0, 100)
 
     ha_start = factory.fuzzy.FuzzyFloat(0, 100)
@@ -595,11 +599,15 @@ class IrrigationPhaseFactory(DjangoModelFactory):
     ef_n2o_t2_start = factory.fuzzy.FuzzyFloat(0, 5)
     ef_n2o_t2_w = factory.fuzzy.FuzzyFloat(0, 5)
     ef_n2o_t2_wo = factory.fuzzy.FuzzyFloat(0, 5)
+
     transmission_loss_t2_start = factory.fuzzy.FuzzyFloat(0, 5)
     transmission_loss_t2_w = factory.fuzzy.FuzzyFloat(0, 5)
     transmission_loss_t2_wo = factory.fuzzy.FuzzyFloat(0, 5)
+
     average_pressure_t2 = factory.fuzzy.FuzzyFloat(0, 5)
+
     total_dynamic_head_t2 = factory.fuzzy.FuzzyFloat(0, 5)
+    
     pumping_efficiency_t2_start = factory.fuzzy.FuzzyFloat(0, 5)
     pumping_efficiency_t2_w = factory.fuzzy.FuzzyFloat(0, 5)
     pumping_efficiency_t2_wo = factory.fuzzy.FuzzyFloat(0, 5)
