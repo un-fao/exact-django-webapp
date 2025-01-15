@@ -153,11 +153,7 @@ class BaseProjectReport:
     def __post_init__(self):
         self.activity_reports = []
         self.cumulative_hectares_yearly = [0] * (self.project.implementation_years + self.project.capitalization_years)
-
-        # NOTE: Activities in reports can be filled by passing them as an argument to the constructor
-        if self.activities is None:
-            self.activities = self.project.activities.all()
-
+        self.activities = self.project.activities.all()
         self.excel_manager = ExcelFileManager()
         pass
 

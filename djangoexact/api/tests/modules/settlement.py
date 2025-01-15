@@ -17,7 +17,6 @@ class SettlementTest(t.ModuleWithSubmodulesTest):
         self.submodule_types = [
             ModuleType.objects.get(class_name="Road"),
             ModuleType.objects.get(class_name="Building"),
-            ModuleType.objects.get(class_name="OtherInfrastructure"),
         ]
         self.create_module()
         self.create_submodules(n=4)
