@@ -99,10 +99,13 @@ class AnnexedModule(BaseModule):
                 return total_biomass * multiplication_parameter_co2, total_biomass * multiplication_parameter_co, total_biomass * multiplication_parameter_ch4
 
             try:
-                dry_matter_ref_fire = self.dry_matter_ref_fire if not self.dry_matter_tier_2_fire else self.dry_matter_tier_2_fire
+                dry_matter_ref_fire = self.dry_matter_ref_fire if self.dry_matter_tier_2_fire is None else self.dry_matter_tier_2_fire
 
                 if self.fire_boolean_end and self.fire_periodicity_end < self.implementation_time + self.capitalization_time and self.area_affected_by_action_end != 0 and dry_matter_ref_fire != 0:
-                    co2, co, ch4 = fire_co2_co_ch4(self.fire_periodicity_end, dry_matter_ref_fire, self.area_affected_by_action_end, self.rate_type, self.implementation_time, self.capitalization_time, self.percentage_area_burned_end, self.ef_co2_ref_fire if not self.ef_co2_tier_2_fire else self.ef_co2_tier_2_fire, self.ef_co_ref_fire if not self.ef_co_tier_2_fire else self.ef_co_tier_2_fire, self.ef_ch4_ref_fire if not self.ef_ch4_tier_2_fire else self.ef_ch4_tier_2_fire, self.methane_constant)
+                    co2, co, ch4 = fire_co2_co_ch4(self.fire_periodicity_end, dry_matter_ref_fire, self.area_affected_by_action_end, self.rate_type, self.implementation_time, self.capitalization_time, self.percentage_area_burned_end, self.ef_co2_ref_fire 
+                                                   if self.ef_co2_tier_2_fire is None else self.ef_co2_tier_2_fire, self.ef_co_ref_fire 
+                                                   if self.ef_co_tier_2_fire is None else self.ef_co_tier_2_fire, self.ef_ch4_ref_fire 
+                                                   if self.ef_ch4_tier_2_fire is None else self.ef_ch4_tier_2_fire, self.methane_constant)
 
                     emissions_co2_yearly = breakdown_proportionally_to_values(co2, compute_yearly_or_half_year_cumulative(0, self.area_affected_by_action_end * dry_matter_ref_fire, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True))
                     emissions_co_yearly = breakdown_proportionally_to_values(co, compute_yearly_or_half_year_cumulative(0, self.area_affected_by_action_end * dry_matter_ref_fire, self.implementation_time, self.capitalization_time, self.rate_type, interim_values=True))
@@ -139,11 +142,11 @@ class AnnexedModule(BaseModule):
                         # No return as I want it to crash if there is an error
 
                 try:
-                    ef_n2o = self.ef_n2o_ref_drainage_initial if not self.ef_n2o_tier_2_drainage_initial else self.ef_n2o_tier_2_drainage_initial
-                    ef_ch4_on_site = self.ef_ch4_onsite_ref_drainage_initial if not self.ef_ch4_onsite_tier_2_drainage_initial else self.ef_ch4_onsite_tier_2_drainage_initial
-                    ef_ch4_off_site = self.ef_ch4_offsite_ref_drainage_initial if not self.ef_ch4_offsite_tier_2_drainage_initial else self.ef_ch4_offsite_tier_2_drainage_initial
-                    ef_co2 = self.ef_co2_ref_drainage_initial if not self.ef_co2_tier_2_drainage_initial else self.ef_co2_tier_2_drainage_initial
-                    ef_doc = self.ef_doc_ref_drainage_initial if not self.ef_doc_tier_2_drainage_initial else self.ef_doc_tier_2_drainage_initial
+                    ef_n2o = self.ef_n2o_ref_drainage_initial if self.ef_n2o_tier_2_drainage_initial is None else self.ef_n2o_tier_2_drainage_initial
+                    ef_ch4_on_site = self.ef_ch4_onsite_ref_drainage_initial if self.ef_ch4_onsite_tier_2_drainage_initial is None else self.ef_ch4_onsite_tier_2_drainage_initial
+                    ef_ch4_off_site = self.ef_ch4_offsite_ref_drainage_initial if self.ef_ch4_offsite_tier_2_drainage_initial is None else self.ef_ch4_offsite_tier_2_drainage_initial
+                    ef_co2 = self.ef_co2_ref_drainage_initial if self.ef_co2_tier_2_drainage_initial is None else self.ef_co2_tier_2_drainage_initial
+                    ef_doc = self.ef_doc_ref_drainage_initial if self.ef_doc_tier_2_drainage_initial is None else self.ef_doc_tier_2_drainage_initial
 
                     n2ostart, n2oend = calculate_emissions_start_end(ef_n2o, self.area_drained_start, self.area_drained_end, 1, 1, self.area_affected_by_action_end, 44 / 28 * self.nitrous_constant / 1000)
 
@@ -187,11 +190,11 @@ class AnnexedModule(BaseModule):
 
                 try:
                     # TODO: check why I need initial and final, only calculate_emissions_start_end is different???
-                    ef_n2o = self.ef_n2o_ref_drainage_final if not self.ef_n2o_tier_2_drainage_final else self.ef_n2o_tier_2_drainage_final
-                    ef_ch4_on_site = self.ef_ch4_onsite_ref_drainage_final if not self.ef_ch4_onsite_tier_2_drainage_final else self.ef_ch4_onsite_tier_2_drainage_final
-                    ef_ch4_off_site = self.ef_ch4_offsite_ref_drainage_final if not self.ef_ch4_offsite_tier_2_drainage_final else self.ef_ch4_offsite_tier_2_drainage_final
-                    ef_co2 = self.ef_co2_ref_drainage_final if not self.ef_co2_tier_2_drainage_final else self.ef_co2_tier_2_drainage_final
-                    ef_doc = self.ef_doc_ref_drainage_final if not self.ef_doc_tier_2_drainage_final else self.ef_doc_tier_2_drainage_final
+                    ef_n2o = self.ef_n2o_ref_drainage_final if self.ef_n2o_tier_2_drainage_final is None else self.ef_n2o_tier_2_drainage_final
+                    ef_ch4_on_site = self.ef_ch4_onsite_ref_drainage_final if self.ef_ch4_onsite_tier_2_drainage_final is None else self.ef_ch4_onsite_tier_2_drainage_final
+                    ef_ch4_off_site = self.ef_ch4_offsite_ref_drainage_final if self.ef_ch4_offsite_tier_2_drainage_final is None else self.ef_ch4_offsite_tier_2_drainage_final
+                    ef_co2 = self.ef_co2_ref_drainage_final if self.ef_co2_tier_2_drainage_final is None else self.ef_co2_tier_2_drainage_final
+                    ef_doc = self.ef_doc_ref_drainage_final if self.ef_doc_tier_2_drainage_final is None else self.ef_doc_tier_2_drainage_final
 
                     n2ostart, n2oend = calculate_emissions_start_end(ef_n2o, self.area_drained_start, self.area_drained_end, 1, 1, self.area_affected_by_action_end, 44 / 28 * self.nitrous_constant / 1000)
 
@@ -271,15 +274,15 @@ class AnnexedModule(BaseModule):
                     area_rewet_initial = max(0, area_not_drained_end - area_not_drained_start - self.area_affected_by_action_end)
                     area_rewet_final = max(0, area_not_drained_end - area_not_drained_start)
 
-                ef_doc_rewetting_initial = self.ef_doc_rewetting_initial if not self.ef_doc_rewetting_initial_tier_2 else self.ef_doc_rewetting_initial_tier_2
-                ef_co2_rewetting_initial = self.ef_co2_rewetting_initial if not self.ef_co2_rewetting_initial_tier_2 else self.ef_co2_rewetting_initial_tier_2
-                ef_ch4_rewetting_initial = self.ef_ch4_rewetting_initial if not self.ef_ch4_rewetting_initial_tier_2 else self.ef_ch4_rewetting_initial_tier_2
-                ef_n2o_rewetting_initial = self.ef_n2o_rewetting_initial if not self.ef_n2o_rewetting_initial_tier_2 else self.ef_n2o_rewetting_initial_tier_2
+                ef_doc_rewetting_initial = self.ef_doc_rewetting_initial if self.ef_doc_rewetting_initial_tier_2 is None else self.ef_doc_rewetting_initial_tier_2
+                ef_co2_rewetting_initial = self.ef_co2_rewetting_initial if self.ef_co2_rewetting_initial_tier_2 is None else self.ef_co2_rewetting_initial_tier_2
+                ef_ch4_rewetting_initial = self.ef_ch4_rewetting_initial if self.ef_ch4_rewetting_initial_tier_2 is None else self.ef_ch4_rewetting_initial_tier_2
+                ef_n2o_rewetting_initial = self.ef_n2o_rewetting_initial if self.ef_n2o_rewetting_initial_tier_2 is None else self.ef_n2o_rewetting_initial_tier_2
 
-                ef_doc_rewetting_final = self.ef_doc_rewetting_final if not self.ef_doc_rewetting_final_tier_2 else self.ef_doc_rewetting_final_tier_2
-                ef_co2_rewetting_final = self.ef_co2_rewetting_final if not self.ef_co2_rewetting_final_tier_2 else self.ef_co2_rewetting_final_tier_2
-                ef_ch4_rewetting_final = self.ef_ch4_rewetting_final if not self.ef_ch4_rewetting_final_tier_2 else self.ef_ch4_rewetting_final_tier_2
-                ef_n2o_rewetting_final = self.ef_n2o_rewetting_final if not self.ef_n2o_rewetting_final_tier_2 else self.ef_n2o_rewetting_final_tier_2
+                ef_doc_rewetting_final = self.ef_doc_rewetting_final if self.ef_doc_rewetting_final_tier_2 is None else self.ef_doc_rewetting_final_tier_2
+                ef_co2_rewetting_final = self.ef_co2_rewetting_final if self.ef_co2_rewetting_final_tier_2 is None else self.ef_co2_rewetting_final_tier_2
+                ef_ch4_rewetting_final = self.ef_ch4_rewetting_final if self.ef_ch4_rewetting_final_tier_2 is None else self.ef_ch4_rewetting_final_tier_2
+                ef_n2o_rewetting_final = self.ef_n2o_rewetting_final if self.ef_n2o_rewetting_final_tier_2 is None else self.ef_n2o_rewetting_final_tier_2
 
                 total_co2_doc_initial, total_ch4_initial, total_n2o_initital, total_rewetting_initial = rewetting_emissions(area_rewet_initial, ef_doc_rewetting_initial, ef_co2_rewetting_initial, ef_ch4_rewetting_initial, ef_n2o_rewetting_initial, self.methane_constant, self.nitrous_constant, self.rate_type, self.implementation_time, self.capitalization_time)
                 total_co2_doc_final, total_ch4_final, total_n2o_final, total_rewetting_final = rewetting_emissions(area_rewet_final, ef_doc_rewetting_final, ef_co2_rewetting_final, ef_ch4_rewetting_final, ef_n2o_rewetting_final, self.methane_constant, self.nitrous_constant, self.rate_type, self.implementation_time, self.capitalization_time)
@@ -349,11 +352,11 @@ class PeatExtraction(BaseModule):
                 return hectars_start * ef * ef_multiplication_parameter * multiplier_start, hectars_end * ef * ef_multiplication_parameter * multiplier_end
 
             try:
-                ef_co2_onsite = self.ef_co2_onsite_ref if not self.ef_co2_onsite_tier_2 else self.ef_co2_onsite_tier_2
-                ef_ch4_onsite = self.ef_ch4_onsite_ref if not self.ef_ch4_onsite_tier_2 else self.ef_ch4_onsite_tier_2
-                ef_n2o_onsite = self.ef_n2o_onsite_ref if not self.ef_n2o_onsite_tier_2 else self.ef_n2o_onsite_tier_2
-                ef_doc_offsite = self.ef_doc_offsite_ref if not self.ef_doc_offsite_tier_2 else self.ef_doc_offsite_tier_2
-                ef_ch4_offsite = self.ef_ch4_offsite_ref if not self.ef_ch4_offsite_tier_2 else self.ef_ch4_offsite_tier_2
+                ef_co2_onsite = self.ef_co2_onsite_ref if self.ef_co2_onsite_tier_2 is None else self.ef_co2_onsite_tier_2
+                ef_ch4_onsite = self.ef_ch4_onsite_ref if self.ef_ch4_onsite_tier_2 is None else self.ef_ch4_onsite_tier_2
+                ef_n2o_onsite = self.ef_n2o_onsite_ref if self.ef_n2o_onsite_tier_2 is None else self.ef_n2o_onsite_tier_2
+                ef_doc_offsite = self.ef_doc_offsite_ref if self.ef_doc_offsite_tier_2 is None else self.ef_doc_offsite_tier_2
+                ef_ch4_offsite = self.ef_ch4_offsite_ref if self.ef_ch4_offsite_tier_2 is None else self.ef_ch4_offsite_tier_2
 
                 co2_onsite_emissions_start, co2_onsite_emissions_end = yearly_emissions_calculation(44 / 12, self.hectares_start, self.hectares_end, ef_co2_onsite)
                 ch4_onsite_emissions_start, ch4_onsite_emissions_end = yearly_emissions_calculation(self.methane_constant / 1000, self.hectares_start, self.hectares_end, ef_ch4_onsite, 1 - self.percentage_ditches_start, 1 - self.percentage_ditches_end)
@@ -382,7 +385,7 @@ class PeatExtraction(BaseModule):
                 return mass_tonnes * hectares_start * height_of_extraction_start * 100, mass_tonnes * hectares_end * height_of_extraction_end * 100
 
             try:
-                mass_tonnes = self.weight_peat * self.conversion_factor_volume / self.c_fraction_ref if not self.mass_tonnes_tier_2 else self.mass_tonnes_tier_2
+                mass_tonnes = self.weight_peat * self.conversion_factor_volume / self.c_fraction_ref if self.mass_tonnes_tier_2 is None else self.mass_tonnes_tier_2
                 air_dry_weight_start, air_dry_weight_end = yearly_emissions_calculation(mass_tonnes, self.hectares_start, self.hectares_end, self.extraction_height_start, self.extraction_height_end)
 
                 em_start = air_dry_weight_start * self.c_fraction_ref * 44 / 12

@@ -44,9 +44,7 @@ def compute_yearly_or_half_year_cumulative(start_value, end_value, years_impleme
         if interim_values:
             return average_yearly_value(yearly_breakdown)
         else:
-            yearly_breakdown
-
-        return yearly_breakdown
+            return yearly_breakdown
 
     elif function == "linear":
         # calculate the parameters for the function a + bx
@@ -96,11 +94,11 @@ def compute_half_year_cumulative_n_year_maturity(start_value, end_value, years_i
     return average_before_20, average_after_20
 
 
-def breakdown_proportionally_to_values(maximum, list_of_proportions):
+def breakdown_proportionally_to_values(total, list_of_proportions):
     if sum(list_of_proportions) == 0:
         return [0 for i in list_of_proportions]
     else:
-        result = [maximum * i / sum(list_of_proportions) for i in list_of_proportions]
+        result = [total * i / sum(list_of_proportions) for i in list_of_proportions]
         return result
 
 
@@ -277,7 +275,7 @@ def gas_head_calculation(tam: float, vser_or_ner: float, ef_prp: float,
         percentage_prp = percentage_prp_default if percentage_prp_tier_2 is None else percentage_prp_tier_2
 
         # TODO: add tier 2 value for ef_prp
-        gas_prp = ef_prp * (tam / 1000) * vser_or_ner / gas_dividing_parameter * 365 * percentage_prp / 100 if not gas_prp_tier_2 else gas_prp_tier_2 * percentage_prp / 100
+        gas_prp = ef_prp * (tam / 1000) * vser_or_ner / gas_dividing_parameter * 365 * percentage_prp / 100 if gas_prp_tier_2 is None else gas_prp_tier_2 * percentage_prp / 100
 
         gas_head = sum(gas_system) + gas_prp
 

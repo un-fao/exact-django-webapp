@@ -80,20 +80,20 @@ class LandModule(BaseModule):
     def __post_init__(self):
         super().__post_init__()
 
-        fmg_start = self.fmg_start_tier_2 or self.fmg_start_default
-        fmg_end = self.fmg_end_tier_2 or self.fmg_end_default
-        flu_start = self.flu_start_tier_2 or self.flu_start_default
-        flu_end = self.flu_end_tier_2 or self.flu_end_default
-        fi_start = self.fi_start_tier_2 or self.fi_start_default
-        fi_end = self.fi_end_tier_2 or self.fi_end_default
-        soc_ref_start = self.soc_start_tier_2 or self.soc_start_default
-        soc_ref_end = self.soc_end_tier_2 or self.soc_end_default
+        fmg_start = self.fmg_start_tier_2 if self.fmg_start_tier_2 is not None else self.fmg_start_default
+        fmg_end = self.fmg_end_tier_2 if self.fmg_end_tier_2 is not None else self.fmg_end_default
+        flu_start = self.flu_start_tier_2 if self.flu_start_tier_2 is not None else self.flu_start_default
+        flu_end = self.flu_end_tier_2 if self.flu_end_tier_2 is not None else self.flu_end_default
+        fi_start = self.fi_start_tier_2 if self.fi_start_tier_2 is not None else self.fi_start_default
+        fi_end = self.fi_end_tier_2 if self.fi_end_tier_2 is not None else self.fi_end_default
+        soc_ref_start = self.soc_start_tier_2 if self.soc_start_tier_2 is not None else self.soc_start_default
+        soc_ref_end = self.soc_end_tier_2 if self.soc_end_tier_2 is not None else self.soc_end_default
 
         self.soc_start = soc_ref_start * fmg_start * fi_start * flu_start
         self.soc_end = soc_ref_end * fmg_end * fi_end * flu_end
 
-        self.biomass_start = self.biomass_start_tier_2 or self.biomass_start_default
-        self.biomass_end = self.biomass_end_tier_2 or self.biomass_end_default
+        self.biomass_start = self.biomass_start_tier_2 if self.biomass_start_tier_2 is not None else self.biomass_start_default
+        self.biomass_end = self.biomass_end_tier_2 if self.biomass_end_tier_2 is not None else self.biomass_end_default
 
         self.hectares_before_20, self.hectares_after_20 = compute_half_year_cumulative_n_year_maturity(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
         self.hectares_total = compute_yearly_or_half_year_cumulative(self.hectares_start, self.hectares_end, self.implementation_time, self.capitalization_time, self.rate_type)
