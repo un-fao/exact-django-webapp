@@ -103,7 +103,7 @@ jobs:
 
           sed -i "s|\$DB_ENGINE|${{ vars.DB_ENGINE }}|g" djangoexact/djangoexact/settings.py
           sed -i "s|\$DB_INSTANCE_CONNECTION|${{ vars.DB_INSTANCE_CONNECTION }}|g" djangoexact/djangoexact/settings.py
-          sed -i "s|\$DB_HOST|127.0.0.1 }}|g" djangoexact/djangoexact/settings.py
+          sed -i "s|\$DB_HOST|127.0.0.1|g" djangoexact/djangoexact/settings.py
           sed -i "s|\$DB_USERNAME|${{ vars.DB_USERNAME }}|g" djangoexact/djangoexact/settings.py
           sed -i "s|\$DB_PASSWORD|${{ secrets.DB_PASSWORD }}|g" djangoexact/djangoexact/settings.py
           sed -i "s|\$DB_NAME|${{ vars.DB_NAME }}|g" djangoexact/djangoexact/settings.py
