@@ -44,8 +44,8 @@ jobs:
       - name: Expose GitHub Variables
         run: echo "$VARS" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
 
-      - name: Expose JSON-based secrets
-        run: echo "$SECRETS" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"'
+      - name: Expose Github secrets
+        run: echo "$SECRETS"
 
       - name: show all env vars
         run: printenv
