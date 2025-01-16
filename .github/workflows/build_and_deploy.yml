@@ -88,7 +88,7 @@ jobs:
           sudo apt-get install -y postgresql-client
           psql --host=127.0.0.1 --port=${{ vars.DB_PORT }} --username=${{ vars.DB_USERNAME }} --dbname=${{ vars.DB_NAME }} -c "\dt"
 
-      - name: Replace vars
+      - name: Replace vars in app.yaml
         run: |
           sed -i "s|\$SERVICE_NAME|${{ vars.SERVICE_NAME }}|g" djangoexact/app.yaml
           sed -i "s|\$PROJECT_ID|${{ vars.PROJECT_ID }}|g" djangoexact/app.yaml
@@ -99,8 +99,11 @@ jobs:
           sed -i "s|\$DB_NAME|${{ vars.DB_NAME }}|g" djangoexact/app.yaml
           sed -i "s|\$DB_PORT|${{ vars.DB_PORT }}|g" djangoexact/app.yaml
           sed -i "s|\$SECRET_KEY|${{ secrets.SECRET_KEY }}|g" djangoexact/app.yaml
-          cat djangoexact/app.yaml
 
+      - run: cat djangoexact/app.yaml
+
+      - name: Replace vars in settings.py
+        run: |
           sed -i "s|\$DB_ENGINE|${{ vars.DB_ENGINE }}|g" djangoexact/djangoexact/settings.py
           sed -i "s|\$DB_INSTANCE_CONNECTION|${{ vars.DB_INSTANCE_CONNECTION }}|g" djangoexact/djangoexact/settings.py
           sed -i "s|\$DB_HOST|127.0.0.1|g" djangoexact/djangoexact/settings.py
@@ -122,7 +125,8 @@ jobs:
           sed -i "s|\$FIREBASE_APP_ID|${{ vars.FIREBASE_APP_ID }}|g" djangoexact/djangoexact/settings.py
           sed -i "s|\$FIREBASE_MEASUREMENT_ID|${{ vars.FIREBASE_MEASUREMENT_ID }}|g" djangoexact/djangoexact/settings.py
           sed -i "s|\$FIREBASE_SERVICE_ACCOUNT|${{ secrets.FIREBASE_SERVICE_ACCOUNT }}|g" djangoexact/djangoexact/settings.py
-          cat djangoexact/djangoexact/settings.py
+
+      - run: cat djangoexact/djangoexact/settings.py
 
       - run: pip install -r djangoexact/requirements.txt
       - run: cd djangoexact/ && python manage.py migrate
