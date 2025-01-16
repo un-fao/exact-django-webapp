@@ -90,6 +90,7 @@ jobs:
 
       - name: Replace vars in app.yaml
         run: |
+          set +H
           sed -i "s|\$SERVICE_NAME|${{ vars.SERVICE_NAME }}|g" djangoexact/app.yaml
           sed -i "s|\$PROJECT_ID|${{ vars.PROJECT_ID }}|g" djangoexact/app.yaml
           sed -i "s|\$DB_ENGINE|${{ vars.DB_ENGINE }}|g" djangoexact/app.yaml
@@ -98,7 +99,7 @@ jobs:
           sed -i "s|\$DB_PASSWORD|${{ secrets.DB_PASSWORD }}|g" djangoexact/app.yaml
           sed -i "s|\$DB_NAME|${{ vars.DB_NAME }}|g" djangoexact/app.yaml
           sed -i "s|\$DB_PORT|${{ vars.DB_PORT }}|g" djangoexact/app.yaml
-          sed -i "s|\$SECRET_KEY|${{ vars._SECRET_KEY }}|g" djangoexact/app.yaml
+          sed -i 's|\$SECRET_KEY|'"${{ vars._SECRET_KEY }}"'|g' djangoexact/app.yaml
 
       - run: cat djangoexact/app.yaml
 
