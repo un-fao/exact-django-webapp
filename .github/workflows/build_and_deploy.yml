@@ -102,7 +102,7 @@ jobs:
           sed -i "s|\$DB_PASSWORD|${{ secrets.DB_PASSWORD }}|g" djangoexact/app.yaml
           sed -i "s|\$DB_NAME|${{ vars.DB_NAME }}|g" djangoexact/app.yaml
           sed -i "s|\$DB_PORT|${{ vars.DB_PORT }}|g" djangoexact/app.yaml
-          sed -i "s|\$SECRET_KEY|${{ secrets.GAE_APPLICATION }}|g" djangoexact/app.yaml
+          sed -i "s|\$SECRET_KEY|${{ secrets.SECRET_KEY }}|g" djangoexact/app.yaml
 
       - run: cat djangoexact/app.yaml
 
@@ -117,7 +117,7 @@ jobs:
           sed -i "s|\$DB_NAME|${{ vars.DB_NAME }}|g" djangoexact/djangoexact/settings.py
           sed -i "s|\$DB_PORT|${{ vars.DB_PORT }}|g" djangoexact/djangoexact/settings.py
           sed -i "s|\$ALLOWED_HOST|${{ vars.ALLOWED_HOST }}|g" djangoexact/djangoexact/settings.py
-          sed -i "s|\$SECRET_KEY|${{ secrets.GAE_APPLICATION }}|g" djangoexact/djangoexact/settings.py
+          sed -i "s|\$SECRET_KEY|${{ secrets.SECRET_KEY }}|g" djangoexact/djangoexact/settings.py
           sed -i "s|\$EMAIL_HOST|${{ vars.EMAIL_HOST }}|g" djangoexact/djangoexact/settings.py
           sed -i "s|\$EMAIL_PORT|${{ vars.EMAIL_PORT }}|g" djangoexact/djangoexact/settings.py
           sed -i "s|\$SMTP_USER_EMAIL|${{ vars.SMTP_USER_EMAIL }}|g" djangoexact/djangoexact/settings.py
