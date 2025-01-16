@@ -41,8 +41,12 @@ jobs:
       contents: read
       issues: write
     steps:
-      - name: Set env vars from vars context JSON
-        run: echo "$VARS" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
+      - name: Expose GitHub Variables
+        run: echo "${{ vars.VARS }}" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
+
+      - name: Expose JSON-based secrets
+        run: |
+          echo "${{ secrets.MY_SECRETS }}" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
 
       - name: show all env vars
         run: printenv
