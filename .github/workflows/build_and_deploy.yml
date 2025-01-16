@@ -28,6 +28,7 @@ jobs:
               ;;
             *)
               ;;
+          esac
 
   deploy:
     runs-on: ubuntu-22.04
