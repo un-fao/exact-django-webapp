@@ -42,11 +42,10 @@ jobs:
       issues: write
     steps:
       - name: Expose GitHub Variables
-        run: echo "${{ vars.VARS }}" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
+        run: echo "$VARS" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
 
       - name: Expose JSON-based secrets
-        run: |
-          echo "${{ secrets.MY_SECRETS }}" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
+        run: echo "$SECRETS" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
 
       - name: show all env vars
         run: printenv
