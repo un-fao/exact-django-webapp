@@ -46,10 +46,11 @@ jobs:
 
       - name: Expose Github secrets
         run: |
-          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
-          echo "FIREBASE_PRIVATE_KEY=${{ secrets.SMTP_USER_PASSWORD }}" >> $GITHUB_ENV
-          echo "FIREBASE_SERVICE_ACCOUNT=${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" >> $GITHUB_ENV
-          echo "SMTP_USER_PASSWORD=${{ secrets.SMTP_USER_PASSWORD }}" >> $GITHUB_ENV
+          echo "DB_PASSWORD='${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
+          echo "FIREBASE_PRIVATE_KEY='${{ secrets.SMTP_USER_PASSWORD }}" >> $GITHUB_ENV
+          echo "FIREBASE_SERVICE_ACCOUNT='${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" >> $GITHUB_ENV
+          echo "SECRET_KEY='${{ secrets.SECRET_KEY }}" >> $GITHUB_ENV
+          echo "SMTP_USER_PASSWORD='${{ secrets.SMTP_USER_PASSWORD }}" >> $GITHUB_ENV
 
       - name: show all env vars
         run: printenv
