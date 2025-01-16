@@ -109,12 +109,12 @@ jobs:
 
       - name: Replace vars in settings.py
         run: |
-          sed -i "s|os.getenv(\"DB_ENGINE\")|${{ vars.DB_ENGINE }}|g" djangoexact/djangoexact/settings.py
-          sed -i "s|os.getenv(\"DB_HOST\")|127.0.0.1|g" djangoexact/djangoexact/settings.py
-          sed -i "s|os.getenv(\"DB_USERNAME\")|${{ vars.DB_USERNAME }}|g" djangoexact/djangoexact/settings.py
-          sed -i "s|os.getenv(\"DB_PASSWORD\")|${{ secrets.DB_PASSWORD }}|g" djangoexact/djangoexact/settings.py
-          sed -i "s|os.getenv(\"DB_NAME\")|${{ vars.DB_NAME }}|g" djangoexact/djangoexact/settings.py
-          sed -i "s|os.getenv(\"DB_PORT\")|${{ vars.DB_PORT }}|g" djangoexact/djangoexact/settings.py
+          sed -i "s|os.getenv(\"DB_ENGINE\")|\"${{ vars.DB_ENGINE }}\"|g" djangoexact/djangoexact/settings.py
+          sed -i "s|os.getenv(\"DB_HOST\")|\"127.0.0.1\"|g" djangoexact/djangoexact/settings.py
+          sed -i "s|os.getenv(\"DB_USERNAME\")|\"${{ vars.DB_USERNAME }}\"|g" djangoexact/djangoexact/settings.py
+          sed -i "s|os.getenv(\"DB_PASSWORD\")|\"${{ secrets.DB_PASSWORD }}\"|g" djangoexact/djangoexact/settings.py
+          sed -i "s|os.getenv(\"DB_NAME\")|\"${{ vars.DB_NAME }}\"|g" djangoexact/djangoexact/settings.py
+          sed -i "s|os.getenv(\"DB_PORT\")|\"${{ vars.DB_PORT }}\"|g" djangoexact/djangoexact/settings.py
           sed -i "s|\$ALLOWED_HOST|${{ vars.ALLOWED_HOST }}|g" djangoexact/djangoexact/settings.py
           sed -i "s|\$SECRET_KEY|${{ secrets.SECRET_KEY }}|g" djangoexact/djangoexact/settings.py
           sed -i "s|\$EMAIL_HOST|${{ vars.EMAIL_HOST }}|g" djangoexact/djangoexact/settings.py
