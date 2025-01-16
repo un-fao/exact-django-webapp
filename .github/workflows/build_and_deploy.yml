@@ -98,6 +98,7 @@ jobs:
           sed -i "s|\$DB_PASSWORD|${{ secrets.DB_PASSWORD }}|g" djangoexact/app.yaml
           sed -i "s|\$DB_NAME|${{ vars.DB_NAME }}|g" djangoexact/app.yaml
           sed -i "s|\$DB_PORT|${{ vars.DB_PORT }}|g" djangoexact/app.yaml
+          sed -i "s|\$SECRET_KEY|${{ secrets.SECRET_KEY }}|g" djangoexact/app.yaml
           cat djangoexact/app.yaml
 
           sed -i "s|\$DB_ENGINE|${{ vars.DB_ENGINE }}|g" djangoexact/djangoexact/settings.py
