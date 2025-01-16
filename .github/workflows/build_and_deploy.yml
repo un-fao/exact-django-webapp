@@ -45,7 +45,7 @@ jobs:
         run: echo "$VARS" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
 
       - name: Expose Github secrets
-        run: echo "$SECRETS"
+        run: gh secret list --env $(git branch --show-current) --json name | jq -c '.[]'
 
       - name: show all env vars
         run: printenv
