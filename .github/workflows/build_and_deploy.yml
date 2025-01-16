@@ -45,9 +45,11 @@ jobs:
         run: echo "$VARS" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
 
       - name: Expose Github secrets
-        env: 
-          GH_TOKEN: ${{ github.token }}
-        run: gh secret list --env "${{ github.ref_name }}" --json name | jq -c '.[]'
+        run: |
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
+          echo "FIREBASE_PRIVATE_KEY=${{ secrets.SMTP_USER_PASSWORD }}" >> $GITHUB_ENV
+          echo "FIREBASE_SERVICE_ACCOUNT=${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" >> $GITHUB_ENV
+          echo "SMTP_USER_PASSWORD=${{ secrets.SMTP_USER_PASSWORD }}" >> $GITHUB_ENV
 
       - name: show all env vars
         run: printenv
@@ -106,6 +108,7 @@ jobs:
 
       - name: Replace vars in settings.py
         run: |
+          set +H
           sed -i "s|\$DB_ENGINE|${{ vars.DB_ENGINE }}|g" djangoexact/djangoexact/settings.py
           sed -i "s|\$DB_INSTANCE_CONNECTION|${{ vars.DB_INSTANCE_CONNECTION }}|g" djangoexact/djangoexact/settings.py
           sed -i "s|\$DB_HOST|127.0.0.1|g" djangoexact/djangoexact/settings.py
@@ -114,7 +117,7 @@ jobs:
           sed -i "s|\$DB_NAME|${{ vars.DB_NAME }}|g" djangoexact/djangoexact/settings.py
           sed -i "s|\$DB_PORT|${{ vars.DB_PORT }}|g" djangoexact/djangoexact/settings.py
           sed -i "s|\$ALLOWED_HOST|${{ vars.ALLOWED_HOST }}|g" djangoexact/djangoexact/settings.py
-          sed -i "s|\$SECRET_KEY|${{ vars._SECRET_KEY }}|g" djangoexact/djangoexact/settings.py
+          sed -i "s|\$SECRET_KEY|$SECRET_KEY|g" djangoexact/djangoexact/settings.py
           sed -i "s|\$EMAIL_HOST|${{ vars.EMAIL_HOST }}|g" djangoexact/djangoexact/settings.py
           sed -i "s|\$EMAIL_PORT|${{ vars.EMAIL_PORT }}|g" djangoexact/djangoexact/settings.py
           sed -i "s|\$SMTP_USER_EMAIL|${{ vars.SMTP_USER_EMAIL }}|g" djangoexact/djangoexact/settings.py
