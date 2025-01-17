@@ -1,5 +1,5 @@
 import django_filters as filters
-from .models import FuelType
+from .models import FuelType, SoilType
 from django.db.models import Q
 
 
@@ -31,3 +31,11 @@ class FuelTypeFilter(filters.FilterSet):
     class Meta:
         model = FuelType
         fields = ['fuel_use_type']
+
+class SoilTypeFilter(filters.FilterSet):
+    active = filters.BooleanFilter(field_name='active', initial=True)
+    is_coastal = filters.BooleanFilter(field_name='is_coastal', initial=False)
+
+    class Meta:
+        model = SoilType
+        fields = ['active', 'is_coastal']

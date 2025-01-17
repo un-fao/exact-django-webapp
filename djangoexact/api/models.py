@@ -297,6 +297,7 @@ class Moisture(models.Model):
 class SoilType(models.Model):
     name = models.CharField(max_length=100)
     active = models.BooleanField(default=True)
+    is_coastal = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
