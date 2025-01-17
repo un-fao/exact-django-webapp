@@ -510,7 +510,7 @@ class FuelType(models.Model):
         unique_together = ("name", "fuel_use_type", "macro_fuel_type")
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.fuel_use_type})"
 
 
 class SalinityType(models.Model):
