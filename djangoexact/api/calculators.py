@@ -5057,7 +5057,7 @@ class CoastalWetlandCalculator(BaseCalculator):
             self.bgb_default.value = getattr_or_default(self.math_w, "bgb_tier_2_default") or getattr_or_default(self.math_wo, "bgb_tier_2_default")
 
         self.soil_type_name = self.module.soil_type_t2.name if self.module.soil_type_t2 else "Mineral"
-        self.salinity_type = self.module.avg_salinity_t2 if self.module.avg_salinity_t2 else SalinityType.objects.get(value=">18")
+        self.salinity_type: SalinityType = self.module.avg_salinity_t2 if self.module.avg_salinity_t2 else SalinityType.objects.get(value="<18")
 
         try:
             self.agb = ipcc.CoastalAGB.objects.get(**cm, land_use_type=self.module.land_use_type)
