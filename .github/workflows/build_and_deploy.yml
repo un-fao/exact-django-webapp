@@ -138,13 +138,10 @@ jobs:
       - run: cd djangoexact/ && python manage.py update_translation_fields
       - run: cd djangoexact/ && python manage.py sync_translation_fields
 
-      - name: Replace DB vars for GAE
-        run: |
-          sed -i 's|"127.0.0.1"|"/cloudsql/${{ vars.DB_INSTANCE_CONNECTION }}"|g' djangoexact/djangoexact/settings.py
-          sed -i '/"PORT":d' djangoexact/djangoexact/settings.py
-          
-          sed -i "s|\"127.0.0.1\"|\"/cloudsql/${{ vars.DB_INSTANCE_CONNECTION }}\"|g" djangoexact/djangoexact/settings.py
-          sed -i "/\"PORT\":d" djangoexact/djangoexact/settings.py
+      - name: Replace DB_HOST for GAE
+        run: sed -i "s|\"127.0.0.1\"|\"/cloudsql/${{ vars.DB_INSTANCE_CONNECTION }}\"|g" djangoexact/djangoexact/settings.py
+      - name: Remove DB_PORT for GAE
+        run: sed -i "/\"PORT\":d" djangoexact/djangoexact/settings.py
 
       - name: Deploy
         run: |
