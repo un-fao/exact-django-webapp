@@ -66,6 +66,7 @@ from .models import (
     ProjectFileAttachment,
     APIHealth,
     FuelType,
+    SoilType,
 )
 from .serializers import (
     ActionTypes,
@@ -2117,3 +2118,36 @@ class FuelTypeViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
     )
     def list(self, request):
         super().list(request)
+
+class SoilTypeViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
+    queryset = SoilType.objects.all()
+    serializer_class = get_model_serializer(SoilType)
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = api_filters.SoilTypeFilter
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                name="all",
+                in_=openapi.IN_QUERY,
+                type=openapi.TYPE_BOOLEAN,
+                description="Retrieve all entries.",
+            ),
+        ],
+        responses={200: get_model_serializer(SoilType)(many=True)},
+        description="Retrieve a list of entries filtered by coastal status."
+    )
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        if 'all' in self.request.query_params:
+            all = self.request.query_params.get('all', None)
+            if all == 'true':
+                return queryset
+
+        if 'active' not in self.request.query_params:
+            queryset = queryset.filter(active=True)
+        if 'is_coastal' not in self.request.query_params:
+            queryset = queryset.filter(is_coastal=False)
+
+        return queryset
