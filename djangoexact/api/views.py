@@ -65,6 +65,7 @@ from .models import (
     ProjectTag,
     ProjectFileAttachment,
     APIHealth,
+    FuelType,
 )
 from .serializers import (
     ActionTypes,
@@ -107,6 +108,7 @@ from .serializers import (
     ProjectFileUploadSerializer,
     ProjectFileReadSerializer,
     APIStatusSerializer,
+    FuelTypeSerializer,
 )
 
 from djangoexact.settings import auth
@@ -2087,3 +2089,31 @@ class APIHealthView(views.APIView):
 
         cache.set(self.CACHE_KEY, serializer.data, self.CACHE_TIMEOUT_SECONDS)
         return Response(serializer.data, status=status)
+
+    
+class FuelTypeViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
+    queryset = FuelType.objects.all()
+    serializer_class = FuelTypeSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = api_filters.FuelTypeFilter
+
+    @swagger_auto_schema(
+        parameters=[
+            # openapi.Parameter(
+            #     name="fuel_use_type",
+            #     type={"type": "string", "example": "diesel,Gas,electric"},
+            #     description="Comma-separated list of fuel use types (case-insensitive).",
+            #     required=False,
+            # ),
+            openapi.Parameter(
+                name="fuel_use_type",
+                in_=openapi.IN_QUERY,
+                type=openapi.TYPE_STRING,
+                description="Comma-separated list of fuel use types (case-insensitive).",
+            )
+        ],
+        responses={200: FuelTypeSerializer(many=True)},
+        description="Retrieve a list of entries filtered by fuel use type."
+    )
+    def list(self, request):
+        super().list(request)
