@@ -26,6 +26,9 @@ jobs:
             develop|review)
               echo "env=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
               ;;
+            _develop)
+              echo "env=develop" >> "$GITHUB_OUTPUT"
+              ;;
             *)
               ;;
           esac
