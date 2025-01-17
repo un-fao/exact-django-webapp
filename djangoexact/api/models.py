@@ -2054,7 +2054,6 @@ class CoastalWetland(Module):
 
     avg_salinity_t2 = models.ForeignKey(SalinityType, null=True, blank=True, on_delete=models.SET_NULL, verbose_name=_("avg_salinity_t2"))
 
-
 ##### Fisheries and Aquaculture #####
 
 
