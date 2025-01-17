@@ -4429,7 +4429,7 @@ def delete_and_import_value_chain_packaging_emission_factors():
         ValueChainPackagingEmissionFactor.objects.create(packaging_material_type=packaging_type, value=value)
 
 
-def delete_and_import_value_chain_refrigerant_types():
+def import_value_chain_refrigerant_types():
     df = pd.read_csv(
         os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainRefrigerantTypes.csv"),
         header=0,
@@ -4500,7 +4500,8 @@ def delete_and_import_eletricity_emissions():
         sep=";",
     )
 
-    for row in df.iterrows():
+    for i, row in df.iterrows():
+        print(row)
         country = row["country"]
         operating_margin = parse_csv_number(row["operating_margin"])
         combined_margin = parse_csv_number(row["combined_margin"])
@@ -4582,7 +4583,7 @@ def assign_fuel_type_units():
 
     for i, row in df.iterrows():
         fuel_type = FuelType.objects.filter(name__iexact=row["fuel_type"]).all()
-        unit = Unit.objects.get(name__iexact=row["unit"])
+        unit = Unit.objects.get_or_create(name__iexact=row["unit"])[0]
 
         for ft in fuel_type:
             ft.unit = unit
@@ -4590,16 +4591,6 @@ def assign_fuel_type_units():
 
 
 # TODO: Run in production
-
-# delete_and_import_value_chain_packaging_material_types()
-# delete_and_import_value_chain_packaging_emission_factors()
-# delete_and_import_value_chain_refrigerant_types()
-# delete_and_import_value_chain_refrigerant_emission_factors()
-# delete_and_import_eletricity_emissions()
-# delete_and_import_crop_yield_stats()
-# import_fuel_type_fuel_use_type_mapping()
-# delete_and_import_input_emission_factors()
-# assign_fuel_type_units()
 
 # TODO: Run in review
 
