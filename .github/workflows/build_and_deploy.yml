@@ -144,8 +144,8 @@ jobs:
       - name: Replace DB_HOST for GAE
         run: sed -i "s|\"127.0.0.1\"|\"/cloudsql/${{ vars.DB_INSTANCE_CONNECTION }}\"|g" djangoexact/djangoexact/settings.py
       - name: Remove DB_PORT for GAE
-        run: sed -i "/\"PORT\":d" djangoexact/djangoexact/settings.py
-
+        run: sed -i "/\"PORT\":/d" djangoexact/djangoexact/settings.py
+        
       - name: Deploy
         run: |
           gcloud app deploy djangoexact/app.yaml --project ${{ vars.PROJECT_ID }} --verbosity=debug
