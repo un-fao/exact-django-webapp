@@ -2,7 +2,7 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - develop
+      - _develop
       # - review
   # pull_request:
   #   branches:
@@ -142,6 +142,9 @@ jobs:
         run: |
           sed -i 's|"127.0.0.1"|"/cloudsql/${{ vars.DB_INSTANCE_CONNECTION }}"|g' djangoexact/djangoexact/settings.py
           sed -i '/"PORT":d' djangoexact/djangoexact/settings.py
+          
+          sed -i "s|\"127.0.0.1\"|\"/cloudsql/${{ vars.DB_INSTANCE_CONNECTION }}\"|g" djangoexact/djangoexact/settings.py
+          sed -i "/\"PORT\":d" djangoexact/djangoexact/settings.py
 
       - name: Deploy
         run: |
