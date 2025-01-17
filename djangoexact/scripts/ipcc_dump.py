@@ -4592,10 +4592,37 @@ def delete_and_import_forest_total_biomass():
                 value=value,
             )
 
+def get_or_create_soil_types_and_update_info():
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "SoilTypes.csv"),
+        header=0,
+        sep=",",
+    )
+
+    for i, row in df.iterrows():
+        name = row["name"]
+        active = row["active"]
+        is_coastal = row["is_coastal"]
+
+        print(name, active, is_coastal)
+
+        if SoilType.objects.filter(name__iexact=name).exists():
+            print(f"SoilType {name} already exists.")
+            soil_type = SoilType.objects.get(name__iexact=name)
+        else:
+            soil_type = SoilType.objects.create(name=name)
+
+        soil_type.active = active
+        soil_type.is_coastal = is_coastal
+        soil_type.save()
+
 
 # TODO: Run in production
 
 # TODO: Run in review
+
+get_or_create_soil_types_and_update_info()
 
 # TODO: Run in development
 
