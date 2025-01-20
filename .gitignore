@@ -95,6 +95,9 @@ djangoexact/docs/EX-ACT VC migration.docx
 docs/docs/
 djangoexact/docker-compose.yml
 djangoexact/Dockerfile
+djangoexact/djangoexact/.env.development
+djangoexact/djangoexact/.env.production
+djangoexact/djangoexact/.env.review
 
 djangoexact/matrices/
 djangoexact/djangoexact/.env.development

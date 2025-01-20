@@ -4623,9 +4623,9 @@ def get_or_create_soil_types_and_update_info():
 # TODO: Run in review
 
 get_or_create_soil_types_and_update_info()
+delete_and_import_forest_total_biomass()
+delete_and_import_total_biomass_after_defo()
 
 # TODO: Run in development
 
-delete_and_import_forest_total_biomass()
-delete_and_import_total_biomass_after_defo()
 
