@@ -98,3 +98,5 @@ djangoexact/Dockerfile
 djangoexact/djangoexact/.env.development
 djangoexact/djangoexact/.env.production
 djangoexact/djangoexact/.env.review
+
+djangoexact/matrices/
