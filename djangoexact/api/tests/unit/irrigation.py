@@ -14,21 +14,22 @@ import copy
 from . import base_module
 
 
-class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
+class IrrigationTestCase(base_module.BaseModuleWithSubmoduleTestCase):
     def setUp(self):
-        self.ModuleClass = models.Energy
-        self.submodule_classes = [models.Electricity, models.Fuel]
+        self.ModuleClass = models.Irrigation
+        self.submodule_classes = [models.IrrigationSystem, models.IrrigationPhase]
         super().setUp()
 
         self.land_use_types = self.land_use_types.filter(module_types__class_name=self.ModuleClass.__name__, climates=self.project.climate, moistures=self.project.moisture, is_active=True)
 
         self.validated_data = {
-            "quantity_consumed_per_year_start": FuzzyFloat(0, 1000).fuzz(),
-            "quantity_consumed_per_year_w": FuzzyFloat(0, 1000).fuzz(),
-            "quantity_consumed_per_year_wo": FuzzyFloat(0, 1000).fuzz(),
-            "electricity_ef_t2_start": FuzzyFloat(0, 10).fuzz(),
-            "electricity_ef_t2_w": FuzzyFloat(0, 10).fuzz(),
-            "electricity_ef_t2_wo": FuzzyFloat(0, 10).fuzz(),
+            "irrigation_system_type": models.IrrigationSystemType.objects.order_by("?").first().pk,
+            "ha_start": FuzzyFloat(0, 1000).fuzz(),
+            "ha_w": FuzzyFloat(0, 1000).fuzz(),
+            "ha_wo": FuzzyFloat(0, 1000).fuzz(),
+            "ef_t2_start": FuzzyFloat(0, 1000).fuzz(),
+            "ef_t2_w": FuzzyFloat(0, 1000).fuzz(),
+            "ef_t2_wo": FuzzyFloat(0, 1000).fuzz(),
         }
 
         self.edit_module(self.submodules[0], self.user, self.validated_data)
@@ -37,6 +38,20 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         fuel_data["fuel_type_start"] = models.FuelType.objects.order_by("?").first().pk
         fuel_data["fuel_type_w"] = models.FuelType.objects.order_by("?").first().pk
         fuel_data["fuel_type_wo"] = models.FuelType.objects.order_by("?").first().pk
+        fuel_data["well_depth"] = FuzzyFloat(0, 10).fuzz()
+        fuel_data["gross_irrigation_water_start"] = FuzzyFloat(0, 100).fuzz()
+        fuel_data["gross_irrigation_water_w"] = FuzzyFloat(0, 100).fuzz()
+        fuel_data["gross_irrigation_water_wo"] = FuzzyFloat(0, 100).fuzz()
+        fuel_data["ef_co2_t2_start"] = FuzzyFloat(0, 1000).fuzz()
+        fuel_data["ef_co2_t2_w"] = FuzzyFloat(0, 1000).fuzz()
+        fuel_data["ef_co2_t2_wo"] = FuzzyFloat(0, 1000).fuzz()
+        fuel_data["ef_ch4_t2_start"] = FuzzyFloat(0, 1000).fuzz()
+        fuel_data["ef_ch4_t2_w"] = FuzzyFloat(0, 1000).fuzz()
+        fuel_data["ef_ch4_t2_wo"] = FuzzyFloat(0, 1000).fuzz()
+        fuel_data["ef_n2o_t2_start"] = FuzzyFloat(0, 1000).fuzz()
+        fuel_data["ef_n2o_t2_w"] = FuzzyFloat(0, 1000).fuzz()
+        fuel_data["ef_n2o_t2_wo"] = FuzzyFloat(0, 1000).fuzz()
+
         self.edit_module(self.submodules[1], self.user, fuel_data)
 
         self.submodules[0].refresh_from_db()
@@ -58,7 +73,7 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         prev_balance = response.data["balance"]
 
         validated_data = copy.deepcopy(self.validated_data)
-        validated_data["transmission_loss_t2_w"] = FuzzyFloat(0, 10).fuzz()
+        validated_data["ef_t2_start"] = FuzzyFloat(0, 1000).fuzz()
 
         response = self.edit_module(self.submodules[0], self.user, validated_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -74,7 +89,7 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
     def test_modify(self):
 
         validated_data = copy.deepcopy(self.validated_data)
-        validated_data["quantity_consumed_per_year_start"] = FuzzyFloat(0, 1000).fuzz()
+        validated_data["ha_start"] = FuzzyFloat(0, 1000).fuzz()
         response = self.edit_module(self.submodules[0], self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -83,7 +98,7 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
     def test_patch_to_not_ready(self):
 
         validated_data = copy.deepcopy(self.validated_data)
-        validated_data["quantity_consumed_per_year_start"] = None
+        validated_data["ha_start"] = None
         response = self.edit_module(self.submodules[0], self.user, validated_data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)

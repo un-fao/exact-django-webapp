@@ -95,6 +95,8 @@ from .models import (
     TransportEntry,
     ProjectFileAttachment,
     ApplicationParameter,
+    APIHealth,
+    FuelUseType,
 )
 from datetime import timedelta
 
@@ -450,13 +452,13 @@ class WriteProjectSerializer(serializers.ModelSerializer):
             if project.is_locked and project.lock_updated_at and has_more_than_thirty_minutes_passed:
                 project.unlock()
 
-            if project.is_locked and project.locked_by != user:
+            if project.is_locked and project.locked_by != user and not user.is_staff:
                 log.warning(f"Project is already locked by: {project.locked_by.email}")
                 raise serializers.ValidationError("The project is already locked")
 
             # If the project is not locked, or a lock is requested
             if not project.is_locked or is_locking is True:
-                if project.is_locked and project.locked_by != user:
+                if project.is_locked and project.locked_by != user and not user.is_staff:
                     log.warning(f"Project is already locked by: {project.locked_by.email}")
                     raise serializers.ValidationError("The project is already locked")
 
@@ -538,7 +540,7 @@ class WriteActivitySerializer(serializers.ModelSerializer):
 
         project = self.instance.project if self.instance else data.get("project")
 
-        if project.is_locked and not project.locked_by == self.context["request"].user:
+        if project.is_locked and not project.locked_by == self.context["request"].user and not self.context["request"].user.is_staff:
             raise serializers.ValidationError("Project is locked by another user")
 
         if self.instance:
@@ -1069,7 +1071,7 @@ class BaseModuleSerializer(BaseGenericModuleSerializer):
 
         module_types = list(map(lambda module: module.class_name, activity.module_types.all()))
 
-        if project.is_locked and not project.locked_by == self.context["request"].user:
+        if project.is_locked and not project.locked_by == self.context["request"].user and not self.context["request"].user.is_staff:
             log.error("Project is locked by another user")
             raise serializers.ValidationError("Project is locked by another user")
 
@@ -1242,6 +1244,14 @@ class LandModuleSeralizer(ScenarioModuleSerializer):
 
             for field, value in data.items():
                 setattr(self.instance, field, value)
+
+            # Validate the parent Land Use Change on related LandModule change
+            parent_luc = getattr(self.instance, "land_use_change", None)
+
+            if parent_luc:
+                luc_serializer = get_module_serializer(LandUseChange)(data={}, instance=parent_luc, many=False, partial=True, context=self.context)
+                luc_serializer.is_valid()
+                luc_serializer.save()
 
         if luc:
             # If the module is associated with a Land Use Change, update the status of the Land Use Change
@@ -1858,17 +1868,22 @@ class IrrigationReadSerializer(BaseGenericModuleSerializer):
         mandatory_fields = {}
 
     def validate(self, data):
+        super().validate(data)
 
-        irrigation_systems = self.instance.irrigation_systems.all()
-        irrigation_phases = self.instance.irrigation_phases.all()
+        irrigation_systems: list[IrrigationSystem] = self.instance.irrigation_systems.all()
+        irrigation_phases: list[IrrigationPhase] = self.instance.irrigation_phases.all()
 
-        if any([system.status.name_en == "EMPTY" for system in irrigation_systems]):
-            raise serializers.ValidationError("Irrigation systems are not ready for calculations")
+        for irrigation_system in irrigation_systems:
+            if not irrigation_system.is_ready():
+                self.instance.status = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
+                break
 
-        if any([phase.status.name_en == "EMPTY" for phase in irrigation_phases]):
-            raise serializers.ValidationError("Irrigation phases are not ready for calculations")
+        for irrigation_phase in irrigation_phases:
+            if not irrigation_phase.is_ready():
+                self.instance.status = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
+                break
 
-        return super().validate(data)
+        return data
 
 
 # IrrigationSystem
@@ -1907,6 +1922,11 @@ class IrrigationSystemWriteSerializer(ScenarioSubmoduleSerializer):
 
         if self.instance and self.instance.parent.irrigation_systems.all().count() + 1 > max_entries:
             raise serializers.ValidationError(f"Only {max_entries} irrigation systems are allowed")
+        
+        parent = utils.getany([self.instance, dict(data)], "parent")
+        parent_serializer = IrrigationWriteSerializer(data={}, instance=parent, partial=True, context=self.context)
+        parent_serializer.is_valid()
+        parent_serializer.save()
 
         return data
 
@@ -1931,24 +1951,27 @@ class IrrigationPhaseWriteSerializer(ScenarioSubmoduleSerializer):
         mandatory_fields = {
             "start": {
                 "mandatory": [
+                    "gross_irrigation_water_start",
                     "irrigation_system_type",
-                    "fuel_type",
+                    "fuel_type_start",
                     "well_depth",
                     "ha_start",
                 ],
             },
             "with": {
                 "mandatory": [
+                    "gross_irrigation_water_w",
                     "irrigation_system_type",
-                    "fuel_type",
+                    "fuel_type_w",
                     "well_depth",
                     "ha_w",
                 ],
             },
             "without": {
                 "mandatory": [
+                    "gross_irrigation_water_wo",
                     "irrigation_system_type",
-                    "fuel_type",
+                    "fuel_type_wo",
                     "well_depth",
                     "ha_wo",
                 ],
@@ -1962,6 +1985,11 @@ class IrrigationPhaseWriteSerializer(ScenarioSubmoduleSerializer):
 
         if self.instance and self.instance.parent.irrigation_phases.all().count() + 1 > max_entries:
             raise serializers.ValidationError(f"Only {max_entries} irrigation phases are allowed")
+        
+        parent = utils.getany([self.instance, dict(data)], "parent")
+        parent_serializer = IrrigationWriteSerializer(data={}, instance=parent, partial=True, context=self.context)
+        parent_serializer.is_valid()
+        parent_serializer.save()
 
         return data
 
@@ -2030,19 +2058,19 @@ class FuelSerializer(ScenarioSubmoduleSerializer):
         mandatory_fields = {
             "start": {
                 "mandatory": [
-                    "fuel_type",
+                    "fuel_type_start",
                     "quantity_consumed_per_year_start",
                 ],
             },
             "with": {
                 "mandatory": [
-                    "fuel_type",
+                    "fuel_type_w",
                     "quantity_consumed_per_year_w",
                 ],
             },
             "without": {
                 "mandatory": [
-                    "fuel_type",
+                    "fuel_type_wo",
                     "quantity_consumed_per_year_wo",
                 ],
             },
@@ -2595,6 +2623,11 @@ class InputEntrySerializer(ScenarioSubmoduleSerializer):
 
         if parent.input_entries.count() + 1 > max_entries:
             raise serializers.ValidationError(f"Only {max_entries} input entries are allowed")
+        
+        # Validate parent
+        parent_serializer = InputSerializer(data={}, instance=parent, partial=True, context=self.context)
+        parent_serializer.is_valid()
+        parent_serializer.save()
 
         return data
 
@@ -2795,9 +2828,16 @@ class MacroFuelTypeSerializer(serializers.ModelSerializer):
         fields = "__all__"
         ref_name = "MacroFuelType"
 
+class FuelUseTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FuelUseType
+        fields = "__all__"
+        ref_name = "FuelUseType"
+
 
 class FuelTypeSerializer(serializers.ModelSerializer):
     macro_fuel_type = MacroFuelTypeSerializer(many=False, read_only=True)
+    fuel_use_type = FuelUseTypeSerializer(many=False, read_only=True)
     unit = serializers.SerializerMethodField()
 
     def get_unit(self, obj):
@@ -3446,3 +3486,9 @@ class ProjectFileReadSerializer(serializers.ModelSerializer):
 class ProjectFileDownloadSerializer(serializers.Serializer):
     file_name = serializers.CharField()
     content_type = serializers.CharField()
+
+class APIStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = APIHealth
+        fields = ['is_under_maintenance', 'maintenance_end_time', 'maintenance_message']
+        ref_name = "APIStatus"
