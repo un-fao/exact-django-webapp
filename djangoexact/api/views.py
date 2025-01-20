@@ -18,7 +18,7 @@ from django.utils import timezone
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from math_model.no_time_dependency_final.ghg_emissions_classes import BreakdownTypes
-from rest_framework import permissions, viewsets
+from rest_framework import permissions, viewsets, views
 from rest_framework import status as http_status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -63,7 +63,10 @@ from .models import (
     LandModule,
     CachedResultMixin,
     ProjectTag,
-    ProjectFileAttachment
+    ProjectFileAttachment,
+    APIHealth,
+    FuelType,
+    SoilType,
 )
 from .serializers import (
     ActionTypes,
@@ -105,6 +108,8 @@ from .serializers import (
     ProjectTagSerializer,
     ProjectFileUploadSerializer,
     ProjectFileReadSerializer,
+    APIStatusSerializer,
+    FuelTypeSerializer,
 )
 
 from djangoexact.settings import auth
@@ -124,6 +129,7 @@ from django.test import RequestFactory
 import asyncio
 from asgiref.sync import sync_to_async
 from django.utils.text import slugify
+from django.core.cache import cache
 
 
 logger = logging.getLogger("console")
@@ -448,7 +454,12 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 type=openapi.TYPE_BOOLEAN,
             ),
         ], 
-        responses={404: "Project not found", 403: "Selected user does not have permission to view projects", 200: ReadProjectSerializer | ProjectSummarySerializer},
+        responses={
+            404: "Project not found", 
+            403: "Selected user does not have permission to view projects", 
+            200: ReadProjectSerializer,
+            201: ProjectSummarySerializer,
+        },
         serializer_class=ReadProjectSerializer,
     )
     def list(self, request):
@@ -601,7 +612,18 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(ReadProjectSerializer(project, context={"request": request}).data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])
-    @swagger_auto_schema(responses={404: "Project not found", 403: "Selected user does not have permission to view project results"})
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "activities",
+                openapi.IN_QUERY,
+                description="List of activity IDs to include in the report",
+                type=openapi.TYPE_ARRAY,
+                items={"type": openapi.TYPE_INTEGER},
+            )
+        ],
+        responses={404: "Project not found", 403: "Selected user does not have permission to view project results"},
+    )
     def report(self, request, pk=None):
         project: Project = self.get_object()
 
@@ -612,9 +634,15 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not project.is_ready():
             logging.error("Project is not ready")
             return utils.ErrorResponse("To get a report for a project, all activities must have been completed.", status=http_status.HTTP_400_BAD_REQUEST)
+        
+        selected_activities = request.query_params.get("activities", "").split(",")
+        if selected_activities == [""]:
+            selected_activities = None
+        else:
+            selected_activities = project.activities.filter(pk__in=selected_activities)
 
         try:
-            report = reports.BaseProjectReport(project)
+            report = reports.BaseProjectReport(project, activities=selected_activities)
             _, file_bytes_buffer = report.build_report()
             report.close_file()
         except Exception as e:
@@ -1650,7 +1678,7 @@ def generic_module_viewset(model: Module):
         @action(detail=True, methods=["get"], url_path="results")
         @swagger_auto_schema(
             manual_parameters=[
-                openapi.Parameter("aggregate", openapi.IN_QUERY, description="Aggregate results by", type=openapi.TYPE_STRING, enum=[BreakdownTypes.TOTAL, BreakdownTypes.ACTIVITY, BreakdownTypes.GAS, BreakdownTypes.ACTIVITY_GAS]),
+                openapi.Parameter("aggregate", openapi.IN_QUERY, description="Aggregate results by", type=openapi.TYPE_STRING, enum=[BreakdownTypes.TOTAL.value, BreakdownTypes.ACTIVITY.value, BreakdownTypes.GAS.value, BreakdownTypes.ACTIVITY_GAS.value]),
                 openapi.Parameter("cached", openapi.IN_QUERY, description="Use cached results", type=openapi.TYPE_BOOLEAN),
             ],
             responses={400: "Bad request", 403: "Selected user does not have permission to view module results", 200: DynamicResultSerializer},
@@ -1677,6 +1705,7 @@ def generic_module_viewset(model: Module):
                     return utils.ErrorResponse("Not all modules are ready. Land Use Change module cannot be calculated.")
             else:
                 if not module.is_ready():
+                    logger.error(f"Module {module.module_type} is not ready. Cannot calculate result.")
                     return utils.ErrorResponse("Module is not ready. Cannot calculate result.")
 
             try:
@@ -1876,6 +1905,8 @@ class ProjectTagViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     ordering = ["name"]
 
     def get_serializer_context(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return {}
         context = super().get_serializer_context()
         project_id = self.kwargs.get("project_pk")
         context["project"] = get_object_or_404(Project, pk=project_id)
@@ -1929,6 +1960,8 @@ class ProjectFileAttachmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     ordering = ["name"]
 
     def get_serializer_context(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return {}
         context = super().get_serializer_context()
         project_id = self.kwargs.get("project_pk")
         context["project"] = get_object_or_404(Project, pk=project_id)
@@ -1937,6 +1970,7 @@ class ProjectFileAttachmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
     @transaction.atomic
     def create(self, request):
+        
         project_id = request.data.get("project", None)
 
         if project_id is None:
@@ -2028,3 +2062,92 @@ class ProjectFileAttachmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         attachment.delete()
 
         return Response(status=http_status.HTTP_204_NO_CONTENT)
+
+class APIHealthView(views.APIView):
+    permission_classes = [permissions.AllowAny]
+
+    CACHE_KEY = "api_health_status"
+    CACHE_TIMEOUT_SECONDS = 60
+
+    @swagger_auto_schema(responses={503: APIStatusSerializer, 200: APIStatusSerializer})
+    def get(self, request):
+        status = http_status.HTTP_200_OK
+        cached_status: dict = cache.get(self.CACHE_KEY)
+
+        if cached_status:
+            if cached_status["is_under_maintenance"]:
+                status = http_status.HTTP_503_SERVICE_UNAVAILABLE
+            return Response(cached_status, status=status)
+        
+
+        try:
+            api_status = APIHealth.objects.first()
+            serializer = APIStatusSerializer(api_status)
+            if api_status and api_status.is_under_maintenance:
+                status = http_status.HTTP_503_SERVICE_UNAVAILABLE
+        except APIHealth.DoesNotExist:
+            pass
+
+        cache.set(self.CACHE_KEY, serializer.data, self.CACHE_TIMEOUT_SECONDS)
+        return Response(serializer.data, status=status)
+
+    
+class FuelTypeViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
+    queryset = FuelType.objects.all()
+    serializer_class = FuelTypeSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = api_filters.FuelTypeFilter
+
+    @swagger_auto_schema(
+        parameters=[
+            # openapi.Parameter(
+            #     name="fuel_use_type",
+            #     type={"type": "string", "example": "diesel,Gas,electric"},
+            #     description="Comma-separated list of fuel use types (case-insensitive).",
+            #     required=False,
+            # ),
+            openapi.Parameter(
+                name="fuel_use_type",
+                in_=openapi.IN_QUERY,
+                type=openapi.TYPE_STRING,
+                description="Comma-separated list of fuel use types (case-insensitive).",
+            )
+        ],
+        responses={200: FuelTypeSerializer(many=True)},
+        description="Retrieve a list of entries filtered by fuel use type."
+    )
+    def list(self, request):
+        super().list(request)
+
+class SoilTypeViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
+    queryset = SoilType.objects.all()
+    serializer_class = get_model_serializer(SoilType)
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = api_filters.SoilTypeFilter
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                name="all",
+                in_=openapi.IN_QUERY,
+                type=openapi.TYPE_BOOLEAN,
+                description="Retrieve all entries.",
+            ),
+        ],
+        responses={200: get_model_serializer(SoilType)(many=True)},
+        description="Retrieve a list of entries filtered by coastal status."
+    )
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        if 'all' in self.request.query_params:
+            all = self.request.query_params.get('all', None)
+            if all == 'true':
+                return queryset
+
+        if 'active' not in self.request.query_params:
+            queryset = queryset.filter(active=True)
+        if 'is_coastal' not in self.request.query_params:
+            queryset = queryset.filter(is_coastal=False)
+
+        return queryset
