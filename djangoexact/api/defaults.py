@@ -805,6 +805,7 @@ class CoastalWetlandDefaults(Defaults):
             ch4_rewetting_t2_start_default=defaults.rewetting_ch4.value,
             ch4_rewetting_t2_w_default=defaults.rewetting_ch4.value,
             ch4_rewetting_t2_wo_default=defaults.rewetting_ch4.value,
+            avg_salinity_t2_default=defaults.salinity_type.value,
         )
 
 

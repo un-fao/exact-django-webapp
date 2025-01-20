@@ -96,6 +96,7 @@ from .models import (
     ProjectFileAttachment,
     ApplicationParameter,
     APIHealth,
+    FuelUseType,
 )
 from datetime import timedelta
 
@@ -2827,9 +2828,16 @@ class MacroFuelTypeSerializer(serializers.ModelSerializer):
         fields = "__all__"
         ref_name = "MacroFuelType"
 
+class FuelUseTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FuelUseType
+        fields = "__all__"
+        ref_name = "FuelUseType"
+
 
 class FuelTypeSerializer(serializers.ModelSerializer):
     macro_fuel_type = MacroFuelTypeSerializer(many=False, read_only=True)
+    fuel_use_type = FuelUseTypeSerializer(many=False, read_only=True)
     unit = serializers.SerializerMethodField()
 
     def get_unit(self, obj):
