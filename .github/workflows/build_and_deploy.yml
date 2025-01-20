@@ -95,12 +95,13 @@ jobs:
 
       - run: cat djangoexact/app.yaml
 
-      - run: sed -i "s|\$DB_ENGINE|\"${{ vars.DB_ENGINE }}\"|g" djangoexact/djangoexact/settings.py
+      - run: sed -i "s|\$DB_ENGINE|${{ vars.DB_ENGINE }}|g" djangoexact/djangoexact/settings.py
       - run: sed -i "s|\$DB_HOST|${{ vars.DB_HOST }}|g" djangoexact/djangoexact/settings.py
-      - run: sed -i "s|\$DB_USERNAME|\"${{ vars.DB_USERNAME }}\"|g" djangoexact/djangoexact/settings.py
-      - run: sed -i "s|\$DB_PASSWORD|\"${{ secrets.DB_PASSWORD }}\"|g" djangoexact/djangoexact/settings.py
-      - run: sed -i "s|\$DB_NAME|\"${{ vars.DB_NAME }}\"|g" djangoexact/djangoexact/settings.py
-      - run: sed -i "s|\$DB_PORT|\"${{ vars.DB_PORT }}\"|g" djangoexact/djangoexact/settings.py
+      - run: sed -i "s|\$DB_INSTANCE_CONNECTION|${{ vars.DB_INSTANCE_CONNECTION }}|g" djangoexact/djangoexact/settings.py
+      - run: sed -i "s|\$DB_USERNAME|${{ vars.DB_USERNAME }}|g" djangoexact/djangoexact/settings.py
+      - run: sed -i "s|\$DB_PASSWORD|${{ secrets.DB_PASSWORD }}|g" djangoexact/djangoexact/settings.py
+      - run: sed -i "s|\$DB_NAME|${{ vars.DB_NAME }}|g" djangoexact/djangoexact/settings.py
+      - run: sed -i "s|\$DB_PORT|${{ vars.DB_PORT }}|g" djangoexact/djangoexact/settings.py
       - run: sed -i "s|\$ALLOWED_HOST|${{ vars.ALLOWED_HOST }}|g" djangoexact/djangoexact/settings.py
       - run: |
           SECRET_KEY='${{ secrets.SECRET_KEY }}'
