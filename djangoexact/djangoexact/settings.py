@@ -20,8 +20,16 @@ import base64
 import firebase_admin
 import pyrebase
 from dotenv import load_dotenv
+import logging as log
 
 load_dotenv()
+
+app_mode = os.getenv("APP_MODE", "development")
+print(f"Running in {app_mode} mode")
+
+dotenv_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), "djangoexact", f".env.{app_mode}")
+
+load_dotenv(dotenv_file)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -114,40 +122,20 @@ WSGI_APPLICATION = "djangoexact.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-if os.getenv("GAE_APPLICATION", None):
-    # Running on production App Engine, so connect to Google Cloud SQL using
-    # the unix socket at /cloudsql/<your-cloudsql-connection string>
-    DATABASES = {
-        "default": {
-            "ENGINE": "$DB_ENGINE",
-            "HOST": "/cloudsql/$DB_INSTANCE_CONNECTION",
-            "USER": "$DB_USERNAME",
-            "PASSWORD": "$DB_PASSWORD",
-            "NAME": "$DB_NAME",
-            "TEST": {
-                "NAME": "$DB_NAME",
-            },
-            "OPTIONS": {
-                "connect_timeout": 30,  # Optional: set timeout
-            },
-            "CONN_MAX_AGE": 30,
-        }
+DATABASES = {
+    "default": {
+        "ENGINE": os.getenv("DB_ENGINE"),
+        "HOST": os.getenv("DB_HOST"),
+        "USER": os.getenv("DB_USERNAME"),
+        "PASSWORD": os.getenv("DB_PASSWORD"),
+        "NAME": os.getenv("DB_NAME"),
+        "PORT": os.getenv("DB_PORT"),
+        "OPTIONS": {
+            "connect_timeout": 30,  # Optional: set timeout
+        },
+        "CONN_MAX_AGE": 30,
     }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": os.getenv("DB_ENGINE", default="$DB_ENGINE"),
-            "HOST": os.getenv("DB_HOST", default="$DB_HOST"),
-            "USER": os.getenv("DB_USER", default="$DB_USERNAME"),
-            "PASSWORD": os.getenv("DB_PASSWORD", default="$DB_PASSWORD"),
-            "NAME": os.getenv("DB_NAME", default="$DB_NAME"),
-            "PORT": os.getenv("DB_PORT", default="$DB_PORT"),
-            "OPTIONS": {
-                "connect_timeout": 30,  # Optional: set timeout
-            },
-            "CONN_MAX_AGE": 30,
-        }
-    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators

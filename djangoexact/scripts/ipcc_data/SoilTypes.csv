@@ -1,0 +1,10 @@
+name,active,is_coastal
+Mineral,True,True
+Organic,True,True
+Aggregated,True,True
+High Activity Clay,True,False
+Low Activity Clay,True,False
+Sandy,True,False
+Spodic,True,False
+Volcanic,True,False
+Wetland,True,False

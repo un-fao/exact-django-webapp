@@ -2,9 +2,11 @@ name: Django Exact
 
 on:
   push:
-    branches: [ review-testing-pipeline, review ]
-  pull_request:
-    branches: [ review ]
+    branches:
+      - nothing
+  #   branches: [ review-testing-pipeline, review ]
+  # pull_request:
+  #   branches: [ review ]
 
 jobs:
   setup:
