@@ -66,8 +66,8 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: $WORKLOAD_ID_PROVIDER }}
-          service_account: $SERVICE_ACCOUNT }}
+          workload_identity_provider: ${{ vars.WORKLOAD_ID_PROVIDER }}
+          service_account: ${{ vars.SERVICE_ACCOUNT }}
 
       - name: Check Auth
         run: gcloud auth list
@@ -87,7 +87,7 @@ jobs:
         run: |
           curl -o cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.14.2/cloud-sql-proxy.linux.amd64
           chmod +x cloud-sql-proxy
-          ./cloud-sql-proxy -g -p $DB_PORT }} $DB_INSTANCE_CONNECTION }} &
+          ./cloud-sql-proxy -g -p $DB_PORT $DB_INSTANCE_CONNECTION &
 
       - name: Test cloud-sql-proxy
         shell: bash
