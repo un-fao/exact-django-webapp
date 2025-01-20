@@ -2,11 +2,13 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - _develop
-      # - review
-  # pull_request:
-  #   branches:
-      # - main
+      # - _develop
+      - develop
+      - review
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
     # paths-ignore:
       # - .github/**
 
