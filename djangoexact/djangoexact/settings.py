@@ -24,13 +24,13 @@ import logging as log
 
 load_dotenv()
 
-app_mode = os.getenv("APP_MODE", "development")
-if app_mode == "development":
-    print(f"Running in {app_mode} mode")
+# app_mode = os.getenv("APP_MODE", "development")
+# if app_mode == "development":
+#     print(f"Running in {app_mode} mode")
 
-    dotenv_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), "djangoexact", f".env.{app_mode}")
+#     dotenv_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), "djangoexact", f".env.{app_mode}")
         
-    load_dotenv(dotenv_file)
+#     load_dotenv(dotenv_file)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
