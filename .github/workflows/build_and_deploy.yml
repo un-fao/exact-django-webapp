@@ -47,7 +47,7 @@ jobs:
       issues: write
     steps:
       - name: Expose GitHub Variables
-        run: echo "$VARS" | jq -r 'to_entries | .[] | "\(.key)=\'\(.value)\'"' >> $GITHUB_ENV
+        run: echo "$VARS" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
 
       - name: Expose Github secrets
         run: |
