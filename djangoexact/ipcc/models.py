@@ -1278,6 +1278,9 @@ class IrrigationPhaseData(Model):
     n2o_emissions = FloatField(blank=True, null=True)
     density = FloatField(blank=True, null=True)
 
+    def __str__(self):
+        return f"({self.pk}) {self.fuel_type} {self.emission_factor}"
+
 
 class IrrigationPressureRequirement(Model):
 
