@@ -105,7 +105,7 @@ router.register(r"status-types", views.generic_viewset(models.StatusType), basen
 
 router.register(r"land-use-changes", views.generic_module_viewset(models.LandUseChange), basename="landusechange")
 router.register(r"organic-soils", views.generic_module_viewset(models.OrganicSoil), basename="organicsoil")
-router.register(r"soil-types", views.generic_viewset(models.SoilType), basename="soiltype")
+router.register(r"soil-types", views.SoilTypeViewset, basename="soiltype")
 router.register(r"climates", views.generic_viewset(models.Climate), basename="climate")
 router.register(r"moistures", views.generic_viewset(models.Moisture), basename="moisture")
 
@@ -155,7 +155,7 @@ router.register(r"emission-factor-sources", views.generic_viewset(models.Emissio
 
 # Fuel
 router.register(r"macro-fuel-types", views.generic_viewset(models.MacroFuelType), basename="macrofueltypes")
-router.register(r"fuel-types", views.generic_viewset(models.FuelType), basename="fueltypes")
+router.register(r"fuel-types", views.FuelTypeViewset, basename="fueltypes")
 router.register(r"fuel-use-types", views.generic_viewset(models.FuelUseType), basename="fuelusetypes")
 
 # Organic Soil
