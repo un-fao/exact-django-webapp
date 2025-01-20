@@ -115,7 +115,7 @@ jobs:
       - run: SMTP_USER_PASSWORD='${{ secrets.SMTP_USER_PASSWORD }}' && sed -i "s|\$SMTP_USER_PASSWORD|$SMTP_USER_PASSWORD|g" djangoexact/djangoexact/settings.py
       - run: DB_PASSWORD='${{ secrets.DB_PASSWORD }}' && sed -i "s|\$DB_PASSWORD|$DB_PASSWORD|g" djangoexact/djangoexact/settings.py
       - run: SECRET_KEY='${{ secrets.SECRET_KEY }}' && sed -i "s|\$SECRET_KEY|$SECRET_KEY|g" djangoexact/djangoexact/settings.py
-      - run: $FIREBASE_SERVICE_ACCOUNT='${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' && sed -i "s|\$FIREBASE_SERVICE_ACCOUNT|$FIREBASE_SERVICE_ACCOUNT|g" djangoexact/djangoexact/settings.py
+      - run: FIREBASE_SERVICE_ACCOUNT='${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' && sed -i "s|\$FIREBASE_SERVICE_ACCOUNT|$FIREBASE_SERVICE_ACCOUNT|g" djangoexact/djangoexact/settings.py
 
       - run: cat djangoexact/djangoexact/settings.py
 
