@@ -3848,129 +3848,6 @@ for i, row in enumerate(df_dict2):
             value=parse_csv_number(row[df_headers2[j]]),
         )
 
-annualcropland = LandUseType.objects.get(name__iexact="Annual Cropland")
-crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropland").all()
-
-ForestTotalBiomass.objects.all().delete()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestTotalBiomass.csv"),
-    header=0,
-    sep=";",
-)
-
-headers = df.columns.values.tolist()
-rows = df.to_dict("records")
-
-for i, row in enumerate(rows):
-    climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
-    moisture = Moisture.objects.get(name__iexact=sanitize(row["moisture"]))
-    region = Region.objects.get(name__iexact=sanitize(row["region"]))
-
-    for j, header in enumerate(headers, start=3):
-
-        if j == len(headers):
-            break
-
-        land_use_type = LandUseType.objects.get(name__iexact=headers[j])
-        value = parse_csv_number(row[headers[j]])
-        if pd.isna(value):
-            continue
-
-        if land_use_type == annualcropland:
-            for crop in crops:
-                print(f"{crop}, {climate}, {moisture}, {region}, {value}")
-
-                ForestTotalBiomass.objects.create(
-                    land_use_type=crop,
-                    climate=climate,
-                    moisture=moisture,
-                    continent=region,
-                    value=value,
-                )
-
-        print(
-            land_use_type,
-            climate,
-            moisture,
-            region,
-            value,
-        )
-
-        ForestTotalBiomass.objects.create(
-            land_use_type=land_use_type,
-            climate=climate,
-            moisture=moisture,
-            continent=region,
-            value=value,
-        )
-
-
-annualcropland = LandUseType.objects.get(name__iexact="Annual Cropland")
-crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropland").all()
-
-TotalBiomassAfterDefo.objects.all().delete()
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "TotalBiomassAfterDefo.csv"),
-    header=0,
-    sep=";",
-)
-
-headers = df.columns.values.tolist()
-rows = df.to_dict("records")
-
-for i, row in enumerate(rows):
-    climate = Climate.objects.get(name__iexact=row["climate"])
-    moisture = Moisture.objects.get(name__iexact=row["moisture"])
-    region = Region.objects.get(name__iexact=row["region"])
-
-    for j, header in enumerate(headers, start=3):
-
-        if j == len(headers):
-            break
-
-        print(headers[j])
-        land_use_type = LandUseType.objects.get(name__iexact=headers[j])
-        value = parse_csv_number(row[headers[j]])
-        if value is None:
-            print(f"Skipping {land_use_type} {climate} {moisture} {region} {value}")
-            continue
-
-        if land_use_type == annualcropland:
-            for crop in crops:
-                print(
-                    crop,
-                    climate,
-                    moisture,
-                    region,
-                    value,
-                )
-
-                TotalBiomassAfterDefo.objects.create(
-                    land_use_type=crop,
-                    climate=climate,
-                    moisture=moisture,
-                    continent=region,
-                    value=value,
-                )
-
-        print(
-            land_use_type,
-            climate,
-            moisture,
-            region,
-            value,
-        )
-
-        TotalBiomassAfterDefo.objects.create(
-            land_use_type=land_use_type,
-            climate=climate,
-            moisture=moisture,
-            continent=region,
-            value=value,
-        )
-
 print("Deleting all MethaneManureManagementFactor...")
 LivestockAWMS.objects.all().delete()
 print("Deleted all MethaneManureManagementFactor.")
@@ -4429,7 +4306,7 @@ def delete_and_import_value_chain_packaging_emission_factors():
         ValueChainPackagingEmissionFactor.objects.create(packaging_material_type=packaging_type, value=value)
 
 
-def delete_and_import_value_chain_refrigerant_types():
+def import_value_chain_refrigerant_types():
     df = pd.read_csv(
         os.path.join(os.path.dirname(__file__), "ipcc_data", "ValueChainRefrigerantTypes.csv"),
         header=0,
@@ -4500,7 +4377,8 @@ def delete_and_import_eletricity_emissions():
         sep=";",
     )
 
-    for row in df.iterrows():
+    for i, row in df.iterrows():
+        print(row)
         country = row["country"]
         operating_margin = parse_csv_number(row["operating_margin"])
         combined_margin = parse_csv_number(row["combined_margin"])
@@ -4582,26 +4460,172 @@ def assign_fuel_type_units():
 
     for i, row in df.iterrows():
         fuel_type = FuelType.objects.filter(name__iexact=row["fuel_type"]).all()
-        unit = Unit.objects.get(name__iexact=row["unit"])
+        unit = Unit.objects.get_or_create(name__iexact=row["unit"])[0]
 
         for ft in fuel_type:
             ft.unit = unit
             ft.save()
 
+def delete_and_import_total_biomass_after_defo():
+
+    annualcropland = LandUseType.objects.get(name__iexact="Annual Cropland")
+    crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropland").all()
+
+    TotalBiomassAfterDefo.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "TotalBiomassAfterDefo.csv"),
+        header=0,
+        sep=";",
+    )
+
+    headers = df.columns.values.tolist()
+    rows = df.to_dict("records")
+
+    for i, row in enumerate(rows):
+        climate = Climate.objects.get(name__iexact=row["climate"])
+        moisture = Moisture.objects.get(name__iexact=row["moisture"])
+        region = Region.objects.get(name__iexact=row["region"])
+
+        for j, header in enumerate(headers, start=3):
+
+            if j == len(headers):
+                break
+
+            print(headers[j])
+            land_use_type = LandUseType.objects.get(name__iexact=headers[j])
+            value = parse_csv_number(row[headers[j]])
+            if value is None:
+                print(f"Skipping {land_use_type} {climate} {moisture} {region} {value}")
+                continue
+
+            if land_use_type == annualcropland:
+                for crop in crops:
+                    print(
+                        crop,
+                        climate,
+                        moisture,
+                        region,
+                        value,
+                    )
+
+                    TotalBiomassAfterDefo.objects.create(
+                        land_use_type=crop,
+                        climate=climate,
+                        moisture=moisture,
+                        continent=region,
+                        value=value,
+                    )
+
+            print(
+                land_use_type,
+                climate,
+                moisture,
+                region,
+                value,
+            )
+
+            TotalBiomassAfterDefo.objects.create(
+                land_use_type=land_use_type,
+                climate=climate,
+                moisture=moisture,
+                continent=region,
+                value=value,
+            )
+
+def delete_and_import_forest_total_biomass():
+
+    annualcropland = LandUseType.objects.get(name__iexact="Annual Cropland")
+    crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropland").all()
+
+    ForestTotalBiomass.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "ForestTotalBiomass.csv"),
+        header=0,
+        sep=";",
+    )
+
+    headers = df.columns.values.tolist()
+    rows = df.to_dict("records")
+
+    for i, row in enumerate(rows):
+        climate = Climate.objects.get(name__iexact=sanitize(row["climate"]))
+        moisture = Moisture.objects.get(name__iexact=sanitize(row["moisture"]))
+        region = Region.objects.get(name__iexact=sanitize(row["region"]))
+
+        for j, header in enumerate(headers, start=3):
+
+            if j == len(headers):
+                break
+
+            land_use_type = LandUseType.objects.get(name__iexact=headers[j])
+            value = parse_csv_number(row[headers[j]])
+            if pd.isna(value):
+                continue
+
+            if land_use_type == annualcropland:
+                for crop in crops:
+                    print(f"{crop}, {climate}, {moisture}, {region}, {value}")
+
+                    ForestTotalBiomass.objects.create(
+                        land_use_type=crop,
+                        climate=climate,
+                        moisture=moisture,
+                        continent=region,
+                        value=value,
+                    )
+
+            print(
+                land_use_type,
+                climate,
+                moisture,
+                region,
+                value,
+            )
+
+            ForestTotalBiomass.objects.create(
+                land_use_type=land_use_type,
+                climate=climate,
+                moisture=moisture,
+                continent=region,
+                value=value,
+            )
+
+def get_or_create_soil_types_and_update_info():
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "SoilTypes.csv"),
+        header=0,
+        sep=",",
+    )
+
+    for i, row in df.iterrows():
+        name = row["name"]
+        active = row["active"]
+        is_coastal = row["is_coastal"]
+
+        print(name, active, is_coastal)
+
+        if SoilType.objects.filter(name__iexact=name).exists():
+            print(f"SoilType {name} already exists.")
+            soil_type = SoilType.objects.get(name__iexact=name)
+        else:
+            soil_type = SoilType.objects.create(name=name)
+
+        soil_type.active = active
+        soil_type.is_coastal = is_coastal
+        soil_type.save()
+
 
 # TODO: Run in production
 
-# delete_and_import_value_chain_packaging_material_types()
-# delete_and_import_value_chain_packaging_emission_factors()
-# delete_and_import_value_chain_refrigerant_types()
-# delete_and_import_value_chain_refrigerant_emission_factors()
-# delete_and_import_eletricity_emissions()
-# delete_and_import_crop_yield_stats()
-# import_fuel_type_fuel_use_type_mapping()
-# delete_and_import_input_emission_factors()
-# assign_fuel_type_units()
-
 # TODO: Run in review
 
-# TODO: Run in develop
+get_or_create_soil_types_and_update_info()
+delete_and_import_forest_total_biomass()
+delete_and_import_total_biomass_after_defo()
+
+# TODO: Run in development
+
 
