@@ -297,6 +297,7 @@ class Moisture(models.Model):
 class SoilType(models.Model):
     name = models.CharField(max_length=100)
     active = models.BooleanField(default=True)
+    is_coastal = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -510,7 +511,7 @@ class FuelType(models.Model):
         unique_together = ("name", "fuel_use_type", "macro_fuel_type")
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.fuel_use_type})"
 
 
 class SalinityType(models.Model):
@@ -2053,7 +2054,6 @@ class CoastalWetland(Module):
     ch4_rewetting_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("ch4_rewetting_t2_wo"))
 
     avg_salinity_t2 = models.ForeignKey(SalinityType, null=True, blank=True, on_delete=models.SET_NULL, verbose_name=_("avg_salinity_t2"))
-
 
 ##### Fisheries and Aquaculture #####
 

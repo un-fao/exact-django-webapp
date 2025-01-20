@@ -65,6 +65,8 @@ from .models import (
     ProjectTag,
     ProjectFileAttachment,
     APIHealth,
+    FuelType,
+    SoilType,
 )
 from .serializers import (
     ActionTypes,
@@ -107,6 +109,7 @@ from .serializers import (
     ProjectFileUploadSerializer,
     ProjectFileReadSerializer,
     APIStatusSerializer,
+    FuelTypeSerializer,
 )
 
 from djangoexact.settings import auth
@@ -2087,3 +2090,64 @@ class APIHealthView(views.APIView):
 
         cache.set(self.CACHE_KEY, serializer.data, self.CACHE_TIMEOUT_SECONDS)
         return Response(serializer.data, status=status)
+
+    
+class FuelTypeViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
+    queryset = FuelType.objects.all()
+    serializer_class = FuelTypeSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = api_filters.FuelTypeFilter
+
+    @swagger_auto_schema(
+        parameters=[
+            # openapi.Parameter(
+            #     name="fuel_use_type",
+            #     type={"type": "string", "example": "diesel,Gas,electric"},
+            #     description="Comma-separated list of fuel use types (case-insensitive).",
+            #     required=False,
+            # ),
+            openapi.Parameter(
+                name="fuel_use_type",
+                in_=openapi.IN_QUERY,
+                type=openapi.TYPE_STRING,
+                description="Comma-separated list of fuel use types (case-insensitive).",
+            )
+        ],
+        responses={200: FuelTypeSerializer(many=True)},
+        description="Retrieve a list of entries filtered by fuel use type."
+    )
+    def list(self, request):
+        super().list(request)
+
+class SoilTypeViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
+    queryset = SoilType.objects.all()
+    serializer_class = get_model_serializer(SoilType)
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = api_filters.SoilTypeFilter
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                name="all",
+                in_=openapi.IN_QUERY,
+                type=openapi.TYPE_BOOLEAN,
+                description="Retrieve all entries.",
+            ),
+        ],
+        responses={200: get_model_serializer(SoilType)(many=True)},
+        description="Retrieve a list of entries filtered by coastal status."
+    )
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        if 'all' in self.request.query_params:
+            all = self.request.query_params.get('all', None)
+            if all == 'true':
+                return queryset
+
+        if 'active' not in self.request.query_params:
+            queryset = queryset.filter(active=True)
+        if 'is_coastal' not in self.request.query_params:
+            queryset = queryset.filter(is_coastal=False)
+
+        return queryset
