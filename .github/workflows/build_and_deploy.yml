@@ -2,11 +2,13 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - _develop
-      # - review
-  # pull_request:
-  #   branches:
-      # - main
+      # - _develop
+      - develop
+      - review
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
     # paths-ignore:
       # - .github/**
 
@@ -25,6 +27,9 @@ jobs:
           case "${{ github.ref_name }}" in
             develop|review)
               echo "env=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+              ;;
+            _develop)
+              echo "env=develop" >> "$GITHUB_OUTPUT"
               ;;
             *)
               ;;
@@ -138,14 +143,11 @@ jobs:
       - run: cd djangoexact/ && python manage.py update_translation_fields
       - run: cd djangoexact/ && python manage.py sync_translation_fields
 
-      - name: Replace DB vars for GAE
+      - name: Replace and Remove DB vars for GAE
         run: |
-          sed -i 's|"127.0.0.1"|"/cloudsql/${{ vars.DB_INSTANCE_CONNECTION }}"|g' djangoexact/djangoexact/settings.py
-          sed -i '/"PORT":d' djangoexact/djangoexact/settings.py
-          
           sed -i "s|\"127.0.0.1\"|\"/cloudsql/${{ vars.DB_INSTANCE_CONNECTION }}\"|g" djangoexact/djangoexact/settings.py
-          sed -i "/\"PORT\":d" djangoexact/djangoexact/settings.py
-
+          sed -i "/\"PORT\":/d" djangoexact/djangoexact/settings.py
+        
       - name: Deploy
         run: |
           gcloud app deploy djangoexact/app.yaml --project ${{ vars.PROJECT_ID }} --verbosity=debug
