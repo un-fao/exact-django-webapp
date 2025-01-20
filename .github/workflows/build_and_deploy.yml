@@ -95,58 +95,32 @@ jobs:
           sudo apt-get install -y postgresql-client
           psql --host=127.0.0.1 --port=${{ vars.DB_PORT }} --username=${{ vars.DB_USERNAME }} --dbname=${{ vars.DB_NAME }} -c "\dt"
   
-      - name: Replace vars and secrets value
-        uses: htsnvhoang/find-replace-multiple@master
+      - uses: flcdrg/replace-multiple-action@v1
         with:
-          finds: |
-            $SERVICE_NAME,
-            $PROJECT_ID,
-            $DB_ENGINE,
-            $DB_HOST,
-            $DB_USERNAME,
-            $DB_PASSWORD,
-            $DB_NAME,
-            $DB_PORT,
-            $SECRET_KEY,
-            $ALLOWED_HOST,
-            $EMAIL_HOST,
-            $EMAIL_PORT,
-            $SMTP_USER_EMAIL,
-            $SMTP_USER_PASSWORD,
-            $FIREBASE_API_KEY,
-            $FIREBASE_AUTH_DOMAIN,
-            $FIREBASE_PROJECT_ID,
-            $FIREBASE_STORAGE_BUCKET,
-            $FIREBASE_MESSAGING_SENDER_ID,
-            $FIREBASE_APP_ID,
-            $FIREBASE_MEASUREMENT_ID,
-            $FIREBASE_SERVICE_ACCOUNT
-          replaces: |
-            ${{ vars.SERVICE_NAME }},
-            ${{ vars.PROJECT_ID }},
-            ${{ vars.DB_ENGINE }},
-            ${{ vars.DB_HOST }},
-            ${{ vars.DB_USERNAME }},
-            ${{ secrets.DB_PASSWORD }},
-            ${{ vars.DB_NAME }},
-            ${{ vars.DB_PORT }},
-            ${{ secrets.SECRET_KEY }},
-            ${{ vars.ALLOWED_HOST }},
-            ${{ vars.EMAIL_HOST }},
-            ${{ vars.EMAIL_PORT }},
-            ${{ vars.SMTP_USER_EMAIL }},
-            ${{ secrets.SMTP_USER_PASSWORD }},
-            ${{ vars.FIREBASE_API_KEY }},
-            ${{ vars.FIREBASE_AUTH_DOMAIN }},
-            ${{ vars.FIREBASE_PROJECT_ID }},
-            ${{ vars.FIREBASE_STORAGE_BUCKET }},
-            ${{ vars.FIREBASE_MESSAGING_SENDER_ID }},
-            ${{ vars.FIREBASE_APP_ID }},
-            ${{ vars.FIREBASE_MEASUREMENT_ID }},
-            ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          include: |
-            djangoexact/app.yaml
-            djangoexact/djangoexact/settings.py
+          files: 'djangoexact/app.yaml, djangoexact/djangoexact/settings.py'
+          find: '[
+            { "find": "$SERVICE_NAME", "replace": "${{ vars.SERVICE_NAME }}" },
+            { "find": "$PROJECT_ID", "replace": "${{ vars.PROJECT_ID }}" },
+            { "find": "$DB_ENGINE", "replace": "${{ vars.DB_ENGINE }}" },
+            { "find": "$DB_HOST", "replace": "${{ vars.DB_HOST }}" },
+            { "find": "$DB_USERNAME", "replace": "${{ vars.DB_USERNAME }}" },
+            { "find": "$DB_PASSWORD", "replace": "${{ secrets.DB_PASSWORD }}" },
+            { "find": "$DB_NAME", "replace": "${{ vars.DB_NAME }}" },
+            { "find": "$DB_PORT", "replace": "${{ vars.DB_PORT }}" },
+            { "find": "$SECRET_KEY", "replace": "${{ secrets.SECRET_KEY }}" },
+            { "find": "$ALLOWED_HOST", "replace": "${{ vars.ALLOWED_HOST }}" },
+            { "find": "$EMAIL_HOST", "replace": "${{ vars.EMAIL_HOST }}" },
+            { "find": "$EMAIL_PORT", "replace": "${{ vars.EMAIL_PORT }}" },
+            { "find": "$SMTP_USER_EMAIL", "replace": "${{ vars.SMTP_USER_EMAIL }}" },
+            { "find": "$SMTP_USER_PASSWORD", "replace": "${{ secrets.SMTP_USER_PASSWORD }}" },
+            { "find": "$FIREBASE_API_KEY", "replace": "${{ vars.FIREBASE_API_KEY }}" },
+            { "find": "$FIREBASE_AUTH_DOMAIN", "replace": "${{ vars.FIREBASE_AUTH_DOMAIN }}" },
+            { "find": "$FIREBASE_PROJECT_ID", "replace": "${{ vars.FIREBASE_PROJECT_ID }}" },
+            { "find": "$FIREBASE_STORAGE_BUCKET", "replace": "${{ vars.FIREBASE_STORAGE_BUCKET }}" },
+            { "find": "$FIREBASE_MESSAGING_SENDER_ID", "replace": "${{ vars.FIREBASE_MESSAGING_SENDER_ID }}" },
+            { "find": "$FIREBASE_APP_ID", "replace": "${{ vars.FIREBASE_APP_ID }}" },
+            { "find": "$FIREBASE_MEASUREMENT_ID", "replace": "${{ vars.FIREBASE_MEASUREMENT_ID }}" },
+            { "find": "$FIREBASE_SERVICE_ACCOUNT", "replace": "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" }]'
 
       - run: pip install -r djangoexact/requirements.txt
       - run: cd djangoexact/ && python manage.py migrate
