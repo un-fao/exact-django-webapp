@@ -85,13 +85,13 @@ jobs:
           sudo apt-get install -y postgresql-client
           psql --host=127.0.0.1 --port=${{ vars.DB_PORT }} --username=${{ vars.DB_USERNAME }} --dbname=${{ vars.DB_NAME }} -c "\dt"
       
-      - run: echo "$VARS" | jq -r 'to_entries | .[] | "\(.key)=\(.value | @sh)"' >> $GITHUB_ENV
-      - run: echo "$SECRETS" | jq -r 'to_entries | .[] | "\(.key)=\(.value | @sh)"' >> $GITHUB_ENV
-      # - run: echo DB_PASSWORD='${{ secrets.DB_PASSWORD }}' >> $GITHUB_ENV
-      # - run: echo FIREBASE_PRIVATE_KEY='${{ secrets.SMTP_USER_PASSWORD }}' >> $GITHUB_ENV
-      # - run: echo FIREBASE_SERVICE_ACCOUNT='${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' >> $GITHUB_ENV
-      # - run: echo SECRET_KEY='${{ secrets.SECRET_KEY }}' >> $GITHUB_ENV
-      # - run: echo SMTP_USER_PASSWORD='${{ secrets.SMTP_USER_PASSWORD }}' >> $GITHUB_ENV
+      - run: echo "$VARS" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
+      # - run: echo "$SECRETS" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
+      - run: echo DB_PASSWORD='${{ secrets.DB_PASSWORD }}' >> $GITHUB_ENV
+      - run: echo FIREBASE_PRIVATE_KEY='${{ secrets.SMTP_USER_PASSWORD }}' >> $GITHUB_ENV
+      - run: echo FIREBASE_SERVICE_ACCOUNT='${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' >> $GITHUB_ENV
+      - run: echo SECRET_KEY='${{ secrets.SECRET_KEY }}' >> $GITHUB_ENV
+      - run: echo SMTP_USER_PASSWORD='${{ secrets.SMTP_USER_PASSWORD }}' >> $GITHUB_ENV
 
       - uses: franzbischoff/replace_envs@v1
         with:
