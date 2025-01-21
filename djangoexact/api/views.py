@@ -2100,12 +2100,6 @@ class FuelTypeViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
 
     @swagger_auto_schema(
         parameters=[
-            # openapi.Parameter(
-            #     name="fuel_use_type",
-            #     type={"type": "string", "example": "diesel,Gas,electric"},
-            #     description="Comma-separated list of fuel use types (case-insensitive).",
-            #     required=False,
-            # ),
             openapi.Parameter(
                 name="fuel_use_type",
                 in_=openapi.IN_QUERY,
@@ -2116,8 +2110,8 @@ class FuelTypeViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
         responses={200: FuelTypeSerializer(many=True)},
         description="Retrieve a list of entries filtered by fuel use type."
     )
-    def list(self, request):
-        super().list(request)
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 class SoilTypeViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = SoilType.objects.all()
