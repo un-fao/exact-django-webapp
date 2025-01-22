@@ -729,13 +729,11 @@ class LandModuleReport(BaseModuleReport):
 
         hectares_length = self.module.activity.implementation_years + self.module.activity.capitalization_years
 
-        break_start_w = getattr(self.calculator.math_start_w, "hectares_total", np.zeros(hectares_length))
-        break_start_wo = getattr(self.calculator.math_start_wo, "hectares_total", np.zeros(hectares_length))
         break_w = getattr(self.calculator.math_w, "hectares_total", np.zeros(hectares_length))
         break_wo = getattr(self.calculator.math_wo, "hectares_total", np.zeros(hectares_length))
 
-        self.units_breakdown_w = [x + y for x, y in zip(break_start_w, break_w)]
-        self.units_breakdown_wo = [x + y for x, y in zip(break_start_wo, break_wo)]
+        self.units_breakdown_w = np.round(break_w, 2)
+        self.units_breakdown_wo = np.round(break_wo, 2)
 
     def get_result(self):
         """
