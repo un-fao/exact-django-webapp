@@ -703,12 +703,12 @@ class DeforestationCalculator(BaseCalculator):
 
         module: LandModule = self.data
         luc: LandUseChange = module.land_use_change
-        project: Project = module.activity.project
-        change_rate = module.activity.change_rate
-        climate = project.climate
-        moisture = project.moisture
-        region = project.country.region
-        soil_type = project.soil_type
+        project: Project = self.project
+        change_rate = self.change_rate
+        climate = self.climate
+        moisture = self.moisture
+        region = self.region
+        soil_type = self.soil_type
 
         forest: ForestManagement = module.activity.forestmanagement.first()
 
