@@ -41,7 +41,7 @@ class SoilTypeFilter(filters.FilterSet):
         model = SoilType
         fields = ['active', 'is_coastal']
 
-class AllFieldsSearchFilter(BaseFilterBackend):
+class DynamicSearchAndFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         search_terms = request.query_params.getlist('s')  # Get multiple values for 'search'
         if search_terms:
