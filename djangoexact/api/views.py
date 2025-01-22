@@ -232,7 +232,7 @@ class PublicViewSet(BaseWiewSet):
     permission_classes = [permissions.AllowAny]
 
 class DynamicFilterViewSet(viewsets.ReadOnlyModelViewSet):
-    filter_backends = [api_filters.AllFieldsSearchFilter]
+    filter_backends = [api_filters.DynamicSearchAndFilterBackend]
 
     @swagger_auto_schema(
         parameters=[
