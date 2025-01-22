@@ -1,6 +1,7 @@
 import django_filters as filters
 from .models import FuelType, SoilType
-from django.db.models import Q
+from django.db.models import Q, CharField, TextField, FloatField, IntegerField, ForeignKey
+from rest_framework.filters import BaseFilterBackend
 
 
 def get_model_filter(model_arg):
@@ -39,3 +40,36 @@ class SoilTypeFilter(filters.FilterSet):
     class Meta:
         model = SoilType
         fields = ['active', 'is_coastal']
+
+class AllFieldsSearchFilter(BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        search_terms = request.query_params.getlist('s')  # Get multiple values for 'search'
+        if not search_terms:
+            return queryset
+
+        search_fields = getattr(view, 'search_fields', None)
+        if search_fields is None:
+            # Automatically discover applicable fields
+            model = queryset.model
+            search_fields = []
+            for field in model._meta.fields:
+                if isinstance(field, (CharField, TextField)):
+                    search_fields.append(field.name)
+                elif isinstance(field, (FloatField, IntegerField)):
+                    search_fields.append(field.name)
+                elif isinstance(field, ForeignKey):
+                    search_fields.append(f"{field.name}__name")
+
+        query = Q()
+        for search_term in search_terms:
+            term_query = Q()
+            for field in search_fields:
+                try:
+                    # Attempt numeric match for numeric fields
+                    query_value = float(search_term)
+                    term_query |= Q(**{f"{field}": query_value})
+                except ValueError:
+                    term_query |= Q(**{f"{field}__icontains": search_term})
+            query |= term_query  # Combine all conditions for the current term
+
+        return queryset.filter(query)
