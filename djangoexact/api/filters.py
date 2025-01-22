@@ -44,32 +44,43 @@ class SoilTypeFilter(filters.FilterSet):
 class AllFieldsSearchFilter(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         search_terms = request.query_params.getlist('s')  # Get multiple values for 'search'
-        if not search_terms:
-            return queryset
+        if search_terms:
 
-        search_fields = getattr(view, 'search_fields', None)
-        if search_fields is None:
-            # Automatically discover applicable fields
-            model = queryset.model
-            search_fields = []
-            for field in model._meta.fields:
-                if isinstance(field, (CharField, TextField)):
-                    search_fields.append(field.name)
-                elif isinstance(field, (FloatField, IntegerField)):
-                    search_fields.append(field.name)
-                elif isinstance(field, ForeignKey):
-                    search_fields.append(f"{field.name}__name")
+            search_fields = getattr(view, 'search_fields', None)
+            if search_fields is None:
+                # Automatically discover applicable fields
+                model = queryset.model
+                search_fields = []
+                for field in model._meta.fields:
+                    if isinstance(field, (CharField, TextField)):
+                        search_fields.append(field.name)
+                    elif isinstance(field, (FloatField, IntegerField)):
+                        search_fields.append(field.name)
+                    elif isinstance(field, ForeignKey):
+                        search_fields.append(f"{field.name}__name")
 
-        query = Q()
-        for search_term in search_terms:
-            term_query = Q()
-            for field in search_fields:
-                try:
-                    # Attempt numeric match for numeric fields
-                    query_value = float(search_term)
-                    term_query |= Q(**{f"{field}": query_value})
-                except ValueError:
-                    term_query |= Q(**{f"{field}__icontains": search_term})
-            query |= term_query  # Combine all conditions for the current term
+            query = Q()
+            for search_term in search_terms:
+                term_query = Q()
+                for field in search_fields:
+                    try:
+                        # Attempt numeric match for numeric fields
+                        query_value = float(search_term)
+                        term_query |= Q(**{f"{field}": query_value})
+                    except ValueError:
+                        term_query |= Q(**{f"{field}__icontains": search_term})
+                query |= term_query  # Combine all conditions for the current term
 
-        return queryset.filter(query)
+            queryset = queryset.filter(query)
+
+        query_params = request.query_params
+        model_fields = {field.name for field in queryset.model._meta.fields}
+
+        # Handle dynamic filtering for other query parameters
+        filters = {}
+        for param, value in query_params.items():
+            if param == 'search':  # Skip 'search' as it's handled separately
+                continue
+            if param in model_fields:
+                filters[param] = value
+        return queryset.filter(**filters)
