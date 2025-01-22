@@ -1970,8 +1970,8 @@ class LivestockReport(BaseModuleReport):
             self.metadata_worksheet.cell(row=last_metadata_row + 2, column=2, value=self.module.heads_number_start)
             self.metadata_worksheet.cell(row=last_metadata_row + 3, column=2, value=self.module.livestock_production_type_start.name)
             self.metadata_worksheet.cell(row=last_metadata_row + 4, column=2, value=self.module.production_start)
-            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=2, value="WIP")  # TODO: Ask Lorenzo what this value should be
-            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=2, value="WIP")  # TODO: Ask Lorenzo what this value should be
+            self.metadata_worksheet.cell(row=last_metadata_row + 5, column=2, value="WIP")  # TODO: Ask Lorenzo what this value should be # ComplementaryManureManagementType
+            self.metadata_worksheet.cell(row=last_metadata_row + 6, column=2, value="WIP")  # TODO: Ask Lorenzo what this value should be # LivestockAWMS Default
 
         if self.module.is_with():
             self.metadata_worksheet.cell(row=last_metadata_row + 1, column=3, value=self.module.livestock_category_type.name)
