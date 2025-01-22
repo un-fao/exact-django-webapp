@@ -5853,7 +5853,6 @@ class ForestManagementCalculator(LandModuleCalculator):
         self.has_t2_growth_w = False
         self.has_t2_growth_wo = False
 
-        self.mangroves_data = ipcc.DataOnMangrove()
         self.litter_dw = ipcc.LitterDeadwoodCarbonStock()
         self.agb_growth = ipcc.ForestManagementAGBGrowth()
         self.bgb_before_20_yrs = ipcc.ForestManagementBGB()
@@ -5919,13 +5918,6 @@ class ForestManagementCalculator(LandModuleCalculator):
         self.combustion_factor_start: ipcc.ForestCombustionFactor = utils.get_or_raise(ipcc.ForestCombustionFactor, {"land_use_type": self.module.land_use_type_start, "climate": self.climate, "forest_type": self.forest.forest_type}, f"Combustion Factor Start not found for {self.module.land_use_type_start.name}, {self.climate.name}, {self.forest.forest_type.name}")
         self.combustion_factor_w: ipcc.ForestCombustionFactor = utils.get_or_raise(ipcc.ForestCombustionFactor, {"land_use_type": self.module.land_use_type_w, "climate": self.climate, "forest_type": self.forest.forest_type}, f"Combustion Factor W not found for {self.module.land_use_type_w.name}, {self.climate.name}, {self.forest.forest_type.name}")
         self.combustion_factor_wo: ipcc.ForestCombustionFactor = utils.get_or_raise(ipcc.ForestCombustionFactor, {"land_use_type": self.module.land_use_type_wo, "climate": self.climate, "forest_type": self.forest.forest_type}, f"Combustion Factor WO not found for {self.module.land_use_type_wo.name}, {self.climate.name}, {self.forest.forest_type.name}")
-
-        # TODO: Not used. Turn into has_mangrove flag
-        if self.forest.land_use_type_start.name_en == "Mangrove Forest":
-            try:
-                self.mangroves_data = ipcc.DataOnMangrove.objects.get(climate=self.climate, moisture=self.climate)
-            except ipcc.DataOnMangrove.DoesNotExist:
-                pass
 
         try:
             self.litter_dw = ipcc.LitterDeadwoodCarbonStock.objects.get(climate=self.climate, forest_type=self.forest.forest_type, land_use_type=land_use_type)
@@ -6131,7 +6123,7 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "forest_gef_ch4": self.combustion_factor_start.ch4,
                 "forest_gef_n2o": self.combustion_factor_start.n2o,
                 "forest_gef_co2": self.combustion_factor_start.co2,
-                "mangrove_factor": utils.MANGROVE_FACTOR if self.mangroves_data is not None else utils.NON_MANGROVE_FACTOR,
+                "mangrove_factor": utils.NON_MANGROVE_FACTOR,
                 "degradation_percentage": self.forest.average_yearly_degradation_percentage_start,
                 "ef_nitrous_som": self.som.value,
                 "nitrous_constant": self.project.gwp.n2o,
@@ -6210,7 +6202,7 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "forest_gef_ch4": self.combustion_factor_w.ch4,
                 "forest_gef_n2o": self.combustion_factor_w.n2o,
                 "forest_gef_co2": self.combustion_factor_w.co2,
-                "mangrove_factor": utils.MANGROVE_FACTOR if self.mangroves_data is not None else utils.NON_MANGROVE_FACTOR,  # set to 0.47 if not mangrove else 0.451 # TODO: (@Peter) Can be removed as it's not used anymore (also check Deforestation)
+                "mangrove_factor": utils.NON_MANGROVE_FACTOR,  # set to 0.47 if not mangrove else 0.451 # TODO: (@Peter) Can be removed as it's not used anymore (also check Deforestation)
                 "degradation_percentage": self.forest.average_yearly_degradation_percentage_w,
                 "ef_nitrous_som": self.som.value,
                 "nitrous_constant": self.project.gwp.n2o,
@@ -6286,7 +6278,7 @@ class ForestManagementCalculator(LandModuleCalculator):
                 "forest_gef_ch4": self.combustion_factor_wo.ch4,
                 "forest_gef_n2o": self.combustion_factor_wo.n2o,
                 "forest_gef_co2": self.combustion_factor_wo.co2,
-                "mangrove_factor": utils.MANGROVE_FACTOR if self.mangroves_data is not None else utils.NON_MANGROVE_FACTOR,  # set to 0.47 if not mangrove else 0.451 # TODO: (@Peter) Can be removed as it's not used anymore (also check Deforestation)
+                "mangrove_factor": utils.NON_MANGROVE_FACTOR,  # set to 0.47 if not mangrove else 0.451 # TODO: (@Peter) Can be removed as it's not used anymore (also check Deforestation)
                 "degradation_percentage": self.forest.average_yearly_degradation_percentage_wo,
                 "ef_nitrous_som": self.som.value,
                 "nitrous_constant": self.project.gwp.n2o,
