@@ -1825,7 +1825,7 @@ def generic_viewset(model: Model):
         queryset = model.objects.all()
         serializer_class = get_model_serializer(model)
         filterset_class = api_filters.get_model_filter(model)
-        filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
+        filter_backends = [filters.OrderingFilter, DjangoFilterBackend, api_filters.DynamicSearchAndFilterBackend]
 
         def get_queryset(self):
             for field in model._meta.get_fields():
