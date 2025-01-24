@@ -26,9 +26,23 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
             "quantity_consumed_per_year_start": FuzzyFloat(0, 1000).fuzz(),
             "quantity_consumed_per_year_w": FuzzyFloat(0, 1000).fuzz(),
             "quantity_consumed_per_year_wo": FuzzyFloat(0, 1000).fuzz(),
+            
             "electricity_ef_t2_start": FuzzyFloat(0, 10).fuzz(),
             "electricity_ef_t2_w": FuzzyFloat(0, 10).fuzz(),
             "electricity_ef_t2_wo": FuzzyFloat(0, 10).fuzz(),
+
+            "energy_ef_co2_t2_start": FuzzyFloat(0, 10).fuzz(),
+            "energy_ef_ch4_t2_start": FuzzyFloat(0, 10).fuzz(),
+            "energy_ef_n2o_t2_start": FuzzyFloat(0, 10).fuzz(),
+
+            "energy_ef_co2_t2_w": FuzzyFloat(0, 10).fuzz(),
+            "energy_ef_ch4_t2_w": FuzzyFloat(0, 10).fuzz(),
+            "energy_ef_n2o_t2_w": FuzzyFloat(0, 10).fuzz(),
+            
+            "energy_ef_co2_t2_wo": FuzzyFloat(0, 10).fuzz(),
+            "energy_ef_ch4_t2_wo": FuzzyFloat(0, 10).fuzz(),
+            "energy_ef_n2o_t2_wo": FuzzyFloat(0, 10).fuzz(),
+
         }
 
         self.edit_module(self.submodules[0], self.user, self.validated_data)

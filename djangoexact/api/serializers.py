@@ -1874,14 +1874,6 @@ class IrrigationWriteSerializer(ScenarioModuleSerializer):
         ref_name = "Irrigation"
         mandatory_fields = {}
 
-
-class IrrigationReadSerializer(BaseGenericModuleSerializer):
-    class Meta:
-        model = Irrigation
-        fields = "__all__"
-        ref_name = "Irrigation"
-        mandatory_fields = {}
-
     def validate(self, data):
         super().validate(data)
 
@@ -1890,15 +1882,23 @@ class IrrigationReadSerializer(BaseGenericModuleSerializer):
 
         for irrigation_system in irrigation_systems:
             if not irrigation_system.is_ready():
-                self.instance.status = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
+                data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
                 break
 
         for irrigation_phase in irrigation_phases:
             if not irrigation_phase.is_ready():
-                self.instance.status = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
+                data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
                 break
 
         return data
+
+
+class IrrigationReadSerializer(BaseGenericModuleSerializer):
+    class Meta:
+        model = Irrigation
+        fields = "__all__"
+        ref_name = "Irrigation"
+        mandatory_fields = {}
 
 
 # IrrigationSystem
