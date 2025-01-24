@@ -3097,6 +3097,26 @@ class ValueChainParentModuleSerializer(ScenarioModuleSerializer):
 
         return data
 
+class ValueChainSubmoduleWriteSerializer(ScenarioSubmoduleSerializer):
+    
+    def validate_parent(self, parent):
+        ParentWriteSerializer = globals().get(f"{parent.__class__.__name__}WriteSerializer", None)
+        if ParentWriteSerializer is None:
+            raise ValueError(f"Write serializer for {parent.__class__.__name__} does not exist")
+        
+        parent_serializer: serializers.ModelSerializer = ParentWriteSerializer(data={}, instance=parent, partial=True, context=self.context)
+        if parent_serializer.is_valid():
+            parent_serializer.save()
+
+    def save(self, **kwargs):
+        super().save(**kwargs)
+
+        if not hasattr(self.instance, "parent"):
+            log.error(f"Parent attribute is not defined for {self.instance}")
+            raise ValueError("Parent attribute is not defined")
+
+        self.validate_parent(self.instance.parent)
+        return self.instance
 
 class StorageSerializer(ValueChainParentModuleSerializer):
     class Meta:
@@ -3161,18 +3181,8 @@ class StorageEntrySerializer(ScenarioSubmoduleSerializer):
         }
 
 
-class StorageEntryWriteSerializer(StorageEntrySerializer):
-
-    def save(self, **kwargs):
-        super().save(**kwargs)
-
-        parent: Storage = utils.getany([self.instance, dict(kwargs)], "parent")
-        parent_serializer = StorageWriteSerializer(data={}, instance=parent, partial=True, context=self.context)
-        if parent_serializer.is_valid():
-            parent_serializer.save()
-
-        return self.instance
-
+class StorageEntryWriteSerializer(StorageEntrySerializer, ValueChainSubmoduleWriteSerializer):
+    pass
 
 class StorageEntryReadSerializer(BaseGenericModuleSerializer):
 
@@ -3246,17 +3256,8 @@ class ProcessingEntrySerializer(ScenarioSubmoduleSerializer):
         }
 
 
-class ProcessingEntryWriteSerializer(ProcessingEntrySerializer):
-
-    def save(self, **kwargs):
-        super().save(**kwargs)
-
-        parent: Processing = utils.getany([self.instance, dict(kwargs)], "parent")
-        parent_serializer = ProcessingWriteSerializer(data={}, instance=parent, partial=True, context=self.context)
-        if parent_serializer.is_valid():
-            parent_serializer.save()
-
-        return self.instance
+class ProcessingEntryWriteSerializer(ProcessingEntrySerializer, ValueChainSubmoduleWriteSerializer):
+    pass
 
 
 class ProcessingEntryReadSerializer(BaseGenericModuleSerializer):
@@ -3331,17 +3332,8 @@ class PackagingEntrySerializer(ScenarioSubmoduleSerializer):
         }
 
 
-class PackagingEntryWriteSerializer(PackagingEntrySerializer):
-
-    def save(self, **kwargs):
-        super().save(**kwargs)
-
-        parent: Packaging = utils.getany([self.instance, dict(kwargs)], "parent")
-        parent_serializer = PackagingWriteSerializer(data={}, instance=parent, partial=True, context=self.context)
-        if parent_serializer.is_valid():
-            parent_serializer.save()
-
-        return self.instance
+class PackagingEntryWriteSerializer(PackagingEntrySerializer, ValueChainSubmoduleWriteSerializer):
+    pass
 
 
 class PackagingEntryReadSerializer(BaseGenericModuleSerializer):
@@ -3401,17 +3393,8 @@ class TransportEntrySerializer(ScenarioSubmoduleSerializer):
         }
 
 
-class TransportEntryWriteSerializer(TransportEntrySerializer):
-
-    def save(self, **kwargs):
-        super().save(**kwargs)
-
-        parent: Transport = utils.getany([self.instance, dict(kwargs)], "parent")
-        parent_serializer = TransportWriteSerializer(data={}, instance=parent, partial=True, context=self.context)
-        if parent_serializer.is_valid():
-            parent_serializer.save()
-
-        return self.instance
+class TransportEntryWriteSerializer(TransportEntrySerializer, ValueChainSubmoduleWriteSerializer):
+    pass
 
 
 class TransportEntryReadSerializer(BaseGenericModuleSerializer):
