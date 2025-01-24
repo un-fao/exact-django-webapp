@@ -2385,8 +2385,15 @@ class RoadType(models.Model):
     def __str__(self):
         return self.name
 
+class SettlementSubmoduleTier2Mixin(models.Model):
+    ef_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_start"))
+    ef_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_w"))
+    ef_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_wo"))
 
-class Building(Submodule):
+    class Meta:
+        abstract = True
+
+class Building(Submodule, SettlementSubmoduleTier2Mixin):
     parent = models.ForeignKey("api.Settlement", on_delete=models.CASCADE, null=True, blank=True, related_name="buildings")
 
     building_type = models.ForeignKey(BuildingType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_building_type", verbose_name=_("building_type"))
@@ -2397,12 +2404,7 @@ class Building(Submodule):
     area_m2_wo = models.FloatField(null=True, blank=True, verbose_name=_("area_m2_wo"))
     area_m2_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_surface_thread", on_delete=models.SET_NULL)
 
-    ef_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_start"))
-    ef_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_w"))
-    ef_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_wo"))
-
-
-class Road(Submodule):
+class Road(Submodule, SettlementSubmoduleTier2Mixin):
     parent = models.ForeignKey("api.Settlement", on_delete=models.CASCADE, null=True, blank=True, related_name="roads")
 
     road_type = models.ForeignKey(RoadType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_road_type", verbose_name=_("road_type"))
@@ -2418,22 +2420,14 @@ class Road(Submodule):
     width_m_wo = models.FloatField(null=True, blank=True, verbose_name=_("width_m_wo"))
     width_m_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_width_m_thread", on_delete=models.SET_NULL)
 
-    ef_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_start"))
-    ef_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_w"))
-    ef_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_wo"))
 
-
-class OtherInfrastructure(Submodule):
+class OtherInfrastructure(Submodule, SettlementSubmoduleTier2Mixin):
     parent = models.ForeignKey("api.Settlement", on_delete=models.CASCADE, null=True, blank=True, related_name="other_infrastructures")
 
     area_m2_start = models.FloatField(null=True, blank=True, verbose_name=_("area_m2_start"))
     area_m2_w = models.FloatField(null=True, blank=True, verbose_name=_("area_m2_w"))
     area_m2_wo = models.FloatField(null=True, blank=True, verbose_name=_("area_m2_wo"))
     area_m2_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_area_m2_thread", on_delete=models.SET_NULL)
-
-    ef_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_start"))
-    ef_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_w"))
-    ef_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_wo"))
 
 
 class OrganicSoil(LandModuleFixed):
