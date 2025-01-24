@@ -449,13 +449,13 @@ class BaseActivityReport:
         log.debug(f"Last additional indicators row: {last_additional_indicators_row}")
         self.activity_title_row_index = last_results_row
 
-        self.results_worksheet.cell(row=last_results_row, column=1, value=str(self.activity_title)[:6])
+        self.results_worksheet.cell(row=last_results_row, column=1, value=str(self.activity_title))
         self.results_worksheet.cell(row=last_results_row, column=1).fill = Colors.LIGHT_ORANGE_FILL.value
 
-        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value=str(self.activity_title)[:6])
+        self.metadata_worksheet.cell(row=last_metadata_row, column=1, value=str(self.activity_title))
         self.metadata_worksheet.cell(row=last_metadata_row, column=1).fill = Colors.LIGHT_BLUE_FILL.value
 
-        self.additional_indicators_worksheet.cell(row=last_additional_indicators_row, column=1, value=str(self.activity_title)[:6])
+        self.additional_indicators_worksheet.cell(row=last_additional_indicators_row, column=1, value=str(self.activity_title))
         self.additional_indicators_worksheet.cell(row=last_additional_indicators_row, column=1).fill = Colors.LIGHT_ORANGE_FILL.value
 
         self.additional_indicators_worksheet.cell(row=last_additional_indicators_row + 1, column=1, value="Land Uses Targeted (ha)")
