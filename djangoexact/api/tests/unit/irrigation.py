@@ -126,4 +126,20 @@ class IrrigationTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         print(response.data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(type(response.data) == dict)
+        self.assertTrue(isinstance(response.data, dict))
+
+    def test_parent_not_ready_if_submodule_not_ready(self):
+
+        log.info("START - Testing parent not ready if submodule not ready")
+
+        validated_data = copy.deepcopy(self.validated_data)
+        validated_data["fuel_type_start"] = None
+        response = self.edit_module(self.submodules[1], self.user, validated_data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["status"]["name"], "EMPTY")
+
+        self.module.refresh_from_db()
+        self.assertEqual(self.module.status.name, "SUBMODULES_EMPTY")
+
+        log.info("END - Testing parent not ready if submodule not ready")
