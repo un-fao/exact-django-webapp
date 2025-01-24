@@ -1732,14 +1732,16 @@ class FloodedRiceWriteSerializer(LandModuleSeralizer):
         minor_seasons = data.get("minor_seasons", None)
 
         if minor_seasons:
+            # TODO: Move to database Parameter
             if minor_seasons.count() > 4:
-                raise serializers.ValidationError(f"Minor seasons cannot be more than 4")
+                raise serializers.ValidationError("Minor seasons cannot be more than 4")
 
             # for season in minor_seasons:
             #     cultivation_days += season.get("cultivation_days", 0)
 
+        # TODO: Move to database Parameter
         if cultivation_days > 365:
-            raise serializers.ValidationError(f"Cultivation days cannot be greater than 365 (one year)")
+            raise serializers.ValidationError("Cultivation days cannot be greater than 365 (one year)")
 
         return super().validate(data)
 
@@ -2756,38 +2758,24 @@ class SettlementSerializer(LandModuleSeralizer):
         }
 
     def validate(self, data):
+        super().validate(data)
 
         buildings = Building.objects.filter(parent=self.instance).all()
 
         if any(not building.is_ready() for building in buildings):
-            raise serializers.ValidationError("At least one building is not ready for calculations")
-
-        for building in buildings:
-            building_serializer = BuildingReadSerializer(data={}, partial=True, instance=building, context=self.context)
-            if not building_serializer.is_valid():
-                raise serializers.ValidationError(building_serializer.errors)
+            data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
 
         roads = Road.objects.filter(parent=self.instance).all()
 
         if any(not road.is_ready() for road in roads):
-            raise serializers.ValidationError("At least one road is not ready for calculations")
-
-        for road in roads:
-            road_serializer = RoadReadSerializer(data={}, partial=True, instance=road, context=self.context)
-            if not road_serializer.is_valid():
-                raise serializers.ValidationError(road_serializer.errors)
+            data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
 
         other_infrastructures = OtherInfrastructure.objects.filter(parent=self.instance).all()
 
         if any(not other_infrastructure.is_ready() for other_infrastructure in other_infrastructures):
-            raise serializers.ValidationError("At least one other infrastructure is not ready for calculations")
+            data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
 
-        for other_infrastructure in other_infrastructures:
-            other_infrastructure_serializer = OtherInfrastructureReadSerializer(data={}, partial=True, instance=other_infrastructure, context=self.context)
-            if not other_infrastructure_serializer.is_valid():
-                raise serializers.ValidationError(other_infrastructure_serializer.errors)
-
-        return super().validate(data)
+        return data
 
 
 class SettlementWriteSerializer(SettlementSerializer):
