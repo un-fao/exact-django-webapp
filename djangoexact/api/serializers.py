@@ -1125,6 +1125,25 @@ class BaseSubmoduleSerializer(BaseGenericModuleSerializer):
 
         log.debug(f"END SubmoduleBaseSerializer[{self.Meta.ref_name}].validate")
         return super().validate(data)
+    
+    def validate_parent(self, parent):
+        ParentWriteSerializer = globals().get(f"{parent.__class__.__name__}WriteSerializer", None)
+        if ParentWriteSerializer is None:
+            raise ValueError(f"Write serializer for {parent.__class__.__name__} does not exist")
+        
+        parent_serializer: serializers.ModelSerializer = ParentWriteSerializer(data={}, instance=parent, partial=True, context=self.context)
+        if parent_serializer.is_valid():
+            parent_serializer.save()
+
+    def save(self, **kwargs):
+        super().save(**kwargs)
+
+        if not hasattr(self.instance, "parent"):
+            log.error(f"Parent attribute is not defined for {self.instance}")
+            raise ValueError("Parent attribute is not defined")
+
+        self.validate_parent(self.instance.parent)
+        return self.instance
 
 
 class NoScenarioBaseSerializer(BaseGenericModuleSerializer):
@@ -2623,11 +2642,6 @@ class InputEntrySerializer(ScenarioSubmoduleSerializer):
 
         if parent.input_entries.count() + 1 > max_entries:
             raise serializers.ValidationError(f"Only {max_entries} input entries are allowed")
-        
-        # Validate parent
-        parent_serializer = InputSerializer(data={}, instance=parent, partial=True, context=self.context)
-        parent_serializer.is_valid()
-        parent_serializer.save()
 
         return data
 
@@ -3098,25 +3112,7 @@ class ValueChainParentModuleSerializer(ScenarioModuleSerializer):
         return data
 
 class ValueChainSubmoduleWriteSerializer(ScenarioSubmoduleSerializer):
-    
-    def validate_parent(self, parent):
-        ParentWriteSerializer = globals().get(f"{parent.__class__.__name__}WriteSerializer", None)
-        if ParentWriteSerializer is None:
-            raise ValueError(f"Write serializer for {parent.__class__.__name__} does not exist")
-        
-        parent_serializer: serializers.ModelSerializer = ParentWriteSerializer(data={}, instance=parent, partial=True, context=self.context)
-        if parent_serializer.is_valid():
-            parent_serializer.save()
-
-    def save(self, **kwargs):
-        super().save(**kwargs)
-
-        if not hasattr(self.instance, "parent"):
-            log.error(f"Parent attribute is not defined for {self.instance}")
-            raise ValueError("Parent attribute is not defined")
-
-        self.validate_parent(self.instance.parent)
-        return self.instance
+    pass
 
 class StorageSerializer(ValueChainParentModuleSerializer):
     class Meta:
