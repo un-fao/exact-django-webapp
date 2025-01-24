@@ -775,6 +775,7 @@ class CoastalWetlandDefaults(Defaults):
             ch4_rewetting_t2_w_default=0,
             ch4_rewetting_t2_wo_default=0,
             avg_salinity_t2_default=0,
+            soil_type_t2_default=None,
         )
 
     def get_defaults(self, calculate=False) -> dict:
@@ -806,6 +807,7 @@ class CoastalWetlandDefaults(Defaults):
             ch4_rewetting_t2_w_default=defaults.rewetting_ch4.value,
             ch4_rewetting_t2_wo_default=defaults.rewetting_ch4.value,
             avg_salinity_t2_default=defaults.salinity_type.value,
+            soil_type_t2_default=defaults.soil_type_name,
         )
 
 

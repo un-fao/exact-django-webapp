@@ -1,6 +1,5 @@
 import os
 import logging
-from datetime import timedelta
 from types import SimpleNamespace
 import uuid
 from django.core.mail import send_mail
@@ -25,13 +24,8 @@ from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import generics
-import django_filters
 from rest_framework import filters
-from rest_framework.exceptions import PermissionDenied
-
 from google.cloud import storage
-
 import api.filters as api_filters
 import api.labels as labels
 import api.utilities as utils
@@ -112,25 +106,14 @@ from .serializers import (
     FuelTypeSerializer,
 )
 
-from djangoexact.settings import auth
-from django.utils.translation import activate, get_language, deactivate
 from firebase_admin import auth as firebase_admin_auth
-from django.contrib.auth import logout
 from auditlog.context import disable_auditlog, LogEntry
-from django.utils import translation
 from django.db import connection
 import time
 import api.reports as reports
-from django.http import FileResponse
-from django.http import HttpResponse, StreamingHttpResponse
-import threading
+from django.http import HttpResponse
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from django.test import RequestFactory
-import asyncio
-from asgiref.sync import sync_to_async
-from django.utils.text import slugify
 from django.core.cache import cache
-
 
 logger = logging.getLogger("console")
 
@@ -248,6 +231,21 @@ class AuthenticatedViewSet(BaseWiewSet):
 class PublicViewSet(BaseWiewSet):
     permission_classes = [permissions.AllowAny]
 
+class DynamicFilterViewSet(viewsets.ReadOnlyModelViewSet):
+    filter_backends = [api_filters.DynamicSearchAndFilterBackend]
+
+    @swagger_auto_schema(
+        parameters=[
+            openapi.Parameter(
+                name="s",
+                in_=openapi.IN_QUERY,
+                type=openapi.TYPE_STRING,
+                description='Search query. Example: ?s="search query". Allows for multiple queryes. Example: ?s="search query 1&s=search query 2"',
+            ),
+        ],
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 class GroupViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = Group.objects.all()
@@ -1827,8 +1825,7 @@ def generic_viewset(model: Model):
         queryset = model.objects.all()
         serializer_class = get_model_serializer(model)
         filterset_class = api_filters.get_model_filter(model)
-        filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
-        search_fields = ["fuel_use_type__name"]
+        filter_backends = [filters.OrderingFilter, DjangoFilterBackend, api_filters.DynamicSearchAndFilterBackend]
 
         def get_queryset(self):
             for field in model._meta.get_fields():
@@ -2090,28 +2087,10 @@ class APIHealthView(views.APIView):
 
         cache.set(self.CACHE_KEY, serializer.data, self.CACHE_TIMEOUT_SECONDS)
         return Response(serializer.data, status=status)
-
     
-class FuelTypeViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
+class FuelTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet, DynamicFilterViewSet):
     queryset = FuelType.objects.all()
     serializer_class = FuelTypeSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_class = api_filters.FuelTypeFilter
-
-    @swagger_auto_schema(
-        parameters=[
-            openapi.Parameter(
-                name="fuel_use_type",
-                in_=openapi.IN_QUERY,
-                type=openapi.TYPE_STRING,
-                description="Comma-separated list of fuel use types (case-insensitive).",
-            )
-        ],
-        responses={200: FuelTypeSerializer(many=True)},
-        description="Retrieve a list of entries filtered by fuel use type."
-    )
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
 
 class SoilTypeViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = SoilType.objects.all()

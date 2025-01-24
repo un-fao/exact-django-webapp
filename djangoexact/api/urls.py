@@ -155,7 +155,7 @@ router.register(r"emission-factor-sources", views.generic_viewset(models.Emissio
 
 # Fuel
 router.register(r"macro-fuel-types", views.generic_viewset(models.MacroFuelType), basename="macrofueltypes")
-router.register(r"fuel-types", views.FuelTypeViewset, basename="fueltypes")
+router.register(r"fuel-types", views.FuelTypeViewSet, basename="fueltypes")
 router.register(r"fuel-use-types", views.generic_viewset(models.FuelUseType), basename="fuelusetypes")
 
 # Organic Soil
