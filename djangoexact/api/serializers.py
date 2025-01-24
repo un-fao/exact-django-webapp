@@ -1778,10 +1778,6 @@ class BuildingSerializer(ScenarioSubmoduleSerializer):
             },
         }
 
-    def validate(self, data):
-
-        return super().validate(data)
-
 
 class BuildingWriteSerializer(BuildingSerializer):
     pass
@@ -1822,9 +1818,6 @@ class RoadSerializer(ScenarioSubmoduleSerializer):
                 ],
             },
         }
-
-    def validate(self, data):
-        return super().validate(data)
 
 
 class RoadWriteSerializer(RoadSerializer):
@@ -1944,11 +1937,6 @@ class IrrigationSystemWriteSerializer(ScenarioSubmoduleSerializer):
 
         if self.instance and self.instance.parent.irrigation_systems.all().count() + 1 > max_entries:
             raise serializers.ValidationError(f"Only {max_entries} irrigation systems are allowed")
-        
-        parent = utils.getany([self.instance, dict(data)], "parent")
-        parent_serializer = IrrigationWriteSerializer(data={}, instance=parent, partial=True, context=self.context)
-        parent_serializer.is_valid()
-        parent_serializer.save()
 
         return data
 
@@ -2007,11 +1995,6 @@ class IrrigationPhaseWriteSerializer(ScenarioSubmoduleSerializer):
 
         if self.instance and self.instance.parent.irrigation_phases.all().count() + 1 > max_entries:
             raise serializers.ValidationError(f"Only {max_entries} irrigation phases are allowed")
-        
-        parent = utils.getany([self.instance, dict(data)], "parent")
-        parent_serializer = IrrigationWriteSerializer(data={}, instance=parent, partial=True, context=self.context)
-        parent_serializer.is_valid()
-        parent_serializer.save()
 
         return data
 
@@ -2048,10 +2031,10 @@ class EnergySerializer(ScenarioModuleSerializer):
         fuels: QuerySet[Fuel] = self.instance.fuels.all()
 
         if any([not electricity.is_ready() for electricity in electricities]):
-            raise serializers.ValidationError("Electricity modules are not ready for calculations")
+            data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
 
         if any([not fuel.is_ready() for fuel in fuels]):
-            raise serializers.ValidationError("Fuel modules are not ready for calculations")
+            data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
 
         return data
 
@@ -2107,10 +2090,6 @@ class FuelSerializer(ScenarioSubmoduleSerializer):
         if parent.fuels.count() + 1 > max_elements:
             raise serializers.ValidationError(f"Only {max_elements} fuel modules are allowed")
 
-        parent_serializer = EnergySerializer(data={}, instance=parent, partial=True, context=self.context)
-        if parent_serializer.is_valid():
-            parent_serializer.save()
-
         return data
 
 
@@ -2161,10 +2140,6 @@ class ElectricityWriteSerializer(NoScenarioSubmoduleSerializer):
 
         if not self.instance and parent.electricities.count() + 1 > max_elements:
             raise serializers.ValidationError(f"Only {max_elements} electricity modules are allowed")
-
-        parent_serializer = EnergySerializer(data={}, instance=parent, partial=True, context=self.context)
-        if parent_serializer.is_valid():
-            parent_serializer.save()
 
         return data
 
