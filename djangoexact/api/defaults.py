@@ -811,7 +811,7 @@ class CoastalWetlandDefaults(Defaults):
             avg_salinity_t2_default=defaults.salinity_type.value,
             soil_type_t2_default=defaults.soil_type_name,
             litter_t2_default=defaults.litter.value,
-            deadwood_t2_default=defaults.deadwood.value,
+            deadwood_t2_default=defaults.dw.value,
         )
 
 
