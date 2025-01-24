@@ -1126,7 +1126,7 @@ class BaseSubmoduleSerializer(BaseGenericModuleSerializer):
         log.debug(f"END SubmoduleBaseSerializer[{self.Meta.ref_name}].validate")
         return super().validate(data)
     
-    def validate_parent(self, parent):
+    def parent_validation(self, parent):
         ParentWriteSerializer = globals().get(f"{parent.__class__.__name__}WriteSerializer", None)
         if ParentWriteSerializer is None:
             raise ValueError(f"Write serializer for {parent.__class__.__name__} does not exist")
@@ -1142,7 +1142,10 @@ class BaseSubmoduleSerializer(BaseGenericModuleSerializer):
             log.error(f"Parent attribute is not defined for {self.instance}")
             raise ValueError("Parent attribute is not defined")
 
-        self.validate_parent(self.instance.parent)
+        parent = utils.getany([self.instance, dict(kwargs)], "parent")
+        log.info(f"Parent in serializer: {parent}")
+        self.parent_validation(parent)
+        
         return self.instance
 
 
