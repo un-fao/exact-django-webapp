@@ -1443,11 +1443,19 @@ class StorageEntryDefaults(Defaults):
         self.emission_factor_t2_wo_default = defaults.refrigerant_ef_wo.value
         self.electricity_ef_t2_default = defaults.electricity_ef_selected.value
 
+        country = None
+
+        if self.input.is_with():
+            country = defaults.electricity_calculator_w.country.name
+        else:
+            country = defaults.electricity_calculator_wo.country.name
+
         return SimpleNamespace(
             emission_factor_t2_start_default=self.emission_factor_t2_start_default,
             emission_factor_t2_w_default=self.emission_factor_t2_w_default,
             emission_factor_t2_wo_default=self.emission_factor_t2_wo_default,
             electricity_ef_t2_default=self.electricity_ef_t2_default,
+            country_t2_default=country,
         )
 
 
@@ -1525,8 +1533,11 @@ class ProcessingEntryDefaults(Defaults):
         defaults = calcs.ProcessingEntryCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
+        country = None
+
         if isinstance(defaults.energy_calculator_w, calcs.ElectricityCalculator):
             self.electricity_ef_t2_w_default = defaults.energy_calculator_w.electricity_ef_selected.value
+            country = defaults.energy_calculator_w.country.name
         elif isinstance(defaults.energy_calculator_w, calcs.FuelCalculator):
             self.energy_ef_co2_t2_w_default = defaults.energy_calculator_w.energy_ef_default.co2
             self.energy_ef_ch4_t2_w_default = defaults.energy_calculator_w.energy_ef_default.ch4
@@ -1534,6 +1545,7 @@ class ProcessingEntryDefaults(Defaults):
 
         if isinstance(defaults.energy_calculator_wo, calcs.ElectricityCalculator):
             self.electricity_ef_t2_wo_default = defaults.energy_calculator_wo.electricity_ef_selected.value
+            country = defaults.energy_calculator_wo.country.name
         elif isinstance(defaults.energy_calculator_wo, calcs.FuelCalculator):
             self.energy_ef_co2_t2_wo_default = defaults.energy_calculator_wo.energy_ef_default.co2
             self.energy_ef_ch4_t2_wo_default = defaults.energy_calculator_wo.energy_ef_default.ch4
@@ -1551,6 +1563,7 @@ class ProcessingEntryDefaults(Defaults):
             energy_ef_n2o_t2_wo_default=self.energy_ef_n2o_t2_wo_default,
             electricity_ef_t2_w_default=self.electricity_ef_t2_w_default,
             electricity_ef_t2_wo_default=self.electricity_ef_t2_wo_default,
+            country_t2_default=country,
         )
 
 
@@ -1579,6 +1592,13 @@ class PackagingEntryDefaults(Defaults):
         self.electricity_ef_t2_w_default = defaults.energy_calculator_w.electricity_ef_selected.value
         self.electricity_ef_t2_wo_default = defaults.energy_calculator_wo.electricity_ef_selected.value
 
+        country = None
+
+        if self.input.is_with():
+            country = defaults.energy_calculator_w.country.name
+        else:
+            country = defaults.energy_calculator_wo.country.name
+
         return SimpleNamespace(
             emission_factor_t2_start_default=self.emission_factor_t2_start_default,
             emission_factor_t2_w_default=self.emission_factor_t2_w_default,
@@ -1586,4 +1606,5 @@ class PackagingEntryDefaults(Defaults):
             electricity_ef_t2_start_default=self.electricity_ef_t2_start_default,
             electricity_ef_t2_w_default=self.electricity_ef_t2_w_default,
             electricity_ef_t2_wo_default=self.electricity_ef_t2_wo_default,
+            country_t2_default=country,
         )
