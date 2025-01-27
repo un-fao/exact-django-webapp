@@ -41,7 +41,6 @@ class Colors(Enum):
 
 
 class ReportFactory:
-
     @staticmethod
     def get_report_class(module: api_models.Module | api_models.LandModule):
         if isinstance(module, api_models.PerennialCropland):
@@ -92,10 +91,9 @@ class ExcelFileManager:
         # Start with an empty in-memory Excel file
         self.excel_file = BytesIO()
         self._create_initial_excel()
-        self.SAVE_TO_FILE = False # Set to True to save the Excel file to disk
+        self.SAVE_TO_FILE = False  # Set to True to save the Excel file to disk
 
     def _create_initial_excel(self):
-
         workbook = xlsxwriter.Workbook(self.excel_file, {"in_memory": True})
         workbook.add_worksheet("Results")
         metadata_worksheet = workbook.add_worksheet("Metadata")
@@ -213,7 +211,7 @@ class BaseProjectReport:
 
         self.results_worksheet.cell(row=11, column=2, value="Coming soon")
         self.results_worksheet.cell(row=11, column=2, value="Coming soon").fill = Colors.LIGHT_BEIGE_FILL.value
- 
+
         self.results_worksheet.cell(row=12, column=2, value="Coming soon")
         self.results_worksheet.cell(row=12, column=2, value="Coming soon").fill = Colors.LIGHT_BEIGE_FILL.value
 
@@ -224,6 +222,7 @@ class BaseProjectReport:
 
         self.metadata_worksheet.cell(row=1, column=1, value="Report download date")
         self.metadata_worksheet.cell(row=1, column=5, value="Tier 2")
+        self.metadata_worksheet.cell(row=1, column=6, value="Comments")
         self.metadata_worksheet.cell(row=2, column=1, value="Project name")
         self.metadata_worksheet.cell(row=3, column=1, value="Status")
         self.metadata_worksheet.cell(row=4, column=1, value="Country")
@@ -320,7 +319,11 @@ class BaseProjectReport:
                 other_ghgs.append(module.extract_emissions(module.emissions_set, gas_type=math_utils.GasTypes.OTHER))
                 n2o.append(module.extract_emissions(module.emissions_set, gas_type=math_utils.GasTypes.N2O))
                 ch4.append(module.extract_emissions(module.emissions_set, gas_type=math_utils.GasTypes.CH4))
-                other_co2.append(module.extract_emissions(module.emissions_set, activity_type=None, gas_type=math_utils.GasTypes.CO2, excluded_activity_types=[math_utils.ActivityTypes.BIOMASS, math_utils.ActivityTypes.SOIL_CO2_CHANGE]))
+                other_co2.append(
+                    module.extract_emissions(
+                        module.emissions_set, activity_type=None, gas_type=math_utils.GasTypes.CO2, excluded_activity_types=[math_utils.ActivityTypes.BIOMASS, math_utils.ActivityTypes.SOIL_CO2_CHANGE]
+                    )
+                )
                 soil_co2.append(module.extract_emissions(module.emissions_set, activity_type=math_utils.ActivityTypes.SOIL_CO2_CHANGE, gas_type=math_utils.GasTypes.CO2))
                 biomass_co2.append(module.extract_emissions(module.emissions_set, activity_type=math_utils.ActivityTypes.BIOMASS, gas_type=math_utils.GasTypes.CO2))
 
@@ -391,7 +394,6 @@ class BaseProjectReport:
 
 @dataclass
 class BaseActivityReport:
-
     project_report: BaseProjectReport
     activity: api_models.Activity
     modules_reports: list["BaseModuleReport"] = None
@@ -590,7 +592,6 @@ class BaseModuleReport:
     total_emissions: list[float] = None
 
     def __post_init__(self):
-
         try:
             self.result = self.calculator.calculate()
         except Exception as e:
@@ -691,7 +692,6 @@ class BaseModuleReport:
 
 @dataclass
 class LandModuleReport(BaseModuleReport):
-
     biomass_co2: list[float] = None
     soil_co2: list[float] = None
     soil_n2o: list[float] = None
@@ -910,7 +910,6 @@ class LandUseChangeReport(LandModuleReport):
 
 @dataclass
 class PerennialCroplandReport(LandModuleReport):
-
     module: api_models.PerennialCropland
 
     def __post_init__(self):
@@ -1110,7 +1109,6 @@ class PerennialCroplandReport(LandModuleReport):
 
 @dataclass
 class AnnualCroplandReport(LandModuleReport):
-
     module: api_models.AnnualCropland
     activity_report: BaseActivityReport = None
 
@@ -1172,7 +1170,9 @@ class AnnualCroplandReport(LandModuleReport):
             self.metadata_worksheet.cell(row=last_metadata_row + 5, column=2, value=self.module.residue_management_type_start.name)
             self.metadata_worksheet.cell(row=last_metadata_row + 6, column=2, value=self.module.crop_yield_t2_start if self.module.crop_yield_t2_start is not None else "Default")
             self.metadata_worksheet.cell(row=last_metadata_row + 7, column=2, value=self.module.minor_land_use_type_start.name if self.module.minor_land_use_type_start is not None else "Default")
-            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=2, value=self.module.minor_residue_management_type_start.name if self.module.minor_residue_management_type_start is not None else "Default")
+            self.metadata_worksheet.cell(
+                row=last_metadata_row + 8, column=2, value=self.module.minor_residue_management_type_start.name if self.module.minor_residue_management_type_start is not None else "Default"
+            )
             self.metadata_worksheet.cell(row=last_metadata_row + 9, column=2, value=self.module.minor_yield_start if self.module.minor_yield_start is not None else "Default")
 
         if self.module.is_with():
@@ -1183,7 +1183,9 @@ class AnnualCroplandReport(LandModuleReport):
             self.metadata_worksheet.cell(row=last_metadata_row + 5, column=3, value=self.module.residue_management_type_w.name)
             self.metadata_worksheet.cell(row=last_metadata_row + 6, column=3, value=self.module.crop_yield_t2_w if self.module.crop_yield_t2_w is not None else "Default")
             self.metadata_worksheet.cell(row=last_metadata_row + 7, column=3, value=self.module.minor_land_use_type_w.name if self.module.minor_land_use_type_w is not None else "Default")
-            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=3, value=self.module.minor_residue_management_type_w.name if self.module.minor_residue_management_type_w is not None else "Default")
+            self.metadata_worksheet.cell(
+                row=last_metadata_row + 8, column=3, value=self.module.minor_residue_management_type_w.name if self.module.minor_residue_management_type_w is not None else "Default"
+            )
             self.metadata_worksheet.cell(row=last_metadata_row + 9, column=3, value=self.module.minor_yield_w if self.module.minor_yield_w is not None else "Default")
 
         if self.module.is_without():
@@ -1194,7 +1196,9 @@ class AnnualCroplandReport(LandModuleReport):
             self.metadata_worksheet.cell(row=last_metadata_row + 5, column=4, value=self.module.residue_management_type_wo.name)
             self.metadata_worksheet.cell(row=last_metadata_row + 6, column=4, value=self.module.crop_yield_t2_wo if self.module.crop_yield_t2_wo is not None else "Default")
             self.metadata_worksheet.cell(row=last_metadata_row + 7, column=4, value=self.module.minor_land_use_type_wo.name if self.module.minor_land_use_type_wo is not None else "Default")
-            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=4, value=self.module.minor_residue_management_type_wo.name if self.module.minor_residue_management_type_wo is not None else "Default")
+            self.metadata_worksheet.cell(
+                row=last_metadata_row + 8, column=4, value=self.module.minor_residue_management_type_wo.name if self.module.minor_residue_management_type_wo is not None else "Default"
+            )
             self.metadata_worksheet.cell(row=last_metadata_row + 9, column=4, value=self.module.minor_yield_wo if self.module.minor_yield_wo is not None else "Default")
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
@@ -1248,7 +1252,6 @@ class AnnualCroplandReport(LandModuleReport):
 
 @dataclass
 class SetAsideReport(LandModuleReport):
-
     module: api_models.SetAside
     activity_report: BaseActivityReport = None
 
@@ -1290,7 +1293,6 @@ class SetAsideReport(LandModuleReport):
 
 @dataclass
 class GrasslandReport(LandModuleReport):
-
     module: api_models.Grassland
     activity_report: BaseActivityReport = None
 
@@ -1350,7 +1352,6 @@ class GrasslandReport(LandModuleReport):
 
 @dataclass
 class OtherLandReport(LandModuleReport):
-
     module: api_models.OtherLand
     activity_report: BaseActivityReport = None
 
@@ -1361,7 +1362,6 @@ class OtherLandReport(LandModuleReport):
 
 @dataclass
 class CoastalWetlandReport(LandModuleReport):
-
     module: api_models.CoastalWetland
     activity_report: BaseActivityReport = None
 
@@ -1451,7 +1451,6 @@ class CoastalWetlandReport(LandModuleReport):
 
 @dataclass
 class FloodedRiceReport(LandModuleReport):
-
     module: api_models.FloodedRice
     activity_report: BaseActivityReport = None
 
@@ -1495,7 +1494,9 @@ class FloodedRiceReport(LandModuleReport):
             self.fire_n2o = [x + y for x, y in zip(self.fire_n2o, self.extract_emissions(minor_emission_set, self.fire_n2o_source[0], self.fire_n2o_source[1]))]
             self.fire_ch4 = [x + y for x, y in zip(self.fire_ch4, self.extract_emissions(minor_emission_set, self.fire_ch4_source[0], self.fire_ch4_source[1]))]
             ### Until here
-            self.rice_cultivation_ch4 = [x + y for x, y in zip(self.rice_cultivation_ch4, self.extract_emissions(minor_emission_set, self.rice_cultivation_ch4_source[0], self.rice_cultivation_ch4_source[1]))]
+            self.rice_cultivation_ch4 = [
+                x + y for x, y in zip(self.rice_cultivation_ch4, self.extract_emissions(minor_emission_set, self.rice_cultivation_ch4_source[0], self.rice_cultivation_ch4_source[1]))
+            ]
 
             self.total_emissions = list(map(sum, zip(self.biomass_co2, self.soil_co2, self.soil_n2o, self.fire_n2o, self.fire_ch4, self.rice_cultivation_ch4)))
 
@@ -1603,7 +1604,6 @@ class FloodedRiceReport(LandModuleReport):
 
 @dataclass
 class WaterbodyReport(BaseModuleReport):
-
     module: api_models.Waterbody
 
     waterbody_management_ch4: list[float] = None
@@ -1640,7 +1640,6 @@ class WaterbodyReport(BaseModuleReport):
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
     def build_report(self):
-
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
         self.results_worksheet = self.workbook["Results"]
 
@@ -1662,7 +1661,6 @@ class WaterbodyReport(BaseModuleReport):
 
 @dataclass
 class AquacultureReport(BaseModuleReport):
-
     module: api_models.Aquaculture
 
     fish_n2o: list[float] = None
@@ -1750,7 +1748,6 @@ class AquacultureReport(BaseModuleReport):
 
 @dataclass
 class FisheryReport(BaseModuleReport):
-
     liquid_fuel_co2: list[float] = None
     liquid_fuel_n2o: list[float] = None
     liquid_fuel_ch4: list[float] = None
@@ -1797,7 +1794,6 @@ class FisheryReport(BaseModuleReport):
 
 @dataclass
 class SmallFisheryReport(FisheryReport):
-
     module: api_models.SmallFishery
 
     def __post_init__(self):
@@ -1864,7 +1860,6 @@ class SmallFisheryReport(FisheryReport):
 
 @dataclass
 class LargeFisheryReport(FisheryReport):
-
     module: api_models.LargeFishery
 
     def __post_init__(self):
@@ -1930,7 +1925,6 @@ class LargeFisheryReport(FisheryReport):
 
 
 class LivestockReport(BaseModuleReport):
-
     module: api_models.Livestock
 
     enteric_fermentation_ch4: list[float] = None
@@ -2009,13 +2003,23 @@ class LivestockReport(BaseModuleReport):
 
         self.enteric_fermentation_ch4 = self.extract_emissions(self.emissions_set, self.enteric_fermentation_ch4_source[0], self.enteric_fermentation_ch4_source[1])
         self.manure_management_other_than_prp_ch4 = self.extract_emissions(self.emissions_set, self.manure_management_other_than_prp_ch4_source[0], self.manure_management_other_than_prp_ch4_source[1])
-        self.manure_management_other_than_prp_direct_n2o = self.extract_emissions(self.emissions_set, self.manure_management_other_than_prp_direct_n2o_source[0], self.manure_management_other_than_prp_direct_n2o_source[1])
-        self.manure_management_other_than_prp_leaching_indirect_n2o = self.extract_emissions(self.emissions_set, self.manure_management_other_than_prp_leaching_indirect_n2o_source[0], self.manure_management_other_than_prp_leaching_indirect_n2o_source[1])
-        self.manure_management_other_than_prp_volatilization_indirect_n2o = self.extract_emissions(self.emissions_set, self.manure_management_other_than_prp_volatilization_indirect_n2o_source[0], self.manure_management_other_than_prp_volatilization_indirect_n2o_source[1])
+        self.manure_management_other_than_prp_direct_n2o = self.extract_emissions(
+            self.emissions_set, self.manure_management_other_than_prp_direct_n2o_source[0], self.manure_management_other_than_prp_direct_n2o_source[1]
+        )
+        self.manure_management_other_than_prp_leaching_indirect_n2o = self.extract_emissions(
+            self.emissions_set, self.manure_management_other_than_prp_leaching_indirect_n2o_source[0], self.manure_management_other_than_prp_leaching_indirect_n2o_source[1]
+        )
+        self.manure_management_other_than_prp_volatilization_indirect_n2o = self.extract_emissions(
+            self.emissions_set, self.manure_management_other_than_prp_volatilization_indirect_n2o_source[0], self.manure_management_other_than_prp_volatilization_indirect_n2o_source[1]
+        )
         self.manure_management_prp_ch4 = self.extract_emissions(self.emissions_set, self.manure_management_prp_ch4_source[0], self.manure_management_prp_ch4_source[1])
         self.manure_management_prp_direct_n2o = self.extract_emissions(self.emissions_set, self.manure_management_prp_direct_n2o_source[0], self.manure_management_prp_direct_n2o_source[1])
-        self.manure_management_prp_leaching_indirect_n2o = self.extract_emissions(self.emissions_set, self.manure_management_prp_leaching_indirect_n2o_source[0], self.manure_management_prp_leaching_indirect_n2o_source[1])
-        self.manure_management_prp_volatilization_indirect_n2o = self.extract_emissions(self.emissions_set, self.manure_management_prp_volatilization_indirect_n2o_source[0], self.manure_management_prp_volatilization_indirect_n2o_source[1])
+        self.manure_management_prp_leaching_indirect_n2o = self.extract_emissions(
+            self.emissions_set, self.manure_management_prp_leaching_indirect_n2o_source[0], self.manure_management_prp_leaching_indirect_n2o_source[1]
+        )
+        self.manure_management_prp_volatilization_indirect_n2o = self.extract_emissions(
+            self.emissions_set, self.manure_management_prp_volatilization_indirect_n2o_source[0], self.manure_management_prp_volatilization_indirect_n2o_source[1]
+        )
 
         self.total_emissions = list(
             map(
@@ -2062,10 +2066,8 @@ class LivestockReport(BaseModuleReport):
         self.populate_metadata()
 
 
-
 @dataclass
 class ForestManagementReport(LandModuleReport):
-
     module: api_models.ForestManagement
 
     hwp_co2: list[float] = None
@@ -2277,6 +2279,12 @@ class ForestManagementReport(LandModuleReport):
         if self.module.is_without():
             self.metadata_worksheet.cell(row=last_metadata_row + 17 + len(self.module.disturbances.all()), column=4, value=self.module.average_yearly_degradation_percentage_wo)
 
+        self.metadata_worksheet.cell(row=last_metadata_row + 4, column=6, value=self.module.rotation_length_yrs_thread.format_comments())
+        self.metadata_worksheet.cell(row=last_metadata_row + 5, column=6, value=self.module.rotation_percentage_biomass_for_energy_thread.format_comments())
+        self.metadata_worksheet.cell(row=last_metadata_row + 7, column=6, value=self.module.logging_recurrence_yrs_thread.format_comments())
+        self.metadata_worksheet.cell(row=last_metadata_row + 8, column=6, value=self.module.logging_percentage_agb_logged_thread.format_comments())
+        self.metadata_worksheet.cell(row=last_metadata_row + 17 + len(self.module.disturbances.all()), column=6, value=self.module.average_yearly_degradation_percentage_thread.format_comments())
+
     def build_report(self):
         super().build_report()
 
@@ -2319,7 +2327,23 @@ class ForestManagementReport(LandModuleReport):
         self.hwp_co2 = list(map(sum, zip(self.rotation_hwp_agb_co2, self.rotation_hwp_bgb_co2, self.logging_hwp_agb_co2, self.logging_hwp_bgb_co2)))
         self.fire_n2o = list(map(sum, zip(self.rotation_agb_n2o, self.rotation_bgb_n2o, self.disturbance_agb_n2o, self.disturbance_bgb_n2o, self.logging_agb_n2o, self.logging_bgb_n2o)))
         self.fire_ch4 = list(map(sum, zip(self.rotation_agb_ch4, self.rotation_bgb_ch4, self.disturbance_agb_ch4, self.disturbance_bgb_ch4, self.logging_agb_ch4, self.logging_bgb_ch4)))
-        self.biomass_loss_co2 = list(map(sum, zip(self.rotation_agb_co2, self.rotation_bgb_co2, self.disturbance_agb_co2, self.disturbance_bgb_co2, self.logging_agb_co2, self.logging_bgb_co2, self.degradation_agb_co2, self.degradation_bgb_co2, self.degradation_litter_co2, self.degradation_deadwood_co2)))
+        self.biomass_loss_co2 = list(
+            map(
+                sum,
+                zip(
+                    self.rotation_agb_co2,
+                    self.rotation_bgb_co2,
+                    self.disturbance_agb_co2,
+                    self.disturbance_bgb_co2,
+                    self.logging_agb_co2,
+                    self.logging_bgb_co2,
+                    self.degradation_agb_co2,
+                    self.degradation_bgb_co2,
+                    self.degradation_litter_co2,
+                    self.degradation_deadwood_co2,
+                ),
+            )
+        )
         self.biomass_gain_co2 = list(map(sum, zip(self.growth_agb_co2, self.growth_bgb_co2, self.litter_co2, self.deadwood_co2)))
 
         self.total_emissions = list(
@@ -2402,7 +2426,6 @@ class EnergyReport(BaseModuleReport):
         return super().__post_init__()
 
     def add_submodules_results(self):
-
         submodules: list[api_models.Submodule] = self.module.submodules
 
         for submodule in submodules:
@@ -2545,7 +2568,6 @@ class EnergyReport(BaseModuleReport):
 
 @dataclass
 class InputReport(BaseModuleReport):
-
     module: api_models.Input
 
     inputs_co2: list[float] = None
@@ -2598,7 +2620,6 @@ class InputReport(BaseModuleReport):
         last_metadata_row = self.metadata_worksheet.max_row
 
         for i, entry in enumerate(self.module.submodules):
-
             if i != 0:
                 last_metadata_row += 2
 
@@ -2664,7 +2685,6 @@ class InputReport(BaseModuleReport):
 
 @dataclass
 class IrrigationReport(BaseModuleReport):
-
     module: api_models.Irrigation
 
     other_infrastructure_co2_eq: list[float] = None
@@ -2703,22 +2723,48 @@ class IrrigationReport(BaseModuleReport):
                 log.error(f"Cannot calculate emissions for submodule {submodule.module_type.name} in activity {submodule.parent.activity.name}: {e}")
                 raise NotReadyError(f"Cannot calculate emissions for submodule {submodule.module_type.name} in activity {submodule.parent.activity.name}: {e}")
 
-            self.other_infrastructure_co2_eq = list(map(sum, zip(self.other_infrastructure_co2_eq, self.extract_emissions(submodules_emission_set, self.other_infrastructure_co2_eq_source[0], self.other_infrastructure_co2_eq_source[1]))))
-            self.liquid_fuel_or_electricity_co2 = list(map(sum, zip(self.liquid_fuel_or_electricity_co2, self.extract_emissions(submodules_emission_set, self.liquid_fuel_or_electricity_co2_source[0], self.liquid_fuel_or_electricity_co2_source[1]))))
-            self.liquid_fuel_or_electricity_ch4 = list(map(sum, zip(self.liquid_fuel_or_electricity_ch4, self.extract_emissions(submodules_emission_set, self.liquid_fuel_or_electricity_ch4_source[0], self.liquid_fuel_or_electricity_ch4_source[1]))))
-            self.liquid_fuel_or_electricity_n2o = list(map(sum, zip(self.liquid_fuel_or_electricity_n2o, self.extract_emissions(submodules_emission_set, self.liquid_fuel_or_electricity_n2o_source[0], self.liquid_fuel_or_electricity_n2o_source[1]))))
+            self.other_infrastructure_co2_eq = list(
+                map(sum, zip(self.other_infrastructure_co2_eq, self.extract_emissions(submodules_emission_set, self.other_infrastructure_co2_eq_source[0], self.other_infrastructure_co2_eq_source[1])))
+            )
+            self.liquid_fuel_or_electricity_co2 = list(
+                map(
+                    sum,
+                    zip(
+                        self.liquid_fuel_or_electricity_co2,
+                        self.extract_emissions(submodules_emission_set, self.liquid_fuel_or_electricity_co2_source[0], self.liquid_fuel_or_electricity_co2_source[1]),
+                    ),
+                )
+            )
+            self.liquid_fuel_or_electricity_ch4 = list(
+                map(
+                    sum,
+                    zip(
+                        self.liquid_fuel_or_electricity_ch4,
+                        self.extract_emissions(submodules_emission_set, self.liquid_fuel_or_electricity_ch4_source[0], self.liquid_fuel_or_electricity_ch4_source[1]),
+                    ),
+                )
+            )
+            self.liquid_fuel_or_electricity_n2o = list(
+                map(
+                    sum,
+                    zip(
+                        self.liquid_fuel_or_electricity_n2o,
+                        self.extract_emissions(submodules_emission_set, self.liquid_fuel_or_electricity_n2o_source[0], self.liquid_fuel_or_electricity_n2o_source[1]),
+                    ),
+                )
+            )
 
-        self.total_emissions = list(map(sum, zip(self.total_emissions, self.other_infrastructure_co2_eq, self.liquid_fuel_or_electricity_co2, self.liquid_fuel_or_electricity_ch4, self.liquid_fuel_or_electricity_n2o)))
+        self.total_emissions = list(
+            map(sum, zip(self.total_emissions, self.other_infrastructure_co2_eq, self.liquid_fuel_or_electricity_co2, self.liquid_fuel_or_electricity_ch4, self.liquid_fuel_or_electricity_n2o))
+        )
 
     def populate_metadata(self):
-
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
         self.metadata_worksheet = self.workbook["Metadata"]
 
         last_metadata_row = self.metadata_worksheet.max_row
 
         for i, system in enumerate(self.module.irrigation_systems.all()):
-
             system: api_models.IrrigationSystem
 
             if i != 0:
@@ -2742,7 +2788,6 @@ class IrrigationReport(BaseModuleReport):
         last_metadata_row += len(self.module.irrigation_systems.all()) + 1
 
         for i, phase in enumerate(self.module.irrigation_phases.all()):
-
             phase: api_models.IrrigationPhase
 
             if i != 0:
@@ -2778,7 +2823,6 @@ class IrrigationReport(BaseModuleReport):
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
     def populate_results(self):
-
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
         self.results_worksheet = self.workbook["Results"]
 
@@ -2807,7 +2851,6 @@ class IrrigationReport(BaseModuleReport):
 
 # @dataclass
 class SettlementReport(LandModuleReport):
-
     module: api_models.Settlement
 
     buildings_co2_eq: list[float] = None
@@ -2852,7 +2895,6 @@ class SettlementReport(LandModuleReport):
         self.total_emissions = list(map(sum, zip(self.total_emissions, self.buildings_co2_eq)))
 
     def populate_metadata(self):
-
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
         self.metadata_worksheet = self.workbook["Metadata"]
 
@@ -2911,7 +2953,7 @@ class SettlementReport(LandModuleReport):
         for i, infra in enumerate(self.module.other_infrastructures.all()):
             infra: api_models.OtherInfrastructure
 
-            self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=1, value=f"Area of infrastructure {i+1} (m2)")
+            self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=1, value=f"Area of infrastructure {i + 1} (m2)")
 
             if self.module.is_start():
                 self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=2, value=infra.area_m2_start)
@@ -2955,7 +2997,6 @@ class SettlementReport(LandModuleReport):
 
 @dataclass
 class OrganicSoilReport(BaseModuleReport):
-
     module: api_models.OrganicSoil
 
     def __post_init__(self):
@@ -2963,7 +3004,6 @@ class OrganicSoilReport(BaseModuleReport):
         return super().__post_init__()
 
     def populate_metadata(self):
-
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
         self.metadata_worksheet = self.workbook["Metadata"]
 
@@ -2990,7 +3030,6 @@ class OrganicSoilReport(BaseModuleReport):
         luc: api_models.LandUseChange = self.module.land_use_change
 
         if self.module.is_start():
-
             math = self.calculator.math_start_w or self.calculator.math_start_wo
             peat_density = math.peat_density_tier_2_default
 
@@ -3008,7 +3047,6 @@ class OrganicSoilReport(BaseModuleReport):
             self.metadata_worksheet.cell(row=last_metadata_row + 12, column=2, value=peat_density)
 
         if self.module.is_with():
-
             math = self.calculator.math_start_w
             peat_density = math.peat_density_tier_2_default
 
@@ -3026,7 +3064,6 @@ class OrganicSoilReport(BaseModuleReport):
             self.metadata_worksheet.cell(row=last_metadata_row + 24, column=3, value=peat_density)
 
         if self.module.is_without():
-
             math = self.calculator.math_start_wo
             peat_density = math.peat_density_tier_2_default
 
