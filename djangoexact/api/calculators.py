@@ -3607,17 +3607,17 @@ class FuelCalculator(BaseCalculator):
     def get_energy_ef_default(self, scenario: utils.ScenarioTypes):
         try:
             fuel_type: FuelType = getattr(self.module, f"fuel_type_{scenario.value}")
-            energy_ef_default = ipcc.EnergyDefaultEmissionFactor.objects.get(
+            self.energy_ef_default = ipcc.EnergyDefaultEmissionFactor.objects.get(
                 fuel_type=fuel_type,
                 fuel_use_type=fuel_type.fuel_use_type,
             )
 
-            if energy_ef_default:
-                if energy_ef_default.co2 is None and getattr(self.module, f"energy_ef_co2_t2_{scenario.value}") is None:
+            if self.energy_ef_default:
+                if self.energy_ef_default.co2 is None and getattr(self.module, f"energy_ef_co2_t2_{scenario.value}") is None:
                     raise ValueError(f"Default CO2 emission factor for {fuel_type.name} {fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value for scenario: {scenario.name.lower()}")
-                if energy_ef_default.ch4 is None and getattr(self.module, f"energy_ef_ch4_t2_{scenario.value}") is None:
+                if self.energy_ef_default.ch4 is None and getattr(self.module, f"energy_ef_ch4_t2_{scenario.value}") is None:
                     raise ValueError(f"Default CH4 emission factor for {fuel_type.name} {fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value for scenario: {scenario.name.lower()}")
-                if energy_ef_default.n2o is None and getattr(self.module, f"energy_ef_n2o_t2_{scenario.value}") is None:
+                if self.energy_ef_default.n2o is None and getattr(self.module, f"energy_ef_n2o_t2_{scenario.value}") is None:
                     raise ValueError(f"Default N2O emission factor for {fuel_type.name} {fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value for scenario: {scenario.name.lower()}")
 
         except ipcc.EnergyDefaultEmissionFactor.DoesNotExist:
@@ -3628,7 +3628,7 @@ class FuelCalculator(BaseCalculator):
             if getattr(self.module, f"energy_ef_n2o_t2_{scenario.value}") is None:
                 raise ValueError(f"N2O emission factor for {fuel_type.name} {fuel_type.fuel_use_type.name} does not exist. Please provide a tier 2 value for scenario: {scenario.name.lower()}")
 
-        self.energy_ef_default = energy_ef_default
+        self.energy_ef_default = self.energy_ef_default
 
     def get_defaults(self, calculate=False) -> dict:
         super().get_defaults(calculate)
@@ -6658,6 +6658,12 @@ class BaseValueChainCalculator(BaseCalculator):
     def __init__(self, input) -> None:
         super().__init__(input)
 
+        # TODO: Review energy calculators logic for VC. There's a lot that can be generalized.
+        self.electricity_calculator_start_w = ElectricityCalculator(self.module)
+        self.electricity_calculator_start_wo = ElectricityCalculator(self.module)
+        self.electricity_calculator_w = ElectricityCalculator(self.module)
+        self.electricity_calculator_wo = ElectricityCalculator(self.module)
+
         self.electricity_math_start_w = None
         self.electricity_math_start_wo = None
         self.electricity_math_w = None
@@ -6774,9 +6780,8 @@ class StorageEntryCalculator(BaseValueChainCalculator):
                 self.math_w = MathValueChain(**self.inputs_w)
                 self.math_w.calculate_emissions()
 
-            calc = ElectricityCalculator(self.module)
-            calc.calculate()
-            self.math_w = calc.math_w
+            self.electricity_calculator_w.calculate()
+            self.electricity_math_w = self.electricity_calculator_w.math_w
 
         if self.module.is_without():
             if self.module.is_refrigerant_used:
@@ -6794,9 +6799,8 @@ class StorageEntryCalculator(BaseValueChainCalculator):
                 self.math_wo = MathValueChain(**self.inputs_wo)
                 self.math_wo.calculate_emissions()
 
-            calc = ElectricityCalculator(self.module)
-            calc.calculate()
-            self.math_wo = calc.math_wo
+            self.electricity_calculator_wo.calculate()
+            self.electricity_math_wo = self.electricity_calculator_wo.math_wo
 
         self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
         self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
@@ -6874,14 +6878,11 @@ class ProcessingEntryCalculator(BaseValueChainCalculator):
         self.get_defaults()
 
         if self.module.is_with():
-            # TODO: Remove this logic as fuel_type in FuelCalculator is now scenario-based
-            self.module.fuel_type = self.module.fuel_type_w  # Temporarily assign fuel type to comply with the Fuel calculator requirements
             self.energy_calculator_w = ElectricityCalculator(self.module) if self.module.fuel_type_w.name.casefold() == "electricity" else FuelCalculator(self.module)
             self.energy_calculator_w.calculate()
             self.math_w = self.energy_calculator_w.math_w
 
         if self.module.is_without():
-            self.module.fuel_type = self.module.fuel_type_wo  # Temporarily assign fuel type to comply with the Fuel calculator requirements
             self.energy_calculator_wo = ElectricityCalculator(self.module) if self.module.fuel_type_wo.name.casefold() == "electricity" else FuelCalculator(self.module)
             self.energy_calculator_wo.calculate()
             self.math_wo = self.energy_calculator_wo.math_wo
