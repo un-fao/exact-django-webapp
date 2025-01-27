@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from api.models import *
 from ipcc.models import *
+import scripts.import_definitions as import_definitions
 
 
 def capitalize_all(string):
@@ -4593,25 +4594,29 @@ def delete_and_import_forest_total_biomass():
             )
 
 def get_or_create_soil_types_and_update_info():
-
+    """Import soil types from CSV and update their properties."""
     df = pd.read_csv(
         os.path.join(os.path.dirname(__file__), "ipcc_data", "SoilTypes.csv"),
         header=0,
         sep=",",
     )
 
-    for i, row in df.iterrows():
+    for _, row in df.iterrows():
         name = row["name"]
         active = row["active"]
         is_coastal = row["is_coastal"]
 
-        print(name, active, is_coastal)
+        print(f"Processing soil type: {name} (active={active}, coastal={is_coastal})")
 
-        if SoilType.objects.filter(name__iexact=name).exists():
-            print(f"SoilType {name} already exists.")
-            soil_type = SoilType.objects.get(name__iexact=name)
+        soil_type, created = SoilType.objects.get_or_create(
+            name__iexact=name,
+            defaults={"name": name}
+        )
+
+        if not created:
+            print(f"Updated existing soil type: {name}")
         else:
-            soil_type = SoilType.objects.create(name=name)
+            print(f"Created new soil type: {name}")
 
         soil_type.active = active
         soil_type.is_coastal = is_coastal
@@ -4622,6 +4627,7 @@ def rename_solar_fuel_type_to_renewable():
 
 # TODO: Run in production
 
+# import_definitions.import_definitions()
 # rename_solar_fuel_type_to_renewable()
 # assign_fuel_type_units()
 
