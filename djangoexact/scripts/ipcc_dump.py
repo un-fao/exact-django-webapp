@@ -4617,15 +4617,23 @@ def get_or_create_soil_types_and_update_info():
         soil_type.is_coastal = is_coastal
         soil_type.save()
 
+def rename_solar_fuel_type_to_renewable():
+    FuelType.objects.filter(name__iexact="Solar").update(name="Renewable")
 
 # TODO: Run in production
 
+# rename_solar_fuel_type_to_renewable()
+# assign_fuel_type_units()
+
 # TODO: Run in review
 
-get_or_create_soil_types_and_update_info()
-delete_and_import_forest_total_biomass()
-delete_and_import_total_biomass_after_defo()
+# get_or_create_soil_types_and_update_info()
+# delete_and_import_forest_total_biomass()
+# delete_and_import_total_biomass_after_defo()
 
 # TODO: Run in development
+
+# rename_solar_fuel_type_to_renewable()
+# assign_fuel_type_units()
 
 
