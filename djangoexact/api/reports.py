@@ -92,7 +92,7 @@ class ExcelFileManager:
         # Start with an empty in-memory Excel file
         self.excel_file = BytesIO()
         self._create_initial_excel()
-        self.SAVE_TO_FILE = True # Set to True to save the Excel file to disk
+        self.SAVE_TO_FILE = False # Set to True to save the Excel file to disk
 
     def _create_initial_excel(self):
 
@@ -2421,12 +2421,12 @@ class EnergyReport(BaseModuleReport):
             self.electricity_co2_eq = list(map(sum, zip(self.electricity_co2_eq, self.extract_emissions(submodule_emission_set, self.electricity_co2_eq_source[0], self.electricity_co2_eq_source[1]))))
 
             if isinstance(submodule, api_models.Fuel):
-                if "solid" in submodule.fuel_type.macro_fuel_type.name.casefold():
+                if "solid" in submodule.fuel_type_w.macro_fuel_type.name.casefold():
                     self.solid_fuel_co2 = list(map(sum, zip(self.solid_fuel_co2, self.extract_emissions(submodule_emission_set, self.solid_fuel_co2_source[0], self.solid_fuel_co2_source[1]))))
                     self.solid_fuel_ch4 = list(map(sum, zip(self.solid_fuel_ch4, self.extract_emissions(submodule_emission_set, self.solid_fuel_ch4_source[0], self.solid_fuel_ch4_source[1]))))
                     self.solid_fuel_n2o = list(map(sum, zip(self.solid_fuel_n2o, self.extract_emissions(submodule_emission_set, self.solid_fuel_n2o_source[0], self.solid_fuel_n2o_source[1]))))
 
-                elif "liquid" in submodule.fuel_type.macro_fuel_type.name.casefold():
+                elif "liquid" in submodule.fuel_type_w.macro_fuel_type.name.casefold():
                     self.liquid_fuel_co2 = list(map(sum, zip(self.liquid_fuel_co2, self.extract_emissions(submodule_emission_set, self.liquid_fuel_co2_source[0], self.liquid_fuel_co2_source[1]))))
                     self.liquid_fuel_ch4 = list(map(sum, zip(self.liquid_fuel_ch4, self.extract_emissions(submodule_emission_set, self.liquid_fuel_ch4_source[0], self.liquid_fuel_ch4_source[1]))))
                     self.liquid_fuel_n2o = list(map(sum, zip(self.liquid_fuel_n2o, self.extract_emissions(submodule_emission_set, self.liquid_fuel_n2o_source[0], self.liquid_fuel_n2o_source[1]))))
@@ -2452,20 +2452,20 @@ class EnergyReport(BaseModuleReport):
             self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=1, value="Scope of emission factor")
 
             if self.module.is_start():
-                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=2, value=electricity.country.name)
-                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=2, value=electricity.mwh_start)
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=2, value=electricity.country_t2.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=2, value=electricity.quantity_consumed_per_year_start)
                 self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=2, value=electricity.mwh_renewables_start)
                 self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=2, value=electricity.ef_source.name)
 
             if self.module.is_with():
-                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=3, value=electricity.country.name)
-                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=3, value=electricity.mwh_w)
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=3, value=electricity.country_t2.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=3, value=electricity.quantity_consumed_per_year_w)
                 self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=3, value=electricity.mwh_renewables_w)
                 self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=3, value=electricity.ef_source.name)
 
             if self.module.is_without():
-                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=4, value=electricity.country.name)
-                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=4, value=electricity.mwh_wo)
+                self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=4, value=electricity.country_t2.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=4, value=electricity.quantity_consumed_per_year_wo)
                 self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=4, value=electricity.mwh_renewables_wo)
                 self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=4, value=electricity.ef_source.name)
 
@@ -2481,20 +2481,20 @@ class EnergyReport(BaseModuleReport):
 
             if self.module.is_start():
                 self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=2, value="WIP")  # TODO: What is this?
-                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=2, value=fuel.fuel_type.name)
-                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=2, value=fuel.fuel_consumption_start)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=2, value=fuel.fuel_type_start.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=2, value=fuel.quantity_consumed_per_year_start)
                 self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=2, value="WIP")  # TODO: What is this?
 
             if self.module.is_with():
                 self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=3, value="WIP")
-                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=3, value=fuel.fuel_type.name)
-                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=3, value=fuel.fuel_consumption_w)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=3, value=fuel.fuel_type_w.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=3, value=fuel.quantity_consumed_per_year_w)
                 self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=3, value="WIP")
 
             if self.module.is_without():
                 self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=4, value="WIP")
-                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=4, value=fuel.fuel_type.name)
-                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=4, value=fuel.fuel_consumption_wo)
+                self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=4, value=fuel.fuel_type_wo.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=4, value=fuel.quantity_consumed_per_year_wo)
                 self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=4, value="WIP")
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
