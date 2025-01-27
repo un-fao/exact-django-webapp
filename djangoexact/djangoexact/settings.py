@@ -1,5 +1,14 @@
 import os
 
+from datetime import timedelta
+from pathlib import Path
+import json
+import base64
+
+import firebase_admin
+import pyrebase
+from dotenv import load_dotenv
+
 """
 Django settings for djangoexact project.
 
@@ -12,24 +21,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
-from datetime import timedelta
-from pathlib import Path
-import json
-import base64
-
-import firebase_admin
-import pyrebase
-from dotenv import load_dotenv
-import logging as log
-
 load_dotenv()
 
 app_mode = os.getenv("APP_MODE", None)
-if app_mode == "development":
+if app_mode:
     print(f"Running in {app_mode} mode")
-
     dotenv_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), "djangoexact", f".env.{app_mode}")
-        
     load_dotenv(dotenv_file)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
