@@ -2046,9 +2046,10 @@ class LivestockReport(BaseModuleReport):
             self.results_worksheet.cell(row=last_results_row + 8, column=i + 2, value=self.manure_management_prp_leaching_indirect_n2o[i])
             self.results_worksheet.cell(row=last_results_row + 9, column=i + 2, value=self.manure_management_prp_volatilization_indirect_n2o[i])
 
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
         self.populate_metadata()
 
-        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
 
 @dataclass
