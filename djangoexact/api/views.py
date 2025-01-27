@@ -1779,6 +1779,10 @@ def generic_module_viewset(model: Module):
 
             try:
                 defaults: SimpleNamespace = DefaultsFactory.get_defaults(module, calculate=True)
+
+                if isinstance(defaults, dict):
+                    defaults = SimpleNamespace(**defaults)
+
                 return Response(defaults.__dict__)
             except Exception as e:
                 return utils.ErrorResponse(str(e))
