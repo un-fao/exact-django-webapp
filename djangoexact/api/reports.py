@@ -92,7 +92,7 @@ class ExcelFileManager:
         # Start with an empty in-memory Excel file
         self.excel_file = BytesIO()
         self._create_initial_excel()
-        self.SAVE_TO_FILE = False
+        self.SAVE_TO_FILE = True # Set to True to save the Excel file to disk
 
     def _create_initial_excel(self):
 
@@ -206,6 +206,16 @@ class BaseProjectReport:
         self.results_worksheet.cell(row=9, column=1, value="Other GHGs")
         self.results_worksheet.cell(row=10, column=1, value="Cumulative Hectares Impacted")
         self.results_worksheet.cell(row=10, column=1, value="Cumulative Hectares Impacted").fill = Colors.LIGHT_ORANGE_FILL.value
+        self.results_worksheet.cell(row=11, column=1, value="Cumulative Heads Impacted")
+        self.results_worksheet.cell(row=11, column=1, value="Cumulative Heads Impacted").fill = Colors.LIGHT_ORANGE_FILL.value
+        self.results_worksheet.cell(row=12, column=1, value="Cumulative Catch Impacted")
+        self.results_worksheet.cell(row=12, column=1, value="Cumulative Catch Impacted").fill = Colors.LIGHT_ORANGE_FILL.value
+
+        self.results_worksheet.cell(row=11, column=2, value="Coming soon")
+        self.results_worksheet.cell(row=11, column=2, value="Coming soon").fill = Colors.LIGHT_BEIGE_FILL.value
+ 
+        self.results_worksheet.cell(row=12, column=2, value="Coming soon")
+        self.results_worksheet.cell(row=12, column=2, value="Coming soon").fill = Colors.LIGHT_BEIGE_FILL.value
 
         for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
             self.results_worksheet.cell(row=1, column=i + 2, value=year)
@@ -2046,9 +2056,11 @@ class LivestockReport(BaseModuleReport):
             self.results_worksheet.cell(row=last_results_row + 8, column=i + 2, value=self.manure_management_prp_leaching_indirect_n2o[i])
             self.results_worksheet.cell(row=last_results_row + 9, column=i + 2, value=self.manure_management_prp_volatilization_indirect_n2o[i])
 
+        # TODO: Not bussin'. Not bussin' at all. Should be generalized in the superclass fr fr
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
         self.populate_metadata()
 
-        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
 
 @dataclass
