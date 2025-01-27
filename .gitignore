@@ -103,3 +103,4 @@ djangoexact/matrices/
 djangoexact/djangoexact/.env.development
 djangoexact/djangoexact/.env.production
 djangoexact/djangoexact/.env.review
+pyproject.toml
