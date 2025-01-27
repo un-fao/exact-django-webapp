@@ -2598,10 +2598,6 @@ class SetAside(LandModule, SingleBiomassModule):
     is_set_aside_w = models.BooleanField(default=False, verbose_name=_("is_set_aside_w"))
     is_set_aside_wo = models.BooleanField(default=False, verbose_name=_("is_set_aside_wo"))
 
-    # NOTE: Why having AGB and BGB AND Biomass when Biomass = AGB + BGB?
-    def get_biomass_t2(self, scenario: utils.ScenarioTypes):
-        return getattr(self, f"biomass_t2_{scenario.value}", None)
-
     def save(self, *args, **kwargs):
 
         if not self.land_use_type_start:
@@ -2616,10 +2612,6 @@ class OtherLand(LandModule, SingleBiomassModule):
     is_degraded_land_start = models.BooleanField(default=False, verbose_name=_("is_degraded_land_start"))
     is_degraded_land_w = models.BooleanField(default=False, verbose_name=_("is_degraded_land_w"))
     is_degraded_land_wo = models.BooleanField(default=False, verbose_name=_("is_degraded_land_wo"))
-
-    # NOTE: Why having AGB and BGB AND Biomass when Biomass = AGB + BGB?
-    def get_biomass_t2(self, scenario: utils.ScenarioTypes):
-        return getattr(self, f"biomass_t2_{scenario.value}", None)
 
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:
