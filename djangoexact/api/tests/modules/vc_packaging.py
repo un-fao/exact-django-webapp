@@ -16,6 +16,7 @@ class ValueChainPackagingTest(t.ModuleWithSubmodulesTest):
         self.module_type = ModuleType.objects.get(class_name="Packaging")
         self.submodule_types = [
             ModuleType.objects.get(class_name="PackagingEntry"),
+            ModuleType.objects.get(class_name="PackagingEntry"),
         ]
         self.create_module()
         self.create_submodules()

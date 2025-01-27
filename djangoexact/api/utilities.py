@@ -32,6 +32,7 @@ TROPHIC_STATE = 0.7
 INCLUDE_RELATED = "include_related"
 
 FOSSIL_METHANE_FUELS = ["peat", "charcoal"]
+ELECTRIC_FUEL_TYPES = ["electricity", "renewable"]
 
 
 class ManureManagementTypes(Enum):
