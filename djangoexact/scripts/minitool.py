@@ -128,33 +128,6 @@ class LivestockData(BaseData):
 
 @dataclass
 class GrasslandData(BaseData):
-    """
-    class Grassland(LandModuleFixed, SingleBiomassModule, AboveBelowGroundBiomassModule):
-    grassland_management_type_start = models.ForeignKey(GrasslandManagementType, on_delete=models.CASCADE, related_name="%(class)s_grassland_management_type_start", null=True, verbose_name=_("grassland_management_type_start"))
-    grassland_management_type_w = models.ForeignKey(GrasslandManagementType, on_delete=models.CASCADE, related_name="%(class)s_grassland_management_type_w", null=True, verbose_name=_("grassland_management_type_w"))
-    grassland_management_type_wo = models.ForeignKey(GrasslandManagementType, on_delete=models.CASCADE, related_name="%(class)s_grassland_management_type_wo", null=True, verbose_name=_("grassland_management_type_wo"))
-
-    is_fire_used_start = models.BooleanField(default=False, verbose_name=_("is_fire_used_start"))
-    is_fire_used_w = models.BooleanField(default=False, verbose_name=_("is_fire_used_w"))
-    is_fire_used_wo = models.BooleanField(default=False, verbose_name=_("is_fire_used_wo"))
-    is_fire_used_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_is_fire_used_thread")
-
-    fire_periodicity_start = models.FloatField(null=True, blank=True, default=0, verbose_name=_("fire_periodicity_start"))
-    fire_periodicity_w = models.FloatField(null=True, blank=True, default=0, verbose_name=_("fire_periodicity_w"))
-    fire_periodicity_wo = models.FloatField(null=True, blank=True, default=0, verbose_name=_("fire_periodicity_wo"))
-    fire_periodicity_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_fire_periodicity_thread")
-
-    fire_impact_start = models.FloatField(null=True, blank=True, default=0, verbose_name=_("fire_impact_start"))
-    fire_impact_w = models.FloatField(null=True, blank=True, default=0, verbose_name=_("fire_impact_w"))
-    fire_impact_wo = models.FloatField(null=True, blank=True, default=0, verbose_name=_("fire_impact_wo"))
-    fire_impact_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_fire_impact_thread")
-
-    yield_start = models.FloatField(null=True, blank=True, verbose_name=_("yield_start"))
-    yield_w = models.FloatField(null=True, blank=True, verbose_name=_("yield_w"))
-    yield_wo = models.FloatField(null=True, blank=True, verbose_name=_("yield_wo"))
-    yield_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_yield_thread")
-    """
-
     grassland_management_type_start: str = None
     grassland_management_type_w: str = None
     grassland_management_type_wo: str = None
