@@ -1,14 +1,21 @@
 import pandas as pd
 from dataclasses import dataclass
 import os
-
+import api.tests.factories as factories
+import api.calculators as calculators
 import api.models as models
+import logging
 
 
 def get_results(model: models.Module):
     rows = model.objects.all()
     rows = filter(lambda x: x.get_cached_results(), rows)
     return rows
+
+
+# TODO: Without must become business as usual, as in without = start
+# NOTE: Permutations are NOT inter-module, they are intra-module
+# NOTE: Results should be displayed as intra-permutation difference. So for example "high c input - low c input", "high c input - without c input", "low c input - without c input"
 
 
 @dataclass
@@ -23,7 +30,8 @@ class BaseData:
         self.climate = self.module.activity.climate_t2.name if self.module.activity.climate_t2 else self.module.activity.project.climate.name
         self.moisture = self.module.activity.moisture_t2.name if self.module.activity.moisture_t2 else self.module.activity.project.moisture.name
         self.soil_type = self.module.activity.soil_type_t2.name if self.module.activity.soil_type_t2 else self.module.activity.project.soil_type.name
-        self.total = self.module.get_cached_results().get("total_w", 0) + self.module.get_cached_results().get("total_wo", 0)
+        self.total = 0
+        # self.total = self.module.get_cached_results().get("total_w", 0) + self.module.get_cached_results().get("total_wo", 0)
 
     def to_dict(self):
         return {
@@ -153,23 +161,23 @@ class GrasslandData(BaseData):
         self.module: models.Grassland
         self.grassland_management_type_start = self.module.grassland_management_type_start.name if self.module.grassland_management_type_start else None
         self.grassland_management_type_w = self.module.grassland_management_type_w.name if self.module.grassland_management_type_w else None
-        self.grassland_management_type_wo = self.module.grassland_management_type_wo.name if self.module.grassland_management_type_wo else None
+        self.grassland_management_type_wo = self.grassland_management_type_start
 
         self.is_fire_used_start = self.module.is_fire_used_start
         self.is_fire_used_w = self.module.is_fire_used_w
-        self.is_fire_used_wo = self.module.is_fire_used_wo
+        self.is_fire_used_wo = self.is_fire_used_start
 
         self.fire_periodicity_start = self.module.fire_periodicity_start
         self.fire_periodicity_w = self.module.fire_periodicity_w
-        self.fire_periodicity_wo = self.module.fire_periodicity_wo
+        self.fire_periodicity_wo = self.fire_impact_start
 
         self.fire_impact_start = self.module.fire_impact_start
         self.fire_impact_w = self.module.fire_impact_w
-        self.fire_impact_wo = self.module.fire_impact_wo
+        self.fire_impact_wo = self.fire_impact_start
 
         self.yield_start = self.module.yield_start
         self.yield_w = self.module.yield_w
-        self.yield_wo = self.module.yield_wo
+        self.yield_wo = self.yield_start
 
     def to_dict(self):
         return {
@@ -218,14 +226,81 @@ def build_data(module):
 
 
 def run():
-    for model in [models.AnnualCropland, models.Livestock, models.Grassland]:
-        data = [build_data(row) for row in get_results(model)]
-        print(f"Total {model.__name__} rows: {len(data)}")
+    # for model in [models.AnnualCropland, models.Livestock, models.Grassland]:
+    #     data = [build_data(row) for row in get_results(model)]
+    #     print(f"Total {model.__name__} rows: {len(data)}")
 
-        df, result = compute_data(data)
-        print(result)
+    #     df, result = compute_data(data)
+    #     print(result)
 
-        # Save the data to a csv file
-        df.to_csv(os.path.join(os.path.dirname(__file__), "minitool", f"{model.__name__}.csv"), index=False)
+    #     # Save the data to a csv file
+    #     df.to_csv(os.path.join(os.path.dirname(__file__), "minitool", f"{model.__name__}.csv"), index=False)
 
-        print("\n\n")
+    #     print("\n\n")
+
+    logging.getLogger().setLevel(logging.CRITICAL)
+    print("Running script without noisy logging...")
+
+    climates = models.Climate.objects.all()
+    moistures = models.Moisture.objects.all()
+    soil_types = models.SoilType.objects.all()
+    countries = models.Country.objects.filter(region__isnull=False).all()
+
+    grassland_management_types = models.GrasslandManagementType.objects.all()
+    is_fire_used = [True, False]
+    fire_periodicities = [1]
+    fire_impacts = [1, 0]
+    yields = [1]
+
+    data = []
+
+    import itertools
+    from tqdm import tqdm
+
+    permutations_list = list(itertools.product(grassland_management_types, is_fire_used, fire_periodicities, fire_impacts, yields, climates, moistures, soil_types, countries))
+
+    data = []
+    for combo in tqdm(permutations_list, desc="Building Grassland permutations"):
+        (grassland_management_type, is_fire_used_val, fire_periodicity, fire_impact, yield_val, climate, moisture, soil_type, country) = combo
+
+        p = factories.ProjectFactory.build(
+            climate=climate,
+            moisture=moisture,
+            soil_type=soil_type,
+            country=country,
+        )
+        a = factories.ActivityFactory.build(project=p)
+
+        module = factories.GrasslandFactory.build(
+            activity=a,
+            grassland_management_type_start=grassland_management_type,
+            grassland_management_type_w=grassland_management_type,
+            grassland_management_type_wo=grassland_management_type,
+            is_fire_used_start=is_fire_used_val,
+            is_fire_used_w=is_fire_used_val,
+            is_fire_used_wo=is_fire_used_val,
+            fire_periodicity_start=fire_periodicity,
+            fire_periodicity_w=fire_periodicity,
+            fire_periodicity_wo=fire_periodicity,
+            fire_impact_start=fire_impact,
+            fire_impact_w=fire_impact,
+            fire_impact_wo=fire_impact,
+            yield_start=yield_val,
+            yield_w=yield_val,
+            yield_wo=yield_val,
+        )
+
+        try:
+            balance = calculators.CalculatorFactory().calculate_result(module)[0][2]
+        except:
+            continue
+
+        module = build_data(module)
+        module["total"] = balance
+
+        data.append(module)
+
+    df, result = compute_data(data)
+    print(result)
+
+    print(f"Total Grassland rows: {len(data)}")
