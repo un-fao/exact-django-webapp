@@ -227,3 +227,5 @@ def run():
 
         # Save the data to a csv file
         df.to_csv(os.path.join(os.path.dirname(__file__), "minitool", f"{model.__name__}.csv"), index=False)
+
+        print("\n\n")
