@@ -319,11 +319,11 @@ def process_combinations_grassland(combo):
         fire_impact_w,
         yield_start,
         yield_w,
-        climate,
-        moisture,
+        climate_moisture,
         soil_type,
         region,
     ) = combo
+    climate, moisture = climate_moisture
 
     p = factories.ProjectFactory.build(
         climate=climate,
@@ -379,11 +379,11 @@ def process_combinations_livestock(combo):
         livestock_production_type_w,
         heads_number_start,
         heads_number_w,
-        climate,
-        moisture,
+        climate_moisture,
         soil_type,
         region,
     ) = combo
+    climate, moisture = climate_moisture
 
     p = factories.ProjectFactory.build(
         climate=climate,
@@ -438,15 +438,15 @@ def process_combinations_annualcropland(combo):
         organic_input_type_w,
         residue_management_type_start,
         residue_management_type_w,
-        climate,
-        moisture,
+        climate_moisture,
         soil_type,
         region,
     ) = combo
+    climate, moisture = climate_moisture
 
     p = factories.ProjectFactory.build(
         climate=climate,
-        moisture=climate.moistures.order_by("?").first(),
+        moisture=moisture,
         soil_type=soil_type,
         country=region.countries.order_by("?").first(),
     )
@@ -492,15 +492,15 @@ def process_combinations_floodedrice(combo):
         water_management_type_after_cultivation_w,
         organic_amendment_type_start,
         organic_amendment_type_w,
-        climate,
-        moisture,
+        climate_moisture,
         soil_type,
         region,
     ) = combo
+    climate, moisture = climate_moisture
 
     p = factories.ProjectFactory.build(
         climate=climate,
-        moisture=climate.moistures.order_by("?").first(),
+        moisture=moisture,
         soil_type=soil_type,
         country=region.countries.order_by("?").first(),
     )
@@ -525,8 +525,6 @@ def process_combinations_floodedrice(combo):
     try:
         balance = calculators.CalculatorFactory().calculate_result(module)[0][2]
     except Exception as e:
-        logging.critical(e)
-        globals()["errors"] += 1
         return None
 
     module = build_data(module)
@@ -549,21 +547,24 @@ def chunked_product(*iterables, chunk_size=1000):
 
 def compute_permutations(fields: dict, model, chunk_size=10000, stop_at=None):
     import api.models as models
-    import json
-    import numpy as np
     import math
+
+    active_climates = models.Climate.objects.filter(is_active=True).all()
+    climate_moistures = []
+    for c in active_climates:
+        for m in c.moistures.all():
+            climate_moistures.append((c, m))
 
     fields.update(
         {
-            "climates": models.Climate.objects.filter(is_active=True).all(),
-            "moistures": models.Moisture.objects.all(),
+            "climate_moistures": climate_moistures,
             "soil_types": models.SoilType.objects.filter(is_coastal=False).all(),
             "region": models.Region.objects.all(),
         }
     )
 
     print(f"Computing permutations for {model.__name__}...")
-    print(f"Fields: {json.dumps({k: len(v) for k, v in fields.items()}, indent=2)}")
+    # print(f"Fields: {json.dumps({k: len(v) for k, v in fields.items()}, indent=2)}")
 
     combiner_function = globals()[f"process_combinations_{model.__name__.lower()}"]
 
@@ -639,12 +640,12 @@ def run():
     # --- Parent process has Django, so we can safely import models here. ---
     import api.models as models
 
-    ANNUAL_CROPLAND = True
+    ANNUAL_CROPLAND = False
     FLOODED_RICE = False
-    GRASSLAND = False
-    LIVESTOCK = False
+    GRASSLAND = True
+    LIVESTOCK = True
 
-    MAX_ROWS = 1000
+    MAX_ROWS = 10000
 
     if GRASSLAND:
         compute_permutations(
