@@ -105,3 +105,4 @@ djangoexact/djangoexact/.env.production
 djangoexact/djangoexact/.env.review
 pyproject.toml
 djangoexact/scripts/minitool/
+djangoexact/djangoexact/.env.test
