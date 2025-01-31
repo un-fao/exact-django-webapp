@@ -1028,40 +1028,6 @@ for i, row in enumerate(df_dict2):
             value=parse_csv_number(row[df_headers2[j]]),
         )
 
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "IrrigationPhaseData.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers = df.columns.values.tolist()
-df_dict = df.to_dict("records")
-
-for i, row in enumerate(df_dict):
-    fuel_type = FuelType.objects.get(
-        name__iexact=sanitize(row["fuel_type"]),
-    )
-
-    print(
-        fuel_type,
-        row["emission_factor"],
-        row["calorific_value"],
-        row["co2_emissions"],
-        row["ch4_emissions"],
-        row["n2o_emissions"],
-        row["density"],
-    )
-
-    data = IrrigationPhaseData.objects.get(
-        fuel_type=fuel_type,
-        emission_factor=parse_csv_number(row["emission_factor"], nan_value=None),
-        calorific_value=parse_csv_number(row["calorific_value"], nan_value=None),
-        co2_emissions=parse_csv_number(row["co2_emissions"], nan_value=None),
-        ch4_emissions=parse_csv_number(row["ch4_emissions"], nan_value=None),
-        n2o_emissions=parse_csv_number(row["n2o_emissions"], nan_value=None),
-        density=parse_csv_number(row["density"], nan_value=None),
-    )
-
 PerennialMaxAGB.objects.all().delete()
 
 
@@ -4616,6 +4582,43 @@ def add_or_replace_application_parameters():
             print(f"Created {name} with value {value} and unit {unit}")
 
 
+def delete_and_import_irrigation_phase_data():
+    log.debug("Deleting all IrrigationPhaseData objects...")
+    IrrigationPhaseData.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "IrrigationPhaseData.csv"),
+        header=0,
+        sep=";",
+    )
+
+    for i, row in df.iterrows():
+        fuel_type = FuelType.objects.get(
+            name__iexact=sanitize(row["fuel_type"]),
+            fuel_use_type__name__iexact="stationary",
+        )
+
+        print(
+            fuel_type,
+            row["emission_factor"],
+            row["calorific_value"],
+            row["co2_emissions"],
+            row["ch4_emissions"],
+            row["n2o_emissions"],
+            row["density"],
+        )
+
+        data = IrrigationPhaseData.objects.create(
+            fuel_type=fuel_type,
+            emission_factor=parse_csv_number(row["emission_factor"], nan_value=None),
+            calorific_value=parse_csv_number(row["calorific_value"], nan_value=None),
+            co2_emissions=parse_csv_number(row["co2_emissions"], nan_value=None),
+            ch4_emissions=parse_csv_number(row["ch4_emissions"], nan_value=None),
+            n2o_emissions=parse_csv_number(row["n2o_emissions"], nan_value=None),
+            density=parse_csv_number(row["density"], nan_value=None),
+        )
+
+
 def run():
     import os
 
@@ -4624,20 +4627,22 @@ def run():
 
     if app_mode == "production":
         # TODO: Run in production
-        # import_definitions.import_definitions()
-        # rename_solar_fuel_type_to_renewable()
-        # assign_fuel_type_units()
-        # find_all_stroke_fuel_types_and_put_stroke_lowercase()
-        # add_or_replace_application_parameters()
+        import_definitions.import_definitions()
+        rename_solar_fuel_type_to_renewable()
+        assign_fuel_type_units()
+        find_all_stroke_fuel_types_and_put_stroke_lowercase()
+        add_or_replace_application_parameters()
+        delete_and_import_irrigation_phase_data()
         pass
 
     if app_mode == "review":
         # TODO: Run in review
-        # get_or_create_soil_types_and_update_info()
-        # delete_and_import_forest_total_biomass()
-        # delete_and_import_total_biomass_after_defo()
-        # find_all_stroke_fuel_types_and_put_stroke_lowercase()
-        # add_or_replace_application_parameters()
+        get_or_create_soil_types_and_update_info()
+        delete_and_import_forest_total_biomass()
+        delete_and_import_total_biomass_after_defo()
+        find_all_stroke_fuel_types_and_put_stroke_lowercase()
+        add_or_replace_application_parameters()
+        delete_and_import_irrigation_phase_data()
         pass
 
     if app_mode == "development":
@@ -4646,7 +4651,6 @@ def run():
 
     if app_mode == "test":
         # TODO: Run in test
-        # add_or_replace_application_parameters()
         pass
 
     return True

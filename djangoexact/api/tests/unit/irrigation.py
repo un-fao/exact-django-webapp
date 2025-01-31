@@ -23,16 +23,18 @@ class IrrigationTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         self.land_use_types = self.land_use_types.filter(module_types__class_name=self.ModuleClass.__name__, climates=self.project.climate, moistures=self.project.moisture, is_active=True)
 
         self.validated_data = {
-            "irrigation_system_type": models.IrrigationSystemType.objects.order_by("?").first().pk,
+            "irrigation_system_type": models.IrrigationSystemType.objects.filter(module_types__class_name="IrrigationSystem").exclude(name__in="Other").order_by("?").first().pk,
             "ha_start": FuzzyFloat(0, 1000).fuzz(),
             "ha_w": FuzzyFloat(0, 1000).fuzz(),
             "ha_wo": FuzzyFloat(0, 1000).fuzz(),
-            "ef_t2_start": FuzzyFloat(0, 1000).fuzz(),
-            "ef_t2_w": FuzzyFloat(0, 1000).fuzz(),
-            "ef_t2_wo": FuzzyFloat(0, 1000).fuzz(),
+            # "ef_t2_start": FuzzyFloat(0, 1000).fuzz(),
+            # "ef_t2_w": FuzzyFloat(0, 1000).fuzz(),
+            # "ef_t2_wo": FuzzyFloat(0, 1000).fuzz(),
         }
 
         self.edit_module(self.submodules[0], self.user, self.validated_data)
+
+        self.validated_data["irrigation_system_type"] = models.IrrigationSystemType.objects.filter(module_types__class_name="IrrigationPhase").exclude(name__in="Other").order_by("?").first().pk
 
         fuel_data = copy.deepcopy(self.validated_data)
         fuel_data["fuel_type_start"] = models.FuelType.objects.order_by("?").first().pk
@@ -59,7 +61,6 @@ class IrrigationTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         self.module.refresh_from_db()
 
     def test_results_influenced_by_tier_2_values(self):
-
         results_view = self.module_viewset.as_view({"get": "results"})
         request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
 
@@ -87,7 +88,6 @@ class IrrigationTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         self.assertNotEqual(prev_balance, response.data["balance"])
 
     def test_modify(self):
-
         validated_data = copy.deepcopy(self.validated_data)
         validated_data["ha_start"] = FuzzyFloat(0, 1000).fuzz()
         response = self.edit_module(self.submodules[0], self.user, validated_data)
@@ -96,7 +96,6 @@ class IrrigationTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         self.assertEqual(response.data["status"]["name"], "READY")
 
     def test_patch_to_not_ready(self):
-
         validated_data = copy.deepcopy(self.validated_data)
         validated_data["ha_start"] = None
         response = self.edit_module(self.submodules[0], self.user, validated_data)
@@ -105,7 +104,6 @@ class IrrigationTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         self.assertEqual(response.data["status"]["name"], "EMPTY")
 
     def test_calculate_results(self):
-
         view = self.module_viewset.as_view({"get": "results"})
         request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
 
@@ -117,7 +115,6 @@ class IrrigationTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         self.assertTrue("balance" in response.data)
 
     def test_get_defaults(self):
-
         view = self.module_viewset.as_view({"get": "defaults"})
         request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-defaults", args=[self.module.pk]), format="json")
 
@@ -129,7 +126,6 @@ class IrrigationTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         self.assertTrue(isinstance(response.data, dict))
 
     def test_parent_not_ready_if_submodule_not_ready(self):
-
         log.info("START - Testing parent not ready if submodule not ready")
 
         validated_data = copy.deepcopy(self.validated_data)
