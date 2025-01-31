@@ -104,6 +104,7 @@ from .serializers import (
     ProjectFileReadSerializer,
     APIStatusSerializer,
     FuelTypeSerializer,
+    ProjectLockHolderInformationSerializer,
 )
 
 from firebase_admin import auth as firebase_admin_auth
@@ -212,7 +213,6 @@ def warmup(request):
 
 class BaseWiewSet(viewsets.GenericViewSet):
     def get_queryset(self):
-
         # If list operation, filter out inactive objects, unless ?filter_inactive=true
         if self.action == "list" and not self.request.query_params.get("filter_inactive"):
             try:
@@ -231,6 +231,7 @@ class AuthenticatedViewSet(BaseWiewSet):
 class PublicViewSet(BaseWiewSet):
     permission_classes = [permissions.AllowAny]
 
+
 class DynamicFilterViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = [api_filters.DynamicSearchAndFilterBackend]
 
@@ -246,6 +247,7 @@ class DynamicFilterViewSet(viewsets.ReadOnlyModelViewSet):
     )
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
+
 
 class GroupViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = Group.objects.all()
@@ -451,10 +453,10 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 description="Show archived projects",
                 type=openapi.TYPE_BOOLEAN,
             ),
-        ], 
+        ],
         responses={
-            404: "Project not found", 
-            403: "Selected user does not have permission to view projects", 
+            404: "Project not found",
+            403: "Selected user does not have permission to view projects",
             200: ReadProjectSerializer,
             201: ProjectSummarySerializer,
         },
@@ -513,7 +515,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 description="Return cached results",
                 type=openapi.TYPE_BOOLEAN,
             ),
-        ], 
+        ],
         responses={404: "Project not found", 403: "Selected user does not have permission to view project results", 200: ProjectResultSerializer},
     )
     def results(self, request, pk=None):
@@ -571,7 +573,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not utils.has_project_permission("change_project", user, project):
             logging.error("Selected user does not have permission to update the project")
             return utils.ErrorResponse("Selected user does not have permission to update the project", status=http_status.HTTP_403_FORBIDDEN)
-        
+
         if project.is_archived:
             return utils.ErrorResponse("Archived projects cannot be updated", status=http_status.HTTP_400_BAD_REQUEST)
 
@@ -594,7 +596,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not utils.has_project_permission("change_project", user, project):
             logging.error("Selected user does not have permission to update the project")
             return utils.ErrorResponse("Selected user does not have permission to update the project", status=http_status.HTTP_403_FORBIDDEN)
-        
+
         if project.is_archived:
             return utils.ErrorResponse("Archived projects cannot be updated", status=http_status.HTTP_400_BAD_REQUEST)
 
@@ -632,7 +634,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not project.is_ready():
             logging.error("Project is not ready")
             return utils.ErrorResponse("To get a report for a project, all activities must have been completed.", status=http_status.HTTP_400_BAD_REQUEST)
-        
+
         selected_activities = request.query_params.get("activities", "").split(",")
         if selected_activities == [""]:
             selected_activities = None
@@ -729,6 +731,19 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
+    @action(detail=True, methods=["get"])
+    def lock(self, request, pk=None):
+        project: Project = self.get_object()
+
+        if not utils.has_project_permission("view_project", self.request.user, project):
+            logging.error("Selected user does not have permission to view the project")
+            return utils.ErrorResponse("Selected user does not have permission to view the project", status=http_status.HTTP_403_FORBIDDEN)
+
+        serializer = ProjectLockHolderInformationSerializer(project, many=False)
+
+        return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+
+
 class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = ProjectMembership.objects.all()
     serializer_class = ProjectMembershipSerializer
@@ -795,7 +810,7 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not utils.has_project_permission("add_projectmembership", self.request.user, project):
             logging.error("Selected user does not have permission to add project memberships")
             return utils.ErrorResponse("Selected user does not have permission to add project memberships", status=http_status.HTTP_403_FORBIDDEN)
-        
+
         if project.is_archived:
             return utils.ErrorResponse("Archived projects cannot have memberships added", status=http_status.HTTP_400_BAD_REQUEST)
 
@@ -898,7 +913,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not utils.has_project_permission("add_projectinvitation", self.request.user, project):
             logging.error("Selected user does not have permission to invite users to the project")
             return utils.ErrorResponse("Selected user does not have permission to invite users to the project", status=http_status.HTTP_403_FORBIDDEN)
-        
+
         if project.is_archived:
             return utils.ErrorResponse("Archived projects cannot have invitations sent", status=http_status.HTTP_400_BAD_REQUEST)
 
@@ -946,7 +961,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not utils.has_project_permission("change_projectinvitation", self.request.user, invitation.project):
             logging.error("Selected user does not have permission to update invitations")
             return utils.ErrorResponse("Selected user does not have permission to update invitations", status=http_status.HTTP_403_FORBIDDEN)
-        
+
         if invitation.project.is_archived:
             return utils.ErrorResponse("Archived projects cannot have invitations updated", status=http_status.HTTP_400_BAD_REQUEST)
 
@@ -1021,7 +1036,6 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     )
     @action(detail=False, methods=["get"], url_path="accept/(?P<token>[0-9a-f-]+)", permission_classes=[permissions.AllowAny])
     def accept(self, request, token=None):
-
         if not token:
             return utils.ErrorResponse("Token not provided", status=http_status.HTTP_400_BAD_REQUEST)
 
@@ -1073,7 +1087,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not utils.has_project_permission("change_activity", self.request.user, activity.project):
             logging.error("Selected user does not have permission to update activities in the project")
             return utils.ErrorResponse("Selected user does not have permission to update activities in the project", status=http_status.HTTP_403_FORBIDDEN)
-        
+
         if activity.project.is_archived:
             return utils.ErrorResponse("Archived projects cannot have activities updated", status=http_status.HTTP_400_BAD_REQUEST)
 
@@ -1096,7 +1110,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not utils.has_project_permission("change_activity", self.request.user, activity.project):
             logging.error("Selected user does not have permission to update activities in the project")
             return utils.ErrorResponse("Selected user does not have permission to update activities in the project", status=http_status.HTTP_403_FORBIDDEN)
-        
+
         if activity.project.is_archived:
             return utils.ErrorResponse("Archived projects cannot have activities updated", status=http_status.HTTP_400_BAD_REQUEST)
 
@@ -1125,7 +1139,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not utils.has_project_permission("add_activity", self.request.user, serializer.validated_data["project"]):
             logging.error("Selected user does not have permission to add activities to the project")
             return utils.ErrorResponse("Selected user does not have permission to add activities to the project", status=http_status.HTTP_403_FORBIDDEN)
-        
+
         if serializer.validated_data["project"].is_archived:
             return utils.ErrorResponse("Archived projects cannot have activities added", status=http_status.HTTP_400_BAD_REQUEST)
 
@@ -1227,7 +1241,6 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         modules = []
         # TODO: Make a serializer for this
         for module in activity.modules:
-
             if not module or (module.status and module.status.name_en != "READY"):
                 continue
 
@@ -1289,7 +1302,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not utils.has_project_permission("add_activity", self.request.user, project):
             logging.error("Selected user does not have permission to add activities to the project")
             return utils.ErrorResponse("Selected user does not have permission to add activities to the project", status=http_status.HTTP_403_FORBIDDEN)
-        
+
         if project.is_archived:
             return utils.ErrorResponse("Archived projects cannot have activities added", status=http_status.HTTP_400_BAD_REQUEST)
 
@@ -1367,7 +1380,7 @@ class NoteViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not utils.has_project_permission("add_note", self.request.user, module.project):
             logging.error("Selected user does not have permission to add notes to the project")
             return utils.ErrorResponse("Selected user does not have permission to add notes to the project", status=http_status.HTTP_403_FORBIDDEN)
-        
+
         if module.project.is_archived:
             return utils.ErrorResponse("Archived projects cannot have notes added", status=http_status.HTTP_400_BAD_REQUEST)
 
@@ -1383,7 +1396,7 @@ class NoteViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not utils.has_project_permission("change_note", self.request.user, note.project):
             logging.error("Selected user does not have permission to update notes in the project")
             return utils.ErrorResponse("Selected user does not have permission to update notes in the project", status=http_status.HTTP_403_FORBIDDEN)
-        
+
         if note.project.is_archived:
             return utils.ErrorResponse("Archived projects cannot have notes updated", status=http_status.HTTP_400_BAD_REQUEST)
 
@@ -1406,7 +1419,7 @@ class NoteViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not utils.has_project_permission("change_note", self.request.user, note.project):
             logging.error("Selected user does not have permission to update notes in the project")
             return utils.ErrorResponse("Selected user does not have permission to update notes in the project", status=http_status.HTTP_403_FORBIDDEN)
-        
+
         if note.project.is_archived:
             return utils.ErrorResponse("Archived projects cannot have notes updated", status=http_status.HTTP_400_BAD_REQUEST)
 
@@ -1452,6 +1465,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         comments = Comment.objects.filter(thread__id=thread_id, parent=None).all()
         serializer = CommentSerializer(comments, many=True)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+
 
 class ModuleTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     """
@@ -1551,7 +1565,7 @@ def generic_module_viewset(model: Module):
             if not utils.has_project_permission("can_change_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to update this module in the project")
                 return utils.ErrorResponse("Selected user does not have permission to update this module in the project", status=http_status.HTTP_403_FORBIDDEN)
-            
+
             if activity.project.is_archived:
                 return utils.ErrorResponse("Archived projects cannot have modules updated", status=http_status.HTTP_400_BAD_REQUEST)
 
@@ -1582,7 +1596,7 @@ def generic_module_viewset(model: Module):
             if not utils.has_project_permission("can_change_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to update this module in the project")
                 return utils.ErrorResponse("Selected user does not have permission to update this module in the project", status=http_status.HTTP_403_FORBIDDEN)
-            
+
             if activity.project.is_archived:
                 return utils.ErrorResponse("Archived projects cannot have modules updated", status=http_status.HTTP_400_BAD_REQUEST)
 
@@ -1626,7 +1640,7 @@ def generic_module_viewset(model: Module):
             if not utils.has_project_permission("can_create_modules", self.request.user, activity.project):
                 logging.error("Selected user does not have permission to add this module to the project")
                 return utils.ErrorResponse("Selected user does not have permission to add this module to the project", status=http_status.HTTP_403_FORBIDDEN)
-            
+
             if activity.project.is_archived:
                 return utils.ErrorResponse("Archived projects cannot have modules added", status=http_status.HTTP_400_BAD_REQUEST)
 
@@ -1644,7 +1658,10 @@ def generic_module_viewset(model: Module):
 
             return Response(read_serializer.data, status=http_status.HTTP_201_CREATED)
 
-        @swagger_auto_schema(manual_parameters=[activity_id, module_type, page_size, page], responses={400: "Bad request", 403: "Selected user does not have permission to view the module", 200: get_module_serializer(model)})
+        @swagger_auto_schema(
+            manual_parameters=[activity_id, module_type, page_size, page],
+            responses={400: "Bad request", 403: "Selected user does not have permission to view the module", 200: get_module_serializer(model)},
+        )
         def list(self, request):
             """
             Lists the module(s) of a given activity
@@ -1676,7 +1693,13 @@ def generic_module_viewset(model: Module):
         @action(detail=True, methods=["get"], url_path="results")
         @swagger_auto_schema(
             manual_parameters=[
-                openapi.Parameter("aggregate", openapi.IN_QUERY, description="Aggregate results by", type=openapi.TYPE_STRING, enum=[BreakdownTypes.TOTAL.value, BreakdownTypes.ACTIVITY.value, BreakdownTypes.GAS.value, BreakdownTypes.ACTIVITY_GAS.value]),
+                openapi.Parameter(
+                    "aggregate",
+                    openapi.IN_QUERY,
+                    description="Aggregate results by",
+                    type=openapi.TYPE_STRING,
+                    enum=[BreakdownTypes.TOTAL.value, BreakdownTypes.ACTIVITY.value, BreakdownTypes.GAS.value, BreakdownTypes.ACTIVITY_GAS.value],
+                ),
                 openapi.Parameter("cached", openapi.IN_QUERY, description="Use cached results", type=openapi.TYPE_BOOLEAN),
             ],
             responses={400: "Bad request", 403: "Selected user does not have permission to view module results", 200: DynamicResultSerializer},
@@ -1707,7 +1730,6 @@ def generic_module_viewset(model: Module):
                     return utils.ErrorResponse("Module is not ready. Cannot calculate result.")
 
             try:
-
                 aggregate_by = BreakdownTypes(request.query_params.get("aggregate", BreakdownTypes.TOTAL))
                 module_results = module.get_cached_results(by=aggregate_by)
                 use_cached_results = request.query_params.get("cached", "true") == "true"
@@ -1744,7 +1766,15 @@ def generic_module_viewset(model: Module):
                     }
                     results_by_activity_gas = DynamicResultSerializer(results_by_activity_gas, aggregate_by=BreakdownTypes.ACTIVITY_GAS).data
 
-                    module_results = results_total if aggregate_by == BreakdownTypes.TOTAL else results_by_activity if aggregate_by == BreakdownTypes.ACTIVITY else results_by_gas if aggregate_by == BreakdownTypes.GAS else results_by_activity_gas
+                    module_results = (
+                        results_total
+                        if aggregate_by == BreakdownTypes.TOTAL
+                        else results_by_activity
+                        if aggregate_by == BreakdownTypes.ACTIVITY
+                        else results_by_gas
+                        if aggregate_by == BreakdownTypes.GAS
+                        else results_by_activity_gas
+                    )
                     module.cache_results(results_total, results_by_activity, results_by_gas, results_by_activity_gas)
 
                 serializer = DynamicResultSerializer(module_results, aggregate_by=aggregate_by)
@@ -1849,13 +1879,11 @@ def public_generic_viewset(model: Model):
 
 
 class FieldDefinitionViewSet(viewsets.ViewSet):
-
     @swagger_auto_schema(
         request_body=FieldDefinitionSerializer,
         responses={400: "Bad request", 201: FieldDefinitionSerializer},
     )
     def create(self, request, *args, **kwargs):
-
         serializer = FieldDefinitionSerializer(data=request.data)
 
         if not serializer.is_valid():
@@ -1906,7 +1934,7 @@ class ProjectTagViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     ordering = ["name"]
 
     def get_serializer_context(self):
-        if getattr(self, 'swagger_fake_view', False):
+        if getattr(self, "swagger_fake_view", False):
             return {}
         context = super().get_serializer_context()
         project_id = self.kwargs.get("project_pk")
@@ -1952,6 +1980,7 @@ class ProjectTagViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         return Response(serializer.data, status=http_status.HTTP_200_OK)
 
+
 class ProjectFileAttachmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = ProjectFileAttachment.objects.all()
     serializer_class = ProjectFileUploadSerializer
@@ -1961,7 +1990,7 @@ class ProjectFileAttachmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     ordering = ["name"]
 
     def get_serializer_context(self):
-        if getattr(self, 'swagger_fake_view', False):
+        if getattr(self, "swagger_fake_view", False):
             return {}
         context = super().get_serializer_context()
         project_id = self.kwargs.get("project_pk")
@@ -1971,7 +2000,6 @@ class ProjectFileAttachmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
     @transaction.atomic
     def create(self, request):
-        
         project_id = request.data.get("project", None)
 
         if project_id is None:
@@ -2012,7 +2040,7 @@ class ProjectFileAttachmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         serializer = ProjectFileReadSerializer(queryset, many=True)
 
         return Response(serializer.data, status=http_status.HTTP_200_OK)
-    
+
     def retrieve(self, request, pk=None):
         attachment = get_object_or_404(ProjectFileAttachment, pk=pk)
 
@@ -2023,10 +2051,9 @@ class ProjectFileAttachmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         serializer = ProjectFileReadSerializer(attachment)
 
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
-    
+
     @action(detail=True, methods=["get"])
     def download(self, request, pk=None):
-
         attachment = get_object_or_404(ProjectFileAttachment, pk=pk)
 
         if not utils.has_project_permission("view_project", self.request.user, attachment.project):
@@ -2040,15 +2067,14 @@ class ProjectFileAttachmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         def file_iterator(blob):
             with blob.open("rb") as f:
                 for line in f:
-                    yield line        
+                    yield line
 
         response = HttpResponse(file_iterator(blob), content_type=blob.content_type)
         response["Content-Disposition"] = f"attachment; filename={attachment.name}"
 
         return response
-    
-    def destroy(self, request, pk=None):
 
+    def destroy(self, request, pk=None):
         attachment = get_object_or_404(ProjectFileAttachment, pk=pk)
 
         if not utils.has_project_permission("change_project", self.request.user, attachment.project):
@@ -2063,6 +2089,7 @@ class ProjectFileAttachmentViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         attachment.delete()
 
         return Response(status=http_status.HTTP_204_NO_CONTENT)
+
 
 class APIHealthView(views.APIView):
     permission_classes = [permissions.AllowAny]
@@ -2079,7 +2106,6 @@ class APIHealthView(views.APIView):
             if cached_status["is_under_maintenance"]:
                 status = http_status.HTTP_503_SERVICE_UNAVAILABLE
             return Response(cached_status, status=status)
-        
 
         try:
             api_status = APIHealth.objects.first()
@@ -2091,10 +2117,12 @@ class APIHealthView(views.APIView):
 
         cache.set(self.CACHE_KEY, serializer.data, self.CACHE_TIMEOUT_SECONDS)
         return Response(serializer.data, status=status)
-    
+
+
 class FuelTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet, DynamicFilterViewSet):
     queryset = FuelType.objects.all()
     serializer_class = FuelTypeSerializer
+
 
 class SoilTypeViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = SoilType.objects.all()
@@ -2112,19 +2140,19 @@ class SoilTypeViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
             ),
         ],
         responses={200: get_model_serializer(SoilType)(many=True)},
-        description="Retrieve a list of entries filtered by coastal status."
+        description="Retrieve a list of entries filtered by coastal status.",
     )
     def get_queryset(self):
         queryset = super().get_queryset()
 
-        if 'all' in self.request.query_params:
-            all = self.request.query_params.get('all', None)
-            if all == 'true':
+        if "all" in self.request.query_params:
+            all = self.request.query_params.get("all", None)
+            if all == "true":
                 return queryset
 
-        if 'active' not in self.request.query_params:
+        if "active" not in self.request.query_params:
             queryset = queryset.filter(active=True)
-        if 'is_coastal' not in self.request.query_params:
+        if "is_coastal" not in self.request.query_params:
             queryset = queryset.filter(is_coastal=False)
 
         return queryset
