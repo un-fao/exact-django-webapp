@@ -3531,17 +3531,15 @@ class ElectricityCalculator(BaseCalculator):
 
         self.module: Electricity
 
-        self.TRANSMISSION_LOSS = 0.1  # TODO: Add to database parameters
+        self.TRANSMISSION_LOSS = 0.1  # TODO: Already available as ApplicationParameter
         self.electricity_ef_default: ipcc.ElectricityEmission = ipcc.ElectricityEmission()
         self.electricity_ef_selected: DefaultValue = DefaultValue()
 
     def get_defaults(self, calculate=False) -> dict:
         super().get_defaults(calculate)
 
-        country = self.module.country_t2 if self.module.country_t2 else self.country
-
         try:
-            self.electricity_ef_default = ipcc.ElectricityEmission.objects.get(country=country)
+            self.electricity_ef_default = ipcc.ElectricityEmission.objects.get(country=self.country)
 
             if self.module.ef_source.name == "Operating Margin":
                 self.electricity_ef_selected.value = self.electricity_ef_default.operating_margin
@@ -3551,7 +3549,7 @@ class ElectricityCalculator(BaseCalculator):
         except ipcc.ElectricityEmission.DoesNotExist:
             missing_scenarios = utils.find_empty_scenarios(self.module, "electricity_ef_t2")
             if missing_scenarios:
-                raise ValueError(f"Electricity Emission Factor for {self.country.name} does not exist. Please provide a tier 2 value for scenarios: {', '.join(missing_scenarios)}")
+                raise ValueError(f"Electricity Emission Factor for {self.country} does not exist. Please provide a tier 2 value for scenarios: {', '.join(missing_scenarios)}")
 
     def calculate(self) -> list[Result]:
         """

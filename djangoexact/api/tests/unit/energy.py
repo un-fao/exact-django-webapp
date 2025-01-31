@@ -26,23 +26,18 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
             "quantity_consumed_per_year_start": FuzzyFloat(0, 1000).fuzz(),
             "quantity_consumed_per_year_w": FuzzyFloat(0, 1000).fuzz(),
             "quantity_consumed_per_year_wo": FuzzyFloat(0, 1000).fuzz(),
-            
-            "electricity_ef_t2_start": FuzzyFloat(0, 10).fuzz(),
-            "electricity_ef_t2_w": FuzzyFloat(0, 10).fuzz(),
-            "electricity_ef_t2_wo": FuzzyFloat(0, 10).fuzz(),
-
-            "energy_ef_co2_t2_start": FuzzyFloat(0, 10).fuzz(),
-            "energy_ef_ch4_t2_start": FuzzyFloat(0, 10).fuzz(),
-            "energy_ef_n2o_t2_start": FuzzyFloat(0, 10).fuzz(),
-
-            "energy_ef_co2_t2_w": FuzzyFloat(0, 10).fuzz(),
-            "energy_ef_ch4_t2_w": FuzzyFloat(0, 10).fuzz(),
-            "energy_ef_n2o_t2_w": FuzzyFloat(0, 10).fuzz(),
-            
-            "energy_ef_co2_t2_wo": FuzzyFloat(0, 10).fuzz(),
-            "energy_ef_ch4_t2_wo": FuzzyFloat(0, 10).fuzz(),
-            "energy_ef_n2o_t2_wo": FuzzyFloat(0, 10).fuzz(),
-
+            # "electricity_ef_t2_start": FuzzyFloat(0, 10).fuzz(),
+            # "electricity_ef_t2_w": FuzzyFloat(0, 10).fuzz(),
+            # "electricity_ef_t2_wo": FuzzyFloat(0, 10).fuzz(),
+            # "energy_ef_co2_t2_start": FuzzyFloat(0, 10).fuzz(),
+            # "energy_ef_ch4_t2_start": FuzzyFloat(0, 10).fuzz(),
+            # "energy_ef_n2o_t2_start": FuzzyFloat(0, 10).fuzz(),
+            # "energy_ef_co2_t2_w": FuzzyFloat(0, 10).fuzz(),
+            # "energy_ef_ch4_t2_w": FuzzyFloat(0, 10).fuzz(),
+            # "energy_ef_n2o_t2_w": FuzzyFloat(0, 10).fuzz(),
+            # "energy_ef_co2_t2_wo": FuzzyFloat(0, 10).fuzz(),
+            # "energy_ef_ch4_t2_wo": FuzzyFloat(0, 10).fuzz(),
+            # "energy_ef_n2o_t2_wo": FuzzyFloat(0, 10).fuzz(),
         }
 
         self.edit_module(self.submodules[0], self.user, self.validated_data)
@@ -58,7 +53,6 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         self.module.refresh_from_db()
 
     def test_results_influenced_by_tier_2_values(self):
-
         results_view = self.module_viewset.as_view({"get": "results"})
         request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
 
@@ -86,7 +80,6 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         self.assertNotEqual(prev_balance, response.data["balance"])
 
     def test_modify(self):
-
         validated_data = copy.deepcopy(self.validated_data)
         validated_data["quantity_consumed_per_year_start"] = FuzzyFloat(0, 1000).fuzz()
         response = self.edit_module(self.submodules[0], self.user, validated_data)
@@ -95,7 +88,6 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         self.assertEqual(response.data["status"]["name"], "READY")
 
     def test_patch_to_not_ready(self):
-
         validated_data = copy.deepcopy(self.validated_data)
         validated_data["quantity_consumed_per_year_start"] = None
         response = self.edit_module(self.submodules[0], self.user, validated_data)
@@ -104,7 +96,6 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         self.assertEqual(response.data["status"]["name"], "EMPTY")
 
     def test_calculate_results(self):
-
         view = self.module_viewset.as_view({"get": "results"})
         request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
 
@@ -116,7 +107,6 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         self.assertTrue("balance" in response.data)
 
     def test_get_defaults(self):
-
         view = self.module_viewset.as_view({"get": "defaults"})
         request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-defaults", args=[self.module.pk]), format="json")
 
@@ -128,7 +118,6 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         self.assertTrue(isinstance(response.data, dict))
 
     def test_parent_not_ready_if_submodule_not_ready(self):
-
         log.info("START - Testing parent not ready if submodule not ready")
 
         validated_data = copy.deepcopy(self.validated_data)
