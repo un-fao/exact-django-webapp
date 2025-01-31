@@ -1028,93 +1028,6 @@ for i, row in enumerate(df_dict2):
             value=parse_csv_number(row[df_headers2[j]]),
         )
 
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "LiquidFuelTypes.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers = df.columns.values.tolist()
-df_dict = df.to_dict("records")
-
-for i, row in enumerate(df_dict):
-    macro_fuel_type = (
-        MacroFuelType.objects.get(name__iexact=sanitize(row["macro_fuel_type"]))
-        if row["macro_fuel_type"]
-        else None
-    )
-    fuel_use_type = (
-        FuelUseType.objects.get(name__iexact=sanitize(row["fuel_use_type"]))
-        if pd.notna(row["fuel_use_type"])
-        else None
-    )
-    fuel_type = (
-        FuelType.objects.get(
-            name__iexact=sanitize(row["fuel_type"]),
-            macro_type=macro_fuel_type,
-            fuel_use_type=fuel_use_type,
-        )
-        if row["fuel_type"]
-        else None
-    )
-
-    print(
-        fuel_type,
-        row["t_co2_eq"],
-        row["co2"],
-        row["ch4"],
-        row["n2o"],
-        row["density"],
-        row["net_calorific_value"],
-    )
-
-    EnergyDefaultEmissionFactor.objects.get(
-        fuel_type=fuel_type,
-        t_co2_eq=parse_csv_number(row["t_co2_eq"], nan_value=None),
-        co2=parse_csv_number(row["co2"], nan_value=None),
-        ch4=parse_csv_number(row["ch4"], nan_value=None),
-        n2o=parse_csv_number(row["n2o"], nan_value=None),
-        density=parse_csv_number(row["density"], nan_value=None),
-        net_calorific_value=parse_csv_number(
-            row["net_calorific_value"], nan_value=None
-        ),
-    )
-
-
-df = pd.read_csv(
-    os.path.join(os.path.dirname(__file__), "ipcc_data", "IrrigationPhaseData.csv"),
-    header=0,
-    sep=";",
-)
-
-df_headers = df.columns.values.tolist()
-df_dict = df.to_dict("records")
-
-for i, row in enumerate(df_dict):
-    fuel_type = FuelType.objects.get(
-        name__iexact=sanitize(row["fuel_type"]),
-    )
-
-    print(
-        fuel_type,
-        row["emission_factor"],
-        row["calorific_value"],
-        row["co2_emissions"],
-        row["ch4_emissions"],
-        row["n2o_emissions"],
-        row["density"],
-    )
-
-    data = IrrigationPhaseData.objects.get(
-        fuel_type=fuel_type,
-        emission_factor=parse_csv_number(row["emission_factor"], nan_value=None),
-        calorific_value=parse_csv_number(row["calorific_value"], nan_value=None),
-        co2_emissions=parse_csv_number(row["co2_emissions"], nan_value=None),
-        ch4_emissions=parse_csv_number(row["ch4_emissions"], nan_value=None),
-        n2o_emissions=parse_csv_number(row["n2o_emissions"], nan_value=None),
-        density=parse_csv_number(row["density"], nan_value=None),
-    )
-
 PerennialMaxAGB.objects.all().delete()
 
 
@@ -4221,7 +4134,6 @@ def import_irrigation_system_types():
 
 
 def delete_and_import_input_emission_factors():
-
     log.debug("Deleting all InputEmissionFactor models...")
     EnergyDefaultEmissionFactor.objects.all().delete()
 
@@ -4452,6 +4364,7 @@ def import_fuel_type_fuel_use_type_mapping():
         log.debug(fuel_type, fuel_use_type)
         FuelType.objects.create(name=fuel_type, fuel_use_type=fuel_use_type)
 
+
 def assign_fuel_type_units():
     df = pd.read_csv(
         os.path.join(os.path.dirname(__file__), "ipcc_data", "FuelType_Unit.csv"),
@@ -4467,8 +4380,8 @@ def assign_fuel_type_units():
             ft.unit = unit
             ft.save()
 
-def delete_and_import_total_biomass_after_defo():
 
+def delete_and_import_total_biomass_after_defo():
     annualcropland = LandUseType.objects.get(name__iexact="Annual Cropland")
     crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropland").all()
 
@@ -4489,7 +4402,6 @@ def delete_and_import_total_biomass_after_defo():
         region = Region.objects.get(name__iexact=row["region"])
 
         for j, header in enumerate(headers, start=3):
-
             if j == len(headers):
                 break
 
@@ -4534,8 +4446,8 @@ def delete_and_import_total_biomass_after_defo():
                 value=value,
             )
 
-def delete_and_import_forest_total_biomass():
 
+def delete_and_import_forest_total_biomass():
     annualcropland = LandUseType.objects.get(name__iexact="Annual Cropland")
     crops = LandUseType.objects.filter(module_types__class_name__iexact="AnnualCropland").all()
 
@@ -4556,7 +4468,6 @@ def delete_and_import_forest_total_biomass():
         region = Region.objects.get(name__iexact=sanitize(row["region"]))
 
         for j, header in enumerate(headers, start=3):
-
             if j == len(headers):
                 break
 
@@ -4593,6 +4504,7 @@ def delete_and_import_forest_total_biomass():
                 value=value,
             )
 
+
 def get_or_create_soil_types_and_update_info():
     """Import soil types from CSV and update their properties."""
     df = pd.read_csv(
@@ -4608,10 +4520,7 @@ def get_or_create_soil_types_and_update_info():
 
         print(f"Processing soil type: {name} (active={active}, coastal={is_coastal})")
 
-        soil_type, created = SoilType.objects.get_or_create(
-            name__iexact=name,
-            defaults={"name": name}
-        )
+        soil_type, created = SoilType.objects.get_or_create(name__iexact=name, defaults={"name": name})
 
         if not created:
             print(f"Updated existing soil type: {name}")
@@ -4622,24 +4531,126 @@ def get_or_create_soil_types_and_update_info():
         soil_type.is_coastal = is_coastal
         soil_type.save()
 
+
 def rename_solar_fuel_type_to_renewable():
     FuelType.objects.filter(name__iexact="Solar").update(name="Renewable")
 
-# TODO: Run in production
 
-# import_definitions.import_definitions()
-# rename_solar_fuel_type_to_renewable()
-# assign_fuel_type_units()
-
-# TODO: Run in review
-
-# get_or_create_soil_types_and_update_info()
-# delete_and_import_forest_total_biomass()
-# delete_and_import_total_biomass_after_defo()
-
-# TODO: Run in development
-
-# rename_solar_fuel_type_to_renewable()
-# assign_fuel_type_units()
+def find_all_stroke_fuel_types_and_put_stroke_lowercase():
+    fuels = FuelType.objects.filter(name__icontains="Stroke")
+    for fuel in fuels:
+        fuel.name = fuel.name.replace("Stroke", "stroke")
+        fuel.save()
 
 
+def add_or_replace_application_parameters():
+    parameters = [
+        {"name": "project_uploads_max_file_size_mb", "value": 50.0, "unit": "MB"},
+        {"name": "c_fraction_ref", "value": 1.0, "unit": None},
+        {"name": "percentage_c_lost_excavation", "value": 0.96, "unit": "%"},
+        {"name": "default_fire_periodicity", "value": 1.0, "unit": "years"},
+        {"name": "default_combustion_factor", "value": 0.77, "unit": None},
+        {"name": "feed_ef_default", "value": 0.0, "unit": None},
+        {"name": "nitrous_ef_default", "value": 0.00169, "unit": None},
+        {"name": "large_fishery_tonnes_ice_default", "value": 2.8, "unit": "tonnes"},
+        {"name": "large_fishery_kw_tonnes", "value": 60.0, "unit": "kW/tonnes"},
+        {"name": "large_fishery_lost_refrigerant_default", "value": 0.48734, "unit": None},
+        {"name": "small_fishery_tonnes_ice_default", "value": 2.8, "unit": "tonnes"},
+        {"name": "small_fishery_kw_tonnes", "value": 60.0, "unit": "kW/tonnes"},
+        {"name": "small_fishery_lost_refrigerant_default", "value": 0.083, "unit": None},
+        {"name": "pumping_efficiency", "value": 0.45, "unit": None},
+        {"name": "transportation_loss", "value": 0.1, "unit": None},
+        {"name": "erh_electricity", "value": 2.725e-06, "unit": "MWh"},
+        {"name": "conversion_bar_meter_head", "value": 10.19, "unit": "bar/meter"},
+        {"name": "leaching_multiplier", "value": 0.011, "unit": None},
+        {"name": "transmission_loss", "value": 0.1, "unit": None},
+    ]
+
+    for parameter in parameters:
+        name = parameter["name"]
+        value = parameter["value"]
+        unit = parameter["unit"]
+
+        try:
+            parameter = ApplicationParameter.objects.get(name__iexact=name)
+            parameter.value = value
+            parameter.unit = unit
+            parameter.save()
+            print(f"Updated {name} with value {value} and unit {unit}")
+        except ApplicationParameter.DoesNotExist:
+            ApplicationParameter.objects.create(name=name, value=value, unit=unit)
+            print(f"Created {name} with value {value} and unit {unit}")
+
+
+def delete_and_import_irrigation_phase_data():
+    log.debug("Deleting all IrrigationPhaseData objects...")
+    IrrigationPhaseData.objects.all().delete()
+
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "IrrigationPhaseData.csv"),
+        header=0,
+        sep=";",
+    )
+
+    for i, row in df.iterrows():
+        fuel_type = FuelType.objects.get(
+            name__iexact=sanitize(row["fuel_type"]),
+            fuel_use_type__name__iexact="stationary",
+        )
+
+        print(
+            fuel_type,
+            row["emission_factor"],
+            row["calorific_value"],
+            row["co2_emissions"],
+            row["ch4_emissions"],
+            row["n2o_emissions"],
+            row["density"],
+        )
+
+        data = IrrigationPhaseData.objects.create(
+            fuel_type=fuel_type,
+            emission_factor=parse_csv_number(row["emission_factor"], nan_value=None),
+            calorific_value=parse_csv_number(row["calorific_value"], nan_value=None),
+            co2_emissions=parse_csv_number(row["co2_emissions"], nan_value=None),
+            ch4_emissions=parse_csv_number(row["ch4_emissions"], nan_value=None),
+            n2o_emissions=parse_csv_number(row["n2o_emissions"], nan_value=None),
+            density=parse_csv_number(row["density"], nan_value=None),
+        )
+
+
+def run():
+    import os
+
+    app_mode = os.getenv("APP_MODE", None)
+    print(f"Running ippc_dump in {app_mode} mode")
+
+    if app_mode == "production":
+        # TODO: Run in production
+        import_definitions.import_definitions()
+        rename_solar_fuel_type_to_renewable()
+        assign_fuel_type_units()
+        find_all_stroke_fuel_types_and_put_stroke_lowercase()
+        add_or_replace_application_parameters()
+        delete_and_import_irrigation_phase_data()
+        pass
+
+    if app_mode == "review":
+        # TODO: Run in review
+        get_or_create_soil_types_and_update_info()
+        delete_and_import_forest_total_biomass()
+        delete_and_import_total_biomass_after_defo()
+        find_all_stroke_fuel_types_and_put_stroke_lowercase()
+        add_or_replace_application_parameters()
+        delete_and_import_irrigation_phase_data()
+        pass
+
+    if app_mode == "development":
+        # TODO: Run in development
+        pass
+
+    if app_mode == "test":
+        # TODO: Run in test
+        pass
+
+    return True
