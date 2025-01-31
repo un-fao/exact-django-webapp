@@ -171,7 +171,6 @@ def validate_module_fields(data, mandatory_fields: list):
 
 
 def get_model_serializer(model_arg):
-
     class GenericSerializer(serializers.ModelSerializer):
         class Meta:
             model = model_arg
@@ -287,7 +286,6 @@ class CountrySerializer(serializers.ModelSerializer):
 
 
 class ProjectTagSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = ProjectTag
         fields = ["id", "name"]
@@ -363,9 +361,15 @@ class ReadProjectSerializer(serializers.ModelSerializer):
         small_fisheries = SmallFishery.objects.filter(activity__project=obj).all()
         large_fisheries = LargeFishery.objects.filter(activity__project=obj).all()
 
-        all_catch_start = sum([f.total_catch_yr_start for f in list(filter(lambda fishery: fishery.total_catch_yr_start is not None, small_fisheries))]) + sum([f.total_catch_yr_start for f in list(filter(lambda fishery: fishery.total_catch_yr_start is not None, large_fisheries))])
-        all_catch_w = sum([f.total_catch_yr_w for f in list(filter(lambda fishery: fishery.total_catch_yr_w is not None, small_fisheries))]) + sum([f.total_catch_yr_w for f in list(filter(lambda fishery: fishery.total_catch_yr_w is not None, large_fisheries))])
-        all_catch_wo = sum([f.total_catch_yr_wo for f in list(filter(lambda fishery: fishery.total_catch_yr_wo is not None, small_fisheries))]) + sum([f.total_catch_yr_wo for f in list(filter(lambda fishery: fishery.total_catch_yr_wo is not None, large_fisheries))])
+        all_catch_start = sum([f.total_catch_yr_start for f in list(filter(lambda fishery: fishery.total_catch_yr_start is not None, small_fisheries))]) + sum(
+            [f.total_catch_yr_start for f in list(filter(lambda fishery: fishery.total_catch_yr_start is not None, large_fisheries))]
+        )
+        all_catch_w = sum([f.total_catch_yr_w for f in list(filter(lambda fishery: fishery.total_catch_yr_w is not None, small_fisheries))]) + sum(
+            [f.total_catch_yr_w for f in list(filter(lambda fishery: fishery.total_catch_yr_w is not None, large_fisheries))]
+        )
+        all_catch_wo = sum([f.total_catch_yr_wo for f in list(filter(lambda fishery: fishery.total_catch_yr_wo is not None, small_fisheries))]) + sum(
+            [f.total_catch_yr_wo for f in list(filter(lambda fishery: fishery.total_catch_yr_wo is not None, large_fisheries))]
+        )
 
         scenario_based_catch = {
             "start": all_catch_start,
@@ -530,14 +534,12 @@ class ActivitySerializerWithModules(ActivitySerializer):
 
 
 class WriteActivitySerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Activity
         fields = "__all__"
         ref_name = "Activity"
 
     def validate(self, data):
-
         project = self.instance.project if self.instance else data.get("project")
 
         if project.is_locked and not project.locked_by == self.context["request"].user and not self.context["request"].user.is_staff:
@@ -561,7 +563,6 @@ class WriteActivitySerializer(serializers.ModelSerializer):
         activity_cost = data.get("cost", None)
 
         if activity_cost:
-
             project = getattr(self.instance, "project", data.get("project"))
             project_cost = project.cost if project.cost else 0
 
@@ -577,7 +578,6 @@ class WriteActivitySerializer(serializers.ModelSerializer):
         return super().validate(data)
 
     def save(self, **kwargs):
-
         project: Project = getattr(self.instance, "project", self.validated_data.get("project"))
         project.refresh_lock()
 
@@ -658,7 +658,6 @@ class ActivityBuilderSerializer(serializers.Serializer):
         return data
 
     def create_activity(self):
-
         default_change_rate = ChangeRate.objects.get(name="linear")
 
         return Activity.objects.create(
@@ -831,7 +830,9 @@ class ActivityBuilderSerializer(serializers.Serializer):
             luc = self.instance.landusechange.first()
 
             luc_module_types = list(luc.get_module_types()) + [ModuleType.objects.get(class_name="LandUseChange")] if luc else []
-            new_module_types = list(map(lambda module: module, self.validated_data["module_types"] + luc_module_types) if has_luc_module else [module for module in self.validated_data["module_types"]])
+            new_module_types = list(
+                map(lambda module: module, self.validated_data["module_types"] + luc_module_types) if has_luc_module else [module for module in self.validated_data["module_types"]]
+            )
 
             kept_module_types = list(set(old_module_types) & set(new_module_types))
             removed_module_types = list(set(old_module_types) - set(new_module_types))
@@ -883,7 +884,6 @@ class ActivityBuilderSerializer(serializers.Serializer):
             return self.instance
 
         else:
-
             if Activity.objects.filter(name=self.validated_data["name"], project=self.validated_data["project"]).exists():
                 self.validated_data["name"] = self.unique_activity_name()
 
@@ -1062,7 +1062,6 @@ class BaseGenericModuleSerializer(serializers.ModelSerializer):
 
 
 class BaseModuleSerializer(BaseGenericModuleSerializer):
-
     def validate(self, data):
         log.debug(f"START BaseModuleSerializer[{self.Meta.ref_name}].validate")
 
@@ -1106,7 +1105,6 @@ class BaseModuleSerializer(BaseGenericModuleSerializer):
 
 
 class BaseSubmoduleSerializer(BaseGenericModuleSerializer):
-
     def validate(self, data):
         log.debug(f"START SubmoduleBaseSerializer[{self.Meta.ref_name}].validate")
 
@@ -1125,12 +1123,12 @@ class BaseSubmoduleSerializer(BaseGenericModuleSerializer):
 
         log.debug(f"END SubmoduleBaseSerializer[{self.Meta.ref_name}].validate")
         return super().validate(data)
-    
+
     def parent_validation(self, parent):
         ParentWriteSerializer = globals().get(f"{parent.__class__.__name__}WriteSerializer", None)
         if ParentWriteSerializer is None:
             raise ValueError(f"Write serializer for {parent.__class__.__name__} does not exist")
-        
+
         parent_serializer: serializers.ModelSerializer = ParentWriteSerializer(data={}, instance=parent, partial=True, context=self.context)
         if parent_serializer.is_valid():
             parent_serializer.save()
@@ -1145,7 +1143,7 @@ class BaseSubmoduleSerializer(BaseGenericModuleSerializer):
         parent = utils.getany([self.instance, dict(kwargs)], "parent")
         log.info(f"Parent in serializer: {parent}")
         self.parent_validation(parent)
-        
+
         return self.instance
 
 
@@ -1414,7 +1412,6 @@ class AnnualCroplandSerializer(LandModuleSeralizer):
         }
 
     def validate(self, data):
-
         for minor_season in self.instance.minor_seasons.all():
             minor_season: MinorSeasonAnnualCropland
             if not minor_season.is_ready():
@@ -1526,7 +1523,6 @@ class LandUseChangeWriteSerializer(LandModuleSeralizer):
         mandatory_fields = {}
 
     def validate(self, data):
-
         if self.instance:
             self.instance: LandUseChange
             if all([m.is_ready() for m in self.instance.get_modules()]):
@@ -1616,7 +1612,6 @@ class OrganicSoilWriteSerializer(LandModuleSeralizer):
 
 
 class OrganicSoilReadSerializer(LandModuleSeralizer):
-
     parent_land_use_type_start = serializers.IntegerField(read_only=True)
     parent_land_use_type_w = serializers.IntegerField(read_only=True)
     parent_land_use_type_wo = serializers.IntegerField(read_only=True)
@@ -1726,7 +1721,6 @@ class FloodedRiceWriteSerializer(LandModuleSeralizer):
         }
 
     def validate(self, data):
-
         # Get cultivation_days of all minor_seasons and check that they are not greater than 365 including the main season
         cultivation_days = data.get("cultivation_days", 0)  # TODO: This must be fetched from IPCC data (or t2)
         minor_seasons = data.get("minor_seasons", None)
@@ -1827,7 +1821,6 @@ class RoadWriteSerializer(RoadSerializer):
 
 
 class RoadReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = Road
         fields = "__all__"
@@ -1861,7 +1854,6 @@ class OtherInfrastructureWriteSerializer(OtherInfrastructureSerializer):
 
 
 class OtherInfrastructureReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = OtherInfrastructure
         fields = "__all__"
@@ -1944,7 +1936,6 @@ class IrrigationSystemWriteSerializer(ScenarioSubmoduleSerializer):
 
 
 class IrrigationSystemReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = IrrigationSystem
         fields = "__all__"
@@ -2002,7 +1993,6 @@ class IrrigationPhaseWriteSerializer(ScenarioSubmoduleSerializer):
 
 
 class IrrigationPhaseReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = IrrigationPhase
         fields = "__all__"
@@ -2046,7 +2036,6 @@ class EnergyWriteSerializer(EnergySerializer):
 
 
 class EnergyReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = Energy
         fields = "__all__"
@@ -2100,7 +2089,6 @@ class FuelWriteSerializer(FuelSerializer):
 
 
 class FuelReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = Fuel
         fields = "__all__"
@@ -2147,7 +2135,6 @@ class ElectricityWriteSerializer(NoScenarioSubmoduleSerializer):
 
 
 class ElectricityReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = Electricity
         fields = "__all__"
@@ -2198,7 +2185,6 @@ class LivestockWriteSerializer(LandModuleSeralizer):
 
 
 class LivestockReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = Livestock
         fields = "__all__"
@@ -2237,7 +2223,6 @@ class AquacultureWriteSerializer(LandModuleSeralizer):
 
 
 class AquacultureReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = Aquaculture
         fields = "__all__"
@@ -2288,7 +2273,6 @@ class SmallFisheryWriteSerializer(LandModuleSeralizer):
 
 
 class SmallFisheryReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = SmallFishery
         fields = "__all__"
@@ -2339,7 +2323,6 @@ class LargeFisheryWriteSerializer(LandModuleSeralizer):
 
 
 class LargeFisheryReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = LargeFishery
         fields = "__all__"
@@ -2385,7 +2368,6 @@ class WaterbodyWriteSerializer(WaterbodySerializer):
 
 
 class WaterbodyReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = Waterbody
         fields = "__all__"
@@ -2543,7 +2525,6 @@ class ForestManagementWriteSerializer(LandModuleSeralizer):
 
 
 class ForestManagementReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = ForestManagement
         fields = "__all__"
@@ -2574,7 +2555,6 @@ class InputWriteSerializer(InputSerializer):
 
 
 class InputReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = Input
         fields = "__all__"
@@ -2631,7 +2611,6 @@ class InputEntryWriteSerializer(InputEntrySerializer):
 
 
 class InputEntryReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = InputEntry
         fields = "__all__"
@@ -2709,7 +2688,6 @@ class SetAsideWriteSerializer(LandModuleSeralizer):
 
 
 class SetAsideReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = SetAside
         fields = "__all__"
@@ -2726,7 +2704,6 @@ class OtherLandWriteSerializer(LandModuleSeralizer):
 
 
 class OtherLandReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = OtherLand
         fields = "__all__"
@@ -2783,7 +2760,6 @@ class SettlementWriteSerializer(SettlementSerializer):
 
 
 class SettlementReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = Settlement
         fields = "__all__"
@@ -2807,6 +2783,7 @@ class MacroFuelTypeSerializer(serializers.ModelSerializer):
         model = MacroFuelType
         fields = "__all__"
         ref_name = "MacroFuelType"
+
 
 class FuelUseTypeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -2861,7 +2838,6 @@ class CoastalWetlandWriteSerializer(CoastalWetlandSerializer):
 
 
 class CoastalWetlandReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = CoastalWetland
         fields = "__all__"
@@ -2926,7 +2902,6 @@ class ForestDisturbanceWriteSerializer(ScenarioSubmoduleSerializer):
 
 
 class ForestDisturbanceReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = ForestDisturbance
         fields = "__all__"
@@ -2982,7 +2957,6 @@ class NewNoteSerializer(serializers.ModelSerializer):
         ref_name = "Note"
 
     def validate(self, data):
-
         try:
             module_type = ModuleType.objects.get(pk=data["module_type_id"])
         except ModuleType.DoesNotExist:
@@ -3077,8 +3051,10 @@ class ValueChainParentModuleSerializer(ScenarioModuleSerializer):
 
         return data
 
+
 class ValueChainSubmoduleWriteSerializer(ScenarioSubmoduleSerializer):
     pass
+
 
 class StorageSerializer(ValueChainParentModuleSerializer):
     class Meta:
@@ -3093,7 +3069,6 @@ class StorageWriteSerializer(StorageSerializer):
 
 
 class StorageReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = Storage
         fields = "__all__"
@@ -3146,8 +3121,8 @@ class StorageEntrySerializer(ScenarioSubmoduleSerializer):
 class StorageEntryWriteSerializer(StorageEntrySerializer, ValueChainSubmoduleWriteSerializer):
     pass
 
-class StorageEntryReadSerializer(BaseGenericModuleSerializer):
 
+class StorageEntryReadSerializer(BaseGenericModuleSerializer):
     class Meta:
         model = StorageEntry
         fields = "__all__"
@@ -3168,7 +3143,6 @@ class ProcessingWriteSerializer(ProcessingSerializer):
 
 
 class ProcessingReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = Processing
         fields = "__all__"
@@ -3223,7 +3197,6 @@ class ProcessingEntryWriteSerializer(ProcessingEntrySerializer, ValueChainSubmod
 
 
 class ProcessingEntryReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = ProcessingEntry
         fields = "__all__"
@@ -3244,7 +3217,6 @@ class PackagingWriteSerializer(PackagingSerializer):
 
 
 class PackagingReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = Packaging
         fields = "__all__"
@@ -3299,7 +3271,6 @@ class PackagingEntryWriteSerializer(PackagingEntrySerializer, ValueChainSubmodul
 
 
 class PackagingEntryReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = PackagingEntry
         fields = "__all__"
@@ -3320,7 +3291,6 @@ class TransportWriteSerializer(TransportSerializer):
 
 
 class TransportReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = Transport
         fields = "__all__"
@@ -3360,31 +3330,31 @@ class TransportEntryWriteSerializer(TransportEntrySerializer, ValueChainSubmodul
 
 
 class TransportEntryReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = TransportEntry
         fields = "__all__"
         ref_name = "TransportEntry"
         mandatory_fields = {}
 
+
 class ProjectFileUploadSerializer(serializers.ModelSerializer):
     name = serializers.CharField(read_only=True)
     bucket_public_url = serializers.URLField(read_only=True)
     file = serializers.FileField(required=True, write_only=True)
+
     class Meta:
         model = ProjectFileAttachment
         fields = "__all__"
         ref_name = "ProjectFileAttachment"
 
     def validate(self, attrs):
-
         file = attrs["file"]
 
         max_size_in_mb = int(ApplicationParameter.objects.get(name__iexact="project_uploads_max_file_size_mb").value)
 
         if file.size > max_size_in_mb * 1024 * 1024:
             raise serializers.ValidationError(f"File size must be less than {max_size_in_mb}MB")
-        
+
         if ProjectFileAttachment.objects.filter(project=attrs["project"], name=file.name).exists():
             raise serializers.ValidationError("A file with the same name already exists in the project")
 
@@ -3393,12 +3363,12 @@ class ProjectFileUploadSerializer(serializers.ModelSerializer):
     def save(self, **kwargs):
         project = self.validated_data["project"]
         file = self.validated_data["file"]
-        
+
         from google.cloud import storage
 
         try:
             client = storage.Client()
-            bucket = client.get_bucket("fao-exact-review-uploads") # TODO: Move to settings and make dynamic based on environment (dev, review, prod)
+            bucket = client.get_bucket("fao-exact-review-uploads")  # TODO: Move to settings and make dynamic based on environment (dev, review, prod)
             project_folder = f"projects/{project.id}/"
             blob = bucket.blob(f"{project_folder}{file.name}")
 
@@ -3411,29 +3381,38 @@ class ProjectFileUploadSerializer(serializers.ModelSerializer):
             blob.upload_from_file(file, content_type=file.content_type)
             public_url = blob.public_url
 
-            attachment = ProjectFileAttachment.objects.create(
-                name=file.name,
-                project=project,
-                bucket_public_url=public_url
-            )
+            attachment = ProjectFileAttachment.objects.create(name=file.name, project=project, bucket_public_url=public_url)
         except Exception as e:
             blob.delete()
             raise serializers.ValidationError(str(e))
 
         return attachment
-    
+
+
 class ProjectFileReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectFileAttachment
         fields = "__all__"
         ref_name = "ProjectFileAttachment"
 
+
 class ProjectFileDownloadSerializer(serializers.Serializer):
     file_name = serializers.CharField()
     content_type = serializers.CharField()
 
+
 class APIStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = APIHealth
-        fields = ['is_under_maintenance', 'maintenance_end_time', 'maintenance_message']
+        fields = ["is_under_maintenance", "maintenance_end_time", "maintenance_message"]
         ref_name = "APIStatus"
+
+
+class ProjectLockHolderInformationSerializer(serializers.Serializer):
+    is_locked = serializers.BooleanField()
+    locked_at = serializers.DateTimeField()
+    lock_updated_at = serializers.DateTimeField()
+    locked_by = serializers.SerializerMethodField()
+
+    def get_locked_by(self, obj):
+        return obj.locked_by.email if obj.locked_by else None
