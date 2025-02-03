@@ -125,13 +125,13 @@ if os.getenv("GAE_APPLICATION", None):
     # the unix socket at /cloudsql/<your-cloudsql-connection string>
     DATABASES = {
         "default": {
-            "ENGINE": "${DB_ENGINE}",
-            "HOST": "/cloudsql/${DB_INSTANCE_CONNECTION}",
-            "USER": "${DB_USERNAME}",
-            "PASSWORD": "${DB_PASSWORD}",
-            "NAME": "${DB_NAME}",
+            "ENGINE": "$DB_ENGINE",
+            "HOST": "/cloudsql/$DB_INSTANCE_CONNECTION",
+            "USER": "$DB_USERNAME",
+            "PASSWORD": "$DB_PASSWORD",
+            "NAME": "$DB_NAME",
             "TEST": {
-                "NAME": "${DB_NAME}",
+                "NAME": "$DB_NAME",
             },
             "OPTIONS": {
                 "connect_timeout": 30,  # Optional: set timeout
@@ -142,12 +142,12 @@ if os.getenv("GAE_APPLICATION", None):
 else:
     DATABASES = {
         "default": {
-            "ENGINE": os.getenv("DB_ENGINE", default="${DB_ENGINE}"),
-            "HOST": os.getenv("DB_HOST", default="${DB_HOST}"),
-            "USER": os.getenv("DB_USER", default="${DB_USERNAME}"),
-            "PASSWORD": os.getenv("DB_PASSWORD", default="${DB_PASSWORD}"),
-            "NAME": os.getenv("DB_NAME", default="${DB_NAME}"),
-            "PORT": os.getenv("DB_PORT", default="${DB_PORT}"),
+            "ENGINE": os.getenv("DB_ENGINE", default="$DB_ENGINE"),
+            "HOST": os.getenv("DB_HOST", default="$DB_HOST"),
+            "USER": os.getenv("DB_USER", default="$DB_USERNAME"),
+            "PASSWORD": os.getenv("DB_PASSWORD", default="$DB_PASSWORD"),
+            "NAME": os.getenv("DB_NAME", default="$DB_NAME"),
+            "PORT": os.getenv("DB_PORT", default="$DB_PORT"),
             "OPTIONS": {
                 "connect_timeout": 30,  # Optional: set timeout
             },
