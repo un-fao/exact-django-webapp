@@ -12,5 +12,8 @@ Natural Gas,Mobile
 Ethanol (Cars),Mobile
 Ethanol (Trucks),Mobile
 Diesel,Off-Road
-Gasoline (2-Stroke),Off-Road
-Gasoline (4-Stroke),Off-Road
+Gasoline (2-stroke),Off-Road
+Gasoline (4-stroke),Off-Road
+Wood,Stationary
+Peat,Stationary
+Charcoal,Stationary

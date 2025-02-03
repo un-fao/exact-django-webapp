@@ -429,11 +429,11 @@ class ElectricityFactory(DjangoModelFactory):
 
     status = READY
 
-    country = factory.fuzzy.FuzzyChoice(countries)
+    country_t2 = factory.fuzzy.FuzzyChoice(countries)
 
-    mwh_start = factory.fuzzy.FuzzyFloat(0, 100)
-    mwh_w = factory.fuzzy.FuzzyFloat(0, 100)
-    mwh_wo = factory.fuzzy.FuzzyFloat(0, 100)
+    quantity_consumed_per_year_start = factory.fuzzy.FuzzyFloat(0, 100)
+    quantity_consumed_per_year_w = factory.fuzzy.FuzzyFloat(0, 100)
+    quantity_consumed_per_year_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
     mwh_renewables_start = factory.fuzzy.FuzzyFloat(0, 100)
     mwh_renewables_w = factory.fuzzy.FuzzyFloat(0, 100)
@@ -454,9 +454,9 @@ class FuelFactory(DjangoModelFactory):
     fuel_type_w = factory.fuzzy.FuzzyChoice(fuels)
     fuel_type_wo = factory.fuzzy.FuzzyChoice(fuels)
 
-    fuel_consumption_start = factory.fuzzy.FuzzyFloat(0, 100)
-    fuel_consumption_w = factory.fuzzy.FuzzyFloat(0, 100)
-    fuel_consumption_wo = factory.fuzzy.FuzzyFloat(0, 100)
+    quantity_consumed_per_year_start = factory.fuzzy.FuzzyFloat(0, 100)
+    quantity_consumed_per_year_w = factory.fuzzy.FuzzyFloat(0, 100)
+    quantity_consumed_per_year_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
     # ef_t2 = factory.fuzzy.FuzzyFloat(0, 100)
     # account_for_co2 = factory.fuzzy.FuzzyChoice([True, False])

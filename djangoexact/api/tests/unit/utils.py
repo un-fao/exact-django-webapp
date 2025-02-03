@@ -183,7 +183,7 @@ class APITestCaseMixin(APITestCase):
         with the provided submodule data in JSON format. The request is authenticated with the provided user,
         and the response is returned.
         """
-        log.info("Creating submodule")
+        log.info(f"Creating submodule with data: {data}")
         view = generic_module_viewset(SubmoduleClass).as_view({"post": "create"})
         request = self.request_factory.post(
             reverse(f"{SubmoduleClass.__name__.lower()}-list"),

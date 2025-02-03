@@ -1,5 +1,5 @@
 runtime: python311
-service: $SERVICE_NAME
+service: ${SERVICE_NAME}
 instance_class: F2
 
 entrypoint: gunicorn -b :$PORT -w 4 main:app --timeout 120
@@ -17,14 +17,14 @@ handlers:
   script: auto
 
 env_variables:
-  PROJECT_ID: "$PROJECT_ID"
-  DB_ENGINE: "$DB_ENGINE"
-  DB_HOST: "$DB_HOST"
-  DB_USERNAME: "$DB_USERNAME"
-  DB_PASSWORD: "$DB_PASSWORD"
-  DB_NAME: "$DB_NAME"
-  DB_PORT: "$DB_PORT"
-  SECRET_KEY: "$SECRET_KEY"
+  PROJECT_ID: "${PROJECT_ID}"
+  DB_ENGINE: "${DB_ENGINE}"
+  DB_HOST: "${DB_HOST}"
+  DB_USERNAME: "${DB_USERNAME}"
+  DB_PASSWORD: "${DB_PASSWORD}"
+  DB_NAME: "${DB_NAME}"
+  DB_PORT: "${DB_PORT}"
+  SECRET_KEY: "${SECRET_KEY}"
 
 automatic_scaling:
   min_idle_instances: 1
