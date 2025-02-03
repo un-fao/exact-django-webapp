@@ -43,7 +43,6 @@ class DefaultsFactory:
         DefaultClass: Defaults = globals().get(f"{module_type}Defaults", None)
 
         if DefaultClass is not None:
-
             if not input.is_ready():
                 return DefaultClass(input).values
 
@@ -53,7 +52,6 @@ class DefaultsFactory:
 
 
 class GrasslandDefaults(Defaults):
-
     def __init__(self, input: calcs.Module):
         super().__init__(input)
 
@@ -152,7 +150,6 @@ class AnnualCroplandDefaults(Defaults):
         )
 
     def get_defaults(self, calculate=False) -> dict:
-
         self.input: api.AnnualCropland
 
         defaults = calcs.AnnualCropCalculator(self.input)
@@ -192,7 +189,6 @@ class AnnualCroplandDefaults(Defaults):
 
 
 class PerennialCroplandDefaults(Defaults):
-
     def __init__(self, input: calcs.Module):
         super().__init__(input)
 
@@ -274,7 +270,6 @@ class MinorSeasonPerennialCroplandDefaults(PerennialCroplandDefaults):
 
 
 class FloodedRiceDefaults(Defaults):
-
     def __init__(self, input: calcs.Module):
         super().__init__(input)
 
@@ -373,7 +368,6 @@ class FloodedRiceDefaults(Defaults):
 
 
 class MinorSeasonFloodedRiceDefaults(FloodedRiceDefaults):
-
     def __init__(self, input: calcs.Module):
         super().__init__(input)
 
@@ -382,7 +376,6 @@ class MinorSeasonFloodedRiceDefaults(FloodedRiceDefaults):
 
 
 class LivestockDefaults(Defaults):
-
     def __init__(self, input: calcs.Module):
         super().__init__(input)
 
@@ -436,7 +429,6 @@ class LivestockDefaults(Defaults):
 
 
 class ElectricityDefaults(Defaults):
-
     def __init__(self, input: calcs.Module):
         super().__init__(input)
 
@@ -468,20 +460,19 @@ class ElectricityDefaults(Defaults):
 
 
 class FuelDefaults(Defaults):
-
     def __init__(self, input: calcs.Module):
         super().__init__(input)
 
         self.values = SimpleNamespace(
-            energy_ef_co2_t2_start_default = None,
-            energy_ef_ch4_t2_start_default = None,
-            energy_ef_n2o_t2_start_default = None,
-            energy_ef_co2_t2_w_default = None,
-            energy_ef_ch4_t2_w_default = None,
-            energy_ef_n2o_t2_w_default = None,
-            energy_ef_co2_t2_wo_default = None,
-            energy_ef_ch4_t2_wo_default = None,
-            energy_ef_n2o_t2_wo_default = None,
+            energy_ef_co2_t2_start_default=None,
+            energy_ef_ch4_t2_start_default=None,
+            energy_ef_n2o_t2_start_default=None,
+            energy_ef_co2_t2_w_default=None,
+            energy_ef_ch4_t2_w_default=None,
+            energy_ef_n2o_t2_w_default=None,
+            energy_ef_co2_t2_wo_default=None,
+            energy_ef_ch4_t2_wo_default=None,
+            energy_ef_n2o_t2_wo_default=None,
         )
 
     def get_defaults(self, calculate=False) -> dict:
@@ -504,7 +495,6 @@ class FuelDefaults(Defaults):
 
 
 class InputEntryDefaults(Defaults):
-
     def __init__(self, input: calcs.Module):
         super().__init__(input)
 
@@ -532,7 +522,6 @@ class InputEntryDefaults(Defaults):
 
 
 class LargeFisheryDefaults(Defaults):
-
     def __init__(self, input: calcs.Module):
         super().__init__(input)
 
@@ -592,7 +581,6 @@ class LargeFisheryDefaults(Defaults):
 
 
 class SmallFisheryDefaults(Defaults):
-
     def __init__(self, input: calcs.Module):
         super().__init__(input)
 
@@ -652,7 +640,6 @@ class SmallFisheryDefaults(Defaults):
 
 
 class IrrigationSystemDefaults(Defaults):
-
     def __init__(self, input: calcs.IrrigationSystem):
         super().__init__(input)
 
@@ -676,7 +663,6 @@ class IrrigationSystemDefaults(Defaults):
 
 
 class IrrigationPhaseDefaults(Defaults):
-
     def __init__(self, input: calcs.IrrigationPhase):
         super().__init__(input)
 
@@ -824,7 +810,7 @@ class CoastalWetlandDefaults(Defaults):
             avg_salinity_t2_default=defaults.salinity_type.value,
             soil_type_t2_default=defaults.soil_type_name,
             litter_t2_default=defaults.litter.value,
-            deadwood_t2_default=defaults.deadwood.value,
+            deadwood_t2_default=defaults.dw.value,
         )
 
 
@@ -989,7 +975,6 @@ class OrganicSoilDefaults(Defaults):
 
 
 class AquacultureDefaults(Defaults):
-
     def __init__(self, input: calcs.Module):
         super().__init__(input)
 
@@ -1117,6 +1102,7 @@ class BuildingDefaults(Defaults):
             ef_t2_wo_default=defaults.ef.value,
         )
 
+
 class OtherInfrastructureDefaults(Defaults):
     def __init__(self, input: calcs.Module):
         super().__init__(input)
@@ -1138,6 +1124,7 @@ class OtherInfrastructureDefaults(Defaults):
             ef_t2_w_default=defaults.ef.value,
             ef_t2_wo_default=defaults.ef.value,
         )
+
 
 class SetAsideDefaults(Defaults):
     def __init__(self, input: calcs.Module):
@@ -1403,7 +1390,6 @@ class ForestManagementDefaults(Defaults):
 
 
 class ForestDisturbanceDefaults(Defaults):
-
     start_year_t2_start_default = 0
     start_year_t2_w_default = 0
     start_year_t2_wo_default = 0
@@ -1434,34 +1420,34 @@ class ForestDisturbanceDefaults(Defaults):
             start_year_t2_wo_default=self.start_year_t2_wo_default,
         )
 
+
 @dataclass
 class ValueChainEntryEnergyDefaultsMixin(Defaults):
-
     class Meta:
         # Define the default values to return to the frontend
         abstract = True
         defaults = [
-            'emission_factor_t2_start_default',
-            'emission_factor_t2_w_default',
-            'emission_factor_t2_wo_default',
-            'energy_ef_co2_t2_start_default',
-            'energy_ef_ch4_t2_start_default',
-            'energy_ef_n2o_t2_start_default',
-            'energy_ef_co2_t2_w_default',
-            'energy_ef_ch4_t2_w_default',
-            'energy_ef_n2o_t2_w_default',
-            'energy_ef_co2_t2_wo_default',
-            'energy_ef_ch4_t2_wo_default',
-            'energy_ef_n2o_t2_wo_default',
-            'electricity_ef_t2_w_default',
-            'electricity_ef_t2_wo_default',
-            'country_t2_default',
+            "emission_factor_t2_start_default",
+            "emission_factor_t2_w_default",
+            "emission_factor_t2_wo_default",
+            "energy_ef_co2_t2_start_default",
+            "energy_ef_ch4_t2_start_default",
+            "energy_ef_n2o_t2_start_default",
+            "energy_ef_co2_t2_w_default",
+            "energy_ef_ch4_t2_w_default",
+            "energy_ef_n2o_t2_w_default",
+            "energy_ef_co2_t2_wo_default",
+            "energy_ef_ch4_t2_wo_default",
+            "energy_ef_n2o_t2_wo_default",
+            "electricity_ef_t2_w_default",
+            "electricity_ef_t2_wo_default",
+            "country_t2_default",
         ]
 
     input: api.ValueChainSubmodule
-    emission_factor_t2_start_default=None
-    emission_factor_t2_w_default=None
-    emission_factor_t2_wo_default=None
+    emission_factor_t2_start_default = None
+    emission_factor_t2_w_default = None
+    emission_factor_t2_wo_default = None
     energy_ef_co2_t2_start_default = None
     energy_ef_ch4_t2_start_default = None
     energy_ef_n2o_t2_start_default = None
@@ -1502,9 +1488,10 @@ class ValueChainEntryEnergyDefaultsMixin(Defaults):
 
         foo = self.get_defaults_for_frontend()
         return foo
-    
+
     def get_defaults_for_frontend(self) -> dict:
         return {key: getattr(self, key) for key in self.Meta.defaults}
+
 
 class StorageEntryDefaults(ValueChainEntryEnergyDefaultsMixin):
     def __init__(self, input: calcs.Module):
@@ -1527,11 +1514,13 @@ class TransportEntryDefaults(ValueChainEntryEnergyDefaultsMixin):
         self.input: api.TransportEntry
         self.defaults: calcs.TransportEntryCalculator
 
+
 class ProcessingEntryDefaults(ValueChainEntryEnergyDefaultsMixin):
     def __init__(self, input: calcs.Module):
         super().__init__(input)
         self.input: api.Processing
         self.defaults: calcs.ProcessingEntryCalculator
+
 
 class PackagingEntryDefaults(ValueChainEntryEnergyDefaultsMixin):
     def __init__(self, input: calcs.Module):
