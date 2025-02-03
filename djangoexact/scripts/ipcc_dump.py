@@ -4619,6 +4619,23 @@ def delete_and_import_irrigation_phase_data():
         )
 
 
+def add_pit_gt_1_month_to_livestock_awms_where_manure_management_type_is_null():
+    livestock_manure_ef = LivestockAWMS.objects.filter(manure_management_type=None)
+    manure_management_type = ManureManagementType.objects.get(name__iexact="Pit>1Month")
+
+    print(f"Adding {manure_management_type} to {livestock_manure_ef.count()} LivestockAWMS objects")
+
+    efs = []
+
+    for ef in livestock_manure_ef:
+        ef.manure_management_type = manure_management_type
+        efs.append(ef)
+
+    print(f"Updating {len(efs)} LivestockAWMS objects")
+
+    LivestockAWMS.objects.bulk_update(efs, ["manure_management_type"])
+
+
 def run():
     import os
 
@@ -4633,20 +4650,22 @@ def run():
         find_all_stroke_fuel_types_and_put_stroke_lowercase()
         add_or_replace_application_parameters()
         delete_and_import_irrigation_phase_data()
+        add_pit_gt_1_month_to_livestock_awms_where_manure_management_type_is_null()
         pass
 
     if app_mode == "review":
         # TODO: Run in review
-        get_or_create_soil_types_and_update_info()
-        delete_and_import_forest_total_biomass()
-        delete_and_import_total_biomass_after_defo()
-        find_all_stroke_fuel_types_and_put_stroke_lowercase()
-        add_or_replace_application_parameters()
-        delete_and_import_irrigation_phase_data()
+        # get_or_create_soil_types_and_update_info()
+        # delete_and_import_forest_total_biomass()
+        # delete_and_import_total_biomass_after_defo()
+        # find_all_stroke_fuel_types_and_put_stroke_lowercase()
+        # add_or_replace_application_parameters()
+        # delete_and_import_irrigation_phase_data()
         pass
 
     if app_mode == "development":
         # TODO: Run in development
+        add_pit_gt_1_month_to_livestock_awms_where_manure_management_type_is_null()
         pass
 
     if app_mode == "test":
