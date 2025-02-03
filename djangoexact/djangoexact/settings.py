@@ -1,5 +1,14 @@
 import os
 
+from datetime import timedelta
+from pathlib import Path
+import json
+import base64
+
+import firebase_admin
+import pyrebase
+from dotenv import load_dotenv
+
 """
 Django settings for djangoexact project.
 
@@ -12,24 +21,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
-from datetime import timedelta
-from pathlib import Path
-import json
-import base64
-
-import firebase_admin
-import pyrebase
-from dotenv import load_dotenv
-import logging as log
-
 load_dotenv()
 
 app_mode = os.getenv("APP_MODE", None)
-if app_mode == "development":
+if app_mode:
     print(f"Running in {app_mode} mode")
-
     dotenv_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), "djangoexact", f".env.{app_mode}")
-        
     load_dotenv(dotenv_file)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -40,12 +37,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY", "$SECRET_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY", "${SECRET_KEY}")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["$ALLOWED_HOST", "localhost", "127.0.0.1", "0.0.0.0", "localhost:3000", "20241104t080651.fao-exact-review.ew.r.appspot.com"]
+ALLOWED_HOSTS = ["${ALLOWED_HOST}", ".${ALLOWED_HOST}", "localhost", "127.0.0.1", "0.0.0.0", "localhost:3000"]
 
 CORS_ORIGIN_ALLOW_ALL = True
 
@@ -128,13 +125,13 @@ if os.getenv("GAE_APPLICATION", None):
     # the unix socket at /cloudsql/<your-cloudsql-connection string>
     DATABASES = {
         "default": {
-            "ENGINE": "$DB_ENGINE",
-            "HOST": "/cloudsql/$DB_INSTANCE_CONNECTION",
-            "USER": "$DB_USERNAME",
-            "PASSWORD": "$DB_PASSWORD",
-            "NAME": "$DB_NAME",
+            "ENGINE": "${DB_ENGINE}",
+            "HOST": "/cloudsql/${DB_INSTANCE_CONNECTION}",
+            "USER": "${DB_USERNAME}",
+            "PASSWORD": "${DB_PASSWORD}",
+            "NAME": "${DB_NAME}",
             "TEST": {
-                "NAME": "$DB_NAME",
+                "NAME": "${DB_NAME}",
             },
             "OPTIONS": {
                 "connect_timeout": 30,  # Optional: set timeout
@@ -145,12 +142,12 @@ if os.getenv("GAE_APPLICATION", None):
 else:
     DATABASES = {
         "default": {
-            "ENGINE": os.getenv("DB_ENGINE", default="$DB_ENGINE"),
-            "HOST": os.getenv("DB_HOST", default="$DB_HOST"),
-            "USER": os.getenv("DB_USER", default="$DB_USERNAME"),
-            "PASSWORD": os.getenv("DB_PASSWORD", default="$DB_PASSWORD"),
-            "NAME": os.getenv("DB_NAME", default="$DB_NAME"),
-            "PORT": os.getenv("DB_PORT", default="$DB_PORT"),
+            "ENGINE": os.getenv("DB_ENGINE", default="${DB_ENGINE}"),
+            "HOST": os.getenv("DB_HOST", default="${DB_HOST}"),
+            "USER": os.getenv("DB_USER", default="${DB_USERNAME}"),
+            "PASSWORD": os.getenv("DB_PASSWORD", default="${DB_PASSWORD}"),
+            "NAME": os.getenv("DB_NAME", default="${DB_NAME}"),
+            "PORT": os.getenv("DB_PORT", default="${DB_PORT}"),
             "OPTIONS": {
                 "connect_timeout": 30,  # Optional: set timeout
             },
