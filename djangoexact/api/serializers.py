@@ -3341,6 +3341,7 @@ class ProjectFileUploadSerializer(serializers.ModelSerializer):
     name = serializers.CharField(read_only=True)
     bucket_public_url = serializers.URLField(read_only=True)
     file = serializers.FileField(required=True, write_only=True)
+    size = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = ProjectFileAttachment
@@ -3374,14 +3375,16 @@ class ProjectFileUploadSerializer(serializers.ModelSerializer):
 
             file_size = file.size
 
+            max_size_in_mb = int(ApplicationParameter.objects.get(name__iexact="project_uploads_max_file_size_mb").value)
+
             total_size = sum([blob.size for blob in bucket.list_blobs(prefix=project_folder)])
-            if total_size + file_size > 25 * 1024 * 1024:
-                raise serializers.ValidationError("Maximum total project files size reached. Total size of all files in the project must be less than 25MB.")
+            if total_size + file_size > max_size_in_mb * 1024 * 1024:
+                raise serializers.ValidationError(f"Maximum total project files size reached. Total size of all files in the project must be less than {max_size_in_mb}MB.")
 
             blob.upload_from_file(file, content_type=file.content_type)
             public_url = blob.public_url
 
-            attachment = ProjectFileAttachment.objects.create(name=file.name, project=project, bucket_public_url=public_url)
+            attachment = ProjectFileAttachment.objects.create(name=file.name, project=project, bucket_public_url=public_url, size=file_size)
         except Exception as e:
             blob.delete()
             raise serializers.ValidationError(str(e))
