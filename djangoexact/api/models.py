@@ -2539,29 +2539,29 @@ class Building(Submodule, SettlementSubmoduleTier2Mixin):
     parent = models.ForeignKey("api.Settlement", on_delete=models.CASCADE, null=True, blank=True, related_name="buildings")
 
     building_type = models.ForeignKey(BuildingType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_building_type", verbose_name=_("building_type"))
-    building_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_building_type_thread", on_delete=models.SET_NULL)
+    building_type_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_building_type_thread", on_delete=models.SET_NULL)
 
     area_m2_start = models.FloatField(null=True, blank=True, verbose_name=_("area_m2_start"))
     area_m2_w = models.FloatField(null=True, blank=True, verbose_name=_("area_m2_w"))
     area_m2_wo = models.FloatField(null=True, blank=True, verbose_name=_("area_m2_wo"))
-    area_m2_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_surface_thread", on_delete=models.SET_NULL)
+    area_m2_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_surface_thread", on_delete=models.SET_NULL)
 
 
 class Road(Submodule, SettlementSubmoduleTier2Mixin):
     parent = models.ForeignKey("api.Settlement", on_delete=models.CASCADE, null=True, blank=True, related_name="roads")
 
     road_type = models.ForeignKey(RoadType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_road_type", verbose_name=_("road_type"))
-    road_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_road_type_thread", on_delete=models.SET_NULL)
+    road_type_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_road_type_thread", on_delete=models.SET_NULL)
 
     length_km_start = models.FloatField(null=True, blank=True, verbose_name=_("length_km_start"))
     length_km_w = models.FloatField(null=True, blank=True, verbose_name=_("length_km_w"))
     length_km_wo = models.FloatField(null=True, blank=True, verbose_name=_("length_km_wo"))
-    length_km_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_length_km_thread", on_delete=models.SET_NULL)
+    length_km_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_length_km_thread", on_delete=models.SET_NULL)
 
     width_m_start = models.FloatField(null=True, blank=True, verbose_name=_("width_m_start"))
     width_m_w = models.FloatField(null=True, blank=True, verbose_name=_("width_m_w"))
     width_m_wo = models.FloatField(null=True, blank=True, verbose_name=_("width_m_wo"))
-    width_m_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_width_m_thread", on_delete=models.SET_NULL)
+    width_m_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_width_m_thread", on_delete=models.SET_NULL)
 
 
 class OtherInfrastructure(Submodule, SettlementSubmoduleTier2Mixin):
@@ -2570,7 +2570,7 @@ class OtherInfrastructure(Submodule, SettlementSubmoduleTier2Mixin):
     area_m2_start = models.FloatField(null=True, blank=True, verbose_name=_("area_m2_start"))
     area_m2_w = models.FloatField(null=True, blank=True, verbose_name=_("area_m2_w"))
     area_m2_wo = models.FloatField(null=True, blank=True, verbose_name=_("area_m2_wo"))
-    area_m2_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_area_m2_thread", on_delete=models.SET_NULL)
+    area_m2_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_area_m2_thread", on_delete=models.SET_NULL)
 
 
 class OrganicSoil(LandModuleFixed):
