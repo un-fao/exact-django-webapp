@@ -3016,7 +3016,7 @@ class SettlementReport(LandModuleReport):
                 self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=4, value=road.length_km_wo)
                 self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=4, value=road.width_m_wo)
 
-            self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=6, value=road.road_type_thread.format_comments())
+            self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=6, value=road.road_type_thread.format_comments())
             self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=6, value=road.length_km_thread.format_comments())
             self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=6, value=road.width_m_thread.format_comments())
 
@@ -3153,6 +3153,17 @@ class OrganicSoilReport(BaseModuleReport):
             self.metadata_worksheet.cell(row=last_metadata_row + 34, column=4, value="Yes" if self.module.is_peat_for_energy_wo else "No")
             self.metadata_worksheet.cell(row=last_metadata_row + 35, column=4, value=self.module.peat_type.name)
             self.metadata_worksheet.cell(row=last_metadata_row + 36, column=4, value=peat_density)
+
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=6, value=self.module.land_use_type_thread.format_comments())
+        self.metadata_worksheet.cell(row=last_metadata_row + 3, column=6, value=self.module.drainage_area_thread.format_comments())
+        self.metadata_worksheet.cell(row=last_metadata_row + 4, column=6, value=self.module.ditches_area_thread.format_comments())
+        self.metadata_worksheet.cell(row=last_metadata_row + 5, column=6, value=self.module.fire_type_thread.format_comments())
+        self.metadata_worksheet.cell(row=last_metadata_row + 6, column=6, value=self.module.soil_fire_periodicity_thread.format_comments())
+        self.metadata_worksheet.cell(row=last_metadata_row + 7, column=6, value=self.module.soil_fire_impact_percentage_thread.format_comments())
+        self.metadata_worksheet.cell(row=last_metadata_row + 8, column=6, value=self.module.peat_area_thread.format_comments())
+        self.metadata_worksheet.cell(row=last_metadata_row + 9, column=6, value=self.module.peat_extraction_height_thread.format_comments())
+        self.metadata_worksheet.cell(row=last_metadata_row + 10, column=6, value=self.module.is_peat_for_energy_thread.format_comments())
+        self.metadata_worksheet.cell(row=last_metadata_row + 11, column=6, value=self.module.peat_type_thread.format_comments())
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
