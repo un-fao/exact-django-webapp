@@ -1667,6 +1667,9 @@ class WaterbodyReport(BaseModuleReport):
             self.metadata_worksheet.cell(row=last_metadata_row + 1, column=4, value=self.module.waterbody_type.name)
             self.metadata_worksheet.cell(row=last_metadata_row + 2, column=4, value=self.module.trophic_type_wo.name)
 
+        # self.metadata_worksheet.cell(row=last_metadata_row + 1, column=6, value=self.module.waterbody_type_thread.format_comments())
+        # self.metadata_worksheet.cell(row=last_metadata_row + 2, column=6, value=self.module.trophic_type_thread.format_comments()) # TODO: Add?
+
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
     def build_report(self):
