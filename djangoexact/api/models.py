@@ -2197,19 +2197,19 @@ class Fishery(Module):
     refrigerant_pc_start = models.FloatField(validators=[pc_as_float], default=0, verbose_name=_("refrigerant_pc_start"))
     refrigerant_pc_w = models.FloatField(validators=[pc_as_float], default=0, verbose_name=_("refrigerant_pc_w"))
     refrigerant_pc_wo = models.FloatField(validators=[pc_as_float], default=0, verbose_name=_("refrigerant_pc_wo"))
-    refrigerant_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_refrigerant_thread", on_delete=models.SET_NULL)
+    refrigerant_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_refrigerant_thread", on_delete=models.SET_NULL)
 
     refrigerant_gwp = models.FloatField(null=True, blank=True, default=1810, verbose_name=_("refrigerant_gwp"))
 
     total_catch_yr_start = models.FloatField(null=True, blank=True, verbose_name=_("total_catch_yr_start"))
     total_catch_yr_w = models.FloatField(null=True, blank=True, verbose_name=_("total_catch_yr_w"))
     total_catch_yr_wo = models.FloatField(null=True, blank=True, verbose_name=_("total_catch_yr_wo"))
-    total_catch_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_total_catch_thread", on_delete=models.SET_NULL)
+    total_catch_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_total_catch_thread", on_delete=models.SET_NULL)
 
     ice_preserved_catch_pc_start = models.FloatField(default=0, validators=[pc_as_float], verbose_name=_("ice_preserved_catch_pc_start"))
     ice_preserved_catch_pc_w = models.FloatField(default=0, validators=[pc_as_float], verbose_name=_("ice_preserved_catch_pc_w"))
     ice_preserved_catch_pc_wo = models.FloatField(default=0, validators=[pc_as_float], verbose_name=_("ice_preserved_catch_pc_wo"))
-    ice_preserved_catch_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_ice_preserved_catch_thread", on_delete=models.SET_NULL)
+    ice_preserved_catch_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_ice_preserved_catch_thread", on_delete=models.SET_NULL)
 
     energy_ef_co2_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_co2_t2_start"))
     energy_ef_co2_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_co2_t2_w"))
@@ -2252,7 +2252,7 @@ class SmallFishery(Fishery):
     gear_type_start = models.ForeignKey(SmallFisheryGearType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_gear_type_start", verbose_name=_("gear_type_start"))
     gear_type_w = models.ForeignKey(SmallFisheryGearType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_gear_type_w", verbose_name=_("gear_type_w"))
     gear_type_wo = models.ForeignKey(SmallFisheryGearType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_gear_type_wo", verbose_name=_("gear_type_wo"))
-    gear_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_gear_type_thread", on_delete=models.SET_NULL)
+    gear_type_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_gear_type_thread", on_delete=models.SET_NULL)
     fishery_type = models.ForeignKey(FisheryType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fishery_type"))
 
 
@@ -2260,7 +2260,7 @@ class LargeFishery(Fishery):
     gear_type_start = models.ForeignKey(LargeFisheryGearType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_gear_type_start", verbose_name=_("gear_type_start"))
     gear_type_w = models.ForeignKey(LargeFisheryGearType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_gear_type_w", verbose_name=_("gear_type_w"))
     gear_type_wo = models.ForeignKey(LargeFisheryGearType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_gear_type_wo", verbose_name=_("gear_type_wo"))
-    gear_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_gear_type_thread", on_delete=models.SET_NULL)
+    gear_type_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_gear_type_thread", on_delete=models.SET_NULL)
     fish_type = models.ForeignKey(FishType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fish_type"))
 
 
