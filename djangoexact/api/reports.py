@@ -2543,6 +2543,9 @@ class EnergyReport(BaseModuleReport):
                 self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=4, value=electricity.mwh_renewables_wo)
                 self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=4, value=electricity.ef_source.name)
 
+            self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=6, value=electricity.quantity_consumed_per_year_thread.format_comments())
+            self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=6, value=electricity.mwh_renewables_thread.format_comments())
+
         last_metadata_row += len(api_models.Electricity.objects.filter(parent=self.module).all()) + 3
 
         for i, fuel in enumerate(api_models.Fuel.objects.filter(parent=self.module).all()):
@@ -2570,6 +2573,9 @@ class EnergyReport(BaseModuleReport):
                 self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=4, value=fuel.fuel_type_wo.name)
                 self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=4, value=fuel.quantity_consumed_per_year_wo)
                 self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=4, value="WIP")
+
+            # self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=6, value=fuel.fuel_type_thread.format_comments()) # TODO: Add?
+            self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=6, value=fuel.quantity_consumed_per_year_thread.format_comments())
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
