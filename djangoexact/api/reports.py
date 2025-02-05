@@ -1351,6 +1351,12 @@ class GrasslandReport(LandModuleReport):
             self.metadata_worksheet.cell(row=last_metadata_row + 5, column=4, value=self.module.fire_periodicity_wo)
             self.metadata_worksheet.cell(row=last_metadata_row + 6, column=4, value=self.module.fire_impact_wo)
 
+        # self.metadata_worksheet.cell(row=last_metadata_row + 2, column=6, value=self.module.grassland_management_type_thread.format_comments()) # TODO: Add?
+        self.metadata_worksheet.cell(row=last_metadata_row + 3, column=6, value=self.module.yield_thread.format_comments())
+        self.metadata_worksheet.cell(row=last_metadata_row + 4, column=6, value=self.module.is_fire_used_thread.format_comments())
+        self.metadata_worksheet.cell(row=last_metadata_row + 5, column=6, value=self.module.fire_periodicity_thread.format_comments())
+        self.metadata_worksheet.cell(row=last_metadata_row + 6, column=6, value=self.module.fire_impact_thread.format_comments())
+
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
     def build_report(self):
