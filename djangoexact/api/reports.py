@@ -2700,6 +2700,8 @@ class InputReport(BaseModuleReport):
                 self.metadata_worksheet.cell(row=last_metadata_row + i + 2, column=4, value=entry.input_type.name)
                 self.metadata_worksheet.cell(row=last_metadata_row + i + 3, column=4, value=entry.value_wo)
 
+            self.metadata_worksheet.cell(row=last_metadata_row + i + 3, column=6, value=entry.value_thread.format_comments())
+
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
     def populate_results(self):
