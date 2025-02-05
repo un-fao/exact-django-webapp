@@ -1876,7 +1876,7 @@ class Livestock(Module):
     livestock_category_type = models.ForeignKey(
         LivestockCategoryType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_livestock_category_type", verbose_name=_("livestock_category_type")
     )
-    livestock_category_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_livestock_categories_thread", on_delete=models.SET_NULL)
+    livestock_category_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_livestock_categories_thread", on_delete=models.SET_NULL)
 
     livestock_production_type_start = models.ForeignKey(LivestockProductionType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("livestock_production_type_start"))
     livestock_production_type_w = models.ForeignKey(
@@ -1885,17 +1885,17 @@ class Livestock(Module):
     livestock_production_type_wo = models.ForeignKey(
         LivestockProductionType, on_delete=models.CASCADE, related_name="%(class)s_livestock_productions_wo", null=True, blank=True, verbose_name=_("livestock_production_type_wo")
     )
-    livestock_production_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_livestock_production_type_thread", on_delete=models.SET_NULL)
+    livestock_production_type_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_livestock_production_type_thread", on_delete=models.SET_NULL)
 
     production_start = models.FloatField(null=True, blank=True, verbose_name=_("production_start"))
     production_w = models.FloatField(null=True, blank=True, verbose_name=_("production_w"))
     production_wo = models.FloatField(null=True, blank=True, verbose_name=_("production_wo"))
-    production_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_production_thread", on_delete=models.SET_NULL)
+    production_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_production_thread", on_delete=models.SET_NULL)
 
     heads_number_start = models.IntegerField(null=True, blank=True, verbose_name=_("heads_number_start"))
     heads_number_w = models.IntegerField(null=True, blank=True, verbose_name=_("heads_number_w"))
     heads_number_wo = models.IntegerField(null=True, blank=True, verbose_name=_("heads_number_wo"))
-    heads_number_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_heads_number_thread", on_delete=models.SET_NULL)
+    heads_number_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_heads_number_thread", on_delete=models.SET_NULL)
 
     complementary_manure_management_type_start = models.ForeignKey(
         ManureManagementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_manure_management_type_t2_start", verbose_name=_("complementary_manure_management_type_start")
@@ -1907,7 +1907,7 @@ class Livestock(Module):
         ManureManagementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_manure_management_type_t2_wo", verbose_name=_("complementary_manure_management_type_wo")
     )
     complementary_manure_management_type_thread = models.OneToOneField(
-        "api.CommentThread", null=True, blank=True, related_name="%(class)s_complementary_manure_management_type_thread", on_delete=models.SET_NULL
+        CommentThread, null=True, blank=True, related_name="%(class)s_complementary_manure_management_type_thread", on_delete=models.SET_NULL
     )
 
     enteric_fermentation_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("enteric_fermentation_t2_start"))
@@ -1917,7 +1917,7 @@ class Livestock(Module):
     prp_percentage_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("prp_percentage_t2_start"))
     prp_percentage_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("prp_percentage_t2_w"))
     prp_percentage_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("prp_percentage_t2_wo"))
-    prp_percentage_t2_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_prp_percentage_t2_thread", on_delete=models.SET_NULL)
+    prp_percentage_t2_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_prp_percentage_t2_thread", on_delete=models.SET_NULL)
 
     prp_ch4_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("prp_ch4_t2_start"))
     prp_ch4_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("prp_ch4_t2_w"))
