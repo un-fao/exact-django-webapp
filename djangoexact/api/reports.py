@@ -2986,6 +2986,9 @@ class SettlementReport(LandModuleReport):
                 self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=4, value=building.building_type.name)
                 self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=4, value=building.area_m2_wo)
 
+            self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=6, value=building.building_type_thread.format_comments())
+            self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=6, value=building.area_m2_thread.format_comments())
+
         last_metadata_row += len(self.module.buildings.all()) + 1
 
         for i, road in enumerate(self.module.roads.all()):
@@ -3013,6 +3016,10 @@ class SettlementReport(LandModuleReport):
                 self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=4, value=road.length_km_wo)
                 self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=4, value=road.width_m_wo)
 
+            self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=6, value=road.road_type_thread.format_comments())
+            self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=6, value=road.length_km_thread.format_comments())
+            self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=6, value=road.width_m_thread.format_comments())
+
         last_metadata_row += len(self.module.roads.all()) + 2
 
         for i, infra in enumerate(self.module.other_infrastructures.all()):
@@ -3028,6 +3035,8 @@ class SettlementReport(LandModuleReport):
 
             if self.module.is_without():
                 self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=4, value=infra.area_m2_wo)
+
+            self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=6, value=infra.area_m2_thread.format_comments())
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
