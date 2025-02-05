@@ -210,3 +210,32 @@ class ProjectTestCase(APITestCaseMixin):
 
         modify_response = self.edit_project(project, self.user, {"name": "New Name"})
         self.assertEqual(modify_response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_change_activity_last_year_of_accounting_t2_and_check_if_capitalization_years_change(self):
+        """
+        Test that changing the last year of accounting for an activity updates the capitalization years.
+
+        This test performs the following steps:
+        1. Creates a project and verifies the project creation.
+        2. Creates an activity within the project and verifies the activity creation.
+        3. Retrieves the created activity from the database.
+        4. Changes the last year of accounting for the activity and verifies the response status code is 200 OK.
+        5. Retrieves the updated activity from the database.
+        6. Verifies that the capitalization years have been updated as expected.
+
+        The test ensures that changing the last year of accounting for an activity updates the capitalization years as expected.
+        """
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        create_activity_response = self.create_activity(project, self.user)
+        self.assertEqual(create_activity_response.status_code, status.HTTP_200_OK)
+        activity = models.Activity.objects.get(id=create_activity_response.data["id"])
+
+        response = self.edit_activity(activity, self.user, {"last_year_of_accounting_t2": 2022, "start_year_t2": 2020, "duration_t2": 2})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        updated_activity = models.Activity.objects.get(id=activity.id)
+        self.assertNotEqual(updated_activity.capitalization_years, project.capitalization_years)

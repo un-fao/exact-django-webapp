@@ -812,6 +812,7 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
     soil_type_t2 = models.ForeignKey(SoilType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("soil_type_t2"))
     duration_t2 = models.IntegerField(null=True, blank=True, verbose_name=_("duration_t2"))
     start_year_t2 = models.IntegerField(null=True, blank=True, verbose_name=_("start_year_t2"))
+    last_year_of_accounting_t2 = models.IntegerField(null=True, blank=True, verbose_name=_("last_year_of_accounting_t2"))
     soc_t2 = models.FloatField(null=True, blank=True, verbose_name=_("soc_t2"))
 
     created_at = models.DateTimeField(auto_now_add=True, null=True, verbose_name=_("created_at"))
@@ -841,6 +842,10 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
     @property
     def completion_percentage(self):
         return self.__calculate_completion_percentage()
+
+    @property
+    def last_year_of_accounting(self):
+        return self.last_year_of_accounting_t2 or self.project.last_year_of_accounting
 
     class Meta:
         unique_together = ("name", "project")
@@ -886,7 +891,7 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
         if any([self.start_year_t2 is None, self.start_year_t2 == 0, self.duration_t2 is None, self.duration_t2 == 0]):
             return self.project.capitalization_years
 
-        return self.project.last_year_of_accounting - (self.start_year_t2 + self.duration_t2)
+        return self.last_year_of_accounting - (self.start_year_t2 + self.duration_t2)
 
     def __get_all_modules(self):
         module_types = self.module_types.all()
