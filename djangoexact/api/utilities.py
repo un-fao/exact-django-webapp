@@ -295,7 +295,6 @@ def getany(objects: list[object], key: str):
         raise ValueError("All arguments must be objects")
 
     for obj in objects:
-
         obj_type = type(obj)
 
         if obj_type is dict:
@@ -349,7 +348,6 @@ def get_or_raise(model, filter_criteria, error_message, method="get") -> models.
 
 
 def get_soc(module, climate, moisture, soil_type, scenario: ScenarioTypes) -> models.QuerySet | models.Model:
-
     if hasattr(module, f"soc_t2_{scenario.value}"):
         return getattr(module, f"soc_t2_{scenario.value}")
 
@@ -420,7 +418,6 @@ def find_organic_soil_parent_module(organic_soil) -> tuple:
 
 
 def get_changes(records: list[HistoricalRecords]):
-
     class ChangeLog:
         def __init__(self, date, user, reason, changes):
             self.date = date
@@ -485,7 +482,9 @@ def get_entity_definitions(entity_type: str) -> dict:
     except LookupError:
         raise ValueError(f"Model '{entity_type}' not found")
     # Extract the field names and their translated verbose names
-    field_definitions = {field.name: _(field.verbose_name) if field.verbose_name else field.name for field in model_class._meta.get_fields() if hasattr(field, "verbose_name") and not field.name.endswith("_thread")}
+    field_definitions = {
+        field.name: _(field.verbose_name) if field.verbose_name else field.name for field in model_class._meta.get_fields() if hasattr(field, "verbose_name") and not field.name.endswith("_thread")
+    }
 
     return field_definitions
 
@@ -542,3 +541,11 @@ def update_change_reason(instance, reason):
     record = history.filter(id=instance.pk).order_by("-history_date").first()
     record.history_change_reason = reason
     record.save()
+
+
+def validate_uuid(uuid_string):
+    try:
+        uuid.UUID(uuid_string)
+    except ValueError:
+        return False
+    return True
