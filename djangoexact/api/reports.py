@@ -1605,6 +1605,13 @@ class FloodedRiceReport(LandModuleReport):
                 self.metadata_worksheet.cell(row=last_metadata_row + 12 + i, column=4, value=season.organic_amendment_type_wo.name)
                 self.metadata_worksheet.cell(row=last_metadata_row + 13 + i, column=4, value=season_calculator.yield_default.value)
 
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=6, value=self.module.land_use_type_thread.format_comments())
+        # self.metadata_worksheet.cell(row=last_metadata_row + 3, column=6, value=self.module.cultivation_period_thread.format_comments())
+        # self.metadata_worksheet.cell(row=last_metadata_row + 4, column=6, value=self.module.water_management_type_before_cultivation_thread.format_comments()) # TODO: Add?
+        # self.metadata_worksheet.cell(row=last_metadata_row + 5, column=6, value=self.module.water_management_type_after_cultivation_thread.format_comments()) # TODO: Add?
+        # self.metadata_worksheet.cell(row=last_metadata_row + 6, column=6, value=self.module.organic_amendment_type_thread.format_comments()) # TODO: Add?
+        self.metadata_worksheet.cell(row=last_metadata_row + 7, column=6, value=self.module.crop_yield_t2_thread.format_comments())
+
     def build_report(self):
         super().build_report()
 
