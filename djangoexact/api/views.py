@@ -480,7 +480,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         shared_projects = request.user.memberships.filter(**filters).all()
         projects_list = [share.project for share in shared_projects if utils.has_project_permission("view_project", self.request.user, share.project)]
-        ordered_projects = sorted(projects_list, key=lambda x: x.created_at, reverse=True)
+        ordered_projects = sorted(projects_list, key=lambda x: x.updated_at, reverse=True)
 
         SerializerClass = ReadProjectSerializer
         if is_summary:
