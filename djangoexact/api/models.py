@@ -2281,6 +2281,8 @@ class Aquaculture(Module):
     electricity_ef_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("electricity_ef_t2_w"))
     electricity_ef_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("electricity_ef_t2_wo"))
 
+    # TODO: Missing comment threads?
+
 
 class MacroInputType(models.Model):
     name = models.CharField(max_length=255, unique=True)
