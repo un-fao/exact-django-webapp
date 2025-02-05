@@ -2844,6 +2844,8 @@ class IrrigationReport(BaseModuleReport):
                 self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=4, value=system.irrigation_system_type.name)
                 self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=4, value=system.ha_wo)
 
+            self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=6, value=system.ha_thread.format_comments())
+
         last_metadata_row += len(self.module.irrigation_systems.all()) + 1
 
         for i, phase in enumerate(self.module.irrigation_phases.all()):
@@ -2861,23 +2863,27 @@ class IrrigationReport(BaseModuleReport):
             if self.module.is_start():
                 self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=2, value=phase.irrigation_system_type.name)
                 self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=2, value=phase.ha_start)
-                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=2, value=phase.fuel_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=2, value=phase.fuel_type_start.name)
                 self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=2, value=phase.well_depth)
                 self.metadata_worksheet.cell(row=last_metadata_row + 5 + i, column=2, value=phase.gross_irrigation_water_start)
 
             if self.module.is_with():
                 self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=3, value=phase.irrigation_system_type.name)
                 self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=3, value=phase.ha_w)
-                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=3, value=phase.fuel_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=3, value=phase.fuel_type_w.name)
                 self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=3, value=phase.well_depth)
                 self.metadata_worksheet.cell(row=last_metadata_row + 5 + i, column=3, value=phase.gross_irrigation_water_w)
 
             if self.module.is_without():
                 self.metadata_worksheet.cell(row=last_metadata_row + 1 + i, column=4, value=phase.irrigation_system_type.name)
                 self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=4, value=phase.ha_wo)
-                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=4, value=phase.fuel_type.name)
+                self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=4, value=phase.fuel_type_wo.name)
                 self.metadata_worksheet.cell(row=last_metadata_row + 4 + i, column=4, value=phase.well_depth)
                 self.metadata_worksheet.cell(row=last_metadata_row + 5 + i, column=4, value=phase.gross_irrigation_water_wo)
+
+            self.metadata_worksheet.cell(row=last_metadata_row + 2 + i, column=6, value=phase.ha_thread.format_comments())
+            # self.metadata_worksheet.cell(row=last_metadata_row + 3 + i, column=6, value=phase.fuel_type_thread.format_comments()) # TODO: Add?
+            self.metadata_worksheet.cell(row=last_metadata_row + 5 + i, column=6, value=phase.gross_irrigation_water_thread.format_comments())
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
