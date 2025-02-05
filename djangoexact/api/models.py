@@ -2577,32 +2577,32 @@ class OrganicSoil(LandModuleFixed):
     drainage_area_start = models.FloatField(default=0, verbose_name=_("drainage_area_start"))
     drainage_area_w = models.FloatField(default=0, verbose_name=_("drainage_area_w"))
     drainage_area_wo = models.FloatField(default=0, verbose_name=_("drainage_area_wo"))
-    drainage_area_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_drainage_area_thread", on_delete=models.SET_NULL)
+    drainage_area_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_drainage_area_thread", on_delete=models.SET_NULL)
 
     area_not_drained_start = models.FloatField(default=0, verbose_name=_("area_not_drained_start"))
     area_not_drained_w = models.FloatField(default=0, verbose_name=_("area_not_drained_w"))
     area_not_drained_wo = models.FloatField(default=0, verbose_name=_("area_not_drained_wo"))
-    area_not_drained_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_area_not_drained_thread", on_delete=models.SET_NULL)
+    area_not_drained_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_area_not_drained_thread", on_delete=models.SET_NULL)
 
     ditches_area_start = models.FloatField(default=0, verbose_name=_("ditches_area_start"))
     ditches_area_w = models.FloatField(default=0, verbose_name=_("ditches_area_w"))
     ditches_area_wo = models.FloatField(default=0, verbose_name=_("ditches_area_wo"))
-    ditches_area_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_ditches_area_thread", on_delete=models.SET_NULL)
+    ditches_area_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_ditches_area_thread", on_delete=models.SET_NULL)
 
     fire_type_start = models.ForeignKey(FireType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_fire_type_start", verbose_name=_("fire_type_start"))
     fire_type_w = models.ForeignKey(FireType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_fire_type_w", verbose_name=_("fire_type_w"))
     fire_type_wo = models.ForeignKey(FireType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_fire_type_wo", verbose_name=_("fire_type_wo"))
-    fire_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_fire_type_thread", on_delete=models.SET_NULL)
+    fire_type_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_fire_type_thread", on_delete=models.SET_NULL)
 
     soil_fire_periodicity_start = models.FloatField(null=True, blank=True, verbose_name=_("soil_fire_periodicity_start"))
     soil_fire_periodicity_w = models.FloatField(null=True, blank=True, verbose_name=_("soil_fire_periodicity_w"))
     soil_fire_periodicity_wo = models.FloatField(null=True, blank=True, verbose_name=_("soil_fire_periodicity_wo"))
-    soil_fire_periodicity_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_soil_fire_periodicity_thread", on_delete=models.SET_NULL)
+    soil_fire_periodicity_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_soil_fire_periodicity_thread", on_delete=models.SET_NULL)
 
     soil_fire_impact_percentage_start = models.FloatField(null=True, blank=True, verbose_name=_("soil_fire_impact_percentage_start"))
     soil_fire_impact_percentage_w = models.FloatField(null=True, blank=True, verbose_name=_("soil_fire_impact_percentage_w"))
     soil_fire_impact_percentage_wo = models.FloatField(null=True, blank=True, verbose_name=_("soil_fire_impact_percentage_wo"))
-    soil_fire_impact_percentage_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_soil_fire_impact_percentage_thread", on_delete=models.SET_NULL)
+    soil_fire_impact_percentage_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_soil_fire_impact_percentage_thread", on_delete=models.SET_NULL)
 
     onsite_co2_drainge_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("onsite_co2_drainge_t2_start"))
     onsite_co2_drainge_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("onsite_co2_drainge_t2_w"))
@@ -2659,27 +2659,27 @@ class OrganicSoil(LandModuleFixed):
     ##### Peat Extraction #####
 
     peat_type = models.ForeignKey(PeatType, on_delete=models.CASCADE, null=True, blank=True, default=utils.get_default_peat_type, related_name="%(class)s_peat_type", verbose_name=_("peat_type"))
-    peat_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_type_thread", on_delete=models.SET_NULL)
+    peat_type_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_peat_type_thread", on_delete=models.SET_NULL)
 
     peat_area_start = models.FloatField(null=True, blank=True, verbose_name=_("peat_area_start"))
     peat_area_w = models.FloatField(null=True, blank=True, verbose_name=_("peat_area_w"))
     peat_area_wo = models.FloatField(null=True, blank=True, verbose_name=_("peat_area_wo"))
-    peat_area_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_area_thread", on_delete=models.SET_NULL)
+    peat_area_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_peat_area_thread", on_delete=models.SET_NULL)
 
     peat_ditches_area_start = models.FloatField(null=True, blank=True, verbose_name=_("peat_ditches_area_start"))
     peat_ditches_area_w = models.FloatField(null=True, blank=True, verbose_name=_("peat_ditches_area_w"))
     peat_ditches_area_wo = models.FloatField(null=True, blank=True, verbose_name=_("peat_ditches_area_wo"))
-    peat_ditches_area_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_ditches_area_thread", on_delete=models.SET_NULL)
+    peat_ditches_area_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_peat_ditches_area_thread", on_delete=models.SET_NULL)
 
     peat_extraction_height_start = models.FloatField(null=True, blank=True, verbose_name=_("peat_extraction_height_start"))
     peat_extraction_height_w = models.FloatField(null=True, blank=True, verbose_name=_("peat_extraction_height_w"))
     peat_extraction_height_wo = models.FloatField(null=True, blank=True, verbose_name=_("peat_extraction_height_wo"))
-    peat_extraction_height_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_extraction_height_thread", on_delete=models.SET_NULL)
+    peat_extraction_height_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_peat_extraction_height_thread", on_delete=models.SET_NULL)
 
     is_peat_for_energy_start = models.BooleanField(default=False, verbose_name=_("is_peat_for_energy_start"))
     is_peat_for_energy_w = models.BooleanField(default=False, verbose_name=_("is_peat_for_energy_w"))
     is_peat_for_energy_wo = models.BooleanField(default=False, verbose_name=_("is_peat_for_energy_wo"))
-    is_peat_for_energy_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_is_for_energy_thread", on_delete=models.SET_NULL)
+    is_peat_for_energy_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_peat_is_for_energy_thread", on_delete=models.SET_NULL)
 
     onsite_co2_peat_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("onsite_co2_peat_t2_start"))
     onsite_co2_peat_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("onsite_co2_peat_t2_w"))
