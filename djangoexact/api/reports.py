@@ -892,6 +892,10 @@ class LandUseChangeReport(LandModuleReport):
             self.metadata_worksheet.cell(row=last_metadata_row + 2, column=4, value="Yes" if self.module.is_fire_used_wo else "No")
             self.metadata_worksheet.cell(row=last_metadata_row + 3, column=4, value=self.module.dry_matter_wo)
 
+        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=6, value=self.module.module_type_thread.format_comments())
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=6, value=self.module.is_fire_used_thread.format_comments())
+        self.metadata_worksheet.cell(row=last_metadata_row + 3, column=6, value=self.module.dry_matter_thread.format_comments())
+
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
     def get_result(self):
@@ -1605,7 +1609,7 @@ class FloodedRiceReport(LandModuleReport):
                 self.metadata_worksheet.cell(row=last_metadata_row + 12 + i, column=4, value=season.organic_amendment_type_wo.name)
                 self.metadata_worksheet.cell(row=last_metadata_row + 13 + i, column=4, value=season_calculator.yield_default.value)
 
-        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=6, value=self.module.land_use_type_thread.format_comments())
+        # self.metadata_worksheet.cell(row=last_metadata_row + 2, column=6, value=self.module.land_use_type_thread.format_comments())
         # self.metadata_worksheet.cell(row=last_metadata_row + 3, column=6, value=self.module.cultivation_period_thread.format_comments())
         # self.metadata_worksheet.cell(row=last_metadata_row + 4, column=6, value=self.module.water_management_type_before_cultivation_thread.format_comments()) # TODO: Add?
         # self.metadata_worksheet.cell(row=last_metadata_row + 5, column=6, value=self.module.water_management_type_after_cultivation_thread.format_comments()) # TODO: Add?
