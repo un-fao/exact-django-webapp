@@ -875,7 +875,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error(f"User with email {email} does not exist")
             return utils.ErrorResponse(f"User with email {email} does not exist", status=http_status.HTTP_400_BAD_REQUEST)
 
-        group = serializer.validated_data["group"]
+        group: Group = serializer.validated_data["group"]
         invitation = ProjectInvitation.objects.filter(project=project, user=user, group=group).first()
 
         if invitation:
@@ -887,12 +887,35 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         invitation.save()
 
         invitation_link = reverse("projectinvitations-accept", args=[invitation.token])
-        send_mail(
-            f"You have been invited to join the project {project.name}",
-            f"Click the link to accept the invitation: {request.build_absolute_uri(invitation_link)}",
-            settings.EMAIL_HOST_USER,
-            [invitation.user.email],
+        invitation_subject = f'[EX-ACT] You have been invited to join the project "{project.name}"'
+        invitation_text = """
+Project title:\t{project_title}
+Role assigned:\t{invitation_role}
+Date of share:\t{invitation_date}
+
+Dear {invitation_recipient_name},
+You have been invited to join the EX-ACT project "{project_title}" with a role of "{invitation_role}".
+To accept this invitation and begin collaborating, please click the link below: Accept Invitation
+
+{invitation_link}
+
+What is EX-ACT?
+EX-ACT (Environmental eXternalities ACcounting Tool) * is an FAO-developed appraisal tool designed for estimating and tracking greenhouse gas emissions in agricultural sector including Agriculture, Forestry and Other Land Use (AFOLU) inland and coastal wetlands, fisheries and aquaculture, agricultural inputs and infrastructure.
+
+If you require further assistance, feel free to reach out to {exact_email}.
+* Previously known as EX-Ante Carbon-balance Tool
+
+Best regards,
+The EX-ACT Team
+        """.format(
+            project_title=project.name,
+            invitation_role=group.name,
+            invitation_recipient_name=user.get_full_name(),
+            invitation_link=request.build_absolute_uri(invitation_link),
+            exact_email="exact@fao.org",
+            invitation_date=invitation.created_at.strftime("%Y-%m-%d"),
         )
+        send_mail(invitation_subject, invitation_text, settings.EMAIL_HOST_USER, [invitation.user.email])
 
         logging.debug("END ProjectInvitationViewset.create")
         return Response({"message": f"Invitation for {user.email} sent successfully", "id": invitation.id}, status=http_status.HTTP_201_CREATED)
