@@ -2036,6 +2036,12 @@ class LivestockReport(BaseModuleReport):
             self.metadata_worksheet.cell(row=last_metadata_row + 5, column=4, value="WIP")  # TODO: Ask Lorenzo what this value should be
             self.metadata_worksheet.cell(row=last_metadata_row + 6, column=4, value="WIP")  # TODO: Ask Lorenzo what this value should be
 
+        self.metadata_worksheet.cell(row=last_metadata_row + 1, column=6, value=self.module.livestock_category_thread.format_comments())
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=6, value=self.module.heads_number_thread.format_comments())
+        self.metadata_worksheet.cell(row=last_metadata_row + 3, column=6, value=self.module.livestock_production_type_thread.format_comments())
+        self.metadata_worksheet.cell(row=last_metadata_row + 4, column=6, value=self.module.production_thread.format_comments())
+        self.metadata_worksheet.cell(row=last_metadata_row + 5, column=6, value=self.module.complementary_manure_management_type_thread.format_comments())
+
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
     def build_report(self):
