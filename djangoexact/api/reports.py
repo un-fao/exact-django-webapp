@@ -1206,6 +1206,12 @@ class AnnualCroplandReport(LandModuleReport):
             )
             self.metadata_worksheet.cell(row=last_metadata_row + 9, column=4, value=self.module.minor_yield_wo if self.module.minor_yield_wo is not None else "Default")
 
+        self.metadata_worksheet.cell(row=last_metadata_row + 2, column=6, value=self.module.land_use_type_thread.format_comments())
+        self.metadata_worksheet.cell(row=last_metadata_row + 3, column=6, value=self.module.tillage_management_type_thread.format_comments())
+        self.metadata_worksheet.cell(row=last_metadata_row + 4, column=6, value=self.module.organic_input_type_thread.format_comments())
+        self.metadata_worksheet.cell(row=last_metadata_row + 5, column=6, value=self.module.residue_management_type_thread.format_comments())
+        self.metadata_worksheet.cell(row=last_metadata_row + 6, column=6, value=self.module.crop_yield_t2_thread.format_comments())
+
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
     def build_additional_indicators(self):
