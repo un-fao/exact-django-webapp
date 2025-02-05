@@ -724,10 +724,7 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     )
     def retrieve(self, request, *args, **kwargs):
         membership: ProjectMembership = self.get_object()
-
-        if not utils.has_project_permission("view_projectmembership", self.request.user, membership.project):
-            logging.error("Selected user does not have permission to view project memberships")
-            return utils.ErrorResponse("Selected user does not have permission to view project memberships", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("view_projectmembership", self.request.user, membership.project)
 
         return super().retrieve(request, *args, **kwargs)
 
@@ -742,15 +739,13 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     def list(self, request, *args, **kwargs):
         project_id = self.request.query_params.get("project_id", None)
 
+        # TODO: Generalize query param validation checks
         if not project_id:
             logging.error("Project id not provided")
             return utils.ErrorResponse("Project id not provided", status=http_status.HTTP_400_BAD_REQUEST)
 
         project = get_object_or_404(Project, pk=project_id)
-
-        if not utils.has_project_permission("view_projectmembership", self.request.user, project):
-            logging.error("Selected user does not have permission to view project memberships")
-            return utils.ErrorResponse("Selected user does not have permission to view project memberships", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("view_projectmembership", self.request.user, project)
 
         serializer = ProjectMembershipSerializer(project.members.all(), many=True)
 
@@ -772,10 +767,7 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
         project = serializer.validated_data["project"]
-
-        if not utils.has_project_permission("add_projectmembership", self.request.user, project):
-            logging.error("Selected user does not have permission to add project memberships")
-            return utils.ErrorResponse("Selected user does not have permission to add project memberships", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("add_projectmembership", self.request.user, project)
 
         if project.is_archived:
             return utils.ErrorResponse("Archived projects cannot have memberships added", status=http_status.HTTP_400_BAD_REQUEST)
@@ -795,10 +787,7 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     )
     def update(self, request, *args, **kwargs):
         membership = self.get_object()
-
-        if not utils.has_project_permission("change_projectmembership", self.request.user, membership.project):
-            logging.error("Selected user does not have permission to change project memberships")
-            return utils.ErrorResponse("Selected user does not have permission to change project memberships", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("change_projectmembership", self.request.user, membership.project)
 
         if membership.project.is_archived:
             return utils.ErrorResponse("Archived projects cannot have memberships updated", status=http_status.HTTP_400_BAD_REQUEST)
@@ -825,6 +814,7 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         if membership.user == self.request.user and membership.project.owner != self.request.user:
             membership.delete()
+
         elif not utils.has_project_permission("delete_projectmembership", self.request.user, membership.project):
             logging.error("Selected user does not have permission to delete project memberships")
             return utils.ErrorResponse("Selected user does not have permission to delete project memberships", status=http_status.HTTP_403_FORBIDDEN)
@@ -848,11 +838,9 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     )
     def retrieve(self, request, *args, **kwargs):
         logging.debug("START ProjectInvitationViewset.retrieve")
-        invitation: ProjectInvitation = self.get_object()
 
-        if not utils.has_project_permission("view_projectinvitation", self.request.user, invitation.project):
-            logging.error("Selected user does not have permission to view invitations")
-            return utils.ErrorResponse("Selected user does not have permission to view invitations", status=http_status.HTTP_403_FORBIDDEN)
+        invitation: ProjectInvitation = self.get_object()
+        security.check_permission("view_projectinvitation", self.request.user, invitation.project)
 
         logging.debug("END ProjectInvitationViewset.retrieve")
         return super().retrieve(request, *args, **kwargs)
@@ -875,10 +863,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
         project: Project = serializer.validated_data["project"]
-
-        if not utils.has_project_permission("add_projectinvitation", self.request.user, project):
-            logging.error("Selected user does not have permission to invite users to the project")
-            return utils.ErrorResponse("Selected user does not have permission to invite users to the project", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("add_projectinvitation", self.request.user, project)
 
         if project.is_archived:
             return utils.ErrorResponse("Archived projects cannot have invitations sent", status=http_status.HTTP_400_BAD_REQUEST)
@@ -922,11 +907,9 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     )
     def partial_update(self, request, *args, **kwargs):
         invitation = get_object_or_404(ProjectInvitation, pk=kwargs["pk"])
-        data = ProjectInvitationModelWriteSerializer(invitation, data=request.data, partial=True)
+        security.check_permission("change_projectinvitation", self.request.user, invitation.project)
 
-        if not utils.has_project_permission("change_projectinvitation", self.request.user, invitation.project):
-            logging.error("Selected user does not have permission to update invitations")
-            return utils.ErrorResponse("Selected user does not have permission to update invitations", status=http_status.HTTP_403_FORBIDDEN)
+        data = ProjectInvitationModelWriteSerializer(invitation, data=request.data, partial=True)
 
         if invitation.project.is_archived:
             return utils.ErrorResponse("Archived projects cannot have invitations updated", status=http_status.HTTP_400_BAD_REQUEST)
@@ -982,10 +965,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return utils.ErrorResponse("Project id not provided", status=http_status.HTTP_400_BAD_REQUEST)
 
         project = get_object_or_404(Project, pk=project_id)
-
-        if not utils.has_project_permission("view_projectinvitation", self.request.user, project):
-            logging.error("Selected user does not have permission to view invitations")
-            return utils.ErrorResponse("Selected user does not have permission to view invitations", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("view_projectinvitation", self.request.user, project)
 
         serializer = ProjectInvitationReadSerializer(project.invitations.all(), many=True)
 
@@ -1005,9 +985,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not token:
             return utils.ErrorResponse("Token not provided", status=http_status.HTTP_400_BAD_REQUEST)
 
-        try:
-            uuid.UUID(token)
-        except ValueError:
+        if not utils.validate_uuid(token):
             return utils.ErrorResponse("Invalid token", status=http_status.HTTP_400_BAD_REQUEST)
 
         invitation: ProjectInvitation = get_object_or_404(ProjectInvitation, token=token)
@@ -1049,10 +1027,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
     def update(self, request, *args, **kwargs):
         activity = self.get_object()
-
-        if not utils.has_project_permission("change_activity", self.request.user, activity.project):
-            logging.error("Selected user does not have permission to update activities in the project")
-            return utils.ErrorResponse("Selected user does not have permission to update activities in the project", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("change_activity", self.request.user, activity.project)
 
         if activity.project.is_archived:
             return utils.ErrorResponse("Archived projects cannot have activities updated", status=http_status.HTTP_400_BAD_REQUEST)
@@ -1072,10 +1047,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
     def partial_update(self, request, *args, **kwargs):
         activity = self.get_object()
-
-        if not utils.has_project_permission("change_activity", self.request.user, activity.project):
-            logging.error("Selected user does not have permission to update activities in the project")
-            return utils.ErrorResponse("Selected user does not have permission to update activities in the project", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("change_activity", self.request.user, activity.project)
 
         if activity.project.is_archived:
             return utils.ErrorResponse("Archived projects cannot have activities updated", status=http_status.HTTP_400_BAD_REQUEST)
@@ -1097,17 +1069,11 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     def create(self, request, *args, **kwargs):
         _status = StatusType.objects.get_or_create(name_en="EMPTY")[0]
         request.data["status"] = _status.pk
+
         serializer = WriteActivitySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
-
-        if not utils.has_project_permission("add_activity", self.request.user, serializer.validated_data["project"]):
-            logging.error("Selected user does not have permission to add activities to the project")
-            return utils.ErrorResponse("Selected user does not have permission to add activities to the project", status=http_status.HTTP_403_FORBIDDEN)
-
-        if serializer.validated_data["project"].is_archived:
-            return utils.ErrorResponse("Archived projects cannot have activities added", status=http_status.HTTP_400_BAD_REQUEST)
+        security.check_permission("add_activity", self.request.user, serializer.validated_data["project"])
 
         activity: Activity = serializer.save()
         activity.owner = self.request.user
@@ -1125,11 +1091,9 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         Get a single activity for a given user.
         """
         logger.info("ActivityViewSet.retrieve")
-        activity = get_object_or_404(Activity, pk=pk)
 
-        if not utils.has_project_permission("view_activity", self.request.user, activity.project):
-            logging.error("Selected user does not have permission to view the activity")
-            return utils.ErrorResponse("Selected user does not have permission to view the activity", status=http_status.HTTP_403_FORBIDDEN)
+        activity = get_object_or_404(Activity, pk=pk)
+        security.check_permission("view_activity", self.request.user, activity.project)
 
         return Response(data=self.serializer_class(activity).data, status=http_status.HTTP_200_OK)
 
@@ -1153,9 +1117,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if is_summary:
             SerializerClass = ActivitySummarySerializer
 
-        if not utils.has_project_permission("view_activity", self.request.user, project):
-            logging.error("Selected user does not have permission to view activities in the project")
-            return utils.ErrorResponse("Selected user does not have permission to view activities in the project", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("view_activity", self.request.user, project)
 
         def process_activity(activity):
             activity_dict = SerializerClass(activity).data
@@ -1197,10 +1159,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
 
         activity = Activity.objects.prefetch_related().get(pk=pk)
-
-        if not utils.has_project_permission("view_activity", self.request.user, activity.project):
-            logging.error("Selected user does not have permission to view the activity")
-            return utils.ErrorResponse("Selected user does not have permission to view the activity", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("view_activity", self.request.user, activity.project)
 
         response = {**ActivityResultSerializer(activity).data}
 
@@ -1233,10 +1192,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
 
         activity = get_object_or_404(Activity, pk=pk)
-
-        if not utils.has_project_permission("view_activity", self.request.user, activity.project):
-            logging.error("Selected user does not have permission to view the activity")
-            return utils.ErrorResponse("Selected user does not have permission to view the activity", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("view_activity", self.request.user, activity.project)
 
         modules = get_modules(activity)
 
@@ -1259,18 +1215,10 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
 
         serializer = ActivityBuilderSerializer(data=request.data, context={"request": request})
-
-        if not serializer.is_valid():
-            return utils.ErrorResponse(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
 
         project: Project = serializer.validated_data["project"]
-
-        if not utils.has_project_permission("add_activity", self.request.user, project):
-            logging.error("Selected user does not have permission to add activities to the project")
-            return utils.ErrorResponse("Selected user does not have permission to add activities to the project", status=http_status.HTTP_403_FORBIDDEN)
-
-        if project.is_archived:
-            return utils.ErrorResponse("Archived projects cannot have activities added", status=http_status.HTTP_400_BAD_REQUEST)
+        security.check_permission("add_activity", self.request.user, project)
 
         try:
             activity = serializer.save()
@@ -1283,10 +1231,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     @swagger_auto_schema(responses={404: "Project not found", 403: "Selected user does not have permission to copy the activity", 201: ActivitySerializer}, request_body=EmptySerializer)
     def copy(self, request, pk=None):
         activity = self.get_object()
-
-        if not utils.has_project_permission("view_activity", self.request.user, activity.project):
-            logging.error("Selected user does not have permission to copy the activity")
-            return utils.ErrorResponse("Selected user does not have permission to copy the activity", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("view_activity", self.request.user, activity.project)
 
         new_activity = utils.copy_activity(activity)
 
@@ -1296,10 +1241,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view activity changes", 200: ChangeHistorySerializer})
     def history(self, request, pk=None):
         activity: Activity = self.get_object()
-
-        if not utils.has_project_permission("view_activity", self.request.user, activity.project):
-            logging.error("Selected user does not have permission to view the activity")
-            return utils.ErrorResponse("Selected user does not have permission to view the activity", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("view_activity", self.request.user, activity.project)
 
         changes = utils.get_changes(activity.history.all())
 

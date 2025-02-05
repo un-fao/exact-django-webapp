@@ -542,6 +542,9 @@ class WriteActivitySerializer(serializers.ModelSerializer):
     def validate(self, data):
         project = self.instance.project if self.instance else data.get("project")
 
+        if project.is_archived:
+            return serializers.ValidationError("Archived projects cannot have activities added")
+
         if project.is_locked and not project.locked_by == self.context["request"].user and not self.context["request"].user.is_staff:
             raise serializers.ValidationError("Project is locked by another user")
 
@@ -637,6 +640,13 @@ class ActivityBuilderSerializer(serializers.Serializer):
         module_types = data.get("module_types", [])
         land_use_change = data.get("land_use_change", None)
         area = data.get("area", None)
+        project = data.get("project")
+
+        if project.is_locked and not project.locked_by == self.context["request"].user and not self.context["request"].user.is_staff:
+            raise serializers.ValidationError("Project is locked by another user")
+
+        if project.is_archived:
+            raise serializers.ValidationError("Archived projects cannot have activities added")
 
         if luc_module in module_types:
             raise serializers.ValidationError("Land Use Change module cannot be added manually")
@@ -3356,6 +3366,7 @@ class ProjectFileUploadSerializer(serializers.ModelSerializer):
         if file.size > max_size_in_mb * 1024 * 1024:
             raise serializers.ValidationError(f"File size must be less than {max_size_in_mb}MB")
 
+        # TODO: Remove this and add a (1) to the file name if a file with the same name exists
         if ProjectFileAttachment.objects.filter(project=attrs["project"], name=file.name).exists():
             raise serializers.ValidationError("A file with the same name already exists in the project")
 
