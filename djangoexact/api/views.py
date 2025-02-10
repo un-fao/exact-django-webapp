@@ -116,6 +116,7 @@ from django.http import HttpResponse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from django.core.cache import cache
 import api.security as security
+import ipcc.models as ipcc_models
 
 logger = logging.getLogger("console")
 
@@ -710,6 +711,72 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
 
+    @action(detail=True, methods=["get"])
+    @swagger_auto_schema(
+        operation_description="Generate a PDF from an HTML template",
+        manual_parameters=[
+            openapi.Parameter(
+                "template",
+                openapi.IN_QUERY,
+                description="Name of the Django template to render",
+                type=openapi.TYPE_STRING,
+                required=True
+            )
+        ],
+        responses={
+            200: "PDF file generated successfully",
+            400: "Template name not provided or template not found",
+            500: "Error generating PDF"
+        },
+        produces=["application/pdf"]
+    )
+    def template(self, request, pk=None):
+        template_name = request.query_params.get("template")
+        
+        if not template_name:
+            return utils.ErrorResponse("Template name is required", status=http_status.HTTP_400_BAD_REQUEST)
+
+        try:
+
+            project: Project = self.get_object()
+            soc: ipcc_models.SoilOrganicCarbon = ipcc_models.SoilOrganicCarbon.objects.get(climate=project.climate, moisture=project.moisture, soil_type=project.soil_type)
+
+            # Calculate total area of all activities
+            total_area = sum(activity.area for activity in project.activities.all())
+            
+
+            context = {
+                "project": project,
+                "start_year_of_activities": project.start_year_of_activities,
+                "implementation_years": project.implementation_years,
+                "last_year_of_accounting": project.last_year_of_accounting,
+                "total_project_years": (project.implementation_years + project.capitalization_years),
+                "total_carbon_balance": "XXX,XXX",
+                "total_area": total_area,
+                "total_heads": "WIP",
+                "total_tonnes_of_catch": "WIP",
+                "soc": soc.value,
+            }
+
+            html = render(request, f"{template_name}.html", context).content.decode()
+            
+            # Generate PDF from HTML using WeasyPrint
+            from weasyprint import HTML
+            pdf = HTML(string=html).write_pdf()
+            
+            # Create the HTTP response with PDF content
+            response = HttpResponse(pdf, content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="{template_name}.pdf"'
+            
+            return response
+
+        except Exception as e:
+            return utils.ErrorResponse(
+                f"Error generating PDF: {str(e)}", 
+                status=http_status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
 class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = ProjectMembership.objects.all()
     serializer_class = ProjectMembershipSerializer
@@ -822,7 +889,6 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         membership.delete()
 
         return Response(status=http_status.HTTP_204_NO_CONTENT)
-
 
 class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = ProjectInvitation.objects.all()
