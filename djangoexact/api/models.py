@@ -846,6 +846,10 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
     @property
     def last_year_of_accounting(self):
         return self.last_year_of_accounting_t2 or self.project.last_year_of_accounting
+    
+    @property
+    def area(self):
+        return self.get_land_modules_area()
 
     class Meta:
         unique_together = ("name", "project")
