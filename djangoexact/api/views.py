@@ -761,6 +761,8 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             project_tertiary_ghg = "N2O"
             project_tertiary_ghg_emissions = 8000
             project_tertiary_ghg_direction = "increases" if project_tertiary_ghg_emissions >= 0 else "decreases"
+
+            activities = project.activities.all()
             
 
             context = {
@@ -786,6 +788,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 "project_tertiary_ghg": project_tertiary_ghg,
                 "project_tertiary_ghg_emissions": project_tertiary_ghg_emissions,
                 "project_tertiary_ghg_direction": project_tertiary_ghg_direction, 
+                "activities": activities
             }
 
             html = render(request, f"{template_name}.html", context).content.decode()
