@@ -741,8 +741,26 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             project: Project = self.get_object()
             soc: ipcc_models.SoilOrganicCarbon = ipcc_models.SoilOrganicCarbon.objects.get(climate=project.climate, moisture=project.moisture, soil_type=project.soil_type)
 
+            # TODO: Remove mock data
+
             # Calculate total area of all activities
             total_area = sum(activity.area for activity in project.activities.all())
+
+            project_emissions_w = 10000
+            project_emissions_wo = 10000
+            project_emissions_balance = project_emissions_w - project_emissions_wo
+
+            project_primary_ghg = "CO2"
+            project_primary_ghg_emissions = 10000
+            project_primary_ghg_direction = "increases" if project_primary_ghg_emissions >= 0 else "decreases"
+
+            project_secondary_ghg = "CH4"
+            project_secondary_ghg_emissions = -9000
+            project_secondary_ghg_direction = "increases" if project_secondary_ghg_emissions >= 0 else "decreases"
+
+            project_tertiary_ghg = "N2O"
+            project_tertiary_ghg_emissions = 8000
+            project_tertiary_ghg_direction = "increases" if project_tertiary_ghg_emissions >= 0 else "decreases"
             
 
             context = {
@@ -752,10 +770,22 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 "last_year_of_accounting": project.last_year_of_accounting,
                 "total_project_years": (project.implementation_years + project.capitalization_years),
                 "total_carbon_balance": "XXX,XXX",
+                "project_emissions_w": project_emissions_w,
+                "project_emissions_wo": project_emissions_wo,
+                "project_emissions_balance": project_emissions_balance,
                 "total_area": total_area,
                 "total_heads": "WIP",
                 "total_tonnes_of_catch": "WIP",
                 "soc": soc.value,
+                "project_primary_ghg": project_primary_ghg,
+                "project_primary_ghg_emissions": project_primary_ghg_emissions,
+                "project_primary_ghg_direction": project_primary_ghg_direction,
+                "project_secondary_ghg": project_secondary_ghg,
+                "project_secondary_ghg_emissions": project_secondary_ghg_emissions,
+                "project_secondary_ghg_direction": project_secondary_ghg_direction,
+                "project_tertiary_ghg": project_tertiary_ghg,
+                "project_tertiary_ghg_emissions": project_tertiary_ghg_emissions,
+                "project_tertiary_ghg_direction": project_tertiary_ghg_direction, 
             }
 
             html = render(request, f"{template_name}.html", context).content.decode()
@@ -2153,3 +2183,23 @@ class SoilTypeViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
             queryset = queryset.filter(is_coastal=False)
 
         return queryset
+
+def generate_chart(with_value, without_value, balance):
+    # Create the bar chart
+    fig, ax = plt.subplots(figsize=(10, 4))
+    labels = ['With', 'Without', 'Balance']
+    values = [with_value, without_value, balance]
+    colors = ['green' if v < 0 else 'red' for v in values]
+    
+    # Create horizontal bar chart
+    ax.barh(labels, values, color=colors)
+    
+    # Customize the chart
+    ax.set_xlim(min(values) - 10000, max(values) + 10000)
+    ax.grid(True, axis='x', linestyle='--', alpha=0.7)
+    
+    # Save the chart
+    chart_path = os.path.join(settings.STATIC_ROOT, 'images', 'ghg_chart.png')
+    os.makedirs(os.path.dirname(chart_path), exist_ok=True)
+    plt.savefig(chart_path, bbox_inches='tight', dpi=300)
+    plt.close()
