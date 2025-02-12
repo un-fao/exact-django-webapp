@@ -825,7 +825,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
                 # Save to a BytesIO buffer
                 buf = io.BytesIO()
-                plt.savefig(buf, format="png")
+                plt.savefig(buf, format="svg")
                 buf.seek(0)
 
                 # Encode as base64 for embedding in HTML
@@ -833,6 +833,12 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 plt.close(fig)
 
                 return chart_base64
+
+            # Get faologo.eps from static files
+            faologo = open("djangoexact/media/faologo.svg", "rb")
+
+            # Add it as base64 to the context
+            faologo_base64 = base64.b64encode(faologo.read()).decode("utf-8")
 
             context = {
                 "project": project,
@@ -859,6 +865,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 "project_tertiary_ghg_direction": project_tertiary_ghg_direction,
                 "activities": activities,
                 "project_chart_base64": plot_project_balance_graph(project_emissions_w, project_emissions_wo, project_emissions_balance),
+                "faologo_base64": faologo_base64,
             }
 
             html = render(request, f"{template_name}.html", context).content.decode()
