@@ -117,6 +117,9 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from django.core.cache import cache
 import api.security as security
 import ipcc.models as ipcc_models
+import matplotlib.pyplot as plt
+import io
+import base64
 
 logger = logging.getLogger("console")
 
@@ -710,34 +713,20 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         serializer = ProjectLockHolderInformationSerializer(project, many=False)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
-
     @action(detail=True, methods=["get"])
     @swagger_auto_schema(
         operation_description="Generate a PDF from an HTML template",
-        manual_parameters=[
-            openapi.Parameter(
-                "template",
-                openapi.IN_QUERY,
-                description="Name of the Django template to render",
-                type=openapi.TYPE_STRING,
-                required=True
-            )
-        ],
-        responses={
-            200: "PDF file generated successfully",
-            400: "Template name not provided or template not found",
-            500: "Error generating PDF"
-        },
-        produces=["application/pdf"]
+        manual_parameters=[openapi.Parameter("template", openapi.IN_QUERY, description="Name of the Django template to render", type=openapi.TYPE_STRING, required=True)],
+        responses={200: "PDF file generated successfully", 400: "Template name not provided or template not found", 500: "Error generating PDF"},
+        produces=["application/pdf"],
     )
     def template(self, request, pk=None):
         template_name = request.query_params.get("template")
-        
+
         if not template_name:
             return utils.ErrorResponse("Template name is required", status=http_status.HTTP_400_BAD_REQUEST)
 
         try:
-
             project: Project = self.get_object()
             soc: ipcc_models.SoilOrganicCarbon = ipcc_models.SoilOrganicCarbon.objects.get(climate=project.climate, moisture=project.moisture, soil_type=project.soil_type)
 
@@ -746,24 +735,101 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             # Calculate total area of all activities
             total_area = sum(activity.area for activity in project.activities.all())
 
-            project_emissions_w = 10000
-            project_emissions_wo = 10000
-            project_emissions_balance = project_emissions_w - project_emissions_wo
+            # Call project results endpoint
+            response = self.results(request, pk=pk)
 
-            project_primary_ghg = "CO2"
-            project_primary_ghg_emissions = 10000
+            data = response.data
+            activities = data["activities"]
+            modules = [module for activity in activities for module in activity["modules"]]
+            results = [module["results"] for module in modules]
+            total_w = sum(result["total_w"] for result in results)
+            total_wo = sum(result["total_wo"] for result in results)
+            total_balance = total_w - total_wo
+
+            project_emissions_w = total_w
+            project_emissions_wo = total_wo
+            project_emissions_balance = total_balance
+
+            new_request = request._request
+            new_request.query_params = request.query_params.copy()
+            new_request.query_params["aggregate"] = "gas"
+
+            response = self.results(new_request, pk=pk)
+
+            data = response.data
+            activities = data["activities"]
+            modules = [module for activity in activities for module in activity["modules"]]
+            results = [module["results"] for module in modules]
+
+            balances = [result["balance"] for result in results]
+
+            co2 = {"name": "CO2", "value": 0}
+            ch4 = {"name": "CH4", "value": 0}
+            n2o = {"name": "N2O", "value": 0}
+            co = {"name": "CO", "value": 0}
+            doc = {"name": "DOC", "value": 0}
+            other = {"name": "OTHER", "value": 0}
+
+            for b in balances:
+                for g in b:
+                    if g["gas_type"]["name"] == "CO2":
+                        co2["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "CH4":
+                        ch4["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "N2O":
+                        n2o["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "CO":
+                        co["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "DOC":
+                        doc["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "OTHER":
+                        other["value"] += sum([e["value"] for e in g["emissions"]])
+
+            highest_gas = max([co2, ch4, n2o, co, doc, other], key=lambda x: abs(x["value"]))
+            second_highest_gas = sorted([co2, ch4, n2o, co, doc, other], key=lambda x: abs(x["value"]), reverse=True)[1]
+            third_highest_gas = sorted([co2, ch4, n2o, co, doc, other], key=lambda x: abs(x["value"]), reverse=True)[2]
+
+            project_primary_ghg = highest_gas["name"]
+            project_primary_ghg_emissions = highest_gas["value"]
             project_primary_ghg_direction = "increases" if project_primary_ghg_emissions >= 0 else "decreases"
 
-            project_secondary_ghg = "CH4"
-            project_secondary_ghg_emissions = -9000
+            project_secondary_ghg = second_highest_gas["name"]
+            project_secondary_ghg_emissions = second_highest_gas["value"]
             project_secondary_ghg_direction = "increases" if project_secondary_ghg_emissions >= 0 else "decreases"
 
-            project_tertiary_ghg = "N2O"
-            project_tertiary_ghg_emissions = 8000
+            project_tertiary_ghg = third_highest_gas["name"]
+            project_tertiary_ghg_emissions = third_highest_gas["value"]
             project_tertiary_ghg_direction = "increases" if project_tertiary_ghg_emissions >= 0 else "decreases"
 
             activities = project.activities.all()
-            
+
+            def plot_project_balance_graph(project_emissions_w, project_emissions_wo, project_emissions_balance):
+                # Create the figure and axis
+                fig, ax = plt.subplots(figsize=(6.5, 4))
+
+                # Data
+                labels = ["With", "Without", "Balance"]
+                emissions = [project_emissions_w, project_emissions_wo, project_emissions_balance]
+                # Create horizontal bar chart
+                ax.barh(labels, emissions, color=["#1f77b4", "#ff7f0e", "#2ca02c"])
+
+                for i, v in enumerate(emissions):
+                    ax.text(0 if v > 0 else v, i, f"{v:,.2f}", va="center")
+
+                # Customize the chart
+                ax.ticklabel_format(style="plain", axis="x", useOffset=False)
+                ax.grid(True, axis="x", linestyle="--", alpha=0.7)
+
+                # Save to a BytesIO buffer
+                buf = io.BytesIO()
+                plt.savefig(buf, format="png")
+                buf.seek(0)
+
+                # Encode as base64 for embedding in HTML
+                chart_base64 = base64.b64encode(buf.getvalue()).decode("utf-8")
+                plt.close(fig)
+
+                return chart_base64
 
             context = {
                 "project": project,
@@ -771,7 +837,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 "implementation_years": project.implementation_years,
                 "last_year_of_accounting": project.last_year_of_accounting,
                 "total_project_years": (project.implementation_years + project.capitalization_years),
-                "total_carbon_balance": "XXX,XXX",
+                "total_carbon_balance": project_emissions_balance,
                 "project_emissions_w": project_emissions_w,
                 "project_emissions_wo": project_emissions_wo,
                 "project_emissions_balance": project_emissions_balance,
@@ -787,27 +853,26 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 "project_secondary_ghg_direction": project_secondary_ghg_direction,
                 "project_tertiary_ghg": project_tertiary_ghg,
                 "project_tertiary_ghg_emissions": project_tertiary_ghg_emissions,
-                "project_tertiary_ghg_direction": project_tertiary_ghg_direction, 
-                "activities": activities
+                "project_tertiary_ghg_direction": project_tertiary_ghg_direction,
+                "activities": activities,
+                "project_chart_base64": plot_project_balance_graph(project_emissions_w, project_emissions_wo, project_emissions_balance),
             }
 
             html = render(request, f"{template_name}.html", context).content.decode()
-            
+
             # Generate PDF from HTML using WeasyPrint
             from weasyprint import HTML
+
             pdf = HTML(string=html).write_pdf()
-            
+
             # Create the HTTP response with PDF content
-            response = HttpResponse(pdf, content_type='application/pdf')
-            response['Content-Disposition'] = f'attachment; filename="{template_name}.pdf"'
-            
+            response = HttpResponse(pdf, content_type="application/pdf")
+            response["Content-Disposition"] = f'attachment; filename="{template_name}.pdf"'
+
             return response
 
         except Exception as e:
-            return utils.ErrorResponse(
-                f"Error generating PDF: {str(e)}", 
-                status=http_status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+            return utils.ErrorResponse(f"Error generating PDF: {str(e)}", status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
@@ -922,6 +987,7 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         membership.delete()
 
         return Response(status=http_status.HTTP_204_NO_CONTENT)
+
 
 class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = ProjectInvitation.objects.all()
@@ -2187,22 +2253,23 @@ class SoilTypeViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         return queryset
 
+
 def generate_chart(with_value, without_value, balance):
     # Create the bar chart
     fig, ax = plt.subplots(figsize=(10, 4))
-    labels = ['With', 'Without', 'Balance']
+    labels = ["With", "Without", "Balance"]
     values = [with_value, without_value, balance]
-    colors = ['green' if v < 0 else 'red' for v in values]
-    
+    colors = ["green" if v < 0 else "red" for v in values]
+
     # Create horizontal bar chart
     ax.barh(labels, values, color=colors)
-    
+
     # Customize the chart
     ax.set_xlim(min(values) - 10000, max(values) + 10000)
-    ax.grid(True, axis='x', linestyle='--', alpha=0.7)
-    
+    ax.grid(True, axis="x", linestyle="--", alpha=0.7)
+
     # Save the chart
-    chart_path = os.path.join(settings.STATIC_ROOT, 'images', 'ghg_chart.png')
+    chart_path = os.path.join(settings.STATIC_ROOT, "images", "ghg_chart.png")
     os.makedirs(os.path.dirname(chart_path), exist_ok=True)
-    plt.savefig(chart_path, bbox_inches='tight', dpi=300)
+    plt.savefig(chart_path, bbox_inches="tight", dpi=300)
     plt.close()
