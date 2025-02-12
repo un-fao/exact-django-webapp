@@ -261,7 +261,7 @@
 							<div class="col-sm-6 text-start">
 								<p>
 									{{project.name}} has an estimated total carbon balance of
-									<b>{{total_carbon_balance}}</b>
+									<b>{{total_carbon_balance|floatformat:2|intcomma}}</b>
 									tCO2e over the entire period of accounting of {{total_project_years}}
 									years.
 								</p>
@@ -272,79 +272,7 @@
 								</p>
 								<div class="row mt-4">
 									<div class="col-12">
-										<div class="position-relative" style="height: 200px">
-											<!-- Balance Bar -->
-											<div
-												class="d-flex align-items-center position-absolute"
-												style="width: 100%; top: 0">
-												<div class="text-end pe-2" style="width: 80px">
-													<span
-														class="badge {% if total_carbon_balance < 0 %}bg-success{% else %}bg-danger{% endif %}">
-														{{project_emissions_balance}}
-													</span>
-												</div>
-												<div class="flex-grow-1">
-													<div
-														class="bg-secondary"
-														style="height: 30px; border-radius: 4px"></div>
-												</div>
-												<div style="width: 40px; text-align: center">
-													<small>Start ↓ 0</small>
-												</div>
-											</div>
-
-											<!-- With Project Bar -->
-											<div
-												class="d-flex align-items-center position-absolute"
-												style="width: 50%; top: 80px">
-												<div class="text-end pe-2" style="width: 80px">
-													<span
-														class="badge {% if project.with_project_emissions < 0 %}bg-success{% else %}bg-danger{% endif %}">
-														{{project_emissions_w}}
-													</span>
-												</div>
-												<div class="flex-grow-1">
-													<div
-														class="bg-secondary"
-														style="height: 30px; border-radius: 4px"></div>
-												</div>
-												<div style="width: 40px; text-align: center">
-													<small>Start ↓ 0</small>
-												</div>
-											</div>
-
-											<!-- Without Project Bar -->
-											<div
-												class="d-flex align-items-center position-absolute"
-												style="width: 50%; left: 50%; top: 80px">
-												<div class="text-end pe-2" style="width: 80px">
-													<span
-														class="badge {% if project.without_project_emissions < 0 %}bg-success{% else %}bg-danger{% endif %}">
-														{{project_emissions_wo}}
-													</span>
-												</div>
-												<div class="flex-grow-1">
-													<div
-														class="bg-secondary"
-														style="height: 30px; border-radius: 4px"></div>
-												</div>
-												<div style="width: 40px; text-align: center">
-													<small>Start ↓ 0</small>
-												</div>
-											</div>
-
-											<!-- Labels -->
-											<div class="position-absolute" style="top: 130px; width: 100%">
-												<div class="row">
-													<div class="col-6">
-														<h5>With</h5>
-													</div>
-													<div class="col-6">
-														<h5>Without</h5>
-													</div>
-												</div>
-											</div>
-										</div>
+										<img src="data:image/png;base64,{{ project_chart_base64 }}" alt="Chart">
 									</div>
 								</div>
 								<p>
