@@ -816,6 +816,9 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 for i, v in enumerate(emissions):
                     ax.text(0 if v > 0 else v, i, f"{v:,.2f}", va="center")
 
+                # Add legend
+                ax.text(0.5, 1.1, "tCO2e", ha="center", va="bottom", transform=ax.transAxes)
+
                 # Customize the chart
                 ax.ticklabel_format(style="plain", axis="x", useOffset=False)
                 ax.grid(True, axis="x", linestyle="--", alpha=0.7)
