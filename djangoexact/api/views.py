@@ -772,6 +772,57 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             modules = [module for activity in activities for module in activity["modules"]]
             results = [module["results"] for module in modules]
 
+            emissions_w = [result["total_w"] for result in results]
+            emissions_wo = [result["total_wo"] for result in results]
+
+            co2_w = {"name": "CO2", "value": 0}
+            ch4_w = {"name": "CH4", "value": 0}
+            n2o_w = {"name": "N2O", "value": 0}
+            co_w = {"name": "CO", "value": 0}
+            doc_w = {"name": "DOC", "value": 0}
+            other_w = {"name": "OTHER", "value": 0}
+
+            gases_w = [co2_w, ch4_w, n2o_w, co_w, doc_w, other_w]
+
+            for w in emissions_w:
+                for g in w:
+                    if g["gas_type"]["name"] == "CO2":
+                        co2_w["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "CH4":
+                        ch4_w["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "N2O":
+                        n2o_w["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "CO":
+                        co_w["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "DOC":
+                        doc_w["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "OTHER":
+                        other_w["value"] += sum([e["value"] for e in g["emissions"]])
+
+            co2_wo = {"name": "CO2", "value": 0}
+            ch4_wo = {"name": "CH4", "value": 0}
+            n2o_wo = {"name": "N2O", "value": 0}
+            co_wo = {"name": "CO", "value": 0}
+            doc_wo = {"name": "DOC", "value": 0}
+            other_wo = {"name": "OTHER", "value": 0}
+
+            gases_wo = [co2_wo, ch4_wo, n2o_wo, co_wo, doc_wo, other_wo]
+
+            for wo in emissions_wo:
+                for g in wo:
+                    if g["gas_type"]["name"] == "CO2":
+                        co2_wo["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "CH4":
+                        ch4_wo["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "N2O":
+                        n2o_wo["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "CO":
+                        co_wo["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "DOC":
+                        doc_wo["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "OTHER":
+                        other_wo["value"] += sum([e["value"] for e in g["emissions"]])
+
             balances = [result["balance"] for result in results]
 
             co2 = {"name": "CO2", "value": 0}
@@ -795,6 +846,8 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                         doc["value"] += sum([e["value"] for e in g["emissions"]])
                     if g["gas_type"]["name"] == "OTHER":
                         other["value"] += sum([e["value"] for e in g["emissions"]])
+
+            gases = [co2, ch4, n2o, co, doc, other]
 
             highest_gas = max([co2, ch4, n2o, co, doc, other], key=lambda x: abs(x["value"]))
             second_highest_gas = sorted([co2, ch4, n2o, co, doc, other], key=lambda x: abs(x["value"]), reverse=True)[1]
@@ -835,6 +888,9 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 processed_activities.append(db_activity)
 
             activities_total = processed_activities
+
+            def plot_with_without_balance_bar_chart_stacked_by_gas(gases_w, gases_wo, gases):
+                return None
 
             def plot_project_balance_graph(project_emissions_w, project_emissions_wo, project_emissions_balance):
                 # Create the figure and axis
@@ -899,6 +955,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 "activities": activities,
                 "activities_total": activities_total,
                 "project_chart_base64": plot_project_balance_graph(project_emissions_w, project_emissions_wo, project_emissions_balance),
+                "project_gases_chart_base64": plot_with_without_balance_bar_chart_stacked_by_gas(gases_w, gases_wo, gases),
                 "faologo_base64": faologo_base64,
             }
 
