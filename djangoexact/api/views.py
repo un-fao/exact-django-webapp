@@ -61,6 +61,8 @@ from .models import (
     APIHealth,
     FuelType,
     SoilType,
+    Fishery,
+    Livestock,
 )
 from .serializers import (
     ActionTypes,
@@ -736,10 +738,10 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             total_area = sum(activity.area for activity in project.activities.all())
 
             # Call project results endpoint
-            response = self.results(request, pk=pk)
+            total_results_response = self.results(request, pk=pk)
 
-            data = response.data
-            activities = data["activities"]
+            total_data = total_results_response.data
+            activities = total_data["activities"]
             modules = [module for activity in activities for module in activity["modules"]]
             results = [module["results"] for module in modules]
             total_w = sum(result["total_w"] for result in results)
@@ -754,10 +756,9 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             new_request.query_params = request.query_params.copy()
             new_request.query_params["aggregate"] = "gas"
 
-            response = self.results(new_request, pk=pk)
-
-            data = response.data
-            activities = data["activities"]
+            gas_results_response = self.results(new_request, pk=pk)
+            gas_data = gas_results_response.data
+            activities = gas_data["activities"]
             modules = [module for activity in activities for module in activity["modules"]]
             results = [module["results"] for module in modules]
 
@@ -802,6 +803,41 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             project_tertiary_ghg_direction = "increases" if project_tertiary_ghg_emissions >= 0 else "decreases"
 
             activities = project.activities.all()
+
+            processed_activities = []
+
+            for a in total_data["activities"]:
+                db_activity: Activity = activities.get(name=a["name"])
+                mlist = a["modules"]
+                highest_module = max(mlist, key=lambda x: abs(x["results"]["balance"]))
+                second_highest_module = sorted(mlist, key=lambda x: abs(x["results"]["balance"]), reverse=True)[1]
+
+                sum_all_total_w = sum([m["results"]["total_w"] for m in mlist])
+                sum_all_total_wo = sum([m["results"]["total_wo"] for m in mlist])
+                sum_all_balance = sum_all_total_w - sum_all_total_wo
+
+                db_activity.module_1 = {
+                    "name": highest_module["module_type"]["name"],
+                    "balance": highest_module["results"]["balance"],
+                }
+
+                db_activity.module_2 = {
+                    "name": second_highest_module["module_type"]["name"],
+                    "balance": second_highest_module["results"]["balance"],
+                }
+
+                db_activity.results = {
+                    "total_w": sum_all_total_w,
+                    "total_wo": sum_all_total_wo,
+                    "balance": sum_all_balance,
+                }
+
+                db_activity.catch_w = sum(m.total_catch_yr_w for m in db_activity.modules if issubclass(m.__class__, Fishery))
+                db_activity.heads_w = sum(m.heads_number_w for m in db_activity.modules if issubclass(m.__class__, Livestock))
+
+                processed_activities.append(db_activity)
+
+            activities_total = processed_activities
 
             def plot_project_balance_graph(project_emissions_w, project_emissions_wo, project_emissions_balance):
                 # Create the figure and axis
@@ -864,6 +900,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 "project_tertiary_ghg_emissions": project_tertiary_ghg_emissions,
                 "project_tertiary_ghg_direction": project_tertiary_ghg_direction,
                 "activities": activities,
+                "activities_total": activities_total,
                 "project_chart_base64": plot_project_balance_graph(project_emissions_w, project_emissions_wo, project_emissions_balance),
                 "faologo_base64": faologo_base64,
             }
@@ -1872,15 +1909,7 @@ def generic_module_viewset(model: Module):
                     }
                     results_by_activity_gas = DynamicResultSerializer(results_by_activity_gas, aggregate_by=BreakdownTypes.ACTIVITY_GAS).data
 
-                    module_results = (
-                        results_total
-                        if aggregate_by == BreakdownTypes.TOTAL
-                        else results_by_activity
-                        if aggregate_by == BreakdownTypes.ACTIVITY
-                        else results_by_gas
-                        if aggregate_by == BreakdownTypes.GAS
-                        else results_by_activity_gas
-                    )
+                    module_results = results_total if aggregate_by == BreakdownTypes.TOTAL else results_by_activity if aggregate_by == BreakdownTypes.ACTIVITY else results_by_gas if aggregate_by == BreakdownTypes.GAS else results_by_activity_gas
                     module.cache_results(results_total, results_by_activity, results_by_gas, results_by_activity_gas)
 
                 serializer = DynamicResultSerializer(module_results, aggregate_by=aggregate_by)
