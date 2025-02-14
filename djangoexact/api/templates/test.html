@@ -301,11 +301,28 @@
 						<h3>Carbon Balance by Activity</h3>
 					</div>
 					<div class="card-body">
-						{% for activity in activities %}
+						{% for activity in activities_total %}
 						<div class="row mb-3">
 							<h4>Activity {{forloop.counter}} - {{activity.name}}</h4>
 							<hr />
-							<div class="col-sm-6 text-start"></div>
+							<div class="col-sm-6 text-start">
+								The activity will be implemented starting from {{activity.start_year}}, for a total of {{activity.implementation_years}} years of implementation, with last year of accounting in {{activity.last_year_of_accounting}}.
+								<br>
+								<br>
+								Under the With project scenario, the activity will impact
+									{% if activity.is_luc %}{{activity.area}} hectares.
+									{% elif activity.is_fishery %}{{activity.catch_w}} tonnes of catch.
+									{% else %}{{activity.heads}} heads.
+									{% endif %}
+								<br>
+								The activity has a carbon balance of <b>{{activity.results.balance|floatformat:2|intcomma}} tCO2-e</b> over the period of accounting, mainly due to interventions in:
+								<br>
+								<br>
+								<ol>
+									<li><b>{{activity.module_1.name}}</b> ({{activity.module_1.balance|floatformat:2|intcomma}} tCO2-e)</li>
+									<li><b>{{activity.module_2.name}}</b> ({{activity.module_2.balance|floatformat:2|intcomma}} tCO2-e)</li>
+								</ol>
+							</div>
 						</div>
 						{% endfor %}
 					</div>
