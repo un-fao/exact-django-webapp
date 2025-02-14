@@ -319,8 +319,9 @@
 								<br>
 								<br>
 								<ol>
-									<li><b>{{activity.module_1.name}}</b> ({{activity.module_1.balance|floatformat:2|intcomma}} tCO2-e)</li>
-									<li><b>{{activity.module_2.name}}</b> ({{activity.module_2.balance|floatformat:2|intcomma}} tCO2-e)</li>
+									{% for m in activity.modules_emissions %}
+									<li><b>{{m.name}}</b> ({{m.balance|floatformat:2|intcomma}} tCO2-e)</li>
+									{% endfor %}
 								</ol>
 							</div>
 						</div>

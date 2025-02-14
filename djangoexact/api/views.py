@@ -809,28 +809,15 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             for a in total_data["activities"]:
                 db_activity: Activity = activities.get(name=a["name"])
                 mlist = a["modules"]
-                highest_module = max(mlist, key=lambda x: abs(x["results"]["balance"]))
-                second_highest_module = sorted(mlist, key=lambda x: abs(x["results"]["balance"]), reverse=True)[1]
+                modules_by_highest_emissions = sorted(mlist, key=lambda x: abs(x["results"]["balance"]), reverse=True)
+
+                db_activity.modules_emissions = [{"name": m["module_type"]["name"], "balance": m["results"]["balance"]} for m in modules_by_highest_emissions]
 
                 sum_all_total_w = sum([m["results"]["total_w"] for m in mlist])
                 sum_all_total_wo = sum([m["results"]["total_wo"] for m in mlist])
                 sum_all_balance = sum_all_total_w - sum_all_total_wo
 
-                db_activity.module_1 = {
-                    "name": highest_module["module_type"]["name"],
-                    "balance": highest_module["results"]["balance"],
-                }
-
-                db_activity.module_2 = {
-                    "name": second_highest_module["module_type"]["name"],
-                    "balance": second_highest_module["results"]["balance"],
-                }
-
-                db_activity.results = {
-                    "total_w": sum_all_total_w,
-                    "total_wo": sum_all_total_wo,
-                    "balance": sum_all_balance,
-                }
+                db_activity.results = {"total_w": sum_all_total_w, "total_wo": sum_all_total_wo, "balance": sum_all_balance}
 
                 db_activity.catch_w = sum(m.total_catch_yr_w for m in db_activity.modules if issubclass(m.__class__, Fishery))
                 db_activity.heads_w = sum(m.heads_number_w for m in db_activity.modules if issubclass(m.__class__, Livestock))
