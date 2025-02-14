@@ -617,7 +617,14 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 description="List of activity IDs to include in the report",
                 type=openapi.TYPE_ARRAY,
                 items={"type": openapi.TYPE_INTEGER},
-            )
+            ),
+            openapi.Parameter(
+                "template",
+                openapi.IN_QUERY,
+                description="Name of the report template to render",
+                type=openapi.TYPE_STRING,
+                required=False,
+            ),
         ],
         responses={404: "Project not found", 403: "Selected user does not have permission to view project results"},
     )
@@ -628,6 +635,10 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not project.is_ready():
             logging.error("Project is not ready")
             return utils.ErrorResponse("To get a report for a project, all activities must have been completed.", status=http_status.HTTP_400_BAD_REQUEST)
+
+        if request.query_params.get("template", None):
+            response = self.template(request, pk=pk)
+            return response
 
         selected_activities = request.query_params.get("activities", "").split(",")
         if selected_activities == [""]:
@@ -715,7 +726,6 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         serializer = ProjectLockHolderInformationSerializer(project, many=False)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
-    @action(detail=True, methods=["get"])
     @swagger_auto_schema(
         operation_description="Generate a PDF from an HTML template",
         manual_parameters=[openapi.Parameter("template", openapi.IN_QUERY, description="Name of the Django template to render", type=openapi.TYPE_STRING, required=True)],
