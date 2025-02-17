@@ -998,6 +998,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
                 ax.set_xticks(x)
                 ax.set_xticklabels(labels)
+                ax.ticklabel_format(style="plain", axis="y", useOffset=False)
                 ax.set_ylabel("Emissions (tonnes)")
                 ax.set_title("")
                 ax.legend()
