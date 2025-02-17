@@ -6,6 +6,7 @@ from django.core.mail import send_mail
 from django.urls import reverse
 from django.conf import settings
 from django.shortcuts import render
+import numpy as np
 
 from django.apps import apps
 from django.contrib.auth.models import Group
@@ -61,6 +62,13 @@ from .models import (
     APIHealth,
     FuelType,
     SoilType,
+    Fishery,
+    Livestock,
+    LivestockCategoryType,
+    FishType,
+    FisheryType,
+    SmallFishery,
+    LargeFishery,
 )
 from .serializers import (
     ActionTypes,
@@ -116,6 +124,10 @@ from django.http import HttpResponse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from django.core.cache import cache
 import api.security as security
+import ipcc.models as ipcc_models
+import matplotlib.pyplot as plt
+import io
+import base64
 
 logger = logging.getLogger("console")
 
@@ -611,7 +623,14 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 description="List of activity IDs to include in the report",
                 type=openapi.TYPE_ARRAY,
                 items={"type": openapi.TYPE_INTEGER},
-            )
+            ),
+            openapi.Parameter(
+                "template",
+                openapi.IN_QUERY,
+                description="Name of the report template to render",
+                type=openapi.TYPE_STRING,
+                required=False,
+            ),
         ],
         responses={404: "Project not found", 403: "Selected user does not have permission to view project results"},
     )
@@ -622,6 +641,10 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not project.is_ready():
             logging.error("Project is not ready")
             return utils.ErrorResponse("To get a report for a project, all activities must have been completed.", status=http_status.HTTP_400_BAD_REQUEST)
+
+        if request.query_params.get("template", None):
+            response = self.template(request, pk=pk)
+            return response
 
         selected_activities = request.query_params.get("activities", "").split(",")
         if selected_activities == [""]:
@@ -708,6 +731,379 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         serializer = ProjectLockHolderInformationSerializer(project, many=False)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_description="Generate a PDF from an HTML template",
+        manual_parameters=[openapi.Parameter("template", openapi.IN_QUERY, description="Name of the Django template to render", type=openapi.TYPE_STRING, required=True)],
+        responses={200: "PDF file generated successfully", 400: "Template name not provided or template not found", 500: "Error generating PDF"},
+        produces=["application/pdf"],
+    )
+    def template(self, request, pk=None):
+        template_name = request.query_params.get("template")
+
+        if not template_name:
+            return utils.ErrorResponse("Template name is required", status=http_status.HTTP_400_BAD_REQUEST)
+
+        try:
+            project: Project = self.get_object()
+            soc: ipcc_models.SoilOrganicCarbon = ipcc_models.SoilOrganicCarbon.objects.get(climate=project.climate, moisture=project.moisture, soil_type=project.soil_type)
+
+            # TODO: Remove mock data
+
+            # Calculate total area of all activities
+            total_area = sum(activity.area for activity in project.activities.all())
+
+            # Call project results endpoint
+            total_results_response = self.results(request, pk=pk)
+
+            total_data = total_results_response.data
+            activities = total_data["activities"]
+            modules = [module for activity in activities for module in activity["modules"]]
+            results = [module["results"] for module in modules]
+            total_w = sum(result["total_w"] for result in results)
+            total_wo = sum(result["total_wo"] for result in results)
+            total_balance = total_w - total_wo
+
+            project_emissions_w = total_w
+            project_emissions_wo = total_wo
+            project_emissions_balance = total_balance
+
+            new_request = request._request
+            new_request.query_params = request.query_params.copy()
+            new_request.query_params["aggregate"] = "gas"
+
+            gas_results_response = self.results(new_request, pk=pk)
+            gas_data = gas_results_response.data
+            activities = gas_data["activities"]
+            modules = [module for activity in activities for module in activity["modules"]]
+            results = [module["results"] for module in modules]
+
+            emissions_w = [result["total_w"] for result in results]
+            emissions_wo = [result["total_wo"] for result in results]
+
+            co2_w = {"name": "CO2", "value": 0}
+            ch4_w = {"name": "CH4", "value": 0}
+            n2o_w = {"name": "N2O", "value": 0}
+            co_w = {"name": "CO", "value": 0}
+            doc_w = {"name": "DOC", "value": 0}
+            other_w = {"name": "OTHER", "value": 0}
+
+            gases_w = [co2_w, ch4_w, n2o_w, co_w, doc_w, other_w]
+
+            for w in emissions_w:
+                for g in w:
+                    if g["gas_type"]["name"] == "CO2":
+                        co2_w["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "CH4":
+                        ch4_w["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "N2O":
+                        n2o_w["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "CO":
+                        co_w["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "DOC":
+                        doc_w["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "OTHER":
+                        other_w["value"] += sum([e["value"] for e in g["emissions"]])
+
+            co2_wo = {"name": "CO2", "value": 0}
+            ch4_wo = {"name": "CH4", "value": 0}
+            n2o_wo = {"name": "N2O", "value": 0}
+            co_wo = {"name": "CO", "value": 0}
+            doc_wo = {"name": "DOC", "value": 0}
+            other_wo = {"name": "OTHER", "value": 0}
+
+            gases_wo = [co2_wo, ch4_wo, n2o_wo, co_wo, doc_wo, other_wo]
+
+            for wo in emissions_wo:
+                for g in wo:
+                    if g["gas_type"]["name"] == "CO2":
+                        co2_wo["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "CH4":
+                        ch4_wo["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "N2O":
+                        n2o_wo["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "CO":
+                        co_wo["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "DOC":
+                        doc_wo["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "OTHER":
+                        other_wo["value"] += sum([e["value"] for e in g["emissions"]])
+
+            balances = [result["balance"] for result in results]
+
+            co2 = {"name": "CO2", "value": 0}
+            ch4 = {"name": "CH4", "value": 0}
+            n2o = {"name": "N2O", "value": 0}
+            co = {"name": "CO", "value": 0}
+            doc = {"name": "DOC", "value": 0}
+            other = {"name": "OTHER", "value": 0}
+
+            for b in balances:
+                for g in b:
+                    if g["gas_type"]["name"] == "CO2":
+                        co2["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "CH4":
+                        ch4["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "N2O":
+                        n2o["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "CO":
+                        co["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "DOC":
+                        doc["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "OTHER":
+                        other["value"] += sum([e["value"] for e in g["emissions"]])
+
+            gases = [co2, ch4, n2o, co, doc, other]
+
+            highest_gas = max([co2, ch4, n2o, co, doc, other], key=lambda x: abs(x["value"]))
+            second_highest_gas = sorted([co2, ch4, n2o, co, doc, other], key=lambda x: abs(x["value"]), reverse=True)[1]
+            third_highest_gas = sorted([co2, ch4, n2o, co, doc, other], key=lambda x: abs(x["value"]), reverse=True)[2]
+
+            project_primary_ghg = highest_gas["name"]
+            project_primary_ghg_emissions = highest_gas["value"]
+            project_primary_ghg_direction = "increases" if project_primary_ghg_emissions >= 0 else "decreases"
+
+            project_secondary_ghg = second_highest_gas["name"]
+            project_secondary_ghg_emissions = second_highest_gas["value"]
+            project_secondary_ghg_direction = "increases" if project_secondary_ghg_emissions >= 0 else "decreases"
+
+            project_tertiary_ghg = third_highest_gas["name"]
+            project_tertiary_ghg_emissions = third_highest_gas["value"]
+            project_tertiary_ghg_direction = "increases" if project_tertiary_ghg_emissions >= 0 else "decreases"
+
+            activities = project.activities.all()
+
+            processed_activities = []
+
+            # Hectares: if with to without, with is counted as 0 and without as area
+            livestock_heads = [{"name": lct.name, "value_w": 0, "value_wo": 0} for lct in LivestockCategoryType.objects.all()]
+
+            small_fishery_types = [{"name": ft.name, "value_w": 0, "value_wo": 0} for ft in FisheryType.objects.all()]
+            large_fishery_data = {"name": "Large Fisheries", "value_w": 0, "value_wo": 0}
+            land_types = [{"name": lt.name, "value_w": 0, "value_wo": 0} for lt in ModuleType.objects.filter(is_luc=True).all()]
+
+            for a in total_data["activities"]:
+                db_activity: Activity = activities.get(name=a["name"])
+                mlist = a["modules"]
+                modules_by_highest_emissions = sorted(mlist, key=lambda x: abs(x["results"]["balance"]), reverse=True)
+
+                db_activity.modules_emissions = [{"name": m["module_type"]["name"], "balance": m["results"]["balance"]} for m in modules_by_highest_emissions]
+
+                sum_all_total_w = sum([m["results"]["total_w"] for m in mlist])
+                sum_all_total_wo = sum([m["results"]["total_wo"] for m in mlist])
+                sum_all_balance = sum_all_total_w - sum_all_total_wo
+
+                db_activity.results = {"total_w": sum_all_total_w, "total_wo": sum_all_total_wo, "balance": sum_all_balance}
+
+                for m in db_activity.modules:
+                    if issubclass(m.__class__, Fishery):
+                        if isinstance(m, SmallFishery):
+                            m: SmallFishery
+                            for ft in small_fishery_types:
+                                if ft["name"] == m.fishery_type.name:
+                                    ft["value_w"] += m.total_catch_yr_w
+                                    ft["value_wo"] += m.total_catch_yr_wo
+                        elif isinstance(m, LargeFishery):
+                            m: LargeFishery
+                            large_fishery_data["value_wo"] += m.total_catch_yr_wo
+                            large_fishery_data["value_w"] += m.total_catch_yr_w
+
+                        db_activity.catch_w += m.total_catch_yr_w
+
+                    elif isinstance(m, Livestock):
+                        m: Livestock
+                        db_activity.heads_w += m.heads_number_w
+
+                        for lh in livestock_heads:
+                            if lh["name"] == m.livestock_category_type.name:
+                                lh["value_w"] += m.heads_number_w
+                                lh["value_wo"] += m.heads_number_wo
+                    elif issubclass(m.__class__, LandModule):
+                        m: LandModule
+                        for lt in land_types:
+                            if lt["name"] == m.module_type.name:
+                                if m.is_with() and not m.is_without():
+                                    lt["value_w"] += m.area
+                                elif m.is_without() and not m.is_with():
+                                    lt["value_wo"] += m.area
+
+                processed_activities.append(db_activity)
+
+            livestock_heads = list(filter(lambda x: x["value_w"] != 0 or x["value_wo"] != 0, livestock_heads))
+            small_fishery_types = list(filter(lambda x: x["value_w"] != 0 or x["value_wo"] != 0, small_fishery_types))
+            large_fishery_data = {} if large_fishery_data["value_w"] == 0 or large_fishery_data["value_wo"] == 0 else large_fishery_data
+            land_types = list(filter(lambda x: x["value_w"] != 0 or x["value_wo"] != 0, land_types))
+
+            activities_total = processed_activities
+
+            def plot_with_without_balance_bar_chart_stacked_by_gas(data_w: list, data_wo: list):
+                co2_w, ch4_w, n2o_w, co_w, doc_w, other_w = data_w
+                co2_wo, ch4_wo, n2o_wo, co_wo, doc_wo, other_wo = data_wo
+
+                # Prepare bar labels
+                labels = ["With", "Without", "Balance"]
+
+                # Build lists of values for each gas for "With", "Without", and the difference
+                co2_vals = [
+                    co2_w["value"],
+                    co2_wo["value"],
+                    co2_w["value"] - co2_wo["value"],
+                ]
+                ch4_vals = [
+                    ch4_w["value"],
+                    ch4_wo["value"],
+                    ch4_w["value"] - ch4_wo["value"],
+                ]
+                n2o_vals = [
+                    n2o_w["value"],
+                    n2o_wo["value"],
+                    n2o_w["value"] - n2o_wo["value"],
+                ]
+                co_vals = [
+                    co_w["value"],
+                    co_wo["value"],
+                    co_w["value"] - co_wo["value"],
+                ]
+                doc_vals = [
+                    doc_w["value"],
+                    doc_wo["value"],
+                    doc_w["value"] - doc_wo["value"],
+                ]
+                other_vals = [
+                    other_w["value"],
+                    other_wo["value"],
+                    other_w["value"] - other_wo["value"],
+                ]
+
+                # Stack them in an array for plotting
+                data_arrays = np.array([co2_vals, ch4_vals, n2o_vals, co_vals, doc_vals, other_vals])
+                # Each row is a gas, each column is a bar (With, Without, Balance)
+
+                x = np.arange(len(labels))
+                width = 0.6
+
+                fig, ax = plt.subplots(figsize=(6.5, 4))
+
+                # We'll accumulate the bottom of each stack as we go
+                bottom = np.zeros(len(labels))
+
+                colors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b"]
+                names = ["CO2", "CH4", "N2O", "CO", "DOC", "OTHER"]
+
+                for idx, row in enumerate(data_arrays):
+                    ax.bar(x, row, width, bottom=bottom, color=colors[idx], label=names[idx])
+                    bottom += row
+
+                ax.set_xticks(x)
+                ax.set_xticklabels(labels)
+                ax.set_ylabel("Emissions (units)")
+                ax.set_title("Stacked Bar Chart: With vs Without vs Balance")
+                ax.legend()
+
+                # Save to a BytesIO buffer
+                buf = io.BytesIO()
+                plt.savefig(buf, format="svg")
+                buf.seek(0)
+
+                # Encode as base64 for embedding in HTML
+                chart_base64 = base64.b64encode(buf.getvalue()).decode("utf-8")
+                plt.close(fig)
+                plt.clf()
+
+                buf.close()
+                return chart_base64
+
+            def plot_project_balance_graph(project_emissions_w, project_emissions_wo, project_emissions_balance):
+                # Create the figure and axis
+                fig, ax = plt.subplots(figsize=(6.5, 4))
+
+                # Data
+                labels = ["With", "Without", "Balance"]
+                emissions = [project_emissions_w, project_emissions_wo, project_emissions_balance]
+                # Create horizontal bar chart
+                ax.barh(labels, emissions, color=["#1f77b4", "#ff7f0e", "#2ca02c"])
+
+                for i, v in enumerate(emissions):
+                    ax.text(0 if v > 0 else v, i, f"{v:,.2f}", va="center")
+
+                # Add legend
+                ax.text(0.5, 1.1, "tCO2e", ha="center", va="bottom", transform=ax.transAxes)
+
+                # Customize the chart
+                ax.ticklabel_format(style="plain", axis="x", useOffset=False)
+                ax.grid(True, axis="x", linestyle="--", alpha=0.7)
+
+                # Save to a BytesIO buffer
+                buf = io.BytesIO()
+                plt.savefig(buf, format="svg")
+                buf.seek(0)
+
+                # Encode as base64 for embedding in HTML
+                chart_base64 = base64.b64encode(buf.getvalue()).decode("utf-8")
+                plt.close(fig)
+                plt.clf()
+
+                buf.close()
+                return chart_base64
+
+            # Get faologo.eps from static files
+            faologo = open("djangoexact/media/faologo.svg", "rb")
+
+            # Add it as base64 to the context
+            faologo_base64 = base64.b64encode(faologo.read()).decode("utf-8")
+
+            project_chart_base64 = plot_project_balance_graph(project_emissions_w, project_emissions_wo, project_emissions_balance)
+            project_gases_chart_base64 = plot_with_without_balance_bar_chart_stacked_by_gas(gases_w, gases_wo)
+
+            context = {
+                "project": project,
+                "start_year_of_activities": project.start_year_of_activities,
+                "implementation_years": project.implementation_years,
+                "last_year_of_accounting": project.last_year_of_accounting,
+                "total_project_years": (project.implementation_years + project.capitalization_years),
+                "total_carbon_balance": project_emissions_balance,
+                "project_emissions_w": project_emissions_w,
+                "project_emissions_wo": project_emissions_wo,
+                "project_emissions_balance": project_emissions_balance,
+                "total_area": total_area,
+                "total_heads": "WIP",
+                "total_tonnes_of_catch": "WIP",
+                "soc": soc.value,
+                "project_primary_ghg": project_primary_ghg,
+                "project_primary_ghg_emissions": project_primary_ghg_emissions,
+                "project_primary_ghg_direction": project_primary_ghg_direction,
+                "project_secondary_ghg": project_secondary_ghg,
+                "project_secondary_ghg_emissions": project_secondary_ghg_emissions,
+                "project_secondary_ghg_direction": project_secondary_ghg_direction,
+                "project_tertiary_ghg": project_tertiary_ghg,
+                "project_tertiary_ghg_emissions": project_tertiary_ghg_emissions,
+                "project_tertiary_ghg_direction": project_tertiary_ghg_direction,
+                "activities": activities,
+                "activities_total": activities_total,
+                "project_chart_base64": project_chart_base64,
+                "project_gases_chart_base64": project_gases_chart_base64,
+                "faologo_base64": faologo_base64,
+                "livestock_heads": livestock_heads,
+                "small_fishery_types": small_fishery_types,
+                "large_fishery_data": large_fishery_data,
+                "land_types": land_types,
+            }
+
+            html = render(request, f"{template_name}.html", context).content.decode()
+
+            # Generate PDF from HTML using WeasyPrint
+            from weasyprint import HTML
+
+            pdf = HTML(string=html).write_pdf()
+
+            # Create the HTTP response with PDF content
+            response = HttpResponse(pdf, content_type="application/pdf")
+            response["Content-Disposition"] = f'attachment; filename="{template_name}.pdf"'
+
+            return response
+
+        except Exception as e:
+            return utils.ErrorResponse(f"Error generating PDF: {str(e)}", status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
@@ -1697,15 +2093,7 @@ def generic_module_viewset(model: Module):
                     }
                     results_by_activity_gas = DynamicResultSerializer(results_by_activity_gas, aggregate_by=BreakdownTypes.ACTIVITY_GAS).data
 
-                    module_results = (
-                        results_total
-                        if aggregate_by == BreakdownTypes.TOTAL
-                        else results_by_activity
-                        if aggregate_by == BreakdownTypes.ACTIVITY
-                        else results_by_gas
-                        if aggregate_by == BreakdownTypes.GAS
-                        else results_by_activity_gas
-                    )
+                    module_results = results_total if aggregate_by == BreakdownTypes.TOTAL else results_by_activity if aggregate_by == BreakdownTypes.ACTIVITY else results_by_gas if aggregate_by == BreakdownTypes.GAS else results_by_activity_gas
                     module.cache_results(results_total, results_by_activity, results_by_gas, results_by_activity_gas)
 
                 serializer = DynamicResultSerializer(module_results, aggregate_by=aggregate_by)
@@ -2087,3 +2475,24 @@ class SoilTypeViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
             queryset = queryset.filter(is_coastal=False)
 
         return queryset
+
+
+def generate_chart(with_value, without_value, balance):
+    # Create the bar chart
+    fig, ax = plt.subplots(figsize=(10, 4))
+    labels = ["With", "Without", "Balance"]
+    values = [with_value, without_value, balance]
+    colors = ["green" if v < 0 else "red" for v in values]
+
+    # Create horizontal bar chart
+    ax.barh(labels, values, color=colors)
+
+    # Customize the chart
+    ax.set_xlim(min(values) - 10000, max(values) + 10000)
+    ax.grid(True, axis="x", linestyle="--", alpha=0.7)
+
+    # Save the chart
+    chart_path = os.path.join(settings.STATIC_ROOT, "images", "ghg_chart.png")
+    os.makedirs(os.path.dirname(chart_path), exist_ok=True)
+    plt.savefig(chart_path, bbox_inches="tight", dpi=300)
+    plt.close()
