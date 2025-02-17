@@ -63,6 +63,11 @@ from .models import (
     SoilType,
     Fishery,
     Livestock,
+    LivestockCategoryType,
+    FishType,
+    FisheryType,
+    SmallFishery,
+    LargeFishery,
 )
 from .serializers import (
     ActionTypes,
@@ -869,6 +874,13 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
             processed_activities = []
 
+            # Hectares: if with to without, with is counted as 0 and without as area
+            livestock_heads = [{"name": lct.name, "value_w": 0, "value_wo": 0} for lct in LivestockCategoryType.objects.all()]
+
+            small_fishery_types = [{"name": ft.name, "value_w": 0, "value_wo": 0} for ft in FisheryType.objects.all()]
+            large_fishery_data = {"name": "Large Fisheries", "value_w": 0, "value_wo": 0}
+            land_types = [{"name": lt.name, "value_w": 0, "value_wo": 0} for lt in ModuleType.objects.filter(is_luc=True).all()]
+
             for a in total_data["activities"]:
                 db_activity: Activity = activities.get(name=a["name"])
                 mlist = a["modules"]
@@ -882,10 +894,48 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
                 db_activity.results = {"total_w": sum_all_total_w, "total_wo": sum_all_total_wo, "balance": sum_all_balance}
 
-                db_activity.catch_w = sum(m.total_catch_yr_w for m in db_activity.modules if issubclass(m.__class__, Fishery))
-                db_activity.heads_w = sum(m.heads_number_w for m in db_activity.modules if issubclass(m.__class__, Livestock))
+                for m in db_activity.modules:
+                    if issubclass(m.__class__, Fishery):
+                        if isinstance(m, SmallFishery):
+                            m: SmallFishery
+                            for ft in small_fishery_types:
+                                if ft["name"] == m.fishery_type.name:
+                                    ft["value_w"] += m.total_catch_yr_w
+                                    ft["value_wo"] += m.total_catch_yr_wo
+                        elif isinstance(m, LargeFishery):
+                            m: LargeFishery
+                            large_fishery_data["value_wo"] += m.total_catch_yr_wo
+                            large_fishery_data["value_w"] += m.total_catch_yr_w
+
+                        db_activity.catch_w += m.total_catch_yr_w
+
+                    elif isinstance(m, Livestock):
+                        m: Livestock
+                        db_activity.heads_w += m.heads_number_w
+
+                        for lh in livestock_heads:
+                            if lh["name"] == m.livestock_category_type.name:
+                                lh["value_w"] += m.heads_number_w
+                                lh["value_wo"] += m.heads_number_wo
+                    elif issubclass(m.__class__, LandModule):
+                        m: LandModule
+                        for lt in land_types:
+                            if lt["name"] == m.module_type.name:
+                                if m.is_start() and m.is_with() and not m.is_without():
+                                    lt["value_w"] += m.area
+                                elif m.is_start() and m.is_without() and not m.is_with():
+                                    lt["value_wo"] += m.area
+                                elif not m.is_start() and m.is_with() and not m.is_without():
+                                    lt["value_w"] += m.area
+                                elif not m.is_start() and m.is_without() and not m.is_with():
+                                    lt["value_wo"] += m.area
 
                 processed_activities.append(db_activity)
+
+            livestock_heads = list(filter(lambda x: x["value_w"] != 0 or x["value_wo"] != 0, livestock_heads))
+            small_fishery_types = list(filter(lambda x: x["value_w"] != 0 or x["value_wo"] != 0, small_fishery_types))
+            large_fishery_data = {} if large_fishery_data["value_w"] == 0 or large_fishery_data["value_wo"] == 0 else large_fishery_data
+            land_types = list(filter(lambda x: x["value_w"] != 0 or x["value_wo"] != 0, land_types))
 
             activities_total = processed_activities
 
@@ -957,6 +1007,10 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 "project_chart_base64": plot_project_balance_graph(project_emissions_w, project_emissions_wo, project_emissions_balance),
                 "project_gases_chart_base64": plot_with_without_balance_bar_chart_stacked_by_gas(gases_w, gases_wo, gases),
                 "faologo_base64": faologo_base64,
+                "livestock_heads": livestock_heads,
+                "small_fishery_types": small_fishery_types,
+                "large_fishery_data": large_fishery_data,
+                "land_types": land_types,
             }
 
             html = render(request, f"{template_name}.html", context).content.decode()
