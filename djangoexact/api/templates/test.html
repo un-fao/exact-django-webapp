@@ -152,7 +152,7 @@
 								<p><strong>Project Code:</strong> {{project.code}}</p>
 								<p><strong>Funding Agency:</strong> {{project.funding_agency}}</p>
 								<p><strong>Executing Agency:</strong> {{project.executing_agency}}</p>
-								<p><strong>Project Cost [USD]:</strong> {{project.cost}}</p>
+								<p><strong>Project Cost [USD]:</strong> {{project.cost|floatformat:2|intcomma}}</p>
 								<p><strong>Status:</strong> {{project.status}}</p>
 							</div>
 						</div>
