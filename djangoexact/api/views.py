@@ -921,13 +921,9 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                         m: LandModule
                         for lt in land_types:
                             if lt["name"] == m.module_type.name:
-                                if m.is_start() and m.is_with() and not m.is_without():
+                                if m.is_with() and not m.is_without():
                                     lt["value_w"] += m.area
-                                elif m.is_start() and m.is_without() and not m.is_with():
-                                    lt["value_wo"] += m.area
-                                elif not m.is_start() and m.is_with() and not m.is_without():
-                                    lt["value_w"] += m.area
-                                elif not m.is_start() and m.is_without() and not m.is_with():
+                                elif m.is_without() and not m.is_with():
                                     lt["value_wo"] += m.area
 
                 processed_activities.append(db_activity)
