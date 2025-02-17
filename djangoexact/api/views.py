@@ -933,6 +933,8 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             small_fishery_types = list(filter(lambda x: x["value_w"] != 0 or x["value_wo"] != 0, small_fishery_types))
             large_fishery_data = {} if large_fishery_data["value_w"] == 0 or large_fishery_data["value_wo"] == 0 else large_fishery_data
             land_types = list(filter(lambda x: x["value_w"] != 0 or x["value_wo"] != 0, land_types))
+            total_heads = sum([lh["value_w"] for lh in livestock_heads])
+            total_tonnes_of_catch = sum([ft["value_w"] for ft in small_fishery_types]) + large_fishery_data.get("value_w", 0)
 
             activities_total = processed_activities
 
@@ -996,8 +998,8 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
                 ax.set_xticks(x)
                 ax.set_xticklabels(labels)
-                ax.set_ylabel("Emissions (units)")
-                ax.set_title("Stacked Bar Chart: With vs Without vs Balance")
+                ax.set_ylabel("Emissions (tonnes)")
+                ax.set_title("")
                 ax.legend()
 
                 # Save to a BytesIO buffer
@@ -1066,8 +1068,8 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 "project_emissions_wo": project_emissions_wo,
                 "project_emissions_balance": project_emissions_balance,
                 "total_area": total_area,
-                "total_heads": "WIP",
-                "total_tonnes_of_catch": "WIP",
+                "total_heads": total_heads,
+                "total_tonnes_of_catch": total_tonnes_of_catch,
                 "soc": soc.value,
                 "project_primary_ghg": project_primary_ghg,
                 "project_primary_ghg_emissions": project_primary_ghg_emissions,
