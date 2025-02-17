@@ -6,6 +6,7 @@ from django.core.mail import send_mail
 from django.urls import reverse
 from django.conf import settings
 from django.shortcuts import render
+import numpy as np
 
 from django.apps import apps
 from django.contrib.auth.models import Group
@@ -935,8 +936,82 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
             activities_total = processed_activities
 
-            def plot_with_without_balance_bar_chart_stacked_by_gas(gases_w, gases_wo, gases):
-                return None
+            def plot_with_without_balance_bar_chart_stacked_by_gas(data_w: list, data_wo: list):
+                co2_w, ch4_w, n2o_w, co_w, doc_w, other_w = data_w
+                co2_wo, ch4_wo, n2o_wo, co_wo, doc_wo, other_wo = data_wo
+
+                # Prepare bar labels
+                labels = ["With", "Without", "Balance"]
+
+                # Build lists of values for each gas for "With", "Without", and the difference
+                co2_vals = [
+                    co2_w["value"],
+                    co2_wo["value"],
+                    co2_w["value"] - co2_wo["value"],
+                ]
+                ch4_vals = [
+                    ch4_w["value"],
+                    ch4_wo["value"],
+                    ch4_w["value"] - ch4_wo["value"],
+                ]
+                n2o_vals = [
+                    n2o_w["value"],
+                    n2o_wo["value"],
+                    n2o_w["value"] - n2o_wo["value"],
+                ]
+                co_vals = [
+                    co_w["value"],
+                    co_wo["value"],
+                    co_w["value"] - co_wo["value"],
+                ]
+                doc_vals = [
+                    doc_w["value"],
+                    doc_wo["value"],
+                    doc_w["value"] - doc_wo["value"],
+                ]
+                other_vals = [
+                    other_w["value"],
+                    other_wo["value"],
+                    other_w["value"] - other_wo["value"],
+                ]
+
+                # Stack them in an array for plotting
+                data_arrays = np.array([co2_vals, ch4_vals, n2o_vals, co_vals, doc_vals, other_vals])
+                # Each row is a gas, each column is a bar (With, Without, Balance)
+
+                x = np.arange(len(labels))
+                width = 0.6
+
+                fig, ax = plt.subplots(figsize=(6.5, 4))
+
+                # We'll accumulate the bottom of each stack as we go
+                bottom = np.zeros(len(labels))
+
+                colors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b"]
+                names = ["CO2", "CH4", "N2O", "CO", "DOC", "OTHER"]
+
+                for idx, row in enumerate(data_arrays):
+                    ax.bar(x, row, width, bottom=bottom, color=colors[idx], label=names[idx])
+                    bottom += row
+
+                ax.set_xticks(x)
+                ax.set_xticklabels(labels)
+                ax.set_ylabel("Emissions (units)")
+                ax.set_title("Stacked Bar Chart: With vs Without vs Balance")
+                ax.legend()
+
+                # Save to a BytesIO buffer
+                buf = io.BytesIO()
+                plt.savefig(buf, format="svg")
+                buf.seek(0)
+
+                # Encode as base64 for embedding in HTML
+                chart_base64 = base64.b64encode(buf.getvalue()).decode("utf-8")
+                plt.close(fig)
+                plt.clf()
+
+                buf.close()
+                return chart_base64
 
             def plot_project_balance_graph(project_emissions_w, project_emissions_wo, project_emissions_balance):
                 # Create the figure and axis
@@ -966,7 +1041,9 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 # Encode as base64 for embedding in HTML
                 chart_base64 = base64.b64encode(buf.getvalue()).decode("utf-8")
                 plt.close(fig)
+                plt.clf()
 
+                buf.close()
                 return chart_base64
 
             # Get faologo.eps from static files
@@ -974,6 +1051,9 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
             # Add it as base64 to the context
             faologo_base64 = base64.b64encode(faologo.read()).decode("utf-8")
+
+            project_chart_base64 = plot_project_balance_graph(project_emissions_w, project_emissions_wo, project_emissions_balance)
+            project_gases_chart_base64 = plot_with_without_balance_bar_chart_stacked_by_gas(gases_w, gases_wo)
 
             context = {
                 "project": project,
@@ -1000,8 +1080,8 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 "project_tertiary_ghg_direction": project_tertiary_ghg_direction,
                 "activities": activities,
                 "activities_total": activities_total,
-                "project_chart_base64": plot_project_balance_graph(project_emissions_w, project_emissions_wo, project_emissions_balance),
-                "project_gases_chart_base64": plot_with_without_balance_bar_chart_stacked_by_gas(gases_w, gases_wo, gases),
+                "project_chart_base64": project_chart_base64,
+                "project_gases_chart_base64": project_gases_chart_base64,
                 "faologo_base64": faologo_base64,
                 "livestock_heads": livestock_heads,
                 "small_fishery_types": small_fishery_types,
