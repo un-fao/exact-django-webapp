@@ -13,17 +13,52 @@
 			crossorigin="anonymous"></script>
 
 		<title>Report</title>
+		<meta charset="UTF-8">
 		<style>
+			@page {
+				margin: 2cm;
+				@top-left {
+					content: element(page-header);
+				}
+				@bottom-left {
+					content: element(page-footer);
+				}
+			}
+			header {
+				position: running(page-header);
+				display: block;
+				width: 100%;
+				height: 2cm;
+				text-align: left;
+				line-height: 2cm;
+				padding-left: 0.5cm;
+			}
+			footer {
+				position: running(page-footer);
+				display: block;
+				width: 100%;
+				height: 2cm;
+				text-align: left;
+				line-height: 2cm;
+				padding-left: 0.5cm;
+			}
+			/* Force a new page when needed */
+			.page-break {
+				page-break-before: always;
+			  /* For modern browsers: break-before: page; */
+			}
+			main {
+			  /* Main content doesn't require extra margin since header/footer are in margin boxes */
+			}
+
 			.timeline-container {
 				padding: 20px;
 				position: relative;
-				margin: 60px 0;
 			}
 
 			.timeline {
 				height: 12px;
 				position: relative;
-				margin: 0 60px;
 			}
 
 			.timeline-phase {
@@ -33,13 +68,13 @@
 			}
 
 			.implementation-phase {
-				left: 0;
-				width: 50%;
+				left: 15%;
+				width: 35%;
 			}
 
 			.capitalization-phase {
 				left: 50%;
-				width: 50%;
+				width: 35%;
 			}
 
 			.segments {
@@ -83,7 +118,7 @@
 			.timeline-point .year {
 				position: absolute;
 				bottom: 30px;
-				left: 50%;
+				left: 35%;
 				transform: translateX(-50%);
 				white-space: nowrap;
 				font-size: 1.1em;
@@ -93,14 +128,14 @@
 			.timeline-point .label {
 				position: absolute;
 				top: 30px;
-				left: 50%;
+				left: 35%;
 				transform: translateX(-50%);
 				white-space: nowrap;
 				font-size: 1.1em;
 			}
 
 			.timeline-point.start {
-				left: 0%;
+				left: 15%;
 			}
 
 			.timeline-point.implementation {
@@ -108,15 +143,7 @@
 			}
 
 			.timeline-point.end {
-				left: 100%;
-			}
-
-			.new-page {
-				page-break-before: always;
-			}
-
-			.page {
-				min-height: 100vh;
+				left: 85%;
 			}
 		</style>
 	</head>
@@ -136,9 +163,20 @@
 				</h1>
 			</div>
 		</div>
-		<div class="new-page"></div>
-		<div class="page">
-			<div class="container">
+
+		<header>
+		<!-- Header content (appears on every page) -->
+		<p style="font-size: 12px">Environmental eXternalities ACcounting Tool (EX-ACT)</p>
+		</header>
+	
+		<footer>
+		<!-- Footer content (appears on every page) -->
+			<p style="font-size: 12px">Downloaded on {{download_date_time}} | EX-ACT Version: V10 | User: {{user.email}}</p>
+			{% comment %} <p style="font-size: 12px">Owner: {{owner}}</p> NOTE: There's no project owner{% endcomment %}
+		</footer>
+
+		<main>
+			<section>
 				<div class="card mb-4">
 					<div class="card-header bg-dark text-white">
 						<h3>Project Description</h3>
@@ -171,7 +209,7 @@
 							</div>
 						</div>
 
-						<div class="row mb-3">
+						<div class="row">
 							<h4 class="text-center">Project Duration</h4>
 							<hr />
 							<div class="col-sm-6 text-start text-black">
@@ -186,7 +224,10 @@
 									<strong>Last Year of Accounting:</strong> {{last_year_of_accounting}}
 								</p>
 							</div>
-							<div class="col-12 mt-3">
+						</div>
+
+						<div class="row" style="padding-top: 60px">
+							<div class="col-12">
 								<div class="timeline-container">
 									<div class="timeline">
 										<div class="timeline-phase implementation-phase">
@@ -197,29 +238,28 @@
 										</div>
 										<div class="timeline-point start">
 											<div class="year">{{project.start_year_of_activities}}</div>
-											<div class="label">Start year of accounting</div>
+											<div class="label" style="font-size: 14px">Start year of accounting</div>
 										</div>
 										<div class="timeline-point implementation">
 											<div class="year">
 												{{project.start_year_of_activities|add:project.implementation_years}}
 											</div>
-											<div class="label">Implementation ends</div>
+											<div class="label" style="font-size: 14px">End year of implementation</div>
 										</div>
 										<div class="timeline-point end">
 											<div class="year">{{project.last_year_of_accounting}}</div>
-											<div class="label">Capitalization ends</div>
+											<div class="label" style="font-size: 14px">Last year of accounting</div>
 										</div>
 									</div>
 								</div>
 							</div>
 						</div>
+
 					</div>
 				</div>
-			</div>
-		</div>
-		<div class="new-page"></div>
-		<div class="page">
-			<div class="container">
+			</section>
+			<div class="page-break"></div>
+			<section>
 				<div class="card mb-4">
 					<div class="card-header bg-dark text-white">
 						<h3>Project Summary</h3>
@@ -244,11 +284,9 @@
 						</div>
 					</div>
 				</div>
-			</div>
-		</div>
-		<div class="new-page"></div>
-		<div class="page">
-			<div class="container">
+			</section>
+			<div class="page-break"></div>
+			<section>
 				<div class="card mb-4">
 					<div class="card-header bg-dark text-white">
 						<h3>GHG Assessment Results</h3>
@@ -278,11 +316,9 @@
 						</div>
 					</div>
 				</div>
-			</div>
-		</div>
-		<div class="new-page"></div>
-		<div class="page">
-			<div class="container">
+			</section>
+			<div class="page-break"></div>
+			<section>
 				<div class="card mb-4">
 					<div class="card-header bg-dark text-white">
 						<h3>GHG Assessment Results</h3>
@@ -315,11 +351,9 @@
 						</div>
 					</div>
 				</div>
-			</div>
-		</div>
-		<div class="new-page"></div>
-		<div class="page">
-			<div class="container">
+			</section>
+			<div class="page-break"></div>
+			<section>
 				<div class="card mb-4">
 					<div class="card-header bg-dark text-white">
 						<h3>Carbon Balance by Activity</h3>
@@ -352,11 +386,9 @@
 						{% endfor %}
 					</div>
 				</div>
-			</div>
-		</div>
-		<div class="new-page"></div>
-		<div class="page">
-			<div class="container">
+			</section>
+			<div class="page-break"></div>
+			<section>
 				<div class="card mb-4">
 					<div class="card-header bg-dark text-white">
 						<h3>Units Breakdown</h3>
@@ -422,63 +454,79 @@
 						</table>
 					</div>
 				</div>
-			</div>
-		</div>
-		<div class="new-page"></div>
-		<div class="container">
-			<h1 class="text-start">EX-ACT Methodological Overview</h1>
-			<p style="text-align: justify; font-size: 15px">
-				The Environmental EXternalities ACcounting Tool (EX-ACT) has been developed by the
-				Food and Agriculture Organization of the United Nations (FAO) to estimate the
-				effects of interventions in the agricultural sector on climate change mitigation
-				and biodiversity conservation1. The climate section of EX-ACT estimates greenhouse
-				gas (GHG) fluxes generated by activities implemented at field level, and along the
-				value chain, providing estimates of the emission/mitigation potential of public
-				and private investment projects, policies, and national level programs. The tool
-				covers the whole agrifood sector including the agriculture, forestry and other
-				land use (AFOLU) sector, fisheries and aquaculture, agricultural inputs and
-				infrastructure, and downstream value chain activities. The climate section of
-				EX-ACT is primarily based on the Volume 4 of the 2019 Refinement to the 2006
-				Guidelines for National Greenhouse Gas Inventories (IPCC, 2019), the 2013
-				Supplement to the 2006 IPCC Guidelines for National Greenhouse Gas Inventories:
-				Wetlands (IPCC, 2014), and Volume 4 of the 2006 IPCC Guidelines for National
-				Greenhouse Gas Inventories (IPCC, 2006), complemented by other scientific
-				research. GHG emissions for farm operations, inputs, transport, and irrigation
-				systems implementation are based on Lal (2004). Emission factors for electricity
-				use are based on United Nation Framework Convention on Climate Change (UNFCCC,
-				2021), and those for on-farm infrastructure are from Agence De l’Environnement et
-				de la Maitrise de l’Energie (ADEME, 2021). Emissions factors for the fishery
-				sector are derived from Parker & Tyedmers (2014), Sciortino (2010), Winther et al.
-				(2009) and Irribaren et al. (2010 & 2011). Soil carbon stock in mangroves is
-				complemented by the review from Atwood et al. (2017). These references provide
-				EX-ACT with recognized default values for emission factors and carbon values, the
-				so-called Tier 1 level of precision. The tool consists of a set of different
-				modules allowing for an analysis of carbon dioxide (CO2) emissions and removals
-				resulting from changes in carbon stocks in the five quantifiable carbon pools
-				(i.e. aboveground biomass, belowground biomass, litter and deadwood, and soil),
-				and non-CO2 emissions: methane (CH4), nitrous oxide (N2O) and hydrofluorocarbons
-				(HFC) originating from activities in the agricultural sector. All GHG fluxes are
-				computed in tonnes of CO2 equivalent according to Global Warming Potentials
-				provided by the IPCC Assessment Reports. The EX-ACT appraisal assesses how the
-				results of an intervention compare to a scenario where the activities are not
-				implemented (also known as reference or business as usual (BAU) scenario). To
-				compute the carbon balance, the tool requires data for three specific points in
-				time: initial situation, with project scenario, without project scenario. The
-				carbon balance is equal to the difference between GHG fluxes generated from the
-				“with project” scenario and those generated from the “without project” scenario.
-				The carbon balance in EX-ACT represents the estimated impact of the project.
-				Calculations are done using Tier 1 parameters provided by IPCC (2019) that
-				represent average values differentiated by region, climate, moisture level and
-				soil type, drawing from the most recent scientific literature. The users have the
-				possibility to input location-specific parameters (Tier 2) if data is available.
-				For a thorough description of the methodology applied in EX-ACT, please consult
-				the EX-ACT guidelines available at the following link:
-				<u>EX-ACT Guidelines</u>.
-				<br />
-				<br />
-				Please contact us for any feedback and questions you may have:
-				<a href="mailto:EX-ACT@fao.org">EX-ACT@fao.org</a>
-			</p>
-		</div>
+			</section>
+			<div class="page-break"></div>
+			<section>
+				<h1 class="text-start">EX-ACT Methodological Overview</h1>
+				<p style="text-align: justify; font-size: 15px">
+					The Environmental EXternalities ACcounting Tool (EX-ACT) has been developed by the
+					Food and Agriculture Organization of the United Nations (FAO) to estimate the
+					effects of interventions in the agricultural sector on climate change mitigation
+					and biodiversity conservation1. The climate section of EX-ACT estimates greenhouse
+					gas (GHG) fluxes generated by activities implemented at field level, and along the
+					value chain, providing estimates of the emission/mitigation potential of public
+					and private investment projects, policies, and national level programs. The tool
+					covers the whole agrifood sector including the agriculture, forestry and other
+					land use (AFOLU) sector, fisheries and aquaculture, agricultural inputs and
+					infrastructure, and downstream value chain activities. The climate section of
+					EX-ACT is primarily based on the Volume 4 of the 2019 Refinement to the 2006
+					Guidelines for National Greenhouse Gas Inventories (IPCC, 2019), the 2013
+					Supplement to the 2006 IPCC Guidelines for National Greenhouse Gas Inventories:
+					Wetlands (IPCC, 2014), and Volume 4 of the 2006 IPCC Guidelines for National
+					Greenhouse Gas Inventories (IPCC, 2006), complemented by other scientific
+					research. GHG emissions for farm operations, inputs, transport, and irrigation
+					systems implementation are based on Lal (2004). Emission factors for electricity
+					use are based on United Nation Framework Convention on Climate Change (UNFCCC,
+					2021), and those for on-farm infrastructure are from Agence De l’Environnement et
+					de la Maitrise de l’Energie (ADEME, 2021). Emissions factors for the fishery
+					sector are derived from Parker & Tyedmers (2014), Sciortino (2010), Winther et al.
+					(2009) and Irribaren et al. (2010 & 2011). Soil carbon stock in mangroves is
+					complemented by the review from Atwood et al. (2017). These references provide
+					EX-ACT with recognized default values for emission factors and carbon values, the
+					so-called Tier 1 level of precision. The tool consists of a set of different
+					modules allowing for an analysis of carbon dioxide (CO2) emissions and removals
+					resulting from changes in carbon stocks in the five quantifiable carbon pools
+					(i.e. aboveground biomass, belowground biomass, litter and deadwood, and soil),
+					and non-CO2 emissions: methane (CH4), nitrous oxide (N2O) and hydrofluorocarbons
+					(HFC) originating from activities in the agricultural sector. All GHG fluxes are
+					computed in tonnes of CO2 equivalent according to Global Warming Potentials
+					provided by the IPCC Assessment Reports. The EX-ACT appraisal assesses how the
+					results of an intervention compare to a scenario where the activities are not
+					implemented (also known as reference or business as usual (BAU) scenario). To
+					compute the carbon balance, the tool requires data for three specific points in
+					time: initial situation, with project scenario, without project scenario. The
+					carbon balance is equal to the difference between GHG fluxes generated from the
+					“with project” scenario and those generated from the “without project” scenario.
+					The carbon balance in EX-ACT represents the estimated impact of the project.
+					Calculations are done using Tier 1 parameters provided by IPCC (2019) that
+					represent average values differentiated by region, climate, moisture level and
+					soil type, drawing from the most recent scientific literature. The users have the
+					possibility to input location-specific parameters (Tier 2) if data is available.
+					For a thorough description of the methodology applied in EX-ACT, please consult
+					the EX-ACT guidelines available at the following link:
+					<u>EX-ACT Guidelines</u>.
+					<br />
+					<br />
+					Please contact us for any feedback and questions you may have:
+					<a href="mailto:EX-ACT@fao.org">EX-ACT@fao.org</a>
+				</p>
+			</section>
+			<div class="page-break"></div>
+			<section>
+				<p style="text-align: justify; font-size: 15px">
+					DISCLAIMER 
+					Information provided in the document is provided “as is” and FAO does not provide any guarantee that such information is correct, complete or up to date. FAO does not represent or endorse the accuracy or reliability of any data provided in the Tool, declines all responsibility for updating the data and assumes no responsibility for errors and omissions in the data provided. FAO also declines all responsibility for errors or deficiencies in the Tool, for program maintenance and upgrading as well as for any damage that may arise from use of the Tool. Registered Users are responsible for reporting any errors or deficiencies in this product by writing to exact@fao.org.
+					<br />
+					<br />
+					FAO makes no, and expressly disclaims any, warranties, express or implied, regarding the correctness, accuracy, completeness, timeliness, and reliability of the text, graphics, links to other sites and any other items accessed from or via the (https://exact.apps.fao.org/), or that the services will be uninterrupted, error-free or free of viruses or other harmful components.
+					<br />
+					<br />
+					The designations employed and the presentation of the material on or in the document do not imply the expression of any opinion whatsoever on the part of FAO concerning the legal or development status of any country, territory, city or area or of its authorities, or concerning the delimitation of its frontiers or boundaries. 
+					<br />
+					<br />
+					FAO shall not be responsible for any information that is not received due to internet connection or software failures. 
+				</p>
+			</section>
+		</main>
 	</body>
 </html>
