@@ -32,6 +32,7 @@ import api.labels as labels
 import api.utilities as utils
 from api.defaults import DefaultsFactory
 from api.models import CustomUser as User
+from datetime import datetime
 
 from .calculators import CalculatorFactory
 from .models import (
@@ -1058,6 +1059,8 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             project_chart_base64 = plot_project_balance_graph(project_emissions_w, project_emissions_wo, project_emissions_balance)
             project_gases_chart_base64 = plot_with_without_balance_bar_chart_stacked_by_gas(gases_w, gases_wo)
 
+            download_date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
             context = {
                 "project": project,
                 "start_year_of_activities": project.start_year_of_activities,
@@ -1090,6 +1093,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 "small_fishery_types": small_fishery_types,
                 "large_fishery_data": large_fishery_data,
                 "land_types": land_types,
+                "download_date_time": download_date_time,
             }
 
             html = render(request, f"{template_name}.html", context).content.decode()
@@ -1102,6 +1106,9 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             # Create the HTTP response with PDF content
             response = HttpResponse(pdf, content_type="application/pdf")
             response["Content-Disposition"] = f'attachment; filename="{template_name}.pdf"'
+
+            # Close the client
+            faologo.close()
 
             return response
 
