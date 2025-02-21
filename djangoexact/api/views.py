@@ -750,8 +750,6 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             project: Project = self.get_object()
             soc: ipcc_models.SoilOrganicCarbon = ipcc_models.SoilOrganicCarbon.objects.get(climate=project.climate, moisture=project.moisture, soil_type=project.soil_type)
 
-            # TODO: Remove mock data
-
             # Calculate total area of all activities
             total_area = sum(activity.area for activity in project.activities.all())
 
@@ -941,7 +939,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             livestock_heads = list(filter(lambda x: x["value_w"] != 0 or x["value_wo"] != 0, livestock_heads))
             small_fishery_types = list(filter(lambda x: x["value_w"] != 0 or x["value_wo"] != 0, small_fishery_types))
             large_fishery_data = {} if large_fishery_data["value_w"] == 0 or large_fishery_data["value_wo"] == 0 else large_fishery_data
-            aquaculture_data = {} if project.aquaculture_area == 0 else {"name": "Aquaculture", "value": project.aquaculture_area}
+            aquaculture_data = {} if aquaculture_data["value_w"] == 0 or aquaculture_data["value_wo"] == 0 else aquaculture_data
             land_types = list(filter(lambda x: x["value_w"] != 0 or x["value_wo"] != 0, land_types))
             total_heads = sum([lh["value_w"] for lh in livestock_heads])
             total_tonnes_of_catch = sum([ft["value_w"] for ft in small_fishery_types]) + large_fishery_data.get("value_w", 0)
@@ -1117,7 +1115,6 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             response = HttpResponse(pdf, content_type="application/pdf")
             response["Content-Disposition"] = f'attachment; filename="{template_name}.pdf"'
 
-            # Close the client
             faologo.close()
 
             return response
