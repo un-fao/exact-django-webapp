@@ -468,6 +468,12 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 description="Show archived projects",
                 type=openapi.TYPE_BOOLEAN,
             ),
+            openapi.Parameter(
+                "tags",
+                openapi.IN_QUERY,
+                description="Filter projects by tags, comma separated. Example: ?tags=tag1,tag2",
+                type=openapi.TYPE_STRING,
+            ),
         ],
         responses={
             404: "Project not found",
@@ -485,12 +491,15 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         search_query = request.query_params.get("name", None)
         is_summary = request.query_params.get("summary", False)
         show_archived = request.query_params.get("show_archived", None)
+        tags = request.query_params.get("tags", None)
 
         filters = {}
         if search_query:
             filters["project__name__icontains"] = search_query
         if not show_archived:
             filters["project__is_archived"] = False
+        if tags:
+            filters["project__tags__name__in"] = tags.split(",")
 
         shared_projects = request.user.memberships.filter(**filters).all()
         projects_list = [share.project for share in shared_projects if utils.has_project_permission("view_project", self.request.user, share.project)]
