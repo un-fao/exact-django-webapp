@@ -427,7 +427,7 @@
 								</tr>
 								{% endfor %}
 								{% endif %}
-								{% if small_fishery_types or large_fishery_data %}
+								{% if small_fishery_types or large_fishery_data or aquaculture_data %}
 								<tr>
 									<td><b>Fisheries (tonnes of catch per year)</b></td>
 								</tr>
@@ -441,13 +441,18 @@
 								{% endfor %}
 								{% endif %}
 								{% if large_fishery_data %}
-								{% for fishery in large_fishery_data %}
 								<tr>
 									<td>{{fishery.name}}</td>
 									<td>{{fishery.value_wo}}</td>
 									<td>{{fishery.value_w}}</td>
 								</tr>
-								{% endfor %}
+								{% endif %}
+								{% if aquaculture_data %}
+								<tr>
+									<td>{{fishery.name}}</td>
+									<td>{{fishery.value_wo}}</td>
+									<td>{{fishery.value_w}}</td>
+								</tr>
 								{% endif %}
 								{% endif %}
 							</tbody>
