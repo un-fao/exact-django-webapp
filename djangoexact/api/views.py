@@ -114,6 +114,7 @@ from .serializers import (
     APIStatusSerializer,
     FuelTypeSerializer,
     ProjectLockHolderInformationSerializer,
+    Aquaculture,
 )
 
 from firebase_admin import auth as firebase_admin_auth
@@ -881,6 +882,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
             small_fishery_types = [{"name": ft.name, "value_w": 0, "value_wo": 0} for ft in FisheryType.objects.all()]
             large_fishery_data = {"name": "Large Fisheries", "value_w": 0, "value_wo": 0}
+            aquaculture_data = {"name": "Aquaculture", "value_w": 0, "value_wo": 0}
             land_types = [{"name": lt.name, "value_w": 0, "value_wo": 0} for lt in ModuleType.objects.filter(is_luc=True).all()]
 
             for a in total_data["activities"]:
@@ -919,6 +921,12 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                             if lh["name"] == m.livestock_category_type.name:
                                 lh["value_w"] += m.heads_number_w
                                 lh["value_wo"] += m.heads_number_wo
+
+                    elif isinstance(m, Aquaculture):
+                        m: Aquaculture
+                        aquaculture_data["value_w"] += m.annual_production_w
+                        aquaculture_data["value_wo"] += m.annual_production_wo
+
                     elif issubclass(m.__class__, LandModule):
                         m: LandModule
                         for lt in land_types:
@@ -933,6 +941,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             livestock_heads = list(filter(lambda x: x["value_w"] != 0 or x["value_wo"] != 0, livestock_heads))
             small_fishery_types = list(filter(lambda x: x["value_w"] != 0 or x["value_wo"] != 0, small_fishery_types))
             large_fishery_data = {} if large_fishery_data["value_w"] == 0 or large_fishery_data["value_wo"] == 0 else large_fishery_data
+            aquaculture_data = {} if project.aquaculture_area == 0 else {"name": "Aquaculture", "value": project.aquaculture_area}
             land_types = list(filter(lambda x: x["value_w"] != 0 or x["value_wo"] != 0, land_types))
             total_heads = sum([lh["value_w"] for lh in livestock_heads])
             total_tonnes_of_catch = sum([ft["value_w"] for ft in small_fishery_types]) + large_fishery_data.get("value_w", 0)
@@ -1092,6 +1101,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 "livestock_heads": livestock_heads,
                 "small_fishery_types": small_fishery_types,
                 "large_fishery_data": large_fishery_data,
+                "aquaculture_data": aquaculture_data,
                 "land_types": land_types,
                 "download_date_time": download_date_time,
             }
