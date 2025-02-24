@@ -659,7 +659,10 @@ class Project(Historical, DirtyFieldsMixin):
         """
         Checks if the project lock has expired and unlocks the project if it has been locked for more than 30 minutes.
         """
-        has_more_than_thirty_minutes_passed = self.lock_updated_at is not None and timezone.now() - self.lock_updated_at > timedelta(minutes=30)
+
+        lock_expiration_time_minutes = ApplicationParameter.objects.get(name="project_lock_expiration_time_minutes").value
+
+        has_more_than_thirty_minutes_passed = self.lock_updated_at is not None and timezone.now() - self.lock_updated_at > timedelta(minutes=lock_expiration_time_minutes)
         if self.is_locked and self.lock_updated_at and has_more_than_thirty_minutes_passed:
             self.unlock()
 
