@@ -740,6 +740,8 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         project: Project = self.get_object()
         security.check_permission("view_project", self.request.user, project)
 
+        project._check_lock_expiration()
+
         serializer = ProjectLockHolderInformationSerializer(project, many=False)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
