@@ -88,7 +88,7 @@ djangoexact/scripts/Ex_Act_Definitions_LM_0108.xlsx
 djangoexact/annual_cropland_results.xlsx
 
 graphs/
-reports/
+/reports/
 static/
 djangoexact/scripts/ipcc_data/ForestManagementAGBRevised.csv
 djangoexact/docs/EX-ACT VC migration.docx
