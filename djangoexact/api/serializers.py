@@ -3358,9 +3358,14 @@ class ProjectFileUploadSerializer(serializers.ModelSerializer):
         if file.size > max_size_in_mb * 1024 * 1024:
             raise serializers.ValidationError(f"File size must be less than {max_size_in_mb}MB")
 
-        # TODO: Remove this and add a (1) to the file name if a file with the same name exists
         if ProjectFileAttachment.objects.filter(project=attrs["project"], name=file.name).exists():
-            raise serializers.ValidationError("A file with the same name already exists in the project")
+            # Incrementally add a number to the file name until it is unique
+            i = 1
+            while ProjectFileAttachment.objects.filter(project=attrs["project"], name=f"{file.name} ({i})").exists():
+                i += 1
+            attrs["file"].name = f"{file.name} ({i})"
+        else:
+            attrs["file"].name = file.name
 
         return super().validate(attrs)
 
