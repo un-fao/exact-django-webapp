@@ -6,6 +6,7 @@ from django.core.mail import send_mail
 from django.urls import reverse
 from django.conf import settings
 from django.shortcuts import render
+import numpy as np
 
 from django.apps import apps
 from django.contrib.auth.models import Group
@@ -31,6 +32,7 @@ import api.labels as labels
 import api.utilities as utils
 from api.defaults import DefaultsFactory
 from api.models import CustomUser as User
+from datetime import datetime
 
 from .calculators import CalculatorFactory
 from .models import (
@@ -61,6 +63,13 @@ from .models import (
     APIHealth,
     FuelType,
     SoilType,
+    Fishery,
+    Livestock,
+    LivestockCategoryType,
+    FishType,
+    FisheryType,
+    SmallFishery,
+    LargeFishery,
 )
 from .serializers import (
     ActionTypes,
@@ -105,6 +114,7 @@ from .serializers import (
     APIStatusSerializer,
     FuelTypeSerializer,
     ProjectLockHolderInformationSerializer,
+    Aquaculture,
 )
 
 from firebase_admin import auth as firebase_admin_auth
@@ -115,6 +125,11 @@ import api.reports as reports
 from django.http import HttpResponse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from django.core.cache import cache
+import api.security as security
+import ipcc.models as ipcc_models
+import matplotlib.pyplot as plt
+import io
+import base64
 
 logger = logging.getLogger("console")
 
@@ -366,10 +381,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         request.data["user"] = self.request.user.pk
         serializer = self.serializer_class(data=request.data, context={"request": request})
-
-        if not serializer.is_valid():
-            logging.error("Error creating project:", serializer.errors)
-            return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
 
         project: Project = serializer.save()
         utils.update_change_reason(project, utils.ChangeReasons.CREATE.value)
@@ -385,23 +397,19 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     @swagger_auto_schema(responses={400: "Bad request", 204: "Project deleted successfully"})
     def destroy(self, request, *args, **kwargs):
         project: Project = self.get_object()
-        user = self.request.user
-
-        if not utils.has_project_permission("delete_project", user, project):
-            logging.error("Selected user does not have permission to delete the project")
-            return utils.ErrorResponse("Selected user does not have permission to delete the project", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("delete_project", self.request.user, project)
 
         # NOTE: This is a workaround for a bug in the simple_history library caused by an unhandled AttributeError when deleting a project with no previous history
         if project.history.count() > 0:
             utils.update_change_reason(project, utils.ChangeReasons.DELETE.value)
 
-        is_deleted = self.raw_delete(project)
+        is_deleted = self.raw_delete_cascade(project)
         if not is_deleted:
             return utils.ErrorResponse("Error deleting project", status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(status=http_status.HTTP_204_NO_CONTENT)
 
-    def raw_delete(self, project: Project):
+    def raw_delete_cascade(self, project: Project):
         with connection.cursor() as cursor:
             project.members.all().delete()
             project.invitations.all().delete()
@@ -412,12 +420,22 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 for m in activity.modules:
                     if hasattr(m, "submodules"):
                         for sm in m.submodules:
-                            cursor.execute(f"DELETE FROM {sm._meta.db_table} WHERE id = %s", [sm.id])
-                    cursor.execute(f"DELETE FROM {m._meta.db_table} WHERE id = %s", [m.id])
+                            table_name = sm._meta.db_table
+                            # Ensures the table is a valid identifier, reducing the risk of SQL injection
+                            if not table_name.isidentifier():
+                                raise ValueError("Invalid table name")
+                            cursor.execute(f"DELETE FROM {table_name} WHERE id = %s", [sm.id])
+                    table_name = m._meta.db_table
+                    # Ensures the table is a valid identifier, reducing the risk of SQL injection
+                    if not table_name.isidentifier():
+                        raise ValueError("Invalid table name")
+                    cursor.execute(f"DELETE FROM {table_name} WHERE id = %s", [m.id])
+
                 LandUseChange.objects.filter(activity=activity).delete()
                 cursor.execute("DELETE FROM api_activity_module_types WHERE activity_id = %s", [activity.id])
                 cursor.execute("DELETE FROM api_activity WHERE id = %s", [activity.id])
 
+            ProjectFileAttachment.objects.filter(project=project).delete()
             cursor.execute("DELETE FROM api_project WHERE id = %s", [project.id])
 
         return True
@@ -429,10 +447,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
 
         project = self.get_object()
-
-        if not utils.has_project_permission("view_project", self.request.user, project):
-            logging.error("Selected user does not have permission to view the project")
-            return utils.ErrorResponse("Selected user does not have permission to view the project", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("view_project", self.request.user, project)
 
         return Response(data=ReadProjectSerializer(project, context={"request": request}).data, status=http_status.HTTP_200_OK)
 
@@ -453,6 +468,12 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 description="Show archived projects",
                 type=openapi.TYPE_BOOLEAN,
             ),
+            openapi.Parameter(
+                "tags",
+                openapi.IN_QUERY,
+                description="Filter projects by tags, comma separated. Example: ?tags=tag1,tag2",
+                type=openapi.TYPE_STRING,
+            ),
         ],
         responses={
             404: "Project not found",
@@ -470,16 +491,19 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         search_query = request.query_params.get("name", None)
         is_summary = request.query_params.get("summary", False)
         show_archived = request.query_params.get("show_archived", None)
+        tags = request.query_params.get("tags", None)
 
         filters = {}
         if search_query:
             filters["project__name__icontains"] = search_query
         if not show_archived:
             filters["project__is_archived"] = False
+        if tags:
+            filters["project__tags__name__in"] = tags.split(",")
 
         shared_projects = request.user.memberships.filter(**filters).all()
         projects_list = [share.project for share in shared_projects if utils.has_project_permission("view_project", self.request.user, share.project)]
-        ordered_projects = sorted(projects_list, key=lambda x: x.created_at, reverse=True)
+        ordered_projects = sorted(projects_list, key=lambda x: x.updated_at, reverse=True)
 
         SerializerClass = ReadProjectSerializer
         if is_summary:
@@ -529,9 +553,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error("Project not found")
             return utils.ErrorResponse("Project not found", status=http_status.HTTP_404_NOT_FOUND)
 
-        if not utils.has_project_permission("view_project", self.request.user, project):
-            logging.error("Selected user does not have permission to view the project")
-            return utils.ErrorResponse("Selected user does not have permission to view the project", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("view_project", self.request.user, project)
 
         serialized_project = ProjectResultSerializer(project, context={"request": request}).data
 
@@ -568,11 +590,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     @transaction.atomic
     def partial_update(self, request, *args, **kwargs):
         project: Project = self.get_object()
-        user: CustomUser = self.request.user
-
-        if not utils.has_project_permission("change_project", user, project):
-            logging.error("Selected user does not have permission to update the project")
-            return utils.ErrorResponse("Selected user does not have permission to update the project", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("change_project", self.request.user, project)
 
         if project.is_archived:
             return utils.ErrorResponse("Archived projects cannot be updated", status=http_status.HTTP_400_BAD_REQUEST)
@@ -591,11 +609,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     @transaction.atomic
     def update(self, request, *args, **kwargs):
         project: Project = self.get_object()
-        user: CustomUser = self.request.user
-
-        if not utils.has_project_permission("change_project", user, project):
-            logging.error("Selected user does not have permission to update the project")
-            return utils.ErrorResponse("Selected user does not have permission to update the project", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("change_project", self.request.user, project)
 
         if project.is_archived:
             return utils.ErrorResponse("Archived projects cannot be updated", status=http_status.HTTP_400_BAD_REQUEST)
@@ -620,20 +634,28 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 description="List of activity IDs to include in the report",
                 type=openapi.TYPE_ARRAY,
                 items={"type": openapi.TYPE_INTEGER},
-            )
+            ),
+            openapi.Parameter(
+                "template",
+                openapi.IN_QUERY,
+                description="Name of the report template to render",
+                type=openapi.TYPE_STRING,
+                required=False,
+            ),
         ],
         responses={404: "Project not found", 403: "Selected user does not have permission to view project results"},
     )
     def report(self, request, pk=None):
         project: Project = self.get_object()
-
-        if not utils.has_project_permission("view_project", self.request.user, project):
-            logging.error("Selected user does not have permission to view the project")
-            return utils.ErrorResponse("Selected user does not have permission to view the project", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("view_project", self.request.user, project)
 
         if not project.is_ready():
             logging.error("Project is not ready")
             return utils.ErrorResponse("To get a report for a project, all activities must have been completed.", status=http_status.HTTP_400_BAD_REQUEST)
+
+        if request.query_params.get("template", None):
+            response = self.template(request, pk=pk)
+            return response
 
         selected_activities = request.query_params.get("activities", "").split(",")
         if selected_activities == [""]:
@@ -663,27 +685,21 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     @swagger_auto_schema(responses={404: "Project not found", 403: "Selected user does not have permission to copy the project", 201: ReadProjectSerializer}, request_body=EmptySerializer)
     def copy(self, request, pk=None):
         project = self.get_object()
-
-        if not utils.has_project_permission("view_project", self.request.user, project):
-            logging.error("Selected user does not have permission to copy the project")
-            return utils.ErrorResponse("Selected user does not have permission to copy the project", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("view_project", self.request.user, project)
 
         new_project = utils.copy_project(project)
         ProjectMembership.objects.create(user=self.request.user, project=new_project, group=Group.objects.get(name="Admin"))
 
-        return Response(data=ReadProjectSerializer(new_project, context={"request": request}).data, status=http_status.HTTP_201_CREATED)
+        serializer = ReadProjectSerializer(new_project, context={"request": request})
+        return Response(data=serializer.data, status=http_status.HTTP_201_CREATED)
 
     @action(detail=True, methods=["get"])
     @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view project memberships", 200: ProjectMembershipSerializer})
     def memberships(self, request, pk=None):
         project = self.get_object()
-
-        if not utils.has_project_permission("view_project", self.request.user, project):
-            logging.error("Selected user does not have permission to copy the project")
-            return utils.ErrorResponse("Selected user does not have permission to copy the project", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("view_project", self.request.user, project)
 
         serializer = ProjectMembershipSerializer(project.members.all(), many=True)
-
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
     # TODO: Remove this action when the frontend is updated
@@ -696,52 +712,431 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view invitations", 200: ProjectInvitationReadSerializer})
     def invitations(self, request, pk=None):
         project = self.get_object()
-
-        if not utils.has_project_permission("view_project", self.request.user, project):
-            logging.error("Selected user does not have permission to view invitations")
-            return utils.ErrorResponse("Selected user does not have permission to view invitations", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("view_project", self.request.user, project)
 
         serializer = ProjectInvitationReadSerializer(project.invitations.all(), many=True)
-
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])
     @swagger_auto_schema(responses={400: "Bad request", 403: "The current user does not have permission to view project changes", 200: ChangeHistorySerializer})
     def history(self, request, pk=None):
         project: Project = self.get_object()
-
-        if not utils.has_project_permission("view_project", self.request.user, project):
-            logging.error("Selected user does not have permission to view the project")
-            return utils.ErrorResponse("Selected user does not have permission to view the project", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("view_project", self.request.user, project)
 
         changes = utils.get_changes(project.history.all())
-
         return Response(data=ChangeHistorySerializer(changes, many=True).data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])
     @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view project tags", 200: ProjectFileReadSerializer})
     def attachments(self, request, pk=None):
         project: Project = self.get_object()
-
-        if not utils.has_project_permission("view_project", self.request.user, project):
-            logging.error("Selected user does not have permission to view the project")
-            return utils.ErrorResponse("Selected user does not have permission to view the project", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("view_project", self.request.user, project)
 
         serializer = ProjectFileReadSerializer(project.attachments.all(), many=True)
-
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"])
     def lock(self, request, pk=None):
         project: Project = self.get_object()
+        security.check_permission("view_project", self.request.user, project)
 
-        if not utils.has_project_permission("view_project", self.request.user, project):
-            logging.error("Selected user does not have permission to view the project")
-            return utils.ErrorResponse("Selected user does not have permission to view the project", status=http_status.HTTP_403_FORBIDDEN)
+        project._check_lock_expiration()
 
         serializer = ProjectLockHolderInformationSerializer(project, many=False)
-
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        operation_description="Generate a PDF from an HTML template",
+        manual_parameters=[openapi.Parameter("template", openapi.IN_QUERY, description="Name of the Django template to render", type=openapi.TYPE_STRING, required=True)],
+        responses={200: "PDF file generated successfully", 400: "Template name not provided or template not found", 500: "Error generating PDF"},
+        produces=["application/pdf"],
+    )
+    def template(self, request, pk=None):
+        template_name = request.query_params.get("template")
+
+        if not template_name:
+            return utils.ErrorResponse("Template name is required", status=http_status.HTTP_400_BAD_REQUEST)
+
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        if not os.path.exists(f"{current_dir}/templates/reports/{template_name}.html"):
+            templates = [os.path.splitext(template)[0] for template in os.listdir(f"{current_dir}/templates/reports")]
+            return utils.ErrorResponse(f"Template '{template_name}' not found. Available templates: {templates}", status=http_status.HTTP_400_BAD_REQUEST)
+
+        try:
+            project: Project = self.get_object()
+            soc: ipcc_models.SoilOrganicCarbon = ipcc_models.SoilOrganicCarbon.objects.get(climate=project.climate, moisture=project.moisture, soil_type=project.soil_type)
+
+            # Calculate total area of all activities
+            total_area = sum(activity.area for activity in project.activities.all())
+
+            # Call project results endpoint
+            total_results_response = self.results(request, pk=pk)
+
+            total_data = total_results_response.data
+            activities = total_data["activities"]
+            modules = [module for activity in activities for module in activity["modules"]]
+            results = [module["results"] for module in modules]
+            total_w = sum(result["total_w"] for result in results)
+            total_wo = sum(result["total_wo"] for result in results)
+            total_balance = total_w - total_wo
+
+            project_emissions_w = total_w
+            project_emissions_wo = total_wo
+            project_emissions_balance = total_balance
+
+            new_request = request._request
+            new_request.query_params = request.query_params.copy()
+            new_request.query_params["aggregate"] = "gas"
+
+            gas_results_response = self.results(new_request, pk=pk)
+            gas_data = gas_results_response.data
+            activities = gas_data["activities"]
+            modules = [module for activity in activities for module in activity["modules"]]
+            results = [module["results"] for module in modules]
+
+            emissions_w = [result["total_w"] for result in results]
+            emissions_wo = [result["total_wo"] for result in results]
+
+            co2_w = {"name": "CO2", "value": 0}
+            ch4_w = {"name": "CH4", "value": 0}
+            n2o_w = {"name": "N2O", "value": 0}
+            co_w = {"name": "CO", "value": 0}
+            doc_w = {"name": "DOC", "value": 0}
+            other_w = {"name": "OTHER", "value": 0}
+
+            gases_w = [co2_w, ch4_w, n2o_w, co_w, doc_w, other_w]
+
+            for w in emissions_w:
+                for g in w:
+                    if g["gas_type"]["name"] == "CO2":
+                        co2_w["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "CH4":
+                        ch4_w["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "N2O":
+                        n2o_w["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "CO":
+                        co_w["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "DOC":
+                        doc_w["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "OTHER":
+                        other_w["value"] += sum([e["value"] for e in g["emissions"]])
+
+            co2_wo = {"name": "CO2", "value": 0}
+            ch4_wo = {"name": "CH4", "value": 0}
+            n2o_wo = {"name": "N2O", "value": 0}
+            co_wo = {"name": "CO", "value": 0}
+            doc_wo = {"name": "DOC", "value": 0}
+            other_wo = {"name": "OTHER", "value": 0}
+
+            gases_wo = [co2_wo, ch4_wo, n2o_wo, co_wo, doc_wo, other_wo]
+
+            for wo in emissions_wo:
+                for g in wo:
+                    if g["gas_type"]["name"] == "CO2":
+                        co2_wo["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "CH4":
+                        ch4_wo["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "N2O":
+                        n2o_wo["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "CO":
+                        co_wo["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "DOC":
+                        doc_wo["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "OTHER":
+                        other_wo["value"] += sum([e["value"] for e in g["emissions"]])
+
+            balances = [result["balance"] for result in results]
+
+            co2 = {"name": "CO2", "value": 0}
+            ch4 = {"name": "CH4", "value": 0}
+            n2o = {"name": "N2O", "value": 0}
+            co = {"name": "CO", "value": 0}
+            doc = {"name": "DOC", "value": 0}
+            other = {"name": "OTHER", "value": 0}
+
+            for b in balances:
+                for g in b:
+                    if g["gas_type"]["name"] == "CO2":
+                        co2["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "CH4":
+                        ch4["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "N2O":
+                        n2o["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "CO":
+                        co["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "DOC":
+                        doc["value"] += sum([e["value"] for e in g["emissions"]])
+                    if g["gas_type"]["name"] == "OTHER":
+                        other["value"] += sum([e["value"] for e in g["emissions"]])
+
+            gases = [co2, ch4, n2o, co, doc, other]
+
+            highest_gas = max([co2, ch4, n2o, co, doc, other], key=lambda x: abs(x["value"]))
+            second_highest_gas = sorted([co2, ch4, n2o, co, doc, other], key=lambda x: abs(x["value"]), reverse=True)[1]
+            third_highest_gas = sorted([co2, ch4, n2o, co, doc, other], key=lambda x: abs(x["value"]), reverse=True)[2]
+
+            project_primary_ghg = highest_gas["name"]
+            project_primary_ghg_emissions = highest_gas["value"]
+            project_primary_ghg_direction = "increases" if project_primary_ghg_emissions >= 0 else "decreases"
+
+            project_secondary_ghg = second_highest_gas["name"]
+            project_secondary_ghg_emissions = second_highest_gas["value"]
+            project_secondary_ghg_direction = "increases" if project_secondary_ghg_emissions >= 0 else "decreases"
+
+            project_tertiary_ghg = third_highest_gas["name"]
+            project_tertiary_ghg_emissions = third_highest_gas["value"]
+            project_tertiary_ghg_direction = "increases" if project_tertiary_ghg_emissions >= 0 else "decreases"
+
+            activities = project.activities.all()
+
+            processed_activities = []
+
+            # Hectares: if with to without, with is counted as 0 and without as area
+            livestock_heads = [{"name": lct.name, "value_w": 0, "value_wo": 0} for lct in LivestockCategoryType.objects.all()]
+
+            small_fishery_types = [{"name": ft.name, "value_w": 0, "value_wo": 0} for ft in FisheryType.objects.all()]
+            large_fishery_data = {"name": "Large Fisheries", "value_w": 0, "value_wo": 0}
+            aquaculture_data = {"name": "Aquaculture", "value_w": 0, "value_wo": 0}
+            land_types = [{"name": lt.name, "value_w": 0, "value_wo": 0} for lt in ModuleType.objects.filter(is_luc=True).all()]
+
+            for a in total_data["activities"]:
+                db_activity: Activity = activities.get(name=a["name"])
+                mlist = a["modules"]
+                modules_by_highest_emissions = sorted(mlist, key=lambda x: abs(x["results"]["balance"]), reverse=True)
+
+                db_activity.modules_emissions = [{"name": m["module_type"]["name"], "balance": m["results"]["balance"]} for m in modules_by_highest_emissions]
+
+                sum_all_total_w = sum([m["results"]["total_w"] for m in mlist])
+                sum_all_total_wo = sum([m["results"]["total_wo"] for m in mlist])
+                sum_all_balance = sum_all_total_w - sum_all_total_wo
+
+                db_activity.results = {"total_w": sum_all_total_w, "total_wo": sum_all_total_wo, "balance": sum_all_balance}
+
+                for m in db_activity.modules:
+                    if issubclass(m.__class__, Fishery):
+                        if isinstance(m, SmallFishery):
+                            m: SmallFishery
+                            for ft in small_fishery_types:
+                                if ft["name"] == m.fishery_type.name:
+                                    ft["value_w"] += m.total_catch_yr_w
+                                    ft["value_wo"] += m.total_catch_yr_wo
+                        elif isinstance(m, LargeFishery):
+                            m: LargeFishery
+                            large_fishery_data["value_wo"] += m.total_catch_yr_wo
+                            large_fishery_data["value_w"] += m.total_catch_yr_w
+
+                        db_activity.catch_w += m.total_catch_yr_w
+
+                    elif isinstance(m, Livestock):
+                        m: Livestock
+                        db_activity.heads_w += m.heads_number_w
+
+                        for lh in livestock_heads:
+                            if lh["name"] == m.livestock_category_type.name:
+                                lh["value_w"] += m.heads_number_w
+                                lh["value_wo"] += m.heads_number_wo
+
+                    elif isinstance(m, Aquaculture):
+                        m: Aquaculture
+                        aquaculture_data["value_w"] += m.annual_production_w
+                        aquaculture_data["value_wo"] += m.annual_production_wo
+
+                    elif issubclass(m.__class__, LandModule):
+                        m: LandModule
+                        for lt in land_types:
+                            if lt["name"] == m.module_type.name:
+                                if m.is_with() and not m.is_without():
+                                    lt["value_w"] += m.area
+                                elif m.is_without() and not m.is_with():
+                                    lt["value_wo"] += m.area
+
+                processed_activities.append(db_activity)
+
+            livestock_heads = list(filter(lambda x: x["value_w"] != 0 or x["value_wo"] != 0, livestock_heads))
+            small_fishery_types = list(filter(lambda x: x["value_w"] != 0 or x["value_wo"] != 0, small_fishery_types))
+            large_fishery_data = {} if large_fishery_data["value_w"] == 0 or large_fishery_data["value_wo"] == 0 else large_fishery_data
+            aquaculture_data = {} if aquaculture_data["value_w"] == 0 or aquaculture_data["value_wo"] == 0 else aquaculture_data
+            land_types = list(filter(lambda x: x["value_w"] != 0 or x["value_wo"] != 0, land_types))
+            total_heads = sum([lh["value_w"] for lh in livestock_heads])
+            total_tonnes_of_catch = sum([ft["value_w"] for ft in small_fishery_types]) + large_fishery_data.get("value_w", 0)
+
+            activities_total = processed_activities
+
+            def plot_with_without_balance_bar_chart_stacked_by_gas(data_w: list, data_wo: list):
+                co2_w, ch4_w, n2o_w, co_w, doc_w, other_w = data_w
+                co2_wo, ch4_wo, n2o_wo, co_wo, doc_wo, other_wo = data_wo
+
+                # Prepare bar labels
+                labels = ["With", "Without", "Balance"]
+
+                # Build lists of values for each gas for "With", "Without", and the difference
+                co2_vals = [
+                    co2_w["value"],
+                    co2_wo["value"],
+                    co2_w["value"] - co2_wo["value"],
+                ]
+                ch4_vals = [
+                    ch4_w["value"],
+                    ch4_wo["value"],
+                    ch4_w["value"] - ch4_wo["value"],
+                ]
+                n2o_vals = [
+                    n2o_w["value"],
+                    n2o_wo["value"],
+                    n2o_w["value"] - n2o_wo["value"],
+                ]
+                co_vals = [
+                    co_w["value"],
+                    co_wo["value"],
+                    co_w["value"] - co_wo["value"],
+                ]
+                doc_vals = [
+                    doc_w["value"],
+                    doc_wo["value"],
+                    doc_w["value"] - doc_wo["value"],
+                ]
+                other_vals = [
+                    other_w["value"],
+                    other_wo["value"],
+                    other_w["value"] - other_wo["value"],
+                ]
+
+                # Stack them in an array for plotting
+                data_arrays = np.array([co2_vals, ch4_vals, n2o_vals, co_vals, doc_vals, other_vals])
+                # Each row is a gas, each column is a bar (With, Without, Balance)
+
+                x = np.arange(len(labels))
+                width = 0.6
+
+                fig, ax = plt.subplots(figsize=(6.5, 4))
+
+                # We'll accumulate the bottom of each stack as we go
+                bottom = np.zeros(len(labels))
+
+                colors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b"]
+                names = ["CO2", "CH4", "N2O", "CO", "DOC", "OTHER"]
+
+                for idx, row in enumerate(data_arrays):
+                    ax.bar(x, row, width, bottom=bottom, color=colors[idx], label=names[idx])
+                    bottom += row
+
+                ax.set_xticks(x)
+                ax.set_xticklabels(labels)
+                ax.ticklabel_format(style="plain", axis="y", useOffset=False)
+                ax.set_ylabel("Emissions (tonnes)")
+                ax.set_title("")
+                ax.legend()
+
+                # Save to a BytesIO buffer
+                buf = io.BytesIO()
+                plt.savefig(buf, format="svg")
+                buf.seek(0)
+
+                # Encode as base64 for embedding in HTML
+                chart_base64 = base64.b64encode(buf.getvalue()).decode("utf-8")
+                plt.close(fig)
+                plt.clf()
+
+                buf.close()
+                return chart_base64
+
+            def plot_project_balance_graph(project_emissions_w, project_emissions_wo, project_emissions_balance):
+                # Create the figure and axis
+                fig, ax = plt.subplots(figsize=(6.5, 4))
+
+                # Data
+                labels = ["With", "Without", "Balance"]
+                emissions = [project_emissions_w, project_emissions_wo, project_emissions_balance]
+                # Create horizontal bar chart
+                ax.barh(labels, emissions, color=["#1f77b4", "#ff7f0e", "#2ca02c"])
+
+                for i, v in enumerate(emissions):
+                    ax.text(0 if v > 0 else v, i, f"{v:,.2f}", va="center")
+
+                # Add legend
+                ax.text(0.5, 1.1, "tCO2e", ha="center", va="bottom", transform=ax.transAxes)
+
+                # Customize the chart
+                ax.ticklabel_format(style="plain", axis="x", useOffset=False)
+                ax.grid(True, axis="x", linestyle="--", alpha=0.7)
+
+                # Save to a BytesIO buffer
+                buf = io.BytesIO()
+                plt.savefig(buf, format="svg")
+                buf.seek(0)
+
+                # Encode as base64 for embedding in HTML
+                chart_base64 = base64.b64encode(buf.getvalue()).decode("utf-8")
+                plt.close(fig)
+                plt.clf()
+
+                buf.close()
+                return chart_base64
+
+            # Get faologo.eps from static files
+            faologo = open("djangoexact/media/faologo.svg", "rb")
+
+            # Add it as base64 to the context
+            faologo_base64 = base64.b64encode(faologo.read()).decode("utf-8")
+
+            project_chart_base64 = plot_project_balance_graph(project_emissions_w, project_emissions_wo, project_emissions_balance)
+            project_gases_chart_base64 = plot_with_without_balance_bar_chart_stacked_by_gas(gases_w, gases_wo)
+
+            download_date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+            context = {
+                "project": project,
+                "start_year_of_activities": project.start_year_of_activities,
+                "implementation_years": project.implementation_years,
+                "last_year_of_accounting": project.last_year_of_accounting,
+                "total_project_years": (project.implementation_years + project.capitalization_years),
+                "total_carbon_balance": project_emissions_balance,
+                "project_emissions_w": project_emissions_w,
+                "project_emissions_wo": project_emissions_wo,
+                "project_emissions_balance": project_emissions_balance,
+                "total_area": total_area,
+                "total_heads": total_heads,
+                "total_tonnes_of_catch": total_tonnes_of_catch,
+                "soc": soc.value,
+                "project_primary_ghg": project_primary_ghg,
+                "project_primary_ghg_emissions": project_primary_ghg_emissions,
+                "project_primary_ghg_direction": project_primary_ghg_direction,
+                "project_secondary_ghg": project_secondary_ghg,
+                "project_secondary_ghg_emissions": project_secondary_ghg_emissions,
+                "project_secondary_ghg_direction": project_secondary_ghg_direction,
+                "project_tertiary_ghg": project_tertiary_ghg,
+                "project_tertiary_ghg_emissions": project_tertiary_ghg_emissions,
+                "project_tertiary_ghg_direction": project_tertiary_ghg_direction,
+                "activities": activities,
+                "activities_total": activities_total,
+                "project_chart_base64": project_chart_base64,
+                "project_gases_chart_base64": project_gases_chart_base64,
+                "faologo_base64": faologo_base64,
+                "livestock_heads": livestock_heads,
+                "small_fishery_types": small_fishery_types,
+                "large_fishery_data": large_fishery_data,
+                "aquaculture_data": aquaculture_data,
+                "land_types": land_types,
+                "download_date_time": download_date_time,
+            }
+
+            html = render(request, f"reports/{template_name}.html", context).content.decode()
+
+            # Generate PDF from HTML using WeasyPrint
+            from weasyprint import HTML
+
+            pdf = HTML(string=html).write_pdf()
+
+            # Create the HTTP response with PDF content
+            response = HttpResponse(pdf, content_type="application/pdf")
+            response["Content-Disposition"] = f'attachment; filename="{template_name}.pdf"'
+
+            faologo.close()
+
+            return response
+
+        except Exception as e:
+            return utils.ErrorResponse(f"Error generating PDF: {str(e)}", status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
@@ -758,10 +1153,7 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     )
     def retrieve(self, request, *args, **kwargs):
         membership: ProjectMembership = self.get_object()
-
-        if not utils.has_project_permission("view_projectmembership", self.request.user, membership.project):
-            logging.error("Selected user does not have permission to view project memberships")
-            return utils.ErrorResponse("Selected user does not have permission to view project memberships", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("view_projectmembership", self.request.user, membership.project)
 
         return super().retrieve(request, *args, **kwargs)
 
@@ -776,15 +1168,13 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     def list(self, request, *args, **kwargs):
         project_id = self.request.query_params.get("project_id", None)
 
+        # TODO: Generalize query param validation checks
         if not project_id:
             logging.error("Project id not provided")
             return utils.ErrorResponse("Project id not provided", status=http_status.HTTP_400_BAD_REQUEST)
 
         project = get_object_or_404(Project, pk=project_id)
-
-        if not utils.has_project_permission("view_projectmembership", self.request.user, project):
-            logging.error("Selected user does not have permission to view project memberships")
-            return utils.ErrorResponse("Selected user does not have permission to view project memberships", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("view_projectmembership", self.request.user, project)
 
         serializer = ProjectMembershipSerializer(project.members.all(), many=True)
 
@@ -806,10 +1196,7 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
         project = serializer.validated_data["project"]
-
-        if not utils.has_project_permission("add_projectmembership", self.request.user, project):
-            logging.error("Selected user does not have permission to add project memberships")
-            return utils.ErrorResponse("Selected user does not have permission to add project memberships", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("add_projectmembership", self.request.user, project)
 
         if project.is_archived:
             return utils.ErrorResponse("Archived projects cannot have memberships added", status=http_status.HTTP_400_BAD_REQUEST)
@@ -829,10 +1216,7 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     )
     def update(self, request, *args, **kwargs):
         membership = self.get_object()
-
-        if not utils.has_project_permission("change_projectmembership", self.request.user, membership.project):
-            logging.error("Selected user does not have permission to change project memberships")
-            return utils.ErrorResponse("Selected user does not have permission to change project memberships", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("change_projectmembership", self.request.user, membership.project)
 
         if membership.project.is_archived:
             return utils.ErrorResponse("Archived projects cannot have memberships updated", status=http_status.HTTP_400_BAD_REQUEST)
@@ -859,9 +1243,18 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         if membership.user == self.request.user and membership.project.owner != self.request.user:
             membership.delete()
+
         elif not utils.has_project_permission("delete_projectmembership", self.request.user, membership.project):
             logging.error("Selected user does not have permission to delete project memberships")
             return utils.ErrorResponse("Selected user does not have permission to delete project memberships", status=http_status.HTTP_403_FORBIDDEN)
+
+        if membership.project.is_archived:
+            return utils.ErrorResponse("Archived projects cannot have memberships deleted", status=http_status.HTTP_400_BAD_REQUEST)
+
+        if membership.group.name == "Admin":
+            admin_count = membership.project.members.filter(group__name="Admin").count()
+            if admin_count == 1:
+                return utils.ErrorResponse("Cannot delete the last admin in the project", status=http_status.HTTP_400_BAD_REQUEST)
 
         membership.delete()
 
@@ -882,11 +1275,9 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     )
     def retrieve(self, request, *args, **kwargs):
         logging.debug("START ProjectInvitationViewset.retrieve")
-        invitation: ProjectInvitation = self.get_object()
 
-        if not utils.has_project_permission("view_projectinvitation", self.request.user, invitation.project):
-            logging.error("Selected user does not have permission to view invitations")
-            return utils.ErrorResponse("Selected user does not have permission to view invitations", status=http_status.HTTP_403_FORBIDDEN)
+        invitation: ProjectInvitation = self.get_object()
+        security.check_permission("view_projectinvitation", self.request.user, invitation.project)
 
         logging.debug("END ProjectInvitationViewset.retrieve")
         return super().retrieve(request, *args, **kwargs)
@@ -909,10 +1300,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
         project: Project = serializer.validated_data["project"]
-
-        if not utils.has_project_permission("add_projectinvitation", self.request.user, project):
-            logging.error("Selected user does not have permission to invite users to the project")
-            return utils.ErrorResponse("Selected user does not have permission to invite users to the project", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("add_projectinvitation", self.request.user, project)
 
         if project.is_archived:
             return utils.ErrorResponse("Archived projects cannot have invitations sent", status=http_status.HTTP_400_BAD_REQUEST)
@@ -924,7 +1312,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error(f"User with email {email} does not exist")
             return utils.ErrorResponse(f"User with email {email} does not exist", status=http_status.HTTP_400_BAD_REQUEST)
 
-        group = serializer.validated_data["group"]
+        group: Group = serializer.validated_data["group"]
         invitation = ProjectInvitation.objects.filter(project=project, user=user, group=group).first()
 
         if invitation:
@@ -936,12 +1324,35 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         invitation.save()
 
         invitation_link = reverse("projectinvitations-accept", args=[invitation.token])
-        send_mail(
-            f"You have been invited to join the project {project.name}",
-            f"Click the link to accept the invitation: {request.build_absolute_uri(invitation_link)}",
-            settings.EMAIL_HOST_USER,
-            [invitation.user.email],
+        invitation_subject = f'[EX-ACT] You have been invited to join the project "{project.name}"'
+        invitation_text = """
+Project title:\t{project_title}
+Role assigned:\t{invitation_role}
+Date of share:\t{invitation_date}
+
+Dear {invitation_recipient_name},
+You have been invited to join the EX-ACT project "{project_title}" with a role of "{invitation_role}".
+To accept this invitation and begin collaborating, please click the link below: Accept Invitation
+
+{invitation_link}
+
+What is EX-ACT?
+EX-ACT (Environmental eXternalities ACcounting Tool) * is an FAO-developed appraisal tool designed for estimating and tracking greenhouse gas emissions in agricultural sector including Agriculture, Forestry and Other Land Use (AFOLU) inland and coastal wetlands, fisheries and aquaculture, agricultural inputs and infrastructure.
+
+If you require further assistance, feel free to reach out to {exact_email}.
+* Previously known as EX-Ante Carbon-balance Tool
+
+Best regards,
+The EX-ACT Team
+        """.format(
+            project_title=project.name,
+            invitation_role=group.name,
+            invitation_recipient_name=user.get_full_name(),
+            invitation_link=request.build_absolute_uri(invitation_link),
+            exact_email="exact@fao.org",
+            invitation_date=invitation.created_at.strftime("%Y-%m-%d"),
         )
+        send_mail(invitation_subject, invitation_text, settings.EMAIL_HOST_USER, [invitation.user.email])
 
         logging.debug("END ProjectInvitationViewset.create")
         return Response({"message": f"Invitation for {user.email} sent successfully", "id": invitation.id}, status=http_status.HTTP_201_CREATED)
@@ -956,11 +1367,9 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     )
     def partial_update(self, request, *args, **kwargs):
         invitation = get_object_or_404(ProjectInvitation, pk=kwargs["pk"])
-        data = ProjectInvitationModelWriteSerializer(invitation, data=request.data, partial=True)
+        security.check_permission("change_projectinvitation", self.request.user, invitation.project)
 
-        if not utils.has_project_permission("change_projectinvitation", self.request.user, invitation.project):
-            logging.error("Selected user does not have permission to update invitations")
-            return utils.ErrorResponse("Selected user does not have permission to update invitations", status=http_status.HTTP_403_FORBIDDEN)
+        data = ProjectInvitationModelWriteSerializer(invitation, data=request.data, partial=True)
 
         if invitation.project.is_archived:
             return utils.ErrorResponse("Archived projects cannot have invitations updated", status=http_status.HTTP_400_BAD_REQUEST)
@@ -1016,10 +1425,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return utils.ErrorResponse("Project id not provided", status=http_status.HTTP_400_BAD_REQUEST)
 
         project = get_object_or_404(Project, pk=project_id)
-
-        if not utils.has_project_permission("view_projectinvitation", self.request.user, project):
-            logging.error("Selected user does not have permission to view invitations")
-            return utils.ErrorResponse("Selected user does not have permission to view invitations", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("view_projectinvitation", self.request.user, project)
 
         serializer = ProjectInvitationReadSerializer(project.invitations.all(), many=True)
 
@@ -1039,9 +1445,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not token:
             return utils.ErrorResponse("Token not provided", status=http_status.HTTP_400_BAD_REQUEST)
 
-        try:
-            uuid.UUID(token)
-        except ValueError:
+        if not utils.validate_uuid(token):
             return utils.ErrorResponse("Invalid token", status=http_status.HTTP_400_BAD_REQUEST)
 
         invitation: ProjectInvitation = get_object_or_404(ProjectInvitation, token=token)
@@ -1083,10 +1487,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
     def update(self, request, *args, **kwargs):
         activity = self.get_object()
-
-        if not utils.has_project_permission("change_activity", self.request.user, activity.project):
-            logging.error("Selected user does not have permission to update activities in the project")
-            return utils.ErrorResponse("Selected user does not have permission to update activities in the project", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("change_activity", self.request.user, activity.project)
 
         if activity.project.is_archived:
             return utils.ErrorResponse("Archived projects cannot have activities updated", status=http_status.HTTP_400_BAD_REQUEST)
@@ -1106,10 +1507,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
     def partial_update(self, request, *args, **kwargs):
         activity = self.get_object()
-
-        if not utils.has_project_permission("change_activity", self.request.user, activity.project):
-            logging.error("Selected user does not have permission to update activities in the project")
-            return utils.ErrorResponse("Selected user does not have permission to update activities in the project", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("change_activity", self.request.user, activity.project)
 
         if activity.project.is_archived:
             return utils.ErrorResponse("Archived projects cannot have activities updated", status=http_status.HTTP_400_BAD_REQUEST)
@@ -1131,17 +1529,11 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     def create(self, request, *args, **kwargs):
         _status = StatusType.objects.get_or_create(name_en="EMPTY")[0]
         request.data["status"] = _status.pk
+
         serializer = WriteActivitySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
-
-        if not utils.has_project_permission("add_activity", self.request.user, serializer.validated_data["project"]):
-            logging.error("Selected user does not have permission to add activities to the project")
-            return utils.ErrorResponse("Selected user does not have permission to add activities to the project", status=http_status.HTTP_403_FORBIDDEN)
-
-        if serializer.validated_data["project"].is_archived:
-            return utils.ErrorResponse("Archived projects cannot have activities added", status=http_status.HTTP_400_BAD_REQUEST)
+        security.check_permission("add_activity", self.request.user, serializer.validated_data["project"])
 
         activity: Activity = serializer.save()
         activity.owner = self.request.user
@@ -1159,11 +1551,9 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         Get a single activity for a given user.
         """
         logger.info("ActivityViewSet.retrieve")
-        activity = get_object_or_404(Activity, pk=pk)
 
-        if not utils.has_project_permission("view_activity", self.request.user, activity.project):
-            logging.error("Selected user does not have permission to view the activity")
-            return utils.ErrorResponse("Selected user does not have permission to view the activity", status=http_status.HTTP_403_FORBIDDEN)
+        activity = get_object_or_404(Activity, pk=pk)
+        security.check_permission("view_activity", self.request.user, activity.project)
 
         return Response(data=self.serializer_class(activity).data, status=http_status.HTTP_200_OK)
 
@@ -1187,9 +1577,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if is_summary:
             SerializerClass = ActivitySummarySerializer
 
-        if not utils.has_project_permission("view_activity", self.request.user, project):
-            logging.error("Selected user does not have permission to view activities in the project")
-            return utils.ErrorResponse("Selected user does not have permission to view activities in the project", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("view_activity", self.request.user, project)
 
         def process_activity(activity):
             activity_dict = SerializerClass(activity).data
@@ -1231,10 +1619,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
 
         activity = Activity.objects.prefetch_related().get(pk=pk)
-
-        if not utils.has_project_permission("view_activity", self.request.user, activity.project):
-            logging.error("Selected user does not have permission to view the activity")
-            return utils.ErrorResponse("Selected user does not have permission to view the activity", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("view_activity", self.request.user, activity.project)
 
         response = {**ActivityResultSerializer(activity).data}
 
@@ -1267,10 +1652,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
 
         activity = get_object_or_404(Activity, pk=pk)
-
-        if not utils.has_project_permission("view_activity", self.request.user, activity.project):
-            logging.error("Selected user does not have permission to view the activity")
-            return utils.ErrorResponse("Selected user does not have permission to view the activity", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("view_activity", self.request.user, activity.project)
 
         modules = get_modules(activity)
 
@@ -1293,18 +1675,10 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         """
 
         serializer = ActivityBuilderSerializer(data=request.data, context={"request": request})
-
-        if not serializer.is_valid():
-            return utils.ErrorResponse(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
 
         project: Project = serializer.validated_data["project"]
-
-        if not utils.has_project_permission("add_activity", self.request.user, project):
-            logging.error("Selected user does not have permission to add activities to the project")
-            return utils.ErrorResponse("Selected user does not have permission to add activities to the project", status=http_status.HTTP_403_FORBIDDEN)
-
-        if project.is_archived:
-            return utils.ErrorResponse("Archived projects cannot have activities added", status=http_status.HTTP_400_BAD_REQUEST)
+        security.check_permission("add_activity", self.request.user, project)
 
         try:
             activity = serializer.save()
@@ -1317,10 +1691,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     @swagger_auto_schema(responses={404: "Project not found", 403: "Selected user does not have permission to copy the activity", 201: ActivitySerializer}, request_body=EmptySerializer)
     def copy(self, request, pk=None):
         activity = self.get_object()
-
-        if not utils.has_project_permission("view_activity", self.request.user, activity.project):
-            logging.error("Selected user does not have permission to copy the activity")
-            return utils.ErrorResponse("Selected user does not have permission to copy the activity", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("view_activity", self.request.user, activity.project)
 
         new_activity = utils.copy_activity(activity)
 
@@ -1330,10 +1701,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view activity changes", 200: ChangeHistorySerializer})
     def history(self, request, pk=None):
         activity: Activity = self.get_object()
-
-        if not utils.has_project_permission("view_activity", self.request.user, activity.project):
-            logging.error("Selected user does not have permission to view the activity")
-            return utils.ErrorResponse("Selected user does not have permission to view the activity", status=http_status.HTTP_403_FORBIDDEN)
+        security.check_permission("view_activity", self.request.user, activity.project)
 
         changes = utils.get_changes(activity.history.all())
 
@@ -1766,15 +2134,7 @@ def generic_module_viewset(model: Module):
                     }
                     results_by_activity_gas = DynamicResultSerializer(results_by_activity_gas, aggregate_by=BreakdownTypes.ACTIVITY_GAS).data
 
-                    module_results = (
-                        results_total
-                        if aggregate_by == BreakdownTypes.TOTAL
-                        else results_by_activity
-                        if aggregate_by == BreakdownTypes.ACTIVITY
-                        else results_by_gas
-                        if aggregate_by == BreakdownTypes.GAS
-                        else results_by_activity_gas
-                    )
+                    module_results = results_total if aggregate_by == BreakdownTypes.TOTAL else results_by_activity if aggregate_by == BreakdownTypes.ACTIVITY else results_by_gas if aggregate_by == BreakdownTypes.GAS else results_by_activity_gas
                     module.cache_results(results_total, results_by_activity, results_by_gas, results_by_activity_gas)
 
                 serializer = DynamicResultSerializer(module_results, aggregate_by=aggregate_by)
@@ -2156,3 +2516,24 @@ class SoilTypeViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
             queryset = queryset.filter(is_coastal=False)
 
         return queryset
+
+
+def generate_chart(with_value, without_value, balance):
+    # Create the bar chart
+    fig, ax = plt.subplots(figsize=(10, 4))
+    labels = ["With", "Without", "Balance"]
+    values = [with_value, without_value, balance]
+    colors = ["green" if v < 0 else "red" for v in values]
+
+    # Create horizontal bar chart
+    ax.barh(labels, values, color=colors)
+
+    # Customize the chart
+    ax.set_xlim(min(values) - 10000, max(values) + 10000)
+    ax.grid(True, axis="x", linestyle="--", alpha=0.7)
+
+    # Save the chart
+    chart_path = os.path.join(settings.STATIC_ROOT, "images", "ghg_chart.png")
+    os.makedirs(os.path.dirname(chart_path), exist_ok=True)
+    plt.savefig(chart_path, bbox_inches="tight", dpi=300)
+    plt.close()
