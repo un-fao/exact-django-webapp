@@ -1241,6 +1241,14 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error("Selected user does not have permission to delete project memberships")
             return utils.ErrorResponse("Selected user does not have permission to delete project memberships", status=http_status.HTTP_403_FORBIDDEN)
 
+        if membership.project.is_archived:
+            return utils.ErrorResponse("Archived projects cannot have memberships deleted", status=http_status.HTTP_400_BAD_REQUEST)
+
+        if membership.group.name == "Admin":
+            admin_count = membership.project.members.filter(group__name="Admin").count()
+            if admin_count == 1:
+                return utils.ErrorResponse("Cannot delete the last admin in the project", status=http_status.HTTP_400_BAD_REQUEST)
+
         membership.delete()
 
         return Response(status=http_status.HTTP_204_NO_CONTENT)
