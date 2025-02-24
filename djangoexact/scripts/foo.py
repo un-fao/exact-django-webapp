@@ -169,3 +169,38 @@ def create_twenty_projects_and_assign_a_tag():
 # create_test_user_for_peter()
 # activate_test_user_for_peter_on_firebase()
 # create_twenty_projects_and_assign_a_tag()
+
+
+def add_default_project_lock_expiration_time_minutes_application_parameter():
+    """
+    Add default project lock expiration time minutes application parameter
+    """
+    models.ApplicationParameter.objects.create(name="project_lock_expiration_time_minutes", value=30)
+
+
+def run():
+    import os
+
+    app_mode = os.getenv("APP_MODE", None)
+    print(f"Running ippc_dump in {app_mode} mode")
+
+    if app_mode == "production":
+        # TODO: Run in production
+        add_default_project_lock_expiration_time_minutes_application_parameter()
+        pass
+
+    if app_mode == "review":
+        # TODO: Run in review
+        add_default_project_lock_expiration_time_minutes_application_parameter()
+        pass
+
+    if app_mode == "development":
+        # TODO: Run in development
+        pass
+
+    if app_mode == "test":
+        # TODO: Run in test
+        add_default_project_lock_expiration_time_minutes_application_parameter()
+        pass
+
+    return True
