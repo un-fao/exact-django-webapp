@@ -175,10 +175,17 @@ def find_modules(activity):
     return modules
 
 
+def get_unique_name(instance, name):
+    i = 1
+    while instance.__class__.objects.filter(name=f"{name} ({i})").exists():
+        i += 1
+    return f"{name} ({i})"
+
+
 def copy_project(project):
     project_copy = copy.deepcopy(project)
     project_copy.pk = None
-    project_copy.name = f"{project_copy.name} copy {uuid.uuid4().hex[:6]}"
+    project_copy.name = get_unique_name(project_copy, project_copy.name)
     project_copy._state.adding = True
     project_copy.save()
 
@@ -191,7 +198,7 @@ def copy_project(project):
 def copy_activity(activity, new_project=None):
     activity_copy = copy.deepcopy(activity)
     activity_copy.pk = None
-    activity_copy.name = f"{activity_copy.name} copy {uuid.uuid4().hex[:6]}"
+    activity_copy.name = get_unique_name(activity_copy, activity_copy.name)
     if new_project:
         activity_copy.project = new_project
     activity_copy._state.adding = True
@@ -265,7 +272,7 @@ def copy_activity(activity, new_project=None):
                 submodule._state.adding = True
                 submodule.save()
 
-    return activity
+    return activity_copy
 
 
 def create_comment_threads(module_instance):
@@ -482,9 +489,7 @@ def get_entity_definitions(entity_type: str) -> dict:
     except LookupError:
         raise ValueError(f"Model '{entity_type}' not found")
     # Extract the field names and their translated verbose names
-    field_definitions = {
-        field.name: _(field.verbose_name) if field.verbose_name else field.name for field in model_class._meta.get_fields() if hasattr(field, "verbose_name") and not field.name.endswith("_thread")
-    }
+    field_definitions = {field.name: _(field.verbose_name) if field.verbose_name else field.name for field in model_class._meta.get_fields() if hasattr(field, "verbose_name") and not field.name.endswith("_thread")}
 
     return field_definitions
 
