@@ -361,7 +361,7 @@
 					<div class="card-body">
 						{% for activity in activities_total %}
 						<div class="row mb-3">
-							<h4>Activity {{forloop.counter}} - {{activity.name}}</h4>
+							<h4><b>Activity {{forloop.counter}} - {{activity.name}}</b></h4>
 							<hr />
 							<div class="col-sm-6 text-start">
 								The activity will be implemented starting from {{activity.start_year}}, for a total of {{activity.implementation_years}} years of implementation, with last year of accounting in {{activity.last_year_of_accounting}}.
@@ -378,7 +378,7 @@
 								<br>
 								<ol>
 									{% for m in activity.modules_emissions %}
-									<li><b>{{m.name}}</b> ({{m.balance|floatformat:2|intcomma}} tCO2-e)</li>
+									<li>{{m.name}} ({{m.balance|floatformat:2|intcomma}} tCO2-e)</li>
 									{% endfor %}
 								</ol>
 							</div>
