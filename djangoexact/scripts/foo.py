@@ -93,8 +93,10 @@ def activate_test_user_for_peter_on_firebase():
     user = auth.sign_in_with_email_and_password("testuser@test.com", "testuser")
     firebase_admin.auth.update_user(user["localId"], email_verified=True)
 
+
 def migrate_all_parameters():
     from camel_converter import to_snake
+
     params = [
         models.LivestockParameter,
         models.IrrigationParameter,
@@ -117,11 +119,13 @@ def migrate_all_parameters():
                 unit=obj.unit,
             )
 
+
 def add_c_fraction_ref_parameter():
     """
     Add c_fraction_ref parameter to all LandUseTypes
     """
     models.ApplicationParameter.objects.create(name="c_fraction_ref", value=1)
+
 
 def add_project_uploads_max_file_size_parameter():
     """
@@ -129,12 +133,25 @@ def add_project_uploads_max_file_size_parameter():
     """
     models.ApplicationParameter.objects.create(name="project_uploads_max_file_size_mb", value=50)
 
+
 def print_all_fuel_types():
     """
     Print all fuel types
     """
     for fuel_type in models.FuelType.objects.all():
         print(fuel_type.name)
+
+
+def create_twenty_projects_and_assign_a_tag():
+    """
+    Create twenty projects and assign a tag
+    """
+    tag = models.ProjectTag.objects.create(name="Test")
+    u = models.CustomUser.objects.get(email="admin@admin.com")
+    for i in range(20):
+        p = models.Project.objects.create(name=f"Project {i}", tag=tag, owner=u)
+        models.ProjectMembership.objects.create(project=p, user=u, group=models.Group.objects.get(name="Admin"))
+
 
 # TODO: Run in prod
 
@@ -151,4 +168,4 @@ def print_all_fuel_types():
 # cycle_all_modules_and_invalidate_cached_results()
 # create_test_user_for_peter()
 # activate_test_user_for_peter_on_firebase()
-
+# create_twenty_projects_and_assign_a_tag()
