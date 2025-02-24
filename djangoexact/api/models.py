@@ -5,6 +5,7 @@ from django.contrib.auth import models as auth_models
 from django.core import exceptions, validators
 from django.db import models as models
 from django.utils import timezone
+from datetime import timedelta
 from simple_history.models import HistoricalRecords
 import logging as log
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
@@ -653,6 +654,14 @@ class Project(Historical, DirtyFieldsMixin):
         self.lock_updated_at = None
         self.locked_by = None
         self.save()
+
+    def _check_lock_expiration(self):
+        """
+        Checks if the project lock has expired and unlocks the project if it has been locked for more than 30 minutes.
+        """
+        has_more_than_thirty_minutes_passed = self.lock_updated_at is not None and timezone.now() - self.lock_updated_at > timedelta(minutes=30)
+        if self.is_locked and self.lock_updated_at and has_more_than_thirty_minutes_passed:
+            self.unlock()
 
     def refresh_lock(self):
         self.lock_updated_at = timezone.now()
