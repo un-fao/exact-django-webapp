@@ -757,6 +757,11 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not template_name:
             return utils.ErrorResponse("Template name is required", status=http_status.HTTP_400_BAD_REQUEST)
 
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        if not os.path.exists(f"{current_dir}/templates/reports/{template_name}.html"):
+            templates = [os.path.splitext(template)[0] for template in os.listdir(f"{current_dir}/templates/reports")]
+            return utils.ErrorResponse(f"Template '{template_name}' not found. Available templates: {templates}", status=http_status.HTTP_400_BAD_REQUEST)
+
         try:
             project: Project = self.get_object()
             soc: ipcc_models.SoilOrganicCarbon = ipcc_models.SoilOrganicCarbon.objects.get(climate=project.climate, moisture=project.moisture, soil_type=project.soil_type)
@@ -1115,7 +1120,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 "download_date_time": download_date_time,
             }
 
-            html = render(request, f"{template_name}.html", context).content.decode()
+            html = render(request, f"reports/{template_name}.html", context).content.decode()
 
             # Generate PDF from HTML using WeasyPrint
             from weasyprint import HTML
