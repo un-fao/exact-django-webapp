@@ -448,9 +448,7 @@ class WriteProjectSerializer(serializers.ModelSerializer):
                         activity.save()
                 project.save()
 
-            has_more_than_thirty_minutes_passed = project.lock_updated_at is not None and timezone.now() - project.lock_updated_at > timedelta(minutes=30)
-            if project.is_locked and project.lock_updated_at and has_more_than_thirty_minutes_passed:
-                project.unlock()
+            project._check_lock_expiration()
 
             if project.is_locked and project.locked_by != user and not user.is_staff:
                 log.warning(f"Project is already locked by: {project.locked_by.email}")
