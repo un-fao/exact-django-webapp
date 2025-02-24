@@ -286,6 +286,8 @@ class CountrySerializer(serializers.ModelSerializer):
 
 
 class ProjectTagSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = ProjectTag
         fields = ["id", "name"]
@@ -361,15 +363,9 @@ class ReadProjectSerializer(serializers.ModelSerializer):
         small_fisheries = SmallFishery.objects.filter(activity__project=obj).all()
         large_fisheries = LargeFishery.objects.filter(activity__project=obj).all()
 
-        all_catch_start = sum([f.total_catch_yr_start for f in list(filter(lambda fishery: fishery.total_catch_yr_start is not None, small_fisheries))]) + sum(
-            [f.total_catch_yr_start for f in list(filter(lambda fishery: fishery.total_catch_yr_start is not None, large_fisheries))]
-        )
-        all_catch_w = sum([f.total_catch_yr_w for f in list(filter(lambda fishery: fishery.total_catch_yr_w is not None, small_fisheries))]) + sum(
-            [f.total_catch_yr_w for f in list(filter(lambda fishery: fishery.total_catch_yr_w is not None, large_fisheries))]
-        )
-        all_catch_wo = sum([f.total_catch_yr_wo for f in list(filter(lambda fishery: fishery.total_catch_yr_wo is not None, small_fisheries))]) + sum(
-            [f.total_catch_yr_wo for f in list(filter(lambda fishery: fishery.total_catch_yr_wo is not None, large_fisheries))]
-        )
+        all_catch_start = sum([f.total_catch_yr_start for f in list(filter(lambda fishery: fishery.total_catch_yr_start is not None, small_fisheries))]) + sum([f.total_catch_yr_start for f in list(filter(lambda fishery: fishery.total_catch_yr_start is not None, large_fisheries))])
+        all_catch_w = sum([f.total_catch_yr_w for f in list(filter(lambda fishery: fishery.total_catch_yr_w is not None, small_fisheries))]) + sum([f.total_catch_yr_w for f in list(filter(lambda fishery: fishery.total_catch_yr_w is not None, large_fisheries))])
+        all_catch_wo = sum([f.total_catch_yr_wo for f in list(filter(lambda fishery: fishery.total_catch_yr_wo is not None, small_fisheries))]) + sum([f.total_catch_yr_wo for f in list(filter(lambda fishery: fishery.total_catch_yr_wo is not None, large_fisheries))])
 
         scenario_based_catch = {
             "start": all_catch_start,
@@ -452,9 +448,7 @@ class WriteProjectSerializer(serializers.ModelSerializer):
                         activity.save()
                 project.save()
 
-            has_more_than_thirty_minutes_passed = project.lock_updated_at is not None and timezone.now() - project.lock_updated_at > timedelta(minutes=30)
-            if project.is_locked and project.lock_updated_at and has_more_than_thirty_minutes_passed:
-                project.unlock()
+            project._check_lock_expiration()
 
             if project.is_locked and project.locked_by != user and not user.is_staff:
                 log.warning(f"Project is already locked by: {project.locked_by.email}")
@@ -541,6 +535,9 @@ class WriteActivitySerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         project = self.instance.project if self.instance else data.get("project")
+
+        if project.is_archived:
+            return serializers.ValidationError("Archived projects cannot have activities added")
 
         if project.is_locked and not project.locked_by == self.context["request"].user and not self.context["request"].user.is_staff:
             raise serializers.ValidationError("Project is locked by another user")
@@ -637,6 +634,13 @@ class ActivityBuilderSerializer(serializers.Serializer):
         module_types = data.get("module_types", [])
         land_use_change = data.get("land_use_change", None)
         area = data.get("area", None)
+        project = data.get("project")
+
+        if project.is_locked and not project.locked_by == self.context["request"].user and not self.context["request"].user.is_staff:
+            raise serializers.ValidationError("Project is locked by another user")
+
+        if project.is_archived:
+            raise serializers.ValidationError("Archived projects cannot have activities added")
 
         if luc_module in module_types:
             raise serializers.ValidationError("Land Use Change module cannot be added manually")
@@ -830,9 +834,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
             luc = self.instance.landusechange.first()
 
             luc_module_types = list(luc.get_module_types()) + [ModuleType.objects.get(class_name="LandUseChange")] if luc else []
-            new_module_types = list(
-                map(lambda module: module, self.validated_data["module_types"] + luc_module_types) if has_luc_module else [module for module in self.validated_data["module_types"]]
-            )
+            new_module_types = list(map(lambda module: module, self.validated_data["module_types"] + luc_module_types) if has_luc_module else [module for module in self.validated_data["module_types"]])
 
             kept_module_types = list(set(old_module_types) & set(new_module_types))
             removed_module_types = list(set(old_module_types) - set(new_module_types))
@@ -3341,6 +3343,7 @@ class ProjectFileUploadSerializer(serializers.ModelSerializer):
     name = serializers.CharField(read_only=True)
     bucket_public_url = serializers.URLField(read_only=True)
     file = serializers.FileField(required=True, write_only=True)
+    size = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = ProjectFileAttachment
@@ -3355,8 +3358,7 @@ class ProjectFileUploadSerializer(serializers.ModelSerializer):
         if file.size > max_size_in_mb * 1024 * 1024:
             raise serializers.ValidationError(f"File size must be less than {max_size_in_mb}MB")
 
-        if ProjectFileAttachment.objects.filter(project=attrs["project"], name=file.name).exists():
-            raise serializers.ValidationError("A file with the same name already exists in the project")
+        attrs["file"].name = utils.get_unique_name(file.name)
 
         return super().validate(attrs)
 
@@ -3374,14 +3376,16 @@ class ProjectFileUploadSerializer(serializers.ModelSerializer):
 
             file_size = file.size
 
+            max_size_in_mb = int(ApplicationParameter.objects.get(name__iexact="project_uploads_max_file_size_mb").value)
+
             total_size = sum([blob.size for blob in bucket.list_blobs(prefix=project_folder)])
-            if total_size + file_size > 25 * 1024 * 1024:
-                raise serializers.ValidationError("Maximum total project files size reached. Total size of all files in the project must be less than 25MB.")
+            if total_size + file_size > max_size_in_mb * 1024 * 1024:
+                raise serializers.ValidationError(f"Maximum total project files size reached. Total size of all files in the project must be less than {max_size_in_mb}MB.")
 
             blob.upload_from_file(file, content_type=file.content_type)
             public_url = blob.public_url
 
-            attachment = ProjectFileAttachment.objects.create(name=file.name, project=project, bucket_public_url=public_url)
+            attachment = ProjectFileAttachment.objects.create(name=file.name, project=project, bucket_public_url=public_url, size=file_size)
         except Exception as e:
             blob.delete()
             raise serializers.ValidationError(str(e))
