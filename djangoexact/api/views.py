@@ -1332,7 +1332,7 @@ Date of share:\t{invitation_date}
 
 Dear {invitation_recipient_name},
 You have been invited to join the EX-ACT project "{project_title}" with a role of "{invitation_role}".
-To accept this invitation and begin collaborating, please click the link below: Accept Invitation
+To accept this invitation and begin collaborating, please click the link below:
 
 {invitation_link}
 
@@ -1349,7 +1349,7 @@ The EX-ACT Team
             invitation_role=group.name,
             invitation_recipient_name=user.get_full_name(),
             invitation_link=request.build_absolute_uri(invitation_link),
-            exact_email="exact@fao.org",
+            exact_email="ex-act@fao.org",
             invitation_date=invitation.created_at.strftime("%Y-%m-%d"),
         )
         send_mail(invitation_subject, invitation_text, settings.EMAIL_HOST_USER, [invitation.user.email])
