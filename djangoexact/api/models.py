@@ -736,6 +736,7 @@ class ProjectTag(models.Model):
 class ProjectInvitation(Historical):
     STATUS_CHOICES = (("sent", "Sent"), ("accepted", "Accepted"), ("declined", "Declined"))
 
+    sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="sent_invitations")
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="invitations")
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="invitations")
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
