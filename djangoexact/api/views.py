@@ -1321,11 +1321,13 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         invitation = ProjectInvitation(project=project, user=user, group=group)
         invitation.status = InvitationStatusType.objects.get(name_en=utils.InvitationStatus.PENDING.value)
+        invitation.sender = self.request.user
         invitation.save()
 
         invitation_link = reverse("projectinvitations-accept", args=[invitation.token])
         invitation_subject = f'[EX-ACT] You have been invited to join the project "{project.name}"'
         invitation_text = """
+Invited by:\t{invitation_sender}
 Project title:\t{project_title}
 Role assigned:\t{invitation_role}
 Date of share:\t{invitation_date}
@@ -1351,6 +1353,7 @@ The EX-ACT Team
             invitation_link=request.build_absolute_uri(invitation_link),
             exact_email="ex-act@fao.org",
             invitation_date=invitation.created_at.strftime("%Y-%m-%d"),
+            invitation_sender=invitation.sender.get_full_name(),
         )
         send_mail(invitation_subject, invitation_text, settings.EMAIL_HOST_USER, [invitation.user.email])
 
