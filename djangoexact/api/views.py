@@ -1313,26 +1313,29 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return utils.ErrorResponse(f"User with email {email} does not exist", status=http_status.HTTP_400_BAD_REQUEST)
 
         group: Group = serializer.validated_data["group"]
-        invitation = ProjectInvitation.objects.filter(project=project, user=user, group=group).first()
+        invitation = ProjectInvitation.objects.filter(project=project, user=user, group=group, status__name__ne=utils.InvitationStatus.REJECTED.value).first()
 
-        if invitation:
-            logging.warning(f"Invitation for {user.email} already sent with id {invitation.id}")
+        if not invitation:
+            invitation = ProjectInvitation(project=project, user=user, group=group)
+            invitation.status = InvitationStatusType.objects.get(name_en=utils.InvitationStatus.PENDING.value)
+            invitation.sender = self.request.user
+            invitation.save()
+
+        if not invitation.status.name == utils.InvitationStatus.PENDING.value:
+            logging.warning(f"Invitation for {user.email} already sent with id {invitation.pk}")
             return Response({"message": f"Invitation for {user.email} already sent for group {invitation.group.name}"}, status=http_status.HTTP_200_OK)
-
-        invitation = ProjectInvitation(project=project, user=user, group=group)
-        invitation.status = InvitationStatusType.objects.get(name_en=utils.InvitationStatus.PENDING.value)
-        invitation.save()
 
         invitation_link = reverse("projectinvitations-accept", args=[invitation.token])
         invitation_subject = f'[EX-ACT] You have been invited to join the project "{project.name}"'
         invitation_text = """
+Invited by:\t{invitation_sender}
 Project title:\t{project_title}
 Role assigned:\t{invitation_role}
 Date of share:\t{invitation_date}
 
 Dear {invitation_recipient_name},
 You have been invited to join the EX-ACT project "{project_title}" with a role of "{invitation_role}".
-To accept this invitation and begin collaborating, please click the link below: Accept Invitation
+To accept this invitation and begin collaborating, please click the link below:
 
 {invitation_link}
 
@@ -1349,8 +1352,9 @@ The EX-ACT Team
             invitation_role=group.name,
             invitation_recipient_name=user.get_full_name(),
             invitation_link=request.build_absolute_uri(invitation_link),
-            exact_email="exact@fao.org",
+            exact_email="ex-act@fao.org",
             invitation_date=invitation.created_at.strftime("%Y-%m-%d"),
+            invitation_sender=invitation.sender.get_full_name(),
         )
         send_mail(invitation_subject, invitation_text, settings.EMAIL_HOST_USER, [invitation.user.email])
 
@@ -1474,7 +1478,7 @@ The EX-ACT Team
         invitation.save()
 
         # Teturn simple html page with message
-        return render(request, "invitation_accepted.html", {"project_name": invitation.project.name, "group": invitation.group.name})
+        return render(request, "invitation_accepted.html", {"project_name": invitation.project.name, "group": invitation.group.name, "link": settings.FRONTEND_URL})
 
 
 class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
