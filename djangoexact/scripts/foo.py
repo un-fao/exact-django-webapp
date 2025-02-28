@@ -191,7 +191,6 @@ def run():
 
     if app_mode == "review":
         # TODO: Run in review
-        add_default_project_lock_expiration_time_minutes_application_parameter()
         pass
 
     if app_mode == "development":

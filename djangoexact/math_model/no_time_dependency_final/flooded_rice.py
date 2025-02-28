@@ -57,7 +57,7 @@ class FloodedRice(LandModule):
 
         # NOTE: this is a default value that is calculated based on the input values, needed for the frontend
         self.straw_tonnes_tier_2_default = self.yield_ref * self.rice_slope + self.rice_intercept
-        self.SFo_tier_2_default = 1 + (self.straw_tonnes_tier_2 or self.straw_tonnes_tier_2_default) * self.cfoa * 0.59
+        self.SFo_tier_2_default = (1 + (self.straw_tonnes_tier_2 or self.straw_tonnes_tier_2_default) * self.cfoa) ** 0.59
         self.adjusted_daily_ef_methane_tier_2_default = self.EFc * self.SFw * self.SFp * (self.SFo_tier_2 or self.SFo_tier_2_default)
 
 
@@ -108,6 +108,7 @@ class FloodedRice(LandModule):
 
                     self.result.yearly_emissions_by_sector_by_gas.append(straw_burning_set_methane)
                     self.result.yearly_emissions_by_sector_by_gas.append(straw_burning_set_nitrous)
+                    
             except Exception as e:
                 traceback.print_exc()
                 raise e
