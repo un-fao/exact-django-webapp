@@ -1827,6 +1827,7 @@ class Grassland(LandModuleFixed, SingleBiomassModule, AboveBelowGroundBiomassMod
     grassland_management_type_start = models.ForeignKey(GrasslandManagementType, on_delete=models.CASCADE, related_name="%(class)s_grassland_management_type_start", null=True, verbose_name=_("grassland_management_type_start"))
     grassland_management_type_w = models.ForeignKey(GrasslandManagementType, on_delete=models.CASCADE, related_name="%(class)s_grassland_management_type_w", null=True, verbose_name=_("grassland_management_type_w"))
     grassland_management_type_wo = models.ForeignKey(GrasslandManagementType, on_delete=models.CASCADE, related_name="%(class)s_grassland_management_type_wo", null=True, verbose_name=_("grassland_management_type_wo"))
+    grassland_management_type_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_grassland_management_type_thread")
 
     is_fire_used_start = models.BooleanField(default=False, verbose_name=_("is_fire_used_start"))
     is_fire_used_w = models.BooleanField(default=False, verbose_name=_("is_fire_used_w"))
@@ -2069,6 +2070,7 @@ class Waterbody(Module):
     trophic_type_start = models.ForeignKey(TrophicType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_trophic_class_start", verbose_name=_("trophic_type_start"))
     trophic_type_w = models.ForeignKey(TrophicType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_trophic_class_w", verbose_name=_("trophic_type_w"))
     trophic_type_wo = models.ForeignKey(TrophicType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_trophic_class_wo", verbose_name=_("trophic_type_wo"))
+    trophic_type_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_trophic_class_thread")
 
     ch4_ef_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("ch4_ef_t2_start"))
     ch4_ef_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("ch4_ef_t2_w"))
@@ -2231,6 +2233,7 @@ class Aquaculture(Module):
     annual_production_start = models.FloatField(null=True, blank=True, verbose_name=_("annual_production_start"))
     annual_production_w = models.FloatField(null=True, blank=True, verbose_name=_("annual_production_w"))
     annual_production_wo = models.FloatField(null=True, blank=True, verbose_name=_("annual_production_wo"))
+    annual_production_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_annual_production_thread", on_delete=models.SET_NULL)
 
     n2o_from_production_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("n2o_from_production_t2_start"))
     n2o_from_production_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("n2o_from_production_t2_w"))
@@ -2371,6 +2374,7 @@ class FuelMixin(models.Model):
     fuel_type_start = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fuel_type_start"), related_name="%(class)s_fuel_type_start")
     fuel_type_w = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fuel_type_w"), related_name="%(class)s_fuel_type_w")
     fuel_type_wo = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fuel_type_wo"), related_name="%(class)s_fuel_type_wo")
+    fuel_type_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_fuel_type_thread")
 
     quantity_consumed_per_year_start = models.FloatField(null=True, blank=True, verbose_name=_("quantity_consumed_per_year_start"))
     quantity_consumed_per_year_w = models.FloatField(null=True, blank=True, verbose_name=_("quantity_consumed_per_year_w"))
@@ -2430,9 +2434,12 @@ class IrrigationSystem(Submodule):
 class IrrigationPhase(Submodule):
     parent = models.ForeignKey(Irrigation, on_delete=models.CASCADE, null=True, blank=True, related_name="irrigation_phases")
     irrigation_system_type = models.ForeignKey(IrrigationSystemType, on_delete=models.CASCADE, null=True, blank=True, related_name="irrigation_phases", verbose_name=_("irrigation_system_type"))
+
     fuel_type_start = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fuel_type_start"), related_name="%(class)s_fuel_type_start")
     fuel_type_w = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fuel_type_w"), related_name="%(class)s_fuel_type_w")
     fuel_type_wo = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fuel_type_wo"), related_name="%(class)s_fuel_type_wo")
+    fuel_type_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_fuel_type_thread")
+
     well_depth = models.FloatField(null=True, blank=True, verbose_name=_("well_depth"))
 
     ha_start = models.FloatField(null=True, blank=True, verbose_name=_("ha_start"))
