@@ -3,6 +3,7 @@ from dataclasses import dataclass
 import xlsxwriter.format
 import xlsxwriter.worksheet
 import api.models as api_models
+import ipcc.models as ipcc_models
 import api.calculators as calculators
 import api.defaults as defaults
 from typing import Optional
@@ -98,6 +99,7 @@ class ExcelFileManager:
         workbook.add_worksheet("Results")
         metadata_worksheet = workbook.add_worksheet("Metadata")
         additional_indicators_worksheet = workbook.add_worksheet("Additional Indicators")
+        shadow_price_of_carbon_worksheet = workbook.add_worksheet("Shadow Price of Carbon")
         # metadata_worksheet.hide()
         additional_indicators_worksheet.hide()
 
@@ -140,6 +142,7 @@ class BaseProjectReport:
     results_worksheet: Worksheet = None
     metadata_worksheet: Worksheet = None
     additional_indicators_worksheet: Worksheet = None
+    shadow_price_of_carbon_worksheet: Worksheet = None
     activities: list[api_models.Activity] = None
     activity_reports: list["BaseActivityReport"] = None
 
@@ -191,6 +194,7 @@ class BaseProjectReport:
         self.results_worksheet = self.workbook["Results"]
         self.metadata_worksheet = self.workbook["Metadata"]
         self.additional_indicators_worksheet = self.workbook["Additional Indicators"]
+        self.shadow_price_of_carbon_worksheet = self.workbook["Shadow Price of Carbon"]
 
         self.results_worksheet.cell(row=1, column=1, value="Activity and GHGs / Years")
 
@@ -304,12 +308,26 @@ class BaseProjectReport:
         log.debug(f"Finalizing report for project {self.project.name}")
 
         other_ghgs = [[0] * self.duration]
+        other_ghgs_w = [[0] * self.duration]
+        other_ghgs_wo = [[0] * self.duration]
         n2o = [[0] * self.duration]
+        n2o_w = [[0] * self.duration]
+        n2o_wo = [[0] * self.duration]
         ch4 = [[0] * self.duration]
+        ch4_w = [[0] * self.duration]
+        ch4_wo = [[0] * self.duration]
         other_co2 = [[0] * self.duration]
+        other_co2_w = [[0] * self.duration]
+        other_co2_wo = [[0] * self.duration]
         soil_co2 = [[0] * self.duration]
+        soil_co2_w = [[0] * self.duration]
+        soil_co2_wo = [[0] * self.duration]
         biomass_co2 = [[0] * self.duration]
+        biomass_co2_w = [[0] * self.duration]
+        biomass_co2_wo = [[0] * self.duration]
         yearly_balance_t_co2_eq = [[0] * self.duration]
+        yearly_balance_t_co2_eq_w = [[0] * self.duration]
+        yearly_balance_t_co2_eq_wo = [[0] * self.duration]
         cumulative_balance_t_co2_eq = [[0] * self.duration]
 
         for activity in self.activity_reports:
@@ -319,26 +337,53 @@ class BaseProjectReport:
                 other_ghgs.append(module.extract_emissions(module.emissions_set, gas_type=math_utils.GasTypes.OTHER))
                 n2o.append(module.extract_emissions(module.emissions_set, gas_type=math_utils.GasTypes.N2O))
                 ch4.append(module.extract_emissions(module.emissions_set, gas_type=math_utils.GasTypes.CH4))
-                other_co2.append(
-                    module.extract_emissions(
-                        module.emissions_set, activity_type=None, gas_type=math_utils.GasTypes.CO2, excluded_activity_types=[math_utils.ActivityTypes.BIOMASS, math_utils.ActivityTypes.SOIL_CO2_CHANGE]
-                    )
-                )
+                other_co2.append(module.extract_emissions(module.emissions_set, activity_type=None, gas_type=math_utils.GasTypes.CO2, excluded_activity_types=[math_utils.ActivityTypes.BIOMASS, math_utils.ActivityTypes.SOIL_CO2_CHANGE]))
                 soil_co2.append(module.extract_emissions(module.emissions_set, activity_type=math_utils.ActivityTypes.SOIL_CO2_CHANGE, gas_type=math_utils.GasTypes.CO2))
                 biomass_co2.append(module.extract_emissions(module.emissions_set, activity_type=math_utils.ActivityTypes.BIOMASS, gas_type=math_utils.GasTypes.CO2))
 
+                # With
+                other_ghgs_w.append(module.extract_emissions(module.emissions_set_w, gas_type=math_utils.GasTypes.OTHER))
+                n2o_w.append(module.extract_emissions(module.emissions_set_w, gas_type=math_utils.GasTypes.N2O))
+                ch4_w.append(module.extract_emissions(module.emissions_set_w, gas_type=math_utils.GasTypes.CH4))
+                other_co2_w.append(module.extract_emissions(module.emissions_set_w, activity_type=None, gas_type=math_utils.GasTypes.CO2, excluded_activity_types=[math_utils.ActivityTypes.BIOMASS, math_utils.ActivityTypes.SOIL_CO2_CHANGE]))
+                soil_co2_w.append(module.extract_emissions(module.emissions_set_w, activity_type=math_utils.ActivityTypes.SOIL_CO2_CHANGE, gas_type=math_utils.GasTypes.CO2))
+                biomass_co2_w.append(module.extract_emissions(module.emissions_set_w, activity_type=math_utils.ActivityTypes.BIOMASS, gas_type=math_utils.GasTypes.CO2))
+
+                # Without
+                other_ghgs_wo.append(module.extract_emissions(module.emissions_set_wo, gas_type=math_utils.GasTypes.OTHER))
+                n2o_wo.append(module.extract_emissions(module.emissions_set_wo, gas_type=math_utils.GasTypes.N2O))
+                ch4_wo.append(module.extract_emissions(module.emissions_set_wo, gas_type=math_utils.GasTypes.CH4))
+                other_co2_wo.append(module.extract_emissions(module.emissions_set_wo, activity_type=None, gas_type=math_utils.GasTypes.CO2, excluded_activity_types=[math_utils.ActivityTypes.BIOMASS, math_utils.ActivityTypes.SOIL_CO2_CHANGE]))
+                soil_co2_wo.append(module.extract_emissions(module.emissions_set_wo, activity_type=math_utils.ActivityTypes.SOIL_CO2_CHANGE, gas_type=math_utils.GasTypes.CO2))
+                biomass_co2_wo.append(module.extract_emissions(module.emissions_set_wo, activity_type=math_utils.ActivityTypes.BIOMASS, gas_type=math_utils.GasTypes.CO2))
+
         other_ghgs = list(map(sum, zip(*other_ghgs)))
+        other_ghgs_w = list(map(sum, zip(*other_ghgs_w)))
+        other_ghgs_wo = list(map(sum, zip(*other_ghgs_wo)))
         n2o = list(map(sum, zip(*n2o)))
+        n2o_w = list(map(sum, zip(*n2o_w)))
+        n2o_wo = list(map(sum, zip(*n2o_wo)))
         ch4 = list(map(sum, zip(*ch4)))
+        ch4_w = list(map(sum, zip(*ch4_w)))
+        ch4_wo = list(map(sum, zip(*ch4_wo)))
         other_co2 = list(map(sum, zip(*other_co2)))
+        other_co2_w = list(map(sum, zip(*other_co2_w)))
+        other_co2_wo = list(map(sum, zip(*other_co2_wo)))
         soil_co2 = list(map(sum, zip(*soil_co2)))
+        soil_co2_w = list(map(sum, zip(*soil_co2_w)))
+        soil_co2_wo = list(map(sum, zip(*soil_co2_wo)))
         biomass_co2 = list(map(sum, zip(*biomass_co2)))
+        biomass_co2_w = list(map(sum, zip(*biomass_co2_w)))
+        biomass_co2_wo = list(map(sum, zip(*biomass_co2_wo)))
 
         yearly_balance_t_co2_eq = list(map(sum, zip(biomass_co2, soil_co2, other_co2, ch4, n2o, other_ghgs)))
+        yearly_balance_t_co2_eq_w = list(map(sum, zip(biomass_co2_w, soil_co2_w, other_co2_w, ch4_w, n2o_w, other_ghgs_w)))
+        yearly_balance_t_co2_eq_wo = list(map(sum, zip(biomass_co2_wo, soil_co2_wo, other_co2_wo, ch4_wo, n2o_wo, other_ghgs_wo)))
         cumulative_balance_t_co2_eq = np.cumsum(yearly_balance_t_co2_eq)
 
         self.workbook = self.excel_manager.get_workbook()
         self.results_worksheet = self.workbook["Results"]
+        self.shadow_price_of_carbon_worksheet = self.workbook["Shadow Price of Carbon"]
 
         for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
             self.results_worksheet.cell(row=2, column=i + 2, value=cumulative_balance_t_co2_eq[i])
@@ -351,6 +396,114 @@ class BaseProjectReport:
             self.results_worksheet.cell(row=9, column=i + 2, value=other_ghgs[i])
             self.results_worksheet.cell(row=10, column=i + 2, value=self.cumulative_hectares_yearly[i])
             self.results_worksheet.cell(row=10, column=i + 2, value=self.cumulative_hectares_yearly[i]).fill = Colors.LIGHT_BEIGE_FILL.value
+
+        # Shadow Price of Carbon
+        shadow_prices = ipcc_models.ShadowPriceOfCarbon.objects.all()
+
+        self.shadow_price_of_carbon_worksheet.cell(row=1, column=1, value="Economic value of GHG fluxes").fill = Colors.LIGHT_ORANGE_FILL.value
+        self.shadow_price_of_carbon_worksheet.cell(row=1, column=2, value="").fill = Colors.LIGHT_ORANGE_FILL.value
+        self.shadow_price_of_carbon_worksheet.cell(row=1, column=3, value="").fill = Colors.LIGHT_ORANGE_FILL.value
+        self.shadow_price_of_carbon_worksheet.cell(row=1, column=4, value="").fill = Colors.LIGHT_ORANGE_FILL.value
+        self.shadow_price_of_carbon_worksheet.cell(row=2, column=1, value="Year")
+        self.shadow_price_of_carbon_worksheet.cell(row=3, column=1, value="Without (tCO2-eq)")
+        self.shadow_price_of_carbon_worksheet.cell(row=4, column=1, value="Low Boundary")
+        self.shadow_price_of_carbon_worksheet.cell(row=5, column=1, value="High Boundary")
+        self.shadow_price_of_carbon_worksheet.cell(row=6, column=1, value="Average")
+        self.shadow_price_of_carbon_worksheet.cell(row=7, column=1, value="")
+        self.shadow_price_of_carbon_worksheet.cell(row=8, column=1, value="With (tCO2-eq)")
+        self.shadow_price_of_carbon_worksheet.cell(row=9, column=1, value="Low Boundary")
+        self.shadow_price_of_carbon_worksheet.cell(row=10, column=1, value="High Boundary")
+        self.shadow_price_of_carbon_worksheet.cell(row=11, column=1, value="Average")
+        self.shadow_price_of_carbon_worksheet.cell(row=12, column=1, value="")
+        self.shadow_price_of_carbon_worksheet.cell(row=13, column=1, value="Balance (tCO2-eq)")
+        self.shadow_price_of_carbon_worksheet.cell(row=14, column=1, value="Low Boundary")
+        self.shadow_price_of_carbon_worksheet.cell(row=15, column=1, value="High Boundary")
+        self.shadow_price_of_carbon_worksheet.cell(row=16, column=1, value="Average")
+
+        self.shadow_price_of_carbon_worksheet.cell(row=18, column=1, value="Shadow Price of Carbon, nominal (2017 $US) - World Bank*")
+        self.shadow_price_of_carbon_worksheet.cell(row=18, column=1, value="Shadow Price of Carbon, nominal (2017 $US) - World Bank*").fill = Colors.LIGHT_ORANGE_FILL.value
+        self.shadow_price_of_carbon_worksheet.cell(row=18, column=2, value="").fill = Colors.LIGHT_ORANGE_FILL.value
+        self.shadow_price_of_carbon_worksheet.cell(row=18, column=3, value="").fill = Colors.LIGHT_ORANGE_FILL.value
+        self.shadow_price_of_carbon_worksheet.cell(row=18, column=4, value="").fill = Colors.LIGHT_ORANGE_FILL.value
+        self.shadow_price_of_carbon_worksheet.cell(row=18, column=5, value="").fill = Colors.LIGHT_ORANGE_FILL.value
+        self.shadow_price_of_carbon_worksheet.cell(row=18, column=6, value="").fill = Colors.LIGHT_ORANGE_FILL.value
+        self.shadow_price_of_carbon_worksheet.cell(row=18, column=7, value="").fill = Colors.LIGHT_ORANGE_FILL.value
+        self.shadow_price_of_carbon_worksheet.cell(row=19, column=1, value="Year")
+        self.shadow_price_of_carbon_worksheet.cell(row=20, column=1, value="Low 2017")
+        self.shadow_price_of_carbon_worksheet.cell(row=21, column=1, value="High")
+
+        last_known_shadow_price = shadow_prices.last()
+
+        additional_shadow_prices = []
+
+        SPC_INCREASE_RATE = 0.0225
+
+        for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
+            shadow_price = shadow_prices.filter(year=year).first()
+            if shadow_price is None and year > 2017:
+                shadow_price = ipcc_models.ShadowPriceOfCarbon(
+                    year=year,
+                    min_value=last_known_shadow_price.min_value * (1 + SPC_INCREASE_RATE),
+                    max_value=last_known_shadow_price.max_value * (1 + SPC_INCREASE_RATE),
+                )
+                last_known_shadow_price = shadow_price
+                additional_shadow_prices.append(shadow_price)
+
+            yearly_balance = yearly_balance_t_co2_eq[i]
+            yearly_balance_w = yearly_balance_t_co2_eq_w[i]
+            yearly_balance_wo = yearly_balance_t_co2_eq_wo[i]
+
+            self.shadow_price_of_carbon_worksheet.cell(row=2, column=i + 2, value=year)
+            self.shadow_price_of_carbon_worksheet.cell(row=3, column=i + 2, value=yearly_balance_wo)
+            self.shadow_price_of_carbon_worksheet.cell(row=8, column=i + 2, value=yearly_balance_w)
+            self.shadow_price_of_carbon_worksheet.cell(row=13, column=i + 2, value=yearly_balance)
+
+            """
+            NOTE: To change the base year of the SPCs from 2017 to any other year, the prices should be adjusted using the
+            U.S. gross domestic product (GDP) deflator or seasonally adjusted U.S. consumer price index (CPI), starting
+            in 2022. The Climate Change Group will update the SPCs once a year at the beginning of each fiscal year.
+            """
+
+            if year < 2017:
+                continue
+
+            sp_wo_min = shadow_price.min_value * yearly_balance_wo
+            sp_wo_max = shadow_price.max_value * yearly_balance_wo
+            sp_wo_avg = np.average([sp_wo_min, sp_wo_max])
+
+            sp_w_min = shadow_price.min_value * yearly_balance_w
+            sp_w_max = shadow_price.max_value * yearly_balance_w
+            sp_w_avg = np.average([sp_w_min, sp_w_max])
+
+            sp_min = shadow_price.min_value * yearly_balance
+            sp_max = shadow_price.max_value * yearly_balance
+            sp_avg = np.average([sp_min, sp_max])
+
+            self.shadow_price_of_carbon_worksheet.cell(row=4, column=i + 2, value=sp_wo_min)
+            self.shadow_price_of_carbon_worksheet.cell(row=5, column=i + 2, value=sp_wo_max)
+            self.shadow_price_of_carbon_worksheet.cell(row=6, column=i + 2, value=sp_wo_avg)
+
+            self.shadow_price_of_carbon_worksheet.cell(row=9, column=i + 2, value=sp_w_min)
+            self.shadow_price_of_carbon_worksheet.cell(row=10, column=i + 2, value=sp_w_max)
+            self.shadow_price_of_carbon_worksheet.cell(row=11, column=i + 2, value=sp_w_avg)
+
+            self.shadow_price_of_carbon_worksheet.cell(row=14, column=i + 2, value=sp_min)
+            self.shadow_price_of_carbon_worksheet.cell(row=15, column=i + 2, value=sp_max)
+            self.shadow_price_of_carbon_worksheet.cell(row=16, column=i + 2, value=sp_avg)
+
+        for i, sp in enumerate(list(shadow_prices) + additional_shadow_prices):
+            self.shadow_price_of_carbon_worksheet.cell(row=19, column=i + 2, value=sp.year)
+            self.shadow_price_of_carbon_worksheet.cell(row=20, column=i + 2, value=round(sp.min_value, 2))
+            self.shadow_price_of_carbon_worksheet.cell(row=21, column=i + 2, value=round(sp.max_value, 2))
+
+            if i > len(shadow_prices) - 1:
+                # Red fill for the additional shadow prices
+                self.shadow_price_of_carbon_worksheet.cell(row=19, column=i + 2).fill = Colors.LIGHT_RED_FILL.value
+                self.shadow_price_of_carbon_worksheet.cell(row=20, column=i + 2).fill = Colors.LIGHT_RED_FILL.value
+                self.shadow_price_of_carbon_worksheet.cell(row=21, column=i + 2).fill = Colors.LIGHT_RED_FILL.value
+
+        # footnote with information about the shadow price of carbon calculations beyond 2050
+        self.shadow_price_of_carbon_worksheet.cell(row=23, column=1, value="* The shadow price of carbon (SPC) beyond 2050 is calculated by applying a 2.25% annual increase in the SPC values starting from 2050, as per 2024 Guidance Note on Shadow Price of Carbon in Economic Analysis")
 
         self.excel_manager.save_workbook(self.workbook)
 
@@ -577,6 +730,8 @@ class BaseModuleReport:
     calculator: calculators.BaseCalculator | calculators.LandModuleCalculator = None
     result: dict = None
     emissions_set: list[math_utils.YearlyGasActivityEmissionSet] = None
+    emissions_set_w: list[math_utils.YearlyGasActivityEmissionSet] = None
+    emissions_set_wo: list[math_utils.YearlyGasActivityEmissionSet] = None
 
     start_year_of_activities: int = None
     last_year_of_accounting: int = None
@@ -601,6 +756,8 @@ class BaseModuleReport:
         from api.calculators import Result
 
         self.emissions_set = Result(*self.result).balance.yearly_emissions_by_sector_by_gas
+        self.emissions_set_w = Result(*self.result).total_w.yearly_emissions_by_sector_by_gas
+        self.emissions_set_wo = Result(*self.result).total_wo.yearly_emissions_by_sector_by_gas
 
         self.start_year_of_activities = self.module.activity.project.start_year_of_activities
         self.last_year_of_accounting = self.module.activity.project.last_year_of_accounting
@@ -1179,9 +1336,7 @@ class AnnualCroplandReport(LandModuleReport):
             self.metadata_worksheet.cell(row=last_metadata_row + 5, column=2, value=self.module.residue_management_type_start.name)
             self.metadata_worksheet.cell(row=last_metadata_row + 6, column=2, value=self.module.crop_yield_t2_start if self.module.crop_yield_t2_start is not None else "Default")
             self.metadata_worksheet.cell(row=last_metadata_row + 7, column=2, value=self.module.minor_land_use_type_start.name if self.module.minor_land_use_type_start is not None else "Default")
-            self.metadata_worksheet.cell(
-                row=last_metadata_row + 8, column=2, value=self.module.minor_residue_management_type_start.name if self.module.minor_residue_management_type_start is not None else "Default"
-            )
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=2, value=self.module.minor_residue_management_type_start.name if self.module.minor_residue_management_type_start is not None else "Default")
             self.metadata_worksheet.cell(row=last_metadata_row + 9, column=2, value=self.module.minor_yield_start if self.module.minor_yield_start is not None else "Default")
 
         if self.module.is_with():
@@ -1192,9 +1347,7 @@ class AnnualCroplandReport(LandModuleReport):
             self.metadata_worksheet.cell(row=last_metadata_row + 5, column=3, value=self.module.residue_management_type_w.name)
             self.metadata_worksheet.cell(row=last_metadata_row + 6, column=3, value=self.module.crop_yield_t2_w if self.module.crop_yield_t2_w is not None else "Default")
             self.metadata_worksheet.cell(row=last_metadata_row + 7, column=3, value=self.module.minor_land_use_type_w.name if self.module.minor_land_use_type_w is not None else "Default")
-            self.metadata_worksheet.cell(
-                row=last_metadata_row + 8, column=3, value=self.module.minor_residue_management_type_w.name if self.module.minor_residue_management_type_w is not None else "Default"
-            )
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=3, value=self.module.minor_residue_management_type_w.name if self.module.minor_residue_management_type_w is not None else "Default")
             self.metadata_worksheet.cell(row=last_metadata_row + 9, column=3, value=self.module.minor_yield_w if self.module.minor_yield_w is not None else "Default")
 
         if self.module.is_without():
@@ -1205,9 +1358,7 @@ class AnnualCroplandReport(LandModuleReport):
             self.metadata_worksheet.cell(row=last_metadata_row + 5, column=4, value=self.module.residue_management_type_wo.name)
             self.metadata_worksheet.cell(row=last_metadata_row + 6, column=4, value=self.module.crop_yield_t2_wo if self.module.crop_yield_t2_wo is not None else "Default")
             self.metadata_worksheet.cell(row=last_metadata_row + 7, column=4, value=self.module.minor_land_use_type_wo.name if self.module.minor_land_use_type_wo is not None else "Default")
-            self.metadata_worksheet.cell(
-                row=last_metadata_row + 8, column=4, value=self.module.minor_residue_management_type_wo.name if self.module.minor_residue_management_type_wo is not None else "Default"
-            )
+            self.metadata_worksheet.cell(row=last_metadata_row + 8, column=4, value=self.module.minor_residue_management_type_wo.name if self.module.minor_residue_management_type_wo is not None else "Default")
             self.metadata_worksheet.cell(row=last_metadata_row + 9, column=4, value=self.module.minor_yield_wo if self.module.minor_yield_wo is not None else "Default")
 
         self.metadata_worksheet.cell(row=last_metadata_row + 2, column=6, value=self.module.land_use_type_thread.format_comments())
@@ -1521,9 +1672,7 @@ class FloodedRiceReport(LandModuleReport):
             self.fire_n2o = [x + y for x, y in zip(self.fire_n2o, self.extract_emissions(minor_emission_set, self.fire_n2o_source[0], self.fire_n2o_source[1]))]
             self.fire_ch4 = [x + y for x, y in zip(self.fire_ch4, self.extract_emissions(minor_emission_set, self.fire_ch4_source[0], self.fire_ch4_source[1]))]
             ### Until here
-            self.rice_cultivation_ch4 = [
-                x + y for x, y in zip(self.rice_cultivation_ch4, self.extract_emissions(minor_emission_set, self.rice_cultivation_ch4_source[0], self.rice_cultivation_ch4_source[1]))
-            ]
+            self.rice_cultivation_ch4 = [x + y for x, y in zip(self.rice_cultivation_ch4, self.extract_emissions(minor_emission_set, self.rice_cultivation_ch4_source[0], self.rice_cultivation_ch4_source[1]))]
 
             self.total_emissions = list(map(sum, zip(self.biomass_co2, self.soil_co2, self.soil_n2o, self.fire_n2o, self.fire_ch4, self.rice_cultivation_ch4)))
 
@@ -2058,23 +2207,13 @@ class LivestockReport(BaseModuleReport):
 
         self.enteric_fermentation_ch4 = self.extract_emissions(self.emissions_set, self.enteric_fermentation_ch4_source[0], self.enteric_fermentation_ch4_source[1])
         self.manure_management_other_than_prp_ch4 = self.extract_emissions(self.emissions_set, self.manure_management_other_than_prp_ch4_source[0], self.manure_management_other_than_prp_ch4_source[1])
-        self.manure_management_other_than_prp_direct_n2o = self.extract_emissions(
-            self.emissions_set, self.manure_management_other_than_prp_direct_n2o_source[0], self.manure_management_other_than_prp_direct_n2o_source[1]
-        )
-        self.manure_management_other_than_prp_leaching_indirect_n2o = self.extract_emissions(
-            self.emissions_set, self.manure_management_other_than_prp_leaching_indirect_n2o_source[0], self.manure_management_other_than_prp_leaching_indirect_n2o_source[1]
-        )
-        self.manure_management_other_than_prp_volatilization_indirect_n2o = self.extract_emissions(
-            self.emissions_set, self.manure_management_other_than_prp_volatilization_indirect_n2o_source[0], self.manure_management_other_than_prp_volatilization_indirect_n2o_source[1]
-        )
+        self.manure_management_other_than_prp_direct_n2o = self.extract_emissions(self.emissions_set, self.manure_management_other_than_prp_direct_n2o_source[0], self.manure_management_other_than_prp_direct_n2o_source[1])
+        self.manure_management_other_than_prp_leaching_indirect_n2o = self.extract_emissions(self.emissions_set, self.manure_management_other_than_prp_leaching_indirect_n2o_source[0], self.manure_management_other_than_prp_leaching_indirect_n2o_source[1])
+        self.manure_management_other_than_prp_volatilization_indirect_n2o = self.extract_emissions(self.emissions_set, self.manure_management_other_than_prp_volatilization_indirect_n2o_source[0], self.manure_management_other_than_prp_volatilization_indirect_n2o_source[1])
         self.manure_management_prp_ch4 = self.extract_emissions(self.emissions_set, self.manure_management_prp_ch4_source[0], self.manure_management_prp_ch4_source[1])
         self.manure_management_prp_direct_n2o = self.extract_emissions(self.emissions_set, self.manure_management_prp_direct_n2o_source[0], self.manure_management_prp_direct_n2o_source[1])
-        self.manure_management_prp_leaching_indirect_n2o = self.extract_emissions(
-            self.emissions_set, self.manure_management_prp_leaching_indirect_n2o_source[0], self.manure_management_prp_leaching_indirect_n2o_source[1]
-        )
-        self.manure_management_prp_volatilization_indirect_n2o = self.extract_emissions(
-            self.emissions_set, self.manure_management_prp_volatilization_indirect_n2o_source[0], self.manure_management_prp_volatilization_indirect_n2o_source[1]
-        )
+        self.manure_management_prp_leaching_indirect_n2o = self.extract_emissions(self.emissions_set, self.manure_management_prp_leaching_indirect_n2o_source[0], self.manure_management_prp_leaching_indirect_n2o_source[1])
+        self.manure_management_prp_volatilization_indirect_n2o = self.extract_emissions(self.emissions_set, self.manure_management_prp_volatilization_indirect_n2o_source[0], self.manure_management_prp_volatilization_indirect_n2o_source[1])
 
         self.total_emissions = list(
             map(
@@ -2786,9 +2925,7 @@ class IrrigationReport(BaseModuleReport):
                 log.error(f"Cannot calculate emissions for submodule {submodule.module_type.name} in activity {submodule.parent.activity.name}: {e}")
                 raise NotReadyError(f"Cannot calculate emissions for submodule {submodule.module_type.name} in activity {submodule.parent.activity.name}: {e}")
 
-            self.other_infrastructure_co2_eq = list(
-                map(sum, zip(self.other_infrastructure_co2_eq, self.extract_emissions(submodules_emission_set, self.other_infrastructure_co2_eq_source[0], self.other_infrastructure_co2_eq_source[1])))
-            )
+            self.other_infrastructure_co2_eq = list(map(sum, zip(self.other_infrastructure_co2_eq, self.extract_emissions(submodules_emission_set, self.other_infrastructure_co2_eq_source[0], self.other_infrastructure_co2_eq_source[1]))))
             self.liquid_fuel_or_electricity_co2 = list(
                 map(
                     sum,
@@ -2817,9 +2954,7 @@ class IrrigationReport(BaseModuleReport):
                 )
             )
 
-        self.total_emissions = list(
-            map(sum, zip(self.total_emissions, self.other_infrastructure_co2_eq, self.liquid_fuel_or_electricity_co2, self.liquid_fuel_or_electricity_ch4, self.liquid_fuel_or_electricity_n2o))
-        )
+        self.total_emissions = list(map(sum, zip(self.total_emissions, self.other_infrastructure_co2_eq, self.liquid_fuel_or_electricity_co2, self.liquid_fuel_or_electricity_ch4, self.liquid_fuel_or_electricity_n2o)))
 
     def populate_metadata(self):
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()

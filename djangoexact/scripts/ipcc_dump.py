@@ -4636,6 +4636,33 @@ def add_pit_gt_1_month_to_livestock_awms_where_manure_management_type_is_null():
     LivestockAWMS.objects.bulk_update(efs, ["manure_management_type"])
 
 
+def import_shadow_prices_of_carbon():
+    df = pd.read_csv(
+        os.path.join(os.path.dirname(__file__), "ipcc_data", "ShadowPriceOfCarbon.csv"),
+        header=0,
+        sep=",",
+    )
+
+    shadow_prices = []
+
+    for i, row in df.iterrows():
+        year = row["Year"]
+        min_value = row["Min"]
+        max_value = row["Max"]
+
+        print(year, min_value, max_value)
+
+        shadow_prices.append(
+            ShadowPriceOfCarbon(
+                year=year,
+                min_value=min_value,
+                max_value=max_value,
+            )
+        )
+
+    ShadowPriceOfCarbon.objects.bulk_create(shadow_prices)
+
+
 def run():
     import os
 
@@ -4651,6 +4678,7 @@ def run():
         add_or_replace_application_parameters()
         delete_and_import_irrigation_phase_data()
         add_pit_gt_1_month_to_livestock_awms_where_manure_management_type_is_null()
+        import_shadow_prices_of_carbon()
         pass
 
     if app_mode == "review":
@@ -4661,6 +4689,7 @@ def run():
         # find_all_stroke_fuel_types_and_put_stroke_lowercase()
         # add_or_replace_application_parameters()
         # delete_and_import_irrigation_phase_data()
+        import_shadow_prices_of_carbon()
         pass
 
     if app_mode == "development":
