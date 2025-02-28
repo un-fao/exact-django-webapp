@@ -4,7 +4,6 @@ from django.db.models import *
 
 
 class GlobalWarmingPotential(Model):
-
     class Meta:
         verbose_name = "Global Warming Potential"
         verbose_name_plural = "Global Warming Potentials"
@@ -107,7 +106,6 @@ class AfforestationCombustionFactorManager(Manager):
 
 
 class AfforestationCombustionFactor(Model):
-
     class Meta:
         verbose_name = "Afforestation Combustion Factor"
         verbose_name_plural = "Afforestation Combustion Factors"
@@ -125,7 +123,6 @@ class AfforestationCombustionFactor(Model):
 
 
 class LitterDeadwoodCarbonStock(Model):
-
     class Meta:
         verbose_name = "Litter/Deadwood Carbon Stock"
         verbose_name_plural = "Litter/Deadwood Carbon Stock"
@@ -240,7 +237,6 @@ class ForestManagementBGBManager(Manager):
 
 
 class ForestManagementBGB(Model):
-
     class Meta:
         verbose_name = "Forest Management BGB"
         verbose_name_plural = "Forest Management BGB"
@@ -258,7 +254,6 @@ class ForestManagementBGB(Model):
 
 
 class SoilOrganicCarbon(Model):
-
     class Meta:
         verbose_name = "Soil Organic Carbon"
         verbose_name_plural = "Soil Organic Carbon"
@@ -291,7 +286,6 @@ class ForestTotalBiomassManager(Manager):
 
 
 class ForestTotalBiomass(Model):
-
     class Meta:
         verbose_name = "Forest Biomass for Initial Land Use"
         verbose_name_plural = "Forest Biomass for Initial Land Use"
@@ -326,7 +320,6 @@ class AfforestationLandUseStockExchangeFactorManager(Manager):
 
 
 class AfforestationLandUseStockExchangeFactor(Model):
-
     class Meta:
         verbose_name = "Afforestation Land Use Stock Exchange Factor"
         verbose_name_plural = "Afforestation Land Use Stock Exchange Factors"
@@ -343,7 +336,6 @@ class AfforestationLandUseStockExchangeFactor(Model):
 
 
 class ForestManagementAGBGrowth(Model):
-
     class Meta:
         verbose_name = "Forest Management AGB Growth"
         verbose_name_plural = "Forest Management AGB Growth"
@@ -449,7 +441,6 @@ class CropNitrousEstimationDefaultFactor(Model):
 
 
 class TillageCarbonStockExchangeFactor(Model):
-
     class Meta:
         verbose_name = "Tillage Carbon Stock Exchange Factor"
         verbose_name_plural = "Tillage Carbon Stock Exchange Factors"
@@ -464,7 +455,6 @@ class TillageCarbonStockExchangeFactor(Model):
 
 
 class OrganicInputCarbonStockExchangeFactor(Model):
-
     class Meta:
         verbose_name = "Organic Input Carbon Stock Exchange Factor"
         verbose_name_plural = "Organic Input Carbon Stock Exchange Factors"
@@ -590,7 +580,6 @@ class RewettingMethaneFactor(Model):
 
 
 class OtherConstructedWaterbodiesEmissionFactor(Model):
-
     class Meta:
         verbose_name = "Other Constructed Waterbodies Emission Factor"
         verbose_name_plural = "Other Constructed Waterbodies Emission Factors"
@@ -605,7 +594,6 @@ class OtherConstructedWaterbodiesEmissionFactor(Model):
 
 
 class Atwood(Model):
-
     class Meta:
         verbose_name = "Atwood"
         verbose_name_plural = "Atwood"
@@ -622,7 +610,6 @@ class Atwood(Model):
 
 
 class DefaultSoilCarbonStock(Model):
-
     class Meta:
         verbose_name = "Default Soil Carbon Stock"
         verbose_name_plural = "Default Soil Carbon Stock"
@@ -714,7 +701,6 @@ class PerennialBGBManager(Manager):
 
 
 class PerennialBGB(Model):
-
     class Meta:
         verbose_name = "Perennial BGB"
         verbose_name_plural = "Perennial BGB"
@@ -784,7 +770,6 @@ class CroplandFLU(Model):
 
 
 class CroplandFMG(Model):
-
     class Meta:
         verbose_name = "Cropland FMG"
         verbose_name_plural = "Cropland FMGs"
@@ -799,7 +784,6 @@ class CroplandFMG(Model):
 
 
 class CroplandFI(Model):
-
     class Meta:
         verbose_name = "Cropland FI"
         verbose_name_plural = "Cropland FIs"
@@ -814,7 +798,6 @@ class CroplandFI(Model):
 
 
 class AfforestationFLU(Model):
-
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     moisture = ForeignKey("api.Moisture", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
@@ -851,7 +834,6 @@ class GrasslandBiomass(Model):
 
 
 class GrasslandSOC(Model):
-
     class Meta:
         verbose_name = "Grassland SOC"
         verbose_name_plural = "Grassland SOC"
@@ -873,7 +855,6 @@ class GrasslandStockExchangeFactorManager(Manager):
 
 
 class GrasslandStockExchangeFactor(Model):
-
     class Meta:
         verbose_name = "Grassland Stock Exchange Factor"
         verbose_name_plural = "Grassland Stock Exchange Factors"
@@ -891,7 +872,6 @@ class GrasslandStockExchangeFactor(Model):
 
 
 class ElectricityEmission(Model):
-
     class Meta:
         verbose_name = "Electricity Emission"
         verbose_name_plural = "Electricity Emissions"
@@ -942,7 +922,6 @@ class LargeFisheryFUIManager(Manager):
 
 
 class LargeFisheryFUI(Model):
-
     fish_type = ForeignKey("api.FishType", on_delete=CASCADE)
     gear_type = ForeignKey("api.LargeFisheryGearType", on_delete=CASCADE, null=True)
     value = FloatField()
@@ -1014,7 +993,6 @@ class CropYieldStat(Model):
 
 
 class InputReference(Model):
-
     class Meta:
         verbose_name = "Input Reference"
         verbose_name_plural = "Input References"
@@ -1033,7 +1011,6 @@ class InputReference(Model):
 
 
 class InputEmissionFactor(Model):
-
     class Meta:
         verbose_name = "Input Emission Factor"
         verbose_name_plural = "Input Emission Factors"
@@ -1051,7 +1028,6 @@ class InputEmissionFactor(Model):
 
 
 class BuildingEmissionFactor(Model):
-
     class Meta:
         verbose_name = "Building Emission Factor"
         verbose_name_plural = "Building Emission Factors"
@@ -1064,7 +1040,6 @@ class BuildingEmissionFactor(Model):
 
 
 class RoadEmissionFactor(Model):
-
     class Meta:
         verbose_name = "Road Emission Factor"
         verbose_name_plural = "Road Emission Factors"
@@ -1221,7 +1196,6 @@ class MethaneEntericFermentationFactor(Model):
 
 
 class ManureManagementVolatilizationMultiplier(Model):
-
     class Meta:
         verbose_name = "Manure Management Volatilization Multiplier"
         verbose_name_plural = "Manure Management Volatilization Multipliers"
@@ -1265,7 +1239,6 @@ class IrrigationSystemData(Model):
 
 
 class IrrigationPhaseData(Model):
-
     class Meta:
         verbose_name = "Irrigation Phase Data"
         verbose_name_plural = "Irrigation Phase Data"
@@ -1283,7 +1256,6 @@ class IrrigationPhaseData(Model):
 
 
 class IrrigationPressureRequirement(Model):
-
     class Meta:
         verbose_name = "Irrigation Pressure Requirement"
         verbose_name_plural = "Irrigation Pressure Requirements"
@@ -1426,7 +1398,6 @@ class OrganicSoilDrainageEmissionFactorManager(Manager):
 
 
 class OrganicSoilDrainageEmissionFactor(Model):
-
     class Meta:
         verbose_name = "Organic Soil Drainage Emission Factor"
         verbose_name_plural = "Organic Soil Drainage Emission Factors"
@@ -1456,7 +1427,6 @@ class OrganicSoilDrainageEmissionFactor(Model):
 
 
 class PeatExtractionEmissionFactor(Model):
-
     class Meta:
         verbose_name = "Peat Extraction Emission Factor"
         verbose_name_plural = "Peat Extraction Emission Factors"
@@ -1483,7 +1453,6 @@ class PeatExtractionEmissionFactor(Model):
 
 
 class PeatExtractionConversionFactor(Model):
-
     class Meta:
         verbose_name = "Peat Extraction Conversion Factor"
         verbose_name_plural = "Peat Extraction Conversion Factors"
@@ -1501,7 +1470,6 @@ class PeatExtractionConversionFactor(Model):
 
 
 class OrganicSoilFuelConsumption(Model):
-
     class Meta:
         verbose_name = "Organic Soil Fuel Consumption"
         verbose_name_plural = "Organic Soil Fuel Consumptions"
@@ -1517,7 +1485,6 @@ class OrganicSoilFuelConsumption(Model):
 
 
 class OrganicSoilGefEmissionFactor(Model):
-
     class Meta:
         verbose_name = "Organic Soil GEF Emission Factor"
         verbose_name_plural = "Organic Soil GEF Emission Factors"
@@ -1536,7 +1503,6 @@ class OrganicSoilGefEmissionFactor(Model):
 
 
 class OrganicSoilRewettingEmissionFactor(Model):
-
     class Meta:
         verbose_name = "Organic Soil Rewetting Emission Factor"
         verbose_name_plural = "Organic Soil Rewetting Emission Factors"
@@ -1563,7 +1529,6 @@ class OrganicSoilRewettingEmissionFactor(Model):
 
 
 class ForestManagementAGB(Model):
-
     climate = ForeignKey("api.Climate", on_delete=CASCADE)
     land_use_type = ForeignKey("api.LandUseType", on_delete=CASCADE)
     region = ForeignKey("api.Region", on_delete=CASCADE)
@@ -1586,7 +1551,6 @@ class ForestManagementAGB(Model):
 
 
 class FMGData(Model):
-
     class Meta:
         verbose_name = "FMG Data"
         verbose_name_plural = "FMG Data"
@@ -1618,7 +1582,6 @@ class FIData(Model):
 
 
 class FLUData(Model):
-
     class Meta:
         verbose_name = "FLU Data"
         verbose_name_plural = "FLU Data"
@@ -1655,7 +1618,6 @@ class SettlementEF(Model):
 
 
 class NitrousEmissionFactor(Model):
-
     class Meta:
         verbose_name = "Nitrous Emission Factor"
         verbose_name_plural = "Nitrous Emission Factors"
@@ -1668,7 +1630,6 @@ class NitrousEmissionFactor(Model):
 
 
 class InputsNitrousEmissionFactor(Model):
-
     class Meta:
         verbose_name = "Inputs Nitrous Emission Factor"
         verbose_name_plural = "Inputs Nitrous Emission Factors"
@@ -1713,3 +1674,13 @@ class ValueChainRefrigerantEmissionFactor(Model):
 
     def __str__(self):
         return f"({self.pk}) {self.refrigerant_type.name} {self.value}"
+
+
+class ShadowPriceOfCarbon(Model):
+    class Meta:
+        verbose_name = "Shadow Price of Carbon"
+        verbose_name_plural = "Shadow Prices of Carbon"
+
+    year = IntegerField(unique=True)
+    min_value = FloatField()
+    max_value = FloatField()
