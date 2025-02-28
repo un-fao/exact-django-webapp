@@ -28,12 +28,12 @@ if app_mode:
     print(f"Running in {app_mode} mode")
     dotenv_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), "djangoexact", f".env.{app_mode}")
     load_dotenv(dotenv_file)
+    FRONTEND_URL = "https://exact.review.fao.org" if app_mode == "review" else "https://exact.apps.fao.org"
+else:
+    FRONTEND_URL = "https://exact.review.fao.org" if os.getenv("BRANCH_NAME") == "review" else "https://exact.apps.fao.org"
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-FRONTEND_URL = "https://exact.review.fao.org" if app_mode == "review" else "https://exact.apps.fao.org"
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
