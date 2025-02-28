@@ -1474,7 +1474,7 @@ The EX-ACT Team
         invitation.save()
 
         # Teturn simple html page with message
-        return render(request, "invitation_accepted.html", {"project_name": invitation.project.name, "group": invitation.group.name})
+        return render(request, "invitation_accepted.html", {"project_name": invitation.project.name, "group": invitation.group.name, "link": settings.FRONTEND_URL})
 
 
 class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
