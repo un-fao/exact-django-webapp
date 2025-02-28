@@ -1313,16 +1313,17 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return utils.ErrorResponse(f"User with email {email} does not exist", status=http_status.HTTP_400_BAD_REQUEST)
 
         group: Group = serializer.validated_data["group"]
-        invitation = ProjectInvitation.objects.filter(project=project, user=user, group=group).first()
+        invitation = ProjectInvitation.objects.filter(project=project, user=user, group=group, status__name__ne=utils.InvitationStatus.REJECTED.value).first()
 
-        if invitation:
-            logging.warning(f"Invitation for {user.email} already sent with id {invitation.id}")
+        if not invitation:
+            invitation = ProjectInvitation(project=project, user=user, group=group)
+            invitation.status = InvitationStatusType.objects.get(name_en=utils.InvitationStatus.PENDING.value)
+            invitation.sender = self.request.user
+            invitation.save()
+
+        if not invitation.status.name == utils.InvitationStatus.PENDING.value:
+            logging.warning(f"Invitation for {user.email} already sent with id {invitation.pk}")
             return Response({"message": f"Invitation for {user.email} already sent for group {invitation.group.name}"}, status=http_status.HTTP_200_OK)
-
-        invitation = ProjectInvitation(project=project, user=user, group=group)
-        invitation.status = InvitationStatusType.objects.get(name_en=utils.InvitationStatus.PENDING.value)
-        invitation.sender = self.request.user
-        invitation.save()
 
         invitation_link = reverse("projectinvitations-accept", args=[invitation.token])
         invitation_subject = f'[EX-ACT] You have been invited to join the project "{project.name}"'
