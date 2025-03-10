@@ -1074,7 +1074,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 return chart_base64
 
             # Get faologo.eps from static files
-            faologo = open("djangoexact/media/faologo.svg", "rb")
+            faologo = open(os.path.join(settings.BASE_DIR, "media", "faologo.svg"), "rb")
 
             # Add it as base64 to the context
             faologo_base64 = base64.b64encode(faologo.read()).decode("utf-8")
