@@ -3358,7 +3358,7 @@ class ProjectFileUploadSerializer(serializers.ModelSerializer):
         if file.size > max_size_in_mb * 1024 * 1024:
             raise serializers.ValidationError(f"File size must be less than {max_size_in_mb}MB")
 
-        attrs["file"].name = utils.get_unique_name(file.name)
+        attrs["file"].name = utils.get_unique_name(attrs["project"], file.name)
 
         return super().validate(attrs)
 
