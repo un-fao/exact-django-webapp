@@ -619,6 +619,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
     soil_type_t2 = serializers.PrimaryKeyRelatedField(queryset=SoilType.objects.all(), required=False, allow_null=True)
     duration_t2 = serializers.IntegerField(required=False, allow_null=True)
     start_year_t2 = serializers.IntegerField(required=False, allow_null=True)
+    last_year_of_accounting_t2 = serializers.IntegerField(required=False, allow_null=True)
     land_use_change = LandUseChangeBuilderSerializer(many=False, required=False, allow_null=True)
     module_types = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
     area = serializers.FloatField(required=False, min_value=0)
@@ -674,6 +675,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
             duration_t2=self.validated_data.get("duration_t2", None),
             soil_type_t2=self.validated_data.get("soil_type_t2", None),
             start_year_t2=self.validated_data.get("start_year_t2", None),
+            last_year_of_accounting_t2=self.validated_data.get("last_year_of_accounting_t2", None),
             owner=self.context["request"].user,
         )
 
