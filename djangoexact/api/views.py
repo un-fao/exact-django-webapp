@@ -1313,7 +1313,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return utils.ErrorResponse(f"User with email {email} does not exist", status=http_status.HTTP_400_BAD_REQUEST)
 
         group: Group = serializer.validated_data["group"]
-        invitation = ProjectInvitation.objects.filter(project=project, user=user, group=group, status__name__ne=utils.InvitationStatus.REJECTED.value).first()
+        invitation = ProjectInvitation.objects.filter(project=project, user=user, group=group).exclude(status__name=utils.InvitationStatus.REJECTED.value).first()
 
         if not invitation:
             invitation = ProjectInvitation(project=project, user=user, group=group)
