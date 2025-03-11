@@ -1074,7 +1074,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 return chart_base64
 
             # Get faologo.eps from static files
-            faologo = open("djangoexact/media/faologo.svg", "rb")
+            faologo = open(os.path.join(settings.BASE_DIR, "media", "faologo.svg"), "rb")
 
             # Add it as base64 to the context
             faologo_base64 = base64.b64encode(faologo.read()).decode("utf-8")
@@ -1137,6 +1137,16 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         except Exception as e:
             return utils.ErrorResponse(f"Error generating PDF: {str(e)}", status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=False, methods=["get"])
+    @swagger_auto_schema(
+        responses={200: ProjectTagSerializer},
+        operation_description="Get all tags for the current user",
+    )
+    def tags(self, request):
+        tags = ProjectTag.objects.filter(user=self.request.user)
+        serializer = ProjectTagSerializer(tags, many=True)
+        return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
 
 class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
@@ -1313,7 +1323,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             return utils.ErrorResponse(f"User with email {email} does not exist", status=http_status.HTTP_400_BAD_REQUEST)
 
         group: Group = serializer.validated_data["group"]
-        invitation = ProjectInvitation.objects.filter(project=project, user=user, group=group, status__name__ne=utils.InvitationStatus.REJECTED.value).first()
+        invitation = ProjectInvitation.objects.filter(project=project, user=user, group=group).exclude(status__name=utils.InvitationStatus.REJECTED.value).first()
 
         if not invitation:
             invitation = ProjectInvitation(project=project, user=user, group=group)

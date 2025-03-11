@@ -603,6 +603,8 @@ class Project(Historical, DirtyFieldsMixin):
 
     is_archived = models.BooleanField(default=False, verbose_name=_("is_archived"))
 
+    map_data = models.JSONField(null=True, blank=True, verbose_name=_("map_data"))
+
     @property
     def capitalization_years(self) -> int:
         return self.__get_capitalization_years()
@@ -1640,6 +1642,9 @@ class AnnualCropland(LandModule, SingleBiomassModule, ResidueAvailability):
 class PerennialCrop(models.Model):
     class Meta:
         abstract = True
+
+    is_system_in_maturity = models.BooleanField(default=True, verbose_name=_("is_system_in_maturity"))  # TODO: Ask Lorenzo if default should be True or False
+    is_complete_renewal = models.BooleanField(default=False, verbose_name=_("is_complete_renewal"))
 
     tillage_management_type_start = models.ForeignKey(TillageManagementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_tillage_management_type_start", verbose_name=_("tillage_management_type_start"))
     tillage_management_type_w = models.ForeignKey(TillageManagementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_tillage_management_type_w", verbose_name=_("tillage_management_type_w"))
