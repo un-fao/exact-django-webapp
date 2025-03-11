@@ -603,6 +603,8 @@ class Project(Historical, DirtyFieldsMixin):
 
     is_archived = models.BooleanField(default=False, verbose_name=_("is_archived"))
 
+    map_data = models.JSONField(null=True, blank=True, verbose_name=_("map_data"))
+
     @property
     def capitalization_years(self) -> int:
         return self.__get_capitalization_years()
