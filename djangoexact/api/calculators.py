@@ -1840,39 +1840,56 @@ class PerennialCropCalculator(LandModuleCalculator):
             self.end_module_has_growth_wo = True
 
         # Perennial to LUC
-        if self.module.is_start() and not self.module.is_with() and self.module_w.module_type.is_luc:
+        if self.module.is_start() and not self.module.is_with():
             self.biomass_ef_w.value = 0
-            self.biomass_ef_wo.value = 0
 
-        if self.module.is_start() and not self.module.is_without() and self.module_wo.module_type.is_luc:
+        if self.module.is_start() and not self.module.is_without():
             self.biomass_ef_wo.value = 0
 
     def _compute_biomass_for_maturity(
         self, biomass_start, biomass_end, has_change_in_system, scenario_type_start: utils.ScenarioTypes, scenario_type_end: utils.ScenarioTypes
     ) -> tuple[ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB, ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB]:
+        """
+        Computes and adjusts biomass values for start and end scenarios based on system maturity and scenario types.
+
+        This method handles different cases including perennial to land use change transitions and
+        perennial to perennial transitions. It adjusts biomass values according to whether the system
+        is in maturity, whether there is a change in the system, or if there is complete renewal.
+
+        Args:
+            biomass_start: Initial biomass value for the start scenario
+            biomass_end: Initial biomass value for the end scenario
+            has_change_in_system: Boolean indicating if there's a change in the system between scenarios
+            scenario_type_start: Enumeration indicating the type of the start scenario (START, WITH, WITHOUT)
+            scenario_type_end: Enumeration indicating the type of the end scenario
+
+        Returns:
+            tuple: Adjusted (biomass_start, biomass_end) values based on the scenario conditions
+        """
+
         biomass_start: ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB = copy.deepcopy(biomass_start)
         biomass_end: ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB = copy.deepcopy(biomass_end)
 
-        if scenario_type_start is utils.ScenarioTypes.START:
-            if has_change_in_system:
-                biomass_start = self.agb_max_start_default
-                biomass_end.value = 0
-            elif self.module.is_complete_renewal:
-                biomass_end.value = 0
-            elif self.module.is_system_in_maturity:
-                setattr(self, f"end_module_has_growth_{scenario_type_end.value}", False)
-                biomass_start = self.agb_max_start_default
-                biomass_end: ipcc.PerennialMaxAGB = getattr(self, f"agb_max_{scenario_type_end.value}_default")
-
-        elif scenario_type_start in [utils.ScenarioTypes.WITH, utils.ScenarioTypes.WITHOUT]:
-            if has_change_in_system:
-                biomass_start.value = 0
-            elif self.module.is_system_in_maturity:
+        # Checking the start scenario covers both "Perennial -> LUC" and "Perennial -> Perennial" cases
+        # In all other cases, the biomass values are returned as is
+        if self.module.is_start():
+            if self.module.is_system_in_maturity:
                 setattr(self, f"end_module_has_growth_{scenario_type_end.value}", False)
                 biomass_start = getattr(self, f"agb_max_{scenario_type_start.value}_default")
                 biomass_end: ipcc.PerennialMaxAGB = getattr(self, f"agb_max_{scenario_type_end.value}_default")
-            elif not self.module.is_system_in_maturity:
-                biomass_end.value = None
+
+            if scenario_type_start is utils.ScenarioTypes.START:
+                if has_change_in_system:
+                    biomass_start = self.agb_max_start_default
+                    biomass_end.value = 0
+                elif self.module.is_complete_renewal:
+                    biomass_end.value = 0
+
+            elif scenario_type_start in [utils.ScenarioTypes.WITH, utils.ScenarioTypes.WITHOUT]:
+                if has_change_in_system:
+                    biomass_start.value = 0
+                elif not self.module.is_system_in_maturity:
+                    biomass_end.value = None
 
         return biomass_start, biomass_end
 
