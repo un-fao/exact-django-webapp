@@ -1138,6 +1138,16 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         except Exception as e:
             return utils.ErrorResponse(f"Error generating PDF: {str(e)}", status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    @action(detail=False, methods=["get"])
+    @swagger_auto_schema(
+        responses={200: ProjectTagSerializer},
+        operation_description="Get all tags for the current user",
+    )
+    def tags(self, request):
+        tags = ProjectTag.objects.filter(user=self.request.user)
+        serializer = ProjectTagSerializer(tags, many=True)
+        return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+
 
 class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = ProjectMembership.objects.all()
