@@ -362,15 +362,15 @@ class ReadProjectSerializer(serializers.ModelSerializer):
     def get_total_catch(self, obj):
         small_fisheries = SmallFishery.objects.filter(activity__project=obj).all()
         large_fisheries = LargeFishery.objects.filter(activity__project=obj).all()
+        aquacultures = Aquaculture.objects.filter(activity__project=obj).all()
 
-        all_catch_start = sum([f.total_catch_yr_start for f in list(filter(lambda fishery: fishery.total_catch_yr_start is not None, small_fisheries))]) + sum([f.total_catch_yr_start for f in list(filter(lambda fishery: fishery.total_catch_yr_start is not None, large_fisheries))])
-        all_catch_w = sum([f.total_catch_yr_w for f in list(filter(lambda fishery: fishery.total_catch_yr_w is not None, small_fisheries))]) + sum([f.total_catch_yr_w for f in list(filter(lambda fishery: fishery.total_catch_yr_w is not None, large_fisheries))])
-        all_catch_wo = sum([f.total_catch_yr_wo for f in list(filter(lambda fishery: fishery.total_catch_yr_wo is not None, small_fisheries))]) + sum([f.total_catch_yr_wo for f in list(filter(lambda fishery: fishery.total_catch_yr_wo is not None, large_fisheries))])
+        def safe_sum(items, attr):
+            return sum(getattr(item, attr) or 0 for item in items)
 
         scenario_based_catch = {
-            "start": all_catch_start,
-            "w": all_catch_w,
-            "wo": all_catch_wo,
+            "start": safe_sum(small_fisheries, "total_catch_yr_start") + safe_sum(large_fisheries, "total_catch_yr_start") + safe_sum(aquacultures, "annual_production_start"),
+            "w": safe_sum(small_fisheries, "total_catch_yr_w") + safe_sum(large_fisheries, "total_catch_yr_w") + safe_sum(aquacultures, "annual_production_w"),
+            "wo": safe_sum(small_fisheries, "total_catch_yr_wo") + safe_sum(large_fisheries, "total_catch_yr_wo") + safe_sum(aquacultures, "annual_production_wo"),
         }
 
         return scenario_based_catch
