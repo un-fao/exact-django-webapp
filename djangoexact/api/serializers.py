@@ -2497,9 +2497,9 @@ class ForestManagementWriteSerializer(LandModuleSeralizer):
                 errors.append(f"If a forest has degradation it cannot have rotation, logging, or disturbances in the {verbose_scenario_name} scenario")
 
         if instance and instance.disturbances.count() > 0:
-            pc_biomass_destruction_start = data.get("logging_percentage_agb_logged_start", 0)
-            pc_biomass_destruction_wo = data.get("logging_percentage_agb_logged_wo", 0)
-            pc_biomass_destruction_w = data.get("logging_percentage_agb_logged_w", 0)
+            pc_biomass_destruction_start = data.get("logging_percentage_agb_logged_start", 0) or 0
+            pc_biomass_destruction_wo = data.get("logging_percentage_agb_logged_wo", 0) or 0
+            pc_biomass_destruction_w = data.get("logging_percentage_agb_logged_w", 0) or 0
 
             for disturbance in instance.disturbances.all():
                 disturbance: ForestDisturbance
