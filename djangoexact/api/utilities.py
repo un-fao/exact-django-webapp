@@ -32,6 +32,7 @@ TROPHIC_STATE = 0.7
 INCLUDE_RELATED = "include_related"
 
 FOSSIL_METHANE_FUELS = ["peat", "charcoal"]
+ELECTRIC_FUEL_TYPES = ["electricity", "renewable"]
 
 
 class ManureManagementTypes(Enum):
@@ -174,10 +175,17 @@ def find_modules(activity):
     return modules
 
 
+def get_unique_name(instance, name):
+    i = 1
+    while instance.__class__.objects.filter(name=f"{name} ({i})").exists():
+        i += 1
+    return f"{name} ({i})"
+
+
 def copy_project(project):
     project_copy = copy.deepcopy(project)
     project_copy.pk = None
-    project_copy.name = f"{project_copy.name} copy {uuid.uuid4().hex[:6]}"
+    project_copy.name = get_unique_name(project_copy, project_copy.name)
     project_copy._state.adding = True
     project_copy.save()
 
@@ -190,7 +198,7 @@ def copy_project(project):
 def copy_activity(activity, new_project=None):
     activity_copy = copy.deepcopy(activity)
     activity_copy.pk = None
-    activity_copy.name = f"{activity_copy.name} copy {uuid.uuid4().hex[:6]}"
+    activity_copy.name = get_unique_name(activity_copy, activity_copy.name)
     if new_project:
         activity_copy.project = new_project
     activity_copy._state.adding = True
@@ -264,7 +272,7 @@ def copy_activity(activity, new_project=None):
                 submodule._state.adding = True
                 submodule.save()
 
-    return activity
+    return activity_copy
 
 
 def create_comment_threads(module_instance):
@@ -294,7 +302,6 @@ def getany(objects: list[object], key: str):
         raise ValueError("All arguments must be objects")
 
     for obj in objects:
-
         obj_type = type(obj)
 
         if obj_type is dict:
@@ -348,7 +355,6 @@ def get_or_raise(model, filter_criteria, error_message, method="get") -> models.
 
 
 def get_soc(module, climate, moisture, soil_type, scenario: ScenarioTypes) -> models.QuerySet | models.Model:
-
     if hasattr(module, f"soc_t2_{scenario.value}"):
         return getattr(module, f"soc_t2_{scenario.value}")
 
@@ -419,7 +425,6 @@ def find_organic_soil_parent_module(organic_soil) -> tuple:
 
 
 def get_changes(records: list[HistoricalRecords]):
-
     class ChangeLog:
         def __init__(self, date, user, reason, changes):
             self.date = date
@@ -541,3 +546,11 @@ def update_change_reason(instance, reason):
     record = history.filter(id=instance.pk).order_by("-history_date").first()
     record.history_change_reason = reason
     record.save()
+
+
+def validate_uuid(uuid_string):
+    try:
+        uuid.UUID(uuid_string)
+    except ValueError:
+        return False
+    return True
