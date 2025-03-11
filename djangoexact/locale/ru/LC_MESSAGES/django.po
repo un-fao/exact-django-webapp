@@ -1,1474 +1,3139 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
-"Report-Msgid-Bugs-To: support@example.com\n"
-"POT-Creation-Date: 2024-10-24 12:29\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-03-11 11:09+0000\n"
 "PO-Revision-Date: 2024-12-31 06:05+0000\n"
 "Last-Translator: Your Name <your.email@example.com>\n"
 "Language-Team: English\n"
 "Language: en\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
 "\n"
 "X-Loco-Source-Locale: it_IT\n"
 "X-Loco-Parser: loco_parse_po\n"
-"X-Generator: Loco https://localise.biz/"
+"X-Generator: Loco https://localise.biz/\n"
 
-#. InvitationStatusType
-msgid "pending"
-msgstr "В ожидании"
-
-#. InvitationStatusType
-msgid "accepted"
+#: api/models.py:569 api/models.py:833
+msgid "owner"
 msgstr ""
-"одобренный"
 
-#. InvitationStatusType
-msgid "rejected"
-msgstr "Отклонено"
-
-#. InvitationStatusType
-msgid "canceled"
-msgstr "Отменённый"
-
-#. ForestType
-msgid "Natural"
-msgstr "Естественный"
-
-#. ForestType
-msgid "Plantation"
-msgstr "Плантация"
-
-#. ForestConditionType
-msgid "Primary"
-msgstr "Первичный"
-
-#. ForestConditionType
-msgid "Secondary"
-msgstr "Вторичный"
-
-#. SiteLocationType
-msgid "On-Site"
-msgstr "на месте, локальный"
-
-#. SiteLocationType
-msgid "Off-Site"
-msgstr "Вне участка"
-
-#. StatusType
-msgid "EMPTY"
-msgstr "ПУСТОЙ"
-
-#. StatusType
-msgid "READY"
-msgstr "ГОТОВО"
-
-#. StatusType
-msgid "SUBMODULES_EMPTY"
-msgstr "ПОДМОДУЛИ_ПУСТЫЕ"
-
-#. StatusType
-msgid "IN PROGRESS"
-msgstr "В ПРОЦЕССЕ"
-
-#. LandUseType
-msgid "Barley"
-msgstr "Ячмень"
-
-#. LandUseType
-msgid "Oats"
-msgstr "Овес"
-
-#. LandUseType
-msgid "Millet"
-msgstr "пшено"
-
-#. LandUseType
-msgid "Rice"
-msgstr "рис"
-
-#. LandUseType
-msgid "Sorghum"
-msgstr "Сорго"
-
-#. LandUseType
-msgid "Rye"
-msgstr "Рожь"
-
-#. LandUseType
-msgid "Generic Value"
-msgstr "Общая ценность"
-
-#. LandUseType
-msgid "Soybeans"
-msgstr "Соя"
-
-#. LandUseType
-msgid "Dry Bean"
-msgstr "Сухие бобы"
-
-#. LandUseType
-msgid "Potatoes"
-msgstr "Картофель"
-
-#. LandUseType
-msgid "N-Fixing Forages"
-msgstr "Азотфиксирующие корма"
-
-#. LandUseType
-msgid "Non-N-Fixing Forages"
-msgstr "Неазотфиксирующие корма"
-
-#. LandUseType
-msgid "Winter Wheat"
+#: api/models.py:570
+msgid "date"
 msgstr ""
-" "
-"Озимая пшеница "
 
-#. LandUseType
-msgid "Spring Wheat"
-msgstr "Яровая пшеница"
-
-#. LandUseType
-msgid "Non-Legume Hay"
-msgstr "Небобовое сено"
-
-#. LandUseType
-msgid "Perennial Grasses"
-msgstr "Многолетние травы"
-
-#. LandUseType
-msgid "Grass-Clover Mixtures"
-msgstr "Смеси травы и клевера"
-
-#. LandUseType
-msgid "Long-Term Cultivated"
-msgstr "Долгосрочно культивируемый"
-
-#. LandUseType
-msgid "Perennial/Tree Crop"
-msgstr "Многолетние/деревья-урожай"
-
-#. LandUseType
-msgid "Set Aside (< 20 Yrs)"
-msgstr "Отложенный (< 20 лет)"
-
-#. LandUseType
-msgid "Default"
-msgstr "По умолчанию"
-
-#. LandUseType
-msgid "Peanuts"
-msgstr "Арахис"
-
-#. LandUseType
-msgid "Alley Cropping"
-msgstr "Полосное земледелие"
-
-#. LandUseType
-msgid "Perennial Fallow"
-msgstr "Многолетний залеж"
-
-#. LandUseType
-msgid "Hedgerow"
-msgstr "Живая изгородь"
-
-#. LandUseType
-msgid "Multistrata"
-msgstr "Multistrata"
-
-#. LandUseType
-msgid "Parkland"
-msgstr "Парковая зона"
-
-#. LandUseType
-msgid "Shaded Perennial"
-msgstr "Тенистое многолетнее растение"
-
-#. LandUseType
-msgid "Silvoarable"
-msgstr "Лесоводство с сельским хозяйством"
-
-#. LandUseType
-msgid "Silvopasture"
-msgstr " Лесопастбище"
-
-#. LandUseType
-msgid "Olive"
-msgstr "Олива"
-
-#. LandUseType
-msgid "Orchard"
+#: api/models.py:571 api/models.py:816
+msgid "name"
 msgstr ""
-" "
-"Плодовый сад"
 
-#. LandUseType
-msgid "Short Rotation Coppice"
-msgstr "Краткосроковый пни"
+#: api/models.py:572
+msgid "code"
+msgstr ""
 
-#. LandUseType
-msgid "Tea"
-msgstr "Чай"
+#: api/models.py:573 api/models.py:818
+msgid "cost"
+msgstr ""
 
-#. LandUseType
-msgid "Vine"
-msgstr "Лоза"
+#: api/models.py:574
+msgid "funding_agency"
+msgstr ""
 
-#. LandUseType
-msgid "Oil Palm"
-msgstr "Масличная пальма"
+#: api/models.py:575
+msgid "executing_agency"
+msgstr ""
 
-#. LandUseType
-msgid "Rubber"
-msgstr "Резина"
+#: api/models.py:576 api/models.py:1150
+msgid "status"
+msgstr ""
 
-#. LandUseType
-msgid "Alfalfa"
-msgstr "Люцерна"
+#: api/models.py:578
+msgid "implementation_years"
+msgstr ""
 
-#. LandUseType
-msgid "Agroforestry - Default"
-msgstr "Агролесоводство - по умолчанию"
+#: api/models.py:579
+msgid "start_year_of_activities"
+msgstr ""
 
-#. LandUseType
-msgid "Annual Cropland"
-msgstr "Однолетние посевы"
+#: api/models.py:580
+msgid "last_year_of_accounting"
+msgstr ""
 
-#. LandUseType
-msgid "Annual Fallow"
-msgstr "Ежегодное залежное земледелие"
+#: api/models.py:582
+msgid "country"
+msgstr ""
 
-#. LandUseType
-msgid "Flooded Rice"
-msgstr "Затопленный рис"
+#: api/models.py:583
+msgid "climate"
+msgstr ""
 
-#. LandUseType
-msgid "Grassland"
-msgstr "Пастбища"
+#: api/models.py:584
+#, fuzzy
+#| msgid "Moist"
+msgid "moisture"
+msgstr "Влажный"
 
-#. LandUseType
-msgid "Other Land (Non-Vegetated)"
-msgstr "Прочая земля (не покрытая растительностью)"
+#: api/models.py:585
+msgid "soil_type"
+msgstr ""
 
-#. LandUseType
-msgid "Wheat"
-msgstr "Пшеница"
+#: api/models.py:587
+msgid "is_locked"
+msgstr ""
 
-#. LandUseType
-msgid "Beans & Pulses"
-msgstr "Бобовые, зернобобовые культуры"
+#: api/models.py:588
+msgid "locked_at"
+msgstr ""
 
-#. LandUseType
-msgid "Tubers"
-msgstr "Клубни"
+#: api/models.py:589
+msgid "lock_updated_at"
+msgstr ""
 
-#. LandUseType
-msgid "Root Crops"
-msgstr "Корнеплоды"
+#: api/models.py:590
+msgid "locked_by"
+msgstr ""
 
-#. LandUseType
-msgid "Shrubland"
-msgstr "Кустарники"
+#: api/models.py:592
+msgid "gw_potential"
+msgstr ""
 
-#. LandUseType
-msgid "Humid Forest"
-msgstr "Влажный лес"
+#: api/models.py:594
+msgid "gwp_co2_t2"
+msgstr ""
 
-#. LandUseType
-msgid "﻿Long-Term Cultivated"
-msgstr "Долгосрочно культивируемый"
+#: api/models.py:595
+msgid "gwp_ch4_t2"
+msgstr ""
 
-#. LandUseType
-msgid "Mangrove Forest"
-msgstr "Мангровый лес"
+#: api/models.py:596
+msgid "gwp_n2o_t2"
+msgstr ""
 
-#. LandUseType
-msgid "Mangrove"
-msgstr "Мангровое дерево/Мангры"
+#: api/models.py:597
+msgid "gwp_ch4_fossil_t2"
+msgstr ""
 
-#. LandUseType
-msgid "Tidal Marsh"
-msgstr "Прибрежные болота"
+#: api/models.py:599
+msgid "soc_ref_t2"
+msgstr ""
 
-#. LandUseType
-msgid "Seagrass"
-msgstr "Морская трава"
-
-#. LandUseType
-msgid "Tidal Marsh Mediterranean"
-msgstr "Прибрежные болота Средиземноморья"
-
-#. LandUseType
-msgid "Set Aside"
-msgstr "Отложенный"
-
-#. LandUseType
-msgid "Perennial Cropland"
-msgstr "Многолетние сельскохозяйственные угодья"
-
-#. LandUseType
-msgid "Vegetables"
-msgstr "Овощи"
-
-#. LandUseType
-msgid "Oilseeds"
-msgstr "Масличные культуры"
-
-#. LandUseType
-msgid "Groundnuts"
-msgstr "Арахис"
-
-#. LandUseType
-msgid "Organic Soil"
-msgstr "Органическая почва"
-
-#. LandUseType
-msgid "Rainforest"
-msgstr "Тропический лес"
-
-#. LandUseType
-msgid "Moist Deciduous Forest"
-msgstr "Влажный лиственный лес"
-
-#. LandUseType
-msgid "Dry Forest"
-msgstr "Сухой лес"
-
-#. LandUseType
-msgid "Settlement"
-msgstr "Поселение"
-
-#. LandUseType
-msgid "Oceanic Forest"
-msgstr "Океанический/прибрежный лес"
-
-#. LandUseType
-msgid "Continental Forest"
-msgstr "Континентальный лес"
-
-#. LandUseType
-msgid "Desert"
-msgstr "Пустыня"
-
-#. LandUseType
-msgid "Steppe"
-msgstr "Степь"
-
-#. LandUseType
-msgid "Coniferous Forest"
-msgstr "Хвойный лес"
-
-#. LandUseType
-msgid "Tundra Woodland"
-msgstr "Лесная тундра"
-
-#. LandUseType
-msgid "Mountain System"
-msgstr "Mountain System"
-
-#. LandUseType
-msgid "Other Land"
-msgstr "Прочая земля"
-
-#. LandUseType
-msgid "Grains"
-msgstr "Зерна"
-
-#. LandUseType
-msgid "Maize"
-msgstr "Кукуруза"
-
-#. LandUseType
-msgid "Sugarcane"
-msgstr "Сахарный тростник"
-
-#. SettlementType
-msgid "Infrastructure on existing land (no paving)"
-msgstr "Инфраструктура на существующей земле (без асфальтирования)"
-
-#. SettlementType
-msgid "Paved settlement"
-msgstr "Асфальтированное поселение"
-
-#. SettlementType
-msgid "Turfgrass"
-msgstr "Газонные травы"
-
-#. SettlementType
-msgid "Wooded area"
-msgstr "Лесистая местность"
-
-#. SettlementType
-msgid "Cultivated soil"
-msgstr "Обрабатываемая почва"
-
-#. SoilType
-msgid "High Activity Clay"
-msgstr "Высокоактивная глина"
-
-#. SoilType
-msgid "Low Activity Clay"
-msgstr "Глина с низкой активностью"
-
-#. SoilType
-msgid "Sandy"
-msgstr "Песчаный"
-
-#. SoilType
-msgid "Spodic"
-msgstr "Сподичный"
-
-#. SoilType
-msgid "Volcanic"
-msgstr "Вулканический"
-
-#. SoilType
-msgid "Wetland"
-msgstr "Влажные земли"
-
-#. SoilType
-msgid "Organic"
-msgstr "Органический"
-
-#. SoilType
-msgid "Mineral"
-msgstr "Минерал"
-
-#. SoilType
-msgid "Aggregated"
+#: api/models.py:601 api/models.py:831
+#, fuzzy
+#| msgid "Aggregated"
+msgid "created_at"
 msgstr "совокупный"
 
-#. TillageType
-msgid "Full Tillage"
-msgstr "Полная обработка почвы"
-
-#. TillageType
-msgid "Reduced Tillage"
-msgstr "Сниженная обработка почвы"
-
-#. TillageType
-msgid "No Tillage"
-msgstr "Без обработки почвы"
-
-#. OrganicInputType
-msgid "Low C input"
-msgstr "Низкий углеродный ввод"
-
-#. OrganicInputType
-msgid "Medium C input"
-msgstr "Средний углеродный ввод"
-
-#. OrganicInputType
-msgid "High C input, no manure"
-msgstr "Высокое содержание углерода, без навоза"
-
-#. OrganicInputType
-msgid "High C input, with manure"
-msgstr "Высокое содержание углерода, с навозом"
-
-#. ResidueManagementType
-msgid "Burned"
-msgstr "Сожжённый"
-
-#. ResidueManagementType
-msgid "Retained"
-msgstr "Сохранено/Удержано"
-
-#. ResidueManagementType
-msgid "Exported"
-msgstr "Экспортировано"
-
-#. WaterRegimeType
-msgid "Irrigated, Continuously Flooded"
-msgstr "Орошаемое, постоянно затопленное"
-
-#. WaterRegimeType
-msgid "Irrigated, Single Drainage Period"
-msgstr "Орошаемое, с одним периодом осушения"
-
-#. WaterRegimeType
-msgid "Irrigated, Multiple Drainage Periods"
-msgstr "Орошаемое, с несколькими периодами осушения"
-
-#. OrganicAmendmentType
-msgid "Straw Burnt"
-msgstr "Сожженная солома  "
-
-#. OrganicAmendmentType
-msgid "Straw Exported"
-msgstr "Экспортированная солома"
-
-#. OrganicAmendmentType
-msgid "Compost"
-msgstr "Компост"
-
-#. OrganicAmendmentType
-msgid "Farm Yard Manure"
-msgstr "Навоз для фермерского двора"
-
-#. OrganicAmendmentType
-msgid "Green Manure"
-msgstr "Зеленое удобрение"
-
-#. OrganicAmendmentType
-msgid "Straw Incorporated Long (>30 Days) Before Cultivation"
-msgstr "Солома, внесённая за долго до посева (>30 дней)"
-
-#. OrganicAmendmentType
-msgid "Straw Incorporated Shortly (<30 Days) Before Cultivation"
-msgstr "Солома, внесённая за долго до посева (<30 дней)"
-
-#. GrasslandManagementType
-msgid "Non-Degraded"
-msgstr "Не деградированный"
-
-#. GrasslandManagementType
-msgid "High Intensity Grazing"
-msgstr "Высокоинтенсивный выпас"
-
-#. GrasslandManagementType
-msgid "Severely Degraded"
-msgstr "Сильно деградированные"
-
-#. GrasslandManagementType
-msgid "Improved With Medium Inputs"
-msgstr "Улучшено с использованием средних затрат"
-
-#. GrasslandManagementType
-msgid "Improved Grassland"
-msgstr "Улучшенные пастбища"
-
-#. GrasslandManagementType
-msgid "Improved With High Inputs"
-msgstr "Улучшено с использованием высоких затрат"
-
-#. LivestockCategoryType
-msgid "Dairy Cattle"
-msgstr "дойная корова"
-
-#. LivestockCategoryType
-msgid "Other Cattle"
-msgstr "Другие крупный рогатый скот"
-
-#. LivestockCategoryType
-msgid "Camels"
-msgstr "Верблюды"
-
-#. LivestockCategoryType
-msgid "Horses"
-msgstr "Лошади"
-
-#. LivestockCategoryType
-msgid "Mules And Asses"
-msgstr "Mules And Asses"
-
-#. LivestockCategoryType
-msgid "Other Buffalo"
-msgstr "Другие буйволы"
-
-#. LivestockCategoryType
-msgid "Dairy Buffalo"
-msgstr "дойная буйвола"
-
-#. LivestockCategoryType
-msgid "Dairy Sheep"
-msgstr "дойная овца"
-
-#. LivestockCategoryType
-msgid "Other Sheep"
-msgstr "Другие виды овец"
-
-#. LivestockCategoryType
-msgid "Growing Swine"
-msgstr "Разведение свиней"
-
-#. LivestockCategoryType
-msgid "Breeding Swine"
-msgstr "Разведение свиней"
-
-#. LivestockCategoryType
-msgid "Goats"
-msgstr "Козы"
-
-#. LivestockCategoryType
-msgid "Deer"
-msgstr "Олень"
-
-#. LivestockCategoryType
-msgid "Ostrich"
-msgstr "Страус"
-
-#. LivestockCategoryType
-msgid "Chicken Layer"
-msgstr "Курица несушка"
-
-#. LivestockCategoryType
-msgid "Chicken Broiler"
-msgstr "Цыпленок-бройлер"
-
-#. LivestockCategoryType
-msgid "Llamas And Alpacas"
-msgstr "Ламы и альпаки"
-
-#. LivestockProductionType
-msgid "High-Productivity"
-msgstr "Высокая производительность"
-
-#. LivestockProductionType
-msgid "Low-Productivity"
-msgstr "Низкая продуктивность"
-
-#. ManureManagementType
-msgid "Pasture/Range/Paddock"
-msgstr "Пастбище/Выпас/Паддок"
-
-#. ManureManagementType
-msgid "Daily Spread"
-msgstr "Ежедневное распределение"
-
-#. ManureManagementType
-msgid "Digester"
-msgstr "Дигестер"
-
-#. ManureManagementType
-msgid "Burned For Fuel"
-msgstr "Сожжённый в качестве топлива"
-
-#. ManureManagementType
-msgid "Pit<1Month"
-msgstr "Яма <1 месяц"
-
-#. ManureManagementType
-msgid "Pit>1Month"
-msgstr "Яма >1 месяц"
-
-#. ManureManagementType
-msgid "Poultry Manure"
-msgstr "Птичий навоз"
-
-#. ManureManagementType
-msgid "Deep Bedding"
-msgstr "Глубокая подстилка"
-
-#. ManureManagementType
-msgid "Composting"
-msgstr "Компостирование"
-
-#. ManureManagementType
-msgid "Aerobic Treatment"
-msgstr "Аэробная обработка"
-
-#. ManureManagementType
-msgid "Lagoon"
-msgstr "Лагуна"
-
-#. ManureManagementType
-msgid "Liquid/Slurry"
-msgstr "Жидкость/Жижа"
-
-#. ManureManagementType
-msgid "Solid Storage"
-msgstr "Твёрдое хранение"
-
-#. ManureManagementType
-msgid "Dry Lot"
-msgstr "Сухой загон"
-
-#. ManureManagementType
-msgid "Other (Pls. Go Tier 2)"
-msgstr "Прочее (уровень 2/Tier 2)"
-
-#. ManureManagementType
-msgid "Other (pls. Go Tier 2)"
-msgstr "Прочее (пожалуйста, перейдите ко второму уровню)"
-
-#. ModuleType
-msgid "Forest Management"
-msgstr "Управление лесным хозяйством"
-
-#. ModuleType
-msgid "Road"
-msgstr "Дорога"
-
-#. ModuleType
-msgid "Building"
-msgstr "Здание"
-
-#. ModuleType
-msgid "Energy"
-msgstr "Энергия"
-
-#. ModuleType
-msgid "Irrigation"
-msgstr "Орошение"
-
-#. ModuleType
-msgid "Irrigation System"
-msgstr "Система орошения"
-
-#. ModuleType
-msgid "Operation Phase of Irrigation"
-msgstr "Фаза эксплуатации ирригации"
-
-#. ModuleType
-msgid "Project"
+#: api/models.py:602 api/models.py:832 api/models.py:978
+msgid "updated_at"
+msgstr ""
+
+#: api/models.py:604
+msgid "is_archived"
+msgstr ""
+
+#: api/models.py:815
+#, fuzzy
+#| msgid "Project"
+msgid "project"
 msgstr "Проект"
 
-#. ModuleType
-msgid "Activity"
-msgstr "деятельность"
-
-#. ModuleType
-msgid "OtherLandUse"
-msgstr "Прочее использование земли"
-
-#. ModuleType
-msgid "Flooded Rice Minor Season"
-msgstr "Малый сезон затопленного риса"
-
-#. ModuleType
-msgid "Perennial Cropland Minor Season"
-msgstr "Многолетние сельскохозяйственные угодья, не основной сезон"
-
-#. ModuleType
-msgid "Annual Cropland Minor Season"
-msgstr "Однолетние посевы вторичного сезона"
-
-#. ModuleType
-msgid "Livestock"
-msgstr "Домашний скот"
-
-#. ModuleType
-msgid "Waterbody"
-msgstr "Водоём"
-
-#. ModuleType
-msgid "Small Fishery"
-msgstr "Небольшое рыболовство"
-
-#. ModuleType
-msgid "Large Fishery"
-msgstr "Крупное рыболовное хозяйство"
-
-#. ModuleType
-msgid "Aquaculture"
-msgstr "Аквакультура"
-
-#. ModuleType
-msgid "Coastal Wetland"
-msgstr "Прибрежное водно-болотное угодье"
-
-#. ModuleType
-msgid "Land Use Change"
-msgstr "Изменение землепользования"
-
-#. ModuleType
-msgid "Other Infrastructure"
-msgstr "Прочая инфраструктура"
-
-#. ModuleType
-msgid "Electricity"
-msgstr "Электричество"
-
-#. ModuleType
-msgid "Fuel"
-msgstr "Топливо"
-
-#. ModuleType
-msgid "Input"
-msgstr "входные ресурсы"
-
-#. ModuleType
-msgid "Input Entry"
-msgstr "Input Entry"
-
-#. ModuleType
-msgid "Forest Disturbance"
-msgstr "Нарушение лесного покрова"
-
-#. FireType
-msgid "Wildfire Undrained Peat"
-msgstr " Торф, не высушенный лесным пожаром"
-
-#. FireType
-msgid "Wildfire Drained Peat"
-msgstr "Торф, высушенный лесным пожаром"
-
-#. FireType
-msgid "Prescribed Fire (E.G. Land Mgnt)"
-msgstr "Предписанный огонь (например, управление земельными ресурсами)"
-
-#. PeatType
-msgid "Nutrient Rich"
-msgstr "Богат питательными веществами"
-
-#. PeatType
-msgid "Nutrient Poor"
-msgstr "Бедный питательными веществами"
-
-#. WaterbodyType
-msgid "Freshwater Pond"
-msgstr "Пресноводный пруд"
-
-#. WaterbodyType
-msgid "Brackishwater Pond"
-msgstr "Солоноватый пруд"
-
-#. WaterbodyType
-msgid "Canals & Ditches"
-msgstr "Каналы, Канавы"
-
-#. WaterbodyType
-msgid "Saline Pond"
-msgstr "Солёный пруд"
-
-#. TrophicType
-msgid "Oligotrophic"
-msgstr "Олиготрофный"
-
-#. TrophicType
-msgid "Eutrophic"
-msgstr "Эвтрофный"
-
-#. TrophicType
-msgid "Mesotrophic"
-msgstr "Мезоэутрофный"
-
-#. TrophicType
-msgid "Hypereutrophic"
-msgstr "Гиперэвтрофный"
-
-#. FisheryType
-msgid "Marine"
-msgstr "Морской"
-
-#. FisheryType
-msgid "Inland"
-msgstr "Внутренний"
-
-#. FisheryType
-msgid "Unmotorized Fishing"
-msgstr "Ручное рыболовство"
-
-#. LargeFisheryGearType
-msgid "Dredges"
-msgstr "Драги"
-
-#. LargeFisheryGearType
-msgid "Other Or Mixed"
-msgstr "Прочее или смешанное"
-
-#. LargeFisheryGearType
-msgid "Mobile Seine"
-msgstr "Мобильный сачок"
-
-#. LargeFisheryGearType
-msgid "Not Specified"
-msgstr "Не указан"
-
-#. LargeFisheryGearType
-msgid "Bottom Trawls"
-msgstr "Донные тралы"
-
-#. LargeFisheryGearType
-msgid "Gillnets And Entangling Nets"
-msgstr "Ловчие и запутывающие сети"
-
-#. LargeFisheryGearType
-msgid "Hooks And Lines"
-msgstr "Крючки и лески"
-
-#. LargeFisheryGearType
-msgid "Midwater Trawls"
-msgstr "Травы средней воды"
-
-#. LargeFisheryGearType
-msgid "Traps And Lift Nets"
-msgstr "Ловушки и подъёмные сети"
-
-#. LargeFisheryGearType
-msgid "Surrounding Nets"
-msgstr "Окружающие сети"
-
-#. SmallFisheryGearType
-msgid "Trawls"
-msgstr "Травли"
-
-#. SmallFisheryGearType
-msgid "Multiple"
-msgstr "Multiple"
-
-#. SmallFisheryGearType
-msgid "Pots And Traps"
-msgstr "Ловушки и кошели"
-
-#. FishType
+#: api/models.py:817
 #, fuzzy
-msgid "Abalones, Winkles And Conchs"
-msgstr "Морские ушки, улитки и ракушки"
-
-#. FishType
-msgid "Clams, Cockles And Arkshells"
-msgstr "Моллюски, Моллюски семейства сердцевидок и Арковидные моллюски"
-
-#. FishType
-msgid "Cods, Hakes And Haddocks"
-msgstr "Треска, Пикша, Морской окунь "
-
-#. FishType
-msgid "Flounders, Halibuts And Soles"
-msgstr "Камбалы, палтусы и Солевая рыба"
-
-#. FishType
-msgid "Herrings, Sardines And Anchovies"
-msgstr "Сельдь, сардины и анчоусы"
-
-#. FishType
-msgid "Jacks, Mullets And Sauries"
-msgstr "Джековые рыбы, Кефаль и Сайра"
-
-#. FishType
-msgid "Krill And Plankton"
-msgstr "Криль и планктон"
-
-#. FishType
-msgid "Mackerels, Snoeks And Cutlassfish"
-msgstr "Скумбрия, зубатки и рыбы-сабли"
-
-#. FishType
-msgid "Miscellaneous Marine Crustaceans"
-msgstr "Разнообразные морские ракообразные"
-
-#. FishType
-msgid "Miscellaneous Marine Fishes"
-msgstr ""
-"Разнообразные морские рыбы"
-
-#. FishType
-msgid "Miscellaneous Marine Molluscs"
-msgstr "Разнообразные морские моллюски"
-
-#. FishType
-msgid "Mussels"
-msgstr "Mussels"
-
-#. FishType
-msgid "Redfish, Basses And Congers"
-msgstr "Красная рыба, окуни и угри"
-
-#. FishType
-msgid "Salmons, Trots And Smelts"
-msgstr "Лососи, форели и смельты"
-
-#. FishType
-msgid "Scallops And Pectens"
-msgstr "Гребешки и пектены"
-
-#. FishType
-msgid "Shads"
-msgstr "Пузанковые сельди"
-
-#. FishType
-msgid "Sharks And Rays"
-msgstr "Акулы и скаты"
-
-#. FishType
-msgid "Shrimps And Prawns"
-msgstr "Креветки и раки"
-
-#. FishType
-msgid "Squat Lobsters"
-msgstr "Карликовые омары"
-
-#. FishType
-msgid "Squids, Cuttlefish And Octopuses"
-msgstr "Кальмары, каракатицы и осьминоги"
-
-#. FishType
-msgid "Tunas, Bonitos And Billfishes"
-msgstr "Тунцы, бонито и рыбы-марлины"
-
-#. FishType
-msgid "Lobsters And Spiny-rock Lobsters"
-msgstr "Омары и лангусты"
-
-#. FishType
-msgid "Sea-spiders And Crabs"
-msgstr "Морские пауки и крабы"
-
-#. MacroFuelType
-msgid "Solid (tdm)"
-msgstr "Твёрдый (тонн сухого вещества)"
-
-#. MacroFuelType
-msgid "Liquid or gaseous (m3)"
-msgstr "Жидкость или газ (м3)"
-
-#. FuelUseType
-msgid "Stationary"
-msgstr "Стационарный"
-
-#. FuelUseType
-msgid "Mobile"
-msgstr "Мобильный"
-
-#. FuelUseType
-msgid "Off-Road"
-msgstr "бездорожный"
-
-#. FuelType
-msgid "Ethanol (Cars)"
-msgstr "Этанол (Автомобили)"
-
-#. FuelType
-msgid "Ethanol (Trucks)"
-msgstr "Этанол (Грузовики)"
-
-#. FuelType
-msgid "Diesel"
-msgstr "Дизель"
-
-#. FuelType
-msgid "Gasoline (2-Stroke)"
-msgstr "Бензин (для двухтактных двигателей)"
-
-#. FuelType
-msgid "Gasoline (4-Stroke)"
-msgstr "Бензин (для четырехтактных двигателей)"
-
-#. FuelType
-msgid "Wood"
-msgstr "Древесина"
-
-#. FuelType
-msgid "Peat"
-msgstr "Торф"
-
-#. FuelType
-msgid "Charcoal"
-msgstr "Уголь"
-
-#. FuelType
-msgid "Motor Gasoline"
-msgstr "Motor Gasoline"
-
-#. FuelType
-msgid "Gasoil /Diesel Oil"
-msgstr "Газообразное/Дизельное топливо"
-
-#. FuelType
-msgid "Waste Oil / Lubrificants"
-msgstr "Отработанное масло/Смазочные жидкости"
-
-#. FuelType
-msgid "Lpg"
-msgstr "сжиженный газ"
-
-#. FuelType
-msgid "Natural Gas"
-msgstr "Природный газ"
-
-#. FuelType
-msgid "Solar"
-msgstr "Солнечный"
-
-#. CropType
-msgid "Cereals"
-msgstr "Злаки"
-
-#. CropType
-msgid "Pulses"
-msgstr "Бобовые культуры"
-
-#. CropType
-msgid "Roots And Tubers"
-msgstr "Корни и клубни"
-
-#. CropType
-msgid "Beans"
-msgstr "Бобы"
-
-#. CropType
-msgid "Agroforestry - default"
-msgstr "Агролесоводство - по умолчанию"
-
-#. CropType
-msgid "Alley cropping"
-msgstr "Полосное агролесоводство"
-
-#. CropType
-msgid "Oil palm"
-msgstr "Масличная пальма"
-
-#. CropType
-msgid "Perennial fallow"
-msgstr "Многолетний залеж"
-
-#. CropType
-msgid "Shaded perennial"
-msgstr "Тенистое многолетнее растение"
-
-#. DisturbanceType
-msgid "Fire"
-msgstr "Огонь"
-
-#. DisturbanceType
-msgid "Insects"
-msgstr "Насекомые"
-
-#. MacroInputType
-msgid "Lime Application"
-msgstr "Применение извести"
-
-#. MacroInputType
-msgid "Synthetic Fertilizers"
-msgstr "Синтетические удобрения"
-
-#. MacroInputType
-msgid "N-Fertilizers On Irrigated Rice"
-msgstr "Азотные удобрения на орошаемом рисе"
-
-#. MacroInputType
-msgid "Organic N-Fertilizers"
-msgstr "Органические азотные удобрения"
-
-#. MacroInputType
-msgid "Pesticides"
-msgstr "Пестициды"
-
-#. MacroInputType
-msgid "Animal Feed"
-msgstr "Корм для животных"
-
-#. InputType
-msgid "Limestone"
-msgstr "Известняк"
-
-#. InputType
-msgid "Dolomite"
-msgstr "Доломит"
-
-#. InputType
-msgid "Urea"
-msgstr "Kарбамид"
-
-#. InputType
-msgid "Synthetic N-Fertilizers Other Than Urea"
-msgstr "Синтетические азотные удобрения, кроме карбамидa"
-
-#. InputType
-msgid "Sewage"
-msgstr "Канализация"
-
-#. InputType
-msgid "Rendering Waste, Brewery Waste, Guano"
-msgstr "Отходы переработки, отходы пивоварни, гуано"
-
-#. InputType
-msgid "Potassium"
-msgstr "Калий"
-
-#. InputType
-msgid "Fungicides"
-msgstr "Фунгициды"
-
-#. InputType
-msgid "Herbicides"
-msgstr "Гербициды"
-
-#. InputType
-msgid "Insecticides"
-msgstr "Инсектициды"
-
-#. InputType
-msgid "N-Fertilizers In Continuously Irrigated Rice"
-msgstr "Азотные удобрения в постоянно орошаемом рисе"
-
-#. InputType
-msgid "N-Fertilizers In Wet And Dry Irrigated Rice"
-msgstr "Азотные удобрения в орошаемом рисе в условиях влажного и сухого полива"
-
-#. InputType
-msgid "Phosphorous"
-msgstr "Фосфор"
-
-#. InputType
-msgid "User Defined Animal Feed (tier 2)"
-msgstr "Кормление животных, определяемое пользователем (Уровень 2/Tier 2)"
-
-#. InputType
-msgid "User Defined Input (tier 2)"
-msgstr "Пользовательский ввод (уровень 2/Tier 2)"
-
-#. IrrigationSystemType
-msgid "Surface Without IRRS"
-msgstr "Поверхностное орошение без системы возврата оросительного стока"
-
-#. IrrigationSystemType
-msgid "Surface With IRRS"
-msgstr "Поверхностное орошение с системой возврата оросительного стока"
-
-#. IrrigationSystemType
-msgid "Solid Set Sprinkler"
-msgstr "Твёрдое орошение"
-
-#. IrrigationSystemType
-msgid "Permanent Sprinkler"
-msgstr "Постоянный орошатель"
-
-#. IrrigationSystemType
-msgid "Hand Moved Sprinkler"
-msgstr "Ручной передвижной спринклер"
-
-#. IrrigationSystemType
-msgid "Solid Roll Sprinkler"
-msgstr "Твёрдый вращающийся орошатель"
-
-#. IrrigationSystemType
-msgid "Center-Pivot Sprinkler"
-msgstr "Центробежное орошение"
-
-#. IrrigationSystemType
-msgid "Traveler Sprinkler"
-msgstr "Перемещающийся орошатель"
-
-#. IrrigationSystemType
-msgid "Trickle"
-msgstr "Капельное орошение"
-
-#. IrrigationSystemType
-msgid "Micro Sprinkler"
-msgstr "Микроорашиватель"
-
-#. IrrigationSystemType
-msgid "Sprinkler"
-msgstr "Орошатель"
-
-#. BuildingType
-msgid "Housing (Concrete)"
-msgstr "Жилье (Бетон)"
-
-#. BuildingType
-msgid "Agricultural Buildings (Concrete)"
-msgstr "Сельскохозяйственные постройки (бетон)"
-
-#. BuildingType
-msgid "Agricultural Buildings (Metal)"
-msgstr "Сельскохозяйственные постройки (металл)"
-
-#. BuildingType
-msgid "Industrial Buildings (Concrete)"
-msgstr "Промышленные здания (бетон)"
-
-#. BuildingType
-msgid "Industrial Buildings (Metal)"
-msgstr "Промышленные здания (металл)"
-
-#. BuildingType
-msgid "Garage (Concrete)"
-msgstr "Гараж (Бетон)"
-
-#. BuildingType
-msgid "Garage (Metal)"
-msgstr "Гараж (Металлический)"
-
-#. BuildingType
-msgid "Offices (Concrete)"
-msgstr "Офисы (бетонные)"
-
-#. BuildingType
-msgid "Offices (Metal)"
-msgstr "Офисы (металлические)"
-
-#. BuildingType
-msgid "Food Sales (Retail Or Wholesale)"
-msgstr "Продажа продуктов питания (розничная или оптовая)"
-
-#. BuildingType
-msgid "Food Service (Restaurants)"
-msgstr "Общественное питание (рестораны)"
-
-#. BuildingType
-msgid "Warehouse And Storage"
-msgstr "Склад и хранение"
-
-#. BuildingType
-msgid "Education"
+#| msgid "Education"
+msgid "description"
 msgstr "Образование"
 
-#. BuildingType
-msgid "Health Care (Metal)"
-msgstr "Здравоохранение (Металл)"
-
-#. RoadType
-msgid "Road (Bitumen)"
-msgstr "Дорога (Битум)"
-
-#. RoadType
-msgid "Road (Asphalt)"
-msgstr "Дорога (Асфальт)"
-
-#. RoadType
-msgid "Road (Reinforced Concrete)"
-msgstr "Дорога (Армированный бетон)"
-
-#. RoadType
-msgid "Road Rehabilitated (Pavement)"
-msgstr "Реконструкция дорог (Покрытие)"
-
-#. Climate
-msgid "Cool Temperate"
-msgstr "Прохладный умеренный климат"
-
-#. Climate
-msgid "Warm Temperate"
-msgstr "Тёплый умеренный"
-
-#. Climate
-msgid "Tropical"
-msgstr "Тропический"
-
-#. Climate
-msgid "Boreal"
-msgstr "Бореальный"
-
-#. Climate
-msgid "Tropical Montane"
-msgstr "Тропическая горная местность"
-
-#. Moisture
-msgid "Dry"
-msgstr "Сухой"
-
-#. Moisture
-msgid "Moist"
-msgstr "Влажный"
-
-#. Moisture
-msgid "Wet"
-msgstr "Влажный"
-
-#. Moisture
-msgid "Temperate"
-msgstr "Умеренный"
-
-#. Region
-msgid "Eastern Africa"
-msgstr "Восточная Африка"
-
-#. Region
-msgid "Central Africa"
-msgstr "Центральная Африка"
-
-#. Region
-msgid "Northern Africa"
-msgstr "Северная Африка"
-
-#. Region
-msgid "Southern Africa"
-msgstr "Южная Африка"
-
-#. Region
-msgid "Western Africa"
-msgstr "Западная Африка"
-
-#. Region
-msgid "Central Asia"
-msgstr "Центральная Азия"
-
-#. Region
-msgid "Eastern Asia"
-msgstr "Восточная Азия"
-
-#. Region
-msgid "South-Eastern Asia"
-msgstr "Юго-восточная Азия"
-
-#. Region
-msgid "Southern Asia"
-msgstr "Южная Азия"
-
-#. Region
-msgid "Western Asia"
-msgstr "Западная Азия"
-
-#. Region
-msgid "Europe"
-msgstr "Европа"
-
-#. Region
-msgid "Oceania"
-msgstr "Океания"
-
-#. Region
-msgid "North America"
-msgstr "Северная Америка"
-
-#. Region
-msgid "South America"
-msgstr "Южная Америка"
-
-#. Region
-msgid "Central America"
-msgstr "Центральная Америка"
-
-#. Region
-msgid "Caribbean"
-msgstr "Карибский"
-
-#. Region
-msgid "Western Europe"
-msgstr "Западная Европа"
-
-#. Region
-msgid "Eastern Europe"
-msgstr "Восточная Европа"
-
-#. GlobalWarmingPotential
-msgid "IPCC Fifth Assessment Report (AR5) with Climate Change Feedback"
+#: api/models.py:820
+msgid "change_rate"
 msgstr ""
-"Пятый оценочный отчет МГЭИК (ОД5) с учетом обратной связи изменения климата"
 
-#. GlobalWarmingPotential
-msgid "IPCC Fifth Assessment Report (AR5) without Climate Change Feedback"
+#: api/models.py:821
+msgid "module_types"
 msgstr ""
-"Пятый оценочный отчет МГЭИК (ОД5) без учета обратной связи изменения климата"
 
-#. GlobalWarmingPotential
-msgid "IPCC Sixth Assessment Report (AR6)"
-msgstr "Шестой оценочный отчет МГЭИК (ОД6)"
+#: api/models.py:823
+msgid "climate_t2"
+msgstr ""
 
-#. GlobalWarmingPotential
-msgid "IPCC Fourth Assessment Report (AR4)"
-msgstr "Четвертый оценочный отчет МГЭИК (ОД4)"
+#: api/models.py:824
+msgid "moisture_t2"
+msgstr ""
 
-#. GlobalWarmingPotential
-msgid "IPCC Second Assessment Report (SAR)"
-msgstr "Второй оценочный отчет МГЭИК (SAR)"
+#: api/models.py:825 api/models.py:2118
+msgid "soil_type_t2"
+msgstr ""
 
-#. WaterManagementTypeBeforeCultivation
-msgid "Non Flooded Pre-Season <180 D"
-msgstr "Не затопленные до сезона, менее 180 дней"
+#: api/models.py:826
+#, fuzzy
+#| msgid "Education"
+msgid "duration_t2"
+msgstr "Образование"
 
-#. WaterManagementTypeBeforeCultivation
-msgid "Non Flooded Pre-Season >180 D"
-msgstr "Не затопленные до сезона, более 180 дней"
+#: api/models.py:827
+msgid "start_year_t2"
+msgstr ""
 
-#. WaterManagementTypeBeforeCultivation
-msgid "Flooded Pre-Season > 30 D"
-msgstr "Затопленный предсезонный период > 30 дней"
+#: api/models.py:828
+msgid "last_year_of_accounting_t2"
+msgstr ""
 
-#. WaterManagementTypeAfterCultivation
-msgid "Rainfed, Wet Season (Regular Rainfed)"
-msgstr "Дождевое орошение, влажный сезон (регулярное дождевое орошение)"
+#: api/models.py:829
+msgid "soc_t2"
+msgstr ""
 
-#. WaterManagementTypeAfterCultivation
-msgid "Rainfed, Dry Season (Drought Prone)"
-msgstr "Дождевое орошение, сухой сезон (подвержено засухе)"
+#: api/models.py:979
+msgid "last_cached_at"
+msgstr ""
 
-#. WaterManagementTypeAfterCultivation
-msgid "Rainfed, Deep Water"
-msgstr "Дождевое орошение, глубокие воды"
+#: api/models.py:980 api/models.py:981 api/models.py:982 api/models.py:983
+msgid "cached_results_total"
+msgstr ""
+
+#: api/models.py:984
+msgid "last_modified"
+msgstr ""
+
+#: api/models.py:1058 api/models.py:1146 api/models.py:2120
+msgid "soc_t2_start"
+msgstr ""
+
+#: api/models.py:1059 api/models.py:1147 api/models.py:2121
+msgid "soc_t2_w"
+msgstr ""
+
+#: api/models.py:1060 api/models.py:1148 api/models.py:2122
+msgid "soc_t2_wo"
+msgstr ""
+
+#: api/models.py:1142
+#, fuzzy
+#| msgid "Activity"
+msgid "activity"
+msgstr "деятельность"
+
+#: api/models.py:1143
+msgid "start_year"
+msgstr ""
+
+#: api/models.py:1301 api/models.py:1343
+msgid "biomass_t2_start"
+msgstr ""
+
+#: api/models.py:1302 api/models.py:1344
+msgid "biomass_t2_w"
+msgstr ""
+
+#: api/models.py:1303 api/models.py:1345
+msgid "biomass_t2_wo"
+msgstr ""
+
+#: api/models.py:1371
+msgid "residue_availability_t2_start"
+msgstr ""
+
+#: api/models.py:1372
+msgid "residue_availability_t2_w"
+msgstr ""
+
+#: api/models.py:1373
+msgid "residue_availability_t2_wo"
+msgstr ""
+
+#: api/models.py:1380 api/models.py:2128
+msgid "agb_t2_start"
+msgstr ""
+
+#: api/models.py:1381 api/models.py:2129
+msgid "agb_t2_w"
+msgstr ""
+
+#: api/models.py:1382 api/models.py:2130
+msgid "agb_t2_wo"
+msgstr ""
+
+#: api/models.py:1384 api/models.py:2132
+msgid "bgb_t2_start"
+msgstr ""
+
+#: api/models.py:1385 api/models.py:2133
+msgid "bgb_t2_w"
+msgstr ""
+
+#: api/models.py:1386 api/models.py:2134
+msgid "bgb_t2_wo"
+msgstr ""
+
+#: api/models.py:1437 api/models.py:2136
+msgid "litter_t2_start"
+msgstr ""
+
+#: api/models.py:1438 api/models.py:2137
+msgid "litter_t2_w"
+msgstr ""
+
+#: api/models.py:1439 api/models.py:2138
+msgid "litter_t2_wo"
+msgstr ""
+
+#: api/models.py:1441 api/models.py:2140
+msgid "deadwood_t2_start"
+msgstr ""
+
+#: api/models.py:1442 api/models.py:2141
+msgid "deadwood_t2_w"
+msgstr ""
+
+#: api/models.py:1443 api/models.py:2142
+msgid "deadwood_t2_wo"
+msgstr ""
+
+#: api/models.py:1502
+#, fuzzy
+#| msgid "Land Use Change"
+msgid "land_use_change"
+msgstr "Изменение землепользования"
+
+#: api/models.py:1503 api/models.py:2756
+#, fuzzy
+#| msgid "Organic Soil"
+msgid "organic_soil"
+msgstr "Органическая почва"
+
+#: api/models.py:1505 api/models.py:1617 api/models.py:1662 api/models.py:1856
+#: api/models.py:2073 api/models.py:2095 api/models.py:2744
+msgid "area"
+msgstr ""
+
+#: api/models.py:1507 api/models.py:1694
+msgid "land_use_type_start"
+msgstr ""
+
+#: api/models.py:1508 api/models.py:1695
+msgid "land_use_type_w"
+msgstr ""
+
+#: api/models.py:1509 api/models.py:1696
+msgid "land_use_type_wo"
+msgstr ""
+
+#: api/models.py:1512
+msgid "flu_t2_start"
+msgstr ""
+
+#: api/models.py:1513
+msgid "flu_t2_w"
+msgstr ""
+
+#: api/models.py:1514
+msgid "flu_t2_wo"
+msgstr ""
+
+#: api/models.py:1516
+msgid "fi_t2_start"
+msgstr ""
+
+#: api/models.py:1517
+msgid "fi_t2_w"
+msgstr ""
+
+#: api/models.py:1518
+msgid "fi_t2_wo"
+msgstr ""
+
+#: api/models.py:1520
+msgid "fmg_t2_start"
+msgstr ""
+
+#: api/models.py:1521
+msgid "fmg_t2_w"
+msgstr ""
+
+#: api/models.py:1522
+msgid "fmg_t2_wo"
+msgstr ""
+
+#: api/models.py:1597 api/models.py:1647
+msgid "tillage_management_type_start"
+msgstr ""
+
+#: api/models.py:1598 api/models.py:1648
+msgid "tillage_management_type_w"
+msgstr ""
+
+#: api/models.py:1599 api/models.py:1649
+msgid "tillage_management_type_wo"
+msgstr ""
+
+#: api/models.py:1602 api/models.py:1652
+msgid "organic_input_type_start"
+msgstr ""
+
+#: api/models.py:1603 api/models.py:1653
+msgid "organic_input_type_w"
+msgstr ""
+
+#: api/models.py:1604 api/models.py:1654
+msgid "organic_input_type_wo"
+msgstr ""
+
+#: api/models.py:1607 api/models.py:1699
+msgid "residue_management_type_start"
+msgstr ""
+
+#: api/models.py:1608 api/models.py:1700
+msgid "residue_management_type_w"
+msgstr ""
+
+#: api/models.py:1609 api/models.py:1701
+msgid "residue_management_type_wo"
+msgstr ""
+
+#: api/models.py:1612 api/models.py:1664 api/models.py:1704 api/models.py:1770
+msgid "crop_yield_t2_start"
+msgstr ""
+
+#: api/models.py:1613 api/models.py:1665 api/models.py:1705 api/models.py:1771
+msgid "crop_yield_t2_w"
+msgstr ""
+
+#: api/models.py:1614 api/models.py:1666 api/models.py:1706 api/models.py:1772
+msgid "crop_yield_t2_wo"
+msgstr ""
+
+#: api/models.py:1619
+msgid "minor_land_use_type_start"
+msgstr ""
+
+#: api/models.py:1620
+msgid "minor_land_use_type_w"
+msgstr ""
+
+#: api/models.py:1621
+msgid "minor_land_use_type_wo"
+msgstr ""
+
+#: api/models.py:1623
+msgid "minor_yield_start"
+msgstr ""
+
+#: api/models.py:1624
+msgid "minor_yield_w"
+msgstr ""
+
+#: api/models.py:1625
+msgid "minor_yield_wo"
+msgstr ""
+
+#: api/models.py:1627
+msgid "minor_residue_management_type_start"
+msgstr ""
+
+#: api/models.py:1628
+msgid "minor_residue_management_type_w"
+msgstr ""
+
+#: api/models.py:1629
+msgid "minor_residue_management_type_wo"
+msgstr ""
+
+#: api/models.py:1631
+msgid "minor_biomass_factor_t2_start"
+msgstr ""
+
+#: api/models.py:1632
+msgid "minor_biomass_factor_t2_w"
+msgstr ""
+
+#: api/models.py:1633
+msgid "minor_biomass_factor_t2_wo"
+msgstr ""
+
+#: api/models.py:1644
+msgid "is_system_in_maturity"
+msgstr ""
+
+#: api/models.py:1645
+msgid "is_complete_renewal"
+msgstr ""
+
+#: api/models.py:1657
+msgid "is_biomass_burned_start"
+msgstr ""
+
+#: api/models.py:1658
+msgid "is_biomass_burned_w"
+msgstr ""
+
+#: api/models.py:1659
+msgid "is_biomass_burned_wo"
+msgstr ""
+
+#: api/models.py:1669
+msgid "agb_max_t2_start"
+msgstr ""
+
+#: api/models.py:1670
+msgid "agb_max_t2_w"
+msgstr ""
+
+#: api/models.py:1671
+msgid "agb_max_t2_wo"
+msgstr ""
+
+#: api/models.py:1673
+msgid "fire_periodicity_t2_start"
+msgstr ""
+
+#: api/models.py:1674
+msgid "fire_periodicity_t2_w"
+msgstr ""
+
+#: api/models.py:1675
+msgid "fire_periodicity_t2_wo"
+msgstr ""
+
+#: api/models.py:1727
+msgid "water_management_type_before_cultivation_start"
+msgstr ""
+
+#: api/models.py:1734
+msgid "water_management_type_before_cultivation_w"
+msgstr ""
+
+#: api/models.py:1741
+msgid "water_management_type_before_cultivation_wo"
+msgstr ""
+
+#: api/models.py:1749
+msgid "water_management_type_after_cultivation_start"
+msgstr ""
+
+#: api/models.py:1756
+msgid "water_management_type_after_cultivation_w"
+msgstr ""
+
+#: api/models.py:1763
+msgid "water_management_type_after_cultivation_wo"
+msgstr ""
+
+#: api/models.py:1775
+msgid "efc_t2_start"
+msgstr ""
+
+#: api/models.py:1776
+msgid "efc_t2_w"
+msgstr ""
+
+#: api/models.py:1777
+msgid "efc_t2_wo"
+msgstr ""
+
+#: api/models.py:1779
+msgid "sfw_t2_start"
+msgstr ""
+
+#: api/models.py:1780
+msgid "sfw_t2_w"
+msgstr ""
+
+#: api/models.py:1781
+msgid "sfw_t2_wo"
+msgstr ""
+
+#: api/models.py:1783
+msgid "sfp_t2_start"
+msgstr ""
+
+#: api/models.py:1784
+msgid "sfp_t2_w"
+msgstr ""
+
+#: api/models.py:1785
+msgid "sfp_t2_wo"
+msgstr ""
+
+#: api/models.py:1787
+msgid "sfo_t2_start"
+msgstr ""
+
+#: api/models.py:1788
+msgid "sfo_t2_w"
+msgstr ""
+
+#: api/models.py:1789
+msgid "sfo_t2_wo"
+msgstr ""
+
+#: api/models.py:1791
+msgid "efi_t2_start"
+msgstr ""
+
+#: api/models.py:1792
+msgid "efi_t2_w"
+msgstr ""
+
+#: api/models.py:1793
+msgid "efi_t2_wo"
+msgstr ""
+
+#: api/models.py:1795
+msgid "rice_straw_t2_start"
+msgstr ""
+
+#: api/models.py:1796
+msgid "rice_straw_t2_w"
+msgstr ""
+
+#: api/models.py:1797
+msgid "rice_straw_t2_wo"
+msgstr ""
+
+#: api/models.py:1799
+msgid "cultivation_period_t2_start"
+msgstr ""
+
+#: api/models.py:1800
+msgid "cultivation_period_t2_w"
+msgstr ""
+
+#: api/models.py:1801
+msgid "cultivation_period_t2_wo"
+msgstr ""
+
+#: api/models.py:1831
+msgid "grassland_management_type_start"
+msgstr ""
+
+#: api/models.py:1832
+msgid "grassland_management_type_w"
+msgstr ""
+
+#: api/models.py:1833
+msgid "grassland_management_type_wo"
+msgstr ""
+
+#: api/models.py:1836 api/models.py:2746
+msgid "is_fire_used_start"
+msgstr ""
+
+#: api/models.py:1837 api/models.py:2747
+msgid "is_fire_used_w"
+msgstr ""
+
+#: api/models.py:1838 api/models.py:2748
+msgid "is_fire_used_wo"
+msgstr ""
+
+#: api/models.py:1841
+msgid "fire_periodicity_start"
+msgstr ""
+
+#: api/models.py:1842
+msgid "fire_periodicity_w"
+msgstr ""
+
+#: api/models.py:1843
+msgid "fire_periodicity_wo"
+msgstr ""
+
+#: api/models.py:1846
+msgid "fire_impact_start"
+msgstr ""
+
+#: api/models.py:1847
+msgid "fire_impact_w"
+msgstr ""
+
+#: api/models.py:1848
+msgid "fire_impact_wo"
+msgstr ""
+
+#: api/models.py:1851
+msgid "yield_start"
+msgstr ""
+
+#: api/models.py:1852
+msgid "yield_w"
+msgstr ""
+
+#: api/models.py:1853
+msgid "yield_wo"
+msgstr ""
+
+#: api/models.py:1858
+msgid "combustion_factor_t2_start"
+msgstr ""
+
+#: api/models.py:1859
+msgid "combustion_factor_t2_w"
+msgstr ""
+
+#: api/models.py:1860
+msgid "combustion_factor_t2_wo"
+msgstr ""
+
+#: api/models.py:1872
+msgid "livestock_category_type"
+msgstr ""
+
+#: api/models.py:1875
+msgid "livestock_production_type_start"
+msgstr ""
+
+#: api/models.py:1876
+msgid "livestock_production_type_w"
+msgstr ""
+
+#: api/models.py:1877
+msgid "livestock_production_type_wo"
+msgstr ""
+
+#: api/models.py:1880
+msgid "production_start"
+msgstr ""
+
+#: api/models.py:1881
+#, fuzzy
+#| msgid "Education"
+msgid "production_w"
+msgstr "Образование"
+
+#: api/models.py:1882
+#, fuzzy
+#| msgid "Education"
+msgid "production_wo"
+msgstr "Образование"
+
+#: api/models.py:1885
+msgid "heads_number_start"
+msgstr ""
+
+#: api/models.py:1886
+msgid "heads_number_w"
+msgstr ""
+
+#: api/models.py:1887
+msgid "heads_number_wo"
+msgstr ""
+
+#: api/models.py:1890
+msgid "complementary_manure_management_type_start"
+msgstr ""
+
+#: api/models.py:1891
+msgid "complementary_manure_management_type_w"
+msgstr ""
+
+#: api/models.py:1892
+msgid "complementary_manure_management_type_wo"
+msgstr ""
+
+#: api/models.py:1895
+msgid "enteric_fermentation_t2_start"
+msgstr ""
+
+#: api/models.py:1896
+msgid "enteric_fermentation_t2_w"
+msgstr ""
+
+#: api/models.py:1897
+msgid "enteric_fermentation_t2_wo"
+msgstr ""
+
+#: api/models.py:1899
+msgid "prp_percentage_t2_start"
+msgstr ""
+
+#: api/models.py:1900
+msgid "prp_percentage_t2_w"
+msgstr ""
+
+#: api/models.py:1901
+msgid "prp_percentage_t2_wo"
+msgstr ""
+
+#: api/models.py:1904
+msgid "prp_ch4_t2_start"
+msgstr ""
+
+#: api/models.py:1905
+msgid "prp_ch4_t2_w"
+msgstr ""
+
+#: api/models.py:1906
+msgid "prp_ch4_t2_wo"
+msgstr ""
+
+#: api/models.py:1908
+msgid "prp_n2o_t2_start"
+msgstr ""
+
+#: api/models.py:1909
+msgid "prp_n2o_t2_w"
+msgstr ""
+
+#: api/models.py:1910
+msgid "prp_n2o_t2_wo"
+msgstr ""
+
+#: api/models.py:1912
+msgid "emission_factor_ch4_t2_start"
+msgstr ""
+
+#: api/models.py:1913
+msgid "emission_factor_n2o_t2_start"
+msgstr ""
+
+#: api/models.py:1915
+msgid "emission_factor_ch4_t2_w"
+msgstr ""
+
+#: api/models.py:1916
+msgid "emission_factor_n2o_t2_w"
+msgstr ""
+
+#: api/models.py:1918
+msgid "emission_factor_ch4_t2_wo"
+msgstr ""
+
+#: api/models.py:1919
+msgid "emission_factor_n2o_t2_wo"
+msgstr ""
+
+#: api/models.py:1921
+msgid "implementation_year_start"
+msgstr ""
+
+#: api/models.py:1928
+msgid "forest_type"
+msgstr ""
+
+#: api/models.py:1929
+msgid "forest_condition_type"
+msgstr ""
+
+#: api/models.py:1933
+msgid "rotation_length_yrs_start"
+msgstr ""
+
+#: api/models.py:1934
+msgid "rotation_length_yrs_w"
+msgstr ""
+
+#: api/models.py:1935
+msgid "rotation_length_yrs_wo"
+msgstr ""
+
+#: api/models.py:1938
+msgid "rotation_percentage_biomass_for_energy_start"
+msgstr ""
+
+#: api/models.py:1939
+msgid "rotation_percentage_biomass_for_energy_w"
+msgstr ""
+
+#: api/models.py:1940
+msgid "rotation_percentage_biomass_for_energy_wo"
+msgstr ""
+
+#: api/models.py:1945
+msgid "logging_recurrence_yrs_start"
+msgstr ""
+
+#: api/models.py:1946
+msgid "logging_recurrence_yrs_w"
+msgstr ""
+
+#: api/models.py:1947
+msgid "logging_recurrence_yrs_wo"
+msgstr ""
+
+#: api/models.py:1950
+msgid "logging_percentage_agb_logged_start"
+msgstr ""
+
+#: api/models.py:1951
+msgid "logging_percentage_agb_logged_w"
+msgstr ""
+
+#: api/models.py:1952
+msgid "logging_percentage_agb_logged_wo"
+msgstr ""
+
+#: api/models.py:1955
+msgid "logging_percentage_biomass_for_energy_start"
+msgstr ""
+
+#: api/models.py:1956
+msgid "logging_percentage_biomass_for_energy_w"
+msgstr ""
+
+#: api/models.py:1957
+msgid "logging_percentage_biomass_for_energy_wo"
+msgstr ""
+
+#: api/models.py:1962
+msgid "average_yearly_degradation_percentage_start"
+msgstr ""
+
+#: api/models.py:1963
+msgid "average_yearly_degradation_percentage_w"
+msgstr ""
+
+#: api/models.py:1964
+msgid "average_yearly_degradation_percentage_wo"
+msgstr ""
+
+#: api/models.py:1969
+msgid "agb_growth_rate_le_20_yrs_t2_start"
+msgstr ""
+
+#: api/models.py:1970
+msgid "agb_growth_rate_le_20_yrs_t2_w"
+msgstr ""
+
+#: api/models.py:1971
+msgid "agb_growth_rate_le_20_yrs_t2_wo"
+msgstr ""
+
+#: api/models.py:1973
+msgid "agb_growth_rate_gt_20_yrs_t2_start"
+msgstr ""
+
+#: api/models.py:1974
+msgid "agb_growth_rate_gt_20_yrs_t2_w"
+msgstr ""
+
+#: api/models.py:1975
+msgid "agb_growth_rate_gt_20_yrs_t2_wo"
+msgstr ""
+
+#: api/models.py:1977
+msgid "bgb_growth_rate_le_20_yrs_t2_start"
+msgstr ""
+
+#: api/models.py:1978
+msgid "bgb_growth_rate_le_20_yrs_t2_w"
+msgstr ""
+
+#: api/models.py:1979
+msgid "bgb_growth_rate_le_20_yrs_t2_wo"
+msgstr ""
+
+#: api/models.py:1981
+msgid "bgb_growth_rate_gt_20_yrs_t2_start"
+msgstr ""
+
+#: api/models.py:1982
+msgid "bgb_growth_rate_gt_20_yrs_t2_w"
+msgstr ""
+
+#: api/models.py:1983
+msgid "bgb_growth_rate_gt_20_yrs_t2_wo"
+msgstr ""
+
+#: api/models.py:1985
+msgid "rotation_start_year_t2_start"
+msgstr ""
+
+#: api/models.py:1986
+msgid "rotation_start_year_t2_w"
+msgstr ""
+
+#: api/models.py:1987
+msgid "rotation_start_year_t2_wo"
+msgstr ""
+
+#: api/models.py:1989
+msgid "logging_start_year_t2_start"
+msgstr ""
+
+#: api/models.py:1990
+msgid "logging_start_year_t2_w"
+msgstr ""
+
+#: api/models.py:1991
+msgid "logging_start_year_t2_wo"
+msgstr ""
+
+#: api/models.py:1993
+msgid "logging_dry_matter_logged_t2_start"
+msgstr ""
+
+#: api/models.py:1994
+msgid "logging_dry_matter_logged_t2_w"
+msgstr ""
+
+#: api/models.py:1995
+msgid "logging_dry_matter_logged_t2_wo"
+msgstr ""
+
+#: api/models.py:1997
+msgid "degradation_dry_matter_impacted_t2_start"
+msgstr ""
+
+#: api/models.py:1998
+msgid "degradation_dry_matter_impacted_t2_w"
+msgstr ""
+
+#: api/models.py:1999
+msgid "degradation_dry_matter_impacted_t2_wo"
+msgstr ""
+
+#: api/models.py:2038
+msgid "disturbance_type"
+msgstr ""
+
+#: api/models.py:2041
+msgid "recurrence_yrs_start"
+msgstr ""
+
+#: api/models.py:2042
+msgid "recurrence_yrs_w"
+msgstr ""
+
+#: api/models.py:2043
+msgid "recurrence_yrs_wo"
+msgstr ""
+
+#: api/models.py:2046
+msgid "percentage_biomass_destruction_start"
+msgstr ""
+
+#: api/models.py:2047
+msgid "percentage_biomass_destruction_w"
+msgstr ""
+
+#: api/models.py:2048
+msgid "percentage_biomass_destruction_wo"
+msgstr ""
+
+#: api/models.py:2051
+msgid "start_year_t2_start"
+msgstr ""
+
+#: api/models.py:2052
+msgid "start_year_t2_w"
+msgstr ""
+
+#: api/models.py:2053
+msgid "start_year_t2_wo"
+msgstr ""
+
+#: api/models.py:2055
+msgid "dry_matter_impacted_t2_start"
+msgstr ""
+
+#: api/models.py:2056
+msgid "dry_matter_impacted_t2_w"
+msgstr ""
+
+#: api/models.py:2057
+msgid "dry_matter_impacted_t2_wo"
+msgstr ""
+
+#: api/models.py:2072
+#, fuzzy
+#| msgid "Waterbody"
+msgid "waterbody_type"
+msgstr "Водоём"
+
+#: api/models.py:2074
+msgid "trophic_type_start"
+msgstr ""
+
+#: api/models.py:2075
+#, fuzzy
+#| msgid "Eutrophic"
+msgid "trophic_type_w"
+msgstr "Эвтрофный"
+
+#: api/models.py:2076
+msgid "trophic_type_wo"
+msgstr ""
+
+#: api/models.py:2079
+msgid "ch4_ef_t2_start"
+msgstr ""
+
+#: api/models.py:2080
+msgid "ch4_ef_t2_w"
+msgstr ""
+
+#: api/models.py:2081
+msgid "ch4_ef_t2_wo"
+msgstr ""
+
+#: api/models.py:2083
+msgid "alpha_t2_start"
+msgstr ""
+
+#: api/models.py:2084
+msgid "alpha_t2_w"
+msgstr ""
+
+#: api/models.py:2085
+msgid "alpha_t2_wo"
+msgstr ""
+
+#: api/models.py:2087
+msgid "mean_annual_t2_start"
+msgstr ""
+
+#: api/models.py:2088
+msgid "mean_annual_t2_w"
+msgstr ""
+
+#: api/models.py:2089
+msgid "mean_annual_t2_wo"
+msgstr ""
+
+#: api/models.py:2093
+msgid "land_use_type"
+msgstr ""
+
+#: api/models.py:2098
+msgid "area_under_drainage_start"
+msgstr ""
+
+#: api/models.py:2099
+msgid "area_under_drainage_w"
+msgstr ""
+
+#: api/models.py:2100
+msgid "area_under_drainage_wo"
+msgstr ""
+
+#: api/models.py:2103
+msgid "drained_area_excavated_start"
+msgstr ""
+
+#: api/models.py:2104
+msgid "drained_area_excavated_w"
+msgstr ""
+
+#: api/models.py:2105
+msgid "drained_area_excavated_wo"
+msgstr ""
+
+#: api/models.py:2108
+msgid "area_not_drained_or_rewetted_start"
+msgstr ""
+
+#: api/models.py:2109
+msgid "area_not_drained_or_rewetted_w"
+msgstr ""
+
+#: api/models.py:2110
+msgid "area_not_drained_or_rewetted_wo"
+msgstr ""
+
+#: api/models.py:2113
+msgid "area_w_restored_vegetation_start"
+msgstr ""
+
+#: api/models.py:2114
+msgid "area_w_restored_vegetation_w"
+msgstr ""
+
+#: api/models.py:2115
+msgid "area_w_restored_vegetation_wo"
+msgstr ""
+
+#: api/models.py:2124
+msgid "pc_c_lost_after_excavation_t2_start"
+msgstr ""
+
+#: api/models.py:2125
+msgid "pc_c_lost_after_excavation_t2_w"
+msgstr ""
+
+#: api/models.py:2126
+msgid "pc_c_lost_after_excavation_t2_wo"
+msgstr ""
+
+#: api/models.py:2144
+msgid "drainage_ef_t2_start"
+msgstr ""
+
+#: api/models.py:2145
+msgid "drainage_ef_t2_w"
+msgstr ""
+
+#: api/models.py:2146
+msgid "drainage_ef_t2_wo"
+msgstr ""
+
+#: api/models.py:2148
+msgid "co2_rewetting_t2_start"
+msgstr ""
+
+#: api/models.py:2149
+msgid "co2_rewetting_t2_w"
+msgstr ""
+
+#: api/models.py:2150
+msgid "co2_rewetting_t2_wo"
+msgstr ""
+
+#: api/models.py:2152
+msgid "ch4_rewetting_t2_start"
+msgstr ""
+
+#: api/models.py:2153
+msgid "ch4_rewetting_t2_w"
+msgstr ""
+
+#: api/models.py:2154
+msgid "ch4_rewetting_t2_wo"
+msgstr ""
+
+#: api/models.py:2156
+msgid "avg_salinity_t2"
+msgstr ""
+
+#: api/models.py:2166
+msgid "refrigerant_pc_start"
+msgstr ""
+
+#: api/models.py:2167
+msgid "refrigerant_pc_w"
+msgstr ""
+
+#: api/models.py:2168
+msgid "refrigerant_pc_wo"
+msgstr ""
+
+#: api/models.py:2171
+msgid "refrigerant_gwp"
+msgstr ""
+
+#: api/models.py:2173
+msgid "total_catch_yr_start"
+msgstr ""
+
+#: api/models.py:2174
+msgid "total_catch_yr_w"
+msgstr ""
+
+#: api/models.py:2175
+msgid "total_catch_yr_wo"
+msgstr ""
+
+#: api/models.py:2178
+msgid "ice_preserved_catch_pc_start"
+msgstr ""
+
+#: api/models.py:2179
+msgid "ice_preserved_catch_pc_w"
+msgstr ""
+
+#: api/models.py:2180
+msgid "ice_preserved_catch_pc_wo"
+msgstr ""
+
+#: api/models.py:2183
+msgid "energy_emission_factor_co2_t2_start"
+msgstr ""
+
+#: api/models.py:2184
+msgid "energy_emission_factor_co2_t2_w"
+msgstr ""
+
+#: api/models.py:2185
+msgid "energy_emission_factor_co2_t2_wo"
+msgstr ""
+
+#: api/models.py:2187
+msgid "energy_emission_factor_ch4_t2_start"
+msgstr ""
+
+#: api/models.py:2188
+msgid "energy_emission_factor_ch4_t2_w"
+msgstr ""
+
+#: api/models.py:2189
+msgid "energy_emission_factor_ch4_t2_wo"
+msgstr ""
+
+#: api/models.py:2191
+msgid "energy_emission_factor_n2o_t2_start"
+msgstr ""
+
+#: api/models.py:2192
+msgid "energy_emission_factor_n2o_t2_w"
+msgstr ""
+
+#: api/models.py:2193
+msgid "energy_emission_factor_n2o_t2_wo"
+msgstr ""
+
+#: api/models.py:2195
+msgid "refrigerant_lost_per_tonne_t2_start"
+msgstr ""
+
+#: api/models.py:2196
+msgid "refrigerant_lost_per_tonne_t2_w"
+msgstr ""
+
+#: api/models.py:2197
+msgid "refrigerant_lost_per_tonne_t2_wo"
+msgstr ""
+
+#: api/models.py:2199
+msgid "refrigerant_gwp_t2_start"
+msgstr ""
+
+#: api/models.py:2200
+msgid "refrigerant_gwp_t2_w"
+msgstr ""
+
+#: api/models.py:2201
+msgid "refrigerant_gwp_t2_wo"
+msgstr ""
+
+#: api/models.py:2203
+msgid "tonnes_of_ice_t2_start"
+msgstr ""
+
+#: api/models.py:2204
+msgid "tonnes_of_ice_t2_w"
+msgstr ""
+
+#: api/models.py:2205
+msgid "tonnes_of_ice_t2_wo"
+msgstr ""
+
+#: api/models.py:2207
+msgid "inshore_ice_production_kwh_per_tonne_t2_start"
+msgstr ""
+
+#: api/models.py:2208
+msgid "inshore_ice_production_kwh_per_tonne_t2_w"
+msgstr ""
+
+#: api/models.py:2209
+msgid "inshore_ice_production_kwh_per_tonne_t2_wo"
+msgstr ""
+
+#: api/models.py:2211
+msgid "fui_t2_start"
+msgstr ""
+
+#: api/models.py:2212
+msgid "fui_t2_w"
+msgstr ""
+
+#: api/models.py:2213
+msgid "fui_t2_wo"
+msgstr ""
+
+#: api/models.py:2215
+msgid "inshore_ice_production_country_t2"
+msgstr ""
+
+#: api/models.py:2217 api/models.py:2300
+msgid "implementation_year_t2"
+msgstr ""
+
+#: api/models.py:2221 api/models.py:2229
+msgid "gear_type_start"
+msgstr ""
+
+#: api/models.py:2222 api/models.py:2230
+msgid "gear_type_w"
+msgstr ""
+
+#: api/models.py:2223 api/models.py:2231
+msgid "gear_type_wo"
+msgstr ""
+
+#: api/models.py:2225
+msgid "fishery_type"
+msgstr ""
+
+#: api/models.py:2233
+msgid "fish_type"
+msgstr ""
+
+#: api/models.py:2237
+msgid "annual_production_start"
+msgstr ""
+
+#: api/models.py:2238
+msgid "annual_production_w"
+msgstr ""
+
+#: api/models.py:2239
+msgid "annual_production_wo"
+msgstr ""
+
+#: api/models.py:2242
+msgid "n2o_from_production_t2_start"
+msgstr ""
+
+#: api/models.py:2243
+msgid "n2o_from_production_t2_w"
+msgstr ""
+
+#: api/models.py:2244
+msgid "n2o_from_production_t2_wo"
+msgstr ""
+
+#: api/models.py:2246
+msgid "electricity_used_t2_start"
+msgstr ""
+
+#: api/models.py:2247
+#, fuzzy
+#| msgid "Electricity"
+msgid "electricity_used_t2_w"
+msgstr "Электричество"
+
+#: api/models.py:2248
+#, fuzzy
+#| msgid "Electricity"
+msgid "electricity_used_t2_wo"
+msgstr "Электричество"
+
+#: api/models.py:2250
+msgid "electricity_ef_t2_start"
+msgstr ""
+
+#: api/models.py:2251
+#, fuzzy
+#| msgid "Electricity"
+msgid "electricity_ef_t2_w"
+msgstr "Электричество"
+
+#: api/models.py:2252
+#, fuzzy
+#| msgid "Electricity"
+msgid "electricity_ef_t2_wo"
+msgstr "Электричество"
+
+#: api/models.py:2289
+msgid "input_type"
+msgstr ""
+
+#: api/models.py:2291
+msgid "value_start"
+msgstr ""
+
+#: api/models.py:2292
+msgid "value_w"
+msgstr ""
+
+#: api/models.py:2293
+msgid "value_wo"
+msgstr ""
+
+#: api/models.py:2296
+msgid "co2_emissions_t2"
+msgstr ""
+
+#: api/models.py:2297
+msgid "n2o_emissions_t2"
+msgstr ""
+
+#: api/models.py:2298
+msgid "co2_e_emissions_t2"
+msgstr ""
+
+#: api/models.py:2319
+msgid "country_t2"
+msgstr ""
+
+#: api/models.py:2321 api/models.py:2430 api/models.py:2504
+msgid "ef_t2_start"
+msgstr ""
+
+#: api/models.py:2322 api/models.py:2431 api/models.py:2505
+msgid "ef_t2_w"
+msgstr ""
+
+#: api/models.py:2323 api/models.py:2432 api/models.py:2506
+msgid "ef_t2_wo"
+msgstr ""
+
+#: api/models.py:2325 api/models.py:2473
+msgid "transmission_loss_t2_start"
+msgstr ""
+
+#: api/models.py:2326 api/models.py:2474
+msgid "transmission_loss_t2_w"
+msgstr ""
+
+#: api/models.py:2327 api/models.py:2475
+msgid "transmission_loss_t2_wo"
+msgstr ""
+
+#: api/models.py:2329
+msgid "ef_source"
+msgstr ""
+
+#: api/models.py:2342 api/models.py:2383
+msgid "quantity_consumed_per_year_start"
+msgstr ""
+
+#: api/models.py:2343 api/models.py:2384
+msgid "quantity_consumed_per_year_w"
+msgstr ""
+
+#: api/models.py:2344 api/models.py:2385
+msgid "quantity_consumed_per_year_wo"
+msgstr ""
+
+#: api/models.py:2347
+msgid "mwh_renewables_start"
+msgstr ""
+
+#: api/models.py:2348
+msgid "mwh_renewables_w"
+msgstr ""
+
+#: api/models.py:2349
+msgid "mwh_renewables_wo"
+msgstr ""
+
+#: api/models.py:2361
+msgid "ef_co2_t2"
+msgstr ""
+
+#: api/models.py:2362
+msgid "ef_ch4_t2"
+msgstr ""
+
+#: api/models.py:2363
+msgid "ef_n2o_t2"
+msgstr ""
+
+#: api/models.py:2365 api/models.py:2462
+msgid "ef_co2_t2_w"
+msgstr ""
+
+#: api/models.py:2366 api/models.py:2466
+msgid "ef_ch4_t2_w"
+msgstr ""
+
+#: api/models.py:2367 api/models.py:2470
+msgid "ef_n2o_t2_w"
+msgstr ""
+
+#: api/models.py:2369 api/models.py:2463
+msgid "ef_co2_t2_wo"
+msgstr ""
+
+#: api/models.py:2370 api/models.py:2467
+msgid "ef_ch4_t2_wo"
+msgstr ""
+
+#: api/models.py:2371 api/models.py:2471
+msgid "ef_n2o_t2_wo"
+msgstr ""
+
+#: api/models.py:2378 api/models.py:2442
+msgid "fuel_type_start"
+msgstr ""
+
+#: api/models.py:2379 api/models.py:2443
+msgid "fuel_type_w"
+msgstr ""
+
+#: api/models.py:2380 api/models.py:2444
+msgid "fuel_type_wo"
+msgstr ""
+
+#: api/models.py:2388
+msgid "account_for_co2"
+msgstr ""
+
+#: api/models.py:2423 api/models.py:2440
+#, fuzzy
+#| msgid "Irrigation System"
+msgid "irrigation_system_type"
+msgstr "Система орошения"
+
+#: api/models.py:2425 api/models.py:2449
+msgid "ha_start"
+msgstr ""
+
+#: api/models.py:2426 api/models.py:2450
+msgid "ha_w"
+msgstr ""
+
+#: api/models.py:2427 api/models.py:2451
+msgid "ha_wo"
+msgstr ""
+
+#: api/models.py:2447
+msgid "well_depth"
+msgstr ""
+
+#: api/models.py:2454
+msgid "gross_irrigation_water_start"
+msgstr ""
+
+#: api/models.py:2455
+msgid "gross_irrigation_water_w"
+msgstr ""
+
+#: api/models.py:2456
+msgid "gross_irrigation_water_wo"
+msgstr ""
+
+#: api/models.py:2459
+msgid "power_origin_country_t2"
+msgstr ""
+
+#: api/models.py:2461
+msgid "ef_co2_t2_start"
+msgstr ""
+
+#: api/models.py:2465
+msgid "ef_ch4_t2_start"
+msgstr ""
+
+#: api/models.py:2469
+msgid "ef_n2o_t2_start"
+msgstr ""
+
+#: api/models.py:2477
+msgid "average_pressure_t2"
+msgstr ""
+
+#: api/models.py:2479
+msgid "total_dynamic_head_t2"
+msgstr ""
+
+#: api/models.py:2481
+msgid "pumping_efficiency_t2_start"
+msgstr ""
+
+#: api/models.py:2482
+msgid "pumping_efficiency_t2_w"
+msgstr ""
+
+#: api/models.py:2483
+msgid "pumping_efficiency_t2_wo"
+msgstr ""
+
+#: api/models.py:2515
+#, fuzzy
+#| msgid "Building"
+msgid "building_type"
+msgstr "Здание"
+
+#: api/models.py:2518 api/models.py:2544
+msgid "area_m2_start"
+msgstr ""
+
+#: api/models.py:2519 api/models.py:2545
+msgid "area_m2_w"
+msgstr ""
+
+#: api/models.py:2520 api/models.py:2546
+msgid "area_m2_wo"
+msgstr ""
+
+#: api/models.py:2527
+msgid "road_type"
+msgstr ""
+
+#: api/models.py:2530
+msgid "length_km_start"
+msgstr ""
+
+#: api/models.py:2531
+msgid "length_km_w"
+msgstr ""
+
+#: api/models.py:2532
+msgid "length_km_wo"
+msgstr ""
+
+#: api/models.py:2535
+msgid "width_m_start"
+msgstr ""
+
+#: api/models.py:2536
+msgid "width_m_w"
+msgstr ""
+
+#: api/models.py:2537
+msgid "width_m_wo"
+msgstr ""
+
+#: api/models.py:2551
+msgid "drainage_area_start"
+msgstr ""
+
+#: api/models.py:2552
+msgid "drainage_area_w"
+msgstr ""
+
+#: api/models.py:2553
+msgid "drainage_area_wo"
+msgstr ""
+
+#: api/models.py:2556
+msgid "area_not_drained_start"
+msgstr ""
+
+#: api/models.py:2557
+msgid "area_not_drained_w"
+msgstr ""
+
+#: api/models.py:2558
+msgid "area_not_drained_wo"
+msgstr ""
+
+#: api/models.py:2561
+msgid "ditches_area_start"
+msgstr ""
+
+#: api/models.py:2562
+msgid "ditches_area_w"
+msgstr ""
+
+#: api/models.py:2563
+msgid "ditches_area_wo"
+msgstr ""
+
+#: api/models.py:2566
+msgid "fire_type_start"
+msgstr ""
+
+#: api/models.py:2567
+msgid "fire_type_w"
+msgstr ""
+
+#: api/models.py:2568
+msgid "fire_type_wo"
+msgstr ""
+
+#: api/models.py:2571
+msgid "soil_fire_periodicity_start"
+msgstr ""
+
+#: api/models.py:2572
+msgid "soil_fire_periodicity_w"
+msgstr ""
+
+#: api/models.py:2573
+msgid "soil_fire_periodicity_wo"
+msgstr ""
+
+#: api/models.py:2576
+msgid "soil_fire_impact_percentage_start"
+msgstr ""
+
+#: api/models.py:2577
+msgid "soil_fire_impact_percentage_w"
+msgstr ""
+
+#: api/models.py:2578
+msgid "soil_fire_impact_percentage_wo"
+msgstr ""
+
+#: api/models.py:2581
+msgid "onsite_co2_drainge_t2_start"
+msgstr ""
+
+#: api/models.py:2582
+msgid "onsite_co2_drainge_t2_w"
+msgstr ""
+
+#: api/models.py:2583
+msgid "onsite_co2_drainge_t2_wo"
+msgstr ""
+
+#: api/models.py:2585
+msgid "onsite_ch4_drainge_t2_start"
+msgstr ""
+
+#: api/models.py:2586
+msgid "onsite_ch4_drainge_t2_w"
+msgstr ""
+
+#: api/models.py:2587
+msgid "onsite_ch4_drainge_t2_wo"
+msgstr ""
+
+#: api/models.py:2589
+msgid "onsite_n2o_drainge_t2_start"
+msgstr ""
+
+#: api/models.py:2590
+msgid "onsite_n2o_drainge_t2_w"
+msgstr ""
+
+#: api/models.py:2591
+msgid "onsite_n2o_drainge_t2_wo"
+msgstr ""
+
+#: api/models.py:2593
+msgid "offsite_doc_drainge_t2_start"
+msgstr ""
+
+#: api/models.py:2594
+msgid "offsite_doc_drainge_t2_w"
+msgstr ""
+
+#: api/models.py:2595
+msgid "offsite_doc_drainge_t2_wo"
+msgstr ""
+
+#: api/models.py:2597
+msgid "offsite_ch4_drainge_t2_start"
+msgstr ""
+
+#: api/models.py:2598
+msgid "offsite_ch4_drainge_t2_w"
+msgstr ""
+
+#: api/models.py:2599
+msgid "offsite_ch4_drainge_t2_wo"
+msgstr ""
+
+#: api/models.py:2601
+msgid "onsite_co2_rewetting_t2_start"
+msgstr ""
+
+#: api/models.py:2602
+msgid "onsite_co2_rewetting_t2_w"
+msgstr ""
+
+#: api/models.py:2603
+msgid "onsite_co2_rewetting_t2_wo"
+msgstr ""
+
+#: api/models.py:2605
+msgid "onsite_ch4_rewetting_t2_start"
+msgstr ""
+
+#: api/models.py:2606
+msgid "onsite_ch4_rewetting_t2_w"
+msgstr ""
+
+#: api/models.py:2607
+msgid "onsite_ch4_rewetting_t2_wo"
+msgstr ""
+
+#: api/models.py:2609
+msgid "onsite_n2o_rewetting_t2_start"
+msgstr ""
+
+#: api/models.py:2610
+msgid "onsite_n2o_rewetting_t2_w"
+msgstr ""
+
+#: api/models.py:2611
+msgid "onsite_n2o_rewetting_t2_wo"
+msgstr ""
+
+#: api/models.py:2613
+msgid "offsite_doc_rewetting_t2_start"
+msgstr ""
+
+#: api/models.py:2614
+msgid "offsite_doc_rewetting_t2_w"
+msgstr ""
+
+#: api/models.py:2615
+msgid "offsite_doc_rewetting_t2_wo"
+msgstr ""
+
+#: api/models.py:2617
+msgid "mean_dry_matter_t2_start"
+msgstr ""
+
+#: api/models.py:2618
+msgid "mean_dry_matter_t2_w"
+msgstr ""
+
+#: api/models.py:2619
+msgid "mean_dry_matter_t2_wo"
+msgstr ""
+
+#: api/models.py:2621
+msgid "fire_on_soil_co2_t2_start"
+msgstr ""
+
+#: api/models.py:2622
+msgid "fire_on_soil_co2_t2_w"
+msgstr ""
+
+#: api/models.py:2623
+msgid "fire_on_soil_co2_t2_wo"
+msgstr ""
+
+#: api/models.py:2625
+msgid "fire_on_soil_co_t2_start"
+msgstr ""
+
+#: api/models.py:2626
+msgid "fire_on_soil_co_t2_w"
+msgstr ""
+
+#: api/models.py:2627
+msgid "fire_on_soil_co_t2_wo"
+msgstr ""
+
+#: api/models.py:2629
+msgid "fire_on_soil_ch4_t2_start"
+msgstr ""
+
+#: api/models.py:2630
+msgid "fire_on_soil_ch4_t2_w"
+msgstr ""
+
+#: api/models.py:2631
+msgid "fire_on_soil_ch4_t2_wo"
+msgstr ""
+
+#: api/models.py:2635
+msgid "peat_type"
+msgstr ""
+
+#: api/models.py:2638
+msgid "peat_area_start"
+msgstr ""
+
+#: api/models.py:2639
+msgid "peat_area_w"
+msgstr ""
+
+#: api/models.py:2640
+msgid "peat_area_wo"
+msgstr ""
+
+#: api/models.py:2643
+msgid "peat_ditches_area_start"
+msgstr ""
+
+#: api/models.py:2644
+msgid "peat_ditches_area_w"
+msgstr ""
+
+#: api/models.py:2645
+msgid "peat_ditches_area_wo"
+msgstr ""
+
+#: api/models.py:2648
+msgid "peat_extraction_height_start"
+msgstr ""
+
+#: api/models.py:2649
+msgid "peat_extraction_height_w"
+msgstr ""
+
+#: api/models.py:2650
+msgid "peat_extraction_height_wo"
+msgstr ""
+
+#: api/models.py:2653
+msgid "is_peat_for_energy_start"
+msgstr ""
+
+#: api/models.py:2654
+msgid "is_peat_for_energy_w"
+msgstr ""
+
+#: api/models.py:2655
+msgid "is_peat_for_energy_wo"
+msgstr ""
+
+#: api/models.py:2658
+msgid "onsite_co2_peat_t2_start"
+msgstr ""
+
+#: api/models.py:2659
+msgid "onsite_co2_peat_t2_w"
+msgstr ""
+
+#: api/models.py:2660
+msgid "onsite_co2_peat_t2_wo"
+msgstr ""
+
+#: api/models.py:2662
+msgid "onsite_n2o_peat_t2_start"
+msgstr ""
+
+#: api/models.py:2663
+msgid "onsite_n2o_peat_t2_w"
+msgstr ""
+
+#: api/models.py:2664
+msgid "onsite_n2o_peat_t2_wo"
+msgstr ""
+
+#: api/models.py:2666
+msgid "offsite_doc_peat_t2_start"
+msgstr ""
+
+#: api/models.py:2667
+msgid "offsite_doc_peat_t2_w"
+msgstr ""
+
+#: api/models.py:2668
+msgid "offsite_doc_peat_t2_wo"
+msgstr ""
+
+#: api/models.py:2670
+msgid "offsite_ch4_peat_t2_start"
+msgstr ""
+
+#: api/models.py:2671
+msgid "offsite_ch4_peat_t2_w"
+msgstr ""
+
+#: api/models.py:2672
+msgid "offsite_ch4_peat_t2_wo"
+msgstr ""
+
+#: api/models.py:2674
+msgid "peat_density_t2_start"
+msgstr ""
+
+#: api/models.py:2675
+msgid "peat_density_t2_w"
+msgstr ""
+
+#: api/models.py:2676
+msgid "peat_density_t2_wo"
+msgstr ""
+
+#: api/models.py:2688
+msgid "settlement_type_start"
+msgstr ""
+
+#: api/models.py:2689
+#, fuzzy
+#| msgid "Settlement"
+msgid "settlement_type_w"
+msgstr "Поселение"
+
+#: api/models.py:2690
+#, fuzzy
+#| msgid "Settlement"
+msgid "settlement_type_wo"
+msgstr "Поселение"
+
+#: api/models.py:2711
+msgid "is_set_aside_start"
+msgstr ""
+
+#: api/models.py:2712
+msgid "is_set_aside_w"
+msgstr ""
+
+#: api/models.py:2713
+msgid "is_set_aside_wo"
+msgstr ""
+
+#: api/models.py:2725
+msgid "is_degraded_land_start"
+msgstr ""
+
+#: api/models.py:2726
+msgid "is_degraded_land_w"
+msgstr ""
+
+#: api/models.py:2727
+msgid "is_degraded_land_wo"
+msgstr ""
+
+#: api/models.py:2739
+msgid "module_type_start"
+msgstr ""
+
+#: api/models.py:2740
+msgid "module_type_w"
+msgstr ""
+
+#: api/models.py:2741
+msgid "module_type_wo"
+msgstr ""
+
+#: api/models.py:2751
+msgid "dry_matter_start"
+msgstr ""
+
+#: api/models.py:2752
+msgid "dry_matter_w"
+msgstr ""
+
+#: api/models.py:2753
+msgid "dry_matter_wo"
+msgstr ""
+
+#: api/models.py:2890
+msgid "Field Name"
+msgstr ""
+
+#: api/models.py:2891
+msgid "Field Description"
+msgstr ""
+
+#: api/models.py:2895
+msgid "Field Definition"
+msgstr ""
+
+#: api/models.py:2896
+msgid "Field Definitions"
+msgstr ""
+
+#~ msgid "pending"
+#~ msgstr "В ожидании"
+
+#~ msgid "accepted"
+#~ msgstr "одобренный"
+
+#~ msgid "rejected"
+#~ msgstr "Отклонено"
+
+#~ msgid "canceled"
+#~ msgstr "Отменённый"
+
+#~ msgid "Natural"
+#~ msgstr "Естественный"
+
+#~ msgid "Plantation"
+#~ msgstr "Плантация"
+
+#~ msgid "Primary"
+#~ msgstr "Первичный"
+
+#~ msgid "Secondary"
+#~ msgstr "Вторичный"
+
+#~ msgid "On-Site"
+#~ msgstr "на месте, локальный"
+
+#~ msgid "Off-Site"
+#~ msgstr "Вне участка"
+
+#~ msgid "EMPTY"
+#~ msgstr "ПУСТОЙ"
+
+#~ msgid "READY"
+#~ msgstr "ГОТОВО"
+
+#~ msgid "SUBMODULES_EMPTY"
+#~ msgstr "ПОДМОДУЛИ_ПУСТЫЕ"
+
+#~ msgid "IN PROGRESS"
+#~ msgstr "В ПРОЦЕССЕ"
+
+#~ msgid "Barley"
+#~ msgstr "Ячмень"
+
+#~ msgid "Oats"
+#~ msgstr "Овес"
+
+#~ msgid "Millet"
+#~ msgstr "пшено"
+
+#~ msgid "Rice"
+#~ msgstr "рис"
+
+#~ msgid "Sorghum"
+#~ msgstr "Сорго"
+
+#~ msgid "Rye"
+#~ msgstr "Рожь"
+
+#~ msgid "Generic Value"
+#~ msgstr "Общая ценность"
+
+#~ msgid "Soybeans"
+#~ msgstr "Соя"
+
+#~ msgid "Dry Bean"
+#~ msgstr "Сухие бобы"
+
+#~ msgid "Potatoes"
+#~ msgstr "Картофель"
+
+#~ msgid "N-Fixing Forages"
+#~ msgstr "Азотфиксирующие корма"
+
+#~ msgid "Non-N-Fixing Forages"
+#~ msgstr "Неазотфиксирующие корма"
+
+#~ msgid "Winter Wheat"
+#~ msgstr " Озимая пшеница "
+
+#~ msgid "Spring Wheat"
+#~ msgstr "Яровая пшеница"
+
+#~ msgid "Non-Legume Hay"
+#~ msgstr "Небобовое сено"
+
+#~ msgid "Perennial Grasses"
+#~ msgstr "Многолетние травы"
+
+#~ msgid "Grass-Clover Mixtures"
+#~ msgstr "Смеси травы и клевера"
+
+#~ msgid "Long-Term Cultivated"
+#~ msgstr "Долгосрочно культивируемый"
+
+#~ msgid "Perennial/Tree Crop"
+#~ msgstr "Многолетние/деревья-урожай"
+
+#~ msgid "Set Aside (< 20 Yrs)"
+#~ msgstr "Отложенный (< 20 лет)"
+
+#~ msgid "Default"
+#~ msgstr "По умолчанию"
+
+#~ msgid "Peanuts"
+#~ msgstr "Арахис"
+
+#~ msgid "Alley Cropping"
+#~ msgstr "Полосное земледелие"
+
+#~ msgid "Perennial Fallow"
+#~ msgstr "Многолетний залеж"
+
+#~ msgid "Hedgerow"
+#~ msgstr "Живая изгородь"
+
+#~ msgid "Multistrata"
+#~ msgstr "Multistrata"
+
+#~ msgid "Parkland"
+#~ msgstr "Парковая зона"
+
+#~ msgid "Shaded Perennial"
+#~ msgstr "Тенистое многолетнее растение"
+
+#~ msgid "Silvoarable"
+#~ msgstr "Лесоводство с сельским хозяйством"
+
+#~ msgid "Silvopasture"
+#~ msgstr " Лесопастбище"
+
+#~ msgid "Olive"
+#~ msgstr "Олива"
+
+#~ msgid "Orchard"
+#~ msgstr " Плодовый сад"
+
+#~ msgid "Short Rotation Coppice"
+#~ msgstr "Краткосроковый пни"
+
+#~ msgid "Tea"
+#~ msgstr "Чай"
+
+#~ msgid "Vine"
+#~ msgstr "Лоза"
+
+#~ msgid "Oil Palm"
+#~ msgstr "Масличная пальма"
+
+#~ msgid "Rubber"
+#~ msgstr "Резина"
+
+#~ msgid "Alfalfa"
+#~ msgstr "Люцерна"
+
+#~ msgid "Agroforestry - Default"
+#~ msgstr "Агролесоводство - по умолчанию"
+
+#~ msgid "Annual Cropland"
+#~ msgstr "Однолетние посевы"
+
+#~ msgid "Annual Fallow"
+#~ msgstr "Ежегодное залежное земледелие"
+
+#~ msgid "Flooded Rice"
+#~ msgstr "Затопленный рис"
+
+#~ msgid "Grassland"
+#~ msgstr "Пастбища"
+
+#~ msgid "Other Land (Non-Vegetated)"
+#~ msgstr "Прочая земля (не покрытая растительностью)"
+
+#~ msgid "Wheat"
+#~ msgstr "Пшеница"
+
+#~ msgid "Beans & Pulses"
+#~ msgstr "Бобовые, зернобобовые культуры"
+
+#~ msgid "Tubers"
+#~ msgstr "Клубни"
+
+#~ msgid "Root Crops"
+#~ msgstr "Корнеплоды"
+
+#~ msgid "Shrubland"
+#~ msgstr "Кустарники"
+
+#~ msgid "Humid Forest"
+#~ msgstr "Влажный лес"
+
+#~ msgid "﻿Long-Term Cultivated"
+#~ msgstr "Долгосрочно культивируемый"
+
+#~ msgid "Mangrove Forest"
+#~ msgstr "Мангровый лес"
+
+#~ msgid "Mangrove"
+#~ msgstr "Мангровое дерево/Мангры"
+
+#~ msgid "Tidal Marsh"
+#~ msgstr "Прибрежные болота"
+
+#~ msgid "Seagrass"
+#~ msgstr "Морская трава"
+
+#~ msgid "Tidal Marsh Mediterranean"
+#~ msgstr "Прибрежные болота Средиземноморья"
+
+#~ msgid "Set Aside"
+#~ msgstr "Отложенный"
+
+#~ msgid "Perennial Cropland"
+#~ msgstr "Многолетние сельскохозяйственные угодья"
+
+#~ msgid "Vegetables"
+#~ msgstr "Овощи"
+
+#~ msgid "Oilseeds"
+#~ msgstr "Масличные культуры"
+
+#~ msgid "Groundnuts"
+#~ msgstr "Арахис"
+
+#~ msgid "Rainforest"
+#~ msgstr "Тропический лес"
+
+#~ msgid "Moist Deciduous Forest"
+#~ msgstr "Влажный лиственный лес"
+
+#~ msgid "Dry Forest"
+#~ msgstr "Сухой лес"
+
+#~ msgid "Oceanic Forest"
+#~ msgstr "Океанический/прибрежный лес"
+
+#~ msgid "Continental Forest"
+#~ msgstr "Континентальный лес"
+
+#~ msgid "Desert"
+#~ msgstr "Пустыня"
+
+#~ msgid "Steppe"
+#~ msgstr "Степь"
+
+#~ msgid "Coniferous Forest"
+#~ msgstr "Хвойный лес"
+
+#~ msgid "Tundra Woodland"
+#~ msgstr "Лесная тундра"
+
+#~ msgid "Mountain System"
+#~ msgstr "Mountain System"
+
+#~ msgid "Other Land"
+#~ msgstr "Прочая земля"
+
+#~ msgid "Grains"
+#~ msgstr "Зерна"
+
+#~ msgid "Maize"
+#~ msgstr "Кукуруза"
+
+#~ msgid "Sugarcane"
+#~ msgstr "Сахарный тростник"
+
+#~ msgid "Infrastructure on existing land (no paving)"
+#~ msgstr "Инфраструктура на существующей земле (без асфальтирования)"
+
+#~ msgid "Paved settlement"
+#~ msgstr "Асфальтированное поселение"
+
+#~ msgid "Turfgrass"
+#~ msgstr "Газонные травы"
+
+#~ msgid "Wooded area"
+#~ msgstr "Лесистая местность"
+
+#~ msgid "Cultivated soil"
+#~ msgstr "Обрабатываемая почва"
+
+#~ msgid "High Activity Clay"
+#~ msgstr "Высокоактивная глина"
+
+#~ msgid "Low Activity Clay"
+#~ msgstr "Глина с низкой активностью"
+
+#~ msgid "Sandy"
+#~ msgstr "Песчаный"
+
+#~ msgid "Spodic"
+#~ msgstr "Сподичный"
+
+#~ msgid "Volcanic"
+#~ msgstr "Вулканический"
+
+#~ msgid "Wetland"
+#~ msgstr "Влажные земли"
+
+#~ msgid "Organic"
+#~ msgstr "Органический"
+
+#~ msgid "Mineral"
+#~ msgstr "Минерал"
+
+#~ msgid "Full Tillage"
+#~ msgstr "Полная обработка почвы"
+
+#~ msgid "Reduced Tillage"
+#~ msgstr "Сниженная обработка почвы"
+
+#~ msgid "No Tillage"
+#~ msgstr "Без обработки почвы"
+
+#~ msgid "Low C input"
+#~ msgstr "Низкий углеродный ввод"
+
+#~ msgid "Medium C input"
+#~ msgstr "Средний углеродный ввод"
+
+#~ msgid "High C input, no manure"
+#~ msgstr "Высокое содержание углерода, без навоза"
+
+#~ msgid "High C input, with manure"
+#~ msgstr "Высокое содержание углерода, с навозом"
+
+#~ msgid "Burned"
+#~ msgstr "Сожжённый"
+
+#~ msgid "Retained"
+#~ msgstr "Сохранено/Удержано"
+
+#~ msgid "Exported"
+#~ msgstr "Экспортировано"
+
+#~ msgid "Irrigated, Continuously Flooded"
+#~ msgstr "Орошаемое, постоянно затопленное"
+
+#~ msgid "Irrigated, Single Drainage Period"
+#~ msgstr "Орошаемое, с одним периодом осушения"
+
+#~ msgid "Irrigated, Multiple Drainage Periods"
+#~ msgstr "Орошаемое, с несколькими периодами осушения"
+
+#~ msgid "Straw Burnt"
+#~ msgstr "Сожженная солома  "
+
+#~ msgid "Straw Exported"
+#~ msgstr "Экспортированная солома"
+
+#~ msgid "Compost"
+#~ msgstr "Компост"
+
+#~ msgid "Farm Yard Manure"
+#~ msgstr "Навоз для фермерского двора"
+
+#~ msgid "Green Manure"
+#~ msgstr "Зеленое удобрение"
+
+#~ msgid "Straw Incorporated Long (>30 Days) Before Cultivation"
+#~ msgstr "Солома, внесённая за долго до посева (>30 дней)"
+
+#~ msgid "Straw Incorporated Shortly (<30 Days) Before Cultivation"
+#~ msgstr "Солома, внесённая за долго до посева (<30 дней)"
+
+#~ msgid "Non-Degraded"
+#~ msgstr "Не деградированный"
+
+#~ msgid "High Intensity Grazing"
+#~ msgstr "Высокоинтенсивный выпас"
+
+#~ msgid "Severely Degraded"
+#~ msgstr "Сильно деградированные"
+
+#~ msgid "Improved With Medium Inputs"
+#~ msgstr "Улучшено с использованием средних затрат"
+
+#~ msgid "Improved Grassland"
+#~ msgstr "Улучшенные пастбища"
+
+#~ msgid "Improved With High Inputs"
+#~ msgstr "Улучшено с использованием высоких затрат"
+
+#~ msgid "Dairy Cattle"
+#~ msgstr "дойная корова"
+
+#~ msgid "Other Cattle"
+#~ msgstr "Другие крупный рогатый скот"
+
+#~ msgid "Camels"
+#~ msgstr "Верблюды"
+
+#~ msgid "Horses"
+#~ msgstr "Лошади"
+
+#~ msgid "Mules And Asses"
+#~ msgstr "Mules And Asses"
+
+#~ msgid "Other Buffalo"
+#~ msgstr "Другие буйволы"
+
+#~ msgid "Dairy Buffalo"
+#~ msgstr "дойная буйвола"
+
+#~ msgid "Dairy Sheep"
+#~ msgstr "дойная овца"
+
+#~ msgid "Other Sheep"
+#~ msgstr "Другие виды овец"
+
+#~ msgid "Growing Swine"
+#~ msgstr "Разведение свиней"
+
+#~ msgid "Breeding Swine"
+#~ msgstr "Разведение свиней"
+
+#~ msgid "Goats"
+#~ msgstr "Козы"
+
+#~ msgid "Deer"
+#~ msgstr "Олень"
+
+#~ msgid "Ostrich"
+#~ msgstr "Страус"
+
+#~ msgid "Chicken Layer"
+#~ msgstr "Курица несушка"
+
+#~ msgid "Chicken Broiler"
+#~ msgstr "Цыпленок-бройлер"
+
+#~ msgid "Llamas And Alpacas"
+#~ msgstr "Ламы и альпаки"
+
+#~ msgid "High-Productivity"
+#~ msgstr "Высокая производительность"
+
+#~ msgid "Low-Productivity"
+#~ msgstr "Низкая продуктивность"
+
+#~ msgid "Pasture/Range/Paddock"
+#~ msgstr "Пастбище/Выпас/Паддок"
+
+#~ msgid "Daily Spread"
+#~ msgstr "Ежедневное распределение"
+
+#~ msgid "Digester"
+#~ msgstr "Дигестер"
+
+#~ msgid "Burned For Fuel"
+#~ msgstr "Сожжённый в качестве топлива"
+
+#~ msgid "Pit<1Month"
+#~ msgstr "Яма <1 месяц"
+
+#~ msgid "Pit>1Month"
+#~ msgstr "Яма >1 месяц"
+
+#~ msgid "Poultry Manure"
+#~ msgstr "Птичий навоз"
+
+#~ msgid "Deep Bedding"
+#~ msgstr "Глубокая подстилка"
+
+#~ msgid "Composting"
+#~ msgstr "Компостирование"
+
+#~ msgid "Aerobic Treatment"
+#~ msgstr "Аэробная обработка"
+
+#~ msgid "Lagoon"
+#~ msgstr "Лагуна"
+
+#~ msgid "Liquid/Slurry"
+#~ msgstr "Жидкость/Жижа"
+
+#~ msgid "Solid Storage"
+#~ msgstr "Твёрдое хранение"
+
+#~ msgid "Dry Lot"
+#~ msgstr "Сухой загон"
+
+#~ msgid "Other (Pls. Go Tier 2)"
+#~ msgstr "Прочее (уровень 2/Tier 2)"
+
+#~ msgid "Other (pls. Go Tier 2)"
+#~ msgstr "Прочее (пожалуйста, перейдите ко второму уровню)"
+
+#~ msgid "Forest Management"
+#~ msgstr "Управление лесным хозяйством"
+
+#~ msgid "Road"
+#~ msgstr "Дорога"
+
+#~ msgid "Energy"
+#~ msgstr "Энергия"
+
+#~ msgid "Irrigation"
+#~ msgstr "Орошение"
+
+#~ msgid "Operation Phase of Irrigation"
+#~ msgstr "Фаза эксплуатации ирригации"
+
+#~ msgid "OtherLandUse"
+#~ msgstr "Прочее использование земли"
+
+#~ msgid "Flooded Rice Minor Season"
+#~ msgstr "Малый сезон затопленного риса"
+
+#~ msgid "Perennial Cropland Minor Season"
+#~ msgstr "Многолетние сельскохозяйственные угодья, не основной сезон"
+
+#~ msgid "Annual Cropland Minor Season"
+#~ msgstr "Однолетние посевы вторичного сезона"
+
+#~ msgid "Livestock"
+#~ msgstr "Домашний скот"
+
+#~ msgid "Small Fishery"
+#~ msgstr "Небольшое рыболовство"
+
+#~ msgid "Large Fishery"
+#~ msgstr "Крупное рыболовное хозяйство"
+
+#~ msgid "Aquaculture"
+#~ msgstr "Аквакультура"
+
+#~ msgid "Coastal Wetland"
+#~ msgstr "Прибрежное водно-болотное угодье"
+
+#~ msgid "Other Infrastructure"
+#~ msgstr "Прочая инфраструктура"
+
+#~ msgid "Fuel"
+#~ msgstr "Топливо"
+
+#~ msgid "Input"
+#~ msgstr "входные ресурсы"
+
+#~ msgid "Input Entry"
+#~ msgstr "Input Entry"
+
+#~ msgid "Forest Disturbance"
+#~ msgstr "Нарушение лесного покрова"
+
+#~ msgid "Wildfire Undrained Peat"
+#~ msgstr " Торф, не высушенный лесным пожаром"
+
+#~ msgid "Wildfire Drained Peat"
+#~ msgstr "Торф, высушенный лесным пожаром"
+
+#~ msgid "Prescribed Fire (E.G. Land Mgnt)"
+#~ msgstr "Предписанный огонь (например, управление земельными ресурсами)"
+
+#~ msgid "Nutrient Rich"
+#~ msgstr "Богат питательными веществами"
+
+#~ msgid "Nutrient Poor"
+#~ msgstr "Бедный питательными веществами"
+
+#~ msgid "Freshwater Pond"
+#~ msgstr "Пресноводный пруд"
+
+#~ msgid "Brackishwater Pond"
+#~ msgstr "Солоноватый пруд"
+
+#~ msgid "Canals & Ditches"
+#~ msgstr "Каналы, Канавы"
+
+#~ msgid "Saline Pond"
+#~ msgstr "Солёный пруд"
+
+#~ msgid "Oligotrophic"
+#~ msgstr "Олиготрофный"
+
+#~ msgid "Mesotrophic"
+#~ msgstr "Мезоэутрофный"
+
+#~ msgid "Hypereutrophic"
+#~ msgstr "Гиперэвтрофный"
+
+#~ msgid "Marine"
+#~ msgstr "Морской"
+
+#~ msgid "Inland"
+#~ msgstr "Внутренний"
+
+#~ msgid "Unmotorized Fishing"
+#~ msgstr "Ручное рыболовство"
+
+#~ msgid "Dredges"
+#~ msgstr "Драги"
+
+#~ msgid "Other Or Mixed"
+#~ msgstr "Прочее или смешанное"
+
+#~ msgid "Mobile Seine"
+#~ msgstr "Мобильный сачок"
+
+#~ msgid "Not Specified"
+#~ msgstr "Не указан"
+
+#~ msgid "Bottom Trawls"
+#~ msgstr "Донные тралы"
+
+#~ msgid "Gillnets And Entangling Nets"
+#~ msgstr "Ловчие и запутывающие сети"
+
+#~ msgid "Hooks And Lines"
+#~ msgstr "Крючки и лески"
+
+#~ msgid "Midwater Trawls"
+#~ msgstr "Травы средней воды"
+
+#~ msgid "Traps And Lift Nets"
+#~ msgstr "Ловушки и подъёмные сети"
+
+#~ msgid "Surrounding Nets"
+#~ msgstr "Окружающие сети"
+
+#~ msgid "Trawls"
+#~ msgstr "Травли"
+
+#~ msgid "Multiple"
+#~ msgstr "Multiple"
+
+#~ msgid "Pots And Traps"
+#~ msgstr "Ловушки и кошели"
+
+#, fuzzy
+#~ msgid "Abalones, Winkles And Conchs"
+#~ msgstr "Морские ушки, улитки и ракушки"
+
+#~ msgid "Clams, Cockles And Arkshells"
+#~ msgstr "Моллюски, Моллюски семейства сердцевидок и Арковидные моллюски"
+
+#~ msgid "Cods, Hakes And Haddocks"
+#~ msgstr "Треска, Пикша, Морской окунь "
+
+#~ msgid "Flounders, Halibuts And Soles"
+#~ msgstr "Камбалы, палтусы и Солевая рыба"
+
+#~ msgid "Herrings, Sardines And Anchovies"
+#~ msgstr "Сельдь, сардины и анчоусы"
+
+#~ msgid "Jacks, Mullets And Sauries"
+#~ msgstr "Джековые рыбы, Кефаль и Сайра"
+
+#~ msgid "Krill And Plankton"
+#~ msgstr "Криль и планктон"
+
+#~ msgid "Mackerels, Snoeks And Cutlassfish"
+#~ msgstr "Скумбрия, зубатки и рыбы-сабли"
+
+#~ msgid "Miscellaneous Marine Crustaceans"
+#~ msgstr "Разнообразные морские ракообразные"
+
+#~ msgid "Miscellaneous Marine Fishes"
+#~ msgstr "Разнообразные морские рыбы"
+
+#~ msgid "Miscellaneous Marine Molluscs"
+#~ msgstr "Разнообразные морские моллюски"
+
+#~ msgid "Mussels"
+#~ msgstr "Mussels"
+
+#~ msgid "Redfish, Basses And Congers"
+#~ msgstr "Красная рыба, окуни и угри"
+
+#~ msgid "Salmons, Trots And Smelts"
+#~ msgstr "Лососи, форели и смельты"
+
+#~ msgid "Scallops And Pectens"
+#~ msgstr "Гребешки и пектены"
+
+#~ msgid "Shads"
+#~ msgstr "Пузанковые сельди"
+
+#~ msgid "Sharks And Rays"
+#~ msgstr "Акулы и скаты"
+
+#~ msgid "Shrimps And Prawns"
+#~ msgstr "Креветки и раки"
+
+#~ msgid "Squat Lobsters"
+#~ msgstr "Карликовые омары"
+
+#~ msgid "Squids, Cuttlefish And Octopuses"
+#~ msgstr "Кальмары, каракатицы и осьминоги"
+
+#~ msgid "Tunas, Bonitos And Billfishes"
+#~ msgstr "Тунцы, бонито и рыбы-марлины"
+
+#~ msgid "Lobsters And Spiny-rock Lobsters"
+#~ msgstr "Омары и лангусты"
+
+#~ msgid "Sea-spiders And Crabs"
+#~ msgstr "Морские пауки и крабы"
+
+#~ msgid "Solid (tdm)"
+#~ msgstr "Твёрдый (тонн сухого вещества)"
+
+#~ msgid "Liquid or gaseous (m3)"
+#~ msgstr "Жидкость или газ (м3)"
+
+#~ msgid "Stationary"
+#~ msgstr "Стационарный"
+
+#~ msgid "Mobile"
+#~ msgstr "Мобильный"
+
+#~ msgid "Off-Road"
+#~ msgstr "бездорожный"
+
+#~ msgid "Ethanol (Cars)"
+#~ msgstr "Этанол (Автомобили)"
+
+#~ msgid "Ethanol (Trucks)"
+#~ msgstr "Этанол (Грузовики)"
+
+#~ msgid "Diesel"
+#~ msgstr "Дизель"
+
+#~ msgid "Gasoline (2-Stroke)"
+#~ msgstr "Бензин (для двухтактных двигателей)"
+
+#~ msgid "Gasoline (4-Stroke)"
+#~ msgstr "Бензин (для четырехтактных двигателей)"
+
+#~ msgid "Wood"
+#~ msgstr "Древесина"
+
+#~ msgid "Peat"
+#~ msgstr "Торф"
+
+#~ msgid "Charcoal"
+#~ msgstr "Уголь"
+
+#~ msgid "Motor Gasoline"
+#~ msgstr "Motor Gasoline"
+
+#~ msgid "Gasoil /Diesel Oil"
+#~ msgstr "Газообразное/Дизельное топливо"
+
+#~ msgid "Waste Oil / Lubrificants"
+#~ msgstr "Отработанное масло/Смазочные жидкости"
+
+#~ msgid "Lpg"
+#~ msgstr "сжиженный газ"
+
+#~ msgid "Natural Gas"
+#~ msgstr "Природный газ"
+
+#~ msgid "Solar"
+#~ msgstr "Солнечный"
+
+#~ msgid "Cereals"
+#~ msgstr "Злаки"
+
+#~ msgid "Pulses"
+#~ msgstr "Бобовые культуры"
+
+#~ msgid "Roots And Tubers"
+#~ msgstr "Корни и клубни"
+
+#~ msgid "Beans"
+#~ msgstr "Бобы"
+
+#~ msgid "Agroforestry - default"
+#~ msgstr "Агролесоводство - по умолчанию"
+
+#~ msgid "Alley cropping"
+#~ msgstr "Полосное агролесоводство"
+
+#~ msgid "Oil palm"
+#~ msgstr "Масличная пальма"
+
+#~ msgid "Perennial fallow"
+#~ msgstr "Многолетний залеж"
+
+#~ msgid "Shaded perennial"
+#~ msgstr "Тенистое многолетнее растение"
+
+#~ msgid "Fire"
+#~ msgstr "Огонь"
+
+#~ msgid "Insects"
+#~ msgstr "Насекомые"
+
+#~ msgid "Lime Application"
+#~ msgstr "Применение извести"
+
+#~ msgid "Synthetic Fertilizers"
+#~ msgstr "Синтетические удобрения"
+
+#~ msgid "N-Fertilizers On Irrigated Rice"
+#~ msgstr "Азотные удобрения на орошаемом рисе"
+
+#~ msgid "Organic N-Fertilizers"
+#~ msgstr "Органические азотные удобрения"
+
+#~ msgid "Pesticides"
+#~ msgstr "Пестициды"
+
+#~ msgid "Animal Feed"
+#~ msgstr "Корм для животных"
+
+#~ msgid "Limestone"
+#~ msgstr "Известняк"
+
+#~ msgid "Dolomite"
+#~ msgstr "Доломит"
+
+#~ msgid "Urea"
+#~ msgstr "Kарбамид"
+
+#~ msgid "Synthetic N-Fertilizers Other Than Urea"
+#~ msgstr "Синтетические азотные удобрения, кроме карбамидa"
+
+#~ msgid "Sewage"
+#~ msgstr "Канализация"
+
+#~ msgid "Rendering Waste, Brewery Waste, Guano"
+#~ msgstr "Отходы переработки, отходы пивоварни, гуано"
+
+#~ msgid "Potassium"
+#~ msgstr "Калий"
+
+#~ msgid "Fungicides"
+#~ msgstr "Фунгициды"
+
+#~ msgid "Herbicides"
+#~ msgstr "Гербициды"
+
+#~ msgid "Insecticides"
+#~ msgstr "Инсектициды"
+
+#~ msgid "N-Fertilizers In Continuously Irrigated Rice"
+#~ msgstr "Азотные удобрения в постоянно орошаемом рисе"
+
+#~ msgid "N-Fertilizers In Wet And Dry Irrigated Rice"
+#~ msgstr ""
+#~ "Азотные удобрения в орошаемом рисе в условиях влажного и сухого полива"
+
+#~ msgid "Phosphorous"
+#~ msgstr "Фосфор"
+
+#~ msgid "User Defined Animal Feed (tier 2)"
+#~ msgstr "Кормление животных, определяемое пользователем (Уровень 2/Tier 2)"
+
+#~ msgid "User Defined Input (tier 2)"
+#~ msgstr "Пользовательский ввод (уровень 2/Tier 2)"
+
+#~ msgid "Surface Without IRRS"
+#~ msgstr "Поверхностное орошение без системы возврата оросительного стока"
+
+#~ msgid "Surface With IRRS"
+#~ msgstr "Поверхностное орошение с системой возврата оросительного стока"
+
+#~ msgid "Solid Set Sprinkler"
+#~ msgstr "Твёрдое орошение"
+
+#~ msgid "Permanent Sprinkler"
+#~ msgstr "Постоянный орошатель"
+
+#~ msgid "Hand Moved Sprinkler"
+#~ msgstr "Ручной передвижной спринклер"
+
+#~ msgid "Solid Roll Sprinkler"
+#~ msgstr "Твёрдый вращающийся орошатель"
+
+#~ msgid "Center-Pivot Sprinkler"
+#~ msgstr "Центробежное орошение"
+
+#~ msgid "Traveler Sprinkler"
+#~ msgstr "Перемещающийся орошатель"
+
+#~ msgid "Trickle"
+#~ msgstr "Капельное орошение"
+
+#~ msgid "Micro Sprinkler"
+#~ msgstr "Микроорашиватель"
+
+#~ msgid "Sprinkler"
+#~ msgstr "Орошатель"
+
+#~ msgid "Housing (Concrete)"
+#~ msgstr "Жилье (Бетон)"
+
+#~ msgid "Agricultural Buildings (Concrete)"
+#~ msgstr "Сельскохозяйственные постройки (бетон)"
+
+#~ msgid "Agricultural Buildings (Metal)"
+#~ msgstr "Сельскохозяйственные постройки (металл)"
+
+#~ msgid "Industrial Buildings (Concrete)"
+#~ msgstr "Промышленные здания (бетон)"
+
+#~ msgid "Industrial Buildings (Metal)"
+#~ msgstr "Промышленные здания (металл)"
+
+#~ msgid "Garage (Concrete)"
+#~ msgstr "Гараж (Бетон)"
+
+#~ msgid "Garage (Metal)"
+#~ msgstr "Гараж (Металлический)"
+
+#~ msgid "Offices (Concrete)"
+#~ msgstr "Офисы (бетонные)"
+
+#~ msgid "Offices (Metal)"
+#~ msgstr "Офисы (металлические)"
+
+#~ msgid "Food Sales (Retail Or Wholesale)"
+#~ msgstr "Продажа продуктов питания (розничная или оптовая)"
+
+#~ msgid "Food Service (Restaurants)"
+#~ msgstr "Общественное питание (рестораны)"
+
+#~ msgid "Warehouse And Storage"
+#~ msgstr "Склад и хранение"
+
+#~ msgid "Health Care (Metal)"
+#~ msgstr "Здравоохранение (Металл)"
+
+#~ msgid "Road (Bitumen)"
+#~ msgstr "Дорога (Битум)"
+
+#~ msgid "Road (Asphalt)"
+#~ msgstr "Дорога (Асфальт)"
+
+#~ msgid "Road (Reinforced Concrete)"
+#~ msgstr "Дорога (Армированный бетон)"
+
+#~ msgid "Road Rehabilitated (Pavement)"
+#~ msgstr "Реконструкция дорог (Покрытие)"
+
+#~ msgid "Cool Temperate"
+#~ msgstr "Прохладный умеренный климат"
+
+#~ msgid "Warm Temperate"
+#~ msgstr "Тёплый умеренный"
+
+#~ msgid "Tropical"
+#~ msgstr "Тропический"
+
+#~ msgid "Boreal"
+#~ msgstr "Бореальный"
+
+#~ msgid "Tropical Montane"
+#~ msgstr "Тропическая горная местность"
+
+#~ msgid "Dry"
+#~ msgstr "Сухой"
+
+#~ msgid "Wet"
+#~ msgstr "Влажный"
+
+#~ msgid "Temperate"
+#~ msgstr "Умеренный"
+
+#~ msgid "Eastern Africa"
+#~ msgstr "Восточная Африка"
+
+#~ msgid "Central Africa"
+#~ msgstr "Центральная Африка"
+
+#~ msgid "Northern Africa"
+#~ msgstr "Северная Африка"
+
+#~ msgid "Southern Africa"
+#~ msgstr "Южная Африка"
+
+#~ msgid "Western Africa"
+#~ msgstr "Западная Африка"
+
+#~ msgid "Central Asia"
+#~ msgstr "Центральная Азия"
+
+#~ msgid "Eastern Asia"
+#~ msgstr "Восточная Азия"
+
+#~ msgid "South-Eastern Asia"
+#~ msgstr "Юго-восточная Азия"
+
+#~ msgid "Southern Asia"
+#~ msgstr "Южная Азия"
+
+#~ msgid "Western Asia"
+#~ msgstr "Западная Азия"
+
+#~ msgid "Europe"
+#~ msgstr "Европа"
+
+#~ msgid "Oceania"
+#~ msgstr "Океания"
+
+#~ msgid "North America"
+#~ msgstr "Северная Америка"
+
+#~ msgid "South America"
+#~ msgstr "Южная Америка"
+
+#~ msgid "Central America"
+#~ msgstr "Центральная Америка"
+
+#~ msgid "Caribbean"
+#~ msgstr "Карибский"
+
+#~ msgid "Western Europe"
+#~ msgstr "Западная Европа"
+
+#~ msgid "Eastern Europe"
+#~ msgstr "Восточная Европа"
+
+#~ msgid "IPCC Fifth Assessment Report (AR5) with Climate Change Feedback"
+#~ msgstr ""
+#~ "Пятый оценочный отчет МГЭИК (ОД5) с учетом обратной связи изменения "
+#~ "климата"
+
+#~ msgid "IPCC Fifth Assessment Report (AR5) without Climate Change Feedback"
+#~ msgstr ""
+#~ "Пятый оценочный отчет МГЭИК (ОД5) без учета обратной связи изменения "
+#~ "климата"
+
+#~ msgid "IPCC Sixth Assessment Report (AR6)"
+#~ msgstr "Шестой оценочный отчет МГЭИК (ОД6)"
+
+#~ msgid "IPCC Fourth Assessment Report (AR4)"
+#~ msgstr "Четвертый оценочный отчет МГЭИК (ОД4)"
+
+#~ msgid "IPCC Second Assessment Report (SAR)"
+#~ msgstr "Второй оценочный отчет МГЭИК (SAR)"
+
+#~ msgid "Non Flooded Pre-Season <180 D"
+#~ msgstr "Не затопленные до сезона, менее 180 дней"
+
+#~ msgid "Non Flooded Pre-Season >180 D"
+#~ msgstr "Не затопленные до сезона, более 180 дней"
+
+#~ msgid "Flooded Pre-Season > 30 D"
+#~ msgstr "Затопленный предсезонный период > 30 дней"
+
+#~ msgid "Rainfed, Wet Season (Regular Rainfed)"
+#~ msgstr "Дождевое орошение, влажный сезон (регулярное дождевое орошение)"
+
+#~ msgid "Rainfed, Dry Season (Drought Prone)"
+#~ msgstr "Дождевое орошение, сухой сезон (подвержено засухе)"
+
+#~ msgid "Rainfed, Deep Water"
+#~ msgstr "Дождевое орошение, глубокие воды"

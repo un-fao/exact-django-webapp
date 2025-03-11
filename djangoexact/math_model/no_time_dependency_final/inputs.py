@@ -3,7 +3,7 @@ import traceback
 import numpy as np
 from .generalized_modules import BaseModule
 
-from .general_functions import input_single_calculation, compute_yearly_or_half_year_cumulative, breakdown_proportionally_to_values
+from .general_functions import input_single_calculation, compute_yearly_or_half_year_cumulative, breakdown_proportionally_to_values, compute_yearly_delta
 from .ghg_emissions_classes import (
     ActivityTypes,
     Emission,
@@ -157,7 +157,7 @@ class Roads(BaseModule):
             ef = self.ef_tier_2 or self.ef_ipcc
 
             self.total_emissions = self.units_end * ef / 1000  # to convert the ef from kg to g
-            yearly_units = compute_yearly_or_half_year_cumulative(0, self.units_end, self.implementation_time, self.capitalization_time, self.rate_type)
+            yearly_units = compute_yearly_delta(0, self.units_end, self.implementation_time, self.capitalization_time, self.rate_type)
             self.emissions_total_yearly = breakdown_proportionally_to_values(self.total_emissions, yearly_units)
 
             roads_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_total_yearly], ActivityTypes.ROADS, delay=self.delay)
@@ -261,12 +261,13 @@ class NewIrrigation(BaseModule):
             ef = self.ef_tier_2 or self.ef_ref
 
             self.total_emissions = ef * (self.units_end - self.units_start) / 1000  # to convert the ef from kg to g
-            yearly_units = compute_yearly_or_half_year_cumulative(self.units_start, self.units_end, self.implementation_time, self.capitalization_time, self.rate_type)
-            emissions_total_yearly = breakdown_proportionally_to_values(self.total_emissions, yearly_units)
+            yearly_units = compute_yearly_delta(self.units_start, self.units_end, self.implementation_time, self.capitalization_time, self.rate_type)
+            self.emissions_total_yearly = breakdown_proportionally_to_values(self.total_emissions, yearly_units)
 
-            new_irrigation_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_total_yearly], ActivityTypes.NEW_IRRIGATION, delay=self.delay)
+            new_irrigation_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in self.emissions_total_yearly], ActivityTypes.NEW_IRRIGATION, delay=self.delay)
             self.result.yearly_emissions_by_sector_by_gas.append(new_irrigation_emission_set)
 
         except Exception as e:
             traceback.print_exc()
             raise e
+

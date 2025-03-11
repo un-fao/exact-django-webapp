@@ -362,15 +362,15 @@ class ReadProjectSerializer(serializers.ModelSerializer):
     def get_total_catch(self, obj):
         small_fisheries = SmallFishery.objects.filter(activity__project=obj).all()
         large_fisheries = LargeFishery.objects.filter(activity__project=obj).all()
+        aquacultures = Aquaculture.objects.filter(activity__project=obj).all()
 
-        all_catch_start = sum([f.total_catch_yr_start for f in list(filter(lambda fishery: fishery.total_catch_yr_start is not None, small_fisheries))]) + sum([f.total_catch_yr_start for f in list(filter(lambda fishery: fishery.total_catch_yr_start is not None, large_fisheries))])
-        all_catch_w = sum([f.total_catch_yr_w for f in list(filter(lambda fishery: fishery.total_catch_yr_w is not None, small_fisheries))]) + sum([f.total_catch_yr_w for f in list(filter(lambda fishery: fishery.total_catch_yr_w is not None, large_fisheries))])
-        all_catch_wo = sum([f.total_catch_yr_wo for f in list(filter(lambda fishery: fishery.total_catch_yr_wo is not None, small_fisheries))]) + sum([f.total_catch_yr_wo for f in list(filter(lambda fishery: fishery.total_catch_yr_wo is not None, large_fisheries))])
+        def safe_sum(items, attr):
+            return sum(getattr(item, attr) or 0 for item in items)
 
         scenario_based_catch = {
-            "start": all_catch_start,
-            "w": all_catch_w,
-            "wo": all_catch_wo,
+            "start": safe_sum(small_fisheries, "total_catch_yr_start") + safe_sum(large_fisheries, "total_catch_yr_start") + safe_sum(aquacultures, "annual_production_start"),
+            "w": safe_sum(small_fisheries, "total_catch_yr_w") + safe_sum(large_fisheries, "total_catch_yr_w") + safe_sum(aquacultures, "annual_production_w"),
+            "wo": safe_sum(small_fisheries, "total_catch_yr_wo") + safe_sum(large_fisheries, "total_catch_yr_wo") + safe_sum(aquacultures, "annual_production_wo"),
         }
 
         return scenario_based_catch
@@ -619,6 +619,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
     soil_type_t2 = serializers.PrimaryKeyRelatedField(queryset=SoilType.objects.all(), required=False, allow_null=True)
     duration_t2 = serializers.IntegerField(required=False, allow_null=True)
     start_year_t2 = serializers.IntegerField(required=False, allow_null=True)
+    last_year_of_accounting_t2 = serializers.IntegerField(required=False, allow_null=True)
     land_use_change = LandUseChangeBuilderSerializer(many=False, required=False, allow_null=True)
     module_types = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
     area = serializers.FloatField(required=False, min_value=0)
@@ -674,6 +675,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
             duration_t2=self.validated_data.get("duration_t2", None),
             soil_type_t2=self.validated_data.get("soil_type_t2", None),
             start_year_t2=self.validated_data.get("start_year_t2", None),
+            last_year_of_accounting_t2=self.validated_data.get("last_year_of_accounting_t2", None),
             owner=self.context["request"].user,
         )
 
@@ -821,7 +823,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
         if self.instance:
             old_module_types = list(map(lambda module: module, self.instance.module_types.all()))
             new_module_types = list(map(lambda module: module, self.validated_data["module_types"]))
-            create_organic_soil = create_organic_soil and not "OrganicSoil" in [module.class_name for module in old_module_types]
+            create_organic_soil = create_organic_soil and "OrganicSoil" not in [module.class_name for module in old_module_types]
 
             luc: LandUseChange = self.instance.landusechange.first()
             if luc and has_luc_module:
@@ -2495,9 +2497,9 @@ class ForestManagementWriteSerializer(LandModuleSeralizer):
                 errors.append(f"If a forest has degradation it cannot have rotation, logging, or disturbances in the {verbose_scenario_name} scenario")
 
         if instance and instance.disturbances.count() > 0:
-            pc_biomass_destruction_start = data.get("logging_percentage_agb_logged_start", 0)
-            pc_biomass_destruction_wo = data.get("logging_percentage_agb_logged_wo", 0)
-            pc_biomass_destruction_w = data.get("logging_percentage_agb_logged_w", 0)
+            pc_biomass_destruction_start = data.get("logging_percentage_agb_logged_start", 0) or 0
+            pc_biomass_destruction_wo = data.get("logging_percentage_agb_logged_wo", 0) or 0
+            pc_biomass_destruction_w = data.get("logging_percentage_agb_logged_w", 0) or 0
 
             for disturbance in instance.disturbances.all():
                 disturbance: ForestDisturbance
@@ -3358,7 +3360,7 @@ class ProjectFileUploadSerializer(serializers.ModelSerializer):
         if file.size > max_size_in_mb * 1024 * 1024:
             raise serializers.ValidationError(f"File size must be less than {max_size_in_mb}MB")
 
-        attrs["file"].name = utils.get_unique_name(file.name)
+        attrs["file"].name = utils.get_unique_name(attrs["project"], file.name)
 
         return super().validate(attrs)
 
