@@ -823,7 +823,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
         if self.instance:
             old_module_types = list(map(lambda module: module, self.instance.module_types.all()))
             new_module_types = list(map(lambda module: module, self.validated_data["module_types"]))
-            create_organic_soil = create_organic_soil and not "OrganicSoil" in [module.class_name for module in old_module_types]
+            create_organic_soil = create_organic_soil and "OrganicSoil" not in [module.class_name for module in old_module_types]
 
             luc: LandUseChange = self.instance.landusechange.first()
             if luc and has_luc_module:
