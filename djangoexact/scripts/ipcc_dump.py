@@ -4689,7 +4689,7 @@ def run():
         # find_all_stroke_fuel_types_and_put_stroke_lowercase()
         # add_or_replace_application_parameters()
         # delete_and_import_irrigation_phase_data()
-        import_shadow_prices_of_carbon()
+        # import_shadow_prices_of_carbon()
         pass
 
     if app_mode == "development":
