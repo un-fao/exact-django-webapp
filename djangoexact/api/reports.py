@@ -1708,7 +1708,7 @@ class FloodedRiceReport(LandModuleReport):
 
         if self.module.is_start():
             self.metadata_worksheet.cell(row=last_metadata_row + 2, column=2, value=self.module.area)
-            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=2, value=self.calculator.efc_default.cultivation_period)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=2, value=self.calculator.efc_default.cultivation_period if self.module.cultivation_period_t2_start is None else self.module.cultivation_period_t2_start)
             self.metadata_worksheet.cell(row=last_metadata_row + 4, column=2, value=self.module.water_management_type_before_cultivation_start.name)
             self.metadata_worksheet.cell(row=last_metadata_row + 5, column=2, value=self.module.water_management_type_after_cultivation_start.name)
             self.metadata_worksheet.cell(row=last_metadata_row + 6, column=2, value=self.module.organic_amendment_type_start.name)
@@ -1716,7 +1716,7 @@ class FloodedRiceReport(LandModuleReport):
 
         if self.module.is_with():
             self.metadata_worksheet.cell(row=last_metadata_row + 2, column=3, value=self.module.area)
-            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=3, value=self.calculator.efc_default.cultivation_period)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=3, value=self.calculator.efc_default.cultivation_period if self.module.cultivation_period_t2_w is None else self.module.cultivation_period_t2_w)
             self.metadata_worksheet.cell(row=last_metadata_row + 4, column=3, value=self.module.water_management_type_before_cultivation_w.name)
             self.metadata_worksheet.cell(row=last_metadata_row + 5, column=3, value=self.module.water_management_type_after_cultivation_w.name)
             self.metadata_worksheet.cell(row=last_metadata_row + 6, column=3, value=self.module.organic_amendment_type_w.name)
@@ -1724,7 +1724,7 @@ class FloodedRiceReport(LandModuleReport):
 
         if self.module.is_without():
             self.metadata_worksheet.cell(row=last_metadata_row + 2, column=4, value=self.module.area)
-            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=4, value=self.calculator.efc_default.cultivation_period)
+            self.metadata_worksheet.cell(row=last_metadata_row + 3, column=4, value=self.calculator.efc_default.cultivation_period if self.module.cultivation_period_t2_wo is None else self.module.cultivation_period_t2_wo)
             self.metadata_worksheet.cell(row=last_metadata_row + 4, column=4, value=self.module.water_management_type_before_cultivation_wo.name)
             self.metadata_worksheet.cell(row=last_metadata_row + 5, column=4, value=self.module.water_management_type_after_cultivation_wo.name)
             self.metadata_worksheet.cell(row=last_metadata_row + 6, column=4, value=self.module.organic_amendment_type_wo.name)
@@ -1765,6 +1765,8 @@ class FloodedRiceReport(LandModuleReport):
         # self.metadata_worksheet.cell(row=last_metadata_row + 6, column=6, value=self.module.organic_amendment_type_thread.format_comments()) # TODO: Add?
         self.metadata_worksheet.cell(row=last_metadata_row + 7, column=6, value=self.module.crop_yield_t2_thread.format_comments())
 
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
     def build_report(self):
         super().build_report()
 
@@ -1780,9 +1782,9 @@ class FloodedRiceReport(LandModuleReport):
         for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
             self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.rice_cultivation_ch4[i])
 
-        self.populate_metadata()
-
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+        self.populate_metadata()
 
 
 @dataclass
