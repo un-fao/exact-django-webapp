@@ -4663,6 +4663,16 @@ def import_shadow_prices_of_carbon():
     ShadowPriceOfCarbon.objects.bulk_create(shadow_prices)
 
 
+def add_0_2_to_co2_value_in_input_emission_factor():
+    # NOTE: 11/03/2025 / Was changed from 0.2 to 0.12 but Lorenzo asked to change it back to 0.2
+    """
+    Add 0,2 to co2_value in InputEmissionFactor if input_type__name="Urea"
+    """
+    print("Adding 0.2 to co2_value in InputEmissionFactor where input_type__name='Urea'")
+    urea = InputType.objects.get(name_en="Urea")
+    input_emission_factor = InputEmissionFactor.objects.filter(input_type=urea).update(co2_value=0.2)
+
+
 def run():
     import os
 
@@ -4679,6 +4689,7 @@ def run():
         delete_and_import_irrigation_phase_data()
         add_pit_gt_1_month_to_livestock_awms_where_manure_management_type_is_null()
         import_shadow_prices_of_carbon()
+        add_0_2_to_co2_value_in_input_emission_factor()
         pass
 
     if app_mode == "review":
@@ -4690,11 +4701,13 @@ def run():
         # add_or_replace_application_parameters()
         # delete_and_import_irrigation_phase_data()
         # import_shadow_prices_of_carbon()
+        # add_0_2_to_co2_value_in_input_emission_factor()
         pass
 
     if app_mode == "development":
         # TODO: Run in development
         add_pit_gt_1_month_to_livestock_awms_where_manure_management_type_is_null()
+        add_0_2_to_co2_value_in_input_emission_factor()
         pass
 
     if app_mode == "test":
