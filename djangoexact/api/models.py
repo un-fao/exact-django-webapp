@@ -5,6 +5,7 @@ from django.contrib.auth import models as auth_models
 from django.core import exceptions, validators
 from django.db import models as models
 from django.utils import timezone
+from datetime import timedelta
 from simple_history.models import HistoricalRecords
 import logging as log
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
@@ -136,6 +137,23 @@ class ConfigParam(models.Model):
 class CommentThread(models.Model):
     def __str__(self):
         return f"({self.pk})"
+
+    def format_comments(self):
+        if not self.pk or not self.comments.exists():
+            return None
+
+        # Get all comments from thread, ordered by date
+        comments = self.comments.all().order_by("date_created")
+
+        # Format each comment
+        formatted_comments = []
+        for comment in comments:
+            date_str = comment.date_created.strftime("%d/%m/%Y %H:%M")
+            formatted_comment = f"{date_str} - {comment.author.email}: {comment.content}"
+            formatted_comments.append(formatted_comment)
+
+        # Join all comments with newlines
+        return "\n".join(formatted_comments)
 
 
 class Comment(models.Model):
@@ -494,11 +512,13 @@ class FuelUseType(models.Model):
     def __str__(self):
         return self.name
 
+
 class Unit(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
+
 
 class FuelType(models.Model):
     name = models.CharField(max_length=100)
@@ -511,7 +531,7 @@ class FuelType(models.Model):
         unique_together = ("name", "fuel_use_type", "macro_fuel_type")
 
     def __str__(self):
-        return f"{self.name} ({self.fuel_use_type})"
+        return f"{self.name} - {self.fuel_use_type}"
 
 
 class SalinityType(models.Model):
@@ -583,6 +603,8 @@ class Project(Historical, DirtyFieldsMixin):
 
     is_archived = models.BooleanField(default=False, verbose_name=_("is_archived"))
 
+    map_data = models.JSONField(null=True, blank=True, verbose_name=_("map_data"))
+
     @property
     def capitalization_years(self) -> int:
         return self.__get_capitalization_years()
@@ -635,6 +657,17 @@ class Project(Historical, DirtyFieldsMixin):
         self.locked_by = None
         self.save()
 
+    def _check_lock_expiration(self):
+        """
+        Checks if the project lock has expired and unlocks the project if it has been locked for more than 30 minutes.
+        """
+
+        lock_expiration_time_minutes = ApplicationParameter.objects.get(name="project_lock_expiration_time_minutes").value
+
+        has_more_than_thirty_minutes_passed = self.lock_updated_at is not None and timezone.now() - self.lock_updated_at > timedelta(minutes=lock_expiration_time_minutes)
+        if self.is_locked and self.lock_updated_at and has_more_than_thirty_minutes_passed:
+            self.unlock()
+
     def refresh_lock(self):
         self.lock_updated_at = timezone.now()
         self.save()
@@ -672,13 +705,17 @@ class Project(Historical, DirtyFieldsMixin):
 
         return self.gw_potential
 
+
 class ProjectFileAttachment(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="attachments")
     name = models.CharField(max_length=255)
     bucket_public_url = models.URLField()
+    size = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"({self.pk}) {self.project.name} - {self.name}"
+
 
 class ProjectTag(models.Model):
     class Meta:
@@ -701,6 +738,7 @@ class ProjectTag(models.Model):
 class ProjectInvitation(Historical):
     STATUS_CHOICES = (("sent", "Sent"), ("accepted", "Accepted"), ("declined", "Declined"))
 
+    sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="sent_invitations")
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="invitations")
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="invitations")
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
@@ -789,6 +827,7 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
     soil_type_t2 = models.ForeignKey(SoilType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("soil_type_t2"))
     duration_t2 = models.IntegerField(null=True, blank=True, verbose_name=_("duration_t2"))
     start_year_t2 = models.IntegerField(null=True, blank=True, verbose_name=_("start_year_t2"))
+    last_year_of_accounting_t2 = models.IntegerField(null=True, blank=True, verbose_name=_("last_year_of_accounting_t2"))
     soc_t2 = models.FloatField(null=True, blank=True, verbose_name=_("soc_t2"))
 
     created_at = models.DateTimeField(auto_now_add=True, null=True, verbose_name=_("created_at"))
@@ -818,6 +857,30 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
     @property
     def completion_percentage(self):
         return self.__calculate_completion_percentage()
+
+    @property
+    def last_year_of_accounting(self):
+        return self.last_year_of_accounting_t2 or self.project.last_year_of_accounting
+
+    @property
+    def area(self):
+        return self.get_land_modules_area()
+
+    @property
+    def start_year(self):
+        return self.start_year_t2 or self.project.start_year_of_activities
+
+    @property
+    def is_luc(self):
+        return any([issubclass(module.__class__, LandModule) for module in self.modules])
+
+    @property
+    def is_fishery(self):
+        return any([issubclass(module.__class__, Fishery) for module in self.modules])
+
+    @property
+    def is_livestock(self):
+        return any([isinstance(module, Livestock) for module in self.modules])
 
     class Meta:
         unique_together = ("name", "project")
@@ -863,7 +926,7 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
         if any([self.start_year_t2 is None, self.start_year_t2 == 0, self.duration_t2 is None, self.duration_t2 == 0]):
             return self.project.capitalization_years
 
-        return self.project.last_year_of_accounting - (self.start_year_t2 + self.duration_t2)
+        return self.last_year_of_accounting - (self.start_year_t2 + self.duration_t2)
 
     def __get_all_modules(self):
         module_types = self.module_types.all()
@@ -1340,7 +1403,6 @@ class AboveBelowGroundBiomassModule(BiomassModule):
         return self.get_biomass_t2(utils.ScenarioTypes.WITHOUT)
 
     def get_biomass_t2(self, scenario: utils.ScenarioTypes):
-
         if getattr(self, f"agb_t2_{scenario.value}", None) is None and getattr(self, f"bgb_t2_{scenario.value}", None) is None:
             return None
 
@@ -1398,7 +1460,6 @@ class LitterDeadwoodBiomassModule(AboveBelowGroundBiomassModule):
         return self.get_biomass_t2(utils.ScenarioTypes.WITHOUT)
 
     def get_biomass_t2(self, scenario: utils.ScenarioTypes):
-
         if getattr(self, f"litter_t2_{scenario.value}", None) is None and getattr(self, f"deadwood_t2_{scenario.value}", None) is None:
             return None
 
@@ -1582,6 +1643,9 @@ class PerennialCrop(models.Model):
     class Meta:
         abstract = True
 
+    is_system_in_maturity = models.BooleanField(default=True, verbose_name=_("is_system_in_maturity"))  # TODO: Ask Lorenzo if default should be True or False
+    is_complete_renewal = models.BooleanField(default=False, verbose_name=_("is_complete_renewal"))
+
     tillage_management_type_start = models.ForeignKey(TillageManagementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_tillage_management_type_start", verbose_name=_("tillage_management_type_start"))
     tillage_management_type_w = models.ForeignKey(TillageManagementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_tillage_management_type_w", verbose_name=_("tillage_management_type_w"))
     tillage_management_type_wo = models.ForeignKey(TillageManagementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_tillage_management_type_wo", verbose_name=_("tillage_management_type_wo"))
@@ -1657,13 +1721,49 @@ class Rice(ResidueAvailability):
     class Meta:
         abstract = True
 
-    water_management_type_before_cultivation_start = models.ForeignKey(WaterManagementTypeBeforeCultivation, on_delete=models.CASCADE, related_name="%(class)s_water_management_type_before_cultivation_start", null=True, verbose_name=_("water_management_type_before_cultivation_start"))
-    water_management_type_before_cultivation_w = models.ForeignKey(WaterManagementTypeBeforeCultivation, on_delete=models.CASCADE, related_name="%(class)s_water_management_type_before_cultivation_w", null=True, verbose_name=_("water_management_type_before_cultivation_w"))
-    water_management_type_before_cultivation_wo = models.ForeignKey(WaterManagementTypeBeforeCultivation, on_delete=models.CASCADE, related_name="%(class)s_water_management_type_before_cultivation_wo", null=True, verbose_name=_("water_management_type_before_cultivation_wo"))
+    water_management_type_before_cultivation_start = models.ForeignKey(
+        WaterManagementTypeBeforeCultivation,
+        on_delete=models.CASCADE,
+        related_name="%(class)s_water_management_type_before_cultivation_start",
+        null=True,
+        verbose_name=_("water_management_type_before_cultivation_start"),
+    )
+    water_management_type_before_cultivation_w = models.ForeignKey(
+        WaterManagementTypeBeforeCultivation,
+        on_delete=models.CASCADE,
+        related_name="%(class)s_water_management_type_before_cultivation_w",
+        null=True,
+        verbose_name=_("water_management_type_before_cultivation_w"),
+    )
+    water_management_type_before_cultivation_wo = models.ForeignKey(
+        WaterManagementTypeBeforeCultivation,
+        on_delete=models.CASCADE,
+        related_name="%(class)s_water_management_type_before_cultivation_wo",
+        null=True,
+        verbose_name=_("water_management_type_before_cultivation_wo"),
+    )
 
-    water_management_type_after_cultivation_start = models.ForeignKey(WaterManagementTypeAfterCultivation, on_delete=models.CASCADE, related_name="%(class)s_water_management_type_after_cultivation_start", null=True, verbose_name=_("water_management_type_after_cultivation_start"))
-    water_management_type_after_cultivation_w = models.ForeignKey(WaterManagementTypeAfterCultivation, on_delete=models.CASCADE, related_name="%(class)s_water_management_type_after_cultivation_w", null=True, verbose_name=_("water_management_type_after_cultivation_w"))
-    water_management_type_after_cultivation_wo = models.ForeignKey(WaterManagementTypeAfterCultivation, on_delete=models.CASCADE, related_name="%(class)s_water_management_type_after_cultivation_wo", null=True, verbose_name=_("water_management_type_after_cultivation_wo"))
+    water_management_type_after_cultivation_start = models.ForeignKey(
+        WaterManagementTypeAfterCultivation,
+        on_delete=models.CASCADE,
+        related_name="%(class)s_water_management_type_after_cultivation_start",
+        null=True,
+        verbose_name=_("water_management_type_after_cultivation_start"),
+    )
+    water_management_type_after_cultivation_w = models.ForeignKey(
+        WaterManagementTypeAfterCultivation,
+        on_delete=models.CASCADE,
+        related_name="%(class)s_water_management_type_after_cultivation_w",
+        null=True,
+        verbose_name=_("water_management_type_after_cultivation_w"),
+    )
+    water_management_type_after_cultivation_wo = models.ForeignKey(
+        WaterManagementTypeAfterCultivation,
+        on_delete=models.CASCADE,
+        related_name="%(class)s_water_management_type_after_cultivation_wo",
+        null=True,
+        verbose_name=_("water_management_type_after_cultivation_wo"),
+    )
 
     organic_amendment_type_start = models.ForeignKey(OrganicAmendmentType, on_delete=models.CASCADE, related_name="%(class)s_organic_amendment_type_start", null=True)
     organic_amendment_type_w = models.ForeignKey(OrganicAmendmentType, on_delete=models.CASCADE, related_name="%(class)s_organic_amendment_type_w", null=True)
@@ -1733,6 +1833,7 @@ class Grassland(LandModuleFixed, SingleBiomassModule, AboveBelowGroundBiomassMod
     grassland_management_type_start = models.ForeignKey(GrasslandManagementType, on_delete=models.CASCADE, related_name="%(class)s_grassland_management_type_start", null=True, verbose_name=_("grassland_management_type_start"))
     grassland_management_type_w = models.ForeignKey(GrasslandManagementType, on_delete=models.CASCADE, related_name="%(class)s_grassland_management_type_w", null=True, verbose_name=_("grassland_management_type_w"))
     grassland_management_type_wo = models.ForeignKey(GrasslandManagementType, on_delete=models.CASCADE, related_name="%(class)s_grassland_management_type_wo", null=True, verbose_name=_("grassland_management_type_wo"))
+    grassland_management_type_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_grassland_management_type_thread")
 
     is_fire_used_start = models.BooleanField(default=False, verbose_name=_("is_fire_used_start"))
     is_fire_used_w = models.BooleanField(default=False, verbose_name=_("is_fire_used_w"))
@@ -1771,27 +1872,27 @@ class Grassland(LandModuleFixed, SingleBiomassModule, AboveBelowGroundBiomassMod
 
 class Livestock(Module):
     livestock_category_type = models.ForeignKey(LivestockCategoryType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_livestock_category_type", verbose_name=_("livestock_category_type"))
-    livestock_category_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_livestock_categories_thread", on_delete=models.SET_NULL)
+    livestock_category_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_livestock_categories_thread", on_delete=models.SET_NULL)
 
     livestock_production_type_start = models.ForeignKey(LivestockProductionType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("livestock_production_type_start"))
     livestock_production_type_w = models.ForeignKey(LivestockProductionType, on_delete=models.CASCADE, related_name="%(class)s_livestock_productions_w", null=True, blank=True, verbose_name=_("livestock_production_type_w"))
     livestock_production_type_wo = models.ForeignKey(LivestockProductionType, on_delete=models.CASCADE, related_name="%(class)s_livestock_productions_wo", null=True, blank=True, verbose_name=_("livestock_production_type_wo"))
-    livestock_production_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_livestock_production_type_thread", on_delete=models.SET_NULL)
+    livestock_production_type_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_livestock_production_type_thread", on_delete=models.SET_NULL)
 
     production_start = models.FloatField(null=True, blank=True, verbose_name=_("production_start"))
     production_w = models.FloatField(null=True, blank=True, verbose_name=_("production_w"))
     production_wo = models.FloatField(null=True, blank=True, verbose_name=_("production_wo"))
-    production_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_production_thread", on_delete=models.SET_NULL)
+    production_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_production_thread", on_delete=models.SET_NULL)
 
     heads_number_start = models.IntegerField(null=True, blank=True, verbose_name=_("heads_number_start"))
     heads_number_w = models.IntegerField(null=True, blank=True, verbose_name=_("heads_number_w"))
     heads_number_wo = models.IntegerField(null=True, blank=True, verbose_name=_("heads_number_wo"))
-    heads_number_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_heads_number_thread", on_delete=models.SET_NULL)
+    heads_number_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_heads_number_thread", on_delete=models.SET_NULL)
 
     complementary_manure_management_type_start = models.ForeignKey(ManureManagementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_manure_management_type_t2_start", verbose_name=_("complementary_manure_management_type_start"))
     complementary_manure_management_type_w = models.ForeignKey(ManureManagementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_manure_management_type_t2_w", verbose_name=_("complementary_manure_management_type_w"))
     complementary_manure_management_type_wo = models.ForeignKey(ManureManagementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_manure_management_type_t2_wo", verbose_name=_("complementary_manure_management_type_wo"))
-    complementary_manure_management_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_complementary_manure_management_type_thread", on_delete=models.SET_NULL)
+    complementary_manure_management_type_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_complementary_manure_management_type_thread", on_delete=models.SET_NULL)
 
     enteric_fermentation_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("enteric_fermentation_t2_start"))
     enteric_fermentation_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("enteric_fermentation_t2_w"))
@@ -1800,7 +1901,7 @@ class Livestock(Module):
     prp_percentage_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("prp_percentage_t2_start"))
     prp_percentage_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("prp_percentage_t2_w"))
     prp_percentage_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("prp_percentage_t2_wo"))
-    prp_percentage_t2_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_prp_percentage_t2_thread", on_delete=models.SET_NULL)
+    prp_percentage_t2_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_prp_percentage_t2_thread", on_delete=models.SET_NULL)
 
     prp_ch4_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("prp_ch4_t2_start"))
     prp_ch4_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("prp_ch4_t2_w"))
@@ -1975,6 +2076,7 @@ class Waterbody(Module):
     trophic_type_start = models.ForeignKey(TrophicType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_trophic_class_start", verbose_name=_("trophic_type_start"))
     trophic_type_w = models.ForeignKey(TrophicType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_trophic_class_w", verbose_name=_("trophic_type_w"))
     trophic_type_wo = models.ForeignKey(TrophicType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_trophic_class_wo", verbose_name=_("trophic_type_wo"))
+    trophic_type_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_trophic_class_thread")
 
     ch4_ef_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("ch4_ef_t2_start"))
     ch4_ef_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("ch4_ef_t2_w"))
@@ -2055,6 +2157,7 @@ class CoastalWetland(Module):
 
     avg_salinity_t2 = models.ForeignKey(SalinityType, null=True, blank=True, on_delete=models.SET_NULL, verbose_name=_("avg_salinity_t2"))
 
+
 ##### Fisheries and Aquaculture #####
 
 
@@ -2065,19 +2168,19 @@ class Fishery(Module):
     refrigerant_pc_start = models.FloatField(validators=[pc_as_float], default=0, verbose_name=_("refrigerant_pc_start"))
     refrigerant_pc_w = models.FloatField(validators=[pc_as_float], default=0, verbose_name=_("refrigerant_pc_w"))
     refrigerant_pc_wo = models.FloatField(validators=[pc_as_float], default=0, verbose_name=_("refrigerant_pc_wo"))
-    refrigerant_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_refrigerant_thread", on_delete=models.SET_NULL)
+    refrigerant_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_refrigerant_thread", on_delete=models.SET_NULL)
 
     refrigerant_gwp = models.FloatField(null=True, blank=True, default=1810, verbose_name=_("refrigerant_gwp"))
 
     total_catch_yr_start = models.FloatField(null=True, blank=True, verbose_name=_("total_catch_yr_start"))
     total_catch_yr_w = models.FloatField(null=True, blank=True, verbose_name=_("total_catch_yr_w"))
     total_catch_yr_wo = models.FloatField(null=True, blank=True, verbose_name=_("total_catch_yr_wo"))
-    total_catch_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_total_catch_thread", on_delete=models.SET_NULL)
+    total_catch_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_total_catch_thread", on_delete=models.SET_NULL)
 
     ice_preserved_catch_pc_start = models.FloatField(default=0, validators=[pc_as_float], verbose_name=_("ice_preserved_catch_pc_start"))
     ice_preserved_catch_pc_w = models.FloatField(default=0, validators=[pc_as_float], verbose_name=_("ice_preserved_catch_pc_w"))
     ice_preserved_catch_pc_wo = models.FloatField(default=0, validators=[pc_as_float], verbose_name=_("ice_preserved_catch_pc_wo"))
-    ice_preserved_catch_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_ice_preserved_catch_thread", on_delete=models.SET_NULL)
+    ice_preserved_catch_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_ice_preserved_catch_thread", on_delete=models.SET_NULL)
 
     energy_ef_co2_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_co2_t2_start"))
     energy_ef_co2_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("energy_emission_factor_co2_t2_w"))
@@ -2120,7 +2223,7 @@ class SmallFishery(Fishery):
     gear_type_start = models.ForeignKey(SmallFisheryGearType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_gear_type_start", verbose_name=_("gear_type_start"))
     gear_type_w = models.ForeignKey(SmallFisheryGearType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_gear_type_w", verbose_name=_("gear_type_w"))
     gear_type_wo = models.ForeignKey(SmallFisheryGearType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_gear_type_wo", verbose_name=_("gear_type_wo"))
-    gear_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_gear_type_thread", on_delete=models.SET_NULL)
+    gear_type_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_gear_type_thread", on_delete=models.SET_NULL)
     fishery_type = models.ForeignKey(FisheryType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fishery_type"))
 
 
@@ -2128,7 +2231,7 @@ class LargeFishery(Fishery):
     gear_type_start = models.ForeignKey(LargeFisheryGearType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_gear_type_start", verbose_name=_("gear_type_start"))
     gear_type_w = models.ForeignKey(LargeFisheryGearType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_gear_type_w", verbose_name=_("gear_type_w"))
     gear_type_wo = models.ForeignKey(LargeFisheryGearType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_gear_type_wo", verbose_name=_("gear_type_wo"))
-    gear_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_gear_type_thread", on_delete=models.SET_NULL)
+    gear_type_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_gear_type_thread", on_delete=models.SET_NULL)
     fish_type = models.ForeignKey(FishType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fish_type"))
 
 
@@ -2136,6 +2239,7 @@ class Aquaculture(Module):
     annual_production_start = models.FloatField(null=True, blank=True, verbose_name=_("annual_production_start"))
     annual_production_w = models.FloatField(null=True, blank=True, verbose_name=_("annual_production_w"))
     annual_production_wo = models.FloatField(null=True, blank=True, verbose_name=_("annual_production_wo"))
+    annual_production_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_annual_production_thread", on_delete=models.SET_NULL)
 
     n2o_from_production_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("n2o_from_production_t2_start"))
     n2o_from_production_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("n2o_from_production_t2_w"))
@@ -2148,6 +2252,8 @@ class Aquaculture(Module):
     electricity_ef_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("electricity_ef_t2_start"))  # TODO: Rename to n2o_fish_production
     electricity_ef_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("electricity_ef_t2_w"))
     electricity_ef_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("electricity_ef_t2_wo"))
+
+    # TODO: Missing comment threads?
 
 
 class MacroInputType(models.Model):
@@ -2210,6 +2316,7 @@ class Energy(Module):
     def submodules(self) -> list["Submodule"]:
         return list(self.electricities.all()) + list(self.fuels.all())
 
+
 class ElectricityTier2Mixin(models.Model):
     country_t2 = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("country_t2"))
 
@@ -2224,7 +2331,6 @@ class ElectricityTier2Mixin(models.Model):
     ef_source = models.ForeignKey(EmissionFactorSource, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("ef_source"))
 
     def save(self, *args, **kwargs):
-
         if self.pk is None and not self.ef_source:
             self.ef_source = EmissionFactorSource.objects.get_or_create(name="Operating Margin")[0]
 
@@ -2232,6 +2338,7 @@ class ElectricityTier2Mixin(models.Model):
 
     class Meta:
         abstract = True
+
 
 class ElectricityMixin(models.Model):
     quantity_consumed_per_year_start = models.FloatField(null=True, blank=True, verbose_name=_("quantity_consumed_per_year_start"))
@@ -2247,8 +2354,10 @@ class ElectricityMixin(models.Model):
     class Meta:
         abstract = True
 
+
 class Electricity(Submodule, ElectricityMixin, ElectricityTier2Mixin):
     parent = models.ForeignKey(Energy, on_delete=models.CASCADE, null=True, blank=True, related_name="electricities")
+
 
 class FuelTier2Mixin(models.Model):
     energy_ef_co2_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("ef_co2_t2"))
@@ -2266,11 +2375,13 @@ class FuelTier2Mixin(models.Model):
     class Meta:
         abstract = True
 
+
 class FuelMixin(models.Model):
     fuel_type_start = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fuel_type_start"), related_name="%(class)s_fuel_type_start")
     fuel_type_w = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fuel_type_w"), related_name="%(class)s_fuel_type_w")
     fuel_type_wo = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fuel_type_wo"), related_name="%(class)s_fuel_type_wo")
-    
+    fuel_type_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_fuel_type_thread")
+
     quantity_consumed_per_year_start = models.FloatField(null=True, blank=True, verbose_name=_("quantity_consumed_per_year_start"))
     quantity_consumed_per_year_w = models.FloatField(null=True, blank=True, verbose_name=_("quantity_consumed_per_year_w"))
     quantity_consumed_per_year_wo = models.FloatField(null=True, blank=True, verbose_name=_("quantity_consumed_per_year_wo"))
@@ -2281,8 +2392,10 @@ class FuelMixin(models.Model):
     class Meta:
         abstract = True
 
+
 class Fuel(Submodule, FuelMixin, FuelTier2Mixin):
     parent = models.ForeignKey(Energy, on_delete=models.CASCADE, null=True, blank=True, related_name="fuels")
+
 
 class IrrigationSystemType(models.Model):
     module_types = models.ManyToManyField(ModuleType, related_name="irrigation_system_types", null=True, blank=True)
@@ -2327,9 +2440,12 @@ class IrrigationSystem(Submodule):
 class IrrigationPhase(Submodule):
     parent = models.ForeignKey(Irrigation, on_delete=models.CASCADE, null=True, blank=True, related_name="irrigation_phases")
     irrigation_system_type = models.ForeignKey(IrrigationSystemType, on_delete=models.CASCADE, null=True, blank=True, related_name="irrigation_phases", verbose_name=_("irrigation_system_type"))
+
     fuel_type_start = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fuel_type_start"), related_name="%(class)s_fuel_type_start")
     fuel_type_w = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fuel_type_w"), related_name="%(class)s_fuel_type_w")
     fuel_type_wo = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fuel_type_wo"), related_name="%(class)s_fuel_type_wo")
+    fuel_type_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_fuel_type_thread")
+
     well_depth = models.FloatField(null=True, blank=True, verbose_name=_("well_depth"))
 
     ha_start = models.FloatField(null=True, blank=True, verbose_name=_("ha_start"))
@@ -2386,86 +2502,83 @@ class RoadType(models.Model):
         return self.name
 
 
-class Building(Submodule):
+class SettlementSubmoduleTier2Mixin(models.Model):
+    ef_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_start"))
+    ef_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_w"))
+    ef_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_wo"))
+
+    class Meta:
+        abstract = True
+
+
+class Building(Submodule, SettlementSubmoduleTier2Mixin):
     parent = models.ForeignKey("api.Settlement", on_delete=models.CASCADE, null=True, blank=True, related_name="buildings")
 
     building_type = models.ForeignKey(BuildingType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_building_type", verbose_name=_("building_type"))
-    building_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_building_type_thread", on_delete=models.SET_NULL)
+    building_type_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_building_type_thread", on_delete=models.SET_NULL)
 
     area_m2_start = models.FloatField(null=True, blank=True, verbose_name=_("area_m2_start"))
     area_m2_w = models.FloatField(null=True, blank=True, verbose_name=_("area_m2_w"))
     area_m2_wo = models.FloatField(null=True, blank=True, verbose_name=_("area_m2_wo"))
-    area_m2_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_surface_thread", on_delete=models.SET_NULL)
-
-    ef_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_start"))
-    ef_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_w"))
-    ef_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_wo"))
+    area_m2_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_surface_thread", on_delete=models.SET_NULL)
 
 
-class Road(Submodule):
+class Road(Submodule, SettlementSubmoduleTier2Mixin):
     parent = models.ForeignKey("api.Settlement", on_delete=models.CASCADE, null=True, blank=True, related_name="roads")
 
     road_type = models.ForeignKey(RoadType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_road_type", verbose_name=_("road_type"))
-    road_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_road_type_thread", on_delete=models.SET_NULL)
+    road_type_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_road_type_thread", on_delete=models.SET_NULL)
 
     length_km_start = models.FloatField(null=True, blank=True, verbose_name=_("length_km_start"))
     length_km_w = models.FloatField(null=True, blank=True, verbose_name=_("length_km_w"))
     length_km_wo = models.FloatField(null=True, blank=True, verbose_name=_("length_km_wo"))
-    length_km_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_length_km_thread", on_delete=models.SET_NULL)
+    length_km_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_length_km_thread", on_delete=models.SET_NULL)
 
     width_m_start = models.FloatField(null=True, blank=True, verbose_name=_("width_m_start"))
     width_m_w = models.FloatField(null=True, blank=True, verbose_name=_("width_m_w"))
     width_m_wo = models.FloatField(null=True, blank=True, verbose_name=_("width_m_wo"))
-    width_m_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_width_m_thread", on_delete=models.SET_NULL)
-
-    ef_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_start"))
-    ef_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_w"))
-    ef_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_wo"))
+    width_m_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_width_m_thread", on_delete=models.SET_NULL)
 
 
-class OtherInfrastructure(Submodule):
+class OtherInfrastructure(Submodule, SettlementSubmoduleTier2Mixin):
     parent = models.ForeignKey("api.Settlement", on_delete=models.CASCADE, null=True, blank=True, related_name="other_infrastructures")
 
     area_m2_start = models.FloatField(null=True, blank=True, verbose_name=_("area_m2_start"))
     area_m2_w = models.FloatField(null=True, blank=True, verbose_name=_("area_m2_w"))
     area_m2_wo = models.FloatField(null=True, blank=True, verbose_name=_("area_m2_wo"))
-    area_m2_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_area_m2_thread", on_delete=models.SET_NULL)
-
-    ef_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_start"))
-    ef_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_w"))
-    ef_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("ef_t2_wo"))
+    area_m2_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_area_m2_thread", on_delete=models.SET_NULL)
 
 
 class OrganicSoil(LandModuleFixed):
     drainage_area_start = models.FloatField(default=0, verbose_name=_("drainage_area_start"))
     drainage_area_w = models.FloatField(default=0, verbose_name=_("drainage_area_w"))
     drainage_area_wo = models.FloatField(default=0, verbose_name=_("drainage_area_wo"))
-    drainage_area_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_drainage_area_thread", on_delete=models.SET_NULL)
+    drainage_area_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_drainage_area_thread", on_delete=models.SET_NULL)
 
     area_not_drained_start = models.FloatField(default=0, verbose_name=_("area_not_drained_start"))
     area_not_drained_w = models.FloatField(default=0, verbose_name=_("area_not_drained_w"))
     area_not_drained_wo = models.FloatField(default=0, verbose_name=_("area_not_drained_wo"))
-    area_not_drained_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_area_not_drained_thread", on_delete=models.SET_NULL)
+    area_not_drained_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_area_not_drained_thread", on_delete=models.SET_NULL)
 
     ditches_area_start = models.FloatField(default=0, verbose_name=_("ditches_area_start"))
     ditches_area_w = models.FloatField(default=0, verbose_name=_("ditches_area_w"))
     ditches_area_wo = models.FloatField(default=0, verbose_name=_("ditches_area_wo"))
-    ditches_area_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_ditches_area_thread", on_delete=models.SET_NULL)
+    ditches_area_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_ditches_area_thread", on_delete=models.SET_NULL)
 
     fire_type_start = models.ForeignKey(FireType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_fire_type_start", verbose_name=_("fire_type_start"))
     fire_type_w = models.ForeignKey(FireType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_fire_type_w", verbose_name=_("fire_type_w"))
     fire_type_wo = models.ForeignKey(FireType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_fire_type_wo", verbose_name=_("fire_type_wo"))
-    fire_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_fire_type_thread", on_delete=models.SET_NULL)
+    fire_type_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_fire_type_thread", on_delete=models.SET_NULL)
 
     soil_fire_periodicity_start = models.FloatField(null=True, blank=True, verbose_name=_("soil_fire_periodicity_start"))
     soil_fire_periodicity_w = models.FloatField(null=True, blank=True, verbose_name=_("soil_fire_periodicity_w"))
     soil_fire_periodicity_wo = models.FloatField(null=True, blank=True, verbose_name=_("soil_fire_periodicity_wo"))
-    soil_fire_periodicity_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_soil_fire_periodicity_thread", on_delete=models.SET_NULL)
+    soil_fire_periodicity_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_soil_fire_periodicity_thread", on_delete=models.SET_NULL)
 
     soil_fire_impact_percentage_start = models.FloatField(null=True, blank=True, verbose_name=_("soil_fire_impact_percentage_start"))
     soil_fire_impact_percentage_w = models.FloatField(null=True, blank=True, verbose_name=_("soil_fire_impact_percentage_w"))
     soil_fire_impact_percentage_wo = models.FloatField(null=True, blank=True, verbose_name=_("soil_fire_impact_percentage_wo"))
-    soil_fire_impact_percentage_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_soil_fire_impact_percentage_thread", on_delete=models.SET_NULL)
+    soil_fire_impact_percentage_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_soil_fire_impact_percentage_thread", on_delete=models.SET_NULL)
 
     onsite_co2_drainge_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("onsite_co2_drainge_t2_start"))
     onsite_co2_drainge_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("onsite_co2_drainge_t2_w"))
@@ -2522,27 +2635,27 @@ class OrganicSoil(LandModuleFixed):
     ##### Peat Extraction #####
 
     peat_type = models.ForeignKey(PeatType, on_delete=models.CASCADE, null=True, blank=True, default=utils.get_default_peat_type, related_name="%(class)s_peat_type", verbose_name=_("peat_type"))
-    peat_type_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_type_thread", on_delete=models.SET_NULL)
+    peat_type_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_peat_type_thread", on_delete=models.SET_NULL)
 
     peat_area_start = models.FloatField(null=True, blank=True, verbose_name=_("peat_area_start"))
     peat_area_w = models.FloatField(null=True, blank=True, verbose_name=_("peat_area_w"))
     peat_area_wo = models.FloatField(null=True, blank=True, verbose_name=_("peat_area_wo"))
-    peat_area_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_area_thread", on_delete=models.SET_NULL)
+    peat_area_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_peat_area_thread", on_delete=models.SET_NULL)
 
     peat_ditches_area_start = models.FloatField(null=True, blank=True, verbose_name=_("peat_ditches_area_start"))
     peat_ditches_area_w = models.FloatField(null=True, blank=True, verbose_name=_("peat_ditches_area_w"))
     peat_ditches_area_wo = models.FloatField(null=True, blank=True, verbose_name=_("peat_ditches_area_wo"))
-    peat_ditches_area_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_ditches_area_thread", on_delete=models.SET_NULL)
+    peat_ditches_area_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_peat_ditches_area_thread", on_delete=models.SET_NULL)
 
     peat_extraction_height_start = models.FloatField(null=True, blank=True, verbose_name=_("peat_extraction_height_start"))
     peat_extraction_height_w = models.FloatField(null=True, blank=True, verbose_name=_("peat_extraction_height_w"))
     peat_extraction_height_wo = models.FloatField(null=True, blank=True, verbose_name=_("peat_extraction_height_wo"))
-    peat_extraction_height_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_extraction_height_thread", on_delete=models.SET_NULL)
+    peat_extraction_height_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_peat_extraction_height_thread", on_delete=models.SET_NULL)
 
     is_peat_for_energy_start = models.BooleanField(default=False, verbose_name=_("is_peat_for_energy_start"))
     is_peat_for_energy_w = models.BooleanField(default=False, verbose_name=_("is_peat_for_energy_w"))
     is_peat_for_energy_wo = models.BooleanField(default=False, verbose_name=_("is_peat_for_energy_wo"))
-    is_peat_for_energy_thread = models.OneToOneField("api.CommentThread", null=True, blank=True, related_name="%(class)s_peat_is_for_energy_thread", on_delete=models.SET_NULL)
+    is_peat_for_energy_thread = models.OneToOneField(CommentThread, null=True, blank=True, related_name="%(class)s_peat_is_for_energy_thread", on_delete=models.SET_NULL)
 
     onsite_co2_peat_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("onsite_co2_peat_t2_start"))
     onsite_co2_peat_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("onsite_co2_peat_t2_w"))
@@ -2574,7 +2687,6 @@ class OrganicSoil(LandModuleFixed):
 
 
 class Settlement(LandModuleFixed, SingleBiomassModule):
-
     settlement_type_start = models.ForeignKey(SettlementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_settlement_type_start", verbose_name=_("settlement_type_start"))
     settlement_type_w = models.ForeignKey(SettlementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_settlement_type_w", verbose_name=_("settlement_type_w"))
     settlement_type_wo = models.ForeignKey(SettlementType, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_settlement_type_wo", verbose_name=_("settlement_type_wo"))
@@ -2589,7 +2701,6 @@ class Settlement(LandModuleFixed, SingleBiomassModule):
         return getattr(self, f"biomass_t2_{scenario.value}", None)
 
     def save(self, *args, **kwargs):
-
         if not self.land_use_type_start:
             self.land_use_type_start = LandUseType.objects.get(name_en="Settlement")
             self.land_use_type_w = self.land_use_type_start
@@ -2599,17 +2710,11 @@ class Settlement(LandModuleFixed, SingleBiomassModule):
 
 
 class SetAside(LandModule, SingleBiomassModule):
-
     is_set_aside_start = models.BooleanField(default=False, verbose_name=_("is_set_aside_start"))
     is_set_aside_w = models.BooleanField(default=False, verbose_name=_("is_set_aside_w"))
     is_set_aside_wo = models.BooleanField(default=False, verbose_name=_("is_set_aside_wo"))
 
-    # NOTE: Why having AGB and BGB AND Biomass when Biomass = AGB + BGB?
-    def get_biomass_t2(self, scenario: utils.ScenarioTypes):
-        return getattr(self, f"biomass_t2_{scenario.value}", None)
-
     def save(self, *args, **kwargs):
-
         if not self.land_use_type_start:
             self.land_use_type_start = LandUseType.objects.get(name_en="Set Aside")
             self.land_use_type_w = self.land_use_type_start
@@ -2622,10 +2727,6 @@ class OtherLand(LandModule, SingleBiomassModule):
     is_degraded_land_start = models.BooleanField(default=False, verbose_name=_("is_degraded_land_start"))
     is_degraded_land_w = models.BooleanField(default=False, verbose_name=_("is_degraded_land_w"))
     is_degraded_land_wo = models.BooleanField(default=False, verbose_name=_("is_degraded_land_wo"))
-
-    # NOTE: Why having AGB and BGB AND Biomass when Biomass = AGB + BGB?
-    def get_biomass_t2(self, scenario: utils.ScenarioTypes):
-        return getattr(self, f"biomass_t2_{scenario.value}", None)
 
     def save(self, *args, **kwargs):
         if not self.land_use_type_start:
@@ -2718,8 +2819,10 @@ class Parameter(models.Model):
     def __str__(self):
         return f"({self.pk}) {self.name} = {self.value} {self.unit if self.unit else ''}"
 
+
 class ApplicationParameter(Parameter):
     pass
+
 
 class LivestockParameter(Parameter):
     pass
@@ -2813,7 +2916,6 @@ class PackagingMaterialType(models.Model):
 
 
 class ValueChainParentModule(Module):
-
     class Meta:
         abstract = True
 
@@ -2823,7 +2925,6 @@ class ValueChainParentModule(Module):
 
 
 class ValueChainSubmodule(Submodule, FuelMixin, FuelTier2Mixin, ElectricityMixin, ElectricityTier2Mixin):
-
     class Meta:
         abstract = True
 
@@ -2834,6 +2935,7 @@ class ValueChainSubmodule(Submodule, FuelMixin, FuelTier2Mixin, ElectricityMixin
     emission_factor_t2_start = models.FloatField(null=True, blank=True)
     emission_factor_t2_w = models.FloatField(null=True, blank=True)
     emission_factor_t2_wo = models.FloatField(null=True, blank=True)
+
 
 class Storage(ValueChainParentModule):
     pass
@@ -2897,7 +2999,6 @@ class Transport(ValueChainParentModule):
 class TransportEntry(ValueChainSubmodule):
     parent = models.ForeignKey(Transport, on_delete=models.CASCADE, null=True, blank=True, related_name="entries")
 
-from django.db import models
 
 class APIHealth(models.Model):
     is_under_maintenance = models.BooleanField(default=False)
