@@ -26,6 +26,8 @@ schema_view = get_schema_view(
 
 router = routers.DefaultRouter()
 
+router.register(r"parameters", views.generic_viewset(models.ApplicationParameter), basename="applicationparameter")
+
 router.register(r"projects", views.ProjectViewSet, basename="project")
 router.register(r"project-attachments", views.ProjectFileAttachmentViewSet, basename="projectattachments")
 
@@ -155,7 +157,7 @@ router.register(r"emission-factor-sources", views.generic_viewset(models.Emissio
 
 # Fuel
 router.register(r"macro-fuel-types", views.generic_viewset(models.MacroFuelType), basename="macrofueltypes")
-router.register(r"fuel-types", views.FuelTypeViewset, basename="fueltypes")
+router.register(r"fuel-types", views.FuelTypeViewSet, basename="fueltypes")
 router.register(r"fuel-use-types", views.generic_viewset(models.FuelUseType), basename="fuelusetypes")
 
 # Organic Soil
@@ -181,7 +183,7 @@ router.register(r"refrigerant-types", views.generic_viewset(models.RefrigerantTy
 
 urlpatterns = [
     path("docs/", include_docs_urls(title="EX-ACT Docs")),
-    path('health/', views.APIHealthView.as_view(), name='api-health'),
+    path("health/", views.APIHealthView.as_view(), name="api-health"),
     re_path(r"^swagger(?P<format>\.json|\.yaml)$", schema_view.without_ui(cache_timeout=0), name="schema-json"),
     re_path(r"^swagger/$", schema_view.with_ui("swagger", cache_timeout=0), name="schema-swagger-ui"),
     re_path(r"^redoc/$", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
