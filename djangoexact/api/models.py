@@ -835,6 +835,10 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
     owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="activities", null=True, blank=True, verbose_name=_("owner"))
 
     @property
+    def soc(self):
+        return self.soc_t2 or self.project.soc_ref_t2
+
+    @property
     def implementation_years(self) -> int:
         return self.__get_duration()
 
