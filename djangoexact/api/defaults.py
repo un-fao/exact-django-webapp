@@ -91,9 +91,9 @@ class GrasslandDefaults(Defaults):
         biomass_ef_start = defaults.biomass_ef_start_w or defaults.biomass_ef_start_wo
 
         return SimpleNamespace(
-            soc_t2_start_default=defaults.soc_start.value,
-            soc_t2_w_default=defaults.soc_w.value,
-            soc_t2_wo_default=defaults.soc_wo.value,
+            soc_t2_start_default=self.input.activity.soc or defaults.soc_start.value,
+            soc_t2_w_default=self.input.activity.soc or defaults.soc_w.value,
+            soc_t2_wo_default=self.input.activity.soc or defaults.soc_wo.value,
             biomass_t2_start_default=biomass_ef_start.value,
             biomass_t2_w_default=defaults.biomass_ef_w.value,
             biomass_t2_wo_default=defaults.biomass_ef_wo.value,
@@ -158,9 +158,9 @@ class AnnualCroplandDefaults(Defaults):
         biomass_ef_start = defaults.biomass_ef_start_w or defaults.biomass_ef_start_wo
 
         return SimpleNamespace(
-            soc_t2_start_default=defaults.soc_start.value,
-            soc_t2_w_default=defaults.soc_w.value,
-            soc_t2_wo_default=defaults.soc_wo.value,
+            soc_t2_start_default=self.input.activity.soc or defaults.soc_start.value,
+            soc_t2_w_default=self.input.activity.soc or defaults.soc_w.value,
+            soc_t2_wo_default=self.input.activity.soc or defaults.soc_wo.value,
             fi_t2_start_default=defaults.fi_start.value,
             fi_t2_w_default=defaults.fi_w.value,
             fi_t2_wo_default=defaults.fi_wo.value,
@@ -232,9 +232,9 @@ class PerennialCroplandDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            soc_t2_start_default=defaults.soc_start.value,
-            soc_t2_w_default=defaults.soc_w.value,
-            soc_t2_wo_default=defaults.soc_wo.value,
+            soc_t2_start_default=self.input.activity.soc or defaults.soc_start.value,
+            soc_t2_w_default=self.input.activity.soc or defaults.soc_w.value,
+            soc_t2_wo_default=self.input.activity.soc or defaults.soc_wo.value,
             agb_t2_start_default=defaults.agb_start_default.value,
             agb_t2_w_default=defaults.agb_w_default.value,
             agb_t2_wo_default=defaults.ag_default_wo.value,
@@ -324,9 +324,9 @@ class FloodedRiceDefaults(Defaults):
         biomass_ef_start = defaults.biomass_ef_start_w or defaults.biomass_ef_start_wo
 
         return SimpleNamespace(
-            soc_t2_start_default=defaults.soc.value,
-            soc_t2_w_default=defaults.soc.value,
-            soc_t2_wo_default=defaults.soc.value,
+            soc_t2_start_default=self.input.activity.soc or defaults.soc.value,
+            soc_t2_w_default=self.input.activity.soc or defaults.soc.value,
+            soc_t2_wo_default=self.input.activity.soc or defaults.soc.value,
             flu_t2_start_default=defaults.flu_start.value,
             flu_t2_w_default=defaults.flu_w.value,
             flu_t2_wo_default=defaults.flu_wo.value,
@@ -729,9 +729,9 @@ class SettlementDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            soc_t2_start_default=defaults.soc_start.value,
-            soc_t2_w_default=defaults.soc_w.value,
-            soc_t2_wo_default=defaults.soc_wo.value,
+            soc_t2_start_default=self.input.activity.soc or defaults.soc_start.value,
+            soc_t2_w_default=self.input.activity.soc or defaults.soc_w.value,
+            soc_t2_wo_default=self.input.activity.soc or defaults.soc_wo.value,
             flu_t2_start_default=defaults.flu_start.value,
             flu_t2_w_default=defaults.flu_w.value,
             flu_t2_wo_default=defaults.flu_wo.value,
@@ -1039,9 +1039,9 @@ class OtherLandDefaults(Defaults):  # TODO: Rename to OtherLand
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            soc_t2_start_default=defaults.soc.value,
-            soc_t2_w_default=defaults.soc.value,
-            soc_t2_wo_default=defaults.soc.value,
+            soc_t2_start_default=self.input.activity.soc or defaults.soc.value,
+            soc_t2_w_default=self.input.activity.soc or defaults.soc.value,
+            soc_t2_wo_default=self.input.activity.soc or defaults.soc.value,
             flu_t2_start_default=defaults.flu_start.value,
             flu_t2_w_default=defaults.flu_w.value,
             flu_t2_wo_default=defaults.flu_wo.value,
@@ -1163,9 +1163,9 @@ class SetAsideDefaults(Defaults):
         biomass_ef_start = defaults.biomass_ef_w or defaults.biomass_ef_wo
 
         return SimpleNamespace(
-            soc_t2_start_default=defaults.soc.value,
-            soc_t2_w_default=defaults.soc.value,
-            soc_t2_wo_default=defaults.soc.value,
+            soc_t2_start_default=self.input.activity.soc or defaults.soc.value,
+            soc_t2_w_default=self.input.activity.soc or defaults.soc.value,
+            soc_t2_wo_default=self.input.activity.soc or defaults.soc.value,
             flu_t2_start_default=defaults.flu_start.value,
             flu_t2_w_default=defaults.flu_w.value,
             flu_t2_wo_default=defaults.flu_wo.value,
@@ -1337,9 +1337,9 @@ class ForestManagementDefaults(Defaults):
             bgb_growth_after_20_yrs_wo = defaults.agb_growth_over_20_wo * defaults.bgb_after_20_yrs.value
 
         return SimpleNamespace(
-            soc_t2_start_default=defaults.soc_start.value,
-            soc_t2_w_default=defaults.soc_w.value,
-            soc_t2_wo_default=defaults.soc_wo.value,
+            soc_t2_start_default=self.input.activity.soc or defaults.soc_start.value,
+            soc_t2_w_default=self.input.activity.soc or defaults.soc_w.value,
+            soc_t2_wo_default=self.input.activity.soc or defaults.soc_wo.value,
             flu_t2_start_default=defaults.flu_start.value,
             flu_t2_w_default=defaults.flu_w.value,
             flu_t2_wo_default=defaults.flu_wo.value,
