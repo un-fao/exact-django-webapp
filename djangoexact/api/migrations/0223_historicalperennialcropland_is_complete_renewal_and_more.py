@@ -20,9 +20,9 @@ class Migration(migrations.Migration):
             name="is_system_in_maturity",
             field=models.BooleanField(default=True, verbose_name="is_system_in_maturity"),
         ),
-        migrations.AddField(
-            model_name="historicalprocessingentry",
-            name="fuel_type_thread",
-            field=models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name="+", to="api.commentthread"),
-        ),
+        # migrations.AddField(
+        #     model_name="historicalprocessingentry",
+        #     name="fuel_type_thread",
+        #     field=models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name="+", to="api.commentthread"),
+        # ),
     ]
