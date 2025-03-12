@@ -40,6 +40,7 @@ class BaseData:
 
     def to_dict(self):
         return {
+            "module": self.module.__class__.__name__,
             "climate": self.climate,
             "moisture": self.moisture,
             "soil_type": self.soil_type,
