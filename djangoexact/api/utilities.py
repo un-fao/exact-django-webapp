@@ -176,9 +176,29 @@ def find_modules(activity):
 
 
 def get_unique_name(instance, name):
+    """
+    Generates a unique name for a Django model instance by appending a counter if necessary.
+
+    This function checks if the provided name already exists for the given model class.
+    If the name is already taken, it appends a counter in parentheses (e.g., "name (1)")
+    and increments the counter until a unique name is found.
+
+    Args:
+        instance: A Django model instance to check uniqueness against.
+        name (str): The original name to use or modify.
+
+    Returns:
+        str: A unique name - either the original name if it's unique, or the name with
+             a counter in parentheses appended (e.g., "name (1)", "name (2)", etc.).
+    """
+
+    if not instance.__class__.objects.filter(name=name).exists():
+        return name
+
     i = 1
     while instance.__class__.objects.filter(name=f"{name} ({i})").exists():
         i += 1
+
     return f"{name} ({i})"
 
 
