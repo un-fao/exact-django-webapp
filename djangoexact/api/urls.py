@@ -26,6 +26,8 @@ schema_view = get_schema_view(
 
 router = routers.DefaultRouter()
 
+router.register(r"parameters", views.generic_viewset(models.ApplicationParameter), basename="applicationparameter")
+
 router.register(r"projects", views.ProjectViewSet, basename="project")
 router.register(r"project-attachments", views.ProjectFileAttachmentViewSet, basename="projectattachments")
 
@@ -105,7 +107,7 @@ router.register(r"status-types", views.generic_viewset(models.StatusType), basen
 
 router.register(r"land-use-changes", views.generic_module_viewset(models.LandUseChange), basename="landusechange")
 router.register(r"organic-soils", views.generic_module_viewset(models.OrganicSoil), basename="organicsoil")
-router.register(r"soil-types", views.generic_viewset(models.SoilType), basename="soiltype")
+router.register(r"soil-types", views.SoilTypeViewset, basename="soiltype")
 router.register(r"climates", views.generic_viewset(models.Climate), basename="climate")
 router.register(r"moistures", views.generic_viewset(models.Moisture), basename="moisture")
 
@@ -155,7 +157,7 @@ router.register(r"emission-factor-sources", views.generic_viewset(models.Emissio
 
 # Fuel
 router.register(r"macro-fuel-types", views.generic_viewset(models.MacroFuelType), basename="macrofueltypes")
-router.register(r"fuel-types", views.generic_viewset(models.FuelType), basename="fueltypes")
+router.register(r"fuel-types", views.FuelTypeViewSet, basename="fueltypes")
 router.register(r"fuel-use-types", views.generic_viewset(models.FuelUseType), basename="fuelusetypes")
 
 # Organic Soil
@@ -181,6 +183,7 @@ router.register(r"refrigerant-types", views.generic_viewset(models.RefrigerantTy
 
 urlpatterns = [
     path("docs/", include_docs_urls(title="EX-ACT Docs")),
+    path("health/", views.APIHealthView.as_view(), name="api-health"),
     re_path(r"^swagger(?P<format>\.json|\.yaml)$", schema_view.without_ui(cache_timeout=0), name="schema-json"),
     re_path(r"^swagger/$", schema_view.with_ui("swagger", cache_timeout=0), name="schema-swagger-ui"),
     re_path(r"^redoc/$", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),

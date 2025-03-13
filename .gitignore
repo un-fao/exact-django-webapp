@@ -88,10 +88,21 @@ djangoexact/scripts/Ex_Act_Definitions_LM_0108.xlsx
 djangoexact/annual_cropland_results.xlsx
 
 graphs/
-reports/
+/reports/
 static/
 djangoexact/scripts/ipcc_data/ForestManagementAGBRevised.csv
 djangoexact/docs/EX-ACT VC migration.docx
 docs/docs/
 djangoexact/docker-compose.yml
 djangoexact/Dockerfile
+djangoexact/djangoexact/.env.development
+djangoexact/djangoexact/.env.production
+djangoexact/djangoexact/.env.review
+
+djangoexact/matrices/
+djangoexact/djangoexact/.env.development
+djangoexact/djangoexact/.env.production
+djangoexact/djangoexact/.env.review
+pyproject.toml
+djangoexact/scripts/minitool/
+djangoexact/djangoexact/.env.test
