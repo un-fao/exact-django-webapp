@@ -1251,10 +1251,10 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     def destroy(self, request, *args, **kwargs):
         membership = self.get_object()
 
-        if membership.user == self.request.user and membership.project.owner != self.request.user:
-            membership.delete()
+        if membership.user == self.request.user and membership.project.owner == self.request.user:
+            return utils.ErrorResponse("Project owner cannot delete their own membership. Delete the project instead.", status=http_status.HTTP_400_BAD_REQUEST)
 
-        elif not utils.has_project_permission("delete_projectmembership", self.request.user, membership.project):
+        elif not utils.has_project_permission("delete_projectmembership", self.request.user, membership.project) and not membership.user == self.request.user:
             logging.error("Selected user does not have permission to delete project memberships")
             return utils.ErrorResponse("Selected user does not have permission to delete project memberships", status=http_status.HTTP_403_FORBIDDEN)
 
