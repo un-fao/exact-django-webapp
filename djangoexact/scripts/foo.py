@@ -6,6 +6,7 @@ import logging as log
 from django.db.models import Q
 from djangoexact.settings import auth
 import firebase_admin
+from firebase_admin import auth as firebase_admin_auth
 
 # TODO: Run in review and prod
 
@@ -178,6 +179,14 @@ def add_default_project_lock_expiration_time_minutes_application_parameter():
     models.ApplicationParameter.objects.create(name="project_lock_expiration_time_minutes", value=30)
 
 
+def verify_user_firebase_email():
+    """
+    Verify user firebase email
+    """
+    user = models.CustomUser.objects.get(email="admin@admin.com")
+    firebase_admin.auth.update_user(user.firebase_uid, email_verified=True)
+
+
 def run():
     import os
 
@@ -186,7 +195,6 @@ def run():
 
     if app_mode == "production":
         # TODO: Run in production
-        add_default_project_lock_expiration_time_minutes_application_parameter()
         pass
 
     if app_mode == "review":

@@ -668,6 +668,8 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             _, file_bytes_buffer = report.build_report()
             report.close_file()
         except Exception as e:
+            # Print stack trace to console
+            e.with_traceback()
             logger.error(f"Error generating report: {e}")
             return utils.ErrorResponse(str(e), status=http_status.HTTP_422_UNPROCESSABLE_ENTITY)
 
@@ -925,12 +927,8 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                             large_fishery_data["value_wo"] += m.total_catch_yr_wo
                             large_fishery_data["value_w"] += m.total_catch_yr_w
 
-                        db_activity.catch_w += m.total_catch_yr_w
-
                     elif isinstance(m, Livestock):
                         m: Livestock
-                        db_activity.heads_w += m.heads_number_w
-
                         for lh in livestock_heads:
                             if lh["name"] == m.livestock_category_type.name:
                                 lh["value_w"] += m.heads_number_w
