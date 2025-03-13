@@ -1,0 +1,125 @@
+name: Build and Deploy
+on:
+  push:
+    branches:
+      - _develop
+      - _review
+  pull_request:
+    branches:
+      - _main
+    # paths-ignore:
+      # - .github/**
+
+jobs:
+  set-environment:
+    runs-on: ubuntu-22.04
+    permissions:
+      id-token: write
+      contents: read
+    outputs:
+      env: ${{ steps.set_env.outputs.env }}
+    steps:
+      - name: Set environment
+        id: set_env
+        run: | 
+          case "${{ github.ref_name }}" in
+            develop|_develop)
+              echo "env=develop" >> "$GITHUB_OUTPUT"
+              ;;
+            review|_review)
+              echo "env=review" >> "$GITHUB_OUTPUT"
+              ;;
+            main|_main)
+              echo "env=production" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              ;;
+          esac
+
+  deploy:
+    runs-on: ubuntu-22.04
+    needs: set-environment
+    environment: ${{ needs.set-environment.outputs.env }}
+    env:
+      VARS: ${{ toJson(vars) }}
+      SECRETS: ${{ toJson(secrets) }}
+    permissions:
+      id-token: write
+      contents: read
+      issues: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.WORKLOAD_ID_PROVIDER }}
+          service_account: ${{ vars.SERVICE_ACCOUNT }}
+
+      - name: Check Auth
+        run: gcloud auth list
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+        with:
+          version: '>= 363.0.0'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Setup cloud-sql-proxy
+        run: |
+          curl -o cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.14.2/cloud-sql-proxy.linux.amd64
+          chmod +x cloud-sql-proxy
+          ./cloud-sql-proxy -g -p ${{ vars.DB_PORT }} ${{ vars.DB_INSTANCE_CONNECTION }} &
+
+      - name: Test cloud-sql-proxy
+        shell: bash
+        env:
+          PGPASSWORD: ${{ secrets.DB_PASSWORD }}
+        run: |
+          sudo apt-get install -y postgresql-client
+          psql --host=127.0.0.1 --port=${{ vars.DB_PORT }} --username=${{ vars.DB_USERNAME }} --dbname=${{ vars.DB_NAME }} -c "\dt"
+      
+      - run: echo "$VARS" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
+      # - run: echo "$SECRETS" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
+      - run: echo DB_PASSWORD='${{ secrets.DB_PASSWORD }}' >> $GITHUB_ENV
+      - run: echo FIREBASE_PRIVATE_KEY='${{ secrets.SMTP_USER_PASSWORD }}' >> $GITHUB_ENV
+      - run: echo FIREBASE_SERVICE_ACCOUNT='${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' >> $GITHUB_ENV
+      - run: echo SECRET_KEY='${{ secrets.SECRET_KEY }}' >> $GITHUB_ENV
+      - run: echo SMTP_USER_PASSWORD='${{ secrets.SMTP_USER_PASSWORD }}' >> $GITHUB_ENV
+
+      - uses: franzbischoff/replace_envs@v1
+        with:
+          from_file: 'djangoexact/app.yaml'
+          to_file: 'djangoexact/app.yaml'
+          commit: 'false'
+
+      - uses: franzbischoff/replace_envs@v1
+        with:
+          from_file: 'djangoexact/djangoexact/settings.py'
+          to_file: 'djangoexact/djangoexact/settings.py'
+          commit: 'false'
+
+      - run: cat djangoexact/app.yaml
+
+      - run: cat djangoexact/djangoexact/settings.py
+
+      - run: pip install -r djangoexact/requirements.txt
+      - run: cd djangoexact/ && python manage.py migrate
+      - run: cd djangoexact/ && python manage.py collectstatic --noinput
+      - run: cd djangoexact/ && python manage.py update_translation_fields
+      - run: cd djangoexact/ && python manage.py sync_translation_fields
+        
+      - name: Deploy
+        run: |
+          gcloud app deploy djangoexact/app.yaml --project ${{ vars.PROJECT_ID }} --verbosity=debug
+          gcloud app versions list --service=${{ vars.SERVICE_NAME }} --project=${{ vars.PROJECT_ID }} --format="value(version.id)" --sort-by="~version.createTime" | tail -n +100 | xargs -r gcloud app versions delete -q
+      
+      - name: Create Issue
+        if: failure()
+        uses: ./.github/utility/create_issue

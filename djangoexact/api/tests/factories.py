@@ -429,11 +429,11 @@ class ElectricityFactory(DjangoModelFactory):
 
     status = READY
 
-    country = factory.fuzzy.FuzzyChoice(countries)
+    country_t2 = factory.fuzzy.FuzzyChoice(countries)
 
-    mwh_start = factory.fuzzy.FuzzyFloat(0, 100)
-    mwh_w = factory.fuzzy.FuzzyFloat(0, 100)
-    mwh_wo = factory.fuzzy.FuzzyFloat(0, 100)
+    quantity_consumed_per_year_start = factory.fuzzy.FuzzyFloat(0, 100)
+    quantity_consumed_per_year_w = factory.fuzzy.FuzzyFloat(0, 100)
+    quantity_consumed_per_year_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
     mwh_renewables_start = factory.fuzzy.FuzzyFloat(0, 100)
     mwh_renewables_w = factory.fuzzy.FuzzyFloat(0, 100)
@@ -450,11 +450,13 @@ class FuelFactory(DjangoModelFactory):
 
     status = READY
 
-    fuel_type = factory.fuzzy.FuzzyChoice(fuels)
+    fuel_type_start = factory.fuzzy.FuzzyChoice(fuels)
+    fuel_type_w = factory.fuzzy.FuzzyChoice(fuels)
+    fuel_type_wo = factory.fuzzy.FuzzyChoice(fuels)
 
-    fuel_consumption_start = factory.fuzzy.FuzzyFloat(0, 100)
-    fuel_consumption_w = factory.fuzzy.FuzzyFloat(0, 100)
-    fuel_consumption_wo = factory.fuzzy.FuzzyFloat(0, 100)
+    quantity_consumed_per_year_start = factory.fuzzy.FuzzyFloat(0, 100)
+    quantity_consumed_per_year_w = factory.fuzzy.FuzzyFloat(0, 100)
+    quantity_consumed_per_year_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
     # ef_t2 = factory.fuzzy.FuzzyFloat(0, 100)
     # account_for_co2 = factory.fuzzy.FuzzyChoice([True, False])
@@ -575,7 +577,11 @@ class IrrigationPhaseFactory(DjangoModelFactory):
     status = READY
 
     irrigation_system_type = factory.fuzzy.FuzzyChoice(IrrigationSystemType.objects.filter(module_types__class_name="IrrigationPhase").all())
-    fuel_type = factory.fuzzy.FuzzyChoice(fuel_types)
+
+    fuel_type_start = factory.fuzzy.FuzzyChoice(fuel_types)
+    fuel_type_w = factory.fuzzy.FuzzyChoice(fuel_types)
+    fuel_type_wo = factory.fuzzy.FuzzyChoice(fuel_types)
+
     well_depth = factory.fuzzy.FuzzyFloat(0, 100)
 
     ha_start = factory.fuzzy.FuzzyFloat(0, 100)
@@ -595,11 +601,15 @@ class IrrigationPhaseFactory(DjangoModelFactory):
     ef_n2o_t2_start = factory.fuzzy.FuzzyFloat(0, 5)
     ef_n2o_t2_w = factory.fuzzy.FuzzyFloat(0, 5)
     ef_n2o_t2_wo = factory.fuzzy.FuzzyFloat(0, 5)
+
     transmission_loss_t2_start = factory.fuzzy.FuzzyFloat(0, 5)
     transmission_loss_t2_w = factory.fuzzy.FuzzyFloat(0, 5)
     transmission_loss_t2_wo = factory.fuzzy.FuzzyFloat(0, 5)
+
     average_pressure_t2 = factory.fuzzy.FuzzyFloat(0, 5)
+
     total_dynamic_head_t2 = factory.fuzzy.FuzzyFloat(0, 5)
+    
     pumping_efficiency_t2_start = factory.fuzzy.FuzzyFloat(0, 5)
     pumping_efficiency_t2_w = factory.fuzzy.FuzzyFloat(0, 5)
     pumping_efficiency_t2_wo = factory.fuzzy.FuzzyFloat(0, 5)
@@ -639,6 +649,16 @@ class BuildingFactory(DjangoModelFactory):
     area_m2_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
     building_type = factory.fuzzy.FuzzyChoice(building_types)
+
+class OtherInfrastructureFactory(DjangoModelFactory):
+    class Meta:
+        model = OtherInfrastructure
+
+    status = READY
+
+    area_m2_start = factory.fuzzy.FuzzyFloat(0, 100)
+    area_m2_w = factory.fuzzy.FuzzyFloat(0, 100)
+    area_m2_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
 
 class OtherLandFactory(DjangoModelFactory):
