@@ -42,7 +42,7 @@ class Inputs(BaseModule):
                 yearly_co2_emissions, total_co2_eq_emissions = input_single_calculation(self.unit_start, self.unit_end, self.ipcc_factor_co2, self.tier_2_factor_co2, self.unit_factor_co2, self.emissions_factor_co2, self.implementation_time, self.capitalization_time, self.rate_type)
                 co2_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_co2_emissions], ActivityTypes.CO2_FIELD, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(co2_emission_set)
-            
+
             if self.unit_factor_n2o is None or self.emissions_factor_n2o is None or self.ipcc_factor_n2o is None:
                 # THIS MEANS THE EMISSIONS CAN'T BE CALCULATED, EASIER FOR COMPREHENSION IMO
                 pass
@@ -58,7 +58,7 @@ class Inputs(BaseModule):
                 yearly_co2_eq_emissions, total_co2_emissions = input_single_calculation(self.unit_start, self.unit_end, self.ipcc_factor_eq, self.tier_2_factor_eq, self.unit_factor_eq, self.emissions_factor_eq, self.implementation_time, self.capitalization_time, self.rate_type)
                 co2_eq_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in yearly_co2_eq_emissions], ActivityTypes.CO2_EQUIVALENT_VC, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(co2_eq_emission_set)
-            
+
         except Exception as e:
             traceback.print_exc()
             raise e
@@ -89,7 +89,9 @@ class OperationPhaseIrrigation(BaseModule):
     def calculate_emissions(
         self,
     ):
-        def ef_calculation(ef_co2_default, ef_co2_tier_2, ef_n2o_default, ef_n2o_tier_2, ef_ch4_default, ef_ch4_tier_2, total_dynamic_head_tier_2, average_pressure_default, average_pressure_tier_2, pumping_efficiency_default, pumping_efficiency_tier_2, erh_electricity, fuel_net_calorific_values, fuel_density, depth, gwir):
+        def ef_calculation(
+            ef_co2_default, ef_co2_tier_2, ef_n2o_default, ef_n2o_tier_2, ef_ch4_default, ef_ch4_tier_2, total_dynamic_head_tier_2, average_pressure_default, average_pressure_tier_2, pumping_efficiency_default, pumping_efficiency_tier_2, erh_electricity, fuel_net_calorific_values, fuel_density, depth, gwir
+        ):
             try:
                 pumping_efficiency = self.pumping_efficiency_tier_2 or self.pumping_efficiency_default
                 average_pressure = self.average_pressure_tier_2 or self.average_pressure_default
@@ -116,7 +118,24 @@ class OperationPhaseIrrigation(BaseModule):
                 raise e
 
         try:
-            ef_co2, ef_n2o, ef_ch4 = ef_calculation(self.ef_co2_default, self.ef_co2_tier_2, self.ef_n2o_default, self.ef_n2o_tier_2, self.ef_ch4_default, self.ef_ch4_tier_2, self.total_dynamic_head_tier_2, self.average_pressure_default, self.average_pressure_tier_2, self.pumping_efficiency_default, self.pumping_efficiency_tier_2, self.erh_electricity, self.fuel_net_calorific_values, self.fuel_density, self.depth, self.gwir)
+            ef_co2, ef_n2o, ef_ch4 = ef_calculation(
+                self.ef_co2_default,
+                self.ef_co2_tier_2,
+                self.ef_n2o_default,
+                self.ef_n2o_tier_2,
+                self.ef_ch4_default,
+                self.ef_ch4_tier_2,
+                self.total_dynamic_head_tier_2,
+                self.average_pressure_default,
+                self.average_pressure_tier_2,
+                self.pumping_efficiency_default,
+                self.pumping_efficiency_tier_2,
+                self.erh_electricity,
+                self.fuel_net_calorific_values,
+                self.fuel_density,
+                self.depth,
+                self.gwir,
+            )
 
             # THESE ARE SAVED IN ORDER TO MULTIPLY BY ELECTRICITY MULTIPLIER
 
@@ -146,7 +165,6 @@ class OperationPhaseIrrigation(BaseModule):
 
 @dataclass
 class Roads(BaseModule):
-
     ef_ipcc: float
     ef_tier_2: Optional[float]
     units_end: float  # This will be used to set `units_end`
@@ -170,7 +188,6 @@ class Roads(BaseModule):
 
 @dataclass
 class ElectricityConsumption(BaseModule):
-
     emissions_factor: float
     specific_factor_start: Optional[float]
     specific_factor_end: Optional[float]
@@ -217,9 +234,9 @@ class SolidAndLiquidFuelsConsumption(BaseModule):
         self,
     ):
         try:
-            factor_co2 = self.specific_factor_co2 or self.emissions_factor_co2
-            factor_ch4 = self.specific_factor_ch4 or self.emissions_factor_ch4
-            factor_n2o = self.specific_factor_n2o or self.emissions_factor_n2o
+            factor_co2 = self.emissions_factor_co2 or self.specific_factor_co2
+            factor_ch4 = self.emissions_factor_ch4 or self.specific_factor_ch4
+            factor_n2o = self.emissions_factor_n2o or self.specific_factor_n2o
 
             annual_start_co2 = factor_co2 * self.mwh_start
             annual_end_co2 = factor_co2 * self.mwh_end
@@ -270,4 +287,3 @@ class NewIrrigation(BaseModule):
         except Exception as e:
             traceback.print_exc()
             raise e
-

@@ -1468,22 +1468,32 @@ class ValueChainEntryEnergyDefaultsMixin(Defaults):
     def get_defaults(self, calculate=False) -> dict:
         self.defaults.get_defaults(calculate=calculate)
 
+        if self.input.is_start():
+            energy_calculator_start = self.defaults.energy_calculator_w if self.input.is_with() else self.defaults.energy_calculator_wo
+            if isinstance(energy_calculator_start, calcs.ElectricityCalculator):
+                self.electricity_ef_t2_start_default = energy_calculator_start.electricity_ef_selected.value
+                self.country_t2_default = energy_calculator_start.country.name
+            elif isinstance(energy_calculator_start, calcs.FuelCalculator):
+                self.energy_ef_co2_t2_start_default = energy_calculator_start.energy_ef_default_start.co2
+                self.energy_ef_ch4_t2_start_default = energy_calculator_start.energy_ef_default_start.ch4
+                self.energy_ef_n2o_t2_start_default = energy_calculator_start.energy_ef_default_start.n2o
+
         if self.input.is_with():
             if isinstance(self.defaults.energy_calculator_w, calcs.ElectricityCalculator):
                 self.electricity_ef_t2_w_default = self.defaults.energy_calculator_w.electricity_ef_selected.value
                 self.country_t2_default = self.defaults.energy_calculator_w.country.name
             elif isinstance(self.defaults.energy_calculator_w, calcs.FuelCalculator):
-                self.energy_ef_co2_t2_w_default = self.defaults.energy_calculator_w.energy_ef_default_start.co2
+                self.energy_ef_co2_t2_w_default = self.defaults.energy_calculator_w.energy_ef_default_w.co2
                 self.energy_ef_ch4_t2_w_default = self.defaults.energy_calculator_w.energy_ef_default_w.ch4
-                self.energy_ef_n2o_t2_w_default = self.defaults.energy_calculator_w.energy_ef_default_wo.n2o
+                self.energy_ef_n2o_t2_w_default = self.defaults.energy_calculator_w.energy_ef_default_w.n2o
 
         if self.input.is_without():
             if isinstance(self.defaults.energy_calculator_wo, calcs.ElectricityCalculator):
                 self.electricity_ef_t2_wo_default = self.defaults.energy_calculator_wo.electricity_ef_selected.value
                 self.country_t2_default = self.defaults.energy_calculator_wo.country.name
             elif isinstance(self.defaults.energy_calculator_wo, calcs.FuelCalculator):
-                self.energy_ef_co2_t2_wo_default = self.defaults.energy_calculator_wo.energy_ef_default_start.co2
-                self.energy_ef_ch4_t2_wo_default = self.defaults.energy_calculator_wo.energy_ef_default_w.ch4
+                self.energy_ef_co2_t2_wo_default = self.defaults.energy_calculator_wo.energy_ef_default_wo.co2
+                self.energy_ef_ch4_t2_wo_default = self.defaults.energy_calculator_wo.energy_ef_default_wo.ch4
                 self.energy_ef_n2o_t2_wo_default = self.defaults.energy_calculator_wo.energy_ef_default_wo.n2o
 
         foo = self.get_defaults_for_frontend()
