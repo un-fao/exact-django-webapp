@@ -937,7 +937,7 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
         modules = []
 
         for module_type in module_types:
-            modules.extend(getattr(self, module_type.class_name.lower()).all())
+            modules.extend(list(getattr(self, module_type.class_name.lower()).all()))
 
         return modules
 

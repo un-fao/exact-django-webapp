@@ -4681,15 +4681,15 @@ def run():
 
     if app_mode == "production":
         # TODO: Run in production
-        import_definitions.import_definitions()
-        rename_solar_fuel_type_to_renewable()
-        assign_fuel_type_units()
-        find_all_stroke_fuel_types_and_put_stroke_lowercase()
-        add_or_replace_application_parameters()
-        delete_and_import_irrigation_phase_data()
-        add_pit_gt_1_month_to_livestock_awms_where_manure_management_type_is_null()
-        import_shadow_prices_of_carbon()
-        add_0_2_to_co2_value_in_input_emission_factor()
+        # import_definitions.import_definitions()
+        # rename_solar_fuel_type_to_renewable()
+        # assign_fuel_type_units()
+        # find_all_stroke_fuel_types_and_put_stroke_lowercase()
+        # add_or_replace_application_parameters()
+        # delete_and_import_irrigation_phase_data()
+        # add_pit_gt_1_month_to_livestock_awms_where_manure_management_type_is_null()
+        # import_shadow_prices_of_carbon()
+        # add_0_2_to_co2_value_in_input_emission_factor()
         pass
 
     if app_mode == "review":
