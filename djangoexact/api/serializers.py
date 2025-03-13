@@ -95,6 +95,8 @@ from .models import (
     TransportEntry,
     ProjectFileAttachment,
     ApplicationParameter,
+    APIHealth,
+    FuelUseType,
 )
 from datetime import timedelta
 
@@ -169,7 +171,6 @@ def validate_module_fields(data, mandatory_fields: list):
 
 
 def get_model_serializer(model_arg):
-
     class GenericSerializer(serializers.ModelSerializer):
         class Meta:
             model = model_arg
@@ -285,6 +286,7 @@ class CountrySerializer(serializers.ModelSerializer):
 
 
 class ProjectTagSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = ProjectTag
@@ -309,7 +311,7 @@ class ProjectSummarySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields = ["id", "name", "country", "updated_at", "role", "tags"]
+        fields = ["id", "name", "country", "updated_at", "role", "tags", "created_at"]
 
     def get_role(self, obj):
         ctx = self.context.get("request", None)
@@ -360,15 +362,15 @@ class ReadProjectSerializer(serializers.ModelSerializer):
     def get_total_catch(self, obj):
         small_fisheries = SmallFishery.objects.filter(activity__project=obj).all()
         large_fisheries = LargeFishery.objects.filter(activity__project=obj).all()
+        aquacultures = Aquaculture.objects.filter(activity__project=obj).all()
 
-        all_catch_start = sum([f.total_catch_yr_start for f in list(filter(lambda fishery: fishery.total_catch_yr_start is not None, small_fisheries))]) + sum([f.total_catch_yr_start for f in list(filter(lambda fishery: fishery.total_catch_yr_start is not None, large_fisheries))])
-        all_catch_w = sum([f.total_catch_yr_w for f in list(filter(lambda fishery: fishery.total_catch_yr_w is not None, small_fisheries))]) + sum([f.total_catch_yr_w for f in list(filter(lambda fishery: fishery.total_catch_yr_w is not None, large_fisheries))])
-        all_catch_wo = sum([f.total_catch_yr_wo for f in list(filter(lambda fishery: fishery.total_catch_yr_wo is not None, small_fisheries))]) + sum([f.total_catch_yr_wo for f in list(filter(lambda fishery: fishery.total_catch_yr_wo is not None, large_fisheries))])
+        def safe_sum(items, attr):
+            return sum(getattr(item, attr) or 0 for item in items)
 
         scenario_based_catch = {
-            "start": all_catch_start,
-            "w": all_catch_w,
-            "wo": all_catch_wo,
+            "start": safe_sum(small_fisheries, "total_catch_yr_start") + safe_sum(large_fisheries, "total_catch_yr_start") + safe_sum(aquacultures, "annual_production_start"),
+            "w": safe_sum(small_fisheries, "total_catch_yr_w") + safe_sum(large_fisheries, "total_catch_yr_w") + safe_sum(aquacultures, "annual_production_w"),
+            "wo": safe_sum(small_fisheries, "total_catch_yr_wo") + safe_sum(large_fisheries, "total_catch_yr_wo") + safe_sum(aquacultures, "annual_production_wo"),
         }
 
         return scenario_based_catch
@@ -446,17 +448,15 @@ class WriteProjectSerializer(serializers.ModelSerializer):
                         activity.save()
                 project.save()
 
-            has_more_than_thirty_minutes_passed = project.lock_updated_at is not None and timezone.now() - project.lock_updated_at > timedelta(minutes=30)
-            if project.is_locked and project.lock_updated_at and has_more_than_thirty_minutes_passed:
-                project.unlock()
+            project._check_lock_expiration()
 
-            if project.is_locked and project.locked_by != user:
+            if project.is_locked and project.locked_by != user and not user.is_staff:
                 log.warning(f"Project is already locked by: {project.locked_by.email}")
                 raise serializers.ValidationError("The project is already locked")
 
             # If the project is not locked, or a lock is requested
             if not project.is_locked or is_locking is True:
-                if project.is_locked and project.locked_by != user:
+                if project.is_locked and project.locked_by != user and not user.is_staff:
                     log.warning(f"Project is already locked by: {project.locked_by.email}")
                     raise serializers.ValidationError("The project is already locked")
 
@@ -528,17 +528,18 @@ class ActivitySerializerWithModules(ActivitySerializer):
 
 
 class WriteActivitySerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Activity
         fields = "__all__"
         ref_name = "Activity"
 
     def validate(self, data):
-
         project = self.instance.project if self.instance else data.get("project")
 
-        if project.is_locked and not project.locked_by == self.context["request"].user:
+        if project.is_archived:
+            return serializers.ValidationError("Archived projects cannot have activities added")
+
+        if project.is_locked and not project.locked_by == self.context["request"].user and not self.context["request"].user.is_staff:
             raise serializers.ValidationError("Project is locked by another user")
 
         if self.instance:
@@ -559,7 +560,6 @@ class WriteActivitySerializer(serializers.ModelSerializer):
         activity_cost = data.get("cost", None)
 
         if activity_cost:
-
             project = getattr(self.instance, "project", data.get("project"))
             project_cost = project.cost if project.cost else 0
 
@@ -575,7 +575,6 @@ class WriteActivitySerializer(serializers.ModelSerializer):
         return super().validate(data)
 
     def save(self, **kwargs):
-
         project: Project = getattr(self.instance, "project", self.validated_data.get("project"))
         project.refresh_lock()
 
@@ -620,6 +619,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
     soil_type_t2 = serializers.PrimaryKeyRelatedField(queryset=SoilType.objects.all(), required=False, allow_null=True)
     duration_t2 = serializers.IntegerField(required=False, allow_null=True)
     start_year_t2 = serializers.IntegerField(required=False, allow_null=True)
+    last_year_of_accounting_t2 = serializers.IntegerField(required=False, allow_null=True)
     land_use_change = LandUseChangeBuilderSerializer(many=False, required=False, allow_null=True)
     module_types = serializers.PrimaryKeyRelatedField(queryset=ModuleType.objects.all(), many=True, required=False)
     area = serializers.FloatField(required=False, min_value=0)
@@ -635,6 +635,13 @@ class ActivityBuilderSerializer(serializers.Serializer):
         module_types = data.get("module_types", [])
         land_use_change = data.get("land_use_change", None)
         area = data.get("area", None)
+        project = data.get("project")
+
+        if project.is_locked and not project.locked_by == self.context["request"].user and not self.context["request"].user.is_staff:
+            raise serializers.ValidationError("Project is locked by another user")
+
+        if project.is_archived:
+            raise serializers.ValidationError("Archived projects cannot have activities added")
 
         if luc_module in module_types:
             raise serializers.ValidationError("Land Use Change module cannot be added manually")
@@ -656,7 +663,6 @@ class ActivityBuilderSerializer(serializers.Serializer):
         return data
 
     def create_activity(self):
-
         default_change_rate = ChangeRate.objects.get(name="linear")
 
         return Activity.objects.create(
@@ -669,6 +675,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
             duration_t2=self.validated_data.get("duration_t2", None),
             soil_type_t2=self.validated_data.get("soil_type_t2", None),
             start_year_t2=self.validated_data.get("start_year_t2", None),
+            last_year_of_accounting_t2=self.validated_data.get("last_year_of_accounting_t2", None),
             owner=self.context["request"].user,
         )
 
@@ -816,7 +823,7 @@ class ActivityBuilderSerializer(serializers.Serializer):
         if self.instance:
             old_module_types = list(map(lambda module: module, self.instance.module_types.all()))
             new_module_types = list(map(lambda module: module, self.validated_data["module_types"]))
-            create_organic_soil = create_organic_soil and not "OrganicSoil" in [module.class_name for module in old_module_types]
+            create_organic_soil = create_organic_soil and "OrganicSoil" not in [module.class_name for module in old_module_types]
 
             luc: LandUseChange = self.instance.landusechange.first()
             if luc and has_luc_module:
@@ -881,7 +888,6 @@ class ActivityBuilderSerializer(serializers.Serializer):
             return self.instance
 
         else:
-
             if Activity.objects.filter(name=self.validated_data["name"], project=self.validated_data["project"]).exists():
                 self.validated_data["name"] = self.unique_activity_name()
 
@@ -1060,7 +1066,6 @@ class BaseGenericModuleSerializer(serializers.ModelSerializer):
 
 
 class BaseModuleSerializer(BaseGenericModuleSerializer):
-
     def validate(self, data):
         log.debug(f"START BaseModuleSerializer[{self.Meta.ref_name}].validate")
 
@@ -1069,7 +1074,7 @@ class BaseModuleSerializer(BaseGenericModuleSerializer):
 
         module_types = list(map(lambda module: module.class_name, activity.module_types.all()))
 
-        if project.is_locked and not project.locked_by == self.context["request"].user:
+        if project.is_locked and not project.locked_by == self.context["request"].user and not self.context["request"].user.is_staff:
             log.error("Project is locked by another user")
             raise serializers.ValidationError("Project is locked by another user")
 
@@ -1104,7 +1109,6 @@ class BaseModuleSerializer(BaseGenericModuleSerializer):
 
 
 class BaseSubmoduleSerializer(BaseGenericModuleSerializer):
-
     def validate(self, data):
         log.debug(f"START SubmoduleBaseSerializer[{self.Meta.ref_name}].validate")
 
@@ -1123,6 +1127,28 @@ class BaseSubmoduleSerializer(BaseGenericModuleSerializer):
 
         log.debug(f"END SubmoduleBaseSerializer[{self.Meta.ref_name}].validate")
         return super().validate(data)
+
+    def parent_validation(self, parent):
+        ParentWriteSerializer = globals().get(f"{parent.__class__.__name__}WriteSerializer", None)
+        if ParentWriteSerializer is None:
+            raise ValueError(f"Write serializer for {parent.__class__.__name__} does not exist")
+
+        parent_serializer: serializers.ModelSerializer = ParentWriteSerializer(data={}, instance=parent, partial=True, context=self.context)
+        if parent_serializer.is_valid():
+            parent_serializer.save()
+
+    def save(self, **kwargs):
+        super().save(**kwargs)
+
+        if not hasattr(self.instance, "parent"):
+            log.error(f"Parent attribute is not defined for {self.instance}")
+            raise ValueError("Parent attribute is not defined")
+
+        parent = utils.getany([self.instance, dict(kwargs)], "parent")
+        log.info(f"Parent in serializer: {parent}")
+        self.parent_validation(parent)
+
+        return self.instance
 
 
 class NoScenarioBaseSerializer(BaseGenericModuleSerializer):
@@ -1242,6 +1268,14 @@ class LandModuleSeralizer(ScenarioModuleSerializer):
 
             for field, value in data.items():
                 setattr(self.instance, field, value)
+
+            # Validate the parent Land Use Change on related LandModule change
+            parent_luc = getattr(self.instance, "land_use_change", None)
+
+            if parent_luc:
+                luc_serializer = get_module_serializer(LandUseChange)(data={}, instance=parent_luc, many=False, partial=True, context=self.context)
+                luc_serializer.is_valid()
+                luc_serializer.save()
 
         if luc:
             # If the module is associated with a Land Use Change, update the status of the Land Use Change
@@ -1382,7 +1416,6 @@ class AnnualCroplandSerializer(LandModuleSeralizer):
         }
 
     def validate(self, data):
-
         for minor_season in self.instance.minor_seasons.all():
             minor_season: MinorSeasonAnnualCropland
             if not minor_season.is_ready():
@@ -1494,7 +1527,6 @@ class LandUseChangeWriteSerializer(LandModuleSeralizer):
         mandatory_fields = {}
 
     def validate(self, data):
-
         if self.instance:
             self.instance: LandUseChange
             if all([m.is_ready() for m in self.instance.get_modules()]):
@@ -1584,7 +1616,6 @@ class OrganicSoilWriteSerializer(LandModuleSeralizer):
 
 
 class OrganicSoilReadSerializer(LandModuleSeralizer):
-
     parent_land_use_type_start = serializers.IntegerField(read_only=True)
     parent_land_use_type_w = serializers.IntegerField(read_only=True)
     parent_land_use_type_wo = serializers.IntegerField(read_only=True)
@@ -1694,20 +1725,21 @@ class FloodedRiceWriteSerializer(LandModuleSeralizer):
         }
 
     def validate(self, data):
-
         # Get cultivation_days of all minor_seasons and check that they are not greater than 365 including the main season
         cultivation_days = data.get("cultivation_days", 0)  # TODO: This must be fetched from IPCC data (or t2)
         minor_seasons = data.get("minor_seasons", None)
 
         if minor_seasons:
+            # TODO: Move to database Parameter
             if minor_seasons.count() > 4:
-                raise serializers.ValidationError(f"Minor seasons cannot be more than 4")
+                raise serializers.ValidationError("Minor seasons cannot be more than 4")
 
             # for season in minor_seasons:
             #     cultivation_days += season.get("cultivation_days", 0)
 
+        # TODO: Move to database Parameter
         if cultivation_days > 365:
-            raise serializers.ValidationError(f"Cultivation days cannot be greater than 365 (one year)")
+            raise serializers.ValidationError("Cultivation days cannot be greater than 365 (one year)")
 
         return super().validate(data)
 
@@ -1745,10 +1777,6 @@ class BuildingSerializer(ScenarioSubmoduleSerializer):
                 ],
             },
         }
-
-    def validate(self, data):
-
-        return super().validate(data)
 
 
 class BuildingWriteSerializer(BuildingSerializer):
@@ -1791,16 +1819,12 @@ class RoadSerializer(ScenarioSubmoduleSerializer):
             },
         }
 
-    def validate(self, data):
-        return super().validate(data)
-
 
 class RoadWriteSerializer(RoadSerializer):
     pass
 
 
 class RoadReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = Road
         fields = "__all__"
@@ -1834,7 +1858,6 @@ class OtherInfrastructureWriteSerializer(OtherInfrastructureSerializer):
 
 
 class OtherInfrastructureReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = OtherInfrastructure
         fields = "__all__"
@@ -1849,6 +1872,24 @@ class IrrigationWriteSerializer(ScenarioModuleSerializer):
         ref_name = "Irrigation"
         mandatory_fields = {}
 
+    def validate(self, data):
+        super().validate(data)
+
+        irrigation_systems: list[IrrigationSystem] = self.instance.irrigation_systems.all()
+        irrigation_phases: list[IrrigationPhase] = self.instance.irrigation_phases.all()
+
+        for irrigation_system in irrigation_systems:
+            if not irrigation_system.is_ready():
+                data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
+                break
+
+        for irrigation_phase in irrigation_phases:
+            if not irrigation_phase.is_ready():
+                data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
+                break
+
+        return data
+
 
 class IrrigationReadSerializer(BaseGenericModuleSerializer):
     class Meta:
@@ -1856,19 +1897,6 @@ class IrrigationReadSerializer(BaseGenericModuleSerializer):
         fields = "__all__"
         ref_name = "Irrigation"
         mandatory_fields = {}
-
-    def validate(self, data):
-
-        irrigation_systems = self.instance.irrigation_systems.all()
-        irrigation_phases = self.instance.irrigation_phases.all()
-
-        if any([system.status.name_en == "EMPTY" for system in irrigation_systems]):
-            raise serializers.ValidationError("Irrigation systems are not ready for calculations")
-
-        if any([phase.status.name_en == "EMPTY" for phase in irrigation_phases]):
-            raise serializers.ValidationError("Irrigation phases are not ready for calculations")
-
-        return super().validate(data)
 
 
 # IrrigationSystem
@@ -1912,7 +1940,6 @@ class IrrigationSystemWriteSerializer(ScenarioSubmoduleSerializer):
 
 
 class IrrigationSystemReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = IrrigationSystem
         fields = "__all__"
@@ -1931,24 +1958,27 @@ class IrrigationPhaseWriteSerializer(ScenarioSubmoduleSerializer):
         mandatory_fields = {
             "start": {
                 "mandatory": [
+                    "gross_irrigation_water_start",
                     "irrigation_system_type",
-                    "fuel_type",
+                    "fuel_type_start",
                     "well_depth",
                     "ha_start",
                 ],
             },
             "with": {
                 "mandatory": [
+                    "gross_irrigation_water_w",
                     "irrigation_system_type",
-                    "fuel_type",
+                    "fuel_type_w",
                     "well_depth",
                     "ha_w",
                 ],
             },
             "without": {
                 "mandatory": [
+                    "gross_irrigation_water_wo",
                     "irrigation_system_type",
-                    "fuel_type",
+                    "fuel_type_wo",
                     "well_depth",
                     "ha_wo",
                 ],
@@ -1967,7 +1997,6 @@ class IrrigationPhaseWriteSerializer(ScenarioSubmoduleSerializer):
 
 
 class IrrigationPhaseReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = IrrigationPhase
         fields = "__all__"
@@ -1998,10 +2027,10 @@ class EnergySerializer(ScenarioModuleSerializer):
         fuels: QuerySet[Fuel] = self.instance.fuels.all()
 
         if any([not electricity.is_ready() for electricity in electricities]):
-            raise serializers.ValidationError("Electricity modules are not ready for calculations")
+            data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
 
         if any([not fuel.is_ready() for fuel in fuels]):
-            raise serializers.ValidationError("Fuel modules are not ready for calculations")
+            data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
 
         return data
 
@@ -2011,7 +2040,6 @@ class EnergyWriteSerializer(EnergySerializer):
 
 
 class EnergyReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = Energy
         fields = "__all__"
@@ -2030,19 +2058,19 @@ class FuelSerializer(ScenarioSubmoduleSerializer):
         mandatory_fields = {
             "start": {
                 "mandatory": [
-                    "fuel_type",
+                    "fuel_type_start",
                     "quantity_consumed_per_year_start",
                 ],
             },
             "with": {
                 "mandatory": [
-                    "fuel_type",
+                    "fuel_type_w",
                     "quantity_consumed_per_year_w",
                 ],
             },
             "without": {
                 "mandatory": [
-                    "fuel_type",
+                    "fuel_type_wo",
                     "quantity_consumed_per_year_wo",
                 ],
             },
@@ -2057,10 +2085,6 @@ class FuelSerializer(ScenarioSubmoduleSerializer):
         if parent.fuels.count() + 1 > max_elements:
             raise serializers.ValidationError(f"Only {max_elements} fuel modules are allowed")
 
-        parent_serializer = EnergySerializer(data={}, instance=parent, partial=True, context=self.context)
-        if parent_serializer.is_valid():
-            parent_serializer.save()
-
         return data
 
 
@@ -2069,7 +2093,6 @@ class FuelWriteSerializer(FuelSerializer):
 
 
 class FuelReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = Fuel
         fields = "__all__"
@@ -2112,15 +2135,10 @@ class ElectricityWriteSerializer(NoScenarioSubmoduleSerializer):
         if not self.instance and parent.electricities.count() + 1 > max_elements:
             raise serializers.ValidationError(f"Only {max_elements} electricity modules are allowed")
 
-        parent_serializer = EnergySerializer(data={}, instance=parent, partial=True, context=self.context)
-        if parent_serializer.is_valid():
-            parent_serializer.save()
-
         return data
 
 
 class ElectricityReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = Electricity
         fields = "__all__"
@@ -2171,7 +2189,6 @@ class LivestockWriteSerializer(LandModuleSeralizer):
 
 
 class LivestockReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = Livestock
         fields = "__all__"
@@ -2210,7 +2227,6 @@ class AquacultureWriteSerializer(LandModuleSeralizer):
 
 
 class AquacultureReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = Aquaculture
         fields = "__all__"
@@ -2261,7 +2277,6 @@ class SmallFisheryWriteSerializer(LandModuleSeralizer):
 
 
 class SmallFisheryReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = SmallFishery
         fields = "__all__"
@@ -2312,7 +2327,6 @@ class LargeFisheryWriteSerializer(LandModuleSeralizer):
 
 
 class LargeFisheryReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = LargeFishery
         fields = "__all__"
@@ -2358,7 +2372,6 @@ class WaterbodyWriteSerializer(WaterbodySerializer):
 
 
 class WaterbodyReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = Waterbody
         fields = "__all__"
@@ -2484,9 +2497,9 @@ class ForestManagementWriteSerializer(LandModuleSeralizer):
                 errors.append(f"If a forest has degradation it cannot have rotation, logging, or disturbances in the {verbose_scenario_name} scenario")
 
         if instance and instance.disturbances.count() > 0:
-            pc_biomass_destruction_start = data.get("logging_percentage_agb_logged_start", 0)
-            pc_biomass_destruction_wo = data.get("logging_percentage_agb_logged_wo", 0)
-            pc_biomass_destruction_w = data.get("logging_percentage_agb_logged_w", 0)
+            pc_biomass_destruction_start = data.get("logging_percentage_agb_logged_start", 0) or 0
+            pc_biomass_destruction_wo = data.get("logging_percentage_agb_logged_wo", 0) or 0
+            pc_biomass_destruction_w = data.get("logging_percentage_agb_logged_w", 0) or 0
 
             for disturbance in instance.disturbances.all():
                 disturbance: ForestDisturbance
@@ -2516,7 +2529,6 @@ class ForestManagementWriteSerializer(LandModuleSeralizer):
 
 
 class ForestManagementReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = ForestManagement
         fields = "__all__"
@@ -2547,7 +2559,6 @@ class InputWriteSerializer(InputSerializer):
 
 
 class InputReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = Input
         fields = "__all__"
@@ -2604,7 +2615,6 @@ class InputEntryWriteSerializer(InputEntrySerializer):
 
 
 class InputEntryReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = InputEntry
         fields = "__all__"
@@ -2682,7 +2692,6 @@ class SetAsideWriteSerializer(LandModuleSeralizer):
 
 
 class SetAsideReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = SetAside
         fields = "__all__"
@@ -2699,7 +2708,6 @@ class OtherLandWriteSerializer(LandModuleSeralizer):
 
 
 class OtherLandReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = OtherLand
         fields = "__all__"
@@ -2731,38 +2739,24 @@ class SettlementSerializer(LandModuleSeralizer):
         }
 
     def validate(self, data):
+        super().validate(data)
 
         buildings = Building.objects.filter(parent=self.instance).all()
 
         if any(not building.is_ready() for building in buildings):
-            raise serializers.ValidationError("At least one building is not ready for calculations")
-
-        for building in buildings:
-            building_serializer = BuildingReadSerializer(data={}, partial=True, instance=building, context=self.context)
-            if not building_serializer.is_valid():
-                raise serializers.ValidationError(building_serializer.errors)
+            data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
 
         roads = Road.objects.filter(parent=self.instance).all()
 
         if any(not road.is_ready() for road in roads):
-            raise serializers.ValidationError("At least one road is not ready for calculations")
-
-        for road in roads:
-            road_serializer = RoadReadSerializer(data={}, partial=True, instance=road, context=self.context)
-            if not road_serializer.is_valid():
-                raise serializers.ValidationError(road_serializer.errors)
+            data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
 
         other_infrastructures = OtherInfrastructure.objects.filter(parent=self.instance).all()
 
         if any(not other_infrastructure.is_ready() for other_infrastructure in other_infrastructures):
-            raise serializers.ValidationError("At least one other infrastructure is not ready for calculations")
+            data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
 
-        for other_infrastructure in other_infrastructures:
-            other_infrastructure_serializer = OtherInfrastructureReadSerializer(data={}, partial=True, instance=other_infrastructure, context=self.context)
-            if not other_infrastructure_serializer.is_valid():
-                raise serializers.ValidationError(other_infrastructure_serializer.errors)
-
-        return super().validate(data)
+        return data
 
 
 class SettlementWriteSerializer(SettlementSerializer):
@@ -2770,7 +2764,6 @@ class SettlementWriteSerializer(SettlementSerializer):
 
 
 class SettlementReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = Settlement
         fields = "__all__"
@@ -2796,8 +2789,16 @@ class MacroFuelTypeSerializer(serializers.ModelSerializer):
         ref_name = "MacroFuelType"
 
 
+class FuelUseTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FuelUseType
+        fields = "__all__"
+        ref_name = "FuelUseType"
+
+
 class FuelTypeSerializer(serializers.ModelSerializer):
     macro_fuel_type = MacroFuelTypeSerializer(many=False, read_only=True)
+    fuel_use_type = FuelUseTypeSerializer(many=False, read_only=True)
     unit = serializers.SerializerMethodField()
 
     def get_unit(self, obj):
@@ -2841,7 +2842,6 @@ class CoastalWetlandWriteSerializer(CoastalWetlandSerializer):
 
 
 class CoastalWetlandReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = CoastalWetland
         fields = "__all__"
@@ -2906,7 +2906,6 @@ class ForestDisturbanceWriteSerializer(ScenarioSubmoduleSerializer):
 
 
 class ForestDisturbanceReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = ForestDisturbance
         fields = "__all__"
@@ -2962,7 +2961,6 @@ class NewNoteSerializer(serializers.ModelSerializer):
         ref_name = "Note"
 
     def validate(self, data):
-
         try:
             module_type = ModuleType.objects.get(pk=data["module_type_id"])
         except ModuleType.DoesNotExist:
@@ -3058,6 +3056,10 @@ class ValueChainParentModuleSerializer(ScenarioModuleSerializer):
         return data
 
 
+class ValueChainSubmoduleWriteSerializer(ScenarioSubmoduleSerializer):
+    pass
+
+
 class StorageSerializer(ValueChainParentModuleSerializer):
     class Meta:
         model = Storage
@@ -3071,7 +3073,6 @@ class StorageWriteSerializer(StorageSerializer):
 
 
 class StorageReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = Storage
         fields = "__all__"
@@ -3121,21 +3122,11 @@ class StorageEntrySerializer(ScenarioSubmoduleSerializer):
         }
 
 
-class StorageEntryWriteSerializer(StorageEntrySerializer):
-
-    def save(self, **kwargs):
-        super().save(**kwargs)
-
-        parent: Storage = utils.getany([self.instance, dict(kwargs)], "parent")
-        parent_serializer = StorageWriteSerializer(data={}, instance=parent, partial=True, context=self.context)
-        if parent_serializer.is_valid():
-            parent_serializer.save()
-
-        return self.instance
+class StorageEntryWriteSerializer(StorageEntrySerializer, ValueChainSubmoduleWriteSerializer):
+    pass
 
 
 class StorageEntryReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = StorageEntry
         fields = "__all__"
@@ -3156,7 +3147,6 @@ class ProcessingWriteSerializer(ProcessingSerializer):
 
 
 class ProcessingReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = Processing
         fields = "__all__"
@@ -3206,21 +3196,11 @@ class ProcessingEntrySerializer(ScenarioSubmoduleSerializer):
         }
 
 
-class ProcessingEntryWriteSerializer(ProcessingEntrySerializer):
-
-    def save(self, **kwargs):
-        super().save(**kwargs)
-
-        parent: Processing = utils.getany([self.instance, dict(kwargs)], "parent")
-        parent_serializer = ProcessingWriteSerializer(data={}, instance=parent, partial=True, context=self.context)
-        if parent_serializer.is_valid():
-            parent_serializer.save()
-
-        return self.instance
+class ProcessingEntryWriteSerializer(ProcessingEntrySerializer, ValueChainSubmoduleWriteSerializer):
+    pass
 
 
 class ProcessingEntryReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = ProcessingEntry
         fields = "__all__"
@@ -3241,7 +3221,6 @@ class PackagingWriteSerializer(PackagingSerializer):
 
 
 class PackagingReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = Packaging
         fields = "__all__"
@@ -3291,21 +3270,11 @@ class PackagingEntrySerializer(ScenarioSubmoduleSerializer):
         }
 
 
-class PackagingEntryWriteSerializer(PackagingEntrySerializer):
-
-    def save(self, **kwargs):
-        super().save(**kwargs)
-
-        parent: Packaging = utils.getany([self.instance, dict(kwargs)], "parent")
-        parent_serializer = PackagingWriteSerializer(data={}, instance=parent, partial=True, context=self.context)
-        if parent_serializer.is_valid():
-            parent_serializer.save()
-
-        return self.instance
+class PackagingEntryWriteSerializer(PackagingEntrySerializer, ValueChainSubmoduleWriteSerializer):
+    pass
 
 
 class PackagingEntryReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = PackagingEntry
         fields = "__all__"
@@ -3326,7 +3295,6 @@ class TransportWriteSerializer(TransportSerializer):
 
 
 class TransportReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = Transport
         fields = "__all__"
@@ -3361,88 +3329,96 @@ class TransportEntrySerializer(ScenarioSubmoduleSerializer):
         }
 
 
-class TransportEntryWriteSerializer(TransportEntrySerializer):
-
-    def save(self, **kwargs):
-        super().save(**kwargs)
-
-        parent: Transport = utils.getany([self.instance, dict(kwargs)], "parent")
-        parent_serializer = TransportWriteSerializer(data={}, instance=parent, partial=True, context=self.context)
-        if parent_serializer.is_valid():
-            parent_serializer.save()
-
-        return self.instance
+class TransportEntryWriteSerializer(TransportEntrySerializer, ValueChainSubmoduleWriteSerializer):
+    pass
 
 
 class TransportEntryReadSerializer(BaseGenericModuleSerializer):
-
     class Meta:
         model = TransportEntry
         fields = "__all__"
         ref_name = "TransportEntry"
         mandatory_fields = {}
 
+
 class ProjectFileUploadSerializer(serializers.ModelSerializer):
     name = serializers.CharField(read_only=True)
     bucket_public_url = serializers.URLField(read_only=True)
     file = serializers.FileField(required=True, write_only=True)
+    size = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = ProjectFileAttachment
         fields = "__all__"
         ref_name = "ProjectFileAttachment"
 
     def validate(self, attrs):
-
         file = attrs["file"]
 
         max_size_in_mb = int(ApplicationParameter.objects.get(name__iexact="project_uploads_max_file_size_mb").value)
 
         if file.size > max_size_in_mb * 1024 * 1024:
             raise serializers.ValidationError(f"File size must be less than {max_size_in_mb}MB")
-        
-        if ProjectFileAttachment.objects.filter(project=attrs["project"], name=file.name).exists():
-            raise serializers.ValidationError("A file with the same name already exists in the project")
+
+        attrs["file"].name = utils.get_unique_name(attrs["project"], file.name)
 
         return super().validate(attrs)
 
     def save(self, **kwargs):
         project = self.validated_data["project"]
         file = self.validated_data["file"]
-        
+
         from google.cloud import storage
 
         try:
             client = storage.Client()
-            bucket = client.get_bucket("fao-exact-review-uploads") # TODO: Move to settings and make dynamic based on environment (dev, review, prod)
+            bucket = client.get_bucket("fao-exact-review-uploads")  # TODO: Move to settings and make dynamic based on environment (dev, review, prod)
             project_folder = f"projects/{project.id}/"
             blob = bucket.blob(f"{project_folder}{file.name}")
 
             file_size = file.size
 
+            max_size_in_mb = int(ApplicationParameter.objects.get(name__iexact="project_uploads_max_file_size_mb").value)
+
             total_size = sum([blob.size for blob in bucket.list_blobs(prefix=project_folder)])
-            if total_size + file_size > 25 * 1024 * 1024:
-                raise serializers.ValidationError("Maximum total project files size reached. Total size of all files in the project must be less than 25MB.")
+            if total_size + file_size > max_size_in_mb * 1024 * 1024:
+                raise serializers.ValidationError(f"Maximum total project files size reached. Total size of all files in the project must be less than {max_size_in_mb}MB.")
 
             blob.upload_from_file(file, content_type=file.content_type)
             public_url = blob.public_url
 
-            attachment = ProjectFileAttachment.objects.create(
-                name=file.name,
-                project=project,
-                bucket_public_url=public_url
-            )
+            attachment = ProjectFileAttachment.objects.create(name=file.name, project=project, bucket_public_url=public_url, size=file_size)
         except Exception as e:
             blob.delete()
             raise serializers.ValidationError(str(e))
 
         return attachment
-    
+
+
 class ProjectFileReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectFileAttachment
         fields = "__all__"
         ref_name = "ProjectFileAttachment"
 
+
 class ProjectFileDownloadSerializer(serializers.Serializer):
     file_name = serializers.CharField()
     content_type = serializers.CharField()
+
+
+class APIStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = APIHealth
+        fields = ["is_under_maintenance", "maintenance_end_time", "maintenance_message"]
+        ref_name = "APIStatus"
+
+
+class ProjectLockHolderInformationSerializer(serializers.Serializer):
+    is_locked = serializers.BooleanField()
+    locked_at = serializers.DateTimeField()
+    lock_updated_at = serializers.DateTimeField()
+    locked_by = serializers.SerializerMethodField()
+
+    def get_locked_by(self, obj):
+        return obj.locked_by.email if obj.locked_by else None
