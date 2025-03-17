@@ -115,6 +115,7 @@ from .serializers import (
     FuelTypeSerializer,
     ProjectLockHolderInformationSerializer,
     Aquaculture,
+    DynamicResultFactory,
 )
 
 from firebase_admin import auth as firebase_admin_auth
@@ -2118,33 +2119,10 @@ def generic_module_viewset(model: Module):
                     logger.debug(f"Cache is invalid. Calculating results for module {module.id}")
                     total, by_activity, by_gas, by_activity_gas = CalculatorFactory().calculate_result(module)
 
-                    results_total = {
-                        "total_w": total[0],
-                        "total_wo": total[1],
-                        "balance": total[2],
-                    }
-                    results_total = DynamicResultSerializer(results_total, aggregate_by=BreakdownTypes.TOTAL).data
-
-                    results_by_activity = {
-                        "total_w": list(by_activity[0]),
-                        "total_wo": list(by_activity[1]),
-                        "balance": list(by_activity[2]),
-                    }
-                    results_by_activity = DynamicResultSerializer(results_by_activity, aggregate_by=BreakdownTypes.ACTIVITY).data
-
-                    results_by_gas = {
-                        "total_w": list(by_gas[0]),
-                        "total_wo": list(by_gas[1]),
-                        "balance": list(by_gas[2]),
-                    }
-                    results_by_gas = DynamicResultSerializer(results_by_gas, aggregate_by=BreakdownTypes.GAS).data
-
-                    results_by_activity_gas = {
-                        "total_w": list(by_activity_gas[0]),
-                        "total_wo": list(by_activity_gas[1]),
-                        "balance": list(by_activity_gas[2]),
-                    }
-                    results_by_activity_gas = DynamicResultSerializer(results_by_activity_gas, aggregate_by=BreakdownTypes.ACTIVITY_GAS).data
+                    results_total = DynamicResultFactory.create(activity, total, aggregate_by=BreakdownTypes.TOTAL)
+                    results_by_activity = DynamicResultFactory.create(activity, by_activity, aggregate_by=BreakdownTypes.ACTIVITY)
+                    results_by_gas = DynamicResultFactory.create(activity, by_gas, aggregate_by=BreakdownTypes.GAS)
+                    results_by_activity_gas = DynamicResultFactory.create(activity, by_activity_gas, aggregate_by=BreakdownTypes.ACTIVITY_GAS)
 
                     module_results = results_total if aggregate_by == BreakdownTypes.TOTAL else results_by_activity if aggregate_by == BreakdownTypes.ACTIVITY else results_by_gas if aggregate_by == BreakdownTypes.GAS else results_by_activity_gas
                     module.cache_results(results_total, results_by_activity, results_by_gas, results_by_activity_gas)
