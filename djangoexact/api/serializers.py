@@ -2681,6 +2681,16 @@ class DynamicResultFactory:
             case _:
                 raise ValueError("Invalid breakdown type")
 
+        activity_duration = sum(activity.implementation_years, activity.capitalization_years)
+        project_duration = sum(activity.project.implementation_years, activity.project.capitalization_years)
+
+        # NOTE: Activity duration can be less than project duration. In this case, we need to pad the results with zeros
+        if activity_duration < project_duration:
+            diff = project_duration - activity_duration
+            results["total_w"] = [0] * diff + results["total_w"]
+            results["total_wo"] = [0] * diff + results["total_wo"]
+            results["balance"] = [0] * diff + results["balance"]
+
         return DynamicResultSerializer(results, aggregate_by=aggregate_by)
 
 
