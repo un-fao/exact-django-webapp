@@ -2661,27 +2661,28 @@ class DynamicResultSerializer(serializers.Serializer):
 class DynamicResultFactory:
     @staticmethod
     def create(activity: Activity, data: dict, aggregate_by: Optional[BreakdownTypes] = BreakdownTypes.TOTAL):
-        class DynamicResultSerializer(DynamicResultSerializer):
-            class Meta:
-                breakdown_type = aggregate_by
+        results = DynamicResultFactory.prepare_data(activity, data, aggregate_by)
+        return DynamicResultSerializer(results, aggregate_by=aggregate_by)
 
+    @staticmethod
+    def prepare_data(activity: Activity, data: dict, aggregate_by: Optional[BreakdownTypes] = BreakdownTypes.TOTAL):
         results = {
-            "total_w": data.get("total_w"),
-            "total_wo": data.get("total_wo"),
-            "balance": data.get("balance"),
+            "total_w": data[0],
+            "total_wo": data[1],
+            "balance": data[2],
         }
 
         match aggregate_by:
             case BreakdownTypes.TOTAL:
                 pass
-            case BreakdownTypes.GAS, BreakdownTypes.ACTIVITY, BreakdownTypes.ACTIVITY_GAS:
-                results["total_w"] = list(data["total_w"])
-                results["total_wo"] = list(data["total_wo"])
-                results["balance"] = list(data["balance"])
+            case BreakdownTypes.GAS | BreakdownTypes.ACTIVITY | BreakdownTypes.ACTIVITY_GAS:
+                results["total_w"] = list(results["total_w"])
+                results["total_wo"] = list(results["total_wo"])
+                results["balance"] = list(results["balance"])
             case _:
                 raise ValueError("Invalid breakdown type")
 
-        return DynamicResultSerializer(results, aggregate_by=aggregate_by)
+        return results
 
 
 class MacroInputTypeSerializer(serializers.ModelSerializer):
