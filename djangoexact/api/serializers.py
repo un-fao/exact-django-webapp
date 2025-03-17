@@ -99,6 +99,7 @@ from .models import (
     FuelUseType,
 )
 from datetime import timedelta
+from typing import Optional
 
 
 class EmptySerializer(serializers.Serializer):
@@ -2655,6 +2656,32 @@ class DynamicResultSerializer(serializers.Serializer):
                 return YearlyActivityEmissionSerializer(data, many=True).data
             case _:
                 raise ValueError("Invalid breakdown type")
+
+
+class DynamicResultFactory:
+    @staticmethod
+    def create(activity: Activity, data: dict, aggregate_by: Optional[BreakdownTypes] = BreakdownTypes.TOTAL):
+        class DynamicResultSerializer(DynamicResultSerializer):
+            class Meta:
+                breakdown_type = aggregate_by
+
+        results = {
+            "total_w": data.get("total_w"),
+            "total_wo": data.get("total_wo"),
+            "balance": data.get("balance"),
+        }
+
+        match aggregate_by:
+            case BreakdownTypes.TOTAL:
+                pass
+            case BreakdownTypes.GAS, BreakdownTypes.ACTIVITY, BreakdownTypes.ACTIVITY_GAS:
+                results["total_w"] = list(data["total_w"])
+                results["total_wo"] = list(data["total_wo"])
+                results["balance"] = list(data["balance"])
+            case _:
+                raise ValueError("Invalid breakdown type")
+
+        return DynamicResultSerializer(results, aggregate_by=aggregate_by)
 
 
 class MacroInputTypeSerializer(serializers.ModelSerializer):
