@@ -1321,6 +1321,9 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error(f"User with email {email} does not exist")
             return utils.ErrorResponse(f"User with email {email} does not exist", status=http_status.HTTP_400_BAD_REQUEST)
 
+        if user == project.owner:
+            logging.error("Project owner cannot be invited to the project")
+
         group: Group = serializer.validated_data["group"]
         invitation = ProjectInvitation.objects.filter(project=project, user=user, group=group).exclude(status__name=utils.InvitationStatus.REJECTED.value).first()
 
