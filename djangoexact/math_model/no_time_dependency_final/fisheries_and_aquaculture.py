@@ -57,17 +57,17 @@ class Fishery(BaseModule):
     def calculate_emissions(self):
         def calculate_catch_emissions():
             try:
-                ef_diesel_co2_start = self.ef_diesel_co2_start_tier_2 or self.ef_diesel_default_co2
-                ef_diesel_co2_end = self.ef_diesel_co2_end_tier_2 or self.ef_diesel_default_co2
+                ef_diesel_co2_start = self.ef_diesel_co2_start_tier_2 if self.ef_diesel_co2_start_tier_2 is not None else self.ef_diesel_default_co2
+                ef_diesel_co2_end = self.ef_diesel_co2_end_tier_2 if self.ef_diesel_co2_end_tier_2 is not None else self.ef_diesel_default_co2
 
-                ef_diesel_n2o_start = self.ef_diesel_n2o_start_tier_2 or self.ef_diesel_default_n2o
-                ef_diesel_n2o_end = self.ef_diesel_n2o_end_tier_2 or self.ef_diesel_default_n2o
+                ef_diesel_n2o_start = self.ef_diesel_n2o_start_tier_2 if self.ef_diesel_n2o_start_tier_2 is not None else self.ef_diesel_default_n2o
+                ef_diesel_n2o_end = self.ef_diesel_n2o_end_tier_2 if self.ef_diesel_n2o_end_tier_2 is not None else self.ef_diesel_default_n2o
 
-                ef_diesel_ch4_start = self.ef_diesel_ch4_start_tier_2 or self.ef_diesel_default_ch4
-                ef_diesel_ch4_end = self.ef_diesel_ch4_end_tier_2 or self.ef_diesel_default_ch4
+                ef_diesel_ch4_start = self.ef_diesel_ch4_start_tier_2 if self.ef_diesel_ch4_start_tier_2 is not None else self.ef_diesel_default_ch4
+                ef_diesel_ch4_end = self.ef_diesel_ch4_end_tier_2 if self.ef_diesel_ch4_end_tier_2 is not None else self.ef_diesel_default_ch4
 
-                fui_start = self.fui_start_tier_2 or self.fui_default_start
-                fui_end = self.fui_end_tier_2 or self.fui_default_end
+                fui_start = self.fui_start_tier_2 if self.fui_start_tier_2 is not None else self.fui_default_start
+                fui_end = self.fui_end_tier_2 if self.fui_end_tier_2 is not None else self.fui_default_end
 
                 # co2 calculation
 
@@ -111,11 +111,11 @@ class Fishery(BaseModule):
 
         def calculate_refrigerant_emissions():
             try:
-                gwp_refrigerant_start = self.gwp_refrigerant_start_tier_2 or self.gwp_refrigerant_default
-                gwp_refrigerant_end = self.gwp_refrigerant_end_tier_2 or self.gwp_refrigerant_default
+                gwp_refrigerant_start = self.gwp_refrigerant_start_tier_2 if self.gwp_refrigerant_start_tier_2 is not None else self.gwp_refrigerant_default
+                gwp_refrigerant_end = self.gwp_refrigerant_end_tier_2 if self.gwp_refrigerant_end_tier_2 is not None else self.gwp_refrigerant_default
 
-                quantity_lost_refrigerant_start = self.quantity_lost_refrigerant_start_tier_2 or self.quantity_lost_refrigerant_default
-                quantity_lost_refrigerant_end = self.quantity_lost_refrigerant_end_tier_2 or self.quantity_lost_refrigerant_default
+                quantity_lost_refrigerant_start = self.quantity_lost_refrigerant_start_tier_2 if self.quantity_lost_refrigerant_start_tier_2 is not None else self.quantity_lost_refrigerant_default
+                quantity_lost_refrigerant_end = self.quantity_lost_refrigerant_end_tier_2 if self.quantity_lost_refrigerant_end_tier_2 is not None else self.quantity_lost_refrigerant_default
 
                 catch_with_refrigerant_start = self.catch_start * self.percentage_refrigerant_start
                 catch_with_refrigerant_end = self.catch_end * self.percentage_refrigerant_end
@@ -132,11 +132,11 @@ class Fishery(BaseModule):
 
         def calculate_ice_emissions():
             try:
-                tonnes_ice_start = self.tonnes_ice_start_tier_2 or self.tonnes_ice_default
-                tonnes_ice_end = self.tonnes_ice_end_tier_2 or self.tonnes_ice_default
+                tonnes_ice_start = self.tonnes_ice_start_tier_2 if self.tonnes_ice_start_tier_2 is not None else self.tonnes_ice_default
+                tonnes_ice_end = self.tonnes_ice_end_tier_2 if self.tonnes_ice_end_tier_2 is not None else self.tonnes_ice_default
 
-                kwh_ice_per_tonne_start = self.kwh_ice_per_tonne_start_tier_2 or self.kwh_ice_per_tonne_default
-                kwh_ice_per_tonne_end = self.kwh_ice_per_tonne_end_tier_2 or self.kwh_ice_per_tonne_default
+                kwh_ice_per_tonne_start = self.kwh_ice_per_tonne_start_tier_2 if self.kwh_ice_per_tonne_start_tier_2 is not None else self.kwh_ice_per_tonne_default
+                kwh_ice_per_tonne_end = self.kwh_ice_per_tonne_end_tier_2 if self.kwh_ice_per_tonne_end_tier_2 is not None else self.kwh_ice_per_tonne_default
 
                 ice_ef_start = tonnes_ice_start * kwh_ice_per_tonne_start * self.operating_margin / 1000
                 ice_ef_end = tonnes_ice_end * kwh_ice_per_tonne_end * self.operating_margin / 1000
@@ -177,8 +177,8 @@ class CoastalAquaculture(BaseModule):
     def calculate_emissions(self):
         def calculate_nitrous_emissions():
             try:
-                nitrous_ef_start = self.nitrous_ef_start_tier_2 or self.nitrous_ef_default
-                nitrous_ef_end = self.nitrous_ef_end_tier_2 or self.nitrous_ef_default
+                nitrous_ef_start = self.nitrous_ef_start_tier_2 if self.nitrous_ef_start_tier_2 is not None else self.nitrous_ef_default
+                nitrous_ef_end = self.nitrous_ef_end_tier_2 if self.nitrous_ef_end_tier_2 is not None else self.nitrous_ef_default
 
                 annual_start = nitrous_ef_start * self.production_start * self.nitrous_constant * 44 / 28
                 annual_end = nitrous_ef_end * self.production_end * self.nitrous_constant * 44 / 28
@@ -193,10 +193,10 @@ class CoastalAquaculture(BaseModule):
 
         def calculate_co2_emissions():
             try:
-                electricity_used_start = self.electricity_used_start_tier_2 or self.electricity_used_default
-                electricity_used_end = self.electricity_used_end_tier_2 or self.electricity_used_default
-                ef_electricity_start = self.ef_electricity_start_tier_2 or self.ef_electricity_default
-                ef_electricity_end = self.ef_electricity_end_tier_2 or self.ef_electricity_default
+                electricity_used_start = self.electricity_used_start_tier_2 if self.electricity_used_start_tier_2 is not None else self.electricity_used_default
+                electricity_used_end = self.electricity_used_end_tier_2 if self.electricity_used_end_tier_2 is not None else self.electricity_used_default
+                ef_electricity_start = self.ef_electricity_start_tier_2 if self.ef_electricity_start_tier_2 is not None else self.ef_electricity_default
+                ef_electricity_end = self.ef_electricity_end_tier_2 if self.ef_electricity_end_tier_2 is not None else self.ef_electricity_default
 
                 annual_start = electricity_used_start * self.production_start * ef_electricity_start
                 annual_end = electricity_used_end * self.production_end * ef_electricity_end

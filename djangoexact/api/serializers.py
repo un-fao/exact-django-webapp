@@ -535,11 +535,12 @@ class WriteActivitySerializer(serializers.ModelSerializer):
         ref_name = "Activity"
 
     def validate(self, data):
-        project = self.instance.project if self.instance else data.get("project")
+        project: Project = self.instance.project if self.instance else data.get("project")
 
         if project.is_archived:
             return serializers.ValidationError("Archived projects cannot have activities added")
 
+        project._check_lock_expiration()
         if project.is_locked and not project.locked_by == self.context["request"].user and not self.context["request"].user.is_staff:
             raise serializers.ValidationError("Project is locked by another user")
 
@@ -636,8 +637,9 @@ class ActivityBuilderSerializer(serializers.Serializer):
         module_types = data.get("module_types", [])
         land_use_change = data.get("land_use_change", None)
         area = data.get("area", None)
-        project = data.get("project")
+        project: Project = data.get("project")
 
+        project._check_lock_expiration()
         if project.is_locked and not project.locked_by == self.context["request"].user and not self.context["request"].user.is_staff:
             raise serializers.ValidationError("Project is locked by another user")
 
@@ -1075,6 +1077,7 @@ class BaseModuleSerializer(BaseGenericModuleSerializer):
 
         module_types = list(map(lambda module: module.class_name, activity.module_types.all()))
 
+        project._check_lock_expiration()
         if project.is_locked and not project.locked_by == self.context["request"].user and not self.context["request"].user.is_staff:
             log.error("Project is locked by another user")
             raise serializers.ValidationError("Project is locked by another user")

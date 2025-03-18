@@ -339,7 +339,7 @@ def biomass_emissions(
 # INPUT SINGLE MODULE CALCULATION
 def input_single_calculation(unit_start, unit_end, ipcc_factor, tier_2_factor, unit_factor, emissions_factor, time_implementation, time_capitalization, rate_type):
     try:
-        ipcc_or_tier_2_factor = tier_2_factor or ipcc_factor
+        ipcc_or_tier_2_factor = tier_2_factor if tier_2_factor is not None else ipcc_factor
 
         unit_start = unit_start * unit_factor
         unit_end = unit_end * unit_factor
