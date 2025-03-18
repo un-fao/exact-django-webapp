@@ -611,10 +611,6 @@ class Project(Historical, DirtyFieldsMixin):
 
     def save(self, *args, **kwargs):
         if self.pk:
-            old = Project.objects.get(pk=self.pk)
-            if old.owner != self.owner:
-                raise exceptions.ValidationError("User cannot be changed")
-
             if self.is_dirty(check_relationship=True):
                 dirty_fields = self.get_dirty_fields(check_relationship=True)
                 exclude_fields = ["is_locked", "locked_at", "lock_updated_at", "locked_by", "updated_at"]
