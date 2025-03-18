@@ -933,6 +933,9 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
         if not self.start_year_t2 and self.duration_t2:
             return self.last_year_of_accounting - (self.project.start_year_of_activities + self.duration_t2)
 
+        if self.start_year_t2 and not self.duration_t2:
+            return self.last_year_of_accounting - (self.start_year_t2 + self.project.implementation_years)
+
         return self.last_year_of_accounting - (self.start_year_t2 + self.duration_t2)
 
     def __get_all_modules(self):
