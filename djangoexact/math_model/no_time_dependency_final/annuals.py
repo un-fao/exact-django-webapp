@@ -48,8 +48,8 @@ class AnnualCropland(LandModule):
     def __post_init__(self):
         super().__post_init__()
 
-        self.yield_main = self.yield_main_tier_2 or self.yield_value_main
-        self.yield_minor = self.yield_minor_tier_2 or self.yield_value_minor
+        self.yield_main = self.yield_main_tier_2 if self.yield_main_tier_2 is not None else self.yield_value_main
+        self.yield_minor = self.yield_minor_tier_2 if self.yield_minor_tier_2 is not None else self.yield_value_minor
 
         # NOTE: this is a default value that is calculated based on the input values, needed for the frontend
         if self.yield_value_main is not None:
