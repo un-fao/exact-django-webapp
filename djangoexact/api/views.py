@@ -1367,6 +1367,7 @@ The EX-ACT Team
         )
         send_mail(invitation_subject, invitation_text, settings.EMAIL_HOST_USER, [invitation.user.email])
 
+        logging.debug(f"Email sent to user ID {user.pk} with role {group.name} for project ID {project.pk}")
         logging.debug("END ProjectInvitationViewset.create")
         return Response({"message": f"Invitation for {user.email} sent successfully", "id": invitation.id}, status=http_status.HTTP_201_CREATED)
 
