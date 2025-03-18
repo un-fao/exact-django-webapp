@@ -29,7 +29,7 @@ class BaseModule:
     delay: int 
 
     def __post_init__(self):
-        self.result = Result(self.implementation_time, self.capitalization_time)
+        self.result = Result(self.implementation_time, self.capitalization_time, self.delay)
 
     def evaluate_tier_2_defaults(self):
         try:
