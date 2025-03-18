@@ -389,7 +389,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         project.lock(self.request.user)
 
-        ProjectMembership.objects.create(user=self.request.user, project=project, group=Group.objects.get(name="Admin"))
+        ProjectMembership.objects.create(user=self.request.user, project=project, group=Group.objects.get(name="Admin"), status=InvitationStatusType.objects.get(name=utils.InvitationStatus.ACCEPTED.value))
         read_serializer = ReadProjectSerializer(instance=project, context={"request": request})
 
         return Response(read_serializer.data, status=http_status.HTTP_201_CREATED)
@@ -1247,13 +1247,19 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             403: "Selected user does not have permission to delete project memberships",
         },
     )
+    @transaction.atomic
     def destroy(self, request, *args, **kwargs):
         membership = self.get_object()
 
-        if membership.user == self.request.user and membership.project.owner == self.request.user:
-            return utils.ErrorResponse("Project owner cannot delete their own membership. Delete the project instead.", status=http_status.HTTP_400_BAD_REQUEST)
+        if membership.user == self.request.user == membership.project.owner:
+            other_admin = membership.project.members.filter(group__name="Admin").exclude(user=membership.project.owner).first()
+            if not other_admin:
+                return utils.ErrorResponse("Last remaining project Admin cannot delete their own membership. Delete the project instead.", status=http_status.HTTP_400_BAD_REQUEST)
 
-        elif not utils.has_project_permission("delete_projectmembership", self.request.user, membership.project) and not membership.user == self.request.user:
+            membership.project.owner = other_admin.user
+            membership.project.save()
+
+        elif not security.check_permission("delete_projectmembership", self.request.user, membership.project) and not membership.user == self.request.user:
             logging.error("Selected user does not have permission to delete project memberships")
             return utils.ErrorResponse("Selected user does not have permission to delete project memberships", status=http_status.HTTP_403_FORBIDDEN)
 
@@ -1263,7 +1269,7 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if membership.group.name == "Admin":
             admin_count = membership.project.members.filter(group__name="Admin").count()
             if admin_count == 1:
-                return utils.ErrorResponse("Cannot delete the last admin in the project", status=http_status.HTTP_400_BAD_REQUEST)
+                return utils.ErrorResponse("Cannot delete the last Admin in the project", status=http_status.HTTP_400_BAD_REQUEST)
 
         membership.delete()
 
@@ -1321,6 +1327,10 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error(f"User with email {email} does not exist")
             return utils.ErrorResponse(f"User with email {email} does not exist", status=http_status.HTTP_400_BAD_REQUEST)
 
+        # BUG: owner should already be a member of the project, so this should be redundant but apparently it's not
+        if user == project.owner:
+            logging.error("Project owner cannot be invited to the project")
+
         group: Group = serializer.validated_data["group"]
         invitation = ProjectInvitation.objects.filter(project=project, user=user, group=group).exclude(status__name=utils.InvitationStatus.REJECTED.value).first()
 
@@ -1367,6 +1377,7 @@ The EX-ACT Team
         )
         send_mail(invitation_subject, invitation_text, settings.EMAIL_HOST_USER, [invitation.user.email])
 
+        logging.debug(f"Email sent to user ID {user.pk} with role {group.name} for project ID {project.pk}")
         logging.debug("END ProjectInvitationViewset.create")
         return Response({"message": f"Invitation for {user.email} sent successfully", "id": invitation.id}, status=http_status.HTTP_201_CREATED)
 

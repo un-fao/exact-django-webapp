@@ -35,8 +35,8 @@ class ValueChain(BaseModule):
     def __post_init__(self):
         super().__post_init__()
 
-        self.emission_factor_start = self.emission_factor_start_tier_2 or self.emission_factor_start_default
-        self.emission_factor_end = self.emission_factor_end_tier_2 or self.emission_factor_end_default
+        self.emission_factor_start = self.emission_factor_start_tier_2 if self.emission_factor_start_tier_2 is not None else self.emission_factor_start_default
+        self.emission_factor_end = self.emission_factor_end_tier_2 if self.emission_factor_end_tier_2 is not None else self.emission_factor_end_default
 
     def calculate_emissions(self):
 
