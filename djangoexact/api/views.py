@@ -1256,7 +1256,7 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             if not other_admin:
                 return utils.ErrorResponse("Last remaining project Admin cannot delete their own membership. Delete the project instead.", status=http_status.HTTP_400_BAD_REQUEST)
 
-            membership.project.owner = other_admin
+            membership.project.owner = other_admin.user
             membership.project.save()
 
         elif not security.check_permission("delete_projectmembership", self.request.user, membership.project) and not membership.user == self.request.user:
