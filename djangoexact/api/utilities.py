@@ -275,7 +275,7 @@ def copy_activity(activity, new_project=None):
         submodules = []
 
         if module.__class__.__name__ == "FloodedRice":
-            submodules = list(module.flooded_rice_phases.all())
+            submodules = list(module.minor_seasons.all())
         elif module.__class__.__name__ == "Input":
             submodules = list(module.input_entries.all())
         elif module.__class__.__name__ == "Energy":
