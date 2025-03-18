@@ -927,8 +927,11 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
         return self.duration_t2
 
     def __get_capitalization_years(self) -> int:
-        if any([self.start_year_t2 is None, self.start_year_t2 == 0, self.duration_t2 is None, self.duration_t2 == 0]):
+        if not self.start_year_t2 and not self.duration_t2:
             return self.project.capitalization_years
+
+        if not self.start_year_t2 and self.duration_t2:
+            return self.last_year_of_accounting - (self.project.start_year_of_activities + self.duration_t2)
 
         return self.last_year_of_accounting - (self.start_year_t2 + self.duration_t2)
 
@@ -937,7 +940,7 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
         modules = []
 
         for module_type in module_types:
-            modules.extend(getattr(self, module_type.class_name.lower()).all())
+            modules.extend(list(getattr(self, module_type.class_name.lower()).all()))
 
         return modules
 

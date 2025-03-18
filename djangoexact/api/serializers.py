@@ -99,6 +99,7 @@ from .models import (
     FuelUseType,
 )
 from datetime import timedelta
+from typing import Optional
 
 
 class EmptySerializer(serializers.Serializer):
@@ -311,7 +312,7 @@ class ProjectSummarySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields = ["id", "name", "country", "updated_at", "role", "tags", "created_at"]
+        fields = ["id", "name", "country", "updated_at", "role", "tags", "created_at", "is_archived"]
 
     def get_role(self, obj):
         ctx = self.context.get("request", None)
@@ -2655,6 +2656,33 @@ class DynamicResultSerializer(serializers.Serializer):
                 return YearlyActivityEmissionSerializer(data, many=True).data
             case _:
                 raise ValueError("Invalid breakdown type")
+
+
+class DynamicResultFactory:
+    @staticmethod
+    def create(activity: Activity, data: dict, aggregate_by: Optional[BreakdownTypes] = BreakdownTypes.TOTAL):
+        results = DynamicResultFactory.prepare_data(activity, data, aggregate_by)
+        return DynamicResultSerializer(results, aggregate_by=aggregate_by)
+
+    @staticmethod
+    def prepare_data(activity: Activity, data: dict, aggregate_by: Optional[BreakdownTypes] = BreakdownTypes.TOTAL):
+        results = {
+            "total_w": data[0],
+            "total_wo": data[1],
+            "balance": data[2],
+        }
+
+        match aggregate_by:
+            case BreakdownTypes.TOTAL:
+                pass
+            case BreakdownTypes.GAS | BreakdownTypes.ACTIVITY | BreakdownTypes.ACTIVITY_GAS:
+                results["total_w"] = list(results["total_w"])
+                results["total_wo"] = list(results["total_wo"])
+                results["balance"] = list(results["balance"])
+            case _:
+                raise ValueError("Invalid breakdown type")
+
+        return results
 
 
 class MacroInputTypeSerializer(serializers.ModelSerializer):
