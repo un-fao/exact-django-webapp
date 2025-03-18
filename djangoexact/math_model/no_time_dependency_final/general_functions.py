@@ -495,10 +495,12 @@ def create_bgb_matrix_from_agb(agb_matrix, delta_agb_matrix, bgb_ratio_under_thr
 
         for i in range(time_impl):
             for j in range(0, agb_matrix.shape[1]):
+                
                 if affo_boolean and is_same_forest_type and forest_start:
                     value_to_assign = agb_matrix[i][j] * bgb_ratio_under_threshold
                     if value_to_assign > threshold * bgb_ratio_under_threshold:
-                        value_to_assign = delta_agb_matrix[i][j] * bgb_ratio_over_threshold + agb_matrix[i][j - 1] * bgb_ratio_under_threshold
+                        delta_bgb_matrix[i][j] = delta_bgb_matrix[i][j] * bgb_ratio_over_threshold / bgb_ratio_under_threshold
+                        value_to_assign = threshold * bgb_ratio_under_threshold + (agb_matrix[i][j] - threshold) * bgb_ratio_over_threshold + np.sum(delta_bgb_matrix[i, i:j])
                         
                 else:
                     value_to_assign = bgb_start + delta_bgb_matrix[i][j] + np.sum(delta_bgb_matrix[i, 0:j])
@@ -752,8 +754,6 @@ def create_litter_deadwood_matrix(years_impl, years_cap, delta_yearly, value_sta
             for j in range(i, years_total):
                 cumulative_matrix[i, j] = value_start + delta_matrix[i][j] + np.sum(delta_matrix[i, i:j])
                 
-        check_agb_matrices(cumulative_matrix, delta_matrix, max_value)
-
         return cumulative_matrix, delta_matrix
 
     except Exception as e:

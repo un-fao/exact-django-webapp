@@ -234,9 +234,9 @@ class SolidAndLiquidFuelsConsumption(BaseModule):
         self,
     ):
         try:
-            factor_co2 = self.emissions_factor_co2 or self.specific_factor_co2
-            factor_ch4 = self.emissions_factor_ch4 or self.specific_factor_ch4
-            factor_n2o = self.emissions_factor_n2o or self.specific_factor_n2o
+            factor_co2 = self.specific_factor_co2 if self.specific_factor_co2 is not None else self.emissions_factor_co2
+            factor_ch4 = self.specific_factor_ch4 if self.specific_factor_ch4 is not None else self.emissions_factor_ch4
+            factor_n2o = self.specific_factor_n2o if self.specific_factor_n2o is not None else self.emissions_factor_n2o
 
             annual_start_co2 = factor_co2 * self.mwh_start
             annual_end_co2 = factor_co2 * self.mwh_end
@@ -275,7 +275,7 @@ class NewIrrigation(BaseModule):
         self,
     ):
         try:
-            ef = self.ef_tier_2 or self.ef_ref
+            ef = self.ef_tier_2 if self.ef_tier_2 is not None else self.ef_ref
 
             self.total_emissions = ef * (self.units_end - self.units_start) / 1000  # to convert the ef from kg to g
             yearly_units = compute_yearly_delta(self.units_start, self.units_end, self.implementation_time, self.capitalization_time, self.rate_type)
