@@ -93,13 +93,13 @@ class OperationPhaseIrrigation(BaseModule):
             ef_co2_default, ef_co2_tier_2, ef_n2o_default, ef_n2o_tier_2, ef_ch4_default, ef_ch4_tier_2, total_dynamic_head_tier_2, average_pressure_default, average_pressure_tier_2, pumping_efficiency_default, pumping_efficiency_tier_2, erh_electricity, fuel_net_calorific_values, fuel_density, depth, gwir
         ):
             try:
-                pumping_efficiency = self.pumping_efficiency_tier_2 or self.pumping_efficiency_default
-                average_pressure = self.average_pressure_tier_2 or self.average_pressure_default
+                pumping_efficiency = self.pumping_efficiency_tier_2 if self.pumping_efficiency_tier_2 is not None else self.pumping_efficiency_default
+                average_pressure = self.average_pressure_tier_2 if self.average_pressure_tier_2 is not None else self.average_pressure_default
                 total_dynamic_head_default = average_pressure * 10.19
-                total_dynamic_head = total_dynamic_head_tier_2 or total_dynamic_head_default
-                ef_co2 = ef_co2_tier_2 or ef_co2_default
-                ef_n2o = ef_n2o_tier_2 or ef_n2o_default
-                ef_ch4 = ef_ch4_tier_2 or ef_ch4_default
+                total_dynamic_head = total_dynamic_head_tier_2 if total_dynamic_head_tier_2 is not None else total_dynamic_head_default
+                ef_co2 = ef_co2_tier_2 if ef_co2_tier_2 is not None else ef_co2_default
+                ef_n2o = ef_n2o_tier_2 if ef_n2o_tier_2 is not None else ef_n2o_default
+                ef_ch4 = ef_ch4_tier_2 if ef_ch4_tier_2 is not None else ef_ch4_default
                 gwir = gwir * 10
                 erh = erh_electricity if erh_electricity else 9.81 / (fuel_net_calorific_values * fuel_density) / math.pow(10, 3)
 
@@ -172,7 +172,7 @@ class Roads(BaseModule):
     def calculate_emissions(self):
         try:
             # NOTE: check this, looks weird
-            ef = self.ef_tier_2 or self.ef_ipcc
+            ef = self.ef_tier_2 if self.ef_tier_2 is not None else self.ef_ipcc
 
             self.total_emissions = self.units_end * ef / 1000  # to convert the ef from kg to g
             yearly_units = compute_yearly_delta(0, self.units_end, self.implementation_time, self.capitalization_time, self.rate_type)
@@ -200,8 +200,8 @@ class ElectricityConsumption(BaseModule):
         self,
     ):
         try:
-            factor_start = self.specific_factor_start or self.emissions_factor
-            factor_end = self.specific_factor_end or self.emissions_factor
+            factor_start = self.specific_factor_start if self.specific_factor_start is not None else self.emissions_factor
+            factor_end = self.specific_factor_end if self.specific_factor_end is not None else self.emissions_factor
 
             annual_start = (factor_start * self.mwh_start) * (1 + self.percent_loss_transportation_start)
             annual_end = (factor_end * self.mwh_end) * (1 + self.percent_loss_transportation_end)
