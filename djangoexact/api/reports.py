@@ -20,6 +20,7 @@ from openpyxl.styles import Color, PatternFill, Font, Border
 from datetime import datetime
 from io import BytesIO
 from rest_framework.test import APIRequestFactory
+from itertools import zip_longest
 
 log.basicConfig(level=log.DEBUG)
 
@@ -357,28 +358,28 @@ class BaseProjectReport:
                 soil_co2_wo.append(module.extract_emissions(module.emissions_set_wo, activity_type=math_utils.ActivityTypes.SOIL_CO2_CHANGE, gas_type=math_utils.GasTypes.CO2))
                 biomass_co2_wo.append(module.extract_emissions(module.emissions_set_wo, activity_type=math_utils.ActivityTypes.BIOMASS, gas_type=math_utils.GasTypes.CO2))
 
-        other_ghgs = list(map(sum, zip(*other_ghgs)))
-        other_ghgs_w = list(map(sum, zip(*other_ghgs_w)))
-        other_ghgs_wo = list(map(sum, zip(*other_ghgs_wo)))
-        n2o = list(map(sum, zip(*n2o)))
-        n2o_w = list(map(sum, zip(*n2o_w)))
-        n2o_wo = list(map(sum, zip(*n2o_wo)))
-        ch4 = list(map(sum, zip(*ch4)))
-        ch4_w = list(map(sum, zip(*ch4_w)))
-        ch4_wo = list(map(sum, zip(*ch4_wo)))
-        other_co2 = list(map(sum, zip(*other_co2)))
-        other_co2_w = list(map(sum, zip(*other_co2_w)))
-        other_co2_wo = list(map(sum, zip(*other_co2_wo)))
-        soil_co2 = list(map(sum, zip(*soil_co2)))
-        soil_co2_w = list(map(sum, zip(*soil_co2_w)))
-        soil_co2_wo = list(map(sum, zip(*soil_co2_wo)))
-        biomass_co2 = list(map(sum, zip(*biomass_co2)))
-        biomass_co2_w = list(map(sum, zip(*biomass_co2_w)))
-        biomass_co2_wo = list(map(sum, zip(*biomass_co2_wo)))
+        other_ghgs = list(map(sum, zip_longest(*other_ghgs, fillvalue=0)))
+        other_ghgs_w = list(map(sum, zip_longest(*other_ghgs_w, fillvalue=0)))
+        other_ghgs_wo = list(map(sum, zip_longest(*other_ghgs_wo, fillvalue=0)))
+        n2o = list(map(sum, zip_longest(*n2o, fillvalue=0)))
+        n2o_w = list(map(sum, zip_longest(*n2o_w, fillvalue=0)))
+        n2o_wo = list(map(sum, zip_longest(*n2o_wo, fillvalue=0)))
+        ch4 = list(map(sum, zip_longest(*ch4, fillvalue=0)))
+        ch4_w = list(map(sum, zip_longest(*ch4_w, fillvalue=0)))
+        ch4_wo = list(map(sum, zip_longest(*ch4_wo, fillvalue=0)))
+        other_co2 = list(map(sum, zip_longest(*other_co2, fillvalue=0)))
+        other_co2_w = list(map(sum, zip_longest(*other_co2_w, fillvalue=0)))
+        other_co2_wo = list(map(sum, zip_longest(*other_co2_wo, fillvalue=0)))
+        soil_co2 = list(map(sum, zip_longest(*soil_co2, fillvalue=0)))
+        soil_co2_w = list(map(sum, zip_longest(*soil_co2_w, fillvalue=0)))
+        soil_co2_wo = list(map(sum, zip_longest(*soil_co2_wo, fillvalue=0)))
+        biomass_co2 = list(map(sum, zip_longest(*biomass_co2, fillvalue=0)))
+        biomass_co2_w = list(map(sum, zip_longest(*biomass_co2_w, fillvalue=0)))
+        biomass_co2_wo = list(map(sum, zip_longest(*biomass_co2_wo, fillvalue=0)))
 
-        yearly_balance_t_co2_eq = list(map(sum, zip(biomass_co2, soil_co2, other_co2, ch4, n2o, other_ghgs)))
-        yearly_balance_t_co2_eq_w = list(map(sum, zip(biomass_co2_w, soil_co2_w, other_co2_w, ch4_w, n2o_w, other_ghgs_w)))
-        yearly_balance_t_co2_eq_wo = list(map(sum, zip(biomass_co2_wo, soil_co2_wo, other_co2_wo, ch4_wo, n2o_wo, other_ghgs_wo)))
+        yearly_balance_t_co2_eq = list(map(sum, zip_longest(biomass_co2, soil_co2, other_co2, ch4, n2o, other_ghgs, fillvalue=0)))
+        yearly_balance_t_co2_eq_w = list(map(sum, zip_longest(biomass_co2_w, soil_co2_w, other_co2_w, ch4_w, n2o_w, other_ghgs_w, fillvalue=0)))
+        yearly_balance_t_co2_eq_wo = list(map(sum, zip_longest(biomass_co2_wo, soil_co2_wo, other_co2_wo, ch4_wo, n2o_wo, other_ghgs_wo, fillvalue=0)))
         cumulative_balance_t_co2_eq = np.cumsum(yearly_balance_t_co2_eq)
 
         self.workbook = self.excel_manager.get_workbook()
@@ -529,7 +530,7 @@ class BaseProjectReport:
             activity_report.build_activity_skeleton()
             activity_report.build_modules_reports()
             activity_report.build_yearly_balance()
-            self.cumulative_hectares_yearly = list(map(sum, zip(self.cumulative_hectares_yearly, activity_report.total_hectares_yearly)))
+            self.cumulative_hectares_yearly = list(map(sum, zip_longest(self.cumulative_hectares_yearly, activity_report.total_hectares_yearly, fillvalue=0)))
             self.activity_reports.append(activity_report)
 
         self.finalize_report()
@@ -570,8 +571,8 @@ class BaseActivityReport:
 
     def __post_init__(self):
         self.activity_title = self.activity.name
-        self.start_year_of_activities = self.activity.project.start_year_of_activities
-        self.last_year_of_accounting = self.activity.project.last_year_of_accounting
+        self.start_year_of_activities = self.activity.start_year
+        self.last_year_of_accounting = self.activity.last_year_of_accounting
         self.implementation_years = self.activity.implementation_years
         self.capitalization_years = self.activity.capitalization_years
         self.duration = self.implementation_years + self.capitalization_years
@@ -663,7 +664,7 @@ class BaseActivityReport:
         activity_title_row = self.activity_title_row_index
         log.debug(f"Last results row: {last_results_row}")
 
-        for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
+        for i in range(self.duration):
             self.results_worksheet.cell(row=activity_title_row, column=i + 2, value=self.total_emissions[i])
             self.results_worksheet.cell(row=activity_title_row, column=i + 2, value=self.total_emissions[i]).fill = Colors.LIGHT_BEIGE_FILL.value
 
@@ -695,11 +696,11 @@ class BaseActivityReport:
                 continue
             module_report = ReportClass(module, self)
             module_report.build_report()
-            self.total_emissions = list(map(sum, zip(self.total_emissions, module_report.total_emissions)))
+            self.total_emissions = list(map(sum, zip_longest(self.total_emissions, module_report.total_emissions, fillvalue=0)))
             if module.is_with() and hasattr(module_report, "units_breakdown_w"):
-                self.total_hectares_yearly = list(map(sum, zip(self.total_hectares_yearly, module_report.units_breakdown_w)))
+                self.total_hectares_yearly = list(map(sum, zip_longest(self.total_hectares_yearly, module_report.units_breakdown_w, fillvalue=0)))
             elif module.is_without() and hasattr(module_report, "units_breakdown_wo"):
-                self.total_hectares_yearly = list(map(sum, zip(self.total_hectares_yearly, module_report.units_breakdown_wo)))
+                self.total_hectares_yearly = list(map(sum, zip_longest(self.total_hectares_yearly, module_report.units_breakdown_wo, fillvalue=0)))
             self.modules_reports.append(module_report)
 
         return self.modules_reports
@@ -759,8 +760,8 @@ class BaseModuleReport:
         self.emissions_set_w = Result(*self.result).total_w.yearly_emissions_by_sector_by_gas
         self.emissions_set_wo = Result(*self.result).total_wo.yearly_emissions_by_sector_by_gas
 
-        self.start_year_of_activities = self.module.activity.project.start_year_of_activities
-        self.last_year_of_accounting = self.module.activity.project.last_year_of_accounting
+        self.start_year_of_activities = self.activity_report.start_year_of_activities
+        self.last_year_of_accounting = self.activity_report.last_year_of_accounting
         self.implementation_years = self.module.activity.implementation_years
         self.capitalization_years = self.module.activity.capitalization_years
         self.duration = self.module.activity.implementation_years + self.module.activity.capitalization_years
@@ -971,7 +972,7 @@ class LandModuleReport(BaseModuleReport):
         self.fire_n2o_row_index = last_results_row + 4
         self.fire_ch4_row_index = last_results_row + 5
 
-        for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
+        for i in range(self.duration):
             self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.biomass_co2[i])
             self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.soil_co2[i])
             self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.soil_n2o[i])
@@ -1182,7 +1183,7 @@ class PerennialCroplandReport(LandModuleReport):
         with_project_row = with_project_row + 1
 
         self.additional_indicators_worksheet.cell(with_project_row, 1, "Perennial Cropland (ha)")
-        for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
+        for i in range(self.duration):
             self.additional_indicators_worksheet.cell(with_project_row, i + 2, self.units_breakdown_w[i])
 
         without_project_row = None
@@ -1194,7 +1195,7 @@ class PerennialCroplandReport(LandModuleReport):
         without_project_row = without_project_row + 1
 
         self.additional_indicators_worksheet.cell(without_project_row, 1, "Perennial Cropland (ha)")
-        for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
+        for i in range(self.duration):
             self.additional_indicators_worksheet.cell(without_project_row, i + 2, self.units_breakdown_wo[i])
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
@@ -1382,7 +1383,7 @@ class AnnualCroplandReport(LandModuleReport):
         with_project_row = with_project_row + 1
 
         self.additional_indicators_worksheet.cell(with_project_row, 1, "Annual Cropland (ha)")
-        for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
+        for i in range(self.duration):
             self.additional_indicators_worksheet.cell(with_project_row, i + 2, self.units_breakdown_w[i])
 
         without_project_row = None
@@ -1394,7 +1395,7 @@ class AnnualCroplandReport(LandModuleReport):
         without_project_row = without_project_row + 1
 
         self.additional_indicators_worksheet.cell(without_project_row, 1, "Annual Cropland (ha)")
-        for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
+        for i in range(self.duration):
             self.additional_indicators_worksheet.cell(without_project_row, i + 2, self.units_breakdown_wo[i])
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
@@ -1779,7 +1780,7 @@ class FloodedRiceReport(LandModuleReport):
 
         self.results_worksheet.cell(row=last_results_row + 1, column=1, value="CH4 from rice cultivation")
 
-        for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
+        for i in range(self.duration):
             self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.rice_cultivation_ch4[i])
 
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
@@ -1839,7 +1840,7 @@ class WaterbodyReport(BaseModuleReport):
 
         self.results_worksheet.cell(row=last_results_row + 1, column=1, value="CH4 from waterbody management")
 
-        for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
+        for i in range(self.duration):
             self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.waterbody_management_ch4[i])
 
         self.populate_metadata()
@@ -1875,7 +1876,7 @@ class AquacultureReport(BaseModuleReport):
         self.results_worksheet.cell(row=last_results_row + 1, column=1, value="N2O from fish")
         self.results_worksheet.cell(row=last_results_row + 2, column=1, value="CO2-eq from electricity")
 
-        for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
+        for i in range(self.duration):
             self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.fish_n2o[i])
             self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.electricity_co2_eq[i])
 
@@ -1971,7 +1972,7 @@ class FisheryReport(BaseModuleReport):
         self.results_worksheet.cell(row=last_results_row + 4, column=1, value="HFC from refrigeration")
         self.results_worksheet.cell(row=last_results_row + 5, column=1, value="CO2-eq from electricity")
 
-        for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
+        for i in range(self.duration):
             self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.liquid_fuel_co2[i])
             self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.liquid_fuel_n2o[i])
             self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.liquid_fuel_ch4[i])
@@ -2245,7 +2246,7 @@ class LivestockReport(BaseModuleReport):
         self.results_worksheet.cell(row=last_results_row + 8, column=1, value="Indirect N2O from manure management PRP (leaching)")
         self.results_worksheet.cell(row=last_results_row + 9, column=1, value="Indirect N2O from manure management PRP (volatilization)")
 
-        for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
+        for i in range(0, self.duration):
             self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.enteric_fermentation_ch4[i])
             self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.manure_management_other_than_prp_ch4[i])
             self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.manure_management_other_than_prp_direct_n2o[i])
@@ -2585,7 +2586,7 @@ class ForestManagementReport(LandModuleReport):
         self.results_worksheet.cell(row=last_results_row + 2, column=1, value="CO2 from biomass loss")
         self.results_worksheet.cell(row=last_results_row + 3, column=1, value="CO2 from biomass gain")
 
-        for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
+        for i in range(self.duration):
             self.results_worksheet.cell(row=self.fire_n2o_row_index, column=i + 2, value=self.fire_n2o[i])
             self.results_worksheet.cell(row=self.fire_ch4_row_index, column=i + 2, value=self.fire_ch4[i])
             self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.hwp_co2[i])
@@ -2748,7 +2749,7 @@ class EnergyReport(BaseModuleReport):
         self.results_worksheet.cell(row=last_results_row + 6, column=1, value="CH4 from solid fuels")
         self.results_worksheet.cell(row=last_results_row + 7, column=1, value="N2O from solid fuels")
 
-        for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
+        for i, year in enumerate(range(self.activity_report.activity.start_year, self.activity_report.activity.last_year_of_accounting)):
             self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.electricity_co2_eq[i])
             self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.liquid_fuel_co2[i])
             self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.liquid_fuel_ch4[i])
@@ -2873,7 +2874,7 @@ class InputReport(BaseModuleReport):
         self.results_worksheet.cell(row=last_results_row + 3, column=1, value="CO2-eq from inputs (production, transportation and storage)")
         self.results_worksheet.cell(row=last_results_row + 4, column=1, value="CO2-eq from feed")
 
-        for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
+        for i in range(self.duration):
             self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.inputs_co2[i])
             self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.inputs_n2o[i])
             self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.inputs_co2_eq[i])
@@ -3041,7 +3042,7 @@ class IrrigationReport(BaseModuleReport):
         self.results_worksheet.cell(row=last_results_row + 3, column=1, value="CH4 from liquid fuel or electricity")
         self.results_worksheet.cell(row=last_results_row + 4, column=1, value="N2O from liquid fuel or electricity")
 
-        for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
+        for i in range(self.duration):
             self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.other_infrastructure_co2_eq[i])
             self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.liquid_fuel_or_electricity_co2[i])
             self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.liquid_fuel_or_electricity_ch4[i])
@@ -3197,7 +3198,7 @@ class SettlementReport(LandModuleReport):
         self.results_worksheet.cell(row=last_results_row + 2, column=1, value="CO2-eq from roads")
         self.results_worksheet.cell(row=last_results_row + 3, column=1, value="CO2-eq from other infrastructure")
 
-        for i, year in enumerate(range(self.start_year_of_activities, self.last_year_of_accounting)):
+        for i in range(self.duration):
             self.results_worksheet.cell(row=last_results_row + 1, column=i + 2, value=self.buildings_co2_eq[i])
             self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.roads_co2_eq[i])
             self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.other_infrastructure_co2_eq[i])
