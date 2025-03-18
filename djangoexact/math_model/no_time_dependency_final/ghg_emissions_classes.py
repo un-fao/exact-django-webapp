@@ -156,10 +156,11 @@ class BreakdownTypes(Enum):
 
 class Result:
 
-    def __init__(self, time_impl, time_cap):
+    def __init__(self, time_impl, time_cap, delay):
         self.yearly_emissions_by_sector_by_gas: list[YearlyGasActivityEmissionSet] = []
         self.balance = 0
-        self.time_tot = time_impl + time_cap
+        self.delay = delay
+        self.time_tot = time_impl + time_cap + delay
 
     def to_dict(self):
         return [emission_set.to_dict() for emission_set in self.yearly_emissions_by_sector_by_gas]
