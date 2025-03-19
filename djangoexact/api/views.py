@@ -389,7 +389,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         project.lock(self.request.user)
 
-        ProjectMembership.objects.create(user=self.request.user, project=project, group=Group.objects.get(name="Admin"), status=InvitationStatusType.objects.get(name=utils.InvitationStatus.ACCEPTED.value))
+        ProjectMembership.objects.create(user=self.request.user, project=project, group=Group.objects.get(name="Admin"))
         read_serializer = ReadProjectSerializer(instance=project, context={"request": request})
 
         return Response(read_serializer.data, status=http_status.HTTP_201_CREATED)
