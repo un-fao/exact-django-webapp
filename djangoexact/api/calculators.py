@@ -3532,14 +3532,8 @@ class EnergyCalculator(BaseCalculator):
         """
 
         module: Energy = self.data
-        self.results_w = MathResult(
-            self.activity.implementation_years,
-            self.activity.capitalization_years,
-        )
-        self.results_wo = MathResult(
-            self.activity.implementation_years,
-            self.activity.capitalization_years,
-        )
+        self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         for elec in module.electricities.all():
             r_w, r_wo = ElectricityCalculator(elec).calculate()
@@ -5076,14 +5070,8 @@ class LivestockCalculator(BaseCalculator):
 class IrrigationCalculator(BaseCalculator):
     def calculate(self) -> list[Result]:
         module: Irrigation = self.data
-        self.results_w = MathResult(
-            self.activity.implementation_years,
-            self.activity.capitalization_years,
-        )
-        self.results_wo = MathResult(
-            self.activity.implementation_years,
-            self.activity.capitalization_years,
-        )
+        self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
         for system in module.irrigation_systems.all():
             r_w, r_wo = IrrigationSystemCalculator(system).calculate()
             self.results_w += r_w
