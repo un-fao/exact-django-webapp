@@ -2474,6 +2474,8 @@ class ForestManagementWriteSerializer(LandModuleSeralizer):
         }
 
     def validate(self, data):
+        super().validate(data)
+
         errors = []
 
         instance: ForestManagement = self.instance
@@ -2527,9 +2529,8 @@ class ForestManagementWriteSerializer(LandModuleSeralizer):
 
         if any([not d.is_ready() for d in instance.disturbances.all()]):
             data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
-            return data
 
-        return super().validate(data)
+        return data
 
 
 class ForestManagementReadSerializer(BaseGenericModuleSerializer):
