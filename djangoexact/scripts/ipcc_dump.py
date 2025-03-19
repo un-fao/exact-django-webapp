@@ -4673,6 +4673,23 @@ def add_0_2_to_co2_value_in_input_emission_factor():
     input_emission_factor = InputEmissionFactor.objects.filter(input_type=urea).update(co2_value=0.2)
 
 
+def clear_cache_of_all_modules():
+    from django.apps import apps
+
+    instances: list[CachedResultMixin] = []
+    for model in apps.get_models():
+        if issubclass(model, (CachedResultMixin)) and not model._meta.abstract:
+            instances.extend(model.objects.all())
+
+    instances = [instance for instance in instances if all([instance.last_cached_at, instance.cached_results_total, instance.cached_results_by_activity, instance.cached_results_by_gas, instance.cached_results_by_activity_by_gas])]
+
+    log.debug(f"Clearing cache for {len(instances)} instances")
+
+    for instance in instances:
+        log.debug(f"Clearing cache for {instance}")
+        instance.invalidate_cached_results()
+
+
 def run():
     import os
 
