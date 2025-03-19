@@ -955,8 +955,8 @@ class DeforestationCalculator(BaseCalculator):
             math_wo = MathDeforestation(**self.inputs_wo)
             math_wo.calculate_emissions()
 
-        res_w = math_w.result if math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        res_wo = math_wo.result if math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        res_w = math_w.result if math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        res_wo = math_wo.result if math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         return (res_w, res_wo)
 
@@ -1192,8 +1192,8 @@ class OtherLandUseCalculator(BaseCalculator):
             self.results_wo = MathOtherLandUseChanges(**inputs_wo)
             self.results_wo.calculate_emissions()
 
-        res_w = self.results_w.result if self.results_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        res_wo = self.results_wo.result if self.results_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        res_w = self.results_w.result if self.results_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        res_wo = self.results_wo.result if self.results_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         if PLOT_GRAPHS:
             res_w.plot_emissions_and_aggregate_by_activity("oluc_w")
@@ -1668,10 +1668,10 @@ class AnnualCropCalculator(LandModuleCalculator):
             self.math_wo = MathAnnualCropland(**self.inputs_wo)
             self.math_wo.calculate_emissions()
 
-        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         if PLOT_GRAPHS:
             self.results_start_w.plot_emissions_and_aggregate_by_activity("annual_start_w")
@@ -2140,10 +2140,10 @@ class PerennialCropCalculator(LandModuleCalculator):
             self.math_wo = MathPerennialCropland(**self.inputs_wo)
             self.math_wo.calculate_emissions()
 
-        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         if PLOT_GRAPHS:
             self.results_start_w.plot_emissions_and_aggregate_by_activity("perennial_start_w")
@@ -2542,10 +2542,10 @@ class FloodedRiceSeasonCalculator(LandModuleCalculator):
             self.math_wo = MathFloodedRice(**self.inputs_wo)
             self.math_wo.calculate_emissions()
 
-        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         if PLOT_GRAPHS:
             self.results_start_w.plot_emissions_and_aggregate_by_activity("flooded_rice_start_w")
@@ -2565,8 +2565,8 @@ class FloodedRiceCalculator(BaseCalculator):
 
     def calculate(self) -> Result:
         module: FloodedRice = self.data
-        self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         r_w, r_wo = FloodedRiceSeasonCalculator(module).calculate()
 
@@ -2835,10 +2835,10 @@ class GrasslandCalculator(LandModuleCalculator):
             self.math_wo = MathGrassland(**self.inputs_wo)
             self.math_wo.calculate_emissions()
 
-        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         if PLOT_GRAPHS:
             self.results_start_w.plot_emissions_and_aggregate_by_activity("grassland_start_w")
@@ -3032,8 +3032,8 @@ class SmallFisheryCalculator(BaseCalculator):
             self.math_wo = MathFishery(**self.inputs_wo)
             self.math_wo.calculate_emissions()
 
-        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         if PLOT_GRAPHS:
             self.results_w.plot_emissions_and_aggregate_by_activity("small_fishery_w")
@@ -3235,8 +3235,8 @@ class LargeFisheryCalculator(BaseCalculator):
             self.math_wo = MathFishery(**self.inputs_wo)
             self.math_wo.calculate_emissions()
 
-        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         if PLOT_GRAPHS:
             self.results_w.plot_emissions_and_aggregate_by_activity("large_fishery_w")
@@ -3354,8 +3354,8 @@ class AquacultureCalculator(BaseCalculator):
             self.math_wo = MathAquaculture(**self.inputs_wo)
             self.math_wo.calculate_emissions()
 
-        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         results_tuple = (self.results_w, self.results_wo)
 
@@ -3373,8 +3373,8 @@ class InputCalculator(BaseCalculator):
     def calculate(self) -> list[MathResult]:
         module: Input = self.data
 
-        self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         entries = module.input_entries.all()
         for entry in entries:
@@ -3491,8 +3491,8 @@ class InputEntryCalculator(BaseCalculator):
         self.math_wo = MathInputs(**self.inputs_wo)
         self.math_wo.calculate_emissions()
 
-        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         results_tuple = (self.results_w, self.results_wo)
 
@@ -3630,8 +3630,8 @@ class ElectricityCalculator(BaseCalculator):
         self.math_wo = ElectricityConsumption(**self.inputs_wo)
         self.math_wo.calculate_emissions()
 
-        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         results_tuple = (self.results_w, self.results_wo)
 
@@ -3766,8 +3766,8 @@ class FuelCalculator(BaseCalculator):
             self.math_wo = SolidAndLiquidFuelsConsumption(**inputs_wo)
             self.math_wo.calculate_emissions()
 
-        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         results_tuple = (self.results_w, self.results_wo)
 
@@ -4000,10 +4000,10 @@ class SettlementCalculator(LandModuleCalculator):
             self.math_wo = MathNotCultivatedLand(**self.inputs_wo)
             self.math_wo.calculate_emissions()
 
-        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         if PLOT_GRAPHS:
             self.results_start_w.plot_emissions_and_aggregate_by_activity("settlement_start_w")
@@ -4091,8 +4091,8 @@ class BuildingCalculator(BaseCalculator):
             self.math_wo = MathRoads(**self.inputs_wo)
             self.math_wo.calculate_emissions()
 
-        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         results_tuple = (self.results_w, self.results_wo)
 
@@ -4129,8 +4129,8 @@ class RoadCalculator(BaseCalculator):
 
         self.get_defaults()
 
-        self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         if self.parent.is_with():
             self.inputs_w = {
@@ -4160,8 +4160,8 @@ class RoadCalculator(BaseCalculator):
             self.math_wo = MathRoads(**self.inputs_wo)
             self.math_wo.calculate_emissions()
 
-        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         results_tuple = (self.results_w, self.results_wo)
 
@@ -4221,8 +4221,8 @@ class OtherInfrastructureCalculator(BaseCalculator):
             self.math_wo = MathRoads(**self.inputs_wo)
             self.math_wo.calculate_emissions()
 
-        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         results_tuple = (self.results_w, self.results_wo)
 
@@ -5063,8 +5063,8 @@ class LivestockCalculator(BaseCalculator):
             self.math_wo = MathLivestock(**inputs_wo)
             self.math_wo.calculate_emissions()
 
-        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         if PLOT_GRAPHS:
             self.results_w.plot_emissions_and_aggregate_by_activity("livestock_w")
@@ -5161,8 +5161,8 @@ class IrrigationSystemCalculator(BaseCalculator):
         self.math_wo = NewIrrigation(**self.inputs_wo)
         self.math_wo.calculate_emissions()
 
-        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         if PLOT_GRAPHS:
             self.results_w.plot_emissions_and_aggregate_by_activity("irrigation_system_w")
@@ -5337,9 +5337,9 @@ class IrrigationPhaseCalculator(BaseCalculator):
             self.math_wo = OperationPhaseIrrigation(**self.inputs_wo)
             self.math_wo.calculate_emissions()
 
-        self.results_start = self.math_start.result if self.math_start else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_start = self.math_start.result if self.math_start else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         if PLOT_GRAPHS:
             self.results_start.plot_emissions_and_aggregate_by_activity("irrigation_phase_start")
@@ -5539,8 +5539,8 @@ class CoastalWetlandCalculator(BaseCalculator):
             self.math_wo = MathCoastalWetland(**self.inputs_wo)
             self.math_wo.calculate_emissions()
 
-        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         results_tuple = (self.results_w, self.results_wo)
 
@@ -5672,9 +5672,9 @@ class WaterbodyCalculator(BaseCalculator):
             self.math_wo.calculate_emissions()
 
         # Collect results
-        self.results_start = self.math_start.result if self.math_start else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_start = self.math_start.result if self.math_start else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         # Combine results
         results_tuple = (self.results_w + self.results_start, self.results_wo + self.results_start)
@@ -5962,8 +5962,8 @@ class OrganicSoilCalculator(BaseCalculator):
 
         ##### Calculate Emissions #####
 
-        self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         self.organic_soil_math_w = None
         self.organic_soil_math_wo = None
@@ -6176,12 +6176,12 @@ class OrganicSoilCalculator(BaseCalculator):
             "peat_extraction": self.peat_extraction_inputs_wo,
         }
 
-        self.organic_soil_results_w = self.organic_soil_math_w.result if self.organic_soil_math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.organic_soil_results_wo = self.organic_soil_math_wo.result if self.organic_soil_math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.organic_soil_results_w = self.organic_soil_math_w.result if self.organic_soil_math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.organic_soil_results_wo = self.organic_soil_math_wo.result if self.organic_soil_math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         if input.peat_area_start:
-            self.peat_extraction_results_w = self.peat_extraction_math_w.result if self.peat_extraction_math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-            self.peat_extraction_results_wo = self.peat_extraction_math_wo.result if self.peat_extraction_math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+            self.peat_extraction_results_w = self.peat_extraction_math_w.result if self.peat_extraction_math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+            self.peat_extraction_results_wo = self.peat_extraction_math_wo.result if self.peat_extraction_math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
             self.results_w += self.organic_soil_results_w + self.peat_extraction_results_w
             self.results_wo += self.organic_soil_results_wo + self.peat_extraction_results_wo
@@ -6507,7 +6507,7 @@ class ForestManagementCalculator(LandModuleCalculator):
             self.math_start = MathForestManagement(**self.inputs_start)
             self.math_start.calculate_emissions()
 
-        self.results_start = self.math_start.result if self.math_start else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_start = self.math_start.result if self.math_start else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         if self.module.is_with():
             self.inputs_w = {
@@ -6659,8 +6659,8 @@ class ForestManagementCalculator(LandModuleCalculator):
             self.math_wo = MathForestManagement(**self.inputs_wo)
             self.math_wo.calculate_emissions()
 
-        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         if PLOT_GRAPHS:
             self.results_start.plot_emissions_and_aggregate_by_activity("forest_start")
@@ -6844,10 +6844,10 @@ class OtherLandCalculator(LandModuleCalculator):
             self.math_wo = MathNotCultivatedLand(**self.inputs_wo)
             self.math_wo.calculate_emissions()
 
-        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         results_tuple = (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
 
@@ -7016,10 +7016,10 @@ class SetAsideCalculator(LandModuleCalculator):
             self.math_wo = MathNotCultivatedLand(**self.inputs_wo)
             self.math_wo.calculate_emissions()
 
-        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         results_tuple = (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
 
@@ -7083,8 +7083,8 @@ class StorageCalculator(BaseCalculator):
         return super().get_defaults(calculate)
 
     def calculate(self) -> list[MathResult]:
-        self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         for entry in self.module.submodules:
             r_w, r_wo = StorageEntryCalculator(entry).calculate()
@@ -7192,15 +7192,15 @@ class StorageEntryCalculator(BaseValueChainCalculator):
             self.energy_calculator_wo.calculate()
             self.electricity_math_wo = self.energy_calculator_wo.math_wo
 
-        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
-        self.results_start_w += self.energy_math_start_w.result if self.energy_math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_start_wo += self.energy_math_start_wo.result if self.energy_math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_w += self.electricity_math_w.result if self.electricity_math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo += self.electricity_math_wo.result if self.electricity_math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_start_w += self.energy_math_start_w.result if self.energy_math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_start_wo += self.energy_math_start_wo.result if self.energy_math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_w += self.electricity_math_w.result if self.electricity_math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo += self.electricity_math_wo.result if self.electricity_math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         results_tuple = (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
 
@@ -7216,8 +7216,8 @@ class ProcessingCalculator(BaseCalculator):
         return super().get_defaults(calculate)
 
     def calculate(self) -> list[MathResult]:
-        self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         for entry in self.module.submodules:
             r_w, r_wo = ProcessingEntryCalculator(entry).calculate()
@@ -7270,10 +7270,10 @@ class ProcessingEntryCalculator(BaseValueChainCalculator):
             self.energy_calculator_wo.calculate()
             self.math_wo = self.energy_calculator_wo.math_wo
 
-        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         results_tuple = (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
 
@@ -7289,8 +7289,8 @@ class PackagingCalculator(BaseCalculator):
         return super().get_defaults(calculate)
 
     def calculate(self) -> list[MathResult]:
-        self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         for entry in self.module.submodules:
             r_w, r_wo = PackagingEntryCalculator(entry).calculate()
@@ -7389,15 +7389,15 @@ class PackagingEntryCalculator(BaseValueChainCalculator):
                 self.energy_calculator_wo.calculate()
                 self.energy_math_wo = self.energy_calculator_wo.math_wo
 
-        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_start_w = self.math_start_w.result if self.math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_start_wo = self.math_start_wo.result if self.math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_w = self.math_w.result if self.math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = self.math_wo.result if self.math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
-        self.results_start_w += self.energy_math_start_w.result if self.energy_math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_start_wo += self.energy_math_start_wo.result if self.energy_math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_w += self.energy_math_w.result if self.energy_math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo += self.energy_math_wo.result if self.energy_math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_start_w += self.energy_math_start_w.result if self.energy_math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_start_wo += self.energy_math_start_wo.result if self.energy_math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_w += self.energy_math_w.result if self.energy_math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo += self.energy_math_wo.result if self.energy_math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         results_tuple = (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
 
@@ -7413,8 +7413,8 @@ class TransportCalculator(BaseCalculator):
         return super().get_defaults(calculate)
 
     def calculate(self) -> list[MathResult]:
-        self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_w = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         for entry in self.module.submodules:
             r_w, r_wo = TransportEntryCalculator(entry).calculate()
@@ -7444,10 +7444,10 @@ class TransportEntryCalculator(BaseValueChainCalculator):
             self.energy_calculator_wo.calculate()
             self.energy_math_wo = self.energy_calculator_wo.math_wo
 
-        self.results_start_w = self.energy_math_start_w.result if self.energy_math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_start_wo = self.energy_math_start_wo.result if self.energy_math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_w = self.energy_math_w.result if self.energy_math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
-        self.results_wo = self.energy_math_wo.result if self.energy_math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years)
+        self.results_start_w = self.energy_math_start_w.result if self.energy_math_start_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_start_wo = self.energy_math_start_wo.result if self.energy_math_start_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_w = self.energy_math_w.result if self.energy_math_w else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
+        self.results_wo = self.energy_math_wo.result if self.energy_math_wo else MathResult(self.activity.implementation_years, self.activity.capitalization_years, self.activity.delay)
 
         results_tuple = (self.results_w + self.results_start_w, self.results_wo + self.results_start_wo)
 
