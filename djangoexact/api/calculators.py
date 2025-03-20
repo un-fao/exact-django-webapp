@@ -2573,16 +2573,16 @@ class FloodedRiceCalculator(BaseCalculator):
         self.results_w += r_w
         self.results_wo += r_wo
 
-        # minor_seasons: list[MinorSeasonFloodedRice] = module.minor_seasons.all()
+        minor_seasons: list[MinorSeasonFloodedRice] = module.minor_seasons.all()
 
-        # if any([not season.is_ready() for season in minor_seasons]):
-        #     raise Exception("At least one minor season is not ready")
+        if any([not season.is_ready() for season in minor_seasons]):
+            raise Exception("At least one minor season is not ready")
 
-        # for season in minor_seasons:
-        #     season: MinorSeasonFloodedRice
-        #     r_w, r_wo = FloodedRiceSeasonCalculator(season).calculate()
-        #     self.results_w += r_w
-        #     self.results_wo += r_wo
+        for season in minor_seasons:
+            season: MinorSeasonFloodedRice
+            r_w, r_wo = FloodedRiceSeasonCalculator(season).calculate()
+            self.results_w += r_w
+            self.results_wo += r_wo
 
         return (self.results_w, self.results_wo)
 
