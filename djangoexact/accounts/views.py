@@ -68,9 +68,10 @@ class CreateNewUserView(APIView):
             if not serializer.is_valid():
                 return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-            db_user: User = serializer.save()
+            serializer.validated_data["email"] = email.casefold().strip()
+            email = serializer.validated_data["email"]
 
-            email = email.casefold().strip()
+            db_user: User = serializer.save()
 
             firebase_user = firebase_admin_auth.create_user(email=email, password=password)
             firebase_uid = firebase_user.uid
