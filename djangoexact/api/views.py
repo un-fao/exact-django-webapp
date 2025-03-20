@@ -1320,6 +1320,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         try:
             email = serializer.validated_data["email"]
+            email = email.casefold().strip()
             user = User.objects.get(email=email)
         except User.DoesNotExist:
             logging.error(f"User with email {email} does not exist")
