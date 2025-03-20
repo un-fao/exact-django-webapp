@@ -60,7 +60,6 @@ class CreateNewUserView(APIView):
         data = request.data
 
         try:
-
             email = data.get("email")
             password = data.get("password")
 
@@ -68,6 +67,9 @@ class CreateNewUserView(APIView):
 
             if not serializer.is_valid():
                 return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+            serializer.validated_data["email"] = email.casefold().strip()
+            email = serializer.validated_data["email"]
 
             db_user: User = serializer.save()
 
@@ -109,6 +111,8 @@ class LoginExistingUserView(APIView):
 
             if not user.email_verified:
                 return Response({"error": "Email not verified"}, status=status.HTTP_401_UNAUTHORIZED)
+
+            email = email.casefold().strip()
 
             try:
                 user = auth.sign_in_with_email_and_password(email, password)
@@ -157,6 +161,8 @@ class PasswordResetView(APIView):
 
         try:
             email = data.get("email", None)
+            if email:
+                email = email.casefold().strip()
 
             firebase_admin_auth.get_user_by_email(email)
 
@@ -179,7 +185,9 @@ class VerifyUserEmail(APIView):
         data = request.data
 
         try:
-            email = data.get("email")
+            email = data.get("email", None)
+            if email:
+                email = email.casefold
 
             user = firebase_admin_auth.get_user_by_email(email)
 
