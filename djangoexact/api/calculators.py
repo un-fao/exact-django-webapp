@@ -3367,8 +3367,8 @@ class InputCalculator(BaseCalculator):
     Calculator for Inputs macromodule
     """
 
-    def get_defaults(self, input: Module) -> dict:
-        return super().get_defaults(input)
+    def get_defaults(self, calculate=False) -> dict:
+        return super().get_defaults(calculate)
 
     def calculate(self) -> list[MathResult]:
         module: Input = self.data
