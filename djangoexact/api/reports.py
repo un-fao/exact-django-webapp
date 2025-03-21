@@ -931,6 +931,8 @@ class LandModuleReport(BaseModuleReport):
 
         self.total_emissions = list(map(sum, zip(self.total_emissions, self.biomass_co2, self.soil_co2, self.soil_n2o, self.fire_n2o, self.fire_ch4)))
 
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
     def build_report(self):
         """
         Builds a detailed report by populating an Excel workbook with emissions data.
@@ -1063,6 +1065,8 @@ class LandUseChangeReport(LandModuleReport):
         self.soil_co2 = list(map(sum, zip(self.soil_co2, dom_co2)))
 
         self.total_emissions = list(map(sum, zip(self.total_emissions, dom_co2)))
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
     def build_report(self):
         super().build_report()
@@ -1247,6 +1251,8 @@ class PerennialCroplandReport(LandModuleReport):
             self.fire_n2o = [x + y for x, y in zip(self.fire_n2o, self.extract_emissions(minor_emission_set, self.fire_n2o_source[0], self.fire_n2o_source[1]))]
             self.fire_ch4 = [x + y for x, y in zip(self.fire_ch4, self.extract_emissions(minor_emission_set, self.fire_ch4_source[0], self.fire_ch4_source[1]))]
 
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
     def get_result(self):
         """
         Generates the result for the report by building and populating it with necessary data.
@@ -1309,6 +1315,8 @@ class AnnualCroplandReport(LandModuleReport):
             self.fire_ch4 = list(map(sum, zip(self.fire_ch4, self.extract_emissions(minor_emission_set, self.fire_ch4_source[0], self.fire_ch4_source[1]))))
 
             self.total_emissions = list(map(sum, zip(self.total_emissions, self.biomass_co2, self.soil_co2, self.soil_n2o, self.fire_n2o, self.fire_ch4)))
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
     def build_metadata(self):
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
@@ -1677,6 +1685,8 @@ class FloodedRiceReport(LandModuleReport):
 
             self.total_emissions = list(map(sum, zip(self.biomass_co2, self.soil_co2, self.soil_n2o, self.fire_n2o, self.fire_ch4, self.rice_cultivation_ch4)))
 
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
     def populate_metadata(self):
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
         self.metadata_worksheet = self.workbook["Metadata"]
@@ -1930,9 +1940,6 @@ class AquacultureReport(BaseModuleReport):
 
         log.debug(f"Report for {self.module_title} built.")
         return self.activity_report.project_report.excel_manager.get_excel_bytes()
-
-    def build_report(self):
-        self.get_result()
 
 
 @dataclass
@@ -2482,6 +2489,8 @@ class ForestManagementReport(LandModuleReport):
         self.metadata_worksheet.cell(row=last_metadata_row + 8, column=6, value=self.module.logging_percentage_agb_logged_thread.format_comments())
         self.metadata_worksheet.cell(row=last_metadata_row + 17 + len(self.module.disturbances.all()), column=6, value=self.module.average_yearly_degradation_percentage_thread.format_comments())
 
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
     def build_report(self):
         super().build_report()
 
@@ -2593,9 +2602,9 @@ class ForestManagementReport(LandModuleReport):
             self.results_worksheet.cell(row=last_results_row + 2, column=i + 2, value=self.biomass_loss_co2[i])
             self.results_worksheet.cell(row=last_results_row + 3, column=i + 2, value=self.biomass_gain_co2[i])
 
-        self.populate_metadata()
-
         self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
+        self.populate_metadata()
 
 
 @dataclass
@@ -2654,6 +2663,7 @@ class EnergyReport(BaseModuleReport):
         self.total_emissions = list(map(sum, zip(self.total_emissions, self.electricity_co2_eq)))
         self.total_emissions = list(map(sum, zip(self.total_emissions, self.liquid_fuel_co2, self.liquid_fuel_ch4, self.liquid_fuel_n2o)))
         self.total_emissions = list(map(sum, zip(self.total_emissions, self.solid_fuel_co2, self.solid_fuel_ch4, self.solid_fuel_n2o)))
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
     def populate_metadata(self):
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
@@ -2816,6 +2826,8 @@ class InputReport(BaseModuleReport):
         self.total_emissions = list(map(sum, zip(self.total_emissions, self.feed_co2_eq)))
         self.total_emissions = list(map(sum, zip(self.total_emissions, self.inputs_co2_eq)))
 
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
     def populate_metadata(self):
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
         self.metadata_worksheet = self.workbook["Metadata"]
@@ -2959,6 +2971,8 @@ class IrrigationReport(BaseModuleReport):
 
         self.total_emissions = list(map(sum, zip(self.total_emissions, self.other_infrastructure_co2_eq, self.liquid_fuel_or_electricity_co2, self.liquid_fuel_or_electricity_ch4, self.liquid_fuel_or_electricity_n2o)))
 
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
+
     def populate_metadata(self):
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
         self.metadata_worksheet = self.workbook["Metadata"]
@@ -3100,6 +3114,8 @@ class SettlementReport(LandModuleReport):
 
         self.total_emissions = list(map(sum, zip(self.total_emissions, self.roads_co2_eq)))
         self.total_emissions = list(map(sum, zip(self.total_emissions, self.buildings_co2_eq)))
+
+        self.activity_report.project_report.excel_manager.save_workbook(self.workbook)
 
     def populate_metadata(self):
         self.workbook = self.activity_report.project_report.excel_manager.get_workbook()
