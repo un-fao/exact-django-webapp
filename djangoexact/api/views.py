@@ -502,7 +502,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if tags:
             filters["project__tags__name__in"] = tags.split(",")
 
-        shared_projects = request.user.memberships.filter(**filters).all()
+        shared_projects = request.user.memberships.filter(**filters).distinct()
         projects_list = [share.project for share in shared_projects if utils.has_project_permission("view_project", self.request.user, share.project)]
         ordered_projects = sorted(projects_list, key=lambda x: x.updated_at, reverse=True)
 
