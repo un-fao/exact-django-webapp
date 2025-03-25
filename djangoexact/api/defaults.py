@@ -350,9 +350,9 @@ class FloodedRiceDefaults(Defaults):
             biomass_ef_start = defaults.biomass_ef_start_w or defaults.biomass_ef_start_wo
 
         return SimpleNamespace(
-            soc_t2_start_default=self.input.activity.soc or defaults.soc.value,
-            soc_t2_w_default=self.input.activity.soc or defaults.soc.value,
-            soc_t2_wo_default=self.input.activity.soc or defaults.soc.value,
+            soc_t2_start_default=defaults.activity.soc or defaults.soc.value,
+            soc_t2_w_default=defaults.activity.soc or defaults.soc.value,
+            soc_t2_wo_default=defaults.activity.soc or defaults.soc.value,
             flu_t2_start_default=defaults.flu_start.value,
             flu_t2_w_default=defaults.flu_w.value,
             flu_t2_wo_default=defaults.flu_wo.value,

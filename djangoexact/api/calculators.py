@@ -2590,6 +2590,10 @@ class FloodedRiceCalculator(BaseCalculator):
         FloodedRiceSeasonCalculator(self.module).get_defaults(calculate=calculate)
 
 
+class MinorSeasonFloodedRiceCalculator(FloodedRiceSeasonCalculator):
+    pass
+
+
 class GrasslandCalculator(LandModuleCalculator):
     """
     Calculator for grassland.
