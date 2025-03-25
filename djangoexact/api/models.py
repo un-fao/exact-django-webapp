@@ -517,7 +517,7 @@ class Unit(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.name
+        return f"({self.pk}) {self.name}"
 
 
 class FuelType(models.Model):
@@ -2721,10 +2721,11 @@ class SetAside(LandModule, SingleBiomassModule):
     is_set_aside_wo = models.BooleanField(default=False, verbose_name=_("is_set_aside_wo"))
 
     def save(self, *args, **kwargs):
-        if not self.land_use_type_start:
-            self.land_use_type_start = LandUseType.objects.get(name_en="Set Aside")
-            self.land_use_type_w = self.land_use_type_start
-            self.land_use_type_wo = self.land_use_type_start
+        # WORKAROUND: For some reason the land_use_type for w and wo is not being set sometimes. Might be a frontend issue tbh.
+        # This ensures that the land_use_type is set correctly at all times.
+        self.land_use_type_start = LandUseType.objects.get(name_en="Set Aside")
+        self.land_use_type_w = self.land_use_type_start
+        self.land_use_type_wo = self.land_use_type_start
 
         return super().save(*args, **kwargs)
 

@@ -88,7 +88,15 @@ class GrasslandDefaults(Defaults):
         defaults = calcs.GrasslandCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
-        biomass_ef_start = defaults.biomass_ef_start_w or defaults.biomass_ef_start_wo
+        if self.input.land_use_change:
+            if self.module_w.__class__.__name__ == "Grassland":
+                biomass_ef_start = defaults.biomass_ef_start_w
+            elif self.module_wo.__class__.__name__ == "Grassland":
+                biomass_ef_start = defaults.biomass_ef_start_wo
+            else:
+                biomass_ef_start = SimpleNamespace(value=0)
+        else:
+            biomass_ef_start = defaults.biomass_ef_start_w or defaults.biomass_ef_start_wo
 
         return SimpleNamespace(
             soc_t2_start_default=self.input.activity.soc or defaults.soc_start.value,
@@ -155,7 +163,15 @@ class AnnualCroplandDefaults(Defaults):
         defaults = calcs.AnnualCropCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
-        biomass_ef_start = defaults.biomass_ef_start_w or defaults.biomass_ef_start_wo
+        if self.input.land_use_change:
+            if self.module_w.__class__.__name__ == "AnnualCropland":
+                biomass_ef_start = defaults.biomass_ef_start_w
+            elif self.module_wo.__class__.__name__ == "AnnualCropland":
+                biomass_ef_start = defaults.biomass_ef_start_wo
+            else:
+                biomass_ef_start = SimpleNamespace(value=0)
+        else:
+            biomass_ef_start = defaults.biomass_ef_start_w or defaults.biomass_ef_start_wo
 
         return SimpleNamespace(
             soc_t2_start_default=self.input.activity.soc or defaults.soc_start.value,
@@ -321,7 +337,17 @@ class FloodedRiceDefaults(Defaults):
         defaults = calcs.FloodedRiceSeasonCalculator(self.input)
         defaults.get_defaults(calculate=calculate)
 
-        biomass_ef_start = defaults.biomass_ef_start_w or defaults.biomass_ef_start_wo
+        if self.input.land_use_change:
+            self.module_start, self.module_w, self.module_wo = calcs.get_luc_modules(self.input.land_use_change)
+            if self.module_w.__class__.__name__ == "FloodedRice":
+                biomass_ef_start = defaults.biomass_ef_start_w
+            elif self.module_wo.__class__.__name__ == "FloodedRice":
+                biomass_ef_start = defaults.biomass_ef_start_wo
+            else:
+                biomass_ef_start = SimpleNamespace(value=0)
+        else:
+            # NOTE: Ugly and maybe wrong, but maybe not.
+            biomass_ef_start = defaults.biomass_ef_start_w or defaults.biomass_ef_start_wo
 
         return SimpleNamespace(
             soc_t2_start_default=self.input.activity.soc or defaults.soc.value,
