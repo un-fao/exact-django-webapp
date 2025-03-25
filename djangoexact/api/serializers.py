@@ -2923,16 +2923,13 @@ class ForestDisturbanceWriteSerializer(ScenarioSubmoduleSerializer):
         super().validate(data)
 
         parent = utils.getany([self.instance, dict(data)], "parent")
+
         if parent.disturbances.count() + 1 > 3:
             raise serializers.ValidationError("Only 3 disturbances are allowed")
 
         if not self.instance or not self.instance.is_ready():
             parent.status = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
             parent.save()
-        else:
-            parent_serializer = ForestManagementReadSerializer(data={}, instance=parent, partial=True, context=self.context)
-            if parent_serializer.is_valid():
-                parent_serializer.save()
 
         return data
 

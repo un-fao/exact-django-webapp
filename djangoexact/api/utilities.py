@@ -202,11 +202,12 @@ def get_unique_name(instance, name):
     return f"{name} ({i})"
 
 
-def copy_project(project):
+def copy_project(project, owner):
     project_copy = copy.deepcopy(project)
     project_copy.pk = None
     project_copy.name = get_unique_name(project_copy, project_copy.name)
     project_copy._state.adding = True
+    project.owner = owner
     project_copy.save()
 
     for activity in project.activities.all():
