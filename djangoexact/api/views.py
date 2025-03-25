@@ -696,12 +696,24 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(ReadProjectSerializer(project, context={"request": request}).data, status=http_status.HTTP_200_OK)
 
     @action(detail=True, methods=["post"])
-    @swagger_auto_schema(responses={404: "Project not found", 403: "Selected user does not have permission to copy the project", 201: ReadProjectSerializer}, request_body=EmptySerializer)
+    @swagger_auto_schema(
+        responses={
+            404: "Project not found",
+            403: "Selected user does not have permission to copy the project",
+            400: "Bad request",
+            201: ReadProjectSerializer,
+        },
+        request_body=EmptySerializer,
+    )
     def copy(self, request, pk=None):
         project = self.get_object()
         error = security.check_permission("view_project", self.request.user, project)
         if error:
             return error
+
+        project = Project.objects.filter(project.name, owner=self.request.user).first()
+        if project:
+            return utils.ErrorResponse("Project with the same name already exists", status=http_status.HTTP_400_BAD_REQUEST)
 
         new_project = utils.copy_project(project, self.request.user)
         ProjectMembership.objects.create(user=self.request.user, project=new_project, group=Group.objects.get(name="Admin"))
