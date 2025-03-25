@@ -4373,8 +4373,10 @@ def assign_fuel_type_units():
     )
 
     for i, row in df.iterrows():
-        fuel_type = FuelType.objects.filter(name__iexact=row["fuel_type"]).all()
-        unit = Unit.objects.get_or_create(name__iexact=row["unit"])[0]
+        fuel_type = FuelType.objects.filter(name_en__iexact=row["fuel_type"]).all()
+        unit = Unit.objects.create(name=row["unit"])
+
+        print(f"Assigning unit {unit.name} to {fuel_type}")
 
         for ft in fuel_type:
             ft.unit = unit
@@ -4700,7 +4702,7 @@ def run():
         # TODO: Run in production
         # import_definitions.import_definitions()
         # rename_solar_fuel_type_to_renewable()
-        # assign_fuel_type_units()
+        assign_fuel_type_units()
         # find_all_stroke_fuel_types_and_put_stroke_lowercase()
         # add_or_replace_application_parameters()
         # delete_and_import_irrigation_phase_data()
