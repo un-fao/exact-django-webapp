@@ -7,5 +7,5 @@ def check_permission(permission, user, project):
     if not utils.has_project_permission(permission, user, project):
         permission = permission.replace("_", " ")
         logging.error(f"Selected user does not have permission to {permission}")
-        return utils.ErrorResponse("Selected user does not have permission to {permission}", status=http_status.HTTP_403_FORBIDDEN)
+        return utils.ErrorResponse(f"Selected user does not have permission to {permission}", status=http_status.HTTP_403_FORBIDDEN)
     return None
