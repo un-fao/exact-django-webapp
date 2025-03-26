@@ -711,10 +711,6 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if error:
             return error
 
-        project = Project.objects.filter(project.name, owner=self.request.user).first()
-        if project:
-            return utils.ErrorResponse("Project with the same name already exists", status=http_status.HTTP_400_BAD_REQUEST)
-
         new_project = utils.copy_project(project, self.request.user)
         ProjectMembership.objects.create(user=self.request.user, project=new_project, group=Group.objects.get(name="Admin"))
 
