@@ -3080,7 +3080,7 @@ class ValueChainParentModuleSerializer(ScenarioModuleSerializer):
         entries = self.instance.entries.all()
 
         if any([not submodule.is_ready() for submodule in entries]):
-            data["status"] = StatusType.objects.get(name="SUBMODULES_EMPTY")
+            data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
 
         return data
 
