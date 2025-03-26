@@ -115,7 +115,7 @@ class PerennialCropland(LandModule):
                 if self.calculate_biomass:
                     if not self.end_module_has_growth:
                         # NOTE: This means that we have received values for both (or we have tier 2 values for both)
-                        emissions_biomass_yearly, emissions_biomass_total = biomass_emissions(self.biomass_end, self.biomass_start, self.hectares_start, self.hectares_end, self.rate_type, self.implementation_time, self.capitalization_time)
+                        emissions_biomass_yearly, emissions_biomass_total = biomass_emissions(self.biomass_start, self.biomass_end, self.hectares_start, self.hectares_end, self.rate_type, self.implementation_time, self.capitalization_time)
 
                         biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_biomass_yearly], ActivityTypes.BIOMASS, delay=self.delay)
                         self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
@@ -159,3 +159,4 @@ class PerennialCropland(LandModule):
         calculate_som()
         calculate_soil()
         calculate_biomass_emissions()
+
