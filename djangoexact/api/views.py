@@ -439,6 +439,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
                 cursor.execute("DELETE FROM api_activity_module_types WHERE activity_id = %s", [activity.id])
                 cursor.execute("DELETE FROM api_activity WHERE id = %s", [activity.id])
 
+            ProjectTag.objects.filter(project=project).delete()
             ProjectFileAttachment.objects.filter(project=project).delete()
             cursor.execute("DELETE FROM api_project WHERE id = %s", [project.id])
 
