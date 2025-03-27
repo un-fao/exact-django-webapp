@@ -444,7 +444,7 @@ class WriteProjectSerializer(serializers.ModelSerializer):
                 project.implementation_years = new_years
 
                 if project.start_year_of_activities + project.implementation_years > project.last_year_of_accounting:
-                    raise serializers.ValidationError("Project implementation years cannot exceed the last year of accounting")
+                    raise serializers.ValidationError("Project implementation phase duration cannot exceed the last year of accounting")
 
                 for activity in project.activities.all():
                     if activity.duration_t2 and activity.duration_t2 > new_years:
