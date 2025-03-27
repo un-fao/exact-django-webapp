@@ -3413,7 +3413,7 @@ class ProjectFileUploadSerializer(serializers.ModelSerializer):
 
             max_size_in_mb = int(ApplicationParameter.objects.get(name__iexact="project_uploads_max_file_size_mb").value)
 
-            total_size = sum([blob.size for blob in bucket.list_blobs(prefix=project_folder)])
+            total_size = sum([b.size for b in bucket.list_blobs(prefix=project_folder)])
             if total_size + file_size > max_size_in_mb * 1024 * 1024:
                 raise serializers.ValidationError(f"Maximum total project files size reached. Total size of all files in the project must be less than {max_size_in_mb}MB.")
 
@@ -3422,7 +3422,8 @@ class ProjectFileUploadSerializer(serializers.ModelSerializer):
 
             attachment = ProjectFileAttachment.objects.create(name=file.name, project=project, bucket_public_url=public_url, size=file_size)
         except Exception as e:
-            blob.delete()
+            if blob:
+                blob.delete()
             raise serializers.ValidationError(str(e))
 
         return attachment
