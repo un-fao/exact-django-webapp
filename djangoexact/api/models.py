@@ -798,6 +798,11 @@ class Note(Historical):
             case "Submodule":
                 return self.content_object.parent.activity.project
 
+        if issubclass(self.content_object.__class__, Module):
+            return self.content_object.activity.project
+
+        raise ValueError("Invalid content object")
+
     def __str__(self):
         return f"({self.pk}) {self.author.email}: {self.content[:40]}..."
 
