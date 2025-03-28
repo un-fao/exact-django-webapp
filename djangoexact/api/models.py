@@ -3021,3 +3021,19 @@ class APIHealth(models.Model):
 
     def __str__(self):
         return "API Health"
+
+
+class PublicToken(models.Model):
+    project = models.ForeignKey("api.Project", on_delete=models.CASCADE, related_name="tokens")
+    token = models.CharField(max_length=255, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if not self.token:
+            import uuid
+
+            self.token = str(uuid.uuid4())
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.token

@@ -70,6 +70,7 @@ from .models import (
     FisheryType,
     SmallFishery,
     LargeFishery,
+    PublicToken,
 )
 from .serializers import (
     ActionTypes,
@@ -116,6 +117,7 @@ from .serializers import (
     ProjectLockHolderInformationSerializer,
     Aquaculture,
     DynamicResultFactory,
+    PublicTokenSerializer,
 )
 
 from firebase_admin import auth as firebase_admin_auth
@@ -2605,3 +2607,23 @@ def generate_chart(with_value, without_value, balance):
     os.makedirs(os.path.dirname(chart_path), exist_ok=True)
     plt.savefig(chart_path, bbox_inches="tight", dpi=300)
     plt.close()
+
+
+class PublicTokenViewset(viewsets.ModelViewSet, AuthenticatedViewSet):
+    queryset = PublicToken.objects.all()
+    serializer_class = PublicTokenSerializer
+
+    def create(self, request, *args, **kwargs):
+        project = get_object_or_404(Project, pk=self.kwargs.get("project_pk", None))
+
+        error = security.check_permission("create_publictoken", self.request.user, project)
+        if error:
+            return error
+
+        serializer = PublicTokenSerializer(data=request.data, context={"request": request})
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
+
+        serializer.save(project=project, user=self.request.user)
+
+        return Response(serializer.data, status=http_status.HTTP_201_CREATED)
