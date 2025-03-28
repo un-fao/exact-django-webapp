@@ -97,6 +97,7 @@ from .models import (
     ApplicationParameter,
     APIHealth,
     FuelUseType,
+    PublicToken,
 )
 from datetime import timedelta
 from typing import Optional
@@ -3456,3 +3457,10 @@ class ProjectLockHolderInformationSerializer(serializers.Serializer):
 
     def get_locked_by(self, obj):
         return obj.locked_by.email if obj.locked_by else None
+
+
+class PublicTokenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PublicToken
+        fields = "__all__"
+        ref_name = "PublicToken"
