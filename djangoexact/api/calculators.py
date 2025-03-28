@@ -1,3 +1,32 @@
+"""
+Calculators module for the EX-ACT Django application.
+
+This module contains calculator classes that interface between Django models and the mathematical
+emission calculation models. Each calculator:
+1. Fetches the necessary input data from Django models
+2. Retrieves default values from IPCC tables when needed
+3. Prepares inputs for the mathematical models
+4. Executes the calculations through the appropriate mathematical model
+5. Returns calculation results in a standardized format
+
+The module implements the calculator pattern with a base calculator class and specialized
+calculator classes for different types of emission sources and land use categories, including:
+- Land modules (forests, croplands, grasslands, etc.)
+- Livestock management
+- Aquaculture and fisheries
+- Energy usage (fuel and electricity)
+- Value chain modules (storage, processing, packaging, transport)
+- Infrastructure and buildings
+
+Each calculator handles three possible scenarios:
+- Start (baseline)
+- With (with project)
+- Without (without project)
+
+Results are represented as pairs of MathResult objects (with, without) containing
+the calculated emissions over time.
+"""
+
 import re
 import copy
 import json
