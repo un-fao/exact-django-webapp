@@ -36,7 +36,7 @@ project_router.register(r"tags", views.ProjectTagViewSet, basename="projecttags"
 # project_router.register(r"tokens", views.PublicTokenViewset, basename="publictoken")
 
 router.register(r"project-invitations", views.ProjectInvitationViewSet, basename="projectinvitations")
-router.register(r"project-memberships", views.ProjectMembershipViewSet)
+router.register(r"project-memberships", views.ProjectMembershipViewSet, basename="projectmembership")
 router.register(r"groups", views.GroupViewSet)
 router.register(r"activities", views.ActivityViewSet, basename="activities")
 router.register(r"threads", views.CommentThreadViewSet, basename="threads")

@@ -1241,12 +1241,6 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if error:
             return error
 
-        if project.is_archived:
-            return utils.ErrorResponse("Archived projects cannot have memberships added", status=http_status.HTTP_400_BAD_REQUEST)
-
-        if project.is_finalized:
-            return utils.ErrorResponse("Finalized projects cannot have memberships added", status=http_status.HTTP_400_BAD_REQUEST)
-
         membership = serializer.save()
 
         return Response(ProjectMembershipSerializer(membership).data, status=http_status.HTTP_201_CREATED)
@@ -1266,13 +1260,22 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if error:
             return error
 
-        if membership.project.is_archived:
-            return utils.ErrorResponse("Archived projects cannot have memberships updated", status=http_status.HTTP_400_BAD_REQUEST)
-
-        if membership.project.is_finalized:
-            return utils.ErrorResponse("Finalized projects cannot have memberships updated", status=http_status.HTTP_400_BAD_REQUEST)
-
         serializer = ProjectMembershipSerializer(data=request.data, instance=membership)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+
+        return Response(ProjectMembershipSerializer(membership).data, status=http_status.HTTP_200_OK)
+
+    def partial_update(self, request, *args, **kwargs):
+        membership = self.get_object()
+        error = security.check_permission("change_projectmembership", self.request.user, membership.project)
+        if error:
+            return error
+
+        serializer = ProjectMembershipSerializer(data=request.data, instance=membership, partial=True)
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
@@ -1304,12 +1307,6 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         elif not security.check_permission("delete_projectmembership", self.request.user, membership.project) and not membership.user == self.request.user:
             logging.error("Selected user does not have permission to delete project memberships")
             return utils.ErrorResponse("Selected user does not have permission to delete project memberships", status=http_status.HTTP_403_FORBIDDEN)
-
-        if membership.project.is_archived:
-            return utils.ErrorResponse("Archived projects cannot have memberships deleted", status=http_status.HTTP_400_BAD_REQUEST)
-
-        if membership.project.is_finalized:
-            return utils.ErrorResponse("Finalized projects cannot have memberships deleted", status=http_status.HTTP_400_BAD_REQUEST)
 
         if membership.group.name == "Admin":
             admin_count = membership.project.members.filter(group__name="Admin").count()

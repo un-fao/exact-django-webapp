@@ -325,11 +325,11 @@ def getany(objects: list[object], key: str):
     for obj in objects:
         obj_type = type(obj)
 
-        if obj_type is dict:
+        if obj_type is dict or obj_type.__name__ == "OrderedDict":
             if key in obj:
                 return obj[key]
         else:
-            if hasattr(obj, key):
+            if hasattr(obj, key) and getattr(obj, key) is not None:
                 return getattr(obj, key)
     return None
 
