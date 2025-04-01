@@ -3033,10 +3033,33 @@ class ProjectInvitationModelWriteSerializer(serializers.ModelSerializer):
         ref_name = "ProjectInvitation"
 
 
-class ProjectInvitationWriteSerializer(serializers.Serializer):
+class ProjectInvitationWriteSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True)
     group = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all(), required=True)
     project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(), required=True)
+
+    class Meta:
+        model = ProjectInvitation
+        fields = ["email", "group", "project"]
+        ref_name = "ProjectInvitation"
+
+    def validate(self, data):
+        super().validate(data)
+
+        project: Project = utils.getany([data, self.instance], "project")
+
+        if project.is_archived:
+            raise serializers.ValidationError("Cannot add members to an archived project")
+
+        if project.is_finalized:
+            raise serializers.ValidationError("Cannot add members to a finalized project")
+
+        if self.instance:
+            new_status = InvitationStatusType.objects.filter(id=data.get("status", None)).first()
+            if self.instance.status.name != utils.InvitationStatus.PENDING.value and (new_status and new_status.name == utils.InvitationStatus.ACCEPTED.value):
+                raise serializers.ValidationError("Cannot accept an invitation that is not pending")
+
+        return data
 
 
 class NewNoteSerializer(serializers.ModelSerializer):
