@@ -1990,7 +1990,7 @@ def generic_module_viewset(model: Module):
             module: Module | Submodule | LandModule = self.get_object()
             activity: Activity = module.get_activity()
 
-            error = security.check_permission("can_change_modules", self.request.user, activity.project)
+            error = security.check_permission("change_modules", self.request.user, activity.project)
             if error:
                 return error
 
@@ -2018,7 +2018,7 @@ def generic_module_viewset(model: Module):
             module: Module | Submodule = self.get_object()
             activity: Activity = module.get_activity()
 
-            error = security.check_permission("can_change_modules", self.request.user, activity.project)
+            error = security.check_permission("change_modules", self.request.user, activity.project)
             if error:
                 return error
 
@@ -2059,7 +2059,7 @@ def generic_module_viewset(model: Module):
             else:
                 activity: Activity = module_serializer.validated_data["activity"]
 
-            error = security.check_permission("can_create_modules", self.request.user, activity.project)
+            error = security.check_permission("add_modules", self.request.user, activity.project)
             if error:
                 return error
 
@@ -2092,7 +2092,7 @@ def generic_module_viewset(model: Module):
             activity = get_object_or_404(Activity, pk=activity_id)
             module_type = ModuleType.objects.get(class_name=model.__name__)
 
-            error = security.check_permission("can_view_modules", self.request.user, activity.project)
+            error = security.check_permission("view_modules", self.request.user, activity.project)
             if error:
                 return error
 
@@ -2131,7 +2131,7 @@ def generic_module_viewset(model: Module):
             module: Module | Submodule = get_object_or_404(model, pk=pk)
             activity = module.get_activity()
 
-            error = security.check_permission("can_view_modules", self.request.user, activity.project)
+            error = security.check_permission("view_modules", self.request.user, activity.project)
             if error:
                 return error
 
@@ -2189,7 +2189,7 @@ def generic_module_viewset(model: Module):
             serializer.is_valid(raise_exception=True)
             serializer.save()
 
-            error = security.check_permission("can_view_modules", self.request.user, activity.project)
+            error = security.check_permission("view_modules", self.request.user, activity.project)
             if error:
                 return error
 
@@ -2209,7 +2209,7 @@ def generic_module_viewset(model: Module):
             module: Module = self.get_object()
             activity = module.get_activity()
 
-            error = security.check_permission("can_view_modules", self.request.user, activity.project)
+            error = security.check_permission("view_modules", self.request.user, activity.project)
             if error:
                 return error
 
@@ -2227,7 +2227,7 @@ def generic_module_viewset(model: Module):
             module: Module | Submodule = get_object_or_404(model, pk=pk)
             activity = module.get_activity()
 
-            error = security.check_permission("can_view_modules", self.request.user, activity.project)
+            error = security.check_permission("view_modules", self.request.user, activity.project)
             if error:
                 return error
 
