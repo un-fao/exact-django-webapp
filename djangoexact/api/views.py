@@ -1363,12 +1363,6 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if error:
             return error
 
-        if project.is_archived:
-            return utils.ErrorResponse("Archived projects cannot have invitations sent", status=http_status.HTTP_400_BAD_REQUEST)
-
-        if project.is_finalized:
-            return utils.ErrorResponse("Finalized projects cannot have invitations sent", status=http_status.HTTP_400_BAD_REQUEST)
-
         try:
             email = serializer.validated_data["email"]
             email = email.casefold().strip()
@@ -1446,12 +1440,6 @@ The EX-ACT Team
             return error
 
         data = ProjectInvitationModelWriteSerializer(invitation, data=request.data, partial=True)
-
-        if invitation.project.is_archived:
-            return utils.ErrorResponse("Archived projects cannot have invitations updated", status=http_status.HTTP_400_BAD_REQUEST)
-
-        if invitation.project.is_finalized:
-            return utils.ErrorResponse("Finalized projects cannot have invitations updated", status=http_status.HTTP_400_BAD_REQUEST)
 
         if not data.is_valid():
             return Response(data.errors, status=http_status.HTTP_400_BAD_REQUEST)
@@ -1531,25 +1519,9 @@ The EX-ACT Team
 
         invitation: ProjectInvitation = get_object_or_404(ProjectInvitation, token=token)
 
-        if invitation.project.is_archived:
-            return utils.ErrorResponse("Archived projects cannot have invitations accepted", status=http_status.HTTP_400_BAD_REQUEST)
-
-        if invitation.project.is_finalized:
-            return utils.ErrorResponse("Finalized projects cannot have invitations accepted", status=http_status.HTTP_400_BAD_REQUEST)
-
-        # NOTE: This is not possible since clicking the link will not authenticate the user
-        # user: CustomUser = self.request.user
-        # if user != invitation.user and not any([user.is_staff, user.is_superuser]):
-        #     return utils.ErrorResponse("Selected user does not have permission to accept the invitation", status=http_status.HTTP_403_FORBIDDEN)
-
-        if invitation.status.name != utils.InvitationStatus.PENDING.value:
-            return utils.ErrorResponse("Invitation is not pending", status=http_status.HTTP_400_BAD_REQUEST)
-
-        # NOTE: This clashes with the uniqueness of the invitations for the same user and the same role in the same project
-        # If we want to allow multiple invitations for the same user and the same role in the same project, we need to change the invitation logic
-        # Possibly removing the error in case of multiple invitation, and instead refreshing the token and sending a new invitation email
-        # if invitation.token_expiry < timezone.now():
-        #     return utils.ErrorResponse("Invitation link has expired", status=http_status.HTTP_400_BAD_REQUEST)
+        serializer = ProjectInvitationWriteSerializer(data=request.data, instance=invitation, partial=True)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
         invitation.status = InvitationStatusType.objects.get(name_en=utils.InvitationStatus.ACCEPTED.value)
 
@@ -1557,7 +1529,6 @@ The EX-ACT Team
 
         invitation.save()
 
-        # Teturn simple html page with message
         return render(request, "invitation_accepted.html", {"project_name": invitation.project.name, "group": invitation.group.name, "link": settings.FRONTEND_URL})
 
 
