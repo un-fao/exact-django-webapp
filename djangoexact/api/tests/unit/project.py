@@ -239,3 +239,26 @@ class ProjectTestCase(APITestCaseMixin):
 
         updated_activity = models.Activity.objects.get(id=activity.id)
         self.assertNotEqual(updated_activity.capitalization_years, project.capitalization_years)
+
+    def test_archive_project_and_try_to_change_last_year_of_accounting(self):
+        """
+        Test that changing the last year of accounting for an archived project is not allowed.
+
+        This test performs the following steps:
+        1. Creates a project and verifies the project creation.
+        2. Archives the project.
+        3. Attempts to change the last year of accounting for the archived project and verifies that the modification attempt fails with a 400 Bad Request status code.
+
+        The test ensures that changing the last year of accounting for an archived project is not allowed.
+        """
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        archive_response = self.edit_project(project, self.user, {"is_archived": True})
+        self.assertEqual(archive_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(archive_response.data["is_archived"])
+
+        modify_response = self.edit_project(project, self.user, {"last_year_of_accounting": 2022})
+        self.assertEqual(modify_response.status_code, status.HTTP_400_BAD_REQUEST)
