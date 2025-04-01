@@ -150,7 +150,13 @@ def has_project_permission(permission, user, project):
 
     memberships: list[api_models.ProjectMembership] = project.members.filter(user=user)
 
-    can_access = memberships and any([membership.group.permissions.filter(codename=permission).exists() for membership in memberships])
+    can_access = False
+
+    if memberships:
+        for membership in memberships:
+            if membership.group.permissions.filter(codename=permission).exists():
+                can_access = True
+                break
 
     return can_access
 
