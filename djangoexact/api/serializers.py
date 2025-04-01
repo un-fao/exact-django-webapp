@@ -344,8 +344,12 @@ class ReadProjectSerializer(serializers.ModelSerializer):
     total_hectares = serializers.SerializerMethodField()
     total_catch = serializers.SerializerMethodField()
     total_livestock = serializers.SerializerMethodField()
+    note = serializers.SerializerMethodField()
 
     capitalization_years = serializers.FloatField(read_only=True)
+
+    def get_note(self, obj):
+        return NoteSerializer(obj.note.first(), many=False).data if obj.note.exists() else None
 
     def get_role(self, obj):
         ctx = self.context.get("request", None)
@@ -3063,41 +3067,65 @@ class ProjectInvitationWriteSerializer(serializers.ModelSerializer):
 
 
 class NewNoteSerializer(serializers.ModelSerializer):
+    entity_type = serializers.ChoiceField(choices=["project", "module"])
     content = serializers.CharField(required=True)
-    module_type_id = serializers.IntegerField(required=True)
+    module_type_id = serializers.IntegerField(required=False)
     module_id = serializers.IntegerField(required=True)
 
     class Meta:
         model = Note
-        fields = ["content", "module_type_id", "module_id"]
+        fields = ["content", "module_type_id", "module_id", "entity_type"]
         ref_name = "Note"
 
     def validate(self, data):
-        try:
-            module_type = ModuleType.objects.get(pk=data["module_type_id"])
-        except ModuleType.DoesNotExist:
-            raise serializers.ValidationError("Module type does not exist")
+        entity_type = data.get("entity_type", "")
 
-        ModuleClass = utils.get_model(module_type.class_name, suffix=None)
-        try:
-            module: Module | Submodule = ModuleClass.objects.get(pk=data["module_id"])
-        except ModuleClass.DoesNotExist:
-            raise serializers.ValidationError("Module does not exist")
+        if entity_type not in ["project", "module"]:
+            raise serializers.ValidationError("Invalid entity type")
 
-        if module.note.exists():
-            raise serializers.ValidationError(f"Note already exists for this module. Use PUT with id {module.note.pk} to update")
+        if entity_type == "module":
+            if data.get("module_type_id", None) is None:
+                raise serializers.ValidationError("Module type ID is required for modules")
+
+            try:
+                module_type = ModuleType.objects.get(pk=data["module_type_id"])
+            except ModuleType.DoesNotExist:
+                raise serializers.ValidationError("Module type does not exist")
+
+            ModuleClass = utils.get_model(module_type.class_name, suffix=None)
+            try:
+                module: Module | Submodule = ModuleClass.objects.get(pk=data["module_id"])
+            except ModuleClass.DoesNotExist:
+                raise serializers.ValidationError("Module does not exist")
+
+            if module.note.exists():
+                raise serializers.ValidationError(f"Note already exists for this module. Use PUT with id {module.note.pk} to update")
+        elif entity_type == "project":
+            try:
+                project = Project.objects.get(pk=data["module_id"])
+            except Project.DoesNotExist:
+                raise serializers.ValidationError("Project does not exist")
+
+            if project.note.exists():
+                raise serializers.ValidationError(f"Note already exists for this project. Use PUT with id {project.note.pk} to update")
 
         return super().validate(data)
 
     def save(self, **kwargs):
-        module_type = ModuleType.objects.get(pk=self.validated_data["module_type_id"])
-        ModuleClass = utils.get_model(module_type.class_name, suffix=None)
-        module: Module | Submodule = ModuleClass.objects.get(pk=self.validated_data["module_id"])
+        content_object = None
+
+        entity_type = self.validated_data["entity_type"]
+        if entity_type == "module":
+            module_type = ModuleType.objects.get(pk=self.validated_data["module_type_id"])
+            ModuleClass = utils.get_model(module_type.class_name, suffix=None)
+            content_object = ModuleClass.objects.get(pk=self.validated_data["module_id"])
+        else:
+            content_object = Project.objects.get(pk=self.validated_data["module_id"])
 
         note = Note.objects.create(
             author=self.context["request"].user,
             content=self.validated_data["content"],
-            content_object=module,
+            content_object=content_object,
         )
 
         return note

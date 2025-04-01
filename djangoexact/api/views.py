@@ -1802,19 +1802,30 @@ class NoteViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     def create(self, request, *args, **kwargs):
         serializer = NewNoteSerializer(data=request.data, context={"request": request})
 
+        project = None
+
         if not serializer.is_valid():
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
-        try:
-            module_type = ModuleType.objects.get(pk=serializer.validated_data["module_type_id"])
-        except ModuleType.DoesNotExist:
-            logging.error("Module type not found")
-            return utils.ErrorResponse("Module type not found", status=http_status.HTTP_400_BAD_REQUEST)
+        if serializer.validated_data["entity_type"] == "module":
+            try:
+                module_type = ModuleType.objects.get(pk=serializer.validated_data["module_type_id"])
+            except ModuleType.DoesNotExist:
+                logging.error("Module type not found")
+                return utils.ErrorResponse("Module type not found", status=http_status.HTTP_400_BAD_REQUEST)
 
-        ModuleClass = utils.get_model(module_type.class_name, suffix=None)
-        module: Module | Submodule = ModuleClass.objects.get(pk=serializer.validated_data["module_id"])
+            ModuleClass = utils.get_model(module_type.class_name, suffix=None)
+            module: Module | Submodule = ModuleClass.objects.get(pk=serializer.validated_data["module_id"])
+            project = module.project
 
-        if not utils.has_project_permission("add_note", self.request.user, module.project):
+        elif serializer.validated_data["entity_type"] == "project":
+            try:
+                project = Project.objects.get(pk=serializer.validated_data["module_id"])
+            except Project.DoesNotExist:
+                logging.error("Project not found")
+                return utils.ErrorResponse("Project not found", status=http_status.HTTP_400_BAD_REQUEST)
+
+        if not utils.has_project_permission("add_note", self.request.user, project):
             logging.error("Selected user does not have permission to add notes to the project")
             return utils.ErrorResponse("Selected user does not have permission to add notes to the project", status=http_status.HTTP_403_FORBIDDEN)
 
