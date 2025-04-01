@@ -33,6 +33,7 @@ router.register(r"project-attachments", views.ProjectFileAttachmentViewSet, base
 
 project_router = nested_routers.NestedSimpleRouter(router, r"projects", lookup="project")
 project_router.register(r"tags", views.ProjectTagViewSet, basename="projecttags")
+# project_router.register(r"tokens", views.PublicTokenViewset, basename="publictoken")
 
 router.register(r"project-invitations", views.ProjectInvitationViewSet, basename="projectinvitations")
 router.register(r"project-memberships", views.ProjectMembershipViewSet)
