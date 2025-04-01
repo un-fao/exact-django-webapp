@@ -98,6 +98,7 @@ from .models import (
     APIHealth,
     FuelUseType,
     PublicToken,
+    EnergyEntry,
 )
 from datetime import timedelta
 from typing import Optional
@@ -2065,6 +2066,9 @@ class EnergySerializer(ScenarioModuleSerializer):
         electricities: QuerySet[Electricity] = self.instance.electricities.all()
         fuels: QuerySet[Fuel] = self.instance.fuels.all()
 
+        if any([not entry.is_ready() for entry in self.instance.entries.all()]):
+            data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
+
         if any([not electricity.is_ready() for electricity in electricities]):
             data["status"] = StatusType.objects.get(name_en="SUBMODULES_EMPTY")
 
@@ -2136,6 +2140,45 @@ class FuelReadSerializer(BaseGenericModuleSerializer):
         model = Fuel
         fields = "__all__"
         ref_name = "Fuel"
+        mandatory_fields = {}
+
+
+# EnergyEntry
+class EnergyEntryWriteSerializer(ScenarioSubmoduleSerializer):
+    class Meta:
+        model = EnergyEntry
+        fields = "__all__"
+        ref_name = "EnergyEntry"
+        mandatory_fields = {
+            "start": {
+                "mandatory": [
+                    "fuel_type_start",
+                    "quantity_consumed_per_year_start",
+                    "transmission_loss_t2_start",
+                ],
+            },
+            "with": {
+                "mandatory": [
+                    "fuel_type_w",
+                    "quantity_consumed_per_year_w",
+                    "transmission_loss_t2_w",
+                ],
+            },
+            "without": {
+                "mandatory": [
+                    "fuel_type_wo",
+                    "quantity_consumed_per_year_wo",
+                    "transmission_loss_t2_wo",
+                ],
+            },
+        }
+
+
+class EnergyEntryReadSerializer(BaseGenericModuleSerializer):
+    class Meta:
+        model = EnergyEntry
+        fields = "__all__"
+        ref_name = "EnergyEntry"
         mandatory_fields = {}
 
 
