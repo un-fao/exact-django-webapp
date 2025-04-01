@@ -103,6 +103,7 @@ from .models import (
 from datetime import timedelta
 from typing import Optional
 from django.contrib.contenttypes.models import ContentType
+import api.security as security
 
 
 class EmptySerializer(serializers.Serializer):
@@ -442,6 +443,7 @@ class WriteProjectSerializer(serializers.ModelSerializer):
             user = self.context["request"].user
             is_archived = data.get("is_archived", None)
             is_finalized = data.get("is_finalized", None)
+            is_public = data.get("is_public", None)
 
             if project.is_archived and is_archived is not False:
                 raise serializers.ValidationError("Archived projects cannot be modified")
@@ -451,6 +453,10 @@ class WriteProjectSerializer(serializers.ModelSerializer):
 
             if not project.is_archived and is_archived:
                 data["archived_at"] = timezone.now()
+
+            errors = security.check_permission("change_public_project_flag", user, project)
+            if is_public is not None and errors is not None:
+                raise serializers.ValidationError("User does not have permission to change the public project flag")
 
             if cost is not None:
                 total_activity_cost = project.activities.all().values_list("cost", flat=True)

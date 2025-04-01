@@ -4725,6 +4725,25 @@ def create_energy_entry_module_type():
     print(f"Created ModuleType: {module_type}")
 
 
+def add_change_public_project_flag_permission_to_admin_group():
+    from django.contrib.auth.models import Group, Permission
+    from django.contrib.contenttypes.models import ContentType
+    from api.models import Project
+
+    # Get the admin group
+    admin_group = Group.objects.get(name="Admin")
+
+    # Get the content type for the Project model
+    content_type = ContentType.objects.get_for_model(Project)
+
+    # Get the permission for changing the public project flag
+    permission = Permission.objects.get(codename="change_public_project_flag", content_type=content_type)
+
+    # Add the permission to the admin group
+    admin_group.permissions.add(permission)
+    print(f"Added permission {permission} to group {admin_group}")
+
+
 def run():
     import os
 
@@ -4745,6 +4764,7 @@ def run():
         create_parent_fuel_types()
         assign_parent_fuel_types_to_fuel_types()
         create_energy_entry_module_type()
+        add_change_public_project_flag_permission_to_admin_group()
         pass
 
     if app_mode == "review":
@@ -4760,10 +4780,12 @@ def run():
         create_parent_fuel_types()
         assign_parent_fuel_types_to_fuel_types()
         create_energy_entry_module_type()
+        add_change_public_project_flag_permission_to_admin_group()
         pass
 
     if app_mode == "development":
         # TODO: Run in development
+        add_change_public_project_flag_permission_to_admin_group()
         pass
 
     if app_mode == "test":
