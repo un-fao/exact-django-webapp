@@ -601,9 +601,13 @@ class Project(Historical, DirtyFieldsMixin):
     created_at = models.DateTimeField(auto_now_add=True, null=True, verbose_name=_("created_at"))
     updated_at = models.DateTimeField(auto_now=True, null=True, verbose_name=_("updated_at"))
 
-    is_archived = models.BooleanField(default=False, verbose_name=_("is_archived"))
+    is_archived = models.BooleanField(default=False, verbose_name=_("is_archived"))  # TODO: Use this when projects are deleted
+    archived_at = models.DateTimeField(null=True, blank=True, verbose_name=_("archived_at"))
 
     map_data = models.JSONField(null=True, blank=True, verbose_name=_("map_data"))
+
+    is_public = models.BooleanField(default=False, verbose_name=_("is_public"))
+    is_finalized = models.BooleanField(default=False, verbose_name=_("is_finalized"))
 
     @property
     def capitalization_years(self) -> int:
@@ -3019,3 +3023,19 @@ class APIHealth(models.Model):
 
     def __str__(self):
         return "API Health"
+
+
+class PublicToken(models.Model):
+    project = models.ForeignKey("api.Project", on_delete=models.CASCADE, related_name="tokens")
+    token = models.CharField(max_length=255, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if not self.token:
+            import uuid
+
+            self.token = str(uuid.uuid4())
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.token
