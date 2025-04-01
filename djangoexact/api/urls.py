@@ -154,6 +154,7 @@ router.register(r"building-types", views.generic_viewset(models.BuildingType), b
 router.register(r"energies", views.generic_module_viewset(models.Energy), basename="energy")
 router.register(r"electricities", views.generic_module_viewset(models.Electricity), basename="electricity")
 router.register(r"fuels", views.generic_module_viewset(models.Fuel), basename="fuel")
+router.register(r"energy-entries", views.generic_module_viewset(models.EnergyEntry), basename="energyentry")
 router.register(r"emission-factor-sources", views.generic_viewset(models.EmissionFactorSource), basename="emissionfactorsources")
 
 # Fuel
