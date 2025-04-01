@@ -1,13 +1,14 @@
 from rest_framework.test import APIRequestFactory, APITestCase
 from rest_framework import status
 from django.urls import reverse
-from api.views import ProjectViewSet, ActivityViewSet, generic_module_viewset
+from api.views import ProjectViewSet, ActivityViewSet, generic_module_viewset, ProjectMembershipViewSet
 import api.models as models
 import ipcc.models as ipcc_models
 import api.tests.factories as factories
 from rest_framework.test import force_authenticate
 from factory.fuzzy import FuzzyText, FuzzyInteger, FuzzyChoice
 import logging as log
+from api import serializers
 
 
 class APITestCaseMixin(APITestCase):
@@ -86,7 +87,14 @@ class APITestCaseMixin(APITestCase):
         This method creates a project membership for the provided user and project.
         """
         log.info("Creating project membership")
-        return models.ProjectMembership.objects.create(user=user, project=project, group=self.group)
+        view = ProjectMembershipViewSet.as_view({"post": "create"})
+        request = self.request_factory.post(
+            reverse("projectmembership-list"),
+            {"user": user.id, "project": project.id, "group": self.group.id},
+            format="json",
+        )
+        force_authenticate(request, user=self.user)
+        return view(request)
 
     def edit_project(self, project, user, data):
         """
@@ -97,7 +105,6 @@ class APITestCaseMixin(APITestCase):
         and the response is returned.
         """
         log.info("Editing project")
-        factory = APIRequestFactory(enforce_csrf_checks=False)
         view = ProjectViewSet.as_view({"patch": "partial_update"})
 
         request = self.request_factory.patch(
