@@ -573,6 +573,7 @@ class Project(Historical, DirtyFieldsMixin):
         verbose_name_plural = "Projects"
         unique_together = ("name", "owner")
         ordering = ["-id"]  # Orders by created_at descending
+        permissions = (("change_public_project_flag", "Can change public project flag"),)
 
     owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="projects", verbose_name=_("owner"))
     date = models.DateTimeField(null=True, blank=True, verbose_name=_("date"))
