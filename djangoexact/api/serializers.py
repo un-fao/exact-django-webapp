@@ -434,6 +434,17 @@ class WriteProjectSerializer(serializers.ModelSerializer):
             new_years = data.get("implementation_years", None)
             is_locking = data.get("is_locked", None)
             user = self.context["request"].user
+            is_archived = data.get("is_archived", None)
+            is_finalized = data.get("is_finalized", None)
+
+            if project.is_archived and is_archived is not False:
+                raise serializers.ValidationError("Archived projects cannot be modified")
+
+            if project.is_finalized and is_finalized is not False:
+                raise serializers.ValidationError("Finalized projects cannot be modified")
+
+            if not project.is_archived and is_archived:
+                data["archived_at"] = timezone.now()
 
             if cost is not None:
                 total_activity_cost = project.activities.all().values_list("cost", flat=True)
@@ -545,6 +556,9 @@ class WriteActivitySerializer(serializers.ModelSerializer):
         if project.is_archived:
             return serializers.ValidationError("Archived projects cannot have activities added")
 
+        if project.is_finalized:
+            return serializers.ValidationError("Finalized projects cannot have activities added")
+
         project._check_lock_expiration()
         if project.is_locked and not project.locked_by == self.context["request"].user and not self.context["request"].user.is_staff:
             raise serializers.ValidationError("Project is locked by another user")
@@ -650,6 +664,9 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
         if project.is_archived:
             raise serializers.ValidationError("Archived projects cannot have activities added")
+
+        if project.is_finalized:
+            raise serializers.ValidationError("Finalized projects cannot have activities added")
 
         if luc_module in module_types:
             raise serializers.ValidationError("Land Use Change module cannot be added manually")
@@ -1086,6 +1103,14 @@ class BaseModuleSerializer(BaseGenericModuleSerializer):
         if project.is_locked and not project.locked_by == self.context["request"].user and not self.context["request"].user.is_staff:
             log.error("Project is locked by another user")
             raise serializers.ValidationError("Project is locked by another user")
+
+        if project.is_archived:
+            log.error("Archived projects cannot have activities added")
+            raise serializers.ValidationError("Archived projects cannot have activities added")
+
+        if project.is_finalized:
+            log.error("Finalized projects cannot have activities added")
+            raise serializers.ValidationError("Finalized projects cannot have activities added")
 
         if getattr(activity, self.Meta.ref_name.lower(), None).exists() and not self.instance:
             log.error(f"Activity already has a {self.Meta.ref_name}")
@@ -3035,6 +3060,19 @@ class NoteSerializer(serializers.ModelSerializer):
 
     def get_module_id(self, obj):
         return obj.content_object.id
+
+    def validate(self, data):
+        project: Project = self.project
+        if not project:
+            raise serializers.ValidationError("Project not found")
+
+        if project.is_archived:
+            raise serializers.ValidationError("Project is archived")
+
+        if project.is_finalized:
+            raise serializers.ValidationError("Project is finalized")
+
+        return super().validate(data)
 
     class Meta:
         model = Note

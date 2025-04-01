@@ -601,11 +601,13 @@ class Project(Historical, DirtyFieldsMixin):
     created_at = models.DateTimeField(auto_now_add=True, null=True, verbose_name=_("created_at"))
     updated_at = models.DateTimeField(auto_now=True, null=True, verbose_name=_("updated_at"))
 
-    is_archived = models.BooleanField(default=False, verbose_name=_("is_archived"))
+    is_archived = models.BooleanField(default=False, verbose_name=_("is_archived"))  # TODO: Use this when projects are deleted
+    archived_at = models.DateTimeField(null=True, blank=True, verbose_name=_("archived_at"))
 
     map_data = models.JSONField(null=True, blank=True, verbose_name=_("map_data"))
 
     is_public = models.BooleanField(default=False, verbose_name=_("is_public"))
+    is_finalized = models.BooleanField(default=False, verbose_name=_("is_finalized"))
 
     @property
     def capitalization_years(self) -> int:

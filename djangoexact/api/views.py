@@ -663,12 +663,9 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if error:
             return error
 
-        if project.is_archived:
-            return utils.ErrorResponse("Archived projects cannot be updated", status=http_status.HTTP_400_BAD_REQUEST)
-
         serializer = self.serializer_class(project, data=request.data, partial=True, context={"request": request})
         if not serializer.is_valid():
-            logging.error("Error updating project:", serializer.errors)
+            logging.error(f"Error updating project: {serializer.errors}")
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
         serializer.save()
@@ -683,9 +680,6 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         error = security.check_permission("change_project", self.request.user, project)
         if error:
             return error
-
-        if project.is_archived:
-            return utils.ErrorResponse("Archived projects cannot be updated", status=http_status.HTTP_400_BAD_REQUEST)
 
         serializer = self.serializer_class(project, data=request.data, context={"request": request})
         if not serializer.is_valid():
@@ -1250,6 +1244,9 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if project.is_archived:
             return utils.ErrorResponse("Archived projects cannot have memberships added", status=http_status.HTTP_400_BAD_REQUEST)
 
+        if project.is_finalized:
+            return utils.ErrorResponse("Finalized projects cannot have memberships added", status=http_status.HTTP_400_BAD_REQUEST)
+
         membership = serializer.save()
 
         return Response(ProjectMembershipSerializer(membership).data, status=http_status.HTTP_201_CREATED)
@@ -1271,6 +1268,9 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         if membership.project.is_archived:
             return utils.ErrorResponse("Archived projects cannot have memberships updated", status=http_status.HTTP_400_BAD_REQUEST)
+
+        if membership.project.is_finalized:
+            return utils.ErrorResponse("Finalized projects cannot have memberships updated", status=http_status.HTTP_400_BAD_REQUEST)
 
         serializer = ProjectMembershipSerializer(data=request.data, instance=membership)
 
@@ -1307,6 +1307,9 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         if membership.project.is_archived:
             return utils.ErrorResponse("Archived projects cannot have memberships deleted", status=http_status.HTTP_400_BAD_REQUEST)
+
+        if membership.project.is_finalized:
+            return utils.ErrorResponse("Finalized projects cannot have memberships deleted", status=http_status.HTTP_400_BAD_REQUEST)
 
         if membership.group.name == "Admin":
             admin_count = membership.project.members.filter(group__name="Admin").count()
@@ -1365,6 +1368,9 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         if project.is_archived:
             return utils.ErrorResponse("Archived projects cannot have invitations sent", status=http_status.HTTP_400_BAD_REQUEST)
+
+        if project.is_finalized:
+            return utils.ErrorResponse("Finalized projects cannot have invitations sent", status=http_status.HTTP_400_BAD_REQUEST)
 
         try:
             email = serializer.validated_data["email"]
@@ -1447,6 +1453,9 @@ The EX-ACT Team
         if invitation.project.is_archived:
             return utils.ErrorResponse("Archived projects cannot have invitations updated", status=http_status.HTTP_400_BAD_REQUEST)
 
+        if invitation.project.is_finalized:
+            return utils.ErrorResponse("Finalized projects cannot have invitations updated", status=http_status.HTTP_400_BAD_REQUEST)
+
         if not data.is_valid():
             return Response(data.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
@@ -1528,6 +1537,9 @@ The EX-ACT Team
         if invitation.project.is_archived:
             return utils.ErrorResponse("Archived projects cannot have invitations accepted", status=http_status.HTTP_400_BAD_REQUEST)
 
+        if invitation.project.is_finalized:
+            return utils.ErrorResponse("Finalized projects cannot have invitations accepted", status=http_status.HTTP_400_BAD_REQUEST)
+
         # NOTE: This is not possible since clicking the link will not authenticate the user
         # user: CustomUser = self.request.user
         # if user != invitation.user and not any([user.is_staff, user.is_superuser]):
@@ -1566,9 +1578,6 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if error:
             return error
 
-        if activity.project.is_archived:
-            return utils.ErrorResponse("Archived projects cannot have activities updated", status=http_status.HTTP_400_BAD_REQUEST)
-
         serializer = WriteActivitySerializer(data=request.data, instance=activity, context={"request": request})
 
         if not serializer.is_valid():
@@ -1587,9 +1596,6 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         error = security.check_permission("change_activity", self.request.user, activity.project)
         if error:
             return error
-
-        if activity.project.is_archived:
-            return utils.ErrorResponse("Archived projects cannot have activities updated", status=http_status.HTTP_400_BAD_REQUEST)
 
         serializer = WriteActivitySerializer(data=request.data, partial=True, instance=activity, context={"request": request})
 
@@ -1844,9 +1850,6 @@ class NoteViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
             logging.error("Selected user does not have permission to add notes to the project")
             return utils.ErrorResponse("Selected user does not have permission to add notes to the project", status=http_status.HTTP_403_FORBIDDEN)
 
-        if module.project.is_archived:
-            return utils.ErrorResponse("Archived projects cannot have notes added", status=http_status.HTTP_400_BAD_REQUEST)
-
         note = serializer.save()
 
         return Response(self.serializer_class(note).data, status=http_status.HTTP_201_CREATED)
@@ -1859,9 +1862,6 @@ class NoteViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not utils.has_project_permission("change_note", self.request.user, note.project):
             logging.error("Selected user does not have permission to update notes in the project")
             return utils.ErrorResponse("Selected user does not have permission to update notes in the project", status=http_status.HTTP_403_FORBIDDEN)
-
-        if note.project.is_archived:
-            return utils.ErrorResponse("Archived projects cannot have notes updated", status=http_status.HTTP_400_BAD_REQUEST)
 
         serializer = self.serializer_class(data=request.data, instance=note)
 
@@ -1882,9 +1882,6 @@ class NoteViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if not utils.has_project_permission("change_note", self.request.user, note.project):
             logging.error("Selected user does not have permission to update notes in the project")
             return utils.ErrorResponse("Selected user does not have permission to update notes in the project", status=http_status.HTTP_403_FORBIDDEN)
-
-        if note.project.is_archived:
-            return utils.ErrorResponse("Archived projects cannot have notes updated", status=http_status.HTTP_400_BAD_REQUEST)
 
         serializer = self.serializer_class(data=request.data, partial=True, instance=note)
 
@@ -2029,9 +2026,6 @@ def generic_module_viewset(model: Module):
             if error:
                 return error
 
-            if activity.project.is_archived:
-                return utils.ErrorResponse("Archived projects cannot have modules updated", status=http_status.HTTP_400_BAD_REQUEST)
-
             serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data=request.data, partial=True, instance=module, context={"request": request})
 
             if not serializer.is_valid():
@@ -2059,9 +2053,6 @@ def generic_module_viewset(model: Module):
             error = security.check_permission("can_change_modules", self.request.user, activity.project)
             if error:
                 return error
-
-            if activity.project.is_archived:
-                return utils.ErrorResponse("Archived projects cannot have modules updated", status=http_status.HTTP_400_BAD_REQUEST)
 
             serializer = get_module_serializer(model, action=ActionTypes.CREATE)(data=request.data, partial=True, instance=module, context={"request": request})
 
@@ -2103,9 +2094,6 @@ def generic_module_viewset(model: Module):
             error = security.check_permission("can_create_modules", self.request.user, activity.project)
             if error:
                 return error
-
-            if activity.project.is_archived:
-                return utils.ErrorResponse("Archived projects cannot have modules added", status=http_status.HTTP_400_BAD_REQUEST)
 
             module_serializer.save()
 
