@@ -574,6 +574,7 @@ class Project(Historical, DirtyFieldsMixin):
     funding_agency = models.CharField(max_length=100, null=True, blank=True, verbose_name=_("funding_agency"))
     executing_agency = models.CharField(max_length=100, null=True, blank=True, verbose_name=_("executing_agency"))
     status = models.ForeignKey(ProjectStatus, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("status"))
+    note = GenericRelation("api.Note", related_name="projects")
 
     implementation_years = models.IntegerField(verbose_name=_("implementation_years"))
     start_year_of_activities = models.IntegerField(verbose_name=_("start_year_of_activities"))
