@@ -2736,13 +2736,43 @@ class InputTypeSerializer(serializers.ModelSerializer):
 
 
 class ProjectMembershipSerializer(serializers.ModelSerializer):
+    project = ProjectNameIdSerializer(many=False, read_only=True)
     user = UserReadSerializer(many=False, read_only=True)
     group = GroupSerializer(many=False, read_only=True)
+
+    project = serializers.PrimaryKeyRelatedField(
+        queryset=Project.objects.all(),
+        many=False,
+        write_only=True,
+    )
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        many=False,
+        write_only=True,
+    )
+    group = serializers.PrimaryKeyRelatedField(
+        queryset=Group.objects.all(),
+        many=False,
+        write_only=True,
+    )
 
     class Meta:
         model = ProjectMembership
         fields = "__all__"
         ref_name = "ProjectMembership"
+
+    def validate(self, data):
+        super().validate(data)
+
+        project: Project = utils.getany([data, self.instance], "project")
+
+        if project.is_archived:
+            raise serializers.ValidationError("Cannot add members to an archived project")
+
+        if project.is_finalized:
+            raise serializers.ValidationError("Cannot add members to a finalized project")
+
+        return data
 
 
 class SetAsideWriteSerializer(LandModuleSeralizer):
