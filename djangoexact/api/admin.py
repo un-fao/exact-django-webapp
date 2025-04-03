@@ -16,9 +16,10 @@ class FieldDefinitionAdmin(ModelAdmin):
     list_display = ("module_type", "field_name", "description")
     search_fields = ("module_type", "field_name")
 
+
 @admin.register(APIHealth)
 class APIStatusAdmin(ModelAdmin):
-    list_display = ('is_under_maintenance', 'maintenance_end_time')
+    list_display = ("is_under_maintenance", "maintenance_end_time")
     list_filter_submit = True  # Submit button at the bottom of the filter
     list_filter = (
         ("maintenance_end_time", RangeDateTimeFilter),  # Datetime filter
@@ -27,8 +28,15 @@ class APIStatusAdmin(ModelAdmin):
     # Ensure only one APIStatus instance exists
     def has_add_permission(self, request):
         return not APIHealth.objects.exists()
-    
+
     def has_delete_permission(self, request, obj=None):
         return False
 
-    # Add datet
+
+from django.contrib.auth.models import Permission
+
+
+@admin.register(Permission)
+class PermissionAdmin(ModelAdmin):
+    list_display = ("name", "codename", "content_type")
+    search_fields = ("name", "codename", "content_type__app_label", "content_type__model")

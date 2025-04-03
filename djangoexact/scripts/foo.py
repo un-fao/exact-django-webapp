@@ -187,14 +187,81 @@ def verify_user_firebase_email():
     firebase_admin.auth.update_user(user.firebase_uid, email_verified=True)
 
 
+def search_historical_projects_for_project_name():
+    """
+    Search historical projects for project name
+    """
+    projects = models.Project.history.filter(name__icontains="improving livelihoods in rural Kenya", owner__email="mariagiulia.crespi@fao.org", history_change_reason="delete")
+    print(f"Found {projects.count()} projects")
+    for project in projects:
+        print(f"Project: {project.name}")
+        print(f"Owner: {project.owner}")
+        print(f"Action: {project.history_change_reason}")
+        print(f"Perpetrator: {project.history_user}")
+        print(f"Action Date: {project.history_date}")
+
+        # Find connected historical activities
+        activities = models.Activity.history.filter(project=project.instance).order_by("name").distinct("name")
+        print(f"Found {activities.count()} activities")
+        for activity in activities:
+            print("----------------------------------------")
+            print(f"Activity: {activity.name}")
+            # print(f"Action: {activity.history_change_reason}")
+            # print(f"Perpetrator: {activity.history_user}")
+            # print(f"Action Date: {activity.history_date}")
+
+            # Get all models of api app
+            api_models = apps.get_app_config("api").get_models()
+            api_models = list(filter(lambda x: issubclass(x, (models.Module)), api_models))
+
+            api_submodules = apps.get_app_config("api").get_models()
+            api_submodules = list(filter(lambda x: issubclass(x, (models.Submodule)), api_submodules))
+
+            for Model in api_models:
+                # Find connected historical modules
+                modules = Model.history.filter(activity=activity.instance).order_by("id").distinct("id")
+
+                if not modules:
+                    continue
+
+                print(f"Found {modules.count()} {Model.__name__} modules")
+                for module in modules:
+                    # print(f"Action: {module.history_change_reason}")
+                    # print(f"Perpetrator: {module.history_user}")
+                    # print(f"Action Date: {module.history_date}")
+
+                    for Submodule in api_submodules:
+                        # Find connected historical submodules
+                        try:
+                            parent_field_name = [f for f in Submodule._meta.get_fields() if f.is_relation and f.related_model == module.instance.__class__]
+                            if not parent_field_name:
+                                continue
+                            parent_field_name = parent_field_name[0].name
+                            filter_kwargs = {f"{parent_field_name}": module.instance}
+                            submodules = Submodule.history.filter(**filter_kwargs).order_by("id", "history_date").distinct("id")
+                        except ValueError:
+                            continue
+
+                        if not submodules:
+                            continue
+
+                        print(f"Found {submodules.count()} {Submodule.__name__} submodules for {module.instance.__class__.__name__}")
+                        # for submodule in submodules:
+                        #     print(f"Action: {submodule.history_change_reason}")
+                        #     print(f"Perpetrator: {submodule.history_user}")
+                        #     print(f"Action Date: {submodule.history_date}")
+            print("----------------------------------------\n\n\n")
+
+
 def run():
     import os
 
     app_mode = os.getenv("APP_MODE", None)
-    print(f"Running ippc_dump in {app_mode} mode")
+    print(f"Running script in {app_mode} mode")
 
     if app_mode == "production":
         # TODO: Run in production
+        search_historical_projects_for_project_name()
         pass
 
     if app_mode == "review":
