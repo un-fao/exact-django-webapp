@@ -4,12 +4,9 @@ from drf_yasg.views import get_schema_view
 from ipcc.models import GlobalWarmingPotential
 from rest_framework import permissions, routers
 from rest_framework.documentation import include_docs_urls
-
 from rest_framework_nested import routers as nested_routers
-
-
+from django.urls import include
 import api.models as models
-
 from . import views
 
 schema_view = get_schema_view(
@@ -33,9 +30,10 @@ router.register(r"project-attachments", views.ProjectFileAttachmentViewSet, base
 
 project_router = nested_routers.NestedSimpleRouter(router, r"projects", lookup="project")
 project_router.register(r"tags", views.ProjectTagViewSet, basename="projecttags")
+# project_router.register(r"tokens", views.PublicTokenViewset, basename="publictoken")
 
 router.register(r"project-invitations", views.ProjectInvitationViewSet, basename="projectinvitations")
-router.register(r"project-memberships", views.ProjectMembershipViewSet)
+router.register(r"project-memberships", views.ProjectMembershipViewSet, basename="projectmembership")
 router.register(r"groups", views.GroupViewSet)
 router.register(r"activities", views.ActivityViewSet, basename="activities")
 router.register(r"threads", views.CommentThreadViewSet, basename="threads")
@@ -153,6 +151,7 @@ router.register(r"building-types", views.generic_viewset(models.BuildingType), b
 router.register(r"energies", views.generic_module_viewset(models.Energy), basename="energy")
 router.register(r"electricities", views.generic_module_viewset(models.Electricity), basename="electricity")
 router.register(r"fuels", views.generic_module_viewset(models.Fuel), basename="fuel")
+router.register(r"energy-entries", views.generic_module_viewset(models.EnergyEntry), basename="energyentry")
 router.register(r"emission-factor-sources", views.generic_viewset(models.EmissionFactorSource), basename="emissionfactorsources")
 
 # Fuel
@@ -187,6 +186,7 @@ urlpatterns = [
     re_path(r"^swagger(?P<format>\.json|\.yaml)$", schema_view.without_ui(cache_timeout=0), name="schema-json"),
     re_path(r"^swagger/$", schema_view.with_ui("swagger", cache_timeout=0), name="schema-swagger-ui"),
     re_path(r"^redoc/$", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
+    path("public/", include(router.urls)),
 ]
 urlpatterns += router.urls
 urlpatterns += project_router.urls

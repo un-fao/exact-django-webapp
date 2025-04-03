@@ -17,12 +17,18 @@ from . import base_module
 class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
     def setUp(self):
         self.ModuleClass = models.Energy
-        self.submodule_classes = [models.Electricity, models.Fuel]
+        self.submodule_classes = [
+            models.EnergyEntry,
+            models.EnergyEntry,
+        ]
         super().setUp()
 
         self.land_use_types = self.land_use_types.filter(module_types__class_name=self.ModuleClass.__name__, climates=self.project.climate, moistures=self.project.moisture, is_active=True)
 
         self.validated_data = {
+            "fuel_type_start": models.FuelType.objects.order_by("?").first().pk,
+            "fuel_type_w": models.FuelType.objects.order_by("?").first().pk,
+            "fuel_type_wo": models.FuelType.objects.order_by("?").first().pk,
             "quantity_consumed_per_year_start": FuzzyFloat(0, 1000).fuzz(),
             "quantity_consumed_per_year_w": FuzzyFloat(0, 1000).fuzz(),
             "quantity_consumed_per_year_wo": FuzzyFloat(0, 1000).fuzz(),
@@ -66,7 +72,8 @@ class EnergyTestCase(base_module.BaseModuleWithSubmoduleTestCase):
         prev_balance = response.data["balance"]
 
         validated_data = copy.deepcopy(self.validated_data)
-        validated_data["transmission_loss_t2_w"] = FuzzyFloat(0, 10).fuzz()
+        validated_data["transmission_loss_t2_w"] = FuzzyFloat(0, 10).fuzz()  # Electricity
+        validated_data["energy_ef_ch4_t2_start"] = FuzzyFloat(0, 10).fuzz()  # Fuel
 
         response = self.edit_module(self.submodules[0], self.user, validated_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
