@@ -150,7 +150,13 @@ def has_project_permission(permission, user, project):
 
     memberships: list[api_models.ProjectMembership] = project.members.filter(user=user)
 
-    can_access = memberships and any([membership.group.permissions.filter(codename=permission).exists() for membership in memberships])
+    can_access = False
+
+    if memberships:
+        for membership in memberships:
+            if membership.group.permissions.filter(codename=permission).exists():
+                can_access = True
+                break
 
     return can_access
 
@@ -209,6 +215,13 @@ def copy_project(project, owner):
     project_copy._state.adding = True
     project.owner = owner
     project_copy.save()
+
+    # Add Membership to the new project
+    api_models.ProjectMembership.objects.create(
+        user=owner,
+        project=project_copy,
+        group=api_models.Group.objects.get(name="Admin"),
+    )
 
     for activity in project.activities.all():
         copy_activity(activity, project_copy)
@@ -325,11 +338,11 @@ def getany(objects: list[object], key: str):
     for obj in objects:
         obj_type = type(obj)
 
-        if obj_type is dict:
+        if obj_type is dict or obj_type.__name__ == "OrderedDict":
             if key in obj:
                 return obj[key]
         else:
-            if hasattr(obj, key):
+            if hasattr(obj, key) and getattr(obj, key) is not None:
                 return getattr(obj, key)
     return None
 
