@@ -1897,8 +1897,11 @@ class PerennialCropCalculator(LandModuleCalculator):
             tuple: Adjusted (biomass_start, biomass_end) values based on the scenario conditions
         """
 
-        biomass_start: ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB = copy.deepcopy(biomass_start)
-        biomass_end: ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB = copy.deepcopy(biomass_end)
+        baseline_biomass_start: ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB = copy.deepcopy(biomass_start)
+        baseline_biomass_end: ipcc.ForestTotalBiomass | ipcc.TotalBiomassAfterDefo | ipcc.PerennialMaxAGB = copy.deepcopy(biomass_end)
+
+        biomass_start = baseline_biomass_start
+        biomass_end = baseline_biomass_end
 
         # Checking the start scenario covers both "Perennial -> LUC" and "Perennial -> Perennial" cases
         # In all other cases, the biomass values are returned as is
@@ -1918,7 +1921,10 @@ class PerennialCropCalculator(LandModuleCalculator):
             elif scenario_type_start in [utils.ScenarioTypes.WITH, utils.ScenarioTypes.WITHOUT]:
                 if has_change_in_system:
                     biomass_start.value = 0
+                    biomass_end = baseline_biomass_end
+                    setattr(self, f"end_module_has_growth_{scenario_type_end.value}", True)
                 elif not self.module.is_system_in_maturity:
+                    biomass_start = baseline_biomass_start
                     biomass_end.value = None
 
         return biomass_start, biomass_end
