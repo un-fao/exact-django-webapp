@@ -4692,6 +4692,58 @@ def clear_cache_of_all_modules():
         instance.invalidate_cached_results()
 
 
+def create_parent_fuel_types():
+    parent_fuel_type_names = ["Fuel", "Electricity"]
+
+    for name in parent_fuel_type_names:
+        if not ParentFuelType.objects.filter(name=name).exists():
+            ParentFuelType.objects.create(name=name)
+            print(f"Created parent fuel type: {name}")
+        else:
+            print(f"Parent fuel type {name} already exists.")
+
+
+def assign_parent_fuel_types_to_fuel_types():
+    fuel_types = FuelType.objects.all()
+    for fuel_type in fuel_types:
+        if fuel_type.name in ["Electricity", "Electricity (Grid)", "Electricity (Non-Grid)"]:
+            parent_fuel_type = ParentFuelType.objects.get(name="Electricity")
+        else:
+            parent_fuel_type = ParentFuelType.objects.get(name="Fuel")
+
+        fuel_type.parent_fuel_type = parent_fuel_type
+        fuel_type.save()
+        print(f"Assigned {parent_fuel_type} to {fuel_type}")
+
+
+def create_energy_entry_module_type():
+    module_type = ModuleType.objects.create(
+        class_name="EnergyEntry",
+        name="Energy Entry",
+        is_submodule=True,
+    )
+    print(f"Created ModuleType: {module_type}")
+
+
+def add_change_public_project_flag_permission_to_admin_group():
+    from django.contrib.auth.models import Group, Permission
+    from django.contrib.contenttypes.models import ContentType
+    from api.models import Project
+
+    # Get the admin group
+    admin_group = Group.objects.get(name="Admin")
+
+    # Get the content type for the Project model
+    content_type = ContentType.objects.get_for_model(Project)
+
+    # Get the permission for changing the public project flag
+    permission = Permission.objects.get(codename="change_public_project_flag", content_type=content_type)
+
+    # Add the permission to the admin group
+    admin_group.permissions.add(permission)
+    print(f"Added permission {permission} to group {admin_group}")
+
+
 def run():
     import os
 
@@ -4709,6 +4761,10 @@ def run():
         # add_pit_gt_1_month_to_livestock_awms_where_manure_management_type_is_null()
         # import_shadow_prices_of_carbon()
         # add_0_2_to_co2_value_in_input_emission_factor()
+        create_parent_fuel_types()
+        assign_parent_fuel_types_to_fuel_types()
+        create_energy_entry_module_type()
+        add_change_public_project_flag_permission_to_admin_group()
         pass
 
     if app_mode == "review":
@@ -4721,12 +4777,15 @@ def run():
         # delete_and_import_irrigation_phase_data()
         # import_shadow_prices_of_carbon()
         # add_0_2_to_co2_value_in_input_emission_factor()
+        create_parent_fuel_types()
+        assign_parent_fuel_types_to_fuel_types()
+        create_energy_entry_module_type()
+        add_change_public_project_flag_permission_to_admin_group()
         pass
 
     if app_mode == "development":
         # TODO: Run in development
-        add_pit_gt_1_month_to_livestock_awms_where_manure_management_type_is_null()
-        add_0_2_to_co2_value_in_input_emission_factor()
+        add_change_public_project_flag_permission_to_admin_group()
         pass
 
     if app_mode == "test":

@@ -1,3 +1,28 @@
+"""
+Default values management for EX-ACT modules.
+
+This module provides classes to handle default value retrieval for all EX-ACT modules.
+It implements a Factory pattern through the DefaultsFactory class, which creates appropriate
+Defaults objects for different module types.
+
+Key components:
+- Defaults: Base class for all default value providers
+- DefaultsFactory: Factory class to create appropriate Defaults objects
+- Module-specific defaults classes (e.g., GrasslandDefaults, AnnualCroplandDefaults)
+
+Each module-specific defaults class:
+1. Inherits from Defaults base class
+2. Initializes default values as a SimpleNamespace
+3. Implements get_defaults() to populate values from calculators
+
+The pattern enables consistent default value retrieval across the application
+while allowing module-specific logic for each module type.
+
+Usage:
+    defaults = DefaultsFactory.get_defaults(module_instance)
+    # Use defaults.attribute_name to access specific default values
+"""
+
 from dataclasses import dataclass
 from types import SimpleNamespace
 import api.calculators as calcs
