@@ -77,7 +77,6 @@ INSTALLED_APPS = [
     "simple_history",
     "ipcc",
     "api",
-    "public",
     "blog",
     "ckeditor",
 ]

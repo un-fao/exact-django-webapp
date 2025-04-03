@@ -4,12 +4,9 @@ from drf_yasg.views import get_schema_view
 from ipcc.models import GlobalWarmingPotential
 from rest_framework import permissions, routers
 from rest_framework.documentation import include_docs_urls
-
 from rest_framework_nested import routers as nested_routers
-
-
+from django.urls import include
 import api.models as models
-
 from . import views
 
 schema_view = get_schema_view(
@@ -189,6 +186,7 @@ urlpatterns = [
     re_path(r"^swagger(?P<format>\.json|\.yaml)$", schema_view.without_ui(cache_timeout=0), name="schema-json"),
     re_path(r"^swagger/$", schema_view.with_ui("swagger", cache_timeout=0), name="schema-swagger-ui"),
     re_path(r"^redoc/$", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
+    path("public/", include(router.urls)),
 ]
 urlpatterns += router.urls
 urlpatterns += project_router.urls
