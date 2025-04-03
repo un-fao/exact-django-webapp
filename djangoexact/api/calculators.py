@@ -5444,16 +5444,17 @@ class IrrigationPhaseCalculator(BaseCalculator):
         def get_ef_default(ft: FuelType, st: utils.ScenarioTypes):
             def check_missing_emission(attribute, gas_name):
                 if getattr(ef, attribute, None) is None:
-                    scenario_value = getattr(self.module, f"{attribute}_t2_{st.value}", None)
+                    gas = attribute.split("_")[0]
+                    scenario_value = getattr(self.module, f"ef_{gas}_t2_{st.value}", None)
                     if scenario_value is None:
                         raise ValueError(f"{gas_name} Emission Factor for {ft} is missing. Please provide a tier 2 value for the following scenario: {st.name.lower()}")
 
             ef = ipcc.IrrigationPhaseData.objects.filter(fuel_type=ft).first()
 
             if ef:
-                check_missing_emission("ef_co2", "CO2")
-                check_missing_emission("ef_ch4", "CH4")
-                check_missing_emission("ef_n2o", "N2O")
+                check_missing_emission("co2_emissions", "CO2")
+                check_missing_emission("ch4_emissions", "CH4")
+                check_missing_emission("n2o_emissions", "N2O")
             else:
                 # Validate and set default emissions
                 for gas in ["co2", "ch4", "n2o"]:
