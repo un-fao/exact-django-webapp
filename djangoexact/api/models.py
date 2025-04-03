@@ -83,10 +83,10 @@ class CustomUser(AbstractUser):
 
     class Meta:
         permissions = (
-            ("can_view_modules", "Can view modules"),
-            ("can_add_modules", "Can add modules"),
-            ("can change_modules", "Can change modules"),
-            ("can delete_modules", "Can delete modules"),
+            ("view_modules", "Can view modules"),
+            ("add_modules", "Can add modules"),
+            ("change_modules", "Can change modules"),
+            ("delete_modules", "Can delete modules"),
         )
 
     def __str__(self):
@@ -520,8 +520,16 @@ class Unit(models.Model):
         return f"({self.pk}) {self.name}"
 
 
+class ParentFuelType(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return f"{self.name}"
+
+
 class FuelType(models.Model):
     name = models.CharField(max_length=100)
+    parent_fuel_type = models.ForeignKey(ParentFuelType, on_delete=models.CASCADE, null=True, blank=True)
     fuel_use_type = models.ForeignKey(FuelUseType, on_delete=models.CASCADE, related_name="fuel_types")
     macro_fuel_type = models.ForeignKey(MacroFuelType, on_delete=models.CASCADE, null=True, blank=True)
     module_types = models.ManyToManyField(ModuleType, related_name="fuel_types")
@@ -565,6 +573,7 @@ class Project(Historical, DirtyFieldsMixin):
         verbose_name_plural = "Projects"
         unique_together = ("name", "owner")
         ordering = ["-id"]  # Orders by created_at descending
+        permissions = (("change_public_project_flag", "Can change public project flag"),)
 
     owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="projects", verbose_name=_("owner"))
     date = models.DateTimeField(null=True, blank=True, verbose_name=_("date"))
@@ -574,6 +583,7 @@ class Project(Historical, DirtyFieldsMixin):
     funding_agency = models.CharField(max_length=100, null=True, blank=True, verbose_name=_("funding_agency"))
     executing_agency = models.CharField(max_length=100, null=True, blank=True, verbose_name=_("executing_agency"))
     status = models.ForeignKey(ProjectStatus, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("status"))
+    note = GenericRelation("api.Note", related_name="projects")
 
     implementation_years = models.IntegerField(verbose_name=_("implementation_years"))
     start_year_of_activities = models.IntegerField(verbose_name=_("start_year_of_activities"))
@@ -601,9 +611,13 @@ class Project(Historical, DirtyFieldsMixin):
     created_at = models.DateTimeField(auto_now_add=True, null=True, verbose_name=_("created_at"))
     updated_at = models.DateTimeField(auto_now=True, null=True, verbose_name=_("updated_at"))
 
-    is_archived = models.BooleanField(default=False, verbose_name=_("is_archived"))
+    is_archived = models.BooleanField(default=False, verbose_name=_("is_archived"))  # TODO: Use this when projects are deleted
+    archived_at = models.DateTimeField(null=True, blank=True, verbose_name=_("archived_at"))
 
     map_data = models.JSONField(null=True, blank=True, verbose_name=_("map_data"))
+
+    is_public = models.BooleanField(default=False, verbose_name=_("is_public"))
+    is_finalized = models.BooleanField(default=False, verbose_name=_("is_finalized"))
 
     @property
     def capitalization_years(self) -> int:
@@ -797,6 +811,11 @@ class Note(Historical):
                 return self.content_object.activity.project
             case "Submodule":
                 return self.content_object.parent.activity.project
+
+        if issubclass(self.content_object.__class__, Module):
+            return self.content_object.activity.project
+
+        raise ValueError("Invalid content object")
 
     def __str__(self):
         return f"({self.pk}) {self.author.email}: {self.content[:40]}..."
@@ -2403,6 +2422,21 @@ class Fuel(Submodule, FuelMixin, FuelTier2Mixin):
     parent = models.ForeignKey(Energy, on_delete=models.CASCADE, null=True, blank=True, related_name="fuels")
 
 
+class EnergyEntry(Submodule, ElectricityTier2Mixin, FuelTier2Mixin):
+    parent = models.ForeignKey(Energy, on_delete=models.CASCADE, null=True, blank=True, related_name="entries")
+    fuel_type_start = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fuel_type_start"), related_name="%(class)s_fuel_type_start")
+    fuel_type_w = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fuel_type_w"), related_name="%(class)s_fuel_type_w")
+    fuel_type_wo = models.ForeignKey(FuelType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("fuel_type_wo"), related_name="%(class)s_fuel_type_wo")
+    fuel_type_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_fuel_type_thread")
+
+    quantity_consumed_per_year_start = models.FloatField(null=True, blank=True, verbose_name=_("quantity_consumed_per_year_start"))
+    quantity_consumed_per_year_w = models.FloatField(null=True, blank=True, verbose_name=_("quantity_consumed_per_year_w"))
+    quantity_consumed_per_year_wo = models.FloatField(null=True, blank=True, verbose_name=_("quantity_consumed_per_year_wo"))
+    quantity_consumed_per_year_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_quantity_consumed_per_year_thread")
+
+    account_for_co2 = models.BooleanField(default=False, verbose_name=_("account_for_co2"))
+
+
 class IrrigationSystemType(models.Model):
     module_types = models.ManyToManyField(ModuleType, related_name="irrigation_system_types", null=True, blank=True)
     name = models.CharField(max_length=255, unique=True)
@@ -3014,3 +3048,19 @@ class APIHealth(models.Model):
 
     def __str__(self):
         return "API Health"
+
+
+class PublicToken(models.Model):
+    project = models.ForeignKey("api.Project", on_delete=models.CASCADE, related_name="tokens")
+    token = models.CharField(max_length=255, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if not self.token:
+            import uuid
+
+            self.token = str(uuid.uuid4())
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.token
