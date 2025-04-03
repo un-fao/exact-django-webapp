@@ -216,6 +216,13 @@ def copy_project(project, owner):
     project.owner = owner
     project_copy.save()
 
+    # Add Membership to the new project
+    api_models.ProjectMembership.objects.create(
+        user=owner,
+        project=project_copy,
+        group=api_models.Group.objects.get(name="Admin"),
+    )
+
     for activity in project.activities.all():
         copy_activity(activity, project_copy)
 
