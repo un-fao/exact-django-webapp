@@ -1171,7 +1171,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         operation_description="Get all tags for the current user",
     )
     def tags(self, request):
-        tags = ProjectTag.objects.filter(user=self.request.user)
+        tags = ProjectTag.objects.filter(user=self.request.user).values("name").distinct()
         serializer = ProjectTagSerializer(tags, many=True)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
