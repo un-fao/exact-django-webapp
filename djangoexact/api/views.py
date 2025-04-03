@@ -133,6 +133,7 @@ import ipcc.models as ipcc_models
 import matplotlib.pyplot as plt
 import io
 import base64
+import api.permissions as api_permissions
 
 logger = logging.getLogger("console")
 
@@ -366,7 +367,7 @@ class LandUseTypeViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
 
-class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
+class ProjectViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows projects to be viewed or edited.
     """
@@ -374,6 +375,7 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = Project.objects.all()
     serializer_class = WriteProjectSerializer
     pagination_class = DefaultPagination
+    permission_classes = [api_permissions.IsPublicOrAuthenticated]
 
     @transaction.atomic
     @swagger_auto_schema(responses={400: "Bad request", 201: ReadProjectSerializer})
@@ -774,6 +776,17 @@ class ProjectViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         project._check_lock_expiration()
 
         serializer = ProjectLockHolderInformationSerializer(project, many=False)
+        return Response(data=serializer.data, status=http_status.HTTP_200_OK)
+
+    @action(detail=True, methods=["get"])
+    def activities(self, request, pk=None):
+        project: Project = self.get_object()
+        error = security.check_permission("view_project", self.request.user, project)
+        if error:
+            return error
+
+        activities = project.activities.all()
+        serializer = ActivitySerializer(activities, many=True)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
     @swagger_auto_schema(
@@ -1539,6 +1552,7 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
     queryset = Activity.objects.all()
     serializer_class = ActivitySerializerWithModules
+    permission_classes = [api_permissions.IsPublicOrAuthenticated]
 
     def update(self, request, *args, **kwargs):
         activity = self.get_object()
@@ -1975,6 +1989,7 @@ def generic_module_viewset(model: Module):
     class GenericModuleViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         queryset = model.objects.all()
         serializer_class = get_module_serializer(model)
+        permission_classes = [api_permissions.IsPublicOrAuthenticated]
 
         def get_serializer_class(self):
             if self.action in ["create", "update", "partial_update"]:
