@@ -21,6 +21,7 @@ from api.views import warmup
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("api.urls")),
+    # path("api/public/", include("public.urls")),
     path("api/ipcc/", include("ipcc.urls")),
     path("api/accounts/", include("accounts.urls")),
     path("api/blog/", include("blog.urls")),
