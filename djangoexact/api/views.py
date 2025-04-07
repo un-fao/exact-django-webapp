@@ -89,7 +89,8 @@ from .serializers import (
     ProjectInvitationReadSerializer,
     ProjectInvitationWriteSerializer,
     ReadProjectSerializer,
-    ProjectMembershipSerializer,
+    ProjectMembershipWriteSerializer,
+    ProjectMembershipReadSerializer,
     UserReadSerializer,
     UserWriteSerializer,
     WriteActivitySerializer,
@@ -717,19 +718,19 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return Response(data=serializer.data, status=http_status.HTTP_201_CREATED)
 
     @action(detail=True, methods=["get"])
-    @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view project memberships", 200: ProjectMembershipSerializer})
+    @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view project memberships", 200: ProjectMembershipReadSerializer})
     def memberships(self, request, pk=None):
         project = self.get_object()
         error = security.check_permission("view_project", self.request.user, project)
         if error:
             return error
 
-        serializer = ProjectMembershipSerializer(project.members.all(), many=True)
+        serializer = ProjectMembershipReadSerializer(project.members.all(), many=True)
         return Response(data=serializer.data, status=http_status.HTTP_200_OK)
 
     # TODO: Remove this action when the frontend is updated
     @action(detail=True, methods=["get"])
-    @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view project memberships", 200: ProjectMembershipSerializer})
+    @swagger_auto_schema(responses={400: "Bad request", 403: "Selected user does not have permission to view project memberships", 200: ProjectMembershipReadSerializer})
     def users(self, request, pk=None):
         return self.memberships(request, pk)
 
@@ -1191,14 +1192,14 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
 class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     queryset = ProjectMembership.objects.all()
-    serializer_class = ProjectMembershipSerializer
+    serializer_class = ProjectMembershipReadSerializer
 
     @swagger_auto_schema(
         operation_description="Get a single project membership by id",
         responses={
             400: "Bad request",
             403: "Selected user does not have permission to view project memberships",
-            200: ProjectMembershipSerializer,
+            200: ProjectMembershipReadSerializer,
         },
     )
     def retrieve(self, request, *args, **kwargs):
@@ -1214,7 +1215,7 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         responses={
             400: "Bad request",
             403: "Selected user does not have permission to view project memberships",
-            200: ProjectMembershipSerializer,
+            200: ProjectMembershipReadSerializer,
         },
     )
     def list(self, request, *args, **kwargs):
@@ -1230,13 +1231,13 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if error:
             return error
 
-        serializer = ProjectMembershipSerializer(project.members.all(), many=True)
+        serializer = ProjectMembershipReadSerializer(project.members.all(), many=True)
 
         return Response(serializer.data, status=http_status.HTTP_200_OK)
 
     @swagger_auto_schema(
         operation_description="Create a new project membership",
-        request_body=ProjectMembershipSerializer,
+        request_body=ProjectMembershipWriteSerializer,
         responses={
             400: "Bad request",
             201: "Project membership created successfully",
@@ -1244,7 +1245,7 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         },
     )
     def create(self, request, *args, **kwargs):
-        serializer = ProjectMembershipSerializer(data=request.data)
+        serializer = ProjectMembershipWriteSerializer(data=request.data)
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
@@ -1256,11 +1257,11 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         membership = serializer.save()
 
-        return Response(ProjectMembershipSerializer(membership).data, status=http_status.HTTP_201_CREATED)
+        return Response(ProjectMembershipReadSerializer(membership).data, status=http_status.HTTP_201_CREATED)
 
     @swagger_auto_schema(
         operation_description="Update a project membership",
-        request_body=ProjectMembershipSerializer,
+        request_body=ProjectMembershipWriteSerializer,
         responses={
             400: "Bad request",
             200: "Project membership updated successfully",
@@ -1273,14 +1274,14 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if error:
             return error
 
-        serializer = ProjectMembershipSerializer(data=request.data, instance=membership)
+        serializer = ProjectMembershipWriteSerializer(data=request.data, instance=membership)
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
         serializer.save()
 
-        return Response(ProjectMembershipSerializer(membership).data, status=http_status.HTTP_200_OK)
+        return Response(ProjectMembershipReadSerializer(membership).data, status=http_status.HTTP_200_OK)
 
     def partial_update(self, request, *args, **kwargs):
         membership = self.get_object()
@@ -1288,14 +1289,14 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         if error:
             return error
 
-        serializer = ProjectMembershipSerializer(data=request.data, instance=membership, partial=True)
+        serializer = ProjectMembershipWriteSerializer(data=request.data, instance=membership, partial=True)
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
 
         serializer.save()
 
-        return Response(ProjectMembershipSerializer(membership).data, status=http_status.HTTP_200_OK)
+        return Response(ProjectMembershipReadSerializer(membership).data, status=http_status.HTTP_200_OK)
 
     @swagger_auto_schema(
         operation_description="Delete a project membership",
