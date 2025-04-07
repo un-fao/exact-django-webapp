@@ -3164,7 +3164,10 @@ class NoteSerializer(serializers.ModelSerializer):
         return obj.content_object.id
 
     def validate(self, data):
-        project: Project = self.project
+        if not self.instance:
+            raise serializers.ValidationError("Instance not found")
+
+        project: Project = self.instance.project
         if not project:
             raise serializers.ValidationError("Project not found")
 
