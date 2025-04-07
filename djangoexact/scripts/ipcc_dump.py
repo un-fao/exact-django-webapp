@@ -4777,10 +4777,10 @@ def run():
         # delete_and_import_irrigation_phase_data()
         # import_shadow_prices_of_carbon()
         # add_0_2_to_co2_value_in_input_emission_factor()
-        create_parent_fuel_types()
-        assign_parent_fuel_types_to_fuel_types()
-        create_energy_entry_module_type()
-        add_change_public_project_flag_permission_to_admin_group()
+        # create_parent_fuel_types()
+        # assign_parent_fuel_types_to_fuel_types()
+        # create_energy_entry_module_type()
+        # add_change_public_project_flag_permission_to_admin_group()
         pass
 
     if app_mode == "development":
