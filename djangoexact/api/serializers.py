@@ -2789,30 +2789,14 @@ class InputTypeSerializer(serializers.ModelSerializer):
         ref_name = "InputType"
 
 
-class ProjectMembershipSerializer(serializers.ModelSerializer):
-    project = ProjectNameIdSerializer(many=False, read_only=True)
-    user = UserReadSerializer(many=False, read_only=True)
-    group = GroupSerializer(many=False, read_only=True)
-
-    project = serializers.PrimaryKeyRelatedField(
-        queryset=Project.objects.all(),
-        many=False,
-        write_only=True,
-    )
-    user = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
-        many=False,
-        write_only=True,
-    )
-    group = serializers.PrimaryKeyRelatedField(
-        queryset=Group.objects.all(),
-        many=False,
-        write_only=True,
-    )
+class ProjectMembershipWriteSerializer(serializers.ModelSerializer):
+    project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(), many=False, write_only=True)
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=False, write_only=True)
+    group = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all(), many=False, write_only=True)
 
     class Meta:
         model = ProjectMembership
-        fields = "__all__"
+        fields = ["project", "user", "group"]
         ref_name = "ProjectMembership"
 
     def validate(self, data):
@@ -2827,6 +2811,12 @@ class ProjectMembershipSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Cannot add members to a finalized project")
 
         return data
+
+
+class ProjectMembershipReadSerializer(serializers.Serializer):
+    project = ProjectNameIdSerializer(many=False, read_only=True)
+    user = UserReadSerializer(many=False, read_only=True)
+    group = GroupSerializer(many=False, read_only=True)
 
 
 class SetAsideWriteSerializer(LandModuleSeralizer):
