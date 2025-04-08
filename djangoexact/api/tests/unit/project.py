@@ -161,7 +161,7 @@ class ProjectTestCase(APITestCaseMixin):
         module = activity.modules[0]
 
         response = self.edit_module(module, self.user2, {"area": 50})
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_modify_module_as_lock_holder(self):
         """
@@ -287,4 +287,27 @@ class ProjectTestCase(APITestCaseMixin):
         self.assertTrue(archive_response.data["is_archived"])
 
         modify_response = self.create_project_membership(project, self.user2)
+        self.assertEqual(modify_response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_add_another_admin_and_archive_project(self):
+        """
+        Test that adding another admin to a project and then archiving the project is not allowed.
+
+        This test performs the following steps:
+        1. Creates a project and verifies the project creation.
+        2. Adds another user as an admin to the project.
+        3. Attempts to archive the project and verifies that the modification attempt fails with a 400 Bad Request status code.
+
+        The test ensures that adding another admin to a project and then archiving the project is not allowed.
+        """
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        self.grouo = models.Group.objects.get(name="Admin")
+        membership_response = self.create_project_membership(project, self.user2)
+        self.assertEqual(membership_response.status_code, status.HTTP_201_CREATED)
+
+        modify_response = self.edit_project(project, self.user2, {"is_archived": True})
         self.assertEqual(modify_response.status_code, status.HTTP_400_BAD_REQUEST)
