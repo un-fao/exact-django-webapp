@@ -8,7 +8,7 @@ from .ghg_emissions_classes import (
     Result,
     YearlyGasActivityEmissionSet,
 )
-
+from .ghg_inventory_class import InventoryPerGasperActivity
 from .generalized_modules import LandModule
 
 from dataclasses import dataclass
@@ -75,6 +75,7 @@ class AnnualCropland(LandModule):
 
                     soil_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_soil_yearly], ActivityTypes.SOIL_CO2_CHANGE, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(soil_emission_set)
+                    self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.CO2, soil_emissions[0], ActivityTypes.SOIL_CO2_CHANGE ))
 
             except Exception as e:
                 traceback.print_exc()
@@ -86,6 +87,7 @@ class AnnualCropland(LandModule):
 
                     som_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.N2O, [Emission(e, GasTypes.N2O) for e in emissions_som_yearly], ActivityTypes.SOM, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(som_emission_set)
+                    self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.N2O, som_emission_set[0], ActivityTypes.SOM ))
 
             except Exception as e:
                 traceback.print_exc()
@@ -148,13 +150,20 @@ class AnnualCropland(LandModule):
 
             self.result.yearly_emissions_by_sector_by_gas.append(residue_burning_nitrous_emission_set)
             self.result.yearly_emissions_by_sector_by_gas.append(residue_burning_methane_emission_set)
+            
+            #TODO: Check with Peter
+            self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.N2O, som_emission_set[0], ActivityTypes.RESIDUE_BURNING ))
+            self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.CH4, som_emission_set[0], ActivityTypes.RESIDUE_BURNING))
 
-        def calculate_biomass_emissions():
+        def calculate_biomass_emissions(self):
             try:
                 if self.calculate_biomass:
                     emissions_biomass_yearly, emissions_biomass_total = biomass_emissions(self.biomass_start, self.biomass_end, self.hectares_start, self.hectares_end, self.rate_type, self.implementation_time, self.capitalization_time)
                     biomass_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in emissions_biomass_yearly], ActivityTypes.BIOMASS, delay=self.delay)
                     self.result.yearly_emissions_by_sector_by_gas.append(biomass_emission_set)
+                    #TODO Peter: Is this the half-year business
+                    self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.CO2, emissions_biomass_yearly[0], ActivityTypes.BIOMASS ))
+                    
                 else:
                     pass
 
