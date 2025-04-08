@@ -454,6 +454,9 @@ class WriteProjectSerializer(serializers.ModelSerializer):
             if not project.is_archived and is_archived:
                 data["archived_at"] = timezone.now()
 
+            if is_archived and project.members.filter(group__name="Admin").count() > 1:
+                raise serializers.ValidationError("Project cannot be archived if there are multiple admins")
+
             errors = security.check_permission("change_public_project_flag", user, project)
             if is_public is not None and errors is not None:
                 raise serializers.ValidationError("User does not have permission to change the public project flag")
