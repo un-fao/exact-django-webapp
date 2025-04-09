@@ -513,6 +513,16 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if tags:
             filters["project__tags__name__in"] = tags.split(",")
 
+        # Get all other filters from the request
+        for key, value in request.query_params.items():
+            if key not in ["name", "summary", "show_archived", "tags"]:
+                if value == "true":
+                    filters[f"project__{key}"] = True
+                elif value == "false":
+                    filters[f"project__{key}"] = False
+                else:
+                    filters[f"project__{key}"] = value
+
         shared_projects = request.user.memberships.filter(**filters).distinct()
         projects_list = [share.project for share in shared_projects if utils.has_project_permission("view_project", self.request.user, share.project)]
         ordered_projects = sorted(projects_list, key=lambda x: x.updated_at, reverse=True)
