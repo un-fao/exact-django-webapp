@@ -445,6 +445,8 @@ class WriteProjectSerializer(serializers.ModelSerializer):
             is_finalized = data.get("is_finalized", None)
             is_public = data.get("is_public", None)
 
+            last_year_of_accounting = data.get("last_year_of_accounting", None)
+
             if project.is_archived and is_archived is not False:
                 raise serializers.ValidationError("Archived projects cannot be modified")
 
@@ -466,6 +468,12 @@ class WriteProjectSerializer(serializers.ModelSerializer):
 
                 if sum(total_activity_cost) > data.get("cost"):
                     raise serializers.ValidationError("Total cost of activities cannot be greater than project cost")
+
+            if last_year_of_accounting is not None:
+                activities: list[Activity] = project.activities.all()
+
+                if any(a.start_year + a.duration_t2 > last_year_of_accounting for a in activities):
+                    raise serializers.ValidationError("Last year of accounting cannot be less than the start year of current activities")
 
             if new_years is not None:
                 project.implementation_years = new_years
