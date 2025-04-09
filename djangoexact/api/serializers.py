@@ -316,7 +316,7 @@ class ProjectSummarySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields = ["id", "name", "country", "updated_at", "role", "tags", "created_at", "is_archived"]
+        fields = ["id", "name", "country", "updated_at", "role", "tags", "created_at", "is_archived", "is_finalized"]
 
     def get_role(self, obj):
         ctx = self.context.get("request", None)
@@ -445,6 +445,8 @@ class WriteProjectSerializer(serializers.ModelSerializer):
             is_finalized = data.get("is_finalized", None)
             is_public = data.get("is_public", None)
 
+            last_year_of_accounting = data.get("last_year_of_accounting", None)
+
             if project.is_archived and is_archived is not False:
                 raise serializers.ValidationError("Archived projects cannot be modified")
 
@@ -453,6 +455,9 @@ class WriteProjectSerializer(serializers.ModelSerializer):
 
             if not project.is_archived and is_archived:
                 data["archived_at"] = timezone.now()
+
+            if is_archived and project.members.filter(group__name="Admin").count() > 1:
+                raise serializers.ValidationError("Project cannot be archived if there are multiple admins")
 
             errors = security.check_permission("change_public_project_flag", user, project)
             if is_public is not None and errors is not None:
@@ -463,6 +468,12 @@ class WriteProjectSerializer(serializers.ModelSerializer):
 
                 if sum(total_activity_cost) > data.get("cost"):
                     raise serializers.ValidationError("Total cost of activities cannot be greater than project cost")
+
+            if last_year_of_accounting is not None:
+                activities: list[Activity] = project.activities.all()
+
+                if any(a.start_year + a.duration_t2 > last_year_of_accounting for a in activities):
+                    raise serializers.ValidationError("Last year of accounting cannot be less than the start year of current activities")
 
             if new_years is not None:
                 project.implementation_years = new_years
@@ -696,6 +707,10 @@ class ActivityBuilderSerializer(serializers.Serializer):
             raise serializers.ValidationError("Only land-based modules are allowed in the Land Use Change")
 
         super().validate(data)
+
+        if self.instance:
+            serializer = WriteActivitySerializer(self.instance, data=data, partial=True)
+            serializer.is_valid(raise_exception=True)
 
         return data
 
@@ -2807,7 +2822,7 @@ class ProjectMembershipWriteSerializer(serializers.ModelSerializer):
         if project.is_archived:
             raise serializers.ValidationError("Cannot add members to an archived project")
 
-        if project.is_finalized:
+        if project.is_finalized and not project.members.filter(user=self.context["request"].user, group__name="Admin").exists():
             raise serializers.ValidationError("Cannot add members to a finalized project")
 
         return data
@@ -3095,7 +3110,7 @@ class ProjectInvitationWriteSerializer(serializers.ModelSerializer):
         if project.is_archived:
             raise serializers.ValidationError("Cannot add members to an archived project")
 
-        if project.is_finalized:
+        if project.is_finalized and not project.members.filter(user=self.context["request"].user, group__name="Admin").exists():
             raise serializers.ValidationError("Cannot add members to a finalized project")
 
         if self.instance:
