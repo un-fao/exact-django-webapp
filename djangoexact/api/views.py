@@ -1255,7 +1255,7 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         },
     )
     def create(self, request, *args, **kwargs):
-        serializer = ProjectMembershipWriteSerializer(data=request.data)
+        serializer = ProjectMembershipWriteSerializer(data=request.data, context={"request": request})
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
@@ -1377,7 +1377,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     def create(self, request, pk=None):
         logging.debug("START ProjectInvitationViewset.create")
 
-        serializer = ProjectInvitationWriteSerializer(data=request.data)
+        serializer = ProjectInvitationWriteSerializer(data=request.data, context={"request": request})
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)

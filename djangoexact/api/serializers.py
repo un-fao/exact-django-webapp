@@ -2822,7 +2822,7 @@ class ProjectMembershipWriteSerializer(serializers.ModelSerializer):
         if project.is_archived:
             raise serializers.ValidationError("Cannot add members to an archived project")
 
-        if project.is_finalized:
+        if project.is_finalized and not project.members.filter(user=self.context["request"].user, group__name="Admin").exists():
             raise serializers.ValidationError("Cannot add members to a finalized project")
 
         return data
@@ -3110,7 +3110,7 @@ class ProjectInvitationWriteSerializer(serializers.ModelSerializer):
         if project.is_archived:
             raise serializers.ValidationError("Cannot add members to an archived project")
 
-        if project.is_finalized:
+        if project.is_finalized and not project.members.filter(user=self.context["request"].user, group__name="Admin").exists():
             raise serializers.ValidationError("Cannot add members to a finalized project")
 
         if self.instance:
