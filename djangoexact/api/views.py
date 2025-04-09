@@ -513,8 +513,26 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if tags:
             filters["project__tags__name__in"] = tags.split(",")
 
+        # Get all other filters from the request (this should be done in a more generic way in the future)
+        for key, value in request.query_params.items():
+            if key not in ["name", "summary", "show_archived", "tags"]:
+                if value == "true":
+                    filters[f"project__{key}"] = True
+                elif value == "false":
+                    filters[f"project__{key}"] = False
+                else:
+                    filters[f"project__{key}"] = value
+
+        # NOTE: Users can have multiple memberships to the same project, so we need to filter by distinct projects
+        # And deduplicate them by assigning them to a dictionary with the project id as the unique key
         shared_projects = request.user.memberships.filter(**filters).distinct()
-        projects_list = [share.project for share in shared_projects if utils.has_project_permission("view_project", self.request.user, share.project)]
+        project_map = {}
+        for share in shared_projects:
+            project = share.project
+            if utils.has_project_permission("view_project", self.request.user, project):
+                project_map[project.pk] = project
+        projects_list = list(project_map.values())
+
         ordered_projects = sorted(projects_list, key=lambda x: x.updated_at, reverse=True)
 
         SerializerClass = ReadProjectSerializer
@@ -1245,7 +1263,7 @@ class ProjectMembershipViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
         },
     )
     def create(self, request, *args, **kwargs):
-        serializer = ProjectMembershipWriteSerializer(data=request.data)
+        serializer = ProjectMembershipWriteSerializer(data=request.data, context={"request": request})
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
@@ -1367,7 +1385,7 @@ class ProjectInvitationViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
     def create(self, request, pk=None):
         logging.debug("START ProjectInvitationViewset.create")
 
-        serializer = ProjectInvitationWriteSerializer(data=request.data)
+        serializer = ProjectInvitationWriteSerializer(data=request.data, context={"request": request})
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
