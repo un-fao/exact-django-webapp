@@ -309,7 +309,7 @@ class ProjectTestCase(APITestCaseMixin):
         self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
         project = models.Project.objects.get(id=create_project_response.data["id"])
 
-        self.grouo = models.Group.objects.get(name="Admin")
+        self.group = models.Group.objects.get(name="Admin")
         membership_response = self.create_project_membership(project, self.user2)
         self.assertEqual(membership_response.status_code, status.HTTP_201_CREATED)
 
@@ -350,3 +350,30 @@ class ProjectTestCase(APITestCaseMixin):
         self.assertEqual(edit_project_response.status_code, status.HTTP_400_BAD_REQUEST)
 
         log.info("END - test_changing_last_year_of_accounting_for_project_with_activity_having_duration_t2_exceeding_last_year_of_accounting")
+
+    def finalize_project_and_try_to_send_invitation_as_admin(self):
+        """
+        Test that sending an invitation as an admin after finalizing a project is not allowed.
+
+        This test performs the following steps:
+        1. Creates a project and verifies the project creation.
+        2. Finalizes the project.
+        3. Attempts to send an invitation as an admin and verifies that the modification attempt succeeds with a 200 OK status code.
+
+        The test ensures that sending an invitation as an admin after finalizing a project is allowed.
+        """
+
+        log.info("START - finalize_project_and_try_to_send_invitation_as_admin")
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        finalize_response = self.edit_project(project, self.user, {"is_finalized": True})
+        self.assertEqual(finalize_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(finalize_response.data["is_finalized"])
+
+        modify_response = self.send_project_invitation(project, self.user2, self.group)
+        self.assertEqual(modify_response.status_code, status.HTTP_200_OK)
+
+        log.info("END - finalize_project_and_try_to_send_invitation_as_admin")
