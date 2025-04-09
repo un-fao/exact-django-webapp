@@ -708,6 +708,10 @@ class ActivityBuilderSerializer(serializers.Serializer):
 
         super().validate(data)
 
+        if self.instance:
+            serializer = WriteActivitySerializer(self.instance, data=data, partial=True)
+            serializer.is_valid(raise_exception=True)
+
         return data
 
     def create_activity(self):
