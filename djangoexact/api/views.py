@@ -515,7 +515,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         # Get all other filters from the request (this should be done in a more generic way in the future)
         for key, value in request.query_params.items():
-            if key not in ["name", "summary", "show_archived", "tags"]:
+            if key not in ["name", "summary", "show_archived", "tags", "page", "page_size"]:
                 if value == "true":
                     filters[f"project__{key}"] = True
                 elif value == "false":
