@@ -4744,6 +4744,15 @@ def add_change_public_project_flag_permission_to_admin_group():
     print(f"Added permission {permission} to group {admin_group}")
 
 
+def add_density_zero_where_density_is_none_in_irrigation_phase_data():
+    """
+    Add density=0.0 to IrrigationPhaseData objects where density is None
+    """
+    print("Adding density=0.0 to IrrigationPhaseData objects where density is None")
+    irrigation_phase_data = IrrigationPhaseData.objects.filter(density=None).update(density=0.0)
+    print(f"Updated {irrigation_phase_data} IrrigationPhaseData objects")
+
+
 def run():
     import os
 
@@ -4777,10 +4786,11 @@ def run():
         # delete_and_import_irrigation_phase_data()
         # import_shadow_prices_of_carbon()
         # add_0_2_to_co2_value_in_input_emission_factor()
-        create_parent_fuel_types()
-        assign_parent_fuel_types_to_fuel_types()
-        create_energy_entry_module_type()
-        add_change_public_project_flag_permission_to_admin_group()
+        # create_parent_fuel_types()
+        # assign_parent_fuel_types_to_fuel_types()
+        # create_energy_entry_module_type()
+        # add_change_public_project_flag_permission_to_admin_group()
+        add_density_zero_where_density_is_none_in_irrigation_phase_data()
         pass
 
     if app_mode == "development":

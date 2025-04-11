@@ -61,6 +61,7 @@ definitions:
           - sed -i "s|\$FIREBASE_SERVICE_ACCOUNT|$FIREBASE_SERVICE_ACCOUNT|g" djangoexact/settings.py
           - echo "$(cat djangoexact/settings.py)"
 
+          - pip install --upgrade pip setuptools wheel
           - pip install -r requirements.txt
           # - yes | python manage.py makemigrations --merge
           - python manage.py migrate
