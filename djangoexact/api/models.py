@@ -2477,7 +2477,7 @@ class IrrigationSystem(Submodule):
         return f"({self.id}) {self.irrigation_system_type}"
 
 
-class IrrigationPhase(Submodule):
+class IrrigationPhase(Submodule, ElectricityTier2Mixin, FuelTier2Mixin):
     parent = models.ForeignKey(Irrigation, on_delete=models.CASCADE, null=True, blank=True, related_name="irrigation_phases")
     irrigation_system_type = models.ForeignKey(IrrigationSystemType, on_delete=models.CASCADE, null=True, blank=True, related_name="irrigation_phases", verbose_name=_("irrigation_system_type"))
 
@@ -2497,8 +2497,6 @@ class IrrigationPhase(Submodule):
     gross_irrigation_water_w = models.FloatField(null=True, blank=True, verbose_name=_("gross_irrigation_water_w"))
     gross_irrigation_water_wo = models.FloatField(null=True, blank=True, verbose_name=_("gross_irrigation_water_wo"))
     gross_irrigation_water_thread = models.ForeignKey(CommentThread, on_delete=models.CASCADE, null=True, blank=True, related_name="%(class)s_gross_irrigation_water_thread")
-
-    power_origin_country_t2 = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("power_origin_country_t2"))
 
     ef_co2_t2_start = models.FloatField(null=True, blank=True, verbose_name=_("ef_co2_t2_start"))
     ef_co2_t2_w = models.FloatField(null=True, blank=True, verbose_name=_("ef_co2_t2_w"))

@@ -1,7 +1,7 @@
 from rest_framework.test import APIRequestFactory, APITestCase
 from rest_framework import status
 from django.urls import reverse
-from api.views import ProjectViewSet, ActivityViewSet, generic_module_viewset, ProjectMembershipViewSet
+from api.views import ProjectViewSet, ActivityViewSet, generic_module_viewset, ProjectMembershipViewSet, ProjectInvitationViewSet
 import api.models as models
 import ipcc.models as ipcc_models
 import api.tests.factories as factories
@@ -80,17 +80,39 @@ class APITestCaseMixin(APITestCase):
         force_authenticate(request, user=self.user)
         return view(request)
 
-    def create_project_membership(self, project, user):
+    def send_project_invitation(self, project, user, group):
+        """
+        Send a project invitation using the ProjectViewSet.
+
+        This method sends a project invitation by sending a POST request to the 'project-invite' endpoint
+        with the provided project data in JSON format. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.info("Sending project invitation")
+        view = ProjectInvitationViewSet.as_view({"post": "create"})
+        request = self.request_factory.post(
+            reverse("projectinvitation-list"),
+            {"email": user.email, "project": project.id, "group": group.id},
+            format="json",
+        )
+        force_authenticate(request, user=self.user)
+        return view(request)
+
+    def create_project_membership(self, project, user, group=None):
         """
         Create a project membership for a user.
 
         This method creates a project membership for the provided user and project.
         """
         log.info("Creating project membership")
+
+        if group is None:
+            group = self.group
+
         view = ProjectMembershipViewSet.as_view({"post": "create"})
         request = self.request_factory.post(
             reverse("projectmembership-list"),
-            {"user": user.id, "project": project.id, "group": self.group.id},
+            {"user": user.id, "project": project.id, "group": group.id},
             format="json",
         )
         force_authenticate(request, user=self.user)

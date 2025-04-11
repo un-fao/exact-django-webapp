@@ -316,7 +316,7 @@ class ProjectSummarySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields = ["id", "name", "country", "updated_at", "role", "tags", "created_at", "is_archived"]
+        fields = ["id", "name", "country", "updated_at", "role", "tags", "created_at", "is_archived", "is_finalized"]
 
     def get_role(self, obj):
         ctx = self.context.get("request", None)
@@ -445,6 +445,8 @@ class WriteProjectSerializer(serializers.ModelSerializer):
             is_finalized = data.get("is_finalized", None)
             is_public = data.get("is_public", None)
 
+            last_year_of_accounting = data.get("last_year_of_accounting", None)
+
             if project.is_archived and is_archived is not False:
                 raise serializers.ValidationError("Archived projects cannot be modified")
 
@@ -453,6 +455,9 @@ class WriteProjectSerializer(serializers.ModelSerializer):
 
             if not project.is_archived and is_archived:
                 data["archived_at"] = timezone.now()
+
+            if is_archived and project.members.filter(group__name="Admin").count() > 1:
+                raise serializers.ValidationError("Project cannot be archived if there are multiple admins")
 
             errors = security.check_permission("change_public_project_flag", user, project)
             if is_public is not None and errors is not None:
@@ -463,6 +468,12 @@ class WriteProjectSerializer(serializers.ModelSerializer):
 
                 if sum(total_activity_cost) > data.get("cost"):
                     raise serializers.ValidationError("Total cost of activities cannot be greater than project cost")
+
+            if last_year_of_accounting is not None:
+                activities: list[Activity] = project.activities.all()
+
+                if any(a.start_year + a.duration_t2 > last_year_of_accounting for a in activities):
+                    raise serializers.ValidationError("Last year of accounting cannot be less than the start year of current activities")
 
             if new_years is not None:
                 project.implementation_years = new_years
@@ -2789,30 +2800,14 @@ class InputTypeSerializer(serializers.ModelSerializer):
         ref_name = "InputType"
 
 
-class ProjectMembershipSerializer(serializers.ModelSerializer):
-    project = ProjectNameIdSerializer(many=False, read_only=True)
-    user = UserReadSerializer(many=False, read_only=True)
-    group = GroupSerializer(many=False, read_only=True)
-
-    project = serializers.PrimaryKeyRelatedField(
-        queryset=Project.objects.all(),
-        many=False,
-        write_only=True,
-    )
-    user = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
-        many=False,
-        write_only=True,
-    )
-    group = serializers.PrimaryKeyRelatedField(
-        queryset=Group.objects.all(),
-        many=False,
-        write_only=True,
-    )
+class ProjectMembershipWriteSerializer(serializers.ModelSerializer):
+    project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all(), many=False, write_only=True)
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=False, write_only=True)
+    group = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all(), many=False, write_only=True)
 
     class Meta:
         model = ProjectMembership
-        fields = "__all__"
+        fields = ["project", "user", "group"]
         ref_name = "ProjectMembership"
 
     def validate(self, data):
@@ -2823,10 +2818,16 @@ class ProjectMembershipSerializer(serializers.ModelSerializer):
         if project.is_archived:
             raise serializers.ValidationError("Cannot add members to an archived project")
 
-        if project.is_finalized:
+        if project.is_finalized and not project.members.filter(user=self.context["request"].user, group__name="Admin").exists():
             raise serializers.ValidationError("Cannot add members to a finalized project")
 
         return data
+
+
+class ProjectMembershipReadSerializer(serializers.Serializer):
+    project = ProjectNameIdSerializer(many=False, read_only=True)
+    user = UserReadSerializer(many=False, read_only=True)
+    group = GroupSerializer(many=False, read_only=True)
 
 
 class SetAsideWriteSerializer(LandModuleSeralizer):
@@ -3105,7 +3106,7 @@ class ProjectInvitationWriteSerializer(serializers.ModelSerializer):
         if project.is_archived:
             raise serializers.ValidationError("Cannot add members to an archived project")
 
-        if project.is_finalized:
+        if project.is_finalized and not project.members.filter(user=self.context["request"].user, group__name="Admin").exists():
             raise serializers.ValidationError("Cannot add members to a finalized project")
 
         if self.instance:
@@ -3174,7 +3175,10 @@ class NoteSerializer(serializers.ModelSerializer):
         return obj.content_object.id
 
     def validate(self, data):
-        project: Project = self.project
+        if not self.instance:
+            raise serializers.ValidationError("Instance not found")
+
+        project: Project = self.instance.project
         if not project:
             raise serializers.ValidationError("Project not found")
 
