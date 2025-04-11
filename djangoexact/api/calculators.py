@@ -543,7 +543,7 @@ class BaseCalculator(ABC):
         self.climate: Climate = self.activity.climate_t2 or self.project.climate
         self.moisture: Moisture = self.activity.moisture_t2 or self.project.moisture
         self.soil_type: SoilType = self.activity.soil_type_t2 or self.project.soil_type
-        self.country: Country = self.project.country
+        self.country: Country = getattr(self.module, "country_t2", self.project.country)
         self.region: Region = self.project.country.region
         self.change_rate: ChangeRate = self.activity.change_rate
 
