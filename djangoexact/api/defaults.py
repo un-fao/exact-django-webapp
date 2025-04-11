@@ -736,15 +736,15 @@ class IrrigationPhaseDefaults(Defaults):
         defaults.get_defaults(calculate=calculate)
 
         return SimpleNamespace(
-            ef_co2_t2_start_default=defaults.ef_default.co2_emissions,
-            ef_co2_t2_w_default=defaults.ef_default.co2_emissions,
-            ef_co2_t2_wo_default=defaults.ef_default.co2_emissions,
-            ef_n2o_t2_start_default=defaults.ef_default.n2o_emissions,
-            ef_n2o_t2_w_default=defaults.ef_default.n2o_emissions,
-            ef_n2o_t2_wo_default=defaults.ef_default.n2o_emissions,
-            ef_ch4_t2_start_default=defaults.ef_default.ch4_emissions,
-            ef_ch4_t2_w_default=defaults.ef_default.ch4_emissions,
-            ef_ch4_t2_wo_default=defaults.ef_default.ch4_emissions,
+            ef_co2_t2_start_default=defaults.ef_default_start.co2,
+            ef_co2_t2_w_default=defaults.ef_default_w.co2,
+            ef_co2_t2_wo_default=defaults.ef_default_wo.co2,
+            ef_n2o_t2_start_default=defaults.ef_default_start.n2o,
+            ef_n2o_t2_w_default=defaults.ef_default_w.n2o,
+            ef_n2o_t2_wo_default=defaults.ef_default_wo.n2o,
+            ef_ch4_t2_start_default=defaults.ef_default_start.ch4,
+            ef_ch4_t2_w_default=defaults.ef_default_wo.ch4,
+            ef_ch4_t2_wo_default=defaults.ef_default_wo.ch4,
         )
 
 

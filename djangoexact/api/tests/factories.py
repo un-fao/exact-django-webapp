@@ -567,7 +567,7 @@ class IrrigationSystemFactory(DjangoModelFactory):
     ef_t2_wo = factory.fuzzy.FuzzyFloat(0, 5)
 
 
-fuel_types = [fuel for fuel in FuelType.objects.filter(fuel_use_type__name__icontains="Stationary").all()]
+fuel_types = [fuel for fuel in FuelType.objects.filter(fuel_use_type__name__icontains="Stationary").exclude(name__in=["Wood", "Peat", "Charcoal"]).all()]
 
 
 class IrrigationPhaseFactory(DjangoModelFactory):
@@ -609,7 +609,7 @@ class IrrigationPhaseFactory(DjangoModelFactory):
     average_pressure_t2 = factory.fuzzy.FuzzyFloat(0, 5)
 
     total_dynamic_head_t2 = factory.fuzzy.FuzzyFloat(0, 5)
-    
+
     pumping_efficiency_t2_start = factory.fuzzy.FuzzyFloat(0, 5)
     pumping_efficiency_t2_w = factory.fuzzy.FuzzyFloat(0, 5)
     pumping_efficiency_t2_wo = factory.fuzzy.FuzzyFloat(0, 5)
@@ -650,6 +650,7 @@ class BuildingFactory(DjangoModelFactory):
 
     building_type = factory.fuzzy.FuzzyChoice(building_types)
 
+
 class OtherInfrastructureFactory(DjangoModelFactory):
     class Meta:
         model = OtherInfrastructure
@@ -689,15 +690,15 @@ class RoadFactory(DjangoModelFactory):
     width_m_w = factory.fuzzy.FuzzyFloat(0, 100)
     width_m_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
+
 class PackagingFactory(DjangoModelFactory):
-    
     class Meta:
         model = Packaging
 
     status = READY
 
-class PackagingEntryFactory(DjangoModelFactory):
 
+class PackagingEntryFactory(DjangoModelFactory):
     class Meta:
         model = PackagingEntry
 
@@ -717,15 +718,15 @@ class PackagingEntryFactory(DjangoModelFactory):
     quantity_consumed_per_year_w = factory.fuzzy.FuzzyFloat(0, 100)
     quantity_consumed_per_year_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
+
 class StorageFactory(DjangoModelFactory):
-    
     class Meta:
         model = Storage
 
     status = READY
 
-class StorageEntryFactory(DjangoModelFactory):
 
+class StorageEntryFactory(DjangoModelFactory):
     class Meta:
         model = StorageEntry
 
@@ -752,12 +753,13 @@ class StorageEntryFactory(DjangoModelFactory):
 
 fuel_types_stationary = [fuel for fuel in FuelType.objects.filter(fuel_use_type__name__icontains="stationary").all()]
 
-class ProcessingFactory(DjangoModelFactory):
 
+class ProcessingFactory(DjangoModelFactory):
     class Meta:
         model = Processing
 
     status = READY
+
 
 class ProcessingEntryFactory(DjangoModelFactory):
     class Meta:
@@ -779,15 +781,15 @@ class ProcessingEntryFactory(DjangoModelFactory):
     water_use_per_year_w = factory.fuzzy.FuzzyFloat(0, 100)
     water_use_per_year_wo = factory.fuzzy.FuzzyFloat(0, 100)
 
+
 class TransportFactory(DjangoModelFactory):
-    
     class Meta:
         model = Transport
 
     status = READY
 
-class TransportEntryFactory(DjangoModelFactory):
 
+class TransportEntryFactory(DjangoModelFactory):
     class Meta:
         model = TransportEntry
 
