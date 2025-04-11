@@ -543,7 +543,7 @@ class BaseCalculator(ABC):
         self.climate: Climate = self.activity.climate_t2 or self.project.climate
         self.moisture: Moisture = self.activity.moisture_t2 or self.project.moisture
         self.soil_type: SoilType = self.activity.soil_type_t2 or self.project.soil_type
-        self.country: Country = self.project.country
+        self.country: Country = getattr(self.module, "country_t2", self.project.country)
         self.region: Region = self.project.country.region
         self.change_rate: ChangeRate = self.activity.change_rate
 
@@ -5435,55 +5435,49 @@ class IrrigationPhaseCalculator(BaseCalculator):
 
         self.module: IrrigationPhase
 
-        self.ef_default_start: ipcc.IrrigationPhaseData = ipcc.IrrigationPhaseData()
-        self.ef_default_w: ipcc.IrrigationPhaseData = ipcc.IrrigationPhaseData()
-        self.ef_default_wo: ipcc.IrrigationPhaseData = ipcc.IrrigationPhaseData()
+        self.DEFAULT_TRANSMISSION_LOSS = ApplicationParameter.objects.get(name="transmission_loss").value
+        self.irrigation_data_start: ipcc.IrrigationPhaseData = ipcc.IrrigationPhaseData()
+        self.irrigation_data_w: ipcc.IrrigationPhaseData = ipcc.IrrigationPhaseData()
+        self.irrigation_data_wo: ipcc.IrrigationPhaseData = ipcc.IrrigationPhaseData()
         self.energy_ef_default = ipcc.EnergyDefaultEmissionFactor()
         self.pressure_default = ipcc.IrrigationPressureRequirement()
         self.erh_electricity_default = ApplicationParameter()
         self.transportation_loss_default = ApplicationParameter()
         self.pumping_efficiency_default = ApplicationParameter()
 
+        self.energy_calculator_start: EnergyEntryCalculator = EnergyEntryCalculator(self.module)
+        self.energy_calculator_w: EnergyEntryCalculator = EnergyEntryCalculator(self.module)
+        self.energy_calculator_wo: EnergyEntryCalculator = EnergyEntryCalculator(self.module)
+
+        self.ef_default_start: ipcc.EnergyDefaultEmissionFactor = ipcc.EnergyDefaultEmissionFactor()
+        self.ef_default_w: ipcc.EnergyDefaultEmissionFactor = ipcc.EnergyDefaultEmissionFactor()
+        self.ef_default_wo: ipcc.EnergyDefaultEmissionFactor = ipcc.EnergyDefaultEmissionFactor()
+
     def get_defaults(self, calculate=False) -> dict:
         super().get_defaults(calculate)
 
-        def get_ef_default(ft: FuelType, st: utils.ScenarioTypes):
-            def check_missing_emission(attribute, gas_name):
-                if getattr(ef, attribute, None) is None:
-                    gas = attribute.split("_")[0]
-                    scenario_value = getattr(self.module, f"ef_{gas}_t2_{st.value}", None)
-                    if scenario_value is None:
-                        raise ValueError(f"{gas_name} Emission Factor for {ft} is missing. Please provide a tier 2 value for the following scenario: {st.name.lower()}")
+        self.energy_calculator_start.get_defaults()
+        self.energy_calculator_w.get_defaults()
+        self.energy_calculator_wo.get_defaults()
 
-            ef = ipcc.IrrigationPhaseData.objects.filter(fuel_type=ft).first()
+        self.ef_default_start.co2 = self.energy_calculator_start.energy_ef_default_start.co2 if self.module.fuel_type_start.name_en != "Electricity" else self.energy_calculator_start.electricity_ef_selected.value
+        self.ef_default_start.ch4 = self.energy_calculator_start.energy_ef_default_start.ch4 if self.module.fuel_type_start.name_en != "Electricity" else self.energy_calculator_start.electricity_ef_selected.value
+        self.ef_default_start.n2o = self.energy_calculator_start.energy_ef_default_start.n2o if self.module.fuel_type_start.name_en != "Electricity" else self.energy_calculator_start.electricity_ef_selected.value
 
-            if ef:
-                check_missing_emission("co2_emissions", "CO2")
-                check_missing_emission("ch4_emissions", "CH4")
-                check_missing_emission("n2o_emissions", "N2O")
-            else:
-                # Validate and set default emissions
-                for gas in ["co2", "ch4", "n2o"]:
-                    scenario_value = getattr(self.module, f"ef_{gas}_t2_{st.value}", None)
-                    if scenario_value is None:
-                        raise ValueError(f"{gas.upper()} Emission Factor for {ft} is missing. Please provide a tier 2 value for the following scenario: {st.name.lower()}")
+        self.ef_default_w.co2 = self.energy_calculator_w.energy_ef_default_w.co2 if self.module.fuel_type_w.name_en != "Electricity" else self.energy_calculator_w.electricity_ef_selected.value
+        self.ef_default_w.ch4 = self.energy_calculator_w.energy_ef_default_w.ch4 if self.module.fuel_type_w.name_en != "Electricity" else self.energy_calculator_w.electricity_ef_selected.value
+        self.ef_default_w.n2o = self.energy_calculator_w.energy_ef_default_w.n2o if self.module.fuel_type_w.name_en != "Electricity" else self.energy_calculator_w.electricity_ef_selected.value
 
-                ef = ipcc.IrrigationPhaseData(
-                    co2_emissions=getattr(self.module, f"ef_co2_t2_{st.value}"),
-                    ch4_emissions=getattr(self.module, f"ef_ch4_t2_{st.value}"),
-                    n2o_emissions=getattr(self.module, f"ef_n2o_t2_{st.value}"),
-                    calorific_value=getattr(self.module, f"calorific_value_t2_{st.value}", 0),
-                    density=getattr(self.module, f"density_t2_{st.value}", 0),
-                )
-
-            return ef
+        self.ef_default_wo.co2 = self.energy_calculator_wo.energy_ef_default_wo.co2 if self.module.fuel_type_wo.name_en != "Electricity" else self.energy_calculator_wo.electricity_ef_selected.value
+        self.ef_default_wo.ch4 = self.energy_calculator_wo.energy_ef_default_wo.ch4 if self.module.fuel_type_wo.name_en != "Electricity" else self.energy_calculator_wo.electricity_ef_selected.value
+        self.ef_default_wo.n2o = self.energy_calculator_wo.energy_ef_default_wo.n2o if self.module.fuel_type_wo.name_en != "Electricity" else self.energy_calculator_wo.electricity_ef_selected.value
 
         if self.module.is_start():
-            self.ef_default_start = get_ef_default(self.module.fuel_type_start, utils.ScenarioTypes.START)
+            self.irrigation_data_start = ipcc.IrrigationPhaseData.objects.get(fuel_type=self.module.fuel_type_start)
         if self.module.is_with():
-            self.ef_default_w = get_ef_default(self.module.fuel_type_w, utils.ScenarioTypes.WITH)
+            self.irrigation_data_w = ipcc.IrrigationPhaseData.objects.get(fuel_type=self.module.fuel_type_w)
         if self.module.is_without():
-            self.ef_default_wo = get_ef_default(self.module.fuel_type_wo, utils.ScenarioTypes.WITHOUT)
+            self.irrigation_data_wo = ipcc.IrrigationPhaseData.objects.get(fuel_type=self.module.fuel_type_wo)
 
         try:
             self.pressure_default = ipcc.IrrigationPressureRequirement.objects.get(irrigation_system_type=self.module.irrigation_system_type)
@@ -5506,27 +5500,27 @@ class IrrigationPhaseCalculator(BaseCalculator):
 
         if self.module.is_start():
             self.inputs_start = {
-                "ef_co2_default": self.ef_default_start.co2_emissions,
+                "ef_co2_default": self.ef_default_start.co2,
                 "ef_co2_tier_2": self.module.ef_co2_t2_start,
-                "ef_ch4_default": self.ef_default_start.ch4_emissions,
+                "ef_ch4_default": self.ef_default_start.ch4,
                 "ef_ch4_tier_2": self.module.ef_ch4_t2_start,
-                "ef_n2o_default": self.ef_default_start.n2o_emissions,
+                "ef_n2o_default": self.ef_default_start.n2o,
                 "ef_n2o_tier_2": self.module.ef_n2o_t2_start,
                 "total_dynamic_head_tier_2": self.module.total_dynamic_head_t2,
                 "average_pressure_default": self.pressure_default.avg_pressure,
                 "average_pressure_tier_2": self.module.average_pressure_t2,
                 "pumping_efficiency_default": self.pumping_efficiency_default.value,
                 "pumping_efficiency_tier_2": self.module.pumping_efficiency_t2_start,
-                "erh_electricity": self.erh_electricity_default.value,
-                "fuel_net_calorific_values": self.ef_default_start.calorific_value,
-                "fuel_density": self.ef_default_start.density,
+                "erh_electricity": self.erh_electricity_default.value if self.module.fuel_type_start.name_en == "Electricity" else None,
+                "fuel_net_calorific_values": self.irrigation_data_start.calorific_value,
+                "fuel_density": self.irrigation_data_start.density,
                 "depth": self.module.well_depth,
                 "units_start": self.module.ha_start,
                 "units_end": 0,
                 "rate_type": self.change_rate.name,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "transportation_loss": self.transportation_loss_default.value if self.module.fuel_type_start.name_en == "Electricity" else 0,
+                "transportation_loss": self.DEFAULT_TRANSMISSION_LOSS if self.module.fuel_type_start.name_en == "Electricity" else 0,
                 "gwir": self.module.gross_irrigation_water_start,
                 "delay": self.activity.delay,
             }
@@ -5536,27 +5530,27 @@ class IrrigationPhaseCalculator(BaseCalculator):
 
         if self.module.is_with():
             self.inputs_w = {
-                "ef_co2_default": self.ef_default_w.co2_emissions,
+                "ef_co2_default": self.ef_default_w.co2,
                 "ef_co2_tier_2": self.module.ef_co2_t2_w,
-                "ef_ch4_default": self.ef_default_w.ch4_emissions,
+                "ef_ch4_default": self.ef_default_w.ch4,
                 "ef_ch4_tier_2": self.module.ef_ch4_t2_w,
-                "ef_n2o_default": self.ef_default_w.n2o_emissions,
+                "ef_n2o_default": self.ef_default_w.n2o,
                 "ef_n2o_tier_2": self.module.ef_n2o_t2_w,
                 "total_dynamic_head_tier_2": self.module.total_dynamic_head_t2,
                 "average_pressure_default": self.pressure_default.avg_pressure,
                 "average_pressure_tier_2": self.module.average_pressure_t2,
                 "pumping_efficiency_default": self.pumping_efficiency_default.value,
                 "pumping_efficiency_tier_2": self.module.pumping_efficiency_t2_w,
-                "erh_electricity": self.erh_electricity_default.value,
-                "fuel_net_calorific_values": self.ef_default_w.calorific_value,
-                "fuel_density": self.ef_default_w.density,
+                "erh_electricity": self.erh_electricity_default.value if self.module.fuel_type_w.name_en == "Electricity" else None,
+                "fuel_net_calorific_values": self.irrigation_data_w.calorific_value,
+                "fuel_density": self.irrigation_data_w.density,
                 "depth": self.module.well_depth,
                 "units_start": 0,
                 "units_end": self.module.ha_w,
                 "rate_type": self.change_rate.name,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "transportation_loss": self.transportation_loss_default.value if self.module.fuel_type_w.name_en == "Electricity" else 0,
+                "transportation_loss": self.DEFAULT_TRANSMISSION_LOSS if self.module.fuel_type_w.name_en == "Electricity" else 0,
                 "gwir": self.module.gross_irrigation_water_w,
                 "delay": self.activity.delay,
             }
@@ -5566,27 +5560,27 @@ class IrrigationPhaseCalculator(BaseCalculator):
 
         if self.module.is_without():
             self.inputs_wo = {
-                "ef_co2_default": self.ef_default_wo.co2_emissions,
+                "ef_co2_default": self.ef_default_wo.co2,
                 "ef_co2_tier_2": self.module.ef_co2_t2_wo,
-                "ef_ch4_default": self.ef_default_wo.ch4_emissions,
+                "ef_ch4_default": self.ef_default_wo.ch4,
                 "ef_ch4_tier_2": self.module.ef_ch4_t2_wo,
-                "ef_n2o_default": self.ef_default_wo.n2o_emissions,
+                "ef_n2o_default": self.ef_default_wo.n2o,
                 "ef_n2o_tier_2": self.module.ef_n2o_t2_wo,
                 "total_dynamic_head_tier_2": self.module.total_dynamic_head_t2,
                 "average_pressure_default": self.pressure_default.avg_pressure,
                 "average_pressure_tier_2": self.module.average_pressure_t2,
                 "pumping_efficiency_default": self.pumping_efficiency_default.value,
                 "pumping_efficiency_tier_2": self.module.pumping_efficiency_t2_wo,
-                "erh_electricity": self.erh_electricity_default.value,
-                "fuel_net_calorific_values": self.ef_default_wo.calorific_value,
-                "fuel_density": self.ef_default_wo.density,
+                "erh_electricity": self.erh_electricity_default.value if self.module.fuel_type_wo.name_en == "Electricity" else None,
+                "fuel_net_calorific_values": self.irrigation_data_wo.calorific_value,
+                "fuel_density": self.irrigation_data_wo.density,
                 "depth": self.module.well_depth,
                 "units_start": 0,
                 "units_end": self.module.ha_wo,
                 "rate_type": self.change_rate.name,
                 "implementation_time": self.activity.implementation_years,
                 "capitalization_time": self.activity.capitalization_years,
-                "transportation_loss": self.transportation_loss_default.value if self.module.fuel_type_wo.name_en == "Electricity" else 0,
+                "transportation_loss": self.DEFAULT_TRANSMISSION_LOSS if self.module.fuel_type_wo.name_en == "Electricity" else 0,
                 "gwir": self.module.gross_irrigation_water_wo,
                 "delay": self.activity.delay,
             }
