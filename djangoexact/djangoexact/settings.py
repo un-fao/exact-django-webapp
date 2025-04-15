@@ -79,6 +79,7 @@ INSTALLED_APPS = [
     "api",
     "blog",
     "ckeditor",
+    "minitool",
 ]
 
 if DEBUG:
@@ -140,7 +141,11 @@ if os.getenv("GAE_APPLICATION", None):
                 "connect_timeout": 30,  # Optional: set timeout
             },
             "CONN_MAX_AGE": 30,
-        }
+        },
+        "minitool": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.path.join(BASE_DIR, "minitool.db"),
+        },
     }
 else:
     DATABASES = {
@@ -155,8 +160,14 @@ else:
                 "connect_timeout": 30,  # Optional: set timeout
             },
             "CONN_MAX_AGE": 30,
-        }
+        },
+        "minitool": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.path.join(BASE_DIR, "minitool.db"),
+        },
     }
+
+DATABASE_ROUTERS = ["minitool.db_router.AppSpecificDatabaseRouter", "ipcc.db_router.AppSpecificDatabaseRouter", "api.db_router.AppSpecificDatabaseRouter"]
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
