@@ -13,7 +13,7 @@ from rest_framework.pagination import PageNumberPagination
 class DefaultPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = "page_size"
-    max_page_size = 1000000000
+    max_page_size = 10000
 
 
 class EntryViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
