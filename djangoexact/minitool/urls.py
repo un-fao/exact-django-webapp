@@ -6,6 +6,7 @@ import minitool.views as views
 router = DefaultRouter()
 
 router.register("entries", views.EntryViewSet, basename="entries")
+router.register("statistics", views.StatisticsModuleTotalViewSet, basename="statistics")
 
 urlpatterns = []
 urlpatterns += router.urls

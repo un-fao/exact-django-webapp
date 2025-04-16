@@ -21,6 +21,9 @@ def compute_practice_differences(aggregation_level=None):
     for entry in aggregated_data:
         # Filter entries matching the current group
         group_entries = Entry.objects.filter(changes__0__field=aggregation_level, changes__0__from=entry["changes__0__from"], changes__0__to=entry["changes__0__to"]).values_list("total", flat=True)
+        module_type = Entry.objects.filter(changes__0__field=aggregation_level, changes__0__from=entry["changes__0__from"], changes__0__to=entry["changes__0__to"]).values_list("module_type", flat=True)
+        if module_type:
+            entry["module_type"] = module_type[0]
 
         carbon_balances = sorted(group_entries)
         if carbon_balances:
@@ -40,9 +43,14 @@ def compute_practice_differences(aggregation_level=None):
     # Build dataframe with aggregated data (including field, from and to)
     df = pd.DataFrame(aggregated_data)
     # Add columns at the beginning of the DataFrame
-    df.insert(0, "field", aggregation_level)
-    df.insert(1, "from", df["changes__0__from"])
-    df.insert(2, "to", df["changes__0__to"])
+
+    mt = df["module_type"] if "module_type" in df else ""
+    if type(mt) is not str:
+        df.drop(columns=["module_type"], inplace=True)
+    df.insert(0, "module_type", mt)
+    df.insert(1, "field", aggregation_level)
+    df.insert(2, "from", df["changes__0__from"])
+    df.insert(3, "to", df["changes__0__to"])
     df.drop(columns=["changes__0__from", "changes__0__to", "total"], inplace=True)
 
     return df

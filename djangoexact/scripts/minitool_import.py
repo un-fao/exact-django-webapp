@@ -1,4 +1,4 @@
-from minitool.models import Entry
+from minitool.models import Entry, StatisticsModuleTotal
 import json
 import os
 import django
@@ -34,6 +34,44 @@ def import_changes_into_entries():
     print(f"Imported {len(entries)} entries into the database.")
 
 
+def import_aggregated_practices_csv():
+    # Open aggregated_practices.csv file in this directory
+    with open(os.path.join(os.path.dirname(__file__), "minitool", "aggregated_practices.csv"), "r") as f:
+        changes = f.read()
+
+    # Parse the CSV data
+    changes = changes.splitlines()
+    entries = []
+
+    print(f"Found {len(changes)} changes in the CSV file.")
+
+    for change in changes[1:]:
+        change = change.split(",")
+        try:
+            entry = StatisticsModuleTotal(
+                module_type=change[0],
+                field=change[1],
+                from_value=str(change[2]),
+                to_value=str(change[3]),
+                mean=float(change[4]) if change[4] else 0,
+                median=float(change[5]) if change[5] else 0,
+                min=float(change[6]) if change[6] else 0,
+                max=float(change[7]) if change[7] else 0,
+                q1=float(change[8]) if change[8] else 0,
+                q3=float(change[9]) if change[9] else 0,
+            )
+        except ValueError as e:
+            print(f"Error parsing entry: {change}. Error: {e}")
+            continue
+
+        entries.append(entry)
+
+    # Save the entries to the database
+    StatisticsModuleTotal.objects.db_manager("minitool").bulk_create(entries)
+    print(f"Imported {len(entries)} entries into the database.")
+
+
 def run():
-    import_changes_into_entries()
+    # import_changes_into_entries()
+    import_aggregated_practices_csv()
     print("Changes imported successfully.")

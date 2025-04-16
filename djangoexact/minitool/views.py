@@ -42,3 +42,37 @@ class EntryViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
             return paginator.get_paginated_response(serializer.data)
         serializer = serializers.EntrySerializer(queryset, many=True)
         return Response(serializer.data)
+
+
+class StatisticsModuleTotalViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    class GenericFilterSet(django_filters.FilterSet):
+        class Meta:
+            model = models.StatisticsModuleTotal
+            fields = "__all__"
+            filter_overrides = {
+                JSONField: {
+                    "filter_class": django_filters.CharFilter,
+                },
+            }
+
+    queryset = models.StatisticsModuleTotal.objects.all()
+    serializer_class = serializers.StatisticsModuleTotalSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = GenericFilterSet
+
+    @decorators.action(detail=False, methods=["get"])
+    def aggregate(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        queryset = self.filter_queryset(queryset)
+
+        by = request.query_params.get("by", None)
+
+        queryset = queryset.filter(field=by)
+
+        paginator = DefaultPagination()
+        page = paginator.paginate_queryset(queryset, request)
+        if page is not None:
+            serializer = serializers.StatisticsModuleTotalSerializer(page, many=True)
+            return paginator.get_paginated_response(serializer.data)
+        serializer = serializers.StatisticsModuleTotalSerializer(queryset, many=True)
+        return Response(serializer.data)
