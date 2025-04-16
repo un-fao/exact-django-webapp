@@ -1,20 +1,73 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
+from django.http import HttpResponse
+import csv
 
 from .models import *
 
-for model in [model for model in dir() if not model.startswith("_") and not model.startswith("ForestManagementAGB") and not model.startswith("PerennialAGB") and not model.startswith("PerennialBGB") and not model.startswith("AfforestationFLU") and not model.startswith("LivestockTAM") and not model.startswith("LivestockVSER") and not model.startswith("LivestockManureEF") and not model.startswith("FLUData") and not model.startswith("LivestockAWMS") and not model.startswith("ForestManagementBGB") and not model.startswith("ForestTotalBiomass")]:
+from django.db.models import ForeignKey, OneToOneField, ManyToManyField
+
+
+class GenericExportModelAdmin(ModelAdmin):
+    actions = ["export_as_csv"]
+
+    def __init__(self, model, admin_site):
+        self.list_display = [field.name for field in model._meta.fields]
+        search_fields = []
+        for field in model._meta.fields:
+            if not isinstance(field, (ForeignKey, OneToOneField, ManyToManyField)):
+                search_fields.append(field.name)
+            elif isinstance(field, (ForeignKey, OneToOneField)):
+                # Check if related model has a 'name' attribute
+                rel_model = field.remote_field.model
+                if any(f.name == "name" for f in rel_model._meta.fields):
+                    search_fields.append(f"{field.name}__name")
+        self.search_fields = search_fields
+        super().__init__(model, admin_site)
+
+    def export_as_csv(self, request, queryset):
+        meta = self.model._meta
+        field_names = [field.name for field in meta.fields]
+
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = f"attachment; filename={meta}.csv"
+        writer = csv.writer(response)
+
+        writer.writerow(field_names)
+        for obj in queryset:
+            writer.writerow([getattr(obj, field) for field in field_names])
+        return response
+
+    export_as_csv.short_description = "Export Selected as CSV"
+
+
+for model in [
+    model
+    for model in dir()
+    if not model.startswith("_")
+    and not model.startswith("ForestManagementAGB")
+    and not model.startswith("PerennialAGB")
+    and not model.startswith("PerennialBGB")
+    and not model.startswith("AfforestationFLU")
+    and not model.startswith("LivestockTAM")
+    and not model.startswith("LivestockVSER")
+    and not model.startswith("LivestockManureEF")
+    and not model.startswith("FLUData")
+    and not model.startswith("LivestockAWMS")
+    and not model.startswith("ForestManagementBGB")
+    and not model.startswith("ForestTotalBiomass")
+]:
     try:
-        admin.site.register(eval(model), ModelAdmin)
+        admin.site.register(eval(model), GenericExportModelAdmin)
     except:
         pass
 
 
-class AGBAdmin(ModelAdmin):
+class AGBAdmin(GenericExportModelAdmin):
     search_fields = ["climate__name", "moisture__name", "land_use_type__name", "value"]
 
 
-class BGBAdmin(ModelAdmin):
+class BGBAdmin(GenericExportModelAdmin):
     search_fields = [
         "climate__name",
         "moisture__name",
@@ -23,11 +76,11 @@ class BGBAdmin(ModelAdmin):
     ]
 
 
-class AfforestationFLUAdmin(ModelAdmin):
+class AfforestationFLUAdmin(GenericExportModelAdmin):
     search_fields = ["climate__name", "moisture__name", "land_use_type__name"]
 
 
-class LivestockAWMSAdmin(ModelAdmin):
+class LivestockAWMSAdmin(GenericExportModelAdmin):
     list_display = [
         "livestock_production_type",
         "livestock_category_type",
@@ -51,7 +104,7 @@ class LivestockAWMSAdmin(ModelAdmin):
     ]
 
 
-class LivestockTAMAdmin(ModelAdmin):
+class LivestockTAMAdmin(GenericExportModelAdmin):
     list_display = [
         "livestock_production_type",
         "livestock_category_type",
@@ -72,7 +125,7 @@ class LivestockTAMAdmin(ModelAdmin):
     ]
 
 
-class ForestManagementAGBAdmin(ModelAdmin):
+class ForestManagementAGBAdmin(GenericExportModelAdmin):
     list_display = [
         "forest_type",
         "climate",
@@ -103,7 +156,7 @@ class ForestManagementAGBAdmin(ModelAdmin):
     ]
 
 
-class LivestockVSERAdmin(ModelAdmin):
+class LivestockVSERAdmin(GenericExportModelAdmin):
     list_display = [
         "livestock_production_type",
         "livestock_category_type",
@@ -124,7 +177,7 @@ class LivestockVSERAdmin(ModelAdmin):
     ]
 
 
-class LivestockManureEFAdmin(ModelAdmin):
+class LivestockManureEFAdmin(GenericExportModelAdmin):
     list_display = [
         "emission_type",
         "livestock_production_type",
@@ -154,11 +207,11 @@ class LivestockManureEFAdmin(ModelAdmin):
     ]
 
 
-class FLUDataAdmin(ModelAdmin):
+class FLUDataAdmin(GenericExportModelAdmin):
     search_fields = ["climate__name", "moisture__name", "land_use_type__name", "value"]
 
 
-class ForestManagementBGBAdmin(ModelAdmin):
+class ForestManagementBGBAdmin(GenericExportModelAdmin):
     list_display = [
         "climate",
         "region",
@@ -184,7 +237,7 @@ class ForestManagementBGBAdmin(ModelAdmin):
     ]
 
 
-class ForestTotalBiomassAdmin(ModelAdmin):
+class ForestTotalBiomassAdmin(GenericExportModelAdmin):
     list_display = [
         "climate",
         "moisture",
