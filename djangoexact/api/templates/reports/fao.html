@@ -370,8 +370,11 @@
 								Under the With project scenario, the activity will impact
 									{% if activity.is_luc %}{{activity.area}} hectares.
 									{% elif activity.is_fishery %}{{activity.catch_w}} tonnes of catch.
-									{% else %}{{activity.heads}} heads.
+									{% elif activity.is_livestock %}{{activity.heads}} heads.
+									{% else %}emissions relative to 
+									{% for m in activity.modules_emissions %}{% if not forloop.last %} {% endif %}{{ m.name }}{% if not forloop.last %},{% endif %}{% endfor %}.
 									{% endif %}
+								<br>
 								<br>
 								The activity has a carbon balance of <b>{{activity.results.balance|floatformat:2|intcomma}} tCO2-e</b> over the period of accounting, mainly due to interventions in:
 								<br>

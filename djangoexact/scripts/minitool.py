@@ -35,7 +35,7 @@ class BaseData:
         self.climate = self.module.activity.climate_t2.name if self.module.activity.climate_t2 else self.module.activity.project.climate.name
         self.moisture = self.module.activity.moisture_t2.name if self.module.activity.moisture_t2 else self.module.activity.project.moisture.name
         self.soil_type = self.module.activity.soil_type_t2.name if self.module.activity.soil_type_t2 else self.module.activity.project.soil_type.name
-        self.region = self.module.activity.project.country.name
+        self.region = self.module.activity.project.country.region
         self.total = 0
 
     def to_dict(self):
@@ -643,10 +643,10 @@ def run():
 
     ANNUAL_CROPLAND = False
     FLOODED_RICE = False
-    GRASSLAND = True
-    LIVESTOCK = True
+    GRASSLAND = False
+    LIVESTOCK = False
 
-    MAX_ROWS = 10000
+    MAX_ROWS = None
 
     if GRASSLAND:
         compute_permutations(

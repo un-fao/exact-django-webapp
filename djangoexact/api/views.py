@@ -934,9 +934,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
             gases = [co2, ch4, n2o, co, doc, other]
 
-            highest_gas = max([co2, ch4, n2o, co, doc, other], key=lambda x: abs(x["value"]))
-            second_highest_gas = sorted([co2, ch4, n2o, co, doc, other], key=lambda x: abs(x["value"]), reverse=True)[1]
-            third_highest_gas = sorted([co2, ch4, n2o, co, doc, other], key=lambda x: abs(x["value"]), reverse=True)[2]
+            sorted_gases = sorted(gases, key=lambda x: (abs(x["value"]) and x["value"] != 0), reverse=True)
+            highest_gas = sorted_gases[0]
+            second_highest_gas = sorted_gases[1]
+            third_highest_gas = sorted_gases[2]
 
             project_primary_ghg = highest_gas["name"]
             project_primary_ghg_emissions = highest_gas["value"]
