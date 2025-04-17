@@ -66,11 +66,6 @@ class ExtractionSoilTypeTranslationOptions(NameOnlyTranslationOptions):
     pass
 
 
-@register(models.TillageType)
-class TillageTypeTranslationOptions(NameOnlyTranslationOptions):
-    pass
-
-
 @register(models.OrganicInputType)
 class OrganicInputTypeTranslationOptions(NameOnlyTranslationOptions):
     pass
