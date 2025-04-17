@@ -68,8 +68,17 @@ for language in LANGUAGES:
             if entry.obsolete:
                 continue
 
-            obj_type = apps.get_model("api", entry.comment)
-            obj = obj_type.objects.get(name=entry.msgid)
+            try:
+                obj_type = apps.get_model("api", entry.comment)
+            except LookupError:
+                obj_type = apps.get_model("ipcc", entry.comment)
+
+            try:
+                objs = obj_type.objects.filter(name=entry.msgid).all()
+            except obj_type.DoesNotExist:
+                print(f"Object of type {obj_type} with name {entry.msgid} does not exist.")
+                continue
             if entry.msgstr:
-                setattr(obj, f"name_{language[0]}", entry.msgstr)
-                obj.save()
+                for obj in objs:
+                    setattr(obj, f"name_{language[0]}", entry.msgstr)
+                    obj.save()
