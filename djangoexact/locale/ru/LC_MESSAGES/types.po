@@ -439,15 +439,15 @@ msgstr "Минерал"
 msgid "Aggregated"
 msgstr "совокупный"
 
-#. TillageType
+#. TillageManagementType
 msgid "Full Tillage"
 msgstr "Полная обработка почвы"
 
-#. TillageType
+#. TillageManagementType
 msgid "Reduced Tillage"
 msgstr "Сниженная обработка почвы"
 
-#. TillageType
+#. TillageManagementType
 msgid "No Tillage"
 msgstr "Без обработки почвы"
 

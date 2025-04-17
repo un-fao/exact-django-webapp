@@ -432,15 +432,15 @@ msgstr "Mineral"
 msgid "Aggregated"
 msgstr "Agregado"
 
-#. TillageType
+#. TillageManagementType
 msgid "Full Tillage"
 msgstr "Laboreo Total"
 
-#. TillageType
+#. TillageManagementType
 msgid "Reduced Tillage"
 msgstr "Laboreo Reducido"
 
-#. TillageType
+#. TillageManagementType
 msgid "No Tillage"
 msgstr "Sin Laboreo"
 

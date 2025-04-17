@@ -23,7 +23,6 @@ for language in LANGUAGES:
         SettlementType,
         SoilType,
         ExtractionSoilType,
-        TillageType,
         OrganicInputType,
         ResidueManagementType,
         WaterRegimeType,

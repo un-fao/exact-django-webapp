@@ -432,15 +432,15 @@ msgstr ""
 msgid "Aggregated"
 msgstr ""
 
-#. TillageType
+#. TillageManagementType
 msgid "Full Tillage"
 msgstr ""
 
-#. TillageType
+#. TillageManagementType
 msgid "Reduced Tillage"
 msgstr ""
 
-#. TillageType
+#. TillageManagementType
 msgid "No Tillage"
 msgstr ""
 
