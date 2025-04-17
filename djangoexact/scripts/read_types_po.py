@@ -60,6 +60,7 @@ for language in LANGUAGES:
         GlobalWarmingPotential,
         WaterManagementTypeBeforeCultivation,
         WaterManagementTypeAfterCultivation,
+        PackagingMaterialType,
     ]
 
     with transaction.atomic():
