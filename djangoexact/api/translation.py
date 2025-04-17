@@ -249,3 +249,8 @@ class WaterManagementTypeBeforeCultivationTranslationOptions(NameOnlyTranslation
 @register(models.WaterManagementTypeAfterCultivation)
 class WaterManagementTypeAfterCultivationTranslationOptions(NameOnlyTranslationOptions):
     pass
+
+
+@register(models.PackagingMaterialType)
+class PackagingMaterialTypeTranslationOptions(NameOnlyTranslationOptions):
+    pass

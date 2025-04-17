@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: support@example.com\n"
-"POT-Creation-Date: 2024-10-24 12:29\n"
-"PO-Revision-Date: 2024-10-24 12:29\n"
+"POT-Creation-Date: 2025-04-17 14:27\n"
+"PO-Revision-Date: 2025-04-17 14:27\n"
 "Last-Translator: Your Name <your.email@example.com>\n"
 "Language-Team: English <support@example.com>\n"
 "Language: en\n"
@@ -1459,3 +1459,83 @@ msgstr "Rainfed, Dry Season (Drought Prone)"
 #. WaterManagementTypeAfterCultivation
 msgid "Rainfed, Deep Water"
 msgstr "Rainfed, Deep Water"
+
+#. ModuleType
+msgid "Processing"
+msgstr "Processing"
+
+#. ModuleType
+msgid "Packaging"
+msgstr "Packaging"
+
+#. ModuleType
+msgid "Processing Entry"
+msgstr "Processing Entry"
+
+#. ModuleType
+msgid "Packaging Entry"
+msgstr "Packaging Entry"
+
+#. ModuleType
+msgid "Transport"
+msgstr "Transport"
+
+#. ModuleType
+msgid "Storage"
+msgstr "Storage"
+
+#. ModuleType
+msgid "Transport Entry"
+msgstr "Transport Entry"
+
+#. ModuleType
+msgid "Storage Entry"
+msgstr "Storage Entry"
+
+#. ModuleType
+msgid "Energy Entry"
+msgstr "Energy Entry"
+
+#. FuelType
+msgid "LPG"
+msgstr "LPG"
+
+#. FuelType
+msgid "Gasoil/Diesel Oil"
+msgstr "Gasoil/Diesel Oil"
+
+#. FuelType
+msgid "Waste Oil/Lubricants"
+msgstr "Waste Oil/Lubricants"
+
+#. FuelType
+msgid "Renewable"
+msgstr "Renewable"
+
+#. FuelType
+msgid "Gasoline (4-stroke)"
+msgstr "Gasoline (4-stroke)"
+
+#. FuelType
+msgid "Gasoline (2-stroke)"
+msgstr "Gasoline (2-stroke)"
+
+#. IrrigationSystemType
+msgid "Other (set up Tier 2)"
+msgstr "Other (set up Tier 2)"
+
+#. PackagingMaterialType
+msgid "Paper"
+msgstr "Paper"
+
+#. PackagingMaterialType
+msgid "Aluminium"
+msgstr "Aluminium"
+
+#. PackagingMaterialType
+msgid "Plastic (mixed)"
+msgstr "Plastic (mixed)"
+
+#. PackagingMaterialType
+msgid "Plastic (LDPE)"
+msgstr "Plastic (LDPE)"
