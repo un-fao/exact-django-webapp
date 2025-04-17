@@ -190,6 +190,7 @@ LANGUAGES = [
     ("en", "English"),
     ("fr", "French"),
     ("es", "Spanish"),
+    ("ru", "Russian"),
 ]
 
 USE_TZ = True
