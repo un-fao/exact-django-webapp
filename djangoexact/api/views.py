@@ -966,7 +966,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             for a in total_data["activities"]:
                 db_activity: Activity = activities.get(name=a["name"])
                 mlist = a["modules"]
-                modules_by_highest_emissions = sorted(mlist, key=lambda x: abs(x["results"]["balance"]), reverse=True)
+                modules_by_highest_emissions = sorted(mlist, key=lambda x: x["results"]["balance"], reverse=total_balance > 0)
 
                 db_activity.modules_emissions = [{"name": m["module_type"]["name"], "balance": m["results"]["balance"]} for m in modules_by_highest_emissions]
 
@@ -1011,6 +1011,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
                                     lt["value_wo"] += m.area
 
                 processed_activities.append(db_activity)
+
+            processed_activities = sorted(processed_activities, key=lambda x: x.results["balance"], reverse=total_balance > 0)
 
             livestock_heads = list(filter(lambda x: x["value_w"] != 0 or x["value_wo"] != 0, livestock_heads))
             small_fishery_types = list(filter(lambda x: x["value_w"] != 0 or x["value_wo"] != 0, small_fishery_types))
