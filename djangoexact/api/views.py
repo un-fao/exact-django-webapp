@@ -135,6 +135,8 @@ import matplotlib.pyplot as plt
 import io
 import base64
 import api.permissions as api_permissions
+from django.utils.translation import gettext as _
+from django.utils.translation import activate
 
 logger = logging.getLogger("console")
 
@@ -810,22 +812,27 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
     @swagger_auto_schema(
         operation_description="Generate a PDF from an HTML template",
-        manual_parameters=[openapi.Parameter("template", openapi.IN_QUERY, description="Name of the Django template to render", type=openapi.TYPE_STRING, required=True)],
+        manual_parameters=[
+            openapi.Parameter("template", openapi.IN_QUERY, description="Name of the Django template to render", type=openapi.TYPE_STRING, required=True),
+            openapi.Parameter("lang", openapi.IN_QUERY, description="Language of the template", type=openapi.TYPE_STRING, required=False),
+        ],
         responses={200: "PDF file generated successfully", 400: "Template name not provided or template not found", 500: "Error generating PDF"},
         produces=["application/pdf"],
     )
     def template(self, request, pk=None):
         template_name = request.query_params.get("template")
+        lang = request.query_params.get("lang", "en")
 
         if not template_name:
             return utils.ErrorResponse("Template name is required", status=http_status.HTTP_400_BAD_REQUEST)
 
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        if not os.path.exists(f"{current_dir}/templates/reports/{template_name}.html"):
-            templates = [os.path.splitext(template)[0] for template in os.listdir(f"{current_dir}/templates/reports")]
-            return utils.ErrorResponse(f"Template '{template_name}' not found. Available templates: {templates}", status=http_status.HTTP_400_BAD_REQUEST)
+        if not os.path.exists(f"{current_dir}/templates/reports/{template_name}_{lang}.html"):
+            return utils.ErrorResponse(f"Template '{template_name}' not found for language '{lang}'", status=http_status.HTTP_400_BAD_REQUEST)
 
         try:
+            activate(lang)
+
             project: Project = self.get_object()
             soc: ipcc_models.SoilOrganicCarbon = ipcc_models.SoilOrganicCarbon.objects.get(climate=project.climate, moisture=project.moisture, soil_type=project.soil_type)
 
@@ -934,6 +941,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
             gases = [co2, ch4, n2o, co, doc, other]
 
+            INCREASES = _("increases")
+            DECREASES = _("decreases")
+
             sorted_gases = sorted(gases, key=lambda x: (abs(x["value"]) and x["value"] != 0), reverse=True)
             highest_gas = sorted_gases[0]
             second_highest_gas = sorted_gases[1]
@@ -941,15 +951,15 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
             project_primary_ghg = highest_gas["name"]
             project_primary_ghg_emissions = highest_gas["value"]
-            project_primary_ghg_direction = "increases" if project_primary_ghg_emissions >= 0 else "decreases"
+            project_primary_ghg_direction = INCREASES if project_primary_ghg_emissions >= 0 else DECREASES
 
             project_secondary_ghg = second_highest_gas["name"]
             project_secondary_ghg_emissions = second_highest_gas["value"]
-            project_secondary_ghg_direction = "increases" if project_secondary_ghg_emissions >= 0 else "decreases"
+            project_secondary_ghg_direction = INCREASES if project_secondary_ghg_emissions >= 0 else DECREASES
 
             project_tertiary_ghg = third_highest_gas["name"]
             project_tertiary_ghg_emissions = third_highest_gas["value"]
-            project_tertiary_ghg_direction = "increases" if project_tertiary_ghg_emissions >= 0 else "decreases"
+            project_tertiary_ghg_direction = INCREASES if project_tertiary_ghg_emissions >= 0 else DECREASES
 
             activities = project.activities.all()
 
@@ -1136,7 +1146,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 return chart_base64
 
             # Get faologo.eps from static files
-            faologo = open(os.path.join(settings.BASE_DIR, "media", "faologo.svg"), "rb")
+            try:
+                faologo = open(os.path.join(settings.BASE_DIR, "media", f"faologo_{lang}.svg"), "rb")
+            except FileNotFoundError:
+                faologo = open(os.path.join(settings.BASE_DIR, "media", "faologo.svg"), "rb")
 
             # Add it as base64 to the context
             faologo_base64 = base64.b64encode(faologo.read()).decode("utf-8")
@@ -1182,7 +1195,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 "download_date_time": download_date_time,
             }
 
-            html = render(request, f"reports/{template_name}.html", context).content.decode()
+            html = render(request, f"reports/{template_name}_{lang}.html", context).content.decode()
 
             # Generate PDF from HTML using WeasyPrint
             from weasyprint import HTML
