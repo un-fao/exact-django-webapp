@@ -9,6 +9,8 @@ from rest_framework.test import force_authenticate
 from factory.fuzzy import FuzzyText, FuzzyInteger, FuzzyChoice
 import logging as log
 from api import serializers
+import io
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 
 class APITestCaseMixin(APITestCase):
@@ -137,7 +139,7 @@ class APITestCaseMixin(APITestCase):
         force_authenticate(request, user=user)
         return view(request, pk=project.id)
 
-    def upload_project_file(self, project, user, file):
+    def upload_project_file(self, project, user, file=None):
         """
         Upload a project file using the ProjectViewSet.
 
@@ -148,8 +150,12 @@ class APITestCaseMixin(APITestCase):
         log.info("Uploading project file")
         view = ProjectFileAttachmentViewSet.as_view({"post": "create"})
 
+        if file is None:
+            sample_content = b"Sample file content for testing."
+            file = SimpleUploadedFile("testfile.txt", sample_content, content_type="text/plain")
+
         request = self.request_factory.post(
-            reverse("projectfileattachment-list"),
+            reverse("projectattachment-list"),
             {"file": file, "project": project.id},
             format="json",
         )

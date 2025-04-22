@@ -408,3 +408,30 @@ class ProjectTestCase(APITestCaseMixin):
         self.assertEqual(delete_activity_response.status_code, status.HTTP_400_BAD_REQUEST)
 
         log.info("END - try_deleting_activity_of_finalized_project")
+
+    def test_upload_file_in_finalized_project(self):
+        """
+        Test that uploading a file in a finalized project is not allowed.
+
+        This test performs the following steps:
+        1. Creates a project and verifies the project creation.
+        2. Finalizes the project.
+        3. Attempts to upload a file in the finalized project and verifies that the upload attempt fails with a 400 Bad Request status code.
+
+        The test ensures that uploading a file in a finalized project is not allowed.
+        """
+
+        log.info("START - test_upload_file_in_finalized_project")
+
+        create_project_response = self.create_project()
+        self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+        project = models.Project.objects.get(id=create_project_response.data["id"])
+
+        finalize_response = self.edit_project(project, self.user, {"is_finalized": True})
+        self.assertEqual(finalize_response.status_code, status.HTTP_200_OK)
+        self.assertTrue(finalize_response.data["is_finalized"])
+
+        upload_file_response = self.upload_project_file(project, self.user)
+        self.assertEqual(upload_file_response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        log.info("END - test_upload_file_in_finalized_project")
