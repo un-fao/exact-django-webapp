@@ -174,7 +174,7 @@
 		<footer>
 			<!-- Footer content (appears on every page) -->
 			<p style="font-size: 12px">
-				Descargado por {{download_date_time}} | EX-ACT Version: V10 | Usuarlo: {{user.email}}
+				Descargado el {{download_date_time}} | EX-ACT Version: V10 | Usuario: {{user.email}}
 			</p>
 			{% comment %}
 			<p style="font-size: 12px">Owner: {{owner}}</p>
@@ -316,7 +316,7 @@
 									Se estima que el proyecto {{project.name}} tiene un balance total de
 									carbono de
 									<b>{{total_carbon_balance|floatformat:2|intcomma}}</b>
-									tCO2e durante todo el período de contabilidad de {{total_project_years}}
+									tCO2e durante todo el periodo de contabilidad de {{total_project_years}}
 									años.
 								</p>
 								<p>
@@ -393,7 +393,7 @@
 								<br />
 								<br />
 								Bajo el escenario Con Proyecto, la actividad impactará 
-								{% if activity.is_luc %}{{activity.area}} hectares. 
+								{% if activity.is_luc %}{{activity.area}} hectáreas. 
 								{% elif activity.is_fishery %}{{activity.catch_w}} tonnes of catch. 
 								{% elif activity.is_livestock %}{{activity.heads}} heads. 
 								{% else %}emissions relative to 
@@ -434,7 +434,7 @@
 							<tbody>
 								{% if land_types %}
 								<tr>
-									<td><b>Covertura terrestre (hectáreas)</b></td>
+									<td><b>Cobertura terrestre (hectáreas)</b></td>
 								</tr>
 								{% for land in land_types %}
 								<tr>
@@ -513,8 +513,7 @@
 			<section>
 				<h1 class="text-start">Notes</h1>
 				<p style="font-size: 12px">
-					<sup>1</sup>The biodiversity section of EX-ACT is not yet public but will be
-					released in mid-2025
+					<sup>1</sup>La sección de biodiversidad de EX-ACT aún no es pública, pero será lanzada a mediados de 2025
 				</p>
 			</section>
 		</main>
