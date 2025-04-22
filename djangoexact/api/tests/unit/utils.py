@@ -1,7 +1,7 @@
 from rest_framework.test import APIRequestFactory, APITestCase
 from rest_framework import status
 from django.urls import reverse
-from api.views import ProjectViewSet, ActivityViewSet, generic_module_viewset, ProjectMembershipViewSet, ProjectInvitationViewSet
+from api.views import ProjectViewSet, ActivityViewSet, generic_module_viewset, ProjectMembershipViewSet, ProjectInvitationViewSet, ProjectFileAttachmentViewSet
 import api.models as models
 import ipcc.models as ipcc_models
 import api.tests.factories as factories
@@ -137,6 +137,25 @@ class APITestCaseMixin(APITestCase):
         force_authenticate(request, user=user)
         return view(request, pk=project.id)
 
+    def upload_project_file(self, project, user, file):
+        """
+        Upload a project file using the ProjectViewSet.
+
+        This method uploads a project file by sending a POST request to the 'project-upload' endpoint
+        with the provided file data in JSON format. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.info("Uploading project file")
+        view = ProjectFileAttachmentViewSet.as_view({"post": "create"})
+
+        request = self.request_factory.post(
+            reverse("projectfileattachment-list"),
+            {"file": file, "project": project.id},
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request)
+
     def create_activity(self, project, user, module_types=None):
         """
         Create an activity using the ActivityViewSet.
@@ -179,6 +198,24 @@ class APITestCaseMixin(APITestCase):
         request = self.request_factory.patch(
             reverse("activities-detail", args=[activity.id]),
             data,
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=activity.id)
+
+    def delete_activity(self, activity, user):
+        """
+        Delete an activity using the ActivityViewSet.
+
+        This method deletes an activity by sending a DELETE request to the 'activity-detail' endpoint
+        with the provided activity ID. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.info("Deleting activity")
+        view = ActivityViewSet.as_view({"delete": "destroy"})
+
+        request = self.request_factory.delete(
+            reverse("activities-detail", args=[activity.id]),
             format="json",
         )
         force_authenticate(request, user=user)

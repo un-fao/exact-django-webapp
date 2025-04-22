@@ -1825,6 +1825,18 @@ class ActivityViewSet(viewsets.ModelViewSet, AuthenticatedViewSet):
 
         return Response(data=ChangeHistorySerializer(changes, many=True).data, status=http_status.HTTP_200_OK)
 
+    def destroy(self, request, *args, **kwargs):
+        activity = self.get_object()
+        error = security.check_permission("delete_activity", self.request.user, activity.project)
+        if error:
+            return error
+
+        serializer = WriteActivitySerializer(data=request.data, instance=activity, partial=True)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
+
+        return Response(status=http_status.HTTP_204_NO_CONTENT)
+
 
 class CommentThreadViewSet(viewsets.ModelViewSet):
     queryset = CommentThread.objects.all()
