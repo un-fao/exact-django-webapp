@@ -209,6 +209,24 @@ class APITestCaseMixin(APITestCase):
         force_authenticate(request, user=user)
         return view(request, pk=activity.id)
 
+    def copy_activity(self, activity, user):
+        """
+        Copy an activity using the ActivityViewSet.
+
+        This method copies an activity by sending a POST request to the 'activity-copy' endpoint
+        with the provided activity ID. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.info("Copying activity")
+        view = ActivityViewSet.as_view({"post": "copy"})
+
+        request = self.request_factory.post(
+            reverse("activities-copy", args=[activity.id]),
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=activity.id)
+
     def delete_activity(self, activity, user):
         """
         Delete an activity using the ActivityViewSet.

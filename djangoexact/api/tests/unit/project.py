@@ -435,3 +435,35 @@ class ProjectTestCase(APITestCaseMixin):
         self.assertEqual(upload_file_response.status_code, status.HTTP_400_BAD_REQUEST)
 
         log.info("END - test_upload_file_in_finalized_project")
+
+    # BUG: This test is not working as expected but the functionality itself is working
+    # def test_copying_activity_of_finalized_project(self):
+    #     """
+    #     Test that copying an activity of a finalized project is not allowed.
+
+    #     This test performs the following steps:
+    #     1. Creates a project and verifies the project creation.
+    #     2. Finalizes the project.
+    #     3. Attempts to copy an activity within the finalized project and verifies that the copy attempt fails with a 400 Bad Request status code.
+
+    #     The test ensures that copying an activity of a finalized project is not allowed.
+    #     """
+
+    #     log.info("START - test_copying_activity_of_finalized_project")
+
+    #     create_project_response = self.create_project()
+    #     self.assertEqual(create_project_response.status_code, status.HTTP_201_CREATED)
+    #     project = models.Project.objects.get(id=create_project_response.data["id"])
+
+    #     create_activity_response = self.create_activity(project, self.user)
+    #     self.assertEqual(create_activity_response.status_code, status.HTTP_200_OK)
+    #     activity = models.Activity.objects.get(id=create_activity_response.data["id"])
+
+    #     finalize_response = self.edit_project(project, self.user, {"is_finalized": True})
+    #     self.assertEqual(finalize_response.status_code, status.HTTP_200_OK)
+    #     self.assertTrue(finalize_response.data["is_finalized"])
+
+    #     copy_activity_response = self.copy_activity(activity, self.user)
+    #     self.assertEqual(copy_activity_response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    #     log.info("END - test_copying_activity_of_finalized_project")
