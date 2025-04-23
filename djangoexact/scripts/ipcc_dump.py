@@ -4798,6 +4798,25 @@ def import_fra_carbon_stock_data():
     print(f"Missing countries: {missing_countries}")
 
 
+def add_ipcc_and_fra_as_data_sources():
+    """
+    Add IPCC and FRA as data sources to the database.
+    """
+    from api.models import DataSource
+
+    ipcc_data_source, created = DataSource.objects.get_or_create(short_name="IPCC")
+    if created:
+        print("Created IPCC data source")
+    else:
+        print("IPCC data source already exists")
+
+    fra_data_source, created = DataSource.objects.get_or_create(short_name="FRA")
+    if created:
+        print("Created FRA data source")
+    else:
+        print("FRA data source already exists")
+
+
 def run():
     import os
 
@@ -4820,6 +4839,7 @@ def run():
         create_energy_entry_module_type()
         add_change_public_project_flag_permission_to_admin_group()
         import_fra_carbon_stock_data()
+        add_ipcc_and_fra_as_data_sources()
         pass
 
     if app_mode == "review":
@@ -4838,10 +4858,12 @@ def run():
         # add_change_public_project_flag_permission_to_admin_group()
         add_density_zero_where_density_is_none_in_irrigation_phase_data()
         import_fra_carbon_stock_data()
+        add_ipcc_and_fra_as_data_sources()
         pass
 
     if app_mode == "development":
         # TODO: Run in development
+        add_ipcc_and_fra_as_data_sources()
         pass
 
     if app_mode == "test":
