@@ -436,14 +436,18 @@ class ModuleType(models.Model):
 
 
 class DataSource(models.Model):
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=255, unique=True)
     year = models.IntegerField(null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     module_types = models.ManyToManyField(ModuleType, related_name="data_sources", blank=True)
 
     def __str__(self):
-        return self.name
+        return self.short_name
+
+    class Meta:
+        verbose_name_plural = "Data sources"
+        unique_together = ("name", "short_name", "year")
 
 
 class ForestDegradationLevel(models.Model):
