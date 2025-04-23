@@ -437,6 +437,7 @@ class ModuleType(models.Model):
 
 class DataSource(models.Model):
     name = models.CharField(max_length=255, unique=True)
+    short_name = models.CharField(max_length=255, unique=True)
     year = models.IntegerField(null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     module_types = models.ManyToManyField(ModuleType, related_name="data_sources", blank=True)
@@ -2047,7 +2048,7 @@ class ForestManagement(LandModule, LitterDeadwoodBiomassModule):
             self.land_use_type_wo = self.land_use_type_start
 
         if self.data_source is None:
-            self.data_source = DataSource.objects.get_or_create(name="IPCC")[0]
+            self.data_source = DataSource.objects.get_or_create(short_name="IPCC")[0]
 
         return super().save(*args, **kwargs)
 
