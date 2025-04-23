@@ -283,3 +283,20 @@ class APITestCaseMixin(APITestCase):
         force_authenticate(request, user=user)
         response = view(request)
         return response
+
+    def get_module_defaults(self, module, user):
+        """
+        Get module defaults using the ModuleViewSet.
+
+        This method retrieves module defaults by sending a GET request to the 'module-defaults' endpoint
+        with the provided module ID. The request is authenticated with the provided user,
+        and the response is returned.
+        """
+        log.info("Getting module defaults")
+        view = generic_module_viewset(module.__class__).as_view({"get": "defaults"})
+        request = self.request_factory.get(
+            reverse(f"{module.__class__.__name__.lower()}-defaults", args=[module.pk]),
+            format="json",
+        )
+        force_authenticate(request, user=user)
+        return view(request, pk=module.pk)
