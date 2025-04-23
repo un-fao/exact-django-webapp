@@ -1444,3 +1444,14 @@ class ShadowPriceOfCarbon(Model):
     year = IntegerField(unique=True)
     min_value = FloatField()
     max_value = FloatField()
+
+
+class FRACarbonStock(Model):
+    country = ForeignKey("api.Country", on_delete=CASCADE)
+    year = IntegerField()
+    agb = FloatField(null=True, blank=True)
+    bgb = FloatField(null=True, blank=True)
+    deadwood = FloatField(null=True, blank=True)
+    litter = FloatField(null=True, blank=True)
+    carbon_stock_biomass_total = FloatField(null=True, blank=True)
+    carbon_stock_total = FloatField(null=True, blank=True)
