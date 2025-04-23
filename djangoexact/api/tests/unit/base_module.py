@@ -15,7 +15,6 @@ from django.apps import apps
 
 
 class BaseModuleTestCase(APITestCaseMixin):
-
     def setUp(self):
         super().setUp()
 
@@ -42,10 +41,12 @@ class BaseModuleTestCase(APITestCaseMixin):
         if isinstance(self.ModuleClass, models.CoastalWetland):
             self.land_use_types = self.land_use_types.filter(is_coastal=True)
 
+
 class BaseModuleWithSubmoduleTestCase(BaseModuleTestCase):
     def setUp(self):
         super().setUp()
         self.submodules = []
+        self.submodules_viewsets = []
 
         for submodule in self.submodule_classes:
             submodule: models.Module
@@ -53,3 +54,4 @@ class BaseModuleWithSubmoduleTestCase(BaseModuleTestCase):
             self.assertEqual(submodule_response.status_code, status.HTTP_201_CREATED)
 
             self.submodules.append(submodule.objects.get(id=submodule_response.data["id"]))
+            self.submodules_viewsets.append(generic_module_viewset(submodule))
