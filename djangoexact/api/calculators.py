@@ -6466,6 +6466,8 @@ class ForestManagementCalculator(LandModuleCalculator):
         self.agb_under_20_yrs = ipcc.ForestManagementAGB()
         self.agb_over_20_yrs = ipcc.ForestManagementAGB()
 
+        self.fra_carbon_stock = ipcc.FRACarbonStock()
+
         self.agb_max_start = None
         self.agb_growth_over_20_start = None
         self.agb_growth_under_20_start = None
@@ -6673,6 +6675,18 @@ class ForestManagementCalculator(LandModuleCalculator):
             self.agb_growth_under_20_wo = statistics.mean([self.agb_under_20_wo.agb_growth_max, self.agb_under_20_wo.agb_growth_min]) if all([self.agb_under_20_wo.agb_growth_max, self.agb_under_20_wo.agb_growth_min]) else self.forest.agb_growth_rate_le_20_yrs_t2_wo
             self.agb_start_wo = 0
             self.litter_dw_start_wo = SimpleNamespace(litter=0, dw=0)
+
+        if self.module.data_source is not None and self.module.data_source.short_name == "FRA":
+            self.fra_carbon_stock = ipcc.FRACarbonStock.objects.get(country=self.country)
+            self.agb_max_start = self.fra_carbon_stock.agb if self.fra_carbon_stock.agb is not None else 0
+            self.agb_max_w = self.fra_carbon_stock.agb if self.fra_carbon_stock.agb is not None else 0
+            self.agb_max_wo = self.fra_carbon_stock.agb if self.fra_carbon_stock.agb is not None else 0
+            self.litter_dw_max_start.litter = self.fra_carbon_stock.litter if self.fra_carbon_stock.litter is not None else 0
+            self.litter_dw_max_w.litter = self.fra_carbon_stock.litter if self.fra_carbon_stock.litter is not None else 0
+            self.litter_dw_max_wo.litter = self.fra_carbon_stock.litter if self.fra_carbon_stock.litter is not None else 0
+            self.litter_dw_max_start.dw = self.fra_carbon_stock.deadwood if self.fra_carbon_stock.deadwood is not None else 0
+            self.litter_dw_max_w.dw = self.fra_carbon_stock.deadwood if self.fra_carbon_stock.deadwood is not None else 0
+            self.litter_dw_max_wo.dw = self.fra_carbon_stock.deadwood if self.fra_carbon_stock.deadwood is not None else 0
 
         self.disturbances: list[ForestDisturbance] = self.module.disturbances.all()
 
