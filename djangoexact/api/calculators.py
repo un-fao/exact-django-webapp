@@ -6678,15 +6678,15 @@ class ForestManagementCalculator(LandModuleCalculator):
 
         if self.module.data_source is not None and self.module.data_source.short_name == "FRA":
             self.fra_carbon_stock = ipcc.FRACarbonStock.objects.get(country=self.country)
-            self.agb_max_start = self.fra_carbon_stock.agb
-            self.agb_max_w = self.fra_carbon_stock.agb
-            self.agb_max_wo = self.fra_carbon_stock.agb
-            self.litter_dw_max_start.litter = self.fra_carbon_stock.litter
-            self.litter_dw_max_w.litter = self.fra_carbon_stock.litter
-            self.litter_dw_max_wo.litter = self.fra_carbon_stock.litter
-            self.litter_dw_max_start.dw = self.fra_carbon_stock.deadwood
-            self.litter_dw_max_w.dw = self.fra_carbon_stock.deadwood
-            self.litter_dw_max_wo.dw = self.fra_carbon_stock.deadwood
+            self.agb_max_start = self.fra_carbon_stock.agb if self.fra_carbon_stock.agb is not None else 0
+            self.agb_max_w = self.fra_carbon_stock.agb if self.fra_carbon_stock.agb is not None else 0
+            self.agb_max_wo = self.fra_carbon_stock.agb if self.fra_carbon_stock.agb is not None else 0
+            self.litter_dw_max_start.litter = self.fra_carbon_stock.litter if self.fra_carbon_stock.litter is not None else 0
+            self.litter_dw_max_w.litter = self.fra_carbon_stock.litter if self.fra_carbon_stock.litter is not None else 0
+            self.litter_dw_max_wo.litter = self.fra_carbon_stock.litter if self.fra_carbon_stock.litter is not None else 0
+            self.litter_dw_max_start.dw = self.fra_carbon_stock.deadwood if self.fra_carbon_stock.deadwood is not None else 0
+            self.litter_dw_max_w.dw = self.fra_carbon_stock.deadwood if self.fra_carbon_stock.deadwood is not None else 0
+            self.litter_dw_max_wo.dw = self.fra_carbon_stock.deadwood if self.fra_carbon_stock.deadwood is not None else 0
 
         self.disturbances: list[ForestDisturbance] = self.module.disturbances.all()
 
