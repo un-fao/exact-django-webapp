@@ -435,6 +435,16 @@ class ModuleType(models.Model):
         verbose_name_plural = "Module types"
 
 
+class DataSource(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    year = models.IntegerField(null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    module_types = models.ManyToManyField(ModuleType, related_name="data_sources", blank=True)
+
+    def __str__(self):
+        return self.name
+
+
 class ForestDegradationLevel(models.Model):
     name = models.CharField(max_length=100)
     value = models.FloatField()
@@ -1087,6 +1097,7 @@ class Submodule(Historical, CachedResultMixin):
     soc_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("soc_t2_wo"))
     status = models.ForeignKey(StatusType, on_delete=models.CASCADE, null=True, blank=True)
     note = GenericRelation("api.Note")
+    data_source = models.ForeignKey(DataSource, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("data_source"))
 
     class Meta:
         abstract = True
@@ -1175,6 +1186,7 @@ class Module(Historical, CachedResultMixin):
     soc_t2_wo = models.FloatField(null=True, blank=True, verbose_name=_("soc_t2_wo"))
 
     status = models.ForeignKey(StatusType, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("status"))
+    data_source = models.ForeignKey(DataSource, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("data_source"))
 
     @property
     def module_type(self):
@@ -2033,6 +2045,10 @@ class ForestManagement(LandModule, LitterDeadwoodBiomassModule):
         if self.land_use_type_start:
             self.land_use_type_w = self.land_use_type_start
             self.land_use_type_wo = self.land_use_type_start
+
+        if self.data_source is None:
+            self.data_source = DataSource.objects.get_or_create(name="IPCC")[0]
+
         return super().save(*args, **kwargs)
 
     def get_agb_growth_ref(self, land_use_type: LandUseType, from_year: int = 0) -> ipcc.ForestManagementAGB:
