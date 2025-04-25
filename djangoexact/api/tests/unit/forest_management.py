@@ -44,7 +44,6 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
         self.module.refresh_from_db()
 
     def test_modify(self):
-
         validated_data = copy.deepcopy(self.validated_data)
         validated_data["forest_type"] = models.ForestType.objects.order_by("?").first().id
         response = self.edit_module(self.module, self.user, validated_data)
@@ -90,7 +89,6 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
         self.assertNotEqual(old_balance, new_balance)
 
     def test_patch_to_not_ready(self):
-
         validated_data = copy.deepcopy(self.validated_data)
         validated_data["forest_type"] = None
         response = self.edit_module(self.module, self.user, validated_data)
@@ -99,7 +97,6 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
         self.assertEqual(response.data["status"]["name"], "EMPTY")
 
     def test_calculate_results(self):
-
         view = self.module_viewset.as_view({"get": "results"})
         request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
 
@@ -111,13 +108,38 @@ class ForestManagementTestCase(base_module.BaseModuleTestCase):
         self.assertTrue("balance" in response.data)
 
     def test_get_defaults(self):
+        response = self.get_module_defaults(self.module, self.user)
+        print(response.data)
 
-        view = self.module_viewset.as_view({"get": "defaults"})
-        request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-defaults", args=[self.module.pk]), format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(type(response.data) == dict)
+
+    def test_select_fra_data_source_and_check_if_results_change(self):
+        # Call the view to get the first results
+        view = self.module_viewset.as_view({"get": "results"})
+        request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
+        force_authenticate(request, user=self.user)
+        response = view(request, pk=self.module.pk)
+        print(response.data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue("balance" in response.data)
+
+        first_balance = response.data["balance"]
+
+        # Change the data source
+        edit_response = self.edit_module(self.module, self.user, {"data_source": models.DataSource.objects.get(short_name="FRA").pk})
+        self.assertEqual(edit_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(edit_response.data["status"]["name"], "READY")
+        self.module.refresh_from_db()
+
+        # Check that the results change
+        view = self.module_viewset.as_view({"get": "results"})
+        request = self.request_factory.get(reverse(f"{self.ModuleClass.__name__.lower()}-results", args=[self.module.pk]), format="json")
 
         force_authenticate(request, user=self.user)
         response = view(request, pk=self.module.pk)
         print(response.data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(type(response.data) == dict)
+        self.assertTrue("balance" in response.data)
+        self.assertNotEqual(first_balance, response.data["balance"])
