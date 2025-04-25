@@ -986,6 +986,29 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
                 db_activity.results = {"total_w": sum_all_total_w, "total_wo": sum_all_total_wo, "balance": sum_all_balance}
 
+                main_impact = None
+                secondary_impacts = []
+
+                if db_activity.is_luc:
+                    main_impact = _("hectares")
+                elif db_activity.is_fishery:
+                    main_impact = _("tonnes of catch")
+                elif db_activity.is_livestock:
+                    main_impact = _("livestock heads")
+
+                if any([db_activity.is_energy, db_activity.is_storage, db_activity.is_transport, db_activity.is_processing]):
+                    secondary_impacts.append(_("energy consumption"))
+                if db_activity.is_packaging:
+                    secondary_impacts.append(_("packaging material"))
+                if db_activity.is_input:
+                    secondary_impacts.append(_("agricultural inputs use"))
+
+                secondary_impacts = ", ".join(secondary_impacts)
+
+                db_activity.main_impact = main_impact
+                if secondary_impacts:
+                    db_activity.secondary_impacts = secondary_impacts
+
                 for m in db_activity.modules:
                     if issubclass(m.__class__, Fishery):
                         if isinstance(m, SmallFishery):

@@ -916,6 +916,30 @@ class Activity(Historical, NoteMixin, DirtyFieldsMixin):
     def is_livestock(self):
         return any([isinstance(module, Livestock) for module in self.modules])
 
+    @property
+    def is_energy(self):
+        return any([isinstance(module, Energy) for module in self.modules])
+
+    @property
+    def is_packaging(self):
+        return any([isinstance(module, Packaging) for module in self.modules])
+
+    @property
+    def is_storage(self):
+        return any([isinstance(module, Storage) for module in self.modules])
+
+    @property
+    def is_transport(self):
+        return any([isinstance(module, Transport) for module in self.modules])
+
+    @property
+    def is_processing(self):
+        return any([isinstance(module, Processing) for module in self.modules])
+
+    @property
+    def is_input(self):
+        return any([isinstance(module, Input) for module in self.modules])
+
     class Meta:
         unique_together = ("name", "project")
         ordering = ["-created_at"]  # Orders by created_at descending

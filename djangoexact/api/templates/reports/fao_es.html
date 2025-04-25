@@ -392,13 +392,7 @@
 								el último año de contabilidad en {{activity.last_year_of_accounting}}.
 								<br />
 								<br />
-								Bajo el escenario Con Proyecto, la actividad impactará 
-								{% if activity.is_luc %}{{activity.area}} hectáreas. 
-								{% elif activity.is_fishery %}{{activity.catch_w}} tonnes of catch. 
-								{% elif activity.is_livestock %}{{activity.heads}} heads. 
-								{% else %}emissions relative to 
-								{% for m in activity.modules_emissions %}
-									{% if not forloop.last %} {% endif %}{{m.name }}{% if not forloop.last %},{% endif %}{% endfor %}. {% endif %}
+								Bajo el escenario Con Proyecto, la actividad impactará {{activity.area}} {{activity.main_impact}}{% if activity.secondary_impacts %}, además de emisiones relativas a {{activity.secondary_impacts}}.{% endif %}
 								<br />
 								<br />
 								La actividad tiene un balance de carbono de
