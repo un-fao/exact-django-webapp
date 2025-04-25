@@ -192,6 +192,7 @@ class CoastalAquaculture(BaseModule):
                 emissions_nitrous_yearly = compute_yearly_or_half_year_cumulative(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(x, GasTypes.N2O) for x in emissions_nitrous_yearly], activity=ActivityTypes.N20_FIELD, delay=self.delay))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.N2O, annual_start, ActivityTypes.N20_FIELD ))
 
             except Exception as e:
                 traceback.print_exc()
@@ -210,6 +211,7 @@ class CoastalAquaculture(BaseModule):
                 emissions_co2_yearly = compute_yearly_or_half_year_cumulative(annual_start, annual_end, self.implementation_time, self.capitalization_time, self.rate_type)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(x, GasTypes.CO2) for x in emissions_co2_yearly], activity=ActivityTypes.ELECTRICITY, delay=self.delay))
+                self.inventory.emissions_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.CO2, annual_start, ActivityTypes.ELECTRICITY ))
 
             except Exception as e:
                 traceback.print_exc()

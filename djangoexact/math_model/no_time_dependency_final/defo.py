@@ -21,6 +21,7 @@ from .generalized_modules import BaseModule
 
 from dataclasses import dataclass, field
 from typing import Optional
+from ghg_inventory_class import InventoryPerGasperActivity
 
 
 @dataclass
@@ -125,6 +126,7 @@ class Defo(BaseModule):
                 emissions_biomass_loss_yearly = breakdown_proportionally_to_values(biomass_loss, self.delta_hectares)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in emissions_biomass_loss_yearly], activity=ActivityTypes.BIOMASS, delay=self.delay))
+                self.inventory.emission_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.CO2, 0, ActivityTypes.BIOMASS))
 
             except Exception as e:
                 traceback.print_exc()
@@ -142,6 +144,7 @@ class Defo(BaseModule):
                 emissions_dom_yearly = breakdown_proportionally_to_values(dom_loss, self.delta_hectares)
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CO2, emissions=[Emission(e, GasTypes.CO2) for e in emissions_dom_yearly], activity=ActivityTypes.DOM, delay=self.delay))
+                self.inventory.emission_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.CO2, 0, ActivityTypes.DOM))
 
             except Exception as e:
                 traceback.print_exc()
@@ -164,7 +167,9 @@ class Defo(BaseModule):
 
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.CH4, emissions=[Emission(e, GasTypes.CH4) for e in emissions_ch4], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
                 self.result.yearly_emissions_by_sector_by_gas.append(YearlyGasActivityEmissionSet(year=0, gas_type=GasTypes.N2O, emissions=[Emission(e, GasTypes.N2O) for e in emissions_n2o], activity=ActivityTypes.RESIDUE_BURNING, delay=self.delay))
-
+                self.inventory.emission_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.CH4, 0, ActivityTypes.RESIDUE_BURNING))
+                self.inventory.emission_by_sector_by_gas.append(InventoryPerGasperActivity(GasTypes.N2O, 0, ActivityTypes.RESIDUE_BURNING))
+                
             except Exception as e:
                 traceback.print_exc()
 

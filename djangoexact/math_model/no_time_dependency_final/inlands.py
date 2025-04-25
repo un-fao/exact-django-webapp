@@ -13,6 +13,7 @@ from .ghg_emissions_classes import (
     Result,
     YearlyGasActivityEmissionSet,
 )
+from .ghg_inventory_class import InventoryPerGasperActivity
 
 from dataclasses import dataclass, field
 from typing import Optional
@@ -118,6 +119,10 @@ class AnnexedModule(BaseModule):
                     self.result.yearly_emissions_by_sector_by_gas.append(co2_emission_set)
                     self.result.yearly_emissions_by_sector_by_gas.append(co_emission_set)
                     self.result.yearly_emissions_by_sector_by_gas.append(ch4_emission_set)
+
+                    self.inventory.emissions_by_sector_by_gas(InventoryPerGasperActivity(GasTypes.CO2, 0,ActivityTypes.FIRE_ON_SOIL))
+                    self.inventory.emissions_by_sector_by_gas(InventoryPerGasperActivity(GasTypes.CO,  0,ActivityTypes.FIRE_ON_SOIL))
+                    self.inventory.emissions_by_sector_by_gas(InventoryPerGasperActivity(GasTypes.CH4, 0,ActivityTypes.FIRE_ON_SOIL))
 
             except Exception as e:
                 traceback.print_exc()
@@ -240,6 +245,12 @@ class AnnexedModule(BaseModule):
                 self.result.yearly_emissions_by_sector_by_gas.append(ch4_offsite_emission_set)
                 self.result.yearly_emissions_by_sector_by_gas.append(n2o_emission_set)
 
+                self.inventory.emissions_by_sector_by_gas(InventoryPerGasperActivity(GasTypes.CO2, co2_initial,ActivityTypes.DRAINAGE))
+                self.inventory.emissions_by_sector_by_gas(InventoryPerGasperActivity(GasTypes.DOC, doc_initial,ActivityTypes.DRAINAGE))
+                self.inventory.emissions_by_sector_by_gas(InventoryPerGasperActivity(GasTypes.CH4, ch4_onsite_initial, ActivityTypes.DRAINAGE))
+                self.inventory.emissions_by_sector_by_gas(InventoryPerGasperActivity(GasTypes.CH4, ch4_offsite_total, ActivityTypes.DRAINAGE))
+                self.inventory.emissions_by_sector_by_gas(InventoryPerGasperActivity(GasTypes.N2O, n2o_initial,ActivityTypes.DRAINAGE))
+
             except Exception as e:
                 traceback.print_exc()
                 raise e
@@ -302,6 +313,10 @@ class AnnexedModule(BaseModule):
                 self.result.yearly_emissions_by_sector_by_gas.append(co2_doc_emission_set_final)
                 self.result.yearly_emissions_by_sector_by_gas.append(ch4_emission_set_final)
                 self.result.yearly_emissions_by_sector_by_gas.append(n2o_emission_set_final)
+                self.inventory.emissions_by_sector_by_gas(InventoryPerGasperActivity(GasTypes.CO2, 0,ActivityTypes.REWETTING))
+                self.inventory.emissions_by_sector_by_gas(InventoryPerGasperActivity(GasTypes.CH4, 0,ActivityTypes.REWETTING))
+                self.inventory.emissions_by_sector_by_gas(InventoryPerGasperActivity(GasTypes.N2O, 0,ActivityTypes.REWETTING))
+
 
             except Exception as e:
                 traceback.print_exc()
@@ -376,6 +391,15 @@ class PeatExtraction(BaseModule):
                 self.result.yearly_emissions_by_sector_by_gas.append(drainage_peat_ch4_emission_set)
                 self.result.yearly_emissions_by_sector_by_gas.append(drainage_peat_n2o_emission_set)
 
+                inventory_co2 = InventoryPerGasperActivity(gas_type=GasTypes.CO2, emissions=co2_onsite_emissions_start + doc_offsite_emissions_start, activity=ActivityTypes.DRAINAGE_PEAT)
+                inventory_ch4 = InventoryPerGasperActivity(gas_type=GasTypes.CH4, emissions=ch4_onsite_emissions_start + ch4_offsite_emissions_start, activity=ActivityTypes.DRAINAGE_PEAT)
+                inventory_n20 = InventoryPerGasperActivity(gas_type=GasTypes.N2O, emissions=n2o_onsite_emissions_start, activity=ActivityTypes.DRAINAGE_PEAT)
+
+                self.inventory.emission_by_sector_by_gas.append(inventory_co2)
+                self.inventory.emission_by_sector_by_gas.append(inventory_ch4)
+                self.inventory.emission_by_sector_by_gas.append(inventory_n20)
+
+
             except Exception as e:
                 traceback.print_exc()
                 raise e
@@ -396,6 +420,9 @@ class PeatExtraction(BaseModule):
 
                 offsite_emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CO2, [Emission(e, GasTypes.CO2) for e in offsite_emissions_yearly], ActivityTypes.OFFSITE_PEAT, delay=self.delay)
                 self.result.yearly_emissions_by_sector_by_gas.append(offsite_emission_set)
+
+                inventory = InventoryPerGasperActivity(gas_type=GasTypes.CO2, emissions=em_start, activity=ActivityTypes.OFFSITE_PEAT)
+                self.inventory.emission_by_sector_by_gas.append(inventory)
 
                 self.peat_density_tier_2_default = mass_tonnes  # mass_tonnes should be renamed to density for more clarity
 

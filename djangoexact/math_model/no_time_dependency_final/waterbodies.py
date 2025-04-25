@@ -5,6 +5,7 @@ from .ghg_emissions_classes import YearlyGasActivityEmissionSet, Emission, GasTy
 from .generalized_modules import BaseModule
 from dataclasses import dataclass
 from typing import Optional
+from ghg_inventory_class import InventoryPerGasperActivity
 
 @dataclass
 class CoastalWaterbodies(BaseModule):
@@ -52,7 +53,8 @@ class CoastalWaterbodies(BaseModule):
 
             emission_set = YearlyGasActivityEmissionSet(0, GasTypes.CH4, [Emission(e, GasTypes.CH4) for e in self.emissions_yearly], ActivityTypes.COASTAL_WATERBODIES, delay=self.delay)
             self.result.yearly_emissions_by_sector_by_gas.append(emission_set)
-            
+            inventory = InventoryPerGasperActivity(GasTypes.CH4,yearly_emissions_start, ActivityTypes.COASTAL_WATERBODIES)
+            self.inventory.emissions_by_sector_by_gas(inventory)
         except Exception as e:
             traceback.print_exc()
             raise e
