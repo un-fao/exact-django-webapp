@@ -180,6 +180,8 @@ router.register(r"transport-entries", views.generic_module_viewset(models.Transp
 router.register(r"packaging-material-types", views.generic_viewset(models.PackagingMaterialType), basename="packagingmaterialtypes")
 router.register(r"refrigerant-types", views.generic_viewset(models.RefrigerantType), basename="refrigeranttypes")
 
+router.register(r"data-sources", views.generic_viewset(models.DataSource), basename="datasource")
+
 urlpatterns = [
     path("docs/", include_docs_urls(title="EX-ACT Docs")),
     path("health/", views.APIHealthView.as_view(), name="api-health"),
