@@ -4856,14 +4856,13 @@ def run():
         # assign_parent_fuel_types_to_fuel_types()
         # create_energy_entry_module_type()
         # add_change_public_project_flag_permission_to_admin_group()
-        add_density_zero_where_density_is_none_in_irrigation_phase_data()
-        import_fra_carbon_stock_data()
-        add_ipcc_and_fra_as_data_sources()
+        # add_density_zero_where_density_is_none_in_irrigation_phase_data()
+        # import_fra_carbon_stock_data()
+        # add_ipcc_and_fra_as_data_sources()
         pass
 
     if app_mode == "development":
         # TODO: Run in development
-        add_ipcc_and_fra_as_data_sources()
         pass
 
     if app_mode == "test":
