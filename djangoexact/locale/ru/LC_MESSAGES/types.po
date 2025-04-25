@@ -22,8 +22,7 @@ msgstr "В ожидании"
 
 #. InvitationStatusType
 msgid "accepted"
-msgstr ""
-"одобренный\n"
+msgstr "одобренный"
 
 #. InvitationStatusType
 msgid "rejected"
@@ -123,9 +122,7 @@ msgstr "Неазотфиксирующие корма"
 
 #. LandUseType
 msgid "Winter Wheat"
-msgstr ""
-"\n"
-"Озимая пшеница "
+msgstr "Озимая пшеница"
 
 #. LandUseType
 msgid "Spring Wheat"
@@ -942,8 +939,7 @@ msgstr "Разнообразные морские ракообразные"
 
 #. FishType
 msgid "Miscellaneous Marine Fishes"
-msgstr ""
-"Разнообразные морские рыбы\n"
+msgstr "Разнообразные морские рыбы"
 
 #. FishType
 msgid "Miscellaneous Marine Molluscs"

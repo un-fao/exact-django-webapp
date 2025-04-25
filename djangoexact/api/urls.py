@@ -26,7 +26,7 @@ router = routers.DefaultRouter()
 router.register(r"parameters", views.generic_viewset(models.ApplicationParameter), basename="applicationparameter")
 
 router.register(r"projects", views.ProjectViewSet, basename="project")
-router.register(r"project-attachments", views.ProjectFileAttachmentViewSet, basename="projectattachments")
+router.register(r"project-attachments", views.ProjectFileAttachmentViewSet, basename="projectattachment")
 
 project_router = nested_routers.NestedSimpleRouter(router, r"projects", lookup="project")
 project_router.register(r"tags", views.ProjectTagViewSet, basename="projecttags")
