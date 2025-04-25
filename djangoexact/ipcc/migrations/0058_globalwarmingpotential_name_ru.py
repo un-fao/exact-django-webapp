@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('ipcc', '0057_globalwarmingpotential_name_ru_fracarbonstock'),
+        ("ipcc", "0057_globalwarmingpotential_name_ru_fracarbonstock"),
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='globalwarmingpotential',
-            name='name_ru',
-            field=models.CharField(max_length=100, null=True),
-        ),
+        # migrations.AddField(
+        #     model_name='globalwarmingpotential',
+        #     name='name_ru',
+        #     field=models.CharField(max_length=100, null=True),
+        # ),
     ]
